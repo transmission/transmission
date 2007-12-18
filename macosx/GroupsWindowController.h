@@ -37,7 +37,8 @@
 }
 
 + (GroupsWindowController *) groupsController;
-- (CTGradient *) gradientForIndex: (int) index;
+
+- (NSColor *) colorForIndex: (int) index;
 
 - (int) orderValueForIndex: (int) index;
 

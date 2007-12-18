@@ -50,6 +50,8 @@
 #define PADDING_BETWEEN_PROGRESS_AND_BAR 2.0
 #define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
+
+#define WIDTH_GROUP_FADE 16.0
 #define WIDTH_GROUP 38.0
 #define WIDTH_GROUP_MIN 22.0
 
@@ -209,13 +211,23 @@
     int groupValue = [torrent groupValue];
     if (groupValue != -1)
     {
+        NSColor * color = [[[GroupsWindowController groupsController] colorForIndex: groupValue]
+                            blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
+        
         NSRect groupRect = cellFrame;
-        groupRect.size.width = minimal ? WIDTH_GROUP_MIN : WIDTH_GROUP;
+        groupRect.size.width = (minimal ? WIDTH_GROUP_MIN : WIDTH_GROUP) - WIDTH_GROUP_FADE;
         groupRect.origin.x -= 1.0;
         groupRect.size.height += 1.0;
         groupRect.origin.y -= 1.0;
         
-        [[[GroupsWindowController groupsController] gradientForIndex: groupValue] fillRect: groupRect angle: 90];
+        [color set];
+        NSRectFill(groupRect);
+        
+        groupRect.origin.x += groupRect.size.width;
+        groupRect.size.width = WIDTH_GROUP_FADE;
+        
+        CTGradient * gradient = [CTGradient gradientWithBeginningColor: color endingColor: [color colorWithAlphaComponent: 0.0]];
+        [gradient fillRect: groupRect angle: 0];
     }
     
     //error image
