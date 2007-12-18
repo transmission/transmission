@@ -92,6 +92,11 @@
 {
     if (fPortStatusTimer)
         [fPortStatusTimer invalidate];
+    if (fPortChecker)
+    {
+        [fPortChecker endProbe];
+        [fPortChecker release];
+    }
     
     [super dealloc];
 }
@@ -223,12 +228,13 @@
 - (void) setNat: (id) sender
 {
     tr_natTraversalEnable(fHandle, [fDefaults boolForKey: @"NatTraversal"]);
+    
+    fNatStatus = -1;
     [self updatePortStatus];
 }
 
 - (void) updatePortStatus
 {
-#warning look into
     tr_handle_status * stat = tr_handleStatus(fHandle);
     if (fNatStatus != stat->natTraversalStatus || fPublicPort != stat->publicPort)
     {
@@ -252,7 +258,7 @@
 - (void) portCheckerDidFinishProbing: (PortChecker *) portChecker
 {
     [fPortStatusProgress stopAnimation: self];
-    switch ([portChecker status])
+    switch ([fPortChecker status])
     {
         case PORT_STATUS_OPEN:
             [fPortStatusField setStringValue: NSLocalizedString(@"Port is open", "Preferences -> Advanced -> port status")];

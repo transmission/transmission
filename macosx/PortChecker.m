@@ -52,8 +52,8 @@
 
 - (void) dealloc
 {
-    [fPortProbeData release];
     [fConnection release];
+    [fPortProbeData release];
     [super dealloc];
 }
 
