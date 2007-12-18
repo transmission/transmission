@@ -26,6 +26,7 @@
 
 typedef enum
 {
+    PORT_STATUS_CHECKING,
     PORT_STATUS_OPEN,
     PORT_STATUS_CLOSED,
     PORT_STATUS_ERROR
@@ -40,8 +41,7 @@ typedef enum
     NSMutableData   * fPortProbeData;
 }
 
-- (id) initWithDelegate: (id) delegate;
-- (void) probePort: (int) portNumber;
+- (id) initForPort: (int) portNumber withDelegate: (id) delegate;
 - (void) endProbe;
 
 - (void) callBackWithStatus: (port_status_t) status;

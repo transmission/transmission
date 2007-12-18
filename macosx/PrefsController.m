@@ -245,8 +245,7 @@
             [fPortChecker endProbe];
             [fPortChecker release];
         }
-        fPortChecker = [[PortChecker alloc] initWithDelegate: self];
-        [fPortChecker probePort: fPublicPort];
+        fPortChecker = [[PortChecker alloc] initForPort: fPublicPort withDelegate: self];
     }
 }
 

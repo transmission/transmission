@@ -27,11 +27,24 @@
 
 @implementation PortChecker
 
-- (id) initWithDelegate: (id) delegate
+- (id) initForPort: (int) portNumber withDelegate: (id) delegate
 {
     if ((self = [super init]))
     {
-        fDelegate = delegate;
+        NSURLRequest * portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString:
+                [NSString stringWithFormat: @"http://transmission.m0k.org/PortCheck.php?port=%d", portNumber]] cachePolicy:
+                [NSApp isOnLeopardOrBetter] ? NSURLRequestReloadIgnoringLocalAndRemoteCacheData : NSURLRequestReloadIgnoringCacheData
+                timeoutInterval: 15.0];
+        
+        fStatus = PORT_STATUS_CHECKING;
+        
+        if ((fConnection = [[NSURLConnection alloc] initWithRequest: portProbeRequest delegate: self]))
+            fPortProbeData = [[NSMutableData data] retain];
+        else
+        {
+            NSLog(@"Unable to get port status: failed to initiate connection");
+            [self callBackWithStatus: PORT_STATUS_ERROR];
+        }
     }
     
     return self;
@@ -47,23 +60,6 @@
 - (port_status_t) status
 {
     return fStatus;
-}
-
-- (void) probePort: (int) portNumber
-{
-    NSURLRequest * portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString:
-                [NSString stringWithFormat: @"http://transmission.m0k.org/PortCheck.php?port=%d", portNumber]] cachePolicy:
-                [NSApp isOnLeopardOrBetter] ? NSURLRequestReloadIgnoringLocalAndRemoteCacheData : NSURLRequestReloadIgnoringCacheData
-                timeoutInterval: 15.0];
-    
-    
-    if ((fConnection = [[NSURLConnection alloc] initWithRequest: portProbeRequest delegate: self]))
-        fPortProbeData = [[NSMutableData data] retain];
-    else
-    {
-        NSLog(@"Unable to get port status: failed to initiate connection");
-        [self callBackWithStatus: PORT_STATUS_ERROR];
-    }
 }
 
 - (void) endProbe
@@ -110,7 +106,6 @@
         status = PORT_STATUS_ERROR;
     
     [self callBackWithStatus: status];
-    
     [probeString release];
 }
 
