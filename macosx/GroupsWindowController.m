@@ -377,7 +377,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 
 - (CTGradient *) gradientForColor: (NSColor *) color
 {
-    return [CTGradient gradientWithBeginningColor: [color blendedColorWithFraction: 0.7 ofColor: [NSColor whiteColor]]
+    return [CTGradient gradientWithBeginningColor: [color blendedColorWithFraction: 0.65 ofColor: [NSColor whiteColor]]
             endingColor: [color blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]]];
 }
 

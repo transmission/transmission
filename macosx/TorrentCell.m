@@ -213,7 +213,7 @@
     int groupValue = [torrent groupValue];
     if (groupValue != -1)
         [[[GroupsWindowController groupsController] gradientForIndex: groupValue] fillBezierPath:
-            [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(iconRect, -2.0, -2.0) radius: 6.0] angle: 90.0];
+            [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(iconRect, -2.0, minimal ? -3.0 : -2.0) radius: 6.0] angle: 90.0];
     
     //error image
     BOOL error = [torrent isError];
