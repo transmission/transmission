@@ -50,6 +50,8 @@
 #define PADDING_BETWEEN_PROGRESS_AND_BAR 2.0
 #define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
+#define WIDTH_GROUP 38.0
+#define WIDTH_GROUP_MIN 22.0
 
 #define MAX_PIECES 324
 #define BLANK_PIECE -99
@@ -208,12 +210,12 @@
     if (groupValue != -1)
     {
         NSRect groupRect = cellFrame;
-        groupRect.size.width = 38.0;
+        groupRect.size.width = minimal ? WIDTH_GROUP_MIN : WIDTH_GROUP;
         groupRect.origin.x -= 1.0;
         groupRect.size.height += 1.0;
         groupRect.origin.y -= 1.0;
         
-        [[[GroupsWindowController groupsController] gradientForIndex: groupValue] fillRect: groupRect angle: 270];
+        [[[GroupsWindowController groupsController] gradientForIndex: groupValue] fillRect: groupRect angle: 90];
     }
     
     //error image

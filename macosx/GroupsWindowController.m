@@ -348,7 +348,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         NSImage * icon = [[NSImage alloc] initWithSize: NSMakeSize(16.0, 16.0)];
         
         [icon lockFocus];
-        [[self gradientForColor: [dict objectForKey: @"Color"]] fillBezierPath: bp angle: 90];
+        [[self gradientForColor: [dict objectForKey: @"Color"]] fillBezierPath: bp angle: 270.0];
         [icon unlockFocus];
         
         [item setImage: icon];
@@ -374,8 +374,8 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 
 - (CTGradient *) gradientForColor: (NSColor *) color
 {
-    return [CTGradient gradientWithBeginningColor: [color blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]]
-            endingColor: [color blendedColorWithFraction: 0.7 ofColor: [NSColor whiteColor]]];
+    return [CTGradient gradientWithBeginningColor: [color blendedColorWithFraction: 0.7 ofColor: [NSColor whiteColor]]
+            endingColor: [color blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]]];
 }
 
 - (void) changeColor: (id) sender
