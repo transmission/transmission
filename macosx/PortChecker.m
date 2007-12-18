@@ -102,9 +102,9 @@
     NSString * probeString = [[NSString alloc] initWithData: fPortProbeData encoding: NSASCIIStringEncoding];
     
     port_status_t status;
-    if ([probeString isEqualToString: @"0"])
+    if ([probeString isEqualToString: @"1"])
         status = PORT_STATUS_OPEN;
-    else if ([probeString isEqualToString: @"1"])
+    else if ([probeString isEqualToString: @"0"])
         status = PORT_STATUS_CLOSED;
     else
         status = PORT_STATUS_ERROR;
