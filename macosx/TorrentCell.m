@@ -77,7 +77,7 @@
 
 @implementation TorrentCell
 
-//only called one, so don't worry about release
+//only called once, so don't worry about releasing
 - (id) init
 {
     if ((self = [super init]))
@@ -227,7 +227,7 @@
         groupRect.size.width = WIDTH_GROUP_FADE;
         
         CTGradient * gradient = [CTGradient gradientWithBeginningColor: color endingColor: [color colorWithAlphaComponent: 0.0]];
-        [gradient fillRect: groupRect angle: 0];
+        [gradient fillRect: groupRect angle: 0.0];
     }
     
     //error image
