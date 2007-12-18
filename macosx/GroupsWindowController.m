@@ -40,7 +40,7 @@ typedef enum
 
 - (void) saveGroups;
 
-- (CTGradient *) gradientForPreviewColor: (NSColor *) color;
+- (CTGradient *) gradientForColor: (NSColor *) color;
 - (void) changeColor: (id) sender;
 
 @end
@@ -133,7 +133,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     [super dealloc];
 }
 
-- (NSColor *) colorForIndex: (int) index
+- (CTGradient *) gradientForIndex: (int) index
 {
     if (index < 0)
         return nil;
@@ -142,7 +142,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     NSDictionary * dict;
     while ((dict = [enumerator nextObject]))
         if ([[dict objectForKey: @"Index"] intValue] == index)
-            return [dict objectForKey: @"Color"];
+            return [self gradientForColor: [dict objectForKey: @"Color"]];
     
     return nil;
 }
@@ -168,7 +168,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 {
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Color"])
-        return [self gradientForPreviewColor: [[fGroups objectAtIndex: row] objectForKey: @"Color"]];
+        return [self gradientForColor: [[fGroups objectAtIndex: row] objectForKey: @"Color"]];
     else
         return [[fGroups objectAtIndex: row] objectForKey: @"Name"];
 }
@@ -351,7 +351,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         NSImage * icon = [[NSImage alloc] initWithSize: [bp bounds].size];
         
         [icon lockFocus];
-        [[self gradientForPreviewColor: [dict objectForKey: @"Color"]] fillBezierPath: bp angle: 270.0];
+        [[self gradientForColor: [dict objectForKey: @"Color"]] fillBezierPath: bp angle: 270.0];
         [icon unlockFocus];
         
         [item setImage: icon];
@@ -375,7 +375,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     [[NSUserDefaults standardUserDefaults] setObject: [NSArchiver archivedDataWithRootObject: fGroups] forKey: @"Groups"];
 }
 
-- (CTGradient *) gradientForPreviewColor: (NSColor *) color
+- (CTGradient *) gradientForColor: (NSColor *) color
 {
     return [CTGradient gradientWithBeginningColor: [color blendedColorWithFraction: 0.7 ofColor: [NSColor whiteColor]]
             endingColor: [color blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]]];

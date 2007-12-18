@@ -207,20 +207,13 @@
     
     BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
+    //group coloring
+    NSRect iconRect = [self iconRectForBounds: cellFrame];
+    
     int groupValue = [torrent groupValue];
     if (groupValue != -1)
-    {
-        NSRect groupRect = cellFrame;
-        groupRect.size.width = minimal ? WIDTH_GROUP_MIN : WIDTH_GROUP;
-        groupRect.origin.x -= 1.0;
-        groupRect.size.height += 1.0;
-        groupRect.origin.y -= 1.0;
-        
-        NSColor * color = [[[GroupsWindowController groupsController] colorForIndex: groupValue]
-                            blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
-        CTGradient * gradient = [CTGradient gradientWithBeginningColor: color endingColor: [color colorWithAlphaComponent: 0.0]];
-        [gradient fillRect: groupRect angle: 0.0];
-    }
+        [[[GroupsWindowController groupsController] gradientForIndex: groupValue] fillBezierPath:
+            [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(iconRect, -2.0, -2.0) radius: 6.0] angle: 90.0];
     
     //error image
     BOOL error = [torrent isError];
@@ -232,7 +225,6 @@
     
     //icon
     NSImage * icon = minimal && error ? fErrorImage : [torrent icon];
-    NSRect iconRect = [self iconRectForBounds: cellFrame];
     [icon drawInRect: iconRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     
     if (error && !minimal)
