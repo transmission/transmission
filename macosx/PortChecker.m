@@ -31,15 +31,17 @@
 {
     if ((self = [super init]))
     {
+        fDelegate = delegate;
+        
         NSURLRequest * portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString:
                 [NSString stringWithFormat: @"http://transmission.m0k.org/PortCheck.php?port=%d", portNumber]] cachePolicy:
-                [NSApp isOnLeopardOrBetter] ? NSURLRequestReloadIgnoringLocalAndRemoteCacheData : NSURLRequestReloadIgnoringCacheData
+                [NSApp isOnLeopardOrBetter] ? NSURLRequestReloadIgnoringLocalCacheData : NSURLRequestReloadIgnoringCacheData
                 timeoutInterval: 15.0];
         
         fStatus = PORT_STATUS_CHECKING;
         
         if ((fConnection = [[NSURLConnection alloc] initWithRequest: portProbeRequest delegate: self]))
-            fPortProbeData = [[NSMutableData data] retain];
+            fPortProbeData = [[NSMutableData alloc] init];
         else
         {
             NSLog(@"Unable to get port status: failed to initiate connection");
