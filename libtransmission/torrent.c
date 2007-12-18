@@ -790,9 +790,9 @@ tr_torrentStat( tr_torrent * tor )
 
         for( i=0; i<tor->info.pieceCount; ++i ) {
             if( !tor->info.pieces[i].dnd ) {
-                s->desiredSize += tor->info.pieceSize;
+                s->desiredSize += tr_torPieceCountBytes( tor, i );
                 if( tr_bitfieldHas( available, i ) )
-                    s->desiredAvailable += tor->info.pieceSize;
+                    s->desiredAvailable += tr_torPieceCountBytes( tor, i );
             }
         }
 
