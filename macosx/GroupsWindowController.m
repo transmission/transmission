@@ -118,6 +118,11 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     
     if ([NSApp isOnLeopardOrBetter])
         [[self window] setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
+    else
+    {
+        [fAddRemoveControl setLabel: @"+" forSegment: 0];
+        [fAddRemoveControl setLabel: @"-" forSegment: 1];
+    }
     
     [fAddRemoveControl setEnabled: NO forSegment: REMOVE_TAG];
 }
