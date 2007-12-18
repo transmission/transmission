@@ -33,7 +33,7 @@
     IBOutlet NSTableView * fTableView;
     IBOutlet NSSegmentedControl * fAddRemoveControl;
     
-    NSMutableDictionary * fCurrentColorDict, * fGroupGradients;
+    NSMutableDictionary * fCurrentColorDict;
 }
 
 + (GroupsWindowController *) groupsController;

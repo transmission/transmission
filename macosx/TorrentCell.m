@@ -51,9 +51,6 @@
 #define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
 
-#define GROUP_BORDER_X 4.0
-#define GROUP_BORDER_Y 1.0
-
 #define MAX_PIECES 324
 #define BLANK_PIECE -99
 
@@ -199,13 +196,25 @@
     return NSCellHitContentArea;
 }
 
-- (void) drawInteriorWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
+- (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
-    [super drawInteriorWithFrame: cellFrame inView: controlView];
+    [super drawWithFrame: cellFrame inView: controlView];
     
     Torrent * torrent = [self representedObject];
     
     BOOL minimal = [fDefaults boolForKey: @"SmallView"];
+    
+    int groupValue = [torrent groupValue];
+    if (groupValue != -1)
+    {
+        NSRect groupRect = cellFrame;
+        groupRect.size.width = 38.0;
+        groupRect.origin.x -= 1.0;
+        groupRect.size.height += 1.0;
+        groupRect.origin.y -= 1.0;
+        
+        [[[GroupsWindowController groupsController] gradientForIndex: groupValue] fillRect: groupRect angle: 270];
+    }
     
     //error image
     BOOL error = [torrent isError];
@@ -228,12 +237,20 @@
     }
     
     //text color
+    NSColor * titleColor, * statusColor;
     BOOL selected = [NSApp isOnLeopardOrBetter] ? [self backgroundStyle] == NSBackgroundStyleDark : [self isHighlighted]
                     && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]];
-    int groupIndex = [torrent groupValue];
-    
-    NSColor * titleColor = selected && groupIndex == -1 ? [NSColor whiteColor] : [NSColor controlTextColor],
-            * statusColor = selected ? [NSColor whiteColor] : [NSColor darkGrayColor];
+    if ([NSApp isOnLeopardOrBetter] ? [self backgroundStyle] == NSBackgroundStyleDark : [self isHighlighted]
+        && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]])
+    {
+        titleColor = [NSColor whiteColor];
+        statusColor = [NSColor whiteColor];
+    }
+    else
+    {
+        titleColor = [NSColor controlTextColor];
+        statusColor = [NSColor darkGrayColor];
+    }
     
     //minimal status
     NSRect minimalStatusRect;
@@ -250,11 +267,6 @@
     //title
     NSAttributedString * titleString = [self attributedTitleWithColor: titleColor];
     NSRect titleRect = [self rectForTitleWithString: titleString basedOnMinimalStatusRect: minimalStatusRect inBounds: cellFrame];
-    
-    if (groupIndex != -1)
-        [[[GroupsWindowController groupsController] gradientForIndex: [torrent groupValue]] fillBezierPath:
-            [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(titleRect, -GROUP_BORDER_X, -GROUP_BORDER_Y) radius: 7.0] angle: 90];
-    
     [titleString drawInRect: titleRect];
     
     //progress
@@ -560,7 +572,6 @@
     
     result.size = [string size];
     result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL
-                            - ([[self representedObject] groupValue] != -1 ? GROUP_BORDER_X : 0)
                             - (minimal ? PADDING_BETWEEN_TITLE_AND_MIN_STATUS + statusRect.size.width : 0));
     
     return result;
