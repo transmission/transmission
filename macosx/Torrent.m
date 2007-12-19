@@ -1202,7 +1202,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return [[GroupsWindowController groupsController] orderValueForIndex: fGroupValue];
 }
 
-- (void) checkGroupValue: (NSNotification *) notification
+- (void) checkGroupValueForRemoval: (NSNotification *) notification
 {
     if (fGroupValue != -1 && [[[notification userInfo] objectForKey: @"Indexes"] containsIndex: fGroupValue])
         fGroupValue = -1;
@@ -1518,7 +1518,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     [self createFileList];
     
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValue:)
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValueForRemoval:)
         name: @"GroupValueRemoved" object: nil];
     
     [self update];

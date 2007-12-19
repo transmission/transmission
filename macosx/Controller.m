@@ -291,7 +291,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [fPauseFilterButton setFrame: pauseRect];
     }
     
-    [self updateGroupFilterButton];
+    [self updateGroupsFilterButton];
     
     //set up filter bar
     NSView * contentView = [fWindow contentView];
@@ -449,6 +449,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //open newly created torrent file
     [nc addObserver: self selector: @selector(openCreatedFile:)
                     name: @"OpenCreatedTorrentFile" object: nil];
+    
+    //update when groups change
+    [nc addObserver: self selector: @selector(updateGroupsFilters:)
+                    name: @"UpdateGroups" object: nil];
 
     //timer to update the interface every second
     [self updateUI];
@@ -2105,11 +2109,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) setGroupFilter: (id) sender
 {
     [fDefaults setInteger: [sender tag] forKey: @"FilterGroup"];
-    [self updateGroupFilterButton];
+    [self updateGroupsFilterButton];
     [self applyFilter: nil];
 }
 
-- (void) updateGroupFilterButton
+- (void) updateGroupsFilterButton
 {
     int index = [fDefaults integerForKey: @"FilterGroup"];
     
@@ -2134,6 +2138,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                         [[GroupsWindowController groupsController] nameForIndex: index]];
     }
     [fGroupsButton setToolTip: toolTip];
+}
+
+- (void) updateGroupsFilters: (NSNotification *) notification
+{
+    [self updateGroupsFilterButton];
+    [self applyFilter: nil];
 }
 
 - (void) toggleSpeedLimit: (id) sender

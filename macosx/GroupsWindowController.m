@@ -192,6 +192,8 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     {
         [[fGroups objectAtIndex: row] setObject: object forKey: @"Name"];
         [self saveGroups];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
     }
     else if ([identifier isEqualToString: @"Button"])
     {
@@ -273,7 +275,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         
         [fTableView reloadData];
         
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
     }
     
     return YES;
@@ -330,13 +332,17 @@ GroupsWindowController * fGroupsWindowInstance = nil;
             
             [[NSNotificationCenter defaultCenter] postNotificationName: @"GroupValueRemoved" object: self userInfo:
                 [NSDictionary dictionaryWithObject: indexes forKey: @"Indexes"]];
+            
+            if ([indexes containsIndex: [[NSUserDefaults standardUserDefaults] integerForKey: @"FilterGroup"]])
+                [[NSUserDefaults standardUserDefaults] setInteger: -2 forKey: @"FilterGroup"];
+            
             break;
         
         default:
             return;
     }
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
     [self saveGroups];
 }
 
@@ -390,7 +396,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     [fTableView reloadData];
     
     [self saveGroups];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
 }
 
 - (NSImage *) imageForGroup: (NSDictionary *) dict isSmall: (BOOL) small

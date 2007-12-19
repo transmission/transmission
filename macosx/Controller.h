@@ -195,7 +195,8 @@
 - (void) showGroups: (id) sender;
 - (void) setGroup: (id) sender;
 - (void) setGroupFilter: (id) sender;
-- (void) updateGroupFilterButton;
+- (void) updateGroupsFilterButton;
+- (void) updateGroupsFilters: (NSNotification *) notification;
 
 - (void) toggleSpeedLimit: (id) sender;
 - (void) autoSpeedLimitChange: (NSNotification *) notification;
