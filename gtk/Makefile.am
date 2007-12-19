@@ -20,8 +20,8 @@ noinst_HEADERS = \
     makemeta-ui.h \
     msgwin.h \
     stats.h \
+    torrent-cell-renderer.h \
     torrent-inspector.h \
-    tr_cell_renderer_progress.h \
     tr_core.h \
     tr_icon.h \
     tr_prefs.h \
@@ -43,8 +43,8 @@ transmission_SOURCES = \
     makemeta-ui.c \
     msgwin.c \
     stats.c \
+    torrent-cell-renderer.c \
     torrent-inspector.c \
-    tr_cell_renderer_progress.c \
     tr_core.c \
     tr_icon.c \
     tr_prefs.c \

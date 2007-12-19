@@ -43,7 +43,6 @@
 #include "msgwin.h"
 #include "stats.h"
 #include "torrent-inspector.h"
-#include "tr_cell_renderer_progress.h"
 #include "tr_core.h"
 #include "tr_icon.h"
 #include "tr_prefs.h"
@@ -169,10 +168,13 @@ accumulateStatusForeach (GtkTreeModel * model,
 {
     int status = 0;
     struct counts_data * counts = user_data;
+    tr_torrent * tor;
 
     ++counts->totalCount;
 
-    gtk_tree_model_get( model, iter, MC_STAT, &status, -1 );
+    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
+    status = tr_torrentStat( tor )->status;
+
     if( TR_STATUS_IS_ACTIVE( status ) )
         ++counts->activeCount;
     else
@@ -247,6 +249,8 @@ main( int argc, char ** argv )
     /* initialize gtk */
     g_thread_init( NULL );
     gtk_init_with_args( &argc, &argv, _("[torrent files]"), entries, domain, NULL );
+    didinit = cf_init( tr_getPrefsDirectory(), NULL ); /* must come before actions_init */
+    tr_prefs_init_global( );
     myUIManager = gtk_ui_manager_new ();
     actions_init ( myUIManager, cbdata );
     gtk_ui_manager_add_ui_from_string (myUIManager, fallback_ui_file, -1, NULL);
@@ -254,7 +258,6 @@ main( int argc, char ** argv )
     gtk_window_set_default_icon_name ( "transmission-logo" );
 
     argfiles = checkfilenames( argc-1, argv+1 );
-    didinit = cf_init( tr_getPrefsDirectory(), NULL );
     didlock = didinit && sendremote( argfiles, sendquit );
     setupsighandlers( ); /* set up handlers for fatal signals */
 
@@ -263,8 +266,6 @@ main( int argc, char ** argv )
     {
         /* create main window now to be a parent to any error dialogs */
         GtkWindow * mainwind = GTK_WINDOW( tr_window_new( myUIManager ) );
-
-        tr_prefs_init_global( );
 
         /* set message level here before tr_init() */
         msgwin_loadpref( );
@@ -665,7 +666,9 @@ initializeFromPrefs( struct cbdata * cbdata )
         PREF_KEY_NAT,
         PREF_KEY_PEX,
         PREF_KEY_SYSTRAY,
-        PREF_KEY_SORT_COLUMN,
+        PREF_KEY_SORT_MODE,
+        PREF_KEY_SORT_REVERSED,
+        PREF_KEY_MINIMAL_VIEW,
         PREF_KEY_ENCRYPTED_ONLY
     };
 
@@ -727,14 +730,19 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
             cbdata->icon = NULL;
         }
     }
-    else if( !strcmp( key, PREF_KEY_SORT_COLUMN ) )
+    else if( !strcmp( key, PREF_KEY_SORT_MODE ) || !strcmp( key, PREF_KEY_SORT_REVERSED ) )
     {
-        tr_core_set_sort_column_from_prefs( cbdata->core );
+        tr_core_resort( cbdata->core );
     }
     else if( !strcmp( key, PREF_KEY_PEX ) )
     {
         gboolean enabled = pref_flag_get( key );
         tr_torrentIterate( tr, setpex, &enabled );
+    }
+    else if( !strcmp( key, PREF_KEY_MINIMAL_VIEW ) )
+    {
+        const gboolean enabled = pref_flag_get( key );
+        g_message( "minimal view: %d", enabled );
     }
 }
 
@@ -1015,6 +1023,23 @@ doAction ( const char * action_name, gpointer user_data )
             gtk_widget_hide (w);
         else
             gtk_window_present (GTK_WINDOW(w));
+    }
+    else if( !strcmp( action_name, "sort-by-activity" )
+         ||  !strcmp( action_name, "sort-by-date-added" )
+         ||  !strcmp( action_name, "sort-by-name" )
+         ||  !strcmp( action_name, "sort-by-progress" )
+         ||  !strcmp( action_name, "sort-by-state" )
+         ||  !strcmp( action_name, "sort-by-tracker" ) )
+    {
+        tr_core_set_pref( data->core, PREF_KEY_SORT_MODE, action_name );
+    }
+    else if( !strcmp( action_name, "reverse-sort-order" ) )
+    {
+        tr_core_toggle_pref_bool( data->core, PREF_KEY_SORT_REVERSED );
+    }
+    else if( !strcmp( action_name, "minimal-view" ) )
+    {
+        tr_core_toggle_pref_bool( data->core, PREF_KEY_MINIMAL_VIEW );
     }
     else g_error ("Unhandled action: %s", action_name );
 

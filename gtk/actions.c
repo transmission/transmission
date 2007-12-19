@@ -14,7 +14,9 @@
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 #include <libtransmission/transmission.h>
+#include "conf.h"
 #include "torrent-inspector.h"
+#include "tr_prefs.h"
 #include "lock.h"
 #include "logo.h"
 
@@ -53,6 +55,24 @@ priority_changed_cb (GtkAction *action UNUSED, GtkRadioAction *current)
   set_selected_file_priority ( priority );
 }
 
+static GtkRadioActionEntry sort_radio_entries[] =
+{
+  { "sort-by-activity",   NULL, N_("Sort by _Activity"),   NULL, NULL, 0 },
+  { "sort-by-date-added", NULL, N_("Sort by _Date Added"), NULL, NULL, 1 },
+  { "sort-by-name",       NULL, N_("Sort by _Name"),       NULL, NULL, 2 },
+  { "sort-by-progress",   NULL, N_("Sort by _Progress"),   NULL, NULL, 3 },
+  { "sort-by-state",      NULL, N_("Sort by _State"),      NULL, NULL, 4 },
+  { "sort-by-tracker",    NULL, N_("Sort by _Tracker"),    NULL, NULL, 5 }
+};
+
+static void
+sort_changed_cb( GtkAction * action UNUSED, GtkRadioAction * current, gpointer user_data )
+{
+  const int i = gtk_radio_action_get_current_value( current );
+  const char * name = sort_radio_entries[i].name;
+  doAction ( name, user_data );
+}
+
 static GtkToggleActionEntry show_toggle_entries[] = 
 {
   { "toggle-main-window", NULL, 
@@ -61,9 +81,19 @@ static GtkToggleActionEntry show_toggle_entries[] =
     N_("Show Message _Log"), NULL, NULL, G_CALLBACK(action_cb), FALSE }
 };
 
+static GtkToggleActionEntry persistent_toggle_entries[] =
+{
+  { "minimal-view", NULL,
+    N_("_Minimal View"), "<control>M", NULL, G_CALLBACK(action_cb), FALSE },
+  { "reverse-sort-order", NULL,
+    N_("_Reverse Sort Order"), NULL, NULL, G_CALLBACK(action_cb), FALSE }
+};
+
 static GtkActionEntry entries[] =
 {
   { "torrent-menu", NULL, N_("_Torrent"), NULL, NULL, NULL },
+  { "view-menu", NULL, N_("_View"), NULL, NULL, NULL },
+  { "sort-menu", NULL, N_("_Sort Torrents By"), NULL, NULL, NULL },
   { "edit-menu", NULL, N_("_Edit"), NULL, NULL, NULL },
   { "help-menu", NULL, N_("_Help"), NULL, NULL, NULL },
   { "priority-menu", NULL, N_("_Priority"), NULL, NULL, NULL },
@@ -160,7 +190,9 @@ static GtkUIManager * myUIManager = NULL;
 void
 actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
 {
-  int i;
+  int i, n;
+  int active;
+  char * match;
   const int n_entries = G_N_ELEMENTS( entries );
   GtkActionGroup * action_group;
 
@@ -180,10 +212,34 @@ actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
                                       TR_PRI_NORMAL,
                                       G_CALLBACK(priority_changed_cb), NULL);
 
-  gtk_action_group_add_toggle_actions ( action_group, 
-					show_toggle_entries, 
-					G_N_ELEMENTS(show_toggle_entries), 
-					callback_user_data );
+
+  match = pref_string_get( PREF_KEY_SORT_MODE );
+  for( i=0, n=G_N_ELEMENTS(sort_radio_entries), active=-1; active==-1 && i<n; ++i ) {
+      if( !strcmp( sort_radio_entries[i].name, match ) ) {
+          g_message( "found %s in index %d", match, i );
+          active = i;
+      }
+  }
+
+  gtk_action_group_add_radio_actions( action_group,
+                                      sort_radio_entries,
+                                      G_N_ELEMENTS(sort_radio_entries),
+                                      active,
+                                      G_CALLBACK(sort_changed_cb),
+                                      callback_user_data );
+
+  gtk_action_group_add_toggle_actions( action_group, 
+                                       show_toggle_entries, 
+                                       G_N_ELEMENTS(show_toggle_entries), 
+                                       callback_user_data );
+
+  for( i=0, n=G_N_ELEMENTS(persistent_toggle_entries); i<n; ++i )
+    persistent_toggle_entries[i].is_active = pref_flag_get( persistent_toggle_entries[i].name );
+
+  gtk_action_group_add_toggle_actions( action_group, 
+                                       persistent_toggle_entries, 
+                                       G_N_ELEMENTS(persistent_toggle_entries), 
+                                       callback_user_data );
 
   gtk_action_group_add_actions( action_group,
                                 entries, n_entries,

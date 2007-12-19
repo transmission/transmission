@@ -35,7 +35,6 @@
 #include "conf.h"
 #include "dialogs.h"
 #include "hig.h"
-#include "tr_cell_renderer_progress.h"
 #include "tr_core.h"
 #include "tr_icon.h"
 #include "tr_prefs.h"

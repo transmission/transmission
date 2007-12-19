@@ -50,8 +50,6 @@ struct _TrTorrent {
   GObject parent;
   tr_torrent *handle;
   char *delfile;
-  tr_stat stat;
-  time_t lastStatTime;
 
   /* FIXME: hm, are these heavyweight enough to deserve their own properties? */
   gboolean severed;

@@ -35,7 +35,9 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_ASKQUIT           "prompt-before-exit"
 #define PREF_KEY_ENCRYPTED_ONLY    "encrypted-connections-only"
 #define PREF_KEY_MSGLEVEL          "debug-message-level"
-#define PREF_KEY_SORT_COLUMN       "sort-column"
+#define PREF_KEY_SORT_MODE         "sort-mode"
+#define PREF_KEY_SORT_REVERSED     "sort-reversed"
+#define PREF_KEY_MINIMAL_VIEW      "minimal-view"
 
 void tr_prefs_init_global( void );
 

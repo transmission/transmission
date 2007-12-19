@@ -50,7 +50,9 @@ tr_prefs_init_global( void )
 
     pref_int_set_default    ( PREF_KEY_MSGLEVEL, TR_MSG_INF );
 
-    pref_string_set_default ( PREF_KEY_SORT_COLUMN, "name" );
+    pref_string_set_default ( PREF_KEY_SORT_MODE, "sort-by-name" );
+    pref_flag_set_default   ( PREF_KEY_SORT_REVERSED, FALSE );
+    pref_flag_set_default   ( PREF_KEY_MINIMAL_VIEW, FALSE );
 
     pref_save( NULL );
 }
@@ -219,7 +221,7 @@ test_port( gpointer l )
     g_usleep( G_USEC_PER_SEC * 3 ); /* give portmapping time to kick in */
     snprintf( url, sizeof(url), "http://transmission.m0k.org/PortCheck.php?port=%d", port );
     text = miniwget( url, &size );
-    g_message(" got len %d, [%*.*s]", size, size, size, text );
+    /*g_message(" got len %d, [%*.*s]", size, size, size, text );*/
     isOpen = text && *text=='1';
     gtk_label_set_markup( GTK_LABEL(l), isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>") );
 

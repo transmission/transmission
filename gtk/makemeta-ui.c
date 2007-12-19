@@ -173,8 +173,8 @@ static void
 file_selection_changed_cb( GtkFileChooser *chooser, gpointer user_data )
 {
     MakeMetaUI * ui = (MakeMetaUI *) user_data;
-    char * pch;
     char * filename;
+    char sizeStr[128];
     char buf[512];
     uint64_t totalSize=0;
     int fileCount=0, pieceCount=0, pieceSize=0;
@@ -194,20 +194,18 @@ file_selection_changed_cb( GtkFileChooser *chooser, gpointer user_data )
         pieceSize = ui->builder->pieceSize;
     }
 
-    pch = readablesize( totalSize );
+    tr_strlsize( sizeStr, totalSize, sizeof(sizeStr) );
     g_snprintf( buf, sizeof(buf), "<i>%s; %d %s</i>",
-                pch, fileCount,
+                sizeStr, fileCount,
                 ngettext("File", "Files", fileCount) );
     gtk_label_set_markup ( GTK_LABEL(ui->size_lb), buf );
-    g_free( pch );
 
-    pch = readablesize( pieceSize );
+    tr_strlsize( sizeStr, pieceSize, sizeof(sizeStr) );
     g_snprintf( buf, sizeof(buf), "<i>%d %s @ %s</i>",
                 pieceCount,
                 ngettext("Piece", "Pieces", pieceCount),
-                pch );
+                sizeStr );
     gtk_label_set_markup ( GTK_LABEL(ui->pieces_lb), buf );
-    g_free( pch );
 }
 
 static void

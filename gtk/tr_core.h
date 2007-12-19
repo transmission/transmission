@@ -162,6 +162,8 @@ tr_core_quit( TrCore * self );
 void
 tr_core_set_pref( TrCore * self, const char * key, const char * val );
 
+gboolean
+tr_core_toggle_pref_bool( TrCore * core, const char * key );
 /* Set a boolean preference value, save the prefs file, and emit the
    "prefs-changed" signal */
 void
@@ -173,16 +175,19 @@ void
 tr_core_set_pref_int( TrCore * self, const char * key, int val );
 
 void
-tr_core_set_sort_column_from_prefs( TrCore * core );
+tr_core_resort( TrCore * core );
 
 /* column names for the model used to store torrent information */
 /* keep this in sync with the type array in tr_core_init() in tr_core.c */
-enum {
-  MC_NAME, MC_SIZE, MC_HASH, MC_STAT, MC_ERR, MC_TERR,
-  MC_PROG_C, MC_PROG_D, MC_DRATE, MC_URATE, MC_ETA, MC_PEERS,
-  MC_UPEERS, MC_DPEERS, MC_SEED, MC_LEECH, MC_DONE,
-  MC_DOWN, MC_UP, MC_RATIO, MC_LEFT, MC_TORRENT, MC_ID,
-  MC_ROW_COUNT
+enum
+{
+    MC_NAME,
+    MC_NAME_COLLATED,
+    MC_HASH,
+    MC_TORRENT,
+    MC_TORRENT_RAW,
+    MC_ID,
+    MC_ROW_COUNT
 };
 
 #endif

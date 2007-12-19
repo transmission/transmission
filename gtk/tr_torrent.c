@@ -45,7 +45,6 @@ tr_torrent_init(GTypeInstance *instance, gpointer g_class UNUSED )
 #endif
 
   self->handle = NULL;
-  self->lastStatTime = 0;
   self->delfile = NULL;
   self->severed = FALSE;
   self->disposed = FALSE;
@@ -130,9 +129,6 @@ tr_torrent_handle(TrTorrent *tor)
 static tr_stat*
 refreshStat( TrTorrent * tor )
 {
-    tor->lastStatTime= time( NULL );
-    tor->stat = *tr_torrentStat( tor->handle );
-    return &tor->stat;
 }
 
 const tr_stat *
@@ -140,10 +136,7 @@ tr_torrent_stat(TrTorrent *tor)
 {
     g_assert( TR_IS_TORRENT(tor) );
 
-    if( !tor->severed && tor->lastStatTime!=time(NULL) )
-        refreshStat( tor );
-
-    return &tor->stat;
+    return tor->severed ? NULL : tr_torrentStat( tor->handle );
 }
 
 const tr_info *

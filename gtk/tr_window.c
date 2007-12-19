@@ -31,7 +31,7 @@
 
 #include "actions.h"
 #include "hig.h"
-#include "tr_cell_renderer_progress.h"
+#include "torrent-cell-renderer.h"
 #include "tr_core.h"
 #include "tr_torrent.h"
 #include "tr_window.h"
@@ -45,7 +45,6 @@ typedef struct
     GtkWidget * ul_lb;
     GtkWidget * dl_lb;
     GtkTreeSelection * selection;
-    GtkCellRenderer * namerend;
 }
 PrivateData;
 
@@ -60,91 +59,6 @@ get_private_data( TrWindow * w )
 /***
 ****
 ***/
-
-static void
-formatname( GtkTreeViewColumn * col UNUSED, GtkCellRenderer * rend,
-            GtkTreeModel * model, GtkTreeIter * iter, gpointer data UNUSED )
-{
-    TrTorrent * gtor;
-    char  * name, * mb, * str, * top, * bottom;
-    const char * fmt;
-    guint64 size;
-    int     status, err, eta, tpeers, upeers, dpeers;
-
-    gtk_tree_model_get( model, iter, MC_NAME, &name, MC_STAT, &status,
-                        MC_ERR, &err, MC_SIZE, &size,
-                        MC_ETA, &eta, MC_PEERS, &tpeers, MC_UPEERS, &upeers,
-                        MC_DPEERS, &dpeers, MC_TORRENT, &gtor, -1 );
-
-    tpeers = MAX( tpeers, 0 );
-    upeers = MAX( upeers, 0 );
-    dpeers = MAX( dpeers, 0 );
-    mb = readablesize(size);
-
-    top = tr_torrent_status_str ( gtor );
-
-    if( TR_OK != err )
-    {
-        char * terr;
-        gtk_tree_model_get( model, iter, MC_TERR, &terr, -1 );
-        bottom = g_strconcat( _("Error"), ": ", terr, NULL );
-        g_free( terr );
-    }
-    else if( TR_STATUS_DOWNLOAD & status )
-    {
-        bottom = g_strdup_printf( ngettext( "Downloading from %i of %i connections",
-                                            "Downloading from %i of %i connections",
-                                            tpeers ), dpeers, tpeers );
-    }
-    else
-    {
-        bottom = NULL;
-    }
-
-    fmt = err==TR_OK
-        ? "<b>%s (%s)</b>\n<small>%s\n%s</small>"
-        : "<span color='red'><b>%s (%s)</b>\n<small>%s\n%s</small></span>";
-    str = g_markup_printf_escaped( fmt, name, mb, top, (bottom ? bottom : "") );
-    g_object_set( rend, "markup", str, NULL );
-    g_free( name );
-    g_free( mb );
-    g_free( str );
-    g_free( top );
-    g_free( bottom );
-    g_object_unref( gtor );
-}
-
-static void
-formatprog( GtkTreeViewColumn * col UNUSED, GtkCellRenderer * rend,
-            GtkTreeModel * model, GtkTreeIter * iter, gpointer data UNUSED )
-{
-    char  * dlstr, * ulstr, * str, * marked;
-    gfloat  prog, dl, ul, ratio;
-    guint64 down, up;
-
-    gtk_tree_model_get( model, iter, MC_PROG_D, &prog, MC_DRATE, &dl,
-                        MC_URATE, &ul, MC_DOWN, &down, MC_UP, &up, MC_RATIO, &ratio, -1 );
-    prog = MAX( prog, 0.0 );
-    prog = MIN( prog, 1.0 );
-
-    ulstr = readablespeed (ul);
-    if( 1.0 == prog )
-    {
-        dlstr = g_strdup_printf( "%.1f", ratio );
-        str = g_strdup_printf( _("Ratio: %s\nUL: %s"), dlstr, ulstr );
-    }
-    else
-    {
-        dlstr = readablespeed( dl );
-        str = g_strdup_printf( _("DL: %s\nUL: %s"), dlstr, ulstr );
-    }
-    marked = g_markup_printf_escaped( "<small>%s</small>", str );
-    g_object_set( rend, "markup", str, "progress", prog, NULL );
-    g_free( dlstr );
-    g_free( ulstr );
-    g_free( str );
-    g_free( marked );
-}
 
 static void
 on_popup_menu ( GtkWidget * self UNUSED, GdkEventButton * event )
@@ -170,36 +84,18 @@ makeview( PrivateData * p )
     GtkWidget         * view;
     GtkTreeViewColumn * col;
     GtkTreeSelection  * sel;
-    GtkCellRenderer   * namerend, * progrend;
-    char              * str;
+    GtkCellRenderer   * r;
 
     view = gtk_tree_view_new();
+    gtk_tree_view_set_headers_visible( GTK_TREE_VIEW(view), FALSE );
 
     p->selection = gtk_tree_view_get_selection( GTK_TREE_VIEW(view) );
-    namerend = gtk_cell_renderer_text_new();
-    p->namerend = namerend;
-    /* note that this renderer is set to ellipsize, just not here */
-    col = gtk_tree_view_column_new_with_attributes( _("Name"), namerend,
-                                                    NULL );
-    gtk_tree_view_column_set_cell_data_func( col, namerend, formatname,
-                                             NULL, NULL );
-    gtk_tree_view_column_set_expand( col, TRUE );
-    gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_AUTOSIZE );
-    gtk_tree_view_column_set_sort_column_id( col, MC_NAME );
-    gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
 
-    progrend = tr_cell_renderer_progress_new();
-    /* this string is only used to determine the size of the progress bar */
-    str = g_markup_printf_escaped( "<big>%s</big>", "  fnord    fnord  " );
-    g_object_set( progrend, "bar-sizing", str, NULL );
-    g_free(str);
-    col = gtk_tree_view_column_new_with_attributes( _("Progress"), progrend,
-                                                    NULL);
-    gtk_tree_view_column_set_cell_data_func( col, progrend, formatprog,
-                                             NULL, NULL );
+    r = torrent_cell_renderer_new( );
+    col = gtk_tree_view_column_new_with_attributes( _("Torrent"), r, "torrent", MC_TORRENT_RAW, NULL );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_AUTOSIZE );
-    gtk_tree_view_column_set_sort_column_id( col, MC_PROG_D );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
+    g_object_set( r, "xpad", GUI_PAD_SMALL, "ypad", GUI_PAD_SMALL, NULL );
 
     gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( view ), TRUE );
     sel = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
@@ -222,7 +118,6 @@ realized_cb ( GtkWidget * wind, gpointer unused UNUSED )
     PrivateData * p = get_private_data( GTK_WINDOW( wind ) );
     sizingmagic( GTK_WINDOW(wind), GTK_SCROLLED_WINDOW( p->scroll ),
                  GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS );
-    g_object_set( p->namerend, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
 }
 
 /***
@@ -289,19 +184,16 @@ void
 tr_window_update( TrWindow * self, float downspeed, float upspeed )
 {
     PrivateData * p = get_private_data( self );
-    char *tmp1, *tmp2;
+    char speedStr[64];
+    char buf[128];
 
-    tmp1 = readablespeed( downspeed );
-    tmp2 = g_strdup_printf( _("Total DL: %s"), tmp1 );
-    gtk_label_set_text( GTK_LABEL(p->dl_lb), tmp2 );
-    g_free( tmp2 );
-    g_free( tmp1 );
+    tr_strlspeed( speedStr, downspeed, sizeof(speedStr) );
+    g_snprintf( buf, sizeof(buf), _("Total DL: %s"), speedStr );
+    gtk_label_set_text( GTK_LABEL(p->dl_lb), buf );
 
-    tmp1 = readablespeed( upspeed );
-    tmp2 = g_strdup_printf( _("Total UL: %s"), tmp1 );
-    gtk_label_set_text( GTK_LABEL(p->ul_lb), tmp2 );
-    g_free( tmp2 );
-    g_free( tmp1 );
+    tr_strlspeed( speedStr, upspeed, sizeof(speedStr) );
+    g_snprintf( buf, sizeof(buf), _("Total UL: %s"), speedStr );
+    gtk_label_set_text( GTK_LABEL(p->ul_lb), buf );
 }
 
 GtkTreeSelection*

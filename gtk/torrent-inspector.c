@@ -398,9 +398,9 @@ render_ul_rate (GtkTreeViewColumn  * column UNUSED,
   if( rate < 0.01 )
     g_object_set (renderer, "text", "", NULL);
   else {
-    char * pch = readablespeed (rate);
-    g_object_set (renderer, "text", pch, NULL);
-    g_free (pch); 
+    char speedStr[64];
+    tr_strlspeed( speedStr, rate, sizeof(speedStr) );
+    g_object_set( renderer, "text", speedStr, NULL );
   }
 }
 
@@ -416,9 +416,9 @@ render_dl_rate (GtkTreeViewColumn  * column UNUSED,
   if( rate < 0.01 )
     g_object_set (renderer, "text", "", NULL);
   else {
-    char * pch = readablespeed (rate);
-    g_object_set (renderer, "text", pch, NULL);
-    g_free (pch); 
+    char speedStr[64];
+    tr_strlspeed( speedStr, rate, sizeof(speedStr) );
+    g_object_set( renderer, "text", speedStr, NULL );
   }
 }
 
@@ -739,6 +739,7 @@ static GtkWidget* info_page_new (tr_torrent * tor)
   GtkWidget *l, *w, *fr;
   char *pch;
   char *dname, *bname;
+  char sizeStr[128];
   char buf[256];
   char name[128];
   const char * namefmt = "%s:";
@@ -759,11 +760,10 @@ static GtkWidget* info_page_new (tr_torrent * tor)
     g_free (pch);
 
     g_snprintf (name, sizeof(name), namefmt, _("Pieces"));
-    pch = readablesize (info->pieceSize);
-    g_snprintf (buf, sizeof(buf), "%d (%s)", info->pieceCount, pch);
+    tr_strlsize( sizeStr, info->pieceSize, sizeof(sizeStr) );
+    g_snprintf( buf, sizeof(buf), "%d (%s)", info->pieceCount, sizeStr );
     l = gtk_label_new (buf);
     hig_workarea_add_row (t, &row, name, l, NULL);
-    g_free (pch);
 
     g_snprintf (name, sizeof(name), namefmt, _("Hash"));
     l = gtk_label_new (info->hashString);
@@ -853,7 +853,10 @@ refresh_activity (GtkWidget * top)
 {
   Activity * a = (Activity*) g_object_get_data (G_OBJECT(top), "activity-data");
   const tr_stat * stat = tr_torrent_stat( a->gtor );
-  char *pch, *pch2, *pch3;
+  char *pch;
+  char sizeStr[64];
+  char sizeStr2[64];
+  char buf[128];
 
   pch = tr_torrent_status_str( a->gtor );
   gtk_label_set_text (GTK_LABEL(a->state_lb), pch);
@@ -863,33 +866,25 @@ refresh_activity (GtkWidget * top)
   gtk_label_set_text (GTK_LABEL(a->progress_lb), pch);
   g_free (pch);
 
-  pch = readablesize( stat->haveValid + stat->haveUnchecked );
-  pch2 = readablesize( stat->haveValid );
-  pch3 = g_strdup_printf( _("%s (%s verified)"), pch, pch2 );
-  gtk_label_set_text( GTK_LABEL( a->have_lb ), pch3 );
-  g_free( pch3 );
-  g_free( pch2 );
-  g_free( pch );
+  tr_strlsize( sizeStr,  stat->haveValid + stat->haveUnchecked, sizeof(sizeStr) );
+  tr_strlsize( sizeStr2, stat->haveValid,                       sizeof(sizeStr2) );
+  g_snprintf( buf, sizeof(buf), _("%s (%s verified)"), sizeStr, sizeStr2 );
+  gtk_label_set_text( GTK_LABEL( a->have_lb ), buf );
 
-  pch = readablesize (stat->downloadedEver);
-  gtk_label_set_text (GTK_LABEL(a->dl_lb), pch);
-  g_free (pch);
+  tr_strlsize( sizeStr, stat->downloadedEver, sizeof(sizeStr) );
+  gtk_label_set_text( GTK_LABEL(a->dl_lb), sizeStr );
 
-  pch = readablesize (stat->uploadedEver);
-  gtk_label_set_text (GTK_LABEL(a->ul_lb), pch);
-  g_free (pch);
+  tr_strlsize( sizeStr, stat->uploadedEver, sizeof(sizeStr) );
+  gtk_label_set_text( GTK_LABEL(a->ul_lb), sizeStr );
 
-  pch = readablesize (stat->corruptEver);
-  gtk_label_set_text (GTK_LABEL(a->failed_lb), pch);
-  g_free (pch);
+  tr_strlsize( sizeStr, stat->corruptEver, sizeof(sizeStr) );
+  gtk_label_set_text (GTK_LABEL(a->failed_lb), sizeStr );
 
-  pch = g_strdup_printf( "%.1f", stat->ratio );
-  gtk_label_set_text (GTK_LABEL(a->ratio_lb), pch);
-  g_free (pch);
+  g_snprintf( buf, sizeof(buf), "%.1f", stat->ratio );
+  gtk_label_set_text (GTK_LABEL(a->ratio_lb), buf );
 
-  pch = readablespeed (stat->swarmspeed);
-  gtk_label_set_text (GTK_LABEL(a->swarm_lb), pch);
-  g_free (pch);
+  tr_strlspeed( buf, stat->swarmspeed, sizeof(buf) );
+  gtk_label_set_text (GTK_LABEL(a->swarm_lb), buf );
 
   gtk_label_set_text (GTK_LABEL(a->err_lb),
                       *stat->errorString ? stat->errorString : _("None"));
@@ -1112,12 +1107,13 @@ getdirtotals( GtkTreeStore * store, GtkTreeIter * parent )
     GtkTreeModel * model;
     GtkTreeIter    iter;
     uint64_t       mysize, subsize;
-    char         * sizestr, * name, * label;
+    char         * name, * label;
 
     model  = GTK_TREE_MODEL( store );
     mysize = 0;
     if( gtk_tree_model_iter_children( model, &iter, parent ) ) do
     {
+         char sizeStr[64];
         if( gtk_tree_model_iter_has_child( model, &iter ) )
         {
             subsize = getdirtotals( store, &iter );
@@ -1128,10 +1124,9 @@ getdirtotals( GtkTreeStore * store, GtkTreeIter * parent )
             gtk_tree_model_get( model, &iter, FC_SIZE, &subsize, -1 );
         }
         gtk_tree_model_get( model, &iter, FC_LABEL, &name, -1 );
-        sizestr = readablesize( subsize );
+        tr_strlsize( sizeStr, subsize, sizeof( sizeStr ) );
         label = g_markup_printf_escaped( "<small>%s (%s)</small>",
-                                          name, sizestr );
-        g_free( sizestr );
+                                          name, sizeStr );
         g_free( name );
         gtk_tree_store_set( store, &iter, FC_LABEL, label, -1 );
         g_free( label );
@@ -1679,22 +1674,21 @@ GtkWidget*
 torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
 {
   guint tag;
-  char *size, *pch;
   GtkWidget *d, *n, *w;
   tr_torrent * tor = tr_torrent_handle (gtor);
+  char sizeStr[64];
+  char title[512];
   const tr_info * info = tr_torrent_info (gtor);
 
   /* create the dialog */
-  size = readablesize( info->totalSize );
-  pch = g_strdup_printf( _( "Details for %s (%s)" ), info->name, size );
-  d = gtk_dialog_new_with_buttons (pch, parent, 0,
+  tr_strlsize( sizeStr, info->totalSize, sizeof(sizeStr) );
+  g_snprintf( title, sizeof(title), _( "Details for %s (%s)" ), info->name, sizeStr );
+  d = gtk_dialog_new_with_buttons (title, parent, 0,
                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                    NULL);
   gtk_window_set_role (GTK_WINDOW(d), "tr-info" );
   g_signal_connect (d, "response", G_CALLBACK (response_cb), gtor);
   g_object_weak_ref (G_OBJECT(gtor), torrent_destroyed, d);
-  g_free( pch );
-  g_free( size );
 
   /* add the notebook */
   n = gtk_notebook_new ();

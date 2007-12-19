@@ -38,8 +38,6 @@
 #include "conf.h"
 #include "util.h"
 
-#define BESTDECIMAL(d) ( (d)<100 ? 1 : 0 )
-
 static void
 errcb(GtkWidget *wind, int resp, gpointer data);
 
@@ -52,40 +50,41 @@ tr_strcmp( const char * a, const char * b )
     return 0;
 }
 
-static const char *sizestrs[] = {
-  N_("B"), N_("KiB"), N_("MiB"), N_("GiB"), N_("TiB"), N_("PiB"), N_("EiB"),
-};
-
-char *
-readablesize(guint64 size) {
-  int ii;
-  double small = size;
-
-  if( !size )
-    return g_strdup_printf( _("None") );
-
-  for(ii = 0; ii + 1 < ALEN(sizestrs) && 1024.0 <= small / 1024.0; ii++)
-    small /= 1024.0;
-
-  if(1024.0 <= small) {
-    small /= 1024.0;
-    ii++;
-  }
-
-  return g_strdup_printf("%.*f %s", BESTDECIMAL(small), small,
-                         gettext(sizestrs[ii]));
-}
-
-char *
-readablespeed (double KiBps)
+char*
+tr_strlsize( char * buf, guint64 size, size_t buflen )
 {
-  const guint64 bps = KiBps * 1024;
-  char * str = readablesize (bps);
-  char * ret = bps ? g_strdup_printf ("%s/s", str) : g_strdup( str );
-  g_free (str);
-  return ret;
+    if( !size )
+        g_strlcpy( buf, _("None"), buflen );
+    else {
+        static const char *units[] = {
+            N_("B"), N_("KiB"), N_("MiB"), N_("GiB"), N_("TiB"),
+            N_("PiB"), N_("EiB"), N_("ZiB"), N_("YiB")
+        };
+        unsigned int i;
+        guint64 small = size;
+        for( i=0; i<G_N_ELEMENTS(units) && small>=1024; ++i )
+            small >>= 10;
+        if( small < 100 )
+            g_snprintf( buf, buflen, "%.1f %s", (double)small, _(units[i]) );
+        else
+            g_snprintf( buf, buflen, "%d %s", (int)small, _(units[i]) );
+    }
+    return buf;
 }
- 
+
+char*
+tr_strlspeed( char * buf, double KiBps, size_t buflen )
+{
+    const guint64 bps = KiBps * 1024;
+    if( !bps )
+        g_strlcpy( buf, _("None"), buflen );
+    else {
+        char bbuf[64];
+        tr_strlsize( bbuf, (guint64)(KiBps*1024), sizeof(bbuf) );
+        g_snprintf( buf, buflen, "%s/s", bbuf );
+    }
+    return buf;
+}
 
 #define SECONDS(s)              ((s) % 60)
 #define MINUTES(s)              ((s) / 60 % 60)
