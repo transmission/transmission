@@ -126,17 +126,10 @@ tr_torrent_handle(TrTorrent *tor)
     return tor->severed ? NULL : tor->handle;
 }
 
-static tr_stat*
-refreshStat( TrTorrent * tor )
-{
-}
-
 const tr_stat *
 tr_torrent_stat(TrTorrent *tor)
 {
-    g_assert( TR_IS_TORRENT(tor) );
-
-    return tor->severed ? NULL : tr_torrentStat( tor->handle );
+    return tor && !tor->severed ? tr_torrentStat( tor->handle ) : NULL;
 }
 
 const tr_info *
