@@ -790,20 +790,25 @@ tr_torrentStat( tr_torrent * tor )
 
     {
         int i;
-        tr_bitfield * available = tr_peerMgrGetAvailable( tor->handle->peerMgr,
-                                                          tor->info.hash );
+        tr_bitfield * availablePieces = tr_peerMgrGetAvailable( tor->handle->peerMgr,
+                                                                tor->info.hash );
         s->desiredSize = 0;
         s->desiredAvailable = 0;
 
         for( i=0; i<tor->info.pieceCount; ++i ) {
             if( !tor->info.pieces[i].dnd ) {
-                s->desiredSize += tr_torPieceCountBytes( tor, i );
-                if( tr_bitfieldHas( available, i ) )
-                    s->desiredAvailable += tr_torPieceCountBytes( tor, i );
+                const uint64_t byteCount = tr_torPieceCountBytes( tor, i );
+                s->desiredSize += byteCount;
+                if( tr_bitfieldHas( availablePieces, i ) )
+                    s->desiredAvailable += byteCount;
             }
         }
 
-        tr_bitfieldFree( available );
+        /* "availablePieces" can miss our unverified blocks... */
+        if( s->desiredAvailable < s->haveValid + s->haveUnchecked )
+            s->desiredAvailable = s->haveValid + s->haveUnchecked;
+
+        tr_bitfieldFree( availablePieces );
     }
    
     s->ratio = ( s->downloadedEver || s->haveValid )

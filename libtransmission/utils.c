@@ -698,8 +698,8 @@ tr_bitfieldOr( tr_bitfield * a, const tr_bitfield * b )
 
     assert( a->len == b->len );
 
-    for( ait=a->bits, bit=b->bits, aend=ait+a->len; ait!=aend; ++ait, ++bit )
-        *ait |= *bit;
+    for( ait=a->bits, bit=b->bits, aend=ait+a->len; ait!=aend; )
+        *ait++ |= *bit++;
 
     return a;
 }
