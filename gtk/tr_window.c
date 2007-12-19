@@ -109,7 +109,9 @@ makeview( PrivateData * p )
     p->renderer = r = torrent_cell_renderer_new( );
     p->column = col = gtk_tree_view_column_new_with_attributes(
         _("Torrent"), r, "torrent", MC_TORRENT_RAW, NULL );
-    gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_AUTOSIZE );
+    g_object_set( G_OBJECT(col), "resizable", TRUE,
+                                 "sizing", GTK_TREE_VIEW_COLUMN_FIXED,
+                                 NULL );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
     g_object_set( r, "xpad", GUI_PAD_SMALL, "ypad", GUI_PAD_SMALL, NULL );
 
