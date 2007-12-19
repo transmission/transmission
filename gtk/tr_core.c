@@ -396,7 +396,12 @@ TrCore *
 tr_core_new( void )
 {
     TrCore * core = TR_CORE( g_object_new( TR_CORE_TYPE, NULL ) );
+
+    /* init from prefs & listen to pref changes */
     g_signal_connect( core, "prefs-changed", G_CALLBACK(prefsChanged), NULL );
+    prefsChanged( core, PREF_KEY_SORT_MODE, NULL );
+    prefsChanged( core, PREF_KEY_SORT_REVERSED, NULL );
+
     return core;
 }
 

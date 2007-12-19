@@ -299,6 +299,7 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
             }
         }
 
+g_message ("width %d height %d", *width, *height );
         *width = w + xpad*2;
         *height = h + ypad*2;
     }
@@ -555,7 +556,7 @@ torrent_cell_renderer_set_property( GObject      * object,
     {
         case P_TORRENT:             p->tor = g_value_get_pointer( v ); break;
         case P_BAR_HEIGHT:          p->bar_height = g_value_get_int( v ); break;
-        case P_MINIMAL:             p->minimal  = g_value_get_boolean( v ); break;
+        case P_MINIMAL:             { p->minimal  = g_value_get_boolean( v ); g_message("setting minimal to %d", p->minimal ); break; }
         case P_GRADIENT:            p->gradient = g_value_get_boolean( v ); break;
         case P_SHOW_UNAVAILABLE:    p->show_unavailable = g_value_get_boolean( v ); break;
         case P_COLOR_MISSING:       v2c( &p->color_missing[0],     v ); break;
@@ -586,7 +587,6 @@ c2v( GValue * value, const GdkColor * color )
                 (color->blue >> 8) & 0xff );
     g_value_set_string( value, buf );
 }
-
 
 static void
 torrent_cell_renderer_get_property( GObject      * object,

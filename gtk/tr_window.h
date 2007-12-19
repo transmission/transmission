@@ -26,14 +26,14 @@
 #define TR_WINDOW_H
 
 #include <gtk/gtk.h>
+#include "tr_core.h"
 
 typedef GtkWindow TrWindow;
 
 GtkTreeSelection * tr_window_get_selection( TrWindow* wind );
 
-GtkWidget * tr_window_new( GtkUIManager* );
+GtkWidget * tr_window_new( GtkUIManager*, TrCore * core );
 
-void
-tr_window_update( TrWindow * wind, float downspeed, float upspeed );
+void tr_window_update( TrWindow * wind, float downspeed, float upspeed );
 
 #endif

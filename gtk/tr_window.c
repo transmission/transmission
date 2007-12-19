@@ -30,8 +30,10 @@
 #include <libtransmission/transmission.h>
 
 #include "actions.h"
+#include "conf.h"
 #include "hig.h"
 #include "torrent-cell-renderer.h"
+#include "tr_prefs.h"
 #include "tr_torrent.h"
 #include "tr_window.h"
 #include "util.h"
@@ -45,6 +47,8 @@ typedef struct
     GtkWidget * dl_lb;
     GtkTreeSelection * selection;
     GtkCellRenderer  * renderer;
+    TrCore * core;
+    gulong pref_handler_id;
 }
 PrivateData;
 
@@ -120,19 +124,37 @@ realized_cb ( GtkWidget * wind, gpointer unused UNUSED )
                  GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS );
 }
 
+static void
+prefsChanged( TrCore * core UNUSED, const char * key, gpointer wind )
+{
+    if( !strcmp( key, PREF_KEY_MINIMAL_VIEW ) )
+    {
+       PrivateData * p = get_private_data( GTK_WINDOW( wind ) );
+       g_object_set( p->renderer, "minimal", pref_flag_get( key ), NULL );
+    }
+}
+
+static void
+privateFree( gpointer vprivate )
+{
+    PrivateData * p = (PrivateData*) vprivate;
+    g_signal_handler_disconnect( p->core, p->pref_handler_id );
+    g_free( p );
+}
+
 /***
 ****  PUBLIC
 ***/
 
 GtkWidget *
-tr_window_new( GtkUIManager * ui_manager )
+tr_window_new( GtkUIManager * ui_manager, TrCore * core )
 {
     PrivateData * p = g_new( PrivateData, 1 );
     GtkWidget *vbox, *w, *self, *h;
 
     /* make the window */
     self = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    g_object_set_data_full(G_OBJECT(self), PRIVATE_DATA_KEY, p, g_free );
+    g_object_set_data_full(G_OBJECT(self), PRIVATE_DATA_KEY, p, privateFree );
     gtk_window_set_title( GTK_WINDOW( self ), g_get_application_name());
     gtk_window_set_role( GTK_WINDOW( self ), "tr-main" );
     gtk_window_add_accel_group (GTK_WINDOW(self),
@@ -175,6 +197,11 @@ tr_window_new( GtkUIManager * ui_manager )
 
     /* show all but the window */
     gtk_widget_show_all( vbox );
+
+    /* listen for prefs changes that affect the window */
+    prefsChanged( core, PREF_KEY_MINIMAL_VIEW, self );
+    p->core = core;
+    p->pref_handler_id = g_signal_connect( core, "prefs-changed", G_CALLBACK(prefsChanged), self );
 
     return self;
 }

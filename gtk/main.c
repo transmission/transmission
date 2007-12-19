@@ -264,11 +264,14 @@ main( int argc, char ** argv )
     if( ( didinit || cf_init( tr_getPrefsDirectory(), &err ) ) &&
         ( didlock || cf_lock( &err ) ) )
     {
+        cbdata->core = tr_core_new( );
+
         /* create main window now to be a parent to any error dialogs */
-        GtkWindow * mainwind = GTK_WINDOW( tr_window_new( myUIManager ) );
+        GtkWindow * mainwind = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
 
         /* set message level here before tr_init() */
         msgwin_loadpref( );
+
         appsetup( mainwind, argfiles, cbdata, startpaused );
     }
     else
@@ -309,7 +312,6 @@ appsetup( TrWindow * wind, GList * args,
 
     /* fill out cbdata */
     cbdata->wind       = NULL;
-    cbdata->core       = tr_core_new();
     cbdata->icon       = NULL;
     cbdata->msgwin     = NULL;
     cbdata->prefs      = NULL;
@@ -668,9 +670,6 @@ initializeFromPrefs( struct cbdata * cbdata )
         PREF_KEY_NAT,
         PREF_KEY_PEX,
         PREF_KEY_SYSTRAY,
-        PREF_KEY_SORT_MODE,
-        PREF_KEY_SORT_REVERSED,
-        PREF_KEY_MINIMAL_VIEW,
         PREF_KEY_ENCRYPTED_ONLY
     };
 
@@ -736,11 +735,6 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     {
         gboolean enabled = pref_flag_get( key );
         tr_torrentIterate( tr, setpex, &enabled );
-    }
-    else if( !strcmp( key, PREF_KEY_MINIMAL_VIEW ) )
-    {
-        const gboolean enabled = pref_flag_get( key );
-        g_message( "minimal view: %d", enabled );
     }
 }
 
