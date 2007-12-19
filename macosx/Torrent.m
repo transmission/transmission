@@ -227,13 +227,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     float stopRatio;
     if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID && [self ratio] >= stopRatio)
     {
+        [self setRatioSetting: NSOffState];
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
+        
         [self stopTransfer];
         fStat = tr_torrentStat(fHandle);
         
         fFinishedSeeding = YES;
-        
-        [self setRatioSetting: NSOffState];
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
     }
     
     //check if checking data
