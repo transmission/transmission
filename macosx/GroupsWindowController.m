@@ -45,6 +45,7 @@ typedef enum
 
 - (CTGradient *) gradientForColor: (NSColor *) color;
 - (void) changeColor: (id) sender;
+- (NSImage *) imageForGroup: (NSDictionary *) dict isSmall: (BOOL) small;
 
 @end
 
@@ -162,19 +163,11 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 
 - (NSImage *) imageForIndex: (int) index isSmall: (BOOL) small
 {
-    CTGradient * gradient;
-    if (!(gradient = [self gradientForIndex: index]))
+    int orderIndex = [self orderValueForIndex: index];
+    if (orderIndex == -1)
         return nil;
     
-    float width = small ? ICON_WIDTH_SMALL : ICON_WIDTH;
-    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: NSMakeRect(0.0, 0.0, width, width) radius: 4.0];
-    NSImage * icon = [[NSImage alloc] initWithSize: [bp bounds].size];
-    
-    [icon lockFocus];
-    [gradient fillBezierPath: bp angle: 270.0];
-    [icon unlockFocus];
-    
-    return [icon autorelease];
+    return [self imageForGroup: [fGroups objectAtIndex: orderIndex] isSmall: small];
 }
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableview
@@ -365,11 +358,8 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         item = [[NSMenuItem alloc] initWithTitle: [dict objectForKey: @"Name"] action: action keyEquivalent: @""];
         [item setTarget: target];
         
-        int index = [[dict objectForKey: @"Index"] intValue];
-        
-        #warning use dict
-        [item setImage: [self imageForIndex: index isSmall: small]];
-        [item setTag: index];
+        [item setImage: [self imageForGroup: dict isSmall: small]];
+        [item setTag: [[dict objectForKey: @"Index"] intValue]];
         
         [menu addItem: item];
         [item release];
@@ -401,6 +391,19 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     
     [self saveGroups];
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
+}
+
+- (NSImage *) imageForGroup: (NSDictionary *) dict isSmall: (BOOL) small
+{
+    float width = small ? ICON_WIDTH_SMALL : ICON_WIDTH;
+    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: NSMakeRect(0.0, 0.0, width, width) radius: 4.0];
+    NSImage * icon = [[NSImage alloc] initWithSize: [bp bounds].size];
+    
+    [icon lockFocus];
+    [[self gradientForColor: [dict objectForKey: @"Color"]] fillBezierPath: bp angle: 270.0];
+    [icon unlockFocus];
+    
+    return [icon autorelease];
 }
 
 @end
