@@ -162,6 +162,7 @@ struct tr_torrent
 
     tr_recheck_state           recheckState;
 
+    time_t                     lastStatTime;
     tr_stat                    stats[2];
 
     tr_torrent               * next;

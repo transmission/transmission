@@ -713,6 +713,13 @@ tr_torrentStat( tr_torrent * tor )
 {
     tr_stat * s;
     struct tr_tracker * tc;
+    const time_t now = time( NULL );
+
+    /* generating these stats is expensive --
+     * update a maximum of once per second */
+    if( tor->lastStatTime == now )
+        return &tor->stats[tor->statCur];
+    tor->lastStatTime = now;
 
     tr_torrentLock( tor );
 
