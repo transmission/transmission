@@ -22,6 +22,7 @@ const char * fallback_ui_file =
 "      <menuitem action='sort-by-activity'/>\n"
 "      <menuitem action='sort-by-name'/>\n"
 "      <menuitem action='sort-by-progress'/>\n"
+"      <menuitem action='sort-by-ratio'/>\n"
 "      <menuitem action='sort-by-state'/>\n"
 "      <menuitem action='sort-by-tracker'/>\n"
 "      <menuitem action='reverse-sort-order'/>\n"

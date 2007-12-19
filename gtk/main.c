@@ -1028,6 +1028,7 @@ doAction ( const char * action_name, gpointer user_data )
          ||  !strcmp( action_name, "sort-by-date-added" )
          ||  !strcmp( action_name, "sort-by-name" )
          ||  !strcmp( action_name, "sort-by-progress" )
+         ||  !strcmp( action_name, "sort-by-ratio" )
          ||  !strcmp( action_name, "sort-by-state" )
          ||  !strcmp( action_name, "sort-by-tracker" ) )
     {
