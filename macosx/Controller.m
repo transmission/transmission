@@ -2117,11 +2117,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     int index = [fDefaults integerForKey: @"FilterGroup"];
     
-    NSImage * icon;
+    NSImage * icon = nil;
     if (index >= 0)
         icon = [[GroupsWindowController groupsController] imageForIndex: index isSmall: YES];
     else
-        icon = [NSImage imageNamed: NSImageNameRemoveTemplate];
+    {
+        if ([NSApp isOnLeopardOrBetter])
+            icon = [NSImage imageNamed: NSImageNameRemoveTemplate];
+    }
     [[fGroupFilterMenu itemAtIndex: 0] setImage: icon];
     
     NSString * toolTip;
