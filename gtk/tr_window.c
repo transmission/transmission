@@ -163,7 +163,6 @@ tr_window_new( GtkUIManager * ui_manager )
     gtk_widget_set_usize (w, 0u, 6u);
     gtk_box_pack_start( GTK_BOX(vbox), w, FALSE, FALSE, 0 ); 
 
-
     /* statusbar */
     h = gtk_hbox_new( FALSE, 0 );
     w = p->ul_lb = gtk_label_new( NULL );

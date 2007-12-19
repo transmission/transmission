@@ -31,19 +31,20 @@ struct stat_ui
 };
 
 static void
-setLabel( GtkWidget * w, char * ownme )
+setLabel( GtkWidget * w, const char * str )
 {
-    gtk_label_set_text( GTK_LABEL(w), ownme );
-    g_free( ownme );
+    gtk_label_set_text( GTK_LABEL(w), str );
 }
 
 static void
 setLabelFromRatio( GtkWidget * w, double d )
 {
-    char * str = ( (int)d == TR_RATIO_NA )
-        ? g_strdup_printf( _("None" ) )
-        : g_strdup_printf( "%.1f%%", d );
-    setLabel( w, str );
+    char buf[128];
+    if( ( (int)d == TR_RATIO_NA ) )
+        g_strlcpy( buf, _("None"), sizeof(buf) );
+    else
+        g_snprintf( buf, sizeof(buf), "%.1f", d );
+    setLabel( w, buf );
 }
 
 static gboolean
