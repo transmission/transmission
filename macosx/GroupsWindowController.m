@@ -336,7 +336,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"None", "Groups -> Menu") action: action
                             keyEquivalent: @""];
     [item setTarget: target];
-    [item setRepresentedObject: [NSNumber numberWithInt: -1]];
+    [item setTag: -1];
     [menu addItem: item];
     [item release];
     
@@ -358,7 +358,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         [item setImage: icon];
         [icon release];
         
-        [item setRepresentedObject: [dict objectForKey: @"Index"]];
+        [item setTag: [[dict objectForKey: @"Index"] intValue]];
         
         [menu addItem: item];
         [item release];

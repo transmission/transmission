@@ -2065,7 +2065,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
-        [torrent setGroupValue: [[sender representedObject] intValue]];
+        [torrent setGroupValue: [sender tag]];
     
     [self updateUI];
     [self applyFilter: nil];
@@ -3097,7 +3097,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         BOOL checked = NO;
         
-        int index = [[menuItem representedObject] intValue];
+        int index = [menuItem tag];
         NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
