@@ -333,7 +333,8 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 {
     NSMenu * menu = [[NSMenu alloc] initWithTitle: @"Groups"];
     
-    NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: @"None" action: action keyEquivalent: @""];
+    NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"None", "Groups -> Menu") action: action
+                            keyEquivalent: @""];
     [item setTarget: target];
     [item setRepresentedObject: [NSNumber numberWithInt: -1]];
     [menu addItem: item];

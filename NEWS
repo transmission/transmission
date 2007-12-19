@@ -11,7 +11,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Group labels
    + Statistics window
    + Pieces Bar (return of Advanced Bar)
-   + Availability Bar (overlay on regular bar)
+   + Display not available overlay on the regular bar
    + Display remaining time for seeding transfers
    + Sort by total activity
    + Leopard: Time Machine will ignore incomplete downloads
