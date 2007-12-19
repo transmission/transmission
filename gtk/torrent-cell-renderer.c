@@ -243,18 +243,21 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
         char * str;
         int tmp_w, tmp_h;
         int w=0, h=0;
+        struct TorrentCellRendererPrivate * p = self->priv;
+
+        g_object_set( p->text_renderer, "ellipsize", PANGO_ELLIPSIZE_NONE, NULL );
 
         /* above the progressbar */
-        if( self->priv->minimal )
+        if( p->minimal )
         {
             int w1, w2, h1, h2;
             char * shortStatusString = getShortStatusString( torStat );
-            g_object_set( self->priv->text_renderer, "text", name, NULL );
-            gtk_cell_renderer_get_size( self->priv->text_renderer,
+            g_object_set( p->text_renderer, "text", name, NULL );
+            gtk_cell_renderer_get_size( p->text_renderer,
                                         widget, NULL, NULL, NULL, &w1, &h1 );
             str = g_markup_printf_escaped( "<small>%s</small>", shortStatusString );
-            g_object_set( self->priv->text_renderer, "markup", name, NULL );
-            gtk_cell_renderer_get_size( self->priv->text_renderer,
+            g_object_set( p->text_renderer, "markup", str, NULL );
+            gtk_cell_renderer_get_size( p->text_renderer,
                                         widget, NULL, NULL, NULL, &w2, &h2 );
             h += MAX( h1, h2 );
             w = MAX( w, w1+GUI_PAD_BIG+w2 );
@@ -266,8 +269,8 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
             char * progressString = getProgressString( tor, torStat );
             str = g_markup_printf_escaped( "<b>%s</b>\n<small>%s</small>",
                                            name, progressString );
-            g_object_set( self->priv->text_renderer, "markup", str, NULL );
-            gtk_cell_renderer_get_size( self->priv->text_renderer,
+            g_object_set( p->text_renderer, "markup", str, NULL );
+            gtk_cell_renderer_get_size( p->text_renderer,
                                         widget, NULL, NULL, NULL, &tmp_w, &tmp_h );
             h += tmp_h;
             w = MAX( w, tmp_w );
@@ -276,12 +279,12 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
         }
 
         /* below the progressbar */
-        if( !self->priv->minimal )
+        if( !p->minimal )
         {
             char * statusString = getStatusString( torStat );
             str = g_markup_printf_escaped( "<small>%s</small>", statusString );
-            g_object_set( self->priv->text_renderer, "markup", str, NULL );
-            gtk_cell_renderer_get_size( self->priv->text_renderer,
+            g_object_set( p->text_renderer, "markup", str, NULL );
+            gtk_cell_renderer_get_size( p->text_renderer,
                                         widget, NULL, NULL, NULL, &tmp_w, &tmp_h );
             h += tmp_h;
             w = MAX( w, tmp_w );
@@ -289,7 +292,7 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
             g_free( statusString );
         }
 
-        h += self->priv->bar_height;
+        h += p->bar_height;
 
         if( cell_area ) {
             if( x_offset ) *x_offset = 0;
@@ -299,7 +302,6 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
             }
         }
 
-g_message ("width %d height %d", *width, *height );
         *width = w + xpad*2;
         *height = h + ypad*2;
     }
@@ -479,6 +481,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         GdkRectangle my_expose;
         int xpad, ypad;
         int w, h;
+        struct TorrentCellRendererPrivate * p = self->priv;
         g_object_get( self, "xpad", &xpad, "ypad", &ypad, NULL );
 
         my_bg = *background_area; 
@@ -495,39 +498,102 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         my_expose.width -= xpad*2;
 
         /* above the progressbar */
-        str = g_markup_printf_escaped( "<b>%s</b>\n<small>%s</small>",
-                                       name, progressString );
-        g_object_set( self->priv->text_renderer, "markup", str, NULL );
-        gtk_cell_renderer_get_size( self->priv->text_renderer,
-                                    widget, NULL, NULL, NULL, &w, &h );
-        my_bg.height = h;
-        my_cell.height = h;
-        my_expose.height = h;
-        gtk_cell_renderer_render( self->priv->text_renderer,
-                                  window, widget,
-                                  &my_bg, &my_cell, &my_expose, flags );
-        my_bg.y += h;
-        my_cell.y += h;
-        my_expose.y += h;
+        if( !p->minimal )
+        {
+            str = g_markup_printf_escaped( "<b>%s</b>\n<small>%s</small>",
+                                           name, progressString );
+            g_object_set( p->text_renderer, "markup", str,
+                                            "ellipsize", PANGO_ELLIPSIZE_NONE,
+                                            NULL );
+            gtk_cell_renderer_get_size( p->text_renderer,
+                                        widget, NULL, NULL, NULL, &w, &h );
+            my_bg.height = h;
+            my_cell.height = h;
+            my_expose.height = h;
+            g_object_set( p->text_renderer, "ellipsize", PANGO_ELLIPSIZE_END,
+                                            NULL );
+            gtk_cell_renderer_render( p->text_renderer,
+                                      window, widget,
+                                      &my_bg, &my_cell, &my_expose, flags );
+            my_bg.y += h;
+            my_cell.y += h;
+            my_expose.y += h;
+        }
+        else
+        {
+            int w1, w2, h1, h2, tmp_h;
+            char * shortStatusString = getShortStatusString( torStat );
+            GdkRectangle tmp_bg, tmp_cell, tmp_expose;
+
+            /* get the dimensions for the name */
+            g_object_set( p->text_renderer, "text", name,
+                                            "ellipsize", PANGO_ELLIPSIZE_NONE,
+                                            NULL );
+            gtk_cell_renderer_get_size( p->text_renderer,
+                                        widget, NULL, NULL, NULL, &w1, &h1 );
+
+            /* get the dimensions for the short status string */
+            str = g_markup_printf_escaped( "<small>%s</small>", shortStatusString );
+            g_object_set( p->text_renderer, "markup", str,
+                                            "ellipsize", PANGO_ELLIPSIZE_NONE,
+                                            NULL );
+            gtk_cell_renderer_get_size( p->text_renderer,
+                                        widget, NULL, NULL, NULL, &w2, &h2 );
+
+            tmp_h = MAX( h1, h2 );
+
+            /* short status */
+            tmp_bg.x = my_bg.width - w2;
+            tmp_bg.y = my_bg.y;
+            tmp_bg.width = w2;
+            tmp_bg.height = tmp_h;
+            tmp_expose = tmp_cell = tmp_bg;
+            g_object_set( p->text_renderer, "markup", str,
+                                            "ellipsize", PANGO_ELLIPSIZE_NONE,
+                                            NULL );
+            gtk_cell_renderer_render( p->text_renderer,
+                                      window, widget,
+                                      &tmp_bg, &tmp_cell, &tmp_expose, flags );
+
+            /* name */
+            tmp_bg.x = my_bg.x;
+            tmp_bg.width = my_bg.width - w2 - GUI_PAD_BIG;
+            tmp_expose = tmp_cell = tmp_bg;
+            g_object_set( p->text_renderer, "text", name,
+                                            "ellipsize", PANGO_ELLIPSIZE_END,
+                                            NULL );
+            gtk_cell_renderer_render( p->text_renderer,
+                                      window, widget,
+                                      &tmp_bg, &tmp_cell, &tmp_expose, flags );
+
+            g_free( str );
+            g_free( shortStatusString );
+
+            my_bg.y = tmp_bg.y + tmp_bg.height;
+            my_cell.y = tmp_cell.y + tmp_cell.height;
+            my_expose.y += tmp_expose.y + tmp_cell.height;
+        }
 
         /* the progressbar */
-        my_cell.height = self->priv->bar_height;
+        my_cell.height = p->bar_height;
         drawRegularBar( self, info, torStat, window, widget, &my_cell );
         my_bg.y     += my_cell.height;
         my_cell.y   += my_cell.height;
         my_expose.y += my_cell.height;
 
         /* below progressbar */
-        if( !self->priv->minimal )
+        if( !p->minimal )
         {
             str = g_markup_printf_escaped( "<small>%s</small>", statusString );
-            g_object_set( self->priv->text_renderer, "markup", str, NULL );
-            gtk_cell_renderer_get_size( self->priv->text_renderer,
+            g_object_set( p->text_renderer, "markup", str,
+                                            "ellipsize", PANGO_ELLIPSIZE_END,
+                                            NULL );
+            gtk_cell_renderer_get_size( p->text_renderer,
                                         widget, NULL, NULL, NULL, &w, &h );
             my_bg.height      = h;
             my_cell.height    = h;
             my_expose.height  = h;
-            gtk_cell_renderer_render( self->priv->text_renderer,
+            gtk_cell_renderer_render( p->text_renderer,
                                       window, widget,
                                       &my_bg, &my_cell, &my_expose, flags );
         }
@@ -556,7 +622,7 @@ torrent_cell_renderer_set_property( GObject      * object,
     {
         case P_TORRENT:             p->tor = g_value_get_pointer( v ); break;
         case P_BAR_HEIGHT:          p->bar_height = g_value_get_int( v ); break;
-        case P_MINIMAL:             { p->minimal  = g_value_get_boolean( v ); g_message("setting minimal to %d", p->minimal ); break; }
+        case P_MINIMAL:             p->minimal  = g_value_get_boolean( v ); break;
         case P_GRADIENT:            p->gradient = g_value_get_boolean( v ); break;
         case P_SHOW_UNAVAILABLE:    p->show_unavailable = g_value_get_boolean( v ); break;
         case P_COLOR_MISSING:       v2c( &p->color_missing[0],     v ); break;
@@ -731,7 +797,6 @@ torrent_cell_renderer_init( GTypeInstance * instance, gpointer g_class UNUSED )
     p->gradient = TRUE;
     p->show_unavailable = TRUE;
     p->bar_height = DEFAULT_BAR_HEIGHT;
-    g_object_set( p->text_renderer, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
 
     gdk_color_parse( DEFAULT_COLOR_VERIFIED,      &p->color_verified[0] );
     gdk_color_parse( DEFAULT_COLOR_VERIFIED_2,    &p->color_verified[1] );

@@ -38,6 +38,16 @@
 #include "tr_window.h"
 #include "util.h"
 
+#if !GTK_CHECK_VERSION(2,8,0)
+static void
+gtk_tree_view_column_queue_resize( GtkTreeViewColumn * column ) /* yuck */
+{
+   const int spacing = gtk_tree_view_column_get_spacing( column );
+   gtk_tree_view_column_set_spacing( column, spacing+1 );
+   gtk_tree_view_column_set_spacing( column, spacing );
+}
+#endif
+
 typedef struct
 {
     GtkWidget * scroll;
@@ -45,8 +55,9 @@ typedef struct
     GtkWidget * status;
     GtkWidget * ul_lb;
     GtkWidget * dl_lb;
-    GtkTreeSelection * selection;
-    GtkCellRenderer  * renderer;
+    GtkTreeSelection  * selection;
+    GtkCellRenderer   * renderer;
+    GtkTreeViewColumn * column;
     TrCore * core;
     gulong pref_handler_id;
 }
@@ -96,7 +107,8 @@ makeview( PrivateData * p )
     p->selection = gtk_tree_view_get_selection( GTK_TREE_VIEW(view) );
 
     p->renderer = r = torrent_cell_renderer_new( );
-    col = gtk_tree_view_column_new_with_attributes( _("Torrent"), r, "torrent", MC_TORRENT_RAW, NULL );
+    p->column = col = gtk_tree_view_column_new_with_attributes(
+        _("Torrent"), r, "torrent", MC_TORRENT_RAW, NULL );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_AUTOSIZE );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
     g_object_set( r, "xpad", GUI_PAD_SMALL, "ypad", GUI_PAD_SMALL, NULL );
@@ -120,8 +132,10 @@ static void
 realized_cb ( GtkWidget * wind, gpointer unused UNUSED )
 {
     PrivateData * p = get_private_data( GTK_WINDOW( wind ) );
-    sizingmagic( GTK_WINDOW(wind), GTK_SCROLLED_WINDOW( p->scroll ),
-                 GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS );
+    sizingmagic( GTK_WINDOW(wind),
+                 GTK_SCROLLED_WINDOW( p->scroll ),
+                 GTK_POLICY_NEVER,
+                 GTK_POLICY_ALWAYS );
 }
 
 static void
@@ -131,6 +145,7 @@ prefsChanged( TrCore * core UNUSED, const char * key, gpointer wind )
     {
        PrivateData * p = get_private_data( GTK_WINDOW( wind ) );
        g_object_set( p->renderer, "minimal", pref_flag_get( key ), NULL );
+       gtk_tree_view_column_queue_resize( p->column );
     }
 }
 
