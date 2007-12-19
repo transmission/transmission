@@ -58,6 +58,8 @@
 	<string>None</string>
 	<key>FilterBar</key>
 	<false/>
+    <key>FilterGroup</key>
+	<integer>-2</integer>
 	<key>FilterSearchType</key>
 	<string>Name</string>
 	<key>IncompleteDownloadFolder</key>

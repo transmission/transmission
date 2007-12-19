@@ -112,6 +112,8 @@
 				<string>id</string>
 				<key>setGroup</key>
 				<string>id</string>
+				<key>setGroupFilter</key>
+				<string>id</string>
 				<key>setInfoTab</key>
 				<string>id</string>
 				<key>setLimitGlobalEnabled</key>
@@ -185,6 +187,10 @@
 				<string>NSMenuItem</string>
 				<key>fFilterBar</key>
 				<string>StatusBarView</string>
+				<key>fGroupFilterMenu</key>
+				<string>NSMenu</string>
+				<key>fGroupsButton</key>
+				<string>NSPopUpButton</string>
 				<key>fGroupsSetContextMenu</key>
 				<string>NSMenu</string>
 				<key>fGroupsSetMenu</key>
@@ -259,6 +265,14 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>FilterButton</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSButton</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>checkFile</key>
@@ -295,14 +309,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSTableView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>FilterButton</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSButton</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

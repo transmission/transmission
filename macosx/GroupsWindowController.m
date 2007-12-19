@@ -28,6 +28,9 @@
 #import "NSBezierPathAdditions.h"
 #import "NSApplicationAdditions.h"
 
+#define ICON_WIDTH 16.0
+#define ICON_WIDTH_SMALL 12.0
+
 #define GROUP_TABLE_VIEW_DATA_TYPE @"GroupTableViewDataType"
 
 typedef enum
@@ -133,20 +136,6 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     [super dealloc];
 }
 
-- (CTGradient *) gradientForIndex: (int) index
-{
-    if (index < 0)
-        return nil;
-    
-    NSEnumerator * enumerator = [fGroups objectEnumerator];
-    NSDictionary * dict;
-    while ((dict = [enumerator nextObject]))
-        if ([[dict objectForKey: @"Index"] intValue] == index)
-            return [self gradientForColor: [dict objectForKey: @"Color"]];
-    
-    return nil;
-}
-
 - (int) orderValueForIndex: (int) index
 {
     if (index != -1)
@@ -157,6 +146,35 @@ GroupsWindowController * fGroupsWindowInstance = nil;
                 return i;
     }
     return -1;
+}
+
+- (CTGradient *) gradientForIndex: (int) index
+{
+    int orderIndex = [self orderValueForIndex: index];
+    return orderIndex != -1 ? [self gradientForColor: [[fGroups objectAtIndex: orderIndex] objectForKey: @"Color"]] : nil;
+}
+
+- (NSString *) nameForIndex: (int) index
+{
+    int orderIndex = [self orderValueForIndex: index];
+    return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"Name"] : nil;
+}
+
+- (NSImage *) imageForIndex: (int) index isSmall: (BOOL) small
+{
+    CTGradient * gradient;
+    if (!(gradient = [self gradientForIndex: index]))
+        return nil;
+    
+    float width = small ? ICON_WIDTH_SMALL : ICON_WIDTH;
+    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: NSMakeRect(0.0, 0.0, width, width) radius: 4.0];
+    NSImage * icon = [[NSImage alloc] initWithSize: [bp bounds].size];
+    
+    [icon lockFocus];
+    [gradient fillBezierPath: bp angle: 270.0];
+    [icon unlockFocus];
+    
+    return [icon autorelease];
 }
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableview
@@ -329,7 +347,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     [self saveGroups];
 }
 
-- (NSMenu *) groupMenuWithTarget: (id) target action: (SEL) action
+- (NSMenu *) groupMenuWithTarget: (id) target action: (SEL) action isSmall: (BOOL) small
 {
     NSMenu * menu = [[NSMenu alloc] initWithTitle: @"Groups"];
     
@@ -340,8 +358,6 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     [menu addItem: item];
     [item release];
     
-    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: NSMakeRect(0.0, 0.0, 16.0, 16.0) radius: 4.0];
-    
     NSEnumerator * enumerator = [fGroups objectEnumerator];
     NSDictionary * dict;
     while ((dict = [enumerator nextObject]))
@@ -349,21 +365,17 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         item = [[NSMenuItem alloc] initWithTitle: [dict objectForKey: @"Name"] action: action keyEquivalent: @""];
         [item setTarget: target];
         
-        NSImage * icon = [[NSImage alloc] initWithSize: [bp bounds].size];
+        int index = [[dict objectForKey: @"Index"] intValue];
         
-        [icon lockFocus];
-        [[self gradientForColor: [dict objectForKey: @"Color"]] fillBezierPath: bp angle: 270.0];
-        [icon unlockFocus];
-        
-        [item setImage: icon];
-        [icon release];
-        
-        [item setTag: [[dict objectForKey: @"Index"] intValue]];
+        #warning use dict
+        [item setImage: [self imageForIndex: index isSmall: small]];
+        [item setTag: index];
         
         [menu addItem: item];
         [item release];
     }
     
+
     return [menu autorelease];
 }
 

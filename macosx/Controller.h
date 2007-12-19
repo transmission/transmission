@@ -80,7 +80,8 @@
     IBOutlet NSMenuItem             * fUploadLimitItem, * fUploadNoLimitItem,
                                     * fDownloadLimitItem, * fDownloadNoLimitItem;
     
-    IBOutlet NSMenu                 * fGroupsSetMenu, * fGroupsSetContextMenu;
+    IBOutlet NSMenu                 * fGroupsSetMenu, * fGroupsSetContextMenu, * fGroupFilterMenu;
+    IBOutlet NSPopUpButton          * fGroupsButton;
     
     IBOutlet NSWindow               * fURLSheetWindow;
     IBOutlet NSTextField            * fURLSheetTextField;
@@ -193,6 +194,8 @@
 
 - (void) showGroups: (id) sender;
 - (void) setGroup: (id) sender;
+- (void) setGroupFilter: (id) sender;
+- (void) updateGroupFilterButton;
 
 - (void) toggleSpeedLimit: (id) sender;
 - (void) autoSpeedLimitChange: (NSNotification *) notification;

@@ -25,6 +25,8 @@
 #import "PortChecker.h"
 #import "NSApplicationAdditions.h"
 
+#define CHECKER_URL @"http://transmission.m0k.org/PortCheck.php?port=%d"
+
 @implementation PortChecker
 
 - (id) initForPort: (int) portNumber withDelegate: (id) delegate
@@ -34,7 +36,7 @@
         fDelegate = delegate;
         
         NSURLRequest * portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString:
-                [NSString stringWithFormat: @"http://transmission.m0k.org/PortCheck.php?port=%d", portNumber]] cachePolicy:
+                [NSString stringWithFormat: CHECKER_URL, portNumber]] cachePolicy:
                 [NSApp isOnLeopardOrBetter] ? NSURLRequestReloadIgnoringLocalCacheData : NSURLRequestReloadIgnoringCacheData
                 timeoutInterval: 15.0];
         

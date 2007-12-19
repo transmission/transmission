@@ -95,6 +95,8 @@ typedef enum
 #define FILTER_TYPE_TAG_NAME    401
 #define FILTER_TYPE_TAG_TRACKER 402
 
+#define GROUP_FILTER_ALL_TAG    -2
+
 #define STATUS_RATIO_TOTAL      @"RatioTotal"
 #define STATUS_RATIO_SESSION    @"RatioSession"
 #define STATUS_TRANSFER_TOTAL   @"TransferTotal"
@@ -288,6 +290,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         pauseRect.origin.x = NSMaxX(seedRect) + 2.0;
         [fPauseFilterButton setFrame: pauseRect];
     }
+    
+    [self updateGroupFilterButton];
     
     //set up filter bar
     NSView * contentView = [fWindow contentView];
@@ -1858,8 +1862,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fSeedFilterButton setCount: seeding];
     [fPauseFilterButton setCount: paused];
     
+    //remove for groups
+    int groupFilter = [fDefaults integerForKey: @"FilterGroup"];
+    if (groupFilter != GROUP_FILTER_ALL_TAG)
+    {
+        filtering = YES;
+        
+        int i;
+        for (i = [tempTorrents count]-1; i >= 0; i--)
+            if ([[tempTorrents objectAtIndex: i] groupValue] != groupFilter)
+                [tempTorrents removeObjectAtIndex: i];
+    }
+    
+    //remove from text field
     NSString * searchString = [fSearchFilterField stringValue];
-    if ([searchString length] > 0)
+    if ([tempTorrents count] > 0 && [searchString length] > 0)
     {
         filtering = YES;
         
@@ -2054,10 +2071,23 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         for (i = [menu numberOfItems]-1 - keep; i >= 0; i--)
             [menu removeItemAtIndex: i];
         
-        NSMenu * groupMenu = [[GroupsWindowController groupsController] groupMenuWithTarget: self action: @selector(setGroup:)];
+        NSMenu * groupMenu = [[GroupsWindowController groupsController] groupMenuWithTarget: self action: @selector(setGroup:)
+                                isSmall: NO];
         [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange:
                 NSMakeRange(0, [groupMenu numberOfItems])] atBottom: NO];
     }
+    else if (menu == fGroupFilterMenu)
+    {
+        int i;
+        for (i = [menu numberOfItems]-1; i >= 3; i--)
+            [menu removeItemAtIndex: i];
+        
+        NSMenu * groupMenu = [[GroupsWindowController groupsController] groupMenuWithTarget: self action: @selector(setGroupFilter:)
+                                isSmall: YES];
+        [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange:
+                NSMakeRange(0, [groupMenu numberOfItems])] atBottom: YES];
+    }
+    else;
 }
 
 - (void) setGroup: (id) sender
@@ -2070,6 +2100,40 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self updateUI];
     [self applyFilter: nil];
     [self updateTorrentHistory];
+}
+
+- (void) setGroupFilter: (id) sender
+{
+    [fDefaults setInteger: [sender tag] forKey: @"FilterGroup"];
+    [self updateGroupFilterButton];
+    [self applyFilter: nil];
+}
+
+- (void) updateGroupFilterButton
+{
+    int index = [fDefaults integerForKey: @"FilterGroup"];
+    
+    NSImage * icon;
+    if (index >= 0)
+        icon = [[GroupsWindowController groupsController] imageForIndex: index isSmall: YES];
+    else
+        icon = [NSImage imageNamed: NSImageNameRemoveTemplate];
+    [[fGroupFilterMenu itemAtIndex: 0] setImage: icon];
+    
+    NSString * toolTip;
+    switch (index)
+    {
+        case GROUP_FILTER_ALL_TAG:
+            toolTip = NSLocalizedString(@"All Groups", "Groups -> Button");
+            break;
+        case -1:
+            toolTip = NSLocalizedString(@"Group: No Label", "Groups -> Button");
+            break;
+        default:
+            toolTip = [NSLocalizedString(@"Group: ", "Groups -> Button") stringByAppendingString:
+                        [[GroupsWindowController groupsController] nameForIndex: index]];
+    }
+    [fGroupsButton setToolTip: toolTip];
 }
 
 - (void) toggleSpeedLimit: (id) sender
@@ -2664,6 +2728,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         [fSearchFilterField setStringValue: @""];
         [self setFilter: fNoFilterButton];
+        [self setGroupFilter: [fGroupFilterMenu itemWithTag: GROUP_FILTER_ALL_TAG]];
     }
 
     [self showFilterBar: [fFilterBar isHidden] animate: YES];
@@ -3109,6 +3174,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         [menuItem setState: checked ? NSOnState : NSOffState];
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
+    }
+    
+    if (action == @selector(setGroupFilter:))
+    {
+        [menuItem setState: [menuItem tag] == [fDefaults integerForKey: @"FilterGroup"] ? NSOnState : NSOffState];
+        return YES;
     }
     
     if (action == @selector(toggleSmallView:))
