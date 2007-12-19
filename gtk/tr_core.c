@@ -171,12 +171,20 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
 }
 
 static int
+compareDouble( double a, double b )
+{
+    if( a < b ) return -1;
+    if( b > a ) return 1;
+    return 0;
+}
+
+static int
 compareByActivity( GtkTreeModel * model,
                    GtkTreeIter  * a,
                    GtkTreeIter  * b,
                    gpointer       user_data UNUSED )
 {
-    int ia, ib;
+    int i;
     tr_torrent *ta, *tb;
     const tr_stat *sa, *sb;
 
@@ -186,10 +194,9 @@ compareByActivity( GtkTreeModel * model,
     sa = tr_torrentStat( ta );
     sb = tr_torrentStat( tb );
 
-    ia = (int)( 1024 * ( sa->rateUpload + sa->rateDownload ) );
-    ib = (int)( 1024 * ( sb->rateUpload + sb->rateDownload ) );
-    if( ia != ib )
-        return ia - ib;
+    if(( i = compareDouble( sa->rateUpload + sa->rateDownload,
+                            sb->rateUpload + sb->rateDownload ) ))
+        return i;
 
     if( sa->uploadedEver != sb->uploadedEver )
         return sa->uploadedEver < sa->uploadedEver ? -1 : 1;
@@ -203,8 +210,7 @@ compareByDateAdded( GtkTreeModel   * model UNUSED,
                     GtkTreeIter    * b UNUSED,
                     gpointer         user_data UNUSED )
 {
-    /* FIXME */
-    return 0;
+    return 0; /* FIXME */
 }
 
 static int
@@ -229,35 +235,16 @@ compareByProgress( GtkTreeModel   * model,
                    GtkTreeIter    * b,
                    gpointer         user_data UNUSED )
 {
+    int ret;
     tr_torrent *ta, *tb;
     const tr_stat *sa, *sb;
-    int ret;
     gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
     gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
     sa = tr_torrentStat( ta );
     sb = tr_torrentStat( tb );
-         if( sa->percentDone < sb->percentDone ) ret = -1;
-    else if( sa->percentDone > sb->percentDone ) ret =  1;
-    else                                         ret =  0;
-    return ret;
-}
-
-static int
-compareByRatio( GtkTreeModel   * model,
-                GtkTreeIter    * a,
-                GtkTreeIter    * b,
-                gpointer         user_data UNUSED )
-{
-    tr_torrent *ta, *tb;
-    const tr_stat *sa, *sb;
-    int ret;
-    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
-    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
-    sa = tr_torrentStat( ta );
-    sb = tr_torrentStat( tb );
-         if( sa->ratio < sb->ratio ) ret = -1;
-    else if( sa->ratio > sb->ratio ) ret =  1;
-    else                             ret =  0;
+    ret = compareDouble( sa->percentDone, sb->percentDone );
+    if( !ret )
+        ret = compareDouble( sa->ratio, sa->ratio );
     return ret;
 }
 
@@ -312,11 +299,6 @@ setSort( TrCore * core, const char * mode, gboolean isReversed  )
     {
         type = isReversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
         gtk_tree_sortable_set_sort_func( sortable, col, compareByProgress, NULL, NULL );
-    }
-    else if( !strcmp( mode, "sort-by-ratio" ) )
-    {
-        type = isReversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
-        gtk_tree_sortable_set_sort_func( sortable, col, compareByRatio, NULL, NULL );
     }
     else if( !strcmp( mode, "sort-by-state" ) )
     {
