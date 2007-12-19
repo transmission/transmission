@@ -15,6 +15,7 @@
 #include <gtk/gtkcellrenderertext.h>
 #include <glib/gi18n.h>
 #include <libtransmission/transmission.h>
+#include "hig.h"
 #include "torrent-cell-renderer.h"
 #include "tr_torrent.h"
 #include "util.h"
@@ -81,7 +82,7 @@ getProgressString( const tr_torrent * tor, const tr_stat * torStat )
                   torStat->percentDone * 100.0 );
     else if( !isSeed )
         str = g_strdup_printf(
-                  _("%s of %s (%.2f%%), uploaded %s (Ratio: %.2f"),
+                  _("%s of %s (%.2f%%), uploaded %s (Ratio: %.1f"),
                   tr_strlsize( buf1, haveTotal, sizeof(buf1) ),
                   tr_strlsize( buf2, info->totalSize, sizeof(buf2) ),
                   torStat->percentComplete * 100.0,
@@ -89,7 +90,7 @@ getProgressString( const tr_torrent * tor, const tr_stat * torStat )
                                torStat->ratio * 100.0 );
     else
         str = g_strdup_printf(
-                  _("%s, uploaded %s (Ratio: %.2f)"),
+                  _("%s, uploaded %s (Ratio: %.1f)"),
                   tr_strlsize( buf1, info->totalSize, sizeof(buf1) ),
                   tr_strlsize( buf2, torStat->uploadedEver, sizeof(buf2) ),
                   torStat->ratio * 100.0 );
@@ -98,8 +99,49 @@ getProgressString( const tr_torrent * tor, const tr_stat * torStat )
 }
 
 static char*
-getStatusString( const tr_torrent * tor UNUSED, const tr_stat * torStat )
+getShortStatusString( const tr_stat    * torStat )
 {
+    char upStr[64], downStr[64];
+    GString * gstr = g_string_new( NULL );
+
+    switch( torStat->status )
+    {
+        case TR_STATUS_STOPPED:
+            g_string_assign( gstr, _("Paused") );
+            break;
+
+        case TR_STATUS_CHECK_WAIT:
+            g_string_assign( gstr, _( "Waiting to Verify local data" ) );
+            break;
+
+        case TR_STATUS_CHECK:
+            g_string_append_printf( gstr, _("Verifying local data (%.1f%% tested)"),
+                                    torStat->recheckProgress * 100.0 );
+
+        case TR_STATUS_DOWNLOAD:
+            tr_strlspeed( downStr, torStat->rateDownload, sizeof(downStr) ),
+            tr_strlspeed( upStr, torStat->rateUpload, sizeof(upStr) );
+            g_string_append_printf( gstr, _("DL: %s, UL: %s"), downStr, upStr );
+            break;
+
+        case TR_STATUS_SEED:
+        case TR_STATUS_DONE:
+            tr_strlspeed( upStr, torStat->rateUpload, sizeof(upStr) );
+            g_string_append_printf( gstr, _("Ratio: %.1f, UL: %s"),
+                                    torStat->ratio*100.0, upStr );
+            break;
+
+        default:
+            break;
+    }
+
+    return g_string_free( gstr, FALSE );
+}
+
+static char*
+getStatusString( const tr_stat * torStat )
+{
+    char * pch;
     const int isActive = torStat->status != TR_STATUS_STOPPED;
     const int isChecking = torStat->status == TR_STATUS_CHECK
                         || torStat->status == TR_STATUS_CHECK_WAIT;
@@ -113,16 +155,11 @@ getStatusString( const tr_torrent * tor UNUSED, const tr_stat * torStat )
     else switch( torStat->status )
     {
         case TR_STATUS_STOPPED:
-            g_string_assign( gstr, _("Paused" ) );
-            break;
-
         case TR_STATUS_CHECK_WAIT:
-            g_string_assign( gstr, _( "Waiting to Verify local data" ) );
-            break;
-
         case TR_STATUS_CHECK:
-            g_string_append_printf( gstr, _("Verifying local data (%.1f%% tested)"),
-                                    torStat->recheckProgress * 100.0 );
+            pch = getShortStatusString( torStat );
+            g_string_assign( gstr, pch );
+            g_free( pch );
             break;
 
         case TR_STATUS_DOWNLOAD:
@@ -203,32 +240,55 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
         const tr_info * info = tr_torrentInfo( tor );
         const char * name = info->name;
         const tr_stat * torStat = tr_torrentStat( (tr_torrent*)tor );
-        char * progressString = getProgressString( tor, torStat );
-        char * statusString = getStatusString( tor, torStat );
         char * str;
         int tmp_w, tmp_h;
         int w=0, h=0;
 
         /* above the progressbar */
-        str = g_markup_printf_escaped( "<b>%s</b>\n<small>%s</small>",
-                                       name, progressString );
-        g_object_set( self->priv->text_renderer, "markup", str, NULL );
-        gtk_cell_renderer_get_size( self->priv->text_renderer,
-                                    widget, NULL, NULL, NULL, &tmp_w, &tmp_h );
-        h += tmp_h;
-        w = MAX( w, tmp_w );
-        g_free( str );
+        if( self->priv->minimal )
+        {
+            int w1, w2, h1, h2;
+            char * shortStatusString = getShortStatusString( torStat );
+            g_object_set( self->priv->text_renderer, "text", name, NULL );
+            gtk_cell_renderer_get_size( self->priv->text_renderer,
+                                        widget, NULL, NULL, NULL, &w1, &h1 );
+            str = g_markup_printf_escaped( "<small>%s</small>", shortStatusString );
+            g_object_set( self->priv->text_renderer, "markup", name, NULL );
+            gtk_cell_renderer_get_size( self->priv->text_renderer,
+                                        widget, NULL, NULL, NULL, &w2, &h2 );
+            h += MAX( h1, h2 );
+            w = MAX( w, w1+GUI_PAD_BIG+w2 );
+            g_free( str );
+            g_free( shortStatusString );
+        }
+        else
+        {
+            char * progressString = getProgressString( tor, torStat );
+            str = g_markup_printf_escaped( "<b>%s</b>\n<small>%s</small>",
+                                           name, progressString );
+            g_object_set( self->priv->text_renderer, "markup", str, NULL );
+            gtk_cell_renderer_get_size( self->priv->text_renderer,
+                                        widget, NULL, NULL, NULL, &tmp_w, &tmp_h );
+            h += tmp_h;
+            w = MAX( w, tmp_w );
+            g_free( str );
+            g_free( progressString );
+        }
 
         /* below the progressbar */
-        str = g_markup_printf_escaped( "<small>%s</small>", statusString );
-        g_object_set( self->priv->text_renderer, "markup", str, NULL );
-        gtk_cell_renderer_get_size( self->priv->text_renderer,
-                                    widget, NULL, NULL, NULL, &tmp_w, &tmp_h );
-        h += tmp_h;
-        w = MAX( w, tmp_w );
-        g_free( str );
+        if( !self->priv->minimal )
+        {
+            char * statusString = getStatusString( torStat );
+            str = g_markup_printf_escaped( "<small>%s</small>", statusString );
+            g_object_set( self->priv->text_renderer, "markup", str, NULL );
+            gtk_cell_renderer_get_size( self->priv->text_renderer,
+                                        widget, NULL, NULL, NULL, &tmp_w, &tmp_h );
+            h += tmp_h;
+            w = MAX( w, tmp_w );
+            g_free( str );
+            g_free( statusString );
+        }
 
-        /* make the progressbar the same height as the below */
         h += self->priv->bar_height;
 
         if( cell_area ) {
@@ -241,10 +301,6 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
 
         *width = w + xpad*2;
         *height = h + ypad*2;
-
-        /* cleanup */
-        g_free( statusString );
-        g_free( progressString );
     }
 }
 
@@ -415,7 +471,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         const char * name = info->name;
         const tr_stat * torStat = tr_torrentStat( (tr_torrent*)tor );
         char * progressString = getProgressString( tor, torStat );
-        char * statusString = getStatusString( tor, torStat );
+        char * statusString = getStatusString( torStat );
         char * str;
         GdkRectangle my_bg;
         GdkRectangle my_cell;
@@ -461,16 +517,19 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         my_expose.y += my_cell.height;
 
         /* below progressbar */
-        str = g_markup_printf_escaped( "<small>%s</small>", statusString );
-        g_object_set( self->priv->text_renderer, "markup", str, NULL );
-        gtk_cell_renderer_get_size( self->priv->text_renderer,
-                                    widget, NULL, NULL, NULL, &w, &h );
-        my_bg.height      = h;
-        my_cell.height    = h;
-        my_expose.height  = h;
-        gtk_cell_renderer_render( self->priv->text_renderer,
-                                  window, widget,
-                                  &my_bg, &my_cell, &my_expose, flags );
+        if( !self->priv->minimal )
+        {
+            str = g_markup_printf_escaped( "<small>%s</small>", statusString );
+            g_object_set( self->priv->text_renderer, "markup", str, NULL );
+            gtk_cell_renderer_get_size( self->priv->text_renderer,
+                                        widget, NULL, NULL, NULL, &w, &h );
+            my_bg.height      = h;
+            my_cell.height    = h;
+            my_expose.height  = h;
+            gtk_cell_renderer_render( self->priv->text_renderer,
+                                      window, widget,
+                                      &my_bg, &my_cell, &my_expose, flags );
+        }
 
         g_free( statusString );
         g_free( progressString );
@@ -478,7 +537,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
 }
 
 static void
-setColor( GdkColor * color, const GValue * value )
+v2c( GdkColor * color, const GValue * value )
 {
     gdk_color_parse( g_value_get_string( value ), color );
 }
@@ -486,7 +545,7 @@ setColor( GdkColor * color, const GValue * value )
 static void
 torrent_cell_renderer_set_property( GObject      * object,
                                     guint          property_id,
-                                    const GValue * value,
+                                    const GValue * v,
                                     GParamSpec   * pspec)
 {
     TorrentCellRenderer * self = TORRENT_CELL_RENDERER( object );
@@ -494,31 +553,31 @@ torrent_cell_renderer_set_property( GObject      * object,
 
     switch( property_id )
     {
-        case P_TORRENT:             p->tor = g_value_get_pointer( value ); break;
-        case P_BAR_HEIGHT:          p->bar_height = g_value_get_int( value ); break;
-        case P_MINIMAL:             p->minimal          = g_value_get_boolean( value ); break;
-        case P_GRADIENT:            p->gradient         = g_value_get_boolean( value ); break;
-        case P_SHOW_UNAVAILABLE:    p->show_unavailable = g_value_get_boolean( value ); break;
-        case P_COLOR_MISSING:       setColor( &p->color_missing[0],     value ); break;
-        case P_COLOR_MISSING_2:     setColor( &p->color_missing[1],     value ); break;
-        case P_COLOR_UNWANTED:      setColor( &p->color_unwanted[0],    value ); break;
-        case P_COLOR_UNWANTED_2:    setColor( &p->color_unwanted[1],    value ); break;
-        case P_COLOR_PAUSED:        setColor( &p->color_paused[0],      value ); break;
-        case P_COLOR_PAUSED_2:      setColor( &p->color_paused[1],      value ); break;
-        case P_COLOR_VERIFIED:      setColor( &p->color_verified[0],    value ); break;
-        case P_COLOR_VERIFIED_2:    setColor( &p->color_verified[1],    value ); break;
-        case P_COLOR_UNAVAILABLE:   setColor( &p->color_unavailable[0], value ); break;
-        case P_COLOR_UNAVAILABLE_2: setColor( &p->color_unavailable[1], value ); break;
-        case P_COLOR_VERIFYING:     setColor( &p->color_verifying[0],   value ); break;
-        case P_COLOR_VERIFYING_2:   setColor( &p->color_verifying[1],   value ); break;
-        case P_COLOR_SEEDING:       setColor( &p->color_seeding[0],     value ); break;
-        case P_COLOR_SEEDING_2:     setColor( &p->color_seeding[1],     value ); break;
+        case P_TORRENT:             p->tor = g_value_get_pointer( v ); break;
+        case P_BAR_HEIGHT:          p->bar_height = g_value_get_int( v ); break;
+        case P_MINIMAL:             p->minimal  = g_value_get_boolean( v ); break;
+        case P_GRADIENT:            p->gradient = g_value_get_boolean( v ); break;
+        case P_SHOW_UNAVAILABLE:    p->show_unavailable = g_value_get_boolean( v ); break;
+        case P_COLOR_MISSING:       v2c( &p->color_missing[0],     v ); break;
+        case P_COLOR_MISSING_2:     v2c( &p->color_missing[1],     v ); break;
+        case P_COLOR_UNWANTED:      v2c( &p->color_unwanted[0],    v ); break;
+        case P_COLOR_UNWANTED_2:    v2c( &p->color_unwanted[1],    v ); break;
+        case P_COLOR_PAUSED:        v2c( &p->color_paused[0],      v ); break;
+        case P_COLOR_PAUSED_2:      v2c( &p->color_paused[1],      v ); break;
+        case P_COLOR_VERIFIED:      v2c( &p->color_verified[0],    v ); break;
+        case P_COLOR_VERIFIED_2:    v2c( &p->color_verified[1],    v ); break;
+        case P_COLOR_UNAVAILABLE:   v2c( &p->color_unavailable[0], v ); break;
+        case P_COLOR_UNAVAILABLE_2: v2c( &p->color_unavailable[1], v ); break;
+        case P_COLOR_VERIFYING:     v2c( &p->color_verifying[0],   v ); break;
+        case P_COLOR_VERIFYING_2:   v2c( &p->color_verifying[1],   v ); break;
+        case P_COLOR_SEEDING:       v2c( &p->color_seeding[0],     v ); break;
+        case P_COLOR_SEEDING_2:     v2c( &p->color_seeding[1],     v ); break;
         default: G_OBJECT_WARN_INVALID_PROPERTY_ID( object, property_id, pspec ); break;
     }
 }
 
 static void
-setValueColor( GValue * value, const GdkColor * color )
+c2v( GValue * value, const GdkColor * color )
 {
     char buf[16];
     g_snprintf( buf, sizeof(buf), "#%2.2x%2.2x%2.2x",
@@ -532,7 +591,7 @@ setValueColor( GValue * value, const GdkColor * color )
 static void
 torrent_cell_renderer_get_property( GObject      * object,
                                     guint          property_id,
-                                    GValue       * value,
+                                    GValue       * v,
                                     GParamSpec   * pspec)
 {
     const TorrentCellRenderer * self = TORRENT_CELL_RENDERER( object );
@@ -540,25 +599,25 @@ torrent_cell_renderer_get_property( GObject      * object,
 
     switch( property_id )
     {
-        case P_TORRENT:             g_value_set_pointer( value, p->tor ); break;
-        case P_BAR_HEIGHT:          g_value_set_int( value, p->bar_height ); break;
-        case P_MINIMAL:             g_value_set_boolean( value, p->minimal ); break;
-        case P_GRADIENT:            g_value_set_boolean( value, p->gradient ); break;
-        case P_SHOW_UNAVAILABLE:    g_value_set_boolean( value, p->show_unavailable ); break;
-        case P_COLOR_MISSING:       setValueColor( value, &p->color_missing[0] ); break;
-        case P_COLOR_MISSING_2:     setValueColor( value, &p->color_missing[1] ); break;
-        case P_COLOR_UNWANTED:      setValueColor( value, &p->color_unwanted[0] ); break;
-        case P_COLOR_UNWANTED_2:    setValueColor( value, &p->color_unwanted[1] ); break;
-        case P_COLOR_PAUSED:        setValueColor( value, &p->color_paused[0] ); break;
-        case P_COLOR_PAUSED_2:      setValueColor( value, &p->color_paused[1] ); break;
-        case P_COLOR_VERIFIED:      setValueColor( value, &p->color_verified[0] ); break;
-        case P_COLOR_VERIFIED_2:    setValueColor( value, &p->color_verified[1] ); break;
-        case P_COLOR_UNAVAILABLE:   setValueColor( value, &p->color_unavailable[0] ); break;
-        case P_COLOR_UNAVAILABLE_2: setValueColor( value, &p->color_unavailable[1] ); break;
-        case P_COLOR_VERIFYING:     setValueColor( value, &p->color_verifying[0] ); break;
-        case P_COLOR_VERIFYING_2:   setValueColor( value, &p->color_verifying[1] ); break;
-        case P_COLOR_SEEDING:       setValueColor( value, &p->color_seeding[0] ); break;
-        case P_COLOR_SEEDING_2:     setValueColor( value, &p->color_seeding[1] ); break;
+        case P_TORRENT:             g_value_set_pointer( v, p->tor ); break;
+        case P_BAR_HEIGHT:          g_value_set_int( v, p->bar_height ); break;
+        case P_MINIMAL:             g_value_set_boolean( v, p->minimal ); break;
+        case P_GRADIENT:            g_value_set_boolean( v, p->gradient ); break;
+        case P_SHOW_UNAVAILABLE:    g_value_set_boolean( v, p->show_unavailable ); break;
+        case P_COLOR_MISSING:       c2v( v, &p->color_missing[0] ); break;
+        case P_COLOR_MISSING_2:     c2v( v, &p->color_missing[1] ); break;
+        case P_COLOR_UNWANTED:      c2v( v, &p->color_unwanted[0] ); break;
+        case P_COLOR_UNWANTED_2:    c2v( v, &p->color_unwanted[1] ); break;
+        case P_COLOR_PAUSED:        c2v( v, &p->color_paused[0] ); break;
+        case P_COLOR_PAUSED_2:      c2v( v, &p->color_paused[1] ); break;
+        case P_COLOR_VERIFIED:      c2v( v, &p->color_verified[0] ); break;
+        case P_COLOR_VERIFIED_2:    c2v( v, &p->color_verified[1] ); break;
+        case P_COLOR_UNAVAILABLE:   c2v( v, &p->color_unavailable[0] ); break;
+        case P_COLOR_UNAVAILABLE_2: c2v( v, &p->color_unavailable[1] ); break;
+        case P_COLOR_VERIFYING:     c2v( v, &p->color_verifying[0] ); break;
+        case P_COLOR_VERIFYING_2:   c2v( v, &p->color_verifying[1] ); break;
+        case P_COLOR_SEEDING:       c2v( v, &p->color_seeding[0] ); break;
+        case P_COLOR_SEEDING_2:     c2v( v, &p->color_seeding[1] ); break;
         default:
             G_OBJECT_WARN_INVALID_PROPERTY_ID( object, property_id, pspec );
             break;
