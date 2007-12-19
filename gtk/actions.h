@@ -14,8 +14,11 @@
 #define TR_ACTIONS_H
 
 #include <gtk/gtk.h>
+#include "tr_core.h"
 
 void actions_init ( GtkUIManager * ui_manager, gpointer callback_user_data );
+
+void actions_set_core( TrCore * core );
 
 void action_activate ( const char * name );
 

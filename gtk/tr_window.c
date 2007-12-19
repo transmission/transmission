@@ -32,7 +32,6 @@
 #include "actions.h"
 #include "hig.h"
 #include "torrent-cell-renderer.h"
-#include "tr_core.h"
 #include "tr_torrent.h"
 #include "tr_window.h"
 #include "util.h"
@@ -45,6 +44,7 @@ typedef struct
     GtkWidget * ul_lb;
     GtkWidget * dl_lb;
     GtkTreeSelection * selection;
+    GtkCellRenderer  * renderer;
 }
 PrivateData;
 
@@ -91,7 +91,7 @@ makeview( PrivateData * p )
 
     p->selection = gtk_tree_view_get_selection( GTK_TREE_VIEW(view) );
 
-    r = torrent_cell_renderer_new( );
+    p->renderer = r = torrent_cell_renderer_new( );
     col = gtk_tree_view_column_new_with_attributes( _("Torrent"), r, "torrent", MC_TORRENT_RAW, NULL );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_AUTOSIZE );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );

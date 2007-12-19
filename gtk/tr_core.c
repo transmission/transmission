@@ -318,13 +318,16 @@ setSort( TrCore * core, const char * mode, gboolean isReversed  )
     gtk_tree_sortable_set_sort_column_id( sortable, col, type );
 }
 
-void
-tr_core_resort( TrCore * core )
+static void
+prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
 {
-    char * mode = pref_string_get( PREF_KEY_SORT_MODE );
-    gboolean isReversed = pref_flag_get( PREF_KEY_SORT_REVERSED );
-    setSort( core, mode, isReversed );
-    g_free( mode );
+    if( !strcmp( key, PREF_KEY_SORT_MODE ) || !strcmp( key, PREF_KEY_SORT_REVERSED ) )
+    {
+        char * mode = pref_string_get( PREF_KEY_SORT_MODE );
+        gboolean isReversed = pref_flag_get( PREF_KEY_SORT_REVERSED );
+        setSort( core, mode, isReversed );
+        g_free( mode );
+    }
 }
 
 static void
@@ -392,7 +395,9 @@ tr_core_get_type( void )
 TrCore *
 tr_core_new( void )
 {
-    return g_object_new( TR_CORE_TYPE, NULL );
+    TrCore * core = TR_CORE( g_object_new( TR_CORE_TYPE, NULL ) );
+    g_signal_connect( core, "prefs-changed", G_CALLBACK(prefsChanged), NULL );
+    return core;
 }
 
 GtkTreeModel *
@@ -695,15 +700,6 @@ tr_core_set_pref_bool( TrCore * self, const char * key, gboolean newval )
         pref_flag_set( key, newval );
         commitPrefsChange( self, key );
     }
-}
-
-gboolean
-tr_core_toggle_pref_bool( TrCore * core, const char * key )
-{
-    const gboolean newval = !pref_flag_get( key );
-    pref_flag_set( key, newval );
-    commitPrefsChange( core, key );
-    return newval;
 }
 
 void

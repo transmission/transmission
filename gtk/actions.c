@@ -16,6 +16,7 @@
 #include <libtransmission/transmission.h>
 #include "conf.h"
 #include "torrent-inspector.h"
+#include "tr_core.h"
 #include "tr_prefs.h"
 #include "lock.h"
 #include "logo.h"
@@ -24,9 +25,12 @@
 
 extern void doAction (const char * action_name, gpointer user_data );
 
+static TrCore * myCore = 0;
+
 static GtkActionGroup * myGroup = 0;
 
-static void action_cb ( GtkAction * a, gpointer user_data )
+static void
+action_cb ( GtkAction * a, gpointer user_data )
 {
   doAction ( gtk_action_get_name(a), user_data );
 }
@@ -66,11 +70,14 @@ static GtkRadioActionEntry sort_radio_entries[] =
 };
 
 static void
-sort_changed_cb( GtkAction * action UNUSED, GtkRadioAction * current, gpointer user_data )
+sort_changed_cb( GtkAction            * action UNUSED,
+                 GtkRadioAction       * current,
+                 gpointer user_data     UNUSED )
 {
-  const int i = gtk_radio_action_get_current_value( current );
-  const char * name = sort_radio_entries[i].name;
-  doAction ( name, user_data );
+    const char * key = PREF_KEY_SORT_MODE;
+    const int i = gtk_radio_action_get_current_value( current );
+    const char * val = sort_radio_entries[i].name;
+    tr_core_set_pref( myCore, key, val );
 }
 
 static GtkToggleActionEntry show_toggle_entries[] = 
@@ -81,12 +88,20 @@ static GtkToggleActionEntry show_toggle_entries[] =
     N_("Show Message _Log"), NULL, NULL, G_CALLBACK(action_cb), FALSE }
 };
 
-static GtkToggleActionEntry persistent_toggle_entries[] =
+static void
+toggle_pref_cb ( GtkToggleAction * action, gpointer user_data UNUSED )
+{
+    const char * key = gtk_action_get_name( GTK_ACTION( action ) );
+    const gboolean val = gtk_toggle_action_get_active( action );
+    tr_core_set_pref_bool( myCore, key, val );
+}
+
+static GtkToggleActionEntry pref_toggle_entries[] =
 {
   { "minimal-view", NULL,
-    N_("_Minimal View"), "<control>M", NULL, G_CALLBACK(action_cb), FALSE },
-  { "reverse-sort-order", NULL,
-    N_("_Reverse Sort Order"), NULL, NULL, G_CALLBACK(action_cb), FALSE }
+    N_("_Minimal View"), "<control>M", NULL, G_CALLBACK(toggle_pref_cb), FALSE },
+  { "sort-reversed", NULL,
+    N_("_Reverse Sort Order"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE }
 };
 
 static GtkActionEntry entries[] =
@@ -188,6 +203,12 @@ register_my_icons ( void )
 static GtkUIManager * myUIManager = NULL;
 
 void
+actions_set_core( TrCore * core )
+{
+    myCore = core;
+}
+
+void
 actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
 {
   int i, n;
@@ -226,19 +247,19 @@ actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
                                       G_N_ELEMENTS(sort_radio_entries),
                                       active,
                                       G_CALLBACK(sort_changed_cb),
-                                      callback_user_data );
+                                      NULL );
 
   gtk_action_group_add_toggle_actions( action_group, 
                                        show_toggle_entries, 
                                        G_N_ELEMENTS(show_toggle_entries), 
                                        callback_user_data );
 
-  for( i=0, n=G_N_ELEMENTS(persistent_toggle_entries); i<n; ++i )
-    persistent_toggle_entries[i].is_active = pref_flag_get( persistent_toggle_entries[i].name );
+  for( i=0, n=G_N_ELEMENTS(pref_toggle_entries); i<n; ++i )
+    pref_toggle_entries[i].is_active = pref_flag_get( pref_toggle_entries[i].name );
 
   gtk_action_group_add_toggle_actions( action_group, 
-                                       persistent_toggle_entries, 
-                                       G_N_ELEMENTS(persistent_toggle_entries), 
+                                       pref_toggle_entries, 
+                                       G_N_ELEMENTS(pref_toggle_entries), 
                                        callback_user_data );
 
   gtk_action_group_add_actions( action_group,

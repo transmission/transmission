@@ -317,6 +317,8 @@ appsetup( TrWindow * wind, GList * args,
     cbdata->closing    = FALSE;
     cbdata->errqueue   = NULL;
 
+    actions_set_core( cbdata->core );
+
     /* set up core handlers */
     g_signal_connect( cbdata->core, "error", G_CALLBACK( coreerr ), cbdata );
     g_signal_connect( cbdata->core, "directory-prompt",
@@ -730,10 +732,6 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
             cbdata->icon = NULL;
         }
     }
-    else if( !strcmp( key, PREF_KEY_SORT_MODE ) || !strcmp( key, PREF_KEY_SORT_REVERSED ) )
-    {
-        tr_core_resort( cbdata->core );
-    }
     else if( !strcmp( key, PREF_KEY_PEX ) )
     {
         gboolean enabled = pref_flag_get( key );
@@ -1023,23 +1021,6 @@ doAction ( const char * action_name, gpointer user_data )
             gtk_widget_hide (w);
         else
             gtk_window_present (GTK_WINDOW(w));
-    }
-    else if( !strcmp( action_name, "sort-by-activity" )
-         ||  !strcmp( action_name, "sort-by-date-added" )
-         ||  !strcmp( action_name, "sort-by-name" )
-         ||  !strcmp( action_name, "sort-by-progress" )
-         ||  !strcmp( action_name, "sort-by-state" )
-         ||  !strcmp( action_name, "sort-by-tracker" ) )
-    {
-        tr_core_set_pref( data->core, PREF_KEY_SORT_MODE, action_name );
-    }
-    else if( !strcmp( action_name, "reverse-sort-order" ) )
-    {
-        tr_core_toggle_pref_bool( data->core, PREF_KEY_SORT_REVERSED );
-    }
-    else if( !strcmp( action_name, "minimal-view" ) )
-    {
-        tr_core_toggle_pref_bool( data->core, PREF_KEY_MINIMAL_VIEW );
     }
     else g_error ("Unhandled action: %s", action_name );
 
