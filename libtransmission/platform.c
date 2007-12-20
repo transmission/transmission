@@ -367,7 +367,6 @@ tr_getPrefsDirectory( void )
                         buf, sizeof( buf ) );
         strcat( buf, "/Transmission" );
 #elif defined( SYS_DARWIN )
-        const char * h = tr_getHomeDirectory( );
         tr_buildPath ( buf, sizeof( buf ),
                        tr_getHomeDirectory( ),
                        "Library",
