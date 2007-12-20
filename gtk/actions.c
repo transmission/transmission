@@ -274,6 +274,7 @@ actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
 
   gtk_ui_manager_insert_action_group( ui_manager, action_group, 0 );
   g_object_unref (G_OBJECT(action_group));
+  g_free( match );
 }
 
 /****
