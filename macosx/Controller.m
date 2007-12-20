@@ -2206,6 +2206,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) setLimitGlobalEnabled: (id) sender
 {
+    [fDefaults setBool: sender == ([sender menu] == fUploadMenu ? fUploadLimitItem : fDownloadLimitItem)
+        forKey: [sender menu] == fUploadMenu ? @"CheckUpload" : @"CheckDownload"];
     [fPrefsController applySpeedSettings: nil];
 }
 
@@ -3197,6 +3199,16 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         [menuItem setState: [fDefaults boolForKey: @"DisplayProgressBarAvailable"] ? NSOnState : NSOffState];
         return [fWindow isVisible];
+    }
+    
+    if (action == @selector(setLimitGlobalEnabled:))
+    {NSLog(@"%@", menuItem);
+        BOOL upload = [menuItem menu] == fUploadMenu;
+        NSString * key = upload ? @"CheckUpload" : @"CheckDownload";
+        BOOL state = menuItem == (upload ? fUploadLimitItem : fDownloadLimitItem);
+        
+        [menuItem setState: [fDefaults boolForKey: key] ? state : !state];
+        return YES;
     }
 
     //enable show info

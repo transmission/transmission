@@ -323,7 +323,7 @@
 - (void) applySpeedSettings: (id) sender
 {
     if ([fDefaults boolForKey: @"SpeedLimit"])
-    {
+    {NSLog(@"Speed Limit up: %d down: %d", [fDefaults integerForKey: @"SpeedLimitUploadLimit"], [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
         tr_setUseGlobalSpeedLimit(fHandle, TR_UP, 1);
         tr_setGlobalSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
         
@@ -331,7 +331,8 @@
         tr_setGlobalSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
     }
     else
-    {
+    {NSLog(@"up (%d): %d down (%d): %d", [fDefaults boolForKey: @"CheckUpload"], [fDefaults integerForKey: @"UploadLimit"],
+                            [fDefaults boolForKey: @"CheckDownload"], [fDefaults integerForKey: @"DownloadLimit"]);
         tr_setUseGlobalSpeedLimit(fHandle, TR_UP, [fDefaults boolForKey: @"CheckUpload"]);
         tr_setGlobalSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"UploadLimit"]);
         
