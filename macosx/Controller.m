@@ -39,7 +39,6 @@
 #import "NSStringAdditions.h"
 #import "NSMenuAdditions.h"
 #import "UKKQueue.h"
-#import "ActionMenuRatioToDisplayRatioTransformer.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 #import "SpeedLimitToTurtleIconTransformer.h"
@@ -176,10 +175,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [[NSBundle mainBundle] pathForResource: @"Defaults" ofType: @"plist"]]];
     
     //set custom value transformers
-    ActionMenuRatioToDisplayRatioTransformer * ratioTransformer =
-                        [[[ActionMenuRatioToDisplayRatioTransformer alloc] init] autorelease];
-    [NSValueTransformer setValueTransformer: ratioTransformer forName: @"ActionMenuRatioToDisplayRatioTransformer"];
-    
     ExpandedPathToPathTransformer * pathTransformer =
                         [[[ExpandedPathToPathTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer: pathTransformer forName: @"ExpandedPathToPathTransformer"];
@@ -2203,6 +2198,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     [fDefaults setBool: sender == ([sender menu] == fUploadMenu ? fUploadLimitItem : fDownloadLimitItem)
         forKey: [sender menu] == fUploadMenu ? @"CheckUpload" : @"CheckDownload"];
+    
     [fPrefsController applySpeedSettings: nil];
 }
 
@@ -2215,7 +2211,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fPrefsController applySpeedSettings: nil];
 }
 
-#warning get rid of bindings :(
+- (void) setRatioGlobalEnabled: (id) sender
+{
+    [fDefaults setBool: sender == fCheckRatioItem forKey: @"RatioCheck"];
+}
+
 - (void) setQuickRatioGlobal: (id) sender
 {
     [fDefaults setBool: YES forKey: @"RatioCheck"];
@@ -3207,6 +3207,17 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                     [fDefaults integerForKey: upload ? @"UploadLimit" : @"DownloadLimit"]]];
         
         [menuItem setState: [fDefaults boolForKey: upload ? @"CheckUpload" : @"CheckDownload"] ? limit : !limit];
+        return YES;
+    }
+    
+    if (action == @selector(setRatioGlobalEnabled:))
+    {
+        BOOL check = menuItem == fCheckRatioItem;
+        if (check)
+            [menuItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
+                                    "Action context menu -> ratio stop"), [fDefaults floatForKey: @"RatioLimit"]]];
+        
+        [menuItem setState: [fDefaults boolForKey: @"RatioCheck"] ? check : !check];
         return YES;
     }
 

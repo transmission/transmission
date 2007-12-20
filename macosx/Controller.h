@@ -81,6 +81,8 @@
     IBOutlet NSMenuItem             * fUploadLimitItem, * fUploadNoLimitItem,
                                     * fDownloadLimitItem, * fDownloadNoLimitItem;
     
+    IBOutlet NSMenuItem             * fCheckRatioItem, * fNoCheckRatioItem;
+    
     IBOutlet NSMenu                 * fGroupsSetMenu, * fGroupsSetContextMenu, * fGroupFilterMenu;
     IBOutlet NSPopUpButton          * fGroupsButton;
     
@@ -206,6 +208,7 @@
 - (void) setLimitGlobalEnabled: (id) sender;
 - (void) setQuickLimitGlobal: (id) sender;
 
+- (void) setRatioGlobalEnabled: (id) sender;
 - (void) setQuickRatioGlobal: (id) sender;
 
 - (void) torrentStoppedForRatio: (NSNotification *) notification;

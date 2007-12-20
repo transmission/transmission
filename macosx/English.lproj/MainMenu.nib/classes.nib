@@ -122,6 +122,8 @@
 				<string>id</string>
 				<key>setQuickRatioGlobal</key>
 				<string>id</string>
+				<key>setRatioGlobalEnabled</key>
+				<string>id</string>
 				<key>setSort</key>
 				<string>id</string>
 				<key>setSortByGroup</key>
@@ -177,6 +179,8 @@
 				<string>StatusBarView</string>
 				<key>fBottomTigerLine</key>
 				<string>NSBox</string>
+				<key>fCheckRatioItem</key>
+				<string>NSMenuItem</string>
 				<key>fDockMenu</key>
 				<string>NSMenu</string>
 				<key>fDownloadFilterButton</key>
@@ -200,6 +204,8 @@
 				<key>fNextFilterItem</key>
 				<string>NSMenuItem</string>
 				<key>fNextInfoTabItem</key>
+				<string>NSMenuItem</string>
+				<key>fNoCheckRatioItem</key>
 				<string>NSMenuItem</string>
 				<key>fNoFilterButton</key>
 				<string>FilterButton</string>
@@ -267,6 +273,14 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>FilterButton</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSButton</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>checkFile</key>
@@ -303,14 +317,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSTableView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>FilterButton</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSButton</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
