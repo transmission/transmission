@@ -70,7 +70,8 @@
     IBOutlet NSTextField            * fTotalDLField, * fTotalULField;
     
     IBOutlet StatusBarView          * fFilterBar;
-    IBOutlet FilterButton           * fNoFilterButton, * fDownloadFilterButton, * fSeedFilterButton, * fPauseFilterButton;
+    IBOutlet FilterButton           * fNoFilterButton, * fActiveFilterButton, * fDownloadFilterButton,
+                                    * fSeedFilterButton, * fPauseFilterButton;
     IBOutlet NSSearchField          * fSearchFilterField;
     IBOutlet NSMenuItem             * fNextFilterItem, * fPrevFilterItem;
                                 

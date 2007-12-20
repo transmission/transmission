@@ -85,6 +85,7 @@ typedef enum
 } sortTag;
 
 #define FILTER_NONE     @"None"
+#define FILTER_ACTIVE   @"Active"
 #define FILTER_DOWNLOAD @"Download"
 #define FILTER_SEED     @"Seed"
 #define FILTER_PAUSE    @"Pause"
@@ -121,8 +122,8 @@ typedef enum
 #define ROW_HEIGHT_SMALL        40.0
 #define WINDOW_REGULAR_WIDTH    468.0
 
-#define SEARCH_FILTER_MIN_WIDTH 55.0
-#define SEARCH_FILTER_MAX_WIDTH 110.0
+#define SEARCH_FILTER_MIN_WIDTH 40.0
+#define SEARCH_FILTER_MAX_WIDTH 95.0
 
 #define UPDATE_UI_SECONDS           1.0
 #define AUTO_SPEED_LIMIT_SECONDS    5.0
@@ -274,12 +275,17 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         //filter bar
         [fNoFilterButton sizeToFit];
+        [fActiveFilterButton sizeToFit];
         [fDownloadFilterButton sizeToFit];
         [fSeedFilterButton sizeToFit];
         [fPauseFilterButton sizeToFit];
         
+        NSRect activeRect = [fActiveFilterButton frame];
+        activeRect.origin.x = NSMaxX([fNoFilterButton frame]) + 2.0;
+        [fActiveFilterButton setFrame: activeRect];
+        
         NSRect downloadRect = [fDownloadFilterButton frame];
-        downloadRect.origin.x = NSMaxX([fNoFilterButton frame]) + 2.0;
+        downloadRect.origin.x = NSMaxX([fActiveFilterButton frame]) + 2.0;
         [fDownloadFilterButton setFrame: downloadRect];
         
         NSRect seedRect = [fSeedFilterButton frame];
@@ -372,7 +378,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     
     NSButton * currentFilterButton;
-    if ([filterType isEqualToString: FILTER_PAUSE])
+    if ([filterType isEqualToString: FILTER_ACTIVE])
+        currentFilterButton = fActiveFilterButton;
+    else if ([filterType isEqualToString: FILTER_PAUSE])
         currentFilterButton = fPauseFilterButton;
     else if ([filterType isEqualToString: FILTER_SEED])
         currentFilterButton = fSeedFilterButton;
@@ -1818,8 +1826,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     int downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
-    BOOL filterDownload = NO, filterSeed = NO, filterPause = NO, filterStatus = YES;
-    if ([filterType isEqualToString: FILTER_DOWNLOAD])
+    BOOL filterActive = NO, filterDownload = NO, filterSeed = NO, filterPause = NO, filterStatus = YES;
+    if ([filterType isEqualToString: FILTER_ACTIVE])
+        filterActive = YES;
+    else if ([filterType isEqualToString: FILTER_DOWNLOAD])
         filterDownload = YES;
     else if ([filterType isEqualToString: FILTER_SEED])
         filterSeed = YES;
@@ -1851,13 +1861,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             if ([torrent isSeeding])
             {
                 seeding++;
-                if (filterStatus && !filterSeed)
+                if (filterStatus && (!filterActive && !filterSeed))
                     continue;
             }
             else
             {
                 downloading++;
-                if (filterStatus && !filterDownload)
+                if (filterStatus && (!filterActive && !filterDownload))
                     continue;
             }
         }
@@ -1910,6 +1920,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //set button tooltips
     [fNoFilterButton setCount: [fTorrents count]];
+    [fActiveFilterButton setCount: downloading + seeding];
     [fDownloadFilterButton setCount: downloading];
     [fSeedFilterButton setCount: seeding];
     [fPauseFilterButton setCount: paused];
@@ -1954,6 +1965,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSButton * prevFilterButton;
     if ([oldFilterType isEqualToString: FILTER_PAUSE])
         prevFilterButton = fPauseFilterButton;
+    else if ([oldFilterType isEqualToString: FILTER_ACTIVE])
+        prevFilterButton = fActiveFilterButton;
     else if ([oldFilterType isEqualToString: FILTER_SEED])
         prevFilterButton = fSeedFilterButton;
     else if ([oldFilterType isEqualToString: FILTER_DOWNLOAD])
@@ -1967,7 +1980,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [sender setState: NSOnState];
 
         NSString * filterType;
-        if (sender == fDownloadFilterButton)
+        if (sender == fActiveFilterButton)
+            filterType = FILTER_ACTIVE;
+        else if (sender == fDownloadFilterButton)
             filterType = FILTER_DOWNLOAD;
         else if (sender == fPauseFilterButton)
             filterType = FILTER_PAUSE;
@@ -2016,9 +2031,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     NSButton * button;
     if ([filterType isEqualToString: FILTER_NONE])
-        button = sender == fNextFilterItem ? fDownloadFilterButton : fPauseFilterButton;
+        button = sender == fNextFilterItem ? fActiveFilterButton : fPauseFilterButton;
+    else if ([filterType isEqualToString: FILTER_ACTIVE])
+        button = sender == fNextFilterItem ? fDownloadFilterButton : fNoFilterButton;
     else if ([filterType isEqualToString: FILTER_DOWNLOAD])
-        button = sender == fNextFilterItem ? fSeedFilterButton : fNoFilterButton;
+        button = sender == fNextFilterItem ? fSeedFilterButton : fActiveFilterButton;
     else if ([filterType isEqualToString: FILTER_SEED])
         button = sender == fNextFilterItem ? fPauseFilterButton : fDownloadFilterButton;
     else if ([filterType isEqualToString: FILTER_PAUSE])
@@ -3598,25 +3615,67 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) windowDidResize: (NSNotification *) notification
 {
+    //replace all buttons
+    [fActiveFilterButton sizeToFit];
+    [fDownloadFilterButton sizeToFit];
+    [fSeedFilterButton sizeToFit];
+    [fPauseFilterButton sizeToFit];
+    
+    NSRect activeRect = [fActiveFilterButton frame];
+    
+    NSRect downloadRect = [fDownloadFilterButton frame];
+    downloadRect.origin.x = NSMaxX(activeRect) + 2.0;
+    [fDownloadFilterButton setFrame: downloadRect];
+    
+    NSRect seedRect = [fSeedFilterButton frame];
+    seedRect.origin.x = NSMaxX(downloadRect) + 2.0;
+    [fSeedFilterButton setFrame: seedRect];
+    
+    NSRect pauseRect = [fPauseFilterButton frame];
+    pauseRect.origin.x = NSMaxX(seedRect) + 2.0;
+    [fPauseFilterButton setFrame: pauseRect];
+    
     //size search filter to not overlap buttons
     float pointX = NSMaxX([fPauseFilterButton frame]) + 5.0;
-    NSRect oldFrame = [fSearchFilterField frame],
-            frame = NSMakeRect(pointX, oldFrame.origin.y, NSMaxX(oldFrame) - pointX, oldFrame.size.height);
+    NSRect searchFrame = [fSearchFilterField frame];
+    searchFrame.origin.x = NSMaxX(pauseRect) + 5.0;
+    searchFrame.size.width = [fStatusBar frame].size.width - searchFrame.origin.x - 5.0;
     
-    BOOL show = frame.size.width >= SEARCH_FILTER_MIN_WIDTH;
-    if (show)
+    //make sure it is not too long
+    if (searchFrame.size.width > SEARCH_FILTER_MAX_WIDTH)
     {
-        //make sure it is not too long
-        if (frame.size.width > SEARCH_FILTER_MAX_WIDTH)
-        {
-            frame.origin.x += frame.size.width - SEARCH_FILTER_MAX_WIDTH;
-            frame.size.width = SEARCH_FILTER_MAX_WIDTH;
-        }
-        [fSearchFilterField setFrame: frame];
+        searchFrame.origin.x += searchFrame.size.width - SEARCH_FILTER_MAX_WIDTH;
+        searchFrame.size.width = SEARCH_FILTER_MAX_WIDTH;
     }
+    else if (searchFrame.size.width < SEARCH_FILTER_MIN_WIDTH)
+    {
+        searchFrame.origin.x += searchFrame.size.width - SEARCH_FILTER_MIN_WIDTH;
+        searchFrame.size.width = SEARCH_FILTER_MIN_WIDTH;
+        
+        //resize each button until they don't overlap search
+        do
+        {
+            activeRect.size.width--;
+            
+            downloadRect.size.width--;
+            downloadRect.origin.x--;
+            
+            seedRect.size.width--;
+            seedRect.origin.x -= 2.0;
+            
+            pauseRect.size.width--;
+            pauseRect.origin.x -= 3.0;
+        }
+        while (NSMaxX(pauseRect) + 5.0 > searchFrame.origin.x);
+        
+        [fActiveFilterButton setFrame: activeRect];
+        [fDownloadFilterButton setFrame: downloadRect];
+        [fSeedFilterButton setFrame: seedRect];
+        [fPauseFilterButton setFrame: pauseRect];
+    }
+    else;
     
-    //hide search filter if it overlaps filter buttons
-    [fSearchFilterField setHidden: !show];
+    [fSearchFilterField setFrame: searchFrame];
 }
 
 - (void) applicationWillUnhide: (NSNotification *) notification

@@ -171,6 +171,8 @@
 			<dict>
 				<key>fActionButton</key>
 				<string>NSButton</string>
+				<key>fActiveFilterButton</key>
+				<string>FilterButton</string>
 				<key>fBottomTigerBar</key>
 				<string>StatusBarView</string>
 				<key>fBottomTigerLine</key>
