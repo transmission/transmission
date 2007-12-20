@@ -3625,18 +3625,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     NSRect downloadRect = [fDownloadFilterButton frame];
     downloadRect.origin.x = NSMaxX(activeRect) + 1.0;
-    [fDownloadFilterButton setFrame: downloadRect];
     
     NSRect seedRect = [fSeedFilterButton frame];
     seedRect.origin.x = NSMaxX(downloadRect) + 1.0;
-    [fSeedFilterButton setFrame: seedRect];
     
     NSRect pauseRect = [fPauseFilterButton frame];
     pauseRect.origin.x = NSMaxX(seedRect) + 1.0;
-    [fPauseFilterButton setFrame: pauseRect];
     
     //size search filter to not overlap buttons
-    float pointX = NSMaxX([fPauseFilterButton frame]) + 5.0;
     NSRect searchFrame = [fSearchFilterField frame];
     searchFrame.origin.x = NSMaxX(pauseRect) + 5.0;
     searchFrame.size.width = [fStatusBar frame].size.width - searchFrame.origin.x - 5.0;
@@ -3657,7 +3653,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         BOOL seeding = NO, paused = NO;
         do
         {
-            if (download < 11)
+            if (download < 8)
             {
                 download++;
                 downloadRect.size.width--;
@@ -3692,13 +3688,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             }
         }
         while (NSMaxX(pauseRect) + 5.0 > searchFrame.origin.x);
-        
-        [fActiveFilterButton setFrame: activeRect];
-        [fDownloadFilterButton setFrame: downloadRect];
-        [fSeedFilterButton setFrame: seedRect];
-        [fPauseFilterButton setFrame: pauseRect];
     }
     else;
+    
+    [fActiveFilterButton setFrame: activeRect];
+    [fDownloadFilterButton setFrame: downloadRect];
+    [fSeedFilterButton setFrame: seedRect];
+    [fPauseFilterButton setFrame: pauseRect];
     
     [fSearchFilterField setFrame: searchFrame];
 }
