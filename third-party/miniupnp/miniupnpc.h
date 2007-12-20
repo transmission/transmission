@@ -1,4 +1,4 @@
-/* $Id: miniupnpc.h,v 1.15 2007/10/16 15:07:32 nanard Exp $ */
+/* $Id: miniupnpc.h,v 1.17 2007/12/19 14:58:54 nanard Exp $ */
 /* Project: miniupnp
  * http://miniupnp.free.fr/
  * Author: Thomas Bernard
@@ -15,6 +15,7 @@
 extern "C" {
 #endif
 
+/* Structures definitions : */
 struct UPNParg { const char * elt; const char * val; };
 
 int simpleUPnPcommand(int, const char *, const char *,
@@ -28,17 +29,32 @@ struct UPNPDev {
 	char buffer[2];
 };
 
-/* discover UPnP devices on the network */
-LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif);
-/* free returned list from above function */
+/* upnpDiscover()
+ * discover UPnP devices on the network.
+ * The discovered devices are returned as a chained list.
+ * It is up to the caller to free the list with freeUPNPDevlist().
+ * delay (in millisecond) is the maximum time for waiting any device
+ * response.
+ * If available, device list will be obtained from MiniSSDPd.
+ * Default path for minissdpd socket will be used if minissdpdsock argument
+ * is NULL.
+ * If multicastif is not NULL, it will be used instead of the default
+ * multicast interface for sending SSDP discover packets. */
+LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
+                                      const char * minissdpdsock);
+/* freeUPNPDevlist()
+ * free list returned by upnpDiscover() */
 LIBSPEC void freeUPNPDevlist(struct UPNPDev * devlist);
 
+/* parserootdesc() :
+ * parse root XML description of a UPnP device and fill the IGDdatas
+ * structure. */
 LIBSPEC void parserootdesc(const char *, int, struct IGDdatas *);
 
 /* structure used to get fast access to urls
  * controlURL: controlURL of the WANIPConnection
  * ipcondescURL: url of the description of the WANIPConnection
- * controlURL_CIF: controlURL of the WANCOmmonInterfaceConfig
+ * controlURL_CIF: controlURL of the WANCommonInterfaceConfig
  */
 struct UPNPUrls {
 	char * controlURL;

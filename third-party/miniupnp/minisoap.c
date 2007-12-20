@@ -1,4 +1,4 @@
-/* $Id: minisoap.c,v 1.11 2007/05/19 13:13:08 nanard Exp $ */
+/* $Id: minisoap.c,v 1.12 2007/12/13 17:09:03 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005 Thomas Bernard
@@ -62,13 +62,18 @@ int soapPostSubmit(int fd,
 	char headerbuf[1024];
 	int headerssize;
 	bodysize = (int)strlen(body);
+	/* We are not using keep-alive HTTP connections.
+	 * HTTP/1.1 needs the header Connection: close to do that.
+	 * This is the default with HTTP/1.0 */
 	headerssize = snprintf(headerbuf, sizeof(headerbuf),
-                       "POST %s HTTP/1.1\r\n"
-	                   "HOST: %s:%d\r\n"
-	                   "Content-length: %d\r\n"
+/*                       "POST %s HTTP/1.1\r\n"*/
+                       "POST %s HTTP/1.0\r\n"
+	                   "Host: %s:%d\r\n"
+					   "User-Agent: POSIX, UPnP/1.0, miniUPnPc/1.0\r\n"
+	                   "Content-Length: %d\r\n"
 					   "Content-Type: text/xml\r\n"
 					   "SOAPAction: \"%s\"\r\n"
-					   "Connection: Close\r\n"
+/*					   "Connection: Close\r\n" */
 					   "\r\n",
 					   url, host, port, bodysize, action);
 	return httpWrite(fd, body, bodysize, headerbuf, headerssize);

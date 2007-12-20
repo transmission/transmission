@@ -1,4 +1,4 @@
-/* $Id: miniupnpc.c,v 1.45 2007/10/16 15:23:44 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.49 2007/12/19 14:58:54 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2007 Thomas Bernard
@@ -128,7 +128,7 @@ getContentLengthAndHeaderLength(char * p, int n,
 
 /* simpleUPnPcommand :
  * not so simple !
- *  */
+ * TODO: return some error codes */
 int simpleUPnPcommand(int s, const char * url, const char * service,
                       const char * action, struct UPNParg * args,
                       char * buffer, int * bufsize)
@@ -147,7 +147,7 @@ int simpleUPnPcommand(int s, const char * url, const char * service,
 	snprintf(soapact, sizeof(soapact), "%s#%s", service, action);
 	if(args==NULL)
 	{
-		soapbodylen = snprintf(soapbody, sizeof(soapbody),
+		/*soapbodylen = snprintf(soapbody, sizeof(soapbody),
 						"<?xml version=\"1.0\"?>\r\n"
 	    	              "<SOAP-ENV:Envelope "
 						  "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -155,7 +155,17 @@ int simpleUPnPcommand(int s, const char * url, const char * service,
 						  "<SOAP-ENV:Body>"
 						  "<m:%s xmlns:m=\"%s\"/>"
 						  "</SOAP-ENV:Body></SOAP-ENV:Envelope>"
-					 	  "\r\n", action, service);
+					 	  "\r\n", action, service);*/
+		soapbodylen = snprintf(soapbody, sizeof(soapbody),
+						"<?xml version=\"1.0\"?>\r\n"
+	    	              "<s:Envelope "
+						  "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+						  "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
+						  "<s:Body>"
+						  "<m:%s xmlns:m=\"%s\">"
+						  "</m:%s>"
+						  "</s:Body></s:Envelope>"
+					 	  "\r\n", action, service, action);
 	}
 	else
 	{
@@ -316,7 +326,8 @@ parseMSEARCHReply(const char * reply, int size,
  * no devices was found.
  * It is up to the caller to free the chained list
  * delay is in millisecond (poll) */
-struct UPNPDev * upnpDiscover(int delay, const char * multicastif)
+struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
+                              const char * minissdpdsock)
 {
 	struct UPNPDev * tmp;
 	struct UPNPDev * devlist = 0;
@@ -343,9 +354,17 @@ struct UPNPDev * upnpDiscover(int delay, const char * multicastif)
 
 #ifndef WIN32
 	/* first try to get infos from minissdpd ! */
-	devlist = getDevicesFromMiniSSDPD(deviceList[0], "/var/run/minissdpd.sock");
-	if(devlist)
-		return devlist;
+	if(!minissdpdsock)
+		minissdpdsock = "/var/run/minissdpd.sock";
+	while(!devlist && deviceList[deviceIndex]) {
+		devlist = getDevicesFromMiniSSDPD(deviceList[deviceIndex],
+		                                  minissdpdsock);
+		/* We return what we have found if it was not only a rootdevice */
+		if(devlist && !strstr(deviceList[deviceIndex], "rootdevice"))
+			return devlist;
+		deviceIndex++;
+	}
+	deviceIndex = 0;
 #endif
 	/* fallback to direct discovery */
 #ifdef WIN32
@@ -574,7 +593,8 @@ int ReceiveData(int socket, char * data, int length, int timeout)
     FD_SET(socket, &socketSet);
     timeval.tv_sec = timeout / 1000;
     timeval.tv_usec = (timeout % 1000) * 1000;
-    n = select(0, &socketSet, NULL, NULL, &timeval);
+    /*n = select(0, &socketSet, NULL, NULL, &timeval);*/
+    n = select(FD_SETSIZE, &socketSet, NULL, NULL, &timeval);
     if(n < 0)
     {
         PRINT_SOCKET_ERROR("select");

@@ -87,7 +87,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
     {
         struct UPNPDev * devlist;
         errno = 0;
-        devlist = upnpDiscover( 2000, NULL );
+        devlist = upnpDiscover( 2000, NULL, NULL );
         if( devlist == NULL ) {
             tr_err( KEY "upnpDiscover returned NULL (errno %d - %s)", errno, strerror(errno) );
         }

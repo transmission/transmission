@@ -1,4 +1,4 @@
-/* $Id: upnpcommands.h,v 1.10 2007/01/29 20:27:24 nanard Exp $ */
+/* $Id: upnpcommands.h,v 1.12 2007/12/19 14:56:15 nanard Exp $ */
 /* Miniupnp project : http://miniupnp.free.fr/
  * Author : Thomas Bernard
  * Copyright (c) 2005-2006 Thomas Bernard
@@ -9,6 +9,11 @@
 
 #include "upnpreplyparse.h"
 #include "declspec.h"
+
+/* MiniUPnPc return codes : */
+#define UPNPCOMMAND_SUCCESS (0)
+#define UPNPCOMMAND_UNKNOWN_ERROR (-1)
+#define UPNPCOMMAND_INVALID_ARGS (-2)
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,8 +48,16 @@ UPNP_GetConnectionTypeInfo(const char * controlURL,
 
 /* UPNP_GetExternalIPAddress() call the corresponding UPNP method.
  * if the third arg is not null the value is copied to it.
- * at least 16 bytes must be available */
-LIBSPEC void
+ * at least 16 bytes must be available 
+ *
+ * Return values :
+ * 0 : SUCCESS
+ * NON ZERO : ERROR Either an UPnP error code or an unknown error.
+ * 
+ * possible UPnP Errors :
+ * 402 Invalid Args - See UPnP Device Architecture section on Control.
+ * 501 Action Failed - See UPnP Device Architecture section on Control. */
+LIBSPEC int
 UPNP_GetExternalIPAddress(const char * controlURL,
                           const char * servicetype,
                           char * extIpAdd);
@@ -55,8 +68,29 @@ UPNP_GetLinkLayerMaxBitRates(const char* controlURL,
 							unsigned int * bitrateDown,
 							unsigned int * bitrateUp);
 
-/* Returns zero if unable to add the port mapping, otherwise non-zero 
- * to indicate success */
+/* UPNP_AddPortMapping()
+ *
+ * Return values :
+ * 0 : SUCCESS
+ * NON ZERO : ERROR. Either an UPnP error code or an unknown error.
+ * 
+ * List of possible UPnP errors for AddPortMapping :
+ * errorCode errorDescription (short) - Description (long)
+ * 402 Invalid Args - See UPnP Device Architecture section on Control.
+ * 501 Action Failed - See UPnP Device Architecture section on Control.
+ * 715 WildCardNotPermittedInSrcIP - The source IP address cannot be
+ *                                   wild-carded
+ * 716 WildCardNotPermittedInExtPort - The external port cannot be wild-carded
+ * 718 ConflictInMappingEntry - The port mapping entry specified conflicts
+ *                     with a mapping assigned previously to another client
+ * 724 SamePortValuesRequired - Internal and External port values
+ *                              must be the same 
+ * 725 OnlyPermanentLeasesSupported - The NAT implementation only supports
+ *                  permanent lease times on port mappings
+ * 726 RemoteHostOnlySupportsWildcard - RemoteHost must be a wildcard
+ *                             and cannot be a specific IP address or DNS name
+ * 727 ExternalPortOnlySupportsWildcard - ExternalPort must be a wildcard and
+ *                                        cannot be a specific port value */
 LIBSPEC int
 UPNP_AddPortMapping(const char * controlURL, const char * servicetype,
                     const char * extPort,
@@ -65,17 +99,25 @@ UPNP_AddPortMapping(const char * controlURL, const char * servicetype,
 					const char * desc,
                     const char * proto);
 
-LIBSPEC void
+/* UPNP_DeletePortMapping()
+ * Return Values :
+ * 0 : SUCCESS
+ * NON ZERO : error. Either an UPnP error code or an undefined error.
+ *
+ * List of possible UPnP errors for DeletePortMapping :
+ * 402 Invalid Args - See UPnP Device Architecture section on Control.
+ * 714 NoSuchEntryInArray - The specified value does not exist in the array */
+LIBSPEC int
 UPNP_DeletePortMapping(const char * controlURL, const char * servicetype,
                        const char * extPort, const char * proto);
 
-LIBSPEC void
+LIBSPEC int
 UPNP_GetPortMappingNumberOfEntries(const char* controlURL, const char* servicetype, unsigned int * num);
 
 /* UPNP_GetSpecificPortMappingEntry retrieves an existing port mapping
  * the result is returned in the intClient and intPort strings
  * please provide 16 and 6 bytes of data */
-LIBSPEC void
+LIBSPEC int
 UPNP_GetSpecificPortMappingEntry(const char * controlURL,
                                  const char * servicetype,
                                  const char * extPort,
@@ -83,6 +125,12 @@ UPNP_GetSpecificPortMappingEntry(const char * controlURL,
                                  char * intClient,
                                  char * intPort);
 
+/* UPNP_GetGenericPortMappingEntry()
+ *
+ * Possible UPNP Error codes :
+ * 402 Invalid Args - See UPnP Device Architecture section on Control.
+ * 713 SpecifiedArrayIndexInvalid - The specified array index is out of bounds
+ */
 LIBSPEC int
 UPNP_GetGenericPortMappingEntry(const char * controlURL,
                                 const char * servicetype,

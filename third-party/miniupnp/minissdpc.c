@@ -1,4 +1,4 @@
-/* $Id: minissdpc.c,v 1.3 2007/09/01 23:34:12 nanard Exp $ */
+/* $Id: minissdpc.c,v 1.4 2007/12/19 14:56:58 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2007 Thomas Bernard
@@ -16,16 +16,23 @@
 #include "minissdpc.h"
 #include "miniupnpc.h"
 
+#define DECODELENGTH(n, p) n = 0; \
+                           do { n = (n << 7) | (*p & 0x7f); } \
+                           while(*(p++)&0x80);
+#define CODELENGTH(n, p) do { *p = (n & 0x7f) | ((n > 0x7f) ? 0x80 : 0); \
+                              p++; n >>= 7; } while(n);
+
 struct UPNPDev *
 getDevicesFromMiniSSDPD(const char * devtype, const char * socketpath)
 {
 	struct UPNPDev * tmp;
 	struct UPNPDev * devlist = NULL;
-	unsigned char buffer[512];
+	unsigned char buffer[2048];
 	ssize_t n;
 	unsigned char * p;
+	unsigned char * url;
 	unsigned int i;
-	unsigned int urlsize, stsize;
+	unsigned int urlsize, stsize, usnsize, l;
 	int s;
 	struct sockaddr_un addr;
 
@@ -46,37 +53,53 @@ getDevicesFromMiniSSDPD(const char * devtype, const char * socketpath)
 	}
 	stsize = strlen(devtype);
 	buffer[0] = 1;
-	buffer[1] = stsize;
-	memcpy(buffer + 2, devtype, (int)buffer[1]);
-	if(write(s, buffer, (int)buffer[1] + 2) < 0)
+	p = buffer + 1;
+	l = stsize;	CODELENGTH(l, p);
+	memcpy(p, devtype, stsize);
+	p += stsize;
+	if(write(s, buffer, p - buffer) < 0)
 	{
 		/*syslog(LOG_ERR, "write(): %m");*/
-		perror("write()");
+		perror("minissdpc.c: write()");
 		close(s);
 		return NULL;
 	}
 	n = read(s, buffer, sizeof(buffer));
 	if(n<=0)
 	{
+		perror("minissdpc.c: read()");
 		close(s);
 		return NULL;
 	}
 	p = buffer + 1;
 	for(i = 0; i < buffer[0]; i++)
 	{
-		urlsize = *(p++);
-		stsize = p[urlsize];
+		if(p+2>=buffer+sizeof(buffer))
+			break;
+		DECODELENGTH(urlsize, p);
+		if(p+urlsize+2>=buffer+sizeof(buffer))
+			break;
+		url = p;
+		p += urlsize;
+		DECODELENGTH(stsize, p);
+		if(p+stsize+2>=buffer+sizeof(buffer))
+			break;
 		tmp = (struct UPNPDev *)malloc(sizeof(struct UPNPDev)+urlsize+stsize);
 		tmp->pNext = devlist;
 		tmp->descURL = tmp->buffer;
 		tmp->st = tmp->buffer + 1 + urlsize;
-		memcpy(tmp->buffer, p, urlsize);
+		memcpy(tmp->buffer, url, urlsize);
 		tmp->buffer[urlsize] = '\0';
-		p += urlsize;
-		p++;
 		memcpy(tmp->buffer + urlsize + 1, p, stsize);
+		p += stsize;
 		tmp->buffer[urlsize+1+stsize] = '\0';
 		devlist = tmp;
+		/* added for compatibility with recent versions of MiniSSDPd 
+		 * >= 2007/12/19 */
+		DECODELENGTH(usnsize, p);
+		p += usnsize;
+		if(p>buffer + sizeof(buffer))
+			break;
 	}
 	close(s);
 	return devlist;
