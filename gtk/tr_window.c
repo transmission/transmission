@@ -52,9 +52,11 @@ typedef struct
 {
     GtkWidget * scroll;
     GtkWidget * view;
+    GtkWidget * toolbar;
     GtkWidget * status;
     GtkWidget * ul_lb;
     GtkWidget * dl_lb;
+    GtkWidget * stats_lb;
     GtkTreeSelection  * selection;
     GtkCellRenderer   * renderer;
     GtkTreeViewColumn * column;
@@ -144,11 +146,22 @@ realized_cb ( GtkWidget * wind, gpointer unused UNUSED )
 static void
 prefsChanged( TrCore * core UNUSED, const char * key, gpointer wind )
 {
+    PrivateData * p = get_private_data( GTK_WINDOW( wind ) );
+
     if( !strcmp( key, PREF_KEY_MINIMAL_VIEW ) )
     {
-       PrivateData * p = get_private_data( GTK_WINDOW( wind ) );
        g_object_set( p->renderer, "minimal", pref_flag_get( key ), NULL );
        gtk_tree_view_column_queue_resize( p->column );
+    }
+    else if( !strcmp( key, PREF_KEY_STATUS_BAR ) )
+    {
+        const gboolean isEnabled = pref_flag_get( key );
+        g_object_set( p->status, "visible", isEnabled, NULL );
+    }
+    else if( !strcmp( key, PREF_KEY_TOOLBAR ) )
+    {
+        const gboolean isEnabled = pref_flag_get( key );
+        g_object_set( p->toolbar, "visible", isEnabled, NULL );
     }
 }
 
@@ -188,8 +201,31 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     gtk_box_pack_start( GTK_BOX(vbox), w, FALSE, FALSE, 0 ); 
 
     /* toolbar */
-    w = action_get_widget( "/main-window-toolbar" );
+    w = p->toolbar = action_get_widget( "/main-window-toolbar" );
     gtk_box_pack_start( GTK_BOX(vbox), w, FALSE, FALSE, 0 ); 
+
+    /* statusbar */
+    h = p->status = gtk_hbox_new( FALSE, GUI_PAD );
+    gtk_container_set_border_width( GTK_CONTAINER(h), GUI_PAD );
+     
+    w = p->ul_lb = gtk_label_new( NULL );
+    gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
+    w = gtk_image_new_from_stock( "tr-arrow-up", (GtkIconSize)-1 );
+    gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
+    w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
+    gtk_widget_set_usize( w, GUI_PAD, 0u );
+    gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
+    w = p->dl_lb = gtk_label_new( NULL );
+    gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
+    w = gtk_image_new_from_stock( "tr-arrow-down", (GtkIconSize)-1 );
+    gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
+
+    w = gtk_image_new_from_stock( "tr-yin-yang", (GtkIconSize)-1 );
+    gtk_box_pack_start( GTK_BOX(h), w, FALSE, FALSE, 0 );
+    w = p->stats_lb = gtk_label_new( NULL );
+    gtk_box_pack_start( GTK_BOX(h), w, FALSE, FALSE, 0 );
+
+    gtk_box_pack_start( GTK_BOX(vbox), h, FALSE, FALSE, 0 );
 
     /* workarea */
     p->view = makeview( p );
@@ -203,21 +239,13 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     gtk_widget_set_usize (w, 0u, 6u);
     gtk_box_pack_start( GTK_BOX(vbox), w, FALSE, FALSE, 0 ); 
 
-    /* statusbar */
-    h = gtk_hbox_new( FALSE, 0 );
-    w = p->ul_lb = gtk_label_new( NULL );
-    gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, GUI_PAD );
-    w = gtk_vseparator_new( );
-    gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, GUI_PAD );
-    w = p->dl_lb = gtk_label_new( NULL );
-    gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, GUI_PAD );
-    gtk_box_pack_start( GTK_BOX(vbox), h, FALSE, FALSE, 0 );
-
     /* show all but the window */
     gtk_widget_show_all( vbox );
 
     /* listen for prefs changes that affect the window */
     prefsChanged( core, PREF_KEY_MINIMAL_VIEW, self );
+    prefsChanged( core, PREF_KEY_STATUS_BAR, self );
+    prefsChanged( core, PREF_KEY_TOOLBAR, self );
     p->core = core;
     p->pref_handler_id = g_signal_connect( core, "prefs-changed",
                                            G_CALLBACK(prefsChanged), self );
@@ -229,16 +257,21 @@ void
 tr_window_update( TrWindow * self, float downspeed, float upspeed )
 {
     PrivateData * p = get_private_data( self );
-    char speedStr[32];
-    char buf[64];
+    char up[32], down[32], buf[64];
+    struct tr_session_stats stats;
+    tr_handle * handle = tr_core_handle( p->core );
 
-    tr_strlspeed( speedStr, downspeed, sizeof(speedStr) );
-    g_snprintf( buf, sizeof(buf), _("Down: %s"), speedStr );
-    gtk_label_set_text( GTK_LABEL(p->dl_lb), buf );
+    tr_strlspeed( buf, downspeed, sizeof( buf ) );
+    gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
 
-    tr_strlspeed( speedStr, upspeed, sizeof(speedStr) );
-    g_snprintf( buf, sizeof(buf), _("Up: %s"), speedStr );
-    gtk_label_set_text( GTK_LABEL(p->ul_lb), buf );
+    tr_strlspeed( buf, upspeed, sizeof( buf ) );
+    gtk_label_set_text( GTK_LABEL( p->ul_lb ), buf );
+
+    tr_getCumulativeSessionStats( handle, &stats );
+    tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
+    tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
+    g_snprintf( buf, sizeof( buf ), _( "Down: %s  Up: %s" ), down, up );
+    gtk_label_set_text( GTK_LABEL( p->stats_lb ), buf );
 }
 
 GtkTreeSelection*

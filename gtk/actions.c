@@ -20,6 +20,7 @@
 #include "tr_prefs.h"
 #include "lock.h"
 #include "logo.h"
+#include "status-bar-icons.h"
 
 #define UNUSED G_GNUC_UNUSED
 
@@ -101,7 +102,11 @@ static GtkToggleActionEntry pref_toggle_entries[] =
   { "minimal-view", NULL,
     N_("_Minimal View"), "<alt>M", NULL, G_CALLBACK(toggle_pref_cb), FALSE },
   { "sort-reversed", NULL,
-    N_("_Reverse Sort Order"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE }
+    N_("_Reverse Sort Order"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
+  { "show-status-bar", NULL,
+    N_("Show _Status Bar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
+  { "show-toolbar", NULL,
+    N_("Show _Toolbar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE }
 };
 
 static GtkActionEntry entries[] =
@@ -168,7 +173,10 @@ BuiltinIconInfo;
 const BuiltinIconInfo my_builtin_icons [] =
 {
     { tr_icon_logo, "transmission-logo" },
-    { tr_icon_lock, "transmission-lock" }
+    { tr_icon_lock, "transmission-lock" },
+    { tr_arrow_down, "tr-arrow-down" },
+    { tr_arrow_up, "tr-arrow-up" },
+    { tr_yin_yang, "tr-yin-yang" }
 };
 
 static void
@@ -235,12 +243,9 @@ actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
 
 
   match = pref_string_get( PREF_KEY_SORT_MODE );
-  for( i=0, n=G_N_ELEMENTS(sort_radio_entries), active=-1; active==-1 && i<n; ++i ) {
-      if( !strcmp( sort_radio_entries[i].name, match ) ) {
-          g_message( "found %s in index %d", match, i );
+  for( i=0, n=G_N_ELEMENTS(sort_radio_entries), active=-1; active==-1 && i<n; ++i )
+      if( !strcmp( sort_radio_entries[i].name, match ) )
           active = i;
-      }
-  }
 
   gtk_action_group_add_radio_actions( action_group,
                                       sort_radio_entries,
