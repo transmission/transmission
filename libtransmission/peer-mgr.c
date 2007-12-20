@@ -86,18 +86,11 @@ enum
      * we're we don't get piece data from a peer in this long */
     SNUBBED_SEC = 60,
 
-    /* arbitrary */
-    MAX_CONNECTED_PEERS_PER_TORRENT = 50,
-
     /* when many peers are available, keep idle ones this long */
     MIN_UPLOAD_IDLE_SECS = (60 * 3),
 
     /* when few peers are available, keep idle ones this long */
     MAX_UPLOAD_IDLE_SECS = (60 * 10),
-
-    /* how many peers to unchoke per-torrent. */
-    /* FIXME: make this user-configurable? */
-    NUM_UNCHOKED_PEERS_PER_TORRENT = 16, /* arbitrary */
 
     /* set this too high and there will be a lot of churn.
      * set it too low and you'll get peers too slowly */
@@ -998,7 +991,7 @@ myHandshakeDoneCB( tr_handshake    * handshake,
             tordbg( t, "banned peer %s tried to reconnect", tr_peerIoAddrStr(&atom->addr,atom->port) );
             tr_peerIoFree( io );
         }
-        else if( tr_ptrArraySize( t->peers ) >= MAX_CONNECTED_PEERS_PER_TORRENT )
+        else if( tr_ptrArraySize( t->peers ) >= t->tor->maxConnectedPeers )
         {
             tr_peerIoFree( io );
         }
@@ -1554,7 +1547,7 @@ rechoke( Torrent * t )
 
     qsort( choke, size, sizeof(struct ChokeData), compareChoke );
 
-    for( i=0; i<size && unchoked<NUM_UNCHOKED_PEERS_PER_TORRENT; ++i ) {
+    for( i=0; i<size && unchoked<t->tor->maxUnchokedPeers; ++i ) {
         choke[i].doUnchoke = 1;
         ++unchoked;
     }
@@ -1665,7 +1658,7 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
     /* disconnect if it's been too long since piece data has been transferred.
      * this is on a sliding scale based on number of available peers... */
     if( 1 ) {
-        const int relaxStrictnessIfFewerThanN = (int)((MAX_CONNECTED_PEERS_PER_TORRENT * 0.9) + 0.5);
+        const int relaxStrictnessIfFewerThanN = (int)((tor->maxConnectedPeers * 0.9) + 0.5);
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
         const double strictness = peerCount >= relaxStrictnessIfFewerThanN
@@ -1820,8 +1813,8 @@ reconnectPulse( void * vtorrent )
 
         /* add some new ones */
         addMax = tr_ptrArraySize(t->pool)
-            ? MAX_RECONNECTIONS_PER_PULSE
-            : MAX_CONNECTED_PEERS_PER_TORRENT;
+               ? MAX_RECONNECTIONS_PER_PULSE
+               : t->tor->maxConnectedPeers;
           
         for( i=0; i<nCandidates && i<MAX_RECONNECTIONS_PER_PULSE; ++i )
         {

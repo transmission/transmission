@@ -85,3 +85,8 @@ void tr_fdSocketClose( int s );
  **********************************************************************/
 void tr_fdClose( void );
 
+
+void tr_fdSetPeerLimit( uint16_t n );
+
+uint16_t tr_fdGetPeerLimit( void );
+

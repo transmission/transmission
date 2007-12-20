@@ -273,6 +273,27 @@ void tr_getGlobalSpeedLimit( tr_handle * handle,
                              int         * setme_is_enabled,
                              int         * setme_KiBsec );
 
+
+/***********************************************************************
+***  Peer Limits
+**/
+
+void tr_torrentSetPeerLimits( tr_torrent  * tor,
+                              uint16_t      maxConnectedPeers,
+                              uint16_t      maxUnchokedPeers );
+
+void tr_torrentGetPeerLimits( const tr_torrent  * tor,
+                              uint16_t          * maxConnectedPeers,
+                              uint16_t          * maxUnchokedPeers );
+
+void tr_setGlobalPeerLimit( tr_handle * handle,
+                            uint16_t    maxGlobalPeers );
+
+uint16_t tr_getGlobalPeerLimit( const tr_handle * handle );
+
+
+
+
 /***********************************************************************
  * Torrent Priorities
  **********************************************************************/

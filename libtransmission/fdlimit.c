@@ -86,7 +86,7 @@ myDebug( const char * file, int line, const char * fmt, ... )
 
 enum
 {
-    TR_MAX_SOCKETS = 512,
+    TR_MAX_PEER_SOCKETS = 512,
 
     TR_MAX_OPEN_FILES = 16, /* real files, not sockets */
 
@@ -454,7 +454,7 @@ tr_fdSocketClose( int s )
 void
 tr_fdInit( void )
 {
-    int i, j, s[TR_MAX_SOCKETS];
+    int i, j, s[TR_MAX_PEER_SOCKETS];
 
     assert( gFd == NULL );
 
@@ -462,7 +462,7 @@ tr_fdInit( void )
     gFd->lock = tr_lockNew( );
 
     /* count the max number of sockets we can use */
-    for( i=0; i<TR_MAX_SOCKETS; ++i )
+    for( i=0; i<TR_MAX_PEER_SOCKETS; ++i )
         if( ( s[i] = socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 )
             break;
     for( j=0; j<i; ++j )
@@ -490,4 +490,17 @@ tr_fdClose( void )
 
     tr_list_free( &reservedSockets, NULL );
     tr_free( gFd );
+}
+
+void
+tr_fdSetPeerLimit( uint16_t n )
+{
+    assert( gFd!=NULL && "tr_fdInit() must be called first!" );
+    gFd->normalMax = n;
+}
+
+uint16_t
+tr_fdGetPeerLimit( void )
+{
+    return gFd ? gFd->normalMax : TR_MAX_PEER_SOCKETS;
 }

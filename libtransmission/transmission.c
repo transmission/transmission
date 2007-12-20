@@ -282,6 +282,20 @@ tr_getGlobalSpeedLimit( tr_handle  * h,
                                                         : h->download );
 }
 
+
+void
+tr_setGlobalPeerLimit( tr_handle * handle UNUSED,
+                       uint16_t    maxGlobalPeers )
+{
+    tr_fdSetPeerLimit( maxGlobalPeers );
+}
+
+uint16_t
+tr_getGlobalPeerLimit( const tr_handle * handle UNUSED )
+{
+    return tr_fdGetPeerLimit( );
+}
+
 void
 tr_torrentRates( tr_handle * h, float * toClient, float * toPeer )
 {

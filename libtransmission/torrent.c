@@ -47,6 +47,9 @@
 #include "trevent.h"
 #include "utils.h"
 
+#define DEFAULT_MAX_CONNECTED_PEERS 50
+#define DEFAULT_MAX_UNCHOKED_PEERS 16
+
 /***
 ****
 ***/
@@ -272,6 +275,8 @@ torrentRealInit( tr_handle  * h,
 
     tor->handle   = h;
     tor->pexDisabled = 0;
+    tor->maxConnectedPeers = DEFAULT_MAX_CONNECTED_PEERS;
+    tor->maxUnchokedPeers = DEFAULT_MAX_UNCHOKED_PEERS;
 
     /**
      * Decide on a block size.  constraints:
@@ -1361,6 +1366,32 @@ tr_torrentSetFileDLs ( tr_torrent  * tor,
     saveFastResumeNow( tor );
 
     tr_torrentUnlock( tor );
+}
+
+/***
+****
+***/
+
+void
+tr_torrentSetPeerLimits( tr_torrent  * tor,
+                         uint16_t      maxConnectedPeers,
+                         uint16_t      maxUnchokedPeers )
+{
+    if( maxConnectedPeers )
+        tor->maxConnectedPeers = maxConnectedPeers;
+    if( maxUnchokedPeers )
+        tor->maxUnchokedPeers = maxUnchokedPeers;
+}
+
+void
+tr_torrentGetPeerLimits( const tr_torrent  * tor,
+                         uint16_t          * maxConnectedPeers,
+                         uint16_t          * maxUnchokedPeers )
+{
+    if( maxConnectedPeers )
+        *maxConnectedPeers = tor->maxConnectedPeers;
+    if( maxUnchokedPeers )
+        *maxUnchokedPeers = tor->maxUnchokedPeers;
 }
 
 /***
