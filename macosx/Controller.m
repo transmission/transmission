@@ -39,7 +39,6 @@
 #import "NSStringAdditions.h"
 #import "NSMenuAdditions.h"
 #import "UKKQueue.h"
-#import "ActionMenuSpeedToDisplayLimitTransformer.h"
 #import "ActionMenuRatioToDisplayRatioTransformer.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
@@ -177,10 +176,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [[NSBundle mainBundle] pathForResource: @"Defaults" ofType: @"plist"]]];
     
     //set custom value transformers
-    ActionMenuSpeedToDisplayLimitTransformer * limitTransformer =
-                        [[[ActionMenuSpeedToDisplayLimitTransformer alloc] init] autorelease]; 
-    [NSValueTransformer setValueTransformer: limitTransformer forName: @"ActionMenuSpeedToDisplayLimitTransformer"];
-    
     ActionMenuRatioToDisplayRatioTransformer * ratioTransformer =
                         [[[ActionMenuRatioToDisplayRatioTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer: ratioTransformer forName: @"ActionMenuRatioToDisplayRatioTransformer"];
@@ -3202,12 +3197,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     if (action == @selector(setLimitGlobalEnabled:))
-    {NSLog(@"%@", menuItem);
+    {
         BOOL upload = [menuItem menu] == fUploadMenu;
-        NSString * key = upload ? @"CheckUpload" : @"CheckDownload";
-        BOOL state = menuItem == (upload ? fUploadLimitItem : fDownloadLimitItem);
+        BOOL limit = menuItem == (upload ? fUploadLimitItem : fDownloadLimitItem);
+        if (limit)
+            [menuItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
+                                    "Action context menu -> upload/download limit"),
+                                    [fDefaults integerForKey: upload ? @"UploadLimit" : @"DownloadLimit"]]];
         
-        [menuItem setState: [fDefaults boolForKey: key] ? state : !state];
+        [menuItem setState: [fDefaults boolForKey: upload ? @"CheckUpload" : @"CheckDownload"] ? limit : !limit];
         return YES;
     }
 
