@@ -122,7 +122,7 @@ typedef enum
 #define WINDOW_REGULAR_WIDTH    468.0
 
 #define SEARCH_FILTER_MIN_WIDTH 55.0
-#define SEARCH_FILTER_MAX_WIDTH 115.0
+#define SEARCH_FILTER_MAX_WIDTH 110.0
 
 #define UPDATE_UI_SECONDS           1.0
 #define AUTO_SPEED_LIMIT_SECONDS    5.0
@@ -583,9 +583,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //save history
     [self updateTorrentHistory];
-    
-    [fDisplayedTorrents removeAllObjects];
-    [fTorrents removeAllObjects];
     
     //remaining calls the same as dealloc 
     [fInfoController release];
@@ -3612,9 +3609,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         //make sure it is not too long
         if (frame.size.width > SEARCH_FILTER_MAX_WIDTH)
         {
-            float different = frame.size.width - SEARCH_FILTER_MAX_WIDTH;
-            frame.origin.x += different;
-            frame.size.width -= different;
+            frame.origin.x += frame.size.width - SEARCH_FILTER_MAX_WIDTH;
+            frame.size.width = SEARCH_FILTER_MAX_WIDTH;
         }
         [fSearchFilterField setFrame: frame];
     }
