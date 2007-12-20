@@ -2784,8 +2784,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
 }
 
-- (void) doNothing: (id) sender {}
-
 - (ButtonToolbarItem *) standardToolbarButtonWithIdentifier: (NSString *) ident
 {
     ButtonToolbarItem * item = [[ButtonToolbarItem alloc] initWithItemIdentifier: ident];

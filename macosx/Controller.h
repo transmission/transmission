@@ -196,7 +196,7 @@
 - (void) setStatusLabel: (id) sender;
 
 - (void) showGroups: (id) sender;
-- (void) setGroup: (id) sender;
+- (void) setGroup: (id) sender; //used by delegate-generated menu items
 - (void) setGroupFilter: (id) sender;
 - (void) updateGroupsFilterButton;
 - (void) updateGroupsFilters: (NSNotification *) notification;
@@ -233,8 +233,6 @@
 
 - (void) allToolbarClicked: (id) sender;
 - (void) selectedToolbarClicked: (id) sender;
-
-- (void) doNothing: (id) sender; //needed for menu items that use bindings with no associated action
 
 - (void) setWindowSizeToFit;
 - (NSRect) sizedWindowFrame;
