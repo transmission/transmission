@@ -37,6 +37,7 @@
 
 @end
 
+#warning make singleton?
 @implementation Badger
 
 - (id) initWithLib: (tr_handle *) lib

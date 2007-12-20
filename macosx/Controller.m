@@ -537,8 +537,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
-    [fBadger setQuitting];
-    
     //stop timers and notification checking
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
@@ -550,6 +548,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             [fAutoImportTimer invalidate];
         [fAutoImportTimer release];
     }
+    
+    [fBadger setQuitting];
     
     //remove all torrent downloads
     if (fPendingTorrentDownloads)
@@ -1879,9 +1879,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         //check text field
         if (filterText)
         {
-            BOOL removeTextField = YES;
             if (filterTracker)
             {
+                BOOL removeTextField = YES;
                 NSEnumerator * trackerEnumerator = [[torrent allTrackers] objectEnumerator], * subTrackerEnumerator;
                 NSArray * subTrackers;
                 NSString * tracker;
