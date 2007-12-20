@@ -98,9 +98,32 @@ getProgressString( const tr_info * info, const tr_stat * torStat )
 }
 
 static char*
-getShortStatusString( const tr_stat * torStat )
+getShortTransferString( const tr_stat * torStat, char * buf, size_t buflen )
 {
     char upStr[32], downStr[32];
+    const int haveUp = ( torStat->rateUpload * 1024 ) > 1.0;
+    const int haveDown = ( torStat->rateDownload * 1024 ) > 1.0;
+
+    if( haveDown )
+        tr_strlspeed( downStr, torStat->rateDownload, sizeof(downStr) );
+    if( haveUp )
+        tr_strlspeed( upStr, torStat->rateUpload, sizeof(upStr) );
+
+    if( haveDown && haveUp )
+        g_snprintf( buf, buflen, _( "Down: %s, Up: %s"), downStr, upStr );
+    else if( haveDown )
+        g_snprintf( buf, buflen, _( "Down: %s" ), downStr );
+    else if( haveUp )
+        g_snprintf( buf, buflen, _( "Up: %s" ), upStr );
+    else
+        g_strlcpy( buf, _( "Idle" ), buflen );
+
+    return buf;
+}
+
+static char*
+getShortStatusString( const tr_stat * torStat )
+{
     GString * gstr = g_string_new( NULL );
 
     switch( torStat->status )
@@ -117,18 +140,13 @@ getShortStatusString( const tr_stat * torStat )
             g_string_append_printf( gstr, _("Verifying local data (%.1f%% tested)"),
                                     torStat->recheckProgress * 100.0 );
 
-        case TR_STATUS_DOWNLOAD: {
-            tr_strlspeed( downStr, torStat->rateDownload, sizeof(downStr) );
-            tr_strlspeed( upStr, torStat->rateUpload, sizeof(upStr) );
-            g_string_append_printf( gstr, _("Down: %s, Up: %s"), downStr, upStr );
-            break;
-        }
-
+        case TR_STATUS_DOWNLOAD:
         case TR_STATUS_SEED:
         case TR_STATUS_DONE: {
-            tr_strlspeed( upStr, torStat->rateUpload, sizeof(upStr) );
-            g_string_append_printf( gstr, _("Ratio: %.1f, Up: %s"),
-                                    torStat->ratio*100.0, upStr );
+            char buf[128];
+            if( torStat->status != TR_STATUS_DOWNLOAD )
+                g_string_append_printf( gstr, _("Ratio: %.1f, " ), torStat->ratio*100.0 );
+            g_string_append( gstr, getShortTransferString( torStat, buf, sizeof( buf ) ) );
             break;
         }
 
@@ -185,15 +203,9 @@ getStatusString( const tr_stat * torStat )
 
     if( isActive && !isChecking )
     {
-        char ulbuf[64], dlbuf[64];
-
-        if (torStat->status == TR_STATUS_DOWNLOAD)
-            g_string_append_printf( gstr, _(" - Down: %s, Up: %s" ),
-                tr_strlspeed( dlbuf, torStat->rateDownload, sizeof(dlbuf) ),
-                tr_strlspeed( ulbuf, torStat->rateUpload, sizeof(ulbuf) ) );
-        else
-            g_string_append_printf( gstr, _(" - Up: %s" ),
-                tr_strlspeed( ulbuf, torStat->rateUpload, sizeof(ulbuf) ) );
+        char buf[256];
+        getShortTransferString( torStat, buf, sizeof(buf) );
+        g_string_append_printf( gstr, " - %s", buf );
     }
 
     return g_string_free( gstr, FALSE );

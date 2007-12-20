@@ -233,11 +233,11 @@ tr_window_update( TrWindow * self, float downspeed, float upspeed )
     char buf[64];
 
     tr_strlspeed( speedStr, downspeed, sizeof(speedStr) );
-    g_snprintf( buf, sizeof(buf), _("Total DL: %s"), speedStr );
+    g_snprintf( buf, sizeof(buf), _("Down: %s"), speedStr );
     gtk_label_set_text( GTK_LABEL(p->dl_lb), buf );
 
     tr_strlspeed( speedStr, upspeed, sizeof(speedStr) );
-    g_snprintf( buf, sizeof(buf), _("Total UL: %s"), speedStr );
+    g_snprintf( buf, sizeof(buf), _("Up: %s"), speedStr );
     gtk_label_set_text( GTK_LABEL(p->ul_lb), buf );
 }
 
