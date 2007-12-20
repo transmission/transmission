@@ -3592,6 +3592,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) windowDidResize: (NSNotification *) notification
 {
+    if ([fFilterBar isHidden])
+        return;
+    
     //replace all buttons
     [fActiveFilterButton sizeToFit];
     [fDownloadFilterButton sizeToFit];
