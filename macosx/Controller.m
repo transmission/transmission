@@ -272,29 +272,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [fStatusButton setHidden: YES];
         [fStatusTigerField setHidden: NO];
         [fStatusTigerImageView setHidden: NO];
-        
-        //filter bar
-        [fNoFilterButton sizeToFit];
-        [fActiveFilterButton sizeToFit];
-        [fDownloadFilterButton sizeToFit];
-        [fSeedFilterButton sizeToFit];
-        [fPauseFilterButton sizeToFit];
-        
-        NSRect activeRect = [fActiveFilterButton frame];
-        activeRect.origin.x = NSMaxX([fNoFilterButton frame]) + 1.0;
-        [fActiveFilterButton setFrame: activeRect];
-        
-        NSRect downloadRect = [fDownloadFilterButton frame];
-        downloadRect.origin.x = NSMaxX([fActiveFilterButton frame]) + 1.0;
-        [fDownloadFilterButton setFrame: downloadRect];
-        
-        NSRect seedRect = [fSeedFilterButton frame];
-        seedRect.origin.x = NSMaxX(downloadRect) + 1.0;
-        [fSeedFilterButton setFrame: seedRect];
-        
-        NSRect pauseRect = [fPauseFilterButton frame];
-        pauseRect.origin.x = NSMaxX(seedRect) + 1.0;
-        [fPauseFilterButton setFrame: pauseRect];
     }
     
     [self updateGroupsFilterButton];
