@@ -65,13 +65,12 @@ enum
 ***/
 
 static char*
-getProgressString( const tr_torrent * tor, const tr_stat * torStat )
+getProgressString( const tr_info * info, const tr_stat * torStat )
 {
     const int allDownloaded = torStat->leftUntilDone == 0;
     const uint64_t haveTotal = torStat->haveUnchecked + torStat->haveValid;
-    const tr_info * info = tr_torrentInfo( tor );
     const int isSeed = torStat->haveValid >= info->totalSize;
-    char buf1[128], buf2[128], buf3[128];
+    char buf1[32], buf2[32], buf3[32];
     char * str;
 
     if( !allDownloaded )
@@ -99,9 +98,9 @@ getProgressString( const tr_torrent * tor, const tr_stat * torStat )
 }
 
 static char*
-getShortStatusString( const tr_stat    * torStat )
+getShortStatusString( const tr_stat * torStat )
 {
-    char upStr[64], downStr[64];
+    char upStr[32], downStr[32];
     GString * gstr = g_string_new( NULL );
 
     switch( torStat->status )
@@ -118,18 +117,20 @@ getShortStatusString( const tr_stat    * torStat )
             g_string_append_printf( gstr, _("Verifying local data (%.1f%% tested)"),
                                     torStat->recheckProgress * 100.0 );
 
-        case TR_STATUS_DOWNLOAD:
-            tr_strlspeed( downStr, torStat->rateDownload, sizeof(downStr) ),
+        case TR_STATUS_DOWNLOAD: {
+            tr_strlspeed( downStr, torStat->rateDownload, sizeof(downStr) );
             tr_strlspeed( upStr, torStat->rateUpload, sizeof(upStr) );
-            g_string_append_printf( gstr, _("DL: %s, UL: %s"), downStr, upStr );
+            g_string_append_printf( gstr, _("Down: %s, Up: %s"), downStr, upStr );
             break;
+        }
 
         case TR_STATUS_SEED:
-        case TR_STATUS_DONE:
+        case TR_STATUS_DONE: {
             tr_strlspeed( upStr, torStat->rateUpload, sizeof(upStr) );
-            g_string_append_printf( gstr, _("Ratio: %.1f, UL: %s"),
+            g_string_append_printf( gstr, _("Ratio: %.1f, Up: %s"),
                                     torStat->ratio*100.0, upStr );
             break;
+        }
 
         default:
             break;
@@ -164,21 +165,21 @@ getStatusString( const tr_stat * torStat )
 
         case TR_STATUS_DOWNLOAD:
             g_string_append_printf( gstr,
-                                    ngettext( _("Downloading from %d of %d connected peer" ),
-                                              _("Downloading from %d of %d connected peers" ),
-                                              torStat->peersConnected ),
-                                    torStat->peersSendingToUs,
-                                    torStat->peersConnected );
+                ngettext( _("Downloading from %d of %d connected peer" ),
+                          _("Downloading from %d of %d connected peers" ),
+                          torStat->peersConnected ),
+                torStat->peersSendingToUs,
+                torStat->peersConnected );
             break;
 
         case TR_STATUS_DONE:
         case TR_STATUS_SEED:
             g_string_append_printf( gstr,
-                                    ngettext( _( "Seeding to %d of %d connected peer" ),
-                                              _( "Seeding to %d of %d connected peers" ),
-                                              torStat->peersGettingFromUs ),
-                                    torStat->peersGettingFromUs,
-                                    torStat->peersConnected );
+                ngettext( _( "Seeding to %d of %d connected peer" ),
+                          _( "Seeding to %d of %d connected peers" ),
+                          torStat->peersGettingFromUs ),
+                torStat->peersGettingFromUs,
+                torStat->peersConnected );
             break;
     }
 
@@ -187,12 +188,12 @@ getStatusString( const tr_stat * torStat )
         char ulbuf[64], dlbuf[64];
 
         if (torStat->status == TR_STATUS_DOWNLOAD)
-            g_string_append_printf( gstr, _(" - DL: %s, UL: %s" ),
-                                    tr_strlspeed( dlbuf, torStat->rateDownload, sizeof(dlbuf) ),
-                                    tr_strlspeed( ulbuf, torStat->rateUpload, sizeof(ulbuf) ) );
+            g_string_append_printf( gstr, _(" - Down: %s, Up: %s" ),
+                tr_strlspeed( dlbuf, torStat->rateDownload, sizeof(dlbuf) ),
+                tr_strlspeed( ulbuf, torStat->rateUpload, sizeof(ulbuf) ) );
         else
-            g_string_append_printf( gstr, _(" - UL: %s" ),
-                                    tr_strlspeed( ulbuf, torStat->rateUpload, sizeof(ulbuf) ) );
+            g_string_append_printf( gstr, _(" - Up: %s" ),
+                tr_strlspeed( ulbuf, torStat->rateUpload, sizeof(ulbuf) ) );
     }
 
     return g_string_free( gstr, FALSE );
@@ -214,10 +215,10 @@ struct TorrentCellRendererPrivate
     gboolean gradient;
     GdkColor color_paused[2];
     GdkColor color_verified[2];
+    GdkColor color_verifying[2];
     GdkColor color_missing[2];
     GdkColor color_unwanted[2];
     GdkColor color_unavailable[2];
-    GdkColor color_verifying[2];
     GdkColor color_seeding[2];
 };
 
@@ -241,7 +242,6 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
         const char * name = info->name;
         const tr_stat * torStat = tr_torrentStat( (tr_torrent*)tor );
         char * str;
-        int tmp_w, tmp_h;
         int w=0, h=0;
         struct TorrentCellRendererPrivate * p = self->priv;
 
@@ -251,29 +251,30 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
         if( p->minimal )
         {
             int w1, w2, h1, h2;
-            char * shortStatusString = getShortStatusString( torStat );
+            char * shortStatus = getShortStatusString( torStat );
             g_object_set( p->text_renderer, "text", name, NULL );
             gtk_cell_renderer_get_size( p->text_renderer,
                                         widget, NULL, NULL, NULL, &w1, &h1 );
-            str = g_markup_printf_escaped( "<small>%s</small>", shortStatusString );
+            str = g_markup_printf_escaped( "<small>%s</small>", shortStatus );
             g_object_set( p->text_renderer, "markup", str, NULL );
             gtk_cell_renderer_get_size( p->text_renderer,
                                         widget, NULL, NULL, NULL, &w2, &h2 );
             h += MAX( h1, h2 );
             w = MAX( w, w1+GUI_PAD_BIG+w2 );
             g_free( str );
-            g_free( shortStatusString );
+            g_free( shortStatus );
         }
         else
         {
-            char * progressString = getProgressString( tor, torStat );
+            int w1, h1;
+            char * progressString = getProgressString( info, torStat );
             str = g_markup_printf_escaped( "<b>%s</b>\n<small>%s</small>",
                                            name, progressString );
             g_object_set( p->text_renderer, "markup", str, NULL );
             gtk_cell_renderer_get_size( p->text_renderer,
-                                        widget, NULL, NULL, NULL, &tmp_w, &tmp_h );
-            h += tmp_h;
-            w = MAX( w, tmp_w );
+                                        widget, NULL, NULL, NULL, &w1, &h1 );
+            h += h1;
+            w = MAX( w, w1 );
             g_free( str );
             g_free( progressString );
         }
@@ -281,13 +282,14 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
         /* below the progressbar */
         if( !p->minimal )
         {
+            int w1, h1;
             char * statusString = getStatusString( torStat );
             str = g_markup_printf_escaped( "<small>%s</small>", statusString );
             g_object_set( p->text_renderer, "markup", str, NULL );
             gtk_cell_renderer_get_size( p->text_renderer,
-                                        widget, NULL, NULL, NULL, &tmp_w, &tmp_h );
-            h += tmp_h;
-            w = MAX( w, tmp_w );
+                                        widget, NULL, NULL, NULL, &w1, &h1 );
+            h += h1;
+            w = MAX( w, w1 );
             g_free( str );
             g_free( statusString );
         }
@@ -361,8 +363,10 @@ drawRegularBar( TorrentCellRenderer * self,
 #if 1
     const double verified = torStat->haveValid / (double)info->totalSize;
     const double unverified = torStat->haveUnchecked / (double)info->totalSize;
-    const double unavailable = ( torStat->desiredSize - torStat->desiredAvailable ) / (double)info->totalSize;
-    const double unwanted = ( info->totalSize - torStat->desiredSize ) / (double)info->totalSize;
+    const double unavailable = ( torStat->desiredSize
+                               - torStat->desiredAvailable ) / (double)info->totalSize;
+    const double unwanted = ( info->totalSize
+                            - torStat->desiredSize ) / (double)info->totalSize;
 #else /* for testing */
     const double verified = 0.5;
     const double unverified = 0.1;
@@ -436,7 +440,7 @@ drawRegularBar( TorrentCellRenderer * self,
 
     if( isChecking ) {
         const int checkedWidth = torStat->recheckProgress * area->width;
-        int h2 = area->height / 2;
+        const int h2 = area->height / 2;
         rect = *area;
         rect.y += h2;
         rect.height -= h2;
@@ -462,8 +466,8 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
                               GdkDrawable          * window,
                               GtkWidget            * widget,
                               GdkRectangle         * background_area,
-                              GdkRectangle         * cell_area,
-                              GdkRectangle         * expose_area,
+                              GdkRectangle         * cell_area UNUSED,
+                              GdkRectangle         * expose_area UNUSED,
                               GtkCellRendererState   flags)
 {
     TorrentCellRenderer * self = TORRENT_CELL_RENDERER( cell );
@@ -473,7 +477,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         const tr_info * info = tr_torrentInfo( tor );
         const char * name = info->name;
         const tr_stat * torStat = tr_torrentStat( (tr_torrent*)tor );
-        char * progressString = getProgressString( tor, torStat );
+        char * progressString = getProgressString( info, torStat );
         char * statusString = getStatusString( torStat );
         char * str;
         GdkRectangle my_bg;
@@ -488,14 +492,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         my_bg.x += xpad;
         my_bg.y += ypad;
         my_bg.width -= xpad*2;
-        my_cell = *cell_area;
-        my_cell.x += xpad;
-        my_cell.y += ypad;
-        my_cell.width -= xpad*2;
-        my_expose = *expose_area;
-        my_expose.x += xpad;
-        my_expose.y += ypad;
-        my_expose.width -= xpad*2;
+        my_cell = my_expose = my_bg;
 
         /* above the progressbar */
         if( !p->minimal )
@@ -507,8 +504,8 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
                                             NULL );
             gtk_cell_renderer_get_size( p->text_renderer,
                                         widget, NULL, NULL, NULL, &w, &h );
-            my_bg.height = h;
-            my_cell.height = h;
+            my_bg.height     = 
+            my_cell.height   =
             my_expose.height = h;
             g_object_set( p->text_renderer, "ellipsize", PANGO_ELLIPSIZE_END,
                                             NULL );
@@ -522,7 +519,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         else
         {
             int w1, w2, h1, h2, tmp_h;
-            char * shortStatusString = getShortStatusString( torStat );
+            char * shortStatus = getShortStatusString( torStat );
             GdkRectangle tmp_bg, tmp_cell, tmp_expose;
 
             /* get the dimensions for the name */
@@ -533,7 +530,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
                                         widget, NULL, NULL, NULL, &w1, &h1 );
 
             /* get the dimensions for the short status string */
-            str = g_markup_printf_escaped( "<small>%s</small>", shortStatusString );
+            str = g_markup_printf_escaped( "<small>%s</small>", shortStatus );
             g_object_set( p->text_renderer, "markup", str,
                                             "ellipsize", PANGO_ELLIPSIZE_NONE,
                                             NULL );
@@ -544,7 +541,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
 
             /* short status */
             tmp_bg.x = my_bg.width - w2;
-            tmp_bg.y = my_bg.y;
+            tmp_bg.y = my_bg.y + (h2-h1)/2;
             tmp_bg.width = w2;
             tmp_bg.height = tmp_h;
             tmp_expose = tmp_cell = tmp_bg;
@@ -567,7 +564,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
                                       &tmp_bg, &tmp_cell, &tmp_expose, flags );
 
             g_free( str );
-            g_free( shortStatusString );
+            g_free( shortStatus );
 
             my_bg.y = tmp_bg.y + tmp_bg.height;
             my_cell.y = tmp_cell.y + tmp_cell.height;
@@ -590,8 +587,8 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
                                             NULL );
             gtk_cell_renderer_get_size( p->text_renderer,
                                         widget, NULL, NULL, NULL, &w, &h );
-            my_bg.height      = h;
-            my_cell.height    = h;
+            my_bg.height      =
+            my_cell.height    =
             my_expose.height  = h;
             gtk_cell_renderer_render( p->text_renderer,
                                       window, widget,
@@ -620,10 +617,10 @@ torrent_cell_renderer_set_property( GObject      * object,
 
     switch( property_id )
     {
-        case P_TORRENT:             p->tor = g_value_get_pointer( v ); break;
-        case P_BAR_HEIGHT:          p->bar_height = g_value_get_int( v ); break;
-        case P_MINIMAL:             p->minimal  = g_value_get_boolean( v ); break;
-        case P_GRADIENT:            p->gradient = g_value_get_boolean( v ); break;
+        case P_TORRENT:     p->tor = g_value_get_pointer( v ); break;
+        case P_BAR_HEIGHT:  p->bar_height = g_value_get_int( v ); break;
+        case P_MINIMAL:     p->minimal  = g_value_get_boolean( v ); break;
+        case P_GRADIENT:    p->gradient = g_value_get_boolean( v ); break;
         case P_SHOW_UNAVAILABLE:    p->show_unavailable = g_value_get_boolean( v ); break;
         case P_COLOR_MISSING:       v2c( &p->color_missing[0],     v ); break;
         case P_COLOR_MISSING_2:     v2c( &p->color_missing[1],     v ); break;
@@ -665,10 +662,10 @@ torrent_cell_renderer_get_property( GObject      * object,
 
     switch( property_id )
     {
-        case P_TORRENT:             g_value_set_pointer( v, p->tor ); break;
-        case P_BAR_HEIGHT:          g_value_set_int( v, p->bar_height ); break;
-        case P_MINIMAL:             g_value_set_boolean( v, p->minimal ); break;
-        case P_GRADIENT:            g_value_set_boolean( v, p->gradient ); break;
+        case P_TORRENT:     g_value_set_pointer( v, p->tor ); break;
+        case P_BAR_HEIGHT:  g_value_set_int( v, p->bar_height ); break;
+        case P_MINIMAL:     g_value_set_boolean( v, p->minimal ); break;
+        case P_GRADIENT:    g_value_set_boolean( v, p->gradient ); break;
         case P_SHOW_UNAVAILABLE:    g_value_set_boolean( v, p->show_unavailable ); break;
         case P_COLOR_MISSING:       c2v( v, &p->color_missing[0] ); break;
         case P_COLOR_MISSING_2:     c2v( v, &p->color_missing[1] ); break;
@@ -694,14 +691,15 @@ static void
 torrent_cell_renderer_class_init( TorrentCellRendererClass * klass )
 {
     GObjectClass * gobject_class = G_OBJECT_CLASS( klass );
-    GtkCellRendererClass * cell_renderer_class = GTK_CELL_RENDERER_CLASS( klass );
+    GtkCellRendererClass * cell_class = GTK_CELL_RENDERER_CLASS( klass );
 
-    g_type_class_add_private( klass, sizeof(struct TorrentCellRendererPrivate) );
+    g_type_class_add_private( klass,
+                              sizeof(struct TorrentCellRendererPrivate) );
 
     parent_class = (GtkCellRendererClass*) g_type_class_peek_parent( klass );
 
-    cell_renderer_class->render = torrent_cell_renderer_render;
-    cell_renderer_class->get_size = torrent_cell_renderer_get_size;
+    cell_class->render = torrent_cell_renderer_render;
+    cell_class->get_size = torrent_cell_renderer_get_size;
     gobject_class->set_property = torrent_cell_renderer_set_property;
     gobject_class->get_property = torrent_cell_renderer_get_property;
 
@@ -789,8 +787,8 @@ torrent_cell_renderer_init( GTypeInstance * instance, gpointer g_class UNUSED )
     struct TorrentCellRendererPrivate * p;
     
     p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE( self,
-                                                  TORRENT_CELL_RENDERER_TYPE,
-                                                  struct TorrentCellRendererPrivate );
+                         TORRENT_CELL_RENDERER_TYPE,
+                         struct TorrentCellRendererPrivate );
 
     p->tor = NULL;
     p->text_renderer = gtk_cell_renderer_text_new( );

@@ -123,7 +123,8 @@ makeview( PrivateData * p )
     g_signal_connect( view, "popup-menu",
                       G_CALLBACK(on_popup_menu), NULL );
     g_signal_connect( view, "button-press-event",
-                      G_CALLBACK(on_tree_view_button_pressed), (void *) on_popup_menu);
+                      G_CALLBACK(on_tree_view_button_pressed),
+                      (void *) on_popup_menu);
     g_signal_connect( view, "row-activated",
                       G_CALLBACK(view_row_activated), NULL);
 
@@ -218,7 +219,8 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     /* listen for prefs changes that affect the window */
     prefsChanged( core, PREF_KEY_MINIMAL_VIEW, self );
     p->core = core;
-    p->pref_handler_id = g_signal_connect( core, "prefs-changed", G_CALLBACK(prefsChanged), self );
+    p->pref_handler_id = g_signal_connect( core, "prefs-changed",
+                                           G_CALLBACK(prefsChanged), self );
 
     return self;
 }
@@ -227,8 +229,8 @@ void
 tr_window_update( TrWindow * self, float downspeed, float upspeed )
 {
     PrivateData * p = get_private_data( self );
-    char speedStr[64];
-    char buf[128];
+    char speedStr[32];
+    char buf[64];
 
     tr_strlspeed( speedStr, downspeed, sizeof(speedStr) );
     g_snprintf( buf, sizeof(buf), _("Total DL: %s"), speedStr );

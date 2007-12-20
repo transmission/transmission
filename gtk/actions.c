@@ -99,7 +99,7 @@ toggle_pref_cb ( GtkToggleAction * action, gpointer user_data UNUSED )
 static GtkToggleActionEntry pref_toggle_entries[] =
 {
   { "minimal-view", NULL,
-    N_("_Minimal View"), "<control>M", NULL, G_CALLBACK(toggle_pref_cb), FALSE },
+    N_("_Minimal View"), "<alt>M", NULL, G_CALLBACK(toggle_pref_cb), FALSE },
   { "sort-reversed", NULL,
     N_("_Reverse Sort Order"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE }
 };
@@ -112,7 +112,8 @@ static GtkActionEntry entries[] =
   { "edit-menu", NULL, N_("_Edit"), NULL, NULL, NULL },
   { "help-menu", NULL, N_("_Help"), NULL, NULL, NULL },
   { "priority-menu", NULL, N_("_Priority"), NULL, NULL, NULL },
-  { "add-torrent", GTK_STOCK_OPEN, NULL, NULL, N_("Open Torrent"), G_CALLBACK(action_cb) },
+  { "add-torrent", GTK_STOCK_OPEN,
+    NULL, NULL, N_("Open Torrent"), G_CALLBACK(action_cb) },
   { "start-torrent", GTK_STOCK_MEDIA_PLAY,
     N_("_Start"), "<control>S", NULL, G_CALLBACK(action_cb) },
   { "show-stats", NULL, N_("_Statistics"), NULL, NULL, G_CALLBACK(action_cb) },
@@ -164,7 +165,6 @@ typedef struct
 }
 BuiltinIconInfo;
 
-/* only one icon now... but room to grow ;) */
 const BuiltinIconInfo my_builtin_icons [] =
 {
     { tr_icon_logo, "transmission-logo" },
@@ -255,7 +255,8 @@ actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
                                        callback_user_data );
 
   for( i=0, n=G_N_ELEMENTS(pref_toggle_entries); i<n; ++i )
-    pref_toggle_entries[i].is_active = pref_flag_get( pref_toggle_entries[i].name );
+    pref_toggle_entries[i].is_active =
+      pref_flag_get( pref_toggle_entries[i].name );
 
   gtk_action_group_add_toggle_actions( action_group, 
                                        pref_toggle_entries, 

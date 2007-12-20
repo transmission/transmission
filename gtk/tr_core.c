@@ -282,46 +282,32 @@ static void
 setSort( TrCore * core, const char * mode, gboolean isReversed  )
 {
     int col = MC_TORRENT_RAW;
-    GtkSortType type;
+    GtkSortType type = isReversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
     GtkTreeSortable * sortable = GTK_TREE_SORTABLE( core->model );
 
     if( !strcmp( mode, "sort-by-activity" ) )
-    {
-        type = isReversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
         gtk_tree_sortable_set_sort_func( sortable, col, compareByActivity, NULL, NULL );
-    }
     else if( !strcmp( mode, "sort-by-date-added" ) )
-    {
-        type = isReversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
         gtk_tree_sortable_set_sort_func( sortable, col, compareByDateAdded, NULL, NULL );
-    }
     else if( !strcmp( mode, "sort-by-progress" ) )
-    {
-        type = isReversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
         gtk_tree_sortable_set_sort_func( sortable, col, compareByProgress, NULL, NULL );
-    }
     else if( !strcmp( mode, "sort-by-state" ) )
-    {
-        type = isReversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
         gtk_tree_sortable_set_sort_func( sortable, col, compareByState, NULL, NULL );
-    }
     else if( !strcmp( mode, "sort-by-tracker" ) )
-    {
-        type = isReversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
         gtk_tree_sortable_set_sort_func( sortable, col, compareByTracker, NULL, NULL );
-    }
-    else
-    {
+    else {
         type = isReversed ? GTK_SORT_DESCENDING : GTK_SORT_ASCENDING;
         gtk_tree_sortable_set_sort_func( sortable, col, compareByName, NULL, NULL );
     }
+
     gtk_tree_sortable_set_sort_column_id( sortable, col, type );
 }
 
 static void
 prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
 {
-    if( !strcmp( key, PREF_KEY_SORT_MODE ) || !strcmp( key, PREF_KEY_SORT_REVERSED ) )
+    if( !strcmp( key, PREF_KEY_SORT_MODE )
+     || !strcmp( key, PREF_KEY_SORT_REVERSED ) )
     {
         char * mode = pref_string_get( PREF_KEY_SORT_MODE );
         gboolean isReversed = pref_flag_get( PREF_KEY_SORT_REVERSED );
@@ -347,10 +333,6 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
         G_TYPE_INT        /* ID for IPC */
     };
 
-#ifdef REFDBG
-    fprintf( stderr, "core    %p init\n", self );
-#endif
-
     /* create the model used to store torrent data */
     g_assert( ALEN( types ) == MC_ROW_COUNT );
     store = gtk_list_store_newv( MC_ROW_COUNT, types );
@@ -367,7 +349,7 @@ tr_core_get_type( void )
 {
     static GType type = 0;
 
-    if( 0 == type )
+    if( !type )
     {
         static const GTypeInfo info =
         {
