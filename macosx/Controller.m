@@ -1821,18 +1821,22 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     int downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
-    BOOL filterDownload = [filterType isEqualToString: FILTER_DOWNLOAD],
-        filterSeed = [filterType isEqualToString: FILTER_SEED],
-        filterPause = [filterType isEqualToString: FILTER_PAUSE];
+    BOOL filterDownload = NO, filterSeed = NO, filterPause = NO, filterStatus = YES;
+    if ([filterType isEqualToString: FILTER_DOWNLOAD])
+        filterDownload = YES;
+    else if ([filterType isEqualToString: FILTER_SEED])
+        filterSeed = YES;
+    else if ([filterType isEqualToString: FILTER_PAUSE])
+        filterPause = YES;
+    else
+        filterStatus = NO;
     
-    int groupFilter = [fDefaults integerForKey: @"FilterGroup"];
+    int groupFilterValue = [fDefaults integerForKey: @"FilterGroup"];
+    BOOL filterGroup = groupFilterValue != GROUP_FILTER_ALL_TAG;
+    
     NSString * searchString = [fSearchFilterField stringValue];
-    
-    BOOL filterStatus = filterDownload || filterSeed || filterPause,
-        filterGroup = groupFilter != GROUP_FILTER_ALL_TAG,
-        filterText = [searchString length] > 0;
-    
-    BOOL filterTracker = filterText && [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER];
+    BOOL filterText = [searchString length] > 0,
+        filterTracker = filterText && [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER];
     
     NSMutableIndexSet * indexes = [NSMutableIndexSet indexSet];
     
@@ -1869,7 +1873,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         //checkGroup
         if (filterGroup)
-            if ([torrent groupValue] != groupFilter)
+            if ([torrent groupValue] != groupFilterValue)
                 continue;
         
         //check text field
