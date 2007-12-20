@@ -2215,6 +2215,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fPrefsController applySpeedSettings: nil];
 }
 
+#warning get rid of bindings :(
 - (void) setQuickRatioGlobal: (id) sender
 {
     [fDefaults setBool: YES forKey: @"RatioCheck"];

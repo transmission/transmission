@@ -16,6 +16,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Sort by total activity
    + Leopard: Time Machine will ignore incomplete downloads
    + Leopard: Fix bug where text fields would reject localized decimal values
+   + Leopard: Fix bug where bandwidth rates chosen from the action menu would not apply the first time
 - GTK+:
    + Statistics window
 
