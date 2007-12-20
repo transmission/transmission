@@ -29,6 +29,7 @@ tr_prefs_init_global( void )
 {
     cf_check_older_configs( );
 
+    pref_string_set_default ( PREF_KEY_STATUS_BAR_STATS, "total-ratio" );
     pref_flag_set_default   ( PREF_KEY_STATUS_BAR, TRUE );
     pref_flag_set_default   ( PREF_KEY_TOOLBAR, TRUE );
 

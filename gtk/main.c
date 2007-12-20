@@ -748,7 +748,6 @@ setpex( tr_torrent * tor, void * arg )
 gboolean
 updatemodel(gpointer gdata) {
   struct cbdata *data = gdata;
-  float up, down;
 
   if( !data->closing && 0 < global_sigcount )
   {
@@ -760,11 +759,8 @@ updatemodel(gpointer gdata) {
   tr_core_update( data->core );
 
   /* update the main window's statusbar and toolbar buttons */
-  if( NULL != data->wind )
-  {
-      tr_torrentRates( tr_core_handle( data->core ), &down, &up );
-      tr_window_update( data->wind, down, up );
-  }
+  if( data->wind )
+      tr_window_update( data->wind );
 
   /* update the message window */
   msgwin_update();

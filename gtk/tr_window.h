@@ -34,6 +34,6 @@ GtkTreeSelection * tr_window_get_selection( TrWindow* wind );
 
 GtkWidget * tr_window_new( GtkUIManager*, TrCore * core );
 
-void tr_window_update( TrWindow * wind, float downspeed, float upspeed );
+void tr_window_update( TrWindow * wind );
 
 #endif
