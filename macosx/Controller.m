@@ -1818,108 +1818,100 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //remember selected rows if needed
     NSArray * selectedTorrents = [fTableView numberOfSelectedRows] > 0
                 ? [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] : nil;
-
-    NSMutableArray * tempTorrents = [NSMutableArray arrayWithCapacity: [fTorrents count]];
-    
-    NSString * filterType = [fDefaults stringForKey: @"Filter"];
     
     int downloading = 0, seeding = 0, paused = 0;
-    BOOL isDownload = [filterType isEqualToString: FILTER_DOWNLOAD],
-            isSeed = [filterType isEqualToString: FILTER_SEED],
-            isPause = [filterType isEqualToString: FILTER_PAUSE];
-    BOOL filtering = isDownload || isSeed || isPause;
+    NSString * filterType = [fDefaults stringForKey: @"Filter"];
+    BOOL filterDownload = [filterType isEqualToString: FILTER_DOWNLOAD],
+        filterSeed = [filterType isEqualToString: FILTER_SEED],
+        filterPause = [filterType isEqualToString: FILTER_PAUSE];
+    
+    int groupFilter = [fDefaults integerForKey: @"FilterGroup"];
+    NSString * searchString = [fSearchFilterField stringValue];
+    
+    BOOL filterStatus = filterDownload || filterSeed || filterPause,
+        filterGroup = groupFilter != GROUP_FILTER_ALL_TAG,
+        filterText = [searchString length] > 0;
+    
+    BOOL filterTracker = filterText && [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER];
+    
+    NSMutableIndexSet * indexes = [NSMutableIndexSet indexSet];
     
     //get count of each type
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
+    int i = -1;
     while ((torrent = [enumerator nextObject]))
     {
+        i++;
+        
+        //check status
         if ([torrent isActive])
         {
             if ([torrent isSeeding])
             {
                 seeding++;
-                if (isSeed)
-                    [tempTorrents addObject: torrent];
+                if (filterStatus && !filterSeed)
+                    continue;
             }
             else
             {
                 downloading++;
-                if (isDownload)
-                    [tempTorrents addObject: torrent];
+                if (filterStatus && !filterDownload)
+                    continue;
             }
         }
         else
         {
             paused++;
-            if (isPause)
-                [tempTorrents addObject: torrent];
+            if (filterStatus && !filterPause)
+                continue;
         }
+        
+        //checkGroup
+        if (filterGroup)
+            if ([torrent groupValue] != groupFilter)
+                continue;
+        
+        //check text field
+        if (filterText)
+        {
+            BOOL removeTextField = YES;
+            if (filterTracker)
+            {
+                NSEnumerator * trackerEnumerator = [[torrent allTrackers] objectEnumerator], * subTrackerEnumerator;
+                NSArray * subTrackers;
+                NSString * tracker;
+                while (removeTextField && (subTrackers = [trackerEnumerator nextObject]))
+                {
+                    subTrackerEnumerator = [subTrackers objectEnumerator];
+                    while ((tracker = [subTrackerEnumerator nextObject]))
+                        if ([tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location != NSNotFound)
+                        {
+                            removeTextField = NO;
+                            break;
+                        }
+                }
+                
+                if (removeTextField)
+                    continue;
+            }
+            else
+            {
+                if ([[torrent name] rangeOfString: searchString options: NSCaseInsensitiveSearch].location == NSNotFound)
+                    continue;
+            }
+        }
+        
+        [indexes addIndex: i];
     }
     
-    if (!filtering)
-        [tempTorrents setArray: fTorrents];
+    [fDisplayedTorrents setArray: [fTorrents objectsAtIndexes: indexes]];
     
     //set button tooltips
     [fNoFilterButton setCount: [fTorrents count]];
     [fDownloadFilterButton setCount: downloading];
     [fSeedFilterButton setCount: seeding];
     [fPauseFilterButton setCount: paused];
-    
-    //remove for groups
-    int groupFilter = [fDefaults integerForKey: @"FilterGroup"];
-    if (groupFilter != GROUP_FILTER_ALL_TAG)
-    {
-        filtering = YES;
-        
-        int i;
-        for (i = [tempTorrents count]-1; i >= 0; i--)
-            if ([[tempTorrents objectAtIndex: i] groupValue] != groupFilter)
-                [tempTorrents removeObjectAtIndex: i];
-    }
-    
-    //remove from text field
-    NSString * searchString = [fSearchFilterField stringValue];
-    if ([tempTorrents count] > 0 && [searchString length] > 0)
-    {
-        filtering = YES;
-        
-        Torrent * torrent;
-        BOOL filterTracker = [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER], remove;
-        
-        int i;
-        for (i = [tempTorrents count]-1; i >= 0; i--)
-        {
-            torrent = [tempTorrents objectAtIndex: i];
-            remove = YES;
-            
-            if (filterTracker)
-            {
-                NSEnumerator * trackerEnumerator = [[torrent allTrackers] objectEnumerator], * subTrackerEnumerator;
-                NSArray * subTrackers;
-                NSString * tracker;
-                while (remove && (subTrackers = [trackerEnumerator nextObject]))
-                {
-                    subTrackerEnumerator = [subTrackers objectEnumerator];
-                    while ((tracker = [subTrackerEnumerator nextObject]))
-                    {
-                        if ([tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location != NSNotFound)
-                        {
-                            remove = NO;
-                            break;
-                        }
-                    }
-                }
-            }
-            else
-                remove = [[torrent name] rangeOfString: searchString options: NSCaseInsensitiveSearch].location == NSNotFound;
-            
-            if (remove)
-                [tempTorrents removeObjectAtIndex: i];
-        }
-    }
-    
-    [fDisplayedTorrents setArray: tempTorrents];
     
     [self sortTorrentsIgnoreSelected];
     
@@ -1928,14 +1920,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         Torrent * torrent;
         NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
-        NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
+        NSMutableIndexSet * selectedIndexes = [NSMutableIndexSet indexSet];
         unsigned index;
         while ((torrent = [enumerator nextObject]))
             if ((index = [fDisplayedTorrents indexOfObject: torrent]) != NSNotFound)
-                [indexSet addIndex: index];
+                [selectedIndexes addIndex: index];
         
-        [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
-        [indexSet release];
+        [fTableView selectRowIndexes: selectedIndexes byExtendingSelection: NO];
     }
     
     //set status bar torrent count text
@@ -1946,7 +1937,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     else
         totalTorrentsString = NSLocalizedString(@"1 transfer", "Status bar transfer count");
     
-    if (filtering)
+    if (filterStatus || filterGroup || filterText)
         totalTorrentsString = [NSString stringWithFormat: @"%d of %@", [fDisplayedTorrents count], totalTorrentsString];
     
     [fTotalTorrentsField setStringValue: totalTorrentsString];
