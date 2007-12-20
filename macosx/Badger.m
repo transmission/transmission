@@ -230,7 +230,7 @@
         fSpeedBadge = NO;
         fCompleted = 0;
         fCompletedBadged = 0;
-        [NSApp setApplicationIconImage: nil];
+        [NSApp setApplicationIconImage: @"NSApplicationIcon"];
     }
 }
 
