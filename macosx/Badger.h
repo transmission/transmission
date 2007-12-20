@@ -27,13 +27,15 @@
 
 @interface Badger : NSObject
 {
-    tr_handle       * fLib;
+    tr_handle * fLib;
     
-    NSImage         * fDockIcon, * fBadge;
+    NSImage * fDockIcon, * fBadge;
     
-    NSDictionary    * fAttributes;
-    int             fCompleted, fCompletedBadged;
-    BOOL            fSpeedBadge;
+    NSDictionary * fAttributes;
+    int fCompleted, fCompletedBadged;
+    BOOL fSpeedBadge;
+    
+    BOOL fQuittingTiger;
 }
 
 - (id) initWithLib: (tr_handle *) lib;

@@ -56,6 +56,8 @@
             [[NSApp dockTile] setContentView: view];
             [view release];
         }
+        else
+            fQuittingTiger = NO;
         
         //change that just impacts the dock badge
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBadge) name: @"DockBadgeChange" object: nil];
@@ -80,6 +82,11 @@
     {
         [[NSApp dockTile] display];
         return;
+    }
+    else
+    {
+        if (fQuittingTiger)
+            return;
     }
     
     //set completed badge to top right
@@ -227,10 +234,12 @@
     }
     else
     {
+        fQuittingTiger = YES;
+        
         fSpeedBadge = NO;
         fCompleted = 0;
         fCompletedBadged = 0;
-        [NSApp setApplicationIconImage: @"NSApplicationIcon"];
+        [NSApp setApplicationIconImage: nil];
     }
 }
 
