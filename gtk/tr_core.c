@@ -191,8 +191,8 @@ compareByActivity( GtkTreeModel * model,
     gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
     gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
 
-    sa = tr_torrentStat( ta );
-    sb = tr_torrentStat( tb );
+    sa = tr_torrentStatCached( ta );
+    sb = tr_torrentStatCached( tb );
 
     if(( i = compareDouble( sa->rateUpload + sa->rateDownload,
                             sb->rateUpload + sb->rateDownload ) ))
@@ -240,8 +240,8 @@ compareByProgress( GtkTreeModel   * model,
     const tr_stat *sa, *sb;
     gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
     gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
-    sa = tr_torrentStat( ta );
-    sb = tr_torrentStat( tb );
+    sa = tr_torrentStatCached( ta );
+    sb = tr_torrentStatCached( tb );
     ret = compareDouble( sa->percentDone, sb->percentDone );
     if( !ret )
         ret = compareDouble( sa->ratio, sa->ratio );
@@ -257,7 +257,7 @@ compareByState( GtkTreeModel   * model,
     tr_torrent *ta, *tb;
     gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
     gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
-    return tr_torrentStat(ta)->status - tr_torrentStat(tb)->status;
+    return tr_torrentStatCached(ta)->status - tr_torrentStatCached(tb)->status;
 }
 
 static int
@@ -453,17 +453,24 @@ tr_core_load( TrCore * self, gboolean paused )
     int count = 0;
     tr_torrent ** torrents;
     char * path;
+    tr_ctor * ctor;
 
     TR_IS_CORE( self );
 
     path = getdownloaddir( );
 
-    torrents = tr_loadTorrents ( self->handle, path, paused, &count );
+    ctor = tr_ctorNew( self->handle );
+    tr_ctorSetPaused( ctor, TR_FORCE, paused );
+    tr_ctorSetDestination( ctor, TR_FALLBACK, path );
+
+    torrents = tr_loadTorrents ( self->handle, ctor, &count );
     for( i=0; i<count; ++i )
         tr_core_insert( self, tr_torrent_new_preexisting( torrents[i] ) );
-    tr_free( torrents );
 
+    tr_free( torrents );
+    tr_ctorFree( ctor );
     g_free( path );
+
     return count;
 }
 

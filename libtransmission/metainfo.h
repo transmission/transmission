@@ -27,11 +27,14 @@
 
 #include "transmission.h"
 
+struct benc_val_t;
+
 int tr_metainfoParseFile( tr_info *, const char * tag,
                           const char * path, int save );
 int tr_metainfoParseData( tr_info *, const char * tag,
                           const uint8_t * data, size_t size, int save );
 int tr_metainfoParseHash( tr_info *, const char * tag, const char * hash );
+int tr_metainfoParseBenc( tr_info *, const char * tag, const struct benc_val_s *, int save );
 void tr_metainfoFree( tr_info * inf );
 void tr_metainfoRemoveSaved( const char * hashString, const char * tag );
 

@@ -383,20 +383,19 @@ tr_close( tr_handle * h )
 
 tr_torrent **
 tr_loadTorrents ( tr_handle   * h,
-                  const char  * fallbackDestination,
-                  int           isPaused,
+                  tr_ctor     * ctor,
                   int         * setmeCount )
 {
     int i, n = 0;
     struct stat sb;
     DIR * odir = NULL;
-    const char * torrentDir = tr_getTorrentsDirectory( );
+    const char * dirname = tr_getTorrentsDirectory( );
     tr_torrent ** torrents;
     tr_list *l=NULL, *list=NULL;
 
-    if( !stat( torrentDir, &sb )
+    if( !stat( dirname, &sb )
         && S_ISDIR( sb.st_mode )
-        && (( odir = opendir ( torrentDir ) )) )
+        && (( odir = opendir ( dirname ) )) )
     {
         struct dirent *d;
         for (d = readdir( odir ); d!=NULL; d=readdir( odir ) )
@@ -404,9 +403,10 @@ tr_loadTorrents ( tr_handle   * h,
             if( d->d_name && d->d_name[0]!='.' ) /* skip dotfiles, ., and .. */
             {
                 tr_torrent * tor;
-                char path[MAX_PATH_LENGTH];
-                tr_buildPath( path, sizeof(path), torrentDir, d->d_name, NULL );
-                tor = tr_torrentLoad( h, path, fallbackDestination, isPaused, NULL );
+                char filename[MAX_PATH_LENGTH];
+                tr_buildPath( filename, sizeof(filename), dirname, d->d_name, NULL );
+                tr_ctorSetMetainfoFromFile( ctor, filename );
+                tor = tr_torrentNew( h, ctor, NULL );
                 if( tor != NULL ) {
                     tr_list_append( &list, tor );
                     n++;

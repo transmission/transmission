@@ -68,6 +68,7 @@ tr_httpParseUrl( const char * url_in, int len,
  * Local prototypes
  **********************************************************************/
 static int realparse( tr_info * inf, const uint8_t * buf, size_t len );
+static int realparse2( tr_info * inf, const benc_val_t * meta );
 static void savedname( char * name, size_t len, const char * hash,
                        const char * tag );
 static uint8_t * readtorrent( const char * path, size_t * len );
@@ -222,6 +223,26 @@ tr_metainfoParseData( tr_info * inf, const char * tag,
 }
 
 int
+tr_metainfoParseBenc( tr_info * inf, const char * tag, const benc_val_t * val, int save )
+{
+    int err = 0;
+
+    if( !err && realparse2( inf, val ) )
+        err = TR_EINVALID;
+
+    if( !err && save ) {
+        int len;
+        uint8_t * text = (uint8_t *) tr_bencSave( val, &len );
+        err = savetorrent( inf->hashString, tag, text, len );
+        tr_free( text );
+        if( !err )
+            savedname( inf->torrent, sizeof( inf->torrent ), inf->hashString, tag );
+    }
+
+    return err;
+}
+
+int
 tr_metainfoParseHash( tr_info * inf, const char * tag, const char * hash )
 {
     struct stat sb;
@@ -273,26 +294,44 @@ tr_metainfoParseHash( tr_info * inf, const char * tag, const char * hash )
 static int
 realparse( tr_info * inf, const uint8_t * buf, size_t size )
 {
-    benc_val_t   meta, * beInfo, * val, * val2;
-    int          i;
+    int err = 0;
+    benc_val_t meta;
 
-    /* Parse bencoded infos */
-    if( tr_bencLoad( buf, size, &meta, NULL ) )
-    {
+    if( !err && tr_bencLoad( buf, size, &meta, NULL ) ) {
+        err = TR_EINVALID;
         tr_err( "Error while parsing bencoded data [%*.*s]", (int)size, (int)size, (char*)buf );
-        return TR_EINVALID;
     }
 
-    /* Get info hash */
-    beInfo = tr_bencDictFind( &meta, "info" );
-    if( NULL == beInfo || TYPE_DICT != beInfo->type )
-    {
-        tr_err( "%s \"info\" dictionary", ( beInfo ? "Invalid" : "Missing" ) );
+    if( !err ) {
+        err = realparse2( inf, &meta );
         tr_bencFree( &meta );
-        return TR_EINVALID;
     }
 
-    tr_sha1( inf->hash, beInfo->begin, beInfo->end - beInfo->begin, NULL );
+    return err;
+}
+
+static int
+realparse2( tr_info * inf, const benc_val_t * meta_in )
+{
+    int i;
+    benc_val_t * beInfo, * val, * val2;
+    benc_val_t * meta = (benc_val_t *) meta_in;
+
+    /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
+     * from the Metainfo file. Note that the value will be a bencoded 
+     * dictionary, given the definition of the info key above. */
+    if(( beInfo = tr_bencDictFindType( meta, "info", TYPE_DICT )))
+    {
+        int len;
+        char * str = tr_bencSave( beInfo, &len );
+        tr_sha1( inf->hash, str, len, NULL );
+        tr_free( str );
+    }
+    else
+    {
+        tr_err( "info dictionary not found!" );
+        return TR_EINVALID;
+    }
 
     for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
     {
@@ -301,14 +340,14 @@ realparse( tr_info * inf, const uint8_t * buf, size_t size )
     }
 
     /* Comment info */
-    val = tr_bencDictFindFirst( &meta, "comment.utf-8", "comment", NULL );
+    val = tr_bencDictFindFirst( meta, "comment.utf-8", "comment", NULL );
     if( NULL != val && TYPE_STR == val->type )
     {
         strlcat_utf8( inf->comment, val->val.s.s, sizeof( inf->comment ), 0 );
     }
     
     /* Creator info */
-    val = tr_bencDictFindFirst( &meta, "created by.utf-8", "created by", NULL );
+    val = tr_bencDictFindFirst( meta, "created by.utf-8", "created by", NULL );
     if( NULL != val && TYPE_STR == val->type )
     {
         strlcat_utf8( inf->creator, val->val.s.s, sizeof( inf->creator ), 0 );
@@ -316,7 +355,7 @@ realparse( tr_info * inf, const uint8_t * buf, size_t size )
     
     /* Date created */
     inf->dateCreated = 0;
-    val = tr_bencDictFind( &meta, "creation date" );
+    val = tr_bencDictFind( meta, "creation date" );
     if( NULL != val && TYPE_INT == val->type )
     {
         inf->dateCreated = val->val.i;
@@ -324,7 +363,7 @@ realparse( tr_info * inf, const uint8_t * buf, size_t size )
     
     /* Private torrent */
     val  = tr_bencDictFind( beInfo, "private" );
-    val2 = tr_bencDictFind( &meta,  "private" );
+    val2 = tr_bencDictFind( meta,  "private" );
     if( ( NULL != val  && ( TYPE_INT != val->type  || 0 != val->val.i ) ) ||
         ( NULL != val2 && ( TYPE_INT != val2->type || 0 != val2->val.i ) ) )
     {
@@ -393,17 +432,15 @@ realparse( tr_info * inf, const uint8_t * buf, size_t size )
     }
 
     /* get announce or announce-list */
-    if( getannounce( inf, &meta ) )
+    if( getannounce( inf, meta ) )
     {
         goto fail;
     }
 
-    tr_bencFree( &meta );
     return TR_OK;
 
   fail:
     tr_metainfoFree( inf );
-    tr_bencFree( &meta );
     return TR_EINVALID;
 }
 

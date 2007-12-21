@@ -16,6 +16,9 @@
 #include "trcompat.h" /* strlcpy */
 #include "utils.h"
 
+#define DEFAULT_MAX_UNCHOKED_PEERS 16
+#define DEFAULT_MAX_CONNECTED_PEERS 50
+
 struct optional_args
 {
     unsigned int isSet_paused : 1;
@@ -31,74 +34,61 @@ struct optional_args
 
 struct tr_ctor
 {
-    tr_handle * handle;
+    const tr_handle * handle;
 
-    unsigned int isSet_metadata : 1;
-    benc_val_t metadata;
+    unsigned int isSet_metainfo : 1;
+    benc_val_t metainfo;
 
     struct optional_args optionalArgs[2];
 };
 
-tr_ctor*
-tr_ctorNew( tr_handle * handle )
-{
-    tr_ctor * ctor = tr_new0( struct tr_ctor, 1 );
-    ctor->handle = handle;
-    tr_ctorSetMaxConnectedPeers( ctor, TR_FALLBACK, 50 );
-    tr_ctorSetMaxUnchokedPeers( ctor, TR_FALLBACK, 16 );
-    tr_ctorSetPaused( ctor, TR_FALLBACK, FALSE );
-    return ctor;
-}
-
-void
-tr_ctorFree( tr_ctor * ctor )
-{
-    tr_free( ctor );
-}
+/***
+****
+***/
 
 static void
-clearMetadata( tr_ctor * ctor )
+clearMetainfo( tr_ctor * ctor )
 {
-    if( ctor->isSet_metadata ) {
-        ctor->isSet_metadata = 0;
-        tr_bencFree( &ctor->metadata );
+    if( ctor->isSet_metainfo ) {
+        ctor->isSet_metainfo = 0;
+        tr_bencFree( &ctor->metainfo );
     }
 }
 
 int
-tr_ctorSetMetadata( tr_ctor        * ctor,
-                    const uint8_t  * metadata,
+tr_ctorSetMetainfo( tr_ctor        * ctor,
+                    const uint8_t  * metainfo,
                     size_t           len )
 {
     int err;
-    clearMetadata( ctor );
-    err = tr_bencLoad( metadata, len, &ctor->metadata, NULL );
-    ctor->isSet_metadata = !err;
+    clearMetainfo( ctor );
+    err = tr_bencLoad( metainfo, len, &ctor->metainfo, NULL );
+    ctor->isSet_metainfo = !err;
     return err;
 }
 
 int
-tr_ctorSetMetadataFromFile( tr_ctor        * ctor,
+tr_ctorSetMetainfoFromFile( tr_ctor        * ctor,
                             const char     * filename )
 {
-    uint8_t * metadata;
+    uint8_t * metainfo;
     size_t len;
     int err;
 
-    metadata = tr_loadFile( filename, &len );
-    if( metadata && len )
-        err = tr_ctorSetMetadata( ctor, metadata, len );
+    metainfo = tr_loadFile( filename, &len );
+    if( metainfo && len )
+        err = tr_ctorSetMetainfo( ctor, metainfo, len );
     else {
-        clearMetadata( ctor );
+        clearMetainfo( ctor );
         err = 1;
     }
 
-    tr_free( metadata );
+    tr_free( metainfo );
     return err;
 }
 
 int
-tr_ctorSetMetadataFromHash( tr_ctor        * ctor,
+tr_ctorSetMetainfoFromHash( tr_ctor        * ctor,
                             const char     * hashString )
 {
     int err = -1;
@@ -108,12 +98,14 @@ tr_ctorSetMetadataFromHash( tr_ctor        * ctor,
     if( err && ( ctor->handle->tag != NULL ) ) {
         snprintf( basename, sizeof(basename), "%s-%s", hashString, ctor->handle->tag );
         tr_buildPath( filename, sizeof(filename), tr_getTorrentsDirectory(), basename );
-        err = tr_ctorSetMetadataFromFile( ctor, filename );
+        err = tr_ctorSetMetainfoFromFile( ctor, filename );
+        fprintf( stderr, "trying [%s] returned %d\n", filename, err );
     }
 
     if( err ) {
         tr_buildPath( filename, sizeof(filename), tr_getTorrentsDirectory(), hashString );
-        err = tr_ctorSetMetadataFromFile( ctor, filename );
+        err = tr_ctorSetMetainfoFromFile( ctor, filename );
+        fprintf( stderr, "trying [%s] returned %d\n", filename, err );
     }
 
     return err;
@@ -126,11 +118,11 @@ tr_ctorSetMetadataFromHash( tr_ctor        * ctor,
 void
 tr_ctorSetPaused( tr_ctor        * ctor,
                   tr_ctorMode      mode,
-                  int              isPaused )
+                  uint8_t          isPaused )
 {
     struct optional_args * args = &ctor->optionalArgs[mode];
     args->isSet_paused = 1;
-    args->isPaused = isPaused;
+    args->isPaused = isPaused ? 1 : 0;
 }
 
 void
@@ -168,11 +160,15 @@ tr_ctorGetMaxConnectedPeers( const tr_ctor  * ctor,
                              tr_ctorMode      mode,
                              uint16_t       * setmeCount )
 {
+    int err = 0;
     const struct optional_args * args = &ctor->optionalArgs[mode];
-    const int isSet = args->isSet_connected;
-    if( isSet )
+
+    if( args->isSet_connected )
         *setmeCount = args->maxConnectedPeers;
-    return isSet;
+    else
+        err = 1;
+
+    return err;
 }
 
 int
@@ -180,23 +176,31 @@ tr_ctorGetMaxUnchokedPeers( const tr_ctor  * ctor,
                             tr_ctorMode      mode,
                             uint8_t        * setmeCount )
 {
+    int err = 0;
     const struct optional_args * args = &ctor->optionalArgs[mode];
-    const int isSet = args->isSet_unchoked;
-    if( isSet )
+
+    if( args->isSet_unchoked )
         *setmeCount = args->maxUnchokedPeers;
-    return isSet;
+    else
+        err = 1;
+
+    return err;
 }
 
 int
 tr_ctorGetIsPaused( const tr_ctor  * ctor,
                     tr_ctorMode      mode,
-                    int            * setmeIsPaused )
+                    uint8_t        * setmeIsPaused )
 {
+    int err = 0;
     const struct optional_args * args = &ctor->optionalArgs[mode];
-    const int isSet = args->isSet_paused;
-    if( isSet )
-        *setmeIsPaused = args->isPaused;
-    return isSet;
+
+    if( args->isSet_paused )
+        *setmeIsPaused = args->isPaused ? 1 : 0;
+    else
+        err = 1;
+
+    return err;
 }
 
 int
@@ -204,19 +208,49 @@ tr_ctorGetDestination( const tr_ctor  * ctor,
                        tr_ctorMode      mode,
                        const char    ** setmeDestination )
 {
+    int err = 0;
     const struct optional_args * args = &ctor->optionalArgs[mode];
-    const int isSet = args->isSet_destination;
-    if( isSet )
+
+    if( args->isSet_destination )
         *setmeDestination = args->destination;
-    return isSet;
+    else
+        err = 1;
+
+    return err;
 }
 
 int
-tr_ctorGetMetadata( const tr_ctor              * ctor,
+tr_ctorGetMetainfo( const tr_ctor              * ctor,
                     const struct benc_val_s   ** setme )
 {
-    const int isSet = ctor->isSet_metadata;
-    if( isSet )
-        *setme = &ctor->metadata;
-    return isSet;
+    int err = 0;
+
+    if( ctor->isSet_metainfo )
+        *setme = &ctor->metainfo;
+    else
+        err = 1;
+
+    return err;
+}
+
+/***
+****
+***/
+
+tr_ctor*
+tr_ctorNew( const tr_handle * handle )
+{
+    tr_ctor * ctor = tr_new0( struct tr_ctor, 1 );
+    ctor->handle = handle;
+    tr_ctorSetMaxConnectedPeers( ctor, TR_FALLBACK, DEFAULT_MAX_CONNECTED_PEERS );
+    tr_ctorSetMaxUnchokedPeers( ctor, TR_FALLBACK, DEFAULT_MAX_UNCHOKED_PEERS );
+    tr_ctorSetPaused( ctor, TR_FALLBACK, FALSE );
+    return ctor;
+}
+
+void
+tr_ctorFree( tr_ctor * ctor )
+{
+    clearMetainfo( ctor );
+    tr_free( ctor );
 }

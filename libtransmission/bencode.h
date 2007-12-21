@@ -30,8 +30,6 @@
 
 typedef struct benc_val_s
 {
-    char * begin;
-    char * end;
 #define TYPE_INT  1
 #define TYPE_STR  2
 #define TYPE_LIST 4

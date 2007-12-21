@@ -342,40 +342,30 @@ void tr_torrentRates( tr_handle *, float *, float * );
 
 
 /**
- *  Load all the torrents in tr_getTorrentsDirectory().
- *  This can be used at startup to kickstart all the torrents
- *  from the previous session.
- */
-tr_torrent ** tr_loadTorrents ( tr_handle  * h,
-                                const char   * fallback_destination,
-                                int            isPaused,
-                                int          * setmeCount );
-
-
-/**
  *  Torrent Instantiation
  *
- *  Creating torrents has gotten more complicated as we've added options,
- *  and there are now a lot of functions for creating torrents, all slightly
- *  different.  To remedy this, a Torrent Constructor (struct tr_ctor) has
- *   been introduced.  You can fill in the settings you want, and leave the
- *  rest to the system defaults.  It also gives us a backwards-compatable
- *  way of adding features in the future -- we can add new tr_ctor() functions
- *  and leave tr_torrentInit()'s signature alone.
+ *  Instantiating a tr_torrent has gotten a lot more complaticated as we
+ *  add more options to them.  At the worst point there were four functions
+ *  to check metainfo, and four (or five) functions to create tr_torrents.
+ *  They all did mostly the same thing, but each was just *slightly* different.
  *
- *  You _must_ call one of the SetMetadata() functions before creating
+ *  To remedy this, a Torrent Constructor (struct tr_ctor) has been introduced:
+ *  + Simplifies the API down to two (non-deprecated) functions.
+ *  + You can set the fields you want; the system sets defaults for the rest.
+ *  + You can specify whether or not your fields should supercede fastresume's.
+ *  + We can add new features to tr_ctor without breaking tr_torrentNew()'s API.
+ *
+ *  All the tr_ctor{Get,Set}*() functions with a return value return 
+ *  an error number, or zero if no error occurred.
+ *
+ *  You must call one of the SetMetainfo() functions before creating
  *  a torrent with a tr_ctor.  The other functions are optional.
  *
- *  You can reuse a tr_ctor when creating a batch of torrents.
- *  Just call one of the SetMetadata() functions between each
- *  tr_torrentInit() call.
+ *  You can reuse a single tr_ctor to create a batch of torrents --
+ *  just call one of the SetMetainfo() functions between each
+ *  tr_torrentNew() call.
  *
- *  The tr_ctorGet*() functions will return nonzero if that field
- *  has been set via one of the tr_ctorSet*() functions.
- *
- *  Every call to tr_ctorSetMetadata*() will free the previous metadata.
- *  The tr_ctorSetMetadata*() functions return an error number, or zero
- *  if no error occurred.
+ *  Every call to tr_ctorSetMetainfo*() frees the previous metainfo.
  */
 
 typedef enum
@@ -383,25 +373,26 @@ typedef enum
     TR_FALLBACK, /* indicates the ctor value should be used only
                     in case of missing fastresume settings */
 
-    TR_FORCE, /* manditory use -- overrides the fastresume settings */
+    TR_FORCE, /* indicates the ctor value should be used
+                 regardless of what's in the fastresume settings */
 }
 tr_ctorMode;
 
 typedef struct tr_ctor tr_ctor;
 struct benc_val_s;
 
-tr_ctor* tr_ctorNew                    ( tr_handle      * handle);
+tr_ctor* tr_ctorNew                    ( const tr_handle  * handle);
 
 void     tr_ctorFree                   ( tr_ctor        * ctor );
 
-int      tr_ctorSetMetadata            ( tr_ctor        * ctor,
-                                         const uint8_t  * metadata,
+int      tr_ctorSetMetainfo            ( tr_ctor        * ctor,
+                                         const uint8_t  * metainfo,
                                          size_t           len );
 
-int      tr_ctorSetMetadataFromFile    ( tr_ctor        * ctor,
+int      tr_ctorSetMetainfoFromFile    ( tr_ctor        * ctor,
                                          const char     * filename );
 
-int      tr_ctorSetMetadataFromHash    ( tr_ctor        * ctor,
+int      tr_ctorSetMetainfoFromHash    ( tr_ctor        * ctor,
                                          const char     * hashString );
 
 void     tr_ctorSetMaxConnectedPeers   ( tr_ctor        * ctor,
@@ -418,7 +409,7 @@ void     tr_ctorSetDestination         ( tr_ctor        * ctor,
 
 void     tr_ctorSetPaused              ( tr_ctor        * ctor,
                                          tr_ctorMode      mode,
-                                         int              isPaused );
+                                         uint8_t          isPaused );
 
 int      tr_ctorGetMaxConnectedPeers   ( const tr_ctor  * ctor,
                                          tr_ctorMode      mode,
@@ -430,14 +421,16 @@ int      tr_ctorGetMaxUnchokedPeers    ( const tr_ctor  * ctor,
 
 int      tr_ctorGetIsPaused            ( const tr_ctor  * ctor,
                                          tr_ctorMode      mode,
-                                         int            * setmeIsPaused );
+                                         uint8_t        * setmeIsPaused );
 
 int      tr_ctorGetDestination         ( const tr_ctor  * ctor,
                                          tr_ctorMode      mode,
                                          const char    ** setmeDestination );
 
-int      tr_ctorGetMetadata            ( const tr_ctor  * ctor,
+int      tr_ctorGetMetainfo            ( const tr_ctor  * ctor,
                                          const struct benc_val_s ** setme );
+
+typedef struct tr_info tr_info;
 
 /**
  * Parses the specified metainfo.
@@ -448,14 +441,15 @@ int      tr_ctorGetMetadata            ( const tr_ctor  * ctor,
  *
  * "setme_info" can be NULL if you don't need the information.
  * If the metainfo can be parsed and setme_info is non-NULL,
- * it will be filled with the metadata's info.  You'll need to
+ * it will be filled with the metainfo's info.  You'll need to
  * call tr_metainfoFree( setme_info ) when done with it.
  */
-int tr_torrentParseFromCtor( tr_handle      * handle,
-                             const tr_ctor  * ctor );
+int tr_torrentParseFromCtor( const tr_handle  * handle,
+                             const tr_ctor    * ctor,
+                             tr_info          * setme_info );
 
 /**
- * Instantiate the torrent from the given tr_ctor.
+ * Instantiate a single torrent.
  */
 #define TR_EINVALID     1
 #define TR_EUNSUPPORTED 2
@@ -467,35 +461,34 @@ tr_torrent * tr_torrentNew( tr_handle      * handle,
 
 
 /**
+ *  Load all the torrents in tr_getTorrentsDirectory().
+ *  This can be used at startup to kickstart all the torrents
+ *  from the previous session.
+ */
+tr_torrent ** tr_loadTorrents ( tr_handle  * h,
+                                tr_ctor    * ctor,
+                                int        * setmeCount );
+
+
+/**
 ***
 **/
 
 /***********************************************************************
- * tr_torrentInit
- ***********************************************************************
  * Opens and parses torrent file at 'path'. If the file exists and is
  * a valid torrent file, returns an handle and adds it to the list of
  * torrents (but doesn't start it). Returns NULL and sets *error
  * otherwise. If hash is not NULL and the torrent is already loaded
  * then it's 20-byte hash will be copied in. If the TR_FLAG_SAVE flag
  * is passed then a copy of the torrent file will be saved.
- **********************************************************************/
+ *
+ * !! DO NOT USE THIS FUNCTION IN NEW CODE !!
+ */
 tr_torrent * tr_torrentInit( tr_handle    * handle,
                              const char   * metainfo_filename,
                              const char   * destination,
                              int            isPaused,
                              int          * setme_error );
-
-/* This is a stupid hack to fix #415.  Probably I should fold all
- * these torrent constructors into a single function that takes
- * a function object to hold all these esoteric arguments. */
-tr_torrent * tr_torrentLoad( tr_handle    * handle,
-                             const char   * metainfo_filename,
-                             const char   * fallback_destination,
-                             int            isPaused,
-                             int          * setme_error );
-
-typedef struct tr_info tr_info;
 
 /**
  * Parses the specified metainfo file.
@@ -509,8 +502,10 @@ typedef struct tr_info tr_info;
  *
  " "setme_info" can be NULL if you don't need the information.
  * If the metainfo can be parsed and setme_info is non-NULL,
- * it will be filled with the metadata's info.  You'll need to
+ * it will be filled with the metainfo's info.  You'll need to
  * call tr_metainfoFree( setme_info ) when done with it.
+ *
+ * !! DO NOT USE THIS FUNCTION IN NEW CODE !!
  */
 int tr_torrentParse( const tr_handle  * handle,
                      const char       * metainfo_filename,
@@ -520,6 +515,8 @@ int tr_torrentParse( const tr_handle  * handle,
 /**
  * Parses the cached metainfo file that matches the given hash string.
  * See tr_torrentParse() for a description of the arguments
+ *
+ * !! DO NOT USE THIS FUNCTION IN NEW CODE !!
  */
 int
 tr_torrentParseHash( const tr_handle  * h,
@@ -529,11 +526,11 @@ tr_torrentParseHash( const tr_handle  * h,
 
 
 /***********************************************************************
- * tr_torrentInitData
- ***********************************************************************
  * Like tr_torrentInit, except the actual torrent data is passed in
  * instead of the filename.
- **********************************************************************/
+ *
+ * !! DO NOT USE THIS FUNCTION IN NEW CODE !!
+ */
 tr_torrent * tr_torrentInitData( tr_handle *,
                                  const uint8_t * data, size_t size,
                                  const char * destination,
@@ -541,12 +538,12 @@ tr_torrent * tr_torrentInitData( tr_handle *,
                                  int * error );
 
 /***********************************************************************
- * tr_torrentInitSaved
- ***********************************************************************
  * Opens and parses a torrent file as with tr_torrentInit, only taking
  * the hash string of a saved torrent file instead of a filename. There
  * are currently no valid flags for this function.
- **********************************************************************/
+ *
+ * !! DO NOT USE THIS FUNCTION IN NEW CODE !!
+ */
 tr_torrent * tr_torrentInitSaved( tr_handle *,
                                   const char * hashStr,
                                   const char * destination,
@@ -641,6 +638,7 @@ int tr_torrentCanManualUpdate( const tr_torrent * );
  **********************************************************************/
 typedef struct tr_stat tr_stat;
 const tr_stat * tr_torrentStat( tr_torrent * );
+const tr_stat * tr_torrentStatCached( tr_torrent * );
 
 /***********************************************************************
  * tr_torrentPeers
@@ -676,12 +674,10 @@ void tr_torrentRemoveSaved( tr_torrent * );
 
 void tr_torrentRecheck( tr_torrent * );
 
-/***********************************************************************
- * tr_torrentClose
- ***********************************************************************
- * Frees memory allocated by tr_torrentInit. If the torrent was running,
- * it is stopped first.
- **********************************************************************/
+/**
+ * Frees memory allocated by tr_torrentNew().
+ * Running torrents are stopped first.
+ */
 void tr_torrentClose( tr_torrent * );
 
 /***********************************************************************

@@ -545,22 +545,23 @@ parsePeers( tr_torrent * tor, const uint8_t * buf, uint32_t len )
 }
 
 static uint64_t
-parseDestination( tr_torrent * tor, const uint8_t * buf, uint32_t len,
-                  const char * destination, int argIsFallback )
+parseDestination( tr_torrent * tor, const uint8_t * buf, uint32_t len )
 {
-    if( argIsFallback )
-        tor->destination = tr_strdup( len ? (const char*)buf : destination );
-    else
-        tor->destination = tr_strdup( len ? destination : (const char*)buf );
+    uint64_t ret = 0;
 
-    return TR_FR_DESTINATION;
+    if( buf && *buf && len ) {
+        tr_free( tor->destination );
+        tor->destination = tr_strndup( (char*)buf, len );
+        ret = TR_FR_DESTINATION;
+    }
+
+    return ret;
 }
 
 static uint64_t
 parseVersion1( tr_torrent * tor, const uint8_t * buf, const uint8_t * end,
                uint64_t fieldsToLoad,
-               tr_bitfield  * uncheckedPieces,
-               const char * destination, int argIsFallback )
+               tr_bitfield  * uncheckedPieces )
 {
     uint64_t ret = 0;
 
@@ -582,7 +583,7 @@ parseVersion1( tr_torrent * tor, const uint8_t * buf, const uint8_t * end,
             case FR_ID_CORRUPT:     ret |= parseCorrupt( tor, buf, len ); break;
             case FR_ID_PEERS:       ret |= parsePeers( tor, buf, len ); break;
             case FR_ID_PEX:         ret |= parsePex( tor, buf, len ); break;
-            case FR_ID_DESTINATION: ret |= parseDestination( tor, buf, len, destination, argIsFallback ); break;
+            case FR_ID_DESTINATION: ret |= parseDestination( tor, buf, len ); break;
             default:                tr_dbg( "Skipping unknown resume code %d", (int)id ); break;
         }
 
@@ -620,9 +621,7 @@ loadResumeFile( const tr_torrent * tor, size_t * len )
 static uint64_t
 fastResumeLoadImpl ( tr_torrent   * tor,
                      uint64_t       fieldsToLoad,
-                     tr_bitfield  * uncheckedPieces,
-                     const char   * destination,
-                     int            argIsFallback )
+                     tr_bitfield  * uncheckedPieces )
 {
     uint64_t ret = 0;
     size_t size = 0;
@@ -637,7 +636,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
             uint32_t version;
             readBytes( &version, &walk, sizeof(version) );
             if( version == 1 )
-                ret |= parseVersion1 ( tor, walk, end, fieldsToLoad, uncheckedPieces, destination, argIsFallback );
+                ret |= parseVersion1 ( tor, walk, end, fieldsToLoad, uncheckedPieces );
             else
                 tr_inf( "Unsupported resume file %d for '%s'", version, tor->info.name );
         }
@@ -648,20 +647,56 @@ fastResumeLoadImpl ( tr_torrent   * tor,
     return ret;
 }
 
-uint64_t
-tr_fastResumeLoad( tr_torrent   * tor,
-                   uint64_t       fieldsToLoad,
-                   tr_bitfield  * uncheckedPieces,
-                   const char   * destination,
-                   int            argIsFallback )
+static uint64_t
+setFromCtor( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor, int mode )
 {
-    const uint64_t ret = fastResumeLoadImpl( tor, fieldsToLoad, uncheckedPieces, destination, argIsFallback );
+    uint64_t ret = 0;
 
-    if( ! ( ret & TR_FR_PROGRESS ) )
-        tr_bitfieldAddRange( uncheckedPieces, 0, tor->info.pieceCount );
+    if( fields & TR_FR_MAX_UNCHOKED )
+        if( !tr_ctorGetMaxUnchokedPeers( ctor, mode, &tor->maxUnchokedPeers ) )
+            ret |= TR_FR_MAX_UNCHOKED;
 
-    if( !tor->destination )
-        tor->destination = tr_strdup( destination );
+    if( fields & TR_FR_MAX_PEERS ) 
+        if( !tr_ctorGetMaxConnectedPeers( ctor, mode, &tor->maxConnectedPeers ) )
+            ret |= TR_FR_MAX_PEERS;
+
+    if( fields & TR_FR_DESTINATION ) {
+        const char * destination;
+        if( !tr_ctorGetDestination( ctor, mode, &destination ) ) {
+            ret |= TR_FR_DESTINATION;
+            tr_free( tor->destination );
+            tor->destination = tr_strdup( destination );
+        }
+    }
+
+    return ret;
+}
+
+static uint64_t
+useManditoryFields( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor )
+{
+    return setFromCtor( tor, fields, ctor, TR_FORCE );
+}
+
+static uint64_t
+useFallbackFields( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor )
+{
+    return setFromCtor( tor, fields, ctor, TR_FALLBACK );
+}
+
+uint64_t
+tr_fastResumeLoad( tr_torrent     * tor,
+                   uint64_t         fieldsToLoad,
+                   tr_bitfield    * uncheckedPieces,
+                   const tr_ctor  * ctor )
+{
+    uint64_t ret = 0;
+
+    ret |= useManditoryFields( tor, fieldsToLoad, ctor );
+    fieldsToLoad &= ~ret;
+    ret |= fastResumeLoadImpl( tor, fieldsToLoad, uncheckedPieces );
+    fieldsToLoad &= ~ret;
+    ret |= useFallbackFields( tor, fieldsToLoad, ctor );
 
     return ret;
 }

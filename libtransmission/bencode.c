@@ -199,9 +199,6 @@ int _tr_bencLoad( char * buf, int len, benc_val_t * val, char ** end )
         }
     }
 
-    val->begin = buf;
-    val->end   = *end;
-
     return 0;
 }
 

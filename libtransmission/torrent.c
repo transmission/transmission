@@ -30,6 +30,7 @@
 #include <sys/types.h>
 
 #include "transmission.h"
+#include "bencode.h"
 #include "completion.h"
 #include "crypto.h" /* for tr_sha1 */
 #include "fastresume.h"
@@ -46,9 +47,6 @@
 #include "trcompat.h" /* for strlcpy */
 #include "trevent.h"
 #include "utils.h"
-
-#define DEFAULT_MAX_CONNECTED_PEERS 50
-#define DEFAULT_MAX_UNCHOKED_PEERS 16
 
 /***
 ****
@@ -259,11 +257,12 @@ tr_torrentInitFilePieces( tr_torrent * tor )
 }
 
 static void
-torrentRealInit( tr_handle  * h,
-                 tr_torrent * tor,
-                 const char * destination,
-                 int          destinationIsFallback,
-                 int          isPaused )
+torrentRealInit( tr_handle     * h,
+                 tr_torrent    * tor,
+                 const tr_ctor * ctor )
+                 //const char * destination,
+                 //int          destinationIsFallback,
+                 //int          isPaused )
 {
     int doStart;
     uint64_t loaded;
@@ -275,8 +274,6 @@ torrentRealInit( tr_handle  * h,
 
     tor->handle   = h;
     tor->pexDisabled = 0;
-    tor->maxConnectedPeers = DEFAULT_MAX_CONNECTED_PEERS;
-    tor->maxUnchokedPeers = DEFAULT_MAX_UNCHOKED_PEERS;
 
     /**
      * Decide on a block size.  constraints:
@@ -345,25 +342,17 @@ torrentRealInit( tr_handle  * h,
 
     uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
 
-    loaded = tr_fastResumeLoad( tor, ~0, uncheckedPieces, destination, destinationIsFallback );
+    loaded = tr_fastResumeLoad( tor, ~0, uncheckedPieces, ctor );
+    
     assert( tor->destination != NULL );
 
-    /* the `paused' flag has highest precedence...
-       after that, the fastresume setting is used...
-       if that's not found, default to RUNNING */
-    if( isPaused )
-        doStart = 0;
-    else if( loaded & TR_FR_RUN )
-        doStart = tor->isRunning;
-    else
-        doStart = 1;
+    doStart = tor->isRunning;
     tor->isRunning = 0;
 
     if( tr_bitfieldIsEmpty( uncheckedPieces ) )
         tr_bitfieldFree( uncheckedPieces );
     else
         tor->uncheckedPieces = uncheckedPieces;
-
 
     if( !(loaded & TR_FR_SPEEDLIMIT ) ) {
         int limit, enabled;
@@ -389,21 +378,6 @@ torrentRealInit( tr_handle  * h,
 }
 
 static int
-pathIsInUse ( const tr_handle   * h,
-              const char        * destination,
-              const char        * name )
-{
-    const tr_torrent * tor;
-    
-    for( tor=h->torrentList; tor; tor=tor->next )
-        if( !strcmp( destination, tor->destination )
-         && !strcmp( name, tor->info.name ) )
-            return TRUE;
-
-    return FALSE;
-}
-
-static int
 hashExists( const tr_handle   * h,
             const uint8_t     * hash )
 {
@@ -416,200 +390,145 @@ hashExists( const tr_handle   * h,
     return FALSE;
 }
 
-static int
-infoCanAdd( const tr_handle   * h,
-            const char        * destination,
-            const tr_info     * info )
-{
-    if( hashExists( h, info->hash ) )
-        return TR_EDUPLICATE;
-
-    if( destination && pathIsInUse( h, destination, info->name ) )
-        return TR_EDUPLICATE;
-
-    return TR_OK;
-}
-
 int
-tr_torrentParse( const tr_handle  * h,
-                 const char       * path,
-                 const char       * destination,
-                 tr_info          * setme_info )
+tr_torrentParseFromCtor( const tr_handle  * handle,
+                         const tr_ctor    * ctor,
+                         tr_info          * setmeInfo )
 {
-    int ret, doFree;
+    int err = 0;
+    int doFree;
     tr_info tmp;
+    const benc_val_t * metainfo;
 
-    if( setme_info == NULL )
-        setme_info = &tmp;
+    if( setmeInfo == NULL )
+        setmeInfo = &tmp;
+    memset( setmeInfo, 0, sizeof( tr_info ) );
 
-    memset( setme_info, 0, sizeof( tr_info ) );
-    ret = tr_metainfoParseFile( setme_info, h->tag, path, FALSE );
-    doFree = !ret && (setme_info == &tmp);
+    if( !err && tr_ctorGetMetainfo( ctor, &metainfo ) )
+        return TR_EINVALID;
 
-    if( ret == TR_OK )
-        ret = infoCanAdd( h, destination, setme_info );
+    err = tr_metainfoParseBenc( setmeInfo, handle->tag, metainfo, FALSE );
+    doFree = !err && ( setmeInfo == &tmp );
+
+    if( !err && hashExists( handle, setmeInfo->hash ) )
+        err = TR_EDUPLICATE;
 
     if( doFree )
-        tr_metainfoFree( &tmp );
+        tr_metainfoFree( setmeInfo );
 
-    return ret;
+    return err;
 }
- 
-static tr_torrent *
-tr_torrentInitImpl( tr_handle   * h,
-                    const char  * path,
-                    const char  * destination,
-                    int           destinationIsFallback,
-                    int           isPaused,
-                    int         * error )
+
+tr_torrent *
+tr_torrentNew( tr_handle      * handle,
+               const tr_ctor  * ctor,
+               int            * setmeError )
 {
-    int val;
-    int tmpError;
+    int err;
+    tr_info tmpInfo;
     tr_torrent * tor = NULL;
 
-    if( !error )
-         error = &tmpError;
-
-    if(( val = tr_torrentParse( h, path, destination, NULL )))
-        *error = val;
-    else if(!(( tor = tr_new0( tr_torrent, 1 ))))
-        *error = TR_EOTHER;
-    else {
-        tr_metainfoParseFile( &tor->info, h->tag, path, TRUE );
-        torrentRealInit( h, tor, destination, destinationIsFallback, isPaused );
+    err = tr_torrentParseFromCtor( handle, ctor, &tmpInfo );
+    if( !err ) {
+        tor = tr_new0( tr_torrent, 1 );
+        tor->info = tmpInfo;
+        torrentRealInit( handle, tor, ctor );
+    } else if( setmeError ) {
+        *setmeError = err;
     }
 
     return tor;
 }
 
+/***
+****
+***/
+
+/** @deprecated */
+int
+tr_torrentParse( const tr_handle  * h,
+                 const char       * path,
+                 const char       * destination,
+                 tr_info          * setmeInfo )
+{
+    int err;
+    tr_ctor * ctor = tr_ctorNew( h );
+    tr_ctorSetMetainfoFromFile( ctor, path );
+    tr_ctorSetDestination( ctor, TR_FORCE, destination );
+    err = tr_torrentParseFromCtor( h, ctor, setmeInfo );
+    tr_ctorFree( ctor );
+    return err;
+}
+ 
+/** @deprecated */
 tr_torrent *
 tr_torrentInit( tr_handle   * h,
                 const char  * path,
                 const char  * destination,
                 int           isPaused,
-                int         * error )
+                int         * setmeError )
 {
-    return tr_torrentInitImpl( h, path, destination, FALSE, isPaused, error );
+    tr_torrent * tor;
+    tr_ctor * ctor = tr_ctorNew( h );
+    tr_ctorSetMetainfoFromFile( ctor, path );
+    tr_ctorSetDestination( ctor, TR_FORCE, destination );
+    tr_ctorSetPaused( ctor, TR_FORCE, isPaused );
+    tor = tr_torrentNew( h, ctor, setmeError );
+    tr_ctorFree( ctor );
+    return tor;
 }
 
-tr_torrent *
-tr_torrentLoad( tr_handle    * h,
-                const char   * metainfoFilename,
-                const char   * destination,
-                int            isPaused,
-                int          * error )
-{
-    return tr_torrentInitImpl( h, metainfoFilename, destination, TRUE, isPaused, error );
-}
-
+/** @deprecated */
 int
 tr_torrentParseHash( const tr_handle  * h,
                      const char       * hashStr,
                      const char       * destination,
-                     tr_info          * setme_info )
+                     tr_info          * setmeInfo )
 {
-    int ret, doFree;
-    tr_info tmp;
-
-    if( setme_info == NULL )
-        setme_info = &tmp;
-
-    memset( setme_info, 0, sizeof( tr_info ) );
-    ret = tr_metainfoParseHash( setme_info, h->tag, hashStr );
-    doFree = !ret && (setme_info == &tmp);
-
-    if( ret == TR_OK )
-        ret = infoCanAdd( h, destination, setme_info );
-
-    if( doFree )
-        tr_metainfoFree( &tmp );
-
-    return ret;
+    int err;
+    tr_ctor * ctor = tr_ctorNew( h );
+    tr_ctorSetMetainfoFromHash( ctor, hashStr );
+    tr_ctorSetDestination( ctor, TR_FORCE, destination );
+    err = tr_torrentParseFromCtor( h, ctor, setmeInfo );
+    tr_ctorFree( ctor );
+    return err;
 }
 
+/** @deprecated */
 tr_torrent *
 tr_torrentInitSaved( tr_handle    * h,
                      const char   * hashStr,
                      const char   * destination,
                      int            isPaused,
-                     int          * error )
+                     int          * setmeError )
 {
-    int val;
-    int tmpError;
-    tr_torrent * tor = NULL;
-
-    if( !error )
-         error = &tmpError;
-
-    if(( val = tr_torrentParseHash( h, hashStr, destination, NULL )))
-        *error = val;
-    else if(!(( tor = tr_new0( tr_torrent, 1 ))))
-        *error = TR_EOTHER;
-    else {
-        tr_metainfoParseHash( &tor->info, h->tag, hashStr );
-        torrentRealInit( h, tor, destination, FALSE, isPaused );
-    }
-
+    tr_torrent * tor;
+    tr_ctor * ctor = tr_ctorNew( h );
+    tr_ctorSetMetainfoFromHash( ctor, hashStr );
+    tr_ctorSetDestination( ctor, TR_FORCE, destination );
+    tr_ctorSetPaused( ctor, TR_FORCE, isPaused );
+    tor = tr_torrentNew( h, ctor, setmeError );
+    tr_ctorFree( ctor );
     return tor;
 }
 
-static int
-tr_torrentParseData( const tr_handle  * h,
-                     const uint8_t    * data,
-                     size_t             size,
-                     const char       * destination,
-                     tr_info          * setme_info )
-{
-    int ret, doFree;
-    tr_info tmp;
-
-    if( setme_info == NULL )
-        setme_info = &tmp;
-
-    memset( setme_info, 0, sizeof( tr_info ) );
-    ret = tr_metainfoParseData( setme_info, h->tag, data, size, FALSE );
-    doFree = !ret && (setme_info == &tmp);
-
-    if( ret == TR_OK )
-        ret = infoCanAdd( h, destination, setme_info );
-
-    if( doFree )
-        tr_metainfoFree( &tmp );
-
-    return ret;
-}
-
+/** @deprecated */
 tr_torrent *
 tr_torrentInitData( tr_handle      * h,
-                    const uint8_t  * data,
-                    size_t           size,
+                    const uint8_t  * metainfo,
+                    size_t           len,
                     const char     * destination,
                     int              isPaused,
-                    int            * error )
+                    int            * setmeError )
 {
-    int val;
-    int tmpError;
-    tr_torrent * tor = NULL;
-
-    if( !error )
-         error = &tmpError;
-
-    if(( val = tr_torrentParseData( h, data, size, destination, NULL )))
-        *error = val;
-    else if(!(( tor = tr_new0( tr_torrent, 1 ))))
-        *error = TR_EOTHER;
-    else {
-        tr_metainfoParseData( &tor->info, h->tag, data, size, TRUE );
-        torrentRealInit( h, tor, destination, FALSE, isPaused );
-    }
-
+    tr_torrent * tor;
+    tr_ctor * ctor = tr_ctorNew( h );
+    tr_ctorSetMetainfo( ctor, metainfo, len );
+    tr_ctorSetDestination( ctor, TR_FORCE, destination );
+    tr_ctorSetPaused( ctor, TR_FORCE, isPaused );
+    tor = tr_torrentNew( h, ctor, setmeError );
+    tr_ctorFree( ctor );
     return tor;
-}
-
-const tr_info *
-tr_torrentInfo( const tr_torrent * tor )
-{
-    return &tor->info;
 }
 
 /***
@@ -711,23 +630,31 @@ tr_torrentGetRates( const tr_torrent * tor,
     if( toPeer )
         *toPeer = showSpeed ? tr_rcRate( tor->upload ) : 0.0;
 }
+const tr_info *
+tr_torrentInfo( const tr_torrent * tor )
+{
+    return &tor->info;
+}
 
+const tr_stat *
+tr_torrentStatCached( tr_torrent * tor )
+{
+    const time_t now = time( NULL );
+
+    return now == tor->lastStatTime
+        ? &tor->stats[tor->statCur]
+        : tr_torrentStat( tor );
+}
 
 const tr_stat *
 tr_torrentStat( tr_torrent * tor )
 {
     tr_stat * s;
     struct tr_tracker * tc;
-    const time_t now = time( NULL );
-
-    /* generating these stats is expensive --
-     * update a maximum of once per second */
-    if( tor->lastStatTime == now )
-        return &tor->stats[tor->statCur];
-    tor->lastStatTime = now;
 
     tr_torrentLock( tor );
 
+    tor->lastStatTime = time( NULL );
     tr_torrentRecheckCompleteness( tor );
 
     tor->statCur = !tor->statCur;
@@ -1074,7 +1001,7 @@ tr_torrentStart( tr_torrent * tor )
     {
         if( !tor->uncheckedPieces )
             tor->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
-        tr_fastResumeLoad( tor, TR_FR_PROGRESS, tor->uncheckedPieces, tor->destination, FALSE );
+        tr_fastResumeLoad( tor, TR_FR_PROGRESS, tor->uncheckedPieces, NULL );
         tor->isRunning = 1;
         tr_ioRecheckAdd( tor, checkAndStartCB );
     }

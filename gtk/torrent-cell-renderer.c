@@ -254,7 +254,7 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
         const tr_torrent * tor = self->priv->tor;
         const tr_info * info = tr_torrentInfo( tor );
         const char * name = info->name;
-        const tr_stat * torStat = tr_torrentStat( (tr_torrent*)tor );
+        const tr_stat * torStat = tr_torrentStatCached( (tr_torrent*)tor );
         char * str;
         int w=0, h=0;
         struct TorrentCellRendererPrivate * p = self->priv;
@@ -490,7 +490,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         const tr_torrent * tor = self->priv->tor;
         const tr_info * info = tr_torrentInfo( tor );
         const char * name = info->name;
-        const tr_stat * torStat = tr_torrentStat( (tr_torrent*)tor );
+        const tr_stat * torStat = tr_torrentStatCached( (tr_torrent*)tor );
         GdkRectangle my_bg;
         GdkRectangle my_cell;
         GdkRectangle my_expose;

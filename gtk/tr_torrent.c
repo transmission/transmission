@@ -129,7 +129,7 @@ tr_torrent_handle(TrTorrent *tor)
 const tr_stat *
 tr_torrent_stat(TrTorrent *tor)
 {
-    return tor && !tor->severed ? tr_torrentStat( tor->handle ) : NULL;
+    return tor && !tor->severed ? tr_torrentStatCached( tor->handle ) : NULL;
 }
 
 const tr_info *
