@@ -75,7 +75,7 @@
 	<key>NatTraversal</key>
 	<true/>
 	<key>PeersGlobal</key>
-	<integer>400</integer>
+	<integer>500</integer>
 	<key>PiecesBar</key>
 	<false/>
 	<key>PiecesViewShowAvailability</key>
