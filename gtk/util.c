@@ -64,10 +64,10 @@ tr_strlsize( char * buf, guint64 size, size_t buflen )
         guint64 small = size;
         for( i=0; i<G_N_ELEMENTS(units) && small>=1024; ++i )
             small >>= 10;
-        if( small < 100 )
-            g_snprintf( buf, buflen, "%.1f %s", (double)small, _(units[i]) );
-        else
+        if( i < 2 ) /* B & KiB */
             g_snprintf( buf, buflen, "%d %s", (int)small, _(units[i]) );
+        else
+            g_snprintf( buf, buflen, "%.1f %s", (double)small, _(units[i]) );
     }
     return buf;
 }
