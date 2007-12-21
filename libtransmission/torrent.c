@@ -451,7 +451,8 @@ tr_torrentParse( const tr_handle  * h,
     int err;
     tr_ctor * ctor = tr_ctorNew( h );
     tr_ctorSetMetainfoFromFile( ctor, path );
-    tr_ctorSetDestination( ctor, TR_FORCE, destination );
+    if( destination && *destination )
+        tr_ctorSetDestination( ctor, TR_FORCE, destination );
     err = tr_torrentParseFromCtor( h, ctor, setmeInfo );
     tr_ctorFree( ctor );
     return err;
@@ -468,7 +469,8 @@ tr_torrentInit( tr_handle   * h,
     tr_torrent * tor;
     tr_ctor * ctor = tr_ctorNew( h );
     tr_ctorSetMetainfoFromFile( ctor, path );
-    tr_ctorSetDestination( ctor, TR_FORCE, destination );
+    if( destination && *destination )
+        tr_ctorSetDestination( ctor, TR_FORCE, destination );
     tr_ctorSetPaused( ctor, TR_FORCE, isPaused );
     tor = tr_torrentNew( h, ctor, setmeError );
     tr_ctorFree( ctor );
@@ -485,7 +487,8 @@ tr_torrentParseHash( const tr_handle  * h,
     int err;
     tr_ctor * ctor = tr_ctorNew( h );
     tr_ctorSetMetainfoFromHash( ctor, hashStr );
-    tr_ctorSetDestination( ctor, TR_FORCE, destination );
+    if( destination && *destination )
+        tr_ctorSetDestination( ctor, TR_FORCE, destination );
     err = tr_torrentParseFromCtor( h, ctor, setmeInfo );
     tr_ctorFree( ctor );
     return err;
@@ -502,7 +505,8 @@ tr_torrentInitSaved( tr_handle    * h,
     tr_torrent * tor;
     tr_ctor * ctor = tr_ctorNew( h );
     tr_ctorSetMetainfoFromHash( ctor, hashStr );
-    tr_ctorSetDestination( ctor, TR_FORCE, destination );
+    if( destination && *destination )
+        tr_ctorSetDestination( ctor, TR_FORCE, destination );
     tr_ctorSetPaused( ctor, TR_FORCE, isPaused );
     tor = tr_torrentNew( h, ctor, setmeError );
     tr_ctorFree( ctor );
@@ -521,7 +525,8 @@ tr_torrentInitData( tr_handle      * h,
     tr_torrent * tor;
     tr_ctor * ctor = tr_ctorNew( h );
     tr_ctorSetMetainfo( ctor, metainfo, len );
-    tr_ctorSetDestination( ctor, TR_FORCE, destination );
+    if( destination && *destination )
+        tr_ctorSetDestination( ctor, TR_FORCE, destination );
     tr_ctorSetPaused( ctor, TR_FORCE, isPaused );
     tor = tr_torrentNew( h, ctor, setmeError );
     tr_ctorFree( ctor );
