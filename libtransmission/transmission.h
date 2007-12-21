@@ -352,6 +352,124 @@ tr_torrent ** tr_loadTorrents ( tr_handle  * h,
                                 int          * setmeCount );
 
 
+/**
+ *  Torrent Instantiation
+ *
+ *  Creating torrents has gotten more complicated as we've added options,
+ *  and there are now a lot of functions for creating torrents, all slightly
+ *  different.  To remedy this, a Torrent Constructor (struct tr_ctor) has
+ *   been introduced.  You can fill in the settings you want, and leave the
+ *  rest to the system defaults.  It also gives us a backwards-compatable
+ *  way of adding features in the future -- we can add new tr_ctor() functions
+ *  and leave tr_torrentInit()'s signature alone.
+ *
+ *  You _must_ call one of the SetMetadata() functions before creating
+ *  a torrent with a tr_ctor.  The other functions are optional.
+ *
+ *  You can reuse a tr_ctor when creating a batch of torrents.
+ *  Just call one of the SetMetadata() functions between each
+ *  tr_torrentInit() call.
+ *
+ *  The tr_ctorGet*() functions will return nonzero if that field
+ *  has been set via one of the tr_ctorSet*() functions.
+ *
+ *  Every call to tr_ctorSetMetadata*() will free the previous metadata.
+ *  The tr_ctorSetMetadata*() functions return an error number, or zero
+ *  if no error occurred.
+ */
+
+typedef enum
+{
+    TR_FALLBACK, /* indicates the ctor value should be used only
+                    in case of missing fastresume settings */
+
+    TR_FORCE, /* manditory use -- overrides the fastresume settings */
+}
+tr_ctorMode;
+
+typedef struct tr_ctor tr_ctor;
+struct benc_val_s;
+
+tr_ctor* tr_ctorNew                    ( tr_handle      * handle);
+
+void     tr_ctorFree                   ( tr_ctor        * ctor );
+
+int      tr_ctorSetMetadata            ( tr_ctor        * ctor,
+                                         const uint8_t  * metadata,
+                                         size_t           len );
+
+int      tr_ctorSetMetadataFromFile    ( tr_ctor        * ctor,
+                                         const char     * filename );
+
+int      tr_ctorSetMetadataFromHash    ( tr_ctor        * ctor,
+                                         const char     * hashString );
+
+void     tr_ctorSetMaxConnectedPeers   ( tr_ctor        * ctor,
+                                         tr_ctorMode      mode,
+                                         uint16_t         maxConnectedPeers );
+
+void     tr_ctorSetMaxUnchokedPeers    ( tr_ctor        * ctor,
+                                         tr_ctorMode      mode,
+                                         uint8_t          maxUnchokedPeers);
+
+void     tr_ctorSetDestination         ( tr_ctor        * ctor,
+                                         tr_ctorMode      mode,
+                                         const char     * directory );
+
+void     tr_ctorSetPaused              ( tr_ctor        * ctor,
+                                         tr_ctorMode      mode,
+                                         int              isPaused );
+
+int      tr_ctorGetMaxConnectedPeers   ( const tr_ctor  * ctor,
+                                         tr_ctorMode      mode,
+                                         uint16_t       * setmeCount );
+
+int      tr_ctorGetMaxUnchokedPeers    ( const tr_ctor  * ctor,
+                                         tr_ctorMode      mode,
+                                         uint8_t        * setmeCount );
+
+int      tr_ctorGetIsPaused            ( const tr_ctor  * ctor,
+                                         tr_ctorMode      mode,
+                                         int            * setmeIsPaused );
+
+int      tr_ctorGetDestination         ( const tr_ctor  * ctor,
+                                         tr_ctorMode      mode,
+                                         const char    ** setmeDestination );
+
+int      tr_ctorGetMetadata            ( const tr_ctor  * ctor,
+                                         const struct benc_val_s ** setme );
+
+/**
+ * Parses the specified metainfo.
+ * Returns TR_OK if it parsed and can be added to Transmission.
+ * Returns TR_INVALID if it couldn't be parsed.
+ * Returns TR_EDUPLICATE if it parsed but can't be added. 
+ *     "destination" must be set to test for TR_EDUPLICATE.
+ *
+ * "setme_info" can be NULL if you don't need the information.
+ * If the metainfo can be parsed and setme_info is non-NULL,
+ * it will be filled with the metadata's info.  You'll need to
+ * call tr_metainfoFree( setme_info ) when done with it.
+ */
+int tr_torrentParseFromCtor( tr_handle      * handle,
+                             const tr_ctor  * ctor );
+
+/**
+ * Instantiate the torrent from the given tr_ctor.
+ */
+#define TR_EINVALID     1
+#define TR_EUNSUPPORTED 2
+#define TR_EDUPLICATE   3
+#define TR_EOTHER       666
+tr_torrent * tr_torrentNew( tr_handle      * handle,
+                            const tr_ctor  * ctor,
+                            int            * setmeError );
+
+
+/**
+***
+**/
+
 /***********************************************************************
  * tr_torrentInit
  ***********************************************************************
@@ -362,10 +480,6 @@ tr_torrent ** tr_loadTorrents ( tr_handle  * h,
  * then it's 20-byte hash will be copied in. If the TR_FLAG_SAVE flag
  * is passed then a copy of the torrent file will be saved.
  **********************************************************************/
-#define TR_EINVALID     1
-#define TR_EUNSUPPORTED 2
-#define TR_EDUPLICATE   3
-#define TR_EOTHER       666
 tr_torrent * tr_torrentInit( tr_handle    * handle,
                              const char   * metainfo_filename,
                              const char   * destination,

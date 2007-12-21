@@ -28,6 +28,7 @@ libtransmission_a_SOURCES = \
     shared.c \
     stats.c \
     torrent.c \
+    torrent-ctor.c \
     tracker.c \
     transmission.c \
     trevent.c \
