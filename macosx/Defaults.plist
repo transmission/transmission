@@ -74,7 +74,7 @@
 	<string>Constant</string>
 	<key>NatTraversal</key>
 	<true/>
-	<key>PeersGlobals</key>
+	<key>PeersGlobal</key>
 	<integer>400</integer>
 	<key>PiecesBar</key>
 	<false/>
