@@ -2094,30 +2094,25 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     int index = [fDefaults integerForKey: @"FilterGroup"];
     
     NSImage * icon = nil;
-    if (index >= 0)
-        icon = [[GroupsWindowController groupsController] imageForIndex: index isSmall: YES];
-    else if (index == GROUP_FILTER_ALL_TAG)
-        icon = [NSImage imageNamed: @"PinTemplate.png"];
-    else
-    {
-        if ([NSApp isOnLeopardOrBetter])
-            icon = [NSImage imageNamed: NSImageNameRemoveTemplate];
-    }
-    [[fGroupFilterMenu itemAtIndex: 0] setImage: icon];
-    
     NSString * toolTip;
     switch (index)
     {
         case GROUP_FILTER_ALL_TAG:
+            icon = [NSImage imageNamed: @"PinTemplate.png"];
             toolTip = NSLocalizedString(@"All Groups", "Groups -> Button");
             break;
         case -1:
+            if ([NSApp isOnLeopardOrBetter])
+                icon = [NSImage imageNamed: NSImageNameRemoveTemplate];
             toolTip = NSLocalizedString(@"Group: No Label", "Groups -> Button");
             break;
         default:
+            icon = [[GroupsWindowController groupsController] imageForIndex: index isSmall: YES];
             toolTip = [NSLocalizedString(@"Group: ", "Groups -> Button") stringByAppendingString:
                         [[GroupsWindowController groupsController] nameForIndex: index]];
     }
+    
+    [[fGroupFilterMenu itemAtIndex: 0] setImage: icon];
     [fGroupsButton setToolTip: toolTip];
 }
 
