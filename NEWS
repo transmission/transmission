@@ -3,8 +3,8 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 1.00 (zzzz/xx/yy)
 - All Platforms:
    + Port forwarding now performed by MiniUPnP and libnatpmp
+   + Ability to set global and per-torrent number of connections
    + Option to prefer not using encryption
-   + Restore `scrape' feature in the command-line interface client
    + Updated icon
 - OS X:
    + Redesigned Leopard-like look
@@ -19,6 +19,8 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Leopard: Fix bug where bandwidth rates chosen from the action menu would not apply the first time
 - GTK+:
    + Statistics window
+- CLI:
+   + Restore `scrape' feature
 
 0.96 (2007/12/10)
 - All Platforms:
