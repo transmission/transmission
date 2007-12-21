@@ -97,13 +97,13 @@ tr_ctorSetMetainfoFromHash( tr_ctor        * ctor,
 
     if( err && ( ctor->handle->tag != NULL ) ) {
         snprintf( basename, sizeof(basename), "%s-%s", hashString, ctor->handle->tag );
-        tr_buildPath( filename, sizeof(filename), tr_getTorrentsDirectory(), basename );
+        tr_buildPath( filename, sizeof(filename), tr_getTorrentsDirectory(), basename, NULL );
         err = tr_ctorSetMetainfoFromFile( ctor, filename );
         fprintf( stderr, "trying [%s] returned %d\n", filename, err );
     }
 
     if( err ) {
-        tr_buildPath( filename, sizeof(filename), tr_getTorrentsDirectory(), hashString );
+        tr_buildPath( filename, sizeof(filename), tr_getTorrentsDirectory(), hashString, NULL );
         err = tr_ctorSetMetainfoFromFile( ctor, filename );
         fprintf( stderr, "trying [%s] returned %d\n", filename, err );
     }
