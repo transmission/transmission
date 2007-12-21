@@ -260,9 +260,6 @@ static void
 torrentRealInit( tr_handle     * h,
                  tr_torrent    * tor,
                  const tr_ctor * ctor )
-                 //const char * destination,
-                 //int          destinationIsFallback,
-                 //int          isPaused )
 {
     int doStart;
     uint64_t loaded;
