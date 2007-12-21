@@ -2096,6 +2096,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSImage * icon = nil;
     if (index >= 0)
         icon = [[GroupsWindowController groupsController] imageForIndex: index isSmall: YES];
+    else if (index == GROUP_FILTER_ALL_TAG)
+        icon = [NSImage imageNamed: @"PinTemplate.png"];
     else
     {
         if ([NSApp isOnLeopardOrBetter])
