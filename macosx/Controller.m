@@ -2110,7 +2110,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             break;
         case -1:
             if ([NSApp isOnLeopardOrBetter])
-                icon = [NSImage imageNamed: NSImageNameRemoveTemplate];
+                icon = [NSImage imageNamed: NSImageNameStopProgressTemplate];
             toolTip = NSLocalizedString(@"Group: No Label", "Groups -> Button");
             break;
         default:
