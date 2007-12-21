@@ -262,6 +262,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [fStatusButton setHidden: YES];
         [fStatusTigerField setHidden: NO];
         [fStatusTigerImageView setHidden: NO];
+        
+        //filter bar
+        [fNoFilterButton sizeToFit];
+        
+        NSRect activeRect = [fActiveFilterButton frame];
+        activeRect.origin.x = NSMaxX([fNoFilterButton frame]) + 1.0;
+        [fActiveFilterButton setFrame: activeRect];
     }
     
     [self updateGroupsFilterButton];
