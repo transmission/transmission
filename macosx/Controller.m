@@ -1100,10 +1100,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         if ([fDefaults boolForKey: @"CheckRemoveDownloading"] ? downloading > 0 : active > 0)
         {
             NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
-                torrents, @"Torrents",
-                [NSNumber numberWithBool: deleteData], @"DeleteData",
-                [NSNumber numberWithBool: deleteTorrent], @"DeleteTorrent", nil];
-
+                                    torrents, @"Torrents",
+                                    [NSNumber numberWithBool: deleteData], @"DeleteData",
+                                    [NSNumber numberWithBool: deleteTorrent], @"DeleteTorrent", nil];
+            
             NSString * title, * message;
             
             int selected = [fTableView numberOfSelectedRows];
@@ -1154,7 +1154,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     NSLocalizedString(@" Once removed, continuing the transfers will require the torrent files.",
                                 "Removal confirm panel -> message part 2")];
             }
-
+            
             NSBeginAlertSheet(title, NSLocalizedString(@"Remove", "Removal confirm panel -> button"),
                 NSLocalizedString(@"Cancel", "Removal confirm panel -> button"), nil, fWindow, self,
                 nil, @selector(removeSheetDidEnd:returnCode:contextInfo:), dict, message);
@@ -1168,14 +1168,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (NSDictionary *) dict
 {
     NSArray * torrents = [dict objectForKey: @"Torrents"];
-    BOOL deleteData = [[dict objectForKey: @"DeleteData"] boolValue],
-        deleteTorrent = [[dict objectForKey: @"DeleteTorrent"] boolValue];
-    [dict release];
-    
     if (returnCode == NSAlertDefaultReturn)
-        [self confirmRemoveTorrents: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
+        [self confirmRemoveTorrents: torrents deleteData: [[dict objectForKey: @"DeleteData"] boolValue]
+                                                deleteTorrent: [[dict objectForKey: @"DeleteTorrent"] boolValue]];
     else
         [torrents release];
+    
+    [dict release];
 }
 
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
@@ -1185,14 +1184,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
         [torrent setWaitToStart: NO];
-
+    
     int lowestOrderValue = -1, currentOrderValue;
-
+    
+    [fTorrents removeObjectsInArray: torrents];
+    [fDisplayedTorrents removeObjectsInArray: torrents];
+    
     enumerator = [torrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
-        [torrent stopTransfer];
-
         if (deleteData)
             [torrent trashData];
         if (deleteTorrent)
@@ -1204,9 +1204,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             lowestOrderValue = currentOrderValue;
         
         [torrent closeRemoveTorrent];
-        [fTorrents removeObject: torrent];
-        [fDisplayedTorrents removeObject: torrent];
     }
+    
     [torrents release];
 
     //reset the order values if necessary
@@ -1226,9 +1225,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fTableView deselectAll: nil];
     
-    [self updateUI];
-    [self applyFilter: nil];
-    [self updateTorrentHistory];
+    [self updateTorrentsInQueue];
 }
 
 - (void) removeNoDelete: (id) sender
