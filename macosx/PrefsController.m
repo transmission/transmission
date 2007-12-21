@@ -78,6 +78,9 @@
         //set NAT
         tr_natTraversalEnable(fHandle, [fDefaults boolForKey: @"NatTraversal"]);
         
+        //set peer connection values
+        tr_setGlobalPeerLimit(fHandle, [fDefaults integerForKey: @"PeersGlobal"]);
+        
         //set encryption
         [self setEncryptionMode: nil];
         
@@ -142,6 +145,9 @@
     [self updatePortStatus];
     fPortStatusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self
                         selector: @selector(updatePortStatus) userInfo: nil repeats: YES];
+    
+    //set peer connections
+    [fPeersGlobalField setIntValue: [fDefaults integerForKey: @"PeersGlobal"]];
     
     //set queue values
     [fQueueDownloadField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
@@ -314,6 +320,13 @@
         [sound play];
 }
 
+- (void) setPeersGlobal: (id) sender
+{
+    int count = [sender intValue];
+    [fDefaults setInteger: count forKey: @"PeersGlobal"];
+    tr_setGlobalPeerLimit(fHandle, count);
+}
+
 - (void) setEncryptionMode: (id) sender
 {
     tr_setEncryptionMode(fHandle, [fDefaults boolForKey: @"EncryptionPrefer"] ? 
@@ -323,7 +336,7 @@
 - (void) applySpeedSettings: (id) sender
 {
     if ([fDefaults boolForKey: @"SpeedLimit"])
-    {NSLog(@"Speed Limit up: %d down: %d", [fDefaults integerForKey: @"SpeedLimitUploadLimit"], [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
+    {
         tr_setUseGlobalSpeedLimit(fHandle, TR_UP, 1);
         tr_setGlobalSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
         
@@ -331,8 +344,7 @@
         tr_setGlobalSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
     }
     else
-    {NSLog(@"up (%d): %d down (%d): %d", [fDefaults boolForKey: @"CheckUpload"], [fDefaults integerForKey: @"UploadLimit"],
-                            [fDefaults boolForKey: @"CheckDownload"], [fDefaults integerForKey: @"DownloadLimit"]);
+    {
         tr_setUseGlobalSpeedLimit(fHandle, TR_UP, [fDefaults boolForKey: @"CheckUpload"]);
         tr_setGlobalSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"UploadLimit"]);
         

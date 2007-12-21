@@ -47,6 +47,8 @@
     IBOutlet NSTextField    * fUploadField, * fDownloadField,
                             * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
     
+    IBOutlet NSTextField    * fPeersGlobalField, * fPeersTorrentField;
+    
     PortChecker                     * fPortChecker;
     IBOutlet NSTextField            * fPortField, * fPortStatusField;
     IBOutlet NSButton               * fNatCheck;
@@ -66,6 +68,8 @@
 
 - (NSArray *) sounds;
 - (void) setSound: (id) sender;
+
+- (void) setPeersGlobal: (id) sender;
 
 - (void) setEncryptionMode: (id) sender;
 

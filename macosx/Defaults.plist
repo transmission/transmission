@@ -58,7 +58,7 @@
 	<string>None</string>
 	<key>FilterBar</key>
 	<false/>
-    <key>FilterGroup</key>
+	<key>FilterGroup</key>
 	<integer>-2</integer>
 	<key>FilterSearchType</key>
 	<string>Name</string>
@@ -74,6 +74,8 @@
 	<string>Constant</string>
 	<key>NatTraversal</key>
 	<true/>
+	<key>PeersGlobals</key>
+	<integer>400</integer>
 	<key>PiecesBar</key>
 	<false/>
 	<key>PiecesViewShowAvailability</key>

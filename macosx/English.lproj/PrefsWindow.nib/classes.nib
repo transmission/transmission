@@ -39,6 +39,8 @@
 				<string>id</string>
 				<key>setNat</key>
 				<string>id</string>
+				<key>setPeersGlobal</key>
+				<string>id</string>
 				<key>setPort</key>
 				<string>id</string>
 				<key>setQueue</key>
@@ -84,6 +86,10 @@
 				<string>NSTextField</string>
 				<key>fNatStatusImage</key>
 				<string>NSImageView</string>
+				<key>fPeersGlobalField</key>
+				<string>NSTextField</string>
+				<key>fPeersTorrentField</key>
+				<string>NSTextField</string>
 				<key>fPortField</key>
 				<string>NSTextField</string>
 				<key>fPortStatusField</key>
