@@ -1466,7 +1466,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         fIncompleteFolder = [[fIncompleteFolder stringByExpandingTildeInPath] retain];
     }
     
-    //set libT settings
+    //set libtransmission settings for initialization
     tr_ctor * ctor = tr_ctorNew(fLib);
     tr_ctorSetPaused(ctor, TR_FORCE, YES);
     
