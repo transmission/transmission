@@ -1466,29 +1466,40 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         fIncompleteFolder = [[fIncompleteFolder stringByExpandingTildeInPath] retain];
     }
     
-    NSString * currentDownloadFolder;
+    //set libT settings
+    tr_ctor * ctor = tr_ctorNew(fLib);
+    tr_ctorSetPaused(ctor, TR_FORCE, YES);
+    
     tr_info info;
     int error;
     if (hashString)
     {
-        if (tr_torrentParseHash(fLib, [hashString UTF8String], NULL, &info) == TR_OK)
+        tr_ctorSetMetainfoFromHash(ctor, [hashString UTF8String]);
+        if (tr_torrentParseFromCtor(fLib, ctor, &info) == TR_OK)
         {
-            currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
+            NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                         ? fIncompleteFolder : fDownloadFolder;
-            fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], [currentDownloadFolder UTF8String], YES, &error);
+            tr_ctorSetDestination(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
+            
+            fHandle = tr_torrentNew(fLib, ctor, &error);
         }
         tr_metainfoFree(&info);
     }
     if (!fHandle && path)
     {
-        if (tr_torrentParse(fLib, [path UTF8String], NULL, &info) == TR_OK)
+        tr_ctorSetMetainfoFromFile(ctor, [path UTF8String]);
+        if (tr_torrentParseFromCtor(fLib, ctor, &info) == TR_OK)
         {
-            currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
+            NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                         ? fIncompleteFolder : fDownloadFolder;
-            fHandle = tr_torrentInit(fLib, [path UTF8String], [currentDownloadFolder UTF8String], YES, &error);
+            tr_ctorSetDestination(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
+            
+            fHandle = tr_torrentNew(fLib, ctor, &error);
         }
         tr_metainfoFree(&info);
     }
+    tr_ctorFree(ctor);
+    
     if (!fHandle)
     {
         [self release];
