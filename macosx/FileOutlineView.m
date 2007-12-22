@@ -43,16 +43,16 @@
     [self setAutoresizesOutlineColumn: NO];
     [self setIndentationPerLevel: 14.0];
     
-    NSColor * beginningColor = [NSColor colorWithCalibratedRed: 217.0/255.0 green: 250.0/255.0 blue: 211.0/255.0 alpha: 1.0];
-    NSColor * endingColor = [NSColor colorWithCalibratedRed: 200.0/255.0 green: 231.0/255.0 blue: 194.0/255.0 alpha: 1.0];
+    NSColor * endingColor = [NSColor colorWithCalibratedRed: 217.0/255.0 green: 250.0/255.0 blue: 211.0/255.0 alpha: 1.0];
+    NSColor * beginningColor = [endingColor blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
     fHighPriorityGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
     
-    beginningColor = [NSColor colorWithCalibratedRed: 255.0/255.0 green: 243.0/255.0 blue: 206.0/255.0 alpha: 1.0];
-    endingColor = [NSColor colorWithCalibratedRed: 235.0/255.0 green: 226.0/255.0 blue: 192.0/255.0 alpha: 1.0];
+    endingColor = [NSColor colorWithCalibratedRed: 255.0/255.0 green: 243.0/255.0 blue: 206.0/255.0 alpha: 1.0];
+    beginningColor = [endingColor blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
     fLowPriorityGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
     
-    beginningColor = [NSColor colorWithCalibratedRed: 225.0/255.0 green: 218.0/255.0 blue: 255.0/255.0 alpha: 1.0];
-    endingColor = [NSColor colorWithCalibratedRed: 214.0/255.0 green: 207.0/255.0 blue: 242.0/255.0 alpha: 1.0];
+    endingColor = [NSColor colorWithCalibratedRed: 225.0/255.0 green: 218.0/255.0 blue: 255.0/255.0 alpha: 1.0];
+    beginningColor = [endingColor blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
     fMixedPriorityGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
     
     fHoverRow = -1;
