@@ -2329,30 +2329,32 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     BOOL ask = [[fDefaults stringForKey: @"DownloadChoice"] isEqualToString: @"Ask"];
     
     NSEnumerator * enumerator = [newNames objectEnumerator];
-    int canAdd, count;
+    int count;
     tr_ctor * ctor;
     while ((file = [enumerator nextObject]))
     {
-        tr_ctor * ctor = tr_ctorNew(fLib);
+        ctor = tr_ctorNew(fLib);
         tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
-        canAdd = tr_torrentParseFromCtor(fLib, ctor, NULL);
-        tr_ctorFree(ctor);
         
-        if (canAdd == TR_OK)
+        switch (tr_torrentParseFromCtor(fLib, ctor, NULL))
         {
-            if (!ask)
-                count = [fTorrents count];
-            [self openFiles: [NSArray arrayWithObject: file]];
+            case TR_OK:
+                if (!ask)
+                    count = [fTorrents count];
+                [self openFiles: [NSArray arrayWithObject: file]];
+                
+                //check if torrent was opened
+                if (!ask && [fTorrents count] > count)
+                    [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added",
+                        "Growl notification title") description: [file lastPathComponent]
+                        notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
+                break;
             
-            //check if torrent was opened
-            if (!ask && [fTorrents count] > count)
-                [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added",
-                    "Growl notification title") description: [file lastPathComponent]
-                    notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
+            case TR_EINVALID:
+                [fAutoImportedNames removeObject: [file lastPathComponent]];
         }
-        else if (canAdd == TR_EINVALID)
-            [fAutoImportedNames removeObject: [file lastPathComponent]];
-        else;
+        
+        tr_ctorFree(ctor);
     }
     
     [newNames release];
