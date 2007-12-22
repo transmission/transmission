@@ -148,6 +148,7 @@
     
     //set peer connections
     [fPeersGlobalField setIntValue: [fDefaults integerForKey: @"PeersGlobal"]];
+    [fPeersTorrentField setIntValue: [fDefaults integerForKey: @"PeersTorrent"]];
     
     //set queue values
     [fQueueDownloadField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
@@ -325,6 +326,12 @@
     int count = [sender intValue];
     [fDefaults setInteger: count forKey: @"PeersGlobal"];
     tr_setGlobalPeerLimit(fHandle, count);
+}
+
+- (void) setPeersTorrent: (id) sender
+{
+    int count = [sender intValue];
+    [fDefaults setInteger: count forKey: @"PeersTorrent"];
 }
 
 - (void) setEncryptionMode: (id) sender

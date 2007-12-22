@@ -1469,6 +1469,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     //set libtransmission settings for initialization
     tr_ctor * ctor = tr_ctorNew(fLib);
     tr_ctorSetPaused(ctor, TR_FORCE, YES);
+    tr_ctorSetMaxConnectedPeers(ctor, TR_FALLBACK, [fDefaults integerForKey: @"PeersTorrent"]);
     
     tr_info info;
     int error;

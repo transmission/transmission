@@ -41,6 +41,8 @@
 				<string>id</string>
 				<key>setPeersGlobal</key>
 				<string>id</string>
+				<key>setPeersTorrent</key>
+				<string>id</string>
 				<key>setPort</key>
 				<string>id</string>
 				<key>setQueue</key>

@@ -70,6 +70,7 @@
 - (void) setSound: (id) sender;
 
 - (void) setPeersGlobal: (id) sender;
+- (void) setPeersTorrent: (id) sender;
 
 - (void) setEncryptionMode: (id) sender;
 

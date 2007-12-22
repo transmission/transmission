@@ -76,6 +76,8 @@
 	<true/>
 	<key>PeersGlobal</key>
 	<integer>500</integer>
+	<key>PeersTorrent</key>
+	<integer>75</integer>
 	<key>PiecesBar</key>
 	<false/>
 	<key>PiecesViewShowAvailability</key>
