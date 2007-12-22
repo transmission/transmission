@@ -25,7 +25,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "ipcparse.h"
-
+@class PrefsController;
 @interface NSObject (IPCControllerDelegate)
 
 - (void)                    ipcQuit;
@@ -58,7 +58,7 @@
     id                 _delegate;
 }
 
-- (id)          init;
+- (id) initWithHandle: (PrefsController *) thePrefsController;
 - (id)      delegate;
 - (void) setDelegate: (id) newdelegate;
 

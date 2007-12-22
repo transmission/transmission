@@ -207,7 +207,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         fBadger = [[Badger alloc] initWithLib: fLib];
         
-        fIPCController = [[IPCController alloc] init];
+        fIPCController = [[IPCController alloc] initWithHandle: fPrefsController];
         [fIPCController setDelegate: self];
         fRemoteQuit = NO;
         

@@ -36,6 +36,7 @@
 
 #import "IPCController.h"
 #import "Torrent.h"
+#import "PrefsController.h"
 
 static void
 getaddr( struct sockaddr_un * );
@@ -109,13 +110,17 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
 
 - (void)  newclient: (NSNotification *) notification;
 - (void) killclient: (IPCClient *) client;
+NSUserDefaults          * fDefaults;
+PrefsController         * fPrefsController;
+
 
 @end
 
 @implementation IPCController
 
-- (id) init
+- (id) initWithHandle : (PrefsController *) thePrefsController
 {
+    fPrefsController = thePrefsController;
     struct sockaddr_un sun;
 
     self = [super init];
@@ -221,6 +226,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
     NSFileHandle * handle;
     NSNumber     * error;
     IPCClient    * client;
+    
 
     info   = [notification userInfo];
     handle = [info objectForKey: NSFileHandleNotificationFileHandleItem];
@@ -495,8 +501,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
 
 @end
 
-void
-getaddr( struct sockaddr_un * sun )
+void getaddr( struct sockaddr_un * sun )
 {
     bzero( sun, sizeof *sun );
     sun->sun_family = AF_LOCAL;
@@ -504,8 +509,7 @@ getaddr( struct sockaddr_un * sun )
     strlcat( sun->sun_path, "/socket", sizeof sun->sun_path );
 }
 
-NSArray *
-bencarray( benc_val_t * val, int type )
+NSArray * bencarray( benc_val_t * val, int type )
 {
     int              ii;
     NSMutableArray * ret;
@@ -536,8 +540,7 @@ bencarray( benc_val_t * val, int type )
     return ret;
 }
 
-void
-msg_lookup( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_lookup( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient      * client = arg;
     NSArray        * hashes, * tors;
@@ -561,8 +564,7 @@ msg_lookup( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
                    types: IPC_INF_HASH];
 }
 
-void
-msg_info( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_info( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient  * client = arg;
     enum ipc_msg respid;
@@ -589,8 +591,7 @@ msg_info( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     [client sendrespEmpty: IPC_MSG_BAD tag: tag];
 }
 
-void
-msg_infoall( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_infoall( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient  * client = arg;
     enum ipc_msg respid;
@@ -610,8 +611,7 @@ msg_infoall( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     [client sendrespInfo: respid tag: tag torrents: tors types: types];
 }
 
-void
-msg_action( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_action( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
     BOOL        res;
@@ -650,8 +650,7 @@ msg_action( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
         [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
 }
 
-void
-msg_actionall( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_actionall( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
     BOOL        res;
@@ -682,8 +681,7 @@ msg_actionall( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
         [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
 }
 
-void
-msg_addold( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_addold( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
     NSArray   * paths;
@@ -704,8 +702,7 @@ msg_addold( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
         [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
 }
 
-void
-msg_addnew( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_addnew( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient  * client = arg;
     benc_val_t * fileval, * dataval, * dirval, * autoval;
@@ -774,16 +771,22 @@ msg_addnew( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     [client sendrespEmpty: IPC_MSG_BAD tag: tag];
 }
 
-void
-msg_getbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_getbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
+    
+    fDefaults = [NSUserDefaults standardUserDefaults];
 
     switch( msgid )
     {
         case IPC_MSG_GETAUTOMAP:
+            [client sendrespInt:IPC_MSG_AUTOMAP tag:tag val:[fDefaults boolForKey:@"NatTraversal"]];
+            break;
         case IPC_MSG_GETAUTOSTART:
+            [client sendrespInt:IPC_MSG_AUTOSTART tag:tag val:[fDefaults boolForKey:@"AutoStartDownload"]];
+            break;
         case IPC_MSG_GETPEX:
+#warning we dont support this :(
             [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
             break;
         default:
@@ -792,17 +795,22 @@ msg_getbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     }
 }
 
-void
-msg_getint( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_getint( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
-
+    
+    fDefaults = [NSUserDefaults standardUserDefaults];
+    
     switch( msgid )
     {
         case IPC_MSG_GETDOWNLIMIT:
+            [client sendrespInt:IPC_MSG_DOWNLIMIT tag:tag val:[fDefaults integerForKey:@"DownloadLimit"]];
+            break;
         case IPC_MSG_GETPORT:
+            [client sendrespInt:IPC_MSG_PORT tag:tag val:[fDefaults integerForKey:@"BindPort"]];
+            break;
         case IPC_MSG_GETUPLIMIT:
-            [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
+            [client sendrespInt:IPC_MSG_UPLIMIT tag:tag val:[fDefaults integerForKey:@"UploadLimit"]];
             break;
         default:
             assert( 0 );
@@ -810,15 +818,17 @@ msg_getint( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     }
 }
 
-void
-msg_getstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_getstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
 
+    fDefaults = [NSUserDefaults standardUserDefaults];
+    
     switch( msgid )
     {
+            
         case IPC_MSG_GETDIR:
-            [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
+            [client sendrespStr:IPC_MSG_DIR tag:tag val:[fDefaults stringForKey:@"DownloadFolder"]];
             break;
         default:
             assert( 0 );
@@ -826,8 +836,7 @@ msg_getstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     }
 }
 
-void
-msg_setbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_setbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
 
@@ -837,12 +846,21 @@ msg_setbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
         [client sendrespEmpty: IPC_MSG_BAD tag: tag];
         return;
     }
-
+    
+    fDefaults = [NSUserDefaults standardUserDefaults];
+    
     switch( msgid )
     {
         case IPC_MSG_AUTOMAP:
+            [fDefaults setBool:(bool)val->val.i forKey:@"NatTraversal"];
+            [client sendrespEmpty:IPC_MSG_OK tag:tag];
+            break;
         case IPC_MSG_AUTOSTART:
+            [fDefaults setBool:(bool)val->val.i forKey:@"AutoStartDownload"];
+            [client sendrespEmpty:IPC_MSG_OK tag:tag];
+            break;
         case IPC_MSG_PEX:
+#warning we dont support this :(
             [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
             break;
         default:
@@ -851,8 +869,7 @@ msg_setbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     }
 }
 
-void
-msg_setint( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_setint( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
 
@@ -862,22 +879,32 @@ msg_setint( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
         [client sendrespEmpty: IPC_MSG_BAD tag: tag];
         return;
     }
-
+    
+    fDefaults = [NSUserDefaults standardUserDefaults];
     switch( msgid )
     {
         case IPC_MSG_DOWNLIMIT:
+            [fDefaults setInteger:val->val.i forKey:@"DownloadLimit"];
+            [fPrefsController updateLimitFields];
+            [fPrefsController applySpeedSettings: nil];
+            break;
         case IPC_MSG_PORT:
+#warning show in preference window
+            [fPrefsController setPort:[NSNumber numberWithInt:val->val.i]];
+            break;
         case IPC_MSG_UPLIMIT:
-            [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
+            [fDefaults setInteger:val->val.i forKey:@"UploadLimit"];
+            [fPrefsController updateLimitFields];
+            [fPrefsController applySpeedSettings: nil];
             break;
         default:
             assert( 0 );
             break;
     }
+    [client sendrespEmpty:IPC_MSG_OK tag:tag];
 }
 
-void
-msg_setstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_setstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
 
@@ -887,20 +914,23 @@ msg_setstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
         [client sendrespEmpty: IPC_MSG_BAD tag: tag];
         return;
     }
-
+             
+    fDefaults = [NSUserDefaults standardUserDefaults];
+             
     switch( msgid )
     {
         case IPC_MSG_DIR:
-            [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
-            break;
+             [fDefaults setObject:[NSString stringWithCString: val->val.s.s] forKey:@"DownloadFolder"];
+             [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"]; //not sure about this line
+             [client sendrespEmpty: IPC_MSG_OK tag: tag];
+             break;
         default:
-            assert( 0 );
-            break;
+             assert( 0 );
+             break;
     }
 }
 
-void
-msg_empty( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_empty( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
 
@@ -919,8 +949,7 @@ msg_empty( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     }
 }
 
-void
-msg_sup( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_sup( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient       * client = arg;
     benc_val_t        packet, * pkval, * name;
@@ -974,8 +1003,7 @@ msg_sup( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     [[client controller] killclient: client];
 }
 
-void
-msg_default( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+void msg_default( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
 
