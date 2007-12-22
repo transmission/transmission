@@ -243,6 +243,9 @@ typedef enum
             [fPexCheck setEnabled: NO];
             [fPexCheck setState: NSOffState];
             [fPexCheck setToolTip: nil];
+            
+            [fPeersConnectField setEnabled: NO];
+            [fPexCheck setStringValue: @""];
         }
         
         [fFileOutline setTorrent: nil];
@@ -539,6 +542,25 @@ typedef enum
         [fRatioLimitField setFloatValue: ratioLimit];
     else
         [fRatioLimitField setStringValue: @""];
+    
+    //get peer info
+    enumerator = [fTorrents objectEnumerator];
+    torrent = [enumerator nextObject]; //first torrent
+    
+    int maxPeers = [torrent maxPeerConnect];
+    
+    while ((torrent = [enumerator nextObject]) && maxPeers != INVALID)
+    {
+        if (/*maxPeers != INVALID &&*/ maxPeers != [torrent maxPeerConnect])
+            maxPeers = INVALID;
+    }
+    
+    //set peer view
+    [fPeersConnectField setEnabled: YES];
+    if (maxPeers != INVALID)
+        [fPeersConnectField setIntValue: maxPeers];
+    else
+        [fPeersConnectField setStringValue: @""];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
@@ -1219,7 +1241,7 @@ typedef enum
     if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%.2f", ratioLimit]] || ratioLimit < 0)
     {
         NSBeep();
-        float ratioLimit = [[enumerator nextObject] ratioLimit]; //use first torrent
+        ratioLimit = [[enumerator nextObject] ratioLimit]; //use first torrent
         while ((torrent = [enumerator nextObject]))
             if (ratioLimit != [torrent ratioLimit])
             {
@@ -1234,8 +1256,6 @@ typedef enum
         while ((torrent = [enumerator nextObject]))
             [torrent setRatioLimit: ratioLimit];
     }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
 }
 
 - (void) setPex: (id) sender
@@ -1252,6 +1272,35 @@ typedef enum
 	
 	while ((torrent = [enumerator nextObject]))
 		[torrent setPex: state == NSOnState];
+}
+
+#warning not saving between launches
+- (void) setPeersConnectLimit: (id) sender
+{
+    Torrent * torrent;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+
+    int limit = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%i", limit]] || limit <= 0)
+    {
+        NSBeep();
+        limit = [[enumerator nextObject] maxPeerConnect]; //use first torrent
+        while ((torrent = [enumerator nextObject]))
+            if (limit != [torrent maxPeerConnect])
+            {
+                [sender setStringValue: @""];
+                return;
+            }
+        
+        [sender setIntValue: limit];
+    }
+    else
+    {
+        while ((torrent = [enumerator nextObject]))
+            [torrent setMaxPeerConnect: limit];
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
 }
 
 @end

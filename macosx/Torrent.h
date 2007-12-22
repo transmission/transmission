@@ -112,6 +112,9 @@ typedef enum
 - (int) speedLimit: (BOOL) upload;
 - (void) setSpeedLimit: (int) limit upload: (BOOL) upload;
 
+- (void) setMaxPeerConnect: (uint16_t) count;
+- (uint16_t) maxPeerConnect;
+
 - (void) setWaitToStart: (BOOL) wait;
 - (BOOL) waitingToStart;
 

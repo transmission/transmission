@@ -374,6 +374,17 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     tr_torrentSetSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN, limit);
 }
 
+- (void) setMaxPeerConnect: (uint16_t) count
+{
+    if (count > 0)
+        tr_torrentSetMaxConnectedPeers(fHandle, count);
+}
+
+- (uint16_t) maxPeerConnect
+{
+    return tr_torrentGetMaxConnectedPeers(fHandle);
+}
+
 - (void) setWaitToStart: (BOOL) wait
 {
     fWaitToStart = wait;
