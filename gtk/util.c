@@ -61,13 +61,13 @@ tr_strlsize( char * buf, guint64 size, size_t buflen )
             N_("PiB"), N_("EiB"), N_("ZiB"), N_("YiB")
         };
         unsigned int i;
-        guint64 small = size;
-        for( i=0; i<G_N_ELEMENTS(units) && small>=1024; ++i )
-            small >>= 10;
+        double small = size;
+        for( i=0; i<G_N_ELEMENTS(units) && (small>=1024.0); ++i )
+            small /= 1024.0;
         if( i < 2 ) /* B & KiB */
             g_snprintf( buf, buflen, "%d %s", (int)small, _(units[i]) );
         else
-            g_snprintf( buf, buflen, "%.1f %s", (double)small, _(units[i]) );
+            g_snprintf( buf, buflen, "%.1f %s", small, _(units[i]) );
     }
     return buf;
 }

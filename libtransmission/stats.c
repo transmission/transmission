@@ -132,17 +132,25 @@ tr_statsClose( tr_handle * handle )
     handle->sessionStats = NULL;
 }
 
+static void
+updateRatio( tr_session_stats * setme )
+{
+    if( setme->downloadedBytes )
+        setme->ratio = setme->uploadedBytes / (double)setme->downloadedBytes;
+    else if( setme->uploadedBytes )
+        setme->ratio = TR_RATIO_INF;
+    else
+        setme->ratio = TR_RATIO_NA;
+}
+
 void
 tr_getSessionStats( const tr_handle   * handle,
                     tr_session_stats  * setme )
 {
     const struct tr_stats_handle * stats = handle->sessionStats;
     *setme = stats->single;
-    
-    setme->ratio = setme->downloadedBytes ? (double)setme->uploadedBytes / (double)setme->downloadedBytes
-                                            : ( setme->uploadedBytes ? TR_RATIO_INF : TR_RATIO_NA );
-    
     setme->secondsActive += ( time(NULL) - stats->startTime );
+    updateRatio( setme );
 }
 
 void
@@ -151,8 +159,8 @@ tr_getCumulativeSessionStats( const tr_handle   * handle,
 {
     const struct tr_stats_handle * stats = handle->sessionStats;
     *setme = stats->cumulative;
-    setme->ratio = setme->downloadedBytes ? (double)setme->uploadedBytes / (double)setme->downloadedBytes : TR_RATIO_NA;
     setme->secondsActive += ( time(NULL) - stats->startTime );
+    updateRatio( setme );
 }
 
 /**
