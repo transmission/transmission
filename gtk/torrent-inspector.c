@@ -1534,12 +1534,14 @@ dl_speed_toggled_cb (GtkToggleButton *tb, gpointer gtor)
 }
 
 
+#if 0
 static void
 seeding_cap_toggled_cb (GtkToggleButton *tb, gpointer gtor)
 {
   tr_torrent_set_seeding_cap_enabled (TR_TORRENT(gtor), 
                                       gtk_toggle_button_get_active(tb));
 }
+#endif
 
 static void
 sensitize_from_check_cb (GtkToggleButton *toggle, gpointer w)
@@ -1566,16 +1568,27 @@ dl_speed_spun_cb (GtkSpinButton *spin, gpointer gtor)
   setSpeedLimit( spin, gtor, TR_DOWN );
 }
 
+#if 0
 static void
 seeding_ratio_spun_cb (GtkSpinButton *spin, gpointer gtor)
 {
   tr_torrent_set_seeding_cap_ratio (TR_TORRENT(gtor),
                                     gtk_spin_button_get_value(spin));
 }
+#endif
+
+static void
+max_peers_spun_cb( GtkSpinButton * spin, gpointer gtor )
+{
+  const uint16_t maxConnectedPeers = gtk_spin_button_get_value( spin );
+  tr_torrentSetPeerLimits( tr_torrent_handle( gtor ), maxConnectedPeers, 0 );
+}
 
 GtkWidget*
 options_page_new ( TrTorrent * gtor )
 {
+  uint8_t maxUnchokedPeers;
+  uint16_t maxConnectedPeers;
   int i, row;
   gboolean b;
   GtkAdjustment *a;
@@ -1614,9 +1627,16 @@ options_page_new ( TrTorrent * gtor )
     hig_workarea_add_row_w (t, &row, tb, w, NULL);
 
   hig_workarea_add_section_divider (t, &row);
-  hig_workarea_add_section_title (t, &row, _("Seeding"));
+  hig_workarea_add_section_title (t, &row, _("Peer Connections"));
   hig_workarea_add_section_spacer (t, row, 1);
 
+    tr_torrentGetPeerLimits( tor, &maxConnectedPeers, &maxUnchokedPeers );
+    w = gtk_spin_button_new_with_range( 1, 3000, 5 );
+    gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), maxConnectedPeers );
+    hig_workarea_add_row( t, &row, _( "Maximum connected peers:" ), w, NULL );
+    g_signal_connect( w, "value-changed", G_CALLBACK( max_peers_spun_cb ), gtor );
+
+#if 0
     tb = gtk_check_button_new_with_mnemonic (_("_Stop Seeding at Ratio:"));
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(tb), gtor->seeding_cap_enabled);
     g_signal_connect (tb, "toggled", G_CALLBACK(seeding_cap_toggled_cb), gtor);
@@ -1626,6 +1646,7 @@ options_page_new ( TrTorrent * gtor )
     g_signal_connect (tb, "toggled", G_CALLBACK(sensitize_from_check_cb), w);
     sensitize_from_check_cb (GTK_TOGGLE_BUTTON(tb), w);
     hig_workarea_add_row_w (t, &row, tb, w, NULL);
+#endif
 
   hig_workarea_finish (t, &row);
   return t;

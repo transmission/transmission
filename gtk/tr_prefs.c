@@ -29,6 +29,9 @@ tr_prefs_init_global( void )
 {
     cf_check_older_configs( );
 
+    pref_int_set_default    ( PREF_KEY_MAX_PEERS_GLOBAL, 400 );
+    pref_int_set_default    ( PREF_KEY_MAX_PEERS_PER_TORRENT, 60 );
+
     pref_string_set_default ( PREF_KEY_STATUS_BAR_STATS, "total-ratio" );
     pref_flag_set_default   ( PREF_KEY_STATUS_BAR, TRUE );
     pref_flag_set_default   ( PREF_KEY_TOOLBAR, TRUE );
@@ -298,6 +301,15 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
         w = new_action_combo( PREF_KEY_ADDIPC, core );
         s = _("For torrents added from _command-line:");
         l = hig_workarea_add_row( t, &row, s, w, NULL );
+
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Peer Connections" ) );
+    hig_workarea_add_section_spacer(t , row, 2 );
+  
+        w = new_spin_button( PREF_KEY_MAX_PEERS_GLOBAL, core, 1, 3000 );
+        hig_workarea_add_row( t, &row, _( "Global maximum connected peers:" ), w, NULL );
+        w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300 );
+        hig_workarea_add_row( t, &row, _( "Maximum connected peers for new torrents:" ), w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title (t, &row, _("Network"));

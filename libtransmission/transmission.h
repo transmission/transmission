@@ -278,13 +278,14 @@ void tr_getGlobalSpeedLimit( tr_handle * handle,
 ***  Peer Limits
 **/
 
+/* pass `0' to a field here to leave it unchanged */
 void tr_torrentSetPeerLimits( tr_torrent  * tor,
                               uint16_t      maxConnectedPeers,
-                              uint16_t      maxUnchokedPeers );
+                              uint8_t       maxUnchokedPeers );
 
 void tr_torrentGetPeerLimits( const tr_torrent  * tor,
                               uint16_t          * maxConnectedPeers,
-                              uint16_t          * maxUnchokedPeers );
+                              uint8_t           * maxUnchokedPeers );
 
 void tr_setGlobalPeerLimit( tr_handle * handle,
                             uint16_t    maxGlobalPeers );

@@ -306,13 +306,17 @@ setSort( TrCore * core, const char * mode, gboolean isReversed  )
 static void
 prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
 {
-    if( !strcmp( key, PREF_KEY_SORT_MODE )
-     || !strcmp( key, PREF_KEY_SORT_REVERSED ) )
+    if( !strcmp( key, PREF_KEY_SORT_MODE ) || !strcmp( key, PREF_KEY_SORT_REVERSED ) )
     {
         char * mode = pref_string_get( PREF_KEY_SORT_MODE );
         gboolean isReversed = pref_flag_get( PREF_KEY_SORT_REVERSED );
         setSort( core, mode, isReversed );
         g_free( mode );
+    }
+    else if( !strcmp( key, PREF_KEY_MAX_PEERS_GLOBAL ) )
+    {
+        const uint16_t val = pref_int_get( key );
+        tr_setGlobalPeerLimit( core->handle, val );
     }
 }
 
@@ -383,6 +387,7 @@ tr_core_new( void )
     g_signal_connect( core, "prefs-changed", G_CALLBACK(prefsChanged), NULL );
     prefsChanged( core, PREF_KEY_SORT_MODE, NULL );
     prefsChanged( core, PREF_KEY_SORT_REVERSED, NULL );
+    prefsChanged( core, PREF_KEY_MAX_PEERS_GLOBAL, NULL );
 
     return core;
 }
@@ -462,6 +467,7 @@ tr_core_load( TrCore * self, gboolean paused )
     ctor = tr_ctorNew( self->handle );
     tr_ctorSetPaused( ctor, TR_FORCE, paused );
     tr_ctorSetDestination( ctor, TR_FALLBACK, path );
+    tr_ctorSetMaxConnectedPeers( ctor, TR_FALLBACK, pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
 
     torrents = tr_loadTorrents ( self->handle, ctor, &count );
     for( i=0; i<count; ++i )
