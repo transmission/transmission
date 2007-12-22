@@ -90,7 +90,7 @@
         {
             ctor = tr_ctorNew(fLib);
             tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
-            if (tr_torrentParseFromCtor(fLib, ctor, &info) == TR_OK)
+            if (tr_torrentParse(fLib, ctor, &info) == TR_OK)
             {
                 count++;
                 size += info.totalSize;

@@ -1487,10 +1487,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (hashString)
     {
         tr_ctorSetMetainfoFromHash(ctor, [hashString UTF8String]);
-        if (tr_torrentParseFromCtor(fLib, ctor, &info) == TR_OK)
+        if (tr_torrentParse(fLib, ctor, &info) == TR_OK)
         {
             NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
-                                        ? fIncompleteFolder : fDownloadFolder;
+                                                ? fIncompleteFolder : fDownloadFolder;
             tr_ctorSetDestination(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
             
             fHandle = tr_torrentNew(fLib, ctor, &error);
@@ -1500,10 +1500,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (!fHandle && path)
     {
         tr_ctorSetMetainfoFromFile(ctor, [path UTF8String]);
-        if (tr_torrentParseFromCtor(fLib, ctor, &info) == TR_OK)
+        if (tr_torrentParse(fLib, ctor, &info) == TR_OK)
         {
             NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
-                                        ? fIncompleteFolder : fDownloadFolder;
+                                                ? fIncompleteFolder : fDownloadFolder;
             tr_ctorSetDestination(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
             
             fHandle = tr_torrentNew(fLib, ctor, &error);

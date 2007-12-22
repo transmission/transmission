@@ -741,7 +741,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         tr_ctor * ctor = tr_ctorNew(fLib);
         tr_ctorSetMetainfoFromFile(ctor, [torrentPath UTF8String]);
-        if (tr_torrentParseFromCtor(fLib, ctor, &info) == TR_EDUPLICATE)
+        if (tr_torrentParse(fLib, ctor, &info) == TR_EDUPLICATE)
         {
             [self duplicateOpenAlert: [NSString stringWithUTF8String: info.name]];
             tr_metainfoFree(&info);
@@ -816,7 +816,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         ctor = tr_ctorNew(fLib);
         tr_ctorSetMetainfoFromFile(ctor, [torrentPath UTF8String]);
-        canAdd = tr_torrentParseFromCtor(fLib, ctor, &info);
+        canAdd = tr_torrentParse(fLib, ctor, &info);
         tr_ctorFree(ctor);
         
         if (canAdd == TR_OK)
@@ -2336,7 +2336,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         ctor = tr_ctorNew(fLib);
         tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
         
-        switch (tr_torrentParseFromCtor(fLib, ctor, NULL))
+        switch (tr_torrentParse(fLib, ctor, NULL))
         {
             case TR_OK:
                 if (!ask)
@@ -2498,7 +2498,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             {
                 ctor = tr_ctorNew(fLib);
                 tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
-                switch (tr_torrentParseFromCtor(fLib, ctor, NULL))
+                switch (tr_torrentParse(fLib, ctor, NULL))
                 {
                     case TR_OK:
                         if (!fOverlayWindow)
@@ -2565,7 +2565,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             {
                 ctor = tr_ctorNew(fLib);
                 tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
-                switch (tr_torrentParseFromCtor(fLib, ctor, NULL))
+                switch (tr_torrentParse(fLib, ctor, NULL))
                 {
                     case TR_OK:
                         [filesToOpen addObject: file];
