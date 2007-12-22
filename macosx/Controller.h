@@ -45,11 +45,12 @@
     NSMutableArray                  * fTorrents, * fDisplayedTorrents;
     
     PrefsController                 * fPrefsController;
-    NSUserDefaults                  * fDefaults;
     InfoWindowController            * fInfoController;
     MessageWindowController         * fMessageController;
     IPCController                   * fIPCController;
-
+    
+    NSUserDefaults                  * fDefaults;
+    
     IBOutlet NSWindow               * fWindow;
     DragOverlayWindow               * fOverlayWindow;
     IBOutlet NSScrollView           * fScrollView;

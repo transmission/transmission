@@ -3085,15 +3085,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //set info image
     if ([ident isEqualToString: TOOLBAR_INFO])
     {
-        [toolbarItem setImage: [[fInfoController window] isVisible] ? [NSImage imageNamed: @"InfoBlue"]
-                                                                    : [NSImage imageNamed: @"Info"]];
+        [toolbarItem setImage: [[fInfoController window] isVisible] ? [NSImage imageNamed: @"InfoBlue.png"]
+                                                                    : [NSImage imageNamed: @"Info.png"]];
         return YES;
     }
     
     //set filter image
     if ([ident isEqualToString: TOOLBAR_FILTER])
     {
-        [toolbarItem setImage: ![fFilterBar isHidden] ? [NSImage imageNamed: @"FilterBlue"] : [NSImage imageNamed: @"Filter"]];
+        [toolbarItem setImage: ![fFilterBar isHidden] ? [NSImage imageNamed: @"FilterBlue.png"] : [NSImage imageNamed: @"Filter.png"]];
         return YES;
     }
 
