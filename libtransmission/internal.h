@@ -43,6 +43,12 @@ typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 #define FALSE 0
 #endif
 
+/* just like tr_torrentSetFileDLs but doesn't trigger a fastresume save */
+void tr_torrentInitFileDLs( tr_torrent   * tor,
+                            int          * files,
+                            int            fileCount,
+                            int            do_download );
+
 int tr_torrentIsPrivate( const tr_torrent * );
 
 void tr_torrentRecheckCompleteness( tr_torrent * );

@@ -57,6 +57,7 @@
 #include "transmission.h"
 #include "completion.h"
 #include "fastresume.h"
+#include "internal.h" /* tr_torrentInitFileDLs */
 #include "peer-mgr.h"
 #include "platform.h"
 #include "utils.h"
@@ -350,16 +351,18 @@ internalIdToPublicBitfield( uint8_t id )
 
     switch( id )
     {
-        case FR_ID_DOWNLOADED:     ret = TR_FR_DOWNLOADED;  break;
-        case FR_ID_UPLOADED:       ret = TR_FR_UPLOADED;    break;
-        case FR_ID_PROGRESS:       ret = TR_FR_PROGRESS;    break;
-        case FR_ID_PRIORITY:       ret = TR_FR_PRIORITY;    break;
-        case FR_ID_SPEED:          ret = TR_FR_SPEEDLIMIT;  break;
-        case FR_ID_RUN:            ret = TR_FR_RUN;         break;
-        case FR_ID_CORRUPT:        ret = TR_FR_CORRUPT;     break;
-        case FR_ID_PEERS:          ret = TR_FR_PEERS;       break;
-        case FR_ID_DESTINATION:    ret = TR_FR_DESTINATION; break;
-        case FR_ID_PEX:            ret = TR_FR_PEX;         break;
+        case FR_ID_DOWNLOADED:     ret = TR_FR_DOWNLOADED;    break;
+        case FR_ID_UPLOADED:       ret = TR_FR_UPLOADED;      break;
+        case FR_ID_PROGRESS:       ret = TR_FR_PROGRESS;      break;
+        case FR_ID_PRIORITY:       ret = TR_FR_PRIORITY;      break;
+        case FR_ID_SPEED:          ret = TR_FR_SPEEDLIMIT;    break;
+        case FR_ID_RUN:            ret = TR_FR_RUN;           break;
+        case FR_ID_CORRUPT:        ret = TR_FR_CORRUPT;       break;
+        case FR_ID_PEERS:          ret = TR_FR_PEERS;         break;
+        case FR_ID_DESTINATION:    ret = TR_FR_DESTINATION;   break;
+        case FR_ID_PEX:            ret = TR_FR_PEX;           break;
+        case FR_ID_MAX_PEERS:      ret = TR_FR_MAX_PEERS;     break;
+        case FR_ID_MAX_UNCHOKED:   ret = TR_FR_MAX_UNCHOKED;  break;
     }
 
     return ret;
@@ -501,9 +504,9 @@ parsePriorities( tr_torrent * tor, const uint8_t * buf, uint32_t len )
                 dl[dlCount++] = i;
 
         if( dndCount )
-            tr_torrentSetFileDLs ( tor, dnd, dndCount, FALSE );
+            tr_torrentInitFileDLs ( tor, dnd, dndCount, FALSE );
         if( dlCount )
-            tr_torrentSetFileDLs ( tor, dl, dlCount, TRUE );
+            tr_torrentInitFileDLs ( tor, dl, dlCount, TRUE );
 
         tr_free( dnd );
         tr_free( dl );
@@ -616,9 +619,9 @@ parseVersion1( tr_torrent * tor, const uint8_t * buf, const uint8_t * end,
             case FR_ID_PEERS:        ret |= parsePeers( tor, buf, len ); break;
             case FR_ID_MAX_PEERS:    ret |= parseConnections( tor, buf, len ); break;
             case FR_ID_MAX_UNCHOKED: ret |= parseUnchoked( tor, buf, len ); break;
-            case FR_ID_PEX:         ret |= parsePex( tor, buf, len ); break;
-            case FR_ID_DESTINATION: ret |= parseDestination( tor, buf, len ); break;
-            default:                tr_dbg( "Skipping unknown resume code %d", (int)id ); break;
+            case FR_ID_PEX:          ret |= parsePex( tor, buf, len ); break;
+            case FR_ID_DESTINATION:  ret |= parseDestination( tor, buf, len ); break;
+            default:                 tr_dbg( "Skipping unknown resume code %d", (int)id ); break;
         }
 
         buf += len;

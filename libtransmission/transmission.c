@@ -393,6 +393,8 @@ tr_loadTorrents ( tr_handle   * h,
     tr_torrent ** torrents;
     tr_list *l=NULL, *list=NULL;
 
+    tr_ctorSetSave( ctor, FALSE ); /* since we already have them */
+
     if( !stat( dirname, &sb )
         && S_ISDIR( sb.st_mode )
         && (( odir = opendir ( dirname ) )) )

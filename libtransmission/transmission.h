@@ -387,6 +387,9 @@ tr_ctor* tr_ctorNew                    ( const tr_handle  * handle);
 
 void     tr_ctorFree                   ( tr_ctor        * ctor );
 
+void     tr_ctorSetSave                ( tr_ctor        * ctor,
+                                         int              saveMetadataInOurTorrentsDir );
+
 int      tr_ctorSetMetainfo            ( tr_ctor        * ctor,
                                          const uint8_t  * metainfo,
                                          size_t           len );
@@ -431,6 +434,8 @@ int      tr_ctorGetDestination         ( const tr_ctor  * ctor,
 
 int      tr_ctorGetMetainfo            ( const tr_ctor  * ctor,
                                          const struct benc_val_s ** setme );
+
+int      tr_ctorGetSave                ( const tr_ctor  * ctor );
 
 typedef struct tr_info tr_info;
 

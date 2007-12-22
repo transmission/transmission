@@ -35,6 +35,7 @@ struct optional_args
 struct tr_ctor
 {
     const tr_handle * handle;
+    unsigned int saveInOurTorrentsDir : 1;
 
     unsigned int isSet_metainfo : 1;
     benc_val_t metainfo;
@@ -114,6 +115,19 @@ tr_ctorSetMetainfoFromHash( tr_ctor        * ctor,
 /***
 ****
 ***/
+
+void
+tr_ctorSetSave( tr_ctor  * ctor,
+                int        saveInOurTorrentsDir )
+{
+    ctor->saveInOurTorrentsDir = saveInOurTorrentsDir ? 1 : 0;
+}
+
+int
+tr_ctorGetSave( const tr_ctor * ctor )
+{
+    return ctor && ctor->saveInOurTorrentsDir;
+}
 
 void
 tr_ctorSetPaused( tr_ctor        * ctor,
@@ -245,6 +259,7 @@ tr_ctorNew( const tr_handle * handle )
     tr_ctorSetMaxConnectedPeers( ctor, TR_FALLBACK, DEFAULT_MAX_CONNECTED_PEERS );
     tr_ctorSetMaxUnchokedPeers( ctor, TR_FALLBACK, DEFAULT_MAX_UNCHOKED_PEERS );
     tr_ctorSetPaused( ctor, TR_FALLBACK, FALSE );
+    tr_ctorSetSave( ctor, TRUE );
     return ctor;
 }
 

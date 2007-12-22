@@ -396,6 +396,7 @@ tr_torrentParseFromCtor( const tr_handle  * handle,
     int doFree;
     tr_info tmp;
     const benc_val_t * metainfo;
+    const int doSave = tr_ctorGetSave( ctor );
 
     if( setmeInfo == NULL )
         setmeInfo = &tmp;
@@ -404,7 +405,7 @@ tr_torrentParseFromCtor( const tr_handle  * handle,
     if( !err && tr_ctorGetMetainfo( ctor, &metainfo ) )
         return TR_EINVALID;
 
-    err = tr_metainfoParseBenc( setmeInfo, handle->tag, metainfo, FALSE );
+    err = tr_metainfoParseBenc( setmeInfo, handle->tag, metainfo, doSave );
     doFree = !err && ( setmeInfo == &tmp );
 
     if( !err && hashExists( handle, setmeInfo->hash ) )
@@ -1185,10 +1186,10 @@ setFileDND( tr_torrent  * tor,
 }
 
 void
-tr_torrentSetFileDLs ( tr_torrent  * tor,
-                       int         * files,
-                       int           fileCount,
-                       int           doDownload )
+tr_torrentInitFileDLs ( tr_torrent   * tor,
+                        int          * files,
+                        int            fileCount,
+                        int            doDownload )
 {
     int i;
     tr_torrentLock( tor );
@@ -1196,8 +1197,19 @@ tr_torrentSetFileDLs ( tr_torrent  * tor,
     for( i=0; i<fileCount; ++i )
         setFileDND( tor, files[i], doDownload );
     tr_cpInvalidateDND ( tor->completion );
-    saveFastResumeNow( tor );
 
+    tr_torrentUnlock( tor );
+}
+
+void
+tr_torrentSetFileDLs ( tr_torrent  * tor,
+                       int         * files,
+                       int           fileCount,
+                       int           doDownload )
+{
+    tr_torrentLock( tor );
+    tr_torrentInitFileDLs( tor, files, fileCount, doDownload );
+    saveFastResumeNow( tor );
     tr_torrentUnlock( tor );
 }
 
