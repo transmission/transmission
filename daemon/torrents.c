@@ -489,6 +489,7 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
     struct tor * tor, * found;
     int          errcode;
     const tr_info  * inf;
+    tr_ctor        * ctor;
 
     assert( ( NULL != path && NULL == hash && NULL == data ) ||
             ( NULL == path && NULL != hash && NULL == data ) ||
@@ -512,18 +513,17 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
     if( dir == NULL )
         dir = gl_dir;
 
-    if( NULL != path )
-    {
-        tor->tor = tr_torrentInit( gl_handle, path, dir, 1, &errcode );
-    }
-    else if( NULL != hash )
-    {
-        tor->tor = tr_torrentInitSaved( gl_handle, hash, dir, 1, &errcode );
-    }
+    ctor = tr_ctorNew( gl_handle );
+    tr_ctorSetPaused( ctor, TR_FORCE, 1 );
+    tr_ctorSetDestination( ctor, TR_FORCE, dir );
+    if( path != NULL )
+        tr_ctorSetMetainfoFromFile( ctor, path );
+    else if( hash != NULL )
+        tr_ctorSetMetainfoFromHash( ctor, hash );
     else
-    {
-        tor->tor = tr_torrentInitData( gl_handle, data, size, dir, 1, &errcode );
-    }
+        tr_ctorSetMetainfo( ctor, data, size );
+    tor->tor = tr_torrentNew( gl_handle, ctor, &errcode );
+    tr_ctorFree( ctor );
 
     if( NULL == tor->tor )
     {

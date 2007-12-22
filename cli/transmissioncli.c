@@ -108,6 +108,7 @@ int main( int argc, char ** argv )
     tr_handle  * h;
     const tr_stat    * s;
     tr_handle_status * hstat;
+    tr_ctor * ctor;
 
     printf( "Transmission %s - http://transmission.m0k.org/\n\n",
             LONG_VERSION_STRING );
@@ -163,8 +164,13 @@ int main( int argc, char ** argv )
         return ret;
     }
 
-    /* Open and parse torrent file */
-    if( !( tor = tr_torrentInit( h, torrentPath, savePath, 0, &error ) ) )
+    ctor = tr_ctorNew( h );
+    tr_ctorSetMetainfoFromFile( ctor, torrentPath );
+    tr_ctorSetPaused( ctor, TR_FORCE, 0 );
+    tr_ctorSetDestination( ctor, TR_FORCE, savePath );
+    tor = tr_torrentNew( h, ctor, &error );
+    tr_ctorFree( ctor );
+    if( tor == NULL )
     {
         printf( "Failed opening torrent file `%s'\n", torrentPath );
         tr_close( h );
