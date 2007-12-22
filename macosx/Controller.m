@@ -739,13 +739,16 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         else
             location = [torrentPath stringByDeletingLastPathComponent];
         
-        if (tr_torrentParse(fLib, [torrentPath UTF8String], NULL, &info) == TR_EDUPLICATE)
+        tr_ctor * ctor = tr_ctorNew(fLib);
+        tr_ctorSetMetainfoFromFile(ctor, [torrentPath UTF8String]);
+        if (tr_torrentParseFromCtor(fLib, ctor, &info) == TR_EDUPLICATE)
         {
             [self duplicateOpenAlert: [NSString stringWithUTF8String: info.name]];
             tr_metainfoFree(&info);
             continue;
         }
         tr_metainfoFree(&info);
+        tr_ctorFree(ctor);
         
         if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location deleteTorrentFile: deleteTorrent lib: fLib]))
             continue;
@@ -806,10 +809,16 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSString * torrentPath;
     int canAdd;
     tr_info info;
+    tr_ctor * ctor;
     while ([files count] > 0)
     {
         torrentPath = [[files objectAtIndex: 0] retain];
-        canAdd = tr_torrentParse(fLib, [torrentPath UTF8String], NULL, &info);
+        
+        ctor = tr_ctorNew(fLib);
+        tr_ctorSetMetainfoFromFile(ctor, [torrentPath UTF8String]);
+        canAdd = tr_torrentParseFromCtor(fLib, ctor, &info);
+        tr_ctorFree(ctor);
+        
         if (canAdd == TR_OK)
             break;
         else if (canAdd == TR_EDUPLICATE)
@@ -2321,9 +2330,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     NSEnumerator * enumerator = [newNames objectEnumerator];
     int canAdd, count;
+    tr_ctor * ctor;
     while ((file = [enumerator nextObject]))
     {
-        canAdd = tr_torrentParse(fLib, [file UTF8String], NULL, NULL);
+        tr_ctor * ctor = tr_ctorNew(fLib);
+        tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
+        canAdd = tr_torrentParseFromCtor(fLib, ctor, NULL);
+        tr_ctorFree(ctor);
+        
         if (canAdd == TR_OK)
         {
             if (!ask)
@@ -2475,11 +2489,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSString * file;
         BOOL torrent = NO;
         int canAdd;
+        tr_ctor * ctor;
         while ((file = [enumerator nextObject]))
         {
             if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
             {
-                switch (canAdd = tr_torrentParse(fLib, [file UTF8String], NULL, NULL))
+                ctor = tr_ctorNew(fLib);
+                tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
+                switch (tr_torrentParseFromCtor(fLib, ctor, NULL))
                 {
                     case TR_OK:
                         if (!fOverlayWindow)
@@ -2491,6 +2508,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     case TR_EDUPLICATE:
                         torrent = YES;
                 }
+                tr_ctorFree(ctor);
             }
         }
         
@@ -2538,11 +2556,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
         NSEnumerator * enumerator = [files objectEnumerator];
         NSString * file;
+        tr_ctor * ctor;
         while ((file = [enumerator nextObject]))
         {
             if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
             {
-                switch(tr_torrentParse(fLib, [file UTF8String], NULL, NULL))
+                ctor = tr_ctorNew(fLib);
+                tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
+                switch (tr_torrentParseFromCtor(fLib, ctor, NULL))
                 {
                     case TR_OK:
                         [filesToOpen addObject: file];
@@ -2552,6 +2573,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     case TR_EDUPLICATE:
                         torrent = YES;
                 }
+                tr_ctorFree(ctor);
             }
         }
         

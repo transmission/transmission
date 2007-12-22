@@ -82,24 +82,29 @@
     
     NSString * file;
     NSEnumerator * enumerator = [files objectEnumerator];
+    tr_ctor * ctor;
     tr_info info;
     while ((file = [enumerator nextObject]))
     {
-        if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame
-            && tr_torrentParse(fLib, [file UTF8String], NULL, &info) == TR_OK)
+        if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {
-            count++;
-            size += info.totalSize;
-            fileCount += info.fileCount;
-            
-            //only useful when one torrent
-            if (count == 1)
+            ctor = tr_ctorNew(fLib);
+            tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
+            if (tr_torrentParseFromCtor(fLib, ctor, &info) == TR_OK)
             {
-                name = [NSString stringWithUTF8String: info.name];
-                folder = info.isMultifile;
+                count++;
+                size += info.totalSize;
+                fileCount += info.fileCount;
+                
+                //only useful when one torrent
+                if (count == 1)
+                {
+                    name = [NSString stringWithUTF8String: info.name];
+                    folder = info.isMultifile;
+                }
             }
+            tr_metainfoFree(&info);
         }
-        tr_metainfoFree(&info);
     }
     
     if (count <= 0)
