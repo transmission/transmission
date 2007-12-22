@@ -1206,25 +1206,27 @@ tr_torrentSetFileDLs ( tr_torrent  * tor,
 ***/
 
 void
-tr_torrentSetPeerLimit( tr_torrent  * tor,
-                         uint16_t      maxConnectedPeers )
+tr_torrentSetMaxConnectedPeers( tr_torrent  * tor,
+                                uint16_t      maxConnectedPeers )
 {
     tor->maxConnectedPeers = maxConnectedPeers;
 }
 
 void
-tr_torrentSetPeerUnchokedLimit( tr_torrent  * tor,
-                         uint8_t       maxUnchokedPeers )
+tr_torrentSetMaxUnchokedPeers( tr_torrent  * tor,
+                               uint8_t       maxUnchokedPeers )
 {
     tor->maxUnchokedPeers = maxUnchokedPeers;
 }
 
-uint16_t tr_torrentGetPeerLimit( const tr_torrent  * tor )
+uint16_t
+tr_torrentGetMaxConnectedPeers( const tr_torrent  * tor )
 {
     return tor->maxConnectedPeers;
 }
 
-uint8_t tr_torrentGetPeerUnchokedLimit( const tr_torrent  * tor )
+uint8_t
+tr_torrentGetMaxUnchokedPeers( const tr_torrent  * tor )
 {
     return tor->maxUnchokedPeers;
 }

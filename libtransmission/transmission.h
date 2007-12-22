@@ -278,15 +278,15 @@ void tr_getGlobalSpeedLimit( tr_handle * handle,
 ***  Peer Limits
 **/
 
-void tr_torrentSetPeerLimit( tr_torrent  * tor,
-                              uint16_t      maxConnectedPeers);
+void tr_torrentSetMaxConnectedPeers( tr_torrent  * tor,
+                                     uint16_t      maxConnectedPeers);
 
-void tr_torrentSetPeerUnchokedLimit( tr_torrent  * tor,
-                              uint8_t       maxUnchokedPeers );
+uint16_t tr_torrentGetMaxConnectedPeers( const tr_torrent  * tor );
 
-uint16_t tr_torrentGetPeerLimit( const tr_torrent  * tor );
+void tr_torrentSetMaxUnchokedPeers( tr_torrent  * tor,
+                                    uint8_t       maxUnchokedPeers );
 
-uint8_t tr_torrentGetPeerUnchokedLimit( const tr_torrent  * tor );
+uint8_t tr_torrentGetMaxUnchokedPeers( const tr_torrent  * tor );
 
 void tr_setGlobalPeerLimit( tr_handle * handle,
                             uint16_t    maxGlobalPeers );
