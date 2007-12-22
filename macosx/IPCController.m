@@ -860,7 +860,7 @@ void msg_setbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg 
             [client sendrespEmpty:IPC_MSG_OK tag:tag];
             break;
         case IPC_MSG_PEX:
-#warning we dont support this :(
+        //we dont support this :(
             [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
             break;
         default:
