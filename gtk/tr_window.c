@@ -303,11 +303,11 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     gtk_widget_show_all( vbox );
 
     /* listen for prefs changes that affect the window */
+    p->core = core;
     prefsChanged( core, PREF_KEY_MINIMAL_VIEW, self );
     prefsChanged( core, PREF_KEY_STATUS_BAR, self );
     prefsChanged( core, PREF_KEY_STATUS_BAR_STATS, self );
     prefsChanged( core, PREF_KEY_TOOLBAR, self );
-    p->core = core;
     p->pref_handler_id = g_signal_connect( core, "prefs-changed",
                                            G_CALLBACK(prefsChanged), self );
 
