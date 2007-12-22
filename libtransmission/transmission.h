@@ -451,9 +451,9 @@ typedef struct tr_info tr_info;
  * it will be filled with the metainfo's info.  You'll need to
  * call tr_metainfoFree( setme_info ) when done with it.
  */
-int tr_torrentParseFromCtor( const tr_handle  * handle,
-                             const tr_ctor    * ctor,
-                             tr_info          * setme_info );
+int tr_torrentParse( const tr_handle  * handle,
+                     const tr_ctor    * ctor,
+                     tr_info          * setme_info );
 
 /**
  * Instantiate a single torrent.

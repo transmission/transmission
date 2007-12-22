@@ -370,6 +370,19 @@ torrentRealInit( tr_handle     * h,
 
     tr_globalUnlock( h );
 
+    /* maybe save our own copy of the metainfo */
+    if( tr_ctorGetSave( ctor ) ) {
+        const benc_val_t * val;
+        if( !tr_ctorGetMetainfo( ctor, &val ) ) {
+            int len;
+            uint8_t * text = (uint8_t*) tr_bencSave( val, &len );
+            tr_metainfoSave( tor->info.hashString,
+                             tor->handle->tag,
+                             text, len );
+            tr_free( text );
+        }
+    }
+
     if( doStart )
         tr_torrentStart( tor );
 }
@@ -388,15 +401,14 @@ hashExists( const tr_handle   * h,
 }
 
 int
-tr_torrentParseFromCtor( const tr_handle  * handle,
-                         const tr_ctor    * ctor,
-                         tr_info          * setmeInfo )
+tr_torrentParse( const tr_handle  * handle,
+                 const tr_ctor    * ctor,
+                 tr_info          * setmeInfo )
 {
     int err = 0;
     int doFree;
     tr_info tmp;
     const benc_val_t * metainfo;
-    const int doSave = tr_ctorGetSave( ctor );
 
     if( setmeInfo == NULL )
         setmeInfo = &tmp;
@@ -405,7 +417,7 @@ tr_torrentParseFromCtor( const tr_handle  * handle,
     if( !err && tr_ctorGetMetainfo( ctor, &metainfo ) )
         return TR_EINVALID;
 
-    err = tr_metainfoParseBenc( setmeInfo, handle->tag, metainfo, doSave );
+    err = tr_metainfoParse( setmeInfo, metainfo );
     doFree = !err && ( setmeInfo == &tmp );
 
     if( !err && hashExists( handle, setmeInfo->hash ) )
@@ -426,7 +438,7 @@ tr_torrentNew( tr_handle      * handle,
     tr_info tmpInfo;
     tr_torrent * tor = NULL;
 
-    err = tr_torrentParseFromCtor( handle, ctor, &tmpInfo );
+    err = tr_torrentParse( handle, ctor, &tmpInfo );
     if( !err ) {
         tor = tr_new0( tr_torrent, 1 );
         tor->info = tmpInfo;
