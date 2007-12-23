@@ -64,6 +64,8 @@
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField, * fPeersConnectField,
                         * fUploadLimitLabel, * fDownloadLimitLabel;
     IBOutlet NSButton * fPexCheck;
+    
+    NSString * fInitialString;
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents;

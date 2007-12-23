@@ -1171,31 +1171,13 @@ typedef enum
 - (void) setSpeedLimit: (id) sender
 {
     BOOL upload = sender == fUploadLimitField;
+    int limit = [sender intValue];
     
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
-
-    int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%i", limit]] || limit < 0)
-    {
-        NSBeep();
-        
-        torrent = [enumerator nextObject]; //use first torrent
-        limit = [torrent speedLimit: upload];
-        while ((torrent = [enumerator nextObject]))
-            if (limit != [torrent speedLimit: upload])
-            {
-                [sender setStringValue: @""];
-                return;
-            }
-        
-        [sender setIntValue: limit];
-    }
-    else
-    {
-        while ((torrent = [enumerator nextObject]))
-            [torrent setSpeedLimit: limit upload: upload];
-    }
+    
+    while ((torrent = [enumerator nextObject]))
+        [torrent setSpeedLimit: limit upload: upload];
 }
 
 - (void) setRatioSetting: (id) sender
@@ -1234,28 +1216,13 @@ typedef enum
 
 - (void) setRatioLimit: (id) sender
 {
+    float limit = [sender floatValue];
+    
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
-
-    float ratioLimit = [sender floatValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%.2f", ratioLimit]] || ratioLimit < 0)
-    {
-        NSBeep();
-        ratioLimit = [[enumerator nextObject] ratioLimit]; //use first torrent
-        while ((torrent = [enumerator nextObject]))
-            if (ratioLimit != [torrent ratioLimit])
-            {
-                [sender setStringValue: @""];
-                return;
-            }
-        
-        [sender setFloatValue: ratioLimit];
-    }
-    else
-    {
-        while ((torrent = [enumerator nextObject]))
-            [torrent setRatioLimit: ratioLimit];
-    }
+    
+    while ((torrent = [enumerator nextObject]))
+        [torrent setRatioLimit: limit];
 }
 
 - (void) setPex: (id) sender
@@ -1274,33 +1241,35 @@ typedef enum
 		[torrent setPex: state == NSOnState];
 }
 
-#warning not saving between launches
 - (void) setPeersConnectLimit: (id) sender
 {
+    int limit = [sender intValue];
+    
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    while ((torrent = [enumerator nextObject]))
+        [torrent setMaxPeerConnect: limit];
+}
 
-    int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%i", limit]] || limit <= 0)
-    {
-        NSBeep();
-        limit = [[enumerator nextObject] maxPeerConnect]; //use first torrent
-        while ((torrent = [enumerator nextObject]))
-            if (limit != [torrent maxPeerConnect])
-            {
-                [sender setStringValue: @""];
-                return;
-            }
-        
-        [sender setIntValue: limit];
-    }
-    else
-    {
-        while ((torrent = [enumerator nextObject]))
-            [torrent setMaxPeerConnect: limit];
-    }
+
+- (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
+{
+    [fInitialString release];
+    fInitialString = [[control stringValue] retain];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    return YES;
+}
+
+- (BOOL) control: (NSControl *) control didFailToFormatString: (NSString *) string errorDescription: (NSString *) error
+{
+    NSBeep();
+    if (fInitialString)
+    {
+        [control setStringValue: fInitialString];
+        [fInitialString release];
+        fInitialString = nil;
+    }
+    return NO;
 }
 
 @end
