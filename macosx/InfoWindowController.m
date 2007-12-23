@@ -245,7 +245,7 @@ typedef enum
             [fPexCheck setToolTip: nil];
             
             [fPeersConnectField setEnabled: NO];
-            [fPexCheck setStringValue: @""];
+            [fPeersConnectField setStringValue: @""];
         }
         
         [fFileOutline setTorrent: nil];
