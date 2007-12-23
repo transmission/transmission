@@ -786,7 +786,7 @@ void msg_getbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg 
             [client sendrespInt:IPC_MSG_AUTOSTART tag:tag val:[fDefaults boolForKey:@"AutoStartDownload"]];
             break;
         case IPC_MSG_GETPEX:
-#warning we dont support this :(
+// we dont support this :(
             [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
             break;
         default:
