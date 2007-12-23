@@ -118,6 +118,8 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     [[fTableView tableColumnWithIdentifier: @"Color"] setDataCell: cell];
     [cell release];
     
+    [[[fTableView tableColumnWithIdentifier: @"Button"] dataCell] setTitle: NSLocalizedString(@"Color", "Groups -> Color Button")];
+    
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: GROUP_TABLE_VIEW_DATA_TYPE]];
     
     if ([NSApp isOnLeopardOrBetter])
