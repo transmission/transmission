@@ -111,6 +111,17 @@ tr_handle * tr_init( const char * tag );
 /* shut down a libtransmission instance created by tr_init(). */
 void tr_close( tr_handle * );
 
+tr_handle * tr_initFull( const char * tag,
+                         int          isPexEnabled,
+                         int          isNatEnabled,
+                         int          publicPort,
+                         int          encryptionMode,
+                         int          isUploadLimitEnabled,
+                         int          uploadLimit,
+                         int          isDownloadLimitEnabled,
+                         int          downloadLimit,
+                         int          globalPeerLimit );
+
 
 /**
 ***

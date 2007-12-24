@@ -29,7 +29,7 @@
 
 typedef struct tr_shared tr_shared;
 
-tr_shared* tr_sharedInit            ( tr_handle * );
+tr_shared* tr_sharedInit            ( tr_handle *, int isEnabled, int publicPort );
 void       tr_sharedShuttingDown    ( tr_shared * );
 void       tr_sharedSetPort         ( tr_shared *, int publicPort );
 void       tr_sharedTraversalEnable ( tr_shared *, int isEnabled );

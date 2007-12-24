@@ -29,7 +29,7 @@
  ***********************************************************************
  * Detect the maximum number of open files and initializes things.
  **********************************************************************/
-void tr_fdInit( void );
+void tr_fdInit( int globalPeerLimit );
 
 void tr_fdClose( void );
 

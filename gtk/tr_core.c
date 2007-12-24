@@ -323,6 +323,7 @@ prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
 static void
 tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
 {
+    tr_handle * h;
     TrCore * self = (TrCore *) instance;
     GtkListStore * store;
 
@@ -337,12 +338,25 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
         G_TYPE_INT        /* ID for IPC */
     };
 
+    h = tr_initFull( "gtk",
+                     pref_flag_get( PREF_KEY_PEX ),
+                     pref_flag_get( PREF_KEY_NAT ),
+                     pref_int_get( PREF_KEY_PORT ),
+                     pref_flag_get( PREF_KEY_ENCRYPTED_ONLY )
+                         ? TR_ENCRYPTION_REQUIRED
+                         : TR_ENCRYPTION_PREFERRED,
+                     pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ),
+                     pref_int_get( PREF_KEY_UL_LIMIT ),
+                     pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ),
+                     pref_int_get( PREF_KEY_DL_LIMIT ),
+                     pref_int_get( PREF_KEY_MAX_PEERS_GLOBAL ) );
+
     /* create the model used to store torrent data */
     g_assert( ALEN( types ) == MC_ROW_COUNT );
     store = gtk_list_store_newv( MC_ROW_COUNT, types );
 
     self->model    = GTK_TREE_MODEL( store );
-    self->handle   = tr_init( "gtk" );
+    self->handle   = h;
     self->nextid   = 1;
     self->quitting = FALSE;
     self->disposed = FALSE;

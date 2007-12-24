@@ -168,18 +168,18 @@ sharedPulse( void * vshared )
 ***/
 
 tr_shared *
-tr_sharedInit( tr_handle * h )
+tr_sharedInit( tr_handle * h, int isEnabled, int publicPort )
 {
     tr_shared * s = tr_new0( tr_shared, 1 );
 
     s->h            = h;
-    s->publicPort   = -1;
+    s->publicPort   = publicPort;
     s->bindPort     = -1;
     s->bindSocket   = -1;
     s->natpmp       = tr_natpmpInit();
     s->upnp         = tr_upnpInit();
     s->pulseTimer   = tr_timerNew( h, sharedPulse, s, 500 );
-    s->isEnabled    = 0;
+    s->isEnabled    = isEnabled ? 1 : 0;
     s->natStatus    = TR_NAT_TRAVERSAL_UNMAPPED;
 
     return s;

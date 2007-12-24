@@ -657,22 +657,7 @@ corepromptdata( TrCore * core, uint8_t * data, size_t size,
 static void
 initializeFromPrefs( struct cbdata * cbdata )
 {
-    size_t i;
-    const char * keys[] =
-    {
-        PREF_KEY_PORT,
-        PREF_KEY_DL_LIMIT_ENABLED,
-        PREF_KEY_DL_LIMIT,
-        PREF_KEY_UL_LIMIT_ENABLED,
-        PREF_KEY_UL_LIMIT,
-        PREF_KEY_NAT,
-        PREF_KEY_PEX,
-        PREF_KEY_SYSTRAY,
-        PREF_KEY_ENCRYPTED_ONLY
-    };
-
-    for( i=0; i<G_N_ELEMENTS(keys); ++i )
-        prefschanged( NULL, keys[i], cbdata );
+    prefschanged( NULL, PREF_KEY_SYSTRAY, cbdata );
 }
 
 static void

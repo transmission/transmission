@@ -103,13 +103,17 @@ tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode )
 ****
 ***/
 
-
-/***********************************************************************
- * tr_init
- ***********************************************************************
- * Allocates a tr_handle structure and initializes a few things
- **********************************************************************/
-tr_handle * tr_init( const char * tag )
+tr_handle *
+tr_initFull( const char * tag,
+             int          isPexEnabled,
+             int          isNatEnabled,
+             int          publicPort,
+             int          encryptionMode,
+             int          isUploadLimitEnabled,
+             int          uploadLimit,
+             int          isDownloadLimitEnabled,
+             int          downloadLimit,
+             int          globalPeerLimit )
 {
     tr_handle * h;
 
@@ -118,15 +122,12 @@ tr_handle * tr_init( const char * tag )
     signal( SIGPIPE, SIG_IGN );
 #endif
 
-    tr_msgInit();
+    tr_msgInit( );
 
     h = tr_new0( tr_handle, 1 );
-    if( !h )
-        return NULL;
-
     h->lock = tr_lockNew( );
-    h->isPexEnabled = 1;
-    h->encryptionMode = TR_ENCRYPTION_PREFERRED;
+    h->isPexEnabled = isPexEnabled ? 1 : 0;
+    h->encryptionMode = encryptionMode;
 
     tr_netInit(); /* must go before tr_eventInit */
 
@@ -143,17 +144,38 @@ tr_handle * tr_init( const char * tag )
     h->peerMgr = tr_peerMgrNew( h );
 
     /* Initialize rate and file descripts controls */
-    h->upload   = tr_rcInit();
-    h->download = tr_rcInit();
 
-    tr_fdInit();
-    h->shared = tr_sharedInit( h );
+    h->upload = tr_rcInit();
+    tr_rcSetLimit( h->upload, uploadLimit );
+    h->useUploadLimit = isUploadLimitEnabled;
+
+    h->download = tr_rcInit();
+    tr_rcSetLimit( h->download, downloadLimit );
+    h->useDownloadLimit = isDownloadLimitEnabled;
+
+    tr_fdInit( globalPeerLimit );
+    h->shared = tr_sharedInit( h, isNatEnabled, publicPort );
+    h->isPortSet = publicPort >= 0;
 
     tr_inf( TR_NAME " " LONG_VERSION_STRING " started" );
 
     tr_statsInit( h );
 
     return h;
+}
+
+tr_handle * tr_init( const char * tag )
+{
+    return tr_initFull( tag,
+                        TRUE, /* pex enabled */
+                        FALSE, /* nat enabled */
+                        -1, /* public port */
+                        TR_ENCRYPTION_PREFERRED, /* encryption mode */
+                        FALSE, /* use upload speed limit? */ 
+                        -1, /* upload speed limit */
+                        FALSE, /* use download speed limit? */
+                        -1, /* download speed limit */
+                        512 ); /* globalPeerLimit */
 }
 
 /***
