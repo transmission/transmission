@@ -125,7 +125,7 @@ tr_handle * tr_init( const char * tag )
         return NULL;
 
     h->lock = tr_lockNew( );
-
+    h->isPexEnabled = 1;
     h->encryptionMode = TR_ENCRYPTION_PREFERRED;
 
     tr_netInit(); /* must go before tr_eventInit */
@@ -428,4 +428,20 @@ tr_loadTorrents ( tr_handle   * h,
     *setmeCount = n;
     tr_inf( "Loaded %d torrents from disk", *setmeCount );
     return torrents;
+}
+
+/***
+****
+***/
+
+void
+tr_setPexEnabled( tr_handle * handle, int isPexEnabled )
+{
+    handle->isPexEnabled = isPexEnabled ? 1 : 0;
+}
+
+int
+tr_isPexEnabled( const tr_handle * handle )
+{
+    return handle->isPexEnabled;
 }

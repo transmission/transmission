@@ -270,7 +270,6 @@ torrentRealInit( tr_handle     * h,
     tr_globalLock( h );
 
     tor->handle   = h;
-    tor->pexDisabled = 0;
 
     /**
      * Decide on a block size.  constraints:
@@ -493,24 +492,11 @@ tr_torrentIsPrivate( const tr_torrent * tor )
 }
 
 int
-tr_torrentIsPexEnabled( const tr_torrent * tor )
+tr_torrentAllowsPex( const tr_torrent * tor )
 {
     return tor
-        && !tr_torrentIsPrivate( tor )
-        && !tor->pexDisabled;
-}
-
-void
-tr_torrentDisablePex( tr_torrent * tor, int disable )
-{
-    assert( tor != NULL );
-    assert( disable==0 || disable==1 );
-
-    /* pex is ALWAYS disabled for private torrents */
-    if( tor->info.isPrivate )
-        disable = TRUE;
-
-    tor->pexDisabled = disable;
+        && tor->handle->isPexEnabled
+        && !tr_torrentIsPrivate( tor );
 }
 
 static void

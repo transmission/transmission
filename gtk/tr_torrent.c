@@ -164,7 +164,6 @@ static TrTorrent *
 maketorrent( tr_torrent * handle )
 {
     TrTorrent * tor = g_object_new( TR_TORRENT_TYPE, NULL );
-    tr_torrentDisablePex( handle, !pref_flag_get( PREF_KEY_PEX ) );
     tor->handle = handle;
     return tor;
 }

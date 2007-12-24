@@ -293,12 +293,6 @@ tr_fastResumeSave( const tr_torrent * tor )
         tr_free( buf );
     }
 
-    if( TRUE ) /* FR_ID_PEX */
-    {
-        const char flag = tor->pexDisabled ? 'f' : 't';
-        fastResumeWriteData( FR_ID_PEX, &flag, 1, 1, file );
-    }
-
     if( TRUE ) /* FR_ID_RUN */
     {
         const char is_running = tor->isRunning ? 't' : 'f';
@@ -360,7 +354,6 @@ internalIdToPublicBitfield( uint8_t id )
         case FR_ID_CORRUPT:        ret = TR_FR_CORRUPT;       break;
         case FR_ID_PEERS:          ret = TR_FR_PEERS;         break;
         case FR_ID_DESTINATION:    ret = TR_FR_DESTINATION;   break;
-        case FR_ID_PEX:            ret = TR_FR_PEX;           break;
         case FR_ID_MAX_PEERS:      ret = TR_FR_MAX_PEERS;     break;
         case FR_ID_MAX_UNCHOKED:   ret = TR_FR_MAX_UNCHOKED;  break;
     }
@@ -552,15 +545,6 @@ parseRun( tr_torrent * tor, const uint8_t * buf, uint32_t len )
 }
 
 static uint64_t
-parsePex( tr_torrent * tor, const uint8_t * buf, uint32_t len )
-{
-    if( len != 1 )
-        return 0;
-    tor->pexDisabled = *buf!='t';
-    return TR_FR_PEX;
-}
-
-static uint64_t
 parsePeers( tr_torrent * tor, const uint8_t * buf, uint32_t len )
 {
     uint64_t ret = 0;
@@ -619,7 +603,6 @@ parseVersion1( tr_torrent * tor, const uint8_t * buf, const uint8_t * end,
             case FR_ID_PEERS:        ret |= parsePeers( tor, buf, len ); break;
             case FR_ID_MAX_PEERS:    ret |= parseConnections( tor, buf, len ); break;
             case FR_ID_MAX_UNCHOKED: ret |= parseUnchoked( tor, buf, len ); break;
-            case FR_ID_PEX:          ret |= parsePex( tor, buf, len ); break;
             case FR_ID_DESTINATION:  ret |= parseDestination( tor, buf, len ); break;
             default:                 tr_dbg( "Skipping unknown resume code %d", (int)id ); break;
         }

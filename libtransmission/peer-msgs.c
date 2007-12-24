@@ -731,7 +731,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
     msgs->clientSentLtepHandshake = 1;
 
     /* decide if we want to advertise pex support */
-    if( !tr_torrentIsPexEnabled( msgs->torrent ) )
+    if( !tr_torrentAllowsPex( msgs->torrent ) )
         pex = 0;
     else if( msgs->peerSentLtepHandshake )
         pex = msgs->peerSupportsPex ? 1 : 0;
@@ -823,7 +823,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
     benc_val_t val, * sub;
     uint8_t * tmp;
 
-    if( !tr_torrentIsPexEnabled( msgs->torrent ) ) /* no sharing! */
+    if( !tr_torrentAllowsPex( msgs->torrent ) ) /* no sharing! */
         return;
 
     tmp = tr_new( uint8_t, msglen );
@@ -1710,7 +1710,7 @@ pexElementCb( void * vpex, void * userData )
 static void
 sendPex( tr_peermsgs * msgs )
 {
-    if( msgs->peerSupportsPex && tr_torrentIsPexEnabled( msgs->torrent ) )
+    if( msgs->peerSupportsPex && tr_torrentAllowsPex( msgs->torrent ) )
     {
         int i;
         tr_pex * newPex = NULL;

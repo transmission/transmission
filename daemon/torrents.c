@@ -57,8 +57,6 @@ struct tor
     int             id;
     uint8_t         hash[SHA_DIGEST_LENGTH];
     tr_torrent    * tor;
-    int             pexset;
-    int             pex;
     RB_ENTRY( tor ) idlinks;
     RB_ENTRY( tor ) hashlinks;
 };
@@ -373,27 +371,15 @@ torrent_get_port( void )
 void
 torrent_set_pex( int pex )
 {
-    struct tor * tor;
-
     assert( NULL != gl_handle );
     assert( !gl_exiting );
 
-    if( pex == gl_pex )
+    if( pex != gl_pex )
     {
-        return;
-    }
-    gl_pex = pex;
+        tr_setPexEnabled( gl_handle, gl_pex );
 
-    for( tor = iterate( NULL ); NULL != tor; tor = iterate( tor ) )
-    {
-        if( tor->pexset )
-        {
-            continue;
-        }
-        tr_torrentDisablePex( tor->tor, !gl_pex );
+        savestate( );
     }
-
-    savestate();
 }
 
 int
@@ -578,16 +564,6 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
     assert( sizeof( inf->hash ) == sizeof( tor->hash ) );
     inf = tr_torrentInfo( tor->tor );
     memcpy( tor->hash, inf->hash, sizeof tor->hash );
-
-    if( inf->isPrivate )
-    {
-        tor->pexset = 1;
-        tor->pex    = 0;
-    }
-    else
-    {
-        tr_torrentDisablePex( tor->tor, !gl_pex );
-    }
 
     found = RB_INSERT( tortree, &gl_tree, tor );
     assert( NULL == found );
@@ -796,10 +772,8 @@ loadstate( void )
         num = tr_bencDictFind( dict, "pex" );
         if( NULL != num && TYPE_INT == num->type )
         {
-            tor->pexset = 1;
-            tor->pex = ( num->val.i ? 1 : 0 );
+            fprintf( stderr, "warning: obsolete command 'pex'\n" );
         }
-        tr_torrentDisablePex( tor->tor, !( tor->pexset ? tor->pex : gl_pex ) );
 
         num = tr_bencDictFind( dict, "paused" );
         if( NULL != num && TYPE_INT == num->type && !num->val.i )
@@ -817,7 +791,7 @@ savestate( void )
     benc_val_t   top, * list, * tor;
     struct tor * ii;
     uint8_t    * buf;
-    int          len, pexset;
+    int          len;
 
     tr_bencInit( &top, TYPE_DICT );
     if( tr_bencDictReserve( &top, 9 ) )
@@ -861,8 +835,7 @@ savestate( void )
         tr_bencInit( tor, TYPE_DICT );
         inf    = tr_torrentInfo( ii->tor );
         st     = tr_torrentStat( ii->tor );
-        pexset = ( ii->pexset && !inf->isPrivate );
-        if( tr_bencDictReserve( tor, ( pexset ? 4 : 3 ) ) )
+        if( tr_bencDictReserve( tor, 3 ) )
         {
             goto nomem;
         }
@@ -872,10 +845,6 @@ savestate( void )
                         !TR_STATUS_IS_ACTIVE( st->status ) );
         tr_bencInitStr( tr_bencDictAdd( tor, "directory" ),
                         tr_torrentGetFolder( ii->tor ), -1, 1 );
-        if( pexset )
-        {
-            tr_bencInitInt( tr_bencDictAdd( tor, "pex" ), ii->pex );
-        }
     }
 
     buf = ( uint8_t * )tr_bencSave( &top, &len );

@@ -478,19 +478,19 @@ tr_torrent ** tr_loadTorrents ( tr_handle  * h,
 
 
 
-/***********************************************************************
- * tr_torrentDisablePex
- ***********************************************************************
- * Disable or enable peer exchange for this torrent. Peer exchange is
- * enabled by default, except for private torrents where pex is
- * disabled and cannot be enabled.
- **********************************************************************/
-void tr_torrentDisablePex( tr_torrent *, int disable );
-int tr_torrentIsPexEnabled( const tr_torrent * );
+/**
+ * Set whether or not torrents are allowed to do peer exchanges.
+ * By default, PEX is enabled.
+ * PEX is always disabled in private torrents regardless of this.
+ */
+void tr_setPexEnabled( tr_handle *, int isEnabled );
+
+int tr_isPexEnabled( const tr_handle * );
 
 const tr_info * tr_torrentInfo( const tr_torrent * );
 
 void   tr_torrentSetFolder( tr_torrent *, const char * );
+
 const char * tr_torrentGetFolder( const tr_torrent * );
 
 /***********************************************************************

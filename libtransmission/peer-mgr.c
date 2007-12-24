@@ -1649,7 +1649,7 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
     if( 1 ) {
         const int clientIsSeed = tr_torrentIsSeed( tor );
         const int peerIsSeed = atom->flags & ADDED_F_SEED_FLAG;
-        if( peerIsSeed && clientIsSeed && ( !tr_torrentIsPexEnabled(tor) || (now-atom->time>=30) ) ) {
+        if( peerIsSeed && clientIsSeed && ( !tr_torrentAllowsPex(tor) || (now-atom->time>=30) ) ) {
             tordbg( t, "purging peer %s because we're both seeds", tr_peerIoAddrStr(&atom->addr,atom->port) );
             return TRUE;
         }

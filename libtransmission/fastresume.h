@@ -38,9 +38,8 @@ enum
   TR_FR_SPEEDLIMIT   = (1<<6),
   TR_FR_RUN          = (1<<7),
   TR_FR_DESTINATION  = (1<<8),
-  TR_FR_PEX          = (1<<9),
-  TR_FR_MAX_PEERS    = (1<<10),
-  TR_FR_MAX_UNCHOKED = (1<<11),
+  TR_FR_MAX_PEERS    = (1<<9),
+  TR_FR_MAX_UNCHOKED = (1<<10)
 };
 
 /**

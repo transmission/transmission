@@ -78,6 +78,8 @@ tr_torrent* tr_torrentFindFromObfuscatedHash( tr_handle *, const uint8_t* );
 
 void tr_torrentGetRates( const tr_torrent *, float * toClient, float * toPeer );
 
+int tr_torrentAllowsPex( const tr_torrent * );
+
 /* get the index of this piece's first block */
 #define tr_torPieceFirstBlock(tor,piece) ( (piece) * (tor)->blockCountInPiece )
 
@@ -162,7 +164,6 @@ struct tr_torrent
     tr_torrent_status_func   * status_func;
     void                     * status_func_user_data;
 
-    unsigned int               pexDisabled : 1;
     unsigned int               statCur : 1;
     unsigned int               isRunning : 1;
 
@@ -187,7 +188,8 @@ struct tr_handle
     tr_torrent               * torrentList;
 
     char                     * tag;
-    int                        isPortSet;
+    unsigned int               isPortSet : 1;
+    unsigned int               isPexEnabled : 1;
 
     char                       useUploadLimit;
     char                       useDownloadLimit;

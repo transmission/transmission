@@ -141,8 +141,6 @@ static void
 initializeFromPrefs( struct cbdata * cbdata );
 static void
 prefschanged( TrCore * core, const char * key, gpointer data );
-static void
-setpex( tr_torrent * tor, void * arg );
 static gboolean
 updatemodel(gpointer gdata);
 static GList *
@@ -733,16 +731,9 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     }
     else if( !strcmp( key, PREF_KEY_PEX ) )
     {
-        gboolean enabled = pref_flag_get( key );
-        tr_torrentIterate( tr, setpex, &enabled );
+        const gboolean enabled = pref_flag_get( key );
+        tr_setPexEnabled( tr_core_handle( cbdata->core ), enabled );
     }
-}
-
-void
-setpex( tr_torrent * tor, void * arg )
-{
-    const gboolean * val = arg;
-    tr_torrentDisablePex( tor, !*val );
 }
 
 gboolean
