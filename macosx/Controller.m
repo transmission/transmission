@@ -192,14 +192,23 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     if ((self = [super init]))
     {
-        fLib = tr_init("macosx");
+        fDefaults = [NSUserDefaults standardUserDefaults];
+        
+        fLib = tr_initFull("macosx",
+                        [fDefaults boolForKey: @"PEXGlobal"],
+                        [fDefaults boolForKey: @"NatTraversal"],
+                        [fDefaults integerForKey: @"BindPort"],
+                        TR_ENCRYPTION_PREFERRED, /* reset in prefs */
+                        FALSE, /* reset in prefs */
+                        -1, /* reset in prefs */
+                        FALSE, /* reset in prefs */
+                        -1, /* reset in prefs */
+                        [fDefaults integerForKey: @"PeersGlobal"]);
         
         [NSApp setDelegate: self];
         
         fTorrents = [[NSMutableArray alloc] init];
         fDisplayedTorrents = [[NSMutableArray alloc] init];
-        
-        fDefaults = [NSUserDefaults standardUserDefaults];
         
         fMessageController = [[MessageWindowController alloc] init];
         fInfoController = [[InfoWindowController alloc] init];

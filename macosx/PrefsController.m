@@ -72,18 +72,6 @@
         if ([fDefaults boolForKey: @"AutoImport"] && (autoPath = [fDefaults stringForKey: @"AutoImportDirectory"]))
             [[UKKQueue sharedFileWatcher] addPath: [autoPath stringByExpandingTildeInPath]];
         
-        //set bind port
-        tr_setBindPort(fHandle, [fDefaults integerForKey: @"BindPort"]);
-        
-        //set NAT
-        tr_natTraversalEnable(fHandle, [fDefaults boolForKey: @"NatTraversal"]);
-        
-        //set peer connection values
-        tr_setGlobalPeerLimit(fHandle, [fDefaults integerForKey: @"PeersGlobal"]);
-        
-        //set pex
-        [self setPEX: nil];
-        
         //set encryption
         [self setEncryptionMode: nil];
         
