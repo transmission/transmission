@@ -517,7 +517,7 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
 
     /* filter */
     toggles = NULL;
-    h = p->filter = gtk_hbox_new( FALSE, GUI_PAD );
+    h = p->filter = gtk_hbox_new( FALSE, 0 );
     gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD_SMALL );
     for( i=0; i<FILTER_MODE_QTY; ++i ) {
         const char * mnemonic = _( filter_names[i] );
