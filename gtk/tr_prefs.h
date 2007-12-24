@@ -38,6 +38,7 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_SORT_MODE              "sort-mode"
 #define PREF_KEY_SORT_REVERSED          "sort-reversed"
 #define PREF_KEY_MINIMAL_VIEW           "minimal-view"
+#define PREF_KEY_FILTER_BAR             "show-filter-bar"
 #define PREF_KEY_STATUS_BAR             "show-status-bar"
 #define PREF_KEY_STATUS_BAR_STATS       "status-bar-stats"
 #define PREF_KEY_TOOLBAR                "show-toolbar"

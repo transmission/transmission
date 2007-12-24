@@ -32,9 +32,10 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_MAX_PEERS_GLOBAL, 400 );
     pref_int_set_default    ( PREF_KEY_MAX_PEERS_PER_TORRENT, 60 );
 
-    pref_string_set_default ( PREF_KEY_STATUS_BAR_STATS, "total-ratio" );
-    pref_flag_set_default   ( PREF_KEY_STATUS_BAR, TRUE );
     pref_flag_set_default   ( PREF_KEY_TOOLBAR, TRUE );
+    pref_flag_set_default   ( PREF_KEY_FILTER_BAR, TRUE );
+    pref_flag_set_default   ( PREF_KEY_STATUS_BAR, TRUE );
+    pref_string_set_default ( PREF_KEY_STATUS_BAR_STATS, "total-ratio" );
 
     pref_flag_set_default   ( PREF_KEY_DL_LIMIT_ENABLED, FALSE );
     pref_int_set_default    ( PREF_KEY_DL_LIMIT, 100 );

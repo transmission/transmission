@@ -31,6 +31,7 @@ const char * fallback_ui_file =
 "      <separator/>\n"
 "      <menuitem action='show-toolbar'/>\n"
 "      <menuitem action='show-status-bar'/>\n"
+"      <menuitem action='show-filter-bar'/>\n"
 "      <separator/>\n"
 "    </menu>\n"
 "    <menu action='edit-menu'>\n"

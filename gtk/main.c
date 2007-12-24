@@ -395,7 +395,7 @@ winsetup( struct cbdata * cbdata, TrWindow * wind )
     g_signal_connect( sel, "changed", G_CALLBACK(selectionChangedCB), NULL );
     selectionChangedCB( sel, NULL );
     model = tr_core_model( cbdata->core );
-    gtk_tree_view_set_model ( gtk_tree_selection_get_tree_view(sel), model );
+    //gtk_tree_view_set_model ( gtk_tree_selection_get_tree_view(sel), model );
     g_signal_connect( model, "row-changed", G_CALLBACK(rowChangedCB), sel );
     g_signal_connect( wind, "delete-event", G_CALLBACK( winclose ), cbdata );
     refreshTorrentActions( sel );

@@ -103,6 +103,8 @@ static GtkToggleActionEntry pref_toggle_entries[] =
     N_("_Minimal View"), "<alt>M", NULL, G_CALLBACK(toggle_pref_cb), FALSE },
   { "sort-reversed", NULL,
     N_("_Reverse Sort Order"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
+  { "show-filter-bar", NULL,
+    N_("Show _Filter Bar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
   { "show-status-bar", NULL,
     N_("Show _Status Bar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
   { "show-toolbar", NULL,
@@ -176,7 +178,8 @@ const BuiltinIconInfo my_builtin_icons [] =
     { tr_icon_lock, "transmission-lock" },
     { tr_arrow_down, "tr-arrow-down" },
     { tr_arrow_up, "tr-arrow-up" },
-    { tr_yin_yang, "tr-yin-yang" }
+    { tr_yin_yang, "tr-yin-yang" },
+    { tr_search_pulldown, "tr-search-pulldown" }
 };
 
 static void

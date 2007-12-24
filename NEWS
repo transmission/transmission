@@ -19,6 +19,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Leopard: Fix bug where bandwidth rates chosen from the action menu would not apply the first time
 - GTK+:
    + Minimal Mode for showing more torrents in less desktop space
+   + Torrent filtering
    + Port forwarding tester in Preferences
    + Statistics window
    + Sort by total activity, progress, state, and tracker
