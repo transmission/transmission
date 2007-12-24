@@ -113,7 +113,8 @@ tr_initFull( const char * tag,
              int          uploadLimit,
              int          isDownloadLimitEnabled,
              int          downloadLimit,
-             int          globalPeerLimit )
+             int          globalPeerLimit,
+             int          messageLevel )
 {
     tr_handle * h;
 
@@ -123,6 +124,7 @@ tr_initFull( const char * tag,
 #endif
 
     tr_msgInit( );
+    tr_setMessageLevel( messageLevel );
 
     h = tr_new0( tr_handle, 1 );
     h->lock = tr_lockNew( );
@@ -175,7 +177,8 @@ tr_handle * tr_init( const char * tag )
                         -1, /* upload speed limit */
                         FALSE, /* use download speed limit? */
                         -1, /* download speed limit */
-                        512 ); /* globalPeerLimit */
+                        512, /* globalPeerLimit */
+                        TR_MSG_INF ); /* message level */
 }
 
 /***

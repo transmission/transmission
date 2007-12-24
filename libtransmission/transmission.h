@@ -120,7 +120,8 @@ tr_handle * tr_initFull( const char * tag,
                          int          uploadLimit,
                          int          isDownloadLimitEnabled,
                          int          downloadLimit,
-                         int          globalPeerLimit );
+                         int          globalPeerLimit,
+                         int          messageLevel );
 
 
 /**
