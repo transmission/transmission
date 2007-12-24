@@ -61,6 +61,7 @@
 - (id) initWithHandle: (tr_handle *) handle;
 - (void) setUpdater: (SUUpdater *) updater;
 
+- (void) updatePortField;
 - (void) setPort: (id) sender;
 - (void) setNat: (id) sender;
 - (void) updatePortStatus;

@@ -207,8 +207,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         fBadger = [[Badger alloc] initWithLib: fLib];
         
-        fIPCController = [[IPCController alloc] initWithHandle: fPrefsController];
+        fIPCController = [[IPCController alloc] init];
         [fIPCController setDelegate: self];
+        [fIPCController setPrefsController: fPrefsController];
         fRemoteQuit = NO;
         
         [GrowlApplicationBridge setGrowlDelegate: self];
@@ -2490,7 +2491,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSEnumerator * enumerator = [files objectEnumerator];
         NSString * file;
         BOOL torrent = NO;
-        int canAdd;
         tr_ctor * ctor;
         while ((file = [enumerator nextObject]))
         {

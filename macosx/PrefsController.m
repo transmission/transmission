@@ -222,6 +222,12 @@
     return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_BANDWIDTH, TOOLBAR_ADVANCED, nil];
 }
 
+//used by ipc
+- (void) updatePortField
+{
+    [fPortField setIntValue: [fDefaults integerForKey: @"BindPort"]];
+}
+
 - (void) setPort: (id) sender
 {
     int port = [sender intValue];

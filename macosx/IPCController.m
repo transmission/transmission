@@ -118,9 +118,8 @@ PrefsController         * fPrefsController;
 
 @implementation IPCController
 
-- (id) initWithHandle : (PrefsController *) thePrefsController
+- (id) init
 {
-    fPrefsController = thePrefsController;
     struct sockaddr_un sun;
 
     self = [super init];
@@ -150,10 +149,12 @@ PrefsController         * fPrefsController;
         0 > ipc_addmsg( _funcs, IPC_MSG_ADDONEFILE,   msg_addnew    ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_AUTOMAP,      msg_setbool   ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_AUTOSTART,    msg_setbool   ) ||
+        0 > ipc_addmsg( _funcs, IPC_MSG_CRYPTO,       msg_setstr    ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_DIR,          msg_setstr    ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_DOWNLIMIT,    msg_setint    ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_GETAUTOMAP,   msg_getbool   ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_GETAUTOSTART, msg_getbool   ) ||
+        0 > ipc_addmsg( _funcs, IPC_MSG_GETCRYPTO,    msg_getstr    ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_GETDIR,       msg_getstr    ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_GETDOWNLIMIT, msg_getint    ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_GETINFO,      msg_info      ) ||
@@ -214,6 +215,11 @@ PrefsController         * fPrefsController;
 - (void) setDelegate: (id) newdelegate
 {
     _delegate = newdelegate;
+}
+
+- (void) setPrefsController: (id) thePrefsController
+{
+    fPrefsController = thePrefsController;
 }
 
 @end
@@ -786,7 +792,7 @@ void msg_getbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg 
             [client sendrespInt:IPC_MSG_AUTOSTART tag:tag val:[fDefaults boolForKey:@"AutoStartDownload"]];
             break;
         case IPC_MSG_GETPEX:
-// we dont support this :(
+//warning we dont support this :(
             [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
             break;
         default:
@@ -821,6 +827,7 @@ void msg_getint( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 void msg_getstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
+    NSString    * cryptoValue;
 
     fDefaults = [NSUserDefaults standardUserDefaults];
     
@@ -830,6 +837,19 @@ void msg_getstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
         case IPC_MSG_GETDIR:
             [client sendrespStr:IPC_MSG_DIR tag:tag val:[fDefaults stringForKey:@"DownloadFolder"]];
             break;
+            
+        case IPC_MSG_GETCRYPTO:
+            if ([fDefaults boolForKey: @"EncryptionPrefer"])
+                if ([fDefaults boolForKey: @"EncryptionRequire"])
+                    cryptoValue = @"required";
+                else
+                    cryptoValue = @"preferred";
+            else
+                cryptoValue = @"plaintext";
+            
+            [client sendrespStr:IPC_MSG_CRYPTO tag:tag val:cryptoValue];
+            break;
+            
         default:
             assert( 0 );
             break;
@@ -860,7 +880,7 @@ void msg_setbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg 
             [client sendrespEmpty:IPC_MSG_OK tag:tag];
             break;
         case IPC_MSG_PEX:
-        //we dont support this :(
+//warning we dont support this :(
             [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
             break;
         default:
@@ -889,8 +909,8 @@ void msg_setint( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
             [fPrefsController applySpeedSettings: nil];
             break;
         case IPC_MSG_PORT:
-#warning show in preference window
             [fPrefsController setPort:[NSNumber numberWithInt:val->val.i]];
+            [fPrefsController updatePortField];
             break;
         case IPC_MSG_UPLIMIT:
             [fDefaults setInteger:val->val.i forKey:@"UploadLimit"];
@@ -924,6 +944,29 @@ void msg_setstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
              [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"]; //not sure about this line
              [client sendrespEmpty: IPC_MSG_OK tag: tag];
              break;
+            
+        case IPC_MSG_CRYPTO:
+            if(!strcasecmp(val->val.s.s, "required"))
+            {
+                [fDefaults setBool:TRUE  forKey: @"EncryptionPrefer"];
+                [fDefaults setBool:TRUE  forKey: @"EncryptionRequire"];
+            }
+            
+            else if(!strcasecmp(val->val.s.s, "preferred"))
+            {
+                [fDefaults setBool:TRUE  forKey: @"EncryptionPrefer"];
+                [fDefaults setBool:FALSE  forKey: @"EncryptionRequire"];
+            }
+            
+            else if(!strcasecmp(val->val.s.s, "plaintext"))
+            {
+                [fDefaults setBool:FALSE  forKey: @"EncryptionPrefer"];
+                [fDefaults setBool:FALSE  forKey: @"EncryptionRequire"];
+            }
+            
+            [client sendrespEmpty: IPC_MSG_OK tag: tag];
+            break;
+           
         default:
              assert( 0 );
              break;

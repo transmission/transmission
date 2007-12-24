@@ -638,7 +638,9 @@ strmsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     switch( id )
     {
         case IPC_MSG_CRYPTO:
-            if(!strcasecmp(val->val.s.s, "preferred"))
+            if(!strcasecmp(val->val.s.s, "plaintext"))
+                torrent_set_encryption(TR_PLAINTEXT_PREFERRED);
+            else if(!strcasecmp(val->val.s.s, "preferred"))
                 torrent_set_encryption(TR_ENCRYPTION_PREFERRED);
             else if(!strcasecmp(val->val.s.s, "required"))
                 torrent_set_encryption(TR_ENCRYPTION_REQUIRED);
@@ -930,6 +932,9 @@ prefmsg( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag, void * arg )
         case IPC_MSG_GETCRYPTO:
             switch(torrent_get_encryption())
             {
+                case TR_PLAINTEXT_PREFERRED:
+                    strval = "plaintext";
+                    break;
                 case TR_ENCRYPTION_PREFERRED:
                     strval = "preferred";
                     break;

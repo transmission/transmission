@@ -198,7 +198,7 @@ Replies: "succeeded", "failed", "not-supported", "bad-format"
 Example: 10:encryption8:required
          "encryption", "required"
 Details: Set the encryption mode for peer connections. Valid values
-         are "required" and "preferred".
+         are "required", "preferred" and "plaintext".
 
 Key:     "failed"
 Version: 2

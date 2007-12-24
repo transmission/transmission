@@ -58,8 +58,10 @@
     id                 _delegate;
 }
 
-- (id) initWithHandle: (PrefsController *) thePrefsController;
+
+- (id) init;
 - (id)      delegate;
 - (void) setDelegate: (id) newdelegate;
+- (void) setPrefsController: (id) thePrefsController;
 
 @end
