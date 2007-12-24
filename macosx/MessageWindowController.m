@@ -60,11 +60,6 @@
 #warning don't update when the window is closed
 - (void) awakeFromNib
 {
-    fMessages = [[NSMutableArray alloc] init];
-        
-    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
-                selector: @selector(updateLog:) userInfo: nil repeats: YES];
-    
     NSWindow * window = [self window];
     [window setFrameAutosaveName: @"MessageWindowFrame"];
     [window setFrameUsingName: @"MessageWindowFrame"];
@@ -87,8 +82,7 @@
     [[fLevelButton itemAtIndex: LEVEL_DEBUG] setImage: fDebugImage];
     
     //select proper level in popup button
-    int level = tr_getMessageLevel();
-    switch (level)
+    switch (tr_getMessageLevel())
     {
         case TR_MSG_ERR:
             [fLevelButton selectItemAtIndex: LEVEL_ERROR];
@@ -100,7 +94,21 @@
             [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
     }
     
+    fMessages = [[NSMutableArray alloc] init];
+}
+
+- (void) windowDidBecomeKey: (NSNotification *) notification
+{
+    if (!fTimer)
+        fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
+                    selector: @selector(updateLog:) userInfo: nil repeats: YES];
     [self updateLog: nil];
+}
+
+- (void) windowWillClose: (id)sender
+{
+    [fTimer invalidate];
+    fTimer = nil;
 }
 
 - (void) updateLog: (NSTimer *) timer
