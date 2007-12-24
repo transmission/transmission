@@ -615,53 +615,62 @@ updateTorrentCount( PrivateData * p )
     }
 }
 
+static void
+updateStats( PrivateData * p )
+{
+    char * pch;
+    char up[32], down[32], buf[128];
+    struct tr_session_stats stats;
+    tr_handle * handle = tr_core_handle( p->core );
+
+    /* update the stats */
+    pch = pref_string_get( PREF_KEY_STATUS_BAR_STATS );
+    if( !strcmp( pch, "session-ratio" ) ) {
+        tr_getSessionStats( handle, &stats );
+        g_snprintf( buf, sizeof(buf), _("Ratio: %.1f"), stats.ratio );
+    } else if( !strcmp( pch, "session-transfer" ) ) {
+        tr_getSessionStats( handle, &stats );
+        tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
+        tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
+        g_snprintf( buf, sizeof( buf ), _( "Down: %s  Up: %s" ), down, up );
+    } else if( !strcmp( pch, "total-transfer" ) ) { 
+        tr_getCumulativeSessionStats( handle, &stats );
+        tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
+        tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
+        g_snprintf( buf, sizeof( buf ), _( "Down: %s  Up: %s" ), down, up );
+    } else { /* default is total-ratio */
+        tr_getCumulativeSessionStats( handle, &stats );
+        g_snprintf( buf, sizeof(buf), _("Ratio: %.1f"), stats.ratio );
+    }
+    g_free( pch );
+    gtk_label_set_text( GTK_LABEL( p->stats_lb ), buf );
+}
+
+static void
+updateSpeeds( PrivateData * p )
+{
+    char buf[128];
+    float u, d;
+    tr_handle * handle = tr_core_handle( p->core );
+
+    tr_torrentRates( handle, &d, &u );
+    tr_strlspeed( buf, d, sizeof( buf ) );
+    gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
+    tr_strlspeed( buf, u, sizeof( buf ) );
+    gtk_label_set_text( GTK_LABEL( p->ul_lb ), buf );
+}
+
 
 void
 tr_window_update( TrWindow * self )
 {
     PrivateData * p = get_private_data( self );
-    tr_handle * handle = NULL;
-
-    if( p && p->core )
-        handle = tr_core_handle( p->core );
-
-    if( handle )
+    if( p && p->core && tr_core_handle(p->core) )
     {
-        char * pch;
-        float u, d;
-        char up[32], down[32], buf[128];
-        struct tr_session_stats stats;
-
-        /* update the speeds */
-        tr_torrentRates( handle, &d, &u );
-        tr_strlspeed( buf, d, sizeof( buf ) );
-        gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
-        tr_strlspeed( buf, u, sizeof( buf ) );
-        gtk_label_set_text( GTK_LABEL( p->ul_lb ), buf );
-
+        updateSpeeds( p );
         updateTorrentCount( p );
-
-        /* update the stats */
-        pch = pref_string_get( PREF_KEY_STATUS_BAR_STATS );
-        if( !strcmp( pch, "session-ratio" ) ) {
-            tr_getSessionStats( handle, &stats );
-            g_snprintf( buf, sizeof(buf), _("Ratio: %.1f"), stats.ratio );
-        } else if( !strcmp( pch, "session-transfer" ) ) {
-            tr_getSessionStats( handle, &stats );
-            tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
-            tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
-            g_snprintf( buf, sizeof( buf ), _( "Down: %s  Up: %s" ), down, up );
-        } else if( !strcmp( pch, "total-transfer" ) ) { 
-            tr_getCumulativeSessionStats( handle, &stats );
-            tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
-            tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
-            g_snprintf( buf, sizeof( buf ), _( "Down: %s  Up: %s" ), down, up );
-        } else { /* default is total-ratio */
-            tr_getCumulativeSessionStats( handle, &stats );
-            g_snprintf( buf, sizeof(buf), _("Ratio: %.1f"), stats.ratio );
-        }
-        g_free( pch );
-        gtk_label_set_text( GTK_LABEL( p->stats_lb ), buf );
+        updateStats( p );
+        refilter( p );
     }
 }
 
