@@ -73,6 +73,8 @@
 - (void) setPeersGlobal: (id) sender;
 - (void) setPeersTorrent: (id) sender;
 
+- (void) setPEX: (id) sender;
+
 - (void) setEncryptionMode: (id) sender;
 
 - (void) setBadge: (id) sender;

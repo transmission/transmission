@@ -81,6 +81,9 @@
         //set peer connection values
         tr_setGlobalPeerLimit(fHandle, [fDefaults integerForKey: @"PeersGlobal"]);
         
+        //set pex
+        [self setPEX: nil];
+        
         //set encryption
         [self setEncryptionMode: nil];
         
@@ -338,6 +341,11 @@
 {
     int count = [sender intValue];
     [fDefaults setInteger: count forKey: @"PeersTorrent"];
+}
+
+- (void) setPEX: (id) sender
+{
+    tr_setPexEnabled(fHandle, [fDefaults boolForKey: @"PEXGlobal"]);
 }
 
 - (void) setEncryptionMode: (id) sender

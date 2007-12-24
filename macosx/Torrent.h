@@ -205,9 +205,6 @@ typedef enum
 - (uint64_t) failedHash;
 - (float) swarmSpeed;
 
-- (BOOL) pex;
-- (void) setPex: (BOOL) enable;
-
 - (int) orderValue;
 - (void) setOrderValue: (int) orderValue;
 

@@ -1179,16 +1179,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fStat->swarmspeed;
 }
 
-- (BOOL) pex
-{
-	return tr_torrentIsPexEnabled(fHandle);
-}
-
-- (void) setPex: (BOOL) enable
-{
-	tr_torrentDisablePex(fHandle, !enable);
-}
-
 - (int) orderValue
 {
     return fOrderValue;

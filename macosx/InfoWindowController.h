@@ -63,7 +63,6 @@
     IBOutlet NSPopUpButton * fRatioPopUp, * fUploadLimitPopUp, * fDownloadLimitPopUp;
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField, * fPeersConnectField,
                         * fUploadLimitLabel, * fDownloadLimitLabel;
-    IBOutlet NSButton * fPexCheck;
     
     NSString * fInitialString;
 }
@@ -93,8 +92,6 @@
 
 - (void) setRatioSetting: (id) sender;
 - (void) setRatioLimit: (id) sender;
-
-- (void) setPex: (id) sender;
 
 - (void) setPeersConnectLimit: (id) sender;
 

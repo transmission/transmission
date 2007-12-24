@@ -74,6 +74,8 @@
 	<string>Constant</string>
 	<key>NatTraversal</key>
 	<true/>
+	<key>PEXGlobal</key>
+	<true/>
 	<key>PeersGlobal</key>
 	<integer>500</integer>
 	<key>PeersTorrent</key>
