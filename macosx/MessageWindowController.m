@@ -44,17 +44,7 @@
 
 - (id) init
 {
-    if ((self = [super initWithWindowNibName: @"MessageWindow"]))
-    {
-        fMessages = [[NSMutableArray alloc] init];
-        
-        fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
-                    selector: @selector(updateLog:) userInfo: nil repeats: YES];
-        
-        tr_setMessageLevel([[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"]);
-        tr_setMessageQueuing(1);
-    }
-    return self;
+    return [super initWithWindowNibName: @"MessageWindow"];
 }
 
 - (void) dealloc
@@ -67,8 +57,14 @@
     [super dealloc];
 }
 
+#warning don't update when the window is closed
 - (void) awakeFromNib
 {
+    fMessages = [[NSMutableArray alloc] init];
+        
+    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
+                selector: @selector(updateLog:) userInfo: nil repeats: YES];
+    
     NSWindow * window = [self window];
     [window setFrameAutosaveName: @"MessageWindowFrame"];
     [window setFrameUsingName: @"MessageWindowFrame"];
@@ -78,11 +74,8 @@
     
     //initially sort peer table by IP
     if ([[fMessageTable sortDescriptors] count] == 0)
-    {
         [fMessageTable setSortDescriptors: [NSArray arrayWithObject: [[fMessageTable tableColumnWithIdentifier: @"Date"]
                                             sortDescriptorPrototype]]];
-        [self updateLog: nil];
-    }
     
     fErrorImage = [NSImage imageNamed: @"RedDot.png"];
     fInfoImage = [NSImage imageNamed: @"YellowDot.png"];
@@ -106,6 +99,8 @@
         case TR_MSG_DBG:
             [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
     }
+    
+    [self updateLog: nil];
 }
 
 - (void) updateLog: (NSTimer *) timer
