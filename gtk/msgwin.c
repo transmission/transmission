@@ -309,6 +309,4 @@ void
 msgwin_loadpref( void )
 {
     textbuf = debug_window_text_buffer_new ( );
-    tr_setMessageLevel( pref_int_get( PREF_KEY_MSGLEVEL ) );
-    tr_setMessageQueuing( TRUE );
 }

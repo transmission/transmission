@@ -121,7 +121,8 @@ tr_handle * tr_initFull( const char * tag,
                          int          isDownloadLimitEnabled,
                          int          downloadLimit,
                          int          globalPeerLimit,
-                         int          messageLevel );
+                         int          messageLevel,
+                         int          isMessageQueueingEnabled );
 
 
 /**
