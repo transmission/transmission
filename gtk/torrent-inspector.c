@@ -540,7 +540,7 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
                          PEER_COL_IS_ENCRYPTED,
                          PEER_COL_UPLOAD_RATE,
                          PEER_COL_DOWNLOAD_RATE
-#if 1
+#if 0
                          , PEER_COL_STATUS
 #endif
                        };
