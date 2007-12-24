@@ -80,6 +80,7 @@ typedef struct
     GtkWidget * ul_lb;
     GtkWidget * dl_lb;
     GtkWidget * stats_lb;
+    GtkWidget * gutter_lb;
     GtkTreeSelection  * selection;
     GtkCellRenderer   * renderer;
     GtkTreeViewColumn * column;
@@ -337,10 +338,14 @@ is_row_visible( GtkTreeModel   * model,
         && checkFilterText( p->filter_text_mode, tr_torrentInfo( tor ), p->filter_text );
 }
 
+static void updateTorrentCount( PrivateData * p );
+
 static void
 refilter( PrivateData * p )
 {
     gtk_tree_model_filter_refilter( GTK_TREE_MODEL_FILTER( p->filter_model ) );
+
+    updateTorrentCount( p );
 }
 
 static void
@@ -437,6 +442,10 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     const char * filter_text_names[FILTER_TEXT_MODE_QTY] = {
         N_("Name"), N_("Files"), N_("Tracker")
     };
+
+    p->filter_mode = FILTER_MODE_ALL;
+    p->filter_text_mode = FILTER_TEXT_MODE_NAME;
+    p->filter_text = NULL;
 
     /* make the window */
     self = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -561,6 +570,12 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     gtk_widget_set_usize (w, 0u, 6u);
     gtk_box_pack_start( GTK_BOX(vbox), w, FALSE, FALSE, 0 ); 
 
+    /* status */
+    h = gtk_hbox_new( FALSE, GUI_PAD );
+    w = p->gutter_lb = gtk_label_new( "N transfers" );
+    gtk_box_pack_start_defaults( GTK_BOX(h), w );
+    gtk_box_pack_start( GTK_BOX(vbox), h, FALSE, FALSE, 0 ); 
+
     /* show all but the window */
     gtk_widget_show_all( vbox );
 
@@ -577,6 +592,30 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     return self;
 }
 
+static void
+updateTorrentCount( PrivateData * p )
+{
+    if( p && p->core )
+    {
+        char buf[128];
+        const int torrentCount = gtk_tree_model_iter_n_children( tr_core_model( p->core ), NULL );
+        const int visibleCount = gtk_tree_model_iter_n_children( p->filter_model, NULL );
+
+        if( torrentCount != visibleCount )
+            g_snprintf( buf, sizeof( buf ), ngettext( _( "%d of %d Transfer" ),
+                                                      _( "%d of %d Transfers" ),
+                                                      torrentCount ),
+                                            visibleCount, torrentCount );
+        else
+            g_snprintf( buf, sizeof( buf ), ngettext( _( "%d Transfer" ),
+                                                      _( "%d Transfers" ),
+                                                      torrentCount ),
+                                            torrentCount );
+        gtk_label_set_text( GTK_LABEL( p->gutter_lb ), buf );
+    }
+}
+
+
 void
 tr_window_update( TrWindow * self )
 {
@@ -590,15 +629,19 @@ tr_window_update( TrWindow * self )
     {
         char * pch;
         float u, d;
-        char up[32], down[32], buf[64];
+        char up[32], down[32], buf[128];
         struct tr_session_stats stats;
 
+        /* update the speeds */
         tr_torrentRates( handle, &d, &u );
         tr_strlspeed( buf, d, sizeof( buf ) );
         gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
         tr_strlspeed( buf, u, sizeof( buf ) );
         gtk_label_set_text( GTK_LABEL( p->ul_lb ), buf );
 
+        updateTorrentCount( p );
+
+        /* update the stats */
         pch = pref_string_get( PREF_KEY_STATUS_BAR_STATS );
         if( !strcmp( pch, "session-ratio" ) ) {
             tr_getSessionStats( handle, &stats );
