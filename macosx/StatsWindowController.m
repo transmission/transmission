@@ -62,8 +62,7 @@ tr_handle * fLib;
 
 - (void) windowWillClose: (id)sender
 {
-    if (fTimer)
-        [fTimer invalidate];
+    [fTimer invalidate];
     
 	[fStatsWindowInstance release];
     fStatsWindowInstance = nil;
