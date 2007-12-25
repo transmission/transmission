@@ -85,6 +85,8 @@ enum
     MAX_FAST_ALLOWED_COUNT   = 10,          /* max. number of pieces we fast-allow to another peer */
     MAX_FAST_ALLOWED_THRESHOLD = 10,        /* max threshold for allowing fast-pieces requests */
 
+    REQUEST_TTL_SECS = 120
+
 };
 
 enum
@@ -564,6 +566,39 @@ requestIsValid( const tr_peermsgs * msgs, const struct peer_request * req )
 }
 
 static void
+expireOldRequests( tr_peermsgs * msgs )
+{
+    tr_list * l;
+    tr_list * prune = NULL;
+    const time_t now = time( NULL );
+
+    // find queued requests that are too old
+    // "time_requested" here is when the request was queued
+    for( l=msgs->clientWillAskFor; l!=NULL; l=l->next ) {
+        struct peer_request * req = l->data;
+        if( req->time_requested + REQUEST_TTL_SECS < now )
+            tr_list_prepend( &prune, req );
+    }
+
+    // find sent requests that are too old
+    // "time_requested" here is when the request was sent
+    for( l=msgs->clientAskedFor; l!=NULL; l=l->next ) {
+        struct peer_request * req = l->data;
+        if( req->time_requested + REQUEST_TTL_SECS < now )
+            tr_list_prepend( &prune, req );
+    }
+
+    // expire the old requests
+    for( l=prune; l!=NULL; l=l->next ) {
+        struct peer_request * req = l->data;
+        tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
+    }
+
+    // cleanup
+    tr_list_free( &prune, NULL );
+}
+
+static void
 pumpRequestQueue( tr_peermsgs * msgs )
 {
     const int max = msgs->maxActiveRequests;
@@ -654,6 +689,7 @@ tr_peerMsgsAddRequest( tr_peermsgs * msgs,
     dbgmsg( msgs, "added req for piece %d, offset %d", (int)index, (int)offset );
     req = tr_new0( struct peer_request, 1 );
     *req = tmp;
+    req->time_requested = time( NULL );
     tr_list_append( &msgs->clientWillAskFor, req );
     return TR_ADDREQ_OK;
 }
@@ -1560,6 +1596,7 @@ pulse( void * vmsgs )
 
     tr_peerIoTryRead( msgs->io );
     pumpRequestQueue( msgs );
+    expireOldRequests( msgs );
     updatePeerStatus( msgs );
 
     if( msgs->sendingBlock )
