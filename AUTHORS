@@ -9,8 +9,9 @@ Lead Developers <transmission-dev@m0k.org>
         Bryan Varner <bryan@varnernet.com>  (BeOS interface)
 
 Project Contributors
-        Nick Pucius  (Mac OS X Help documentation)
 	Hugo van Heuven, madebysofa  (Main icon design)
+	Kendall Hopkins (IPC patches)
+        Nick Pucius  (Mac OS X Help documentation)
 
 Translators
 Mac OS X, current release:
@@ -54,7 +55,6 @@ Image Contributors
 Other Contributors
         Omar and Adrien  (Beta testing)
         BitTorrent Protocol Specification <http://wiki.theory.org/BitTorrentSpecification>
-        vi@nwr.jp  (Free SHA1 implementation)
         Ahmad M. Afuni  (NetBSD patch)
         Jeremy Messenger  (FreeBSD patch)
         John Blitch  (Mac OS X patch)
