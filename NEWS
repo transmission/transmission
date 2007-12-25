@@ -13,9 +13,9 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Statistics window
    + Pieces Bar (return of Advanced Bar)
    + Display "not available" overlay on the regular bar
-   + The Clutch web gui can now connect to the mac client.
    + Display remaining time for seeding transfers
    + Sort by total activity
+   + Connectable from the Clutch web interface
    + Leopard: Time Machine will ignore incomplete downloads
    + Leopard: Fix bug where text fields would reject localized decimal values
    + Leopard: Fix bug where bandwidth rates chosen from the action menu would not apply the first time
