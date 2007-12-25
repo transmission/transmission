@@ -29,7 +29,7 @@
 
 struct benc_val_t;
 
-int tr_metainfoParse( tr_info *, const struct benc_val_s * );
+int tr_metainfoParse( tr_info *, const struct benc_val_s *, const char * tag );
 void tr_metainfoFree( tr_info * inf );
 void tr_metainfoRemoveSaved( const char * hashString, const char * tag );
 

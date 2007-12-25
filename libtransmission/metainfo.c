@@ -148,8 +148,26 @@ strlcat_utf8( void * dest, const void * src, size_t len, char skip )
     }
 }
 
+static void
+savedname( char * name, size_t len, const char * hash, const char * tag )
+{
+    const char * torDir = tr_getTorrentsDirectory ();
+
+    if( tag == NULL )
+    {
+        tr_buildPath( name, len, torDir, hash, NULL );
+    }
+    else
+    {
+        char base[1024];
+        snprintf( base, sizeof(base), "%s-%s", hash, tag );
+        tr_buildPath( name, len, torDir, base, NULL );
+    }
+}
+
+
 int
-tr_metainfoParse( tr_info * inf, const benc_val_t * meta_in )
+tr_metainfoParse( tr_info * inf, const benc_val_t * meta_in, const char * tag )
 {
     int i;
     benc_val_t * beInfo, * val, * val2;
@@ -176,6 +194,7 @@ tr_metainfoParse( tr_info * inf, const benc_val_t * meta_in )
         snprintf( inf->hashString + i * 2, sizeof( inf->hashString ) - i * 2,
                   "%02x", inf->hash[i] );
     }
+    savedname( inf->torrent, sizeof( inf->torrent ), inf->hashString, tag );
 
     /* Comment info */
     val = tr_bencDictFindFirst( meta, "comment.utf-8", "comment", NULL );
@@ -556,28 +575,10 @@ tr_trackerInfoClear( tr_tracker_info * info )
     memset( info, '\0', sizeof(tr_tracker_info) );
 }
 
-
-static void
-savedname( char * name, size_t len, const char * hash, const char * tag )
-{
-    const char * torDir = tr_getTorrentsDirectory ();
-
-    if( tag == NULL )
-    {
-        tr_buildPath( name, len, torDir, hash, NULL );
-    }
-    else
-    {
-        char base[1024];
-        snprintf( base, sizeof(base), "%s-%s", hash, tag );
-        tr_buildPath( name, len, torDir, base, NULL );
-    }
-}
-
-void tr_metainfoRemoveSaved( const char * hashString, const char * tag )
+void
+tr_metainfoRemoveSaved( const char * hashString, const char * tag )
 {
     char file[MAX_PATH_LENGTH];
-
     savedname( file, sizeof file, hashString, tag );
     unlink( file );
 }
