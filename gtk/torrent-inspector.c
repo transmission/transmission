@@ -753,9 +753,11 @@ static GtkWidget* info_page_new (tr_torrent * tor)
     g_snprintf (name, sizeof(name), namefmt, _("Tracker"));
     track = info->trackerList->list;
     pch = track->port==80
-      ? g_strdup_printf ("http://%s%s", track->address, track->announce)
-      : g_strdup_printf ("http://%s:%d%s", track->address, track->port, track->announce);
-    l = gtk_label_new (pch);
+      ? g_strdup_printf( "http://%s%s", track->address, track->announce )
+      : g_strdup_printf( "http://%s:%d%s", track->address, track->port, track->announce );
+    l = gtk_label_new( pch );
+    gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
+
     hig_workarea_add_row (t, &row, name, l, NULL);
     g_free (pch);
 
@@ -767,6 +769,7 @@ static GtkWidget* info_page_new (tr_torrent * tor)
 
     g_snprintf (name, sizeof(name), namefmt, _("Hash"));
     l = gtk_label_new (info->hashString);
+    gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
     hig_workarea_add_row (t, &row, name, l, NULL);
 
     g_snprintf (name, sizeof(name), namefmt, _("Secure"));
@@ -808,17 +811,20 @@ static GtkWidget* info_page_new (tr_torrent * tor)
 
     g_snprintf (name, sizeof(name), namefmt, _("Downloaded Data"));
     l = gtk_label_new (tr_torrentGetFolder (tor));
+    gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
     hig_workarea_add_row (t, &row, name, l, NULL); 
 
     g_snprintf (name, sizeof(name), namefmt, _("Torrent File Path"));
     dname = g_path_get_dirname (info->torrent);
     l = gtk_label_new ( dname );
+    gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
     hig_workarea_add_row (t, &row, name, l, NULL); 
     g_free (dname);
 
     g_snprintf (name, sizeof(name), namefmt, _("Torrent File Name"));
     bname = g_path_get_basename (info->torrent);
     l = gtk_label_new (bname);
+    gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
     hig_workarea_add_row (t, &row, name, l, NULL); 
     g_free (bname);
 
