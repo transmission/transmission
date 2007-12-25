@@ -590,6 +590,14 @@ compareRefillPiece (const void * aIn, const void * bIn)
     const struct tr_refill_piece * a = aIn;
     const struct tr_refill_piece * b = bIn;
     
+    /* if one piece has a higher priority, it goes first */
+    if (a->priority != b->priority)
+        return a->priority > b->priority ? -1 : 1;
+
+    /* try to fill partial pieces */
+    if( a->percentDone != b->percentDone )
+        return a->percentDone > b->percentDone ? -1 : 1;
+    
     /* if one *might be* fastallowed to us, get it first...
      * I'm putting it on top so we prioritize those pieces at
      * startup, then we'll have them, and we'll be denied access
@@ -597,17 +605,9 @@ compareRefillPiece (const void * aIn, const void * bIn)
     if (a->fastAllowed != b->fastAllowed)
         return a->fastAllowed < b->fastAllowed ? -1 : 1;
     
-    /* if one piece has a higher priority, it goes first */
-    if (a->priority != b->priority)
-        return a->priority > b->priority ? -1 : 1;
-    
     /* otherwise if one was suggested to us, get it */
     if (a->suggested != b->suggested)
         return a->suggested < b->suggested ? -1 : 1;
-
-    /* try to fill partial pieces */
-    if( a->percentDone != b->percentDone )
-        return a->percentDone > b->percentDone ? -1 : 1;
     
     /* otherwise if one has fewer peers, it goes first */
     if (a->peerCount != b->peerCount)

@@ -218,15 +218,20 @@ calculatePiecePriority ( const tr_torrent * tor,
                          int                piece )
 {
     int i;
-    tr_priority_t priority = TR_PRI_NORMAL;
+    tr_priority_t priority = TR_PRI_LOW;
 
+    /* the piece's priority is the max of the priorities
+     * of all the files in that piece */
     for( i=0; i<tor->info.fileCount; ++i )
     {
         const tr_file * file = &tor->info.files[i];
-        if ( file->firstPiece <= piece
-          && file->lastPiece  >= piece
-          && file->priority   >  priority)
-              priority = file->priority;
+
+        if( piece < file->firstPiece )
+            continue;
+        if( piece > file->lastPiece )
+            break;
+
+        priority = MAX( priority, file->priority );
 
         /* when dealing with multimedia files, getting the first and
            last pieces can sometimes allow you to preview it a bit
