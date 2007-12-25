@@ -34,11 +34,14 @@ typedef enum
 
 @interface PortChecker : NSObject
 {    
-    id              fDelegate;
-    port_status_t   fStatus;
+    id fDelegate;
+    port_status_t fStatus;
+    int fPortNumber;
     
     NSURLConnection * fConnection;
-    NSMutableData   * fPortProbeData;
+    NSMutableData * fPortProbeData;
+    
+    NSTimer * fTimer;
 }
 
 - (id) initForPort: (int) portNumber withDelegate: (id) delegate;

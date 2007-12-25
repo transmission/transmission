@@ -64,7 +64,7 @@ tr_handle * fLib;
 {
     [fTimer invalidate];
     
-	[fStatsWindowInstance release];
+    [fStatsWindowInstance release];
     fStatsWindowInstance = nil;
 }
 

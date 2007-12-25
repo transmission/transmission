@@ -26,6 +26,7 @@
 #import "NSApplicationAdditions.h"
 
 #define CHECKER_URL @"http://transmission.m0k.org/PortCheck.php?port=%d"
+#define CHECK_FIRE  3.0
 
 @implementation PortChecker
 
@@ -35,20 +36,11 @@
     {
         fDelegate = delegate;
         
-        NSURLRequest * portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString:
-                [NSString stringWithFormat: CHECKER_URL, portNumber]] cachePolicy:
-                [NSApp isOnLeopardOrBetter] ? NSURLRequestReloadIgnoringLocalCacheData : NSURLRequestReloadIgnoringCacheData
-                timeoutInterval: 15.0];
-        
+        fPortNumber = portNumber;
         fStatus = PORT_STATUS_CHECKING;
         
-        if ((fConnection = [[NSURLConnection alloc] initWithRequest: portProbeRequest delegate: self]))
-            fPortProbeData = [[NSMutableData alloc] init];
-        else
-        {
-            NSLog(@"Unable to get port status: failed to initiate connection");
-            [self callBackWithStatus: PORT_STATUS_ERROR];
-        }
+        fTimer = [NSTimer scheduledTimerWithTimeInterval: CHECK_FIRE target: self selector: @selector(startProbe)
+                        userInfo: nil repeats: NO];
     }
     
     return self;
@@ -56,6 +48,8 @@
 
 - (void) dealloc
 {
+    [fTimer invalidate];
+    
     [fConnection release];
     [fPortProbeData release];
     [super dealloc];
@@ -66,8 +60,27 @@
     return fStatus;
 }
 
+- (void) startProbe
+{
+    fTimer = nil;
+    
+    NSURLRequest * portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString:
+                [NSString stringWithFormat: CHECKER_URL, fPortNumber]] cachePolicy:
+                [NSApp isOnLeopardOrBetter] ? NSURLRequestReloadIgnoringLocalCacheData : NSURLRequestReloadIgnoringCacheData
+                timeoutInterval: 15.0];
+    
+    if ((fConnection = [[NSURLConnection alloc] initWithRequest: portProbeRequest delegate: self]))
+        fPortProbeData = [[NSMutableData alloc] init];
+    else
+    {
+        NSLog(@"Unable to get port status: failed to initiate connection");
+        [self callBackWithStatus: PORT_STATUS_ERROR];
+    }
+}
+
 - (void) endProbe
 {
+    [fTimer invalidate];
     [fConnection cancel];
 }
 

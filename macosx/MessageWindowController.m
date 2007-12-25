@@ -57,7 +57,6 @@
     [super dealloc];
 }
 
-#warning don't update when the window is closed
 - (void) awakeFromNib
 {
     NSWindow * window = [self window];

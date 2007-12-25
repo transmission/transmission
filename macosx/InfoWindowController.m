@@ -539,10 +539,13 @@ typedef enum
     
     int maxPeers = [torrent maxPeerConnect];
     
-    while ((torrent = [enumerator nextObject]) && maxPeers != INVALID)
+    while ((torrent = [enumerator nextObject]))
     {
-        if (/*maxPeers != INVALID &&*/ maxPeers != [torrent maxPeerConnect])
+        if (maxPeers != [torrent maxPeerConnect])
+        {
             maxPeers = INVALID;
+            break;
+        }
     }
     
     //set peer view
