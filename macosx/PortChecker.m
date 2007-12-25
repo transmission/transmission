@@ -78,9 +78,11 @@
     }
 }
 
-- (void) endProbe
+- (void) cancelProbe
 {
     [fTimer invalidate];
+    fTimer = nil;
+    
     [fConnection cancel];
 }
 

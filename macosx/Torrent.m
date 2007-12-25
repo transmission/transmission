@@ -700,7 +700,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fInfo->isPrivate;
 }
 
-#warning not working
 - (NSString *) torrentLocation
 {
     return [NSString stringWithUTF8String: fInfo->torrent];

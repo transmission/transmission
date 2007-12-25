@@ -45,7 +45,7 @@ typedef enum
 }
 
 - (id) initForPort: (int) portNumber withDelegate: (id) delegate;
-- (void) endProbe;
+- (void) cancelProbe;
 
 - (void) callBackWithStatus: (port_status_t) status;
 - (port_status_t) status;

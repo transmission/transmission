@@ -88,7 +88,7 @@
         [fPortStatusTimer invalidate];
     if (fPortChecker)
     {
-        [fPortChecker endProbe];
+        [fPortChecker cancelProbe];
         [fPortChecker release];
     }
     
@@ -252,7 +252,7 @@
         
         if (fPortChecker)
         {
-            [fPortChecker endProbe];
+            [fPortChecker cancelProbe];
             [fPortChecker release];
         }
         fPortChecker = [[PortChecker alloc] initForPort: fPublicPort withDelegate: self];
