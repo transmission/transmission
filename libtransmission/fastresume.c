@@ -485,7 +485,7 @@ parsePriorities( tr_torrent * tor, const uint8_t * buf, uint32_t len )
                case 'h': priority = TR_PRI_HIGH; break;
                default:  priority = TR_PRI_NORMAL; break;
            }
-           tor->info.files[i].priority = priority;
+           tr_torrentInitFilePriority( tor, i, priority );
         }
 
         /* set the dnd flags */

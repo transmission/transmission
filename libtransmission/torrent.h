@@ -77,6 +77,11 @@ int _tr_block( const tr_torrent * tor, int index, int begin );
 
 uint64_t tr_pieceOffset( const tr_torrent * tor, int index, int begin, int length );
 
+void tr_torrentInitFilePriority( tr_torrent   * tor,
+                                 int            fileIndex,
+                                 tr_priority_t  priority );
+
+
 typedef enum
 {
    TR_RECHECK_NONE,

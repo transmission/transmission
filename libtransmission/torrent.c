@@ -213,12 +213,18 @@ initFilePieces ( tr_info * info, int fileIndex )
     file->lastPiece = getBytePiece( info, lastByte );
 }
 
+static int
+pieceHasFile( int piece, const tr_file * file )
+{
+    return ( file->firstPiece <= piece ) && ( piece <= file->lastPiece );
+}
+
 static tr_priority_t
 calculatePiecePriority ( const tr_torrent * tor,
                          int                piece )
 {
     int i;
-    tr_priority_t priority = TR_PRI_LOW;
+    int priority = TR_PRI_LOW;
 
     /* the piece's priority is the max of the priorities
      * of all the files in that piece */
@@ -226,10 +232,8 @@ calculatePiecePriority ( const tr_torrent * tor,
     {
         const tr_file * file = &tor->info.files[i];
 
-        if( piece < file->firstPiece )
+        if( !pieceHasFile( piece, file ) )
             continue;
-        if( piece > file->lastPiece )
-            break;
 
         priority = MAX( priority, file->priority );
 
@@ -1057,10 +1061,10 @@ tr_torrentIsSeed( const tr_torrent * tor )
 ***  File priorities
 **/
 
-static void
-setFilePriority( tr_torrent   * tor,
-                 int            fileIndex,
-                 tr_priority_t  priority )
+void
+tr_torrentInitFilePriority( tr_torrent   * tor,
+                            int            fileIndex,
+                            tr_priority_t  priority )
 {
     int i;
     tr_file * file;
@@ -1089,7 +1093,7 @@ tr_torrentSetFilePriorities( tr_torrent     * tor,
     tr_torrentLock( tor );
 
     for( i=0; i<fileCount; ++i )
-        setFilePriority( tor, files[i], priority );
+        tr_torrentInitFilePriority( tor, files[i], priority );
 
     saveFastResumeNow( tor );
     tr_torrentUnlock( tor );

@@ -591,7 +591,7 @@ compareRefillPiece (const void * aIn, const void * bIn)
     const struct tr_refill_piece * b = bIn;
     
     /* if one piece has a higher priority, it goes first */
-    if (a->priority != b->priority)
+    if( a->priority != b->priority )
         return a->priority > b->priority ? -1 : 1;
 
     /* try to fill partial pieces */
