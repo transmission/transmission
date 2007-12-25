@@ -27,6 +27,7 @@
 
 #include "transmission.h"
 #include "completion.h"
+#include "torrent.h"
 #include "utils.h"
 
 struct tr_completion

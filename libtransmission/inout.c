@@ -28,6 +28,7 @@
 #include "platform.h"
 #include "peer-mgr.h"
 #include "stats.h"
+#include "torrent.h"
 #include "utils.h"
 
 /****

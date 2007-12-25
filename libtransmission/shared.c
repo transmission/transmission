@@ -32,6 +32,7 @@
 #include "net.h"
 #include "peer-mgr.h"
 #include "shared.h"
+#include "torrent.h"
 #include "trevent.h"
 #include "upnp.h"
 #include "utils.h"

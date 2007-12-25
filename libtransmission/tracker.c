@@ -28,6 +28,7 @@
 #include "net.h"
 #include "publish.h"
 #include "shared.h"
+#include "torrent.h"
 #include "tracker.h"
 #include "trevent.h"
 #include "utils.h"

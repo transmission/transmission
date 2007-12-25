@@ -43,6 +43,7 @@
 #include "platform.h"
 #include "ratecontrol.h"
 #include "shared.h"
+#include "torrent.h"
 #include "tracker.h"
 #include "trcompat.h" /* for strlcpy */
 #include "trevent.h"

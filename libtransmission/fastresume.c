@@ -60,6 +60,7 @@
 #include "internal.h" /* tr_torrentInitFileDLs */
 #include "peer-mgr.h"
 #include "platform.h"
+#include "torrent.h"
 #include "utils.h"
 
 /* time_t can be 32 or 64 bits... for consistency we'll hardwire 64 */ 

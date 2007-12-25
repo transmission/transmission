@@ -27,6 +27,7 @@
 
 #include "transmission.h"
 
+struct tr_bitfield;
 typedef struct tr_completion tr_completion;
 
 tr_completion  * tr_cpInit( tr_torrent * );

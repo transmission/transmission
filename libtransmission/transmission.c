@@ -42,6 +42,7 @@
 #include "ratecontrol.h"
 #include "shared.h"
 #include "stats.h"
+#include "torrent.h"
 #include "tracker.h"
 #include "trevent.h"
 #include "utils.h"

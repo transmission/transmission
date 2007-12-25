@@ -35,6 +35,7 @@
 #include "ptrarray.h"
 #include "ratecontrol.h"
 #include "shared.h"
+#include "torrent.h"
 #include "trcompat.h" /* strlcpy */
 #include "trevent.h"
 #include "utils.h"

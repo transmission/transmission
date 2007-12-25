@@ -33,6 +33,7 @@
 #include "peer-msgs.h"
 #include "ratecontrol.h"
 #include "stats.h"
+#include "torrent.h"
 #include "trevent.h"
 #include "utils.h"
 
