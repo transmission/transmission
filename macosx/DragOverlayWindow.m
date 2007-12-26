@@ -104,6 +104,7 @@
                 }
             }
             tr_metainfoFree(&info);
+            tr_ctorFree(ctor);
         }
     }
     
