@@ -91,23 +91,34 @@ tr_strlspeed( char * buf, double KiBps, size_t buflen )
 #define HOURS(s)                ((s) / 60 / 60 % 24)
 #define DAYS(s)                 ((s) / 60 / 60 / 24 % 7)
 
-char *
-readabletime(int secs) {
-  if(60 > secs)
-    return g_strdup_printf(_("%i %s"),
-      SECONDS(secs), ngettext("sec", "secs", SECONDS(secs)));
-  else if(60 * 60 > secs)
-    return g_strdup_printf(_("%i %s %i %s"),
-      MINUTES(secs), ngettext("min", "mins", MINUTES(secs)),
-      SECONDS(secs), ngettext("sec", "secs", SECONDS(secs)));
-  else if(60 * 60 * 24 > secs)
-    return g_strdup_printf(_("%i %s %i %s"),
-      HOURS(secs),   ngettext("hr", "hrs", HOURS(secs)),
-      MINUTES(secs), ngettext("min", "mins", MINUTES(secs)));
-  else
-    return g_strdup_printf(_("%i %s %i %s"),
-      DAYS(secs),    ngettext("day", "days", DAYS(secs)),
-      HOURS(secs),   ngettext("hr", "hrs", HOURS(secs)));
+char*
+tr_strltime( char * buf, int secs, size_t buflen )
+{
+    if( secs < 60 )
+    {
+        g_snprintf( buf, buflen, _( "%i %s" ),
+                    SECONDS(secs), ngettext("sec", "secs", SECONDS(secs)));
+    }
+    else if( secs < 60*60 )
+    {
+        g_snprintf( buf, buflen, _("%i %s %i %s"),
+                    MINUTES(secs), ngettext("min", "mins", MINUTES(secs)),
+                    SECONDS(secs), ngettext("sec", "secs", SECONDS(secs)));
+    }
+    else if( secs < 60*60*24 )
+    {
+        g_snprintf( buf, buflen, _("%i %s %i %s"),
+                    HOURS(secs),   ngettext("hr", "hrs", HOURS(secs)),
+                    MINUTES(secs), ngettext("min", "mins", MINUTES(secs)));
+    }
+    else
+    {
+        g_snprintf( buf, buflen, _("%i %s %i %s"),
+                    DAYS(secs),  ngettext("day", "days", DAYS(secs)),
+                    HOURS(secs), ngettext("hr", "hrs", HOURS(secs)));
+    }
+
+    return buf;
 }
 
 char *

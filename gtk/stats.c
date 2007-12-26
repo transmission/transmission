@@ -59,12 +59,12 @@ updateStats( gpointer gdata )
 
     setLabel( ui->one_up_lb, tr_strlsize( buf, one.uploadedBytes, sizeof(buf) ) );
     setLabel( ui->one_down_lb, tr_strlsize( buf, one.downloadedBytes, sizeof(buf) ) );
-    setLabel( ui->one_time_lb, tr_strlsize( buf, one.secondsActive, sizeof(buf) ) );
+    setLabel( ui->one_time_lb, tr_strltime( buf, one.secondsActive, sizeof(buf) ) );
     setLabelFromRatio( ui->one_ratio_lb, one.ratio );
     setLabel( ui->all_sessions_lb, g_strdup_printf( _("Started %d times"), (int)all.sessionCount ) );
     setLabel( ui->all_up_lb, tr_strlsize( buf, all.uploadedBytes, sizeof(buf) ) );
     setLabel( ui->all_down_lb, tr_strlsize( buf, all.downloadedBytes, sizeof(buf) ) );
-    setLabel( ui->all_time_lb, readabletime( all.secondsActive ) );
+    setLabel( ui->all_time_lb, tr_strltime( buf, all.secondsActive, sizeof(buf) ) );
     setLabelFromRatio( ui->all_ratio_lb, all.ratio );
 
     return TRUE;

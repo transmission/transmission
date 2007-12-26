@@ -309,9 +309,9 @@ tr_torrent_status_str ( TrTorrent * gtor )
             if( eta < 0 )
                 top = g_strdup_printf( _("Stalled (%.1f%%)"), prog );
             else {
-                char * timestr = readabletime(eta);
+                char timestr[128];
+                tr_strltime( timestr, eta, sizeof( timestr ) );
                 top = g_strdup_printf( _("%s remaining (%.1f%%)"), timestr, prog );
-                g_free(timestr);
             }
             break;
 
