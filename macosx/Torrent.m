@@ -1526,7 +1526,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
     
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
-    fGroupValue = groupValue ? [groupValue intValue] : -1;;
+    fGroupValue = groupValue ? [groupValue intValue] : -1;
     
     fError = NO;
     

@@ -1,38 +1,44 @@
-/* Torrent -> progress string */
+﻿/* Torrent -> progress string */
 " - %@ remaining" = " - rimanenti %@";
+
+/* Torrent -> status string */
+" - DL: %@, UL: %@" = " - DL: %1$@, UL: %2$@";
 
 /* Torrent -> progress string */
 " - remaining time unknown" = " - tempo rimanente sconosciuto";
 
+/* Torrent -> status string */
+" - UL: %@" = " - UL: %@";
+
 /* Removal confirm panel -> message part 2 */
-" Once removed, continuing the transfers will require the torrent files. Do you really want to remove them?" = "Qualora rimossi, i file torrent saranno richiesti per proseguire col trasferimento. Si desidera rimuoverli veramente?";
+" Once removed, continuing the transfers will require the torrent files." = "Qualora rimossi, i file torrent saranno richiesti per proseguire nel trasferimento.";
+
+/* stats total */
+" total" = " totali";
 
 /* Inspector -> Activity tab -> progress */
-"%.2f%% (%.2f%% selected)" = "%1$.2f%% (%2$.2f%% selezionati)";
+"%.2f%% (%.2f%% selected)" = "%1$.2f%% (selezionati %2$.2f%%)";
 
 /* Inspector -> Files tab -> file status string */
-"%.2f%% of %@" = "%1$.2f%% di %2$@";
+"%.2f%% of %@" = "%1$.2f%% su %2$@";
 
 /* Inspector -> Activity tab -> have */
-"%@ (%@ verified)" = "%1$@ (%2$@ verificati)";
+"%@ (%@ verified)" = "%1$@ (verificati %2$@)";
 
 /* Torrent -> progress string */
-"%@ of %@ (%.2f%%)" = "%1$@ di %2$@ (%3$.2f%%)";
+"%@ of %@ (%.2f%%)" = "%1$@ su %2$@ (%3$.2f%%)";
 
 /* Torrent -> progress string */
-"%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)" = "%1$@ di %2$@ (%3$.2f%%), inviati %4$@ (quota: %5$@)";
+"%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)" = "%1$@ su %2$@ (%3$.2f%%), inviati %4$@ (quota: %5$@)";
 
 /* Torrent -> progress string */
-"%@ of %@ selected (%.2f%%)" = "%1$@ di %2$@ selezionati (%3$.2f%%)";
+"%@ of %@ selected (%.2f%%)" = "selezionati %1$@ su %2$@ (%3$.2f%%)";
 
 /* Torrent -> progress string */
-"%@ selected, uploaded %@ (Ratio: %@)" = "%1$@ selezionati, inviati %2$@ (quota: %3$@)";
-
-/* Inspector -> above tabs -> total size (several torrents selected) */
-"%@ Total" = "%@ Totale";
+"%@ selected, uploaded %@ (Ratio: %@)" = "selezionati %1$@, inviati %2$@ (quota: %3$@)";
 
 /* Inspector -> Activity tab -> have */
-"%@ verified" = "%@ verificati";
+"%@ verified" = "verificati %@";
 
 /* Create torrent -> info */
 "%@, %@ each" = "%1$@, %2$@ ciascuno";
@@ -46,28 +52,37 @@
 /* Inspector -> Peers tab -> peers */
 "%d Connected" = "%d connessi";
 
+/* stats window -> running time */
+"%d days" = "%d giorni";
+
 /* Torrent -> remaining time */
-"%d days %d hr" = "%1$d giorni %2$d ore";
+"%d days %02d hr" = "%1$d giorni %2$d ore";
 
 /* Dock item - Downloading */
 "%d Downloading" = "%d in download";
 
-/* Inspector -> Files tab -> bottom text (number of files) */
-"%d files total" = "%d file totali";
-
 /* Drag overlay -> torrents
-   Create torrent -> info */
-
+   Create torrent -> info
+   Inspector -> above tabs -> selected torrents */
 "%d Files, " = "%d file, ";
 
+/* Inspector -> above tabs -> selected torrents */
+"%d Files, %@ Total" = "%1$d file, %2$@ totali";
+
+/* stats window -> running time */
+"%d hr" = "%d ore";
+
 /* Torrent -> remaining time */
-"%d hr %d min" = "%1$d ore %2$d min";
+"%d hr %02d min" = "%1$d ore %2$d min";
 
 /* Inspector -> Peers tab -> peers */
 "%d incoming" = "%d in arrivo";
 
+/* stats window -> running time */
+"%d min" = "%d min";
+
 /* Torrent -> remaining time */
-"%d min %d sec" = "%1$d min %2$d sec";
+"%d min %02d sec" = "%1$d min %2$d sec";
 
 /* Inspector -> Peers tab -> peers */
 "%d PEX" = "%d PEX";
@@ -81,6 +96,9 @@
 /* Dock item - Seeding */
 "%d Seeding" = "%d in seed";
 
+/* stats window -> times opened */
+"%d times" = "%d volte";
+
 /* Drag overlay -> torrents */
 "%d Torrent Files" = "%d file torrent";
 
@@ -90,47 +108,56 @@
 /* Inspector -> Peers tab -> peers */
 "%d tracker" = "%d tracker";
 
-/* Filter Bar Button -> tool tip
-   Status bar transfer count */
-
+/* Filter Bar Button -> tool tip */
 "%d Transfers" = "%d trasferimenti";
+
+/* Status bar transfer count */
+"%d transfers" = "%d trasferimenti";
 
 /* File size */
 "%lld bytes" = "%lld byte";
 
+/* stats -> bytes
+   Inspector -> above tabs -> selected torrents */
+"%u bytes" = "%u byte";
+
 /* Torrent -> error string unreadable */
 "(unreadable error)" = "(errore illeggibile)";
 
-/* Torrent -> remaining time */
-"1 day %d hr" = "1 giorno %d ore";
+/* stats window -> running time */
+"1 day" = "1 giorno";
 
-/* Inspector -> Files tab -> bottom text (number of files) */
-"1 file total" = "1 file totale";
+/* Torrent -> remaining time */
+"1 day %02d hr" = "1 giorno %02d ore";
 
 /* Drag overlay -> torrents
-   Create torrent -> info */
-
-"1 File, " = "1 File, ";
+   Create torrent -> info
+   Inspector -> above tabs -> selected torrents */
+"1 File, " = "1 file, ";
 
 /* Create torrent -> info */
 "1 piece" = "1 parte";
 
-/* Filter Bar Button -> tool tip
-   Status bar transfer count */
+/* stats window -> times opened */
+"1 time" = "1 volta";
 
+/* Filter Button -> tool tip */
 "1 Transfer" = "1 trasferimento";
 
+/* Status bar transfer count */
+"1 transfer" = "1 trasferimento";
+
 /* Move folder cannot be used alert -> message */
-"\"%@\" cannot be used. The file will remain in its current location." = "\"%@\" non può essere usato. Il file rimarrà nella sua attuale posizione.";
+"\"%@\" cannot be used. The file will remain in its current location." = "\"%@\" non può essere usato. Il file rimarrà nella sua posizione attuale.";
 
 /* Folder cannot be used alert -> message */
 "\"%@\" cannot be used. The transfer will be paused." = "\"%@\" non può essere usato. Il trasferimento sarà messo in pausa.";
 
 /* Create torrent -> file already exists warning -> warning */
-"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent." = "Un file col nome \"%1$@\" esiste già nella directory \"%2$@\". Scegli un nuovo nome o directory per creare il torrent.";
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent." = "Un file denominato \"%1$@\" esiste già nella cartella \"%2$@\". Scegli un nuovo nome o una nuova cartella per creare il torrent.";
 
 /* Move inside itself alert -> title */
-"A folder cannot be moved to inside itself." = "Una cartella non può essere spostata dentro se stessa.";
+"A folder cannot be moved to inside itself." = "Una cartella non può essere spostata dentro sé stessa.";
 
 /* Create torrent -> zero size -> warning */
 "A torrent file cannot be created for files with no size." = "Un file torrent non può essere creato per file di dimensione nulla.";
@@ -141,19 +168,26 @@
 /* Open duplicate alert -> title */
 "A transfer of \"%@\" is already running." = "Un trasferimento di \"%@\" è già in corso.";
 
-/* Inspector -> tab tooltip
-   Inspector -> title */
-
+/* Inspector -> title */
 "Activity" = "Attività";
 
 /* Preferences -> Advanced toolbar item title */
-"Advanced" = "Avanzato";
+"Advanced" = "Avanzate";
 
-/* Filter Bar Button -> title */
-"All" = "Tutti";
+/* Groups -> Button */
+"All Groups" = "Tutti i gruppi";
 
 /* Torrent file disk space alert -> button */
 "Always Download" = "Scarica sempre";
+
+/* All toolbar item -> label */
+"Apply All" = "Applica tutti";
+
+/* Selected toolbar item -> label */
+"Apply Selected" = "Applica selezionati";
+
+/* inspector -> peer table -> header tool tip */
+"Available" = "Disponibile";
 
 /* Transfer speed (Bytes per second) */
 "B/s" = "B/s";
@@ -162,16 +196,17 @@
 "Bandwidth" = "Banda";
 
 /* Growl notification description */
-"Bandwidth settings changed" = "Impostazioni banda modificate";
+"Bandwidth settings changed" = "Modificate impostazioni banda";
 
-/* Removal confirm panel -> button
-   Confirm Quit panel -> button */
+/* Groups -> Name */
+"Blue" = "Blu";
 
+/* Confirm Quit panel -> button
+   Removal confirm panel -> button */
 "Cancel" = "Annulla";
 
 /* Create torrent -> no url warning -> warning
    Create torrent -> http warning -> warning */
-
 "Change the tracker address to create the torrent." = "Modifica l'indirizzo del tracker per creare il torrent.";
 
 /* Torrent -> status string */
@@ -181,7 +216,10 @@
 "Checking port status" = "Verifica stato della porta";
 
 /* Folder cannot be used alert -> location button */
-"Choose New Location" = "Scegliere nuova posizione";
+"Choose New Location" = "Scegli una nuova posizione";
+
+/* Groups -> Color Button */
+"Color" = "Colore";
 
 /* Confirm Quit panel -> title */
 "Confirm Quit" = "Confermare uscita";
@@ -210,9 +248,6 @@
 /* Removal confirm panel -> title */
 "Confirm removal of \"%@\" from the transfer list." = "Confermare rimozione di \"%@\" dalla lista.";
 
-/* Debug log alert -> informative message */
-"Continuous use at this level might increase memory usage. This setting can be changed in the Message Log window (accessible from the Window menu)." = "Un utilizzo ininterrotto a questo livello potrebbe incrementare l'impiego della memoria. Questa impostazione può essere modificata nella finestra Log messaggi (accessibile dal menu Finestra).";
-
 /* Torrent file copy alert -> title */
 "Copy of \"%@\" Cannot Be Created" = "Impossibile creare copia di \"%@\"";
 
@@ -222,29 +257,30 @@
 /* Drag overlay -> file */
 "Create a Torrent File" = "Crea un file torrent";
 
+/* Create torrent -> select file
+   Create toolbar item -> palette label */
+"Create Torrent File" = "Crea file torrent";
+
 /* Create toolbar item -> tooltip */
 "Create torrent file" = "Crea file torrent";
-
-/* Create toolbar item -> palette label
-   Create torrent -> select file */
-
-"Create Torrent File" = "Crea file torrent";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Creazione di \"%@\" fallita.";
 
+/* status bar -> status label (2 spaces between) */
+"DL: %@  UL: %@" = "DL: %1$@  UL: %2$@";
+
 /* Torrent -> status string */
 "DL: %@, UL: %@" = "DL: %1$@, UL: %2$@";
 
-/* Debug log alert -> button
-   Open duplicate alert -> button */
-
+/* Open duplicate alert -> button */
 "Don't Alert Again" = "Non avvisare nuovamente";
 
 /* Inspector -> files tab -> tooltip */
 "Don't Download" = "Non scaricare";
 
-/* Inspector -> files tab -> tooltip */
+/* Inspector -> files tab -> tooltip
+   inspector -> file table -> header tool tip */
 "Download" = "Download";
 
 /* Torrent file disk space alert -> button */
@@ -256,37 +292,32 @@
 /* Inspector -> files tab -> tooltip */
 "Download Some" = "Scarica alcuni";
 
-/* Filter Bar Button -> title
-   Torrent -> status string */
-
+/* Torrent -> status string */
 "Downloading" = "In download";
 
 /* Torrent -> status string */
-"Downloading from %d of %d peers" = "In download da %1$d di %2$d peer";
+"Downloading from %d of %d peers" = "In download da %1$d su %2$d peer";
 
 /* Torrent -> status string */
-"Downloading from %d of 1 peer" = "In download da %d di 1 peer";
+"Downloading from %d of 1 peer" = "In download da %d su 1 peer";
 
-/* Inspector -> Peers tab -> table row tooltip */
+/* Inspector -> peer -> status */
+"Downloading from peer" = "In download dal peer";
+
+/* inspector -> peer table -> header tool tip */
+"Downloading From Peer" = "In download dal peer";
+
+/* inspector -> peer table -> header tool tip
+   Inspector -> Peers tab -> table row tooltip */
 "Encrypted Connection" = "Connessione criptata";
-
-/* Transfer speed invalid
-   Ratio invalid */
-
-"error" = "errore";
 
 /* Torrent -> status string */
 "Error" = "Errore";
 
-/* Preferences -> Advanced -> port map status */
-"Error mapping port" = "Errore nel mappare la porta";
-
 /* Torrent -> status string */
 "Error: " = "Errore: ";
 
-/* Inspector -> tab tooltip
-   Inspector -> title */
-
+/* Inspector -> title */
 "Files" = "File";
 
 /* Filter toolbar item -> label */
@@ -308,12 +339,25 @@
 "GB" = "GB";
 
 /* Preferences -> General toolbar item title */
-"General" = "Generale";
+"General" = "Generali";
 
-/* Inspector -> tab tooltip
-   Inspector -> title */
-
+/* Inspector -> title */
 "General Info" = "Informazioni generali";
+
+/* Groups -> Name */
+"Gray" = "Grigio";
+
+/* Groups -> Name */
+"Green" = "Verde";
+
+/* Groups -> Button */
+"Group: " = "Gruppo:";
+
+/* Groups -> Button */
+"Group: No Label" = "Gruppo: nessuna etichetta";
+
+/* Inspector -> peer -> status */
+"Handshaking" = "Handshake in corso";
 
 /* View menu -> Filter Bar */
 "Hide Filter Bar" = "Nascondi barra filtro";
@@ -327,9 +371,7 @@
 /* Inspector -> files tab -> tooltip */
 "High Priority" = "Priorità alta";
 
-/* Inspector -> Peers tab -> peers
-   Inspector -> Files tab -> bottom text (number of files) */
-
+/* Inspector -> Peers tab -> peers */
 "info not available" = "informazione non disponibile";
 
 /* Inspector toolbar item -> label */
@@ -344,10 +386,9 @@
 /* About window -> license button */
 "License" = "Licenza";
 
-/* torrent action context menu -> upload/download limit
-   Action context menu -> upload/download limit */
-
-"Limit (%d KB/s)" = "Limite (%d KB/s)";
+/* Action context menu -> upload/download limit
+   torrent action context menu -> upload/download limit */
+"Limit (%d KB/s)" = "Limitata (%d KB/s)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Il log non può essere salvato";
@@ -361,13 +402,15 @@
 /* Inspector -> files tab -> tooltip */
 "Multiple Priorities" = "Priorità multiple";
 
-/* No Ratio
-   Torrent -> status string */
-
+/* Torrent -> status string
+   No Ratio */
 "N/A" = "N/D";
 
 /* Inspector -> above tabs -> selected torrents */
 "No Torrents Selected" = "Nessun torrent selezionato";
+
+/* Groups -> Menu */
+"None" = "Nessuno";
 
 /* Inspector -> files tab -> tooltip */
 "Normal Priority" = "Priorità normale";
@@ -375,84 +418,72 @@
 /* Torrent file disk space alert -> title */
 "Not enough remaining disk space to download \"%@\" completely." = "Spazio su disco insufficiente per scaricare completamente \"%@\".";
 
-/* Debug log alert -> button
-   Open duplicate alert -> button
-   Download not a torrent -> button
-   Create torrent -> http warning -> button
-   Save log alert panel -> button
-   Create torrent -> zero size -> button
-   Move folder cannot be used alert -> button
-   Create torrent -> no url warning -> button
-   Create torrent -> file already exists warning -> button
-   Folder cannot be used alert -> button
-   Torrent file copy alert -> button
-   About window -> license close button
+/* Torrent file copy alert -> button
    Move error alert -> button
+   Create torrent -> file already exists warning -> button
+   Save log alert panel -> button
+   Folder cannot be used alert -> button
+   Create torrent -> no url warning -> button
+   Torrent download failed -> button
+   Torrent file disk space alert -> button
    Create torrent -> failed -> button
    Create torrent -> no files -> button
-   Move inside itself alert -> button
-   Torrent file disk space alert -> button
-   Torrent download failed -> button */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   Download not a torrent -> button
+   About window -> license close button
+   Open duplicate alert -> button
+   Create torrent -> http warning -> button
+   Create torrent -> zero size -> button
+   Move folder cannot be used alert -> button
+   Move inside itself alert -> button */
 "OK" = "Ok";
 
 /* Open toolbar item -> label */
 "Open" = "Apri";
 
-/* Open toolbar item -> tooltip */
-"Open torrent files" = "Apri file torrent";
-
 /* Open toolbar item -> palette label */
 "Open Torrent Files" = "Apri file torrent";
 
-/* Inspector -> tab tooltip
-   Inspector -> title */
+/* Open toolbar item -> tooltip */
+"Open torrent files" = "Apri file torrent";
 
+/* Inspector -> title */
 "Options" = "Opzioni";
 
-/* Pause toolbar item -> label */
-"Pause" = "Metti in pausa";
+/* Groups -> Name */
+"Orange" = "Arancione";
 
-/* Pause All toolbar item -> label */
+/* All toolbar item -> palette label */
+"Pause / Resume All" = "Pausa / Riprendi tutti";
+
+/* Selected toolbar item -> palette label */
+"Pause / Resume Selected" = "Pausa / Riprendi selezionati";
+
+/* All toolbar item -> label */
 "Pause All" = "Metti tutti in pausa";
 
-/* Pause All toolbar item -> tooltip */
+/* All toolbar item -> tooltip */
 "Pause all transfers" = "Metti in pausa tutti i trasferimenti";
 
-/* Pause toolbar item -> palette label */
+/* Selected toolbar item -> label */
 "Pause Selected" = "Metti in pausa selezionati";
 
-/* Pause toolbar item -> tooltip */
+/* Selected toolbar item -> tooltip */
 "Pause selected transfers" = "Metti in pausa i trasferimenti selezionati";
 
-/* Filter Bar Button -> title
-   Torrent -> status string */
+/* Torrent Table -> tooltip */
+"Pause the transfer." = "Metti in pausa il trasferimento.";
 
+/* Torrent -> status string */
 "Paused" = "In pausa";
 
-/* Inspector -> tab tooltip
-   Inspector -> title */
+/* Inspector -> peer -> status */
+"Peer wants our data" = "Il peer vuole i nostri dati";
 
+/* Inspector -> peer -> status */
+"Peer will not send us data" = "Il peer non ci invierà i dati";
+
+/* Inspector -> title */
 "Peers" = "Peer";
-
-/* Inspector -> pex check */
-"PEX can only be toggled on paused public torrents." = "PEX può essere commutato solo con torrent pubblici in pausa.";
 
 /* Preferences -> Advanced -> port status */
 "Port is closed" = "La porta è chiusa";
@@ -460,44 +491,49 @@
 /* Preferences -> Advanced -> port status */
 "Port is open" = "La porta è aperta";
 
-/* Preferences -> Advanced -> port status */
-"Port is stealth" = "La porta è occultata";
-
-/* Preferences -> Advanced -> port map status */
-"Port successfully mapped" = "Porta mappata con successo";
-
 /* Inspector -> Peers tab -> table row tooltip */
 "Port: %d" = "Porta: %d";
 
 /* Inspector -> Peers tab -> table row tooltip */
 "Port: N/A" = "Porta: N/D";
 
+/* inspector -> file table -> header tool tip */
+"Priority" = "Priorità";
+
 /* Inspector -> files tab -> tooltip */
 "Priority Not Available" = "Priorità non disponibile";
 
-/* Inspector -> is private torrent */
-"Private Torrent, PEX disabled" = "Torrent privato, PEX disabilitato";
+/* Inspector -> private torrent */
+"Private Torrent, PEX automatically disabled" = "Torrent privato, PEX disabilitato automaticamente";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Progress: %.1f%%" = "Progresso: %.1f%%";
+"Progress: %.1f%%" = "Progressione: %.1f%%";
 
-/* Inspector -> is not private torrent */
+/* Inspector -> private torrent */
 "Public Torrent" = "Torrent pubblico";
+
+/* Groups -> Name */
+"Purple" = "Viola";
 
 /* Transmission already running alert -> button
    Confirm Quit panel -> button */
-
 "Quit" = "Esci";
 
-/* Torrent -> status string */
+/* Torrent -> status string
+   status bar -> status label */
 "Ratio: " = "Quota: ";
 
 /* Torrent -> status string */
 "Ratio: %@, UL: %@" = "Quota: %1$@, UL: %2$@";
 
+/* Groups -> Name */
+"Red" = "Rosso";
+
+/* Inspector -> peer -> status */
+"Refusing to send data to peer" = "Rifiuto di inviare dati al peer";
+
 /* Removal confirm panel -> button
    Remove toolbar item -> label */
-
 "Remove" = "Rimuovi";
 
 /* Remove toolbar item -> palette label */
@@ -506,24 +542,31 @@
 /* Remove toolbar item -> tooltip */
 "Remove selected transfers" = "Rimuovi trasferimenti selezionati";
 
-/* Resume toolbar item -> label */
-"Resume" = "Riprendi";
+/* Inspector -> peer -> status */
+"Requesting data from peer" = "Richiesta dati dai peer";
 
-/* Resume All toolbar item -> label */
+/* All toolbar item -> label */
 "Resume All" = "Riprendi tutti";
 
-/* Resume All toolbar item -> tooltip */
+/* All toolbar item -> tooltip */
 "Resume all transfers" = "Riprendi tutti i trasferimenti";
 
-/* Resume toolbar item -> palette label */
+/* Selected toolbar item -> label */
 "Resume Selected" = "Riprendi selezionati";
 
-/* Resume toolbar item -> tooltip */
+/* Selected toolbar item -> tooltip */
 "Resume selected transfers" = "Riprendi i trasferimenti selezionati";
 
-/* Filter Bar Button -> title
-   Torrent -> status string */
+/* Torrent Table -> tooltip */
+"Resume the transfer right away." = "Riprendi il trasferimento immediatamente.";
 
+/* Torrent Table -> tooltip */
+"Resume the transfer." = "Riprendi il trasferimento.";
+
+/* Torrent Table -> tooltip */
+"Reveal the data file in Finder." = "Mostra il file dati nel Finder.";
+
+/* Torrent -> status string */
 "Seeding" = "In seed";
 
 /* Torrent -> status string */
@@ -533,22 +576,18 @@
 "Seeding Complete" = "Seed completato";
 
 /* Torrent -> status string */
-"Seeding to %d of %d peers" = "In seed verso %1$d di %2$d peer";
+"Seeding to %d of %d peers" = "In seed verso %1$d su %2$d peer";
 
 /* Torrent -> status string */
-"Seeding to %d of 1 peer" = "In seed verso %d di 1 peer";
+"Seeding to %d of 1 peer" = "In seed verso %d su 1 peer";
 
-/* Default incomplete folder cannot be used alert -> prompt
-   Create torrent -> select file
-   Default folder cannot be used alert -> prompt
-   Open torrent -> prompt
+/* Folder cannot be used alert -> prompt
    Move torrent -> prompt
-   Folder cannot be used alert -> prompt */
-
-
-
-
-
+   Open torrent -> prompt
+   Create torrent -> select file
+   Create torrent -> location sheet -> button
+   Default folder cannot be used alert -> prompt
+   Default incomplete folder cannot be used alert -> prompt */
 "Select" = "Seleziona";
 
 /* Create torrent -> select file */
@@ -556,8 +595,10 @@
 
 /* Folder cannot be used alert -> select destination folder
    Open torrent -> select destination folder */
-
 "Select the download folder for \"%@\"" = "Selezionare la cartella di download per \"%@\"";
+
+/* Create torrent -> location sheet -> message */
+"Select the name and location for the torrent file." = "Selezionare nome e posizione per il file torrent.";
 
 /* Move torrent -> select destination folder */
 "Select the new folder for %d data files." = "Selezionare la nuova cartella per i file dati di %d.";
@@ -567,6 +608,9 @@
 
 /* Main window -> 1st bottom left button (action) tooltip */
 "Shortcuts for changing global settings." = "Scorciatoie per cambiare le impostazioni globali.";
+
+/* Torrent Table -> tooltip */
+"Shortcuts for changing transfer settings." = "Scorciatoie per cambiare le impostazioni dei trasferimenti.";
 
 /* View menu -> Filter Bar */
 "Show Filter Bar" = "Mostra barra filtro";
@@ -589,10 +633,12 @@
 /* Torrent -> status string */
 "Stalled, " = "In stallo, ";
 
-/* torrent action context menu -> ratio stop
-   Action context menu -> ratio stop */
+/* Action context menu -> ratio stop
+   torrent action context menu -> ratio stop */
+"Stop at Ratio (%.2f)" = "Ferma a quota (%.2f)";
 
-"Stop at Ratio (%.2f)" = "Ferma alla quota (%.2f)";
+/* Torrent Table -> tooltip */
+"Stop waiting to start." = "Fermo in attesa di partire.";
 
 /* File size */
 "TB" = "TB";
@@ -604,17 +650,13 @@
 "The folder for downloading \"%@\" cannot be used." = "La cartella per il download di \"%@\" non può essere utilizzata.";
 
 /* Move folder cannot be used alert -> title */
-"The folder for moving the completed \"%@\" cannot be used." = "La cartella ove spostare \"%@\" non può essere utilizzata.";
+"The folder for moving the completed \"%@\" cannot be used." = "La cartella in cui si vuole spostare \"%@\" non può essere utilizzata.";
 
 /* Default incomplete folder cannot be used alert -> message */
 "The incomplete folder cannot be used. Choose a new location or cancel for none." = "La cartella per gli incompleti non può essere utilizzata. Selezionare una nuova posizione o annullare.";
 
-/* Debug log alert -> message */
-"The Message Log is set to \"Debug\"" = "Il Log messaggi è impostato su \"Debug\"";
-
-/* Move inside itself alert -> message
-   Move error alert -> message */
-
+/* Move error alert -> message
+   Move inside itself alert -> message */
 "The move operation of \"%@\" cannot be done." = "Impossibile eseguire l'operazione di spostamento di \"%@\".";
 
 /* Torrent download failed -> message */
@@ -636,40 +678,40 @@
 "The tracker address must begin with \"http://\"." = "L'indirizzo del tracker deve iniziare per \"http://\".";
 
 /* Torrent file disk space alert -> message */
-"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Il trasferimento sarà messo in pausa. Creare spazio libero in %@ o deselezionare alcuni file nel visualizzatore torrent per continuare.";
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Il trasferimento sarà messo in pausa. Liberare spazio in %@ o deselezionare alcuni file nel visualizzatore del torrent per continuare.";
 
 /* Removal confirm panel -> message part 1 */
 "There are %d active transfers." = "Ci sono %d trasferimenti attivi.";
 
 /* Confirm Quit panel -> message */
-"There are %d active transfers. Do you really want to quit?" = "Ci sono %d trasferimenti attivi. Si desidera veramente uscire?";
+"There are %d active transfers. Do you really want to quit?" = "Ci sono %d trasferimenti in corso. Desideri veramente uscire?";
 
 /* Removal confirm panel -> message part 1 */
-"There are %d transfers (%d active)." = "Ci sono %1$d trasferimenti (%2$d attivi).";
+"There are %d transfers (%d active)." = "Ci sono %1$d trasferimenti (%2$d in corso).";
 
 /* Transmission already running alert -> message */
 "There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Una copia di Transmission è già in esecuzione. Questa copia non potrà essere aperta finchè non verrà chiusa la prima istanza.";
 
 /* Confirm Quit panel -> message */
-"There is an active transfer. Do you really want to quit?" = "È presente un trasferimento attivo. Si desidera veramente uscire?";
+"There is an active transfer. Do you really want to quit?" = "È in corso un trasferimento. Desideri veramente uscire?";
 
 /* Create torrent -> no files -> warning */
-"There must be at least one file in a folder to create a torrent file." = "Per creare un file torrent è richiesto che nella cartella sia presente almeno un file.";
+"There must be at least one file in a folder to create a torrent file." = "Per creare un file torrent occorre che nella cartella sia presente almeno un file.";
 
 /* Save log alert panel -> message */
-"There was a problem creating the file \"%@\"." = "È occorso un errore creando il file \"%@\".";
+"There was a problem creating the file \"%@\"." = "Si è verificao un errore creando il file \"%@\".";
 
 /* Move error alert -> title */
-"There was an error moving the data file." = "È occorso un errore spostando il file dati.";
+"There was an error moving the data file." = "Si è verificato un errore spostando il file dati.";
 
 /* Create torrent -> failed -> warning */
-"There was an error parsing the data file. The torrent file was not created." = "È occorso un errore analizzando i file dati. Il file torrent non è stato creato.";
+"There was an error parsing the data file. The torrent file was not created." = "Si è verificato un errore analizzando il file dati. Il file torrent non è stato creato.";
 
 /* Create torrent -> no files -> title */
-"This folder contains no files." = "Questa cartella non contiene file.";
+"This folder contains no files." = "Questa cartella non contiene alcun file.";
 
 /* Removal confirm panel -> message */
-"This transfer is active. Once removed, continuing the transfer will require the torrent file. Do you really want to remove it?" = "Questo trasferimento è attivo. Una volta rimosso, il file torrent sarà richiesto per proseguire col trasferimento. Si desidera veramente rimuoverlo?";
+"This transfer is active. Once removed, continuing the transfer will require the torrent file." = "Questo trasferimento è in corso. Qualora rimosso, il file torrent sarà richiesto per proseguire nel trasferimento.";
 
 /* Filter toolbar item -> palette label */
 "Toggle Filter" = "Mostra/nascondi filtro";
@@ -685,7 +727,6 @@
 
 /* Torrent download error -> title
    Download not a torrent -> title */
-
 "Torrent download failed" = "Fallito download torrent";
 
 /* Growl notification title */
@@ -694,11 +735,14 @@
 /* Inspector -> title */
 "Torrent Inspector" = "Visualizzatore torrent";
 
-/* Status bar -> total download */
-"Total DL: " = "DL totale: ";
+/* Status Bar -> speed tooltip */
+"Total download speed" = "Velocità complessiva download";
 
-/* Status bar -> total upload */
-"Total UL: " = "UL totale: ";
+/* stats total */
+"Total N/A" = "Totale N/D";
+
+/* Status Bar -> speed tooltip */
+"Total upload speed" = "Velocità complessiva upload";
 
 /* Preferences -> Transfers toolbar item title */
 "Transfers" = "Trasferimenti";
@@ -718,14 +762,26 @@
 /* Save log panel -> default file name */
 "untitled" = "senza titolo";
 
+/* Inspector -> peer -> status */
+"Uploading to peer" = "Invio al peer";
+
+/* inspector -> peer table -> header tool tip */
+"Uploading To Peer" = "Invio al peer";
+
 /* Torrent -> status string */
 "Waiting to check existing data" = "In attesa di verificare i dati esistenti";
 
 /* Torrent -> status string */
 "Waiting to download" = "In attesa di scaricare";
 
+/* Inspector -> peer -> status */
+"Waiting to request data from peer" = "In attesa di richiedere i dati dal peer";
+
 /* Torrent -> status string */
 "Waiting to seed" = "In attesa di fare seed";
 
 /* Drag overlay -> url */
 "Web Address" = "Sito web";
+
+/* Groups -> Name */
+"Yellow" = "Giallo";

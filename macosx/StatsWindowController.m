@@ -115,22 +115,24 @@ tr_handle * fLib;
 - (NSString *) timeString: (uint64_t) seconds
 {
     NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: 3];
+    uint64_t remaining = seconds;
     
     if (seconds >= 86400) //24 * 60 * 60
     {
-        int days = seconds / 86400;
+        int days = remaining / 86400;
         if (days == 1)
             [timeArray addObject: NSLocalizedString(@"1 day", "stats window -> running time")];
         else
             [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d days", "stats window -> running time"), days]];
-        seconds %= 86400;
+        remaining %= 86400;
     }
     if (seconds >= 3600) //60 * 60
     {
-        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d hr", "stats window -> running time"), seconds / 3600]];
-        seconds %= 3600;
+        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d hr", "stats window -> running time"),
+                                remaining / 3600]];
+        remaining %= 3600;
     }
-    [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d min", "stats window -> running time"), seconds / 60]];
+    [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d min", "stats window -> running time"), remaining / 60]];
     
     return [timeArray componentsJoinedByString: @" "];
 }
