@@ -28,6 +28,8 @@
 #define BOTTOM_PADDING 2.0
 #define BETWEEN_PADDING 2.0
 
+#define BADGE_HEIGHT 30.0
+
 @interface BadgeView (Private)
 
 - (void) badge: (NSImage *) badge string: (NSString *) string atHeight: (float) height;
@@ -54,6 +56,7 @@
 - (void) dealloc
 {
     [fAttributes release];
+    [fQuitBadge release];
     [super dealloc];
 }
 
@@ -63,8 +66,22 @@
     
     if (fQuitting)
     {
-        #warning make better
-        //[self badge: [NSImage imageNamed: @"UploadBadge"] string: @"Quitting" atHeight: 0.0];
+        if (!fQuitBadge)
+        {
+            NSRect badgeRect = NSMakeRect(0.0, 0.0, rect.size.width, BADGE_HEIGHT);
+            NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: badgeRect xRadius: 15.0 yRadius: 15.0];
+            
+            fQuitBadge = [[NSImage alloc] initWithSize: badgeRect.size];
+            [fQuitBadge lockFocus];
+            
+            [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
+            [bp fill];
+            
+            [fQuitBadge unlockFocus];
+        }
+        
+        [self badge: fQuitBadge string: NSLocalizedString(@"Quitting", "Dock Badger -> quit message")
+                atHeight: (rect.size.height - BADGE_HEIGHT) * 0.5];
         return;
     }
     
