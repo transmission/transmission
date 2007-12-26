@@ -123,9 +123,9 @@ spun_cb( GtkSpinButton * w, gpointer core )
 }
 
 static GtkWidget*
-new_spin_button( const char * key, gpointer core, int low, int high )
+new_spin_button( const char * key, gpointer core, int low, int high, int step )
 {
-    GtkWidget * w = gtk_spin_button_new_with_range( low, high, 1 );
+    GtkWidget * w = gtk_spin_button_new_with_range( low, high, step );
     g_object_set_data_full( G_OBJECT(w), PREFS_KEY, g_strdup(key), g_free );
     gtk_spin_button_set_digits( GTK_SPIN_BUTTON(w), 0 );
     gtk_spin_button_set_value( GTK_SPIN_BUTTON(w), pref_int_get(key) );
@@ -272,14 +272,14 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 
         s = _("_Limit Upload Speed (KiB/s)");
         w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
-        w2 = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX );
+        w2 = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_double_control( t, &row, w, w2 );
 
         s = _("Li_mit Download Speed (KiB/s)");
         w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
-        w2 = new_spin_button( PREF_KEY_DL_LIMIT, core, 0, INT_MAX );
+        w2 = new_spin_button( PREF_KEY_DL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_double_control( t, &row, w, w2 );
@@ -307,9 +307,9 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     hig_workarea_add_section_title( t, &row, _( "Peer Connections" ) );
     hig_workarea_add_section_spacer(t , row, 2 );
   
-        w = new_spin_button( PREF_KEY_MAX_PEERS_GLOBAL, core, 1, 3000 );
+        w = new_spin_button( PREF_KEY_MAX_PEERS_GLOBAL, core, 1, 3000, 5 );
         hig_workarea_add_row( t, &row, _( "Global maximum connected peers:" ), w, NULL );
-        w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300 );
+        w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300, 5 );
         hig_workarea_add_row( t, &row, _( "Maximum connected peers for new torrents:" ), w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
@@ -322,7 +322,7 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
         gtk_tooltips_set_tip( GTK_TOOLTIPS( tips ), w, _( "NAT traversal uses either NAT-PMP or UPnP" ), NULL );
 
         h = gtk_hbox_new( FALSE, GUI_PAD );
-        w2 = new_spin_button( PREF_KEY_PORT, core, 1, INT_MAX );
+        w2 = new_spin_button( PREF_KEY_PORT, core, 1, INT_MAX, 1 );
         gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
         l = gtk_label_new( NULL );
         gtk_misc_set_alignment( GTK_MISC(l), 0.0f, 0.5f );
