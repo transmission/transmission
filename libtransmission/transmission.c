@@ -349,18 +349,6 @@ tr_torrentCount( tr_handle * h )
     return h->torrentCount;
 }
 
-void
-tr_torrentIterate( tr_handle * h, tr_callback_t func, void * d )
-{
-    tr_torrent * tor, * next;
-
-    for( tor = h->torrentList; tor; tor = next )
-    {
-        next = tor->next;
-        func( tor, d );
-    }
-}
-
 static void
 tr_closeImpl( void * vh )
 {

@@ -235,15 +235,7 @@ tr_handle_status * tr_handleStatus( tr_handle * );
 int tr_torrentCount( tr_handle * h );
 
 
-/***********************************************************************
- * tr_torrentIterate
- ***********************************************************************
- * Iterates on open torrents
- **********************************************************************/
 typedef struct tr_torrent tr_torrent;
-typedef void (*tr_callback_t) ( tr_torrent *, void * );
-void tr_torrentIterate( tr_handle *, tr_callback_t, void * );
-
 
 /***********************************************************************
 *** Speed Limits
