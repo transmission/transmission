@@ -700,48 +700,86 @@ getPreferredPieces( Torrent     * t,
 static uint64_t*
 getPreferredBlocks( Torrent * t, uint64_t * setmeCount )
 {
+    int s;
     uint32_t i;
     uint32_t pieceCount;
+    uint32_t blockCount;
+    uint32_t unreqCount[3], reqCount[3];
     uint32_t * pieces;
-    uint64_t *req, *unreq, *ret, *walk;
-    int reqCount, unreqCount;
+    uint64_t * ret, * walk;
+    uint64_t * unreq[3], *req[3];
     const tr_torrent * tor = t->tor;
 
     assert( torrentIsLocked( t ) );
 
     pieces = getPreferredPieces( t, &pieceCount );
 
-    req = tr_new( uint64_t, pieceCount *  tor->blockCountInPiece );
-    reqCount = 0;
-    unreq = tr_new( uint64_t, pieceCount *  tor->blockCountInPiece );
-    unreqCount = 0;
+    /**
+     * Now we walk through those preferred pieces to find all the blocks
+     * are still missing from them.  We put unrequested blocks first,
+     * of course, but by including requested blocks afterwards, endgame
+     * handling happens naturally.
+     *
+     * By doing this once per priority we also effectively get an endgame
+     * mode for each priority level.  The helps keep high priority files
+     * from getting stuck at 99% due of unresponsive peers.
+     */
 
-    for( i=0; i<pieceCount; ++i ) {
+    /* make temporary bins for the four tiers of blocks */
+    for( i=0; i<3; ++i ) {
+        req[i] = tr_new( uint64_t, pieceCount *  tor->blockCountInPiece );
+        reqCount[i] = 0;
+        unreq[i] = tr_new( uint64_t, pieceCount *  tor->blockCountInPiece );
+        unreqCount[i] = 0;
+    }
+
+    /* sort the blocks into our temp bins */
+    for( i=blockCount=0; i<pieceCount; ++i )
+    {
         const uint32_t index = pieces[i];
+        const int priorityIndex = tor->info.pieces[index].priority + 1;
         const int begin = tr_torPieceFirstBlock( tor, index );
         const int end = begin + tr_torPieceCountBlocks( tor, (int)index );
         int block;
+
         for( block=begin; block<end; ++block )
+        {
             if( tr_cpBlockIsComplete( tor->completion, block ) )
                 continue;
-            else if( tr_bitfieldHas( t->requested, block ) )
-                req[reqCount++] = block;
+
+            ++blockCount;
+
+            if( tr_bitfieldHas( t->requested, block ) )
+            {
+                const uint32_t n = reqCount[priorityIndex]++;
+                req[priorityIndex][n] = block;
+            }
             else
-                unreq[unreqCount++] = block;
+            {
+                const uint32_t n = unreqCount[priorityIndex]++;
+                unreq[priorityIndex][n] = block;
+            }
+        }
     }
 
-    ret = walk = tr_new( uint64_t, unreqCount + reqCount );
-    memcpy( walk, unreq, sizeof(uint64_t) * unreqCount );
-    walk += unreqCount;
-    memcpy( walk, req, sizeof(uint64_t) * reqCount );
-    walk += reqCount;
-    assert( ( walk - ret ) == ( unreqCount + reqCount ) );
-    *setmeCount = walk - ret;
+    /* join the bins together, going from highest priority to lowest so
+     * the the blocks we want to request first will be first in the list */
+    ret = walk = tr_new( uint64_t, blockCount );
+    for( s=2; s>=0; --s ) {
+        memcpy( walk, unreq[s], sizeof(uint64_t) * unreqCount[s] );
+        walk += unreqCount[s];
+        memcpy( walk, req[s], sizeof(uint64_t) * reqCount[s] );
+        walk += reqCount[s];
+    }
+    assert( ( walk - ret ) == blockCount );
+    *setmeCount = blockCount;
 
-    tr_free( req );
-    tr_free( unreq );
+    /* cleanup */
     tr_free( pieces );
-
+    for( i=0; i<3; ++i ) {
+        tr_free( unreq[i] );
+        tr_free( req[i] );
+    }
     return ret;
 }
 
