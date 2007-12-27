@@ -917,68 +917,54 @@ activity_page_new (TrTorrent * gtor)
   int row = 0;
   GtkWidget *t = hig_workarea_create ();
   GtkWidget *l, *w;
-  char name[128];
-  const char * namefmt = "%s:";
 
   a->gtor = gtor;
 
   hig_workarea_add_section_title (t, &row, _("Transfer"));
   hig_workarea_add_section_spacer (t, row, 8);
 
-    g_snprintf (name, sizeof(name), namefmt, _("State"));
     l = a->state_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("State:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Progress"));
     l = a->progress_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Progress:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Have") );
     l = a->have_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Have:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Downloaded"));
     l = a->dl_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Downloaded:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Uploaded"));
     l = a->ul_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Uploaded:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Failed DL"));
     l = a->failed_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Failed DL:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Ratio"));
     l = a->ratio_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Ratio:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Swarm Rate"));
     l = a->swarm_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Swarm Rate:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Error"));
     l = a->err_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Error:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Completeness"));
     w = a->availability_da = gtk_drawing_area_new ();
     gtk_widget_set_usize (w, 0u, 100u);
     g_object_set_data (G_OBJECT(w), "draw-mode", GINT_TO_POINTER(DRAW_PROG));
     g_signal_connect (w, "expose-event", G_CALLBACK(refresh_pieces), gtor);
-    hig_workarea_add_row (t, &row, name, w, NULL);
+    hig_workarea_add_row (t, &row, _("Completeness:"), w, NULL);
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Dates"));
   hig_workarea_add_section_spacer (t, row, 3);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Added"));
     l = a->date_added_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Added:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Last Activity"));
     l = a->last_activity_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Last Activity"), l, NULL);
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_finish (t, &row);
