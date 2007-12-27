@@ -185,8 +185,8 @@ getStatusString( const tr_stat * torStat )
 
         case TR_STATUS_DOWNLOAD:
             g_string_append_printf( gstr,
-                ngettext( _("Downloading from %d of %d connected peer" ),
-                          _("Downloading from %d of %d connected peers" ),
+                ngettext( "Downloading from %d of %d connected peer",
+                          "Downloading from %d of %d connected peers",
                           torStat->peersConnected ),
                 torStat->peersSendingToUs,
                 torStat->peersConnected );
@@ -195,9 +195,9 @@ getStatusString( const tr_stat * torStat )
         case TR_STATUS_DONE:
         case TR_STATUS_SEED:
             g_string_append_printf( gstr,
-                ngettext( _( "Seeding to %d of %d connected peer" ),
-                          _( "Seeding to %d of %d connected peers" ),
-                          torStat->peersGettingFromUs ),
+                ngettext( "Seeding to %d of %d connected peer",
+                          "Seeding to %d of %d connected peers",
+                          torStat->peersConnected ),
                 torStat->peersGettingFromUs,
                 torStat->peersConnected );
             break;
