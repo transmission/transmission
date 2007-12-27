@@ -1077,10 +1077,6 @@ tr_torrentInitFilePriority( tr_torrent   * tor,
     file->priority = priority;
     for( i=file->firstPiece; i<=file->lastPiece; ++i )
       tor->info.pieces[i].priority = calculatePiecePriority( tor, i );
-
-    tr_dbg ( "Setting file #%d (pieces %d-%d) priority to %d (%s)",
-             fileIndex, file->firstPiece, file->lastPiece,
-             priority, tor->info.files[fileIndex].name );
 }
 
 void
