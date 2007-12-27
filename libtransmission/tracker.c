@@ -661,8 +661,6 @@ addCommonHeaders( const tr_tracker * t,
     const tr_tracker_info * address = getCurrentAddress( t );
     snprintf( buf, sizeof(buf), "%s:%d", address->address, address->port );
     evhttp_add_header( req->output_headers, "Host", buf );
-    evhttp_add_header( req->output_headers, "Connection", "close" );
-    evhttp_add_header( req->output_headers, "Content-Length", "0" );
     evhttp_add_header( req->output_headers, "User-Agent",
                                          TR_NAME "/" LONG_VERSION_STRING );
 }
@@ -762,11 +760,11 @@ createScrape( tr_handle * handle, const tr_tracker * tracker )
 
 struct tr_tracker_handle
 {
-    int socketCount;
     unsigned int isShuttingDown : 1;
     tr_timer * pulseTimer;
     tr_list * requestQueue;
     tr_list * scrapeQueue;
+    tr_list * connectionPool;
 };
 
 static int pulse( void * vhandle );
@@ -806,7 +804,7 @@ maybeFreeGlobals( tr_handle * handle )
     int globalsExist = handle->tracker != NULL;
 
     if( globalsExist
-        && ( handle->tracker->socketCount < 1 )
+        && ( handle->tracker->connectionPool == NULL )
         && ( handle->tracker->requestQueue == NULL )
         && ( handle->tracker->scrapeQueue == NULL )
         && ( handle->torrentList== NULL ) )
@@ -831,10 +829,26 @@ freeConnection( void * evcon )
     evhttp_connection_free( evcon );
     return FALSE;
 }
+
+static int
+connectionPoolCompare( const void * a, const void * b )
+{
+    return a != b;
+}
+
 static void
 connectionClosedCB( struct evhttp_connection * evcon, void * vhandle )
 {
+    char * address;
+    unsigned short port;
     tr_handle * handle = vhandle;
+
+    evhttp_connection_get_peer( evcon, &address, &port );
+    dbgmsg( NULL, "%s:%d evcon [%s:%d] has closed... removing from pool", __FILE__, __LINE__, address, port );
+
+    tr_list_remove( &handle->tracker->connectionPool,
+                    evcon,
+                    connectionPoolCompare );
 
     /* libevent references evcon right after calling this function,
        so we can't free it yet... defer it to after this call chain
@@ -843,10 +857,40 @@ connectionClosedCB( struct evhttp_connection * evcon, void * vhandle )
 }
 
 static struct evhttp_connection*
+getExistingConnection( tr_handle * handle, const char * address, int port )
+{
+    tr_list * l;
+    dbgmsg( NULL, "%s:%d looking for a connection to {%s:%d}\n", __FILE__, __LINE__, address, port );
+
+    for( l=handle->tracker->connectionPool; l!=NULL; l=l->next )
+    {
+        char * c_address;
+        unsigned short c_port;
+        evhttp_connection_get_peer( l->data, &c_address, &c_port );
+        dbgmsg( NULL, "comparing with [%s:%d]...", c_address, c_port );
+        if( ( port == c_port ) && !strcmp( address, c_address ) ) {
+            dbgmsg( NULL, "%s:%d reusing cached connection of [%s:%d]\n", __FILE__, __LINE__, address, port );
+            return l->data;
+        }
+    }
+
+    dbgmsg( NULL, "%s:%d no match.\n", __FILE__, __LINE__ );
+    return NULL;
+}
+
+static struct evhttp_connection*
 getConnection( tr_handle * handle, const char * address, int port )
 {
-    struct evhttp_connection * c = evhttp_connection_new( address, port );
-    evhttp_connection_set_closecb( c, connectionClosedCB, handle );
+    struct evhttp_connection * c = getExistingConnection( handle, address, port );
+
+    if( c == NULL )
+    {
+        dbgmsg( NULL, "%s:%d creating new connection for [%s:%d]\n", __FILE__, __LINE__, address, port );
+        c = evhttp_connection_new( address, port );
+        evhttp_connection_set_closecb( c, connectionClosedCB, handle );
+        tr_list_prepend( &handle->tracker->connectionPool, c );
+    }
+
     return c;
 }
 
@@ -859,10 +903,6 @@ invokeRequest( tr_handle * handle, const struct tr_tracker_request * req )
     evhttp_connection_set_timeout( evcon, req->timeout );
     if( evhttp_make_request( evcon, req->req, EVHTTP_REQ_GET, req->uri ))
         publishErrorMessageAndStop( t, "Tracker could not be reached." );
-    else {
-        ++handle->tracker->socketCount;
-        dbgmsg( t, "incremented socket count to %d", handle->tracker->socketCount );
-    }
 }
 
 static void
@@ -871,15 +911,6 @@ invokeNextInQueue( tr_handle * handle, tr_list ** list )
     struct tr_tracker_request * req = tr_list_pop_front( list );
     invokeRequest( handle, req );
     freeRequest( req );
-}
-
-static int
-socketIsAvailable( tr_handle * handle )
-{
-    const int max = handle->tracker->isShuttingDown
-                      ? MAX_TRACKER_SOCKETS_DURING_SHUTDOWN
-                      : MAX_TRACKER_SOCKETS;
-    return handle->tracker->socketCount < max;
 }
 
 static void ensureGlobalsExist( tr_handle * );
@@ -913,8 +944,8 @@ pulse( void * vhandle )
     if( handle->tracker == NULL )
         return FALSE;
 
-    if( handle->tracker->socketCount || tr_list_size(th->requestQueue) || tr_list_size(th->scrapeQueue) )
-        dbgmsg( NULL, "tracker pulse... %d sockets, %d reqs left, %d scrapes left", handle->tracker->socketCount, tr_list_size(th->requestQueue), tr_list_size(th->scrapeQueue) );
+    if( tr_list_size(th->connectionPool) || tr_list_size(th->requestQueue) || tr_list_size(th->scrapeQueue) )
+        dbgmsg( NULL, "tracker pulse... %d sockets, %d reqs left, %d scrapes left", tr_list_size(th->connectionPool), tr_list_size(th->requestQueue), tr_list_size(th->scrapeQueue) );
 
     /* upkeep: queue periodic rescrape / reannounce */
     for( tor=handle->torrentList; tor; tor=tor->next )
@@ -932,17 +963,17 @@ pulse( void * vhandle )
         }
     }
 
-    if( handle->tracker->socketCount || tr_list_size(th->requestQueue) || tr_list_size(th->scrapeQueue) )
-        dbgmsg( NULL, "tracker pulse after upkeep... %d sockets, %d reqs left, %d scrapes left", handle->tracker->socketCount, tr_list_size(th->requestQueue), tr_list_size(th->scrapeQueue) );
+    if( tr_list_size(th->connectionPool) || tr_list_size(th->requestQueue) || tr_list_size(th->scrapeQueue) )
+        dbgmsg( NULL, "tracker pulse after upkeep... %d sockets, %d reqs left, %d scrapes left", tr_list_size(th->connectionPool), tr_list_size(th->requestQueue), tr_list_size(th->scrapeQueue) );
 
     /* look for things to do... process all the requests, then process all the scrapes */
-    while( th->requestQueue && socketIsAvailable( handle ) )
+    while( th->requestQueue )
         invokeNextInQueue( handle, &th->requestQueue );
-    while( th->scrapeQueue && socketIsAvailable( handle ) )
+    while( th->scrapeQueue )
         invokeNextInQueue( handle, &th->scrapeQueue );
 
-    if( handle->tracker->socketCount || tr_list_size(th->requestQueue) || tr_list_size(th->scrapeQueue) )
-        dbgmsg( NULL, "tracker pulse done... %d sockets, %d reqs left, %d scrapes left", handle->tracker->socketCount, tr_list_size(th->requestQueue), tr_list_size(th->scrapeQueue) );
+    if( tr_list_size(th->connectionPool) || tr_list_size(th->requestQueue) || tr_list_size(th->scrapeQueue) )
+        dbgmsg( NULL, "tracker pulse done... %d sockets, %d reqs left, %d scrapes left", tr_list_size(th->connectionPool), tr_list_size(th->requestQueue), tr_list_size(th->scrapeQueue) );
 
     return maybeFreeGlobals( handle );
 }
@@ -953,8 +984,6 @@ onReqDone( tr_handle * handle )
     if( handle->tracker )
     {
         pulse( handle );
-        --handle->tracker->socketCount;
-        dbgmsg( NULL, "decrementing socket count to %d", handle->tracker->socketCount );
     }
 }
 
