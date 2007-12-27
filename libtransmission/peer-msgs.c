@@ -75,7 +75,7 @@ enum
 
     /* 13 is the size of the BitTorrent overhead of a BT_PIECE message...
      * since all (or nearly all) piece requests are 16 K, this typically
-     * means we'd fill a 4096 K outbuf 5 times (4096, 4096, 4096, 4096, 16)
+     * means we'd fill a 4096 K outbuf 5 times (4096, 4096, 4096, 4096, 13)
      * but by adding the 13 here we can shorten it to 4 refills... not sure
      * if this actually makes any difference since the libevent layer smooths
      * things out anyway, but it doesn't hurt either... */
