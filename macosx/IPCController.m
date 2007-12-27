@@ -408,7 +408,7 @@ PrefsController         * fPrefsController;
 
     buf = ipc_mkempty( _ipc, &size, msgid, tag );
     if( NULL == buf )
-        return FALSE;
+        return NO;
 
     return [self sendresp: buf
                      size: size];
@@ -423,7 +423,7 @@ PrefsController         * fPrefsController;
 
     buf = ipc_mkint( _ipc, &size, msgid, tag, val );
     if( NULL == buf )
-        return FALSE;
+        return NO;
 
     return [self sendresp: buf
                      size: size];
@@ -451,7 +451,7 @@ PrefsController         * fPrefsController;
         buf = ipc_mkstr( _ipc, &size, msgid, tag, [sucky bytes] );
     }
     if( NULL == buf )
-        return FALSE;
+        return NO;
 
     return [self sendresp: buf
                      size: size];
@@ -807,16 +807,26 @@ void msg_getint( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     
     fDefaults = [NSUserDefaults standardUserDefaults];
     
+    int theValue;
+    
     switch( msgid )
     {
         case IPC_MSG_GETDOWNLIMIT:
-            [client sendrespInt:IPC_MSG_DOWNLIMIT tag:tag val:[fDefaults integerForKey:@"DownloadLimit"]];
+            if ( [fDefaults boolForKey:@"CheckDownload"] )
+                theValue = [fDefaults integerForKey:@"DownloadLimit"];
+            else
+                theValue = -1;
+            [client sendrespInt:IPC_MSG_DOWNLIMIT tag:tag val:theValue];
             break;
         case IPC_MSG_GETPORT:
             [client sendrespInt:IPC_MSG_PORT tag:tag val:[fDefaults integerForKey:@"BindPort"]];
             break;
         case IPC_MSG_GETUPLIMIT:
-            [client sendrespInt:IPC_MSG_UPLIMIT tag:tag val:[fDefaults integerForKey:@"UploadLimit"]];
+            if ( [fDefaults boolForKey:@"CheckUpload"] )
+                theValue = [fDefaults integerForKey:@"UploadLimit"];
+            else
+                theValue = -1;
+            [client sendrespInt:IPC_MSG_UPLIMIT tag:tag val:theValue];
             break;
         default:
             assert( 0 );
@@ -904,7 +914,13 @@ void msg_setint( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     switch( msgid )
     {
         case IPC_MSG_DOWNLIMIT:
-            [fDefaults setInteger:val->val.i forKey:@"DownloadLimit"];
+            if ( val->val.i < 0 )
+                [fDefaults setBool:NO forKey:@"CheckDownload"];
+            else
+            {
+                [fDefaults setBool:YES forKey:@"CheckDownload"];
+                [fDefaults setInteger:val->val.i forKey:@"DownloadLimit"];
+            }
             [fPrefsController updateLimitFields];
             [fPrefsController applySpeedSettings: nil];
             break;
@@ -913,7 +929,13 @@ void msg_setint( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
             [fPrefsController updatePortField];
             break;
         case IPC_MSG_UPLIMIT:
-            [fDefaults setInteger:val->val.i forKey:@"UploadLimit"];
+            if ( val->val.i < 0 )
+                [fDefaults setBool:NO forKey:@"CheckUpload"];
+            else
+            {
+                [fDefaults setBool:YES forKey:@"CheckUpload"];
+                [fDefaults setInteger:val->val.i forKey:@"UploadLimit"];
+            }
             [fPrefsController updateLimitFields];
             [fPrefsController applySpeedSettings: nil];
             break;
@@ -948,20 +970,20 @@ void msg_setstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
         case IPC_MSG_CRYPTO:
             if(!strcasecmp(val->val.s.s, "required"))
             {
-                [fDefaults setBool:TRUE  forKey: @"EncryptionPrefer"];
-                [fDefaults setBool:TRUE  forKey: @"EncryptionRequire"];
+                [fDefaults setBool:YES  forKey: @"EncryptionPrefer"];
+                [fDefaults setBool:YES  forKey: @"EncryptionRequire"];
             }
             
             else if(!strcasecmp(val->val.s.s, "preferred"))
             {
-                [fDefaults setBool:TRUE  forKey: @"EncryptionPrefer"];
-                [fDefaults setBool:FALSE  forKey: @"EncryptionRequire"];
+                [fDefaults setBool:YES  forKey: @"EncryptionPrefer"];
+                [fDefaults setBool:NO  forKey: @"EncryptionRequire"];
             }
             
             else if(!strcasecmp(val->val.s.s, "plaintext"))
             {
-                [fDefaults setBool:FALSE  forKey: @"EncryptionPrefer"];
-                [fDefaults setBool:FALSE  forKey: @"EncryptionRequire"];
+                [fDefaults setBool:NO  forKey: @"EncryptionPrefer"];
+                [fDefaults setBool:NO  forKey: @"EncryptionRequire"];
             }
             
             [client sendrespEmpty: IPC_MSG_OK tag: tag];
