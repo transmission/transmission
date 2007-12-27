@@ -51,6 +51,7 @@
                                 [NSDictionary dictionaryWithObjectsAndKeys: self, NSViewAnimationTargetKey,
                                 NSViewAnimationFadeInEffect, NSViewAnimationEffectKey, nil]]];
         [fFadeInAnimation setDuration: 0.15];
+        [fFadeInAnimation setAnimationBlockingMode: NSAnimationNonblockingThreaded];
         
         fFadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations: [NSArray arrayWithObject:
                                 [NSDictionary dictionaryWithObjectsAndKeys: self, NSViewAnimationTargetKey,
@@ -165,9 +166,6 @@
 
 - (void) fadeOut
 {
-    if ([self alphaValue] <= 0.0)
-        return;
-    
     //stop other animation and set to same progress
     if ([fFadeInAnimation isAnimating])
     {
