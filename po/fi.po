@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fi\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-07 13:35-0700\n"
+"POT-Creation-Date: 2007-12-27 10:24-0600\n"
 "PO-Revision-Date: 2007-04-10 20:18+0300\n"
 "Last-Translator: Jaakko Huhtala <jaakko.huhtala@gmail.com>\n"
 "Language-Team: -\n"
@@ -15,30 +15,176 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: conf.c:91 conf.c:370 msgwin.c:164
-#, c-format
-msgid ""
-"Failed to open the file %s for writing:\n"
-"%s"
+#: ../gtk/transmission.desktop.in.h:1
+#, fuzzy
+msgid "BitTorrent Client"
+msgstr "Torrent-tiedostot"
+
+#: ../gtk/transmission.desktop.in.h:2
+msgid "Transfer files via Peer to Peer"
 msgstr ""
-"Tiedoston %s avaaminen epäonnistui:\n"
-"%s"
 
-#: conf.c:106
-#, c-format
-msgid "Another copy of %s is already running."
-msgstr "%s on jo käynnissä."
+#: ../gtk/transmission.desktop.in.h:3 ../gtk/main.c:245
+msgid "Transmission"
+msgstr "Transmission"
 
-#: conf.c:109
-#, c-format
-msgid ""
-"Failed to lock the file %s:\n"
-"%s"
+#: ../gtk/actions.c:49
+msgid "_High"
 msgstr ""
-"Tiedoston %s lukitseminen epäonnistui:\n"
-"%s"
 
-#: conf.c:132
+#: ../gtk/actions.c:50
+msgid "_Normal"
+msgstr ""
+
+#: ../gtk/actions.c:51
+msgid "_Low"
+msgstr ""
+
+#: ../gtk/actions.c:65
+msgid "Sort by _Activity"
+msgstr ""
+
+#: ../gtk/actions.c:66
+msgid "Sort by _Date Added"
+msgstr ""
+
+#: ../gtk/actions.c:67
+msgid "Sort by _Name"
+msgstr ""
+
+#: ../gtk/actions.c:68
+#, fuzzy
+msgid "Sort by _Progress"
+msgstr "Edistyminen"
+
+#: ../gtk/actions.c:69
+msgid "Sort by _State"
+msgstr ""
+
+#: ../gtk/actions.c:70
+msgid "Sort by _Tracker"
+msgstr ""
+
+#: ../gtk/actions.c:87
+msgid "Show _Main Window"
+msgstr ""
+
+#: ../gtk/actions.c:89
+msgid "Show Message _Log"
+msgstr ""
+
+#: ../gtk/actions.c:103
+msgid "_Minimal View"
+msgstr ""
+
+#: ../gtk/actions.c:105
+msgid "_Reverse Sort Order"
+msgstr ""
+
+#: ../gtk/actions.c:107
+msgid "Show _Filter Bar"
+msgstr ""
+
+#: ../gtk/actions.c:109
+msgid "Show _Status Bar"
+msgstr ""
+
+#: ../gtk/actions.c:111
+msgid "Show _Toolbar"
+msgstr ""
+
+#: ../gtk/actions.c:116
+#, fuzzy
+msgid "_Torrent"
+msgstr "Lisää torrent-tiedosto"
+
+#: ../gtk/actions.c:117
+#, fuzzy
+msgid "_View"
+msgstr "Tiedosto"
+
+#: ../gtk/actions.c:118
+msgid "_Sort Torrents By"
+msgstr ""
+
+#: ../gtk/actions.c:119
+msgid "_Edit"
+msgstr ""
+
+#: ../gtk/actions.c:120
+msgid "_Help"
+msgstr ""
+
+#: ../gtk/actions.c:121
+msgid "_Priority"
+msgstr ""
+
+#: ../gtk/actions.c:123 ../gtk/dialogs.c:87
+#, fuzzy
+msgid "Open Torrent"
+msgstr "Lisää torrent-tiedosto"
+
+#: ../gtk/actions.c:125
+#, fuzzy
+msgid "_Start"
+msgstr "Käynnistä"
+
+#: ../gtk/actions.c:126
+msgid "_Statistics"
+msgstr ""
+
+#: ../gtk/actions.c:128
+msgid "_Verify Local Data"
+msgstr ""
+
+#: ../gtk/actions.c:130
+msgid "_Pause"
+msgstr ""
+
+#: ../gtk/actions.c:132
+msgid "_Remove"
+msgstr ""
+
+#: ../gtk/actions.c:134
+#, fuzzy
+msgid "Create _New Torrent"
+msgstr "Lisää uusi torrent-tiedosto"
+
+#: ../gtk/actions.c:136
+msgid "_Close"
+msgstr ""
+
+#: ../gtk/actions.c:138
+msgid "_Quit"
+msgstr ""
+
+#: ../gtk/actions.c:140
+msgid "Select _All"
+msgstr ""
+
+#: ../gtk/actions.c:142
+msgid "Dese_lect All"
+msgstr ""
+
+#: ../gtk/actions.c:146
+msgid "_Details"
+msgstr ""
+
+#: ../gtk/actions.c:146
+#, fuzzy
+msgid "Torrent Details"
+msgstr "Torrent-tiedostot"
+
+#: ../gtk/actions.c:148
+#, fuzzy
+msgid "_About Transmission"
+msgstr "Transmission"
+
+#: ../gtk/actions.c:150
+msgid "Ask Tracker for _More Peers"
+msgstr ""
+
+#: ../gtk/conf.c:62
 #, c-format
 msgid ""
 "Failed to create the directory %s:\n"
@@ -47,264 +193,131 @@ msgstr ""
 "Tiedoston %s luominen epäonnistui:\n"
 "%s"
 
-#: conf.c:205
+#: ../gtk/conf.c:90
 #, c-format
 msgid ""
-"Failed to open the file %s for reading:\n"
+"Failed to open the file %s for writing:\n"
 "%s"
 msgstr ""
 "Tiedoston %s avaaminen epäonnistui:\n"
 "%s"
 
-#: conf.c:212
+#: ../gtk/conf.c:106
+#, c-format
+msgid "Another copy of %s is already running."
+msgstr "%s on jo käynnissä."
+
+#: ../gtk/conf.c:108
 #, c-format
 msgid ""
-"Error while reading from the file %s:\n"
+"Failed to lock the file %s:\n"
 "%s"
 msgstr ""
-"Virhe luettaessa tiedostoa %s:\n"
+"Tiedoston %s lukitseminen epäonnistui:\n"
 "%s"
 
-#: conf.c:384 msgwin.c:175
-#, c-format
-msgid ""
-"Error while writing to the file %s:\n"
-"%s"
-msgstr ""
-"Virhe kirjoitettaessa tiedostoon %s:\n"
-"%s"
-
-#: conf.c:390
-#, c-format
-msgid ""
-"Failed to rename the file %s to %s:\n"
-"%s"
-msgstr ""
-"Tiedoston nimeäminen %s:stä %s:n epäonnistui:\n"
-"%s"
-
-#: dialogs.c:138
-msgid "Add a Torrent"
-msgstr "Lisää torrent-tiedosto"
-
-#: dialogs.c:145
+#: ../gtk/dialogs.c:94
 msgid "Automatically _start torrent"
 msgstr "Käynnistä torrentin lataus automaattisesti"
 
-#: dialogs.c:147
+#: ../gtk/dialogs.c:96
 msgid "Use alternate _download directory"
 msgstr "Käytä vaihtoehtoista tallennushakemistoa"
 
-#. PREF_ID_DIR
-#: dialogs.c:151 tr_prefs.c:210
+#: ../gtk/dialogs.c:100
 msgid "Choose a download directory"
 msgstr "Valitse tallennushakemisto"
 
-#: dialogs.c:178
+#: ../gtk/dialogs.c:129
 msgid "Torrent files"
 msgstr "Torrent-tiedostot"
 
-#: dialogs.c:180
+#: ../gtk/dialogs.c:131
 msgid "All files"
 msgstr "Kaikki tiedostot"
 
-#: dialogs.c:250
-#, c-format
-msgid "%s - Properties for %s"
-msgstr "%s - Asetukset %s:lle"
-
-#. add general tab
-#: dialogs.c:286
-msgid "General"
-msgstr "Yleiset"
-
-#. add files tab
-#: dialogs.c:292
-msgid "Files"
-msgstr "Tiedostot"
-
-#: dialogs.c:390
-msgid "Tracker:"
-msgstr "Seurantapalvelin:"
-
-#: dialogs.c:391
-msgid "Announce:"
-msgstr "Tiedustelu:"
-
-#: dialogs.c:392
-msgid "Scrape:"
-msgstr "Pikapäivitys:"
-
-#: dialogs.c:394
-msgid "Info Hash:"
-msgstr "Tiiviste"
-
-#: dialogs.c:395
-msgid "Piece Size:"
-msgstr "Osan koko:"
-
-#: dialogs.c:396
-msgid "Pieces:"
-msgstr "Osien määrä:"
-
-#: dialogs.c:397
-msgid "Total Size:"
-msgstr "Koko yhteensä:"
-
-#: dialogs.c:399
-msgid "Seeders:"
-msgstr "Lähteitä:"
-
-#: dialogs.c:400
-msgid "Leechers:"
-msgstr "Lataajia:"
-
-#: dialogs.c:401
-msgid "Completed:"
-msgstr "Päättyneet:"
-
-#: dialogs.c:403
-msgid "Directory:"
-msgstr "Hakemisto:"
-
-#: dialogs.c:405
-msgid "Downloaded:"
-msgstr "Ladattu:"
-
-#: dialogs.c:406
-msgid "Uploaded:"
-msgstr "Lähetetty:"
-
-#: dialogs.c:407
-msgid "Remaining:"
-msgstr "Jäljellä:"
-
-#: dialogs.c:497
-msgid "?"
-msgstr "?"
-
-#: dialogs.c:519
+#: ../gtk/dialogs.c:262
 msgid "Choose a directory"
 msgstr "Valitse hakemisto"
 
-#: dialogs.c:575
+#: ../gtk/dialogs.c:384
 #, c-format
-msgid "Are you sure you want to quit %s?"
-msgstr "Haluatko varmasti lopettaa?"
+msgid "<b>Really Quit %s?</b>"
+msgstr ""
 
-#: dialogs.c:643
-msgid "File"
-msgstr "Tiedosto"
+#: ../gtk/dialogs.c:388
+msgid "This will close all active torrents."
+msgstr ""
 
-#: dialogs.c:656 tr_window.c:406
-msgid "Progress"
-msgstr "Edistyminen"
+#: ../gtk/dialogs.c:396
+msgid "_Don't Ask Me This Again"
+msgstr ""
 
-#. this string is only used to determine the size of the progress bar
-#: dialogs.c:659 tr_window.c:403
-msgid "  fnord    fnord  "
-msgstr "  fnord    fnord  "
-
-#: ipc.c:242
-#, c-format
-msgid ""
-"Failed to set up socket:\n"
-"%s"
+#: ../gtk/ipc.c:197 ../gtk/ipc.c:229
+#, fuzzy, c-format
+msgid "Failed to set up IPC: %s"
 msgstr ""
 "Socketin alustaminen epäonnistui:\n"
 "%s"
 
-#: ipc.c:263
-#, c-format
-msgid "failed to create socket: %s\n"
+#: ../gtk/ipc.c:309
+#, fuzzy, c-format
+msgid "Failed to set up socket: %s"
+msgstr ""
+"Socketin alustaminen epäonnistui:\n"
+"%s"
+
+#: ../gtk/ipc.c:332
+#, fuzzy, c-format
+msgid "Failed to create socket: %s"
 msgstr "socketin luominen epäonnistui: %s\n"
 
-#: ipc.c:272
-#, c-format
-msgid "failed to connect to %s: %s\n"
+#: ../gtk/ipc.c:341
+#, fuzzy, c-format
+msgid "Failed to connect to %s: %s"
 msgstr "yhteyden muodostaminen palvelimeen %s epäonnistui: %s\n"
 
-#: ipc.c:453 ipc.c:501
-#, c-format
-msgid "bad IPC protocol version\n"
+#: ../gtk/ipc.c:431 ../gtk/ipc.c:467
+#, fuzzy
+msgid "Bad IPC protocol version"
 msgstr "väärä IPC protokolla versio\n"
 
-#: main.c:113
-msgid "Add a new torrent"
-msgstr "Lisää uusi torrent-tiedosto"
+#: ../gtk/ipc.c:434 ../gtk/ipc.c:470
+#, fuzzy
+msgid "IPC protocol parse error"
+msgstr "väärä IPC protokolla versio\n"
 
-#: main.c:114
-msgid "Start"
-msgstr "Käynnistä"
-
-#: main.c:115
-msgid "Start a torrent that is not running"
-msgstr "Käynnistä valittu torrent"
-
-#: main.c:117
-msgid "Stop a torrent that is running"
-msgstr "Pysäytä valittu torrent"
-
-#: main.c:119
-msgid "Remove a torrent"
-msgstr "Poista torrent-tiedosto"
-
-#: main.c:122
-msgid "Show additional information about a torrent"
-msgstr "Näytä torrentin tiedot"
-
-#: main.c:123
-msgid "Open debug window"
-msgstr "Avaa virheenjäljitys ikkuna"
-
-#: main.c:127
-msgid "Customize application behavior"
-msgstr "Ohjelman asetukset"
-
-#: main.c:130
-msgid "Close the main window"
-msgstr "Sulje pääikkuna"
-
-#: main.c:132
-msgid "Exit the program"
-msgstr "Poistu ohjelmasta"
-
-#: main.c:288
+#: ../gtk/ipc.c:437 ../gtk/ipc.c:473
 #, c-format
-msgid ""
-"usage: %s [-hpq] [files...]\n"
-"\n"
-"Transmission %s (r%d) http://transmission.m0k.org/\n"
-"A free, lightweight BitTorrent client with a simple, intuitive interface\n"
-"\n"
-"  -h --help    display this message and exit\n"
-"  -p --paused  start with all torrents paused\n"
-"  -q --quit    request that the running %s instance quit\n"
-"\n"
-"Only one instance of %s may run at one time. Multiple\n"
-"torrent files may be loaded at startup by adding them to the command\n"
-"line. If %s is already running, those torrents will be\n"
-"opened in the running instance.\n"
+msgid "IPC parsing failed: %s"
 msgstr ""
-"käyttö: %s [-hpq] [tiedostot...]\n"
-"\n"
-"Transmission %s (r%d) http://transmission.m0k.org/\n"
-"Ilmainen, kevytkäyttöinen BitTorrent ohjelma jossa on helppokäyttöinen käyttöliittymä\n"
-"\n"
-"  -h --help    näyttää tämän viestin\n"
-"  -p --paused  aloittaa ohjelman niin että torrentit ovat poissa päältä\n"
-"  -q --quit    sulkee päällä olevan %s ohjelman\n"
-"\n"
-"Vain yksi %s ohjelma voi olla kerrallaan käynnissä. Useampi\n"
-"torrent tiedosto voidaan ladata käynnistyksessä lisäämällä ne\n"
-"komentoriville. Jos %s ohjelma on jo käynnissä, nämä torrentit\n"
-"avautuvat käynnissä olevassa ohjelmassa.\n"
 
-#: main.c:354
-msgid "Transmission"
-msgstr "Transmission"
+#: ../gtk/main.c:235
+msgid "Start with all torrents paused"
+msgstr ""
 
-#: main.c:1097
+#: ../gtk/main.c:237
+msgid "Request that the running instance quit"
+msgstr ""
+
+#: ../gtk/main.c:249
+#, fuzzy
+msgid "[torrent files]"
+msgstr "Torrent-tiedostot"
+
+#: ../gtk/main.c:481
+msgid "Closing Connections"
+msgstr ""
+
+#: ../gtk/main.c:481
+msgid "Sending upload/download totals to tracker..."
+msgstr ""
+
+#: ../gtk/main.c:487
+msgid "_Quit Immediately"
+msgstr ""
+
+#: ../gtk/main.c:621
 #, c-format
 msgid ""
 "Failed to load torrent file:\n"
@@ -312,319 +325,1062 @@ msgid ""
 msgid_plural ""
 "Failed to load torrent files:\n"
 "%s"
-msgstr[0] "Tiedoston avaaminen epäonnistui:\n"
+msgstr[0] ""
+"Tiedoston avaaminen epäonnistui:\n"
 "%s"
-msgstr[1] "Tiedostojen avaaminen epäonnistui:\n"
+msgstr[1] ""
+"Tiedostojen avaaminen epäonnistui:\n"
 "%s"
 
-#: msgwin.c:54
-msgid "Error"
-msgstr "Virheet"
-
-#: msgwin.c:55
-msgid "Info"
-msgstr "Tiedonannot"
-
-#: msgwin.c:56
-msgid "Debug"
-msgstr "Virheenjäljitys"
-
-#: msgwin.c:142
-msgid "Save Log"
-msgstr "Login tallennus"
-
-#: msgwin.c:229
-msgid "???"
-msgstr "???"
-
-#: tr_prefs.c:82
-msgid "_Limit download speed"
-msgstr "Rajoita latausnopeutta"
-
-#: tr_prefs.c:83
-msgid "Restrict the download rate"
-msgstr "Rajoitettu latausnopeus"
-
-#: tr_prefs.c:87
-msgid "Maximum _download speed:"
-msgstr "Suurin latausnopeus:"
-
-#: tr_prefs.c:88
-msgid "Speed in KiB/sec for restricted download rate"
-msgstr "Aseta nopeus KiB/sec rajoitetulle latausnopeudelle"
-
-#: tr_prefs.c:92
-msgid "Li_mit upload speed"
-msgstr "Rajoita lähetys nopeutta"
-
-#: tr_prefs.c:93
-msgid "Restrict the upload rate"
-msgstr "Rajoitettu lähetys nopeus"
-
-#: tr_prefs.c:97
-msgid "Maximum _upload speed:"
-msgstr "Suurin lähetysnopeus:"
-
-#: tr_prefs.c:98
-msgid "Speed in KiB/sec for restricted upload rate"
-msgstr "Aseta nopeus KiB/sec rajoitetulle lähetysnopeudelle"
-
-#: tr_prefs.c:102
-msgid "Al_ways prompt for download directory"
-msgstr "Kysy aina tallennushakemistoa"
-
-#: tr_prefs.c:103
-msgid ""
-"When adding a torrent, always prompt for a directory to download data files "
-"into"
+#: ../gtk/main.c:788
+msgid "A fast and easy BitTorrent client"
 msgstr ""
-"Lisättäessä torrenttia, kysy aina tallennushakemistoa"
 
-#: tr_prefs.c:108
-msgid "Download di_rectory:"
-msgstr "Tallennushakemisto:"
-
-#: tr_prefs.c:109
-msgid "Destination directory for downloaded data files"
-msgstr "Ladattujen tiedostojen tallennushakemisto"
-
-#: tr_prefs.c:113
-msgid "Listening _port:"
-msgstr "Käytetty portti:"
-
-#: tr_prefs.c:114
-msgid "TCP port number to listen for peer connections"
-msgstr "TCP portin numero yhteyksien kuuntelemiseen"
-
-#: tr_prefs.c:118
-msgid "Au_tomatic port mapping via NAT-PMP or UPnP"
-msgstr "Automaattinen portin mappaus NAT-PMP:llä tai UPnP:llä"
-
-#: tr_prefs.c:119
-msgid "Attempt to bypass NAT or firewall to allow incoming peer connections"
-msgstr "Yritä ohittaa NAT tai palomuuri salliaksesi sisääntulevat yhteydet"
-
-#: tr_prefs.c:123
-msgid "Use peer _exchange if possible"
-msgstr "Käytä käyttäjien osoitteiden jakamista jos se on mahdollista"
-
-#: tr_prefs.c:124
-msgid ""
-"Perform Azureus or µTorrent compatible peer exchange with any peers which "
-"support it"
-msgstr "Käytä käyttäjien osoitteiden jakamista Azureus tai µTorrent "
-"yhteensopivien käyttäjien kanssa jos ne tukevat sitä"
-
-#: tr_prefs.c:129
-msgid "Display an _icon in the system tray"
-msgstr "Näytä ikoni alapalkissa"
-
-#: tr_prefs.c:130
-msgid "Use a system tray / dock / notification area icon"
-msgstr "Käytä alapalkkia / paneelia / huomautus ikonia"
-
-#: tr_prefs.c:134
-msgid "Confirm _quit"
-msgstr "Vahvista ohjelman lopetus"
-
-#: tr_prefs.c:135
-msgid "Prompt for confirmation when quitting"
-msgstr "Kysy vahvistusta lopetettaessa ohjelmaa"
-
-#: tr_prefs.c:140
-msgid "For torrents added _normally:"
-msgstr "Käyttöliittymästä lisätyt torrentit:"
-
-#: tr_prefs.c:141
-msgid "Torrent files added via the toolbar, popup menu, and drag-and-drop"
-msgstr "Käyttöliittymästä lisätyt torrentit:"
-
-#: tr_prefs.c:146
-msgid ""
-"For torrents added e_xternally\n"
-"(via the command-line):"
+#: ../gtk/main.c:790
+msgid "Copyright 2005-2007 The Transmission Project"
 msgstr ""
-"Muualta lisätyt torrentit\n"
-"(päätteestä lisätyt):"
 
-#: tr_prefs.c:147
-msgid "For torrents added via the command-line only"
-msgstr "Ainoastaan päätteestä lisätyt torrentit"
+#. note to translators: put yourself here for credit in the "About" dialog
+#: ../gtk/main.c:793
+msgid "translator-credits"
+msgstr ""
 
-#: tr_prefs.c:342
-#, c-format
-msgid "%s Preferences"
-msgstr "%s asetukset"
+#: ../gtk/makemeta-ui.c:89
+msgid "Torrent creation aborted."
+msgstr ""
 
-#: tr_prefs.c:858
-msgid "Use the torrent file where it is"
-msgstr "Käytä alkuperäistä torrent-tiedostoa"
+#: ../gtk/makemeta-ui.c:90
+#, fuzzy
+msgid "Torrent creation failed."
+msgstr "Torrent-tiedostot"
 
-#: tr_prefs.c:861
-msgid "Keep a copy of the torrent file"
-msgstr "Pidä kopio torrent-tiedostosta"
+#: ../gtk/makemeta-ui.c:101
+#, fuzzy
+msgid "Torrent Created"
+msgstr "Torrent-tiedostot"
 
-#: tr_prefs.c:864
-msgid "Keep a copy and remove the original"
-msgstr "Pidä kopio ja poista alkuperäinen"
+#: ../gtk/makemeta-ui.c:135
+#, fuzzy
+msgid "Making Torrent..."
+msgstr "Lisää torrent-tiedosto"
 
-#: tr_torrent.c:314
-#, c-format
-msgid "%s: not a valid torrent file"
-msgstr "%s: ei ole torrent-tiedosto"
+#: ../gtk/makemeta-ui.c:200 ../gtk/torrent-inspector.c:1420
+#, fuzzy
+msgid "File"
+msgid_plural "Files"
+msgstr[0] "Tiedosto"
+msgstr[1] "Tiedosto"
 
-#: tr_torrent.c:317
-#, c-format
-msgid "%s: torrent is already open"
-msgstr "%s: torrent-tiedosto on jo auki"
+#: ../gtk/makemeta-ui.c:206
+#, fuzzy
+msgid "Piece"
+msgid_plural "Pieces"
+msgstr[0] "Osien määrä:"
+msgstr[1] "Osien määrä:"
 
-#: tr_window.c:169
+#: ../gtk/makemeta-ui.c:229
+#, fuzzy
+msgid "Create New Torrent"
+msgstr "Lisää uusi torrent-tiedosto"
+
+#: ../gtk/makemeta-ui.c:241 ../gtk/tr_window.c:443
+msgid "Files"
+msgstr "Tiedostot"
+
+#: ../gtk/makemeta-ui.c:244
+msgid "File _Type"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:246
+#, fuzzy
+msgid "Directory"
+msgstr "Hakemisto:"
+
+#: ../gtk/makemeta-ui.c:248
+msgid "Single File"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:252
 msgid "_File"
 msgstr "Tiedosto"
 
-#: tr_window.c:355
-#, c-format
-msgid "     Total DL: %s/s     Total UL: %s/s"
-msgstr "     Latausnopeus yhteensä: %s/s     Lähetysnopeus yhteensä: %s/s"
+#: ../gtk/makemeta-ui.c:265
+msgid "No Files Selected"
+msgstr ""
 
-#. note that this renderer is set to ellipsize, just not here
-#: tr_window.c:393
-msgid "Name"
-msgstr "Nimi"
+#: ../gtk/makemeta-ui.c:279 ../gtk/tr_window.c:148
+#, fuzzy
+msgid "Torrent"
+msgstr "Lisää torrent-tiedosto"
 
-#: tr_window.c:511
+#: ../gtk/makemeta-ui.c:282
 #, c-format
-msgid "Checking existing files (%.1f%%)"
-msgstr "Tarkistetaan aikaisempia tiedostoja (%.1f%%)"
+msgid "Private to this Tracker"
+msgstr ""
 
-#: tr_window.c:517
-#, c-format
-msgid "Stalled (%.1f%%)"
-msgstr "Ladattu (%.1f%%)"
+#: ../gtk/makemeta-ui.c:285
+#, fuzzy
+msgid "Announce _URL"
+msgstr "Tiedustelu:"
 
-#: tr_window.c:522
+#: ../gtk/makemeta-ui.c:290
+msgid "Commen_t"
+msgstr ""
+
+#: ../gtk/msgwin.c:160 ../gtk/msgwin.c:174
+#, fuzzy, c-format
+msgid "Error writing to \"%s\": %s"
+msgstr ""
+"Virhe kirjoitettaessa tiedostoon %s:\n"
+"%s"
+
+#: ../gtk/msgwin.c:191
+msgid "Save Log"
+msgstr "Login tallennus"
+
+#: ../gtk/msgwin.c:216
+msgid "Error"
+msgstr "Virheet"
+
+#: ../gtk/msgwin.c:217
+msgid "Info"
+msgstr "Tiedonannot"
+
+#: ../gtk/msgwin.c:218
+msgid "Debug"
+msgstr "Virheenjäljitys"
+
+#: ../gtk/msgwin.c:234
+#, fuzzy
+msgid "Message Log"
+msgstr "Login tallennus"
+
+#: ../gtk/msgwin.c:258
+msgid "Level "
+msgstr ""
+
+#: ../gtk/msgwin.c:259 ../gtk/msgwin.c:290
+msgid "Select the debug filter level."
+msgstr ""
+
+#: ../gtk/stats.c:44 ../gtk/torrent-inspector.c:896 ../gtk/util.c:57
+#: ../gtk/util.c:80
+msgid "None"
+msgstr ""
+
+#: ../gtk/stats.c:64
 #, c-format
-msgid "Finishing in %s (%.1f%%)"
+msgid "Started %d times"
+msgstr ""
+
+#: ../gtk/stats.c:90
+msgid "Statistics"
+msgstr ""
+
+#: ../gtk/stats.c:99
+msgid "Current Session"
+msgstr ""
+
+#: ../gtk/stats.c:102 ../gtk/stats.c:115 ../gtk/torrent-inspector.c:939
+msgid "Uploaded:"
+msgstr "Lähetetty:"
+
+#: ../gtk/stats.c:104 ../gtk/stats.c:117 ../gtk/torrent-inspector.c:936
+msgid "Downloaded:"
+msgstr "Ladattu:"
+
+#: ../gtk/stats.c:106 ../gtk/stats.c:119 ../gtk/torrent-inspector.c:945
+msgid "Ratio:"
+msgstr ""
+
+#: ../gtk/stats.c:108 ../gtk/stats.c:121
+msgid "Duration:"
+msgstr ""
+
+#: ../gtk/stats.c:110
+msgid "Cumulative"
+msgstr ""
+
+#: ../gtk/stats.c:112
+#, c-format
+msgid "Program started %d times"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:78
+#, fuzzy, c-format
+msgid "%s of %s (%.2f%%)"
 msgstr "Kesto %s (%.1f%%)"
 
-#: tr_window.c:530
+#: ../gtk/torrent-cell-renderer.c:84
 #, c-format
-msgid "Seeding, uploading to %d of %d peer"
-msgid_plural "Seeding, uploading to %d of %d peers"
-msgstr[0] "Lähetetään, %d yhdistetty ( %d kaikkiaan )"
-msgstr[1] "Lähetetään, %d yhdistetty ( %d kaikkiaan )"
-
-#: tr_window.c:536
-msgid "Stopping..."
-msgstr "Pysäytetään..."
-
-#: tr_window.c:540
-#, c-format
-msgid "Stopped (%.1f%%)"
-msgstr "Pysäytetty (%.1f%%)"
-
-#: tr_window.c:551
-msgid "Error: "
-msgstr "Virhe: "
-
-#: tr_window.c:556
-#, c-format
-msgid "Downloading from %i of %i peer"
-msgid_plural "Downloading from %i of %i peers"
-msgstr[0] "Ladataan, %i yhdistetty ( %i kaikkiaan )"
-msgstr[1] "Ladataan, %i yhdistetty ( %i kaikkiaan )"
-
-#: tr_window.c:593
-#, c-format
-msgid ""
-"Ratio: %s\n"
-"UL: %s/s"
+msgid "%s of %s (%.2f%%), uploaded %s (Ratio: %.1f"
 msgstr ""
-"Jakosuhde: %s\n"
-"Läh.: %s/s"
 
-#: tr_window.c:598
+#: ../gtk/torrent-cell-renderer.c:92
 #, c-format
-msgid ""
-"DL: %s/s\n"
-"UL: %s/s"
+msgid "%s, uploaded %s (Ratio: %.1f)"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:113
+#, fuzzy, c-format
+msgid "Down: %s, Up: %s"
 msgstr ""
 "Lat.: %s/s\n"
 "Läh.: %s/s"
 
-#: util.c:64
+#: ../gtk/torrent-cell-renderer.c:115
+#, c-format
+msgid "Down: %s"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:117
+#, c-format
+msgid "Up: %s"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:119
+msgid "Idle"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:132
+msgid "Paused"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:136
+msgid "Waiting to Verify local data"
+msgstr ""
+
+#. [0...100]
+#: ../gtk/torrent-cell-renderer.c:140 ../gtk/tr_torrent.c:305
+#, c-format
+msgid "Verifying local data (%.1f%% tested)"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:148
+#, c-format
+msgid "Ratio: %.1f, "
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:188
+#, fuzzy, c-format
+msgid "Downloading from %d of %d connected peer"
+msgstr "Ladataan, %i yhdistetty ( %i kaikkiaan )"
+
+#: ../gtk/torrent-cell-renderer.c:189
+#, fuzzy, c-format
+msgid "Downloading from %d of %d connected peers"
+msgstr "Ladataan, %i yhdistetty ( %i kaikkiaan )"
+
+#: ../gtk/torrent-cell-renderer.c:198
+#, fuzzy, c-format
+msgid "Seeding to %d of %d connected peer"
+msgstr "Lähetetään, %d yhdistetty ( %d kaikkiaan )"
+
+#: ../gtk/torrent-cell-renderer.c:199
+#, fuzzy, c-format
+msgid "Seeding to %d of %d connected peers"
+msgstr "Lähetetään, %d yhdistetty ( %d kaikkiaan )"
+
+#: ../gtk/torrent-inspector.c:248
+msgid "Address"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:249
+msgid "Port"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:250
+msgid "Client"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:251 ../gtk/torrent-inspector.c:583
+#: ../gtk/torrent-inspector.c:1434
+msgid "Progress"
+msgstr "Edistyminen"
+
+#: ../gtk/torrent-inspector.c:253
+#, fuzzy
+msgid "Downloading"
+msgstr "Ladattu:"
+
+#: ../gtk/torrent-inspector.c:254
+msgid "DL Rate"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:255
+#, fuzzy
+msgid "Uploading"
+msgstr "Lähetetty:"
+
+#: ../gtk/torrent-inspector.c:256
+msgid "UL Rate"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:257
+#, fuzzy
+msgid "Status"
+msgstr "Käynnistä"
+
+#: ../gtk/torrent-inspector.c:362
+msgid "Handshaking"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:367
+#, fuzzy
+msgid "Uploading to peer"
+msgstr "Lähetetään, %d yhdistetty ( %d kaikkiaan )"
+
+#: ../gtk/torrent-inspector.c:369
+msgid "Peer wants our data"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:371
+msgid "Refusing to send data to peer"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:376
+#, fuzzy
+msgid "Downloading from peer"
+msgstr "Ladataan, %i yhdistetty ( %i kaikkiaan )"
+
+#: ../gtk/torrent-inspector.c:378
+msgid "Requesting data from peer"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:380
+msgid "Waiting to request data from peer"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:382
+msgid "Peer will not send us data"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:659
+msgid "Piece Availability"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:682
+msgid "Connected Peers"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:699
+#, fuzzy
+msgid "Seeders"
+msgstr "Lähteitä:"
+
+#: ../gtk/torrent-inspector.c:707
+#, fuzzy
+msgid "Leechers"
+msgstr "Lataajia:"
+
+#: ../gtk/torrent-inspector.c:715
+#, fuzzy
+msgid "Completed"
+msgstr "Päättyneet:"
+
+#: ../gtk/torrent-inspector.c:750
+#, fuzzy
+msgid "Torrent Information"
+msgstr "Torrent-tiedostot"
+
+#: ../gtk/torrent-inspector.c:753 ../gtk/tr_window.c:443
+#, fuzzy
+msgid "Tracker"
+msgstr "Seurantapalvelin:"
+
+#: ../gtk/torrent-inspector.c:764
+#, fuzzy
+msgid "Pieces"
+msgstr "Osien määrä:"
+
+#: ../gtk/torrent-inspector.c:770
+msgid "Hash"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:775
+#, fuzzy
+msgid "Secure"
+msgstr "Pikapäivitys:"
+
+#: ../gtk/torrent-inspector.c:777
+msgid "Private Torrent, PEX disabled"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:778
+msgid "Public Torrent"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:782
+msgid "Comment"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:795
+msgid "Created By"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:798
+msgid "Creator"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:799
+msgid "N/A"
+msgstr "N/A"
+
+#: ../gtk/torrent-inspector.c:802
+msgid "Date"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:809
+msgid "Location"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:812
+#, fuzzy
+msgid "Downloaded Data"
+msgstr "Ladattu:"
+
+#: ../gtk/torrent-inspector.c:817
+#, fuzzy
+msgid "Torrent File Path"
+msgstr "Torrent-tiedostot"
+
+#: ../gtk/torrent-inspector.c:824
+#, fuzzy
+msgid "Torrent File Name"
+msgstr "Torrent-tiedostot"
+
+#: ../gtk/torrent-inspector.c:871
+#, c-format
+msgid "%.1f%% (%.1f%% selected)"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:877
+#, c-format
+msgid "%s (%s verified)"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:923
+#, fuzzy
+msgid "Transfer"
+msgstr "Seurantapalvelin:"
+
+#: ../gtk/torrent-inspector.c:927
+#, fuzzy
+msgid "State:"
+msgstr "Käynnistä"
+
+#: ../gtk/torrent-inspector.c:930
+#, fuzzy
+msgid "Progress:"
+msgstr "Edistyminen"
+
+#: ../gtk/torrent-inspector.c:933
+msgid "Have:"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:942
+msgid "Failed DL:"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:948
+msgid "Swarm Rate:"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:951
+#, fuzzy
+msgid "Error:"
+msgstr "Virhe: "
+
+#: ../gtk/torrent-inspector.c:957
+#, fuzzy
+msgid "Completeness:"
+msgstr "Päättyneet:"
+
+#: ../gtk/torrent-inspector.c:960
+msgid "Dates"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:964
+msgid "Added:"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:967
+msgid "Last Activity"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:1008 ../gtk/torrent-inspector.c:1018
+#: ../gtk/torrent-inspector.c:1189
+msgid "High"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:1009 ../gtk/torrent-inspector.c:1191
+msgid "Normal"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:1010 ../gtk/torrent-inspector.c:1019
+#: ../gtk/torrent-inspector.c:1193
+msgid "Low"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:1448
+#, fuzzy
+msgid "Download"
+msgstr "Ladattu:"
+
+#: ../gtk/torrent-inspector.c:1458
+msgid "Priority"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:1591 ../gtk/tr_prefs.c:270
+msgid "Speed Limits"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:1594
+#, fuzzy
+msgid "Limit _Download Speed (KiB/s):"
+msgstr "Rajoita latausnopeutta"
+
+#: ../gtk/torrent-inspector.c:1607
+#, fuzzy
+msgid "Limit _Upload Speed (KiB/s):"
+msgstr "Rajoita lähetys nopeutta"
+
+#: ../gtk/torrent-inspector.c:1621 ../gtk/tr_prefs.c:307
+msgid "Peer Connections"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:1627
+#, fuzzy
+msgid "Maximum connected peers:"
+msgstr "Suurin latausnopeus:"
+
+#: ../gtk/torrent-inspector.c:1631
+msgid "_Stop Seeding at Ratio:"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:1697
+#, c-format
+msgid "Details for %s (%s)"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:1711
+msgid "_Activity"
+msgstr ""
+
+#: ../gtk/torrent-inspector.c:1716
+#, fuzzy
+msgid "_Peers"
+msgstr "Osien määrä:"
+
+#: ../gtk/torrent-inspector.c:1720
+#, fuzzy
+msgid "_Info"
+msgstr "Tiedonannot"
+
+#: ../gtk/torrent-inspector.c:1725
+#, fuzzy
+msgid "_Files"
+msgstr "Tiedostot"
+
+#: ../gtk/torrent-inspector.c:1730
+msgid "_Options"
+msgstr ""
+
+#: ../gtk/tr_prefs.c:182
+msgid "Use the torrent file where it is"
+msgstr "Käytä alkuperäistä torrent-tiedostoa"
+
+#: ../gtk/tr_prefs.c:186
+msgid "Keep a copy of the torrent file"
+msgstr "Pidä kopio torrent-tiedostosta"
+
+#: ../gtk/tr_prefs.c:190
+msgid "Keep a copy and remove the original"
+msgstr "Pidä kopio ja poista alkuperäinen"
+
+#: ../gtk/tr_prefs.c:234
+msgid "Port is <b>open</b>"
+msgstr ""
+
+#: ../gtk/tr_prefs.c:234
+msgid "Port is <b>closed</b>"
+msgstr ""
+
+#: ../gtk/tr_prefs.c:242
+msgid "<i>Testing port...</i>"
+msgstr ""
+
+#: ../gtk/tr_prefs.c:260
+#, fuzzy
+msgid "Preferences"
+msgstr "%s asetukset"
+
+#: ../gtk/tr_prefs.c:273
+#, fuzzy
+msgid "_Limit Upload Speed (KiB/s)"
+msgstr "Rajoita lähetys nopeutta"
+
+#: ../gtk/tr_prefs.c:280
+#, fuzzy
+msgid "Li_mit Download Speed (KiB/s)"
+msgstr "Rajoita latausnopeutta"
+
+#: ../gtk/tr_prefs.c:288
+#, fuzzy
+msgid "Downloads"
+msgstr "Ladattu:"
+
+#: ../gtk/tr_prefs.c:291
+#, fuzzy
+msgid "P_rompt for download directory"
+msgstr "Kysy aina tallennushakemistoa"
+
+#: ../gtk/tr_prefs.c:299
+msgid "For torrents added _normally:"
+msgstr "Käyttöliittymästä lisätyt torrentit:"
+
+#: ../gtk/tr_prefs.c:303
+#, fuzzy
+msgid "For torrents added from _command-line:"
+msgstr "Ainoastaan päätteestä lisätyt torrentit"
+
+#: ../gtk/tr_prefs.c:311
+msgid "Global maximum connected peers:"
+msgstr ""
+
+#: ../gtk/tr_prefs.c:313
+msgid "Maximum connected peers for new torrents:"
+msgstr ""
+
+#: ../gtk/tr_prefs.c:316
+msgid "Network"
+msgstr ""
+
+#: ../gtk/tr_prefs.c:319
+#, fuzzy
+msgid "_Automatically map port"
+msgstr "Käynnistä torrentin lataus automaattisesti"
+
+#: ../gtk/tr_prefs.c:322
+msgid "NAT traversal uses either NAT-PMP or UPnP"
+msgstr ""
+
+#: ../gtk/tr_prefs.c:330
+msgid "Incoming TCP _Port"
+msgstr ""
+
+#: ../gtk/tr_prefs.c:340
+msgid "Options"
+msgstr ""
+
+#: ../gtk/tr_prefs.c:343
+#, fuzzy
+msgid "Use Peer _Exchange if Possible"
+msgstr "Käytä käyttäjien osoitteiden jakamista jos se on mahdollista"
+
+#: ../gtk/tr_prefs.c:347
+msgid "_Ignore Unencrypted Peers"
+msgstr ""
+
+#: ../gtk/tr_prefs.c:351
+#, fuzzy
+msgid "Show an Icon in the System _Tray"
+msgstr "Näytä ikoni alapalkissa"
+
+#: ../gtk/tr_prefs.c:355
+msgid "Confirm _quit"
+msgstr "Vahvista ohjelman lopetus"
+
+#: ../gtk/tr_torrent.c:205
+#, c-format
+msgid "%s: not a valid torrent file"
+msgstr "%s: ei ole torrent-tiedosto"
+
+#: ../gtk/tr_torrent.c:208
+#, c-format
+msgid "%s: torrent is already open"
+msgstr "%s: torrent-tiedosto on jo auki"
+
+#: ../gtk/tr_torrent.c:249
+#, fuzzy
+msgid "not a valid torrent file"
+msgstr "%s: ei ole torrent-tiedosto"
+
+#: ../gtk/tr_torrent.c:252
+#, fuzzy
+msgid "torrent is already open"
+msgstr "%s: torrent-tiedosto on jo auki"
+
+#. [0...100]
+#: ../gtk/tr_torrent.c:300
+#, c-format
+msgid "Waiting to verify local data (%.1f%% tested)"
+msgstr ""
+
+#: ../gtk/tr_torrent.c:310
+#, c-format
+msgid "Stalled (%.1f%%)"
+msgstr "Ladattu (%.1f%%)"
+
+#: ../gtk/tr_torrent.c:314
+#, fuzzy, c-format
+msgid "%s remaining (%.1f%%)"
+msgstr "Kesto %s (%.1f%%)"
+
+#: ../gtk/tr_torrent.c:320
+#, fuzzy, c-format
+msgid "Uploading to %d of %d peer"
+msgid_plural "Uploading to %d of %d peers"
+msgstr[0] "Lähetetään, %d yhdistetty ( %d kaikkiaan )"
+msgstr[1] "Lähetetään, %d yhdistetty ( %d kaikkiaan )"
+
+#: ../gtk/tr_torrent.c:327
+#, fuzzy, c-format
+msgid "Seeding to %d of %d peer"
+msgid_plural "Seeding to %d of %d peers"
+msgstr[0] "Lähetetään, %d yhdistetty ( %d kaikkiaan )"
+msgstr[1] "Lähetetään, %d yhdistetty ( %d kaikkiaan )"
+
+#: ../gtk/tr_torrent.c:333
+#, c-format
+msgid "Stopped (%.1f%%)"
+msgstr "Pysäytetty (%.1f%%)"
+
+#: ../gtk/tr_torrent.c:337
+#, c-format
+msgid "Unrecognized state: %d"
+msgstr ""
+
+#: ../gtk/tr_window.c:241
+#, fuzzy
+msgid "Total Ratio"
+msgstr "Koko yhteensä:"
+
+#: ../gtk/tr_window.c:242
+msgid "Session Ratio"
+msgstr ""
+
+#: ../gtk/tr_window.c:243
+msgid "Total Transfer"
+msgstr ""
+
+#: ../gtk/tr_window.c:244
+msgid "Session Transfer"
+msgstr ""
+
+#: ../gtk/tr_window.c:439
+msgid "A_ll"
+msgstr ""
+
+#: ../gtk/tr_window.c:439
+msgid "_Active"
+msgstr ""
+
+#: ../gtk/tr_window.c:440
+#, fuzzy
+msgid "_Downloading"
+msgstr "Ladattu:"
+
+#: ../gtk/tr_window.c:440
+msgid "_Seeding"
+msgstr ""
+
+#: ../gtk/tr_window.c:440
+msgid "_Paused"
+msgstr ""
+
+#: ../gtk/tr_window.c:443
+msgid "Name"
+msgstr "Nimi"
+
+#: ../gtk/tr_window.c:605
+#, c-format
+msgid "%d of %d Transfer"
+msgstr ""
+
+#: ../gtk/tr_window.c:606
+#, c-format
+msgid "%d of %d Transfers"
+msgstr ""
+
+#: ../gtk/tr_window.c:610
+#, c-format
+msgid "%d Transfer"
+msgstr ""
+
+#: ../gtk/tr_window.c:611
+#, c-format
+msgid "%d Transfers"
+msgstr ""
+
+#: ../gtk/tr_window.c:630 ../gtk/tr_window.c:643
+#, c-format
+msgid "Ratio: %.1f"
+msgstr ""
+
+#: ../gtk/tr_window.c:635 ../gtk/tr_window.c:640
+#, fuzzy, c-format
+msgid "Down: %s  Up: %s"
+msgstr ""
+"Lat.: %s/s\n"
+"Läh.: %s/s"
+
+#: ../gtk/util.c:60
 msgid "B"
 msgstr ""
 
-#: util.c:64
+#: ../gtk/util.c:60
 msgid "KiB"
 msgstr ""
 
-#: util.c:64
+#: ../gtk/util.c:60
 msgid "MiB"
 msgstr ""
 
-#: util.c:64
+#: ../gtk/util.c:60
 msgid "GiB"
 msgstr ""
 
-#: util.c:64
+#: ../gtk/util.c:60
 msgid "TiB"
 msgstr ""
 
-#: util.c:64
+#: ../gtk/util.c:61
 msgid "PiB"
 msgstr ""
 
-#: util.c:64
+#: ../gtk/util.c:61
 msgid "EiB"
 msgstr ""
 
-#: util.c:93
+#: ../gtk/util.c:61
+msgid "ZiB"
+msgstr ""
+
+#: ../gtk/util.c:61
+msgid "YiB"
+msgstr ""
+
+#: ../gtk/util.c:99
 #, c-format
 msgid "%i %s"
 msgstr "%i %s"
 
-#: util.c:94 util.c:98
-msgid "second"
-msgid_plural "seconds"
+#: ../gtk/util.c:100 ../gtk/util.c:106
+#, fuzzy
+msgid "sec"
+msgid_plural "secs"
 msgstr[0] "sekunti"
 msgstr[1] "sekunttia"
 
-#: util.c:96 util.c:100 util.c:104 util.c:108
+#: ../gtk/util.c:104 ../gtk/util.c:110 ../gtk/util.c:116
 #, c-format
 msgid "%i %s %i %s"
 msgstr "%i %s %i %s"
 
-#: util.c:97 util.c:102
-msgid "minute"
-msgid_plural "minutes"
+#: ../gtk/util.c:105 ../gtk/util.c:112
+#, fuzzy
+msgid "min"
+msgid_plural "mins"
 msgstr[0] "minuutti"
 msgstr[1] "minuuttia"
 
-#: util.c:101 util.c:106 util.c:110
-msgid "hour"
-msgid_plural "hours"
+#: ../gtk/util.c:111 ../gtk/util.c:118
+#, fuzzy
+msgid "hr"
+msgid_plural "hrs"
 msgstr[0] "tunti"
 msgstr[1] "tuntia"
 
-#: util.c:105
+#: ../gtk/util.c:117
 msgid "day"
 msgid_plural "days"
 msgstr[0] "päivä"
 msgstr[1] "päivää"
 
-#: util.c:109
-msgid "week"
-msgid_plural "weeks"
-msgstr[0] "viikko"
-msgstr[1] "viikkoa"
+#~ msgid ""
+#~ "Failed to open the file %s for reading:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Tiedoston %s avaaminen epäonnistui:\n"
+#~ "%s"
 
-#: util.c:118
-msgid "N/A"
-msgstr "N/A"
+#~ msgid ""
+#~ "Error while reading from the file %s:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Virhe luettaessa tiedostoa %s:\n"
+#~ "%s"
 
-#. this is a UTF-8 infinity symbol
-#: util.c:122
-msgid "∞"
-msgstr "∞"
+#~ msgid ""
+#~ "Failed to rename the file %s to %s:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Tiedoston nimeäminen %s:stä %s:n epäonnistui:\n"
+#~ "%s"
+
+#~ msgid "%s - Properties for %s"
+#~ msgstr "%s - Asetukset %s:lle"
+
+#~ msgid "General"
+#~ msgstr "Yleiset"
+
+#~ msgid "Info Hash:"
+#~ msgstr "Tiiviste"
+
+#~ msgid "Piece Size:"
+#~ msgstr "Osan koko:"
+
+#~ msgid "Remaining:"
+#~ msgstr "Jäljellä:"
+
+#~ msgid "?"
+#~ msgstr "?"
+
+#~ msgid "Are you sure you want to quit %s?"
+#~ msgstr "Haluatko varmasti lopettaa?"
+
+#~ msgid "  fnord    fnord  "
+#~ msgstr "  fnord    fnord  "
+
+#~ msgid "Start a torrent that is not running"
+#~ msgstr "Käynnistä valittu torrent"
+
+#~ msgid "Stop a torrent that is running"
+#~ msgstr "Pysäytä valittu torrent"
+
+#~ msgid "Remove a torrent"
+#~ msgstr "Poista torrent-tiedosto"
+
+#~ msgid "Show additional information about a torrent"
+#~ msgstr "Näytä torrentin tiedot"
+
+#~ msgid "Open debug window"
+#~ msgstr "Avaa virheenjäljitys ikkuna"
+
+#~ msgid "Customize application behavior"
+#~ msgstr "Ohjelman asetukset"
+
+#~ msgid "Close the main window"
+#~ msgstr "Sulje pääikkuna"
+
+#~ msgid "Exit the program"
+#~ msgstr "Poistu ohjelmasta"
+
+#~ msgid ""
+#~ "usage: %s [-hpq] [files...]\n"
+#~ "\n"
+#~ "Transmission %s (r%d) http://transmission.m0k.org/\n"
+#~ "A free, lightweight BitTorrent client with a simple, intuitive interface\n"
+#~ "\n"
+#~ "  -h --help    display this message and exit\n"
+#~ "  -p --paused  start with all torrents paused\n"
+#~ "  -q --quit    request that the running %s instance quit\n"
+#~ "\n"
+#~ "Only one instance of %s may run at one time. Multiple\n"
+#~ "torrent files may be loaded at startup by adding them to the command\n"
+#~ "line. If %s is already running, those torrents will be\n"
+#~ "opened in the running instance.\n"
+#~ msgstr ""
+#~ "käyttö: %s [-hpq] [tiedostot...]\n"
+#~ "\n"
+#~ "Transmission %s (r%d) http://transmission.m0k.org/\n"
+#~ "Ilmainen, kevytkäyttöinen BitTorrent ohjelma jossa on helppokäyttöinen "
+#~ "käyttöliittymä\n"
+#~ "\n"
+#~ "  -h --help    näyttää tämän viestin\n"
+#~ "  -p --paused  aloittaa ohjelman niin että torrentit ovat poissa päältä\n"
+#~ "  -q --quit    sulkee päällä olevan %s ohjelman\n"
+#~ "\n"
+#~ "Vain yksi %s ohjelma voi olla kerrallaan käynnissä. Useampi\n"
+#~ "torrent tiedosto voidaan ladata käynnistyksessä lisäämällä ne\n"
+#~ "komentoriville. Jos %s ohjelma on jo käynnissä, nämä torrentit\n"
+#~ "avautuvat käynnissä olevassa ohjelmassa.\n"
+
+#~ msgid "???"
+#~ msgstr "???"
+
+#~ msgid "Restrict the download rate"
+#~ msgstr "Rajoitettu latausnopeus"
+
+#~ msgid "Speed in KiB/sec for restricted download rate"
+#~ msgstr "Aseta nopeus KiB/sec rajoitetulle latausnopeudelle"
+
+#~ msgid "Restrict the upload rate"
+#~ msgstr "Rajoitettu lähetys nopeus"
+
+#~ msgid "Maximum _upload speed:"
+#~ msgstr "Suurin lähetysnopeus:"
+
+#~ msgid "Speed in KiB/sec for restricted upload rate"
+#~ msgstr "Aseta nopeus KiB/sec rajoitetulle lähetysnopeudelle"
+
+#~ msgid ""
+#~ "When adding a torrent, always prompt for a directory to download data "
+#~ "files into"
+#~ msgstr "Lisättäessä torrenttia, kysy aina tallennushakemistoa"
+
+#~ msgid "Download di_rectory:"
+#~ msgstr "Tallennushakemisto:"
+
+#~ msgid "Destination directory for downloaded data files"
+#~ msgstr "Ladattujen tiedostojen tallennushakemisto"
+
+#~ msgid "Listening _port:"
+#~ msgstr "Käytetty portti:"
+
+#~ msgid "TCP port number to listen for peer connections"
+#~ msgstr "TCP portin numero yhteyksien kuuntelemiseen"
+
+#~ msgid "Au_tomatic port mapping via NAT-PMP or UPnP"
+#~ msgstr "Automaattinen portin mappaus NAT-PMP:llä tai UPnP:llä"
+
+#~ msgid "Attempt to bypass NAT or firewall to allow incoming peer connections"
+#~ msgstr "Yritä ohittaa NAT tai palomuuri salliaksesi sisääntulevat yhteydet"
+
+#~ msgid ""
+#~ "Perform Azureus or µTorrent compatible peer exchange with any peers which "
+#~ "support it"
+#~ msgstr ""
+#~ "Käytä käyttäjien osoitteiden jakamista Azureus tai µTorrent "
+#~ "yhteensopivien käyttäjien kanssa jos ne tukevat sitä"
+
+#~ msgid "Use a system tray / dock / notification area icon"
+#~ msgstr "Käytä alapalkkia / paneelia / huomautus ikonia"
+
+#~ msgid "Prompt for confirmation when quitting"
+#~ msgstr "Kysy vahvistusta lopetettaessa ohjelmaa"
+
+#~ msgid "Torrent files added via the toolbar, popup menu, and drag-and-drop"
+#~ msgstr "Käyttöliittymästä lisätyt torrentit:"
+
+#~ msgid ""
+#~ "For torrents added e_xternally\n"
+#~ "(via the command-line):"
+#~ msgstr ""
+#~ "Muualta lisätyt torrentit\n"
+#~ "(päätteestä lisätyt):"
+
+#~ msgid "     Total DL: %s/s     Total UL: %s/s"
+#~ msgstr "     Latausnopeus yhteensä: %s/s     Lähetysnopeus yhteensä: %s/s"
+
+#~ msgid "Checking existing files (%.1f%%)"
+#~ msgstr "Tarkistetaan aikaisempia tiedostoja (%.1f%%)"
+
+#~ msgid "Stopping..."
+#~ msgstr "Pysäytetään..."
+
+#~ msgid ""
+#~ "Ratio: %s\n"
+#~ "UL: %s/s"
+#~ msgstr ""
+#~ "Jakosuhde: %s\n"
+#~ "Läh.: %s/s"
+
+#~ msgid "week"
+#~ msgid_plural "weeks"
+#~ msgstr[0] "viikko"
+#~ msgstr[1] "viikkoa"
+
+#~ msgid "∞"
+#~ msgstr "∞"
