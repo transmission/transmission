@@ -185,9 +185,14 @@ compareByActivity( GtkTreeModel * model,
                    gpointer       user_data UNUSED )
 {
     int i;
+    tr_torrent *ta, *tb;
     const tr_stat *sa, *sb;
-    gtk_tree_model_get( model, a, MC_STAT, &sa, -1 );
-    gtk_tree_model_get( model, b, MC_STAT, &sb, -1 );
+
+    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
+    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
+
+    sa = tr_torrentStatCached( ta );
+    sb = tr_torrentStatCached( tb );
 
     if(( i = compareDouble( sa->rateUpload + sa->rateDownload,
                             sb->rateUpload + sb->rateDownload ) ))
@@ -231,9 +236,12 @@ compareByProgress( GtkTreeModel   * model,
                    gpointer         user_data UNUSED )
 {
     int ret;
+    tr_torrent *ta, *tb;
     const tr_stat *sa, *sb;
-    gtk_tree_model_get( model, a, MC_STAT, &sa, -1 );
-    gtk_tree_model_get( model, b, MC_STAT, &sb, -1 );
+    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
+    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
+    sa = tr_torrentStatCached( ta );
+    sb = tr_torrentStatCached( tb );
     ret = compareDouble( sa->percentDone, sb->percentDone );
     if( !ret )
         ret = compareDouble( sa->ratio, sa->ratio );
@@ -246,10 +254,10 @@ compareByState( GtkTreeModel   * model,
                 GtkTreeIter    * b,
                 gpointer         user_data UNUSED )
 {
-    const tr_stat *sa, *sb;
-    gtk_tree_model_get( model, a, MC_STAT, &sa, -1 );
-    gtk_tree_model_get( model, b, MC_STAT, &sb, -1 );
-    return sa->status - sb->status;
+    tr_torrent *ta, *tb;
+    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
+    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
+    return tr_torrentStatCached(ta)->status - tr_torrentStatCached(tb)->status;
 }
 
 static int
