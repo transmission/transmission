@@ -868,7 +868,7 @@ refresh_activity (GtkWidget * top)
   gtk_label_set_text (GTK_LABEL(a->state_lb), pch);
   g_free (pch);
 
-  pch = g_strdup_printf( "%.1f%% (%.1f%% selected)", stat->percentComplete*100.0, stat->percentDone*100.0 );
+  pch = g_strdup_printf( _( "%.1f%% (%.1f%% selected)" ), stat->percentComplete*100.0, stat->percentDone*100.0 );
   gtk_label_set_text (GTK_LABEL(a->progress_lb), pch);
   g_free (pch);
 
