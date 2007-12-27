@@ -220,7 +220,7 @@
             groupRect.origin.y--;
         }
         
-        [[[GroupsWindowController groupsController] gradientForIndex: groupValue] fillBezierPath:
+        [[[GroupsWindowController groups] gradientForIndex: groupValue] fillBezierPath:
             [NSBezierPath bezierPathWithRoundedRect: groupRect radius: 6.0] angle: 90.0];
     }
     

@@ -124,8 +124,8 @@
     else
         status = PORT_STATUS_ERROR;
     
-    [self callBackWithStatus: status];
     [probeString release];
+    [self callBackWithStatus: status];
 }
 
 @end

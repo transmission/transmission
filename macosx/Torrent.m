@@ -1201,7 +1201,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (int) groupOrderValue
 {
-    return [[GroupsWindowController groupsController] orderValueForIndex: fGroupValue];
+    return [[GroupsWindowController groups] orderValueForIndex: fGroupValue];
 }
 
 - (void) checkGroupValueForRemoval: (NSNotification *) notification

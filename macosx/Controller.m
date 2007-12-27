@@ -2065,7 +2065,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) showGroups: (id) sender
 {
-    [[GroupsWindowController groupsController] showWindow: self];
+    [[GroupsWindowController groups] showWindow: self];
 }
 
 - (void) menuNeedsUpdate: (NSMenu *) menu
@@ -2076,8 +2076,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         for (i = [menu numberOfItems]-1 - keep; i >= 0; i--)
             [menu removeItemAtIndex: i];
         
-        NSMenu * groupMenu = [[GroupsWindowController groupsController] groupMenuWithTarget: self action: @selector(setGroup:)
-                                isSmall: NO];
+        NSMenu * groupMenu = [[GroupsWindowController groups] groupMenuWithTarget: self action: @selector(setGroup:) isSmall: NO];
         [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange:
                 NSMakeRange(0, [groupMenu numberOfItems])] atBottom: NO];
     }
@@ -2087,7 +2086,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         for (i = [menu numberOfItems]-1; i >= 3; i--)
             [menu removeItemAtIndex: i];
         
-        NSMenu * groupMenu = [[GroupsWindowController groupsController] groupMenuWithTarget: self action: @selector(setGroupFilter:)
+        NSMenu * groupMenu = [[GroupsWindowController groups] groupMenuWithTarget: self action: @selector(setGroupFilter:)
                                 isSmall: YES];
         [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange:
                 NSMakeRange(0, [groupMenu numberOfItems])] atBottom: YES];
@@ -2132,9 +2131,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             toolTip = NSLocalizedString(@"Group: No Label", "Groups -> Button");
             break;
         default:
-            icon = [[GroupsWindowController groupsController] imageForIndex: index isSmall: YES];
+            icon = [[GroupsWindowController groups] imageForIndex: index isSmall: YES];
             toolTip = [NSLocalizedString(@"Group: ", "Groups -> Button") stringByAppendingString:
-                        [[GroupsWindowController groupsController] nameForIndex: index]];
+                        [[GroupsWindowController groups] nameForIndex: index]];
     }
     
     [[fGroupFilterMenu itemAtIndex: 0] setImage: icon];

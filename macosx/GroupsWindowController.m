@@ -52,7 +52,7 @@ typedef enum
 @implementation GroupsWindowController
 
 GroupsWindowController * fGroupsWindowInstance = nil;
-+ (GroupsWindowController *) groupsController
++ (GroupsWindowController *) groups
 {
     if (!fGroupsWindowInstance)
         fGroupsWindowInstance = [[GroupsWindowController alloc] init];

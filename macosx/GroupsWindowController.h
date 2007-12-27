@@ -36,7 +36,7 @@
     NSMutableDictionary * fCurrentColorDict;
 }
 
-+ (GroupsWindowController *) groupsController;
++ (GroupsWindowController *) groups;
 
 - (int) orderValueForIndex: (int) index;
 - (CTGradient *) gradientForIndex: (int) index;
