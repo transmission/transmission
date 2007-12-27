@@ -185,14 +185,9 @@ compareByActivity( GtkTreeModel * model,
                    gpointer       user_data UNUSED )
 {
     int i;
-    tr_torrent *ta, *tb;
     const tr_stat *sa, *sb;
-
-    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
-    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
-
-    sa = tr_torrentStatCached( ta );
-    sb = tr_torrentStatCached( tb );
+    gtk_tree_model_get( model, a, MC_STAT, &sa, -1 );
+    gtk_tree_model_get( model, b, MC_STAT, &sb, -1 );
 
     if(( i = compareDouble( sa->rateUpload + sa->rateDownload,
                             sb->rateUpload + sb->rateDownload ) ))
@@ -236,12 +231,9 @@ compareByProgress( GtkTreeModel   * model,
                    gpointer         user_data UNUSED )
 {
     int ret;
-    tr_torrent *ta, *tb;
     const tr_stat *sa, *sb;
-    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
-    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
-    sa = tr_torrentStatCached( ta );
-    sb = tr_torrentStatCached( tb );
+    gtk_tree_model_get( model, a, MC_STAT, &sa, -1 );
+    gtk_tree_model_get( model, b, MC_STAT, &sb, -1 );
     ret = compareDouble( sa->percentDone, sb->percentDone );
     if( !ret )
         ret = compareDouble( sa->ratio, sa->ratio );
@@ -254,10 +246,10 @@ compareByState( GtkTreeModel   * model,
                 GtkTreeIter    * b,
                 gpointer         user_data UNUSED )
 {
-    tr_torrent *ta, *tb;
-    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
-    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
-    return tr_torrentStatCached(ta)->status - tr_torrentStatCached(tb)->status;
+    const tr_stat *sa, *sb;
+    gtk_tree_model_get( model, a, MC_STAT, &sa, -1 );
+    gtk_tree_model_get( model, b, MC_STAT, &sb, -1 );
+    return sa->status - sb->status;
 }
 
 static int
@@ -335,6 +327,7 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
         G_TYPE_STRING,    /* hash string */
         TR_TORRENT_TYPE,  /* TrTorrent object */
         G_TYPE_POINTER,   /* tr_torrent* */
+        G_TYPE_POINTER,   /* tr_stat* */
         G_TYPE_INT        /* ID for IPC */
     };
 
@@ -644,12 +637,17 @@ update_foreach( GtkTreeModel * model,
                 GtkTreeIter  * iter,
                 gpointer       data UNUSED)
 {
-    TrTorrent * tor;
+    TrTorrent * gtor;
+    const tr_stat * torStat;
+    gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, -1 );
 
-    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
-    tr_torrent_check_seeding_cap ( tor );
-    g_object_unref( tor );
+    torStat = tr_torrentStat( tr_torrent_handle( gtor ) );
+    gtk_list_store_set( GTK_LIST_STORE( model ), iter,
+                        MC_STAT, (gpointer)torStat,
+                        -1 );
+    tr_torrent_check_seeding_cap ( gtor );
 
+    g_object_unref( gtor );
     return FALSE;
 }
 
