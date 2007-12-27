@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-12-27 17:28+0100\n"
+"POT-Creation-Date: 2007-12-27 20:21+0100\n"
 "PO-Revision-Date: 2007-12-27 17:30:19+0100\n"
 "Last-Translator: Robert-André Mauchin <zebob.m@pengzone.org>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
@@ -543,22 +543,16 @@ msgstr "Ratio : %.1f, "
 #: ../gtk/torrent-cell-renderer.c:188
 #, c-format
 msgid "Downloading from %d of %d connected peer"
-msgstr "Réception depuis %d de %d pair connecté"
-
-#: ../gtk/torrent-cell-renderer.c:189
-#, c-format
-msgid "Downloading from %d of %d connected peers"
-msgstr "Réception depuis %d de %d pairs connectés"
+msgid_plural "Downloading from %d of %d connected peers"
+msgstr[0] "Réception depuis %d de %d pair connecté"
+msgstr[1] "Réception depuis %d de %d pairs connectés"
 
 #: ../gtk/torrent-cell-renderer.c:198
 #, c-format
 msgid "Seeding to %d of %d connected peer"
-msgstr "Partage vers %d de %d pair connecté"
-
-#: ../gtk/torrent-cell-renderer.c:199
-#, c-format
-msgid "Seeding to %d of %d connected peers"
-msgstr "Partage vers %d de %d pairs connectés"
+msgid_plural "Seeding to %d of %d connected peers"
+msgstr[0] "Partage vers %d de %d pair connecté"
+msgstr[1] "Partage vers %d de %d pairs connectés"
 
 #: ../gtk/torrent-inspector.c:248
 msgid "Address"
@@ -1037,22 +1031,16 @@ msgstr "Nom"
 #: ../gtk/tr_window.c:605
 #, c-format
 msgid "%d of %d Transfer"
-msgstr "%d sur %d transfert"
-
-#: ../gtk/tr_window.c:606
-#, c-format
-msgid "%d of %d Transfers"
-msgstr "%d sur %d transferts"
+msgid_plural "%d of %d Transfers"
+msgstr[0] "%d sur %d transfert"
+msgstr[1] "%d sur %d transferts"
 
 #: ../gtk/tr_window.c:610
 #, c-format
 msgid "%d Transfer"
-msgstr "%d transfert"
-
-#: ../gtk/tr_window.c:611
-#, c-format
-msgid "%d Transfers"
-msgstr "%d transferts"
+msgid_plural "%d Transfers"
+msgstr[0] "%d transfert"
+msgstr[1] "%d transferts"
 
 #: ../gtk/tr_window.c:630 ../gtk/tr_window.c:643
 #, c-format
@@ -1133,6 +1121,18 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "jour"
 msgstr[1] "jours"
+
+#~ msgid "Downloading from %d of %d connected peers"
+#~ msgstr "Réception depuis %d de %d pairs connectés"
+
+#~ msgid "Seeding to %d of %d connected peers"
+#~ msgstr "Partage vers %d de %d pairs connectés"
+
+#~ msgid "%d of %d Transfers"
+#~ msgstr "%d sur %d transferts"
+
+#~ msgid "%d Transfers"
+#~ msgstr "%d transferts"
 
 #~ msgid "Downloaded"
 #~ msgstr "Reçu"
