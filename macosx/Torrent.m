@@ -231,7 +231,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fPreviousFinishedPieces = tab;
     
     [fFinishedPiecesDate release];
-    fFinishedPiecesDate = fPreviousFinishedPieces != NULL ? [[NSDate alloc] init] : nil;
+    fFinishedPiecesDate = tab != NULL ? [[NSDate alloc] init] : nil;
 }
 
 - (void) update
