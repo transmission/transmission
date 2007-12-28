@@ -124,8 +124,6 @@ TrOpenFile( int i, const char * filename, int write )
     struct tr_openfile * file = &gFd->open[i];
     int flags;
 
-    tr_dbg( "Opening '%s' (%d)", filename, write );
-
     /* create subfolders, if any */
     if( write ) {
         char * tmp = tr_strdup( filename );
