@@ -156,6 +156,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     if (fPreviousFinishedPieces != NULL)
         free(fPreviousFinishedPieces);
+    [fFinishedPiecesDate release];
     
     [fDownloadFolder release];
     [fIncompleteFolder release];
@@ -217,7 +218,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (float *) getPreviousAmountFinished
 {
-    if (fFinishedPiecesDate && [fFinishedPiecesDate timeIntervalSinceNow] < -1.0)
+    if (fFinishedPiecesDate && [fFinishedPiecesDate timeIntervalSinceNow] > -2.0)
         return fPreviousFinishedPieces;
     else
         return NULL;
