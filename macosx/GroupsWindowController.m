@@ -404,8 +404,9 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 - (NSImage *) imageForGroup: (NSDictionary *) dict isSmall: (BOOL) small
 {
     float width = small ? ICON_WIDTH_SMALL : ICON_WIDTH;
-    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: NSMakeRect(0.0, 0.0, width, width) radius: 4.0];
-    NSImage * icon = [[NSImage alloc] initWithSize: [bp bounds].size];
+    NSRect rect = NSMakeRect(0.0, 0.0, width, width);
+    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: rect radius: 4.0];
+    NSImage * icon = [[NSImage alloc] initWithSize: rect.size];
     
     [icon lockFocus];
     [[self gradientForColor: [dict objectForKey: @"Color"]] fillBezierPath: bp angle: 270.0];
