@@ -503,6 +503,12 @@
 		A265A3310D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/MessageWindow.xib; sourceTree = "<group>"; };
 		A265A3320D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A265A3330D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/StatsWindow.xib; sourceTree = "<group>"; };
+		A265A3BE0D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/Creator.xib; sourceTree = "<group>"; };
+		A265A3BF0D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/InfoWindow.xib; sourceTree = "<group>"; };
+		A265A3C00D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		A265A3C10D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/MessageWindow.xib; sourceTree = "<group>"; };
+		A265A3C20D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
+		A265A3C30D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/StatsWindow.xib; sourceTree = "<group>"; };
 		A26E75870CB6AA7500226674 /* InfoOptions.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoOptions.png; path = macosx/Images/InfoOptions.png; sourceTree = "<group>"; };
 		A26E75950CB6AB4800226674 /* InfoGeneral.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoGeneral.png; path = macosx/Images/InfoGeneral.png; sourceTree = "<group>"; };
 		A2710E740A86796000CE4F7D /* PrefsWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsWindow.h; path = macosx/PrefsWindow.h; sourceTree = "<group>"; };
@@ -1886,6 +1892,7 @@
 				A223AA830D220CEB00840069 /* nl */,
 				A223AABA0D22ECE800840069 /* it */,
 				A265A3320D25767700198AC8 /* fr */,
+				A265A3C20D25AE7800198AC8 /* es */,
 			);
 			name = PrefsWindow.xib;
 			sourceTree = "<group>";
@@ -1897,6 +1904,7 @@
 				A223AA810D220CEB00840069 /* nl */,
 				A223AAB80D22ECE800840069 /* it */,
 				A265A3300D25767700198AC8 /* fr */,
+				A265A3C00D25AE7800198AC8 /* es */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -1908,6 +1916,7 @@
 				A223AA840D220CEB00840069 /* nl */,
 				A223AABB0D22ECE800840069 /* it */,
 				A265A3330D25767700198AC8 /* fr */,
+				A265A3C30D25AE7800198AC8 /* es */,
 			);
 			name = StatsWindow.xib;
 			sourceTree = "<group>";
@@ -1919,6 +1928,7 @@
 				A223AA7D0D220CEB00840069 /* nl */,
 				A223AAB60D22ECE800840069 /* it */,
 				A265A32E0D25767700198AC8 /* fr */,
+				A265A3BE0D25AE7800198AC8 /* es */,
 			);
 			name = Creator.xib;
 			sourceTree = "<group>";
@@ -1930,6 +1940,7 @@
 				A223AA820D220CEB00840069 /* nl */,
 				A223AAB90D22ECE800840069 /* it */,
 				A265A3310D25767700198AC8 /* fr */,
+				A265A3C10D25AE7800198AC8 /* es */,
 			);
 			name = MessageWindow.xib;
 			sourceTree = "<group>";
@@ -1941,6 +1952,7 @@
 				A223AA7F0D220CEB00840069 /* nl */,
 				A223AAB70D22ECE800840069 /* it */,
 				A265A32F0D25767700198AC8 /* fr */,
+				A265A3BF0D25AE7800198AC8 /* es */,
 			);
 			name = InfoWindow.xib;
 			sourceTree = "<group>";
