@@ -61,6 +61,9 @@ typedef enum
     
     NSMenu * fFileMenu;
     
+    float * fPreviousFinishedPieces;
+    NSDate * fFinishedPiecesDate;
+    
     float fRatioLimit;
     int fRatioSetting;
     BOOL fFinishedSeeding, fWaitToStart, fError, fChecking, fStalled;
@@ -86,6 +89,8 @@ typedef enum
 
 - (void) getAvailability: (int8_t *) tab size: (int) size;
 - (void) getAmountFinished: (float *) tab size: (int) size;
+- (float *) getPreviousAmountFinished;
+-(void) setPreviousAmountFinished: (float *) tab;
 
 - (void) update;
 

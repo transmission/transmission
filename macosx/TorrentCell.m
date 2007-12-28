@@ -100,6 +100,7 @@
         fBlue3Color = [[NSColor colorWithCalibratedRed: 0.6 green: 0.8 blue: 1.0 alpha: 1.0] retain];
         fBlue4Color = [[NSColor colorWithCalibratedRed: 0.4 green: 0.6 blue: 1.0 alpha: 1.0] retain];
         fBlueColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
+        fOrangeColor = [[NSColor orangeColor] retain];
         
         fBarOverlayColor = [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] retain];
     }
@@ -307,6 +308,7 @@
     {
         [fBitmap release];
         fBitmap = nil;
+        [[self representedObject] setPreviousAmountFinished: NULL];
         
         [self drawRegularBar: barRect];
     }
@@ -453,12 +455,11 @@
             pixelsWide: MAX_PIECES pixelsHigh: barRect.size.height bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
             isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
     
-    #warning add flashing orange
-    
     Torrent * torrent = [self representedObject];
     
     int pieceCount = MIN([torrent pieceCount], MAX_PIECES);
-    float * piecePercent = malloc(pieceCount * sizeof(float));
+    float * piecePercent = malloc(pieceCount * sizeof(float)),
+        * previousPiecePercent = [torrent getPreviousAmountFinished];
     [torrent getAmountFinished: piecePercent size: pieceCount];
     
     int i, h, index;
@@ -468,7 +469,12 @@
     {
         index = i * increment;
         if (piecePercent[index] >= 1.0)
-            pieceColor = fBlueColor;
+        {
+            if (previousPiecePercent != NULL && previousPiecePercent[index] < 1.0)
+                pieceColor = fOrangeColor;
+            else
+                pieceColor = fBlueColor;
+        }
         else if (piecePercent[index] <= 0.0)
             pieceColor = fGrayColor;
         else if (piecePercent[index] <= 0.25)
@@ -485,7 +491,7 @@
                 [fBitmap setColor: pieceColor atX: i y: h];
     }
     
-    free(piecePercent);
+    [torrent setPreviousAmountFinished: piecePercent];
     
     //actually draw image
     [fBitmap drawInRect: barRect];

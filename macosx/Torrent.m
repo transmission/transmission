@@ -154,6 +154,9 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (fileStat)
         tr_torrentFilesFree(fileStat, [self fileCount]);
     
+    if (fPreviousFinishedPieces != NULL)
+        free(fPreviousFinishedPieces);
+    
     [fDownloadFolder release];
     [fIncompleteFolder release];
     
@@ -210,6 +213,24 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (void) getAmountFinished: (float *) tab size: (int) size
 {
     tr_torrentAmountFinished(fHandle, tab, size);
+}
+
+- (float *) getPreviousAmountFinished
+{
+    if (fFinishedPiecesDate && [fFinishedPiecesDate timeIntervalSinceNow] < -1.0)
+        return fPreviousFinishedPieces;
+    else
+        return NULL;
+}
+
+-(void) setPreviousAmountFinished: (float *) tab
+{
+    if (fPreviousFinishedPieces != NULL)
+        free(fPreviousFinishedPieces);
+    fPreviousFinishedPieces = tab;
+    
+    [fFinishedPiecesDate release];
+    fFinishedPiecesDate = fPreviousFinishedPieces != NULL ? [[NSDate alloc] init] : nil;
 }
 
 - (void) update
