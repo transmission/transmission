@@ -159,19 +159,17 @@ struct counts_data
 };
 
 static void
-accumulateStatusForeach (GtkTreeModel * model,
+accumulateStatusForeach( GtkTreeModel * model,
                          GtkTreePath  * path UNUSED,
                          GtkTreeIter  * iter,
                          gpointer       user_data )
 {
     int status = 0;
     struct counts_data * counts = user_data;
-    tr_torrent * tor;
 
     ++counts->totalCount;
 
-    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
-    status = tr_torrentStat( tor )->status;
+    gtk_tree_model_get( model, iter, MC_STATUS, &status, -1 );
 
     if( TR_STATUS_IS_ACTIVE( status ) )
         ++counts->activeCount;
@@ -185,11 +183,9 @@ accumulateCanUpdateForeach (GtkTreeModel * model,
                             GtkTreeIter  * iter,
                             gpointer       accumulated_status)
 {
-    TrTorrent * gtor = NULL;
-    gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, -1 );
-    *(int*)accumulated_status |=
-        tr_torrentCanManualUpdate( tr_torrent_handle( gtor ) );
-    g_object_unref( G_OBJECT( gtor ) );
+    tr_torrent * tor;
+    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
+    *(int*)accumulated_status |= tr_torrentCanManualUpdate( tor );
 }
 
 static void

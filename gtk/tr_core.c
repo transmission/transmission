@@ -254,10 +254,10 @@ compareByState( GtkTreeModel   * model,
                 GtkTreeIter    * b,
                 gpointer         user_data UNUSED )
 {
-    tr_torrent *ta, *tb;
-    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
-    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
-    return tr_torrentStatCached(ta)->status - tr_torrentStatCached(tb)->status;
+    int sa, sb;
+    gtk_tree_model_get( model, a, MC_STATUS, &sa, -1 );
+    gtk_tree_model_get( model, b, MC_STATUS, &sb, -1 );
+    return sa - sb;
 }
 
 static int
@@ -654,7 +654,7 @@ update_foreach( GtkTreeModel * model,
                                      MC_STATUS, &oldStatus,
                                      -1 );
 
-    torStat = tr_torrentStat( tr_torrent_handle( gtor ) );
+    torStat = tr_torrent_stat( gtor );
 
     if( oldStatus != (int) torStat->status )
         gtk_list_store_set( GTK_LIST_STORE( model ), iter,
