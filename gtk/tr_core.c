@@ -335,7 +335,7 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
         G_TYPE_STRING,    /* hash string */
         TR_TORRENT_TYPE,  /* TrTorrent object */
         G_TYPE_POINTER,   /* tr_torrent* */
-        G_TYPE_POINTER,   /* tr_stat* */
+        G_TYPE_INT,       /* tr_stat()->status */
         G_TYPE_INT        /* ID for IPC */
     };
 
@@ -453,6 +453,7 @@ static void
 tr_core_insert( TrCore * self, TrTorrent * tor )
 {
     const tr_info * inf = tr_torrent_info( tor );
+    const tr_stat * torStat = tr_torrent_stat( tor );
     char * collated = doCollate( inf->name );
     GtkTreeIter unused;
     gtk_list_store_insert_with_values( GTK_LIST_STORE( self->model ), &unused, 0, 
@@ -461,6 +462,7 @@ tr_core_insert( TrCore * self, TrTorrent * tor )
                                        MC_HASH,          inf->hashString,
                                        MC_TORRENT,       tor,
                                        MC_TORRENT_RAW,   tor->handle,
+                                       MC_STATUS,        torStat->status,
                                        MC_ID,            self->nextid,
                                        -1);
     self->nextid++;
@@ -646,13 +648,19 @@ update_foreach( GtkTreeModel * model,
                 gpointer       data UNUSED)
 {
     TrTorrent * gtor;
+    int oldStatus;
     const tr_stat * torStat;
-    gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, -1 );
+    gtk_tree_model_get( model, iter, MC_TORRENT, &gtor,
+                                     MC_STATUS, &oldStatus,
+                                     -1 );
 
     torStat = tr_torrentStat( tr_torrent_handle( gtor ) );
-    gtk_list_store_set( GTK_LIST_STORE( model ), iter,
-                        MC_STAT, (gpointer)torStat,
-                        -1 );
+
+    if( oldStatus != (int) torStat->status )
+        gtk_list_store_set( GTK_LIST_STORE( model ), iter,
+                            MC_STATUS, torStat->status,
+                            -1 );
+
     tr_torrent_check_seeding_cap ( gtor );
 
     g_object_unref( gtor );
