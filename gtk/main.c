@@ -393,7 +393,6 @@ winsetup( struct cbdata * cbdata, TrWindow * wind )
     g_signal_connect( sel, "changed", G_CALLBACK(selectionChangedCB), NULL );
     selectionChangedCB( sel, NULL );
     model = tr_core_model( cbdata->core );
-    //gtk_tree_view_set_model ( gtk_tree_selection_get_tree_view(sel), model );
     g_signal_connect( model, "row-changed", G_CALLBACK(rowChangedCB), sel );
     g_signal_connect( wind, "delete-event", G_CALLBACK( winclose ), cbdata );
     refreshTorrentActions( sel );
@@ -752,16 +751,21 @@ getselection( struct cbdata * cbdata )
 
     if( NULL != cbdata->wind )
     {
-        GList * ii;
+        GList * l;
         GtkTreeSelection *s = tr_window_get_selection(cbdata->wind);
-        GtkTreeModel * model = tr_core_model( cbdata->core );
-        rows = gtk_tree_selection_get_selected_rows( s, NULL );
-        for( ii = rows; NULL != ii; ii = ii->next )
+        GtkTreeModel * filter_model;
+        GtkTreeModel * store_model;
+        rows = gtk_tree_selection_get_selected_rows( s, &filter_model );
+        store_model = gtk_tree_model_filter_get_model(
+                                                 GTK_TREE_MODEL_FILTER( filter_model ) );
+        for( l=rows; l!=NULL; l=l->next )
         {
-            GtkTreeRowReference * ref = gtk_tree_row_reference_new(
-                model, ii->data );
-            gtk_tree_path_free( ii->data );
-            ii->data = ref;
+            GtkTreePath * path = gtk_tree_model_filter_convert_path_to_child_path(
+                                        GTK_TREE_MODEL_FILTER( filter_model ), l->data );
+            GtkTreeRowReference * ref = gtk_tree_row_reference_new( store_model, path );
+            gtk_tree_path_free( path );
+            gtk_tree_path_free( l->data );
+            l->data = ref;
         }
     }
 
@@ -922,7 +926,7 @@ doAction ( const char * action_name, gpointer user_data )
         for( l=sel; l!=NULL; l=l->next )
         {
             GtkTreeIter iter;
-            GtkTreeRowReference * reference = (GtkTreeRowReference *) l->data;
+            GtkTreeRowReference * reference = l->data;
             GtkTreePath * path = gtk_tree_row_reference_get_path( reference );
             gtk_tree_model_get_iter( model, &iter, path );
             tr_core_delete_torrent( data->core, &iter );
