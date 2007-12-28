@@ -55,7 +55,6 @@
 #define WIDTH_GROUP_MIN 24.0
 
 #define MAX_PIECES 324
-#define BLANK_PIECE -99
 
 @interface TorrentCell (Private)
 
@@ -110,9 +109,7 @@
 - (id) copyWithZone: (NSZone *) zone
 {
     TorrentCell * copy = [super copyWithZone: zone];
-    
     copy->fBitmap = nil;
-    copy->fPieces = NULL;
     
     return copy;
 }
@@ -120,9 +117,6 @@
 - (void) dealloc
 {
     [fBitmap release];
-    if (fPieces)
-        free(fPieces);
-    
     [super dealloc];
 }
 
@@ -311,13 +305,8 @@
     }
     else
     {
-        if (fPieces)
-        {
-            free(fPieces);
-            fPieces = NULL;
-            [fBitmap release];
-            fBitmap = nil;
-        }
+        [fBitmap release];
+        fBitmap = nil;
         
         [self drawRegularBar: barRect];
     }
@@ -464,14 +453,6 @@
             pixelsWide: MAX_PIECES pixelsHigh: barRect.size.height bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
             isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
     
-    if (!fPieces)
-    {
-        fPieces = malloc(MAX_PIECES);
-        int i;
-        for (i = 0; i < MAX_PIECES; i++)
-            fPieces[i] = BLANK_PIECE;
-    }
-    
     #warning add flashing orange
     
     Torrent * torrent = [self representedObject];
@@ -486,58 +467,20 @@
     for (i = 0; i < MAX_PIECES; i++)
     {
         index = i * increment;
-        pieceColor = nil;
-        
         if (piecePercent[index] >= 1.0)
-        {
-            if (fPieces[i] != -1)
-            {
-                pieceColor = fBlueColor;
-                fPieces[i] = -1;
-            }
-        }
+            pieceColor = fBlueColor;
         else if (piecePercent[index] <= 0.0)
-        {
-            if (fPieces[i] != 0)
-            {
-                pieceColor = fGrayColor;
-                fPieces[i] = 0;
-            }
-        }
+            pieceColor = fGrayColor;
         else if (piecePercent[index] <= 0.25)
-        {
-            if (fPieces[i] != 1)
-            {
-                pieceColor = fBlue1Color;
-                fPieces[i] = 1;
-            }
-        }
+            pieceColor = fBlue1Color;
         else if (piecePercent[index] <= 0.5)
-        {
-            if (fPieces[i] != 2)
-            {
-                pieceColor = fBlue2Color;
-                fPieces[i] = 2;
-            }
-        }
+            pieceColor = fBlue2Color;
         else if (piecePercent[index] <= 0.75)
-        {
-            if (fPieces[i] != 3)
-            {
-                pieceColor = fBlue3Color;
-                fPieces[i] = 3;
-            }
-        }
+            pieceColor = fBlue3Color;
         else
-        {
-            if (fPieces[i] != 4)
-            {
-                pieceColor = fBlue4Color;
-                fPieces[i] = 4;
-            }
-        }
+            pieceColor = fBlue4Color;
         
-        if (pieceColor)
+        if (![pieceColor isEqualTo: [fBitmap colorAtX: i y: 0]])
             for (h = 0; h < barRect.size.height; h++)
                 [fBitmap setColor: pieceColor atX: i y: h];
     }

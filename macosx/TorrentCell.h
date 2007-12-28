@@ -39,7 +39,6 @@
     NSColor * fGrayColor, * fBlueColor, * fBlue1Color, * fBlue2Color, * fBlue3Color, * fBlue4Color;
     
     NSBitmapImageRep * fBitmap;
-    int8_t * fPieces;
 }
 
 - (NSRect) iconRectForBounds: (NSRect) bounds;
