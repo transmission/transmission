@@ -480,7 +480,7 @@
         else
             pieceColor = fBlue4Color;
         
-        if (![pieceColor isEqualTo: [fBitmap colorAtX: i y: 0]])
+        if (![pieceColor isEqual: [fBitmap colorAtX: i y: 0]])
             for (h = 0; h < barRect.size.height; h++)
                 [fBitmap setColor: pieceColor atX: i y: h];
     }
