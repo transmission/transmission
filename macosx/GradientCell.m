@@ -28,10 +28,10 @@
 
 @implementation GradientCell
 
+#warning switch to image cell
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
-    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: cellFrame radius: 4.0];
-    [[self objectValue] fillBezierPath: bp angle: 90];
+    [[self objectValue] fillBezierPath: [NSBezierPath bezierPathWithRoundedRect: cellFrame radius: 4.0] angle: 90];
 }
 
 @end

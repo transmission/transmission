@@ -135,6 +135,9 @@
     
     tr_freeMessageList(messages);
     
+    NSScroller * scroller = [[fMessageTable enclosingScrollView] verticalScroller];
+    BOOL shouldScroll = [scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0;
+    
     int total = [fMessages count];
     if (total > MAX_MESSAGES)
     {
@@ -152,6 +155,8 @@
     [fMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
     
     [fMessageTable reloadData];
+    if (shouldScroll)
+        [fMessageTable scrollRowToVisible: total-1];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) tableView
