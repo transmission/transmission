@@ -786,3 +786,5 @@
 /* Groups -> Name */
 "Yellow" = "Amarillo";
 
+"%d of %@" = "%1$d de %2$@";
+

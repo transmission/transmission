@@ -1812,6 +1812,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) applyFilter: (id) sender
 {
+    NSMutableArray * previousTorrents = [fDisplayedTorrents mutableCopy];
+    
     //remember selected rows if needed
     NSArray * selectedTorrents = [fTableView numberOfSelectedRows] > 0
                 ? [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] : nil;
@@ -1910,6 +1912,17 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fDisplayedTorrents setArray: [fTorrents objectsAtIndexes: indexes]];
     
+    //clear display cache for not-shown torrents
+    [previousTorrents removeObjectsInArray: fDisplayedTorrents];
+    if ([previousTorrents count] > 0)
+    {
+        NSEnumerator * enumerator = [previousTorrents objectEnumerator];
+        Torrent * torrent;
+        while ((torrent = [enumerator nextObject]))
+            [torrent setPreviousAmountFinished: NULL];
+    }
+    [previousTorrents release];
+    
     //set button tooltips
     [fNoFilterButton setCount: [fTorrents count]];
     [fActiveFilterButton setCount: downloading + seeding];
@@ -1922,8 +1935,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //set selected rows if needed
     if (selectedTorrents)
     {
-        Torrent * torrent;
         NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
+        Torrent * torrent;
         NSMutableIndexSet * selectedIndexes = [NSMutableIndexSet indexSet];
         unsigned index;
         while ((torrent = [enumerator nextObject]))
