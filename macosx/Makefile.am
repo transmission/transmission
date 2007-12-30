@@ -15,14 +15,14 @@ EXTRA_DIST = \
     ko.lproj \
     AboutWindowController.h \
     AboutWindowController.m \
-    ActionMenuRatioToDisplayRatioTransformer.h \
-    ActionMenuRatioToDisplayRatioTransformer.m \
-    ActionMenuSpeedToDisplayLimitTransformer.h \
-    ActionMenuSpeedToDisplayLimitTransformer.m \
     ActionPopUpButton.h \
     ActionPopUpButton.m \
     Badger.h \
     Badger.m \
+    BadgeView.h \
+    BadgeView.m \
+    ButtonToolbarItem.h \
+    ButtonToolbarItem.m \
     Controller.h \
     Controller.m \
     CreatorWindowController.h \
@@ -41,12 +41,14 @@ EXTRA_DIST = \
     FileOutlineView.m \
     FilePriorityCell.h \
     FilePriorityCell.m \
-    FilterBarButton.h \
-    FilterBarButton.m \
-    FilterBarView.h \
-    FilterBarView.m \
-    ImageBackgroundView.h \
-    ImageBackgroundView.m \
+    FilterButton.h \
+    FilterButton.m \
+    GradientCell.h \
+    GradientCell.m \
+    GroupsWindowController.h \
+    GroupsWindowController.m \
+    GroupToolbarItem.h \
+    GroupToolbarItem.m \
     InfoTabButtonCell.h \
     InfoTabButtonCell.m \
     InfoWindowController.h \
@@ -54,8 +56,12 @@ EXTRA_DIST = \
     IPCController.h \
     IPCController.m \
     main.m \
+    MenuLabel.h \
+    MenuLabel.m \
     MessageWindowController.h \
     MessageWindowController.m \
+    NSApplicationAdditions.h \
+    NSApplicationAdditions.m \
     NSBezierPathAdditions.h \
     NSBezierPathAdditions.m \
     NSMenuAdditions.h \
@@ -76,8 +82,12 @@ EXTRA_DIST = \
     PrefsWindow.m \
     SpeedLimitToTurtleIconTransformer.h \
     SpeedLimitToTurtleIconTransformer.m \
+    StatsWindowController.h \
+    StatsWindowController.m \
     StatusBarView.h \
     StatusBarView.m \
+    ToolbarSegmentedCell.h \
+    ToolbarSegmentedCell.m \
     TorrentCell.h \
     TorrentCell.m \
     Torrent.h \
