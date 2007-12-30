@@ -615,7 +615,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         urlString = [directObject stringValue];
     
     if (urlString)
-        [self openURL: [[[NSURL alloc] initWithString: urlString] autorelease]];
+        [self openURL: [NSURL URLWithString: urlString]];
 }
 
 - (void) download: (NSURLDownload *) download decideDestinationWithSuggestedFilename: (NSString *) suggestedName

@@ -71,7 +71,7 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
-    [NSApp setApplicationIconImage: nil];
+    [NSApp setApplicationIconImage: nil]; //needed on 10.4
     
     [fDockIcon release];
     [fAttributes release];
