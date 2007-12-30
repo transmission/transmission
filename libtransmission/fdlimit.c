@@ -171,7 +171,6 @@ TrCloseFile( int i )
     assert( i < TR_MAX_OPEN_FILES );
     assert( fileIsOpen( o ) );
 
-    dbgmsg( "closing slot #%d, %s", i, o->filename );
     close( o->fd );
     o->fd = -1;
     o->isCheckedOut = 0;
