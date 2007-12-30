@@ -1690,70 +1690,72 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue"
                                             ascending: asc] autorelease];
     
-    BOOL sortByOrder = [sortType isEqualToString: SORT_ORDER];
-    
     NSArray * descriptors;
-    if (sortByOrder)
+    if ([sortType isEqualToString: SORT_ORDER])
         descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
-    else if ([sortType isEqualToString: SORT_NAME])
-        descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, orderDescriptor, nil];
-    else if ([sortType isEqualToString: SORT_STATE])
-    {
-        NSSortDescriptor * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                                @"stateSortKey" ascending: !asc] autorelease],
-                        * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"progress" ascending: !asc] autorelease],
-                        * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"ratio" ascending: !asc] autorelease];
-        
-        descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor,
-                                                            nameDescriptor, orderDescriptor, nil];
-    }
-    else if ([sortType isEqualToString: SORT_PROGRESS])
-    {
-        NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"progress" ascending: asc] autorelease],
-                        * ratioProgressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"progressStopRatio" ascending: asc] autorelease],
-                        * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"ratio" ascending: asc] autorelease];
-        
-        descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor,
-                                                            nameDescriptor, orderDescriptor, nil];
-    }
-    else if ([sortType isEqualToString: SORT_TRACKER])
-    {
-        NSSortDescriptor * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddress"
-                                                ascending: asc selector: @selector(caseInsensitiveCompare:)] autorelease];
-        
-        descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, orderDescriptor, nil];
-    }
-    else if ([sortType isEqualToString: SORT_ACTIVITY])
-    {
-        NSSortDescriptor * rateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"totalRate" ascending: !asc]
-                                                    autorelease];
-        NSSortDescriptor * activityDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateActivityOrAdd" ascending: !asc]
-                                                    autorelease];
-        
-        descriptors = [[NSArray alloc] initWithObjects: rateDescriptor, activityDescriptor, orderDescriptor, nil];
-    }
     else
     {
-        NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: asc] autorelease];
-    
-        descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, orderDescriptor, nil];
-    }
-    
-    if (!sortByOrder && [fDefaults boolForKey: @"SortByGroup"])
-    {
-        NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: asc] autorelease];
+        if ([sortType isEqualToString: SORT_NAME])
+            descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, orderDescriptor, nil];
+        else if ([sortType isEqualToString: SORT_STATE])
+        {
+            NSSortDescriptor * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                    @"stateSortKey" ascending: !asc] autorelease],
+                            * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                @"progress" ascending: !asc] autorelease],
+                            * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                @"ratio" ascending: !asc] autorelease];
+            
+            descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor,
+                                                                nameDescriptor, orderDescriptor, nil];
+        }
+        else if ([sortType isEqualToString: SORT_PROGRESS])
+        {
+            NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                @"progress" ascending: asc] autorelease],
+                            * ratioProgressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                @"progressStopRatio" ascending: asc] autorelease],
+                            * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                @"ratio" ascending: asc] autorelease];
+            
+            descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor,
+                                                                nameDescriptor, orderDescriptor, nil];
+        }
+        else if ([sortType isEqualToString: SORT_TRACKER])
+        {
+            NSSortDescriptor * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddress"
+                                                    ascending: asc selector: @selector(caseInsensitiveCompare:)] autorelease];
+            
+            descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, orderDescriptor, nil];
+        }
+        else if ([sortType isEqualToString: SORT_ACTIVITY])
+        {
+            NSSortDescriptor * rateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"totalRate" ascending: !asc]
+                                                        autorelease];
+            NSSortDescriptor * activityDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateActivityOrAdd" ascending: !asc]
+                                                        autorelease];
+            
+            descriptors = [[NSArray alloc] initWithObjects: rateDescriptor, activityDescriptor, orderDescriptor, nil];
+        }
+        else
+        {
+            NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: asc] autorelease];
         
-        NSMutableArray * temp = [[NSMutableArray alloc] initWithCapacity: [descriptors count]+1];
-        [temp addObject: groupDescriptor];
-        [temp addObjectsFromArray: descriptors];
+            descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, orderDescriptor, nil];
+        }
         
-        [descriptors release];
-        descriptors = temp;
+        if ([fDefaults boolForKey: @"SortByGroup"])
+        {
+            NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue"
+                                                    ascending: asc] autorelease];
+            
+            NSMutableArray * temp = [[NSMutableArray alloc] initWithCapacity: [descriptors count]+1];
+            [temp addObject: groupDescriptor];
+            [temp addObjectsFromArray: descriptors];
+            
+            [descriptors release];
+            descriptors = temp;
+        }
     }
     
     [fDisplayedTorrents sortUsingDescriptors: descriptors];
