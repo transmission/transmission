@@ -20,6 +20,7 @@ noinst_HEADERS = \
     makemeta-ui.h \
     msgwin.h \
     stats.h \
+    status-bar-icons.h \
     sexy-icon-entry.h \
     torrent-cell-renderer.h \
     torrent-inspector.h \
