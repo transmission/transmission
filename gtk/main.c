@@ -221,6 +221,7 @@ main( int argc, char ** argv )
     char * err;
     struct cbdata * cbdata = g_new (struct cbdata, 1);
     GList * argfiles;
+    GError * gerr;
     gboolean didinit = FALSE;
     gboolean didlock = FALSE;
     gboolean sendquit = FALSE;
@@ -242,7 +243,13 @@ main( int argc, char ** argv )
 
     /* initialize gtk */
     g_thread_init( NULL );
-    gtk_init_with_args( &argc, &argv, _("[torrent files]"), entries, domain, NULL );
+    gerr = NULL;
+    if( !gtk_init_with_args( &argc, &argv, _("[torrent files]"), entries, domain, &gerr ) ) {
+        g_message( "%s", gerr->message );
+        g_clear_error( &gerr );
+        return 0;
+    }
+
     didinit = cf_init( tr_getPrefsDirectory(), NULL ); /* must come before actions_init */
     tr_prefs_init_global( );
     myUIManager = gtk_ui_manager_new ();
