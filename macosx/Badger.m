@@ -82,11 +82,9 @@
         [[NSApp dockTile] display];
         return;
     }
-    else
-    {
-        if (fQuittingTiger)
-            return;
-    }
+    else if (fQuittingTiger)
+        return;
+    else;
     
     //set completed badge to top right
     BOOL completedChange = fCompleted != fCompletedBadged;

@@ -131,9 +131,9 @@ typedef enum
 
 #define SUPPORT_FOLDER  @"/Library/Application Support/Transmission/Transfers.plist"
 
-#define WEBSITE_URL @"http://transmission.m0k.org/"
-#define FORUM_URL   @"http://transmission.m0k.org/forum/"
-#define DONATE_URL  @"http://transmission.m0k.org/donate.php"
+#define WEBSITE_URL @"http://www.transmissionbt.com/"
+#define FORUM_URL   @"http://www.transmissionbt.com/forum/"
+#define DONATE_URL  @"http://www.transmissionbt.com/donate.php"
 
 void sleepCallBack(void * controller, io_service_t y, natural_t messageType, void * messageArgument)
 {
@@ -1693,7 +1693,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     BOOL sortByOrder = [sortType isEqualToString: SORT_ORDER];
     
     NSArray * descriptors;
-    if ([sortType isEqualToString: SORT_NAME])
+    if (sortByOrder)
+        descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+    else if ([sortType isEqualToString: SORT_NAME])
         descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, orderDescriptor, nil];
     else if ([sortType isEqualToString: SORT_STATE])
     {
@@ -1726,8 +1728,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, orderDescriptor, nil];
     }
-    else if (sortByOrder)
-        descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
     else if ([sortType isEqualToString: SORT_ACTIVITY])
     {
         NSSortDescriptor * rateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"totalRate" ascending: !asc]
