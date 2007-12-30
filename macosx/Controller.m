@@ -595,6 +595,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //complete cleanup
     tr_close(fLib);
+    
+    [fBadger release]; //clears dock icon on 10.4
 }
 
 - (void) handleOpenContentsEvent: (NSAppleEventDescriptor *) event replyEvent: (NSAppleEventDescriptor *) replyEvent

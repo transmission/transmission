@@ -26,10 +26,12 @@
 #import "BadgeView.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
+#import "NSBezierPathAdditions.h"
 
 #define COMPLETED_BOTTOM_PADDING 5.0
 #define SPEED_BOTTOM_PADDING 2.0
 #define SPEED_BETWEEN_PADDING 2.0
+#define BADGE_HEIGHT 30.0
 
 @interface Badger (Private)
 
@@ -68,6 +70,8 @@
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
+    [NSApp setApplicationIconImage: nil];
     
     [fDockIcon release];
     [fAttributes release];
@@ -236,7 +240,25 @@
         fSpeedBadge = NO;
         fCompleted = 0;
         fCompletedBadged = 0;
-        [NSApp setApplicationIconImage: nil];
+        
+        NSImage * quitIcon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
+        NSRect rect = NSZeroRect;
+        rect.size = [quitIcon size];
+        
+        NSRect badgeRect = NSMakeRect(0.0, (rect.size.height - BADGE_HEIGHT) * 0.5, rect.size.width, BADGE_HEIGHT);
+        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: badgeRect radius: 15.0];
+        
+        [quitIcon lockFocus];
+            
+        [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
+        [bp fill];
+        
+        [self badgeString: NSLocalizedString(@"Quitting", "Dock Badger -> quit message") forRect: badgeRect];
+        
+        [quitIcon unlockFocus];
+        
+        [NSApp setApplicationIconImage: quitIcon];
+        [quitIcon release];
     }
 }
 
