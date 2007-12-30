@@ -61,6 +61,7 @@ noinst_HEADERS = \
     publish.h \
     ratecontrol.h \
     shared.h \
+    torrent.h \
     tracker.h \
     transmission.h \
     trcompat.h \
