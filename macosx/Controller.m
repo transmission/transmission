@@ -498,7 +498,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isActive])
+            if ([torrent isActive] && ![torrent isStalled])
             {
                 active++;
                 if (![torrent allDownloaded])
