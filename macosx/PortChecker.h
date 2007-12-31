@@ -29,6 +29,7 @@ typedef enum
     PORT_STATUS_CHECKING,
     PORT_STATUS_OPEN,
     PORT_STATUS_CLOSED,
+    PORT_STATUS_STEALTH,
     PORT_STATUS_ERROR
 } port_status_t;
 

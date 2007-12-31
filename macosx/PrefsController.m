@@ -272,6 +272,10 @@
             [fPortStatusField setStringValue: NSLocalizedString(@"Port is closed", "Preferences -> Advanced -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
             break;
+        case PORT_STATUS_STEALTH:
+            [fPortStatusField setStringValue: NSLocalizedString(@"Port is stealth", "Preferences -> Advanced -> port status")];
+            [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
+            break;
         case PORT_STATUS_ERROR:
             [fPortStatusField setStringValue: NSLocalizedString(@"Unable to check port status",
                                                 "Preferences -> Advanced -> port status")];

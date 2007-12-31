@@ -25,7 +25,7 @@
 #import "PortChecker.h"
 #import "NSApplicationAdditions.h"
 
-#define CHECKER_URL @"http://www.transmissionbt.com/PortCheck.php?port=%d"
+#define CHECKER_URL @"https://www.grc.com/x/portprobe=%d"
 #define CHECK_FIRE  3.0
 
 @implementation PortChecker
@@ -114,18 +114,49 @@
 
 - (void) connectionDidFinishLoading: (NSURLConnection *) connection
 {
-    NSString * probeString = [[NSString alloc] initWithData: fPortProbeData encoding: NSASCIIStringEncoding];
+    NSXMLDocument * shieldsUpProbe = [[NSXMLDocument alloc] initWithData: fPortProbeData options: NSXMLDocumentTidyHTML error: nil];
+    [fPortProbeData release];
+    fPortProbeData = nil;
     
-    port_status_t status;
-    if ([probeString isEqualToString: @"1"])
-        status = PORT_STATUS_OPEN;
-    else if ([probeString isEqualToString: @"0"])
-        status = PORT_STATUS_CLOSED;
+    if (shieldsUpProbe)
+    {
+        NSArray * nodes = [shieldsUpProbe nodesForXPath: @"/html/body/center/table[3]/tr/td[2]" error: nil];
+        if ([nodes count] != 1)
+        {
+            NSArray * title = [shieldsUpProbe nodesForXPath: @"/html/head/title" error: nil];
+            // This may happen when we probe twice too quickly
+            if ([title count] != 1 || ![[[title objectAtIndex: 0] stringValue] isEqualToString:
+                                                                    @"NanoProbe System Already In Use"])
+            {
+                NSLog(@"Unable to get port status: invalid (outdated) XPath expression");
+                [[shieldsUpProbe XMLData] writeToFile: @"/tmp/shieldsUpProbe.html" atomically: YES];
+                [self callBackWithStatus: PORT_STATUS_ERROR];
+            }
+        }
+        else
+        {
+            NSString * portStatus = [[[[nodes objectAtIndex: 0] stringValue] stringByTrimmingCharactersInSet:
+                                                [[NSCharacterSet letterCharacterSet] invertedSet]] lowercaseString];
+            
+            if ([portStatus isEqualToString: @"open"])
+                [self callBackWithStatus: PORT_STATUS_OPEN];
+            else if ([portStatus isEqualToString: @"stealth"])
+                [self callBackWithStatus: PORT_STATUS_STEALTH];
+            else if ([portStatus isEqualToString: @"closed"])
+                [self callBackWithStatus: PORT_STATUS_CLOSED];
+            else
+            {
+                NSLog(@"Unable to get port status: unknown port state");
+                [self callBackWithStatus: PORT_STATUS_ERROR];
+            }
+        }
+        [shieldsUpProbe release];
+    }
     else
-        status = PORT_STATUS_ERROR;
-    
-    [probeString release];
-    [self callBackWithStatus: status];
+    {
+        NSLog(@"Unable to get port status: failed to create xml document");
+        [self callBackWithStatus: PORT_STATUS_ERROR];
+    }
 }
 
 @end
