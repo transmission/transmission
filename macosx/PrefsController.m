@@ -466,7 +466,7 @@
 
 - (void) setStalled: (id) sender
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 }
 
 - (void) setStalledMinutes: (id) sender
