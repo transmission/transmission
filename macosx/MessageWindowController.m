@@ -357,7 +357,8 @@
 {
     NSString * file;
     if ((file = [message objectForKey: @"File"]))
-        return [NSString stringWithFormat: @"%@:%@", [message objectForKey: @"File"], [message objectForKey: @"Line"]];
+        return [NSString stringWithFormat: @"%@:%@", [[message objectForKey: @"File"] lastPathComponent],
+                [message objectForKey: @"Line"]];
     else
         return nil;
 }
