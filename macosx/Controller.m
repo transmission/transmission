@@ -1870,7 +1870,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             else
             {
                 downloading++;
-                isActive = [torrent isActive];
+                isActive = ![torrent isStalled];
                 if (isActive)
                     active++;
                 
