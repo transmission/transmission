@@ -121,19 +121,7 @@
     if (shieldsUpProbe)
     {
         NSArray * nodes = [shieldsUpProbe nodesForXPath: @"/html/body/center/table[3]/tr/td[2]" error: nil];
-        if ([nodes count] != 1)
-        {
-            NSArray * title = [shieldsUpProbe nodesForXPath: @"/html/head/title" error: nil];
-            // This may happen when we probe twice too quickly
-            if ([title count] != 1 || ![[[title objectAtIndex: 0] stringValue] isEqualToString:
-                                                                    @"NanoProbe System Already In Use"])
-            {
-                NSLog(@"Unable to get port status: invalid (outdated) XPath expression");
-                [[shieldsUpProbe XMLData] writeToFile: @"/tmp/shieldsUpProbe.html" atomically: YES];
-                [self callBackWithStatus: PORT_STATUS_ERROR];
-            }
-        }
-        else
+        if ([nodes count] == 1)
         {
             NSString * portStatus = [[[[nodes objectAtIndex: 0] stringValue] stringByTrimmingCharactersInSet:
                                                 [[NSCharacterSet letterCharacterSet] invertedSet]] lowercaseString];
@@ -149,6 +137,11 @@
                 NSLog(@"Unable to get port status: unknown port state");
                 [self callBackWithStatus: PORT_STATUS_ERROR];
             }
+        }
+        else
+        {
+                NSLog(@"Unable to get port status: invalid response");
+                [self callBackWithStatus: PORT_STATUS_ERROR];
         }
         [shieldsUpProbe release];
     }
