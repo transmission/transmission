@@ -708,7 +708,7 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
     info.SetVersion(_T(LONG_VERSION_STRING));
     info.SetCopyright(_T("Copyright 2005-2007 The Transmission Project"));
     info.SetDescription(_T("A fast and easy BitTorrent client"));
-    info.SetWebSite( _T( "http://transmission.m0k.org/" ) );
+    info.SetWebSite( _T( "http://www.transmissionbt.com/" ) );
     info.SetIcon( ico );
     info.AddDeveloper( _T("Charles Kerr (Back-end, GTK+, wxWidgets)") );
     info.AddDeveloper( _T("Mitchell Livingston (Back-end; OS X)")  );

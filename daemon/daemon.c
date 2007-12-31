@@ -125,7 +125,7 @@ usage( const char * msg, ... )
     printf(
   "usage: %s [-dfh] [-p file] [-s file]\n"
   "\n"
-  "Transmission %s http://transmission.m0k.org/\n"
+  "Transmission %s http://www.transmissionbt.com/\n"
   "A fast and easy BitTorrent client\n"
   "\n"
   "  -d --debug                Print data send and received, implies -f\n"

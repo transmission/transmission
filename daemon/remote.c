@@ -227,7 +227,7 @@ usage( const char * msg, ... )
     printf(
   "usage: %s [options]\n"
   "\n"
-  "Transmission %s http://transmission.m0k.org/\n"
+  "Transmission %s http://www.transmissionbt.com/\n"
   "A fast and easy BitTorrent client\n"
   "\n"
   "  -a --add <torrent>        Add a torrent\n"

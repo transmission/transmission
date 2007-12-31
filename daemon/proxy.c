@@ -128,7 +128,7 @@ usage( const char * msg, ... )
     printf(
   "usage: %s [options] [files]...\n"
   "\n"
-  "Transmission %s http://transmission.m0k.org/\n"
+  "Transmission %s http://www.transmissionbt.com/\n"
   "A fast and easy BitTorrent client\n"
   "\n"
   "  -h --help                 Display this message and exit\n"

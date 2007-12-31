@@ -25,7 +25,7 @@
 #import "PortChecker.h"
 #import "NSApplicationAdditions.h"
 
-#define CHECKER_URL @"http://transmission.m0k.org/PortCheck.php?port=%d"
+#define CHECKER_URL @"http://www.transmissionbt.com/PortCheck.php?port=%d"
 #define CHECK_FIRE  3.0
 
 @implementation PortChecker

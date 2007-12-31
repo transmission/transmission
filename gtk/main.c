@@ -793,7 +793,7 @@ about ( void )
 #endif
   gtk_about_dialog_set_logo_icon_name( a, "transmission-logo" );
   gtk_about_dialog_set_comments( a, _("A fast and easy BitTorrent client") );
-  gtk_about_dialog_set_website( a, "http://transmission.m0k.org/" );
+  gtk_about_dialog_set_website( a, "http://www.transmissionbt.com/" );
   gtk_about_dialog_set_copyright( a, _("Copyright 2005-2007 The Transmission Project") );
   gtk_about_dialog_set_authors( a, authors );
   /* note to translators: put yourself here for credit in the "About" dialog */

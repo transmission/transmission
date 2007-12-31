@@ -110,7 +110,7 @@ int main( int argc, char ** argv )
     tr_handle_status * hstat;
     tr_ctor * ctor;
 
-    printf( "Transmission %s - http://transmission.m0k.org/\n\n",
+    printf( "Transmission %s - http://www.transmissionbt.com/\n\n",
             LONG_VERSION_STRING );
 
     /* Get options */

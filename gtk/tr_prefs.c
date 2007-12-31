@@ -227,7 +227,7 @@ test_port( gpointer l )
     char url[256];
 
     g_usleep( G_USEC_PER_SEC * 3 ); /* give portmapping time to kick in */
-    snprintf( url, sizeof(url), "http://transmission.m0k.org/PortCheck.php?port=%d", port );
+    snprintf( url, sizeof(url), "http://www.transmissionbt.com/PortCheck.php?port=%d", port );
     text = miniwget( url, &size );
     /*g_message(" got len %d, [%*.*s]", size, size, size, text );*/
     isOpen = text && *text=='1';
