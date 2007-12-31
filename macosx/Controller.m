@@ -1822,7 +1822,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSArray * selectedTorrents = [fTableView numberOfSelectedRows] > 0
                 ? [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] : nil;
     
-    int downloading = 0, seeding = 0, paused = 0;
+    int active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     BOOL filterActive = NO, filterDownload = NO, filterSeed = NO, filterPause = NO, filterStatus = YES;
     if ([filterType isEqualToString: FILTER_ACTIVE])
@@ -1849,6 +1849,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     int i = -1;
+    BOOL isActive;
     while ((torrent = [enumerator nextObject]))
     {
         i++;
@@ -1859,13 +1860,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             if ([torrent isSeeding])
             {
                 seeding++;
-                if (filterStatus && (!filterActive && !filterSeed))
+                isActive = ![torrent isStalled];
+                if (isActive)
+                    active++;
+                
+                if (filterStatus && (!(filterActive && isActive) && !filterSeed))
                     continue;
             }
             else
             {
                 downloading++;
-                if (filterStatus && (!filterActive && !filterDownload))
+                isActive = [torrent isActive];
+                if (isActive)
+                    active++;
+                
+                if (filterStatus && (!(filterActive && isActive) && !filterDownload))
                     continue;
             }
         }
@@ -1929,7 +1938,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //set button tooltips
     [fNoFilterButton setCount: [fTorrents count]];
-    [fActiveFilterButton setCount: downloading + seeding];
+    [fActiveFilterButton setCount: active];
     [fDownloadFilterButton setCount: downloading];
     [fSeedFilterButton setCount: seeding];
     [fPauseFilterButton setCount: paused];
