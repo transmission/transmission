@@ -131,9 +131,6 @@ int main( int argc, char ** argv )
         return EXIT_SUCCESS;
     }
 
-    /* +1 to convert from cli's verbosity (0-2) to messageLevel (1-3) */
-    tr_setMessageLevel( verboseLevel + 1 );
-
     if( bindPort < 1 || bindPort > 65535 )
     {
         printf( "Invalid port '%d'\n", bindPort );
@@ -141,7 +138,18 @@ int main( int argc, char ** argv )
     }
 
     /* Initialize libtransmission */
-    h = tr_init( "cli" );
+    h = tr_initFull( "cli",
+                     1,                       /* pex enabled */
+                     natTraversal,            /* nat enabled */
+                     bindPort,                /* public port */
+                     TR_ENCRYPTION_PREFERRED, /* encryption mode */
+                     uploadLimit > 0,         /* use upload speed limit? */
+                     uploadLimit,             /* upload speed limit */
+                     downloadLimit > 0,       /* use download speed limit? */
+                     downloadLimit,           /* download speed limit */
+                     512,                     /* globalPeerLimit */
+                     verboseLevel + 1,        /* messageLevel */
+                     0 );                     /* is message queueing enabled? */
 
     if( sourceFile && *sourceFile ) /* creating a torrent */
     {
@@ -239,15 +247,6 @@ int main( int argc, char ** argv )
     signal( SIGINT, sigHandler );
     signal( SIGHUP, sigHandler );
 
-    tr_setBindPort( h, bindPort );
-  
-    tr_setGlobalSpeedLimit   ( h, TR_UP,   uploadLimit );
-    tr_setUseGlobalSpeedLimit( h, TR_UP,   uploadLimit > 0 );
-    tr_setGlobalSpeedLimit   ( h, TR_DOWN, downloadLimit );
-    tr_setUseGlobalSpeedLimit( h, TR_DOWN, downloadLimit > 0 );
-
-    tr_natTraversalEnable( h, natTraversal );
-    
     tr_torrentSetStatusCallback( tor, torrentStateChanged, NULL );
     tr_torrentStart( tor );
 
