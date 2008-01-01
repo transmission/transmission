@@ -24,15 +24,15 @@
 .Bk -words
 .Fl h
 .Nm
-.Op Fl v Ar level
+.Op Fl v Ar [level]
 .Fl i
 .Ar torrent-file
 .Nm
-.Op Fl v Ar level
+.Op Fl v Ar [level]
 .Fl s
 .Ar torrent-file
 .Nm
-.Op Fl v Ar level
+.Op Fl v Ar [level]
 .Op Fl p Ar port
 .Op Fl d Ar download-rate
 .Op Fl u Ar upload-rate
@@ -41,10 +41,10 @@
 .Op Fl n
 .Ar torrent-file
 .Nm
-.Op Fl v Ar level
+.Op Fl v Ar [level]
 .Fl c Ar source-file
 .Fl a Ar announce-url
-.Op Fl p Ar 1
+.Op Fl p Ar port
 .Op Fl m Ar comment
 .Ar output-file
 .Ek
@@ -78,8 +78,8 @@ Uses the specified directory as destination for downloaded data.
 .It Fl s, -scrape
 Prints the number of seeders and leechers for the specified torrent
 file, and exits.
-.It Fl v, -verbose Ar level
-Sets debugging options.  The current range is 0-2, with the highest
+.It Fl v, -verbose Ar [level]
+Sets debugging options. You can use both many -v flags, or a -v level. The current available levels are 0-2, with the highest
 level producing the most output.  The default is 0.
 .It Fl n, Fl -nat-traversal
 Attempt to use the NAT-PMP and UPnP IGD protocols to establish a port

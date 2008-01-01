@@ -56,11 +56,13 @@ const char * USAGE =
 "  -s, --scrape         Print counts of seeders/leechers and exit\n"
 "  -u, --upload <int>   Maximum upload rate (-1 = no limit, default = 20)\n"
 "  -v, --verbose <int>  Verbose level (0 to 2, default = 0)\n"
+"  -V, --version        Print the version number and exit\n"
 "  -y, --recheck        Force a recheck of the torrent data\n";
 
 static int           showHelp      = 0;
 static int           showInfo      = 0;
 static int           showScrape    = 0;
+static int           showVersion   = 0;
 static int           isPrivate     = 0;
 static int           verboseLevel  = 0;
 static int           bindPort      = TR_DEFAULT_PORT;
@@ -110,7 +112,7 @@ int main( int argc, char ** argv )
     tr_handle_status * hstat;
     tr_ctor * ctor;
 
-    printf( "Transmission %s - http://www.transmissionbt.com/\n\n",
+    printf( "Transmission %s - http://www.transmissionbt.com/\n",
             LONG_VERSION_STRING );
 
     /* Get options */
@@ -119,6 +121,9 @@ int main( int argc, char ** argv )
         printf( USAGE, argv[0], TR_DEFAULT_PORT );
         return EXIT_FAILURE;
     }
+
+    if( showVersion )
+        return EXIT_SUCCESS;
 
     if( showHelp )
     {
@@ -360,7 +365,8 @@ cleanup:
     return EXIT_SUCCESS;
 }
 
-static int parseCommandLine( int argc, char ** argv )
+static int
+parseCommandLine( int argc, char ** argv )
 {
     for( ;; )
     {
@@ -369,6 +375,7 @@ static int parseCommandLine( int argc, char ** argv )
             { "info",     no_argument,          NULL, 'i' },
             { "scrape",   no_argument,          NULL, 's' },
             { "private",  no_argument,          NULL, 'r' },
+            { "version",  no_argument,          NULL, 'V' },
             { "verbose",  required_argument,    NULL, 'v' },
             { "port",     required_argument,    NULL, 'p' },
             { "upload",   required_argument,    NULL, 'u' },
@@ -383,7 +390,7 @@ static int parseCommandLine( int argc, char ** argv )
             { 0, 0, 0, 0} };
 
         int c, optind = 0;
-        c = getopt_long( argc, argv, "hisrv:p:u:d:f:c:m:a:no:y",
+        c = getopt_long( argc, argv, "hisrVv:p:u:d:f:c:m:a:no:y",
                          long_options, &optind );
         if( c < 0 )
         {
@@ -405,6 +412,9 @@ static int parseCommandLine( int argc, char ** argv )
                 break;
             case 'v':
                 verboseLevel = atoi( optarg );
+                break;
+            case 'V':
+                showVersion = 1;
                 break;
             case 'p':
                 bindPort = atoi( optarg );
@@ -440,13 +450,13 @@ static int parseCommandLine( int argc, char ** argv )
         }
     }
 
+    if( showHelp || showVersion )
+        return 0;
+
     if( optind >= argc )
-    {
-        return !showHelp;
-    }
+        return 1;
 
     torrentPath = argv[optind];
-
     return 0;
 }
 
