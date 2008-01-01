@@ -49,6 +49,7 @@ enum
     HANDSHAKE_FLAGS_LEN            = 8,
     HANDSHAKE_SIZE                 = 68,
     PEER_ID_LEN                    = 20,
+    INCOMING_HANDSHAKE_LEN         = 48,
 
     /* Encryption Constants */
     PadA_MAXLEN                    = 512,
@@ -116,6 +117,7 @@ enum
 {
     /* incoming */
     AWAITING_HANDSHAKE,
+    AWAITING_PEER_ID,
     AWAITING_YA,
     AWAITING_PAD_A,
     AWAITING_CRYPTO_PROVIDE,
@@ -165,6 +167,7 @@ static const char* getStateName( short state )
     const char * str = "f00!";
     switch( state ) {
         case AWAITING_HANDSHAKE:      str = "awaiting handshake"; break;
+        case AWAITING_PEER_ID:        str = "awaiting peer id"; break;
         case AWAITING_YA:             str = "awaiting ya"; break;
         case AWAITING_PAD_A:          str = "awaiting pad a"; break;
         case AWAITING_CRYPTO_PROVIDE: str = "awaiting crypto_provide"; break;
@@ -562,13 +565,10 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
     uint8_t * pstr;
     uint8_t reserved[HANDSHAKE_FLAGS_LEN];
     uint8_t hash[SHA_DIGEST_LENGTH];
-    char * client;
 
-/* FIXME: use  readHandshake here */
+    dbgmsg( handshake, "payload: need %d, got %d", (int)INCOMING_HANDSHAKE_LEN, (int)EVBUFFER_LENGTH(inbuf) );
 
-    dbgmsg( handshake, "payload: need %d, got %d", (int)HANDSHAKE_SIZE, (int)EVBUFFER_LENGTH(inbuf) );
-
-    if( EVBUFFER_LENGTH(inbuf) < HANDSHAKE_SIZE )
+    if( EVBUFFER_LENGTH(inbuf) < INCOMING_HANDSHAKE_LEN )
         return READ_MORE;
 
     pstrlen = EVBUFFER_DATA(inbuf)[0]; /* peek, don't read.  We may be
@@ -621,6 +621,21 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
     /* reserved bytes */
     tr_peerIoReadBytes( handshake->io, inbuf, reserved, sizeof(reserved) );
 
+    /**
+    *** Extension negotiation
+    **/
+
+    if( HANDSHAKE_HAS_LTEP( reserved ) )
+    {
+        tr_peerIoEnableLTEP( handshake->io, 1 );
+        dbgmsg( handshake,"using ltep" );
+    }
+    if( HANDSHAKE_HAS_FASTEXT( reserved ) )
+    {
+        tr_peerIoEnableFEXT( handshake->io, 1 );
+        dbgmsg( handshake,"using fext" );
+    }
+
     /* torrent hash */
     tr_peerIoReadBytes( handshake->io, inbuf, hash, sizeof(hash) );
     if( tr_peerIoIsIncoming( handshake->io ) )
@@ -647,34 +662,6 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
             return READ_DONE;
         }
     }
-
-    /* peer id */
-    tr_peerIoReadBytes( handshake->io, inbuf, handshake->peer_id, sizeof(handshake->peer_id) );
-    tr_peerIoSetPeersId( handshake->io, handshake->peer_id );
-    handshake->havePeerID = TRUE;
-    client = tr_clientForId( handshake->peer_id );
-    dbgmsg( handshake, "peer-id is [%s]", client );
-    tr_free( client );
-    if( !memcmp( handshake->peer_id, getPeerId(), PEER_ID_LEN ) ) {
-        dbgmsg( handshake, "streuth!  we've connected to ourselves." );
-        tr_handshakeDone( handshake, FALSE );
-        return READ_DONE;
-    }
-
-    /**
-    *** Extension negotiation
-    **/
-
-    if( HANDSHAKE_HAS_LTEP( reserved ) )
-    {
-        tr_peerIoEnableLTEP( handshake->io, 1 );
-        dbgmsg( handshake,"using ltep" );
-    }
-    if( HANDSHAKE_HAS_FASTEXT( reserved ) )
-    {
-        tr_peerIoEnableFEXT( handshake->io, 1 );
-        dbgmsg( handshake,"using fext" );
-    }
     
     /**
     ***  If this is an incoming message, then we need to send a response handshake
@@ -689,8 +676,31 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
         handshake->haveSentBitTorrentHandshake = 1;
     }
 
-    /* we've completed the BT handshake... pass the work on to peer-msgs */
-    tr_handshakeDone( handshake, TRUE );
+    setReadState( handshake, AWAITING_PEER_ID );
+    return READ_AGAIN;
+}
+
+static int
+readPeerId( tr_handshake * handshake, struct evbuffer * inbuf )
+{
+    char * client;
+    int peerIsGood;
+
+    if( EVBUFFER_LENGTH(inbuf) < PEER_ID_LEN )
+        return READ_MORE;
+
+    /* peer id */
+    tr_peerIoReadBytes( handshake->io, inbuf, handshake->peer_id, PEER_ID_LEN );
+    tr_peerIoSetPeersId( handshake->io, handshake->peer_id );
+    handshake->havePeerID = TRUE;
+    client = tr_clientForId( handshake->peer_id );
+    dbgmsg( handshake, "peer-id is [%s] ... isIncoming is %d", client, tr_peerIoIsIncoming( handshake->io ) );
+    tr_free( client );
+
+    /* if we've somehow connected to ourselves, don't keep the connection */
+    peerIsGood = memcmp( handshake->peer_id, getPeerId(), PEER_ID_LEN ) ? 1 : 0;
+    tr_handshakeDone( handshake, peerIsGood );
+    dbgmsg( handshake, "isPeerGood == %d", peerIsGood );
     return READ_DONE;
 }
 
@@ -935,6 +945,7 @@ canRead( struct bufferevent * evin, void * arg )
     switch( handshake->state )
     {
         case AWAITING_HANDSHAKE:       ret = readHandshake    ( handshake, inbuf ); break;
+        case AWAITING_PEER_ID:         ret = readPeerId       ( handshake, inbuf ); break;
         case AWAITING_YA:              ret = readYa           ( handshake, inbuf ); break;
         case AWAITING_PAD_A:           ret = readPadA         ( handshake, inbuf ); break;
         case AWAITING_CRYPTO_PROVIDE:  ret = readCryptoProvide( handshake, inbuf ); break;
