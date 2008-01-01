@@ -383,7 +383,7 @@ static int parseCommandLine( int argc, char ** argv )
             { 0, 0, 0, 0} };
 
         int c, optind = 0;
-        c = getopt_long( argc, argv, "hisrv:p:u:d:f:c:m:a:n:o:y",
+        c = getopt_long( argc, argv, "hisrv:p:u:d:f:c:m:a:no:y",
                          long_options, &optind );
         if( c < 0 )
         {
