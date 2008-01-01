@@ -131,20 +131,8 @@ int main( int argc, char ** argv )
         return EXIT_SUCCESS;
     }
 
-    if( verboseLevel < 0 )
-    {
-        verboseLevel = 0;
-    }
-    else if( verboseLevel > 9 )
-    {
-        verboseLevel = 9;
-    }
-    if( verboseLevel )
-    {
-        static char env[11];
-        snprintf( env, sizeof env, "TR_DEBUG=%d", verboseLevel );
-        putenv( env );
-    }
+    /* +1 to convert from cli's verbosity (0-2) to messageLevel (1-3) */
+    tr_setMessageLevel( verboseLevel + 1 );
 
     if( bindPort < 1 || bindPort > 65535 )
     {
