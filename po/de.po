@@ -324,8 +324,8 @@ msgid "A fast and easy BitTorrent client"
 msgstr "Ein schneller und einfacher BitTorrent-Client"
 
 #: ../gtk/main.c:790
-msgid "Copyright 2005-2007 The Transmission Project"
-msgstr "Copyright 2005-2007 Das Transmission-Projekt"
+msgid "Copyright 2005-2008 The Transmission Project"
+msgstr "Copyright 2005-2008 Das Transmission-Projekt"
 
 #. note to translators: put yourself here for credit in the "About" dialog
 #: ../gtk/main.c:793

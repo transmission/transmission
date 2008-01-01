@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2005-2007 Transmission authors and contributors
+ * Copyright (c) 2005-2008 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -794,7 +794,7 @@ about ( void )
   gtk_about_dialog_set_logo_icon_name( a, "transmission-logo" );
   gtk_about_dialog_set_comments( a, _("A fast and easy BitTorrent client") );
   gtk_about_dialog_set_website( a, "http://www.transmissionbt.com/" );
-  gtk_about_dialog_set_copyright( a, _("Copyright 2005-2007 The Transmission Project") );
+  gtk_about_dialog_set_copyright( a, _("Copyright 2005-2008 The Transmission Project") );
   gtk_about_dialog_set_authors( a, authors );
   /* note to translators: put yourself here for credit in the "About" dialog */
   gtk_about_dialog_set_translator_credits( a, _("translator-credits") );
