@@ -27,7 +27,7 @@ EXTRA_DIST = \
   AUTHORS \
   LICENSE \
   README \
-  Transmission.xcodeproj \
+  Transmission.xcodeproj/project.pbxproj \
   intltool-extract.in \
   intltool-merge.in \
   intltool-update.in 
