@@ -1,7 +1,7 @@
 AM_CPPFLAGS = -I$(top_srcdir) $(LIBEVENT_CPPFLAGS)
 AM_CFLAGS = $(OPENSSL_CFLAGS) $(PTHREAD_CFLAGS)
 
-bin_PROGRAMS = transmission-cli
+bin_PROGRAMS = transmissioncli
 
 dist_man_MANS = transmissioncli.1
 
