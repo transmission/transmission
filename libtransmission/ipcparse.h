@@ -26,6 +26,7 @@
 #define TR_DAEMON_IPC_H
 
 #include <inttypes.h>
+#include <unistd.h> /* for ssize_t */
 
 /* yay for typedefs, we can't forward declare benc_val_t or tr_info
    like with structs */
