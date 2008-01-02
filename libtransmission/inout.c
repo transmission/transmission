@@ -255,7 +255,6 @@ checkPiece( tr_torrent * tor, int pieceIndex )
 static void
 checkFile( tr_torrent   * tor,
            int            fileIndex,
-           tr_bitfield  * uncheckedPieces,
            int          * abortFlag )
 {
     int i;
@@ -273,11 +272,11 @@ checkFile( tr_torrent   * tor,
         {
             tr_torrentSetHasPiece( tor, i, 0 );
         }
-        else if( tr_bitfieldHas( uncheckedPieces, i ) )
+        else if( !tr_torrentIsPieceChecked( tor, i ) )
         {
             const int check = checkPiece( tor, i );
             tr_torrentSetHasPiece( tor, i, !check );
-            tr_bitfieldRem( uncheckedPieces, i );
+            tr_torrentSetPieceChecked( tor, i, TRUE );
         }
     }
 }
@@ -368,29 +367,21 @@ recheckThreadFunc( void * unused UNUSED )
         tr_free( node );
         tr_lockUnlock( getRecheckLock( ) );
 
-        if( tor->uncheckedPieces == NULL ) {
-            tor->recheckState = TR_RECHECK_NONE;
-            fireCheckDone( tor, currentNode.recheck_done_cb );
-            continue;
-        }
-
         tor->recheckState = TR_RECHECK_NOW;
 
         /* remove the unchecked pieces from completion... */
         for( i=0; i<tor->info.pieceCount; ++i ) 
-            if( tr_bitfieldHas( tor->uncheckedPieces, i ) )
+            if( !tr_torrentIsPieceChecked( tor, i ) )
                 tr_cpPieceRem( tor->completion, i );
 
         tr_inf( "Verifying some pieces of \"%s\"", tor->info.name );
         for( i=0; i<tor->info.fileCount && !stopCurrent; ++i )
-            checkFile( tor, i, tor->uncheckedPieces, &stopCurrent );
+            checkFile( tor, i, &stopCurrent );
 
         tor->recheckState = TR_RECHECK_NONE;
 
         if( !stopCurrent )
         {
-            tr_bitfieldFree( tor->uncheckedPieces );
-            tor->uncheckedPieces = NULL;
             tr_fastResumeSave( tor );
             fireCheckDone( tor, currentNode.recheck_done_cb );
         }
@@ -404,7 +395,7 @@ void
 tr_ioRecheckAdd( tr_torrent          * tor,
                  tr_recheck_done_cb    recheck_done_cb )
 {
-    if( !tr_bitfieldCountTrueBits( tor->uncheckedPieces ) )
+    if( tr_torrentCountUncheckedPieces( tor ) == 0 )
     {
         /* doesn't need to be checked... */
         recheck_done_cb( tor );

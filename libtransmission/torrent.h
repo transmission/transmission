@@ -82,6 +82,12 @@ void tr_torrentInitFilePriority( tr_torrent   * tor,
                                  tr_priority_t  priority );
 
 
+int  tr_torrentCountUncheckedPieces( const tr_torrent * );
+int  tr_torrentIsPieceChecked      ( const tr_torrent *, int piece );
+void tr_torrentSetPieceChecked     ( tr_torrent *, int piece, int isChecked );
+void tr_torrentSetFileChecked      ( tr_torrent *, int file, int isChecked );
+void tr_torrentUncheck             ( tr_torrent * );
+
 typedef enum
 {
    TR_RECHECK_NONE,
@@ -123,7 +129,7 @@ struct tr_torrent
     
     struct tr_completion     * completion;
 
-    struct tr_bitfield       * uncheckedPieces;
+    struct tr_bitfield       * checkedPieces;
     cp_status_t                cpStatus;
 
     struct tr_tracker        * tracker;

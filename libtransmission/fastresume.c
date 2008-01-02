@@ -415,10 +415,9 @@ parseUnchoked( tr_torrent * tor, const uint8_t * buf, uint32_t len )
 }
 
 static uint64_t
-parseProgress( const tr_torrent  * tor,
-               const uint8_t     * buf,
-               uint32_t            len,
-               tr_bitfield       * uncheckedPieces )
+parseProgress( tr_torrent     * tor,
+               const uint8_t  * buf,
+               uint32_t         len )
 {
     int i;
     uint64_t ret = 0;
@@ -433,12 +432,10 @@ parseProgress( const tr_torrent  * tor,
         const uint8_t * walk = buf;
         const tr_time_t * oldMTimes = (const tr_time_t *) walk;
         for( i=0; i<n; ++i ) {
-            if ( !curMTimes[i] || ( curMTimes[i] != oldMTimes[i] ) ) {
+            if ( curMTimes[i] && ( curMTimes[i] == oldMTimes[i] ) ) {
                 const tr_file * file = &tor->info.files[i];
-                tr_dbg( "File '%s' mtimes differ-- flagging pieces [%d..%d] for recheck",
-                        file->name, file->firstPiece, file->lastPiece);
-                tr_bitfieldAddRange( uncheckedPieces, 
-                                     file->firstPiece, file->lastPiece+1 );
+                tr_dbg( "File '%s' mtimes match -- no recheck needed", file->name );
+                tr_torrentSetFileChecked( tor, i, TRUE );
             }
         }
         free( curMTimes );
@@ -456,7 +453,7 @@ parseProgress( const tr_torrent  * tor,
     /* the files whose mtimes are wrong,
        remove from completion pending a recheck... */
     for( i=0; i<tor->info.pieceCount; ++i )
-        if( tr_bitfieldHas( uncheckedPieces, i ) )
+        if( !tr_torrentIsPieceChecked( tor, i ) )
             tr_cpPieceRem( tor->completion, i );
 
     return ret;
@@ -580,8 +577,7 @@ parseDestination( tr_torrent * tor, const uint8_t * buf, uint32_t len )
 
 static uint64_t
 parseVersion1( tr_torrent * tor, const uint8_t * buf, const uint8_t * end,
-               uint64_t fieldsToLoad,
-               tr_bitfield  * uncheckedPieces )
+               uint64_t fieldsToLoad )
 {
     uint64_t ret = 0;
 
@@ -596,7 +592,7 @@ parseVersion1( tr_torrent * tor, const uint8_t * buf, const uint8_t * end,
         {
             case FR_ID_DOWNLOADED:   ret |= parseDownloaded( tor, buf, len ); break;
             case FR_ID_UPLOADED:     ret |= parseUploaded( tor, buf, len ); break;
-            case FR_ID_PROGRESS:     ret |= parseProgress( tor, buf, len, uncheckedPieces ); break;
+            case FR_ID_PROGRESS:     ret |= parseProgress( tor, buf, len ); break;
             case FR_ID_PRIORITY:     ret |= parsePriorities( tor, buf, len ); break;
             case FR_ID_SPEED:        ret |= parseSpeedLimit( tor, buf, len ); break;
             case FR_ID_RUN:          ret |= parseRun( tor, buf, len ); break;
@@ -641,8 +637,7 @@ loadResumeFile( const tr_torrent * tor, size_t * len )
 
 static uint64_t
 fastResumeLoadImpl ( tr_torrent   * tor,
-                     uint64_t       fieldsToLoad,
-                     tr_bitfield  * uncheckedPieces )
+                     uint64_t       fieldsToLoad )
 {
     uint64_t ret = 0;
     size_t size = 0;
@@ -657,7 +652,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
             uint32_t version;
             readBytes( &version, &walk, sizeof(version) );
             if( version == 1 )
-                ret |= parseVersion1 ( tor, walk, end, fieldsToLoad, uncheckedPieces );
+                ret |= parseVersion1 ( tor, walk, end, fieldsToLoad );
             else
                 tr_inf( "Unsupported resume file %d for '%s'", version, tor->info.name );
         }
@@ -708,14 +703,13 @@ useFallbackFields( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor )
 uint64_t
 tr_fastResumeLoad( tr_torrent     * tor,
                    uint64_t         fieldsToLoad,
-                   tr_bitfield    * uncheckedPieces,
                    const tr_ctor  * ctor )
 {
     uint64_t ret = 0;
 
     ret |= useManditoryFields( tor, fieldsToLoad, ctor );
     fieldsToLoad &= ~ret;
-    ret |= fastResumeLoadImpl( tor, fieldsToLoad, uncheckedPieces );
+    ret |= fastResumeLoadImpl( tor, fieldsToLoad );
     fieldsToLoad &= ~ret;
     ret |= useFallbackFields( tor, fieldsToLoad, ctor );
 

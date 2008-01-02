@@ -273,7 +273,6 @@ torrentRealInit( tr_handle     * h,
     int doStart;
     uint64_t loaded;
     uint64_t t;
-    tr_bitfield * uncheckedPieces;
     tr_info * info = &tor->info;
    
     tr_globalLock( h );
@@ -345,19 +344,14 @@ torrentRealInit( tr_handle     * h,
 
     tor->error   = TR_OK;
 
-    uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
-
-    loaded = tr_fastResumeLoad( tor, ~0, uncheckedPieces, ctor );
+    tor->checkedPieces = tr_bitfieldNew( tor->info.pieceCount );
+    tr_torrentUncheck( tor );
+    loaded = tr_fastResumeLoad( tor, ~0, ctor );
     
     assert( tor->destination != NULL );
 
     doStart = tor->isRunning;
     tor->isRunning = 0;
-
-    if( tr_bitfieldIsEmpty( uncheckedPieces ) )
-        tr_bitfieldFree( uncheckedPieces );
-    else
-        tor->uncheckedPieces = uncheckedPieces;
 
     if( !(loaded & TR_FR_SPEEDLIMIT ) ) {
         int limit, enabled;
@@ -607,9 +601,8 @@ tr_torrentStat( tr_torrent * tor )
     else
         s->status = TR_STATUS_SEED;
 
-    s->recheckProgress = (tor->uncheckedPieces == NULL)
-        ? 0.0
-        : 1.0 - ((double)tr_bitfieldCountTrueBits(tor->uncheckedPieces) / tor->info.pieceCount);
+    s->recheckProgress =
+        1.0 - (tr_torrentCountUncheckedPieces( tor ) / (double) tor->info.pieceCount);
 
     tr_torrentGetRates( tor, &s->rateDownload, &s->rateUpload );
    
@@ -850,6 +843,8 @@ freeTorrent( tr_torrent * tor )
     tr_trackerFree( tor->tracker );
     tor->tracker = NULL;
 
+    tr_bitfieldFree( tor->checkedPieces );
+
     tr_free( tor->destination );
 
     if( tor == h->torrentList )
@@ -913,9 +908,7 @@ tr_torrentStart( tr_torrent * tor )
 
     if( !tor->isRunning )
     {
-        if( !tor->uncheckedPieces )
-            tor->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
-        tr_fastResumeLoad( tor, TR_FR_PROGRESS, tor->uncheckedPieces, NULL );
+        tr_fastResumeLoad( tor, TR_FR_PROGRESS, NULL );
         tor->isRunning = 1;
         tr_ioRecheckAdd( tor, checkAndStartCB );
     }
@@ -938,10 +931,7 @@ tr_torrentRecheck( tr_torrent * tor )
 {
     tr_globalLock( tor->handle );
 
-    if( !tor->uncheckedPieces )
-        tor->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
-    tr_bitfieldAddRange( tor->uncheckedPieces, 0, tor->info.pieceCount );
-
+    tr_torrentUncheck( tor );
     tr_ioRecheckAdd( tor, torrentRecheckDoneCB );
 
     tr_globalUnlock( tor->handle );
@@ -1266,4 +1256,48 @@ tr_pieceOffset( const tr_torrent * tor, int index, int begin, int length )
     ret += begin;
     ret += length;
     return ret;
+}
+
+/***
+****
+***/
+
+int
+tr_torrentIsPieceChecked( const tr_torrent * tor, int piece )
+{
+    return tr_bitfieldHas( tor->checkedPieces, piece );
+}
+
+void
+tr_torrentSetPieceChecked( tr_torrent * tor, int piece, int isChecked )
+{
+    if( isChecked )
+        tr_bitfieldAdd( tor->checkedPieces, piece );
+    else
+        tr_bitfieldRem( tor->checkedPieces, piece );
+}
+
+void
+tr_torrentSetFileChecked( tr_torrent * tor, int fileIndex, int isChecked )
+{
+    const tr_file * file = &tor->info.files[fileIndex];
+    const size_t begin = file->firstPiece;
+    const size_t end = file->lastPiece + 1;
+
+    if( isChecked )
+        tr_bitfieldAddRange ( tor->checkedPieces, begin, end );
+    else
+        tr_bitfieldRemRange ( tor->checkedPieces, begin, end );
+}
+
+void
+tr_torrentUncheck( tr_torrent * tor )
+{
+    tr_bitfieldRemRange ( tor->checkedPieces, 0, tor->info.pieceCount );
+}
+
+int
+tr_torrentCountUncheckedPieces( const tr_torrent * tor )
+{
+    return tr_bitfieldCountTrueBits( tor->checkedPieces );
 }

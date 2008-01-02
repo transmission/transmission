@@ -47,7 +47,6 @@ enum
  */
 uint64_t tr_fastResumeLoad( tr_torrent          * tor,
                             uint64_t              fieldsToLoad,
-                            struct tr_bitfield  * uncheckedPieces,
                             const tr_ctor       * ctor );
 
 #endif
