@@ -244,8 +244,8 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         NSArray * selectedGroups = [fGroups objectsAtIndexes: [fTableView selectedRowIndexes]];
         
         //determine where to move them
-        int i;
-        for (i = [indexes firstIndex]; i < newRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+        int i, originalRow = newRow;
+        for (i = [indexes firstIndex]; i < originalRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
             newRow--;
         
         //remove objects to reinsert

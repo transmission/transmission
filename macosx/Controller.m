@@ -2462,8 +2462,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                 [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
         
         //determine where to move them
-        int i;
-        for (i = [indexes firstIndex]; i < newRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+        int i, originalRow = newRow;
+        for (i = [indexes firstIndex]; i < originalRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
             newRow--;
         
         //reinsert into array
@@ -3386,6 +3386,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 return YES;
         return NO;
     }
+    
+    #warning hide queue options if all queues are disabled?
     
     //enable resume all waiting item
     if (action == @selector(resumeWaitingTorrents:))
