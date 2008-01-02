@@ -2,7 +2,7 @@ The Transmission Project
 http://www.transmissionbt.com/
 
 Lead Developers <transmission-dev@m0k.org>
-        Mitchell Livingston <livings124@gmail.com>  (Mac OS X interface, Backend)
+        Mitchell Livingston <livings124@gmail.com>  (Mac OS X interface)
         Charles Kerr <charles@rebelbase.com>  (Backend, GTK+ client)
         Eric Petit <titer@m0k.org>  (Creator)
         Josh Elsasser <josh@elsasser.org>  (Daemon, Backend, GTK+ interface)
