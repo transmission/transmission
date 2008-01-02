@@ -3404,6 +3404,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //enable resume selected waiting item
     if (action == @selector(resumeSelectedTorrentsNoWait:))
     {
+        if (!canUseTable)
+            return NO;
+        
         NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
