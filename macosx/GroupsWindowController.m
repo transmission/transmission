@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "GroupsWindowController.h"
-#import "GradientCell.h"
 #import "CTGradient.h"
 #import "NSBezierPathAdditions.h"
 #import "NSApplicationAdditions.h"
@@ -114,10 +113,6 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 
 - (void) awakeFromNib
 {
-    GradientCell * cell = [[GradientCell alloc] init];
-    [[fTableView tableColumnWithIdentifier: @"Color"] setDataCell: cell];
-    [cell release];
-    
     [[[fTableView tableColumnWithIdentifier: @"Button"] dataCell] setTitle: NSLocalizedString(@"Color", "Groups -> Color Button")];
     
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: GROUP_TABLE_VIEW_DATA_TYPE]];
@@ -181,7 +176,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 {
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Color"])
-        return [self gradientForColor: [[fGroups objectAtIndex: row] objectForKey: @"Color"]];
+        return [self imageForGroup: [fGroups objectAtIndex: row] isSmall: NO];
     else
         return [[fGroups objectAtIndex: row] objectForKey: @"Name"];
 }
