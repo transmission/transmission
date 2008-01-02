@@ -487,15 +487,14 @@
     Torrent * torrent = [fTorrents objectAtIndex: row];
     
     //pause/resume icon
-    NSImage * pauseImage = nil;
+    NSImage * pauseImage;
     NSRect pauseRect  = [self pauseRectForRow: row];
+    BOOL inPauseRect = fClickIn && NSPointInRect(fClickPoint, pauseRect);
     if ([torrent isActive])
-        pauseImage = fClickIn && NSPointInRect(fClickPoint, pauseRect) ? [NSImage imageNamed: @"PauseOn.png"]
-                                                                        : [NSImage imageNamed: @"PauseOff.png"];
+        pauseImage = inPauseRect ? [NSImage imageNamed: @"PauseOn.png"] : [NSImage imageNamed: @"PauseOff.png"];
     else
     {
-        BOOL inPauseRect = fClickIn && NSPointInRect(fClickPoint, pauseRect);
-        if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
+        if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
             pauseImage = inPauseRect ? [NSImage imageNamed: @"ResumeNoWaitOn.png"] : [NSImage imageNamed: @"ResumeNoWaitOff.png"];
         else if ([torrent waitingToStart])
             pauseImage = inPauseRect ? [NSImage imageNamed: @"PauseOn.png"] : [NSImage imageNamed: @"PauseOff.png"];
@@ -503,8 +502,7 @@
             pauseImage = inPauseRect ? [NSImage imageNamed: @"ResumeOn.png"] : [NSImage imageNamed: @"ResumeOff.png"];
     }
     
-    if (pauseImage)
-        [pauseImage compositeToPoint: NSMakePoint(pauseRect.origin.x, NSMaxY(pauseRect)) operation: NSCompositeSourceOver];
+    [pauseImage compositeToPoint: NSMakePoint(pauseRect.origin.x, NSMaxY(pauseRect)) operation: NSCompositeSourceOver];
     
     //reveal icon
     NSRect revealRect = [self revealRectForRow: row];
