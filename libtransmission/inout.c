@@ -395,7 +395,9 @@ void
 tr_ioRecheckAdd( tr_torrent          * tor,
                  tr_recheck_done_cb    recheck_done_cb )
 {
-    if( tr_torrentCountUncheckedPieces( tor ) == 0 )
+    const int uncheckedCount = tr_torrentCountUncheckedPieces( tor );
+
+    if( !uncheckedCount )
     {
         /* doesn't need to be checked... */
         recheck_done_cb( tor );
@@ -403,6 +405,8 @@ tr_ioRecheckAdd( tr_torrent          * tor,
     else
     {
         struct recheck_node * node;
+
+        tr_inf( "Queueing %s to verify %d local file pieces", tor->info.name, uncheckedCount );
 
         node = tr_new( struct recheck_node, 1 );
         node->torrent = tor;

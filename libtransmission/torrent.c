@@ -1299,5 +1299,5 @@ tr_torrentUncheck( tr_torrent * tor )
 int
 tr_torrentCountUncheckedPieces( const tr_torrent * tor )
 {
-    return tr_bitfieldCountTrueBits( tor->checkedPieces );
+    return tor->info.pieceCount - tr_bitfieldCountTrueBits( tor->checkedPieces );
 }

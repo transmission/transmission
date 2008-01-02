@@ -432,7 +432,7 @@ parseProgress( tr_torrent     * tor,
         const uint8_t * walk = buf;
         const tr_time_t * oldMTimes = (const tr_time_t *) walk;
         for( i=0; i<n; ++i ) {
-            if ( curMTimes[i] && ( curMTimes[i] == oldMTimes[i] ) ) {
+            if ( curMTimes[i] == oldMTimes[i] ) {
                 const tr_file * file = &tor->info.files[i];
                 tr_dbg( "File '%s' mtimes match -- no recheck needed", file->name );
                 tr_torrentSetFileChecked( tor, i, TRUE );
