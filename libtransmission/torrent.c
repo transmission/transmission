@@ -220,19 +220,31 @@ pieceHasFile( int piece, const tr_file * file )
 
 static tr_priority_t
 calculatePiecePriority ( const tr_torrent * tor,
-                         int                piece )
+                         int                piece,
+                         int                fileHint )
 {
     int i;
     int priority = TR_PRI_LOW;
 
+    /* find the first file that has data in this piece */
+    if( fileHint >= 0 ) {
+        i = fileHint;
+        while( i>0 && pieceHasFile( piece, &tor->info.files[i-1] ) )
+            --i;
+    } else {
+        for( i=0; i<tor->info.fileCount; ++i )
+            if( pieceHasFile( piece, &tor->info.files[i] ) )
+                break;
+    }
+
     /* the piece's priority is the max of the priorities
      * of all the files in that piece */
-    for( i=0; i<tor->info.fileCount; ++i )
+    for( ; i<tor->info.fileCount; ++i )
     {
         const tr_file * file = &tor->info.files[i];
 
         if( !pieceHasFile( piece, file ) )
-            continue;
+            break;
 
         priority = MAX( priority, file->priority );
 
@@ -262,7 +274,7 @@ tr_torrentInitFilePieces( tr_torrent * tor )
     }
 
     for( i=0; i<tor->info.pieceCount; ++i )
-        tor->info.pieces[i].priority = calculatePiecePriority( tor, i );
+        tor->info.pieces[i].priority = calculatePiecePriority( tor, i, -1 );
 }
 
 static void
@@ -1065,7 +1077,7 @@ tr_torrentInitFilePriority( tr_torrent   * tor,
     file = &tor->info.files[fileIndex];
     file->priority = priority;
     for( i=file->firstPiece; i<=file->lastPiece; ++i )
-      tor->info.pieces[i].priority = calculatePiecePriority( tor, i );
+      tor->info.pieces[i].priority = calculatePiecePriority( tor, i, fileIndex );
 }
 
 void
