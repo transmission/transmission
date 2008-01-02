@@ -926,6 +926,7 @@ doAction ( const char * action_name, gpointer user_data )
         /* this modifies the model's contents, so can't use foreach */
         GList *l, *sel = getselection( data );
         GtkTreeModel *model = tr_core_model( data->core );
+        gtk_tree_selection_unselect_all( tr_window_get_selection( data->wind) );
         for( l=sel; l!=NULL; l=l->next )
         {
             GtkTreeIter iter;
