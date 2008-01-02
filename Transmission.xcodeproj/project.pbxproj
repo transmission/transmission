@@ -413,8 +413,6 @@
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A20152630D1C1BE70081714F /* PinTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PinTemplate.png; path = macosx/Images/PinTemplate.png; sourceTree = "<group>"; };
 		A20152790D1C26EB0081714F /* torrent-ctor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "torrent-ctor.c"; path = "libtransmission/torrent-ctor.c"; sourceTree = "<group>"; };
-		A205E08F0CC66BF5001CA81B /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = macosx/el.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A205E0910CC66BF5001CA81B /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = macosx/el.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = macosx/AboutWindowController.h; sourceTree = "<group>"; };
 		A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = macosx/AboutWindowController.m; sourceTree = "<group>"; };
 		A2085E2F0C53C833000BC3B7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -473,8 +471,6 @@
 		A24D2A770C0A65C400A0ED9F /* ipcparse.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ipcparse.c; path = libtransmission/ipcparse.c; sourceTree = "<group>"; };
 		A24D2A780C0A65C400A0ED9F /* ipcparse.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ipcparse.h; path = libtransmission/ipcparse.h; sourceTree = "<group>"; };
 		A24F19070A3A790800C9C145 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = macosx/Sparkle.framework; sourceTree = "<group>"; };
-		A24F967C0CCBF93E00C9314D /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = macosx/ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A24F96920CCBFB7700C9314D /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = macosx/ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A256588A0A9A695400E8A03B /* MessageWindowController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MessageWindowController.h; path = macosx/MessageWindowController.h; sourceTree = "<group>"; };
 		A256588B0A9A695400E8A03B /* MessageWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MessageWindowController.m; path = macosx/MessageWindowController.m; sourceTree = "<group>"; };
 		A257C17F0CAD3003004E121C /* PeerTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PeerTableView.h; path = macosx/PeerTableView.h; sourceTree = "<group>"; };
@@ -1873,8 +1869,6 @@
 				A27476FF0CC38EE6003CC76D /* es */,
 				A2EA8E3C0CC3C9830081201C /* fr */,
 				A2EA8E540CC3DAB80081201C /* it */,
-				A205E08F0CC66BF5001CA81B /* el */,
-				A24F967C0CCBF93E00C9314D /* ko */,
 				A223AA7E0D220CEB00840069 /* nl */,
 				A26AF1050D2855FC00FF7140 /* ru */,
 			);
@@ -1888,8 +1882,6 @@
 				A27477010CC38EE6003CC76D /* es */,
 				A2EA8E3E0CC3C9830081201C /* fr */,
 				A2EA8E560CC3DAB80081201C /* it */,
-				A205E0910CC66BF5001CA81B /* el */,
-				A24F96920CCBFB7700C9314D /* ko */,
 				A223AA800D220CEB00840069 /* nl */,
 				A26AF1070D2855FC00FF7140 /* ru */,
 			);
