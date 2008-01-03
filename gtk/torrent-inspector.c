@@ -1367,7 +1367,7 @@ enabled_toggled (GtkCellRendererToggle  * cell UNUSED,
   gtk_tree_path_free( path );
 }
 
-GtkWidget *
+static GtkWidget *
 file_page_new ( TrTorrent * gtor )
 {
     GtkWidget           * ret;
@@ -1576,7 +1576,7 @@ max_peers_spun_cb( GtkSpinButton * spin, gpointer gtor )
   tr_torrentSetMaxConnectedPeers( tr_torrent_handle( gtor ), n );
 }
 
-GtkWidget*
+static GtkWidget*
 options_page_new ( TrTorrent * gtor )
 {
   uint16_t maxConnectedPeers;
