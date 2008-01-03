@@ -93,9 +93,9 @@ enum
     /* when few peers are available, keep idle ones this long */
     MAX_UPLOAD_IDLE_SECS = (60 * 10),
 
-    /* set this too high and there will be a lot of churn.
-     * set it too low and you'll get peers too slowly */
-    MAX_RECONNECTIONS_PER_PULSE = 2,
+    /* if this * RECONNECT_PERIOD_MSEC is too high, routers die.
+     * if this * RECONNECT_PERIOD_MSEC it too low, peers come slow. */
+    MAX_RECONNECTIONS_PER_PULSE = 1,
 
     /* corresponds to ut_pex's added.f flags */
     ADDED_F_ENCRYPTION_FLAG = 1,
