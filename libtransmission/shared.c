@@ -70,7 +70,7 @@ getNatStateStr( int state )
         case TR_NAT_TRAVERSAL_MAPPING:   return "mapping";
         case TR_NAT_TRAVERSAL_MAPPED:    return "mapped";
         case TR_NAT_TRAVERSAL_UNMAPPING: return "unmapping";
-        case TR_NAT_TRAVERSAL_UNMAPPED:  return "unmapped";
+        case TR_NAT_TRAVERSAL_UNMAPPED:  return "not mapped";
         case TR_NAT_TRAVERSAL_ERROR:     return "error";
     }
 

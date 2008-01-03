@@ -332,7 +332,7 @@ tr_fastResumeSave( const tr_torrent * tor )
 
     fclose( file );
 
-    tr_dbg( "Wrote resume file for '%s'", tor->info.name );
+    /*tr_dbg( "Wrote resume file for '%s'", tor->info.name );*/
 }
 
 /***
@@ -432,11 +432,10 @@ parseProgress( tr_torrent     * tor,
         const uint8_t * walk = buf;
         const tr_time_t * oldMTimes = (const tr_time_t *) walk;
         for( i=0; i<n; ++i ) {
-            if ( curMTimes[i] == oldMTimes[i] ) {
-                const tr_file * file = &tor->info.files[i];
-                tr_dbg( "File '%s' mtimes match -- no recheck needed", file->name );
+            if ( curMTimes[i] == oldMTimes[i] )
                 tr_torrentSetFileChecked( tor, i, TRUE );
-            }
+            else
+                tr_dbg( "File '%s' recheck needed", tor->info.files[i].name );
         }
         free( curMTimes );
         walk += n * sizeof(tr_time_t);
