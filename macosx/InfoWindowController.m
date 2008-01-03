@@ -1213,7 +1213,6 @@ typedef enum
     
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    
     while ((torrent = [enumerator nextObject]))
         [torrent setRatioLimit: limit];
 }
