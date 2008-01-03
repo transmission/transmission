@@ -495,7 +495,7 @@
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setPrompt: @"Select"];
+    [panel setPrompt: NSLocalizedString(@"Select", "Preferences -> Open panel prompt")];
     [panel setAllowsMultipleSelection: NO];
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
@@ -510,7 +510,7 @@
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setPrompt: @"Select"];
+    [panel setPrompt: NSLocalizedString(@"Select", "Preferences -> Open panel prompt")];
     [panel setAllowsMultipleSelection: NO];
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
@@ -542,7 +542,7 @@
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setPrompt: @"Select"];
+    [panel setPrompt: NSLocalizedString(@"Select", "Preferences -> Open panel prompt")];
     [panel setAllowsMultipleSelection: NO];
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
