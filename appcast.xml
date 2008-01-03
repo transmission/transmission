@@ -16,6 +16,7 @@
  <li>Port forwarding now performed by MiniUPnP and libnatpmp</li>
  <li>Ability to set global and per-torrent number of connections</li>
  <li>Option to prefer not using encryption</li>
+ <li>Fix tracker connection error</li>
  <li>PEX is now configured globally</li>
  <li>Updated icon</li>
 </ul>
