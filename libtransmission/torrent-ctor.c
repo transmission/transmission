@@ -10,6 +10,7 @@
  * $Id:$
  */
 
+#include <libgen.h> /* basename */
 #include "transmission.h"
 #include "bencode.h"
 #include "platform.h"
@@ -82,6 +83,21 @@ tr_ctorSetMetainfoFromFile( tr_ctor        * ctor,
     else {
         clearMetainfo( ctor );
         err = 1;
+    }
+
+    /* if no `name' field was set, then set it from the filename */
+    if( ctor->isSet_metainfo ) {
+        benc_val_t * info = tr_bencDictFindType( &ctor->metainfo, "info", TYPE_DICT );
+        if( info != NULL ) {
+            benc_val_t * name = tr_bencDictFindFirst( info, "name.utf-8", "name", NULL );
+            if( name == NULL )
+                name = tr_bencDictAdd( info, "name" );
+            if( name->type!=TYPE_STR || !name->val.s.s || !*name->val.s.s ) {
+                char * tmp = tr_strdup( filename );
+                tr_bencInitStrDup( name, basename( tmp ) );
+                tr_free( tmp );
+            }
+        }
     }
 
     tr_free( metainfo );
