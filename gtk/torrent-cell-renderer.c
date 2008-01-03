@@ -86,13 +86,13 @@ getProgressString( const tr_info * info, const tr_stat * torStat )
                   tr_strlsize( buf2, info->totalSize, sizeof(buf2) ),
                   torStat->percentComplete * 100.0,
                   tr_strlsize( buf3, torStat->uploadedEver, sizeof(buf3) ),
-                               torStat->ratio * 100.0 );
+                  torStat->ratio );
     else
         str = g_strdup_printf(
                   _("%s, uploaded %s (Ratio: %.1f)"),
                   tr_strlsize( buf1, info->totalSize, sizeof(buf1) ),
                   tr_strlsize( buf2, torStat->uploadedEver, sizeof(buf2) ),
-                  torStat->ratio * 100.0 );
+                  torStat->ratio );
 
     return str;
 }
@@ -145,8 +145,7 @@ getShortStatusString( const tr_stat * torStat )
         case TR_STATUS_DONE: {
             char buf[128];
             if( torStat->status != TR_STATUS_DOWNLOAD )
-                g_string_append_printf( gstr, _("Ratio: %.1f, " ),
-                                        torStat->ratio*100.0 );
+                g_string_append_printf( gstr, _("Ratio: %.1f, " ), torStat->ratio );
             getShortTransferString( torStat, buf, sizeof( buf ) );
             g_string_append( gstr, buf );
             break;
