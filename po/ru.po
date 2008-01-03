@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: Transmission HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-12-27 10:24-0600\n"
-"PO-Revision-Date: 2008-01-03 23:20+0300\n"
+"PO-Revision-Date: 2008-01-04 00:11+0300\n"
 "Last-Translator: Pavel Shevchuk <stlwrt@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -89,11 +89,11 @@ msgstr "Показать _фильтр"
 
 #: ../gtk/actions.c:109
 msgid "Show _Status Bar"
-msgstr "Показать панель _состояния"
+msgstr "Показать панель состояни_я"
 
 #: ../gtk/actions.c:111
 msgid "Show _Toolbar"
-msgstr "Показать _панель инструментов"
+msgstr "Показать панель _инструментов"
 
 #: ../gtk/actions.c:116
 msgid "_Torrent"
@@ -126,15 +126,15 @@ msgstr "Открыть торрент"
 
 #: ../gtk/actions.c:125
 msgid "_Start"
-msgstr "_Запустить"
+msgstr "З_апустить"
 
 #: ../gtk/actions.c:126
 msgid "_Statistics"
-msgstr "&Статистика"
+msgstr "_Статистика"
 
 #: ../gtk/actions.c:128
 msgid "_Verify Local Data"
-msgstr "_Проверить локальные данные"
+msgstr "Проверить _локальные данные"
 
 #: ../gtk/actions.c:130
 msgid "_Pause"
@@ -166,7 +166,7 @@ msgstr "_Снять выделение"
 
 #: ../gtk/actions.c:146
 msgid "_Details"
-msgstr "_Подробности"
+msgstr "Подробност_и"
 
 #: ../gtk/actions.c:146
 msgid "Torrent Details"
@@ -939,7 +939,7 @@ msgstr "Обход NAT использует или NAT-PMP, или UPnP"
 
 #: ../gtk/tr_prefs.c:330
 msgid "Incoming TCP _Port"
-msgstr "_Порт для входящих TCP-соединений"
+msgstr "Порт для входящих TCP-_соединений"
 
 #: ../gtk/tr_prefs.c:340
 msgid "Options"
@@ -1039,23 +1039,23 @@ msgstr "Передано за сессию"
 
 #: ../gtk/tr_window.c:439
 msgid "A_ll"
-msgstr "_Все"
+msgstr "Вс_е"
 
 #: ../gtk/tr_window.c:439
 msgid "_Active"
-msgstr "_Активен"
+msgstr "Акт_ивные"
 
 #: ../gtk/tr_window.c:440
 msgid "_Downloading"
-msgstr "_Приём"
+msgstr "При_нимаемые"
 
 #: ../gtk/tr_window.c:440
 msgid "_Seeding"
-msgstr "_Раздача"
+msgstr "_Раздаваемые"
 
 #: ../gtk/tr_window.c:440
 msgid "_Paused"
-msgstr "_Приостановлено"
+msgstr "Приостанов_ленные"
 
 #: ../gtk/tr_window.c:443
 msgid "Name"
