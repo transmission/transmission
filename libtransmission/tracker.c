@@ -11,7 +11,6 @@
  */
 
 #include <assert.h>
-#include <ctype.h> /* isalnum */
 #include <stdio.h> /* snprintf */
 #include <stdlib.h>
 #include <string.h> /* strcmp, strchr */
@@ -973,12 +972,20 @@ generateKeyParam( char * msg, int len )
     *msg = '\0';
 }
 
+static int
+is_rfc2396_alnum( char ch )
+{
+    return strchr( "abcdefghijklmnopqrstuvwxyz"
+                   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                   "0123456789", ch ) != NULL;
+}
+
 static void
 escape( char * out, const uint8_t * in, int in_len ) /* rfc2396 */
 {
     const uint8_t *end = in + in_len;
     while( in != end )
-        if( isalnum(*in) )
+        if( is_rfc2396_alnum(*in) )
             *out++ = (char) *in++;
         else 
             out += snprintf( out, 4, "%%%02X", (unsigned int)*in++ );
