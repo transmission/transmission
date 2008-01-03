@@ -31,6 +31,8 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h> /* getrlimit */
+#include <sys/resource.h> /* getrlimit */
 #include <unistd.h>
 #include <libgen.h> /* basename, dirname */
 #include <fcntl.h> /* O_LARGEFILE */
@@ -88,7 +90,8 @@ enum
 {
     TR_MAX_OPEN_FILES = 16, /* real files, not sockets */
 
-    TR_RESERVED_FDS = 16 /* sockets reserved for tracker connections */
+    NOFILE_BUFFER = 512, /* the process' number of open files is
+                            globalMaxPeers + NOFILE_BUFFER */
 };
 
 struct tr_openfile
@@ -359,9 +362,6 @@ tr_fdSocketCreate( int type, int isReserved )
     int s = -1;
     tr_lockLock( gFd->lock );
 
-    if( isReserved && gFd->reserved >= TR_RESERVED_FDS )
-        isReserved = FALSE;
-
     if( isReserved || ( gFd->normal < gFd->normalMax ) )
         if( ( s = socket( AF_INET, type, 0 ) ) < 0 )
             tr_err( "Couldn't create socket (%s)", strerror( sockerrno ) );
@@ -449,30 +449,21 @@ tr_fdSocketClose( int s )
 void
 tr_fdInit( int globalPeerLimit )
 {
-    int i, j, *s;
+    int i;
+    struct rlimit rlim;
 
     assert( gFd == NULL );
-
     gFd = tr_new0( struct tr_fd_s, 1 );
     gFd->lock = tr_lockNew( );
 
-    s = tr_new( int, globalPeerLimit );
+    getrlimit( RLIMIT_NOFILE, &rlim );
+    rlim.rlim_cur = MIN( rlim.rlim_max, (rlim_t)(globalPeerLimit + NOFILE_BUFFER) );
+    setrlimit( RLIMIT_NOFILE, &rlim );
+    gFd->normalMax = rlim.rlim_cur - NOFILE_BUFFER;
+    tr_dbg( "%d usable file descriptors", globalPeerLimit );
 
-    /* count the max number of sockets we can use */
-    for( i=0; i<globalPeerLimit; ++i )
-        if( ( s[i] = socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 )
-            break;
-    for( j=0; j<i; ++j )
-        socketClose( s[j] );
-    tr_dbg( "%d usable file descriptors", i );
-
-    /* set some fds aside for the UI or daemon to use */
-    gFd->normalMax = i - TR_RESERVED_FDS - 10;
-
-    for( i=0; i<TR_MAX_OPEN_FILES; ++i )
+    for( i=0; i<TR_MAX_OPEN_FILES; ++i ) 
         gFd->open[i].fd = -1;
-
-    tr_free( s );
 }
 
 void
