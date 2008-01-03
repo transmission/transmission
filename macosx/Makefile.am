@@ -43,8 +43,6 @@ EXTRA_DIST = \
     FilePriorityCell.m \
     FilterButton.h \
     FilterButton.m \
-    GradientCell.h \
-    GradientCell.m \
     GroupsWindowController.h \
     GroupsWindowController.m \
     GroupToolbarItem.h \
