@@ -857,31 +857,25 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
 static void
 parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
 {
-    benc_val_t val, * sub;
-    uint8_t * tmp;
-
-    if( !tr_torrentAllowsPex( msgs->torrent ) ) /* no sharing! */
-        return;
-
-    tmp = tr_new( uint8_t, msglen );
+    int gotval = 0;
+    uint8_t * tmp = tr_new( uint8_t, msglen );
+    benc_val_t val, *sub;
     tr_peerIoReadBytes( msgs->io, inbuf, tmp, msglen );
 
-    if( tr_bencLoad( tmp, msglen, &val, NULL ) || ( val.type != TYPE_DICT ) ) {
-        dbgmsg( msgs, "GET can't read extended-pex dictionary" );
-        tr_free( tmp );
-        return;
-    }
-
-    if(( sub = tr_bencDictFindType( &val, "added", TYPE_STR ))) {
+    if( tr_torrentAllowsPex( msgs->torrent )
+        && (( gotval = !tr_bencLoad( tmp, msglen, &val, NULL )))
+        && (( sub = tr_bencDictFindType( &val, "added", TYPE_STR ))))
+    {
         const int n = sub->val.s.i / 6 ;
-        dbgmsg( msgs, "got %d peers from uT pex", n );
+        tr_inf( "torrent %s got %d peers from uT pex", msgs->torrent->info.name, n );
         tr_peerMgrAddPeers( msgs->handle->peerMgr,
                             msgs->torrent->info.hash,
                             TR_PEER_FROM_PEX,
                             (uint8_t*)sub->val.s.s, n );
     }
 
-    tr_bencFree( &val );
+    if( gotval )
+        tr_bencFree( &val );
     tr_free( tmp );
 }
 
