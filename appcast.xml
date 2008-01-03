@@ -5,29 +5,38 @@
     <link>http://www.transmissionbt.com/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Tue, 23 Oct 2007 23:20:00 -0400</pubDate>
-    <lastBuildDate>Tue, 4 Dec 2007 22:45:00 -0400</lastBuildDate>
+    <pubDate>Thu, 3 Jan 2008 15:30:00 -0400</pubDate>
+    <lastBuildDate>Thu, 3 Jan 2008 15:30:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 0.95 Released</title>
+      <title>Transmission 1.00 Released</title>
       <description><![CDATA[
 <h4>Core Changes:</h4>
 <ul>
- <li>Fix router errors caused by sending too many tracker requests at once</li>
- <li>Fix bug that let speed-limited torrents upload too quickly</li>
- <li>Faster average upload speedse</li>
- <li>Faster connection to peers after starting a torrent</li>
- <li>Fix memory corruption error</li>
- <li>Disable SWIFT for ratio-based trackers</li>
+ <li>Port forwarding now performed by MiniUPnP and libnatpmp</li>
+ <li>Ability to set global and per-torrent number of connections</li>
+ <li>Option to prefer not using encryption</li>
+ <li>PEX is now configured globally</li>
+ <li>Updated icon</li>
 </ul>
 <h4>Mac Changes:</h4>
 <ul>
- <li>Leopard: Fix for NAT-PMP port mapping</li>
+ <li>Redesigned Leopard-like look</li>
+ <li>Group labeling, filtering, and sorting</li>
+ <li>Statistics window</li>
+ <li>Pieces Bar (return of Advanced Bar)</li>
+ <li>Display "not available" overlay on the regular bar</li>
+ <li>Display remaining time for seeding transfers</li>
+ <li>Sort by total activity</li>
+ <li>Connectable from the Clutch web interface</li>
+ <li>Leopard: Time Machine will ignore incomplete downloads</li>
+ <li>Leopard: Fix bug where text fields would reject localized decimal values</li>
+ <li>Leopard: Fix bug where bandwidth rates chosen from the action menu would not apply the first time</li>
 </ul>
 
-<h4>TRANSMISSION 0.72 AND EARLIER: COMPLETE YOUR DOWNLOADS BEFORE UPGRADING OR YOU WILL LOSE DATA!</h4>]]></description>
-      <pubDate>Tue, 4 Dec 2007 22:45:00 -0400</pubDate>
-      <enclosure sparkle:version="4067" sparkle:shortVersionString="0.95" url="http://mirrors.m0k.org/transmission/files/Transmission-0.95.dmg" length="2406867" type="application/octet-stream"/>
+Transmission 0.72 and earlier: Complete your downloads before upgrading or you will lose data!]]></description>
+      <pubDate>Thu, 3 Jan 2008 15:30:00 -0400</pubDate>
+      <enclosure sparkle:version="4442" sparkle:shortVersionString="1.00" url="http://mirrors.m0k.org/transmission/files/Transmission-1.00.dmg" length="2694060" type="application/octet-stream"/>
     </item>
     
   </channel>
