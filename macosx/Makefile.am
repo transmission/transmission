@@ -8,11 +8,11 @@ EXTRA_DIST = \
     Images \
     Growl.framework \
     English.lproj \
-    el.lproj \
     es.lproj \
     fr.lproj \
     it.lproj \
-    ko.lproj \
+    nl.lproj \
+    ru.lproj \
     AboutWindowController.h \
     AboutWindowController.m \
     ActionPopUpButton.h \
