@@ -975,9 +975,9 @@ generateKeyParam( char * msg, int len )
 static int
 is_rfc2396_alnum( char ch )
 {
-    return strchr( "abcdefghijklmnopqrstuvwxyz"
-                   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                   "0123456789", ch ) != NULL;
+    return ( (ch >= 'a' && ch <= 'z' )
+            || (ch >= 'A' && ch <= 'Z' )
+            || (ch >= '0' && ch <= '9' ) );
 }
 
 static void
