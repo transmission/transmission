@@ -196,6 +196,7 @@ prefsChanged( TrCore * core UNUSED, const char * key, gpointer wind )
     {
        g_object_set( p->renderer, "minimal", pref_flag_get( key ), NULL );
        gtk_tree_view_column_queue_resize( p->column );
+       gtk_widget_queue_draw( p->view );
     }
     else if( !strcmp( key, PREF_KEY_STATUS_BAR ) )
     {
