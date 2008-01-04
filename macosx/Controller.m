@@ -2305,8 +2305,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             [newNames replaceObjectAtIndex: i withObject: [path stringByAppendingPathComponent: file]];
     }
     
-    #warning fix!!!!!!!!!!
-    BOOL ask = [[fDefaults stringForKey: @"DownloadChoice"] isEqualToString: @"Ask"];
+    BOOL ask = [fDefaults boolForKey: @"DownloadAsk"];
     
     NSEnumerator * enumerator = [newNames objectEnumerator];
     int count;
