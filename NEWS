@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
-1.00 (2008/01/03)
+1.00 (2008/01/04)
 - All Platforms:
    + Port forwarding now performed by MiniUPnP and libnatpmp
    + Ability to set global and per-torrent number of connections

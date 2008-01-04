@@ -5,8 +5,8 @@
     <link>http://www.transmissionbt.com/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Thu, 3 Jan 2008 15:30:00 -0400</pubDate>
-    <lastBuildDate>Thu, 3 Jan 2008 15:30:00 -0400</lastBuildDate>
+    <pubDate>Thu, 4 Jan 2008 15:30:00 -0400</pubDate>
+    <lastBuildDate>Thu, 4 Jan 2008 15:30:00 -0400</lastBuildDate>
 
 	<item>
       <title>Transmission 1.00 Released</title>
@@ -36,8 +36,8 @@
 </ul>
 
 Transmission 0.72 and earlier: Complete your downloads before upgrading or you will lose data!]]></description>
-      <pubDate>Thu, 3 Jan 2008 15:30:00 -0400</pubDate>
-      <enclosure sparkle:version="4442" sparkle:shortVersionString="1.00" url="http://mirrors.m0k.org/transmission/files/Transmission-1.00.dmg" length="2432470" type="application/octet-stream"/>
+      <pubDate>Thu, 4 Jan 2008 15:30:00 -0400</pubDate>
+      <enclosure sparkle:version="4466" sparkle:shortVersionString="1.00" url="http://mirrors.m0k.org/transmission/files/Transmission-1.00.dmg" length="2673859" type="application/octet-stream"/>
     </item>
     
   </channel>
