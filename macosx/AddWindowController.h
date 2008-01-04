@@ -32,6 +32,7 @@
     IBOutlet NSImageView * fIconView, * fLocationImageView;
     IBOutlet NSTextField * fNameField, * fStatusField, * fLocationField;
     IBOutlet NSButton * fStartCheck;
+    IBOutlet NSPopUpButton * fGroupPopUp;
     
     Controller * fController;
     

@@ -24,6 +24,7 @@
 
 #import "AddWindowController.h"
 #import "Controller.h"
+#import "GroupsWindowController.h"
 #import "NSStringAdditions.h"
 #import "ExpandedPathToIconTransformer.h"
 
@@ -34,8 +35,6 @@
 @end
 
 @implementation AddWindowController
-
-#warning add check to delete torrent file
 
 - (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller
         deleteTorrent: (torrentFileState) deleteTorrent
@@ -77,6 +76,10 @@
         statusString = [fileString stringByAppendingString: statusString];
     }
     [fStatusField setStringValue: statusString];
+    
+    #warning make dynamic
+    #warning reset if remove
+    [fGroupPopUp setMenu: [[GroupsWindowController groups] groupMenuWithTarget: nil action: NULL isSmall: NO]];
     
     [fStartCheck setState: [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState];
     
@@ -123,6 +126,7 @@
 - (void) add: (id) sender
 {
     [fTorrent setWaitToStart: [fStartCheck state] == NSOnState];
+    [fTorrent setGroupValue: [[fGroupPopUp selectedItem] tag]];
     
     [fController askOpenConfirmed: fTorrent];
     
