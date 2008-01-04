@@ -475,7 +475,10 @@ tr_buildPath ( char *buf, size_t buflen, const char *first_element, ... )
         evbuffer_add_printf( evbuf, "%s", element );
         element = (const char*) va_arg( vl, const char* );
     }
-    strlcpy( buf, (char*)EVBUFFER_DATA(evbuf), buflen );
+    if( EVBUFFER_LENGTH(evbuf) )
+        strlcpy( buf, (char*)EVBUFFER_DATA(evbuf), buflen );
+    else
+        *buf = '\0';
     evbuffer_free( evbuf );
 }
 
