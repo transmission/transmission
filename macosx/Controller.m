@@ -745,7 +745,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSString * torrentPath;
     tr_info info;
     NSEnumerator * enumerator = [filenames objectEnumerator];
-    BOOL showWindow = [fDefaults boolForKey: @"DownloadAsk"];
+    BOOL showWindow = ignore || [fDefaults boolForKey: @"DownloadAsk"];
     while ((torrentPath = [enumerator nextObject]))
     {
         NSString * location;
