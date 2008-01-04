@@ -121,7 +121,7 @@
     
     [fController askOpenConfirmed: fTorrent];
     
-    #warning remove if necessary
+    #warning remove torrent file if necessary
     
     [self release];
 }
@@ -151,6 +151,8 @@
         ExpandedPathToIconTransformer * iconTransformer = [[ExpandedPathToIconTransformer alloc] init];
         [fLocationImageView setImage: [iconTransformer transformedValue: fDestination]];
         [iconTransformer release];
+        
+        [fTorrent changeDownloadFolder: fDestination];
     }
     else
     {
