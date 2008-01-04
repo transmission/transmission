@@ -24,13 +24,13 @@
 
 #import <Cocoa/Cocoa.h>
 #import "Torrent.h"
-#import "FileOutlineView.h"
+#import "FileOutlineController.h"
 #import "PiecesView.h"
 #import <transmission.h>
 
 @interface InfoWindowController : NSWindowController
 {
-    NSArray * fTorrents, * fPeers, * fFiles;
+    NSArray * fTorrents, * fPeers;
     
     IBOutlet NSView * fInfoView, * fActivityView, * fPeersView, * fFilesView, * fOptionsView;
     int fCurrentTabTag;
@@ -56,9 +56,7 @@
     IBOutlet PiecesView * fPiecesView;
     IBOutlet NSSegmentedControl * fPiecesControl;
     
-    IBOutlet FileOutlineView * fFileOutline;
-    IBOutlet NSMenuItem * fFileCheckItem, * fFileUncheckItem,
-                        * fFilePriorityNormal, * fFilePriorityHigh, * fFilePriorityLow;
+    IBOutlet FileOutlineController * fFileController;
     
     IBOutlet NSPopUpButton * fRatioPopUp, * fUploadLimitPopUp, * fDownloadLimitPopUp;
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField, * fPeersConnectField,
@@ -81,11 +79,6 @@
 
 - (void) revealTorrentFile: (id) sender;
 - (void) revealDataFile: (id) sender;
-- (void) revealFile: (id) sender;
-
-- (void) setCheck: (id) sender;
-- (void) setOnlySelectedCheck: (id) sender;
-- (void) setPriority: (id) sender;
 
 - (void) setSpeedMode: (id) sender;
 - (void) setSpeedLimit: (id) sender;

@@ -118,6 +118,7 @@
 		A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
 		A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
 		A26397550D0F714300D36DF2 /* ActionPopUpButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A26397540D0F714300D36DF2 /* ActionPopUpButton.m */; };
+		A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2190D2DA35A00FF7140 /* FileOutlineController.m */; };
 		A26E75880CB6AA7500226674 /* InfoOptions.png in Resources */ = {isa = PBXBuildFile; fileRef = A26E75870CB6AA7500226674 /* InfoOptions.png */; };
 		A26E75960CB6AB4800226674 /* InfoGeneral.png in Resources */ = {isa = PBXBuildFile; fileRef = A26E75950CB6AB4800226674 /* InfoGeneral.png */; };
 		A2710E770A86796000CE4F7D /* PrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2710E750A86796000CE4F7D /* PrefsWindow.m */; };
@@ -510,6 +511,8 @@
 		A26AF1090D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/MessageWindow.xib; sourceTree = "<group>"; };
 		A26AF10A0D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A26AF10B0D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/StatsWindow.xib; sourceTree = "<group>"; };
+		A26AF2180D2DA35A00FF7140 /* FileOutlineController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileOutlineController.h; path = macosx/FileOutlineController.h; sourceTree = "<group>"; };
+		A26AF2190D2DA35A00FF7140 /* FileOutlineController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FileOutlineController.m; path = macosx/FileOutlineController.m; sourceTree = "<group>"; };
 		A26E75870CB6AA7500226674 /* InfoOptions.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoOptions.png; path = macosx/Images/InfoOptions.png; sourceTree = "<group>"; };
 		A26E75950CB6AB4800226674 /* InfoGeneral.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoGeneral.png; path = macosx/Images/InfoGeneral.png; sourceTree = "<group>"; };
 		A2710E740A86796000CE4F7D /* PrefsWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsWindow.h; path = macosx/PrefsWindow.h; sourceTree = "<group>"; };
@@ -807,6 +810,7 @@
 				A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */,
 				A234D0D40C79FB6000A82373 /* Additions */,
 				E1B6FBF80C0D719B0015FE4D /* Info Window */,
+				A26AF2220D2DA42800FF7140 /* File Outline View */,
 				E1B6FBFD0C0D72430015FE4D /* Prefs Window */,
 				E1B6FC000C0D72A00015FE4D /* Overlay Window */,
 				E138A9720C04D88F00C5426C /* CTGradient */,
@@ -821,10 +825,6 @@
 				A219798A0D07B78400438EA7 /* GroupToolbarItem.m */,
 				A20BFFB50D091CC700CE5D2B /* ToolbarSegmentedCell.h */,
 				A20BFFB60D091CC700CE5D2B /* ToolbarSegmentedCell.m */,
-				A257C17F0CAD3003004E121C /* PeerTableView.h */,
-				A257C1800CAD3003004E121C /* PeerTableView.m */,
-				A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */,
-				A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */,
 				A22180960D148A71007D09ED /* GroupsWindowController.h */,
 				A22180970D148A71007D09ED /* GroupsWindowController.m */,
 			);
@@ -1083,6 +1083,21 @@
 			name = Additions;
 			sourceTree = "<group>";
 		};
+		A26AF2220D2DA42800FF7140 /* File Outline View */ = {
+			isa = PBXGroup;
+			children = (
+				A26AF2180D2DA35A00FF7140 /* FileOutlineController.h */,
+				A26AF2190D2DA35A00FF7140 /* FileOutlineController.m */,
+				A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */,
+				A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */,
+				A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */,
+				A2265F400B5EF5F40093DDA5 /* FileNameCell.m */,
+				35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */,
+				35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */,
+			);
+			name = "File Outline View";
+			sourceTree = "<group>";
+		};
 		BE1183410CE15DF00002D0F3 /* libminiupnp */ = {
 			isa = PBXGroup;
 			children = (
@@ -1185,18 +1200,16 @@
 		E1B6FBF80C0D719B0015FE4D /* Info Window */ = {
 			isa = PBXGroup;
 			children = (
+				A257C17F0CAD3003004E121C /* PeerTableView.h */,
+				A257C1800CAD3003004E121C /* PeerTableView.m */,
+				A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */,
+				A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */,
 				A200B8390A2263BA007BBB1E /* InfoWindowController.h */,
 				A200B83A0A2263BA007BBB1E /* InfoWindowController.m */,
-				A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */,
-				A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */,
-				A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */,
-				A2265F400B5EF5F40093DDA5 /* FileNameCell.m */,
 				A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */,
 				A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */,
 				A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */,
 				A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */,
-				35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */,
-				35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */,
 			);
 			name = "Info Window";
 			sourceTree = "<group>";
@@ -1737,6 +1750,7 @@
 				A26397550D0F714300D36DF2 /* ActionPopUpButton.m in Sources */,
 				A25AFDE90D1038AD0092A1BA /* MenuLabel.m in Sources */,
 				A22180980D148A71007D09ED /* GroupsWindowController.m in Sources */,
+				A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
