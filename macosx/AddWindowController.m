@@ -55,6 +55,8 @@
 
 - (void) awakeFromNib
 {
+    [[self window] setAcceptsMouseMovedEvents: YES];
+    
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateGroupMenu:)
         name: @"UpdateGroups" object: nil];
     
@@ -156,6 +158,11 @@
     [fGroupPopUp selectItemWithTag: groupValue];
 }
 
+- (void) mouseMoved: (NSEvent *) event
+{
+    [fFileController setHoverRowForEvent: event];
+}
+
 @end
 
 @implementation AddWindowController (Private)
@@ -176,7 +183,7 @@
         
         [fTorrent changeDownloadFolder: fDestination];
         
-        #warning make sure to reload file table
+        [fFileController reloadData];
     }
     else
     {
