@@ -1548,7 +1548,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;
     
-    fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
+    fWaitToStart = waitToStart && [waitToStart boolValue];
     
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
     fGroupValue = groupValue ? [groupValue intValue] : -1;

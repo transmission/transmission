@@ -778,6 +778,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             [[[AddWindowController alloc] initWithTorrent: torrent destination: location controller: self] showWindow: self];
         else
         {
+            [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];
+            
             [torrent update];
             [fTorrents addObject: torrent];
             [torrent release];

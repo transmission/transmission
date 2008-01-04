@@ -117,6 +117,8 @@
 
 - (void) add: (id) sender
 {
+    [fTorrent setWaitToStart: [fStartCheck state] == NSOnState];
+    
     [fController askOpenConfirmed: fTorrent];
     
     #warning remove if necessary
