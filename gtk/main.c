@@ -202,7 +202,7 @@ refreshTorrentActions( GtkTreeSelection * s )
     action_sensitize( "start-torrent", counts.inactiveCount!=0 );
     action_sensitize( "remove-torrent", counts.totalCount!=0 );
     action_sensitize( "verify-torrent", counts.totalCount!=0 );
-    action_sensitize( "show-torrent-details", counts.totalCount!=0 );
+    action_sensitize( "show-torrent-details", counts.totalCount==1 );
 
     canUpdate = 0;
     gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach, &canUpdate );
