@@ -24,6 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "Torrent.h"
+#import "FileOutlineController.h"
 
 @class Controller;
 
@@ -33,6 +34,8 @@
     IBOutlet NSTextField * fNameField, * fStatusField, * fLocationField;
     IBOutlet NSButton * fStartCheck;
     IBOutlet NSPopUpButton * fGroupPopUp;
+    
+    IBOutlet FileOutlineController * fFileController;
     
     Controller * fController;
     

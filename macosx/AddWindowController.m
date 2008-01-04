@@ -58,6 +58,8 @@
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateGroupMenu:)
         name: @"UpdateGroups" object: nil];
     
+    [fFileController setTorrent: fTorrent];
+    
     NSString * name = [fTorrent name];
     [[self window] setTitle: name];
     [fNameField setStringValue: name];
