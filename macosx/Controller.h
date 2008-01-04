@@ -111,6 +111,7 @@
 - (void) openFiles:             (NSArray *) filenames;
 - (void) openFiles:             (NSArray *) filenames forcePath: (NSString *) path ignoreDownloadFolder: (BOOL) ignore
                                             deleteTorrentFile: (torrentFileState) deleteTorrent;
+- (void) askOpenConfirmed:      (Torrent *) torrent;
 - (void) openCreatedFile:       (NSNotification *) notification;
 - (void) openFilesWithDict:     (NSDictionary *) dictionary;
 - (void) openFilesAsk:          (NSMutableArray *) files deleteTorrentFile: (torrentFileState) deleteTorrent;

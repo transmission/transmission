@@ -33,7 +33,6 @@
     
     IBOutlet FileOutlineView * fOutline;
     
-    #warning generate outside nib
     IBOutlet NSMenuItem * fFileCheckItem, * fFileUncheckItem,
                         * fFilePriorityNormal, * fFilePriorityHigh, * fFilePriorityLow;
 }

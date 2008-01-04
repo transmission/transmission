@@ -42,12 +42,14 @@
 	<true/>
 	<key>DisplayStatusProgressSelected</key>
 	<false/>
-	<key>DownloadChoice</key>
-	<string>Constant</string>
+	<key>DownloadAsk</key>
+	<false/>
 	<key>DownloadFolder</key>
 	<string>~/Downloads</string>
 	<key>DownloadLimit</key>
 	<integer>100</integer>
+	<key>DownloadLocationConstant</key>
+	<false/>
 	<key>DownloadSound</key>
 	<string>Glass</string>
 	<key>EncryptionPrefer</key>

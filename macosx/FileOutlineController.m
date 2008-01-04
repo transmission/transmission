@@ -37,13 +37,14 @@
     
     //set table header tool tips
     if ([NSApp isOnLeopardOrBetter])
-    {NSLog(@"hafhdash");
+    {
         [[fOutline tableColumnWithIdentifier: @"Check"] setHeaderToolTip: NSLocalizedString(@"Download",
                                                                             "file table -> header tool tip")];
         [[fOutline tableColumnWithIdentifier: @"Priority"] setHeaderToolTip: NSLocalizedString(@"Priority",
                                                                             "file table -> header tool tip")];                                                               
     }
     
+    #warning generate menu in code?
     //set priority item images
     [fFilePriorityNormal setImage: [NSImage imageNamed: @"PriorityNormal.png"]];
     [fFilePriorityLow setImage: [NSImage imageNamed: @"PriorityLow.png"]];
@@ -74,8 +75,9 @@
 - (int) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
 {
     if (!item)
-        return [[fTorrent fileList] count];
-    return [[item objectForKey: @"IsFolder"] boolValue] ? [[item objectForKey: @"Children"] count] : 0;
+        return fTorrent ? [[fTorrent fileList] count] : 0;
+    else
+        return [[item objectForKey: @"IsFolder"] boolValue] ? [[item objectForKey: @"Children"] count] : 0;
 }
 
 - (BOOL) outlineView: (NSOutlineView *) outlineView isItemExpandable: (id) item 

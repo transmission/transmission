@@ -29,7 +29,6 @@
 
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
-#define DOWNLOAD_ASK        3
 
 #define UPDATE_SECONDS 86400
 
@@ -111,13 +110,7 @@
     [self setPrefView: nil];
     
     //set download folder
-    NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
-    if ([downloadChoice isEqualToString: @"Constant"])
-        [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
-    else if ([downloadChoice isEqualToString: @"Torrent"])
-        [fFolderPopUp selectItemAtIndex: DOWNLOAD_TORRENT];
-    else
-        [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
+    [fFolderPopUp selectItemAtIndex: [fDefaults boolForKey: @"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
     
     //set stop ratio
     [self updateRatioStopField];
@@ -477,18 +470,7 @@
 
 - (void) setDownloadLocation: (id) sender
 {
-    switch ([fFolderPopUp indexOfSelectedItem])
-    {
-        case DOWNLOAD_FOLDER:
-            [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
-            break;
-        case DOWNLOAD_TORRENT:
-            [fDefaults setObject: @"Torrent" forKey: @"DownloadChoice"];
-            break;
-        case DOWNLOAD_ASK:
-            [fDefaults setObject: @"Ask" forKey: @"DownloadChoice"];
-            break;
-    }
+    [fDefaults setBool: [fFolderPopUp indexOfSelectedItem] ==  DOWNLOAD_FOLDER forKey: @"DownloadLocationConstant"];
 }
 
 - (void) folderSheetShow: (id) sender
@@ -630,13 +612,7 @@
     else
     {
         //reset if cancelled
-        NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
-        if ([downloadChoice isEqualToString: @"Constant"])
-            [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
-        else if ([downloadChoice isEqualToString: @"Torrent"])
-            [fFolderPopUp selectItemAtIndex: DOWNLOAD_TORRENT];
-        else
-            [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
+        [fFolderPopUp selectItemAtIndex: [fDefaults boolForKey: @"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
     }
 }
 

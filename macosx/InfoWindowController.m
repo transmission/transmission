@@ -379,7 +379,6 @@ typedef enum
     [self updateOptions];
     
     [fPeerTable reloadData];
-    [fFileController reloadData];
 }
 
 - (void) updateInfoStats

@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2007-2008 Transmission authors and contributors
+ * Copyright (c) 2008 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -23,37 +23,30 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "transmission.h"
-#import "makemeta.h"
 
-@interface CreatorWindowController : NSWindowController
+@class Controller;
+@class Torrent;
+
+@interface AddWindowController : NSWindowController
 {
-    IBOutlet NSImageView * fIconView;
-    IBOutlet NSTextField * fNameField, * fStatusField, * fPiecesField, * fTrackerField, * fLocationField;
-    IBOutlet NSTextView * fCommentView;
-    IBOutlet NSButton * fPrivateCheck, * fOpenCheck;
+    IBOutlet NSImageView * fIconView, * fLocationImageView;
+    IBOutlet NSTextField * fNameField, * fStatusField, * fLocationField;
+    IBOutlet NSButton * fStartCheck;
     
-    IBOutlet NSView * fProgressView;
-    IBOutlet NSProgressIndicator * fProgressIndicator;
+    Controller * fController;
     
-    tr_metainfo_builder * fInfo;
-    NSString * fPath, * fLocation;
-    BOOL fOpenTorrent;
-    
-    NSTimer * fTimer;
-    BOOL fStarted;
-    
-    NSUserDefaults * fDefaults;
+    Torrent * fTorrent;
+    NSString * fDestination;
 }
 
-+ (void) createTorrentFile: (tr_handle *) handle;
-+ (void) createTorrentFile: (tr_handle *) handle forFile: (NSString *) file;
+- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller;
 
-- (id) initWithHandle: (tr_handle *) handle path: (NSString *) path;
+- (void) setDestination: (id) sender;
 
-- (void) setLocation: (id) sender;
-- (void) create: (id) sender;
-- (void) cancelCreateWindow: (id) sender;
-- (void) cancelCreateProgress: (id) sender;
+
+
+
+- (void) add: (id) sender;
+- (void) cancelAdd: (id) sender;
 
 @end
