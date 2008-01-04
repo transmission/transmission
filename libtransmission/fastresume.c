@@ -667,6 +667,14 @@ setFromCtor( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor, int mode )
 {
     uint64_t ret = 0;
 
+    if( fields & TR_FR_RUN ) {
+        uint8_t isPaused;
+        if( !tr_ctorGetIsPaused( ctor, mode, &isPaused ) ) {
+            tor->isRunning = !isPaused;
+            ret |= TR_FR_RUN;
+        }
+    }
+
     if( fields & TR_FR_MAX_UNCHOKED )
         if( !tr_ctorGetMaxUnchokedPeers( ctor, mode, &tor->maxUnchokedPeers ) )
             ret |= TR_FR_MAX_UNCHOKED;
