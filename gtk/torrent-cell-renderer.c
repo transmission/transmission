@@ -70,7 +70,7 @@ getProgressString( const tr_info * info, const tr_stat * torStat )
     const int isDone = torStat->leftUntilDone == 0;
     const uint64_t haveTotal = torStat->haveUnchecked + torStat->haveValid;
     const int isSeed = torStat->haveValid >= info->totalSize;
-    char buf1[32], buf2[32], buf3[32];
+    char buf1[32], buf2[32], buf3[32], buf4[32];
     char * str;
 
     if( !isDone )
@@ -81,18 +81,18 @@ getProgressString( const tr_info * info, const tr_stat * torStat )
                   torStat->percentDone * 100.0 );
     else if( !isSeed )
         str = g_strdup_printf(
-                  _("%s of %s (%.2f%%), uploaded %s (Ratio: %.1f"),
+                  _("%s of %s (%.2f%%), uploaded %s (Ratio: %s)"),
                   tr_strlsize( buf1, haveTotal, sizeof(buf1) ),
                   tr_strlsize( buf2, info->totalSize, sizeof(buf2) ),
                   torStat->percentComplete * 100.0,
                   tr_strlsize( buf3, torStat->uploadedEver, sizeof(buf3) ),
-                  torStat->ratio );
+                  tr_strlratio( buf4, torStat->ratio, sizeof( buf4 ) ) );
     else
         str = g_strdup_printf(
-                  _("%s, uploaded %s (Ratio: %.1f)"),
+                  _("%s, uploaded %s (Ratio: %s)"),
                   tr_strlsize( buf1, info->totalSize, sizeof(buf1) ),
                   tr_strlsize( buf2, torStat->uploadedEver, sizeof(buf2) ),
-                  torStat->ratio );
+                  tr_strlratio( buf3, torStat->ratio, sizeof( buf3 ) ) );
 
     return str;
 }
@@ -144,8 +144,10 @@ getShortStatusString( const tr_stat * torStat )
         case TR_STATUS_SEED:
         case TR_STATUS_DONE: {
             char buf[128];
-            if( torStat->status != TR_STATUS_DOWNLOAD )
-                g_string_append_printf( gstr, _("Ratio: %.1f, " ), torStat->ratio );
+            if( torStat->status != TR_STATUS_DOWNLOAD ) {
+                tr_strlratio( buf, torStat->ratio, sizeof( buf ) );
+                g_string_append_printf( gstr, _("Ratio: %s, " ), buf );
+            }
             getShortTransferString( torStat, buf, sizeof( buf ) );
             g_string_append( gstr, buf );
             break;

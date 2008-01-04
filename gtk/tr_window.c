@@ -620,7 +620,7 @@ static void
 updateStats( PrivateData * p )
 {
     char * pch;
-    char up[32], down[32], buf[128];
+    char up[32], down[32], ratio[32], buf[128];
     struct tr_session_stats stats;
     tr_handle * handle = tr_core_handle( p->core );
 
@@ -628,7 +628,8 @@ updateStats( PrivateData * p )
     pch = pref_string_get( PREF_KEY_STATUS_BAR_STATS );
     if( !strcmp( pch, "session-ratio" ) ) {
         tr_getSessionStats( handle, &stats );
-        g_snprintf( buf, sizeof(buf), _("Ratio: %.1f"), stats.ratio );
+        tr_strlratio( ratio, stats.ratio, sizeof( ratio ) );
+        g_snprintf( buf, sizeof(buf), _("Ratio: %s"), ratio );
     } else if( !strcmp( pch, "session-transfer" ) ) {
         tr_getSessionStats( handle, &stats );
         tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
@@ -641,7 +642,8 @@ updateStats( PrivateData * p )
         g_snprintf( buf, sizeof( buf ), _( "Down: %s  Up: %s" ), down, up );
     } else { /* default is total-ratio */
         tr_getCumulativeSessionStats( handle, &stats );
-        g_snprintf( buf, sizeof(buf), _("Ratio: %.1f"), stats.ratio );
+        tr_strlratio( ratio, stats.ratio, sizeof( ratio ) );
+        g_snprintf( buf, sizeof(buf), _("Ratio: %s"), ratio );
     }
     g_free( pch );
     gtk_label_set_text( GTK_LABEL( p->stats_lb ), buf );

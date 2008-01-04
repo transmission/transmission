@@ -50,6 +50,9 @@ char* tr_strlsize( char * buf, guint64 size, size_t buflen );
 /* return a human-readable string for the transfer rate given in bytes. */
 char* tr_strlspeed (char * buf, double KiBps, size_t buflen );
 
+/* return a human-readable string for the given ratio. */
+char* tr_strlratio( char * buf, double ratio, size_t buflen );
+
 /* return a human-readable string for the time given in seconds. */
 char* tr_strltime( char * buf, int secs, size_t buflen );
 

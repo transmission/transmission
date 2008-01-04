@@ -51,10 +51,26 @@ tr_strcmp( const char * a, const char * b )
 }
 
 char*
+tr_strlratio( char * buf, double ratio, size_t buflen )
+{
+    if( (int)ratio == TR_RATIO_NA )
+        g_strlcpy( buf, _( "None" ), buflen );
+    else if( (int)ratio == TR_RATIO_INF )
+        g_strlcpy( buf, "\xE2\x88\x9E", buflen );
+    else if( ratio < 10.0 )
+        g_snprintf( buf, buflen, "%.2f", ratio );
+    else if( ratio < 100.0 )
+        g_snprintf( buf, buflen, "%.1f", ratio );
+    else
+        g_snprintf( buf, buflen, "%.0f", ratio );
+    return buf;
+}
+
+char*
 tr_strlsize( char * buf, guint64 size, size_t buflen )
 {
     if( !size )
-        g_strlcpy( buf, _("None"), buflen );
+        g_strlcpy( buf, _( "None" ), buflen );
     else {
         static const char *units[] = {
             N_("B"), N_("KiB"), N_("MiB"), N_("GiB"), N_("TiB"),
@@ -77,7 +93,7 @@ tr_strlspeed( char * buf, double KiBps, size_t buflen )
 {
     const guint64 bps = KiBps * 1024;
     if( !bps )
-        g_strlcpy( buf, _("None"), buflen );
+        g_strlcpy( buf, _( "None" ), buflen );
     else {
         char bbuf[64];
         tr_strlsize( bbuf, (guint64)(KiBps*1024), sizeof(bbuf) );
@@ -120,6 +136,7 @@ tr_strltime( char * buf, int secs, size_t buflen )
 
     return buf;
 }
+
 
 char *
 rfc822date (guint64 epoch_msec)

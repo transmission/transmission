@@ -883,11 +883,11 @@ refresh_activity (GtkWidget * top)
   tr_strlsize( sizeStr, stat->uploadedEver, sizeof(sizeStr) );
   gtk_label_set_text( GTK_LABEL(a->ul_lb), sizeStr );
 
-  tr_strlsize( sizeStr, stat->corruptEver, sizeof(sizeStr) );
-  gtk_label_set_text (GTK_LABEL(a->failed_lb), sizeStr );
+  tr_strlsize( sizeStr, stat->corruptEver, sizeof( sizeStr ) );
+  gtk_label_set_text( GTK_LABEL( a->failed_lb ), sizeStr );
 
-  g_snprintf( buf, sizeof(buf), "%.1f", stat->ratio );
-  gtk_label_set_text (GTK_LABEL(a->ratio_lb), buf );
+  tr_strlratio( buf, stat->ratio, sizeof( buf ) );
+  gtk_label_set_text( GTK_LABEL( a->ratio_lb ), buf );
 
   tr_strlspeed( buf, stat->swarmspeed, sizeof(buf) );
   gtk_label_set_text (GTK_LABEL(a->swarm_lb), buf );

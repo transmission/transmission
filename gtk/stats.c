@@ -40,10 +40,7 @@ static void
 setLabelFromRatio( GtkWidget * w, double d )
 {
     char buf[128];
-    if( ( (int)d == TR_RATIO_NA ) )
-        g_strlcpy( buf, _("None"), sizeof(buf) );
-    else
-        g_snprintf( buf, sizeof(buf), "%.1f", d );
+    tr_strlratio( buf, d, sizeof( buf ) );
     setLabel( w, buf );
 }
 
