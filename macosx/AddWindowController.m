@@ -153,6 +153,8 @@
         [iconTransformer release];
         
         [fTorrent changeDownloadFolder: fDestination];
+        
+        #warning make sure to reload file table
     }
     else
     {

@@ -114,8 +114,6 @@
 - (void) askOpenConfirmed:      (Torrent *) torrent;
 - (void) openCreatedFile:       (NSNotification *) notification;
 - (void) openFilesWithDict:     (NSDictionary *) dictionary;
-- (void) openFilesAsk:          (NSMutableArray *) files deleteTorrentFile: (torrentFileState) deleteTorrent;
-- (void) openFilesAskWithDict:  (NSDictionary *) dictionary;
 - (void) openShowSheet:         (id) sender;
 
 - (void) duplicateOpenAlert: (NSString *) name;
