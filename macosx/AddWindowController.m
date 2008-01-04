@@ -49,6 +49,7 @@
         
         fDeleteTorrent = deleteTorrent == TORRENT_FILE_DELETE || (deleteTorrent == TORRENT_FILE_DEFAULT
                             && [[NSUserDefaults standardUserDefaults] boolForKey: @"DeleteOriginalTorrent"]);
+        fDeleteEnable = deleteTorrent == TORRENT_FILE_DEFAULT;
     }
     return self;
 }
@@ -87,6 +88,9 @@
     [fGroupPopUp setMenu: [[GroupsWindowController groups] groupMenuWithTarget: nil action: NULL isSmall: NO]];
     
     [fStartCheck setState: [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState];
+    
+    [fDeleteCheck setState: fDeleteTorrent ? NSOnState : NSOffState];
+    [fDeleteCheck setEnabled: fDeleteEnable];
     
     if (fDestination)
     {
@@ -137,7 +141,7 @@
     
     [fController askOpenConfirmed: fTorrent];
     
-    if (fDeleteTorrent)
+    if ([fDeleteCheck state] == NSOnState)
         [fTorrent trashTorrent];
     
     [self release];
@@ -153,6 +157,8 @@
 
 - (void) updateGroupMenu: (NSNotification *) notification
 {
+    #warning add option to go to group window
+    
     int groupValue = [[fGroupPopUp selectedItem] tag];
     [fGroupPopUp setMenu: [[GroupsWindowController groups] groupMenuWithTarget: nil action: NULL isSmall: NO]];
     [fGroupPopUp selectItemWithTag: groupValue];

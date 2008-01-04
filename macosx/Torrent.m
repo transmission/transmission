@@ -540,7 +540,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file disk space alert -> button")];
             [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent file disk space alert -> button")];
             
-            #warning factor in choice with suppression
             BOOL onLeopard = [NSApp isOnLeopardOrBetter];
             if (onLeopard)
                 [alert setShowsSuppressionButton: YES];

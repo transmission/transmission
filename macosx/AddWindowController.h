@@ -32,7 +32,7 @@
 {
     IBOutlet NSImageView * fIconView, * fLocationImageView;
     IBOutlet NSTextField * fNameField, * fStatusField, * fLocationField;
-    IBOutlet NSButton * fStartCheck;
+    IBOutlet NSButton * fStartCheck, * fDeleteCheck;
     IBOutlet NSPopUpButton * fGroupPopUp;
     
     IBOutlet FileOutlineController * fFileController;
@@ -42,7 +42,7 @@
     Torrent * fTorrent;
     NSString * fDestination;
     
-    BOOL fDeleteTorrent;
+    BOOL fDeleteTorrent, fDeleteEnable;
 }
 
 - (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller
