@@ -65,7 +65,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 @implementation Torrent
 
-#warning add init for add dialog
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (torrentFileState) torrentDelete
         lib: (tr_handle *) lib
@@ -438,7 +437,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (void) trashTorrent
 {
     if (fPublicTorrent)
-        [self trashFile: [self publicTorrentLocation]];
+    {
+        [self trashFile: fPublicTorrentLocation];
+        [fPublicTorrentLocation release];
+        fPublicTorrentLocation = nil;
+        
+        fPublicTorrent = NO;
+    }
 }
 
 - (void) moveTorrentDataFileTo: (NSString *) folder

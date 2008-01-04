@@ -745,6 +745,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSString * torrentPath;
     tr_info info;
     NSEnumerator * enumerator = [filenames objectEnumerator];
+    BOOL showWindow = [fDefaults boolForKey: @"DownloadAsk"];
     while ((torrentPath = [enumerator nextObject]))
     {
         NSString * location;
@@ -768,14 +769,19 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         tr_metainfoFree(&info);
         tr_ctorFree(ctor);
         
-        if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location deleteTorrentFile: deleteTorrent lib: fLib]))
+        if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location
+                            deleteTorrentFile: showWindow ? TORRENT_FILE_SAVE : deleteTorrent lib: fLib]))
             continue;
         
         //add it to the "File -> Open Recent" menu
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
         
-        if ([fDefaults boolForKey: @"DownloadAsk"])
-            [[[AddWindowController alloc] initWithTorrent: torrent destination: location controller: self] showWindow: self];
+        if (showWindow)
+        {
+            AddWindowController * addController = [[AddWindowController alloc] initWithTorrent: torrent destination: location
+                            controller: self deleteTorrent: deleteTorrent];
+            [addController showWindow: self];
+        }
         else
         {
             [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];

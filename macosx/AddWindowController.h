@@ -23,9 +23,9 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "Torrent.h"
 
 @class Controller;
-@class Torrent;
 
 @interface AddWindowController : NSWindowController
 {
@@ -37,14 +37,14 @@
     
     Torrent * fTorrent;
     NSString * fDestination;
+    
+    BOOL fDeleteTorrent;
 }
 
-- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller;
+- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller
+        deleteTorrent: (torrentFileState) deleteTorrent;
 
 - (void) setDestination: (id) sender;
-
-
-
 
 - (void) add: (id) sender;
 - (void) cancelAdd: (id) sender;

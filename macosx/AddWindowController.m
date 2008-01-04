@@ -24,7 +24,6 @@
 
 #import "AddWindowController.h"
 #import "Controller.h"
-#import "Torrent.h"
 #import "NSStringAdditions.h"
 #import "ExpandedPathToIconTransformer.h"
 
@@ -36,7 +35,10 @@
 
 @implementation AddWindowController
 
+#warning add check to delete torrent file
+
 - (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller
+        deleteTorrent: (torrentFileState) deleteTorrent
 {
     if ((self = [super initWithWindowNibName: @"AddWindow"]))
     {
@@ -45,6 +47,9 @@
             fDestination = [[path stringByExpandingTildeInPath] retain];
         
         fController = controller;
+        
+        fDeleteTorrent = deleteTorrent == TORRENT_FILE_DELETE || (deleteTorrent == TORRENT_FILE_DEFAULT
+                            && [[NSUserDefaults standardUserDefaults] boolForKey: @"DeleteOriginalTorrent"]);
     }
     return self;
 }
@@ -121,7 +126,8 @@
     
     [fController askOpenConfirmed: fTorrent];
     
-    #warning remove torrent file if necessary
+    if (fDeleteTorrent)
+        [fTorrent trashTorrent];
     
     [self release];
 }
