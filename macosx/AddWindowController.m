@@ -55,8 +55,8 @@
 
 - (void) awakeFromNib
 {
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValueForRemoval:)
-        name: @"GroupValueRemoved" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateGroupMenu:)
+        name: @"UpdateGroups" object: nil];
     
     NSString * name = [fTorrent name];
     [[self window] setTitle: name];
@@ -80,7 +80,6 @@
     }
     [fStatusField setStringValue: statusString];
     
-    #warning make dynamic
     [fGroupPopUp setMenu: [[GroupsWindowController groups] groupMenuWithTarget: nil action: NULL isSmall: NO]];
     
     [fStartCheck setState: [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState];
@@ -148,11 +147,11 @@
     [self release];
 }
 
-- (void) checkGroupValueForRemoval: (NSNotification *) notification
+- (void) updateGroupMenu: (NSNotification *) notification
 {
     int groupValue = [[fGroupPopUp selectedItem] tag];
-    if (groupValue != -1 && [[[notification userInfo] objectForKey: @"Indexes"] containsIndex: groupValue])
-        [fGroupPopUp selectItemWithTag: -1];
+    [fGroupPopUp setMenu: [[GroupsWindowController groups] groupMenuWithTarget: nil action: NULL isSmall: NO]];
+    [fGroupPopUp selectItemWithTag: groupValue];
 }
 
 @end

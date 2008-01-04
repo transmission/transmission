@@ -50,6 +50,6 @@
 - (void) add: (id) sender;
 - (void) cancelAdd: (id) sender;
 
-- (void) checkGroupValueForRemoval: (NSNotification *) notification;
+- (void) updateGroupMenu: (NSNotification *) notification;
 
 @end
