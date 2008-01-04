@@ -684,13 +684,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) openFiles: (NSArray *) filenames forcePath: (NSString *) path ignoreDownloadFolder: (BOOL) ignore
         deleteTorrentFile: (torrentFileState) deleteTorrent
 {
-    NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
-    if (ignore || (!path && [downloadChoice isEqualToString: @"Ask"]))
-    {
-        [self openFilesAsk: [filenames mutableCopy] deleteTorrentFile: deleteTorrent];
-        return;
-    }
-    
     #warning make submethod
     if (!path && [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]
         && access([[[fDefaults stringForKey: @"IncompleteDownloadFolder"] stringByExpandingTildeInPath] UTF8String], 0))
@@ -715,6 +708,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 didEndSelector: @selector(incompleteChoiceClosed:returnCode:contextInfo:) contextInfo: dict];
         return;
     }
+    
+    NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
+    if (ignore || (!path && [downloadChoice isEqualToString: @"Ask"]))
+    {
+        [self openFilesAsk: [filenames mutableCopy] deleteTorrentFile: deleteTorrent];
+        return;
+    }
+    
     if (!path && [downloadChoice isEqualToString: @"Constant"]
         && access([[[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath] UTF8String], 0))
     {
