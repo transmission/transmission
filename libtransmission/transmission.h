@@ -133,7 +133,7 @@ typedef struct tr_session_stats
 {
     uint64_t uploadedBytes;   /* total up */
     uint64_t downloadedBytes; /* total down */
-    double ratio;             /* total up / total down */
+    double ratio;             /* TR_RATIO_INF, TR_RATIO_NA, or total up/down */
     uint64_t filesAdded;      /* number of files added */
     uint64_t sessionCount;    /* program started N times */
     uint64_t secondsActive;   /* how long Transmisson's been running */
@@ -764,6 +764,7 @@ struct tr_stat
 
 #define TR_RATIO_NA  -1
 #define TR_RATIO_INF -2
+    /* TR_RATIO_INF, TR_RATIO_NA, or a regular ratio */
     float               ratio;
     
     uint64_t            startDate;

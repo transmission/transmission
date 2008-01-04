@@ -135,12 +135,7 @@ tr_statsClose( tr_handle * handle )
 static void
 updateRatio( tr_session_stats * setme )
 {
-    if( setme->downloadedBytes )
-        setme->ratio = setme->uploadedBytes / (double)setme->downloadedBytes;
-    else if( setme->uploadedBytes )
-        setme->ratio = TR_RATIO_INF;
-    else
-        setme->ratio = TR_RATIO_NA;
+    setme->ratio = tr_getRatio( setme->uploadedBytes, setme->downloadedBytes );
 }
 
 void

@@ -842,3 +842,22 @@ strlcat(char *dst, const char *src, size_t siz)
 }
 
 #endif /* HAVE_STRLCAT */
+
+/***
+****
+***/
+
+double
+tr_getRatio( double numerator, double denominator )
+{
+    double ratio;
+
+    if( denominator )
+        ratio = numerator / denominator;
+    else if( numerator )
+        ratio = TR_RATIO_INF;
+    else
+        ratio = TR_RATIO_NA;
+
+    return ratio;
+}

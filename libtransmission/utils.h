@@ -150,4 +150,6 @@ size_t tr_bitfieldCountTrueBits( const tr_bitfield* );
 
 tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
 
+double tr_getRatio( double numerator, double denominator );
+
 #endif
