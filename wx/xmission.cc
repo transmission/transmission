@@ -388,7 +388,8 @@ void MyFrame :: OnOpen( wxCommandEvent& WXUNUSED(event) )
 }
 
 
-bool MyApp::OnInit()
+bool
+MyApp :: OnInit( )
 {
     handle = tr_init( "wx" );
 
@@ -690,17 +691,16 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     OnPulse( dummy );
 }
 
-void MyFrame::OnExit(wxCommandEvent& WXUNUSED(event))
+void
+MyFrame :: OnExit( wxCommandEvent& WXUNUSED( event ) )
 {
     Enable( false );
 
-    foreach( torrents_v, myTorrents, it )
-        tr_torrentClose( *it );
+    myTorrents.clear( );
+    mySelectedTorrents.clear( );
+    ApplyCurrentFilter( );
 
-    myTorrents.clear ();
-    mySelectedTorrents.clear ();
-
-    ApplyCurrentFilter ();
+    tr_close( handle );
 
     /* give the connections a max of 10 seconds to shut themselves down */
     myExitTime = time(0) + 10;
