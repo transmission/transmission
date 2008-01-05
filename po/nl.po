@@ -1,32 +1,28 @@
-# Dutch translation of transmission-gtk
-# Copyright (C) 2007
-# This file is distributed under the same license as the transmission package.
-# translation by Jan Geboers, <hiding.out@gmail.com>, 2007
-#
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Transmission-1.00 (4494)\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-12-27 10:24-0600\n"
-"PO-Revision-Date: 2007-07-28 18:23+0100\n"
-"Last-Translator: Jan Geboers <hiding.out@gmail.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2008-01-05 16:35+0100\n"
+"PO-Revision-Date: 2008-01-05 19:04+0100\n"
+"Last-Translator: Arnout Lok <arnout.lok@gmail.com>\n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-Language: Dutch\n"
+"X-Poedit-Country: NETHERLANDS\n"
 
 #: ../gtk/transmission.desktop.in.h:1
-#, fuzzy
 msgid "BitTorrent Client"
-msgstr "Torrent aangemaakt"
+msgstr "BitTorrent client"
 
 #: ../gtk/transmission.desktop.in.h:2
 msgid "Transfer files via Peer to Peer"
-msgstr ""
+msgstr "Bestanden overdragen via 'peer to peer'"
 
-#: ../gtk/transmission.desktop.in.h:3 ../gtk/main.c:245
+#: ../gtk/transmission.desktop.in.h:3
+#: ../gtk/main.c:242
 msgid "Transmission"
 msgstr "Transmission"
 
@@ -43,80 +39,75 @@ msgid "_Low"
 msgstr "_Laag"
 
 #: ../gtk/actions.c:65
-#, fuzzy
 msgid "Sort by _Activity"
-msgstr "_Activiteit"
+msgstr "Sorteren op _activiteit"
 
 #: ../gtk/actions.c:66
 msgid "Sort by _Date Added"
-msgstr ""
+msgstr "Sorteer op _datum toegevoegd"
 
 #: ../gtk/actions.c:67
-#, fuzzy
 msgid "Sort by _Name"
-msgstr "Torrent bestandsnaam"
+msgstr "Sorteren op _naam"
 
 #: ../gtk/actions.c:68
-#, fuzzy
 msgid "Sort by _Progress"
-msgstr "Vooruitgang"
+msgstr "Sorteren op _voortgang"
 
 #: ../gtk/actions.c:69
 msgid "Sort by _State"
-msgstr ""
+msgstr "Sorteren op _status"
 
 #: ../gtk/actions.c:70
-#, fuzzy
 msgid "Sort by _Tracker"
-msgstr "Tracker"
+msgstr "Sorten op _tracker"
 
 #: ../gtk/actions.c:87
-#, fuzzy
 msgid "Show _Main Window"
-msgstr "_Debug venster tonen"
+msgstr "Hoofdscher_m"
 
 #: ../gtk/actions.c:89
 msgid "Show Message _Log"
-msgstr ""
+msgstr "Berichten_logboek"
 
 #: ../gtk/actions.c:103
 msgid "_Minimal View"
-msgstr ""
+msgstr "_Minimaal overzicht"
 
 #: ../gtk/actions.c:105
 msgid "_Reverse Sort Order"
-msgstr ""
+msgstr "Omgekeerde sortee_rvolgorde"
 
+# Volgens nl.gnome.org moet er zo min mogelijk in gebiedende wijs/enkelvoud worden gesproken. Daarom "Filterbar tonen" ipv "Toon Filterbar".
+# Evt. zou het 'tonen' helemaal kunnen wegvallen. Hierbij.
 #: ../gtk/actions.c:107
 msgid "Show _Filter Bar"
-msgstr ""
+msgstr "_Filterbalk"
 
 #: ../gtk/actions.c:109
 msgid "Show _Status Bar"
-msgstr ""
+msgstr "Stat_usbalk"
 
+# Het was "Toolbar tonen", maar in programma's als gnome's Nautlius word ook gewoon Beeld>Statusbalk etc. gebruikt.
 #: ../gtk/actions.c:111
 msgid "Show _Toolbar"
-msgstr ""
+msgstr "Werk_balk"
 
 #: ../gtk/actions.c:116
-#, fuzzy
 msgid "_Torrent"
-msgstr "Torrent"
+msgstr "_Torrent"
 
 #: ../gtk/actions.c:117
-#, fuzzy
 msgid "_View"
-msgstr "_Bestand"
+msgstr "_Beeld"
 
 #: ../gtk/actions.c:118
-#, fuzzy
 msgid "_Sort Torrents By"
-msgstr "_Nieuwe torrent"
+msgstr "_Torrents sorteren op"
 
 #: ../gtk/actions.c:119
 msgid "_Edit"
-msgstr "_Editeren"
+msgstr "Be_werken"
 
 #: ../gtk/actions.c:120
 msgid "_Help"
@@ -126,39 +117,38 @@ msgstr "_Help"
 msgid "_Priority"
 msgstr "_Prioriteit"
 
-#: ../gtk/actions.c:123 ../gtk/dialogs.c:87
-#, fuzzy
+#: ../gtk/actions.c:123
+#: ../gtk/dialogs.c:87
 msgid "Open Torrent"
-msgstr "Torrent"
+msgstr "Open torrent"
 
 #: ../gtk/actions.c:125
 msgid "_Start"
-msgstr "_Start"
+msgstr "_Starten"
 
 #: ../gtk/actions.c:126
 msgid "_Statistics"
-msgstr ""
+msgstr "_Statistieken"
 
 #: ../gtk/actions.c:128
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "Lokale data _verifiëren"
 
 #: ../gtk/actions.c:130
 msgid "_Pause"
-msgstr ""
+msgstr "_Pauzeren"
 
 #: ../gtk/actions.c:132
 msgid "_Remove"
-msgstr "_Verwijderen"
+msgstr "Ve_rwijderen"
 
 #: ../gtk/actions.c:134
-#, fuzzy
 msgid "Create _New Torrent"
 msgstr "_Nieuwe torrent"
 
 #: ../gtk/actions.c:136
 msgid "_Close"
-msgstr "_Sluiten"
+msgstr "Sl_uiten"
 
 #: ../gtk/actions.c:138
 msgid "_Quit"
@@ -166,28 +156,27 @@ msgstr "_Afsluiten"
 
 #: ../gtk/actions.c:140
 msgid "Select _All"
-msgstr ""
+msgstr "_Alles selecteren"
 
 #: ../gtk/actions.c:142
 msgid "Dese_lect All"
-msgstr ""
+msgstr "Se_lectie opheffen"
 
 #: ../gtk/actions.c:146
 msgid "_Details"
-msgstr ""
+msgstr "_Details"
 
 #: ../gtk/actions.c:146
-#, fuzzy
 msgid "Torrent Details"
-msgstr "Torrent bestanden"
+msgstr "Torrent details"
 
 #: ../gtk/actions.c:148
 msgid "_About Transmission"
-msgstr "_Over Transmission"
+msgstr "Over _Transmission"
 
 #: ../gtk/actions.c:150
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "Tracker om _meer peers vragen"
 
 #: ../gtk/conf.c:62
 #, c-format
@@ -223,7 +212,7 @@ msgstr ""
 
 #: ../gtk/dialogs.c:94
 msgid "Automatically _start torrent"
-msgstr "Automatisch de torrent _starten"
+msgstr "Torrent automatisch _starten"
 
 #: ../gtk/dialogs.c:96
 msgid "Use alternate _download directory"
@@ -248,80 +237,79 @@ msgstr "Kies een directory"
 #: ../gtk/dialogs.c:384
 #, c-format
 msgid "<b>Really Quit %s?</b>"
-msgstr "<b>Zeker afsluiten %s?</b>"
+msgstr "<b>Weet u zeker dat u %s wilt afsluiten?</b>"
 
 #: ../gtk/dialogs.c:388
 msgid "This will close all active torrents."
-msgstr "Dit sluit alle actieve torrents"
+msgstr "Dit sluit alle actieve torrents."
 
 #: ../gtk/dialogs.c:396
 msgid "_Don't Ask Me This Again"
-msgstr "_Vraag me dit niet opnieuw"
+msgstr "_Vraag dit niet opnieuw"
 
-#: ../gtk/ipc.c:197 ../gtk/ipc.c:229
-#, fuzzy, c-format
+#: ../gtk/ipc.c:197
+#: ../gtk/ipc.c:229
+#, c-format
 msgid "Failed to set up IPC: %s"
-msgstr ""
-"Fout bij het opzetten van IPC:\n"
-"%s"
+msgstr "Fout bij het opzetten van IPC: %s"
 
 #: ../gtk/ipc.c:309
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to set up socket: %s"
-msgstr ""
-"Aanmaken van socket mislukt:\n"
-"%s"
+msgstr "Aanmaken van socket mislukt: %s"
 
 #: ../gtk/ipc.c:332
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to create socket: %s"
-msgstr "aanmaken van socket mislukt: %s\n"
+msgstr "aanmaken van socket mislukt: %s"
 
 #: ../gtk/ipc.c:341
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to connect to %s: %s"
-msgstr "verbinding maken met %s mislukt: %s\n"
+msgstr "verbinding maken met %s mislukt: %s"
 
-#: ../gtk/ipc.c:431 ../gtk/ipc.c:467
-#, fuzzy
+#: ../gtk/ipc.c:431
+#: ../gtk/ipc.c:467
 msgid "Bad IPC protocol version"
-msgstr "verkeerde IPC protocol versie"
+msgstr "Verkeerde IPC protocol versie"
 
-#: ../gtk/ipc.c:434 ../gtk/ipc.c:470
+# 'Parse' is een engelse term, maar vertalen naar bijvoorbeeld 'Ontleden' klinkt niet echt goed.
+#: ../gtk/ipc.c:434
+#: ../gtk/ipc.c:470
 msgid "IPC protocol parse error"
 msgstr "IPC protocol parse fout"
 
-#: ../gtk/ipc.c:437 ../gtk/ipc.c:473
+#: ../gtk/ipc.c:437
+#: ../gtk/ipc.c:473
 #, c-format
 msgid "IPC parsing failed: %s"
 msgstr "IPC parsen mislukt: %s"
 
-#: ../gtk/main.c:235
+#: ../gtk/main.c:232
 msgid "Start with all torrents paused"
-msgstr ""
+msgstr "Starten met alle torrents gepauzeerd"
 
-#: ../gtk/main.c:237
+#: ../gtk/main.c:234
 msgid "Request that the running instance quit"
-msgstr ""
+msgstr "Verzoek een al open instantie te stoppen"
 
-#: ../gtk/main.c:249
-#, fuzzy
+#: ../gtk/main.c:247
 msgid "[torrent files]"
-msgstr "Torrent bestanden"
+msgstr "[torrent bestanden]"
 
-#: ../gtk/main.c:481
+#: ../gtk/main.c:483
 msgid "Closing Connections"
-msgstr ""
+msgstr "Verbindingen worden afgesloten"
 
-#: ../gtk/main.c:481
+#: ../gtk/main.c:483
 msgid "Sending upload/download totals to tracker..."
-msgstr ""
+msgstr "Bezig met het versturen van de upload/download-totalen naar de tracker..."
 
-#: ../gtk/main.c:487
+#: ../gtk/main.c:489
 msgid "_Quit Immediately"
-msgstr ""
+msgstr "_Direct afsluiten"
 
-#: ../gtk/main.c:621
+#: ../gtk/main.c:623
 #, c-format
 msgid ""
 "Failed to load torrent file:\n"
@@ -330,32 +318,34 @@ msgid_plural ""
 "Failed to load torrent files:\n"
 "%s"
 msgstr[0] ""
-"Inladen van torrent bestand mislukt:\n"
+"Laden van het torrent bestand mislukt:\n"
 "%s"
 msgstr[1] ""
-"Inladen van torrent bestanden mislukt:\n"
+"Laden van de torrent bestanden mislukt:\n"
 "%s"
 
-#: ../gtk/main.c:788
+#: ../gtk/main.c:795
 msgid "A fast and easy BitTorrent client"
-msgstr ""
+msgstr "Een simpele en snelle BitTorrent client"
 
-#: ../gtk/main.c:790
+#: ../gtk/main.c:797
 msgid "Copyright 2005-2008 The Transmission Project"
 msgstr "Copyright 2005-2008 Het Transmission Project"
 
 #. note to translators: put yourself here for credit in the "About" dialog
-#: ../gtk/main.c:793
+#: ../gtk/main.c:800
 msgid "translator-credits"
-msgstr "vertaler-credits"
+msgstr ""
+"Jan Geboers\n"
+"Arnout Lok"
 
 #: ../gtk/makemeta-ui.c:89
 msgid "Torrent creation aborted."
-msgstr "aanmaak van Torrent afgebroken"
+msgstr "Aanmaak van torrent afgebroken."
 
 #: ../gtk/makemeta-ui.c:90
 msgid "Torrent creation failed."
-msgstr "aanmaak van Torrent afgebroken"
+msgstr "Aanmaak van torrent mislukt."
 
 #: ../gtk/makemeta-ui.c:101
 msgid "Torrent Created"
@@ -363,28 +353,27 @@ msgstr "Torrent aangemaakt"
 
 #: ../gtk/makemeta-ui.c:135
 msgid "Making Torrent..."
-msgstr "Aanmaken van de Torrent..."
+msgstr "Aanmaken van torrent..."
 
-#: ../gtk/makemeta-ui.c:200 ../gtk/torrent-inspector.c:1420
-#, fuzzy
+#: ../gtk/makemeta-ui.c:200
+#: ../gtk/torrent-inspector.c:1420
 msgid "File"
 msgid_plural "Files"
 msgstr[0] "Bestand"
-msgstr[1] "Bestand"
+msgstr[1] "Bestanden"
 
 #: ../gtk/makemeta-ui.c:206
-#, fuzzy
 msgid "Piece"
 msgid_plural "Pieces"
-msgstr[0] "Stukken"
-msgstr[1] "Stukken"
+msgstr[0] "Deel"
+msgstr[1] "Delen"
 
 #: ../gtk/makemeta-ui.c:229
-#, fuzzy
 msgid "Create New Torrent"
-msgstr "_Nieuwe torrent"
+msgstr "Nieuwe torrent"
 
-#: ../gtk/makemeta-ui.c:241 ../gtk/tr_window.c:443
+#: ../gtk/makemeta-ui.c:241
+#: ../gtk/tr_window.c:444
 msgid "Files"
 msgstr "Bestanden"
 
@@ -400,18 +389,21 @@ msgstr "Directory"
 msgid "Single File"
 msgstr "Enkel bestand"
 
+# Dit wordt gebruikt bij het "nieuwe torrent" scherm. Hierbij kan gekozen worden tussen een 'enkel bestand' of een 'directory'.
 #: ../gtk/makemeta-ui.c:252
 msgid "_File"
-msgstr "_Bestand"
+msgstr "_Bestand/Directory"
 
 #: ../gtk/makemeta-ui.c:265
 msgid "No Files Selected"
 msgstr "Geen bestanden geselecteerd"
 
-#: ../gtk/makemeta-ui.c:279 ../gtk/tr_window.c:148
+#: ../gtk/makemeta-ui.c:279
+#: ../gtk/tr_window.c:148
 msgid "Torrent"
 msgstr "Torrent"
 
+# DIt zou nog enigzins verbeterd kunnen worden.
 #: ../gtk/makemeta-ui.c:282
 #, c-format
 msgid "Private to this Tracker"
@@ -419,25 +411,25 @@ msgstr "Privé voor deze Tracker"
 
 #: ../gtk/makemeta-ui.c:285
 msgid "Announce _URL"
-msgstr "Aankondiging _URL"
+msgstr "Aankondigings-_URL"
 
 #: ../gtk/makemeta-ui.c:290
 msgid "Commen_t"
 msgstr "Commen_taar"
 
-#: ../gtk/msgwin.c:160 ../gtk/msgwin.c:174
+#: ../gtk/msgwin.c:160
+#: ../gtk/msgwin.c:174
 #, c-format
 msgid "Error writing to \"%s\": %s"
 msgstr "Fout bij het schrijven naar \"%s\": %s"
 
 #: ../gtk/msgwin.c:191
-#, fuzzy
 msgid "Save Log"
-msgstr "Debug Log opslaan"
+msgstr "Log opslaan"
 
 #: ../gtk/msgwin.c:216
 msgid "Error"
-msgstr "Fout"
+msgstr "Foutmelding"
 
 #: ../gtk/msgwin.c:217
 msgid "Info"
@@ -449,17 +441,20 @@ msgstr "Debug"
 
 #: ../gtk/msgwin.c:234
 msgid "Message Log"
-msgstr ""
+msgstr "Berichtenlogboek"
 
 #: ../gtk/msgwin.c:258
 msgid "Level "
 msgstr "Niveau "
 
-#: ../gtk/msgwin.c:259 ../gtk/msgwin.c:290
+#: ../gtk/msgwin.c:259
+#: ../gtk/msgwin.c:290
 msgid "Select the debug filter level."
 msgstr "Selecteer het debug filter niveau"
 
-#: ../gtk/stats.c:44 ../gtk/torrent-inspector.c:896 ../gtk/util.c:57
+#: ../gtk/stats.c:44
+#: ../gtk/torrent-inspector.c:896
+#: ../gtk/util.c:57
 #: ../gtk/util.c:80
 msgid "None"
 msgstr "Geen"
@@ -467,120 +462,116 @@ msgstr "Geen"
 #: ../gtk/stats.c:64
 #, c-format
 msgid "Started %d times"
-msgstr ""
+msgstr "%d keer gestart"
 
 #: ../gtk/stats.c:90
 msgid "Statistics"
-msgstr ""
+msgstr "Statistieken"
 
 #: ../gtk/stats.c:99
 msgid "Current Session"
-msgstr ""
+msgstr "Huidige sessie"
 
-#: ../gtk/stats.c:102 ../gtk/stats.c:115 ../gtk/torrent-inspector.c:939
-#, fuzzy
+# Officieel is het 'geüpload', maar dat staat zo raar vindt ik. De meeste mensen lezen 'geupload' zonder probleem.
+#: ../gtk/stats.c:102
+#: ../gtk/stats.c:115
+#: ../gtk/torrent-inspector.c:939
 msgid "Uploaded:"
-msgstr "Geupload"
+msgstr "Geupload:"
 
-#: ../gtk/stats.c:104 ../gtk/stats.c:117 ../gtk/torrent-inspector.c:936
-#, fuzzy
+#: ../gtk/stats.c:104
+#: ../gtk/stats.c:117
+#: ../gtk/torrent-inspector.c:936
 msgid "Downloaded:"
-msgstr "Gedownload"
+msgstr "Gedownload:"
 
-#: ../gtk/stats.c:106 ../gtk/stats.c:119 ../gtk/torrent-inspector.c:945
-#, fuzzy
+#: ../gtk/stats.c:106
+#: ../gtk/stats.c:119
+#: ../gtk/torrent-inspector.c:945
 msgid "Ratio:"
-msgstr "Ratio"
+msgstr "Ratio:"
 
-#: ../gtk/stats.c:108 ../gtk/stats.c:121
+#: ../gtk/stats.c:108
+#: ../gtk/stats.c:121
 msgid "Duration:"
-msgstr ""
+msgstr "Duur:"
 
 #: ../gtk/stats.c:110
 msgid "Cumulative"
-msgstr ""
+msgstr "Cumulatief"
 
 #: ../gtk/stats.c:112
 #, c-format
 msgid "Program started %d times"
-msgstr ""
+msgstr "Programma %d keer gestart"
 
 #: ../gtk/torrent-cell-renderer.c:78
 #, c-format
 msgid "%s of %s (%.2f%%)"
-msgstr ""
+msgstr "%s van de %s (%.2f%%)"
 
 #: ../gtk/torrent-cell-renderer.c:84
 #, c-format
 msgid "%s of %s (%.2f%%), uploaded %s (Ratio: %.1f"
-msgstr ""
+msgstr "%s van de %s (%.2f%%), geupload %s (Ratio: %.1f"
 
 #: ../gtk/torrent-cell-renderer.c:92
 #, c-format
 msgid "%s, uploaded %s (Ratio: %.1f)"
-msgstr ""
+msgstr "%s, geupload %s (Ratio: %.1f)"
 
 #: ../gtk/torrent-cell-renderer.c:113
-#, fuzzy, c-format
+#, c-format
 msgid "Down: %s, Up: %s"
-msgstr ""
-"DL: %s\n"
-"UL: %s"
+msgstr "Download: %s, Upload: %s"
 
 #: ../gtk/torrent-cell-renderer.c:115
 #, c-format
 msgid "Down: %s"
-msgstr ""
+msgstr "Download: %s"
 
 #: ../gtk/torrent-cell-renderer.c:117
 #, c-format
 msgid "Up: %s"
-msgstr ""
+msgstr "Upload: %s"
 
 #: ../gtk/torrent-cell-renderer.c:119
 msgid "Idle"
-msgstr ""
+msgstr "Rust"
 
 #: ../gtk/torrent-cell-renderer.c:132
 msgid "Paused"
-msgstr ""
+msgstr "Gepauzeerd"
 
 #: ../gtk/torrent-cell-renderer.c:136
 msgid "Waiting to Verify local data"
-msgstr ""
+msgstr "Wachten om lokale data te verifiëren"
 
 #. [0...100]
-#: ../gtk/torrent-cell-renderer.c:140 ../gtk/tr_torrent.c:305
+#: ../gtk/torrent-cell-renderer.c:140
+#: ../gtk/tr_torrent.c:305
 #, c-format
 msgid "Verifying local data (%.1f%% tested)"
-msgstr ""
+msgstr "Verifiëren van lokale data (%.1f%% getest) "
 
 #: ../gtk/torrent-cell-renderer.c:148
-#, fuzzy, c-format
+#, c-format
 msgid "Ratio: %.1f, "
-msgstr ""
-"Ratio: %s\n"
-"UL: %s"
+msgstr "Ratio: %.1f, "
 
-#: ../gtk/torrent-cell-renderer.c:188
-#, fuzzy, c-format
+#: ../gtk/torrent-cell-renderer.c:187
+#, c-format
 msgid "Downloading from %d of %d connected peer"
-msgstr "Downloaden van %i van %i peer"
+msgid_plural "Downloading from %d of %d connected peers"
+msgstr[0] "Downloaden van %i van de %i verbonden peer"
+msgstr[1] "Downloaden van %i van de %i verbonden peers"
 
-#: ../gtk/torrent-cell-renderer.c:189
-#, fuzzy, c-format
-msgid "Downloading from %d of %d connected peers"
-msgstr "Downloaden van %i van %i peer"
-
-#: ../gtk/torrent-cell-renderer.c:198
-#, fuzzy, c-format
+#: ../gtk/torrent-cell-renderer.c:197
+#, c-format
 msgid "Seeding to %d of %d connected peer"
-msgstr "Seeden naar %d van %d peer"
-
-#: ../gtk/torrent-cell-renderer.c:199
-#, fuzzy, c-format
-msgid "Seeding to %d of %d connected peers"
-msgstr "Seeden naar %d van %d peer"
+msgid_plural "Seeding to %d of %d connected peers"
+msgstr[0] "Seeden naar %d van de %d verbonden peer"
+msgstr[1] "Seeden naar %d van de %d verbonden peers"
 
 #: ../gtk/torrent-inspector.c:248
 msgid "Address"
@@ -592,12 +583,13 @@ msgstr "Poort"
 
 #: ../gtk/torrent-inspector.c:250
 msgid "Client"
-msgstr "Cliënt"
+msgstr "Client"
 
-#: ../gtk/torrent-inspector.c:251 ../gtk/torrent-inspector.c:583
+#: ../gtk/torrent-inspector.c:251
+#: ../gtk/torrent-inspector.c:583
 #: ../gtk/torrent-inspector.c:1434
 msgid "Progress"
-msgstr "Vooruitgang"
+msgstr "Voortgang"
 
 #: ../gtk/torrent-inspector.c:253
 msgid "Downloading"
@@ -616,52 +608,48 @@ msgid "UL Rate"
 msgstr "UL snelheid"
 
 #: ../gtk/torrent-inspector.c:257
-#, fuzzy
 msgid "Status"
 msgstr "Status"
 
 #: ../gtk/torrent-inspector.c:362
 msgid "Handshaking"
-msgstr ""
+msgstr "Verbinding opzetten met peer"
 
 #: ../gtk/torrent-inspector.c:367
-#, fuzzy
 msgid "Uploading to peer"
-msgstr "Uploaden naar %d van %d peer"
+msgstr "Uploaden naar peer"
 
 #: ../gtk/torrent-inspector.c:369
 msgid "Peer wants our data"
-msgstr ""
+msgstr "Peer wil onze data"
 
 #: ../gtk/torrent-inspector.c:371
-#, fuzzy
 msgid "Refusing to send data to peer"
-msgstr "Seeden naar %d van %d peer"
+msgstr "Weigeren om data naar peer te sturen"
 
 #: ../gtk/torrent-inspector.c:376
-#, fuzzy
 msgid "Downloading from peer"
-msgstr "Downloaden van %i van %i peer"
+msgstr "Downloaden van peer"
 
 #: ../gtk/torrent-inspector.c:378
 msgid "Requesting data from peer"
-msgstr ""
+msgstr "Peer verzoeken om data"
 
 #: ../gtk/torrent-inspector.c:380
 msgid "Waiting to request data from peer"
-msgstr ""
+msgstr "Wachten met het verzoeken van data van peer"
 
 #: ../gtk/torrent-inspector.c:382
 msgid "Peer will not send us data"
-msgstr ""
+msgstr "Peer weigert ons data te sturen"
 
 #: ../gtk/torrent-inspector.c:659
 msgid "Piece Availability"
-msgstr "Stuk beschikbaarheid"
+msgstr "Beschikbaarheid van de delen"
 
 #: ../gtk/torrent-inspector.c:682
 msgid "Connected Peers"
-msgstr ""
+msgstr "Verbonden peers"
 
 #: ../gtk/torrent-inspector.c:699
 msgid "Seeders"
@@ -679,29 +667,32 @@ msgstr "Klaar"
 msgid "Torrent Information"
 msgstr "Torrent Informatie"
 
-#: ../gtk/torrent-inspector.c:753 ../gtk/tr_window.c:443
+#: ../gtk/torrent-inspector.c:753
+#: ../gtk/tr_window.c:444
 msgid "Tracker"
 msgstr "Tracker"
 
 #: ../gtk/torrent-inspector.c:764
 msgid "Pieces"
-msgstr "Stukken"
+msgstr "Delen"
 
 #: ../gtk/torrent-inspector.c:770
 msgid "Hash"
 msgstr "Controlesom"
 
+# Een letterlijke vertaling is 'Veilig', maar dat lijkt mij in deze context niet toepasselijk. Het gaat namelijk volgens mij om Private en Publieke torrents.
 #: ../gtk/torrent-inspector.c:775
 msgid "Secure"
-msgstr "Veilig"
+msgstr "Beveiliging"
 
+# Eventueel 'privé' mogelijk. Maar 'private' is mijns inziens ook gewoon Nederlands.
 #: ../gtk/torrent-inspector.c:777
 msgid "Private Torrent, PEX disabled"
-msgstr "Private Torrent, PEX uitgeschakeld"
+msgstr "Private torrent, PEX uitgeschakeld"
 
 #: ../gtk/torrent-inspector.c:778
 msgid "Public Torrent"
-msgstr "Publieke Torrent"
+msgstr "Publieke torrent"
 
 #: ../gtk/torrent-inspector.c:782
 msgid "Comment"
@@ -733,7 +724,7 @@ msgstr "Gedownloade data"
 
 #: ../gtk/torrent-inspector.c:817
 msgid "Torrent File Path"
-msgstr "Pad naar Torrent bestand"
+msgstr "Torrent bestand"
 
 #: ../gtk/torrent-inspector.c:824
 msgid "Torrent File Name"
@@ -742,75 +733,70 @@ msgstr "Torrent bestandsnaam"
 #: ../gtk/torrent-inspector.c:871
 #, c-format
 msgid "%.1f%% (%.1f%% selected)"
-msgstr ""
+msgstr "%.1f%% (%.1f%% geselecteerd)"
 
 #: ../gtk/torrent-inspector.c:877
 #, c-format
 msgid "%s (%s verified)"
-msgstr ""
+msgstr "%s (%s geverifieerd)"
 
 #: ../gtk/torrent-inspector.c:923
 msgid "Transfer"
 msgstr "Transfer"
 
 #: ../gtk/torrent-inspector.c:927
-#, fuzzy
 msgid "State:"
-msgstr "Status"
+msgstr "Status:"
 
 #: ../gtk/torrent-inspector.c:930
-#, fuzzy
 msgid "Progress:"
-msgstr "Vooruitgang"
+msgstr "Voortgang:"
 
 #: ../gtk/torrent-inspector.c:933
-#, fuzzy
 msgid "Have:"
-msgstr "Opslaan"
+msgstr "In bezit:"
 
 #: ../gtk/torrent-inspector.c:942
-#, fuzzy
 msgid "Failed DL:"
-msgstr "Geldige DL"
+msgstr "Mislukte DL:"
 
 #: ../gtk/torrent-inspector.c:948
-#, fuzzy
 msgid "Swarm Rate:"
-msgstr "Swarm Rate"
+msgstr "Zwerm tempo:"
 
 #: ../gtk/torrent-inspector.c:951
-#, fuzzy
 msgid "Error:"
-msgstr "Fout: "
+msgstr "Fout:"
 
 #: ../gtk/torrent-inspector.c:957
-#, fuzzy
 msgid "Completeness:"
-msgstr "Compleetheid"
+msgstr "Volledigheid:"
 
 #: ../gtk/torrent-inspector.c:960
 msgid "Dates"
-msgstr "Datums"
+msgstr "Data"
 
 #: ../gtk/torrent-inspector.c:964
-#, fuzzy
 msgid "Added:"
-msgstr "Toegevoegd"
+msgstr "Toegevoegd op:"
 
 #: ../gtk/torrent-inspector.c:967
 msgid "Last Activity"
-msgstr "Laatste activiteit"
+msgstr "Laatste activiteit:"
 
-#: ../gtk/torrent-inspector.c:1008 ../gtk/torrent-inspector.c:1018
+#: ../gtk/torrent-inspector.c:1008
+#: ../gtk/torrent-inspector.c:1018
 #: ../gtk/torrent-inspector.c:1189
 msgid "High"
 msgstr "Hoog"
 
-#: ../gtk/torrent-inspector.c:1009 ../gtk/torrent-inspector.c:1191
+#: ../gtk/torrent-inspector.c:1009
+#: ../gtk/torrent-inspector.c:1191
 msgid "Normal"
 msgstr "Normaal"
 
-#: ../gtk/torrent-inspector.c:1010 ../gtk/torrent-inspector.c:1019
+#: ../gtk/torrent-inspector.c:1010
+#: ../gtk/torrent-inspector.c:1019
 #: ../gtk/torrent-inspector.c:1193
 msgid "Low"
 msgstr "Laag"
@@ -823,35 +809,36 @@ msgstr "Download"
 msgid "Priority"
 msgstr "Prioriteit"
 
-#: ../gtk/torrent-inspector.c:1591 ../gtk/tr_prefs.c:270
+#: ../gtk/torrent-inspector.c:1591
+#: ../gtk/tr_prefs.c:270
 msgid "Speed Limits"
-msgstr ""
+msgstr "Snelheidslimieten"
 
 #: ../gtk/torrent-inspector.c:1594
 msgid "Limit _Download Speed (KiB/s):"
-msgstr "Limiteer _Download Snelheid (KiB/s):"
+msgstr "_Download snelheid limiteren (KiB/s):"
 
 #: ../gtk/torrent-inspector.c:1607
 msgid "Limit _Upload Speed (KiB/s):"
-msgstr "Limiteer _Upload Snelheid (KiB/s):"
+msgstr "_Upload snelheid limiteren (KiB/s):"
 
-#: ../gtk/torrent-inspector.c:1621 ../gtk/tr_prefs.c:307
+#: ../gtk/torrent-inspector.c:1621
+#: ../gtk/tr_prefs.c:307
 msgid "Peer Connections"
-msgstr ""
+msgstr "Peer verbindingen"
 
 #: ../gtk/torrent-inspector.c:1627
-#, fuzzy
 msgid "Maximum connected peers:"
-msgstr "Maximum _download snelheid:"
+msgstr "Maximum aantal verbonden peers:"
 
 #: ../gtk/torrent-inspector.c:1631
 msgid "_Stop Seeding at Ratio:"
-msgstr "_Stop met Seeding bij Ratio:"
+msgstr "_Stop met seeding bij ratio:"
 
 #: ../gtk/torrent-inspector.c:1697
 #, c-format
 msgid "Details for %s (%s)"
-msgstr ""
+msgstr "Details van %s (%s)"
 
 #: ../gtk/torrent-inspector.c:1711
 msgid "_Activity"
@@ -887,93 +874,86 @@ msgstr "Bewaar een kopie en verwijder het origineel"
 
 #: ../gtk/tr_prefs.c:234
 msgid "Port is <b>open</b>"
-msgstr ""
+msgstr "Poort is <b>open</b>"
 
+# Hier misschien 'gesloten' gebruiken ipv 'dicht'?
 #: ../gtk/tr_prefs.c:234
 msgid "Port is <b>closed</b>"
-msgstr ""
+msgstr "Poort is <b>dicht</b>"
 
 #: ../gtk/tr_prefs.c:242
 msgid "<i>Testing port...</i>"
-msgstr ""
+msgstr "<i>Poort aan het testen...</i>"
 
 #: ../gtk/tr_prefs.c:260
-#, fuzzy
 msgid "Preferences"
-msgstr "%s Voorkeuren"
+msgstr "Voorkeuren"
 
 #: ../gtk/tr_prefs.c:273
-#, fuzzy
 msgid "_Limit Upload Speed (KiB/s)"
-msgstr "Limiteer _Upload Snelheid (KiB/s):"
+msgstr "Up_load snelheid limiteren (KiB/s):"
 
 #: ../gtk/tr_prefs.c:280
-#, fuzzy
 msgid "Li_mit Download Speed (KiB/s)"
-msgstr "Limiteer _Download Snelheid (KiB/s):"
+msgstr "Download snelheid li_miteren (KiB/s):"
 
 #: ../gtk/tr_prefs.c:288
-#, fuzzy
 msgid "Downloads"
-msgstr "Download"
+msgstr "Downloads"
 
 #: ../gtk/tr_prefs.c:291
-#, fuzzy
 msgid "P_rompt for download directory"
-msgstr "Al_tijd vragen naar de download directory"
+msgstr "Altijd v_ragen naar de download directory"
 
 #: ../gtk/tr_prefs.c:299
 msgid "For torrents added _normally:"
-msgstr "Voor Torrents die _normaal toegevoegd zijn:"
+msgstr "Voor torrents die _normaal toegevoegd zijn:"
 
 #: ../gtk/tr_prefs.c:303
-#, fuzzy
 msgid "For torrents added from _command-line:"
-msgstr "Enkel voor torrents die via de commando prompt toegevoegd zijn"
+msgstr "Voor torrents die via de _commando prompt toegevoegd zijn:"
 
+# De zin loopt een beetje raar. Misschien door het 'Globaal' op het begin?
 #: ../gtk/tr_prefs.c:311
 msgid "Global maximum connected peers:"
-msgstr ""
+msgstr "Globaal maximum aantal verbonden peers:"
 
 #: ../gtk/tr_prefs.c:313
 msgid "Maximum connected peers for new torrents:"
-msgstr ""
+msgstr "Maximaal aantal verbonden peers voor nieuwe torrents:"
 
 #: ../gtk/tr_prefs.c:316
 msgid "Network"
-msgstr ""
+msgstr "Netwerk"
 
+# Het origineel is enkelvoud. Moet eigenlijk beter.
 #: ../gtk/tr_prefs.c:319
-#, fuzzy
 msgid "_Automatically map port"
-msgstr "Automatisch de torrent _starten"
+msgstr "_Automatisch 'port-mapping' toepassen"
 
 #: ../gtk/tr_prefs.c:322
 msgid "NAT traversal uses either NAT-PMP or UPnP"
-msgstr ""
+msgstr "NAT traversal gebruikt NAT-PMP of UPnP"
 
 #: ../gtk/tr_prefs.c:330
 msgid "Incoming TCP _Port"
-msgstr ""
+msgstr "Inkomende TCP-_poort:"
 
 #: ../gtk/tr_prefs.c:340
-#, fuzzy
 msgid "Options"
-msgstr "_Opties"
+msgstr "Opties"
 
 #: ../gtk/tr_prefs.c:343
-#, fuzzy
 msgid "Use Peer _Exchange if Possible"
-msgstr "Peer _uitwisseling gebruiken indien mogelijk"
+msgstr "P_eer-uitwisseling gebruiken indien mogelijk"
 
 #: ../gtk/tr_prefs.c:347
 msgid "_Ignore Unencrypted Peers"
-msgstr ""
+msgstr "_Onversleutelde peers negeren"
 
 #: ../gtk/tr_prefs.c:351
-#, fuzzy
 msgid "Show an Icon in the System _Tray"
-msgstr "Toon een _icoon in de systeem tray"
+msgstr "P_ictogram in het systeemvak tonen"
 
 #: ../gtk/tr_prefs.c:355
 msgid "Confirm _quit"
@@ -1001,7 +981,7 @@ msgstr "torrent is al open"
 #: ../gtk/tr_torrent.c:300
 #, c-format
 msgid "Waiting to verify local data (%.1f%% tested)"
-msgstr ""
+msgstr "Wachten om lokale data te verifiëren  (%.1f%% getest)"
 
 #: ../gtk/tr_torrent.c:310
 #, c-format
@@ -1017,15 +997,15 @@ msgstr "%s resterend (%.1f%%)"
 #, c-format
 msgid "Uploading to %d of %d peer"
 msgid_plural "Uploading to %d of %d peers"
-msgstr[0] "Uploaden naar %d van %d peer"
-msgstr[1] "Uploaden naar %d van %d peers"
+msgstr[0] "Uploaden naar %d van de %d peer"
+msgstr[1] "Uploaden naar %d van de %d peers"
 
 #: ../gtk/tr_torrent.c:327
 #, c-format
 msgid "Seeding to %d of %d peer"
 msgid_plural "Seeding to %d of %d peers"
-msgstr[0] "Seeden naar %d van %d peer"
-msgstr[1] "Seeden naar %d van %d peers"
+msgstr[0] "Seeden naar %d van de %d peer"
+msgstr[1] "Seeden naar %d van de %d peers"
 
 #: ../gtk/tr_torrent.c:333
 #, c-format
@@ -1035,85 +1015,73 @@ msgstr "Gestopt (%.1f%%)"
 #: ../gtk/tr_torrent.c:337
 #, c-format
 msgid "Unrecognized state: %d"
-msgstr ""
-
-#: ../gtk/tr_window.c:241
-#, fuzzy
-msgid "Total Ratio"
-msgstr "Ratio"
+msgstr "Niet herkende staat: %d"
 
 #: ../gtk/tr_window.c:242
-msgid "Session Ratio"
-msgstr ""
+msgid "Total Ratio"
+msgstr "Ratio (totaal)"
 
 #: ../gtk/tr_window.c:243
-#, fuzzy
-msgid "Total Transfer"
-msgstr "Transfer"
+msgid "Session Ratio"
+msgstr "Ratio (deze sessie)"
 
 #: ../gtk/tr_window.c:244
-#, fuzzy
+msgid "Total Transfer"
+msgstr "Overdracht (totaal)"
+
+#: ../gtk/tr_window.c:245
 msgid "Session Transfer"
-msgstr "Transfer"
+msgstr "Overdracht (deze sessie)"
 
-#: ../gtk/tr_window.c:439
+#: ../gtk/tr_window.c:440
 msgid "A_ll"
-msgstr ""
+msgstr "A_lles"
 
-#: ../gtk/tr_window.c:439
-#, fuzzy
+#: ../gtk/tr_window.c:440
 msgid "_Active"
-msgstr "_Activiteit"
+msgstr "_Actief"
 
-#: ../gtk/tr_window.c:440
-#, fuzzy
+#: ../gtk/tr_window.c:441
 msgid "_Downloading"
-msgstr "Downloaden"
+msgstr "_Downloaden"
 
-#: ../gtk/tr_window.c:440
-#, fuzzy
+#: ../gtk/tr_window.c:441
 msgid "_Seeding"
-msgstr "Seeding"
+msgstr "_Seeden"
 
-#: ../gtk/tr_window.c:440
+#: ../gtk/tr_window.c:441
 msgid "_Paused"
-msgstr ""
+msgstr "_Gepauzeerd"
 
-#: ../gtk/tr_window.c:443
+#: ../gtk/tr_window.c:444
 msgid "Name"
 msgstr "Naam"
 
-#: ../gtk/tr_window.c:605
-#, fuzzy, c-format
-msgid "%d of %d Transfer"
-msgstr "Transfer"
-
 #: ../gtk/tr_window.c:606
-#, fuzzy, c-format
-msgid "%d of %d Transfers"
-msgstr "Transfer"
-
-#: ../gtk/tr_window.c:610
-#, fuzzy, c-format
-msgid "%d Transfer"
-msgstr "Transfer"
+#, c-format
+msgid "%d of %d Transfer"
+msgid_plural "%d of %d Transfers"
+msgstr[0] "%d van de %d transfer"
+msgstr[1] "%d van de %d transfers"
 
 #: ../gtk/tr_window.c:611
-#, fuzzy, c-format
-msgid "%d Transfers"
-msgstr "Transfer"
+#, c-format
+msgid "%d Transfer"
+msgid_plural "%d Transfers"
+msgstr[0] "%d transfer"
+msgstr[1] "%d transfers"
 
-#: ../gtk/tr_window.c:630 ../gtk/tr_window.c:643
-#, fuzzy, c-format
+#: ../gtk/tr_window.c:631
+#: ../gtk/tr_window.c:644
+#, c-format
 msgid "Ratio: %.1f"
-msgstr "Ratio"
+msgstr "Ratio: %.1f"
 
-#: ../gtk/tr_window.c:635 ../gtk/tr_window.c:640
-#, fuzzy, c-format
+#: ../gtk/tr_window.c:636
+#: ../gtk/tr_window.c:641
+#, c-format
 msgid "Down: %s  Up: %s"
-msgstr ""
-"DL: %s\n"
-"UL: %s"
+msgstr "Download: %s  Upload: %s"
 
 #: ../gtk/util.c:60
 msgid "B"
@@ -1144,42 +1112,47 @@ msgid "EiB"
 msgstr "EiB"
 
 #: ../gtk/util.c:61
-#, fuzzy
 msgid "ZiB"
-msgstr "KiB"
+msgstr "ZiB"
 
 #: ../gtk/util.c:61
-#, fuzzy
 msgid "YiB"
-msgstr "KiB"
+msgstr "YiB"
 
 #: ../gtk/util.c:99
 #, c-format
 msgid "%i %s"
 msgstr "%i %s"
 
-#: ../gtk/util.c:100 ../gtk/util.c:106
+# Meervoud bij een afkorting is wat lastig. Anders zou het voluit moeten worden geschreven.
+#: ../gtk/util.c:100
+#: ../gtk/util.c:106
 msgid "sec"
 msgid_plural "secs"
 msgstr[0] "sec"
-msgstr[1] "secs"
+msgstr[1] "sec"
 
-#: ../gtk/util.c:104 ../gtk/util.c:110 ../gtk/util.c:116
+#: ../gtk/util.c:104
+#: ../gtk/util.c:110
+#: ../gtk/util.c:116
 #, c-format
 msgid "%i %s %i %s"
 msgstr "%i %s %i %s"
 
-#: ../gtk/util.c:105 ../gtk/util.c:112
+#: ../gtk/util.c:105
+#: ../gtk/util.c:112
 msgid "min"
 msgid_plural "mins"
 msgstr[0] "min"
-msgstr[1] "mins"
+msgstr[1] "min"
 
-#: ../gtk/util.c:111 ../gtk/util.c:118
+# In deze context gebruik ik geen meervoud. (bijvoorbeeld "tijd resterend: 7 uur 15 min")
+#: ../gtk/util.c:111
+#: ../gtk/util.c:118
 msgid "hr"
 msgid_plural "hrs"
-msgstr[0] "hr"
-msgstr[1] "hrs"
+msgstr[0] "uur"
+msgstr[1] "uur"
 
 #: ../gtk/util.c:117
 msgid "day"
@@ -1187,225 +1160,3 @@ msgid_plural "days"
 msgstr[0] "dag"
 msgstr[1] "dagen"
 
-#~ msgid "Re_check"
-#~ msgstr "Opnieuw_checken"
-
-#~ msgid "S_top"
-#~ msgstr "S_top"
-
-#~ msgid "Edit _Preferences"
-#~ msgstr "_Instellingen wijzigen"
-
-#~ msgid "_Torrent Info"
-#~ msgstr "_Torrent Info"
-
-#~ msgid "Show / Hide _Transmission"
-#~ msgstr "_Transmission verbergen / tonen"
-
-#~ msgid ""
-#~ "Failed to open the file %s for reading:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Fout bij het openen van bestand %s voor lezen:\n"
-#~ "%s"
-
-#~ msgid ""
-#~ "Error while reading from the file %s:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Fout bij het lezen van bestand %s:\n"
-#~ "%s"
-
-#~ msgid ""
-#~ "Error while writing to the file %s:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Fout bij het schrijven naar bestand %s:\n"
-#~ "%s"
-
-#~ msgid ""
-#~ "Failed to rename the file %s to %s:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Hernoemen van bestand %s naar %s mislukt:\n"
-#~ "%s"
-
-#~ msgid "Add a Torrent"
-#~ msgstr "Voeg een Torrent toe"
-
-#~ msgid "?"
-#~ msgstr "?"
-
-#~ msgid "failed to set up IPC: %s\n"
-#~ msgstr "fout bij het opzetten van IPC: %s\n"
-
-#~ msgid "bad IPC protocol version\n"
-#~ msgstr "verkeerde IPC protocol versie\n"
-
-#~ msgid "IPC protocol parse error\n"
-#~ msgstr "IPC protocole parse fout\n"
-
-#~ msgid "IPC parsing failed: %s\n"
-#~ msgstr "IPC parsing mislukt: %s\n"
-
-#~ msgid ""
-#~ "usage: %s [-hpq] [files...]\n"
-#~ "\n"
-#~ "Transmission %s http://transmission.m0k.org/\n"
-#~ "A free, lightweight BitTorrent client with a simple, intuitive interface\n"
-#~ "\n"
-#~ "  -h --help    display this message and exit\n"
-#~ "  -p --paused  start with all torrents paused\n"
-#~ "  -q --quit    request that the running %s instance quit\n"
-#~ "\n"
-#~ "Only one instance of %s may run at one time. Multiple\n"
-#~ "torrent files may be loaded at startup by adding them to the command\n"
-#~ "line. If %s is already running, those torrents will be\n"
-#~ "opened in the running instance.\n"
-#~ msgstr ""
-#~ "gebruik: %s [-hpq] [bestanden...]\n"
-#~ "\n"
-#~ "Transmission %s http://transmission.m0k.org/\n"
-#~ "Een gratis, lichtgewicht BitTorrent programma met een simpele, intuïtieve "
-#~ "interface\n"
-#~ "\n"
-#~ "  -h --help    toon deze boodschap en sluit af\n"
-#~ "  -p --paused  start met alle torrents gepauzeerd\n"
-#~ "  -q --quit    vraag aan dat de actieve %s instantie afsluit\n"
-#~ "\n"
-#~ "Slechts één instantie van %s mag tegelijk actief zijn. Meerdere\n"
-#~ "torrent bestanden mogen ingeladen worden bij het opstarten door ze aan "
-#~ "het commando toe te voegen\n"
-#~ "Als %s al actief is, zullen die torrents\n"
-#~ "in de actieve instantie geopend worden.\n"
-
-#~ msgid "file"
-#~ msgid_plural "files"
-#~ msgstr[0] "bestand"
-#~ msgstr[1] "bestanden"
-
-#~ msgid "piece"
-#~ msgid_plural "pieces"
-#~ msgstr[0] "stuk"
-#~ msgstr[1] "stukken"
-
-#~ msgid "Make a New Torrent"
-#~ msgstr "Maak een Nieuwe Torrent"
-
-#~ msgid "File or Directory to Add to the New Torrent"
-#~ msgstr "Bestand of Directory om de nieuwe Torrent toe te voegen"
-
-#~ msgid "Unable to open \"%s\" for writing: %s"
-#~ msgstr "Kan \"%s\" niet openen om te schrijven: %s"
-
-#~ msgid "Clear"
-#~ msgstr "Wissen"
-
-#~ msgid "Peers"
-#~ msgstr "Peers"
-
-#~ msgid "Transmission Support Folder"
-#~ msgstr "Transmission ondersteuning folder"
-
-#~ msgid "Remaining"
-#~ msgstr "Resterend"
-
-#~ msgid "Transfer Bandwidth"
-#~ msgstr "Transfer Bandbreedte"
-
-#~ msgid "Torrent Inspector"
-#~ msgstr "Torrent Inspector"
-
-#~ msgid "_Limit download speed"
-#~ msgstr "_Limiteer download snelheid"
-
-#~ msgid "Restrict the download rate"
-#~ msgstr "Beperk de download snelheid"
-
-#~ msgid "Speed in KiB/sec for restricted download rate"
-#~ msgstr "Snelheid in KiB/sec voor beperkte download snelheid"
-
-#~ msgid "Li_mit upload speed"
-#~ msgstr "Li_miteer upload snelheid"
-
-#~ msgid "Restrict the upload rate"
-#~ msgstr "Beperk de upload snelheid"
-
-#~ msgid "Maximum _upload speed:"
-#~ msgstr "Maximum _upload snelheid:"
-
-#~ msgid "Speed in KiB/sec for restricted upload rate"
-#~ msgstr "Snelheid in KiB/sec voor beperkte upload snelheid"
-
-#~ msgid ""
-#~ "When adding a torrent, always prompt for a directory to download data "
-#~ "files into"
-#~ msgstr ""
-#~ "Bij het toevoegen van een torrent, altijd vragen in welke directory de "
-#~ "data bestanden opgeslaan moeten worden"
-
-#~ msgid "Download di_rectory:"
-#~ msgstr "Download di_rectory:"
-
-#~ msgid "Destination directory for downloaded data files"
-#~ msgstr "Bestemming directory voor gedownloade data bestanden"
-
-#~ msgid "Listening _port:"
-#~ msgstr "Luisterende _poort:"
-
-#~ msgid "TCP port number to listen for peer connections"
-#~ msgstr "TCP poortnummer om te luisteren naar peer verbindingen"
-
-#~ msgid "Au_tomatic port mapping via NAT-PMP or UPnP"
-#~ msgstr "Au_tomatische poortmapping via NAT-PMP of UPnP"
-
-#~ msgid "Attempt to bypass NAT or firewall to allow incoming peer connections"
-#~ msgstr ""
-#~ "Probeer NAT of firewall te omzeilen om inkomende peer verbindingen toe te "
-#~ "laten"
-
-#~ msgid ""
-#~ "Perform Azureus or ÂµTorrent compatible peer exchange with any peers "
-#~ "which support it"
-#~ msgstr ""
-#~ "Azureus of uTorrent compatibele peer uitwisseling uitvoeren met peers die "
-#~ "dit ondersteunen"
-
-#~ msgid "Use a system tray / dock / notification area icon"
-#~ msgstr "Gebruik een systeem tray / dock / notificatie gebied icoon"
-
-#~ msgid "Prompt for confirmation when quitting"
-#~ msgstr "Bevestiging dialoog bij het afsluiten"
-
-#~ msgid "Torrent files added via the toolbar, popup menu, and drag-and-drop"
-#~ msgstr ""
-#~ "Torrent bestanden toegevoegd via de toolbar, popup menu, en klik-en-sleep"
-
-#~ msgid ""
-#~ "For torrents added e_xternally\n"
-#~ "(via the command-line):"
-#~ msgstr ""
-#~ "Voor torrents die e_xtern toegevoegd zijn\n"
-#~ "(via de commando prompt):"
-
-#~ msgid "Waiting to check existing files (checked %.1f%%)"
-#~ msgstr ""
-#~ "Wachten om de aanwezig bestanden te controleren (%.1f%% gecontroleerd)"
-
-#~ msgid "Checking existing files (checked %.1f%%)"
-#~ msgstr "Aanwezig bestanden aan het controleren (%.1f%% gecontroleerd)"
-
-#~ msgid "Stopping..."
-#~ msgstr "Aan het stoppen..."
-
-#~ msgid "  fnord    fnord  "
-#~ msgstr "  fnord    fnord  "
-
-#~ msgid "Total DL: %s"
-#~ msgstr "Totaal DL: %s"
-
-#~ msgid "Total UL: %s"
-#~ msgstr "Totaal UL: %s"
-
-#~ msgid "â"
-#~ msgstr "â"
