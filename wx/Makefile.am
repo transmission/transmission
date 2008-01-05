@@ -7,14 +7,15 @@ SUBDIRS = images
 bin_PROGRAMS = Xmission
 
 Xmission_SOURCES = \
-  speed-stats.cc \
-  filter.cc \
-  torrent-list.cc \
-  torrent-stats.cc \
-  xmission.cc
+    speed-stats.cc \
+    filter.cc \
+    torrent-list.cc \
+    torrent-stats.cc \
+    xmission.cc
 
 Xmission_LDADD = \
-  $(top_builddir)/libtransmission/libtransmission.a \
-  $(top_builddir)/third-party/libevent/libevent.la \
-  $(top_builddir)/third-party/miniupnp/libminiupnp.a \
-  $(WX_LIBS) $(OPENSSL_LIBS) $(PTHREAD_LIBS) -lm
+    $(top_builddir)/libtransmission/libtransmission.a \
+    $(top_builddir)/third-party/libevent/libevent.la \
+    $(top_builddir)/third-party/miniupnp/libminiupnp.a \
+    $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
+    $(WX_LIBS) $(OPENSSL_LIBS) $(PTHREAD_LIBS) -lm

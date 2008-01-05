@@ -282,16 +282,17 @@ MyFrame :: OnDeselectAllUpdate( wxUpdateUIEvent& event )
 void
 MyFrame :: OnStartUpdate( wxUpdateUIEvent& event )
 {
-    unsigned long l = 0;
+    bool enable = false;
     foreach( torrents_v, mySelectedTorrents, it )
-        l |= tr_torrentStat(*it)->status;
-    event.Enable( (l & TR_STATUS_INACTIVE)!=0 );
+        if( tr_torrentStatCached(*it)->status == TR_STATUS_STOPPED )
+            enable = true;
+    event.Enable( enable );
 }
 void
 MyFrame :: OnStart( wxCommandEvent& WXUNUSED(unused) )
 {
     foreach( torrents_v, mySelectedTorrents, it )
-        if( tr_torrentStat(*it)->status & TR_STATUS_INACTIVE )
+        if( tr_torrentStatCached(*it)->status == TR_STATUS_STOPPED )
             tr_torrentStart( *it );
 }
 
@@ -301,16 +302,17 @@ MyFrame :: OnStart( wxCommandEvent& WXUNUSED(unused) )
 void
 MyFrame :: OnStopUpdate( wxUpdateUIEvent& event )
 {
-    unsigned long l = 0;
+    bool enable = false;
     foreach( torrents_v, mySelectedTorrents, it )
-        l |= tr_torrentStat(*it)->status;
-    event.Enable( (l & TR_STATUS_ACTIVE)!=0 );
+        if( tr_torrentStatCached(*it)->status != TR_STATUS_STOPPED )
+            enable = true;
+    event.Enable( enable );
 }
 void
 MyFrame :: OnStop( wxCommandEvent& WXUNUSED(unused) )
 {
     foreach( torrents_v, mySelectedTorrents, it )
-        if( tr_torrentStat(*it)->status & TR_STATUS_ACTIVE )
+        if( tr_torrentStat(*it)->status != TR_STATUS_STOPPED )
             tr_torrentStop( *it );
 }
 
@@ -368,10 +370,12 @@ void MyFrame :: OnOpen( wxCommandEvent& WXUNUSED(event) )
         for( size_t i=0; i<nPaths; ++i )
         {
             const std::string filename = toStr( paths[i] );
-            tr_torrent * tor = tr_torrentInit( handle,
-                                               filename.c_str(),
-                                               mySavePath.c_str(),
-                                               false, NULL );
+            tr_ctor * ctor = tr_ctorNew( handle );
+            tr_ctorSetMetainfoFromFile( ctor, filename.c_str() );
+            tr_ctorSetDestination( ctor, TR_FALLBACK, mySavePath.c_str() );
+            tr_torrent * tor = tr_torrentNew( handle, ctor, NULL );
+            tr_ctorFree( ctor );
+
             if( tor )
                 myTorrents.push_back( tor );
         }
@@ -674,9 +678,13 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     **/
 
     int count = 0;
-    tr_torrent ** torrents = tr_loadTorrents ( handle, mySavePath.c_str(), paused, &count );
+    tr_ctor * ctor = tr_ctorNew( handle );
+    tr_ctorSetPaused( ctor, TR_FORCE, paused );
+    tr_ctorSetDestination( ctor, TR_FALLBACK, mySavePath.c_str() );
+    tr_torrent ** torrents = tr_loadTorrents ( handle, ctor, &count );
     myTorrents.insert( myTorrents.end(), torrents, torrents+count );
     tr_free( torrents );
+    tr_ctorFree( ctor );
 
     wxTimerEvent dummy;
     OnPulse( dummy );

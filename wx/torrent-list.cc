@@ -303,7 +303,6 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent   * tor,
             case COL_STATE: /* FIXME: divine the meaning of these two columns */
             case COL_STATUS:
                 switch( s->status ) {
-                    case TR_STATUS_STOPPING:    xstr = _("Stopping"); break;
                     case TR_STATUS_STOPPED:     xstr = _("Stopped"); break;
                     case TR_STATUS_CHECK:       xstr = wxString::Format ( _("Checking Files (%.0f)"), s->recheckProgress );  break;
                     case TR_STATUS_CHECK_WAIT:  xstr = _("Waiting to Check"); break;
