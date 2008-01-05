@@ -360,8 +360,6 @@ torrentRealInit( tr_handle     * h,
     tr_torrentUncheck( tor );
     loaded = tr_fastResumeLoad( tor, ~0, ctor );
     
-    assert( tor->destination != NULL );
-
     doStart = tor->isRunning;
     tor->isRunning = 0;
 
