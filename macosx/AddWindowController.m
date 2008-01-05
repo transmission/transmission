@@ -124,6 +124,11 @@
     [super dealloc];
 }
 
+- (Torrent *) torrent
+{
+    return fTorrent;
+}
+
 - (void) setDestination: (id) sender
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
@@ -146,20 +151,15 @@
     [fTorrent setWaitToStart: [fStartCheck state] == NSOnState];
     [fTorrent setGroupValue: [[fGroupPopUp selectedItem] tag]];
     
-    [fController askOpenConfirmed: fTorrent];
+    [fController askOpenConfirmed: self add: YES];
     
     if ([fDeleteCheck state] == NSOnState)
         [fTorrent trashTorrent];
-    
-    [self release];
 }
 
 - (void) cancelAdd: (id) sender
 {
-    [fTorrent closeRemoveTorrent];
-    [fTorrent release];
-    
-    [self release];
+    [fController askOpenConfirmed: self add: NO];
 }
 
 - (void) updateGroupMenu: (NSNotification *) notification
@@ -200,9 +200,8 @@
     }
     else
     {
-        #warning crashes here
         if (!fDestination)
-            [self cancelAdd: nil];
+            [self performSelectorOnMainThread: @selector(cancelAdd:) withObject: nil waitUntilDone: NO];
     }
 }
 

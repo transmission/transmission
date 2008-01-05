@@ -27,6 +27,7 @@
 #import "PrefsController.h"
 #import "InfoWindowController.h"
 #import "MessageWindowController.h"
+#import "AddWindowController.h"
 #import "DragOverlayWindow.h"
 #import "Badger.h"
 #import "StatusBarView.h"
@@ -118,7 +119,7 @@ typedef enum
 
 - (void) openFiles:             (NSArray *) filenames;
 - (void) openFiles:             (NSArray *) filenames addType: (addType) type forcePath: (NSString *) path;
-- (void) askOpenConfirmed:      (Torrent *) torrent;
+- (void) askOpenConfirmed:      (AddWindowController *) addController add: (BOOL) add;
 - (void) openCreatedFile:       (NSNotification *) notification;
 - (void) openFilesWithDict:     (NSDictionary *) dictionary;
 - (void) openShowSheet:         (id) sender;

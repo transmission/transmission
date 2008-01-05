@@ -48,6 +48,8 @@
 - (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller
         deleteTorrent: (torrentFileState) deleteTorrent;
 
+- (Torrent *) torrent;
+
 - (void) setDestination: (id) sender;
 
 - (void) add: (id) sender;

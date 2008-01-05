@@ -1485,7 +1485,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (fPublicTorrent)
         fPublicTorrentLocation = [path retain];
     
-    #warning can it be nil? -- doesn't need the default value, since it'll be passed in
     fDownloadFolder = downloadFolder ? downloadFolder : [fDefaults stringForKey: @"DownloadFolder"];
     fDownloadFolder = [[fDownloadFolder stringByExpandingTildeInPath] retain];
     

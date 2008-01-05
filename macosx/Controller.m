@@ -30,7 +30,6 @@
 #import "TorrentTableView.h"
 #import "CreatorWindowController.h"
 #import "StatsWindowController.h"
-#import "AddWindowController.h"
 #import "GroupsWindowController.h"
 #import "AboutWindowController.h"
 #import "ButtonToolbarItem.h"
@@ -797,15 +796,28 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self updateTorrentsInQueue];
 }
 
-- (void) askOpenConfirmed: (Torrent *) torrent
+- (void) askOpenConfirmed: (AddWindowController *) addController add: (BOOL) add
 {
-    [torrent setOrderValue: [fTorrents count]-1]; //ensure that queue order is always sequential
+    [addController close];
     
-    [torrent update];
-    [fTorrents addObject: torrent];
-    [torrent release];
+    Torrent * torrent = [addController torrent];
+    if (add)
+    {
+        [torrent setOrderValue: [fTorrents count]-1]; //ensure that queue order is always sequential
+        
+        [torrent update];
+        [fTorrents addObject: torrent];
+        [torrent release];
+        
+        [self updateTorrentsInQueue];
+    }
+    else
+    {
+        [torrent closeRemoveTorrent];
+        [torrent release];
+    }
     
-    [self updateTorrentsInQueue];
+    [addController release];
 }
 
 - (void) openCreatedFile: (NSNotification *) notification
