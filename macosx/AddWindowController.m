@@ -26,11 +26,14 @@
 #import "Controller.h"
 #import "GroupsWindowController.h"
 #import "NSStringAdditions.h"
+#import "NSMenuAdditions.h"
 #import "ExpandedPathToIconTransformer.h"
 
 @interface AddWindowController (Private)
 
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) contextInfo;
+- (void) setGroupsMenu;
+- (void) changeGroupValue: (id) sender;
 
 @end
 
@@ -50,6 +53,8 @@
         fDeleteTorrent = deleteTorrent == TORRENT_FILE_DELETE || (deleteTorrent == TORRENT_FILE_DEFAULT
                             && [[NSUserDefaults standardUserDefaults] boolForKey: @"DeleteOriginalTorrent"]);
         fDeleteEnable = deleteTorrent == TORRENT_FILE_DEFAULT;
+        
+        fGroupValue = -1;
     }
     return self;
 }
@@ -85,7 +90,8 @@
     }
     [fStatusField setStringValue: statusString];
     
-    [fGroupPopUp setMenu: [[GroupsWindowController groups] groupMenuWithTarget: nil action: NULL isSmall: NO]];
+    [self setGroupsMenu];
+    [fGroupPopUp selectItemWithTag: -1];
     
     [fStartCheck setState: [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState];
     
@@ -164,11 +170,18 @@
 
 - (void) updateGroupMenu: (NSNotification *) notification
 {
-    #warning add option to go to group window
-    
-    int groupValue = [[fGroupPopUp selectedItem] tag];
-    [fGroupPopUp setMenu: [[GroupsWindowController groups] groupMenuWithTarget: nil action: NULL isSmall: NO]];
-    [fGroupPopUp selectItemWithTag: groupValue];
+    [self setGroupsMenu];
+    if (![fGroupPopUp selectItemWithTag: fGroupValue])
+    {
+        fGroupValue = -1;
+        [fGroupPopUp selectItemWithTag: fGroupValue];
+    }
+}
+
+- (void) showGroupsWindow: (id) sender
+{
+    [fGroupPopUp selectItemWithTag: fGroupValue];
+    [fController showGroups: sender];
 }
 
 - (void) mouseMoved: (NSEvent *) event
@@ -203,6 +216,24 @@
         if (!fDestination)
             [self performSelectorOnMainThread: @selector(cancelAdd:) withObject: nil waitUntilDone: NO];
     }
+}
+
+- (void) setGroupsMenu
+{
+    NSMenu * menu = [fGroupPopUp menu];
+    
+    int i;
+    for (i = [menu numberOfItems]-1 - 2; i >= 0; i--)
+        [menu removeItemAtIndex: i];
+        
+    NSMenu * groupMenu = [[GroupsWindowController groups] groupMenuWithTarget: self action: @selector(changeGroupValue:) isSmall: NO];
+    [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange:
+            NSMakeRange(0, [groupMenu numberOfItems])] atBottom: NO];
+}
+
+- (void) changeGroupValue: (id) sender
+{
+    fGroupValue = [sender tag];
 }
 
 @end

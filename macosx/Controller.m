@@ -798,8 +798,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) askOpenConfirmed: (AddWindowController *) addController add: (BOOL) add
 {
-    [addController close];
-    
     Torrent * torrent = [addController torrent];
     if (add)
     {
@@ -2055,8 +2053,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)
     {
-        int i, keep = (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu) ? 2 : 0;
-        for (i = [menu numberOfItems]-1 - keep; i >= 0; i--)
+        int i;
+        for (i = [menu numberOfItems]-1 - 2; i >= 0; i--)
             [menu removeItemAtIndex: i];
         
         NSMenu * groupMenu = [[GroupsWindowController groups] groupMenuWithTarget: self action: @selector(setGroup:) isSmall: NO];
