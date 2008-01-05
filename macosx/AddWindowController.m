@@ -103,9 +103,16 @@
     }
     else
     {
-        //if there is no destination, prompt for one right away
-        [self setDestination: nil];
+        [fLocationField setStringValue: @""];
+        [fLocationImageView setImage: nil];
     }
+}
+
+- (void) windowDidLoad
+{
+    //if there is no destination, prompt for one right away
+    if (!fDestination)
+        [self setDestination: nil];
 }
 
 - (void) dealloc
