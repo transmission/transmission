@@ -799,7 +799,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) askOpenConfirmed: (Torrent *) torrent
 {
-#warning properly reset queue number
+    [torrent setOrderValue: [fTorrents count]-1]; //ensure that queue order is always sequential
+    
     [torrent update];
     [fTorrents addObject: torrent];
     [torrent release];

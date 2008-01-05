@@ -200,6 +200,7 @@
     }
     else
     {
+        #warning crashes here
         if (!fDestination)
             [self cancelAdd: nil];
     }
