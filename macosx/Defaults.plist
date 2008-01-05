@@ -43,7 +43,7 @@
 	<key>DisplayStatusProgressSelected</key>
 	<false/>
 	<key>DownloadAsk</key>
-	<false/>
+	<true/>
 	<key>DownloadFolder</key>
 	<string>~/Downloads</string>
 	<key>DownloadLimit</key>

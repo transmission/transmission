@@ -68,7 +68,7 @@
         if ((choice = [fDefaults stringForKey: @"DownloadChoice"]))
         {
             [fDefaults setBool: [choice isEqualToString: @"Constant"] forKey: @"DownloadLocationConstant"];
-            [fDefaults setBool: [choice isEqualToString: @"Ask"] forKey: @"DownloadAsk"];
+            [fDefaults setBool: YES forKey: @"DownloadAsk"];
             
             [fDefaults removeObjectForKey: @"DownloadChoice"];
         }
