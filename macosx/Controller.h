@@ -38,6 +38,14 @@
 
 @class TorrentTableView;
 
+typedef enum
+{
+    ADD_NORMAL,
+    ADD_SHOW_OPTIONS,
+    ADD_URL,
+    ADD_CREATED
+} addType;
+
 @interface Controller : NSObject <GrowlApplicationBridgeDelegate>
 {
     tr_handle                       * fLib;
@@ -109,8 +117,7 @@
 }
 
 - (void) openFiles:             (NSArray *) filenames;
-- (void) openFiles:             (NSArray *) filenames forcePath: (NSString *) path ignoreDownloadFolder: (BOOL) ignore
-                                            deleteTorrentFile: (torrentFileState) deleteTorrent;
+- (void) openFiles:             (NSArray *) filenames addType: (addType) type forcePath: (NSString *) path;
 - (void) askOpenConfirmed:      (Torrent *) torrent;
 - (void) openCreatedFile:       (NSNotification *) notification;
 - (void) openFilesWithDict:     (NSDictionary *) dictionary;

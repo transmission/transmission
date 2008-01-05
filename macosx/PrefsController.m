@@ -64,9 +64,9 @@
         }
         
         //check for old version download location
-        if ([fDefaults stringForKey: @"DownloadChoice"])
+        NSString * choice;
+        if ((choice = [fDefaults stringForKey: @"DownloadChoice"]))
         {
-            NSString * choice = [fDefaults stringForKey: @"DownloadChoice"];
             [fDefaults setBool: [choice isEqualToString: @"Constant"] forKey: @"DownloadLocationConstant"];
             [fDefaults setBool: [choice isEqualToString: @"Ask"] forKey: @"DownloadAsk"];
             
