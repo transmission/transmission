@@ -71,8 +71,6 @@ typedef enum
     int fOrderValue, fGroupValue;
     
     NSDictionary * fQuickPauseDict;
-    
-    BOOL fNeedSetTimeMachine;
 }
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (torrentFileState) torrentDelete
