@@ -180,6 +180,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (void) closeRemoveTorrent
 {
+    //allow the file to be index by Time Machine
+    if ([NSApp isOnLeopardOrBetter])
+    {
+        NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
+        CSBackupSetItemExcluded((CFURLRef)url, false, true);
+    }
+    
     tr_torrentRemoveSaved(fHandle);
     tr_torrentClose(fHandle);
 }
