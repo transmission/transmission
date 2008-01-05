@@ -332,6 +332,14 @@ fireGotBlock( tr_peermsgs * msgs, const struct peer_request * req )
 }
 
 static void
+firePieceData( tr_peermsgs * msgs )
+{
+    tr_peermsgs_event e = blankEvent;
+    e.eventType = TR_PEERMSG_PIECE_DATA;
+    publish( msgs, &e );
+}
+
+static void
 fireCancelledReq( tr_peermsgs * msgs, const struct peer_request * req )
 {
     tr_peermsgs_event e = blankEvent;
@@ -1079,6 +1087,7 @@ clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tr_rcTransferred( tor->download, byteCount );
     tr_rcTransferred( tor->handle->download, byteCount );
     tr_statsAddDownloaded( msgs->handle, byteCount );
+    firePieceData( msgs );
 }
 
 static int
@@ -1304,6 +1313,7 @@ peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tr_rcTransferred( tor->upload, byteCount );
     tr_rcTransferred( tor->handle->upload, byteCount );
     tr_statsAddUploaded( msgs->handle, byteCount );
+    firePieceData( msgs );
 }
 
 static size_t

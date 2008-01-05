@@ -130,6 +130,7 @@ struct peer_atom
     uint16_t numFails;
     struct in_addr addr;
     time_t time;
+    time_t piece_data_time;
 };
 
 typedef struct
@@ -916,6 +917,12 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
         case TR_PEERMSG_CANCEL:
             tr_bitfieldRem( t->requested, _tr_block( t->tor, e->pieceIndex, e->offset ) );
             break;
+
+        case TR_PEERMSG_PIECE_DATA: {
+            struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
+            atom->piece_data_time = time( NULL );
+            break;
+        }
 
         case TR_PEERMSG_CLIENT_HAVE:
             broadcastClientHave( t, e->pieceIndex );
@@ -1766,7 +1773,6 @@ getPeerCandidates( Torrent * t, int * setmeSize )
     ret = tr_new( struct peer_atom*, atomCount );
     for( i=retCount=0; i<atomCount; ++i )
     {
-        int wait, minWait, maxWait;
         struct peer_atom * atom = atoms[i];
 
         /* peer fed us too much bad data ... we only keep it around
@@ -1792,16 +1798,22 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         if( atom->numFails > 10 )
             continue;
 
-        /* if we used this peer recently, give someone else a turn */
-        minWait = 60;
-        maxWait = (60 * 20); /* twenty minutes */
-        wait = atom->numFails * 30; /* add 30 secs to the wait interval for each consecutive failure*/
-        if( wait < minWait ) wait = minWait;
-        if( wait > maxWait ) wait = maxWait;
-        if( ( now - atom->time ) < wait ) {
-            tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
-                    i, tr_peerIoAddrStr(&atom->addr,atom->port), wait );
-            continue;
+        /* If we were connected to this peer recently and transferring
+         * piece data, try to reconnect -- network troubles may have
+         * disconnected us.  but if we weren't sharing piece data,
+         * hold off on this peer to give another one a try instead */
+        if( ( now - atom->piece_data_time ) > 15 )
+        {
+            int minWait = 60;
+            int maxWait = (60 * 20); /* twenty minutes */
+            int wait = atom->numFails * 30; /* add 30 secs to the wait interval for each consecutive failure*/
+            if( wait < minWait ) wait = minWait;
+            if( wait > maxWait ) wait = maxWait;
+            if( ( now - atom->time ) < wait ) {
+                tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
+                        i, tr_peerIoAddrStr(&atom->addr,atom->port), wait );
+                continue;
+            }
         }
 
         ret[retCount++] = atom;
