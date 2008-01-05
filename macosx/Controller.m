@@ -689,6 +689,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 }
 
 #warning change ignore to add, and add an ignore only for torrents downloaded
+//perhaps use an enum of different open types?
 - (void) openFiles: (NSArray *) filenames forcePath: (NSString *) path ignoreDownloadFolder: (BOOL) ignore
         deleteTorrentFile: (torrentFileState) deleteTorrent
 {
