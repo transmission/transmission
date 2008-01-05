@@ -1666,8 +1666,22 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (void) updateDownloadFolder
 {
+    //remove old Time Machine location
+    if ([NSApp isOnLeopardOrBetter])
+    {
+        NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
+        fNeedSetTimeMachine = CSBackupSetItemExcluded((CFURLRef)url, false, false) != noErr;
+    }
+    
     NSString * folder = [self shouldUseIncompleteFolderForName: [self name]] ? fIncompleteFolder : fDownloadFolder;
     tr_torrentSetFolder(fHandle, [folder UTF8String]);
+    
+    //update Time Machine location
+    if ([NSApp isOnLeopardOrBetter])
+    {
+        NSURL *url = [NSURL fileURLWithPath: [folder stringByAppendingPathComponent: [self name]]];
+        fNeedSetTimeMachine = CSBackupSetItemExcluded((CFURLRef)url, ![self allDownloaded], false) != noErr;
+    }
 }
 
 //status has been retained
