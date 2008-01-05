@@ -224,13 +224,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [fIPCController setPrefsController: fPrefsController];
         fRemoteQuit = NO;
         
-        //setting from previous
-        if ([[fDefaults stringForKey: @"DownloadChoice"] isEqualToString: @"Constant"])
-        {
-            [fDefaults setBool: YES forKey: @"DownloadLocationConstant"];
-            [fDefaults removeObjectForKey: @"DownloadChoice"];
-        }
-        
         [GrowlApplicationBridge setGrowlDelegate: self];
         [[UKKQueue sharedFileWatcher] setDelegate: self];
     }

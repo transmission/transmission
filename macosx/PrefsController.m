@@ -63,6 +63,16 @@
             [fDefaults setBool: NO forKey: @"CheckUpload"];
         }
         
+        //check for old version download location
+        if ([fDefaults stringForKey: @"DownloadChoice"])
+        {
+            NSString * choice = [fDefaults stringForKey: @"DownloadChoice"];
+            [fDefaults setBool: [choice isEqualToString: @"Constant"] forKey: @"DownloadLocationConstant"];
+            [fDefaults setBool: [choice isEqualToString: @"Ask"] forKey: @"DownloadAsk"];
+            
+            [fDefaults removeObjectForKey: @"DownloadChoice"];
+        }
+        
         //set check for update to right value
         [self setCheckForUpdate: nil];
         
