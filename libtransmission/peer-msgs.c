@@ -513,20 +513,6 @@ sendFastReject( tr_peermsgs * msgs,
     }
 }
 
-static void
-sendFastAllowed( tr_peermsgs * msgs,
-                 uint32_t      pieceIndex)
-{
-    assert( msgs != NULL );
-    
-    if( tr_peerIoSupportsFEXT( msgs->io ) )
-    {
-        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + sizeof(uint32_t) );
-        tr_peerIoWriteUint8( msgs->io, msgs->outMessages, BT_ALLOWED_FAST );
-        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, pieceIndex );
-    }
-}
-
 static tr_bitfield*
 getPeerAllowedPieces( tr_peermsgs * msgs )
 {
@@ -542,6 +528,19 @@ getPeerAllowedPieces( tr_peermsgs * msgs )
     return msgs->peerAllowedPieces;
 }
 
+static void
+sendFastAllowed( tr_peermsgs * msgs,
+                 uint32_t      pieceIndex)
+{
+    assert( msgs != NULL );
+    
+    if( tr_peerIoSupportsFEXT( msgs->io ) )
+    {
+        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + sizeof(uint32_t) );
+        tr_peerIoWriteUint8( msgs->io, msgs->outMessages, BT_ALLOWED_FAST );
+        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, pieceIndex );
+    }
+}
 
 static void
 sendFastAllowedSet( tr_peermsgs * msgs )
@@ -554,6 +553,13 @@ sendFastAllowedSet( tr_peermsgs * msgs )
             sendFastAllowed( msgs, i );
         i++;
     }
+}
+
+static void
+maybeSendFastAllowedSet( tr_peermsgs * msgs )
+{
+    if( tr_bitfieldCountTrueBits( msgs->info->have ) <= MAX_FAST_ALLOWED_THRESHOLD )
+        sendFastAllowedSet( msgs );
 }
 
 
@@ -1223,6 +1229,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             msgs->peerSentBitfield = 1;
             tr_peerIoReadBytes( msgs->io, inbuf, msgs->info->have->bits, msglen );
             updatePeerProgress( msgs );
+            maybeSendFastAllowedSet( msgs );
             tr_peerMsgsSetChoke( msgs, !clientIsSeed || (msgs->info->progress<1.0) );
             fireNeedReq( msgs );
             break;
@@ -1271,6 +1278,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             dbgmsg( msgs, "Got a BT_HAVE_ALL" );
             tr_bitfieldAddRange( msgs->info->have, 0, msgs->torrent->info.pieceCount );
             updatePeerProgress( msgs );
+            maybeSendFastAllowedSet( msgs );
             break;
         
         
@@ -1278,6 +1286,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             dbgmsg( msgs, "Got a BT_HAVE_NONE" );
             tr_bitfieldClear( msgs->info->have );
             updatePeerProgress( msgs );
+            maybeSendFastAllowedSet( msgs );
             break;
         
         case BT_REJECT: {
@@ -1909,7 +1918,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
         sendBitfield( m );
     else {
         /* This peer is fastpeer-enabled, send it have-all or have-none if appropriate */
-        uint32_t peerProgress;
         float completion = tr_cpPercentComplete( m->torrent->completion );
         if ( completion == 0.0f ) {
             sendFastHave( m, 0 );
@@ -1918,10 +1926,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
         } else {
             sendBitfield( m );
         }
-        peerProgress = m->torrent->info.pieceCount * m->info->progress;
-        
-        if ( peerProgress < MAX_FAST_ALLOWED_COUNT )
-            sendFastAllowedSet( m );
     }
 
     return m;
