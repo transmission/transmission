@@ -527,15 +527,30 @@ sendFastAllowed( tr_peermsgs * msgs,
     }
 }
 
+static tr_bitfield*
+getPeerAllowedPieces( tr_peermsgs * msgs )
+{
+    if( !msgs->peerAllowedPieces && tr_peerIoSupportsFEXT( msgs->io ) )
+    {
+        msgs->peerAllowedPieces = tr_peerMgrGenerateAllowedSet(
+            MAX_FAST_ALLOWED_COUNT,
+            msgs->torrent->info.pieceCount,
+            msgs->torrent->info.hash,
+            tr_peerIoGetAddress( msgs->io, NULL ) );
+    }
+
+    return msgs->peerAllowedPieces;
+}
 
 
 static void
 sendFastAllowedSet( tr_peermsgs * msgs )
 {
     int i = 0;
+
     while (i <= msgs->torrent->info.pieceCount )
     {
-        if ( tr_bitfieldHas( msgs->peerAllowedPieces, i) )
+        if ( tr_bitfieldHas( getPeerAllowedPieces( msgs ), i) )
             sendFastAllowed( msgs, i );
         i++;
     }
@@ -998,7 +1013,7 @@ peerMadeRequest( tr_peermsgs * msgs, const struct peer_request * req )
     const int clientHasPiece = reqIsValid && tr_cpPieceIsComplete( msgs->torrent->completion, req->index );
     const int peerIsChoked = msgs->info->peerIsChoked;
     const int peerIsFast = tr_peerIoSupportsFEXT( msgs->io );
-    const int pieceIsFast = reqIsValid && tr_bitfieldHas( msgs->peerAllowedPieces, req->index );
+    const int pieceIsFast = reqIsValid && tr_bitfieldHas( getPeerAllowedPieces( msgs ), req->index );
     const int canSendFast = clientCanSendFastBlock( msgs );
 
     if( !reqIsValid ) /* bad request */
@@ -1878,20 +1893,8 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->clientSuggestedPieces = NULL;
     *setme = tr_publisherSubscribe( m->publisher, func, userData );
     
-    if ( tr_peerIoSupportsFEXT( m->io ) )
-    {
-        /* This peer is fastpeer-enabled, generate its allowed set
-         * (before registering our callbacks) */
-        if ( !m->peerAllowedPieces ) {
-            const struct in_addr *peerAddr = tr_peerIoGetAddress( m->io, NULL );
-            
-            m->peerAllowedPieces = tr_peerMgrGenerateAllowedSet( MAX_FAST_ALLOWED_COUNT,
-                                                                 m->torrent->info.pieceCount,
-                                                                 m->torrent->info.hash,
-                                                                 peerAddr );
-        }
+    if ( tr_peerIoSupportsFEXT( m->io ) ) {
         m->clientAllowedPieces = tr_bitfieldNew( m->torrent->info.pieceCount );
-        
         m->clientSuggestedPieces = tr_bitfieldNew( m->torrent->info.pieceCount );
     }
     

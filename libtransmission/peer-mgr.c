@@ -455,71 +455,44 @@ torrentConstructor( tr_peerMgr * manager, tr_torrent * tor )
 }
 
 /**
-***
-**/
-
+ * For explanation, see http://www.bittorrent.org/fast_extensions.html
+ * Also see the "test-allowed-set" unit test
+ */
 struct tr_bitfield *
-tr_peerMgrGenerateAllowedSet( const uint32_t         setCount,
-                              const uint32_t         pieceCount,
-                              const uint8_t          infohash[20],
-                              const struct in_addr * ip )
+tr_peerMgrGenerateAllowedSet( const uint32_t         k,         /* number of pieces in set */
+                              const uint32_t         sz,        /* number of pieces in torrent */
+                              const uint8_t        * infohash,  /* torrent's SHA1 hash*/
+                              const struct in_addr * ip )       /* peer's address */
 {
-    /* This has been checked against the spec example implementation. Feeding it with :
-    setCount = 9, pieceCount = 1313, infohash = Oxaa,0xaa,...0xaa, ip = 80.4.4.200
-generate :
-    1059, 431, 808, 1217, 287, 376, 1188, 353, 508
-    but since we're storing in a bitfield, it won't be in this order... */
-    /* TODO : We should translate link-local IPv4 adresses to external IP, 
-     * so that being on same local network gives us the same allowed pieces */
-    
-    uint8_t *seed;
-    char buf[4];
-    uint32_t allowedPieceCount = 0;
-    tr_bitfield_t * ret;
+    uint8_t w[SHA_DIGEST_LENGTH + 4];
+    uint8_t x[SHA_DIGEST_LENGTH];
+    tr_bitfield_t * a;
+    uint32_t a_size;
 
-#if 0
-    printf( "%d piece allowed fast set for torrent with %d pieces and hex infohash\n", setCount, pieceCount );
-    printf( "%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x for node with IP %s:\n",
-            infohash[0], infohash[1], infohash[2], infohash[3], infohash[4], infohash[5], infohash[6], infohash[7], infohash[8], infohash[9],
-            infohash[10], infohash[11], infohash[12], infohash[13], infohash[14], infohash[15], infohash[16], infohash[7], infohash[18], infohash[19],
-            inet_ntoa( *ip ) );
-#endif
+    *(uint32_t*)w = ntohl( htonl(ip->s_addr) & 0xffffff00 );   /* (1) */
+    memcpy( w + 4, infohash, SHA_DIGEST_LENGTH );              /* (2) */
+    tr_sha1( x, w, sizeof( w ), NULL );                        /* (3) */
+
+    a = tr_bitfieldNew( sz );
+    a_size = 0;
     
-    seed = malloc(4 + SHA_DIGEST_LENGTH);
-    
-    ret = tr_bitfieldNew( pieceCount );
-    
-    /* We need a seed based on most significant bytes of peer address
-        concatenated with torrent's infohash */
-    *(uint32_t*)buf = ntohl( htonl(ip->s_addr) & 0xffffff00 );
-    
-    memcpy( seed, &buf, 4 );
-    memcpy( seed + 4, infohash, SHA_DIGEST_LENGTH );
-    
-    tr_sha1( seed, seed, 4 + SHA_DIGEST_LENGTH, NULL );
-    
-    while ( allowedPieceCount < setCount )
+    while( a_size < k )
     {
         int i;
-        for ( i = 0 ; i < 5 && allowedPieceCount < setCount ; i++ )
+        for ( i=0; i<5 && a_size<k; ++i )                      /* (4) */
         {
-            /* We generate indices from 4-byte chunks of the seed */
-            uint32_t j = i * 4;
-            uint32_t y = ntohl( *(uint32_t*)(seed + j) );
-            uint32_t index = y % pieceCount;
-            
-            if ( !tr_bitfieldHas( ret, index ) )
-            {
-                tr_bitfieldAdd( ret, index );
-                allowedPieceCount++;
+            uint32_t j = i * 4;                                /* (5) */
+            uint32_t y = ntohl(*(uint32_t*)(x+j));             /* (6) */
+            uint32_t index = y % sz;                           /* (7) */
+            if ( !tr_bitfieldHas( a, index ) ) {               /* (8) */
+                tr_bitfieldAdd( a, index );                    /* (9) */
+                ++a_size;
             }
         }
-        /* We randomize the seed, in case we need to iterate more */
-        tr_sha1( seed, seed, SHA_DIGEST_LENGTH, NULL );
+        tr_sha1( x, x, sizeof( x ), NULL );                    /* (3) */
     }
-    tr_free( seed );
     
-    return ret;
+    return a;
 }
 
 tr_peerMgr*
