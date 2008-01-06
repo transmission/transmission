@@ -258,6 +258,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         [fWindow setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
         [[fTotalTorrentsField cell] setBackgroundStyle: NSBackgroundStyleRaised];
+        
+        [[[fActionButton menu] itemAtIndex: 0] setImage: [NSImage imageNamed: NSImageNameActionTemplate]]; //set in nib if Leopard-only
     }
     else
     {
