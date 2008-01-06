@@ -29,6 +29,25 @@
 
 #define ROW_SMALL_HEIGHT 18.0
 
+typedef enum
+{
+    FILE_CHECK_TAG,
+    FILE_UNCHECK_TAG
+} fileCheckMenuTag;
+
+typedef enum
+{
+    FILE_PRIORITY_HIGH_TAG,
+    FILE_PRIORITY_NORMAL_TAG,
+    FILE_PRIORITY_LOW_TAG
+} filePriorityMenuTag;
+
+@interface FileOutlineController (Private)
+
+- (NSMenu *) menu;
+
+@end
+
 @implementation FileOutlineController
 
 - (void) awakeFromNib
@@ -44,11 +63,7 @@
                                                                             "file table -> header tool tip")];                                                               
     }
     
-    #warning generate menu in code?
-    //set priority item images
-    [fFilePriorityNormal setImage: [NSImage imageNamed: @"PriorityNormal.png"]];
-    [fFilePriorityLow setImage: [NSImage imageNamed: @"PriorityLow.png"]];
-    [fFilePriorityHigh setImage: [NSImage imageNamed: @"PriorityHigh.png"]];
+    [fOutline setMenu: [self menu]];
     
     [self setTorrent: nil];
 }
@@ -188,7 +203,7 @@
 
 - (void) setCheck: (id) sender
 {
-    int state = sender == fFileCheckItem ? NSOnState : NSOffState;
+    int state = [sender tag] == FILE_UNCHECK_TAG ? NSOffState : NSOnState;
     
     NSIndexSet * indexSet = [fOutline selectedRowIndexes];
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
@@ -220,12 +235,17 @@
 - (void) setPriority: (id) sender
 {
     int priority;
-    if (sender == fFilePriorityHigh)
-        priority = TR_PRI_HIGH;
-    else if (sender == fFilePriorityLow)
-        priority = TR_PRI_LOW;
-    else
-        priority = TR_PRI_NORMAL;
+    switch ([sender tag])
+    {
+        case FILE_PRIORITY_HIGH_TAG:
+            priority = TR_PRI_HIGH;
+            break;
+        case FILE_PRIORITY_NORMAL_TAG:
+            priority = TR_PRI_NORMAL;
+            break;
+        case FILE_PRIORITY_LOW_TAG:
+            priority = TR_PRI_LOW;
+    }
     
     NSIndexSet * indexSet = [fOutline selectedRowIndexes];
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
@@ -273,7 +293,7 @@
         
         NSIndexSet * indexSet = [fOutline selectedRowIndexes];
         NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-        int i, state = (menuItem == fFileCheckItem) ? NSOnState : NSOffState;
+        int i, state = ([menuItem tag] == FILE_CHECK_TAG) ? NSOnState : NSOffState;
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
             [itemIndexes addIndexes: [[fOutline itemAtRow: i] objectForKey: @"Indexes"]];
         
@@ -307,12 +327,17 @@
         BOOL current = NO, other = NO;
         int i, priority;
         
-        if (menuItem == fFilePriorityHigh)
-            priority = TR_PRI_HIGH;
-        else if (menuItem == fFilePriorityLow)
-            priority = TR_PRI_LOW;
-        else
-            priority = TR_PRI_NORMAL;
+        switch ([menuItem tag])
+        {
+            case FILE_PRIORITY_HIGH_TAG:
+                priority = TR_PRI_HIGH;
+                break;
+            case FILE_PRIORITY_NORMAL_TAG:
+                priority = TR_PRI_NORMAL;
+                break;
+            case FILE_PRIORITY_LOW_TAG:
+                priority = TR_PRI_LOW;
+        }
         
         NSIndexSet * fileIndexSet;
         for (i = [indexSet firstIndex]; i != NSNotFound && (!current || !other); i = [indexSet indexGreaterThanIndex: i])
@@ -331,6 +356,83 @@
     }
     
     return YES;
+}
+
+@end
+
+@implementation FileOutlineController (Private)
+
+- (NSMenu *) menu
+{
+    NSMenu * menu = [[NSMenu alloc] initWithTitle: @"File Outline Menu"];
+    
+    //check and uncheck
+    NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Check Selected", "File Outline -> Menu")
+                            action: @selector(setCheck:) keyEquivalent: @""];
+    [item setTarget: self];
+    [item setTag: FILE_CHECK_TAG];
+    [menu addItem: item];
+    [item release];
+    
+    item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Uncheck Selected", "File Outline -> Menu")
+            action: @selector(setCheck:) keyEquivalent: @""];
+    [item setTarget: self];
+    [item setTag: FILE_UNCHECK_TAG];
+    [menu addItem: item];
+    [item release];
+    
+    //only check selected
+    item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Only Check Selected", "File Outline -> Menu")
+            action: @selector(setOnlySelectedCheck:) keyEquivalent: @""];
+    [item setTarget: self];
+    [menu addItem: item];
+    [item release];
+    
+    [menu addItem: [NSMenuItem separatorItem]];
+    
+    //priority
+    item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Priority", "File Outline -> Menu") action: NULL keyEquivalent: @""];
+    NSMenu * priorityMenu = [[NSMenu alloc] initWithTitle: @"File Priority Menu"];
+    [item setSubmenu: priorityMenu];
+    [menu addItem: item];
+    [item release];
+    
+    item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"High", "File Outline -> Priority Menu")
+            action: @selector(setPriority:) keyEquivalent: @""];
+    [item setTarget: self];
+    [item setTag: FILE_PRIORITY_HIGH_TAG];
+    [item setImage: [NSImage imageNamed: @"PriorityHigh.png"]];
+    [priorityMenu addItem: item];
+    [item release];
+    
+    item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Normal", "File Outline -> Priority Menu")
+            action: @selector(setPriority:) keyEquivalent: @""];
+    [item setTarget: self];
+    [item setTag: FILE_PRIORITY_NORMAL_TAG];
+    [item setImage: [NSImage imageNamed: @"PriorityNormal.png"]];
+    [priorityMenu addItem: item];
+    [item release];
+    
+    item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Low", "File Outline -> Priority Menu")
+            action: @selector(setPriority:) keyEquivalent: @""];
+    [item setTarget: self];
+    [item setTag: FILE_PRIORITY_LOW_TAG];
+    [item setImage: [NSImage imageNamed: @"PriorityLow.png"]];
+    [priorityMenu addItem: item];
+    [item release];
+    
+    [priorityMenu release];
+    
+    [menu addItem: [NSMenuItem separatorItem]];
+    
+    //reveal in finder
+    item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Reveal in Finder", "File Outline -> Menu")
+            action: @selector(revealFile:) keyEquivalent: @""];
+    [item setTarget: self];
+    [menu addItem: item];
+    [item release];
+    
+    return [menu autorelease];
 }
 
 @end

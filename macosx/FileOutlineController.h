@@ -32,9 +32,6 @@
     Torrent * fTorrent;
     
     IBOutlet FileOutlineView * fOutline;
-    
-    IBOutlet NSMenuItem * fFileCheckItem, * fFileUncheckItem,
-                        * fFilePriorityNormal, * fFilePriorityHigh, * fFilePriorityLow;
 }
 
 - (void) setTorrent: (Torrent *) torrent;
