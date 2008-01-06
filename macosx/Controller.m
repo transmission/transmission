@@ -132,7 +132,7 @@ typedef enum
 #define SUPPORT_FOLDER  @"/Library/Application Support/Transmission/Transfers.plist"
 
 #define WEBSITE_URL @"http://www.transmissionbt.com/"
-#define FORUM_URL   @"http://www.transmissionbt.com/forum/"
+#define FORUM_URL   @"http://forum.transmissionbt.com/"
 #define DONATE_URL  @"http://www.transmissionbt.com/donate.php"
 
 void sleepCallBack(void * controller, io_service_t y, natural_t messageType, void * messageArgument)
