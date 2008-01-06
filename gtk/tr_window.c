@@ -394,8 +394,9 @@ filter_entry_changed( GtkEditable * e, gpointer vprivate )
 {
     char * pch;
     PrivateData * p = (PrivateData*) vprivate;
-    g_free( p->filter_text );
+
     pch = gtk_editable_get_chars( e, 0, -1 );
+    g_free( p->filter_text );
     p->filter_text = g_ascii_strdown( pch, -1 );
     refilter( p );
     g_free( pch );
@@ -410,17 +411,6 @@ entry_icon_released( SexyIconEntry         * entry UNUSED,
     if ( icon_pos == SEXY_ICON_ENTRY_PRIMARY )
         gtk_menu_popup ( GTK_MENU( menu ), 0, 0, 0, 0, 0, gtk_get_current_event_time( ) );
 }
-
-static void
-entry_icon_released_2( SexyIconEntry         * entry,
-                       SexyIconEntryPosition   icon_pos,
-                       int                     button UNUSED,
-                       gpointer                vprivate UNUSED )
-{
-    if ( icon_pos == SEXY_ICON_ENTRY_SECONDARY )
-        gtk_editable_delete_text( GTK_EDITABLE( entry ), 0, -1 );
-}
-
 
 /***
 ****  PUBLIC
@@ -533,10 +523,8 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     for( l=toggles; l!=NULL; l=l->next )
         g_object_set_data( G_OBJECT( l->data ), FILTER_TOGGLES_KEY, toggles );
     s = sexy_icon_entry_new( );
-    image = gtk_image_new_from_stock(GTK_STOCK_CLEAR, GTK_ICON_SIZE_MENU );
-    sexy_icon_entry_set_icon( SEXY_ICON_ENTRY(s), SEXY_ICON_ENTRY_SECONDARY, GTK_IMAGE(image) );
-    sexy_icon_entry_set_icon_highlight( SEXY_ICON_ENTRY(s), SEXY_ICON_ENTRY_SECONDARY, TRUE );
-    image = gtk_image_new_from_stock( "tr-search-pulldown", GTK_ICON_SIZE_MENU );
+    sexy_icon_entry_add_clear_button( SEXY_ICON_ENTRY(s) );
+    image = gtk_image_new_from_stock( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
     sexy_icon_entry_set_icon( SEXY_ICON_ENTRY(s), SEXY_ICON_ENTRY_PRIMARY, GTK_IMAGE(image) );
     sexy_icon_entry_set_icon_highlight( SEXY_ICON_ENTRY(s), SEXY_ICON_ENTRY_PRIMARY, TRUE );
     gtk_box_pack_end( GTK_BOX( h ), s, FALSE, FALSE, 0 );
@@ -556,7 +544,6 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
         gtk_widget_show( w );
     }
     g_signal_connect( s, "icon-released", G_CALLBACK(entry_icon_released), menu );
-    g_signal_connect( s, "icon-released", G_CALLBACK( entry_icon_released_2 ), p );
 
 
     /* workarea */
@@ -590,6 +577,7 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     p->pref_handler_id = g_signal_connect( core, "prefs-changed",
                                            G_CALLBACK(prefsChanged), self );
 
+    filter_entry_changed( GTK_EDITABLE( s ), p );
     return self;
 }
 

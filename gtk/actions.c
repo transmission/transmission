@@ -178,8 +178,7 @@ const BuiltinIconInfo my_builtin_icons [] =
     { tr_icon_lock, "transmission-lock" },
     { tr_arrow_down, "tr-arrow-down" },
     { tr_arrow_up, "tr-arrow-up" },
-    { tr_yin_yang, "tr-yin-yang" },
-    { tr_search_pulldown, "tr-search-pulldown" }
+    { tr_yin_yang, "tr-yin-yang" }
 };
 
 static void
