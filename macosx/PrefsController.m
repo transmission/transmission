@@ -56,11 +56,16 @@
         fDefaults = [NSUserDefaults standardUserDefaults];
         fHandle = handle;
         
-        //checks for old version upload speed of -1
+        //checks for old version speeds of -1
         if ([fDefaults integerForKey: @"UploadLimit"] < 0)
         {
             [fDefaults setInteger: 20 forKey: @"UploadLimit"];
             [fDefaults setBool: NO forKey: @"CheckUpload"];
+        }
+        if ([fDefaults integerForKey: @"DownloadLimit"] < 0)
+        {
+            [fDefaults setInteger: 20 forKey: @"DownloadLimit"];
+            [fDefaults setBool: NO forKey: @"CheckDownload"];
         }
         
         //check for old version download location
