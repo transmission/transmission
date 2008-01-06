@@ -110,6 +110,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
 
 - (void)  newclient: (NSNotification *) notification;
 - (void) killclient: (IPCClient *) client;
+
 NSUserDefaults          * fDefaults;
 PrefsController         * fPrefsController;
 
@@ -792,8 +793,7 @@ void msg_getbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg 
             [client sendrespInt:IPC_MSG_AUTOSTART tag:tag val:[fDefaults boolForKey:@"AutoStartDownload"]];
             break;
         case IPC_MSG_GETPEX:
-//warning we dont support this :(
-            [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
+            [client sendrespInt:IPC_MSG_PEX tag:tag val:[fDefaults boolForKey:@"PEXGlobal"]];
             break;
         default:
             assert( 0 );
@@ -883,6 +883,7 @@ void msg_setbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg 
     {
         case IPC_MSG_AUTOMAP:
             [fDefaults setBool:(bool)val->val.i forKey:@"NatTraversal"];
+            [fPrefsController setNat:nil];
             [client sendrespEmpty:IPC_MSG_OK tag:tag];
             break;
         case IPC_MSG_AUTOSTART:
@@ -890,8 +891,9 @@ void msg_setbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg 
             [client sendrespEmpty:IPC_MSG_OK tag:tag];
             break;
         case IPC_MSG_PEX:
-//warning we dont support this :(
-            [client sendrespEmpty: IPC_MSG_FAIL tag: tag];
+            [fDefaults setBool:(bool)val->val.i forKey:@"PEXGlobal"];
+            [fPrefsController setPEX:nil];
+            [client sendrespEmpty: IPC_MSG_OK tag: tag];
             break;
         default:
             assert( 0 );
@@ -963,7 +965,7 @@ void msg_setstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     {
         case IPC_MSG_DIR:
              [fDefaults setObject:[NSString stringWithCString: val->val.s.s] forKey:@"DownloadFolder"];
-             [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"]; //not sure about this line
+             [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
              [client sendrespEmpty: IPC_MSG_OK tag: tag];
              break;
             
@@ -985,7 +987,7 @@ void msg_setstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
                 [fDefaults setBool:NO  forKey: @"EncryptionPrefer"];
                 [fDefaults setBool:NO  forKey: @"EncryptionRequire"];
             }
-            
+            [fPrefsController setEncryptionMode:nil];
             [client sendrespEmpty: IPC_MSG_OK tag: tag];
             break;
            
