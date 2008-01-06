@@ -63,6 +63,11 @@
             [fDefaults setInteger: 20 forKey: @"UploadLimit"];
             [fDefaults setBool: NO forKey: @"CheckUpload"];
         }
+        if ([fDefaults integerForKey: @"DownloadLimit"] < 0)
+        {
+            [fDefaults setInteger: 20 forKey: @"DownloadLimit"];
+            [fDefaults setBool: NO forKey: @"CheckDownload"];
+        }
         
         //set check for update to right value
         [self setCheckForUpdate: nil];
