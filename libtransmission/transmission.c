@@ -55,29 +55,25 @@ uint8_t*
 tr_peerIdNew( void )
 {
     int i;
+    int val;
     int total = 0;
     uint8_t * buf = tr_new( uint8_t, 21 );
     const char * pool = "0123456789abcdefghijklmnopqrstuvwxyz";
-    const int base = strlen( pool );
+    const int base = 36;
 
     memcpy( buf, PEERID_PREFIX, 8 );
 
     for( i=8; i<19; ++i ) {
-        const int val = tr_rand( base );
+        val = tr_rand( base );
         total += val;
         buf[i] = pool[val];
     }
 
-    if( 1 ) {
-        int val = 0;
-        while( ( total + val ) % base )
-            ++val;
-        buf[19] = pool[val];
-        total += val;
-    }
-
-    assert( ( total % base ) == 0 );
+    val = total % base ? base - (total % base) : 0;
+    total += val;
+    buf[19] = pool[val];
     buf[20] = '\0';
+
     return buf;
 }
 

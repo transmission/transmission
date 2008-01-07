@@ -4,19 +4,22 @@
 #include "peer-mgr.h"
 #include "utils.h"
 
+#define VERBOSE 0
 
 #define check(A) { \
     ++test; \
-    if (A) \
-        fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-    else { \
-        fprintf( stderr, "FAILPASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
+    if (A) { \
+        if( VERBOSE ) \
+            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
+    } else { \
+        if( VERBOSE ) \
+            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
         return test; \
     } \
 }
 
-
-int main( void )
+int
+main( void )
 {
     uint32_t i;
     int test = 0;

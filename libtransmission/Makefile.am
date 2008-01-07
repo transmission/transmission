@@ -73,7 +73,8 @@ noinst_HEADERS = \
 
 
 noinst_PROGRAMS = \
-    test-fastset
+    test-fastset \
+    test-peer-id
 
 TESTS = $(noinst_PROGRAMS)
 
@@ -86,6 +87,8 @@ TEST_LDADD = \
 
 test_fastset_SOURCES = test-fastset.c
 test_fastset_LDADD = $(TEST_LDADD)
+test_peer_id_SOURCES = test-peer-id.c
+test_peer_id_LDADD = $(TEST_LDADD)
 
 
 
