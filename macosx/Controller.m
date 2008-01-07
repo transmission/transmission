@@ -905,10 +905,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         return;
     
     NSAlert * alert = [[NSAlert alloc] init];
-    [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"A transfer of \"%@\" is already running.",
+    [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"A transfer of \"%@\" already exists.",
                             "Open duplicate alert -> title"), name]];
     [alert setInformativeText:
-            NSLocalizedString(@"The torrent file cannot be opened because it is a duplicate of an already running transfer.",
+            NSLocalizedString(@"The torrent file cannot be opened because it is a duplicate of an already added transfer.",
                             "Open duplicate alert -> message")];
     [alert setAlertStyle: NSWarningAlertStyle];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate alert -> button")];
