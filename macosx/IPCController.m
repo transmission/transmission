@@ -551,11 +551,6 @@ void msg_lookup( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient      * client = arg;
     NSArray        * hashes, * tors;
-    benc_val_t       packet, * pkinf;
-    NSEnumerator   * enumerator;
-    Torrent        * tor;
-    uint8_t        * buf;
-    size_t           size;
 
     hashes = bencarray( val, TYPE_STR );
     if( NULL == hashes )
@@ -692,7 +687,6 @@ void msg_addold( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
     NSArray   * paths;
-    BOOL        res;
 
     paths = bencarray( val, TYPE_STR );
     if( nil == paths )
