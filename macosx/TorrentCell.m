@@ -110,14 +110,64 @@
 - (id) copyWithZone: (NSZone *) zone
 {
     TorrentCell * copy = [super copyWithZone: zone];
+    
+    copy->fTitleAttributes = [fTitleAttributes retain];
+    copy->fStatusAttributes = [fStatusAttributes retain];
+    
     copy->fBitmap = nil;
+    
+    copy->fGrayColor = [fGrayColor retain];
+    copy->fBlue1Color = [fBlue1Color retain];
+    copy->fBlue2Color = [fBlue2Color retain];
+    copy->fBlue3Color = [fBlue3Color retain];
+    copy->fBlue4Color = [fBlue4Color retain];
+    copy->fBlueColor = [fBlueColor retain];
+    copy->fOrangeColor = [fOrangeColor retain];
+    
+    copy->fBarOverlayColor = [fBarOverlayColor retain];
+    
+    copy->fGrayGradient = [fGrayGradient retain];
+    copy->fLightGrayGradient = [fLightGrayGradient retain];
+    copy->fBlueGradient = [fBlueGradient retain];
+    copy->fDarkBlueGradient = [fDarkBlueGradient retain];
+    copy->fGreenGradient = [fGreenGradient retain];
+    copy->fLightGreenGradient = [fLightGreenGradient retain];
+    copy->fDarkGreenGradient = [fDarkGreenGradient retain];
+    copy->fYellowGradient = [fYellowGradient retain];
+    copy->fRedGradient = [fRedGradient retain];
+    copy->fTransparentGradient = [fTransparentGradient retain];
     
     return copy;
 }
 
 - (void) dealloc
 {
+    [fTitleAttributes release];
+    [fStatusAttributes release];
+    
     [fBitmap release];
+    
+    [fGrayColor release];
+    [fBlue1Color release];
+    [fBlue2Color release];
+    [fBlue3Color release];
+    [fBlue4Color release];
+    [fBlueColor release];
+    [fOrangeColor release];
+    
+    [fBarOverlayColor release];
+    
+    [fGrayGradient release];
+    [fLightGrayGradient release];
+    [fBlueGradient release];
+    [fDarkBlueGradient release];
+    [fGreenGradient release];
+    [fLightGreenGradient release];
+    [fDarkGreenGradient release];
+    [fYellowGradient release];
+    [fRedGradient release];
+    [fTransparentGradient release];
+    
     [super dealloc];
 }
 
@@ -223,7 +273,7 @@
     BOOL error = [torrent isError];
     if (error && !fErrorImage)
     {
-        fErrorImage = [[NSImage imageNamed: @"Error.png"] copy];
+        fErrorImage = [NSImage imageNamed: @"Error.png"];
         [fErrorImage setFlipped: YES];
     }
     

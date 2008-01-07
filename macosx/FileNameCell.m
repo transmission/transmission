@@ -83,6 +83,7 @@
     
     copy->fTitleAttributes = [fTitleAttributes retain];
     copy->fStatusAttributes = [fStatusAttributes retain];
+    
     copy->fFolderImage = [fFolderImage retain];
     
     return copy;
