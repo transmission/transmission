@@ -104,7 +104,7 @@ struct tr_tracker
        closed and opened again without quitting Transmission ...
        change the peerid. It would help sometimes if a stopped event
        was missed to ensure that we didn't think someone was cheating. */
-    char peer_id[TR_ID_LEN + 1];
+    uint8_t * peer_id;
 
     /* these are set from the latest tracker response... -1 is 'unknown' */
     int timesDownloaded;
@@ -1058,6 +1058,7 @@ onTrackerFreeNow( void * vt )
     tr_publisherFree( &t->publisher );
     tr_free( t->name );
     tr_free( t->trackerID );
+    tr_free( t->peer_id );
 
     /* addresses... */
     for( i=0; i<t->addressCount; ++i )
@@ -1133,7 +1134,9 @@ tr_trackerGetCounts( const tr_tracker  * t,
 void
 tr_trackerStart( tr_tracker * t )
 {
-    tr_peerIdNew( t->peer_id, sizeof(t->peer_id) );
+    tr_free( t->peer_id );
+    t->peer_id = tr_peerIdNew( );
+
     if( t->isRunning == 0 ) {
         t->isRunning = 1;
         enqueueRequest( t->handle, t, TR_REQ_STARTED );

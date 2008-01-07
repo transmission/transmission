@@ -49,7 +49,9 @@ int tr_trackerInfoInit( struct tr_tracker_info  * info,
 
 void tr_trackerInfoClear( struct tr_tracker_info * info );
 
-void tr_peerIdNew ( char* buf, int buflen );
+uint8_t* tr_peerIdNew( void );
+
+const uint8_t* tr_getPeerId( void );
 
 struct tr_handle
 {

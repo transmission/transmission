@@ -96,8 +96,6 @@ typedef enum
 }
 tr_recheck_state;
 
-#define TR_ID_LEN  20
-
 struct tr_torrent
 {
     tr_handle                 * handle;
