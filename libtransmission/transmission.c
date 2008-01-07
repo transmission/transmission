@@ -51,30 +51,43 @@
    characters, where x is the major version number, y is the
    minor version number, z is the maintenance number, and b
    designates beta (Azureus-style) */
-void
-tr_peerIdNew ( char * buf, int buflen )
+uint8_t*
+tr_peerIdNew( void )
 {
     int i;
-    assert( buflen == TR_ID_LEN + 1 );
+    int total = 0;
+    uint8_t * buf = tr_new( uint8_t, 21 );
+    const char * pool = "0123456789abcdefghijklmnopqrstuvwxyz";
+    const int base = strlen( pool );
 
-    snprintf( buf, TR_ID_LEN, "%s", PEERID_PREFIX );
-    assert( strlen(buf) == 8 );
-    for( i=8; i<TR_ID_LEN; ++i ) {
-        const int r = tr_rand( 36 );
-        buf[i] = ( r < 26 ) ? ( 'a' + r ) : ( '0' + r - 26 ) ;
+    memcpy( buf, PEERID_PREFIX, 8 );
+
+    for( i=8; i<19; ++i ) {
+        const int val = tr_rand( base );
+        total += val;
+        buf[i] = pool[val];
     }
-    buf[TR_ID_LEN] = '\0';
+
+    if( 1 ) {
+        int val = 0;
+        while( ( total + val ) % base )
+            ++val;
+        buf[19] = pool[val];
+        total += val;
+    }
+
+    assert( ( total % base ) == 0 );
+    buf[20] = '\0';
+    return buf;
 }
 
-const char*
-getPeerId( void )
+const uint8_t*
+tr_getPeerId( void )
 {
-    static char * peerId = NULL;
-    if( !peerId ) {
-        peerId = tr_new0( char, TR_ID_LEN + 1 );
-        tr_peerIdNew( peerId, TR_ID_LEN + 1 );
-    }
-    return peerId;
+    static uint8_t * id = NULL;
+    if( id == NULL )
+        id = tr_peerIdNew( );
+    return id;
 }
 
 /***
