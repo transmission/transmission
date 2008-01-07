@@ -287,7 +287,7 @@ readargs( int argc, char ** argv, struct opts * opts )
         { "type",               required_argument, NULL, 't' },
         { "upload-limit",       required_argument, NULL, 'u' },
         { "upload-unlimited",   no_argument,       NULL, 'U' },
-        { "proxy",              no_argument,       NULL, 'U' },
+        { "proxy",              no_argument,       NULL, 'x' },
         { NULL, 0, NULL, 0 }
     };
     int opt, gotmsg;
