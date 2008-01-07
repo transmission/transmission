@@ -803,7 +803,7 @@ ipc_addstat( benc_val_t * list, int tor,
             case IPC_ST_ERRMSG:
                 if( '\0' == st->errorString[0] )
                 {
-                    tr_bencInitStr( item, "other", -1, 1 );
+                    tr_bencInitStr( item, "", -1, 1 );
                 }
                 else if( tr_bencInitStrDup( item, st->errorString ) )
                 {
