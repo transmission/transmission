@@ -6,6 +6,13 @@ SUBDIRS = images
 
 bin_PROGRAMS = xmission
 
+noinst_HEADERS = \
+    filter.h \
+    foreach.h \
+    speed-stats.h \
+    torrent-list.h \
+    torrent-stats.h
+
 xmission_SOURCES = \
     speed-stats.cc \
     filter.cc \
