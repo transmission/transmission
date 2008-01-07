@@ -75,7 +75,7 @@
 
 @implementation TorrentCell
 
-//only called once, so don't worry about releasing
+//only called once and the main table is always needed, so don't worry about releasing
 - (id) init
 {
     if ((self = [super init]))
@@ -111,20 +111,7 @@
 {
     TorrentCell * copy = [super copyWithZone: zone];
     
-    copy->fTitleAttributes = [fTitleAttributes retain];
-    copy->fStatusAttributes = [fStatusAttributes retain];
-    
     copy->fBitmap = nil;
-    
-    copy->fGrayColor = [fGrayColor retain];
-    copy->fBlue1Color = [fBlue1Color retain];
-    copy->fBlue2Color = [fBlue2Color retain];
-    copy->fBlue3Color = [fBlue3Color retain];
-    copy->fBlue4Color = [fBlue4Color retain];
-    copy->fBlueColor = [fBlueColor retain];
-    copy->fOrangeColor = [fOrangeColor retain];
-    
-    copy->fBarOverlayColor = [fBarOverlayColor retain];
     
     copy->fGrayGradient = [fGrayGradient retain];
     copy->fLightGrayGradient = [fLightGrayGradient retain];
@@ -142,20 +129,7 @@
 
 - (void) dealloc
 {
-    [fTitleAttributes release];
-    [fStatusAttributes release];
-    
     [fBitmap release];
-    
-    [fGrayColor release];
-    [fBlue1Color release];
-    [fBlue2Color release];
-    [fBlue3Color release];
-    [fBlue4Color release];
-    [fBlueColor release];
-    [fOrangeColor release];
-    
-    [fBarOverlayColor release];
     
     [fGrayGradient release];
     [fLightGrayGradient release];
