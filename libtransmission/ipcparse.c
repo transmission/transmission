@@ -761,7 +761,7 @@ ipc_addstat( benc_val_t * list, int tor,
                 error = st->error;
                 if( TR_OK == error )
                 {
-                    tr_bencInitStr( item, "other", -1, 1 );
+                    tr_bencInitStr( item, "", -1, 1 );
                 }
                 else if( TR_ERROR_ISSET( TR_ERROR_ASSERT, error ) )
                 {
@@ -801,9 +801,13 @@ ipc_addstat( benc_val_t * list, int tor,
                 }
                 break;
             case IPC_ST_ERRMSG:
-                if( '\0' == st->errorString[0] )
+                if( TR_OK == st->error )
                 {
                     tr_bencInitStr( item, "", -1, 1 );
+                }
+                else if( '\0' == st->errorString[0] )
+                {
+                    tr_bencInitStr( item, "other", -1, 1 );
                 }
                 else if( tr_bencInitStrDup( item, st->errorString ) )
                 {
