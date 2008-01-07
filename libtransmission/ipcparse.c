@@ -839,7 +839,7 @@ ipc_addstat( benc_val_t * list, int tor,
                                 st->peersFrom[TR_PEER_FROM_PEX] );
                 break;
             case IPC_ST_PEERTOTAL:
-                tr_bencInitInt( item, st->peersKnown );
+                tr_bencInitInt( item, st->peersConnected );
                 break;
             case IPC_ST_PEERUP:
                 tr_bencInitInt( item, st->peersGettingFromUs );
