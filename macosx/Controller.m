@@ -2888,6 +2888,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [segmentedControl setSegmentCount: 2];
         [segmentedCell setTrackingMode: NSSegmentSwitchTrackingMomentary];
         
+        NSSize groupSize = NSMakeSize(72.0, 25.0);
+        [groupItem setMinSize: groupSize];
+        [groupItem setMaxSize: groupSize];
+        
         [groupItem setLabel: NSLocalizedString(@"Apply All", "All toolbar item -> label")];
         [groupItem setPaletteLabel: NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label")];
         [groupItem setTarget: self];
@@ -2907,10 +2911,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         [groupItem createMenu: [NSArray arrayWithObjects: NSLocalizedString(@"Pause All", "All toolbar item -> label"),
                                         NSLocalizedString(@"Resume All", "All toolbar item -> label"), nil]];
-        
-        NSSize groupSize = NSMakeSize(72.0, 25.0);
-        [groupItem setMinSize: groupSize];
-        [groupItem setMaxSize: groupSize];
         
         [segmentedControl release];
         return [groupItem autorelease];
