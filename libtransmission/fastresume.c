@@ -430,15 +430,15 @@ parseProgress( tr_torrent     * tor,
         /* compare file mtimes */
         tr_time_t * curMTimes = getMTimes( tor, &n );
         const uint8_t * walk = buf;
-        const tr_time_t * oldMTimes = (const tr_time_t *) walk;
+        tr_time_t mtime;
         for( i=0; i<n; ++i ) {
-            if ( curMTimes[i] == oldMTimes[i] )
+            readBytes( &mtime, &walk, sizeof(tr_time_t) );
+            if ( curMTimes[i] == mtime )
                 tr_torrentSetFileChecked( tor, i, TRUE );
             else
                 tr_dbg( "File '%s' recheck needed", tor->info.files[i].name );
         }
         free( curMTimes );
-        walk += n * sizeof(tr_time_t);
 
         /* get the completion bitfield */
         memset( &bitfield, 0, sizeof bitfield );
