@@ -548,11 +548,16 @@ parsePeers( tr_torrent * tor, const uint8_t * buf, uint32_t len )
 
     if( !tor->info.isPrivate )
     {
+        int i;
         const int count = len / sizeof(tr_pex);
-        tr_peerMgrAddPex( tor->handle->peerMgr,
-                          tor->info.hash,
-                          TR_PEER_FROM_CACHE,
-                          (tr_pex*)buf, count );
+
+        for( i=0; i<count; ++i )
+        {
+            tr_pex pex;
+            readBytes( &pex, &buf, sizeof( tr_pex ) );
+            tr_peerMgrAddPex( tor->handle->peerMgr, tor->info.hash, TR_PEER_FROM_CACHE, &pex );
+        }
+
         tr_dbg( "found %i peers in resume file", count );
         ret = TR_FR_PEERS;
     }

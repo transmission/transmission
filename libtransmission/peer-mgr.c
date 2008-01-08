@@ -1075,17 +1075,13 @@ void
 tr_peerMgrAddPex( tr_peerMgr     * manager,
                   const uint8_t  * torrentHash,
                   uint8_t          from,
-                  const tr_pex   * pex,
-                  int              pexCount )
+                  const tr_pex   * pex )
 {
     Torrent * t;
-    const tr_pex * end;
-
     managerLock( manager );
 
     t = getExistingTorrent( manager, torrentHash );
-    for( end=pex+pexCount; pex!=end; ++pex )
-        ensureAtomExists( t, &pex->in_addr, pex->port, pex->flags, from );
+    ensureAtomExists( t, &pex->in_addr, pex->port, pex->flags, from );
 
     managerUnlock( manager );
 }
