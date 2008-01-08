@@ -729,13 +729,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         return;
     }
     
-    Torrent * torrent;
-    NSString * torrentPath;
-    tr_info info;
-    NSEnumerator * enumerator = [filenames objectEnumerator];
-    
     BOOL showWindow = type == ADD_SHOW_OPTIONS || [fDefaults boolForKey: @"DownloadAsk"];
-    
     torrentFileState deleteTorrentFile;
     switch (type)
     {
@@ -749,18 +743,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             deleteTorrentFile = TORRENT_FILE_DEFAULT;
     }
     
+    Torrent * torrent;
+    NSString * torrentPath;
+    tr_info info;
+    NSEnumerator * enumerator = [filenames objectEnumerator];
     while ((torrentPath = [enumerator nextObject]))
     {
-        NSString * location;
-        if (path)
-            location = [path stringByExpandingTildeInPath];
-        else if ([fDefaults boolForKey: @"DownloadLocationConstant"])
-            location = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
-        else if (type != ADD_URL)
-            location = [torrentPath stringByDeletingLastPathComponent];
-        else
-            location = nil;
-        
+        //ensure torrent doesn't already exist
         tr_ctor * ctor = tr_ctorNew(fLib);
         tr_ctorSetMetainfoFromFile(ctor, [torrentPath UTF8String]);
         if (tr_torrentParse(fLib, ctor, &info) == TR_EDUPLICATE)
@@ -772,6 +761,17 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         tr_metainfoFree(&info);
         tr_ctorFree(ctor);
         
+        //determine download location
+        NSString * location;
+        if (path)
+            location = [path stringByExpandingTildeInPath];
+        else if ([fDefaults boolForKey: @"DownloadLocationConstant"])
+            location = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
+        else if (type != ADD_URL)
+            location = [torrentPath stringByDeletingLastPathComponent];
+        else
+            location = nil;
+        
         if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location
                             deleteTorrentFile: showWindow ? TORRENT_FILE_SAVE : deleteTorrentFile lib: fLib]))
             continue;
@@ -779,7 +779,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         //add it to the "File -> Open Recent" menu
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
         
-        if (showWindow)
+        //show the add window or add directly
+        if (showWindow || !location)
         {
             AddWindowController * addController = [[AddWindowController alloc] initWithTorrent: torrent destination: location
                                                     controller: self deleteTorrent: deleteTorrentFile];
@@ -801,6 +802,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) askOpenConfirmed: (AddWindowController *) addController add: (BOOL) add
 {
     Torrent * torrent = [addController torrent];
+    [addController release];
+    
     if (add)
     {
         [torrent setOrderValue: [fTorrents count]-1]; //ensure that queue order is always sequential
@@ -816,8 +819,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [torrent closeRemoveTorrent];
         [torrent release];
     }
-    
-    [addController release];
 }
 
 - (void) openCreatedFile: (NSNotification *) notification
