@@ -12,7 +12,8 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 - OS X:
    + Leopard: Better behavior with Time Machine
 - GTK+:
-   + New Dutch translation
+   + New Chinese, Dutch, and Turkish translations
+   + Fix 1.00 desktop internationalization error
 
 1.00 (2008/01/04)
 - All Platforms:
