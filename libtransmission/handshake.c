@@ -699,8 +699,8 @@ readPeerId( tr_handshake * handshake, struct evbuffer * inbuf )
 
     /* if we've somehow connected to ourselves, don't keep the connection */
     peerIsGood = memcmp( handshake->peer_id, tr_getPeerId(), PEER_ID_LEN ) ? 1 : 0;
-    tr_handshakeDone( handshake, peerIsGood );
     dbgmsg( handshake, "isPeerGood == %d", peerIsGood );
+    tr_handshakeDone( handshake, peerIsGood );
     return READ_DONE;
 }
 
