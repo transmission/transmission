@@ -3958,6 +3958,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     if (!torrents)
         torrents = [NSArray arrayWithArray: fTorrents];
+    [torrents retain];
 
     [self confirmRemoveTorrents: torrents deleteData: NO deleteTorrent: NO];
 
