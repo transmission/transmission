@@ -50,8 +50,7 @@ void tr_peerMgrAddPeers( tr_peerMgr     * manager,
 void tr_peerMgrAddPex( tr_peerMgr     * manager,
                        const uint8_t  * torrentHash,
                        uint8_t          from,
-                       const tr_pex   * pex,
-                       int              pexCount );
+                       const tr_pex   * pex );
 
 void tr_peerMgrSetBlame( tr_peerMgr     * manager,
                          const uint8_t  * torrentHash,
