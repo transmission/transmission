@@ -812,6 +812,10 @@ tr_torrentSetHasPiece( tr_torrent * tor, int pieceIndex, int has )
 {
     tr_torrentLock( tor );
 
+    assert( tor != NULL );
+    assert( pieceIndex >= 0 );
+    assert( pieceIndex < tor->info.pieceCount );
+
     if( has )
         tr_cpPieceAdd( tor->completion, pieceIndex );
     else
