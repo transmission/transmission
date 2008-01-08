@@ -7,6 +7,8 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 1.01 (2008/xx/yy)
 - All Platforms:
    + Improve reconnection to peers with imperfect network connections
+   + Fix 1.00 temporary freezing issue
+   + Fix 1.00 assertion failure
 - OS X:
    + Leopard: Better behavior with Time Machine
 - GTK+:
