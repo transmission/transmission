@@ -160,6 +160,7 @@
     if ([fDeleteCheck state] == NSOnState)
         [fTorrent trashTorrent];
     
+    //ensure last, since it releases this controller
     [fController askOpenConfirmed: self add: YES];
 }
 

@@ -273,7 +273,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 && [fDefaults integerForKey: @"StalledMinutes"] < [self stalledMinutes];
     
     //update queue for checking (from downloading to seeding), stalled, or error
-    if ((wasChecking && !fChecking) || (!wasStalled && fStalled) || (!wasError && fError && [self isActive]))
+    if ((wasChecking && !fChecking) || (wasStalled != fStalled) || (!wasError && fError && [self isActive]))
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 }
 
