@@ -157,10 +157,10 @@
     [fTorrent setWaitToStart: [fStartCheck state] == NSOnState];
     [fTorrent setGroupValue: [[fGroupPopUp selectedItem] tag]];
     
-    [fController askOpenConfirmed: self add: YES];
-    
     if ([fDeleteCheck state] == NSOnState)
         [fTorrent trashTorrent];
+    
+    [fController askOpenConfirmed: self add: YES];
 }
 
 - (void) cancelAdd: (id) sender
