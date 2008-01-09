@@ -1580,40 +1580,6 @@ popNextRequest( tr_peermsgs * msgs )
     return ret;
 }
 
-static void
-updatePeerStatus( tr_peermsgs * msgs )
-{
-    const time_t now = time( NULL );
-    tr_peer * peer = msgs->info;
-    tr_peer_status status = 0;
-
-    if( !msgs->peerSentBitfield )
-        status |= TR_PEER_STATUS_HANDSHAKE;
-
-    if( msgs->info->peerIsChoked )
-        status |= TR_PEER_STATUS_PEER_IS_CHOKED;
-
-    if( msgs->info->peerIsInterested )
-        status |= TR_PEER_STATUS_PEER_IS_INTERESTED;
-
-    if( msgs->info->clientIsChoked )
-        status |= TR_PEER_STATUS_CLIENT_IS_CHOKED;
-
-    if( msgs->info->clientIsInterested )
-        status |= TR_PEER_STATUS_CLIENT_IS_INTERESTED;
-
-    if( ( now - msgs->clientSentPieceDataAt ) < 3 )
-        status |= TR_PEER_STATUS_CLIENT_IS_SENDING;
-
-    if( ( now - msgs->peerSentPieceDataAt ) < 3 )
-        status |= TR_PEER_STATUS_PEER_IS_SENDING;
-
-    if( msgs->clientAskedFor != NULL )
-        status |= TR_PEER_STATUS_CLIENT_SENT_REQUEST;
-
-    peer->status = status;
-}
-
 static int
 pulse( void * vmsgs )
 {
@@ -1624,7 +1590,6 @@ pulse( void * vmsgs )
     tr_peerIoTryRead( msgs->io );
     pumpRequestQueue( msgs );
     expireOldRequests( msgs );
-    updatePeerStatus( msgs );
 
     if( msgs->sendingBlock )
     {
@@ -1884,7 +1849,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->handle = torrent->handle;
     m->torrent = torrent;
     m->io = info->io;
-    m->info->status = TR_PEER_STATUS_HANDSHAKE;
     m->info->clientIsChoked = 1;
     m->info->peerIsChoked = 1;
     m->info->clientIsInterested = 0;

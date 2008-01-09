@@ -72,16 +72,13 @@ static const int SWIFT_PERIOD_MSEC = 5000;
 enum
 {
     /* how frequently to change which peers are choked */
-    RECHOKE_PERIOD_MSEC = (1000),
+    RECHOKE_PERIOD_MSEC = (10 * 1000),
 
     /* how frequently to decide which peers live and die */
     RECONNECT_PERIOD_MSEC = (2 * 1000),
 
     /* how frequently to refill peers' request lists */
     REFILL_PERIOD_MSEC = 666,
-
-    /* don't change a peer's choke status more often than this */
-    MIN_CHOKE_PERIOD_SEC = 10,
 
     /* following the BT spec, we consider ourselves `snubbed' if 
      * we're we don't get piece data from a peer in this long */
@@ -1462,21 +1459,38 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
 
     for( i=0; i<size; ++i )
     {
+        char * pch;
         const tr_peer * peer = peers[i];
         const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
         tr_peer_stat * stat = ret + i;
 
         tr_netNtop( &peer->in_addr, stat->addr, sizeof(stat->addr) );
         strlcpy( stat->client, (peer->client ? peer->client : ""), sizeof(stat->client) );
-        stat->port             = peer->port;
-        stat->from             = atom->from;
-        stat->progress         = peer->progress;
-        stat->isEncrypted      = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
-        stat->uploadToRate     = peer->rateToPeer;
-        stat->downloadFromRate = peer->rateToClient;
-        stat->isDownloading    = stat->uploadToRate > 0.01;
-        stat->isUploading      = stat->downloadFromRate > 0.01;
-        stat->status           = peer->status;
+        stat->port               = peer->port;
+        stat->from               = atom->from;
+        stat->progress           = peer->progress;
+        stat->isEncrypted        = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
+        stat->uploadToRate       = peer->rateToPeer;
+        stat->downloadFromRate   = peer->rateToClient;
+        stat->peerIsChoked       = peer->peerIsChoked;
+        stat->peerIsInterested   = peer->peerIsInterested;
+        stat->clientIsChoked     = peer->clientIsChoked;
+        stat->clientIsInterested = peer->clientIsInterested;
+        stat->isIncoming         = tr_peerIoIsIncoming( peer->io );
+        stat->isDownloading      = stat->clientIsInterested && !stat->clientIsChoked;
+        stat->isUploading        = stat->peerIsInterested && !stat->peerIsChoked;
+
+        pch = stat->flagStr;
+        if( stat->isDownloading ) *pch++ = 'D';
+        else if( stat->clientIsInterested ) *pch++ = 'd';
+        if( stat->isUploading ) *pch++ = 'U';
+        else if( stat->peerIsInterested ) *pch++ = 'u';
+        if( !stat->clientIsChoked && !stat->clientIsInterested ) *pch++ = 'K';
+        if( !stat->peerIsChoked && !stat->peerIsInterested ) *pch++ = '?';
+        if( stat->isEncrypted ) *pch++ = 'E';
+        if( stat->from == TR_PEER_FROM_PEX ) *pch++ = 'X';
+        if( stat->isIncoming ) *pch++ = 'I';
+        *pch = '\0';
     }
 
     *setmeCount = size;
@@ -1492,11 +1506,10 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
 
 struct ChokeData
 {
-    tr_peer * peer;
-    int rate;
-    uint8_t preferred;
-    uint8_t preferred_t;
     uint8_t doUnchoke;
+    uint8_t isInterested;
+    uint32_t rate;
+    tr_peer * peer;
 };
 
 static int
@@ -1504,20 +1517,7 @@ compareChoke( const void * va, const void * vb )
 {
     const struct ChokeData * a = va;
     const struct ChokeData * b = vb;
-    if( a->rate > b->rate ) return -1;
-    if( a->rate < b->rate ) return 1;
-    if( a->preferred_t != b->preferred_t ) return a->preferred_t ? -1 : 1;
-    if( a->preferred   != b->preferred   ) return a->preferred   ? -1 : 1;
-    return 0;
-}
-
-static int
-clientIsSnubbedBy( const tr_peer * peer, int clientIsSeed )
-{
-    assert( peer != NULL );
-
-    return !clientIsSeed
-        && ( peer->peerSentPieceDataAt < (time(NULL) - SNUBBED_SEC ) );
+    return -tr_compareUint32( a->rate, b->rate );
 }
 
 /**
@@ -1525,7 +1525,7 @@ clientIsSnubbedBy( const tr_peer * peer, int clientIsSeed )
 **/
 
 static double
-getWeightedThroughput( const tr_peer * peer, int clientIsSeed )
+getWeightedRate( const tr_peer * peer, int clientIsSeed )
 {
     return (int)( 10.0 * ( clientIsSeed ? peer->rateToPeer
                                         : peer->rateToClient ) );
@@ -1534,8 +1534,7 @@ getWeightedThroughput( const tr_peer * peer, int clientIsSeed )
 static void
 rechoke( Torrent * t )
 {
-    int i, peerCount, size=0, unchoked=0;
-    const time_t fibrillationTime = time(NULL) - MIN_CHOKE_PERIOD_SEC;
+    int i, n, peerCount, size, unchokedInterested;
     tr_peer ** peers = getConnectedPeers( t, &peerCount );
     struct ChokeData * choke = tr_new0( struct ChokeData, peerCount );
     const int clientIsSeed = tr_torrentIsSeed( t->tor );
@@ -1543,35 +1542,48 @@ rechoke( Torrent * t )
     assert( torrentIsLocked( t ) );
     
     /* sort the peers by preference and rate */
-    for( i=0; i<peerCount; ++i )
+    for( i=0, size=0; i<peerCount; ++i )
     {
         tr_peer * peer = peers[i];
-        struct ChokeData * node;
-        if( peer->chokeChangedAt > fibrillationTime ) {
-            if( !peer->peerIsChoked )
-                ++unchoked;
-            continue;
+        if( peer->progress >= 1.0 ) /* choke all seeds */
+            tr_peerMsgsSetChoke( peer->msgs, TRUE );
+        else {
+            struct ChokeData * node = &choke[size++];
+            node->peer = peer;
+            node->isInterested = peer->peerIsInterested;
+            node->rate = getWeightedRate( peer, clientIsSeed );
         }
-
-        node = &choke[size++];
-        node->peer = peer;
-        node->preferred = peer->peerIsInterested && !clientIsSnubbedBy( peer, clientIsSeed );
-        node->preferred_t = node->preferred && peer->client && strstr( peer->client, "Transmission" );
-        node->rate = getWeightedThroughput( peer, clientIsSeed );
     }
 
     qsort( choke, size, sizeof(struct ChokeData), compareChoke );
 
-    for( i=0; i<size && unchoked<t->tor->maxUnchokedPeers; ++i ) {
+    /**
+     * Reciprocation and number of uploads capping is managed by unchoking
+     * the N peers which have the best upload rate and are interested.
+     * This maximizes the client's download rate. These N peers are
+     * referred to as downloaders, because they are interested in downloading
+     * from the client.
+     *
+     * Peers which have a better upload rate (as compared to the downloaders)
+     * but aren't interested get unchoked. If they become interested, the
+     * downloader with the worst upload rate gets choked. If a client has
+     * a complete file, it uses its upload rate rather than its download
+     * rate to decide which peers to unchoke. 
+     */
+    unchokedInterested = 0;
+    for( i=0; i<size && unchokedInterested<t->tor->maxUnchokedPeers; ++i ) {
         choke[i].doUnchoke = 1;
-        ++unchoked;
+        if( choke[i].isInterested )
+            ++unchokedInterested;
     }
+    n = i;
+    while( i<size )
+        choke[i++].doUnchoke = 0;
 
-    for( ; i<size; ++i ) {
-        ++unchoked;
+    /* optimistic unchoke */
+    if( i != size ) {
+        i = n + tr_rand( size - n );
         choke[i].doUnchoke = 1;
-        if( choke[i].peer->peerIsInterested )
-            break;
     }
 
     for( i=0; i<size; ++i )
@@ -1718,6 +1730,9 @@ compareCandidates( const void * va, const void * vb )
     const struct peer_atom * b = * (const struct peer_atom**) vb;
     int i;
 
+    if( a->piece_data_time > b->piece_data_time ) return -1;
+    if( a->piece_data_time < b->piece_data_time ) return  1;
+
     if(( i = tr_compareUint16( a->numFails, b->numFails )))
         return i;
 
@@ -1764,16 +1779,16 @@ getPeerCandidates( Torrent * t, int * setmeSize )
             continue;
 
         /* we're wasting our time trying to connect to this bozo. */
-        if( atom->numFails > 10 )
+        if( atom->numFails > 5 )
             continue;
 
         /* If we were connected to this peer recently and transferring
          * piece data, try to reconnect -- network troubles may have
          * disconnected us.  but if we weren't sharing piece data,
          * hold off on this peer to give another one a try instead */
-        if( ( now - atom->piece_data_time ) > 15 )
+        if( ( now - atom->piece_data_time ) > 30 )
         {
-            int minWait = 60;
+            int minWait = (60 * 2); /* two minutes */
             int maxWait = (60 * 20); /* twenty minutes */
             int wait = atom->numFails * 30; /* add 30 secs to the wait interval for each consecutive failure*/
             if( wait < minWait ) wait = minWait;
