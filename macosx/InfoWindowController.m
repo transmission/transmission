@@ -1085,10 +1085,7 @@ typedef enum
 - (void) updateInfoFiles
 {
     if ([fTorrents count] == 1)
-    {
-        [[fTorrents objectAtIndex: 0] updateFileStat];
         [fFileController reloadData];
-    }
 }
 
 - (NSView *) tabViewForTag: (int) tag

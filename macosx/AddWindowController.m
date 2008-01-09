@@ -33,8 +33,6 @@
 
 @interface AddWindowController (Private)
 
-- (void) updateTorrent;
-
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) contextInfo;
 
 - (void) setGroupsMenu;
@@ -118,8 +116,8 @@
         [fLocationImageView setImage: nil];
     }
     
-    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
-                selector: @selector(updateTorrent) userInfo: nil repeats: YES];
+    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: fFileController
+                selector: @selector(reloadData) userInfo: nil repeats: YES];
 }
 
 - (void) windowDidLoad
@@ -130,7 +128,7 @@
 }
 
 - (void) dealloc
-{NSLog(@"dealloc");
+{
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
     [fTimer invalidate];
@@ -188,7 +186,7 @@
 - (void) verifyLocalData: (id) sender
 {
     [fTorrent resetCache];
-    [self updateTorrent];
+    [fFileController reloadData];
 }
 
 - (void) updateGroupMenu: (NSNotification *) notification
@@ -215,12 +213,6 @@
 @end
 
 @implementation AddWindowController (Private)
-
-- (void) updateTorrent
-{
-    [fTorrent updateFileStat];
-    [fFileController reloadData];
-}
 
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) contextInfo
 {

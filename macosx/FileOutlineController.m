@@ -79,6 +79,7 @@ typedef enum
 
 - (void) reloadData
 {
+    [fTorrent updateFileStat];
     [fOutline reloadData];
 }
 
