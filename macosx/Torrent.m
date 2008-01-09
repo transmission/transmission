@@ -55,6 +55,8 @@ static int static_lastid = 0;
 
 - (void) trashFile: (NSString *) path;
 
+- (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path;
+
 @end
 
 void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void * torrentData)
@@ -181,11 +183,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (void) closeRemoveTorrent
 {
     //allow the file to be index by Time Machine
-    if ([NSApp isOnLeopardOrBetter])
-    {
-        NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
-        CSBackupSetItemExcluded((CFURLRef)url, false, true);
-    }
+    [self setTimeMachineExclude: NO forPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
     
     tr_torrentRemoveSaved(fHandle);
     tr_torrentClose(fHandle);
@@ -1566,11 +1564,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     [self update];
     
     //mark incomplete files to be ignored by Time Machine
-    if ([NSApp isOnLeopardOrBetter])
-    {
-        NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
-        CSBackupSetItemExcluded((CFURLRef)url, ![self allDownloaded], true);
-    }
+    [self setTimeMachineExclude: ![self allDownloaded] forPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
     
     return self;
 }
@@ -1664,21 +1658,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (void) updateDownloadFolder
 {
     //remove old Time Machine location
-    if ([NSApp isOnLeopardOrBetter])
-    {
-        NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
-        CSBackupSetItemExcluded((CFURLRef)url, false, true);
-    }
+    [self setTimeMachineExclude: NO forPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
     
     NSString * folder = [self shouldUseIncompleteFolderForName: [self name]] ? fIncompleteFolder : fDownloadFolder;
     tr_torrentSetFolder(fHandle, [folder UTF8String]);
     
-    //update Time Machine location
-    if ([NSApp isOnLeopardOrBetter])
-    {
-        NSURL *url = [NSURL fileURLWithPath: [folder stringByAppendingPathComponent: [self name]]];
-        CSBackupSetItemExcluded((CFURLRef)url, ![self allDownloaded], true);
-    }
+    [self setTimeMachineExclude: ![self allDownloaded] forPath: [folder stringByAppendingPathComponent: [self name]]];
 }
 
 //status has been retained
@@ -1721,11 +1706,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             fDateCompleted = [[NSDate alloc] init];
             
             //allow to be backed up by Time Machine
-            if ([NSApp isOnLeopardOrBetter])
-            {
-                NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
-                CSBackupSetItemExcluded((CFURLRef)url, false, true);
-            }
+            [self setTimeMachineExclude: NO forPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
             
             fStat = tr_torrentStat(fHandle);
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
@@ -1733,11 +1714,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         
         case TR_CP_INCOMPLETE:
             //do not allow to be backed up by Time Machine
-            if ([NSApp isOnLeopardOrBetter])
-            {
-                NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
-                CSBackupSetItemExcluded((CFURLRef)url, true, true);
-            }
+            [self setTimeMachineExclude: YES forPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
             
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRestartedDownloading" object: self];
             break;
@@ -1787,6 +1764,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         if (![[NSFileManager defaultManager] removeFileAtPath: path handler: nil])
             NSLog(@"Could not trash %@", path);
     }
+}
+
+- (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path
+{
+    if ([NSApp isOnLeopardOrBetter])
+        CSBackupSetItemExcluded((CFURLRef)[NSURL fileURLWithPath: path], exclude, true);
 }
 
 @end
