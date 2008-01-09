@@ -29,9 +29,14 @@
 #import "NSMenuAdditions.h"
 #import "ExpandedPathToIconTransformer.h"
 
+#define UPDATE_SECONDS 1.0
+
 @interface AddWindowController (Private)
 
+- (void) updateTorrent;
+
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) contextInfo;
+
 - (void) setGroupsMenu;
 - (void) changeGroupValue: (id) sender;
 
@@ -112,6 +117,9 @@
         [fLocationField setStringValue: @""];
         [fLocationImageView setImage: nil];
     }
+    
+    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
+                selector: @selector(updateTorrent) userInfo: nil repeats: YES];
 }
 
 - (void) windowDidLoad
@@ -122,8 +130,10 @@
 }
 
 - (void) dealloc
-{
+{NSLog(@"dealloc");
     [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
+    [fTimer invalidate];
     
     [fDestination release];
     
@@ -154,6 +164,9 @@
 
 - (void) add: (id) sender
 {
+    [fTimer invalidate];
+    fTimer = nil;
+    
     [fTorrent setWaitToStart: [fStartCheck state] == NSOnState];
     [fTorrent setGroupValue: [[fGroupPopUp selectedItem] tag]];
     
@@ -166,7 +179,16 @@
 
 - (void) cancelAdd: (id) sender
 {
+    [fTimer invalidate];
+    fTimer = nil;
+    
     [fController askOpenConfirmed: self add: NO];
+}
+
+- (void) verifyLocalData: (id) sender
+{
+    [fTorrent resetCache];
+    [self updateTorrent];
 }
 
 - (void) updateGroupMenu: (NSNotification *) notification
@@ -194,6 +216,12 @@
 
 @implementation AddWindowController (Private)
 
+- (void) updateTorrent
+{
+    [fTorrent updateFileStat];
+    [fFileController reloadData];
+}
+
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) contextInfo
 {
     if (code == NSOKButton)
@@ -209,8 +237,6 @@
         [iconTransformer release];
         
         [fTorrent changeDownloadFolder: fDestination];
-        
-        [fFileController reloadData];
     }
     else
     {

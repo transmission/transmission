@@ -759,7 +759,7 @@ typedef enum
                 break;
         }
         
-        int status = [[peer objectForKey: @"Status"] intValue];
+        /*int status = [[peer objectForKey: @"Status"] intValue];
         if (status & TR_PEER_STATUS_HANDSHAKE)
             [components addObject: NSLocalizedString(@"Handshaking", "Inspector -> peer -> status")];
         else
@@ -786,8 +786,8 @@ typedef enum
             
             if ([peerStatusArray count] > 0)
                 [components addObject: [peerStatusArray componentsJoinedByString: @" - "]];
-        }
-                
+        }*/
+        
         return [components componentsJoinedByString: @"\n"];
     }
     return nil;

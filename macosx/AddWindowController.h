@@ -44,6 +44,8 @@
     
     BOOL fDeleteTorrent, fDeleteEnable;
     int fGroupValue;
+    
+    NSTimer * fTimer;
 }
 
 - (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller
@@ -55,6 +57,8 @@
 
 - (void) add: (id) sender;
 - (void) cancelAdd: (id) sender;
+
+- (void) verifyLocalData: (id) sender;
 
 - (void) updateGroupMenu: (NSNotification *) notification;
 - (void) showGroupsWindow: (id) sender;
