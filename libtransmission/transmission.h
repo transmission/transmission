@@ -776,21 +776,6 @@ struct tr_file_stat
     float progress;
 };
 
-typedef enum
-{
-    TR_PEER_STATUS_HANDSHAKE             = (1<<0), /* we're handshaking with peer */
-
-    TR_PEER_STATUS_PEER_IS_SENDING       = (1<<1), /* peer is sending data to us */
-    TR_PEER_STATUS_PEER_IS_INTERESTED    = (1<<2), /* we have data the peer wants */
-    TR_PEER_STATUS_PEER_IS_CHOKED        = (1<<3), /* we refuse to send data to the peer */
-
-    TR_PEER_STATUS_CLIENT_IS_SENDING     = (1<<4), /* we're sending data to the peer */
-    TR_PEER_STATUS_CLIENT_SENT_REQUEST   = (1<<5), /* we've sent the peer a request */
-    TR_PEER_STATUS_CLIENT_IS_INTERESTED  = (1<<6), /* peer has data that we want */
-    TR_PEER_STATUS_CLIENT_IS_CHOKED      = (1<<7), /* peer refuses to send data to us */
-}
-tr_peer_status;
-
 struct tr_peer_stat
 {
     char addr[INET_ADDRSTRLEN];
@@ -800,7 +785,13 @@ struct tr_peer_stat
     unsigned int isDownloading : 1;
     unsigned int isUploading   : 1;
 
-    tr_peer_status status;
+    unsigned int peerIsChoked : 1;
+    unsigned int peerIsInterested : 1;
+    unsigned int clientIsChoked : 1;
+    unsigned int clientIsInterested : 1;
+    unsigned int isIncoming : 1;
+
+    char flagStr[32];
 
     uint8_t  from;
     uint16_t port;
