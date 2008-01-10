@@ -782,9 +782,9 @@ struct tr_peer_stat
     char addr[INET_ADDRSTRLEN];
     char client[80];
     
-    unsigned int isEncrypted   : 1;
-    unsigned int isDownloading : 1;
-    unsigned int isUploading   : 1;
+    unsigned int isEncrypted : 1;
+    unsigned int isDownloadingFrom : 1;
+    unsigned int isUploadingTo : 1;
 
     unsigned int peerIsChoked : 1;
     unsigned int peerIsInterested : 1;

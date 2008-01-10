@@ -1477,13 +1477,13 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
         stat->clientIsChoked     = peer->clientIsChoked;
         stat->clientIsInterested = peer->clientIsInterested;
         stat->isIncoming         = tr_peerIoIsIncoming( peer->io );
-        stat->isDownloading      = stat->clientIsInterested && !stat->clientIsChoked;
-        stat->isUploading        = stat->peerIsInterested && !stat->peerIsChoked;
+        stat->isDownloadingFrom  = stat->clientIsInterested && !stat->clientIsChoked;
+        stat->isUploadingTo        = stat->peerIsInterested && !stat->peerIsChoked;
 
         pch = stat->flagStr;
-        if( stat->isDownloading ) *pch++ = 'D';
+        if( stat->isDownloadingFrom ) *pch++ = 'D';
         else if( stat->clientIsInterested ) *pch++ = 'd';
-        if( stat->isUploading ) *pch++ = 'U';
+        if( stat->isUploadingTo ) *pch++ = 'U';
         else if( stat->peerIsInterested ) *pch++ = 'u';
         if( !stat->clientIsChoked && !stat->clientIsInterested ) *pch++ = 'K';
         if( !stat->peerIsChoked && !stat->peerIsInterested ) *pch++ = '?';
