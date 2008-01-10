@@ -40,6 +40,9 @@
 #define ACTION_MENU_UNLIMITED_TAG 102
 #define ACTION_MENU_LIMIT_TAG 103
 
+int speedLimitActionValue[] = { 0, 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
+float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
+
 @interface TorrentTableView (Private)
 
 - (NSRect) pauseRectForRow: (int) row;
@@ -371,13 +374,29 @@
     
     if (menu == fUploadMenu || menu == fDownloadMenu)
     {
+        NSMenuItem * item;
+        if ([menu numberOfItems] == 4)
+        {
+            int i;
+            for (i = 0; speedLimitActionValue[i] != -1; i++)
+            {
+                item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%d KB/s",
+                        "Action menu -> upload/download limit"), speedLimitActionValue[i]] action: @selector(setQuickLimit:)
+                        keyEquivalent: @""];
+                [item setTarget: self];
+                [item setRepresentedObject: [NSNumber numberWithInt: speedLimitActionValue[i]]];
+                [menu addItem: item];
+                [item release];
+            }
+        }
+        
         BOOL upload = menu == fUploadMenu;
         int mode = [fMenuTorrent speedMode: upload];
         
-        NSMenuItem * item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
+        item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
         [item setState: mode == TR_SPEEDLIMIT_SINGLE ? NSOnState : NSOffState];
         [item setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
-                    "torrent action context menu -> upload/download limit"), [fMenuTorrent speedLimit: upload]]];
+                    "torrent action menu -> upload/download limit"), [fMenuTorrent speedLimit: upload]]];
         
         item = [menu itemWithTag: ACTION_MENU_UNLIMITED_TAG];
         [item setState: mode == TR_SPEEDLIMIT_UNLIMITED ? NSOnState : NSOffState];
@@ -387,12 +406,28 @@
     }
     else if (menu == fRatioMenu)
     {
+        NSMenuItem * item;
+        if ([menu numberOfItems] == 4)
+        {
+            int i;
+            for (i = 0; ratioLimitActionValue[i] != -1.0; i++)
+            {
+                item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%.2f",
+                        "Action menu -> ratio stop"), ratioLimitActionValue[i]] action: @selector(setQuickRatio:)
+                        keyEquivalent: @""];
+                [item setTarget: self];
+                [item setRepresentedObject: [NSNumber numberWithFloat: ratioLimitActionValue[i]]];
+                [menu addItem: item];
+                [item release];
+            }
+        }
+        
         int mode = [fMenuTorrent ratioSetting];
         
-        NSMenuItem * item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
+        item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
         [item setState: mode == NSOnState ? NSOnState : NSOffState];
-        [item setTitle: [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
-                    "torrent action context menu -> ratio stop"), [fMenuTorrent ratioLimit]]];
+        [item setTitle: [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)", "torrent action menu -> ratio stop"),
+                            [fMenuTorrent ratioLimit]]];
         
         item = [menu itemWithTag: ACTION_MENU_UNLIMITED_TAG];
         [item setState: mode == NSOffState ? NSOnState : NSOffState];
@@ -436,7 +471,7 @@
 {
     BOOL upload = [sender menu] == fUploadMenu;
     [fMenuTorrent setSpeedMode: TR_SPEEDLIMIT_SINGLE upload: upload];
-    [fMenuTorrent setSpeedLimit: [[sender title] intValue] upload: upload];
+    [fMenuTorrent setSpeedLimit: [[sender representedObject] intValue] upload: upload];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
 }
@@ -467,7 +502,7 @@
 - (void) setQuickRatio: (id) sender
 {
     [fMenuTorrent setRatioSetting: NSOnState];
-    [fMenuTorrent setRatioLimit: [[sender title] floatValue]];
+    [fMenuTorrent setRatioLimit: [[sender representedObject] floatValue]];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
 }

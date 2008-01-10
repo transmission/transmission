@@ -109,8 +109,8 @@ typedef enum
     STATUS_TRANSFER_SESSION_TAG = 3
 } statusTag;
 
-int speedLimitsActionMenu[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
-float ratioLimitsActionMenu[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1 };
+int speedLimitGlobalActionValue[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
+float ratioLimitGlobalActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1 };
 
 #define GROWL_DOWNLOAD_COMPLETE @"Download Complete"
 #define GROWL_SEEDING_COMPLETE  @"Seeding Complete"
@@ -2089,13 +2089,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         NSMenuItem * item;
         int i;
-        for (i = 0; speedLimitsActionMenu[i] != -1; i++)
+        for (i = 0; speedLimitGlobalActionValue[i] != -1; i++)
         {
             item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%d KB/s",
-                    "Action menu -> upload/download limit"), speedLimitsActionMenu[i]] action: @selector(setQuickLimitGlobal:)
+                    "Action menu -> upload/download limit"), speedLimitGlobalActionValue[i]] action: @selector(setQuickLimitGlobal:)
                     keyEquivalent: @""];
             [item setTarget: self];
-            [item setRepresentedObject: [NSNumber numberWithInt: speedLimitsActionMenu[i]]];
+            [item setRepresentedObject: [NSNumber numberWithInt: speedLimitGlobalActionValue[i]]];
             [menu addItem: item];
             [item release];
         }
@@ -2107,13 +2107,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         NSMenuItem * item;
         int i;
-        for (i = 0; ratioLimitsActionMenu[i] != -1; i++)
+        for (i = 0; ratioLimitGlobalActionValue[i] != -1; i++)
         {
             item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%.2f",
-                    "Action menu -> ratio stop"), ratioLimitsActionMenu[i]] action: @selector(setQuickRatioGlobal:)
+                    "Action menu -> ratio stop"), ratioLimitGlobalActionValue[i]] action: @selector(setQuickRatioGlobal:)
                     keyEquivalent: @""];
             [item setTarget: self];
-            [item setRepresentedObject: [NSNumber numberWithFloat: ratioLimitsActionMenu[i]]];
+            [item setRepresentedObject: [NSNumber numberWithFloat: ratioLimitGlobalActionValue[i]]];
             [menu addItem: item];
             [item release];
         }
