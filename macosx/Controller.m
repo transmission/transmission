@@ -887,8 +887,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     if (code == NSOKButton)
     {
-        NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys:
-            [panel filenames], @"Files", [useOptions boolValue] ? ADD_SHOW_OPTIONS : ADD_NORMAL, @"UseOptions", nil];
+        NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: [panel filenames], @"Filenames",
+            [NSNumber numberWithInt: [useOptions boolValue] ? ADD_SHOW_OPTIONS : ADD_NORMAL], @"AddType", nil];
         [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
     }
 }
