@@ -40,9 +40,6 @@
 #define ACTION_MENU_UNLIMITED_TAG 102
 #define ACTION_MENU_LIMIT_TAG 103
 
-int speedLimitActionValue[] = { 0, 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
-float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
-
 @interface TorrentTableView (Private)
 
 - (NSRect) pauseRectForRow: (int) row;
@@ -377,6 +374,8 @@ float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
         NSMenuItem * item;
         if ([menu numberOfItems] == 4)
         {
+            const int speedLimitActionValue[] = { 0, 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
+            
             int i;
             for (i = 0; speedLimitActionValue[i] != -1; i++)
             {
@@ -409,6 +408,8 @@ float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
         NSMenuItem * item;
         if ([menu numberOfItems] == 4)
         {
+            const float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
+            
             int i;
             for (i = 0; ratioLimitActionValue[i] != -1.0; i++)
             {
