@@ -109,6 +109,9 @@ typedef enum
     STATUS_TRANSFER_SESSION_TAG = 3
 } statusTag;
 
+int speedLimitsActionMenu[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
+float ratioLimitsActionMenu[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1 };
+
 #define GROWL_DOWNLOAD_COMPLETE @"Download Complete"
 #define GROWL_SEEDING_COMPLETE  @"Seeding Complete"
 #define GROWL_AUTO_ADD          @"Torrent Auto Added"
@@ -2079,6 +2082,42 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange:
                 NSMakeRange(0, [groupMenu numberOfItems])] atBottom: YES];
     }
+    else if (menu == fUploadMenu || menu == fDownloadMenu)
+    {
+        if ([menu numberOfItems] > 3)
+            return;
+        
+        NSMenuItem * item;
+        int i;
+        for (i = 0; speedLimitsActionMenu[i] != -1; i++)
+        {
+            item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%d KB/s",
+                    "Action menu -> upload/download limit"), speedLimitsActionMenu[i]] action: @selector(setQuickLimitGlobal:)
+                    keyEquivalent: @""];
+            [item setTarget: self];
+            [item setRepresentedObject: [NSNumber numberWithInt: speedLimitsActionMenu[i]]];
+            [menu addItem: item];
+            [item release];
+        }
+    }
+    else if (menu == fRatioStopMenu)
+    {
+        if ([menu numberOfItems] > 3)
+            return;
+        
+        NSMenuItem * item;
+        int i;
+        for (i = 0; ratioLimitsActionMenu[i] != -1; i++)
+        {
+            item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%.2f",
+                    "Action menu -> ratio stop"), ratioLimitsActionMenu[i]] action: @selector(setQuickRatioGlobal:)
+                    keyEquivalent: @""];
+            [item setTarget: self];
+            [item setRepresentedObject: [NSNumber numberWithFloat: ratioLimitsActionMenu[i]]];
+            [menu addItem: item];
+            [item release];
+        }
+    }
     else;
 }
 
@@ -2213,7 +2252,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) setQuickLimitGlobal: (id) sender
 {
-    [fDefaults setInteger: [[sender title] intValue] forKey: [sender menu] == fUploadMenu ? @"UploadLimit" : @"DownloadLimit"];
+    [fDefaults setInteger: [[sender representedObject] intValue] forKey: [sender menu] == fUploadMenu
+                ? @"UploadLimit" : @"DownloadLimit"];
     [fDefaults setBool: YES forKey: [sender menu] == fUploadMenu ? @"CheckUpload" : @"CheckDownload"];
     
     [fPrefsController updateLimitFields];
@@ -2228,7 +2268,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) setQuickRatioGlobal: (id) sender
 {
     [fDefaults setBool: YES forKey: @"RatioCheck"];
-    [fDefaults setFloat: [[sender title] floatValue] forKey: @"RatioLimit"];
+    [fDefaults setFloat: [[sender representedObject] floatValue] forKey: @"RatioLimit"];
     
     [fPrefsController updateRatioStopField];
 }
@@ -3224,7 +3264,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         BOOL limit = menuItem == (upload ? fUploadLimitItem : fDownloadLimitItem);
         if (limit)
             [menuItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
-                                    "Action context menu -> upload/download limit"),
+                                    "Action menu -> upload/download limit"),
                                     [fDefaults integerForKey: upload ? @"UploadLimit" : @"DownloadLimit"]]];
         
         [menuItem setState: [fDefaults boolForKey: upload ? @"CheckUpload" : @"CheckDownload"] ? limit : !limit];
@@ -3236,7 +3276,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         BOOL check = menuItem == fCheckRatioItem;
         if (check)
             [menuItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
-                                    "Action context menu -> ratio stop"), [fDefaults floatForKey: @"RatioLimit"]]];
+                                    "Action menu -> ratio stop"), [fDefaults floatForKey: @"RatioLimit"]]];
         
         [menuItem setState: [fDefaults boolForKey: @"RatioCheck"] ? check : !check];
         return YES;

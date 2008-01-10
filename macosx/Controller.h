@@ -91,6 +91,7 @@ typedef enum
     IBOutlet NSMenuItem             * fUploadLimitItem, * fUploadNoLimitItem,
                                     * fDownloadLimitItem, * fDownloadNoLimitItem;
     
+    IBOutlet NSMenu                 * fRatioStopMenu;
     IBOutlet NSMenuItem             * fCheckRatioItem, * fNoCheckRatioItem;
     
     IBOutlet NSMenu                 * fGroupsSetMenu, * fGroupsSetContextMenu, * fGroupFilterMenu;
