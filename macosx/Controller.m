@@ -1157,11 +1157,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     while ((torrent = [enumerator nextObject]))
         [torrent setWaitToStart: NO];
     
-    int lowestOrderValue = [fTorrents count];
-    
     [fTorrents removeObjectsInArray: torrents];
     [fDisplayedTorrents removeObjectsInArray: torrents];
     
+    int lowestOrderValue = INT_MAX;
     enumerator = [torrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
@@ -2450,7 +2449,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         //get all torrents to reorder
         NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                 @"orderValue" ascending: YES] autorelease];
-        NSArray * descriptors = [NSArray arrayWithObject: orderDescriptor];
         
         NSMutableArray * sortedTorrents = [[fTorrents sortedArrayUsingDescriptors:
                                             [NSArray arrayWithObject: orderDescriptor]] mutableCopy];

@@ -160,6 +160,7 @@ typedef enum
 - (float) progress;
 - (float) progressDone;
 - (float) progressLeft;
+- (float) checkingProgress;
 
 - (int) eta;
 - (int) etaRatio;

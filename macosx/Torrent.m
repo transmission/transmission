@@ -762,6 +762,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return (float)[self sizeLeft] / [self size];
 }
 
+- (float) checkingProgress
+{
+    return fStat->recheckProgress;
+}
+
 - (int) eta
 {
     return fStat->eta;
@@ -975,7 +980,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
             case TR_STATUS_CHECK:
                 string = [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
-                                        "Torrent -> status string"), 100.0 * fStat->recheckProgress];
+                                        "Torrent -> status string"), 100.0 * [self checkingProgress]];
                 break;
 
             case TR_STATUS_DOWNLOAD:
@@ -1044,7 +1049,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
         case TR_STATUS_CHECK:
             string = [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
-                                    "Torrent -> status string"), 100.0 * fStat->recheckProgress];
+                                    "Torrent -> status string"), 100.0 * [self checkingProgress]];
             break;
         
         case TR_STATUS_DOWNLOAD:
@@ -1091,7 +1096,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
         case TR_STATUS_CHECK:
             return [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
-                                    "Torrent -> status string"), 100.0 * fStat->recheckProgress];
+                                    "Torrent -> status string"), 100.0 * [self checkingProgress]];
         
         case TR_STATUS_CHECK_WAIT:
             return [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];

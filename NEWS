@@ -6,11 +6,13 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 
 1.01 (2008/xx/yy)
 - All Platforms:
-   + Improve reconnection to peers with imperfect network connections
-   + Fix 1.00 temporary freezing issue
+   + Fix 1.00 freezing issue
    + Fix 1.00 assertion failure
+   + Improve reconnection to peers with imperfect network connections
+   + Fix crashes on architectures that require strict alignment
 - OS X:
    + Leopard: Better behavior with Time Machine
+   + Fix bugs with Clutch support
 - GTK+:
    + New Brazilian Portuguese, Chinese, Dutch, and Turkish translations
    + Fix 1.00 desktop internationalization error
