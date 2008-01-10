@@ -286,9 +286,9 @@ peer_row_set (GtkTreeStore        * store,
                       PEER_COL_CLIENT, client,
                       PEER_COL_IS_ENCRYPTED, peer->isEncrypted,
                       PEER_COL_PROGRESS, (int)(100.0*peer->progress),
-                      PEER_COL_IS_DOWNLOADING, peer->isDownloading,
+                      PEER_COL_IS_DOWNLOADING, peer->isDownloadingFrom,
                       PEER_COL_DOWNLOAD_RATE, peer->downloadFromRate,
-                      PEER_COL_IS_UPLOADING, peer->isUploading,
+                      PEER_COL_IS_UPLOADING, peer->isUploadingTo,
                       PEER_COL_UPLOAD_RATE, peer->uploadToRate,
                       PEER_COL_STATUS, peer->status,
                       -1);
@@ -316,9 +316,9 @@ peer_model_new (tr_torrent * tor)
                                          G_TYPE_STRING,  /* client */
                                          G_TYPE_INT,     /* progress [0..100] */
                                          G_TYPE_BOOLEAN, /* isEncrypted */
-                                         G_TYPE_BOOLEAN, /* isDownloading */
+                                         G_TYPE_BOOLEAN, /* isDownloadingFrom */
                                          G_TYPE_FLOAT,   /* downloadFromRate */
-                                         G_TYPE_BOOLEAN, /* isUploading */
+                                         G_TYPE_BOOLEAN, /* isUploadingTo */
                                          G_TYPE_FLOAT,   /* uploadToRate */
                                          G_TYPE_INT );   /* tr_peer_status */
 
