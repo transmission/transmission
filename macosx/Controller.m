@@ -856,8 +856,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) openFilesWithDict: (NSDictionary *) dictionary
 {
-    [self openFiles: [dictionary objectForKey: @"Filenames"] addType: [[dictionary objectForKey: @"AddType"] intValue]
-            forcePath: nil];
+    [self openFiles: [dictionary objectForKey: @"Filenames"] addType: [[dictionary objectForKey: @"AddType"] intValue] forcePath: nil];
     
     [dictionary release];
 }
@@ -1158,7 +1157,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     while ((torrent = [enumerator nextObject]))
         [torrent setWaitToStart: NO];
     
-    int lowestOrderValue = -1, currentOrderValue;
+    int lowestOrderValue = [fTorrents count];
     
     [fTorrents removeObjectsInArray: torrents];
     [fDisplayedTorrents removeObjectsInArray: torrents];
@@ -1171,10 +1170,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         if (deleteTorrent)
             [torrent trashTorrent];
         
-        //determine lowest order value
-        currentOrderValue = [torrent orderValue];
-        if (lowestOrderValue < currentOrderValue)
-            lowestOrderValue = currentOrderValue;
+        lowestOrderValue = MIN(lowestOrderValue, [torrent orderValue]);
         
         [torrent closeRemoveTorrent];
     }
@@ -1184,12 +1180,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //reset the order values if necessary
     if (lowestOrderValue < [fTorrents count])
     {
-        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                                @"orderValue" ascending: YES] autorelease];
-        NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
-
-        NSArray * tempTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
-        [descriptors release];
+        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: YES] autorelease];
+        NSArray * tempTorrents = [fTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: orderDescriptor]];
 
         int i;
         for (i = lowestOrderValue; i < [tempTorrents count]; i++)
@@ -1473,12 +1465,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSArray * sortedTorrents;
     if ([fTorrents count] > 1 && (desiredDownloadActive > 0 || desiredSeedActive > 0))
     {
-        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                                @"orderValue" ascending: YES] autorelease];
-        NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
-        
-        sortedTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
-        [descriptors release];
+        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: YES] autorelease];
+        sortedTorrents = [fTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: orderDescriptor]];
     }
     else
         sortedTorrents = fTorrents;
@@ -2462,10 +2450,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         //get all torrents to reorder
         NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                 @"orderValue" ascending: YES] autorelease];
-        NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+        NSArray * descriptors = [NSArray arrayWithObject: orderDescriptor];
         
-        NSMutableArray * sortedTorrents = [[fTorrents sortedArrayUsingDescriptors: descriptors] mutableCopy];
-        [descriptors release];
+        NSMutableArray * sortedTorrents = [[fTorrents sortedArrayUsingDescriptors:
+                                            [NSArray arrayWithObject: orderDescriptor]] mutableCopy];
         
         //remove objects to reinsert
         NSArray * movingTorrents = [[fDisplayedTorrents objectsAtIndexes: indexes] retain];
