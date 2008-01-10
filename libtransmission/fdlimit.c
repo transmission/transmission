@@ -22,6 +22,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#ifndef WIN32
+#define HAVE_GETRLIMIT
+#endif
+
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
@@ -31,8 +35,10 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef HAVE_GETRLIMIT
 #include <sys/time.h> /* getrlimit */
 #include <sys/resource.h> /* getrlimit */
+#endif
 #include <unistd.h>
 #include <libgen.h> /* basename, dirname */
 #include <fcntl.h> /* O_LARGEFILE */
@@ -451,16 +457,24 @@ void
 tr_fdInit( int globalPeerLimit )
 {
     int i;
-    struct rlimit rlim;
 
     assert( gFd == NULL );
     gFd = tr_new0( struct tr_fd_s, 1 );
     gFd->lock = tr_lockNew( );
 
-    getrlimit( RLIMIT_NOFILE, &rlim );
-    rlim.rlim_cur = MIN( rlim.rlim_max, (rlim_t)(globalPeerLimit + NOFILE_BUFFER) );
-    setrlimit( RLIMIT_NOFILE, &rlim );
-    gFd->normalMax = rlim.rlim_cur - NOFILE_BUFFER;
+#ifdef HAVE_GETRLIMIT
+    {
+        struct rlimit rlim;
+        getrlimit( RLIMIT_NOFILE, &rlim );
+        rlim.rlim_cur = MIN( rlim.rlim_max,
+               (rlim_t)(globalPeerLimit + NOFILE_BUFFER) );
+        setrlimit( RLIMIT_NOFILE, &rlim );
+        gFd->normalMax = rlim.rlim_cur - NOFILE_BUFFER;
+        tr_dbg( "setrlimit( RLIMIT_NOFILE, %d )", rlim.rlim_cur );
+    }
+#else
+    gFd->normalMax = globalPeerLimit;
+#endif
     tr_dbg( "%d usable file descriptors", globalPeerLimit );
 
     for( i=0; i<TR_MAX_OPEN_FILES; ++i ) 
