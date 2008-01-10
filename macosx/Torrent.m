@@ -874,7 +874,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             [NSNumber numberWithFloat: peer->progress], @"Progress",
             [NSNumber numberWithBool: peer->isEncrypted], @"Encryption",
             [NSString stringWithCString: (char *)peer->client encoding: NSUTF8StringEncoding], @"Client",
-            /*[NSNumber numberWithInt: peer->status], @"Status",*/ nil];
+            [NSNumber numberWithBool: peer->peerIsChoked], @"PeerChoked",
+            [NSNumber numberWithBool: peer->peerIsInterested], @"PeerInterested",
+            [NSNumber numberWithBool: peer->clientIsChoked], @"ClientChoked",
+            [NSNumber numberWithBool: peer->clientIsInterested], @"ClientInterested", nil];
         
         if (peer->isDownloading)
             [dic setObject: [NSNumber numberWithFloat: peer->uploadToRate] forKey: @"UL To Rate"];

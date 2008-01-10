@@ -759,34 +759,18 @@ typedef enum
                 break;
         }
         
-        /*int status = [[peer objectForKey: @"Status"] intValue];
-        if (status & TR_PEER_STATUS_HANDSHAKE)
-            [components addObject: NSLocalizedString(@"Handshaking", "Inspector -> peer -> status")];
-        else
-        {
-            NSMutableArray * peerStatusArray = [NSMutableArray arrayWithCapacity: 2];
-            
-            if (status & TR_PEER_STATUS_CLIENT_IS_SENDING)
-                [peerStatusArray addObject: NSLocalizedString(@"Uploading to peer", "Inspector -> peer -> status")];
-            else if (status & TR_PEER_STATUS_PEER_IS_INTERESTED)
-                [peerStatusArray addObject: NSLocalizedString(@"Peer wants our data", "Inspector -> peer -> status")];
-            else if (status & TR_PEER_STATUS_PEER_IS_CHOKED)
-                [peerStatusArray addObject: NSLocalizedString(@"Refusing to send data to peer", "Inspector -> peer -> status")];
-            else;
-            
-            if (status & TR_PEER_STATUS_PEER_IS_SENDING)
-                [peerStatusArray addObject: NSLocalizedString(@"Downloading from peer", "Inspector -> peer -> status")];
-            else if (status & TR_PEER_STATUS_CLIENT_SENT_REQUEST)
-                [peerStatusArray addObject: NSLocalizedString(@"Requesting data from peer", "Inspector -> peer -> status")];
-            else if (status & TR_PEER_STATUS_CLIENT_IS_INTERESTED)
-                [peerStatusArray addObject: NSLocalizedString(@"Waiting to request data from peer", "Inspector -> peer -> status")];
-            else if (status & TR_PEER_STATUS_CLIENT_IS_CHOKED)
-                [peerStatusArray addObject: NSLocalizedString(@"Peer will not send us data", "Inspector -> peer -> status")];
-            else;
-            
-            if ([peerStatusArray count] > 0)
-                [components addObject: [peerStatusArray componentsJoinedByString: @" - "]];
-        }*/
+        NSMutableArray * peerStatusArray = [NSMutableArray arrayWithCapacity: 2];
+        if ([[peer objectForKey: @"PeerChoked"] boolValue])
+            [peerStatusArray addObject: NSLocalizedString(@"Refusing to send data to peer", "Inspector -> peer -> status")];
+        if ([[peer objectForKey: @"PeerInterested"] boolValue])
+            [peerStatusArray addObject: NSLocalizedString(@"Peer wants our data", "Inspector -> peer -> status")];
+        if ([[peer objectForKey: @"ClientChoked"] boolValue])
+            [peerStatusArray addObject: NSLocalizedString(@"Peer will not send us data", "Inspector -> peer -> status")];
+        if ([[peer objectForKey: @"ClientInterested"] boolValue])
+            [peerStatusArray addObject: NSLocalizedString(@"Waiting to request data from peer", "Inspector -> peer -> status")];
+        
+        if ([peerStatusArray count] > 0)
+            [components addObject: [@"\n" stringByAppendingString: [peerStatusArray componentsJoinedByString: @"\n"]]];
         
         return [components componentsJoinedByString: @"\n"];
     }
