@@ -118,7 +118,6 @@ typedef enum
     BOOL                            fRemoteQuit;
 }
 
-- (void) openFiles:             (NSArray *) filenames;
 - (void) openFiles:             (NSArray *) filenames addType: (addType) type forcePath: (NSString *) path;
 - (void) askOpenConfirmed:      (AddWindowController *) addController add: (BOOL) add;
 - (void) openCreatedFile:       (NSNotification *) notification;

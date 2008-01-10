@@ -759,6 +759,7 @@ typedef enum
                 break;
         }
         
+        #warning redo
         NSMutableArray * peerStatusArray = [NSMutableArray arrayWithCapacity: 2];
         if ([[peer objectForKey: @"PeerChoked"] boolValue])
             [peerStatusArray addObject: NSLocalizedString(@"Refusing to send data to peer", "Inspector -> peer -> status")];

@@ -865,12 +865,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 //called on by applescript
 - (void) open: (NSArray *) files
 {
-    [self performSelectorOnMainThread: @selector(openFiles:) withObject: files waitUntilDone: NO];
-}
-
-- (void) openFiles: (NSArray *) filenames
-{
-    [self openFiles: filenames addType: ADD_NORMAL forcePath: nil];
+    NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: files, @"Filenames",
+                                [NSNumber numberWithInt: ADD_NORMAL], @"AddType", nil];
+    [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dict waitUntilDone: NO];
 }
 
 - (void) openShowSheet: (id) sender
@@ -891,17 +888,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (code == NSOKButton)
     {
         NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                        [panel filenames], @"Files", useOptions, @"UseOptions", nil];
-        [self performSelectorOnMainThread: @selector(openFromSheet:) withObject: dictionary waitUntilDone: NO];
+            [panel filenames], @"Files", [useOptions boolValue] ? ADD_SHOW_OPTIONS : ADD_NORMAL, @"UseOptions", nil];
+        [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
     }
-}
-
-- (void) openFromSheet: (NSDictionary *) dictionary
-{
-    [self openFiles: [dictionary objectForKey: @"Files"] addType: [[dictionary objectForKey: @"UseOptions"] boolValue]
-            ? ADD_SHOW_OPTIONS : ADD_NORMAL forcePath: nil];
-    
-    [dictionary release];
 }
 
 - (void) duplicateOpenAlert: (NSString *) name
@@ -2380,7 +2369,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             case TR_OK:
                 if (!ask)
                     count = [fTorrents count];
-                [self openFiles: [NSArray arrayWithObject: file]];
+                [self openFiles: [NSArray arrayWithObject: file] addType: ADD_NORMAL forcePath: nil];
                 
                 //check if torrent was opened
                 if (!ask && [fTorrents count] > count)
@@ -3875,7 +3864,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     int oldCount = [fTorrents count];
     
-    [self openFiles: torrents];
+    [self openFiles: torrents addType: ADD_NORMAL forcePath: nil];
     
     return [fTorrents count] > oldCount;
 }
