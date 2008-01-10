@@ -14,8 +14,13 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+
+#ifdef WIN32
+#include <winsock2.h>
+#else
 #include <netinet/in.h> /* struct in_addr */
 #include <arpa/inet.h> /* inet_ntoa */
+#endif
 
 #include <event.h>
 
