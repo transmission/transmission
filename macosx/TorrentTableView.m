@@ -413,9 +413,8 @@
             int i;
             for (i = 0; ratioLimitActionValue[i] != -1.0; i++)
             {
-                item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%.2f",
-                        "Action menu -> ratio stop"), ratioLimitActionValue[i]] action: @selector(setQuickRatio:)
-                        keyEquivalent: @""];
+                item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%.2f", ratioLimitActionValue[i]]
+                        action: @selector(setQuickRatio:) keyEquivalent: @""];
                 [item setTarget: self];
                 [item setRepresentedObject: [NSNumber numberWithFloat: ratioLimitActionValue[i]]];
                 [menu addItem: item];

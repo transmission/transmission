@@ -2110,9 +2110,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         int i;
         for (i = 0; ratioLimitActionValue[i] != -1; i++)
         {
-            item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%.2f",
-                    "Action menu -> ratio stop"), ratioLimitActionValue[i]] action: @selector(setQuickRatioGlobal:)
-                    keyEquivalent: @""];
+            item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%.2f", ratioLimitActionValue[i]]
+                    action: @selector(setQuickRatioGlobal:) keyEquivalent: @""];
             [item setTarget: self];
             [item setRepresentedObject: [NSNumber numberWithFloat: ratioLimitActionValue[i]]];
             [menu addItem: item];
