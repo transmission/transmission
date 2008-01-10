@@ -1459,38 +1459,21 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
 
     for( i=0; i<size; ++i )
     {
-        char * pch;
         const tr_peer * peer = peers[i];
         const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
         tr_peer_stat * stat = ret + i;
 
         tr_netNtop( &peer->in_addr, stat->addr, sizeof(stat->addr) );
         strlcpy( stat->client, (peer->client ? peer->client : ""), sizeof(stat->client) );
-        stat->port               = peer->port;
-        stat->from               = atom->from;
-        stat->progress           = peer->progress;
-        stat->isEncrypted        = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
-        stat->uploadToRate       = peer->rateToPeer;
-        stat->downloadFromRate   = peer->rateToClient;
-        stat->peerIsChoked       = peer->peerIsChoked;
-        stat->peerIsInterested   = peer->peerIsInterested;
-        stat->clientIsChoked     = peer->clientIsChoked;
-        stat->clientIsInterested = peer->clientIsInterested;
-        stat->isIncoming         = tr_peerIoIsIncoming( peer->io );
-        stat->isDownloadingFrom  = stat->clientIsInterested && !stat->clientIsChoked;
-        stat->isUploadingTo      = stat->peerIsInterested && !stat->peerIsChoked;
-
-        pch = stat->flagStr;
-        if( stat->isDownloadingFrom ) *pch++ = 'D';
-        else if( stat->clientIsInterested ) *pch++ = 'd';
-        if( stat->isUploadingTo ) *pch++ = 'U';
-        else if( stat->peerIsInterested ) *pch++ = 'u';
-        if( !stat->clientIsChoked && !stat->clientIsInterested ) *pch++ = 'K';
-        if( !stat->peerIsChoked && !stat->peerIsInterested ) *pch++ = '?';
-        if( stat->isEncrypted ) *pch++ = 'E';
-        if( stat->from == TR_PEER_FROM_PEX ) *pch++ = 'X';
-        if( stat->isIncoming ) *pch++ = 'I';
-        *pch = '\0';
+        stat->port             = peer->port;
+        stat->from             = atom->from;
+        stat->progress         = peer->progress;
+        stat->isEncrypted      = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
+        stat->uploadToRate     = peer->rateToPeer;
+        stat->downloadFromRate = peer->rateToClient;
+        stat->isDownloading    = stat->uploadToRate > 0.01;
+        stat->isUploading      = stat->downloadFromRate > 0.01;
+        stat->status           = peer->status;
     }
 
     *setmeCount = size;
