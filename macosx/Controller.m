@@ -779,6 +779,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         //add it to the "File -> Open Recent" menu
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
         
+        //verify the data right away if it was newly created
+        if (type == ADD_CREATED)
+            [torrent resetCache];
+        
         //show the add window or add directly
         if (showWindow || !location)
         {
