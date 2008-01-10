@@ -94,7 +94,12 @@ tr_getLogTimeStr( char * buf, int buflen )
     now = time( NULL );
     gettimeofday( &tv, NULL );
 
+#ifdef WIN32
+    now_tm = *localtime( &now );
+#else
     localtime_r( &now, &now_tm );
+#endif
+
     strftime( tmp, sizeof(tmp), "%H:%M:%S", &now_tm );
     milliseconds = (int)(tv.tv_usec / 1000);
     snprintf( buf, buflen, "%s.%03d", tmp, milliseconds );

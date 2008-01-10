@@ -14,7 +14,12 @@
 #define TR_PEER_MGR_H
 
 #include <inttypes.h> /* uint16_t */
+
+#ifdef WIN32
+#include <winsock2.h> /* struct in_addr */
+#else
 #include <netinet/in.h> /* struct in_addr */
+#endif
 
 struct in_addr;
 struct tr_handle;

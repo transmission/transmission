@@ -16,7 +16,6 @@
 #include <string.h> /* strcmp, strchr */
 #include <libgen.h> /* basename */
 
-#include <sys/queue.h> /* evhttp.h needs this */
 #include <event.h>
 #include <evhttp.h>
 

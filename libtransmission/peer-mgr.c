@@ -17,7 +17,6 @@
 #include <limits.h> /* INT_MAX */
 
 #include <libgen.h> /* basename */
-#include <arpa/inet.h> /* inet_ntoa */
 
 #include <event.h>
 
@@ -742,7 +741,7 @@ getPreferredBlocks( Torrent * t, uint64_t * setmeCount )
         memcpy( walk, req[s], sizeof(uint64_t) * reqCount[s] );
         walk += reqCount[s];
     }
-    assert( ( walk - ret ) == blockCount );
+    assert( ( walk - ret ) == ( int )blockCount );
     *setmeCount = blockCount;
 
     /* cleanup */

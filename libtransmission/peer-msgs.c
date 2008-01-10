@@ -17,8 +17,6 @@
 #include <string.h>
 #include <libgen.h> /* basename */
 
-#include <netinet/in.h> /* struct in_addr */
-
 #include <event.h>
 
 #include "transmission.h"

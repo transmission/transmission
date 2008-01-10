@@ -17,8 +17,6 @@
 #include <stdio.h>
 
 #include <signal.h>
-#include <sys/queue.h> /* for evhttp */
-#include <sys/types.h> /* for evhttp */
 
 #include <event.h>
 #include <evdns.h>
