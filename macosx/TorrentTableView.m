@@ -128,7 +128,8 @@
         
         [super mouseDown: event];
         
-        if ([event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
+        //acts as if mouseUp:
+        if ([NSApp isOnLeopardOrBetter] && [event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
         {
             if ([self pointInProgressRect: fClickPoint])
             {
@@ -145,6 +146,7 @@
     }
 }
 
+//only applies for paths in mouseDown: where the super mouseDown: isn't called
 - (void) mouseUp: (NSEvent *) event
 {
     int oldRow;
@@ -174,12 +176,28 @@
             [[fTorrents objectAtIndex: row] revealData];
         else;
     }
+    else if (![NSApp isOnLeopardOrBetter] && [event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
+    {
+        NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+        int row = [self rowAtPoint: point];
+        
+        if ([self pointInProgressRect: fClickPoint])
+        {
+            [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
+            [self reloadData];
+        }
+        else if ([self pointInIconRect: point])
+            [[fTorrents objectAtIndex: row] revealData];
+        else if (![self pointInActionRect: point])
+            [fController showInfo: nil];
+        else;
+    }
+    else;
     
     [super mouseUp: event];
 
     fClickPoint = NSZeroPoint;
     
-    #warning need fClickIn?
     BOOL wasClickIn = fClickIn;
     fClickIn = NO;
     
