@@ -586,7 +586,7 @@ tr_peerIoDrain( tr_peerIo        * io,
 }
 
 int
-tr_peerGetAge( const tr_peerIo * io )
+tr_peerIoGetAge( const tr_peerIo * io )
 {
     return time( NULL ) - io->timeCreated;
 }
