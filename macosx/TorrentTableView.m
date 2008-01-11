@@ -142,7 +142,6 @@
                 [fController showInfo: nil];
             else;
         }
-        else;
     }
 }
 
