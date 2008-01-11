@@ -140,6 +140,8 @@
 	<false/>
 	<key>WarningDuplicate</key>
 	<true/>
+	<key>WarningFolderDataSameName</key>
+	<true/>
 	<key>WarningRemainingSpace</key>
 	<true/>
 </dict>

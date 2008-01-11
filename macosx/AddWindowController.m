@@ -27,16 +27,21 @@
 #import "GroupsWindowController.h"
 #import "NSStringAdditions.h"
 #import "NSMenuAdditions.h"
+#import "NSApplicationAdditions.h"
 #import "ExpandedPathToIconTransformer.h"
 
 #define UPDATE_SECONDS 1.0
 
 @interface AddWindowController (Private)
 
+- (void) confirmAdd;
+
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) contextInfo;
 
 - (void) setGroupsMenu;
 - (void) changeGroupValue: (id) sender;
+
+- (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (int) returnCode contextInfo: (void *) contextInfo;
 
 @end
 
@@ -162,17 +167,28 @@
 
 - (void) add: (id) sender
 {
-    [fTimer invalidate];
-    fTimer = nil;
-    
-    [fTorrent setWaitToStart: [fStartCheck state] == NSOnState];
-    [fTorrent setGroupValue: [[fGroupPopUp selectedItem] tag]];
-    
-    if ([fDeleteCheck state] == NSOnState)
-        [fTorrent trashTorrent];
-    
-    //ensure last, since it releases this controller
-    [fController askOpenConfirmed: self add: YES];
+    if ([[fDestination lastPathComponent] isEqualToString: [fTorrent name]]
+        && [[NSUserDefaults standardUserDefaults] boolForKey: @"WarningFolderDataSameName"])
+    {
+        NSAlert * alert = [[NSAlert alloc] init];
+        [alert setMessageText: NSLocalizedString(@"The destination directory and root data directory have the same name.",
+                                "Add torrent -> same name -> title")];
+        [alert setInformativeText: NSLocalizedString(@"If you are attempting to use already existing data,"
+            " the root data directory should be inside the destination directory.", "Add torrent -> same name -> message")];
+        [alert setAlertStyle: NSWarningAlertStyle];
+        [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Add torrent -> same name -> button")];
+        [alert addButtonWithTitle: NSLocalizedString(@"Add", "Add torrent -> same name -> button")];
+        
+        if ([NSApp isOnLeopardOrBetter])
+            [alert setShowsSuppressionButton: YES];
+        else
+            [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Add torrent -> same name -> button")];
+        
+        [alert beginSheetModalForWindow: [self window] modalDelegate: self
+            didEndSelector: @selector(sameNameAlertDidEnd:returnCode:contextInfo:) contextInfo: nil];
+    }
+    else
+        [self confirmAdd];
 }
 
 - (void) cancelAdd: (id) sender
@@ -214,6 +230,21 @@
 
 @implementation AddWindowController (Private)
 
+- (void) confirmAdd
+{
+    [fTimer invalidate];
+    fTimer = nil;
+    
+    [fTorrent setWaitToStart: [fStartCheck state] == NSOnState];
+    [fTorrent setGroupValue: [[fGroupPopUp selectedItem] tag]];
+    
+    if ([fDeleteCheck state] == NSOnState)
+        [fTorrent trashTorrent];
+    
+    //ensure last, since it releases this controller
+    [fController askOpenConfirmed: self add: YES];
+}
+
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) contextInfo
 {
     if (code == NSOKButton)
@@ -253,6 +284,17 @@
 - (void) changeGroupValue: (id) sender
 {
     fGroupValue = [sender tag];
+}
+
+- (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (int) returnCode contextInfo: (void *) contextInfo
+{
+    if (([NSApp isOnLeopardOrBetter] ? [[alert suppressionButton] state] == NSOnState : returnCode == NSAlertThirdButtonReturn))
+        [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningFolderDataSameName"];
+    
+    [alert release];
+    
+    if (returnCode == NSAlertSecondButtonReturn)
+        [self performSelectorOnMainThread: @selector(confirmAdd) withObject: nil waitUntilDone: NO];
 }
 
 @end
