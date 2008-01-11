@@ -8,7 +8,7 @@
 #         "0" for stable, supported releases
 # these should be the only two lines you need to change
 PEERID_PREFIX="-TR100X-"
-USERAGENT_PREFIX="1.01 Test Release 2"
+USERAGENT_PREFIX="1.01 Test Release 3"
 
 
 SVN_REVISION=`find ./ -name "*\.[chmp]" -o -name "*\.cpp" -o -name "*\.po" -o -name "*\.sh" | \
