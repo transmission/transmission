@@ -8,7 +8,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Fix crashes on architectures that require strict alignment
 - OS X:
    + Leopard: Better behavior with Time Machine
-   + Bugfixes with Clutch support
+   + Fix bugs with Clutch support
 - GTK+:
    + New Brazilian Portuguese, Chinese, Dutch, and Turkish translations
    + Fix 1.00 desktop internationalization error

@@ -870,9 +870,9 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             [NSString stringWithCString: (char *)peer->client encoding: NSUTF8StringEncoding], @"Client",
             [NSNumber numberWithInt: peer->status], @"Status", nil];
         
-        if (peer->isUploadingTo)
+        if (peer->isDownloading)
             [dic setObject: [NSNumber numberWithFloat: peer->uploadToRate] forKey: @"UL To Rate"];
-        if (peer->isDownloadingFrom)
+        if (peer->isUploading)
             [dic setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];
         
         [peerDics addObject: dic];
