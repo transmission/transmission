@@ -74,9 +74,6 @@ enum
     /* how frequently to change which peers are choked */
     RECHOKE_PERIOD_MSEC = (10 * 1000),
 
-    /* how frequently to decide which peers live and die */
-    RECONNECT_PERIOD_MSEC = (5 * 1000),
-
     /* how frequently to refill peers' request lists */
     REFILL_PERIOD_MSEC = 666,
 
@@ -90,12 +87,19 @@ enum
     /* when few peers are available, keep idle ones this long */
     MAX_UPLOAD_IDLE_SECS = (60 * 10),
 
-    /* if this * RECONNECT_PERIOD_MSEC is too high, routers die.
-     * if this * RECONNECT_PERIOD_MSEC it too low, peers come slow. */
+    /* how frequently to decide which peers live and die */
+    RECONNECT_PERIOD_MSEC = (4 * 1000),
+
+    /* max # of peers to ask fer per torrent per reconnect pulse */
     MAX_RECONNECTIONS_PER_PULSE = 16,
+
+    /* max number of peers to ask for per second overall.
+     * this throttle is to avoid overloading the router */
+    MAX_CONNECTIONS_PER_SECOND = 64,
 
     /* corresponds to ut_pex's added.f flags */
     ADDED_F_ENCRYPTION_FLAG = 1,
+
     /* corresponds to ut_pex's added.f flags */
     ADDED_F_SEED_FLAG = 2,
 
@@ -1823,8 +1827,18 @@ static int
 reconnectPulse( void * vtorrent )
 {
     Torrent * t = vtorrent;
+    static time_t prevTime = 0;
+    static int newConnectionsThisSecond = 0;
+    time_t now;
 
     torrentLock( t );
+
+    now = time( NULL );
+    if( prevTime != now )
+    {
+        prevTime = now;
+        newConnectionsThisSecond = 0;
+    }
 
     if( !t->isRunning )
     {
@@ -1858,7 +1872,9 @@ reconnectPulse( void * vtorrent )
         }
 
         /* add some new ones */
-        for( i=0; i<nCandidates && i<MAX_RECONNECTIONS_PER_PULSE; ++i )
+        for( i=0;    i < nCandidates
+                  && i < MAX_RECONNECTIONS_PER_PULSE
+                  && newConnectionsThisSecond < MAX_CONNECTIONS_PER_SECOND; ++i )
         {
             tr_peerMgr * mgr = t->manager;
             struct peer_atom * atom = candidates[i];
@@ -1880,6 +1896,8 @@ reconnectPulse( void * vtorrent )
                                                             mgr );
 
                 assert( tr_peerIoGetTorrentHash( io ) != NULL );
+
+                ++newConnectionsThisSecond;
 
                 tr_ptrArrayInsertSorted( t->outgoingHandshakes, handshake, handshakeCompare );
             }
