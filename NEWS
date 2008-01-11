@@ -4,6 +4,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 - All Platforms:
    + Fix 1.00 freezing issue
    + Fix 1.00 assertion failure
+   + Improve initial connection speed
    + Improve reconnection to peers with imperfect network connections
    + Fix crashes on architectures that require strict alignment
 - OS X:
