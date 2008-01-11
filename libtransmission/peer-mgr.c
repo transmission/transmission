@@ -74,7 +74,7 @@ enum
     RECHOKE_PERIOD_MSEC = (10 * 1000),
 
     /* how frequently to decide which peers live and die */
-    RECONNECT_PERIOD_MSEC = (2 * 1000),
+    RECONNECT_PERIOD_MSEC = (5 * 1000),
 
     /* how frequently to refill peers' request lists */
     REFILL_PERIOD_MSEC = 666,
@@ -91,7 +91,7 @@ enum
 
     /* if this * RECONNECT_PERIOD_MSEC is too high, routers die.
      * if this * RECONNECT_PERIOD_MSEC it too low, peers come slow. */
-    MAX_RECONNECTIONS_PER_PULSE = 1,
+    MAX_RECONNECTIONS_PER_PULSE = 16,
 
     /* corresponds to ut_pex's added.f flags */
     ADDED_F_ENCRYPTION_FLAG = 1,
@@ -1820,7 +1820,7 @@ reconnectPulse( void * vtorrent )
     }
     else
     {
-        int i, nCandidates, nBad, addMax;
+        int i, nCandidates, nBad;
         struct peer_atom ** candidates = getPeerCandidates( t, &nCandidates );
         struct tr_peer ** connections = getPeersToClose( t, &nBad );
 
@@ -1846,10 +1846,6 @@ reconnectPulse( void * vtorrent )
         }
 
         /* add some new ones */
-        addMax = tr_ptrArraySize(t->pool)
-               ? MAX_RECONNECTIONS_PER_PULSE
-               : t->tor->maxConnectedPeers;
-          
         for( i=0; i<nCandidates && i<MAX_RECONNECTIONS_PER_PULSE; ++i )
         {
             tr_peerMgr * mgr = t->manager;
