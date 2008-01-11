@@ -40,7 +40,7 @@
         for (i = 0; i < [self segmentCount]; i++)
         {
             [self setLabel: @"" forSegment: i];
-            [self setWidth: 7.0 forSegment: i];
+            [self setWidth: 9.0 forSegment: i]; //9 is minimum size to get proper look
         }
     }
     return self;
