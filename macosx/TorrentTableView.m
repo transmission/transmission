@@ -125,38 +125,62 @@
             fClickPoint = NSZeroPoint;
             [self reloadData];
         }
-
+        
         [super mouseDown: event];
+        
+        //acts as if mouseUp:
+        if ([NSApp isOnLeopardOrBetter] && [event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
+        {
+            if ([self pointInProgressRect: fClickPoint])
+            {
+                [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
+                [self reloadData];
+            }
+            else if ([self pointInIconRect: fClickPoint])
+                [[fTorrents objectAtIndex: [self rowAtPoint: fClickPoint]] revealData];
+            else if (![self pointInActionRect: fClickPoint])
+                [fController showInfo: nil];
+            else;
+        }
+        else;
     }
 }
 
-#warning not working on Leopard
+//only applies for paths in mouseDown: where the super mouseDown: isn't called
 - (void) mouseUp: (NSEvent *) event
 {
-    //NSLog(@"up");
-    NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
-    int row = [self rowAtPoint: point], oldRow = [self rowAtPoint: fClickPoint];
-    
-    if (row == oldRow && [self pointInPauseRect: point] && [self pointInPauseRect: fClickPoint])
+    int oldRow;
+    if (fClickIn)
     {
-        Torrent * torrent = [fTorrents objectAtIndex: row];
+        NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+        int row = [self rowAtPoint: point];
+        oldRow = [self rowAtPoint: fClickPoint];
         
-        if ([torrent isActive])
-            [fController stopTorrents: [NSArray arrayWithObject: torrent]];
-        else
+        if (row == oldRow && [self pointInPauseRect: point] && [self pointInPauseRect: fClickPoint])
         {
-            if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
-                [fController resumeTorrentsNoWait: [NSArray arrayWithObject: torrent]];
-            else if ([torrent waitingToStart])
+            Torrent * torrent = [fTorrents objectAtIndex: row];
+            
+            if ([torrent isActive])
                 [fController stopTorrents: [NSArray arrayWithObject: torrent]];
             else
-                [fController resumeTorrents: [NSArray arrayWithObject: torrent]];
+            {
+                if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
+                    [fController resumeTorrentsNoWait: [NSArray arrayWithObject: torrent]];
+                else if ([torrent waitingToStart])
+                    [fController stopTorrents: [NSArray arrayWithObject: torrent]];
+                else
+                    [fController resumeTorrents: [NSArray arrayWithObject: torrent]];
+            }
         }
+        else if (row == oldRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
+            [[fTorrents objectAtIndex: row] revealData];
+        else;
     }
-    else if (row == oldRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
-        [[fTorrents objectAtIndex: row] revealData];
-    else if ([event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
+    else if (![NSApp isOnLeopardOrBetter] && [event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
     {
+        NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+        int row = [self rowAtPoint: point];
+        
         if ([self pointInProgressRect: fClickPoint])
         {
             [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
@@ -173,8 +197,12 @@
     [super mouseUp: event];
 
     fClickPoint = NSZeroPoint;
+    
+    BOOL wasClickIn = fClickIn;
     fClickIn = NO;
-    [self setNeedsDisplayInRect: [self rectOfRow: oldRow]];
+    
+    if (wasClickIn)
+        [self setNeedsDisplayInRect: [self rectOfRow: oldRow]];
 }
 
 - (void) mouseDragged: (NSEvent *) event
