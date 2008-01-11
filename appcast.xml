@@ -6,38 +6,29 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Thu, 4 Jan 2008 15:30:00 -0400</pubDate>
-    <lastBuildDate>Thu, 4 Jan 2008 15:30:00 -0400</lastBuildDate>
+    <lastBuildDate>Thu, 11 Jan 2008 15:40:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 1.00 Released</title>
+      <title>Transmission 1.01 Released</title>
       <description><![CDATA[
 <h4>Core Changes:</h4>
 <ul>
- <li>Port forwarding now performed by MiniUPnP and libnatpmp</li>
- <li>Ability to set global and per-torrent number of connections</li>
- <li>Option to prefer not using encryption</li>
- <li>Fix tracker connection error</li>
- <li>PEX is now configured globally</li>
- <li>Updated icon</li>
+ <li>Fix 1.00 freezing issue</li>
+ <li>Fix 1.00 assertion failure</li>
+ <li>Improve initial connection speed</li>
+ <li>Added connection throttle to avoid router overload</li>
+ <li>Improve reconnection to peers with imperfect network connections</li>
 </ul>
 <h4>Mac Changes:</h4>
 <ul>
- <li>Redesigned Leopard-like look</li>
- <li>Group labeling, filtering, and sorting</li>
- <li>Statistics window</li>
- <li>Pieces Bar (return of Advanced Bar)</li>
- <li>Display "not available" overlay on the regular bar</li>
- <li>Display remaining time for seeding transfers</li>
- <li>Sort by total activity</li>
- <li>Connectable from the Clutch web interface</li>
- <li>Leopard: Time Machine will ignore incomplete downloads</li>
- <li>Leopard: Fix bug where text fields would reject localized decimal values</li>
- <li>Leopard: Fix bug where bandwidth rates chosen from the action menu would not apply the first time</li>
+ <li>Leopard: Double-click icon to reveal in Finder, progress string to toggle selected and total, and anywhere else to toggle the inspector</li>
+ <li>Leopard: Better behavior with Time Machine</li>
+ <li>Fix bugs with Clutch support</li>
 </ul>
 
 Transmission 0.72 and earlier: Complete your downloads before upgrading or you will lose data!]]></description>
-      <pubDate>Thu, 4 Jan 2008 15:30:00 -0400</pubDate>
-      <enclosure sparkle:version="4479" sparkle:shortVersionString="1.00" url="http://mirrors.m0k.org/transmission/files/Transmission-1.00.dmg" length="2423526" type="application/octet-stream"/>
+      <pubDate>Thu, 4 Jan 2008 15:40:00 -0400</pubDate>
+      <enclosure sparkle:version="4627" sparkle:shortVersionString="1.01" url="http://mirrors.m0k.org/transmission/files/Transmission-1.01.dmg" length="2663961" type="application/octet-stream"/>
     </item>
     
   </channel>
