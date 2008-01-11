@@ -8,6 +8,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Improve reconnection to peers with imperfect network connections
    + Fix crashes on architectures that require strict alignment
 - OS X:
+   + Leopard: Double-click: icon to reveal in Finder, progress string to toggle between selected and total, anywhere else to toggle the inspector
    + Leopard: Better behavior with Time Machine
    + Fix bugs with Clutch support
 - GTK+:
