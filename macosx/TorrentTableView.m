@@ -100,7 +100,6 @@
 
 - (void) mouseDown: (NSEvent *) event
 {
-    NSLog(@"down");
     fClickPoint = [self convertPoint: [event locationInWindow] fromView: nil];
 
     if ([self pointInActionRect: fClickPoint])
@@ -148,34 +147,44 @@
 
 - (void) mouseUp: (NSEvent *) event
 {
-    NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
-    int row = [self rowAtPoint: point], oldRow = [self rowAtPoint: fClickPoint];
-    
-    if (row == oldRow && [self pointInPauseRect: point] && [self pointInPauseRect: fClickPoint])
+    int oldRow;
+    if (fClickIn)
     {
-        Torrent * torrent = [fTorrents objectAtIndex: row];
+        NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+        int row = [self rowAtPoint: point];
+        oldRow = [self rowAtPoint: fClickPoint];
         
-        if ([torrent isActive])
-            [fController stopTorrents: [NSArray arrayWithObject: torrent]];
-        else
+        if (row == oldRow && [self pointInPauseRect: point] && [self pointInPauseRect: fClickPoint])
         {
-            if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
-                [fController resumeTorrentsNoWait: [NSArray arrayWithObject: torrent]];
-            else if ([torrent waitingToStart])
+            Torrent * torrent = [fTorrents objectAtIndex: row];
+            
+            if ([torrent isActive])
                 [fController stopTorrents: [NSArray arrayWithObject: torrent]];
             else
-                [fController resumeTorrents: [NSArray arrayWithObject: torrent]];
+            {
+                if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
+                    [fController resumeTorrentsNoWait: [NSArray arrayWithObject: torrent]];
+                else if ([torrent waitingToStart])
+                    [fController stopTorrents: [NSArray arrayWithObject: torrent]];
+                else
+                    [fController resumeTorrents: [NSArray arrayWithObject: torrent]];
+            }
         }
+        else if (row == oldRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
+            [[fTorrents objectAtIndex: row] revealData];
+        else;
     }
-    else if (row == oldRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
-        [[fTorrents objectAtIndex: row] revealData];
-    else;
     
     [super mouseUp: event];
 
     fClickPoint = NSZeroPoint;
+    
+    #warning need fClickIn?
+    BOOL wasClickIn = fClickIn;
     fClickIn = NO;
-    [self setNeedsDisplayInRect: [self rectOfRow: oldRow]];
+    
+    if (wasClickIn)
+        [self setNeedsDisplayInRect: [self rectOfRow: oldRow]];
 }
 
 - (void) mouseDragged: (NSEvent *) event

@@ -3,6 +3,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 1.10 (2008/xx/yy)
 - OS X:
    + Window when adding torrents to select files and other settings
+   + Leopard: Fix to allow double-clicking the icon to reveal in Finder, double-clicking the progress string to toggle between selected and total progress, and double-clicking anywhere else to toggle the inspector
 
 1.01 (2008/xx/yy)
 - All Platforms:
