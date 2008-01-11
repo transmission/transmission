@@ -747,7 +747,7 @@ getPreferredBlocks( Torrent * t, uint64_t * setmeCount )
         memcpy( walk, req[s], sizeof(uint64_t) * reqCount[s] );
         walk += reqCount[s];
     }
-    assert( ( walk - ret ) == blockCount );
+    assert( ( walk - ret ) == ( int )blockCount );
     *setmeCount = blockCount;
 
     /* cleanup */
