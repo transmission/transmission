@@ -140,6 +140,7 @@ typedef struct
     tr_timer * refillTimer;
     tr_timer * swiftTimer;
     tr_torrent * tor;
+    tr_peer * optimistic; /* the optimistic peer, or NULL if none */
     tr_bitfield * requested;
 
     unsigned int isRunning : 1;
@@ -1480,6 +1481,7 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
         stat->isUploadingTo        = stat->peerIsInterested && !stat->peerIsChoked;
 
         pch = stat->flagStr;
+        if( t->optimistic == peer ) *pch++ = 'O';
         if( stat->isDownloadingFrom ) *pch++ = 'D';
         else if( stat->clientIsInterested ) *pch++ = 'd';
         if( stat->isUploadingTo ) *pch++ = 'U';
@@ -1517,6 +1519,18 @@ compareChoke( const void * va, const void * vb )
     const struct ChokeData * a = va;
     const struct ChokeData * b = vb;
     return -tr_compareUint32( a->rate, b->rate );
+}
+
+static int
+isNew( const tr_peer * peer )
+{
+    return peer && peer->io && tr_peerIoGetAge( peer->io ) < 45;
+}
+
+static int
+isSame( const tr_peer * peer )
+{
+    return peer && peer->client && strstr( peer->client, "Transmission" );
 }
 
 /**
@@ -1580,9 +1594,24 @@ rechoke( Torrent * t )
         choke[i++].doUnchoke = 0;
 
     /* optimistic unchoke */
-    if( i != size ) {
-        i = n + tr_rand( size - n );
-        choke[i].doUnchoke = 1;
+    if( i < size )
+    {
+        struct ChokeData * c;
+        tr_ptrArray * randPool = tr_ptrArrayNew( );
+        for( ; i<size; ++i )
+        {
+            const tr_peer * peer = choke[i].peer;
+            int x=1, y;
+            if( isNew( peer ) ) x *= 3;
+            if( isSame( peer ) ) x *= 3;
+            for( y=0; y<x; ++y )
+                tr_ptrArrayAppend( randPool, choke );
+        }
+        i = tr_rand( tr_ptrArraySize( randPool ) );
+        c = ( struct ChokeData* )tr_ptrArrayNth( randPool, i);
+        c->doUnchoke = 1;
+        t->optimistic = c->peer;
+        tr_ptrArrayFree( randPool, NULL );
     }
 
     for( i=0; i<size; ++i )

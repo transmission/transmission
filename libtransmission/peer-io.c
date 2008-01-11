@@ -58,6 +58,7 @@ struct tr_peerIo
     int timeout;
     struct bufferevent * bufev;
     uint8_t peerId[20];
+    time_t timeCreated;
 
     tr_extensions extensions;
 
@@ -146,6 +147,7 @@ tr_peerIoNew( struct tr_handle     * handle,
     c->socket = socket;
     c->isIncoming = isIncoming ? 1 : 0;
     c->timeout = IO_TIMEOUT_SECS;
+    c->timeCreated = time( NULL );
     c->bufev = bufferevent_new( c->socket,
                                 canReadWrapper,
                                 didWriteWrapper,
@@ -581,4 +583,10 @@ tr_peerIoDrain( tr_peerIo        * io,
     uint8_t * tmp = tr_new( uint8_t, byteCount );
     tr_peerIoReadBytes( io, inbuf, tmp, byteCount );
     tr_free( tmp );
+}
+
+int
+tr_peerGetAge( const tr_peerIo * io )
+{
+    return time( NULL ) - io->timeCreated;
 }

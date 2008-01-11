@@ -17,7 +17,7 @@
 #include "trcompat.h" /* strlcpy */
 #include "utils.h"
 
-#define DEFAULT_MAX_UNCHOKED_PEERS 16
+#define DEFAULT_MAX_UNCHOKED_PEERS 12
 #define DEFAULT_MAX_CONNECTED_PEERS 50
 
 struct optional_args
