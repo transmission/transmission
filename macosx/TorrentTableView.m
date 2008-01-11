@@ -100,6 +100,7 @@
 
 - (void) mouseDown: (NSEvent *) event
 {
+    NSLog(@"down");
     fClickPoint = [self convertPoint: [event locationInWindow] fromView: nil];
 
     if ([self pointInActionRect: fClickPoint])
@@ -125,15 +126,28 @@
             fClickPoint = NSZeroPoint;
             [self reloadData];
         }
-
+        
         [super mouseDown: event];
+        
+        if ([event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
+        {
+            if ([self pointInProgressRect: fClickPoint])
+            {
+                [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
+                [self reloadData];
+            }
+            else if ([self pointInIconRect: fClickPoint])
+                [[fTorrents objectAtIndex: [self rowAtPoint: fClickPoint]] revealData];
+            else if (![self pointInActionRect: fClickPoint])
+                [fController showInfo: nil];
+            else;
+        }
+        else;
     }
 }
 
-#warning not working on Leopard
 - (void) mouseUp: (NSEvent *) event
 {
-    //NSLog(@"up");
     NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
     int row = [self rowAtPoint: point], oldRow = [self rowAtPoint: fClickPoint];
     
@@ -155,19 +169,6 @@
     }
     else if (row == oldRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
         [[fTorrents objectAtIndex: row] revealData];
-    else if ([event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
-    {
-        if ([self pointInProgressRect: fClickPoint])
-        {
-            [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
-            [self reloadData];
-        }
-        else if ([self pointInIconRect: point])
-            [[fTorrents objectAtIndex: row] revealData];
-        else if (![self pointInActionRect: point])
-            [fController showInfo: nil];
-        else;
-    }
     else;
     
     [super mouseUp: event];
