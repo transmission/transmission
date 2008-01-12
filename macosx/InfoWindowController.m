@@ -88,7 +88,6 @@ typedef enum
     [window setFrame: windowRect display: NO];
     
     [window setBecomesKeyOnlyIfNeeded: YES];
-    [window setAcceptsMouseMovedEvents: YES];
     
     //set tab images and tooltips
     [[fTabMatrix cellWithTag: TAB_INFO_TAG] setIcon: [NSImage imageNamed: @"InfoGeneral.png"]];
@@ -776,11 +775,6 @@ typedef enum
         return [components componentsJoinedByString: @"\n"];
     }
     return nil;
-}
-
-- (void) mouseMoved: (NSEvent *) event
-{
-    [fFileController setHoverRowForEvent: fCurrentTabTag == TAB_FILES_TAG ? event : nil];
 }
 
 - (void) setPiecesView: (id) sender

@@ -54,6 +54,8 @@
         [upArrow setScalesWhenResized: YES];
         [upArrow setSize: imageSize];
         [self setImage: upArrow forSegment: 2];
+        
+        fHoverRow = NO;
     }
     return self;
 }
@@ -83,6 +85,35 @@
     [controlView reloadData];
 }
 
+- (void) addTrackingAreasForView:( NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo
+            mouseLocation: (NSPoint) mouseLocation
+{
+    NSTrackingAreaOptions options = NSTrackingEnabledDuringMouseDrag | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
+
+    BOOL mouseIsInside = NSMouseInRect(mouseLocation, cellFrame, [controlView isFlipped]);
+    if (mouseIsInside)
+    {
+        options |= NSTrackingAssumeInside;
+        [controlView setNeedsDisplayInRect:cellFrame];
+    }
+    
+    NSTrackingArea *area = [[NSTrackingArea alloc] initWithRect: cellFrame options: options owner: controlView userInfo: userInfo];
+    [controlView addTrackingArea: area];
+    [area release];
+}
+
+- (void) mouseEntered: (NSEvent *) event
+{
+    fHoverRow = YES;
+    [(NSControl *)[self controlView] updateCell: self];
+}
+
+- (void) mouseExited: (NSEvent *) event
+{
+    fHoverRow = NO;
+    [(NSControl *)[self controlView] updateCell: self];
+}
+
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     Torrent * torrent = [(FileOutlineView *)controlView torrent];
@@ -90,9 +121,7 @@
     NSSet * priorities = [torrent filePrioritiesForIndexes: [dict objectForKey: @"Indexes"]];
     
     int count = [priorities count];
-    
-    int hoverRow = [(FileOutlineView *)controlView hoverRow];
-    if (count > 0 && hoverRow != -1 && [(FileOutlineView *)controlView itemAtRow: hoverRow] == dict)
+    if (fHoverRow && count > 0)
     {
         [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_LOW]] forSegment: 0];
         [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_NORMAL]] forSegment: 1];

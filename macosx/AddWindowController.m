@@ -69,8 +69,6 @@
 
 - (void) awakeFromNib
 {
-    [[self window] setAcceptsMouseMovedEvents: YES];
-    
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateGroupMenu:)
         name: @"UpdateGroups" object: nil];
     
@@ -219,11 +217,6 @@
 {
     [fGroupPopUp selectItemWithTag: fGroupValue];
     [fController showGroups: sender];
-}
-
-- (void) mouseMoved: (NSEvent *) event
-{
-    [fFileController setHoverRowForEvent: event];
 }
 
 @end

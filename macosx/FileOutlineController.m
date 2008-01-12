@@ -83,11 +83,6 @@ typedef enum
     [fOutline reloadData];
 }
 
-- (void) setHoverRowForEvent: (NSEvent *) event
-{
-    [fOutline setHoverRowForEvent: event];
-}
-
 - (int) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
 {
     if (!item)

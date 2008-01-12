@@ -30,6 +30,15 @@
 
 @implementation FileOutlineView
 
+- (id) initWithCoder: (NSCoder *) coder
+{
+    if ((self = [super initWithCoder: coder]))
+    {
+        fMouseRow = -1;
+    }
+    return self;    
+}
+
 - (void) awakeFromNib
 {
     FileNameCell * nameCell = [[FileNameCell alloc] init];
@@ -54,8 +63,6 @@
     endingColor = [NSColor colorWithCalibratedRed: 225.0/255.0 green: 218.0/255.0 blue: 255.0/255.0 alpha: 1.0];
     beginningColor = [endingColor blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
     fMixedPriorityGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
-    
-    fHoverRow = -1;
 }
 
 - (void) dealloc
@@ -63,6 +70,8 @@
     [fHighPriorityGradient release];
     [fLowPriorityGradient release];
     [fMixedPriorityGradient release];
+    
+    [fMouseCell release];
     
     [super dealloc];
 }
@@ -98,29 +107,83 @@
     return [self menu];
 }
 
-- (void) setHoverRowForEvent: (NSEvent *) event
+- (void) updateTrackingAreas
 {
-    int row = -1;
-    if (event)
+    NSEnumerator * enumerator = [[self trackingAreas] objectEnumerator];
+    NSTrackingArea * area;
+    while ((area = [enumerator nextObject]))
     {
-        NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
-        if ([self columnAtPoint: point] == [self columnWithIdentifier: @"Priority"])
-            row = [self rowAtPoint: point];
+        if ([area owner] == self && [[area userInfo] objectForKey: @"Row"])
+            [self removeTrackingArea: area];
     }
     
-    if (row != fHoverRow)
+    int col = [self columnWithIdentifier: @"Priority"];
+    NSTrackingAreaOptions options = NSTrackingEnabledDuringMouseDrag | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
+    NSPoint mouseLocation = [self convertPoint: [[self window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil];
+    
+    NSRange visibleRows = [self rowsInRect: [self visibleRect]];
+    int row;
+    for (row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
     {
-        if (fHoverRow != -1)
-            [self reloadItem: [self itemAtRow: fHoverRow]];
-        fHoverRow = row;
-        if (fHoverRow != -1)
-            [self reloadItem: [self itemAtRow: fHoverRow]];
+        FilePriorityCell * cell = (FilePriorityCell *)[self preparedCellAtColumn: col row: row];
+        
+        NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: row] forKey: @"Row"];
+        [cell addTrackingAreasForView: self inRect: [self frameOfCellAtColumn: col row: row] withUserInfo: userInfo
+                mouseLocation: mouseLocation];
     }
 }
 
-- (int) hoverRow
+- (void) mouseEntered: (NSEvent *) event
 {
-    return fHoverRow;
+    NSNumber * row;
+    if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
+    {
+        int rowVal = [row intValue];
+        FilePriorityCell * cell = (FilePriorityCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Priority"] row: rowVal];
+        if (fMouseCell != cell)
+        {
+            [fMouseCell release];
+            
+            fMouseRow = rowVal;
+            fMouseCell = [cell copy];
+            
+            [fMouseCell setControlView: self];
+            [fMouseCell mouseEntered: event];
+            [fMouseCell setRepresentedObject: [cell representedObject]];
+        }
+    }
+}
+
+- (void) mouseExited: (NSEvent *) event
+{
+    NSNumber * row;
+    if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
+    {
+        FilePriorityCell * cell = (FilePriorityCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Priority"]
+                                                        row: [row intValue]];
+        [cell setControlView: self];
+        [cell mouseExited: event];
+        
+        [fMouseCell release];
+        fMouseCell = nil;
+        fMouseRow = -1;
+    }
+}
+
+- (NSCell *) preparedCellAtColumn: (NSInteger) column row: (NSInteger) row
+{
+    if (row == fMouseRow && column == [self columnWithIdentifier: @"Priority"])
+        return fMouseCell;
+    else
+        return [super preparedCellAtColumn: column row: row];
+}
+
+- (void) updateCell: (NSCell *) cell
+{
+    if (cell == fMouseCell)
+        [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Priority"] row: fMouseRow]];
+    else
+        [super updateCell: cell];
 }
 
 - (void) drawRow: (int) row clipRect: (NSRect) clipRect

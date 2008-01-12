@@ -27,6 +27,12 @@
 
 @interface FilePriorityCell : NSSegmentedCell
 {
+    BOOL fHoverRow;
 }
+
+- (void) addTrackingAreasForView:( NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo
+            mouseLocation: (NSPoint) mouseLocation;
+- (void) mouseEntered: (NSEvent *) event;
+- (void) mouseExited: (NSEvent *) event;
 
 @end
