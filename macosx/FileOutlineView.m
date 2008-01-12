@@ -118,8 +118,8 @@
     }
     
     NSRange visibleRows = [self rowsInRect: [self visibleRect]];
-    if (visibleRows.length == 0){NSLog(@"asdgshs");
-        return;}
+    if (visibleRows.length == 0)
+        return;
     
     int col = [self columnWithIdentifier: @"Priority"];
     NSTrackingAreaOptions options = NSTrackingEnabledDuringMouseDrag | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
