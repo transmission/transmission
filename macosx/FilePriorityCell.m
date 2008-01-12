@@ -90,14 +90,13 @@
 {
     NSTrackingAreaOptions options = NSTrackingEnabledDuringMouseDrag | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
 
-    BOOL mouseIsInside = NSMouseInRect(mouseLocation, cellFrame, [controlView isFlipped]);
-    if (mouseIsInside)
+    if (NSMouseInRect(mouseLocation, cellFrame, [controlView isFlipped]))
     {
         options |= NSTrackingAssumeInside;
-        [controlView setNeedsDisplayInRect:cellFrame];
+        [controlView setNeedsDisplayInRect: cellFrame];
     }
     
-    NSTrackingArea *area = [[NSTrackingArea alloc] initWithRect: cellFrame options: options owner: controlView userInfo: userInfo];
+    NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: cellFrame options: options owner: controlView userInfo: userInfo];
     [controlView addTrackingArea: area];
     [area release];
 }

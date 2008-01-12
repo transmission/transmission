@@ -117,11 +117,14 @@
             [self removeTrackingArea: area];
     }
     
+    NSRange visibleRows = [self rowsInRect: [self visibleRect]];
+    if (visibleRows.length == 0){NSLog(@"asdgshs");
+        return;}
+    
     int col = [self columnWithIdentifier: @"Priority"];
     NSTrackingAreaOptions options = NSTrackingEnabledDuringMouseDrag | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
     NSPoint mouseLocation = [self convertPoint: [[self window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil];
     
-    NSRange visibleRows = [self rowsInRect: [self visibleRect]];
     int row;
     for (row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
     {
