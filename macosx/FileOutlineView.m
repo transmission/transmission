@@ -30,15 +30,6 @@
 
 @implementation FileOutlineView
 
-- (id) initWithCoder: (NSCoder *) coder
-{
-    if ((self = [super initWithCoder: coder]))
-    {
-        fMouseRow = -1;
-    }
-    return self;    
-}
-
 - (void) awakeFromNib
 {
     FileNameCell * nameCell = [[FileNameCell alloc] init];
@@ -63,6 +54,8 @@
     endingColor = [NSColor colorWithCalibratedRed: 225.0/255.0 green: 218.0/255.0 blue: 255.0/255.0 alpha: 1.0];
     beginningColor = [endingColor blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
     fMixedPriorityGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
+    
+    fMouseRow = -1;
 }
 
 - (void) dealloc
@@ -122,7 +115,6 @@
         return;
     
     int col = [self columnWithIdentifier: @"Priority"];
-    NSTrackingAreaOptions options = NSTrackingEnabledDuringMouseDrag | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
     NSPoint mouseLocation = [self convertPoint: [[self window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil];
     
     int row;

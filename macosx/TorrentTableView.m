@@ -644,8 +644,14 @@
     if (row < 0 || [fDefaults boolForKey: @"SmallView"])
         return NO;
     
-    TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
-    [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
+    TorrentCell * cell;
+    if ([NSApp isOnLeopardOrBetter])
+        cell = (TorrentCell * )[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
+    else
+    {
+        cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
+        [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
+    }
     return NSPointInRect(point, [cell progressRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
@@ -655,8 +661,14 @@
     if (row < 0 || ![fDefaults boolForKey: @"SmallView"])
         return NO;
     
-    TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
-    [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
+    TorrentCell * cell;
+    if ([NSApp isOnLeopardOrBetter])
+        cell = (TorrentCell * )[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
+    else
+    {
+        cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
+        [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
+    }
     return NSPointInRect(point, [cell minimalStatusRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
