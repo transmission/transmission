@@ -224,6 +224,7 @@ privateFree( gpointer vprivate )
 {
     PrivateData * p = ( PrivateData * ) vprivate;
     g_signal_handler_disconnect( p->core, p->pref_handler_id );
+    g_free( p->filter_text );
     g_free( p );
 }
 

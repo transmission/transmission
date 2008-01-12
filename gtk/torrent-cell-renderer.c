@@ -708,6 +708,17 @@ torrent_cell_renderer_get_property( GObject      * object,
 }
 
 static void
+torrent_cell_renderer_dispose( GObject * o )
+{
+    TorrentCellRenderer * r = TORRENT_CELL_RENDERER( o );
+    if( r && r->priv )
+    {
+        g_object_unref( G_OBJECT( r->priv->text_renderer ) );
+        r->priv = NULL;
+    }
+}
+
+static void
 torrent_cell_renderer_class_init( TorrentCellRendererClass * klass )
 {
     GObjectClass * gobject_class = G_OBJECT_CLASS( klass );
@@ -722,6 +733,7 @@ torrent_cell_renderer_class_init( TorrentCellRendererClass * klass )
     cell_class->get_size = torrent_cell_renderer_get_size;
     gobject_class->set_property = torrent_cell_renderer_set_property;
     gobject_class->get_property = torrent_cell_renderer_get_property;
+    gobject_class->dispose = torrent_cell_renderer_dispose;
 
     g_object_class_install_property( gobject_class, P_TORRENT,
         g_param_spec_pointer( "torrent", NULL, "tr_torrent*",
@@ -812,6 +824,7 @@ torrent_cell_renderer_init( GTypeInstance * instance, gpointer g_class UNUSED )
 
     p->tor = NULL;
     p->text_renderer = gtk_cell_renderer_text_new( );
+    g_object_ref_sink( G_OBJECT( p->text_renderer ) );
     p->gradient = TRUE;
     p->show_unavailable = TRUE;
     p->bar_height = DEFAULT_BAR_HEIGHT;
