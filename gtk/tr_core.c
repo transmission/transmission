@@ -638,7 +638,7 @@ tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter )
     gtk_list_store_remove( GTK_LIST_STORE( self->model ), iter );
     tr_torrentRemoveSaved( tr_torrent_handle( tor ) );
 
-    tr_torrent_sever( tor );
+    g_object_unref( G_OBJECT( tor ) );
 }
 
 static gboolean
