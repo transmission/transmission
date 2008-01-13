@@ -17,7 +17,6 @@
 #include <limits.h> /* INT_MAX */
 
 #include <libgen.h> /* basename */
-#include <arpa/inet.h> /* inet_ntoa */
 
 #include <event.h>
 
@@ -1597,7 +1596,7 @@ rechoke( Torrent * t )
         i = tr_rand( tr_ptrArraySize( randPool ) );
         c = ( struct ChokeData* )tr_ptrArrayNth( randPool, i);
         c->doUnchoke = 1;
-        t->optimistic =  c->peer;
+        t->optimistic = c->peer;
         tr_ptrArrayFree( randPool, NULL );
     }
 
