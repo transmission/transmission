@@ -38,8 +38,7 @@
     
     NSString * fInitialString;
     
-    IBOutlet NSPopUpButton  * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp,
-                            * fDownloadSoundPopUp, * fSeedingSoundPopUp;
+    IBOutlet NSPopUpButton  * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp;
     IBOutlet NSTextField    * fRatioStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
     
     SUUpdater               * fUpdater;
