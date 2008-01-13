@@ -1890,14 +1890,9 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->incoming.block = evbuffer_new( );
     m->outBlock = evbuffer_new( );
     m->peerAllowedPieces = NULL;
-    m->clientAllowedPieces = NULL;
-    m->clientSuggestedPieces = NULL;
+    m->clientAllowedPieces = tr_bitfieldNew( m->torrent->info.pieceCount );
+    m->clientSuggestedPieces = tr_bitfieldNew( m->torrent->info.pieceCount );
     *setme = tr_publisherSubscribe( m->publisher, func, userData );
-    
-    if ( tr_peerIoSupportsFEXT( m->io ) ) {
-        m->clientAllowedPieces = tr_bitfieldNew( m->torrent->info.pieceCount );
-        m->clientSuggestedPieces = tr_bitfieldNew( m->torrent->info.pieceCount );
-    }
     
     tr_peerIoSetTimeoutSecs( m->io, 150 ); /* timeout after N seconds of inactivity */
     tr_peerIoSetIOFuncs( m->io, canRead, didWrite, gotError, m );
