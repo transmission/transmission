@@ -69,23 +69,26 @@ dnl ----------------------------------------------------------------------------
 dnl
 dnl  detection for the GTK+ client
 
-have_gtk=yes
-PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= $GTK_MINIMUM
-                        glib-2.0 >= $GLIB_MINIMUM
-                        gmodule-2.0 >= $GLIB_MINIMUM
-                        gthread-2.0 >= $GLIB_MINIMUM],, [have_gtk=no])
-AC_ARG_WITH(gtk, AC_HELP_STRING([--with-gtk], [Build gtk client]),
-                 [want_gtk=$withval],
-                 [want_gtk=$have_gtk])
-use_gtk=no
+PKG_CHECK_MODULES(GTK,
+                  [gtk+-2.0 >= $GTK_MINIMUM
+                   glib-2.0 >= $GLIB_MINIMUM
+                   gmodule-2.0 >= $GLIB_MINIMUM
+                   gthread-2.0 >= $GLIB_MINIMUM],
+                  [have_gtk=yes],
+                  [have_gtk=no])
+AC_ARG_ENABLE([gtk],
+              AC_HELP_STRING([--enable-gtk],[build gtk client]),
+              [want_gtk=${enableval}],
+              [want_gtk=${have_gtk}])
+build_gtk=no
 if test "x$want_gtk" = "xyes" ; then
     if test "x$have_gtk" = "xyes"; then
-      use_gtk=yes
+      build_gtk=yes
     else
       AC_MSG_ERROR("GTK+ not found!")
     fi
 fi
-AM_CONDITIONAL([WITH_GTK],[test "x$use_gtk" = "xyes"])
+AM_CONDITIONAL([BUILD_GTK],[test "x$build_gtk" = "xyes"])
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
 
@@ -97,26 +100,26 @@ AM_GLIB_GNU_GETTEXT
 transmissionlocaledir='${prefix}/${DATADIRNAME}/locale'
 AC_SUBST(transmissionlocaledir)
 
+
 dnl ----------------------------------------------------------------------------
 dnl
 dnl  wxWidgets detection for the wxWidgets client
 
-
 AM_OPTIONS_WXCONFIG
 AM_PATH_WXCONFIG($WX_MINIMUM,[have_wx=yes],[have_wx=no])
-AC_ARG_WITH(wx, AC_HELP_STRING([--with-wx], [Build wxWidgets client]),
-                [want_wx=$withval],
-                [want_wx=no])
-dnl                [want_wx=$have_wx])
-use_wx=no
+AC_ARG_ENABLE([wx],
+              AC_HELP_STRING([--enable-wx],[build wxWidgets client]),
+              [want_wx=${enableval}],
+              [want_wx=no])
+build_wx=no
 if test "x$want_wx" = "xyes" ; then
     if test "x$have_wx" = "xyes"; then
-      use_wx=yes
+      build_wx=yes
     else
       AC_MSG_ERROR("wxWidgets not found!")
     fi
 fi
-AM_CONDITIONAL([HAVE_WX],[test "x$use_wx" = "xyes"])
+AM_CONDITIONAL([BUILD_WX],[test "x$build_wx" = "xyes"])
 
 
 
@@ -125,13 +128,13 @@ dnl
 dnl  platform-specific stuff.
 
 AC_CANONICAL_HOST
-beos="no"
-darwin="no"
-msw="no"
+have_beos="no"
+have_darwin="no"
+have_msw="no"
 case $host_os in
 
    *cygwin|*mingw32*)
-     msw="yes"
+     have_msw="yes"
      CXXFLAGS="$CXXFLAGS -mms-bitfields -mwin32 -mwindows"
      CPPFLAGS="$CPPFLAGS -DWIN32 -DWIN32_LEAN_AND_MEAN"
      LIBS="$LIBS -lshell32 -lws2_32"
@@ -149,7 +152,7 @@ case $host_os in
      ;;
 
   *beos*)
-    beos="yes"
+    have_beos="yes"
     RELEASE=`uname -r`
     case $RELEASE in
       6.*|5.0.4) # Zeta or R5 / BONE beta 7
@@ -175,7 +178,7 @@ case $host_os in
     ;;
 
   *darwin*)
-    darwin="yes"
+    have_darwin="yes"
     # Make sure the Universal SDK is installed
     if test ! -d /Developer/SDKs/MacOSX10.4u.sdk; then
       cat << EOF
@@ -191,9 +194,35 @@ EOF
     ;;
 
 esac
-AM_CONDITIONAL([HAVE_BEOS],[test "x$beos" = "xyes"])
-AM_CONDITIONAL([HAVE_DARWIN],[test "x$darwin" = "xyes"])
-AM_CONDITIONAL([HAVE_WINDOWS],[test "x$msw" = "xyes"])
+
+AC_ARG_ENABLE([beos],
+              [AC_HELP_STRING([--enable-beos],[build OS X client])],
+              [build_beos=${enableval}],
+              [build_beos=${have_beos}])
+AM_CONDITIONAL([BUILD_BEOS],[test "x$build_beos" = "xyes"])
+
+AC_ARG_ENABLE([cli],
+              [AC_HELP_STRING([--enable-cli],[build command-line client])],
+              [build_cli=${enableval}],
+              [build_cli="yes"])
+AM_CONDITIONAL([BUILD_CLI],[test "x$build_cli" = "xyes"])
+
+AC_ARG_ENABLE([darwin],
+              [AC_HELP_STRING([--enable-darwin],[build OS X client])],
+              [build_darwin=${enableval}],
+              [build_darwin=${have_darwin}])
+AM_CONDITIONAL([BUILD_DARWIN],[test "x$build_darwin" = "xyes"])
+
+AC_ARG_ENABLE([daemon],
+              [AC_HELP_STRING([--enable-daemon],[build daemon])],
+              [build_daemon=${enableval}],
+              [build_daemon="yes"])
+AM_CONDITIONAL([BUILD_DAEMON],[test "x$build_daemon" = "xyes"])
+
+
+AC_DEFINE([HAVE_BEOS],[test "x$have_beos" = "xyes"])
+AC_DEFINE([HAVE_DARWIN],[test "x$have_darwin" = "xyes"])
+AC_DEFINE([HAVE_WINDOWS],[test "x$have_msw" = "xyes"])
 
 
 dnl ----------------------------------------------------------------------------
@@ -222,13 +251,13 @@ echo "
 
 Configuration:
 
-        Source code location:    ${srcdir}
-        Compiler:                ${CXX}
-        Build libtransmission:   yes
-        Build Daemon:            yes
-        Build BeOS client:       ${beos}
-        Build GTK+ client:       ${use_gtk}
-        Build OS X client:       ${darwin}
-        Build wxWidgets client:  ${use_wx}
+        Source code location:       ${srcdir}
+        Compiler:                   ${CXX}
+        Build Command-Line client:  ${build_cli}
+        Build Daemon:               ${build_daemon}
+        Build BeOS client:          ${build_beos}
+        Build GTK+ client:          ${build_gtk}
+        Build OS X client:          ${build_darwin}
+        Build wxWidgets client:     ${build_wx}
 
 "
