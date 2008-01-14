@@ -143,13 +143,12 @@
     {
         //remove the oldest
         NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"Date" ascending: YES] autorelease];
-        NSArray * descriptors = [[NSArray alloc] initWithObjects: descriptor, nil];
-        [fMessages sortUsingDescriptors: descriptors];
-        [descriptors release];
+        [fMessages sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
         
         [fMessages removeObjectsInRange: NSMakeRange(0, total-MAX_MESSAGES)];
         
         [fMessageTable noteHeightOfRowsWithIndexesChanged: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, MAX_MESSAGES)]];
+        total = MAX_MESSAGES;
     }
     
     [fMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];

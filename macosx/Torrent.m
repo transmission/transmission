@@ -874,12 +874,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         
         dic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
             [NSNumber numberWithInt: peer->from], @"From",
-            [NSString stringWithCString: (char *)peer->addr encoding: NSUTF8StringEncoding], @"IP",
+            [NSString stringWithUTF8String: peer->addr], @"IP",
             [NSNumber numberWithInt: peer->port], @"Port",
             [NSNumber numberWithFloat: peer->progress], @"Progress",
             [NSNumber numberWithBool: peer->isEncrypted], @"Encryption",
-            [NSString stringWithCString: (char *)peer->client encoding: NSUTF8StringEncoding], @"Client",
-            [NSString stringWithCString: (char *)peer->flagStr encoding: NSUTF8StringEncoding], @"Flags", nil];
+            [NSString stringWithUTF8String: peer->client], @"Client",
+            [NSString stringWithUTF8String: peer->flagStr], @"Flags", nil];
         
         if (peer->isUploadingTo)
             [dic setObject: [NSNumber numberWithFloat: peer->uploadToRate] forKey: @"UL To Rate"];
