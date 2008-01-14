@@ -758,19 +758,36 @@ typedef enum
                 break;
         }
         
-        #warning redo
-        NSMutableArray * peerStatusArray = [NSMutableArray arrayWithCapacity: 2];
-        if ([[peer objectForKey: @"PeerChoked"] boolValue])
-            [peerStatusArray addObject: NSLocalizedString(@"Refusing to send data to peer", "Inspector -> peer -> status")];
-        if ([[peer objectForKey: @"PeerInterested"] boolValue])
-            [peerStatusArray addObject: NSLocalizedString(@"Peer wants our data", "Inspector -> peer -> status")];
-        if ([[peer objectForKey: @"ClientChoked"] boolValue])
-            [peerStatusArray addObject: NSLocalizedString(@"Peer will not send us data", "Inspector -> peer -> status")];
-        if ([[peer objectForKey: @"ClientInterested"] boolValue])
-            [peerStatusArray addObject: NSLocalizedString(@"Waiting to request data from peer", "Inspector -> peer -> status")];
+        //determing status strings from flags 
+        NSMutableArray * statusArray = [NSMutableArray arrayWithCapacity: 3];
+        NSString * flags = [peer objectForKey: @"Flags"];
         
-        if ([peerStatusArray count] > 0)
-            [components addObject: [@"\n" stringByAppendingString: [peerStatusArray componentsJoinedByString: @"\n"]]];
+        if ([flags rangeOfString: @"D"].location != NSNotFound)
+            [statusArray addObject: NSLocalizedString(@"Currently downloading (interested and not choked)",
+                "Inspector -> peer -> status")];
+        else if ([flags rangeOfString: @"d"].location != NSNotFound)
+            [statusArray addObject: NSLocalizedString(@"You want to download, but peer does not want to send (interested and choked)",
+                "Inspector -> peer -> status")];
+        else;
+        
+        if ([flags rangeOfString: @"U"].location != NSNotFound)
+            [statusArray addObject: NSLocalizedString(@"Currently uploading (interested and not choked)",
+                "Inspector -> peer -> status")];
+        else if ([flags rangeOfString: @"u"].location != NSNotFound)
+            [statusArray addObject: NSLocalizedString(@"Peer wants you to upload, but you do not want to (interested and choked)",
+                "Inspector -> peer -> status")];
+        else;
+        
+        if ([flags rangeOfString: @"K"].location != NSNotFound)
+            [statusArray addObject: NSLocalizedString(@"Peer is unchoking you, but you are not interested",
+                "Inspector -> peer -> status")];
+        
+        if ([flags rangeOfString: @"?"].location != NSNotFound)
+            [statusArray addObject: NSLocalizedString(@"You unchoked the peer, but the peer is not interested",
+                "Inspector -> peer -> status")];
+        
+        if ([statusArray count] > 0)
+            [components addObject: [@"\n" stringByAppendingString: [statusArray componentsJoinedByString: @"\n\n"]]];
         
         return [components componentsJoinedByString: @"\n"];
     }
