@@ -26,10 +26,6 @@
 #import <transmission.h>
 #import <Controller.h>
 
-//button layout (from end of bar) is: button, padding, button, padding
-#define BUTTON_WIDTH 14.0
-#define BUTTONS_TOTAL_WIDTH 36.0
-
 #define ACTION_BUTTON_HEIGHT 14.0
 #define ACTION_BUTTON_WIDTH 32.0
 
@@ -37,9 +33,6 @@
 {
     IBOutlet Controller * fController;
     NSArray * fTorrents;
-    
-    NSPoint fClickPoint;
-    BOOL fClickIn;
     
     NSUserDefaults * fDefaults;
     
@@ -52,6 +45,8 @@
 }
 
 - (void) setTorrents: (NSArray *) torrents;
+
+- (void) toggleControlForTorrent: (Torrent *) torrent;
 
 - (void) displayTorrentMenuForEvent: (NSEvent *) event;
 

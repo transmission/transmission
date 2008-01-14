@@ -34,6 +34,10 @@
 #define BUTTON_TO_TOP_REGULAR 33.0
 #define BUTTON_TO_TOP_SMALL 20.0
 
+//button layout (from end of bar) is: button, padding, button, padding
+#define BUTTON_WIDTH 14.0
+#define BUTTONS_TOTAL_WIDTH 36.0
+
 #define ACTION_BUTTON_TO_TOP 44.0
 
 #define ACTION_MENU_GLOBAL_TAG 101
@@ -42,16 +46,12 @@
 
 @interface TorrentTableView (Private)
 
-- (NSRect) pauseRectForRow: (int) row;
-- (NSRect) revealRectForRow: (int) row;
 - (NSRect) actionRectForRow: (int) row;
 
 - (BOOL) pointInIconRect: (NSPoint) point;
 - (BOOL) pointInProgressRect: (NSPoint) point;
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point;
 
-- (BOOL) pointInPauseRect: (NSPoint) point;
-- (BOOL) pointInRevealRect: (NSPoint) point;
 - (BOOL) pointInActionRect: (NSPoint) point;
 
 - (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files;
@@ -64,9 +64,6 @@
 {
     if ((self = [super initWithCoder: decoder]))
     {
-        fClickPoint = NSZeroPoint;
-        fClickIn = NO;
-        
         fDefaults = [NSUserDefaults standardUserDefaults];
         
         [self setDelegate: self];
@@ -100,47 +97,39 @@
 
 - (void) mouseDown: (NSEvent *) event
 {
-    fClickPoint = [self convertPoint: [event locationInWindow] fromView: nil];
-
-    if ([self pointInActionRect: fClickPoint])
+    [super mouseDown: event];
+    
+    NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+    
+    if ([self pointInActionRect: point])
     {
-        int row = [self rowAtPoint: fClickPoint];
+        int row = [self rowAtPoint: point];
         [self setNeedsDisplayInRect: [self rectOfRow: row]]; //ensure button is pushed down
         
         [self displayTorrentMenuForEvent: event];
         
-        fClickPoint = NSZeroPoint;
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
-    }
-    else if ([self pointInPauseRect: fClickPoint] || [self pointInRevealRect: fClickPoint])
-    {
-        fClickIn = YES;
-        [self setNeedsDisplayInRect: [self rectOfRow: [self rowAtPoint: fClickPoint]]];
     }
     else
     {
-        if ([self pointInMinimalStatusRect: fClickPoint])
+        if ([self pointInMinimalStatusRect: point])
         {
             [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
-            fClickPoint = NSZeroPoint;
             [self reloadData];
         }
         
-        [super mouseDown: event];
-        
         //acts as if mouseUp:
-        if ([NSApp isOnLeopardOrBetter] && [event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
+        if ([NSApp isOnLeopardOrBetter] && [event clickCount] == 2)
         {
-            if ([self pointInProgressRect: fClickPoint])
+            if ([self pointInProgressRect: point])
             {
                 [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
                 [self reloadData];
             }
-            else if ([self pointInIconRect: fClickPoint])
-                [[fTorrents objectAtIndex: [self rowAtPoint: fClickPoint]] revealData];
-            else if (![self pointInActionRect: fClickPoint])
+            else if ([self pointInIconRect: point])
+                [[fTorrents objectAtIndex: [self rowAtPoint: point]] revealData];
+            else
                 [fController showInfo: nil];
-            else;
         }
     }
 }
@@ -148,89 +137,23 @@
 //only applies for paths in mouseDown: where the super mouseDown: isn't called
 - (void) mouseUp: (NSEvent *) event
 {
-    int oldRow;
-    if (fClickIn)
-    {
-        NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
-        int row = [self rowAtPoint: point];
-        oldRow = [self rowAtPoint: fClickPoint];
-        
-        if (row == oldRow && [self pointInPauseRect: point] && [self pointInPauseRect: fClickPoint])
-        {
-            Torrent * torrent = [fTorrents objectAtIndex: row];
-            
-            if ([torrent isActive])
-                [fController stopTorrents: [NSArray arrayWithObject: torrent]];
-            else
-            {
-                if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
-                    [fController resumeTorrentsNoWait: [NSArray arrayWithObject: torrent]];
-                else if ([torrent waitingToStart])
-                    [fController stopTorrents: [NSArray arrayWithObject: torrent]];
-                else
-                    [fController resumeTorrents: [NSArray arrayWithObject: torrent]];
-            }
-        }
-        else if (row == oldRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
-            [[fTorrents objectAtIndex: row] revealData];
-        else;
-    }
-    else if (![NSApp isOnLeopardOrBetter] && [event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
+    if (![NSApp isOnLeopardOrBetter] && [event clickCount] == 2)
     {
         NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
         int row = [self rowAtPoint: point];
         
-        if ([self pointInProgressRect: fClickPoint])
+        if ([self pointInProgressRect: point])
         {
             [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
             [self reloadData];
         }
         else if ([self pointInIconRect: point])
             [[fTorrents objectAtIndex: row] revealData];
-        else if (![self pointInActionRect: point])
+        else
             [fController showInfo: nil];
-        else;
     }
-    else;
     
     [super mouseUp: event];
-
-    fClickPoint = NSZeroPoint;
-    
-    BOOL wasClickIn = fClickIn;
-    fClickIn = NO;
-    
-    if (wasClickIn)
-        [self setNeedsDisplayInRect: [self rectOfRow: oldRow]];
-}
-
-- (void) mouseDragged: (NSEvent *) event
-{
-    if (NSEqualPoints(fClickPoint, NSZeroPoint))
-    {
-        [super mouseDragged: event];
-        return;
-    }
-    
-    NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
-    int oldRow = [self rowAtPoint: fClickPoint];
-    
-    BOOL inRect;
-    if ([self pointInRevealRect: fClickPoint])
-        inRect = oldRow == [self rowAtPoint: point] && [self pointInRevealRect: point];
-    else if ([self pointInPauseRect: fClickPoint])
-        inRect = oldRow == [self rowAtPoint: point] && [self pointInPauseRect: point];
-    else
-    {
-        [super mouseDragged: event];
-        return;
-    }
-    
-    if (inRect != fClickIn)
-    {
-        fClickIn = inRect;
-        [self setNeedsDisplayInRect: [self rectOfRow: oldRow]];
-    }
 }
 
 - (NSMenu *) menuForEvent: (NSEvent *) event
@@ -319,7 +242,7 @@
 }
 
 #warning get rect to actually change
-- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
+/*- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
     tableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row mouseLocation: (NSPoint) mousePoint
 {
     if ([self pointInActionRect: mousePoint])
@@ -353,6 +276,21 @@
     }
     
     return nil;
+}*/
+
+- (void) toggleControlForTorrent: (Torrent *) torrent
+{
+    if ([torrent isActive])
+        [fController stopTorrents: [NSArray arrayWithObject: torrent]];
+    else
+    {
+        if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
+            [fController resumeTorrentsNoWait: [NSArray arrayWithObject: torrent]];
+        else if ([torrent waitingToStart])
+            [fController stopTorrents: [NSArray arrayWithObject: torrent]];
+        else
+            [fController resumeTorrents: [NSArray arrayWithObject: torrent]];
+    }
 }
 
 - (void) displayTorrentMenuForEvent: (NSEvent *) event
@@ -546,38 +484,12 @@
 {
     [super drawRow: row clipRect: rect];
     
-    Torrent * torrent = [fTorrents objectAtIndex: row];
-    
-    //pause/resume icon
-    NSImage * pauseImage;
-    NSRect pauseRect  = [self pauseRectForRow: row];
-    BOOL inPauseRect = fClickIn && NSPointInRect(fClickPoint, pauseRect);
-    if ([torrent isActive])
-        pauseImage = inPauseRect ? [NSImage imageNamed: @"PauseOn.png"] : [NSImage imageNamed: @"PauseOff.png"];
-    else
-    {
-        if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
-            pauseImage = inPauseRect ? [NSImage imageNamed: @"ResumeNoWaitOn.png"] : [NSImage imageNamed: @"ResumeNoWaitOff.png"];
-        else if ([torrent waitingToStart])
-            pauseImage = inPauseRect ? [NSImage imageNamed: @"PauseOn.png"] : [NSImage imageNamed: @"PauseOff.png"];
-        else
-            pauseImage = inPauseRect ? [NSImage imageNamed: @"ResumeOn.png"] : [NSImage imageNamed: @"ResumeOff.png"];
-    }
-    
-    [pauseImage compositeToPoint: NSMakePoint(pauseRect.origin.x, NSMaxY(pauseRect)) operation: NSCompositeSourceOver];
-    
-    //reveal icon
-    NSRect revealRect = [self revealRectForRow: row];
-    NSImage * revealImage = fClickIn && NSPointInRect(fClickPoint, revealRect) ? [NSImage imageNamed: @"RevealOn.png"]
-                                                                                : [NSImage imageNamed: @"RevealOff.png"];
-    [revealImage compositeToPoint: NSMakePoint(revealRect.origin.x, NSMaxY(revealRect)) operation: NSCompositeSourceOver];
-    
     //action icon
     if (![fDefaults boolForKey: @"SmallView"])
     {
         NSRect actionRect = [self actionRectForRow: row];
-        NSImage * actionImage = NSPointInRect(fClickPoint, actionRect) ? [NSImage imageNamed: @"ActionOn.png"]
-                                                                        : [NSImage imageNamed: @"ActionOff.png"];
+        NSImage * actionImage = /*NSPointInRect(fClickPoint, actionRect) ? [NSImage imageNamed: @"ActionOn.png"]
+                                                                        :*/ [NSImage imageNamed: @"ActionOff.png"];
         [actionImage compositeToPoint: NSMakePoint(actionRect.origin.x, NSMaxY(actionRect)) operation: NSCompositeSourceOver];
     }
 }
@@ -585,32 +497,6 @@
 @end
 
 @implementation TorrentTableView (Private)
-
-- (NSRect) pauseRectForRow: (int) row
-{
-    if (row < 0)
-        return NSZeroRect;
-    
-    NSRect cellRect = [self frameOfCellAtColumn: 0 row: row];
-    
-    float buttonToTop = [fDefaults boolForKey: @"SmallView"] ? BUTTON_TO_TOP_SMALL : BUTTON_TO_TOP_REGULAR;
-    
-    return NSMakeRect(NSMaxX(cellRect) - PADDING - BUTTON_WIDTH - PADDING - BUTTON_WIDTH,
-                        cellRect.origin.y + buttonToTop, BUTTON_WIDTH, BUTTON_WIDTH);
-}
-
-- (NSRect) revealRectForRow: (int) row
-{
-    if (row < 0)
-        return NSZeroRect;
-    
-    NSRect cellRect = [self frameOfCellAtColumn: 0 row: row];
-    
-    float buttonToTop = [fDefaults boolForKey: @"SmallView"] ? BUTTON_TO_TOP_SMALL : BUTTON_TO_TOP_REGULAR;
-    
-    return NSMakeRect(NSMaxX(cellRect) - PADDING - BUTTON_WIDTH,
-                        cellRect.origin.y + buttonToTop, BUTTON_WIDTH, BUTTON_WIDTH);
-}
 
 - (NSRect) actionRectForRow: (int) row
 {
@@ -670,24 +556,6 @@
         [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
     }
     return NSPointInRect(point, [cell minimalStatusRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
-}
-
-- (BOOL) pointInPauseRect: (NSPoint) point
-{
-    int row = [self rowAtPoint: point];
-    if (row < 0)
-        return NO;
-    
-    return NSPointInRect(point, [self pauseRectForRow: row]);
-}
-
-- (BOOL) pointInRevealRect: (NSPoint) point
-{
-    int row = [self rowAtPoint: point];
-    if (row < 0)
-        return NO;
-    
-    return NSPointInRect(point, [self revealRectForRow: row]);
 }
 
 - (BOOL) pointInActionRect: (NSPoint) point

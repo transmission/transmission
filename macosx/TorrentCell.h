@@ -31,6 +31,8 @@
     
     NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
     
+    BOOL fMouseDownControlButton, fMouseDownRevealButton;
+    
     NSColor * fBarOverlayColor;
     CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fBlueGradient, * fDarkBlueGradient, 
                 * fGreenGradient, * fLightGreenGradient, * fDarkGreenGradient, * fYellowGradient, * fRedGradient,
@@ -47,5 +49,8 @@
 - (NSRect) barRectForBounds: (NSRect) bounds;
 - (NSRect) statusRectForBounds: (NSRect) bounds;
 - (NSRect) minimalStatusRectForBounds: (NSRect) bounds;
+
+- (NSRect) controlButtonRectForBounds: (NSRect) bounds;
+- (NSRect) revealButtonRectForBounds: (NSRect) bounds;
 
 @end

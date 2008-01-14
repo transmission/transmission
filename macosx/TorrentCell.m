@@ -35,11 +35,13 @@
 #define IMAGE_SIZE_REG 32.0
 #define IMAGE_SIZE_MIN 16.0
 
-//end up being larger than font height
+#define NORMAL_BUTTON_WIDTH 14.0
+
+//ends up being larger than font height
 #define HEIGHT_TITLE 16.0
 #define HEIGHT_STATUS 12.0
 
-#define PADDING_HORIZONAL 2.0
+#define PADDING_HORIZONTAL 2.0
 #define PADDING_ABOVE_IMAGE_REG 9.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE 5.0
 #define PADDING_BETWEEN_IMAGE_AND_BAR 7.0
@@ -149,7 +151,7 @@
 {
     NSRect result = bounds;
     
-    result.origin.x += PADDING_HORIZONAL;
+    result.origin.x += PADDING_HORIZONTAL;
     
     float imageSize;
     if ([fDefaults boolForKey: @"SmallView"])
@@ -194,7 +196,7 @@
     
     NSRect result = bounds;
     result.size.height = BAR_HEIGHT;
-    result.origin.x = PADDING_HORIZONAL + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_BAR;
+    result.origin.x = PADDING_HORIZONTAL + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_BAR;
     
     result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE;
     if (minimal)
@@ -202,7 +204,7 @@
     else
         result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
     
-    result.size.width = round(NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL - BUTTONS_TOTAL_WIDTH);
+    result.size.width = round(NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH));
     
     return result;
 }
@@ -213,9 +215,116 @@
                     inBounds: bounds];
 }
 
+- (NSRect) controlButtonRectForBounds: (NSRect) bounds
+{
+    NSRect result = bounds;
+    result.size.height = NORMAL_BUTTON_WIDTH;
+    result.size.width = NORMAL_BUTTON_WIDTH;
+    result.origin.x = NSMaxX(bounds) - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
+    
+    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5;
+    if ([fDefaults boolForKey: @"SmallView"])
+        result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
+    else
+        result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
+    
+    return result;
+}
+
+- (NSRect) revealButtonRectForBounds: (NSRect) bounds
+{
+    NSRect result = bounds;
+    result.size.height = NORMAL_BUTTON_WIDTH;
+    result.size.width = NORMAL_BUTTON_WIDTH;
+    result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
+    
+    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5;
+    if ([fDefaults boolForKey: @"SmallView"])
+        result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
+    else
+        result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
+    
+    return result;
+}
+
 - (NSUInteger) hitTestForEvent: (NSEvent *) event inRect: (NSRect) cellFrame ofView: (NSView *) controlView
 {
+    NSPoint point = [controlView convertPoint: [event locationInWindow] fromView: nil];
+    
+    if (NSMouseInRect(point, [self controlButtonRectForBounds: cellFrame], [controlView isFlipped])
+        || NSMouseInRect(point, [self revealButtonRectForBounds: cellFrame], [controlView isFlipped]))
+        return NSCellHitContentArea | NSCellHitTrackableArea;
+    
     return NSCellHitContentArea;
+}
+
++ (BOOL) prefersTrackingUntilMouseUp
+{
+    return YES;
+}
+
+- (BOOL) trackMouse: (NSEvent *) event inRect: (NSRect) cellFrame ofView: (NSView *) controlView untilMouseUp: (BOOL) flag
+{
+    [self setControlView: controlView];
+    
+    NSPoint point = [controlView convertPoint: [event locationInWindow] fromView: nil];
+    
+    fMouseDownControlButton = NO;
+    NSRect controlRect= [self controlButtonRectForBounds: cellFrame];
+    BOOL checkControl = NSMouseInRect(point, controlRect, [controlView isFlipped]);
+    
+    fMouseDownRevealButton = NO;
+    NSRect revealRect = [self revealButtonRectForBounds: cellFrame];
+    BOOL checkReveal = NSMouseInRect(point, revealRect, [controlView isFlipped]);
+    
+    while ([event type] != NSLeftMouseUp)
+    {
+        point = [controlView convertPoint: [event locationInWindow] fromView: nil];
+        
+        if (checkControl)
+        {
+            BOOL inControlButton = NSMouseInRect(point, controlRect, [controlView isFlipped]);
+            if (fMouseDownControlButton != inControlButton)
+            {
+                fMouseDownControlButton = inControlButton;
+                [controlView setNeedsDisplayInRect: cellFrame];
+            }
+        }
+        else if (checkReveal)
+        {
+            BOOL inRevealButton = NSMouseInRect(point, revealRect, [controlView isFlipped]);
+            if (fMouseDownRevealButton != inRevealButton)
+            {
+                fMouseDownRevealButton = inRevealButton;
+                [controlView setNeedsDisplayInRect: cellFrame];
+            }
+        }
+        else;
+        
+        //send events to where necessary
+        if ([event type] == NSMouseEntered || [event type] == NSMouseExited)
+            [NSApp sendEvent: event];
+        event = [[controlView window] nextEventMatchingMask:
+                    (NSLeftMouseUpMask | NSLeftMouseDraggedMask | NSMouseEnteredMask | NSMouseExitedMask)];
+    }
+
+    if (fMouseDownControlButton)
+    {
+        fMouseDownControlButton = NO;
+        [controlView setNeedsDisplayInRect: cellFrame];
+        
+        [(TorrentTableView *)controlView toggleControlForTorrent: [self representedObject]];
+    }
+    else if (fMouseDownRevealButton)
+    {
+        fMouseDownRevealButton = NO;
+        [controlView setNeedsDisplayInRect: cellFrame];
+        
+        [[self representedObject] revealData];
+    }
+    else;
+    
+    return YES;
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
@@ -303,6 +412,30 @@
     
     //bar
     [self drawBar: [self barRectForBounds: cellFrame]];
+    
+    //control button
+    NSString * controlImageSuffix = fMouseDownControlButton ? @"On.png" : @"Off.png";
+    NSImage * controlImage;
+    if ([torrent isActive])
+        controlImage = [NSImage imageNamed: [@"Pause" stringByAppendingString: controlImageSuffix]];
+    else
+    {
+        if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
+            controlImage = [NSImage imageNamed: [@"ResumeNoWait" stringByAppendingString: controlImageSuffix]];
+        else if ([torrent waitingToStart])
+            controlImage = [NSImage imageNamed: [@"Pause" stringByAppendingString: controlImageSuffix]];
+        else
+            controlImage = [NSImage imageNamed: [@"Resume" stringByAppendingString: controlImageSuffix]];
+    }
+    [controlImage setFlipped: YES];
+    [controlImage drawInRect: [self controlButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
+        fraction: 1.0];
+    
+    //reveal button
+    NSImage * revealImage = fMouseDownRevealButton ? [NSImage imageNamed: @"RevealOn.png"] : [NSImage imageNamed: @"RevealOff.png"];
+    [revealImage setFlipped: YES];
+    [revealImage drawInRect: [self revealButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
+        fraction: 1.0];
     
     //status
     if (!minimal)
@@ -534,7 +667,7 @@
     NSRect result = bounds;
     result.size = [string size];
     
-    result.origin.x += bounds.size.width - result.size.width - PADDING_HORIZONAL;
+    result.origin.x += bounds.size.width - result.size.width - PADDING_HORIZONTAL;
     result.origin.y += PADDING_ABOVE_MIN_STATUS;
     
     return result;
@@ -547,10 +680,10 @@
     
     NSRect result = bounds;
     result.origin.y += PADDING_ABOVE_TITLE;
-    result.origin.x += PADDING_HORIZONAL + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    result.origin.x += PADDING_HORIZONTAL + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_TITLE;
     
     result.size = [string size];
-    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL
+    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL
                             - (minimal ? PADDING_BETWEEN_TITLE_AND_MIN_STATUS + statusRect.size.width : 0));
     
     return result;
@@ -563,10 +696,10 @@
     
     NSRect result = bounds;
     result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS;
-    result.origin.x += PADDING_HORIZONAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    result.origin.x += PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
     
     result.size = [string size];
-    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL);
+    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL);
     
     return result;
 }
@@ -579,10 +712,10 @@
     NSRect result = bounds;
     result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS
                         + PADDING_BETWEEN_PROGRESS_AND_BAR + BAR_HEIGHT + PADDING_BETWEEN_BAR_AND_STATUS;
-    result.origin.x += PADDING_HORIZONAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    result.origin.x += PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
     
     result.size = [string size];
-    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL);
+    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL);
     
     return result;
 }
