@@ -754,6 +754,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         if (tr_torrentParse(fLib, ctor, &info) == TR_EDUPLICATE)
         {
             [self duplicateOpenAlert: [NSString stringWithUTF8String: info.name]];
+            tr_ctorFree(ctor);
             tr_metainfoFree(&info);
             continue;
         }
@@ -772,19 +773,19 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         //determine to show the options window
         BOOL showWindow = type == ADD_SHOW_OPTIONS || ([fDefaults boolForKey: @"DownloadAsk"]
-                            && (![fDefaults boolForKey: @"DownloadAskMulti"] || info.isMultifile));
+                            && (info.isMultifile || ![fDefaults boolForKey: @"DownloadAskMulti"]));
         tr_metainfoFree(&info);
         
         if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location
                             deleteTorrentFile: showWindow ? TORRENT_FILE_SAVE : deleteTorrentFile lib: fLib]))
             continue;
         
-        //add it to the "File -> Open Recent" menu
-        [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
-        
         //verify the data right away if it was newly created
         if (type == ADD_CREATED)
             [torrent resetCache];
+        
+        //add it to the "File -> Open Recent" menu
+        [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
         
         //show the add window or add directly
         if (showWindow || !location)
