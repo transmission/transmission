@@ -524,7 +524,14 @@ readCryptoSelect( tr_handshake * handshake, struct evbuffer * inbuf )
 
     tr_peerIoReadUint16( handshake->io, inbuf, &pad_d_len );
     dbgmsg( handshake, "pad_d_len is %d", (int)pad_d_len );
-    assert( pad_d_len <= 512 );
+
+    if( pad_d_len > 512 )
+    {
+        dbgmsg( handshake, "encryption handshake: pad_d_len is too long" );
+        tr_handshakeDone( handshake, FALSE );
+        return READ_DONE;
+    }
+
     handshake->pad_d_len = pad_d_len;
 
     setState( handshake, AWAITING_PAD_D );
