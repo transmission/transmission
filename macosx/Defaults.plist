@@ -44,6 +44,8 @@
 	<false/>
 	<key>DownloadAsk</key>
 	<true/>
+	<key>DownloadAskMulti</key>
+	<false/>
 	<key>DownloadFolder</key>
 	<string>~/Downloads</string>
 	<key>DownloadLimit</key>

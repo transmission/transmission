@@ -729,7 +729,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         return;
     }
     
-    BOOL showWindow = type == ADD_SHOW_OPTIONS || [fDefaults boolForKey: @"DownloadAsk"];
     torrentFileState deleteTorrentFile;
     switch (type)
     {
@@ -758,7 +757,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             tr_metainfoFree(&info);
             continue;
         }
-        tr_metainfoFree(&info);
         tr_ctorFree(ctor);
         
         //determine download location
@@ -771,6 +769,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             location = [torrentPath stringByDeletingLastPathComponent];
         else
             location = nil;
+        
+        //determine to show the options window
+        BOOL showWindow = type == ADD_SHOW_OPTIONS || ([fDefaults boolForKey: @"DownloadAsk"]
+                            && (![fDefaults boolForKey: @"DownloadAskMulti"] || info.isMultifile));
+        tr_metainfoFree(&info);
         
         if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location
                             deleteTorrentFile: showWindow ? TORRENT_FILE_SAVE : deleteTorrentFile lib: fLib]))
