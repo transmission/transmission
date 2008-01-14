@@ -243,7 +243,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (void) update
 {
     //get previous status values before update
-    BOOL wasChecking = [self isChecking], wasError = [self isError], wasStalled = fStalled;
+    BOOL wasChecking = NO, wasError = NO, wasStalled = NO;
+    if (fStat != NULL)
+    {
+        wasChecking = [self isChecking];
+        wasError = [self isError];
+        wasStalled = fStalled;
+    }
     
     fStat = tr_torrentStat(fHandle);
     
