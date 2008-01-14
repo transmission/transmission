@@ -29,31 +29,17 @@
 #import "NSApplicationAdditions.h"
 #import "NSMenuAdditions.h"
 
-#define PADDING 3.0
-
-#define BUTTON_TO_TOP_REGULAR 33.0
-#define BUTTON_TO_TOP_SMALL 20.0
-
-//button layout (from end of bar) is: button, padding, button, padding
-#define BUTTON_WIDTH 14.0
-#define BUTTONS_TOTAL_WIDTH 36.0
-
-#define ACTION_BUTTON_TO_TOP 44.0
-
 #define ACTION_MENU_GLOBAL_TAG 101
 #define ACTION_MENU_UNLIMITED_TAG 102
 #define ACTION_MENU_LIMIT_TAG 103
 
 @interface TorrentTableView (Private)
 
-- (NSRect) actionRectForRow: (int) row;
+- (BOOL) pointInActionRect: (NSPoint) point;
 
 - (BOOL) pointInIconRect: (NSPoint) point;
 - (BOOL) pointInProgressRect: (NSPoint) point;
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point;
-
-- (BOOL) pointInActionRect: (NSPoint) point;
-
 - (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files;
 
 @end
@@ -309,7 +295,8 @@
     [fActionMenu appendItemsFromMenu: fileMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range] atBottom: YES];
     
     //place menu below button
-    NSRect rect = [self actionRectForRow: row];
+    NSRect rect = [[[self tableColumnWithIdentifier: @"Torrent"] dataCell] actionButtonRectForBounds:
+                    [self frameOfCellAtColumn: 0 row: row]];
     NSPoint location = rect.origin;
     location.y += rect.size.height + 5.0;
     location = [self convertPoint: location toView: nil];
@@ -480,38 +467,18 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
 }
 
-- (void) drawRow: (int) row clipRect: (NSRect) rect
-{
-    [super drawRow: row clipRect: rect];
-    
-    //action icon
-    if (![fDefaults boolForKey: @"SmallView"])
-    {
-        NSRect actionRect = [self actionRectForRow: row];
-        NSImage * actionImage = /*NSPointInRect(fClickPoint, actionRect) ? [NSImage imageNamed: @"ActionOn.png"]
-                                                                        :*/ [NSImage imageNamed: @"ActionOff.png"];
-        [actionImage compositeToPoint: NSMakePoint(actionRect.origin.x, NSMaxY(actionRect)) operation: NSCompositeSourceOver];
-    }
-}
-
 @end
 
 @implementation TorrentTableView (Private)
 
-- (NSRect) actionRectForRow: (int) row
+- (BOOL) pointInActionRect: (NSPoint) point
 {
+    int row = [self rowAtPoint: point];
     if (row < 0)
-        return NSZeroRect;
+        return NO;
     
     TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
-    NSRect cellRect = [self frameOfCellAtColumn: 0 row: row],
-            iconRect = [cell iconRectForBounds: cellRect];
-    
-    if ([fDefaults boolForKey: @"SmallView"])
-        return iconRect;
-    else
-        return NSMakeRect(iconRect.origin.x + (iconRect.size.width - ACTION_BUTTON_WIDTH) * 0.5,
-                        cellRect.origin.y + ACTION_BUTTON_TO_TOP, ACTION_BUTTON_WIDTH, ACTION_BUTTON_HEIGHT);
+    return NSPointInRect(point, [cell actionButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (BOOL) pointInIconRect: (NSPoint) point
@@ -556,15 +523,6 @@
         [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
     }
     return NSPointInRect(point, [cell minimalStatusRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
-}
-
-- (BOOL) pointInActionRect: (NSPoint) point
-{
-    int row = [self rowAtPoint: point];
-    if (row < 0)
-        return NO;
-    
-    return NSPointInRect(point, [self actionRectForRow: row]);
 }
 
 - (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files

@@ -36,6 +36,8 @@
 #define IMAGE_SIZE_MIN 16.0
 
 #define NORMAL_BUTTON_WIDTH 14.0
+#define ACTION_BUTTON_HEIGHT 14.0
+#define ACTION_BUTTON_WIDTH 32.0
 
 //ends up being larger than font height
 #define HEIGHT_TITLE 16.0
@@ -43,6 +45,7 @@
 
 #define PADDING_HORIZONTAL 2.0
 #define PADDING_ABOVE_IMAGE_REG 9.0
+#define PADDING_BETWEEN_IMAGE_AND_ACTION_BUTTON 3.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE 5.0
 #define PADDING_BETWEEN_IMAGE_AND_BAR 7.0
 #define PADDING_ABOVE_TITLE 3.0
@@ -247,6 +250,21 @@
     return result;
 }
 
+- (NSRect) actionButtonRectForBounds: (NSRect) bounds
+{
+    NSRect iconRect = [self iconRectForBounds: bounds];
+    if ([fDefaults boolForKey: @"SmallView"])
+        return iconRect;
+    
+    NSRect result = iconRect;
+    result.origin.x += (iconRect.size.width - ACTION_BUTTON_WIDTH) * 0.5;
+    result.origin.y += iconRect.size.height + PADDING_BETWEEN_IMAGE_AND_ACTION_BUTTON;
+    result.size.width = ACTION_BUTTON_WIDTH;
+    result.size.height = ACTION_BUTTON_HEIGHT;
+    
+    return result;
+}
+
 - (NSUInteger) hitTestForEvent: (NSEvent *) event inRect: (NSRect) cellFrame ofView: (NSView *) controlView
 {
     NSPoint point = [controlView convertPoint: [event locationInWindow] fromView: nil];
@@ -435,6 +453,12 @@
     NSImage * revealImage = fMouseDownRevealButton ? [NSImage imageNamed: @"RevealOn.png"] : [NSImage imageNamed: @"RevealOff.png"];
     [revealImage setFlipped: YES];
     [revealImage drawInRect: [self revealButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
+        fraction: 1.0];
+    
+    //action button
+    NSImage * actionImage = /*fMouseDownActionButton ? [NSImage imageNamed: @"ActionOn.png"] :*/ [NSImage imageNamed: @"ActionOff.png"];
+    [actionImage setFlipped: YES];
+    [actionImage drawInRect: [self actionButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
         fraction: 1.0];
     
     //status

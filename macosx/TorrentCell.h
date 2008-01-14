@@ -52,5 +52,6 @@
 
 - (NSRect) controlButtonRectForBounds: (NSRect) bounds;
 - (NSRect) revealButtonRectForBounds: (NSRect) bounds;
+- (NSRect) actionButtonRectForBounds: (NSRect) bounds;
 
 @end

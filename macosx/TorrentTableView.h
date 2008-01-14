@@ -26,9 +26,6 @@
 #import <transmission.h>
 #import <Controller.h>
 
-#define ACTION_BUTTON_HEIGHT 14.0
-#define ACTION_BUTTON_WIDTH 32.0
-
 @interface TorrentTableView : NSTableView
 {
     IBOutlet Controller * fController;
