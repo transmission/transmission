@@ -242,6 +242,9 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (void) update
 {
+    //get previous status values before update
+    BOOL wasChecking = [self isChecking], wasError = [self isError], wasStalled = fStalled;
+    
     fStat = tr_torrentStat(fHandle);
     
     //check to stop for ratio
@@ -257,21 +260,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         fFinishedSeeding = YES;
     }
     
-    //check if checking data
-    BOOL wasChecking = fChecking;
-    fChecking = fStat->status == TR_STATUS_CHECK || fStat->status == TR_STATUS_CHECK_WAIT;
-    
-    //check for error
-    BOOL wasError = fError;
-    fError = [self isError];
-    
-    //check if stalled
-    BOOL wasStalled = fStalled;
+    //check if stalled (stored because based on time and needs to check if it was previously stalled)
     fStalled = [self isActive] && [fDefaults boolForKey: @"CheckStalled"]
                 && [fDefaults integerForKey: @"StalledMinutes"] < [self stalledMinutes];
     
     //update queue for checking (from downloading to seeding), stalled, or error
-    if ((wasChecking && !fChecking) || (wasStalled != fStalled) || (!wasError && fError && [self isActive]))
+    if ((wasChecking && ![self isChecking]) || (wasStalled != fStalled) || (!wasError && [self isError] && [self isActive]))
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 }
 
@@ -1561,8 +1555,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
     fGroupValue = groupValue ? [groupValue intValue] : -1;
-    
-    fError = NO;
     
     [self createFileList];
     

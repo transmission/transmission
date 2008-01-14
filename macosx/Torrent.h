@@ -66,7 +66,7 @@ typedef enum
     
     float fRatioLimit;
     int fRatioSetting;
-    BOOL fFinishedSeeding, fWaitToStart, fError, fChecking, fStalled;
+    BOOL fFinishedSeeding, fWaitToStart, fStalled;
     
     int fOrderValue, fGroupValue;
     
