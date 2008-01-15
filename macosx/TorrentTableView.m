@@ -56,6 +56,7 @@
         
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
+        fMouseActionRow = -1;
         
         [self setDelegate: self];
     }
@@ -83,6 +84,7 @@
     [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
     [cell setControlHover: row == fMouseControlRow];
     [cell setRevealHover: row == fMouseRevealRow];
+    [cell setActionHover: row == fMouseActionRow];
 }
 
 - (NSString *) tableView: (NSTableView *) tableView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn row: (int) row
@@ -118,6 +120,7 @@
 {
     fMouseControlRow = -1;
     fMouseRevealRow = -1;
+    fMouseActionRow = -1;
     
     NSEnumerator * enumerator = [[self trackingAreas] objectEnumerator];
     NSTrackingArea * area;
@@ -142,6 +145,14 @@
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
 }
 
+
+- (void) setActionButtonHover: (int) row
+{
+    fMouseActionRow = row;
+    if (row >= 0)
+        [self setNeedsDisplayInRect: [self rectOfRow: row]];
+}
+
 - (void) mouseEntered: (NSEvent *) event
 {
     NSDictionary * dict = (NSDictionary *)[event userData];
@@ -152,8 +163,10 @@
         int rowVal = [row intValue];
         if ([[dict objectForKey: @"Type"] isEqualToString: @"Control"])
             fMouseControlRow = rowVal;
-        else
+        else if ([[dict objectForKey: @"Type"] isEqualToString: @"Reveal"])
             fMouseRevealRow = rowVal;
+        else
+            fMouseActionRow = rowVal;
         
         [self setNeedsDisplayInRect: [self rectOfRow: rowVal]];
     }
@@ -166,6 +179,7 @@
     {
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
+        fMouseActionRow = -1;
         
         [self setNeedsDisplayInRect: [self rectOfRow: [row intValue]]];
     }
@@ -208,7 +222,7 @@
             [self reloadData];
         }
         
-        if ([NSApp isOnLeopardOrBetter] && [event clickCount] == 2)
+        if ([event clickCount] == 2) //double click
         {
             if ([self pointInProgressRect: point])
             {
@@ -221,28 +235,6 @@
                 [fController showInfo: nil];
         }
     }
-}
-
-//only applies for paths in mouseDown: where the super mouseDown: isn't called
-- (void) mouseUp: (NSEvent *) event
-{
-    if (![NSApp isOnLeopardOrBetter] && [event clickCount] == 2)
-    {
-        NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
-        int row = [self rowAtPoint: point];
-        
-        if ([self pointInProgressRect: point])
-        {
-            [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
-            [self reloadData];
-        }
-        else if ([self pointInIconRect: point])
-            [[fTorrents objectAtIndex: row] revealData];
-        else
-            [fController showInfo: nil];
-    }
-    
-    [super mouseUp: event];
 }
 
 - (NSMenu *) menuForEvent: (NSEvent *) event

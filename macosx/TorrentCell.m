@@ -391,6 +391,22 @@
     [controlView addTrackingArea: area];
     [revealInfo release];
     [area release];
+    
+    //action button (needed even in minimal mode to display status string
+    NSRect actionButtonRect = [self actionButtonRectForBounds: cellFrame];
+    NSTrackingAreaOptions actionOptions = options;
+    if (NSMouseInRect(mouseLocation, actionButtonRect, [controlView isFlipped]))
+    {
+        actionOptions |= NSTrackingAssumeInside;
+        [(TorrentTableView *)controlView setActionButtonHover: [[userInfo objectForKey: @"Row"] intValue]];
+    }
+    
+    NSMutableDictionary * actionInfo = [userInfo mutableCopy];
+    [actionInfo setObject: @"Action" forKey: @"Type"];
+    area = [[NSTrackingArea alloc] initWithRect: actionButtonRect options: actionOptions owner: controlView userInfo: actionInfo];
+    [controlView addTrackingArea: area];
+    [actionInfo release];
+    [area release];
 }
 
 - (void) setControlHover: (BOOL) hover
@@ -401,6 +417,11 @@
 - (void) setRevealHover: (BOOL) hover
 {
     fHoverReveal = [NSApp isOnLeopardOrBetter] ? hover : -1;
+}
+
+- (void) setActionHover: (BOOL) hover
+{
+    fHoverAction = [NSApp isOnLeopardOrBetter] ? hover : -1;
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
@@ -531,8 +552,13 @@
     //action button
     if (!minimal)
     {
-        NSImage * actionImage = /*fMouseDownActionButton ? [NSImage imageNamed: @"ActionOn.png"] :*/
-                                [NSImage imageNamed: @"ActionOff.png"];
+        NSString * actionImageSuffix;
+        if (!fTracking && fHoverAction)
+            actionImageSuffix = /*@"Hover.png"*/@"On.png";
+        else
+            actionImageSuffix = @"Off.png";
+        
+        NSImage * actionImage = [NSImage imageNamed: [@"Action" stringByAppendingString: actionImageSuffix]];
         [actionImage setFlipped: YES];
         [actionImage drawInRect: [self actionButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
             fraction: 1.0];
@@ -846,7 +872,7 @@
     {
         Torrent * torrent = [self representedObject];
         if ([torrent isActive])
-            return NSLocalizedString(@"Pause the transfer.", "Torrent Table -> tooltip");
+            return NSLocalizedString(@"Pause the transfer", "Torrent Table -> tooltip");
         else
         {
             if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
@@ -857,6 +883,8 @@
                 return NSLocalizedString(@"Resume the transfer", "Torrent cell -> button info");
         }
     }
+    else if (!fTracking && fHoverAction)
+        return NSLocalizedString(@"Change transfer settings", "Torrent Table -> tooltip");
     else
         return nil;
 }

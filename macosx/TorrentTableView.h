@@ -37,7 +37,7 @@
     
     IBOutlet NSMenu * fContextRow, * fContextNoRow;
     
-    int fMouseControlRow, fMouseRevealRow;
+    int fMouseControlRow, fMouseRevealRow, fMouseActionRow;
     NSIndexSet * fSelectedIndexes;
     
     NSMutableArray * fKeyStrokes;
@@ -51,6 +51,7 @@
 - (void) removeButtonTrackingAreas;
 - (void) setControlButtonHover: (int) row;
 - (void) setRevealButtonHover: (int) row;
+- (void) setActionButtonHover: (int) row;
 
 - (void) toggleControlForTorrent: (Torrent *) torrent;
 
