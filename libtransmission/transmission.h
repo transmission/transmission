@@ -31,14 +31,14 @@ extern "C" {
 
 #include "version.h"
 
-#include <inttypes.h>
+#include <inttypes.h> /* uintN_t */
 #ifndef PRId64
 # define PRId64 "lld"
 #endif
 #ifndef PRIu64
 # define PRIu64 "llu"
 #endif
-#include <time.h>
+#include <time.h> /* time_t */
 
 #define SHA_DIGEST_LENGTH 20
 #ifdef __BEOS__
@@ -46,10 +46,6 @@ extern "C" {
 # define MAX_PATH_LENGTH  B_FILE_NAME_LENGTH
 #else
 # define MAX_PATH_LENGTH  1024
-#endif
-
-#ifndef INET_ADDRSTRLEN
-#define INET_ADDRSTRLEN 16
 #endif
 
 #if defined(WIN32)
@@ -96,20 +92,15 @@ enum
 /***********************************************************************
  * tr_init
  ***********************************************************************
- * Initializes a libtransmission instance and returns an opaque handle
+ * Initializes and returns an opaque libtransmission handle
  * to be passed to functions below. The tag argument is a short string
  * unique to the program invoking tr_init(), it is currently used as
  * part of saved torrent files' names to prevent one frontend from
  * deleting a torrent used by another. The following tags are used:
- *   beos cli daemon gtk macosx
+ *   beos cli daemon gtk macosx wx
  **********************************************************************/
 
 typedef struct tr_handle tr_handle;
-
-tr_handle * tr_init( const char * tag );
-
-/* shut down a libtransmission instance created by tr_init(). */
-void tr_close( tr_handle * );
 
 tr_handle * tr_initFull( const char * tag,
                          int          isPexEnabled,
@@ -123,6 +114,16 @@ tr_handle * tr_initFull( const char * tag,
                          int          globalPeerLimit,
                          int          messageLevel,
                          int          isMessageQueueingEnabled );
+
+/**
+ * Like tr_initFull() but with default values supplied.
+ */ 
+tr_handle * tr_init( const char * tag );
+
+/**
+ * Shut down a libtransmission instance created by tr_init*()
+ */
+void tr_close( tr_handle * );
 
 
 /**
@@ -140,13 +141,13 @@ typedef struct tr_session_stats
 }
 tr_session_stats;
 
-/* stats from the current and past sessions. */
-void tr_getCumulativeSessionStats( const tr_handle   * handle,
-                                   tr_session_stats  * setme );
-
 /* stats from the current session. */
 void tr_getSessionStats( const tr_handle   * handle,
                          tr_session_stats  * setme );
+
+/* stats from the current and past sessions. */
+void tr_getCumulativeSessionStats( const tr_handle   * handle,
+                                   tr_session_stats  * setme );
 
 
 /**
@@ -166,33 +167,6 @@ tr_encryption_mode tr_getEncryptionMode( tr_handle * handle );
 void tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode );
 
 /***********************************************************************
- * tr_setMessageLevel
- ***********************************************************************
- * Set the level of messages to be output or queued
- **********************************************************************/
-#define TR_MSG_ERR 1
-#define TR_MSG_INF 2
-#define TR_MSG_DBG 3
-void tr_setMessageLevel( int );
-int tr_getMessageLevel( void );
-
-/***********************************************************************
- * tr_setMessageQueuing
- ***********************************************************************
- * Enable or disable message queuing
- **********************************************************************/
-typedef struct tr_msg_list tr_msg_list;
-void tr_setMessageQueuing( int );
-
-/***********************************************************************
- * tr_getQueuedMessages
- ***********************************************************************
- * Return a list of queued messages
- **********************************************************************/
-tr_msg_list * tr_getQueuedMessages( void );
-void tr_freeMessageList( tr_msg_list * list );
-
-/***********************************************************************
  * tr_getPrefsDirectory
  ***********************************************************************
  * Returns the full path to a directory which can be used to store
@@ -200,42 +174,63 @@ void tr_freeMessageList( tr_msg_list * list );
  **********************************************************************/
 const char * tr_getPrefsDirectory( void );
 
+
+
+
 /***********************************************************************
- * tr_setBindPort
- ***********************************************************************
- * Sets the port to listen for incoming peer connections.
- * This can be safely called even with active torrents.
- **********************************************************************/
+** Message Logging
+*/
+
+#define TR_MSG_ERR 1
+#define TR_MSG_INF 2
+#define TR_MSG_DBG 3
+void tr_setMessageLevel( int );
+int tr_getMessageLevel( void );
+
+void tr_setMessageQueuing( int enable );
+
+typedef struct tr_msg_list tr_msg_list;
+tr_msg_list * tr_getQueuedMessages( void );
+void tr_freeMessageList( tr_msg_list * freeme );
+
+/***********************************************************************
+** Incoming Peer Connections Port
+*/
+
 void tr_setBindPort( tr_handle *, int );
+
+void tr_natTraversalEnable( tr_handle *, int enable );
 
 int tr_getPublicPort( const tr_handle * );
 
-/***********************************************************************
- * tr_natTraversalEnable
- * tr_natTraversalDisable
- ***********************************************************************
- * Enable or disable NAT traversal using NAT-PMP or UPnP IGD.
- **********************************************************************/
-void tr_natTraversalEnable( tr_handle *, int enable );
+typedef enum
+{
+    TR_NAT_TRAVERSAL_MAPPING,
+    TR_NAT_TRAVERSAL_MAPPED,
+    TR_NAT_TRAVERSAL_UNMAPPING,
+    TR_NAT_TRAVERSAL_UNMAPPED,
+    TR_NAT_TRAVERSAL_ERROR,
+}
+tr_nat_traversal_status;
 
-/***********************************************************************
- * tr_handleStatus
- ***********************************************************************
- * Returns some status info for the given handle.
- **********************************************************************/
-typedef struct tr_handle_status tr_handle_status;
+typedef struct tr_handle_status
+{
+    tr_nat_traversal_status natTraversalStatus;
+    int publicPort;
+}
+tr_handle_status;
+
 tr_handle_status * tr_handleStatus( tr_handle * );
 
 
 /***********************************************************************
- * tr_torrentCount
- ***********************************************************************
- * Returns the count of open torrents
- **********************************************************************/
-int tr_torrentCount( tr_handle * h );
-
+***
+***  TORRENTS
+**/
 
 typedef struct tr_torrent tr_torrent;
+
+int tr_torrentCount( const tr_handle * h );
 
 /***********************************************************************
 *** Speed Limits
@@ -351,10 +346,9 @@ void tr_torrentRates( tr_handle *, float *, float * );
 /**
  *  Torrent Instantiation
  *
- *  Instantiating a tr_torrent has gotten a lot more complaticated as we
- *  add more options to them.  At the worst point there were four functions
- *  to check metainfo, and four (or five) functions to create tr_torrents.
- *  They all did mostly the same thing, but each was just *slightly* different.
+ *  Instantiating a tr_torrent had gotten more complicated as features were
+ *  added.  At one point there were four functions to check metainfo and five
+ *  to create tr_torrent.
  *
  *  To remedy this, a Torrent Constructor (struct tr_ctor) has been introduced:
  *  + Simplifies the API down to two (non-deprecated) functions.
@@ -393,7 +387,7 @@ tr_ctor* tr_ctorNew                    ( const tr_handle  * handle);
 void     tr_ctorFree                   ( tr_ctor        * ctor );
 
 void     tr_ctorSetSave                ( tr_ctor        * ctor,
-                                         int              saveMetadataInOurTorrentsDir );
+                                         int     saveMetadataInOurTorrentsDir );
 
 int      tr_ctorSetMetainfo            ( tr_ctor        * ctor,
                                          const uint8_t  * metainfo,
@@ -451,14 +445,12 @@ typedef struct tr_info tr_info;
  * Returns TR_EDUPLICATE if it parsed but can't be added. 
  *     "destination" must be set to test for TR_EDUPLICATE.
  *
- * "setme_info" can be NULL if you don't need the information.
- * If the metainfo can be parsed and setme_info is non-NULL,
- * it will be filled with the metainfo's info.  You'll need to
- * call tr_metainfoFree( setme_info ) when done with it.
+ * If "setme_info" is non-NULL, the parsed metainfo is stored there
+ * and will need to be freed by the caller via tr_metainfoFree().
  */
 int tr_torrentParse( const tr_handle  * handle,
                      const tr_ctor    * ctor,
-                     tr_info          * setme_info );
+                     tr_info          * setme_info_or_NULL );
 
 /**
  * Instantiate a single torrent.
@@ -485,8 +477,8 @@ tr_torrent ** tr_loadTorrents ( tr_handle  * h,
 
 /**
  * Set whether or not torrents are allowed to do peer exchanges.
- * By default, PEX is enabled.
  * PEX is always disabled in private torrents regardless of this.
+ * In public torrents, PEX is enabled by default.
  */
 void tr_setPexEnabled( tr_handle *, int isEnabled );
 
@@ -494,29 +486,12 @@ int tr_isPexEnabled( const tr_handle * );
 
 const tr_info * tr_torrentInfo( const tr_torrent * );
 
-void   tr_torrentSetFolder( tr_torrent *, const char * );
+void tr_torrentSetFolder( tr_torrent *, const char * );
 
 const char * tr_torrentGetFolder( const tr_torrent * );
 
-/***********************************************************************
- * tr_torrentStart
- ***********************************************************************
- * Starts downloading. The download is launched in a seperate thread,
- * therefore tr_torrentStart returns immediately.
- **********************************************************************/
-void   tr_torrentStart( tr_torrent * );
+void tr_torrentStart( tr_torrent * );
 
-/***********************************************************************
- * tr_torrentStop
- ***********************************************************************
- * Stops downloading and notices the tracker that we are leaving. The
- * thread keeps running while doing so.
- * The thread will eventually be joined, either:
- * - by tr_torrentStat when the tracker has been successfully noticed,
- * - by tr_torrentStat if the tracker could not be noticed within 60s,
- * - by tr_torrentClose if you choose to remove the torrent without
- *   waiting any further.
- **********************************************************************/
 void tr_torrentStop( tr_torrent * );
 
 
@@ -779,7 +754,7 @@ struct tr_file_stat
 
 struct tr_peer_stat
 {
-    char addr[INET_ADDRSTRLEN];
+    char addr[16];
     char client[80];
     
     unsigned int isEncrypted : 1;
@@ -812,21 +787,6 @@ struct tr_msg_list
     struct tr_msg_list * next;
 };
 
-typedef enum
-{
-    TR_NAT_TRAVERSAL_MAPPING,
-    TR_NAT_TRAVERSAL_MAPPED,
-    TR_NAT_TRAVERSAL_UNMAPPING,
-    TR_NAT_TRAVERSAL_UNMAPPED,
-    TR_NAT_TRAVERSAL_ERROR,
-}
-tr_nat_traversal_status;
-
-struct tr_handle_status
-{
-    tr_nat_traversal_status natTraversalStatus;
-    int publicPort;
-};
 
 #ifdef __TRANSMISSION__
 #  include "internal.h"
