@@ -76,7 +76,9 @@
 - (NSAttributedString *) attributedTitleWithColor: (NSColor *) color;
 - (NSAttributedString *) attributedStatusString: (NSString *) string withColor: (NSColor *) color;
 
+- (NSString *) buttonString;
 - (NSString *) statusString;
+- (NSString *) minimalStatusString;
 
 @end
 
@@ -183,10 +185,8 @@
 
 - (NSRect) minimalStatusRectForBounds: (NSRect) bounds
 {
-    Torrent * torrent = [self representedObject];
-    NSString * string = [fDefaults boolForKey: @"DisplaySmallStatusRegular"]
-                            ? [torrent shortStatusString] : [torrent remainingTimeString];
-    return [self rectForMinimalStatusWithString: [self attributedStatusString: string withColor: nil] inBounds: bounds];
+    return [self rectForMinimalStatusWithString: [self attributedStatusString: [self minimalStatusString] withColor: nil]
+            inBounds: bounds];
 }
 
 - (NSRect) progressRectForBounds: (NSRect) bounds
@@ -465,9 +465,7 @@
     NSRect minimalStatusRect;
     if (minimal)
     {
-        NSString * string = [fDefaults boolForKey: @"DisplaySmallStatusRegular"]
-                            ? [torrent shortStatusString] : [torrent remainingTimeString];
-        NSAttributedString * minimalString = [self attributedStatusString: string withColor: statusColor];
+        NSAttributedString * minimalString = [self attributedStatusString: [self minimalStatusString] withColor: statusColor];
         minimalStatusRect = [self rectForMinimalStatusWithString: minimalString inBounds: cellFrame];
         
         [minimalString drawInRect: minimalStatusRect];
@@ -840,7 +838,7 @@
     return [[[NSAttributedString alloc] initWithString: string attributes: fStatusAttributes] autorelease];
 }
 
-- (NSString *) statusString
+- (NSString *) buttonString
 {
     if (fMouseDownRevealButton || (!fTracking && fHoverReveal))
         return NSLocalizedString(@"Reveal the data file in Finder", "Torrent cell -> button info");
@@ -860,7 +858,28 @@
         }
     }
     else
+        return nil;
+}
+
+- (NSString *) statusString
+{
+    NSString * buttonString;
+    if ((buttonString = [self buttonString]))
+        return buttonString;
+    else
         return [[self representedObject] statusString];
+}
+
+- (NSString *) minimalStatusString
+{
+    NSString * buttonString;
+    if ((buttonString = [self buttonString]))
+        return buttonString;
+    else
+    {
+        Torrent * torrent = [self representedObject];
+        return [fDefaults boolForKey: @"DisplaySmallStatusRegular"] ? [torrent shortStatusString] : [torrent remainingTimeString];
+    }
 }
 
 @end
