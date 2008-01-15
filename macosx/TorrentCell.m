@@ -392,7 +392,7 @@
     [revealInfo release];
     [area release];
     
-    //action button (needed even in minimal mode to display status string
+    //action button (needed even in minimal mode to display status string)
     NSRect actionButtonRect = [self actionButtonRectForBounds: cellFrame];
     NSTrackingAreaOptions actionOptions = options;
     if (NSMouseInRect(mouseLocation, actionButtonRect, [controlView isFlipped]))
@@ -411,17 +411,17 @@
 
 - (void) setControlHover: (BOOL) hover
 {
-    fHoverControl = [NSApp isOnLeopardOrBetter] ? hover : -1;
+    fHoverControl = [NSApp isOnLeopardOrBetter] ? hover : NO;
 }
 
 - (void) setRevealHover: (BOOL) hover
 {
-    fHoverReveal = [NSApp isOnLeopardOrBetter] ? hover : -1;
+    fHoverReveal = [NSApp isOnLeopardOrBetter] ? hover : NO;
 }
 
 - (void) setActionHover: (BOOL) hover
 {
-    fHoverAction = [NSApp isOnLeopardOrBetter] ? hover : -1;
+    fHoverAction = [NSApp isOnLeopardOrBetter] ? hover : NO;
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
