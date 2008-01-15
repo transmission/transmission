@@ -35,8 +35,8 @@
 
 @interface TorrentTableView (Private)
 
-/*- (BOOL) pointInControlRect: (NSPoint) point;
-- (BOOL) pointInRevealRect: (NSPoint) point;*/
+- (BOOL) pointInControlRect: (NSPoint) point;
+- (BOOL) pointInRevealRect: (NSPoint) point;
 - (BOOL) pointInActionRect: (NSPoint) point;
 
 - (BOOL) pointInIconRect: (NSPoint) point;
@@ -65,6 +65,7 @@
 - (void) dealloc
 {
     [fMouseCell release];
+    [fSelectedIndexes release];
     
     [fKeyStrokes release];
     [fMenuTorrent release];
@@ -170,11 +171,23 @@
         [super updateCell: cell];
 }
 
+- (NSIndexSet *)tableView:(NSTableView *)tableView selectionIndexesForProposedSelection:(NSIndexSet *)proposedSelectionIndexes
+{
+    return fSelectedIndexes ? fSelectedIndexes : proposedSelectionIndexes;
+}
+
 - (void) mouseDown: (NSEvent *) event
 {
+    NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+    
+    //if pushing a button, don't change the selected rows
+    if ([self pointInControlRect: point] || [self pointInRevealRect: point] || [self pointInActionRect: point])
+        fSelectedIndexes = [[self selectedRowIndexes] retain];
+    
     [super mouseDown: event];
     
-    NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+    [fSelectedIndexes release];
+    fSelectedIndexes = nil;
     
     if ([self pointInActionRect: point])
     {
@@ -560,7 +573,7 @@
 
 @implementation TorrentTableView (Private)
 
-/*- (BOOL) pointInControlRect: (NSPoint) point
+- (BOOL) pointInControlRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
     if (row < 0)
@@ -578,7 +591,7 @@
     
     TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
     return NSPointInRect(point, [cell revealButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
-}*/
+}
 
 - (BOOL) pointInActionRect: (NSPoint) point
 {

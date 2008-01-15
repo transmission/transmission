@@ -39,6 +39,7 @@
     
     int fMouseRow;
     TorrentCell * fMouseCell;
+    NSIndexSet * fSelectedIndexes;
     
     NSMutableArray * fKeyStrokes;
     
