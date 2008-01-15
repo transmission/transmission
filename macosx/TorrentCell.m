@@ -76,6 +76,8 @@
 - (NSAttributedString *) attributedTitleWithColor: (NSColor *) color;
 - (NSAttributedString *) attributedStatusString: (NSString *) string withColor: (NSColor *) color;
 
+- (NSString *) statusString;
+
 @end
 
 @implementation TorrentCell
@@ -214,8 +216,7 @@
 
 - (NSRect) statusRectForBounds: (NSRect) bounds
 {
-    return [self rectForStatusWithString: [self attributedStatusString: [[self representedObject] statusString] withColor: nil]
-                    inBounds: bounds];
+    return [self rectForStatusWithString: [self attributedStatusString: [self statusString] withColor: nil] inBounds: bounds];
 }
 
 - (NSRect) controlButtonRectForBounds: (NSRect) bounds
@@ -542,7 +543,7 @@
     //status
     if (!minimal)
     {
-        NSAttributedString * statusString = [self attributedStatusString: [torrent statusString] withColor: statusColor];
+        NSAttributedString * statusString = [self attributedStatusString: [self statusString] withColor: statusColor];
         [statusString drawInRect: [self rectForStatusWithString: statusString inBounds: cellFrame]];
     }
 }
@@ -837,6 +838,29 @@
         [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
     
     return [[[NSAttributedString alloc] initWithString: string attributes: fStatusAttributes] autorelease];
+}
+
+- (NSString *) statusString
+{
+    if (fMouseDownRevealButton || (!fTracking && fHoverReveal))
+        return NSLocalizedString(@"Reveal the data file in Finder", "Torrent cell -> button info");
+    else if (fMouseDownControlButton || (!fTracking && fHoverControl))
+    {
+        Torrent * torrent = [self representedObject];
+        if ([torrent isActive])
+            return NSLocalizedString(@"Pause the transfer.", "Torrent Table -> tooltip");
+        else
+        {
+            if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
+                return NSLocalizedString(@"Resume the transfer right away", "Torrent cell -> button info");
+            else if ([torrent waitingToStart])
+                return NSLocalizedString(@"Stop waiting to start", "Torrent cell -> button info");
+            else
+                return NSLocalizedString(@"Resume the transfer", "Torrent cell -> button info");
+        }
+    }
+    else
+        return [[self representedObject] statusString];
 }
 
 @end

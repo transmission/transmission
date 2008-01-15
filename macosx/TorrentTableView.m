@@ -331,7 +331,7 @@
 }
 
 #warning get rect to actually change
-- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
+/*- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
     tableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row mouseLocation: (NSPoint) mousePoint
 {
     if ([self pointInActionRect: mousePoint])
@@ -365,7 +365,7 @@
     }
     
     return nil;
-}
+}*/
 
 - (void) toggleControlForTorrent: (Torrent *) torrent
 {
