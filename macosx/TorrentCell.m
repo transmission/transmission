@@ -522,10 +522,14 @@
         fraction: 1.0];
     
     //action button
-    NSImage * actionImage = /*fMouseDownActionButton ? [NSImage imageNamed: @"ActionOn.png"] :*/ [NSImage imageNamed: @"ActionOff.png"];
-    [actionImage setFlipped: YES];
-    [actionImage drawInRect: [self actionButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
-        fraction: 1.0];
+    if (!minimal)
+    {
+        NSImage * actionImage = /*fMouseDownActionButton ? [NSImage imageNamed: @"ActionOn.png"] :*/
+                                [NSImage imageNamed: @"ActionOff.png"];
+        [actionImage setFlipped: YES];
+        [actionImage drawInRect: [self actionButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
+            fraction: 1.0];
+    }
     
     //status
     if (!minimal)
