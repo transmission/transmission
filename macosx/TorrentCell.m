@@ -388,26 +388,6 @@
     [area release];
 }
 
-/*- (void) mouseEntered: (NSEvent *) event
-{
-    NSDictionary * userInfo = [event userData];
-    
-    if ([[userInfo objectForKey: @"Type"] isEqualToString: @"Control"])
-        fHoverControl = YES;
-    else
-        fHoverReveal = YES;
-    
-    [(NSControl *)[self controlView] updateCell: self];
-}
-
-- (void) mouseExited: (NSEvent *) event
-{
-    fHoverControl = NO;
-    fHoverReveal = NO;
-    
-    [(NSControl *)[self controlView] updateCell: self];
-}*/
-
 - (void) setControlHover: (BOOL) hover
 {
     fHoverControl = hover;

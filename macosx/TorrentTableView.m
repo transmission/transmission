@@ -65,7 +65,6 @@
 
 - (void) dealloc
 {
-    //[fMouseCell release];
     [fSelectedIndexes release];
     
     [fKeyStrokes release];
@@ -129,19 +128,6 @@
     if ((row = [dict objectForKey: @"Row"]))
     {
         int rowVal = [row intValue];
-        /*TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: rowVal];
-        if (fMouseCell != cell)
-        {
-            [fMouseCell release];
-            
-            fMouseRow = rowVal;
-            fMouseCell = [cell copy];
-            
-            [fMouseCell setRepresentedObject: [fTorrents objectAtIndex: rowVal]];
-            [fMouseCell setControlView: self];
-            [fMouseCell mouseEntered: event];
-        }*/
-        
         if ([[dict objectForKey: @"Type"] isEqualToString: @"Control"])
             fMouseControlRow = rowVal;
         else
@@ -156,37 +142,12 @@
     NSNumber * row;
     if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
     {
-        /*TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"]
-                                                        row: [row intValue]];
-        [cell setControlView: self];
-        [cell mouseExited: event];
-        
-        [fMouseCell release];
-        fMouseCell = nil;
-        fMouseRow = -1;*/
-        
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
         
         [self setNeedsDisplayInRect: [self rectOfRow: [row intValue]]];
     }
 }
-
-/*- (NSCell *) preparedCellAtColumn: (NSInteger) column row: (NSInteger) row
-{
-    if (![self selectedCell] && row == fMouseRow && column == [self columnWithIdentifier: @"Torrent"])
-        return fMouseCell;
-    else
-        return [super preparedCellAtColumn: column row: row];
-}
-
-- (void) updateCell: (NSCell *) cell
-{
-    if (cell == fMouseCell)
-        [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: fMouseRow]];
-    else
-        [super updateCell: cell];
-}*/
 
 - (void) tableViewSelectionIsChanging: (NSNotification *) notification
 {
@@ -224,7 +185,6 @@
             [self reloadData];
         }
         
-        //acts as if mouseUp:
         if ([NSApp isOnLeopardOrBetter] && [event clickCount] == 2)
         {
             if ([self pointInProgressRect: point])
@@ -348,18 +308,18 @@
 }
 
 #warning get rect to actually change
-/*- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
+- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
     tableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row mouseLocation: (NSPoint) mousePoint
 {
     if ([self pointInActionRect: mousePoint])
     {
-        *rect = [self actionRectForRow: row];
+        *rect = [(TorrentCell *)cell actionButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]];
         
         return NSLocalizedString(@"Shortcuts for changing transfer settings.", "Torrent Table -> tooltip");
     }
-    else if ([self pointInPauseRect: mousePoint])
+    else if ([self pointInControlRect: mousePoint])
     {
-        *rect = [self pauseRectForRow: row];
+        *rect = *rect = [(TorrentCell *)cell controlButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]];
         
         Torrent * torrent = [fTorrents objectAtIndex: row];
         if ([torrent isActive])
@@ -376,13 +336,13 @@
     }
     else if ([self pointInRevealRect: mousePoint])
     {
-        *rect = [self revealRectForRow: row];
+        *rect = [(TorrentCell *)cell revealButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]];
         
         return NSLocalizedString(@"Reveal the data file in Finder.", "Torrent Table -> tooltip");
     }
     
     return nil;
-}*/
+}
 
 - (void) toggleControlForTorrent: (Torrent *) torrent
 {
