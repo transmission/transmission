@@ -94,16 +94,7 @@
 {
     [super updateTrackingAreas];
     
-    fMouseControlRow = -1;
-    fMouseRevealRow = -1;
-    
-    NSEnumerator * enumerator = [[self trackingAreas] objectEnumerator];
-    NSTrackingArea * area;
-    while ((area = [enumerator nextObject]))
-    {
-        if ([area owner] == self && [[area userInfo] objectForKey: @"Row"])
-            [self removeTrackingArea: area];
-    }
+    [self removeButtonTrackingAreas];
     
     NSRange visibleRows = [self rowsInRect: [self visibleRect]];
     if (visibleRows.length == 0)
@@ -120,6 +111,20 @@
         NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: row] forKey: @"Row"];
         [cell addTrackingAreasForView: self inRect: [self frameOfCellAtColumn: col row: row] withUserInfo: userInfo
                 mouseLocation: mouseLocation];
+    }
+}
+
+- (void) removeButtonTrackingAreas
+{
+    fMouseControlRow = -1;
+    fMouseRevealRow = -1;
+    
+    NSEnumerator * enumerator = [[self trackingAreas] objectEnumerator];
+    NSTrackingArea * area;
+    while ((area = [enumerator nextObject]))
+    {
+        if ([area owner] == self && [[area userInfo] objectForKey: @"Row"])
+            [self removeTrackingArea: area];
     }
 }
 

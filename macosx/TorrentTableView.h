@@ -48,6 +48,8 @@
 
 - (void) setTorrents: (NSArray *) torrents;
 
+- (void) removeButtonTrackingAreas;
+
 - (void) toggleControlForTorrent: (Torrent *) torrent;
 
 - (void) displayTorrentMenuForEvent: (NSEvent *) event;

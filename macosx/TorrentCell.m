@@ -297,6 +297,8 @@
     NSRect revealRect = [self revealButtonRectForBounds: cellFrame];
     BOOL checkReveal = NSMouseInRect(point, revealRect, [controlView isFlipped]);
     
+    [(TorrentTableView *)controlView removeButtonTrackingAreas];
+    
     while ([event type] != NSLeftMouseUp)
     {
         point = [controlView convertPoint: [event locationInWindow] fromView: nil];
@@ -345,6 +347,8 @@
         [[self representedObject] revealData];
     }
     else;
+    
+    [controlView updateTrackingAreas];
     
     return YES;
 }
