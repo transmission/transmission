@@ -118,6 +118,20 @@ typedef enum
     [fTabMatrix selectCellWithTag: tag];
     [self setTab: nil];
     
+    //reset images for reveal buttons, since the images are also used in the main table
+    NSImage * revealOn = [[NSImage imageNamed: @"RevealOn.png"] copy],
+            * revealOff = [[NSImage imageNamed: @"RevealOff.png"] copy];
+    [revealOn setFlipped: NO];
+    [revealOff setFlipped: NO];
+    
+    [fRevealDataButton setImage: revealOff];
+    [fRevealDataButton setAlternateImage: revealOn];
+    [fRevealTorrentButton setImage: revealOff];
+    [fRevealTorrentButton setAlternateImage: revealOn];
+    
+    [revealOn release];
+    [revealOff release];
+    
     //initially sort peer table by IP
     if ([[fPeerTable sortDescriptors] count] == 0)
         [fPeerTable setSortDescriptors: [NSArray arrayWithObject: [[fPeerTable tableColumnWithIdentifier: @"IP"]
