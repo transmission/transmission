@@ -171,9 +171,10 @@
         [super updateCell: cell];
 }
 
-- (NSIndexSet *)tableView:(NSTableView *)tableView selectionIndexesForProposedSelection:(NSIndexSet *)proposedSelectionIndexes
+- (void)tableViewSelectionIsChanging:(NSNotification *)aNotification
 {
-    return fSelectedIndexes ? fSelectedIndexes : proposedSelectionIndexes;
+    if (fSelectedIndexes)
+        [self selectRowIndexes: fSelectedIndexes byExtendingSelection: NO];
 }
 
 - (void) mouseDown: (NSEvent *) event
