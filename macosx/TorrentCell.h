@@ -31,7 +31,7 @@
     
     NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
     
-    BOOL fMouseDownControlButton, fMouseDownRevealButton, fHoverControl, fHoverReveal;
+    BOOL fTracking, fMouseDownControlButton, fMouseDownRevealButton, fHoverControl, fHoverReveal;
     
     NSColor * fBarOverlayColor;
     CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fBlueGradient, * fDarkBlueGradient, 

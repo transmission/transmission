@@ -283,6 +283,8 @@
 
 - (BOOL) trackMouse: (NSEvent *) event inRect: (NSRect) cellFrame ofView: (NSView *) controlView untilMouseUp: (BOOL) flag
 {
+    fTracking = YES;
+    
     [self setControlView: controlView];
     
     NSPoint point = [controlView convertPoint: [event locationInWindow] fromView: nil];
@@ -325,6 +327,8 @@
         event = [[controlView window] nextEventMatchingMask:
                     (NSLeftMouseUpMask | NSLeftMouseDraggedMask | NSMouseEnteredMask | NSMouseExitedMask)];
     }
+    
+    fTracking = NO;
 
     if (fMouseDownControlButton)
     {
@@ -502,7 +506,7 @@
     
     #warning get hover images
     //control button
-    NSString * controlImageSuffix = fMouseDownControlButton || fHoverControl ? @"On.png" : @"Off.png";
+    NSString * controlImageSuffix = fMouseDownControlButton || (!fTracking && fHoverControl) ? @"On.png" : @"Off.png";
     NSImage * controlImage;
     if ([torrent isActive])
         controlImage = [NSImage imageNamed: [@"Pause" stringByAppendingString: controlImageSuffix]];
@@ -521,7 +525,7 @@
     
     if (fMouseDownControlButton)
         controlImage = [NSImage imageNamed: @"ResumeOn.png"];
-    else if (fHoverControl)
+    else if (!fTracking && fHoverControl)
         controlImage = [NSImage imageNamed: @"ResumeNoWaitOff.png"];
     else
         controlImage = [NSImage imageNamed: @"ResumeOff.png"];*/
@@ -531,7 +535,7 @@
         fraction: 1.0];
     
     //reveal button
-    NSString * revealImageSuffix = fMouseDownRevealButton || fHoverReveal ? @"On.png" : @"Off.png";
+    NSString * revealImageSuffix = fMouseDownRevealButton || (!fTracking && fHoverReveal) ? @"On.png" : @"Off.png";
     NSImage * revealImage = [NSImage imageNamed: [@"Reveal" stringByAppendingString: revealImageSuffix]];
     [revealImage setFlipped: YES];
     [revealImage drawInRect: [self revealButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
