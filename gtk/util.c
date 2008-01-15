@@ -454,3 +454,14 @@ on_tree_view_button_pressed (GtkWidget       * view,
   return FALSE;
 }
 
+gpointer
+tr_object_ref_sink( gpointer object )
+{
+#if GLIB_CHECK_VERSION(2,10,0)
+    g_object_ref_sink( object );
+#else
+    g_object_ref( object );
+    gtk_object_sink( GTK_OBJECT( object ) );
+#endif
+    return object;
+}

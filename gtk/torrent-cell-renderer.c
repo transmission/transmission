@@ -826,7 +826,7 @@ torrent_cell_renderer_init( GTypeInstance * instance, gpointer g_class UNUSED )
 
     p->tor = NULL;
     p->text_renderer = gtk_cell_renderer_text_new( );
-    g_object_ref_sink( G_OBJECT( p->text_renderer ) );
+    tr_object_ref_sink( p->text_renderer );
     p->gradient = TRUE;
     p->show_unavailable = TRUE;
     p->bar_height = DEFAULT_BAR_HEIGHT;
