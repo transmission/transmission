@@ -330,43 +330,6 @@
         }
 }
 
-#warning get rect to actually change
-/*- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
-    tableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row mouseLocation: (NSPoint) mousePoint
-{
-    if ([self pointInActionRect: mousePoint])
-    {
-        *rect = [(TorrentCell *)cell actionButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]];
-        
-        return NSLocalizedString(@"Shortcuts for changing transfer settings.", "Torrent Table -> tooltip");
-    }
-    else if ([self pointInControlRect: mousePoint])
-    {
-        *rect = *rect = [(TorrentCell *)cell controlButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]];
-        
-        Torrent * torrent = [fTorrents objectAtIndex: row];
-        if ([torrent isActive])
-            return NSLocalizedString(@"Pause the transfer.", "Torrent Table -> tooltip");
-        else
-        {
-            if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
-                return NSLocalizedString(@"Resume the transfer right away.", "Torrent Table -> tooltip");
-            else if ([torrent waitingToStart])
-                return NSLocalizedString(@"Stop waiting to start.", "Torrent Table -> tooltip");
-            else
-                return NSLocalizedString(@"Resume the transfer.", "Torrent Table -> tooltip");
-        }
-    }
-    else if ([self pointInRevealRect: mousePoint])
-    {
-        *rect = [(TorrentCell *)cell revealButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]];
-        
-        return NSLocalizedString(@"Reveal the data file in Finder.", "Torrent Table -> tooltip");
-    }
-    
-    return nil;
-}*/
-
 - (void) toggleControlForTorrent: (Torrent *) torrent
 {
     if ([torrent isActive])
