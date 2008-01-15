@@ -49,6 +49,8 @@
 - (void) setTorrents: (NSArray *) torrents;
 
 - (void) removeButtonTrackingAreas;
+- (void) setControlButtonHover: (int) row;
+- (void) setRevealButtonHover: (int) row;
 
 - (void) toggleControlForTorrent: (Torrent *) torrent;
 

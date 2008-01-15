@@ -128,6 +128,20 @@
     }
 }
 
+- (void) setControlButtonHover: (int) row
+{
+    fMouseControlRow = row;
+    if (row >= 0)
+        [self setNeedsDisplayInRect: [self rectOfRow: row]];
+}
+
+- (void) setRevealButtonHover: (int) row
+{
+    fMouseRevealRow = row;
+    if (row >= 0)
+        [self setNeedsDisplayInRect: [self rectOfRow: row]];
+}
+
 - (void) mouseEntered: (NSEvent *) event
 {
     NSDictionary * dict = (NSDictionary *)[event userData];

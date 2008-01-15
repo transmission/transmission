@@ -363,9 +363,8 @@
     NSTrackingAreaOptions controlOptions = options;
     if (NSMouseInRect(mouseLocation, controlButtonRect, [controlView isFlipped]))
     {
-        #warning update control view
         controlOptions |= NSTrackingAssumeInside;
-        [controlView setNeedsDisplayInRect: controlButtonRect];
+        [(TorrentTableView *)controlView setControlButtonHover: [[userInfo objectForKey: @"Row"] intValue]];
     }
     
     NSMutableDictionary * controlInfo = [userInfo mutableCopy];
@@ -382,7 +381,7 @@
     if (NSMouseInRect(mouseLocation, revealButtonRect, [controlView isFlipped]))
     {
         revealOptions |= NSTrackingAssumeInside;
-        [controlView setNeedsDisplayInRect: revealButtonRect];
+        [(TorrentTableView *)controlView setRevealButtonHover: [[userInfo objectForKey: @"Row"] intValue]];
     }
     
     NSMutableDictionary * revealInfo = [userInfo mutableCopy];
