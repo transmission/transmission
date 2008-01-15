@@ -130,6 +130,8 @@ on_tree_view_button_pressed (GtkWidget       * view,
                              GdkEventButton  * event,
                              gpointer          unused);
 
+gpointer tr_object_ref_sink (gpointer object);
+
 #endif /* GTK_MAJOR_VERSION */
 
 #endif /* TG_UTIL_H */
