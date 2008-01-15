@@ -24,14 +24,14 @@
 
 @class CTGradient;
 
-@interface TorrentCell : NSCell
+@interface TorrentCell : NSActionCell
 {
     NSUserDefaults * fDefaults;
     NSImage * fErrorImage;
     
     NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
     
-    BOOL fMouseDownControlButton, fMouseDownRevealButton;
+    BOOL fMouseDownControlButton, fMouseDownRevealButton, fHoverControl, fHoverReveal;
     
     NSColor * fBarOverlayColor;
     CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fBlueGradient, * fDarkBlueGradient, 
@@ -53,5 +53,10 @@
 - (NSRect) controlButtonRectForBounds: (NSRect) bounds;
 - (NSRect) revealButtonRectForBounds: (NSRect) bounds;
 - (NSRect) actionButtonRectForBounds: (NSRect) bounds;
+
+- (void) addTrackingAreasForView: (NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo
+            mouseLocation: (NSPoint) mouseLocation;
+- (void) mouseEntered: (NSEvent *) event;
+- (void) mouseExited: (NSEvent *) event;
 
 @end

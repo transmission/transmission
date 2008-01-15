@@ -26,6 +26,8 @@
 #import <transmission.h>
 #import <Controller.h>
 
+@class TorrentCell;
+
 @interface TorrentTableView : NSTableView
 {
     IBOutlet Controller * fController;
@@ -34,6 +36,9 @@
     NSUserDefaults * fDefaults;
     
     IBOutlet NSMenu * fContextRow, * fContextNoRow;
+    
+    int fMouseRow;
+    TorrentCell * fMouseCell;
     
     NSMutableArray * fKeyStrokes;
     

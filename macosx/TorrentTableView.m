@@ -35,6 +35,8 @@
 
 @interface TorrentTableView (Private)
 
+/*- (BOOL) pointInControlRect: (NSPoint) point;
+- (BOOL) pointInRevealRect: (NSPoint) point;*/
 - (BOOL) pointInActionRect: (NSPoint) point;
 
 - (BOOL) pointInIconRect: (NSPoint) point;
@@ -52,6 +54,8 @@
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         
+        fMouseRow = -1;
+        
         [self setDelegate: self];
     }
     
@@ -60,6 +64,8 @@
 
 - (void) dealloc
 {
+    [fMouseCell release];
+    
     [fKeyStrokes release];
     [fMenuTorrent release];
     
@@ -79,6 +85,89 @@
 - (NSString *) tableView: (NSTableView *) tableView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
     return [[fTorrents objectAtIndex: row] name];
+}
+
+- (void) updateTrackingAreas
+{
+    [super updateTrackingAreas];
+    
+    NSEnumerator * enumerator = [[self trackingAreas] objectEnumerator];
+    NSTrackingArea * area;
+    while ((area = [enumerator nextObject]))
+    {
+        if ([area owner] == self && [[area userInfo] objectForKey: @"Row"])
+            [self removeTrackingArea: area];
+    }
+    
+    NSRange visibleRows = [self rowsInRect: [self visibleRect]];
+    if (visibleRows.length == 0)
+        return;
+    
+    int col = [self columnWithIdentifier: @"Torrent"];
+    NSPoint mouseLocation = [self convertPoint: [[self window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil];
+    
+    int row;
+    for (row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
+    {
+        TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: col row: row];
+        
+        NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: row] forKey: @"Row"];
+        [cell addTrackingAreasForView: self inRect: [self frameOfCellAtColumn: col row: row] withUserInfo: userInfo
+                mouseLocation: mouseLocation];
+    }
+}
+
+- (void) mouseEntered: (NSEvent *) event
+{
+    NSNumber * row;
+    if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
+    {
+        int rowVal = [row intValue];
+        TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: rowVal];
+        if (fMouseCell != cell)
+        {
+            [fMouseCell release];
+            
+            fMouseRow = rowVal;
+            fMouseCell = [cell copy];
+            
+            [fMouseCell setRepresentedObject: [fTorrents objectAtIndex: rowVal]];
+            [fMouseCell setControlView: self];
+            [fMouseCell mouseEntered: event];
+        }
+    }
+}
+
+- (void) mouseExited: (NSEvent *) event
+{
+    NSNumber * row;
+    if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
+    {
+        TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"]
+                                                        row: [row intValue]];
+        [cell setControlView: self];
+        [cell mouseExited: event];
+        
+        [fMouseCell release];
+        fMouseCell = nil;
+        fMouseRow = -1;
+    }
+}
+
+- (NSCell *) preparedCellAtColumn: (NSInteger) column row: (NSInteger) row
+{
+    if (![self selectedCell] && row == fMouseRow && column == [self columnWithIdentifier: @"Torrent"])
+        return fMouseCell;
+    else
+        return [super preparedCellAtColumn: column row: row];
+}
+
+- (void) updateCell: (NSCell *) cell
+{
+    if (cell == fMouseCell)
+        [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: fMouseRow]];
+    else
+        [super updateCell: cell];
 }
 
 - (void) mouseDown: (NSEvent *) event
@@ -470,6 +559,26 @@
 @end
 
 @implementation TorrentTableView (Private)
+
+/*- (BOOL) pointInControlRect: (NSPoint) point
+{
+    int row = [self rowAtPoint: point];
+    if (row < 0)
+        return NO;
+    
+    TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
+    return NSPointInRect(point, [cell controlButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+}
+
+- (BOOL) pointInRevealRect: (NSPoint) point
+{
+    int row = [self rowAtPoint: point];
+    if (row < 0)
+        return NO;
+    
+    TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
+    return NSPointInRect(point, [cell revealButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+}*/
 
 - (BOOL) pointInActionRect: (NSPoint) point
 {

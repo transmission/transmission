@@ -345,6 +345,65 @@
     return YES;
 }
 
+- (void) addTrackingAreasForView: (NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo
+            mouseLocation: (NSPoint) mouseLocation
+{
+    NSTrackingAreaOptions options = NSTrackingEnabledDuringMouseDrag | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
+    
+    //control button
+    NSRect controlButtonRect = [self controlButtonRectForBounds: cellFrame];
+    NSTrackingAreaOptions controlOptions = options;
+    if (NSMouseInRect(mouseLocation, controlButtonRect, [controlView isFlipped]))
+    {
+        controlOptions |= NSTrackingAssumeInside;
+        [controlView setNeedsDisplayInRect: controlButtonRect];
+    }
+    
+    NSMutableDictionary * controlInfo = [userInfo mutableCopy];
+    [controlInfo setObject: @"Control" forKey: @"Type"];
+    NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: controlButtonRect options: controlOptions owner: controlView
+                                userInfo: controlInfo];
+    [controlView addTrackingArea: area];
+    [controlInfo release];
+    [area release];
+    
+    //reveal button
+    NSRect revealButtonRect = [self revealButtonRectForBounds: cellFrame];
+    NSTrackingAreaOptions revealOptions = options;
+    if (NSMouseInRect(mouseLocation, revealButtonRect, [controlView isFlipped]))
+    {
+        revealOptions |= NSTrackingAssumeInside;
+        [controlView setNeedsDisplayInRect: revealButtonRect];
+    }
+    
+    NSMutableDictionary * revealInfo = [userInfo mutableCopy];
+    [revealInfo setObject: @"Reveal" forKey: @"Type"];
+    area = [[NSTrackingArea alloc] initWithRect: revealButtonRect options: revealOptions owner: controlView userInfo: revealInfo];
+    [controlView addTrackingArea: area];
+    [revealInfo release];
+    [area release];
+}
+
+- (void) mouseEntered: (NSEvent *) event
+{
+    NSDictionary * userInfo = [event userData];
+    
+    if ([[userInfo objectForKey: @"Type"] isEqualToString: @"Control"])
+        fHoverControl = YES;
+    else
+        fHoverReveal = YES;
+    
+    [(NSControl *)[self controlView] updateCell: self];
+}
+
+- (void) mouseExited: (NSEvent *) event
+{
+    fHoverControl = NO;
+    fHoverReveal = NO;
+    
+    [(NSControl *)[self controlView] updateCell: self];
+}
+
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     [super drawWithFrame: cellFrame inView: controlView];
@@ -431,8 +490,9 @@
     //bar
     [self drawBar: [self barRectForBounds: cellFrame]];
     
+    #warning get hover images
     //control button
-    NSString * controlImageSuffix = fMouseDownControlButton ? @"On.png" : @"Off.png";
+    NSString * controlImageSuffix = fMouseDownControlButton || fHoverControl ? @"On.png" : @"Off.png";
     NSImage * controlImage;
     if ([torrent isActive])
         controlImage = [NSImage imageNamed: [@"Pause" stringByAppendingString: controlImageSuffix]];
@@ -450,7 +510,8 @@
         fraction: 1.0];
     
     //reveal button
-    NSImage * revealImage = fMouseDownRevealButton ? [NSImage imageNamed: @"RevealOn.png"] : [NSImage imageNamed: @"RevealOff.png"];
+    NSString * revealImageSuffix = fMouseDownRevealButton || fHoverReveal ? @"On.png" : @"Off.png";
+    NSImage * revealImage = [NSImage imageNamed: [@"Reveal" stringByAppendingString: revealImageSuffix]];
     [revealImage setFlipped: YES];
     [revealImage drawInRect: [self revealButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
         fraction: 1.0];

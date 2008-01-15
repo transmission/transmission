@@ -85,11 +85,11 @@
     [controlView reloadData];
 }
 
-- (void) addTrackingAreasForView:( NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo
+- (void) addTrackingAreasForView: (NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo
             mouseLocation: (NSPoint) mouseLocation
 {
     NSTrackingAreaOptions options = NSTrackingEnabledDuringMouseDrag | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
-
+    
     if (NSMouseInRect(mouseLocation, cellFrame, [controlView isFlipped]))
     {
         options |= NSTrackingAssumeInside;

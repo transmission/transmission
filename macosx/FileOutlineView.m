@@ -102,6 +102,8 @@
 
 - (void) updateTrackingAreas
 {
+    [super updateTrackingAreas];
+    
     NSEnumerator * enumerator = [[self trackingAreas] objectEnumerator];
     NSTrackingArea * area;
     while ((area = [enumerator nextObject]))
@@ -167,7 +169,7 @@
 
 - (NSCell *) preparedCellAtColumn: (NSInteger) column row: (NSInteger) row
 {
-    if (row == fMouseRow && column == [self columnWithIdentifier: @"Priority"])
+    if (![self selectedCell] && row == fMouseRow && column == [self columnWithIdentifier: @"Priority"])
         return fMouseCell;
     else
         return [super preparedCellAtColumn: column row: row];
