@@ -384,7 +384,7 @@
     [area release];
 }
 
-- (void) mouseEntered: (NSEvent *) event
+/*- (void) mouseEntered: (NSEvent *) event
 {
     NSDictionary * userInfo = [event userData];
     
@@ -402,6 +402,16 @@
     fHoverReveal = NO;
     
     [(NSControl *)[self controlView] updateCell: self];
+}*/
+
+- (void) setControlHover: (BOOL) hover
+{
+    fHoverControl = hover;
+}
+
+- (void) setRevealHover: (BOOL) hover
+{
+    fHoverReveal = hover;
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
@@ -505,6 +515,17 @@
         else
             controlImage = [NSImage imageNamed: [@"Resume" stringByAppendingString: controlImageSuffix]];
     }
+    
+    //TEST CODE
+    /*NSImage * controlImage;
+    
+    if (fMouseDownControlButton)
+        controlImage = [NSImage imageNamed: @"ResumeOn.png"];
+    else if (fHoverControl)
+        controlImage = [NSImage imageNamed: @"ResumeNoWaitOff.png"];
+    else
+        controlImage = [NSImage imageNamed: @"ResumeOff.png"];*/
+    
     [controlImage setFlipped: YES];
     [controlImage drawInRect: [self controlButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
         fraction: 1.0];

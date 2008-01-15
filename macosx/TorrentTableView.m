@@ -54,7 +54,8 @@
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         
-        fMouseRow = -1;
+        fMouseControlRow = -1;
+        fMouseRevealRow = -1;
         
         [self setDelegate: self];
     }
@@ -64,7 +65,7 @@
 
 - (void) dealloc
 {
-    [fMouseCell release];
+    //[fMouseCell release];
     [fSelectedIndexes release];
     
     [fKeyStrokes release];
@@ -81,6 +82,8 @@
 - (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
     [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
+    [cell setControlHover: row == fMouseControlRow];
+    [cell setRevealHover: row == fMouseRevealRow];
 }
 
 - (NSString *) tableView: (NSTableView *) tableView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn row: (int) row
@@ -120,11 +123,13 @@
 
 - (void) mouseEntered: (NSEvent *) event
 {
+    NSDictionary * dict = (NSDictionary *)[event userData];
+    
     NSNumber * row;
-    if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
+    if ((row = [dict objectForKey: @"Row"]))
     {
         int rowVal = [row intValue];
-        TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: rowVal];
+        /*TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: rowVal];
         if (fMouseCell != cell)
         {
             [fMouseCell release];
@@ -135,7 +140,14 @@
             [fMouseCell setRepresentedObject: [fTorrents objectAtIndex: rowVal]];
             [fMouseCell setControlView: self];
             [fMouseCell mouseEntered: event];
-        }
+        }*/
+        
+        if ([[dict objectForKey: @"Type"] isEqualToString: @"Control"])
+            fMouseControlRow = rowVal;
+        else
+            fMouseRevealRow = rowVal;
+        
+        [self setNeedsDisplayInRect: [self rectOfRow: rowVal]];
     }
 }
 
@@ -144,18 +156,23 @@
     NSNumber * row;
     if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
     {
-        TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"]
+        /*TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"]
                                                         row: [row intValue]];
         [cell setControlView: self];
         [cell mouseExited: event];
         
         [fMouseCell release];
         fMouseCell = nil;
-        fMouseRow = -1;
+        fMouseRow = -1;*/
+        
+        fMouseControlRow = -1;
+        fMouseRevealRow = -1;
+        
+        [self setNeedsDisplayInRect: [self rectOfRow: [row intValue]]];
     }
 }
 
-- (NSCell *) preparedCellAtColumn: (NSInteger) column row: (NSInteger) row
+/*- (NSCell *) preparedCellAtColumn: (NSInteger) column row: (NSInteger) row
 {
     if (![self selectedCell] && row == fMouseRow && column == [self columnWithIdentifier: @"Torrent"])
         return fMouseCell;
@@ -169,9 +186,9 @@
         [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: fMouseRow]];
     else
         [super updateCell: cell];
-}
+}*/
 
-- (void)tableViewSelectionIsChanging:(NSNotification *)aNotification
+- (void) tableViewSelectionIsChanging: (NSNotification *) notification
 {
     if (fSelectedIndexes)
         [self selectRowIndexes: fSelectedIndexes byExtendingSelection: NO];

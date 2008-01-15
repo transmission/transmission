@@ -37,8 +37,7 @@
     
     IBOutlet NSMenu * fContextRow, * fContextNoRow;
     
-    int fMouseRow;
-    TorrentCell * fMouseCell;
+    int fMouseControlRow, fMouseRevealRow;
     NSIndexSet * fSelectedIndexes;
     
     NSMutableArray * fKeyStrokes;

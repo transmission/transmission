@@ -56,7 +56,9 @@
 
 - (void) addTrackingAreasForView: (NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo
             mouseLocation: (NSPoint) mouseLocation;
-- (void) mouseEntered: (NSEvent *) event;
-- (void) mouseExited: (NSEvent *) event;
+/*- (void) mouseEntered: (NSEvent *) event;
+- (void) mouseExited: (NSEvent *) event;*/
+- (void) setControlHover: (BOOL) hover;
+- (void) setRevealHover: (BOOL) hover;
 
 @end
