@@ -490,7 +490,14 @@
     
     #warning get hover images
     //control button
-    NSString * controlImageSuffix = fMouseDownControlButton || (!fTracking && fHoverControl) ? @"On.png" : @"Off.png";
+    NSString * controlImageSuffix;
+    if (fMouseDownControlButton)
+        controlImageSuffix = @"On.png";
+    else if (!fTracking && fHoverControl)
+        controlImageSuffix = /*@"Hover.png"*/@"On.png";
+    else
+        controlImageSuffix = @"Off.png";
+    
     NSImage * controlImage;
     if ([torrent isActive])
         controlImage = [NSImage imageNamed: [@"Pause" stringByAppendingString: controlImageSuffix]];
@@ -504,22 +511,19 @@
             controlImage = [NSImage imageNamed: [@"Resume" stringByAppendingString: controlImageSuffix]];
     }
     
-    //TEST CODE
-    /*NSImage * controlImage;
-    
-    if (fMouseDownControlButton)
-        controlImage = [NSImage imageNamed: @"ResumeOn.png"];
-    else if (!fTracking && fHoverControl)
-        controlImage = [NSImage imageNamed: @"ResumeNoWaitOff.png"];
-    else
-        controlImage = [NSImage imageNamed: @"ResumeOff.png"];*/
-    
     [controlImage setFlipped: YES];
     [controlImage drawInRect: [self controlButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
         fraction: 1.0];
     
     //reveal button
-    NSString * revealImageSuffix = fMouseDownRevealButton || (!fTracking && fHoverReveal) ? @"On.png" : @"Off.png";
+    NSString * revealImageSuffix;
+    if (fMouseDownRevealButton)
+        revealImageSuffix = @"On.png";
+    else if (!fTracking && fHoverReveal)
+        revealImageSuffix = /*@"Hover.png"*/@"On.png";
+    else
+        revealImageSuffix = @"Off.png";
+    
     NSImage * revealImage = [NSImage imageNamed: [@"Reveal" stringByAppendingString: revealImageSuffix]];
     [revealImage setFlipped: YES];
     [revealImage drawInRect: [self revealButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
