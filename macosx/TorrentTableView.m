@@ -94,6 +94,9 @@
 {
     [super updateTrackingAreas];
     
+    fMouseControlRow = -1;
+    fMouseRevealRow = -1;
+    
     NSEnumerator * enumerator = [[self trackingAreas] objectEnumerator];
     NSTrackingArea * area;
     while ((area = [enumerator nextObject]))
@@ -160,7 +163,8 @@
     NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
     
     //if pushing a button, don't change the selected rows
-    if ([self pointInControlRect: point] || [self pointInRevealRect: point] || [self pointInActionRect: point])
+    if ([NSApp isOnLeopardOrBetter] && ([self pointInControlRect: point] || [self pointInRevealRect: point]
+            || [self pointInActionRect: point]))
         fSelectedIndexes = [[self selectedRowIndexes] retain];
     
     [super mouseDown: event];

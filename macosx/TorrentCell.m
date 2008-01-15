@@ -359,6 +359,7 @@
     NSTrackingAreaOptions controlOptions = options;
     if (NSMouseInRect(mouseLocation, controlButtonRect, [controlView isFlipped]))
     {
+        #warning update control view
         controlOptions |= NSTrackingAssumeInside;
         [controlView setNeedsDisplayInRect: controlButtonRect];
     }
@@ -390,12 +391,12 @@
 
 - (void) setControlHover: (BOOL) hover
 {
-    fHoverControl = hover;
+    fHoverControl = [NSApp isOnLeopardOrBetter] ? hover : -1;
 }
 
 - (void) setRevealHover: (BOOL) hover
 {
-    fHoverReveal = hover;
+    fHoverReveal = [NSApp isOnLeopardOrBetter] ? hover : -1;
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
