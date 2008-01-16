@@ -128,7 +128,7 @@ static GtkActionEntry entries[] =
   { "pause-torrent", GTK_STOCK_MEDIA_PAUSE,
     N_("_Pause"), "<control>P", NULL, G_CALLBACK(action_cb) },
   { "remove-torrent", GTK_STOCK_REMOVE,
-    N_("_Remove"), "<control>R", NULL, G_CALLBACK(action_cb) },
+    N_("_Remove"), "<control>Delete", NULL, G_CALLBACK(action_cb) },
   { "create-torrent", GTK_STOCK_NEW,
     N_("Create _New Torrent"), NULL, NULL, G_CALLBACK(action_cb) },
   { "close", GTK_STOCK_CLOSE,
