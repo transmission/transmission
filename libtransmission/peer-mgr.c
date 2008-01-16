@@ -1396,6 +1396,18 @@ tr_peerMgrHasConnections( const tr_peerMgr * manager,
     return ret;
 }
 
+static int
+clientIsDownloadingFrom( const tr_peer * peer )
+{
+    return peer->clientIsInterested && !peer->clientIsChoked;
+}
+
+static int
+clientIsUploadingTo( const tr_peer * peer )
+{
+    return peer->peerIsInterested && !peer->peerIsChoked;
+}
+
 void
 tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                         const uint8_t    * torrentHash,
@@ -1434,11 +1446,11 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
 
         ++setmePeersFrom[atom->from];
 
-        if( peer->rateToPeer > 0.01 )
-            ++*setmePeersGettingFromUs;
-
-        if( peer->rateToClient > 0.01 )
+        if( clientIsDownloadingFrom( peer ) )
             ++*setmePeersSendingToUs;
+
+        if( clientIsUploadingTo( peer ) )
+            ++*setmePeersGettingFromUs;
     }
 
     managerUnlock( (tr_peerMgr*)manager );
@@ -1481,8 +1493,8 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
         stat->clientIsChoked     = peer->clientIsChoked;
         stat->clientIsInterested = peer->clientIsInterested;
         stat->isIncoming         = tr_peerIoIsIncoming( peer->io );
-        stat->isDownloadingFrom  = stat->clientIsInterested && !stat->clientIsChoked;
-        stat->isUploadingTo      = stat->peerIsInterested && !stat->peerIsChoked;
+        stat->isDownloadingFrom  = clientIsDownloadingFrom( peer );
+        stat->isUploadingTo      = clientIsUploadingTo( peer );
 
         pch = stat->flagStr;
         if( t->optimistic == peer ) *pch++ = 'O';
