@@ -1832,14 +1832,10 @@ getPeerCandidates( Torrent * t, int * setmeSize )
          * hold off on this peer to give another one a try instead */
         if( ( now - atom->piece_data_time ) > 30 )
         {
-            int minWait = (60 * 5); /* five minutes */
-            int maxWait = (60 * 30); /* thirty minutes */
-            int wait = atom->numFails * minWait;
-            if( wait < minWait ) wait = minWait;
-            if( wait > maxWait ) wait = maxWait;
-            if( ( now - atom->time ) < wait ) {
+            const int interval = 960;
+            if( ( now - atom->time ) < interval ) {
                 tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
-                        i, tr_peerIoAddrStr(&atom->addr,atom->port), wait );
+                        i, tr_peerIoAddrStr(&atom->addr,atom->port), interval );
                 continue;
             }
         }
