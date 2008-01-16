@@ -996,12 +996,15 @@ closeTorrent( void * vtor )
 void
 tr_torrentClose( tr_torrent * tor )
 {
-    tr_globalLock( tor->handle );
+    if( tor != NULL )
+    {
+        tr_globalLock( tor->handle );
 
-    tr_torrentClearStatusCallback( tor );
-    tr_runInEventThread( tor->handle, closeTorrent, tor );
+        tr_torrentClearStatusCallback( tor );
+        tr_runInEventThread( tor->handle, closeTorrent, tor );
 
-    tr_globalUnlock( tor->handle );
+        tr_globalUnlock( tor->handle );
+    }
 }
 
 /**
