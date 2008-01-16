@@ -508,13 +508,12 @@
     //bar
     [self drawBar: [self barRectForBounds: cellFrame]];
     
-    #warning get hover images
     //control button
     NSString * controlImageSuffix;
     if (fMouseDownControlButton)
         controlImageSuffix = @"On.png";
     else if (!fTracking && fHoverControl)
-        controlImageSuffix = /*@"Hover.png"*/@"On.png";
+        controlImageSuffix = @"Hover.png";
     else
         controlImageSuffix = @"Off.png";
     
@@ -540,7 +539,7 @@
     if (fMouseDownRevealButton)
         revealImageSuffix = @"On.png";
     else if (!fTracking && fHoverReveal)
-        revealImageSuffix = /*@"Hover.png"*/@"On.png";
+        revealImageSuffix = @"Hover.png";
     else
         revealImageSuffix = @"Off.png";
     
@@ -554,7 +553,7 @@
     {
         NSString * actionImageSuffix;
         if (!fTracking && fHoverAction)
-            actionImageSuffix = /*@"Hover.png"*/@"On.png";
+            actionImageSuffix = @"Hover.png";
         else
             actionImageSuffix = @"Off.png";
         

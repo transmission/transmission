@@ -120,6 +120,11 @@
 		A2623B2F0D3DC2EF0045D19A /* PriorityControlNormal.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B2C0D3DC2EF0045D19A /* PriorityControlNormal.png */; };
 		A2623B300D3DC2EF0045D19A /* PriorityControlLow.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B2D0D3DC2EF0045D19A /* PriorityControlLow.png */; };
 		A2623B310D3DC2EF0045D19A /* PriorityControlHigh.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B2E0D3DC2EF0045D19A /* PriorityControlHigh.png */; };
+		A2623B3F0D3DC5930045D19A /* ResumeNoWaitHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B3B0D3DC5930045D19A /* ResumeNoWaitHover.png */; };
+		A2623B400D3DC5930045D19A /* RevealHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B3C0D3DC5930045D19A /* RevealHover.png */; };
+		A2623B410D3DC5930045D19A /* ResumeHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B3D0D3DC5930045D19A /* ResumeHover.png */; };
+		A2623B420D3DC5930045D19A /* PauseHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B3E0D3DC5930045D19A /* PauseHover.png */; };
+		A2623B4E0D3DC6DF0045D19A /* ActionHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B4D0D3DC6DF0045D19A /* ActionHover.png */; };
 		A26397550D0F714300D36DF2 /* ActionPopUpButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A26397540D0F714300D36DF2 /* ActionPopUpButton.m */; };
 		A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2190D2DA35A00FF7140 /* FileOutlineController.m */; };
 		A26AF27E0D2DBDDF00FF7140 /* AddWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */; };
@@ -497,6 +502,11 @@
 		A2623B2C0D3DC2EF0045D19A /* PriorityControlNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityControlNormal.png; path = macosx/Images/PriorityControlNormal.png; sourceTree = "<group>"; };
 		A2623B2D0D3DC2EF0045D19A /* PriorityControlLow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityControlLow.png; path = macosx/Images/PriorityControlLow.png; sourceTree = "<group>"; };
 		A2623B2E0D3DC2EF0045D19A /* PriorityControlHigh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityControlHigh.png; path = macosx/Images/PriorityControlHigh.png; sourceTree = "<group>"; };
+		A2623B3B0D3DC5930045D19A /* ResumeNoWaitHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeNoWaitHover.png; path = macosx/Images/ResumeNoWaitHover.png; sourceTree = "<group>"; };
+		A2623B3C0D3DC5930045D19A /* RevealHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RevealHover.png; path = macosx/Images/RevealHover.png; sourceTree = "<group>"; };
+		A2623B3D0D3DC5930045D19A /* ResumeHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeHover.png; path = macosx/Images/ResumeHover.png; sourceTree = "<group>"; };
+		A2623B3E0D3DC5930045D19A /* PauseHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseHover.png; path = macosx/Images/PauseHover.png; sourceTree = "<group>"; };
+		A2623B4D0D3DC6DF0045D19A /* ActionHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionHover.png; path = macosx/Images/ActionHover.png; sourceTree = "<group>"; };
 		A26397530D0F714300D36DF2 /* ActionPopUpButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ActionPopUpButton.h; path = macosx/ActionPopUpButton.h; sourceTree = "<group>"; };
 		A26397540D0F714300D36DF2 /* ActionPopUpButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ActionPopUpButton.m; path = macosx/ActionPopUpButton.m; sourceTree = "<group>"; };
 		A265A32E0D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/Creator.xib; sourceTree = "<group>"; };
@@ -933,14 +943,19 @@
 				A2F41DA80D0B9152006CE378 /* ActionGear.png */,
 				A277DA090C693D9C00DA2CD4 /* ActionOn.png */,
 				A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */,
+				A2623B4D0D3DC6DF0045D19A /* ActionHover.png */,
 				35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */,
 				35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */,
+				A2623B3B0D3DC5930045D19A /* ResumeNoWaitHover.png */,
 				4D6DAAC4090CE00500F43C22 /* RevealOff.png */,
 				4D6DAAC5090CE00500F43C22 /* RevealOn.png */,
+				A2623B3C0D3DC5930045D19A /* RevealHover.png */,
 				4DA6FDB80911233800450CB1 /* PauseOn.png */,
+				A2623B3E0D3DC5930045D19A /* PauseHover.png */,
 				4DA6FDB90911233800450CB1 /* PauseOff.png */,
 				4DA6FDC3091141AD00450CB1 /* ResumeOff.png */,
 				4DA6FDC4091141AD00450CB1 /* ResumeOn.png */,
+				A2623B3D0D3DC5930045D19A /* ResumeHover.png */,
 				4D752E920913C949008EAAD4 /* Preferences.png */,
 				4DE5CCA80980739100BE280E /* Badge.png */,
 				4DDFDD20099A5D8E00189D81 /* DownloadBadge.png */,
@@ -1623,6 +1638,11 @@
 				A2623B2F0D3DC2EF0045D19A /* PriorityControlNormal.png in Resources */,
 				A2623B300D3DC2EF0045D19A /* PriorityControlLow.png in Resources */,
 				A2623B310D3DC2EF0045D19A /* PriorityControlHigh.png in Resources */,
+				A2623B3F0D3DC5930045D19A /* ResumeNoWaitHover.png in Resources */,
+				A2623B400D3DC5930045D19A /* RevealHover.png in Resources */,
+				A2623B410D3DC5930045D19A /* ResumeHover.png in Resources */,
+				A2623B420D3DC5930045D19A /* PauseHover.png in Resources */,
+				A2623B4E0D3DC6DF0045D19A /* ActionHover.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
