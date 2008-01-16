@@ -433,11 +433,6 @@
     fHoverActionIcon = [NSApp isOnLeopardOrBetter] ? hover : NO;
 }
 
-- (void) setPercentPiecesBar: (float) percent
-{
-    fPiecesBarPercent = MIN(percent, 1.0);
-}
-
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     [super drawWithFrame: cellFrame inView: controlView];
@@ -596,16 +591,13 @@
 
 - (void) drawBar: (NSRect) barRect
 {
-    if (fPiecesBarPercent > 0.0)
+    float piecesBarPercent = [(TorrentTableView *)[self controlView] piecesBarPercent];
+    if (piecesBarPercent > 0.0)
     {
         NSRect regularBarRect = barRect, piecesBarRect = barRect;
-        piecesBarRect.size.height *= PIECES_TOTAL_PERCENT * fPiecesBarPercent;
+        piecesBarRect.size.height *= PIECES_TOTAL_PERCENT * piecesBarPercent;
         regularBarRect.size.height -= piecesBarRect.size.height;
         piecesBarRect.origin.y += regularBarRect.size.height;
-        
-        /*regularBarRect.size.height -= (2.5 * fPiecesBarPercent) > 0 ? regularBarRect.size.height * (2.5 * fPiecesBarPercent) : 0.0;
-        piecesBarRect.origin.y += regularBarRect.size.height;
-        piecesBarRect.size.height -= regularBarRect.size.height;*/
         
         [self drawRegularBar: regularBarRect];
         [self drawPiecesBar: piecesBarRect];

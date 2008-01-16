@@ -2658,7 +2658,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) togglePiecesBar: (id) sender
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"PiecesBar"] forKey: @"PiecesBar"];
-    [fTableView toggleAdvancedBar];
+    [fTableView togglePiecesBar];
 }
 
 - (void) toggleAvailabilityBar: (id) sender

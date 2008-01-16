@@ -69,6 +69,7 @@
 
 - (void) checkFile: (id) sender;
 
-- (void) toggleAdvancedBar;
+- (void) togglePiecesBar;
+- (float) piecesBarPercent;
 
 @end

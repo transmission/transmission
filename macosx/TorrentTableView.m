@@ -97,8 +97,6 @@
     [cell setRevealHover: row == fMouseRevealRow];
     [cell setActionHover: row == fMouseActionRow];
     [cell setActionIconHover: row == fMouseActionIconRow];
-    
-    [cell setPercentPiecesBar: fPiecesBarPercent];
 }
 
 - (NSString *) tableView: (NSTableView *) tableView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn row: (int) row
@@ -331,10 +329,8 @@
     //sort torrents by name before finding closest match
     NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: YES
                                             selector: @selector(caseInsensitiveCompare:)] autorelease];
-    NSArray * descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, nil];
 
-    NSArray * tempTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
-    [descriptors release];
+    NSArray * tempTorrents = [fTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: nameDescriptor]];
     
     text = [text lowercaseString];
     
@@ -554,7 +550,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
 }
 
-- (void) toggleAdvancedBar
+- (void) togglePiecesBar
 {
     [self resizePiecesBarIncrement];
     
@@ -565,6 +561,11 @@
         [[NSRunLoop currentRunLoop] addTimer: fPiecesBarTimer forMode: NSModalPanelRunLoopMode];
         [[NSRunLoop currentRunLoop] addTimer: fPiecesBarTimer forMode: NSEventTrackingRunLoopMode];
     }
+}
+
+- (float) piecesBarPercent
+{
+    return fPiecesBarPercent;
 }
 
 @end
