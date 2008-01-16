@@ -407,7 +407,7 @@ static void
 makeicon( struct cbdata * cbdata )
 {
     if( cbdata->icon == NULL )
-        cbdata->icon = tr_icon_new( );
+        cbdata->icon = tr_icon_new( cbdata->core );
 }
 
 static gpointer

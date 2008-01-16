@@ -645,17 +645,28 @@ static gboolean
 update_foreach( GtkTreeModel * model,
                 GtkTreePath  * path UNUSED,
                 GtkTreeIter  * iter,
-                gpointer       data UNUSED)
+                gpointer       data )
 {
     TrTorrent * gtor;
     int oldStatus;
     const tr_stat * torStat;
+    struct core_stats * stats = data;
+
     gtk_tree_model_get( model, iter, MC_TORRENT, &gtor,
                                      MC_STATUS, &oldStatus,
                                      -1 );
 
     torStat = tr_torrent_stat( gtor );
 
+    /* sum the torrents' cumulative stats... */
+    if( torStat->status == TR_STATUS_DOWNLOAD )
+        ++stats->downloadCount;
+    else if( torStat->status == TR_STATUS_SEED )
+        ++stats->seedingCount;
+    stats->clientDownloadSpeed += torStat->rateDownload;
+    stats->clientUploadSpeed += torStat->rateUpload;
+
+    /* update the model's status if necessary */
     if( oldStatus != (int) torStat->status )
         gtk_list_store_set( GTK_LIST_STORE( model ), iter,
                             MC_STATUS, torStat->status,
@@ -680,7 +691,8 @@ tr_core_update( TrCore * self )
     gtk_tree_sortable_set_sort_column_id( sortable, GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, order );
 
     /* refresh the model */
-    gtk_tree_model_foreach( self->model, update_foreach, NULL );
+    memset( &self->stats, 0, sizeof( struct core_stats ) );
+    gtk_tree_model_foreach( self->model, update_foreach, &self->stats );
 
     /* resume sorting */
     gtk_tree_sortable_set_sort_column_id( sortable, column, order );

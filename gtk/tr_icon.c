@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <glib/gi18n.h>
 #include <gtk/gtk.h>
 #include "actions.h"
 #include "tr_icon.h"
@@ -30,7 +31,7 @@
 #ifndef STATUS_ICON_SUPPORTED
 
 gpointer
-tr_icon_new( void )
+tr_icon_new( tr_handle * handle )
 {
     return NULL;
 }
@@ -56,13 +57,44 @@ popup ( GtkStatusIcon  * self,
                     self, button, when );
 }
 
-gpointer
-tr_icon_new( void )
+static void
+core_destroyed( gpointer data, GObject * core UNUSED )
 {
-    GtkStatusIcon * ret = gtk_status_icon_new_from_stock ("transmission-logo");
-    g_signal_connect( ret, "activate", G_CALLBACK( activated ), NULL );
-    g_signal_connect( ret, "popup-menu", G_CALLBACK( popup ), NULL );
-    return ret;
+    g_source_remove( GPOINTER_TO_UINT( data ) );
+}
+
+static gboolean
+refresh_tooltip_cb( gpointer data )
+{
+    GtkStatusIcon * icon = GTK_STATUS_ICON( data );
+    TrCore * core = g_object_get_data( G_OBJECT( icon ), "tr-core" );
+    const struct core_stats * stats = &core->stats;
+    char downStr[32], upStr[32];
+    char tip[256];
+
+    tr_strlspeed( downStr, stats->clientDownloadSpeed, sizeof( downStr ) );
+    tr_strlspeed( upStr, stats->clientUploadSpeed, sizeof( upStr ) );
+    g_snprintf( tip, sizeof( tip ),
+                _( "%d Seeding, %d Downloading\nDown: %s, Up: %s" ), 
+                stats->seedingCount,
+                stats->downloadCount,
+                downStr, upStr );
+    gtk_status_icon_set_tooltip( GTK_STATUS_ICON( icon ), tip );
+
+    return TRUE;
+}
+
+gpointer
+tr_icon_new( TrCore * core )
+{
+    guint id;
+    GtkStatusIcon * icon = gtk_status_icon_new_from_stock ("transmission-logo");
+    g_signal_connect( icon, "activate", G_CALLBACK( activated ), NULL );
+    g_signal_connect( icon, "popup-menu", G_CALLBACK( popup ), NULL );
+    id = g_timeout_add( 1000, refresh_tooltip_cb, icon );
+    g_object_weak_ref( G_OBJECT( core ), core_destroyed, GUINT_TO_POINTER( id ) );
+    g_object_set_data( G_OBJECT( icon ), "tr-core", core );
+    return icon;
 }
 
 #endif

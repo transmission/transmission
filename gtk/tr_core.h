@@ -55,15 +55,24 @@
 typedef struct _TrCore TrCore;
 typedef struct _TrCoreClass TrCoreClass;
 
+struct core_stats
+{
+    int downloadCount;
+    int seedingCount;
+    float clientDownloadSpeed;
+    float clientUploadSpeed;
+};
+
 /* treat the contents of this structure as private */
 struct _TrCore
 {
-    GObject           parent;
-    GtkTreeModel    * model;
-    tr_handle       * handle;
-    int               nextid;
-    gboolean          quitting;
-    gboolean          disposed;
+    GObject            parent;
+    GtkTreeModel     * model;
+    tr_handle        * handle;
+    int                nextid;
+    gboolean           quitting;
+    gboolean           disposed;
+    struct core_stats  stats;
 };
 
 struct _TrCoreClass
