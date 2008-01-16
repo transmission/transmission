@@ -558,10 +558,13 @@
 {
     [self resizePiecesBarIncrement];
     
-    fPiecesBarTimer = [NSTimer scheduledTimerWithTimeInterval: PIECE_TIME target: self
-                        selector: @selector(resizePiecesBarIncrement) userInfo: nil repeats: YES];
-    [[NSRunLoop currentRunLoop] addTimer: fPiecesBarTimer forMode: NSModalPanelRunLoopMode];
-    [[NSRunLoop currentRunLoop] addTimer: fPiecesBarTimer forMode: NSEventTrackingRunLoopMode];
+    if (!fPiecesBarTimer)
+    {
+        fPiecesBarTimer = [NSTimer scheduledTimerWithTimeInterval: PIECE_TIME target: self
+                            selector: @selector(resizePiecesBarIncrement) userInfo: nil repeats: YES];
+        [[NSRunLoop currentRunLoop] addTimer: fPiecesBarTimer forMode: NSModalPanelRunLoopMode];
+        [[NSRunLoop currentRunLoop] addTimer: fPiecesBarTimer forMode: NSEventTrackingRunLoopMode];
+    }
 }
 
 @end
