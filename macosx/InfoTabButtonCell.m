@@ -26,6 +26,7 @@
 
 @implementation InfoTabButtonCell
 
+#warning store images in image/alternateImage?
 - (void) awakeFromNib
 {
     [(NSMatrix *)[self controlView] setToolTip: [self title] forCell: self];
@@ -51,7 +52,7 @@
 - (void) setIcon: (NSImage *) image
 {
     [fIcon release];
-    fIcon = image ? [image retain] : nil;
+    fIcon = [image retain];
     
     if (fRegularImage)
     {
@@ -97,13 +98,12 @@
     {
         if (fIcon)
         {
-            NSSize iconSize = [fIcon size];
-            NSRect imageRect = NSMakeRect(0, 0, [tabImage size].width, [tabImage size].height);
-            NSRect rect = NSMakeRect(imageRect.origin.x + (imageRect.size.width - iconSize.width) * 0.5,
-                            imageRect.origin.y + (imageRect.size.height - iconSize.height) * 0.5, iconSize.width, iconSize.height);
-
+            NSSize iconSize = [fIcon size], tabSize = [tabImage size];
+            NSPoint point = NSMakePoint(floorf((tabSize.width - iconSize.width) * 0.5),
+                                        floorf((tabSize.height - iconSize.height) * 0.5));
+            
             [tabImage lockFocus];
-            [fIcon drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+            [fIcon compositeToPoint: point operation: NSCompositeSourceOver];
             [tabImage unlockFocus];
         }
     }
@@ -113,11 +113,8 @@
 
 - (void) updateControlTint: (NSNotification *) notification
 {
-    if (fSelectedImage)
-    {
-        [fSelectedImage release];
-        fSelectedImage = nil;
-    }
+    [fSelectedImage release];
+    fSelectedImage = nil;
     
     if (fSelected)
         [self setSelectedTab: YES];
