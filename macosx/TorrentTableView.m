@@ -284,6 +284,7 @@
     }
 }
 
+//make sure that the pause buttons become orange when holding down the option key
 - (void) flagsChanged: (NSEvent *) event
 {
     [self display];
