@@ -20,7 +20,6 @@
 #include "tr_prefs.h"
 #include "lock.h"
 #include "logo.h"
-#include "status-bar-icons.h"
 
 #define UNUSED G_GNUC_UNUSED
 
@@ -175,10 +174,7 @@ BuiltinIconInfo;
 const BuiltinIconInfo my_builtin_icons [] =
 {
     { tr_icon_logo, "transmission-logo" },
-    { tr_icon_lock, "transmission-lock" },
-    { tr_arrow_down, "tr-arrow-down" },
-    { tr_arrow_up, "tr-arrow-up" },
-    { tr_yin_yang, "tr-yin-yang" }
+    { tr_icon_lock, "transmission-lock" }
 };
 
 static void

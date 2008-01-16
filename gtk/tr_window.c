@@ -484,17 +484,17 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
      
     w = p->ul_lb = gtk_label_new( NULL );
     gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
-    w = gtk_image_new_from_stock( "tr-arrow-up", (GtkIconSize)-1 );
+    w = gtk_image_new_from_stock( GTK_STOCK_GO_UP, GTK_ICON_SIZE_SMALL_TOOLBAR );
     gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
     w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
     gtk_widget_set_usize( w, GUI_PAD, 0u );
     gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
     w = p->dl_lb = gtk_label_new( NULL );
     gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
-    w = gtk_image_new_from_stock( "tr-arrow-down", (GtkIconSize)-1 );
+    w = gtk_image_new_from_stock( GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_SMALL_TOOLBAR );
     gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
 
-    w = gtk_image_new_from_stock( "tr-yin-yang", (GtkIconSize)-1 );
+    w = gtk_image_new_from_stock( GTK_STOCK_REFRESH, GTK_ICON_SIZE_SMALL_TOOLBAR );
     c = gtk_event_box_new( );
     gtk_container_add( GTK_CONTAINER(c), w );
     w = c;
