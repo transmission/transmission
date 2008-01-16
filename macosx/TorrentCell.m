@@ -36,16 +36,17 @@
 #define IMAGE_SIZE_MIN 16.0
 
 #define NORMAL_BUTTON_WIDTH 14.0
-#define ACTION_BUTTON_HEIGHT 14.0
-#define ACTION_BUTTON_WIDTH 32.0
+/*#define ACTION_BUTTON_HEIGHT 14.0
+#define ACTION_BUTTON_WIDTH 32.0*/
+#define ACTION_BUTTON_WIDTH 16.0
 
 //ends up being larger than font height
 #define HEIGHT_TITLE 16.0
 #define HEIGHT_STATUS 12.0
 
-#define PADDING_HORIZONTAL 2.0
-#define PADDING_ABOVE_IMAGE_REG 9.0
-#define PADDING_BETWEEN_IMAGE_AND_ACTION_BUTTON 3.0
+#define PADDING_HORIZONTAL 3.0
+//#define PADDING_ABOVE_IMAGE_REG 9.0
+//#define PADDING_BETWEEN_IMAGE_AND_ACTION_BUTTON 3.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE 5.0
 #define PADDING_BETWEEN_IMAGE_AND_BAR 7.0
 #define PADDING_ABOVE_TITLE 3.0
@@ -158,9 +159,13 @@
 {
     NSRect result = bounds;
     
-    result.origin.x += PADDING_HORIZONTAL;
+    float imageSize = [fDefaults boolForKey: @"SmallView"] ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG;
     
-    float imageSize;
+    result.origin.x += PADDING_HORIZONTAL;
+    result.origin.y += floorf((result.size.height - imageSize) * 0.5);
+    result.size = NSMakeSize(imageSize, imageSize);
+    
+    /*float imageSize;
     if ([fDefaults boolForKey: @"SmallView"])
     {
         imageSize = IMAGE_SIZE_MIN;
@@ -170,9 +175,7 @@
     {
         imageSize = IMAGE_SIZE_REG;
         result.origin.y += PADDING_ABOVE_IMAGE_REG;
-    }
-    
-    result.size = NSMakeSize(imageSize, imageSize);
+    }*/
     
     return result;
 }
@@ -201,7 +204,7 @@
     
     NSRect result = bounds;
     result.size.height = BAR_HEIGHT;
-    result.origin.x = PADDING_HORIZONTAL + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_BAR;
+    result.origin.x = (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_BAR;
     
     result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE;
     if (minimal)
@@ -257,11 +260,17 @@
     if ([fDefaults boolForKey: @"SmallView"])
         return iconRect;
     
-    NSRect result = iconRect;
+    /*NSRect result = iconRect;
     result.origin.x += (iconRect.size.width - ACTION_BUTTON_WIDTH) * 0.5;
     result.origin.y += iconRect.size.height + PADDING_BETWEEN_IMAGE_AND_ACTION_BUTTON;
     result.size.width = ACTION_BUTTON_WIDTH;
-    result.size.height = ACTION_BUTTON_HEIGHT;
+    result.size.height = ACTION_BUTTON_HEIGHT;*/
+    NSRect result = iconRect;
+    result.origin.x += (iconRect.size.width - ACTION_BUTTON_WIDTH) * 0.5;
+    result.origin.y += (iconRect.size.height - ACTION_BUTTON_WIDTH) * 0.5;
+    result.size.width = ACTION_BUTTON_WIDTH;
+    result.size.height = ACTION_BUTTON_WIDTH;
+    
     
     return result;
 }
@@ -549,14 +558,15 @@
         fraction: 1.0];
     
     //action button
-    if (!minimal)
+    NSString * actionImageSuffix;
+    if (!fTracking && fHoverAction)
+        actionImageSuffix = @"Hover.png";
+    else
+        //actionImageSuffix = @"Off.png";
+        actionImageSuffix = nil;
+    
+    if (actionImageSuffix)
     {
-        NSString * actionImageSuffix;
-        if (!fTracking && fHoverAction)
-            actionImageSuffix = @"Hover.png";
-        else
-            actionImageSuffix = @"Off.png";
-        
         NSImage * actionImage = [NSImage imageNamed: [@"Action" stringByAppendingString: actionImageSuffix]];
         [actionImage setFlipped: YES];
         [actionImage drawInRect: [self actionButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
