@@ -3,7 +3,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 1.10 (2008/xx/yy)
 - Mac:
    + Window when adding torrents to select files and other settings
-   + Leopard: Reduce clutter by hiding per-torrent action button over the transfer's icon
+   + Leopard: Hide per-torrent action button over the file icon
 
 1.01 (2008/01/11)
 - All Platforms:

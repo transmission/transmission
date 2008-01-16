@@ -63,6 +63,7 @@
         fMouseRevealRow = -1;
         fMouseActionRow = -1;
         fMouseActionIconRow = -1;
+        fActionPushedRow = -1;
         
         [self setDelegate: self];
         
@@ -97,6 +98,7 @@
     [cell setRevealHover: row == fMouseRevealRow];
     [cell setActionHover: row == fMouseActionRow];
     [cell setActionIconHover: row == fMouseActionIconRow];
+    [cell setActionPushed: row == fActionPushedRow];
 }
 
 - (NSString *) tableView: (NSTableView *) tableView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn row: (int) row
@@ -237,10 +239,13 @@
     if ([self pointInActionRect: point])
     {
         int row = [self rowAtPoint: point];
+        
+        fActionPushedRow = row;
         [self setNeedsDisplayInRect: [self rectOfRow: row]]; //ensure button is pushed down
         
         [self displayTorrentMenuForEvent: event];
         
+        fActionPushedRow = -1;
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
     }
     else

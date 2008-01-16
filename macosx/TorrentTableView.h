@@ -37,7 +37,7 @@
     
     IBOutlet NSMenu * fContextRow, * fContextNoRow;
     
-    int fMouseControlRow, fMouseRevealRow, fMouseActionRow, fMouseActionIconRow;
+    int fMouseControlRow, fMouseRevealRow, fMouseActionRow, fMouseActionIconRow, fActionPushedRow;
     NSIndexSet * fSelectedIndexes;
     
     NSMutableArray * fKeyStrokes;

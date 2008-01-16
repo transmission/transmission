@@ -433,6 +433,11 @@
     fHoverActionIcon = [NSApp isOnLeopardOrBetter] ? hover : NO;
 }
 
+- (void) setActionPushed: (BOOL) pushed
+{
+    fMouseDownActionButton = pushed;
+}
+
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     [super drawWithFrame: cellFrame inView: controlView];
@@ -562,7 +567,9 @@
     
     //action button
     NSString * actionImageSuffix;
-    if (!fTracking && fHoverAction)
+    if (fMouseDownActionButton)
+        actionImageSuffix = @"On.png";
+    else if (!fTracking && fHoverAction)
         actionImageSuffix = @"Hover.png";
     else if (!fTracking && fHoverActionIcon)
         actionImageSuffix = @"Off.png";
