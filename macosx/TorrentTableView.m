@@ -226,16 +226,6 @@
 {
     NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
     
-    //if pushing a button, don't change the selected rows
-    if ([NSApp isOnLeopardOrBetter] && ([self pointInControlRect: point] || [self pointInRevealRect: point]
-            || [self pointInActionRect: point]))
-        fSelectedIndexes = [[self selectedRowIndexes] retain];
-    
-    [super mouseDown: event];
-    
-    [fSelectedIndexes release];
-    fSelectedIndexes = nil;
-    
     if ([self pointInActionRect: point])
     {
         int row = [self rowAtPoint: point];
@@ -248,24 +238,32 @@
         fActionPushedRow = -1;
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
     }
-    else
+    
+    //if pushing a button, don't change the selected rows
+    if ([NSApp isOnLeopardOrBetter] && ([self pointInControlRect: point] || [self pointInRevealRect: point]
+            || [self pointInActionRect: point]))
+        fSelectedIndexes = [[self selectedRowIndexes] retain];
+    
+    [super mouseDown: event];
+    
+    [fSelectedIndexes release];
+    fSelectedIndexes = nil;
+    
+    if ([self pointInMinimalStatusRect: point])
     {
-        if ([self pointInMinimalStatusRect: point])
+        [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
+        [self reloadData];
+    }
+    
+    if ([event clickCount] == 2) //double click
+    {
+        if ([self pointInProgressRect: point])
         {
-            [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
+            [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
             [self reloadData];
         }
-        
-        if ([event clickCount] == 2) //double click
-        {
-            if ([self pointInProgressRect: point])
-            {
-                [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
-                [self reloadData];
-            }
-            else
-                [fController showInfo: nil];
-        }
+        else
+            [fController showInfo: nil];
     }
 }
 

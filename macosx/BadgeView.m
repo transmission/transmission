@@ -25,10 +25,8 @@
 #import "BadgeView.h"
 #import "NSStringAdditions.h"
 
-#define BOTTOM_PADDING 2.0
-#define BETWEEN_PADDING 2.0
-
 #define BADGE_HEIGHT 30.0
+#define BETWEEN_PADDING 2.0
 
 @interface BadgeView (Private)
 
