@@ -191,6 +191,12 @@
 
 - (void) cancelAdd: (id) sender
 {
+    [[self window] performClose: sender];
+}
+
+//only called on cancel
+- (BOOL) windowShouldClose: (id) window
+{
     [fTimer invalidate];
     fTimer = nil;
     

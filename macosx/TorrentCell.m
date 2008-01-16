@@ -474,7 +474,7 @@
     //icon
     if (!minimal || !(!fTracking && fHoverAction)) //don't show in minimal mode when hovered over
     {
-        NSImage * icon = minimal && error ? fErrorImage : [torrent icon];
+        NSImage * icon = (minimal && error) ? fErrorImage : [torrent icon];
         [icon drawInRect: iconRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     }
     
