@@ -174,7 +174,7 @@
             fMouseActionRow = rowVal;
         else if ([[dict objectForKey: @"Type"] isEqualToString: @"Icon"])
             fMouseActionIconRow = rowVal;
-        if ([[dict objectForKey: @"Type"] isEqualToString: @"Control"])
+        else if ([[dict objectForKey: @"Type"] isEqualToString: @"Control"])
             fMouseControlRow = rowVal;
         else
             fMouseRevealRow = rowVal;
@@ -195,7 +195,7 @@
             fMouseActionRow = -1;
         else if ([[dict objectForKey: @"Type"] isEqualToString: @"Icon"])
             fMouseActionIconRow = -1;
-        if ([[dict objectForKey: @"Type"] isEqualToString: @"Control"])
+        else if ([[dict objectForKey: @"Type"] isEqualToString: @"Control"])
             fMouseControlRow = -1;
         else
             fMouseRevealRow = -1;
