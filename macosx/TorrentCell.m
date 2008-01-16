@@ -36,8 +36,6 @@
 #define IMAGE_SIZE_MIN 16.0
 
 #define NORMAL_BUTTON_WIDTH 14.0
-/*#define ACTION_BUTTON_HEIGHT 14.0
-#define ACTION_BUTTON_WIDTH 32.0*/
 #define ACTION_BUTTON_WIDTH 16.0
 
 //ends up being larger than font height
@@ -45,8 +43,6 @@
 #define HEIGHT_STATUS 12.0
 
 #define PADDING_HORIZONTAL 3.0
-//#define PADDING_ABOVE_IMAGE_REG 9.0
-//#define PADDING_BETWEEN_IMAGE_AND_ACTION_BUTTON 3.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE 5.0
 #define PADDING_BETWEEN_IMAGE_AND_BAR 7.0
 #define PADDING_ABOVE_TITLE 3.0
@@ -157,25 +153,12 @@
 
 - (NSRect) iconRectForBounds: (NSRect) bounds
 {
-    NSRect result = bounds;
-    
     float imageSize = [fDefaults boolForKey: @"SmallView"] ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG;
     
+    NSRect result = bounds;
     result.origin.x += PADDING_HORIZONTAL;
     result.origin.y += floorf((result.size.height - imageSize) * 0.5);
     result.size = NSMakeSize(imageSize, imageSize);
-    
-    /*float imageSize;
-    if ([fDefaults boolForKey: @"SmallView"])
-    {
-        imageSize = IMAGE_SIZE_MIN;
-        result.origin.y += (result.size.height - imageSize) * 0.5;
-    }
-    else
-    {
-        imageSize = IMAGE_SIZE_REG;
-        result.origin.y += PADDING_ABOVE_IMAGE_REG;
-    }*/
     
     return result;
 }
@@ -260,17 +243,11 @@
     if ([fDefaults boolForKey: @"SmallView"])
         return iconRect;
     
-    /*NSRect result = iconRect;
-    result.origin.x += (iconRect.size.width - ACTION_BUTTON_WIDTH) * 0.5;
-    result.origin.y += iconRect.size.height + PADDING_BETWEEN_IMAGE_AND_ACTION_BUTTON;
-    result.size.width = ACTION_BUTTON_WIDTH;
-    result.size.height = ACTION_BUTTON_HEIGHT;*/
     NSRect result = iconRect;
     result.origin.x += (iconRect.size.width - ACTION_BUTTON_WIDTH) * 0.5;
     result.origin.y += (iconRect.size.height - ACTION_BUTTON_WIDTH) * 0.5;
     result.size.width = ACTION_BUTTON_WIDTH;
     result.size.height = ACTION_BUTTON_WIDTH;
-    
     
     return result;
 }
@@ -401,7 +378,7 @@
     [revealInfo release];
     [area release];
     
-    //action button (needed even in minimal mode to display status string)
+    //action button
     NSRect actionButtonRect = [self actionButtonRectForBounds: cellFrame];
     NSTrackingAreaOptions actionOptions = options;
     if (NSMouseInRect(mouseLocation, actionButtonRect, [controlView isFlipped]))
@@ -416,6 +393,26 @@
     [controlView addTrackingArea: area];
     [actionInfo release];
     [area release];
+    
+    //action button (over icon)
+    if (![fDefaults boolForKey: @"SmallView"])
+    {
+        NSRect actionIconButtonRect = [self iconRectForBounds: cellFrame];
+        NSTrackingAreaOptions actionIconOptions = options;
+        if (NSMouseInRect(mouseLocation, actionIconButtonRect, [controlView isFlipped]))
+        {
+            actionIconOptions |= NSTrackingAssumeInside;
+            [(TorrentTableView *)controlView setActionIconButtonHover: [[userInfo objectForKey: @"Row"] intValue]];
+        }
+
+        NSMutableDictionary * actionIconInfo = [userInfo mutableCopy];
+        [actionIconInfo setObject: @"Icon" forKey: @"Type"];
+        area = [[NSTrackingArea alloc] initWithRect: actionIconButtonRect options: actionIconOptions owner: controlView
+                userInfo: actionIconInfo];
+        [controlView addTrackingArea: area];
+        [actionIconInfo release];
+        [area release];
+    }
 }
 
 - (void) setControlHover: (BOOL) hover
@@ -431,6 +428,11 @@
 - (void) setActionHover: (BOOL) hover
 {
     fHoverAction = [NSApp isOnLeopardOrBetter] ? hover : NO;
+}
+
+- (void) setActionIconHover: (BOOL) hover
+{
+    fHoverActionIcon = [NSApp isOnLeopardOrBetter] ? hover : NO;
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
@@ -564,8 +566,9 @@
     NSString * actionImageSuffix;
     if (!fTracking && fHoverAction)
         actionImageSuffix = @"Hover.png";
+    else if (!fTracking && fHoverActionIcon)
+        actionImageSuffix = @"Off.png";
     else
-        //actionImageSuffix = @"Off.png";
         actionImageSuffix = nil;
     
     if (actionImageSuffix)

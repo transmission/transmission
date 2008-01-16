@@ -57,6 +57,7 @@
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
         fMouseActionRow = -1;
+        fMouseActionIconRow = -1;
         
         [self setDelegate: self];
     }
@@ -85,6 +86,7 @@
     [cell setControlHover: row == fMouseControlRow];
     [cell setRevealHover: row == fMouseRevealRow];
     [cell setActionHover: row == fMouseActionRow];
+    [cell setActionIconHover: row == fMouseActionIconRow];
 }
 
 - (NSString *) tableView: (NSTableView *) tableView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn row: (int) row
@@ -121,6 +123,7 @@
     fMouseControlRow = -1;
     fMouseRevealRow = -1;
     fMouseActionRow = -1;
+    fMouseActionIconRow = -1;
     
     NSEnumerator * enumerator = [[self trackingAreas] objectEnumerator];
     NSTrackingArea * area;
@@ -145,10 +148,16 @@
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
 }
 
-
 - (void) setActionButtonHover: (int) row
 {
     fMouseActionRow = row;
+    if (row >= 0)
+        [self setNeedsDisplayInRect: [self rectOfRow: row]];
+}
+
+- (void) setActionIconButtonHover: (int) row
+{
+    fMouseActionIconRow = row;
     if (row >= 0)
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
 }
@@ -161,12 +170,14 @@
     if ((row = [dict objectForKey: @"Row"]))
     {
         int rowVal = [row intValue];
+        if ([[dict objectForKey: @"Type"] isEqualToString: @"Action"])
+            fMouseActionRow = rowVal;
+        else if ([[dict objectForKey: @"Type"] isEqualToString: @"Icon"])
+            fMouseActionIconRow = rowVal;
         if ([[dict objectForKey: @"Type"] isEqualToString: @"Control"])
             fMouseControlRow = rowVal;
-        else if ([[dict objectForKey: @"Type"] isEqualToString: @"Reveal"])
-            fMouseRevealRow = rowVal;
         else
-            fMouseActionRow = rowVal;
+            fMouseRevealRow = rowVal;
         
         [self setNeedsDisplayInRect: [self rectOfRow: rowVal]];
     }
@@ -174,12 +185,20 @@
 
 - (void) mouseExited: (NSEvent *) event
 {
+    NSDictionary * dict = (NSDictionary *)[event userData];
+    
     NSNumber * row;
-    if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
+    if ((row = [dict objectForKey: @"Row"]))
     {
-        fMouseControlRow = -1;
-        fMouseRevealRow = -1;
-        fMouseActionRow = -1;
+        int rowVal = [row intValue];
+        if ([[dict objectForKey: @"Type"] isEqualToString: @"Action"])
+            fMouseActionRow = -1;
+        else if ([[dict objectForKey: @"Type"] isEqualToString: @"Icon"])
+            fMouseActionIconRow = -1;
+        if ([[dict objectForKey: @"Type"] isEqualToString: @"Control"])
+            fMouseControlRow = -1;
+        else
+            fMouseRevealRow = -1;
         
         [self setNeedsDisplayInRect: [self rectOfRow: [row intValue]]];
     }
@@ -229,8 +248,6 @@
                 [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
                 [self reloadData];
             }
-            else if ([self pointInIconRect: point])
-                [[fTorrents objectAtIndex: [self rowAtPoint: point]] revealData];
             else
                 [fController showInfo: nil];
         }
