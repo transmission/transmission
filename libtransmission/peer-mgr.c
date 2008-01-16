@@ -87,7 +87,7 @@ enum
     MAX_UPLOAD_IDLE_SECS = (60 * 10),
 
     /* how frequently to decide which peers live and die */
-    RECONNECT_PERIOD_MSEC = (2 * 1000),
+    RECONNECT_PERIOD_MSEC = (3 * 1000),
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
     MAX_RECONNECTIONS_PER_PULSE = 4,
@@ -1811,7 +1811,7 @@ getPeerCandidates( Torrent * t, int * setmeSize )
             continue;
 
         /* we're wasting our time trying to connect to this bozo. */
-        if( atom->numFails > 5 )
+        if( atom->numFails > 3 )
             continue;
 
         /* If we were connected to this peer recently and transferring
@@ -1820,9 +1820,9 @@ getPeerCandidates( Torrent * t, int * setmeSize )
          * hold off on this peer to give another one a try instead */
         if( ( now - atom->piece_data_time ) > 30 )
         {
-            int minWait = (60 * 2); /* two minutes */
-            int maxWait = (60 * 20); /* twenty minutes */
-            int wait = atom->numFails * 30; /* add 30 secs to the wait interval for each consecutive failure*/
+            int minWait = (60 * 5); /* five minutes */
+            int maxWait = (60 * 30); /* thirty minutes */
+            int wait = atom->numFails * minWait;
             if( wait < minWait ) wait = minWait;
             if( wait > maxWait ) wait = maxWait;
             if( ( now - atom->time ) < wait ) {
