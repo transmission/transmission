@@ -44,6 +44,9 @@
     
     IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu, * fRatioMenu;
     Torrent * fMenuTorrent;
+    
+    float fPiecesBarPercent;
+    NSTimer * fPiecesBarTimer;
 }
 
 - (void) setTorrents: (NSArray *) torrents;
@@ -65,5 +68,7 @@
 - (void) setQuickRatio: (id) sender;
 
 - (void) checkFile: (id) sender;
+
+- (void) toggleAdvancedBar;
 
 @end

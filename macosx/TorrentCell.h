@@ -41,6 +41,7 @@
     NSColor * fGrayColor, * fBlueColor, * fBlue1Color, * fBlue2Color, * fBlue3Color, * fBlue4Color, * fOrangeColor;
     
     NSBitmapImageRep * fBitmap;
+    float fPiecesBarPercent;
 }
 
 - (NSRect) iconRectForBounds: (NSRect) bounds;
@@ -60,5 +61,7 @@
 - (void) setRevealHover: (BOOL) hover;
 - (void) setActionHover: (BOOL) hover;
 - (void) setActionIconHover: (BOOL) hover;
+
+- (void) setPercentPiecesBar: (float) percent;
 
 @end

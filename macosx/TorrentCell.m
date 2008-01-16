@@ -53,9 +53,7 @@
 #define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
 
-#define WIDTH_GROUP 40.0
-#define WIDTH_GROUP_MIN 24.0
-
+#define PIECES_TOTAL_PERCENT 0.6
 #define MAX_PIECES 324
 
 @interface TorrentCell (Private)
@@ -435,6 +433,11 @@
     fHoverActionIcon = [NSApp isOnLeopardOrBetter] ? hover : NO;
 }
 
+- (void) setPercentPiecesBar: (float) percent
+{
+    fPiecesBarPercent = MIN(percent, 1.0);
+}
+
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     [super drawWithFrame: cellFrame inView: controlView];
@@ -593,12 +596,16 @@
 
 - (void) drawBar: (NSRect) barRect
 {
-    if ([fDefaults boolForKey: @"PiecesBar"])
+    if (fPiecesBarPercent > 0.0)
     {
         NSRect regularBarRect = barRect, piecesBarRect = barRect;
-        regularBarRect.size.height /= 2.5;
+        piecesBarRect.size.height *= PIECES_TOTAL_PERCENT * fPiecesBarPercent;
+        regularBarRect.size.height -= piecesBarRect.size.height;
         piecesBarRect.origin.y += regularBarRect.size.height;
-        piecesBarRect.size.height -= regularBarRect.size.height;
+        
+        /*regularBarRect.size.height -= (2.5 * fPiecesBarPercent) > 0 ? regularBarRect.size.height * (2.5 * fPiecesBarPercent) : 0.0;
+        piecesBarRect.origin.y += regularBarRect.size.height;
+        piecesBarRect.size.height -= regularBarRect.size.height;*/
         
         [self drawRegularBar: regularBarRect];
         [self drawPiecesBar: piecesBarRect];
@@ -752,7 +759,7 @@
 {
     if (!fBitmap)
         fBitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
-            pixelsWide: MAX_PIECES pixelsHigh: barRect.size.height bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
+            pixelsWide: MAX_PIECES pixelsHigh: 1 bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
             isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
     
     Torrent * torrent = [self representedObject];
@@ -787,8 +794,7 @@
             pieceColor = fBlue4Color;
         
         if (![pieceColor isEqual: [fBitmap colorAtX: i y: 0]])
-            for (h = 0; h < barRect.size.height; h++)
-                [fBitmap setColor: pieceColor atX: i y: h];
+            [fBitmap setColor: pieceColor atX: i y: 0];
     }
     
     [torrent setPreviousAmountFinished: piecePercent];

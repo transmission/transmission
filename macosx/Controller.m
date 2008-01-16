@@ -466,7 +466,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //timer to auto toggle speed limit
     [self autoSpeedLimitChange: nil];
-    fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self 
+    fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self
         selector: @selector(autoSpeedLimit) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSEventTrackingRunLoopMode];
@@ -2658,7 +2658,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) togglePiecesBar: (id) sender
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"PiecesBar"] forKey: @"PiecesBar"];
-    [fTableView display];
+    [fTableView toggleAdvancedBar];
 }
 
 - (void) toggleAvailabilityBar: (id) sender

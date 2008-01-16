@@ -33,6 +33,9 @@
 #define ACTION_MENU_UNLIMITED_TAG 102
 #define ACTION_MENU_LIMIT_TAG 103
 
+#define PIECE_INCREASE 0.1
+#define PIECE_TIME 0.01
+
 @interface TorrentTableView (Private)
 
 - (BOOL) pointInControlRect: (NSPoint) point;
@@ -43,6 +46,8 @@
 - (BOOL) pointInProgressRect: (NSPoint) point;
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point;
 - (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files;
+
+- (void) resizePiecesBarIncrement;
 
 @end
 
@@ -60,6 +65,8 @@
         fMouseActionIconRow = -1;
         
         [self setDelegate: self];
+        
+        fPiecesBarPercent = [fDefaults boolForKey: @"PiecesBar"] ? 1.0 : 0.0;
     }
     
     return self;
@@ -67,6 +74,8 @@
 
 - (void) dealloc
 {
+    [fPiecesBarTimer invalidate];
+    
     [fSelectedIndexes release];
     
     [fKeyStrokes release];
@@ -83,10 +92,13 @@
 - (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
     [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
+    
     [cell setControlHover: row == fMouseControlRow];
     [cell setRevealHover: row == fMouseRevealRow];
     [cell setActionHover: row == fMouseActionRow];
     [cell setActionIconHover: row == fMouseActionIconRow];
+    
+    [cell setPercentPiecesBar: fPiecesBarPercent];
 }
 
 - (NSString *) tableView: (NSTableView *) tableView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn row: (int) row
@@ -542,6 +554,16 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
 }
 
+- (void) toggleAdvancedBar
+{
+    [self resizePiecesBarIncrement];
+    
+    fPiecesBarTimer = [NSTimer scheduledTimerWithTimeInterval: PIECE_TIME target: self
+                        selector: @selector(resizePiecesBarIncrement) userInfo: nil repeats: YES];
+    [[NSRunLoop currentRunLoop] addTimer: fPiecesBarTimer forMode: NSModalPanelRunLoopMode];
+    [[NSRunLoop currentRunLoop] addTimer: fPiecesBarTimer forMode: NSEventTrackingRunLoopMode];
+}
+
 @end
 
 @implementation TorrentTableView (Private)
@@ -665,6 +687,26 @@
         [item setState: [fMenuTorrent checkForFiles: indexSet]];
         [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
     }
+}
+
+- (void) resizePiecesBarIncrement
+{
+    BOOL increase = [fDefaults boolForKey: @"PiecesBar"];
+    
+    if (increase)
+        fPiecesBarPercent += PIECE_INCREASE;
+    else
+        fPiecesBarPercent -= PIECE_INCREASE;
+    
+    if (increase ? (fPiecesBarPercent >= 1.0) : (fPiecesBarPercent <= 0.0))
+    {
+        [fPiecesBarTimer invalidate];
+        fPiecesBarTimer = nil;
+        
+        fPiecesBarPercent = increase ? 1.0 : 0.0;
+    }
+    
+    [self reloadData];
 }
 
 @end
