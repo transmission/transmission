@@ -117,6 +117,9 @@
 		A261A8260C6A0D68003BAFDA /* Error.png in Resources */ = {isa = PBXBuildFile; fileRef = A261A8250C6A0D68003BAFDA /* Error.png */; };
 		A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
 		A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
+		A2623B2F0D3DC2EF0045D19A /* PriorityControlNormal.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B2C0D3DC2EF0045D19A /* PriorityControlNormal.png */; };
+		A2623B300D3DC2EF0045D19A /* PriorityControlLow.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B2D0D3DC2EF0045D19A /* PriorityControlLow.png */; };
+		A2623B310D3DC2EF0045D19A /* PriorityControlHigh.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B2E0D3DC2EF0045D19A /* PriorityControlHigh.png */; };
 		A26397550D0F714300D36DF2 /* ActionPopUpButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A26397540D0F714300D36DF2 /* ActionPopUpButton.m */; };
 		A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2190D2DA35A00FF7140 /* FileOutlineController.m */; };
 		A26AF27E0D2DBDDF00FF7140 /* AddWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */; };
@@ -491,6 +494,9 @@
 		A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeSelected.png; path = macosx/Images/ResumeSelected.png; sourceTree = "<group>"; };
 		A261A8250C6A0D68003BAFDA /* Error.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Error.png; path = macosx/Images/Error.png; sourceTree = "<group>"; };
 		A261F1DB0A69A1610002815A /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = macosx/Growl.framework; sourceTree = "<group>"; };
+		A2623B2C0D3DC2EF0045D19A /* PriorityControlNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityControlNormal.png; path = macosx/Images/PriorityControlNormal.png; sourceTree = "<group>"; };
+		A2623B2D0D3DC2EF0045D19A /* PriorityControlLow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityControlLow.png; path = macosx/Images/PriorityControlLow.png; sourceTree = "<group>"; };
+		A2623B2E0D3DC2EF0045D19A /* PriorityControlHigh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityControlHigh.png; path = macosx/Images/PriorityControlHigh.png; sourceTree = "<group>"; };
 		A26397530D0F714300D36DF2 /* ActionPopUpButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ActionPopUpButton.h; path = macosx/ActionPopUpButton.h; sourceTree = "<group>"; };
 		A26397540D0F714300D36DF2 /* ActionPopUpButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ActionPopUpButton.m; path = macosx/ActionPopUpButton.m; sourceTree = "<group>"; };
 		A265A32E0D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/Creator.xib; sourceTree = "<group>"; };
@@ -894,6 +900,9 @@
 				A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */,
 				A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */,
 				A20B6F820C4D8A610034AB1D /* PriorityHigh.png */,
+				A2623B2C0D3DC2EF0045D19A /* PriorityControlNormal.png */,
+				A2623B2D0D3DC2EF0045D19A /* PriorityControlLow.png */,
+				A2623B2E0D3DC2EF0045D19A /* PriorityControlHigh.png */,
 				A2FB06950BFF484A0095564D /* Globe.png */,
 				A261A8250C6A0D68003BAFDA /* Error.png */,
 				A2F1511F0CD438BA001F3B0E /* Lock.png */,
@@ -1611,6 +1620,9 @@
 				A23F4FF20D1D98AD002FCB97 /* PrefsWindow.xib in Resources */,
 				A23F50020D1D99D7002FCB97 /* MainMenu.xib in Resources */,
 				A26AF27E0D2DBDDF00FF7140 /* AddWindow.xib in Resources */,
+				A2623B2F0D3DC2EF0045D19A /* PriorityControlNormal.png in Resources */,
+				A2623B300D3DC2EF0045D19A /* PriorityControlLow.png in Resources */,
+				A2623B310D3DC2EF0045D19A /* PriorityControlHigh.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

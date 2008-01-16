@@ -43,17 +43,14 @@
             [self setWidth: 9.0 forSegment: i]; //9 is minimum size to get proper look
         }
         
-        NSSize imageSize = NSMakeSize(7.0, 11.0);
+        NSImage * lowImage = [NSImage imageNamed: @"PriorityControlLow.png"];
+        [self setImage: lowImage forSegment: 0];
         
-        NSImage * downArrow = [NSImage imageNamed: @"DownArrow.png"];
-        [downArrow setScalesWhenResized: YES];
-        [downArrow setSize: imageSize];
-        [self setImage: downArrow forSegment: 0];
+        NSImage * normalImage = [NSImage imageNamed: @"PriorityControlNormal.png"];
+        [self setImage: normalImage forSegment: 1];
         
-        NSImage * upArrow = [NSImage imageNamed: @"UpArrow.png"];
-        [upArrow setScalesWhenResized: YES];
-        [upArrow setSize: imageSize];
-        [self setImage: upArrow forSegment: 2];
+        NSImage * highImage = [NSImage imageNamed: @"PriorityControlHigh.png"];
+        [self setImage: highImage forSegment: 2];
         
         fHoverRow = NO;
     }
