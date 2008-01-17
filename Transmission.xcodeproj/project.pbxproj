@@ -99,6 +99,7 @@
 		A24621410C769D0900088E81 /* trevent.h in Headers */ = {isa = PBXBuildFile; fileRef = A24621350C769CF400088E81 /* trevent.h */; };
 		A24621420C769D0900088E81 /* trevent.c in Sources */ = {isa = PBXBuildFile; fileRef = A24621360C769CF400088E81 /* trevent.c */; };
 		A24872B60C9B6BB9000F5B92 /* Advanced.png in Resources */ = {isa = PBXBuildFile; fileRef = A24872B50C9B6BB9000F5B92 /* Advanced.png */; };
+		A24B65600D3F30870079EA4D /* QuitBadge.png in Resources */ = {isa = PBXBuildFile; fileRef = A24B655F0D3F30870079EA4D /* QuitBadge.png */; };
 		A24D2A640C0A624600A0ED9F /* IPCController.m in Sources */ = {isa = PBXBuildFile; fileRef = A24D2A620C0A624600A0ED9F /* IPCController.m */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
@@ -474,6 +475,7 @@
 		A24621350C769CF400088E81 /* trevent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trevent.h; path = libtransmission/trevent.h; sourceTree = "<group>"; };
 		A24621360C769CF400088E81 /* trevent.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = trevent.c; path = libtransmission/trevent.c; sourceTree = "<group>"; };
 		A24872B50C9B6BB9000F5B92 /* Advanced.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Advanced.png; path = macosx/Images/Advanced.png; sourceTree = "<group>"; };
+		A24B655F0D3F30870079EA4D /* QuitBadge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = QuitBadge.png; path = macosx/Images/QuitBadge.png; sourceTree = "<group>"; };
 		A24D2A610C0A624600A0ED9F /* IPCController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = IPCController.h; path = macosx/IPCController.h; sourceTree = "<group>"; };
 		A24D2A620C0A624600A0ED9F /* IPCController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = IPCController.m; path = macosx/IPCController.m; sourceTree = "<group>"; };
 		A24D2A770C0A65C400A0ED9F /* ipcparse.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ipcparse.c; path = libtransmission/ipcparse.c; sourceTree = "<group>"; };
@@ -960,6 +962,7 @@
 				4DE5CCA80980739100BE280E /* Badge.png */,
 				4DDFDD20099A5D8E00189D81 /* DownloadBadge.png */,
 				4DDFDD21099A5D8E00189D81 /* UploadBadge.png */,
+				A24B655F0D3F30870079EA4D /* QuitBadge.png */,
 				4DE5CCB80981D27700BE280E /* ResumeAll.png */,
 				4DE5CCB90981D27700BE280E /* PauseAll.png */,
 				A25FCDDD0A37695F002BCBBE /* PauseSelected.png */,
@@ -1643,6 +1646,7 @@
 				A2623B410D3DC5930045D19A /* ResumeHover.png in Resources */,
 				A2623B420D3DC5930045D19A /* PauseHover.png in Resources */,
 				A2623B4E0D3DC6DF0045D19A /* ActionHover.png in Resources */,
+				A24B65600D3F30870079EA4D /* QuitBadge.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

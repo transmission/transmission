@@ -157,7 +157,7 @@
             dockIcon = [fDockIcon copy];
             
             NSRect badgeRect;
-            badgeRect.size = [[NSImage imageNamed: @"UploadBadge"] size];
+            badgeRect.size = [[NSImage imageNamed: @"UploadBadge.png"] size];
             badgeRect.origin = NSZeroPoint;
             
             //ignore shadow of badge when placing string
@@ -170,7 +170,7 @@
             if (uploadRateString)
             {
                 //place badge and text
-                [[NSImage imageNamed: @"UploadBadge"] compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
+                [[NSImage imageNamed: @"UploadBadge.png"] compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
                 [self badgeString: uploadRateString forRect: stringRect];
             }
             
@@ -185,7 +185,7 @@
                 }
                 
                 //place badge and text
-                [[NSImage imageNamed: @"DownloadBadge"] compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
+                [[NSImage imageNamed: @"DownloadBadge.png"] compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
                 [self badgeString: downloadRateString forRect: stringRect];
             }
             
@@ -246,13 +246,10 @@
         rect.size = [quitIcon size];
         
         NSRect badgeRect = NSMakeRect(0.0, (rect.size.height - BADGE_HEIGHT) * 0.5, rect.size.width, BADGE_HEIGHT);
-        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: badgeRect radius: 15.0];
         
         [quitIcon lockFocus];
-            
-        [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
-        [bp fill];
         
+        [[NSImage imageNamed: @"QuitBadge.png"] compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
         [self badgeString: NSLocalizedString(@"Quitting", "Dock Badger -> quit message") forRect: badgeRect];
         
         [quitIcon unlockFocus];

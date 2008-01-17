@@ -32,7 +32,6 @@
     NSDictionary * fAttributes;
     
     BOOL fQuitting;
-    NSImage * fQuitBadge;
 }
 
 - (id) initWithFrame: (NSRect) frame lib: (tr_handle *) lib;

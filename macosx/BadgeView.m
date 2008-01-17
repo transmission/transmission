@@ -25,7 +25,6 @@
 #import "BadgeView.h"
 #import "NSStringAdditions.h"
 
-#define BADGE_HEIGHT 30.0
 #define BETWEEN_PADDING 2.0
 
 @interface BadgeView (Private)
@@ -54,7 +53,6 @@
 - (void) dealloc
 {
     [fAttributes release];
-    [fQuitBadge release];
     [super dealloc];
 }
 
@@ -64,22 +62,8 @@
     
     if (fQuitting)
     {
-        if (!fQuitBadge)
-        {
-            NSRect badgeRect = NSMakeRect(0.0, 0.0, rect.size.width, BADGE_HEIGHT);
-            NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: badgeRect xRadius: 15.0 yRadius: 15.0];
-            
-            fQuitBadge = [[NSImage alloc] initWithSize: badgeRect.size];
-            [fQuitBadge lockFocus];
-            
-            [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
-            [bp fill];
-            
-            [fQuitBadge unlockFocus];
-        }
-        
-        [self badge: fQuitBadge string: NSLocalizedString(@"Quitting", "Dock Badger -> quit message")
-                atHeight: (rect.size.height - BADGE_HEIGHT) * 0.5];
+        [self badge: [NSImage imageNamed: @"QuitBadge.png"] string: NSLocalizedString(@"Quitting", "Dock Badger -> quit")
+                atHeight:  (rect.size.height - [[NSImage imageNamed: @"UploadBadge"] size].height) * 0.5];
         return;
     }
     
@@ -91,13 +75,16 @@
         tr_torrentRates(fLib, &downloadRate, &uploadRate);
         
         BOOL upload = checkUpload && uploadRate >= 0.1;
+        upload = YES;
         if (upload)
-            [self badge: [NSImage imageNamed: @"UploadBadge"] string: [NSString stringForSpeedAbbrev: uploadRate] atHeight: 0.0];
-        if (checkDownload && downloadRate >= 0.1)
+            [self badge: [NSImage imageNamed: @"UploadBadge.png"] string: [NSString stringForSpeedAbbrev: uploadRate] atHeight: 0.0];
+        //if (checkDownload && downloadRate >= 0.1)
+        if (YES)
         {
             //download rate above upload rate
-            float bottom = upload ? [[NSImage imageNamed: @"UploadBadge"] size].height + BETWEEN_PADDING : 0.0;
-            [self badge: [NSImage imageNamed: @"DownloadBadge"] string: [NSString stringForSpeedAbbrev: downloadRate] atHeight: bottom];
+            float bottom = upload ? [[NSImage imageNamed: @"UploadBadge.png"] size].height + BETWEEN_PADDING : 0.0;
+            [self badge: [NSImage imageNamed: @"DownloadBadge.png"] string: [NSString stringForSpeedAbbrev: downloadRate]
+                    atHeight: bottom];
         }
     }
 }
