@@ -87,14 +87,14 @@ enum
     MAX_UPLOAD_IDLE_SECS = (60 * 10),
 
     /* how frequently to decide which peers live and die */
-    RECONNECT_PERIOD_MSEC = (3 * 1000),
+    RECONNECT_PERIOD_MSEC = (1000),
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
-    MAX_RECONNECTIONS_PER_PULSE = 4,
+    MAX_RECONNECTIONS_PER_PULSE = 1,
 
     /* max number of peers to ask for per second overall.
      * this throttle is to avoid overloading the router */
-    MAX_CONNECTIONS_PER_SECOND = 16,
+    MAX_CONNECTIONS_PER_SECOND = 12,
 
     /* corresponds to ut_pex's added.f flags */
     ADDED_F_ENCRYPTION_FLAG = 1,
