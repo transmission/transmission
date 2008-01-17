@@ -242,7 +242,7 @@ const char*
 tr_peerIoAddrStr( const struct in_addr * addr, uint16_t port )
 {
     static char buf[512];
-    snprintf( buf, sizeof(buf), "%s:%u", inet_ntoa( *addr ), (unsigned int)port );
+    snprintf( buf, sizeof(buf), "%s:%u", inet_ntoa( *addr ), ntohs( port ) );
     return buf;
 }
 

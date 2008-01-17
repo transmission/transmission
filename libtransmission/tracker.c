@@ -254,7 +254,8 @@ publishNewPeers( tr_tracker * t, int count, uint8_t * peers )
     event.peerCount = count;
     event.peerCompact = peers;
     tr_inf( "Torrent \"%s\" got %d new peers", t->name, count );
-    tr_publisherPublish( t->publisher, t, &event );
+    if( count )
+        tr_publisherPublish( t->publisher, t, &event );
 }
 
 /***
