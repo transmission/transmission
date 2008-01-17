@@ -229,6 +229,17 @@
 {
     NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
     
+    //if pushing a button, don't change the selected rows
+    if ([NSApp isOnLeopardOrBetter] && ([self pointInControlRect: point] || [self pointInRevealRect: point]
+            || [self pointInActionRect: point]))
+        fSelectedIndexes = [[self selectedRowIndexes] retain];
+    
+    [super mouseDown: event];
+    
+    [fSelectedIndexes release];
+    fSelectedIndexes = nil;
+    
+    //avoid weird behavior when showing menu by doing this after mouse down
     if ([self pointInActionRect: point])
     {
         int row = [self rowAtPoint: point];
@@ -241,16 +252,6 @@
         fActionPushedRow = -1;
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
     }
-    
-    //if pushing a button, don't change the selected rows
-    if ([NSApp isOnLeopardOrBetter] && ([self pointInControlRect: point] || [self pointInRevealRect: point]
-            || [self pointInActionRect: point]))
-        fSelectedIndexes = [[self selectedRowIndexes] retain];
-    
-    [super mouseDown: event];
-    
-    [fSelectedIndexes release];
-    fSelectedIndexes = nil;
     
     if ([self pointInMinimalStatusRect: point])
     {

@@ -264,6 +264,7 @@ typedef enum
                 [[fOutline itemAtRow: i] objectForKey: @"Path"]] inFileViewerRootedAtPath: nil];
 }
 
+#warning make real view controller (Leopard-only) so that Command-R will work
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
     if (!fTorrent)
