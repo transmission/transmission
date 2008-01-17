@@ -53,6 +53,7 @@ typedef enum
 - (void) awakeFromNib
 {
     [fOutline setDoubleAction: @selector(revealFile:)];
+    [fOutline setTarget: self];
     
     //set table header tool tips
     if ([NSApp isOnLeopardOrBetter])
