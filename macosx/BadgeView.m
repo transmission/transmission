@@ -75,11 +75,9 @@
         tr_torrentRates(fLib, &downloadRate, &uploadRate);
         
         BOOL upload = checkUpload && uploadRate >= 0.1;
-        upload = YES;
         if (upload)
             [self badge: [NSImage imageNamed: @"UploadBadge.png"] string: [NSString stringForSpeedAbbrev: uploadRate] atHeight: 0.0];
-        //if (checkDownload && downloadRate >= 0.1)
-        if (YES)
+        if (checkDownload && downloadRate >= 0.1)
         {
             //download rate above upload rate
             float bottom = upload ? [[NSImage imageNamed: @"UploadBadge.png"] size].height + BETWEEN_PADDING : 0.0;
