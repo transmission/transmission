@@ -116,8 +116,8 @@ typedef enum
 
 #define TORRENT_TABLE_VIEW_DATA_TYPE    @"TorrentTableViewDataType"
 
-#define ROW_HEIGHT_REGULAR      65.0
-#define ROW_HEIGHT_SMALL        40.0
+#define ROW_HEIGHT_REGULAR      62.0
+#define ROW_HEIGHT_SMALL        38.0
 #define WINDOW_REGULAR_WIDTH    468.0
 
 #define SEARCH_FILTER_MIN_WIDTH 48.0

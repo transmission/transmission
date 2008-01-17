@@ -137,6 +137,9 @@
     fMouseActionRow = -1;
     fMouseActionIconRow = -1;
     
+    if (![NSApp isOnLeopardOrBetter])
+        return;
+    
     NSEnumerator * enumerator = [[self trackingAreas] objectEnumerator];
     NSTrackingArea * area;
     while ((area = [enumerator nextObject]))
