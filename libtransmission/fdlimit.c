@@ -127,19 +127,29 @@ static struct tr_fd_s * gFd = NULL;
 ****
 ***/
 
-static int
-TrOpenFile( int i, const char * filename, int write )
+static tr_errno
+TrOpenFile( int           i,
+            const char  * folder,
+            const char  * torrentFile,
+            int           write )
 {
     struct tr_openfile * file = &gFd->open[i];
     int flags;
+    char filename[MAX_PATH_LENGTH];
+    struct stat sb;
+
+    /* confirm the parent folder exists */
+    if( stat( folder, &sb ) || !S_ISDIR( sb.st_mode ) )
+        return TR_ERROR_IO_PARENT;
 
     /* create subfolders, if any */
+    tr_buildPath ( filename, sizeof(filename), folder, torrentFile, NULL );
     if( write ) {
         char * tmp = tr_strdup( filename );
-        const int val = tr_mkdirp( dirname(tmp), 0777 );
+        const int err = tr_mkdirp( dirname(tmp), 0777 ) ? errno : 0;
         tr_free( tmp );
-        if( val )
-            return tr_ioErrorFromErrno( );
+        if( err )
+            return tr_ioErrorFromErrno( err );
     }
 
     /* open the file */
@@ -150,19 +160,14 @@ TrOpenFile( int i, const char * filename, int write )
 #ifdef WIN32
     flags |= O_BINARY;
 #endif
-    errno = 0;
     file->fd = open( filename, flags, 0666 );
-    if( file->fd < 0 ) {
-        if( errno ) {
-            tr_err( "Couldn't open '%s': %s", filename, strerror(errno) );
-            return tr_ioErrorFromErrno();
-        } else {
-            tr_err( "Couldn't open '%s'", filename );
-            return TR_ERROR_IO_OTHER;
-        }
+    if( file->fd == -1 ) {
+        const int err = errno;
+        tr_err( "Couldn't open '%s': %s", filename, strerror(err) );
+        return tr_ioErrorFromErrno( err );
     }
 
-    return TR_OK;
+    return 0;
 }
 
 static int
@@ -192,14 +197,19 @@ fileIsCheckedOut( const struct tr_openfile * o )
 }
 
 int
-tr_fdFileCheckout( const char * filename, int write )
+tr_fdFileCheckout( const char * folder,
+                   const char * torrentFile, 
+                   int          write )
 {
     int i, winner = -1;
     struct tr_openfile * o;
+    char filename[MAX_PATH_LENGTH];
 
-    assert( filename && *filename );
+    assert( folder && *folder );
+    assert( torrentFile && *torrentFile );
     assert( write==0 || write==1 );
 
+    tr_buildPath ( filename, sizeof(filename), folder, torrentFile, NULL );
     dbgmsg( "looking for file '%s', writable %c", filename, write?'y':'n' );
 
     tr_lockLock( gFd->lock );
@@ -274,10 +284,10 @@ tr_fdFileCheckout( const char * filename, int write )
     o = &gFd->open[winner];
     if( !fileIsOpen( o ) )
     {
-        const int ret = TrOpenFile( winner, filename, write );
-        if( ret ) {
+        const tr_errno err = TrOpenFile( winner, folder, torrentFile, write );
+        if( err ) {
             tr_lockUnlock( gFd->lock );
-            return ret;
+            return err;
         }
 
         dbgmsg( "opened '%s' in slot %d, write %c", filename, winner, write?'y':'n' );

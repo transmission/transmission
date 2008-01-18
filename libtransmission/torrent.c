@@ -880,13 +880,35 @@ freeTorrent( tr_torrent * tor )
     tr_globalUnlock( h );
 }
 
-enum
+/**
+***  Start/Stop Callback
+**/
+
+static void
+fireActiveChange( tr_torrent * tor, int isRunning )
 {
-    AFTER_RECHECK_NONE,
-    AFTER_RECHECK_START,
-    AFTER_RECHECK_STOP,
-    AFTER_RECHECK_CLOSE
-};
+    assert( tor != NULL );
+
+    if( tor->active_func != NULL )
+        (tor->active_func)( tor, isRunning, tor->active_func_user_data );
+}
+
+void
+tr_torrentSetActiveCallback( tr_torrent             * tor,
+                             tr_torrent_active_func   func,
+                             void                   * user_data )
+{
+    assert( tor != NULL );
+    tor->active_func = func;
+    tor->active_func_user_data = user_data;
+}
+
+void
+tr_torrentClearActiveCallback( tr_torrent * torrent )
+{
+    tr_torrentSetActiveCallback( torrent, NULL, NULL );
+}
+
 
 static void
 checkAndStartImpl( void * vtor )
@@ -896,6 +918,7 @@ checkAndStartImpl( void * vtor )
     tr_globalLock( tor->handle );
 
     tor->isRunning  = 1;
+    fireActiveChange( tor, tor->isRunning );
     *tor->errorString = '\0';
     tr_torrentResetTransferStats( tor );
     tor->cpStatus = tr_cpGetStatus( tor->completion );
@@ -959,6 +982,7 @@ stopTorrent( void * vtor )
     tr_ioRecheckRemove( tor );
     tr_peerMgrStopTorrent( tor->handle->peerMgr, tor->info.hash );
     tr_trackerStop( tor->tracker );
+    fireActiveChange( tor, 0 );
 
     for( i=0; i<tor->info.fileCount; ++i )
     {

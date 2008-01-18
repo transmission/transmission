@@ -68,28 +68,6 @@ enum
 };
 
 /***********************************************************************
- * Error codes
- **********************************************************************/
-/* General errors */
-#define TR_OK                       0x00000000
-#define TR_ERROR                    0x81000000
-#define TR_ERROR_ASSERT             0x82000000
-/* I/O errors */
-#define TR_ERROR_IO_MASK            0x000000FF
-#define TR_ERROR_IO_PERMISSIONS     0x80000002
-#define TR_ERROR_IO_SPACE           0x80000004
-#define TR_ERROR_IO_FILE_TOO_BIG    0x80000008
-#define TR_ERROR_IO_OPEN_FILES      0x80000010
-#define TR_ERROR_IO_DUP_DOWNLOAD    0x80000020
-#define TR_ERROR_IO_OTHER           0x80000040
-/* Misc */
-#define TR_ERROR_TC_MASK            0x00000F00
-#define TR_ERROR_TC_ERROR           0x80000100
-#define TR_ERROR_TC_WARNING         0x80000200
-
-#define TR_ERROR_ISSET( num, code ) ( (code) == ( (code) & (num) ) )
-
-/***********************************************************************
  * tr_init
  ***********************************************************************
  * Initializes and returns an opaque libtransmission handle
@@ -496,7 +474,7 @@ void tr_torrentStop( tr_torrent * );
 
 
 /**
-***  Register to be notified whenever a torrent's state changes.
+***
 **/
 
 typedef enum
@@ -511,11 +489,44 @@ typedef void (tr_torrent_status_func)(tr_torrent   * torrent,
                                       cp_status_t    status,
                                       void         * user_data );
 
+/**
+ * Register to be notified whenever a torrent's state changes.
+ *
+ * func is invoked FROM LIBTRANSMISSION'S THREAD!
+ * This means func must be fast (to avoid blocking peers),
+ * shouldn't call libtransmission functions (to avoid deadlock),
+ * and shouldn't modify client-level memory without using a mutex!
+ */
 void tr_torrentSetStatusCallback( tr_torrent             * torrent,
                                   tr_torrent_status_func   func,
                                   void                   * user_data );
 
 void tr_torrentClearStatusCallback( tr_torrent * torrent );
+
+
+
+/**
+***
+**/
+
+typedef void (tr_torrent_active_func)(tr_torrent   * torrent,
+                                      int            isRunning,
+                                      void         * user_data );
+
+/**
+ * Register to be notified whenever a torrent starts or stops.
+ *
+ * func is invoked FROM LIBTRANSMISSION'S THREAD!
+ * This means func must be fast (to avoid blocking peers),
+ * shouldn't call libtransmission functions (to avoid deadlock),
+ * and shouldn't modify client-level memory without using a mutex!
+ */
+void tr_torrentSetActiveCallback( tr_torrent             * torrent,
+                                  tr_torrent_active_func   func,
+                                  void                   * user_data );
+
+void tr_torrentClearActiveCallback( tr_torrent * torrent );
+
 
 /**
  * MANUAL ANNOUNCE
@@ -675,14 +686,41 @@ tr_torrent_status;
 
 #define TR_STATUS_IS_ACTIVE(s) ((s) != TR_STATUS_STOPPED)
 
-/***********************************************************************
- * tr_stat
- **********************************************************************/
+/**
+ * Transmission error codes
+ * errors are always negative, and 0 refers to no error.
+ */
+typedef enum tr_errno
+{
+    TR_OK = 0,
+
+    /* general errors */
+    TR_ERROR = -100,
+    TR_ERROR_ASSERT,
+
+    /* io errors */
+    TR_ERROR_IO_PARENT = -200,
+    TR_ERROR_IO_PERMISSIONS,
+    TR_ERROR_IO_SPACE,
+    TR_ERROR_IO_FILE_TOO_BIG,
+    TR_ERROR_IO_OPEN_FILES,
+    TR_ERROR_IO_DUP_DOWNLOAD,
+    TR_ERROR_IO_OTHER,
+
+    /* tracker errors */
+    TR_ERROR_TC_ERROR = -300,
+    TR_ERROR_TC_WARNING
+}
+tr_errno;
+
+#define TR_ERROR_IS_IO(e) (TR_ERROR_IO_PARENT<=(e) && (e)<=TR_ERROR_IO_OTHER)
+#define TR_ERROR_IS_TC(e) (TR_ERROR_TC_ERROR<=(e) && (e)<=TR_ERROR_TC_WARNING)
+
 struct tr_stat
 {
     tr_torrent_status   status;
 
-    int                 error;
+    tr_errno            error;
     char                errorString[128];
 
     const tr_tracker_info * tracker;

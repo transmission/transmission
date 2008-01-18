@@ -919,12 +919,14 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
             broadcastGotBlock( t, e->pieceIndex, e->offset, e->length );
             break;
 
-        case TR_PEERMSG_GOT_ASSERT_ERROR:
-            addStrike( t, peer );
-            peer->doPurge = 1;
-            break;
-
-        case TR_PEERMSG_GOT_ERROR:
+        case TR_PEERMSG_ERROR:
+            if( TR_ERROR_IS_IO( e->err ) ) {
+                t->tor->error = e->err;
+                strlcpy( t->tor->errorString, tr_errorString( e->err ), sizeof(t->tor->errorString) );
+                tr_torrentStop( t->tor );
+            } else if( e->err == TR_ERROR_ASSERT ) {
+                addStrike( t, peer );
+            }
             peer->doPurge = 1;
             break;
 

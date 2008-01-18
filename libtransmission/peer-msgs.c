@@ -262,7 +262,7 @@ protocolSendChoke( tr_peermsgs * msgs, int choke )
 ***  EVENTS
 **/
 
-static const tr_peermsgs_event blankEvent = { 0, 0, 0, 0, 0.0f };
+static const tr_peermsgs_event blankEvent = { 0, 0, 0, 0, 0.0f, 0 };
 
 static void
 publish( tr_peermsgs * msgs, tr_peermsgs_event * e )
@@ -271,18 +271,11 @@ publish( tr_peermsgs * msgs, tr_peermsgs_event * e )
 }
 
 static void
-fireGotAssertError( tr_peermsgs * msgs )
+fireError( tr_peermsgs * msgs, tr_errno err )
 {
     tr_peermsgs_event e = blankEvent;
-    e.eventType = TR_PEERMSG_GOT_ASSERT_ERROR;
-    publish( msgs, &e );
-}
-
-static void
-fireGotError( tr_peermsgs * msgs )
-{
-    tr_peermsgs_event e = blankEvent;
-    e.eventType = TR_PEERMSG_GOT_ERROR;
+    e.eventType = TR_PEERMSG_ERROR;
+    e.err = err;
     publish( msgs, &e );
 }
 
@@ -592,29 +585,29 @@ expireOldRequests( tr_peermsgs * msgs )
     tr_list * prune = NULL;
     const time_t now = time( NULL );
 
-    // find queued requests that are too old
-    // "time_requested" here is when the request was queued
+    /* find queued requests that are too old
+       "time_requested" here is when the request was queued */
     for( l=msgs->clientWillAskFor; l!=NULL; l=l->next ) {
         struct peer_request * req = l->data;
         if( req->time_requested + REQUEST_TTL_SECS < now )
             tr_list_prepend( &prune, req );
     }
 
-    // find sent requests that are too old
-    // "time_requested" here is when the request was sent
+    /* find sent requests that are too old
+       "time_requested" here is when the request was sent */
     for( l=msgs->clientAskedFor; l!=NULL; l=l->next ) {
         struct peer_request * req = l->data;
         if( req->time_requested + REQUEST_TTL_SECS < now )
             tr_list_prepend( &prune, req );
     }
 
-    // expire the old requests
+    /* expire the old requests */
     for( l=prune; l!=NULL; l=l->next ) {
         struct peer_request * req = l->data;
         tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
     }
 
-    // cleanup
+    /* cleanup */
     tr_list_free( &prune, NULL );
 }
 
@@ -1150,7 +1143,7 @@ readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         if( !err )
             return READ_AGAIN;
         else {
-            fireGotAssertError( msgs );
+            fireError( msgs, err );
             return READ_DONE;
         }
     }
@@ -1164,7 +1157,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     const uint8_t id = msgs->incoming.id;
     const size_t startBufLen = EVBUFFER_LENGTH( inbuf );
 
-    --msglen; // id length
+    --msglen; /* id length */
 
     if( inlen < msglen )
         return READ_MORE;
@@ -1174,7 +1167,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     if( !messageLengthIsCorrect( msgs, id, msglen+1 ) )
     {
         dbgmsg( msgs, "bad packet - BT message #%d with a length of %d", (int)id, (int)msglen );
-        fireGotError( msgs );
+        fireError( msgs, TR_ERROR );
         return READ_DONE;
     }
 
@@ -1386,12 +1379,12 @@ addPeerToBlamefield( tr_peermsgs * msgs, uint32_t index )
     tr_bitfieldAdd( msgs->info->blame, index );
 }
 
-static int
+static tr_errno
 clientGotBlock( tr_peermsgs                * msgs,
                 const uint8_t              * data,
                 const struct peer_request  * req )
 {
-    int i;
+    int err;
     tr_torrent * tor = msgs->torrent;
     const int block = _tr_block( tor, req->index, req->offset );
     struct peer_request *myreq;
@@ -1403,7 +1396,7 @@ clientGotBlock( tr_peermsgs                * msgs,
     {
         dbgmsg( msgs, "wrong block size -- expected %u, got %d",
                 tr_torBlockCountBytes( msgs->torrent, block ), req->length );
-        return TR_ERROR_ASSERT;
+        return TR_ERROR;
     }
 
     /* save the block */
@@ -1444,9 +1437,8 @@ clientGotBlock( tr_peermsgs                * msgs,
     **/
 
     msgs->info->peerSentPieceDataAt = time( NULL );
-    i = tr_ioWrite( tor, req->index, req->offset, req->length, data );
-    if( i )
-        return 0;
+    if(( err = tr_ioWrite( tor, req->index, req->offset, req->length, data )))
+        return err;
 
     tr_cpBlockAdd( tor->completion, block );
 
@@ -1656,7 +1648,7 @@ gotError( struct bufferevent * evbuf UNUSED, short what, void * vmsgs )
     if( what & ( EVBUFFER_EOF | EVBUFFER_ERROR ) ) {
         dbgmsg( vmsgs, "libevent got an error! what=%hd, errno=%d (%s)",
                 what, errno, strerror(errno) );
-        fireGotError( vmsgs );
+        fireError( vmsgs, TR_ERROR );
     }
 }
 

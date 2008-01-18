@@ -489,10 +489,12 @@ tr_buildPath ( char *buf, size_t buflen, const char *first_element, ... )
 }
 
 int
-tr_ioErrorFromErrno( void )
+tr_ioErrorFromErrno( int err )
 {
-    switch( errno )
+    switch( err )
     {
+        case 0:
+            return TR_OK;
         case EACCES:
         case EROFS:
             return TR_ERROR_IO_PERMISSIONS;
@@ -515,24 +517,30 @@ tr_errorString( int code )
     {
         case TR_OK:
             return "No error";
+
         case TR_ERROR:
             return "Generic error";
         case TR_ERROR_ASSERT:
             return "Assert error";
+
+        case TR_ERROR_IO_PARENT:
+            return "Download folder does not exist";
         case TR_ERROR_IO_PERMISSIONS:
             return "Insufficient permissions";
         case TR_ERROR_IO_SPACE:
             return "Insufficient free space";
-        case TR_ERROR_IO_DUP_DOWNLOAD:
-            return "Already active transfer with same name and download folder";
         case TR_ERROR_IO_FILE_TOO_BIG:
             return "File too large";
         case TR_ERROR_IO_OPEN_FILES:
             return "Too many open files";
+        case TR_ERROR_IO_DUP_DOWNLOAD:
+            return "Already active transfer with same name and download folder";
         case TR_ERROR_IO_OTHER:
             return "Generic I/O error";
+    
+        default:
+            return "Unknown error";
     }
-    return "Unknown error";
 }
 
 /****
