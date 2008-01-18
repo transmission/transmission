@@ -31,7 +31,7 @@
 #ifndef STATUS_ICON_SUPPORTED
 
 gpointer
-tr_icon_new( tr_handle * handle )
+tr_icon_new( TrCore * core )
 {
     return NULL;
 }
