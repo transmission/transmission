@@ -1644,12 +1644,10 @@ gotError( struct bufferevent * evbuf UNUSED, short what, void * vmsgs )
 {
     if( what & EVBUFFER_TIMEOUT )
         dbgmsg( vmsgs, "libevent got a timeout, what=%hd", what );
-
-    if( what & ( EVBUFFER_EOF | EVBUFFER_ERROR ) ) {
+    if( what & ( EVBUFFER_EOF | EVBUFFER_ERROR ) )
         dbgmsg( vmsgs, "libevent got an error! what=%hd, errno=%d (%s)",
                 what, errno, strerror(errno) );
-        fireError( vmsgs, TR_ERROR );
-    }
+    fireError( vmsgs, TR_ERROR );
 }
 
 static void
