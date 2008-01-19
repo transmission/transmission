@@ -1048,6 +1048,7 @@ tr_handshakeNew( tr_peerIo           * io,
     handshake->doneCB = doneCB;
     handshake->doneUserData = doneUserData;
     handshake->handle = tr_peerIoGetHandle( io );
+    tr_peerIoSetTimeoutSecs( io, 15 );
     
     tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );
 

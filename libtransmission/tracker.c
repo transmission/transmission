@@ -54,7 +54,7 @@ enum
     DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC = (60 * 2),
 
     /* this is how long we'll leave a request hanging before timeout */
-    TIMEOUT_INTERVAL_SEC = 45,
+    TIMEOUT_INTERVAL_SEC = 30,
 
     /* this is how long we'll leave a 'stop' request hanging before timeout.
        we wait less time for this so it doesn't slow down shutdowns */
@@ -114,6 +114,8 @@ struct tr_tracker
     time_t manualAnnounceAllowedAt;
     time_t reannounceAt;
     time_t scrapeAt;
+
+    int randOffset;
 
     unsigned int isRunning     : 1;
 };
@@ -616,7 +618,7 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
         publishWarning( t, warning );
     }
 
-    t->scrapeAt = time(NULL) + nextScrapeSec;
+    t->scrapeAt = time( NULL ) + t->randOffset + nextScrapeSec;
 }
 
 /***
@@ -901,6 +903,13 @@ enqueueRequest( tr_handle * handle, const tr_tracker * tracker, int reqtype )
     tr_list_append( &handle->tracker->requestQueue, req );
 }
 
+static void
+scrapeSoon( tr_tracker * t )
+{
+    if( trackerSupportsScrape( t ) )
+        t->scrapeAt = time( NULL ) + t->randOffset;
+}
+
 static int
 pulse( void * vhandle )
 {
@@ -1013,6 +1022,7 @@ tr_trackerNew( const tr_torrent * torrent )
     t->leecherCount = -1;
     t->manualAnnounceAllowedAt = ~(time_t)0;
     t->name = tr_strdup( info->name );
+    t->randOffset = tr_rand( 60 );
     memcpy( t->hash, info->hash, SHA_DIGEST_LENGTH );
     escape( t->escaped, info->hash, SHA_DIGEST_LENGTH );
 
@@ -1043,8 +1053,7 @@ tr_trackerNew( const tr_torrent * torrent )
     assert( nwalk - t->addresses == sum );
     assert( iwalk - t->tierFronts == sum );
 
-    if( trackerSupportsScrape( t ) )
-        enqueueScrape( t->handle, t );
+    scrapeSoon( t );
 
     return t;
 }
