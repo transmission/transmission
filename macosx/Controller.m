@@ -684,7 +684,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) openFiles: (NSArray *) filenames addType: (addType) type forcePath: (NSString *) path
 {
-    #warning make submethod
+    #warning checks could probably be removed, since location is checked when starting
     if (!path && [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]
         && access([[[fDefaults stringForKey: @"IncompleteDownloadFolder"] stringByExpandingTildeInPath] UTF8String], 0))
     {

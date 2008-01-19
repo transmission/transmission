@@ -63,7 +63,7 @@
     if (fQuitting)
     {
         [self badge: [NSImage imageNamed: @"QuitBadge.png"] string: NSLocalizedString(@"Quitting", "Dock Badger -> quit")
-                atHeight:  (rect.size.height - [[NSImage imageNamed: @"UploadBadge"] size].height) * 0.5];
+                atHeight:  (rect.size.height - [[NSImage imageNamed: @"QuitBadge.png"] size].height) * 0.5];
         return;
     }
     

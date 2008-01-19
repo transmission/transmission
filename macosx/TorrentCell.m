@@ -333,7 +333,8 @@
     }
     else;
     
-    [controlView updateTrackingAreas];
+    if ([NSApp isOnLeopardOrBetter])
+        [controlView updateTrackingAreas];
     
     return YES;
 }
