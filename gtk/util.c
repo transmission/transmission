@@ -402,7 +402,7 @@ verrmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
 }
 
 static void
-errcb(GtkWidget *widget, int resp SHUTUP, gpointer data) {
+errcb(GtkWidget *widget, int resp UNUSED, gpointer data) {
   GList *funcdata;
   callbackfunc_t func;
 

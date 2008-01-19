@@ -39,8 +39,8 @@
 #include "util.h"
 
 static void
-tr_core_marshal_err( GClosure * closure, GValue * ret SHUTUP, guint count,
-                     const GValue * vals, gpointer hint SHUTUP,
+tr_core_marshal_err( GClosure * closure, GValue * ret UNUSED, guint count,
+                     const GValue * vals, gpointer hint UNUSED,
                      gpointer marshal )
 {
     typedef void (*TRMarshalErr)
@@ -64,8 +64,8 @@ tr_core_marshal_err( GClosure * closure, GValue * ret SHUTUP, guint count,
 }
 
 static void
-tr_core_marshal_prompt( GClosure * closure, GValue * ret SHUTUP, guint count,
-                        const GValue * vals, gpointer hint SHUTUP,
+tr_core_marshal_prompt( GClosure * closure, GValue * ret UNUSED, guint count,
+                        const GValue * vals, gpointer hint UNUSED,
                         gpointer marshal )
 {
     typedef void (*TRMarshalPrompt)
@@ -91,8 +91,8 @@ tr_core_marshal_prompt( GClosure * closure, GValue * ret SHUTUP, guint count,
 }
 
 static void
-tr_core_marshal_data( GClosure * closure, GValue * ret SHUTUP, guint count,
-                      const GValue * vals, gpointer hint SHUTUP,
+tr_core_marshal_data( GClosure * closure, GValue * ret UNUSED, guint count,
+                      const GValue * vals, gpointer hint UNUSED,
                       gpointer marshal )
 {
     typedef void (*TRMarshalPrompt)
@@ -134,7 +134,7 @@ tr_core_dispose( GObject * obj )
 
 
 static void
-tr_core_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
+tr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
 {
     GObjectClass * gobject_class;
     TrCoreClass  * core_class;
@@ -321,7 +321,7 @@ prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
 }
 
 static void
-tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
+tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
 {
     tr_handle * h;
     TrCore * self = (TrCore *) instance;

@@ -363,8 +363,8 @@ client_connect(char *path, struct constate *con) {
 }
 
 static void
-srv_io_accept(GSource *source SHUTUP, int fd, struct sockaddr *sa SHUTUP,
-              socklen_t len SHUTUP, void *vdata) {
+srv_io_accept(GSource *source UNUSED, int fd, struct sockaddr *sa UNUSED,
+              socklen_t len UNUSED, void *vdata) {
   struct constate *con = vdata;
   struct constate *newcon;
   uint8_t        * buf;
@@ -404,7 +404,7 @@ srv_io_accept(GSource *source SHUTUP, int fd, struct sockaddr *sa SHUTUP,
 }
 
 static size_t
-srv_io_received( GSource * source SHUTUP, void * data, size_t len,
+srv_io_received( GSource * source UNUSED, void * data, size_t len,
                  void * vdata )
 {
     struct constate      * con = vdata;
@@ -445,7 +445,7 @@ srv_io_received( GSource * source SHUTUP, void * data, size_t len,
 }
 
 static size_t
-cli_io_received( GSource * source SHUTUP, void * data, size_t len,
+cli_io_received( GSource * source UNUSED, void * data, size_t len,
                  void * vdata )
 {
     struct constate        * con = vdata;
@@ -557,14 +557,14 @@ destroycon(struct constate *con) {
 }
 
 static void
-all_io_closed(GSource *source SHUTUP, void *vdata) {
+all_io_closed(GSource *source UNUSED, void *vdata) {
   struct constate *con = vdata;
 
   destroycon(con);
 }
 
 static void
-cli_io_sent( GSource * source SHUTUP, size_t id, void *vdata )
+cli_io_sent( GSource * source UNUSED, size_t id, void *vdata )
 {
   struct constate_client *cli = &((struct constate*)vdata)->u.client;
 
@@ -575,7 +575,7 @@ cli_io_sent( GSource * source SHUTUP, size_t id, void *vdata )
 }
 
 static void
-smsg_add( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
+smsg_add( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 {
     struct constate      * con = arg;
     struct constate_serv * srv = &con->u.serv;
@@ -607,7 +607,7 @@ smsg_add( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
 }
 
 static void
-smsg_addone( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
+smsg_addone( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag,
              void * arg )
 {
     struct constate      * con = arg;
@@ -670,8 +670,8 @@ smsg_addone( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
 }
 
 static void
-smsg_quit( enum ipc_msg id SHUTUP, benc_val_t * val SHUTUP, int64_t tag SHUTUP,
-           void * arg SHUTUP )
+smsg_quit( enum ipc_msg id UNUSED, benc_val_t * val UNUSED, int64_t tag UNUSED,
+           void * arg UNUSED )
 {
     struct constate      * con = arg;
     struct constate_serv * srv = &con->u.serv;
@@ -680,7 +680,7 @@ smsg_quit( enum ipc_msg id SHUTUP, benc_val_t * val SHUTUP, int64_t tag SHUTUP,
 }
 
 static void
-smsg_noop( enum ipc_msg id SHUTUP, benc_val_t * val SHUTUP, int64_t tag,
+smsg_noop( enum ipc_msg id UNUSED, benc_val_t * val UNUSED, int64_t tag,
            void * arg )
 {
     simpleresp( arg, tag, IPC_MSG_OK );
@@ -827,7 +827,7 @@ addinfo( TrTorrent * tor, enum ipc_msg msgid, int torid, int types,
 }
 
 static void
-smsg_look( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
+smsg_look( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag,
              void * arg )
 {
     struct constate      * con = arg;
@@ -930,7 +930,7 @@ smsg_tor( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 }
 
 static void
-smsg_torall( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag,
+smsg_torall( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag,
              void * arg )
 {
     struct constate      * con = arg;
@@ -975,7 +975,7 @@ smsg_torall( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag,
     ( TR_NAT_TRAVERSAL_UNMAPPED == (st) || TR_NAT_TRAVERSAL_UNMAPPING == (st) )
 
 static void
-smsg_pref( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
+smsg_pref( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag, void * arg )
 {
     struct constate      * con = arg;
     struct constate_serv * srv = &con->u.serv;
@@ -1110,7 +1110,7 @@ smsg_str( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 }
 
 static void
-smsg_sup( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
+smsg_sup( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 {
     struct constate      * con = arg;
     benc_val_t             packet, * pkval, * name;
@@ -1167,7 +1167,7 @@ smsg_sup( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
 }
 
 static void
-all_default( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
+all_default( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag, void * arg )
 {
     switch( id )
     {

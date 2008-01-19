@@ -216,7 +216,7 @@ freeoutbuf(struct iooutbuf *buf) {
 }
 
 static gboolean
-io_prepare(GSource *source SHUTUP, gint *timeout_) {
+io_prepare(GSource *source UNUSED, gint *timeout_) {
   *timeout_ = -1;
   return FALSE;
 }
@@ -234,8 +234,8 @@ io_check(GSource *source) {
 }
 
 static gboolean
-io_dispatch(GSource *source, GSourceFunc callback SHUTUP,
-            gpointer gdata SHUTUP) {
+io_dispatch(GSource *source, GSourceFunc callback UNUSED,
+            gpointer gdata UNUSED) {
   struct iosource *io = (struct iosource*)source;
 
   if(io->infd.revents & (G_IO_ERR | G_IO_HUP) ||
@@ -253,7 +253,7 @@ io_dispatch(GSource *source, GSourceFunc callback SHUTUP,
 
 
 static void
-io_finalize(GSource *source SHUTUP) {
+io_finalize(GSource *source UNUSED) {
   struct iosource *io = (struct iosource*)source;
 
   if(NULL != io->outbufs) {
