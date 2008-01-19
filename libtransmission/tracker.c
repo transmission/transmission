@@ -495,8 +495,8 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
     {
         dbgmsg( t, "request succeeded. reannouncing in %d seconds",
                    t->announceIntervalSec );
-        t->reannounceAt = time(NULL) + t->announceIntervalSec;
-        t->manualAnnounceAllowedAt = time(NULL) + t->announceMinIntervalSec;
+        t->reannounceAt = time( NULL ) + t->randOffset + t->announceIntervalSec;
+        t->manualAnnounceAllowedAt = time( NULL ) + t->announceMinIntervalSec;
     }
     else if( 300<=responseCode && responseCode<=399 )
     {
@@ -504,8 +504,8 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
 
         /* it's a redirect... updateAddresses() has already
          * parsed the redirect, all that's left is to retry */
-        t->reannounceAt = time(NULL);
-        t->manualAnnounceAllowedAt = time(NULL) + t->announceMinIntervalSec;
+        t->reannounceAt = time( NULL );
+        t->manualAnnounceAllowedAt = time( NULL ) + t->announceMinIntervalSec;
     }
     else if( 400<=responseCode && responseCode<=499 )
     {
@@ -523,7 +523,7 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
     }
     else if( 500<=responseCode && responseCode<=599 )
     {
-        dbgmsg( t, "Got a 5xx error... retrying in 15 seconds." );
+        dbgmsg( t, "Got a 5xx error... retrying in one minute." );
 
         /* Response status codes beginning with the digit "5" indicate
          * cases in which the server is aware that it has erred or is
@@ -532,17 +532,17 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
         if( req && req->response_code_line )
             publishWarning( t, req->response_code_line );
         t->manualAnnounceAllowedAt = ~(time_t)0;
-        t->reannounceAt = time(NULL) + 15;
+        t->reannounceAt = time( NULL ) + 60;
     }
     else
     {
-        dbgmsg( t, "Invalid response from tracker... retrying in 60 seconds." );
+        dbgmsg( t, "Invalid response from tracker... retrying in two minutes." );
 
         /* WTF did we get?? */
         if( req && req->response_code_line )
             publishWarning( t, req->response_code_line );
         t->manualAnnounceAllowedAt = ~(time_t)0;
-        t->reannounceAt = time(NULL) + 60;
+        t->reannounceAt = time( NULL ) + t->randOffset + 120;
     }
 }
 
