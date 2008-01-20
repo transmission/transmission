@@ -42,7 +42,6 @@
 - (BOOL) pointInRevealRect: (NSPoint) point;
 - (BOOL) pointInActionRect: (NSPoint) point;
 
-- (BOOL) pointInIconRect: (NSPoint) point;
 - (BOOL) pointInProgressRect: (NSPoint) point;
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point;
 - (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files;
@@ -62,7 +61,6 @@
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
         fMouseActionRow = -1;
-        fMouseActionIconRow = -1;
         fActionPushedRow = -1;
         
         [self setDelegate: self];
@@ -97,7 +95,6 @@
     [cell setControlHover: row == fMouseControlRow];
     [cell setRevealHover: row == fMouseRevealRow];
     [cell setActionHover: row == fMouseActionRow];
-    [cell setActionIconHover: row == fMouseActionIconRow];
     [cell setActionPushed: row == fActionPushedRow];
 }
 
@@ -135,7 +132,6 @@
     fMouseControlRow = -1;
     fMouseRevealRow = -1;
     fMouseActionRow = -1;
-    fMouseActionIconRow = -1;
     
     if (![NSApp isOnLeopardOrBetter])
         return;
@@ -170,13 +166,6 @@
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
 }
 
-- (void) setActionIconButtonHover: (int) row
-{
-    fMouseActionIconRow = row;
-    if (row >= 0)
-        [self setNeedsDisplayInRect: [self rectOfRow: row]];
-}
-
 - (void) mouseEntered: (NSEvent *) event
 {
     NSDictionary * dict = (NSDictionary *)[event userData];
@@ -185,11 +174,10 @@
     if ((row = [dict objectForKey: @"Row"]))
     {
         int rowVal = [row intValue];
-        if ([[dict objectForKey: @"Type"] isEqualToString: @"Action"])
+        NSString * type = [dict objectForKey: @"Type"];
+        if ([type isEqualToString: @"Action"])
             fMouseActionRow = rowVal;
-        else if ([[dict objectForKey: @"Type"] isEqualToString: @"Icon"])
-            fMouseActionIconRow = rowVal;
-        else if ([[dict objectForKey: @"Type"] isEqualToString: @"Control"])
+        else if ([type isEqualToString: @"Control"])
             fMouseControlRow = rowVal;
         else
             fMouseRevealRow = rowVal;
@@ -205,12 +193,10 @@
     NSNumber * row;
     if ((row = [dict objectForKey: @"Row"]))
     {
-        int rowVal = [row intValue];
-        if ([[dict objectForKey: @"Type"] isEqualToString: @"Action"])
+        NSString * type = [dict objectForKey: @"Type"];
+        if ([type isEqualToString: @"Action"])
             fMouseActionRow = -1;
-        else if ([[dict objectForKey: @"Type"] isEqualToString: @"Icon"])
-            fMouseActionIconRow = -1;
-        else if ([[dict objectForKey: @"Type"] isEqualToString: @"Control"])
+        else if ([type isEqualToString: @"Control"])
             fMouseControlRow = -1;
         else
             fMouseRevealRow = -1;
@@ -398,8 +384,7 @@
     [fActionMenu appendItemsFromMenu: fileMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range] atBottom: YES];
     
     //place menu below button
-    NSRect rect = [[[self tableColumnWithIdentifier: @"Torrent"] dataCell] actionButtonRectForBounds:
-                    [self frameOfCellAtColumn: 0 row: row]];
+    NSRect rect = [[[self tableColumnWithIdentifier: @"Torrent"] dataCell] iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]];
     NSPoint location = rect.origin;
     location.y += rect.size.height + 5.0;
     location = [self convertPoint: location toView: nil];
@@ -613,16 +598,6 @@
 }
 
 - (BOOL) pointInActionRect: (NSPoint) point
-{
-    int row = [self rowAtPoint: point];
-    if (row < 0)
-        return NO;
-    
-    TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
-    return NSPointInRect(point, [cell actionButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
-}
-
-- (BOOL) pointInIconRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
     if (row < 0)

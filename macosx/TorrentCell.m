@@ -378,7 +378,7 @@
     [area release];
     
     //action button
-    NSRect actionButtonRect = [self actionButtonRectForBounds: cellFrame];
+    NSRect actionButtonRect = [self iconRectForBounds: cellFrame]; //use the whole icon
     NSTrackingAreaOptions actionOptions = options;
     if (NSMouseInRect(mouseLocation, actionButtonRect, [controlView isFlipped]))
     {
@@ -392,26 +392,6 @@
     [controlView addTrackingArea: area];
     [actionInfo release];
     [area release];
-    
-    //action button (over icon)
-    if (![fDefaults boolForKey: @"SmallView"])
-    {
-        NSRect actionIconButtonRect = [self iconRectForBounds: cellFrame];
-        NSTrackingAreaOptions actionIconOptions = options;
-        if (NSMouseInRect(mouseLocation, actionIconButtonRect, [controlView isFlipped]))
-        {
-            actionIconOptions |= NSTrackingAssumeInside;
-            [(TorrentTableView *)controlView setActionIconButtonHover: [[userInfo objectForKey: @"Row"] intValue]];
-        }
-
-        NSMutableDictionary * actionIconInfo = [userInfo mutableCopy];
-        [actionIconInfo setObject: @"Icon" forKey: @"Type"];
-        area = [[NSTrackingArea alloc] initWithRect: actionIconButtonRect options: actionIconOptions owner: controlView
-                userInfo: actionIconInfo];
-        [controlView addTrackingArea: area];
-        [actionIconInfo release];
-        [area release];
-    }
 }
 
 - (void) setControlHover: (BOOL) hover
@@ -427,11 +407,6 @@
 - (void) setActionHover: (BOOL) hover
 {
     fHoverAction = [NSApp isOnLeopardOrBetter] ? hover : NO;
-}
-
-- (void) setActionIconHover: (BOOL) hover
-{
-    fHoverActionIcon = [NSApp isOnLeopardOrBetter] ? hover : NO;
 }
 
 - (void) setActionPushed: (BOOL) pushed
@@ -572,8 +547,6 @@
         actionImageSuffix = @"On.png";
     else if (!fTracking && fHoverAction)
         actionImageSuffix = @"Hover.png";
-    else if (!fTracking && fHoverActionIcon)
-        actionImageSuffix = @"Off.png";
     else
         actionImageSuffix = nil;
     
