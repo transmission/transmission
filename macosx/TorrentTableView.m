@@ -77,7 +77,7 @@
 {
     [fPiecesBarTimer invalidate];
     
-    [fSelectedIndexes release];
+    [fSelectedTorrents release];
     
     [fKeyStrokes release];
     [fMenuTorrent release];
@@ -221,8 +221,8 @@
 
 - (void) tableViewSelectionIsChanging: (NSNotification *) notification
 {
-    if (fSelectedIndexes)
-        [self selectRowIndexes: fSelectedIndexes byExtendingSelection: NO];
+    if (fSelectedTorrents)
+        [self selectTorrents: fSelectedTorrents];
 }
 
 - (void) mouseDown: (NSEvent *) event
@@ -232,12 +232,12 @@
     //if pushing a button, don't change the selected rows
     if ([NSApp isOnLeopardOrBetter] && ([self pointInControlRect: point] || [self pointInRevealRect: point]
             || [self pointInActionRect: point]))
-        fSelectedIndexes = [[self selectedRowIndexes] retain];
+        fSelectedTorrents = [[fTorrents objectsAtIndexes: [self selectedRowIndexes]] retain];
     
     [super mouseDown: event];
     
-    [fSelectedIndexes release];
-    fSelectedIndexes = nil;
+    [fSelectedTorrents release];
+    fSelectedTorrents = nil;
     
     //avoid weird behavior when showing menu by doing this after mouse down
     if ([self pointInActionRect: point])
@@ -269,6 +269,18 @@
         else
             [fController showInfo: nil];
     }
+}
+
+- (void) selectTorrents: (NSArray *) torrents
+{
+    Torrent * torrent;
+    NSEnumerator * enumerator = [torrents objectEnumerator];
+    NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
+    while ((torrent = [enumerator nextObject]))
+        [indexSet addIndex: [fTorrents indexOfObject: torrent]];
+    
+    [self selectRowIndexes: indexSet byExtendingSelection: NO];
+    [indexSet release];
 }
 
 - (NSMenu *) menuForEvent: (NSEvent *) event

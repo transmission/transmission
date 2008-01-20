@@ -1600,26 +1600,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) sortTorrents
 {
-    //remember selected rows if needed
-    NSArray * selectedTorrents = nil;
-    int numSelected = [fTableView numberOfSelectedRows];
-    if (numSelected > 0 && numSelected < [fDisplayedTorrents count])
-        selectedTorrents = [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]];
+    NSArray * selectedTorrents = [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]];
 
     [self sortTorrentsIgnoreSelected]; //actually sort
     
-    //set selected rows if needed
-    if (selectedTorrents)
-    {
-        Torrent * torrent;
-        NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
-        NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
-        while ((torrent = [enumerator nextObject]))
-            [indexSet addIndex: [fDisplayedTorrents indexOfObject: torrent]];
-        
-        [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
-        [indexSet release];
-    }
+    [fTableView selectTorrents: selectedTorrents];
 }
 
 //doesn't remember selected rows
@@ -1759,9 +1744,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     NSMutableArray * previousTorrents = [fDisplayedTorrents mutableCopy];
     
-    //remember selected rows if needed
-    NSArray * selectedTorrents = [fTableView numberOfSelectedRows] > 0
-                ? [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] : nil;
+    NSArray * selectedTorrents = [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]];
     
     int active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
@@ -1886,19 +1869,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [self sortTorrentsIgnoreSelected];
     
-    //set selected rows if needed
-    if (selectedTorrents)
-    {
-        NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
-        Torrent * torrent;
-        NSMutableIndexSet * selectedIndexes = [NSMutableIndexSet indexSet];
-        unsigned index;
-        while ((torrent = [enumerator nextObject]))
-            if ((index = [fDisplayedTorrents indexOfObject: torrent]) != NSNotFound)
-                [selectedIndexes addIndex: index];
-        
-        [fTableView selectRowIndexes: selectedIndexes byExtendingSelection: NO];
-    }
+    //set selected rows
+    [fTableView selectTorrents: selectedTorrents];
     
     //set status bar torrent count text
     NSString * totalTorrentsString;
@@ -2434,10 +2406,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
         //remember selected rows if needed
-        NSArray * selectedTorrents = nil;
-        int numSelected = [fTableView numberOfSelectedRows];
-        if (numSelected > 0 && numSelected < [fDisplayedTorrents count])
-            selectedTorrents = [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]];
+        NSArray * selectedTorrents = [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]];
     
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData:
                                 [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
@@ -2476,18 +2445,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         [self applyFilter: nil];
         
-        //set selected rows if needed
-        if (selectedTorrents)
-        {
-            Torrent * torrent;
-            NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
-            NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
-            while ((torrent = [enumerator nextObject]))
-                [indexSet addIndex: [fDisplayedTorrents indexOfObject: torrent]];
-            
-            [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
-            [indexSet release];
-        }
+        //set selected rows
+        [fTableView selectTorrents: selectedTorrents];
     }
     
     return YES;
