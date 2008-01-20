@@ -3,7 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.10 (2008/xx/yy)
 - Mac:
    + Window when adding torrents to select files and other settings
-   + Leopard: Hide per-torrent action button over the file icon
+   + Use the file icon as the per-torrent action button
 
 1.01 (2008/01/11)
 - All Platforms:
