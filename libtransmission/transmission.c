@@ -189,7 +189,7 @@ tr_handle * tr_init( const char * tag )
                         -1, /* upload speed limit */
                         FALSE, /* use download speed limit? */
                         -1, /* download speed limit */
-                        512, /* globalPeerLimit */
+                        200, /* globalPeerLimit */
                         TR_MSG_INF, /* message level */
                         FALSE ); /* is message queueing enabled? */
 }
