@@ -263,7 +263,11 @@
     NSEnumerator * enumerator = [torrents objectEnumerator];
     NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
     while ((torrent = [enumerator nextObject]))
-        [indexSet addIndex: [fTorrents indexOfObject: torrent]];
+    {
+        unsigned int index = [fTorrents indexOfObject: torrent];
+        if (index != NSNotFound)
+            [indexSet addIndex: index];
+    }
     
     [self selectRowIndexes: indexSet byExtendingSelection: NO];
     [indexSet release];
