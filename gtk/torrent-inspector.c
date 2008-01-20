@@ -1567,7 +1567,6 @@ seeding_ratio_spun_cb (GtkSpinButton *spin, gpointer gtor)
   tr_torrent_set_seeding_cap_ratio (TR_TORRENT(gtor),
                                     gtk_spin_button_get_value(spin));
 }
-#endif
 
 static void
 max_peers_spun_cb( GtkSpinButton * spin, gpointer gtor )
@@ -1575,11 +1574,12 @@ max_peers_spun_cb( GtkSpinButton * spin, gpointer gtor )
   const uint16_t n = gtk_spin_button_get_value( spin );
   tr_torrentSetMaxConnectedPeers( tr_torrent_handle( gtor ), n );
 }
+#endif
 
 static GtkWidget*
 options_page_new ( TrTorrent * gtor )
 {
-  uint16_t maxConnectedPeers;
+  /* uint16_t maxConnectedPeers; */
   int i, row;
   gboolean b;
   GtkAdjustment *a;
@@ -1617,6 +1617,7 @@ options_page_new ( TrTorrent * gtor )
     sensitize_from_check_cb (GTK_TOGGLE_BUTTON(tb), w);
     hig_workarea_add_row_w (t, &row, tb, w, NULL);
 
+#if 0
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Peer Connections"));
   hig_workarea_add_section_spacer (t, row, 1);
@@ -1627,7 +1628,6 @@ options_page_new ( TrTorrent * gtor )
     hig_workarea_add_row( t, &row, _( "Maximum connected peers:" ), w, NULL );
     g_signal_connect( w, "value-changed", G_CALLBACK( max_peers_spun_cb ), gtor );
 
-#if 0
     tb = gtk_check_button_new_with_mnemonic (_("_Stop Seeding at Ratio:"));
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(tb), gtor->seeding_cap_enabled);
     g_signal_connect (tb, "toggled", G_CALLBACK(seeding_cap_toggled_cb), gtor);
