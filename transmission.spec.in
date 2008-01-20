@@ -8,7 +8,7 @@ Version:   %{version}
 Release:   %{release}
 License:   MIT
 Group:     Applications/Internet
-URL:       http://transmission.m0k.org/
+URL:       http://www.transmissionbt.com/
 Epoch:     1
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
