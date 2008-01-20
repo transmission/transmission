@@ -146,7 +146,7 @@
                         selector: @selector(updatePortStatus) userInfo: nil repeats: YES];
     
     //set peer connections
-    [fPeersGlobalField setIntValue: [fDefaults integerForKey: @"PeersGlobal"]];
+    [fPeersGlobalField setIntValue: [fDefaults integerForKey: @"PeersTotal"]];
     [fPeersTorrentField setIntValue: [fDefaults integerForKey: @"PeersTorrent"]];
     
     //set queue values
@@ -333,7 +333,7 @@
 - (void) setPeersGlobal: (id) sender
 {
     int count = [sender intValue];
-    [fDefaults setInteger: count forKey: @"PeersGlobal"];
+    [fDefaults setInteger: count forKey: @"PeersTotal"];
     tr_setGlobalPeerLimit(fHandle, count);
 }
 

@@ -203,7 +203,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                         -1, /* reset in prefs */
                         FALSE, /* reset in prefs */
                         -1, /* reset in prefs */
-                        [fDefaults integerForKey: @"PeersGlobal"],
+                        [fDefaults integerForKey: @"PeersTotal"],
                         [fDefaults integerForKey: @"MessageLevel"],
                         YES);
         
