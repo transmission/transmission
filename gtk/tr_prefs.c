@@ -29,8 +29,8 @@ tr_prefs_init_global( void )
 {
     cf_check_older_configs( );
 
-    pref_int_set_default    ( PREF_KEY_MAX_PEERS_GLOBAL, 400 );
-    pref_int_set_default    ( PREF_KEY_MAX_PEERS_PER_TORRENT, 60 );
+    pref_int_set_default    ( PREF_KEY_MAX_PEERS_GLOBAL, 200 );
+    pref_int_set_default    ( PREF_KEY_MAX_PEERS_PER_TORRENT, 50 );
 
     pref_flag_set_default   ( PREF_KEY_TOOLBAR, TRUE );
     pref_flag_set_default   ( PREF_KEY_FILTER_BAR, TRUE );
