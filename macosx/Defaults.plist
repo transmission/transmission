@@ -76,10 +76,10 @@
 	<true/>
 	<key>PEXGlobal</key>
 	<true/>
-	<key>PeersGlobal</key>
-	<integer>500</integer>
 	<key>PeersTorrent</key>
-	<integer>75</integer>
+	<integer>60</integer>
+	<key>PeersTotal</key>
+	<integer>200</integer>
 	<key>PiecesBar</key>
 	<false/>
 	<key>PiecesViewShowAvailability</key>
