@@ -76,7 +76,7 @@ freestrlist(GList *list);
 
 /* decodes a string that has been urlencoded */
 char *
-urldecode(const char *str, int len);
+decode_uri( const char * uri );
 
 /* return a list of cleaned-up paths, with invalid directories removed */
 GList *

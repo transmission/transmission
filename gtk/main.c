@@ -545,7 +545,7 @@ gotdrag( GtkWidget         * widget UNUSED,
                 continue;
 
             /* decode the filename */
-            filename = urldecode( files[i], -1 );
+            filename = decode_uri( files[i] );
             freeme = g_list_prepend( freeme, filename );
             if( !g_utf8_validate( filename, -1, NULL ) )
                 continue;

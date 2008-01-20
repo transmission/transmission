@@ -28,10 +28,13 @@
 #include <signal.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+
+#include <libevent/evhttp.h>
 
 #include "tr_prefs.h"
 #include "tr_torrent.h"
@@ -149,33 +152,12 @@ rfc822date (guint64 epoch_msec)
 }
 
 gboolean
-mkdir_p(const char *name, mode_t mode)
+mkdir_p( const char * path, mode_t mode )
 {
-#if GLIB_CHECK_VERSION(2,8,0)
-    return !g_mkdir_with_parents( name, mode );
+#if GLIB_CHECK_VERSION( 2, 8, 0)
+    return !g_mkdir_with_parents( path, mode );
 #else
-    struct stat sb;
-    char *parent;
-    gboolean ret;
-    int oerrno;
-
-    if(0 != stat(name, &sb)) {
-      if(ENOENT != errno)
-        return FALSE;
-      parent = g_path_get_dirname(name);
-      ret = mkdir_p(parent, mode);
-      oerrno = errno;
-      g_free(parent);
-      errno = oerrno;
-      return (ret ? (0 == mkdir(name, mode)) : FALSE);
-    }
-
-    if(!S_ISDIR(sb.st_mode)) {
-      errno = ENOTDIR;
-      return FALSE;
-    }
-
-    return TRUE;
+    return !tr_mkdirp( path, mode );
 #endif
 }
 
@@ -209,37 +191,12 @@ freestrlist(GList *list)
 }
 
 char *
-urldecode(const char *str, int len) {
-  int ii, jj;
-  char *ret;
-
-  if( len <= 0 )
-      len = strlen( str );
-
-  for(ii = jj = 0; ii < len; ii++, jj++)
-    if('%' == str[ii])
-      ii += 2;
-
-  ret = g_new(char, jj + 1);
-
-  for(ii = jj = 0; ii < len; ii++, jj++) {
-    switch(str[ii]) {
-      case '%':
-        if(ii + 2 < len) {
-          char buf[3] = { str[ii+1], str[ii+2], '\0' };
-          ret[jj] = g_ascii_strtoull(buf, NULL, 16);
-        }
-        ii += 2;
-        break;
-      case '+':
-        ret[jj] = ' ';
-      default:
-        ret[jj] = str[ii];
-    }
-  }
-  ret[jj] = '\0';
-
-  return ret;
+decode_uri( const char * uri )
+{
+    char * filename = evhttp_decode_uri( uri );
+    char * ret = g_strdup( filename );
+    free( filename );
+    return ret;
 }
 
 GList *
