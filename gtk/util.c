@@ -81,7 +81,7 @@ tr_strlspeed( char * buf, double KiBps, size_t buflen )
     else {
         char bbuf[64];
         tr_strlsize( bbuf, (guint64)(KiBps*1024), sizeof(bbuf) );
-        g_snprintf( buf, buflen, "%s/s", bbuf );
+        g_snprintf( buf, buflen, _("%s/s"), bbuf );
     }
     return buf;
 }
