@@ -366,8 +366,14 @@ askquit( TrCore          * core,
     GtkWidget * wind;
     GtkWidget * dontask;
 
-    if( !pref_flag_get( PREF_KEY_ASKQUIT ) )
-    {
+    /* if the user doesn't want to be asked, don't ask */
+    if( !pref_flag_get( PREF_KEY_ASKQUIT ) ) {
+        func( cbdata );
+        return;
+    }
+
+    /* if there aren't any torrents, don't ask */
+    if( !tr_torrentCount( tr_core_handle( core ) ) ) {
         func( cbdata );
         return;
     }
