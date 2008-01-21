@@ -87,14 +87,14 @@ enum
     MAX_UPLOAD_IDLE_SECS = (60 * 10),
 
     /* how frequently to decide which peers live and die */
-    RECONNECT_PERIOD_MSEC = (3 * 1000),
+    RECONNECT_PERIOD_MSEC = (2 * 1000),
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
-    MAX_RECONNECTIONS_PER_PULSE = 8,
+    MAX_RECONNECTIONS_PER_PULSE = 1,
 
     /* max number of peers to ask for per second overall.
      * this throttle is to avoid overloading the router */
-    MAX_CONNECTIONS_PER_SECOND = 32,
+    MAX_CONNECTIONS_PER_SECOND = 8,
 
     /* corresponds to ut_pex's added.f flags */
     ADDED_F_ENCRYPTION_FLAG = 1,
@@ -924,7 +924,7 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
             peer->doPurge = 1;
             break;
 
-        case TR_PEERMSG_GOT_ERROR:
+        case TR_PEERMSG_ERROR:
             peer->doPurge = 1;
             break;
 
@@ -1406,6 +1406,18 @@ tr_peerMgrHasConnections( const tr_peerMgr * manager,
     return ret;
 }
 
+static int
+clientIsDownloadingFrom( const tr_peer * peer )
+{
+    return peer->clientIsInterested && !peer->clientIsChoked;
+}
+
+static int
+clientIsUploadingTo( const tr_peer * peer )
+{
+    return peer->peerIsInterested && !peer->peerIsChoked;
+}
+
 void
 tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                         const uint8_t    * torrentHash,
@@ -1444,10 +1456,10 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
 
         ++setmePeersFrom[atom->from];
 
-        if( peer->rateToPeer > 0.01 )
+        if( clientIsUploadingTo( peer ) )
             ++*setmePeersGettingFromUs;
 
-        if( peer->rateToClient > 0.01 )
+        if( clientIsDownloadingFrom( peer ) )
             ++*setmePeersSendingToUs;
     }
 
@@ -1485,8 +1497,8 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
         stat->isEncrypted      = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
         stat->uploadToRate     = peer->rateToPeer;
         stat->downloadFromRate = peer->rateToClient;
-        stat->isDownloading    = stat->uploadToRate > 0.01;
-        stat->isUploading      = stat->downloadFromRate > 0.01;
+        stat->isDownloading    = clientIsDownloadingFrom( peer );
+        stat->isUploading      = clientIsUploadingTo( peer );
         stat->status           = peer->status;
     }
 
@@ -1812,7 +1824,7 @@ getPeerCandidates( Torrent * t, int * setmeSize )
          * hold off on this peer to give another one a try instead */
         if( ( now - atom->piece_data_time ) > 30 )
         {
-            int minWait = (60 * 5); /* five minutes */
+            int minWait = (60 * 10); /* ten minutes */
             int maxWait = (60 * 30); /* thirty minutes */
             int wait = atom->numFails * minWait;
             if( wait < minWait ) wait = minWait;

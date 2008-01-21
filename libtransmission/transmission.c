@@ -353,7 +353,7 @@ tr_torrentRates( tr_handle * h, float * toClient, float * toPeer )
 }
 
 int
-tr_torrentCount( tr_handle * h )
+tr_torrentCount( const tr_handle * h )
 {
     return h->torrentCount;
 }

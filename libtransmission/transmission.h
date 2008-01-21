@@ -232,7 +232,7 @@ tr_handle_status * tr_handleStatus( tr_handle * );
  ***********************************************************************
  * Returns the count of open torrents
  **********************************************************************/
-int tr_torrentCount( tr_handle * h );
+int tr_torrentCount( const tr_handle * h );
 
 
 typedef struct tr_torrent tr_torrent;

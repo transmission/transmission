@@ -56,7 +56,7 @@ readOrWriteBytes( const tr_torrent  * tor,
     char path[MAX_PATH_LENGTH];
     struct stat sb;
     int fd = -1;
-    int ret;
+    int err;
     int fileExists;
 
     assert( 0<=fileIndex && fileIndex<info->fileCount );
@@ -67,25 +67,26 @@ readOrWriteBytes( const tr_torrent  * tor,
     fileExists = !stat( path, &sb );
 
     if( !file->length )
-        return 0;
-    else if ((ioMode==TR_IO_READ) && !fileExists ) /* does file exist? */
-        ret = tr_ioErrorFromErrno ();
-    else if ((fd = tr_fdFileCheckout ( path, ioMode==TR_IO_WRITE )) < 0)
-        ret = fd;
-    else if( lseek( fd, (off_t)fileOffset, SEEK_SET ) == ((off_t)-1) )
-        ret = TR_ERROR_IO_OTHER;
-    else if( func( fd, buf, buflen ) != buflen )
-        ret = tr_ioErrorFromErrno( );
-    else
-        ret = TR_OK;
+        return TR_OK;
 
-    if((ret==TR_OK) && (ioMode==TR_IO_WRITE) && !fileExists )
+    if ((ioMode==TR_IO_READ) && !fileExists ) /* does file exist? */
+        err = tr_ioErrorFromErrno ();
+    else if ((fd = tr_fdFileCheckout ( path, ioMode==TR_IO_WRITE )) < 0)
+        err = fd;
+    else if( lseek( fd, (off_t)fileOffset, SEEK_SET ) == ((off_t)-1) )
+        err = tr_ioErrorFromErrno( );
+    else if( func( fd, buf, buflen ) != buflen )
+        err = tr_ioErrorFromErrno( );
+    else
+        err = TR_OK;
+
+    if( ( err==TR_OK ) && ( !fileExists ) && ( ioMode == TR_IO_WRITE) )
         tr_statsFileCreated( tor->handle );
  
     if( fd >= 0 )
         tr_fdFileReturn( fd );
 
-    return ret;
+    return err;
 }
 
 static void
@@ -122,7 +123,7 @@ ensureMinimumFileSize( const tr_torrent  * tor,
                        uint64_t            minBytes )
 {
     int fd;
-    int ret;
+    int err;
     struct stat sb;
     const tr_file * file = &tor->info.files[fileIndex];
     char path[MAX_PATH_LENGTH];
@@ -134,20 +135,20 @@ ensureMinimumFileSize( const tr_torrent  * tor,
 
     fd = tr_fdFileCheckout( path, TRUE );
     if( fd < 0 ) /* bad fd */
-        ret = fd;
+        err = fd;
     else if (fstat (fd, &sb) ) /* how big is the file? */
-        ret = tr_ioErrorFromErrno ();
+        err = tr_ioErrorFromErrno ();
     else if (sb.st_size >= (off_t)minBytes) /* already big enough */
-        ret = TR_OK;
+        err = TR_OK;
     else if (!ftruncate( fd, minBytes )) /* grow it */
-        ret = TR_OK;
+        err = TR_OK;
     else /* couldn't grow it */
-        ret = tr_ioErrorFromErrno ();
+        err = tr_ioErrorFromErrno ();
 
     if( fd >= 0 )
         tr_fdFileReturn( fd );
 
-    return ret;
+    return err;
 }
 #endif
 
@@ -159,7 +160,7 @@ readOrWritePiece( tr_torrent  * tor,
                   uint8_t     * buf,
                   size_t        buflen )
 {
-    int ret = 0;
+    int err = 0;
     int fileIndex;
     uint64_t fileOffset;
     const tr_info * info = &tor->info;
@@ -169,18 +170,18 @@ readOrWritePiece( tr_torrent  * tor,
 
     findFileLocation ( tor, pieceIndex, pieceOffset, &fileIndex, &fileOffset );
 
-    while( buflen && !ret )
+    while( buflen && !err )
     {
         const tr_file * file = &info->files[fileIndex];
         const uint64_t bytesThisPass = MIN( buflen, file->length - fileOffset );
 
 #ifdef WIN32
         if( ioMode == TR_IO_WRITE )
-            ret = ensureMinimumFileSize( tor, fileIndex,
+            err = ensureMinimumFileSize( tor, fileIndex,
                                          fileOffset + bytesThisPass );
-        if( !ret )
+        if( !err )
 #endif
-            ret = readOrWriteBytes( tor, ioMode,
+            err = readOrWriteBytes( tor, ioMode,
                                     fileIndex, fileOffset, buf, bytesThisPass );
         buf += bytesThisPass;
         buflen -= bytesThisPass;
@@ -188,7 +189,7 @@ readOrWritePiece( tr_torrent  * tor,
         fileOffset = 0;
     }
 
-    return ret;
+    return err;
 }
 
 int

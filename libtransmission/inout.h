@@ -27,17 +27,18 @@
 
 struct tr_torrent;
 
-typedef struct tr_io tr_io;
-
-/***********************************************************************
- * tr_ioRead, tr_ioWrite
- ***********************************************************************
- * Reads or writes the block specified by the piece index, the offset in
- * that piece and the size of the block. Returns 0 if successful, 
- * TR_ERROR_ASSERT if the parameters are incorrect, one of the
- * TR_ERROR_IO_* otherwise.
- **********************************************************************/
+/**
+ * Reads the block specified by the piece index, offset, and length.
+ * @return 0 on success, TR_ERROR_ASSERT if the arguments are incorrect,
+ * or TR_ERROR_IO_* otherwise.
+ */
 int tr_ioRead  ( struct tr_torrent*, int index, int begin, int len, uint8_t * );
+
+/**
+ * Writes the block specified by the piece index, offset, and length.
+ * @return 0 on success, TR_ERROR_ASSERT if the arguments are incorrect,
+ * or TR_ERROR_IO_* otherwise.
+ */
 int tr_ioWrite ( struct tr_torrent *, int index, int begin, int len, const uint8_t * );
 
 /* hashes the specified piece and updates the completion accordingly. */
