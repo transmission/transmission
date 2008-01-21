@@ -1,5 +1,17 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.02 (2008/01/xx)
+- All Platforms:
+   + Fix 1.00 bug that caused some routers to lag
+   + Fix 1.00 crash in peer handshake
+   + Fix 1.01 bug that sometimes froze the app for a long time
+- GTK+
+   + Fix crash when removing a torrent while its details window is open
+   + Better compliance with the Gnome interface guidelines
+   + I18N fixes
+   + Updated Dutch translation
+   + Various other interface additions and improvements
+
 1.01 (2008/01/11)
 - All Platforms:
    + Fix 1.00 freezing issue
