@@ -3860,6 +3860,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         [torrent update];
         [fTorrents addObject: torrent];
+        
+        if (autostart)
+            [torrent startTransfer];
+        
         [torrent release];
         
         [self updateTorrentsInQueue];
