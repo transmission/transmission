@@ -198,7 +198,7 @@ typedef struct tr_handle_status
 }
 tr_handle_status;
 
-tr_handle_status * tr_handleStatus( tr_handle * );
+const tr_handle_status * tr_handleStatus( tr_handle * );
 
 
 /***********************************************************************

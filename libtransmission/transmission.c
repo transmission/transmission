@@ -264,7 +264,8 @@ void tr_natTraversalEnable( tr_handle * h, int enable )
     tr_globalUnlock( h );
 }
 
-tr_handle_status * tr_handleStatus( tr_handle * h )
+const tr_handle_status *
+tr_handleStatus( tr_handle * h )
 {
     tr_handle_status * s;
 
