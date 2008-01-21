@@ -14,8 +14,13 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+
+#ifdef WIN32
+#include <winsock2.h>
+#else
 #include <netinet/in.h> /* struct in_addr */
 #include <arpa/inet.h> /* inet_ntoa */
+#endif
 
 #include <event.h>
 
@@ -237,7 +242,7 @@ const char*
 tr_peerIoAddrStr( const struct in_addr * addr, uint16_t port )
 {
     static char buf[512];
-    snprintf( buf, sizeof(buf), "%s:%u", inet_ntoa( *addr ), (unsigned int)port );
+    snprintf( buf, sizeof(buf), "%s:%u", inet_ntoa( *addr ), ntohs( port ) );
     return buf;
 }
 

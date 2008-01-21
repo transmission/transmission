@@ -29,9 +29,10 @@
 
 #include <sys/types.h>
 
+#ifdef WIN32
+#include <winsock2.h> /* inet_addr */
+#else
 #include <arpa/inet.h> /* inet_addr */
-
-#ifndef WIN32
 #include <netdb.h>
 #include <fcntl.h>
 #endif
