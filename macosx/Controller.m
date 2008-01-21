@@ -2316,10 +2316,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             [newNames replaceObjectAtIndex: i withObject: [path stringByAppendingPathComponent: file]];
     }
     
-    BOOL ask = [fDefaults boolForKey: @"DownloadAsk"];
-    
     NSEnumerator * enumerator = [newNames objectEnumerator];
-    int count;
     tr_ctor * ctor;
     while ((file = [enumerator nextObject]))
     {
@@ -2329,15 +2326,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         switch (tr_torrentParse(fLib, ctor, NULL))
         {
             case TR_OK:
-                if (!ask)
-                    count = [fTorrents count];
                 [self openFiles: [NSArray arrayWithObject: file] addType: ADD_NORMAL forcePath: nil];
                 
-                //check if torrent was opened
-                if (!ask && [fTorrents count] > count)
-                    [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added",
-                        "Growl notification title") description: [file lastPathComponent]
-                        notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
+                [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added", "Growl notification title")
+                    description: [file lastPathComponent] notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO
+                    clickContext: nil];
                 break;
             
             case TR_EINVALID:
