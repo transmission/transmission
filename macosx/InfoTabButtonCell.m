@@ -26,7 +26,6 @@
 
 @implementation InfoTabButtonCell
 
-#warning store images in image/alternateImage?
 - (void) awakeFromNib
 {
     [(NSMatrix *)[self controlView] setToolTip: [self title] forCell: self];

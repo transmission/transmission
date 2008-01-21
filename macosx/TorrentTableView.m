@@ -238,14 +238,12 @@
         fActionPushedRow = -1;
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
     }
-    
-    if ([self pointInMinimalStatusRect: point])
+    else if ([self pointInMinimalStatusRect: point])
     {
         [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
         [self reloadData];
     }
-    
-    if ([event clickCount] == 2) //double click
+    else if ([event clickCount] == 2) //double click
     {
         if ([self pointInProgressRect: point])
         {
@@ -255,6 +253,7 @@
         else
             [fController showInfo: nil];
     }
+    else;
 }
 
 - (void) selectTorrents: (NSArray *) torrents
