@@ -75,6 +75,7 @@ typedef enum
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (torrentFileState) torrentDelete
         lib: (tr_handle *) lib;
+- (id) initWithData: (NSData *) data location: (NSString *) location lib: (tr_handle *) lib;
 - (id) initWithHistory: (NSDictionary *) history lib: (tr_handle *) lib;
 
 - (NSDictionary *) history;
