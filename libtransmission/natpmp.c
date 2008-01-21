@@ -16,10 +16,11 @@
 #include <inttypes.h>
 #include <string.h> /* strerror */
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#ifdef WIN32
+#include <winsock2.h> /* inet_ntoa */
+#else
+#include <arpa/inet.h> /* inet_ntoa */
+#endif
 
 #include <libnatpmp/natpmp.h>
 
