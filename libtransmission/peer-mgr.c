@@ -951,6 +951,16 @@ ensureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8
     }
 }
 
+static int
+getMaxPeerCount( const tr_torrent * tor UNUSED )
+{
+#if 0
+    return t->tor->maxConnectedPeers;
+#else
+    return 50;
+#endif
+}
+
 /* FIXME: this is kind of a mess. */
 static void
 myHandshakeDoneCB( tr_handshake    * handshake,
@@ -1011,7 +1021,7 @@ myHandshakeDoneCB( tr_handshake    * handshake,
             tordbg( t, "banned peer %s tried to reconnect", tr_peerIoAddrStr(&atom->addr,atom->port) );
             tr_peerIoFree( io );
         }
-        else if( tr_ptrArraySize( t->peers ) >= t->tor->maxConnectedPeers )
+        else if( tr_ptrArraySize( t->peers ) >= getMaxPeerCount( t->tor ) )
         {
             tr_peerIoFree( io );
         }
@@ -1699,7 +1709,7 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
     /* disconnect if it's been too long since piece data has been transferred.
      * this is on a sliding scale based on number of available peers... */
     if( 1 ) {
-        const int relaxStrictnessIfFewerThanN = (int)((tor->maxConnectedPeers * 0.9) + 0.5);
+        const int relaxStrictnessIfFewerThanN = (int)((getMaxPeerCount(tor) * 0.9) + 0.5);
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
         const double strictness = peerCount >= relaxStrictnessIfFewerThanN

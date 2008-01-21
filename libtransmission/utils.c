@@ -434,12 +434,12 @@ tr_mkdirp( const char * path_in, int permissions )
         if( stat( path, &sb ) )
         {
             /* Folder doesn't exist yet */
-            if( tr_mkdir( path, permissions ) )
-            {
-                tr_err( "Could not create directory %s (%s)", path,
-                        strerror( errno ) );
+            if( tr_mkdir( path, permissions ) ) {
+                const int err = errno;
+                tr_err( "Couldn't create directory %s (%s)", path, strerror( err ) );
                 tr_free( path );
-                return 1;
+                errno = err;
+                return -1;
             }
         }
         else if( ( sb.st_mode & S_IFMT ) != S_IFDIR )
@@ -447,7 +447,8 @@ tr_mkdirp( const char * path_in, int permissions )
             /* Node exists but isn't a folder */
             tr_err( "Remove %s, it's in the way.", path );
             tr_free( path );
-            return 1;
+            errno = ENOTDIR;
+            return -1;
         }
 
         if( done )
