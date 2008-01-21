@@ -87,7 +87,7 @@ enum
     MAX_UPLOAD_IDLE_SECS = (60 * 10),
 
     /* how frequently to decide which peers live and die */
-    RECONNECT_PERIOD_MSEC = (1000),
+    RECONNECT_PERIOD_MSEC = (2 * 1000),
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
     MAX_RECONNECTIONS_PER_PULSE = 1,
@@ -956,7 +956,6 @@ ensureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8
 static int
 getMaxPeerCount( const tr_torrent * tor UNUSED )
 {
-#warning this is test code and shouldn't ship in a branded release
 #if 0
     return t->tor->maxConnectedPeers;
 #else
@@ -1845,10 +1844,14 @@ getPeerCandidates( Torrent * t, int * setmeSize )
          * hold off on this peer to give another one a try instead */
         if( ( now - atom->piece_data_time ) > 30 )
         {
-            const int interval = 960;
-            if( ( now - atom->time ) < interval ) {
+            int minWait = (60 * 10); /* ten minutes */
+            int maxWait = (60 * 30); /* thirty minutes */
+            int wait = atom->numFails * minWait;
+            if( wait < minWait ) wait = minWait;
+            if( wait > maxWait ) wait = maxWait;
+            if( ( now - atom->time ) < wait ) {
                 tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
-                        i, tr_peerIoAddrStr(&atom->addr,atom->port), interval );
+                        i, tr_peerIoAddrStr(&atom->addr,atom->port), wait );
                 continue;
             }
         }

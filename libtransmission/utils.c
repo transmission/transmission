@@ -99,7 +99,6 @@ tr_getLogTimeStr( char * buf, int buflen )
 #else
     localtime_r( &now, &now_tm );
 #endif
-
     strftime( tmp, sizeof(tmp), "%H:%M:%S", &now_tm );
     milliseconds = (int)(tv.tv_usec / 1000);
     snprintf( buf, buflen, "%s.%03d", tmp, milliseconds );
@@ -537,7 +536,7 @@ tr_errorString( int code )
             return "Already active transfer with same name and download folder";
         case TR_ERROR_IO_OTHER:
             return "Generic I/O error";
-    
+
         default:
             return "Unknown error";
     }

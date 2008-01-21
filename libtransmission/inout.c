@@ -67,7 +67,7 @@ readOrWriteBytes( const tr_torrent  * tor,
     fileExists = !stat( path, &sb );
 
     if( !file->length )
-        return 0;
+        return TR_OK;
 
     if ((ioMode==TR_IO_READ) && !fileExists ) /* does file exist? */
         err = tr_ioErrorFromErrno( errno );
@@ -78,9 +78,9 @@ readOrWriteBytes( const tr_torrent  * tor,
     else if( func( fd, buf, buflen ) != buflen )
         err = tr_ioErrorFromErrno( errno );
     else
-        err = 0;
+        err = TR_OK;
 
-    if( !err && !fileExists && (ioMode==TR_IO_WRITE) )
+    if( ( err==TR_OK ) && ( !fileExists ) && ( ioMode == TR_IO_WRITE) )
         tr_statsFileCreated( tor->handle );
  
     if( fd >= 0 )
@@ -133,14 +133,15 @@ ensureMinimumFileSize( const tr_torrent  * tor,
     assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
     assert( minBytes <= file->length );
 
-    if(( fd = tr_fdFileCheckout( tor->destination, file->name, TRUE )) < 0 )
+    fd = tr_fdFileCheckout( tor->destination, file->name, TRUE );
+    if( fd < 0 ) /* bad fd */
         err = fd;
     else if (fstat (fd, &sb) ) /* how big is the file? */
         err = tr_ioErrorFromErrno( errno );
     else if (sb.st_size >= (off_t)minBytes) /* already big enough */
-        err = 0;
+        err = TR_OK;
     else if ( !ftruncate( fd, minBytes ) ) /* grow it */
-        err = 0;
+        err = TR_OK;
     else /* couldn't grow it */
         err = tr_ioErrorFromErrno( errno );
 

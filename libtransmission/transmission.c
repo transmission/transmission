@@ -323,12 +323,9 @@ tr_getGlobalSpeedLimit( tr_handle  * h,
 
 void
 tr_setGlobalPeerLimit( tr_handle * handle UNUSED,
-                       uint16_t    maxGlobalPeers UNUSED )
+                       uint16_t    maxGlobalPeers )
 {
-#warning this is test code and shouldn't ship in a branded release
-#if 0
     tr_fdSetPeerLimit( maxGlobalPeers );
-#endif
 }
 
 uint16_t

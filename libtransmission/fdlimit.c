@@ -167,7 +167,7 @@ TrOpenFile( int           i,
         return tr_ioErrorFromErrno( err );
     }
 
-    return 0;
+    return TR_OK;
 }
 
 static int
@@ -373,13 +373,23 @@ socketWasReserved( int fd )
     return tr_list_remove_data( &reservedSockets, TR_UINT_TO_PTR(fd) ) != NULL;
 }
 
+static int
+getSocketMax( struct tr_fd_s * gFd )
+{
+#if 0
+    return gFd->normalMax;
+#else
+    return MIN( gFd->normalMax, 200 );
+#endif
+}
+
 int
 tr_fdSocketCreate( int type, int isReserved )
 {
     int s = -1;
     tr_lockLock( gFd->lock );
 
-    if( isReserved || ( gFd->normal < gFd->normalMax ) )
+    if( isReserved || ( gFd->normal < getSocketMax( gFd ) ) )
         if( ( s = socket( AF_INET, type, 0 ) ) < 0 )
             tr_err( "Couldn't create socket (%s)", strerror( sockerrno ) );
 
@@ -411,7 +421,7 @@ tr_fdSocketAccept( int b, struct in_addr * addr, tr_port_t * port )
     assert( port != NULL );
 
     tr_lockLock( gFd->lock );
-    if( gFd->normal < gFd->normalMax )
+    if( gFd->normal < getSocketMax( gFd ) )
     {
         len = sizeof( sock );
         s = accept( b, (struct sockaddr *) &sock, &len );
