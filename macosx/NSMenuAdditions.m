@@ -34,7 +34,7 @@
     unsigned int i;
     for (i = [indexes lastIndex]; i != NSNotFound; i = [indexes indexLessThanIndex: i])
     {
-        item = [[menu itemAtIndex:i] retain];
+        item = [[menu itemAtIndex: i] retain];
         [menu removeItemAtIndex: i];
         [self insertItem: item atIndex: bottomIndex];
         [item release];
