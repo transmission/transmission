@@ -19,7 +19,6 @@
 #include <signal.h>
 
 #include <event.h>
-#include <evdns.h>
 #include <evhttp.h>
 
 #include "transmission.h"
@@ -143,7 +142,6 @@ pumpList( int i UNUSED, short s UNUSED, void * veh )
         timeout_add( &eh->pulse, &eh->pulseInterval );
     else {
         assert( eh->timerCount ==  0 );
-        evdns_shutdown( FALSE );
         event_del( &eh->pulse );
     }
 }
@@ -177,7 +175,6 @@ libeventThreadFunc( void * veh )
 #endif
 
     eh->base = event_init( );
-    evdns_init( );
     timeout_set( &eh->pulse, pumpList, veh );
     timeout_add( &eh->pulse, &eh->pulseInterval );
     eh->h->events = eh;
