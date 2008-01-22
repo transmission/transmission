@@ -107,6 +107,8 @@
         fOrangeColor = [[NSColor orangeColor] retain];
         
         fBarOverlayColor = [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] retain];
+        
+        fFieldBackColor = [[NSColor colorWithDeviceWhite: 0.5 alpha: 0.5] retain];
     }
 	return self;
 }
@@ -255,7 +257,9 @@
     NSPoint point = [controlView convertPoint: [event locationInWindow] fromView: nil];
     
     if (NSMouseInRect(point, [self controlButtonRectForBounds: cellFrame], [controlView isFlipped])
-        || NSMouseInRect(point, [self revealButtonRectForBounds: cellFrame], [controlView isFlipped]))
+        || NSMouseInRect(point, [self revealButtonRectForBounds: cellFrame], [controlView isFlipped])
+        ||  NSMouseInRect(point, [self progressRectForBounds: cellFrame], [controlView isFlipped])
+        ||  NSMouseInRect(point, [self minimalStatusRectForBounds: cellFrame], [controlView isFlipped]))
         return NSCellHitContentArea | NSCellHitTrackableArea;
     
     return NSCellHitContentArea;
@@ -274,13 +278,17 @@
     
     NSPoint point = [controlView convertPoint: [event locationInWindow] fromView: nil];
     
-    fMouseDownControlButton = NO;
     NSRect controlRect= [self controlButtonRectForBounds: cellFrame];
     BOOL checkControl = NSMouseInRect(point, controlRect, [controlView isFlipped]);
     
-    fMouseDownRevealButton = NO;
     NSRect revealRect = [self revealButtonRectForBounds: cellFrame];
     BOOL checkReveal = NSMouseInRect(point, revealRect, [controlView isFlipped]);
+    
+    NSRect progressRect = [self progressRectForBounds: cellFrame];
+    BOOL checkProgress = NSMouseInRect(point, progressRect, [controlView isFlipped]);
+    
+    NSRect minimalStatusRect = [self minimalStatusRectForBounds: cellFrame];
+    BOOL checkMinStatus = NSMouseInRect(point, minimalStatusRect, [controlView isFlipped]);
     
     [(TorrentTableView *)controlView removeButtonTrackingAreas];
     
@@ -306,6 +314,24 @@
                 [controlView setNeedsDisplayInRect: cellFrame];
             }
         }
+        else if (checkProgress)
+        {
+            BOOL inProgressField = NSMouseInRect(point, progressRect, [controlView isFlipped]);
+            if (fMouseDownProgressField != inProgressField)
+            {
+                fMouseDownProgressField = inProgressField;
+                [controlView setNeedsDisplayInRect: cellFrame];
+            }
+        }
+        else if (checkMinStatus)
+        {
+            BOOL inMinStatusField = NSMouseInRect(point, minimalStatusRect, [controlView isFlipped]);
+            if (fMouseDownMinimalStatusField != inMinStatusField)
+            {
+                fMouseDownMinimalStatusField = inMinStatusField;
+                [controlView setNeedsDisplayInRect: cellFrame];
+            }
+        }
         else;
         
         //send events to where necessary
@@ -320,7 +346,6 @@
     if (fMouseDownControlButton)
     {
         fMouseDownControlButton = NO;
-        [controlView setNeedsDisplayInRect: cellFrame];
         
         [(TorrentTableView *)controlView toggleControlForTorrent: [self representedObject]];
     }
@@ -330,6 +355,20 @@
         [controlView setNeedsDisplayInRect: cellFrame];
         
         [[self representedObject] revealData];
+    }
+    else if (fMouseDownProgressField)
+    {
+        fMouseDownProgressField = NO;
+        
+        [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
+        [(TorrentTableView *)controlView reloadData];
+    }
+    else if (fMouseDownMinimalStatusField)
+    {
+        fMouseDownMinimalStatusField = NO;
+        
+        [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
+        [(TorrentTableView *)controlView reloadData];
     }
     else;
     
@@ -482,6 +521,12 @@
         NSAttributedString * minimalString = [self attributedStatusString: [self minimalStatusString] withColor: statusColor];
         minimalStatusRect = [self rectForMinimalStatusWithString: minimalString inBounds: cellFrame];
         
+        if (fMouseDownMinimalStatusField)
+        {
+            [fFieldBackColor set];
+            [[NSBezierPath bezierPathWithRoundedRect: NSInsetRect(minimalStatusRect, -4.0, 0.0) radius: 5.0] fill];
+        }
+        
         [minimalString drawInRect: minimalStatusRect];
     }
     
@@ -495,6 +540,13 @@
     {
         NSAttributedString * progressString = [self attributedStatusString: [torrent progressString] withColor: statusColor];
         NSRect progressRect = [self rectForProgressWithString: progressString inBounds: cellFrame];
+        
+        if (fMouseDownProgressField)
+        {
+            [fFieldBackColor set];
+            [[NSBezierPath bezierPathWithRoundedRect: NSInsetRect(progressRect, -4.0, 0.0) radius: 5.0] fill];
+        }
+        
         [progressString drawInRect: progressRect];
     }
     

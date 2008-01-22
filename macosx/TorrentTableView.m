@@ -216,8 +216,8 @@
     NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
     
     //if pushing a button, don't change the selected rows
-    if ([NSApp isOnLeopardOrBetter] && ([self pointInControlRect: point] || [self pointInRevealRect: point]
-            || [self pointInActionRect: point]))
+    if ([self pointInControlRect: point] || [self pointInRevealRect: point] || [self pointInActionRect: point]
+        || [self pointInProgressRect: point] || [self pointInMinimalStatusRect: point])
         fSelectedTorrents = [[fTorrents objectsAtIndexes: [self selectedRowIndexes]] retain];
     
     [super mouseDown: event];
@@ -238,21 +238,8 @@
         fActionPushedRow = -1;
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
     }
-    else if ([self pointInMinimalStatusRect: point])
-    {
-        [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
-        [self reloadData];
-    }
     else if ([event clickCount] == 2) //double click
-    {
-        if ([self pointInProgressRect: point])
-        {
-            [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
-            [self reloadData];
-        }
-        else
-            [fController showInfo: nil];
-    }
+        [fController showInfo: nil];
     else;
 }
 
@@ -478,13 +465,12 @@
         item = [menu itemWithTag: ACTION_MENU_GLOBAL_TAG];
         [item setState: mode == NSMixedState ? NSOnState : NSOffState];
     }
-    else if ([menu supermenu]) //assume the menu is part of the file list
+    else  //assume the menu is part of the file list
     {
         NSMenu * supermenu = [menu supermenu];
         [self updateFileMenu: menu forFiles: [[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]]
                                                     representedObject] objectForKey: @"Children"]];
     }
-    else;
 }
 
 - (void) setQuickLimitMode: (id) sender
@@ -627,6 +613,7 @@
     return NSPointInRect(point, [cell progressRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
+#warning remove
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];

@@ -3825,14 +3825,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (BOOL) ipcAddTorrentFileAutostart: (NSString *) path directory: (NSString *) directory autostart: (BOOL) autostart
 {
-    NSArray * torrents;
+    NSArray * torrents = nil;
     if (autostart)
         torrents = [fTorrents copy];
     BOOL success = [self ipcAddTorrentFile: path directory: directory];
     
     if (success && autostart)
     {
-        NSEnumerator * enumerator = [torrents objectEnumerator];
+        NSEnumerator * enumerator = [torrents reverseObjectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
             if (![torrents containsObject: torrent])

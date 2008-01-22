@@ -32,14 +32,16 @@
     NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
     
     BOOL fTracking, fMouseDownControlButton, fMouseDownRevealButton, fMouseDownActionButton,
-            fHoverControl, fHoverReveal, fHoverAction;
+            fHoverControl, fHoverReveal, fHoverAction,
+            fMouseDownProgressField, fMouseDownMinimalStatusField;
     
     NSColor * fBarOverlayColor;
     CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fBlueGradient, * fDarkBlueGradient, 
                 * fGreenGradient, * fLightGreenGradient, * fDarkGreenGradient, * fYellowGradient, * fRedGradient,
                 * fTransparentGradient;
     
-    NSColor * fGrayColor, * fBlueColor, * fBlue1Color, * fBlue2Color, * fBlue3Color, * fBlue4Color, * fOrangeColor;
+    NSColor * fGrayColor, * fBlueColor, * fBlue1Color, * fBlue2Color, * fBlue3Color, * fBlue4Color, * fOrangeColor,
+            * fFieldBackColor;
     
     NSBitmapImageRep * fBitmap;
 }
