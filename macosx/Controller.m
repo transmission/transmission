@@ -981,7 +981,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) resumeSelectedTorrents: (id) sender
 {
-    [self resumeTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
+    [self resumeTorrents: [fTableView selectedTorrents]];
 }
 
 - (void) resumeAllTorrents: (id) sender
@@ -1001,7 +1001,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) resumeSelectedTorrentsNoWait:  (id) sender
 {
-    [self resumeTorrentsNoWait: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
+    [self resumeTorrentsNoWait: [fTableView selectedTorrents]];
 }
 
 - (void) resumeWaitingTorrents: (id) sender
@@ -1032,7 +1032,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) stopSelectedTorrents: (id) sender
 {
-    [self stopTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
+    [self stopTorrents: [fTableView selectedTorrents]];
 }
 
 - (void) stopAllTorrents: (id) sender
@@ -1197,25 +1197,25 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) removeNoDelete: (id) sender
 {
-    [self removeTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]
+    [self removeTorrents: [fTableView selectedTorrents]
                 deleteData: NO deleteTorrent: NO];
 }
 
 - (void) removeDeleteData: (id) sender
 {
-    [self removeTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]
+    [self removeTorrents: [fTableView selectedTorrents]
                 deleteData: YES deleteTorrent: NO];
 }
 
 - (void) removeDeleteTorrent: (id) sender
 {
-    [self removeTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]
+    [self removeTorrents: [fTableView selectedTorrents]
                 deleteData: NO deleteTorrent: YES];
 }
 
 - (void) removeDeleteDataAndTorrent: (id) sender
 {
-    [self removeTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]
+    [self removeTorrents: [fTableView selectedTorrents]
                 deleteData: YES deleteTorrent: YES];
 }
 
@@ -1228,7 +1228,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
     
-    NSArray * torrents = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] retain];
+    NSArray * torrents = [[fTableView selectedTorrents] retain];
     int count = [torrents count];
     if (count == 1)
         [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for \"%@\".",
@@ -1257,7 +1257,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) copyTorrentFiles: (id) sender
 {
     [self copyTorrentFileForTorrents: [[NSMutableArray alloc] initWithArray:
-            [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]]];
+            [fTableView selectedTorrents]]];
 }
 
 - (void) copyTorrentFileForTorrents: (NSMutableArray *) torrents
@@ -1311,7 +1311,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) revealFile: (id) sender
 {
-    NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+    NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
         [torrent revealData];
@@ -1319,7 +1319,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) announceSelectedTorrents: (id) sender
 {
-    NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+    NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
     {
@@ -1330,7 +1330,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) resetCacheForSelectedTorrents: (id) sender
 {
-    NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+    NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
         [torrent resetCache];
@@ -1599,7 +1599,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) sortTorrents
 {
-    NSArray * selectedTorrents = [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]];
+    NSArray * selectedTorrents = [fTableView selectedTorrents];
 
     [self sortTorrentsIgnoreSelected]; //actually sort
     
@@ -1743,7 +1743,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     NSMutableArray * previousTorrents = [fDisplayedTorrents mutableCopy];
     
-    NSArray * selectedTorrents = [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]];
+    NSArray * selectedTorrents = [fTableView selectedTorrents];
     
     int active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
@@ -2074,7 +2074,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) setGroup: (id) sender
 {
-    NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+    NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
         [torrent setGroupValue: [sender tag]];
@@ -2402,7 +2402,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
         //remember selected rows if needed
-        NSArray * selectedTorrents = [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]];
+        NSArray * selectedTorrents = [fTableView selectedTorrents];
     
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData:
                                 [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
@@ -2450,7 +2450,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) torrentTableViewSelectionDidChange: (NSNotification *) notification
 {
-    [fInfoController setInfoForTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
+    [fInfoController setInfoForTorrents: [fTableView selectedTorrents]];
 }
 
 - (NSDragOperation) draggingEntered: (id <NSDraggingInfo>) info
@@ -3035,7 +3035,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //enable pause item
     if ([ident isEqualToString: TOOLBAR_PAUSE_SELECTED])
     {
-        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
             if ([torrent isActive] || [torrent waitingToStart])
@@ -3046,7 +3046,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //enable resume item
     if ([ident isEqualToString: TOOLBAR_RESUME_SELECTED])
     {
-        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
             if (![torrent isActive] && ![torrent waitingToStart])
@@ -3155,7 +3155,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         BOOL checked = NO;
         
         int index = [menuItem tag];
-        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
             if (index == [torrent groupValue])
@@ -3266,7 +3266,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             onlyDownloading = [fDefaults boolForKey: @"CheckRemoveDownloading"],
             canDelete = action != @selector(removeDeleteTorrent:) && action != @selector(removeDeleteDataAndTorrent:);
         
-        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
         {
@@ -3344,7 +3344,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         if (!canUseTable)
             return NO;
         
-        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
             if (![torrent isActive])
@@ -3358,7 +3358,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         if (!canUseTable)
             return NO;
     
-        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
             if ([torrent isActive] || [torrent waitingToStart])
@@ -3372,7 +3372,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         if (!canUseTable)
             return NO;
     
-        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
             if (![torrent isActive] && ![torrent waitingToStart])
@@ -3386,7 +3386,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         if (!canUseTable)
             return NO;
         
-        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
             if ([torrent canManualAnnounce])

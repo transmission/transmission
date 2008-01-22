@@ -57,6 +57,7 @@
 - (void) setActionButtonHover: (int) row;
 
 - (void) selectTorrents: (NSArray *) torrents;
+- (NSArray *) selectedTorrents;
 
 - (void) toggleControlForTorrent: (Torrent *) torrent;
 

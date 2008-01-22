@@ -261,6 +261,11 @@
     [indexSet release];
 }
 
+- (NSArray *) selectedTorrents
+{
+    [fTorrents objectsAtIndexes: [self selectedRowIndexes]];
+}
+
 - (NSMenu *) menuForEvent: (NSEvent *) event
 {
     int row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
