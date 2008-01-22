@@ -2,9 +2,10 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.02 (2008/01/22)
 - All Platforms:
-   + Fix 1.00 bug that caused some routers to lag
+   + Fix 1.00 bug that choked some models of routers
    + Fix 1.00 crash in peer handshake
    + Fix 1.01 bug that sometimes froze the app for a long time
+   + Minor improvements to the command-line client
 - GTK+
    + Fix crash when removing a torrent while its details window is open
    + Better compliance with the Gnome interface guidelines
