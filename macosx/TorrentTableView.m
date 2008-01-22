@@ -215,9 +215,11 @@
 {
     NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
     
+    BOOL pushed = [self pointInControlRect: point] || [self pointInRevealRect: point] || [self pointInActionRect: point]
+                    || [self pointInProgressRect: point] || [self pointInMinimalStatusRect: point];
+    
     //if pushing a button, don't change the selected rows
-    if ([self pointInControlRect: point] || [self pointInRevealRect: point] || [self pointInActionRect: point]
-        || [self pointInProgressRect: point] || [self pointInMinimalStatusRect: point])
+    if (pushed)
         fSelectedTorrents = [[fTorrents objectsAtIndexes: [self selectedRowIndexes]] retain];
     
     [super mouseDown: event];
@@ -238,7 +240,7 @@
         fActionPushedRow = -1;
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
     }
-    else if ([event clickCount] == 2) //double click
+    else if (!pushed && [event clickCount] == 2) //double click
         [fController showInfo: nil];
     else;
 }
@@ -613,7 +615,6 @@
     return NSPointInRect(point, [cell progressRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
-#warning remove
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];

@@ -258,8 +258,8 @@
     
     if (NSMouseInRect(point, [self controlButtonRectForBounds: cellFrame], [controlView isFlipped])
         || NSMouseInRect(point, [self revealButtonRectForBounds: cellFrame], [controlView isFlipped])
-        ||  NSMouseInRect(point, [self progressRectForBounds: cellFrame], [controlView isFlipped])
-        ||  NSMouseInRect(point, [self minimalStatusRectForBounds: cellFrame], [controlView isFlipped]))
+        || NSMouseInRect(point, [self progressRectForBounds: cellFrame], [controlView isFlipped])
+        || NSMouseInRect(point, [self minimalStatusRectForBounds: cellFrame], [controlView isFlipped]))
         return NSCellHitContentArea | NSCellHitTrackableArea;
     
     return NSCellHitContentArea;
