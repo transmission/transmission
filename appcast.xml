@@ -6,29 +6,21 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Thu, 4 Jan 2008 15:30:00 -0400</pubDate>
-    <lastBuildDate>Thu, 11 Jan 2008 15:40:00 -0400</lastBuildDate>
+    <lastBuildDate>Tue, 22 Jan 2008 15:44:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 1.01 Released</title>
+      <title>Transmission 1.02 Released</title>
       <description><![CDATA[
 <h4>Core Changes:</h4>
 <ul>
- <li>Fix 1.00 freezing issue</li>
- <li>Fix 1.00 assertion failure</li>
- <li>Improve initial connection speed</li>
- <li>Added connection throttle to avoid router overload</li>
- <li>Improve reconnection to peers with imperfect network connections</li>
-</ul>
-<h4>Mac Changes:</h4>
-<ul>
- <li>Leopard: Double-click icon to reveal in Finder, progress string to toggle selected and total, and anywhere else to toggle the inspector</li>
- <li>Leopard: Better behavior with Time Machine</li>
- <li>Fix bugs with Clutch support</li>
+ <li>Fix 1.00 bug that choked some models of routers</li>
+ <li>Fix 1.00 crash in peer handshake</li>
+ <li>Fix 1.01 bug that sometimes froze the app for a long time</li>
 </ul>
 
 Transmission 0.72 and earlier: Complete your downloads before upgrading or you will lose data!]]></description>
-      <pubDate>Thu, 4 Jan 2008 15:40:00 -0400</pubDate>
-      <enclosure sparkle:version="4627" sparkle:shortVersionString="1.01" url="http://mirrors.m0k.org/transmission/files/Transmission-1.01.dmg" length="2663961" type="application/octet-stream"/>
+      <pubDate>Tue, 22 Jan 2008 15:44:00 -0400</pubDate>
+      <enclosure sparkle:version="4794" sparkle:shortVersionString="1.02" url="http://mirrors.m0k.org/transmission/files/Transmission-1.02.dmg" length="2400989" type="application/octet-stream"/>
     </item>
     
   </channel>
