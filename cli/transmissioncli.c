@@ -111,7 +111,6 @@ main( int argc, char ** argv )
 {
     int i, error;
     tr_handle  * h;
-    tr_handle_status * hstat;
     tr_ctor * ctor;
     tr_torrent * tor = NULL;
 
@@ -146,9 +145,9 @@ main( int argc, char ** argv )
                      natTraversal,            /* nat enabled */
                      bindPort,                /* public port */
                      TR_ENCRYPTION_PREFERRED, /* encryption mode */
-                     uploadLimit > 0,         /* use upload speed limit? */
+                     uploadLimit >= 0,        /* use upload speed limit? */
                      uploadLimit,             /* upload speed limit */
-                     downloadLimit > 0,       /* use download speed limit? */
+                     downloadLimit >= 0,      /* use download speed limit? */
                      downloadLimit,           /* download speed limit */
                      512,                     /* globalPeerLimit */
                      verboseLevel + 1,        /* messageLevel */
@@ -347,7 +346,7 @@ main( int argc, char ** argv )
     tr_natTraversalEnable( h, 0 );
     for( i = 0; i < 10; i++ )
     {
-        hstat = tr_handleStatus( h );
+        const tr_handle_status * hstat = tr_handleStatus( h );
         if( TR_NAT_TRAVERSAL_UNMAPPED == hstat->natTraversalStatus )
         {
             /* Port mappings were deleted */
