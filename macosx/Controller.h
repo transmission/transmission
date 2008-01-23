@@ -191,12 +191,12 @@ typedef enum
 
 - (void) updateTorrentHistory;
 
-- (void) sortTorrentsIgnoreSelected;
+- (void) updateDisplay: (id) sender;
+
 - (void) setSort: (id) sender;
 - (void) setSortByGroup: (id) sender;
 - (void) setSortReverse: (id) sender;
 
-- (void) applyFilter: (id) sender;
 - (void) setFilter: (id) sender;
 - (void) setFilterSearchType: (id) sender;
 - (void) switchFilter: (id) sender;

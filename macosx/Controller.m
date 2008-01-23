@@ -458,7 +458,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
-    [self applyFilter: nil];
+    [self updateDisplay: nil];
     
     [fWindow makeKeyAndOrderFront: nil]; 
     
@@ -1028,7 +1028,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [torrent startTransfer];
     
     [self updateUI];
-    [self applyFilter: nil];
+    [self updateDisplay: nil];
     [self updateTorrentHistory];
 }
 
@@ -1053,7 +1053,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [torrents makeObjectsPerformSelector: @selector(stopTransfer)];
     
     [self updateUI];
-    [self applyFilter: nil];
     [self updateTorrentHistory];
 }
 
@@ -1337,7 +1336,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     while ((torrent = [enumerator nextObject]))
         [torrent resetCache];
     
-    [self applyFilter: nil];
+    [self updateDisplay: nil];
 }
 
 - (void) showPreferenceWindow: (id) sender
@@ -1391,7 +1390,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         if ([fWindow isVisible])
         {
-            [self applyFilter: nil];
+            [self updateDisplay: nil];
             
             //update status bar
             if (![fStatusBar isHidden])
@@ -1505,7 +1504,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     [self updateUI];
-    [self applyFilter: nil];
     [self updateTorrentHistory];
 }
 
@@ -1599,9 +1597,55 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [history writeToFile: [NSHomeDirectory() stringByAppendingPathComponent: SUPPORT_FOLDER] atomically: YES];
 }
 
-#warning rename/change
-//doesn't remember selected rows
-- (void) sortTorrentsIgnoreSelected
+- (void) setSort: (id) sender
+{
+    NSString * sortType;
+    switch ([sender tag])
+    {
+        case SORT_ORDER_TAG:
+            sortType = SORT_ORDER;
+            [fDefaults setBool: NO forKey: @"SortReverse"];
+            [fDefaults setBool: NO forKey: @"SortByGroup"];
+            break;
+        case SORT_DATE_TAG:
+            sortType = SORT_DATE;
+            break;
+        case SORT_NAME_TAG:
+            sortType = SORT_NAME;
+            break;
+        case SORT_PROGRESS_TAG:
+            sortType = SORT_PROGRESS;
+            break;
+        case SORT_STATE_TAG:
+            sortType = SORT_STATE;
+            break;
+        case SORT_TRACKER_TAG:
+            sortType = SORT_TRACKER;
+            break;
+        case SORT_ACTIVITY_TAG:
+            sortType = SORT_ACTIVITY;
+            break;
+        default:
+            return;
+    }
+    
+    [fDefaults setObject: sortType forKey: @"Sort"];
+    [self updateDisplay: nil];
+}
+
+- (void) setSortByGroup: (id) sender
+{
+    [fDefaults setBool: ![fDefaults boolForKey: @"SortByGroup"] forKey: @"SortByGroup"];
+    [self updateDisplay: nil];
+}
+
+- (void) setSortReverse: (id) sender
+{
+    [fDefaults setBool: ![fDefaults boolForKey: @"SortReverse"] forKey: @"SortReverse"];
+    [self updateDisplay: nil];
+}
+
+- (void) prepareForDisplay
 {
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
     BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
@@ -1723,55 +1767,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fTableView reloadData];
 }
 
-- (void) setSort: (id) sender
-{
-    NSString * sortType;
-    switch ([sender tag])
-    {
-        case SORT_ORDER_TAG:
-            sortType = SORT_ORDER;
-            [fDefaults setBool: NO forKey: @"SortReverse"];
-            [fDefaults setBool: NO forKey: @"SortByGroup"];
-            break;
-        case SORT_DATE_TAG:
-            sortType = SORT_DATE;
-            break;
-        case SORT_NAME_TAG:
-            sortType = SORT_NAME;
-            break;
-        case SORT_PROGRESS_TAG:
-            sortType = SORT_PROGRESS;
-            break;
-        case SORT_STATE_TAG:
-            sortType = SORT_STATE;
-            break;
-        case SORT_TRACKER_TAG:
-            sortType = SORT_TRACKER;
-            break;
-        case SORT_ACTIVITY_TAG:
-            sortType = SORT_ACTIVITY;
-            break;
-        default:
-            return;
-    }
-    
-    [fDefaults setObject: sortType forKey: @"Sort"];
-    [self applyFilter: nil];
-}
-
-- (void) setSortByGroup: (id) sender
-{
-    [fDefaults setBool: ![fDefaults boolForKey: @"SortByGroup"] forKey: @"SortByGroup"];
-    [self applyFilter: nil];
-}
-
-- (void) setSortReverse: (id) sender
-{
-    [fDefaults setBool: ![fDefaults boolForKey: @"SortReverse"] forKey: @"SortReverse"];
-    [self applyFilter: nil];
-}
-
-- (void) applyFilter: (id) sender
+- (void) updateDisplay: (id) sender
 {
     NSMutableArray * previousTorrents = [fDisplayedTorrents mutableCopy];
     [previousTorrents removeObjectsAtIndexes: fDisplayedGroupIndexes];
@@ -1898,7 +1894,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [previousTorrents release];
     
     //sort, add groups, and reset selected
-    [self sortTorrentsIgnoreSelected];
+    [self prepareForDisplay];
     [fTableView selectValues: selectedValues];
     
     //set status bar torrent count text
@@ -1957,7 +1953,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     else
         [sender setState: NSOnState];
 
-    [self applyFilter: nil];
+    [self updateDisplay: nil];
 }
 
 - (void) setFilterSearchType: (id) sender
@@ -1983,7 +1979,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [[fSearchFilterField cell] setPlaceholderString: [sender title]];
     }
     
-    [self applyFilter: nil];
+    [self updateDisplay: nil];
 }
 
 - (void) switchFilter: (id) sender
@@ -2110,7 +2106,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [torrent setGroupValue: [sender tag]];
     
     [self updateUI];
-    [self applyFilter: nil];
     [self updateTorrentHistory];
 }
 
@@ -2118,7 +2113,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     [fDefaults setInteger: [sender tag] forKey: @"FilterGroup"];
     [self updateGroupsFilterButton];
-    [self applyFilter: nil];
+    [self updateDisplay: nil];
 }
 
 - (void) updateGroupsFilterButton
@@ -2151,7 +2146,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) updateGroupsFilters: (NSNotification *) notification
 {
     [self updateGroupsFilterButton];
-    [self applyFilter: nil];
+    [self updateDisplay: nil];
 }
 
 - (void) toggleSpeedLimit: (id) sender
@@ -2474,7 +2469,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         [sortedTorrents release];
         
-        [self applyFilter: nil];
+        [self updateDisplay: nil];
         
         //set selected rows
         [fTableView selectValues: selectedValues];
