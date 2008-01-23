@@ -29,9 +29,6 @@
 
 #if GTK_CHECK_VERSION(2,10,0)
 #define STATUS_ICON_SUPPORTED
-#define status_icon_supported() (TRUE)
-#else
-#define status_icon_supported() (FALSE)
 #endif
 
 gpointer tr_icon_new( void );

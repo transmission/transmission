@@ -117,7 +117,8 @@ static gboolean
 sendremote( GList * files, gboolean sendquit );
 static void
 appsetup( TrWindow * wind, GList * args,
-          struct cbdata * , gboolean paused );
+          struct cbdata *,
+          gboolean paused, gboolean minimized );
 static void
 winsetup( struct cbdata * cbdata, TrWindow * wind );
 static void
@@ -226,12 +227,17 @@ main( int argc, char ** argv )
     gboolean didlock = FALSE;
     gboolean sendquit = FALSE;
     gboolean startpaused = FALSE;
+    gboolean startminimized = FALSE;
     char * domain = "transmission";
     GOptionEntry entries[] = {
         { "paused", 'p', 0, G_OPTION_ARG_NONE, &startpaused,
           _("Start with all torrents paused"), NULL },
         { "quit", 'q', 0, G_OPTION_ARG_NONE, &sendquit,
           _( "Request that the running instance quit"), NULL },
+#ifdef STATUS_ICON_SUPPORTED
+        { "minimized", 'm', 0, G_OPTION_ARG_NONE, &startminimized,
+          _( "Start minimized in system tray"), NULL },
+#endif
         { NULL, 0, 0, 0, NULL, NULL, NULL }
     };
 
@@ -273,7 +279,7 @@ main( int argc, char ** argv )
         /* set message level here before tr_init() */
         msgwin_loadpref( );
 
-        appsetup( mainwind, argfiles, cbdata, startpaused );
+        appsetup( mainwind, argfiles, cbdata, startpaused, startminimized );
     }
     else
     {
@@ -307,7 +313,8 @@ sendremote( GList * files, gboolean sendquit )
 
 static void
 appsetup( TrWindow * wind, GList * args,
-          struct cbdata * cbdata, gboolean paused )
+          struct cbdata * cbdata,
+          gboolean paused, gboolean minimized )
 {
     enum tr_torrent_action action;
 
@@ -334,6 +341,9 @@ appsetup( TrWindow * wind, GList * args,
                       G_CALLBACK( prefschanged ), cbdata );
 
     /* apply a few prefs */
+
+    if( minimized )
+        tr_core_set_pref_bool( cbdata->core, PREF_KEY_SYSTRAY, TRUE );
     initializeFromPrefs( cbdata );
 
     /* add torrents from command-line and saved state */
@@ -357,7 +367,8 @@ appsetup( TrWindow * wind, GList * args,
     updatemodel( cbdata );
 
     /* show the window */
-    gtk_widget_show( GTK_WIDGET(wind) );
+    if( !minimized )
+        gtk_widget_show( GTK_WIDGET(wind) );
 }
 
 static gboolean
