@@ -295,13 +295,10 @@
             for (i = 0; i < [fTorrents count]; i++)
             {
                 id currentObject = [fTorrents objectAtIndex: i];
-                if ((![currentObject isKindOfClass: [Torrent class]]))
+                if (![currentObject isKindOfClass: [Torrent class]] && value == [[currentObject objectForKey: @"Group"] intValue])
                 {
-                    if (value == [[currentObject objectForKey: @"Group"] intValue])
-                    {
-                        index = i;
-                        break;
-                    }
+                    index = i;
+                    break;
                 }
             }
         }
@@ -327,8 +324,15 @@
     NSUInteger i;
     for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
     {
-        if ([[fTorrents objectAtIndex: i] isKindOfClass: [Torrent class]])
+        id object = [fTorrents objectAtIndex: i];
+        if ([object isKindOfClass: [Torrent class]])
             [indexSet addIndex: i];
+        else
+        {
+            int count = [[object objectForKey: @"Count"] intValue];
+            [indexSet addIndexesInRange: NSMakeRange(i+1, count)];
+            i += count;
+        }
     }
     
     [fTorrents objectsAtIndexes: indexSet];

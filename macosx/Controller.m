@@ -1686,18 +1686,22 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     int total = [fDisplayedTorrents count];
     if (group && total > 0 && [NSApp isOnLeopardOrBetter])
     {
-        int i, groupValue = [[fDisplayedTorrents objectAtIndex: total-1] groupValue], newGroupValue;
+        int i, groupValue = [[fDisplayedTorrents objectAtIndex: total-1] groupValue], newGroupValue, count = 1;
         for (i = total-1; i >= 0; i--)
         {
             if (i > 0)
                 newGroupValue = [[fDisplayedTorrents objectAtIndex: i-1] groupValue];
             if (groupValue != newGroupValue || i == 0)
             {
-                NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt: groupValue], @"Group", nil];
+                NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt: groupValue], @"Group",
+                                                                                [NSNumber numberWithInt: count], @"Count", nil];
                 [fDisplayedTorrents insertObject: dict atIndex: i];
                 
                 groupValue = newGroupValue;
+                count = 1;
             }
+            else
+                count++;
         }
     }
     
