@@ -309,17 +309,17 @@
     NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSet];
     
     NSUInteger i, next;
-    for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = next)
+    for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
     {
-        next = [selectedIndexes indexGreaterThanIndex: i];
         
         if (![fGroupIndexes containsIndex: i])
             [indexSet addIndex: i];
         else
         {
-            int count = next != NSNotFound ? next - i - 1 : [fTorrents count] - i - 1;
+            unsigned nextGroup = [fGroupIndexes indexGreaterThanIndex: i],
+                    count = nextGroup != NSNotFound ? nextGroup - i - 1 : [fTorrents count] - i - 1;
             [indexSet addIndexesInRange: NSMakeRange(i+1, count)];
-            i += count;
+            i = nextGroup-1;
         }
     }
     [fTorrents objectsAtIndexes: indexSet];
