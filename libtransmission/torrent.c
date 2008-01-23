@@ -1256,23 +1256,10 @@ tr_torrentSetMaxConnectedPeers( tr_torrent  * tor,
     tor->maxConnectedPeers = maxConnectedPeers;
 }
 
-void
-tr_torrentSetMaxUnchokedPeers( tr_torrent  * tor,
-                               uint8_t       maxUnchokedPeers )
-{
-    tor->maxUnchokedPeers = maxUnchokedPeers;
-}
-
 uint16_t
 tr_torrentGetMaxConnectedPeers( const tr_torrent  * tor )
 {
     return tor->maxConnectedPeers;
-}
-
-uint8_t
-tr_torrentGetMaxUnchokedPeers( const tr_torrent  * tor )
-{
-    return tor->maxUnchokedPeers;
 }
 
 /***
