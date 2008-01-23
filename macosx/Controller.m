@@ -323,7 +323,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fPrefsController setUpdater: fUpdater];
     
     [fTableView setTorrents: fDisplayedTorrents];
-    [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[[TorrentCell alloc] init] autorelease]];
     
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
@@ -1081,10 +1080,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             
             NSString * title, * message;
             
-            int selected = [fTableView numberOfSelectedRows];
+            int selected = [torrents count];
             if (selected == 1)
             {
-                NSString * torrentName = [[fDisplayedTorrents objectAtIndex: [fTableView selectedRow]] name];
+                NSString * torrentName = [[torrents objectAtIndex: 0] name];
                 
                 if (!deleteData && !deleteTorrent)
                     title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of \"%@\" from the transfer list.",
@@ -1389,7 +1388,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         if ([fWindow isVisible])
         {
-            [self sortTorrents];
+            [self applyFilter: nil];
             
             //update status bar
             if (![fStatusBar isHidden])
@@ -1597,15 +1596,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [history writeToFile: [NSHomeDirectory() stringByAppendingPathComponent: SUPPORT_FOLDER] atomically: YES];
 }
 
-- (void) sortTorrents
-{
-    NSArray * selectedTorrents = [fTableView selectedTorrents];
-
-    [self sortTorrentsIgnoreSelected]; //actually sort
-    
-    [fTableView selectTorrents: selectedTorrents];
-}
-
+#warning rename/change
 //doesn't remember selected rows
 - (void) sortTorrentsIgnoreSelected
 {
@@ -1616,6 +1607,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                             ascending: asc selector: @selector(caseInsensitiveCompare:)] autorelease],
                     * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue"
                                             ascending: asc] autorelease];
+    
+    BOOL group = NO;
     
     NSArray * descriptors;
     if ([sortType isEqualToString: SORT_ORDER])
@@ -1671,7 +1664,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, orderDescriptor, nil];
         }
         
-        if ([fDefaults boolForKey: @"SortByGroup"])
+        group = [fDefaults boolForKey: @"SortByGroup"];
+        if (group)
         {
             NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue"
                                                     ascending: asc] autorelease];
@@ -1687,6 +1681,25 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fDisplayedTorrents sortUsingDescriptors: descriptors];
     [descriptors release];
+    
+    //add group divider if necessary
+    int total = [fDisplayedTorrents count];
+    if (group && total > 0)
+    {
+        int i, groupValue = [[fDisplayedTorrents objectAtIndex: total-1] groupValue], newGroupValue;
+        for (i = total-1; i >= 0; i--)
+        {
+            if (i > 0)
+                newGroupValue = [[fDisplayedTorrents objectAtIndex: i-1] groupValue];
+            if (groupValue != newGroupValue || i == 0)
+            {
+                NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt: groupValue], @"Group", nil];
+                [fDisplayedTorrents insertObject: dict atIndex: i];
+                
+                groupValue = newGroupValue;
+            }
+        }
+    }
     
     [fTableView reloadData];
 }
@@ -1724,26 +1737,26 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     [fDefaults setObject: sortType forKey: @"Sort"];
-    [self sortTorrents];
+    [self applyFilter: nil];
 }
 
 - (void) setSortByGroup: (id) sender
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"SortByGroup"] forKey: @"SortByGroup"];
-    [self sortTorrents];
+    [self applyFilter: nil];
 }
 
 - (void) setSortReverse: (id) sender
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"SortReverse"] forKey: @"SortReverse"];
-    [self sortTorrents];
+    [self applyFilter: nil];
 }
 
 - (void) applyFilter: (id) sender
 {
     NSMutableArray * previousTorrents = [fDisplayedTorrents mutableCopy];
     
-    NSArray * selectedTorrents = [fTableView selectedTorrents];
+    NSArray * selectedValues = [fTableView selectedValues];
     
     int active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
@@ -1853,9 +1866,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if ([previousTorrents count] > 0)
     {
         NSEnumerator * enumerator = [previousTorrents objectEnumerator];
-        Torrent * torrent;
+        id torrent;
         while ((torrent = [enumerator nextObject]))
-            [torrent setPreviousAmountFinished: NULL];
+        {
+            if ([torrent isKindOfClass: [Torrent class]])
+                [torrent setPreviousAmountFinished: NULL];
+        }
     }
     [previousTorrents release];
     
@@ -1869,7 +1885,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self sortTorrentsIgnoreSelected];
     
     //set selected rows
-    [fTableView selectTorrents: selectedTorrents];
+    [fTableView selectValues: selectedValues];
     
     //set status bar torrent count text
     NSString * totalTorrentsString;
@@ -2367,7 +2383,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
-    return nil;
+    id object = [fDisplayedTorrents objectAtIndex: row];
+    if ([object isKindOfClass: [Torrent class]])
+        return nil;
+    
+    int group = [[object objectForKey: @"Group"] intValue];
+    return group != -1 ? [[GroupsWindowController groups] nameForIndex: group] : NSLocalizedString(@"No Group", "Group table row");
 }
 
 - (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) indexes toPasteboard: (NSPasteboard *) pasteboard
@@ -2402,7 +2423,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
         //remember selected rows if needed
-        NSArray * selectedTorrents = [fTableView selectedTorrents];
+        NSArray * selectedValues = [fTableView selectedValues];
     
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData:
                                 [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
@@ -2442,7 +2463,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [self applyFilter: nil];
         
         //set selected rows
-        [fTableView selectTorrents: selectedTorrents];
+        [fTableView selectValues: selectedValues];
     }
     
     return YES;
@@ -3585,8 +3606,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (NSRect) sizedWindowFrame
 {
-    float heightChange = [fDisplayedTorrents count] * ([fTableView rowHeight] +
-            [fTableView intercellSpacing].height) - [fScrollView frame].size.height;
+    float heightChange = 0;
+    
+    NSEnumerator * enumerator = [fDisplayedTorrents objectEnumerator];
+    id object;
+    while ((object = [enumerator nextObject]))
+        heightChange += ([object isKindOfClass: [Torrent class]] ? [fTableView rowHeight] : GROUP_SEPARATOR_HEIGHT)
+                        + [fTableView intercellSpacing].height;
+    
+    heightChange -= [fScrollView frame].size.height;
     return [self windowFrameByAddingHeight: heightChange checkLimits: YES];
 }
 

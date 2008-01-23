@@ -26,6 +26,8 @@
 #import <transmission.h>
 #import <Controller.h>
 
+#define GROUP_SEPARATOR_HEIGHT 20.0
+
 @class TorrentCell;
 
 @interface TorrentTableView : NSTableView
@@ -38,7 +40,7 @@
     IBOutlet NSMenu * fContextRow, * fContextNoRow;
     
     int fMouseControlRow, fMouseRevealRow, fMouseActionRow, fActionPushedRow;
-    NSArray * fSelectedTorrents;
+    NSArray * fSelectedValues;
     
     NSMutableArray * fKeyStrokes;
     
@@ -56,7 +58,8 @@
 - (void) setRevealButtonHover: (int) row;
 - (void) setActionButtonHover: (int) row;
 
-- (void) selectTorrents: (NSArray *) torrents;
+- (void) selectValues: (NSArray *) values;
+- (NSArray *) selectedValues;
 - (NSArray *) selectedTorrents;
 
 - (void) toggleControlForTorrent: (Torrent *) torrent;
