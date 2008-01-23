@@ -1724,7 +1724,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         if (![NSApp isOnLeopardOrBetter] && [fDefaults boolForKey: @"SortByGroup"])
         {
             NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue"
-                                                    ascending: asc] autorelease];
+                                                    ascending: YES] autorelease];
             
             NSMutableArray * temp = [[NSMutableArray alloc] initWithCapacity: [descriptors count]+1];
             [temp addObject: groupDescriptor];
