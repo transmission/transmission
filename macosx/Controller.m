@@ -1639,7 +1639,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) setSortByGroup: (id) sender
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"SortByGroup"] forKey: @"SortByGroup"];
-    [self sortTorrents];
+    [self updateDisplay: nil];
 }
 
 - (void) setSortReverse: (id) sender
