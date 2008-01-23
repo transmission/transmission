@@ -34,6 +34,7 @@
 {
     IBOutlet Controller * fController;
     NSArray * fTorrents;
+    NSIndexSet * fGroupIndexes;
     
     NSUserDefaults * fDefaults;
     
@@ -52,6 +53,7 @@
 }
 
 - (void) setTorrents: (NSArray *) torrents;
+- (void) setGroupIndexes: (NSIndexSet *) indexes;
 
 - (void) removeButtonTrackingAreas;
 - (void) setControlButtonHover: (int) row;

@@ -52,6 +52,7 @@ typedef enum
     tr_handle                       * fLib;
     
     NSMutableArray                  * fTorrents, * fDisplayedTorrents;
+    NSMutableIndexSet               * fDisplayedGroupIndexes;
     
     PrefsController                 * fPrefsController;
     InfoWindowController            * fInfoController;

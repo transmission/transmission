@@ -794,7 +794,7 @@
         * previousPiecePercent = [torrent getPreviousAmountFinished];
     [torrent getAmountFinished: piecePercent size: pieceCount];
     
-    int i, h, index;
+    int i, index;
     float increment = (float)pieceCount / MAX_PIECES;
     NSColor * pieceColor;
     for (i = 0; i < MAX_PIECES; i++)

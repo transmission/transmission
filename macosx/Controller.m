@@ -211,6 +211,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         fTorrents = [[NSMutableArray alloc] init];
         fDisplayedTorrents = [[NSMutableArray alloc] init];
+        fDisplayedGroupIndexes = [[NSMutableIndexSet alloc] init];
         
         fMessageController = [[MessageWindowController alloc] init];
         fInfoController = [[InfoWindowController alloc] init];
@@ -323,6 +324,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fPrefsController setUpdater: fUpdater];
     
     [fTableView setTorrents: fDisplayedTorrents];
+    [fTableView setGroupIndexes: fDisplayedGroupIndexes];
     
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
@@ -586,6 +588,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fTorrents release];
     [fDisplayedTorrents release];
+    [fDisplayedGroupIndexes release];
     
     [fOverlayWindow release];
     [fIPCController release];
@@ -1684,8 +1687,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //add group divider if necessary
     int total = [fDisplayedTorrents count];
+    
+    [fDisplayedGroupIndexes removeAllIndexes];
     if (group && total > 0 && [NSApp isOnLeopardOrBetter])
     {
+        #warning make more efficient
+        NSMutableIndexSet * tempGroupIndexes = [[NSMutableIndexSet alloc] init];
+        
         int i, groupValue = [[fDisplayedTorrents objectAtIndex: total-1] groupValue], newGroupValue, count = 1;
         for (i = total-1; i >= 0; i--)
         {
@@ -1693,9 +1701,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 newGroupValue = [[fDisplayedTorrents objectAtIndex: i-1] groupValue];
             if (groupValue != newGroupValue || i == 0)
             {
+                #warning count can be derived...elliminate
                 NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt: groupValue], @"Group",
                                                                                 [NSNumber numberWithInt: count], @"Count", nil];
                 [fDisplayedTorrents insertObject: dict atIndex: i];
+                [tempGroupIndexes addIndex: i];
                 
                 groupValue = newGroupValue;
                 count = 1;
@@ -1703,6 +1713,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             else
                 count++;
         }
+        
+        for (i = [tempGroupIndexes firstIndex], count = 0; i != NSNotFound; i = [tempGroupIndexes indexGreaterThanIndex: i], count++)
+            [fDisplayedGroupIndexes addIndex: i+count];
+        
+        [tempGroupIndexes release];
     }
     
     [fTableView reloadData];
@@ -1759,6 +1774,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) applyFilter: (id) sender
 {
     NSMutableArray * previousTorrents = [fDisplayedTorrents mutableCopy];
+    int i;
+    for (i = [fDisplayedGroupIndexes lastIndex]; i != NSNotFound; i = [fDisplayedGroupIndexes indexLessThanIndex: i])
+        [previousTorrents removeObjectAtIndex: i];
     
     NSArray * selectedValues = [fTableView selectedValues];
     
@@ -1788,7 +1806,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //get count of each type
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
-    int i = -1;
+    i = -1;
     BOOL isActive;
     while ((torrent = [enumerator nextObject]))
     {
@@ -1865,20 +1883,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fDisplayedTorrents setArray: [fTorrents objectsAtIndexes: indexes]];
     
-    //clear display cache for not-shown torrents
-    [previousTorrents removeObjectsInArray: fDisplayedTorrents];
-    if ([previousTorrents count] > 0)
-    {
-        NSEnumerator * enumerator = [previousTorrents objectEnumerator];
-        id torrent;
-        while ((torrent = [enumerator nextObject]))
-        {
-            if ([torrent isKindOfClass: [Torrent class]])
-                [torrent setPreviousAmountFinished: NULL];
-        }
-    }
-    [previousTorrents release];
-    
     //set button tooltips
     [fNoFilterButton setCount: [fTorrents count]];
     [fActiveFilterButton setCount: active];
@@ -1886,9 +1890,17 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fSeedFilterButton setCount: seeding];
     [fPauseFilterButton setCount: paused];
     
-    [self sortTorrentsIgnoreSelected];
+    //clear display cache for not-shown torrents
+    [previousTorrents removeObjectsInArray: fDisplayedTorrents]; //neither array should currently have group items
     
-    //set selected rows
+    enumerator = [previousTorrents objectEnumerator];
+    while ((torrent = [enumerator nextObject]))
+        [torrent setPreviousAmountFinished: NULL];
+    
+    [previousTorrents release];
+    
+    //sort, add groups, and reset selected
+    [self sortTorrentsIgnoreSelected];
     [fTableView selectValues: selectedValues];
     
     //set status bar torrent count text
@@ -3610,15 +3622,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (NSRect) sizedWindowFrame
 {
-    float heightChange = 0;
+    float heightChange = (GROUP_SEPARATOR_HEIGHT + [fTableView intercellSpacing].height) * [fDisplayedGroupIndexes count]
+                        + ([fTableView rowHeight] + [fTableView intercellSpacing].height) * ([fDisplayedTorrents count]
+                            - [fDisplayedGroupIndexes count]) - [fScrollView frame].size.height;
     
-    NSEnumerator * enumerator = [fDisplayedTorrents objectEnumerator];
-    id object;
-    while ((object = [enumerator nextObject]))
-        heightChange += ([object isKindOfClass: [Torrent class]] ? [fTableView rowHeight] : GROUP_SEPARATOR_HEIGHT)
-                        + [fTableView intercellSpacing].height;
-    
-    heightChange -= [fScrollView frame].size.height;
     return [self windowFrameByAddingHeight: heightChange checkLimits: YES];
 }
 

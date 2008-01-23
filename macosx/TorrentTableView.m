@@ -94,20 +94,24 @@
     fTorrents = torrents;
 }
 
+- (void) setGroupIndexes: (NSIndexSet *) indexes
+{
+    fGroupIndexes = indexes;
+}
+
 - (id) dataCellForRow: (NSInteger) row
 {
-    return (row == -1 || [[fTorrents objectAtIndex: row] isKindOfClass: [Torrent class]]) ? [[[TorrentCell alloc] init] autorelease]
-                                                                                        : nil;
+    return (row == -1 || ![fGroupIndexes containsIndex: row]) ? [[[TorrentCell alloc] init] autorelease] : nil;
 }
 
 - (BOOL) tableView: (NSTableView *) tableView isGroupRow: (NSInteger) row
 {
-    return ![[fTorrents objectAtIndex: row] isKindOfClass: [Torrent class]];
+    return [fGroupIndexes containsIndex: row];
 }
 
 - (CGFloat) tableView: (NSTableView *) tableView heightOfRow: (NSInteger) row
 {
-    return [[fTorrents objectAtIndex: row] isKindOfClass: [Torrent class]] ? [self rowHeight] : GROUP_SEPARATOR_HEIGHT;
+    return ![fGroupIndexes containsIndex: row] ? [self rowHeight] : GROUP_SEPARATOR_HEIGHT;
 }
 
 - (NSCell *) tableView: (NSTableView *) tableView dataCellForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
@@ -117,7 +121,7 @@
 
 - (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
-    if (![cell isKindOfClass: [TorrentCell class]])
+    if ([fGroupIndexes containsIndex: row])
         return;
     
     [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
@@ -130,8 +134,8 @@
 
 - (NSString *) tableView: (NSTableView *) tableView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
-    id object = [fTorrents objectAtIndex: row];
-    return [object isKindOfClass: [Torrent class]] ? [object name] : [[self preparedCellAtColumn: 0 row: row] stringValue];
+    return ![fGroupIndexes containsIndex: row] ? [[fTorrents objectAtIndex: row] name]
+                                                : [[self preparedCellAtColumn: 0 row: row] stringValue];
 }
 
 - (void) updateTrackingAreas
@@ -150,11 +154,11 @@
     int row;
     for (row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
     {
-        TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: col row: row];
-        if (![cell isKindOfClass: [TorrentCell class]])
+        if ([fGroupIndexes containsIndex: row])
             continue;
         
         NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: row] forKey: @"Row"];
+        TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: col row: row];
         [cell addTrackingAreasForView: self inRect: [self frameOfCellAtColumn: col row: row] withUserInfo: userInfo
                 mouseLocation: mouseLocation];
     }
@@ -278,7 +282,7 @@
     else;
 }
 
-#warning better way?
+#warning better way? - use group indexes
 - (void) selectValues: (NSArray *) values
 {
     id object;
@@ -295,8 +299,7 @@
             unsigned i;
             for (i = 0; i < [fTorrents count]; i++)
             {
-                id currentObject = [fTorrents objectAtIndex: i];
-                if (![currentObject isKindOfClass: [Torrent class]] && value == [[currentObject objectForKey: @"Group"] intValue])
+                if ([fGroupIndexes containsIndex: i] && value == [[[fTorrents objectAtIndex: i] objectForKey: @"Group"] intValue])
                 {
                     index = i;
                     break;
@@ -325,17 +328,16 @@
     NSUInteger i;
     for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
     {
-        id object = [fTorrents objectAtIndex: i];
-        if ([object isKindOfClass: [Torrent class]])
+        if (![fGroupIndexes containsIndex: i])
             [indexSet addIndex: i];
         else
         {
-            int count = [[object objectForKey: @"Count"] intValue];
+            #warning elliminate count so equals comparison can be done?
+            int count = [[[fTorrents objectAtIndex: i] objectForKey: @"Count"] intValue];
             [indexSet addIndexesInRange: NSMakeRange(i+1, count)];
             i += count;
         }
     }
-    
     [fTorrents objectsAtIndexes: indexSet];
 }
 
@@ -649,43 +651,40 @@
 - (BOOL) pointInControlRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0)
+    if (row < 0 || [fGroupIndexes containsIndex: row])
         return NO;
     
-    NSCell * cell = [self dataCellForRow: row];
-    return [cell isKindOfClass: [TorrentCell class]]
-            && NSPointInRect(point, [(TorrentCell*)cell controlButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    TorrentCell * cell = [self dataCellForRow: row];
+    return NSPointInRect(point, [cell controlButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (BOOL) pointInRevealRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0)
+    if (row < 0 || [fGroupIndexes containsIndex: row])
         return NO;
     
-    NSCell * cell = [self dataCellForRow: row];
-    return [cell isKindOfClass: [TorrentCell class]]
-            && NSPointInRect(point, [(TorrentCell*)cell revealButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    TorrentCell * cell = [self dataCellForRow: row];
+    return NSPointInRect(point, [cell revealButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (BOOL) pointInActionRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0)
+    if (row < 0 || [fGroupIndexes containsIndex: row])
         return NO;
     
-    NSCell * cell = [self dataCellForRow: row];
-    return [cell isKindOfClass: [TorrentCell class]]
-            && NSPointInRect(point, [(TorrentCell*)cell iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    TorrentCell * cell = [self dataCellForRow: row];
+    return NSPointInRect(point, [cell iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (BOOL) pointInProgressRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0 || [fDefaults boolForKey: @"SmallView"])
+    if (row < 0  || [fGroupIndexes containsIndex: row] || [fDefaults boolForKey: @"SmallView"])
         return NO;
     
-    NSCell * cell;
+    TorrentCell * cell;
     if ([NSApp isOnLeopardOrBetter])
         cell = (TorrentCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
     else
@@ -693,17 +692,16 @@
         cell = [self dataCellForRow: row];
         [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
     }
-    return [cell isKindOfClass: [TorrentCell class]]
-            && NSPointInRect(point, [(TorrentCell*)cell progressRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    return NSPointInRect(point, [cell progressRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0 || ![fDefaults boolForKey: @"SmallView"])
+    if (row < 0  || [fGroupIndexes containsIndex: row] || ![fDefaults boolForKey: @"SmallView"])
         return NO;
     
-    NSCell * cell;
+    TorrentCell * cell;
     if ([NSApp isOnLeopardOrBetter])
         cell = (TorrentCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
     else
@@ -711,8 +709,7 @@
         cell = [self dataCellForRow: row];
         [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
     }
-    return [cell isKindOfClass: [TorrentCell class]]
-            && NSPointInRect(point, [(TorrentCell*)cell minimalStatusRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    return NSPointInRect(point, [cell minimalStatusRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files
