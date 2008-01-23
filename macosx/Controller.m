@@ -1684,7 +1684,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //add group divider if necessary
     int total = [fDisplayedTorrents count];
-    if (group && total > 0)
+    if (group && total > 0 && [NSApp isOnLeopardOrBetter])
     {
         int i, groupValue = [[fDisplayedTorrents objectAtIndex: total-1] groupValue], newGroupValue;
         for (i = total-1; i >= 0; i--)
