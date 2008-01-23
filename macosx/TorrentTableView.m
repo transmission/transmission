@@ -282,7 +282,6 @@
     else;
 }
 
-#warning better way? - use group indexes
 - (void) selectValues: (NSArray *) values
 {
     id object;
@@ -290,23 +289,7 @@
     NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
     while ((object = [enumerator nextObject]))
     {
-        unsigned index = NSNotFound;
-        if ([object isKindOfClass: [Torrent class]])
-            index = [fTorrents indexOfObject: object];
-        else
-        {
-            int value = [object intValue];
-            unsigned i;
-            for (i = 0; i < [fTorrents count]; i++)
-            {
-                if ([fGroupIndexes containsIndex: i] && value == [[fTorrents objectAtIndex: i] intValue])
-                {
-                    index = i;
-                    break;
-                }
-            }
-        }
-        
+        unsigned index = [fTorrents indexOfObject: object]; //works with torrents and groups
         if (index != NSNotFound)
             [indexSet addIndex: index];
     }
