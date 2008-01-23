@@ -1774,9 +1774,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) applyFilter: (id) sender
 {
     NSMutableArray * previousTorrents = [fDisplayedTorrents mutableCopy];
-    int i;
-    for (i = [fDisplayedGroupIndexes lastIndex]; i != NSNotFound; i = [fDisplayedGroupIndexes indexLessThanIndex: i])
-        [previousTorrents removeObjectAtIndex: i];
+    [previousTorrents removeObjectsAtIndexes: fDisplayedGroupIndexes];
     
     NSArray * selectedValues = [fTableView selectedValues];
     
@@ -1806,7 +1804,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //get count of each type
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
-    i = -1;
+    int i = -1;
     BOOL isActive;
     while ((torrent = [enumerator nextObject]))
     {
