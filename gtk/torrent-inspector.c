@@ -932,7 +932,6 @@ typedef struct
   TrTorrent * gtor;
   GtkTreeModel * model; /* same object as store, but recast */
   GtkTreeStore * store; /* same object as model, but recast */
-  GtkTreeSelection * selection;
 }
 FileData;
 
@@ -1130,33 +1129,6 @@ priority_model_new (void)
 }
 
 static void
-refreshPriorityActions( GtkTreeSelection * sel )
-{
-    GtkTreeIter iter;
-    GtkTreeModel * model;
-    const gboolean has_selection = gtk_tree_selection_get_selected( sel, &model, &iter );
-
-    action_sensitize ( "priority-high", has_selection );
-    action_sensitize ( "priority-normal", has_selection );
-    action_sensitize ( "priority-low", has_selection );
-
-    if( has_selection )
-    {
-        /* set the action priority base on the model's values */
-        char * pch = NULL;
-        const char * key;
-        gtk_tree_model_get( model, &iter, FC_PRIORITY, &pch, -1 );
-        switch( stringToPriority( pch ) ) {
-            case TR_PRI_HIGH:   key = "priority-high";   break;
-            case TR_PRI_LOW:    key = "priority-low";    break;
-            default:            key = "priority-normal"; break;
-        }
-        action_toggle( key, TRUE );
-        g_free( pch );
-    }
-}
-
-static void
 subtree_walk_dnd( GtkTreeStore   * store,
                   GtkTreeIter    * iter,
                   tr_torrent     * tor,
@@ -1217,15 +1189,12 @@ static void
 set_subtree_priority( GtkTreeStore * store,
                       GtkTreeIter * iter,
                       tr_torrent * tor,
-                      int priority,
-                      GtkTreeSelection * selection )
+                      int priority )
 {
     GArray * indices = g_array_new( FALSE, FALSE, sizeof(int) );
     subtree_walk_priority( store, iter, tor, priority, indices );
     tr_torrentSetFilePriorities( tor, (int*)indices->data, (int)indices->len, priority );
     g_array_free( indices, TRUE );
-
-    refreshPriorityActions( selection );
 }
 
 static void
@@ -1235,48 +1204,12 @@ priority_changed_cb (GtkCellRendererText * cell UNUSED,
 		     void                * file_data)
 {
     GtkTreeIter iter;
-    FileData * d = (FileData*) file_data;
+    FileData * d = file_data;
     if (gtk_tree_model_get_iter_from_string (d->model, &iter, path))
     {
         tr_torrent  * tor = tr_torrent_handle( d->gtor );
         const tr_priority_t priority = stringToPriority( value );
-        set_subtree_priority( d->store, &iter, tor, priority, d->selection );
-    }
-}
-
-/* FIXME: NULL this back out when popup goes down */
-static GtkWidget * popupView = NULL;
-
-static void
-on_popup_menu ( GtkWidget * view, GdkEventButton * event )
-{
-    GtkWidget * menu = action_get_widget ( "/file-popup" );
-    popupView = view;
-    gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL,
-                    (event ? event->button : 0),
-                    (event ? event->time : 0));
-}
-
-static void
-fileSelectionChangedCB( GtkTreeSelection * sel, gpointer unused UNUSED )
-{
-    refreshPriorityActions( sel );
-}
-
-void
-set_selected_file_priority ( tr_priority_t priority_val )
-{
-    if( popupView && GTK_IS_TREE_VIEW(popupView) )
-    {
-        GtkTreeView * view = GTK_TREE_VIEW( popupView );
-        tr_torrent * tor = g_object_get_data (G_OBJECT(view), "torrent-handle");
-        GtkTreeModel * model;
-        GtkTreeIter iter;
-        GtkTreeSelection * sel = gtk_tree_view_get_selection (view);
-        gtk_tree_selection_get_selected( sel, &model, &iter );
-
-        set_subtree_priority( GTK_TREE_STORE(model), &iter,
-                              tor, priority_val, sel );
+        set_subtree_priority( d->store, &iter, tor, priority );
     }
 }
 
@@ -1285,7 +1218,7 @@ enabled_toggled (GtkCellRendererToggle  * cell UNUSED,
 	         const gchar            * path_str,
 	         gpointer                 data_gpointer)
 {
-  FileData * data = (FileData*) data_gpointer;
+  FileData * data = data_gpointer;
   GtkTreePath * path = gtk_tree_path_new_from_string( path_str );
   GtkTreeModel * model = data->model;
   GtkTreeIter iter;
@@ -1342,10 +1275,6 @@ file_page_new ( TrTorrent * gtor )
     /* create the view */
     view = gtk_tree_view_new_with_model( GTK_TREE_MODEL( store ) );
     g_object_set_data (G_OBJECT(view), "torrent-handle", tor );
-    g_signal_connect( view, "popup-menu",
-                      G_CALLBACK(on_popup_menu), NULL );
-    g_signal_connect( view, "button-press-event",
-                      G_CALLBACK(on_tree_view_button_pressed), (void*) on_popup_menu);
 
     /* add file column */
     
@@ -1373,8 +1302,6 @@ file_page_new ( TrTorrent * gtor )
     sel = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
     gtk_tree_view_expand_all( GTK_TREE_VIEW( view ) );
     gtk_tree_view_set_search_column( GTK_TREE_VIEW( view ), FC_LABEL );
-    g_signal_connect( sel, "changed", G_CALLBACK(fileSelectionChangedCB), NULL );
-    fileSelectionChangedCB( sel, NULL );
 
     /* add "download" checkbox column */
     col = gtk_tree_view_column_new ();
@@ -1394,7 +1321,7 @@ file_page_new ( TrTorrent * gtor )
     rend = priority_rend = gtk_cell_renderer_combo_new ();
     gtk_tree_view_column_pack_start (col, rend, TRUE);
     g_object_set (G_OBJECT(rend), "model", model,
-                                  "editable", FALSE,
+                                  "editable", TRUE,
                                   "has-entry", FALSE,
                                   "text-column", 0,
                                   NULL);
@@ -1417,7 +1344,6 @@ file_page_new ( TrTorrent * gtor )
     data->gtor = gtor;
     data->model = GTK_TREE_MODEL(store);
     data->store = store;
-    data->selection = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
     g_object_set_data_full (G_OBJECT(ret), "file-data", data, g_free);
     g_signal_connect (G_OBJECT(priority_rend), "edited", G_CALLBACK(priority_changed_cb), data);
     g_signal_connect(enabled_rend, "toggled", G_CALLBACK(enabled_toggled), data );
@@ -1429,7 +1355,7 @@ refresh_files (GtkWidget * top)
 {
     guint64 foo, bar;
     int fileCount = 0;
-    FileData * data = (FileData*) g_object_get_data (G_OBJECT(top), "file-data");
+    FileData * data = g_object_get_data (G_OBJECT(top), "file-data");
     tr_torrent * tor = tr_torrent_handle( data->gtor );
     tr_file_stat * fileStats = tr_torrentFiles( tor, &fileCount );
     updateprogress (data->model, data->store, NULL, fileStats, &foo, &bar);

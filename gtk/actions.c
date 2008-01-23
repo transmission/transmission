@@ -43,22 +43,6 @@ action_cb ( GtkAction * a, gpointer user_data )
 #define GTK_STOCK_SELECT_ALL NULL
 #endif
 
-static GtkRadioActionEntry priority_toggle_entries[] =
-{
-  { "priority-high", NULL, N_("_High"), NULL, NULL, TR_PRI_HIGH },
-  { "priority-normal", NULL, N_("_Normal"), NULL, NULL, TR_PRI_NORMAL },
-  { "priority-low", NULL, N_("_Low"), NULL, NULL, TR_PRI_LOW }
-};
-
-extern void set_selected_file_priority ( tr_priority_t ); 
-
-static void
-priority_changed_cb (GtkAction *action UNUSED, GtkRadioAction *current)
-{
-  const int priority = gtk_radio_action_get_current_value (current);
-  set_selected_file_priority ( priority );
-}
-
 static GtkRadioActionEntry sort_radio_entries[] =
 {
   { "sort-by-activity",   NULL, N_("Sort by _Activity"),   NULL, NULL, 0 },
@@ -117,7 +101,6 @@ static GtkActionEntry entries[] =
   { "sort-menu", NULL, N_("_Sort Torrents By"), NULL, NULL, NULL },
   { "edit-menu", NULL, N_("_Edit"), NULL, NULL, NULL },
   { "help-menu", NULL, N_("_Help"), NULL, NULL, NULL },
-  { "priority-menu", NULL, N_("_Priority"), NULL, NULL, NULL },
   { "add-torrent", GTK_STOCK_OPEN,
     NULL, NULL, N_("Open Torrent"), G_CALLBACK(action_cb) },
   { "start-torrent", GTK_STOCK_MEDIA_PLAY,
@@ -232,12 +215,6 @@ actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
 
   action_group = myGroup = gtk_action_group_new( "Actions" );
   gtk_action_group_set_translation_domain( action_group, NULL );
-
-  gtk_action_group_add_radio_actions( action_group,
-                                      priority_toggle_entries,
-                                      G_N_ELEMENTS(priority_toggle_entries),
-                                      TR_PRI_NORMAL,
-                                      G_CALLBACK(priority_changed_cb), NULL);
 
 
   match = pref_string_get( PREF_KEY_SORT_MODE );
