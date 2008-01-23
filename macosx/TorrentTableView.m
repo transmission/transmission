@@ -97,7 +97,7 @@
 - (id) dataCellForRow: (NSInteger) row
 {
     return (row == -1 || [[fTorrents objectAtIndex: row] isKindOfClass: [Torrent class]]) ? [[[TorrentCell alloc] init] autorelease]
-                                                                                        : [[[NSTextFieldCell alloc] init] autorelease];
+                                                                                        : nil;
 }
 
 - (BOOL) tableView: (NSTableView *) tableView isGroupRow: (NSInteger) row
@@ -653,7 +653,7 @@
     
     NSCell * cell = [self dataCellForRow: row];
     return [cell isKindOfClass: [TorrentCell class]]
-            && NSPointInRect(point, [(TorrentCell*) cell controlButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+            && NSPointInRect(point, [(TorrentCell*)cell controlButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (BOOL) pointInRevealRect: (NSPoint) point
