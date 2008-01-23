@@ -317,7 +317,7 @@
         else
         {
             unsigned nextGroup = [fGroupIndexes indexGreaterThanIndex: i],
-                    count = nextGroup != NSNotFound ? nextGroup - i - 1 : [fTorrents count] - i - 1;
+                    count = (nextGroup != NSNotFound ? nextGroup : [fTorrents count]) - i - 1 ;
             [indexSet addIndexesInRange: NSMakeRange(i+1, count)];
             i = nextGroup-1;
         }

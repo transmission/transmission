@@ -247,7 +247,7 @@
 
 - (void) updatePortStatus
 {
-    tr_handle_status * stat = tr_handleStatus(fHandle);
+    const tr_handle_status * stat = tr_handleStatus(fHandle);
     if (fNatStatus != stat->natTraversalStatus || fPublicPort != stat->publicPort)
     {
         fNatStatus = stat->natTraversalStatus;
