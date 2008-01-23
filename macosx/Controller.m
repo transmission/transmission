@@ -38,6 +38,7 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSMenuAdditions.h"
+#import "NSMutableArrayAdditions.h"
 #import "UKKQueue.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
@@ -1645,6 +1646,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self updateDisplay: nil];
 }
 
+#warning rename sortIgnoringSelected
 - (void) prepareForDisplay
 {
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
@@ -1654,8 +1656,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                             ascending: asc selector: @selector(caseInsensitiveCompare:)] autorelease],
                     * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue"
                                             ascending: asc] autorelease];
-    
-    BOOL group = NO;
     
     NSArray * descriptors;
     if ([sortType isEqualToString: SORT_ORDER])
@@ -1711,8 +1711,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, orderDescriptor, nil];
         }
         
-        group = [fDefaults boolForKey: @"SortByGroup"];
-        if (group)
+        if (![NSApp isOnLeopardOrBetter] && [fDefaults boolForKey: @"SortByGroup"])
         {
             NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue"
                                                     ascending: asc] autorelease];
@@ -1726,40 +1725,28 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         }
     }
     
-    [fDisplayedTorrents sortUsingDescriptors: descriptors];
-    [descriptors release];
-    
-    //add group divider if necessary
-    int total = [fDisplayedTorrents count];
-    
-    [fDisplayedGroupIndexes removeAllIndexes];
-    if (group && total > 0 && [NSApp isOnLeopardOrBetter])
+    //actually sort
+    if ([fDefaults boolForKey: @"SortByGroup"] && [NSApp isOnLeopardOrBetter])
     {
-        int i, groupValue = [[fDisplayedTorrents objectAtIndex: 0] groupValue], newGroupValue, count = 1, start = 0;
-        for (i = 0; i < [fDisplayedTorrents count]; i++)
+        NSUInteger i, nextGroup;
+        for (i = [fDisplayedGroupIndexes firstIndex]; i != NSNotFound; i = nextGroup)
         {
-            BOOL last = i == [fDisplayedTorrents count]-1;
-            if (!last)
-                newGroupValue = [[fDisplayedTorrents objectAtIndex: i+1] groupValue];
-            if (groupValue != newGroupValue || last)
-            {
-                [fDisplayedTorrents insertObject: [NSNumber numberWithInt: groupValue] atIndex: start];
-                [fDisplayedGroupIndexes addIndex: start];
-                
-                groupValue = newGroupValue;
-                count = 1;
-                
-                start = i+2;
-                i++;
-            }
-            else
-                count++;
+            nextGroup = [fDisplayedGroupIndexes indexGreaterThanIndex: i];
+            NSUInteger count = (nextGroup != NSNotFound ? nextGroup : [fDisplayedTorrents count]) - i - 1;
+        
+            [fDisplayedTorrents sortIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(i+1, count)]
+                usingDescriptors: descriptors];
         }
     }
+    else
+        [fDisplayedTorrents sortUsingDescriptors: descriptors];
+    
+    [descriptors release];
     
     [fTableView reloadData];
 }
 
+#warning rename applyFilter
 - (void) updateDisplay: (id) sender
 {
     NSMutableArray * previousTorrents = [fDisplayedTorrents mutableCopy];
@@ -1885,6 +1872,36 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [torrent setPreviousAmountFinished: NULL];
     
     [previousTorrents release];
+    
+    #warning
+    //add group items
+    [fDisplayedGroupIndexes removeAllIndexes];
+    if ([fDefaults boolForKey: @"SortByGroup"] && [NSApp isOnLeopardOrBetter])
+    {
+        NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: YES] autorelease];
+        [fDisplayedTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
+        
+        int i, groupValue = [[fDisplayedTorrents objectAtIndex: 0] groupValue], newGroupValue, count = 1, start = 0;
+        for (i = 0; i < [fDisplayedTorrents count]; i++)
+        {
+            BOOL last = i == [fDisplayedTorrents count]-1;
+            if (!last)
+                newGroupValue = [[fDisplayedTorrents objectAtIndex: i+1] groupValue];
+            if (groupValue != newGroupValue || last)
+            {
+                [fDisplayedTorrents insertObject: [NSNumber numberWithInt: groupValue] atIndex: start];
+                [fDisplayedGroupIndexes addIndex: start];
+                
+                groupValue = newGroupValue;
+                count = 1;
+                
+                start = i+2;
+                i++;
+            }
+            else
+                count++;
+        }
+    }
     
     //sort, add groups, and reset selected
     [self prepareForDisplay];

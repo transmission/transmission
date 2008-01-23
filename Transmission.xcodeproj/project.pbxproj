@@ -86,6 +86,7 @@
 		A2265F420B5EF5F40093DDA5 /* FileNameCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileNameCell.m */; };
 		A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C7A118D0D0B2EB800B5701F /* libnatpmp.a */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
+		A22B862D0D47D91300F9BAD9 /* NSMutableArrayAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A22B862C0D47D91300F9BAD9 /* NSMutableArrayAdditions.m */; };
 		A22D3AA60D00D1790079CFED /* Turtle.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA30D00D1790079CFED /* Turtle.png */; };
 		A22D3AA70D00D1790079CFED /* TurtleBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA40D00D1790079CFED /* TurtleBlue.png */; };
 		A231274C0D11D0B7003F9AFF /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A231274B0D11D0B7003F9AFF /* AboutWindow.xib */; };
@@ -459,6 +460,8 @@
 		A223AABB0D22ECE800840069 /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/StatsWindow.xib; sourceTree = "<group>"; };
 		A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileNameCell.h; path = macosx/FileNameCell.h; sourceTree = "<group>"; };
 		A2265F400B5EF5F40093DDA5 /* FileNameCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileNameCell.m; path = macosx/FileNameCell.m; sourceTree = "<group>"; };
+		A22B862B0D47D91300F9BAD9 /* NSMutableArrayAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSMutableArrayAdditions.h; path = macosx/NSMutableArrayAdditions.h; sourceTree = "<group>"; };
+		A22B862C0D47D91300F9BAD9 /* NSMutableArrayAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSMutableArrayAdditions.m; path = macosx/NSMutableArrayAdditions.m; sourceTree = "<group>"; };
 		A22D3AA30D00D1790079CFED /* Turtle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Turtle.png; path = macosx/Images/Turtle.png; sourceTree = "<group>"; };
 		A22D3AA40D00D1790079CFED /* TurtleBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TurtleBlue.png; path = macosx/Images/TurtleBlue.png; sourceTree = "<group>"; };
 		A231274B0D11D0B7003F9AFF /* AboutWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = AboutWindow.xib; path = macosx/AboutWindow.xib; sourceTree = "<group>"; };
@@ -1111,6 +1114,8 @@
 				A21576090C0D449A0057A26A /* NSBezierPathAdditions.m */,
 				A234D0CF0C79FB3600A82373 /* NSMenuAdditions.h */,
 				A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */,
+				A22B862B0D47D91300F9BAD9 /* NSMutableArrayAdditions.h */,
+				A22B862C0D47D91300F9BAD9 /* NSMutableArrayAdditions.m */,
 			);
 			name = Additions;
 			sourceTree = "<group>";
@@ -1793,6 +1798,7 @@
 				A22180980D148A71007D09ED /* GroupsWindowController.m in Sources */,
 				A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */,
 				A26AF2840D2DC27C00FF7140 /* AddWindowController.m in Sources */,
+				A22B862D0D47D91300F9BAD9 /* NSMutableArrayAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
