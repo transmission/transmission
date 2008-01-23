@@ -284,9 +284,10 @@
 
 - (void) selectValues: (NSArray *) values
 {
-    id object;
+    NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSet];
+    
     NSEnumerator * enumerator = [values objectEnumerator];
-    NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
+    id object;
     while ((object = [enumerator nextObject]))
     {
         unsigned index = [fTorrents indexOfObject: object]; //works with torrents and groups
@@ -295,7 +296,6 @@
     }
     
     [self selectRowIndexes: indexSet byExtendingSelection: NO];
-    [indexSet release];
 }
 
 - (NSArray *) selectedValues
@@ -319,6 +319,7 @@
         {
             int count = next != NSNotFound ? next - i - 1 : [fTorrents count] - i - 1;
             [indexSet addIndexesInRange: NSMakeRange(i+1, count)];
+            i += count;
         }
     }
     [fTorrents objectsAtIndexes: indexSet];
