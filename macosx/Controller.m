@@ -1054,6 +1054,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [torrents makeObjectsPerformSelector: @selector(stopTransfer)];
     
     [self updateUI];
+    [self updateDisplay: nil];
     [self updateTorrentHistory];
 }
 
@@ -1505,6 +1506,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     [self updateUI];
+    [self updateDisplay: nil];
     [self updateTorrentHistory];
 }
 
@@ -2123,6 +2125,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [torrent setGroupValue: [sender tag]];
     
     [self updateUI];
+    [self updateDisplay: nil];
     [self updateTorrentHistory];
 }
 
