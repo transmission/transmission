@@ -458,7 +458,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
-    [self updateDisplay];
+    [self updateDisplay: nil];
     
     [fWindow makeKeyAndOrderFront: nil]; 
     
@@ -1028,7 +1028,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [torrent startTransfer];
     
     [self updateUI];
-    [self updateDisplay];
+    [self updateDisplay: nil];
     [self updateTorrentHistory];
 }
 
@@ -1336,7 +1336,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     while ((torrent = [enumerator nextObject]))
         [torrent resetCache];
     
-    [self updateDisplay];
+    [self updateDisplay: nil];
 }
 
 - (void) showPreferenceWindow: (id) sender
@@ -1390,7 +1390,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         if ([fWindow isVisible])
         {
-            [self updateDisplay];
+            [self updateDisplay: nil];
             
             //update status bar
             if (![fStatusBar isHidden])
@@ -1630,19 +1630,19 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     [fDefaults setObject: sortType forKey: @"Sort"];
-    [self updateDisplay];
+    [self updateDisplay: nil];
 }
 
 - (void) setSortByGroup: (id) sender
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"SortByGroup"] forKey: @"SortByGroup"];
-    [self updateDisplay];
+    [self updateDisplay: nil];
 }
 
 - (void) setSortReverse: (id) sender
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"SortReverse"] forKey: @"SortReverse"];
-    [self updateDisplay];
+    [self updateDisplay: nil];
 }
 
 - (void) prepareForDisplay
@@ -1738,14 +1738,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         int i, groupValue = [[fDisplayedTorrents objectAtIndex: 0] groupValue], newGroupValue, count = 1, start = 0;
         for (i = 0; i < [fDisplayedTorrents count]; i++)
         {
-            if (i < [fDisplayedTorrents count]-1)
+            BOOL last = i == [fDisplayedTorrents count]-1;
+            if (!last)
                 newGroupValue = [[fDisplayedTorrents objectAtIndex: i+1] groupValue];
-            if (groupValue != newGroupValue || i == [fDisplayedTorrents count]-1)
+            if (groupValue != newGroupValue || last)
             {
-                #warning count can be derived...elliminate
-                NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt: groupValue], @"Group",
-                                                                                [NSNumber numberWithInt: count], @"Count", nil];
-                [fDisplayedTorrents insertObject: dict atIndex: start];
+                [fDisplayedTorrents insertObject: [NSNumber numberWithInt: groupValue] atIndex: start];
                 [fDisplayedGroupIndexes addIndex: start];
                 
                 groupValue = newGroupValue;
@@ -1762,7 +1760,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fTableView reloadData];
 }
 
-- (void) updateDisplay
+- (void) updateDisplay: (id) sender
 {
     NSMutableArray * previousTorrents = [fDisplayedTorrents mutableCopy];
     [previousTorrents removeObjectsAtIndexes: fDisplayedGroupIndexes];
@@ -1948,7 +1946,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     else
         [sender setState: NSOnState];
 
-    [self updateDisplay];
+    [self updateDisplay: nil];
 }
 
 - (void) setFilterSearchType: (id) sender
@@ -1974,7 +1972,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [[fSearchFilterField cell] setPlaceholderString: [sender title]];
     }
     
-    [self updateDisplay];
+    [self updateDisplay: nil];
 }
 
 - (void) switchFilter: (id) sender
@@ -2108,7 +2106,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     [fDefaults setInteger: [sender tag] forKey: @"FilterGroup"];
     [self updateGroupsFilterButton];
-    [self updateDisplay];
+    [self updateDisplay: nil];
 }
 
 - (void) updateGroupsFilterButton
@@ -2141,7 +2139,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) updateGroupsFilters: (NSNotification *) notification
 {
     [self updateGroupsFilterButton];
-    [self updateDisplay];
+    [self updateDisplay: nil];
 }
 
 - (void) toggleSpeedLimit: (id) sender
@@ -2387,11 +2385,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
-    id object = [fDisplayedTorrents objectAtIndex: row];
-    if ([object isKindOfClass: [Torrent class]])
+    if (![fDisplayedGroupIndexes containsIndex: row])
         return nil;
     
-    int group = [[object objectForKey: @"Group"] intValue];
+    int group = [[fDisplayedTorrents objectAtIndex: row] intValue];
     return group != -1 ? [[GroupsWindowController groups] nameForIndex: group] : NSLocalizedString(@"No Group", "Group table row");
 }
 
@@ -2464,7 +2461,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         [sortedTorrents release];
         
-        [self updateDisplay];
+        [self updateDisplay: nil];
         
         //set selected rows
         [fTableView selectValues: selectedValues];

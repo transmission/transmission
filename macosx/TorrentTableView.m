@@ -295,11 +295,11 @@
             index = [fTorrents indexOfObject: object];
         else
         {
-            int value = [[object objectForKey: @"Group"] intValue];
+            int value = [object intValue];
             unsigned i;
             for (i = 0; i < [fTorrents count]; i++)
             {
-                if ([fGroupIndexes containsIndex: i] && value == [[[fTorrents objectAtIndex: i] objectForKey: @"Group"] intValue])
+                if ([fGroupIndexes containsIndex: i] && value == [[fTorrents objectAtIndex: i] intValue])
                 {
                     index = i;
                     break;
@@ -325,17 +325,17 @@
     NSIndexSet * selectedIndexes = [self selectedRowIndexes];
     NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSet];
     
-    NSUInteger i;
-    for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
+    NSUInteger i, next;
+    for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = next)
     {
+        next = [selectedIndexes indexGreaterThanIndex: i];
+        
         if (![fGroupIndexes containsIndex: i])
             [indexSet addIndex: i];
         else
         {
-            #warning elliminate count so equals comparison can be done?
-            int count = [[[fTorrents objectAtIndex: i] objectForKey: @"Count"] intValue];
+            int count = next != NSNotFound ? next - i - 1 : [fTorrents count] - i - 1;
             [indexSet addIndexesInRange: NSMakeRange(i+1, count)];
-            i += count;
         }
     }
     [fTorrents objectsAtIndexes: indexSet];
