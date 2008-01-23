@@ -28,6 +28,9 @@
 
 - (void) sortIndexes: (NSIndexSet *) indexes usingDescriptors: (NSArray *) sortDescriptors
 {
+    if ([indexes count] <= 1)
+        return;
+    
     NSArray * items = [self objectsAtIndexes: indexes];
     items = [items sortedArrayUsingDescriptors: sortDescriptors];
     [self replaceObjectsAtIndexes: indexes withObjects: items];

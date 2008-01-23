@@ -524,7 +524,7 @@
         if (fMouseDownMinimalStatusField)
         {
             [fFieldBackColor set];
-            [[NSBezierPath bezierPathWithRoundedRect: NSInsetRect(minimalStatusRect, -4.0, 0.0) radius: 5.0] fill];
+            [[NSBezierPath bezierPathWithRoundedRect: NSInsetRect(minimalStatusRect, -2.0, 0.0) radius: 5.0] fill];
         }
         
         [minimalString drawInRect: minimalStatusRect];
@@ -544,7 +544,7 @@
         if (fMouseDownProgressField)
         {
             [fFieldBackColor set];
-            [[NSBezierPath bezierPathWithRoundedRect: NSInsetRect(progressRect, -4.0, 0.0) radius: 5.0] fill];
+            [[NSBezierPath bezierPathWithRoundedRect: NSInsetRect(progressRect, -2.0, 0.0) radius: 5.0] fill];
         }
         
         [progressString drawInRect: progressRect];
