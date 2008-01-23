@@ -138,6 +138,11 @@
                                                 : [[self preparedCellAtColumn: 0 row: row] stringValue];
 }
 
+- (BOOL) tableView: (NSTableView *) tableView shouldEditTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
+{
+    return NO;
+}
+
 - (void) updateTrackingAreas
 {
     [super updateTrackingAreas];
@@ -308,7 +313,7 @@
     NSIndexSet * selectedIndexes = [self selectedRowIndexes];
     NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSet];
     
-    NSUInteger i, next;
+    NSUInteger i;
     for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
     {
         
