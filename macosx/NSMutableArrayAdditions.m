@@ -28,7 +28,7 @@
 
 - (void) sortIndexes: (NSIndexSet *) indexes usingDescriptors: (NSArray *) sortDescriptors
 {
-	NSArray * items = [self objectsAtIndexes: indexes];
+    NSArray * items = [self objectsAtIndexes: indexes];
     items = [items sortedArrayUsingDescriptors: sortDescriptors];
     [self replaceObjectsAtIndexes: indexes withObjects: items];
 }

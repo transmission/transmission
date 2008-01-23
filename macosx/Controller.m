@@ -1391,7 +1391,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         if ([fWindow isVisible])
         {
-            [self updateDisplay: nil];
+            [self sortTorrents];
             
             //update status bar
             if (![fStatusBar isHidden])
@@ -1631,23 +1631,31 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     [fDefaults setObject: sortType forKey: @"Sort"];
-    [self updateDisplay: nil];
+    [self sortTorrents];
 }
 
 - (void) setSortByGroup: (id) sender
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"SortByGroup"] forKey: @"SortByGroup"];
-    [self updateDisplay: nil];
+    [self sortTorrents];
 }
 
 - (void) setSortReverse: (id) sender
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"SortReverse"] forKey: @"SortReverse"];
-    [self updateDisplay: nil];
+    [self sortTorrents];
 }
 
-#warning rename sortIgnoringSelected
-- (void) prepareForDisplay
+- (void) sortTorrents
+{
+    NSArray * selectedValues = [fTableView selectedValues];
+    
+    [self sortTorrentsIgnoreSelected]; //actually sort
+    
+    [fTableView selectValues: selectedValues];
+}
+
+- (void) sortTorrentsIgnoreSelected
 {
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
     BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
@@ -1873,10 +1881,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [previousTorrents release];
     
-    #warning
     //add group items
     [fDisplayedGroupIndexes removeAllIndexes];
-    if ([fDefaults boolForKey: @"SortByGroup"] && [NSApp isOnLeopardOrBetter])
+    if ([fDefaults boolForKey: @"SortByGroup"] && [fDisplayedTorrents count] > 0 && [NSApp isOnLeopardOrBetter])
     {
         NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: YES] autorelease];
         [fDisplayedTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
@@ -1903,8 +1910,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         }
     }
     
-    //sort, add groups, and reset selected
-    [self prepareForDisplay];
+    //actually sort
+    [self sortTorrentsIgnoreSelected];
     [fTableView selectValues: selectedValues];
     
     //set status bar torrent count text

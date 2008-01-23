@@ -193,6 +193,8 @@ typedef enum
 
 - (void) updateDisplay: (id) sender;
 
+- (void) sortTorrents;
+- (void) sortTorrentsIgnoreSelected;
 - (void) setSort: (id) sender;
 - (void) setSortByGroup: (id) sender;
 - (void) setSortReverse: (id) sender;
