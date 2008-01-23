@@ -130,7 +130,8 @@
 
 - (NSString *) tableView: (NSTableView *) tableView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
-    return [[fTorrents objectAtIndex: row] name];
+    id object = [fTorrents objectAtIndex: row];
+    return [object isKindOfClass: [Torrent class]] ? [object name] : [[self preparedCellAtColumn: 0 row: row] stringValue];
 }
 
 - (void) updateTrackingAreas

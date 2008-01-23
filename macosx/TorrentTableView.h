@@ -26,7 +26,7 @@
 #import <transmission.h>
 #import <Controller.h>
 
-#define GROUP_SEPARATOR_HEIGHT 20.0
+#define GROUP_SEPARATOR_HEIGHT 18.0
 
 @class TorrentCell;
 
