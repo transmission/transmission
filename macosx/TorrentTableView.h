@@ -36,6 +36,8 @@
     NSArray * fTorrents;
     NSIndexSet * fGroupIndexes;
     
+    TorrentCell * fTorrentCell;
+    
     NSUserDefaults * fDefaults;
     
     IBOutlet NSMenu * fContextRow, * fContextNoRow;

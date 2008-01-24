@@ -58,6 +58,8 @@
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         
+        fTorrentCell = [[TorrentCell alloc] init];
+        
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
         fMouseActionRow = -1;
@@ -73,8 +75,10 @@
 
 - (void) awakeFromNib
 {
+    [self setGridStyleMask: NSTableViewSolidVerticalGridLineMask]; //weird redrawing issues if set to none
+    
     if (![NSApp isOnLeopardOrBetter])
-        [[self tableColumnWithIdentifier: @"Torrent"] setDataCell: [[[TorrentCell alloc] init] autorelease]];
+        [[self tableColumnWithIdentifier: @"Torrent"] setDataCell: fTorrentCell];
 }
 
 - (void) dealloc
@@ -85,6 +89,8 @@
     
     [fKeyStrokes release];
     [fMenuTorrent release];
+    
+    [fTorrentCell release];
     
     [super dealloc];
 }
@@ -99,9 +105,10 @@
     fGroupIndexes = indexes;
 }
 
+#warning needed?
 - (id) dataCellForRow: (NSInteger) row
 {
-    return (row == -1 || ![fGroupIndexes containsIndex: row]) ? [[[TorrentCell alloc] init] autorelease] : nil;
+    return (row == -1 || ![fGroupIndexes containsIndex: row]) ? fTorrentCell : nil;
 }
 
 - (BOOL) tableView: (NSTableView *) tableView isGroupRow: (NSInteger) row
