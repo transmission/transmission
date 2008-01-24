@@ -156,22 +156,19 @@
     
     [self removeButtonTrackingAreas];
     
-    NSRange visibleRows = [self rowsInRect: [self visibleRect]];
-    if (visibleRows.length == 0)
+    NSMutableIndexSet * indexes = [NSMutableIndexSet indexSetWithIndexesInRange: [self rowsInRect: [self visibleRect]]];
+    [indexes removeIndexes: fGroupIndexes];
+    if ([indexes count] == 0)
         return;
     
-    int col = [self columnWithIdentifier: @"Torrent"];
     NSPoint mouseLocation = [self convertPoint: [[self window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil];
     
-    int row;
-    for (row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
+    NSUInteger row;
+    for (row = [indexes firstIndex]; row != NSNotFound; row = [indexes indexGreaterThanIndex: row])
     {
-        if ([fGroupIndexes containsIndex: row])
-            continue;
-        
         NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: row] forKey: @"Row"];
-        TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: col row: row];
-        [cell addTrackingAreasForView: self inRect: [self frameOfCellAtColumn: col row: row] withUserInfo: userInfo
+        TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: 0 row: row];
+        [cell addTrackingAreasForView: self inRect: [self frameOfCellAtColumn: 0 row: row] withUserInfo: userInfo
                 mouseLocation: mouseLocation];
     }
 }
@@ -682,7 +679,7 @@
     
     TorrentCell * cell;
     if ([NSApp isOnLeopardOrBetter])
-        cell = (TorrentCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
+        cell = (TorrentCell *)[self preparedCellAtColumn: 0 row: row];
     else
     {
         cell = [self dataCellForRow: row];
@@ -699,7 +696,7 @@
     
     TorrentCell * cell;
     if ([NSApp isOnLeopardOrBetter])
-        cell = (TorrentCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
+        cell = (TorrentCell *)[self preparedCellAtColumn: 0 row: row];
     else
     {
         cell = [self dataCellForRow: row];

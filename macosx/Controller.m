@@ -2657,7 +2657,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             frame.origin.y -= heightChange;
             
             [fWindow setFrame: frame display: YES];
-            [fTableView reloadData];
         }
     }
     else
