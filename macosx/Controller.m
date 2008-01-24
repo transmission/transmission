@@ -1609,6 +1609,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             sortType = SORT_ORDER;
             [fDefaults setBool: NO forKey: @"SortReverse"];
             [fDefaults setBool: NO forKey: @"SortByGroup"];
+            [self updateDisplay: nil]; //ensure groups are removed
             break;
         case SORT_DATE_TAG:
             sortType = SORT_DATE;

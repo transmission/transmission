@@ -105,12 +105,6 @@
     fGroupIndexes = indexes;
 }
 
-#warning needed?
-- (id) dataCellForRow: (NSInteger) row
-{
-    return (row == -1 || ![fGroupIndexes containsIndex: row]) ? fTorrentCell : nil;
-}
-
 - (BOOL) tableView: (NSTableView *) tableView isGroupRow: (NSInteger) row
 {
     return [fGroupIndexes containsIndex: row];
@@ -123,7 +117,7 @@
 
 - (NSCell *) tableView: (NSTableView *) tableView dataCellForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
-    return [self dataCellForRow: row];
+    return ![fGroupIndexes containsIndex: row] ? fTorrentCell : nil;
 }
 
 - (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn row: (int) row
@@ -449,7 +443,7 @@
     [fActionMenu appendItemsFromMenu: fileMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range] atBottom: YES];
     
     //place menu below button
-    NSRect rect = [[self dataCellForRow: row] iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]];
+    NSRect rect = [fTorrentCell iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]];
     NSPoint location = rect.origin;
     location.y += rect.size.height + 5.0;
     location = [self convertPoint: location toView: nil];
@@ -647,8 +641,7 @@
     if (row < 0 || [fGroupIndexes containsIndex: row])
         return NO;
     
-    TorrentCell * cell = [self dataCellForRow: row];
-    return NSPointInRect(point, [cell controlButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    return NSPointInRect(point, [fTorrentCell controlButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (BOOL) pointInRevealRect: (NSPoint) point
@@ -657,8 +650,7 @@
     if (row < 0 || [fGroupIndexes containsIndex: row])
         return NO;
     
-    TorrentCell * cell = [self dataCellForRow: row];
-    return NSPointInRect(point, [cell revealButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    return NSPointInRect(point, [fTorrentCell revealButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (BOOL) pointInActionRect: (NSPoint) point
@@ -667,8 +659,7 @@
     if (row < 0 || [fGroupIndexes containsIndex: row])
         return NO;
     
-    TorrentCell * cell = [self dataCellForRow: row];
-    return NSPointInRect(point, [cell iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    return NSPointInRect(point, [fTorrentCell iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (BOOL) pointInProgressRect: (NSPoint) point
@@ -682,7 +673,7 @@
         cell = (TorrentCell *)[self preparedCellAtColumn: 0 row: row];
     else
     {
-        cell = [self dataCellForRow: row];
+        cell = fTorrentCell;
         [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
     }
     return NSPointInRect(point, [cell progressRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
@@ -699,7 +690,7 @@
         cell = (TorrentCell *)[self preparedCellAtColumn: 0 row: row];
     else
     {
-        cell = [self dataCellForRow: row];
+        cell = fTorrentCell;
         [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
     }
     return NSPointInRect(point, [cell minimalStatusRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
