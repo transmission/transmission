@@ -2634,6 +2634,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fTableView setRowHeight: makeSmall ? ROW_HEIGHT_SMALL : ROW_HEIGHT_REGULAR];
     
+    //non-group rows are being resized
+    NSMutableIndexSet * indexes = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTableView numberOfRows])];
+    [indexes removeIndexes: fDisplayedGroupIndexes];
+    [fTableView noteHeightOfRowsWithIndexesChanged: indexes];
+    
     //window min height
     NSSize contentMinSize = [fWindow contentMinSize],
             contentSize = [[fWindow contentView] frame].size;
