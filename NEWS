@@ -1,5 +1,9 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.03 (2008/xx/yy)
+- All Platforms:
+   + Fix handshake bug with peers that support LTEP
+
 1.02 (2008/01/22)
 - All Platforms:
    + Fix 1.00 bug that choked some models of routers

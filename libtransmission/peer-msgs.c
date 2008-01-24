@@ -856,10 +856,11 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
                                       : ENCRYPTION_PREFERENCE_NO;
 
     /* check supported messages for utorrent pex */
+    msgs->peerSupportsPex = 0;
     if(( sub = tr_bencDictFindType( &val, "m", TYPE_DICT ))) {
         if(( sub = tr_bencDictFindType( sub, "ut_pex", TYPE_INT ))) {
-            msgs->peerSupportsPex = 1;
             msgs->ut_pex_id = (uint8_t) sub->val.i;
+            msgs->peerSupportsPex = msgs->ut_pex_id == 0 ? 0 : 1;
             dbgmsg( msgs, "msgs->ut_pex is %d", (int)msgs->ut_pex_id );
         }
     }
