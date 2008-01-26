@@ -1848,14 +1848,11 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->clientAllowedPieces = tr_bitfieldNew( m->torrent->info.pieceCount );
     m->clientSuggestedPieces = tr_bitfieldNew( m->torrent->info.pieceCount );
     *setme = tr_publisherSubscribe( m->publisher, func, userData );
-    
-    tr_peerIoSetTimeoutSecs( m->io, 150 ); /* timeout after N seconds of inactivity */
-    tr_peerIoSetIOFuncs( m->io, canRead, didWrite, gotError, m );
-    ratePulse( m );
 
     if ( tr_peerIoSupportsLTEP( m->io ) )
         sendLtepHandshake( m );
 
+    /* bitfield/have-all/have-none must preceed other non-handshake messages... */
     if ( !tr_peerIoSupportsFEXT( m->io ) )
         sendBitfield( m );
     else {
@@ -1869,6 +1866,10 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
             sendBitfield( m );
         }
     }
+    
+    tr_peerIoSetTimeoutSecs( m->io, 150 ); /* timeout after N seconds of inactivity */
+    tr_peerIoSetIOFuncs( m->io, canRead, didWrite, gotError, m );
+    ratePulse( m );
 
     return m;
 }

@@ -9,12 +9,13 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.03 (2008/xx/yy)
 - All Platforms:
    + Fix handshake bug with peers that support LTEP
+   + Fix handshake bug with mainline BitTorrent
 
 1.02 (2008/01/22)
 - All Platforms:
    + Fix 1.00 bug that choked some models of routers
    + Fix 1.00 crash in peer handshake
-   + Fix 1.01 bug that sometimes froze the app for a long time
+   + Fix 1.00 bug that sometimes froze the app for a long time
    + Minor improvements to the command-line client
 - GTK+
    + Fix crash when removing a torrent while its details window is open
