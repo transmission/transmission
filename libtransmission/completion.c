@@ -151,7 +151,8 @@ const tr_bitfield * tr_cpPieceBitfield( const tr_completion * cp )
     return cp->pieceBitfield;
 }
 
-void tr_cpPieceAdd( tr_completion * cp, int piece )
+void
+tr_cpPieceAdd( tr_completion * cp, int piece )
 {
     const tr_torrent * tor = cp->tor;
     const int start = tr_torPieceFirstBlock(tor,piece);
@@ -162,7 +163,8 @@ void tr_cpPieceAdd( tr_completion * cp, int piece )
         tr_cpBlockAdd( cp, i );
 }
 
-void tr_cpPieceRem( tr_completion * cp, int piece )
+void
+tr_cpPieceRem( tr_completion * cp, int piece )
 {
     const tr_torrent * tor = cp->tor;
     const int start = tr_torPieceFirstBlock(tor,piece);
@@ -189,6 +191,10 @@ void tr_cpPieceRem( tr_completion * cp, int piece )
     cp->completeBlocks[piece] = 0;
     tr_bitfieldRemRange ( cp->blockBitfield, start, end );
     tr_bitfieldRem( cp->pieceBitfield, piece );
+
+    assert( cp->completeHave <= tor->info.totalSize );
+    assert( cp->doneHave <= tor->info.totalSize );
+    assert( cp->doneHave <= cp->completeHave );
 }
 
 int tr_cpBlockIsComplete( const tr_completion * cp, int block )
@@ -218,6 +224,10 @@ tr_cpBlockAdd( tr_completion * cp, int block )
         if( !tor->info.pieces[piece].dnd )
             cp->doneHave += blockSize;
     }
+
+    assert( cp->completeHave <= tor->info.totalSize );
+    assert( cp->doneHave <= tor->info.totalSize );
+    assert( cp->doneHave <= cp->completeHave );
 }
 
 const tr_bitfield * tr_cpBlockBitfield( const tr_completion * cp )
@@ -262,6 +272,8 @@ tr_cpPercentComplete ( const tr_completion * cp )
 uint64_t
 tr_cpLeftUntilComplete ( const tr_completion * cp )
 {
+    assert( cp->tor->info.totalSize >= cp->completeHave );
+
     return cp->tor->info.totalSize - cp->completeHave;
 }
 
@@ -284,7 +296,9 @@ tr_cpLeftUntilDone ( const tr_completion * cp )
 cp_status_t
 tr_cpGetStatus ( const tr_completion * cp )
 {
-    if( cp->completeHave >= cp->tor->info.totalSize )
+    assert( cp->tor->info.totalSize >= cp->completeHave );
+
+    if( cp->completeHave == cp->tor->info.totalSize )
         return TR_CP_COMPLETE;
 
     tr_cpEnsureDoneValid( cp );
