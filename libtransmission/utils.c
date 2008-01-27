@@ -645,7 +645,7 @@ tr_bitfieldClear( tr_bitfield * bitfield )
 int
 tr_bitfieldIsEmpty( const tr_bitfield * bitfield )
 {
-    unsigned int i;
+    size_t i;
 
     for( i=0; i<bitfield->len; ++i )
         if( bitfield->bits[i] )
@@ -675,7 +675,7 @@ tr_bitfieldAddRange( tr_bitfield  * bitfield,
                      size_t         end )
 {
     /* TODO: there are faster ways to do this */
-    unsigned int i;
+    size_t i;
     for( i=begin; i<end; ++i )
         tr_bitfieldAdd( bitfield, i );
 }
@@ -698,7 +698,7 @@ tr_bitfieldRemRange ( tr_bitfield  * b,
                       size_t         end )
 {
     /* TODO: there are faster ways to do this */
-    unsigned int i;
+    size_t i;
     for( i=begin; i<end; ++i )
         tr_bitfieldRem( b, i );
 }
