@@ -59,6 +59,8 @@
         fDefaults = [NSUserDefaults standardUserDefaults];
         
         fTorrentCell = [[TorrentCell alloc] init];
+        if (![NSApp isOnLeopardOrBetter])
+            [[self tableColumnWithIdentifier: @"Torrent"] setDataCell: fTorrentCell];
         
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
@@ -76,9 +78,6 @@
 - (void) awakeFromNib
 {
     [self setGridStyleMask: NSTableViewSolidVerticalGridLineMask]; //weird redrawing issues if set to none
-    
-    if (![NSApp isOnLeopardOrBetter])
-        [[self tableColumnWithIdentifier: @"Torrent"] setDataCell: fTorrentCell];
 }
 
 - (void) dealloc
@@ -745,19 +744,22 @@
 
 - (void) resizePiecesBarIncrement
 {
-    BOOL increase = [fDefaults boolForKey: @"PiecesBar"];
-    
-    if (increase)
-        fPiecesBarPercent += PIECE_INCREASE;
+    BOOL done;
+    if ([fDefaults boolForKey: @"PiecesBar"])
+    {
+        fPiecesBarPercent = MIN(fPiecesBarPercent + PIECE_INCREASE, 1.0);
+        done = fPiecesBarPercent == 1.0;
+    }
     else
-        fPiecesBarPercent -= PIECE_INCREASE;
+    {
+        fPiecesBarPercent = MAX(fPiecesBarPercent - PIECE_INCREASE, 0.0);
+        done = fPiecesBarPercent == 0.0;
+    }
     
-    if (increase ? (fPiecesBarPercent >= 1.0) : (fPiecesBarPercent <= 0.0))
+    if (done)
     {
         [fPiecesBarTimer invalidate];
         fPiecesBarTimer = nil;
-        
-        fPiecesBarPercent = increase ? 1.0 : 0.0;
     }
     
     [self reloadData];
