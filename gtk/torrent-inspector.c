@@ -598,20 +598,20 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
     gtk_box_pack_start (GTK_BOX(vbox), l, FALSE, FALSE, 0);
 
     w = da = p->completeness = gtk_drawing_area_new ();
-    gtk_widget_set_usize (w, 0u, 100u);
+    gtk_widget_set_size_request (w, 0u, 100u);
     g_object_set_data (G_OBJECT(w), "draw-mode", GINT_TO_POINTER(DRAW_AVAIL));
     g_signal_connect (w, "expose-event", G_CALLBACK(refresh_pieces), gtor);
 
     h = gtk_hbox_new (FALSE, GUI_PAD);
     w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_usize (w, GUI_PAD_BIG, 0);
+    gtk_widget_set_size_request (w, GUI_PAD_BIG, 0);
     gtk_box_pack_start (GTK_BOX(h), w, FALSE, FALSE, 0);
     gtk_box_pack_start_defaults (GTK_BOX(h), da);
     gtk_box_pack_start (GTK_BOX(vbox), h, FALSE, FALSE, 0);
 
     /* a small vertical spacer */
     w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_usize (w, 0u, GUI_PAD);
+    gtk_widget_set_size_request (w, 0u, GUI_PAD);
     gtk_box_pack_start (GTK_BOX(vbox), w, FALSE, FALSE, 0);
 
     g_snprintf (name, sizeof(name), "<b>%s</b>", _("Connected Peers"));
@@ -622,14 +622,14 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
 
     h = gtk_hbox_new (FALSE, GUI_PAD);
     w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_usize (w, GUI_PAD_BIG, 0);
+    gtk_widget_set_size_request (w, GUI_PAD_BIG, 0);
     gtk_box_pack_start (GTK_BOX(h), w, FALSE, FALSE, 0);
     gtk_box_pack_start_defaults (GTK_BOX(h), sw);
     gtk_box_pack_start_defaults (GTK_BOX(vbox), h);
 
     hbox = gtk_hbox_new (FALSE, GUI_PAD);
     w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_usize (w, GUI_PAD_BIG, 0);
+    gtk_widget_set_size_request (w, GUI_PAD_BIG, 0);
     gtk_box_pack_start (GTK_BOX(hbox), w, FALSE, FALSE, 0);
         g_snprintf (name, sizeof(name), "<b>%s:</b>", _("Seeders"));
         l = gtk_label_new (NULL);
@@ -886,7 +886,7 @@ activity_page_new (TrTorrent * gtor)
     hig_workarea_add_row (t, &row, _("Error:"), l, NULL);
 
     w = a->availability_da = gtk_drawing_area_new ();
-    gtk_widget_set_usize (w, 0u, 100u);
+    gtk_widget_set_size_request (w, 0u, 100u);
     g_object_set_data (G_OBJECT(w), "draw-mode", GINT_TO_POINTER(DRAW_PROG));
     g_signal_connect (w, "expose-event", G_CALLBACK(refresh_pieces), gtor);
     hig_workarea_add_row (t, &row, _("Completeness:"), w, NULL);
@@ -1336,7 +1336,7 @@ file_page_new ( TrTorrent * gtor )
     gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(scroll),
                                          GTK_SHADOW_IN);
     gtk_container_add( GTK_CONTAINER( scroll ), view );
-    gtk_widget_set_usize (scroll, 0u, 200u);
+    gtk_widget_set_size_request (scroll, 0u, 200u);
     gtk_container_set_border_width (GTK_CONTAINER(scroll), GUI_PAD);
 
     ret = scroll;

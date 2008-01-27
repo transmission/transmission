@@ -260,7 +260,7 @@ msgwin_create( TrCore * core )
                              NULL, NULL, NULL, NULL);
 
   w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
-  gtk_widget_set_usize( w, GUI_PAD_SMALL, GUI_PAD_SMALL );
+  gtk_widget_set_size_request( w, GUI_PAD_SMALL, GUI_PAD_SMALL );
   gtk_toolbar_append_element( GTK_TOOLBAR(toolbar),
                               GTK_TOOLBAR_CHILD_WIDGET, w,
                               NULL, NULL, NULL, NULL, NULL, NULL);

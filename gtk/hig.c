@@ -27,7 +27,7 @@ hig_workarea_add_section_divider  (GtkWidget   * table,
                                    int         * row)
 {
 	GtkWidget * w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-	gtk_widget_set_usize (w, 0u, 6u);
+	gtk_widget_set_size_request (w, 0u, 6u);
 	gtk_table_attach (GTK_TABLE(table), w, 0, 4, *row, *row+1, 0, 0, 0, 0);
 	++*row;
 }
@@ -57,12 +57,12 @@ hig_workarea_add_section_spacer  (GtkWidget   * table,
 
 	/* spacer to move the fields a little to the right of the name header */
 	w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-	gtk_widget_set_usize (w, 18u, 0u);
+	gtk_widget_set_size_request (w, 18u, 0u);
 	gtk_table_attach (GTK_TABLE(table), w, 0, 1, row, row+items_in_section, 0, 0, 0, 0);
 
 	/* spacer between the controls and their labels */
 	w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-	gtk_widget_set_usize (w, 12u, 0u);
+	gtk_widget_set_size_request (w, 12u, 0u);
 	gtk_table_attach (GTK_TABLE(table), w, 2, 3, row, row+items_in_section, 0, 0, 0, 0);
 }
 

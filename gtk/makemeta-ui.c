@@ -270,7 +270,7 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
         w = ui->pieces_lb = gtk_label_new (NULL);
         gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
         w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-        gtk_widget_set_usize (w, 2 * GUI_PAD_BIG, 0);
+        gtk_widget_set_size_request (w, 2 * GUI_PAD_BIG, 0);
         gtk_box_pack_start_defaults ( GTK_BOX(h), w );
         hig_workarea_add_row (t, &row, "", h, NULL);
         

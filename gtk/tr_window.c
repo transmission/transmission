@@ -516,14 +516,14 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     w = gtk_image_new_from_stock( GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU );
     gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
     w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
-    gtk_widget_set_usize( w, GUI_PAD, 0u );
+    gtk_widget_set_size_request( w, GUI_PAD, 0u );
     gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
     w = p->dl_lb = gtk_label_new( NULL );
     gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
     w = gtk_image_new_from_stock( GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU );
     gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
     w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
-    gtk_widget_set_usize( w, GUI_PAD, 0u );
+    gtk_widget_set_size_request( w, GUI_PAD, 0u );
     gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
     w = p->stats_lb = gtk_label_new( NULL );
     gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
