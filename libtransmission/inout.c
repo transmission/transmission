@@ -18,6 +18,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <openssl/sha.h>
+
 #include "transmission.h"
 #include "completion.h"
 #include "crypto.h"
@@ -224,25 +226,34 @@ tr_ioRecalculateHash( tr_torrent  * tor,
                       int           pieceIndex,
                       uint8_t     * setme )
 {
-    int n;
-    int ret;
-    uint8_t * buf;
+    int offset;
+    int bytesLeft;
+    uint8_t buf[4096];
     const tr_info * info;
+    SHA_CTX sha;
 
     assert( tor != NULL );
     assert( setme != NULL );
     assert( 0<=pieceIndex && pieceIndex<tor->info.pieceCount );
 
     info = &tor->info;
-    n = tr_torPieceCountBytes( tor, pieceIndex );
+    offset = 0;
+    bytesLeft = tr_torPieceCountBytes( tor, pieceIndex );
+    SHA1_Init( &sha );
 
-    buf = tr_new( uint8_t, n );
-    ret = tr_ioRead( tor, pieceIndex, 0, n, buf );
-    if( !ret )
-        tr_sha1( setme, buf, n, NULL );
-    tr_free( buf );
+    while( bytesLeft > 0 )
+    {
+        const int bytesThisPass = MIN( bytesLeft, (int)sizeof(buf) );
+        int ret = tr_ioRead( tor, pieceIndex, offset, bytesThisPass, buf );
+        if( ret )
+            return ret;
+        SHA1_Update( &sha, buf, bytesThisPass );
+        bytesLeft -= bytesThisPass;
+        offset += bytesThisPass;
+    }
 
-    return ret;
+    SHA1_Final( setme, &sha );
+    return 0;
 }
 
 static int
