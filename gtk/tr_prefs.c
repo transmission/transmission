@@ -270,14 +270,14 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     hig_workarea_add_section_title (t, &row, _("Speed Limits"));
     hig_workarea_add_section_spacer (t, row, 2);
 
-        s = _("_Limit Upload Speed (KiB/s)");
+        s = _("_Limit upload speed (KiB/s)");
         w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_double_control( t, &row, w, w2 );
 
-        s = _("Li_mit Download Speed (KiB/s)");
+        s = _("Li_mit download speed (KiB/s)");
         w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_DL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ) );
@@ -340,15 +340,15 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     hig_workarea_add_section_title (t, &row, _("Options"));
     hig_workarea_add_section_spacer (t, row, 3);
         
-        s = _("Use Peer _Exchange if Possible");
+        s = _("Use peer _exchange if possible");
         w = new_check_button( s, PREF_KEY_PEX, core );
         hig_workarea_add_wide_control( t, &row, w );
         
-        s = _("_Ignore Unencrypted Peers");
+        s = _("_Ignore unencrypted peers");
         w = new_check_button( s, PREF_KEY_ENCRYPTED_ONLY, core );
         hig_workarea_add_wide_control( t, &row, w );
         
-        s = _("Show an Icon in the System _Tray");
+        s = _("Show an icon in the system _tray");
         w = new_check_button( s, PREF_KEY_SYSTRAY, core );
         hig_workarea_add_wide_control( t, &row, w );
         
