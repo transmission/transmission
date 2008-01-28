@@ -1164,7 +1164,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [torrent setWaitToStart: NO];
     
     [fTorrents removeObjectsInArray: torrents];
-    [fDisplayedTorrents removeObjectsInArray: torrents];
     
     int lowestOrderValue = INT_MAX;
     enumerator = [torrents objectEnumerator];
@@ -2242,17 +2241,17 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) setLimitGlobalEnabled: (id) sender
 {
-    [fDefaults setBool: sender == ([sender menu] == fUploadMenu ? fUploadLimitItem : fDownloadLimitItem)
-        forKey: [sender menu] == fUploadMenu ? @"CheckUpload" : @"CheckDownload"];
+    BOOL upload = [sender menu] == fUploadMenu;
+    [fDefaults setBool: sender == (upload ? fUploadLimitItem : fDownloadLimitItem) forKey: upload ? @"CheckUpload" : @"CheckDownload"];
     
     [fPrefsController applySpeedSettings: nil];
 }
 
 - (void) setQuickLimitGlobal: (id) sender
 {
-    [fDefaults setInteger: [[sender representedObject] intValue] forKey: [sender menu] == fUploadMenu
-                ? @"UploadLimit" : @"DownloadLimit"];
-    [fDefaults setBool: YES forKey: [sender menu] == fUploadMenu ? @"CheckUpload" : @"CheckDownload"];
+    BOOL upload = [sender menu] == fUploadMenu;
+    [fDefaults setInteger: [[sender representedObject] intValue] forKey: upload ? @"UploadLimit" : @"DownloadLimit"];
+    [fDefaults setBool: YES forKey: upload ? @"CheckUpload" : @"CheckDownload"];
     
     [fPrefsController updateLimitFields];
     [fPrefsController applySpeedSettings: nil];
