@@ -96,7 +96,8 @@ static const char * LICENSE =
 "SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.";
 #endif
 
-struct cbdata {
+struct cbdata
+{
     GtkWindow    * wind;
     TrCore       * core;
     GtkWidget    * icon;
@@ -105,6 +106,8 @@ struct cbdata {
     guint          timer;
     gboolean       closing;
     GList        * errqueue;
+    GHashTable   * tor2details;
+    GHashTable   * details2tor;
 };
 
 #define CBDATA_PTR "callback-data-pointer"
@@ -220,7 +223,7 @@ int
 main( int argc, char ** argv )
 {
     char * err;
-    struct cbdata * cbdata = g_new (struct cbdata, 1);
+    struct cbdata * cbdata;
     GList * argfiles;
     GError * gerr;
     gboolean didinit = FALSE;
@@ -240,6 +243,10 @@ main( int argc, char ** argv )
 #endif
         { NULL, 0, 0, 0, NULL, NULL, NULL }
     };
+
+    cbdata = g_new0( struct cbdata, 1 );
+    cbdata->tor2details = g_hash_table_new( g_str_hash, g_str_equal );
+    cbdata->details2tor = g_hash_table_new( g_direct_hash, g_direct_equal );
 
     /* bind the gettext domain */
     bindtextdomain( domain, TRANSMISSIONLOCALEDIR );
@@ -440,6 +447,9 @@ quitThreadFunc( gpointer gdata )
         g_list_foreach( cbdata->errqueue, (GFunc)g_free, NULL );
         g_list_free( cbdata->errqueue );
     }
+
+    g_hash_table_destroy( cbdata->details2tor );
+    g_hash_table_destroy( cbdata->tor2details );
     g_free( cbdata );
 
     /* exit the gtk main loop */
@@ -850,16 +860,38 @@ updateTrackerForeach (GtkTreeModel * model,
 }
 
 static void
+detailsClosed( gpointer user_data, GObject * details )
+{
+    struct cbdata * data = user_data;
+    gpointer hashString = g_hash_table_lookup( data->details2tor, details );
+    g_hash_table_remove( data->details2tor, details );
+    g_hash_table_remove( data->tor2details, hashString );
+}
+
+static void
 showInfoForeach (GtkTreeModel * model,
                  GtkTreePath  * path UNUSED,
                  GtkTreeIter  * iter,
-                 gpointer       data UNUSED)
+                 gpointer       user_data )
 {
+    const char * hashString;
+    struct cbdata * data = user_data;
     TrTorrent * tor = NULL;
     GtkWidget * w;
+
     gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
-    w = torrent_inspector_new( GTK_WINDOW(data), tor );
-    gtk_widget_show( w );
+    hashString = tr_torrent_info(tor)->hashString;
+    w = g_hash_table_lookup( data->tor2details, hashString );
+    if( w != NULL )
+        gtk_window_present( GTK_WINDOW( w ) );
+    else {
+        w = torrent_inspector_new( GTK_WINDOW( data->wind ), tor );
+        gtk_widget_show( w );
+        g_hash_table_insert( data->tor2details, (gpointer)hashString, w );
+        g_hash_table_insert( data->details2tor, w, (gpointer)hashString );
+        g_object_weak_ref( G_OBJECT( w ), detailsClosed, data );
+    }
+
     g_object_unref( G_OBJECT( tor ) );
 }
 
@@ -885,7 +917,7 @@ msgwinclosed()
 void
 doAction ( const char * action_name, gpointer user_data )
 {
-    struct cbdata * data = (struct cbdata *) user_data;
+    struct cbdata * data = user_data;
     gboolean changed = FALSE;
 
     if (!strcmp (action_name, "add-torrent"))
@@ -919,7 +951,7 @@ doAction ( const char * action_name, gpointer user_data )
     else if (!strcmp (action_name, "show-torrent-details"))
     {
         GtkTreeSelection * s = tr_window_get_selection(data->wind);
-        gtk_tree_selection_selected_foreach( s, showInfoForeach, data->wind );
+        gtk_tree_selection_selected_foreach( s, showInfoForeach, data );
     }
     else if (!strcmp( action_name, "update-tracker"))
     {
