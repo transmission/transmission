@@ -150,7 +150,6 @@ struct tr_torrent
     unsigned int               statCur : 1;
     unsigned int               isRunning : 1;
 
-    uint8_t                    maxUnchokedPeers;
     uint16_t                   maxConnectedPeers;
 
     tr_recheck_state           recheckState;

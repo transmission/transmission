@@ -17,18 +17,15 @@
 #include "trcompat.h" /* strlcpy */
 #include "utils.h"
 
-#define DEFAULT_MAX_UNCHOKED_PEERS 12
 #define DEFAULT_MAX_CONNECTED_PEERS 50
 
 struct optional_args
 {
     unsigned int isSet_paused : 1;
-    unsigned int isSet_unchoked : 1;
     unsigned int isSet_connected : 1;
     unsigned int isSet_destination : 1;
 
     unsigned int isPaused : 1;
-    uint8_t maxUnchokedPeers;
     uint16_t maxConnectedPeers;
     char destination[MAX_PATH_LENGTH];
 };
@@ -154,16 +151,6 @@ tr_ctorSetPaused( tr_ctor        * ctor,
 }
 
 void
-tr_ctorSetMaxUnchokedPeers( tr_ctor        * ctor,
-                            tr_ctorMode      mode,
-                            uint8_t          maxUnchokedPeers)
-{
-    struct optional_args * args = &ctor->optionalArgs[mode];
-    args->isSet_unchoked = 1;
-    args->maxUnchokedPeers = maxUnchokedPeers;
-}
-
-void
 tr_ctorSetMaxConnectedPeers( tr_ctor        * ctor,
                              tr_ctorMode      mode,
                              uint16_t         maxConnectedPeers )
@@ -193,22 +180,6 @@ tr_ctorGetMaxConnectedPeers( const tr_ctor  * ctor,
 
     if( args->isSet_connected )
         *setmeCount = args->maxConnectedPeers;
-    else
-        err = 1;
-
-    return err;
-}
-
-int
-tr_ctorGetMaxUnchokedPeers( const tr_ctor  * ctor,
-                            tr_ctorMode      mode,
-                            uint8_t        * setmeCount )
-{
-    int err = 0;
-    const struct optional_args * args = &ctor->optionalArgs[mode];
-
-    if( args->isSet_unchoked )
-        *setmeCount = args->maxUnchokedPeers;
     else
         err = 1;
 
@@ -271,7 +242,6 @@ tr_ctorNew( const tr_handle * handle )
     tr_ctor * ctor = tr_new0( struct tr_ctor, 1 );
     ctor->handle = handle;
     tr_ctorSetMaxConnectedPeers( ctor, TR_FALLBACK, DEFAULT_MAX_CONNECTED_PEERS );
-    tr_ctorSetMaxUnchokedPeers( ctor, TR_FALLBACK, DEFAULT_MAX_UNCHOKED_PEERS );
     tr_ctorSetPaused( ctor, TR_FALLBACK, FALSE );
     tr_ctorSetSave( ctor, TRUE );
     return ctor;

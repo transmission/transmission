@@ -288,11 +288,6 @@ void tr_torrentSetMaxConnectedPeers( tr_torrent  * tor,
 
 uint16_t tr_torrentGetMaxConnectedPeers( const tr_torrent  * tor );
 
-void tr_torrentSetMaxUnchokedPeers( tr_torrent  * tor,
-                                    uint8_t       maxUnchokedPeers );
-
-uint8_t tr_torrentGetMaxUnchokedPeers( const tr_torrent  * tor );
-
 void tr_setGlobalPeerLimit( tr_handle * handle,
                             uint16_t    maxGlobalPeers );
 
@@ -409,10 +404,6 @@ void     tr_ctorSetMaxConnectedPeers   ( tr_ctor        * ctor,
                                          tr_ctorMode      mode,
                                          uint16_t         maxConnectedPeers );
 
-void     tr_ctorSetMaxUnchokedPeers    ( tr_ctor        * ctor,
-                                         tr_ctorMode      mode,
-                                         uint8_t          maxUnchokedPeers);
-
 void     tr_ctorSetDestination         ( tr_ctor        * ctor,
                                          tr_ctorMode      mode,
                                          const char     * directory );
@@ -424,10 +415,6 @@ void     tr_ctorSetPaused              ( tr_ctor        * ctor,
 int      tr_ctorGetMaxConnectedPeers   ( const tr_ctor  * ctor,
                                          tr_ctorMode      mode,
                                          uint16_t       * setmeCount );
-
-int      tr_ctorGetMaxUnchokedPeers    ( const tr_ctor  * ctor,
-                                         tr_ctorMode      mode,
-                                         uint8_t        * setmeCount );
 
 int      tr_ctorGetIsPaused            ( const tr_ctor  * ctor,
                                          tr_ctorMode      mode,
@@ -600,8 +587,8 @@ void tr_torrentAmountFinished( const tr_torrent * tor, float * tab, int size );
 /***********************************************************************
  * tr_torrentRemoveSaved
  ***********************************************************************
- * Removes the saved copy of a torrent file for torrents which the
- * TR_FLAG_SAVE flag is set.
+ * delete's Transmission's copy of the torrent's metadata from
+ * tr_getTorrentsDirectory().
  **********************************************************************/
 void tr_torrentRemoveSaved( tr_torrent * );
 

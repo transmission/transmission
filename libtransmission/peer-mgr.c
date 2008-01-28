@@ -96,6 +96,9 @@ enum
      * this throttle is to avoid overloading the router */
     MAX_CONNECTIONS_PER_SECOND = 8,
 
+    /* number of unchoked peers per torrent */
+    MAX_UNCHOKED_PEERS = 12,
+
     /* corresponds to ut_pex's added.f flags */
     ADDED_F_ENCRYPTION_FLAG = 1,
 
@@ -1592,7 +1595,7 @@ rechoke( Torrent * t )
      * rate to decide which peers to unchoke. 
      */
     unchokedInterested = 0;
-    for( i=0; i<size && unchokedInterested<t->tor->maxUnchokedPeers; ++i ) {
+    for( i=0; i<size && unchokedInterested<MAX_UNCHOKED_PEERS; ++i ) {
         choke[i].doUnchoke = 1;
         if( choke[i].isInterested )
             ++unchokedInterested;
