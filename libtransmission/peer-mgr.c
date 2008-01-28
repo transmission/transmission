@@ -959,11 +959,7 @@ ensureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8
 static int
 getMaxPeerCount( const tr_torrent * tor UNUSED )
 {
-#if 0
-    return t->tor->maxConnectedPeers;
-#else
-    return 50;
-#endif
+    return tor->maxConnectedPeers;
 }
 
 /* FIXME: this is kind of a mess. */

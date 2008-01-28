@@ -376,11 +376,7 @@ socketWasReserved( int fd )
 static int
 getSocketMax( struct tr_fd_s * gFd )
 {
-#if 0
     return gFd->normalMax;
-#else
-    return MIN( gFd->normalMax, 200 );
-#endif
 }
 
 int
