@@ -914,6 +914,25 @@ msgwinclosed()
   return FALSE;
 }
 
+static void
+toggleMainWindow( struct cbdata * data )
+{
+    static int x=0, y=0;
+    GtkWidget * w = GTK_WIDGET( data->wind );
+    GtkWindow * window = GTK_WINDOW( w );
+
+    if( GTK_WIDGET_VISIBLE( w ) )
+    {
+        gtk_window_get_position( window, &x, &y );
+        gtk_widget_hide( w );
+    }
+    else
+    {
+        gtk_window_move( window, x, y );
+        gtk_window_present( window );
+    }
+}
+
 void
 doAction ( const char * action_name, gpointer user_data )
 {
@@ -1033,11 +1052,7 @@ doAction ( const char * action_name, gpointer user_data )
     }
     else if (!strcmp (action_name, "toggle-main-window"))
     {
-        GtkWidget * w = GTK_WIDGET (data->wind);
-        if (GTK_WIDGET_VISIBLE(w))
-            gtk_widget_hide (w);
-        else
-            gtk_window_present (GTK_WINDOW(w));
+        toggleMainWindow( data );
     }
     else g_error ("Unhandled action: %s", action_name );
 
