@@ -259,10 +259,12 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 
     d = gtk_dialog_new_with_buttons( _("Preferences"), parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
-                                     GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      NULL );
-
     gtk_window_set_role( GTK_WINDOW(d), "transmission-preferences-dialog" );
+    gtk_dialog_set_has_separator( GTK_DIALOG( d ), FALSE );
+    gtk_container_set_border_width( GTK_CONTAINER( d ), GUI_PAD );
+
     g_signal_connect( d, "response", G_CALLBACK(response_cb), core );
 
     t = hig_workarea_create ();
