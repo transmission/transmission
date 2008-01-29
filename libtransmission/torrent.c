@@ -660,7 +660,8 @@ tr_torrentStat( tr_torrent * tor )
         tr_bitfieldFree( availablePieces );
     }
 
-    s->ratio = tr_getRatio( s->uploadedEver, MAX( s->downloadedEver, s->haveValid ) );
+    s->ratio = tr_getRatio( s->uploadedEver,
+                            s->downloadedEver ? s->downloadedEver : s->haveValid );
     
     tr_torrentUnlock( tor );
 
