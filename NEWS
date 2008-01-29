@@ -6,10 +6,15 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Leopard: Group dividers
    + Use the file icon as the per-torrent action button
 
-1.03 (2008/xx/yy)
+1.03 (2008/01/29)
 - All Platforms:
-   + Fix handshake bug with peers that support LTEP
+   + Fix bug setting maximum peer limits
+   + Fix overflow issue with very large torrents
+   + Fix LTEP handshake bug
    + Fix handshake bug with mainline BitTorrent
+   + Fix bug when talking to lighttpd-based trackers
+- GTK+
+   + Various packaging, HiG, and interface improvements
 
 1.02 (2008/01/22)
 - All Platforms:
