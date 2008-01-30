@@ -73,6 +73,7 @@ noinst_HEADERS = \
 
 
 noinst_PROGRAMS = \
+    bencode-test \
     test-fastset \
     test-peer-id
 
@@ -85,6 +86,8 @@ TEST_LDADD = \
     $(top_builddir)/third-party/libevent/libevent.la \
     $(OPENSSL_LIBS) $(PTHREAD_LIBS) -lm
 
+bencode_test_SOURCES = bencode-test.c
+bencode_test_LDADD = $(TEST_LDADD)
 test_fastset_SOURCES = test-fastset.c
 test_fastset_LDADD = $(TEST_LDADD)
 test_peer_id_SOURCES = test-peer-id.c

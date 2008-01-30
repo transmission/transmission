@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <ctype.h> /* isdigit, isprint */
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,6 +57,93 @@ tr_bencIsDict( const benc_val_t * val ) {
 /**
 ***
 **/
+
+/**
+ * The initial i and trailing e are beginning and ending delimiters.
+ * You can have negative numbers such as i-3e. You cannot prefix the
+ * number with a zero such as i04e. However, i0e is valid.  
+ * Example: i3e represents the integer "3" 
+ * NOTE: The maximum number of bit of this integer is unspecified,
+ * but to handle it as a signed 64bit integer is mandatory to handle
+ * "large files" aka .torrent for more that 4Gbyte 
+ */
+int
+tr_bencParseInt( const uint8_t  * buf,
+                 size_t           buflen,
+                 const uint8_t ** setme_end, 
+                 int64_t        * setme_val )
+{
+    int err = TR_OK;
+    char * endptr;
+    const void * begin;
+    const void * end;
+    int64_t val;
+
+    if( !buflen )
+        return TR_ERROR;
+    if( *buf != 'i' )
+        return TR_ERROR;
+
+    begin = buf + 1;
+    end = memchr( begin, 'e', buflen-1 );
+    if( end == NULL )
+        return TR_ERROR;
+
+    errno = 0;
+    val = strtoll( begin, &endptr, 10 );
+    if( errno || ( endptr != end ) ) /* incomplete parse */
+        err = TR_ERROR;
+    else if( val && *(const char*)begin=='0' ) /* the spec forbids leading zeroes */
+        err = TR_ERROR;
+    else {
+        *setme_end = end + 1;
+        *setme_val = val;
+    }
+
+    return err;
+}
+
+
+/**
+ * Byte strings are encoded as follows:
+ * <string length encoded in base ten ASCII>:<string data>
+ * Note that there is no constant beginning delimiter, and no ending delimiter.
+ * Example: 4:spam represents the string "spam" 
+ */
+int
+tr_bencParseStr( const uint8_t  * buf,
+                 size_t           buflen,
+                 const uint8_t ** setme_end,
+                 uint8_t       ** setme_str,
+                 size_t         * setme_strlen )
+{
+    size_t len;
+    const void * end;
+    char * endptr;
+
+    if( !buflen )
+        return TR_ERROR;
+
+    if( !isdigit( *buf  ) )
+        return TR_ERROR;
+
+    end = memchr( buf, ':', buflen );
+    if( end == NULL )
+        return TR_ERROR;
+
+    errno = 0;
+    len = strtoul( (const char*)buf, &endptr, 10 );
+    if( errno || endptr!=end )
+        return TR_ERROR;
+
+    if( ( (const uint8_t*)end - buf ) + 1 + len > buflen )
+        return TR_ERROR;
+
+    *setme_end = end + 1 + len;
+    *setme_str = (uint8_t*) tr_strndup( end + 1, len );
+    *setme_strlen = len;
+    return TR_OK;
+}
 
 /* setting to 1 to help expose bugs with tr_bencListAdd and tr_bencDictAdd */
 #define LIST_SIZE   20 /* number of items to increment list/dict buffer by */

@@ -53,6 +53,7 @@ typedef struct benc_val_s
     } val;
 } benc_val_t;
 
+
 #define tr_bencLoad(b,l,v,e) _tr_bencLoad((char*)(b),(l),(v),(char**)(e))
 int          _tr_bencLoad( char * buf, int len, benc_val_t * val,
                            char ** end );
@@ -88,5 +89,24 @@ benc_val_t * tr_bencDictAdd( benc_val_t * dict, const char * key );
 char*  tr_bencSave( const benc_val_t * val, int * len );
 
 int64_t  tr_bencGetInt ( const benc_val_t * val );
+
+
+/**
+***  Treat these as private -- they're only made public here
+***  so that the unit tests can find them
+**/
+
+int  tr_bencParseInt( const uint8_t  * buf,
+                      size_t           buflen,
+                      const uint8_t ** setme_end, 
+                      int64_t        * setme_val );
+
+int  tr_bencParseStr( const uint8_t  * buf,
+                      size_t           buflen,
+                      const uint8_t ** setme_end, 
+                      uint8_t       ** setme_str,
+                      size_t         * setme_strlen );
+
+
 
 #endif
