@@ -1890,25 +1890,18 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: YES] autorelease];
         [fDisplayedTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
         
-        int i, groupValue = [[fDisplayedTorrents objectAtIndex: 0] groupValue], newGroupValue, count = 1, start = 0;
+        int i, oldGroupValue = -2;
         for (i = 0; i < [fDisplayedTorrents count]; i++)
         {
-            BOOL last = i == [fDisplayedTorrents count]-1;
-            if (!last)
-                newGroupValue = [[fDisplayedTorrents objectAtIndex: i+1] groupValue];
-            if (groupValue != newGroupValue || last)
+            int groupValue = [[fDisplayedTorrents objectAtIndex: i] groupValue];
+            if (groupValue != oldGroupValue)
             {
-                [fDisplayedTorrents insertObject: [NSNumber numberWithInt: groupValue] atIndex: start];
-                [fDisplayedGroupIndexes addIndex: start];
+                [fDisplayedTorrents insertObject: [NSNumber numberWithInt: groupValue] atIndex: i];
+                [fDisplayedGroupIndexes addIndex: i];
                 
-                groupValue = newGroupValue;
-                count = 1;
-                
-                start = i+2;
                 i++;
+                oldGroupValue = groupValue;
             }
-            else
-                count++;
         }
     }
     
