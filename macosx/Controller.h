@@ -191,7 +191,7 @@ typedef enum
 
 - (void) updateTorrentHistory;
 
-- (void) updateDisplay: (id) sender;
+- (void) applyFilter: (id) sender;
 
 - (void) sortTorrents;
 - (void) sortTorrentsIgnoreSelected;
