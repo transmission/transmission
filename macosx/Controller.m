@@ -1919,7 +1919,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     if (filterStatus || filterGroup || filterText)
         totalTorrentsString = [NSString stringWithFormat: NSLocalizedString(@"%d of %@", "Status bar transfer count"),
-                                [fDisplayedTorrents count], totalTorrentsString];
+                                [fDisplayedTorrents count] - [fDisplayedGroupIndexes count], totalTorrentsString];
     
     [fTotalTorrentsField setStringValue: totalTorrentsString];
 
