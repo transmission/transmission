@@ -118,11 +118,6 @@ int  tr_bencParseStr( const uint8_t  * buf,
 ***
 **/
 
-int tr_bencIsInt( const benc_val_t * val );
-int tr_bencIsList( const benc_val_t * val );
-int tr_bencIsDict( const benc_val_t * val );
-int tr_bencIsString( const benc_val_t * val );
-
 benc_val_t* tr_bencListGetNthChild( benc_val_t * val, int i );
 
 
