@@ -278,14 +278,7 @@ parseBencResponse( struct evhttp_request * req, benc_val_t * setme )
 {
     const unsigned char * body = EVBUFFER_DATA( req->input_buffer );
     const int bodylen = EVBUFFER_LENGTH( req->input_buffer );
-    int ret = 1;
-    int i;
-
-    for( i=0; ret && i<bodylen; ++i )
-        if( !tr_bencLoad( body+i, bodylen-1, setme, NULL ) )
-            ret = 0;
-
-    return ret;
+    return tr_bencLoad( body, bodylen, setme, NULL );
 }
 
 static const char*

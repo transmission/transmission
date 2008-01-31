@@ -214,6 +214,13 @@ testParse( void )
     tr_free( saved );
     tr_bencFree( &val );
 
+    end = NULL;
+    snprintf( (char*)buf, sizeof( buf ), "d8:completei1e8:intervali1800e12:min intervali1800e5:peers0:e" );
+    err = tr_bencLoad( buf, sizeof( buf ), &val, (char**)&end );
+    check( !err );
+    check( end == buf + strlen( (const char*)buf ) );
+    tr_bencFree( &val );
+
     return 0;
 }
 
