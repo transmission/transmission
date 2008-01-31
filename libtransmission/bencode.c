@@ -291,18 +291,18 @@ tr_bencParse( const void  * buf_in,
         {
             const uint8_t * end;
             uint8_t * str;
-            size_t strlen;
+            size_t str_len;
             int err;
             benc_val_t * node;
 
-            if(( err = tr_bencParseStr( buf, bufend, &end, &str, &strlen )))
+            if(( err = tr_bencParseStr( buf, bufend, &end, &str, &str_len )))
                 return err;
 
             node = getNode( top, parentStack, TYPE_STR );
             if( !node )
                 return TR_ERROR;
 
-            tr_bencInitStr( node, str, strlen, 0 );
+            tr_bencInitStr( node, str, str_len, 0 );
             buf = end;
 
             if( tr_ptrArrayEmpty( parentStack ) )
@@ -796,6 +796,7 @@ printStringFunc( const benc_val_t * val, void * vdata )
     int ii;
     struct WalkPrint * data = vdata;
     printLeadingSpaces( data );
+    fprintf( data->out, "string:  " );
     for( ii = 0; val->val.s.i > ii; ii++ )
     {
         if( '\\' == val->val.s.s[ii] ) {
@@ -807,6 +808,7 @@ printStringFunc( const benc_val_t * val, void * vdata )
             fprintf( data->out, "\\x%02x", val->val.s.s[ii] );
         }
     }
+    fprintf( data->out, "\n" );
 }
 static void
 printListBeginFunc( const benc_val_t * val UNUSED, void * vdata )
