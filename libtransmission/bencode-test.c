@@ -151,7 +151,6 @@ testParse( void )
     snprintf( (char*)buf, sizeof( buf ), "i64e" );
     err = tr_bencParse( buf, buf + sizeof( buf ), &val, &end );
     check( !err );
-    check( tr_bencIsInt( &val ) );
     check( tr_bencGetInt( &val ) == 64 );
     check( end == buf + 4 );
     tr_bencFree( &val );
@@ -159,7 +158,6 @@ testParse( void )
     snprintf( (char*)buf, sizeof( buf ), "li64ei32ei16ee" );
     err = tr_bencParse( buf, buf + sizeof( buf ), &val, &end );
     check( !err );
-    check( tr_bencIsList( &val ) );
     check( end == buf + strlen( (char*)buf ) );
     check( val.val.l.count == 3 );
     check( tr_bencGetInt( &val.val.l.vals[0] ) == 64 );
@@ -204,11 +202,8 @@ testParse( void )
     err = tr_bencParse( buf, buf + sizeof( buf ), &val, &end );
     check( !err );
     check( end == buf + strlen( (const char*)buf ) );
-    check( tr_bencIsList( &val ) );
     check(( child = tr_bencListGetNthChild( &val, 0 )));
-    check( tr_bencIsList( child ) );
     check(( child2 = tr_bencListGetNthChild( child, 0 )));
-    check( tr_bencIsDict( child2 ) );
     saved = tr_bencSave( &val, &len );
     check( !strcmp( saved, "lld1:ai64e1:bi32eeee" ) );
     tr_free( saved );
@@ -216,7 +211,7 @@ testParse( void )
 
     end = NULL;
     snprintf( (char*)buf, sizeof( buf ), "d8:completei1e8:intervali1800e12:min intervali1800e5:peers0:e" );
-    err = tr_bencLoad( buf, sizeof( buf ), &val, (char**)&end );
+    err = tr_bencParse( buf, buf+sizeof( buf ), &val, &end );
     check( !err );
     check( end == buf + strlen( (const char*)buf ) );
     tr_bencFree( &val );
@@ -245,7 +240,6 @@ testStackSmash( void )
     in[depth*2] = '\0';
     err = tr_bencParse( in, in+(depth*2), &val, &end );
     check( !err );
-    check( tr_bencIsList( &val ) );
     check( end == in+(depth*2) );
     saved = tr_bencSave( &val, &len );
     check( !strcmp( saved, (char*)in ) );

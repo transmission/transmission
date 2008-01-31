@@ -40,25 +40,19 @@
 ***
 **/
 
-int
+static int
 tr_bencIsInt( const benc_val_t * val )
 {
     return val!=NULL && val->type==TYPE_INT;
 }
 
-int
-tr_bencIsString( const benc_val_t * val )
-{
-    return val!=NULL && val->type==TYPE_STR;
-}
-
-int
+static int
 tr_bencIsList( const benc_val_t * val )
 {
     return val!=NULL && val->type==TYPE_LIST;
 }
 
-int
+static int
 tr_bencIsDict( const benc_val_t * val )
 {
     return val!=NULL && val->type==TYPE_DICT;
@@ -580,33 +574,27 @@ nodeNewLeaf( const benc_val_t * val )
 static struct SaveNode*
 nodeNew( const benc_val_t * val )
 {
-    switch( val->type )
-    {
-        case TYPE_INT:
-        case TYPE_STR:
-            return nodeNewLeaf( val );
-            break;
-        case TYPE_LIST:
-            return nodeNewList( val );
-            break;
-        case TYPE_DICT:
-            return nodeNewDict( val );
-            break;
-    }
+    struct SaveNode * node;
 
-    assert( 0 && "invalid type!" );
-    return NULL;
+    if( val->type == TYPE_LIST )
+        node = nodeNewList( val );
+    else if( val->type == TYPE_DICT )
+        node = nodeNewDict( val );
+    else
+        node = nodeNewLeaf( val );
+
+    return node;
 }
 
-typedef void (*BencNodeWalkFunc)( const benc_val_t * val, void * user_data );
+typedef void (*BencWalkFunc)( const benc_val_t * val, void * user_data );
 
 struct WalkFuncs
 {
-    BencNodeWalkFunc intFunc;
-    BencNodeWalkFunc stringFunc;
-    BencNodeWalkFunc dictBeginFunc;
-    BencNodeWalkFunc listBeginFunc;
-    BencNodeWalkFunc containerEndFunc;
+    BencWalkFunc intFunc;
+    BencWalkFunc stringFunc;
+    BencWalkFunc dictBeginFunc;
+    BencWalkFunc listBeginFunc;
+    BencWalkFunc containerEndFunc;
 };
 
 /**
@@ -672,7 +660,9 @@ bencWalk( const benc_val_t   * top,
                 break;
 
             default:
-                assert( 0 && "invalid type!" );
+                /* did caller give us an uninitialized val? */
+                tr_err( "Invalid benc type %d", val->type );
+                break;
         }
     }
 
@@ -684,31 +674,31 @@ bencWalk( const benc_val_t   * top,
 ****/
 
 static void
-saveIntFunc( const benc_val_t * val, void * buf )
+saveIntFunc( const benc_val_t * val, void * evbuf )
 {
-    evbuffer_add_printf( buf, "i%"PRId64"e", tr_bencGetInt(val) );
+    evbuffer_add_printf( evbuf, "i%"PRId64"e", tr_bencGetInt(val) );
 }
 static void
-saveStringFunc( const benc_val_t * val, void * user_data )
+saveStringFunc( const benc_val_t * val, void * vevbuf )
 {
-    struct evbuffer * out = user_data;
-    evbuffer_add_printf( out, "%i:", val->val.s.i );
-    evbuffer_add( out, val->val.s.s, val->val.s.i );
+    struct evbuffer * evbuf = vevbuf;
+    evbuffer_add_printf( evbuf, "%i:", val->val.s.i );
+    evbuffer_add( evbuf, val->val.s.s, val->val.s.i );
 }
 static void
-saveDictBeginFunc( const benc_val_t * val UNUSED, void * buf )
+saveDictBeginFunc( const benc_val_t * val UNUSED, void * evbuf )
 {
-    evbuffer_add_printf( buf, "d" );
+    evbuffer_add_printf( evbuf, "d" );
 }
 static void
-saveListBeginFunc( const benc_val_t * val UNUSED, void * buf )
+saveListBeginFunc( const benc_val_t * val UNUSED, void * evbuf )
 {
-    evbuffer_add_printf( buf, "l" );
+    evbuffer_add_printf( evbuf, "l" );
 }
 static void
-saveContainerEndFunc( const benc_val_t * val UNUSED, void * buf )
+saveContainerEndFunc( const benc_val_t * val UNUSED, void * evbuf )
 {
-    evbuffer_add_printf( buf, "e" );
+    evbuffer_add_printf( evbuf, "e" );
 }
 char*
 tr_bencSave( const benc_val_t * top, int * len )
