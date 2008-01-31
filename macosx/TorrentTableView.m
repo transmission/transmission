@@ -33,7 +33,7 @@
 #define ACTION_MENU_UNLIMITED_TAG 102
 #define ACTION_MENU_LIMIT_TAG 103
 
-#define PIECE_INCREASE 0.1
+#define PIECE_CHANGE 0.1
 #define PIECE_TIME 0.01
 
 @interface TorrentTableView (Private)
@@ -313,15 +313,17 @@
     NSUInteger i;
     for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
     {
-        
         if (![fGroupIndexes containsIndex: i])
             [indexSet addIndex: i];
         else
         {
-            NSUInteger nextGroup = [fGroupIndexes indexGreaterThanIndex: i],
-                        count = (nextGroup != NSNotFound ? nextGroup : [fTorrents count]) - i - 1;
-            [indexSet addIndexesInRange: NSMakeRange(i+1, count)];
-            i = nextGroup-1;
+            NSUInteger nextGroup = [fGroupIndexes indexGreaterThanIndex: i];
+            if (nextGroup == NSNotFound)
+                nextGroup = [fTorrents count];
+            
+            [indexSet addIndexesInRange: NSMakeRange(i+1, nextGroup - i - 1)];
+            
+             i = nextGroup - 1;
         }
     }
     [fTorrents objectsAtIndexes: indexSet];
@@ -330,7 +332,6 @@
 - (NSMenu *) menuForEvent: (NSEvent *) event
 {
     int row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
-    
     if (row >= 0)
     {
         if (![self isRowSelected: row])
@@ -664,7 +665,7 @@
 - (BOOL) pointInProgressRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0  || [fGroupIndexes containsIndex: row] || [fDefaults boolForKey: @"SmallView"])
+    if (row < 0 || [fGroupIndexes containsIndex: row] || [fDefaults boolForKey: @"SmallView"])
         return NO;
     
     TorrentCell * cell;
@@ -681,7 +682,7 @@
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0  || [fGroupIndexes containsIndex: row] || ![fDefaults boolForKey: @"SmallView"])
+    if (row < 0 || [fGroupIndexes containsIndex: row] || ![fDefaults boolForKey: @"SmallView"])
         return NO;
     
     TorrentCell * cell;
@@ -747,12 +748,12 @@
     BOOL done;
     if ([fDefaults boolForKey: @"PiecesBar"])
     {
-        fPiecesBarPercent = MIN(fPiecesBarPercent + PIECE_INCREASE, 1.0);
+        fPiecesBarPercent = MIN(fPiecesBarPercent + PIECE_CHANGE, 1.0);
         done = fPiecesBarPercent == 1.0;
     }
     else
     {
-        fPiecesBarPercent = MAX(fPiecesBarPercent - PIECE_INCREASE, 0.0);
+        fPiecesBarPercent = MAX(fPiecesBarPercent - PIECE_CHANGE, 0.0);
         done = fPiecesBarPercent == 0.0;
     }
     
