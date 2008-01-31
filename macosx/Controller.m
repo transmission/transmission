@@ -1663,10 +1663,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
     BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
     
-    NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name"
-                                            ascending: asc selector: @selector(caseInsensitiveCompare:)] autorelease],
-                    * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue"
-                                            ascending: asc] autorelease];
+    NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: asc] autorelease];
     
     NSArray * descriptors;
     if ([sortType isEqualToString: SORT_ORDER])
@@ -1674,10 +1671,17 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     else
     {
         if ([sortType isEqualToString: SORT_NAME])
+        {
+            NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
+                                                    selector: @selector(caseInsensitiveCompare:)] autorelease];
+            
             descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, orderDescriptor, nil];
+        }
         else if ([sortType isEqualToString: SORT_STATE])
         {
-            NSSortDescriptor * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+            NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
+                                                    selector: @selector(caseInsensitiveCompare:)] autorelease],
+                            * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                     @"stateSortKey" ascending: !asc] autorelease],
                             * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                 @"progress" ascending: !asc] autorelease],
@@ -1689,7 +1693,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         }
         else if ([sortType isEqualToString: SORT_PROGRESS])
         {
-            NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+            NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
+                                                    selector: @selector(caseInsensitiveCompare:)] autorelease],
+                            * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                 @"progress" ascending: asc] autorelease],
                             * ratioProgressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                 @"progressStopRatio" ascending: asc] autorelease],
@@ -1701,7 +1707,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         }
         else if ([sortType isEqualToString: SORT_TRACKER])
         {
-            NSSortDescriptor * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddress"
+            NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
+                                                    selector: @selector(caseInsensitiveCompare:)] autorelease],
+                            * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddress"
                                                     ascending: asc selector: @selector(caseInsensitiveCompare:)] autorelease];
             
             descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, orderDescriptor, nil];
