@@ -977,13 +977,13 @@ smsg_torall( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag,
 static void
 smsg_pref( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag, void * arg )
 {
-    struct constate      * con = arg;
-    struct constate_serv * srv = &con->u.serv;
-    uint8_t              * buf;
-    size_t                 size;
-    tr_handle_status     * hstat;
-    const char           * pref;
-    int                    num;
+    struct constate         * con = arg;
+    struct constate_serv    * srv = &con->u.serv;
+    uint8_t                 * buf;
+    size_t                    size;
+    const tr_handle_status  * hstat;
+    const char              * pref;
+    int                       num;
 
     switch( id )
     {

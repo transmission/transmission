@@ -611,10 +611,10 @@ starttimer( int callnow )
 static void
 timerfunc( int fd UNUSED, short event UNUSED, void * arg UNUSED )
 {
-    struct tor       * tor, * next;
-    tr_handle_status * hs;
-    int                stillmore;
-    struct timeval     tv;
+    struct tor             * tor, * next;
+    const tr_handle_status * hs;
+    int                      stillmore;
+    struct timeval           tv;
 
     /* true if we've still got live torrents... */
     stillmore = tr_torrentCount( gl_handle ) != 0;
