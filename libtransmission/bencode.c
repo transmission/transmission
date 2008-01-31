@@ -119,7 +119,7 @@ tr_bencParseInt( const uint8_t  * buf,
     val = strtoll( begin, &endptr, 10 );
     if( errno || ( endptr != end ) ) /* incomplete parse */
         err = TR_ERROR;
-    else if( val && *(const char*)begin=='0' ) /* the spec forbids leading zeroes */
+    else if( val && *(const char*)begin=='0' ) /* no leading zeroes! */
         err = TR_ERROR;
     else {
         *setme_end = end + 1;
@@ -225,8 +225,8 @@ getNode( benc_val_t * top, tr_ptrArray * parentStack, int type )
  * smashing our stack through deep recursion. (#667)
  */
 int
-tr_bencParse( const void  * buf_in,
-              const void  * bufend_in,
+tr_bencParse( const void     * buf_in,
+              const void     * bufend_in,
               benc_val_t     * top,
               const uint8_t ** setme_end )
 {
@@ -247,7 +247,7 @@ tr_bencParse( const void  * buf_in,
             int err;
             benc_val_t * node;
 
-            if(( err = tr_bencParseInt( (const uint8_t*)buf, bufend, &end, &val )))
+            if(( err = tr_bencParseInt( buf, bufend, &end, &val )))
                 return err;
 
             node = getNode( top, parentStack, TYPE_INT );
@@ -566,7 +566,7 @@ nodeNewList( const benc_val_t * val )
 }
 
 static struct SaveNode*
-nodeNewSimple( const benc_val_t * val )
+nodeNewLeaf( const benc_val_t * val )
 {
     struct SaveNode * node;
 
@@ -584,7 +584,7 @@ nodeNew( const benc_val_t * val )
     {
         case TYPE_INT:
         case TYPE_STR:
-            return nodeNewSimple( val );
+            return nodeNewLeaf( val );
             break;
         case TYPE_LIST:
             return nodeNewList( val );
@@ -615,7 +615,9 @@ struct WalkFuncs
  * smashing our stack through deep recursion. (#667)
  */
 static void
-depthFirstWalk( const benc_val_t * top, struct WalkFuncs * walkFuncs, void * user_data )
+bencWalk( const benc_val_t   * top,
+          struct WalkFuncs   * walkFuncs,
+          void               * user_data )
 {
     tr_ptrArray * stack = tr_ptrArrayNew( );
     tr_ptrArrayAppend( stack, nodeNew( top ) );
@@ -720,8 +722,7 @@ tr_bencSave( const benc_val_t * top, int * len )
     walkFuncs.dictBeginFunc = saveDictBeginFunc;
     walkFuncs.listBeginFunc = saveListBeginFunc;
     walkFuncs.containerEndFunc = saveContainerEndFunc;
-
-    depthFirstWalk( top, &walkFuncs, out );
+    bencWalk( top, &walkFuncs, out );
     
     if( len != NULL )
         *len = EVBUFFER_LENGTH( out );
@@ -762,7 +763,7 @@ tr_bencFree( benc_val_t * val )
         walkFuncs.dictBeginFunc = freeContainerBeginFunc;
         walkFuncs.listBeginFunc = freeContainerBeginFunc;
         walkFuncs.containerEndFunc = freeDummyFunc;
-        depthFirstWalk( val, &walkFuncs, freeme );
+        bencWalk( val, &walkFuncs, freeme );
 
         tr_ptrArrayFree( freeme, tr_free );
     }
@@ -846,5 +847,5 @@ tr_bencPrint( benc_val_t * val )
 
     walkPrint.out = stderr;
     walkPrint.depth = 0;
-    depthFirstWalk( val, &walkFuncs, &walkPrint );
+    bencWalk( val, &walkFuncs, &walkPrint );
 }
