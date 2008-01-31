@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <ctype.h> /* isdigit, isprint */
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,35 +33,149 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "ptrarray.h"
 #include "utils.h"
 
 /**
 ***
 **/
 
-static int
-tr_bencIsInt ( const benc_val_t * val ) {
+int
+tr_bencIsInt( const benc_val_t * val )
+{
     return val!=NULL && val->type==TYPE_INT;
 }
 
-static int
-tr_bencIsList( const benc_val_t * val ) {
+int
+tr_bencIsString( const benc_val_t * val )
+{
+    return val!=NULL && val->type==TYPE_STR;
+}
+
+int
+tr_bencIsList( const benc_val_t * val )
+{
     return val!=NULL && val->type==TYPE_LIST;
 }
 
-static int
-tr_bencIsDict( const benc_val_t * val ) {
+int
+tr_bencIsDict( const benc_val_t * val )
+{
     return val!=NULL && val->type==TYPE_DICT;
 }
+
+static int
+isContainer( const benc_val_t * val )
+{
+    return val!=NULL && ( val->type & ( TYPE_DICT | TYPE_LIST ) );
+}
+
+benc_val_t*
+tr_bencListGetNthChild( benc_val_t * val, int i )
+{
+    benc_val_t * ret = NULL;
+    if( tr_bencIsList( val ) && ( i >= 0 ) && ( i < val->val.l.count ) )
+        ret = val->val.l.vals + i;
+    return ret;
+}
+
 
 /**
 ***
 **/
 
-/* setting to 1 to help expose bugs with tr_bencListAdd and tr_bencDictAdd */
-#define LIST_SIZE   20 /* number of items to increment list/dict buffer by */
+/**
+ * The initial i and trailing e are beginning and ending delimiters.
+ * You can have negative numbers such as i-3e. You cannot prefix the
+ * number with a zero such as i04e. However, i0e is valid.  
+ * Example: i3e represents the integer "3" 
+ * NOTE: The maximum number of bit of this integer is unspecified,
+ * but to handle it as a signed 64bit integer is mandatory to handle
+ * "large files" aka .torrent for more that 4Gbyte 
+ */
+int
+tr_bencParseInt( const uint8_t  * buf,
+                 const uint8_t  * bufend,
+                 const uint8_t ** setme_end, 
+                 int64_t        * setme_val )
+{
+    int err = TR_OK;
+    char * endptr;
+    const void * begin;
+    const void * end;
+    int64_t val;
 
-static int makeroom( benc_val_t * val, int count )
+    if( buf >= bufend )
+        return TR_ERROR;
+    if( *buf != 'i' )
+        return TR_ERROR;
+
+    begin = buf + 1;
+    end = memchr( begin, 'e', (bufend-buf)-1 );
+    if( end == NULL )
+        return TR_ERROR;
+
+    errno = 0;
+    val = strtoll( begin, &endptr, 10 );
+    if( errno || ( endptr != end ) ) /* incomplete parse */
+        err = TR_ERROR;
+    else if( val && *(const char*)begin=='0' ) /* the spec forbids leading zeroes */
+        err = TR_ERROR;
+    else {
+        *setme_end = end + 1;
+        *setme_val = val;
+    }
+
+    return err;
+}
+
+
+/**
+ * Byte strings are encoded as follows:
+ * <string length encoded in base ten ASCII>:<string data>
+ * Note that there is no constant beginning delimiter, and no ending delimiter.
+ * Example: 4:spam represents the string "spam" 
+ */
+int
+tr_bencParseStr( const uint8_t  * buf,
+                 const uint8_t  * bufend,
+                 const uint8_t ** setme_end,
+                 uint8_t       ** setme_str,
+                 size_t         * setme_strlen )
+{
+    size_t len;
+    const void * end;
+    char * endptr;
+
+    if( buf >= bufend )
+        return TR_ERROR;
+
+    if( !isdigit( *buf  ) )
+        return TR_ERROR;
+
+    end = memchr( buf, ':', bufend-buf );
+    if( end == NULL )
+        return TR_ERROR;
+
+    errno = 0;
+    len = strtoul( (const char*)buf, &endptr, 10 );
+    if( errno || endptr!=end )
+        return TR_ERROR;
+
+    if( (const uint8_t*)end + 1 + len > bufend )
+        return TR_ERROR;
+
+    *setme_end = end + 1 + len;
+    *setme_str = (uint8_t*) tr_strndup( end + 1, len );
+    *setme_strlen = len;
+    return TR_OK;
+}
+
+/* setting to 1 to help expose bugs with tr_bencListAdd and tr_bencDictAdd */
+#define LIST_SIZE 8 /* number of items to increment list/dict buffer by */
+
+static int
+makeroom( benc_val_t * val, int count )
 {
     assert( TYPE_LIST == val->type || TYPE_DICT == val->type );
 
@@ -80,214 +195,150 @@ static int makeroom( benc_val_t * val, int count )
     return 0;
 }
 
-int _tr_bencLoad( char * buf, int len, benc_val_t * val, char ** end )
+static benc_val_t*
+getNode( benc_val_t * top, tr_ptrArray * parentStack, int type )
 {
-    char * p, * e, * foo;
+    benc_val_t * parent;
 
-    if( !end )
-    {
-        /* So we only have to check once */
-        end = &foo;
-    }
+    assert( top != NULL );
+    assert( parentStack != NULL );
 
-    for( ;; )
+    if( tr_ptrArrayEmpty( parentStack ) )
+        return top;
+
+    parent = tr_ptrArrayBack( parentStack );
+    assert( parent != NULL );
+
+    /* dictionary keys must be strings */
+    if( ( parent->type == TYPE_DICT )
+        && ( type != TYPE_STR )
+        && ( ! ( parent->val.l.count % 2 ) ) )
+        return NULL;
+
+    makeroom( parent, 1 );
+    return parent->val.l.vals + parent->val.l.count++;
+}
+
+/**
+ * this function's awkward stack-based implementation
+ * is to prevent maliciously-crafed bencode data from
+ * smashing our stack through deep recursion. (#667)
+ */
+int
+tr_bencParse( const void  * buf_in,
+              const void  * bufend_in,
+              benc_val_t     * top,
+              const uint8_t ** setme_end )
+{
+    int err;
+    const uint8_t * buf = buf_in;
+    const uint8_t * bufend = bufend_in;
+    tr_ptrArray * parentStack = tr_ptrArrayNew( );
+
+    while( buf != bufend )
     {
-        if( !buf || len<1 ) /* no more text to parse... */
+        if( buf > bufend ) /* no more text to parse... */
             return 1;
 
-        if( *buf=='i' ) /* Integer: i1234e */
+        if( *buf=='i' ) /* int */
         {
-            int64_t num;
+            int64_t val;
+            const uint8_t * end;
+            int err;
+            benc_val_t * node;
 
-            e = memchr( &buf[1], 'e', len - 1 );
-            if( !e )
-                return 1;
+            if(( err = tr_bencParseInt( (const uint8_t*)buf, bufend, &end, &val )))
+                return err;
 
-            *e = '\0';
-            num = strtoll( &buf[1], &p, 10 );
-            *e = 'e';
+            node = getNode( top, parentStack, TYPE_INT );
+            if( !node )
+                return TR_ERROR;
 
-            if( p != e )
-                return 1;
+            tr_bencInitInt( node, val );
+            buf = end;
 
-            tr_bencInitInt( val, num );
-            *end = p + 1;
-            break;
+            if( tr_ptrArrayEmpty( parentStack ) )
+                break;
         }
-        else if( *buf=='l' || *buf=='d' )
+        else if( *buf=='l' ) /* list */
         {
-            /* List: l<item1><item2>e
-               Dict: d<string1><item1><string2><item2>e
-               A dictionary is just a special kind of list with an even
-               count of items, and where even items are strings. */
-            char * cur;
-            char   is_dict;
-            char   str_expected;
-
-            is_dict      = ( buf[0] == 'd' );
-            cur          = &buf[1];
-            str_expected = 1;
-            tr_bencInit( val, ( is_dict ? TYPE_DICT : TYPE_LIST ) );
-            while( cur - buf < len && cur[0] != 'e' )
-            {
-                if( makeroom( val, 1 ) ||
-                    tr_bencLoad( cur, len - (cur - buf),
-                                 &val->val.l.vals[val->val.l.count], &p ) )
-                {
-                    tr_bencFree( val );
-                    return 1;
-                }
-                val->val.l.count++;
-                if( is_dict && str_expected &&
-                    val->val.l.vals[val->val.l.count - 1].type != TYPE_STR )
-                {
-                    tr_bencFree( val );
-                    return 1;
-                }
-                str_expected = !str_expected;
-
-                cur = p;
-            }
-
-            if( is_dict && ( val->val.l.count & 1 ) )
-            {
-                tr_bencFree( val );
-                return 1;
-            }
-
-            *end = cur + 1;
-            break;
+            benc_val_t * node = getNode( top, parentStack, TYPE_LIST );
+            if( !node )
+                return TR_ERROR;
+            tr_bencInit( node, TYPE_LIST );
+            tr_ptrArrayAppend( parentStack, node );
+            ++buf;
         }
-        else if( isdigit(*buf) )
+        else if( *buf=='d' ) /* dict */
         {
-            int    slen;
-            char * sbuf;
+            benc_val_t * node = getNode( top, parentStack, TYPE_DICT );
+            if( !node )
+                return TR_ERROR;
+            tr_bencInit( node, TYPE_DICT );
+            tr_ptrArrayAppend( parentStack, node );
+            ++buf;
+        }
+        else if( *buf=='e' ) /* end of list or dict */
+        {
+            ++buf;
+            if( tr_ptrArrayEmpty( parentStack ) )
+                return TR_ERROR;
+            tr_ptrArrayPop( parentStack );
+            if( tr_ptrArrayEmpty( parentStack ) )
+                break;
+        }
+        else if( isdigit(*buf) ) /* string? */
+        {
+            const uint8_t * end;
+            uint8_t * str;
+            size_t strlen;
+            int err;
+            benc_val_t * node;
 
-            e = memchr( buf, ':', len );
-            if( NULL == e )
-            {
-                return 1;
-            }
+            if(( err = tr_bencParseStr( buf, bufend, &end, &str, &strlen )))
+                return err;
 
-            /* String: 12:whateverword */
-            e[0] = '\0';
-            slen = strtol( buf, &p, 10 );
-            e[0] = ':';
+            node = getNode( top, parentStack, TYPE_STR );
+            if( !node )
+                return TR_ERROR;
 
-            if( p != e || 0 > slen || len - ( ( p + 1 ) - buf ) < slen )
-            {
-                return 1;
-            }
+            tr_bencInitStr( node, str, strlen, 0 );
+            buf = end;
 
-            sbuf = malloc( slen + 1 );
-            if( NULL == sbuf )
-            {
-                return 1;
-            }
-
-            memcpy( sbuf, p + 1, slen );
-            sbuf[slen] = '\0';
-            tr_bencInitStr( val, sbuf, slen, 0 );
-
-            *end = p + 1 + val->val.s.i;
-            break;
+            if( tr_ptrArrayEmpty( parentStack ) )
+                break;
         }
         else /* invalid bencoded text... march past it */
         {
             ++buf;
-            --len;
         }
     }
 
-    return 0;
+    err = tr_ptrArrayEmpty( parentStack ) ? 0 : 1;
+
+    if( !err && ( setme_end != NULL ) )
+        *setme_end = buf;
+
+    tr_ptrArrayFree( parentStack, NULL );
+    return err;
 }
 
-static void __bencPrint( benc_val_t * val, int space )
+int
+tr_bencLoad( const void  * buf_in,
+             int           buflen,
+             benc_val_t  * setme_benc,
+             char       ** setme_end )
 {
-    int ii;
-
-    for( ii = 0; ii < space; ii++ )
-    {
-        putc( ' ', stderr );
-    }
-
-    switch( val->type )
-    {
-        case TYPE_INT:
-            fprintf( stderr, "int:  %"PRId64"\n", tr_bencGetInt(val) );
-            break;
-
-        case TYPE_STR:
-            for( ii = 0; val->val.s.i > ii; ii++ )
-            {
-                if( '\\' == val->val.s.s[ii] )
-                {
-                    putc( '\\', stderr );
-                    putc( '\\', stderr );
-                }
-                else if( isprint( val->val.s.s[ii] ) )
-                {
-                    putc( val->val.s.s[ii], stderr );
-                }
-                else
-                {
-                    fprintf( stderr, "\\x%02x", val->val.s.s[ii] );
-                }
-            }
-            putc( '\n', stderr );
-            break;
-
-        case TYPE_LIST:
-            fprintf( stderr, "list\n" );
-            for( ii = 0; ii < val->val.l.count; ii++ )
-            {
-                __bencPrint( &val->val.l.vals[ii], space + 1 );
-            }
-            break;
-
-        case TYPE_DICT:
-            fprintf( stderr, "dict\n" );
-            for( ii = 0; ii < val->val.l.count; ii++ )
-            {
-                __bencPrint( &val->val.l.vals[ii], space + 1 );
-            }
-            break;
-    }
+    const uint8_t * buf = buf_in;
+    const uint8_t * end;
+    const int ret = tr_bencParse( buf, buf+buflen, setme_benc, &end );
+    if( !ret && setme_end )
+        *setme_end = (char*) end;
+    return ret;
 }
 
-void tr_bencPrint( benc_val_t * val )
-{
-    __bencPrint( val, 0 );
-}
-
-void tr_bencFree( benc_val_t * val )
-{
-    int i;
-
-    switch( val->type )
-    {
-        case TYPE_INT:
-            break;
-
-        case TYPE_STR:
-            if( !val->val.s.nofree )
-            {
-                free( val->val.s.s );
-            }
-            break;
-
-        case TYPE_LIST:
-        case TYPE_DICT:
-            for( i = 0; i < val->val.l.count; i++ )
-            {
-                tr_bencFree( &val->val.l.vals[i] );
-            }
-            free( val->val.l.vals );
-            break;
-    }
-}
-
-benc_val_t * tr_bencDictFind( benc_val_t * val, const char * key )
+benc_val_t *
+tr_bencDictFind( benc_val_t * val, const char * key )
 {
     int len, ii;
 
@@ -312,7 +363,22 @@ benc_val_t * tr_bencDictFind( benc_val_t * val, const char * key )
     return NULL;
 }
 
-benc_val_t * tr_bencDictFindFirst( benc_val_t * val, ... )
+benc_val_t*
+tr_bencDictFindType( benc_val_t * val, const char * key, int type )
+{
+    benc_val_t * ret = tr_bencDictFind( val, key );
+    return ret && ret->type == type ? ret : NULL;
+}
+
+int64_t
+tr_bencGetInt ( const benc_val_t * val )
+{
+    assert( tr_bencIsInt( val ) );
+    return val->val.i;
+}
+
+benc_val_t *
+tr_bencDictFindFirst( benc_val_t * val, ... )
 {
     const char * key;
     benc_val_t * ret;
@@ -333,14 +399,16 @@ benc_val_t * tr_bencDictFindFirst( benc_val_t * val, ... )
     return ret;
 }
 
-char * tr_bencStealStr( benc_val_t * val )
+char *
+tr_bencStealStr( benc_val_t * val )
 {
     assert( TYPE_STR == val->type );
     val->val.s.nofree = 1;
     return val->val.s.s;
 }
 
-void _tr_bencInitStr( benc_val_t * val, char * str, int len, int nofree )
+void
+_tr_bencInitStr( benc_val_t * val, char * str, int len, int nofree )
 {
     tr_bencInit( val, TYPE_STR );
     val->val.s.s      = str;
@@ -352,7 +420,8 @@ void _tr_bencInitStr( benc_val_t * val, char * str, int len, int nofree )
     val->val.s.i = len;
 }
 
-int tr_bencInitStrDup( benc_val_t * val, const char * str )
+int
+tr_bencInitStrDup( benc_val_t * val, const char * str )
 {
     char * newStr = tr_strdup( str );
     if( newStr == NULL )
@@ -362,27 +431,31 @@ int tr_bencInitStrDup( benc_val_t * val, const char * str )
     return 0;
 }
 
-void tr_bencInitInt( benc_val_t * val, int64_t num )
+void
+tr_bencInitInt( benc_val_t * val, int64_t num )
 {
     tr_bencInit( val, TYPE_INT );
     val->val.i = num;
 }
 
-int tr_bencListReserve( benc_val_t * val, int count )
+int
+tr_bencListReserve( benc_val_t * val, int count )
 {
     assert( TYPE_LIST == val->type );
 
     return makeroom( val, count );
 }
 
-int tr_bencDictReserve( benc_val_t * val, int count )
+int
+tr_bencDictReserve( benc_val_t * val, int count )
 {
     assert( TYPE_DICT == val->type );
 
     return makeroom( val, count * 2 );
 }
 
-benc_val_t * tr_bencListAdd( benc_val_t * list )
+benc_val_t *
+tr_bencListAdd( benc_val_t * list )
 {
     benc_val_t * item;
 
@@ -396,7 +469,8 @@ benc_val_t * tr_bencListAdd( benc_val_t * list )
     return item;
 }
 
-benc_val_t * tr_bencDictAdd( benc_val_t * dict, const char * key )
+benc_val_t *
+tr_bencDictAdd( benc_val_t * dict, const char * key )
 {
     benc_val_t * keyval, * itemval;
 
@@ -412,94 +486,363 @@ benc_val_t * tr_bencDictAdd( benc_val_t * dict, const char * key )
     return itemval;
 }
 
+
+/***
+****  BENC WALKING
+***/
+
 struct KeyIndex
 {
     const char * key;
     int index;
 };
 
-static int compareKeyIndex( const void * va, const void * vb )
+static int
+compareKeyIndex( const void * va, const void * vb )
 {
     const struct KeyIndex * a = va;
     const struct KeyIndex * b = vb;
     return strcmp( a->key, b->key );
 }
 
-static void
-saveImpl( struct evbuffer * out, const benc_val_t * val )
+struct SaveNode
 {
-    int ii;
+    const benc_val_t * val;
+    int valIsSaved;
+    int childCount;
+    int childIndex;
+    int * children;
+};
 
+static struct SaveNode*
+nodeNewDict( const benc_val_t * val )
+{
+    int i, j, n;
+    struct SaveNode * node;
+    struct KeyIndex * indices;
+
+    assert( tr_bencIsDict( val ) );
+
+    n = val->val.l.count;
+    node = tr_new0( struct SaveNode, 1 );
+    node->val = val;
+    node->children = tr_new0( int, n );
+
+    /* ugh, a dictionary's children have to be sorted by key... */
+    indices = tr_new( struct KeyIndex, n );
+    for( i=j=0; i<n; i+=2, ++j ) {
+        indices[j].key = val->val.l.vals[i].val.s.s;
+        indices[j].index = i;
+    }
+    qsort( indices, j, sizeof(struct KeyIndex), compareKeyIndex );
+    for( i=0; i<j; ++i ) {
+        const int index = indices[i].index;
+        node->children[ node->childCount++ ] = index;
+        node->children[ node->childCount++ ] = index + 1;
+    }
+
+    assert( node->childCount == n );
+    tr_free( indices );
+    return node;
+}
+
+static struct SaveNode*
+nodeNewList( const benc_val_t * val )
+{
+    int i, n;
+    struct SaveNode * node;
+
+    assert( tr_bencIsList( val ) );
+
+    n = val->val.l.count;
+    node = tr_new0( struct SaveNode, 1 );
+    node->val = val;
+    node->childCount = n;
+    node->children = tr_new0( int, n );
+    for( i=0; i<n; ++i ) /* a list's children don't need to be reordered */
+        node->children[i] = i;
+
+    return node;
+}
+
+static struct SaveNode*
+nodeNewSimple( const benc_val_t * val )
+{
+    struct SaveNode * node;
+
+    assert( !isContainer( val ) );
+
+    node = tr_new0( struct SaveNode, 1 );
+    node->val = val;
+    return node;
+}
+
+static struct SaveNode*
+nodeNew( const benc_val_t * val )
+{
     switch( val->type )
     {
         case TYPE_INT:
-            evbuffer_add_printf( out, "i%"PRId64"e", tr_bencGetInt(val) );
-            break;
-
         case TYPE_STR:
-            evbuffer_add_printf( out, "%i:", val->val.s.i );
-            evbuffer_add( out, val->val.s.s, val->val.s.i );
+            return nodeNewSimple( val );
             break;
-
         case TYPE_LIST:
-            evbuffer_add_printf( out, "l" );
-            for( ii = 0; val->val.l.count > ii; ii++ )
-                saveImpl( out, val->val.l.vals + ii );
-            evbuffer_add_printf( out, "e" );
+            return nodeNewList( val );
             break;
-
         case TYPE_DICT:
-            /* Keys must be strings and appear in sorted order
-               (sorted as raw strings, not alphanumerics). */
-            evbuffer_add_printf( out, "d" );
-            if( 1 ) {
-                int i;
-                struct KeyIndex * indices = tr_new( struct KeyIndex, val->val.l.count );
-                for( ii=i=0; i<val->val.l.count; i+=2 ) {
-                    indices[ii].key = val->val.l.vals[i].val.s.s;
-                    indices[ii].index = i;
-                    ii++;
-                }
-                qsort( indices, ii, sizeof(struct KeyIndex), compareKeyIndex );
-                for( i=0; i<ii; ++i ) {
-                    const int index = indices[i].index;
-                    saveImpl( out, val->val.l.vals + index );
-                    saveImpl( out, val->val.l.vals + index + 1 );
-                }
-                tr_free( indices );
-            }
-            evbuffer_add_printf( out, "e" );
+            return nodeNewDict( val );
             break;
     }
+
+    assert( 0 && "invalid type!" );
+    return NULL;
 }
 
-char*
-tr_bencSave( const benc_val_t * val, int * len )
+typedef void (*BencNodeWalkFunc)( const benc_val_t * val, void * user_data );
+
+struct WalkFuncs
 {
-    struct evbuffer * buf = evbuffer_new( );
+    BencNodeWalkFunc intFunc;
+    BencNodeWalkFunc stringFunc;
+    BencNodeWalkFunc dictBeginFunc;
+    BencNodeWalkFunc listBeginFunc;
+    BencNodeWalkFunc containerEndFunc;
+};
+
+/**
+ * this function's awkward stack-based implementation
+ * is to prevent maliciously-crafed bencode data from
+ * smashing our stack through deep recursion. (#667)
+ */
+static void
+depthFirstWalk( const benc_val_t * top, struct WalkFuncs * walkFuncs, void * user_data )
+{
+    tr_ptrArray * stack = tr_ptrArrayNew( );
+    tr_ptrArrayAppend( stack, nodeNew( top ) );
+
+    while( !tr_ptrArrayEmpty( stack ) )
+    {
+        struct SaveNode * node = tr_ptrArrayBack( stack );
+        const benc_val_t * val;
+
+        if( !node->valIsSaved )
+        {
+            val = node->val;
+            node->valIsSaved = TRUE;
+        }
+        else if( node->childIndex < node->childCount )
+        {
+            const int index = node->children[ node->childIndex++ ];
+            val = node->val->val.l.vals +  index;
+        }
+        else /* done with this node */
+        {
+            if( isContainer( node->val ) )
+                walkFuncs->containerEndFunc( node->val, user_data );
+            tr_ptrArrayPop( stack );
+            tr_free( node->children );
+            tr_free( node );
+            continue;
+        }
+
+        switch( val->type )
+        {
+            case TYPE_INT:
+                walkFuncs->intFunc( val, user_data );
+                break;
+
+            case TYPE_STR:
+                walkFuncs->stringFunc( val, user_data );
+                break;
+
+            case TYPE_LIST:
+                if( val != node->val )
+                    tr_ptrArrayAppend( stack, nodeNew( val ) );
+                else
+                    walkFuncs->listBeginFunc( val, user_data );
+                break;
+
+            case TYPE_DICT:
+                if( val != node->val )
+                    tr_ptrArrayAppend( stack, nodeNew( val ) );
+                else
+                    walkFuncs->dictBeginFunc( val, user_data );
+                break;
+
+            default:
+                assert( 0 && "invalid type!" );
+        }
+    }
+
+    tr_ptrArrayFree( stack, NULL );
+}
+
+/****
+*****
+****/
+
+static void
+saveIntFunc( const benc_val_t * val, void * buf )
+{
+    evbuffer_add_printf( buf, "i%"PRId64"e", tr_bencGetInt(val) );
+}
+static void
+saveStringFunc( const benc_val_t * val, void * user_data )
+{
+    struct evbuffer * out = user_data;
+    evbuffer_add_printf( out, "%i:", val->val.s.i );
+    evbuffer_add( out, val->val.s.s, val->val.s.i );
+}
+static void
+saveDictBeginFunc( const benc_val_t * val UNUSED, void * buf )
+{
+    evbuffer_add_printf( buf, "d" );
+}
+static void
+saveListBeginFunc( const benc_val_t * val UNUSED, void * buf )
+{
+    evbuffer_add_printf( buf, "l" );
+}
+static void
+saveContainerEndFunc( const benc_val_t * val UNUSED, void * buf )
+{
+    evbuffer_add_printf( buf, "e" );
+}
+char*
+tr_bencSave( const benc_val_t * top, int * len )
+{
     char * ret;
-    saveImpl( buf, val );
+    struct WalkFuncs walkFuncs;
+    struct evbuffer * out = evbuffer_new( );
+
+    walkFuncs.intFunc = saveIntFunc;
+    walkFuncs.stringFunc = saveStringFunc;
+    walkFuncs.dictBeginFunc = saveDictBeginFunc;
+    walkFuncs.listBeginFunc = saveListBeginFunc;
+    walkFuncs.containerEndFunc = saveContainerEndFunc;
+
+    depthFirstWalk( top, &walkFuncs, out );
+    
     if( len != NULL )
-        *len = EVBUFFER_LENGTH( buf );
-    ret = tr_strndup( (char*) EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
-    evbuffer_free( buf );
+        *len = EVBUFFER_LENGTH( out );
+    ret = tr_strndup( (char*) EVBUFFER_DATA( out ), EVBUFFER_LENGTH( out ) );
+    evbuffer_free( out );
     return ret;
 }
 
-/**
-***
-**/
+/***
+****
+***/
 
-benc_val_t*
-tr_bencDictFindType( benc_val_t * val, const char * key, int type )
+static void
+freeDummyFunc( const benc_val_t * val UNUSED, void * buf UNUSED  )
 {
-    benc_val_t * ret = tr_bencDictFind( val, key );
-    return ret && ret->type == type ? ret : NULL;
+}
+static void
+freeStringFunc( const benc_val_t * val, void * freeme )
+{
+    if( !val->val.s.nofree )
+        tr_ptrArrayAppend( freeme, val->val.s.s );
+}
+static void
+freeContainerBeginFunc( const benc_val_t * val, void * freeme )
+{
+    tr_ptrArrayAppend( freeme, val->val.l.vals );
+}
+void
+tr_bencFree( benc_val_t * val )
+{
+    if( val != NULL )
+    {
+        tr_ptrArray * freeme = tr_ptrArrayNew( );
+        struct WalkFuncs walkFuncs;
+
+        walkFuncs.intFunc = freeDummyFunc;
+        walkFuncs.stringFunc = freeStringFunc;
+        walkFuncs.dictBeginFunc = freeContainerBeginFunc;
+        walkFuncs.listBeginFunc = freeContainerBeginFunc;
+        walkFuncs.containerEndFunc = freeDummyFunc;
+        depthFirstWalk( val, &walkFuncs, freeme );
+
+        tr_ptrArrayFree( freeme, tr_free );
+    }
 }
 
-int64_t
-tr_bencGetInt ( const benc_val_t * val )
+/***
+****
+***/
+
+struct WalkPrint
 {
-    assert( tr_bencIsInt( val ) );
-    return val->val.i;
+    int depth;
+    FILE * out;
+};
+static void
+printLeadingSpaces( struct WalkPrint * data )
+{
+    const int width = data->depth * 2;
+    fprintf( data->out, "%*.*s", width, width, " " );
+}
+static void
+printIntFunc( const benc_val_t * val, void * vdata )
+{
+    struct WalkPrint * data = vdata;
+    printLeadingSpaces( data );
+    fprintf( data->out, "int:  %"PRId64"\n", tr_bencGetInt(val) );
+}
+static void
+printStringFunc( const benc_val_t * val, void * vdata )
+{
+    int ii;
+    struct WalkPrint * data = vdata;
+    printLeadingSpaces( data );
+    for( ii = 0; val->val.s.i > ii; ii++ )
+    {
+        if( '\\' == val->val.s.s[ii] ) {
+            putc( '\\', data->out );
+            putc( '\\', data->out );
+        } else if( isprint( val->val.s.s[ii] ) ) {
+            putc( val->val.s.s[ii], data->out );
+        } else {
+            fprintf( data->out, "\\x%02x", val->val.s.s[ii] );
+        }
+    }
+}
+static void
+printListBeginFunc( const benc_val_t * val UNUSED, void * vdata )
+{
+    struct WalkPrint * data = vdata;
+    printLeadingSpaces( data );
+    fprintf( data->out, "list\n" );
+    ++data->depth;
+}
+static void
+printDictBeginFunc( const benc_val_t * val UNUSED, void * vdata )
+{
+    struct WalkPrint * data = vdata;
+    printLeadingSpaces( data );
+    fprintf( data->out, "dict\n" );
+    ++data->depth;
+}
+static void
+printContainerEndFunc( const benc_val_t * val UNUSED, void * vdata )
+{
+    struct WalkPrint * data = vdata;
+    --data->depth;
+}
+void
+tr_bencPrint( benc_val_t * val )
+{
+    struct WalkFuncs walkFuncs;
+    struct WalkPrint walkPrint;
+
+    walkFuncs.intFunc = printIntFunc;
+    walkFuncs.stringFunc = printStringFunc;
+    walkFuncs.dictBeginFunc = printDictBeginFunc;
+    walkFuncs.listBeginFunc = printListBeginFunc;
+    walkFuncs.containerEndFunc = printContainerEndFunc;
+
+    walkPrint.out = stderr;
+    walkPrint.depth = 0;
+    depthFirstWalk( val, &walkFuncs, &walkPrint );
 }

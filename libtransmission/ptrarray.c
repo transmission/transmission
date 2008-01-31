@@ -96,6 +96,14 @@ tr_ptrArrayNth( tr_ptrArray* t, int i )
     return t->items[i];
 }
 
+void*
+tr_ptrArrayBack( tr_ptrArray* t )
+{
+    assert( t->n_items > 0 );
+
+    return tr_ptrArrayNth( t, t->n_items-1 );
+}
+
 int
 tr_ptrArraySize( const tr_ptrArray * t )
 {
@@ -138,6 +146,17 @@ int
 tr_ptrArrayAppend( tr_ptrArray * t, void * ptr )
 {
     return tr_ptrArrayInsert( t, ptr, -1 );
+}
+
+void*
+tr_ptrArrayPop( tr_ptrArray* t )
+{
+    void * ret = NULL;
+
+    if( t->n_items )
+        ret = t->items[--t->n_items];
+   
+    return ret;
 }
 
 void
