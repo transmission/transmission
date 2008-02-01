@@ -213,15 +213,15 @@ testParse( void )
         return err;
     if(( err = testString( "d4:spaml1:a1:bee", TRUE )))
         return err;
-#if 0
-    if(( err = testString( "d9:publisher3:bob18:publisher.location4:home17:publisher-webpage15:www.example.come", TRUE )))
+    if(( err = testString( "d9:publisher3:bob17:publisher-webpage15:www.example.com18:publisher.location4:homee", TRUE )))
         return err;
-#endif
     if(( err = testString( "d8:completei1e8:intervali1800e12:min intervali1800e5:peers0:e", TRUE )))
         return err;
     if(( err = testString( "d1:ai0e1:be", FALSE ))) /* odd number of children */
         return err;
     if(( err = testString( "", FALSE )))
+        return err;
+    if(( err = testString( " ", FALSE )))
         return err;
 
     /* nested containers
