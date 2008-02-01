@@ -214,7 +214,7 @@ tr_ioWrite( tr_torrent     * tor,
             int              len,
             const uint8_t  * buf )
 {
-    return readOrWritePiece( tor, TR_IO_WRITE, pieceIndex, begin, (void*)buf, len );
+    return readOrWritePiece( tor, TR_IO_WRITE, pieceIndex, begin, (uint8_t*)buf, len );
 }
 
 /****
@@ -244,9 +244,9 @@ tr_ioRecalculateHash( tr_torrent  * tor,
     while( bytesLeft > 0 )
     {
         const int bytesThisPass = MIN( bytesLeft, (int)sizeof(buf) );
-        int ret = tr_ioRead( tor, pieceIndex, offset, bytesThisPass, buf );
-        if( ret )
-            return ret;
+        int err = tr_ioRead( tor, pieceIndex, offset, bytesThisPass, buf );
+        if( err )
+            return err;
         SHA1_Update( &sha, buf, bytesThisPass );
         bytesLeft -= bytesThisPass;
         offset += bytesThisPass;
