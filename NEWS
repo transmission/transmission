@@ -1,5 +1,10 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.04 (2008/01/31)
+- All Platforms:
+   + Fix (potential) remote crash bug with extension protocol
+   + Fix bug when verifying a torrent and pressing `pause'
+
 1.03 (2008/01/29)
 - All Platforms:
    + Fix bug setting maximum peer limits
