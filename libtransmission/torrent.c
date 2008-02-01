@@ -1317,6 +1317,22 @@ tr_torrentSetFileChecked( tr_torrent * tor, int fileIndex, int isChecked )
         tr_bitfieldRemRange ( tor->checkedPieces, begin, end );
 }
 
+int
+tr_torrentIsFileChecked( const tr_torrent * tor, int fileIndex )
+{
+    const tr_file * file = &tor->info.files[fileIndex];
+    const size_t begin = file->firstPiece;
+    const size_t end = file->lastPiece + 1;
+    size_t i;
+    int isChecked = TRUE;
+
+    for( i=begin; isChecked && i<end; ++i )
+        if( !tr_torrentIsPieceChecked( tor, i ) )
+            isChecked = FALSE;
+
+    return isChecked;
+}
+
 void
 tr_torrentUncheck( tr_torrent * tor )
 {

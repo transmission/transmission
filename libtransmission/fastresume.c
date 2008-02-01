@@ -208,7 +208,7 @@ tr_fastResumeSave( const tr_torrent * tor )
 
     /* Write progress data */
     if (1) {
-        int n;
+        int i, n;
         tr_time_t * mtimes;
         uint8_t * buf = malloc( FR_PROGRESS_LEN( tor ) );
         uint8_t * walk = buf;
@@ -216,6 +216,9 @@ tr_fastResumeSave( const tr_torrent * tor )
 
         /* mtimes */
         mtimes = getMTimes( tor, &n );
+        for( i=0; i<n; ++i )
+            if( !tr_torrentIsFileChecked( tor, i ) )
+                mtimes[i] = ~(tr_time_t)0; /* force a recheck next time */
         memcpy( walk, mtimes, n*sizeof(tr_time_t) );
         walk += n * sizeof(tr_time_t);
 
@@ -418,8 +421,10 @@ parseProgress( tr_torrent     * tor,
             readBytes( &mtime, &walk, sizeof(tr_time_t) );
             if ( curMTimes[i] == mtime )
                 tr_torrentSetFileChecked( tor, i, TRUE );
-            else
+            else {
+                tr_torrentSetFileChecked( tor, i, FALSE );
                 tr_dbg( "File '%s' recheck needed", tor->info.files[i].name );
+            }
         }
         free( curMTimes );
 
