@@ -24,7 +24,7 @@ testInt( void )
 {
     uint8_t buf[128];
     int64_t val;
-    unsigned int err;
+    int err;
     const uint8_t * end;
 
     /* good int string */
@@ -38,20 +38,20 @@ testInt( void )
     end = NULL;
     val = 888;
     err = tr_bencParseInt( buf, buf+3, &end, &val );
-    check( err == TR_ERROR ); 
+    check( err == (int)TR_ERROR ); 
     check( val == 888 );
     check( end == NULL );
 
     /* empty buffer */
     err = tr_bencParseInt( buf, buf+0, &end, &val );
-    check( err == TR_ERROR ); 
+    check( err == (int)TR_ERROR ); 
     check( val == 888 );
     check( end == NULL );
 
     /* bad number */
     snprintf( (char*)buf, sizeof( buf ), "i6z4e" );
     err = tr_bencParseInt( buf, buf+5, &end, &val );
-    check( err == TR_ERROR );
+    check( err == (int)TR_ERROR );
     check( val == 888 );
     check( end == NULL );
 
@@ -74,7 +74,7 @@ testInt( void )
     end = NULL;
     snprintf( (char*)buf, sizeof( buf ), "i04e" );
     err = tr_bencParseInt( buf, buf+4, &end, &val );
-    check( err == TR_ERROR );
+    check( err == (int)TR_ERROR );
     check( val == 0 );
     check( end == NULL );
 
@@ -85,7 +85,7 @@ static int
 testStr( void )
 {
     uint8_t buf[128];
-    unsigned int err;
+    int err;
     const uint8_t * end;
     uint8_t * str;
     size_t len;
@@ -104,7 +104,7 @@ testStr( void )
 
     /* string goes past end of buffer */
     err = tr_bencParseStr( buf, buf+5, &end, &str, &len );
-    check( err == TR_ERROR );
+    check( err == (int)TR_ERROR );
     check( str == NULL );
     check( end == NULL );
     check( !len );
@@ -133,6 +133,29 @@ testStr( void )
     end = NULL;
     len = 0;
 
+    return 0;
+}
+
+static int
+testString( const char * str, int isGood )
+{
+    benc_val_t val;
+    const uint8_t * end = NULL;
+    char * saved;
+    const size_t len = strlen( str );
+    int savedLen;
+    int err = tr_bencParse( str, str+len, &val , &end );
+    if( !isGood ) {
+        check( err );
+    } else {
+        check( !err );
+        check( end == (const uint8_t*)str + len );
+        saved = tr_bencSave( &val, &savedLen );
+        check( !strcmp( saved, str ) );
+        check( len == (size_t)savedLen );
+        tr_free( saved );
+        tr_bencFree( &val );
+    }
     return 0;
 }
 
@@ -184,15 +207,22 @@ testParse( void )
     tr_free( saved );
     tr_bencFree( &val );
 
-    end = NULL;
-    snprintf( (char*)buf, sizeof( buf ), "llleee" );
-    err = tr_bencParse( buf, buf + sizeof( buf ), &val , &end );
-    check( !err );
-    check( end == buf + 6 );
-    saved = tr_bencSave( &val, &len );
-    check( !strcmp( saved, "llleee" ) );
-    tr_free( saved );
-    tr_bencFree( &val );
+    if(( err = testString( "llleee", TRUE )))
+        return err;
+    if(( err = testString( "d3:cow3:moo4:spam4:eggse", TRUE )))
+        return err;
+    if(( err = testString( "d4:spaml1:a1:bee", TRUE )))
+        return err;
+#if 0
+    if(( err = testString( "d9:publisher3:bob18:publisher.location4:home17:publisher-webpage15:www.example.come", TRUE )))
+        return err;
+#endif
+    if(( err = testString( "d8:completei1e8:intervali1800e12:min intervali1800e5:peers0:e", TRUE )))
+        return err;
+    if(( err = testString( "d1:ai0e1:be", FALSE ))) /* odd number of children */
+        return err;
+    if(( err = testString( "", FALSE )))
+        return err;
 
     /* nested containers
      * parse an unsorted dict
@@ -207,13 +237,6 @@ testParse( void )
     saved = tr_bencSave( &val, &len );
     check( !strcmp( saved, "lld1:ai64e1:bi32eeee" ) );
     tr_free( saved );
-    tr_bencFree( &val );
-
-    end = NULL;
-    snprintf( (char*)buf, sizeof( buf ), "d8:completei1e8:intervali1800e12:min intervali1800e5:peers0:e" );
-    err = tr_bencParse( buf, buf+sizeof( buf ), &val, &end );
-    check( !err );
-    check( end == buf + strlen( (const char*)buf ) );
     tr_bencFree( &val );
 
     return 0;
