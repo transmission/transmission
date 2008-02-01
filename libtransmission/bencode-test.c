@@ -3,7 +3,7 @@
 #include "bencode.h"
 #include "utils.h" /* tr_free */
 
-#define VERBOSE 0
+#define VERBOSE 1
 
 int test = 0;
 
@@ -238,6 +238,29 @@ testParse( void )
     check( !strcmp( saved, "lld1:ai64e1:bi32eeee" ) );
     tr_free( saved );
     tr_bencFree( &val );
+
+    /* too many endings */
+    end = NULL;
+    snprintf( (char*)buf, sizeof( buf ), "leee" );
+    err = tr_bencParse( buf, buf + sizeof( buf ), &val, &end );
+    check( !err );
+    check( end == buf + 2 );
+    saved = tr_bencSave( &val, &len );
+    check( !strcmp( saved, "le" ) );
+    tr_free( saved );
+    tr_bencFree( &val );
+
+    /* no ending */
+    end = NULL;
+    snprintf( (char*)buf, sizeof( buf ), "l1:a1:b1:c" );
+    err = tr_bencParse( buf, buf + strlen( (char*)buf ), &val, &end );
+    check( err );
+
+    /* incomplete string */
+    end = NULL;
+    snprintf( (char*)buf, sizeof( buf ), "1:" );
+    err = tr_bencParse( buf, buf + strlen( (char*)buf ), &val, &end );
+    check( err );
 
     return 0;
 }
