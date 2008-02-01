@@ -6,23 +6,20 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Thu, 4 Jan 2008 15:30:00 -0400</pubDate>
-    <lastBuildDate>Tue, 29 Jan 2008 16:17:00 -0400</lastBuildDate>
+    <lastBuildDate>Thu, 31 Jan 2008 23:42:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 1.02 Released</title>
+      <title>Transmission 1.04 Released</title>
       <description><![CDATA[
 <h4>Core Changes:</h4>
 <ul>
- <li>Fix bug setting maximum peer limits</li>
- <li>Fix overflow issue with very large torrents</li>
- <li>Fix LTEP handshake bug</li>
- <li>Fix handshake bug with mainline BitTorrent</li>
- <li>Fix bug when talking to lighttpd-based trackers</li>
+ <li>Fix (potential) remote crash bug with extension protocol</li>
+ <li>Fix bug when verifying a torrent and pressing `pause'</li>
 </ul>
 
 Transmission 0.72 and earlier: Complete your downloads before upgrading or you will lose data!]]></description>
-      <pubDate>Tue, 29 Jan 2008 16:17:00 -0400</pubDate>
-      <enclosure sparkle:version="4864" sparkle:shortVersionString="1.03" url="http://mirrors.m0k.org/transmission/files/Transmission-1.03.dmg" length="2650497" type="application/octet-stream"/>
+      <pubDate>Thu, 31 Jan 2008 23:42:00 -0400</pubDate>
+      <enclosure sparkle:version="4885" sparkle:shortVersionString="1.04" url="http://mirrors.m0k.org/transmission/files/Transmission-1.04.dmg" length="2640367" type="application/octet-stream"/>
     </item>
     
   </channel>
