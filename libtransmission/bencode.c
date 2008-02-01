@@ -41,27 +41,25 @@
 **/
 
 static int
-isInt( const benc_val_t * val )
+isType( const benc_val_t * val, int type )
 {
-    return val!=NULL && val->type==TYPE_INT;
+    return ( ( val != NULL ) && ( val->type == type ) );
 }
 
-static int
-isList( const benc_val_t * val )
-{
-    return val!=NULL && val->type==TYPE_LIST;
-}
-
-static int
-isDict( const benc_val_t * val )
-{
-    return val!=NULL && val->type==TYPE_DICT;
-}
+#define isInt(v)    ( isType( ( v ), TYPE_INT ) )
+#define isString(v) ( isType( ( v ), TYPE_STR ) )
+#define isList(v)   ( isType( ( v ), TYPE_LIST ) )
+#define isDict(v)   ( isType( ( v ), TYPE_DICT ) )
 
 static int
 isContainer( const benc_val_t * val )
 {
-    return val!=NULL && ( val->type & ( TYPE_DICT | TYPE_LIST ) );
+    return isList(val) || isDict(val);
+}
+static int
+isSomething( const benc_val_t * val )
+{
+    return isContainer(val) || isInt(val) || isString(val);
 }
 
 benc_val_t*
@@ -229,6 +227,8 @@ tr_bencParse( const void     * buf_in,
     const uint8_t * bufend = bufend_in;
     tr_ptrArray * parentStack = tr_ptrArrayNew( );
 
+    tr_bencInit( top, 0 );
+
     while( buf != bufend )
     {
         if( buf > bufend ) /* no more text to parse... */
@@ -274,9 +274,15 @@ tr_bencParse( const void     * buf_in,
         }
         else if( *buf=='e' ) /* end of list or dict */
         {
+            benc_val_t * node;
             ++buf;
             if( tr_ptrArrayEmpty( parentStack ) )
                 return TR_ERROR;
+
+            node = tr_ptrArrayBack( parentStack );
+            if( isDict( node ) && ( node->val.l.count % 2 ) )
+                return TR_ERROR; /* odd # of children in dict */
+
             tr_ptrArrayPop( parentStack );
             if( tr_ptrArrayEmpty( parentStack ) )
                 break;
@@ -308,7 +314,7 @@ tr_bencParse( const void     * buf_in,
         }
     }
 
-    err = tr_ptrArrayEmpty( parentStack ) ? 0 : 1;
+    err = !isSomething( top ) || !tr_ptrArrayEmpty( parentStack );
 
     if( !err && ( setme_end != NULL ) )
         *setme_end = buf;
@@ -511,20 +517,21 @@ struct SaveNode
 static struct SaveNode*
 nodeNewDict( const benc_val_t * val )
 {
-    int i, j, n;
+    int i, j;
+    int nKeys;
     struct SaveNode * node;
     struct KeyIndex * indices;
 
     assert( isDict( val ) );
 
-    n = val->val.l.count;
+    nKeys = val->val.l.count / 2;
     node = tr_new0( struct SaveNode, 1 );
     node->val = val;
-    node->children = tr_new0( int, n );
+    node->children = tr_new0( int, nKeys * 2 );
 
     /* ugh, a dictionary's children have to be sorted by key... */
-    indices = tr_new( struct KeyIndex, n );
-    for( i=j=0; i<n; i+=2, ++j ) {
+    indices = tr_new( struct KeyIndex, nKeys );
+    for( i=j=0; i<(nKeys*2); i+=2, ++j ) {
         indices[j].key = val->val.l.vals[i].val.s.s;
         indices[j].index = i;
     }
@@ -535,7 +542,7 @@ nodeNewDict( const benc_val_t * val )
         node->children[ node->childCount++ ] = index + 1;
     }
 
-    assert( node->childCount == n );
+    assert( node->childCount == nKeys * 2 );
     tr_free( indices );
     return node;
 }
