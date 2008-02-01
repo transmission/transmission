@@ -84,6 +84,7 @@ void tr_torrentInitFilePriority( tr_torrent   * tor,
 
 int  tr_torrentCountUncheckedPieces( const tr_torrent * );
 int  tr_torrentIsPieceChecked      ( const tr_torrent *, int piece );
+int  tr_torrentIsFileChecked       ( const tr_torrent *, int file );
 void tr_torrentSetPieceChecked     ( tr_torrent *, int piece, int isChecked );
 void tr_torrentSetFileChecked      ( tr_torrent *, int file, int isChecked );
 void tr_torrentUncheck             ( tr_torrent * );
