@@ -62,19 +62,10 @@ isSomething( const benc_val_t * val )
     return isContainer(val) || isInt(val) || isString(val);
 }
 
-benc_val_t*
-tr_bencListGetNthChild( benc_val_t * val, int i )
-{
-    benc_val_t * ret = NULL;
-    if( isList( val ) && ( i >= 0 ) && ( i < val->val.l.count ) )
-        ret = val->val.l.vals + i;
-    return ret;
-}
-
-
-/**
-***
-**/
+/***
+****  tr_bencParse()
+****  tr_bencLoad()
+***/
 
 /**
  * The initial i and trailing e are beginning and ending delimiters.
@@ -337,15 +328,17 @@ tr_bencLoad( const void  * buf_in,
     return ret;
 }
 
+/***
+****
+***/
+
 benc_val_t *
 tr_bencDictFind( benc_val_t * val, const char * key )
 {
     int len, ii;
 
-    if( val->type != TYPE_DICT )
-    {
+    if( !isDict( val ) )
         return NULL;
-    }
 
     len = strlen( key );
     
@@ -370,13 +363,6 @@ tr_bencDictFindType( benc_val_t * val, const char * key, int type )
     return ret && ret->type == type ? ret : NULL;
 }
 
-int64_t
-tr_bencGetInt ( const benc_val_t * val )
-{
-    assert( isInt( val ) );
-    return val->val.i;
-}
-
 benc_val_t *
 tr_bencDictFindFirst( benc_val_t * val, ... )
 {
@@ -386,26 +372,41 @@ tr_bencDictFindFirst( benc_val_t * val, ... )
 
     ret = NULL;
     va_start( ap, val );
-    while( ( key = va_arg( ap, const char * ) ) )
-    {
-        ret = tr_bencDictFind( val, key );
-        if( NULL != ret )
-        {
+    while(( key = va_arg( ap, const char * )))
+        if(( ret = tr_bencDictFind( val, key )))
             break;
-        }
-    }
     va_end( ap );
 
     return ret;
 }
 
+benc_val_t*
+tr_bencListGetNthChild( benc_val_t * val, int i )
+{
+    benc_val_t * ret = NULL;
+    if( isList( val ) && ( i >= 0 ) && ( i < val->val.l.count ) )
+        ret = val->val.l.vals + i;
+    return ret;
+}
+
+int64_t
+tr_bencGetInt ( const benc_val_t * val )
+{
+    assert( isInt( val ) );
+    return val->val.i;
+}
+
 char *
 tr_bencStealStr( benc_val_t * val )
 {
-    assert( TYPE_STR == val->type );
+    assert( isString( val ) );
     val->val.s.nofree = 1;
     return val->val.s.s;
 }
+
+/***
+****
+***/
 
 void
 _tr_bencInitStr( benc_val_t * val, char * str, int len, int nofree )
@@ -441,7 +442,7 @@ tr_bencInitInt( benc_val_t * val, int64_t num )
 int
 tr_bencListReserve( benc_val_t * val, int count )
 {
-    assert( TYPE_LIST == val->type );
+    assert( isList( val ) );
 
     return makeroom( val, count );
 }
@@ -449,7 +450,7 @@ tr_bencListReserve( benc_val_t * val, int count )
 int
 tr_bencDictReserve( benc_val_t * val, int count )
 {
-    assert( TYPE_DICT == val->type );
+    assert( isDict( val ) );
 
     return makeroom( val, count * 2 );
 }
@@ -485,7 +486,6 @@ tr_bencDictAdd( benc_val_t * dict, const char * key )
 
     return itemval;
 }
-
 
 /***
 ****  BENC WALKING
@@ -583,9 +583,9 @@ nodeNew( const benc_val_t * val )
 {
     struct SaveNode * node;
 
-    if( val->type == TYPE_LIST )
+    if( isList( val ) )
         node = nodeNewList( val );
-    else if( val->type == TYPE_DICT )
+    else if( isDict( val ) )
         node = nodeNewDict( val );
     else
         node = nodeNewLeaf( val );
