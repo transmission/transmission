@@ -1,4 +1,10 @@
 EXTRA_DIST = \
+    Credits.rtf \
+    AboutWindow.xib \
+    GroupsWindow.xib \
+    Defaults.plist \
+    Info.plist.in \
+    Transmission_Prefix.pch \
     version.sh \
     Sparkle.framework \
     CTGradient \
