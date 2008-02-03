@@ -940,7 +940,7 @@ doAction ( const char * action_name, gpointer user_data )
     struct cbdata * data = user_data;
     gboolean changed = FALSE;
 
-    if (!strcmp (action_name, "open-torrent"))
+    if ( !strcmp (action_name, "open-torrent-menu") || !strcmp( action_name, "open-torrent-toolbar" ))
     {
         makeaddwind( data->wind, data->core );
     }
