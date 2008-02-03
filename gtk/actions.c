@@ -67,9 +67,9 @@ sort_changed_cb( GtkAction            * action UNUSED,
 static GtkToggleActionEntry show_toggle_entries[] = 
 {
   { "toggle-main-window", NULL, 
-    N_("Show _Main Window"), NULL, NULL, G_CALLBACK(action_cb), TRUE }, 
+    N_("_Main Window"), NULL, NULL, G_CALLBACK(action_cb), TRUE }, 
   { "toggle-message-log", NULL,
-    N_("Show Message _Log"), NULL, NULL, G_CALLBACK(action_cb), FALSE }
+    N_("Message _Log"), NULL, NULL, G_CALLBACK(action_cb), FALSE }
 };
 
 static void
@@ -87,11 +87,11 @@ static GtkToggleActionEntry pref_toggle_entries[] =
   { "sort-reversed", NULL,
     N_("_Reverse Sort Order"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
   { "show-filter-bar", NULL,
-    N_("Show _Filter Bar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
+    N_("_Filter Bar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
   { "show-status-bar", NULL,
-    N_("Show _Status Bar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
+    N_("_Status Bar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
   { "show-toolbar", NULL,
-    N_("Show _Toolbar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE }
+    N_("_Toolbar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE }
 };
 
 static GtkActionEntry entries[] =
