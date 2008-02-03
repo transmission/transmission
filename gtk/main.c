@@ -108,6 +108,7 @@ struct cbdata
     GList        * errqueue;
     GHashTable   * tor2details;
     GHashTable   * details2tor;
+    gboolean       minimized;
 };
 
 #define CBDATA_PTR "callback-data-pointer"
@@ -333,6 +334,7 @@ appsetup( TrWindow * wind, GList * args,
     cbdata->timer      = 0;
     cbdata->closing    = FALSE;
     cbdata->errqueue   = NULL;
+    cbdata->minimized  = minimized;
 
     actions_set_core( cbdata->core );
 
@@ -374,8 +376,26 @@ appsetup( TrWindow * wind, GList * args,
     updatemodel( cbdata );
 
     /* show the window */
-    if( !minimized )
-        gtk_widget_show( GTK_WIDGET(wind) );
+    if( minimized )
+        gtk_window_iconify( wind );
+    gtk_widget_show( GTK_WIDGET( wind ) );
+}
+
+static void
+setMainWindowMinimized( struct cbdata * data, gboolean minimized )
+{
+    GtkWindow * window = GTK_WINDOW( data->wind );
+
+    if(( data->minimized = minimized ))
+        gtk_window_iconify( window );
+    else
+        gtk_window_deiconify( window );
+}
+
+static void
+toggleMainWindow( struct cbdata * data )
+{
+    setMainWindowMinimized( data, !data->minimized );
 }
 
 static gboolean
@@ -384,7 +404,7 @@ winclose( GtkWidget * w UNUSED, GdkEvent * event UNUSED, gpointer gdata )
     struct cbdata * cbdata = gdata;
 
     if( cbdata->icon != NULL )
-        gtk_widget_hide( GTK_WIDGET( cbdata->wind ) );
+        setMainWindowMinimized( cbdata, TRUE );
     else
         askquit( cbdata->core, cbdata->wind, wannaquit, cbdata );
 
@@ -914,32 +934,13 @@ msgwinclosed()
   return FALSE;
 }
 
-static void
-toggleMainWindow( struct cbdata * data )
-{
-    static int x=0, y=0;
-    GtkWidget * w = GTK_WIDGET( data->wind );
-    GtkWindow * window = GTK_WINDOW( w );
-
-    if( GTK_WIDGET_VISIBLE( w ) )
-    {
-        gtk_window_get_position( window, &x, &y );
-        gtk_widget_hide( w );
-    }
-    else
-    {
-        gtk_window_move( window, x, y );
-        gtk_window_present( window );
-    }
-}
-
 void
 doAction ( const char * action_name, gpointer user_data )
 {
     struct cbdata * data = user_data;
     gboolean changed = FALSE;
 
-    if (!strcmp (action_name, "add-torrent"))
+    if (!strcmp (action_name, "open-torrent"))
     {
         makeaddwind( data->wind, data->core );
     }

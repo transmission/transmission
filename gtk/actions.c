@@ -101,7 +101,7 @@ static GtkActionEntry entries[] =
   { "sort-menu", NULL, N_("_Sort Torrents By"), NULL, NULL, NULL },
   { "edit-menu", NULL, N_("_Edit"), NULL, NULL, NULL },
   { "help-menu", NULL, N_("_Help"), NULL, NULL, NULL },
-  { "add-torrent", GTK_STOCK_OPEN,
+  { "open-torrent", GTK_STOCK_OPEN,
     NULL, NULL, N_("Open Torrent"), G_CALLBACK(action_cb) },
   { "start-torrent", GTK_STOCK_MEDIA_PLAY,
     N_("_Start"), "<control>S", NULL, G_CALLBACK(action_cb) },
