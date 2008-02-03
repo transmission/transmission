@@ -225,7 +225,8 @@ usage( const char * msg, ... )
     }
 
     printf(
-  "usage: %s [options]\n"
+  "usage: %s [options] [files...]\n"
+  "       %s -x [options] proxy-command [args...]\n"
   "\n"
   "Transmission %s http://www.transmissionbt.com/\n"
   "A fast and easy BitTorrent client\n"
@@ -257,7 +258,7 @@ usage( const char * msg, ... )
   "  -u --upload-limit <int>   Max upload rate in KiB/s\n"
   "  -U --upload-unlimited     No upload rate limit\n"
   "  -x --proxy                Use proxy command to connect to frontend\n",
-            getmyname(), LONG_VERSION_STRING );
+            getmyname(), getmyname(), LONG_VERSION_STRING );
     exit( 0 );
 }
 
@@ -411,7 +412,7 @@ readargs( int argc, char ** argv, struct opts * opts )
                 break;
             case 'x':
                 opts->proxy     = 1;
-                break;
+                continue; /* don't set gotmsg, -x isn't a message */
             default:
                 usage( NULL );
                 break;
@@ -426,6 +427,8 @@ readargs( int argc, char ** argv, struct opts * opts )
 
     if( opts->proxy )
     {
+        if( argc == optind )
+            usage( "can't use -x without any arguments" );
         opts->proxycmd = argv + optind;
     }
     else if( 0 > fileargs( &opts->files, argc - optind, argv + optind ) )
