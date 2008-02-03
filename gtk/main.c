@@ -978,7 +978,7 @@ doAction ( const char * action_name, gpointer user_data )
         GtkTreeSelection * s = tr_window_get_selection(data->wind);
         gtk_tree_selection_selected_foreach( s, updateTrackerForeach, data->wind );
     }
-    else if (!strcmp (action_name, "create-torrent"))
+    else if (!strcmp (action_name, "new-torrent"))
     {
         GtkWidget * w = make_meta_ui( GTK_WINDOW( data->wind ),
                                       tr_core_handle( data->core ) );
