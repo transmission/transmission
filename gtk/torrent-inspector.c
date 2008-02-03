@@ -1279,7 +1279,6 @@ file_page_new ( TrTorrent * gtor )
     /* add file column */
     
     col = GTK_TREE_VIEW_COLUMN (g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,
-        "sizing", GTK_TREE_VIEW_COLUMN_AUTOSIZE,
         "expand", TRUE,
         "title", _("File"),
         NULL));
@@ -1561,6 +1560,7 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
                                    NULL);
   gtk_window_set_role (GTK_WINDOW(d), "tr-info" );
   g_signal_connect (d, "response", G_CALLBACK (response_cb), gtor);
+  gtk_dialog_set_has_separator( GTK_DIALOG( d ), FALSE );
   g_object_weak_ref (G_OBJECT(gtor), torrent_destroyed, d);
 
   /* add the notebook */
