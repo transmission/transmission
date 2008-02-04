@@ -1,7 +1,7 @@
 [Desktop Entry]
 _Name=Transmission BitTorrent Client
 _GenericName=BitTorrent Client
-_Comment=Transfer files via Peer to Peer
+_Comment=Download and share files over BitTorrent
 Exec=transmission %F
 Icon=transmission
 Terminal=false
