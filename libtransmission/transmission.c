@@ -393,6 +393,8 @@ tr_close( tr_handle * h )
     const int maxwait_msec = SHUTDOWN_MAX_SECONDS * 1000;
     const uint64_t deadline = tr_date( ) + maxwait_msec;
 
+    tr_statsClose( h );
+
     tr_runInEventThread( h, tr_closeImpl, h );
     while( !h->isClosed && !deadlineReached( deadline ) )
         tr_wait( 100 );
@@ -402,7 +404,6 @@ tr_close( tr_handle * h )
         tr_wait( 100 );
 
     tr_fdClose( );
-    tr_statsClose( h );
     tr_lockFree( h->lock );
     free( h->tag );
     free( h );
