@@ -252,12 +252,20 @@ static int
 compareByState( GtkTreeModel   * model,
                 GtkTreeIter    * a,
                 GtkTreeIter    * b,
-                gpointer         user_data UNUSED )
+                gpointer         user_data )
 {
-    int sa, sb;
+    int sa, sb, ret;
+
+    /* first by state */
     gtk_tree_model_get( model, a, MC_STATUS, &sa, -1 );
     gtk_tree_model_get( model, b, MC_STATUS, &sb, -1 );
-    return sa - sb;
+    ret = sa - sb;
+
+    /* second by progress */
+    if( !ret )
+        ret = compareByProgress( model, a, b, user_data );
+
+    return ret;
 }
 
 static int
