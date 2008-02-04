@@ -187,7 +187,7 @@
     
     NSRect result = bounds;
     result.size.height = BAR_HEIGHT;
-    result.origin.x = (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_BAR;
+    result.origin.x += (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_BAR;
     
     result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE;
     if (minimal)
