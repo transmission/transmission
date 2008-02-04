@@ -174,7 +174,7 @@ static int
 compareDouble( double a, double b )
 {
     if( a < b ) return -1;
-    if( b > a ) return 1;
+    if( b < a ) return 1;
     return 0;
 }
 
@@ -244,7 +244,7 @@ compareByProgress( GtkTreeModel   * model,
     sb = tr_torrentStatCached( tb );
     ret = compareDouble( sa->percentDone, sb->percentDone );
     if( !ret )
-        ret = compareDouble( sa->ratio, sa->ratio );
+        ret = compareDouble( sa->ratio, sb->ratio );
     return ret;
 }
 
