@@ -492,12 +492,6 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
 
   m  = peer_model_new (tor);
   v = gtk_tree_view_new_with_model (m);
-  {
-    PangoFontDescription * pfd = pango_font_description_new( );
-    pango_font_description_set_size( pfd, 8 * PANGO_SCALE );
-    gtk_widget_modify_font( v, pfd );
-    pango_font_description_free( pfd );
-  }
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW(v), TRUE);
   g_object_unref (G_OBJECT(m));
 
