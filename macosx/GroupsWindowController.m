@@ -258,6 +258,8 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         
         [movingGroups release];
         
+        [self saveGroups];
+        
         if ([selectedGroups count] > 0)
         {
             NSEnumerator * enumerator = [selectedGroups objectEnumerator];
