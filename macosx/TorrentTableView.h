@@ -26,14 +26,13 @@
 #import <transmission.h>
 #import <Controller.h>
 
-#define GROUP_SEPARATOR_HEIGHT 18.0
-
 @class TorrentCell;
 
-@interface TorrentTableView : NSTableView
+#define GROUP_SEPARATOR_HEIGHT 18.0
+
+@interface TorrentTableView : NSOutlineView
 {
     IBOutlet Controller * fController;
-    NSArray * fTorrents;
     NSIndexSet * fGroupIndexes;
     
     TorrentCell * fTorrentCell;
@@ -45,17 +44,12 @@
     int fMouseControlRow, fMouseRevealRow, fMouseActionRow, fActionPushedRow;
     NSArray * fSelectedValues;
     
-    NSMutableArray * fKeyStrokes;
-    
     IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu, * fRatioMenu;
     Torrent * fMenuTorrent;
     
     float fPiecesBarPercent;
     NSTimer * fPiecesBarTimer;
 }
-
-- (void) setTorrents: (NSArray *) torrents;
-- (void) setGroupIndexes: (NSIndexSet *) indexes;
 
 - (void) removeButtonTrackingAreas;
 - (void) setControlButtonHover: (int) row;

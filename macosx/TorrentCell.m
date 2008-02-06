@@ -178,7 +178,7 @@
 - (NSRect) progressRectForBounds: (NSRect) bounds
 {
     return [self rectForProgressWithString: [self attributedStatusString: [[self representedObject] progressString] withColor: nil]
-                    inBounds: bounds];
+            inBounds: bounds];
 }
 
 - (NSRect) barRectForBounds: (NSRect) bounds
@@ -453,13 +453,13 @@
     fMouseDownActionButton = pushed;
 }
 
-- (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
+- (void) drawInteriorWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
-    [super drawWithFrame: cellFrame inView: controlView];
-    
     Torrent * torrent = [self representedObject];
     
     BOOL minimal = [fDefaults boolForKey: @"SmallView"];
+    
+    #warning use inset instead of edges
     
     //group coloring
     NSRect iconRect = [self iconRectForBounds: cellFrame];

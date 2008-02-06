@@ -38,7 +38,6 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSMenuAdditions.h"
-#import "NSMutableArrayAdditions.h"
 #import "UKKQueue.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
@@ -212,7 +211,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         fTorrents = [[NSMutableArray alloc] init];
         fDisplayedTorrents = [[NSMutableArray alloc] init];
-        fDisplayedGroupIndexes = [[NSMutableIndexSet alloc] init];
         
         fMessageController = [[MessageWindowController alloc] init];
         fInfoController = [[InfoWindowController alloc] init];
@@ -252,7 +250,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //window min height
     NSSize contentMinSize = [fWindow contentMinSize];
-    contentMinSize.height = [[fWindow contentView] frame].size.height - [fScrollView frame].size.height
+    contentMinSize.height = [[fWindow contentView] frame].size.height - [[fTableView enclosingScrollView] frame].size.height
                                 + [fTableView rowHeight] + [fTableView intercellSpacing].height;
     [fWindow setContentMinSize: contentMinSize];
     
@@ -324,10 +322,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fPrefsController setUpdater: fUpdater];
     
-    [fTableView setTorrents: fDisplayedTorrents];
-    [fTableView setGroupIndexes: fDisplayedGroupIndexes];
-    
-    [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
+    #warning fix
+    //[fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
 
     //register for sleep notifications
@@ -415,7 +411,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //avoids need of setting delegate
     [nc addObserver: self selector: @selector(torrentTableViewSelectionDidChange:)
-                    name: NSTableViewSelectionDidChangeNotification object: fTableView];
+                    name: NSOutlineViewSelectionDidChangeNotification object: fTableView];
     
     [nc addObserver: self selector: @selector(prepareForUpdate:)
                     name: SUUpdaterWillRestartNotification object: nil];
@@ -429,6 +425,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [nc addObserver: self selector: @selector(setWindowSizeToFit)
                     name: @"AutoSizeSettingChange" object: nil];
+    
+    [nc addObserver: self selector: @selector(updateForExpandCollape)
+                    name: @"OutlineExpandCollapse" object: nil];
     
     [nc addObserver: fWindow selector: @selector(makeKeyWindow)
                     name: @"MakeWindowKey" object: nil];
@@ -589,7 +588,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fTorrents release];
     [fDisplayedTorrents release];
-    [fDisplayedGroupIndexes release];
     
     [fOverlayWindow release];
     [fIPCController release];
@@ -1199,26 +1197,22 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) removeNoDelete: (id) sender
 {
-    [self removeTorrents: [fTableView selectedTorrents]
-                deleteData: NO deleteTorrent: NO];
+    [self removeTorrents: [fTableView selectedTorrents] deleteData: NO deleteTorrent: NO];
 }
 
 - (void) removeDeleteData: (id) sender
 {
-    [self removeTorrents: [fTableView selectedTorrents]
-                deleteData: YES deleteTorrent: NO];
+    [self removeTorrents: [fTableView selectedTorrents] deleteData: YES deleteTorrent: NO];
 }
 
 - (void) removeDeleteTorrent: (id) sender
 {
-    [self removeTorrents: [fTableView selectedTorrents]
-                deleteData: NO deleteTorrent: YES];
+    [self removeTorrents: [fTableView selectedTorrents] deleteData: NO deleteTorrent: YES];
 }
 
 - (void) removeDeleteDataAndTorrent: (id) sender
 {
-    [self removeTorrents: [fTableView selectedTorrents]
-                deleteData: YES deleteTorrent: YES];
+    [self removeTorrents: [fTableView selectedTorrents] deleteData: YES deleteTorrent: YES];
 }
 
 - (void) moveDataFiles: (id) sender
@@ -1258,8 +1252,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) copyTorrentFiles: (id) sender
 {
-    [self copyTorrentFileForTorrents: [[NSMutableArray alloc] initWithArray:
-            [fTableView selectedTorrents]]];
+    [self copyTorrentFileForTorrents: [[NSMutableArray alloc] initWithArray: [fTableView selectedTorrents]]];
 }
 
 - (void) copyTorrentFileForTorrents: (NSMutableArray *) torrents
@@ -1455,6 +1448,35 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //badge dock
     [fBadger updateBadge];
+}
+
+- (void) setBottomCountTextFiltering: (BOOL) filtering
+{
+    NSString * totalTorrentsString;
+    int totalCount = [fTorrents count];
+    if (totalCount != 1)
+        totalTorrentsString = [NSString stringWithFormat: NSLocalizedString(@"%d transfers", "Status bar transfer count"), totalCount];
+    else
+        totalTorrentsString = NSLocalizedString(@"1 transfer", "Status bar transfer count");
+    
+    if (filtering)
+    {
+        int count = 0, rows = [fTableView numberOfRows];
+        if (rows > 0 && ![[fTableView itemAtRow: 0] isKindOfClass: [Torrent class]])
+        {
+            int i;
+            for (i = 1; i < [fTableView numberOfRows]; i++)
+                if ([[fTableView itemAtRow: i] isKindOfClass: [Torrent class]])
+                    count++;
+        }
+        else
+            count = rows;
+        
+        totalTorrentsString = [NSString stringWithFormat: NSLocalizedString(@"%d of %@", "Status bar transfer count"),
+                                count, totalTorrentsString];
+    }
+    
+    [fTotalTorrentsField setStringValue: totalTorrentsString];
 }
 
 - (void) updateTorrentsInQueue
@@ -1738,15 +1760,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //actually sort
     if ([fDefaults boolForKey: @"SortByGroup"] && [NSApp isOnLeopardOrBetter])
     {
-        NSUInteger i, nextGroup;
-        for (i = [fDisplayedGroupIndexes firstIndex]; i != NSNotFound; i = nextGroup)
-        {
-            nextGroup = [fDisplayedGroupIndexes indexGreaterThanIndex: i];
-            NSUInteger count = (nextGroup != NSNotFound ? nextGroup : [fDisplayedTorrents count]) - i - 1;
-        
-            [fDisplayedTorrents sortIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(i+1, count)]
-                usingDescriptors: descriptors];
-        }
+        NSEnumerator * enumerator = [fDisplayedTorrents objectEnumerator];
+        NSDictionary * dict;
+        while ((dict = [enumerator nextObject]))
+            [[dict objectForKey: @"Torrents"] sortUsingDescriptors: descriptors];
     }
     else
         [fDisplayedTorrents sortUsingDescriptors: descriptors];
@@ -1758,8 +1775,17 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) applyFilter: (id) sender
 {
-    NSMutableArray * previousTorrents = [fDisplayedTorrents mutableCopy];
-    [previousTorrents removeObjectsAtIndexes: fDisplayedGroupIndexes];
+    //get all the torrents in the table
+    NSMutableArray * previousTorrents = [NSMutableArray array];
+    if ([fDisplayedTorrents count] > 0 && ![[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [Torrent class]])
+    {
+        NSEnumerator * enumerator = [fDisplayedTorrents objectEnumerator];
+        NSDictionary * dict;
+        while ((dict = [enumerator nextObject]))
+            [previousTorrents addObjectsFromArray: [dict objectForKey: @"Torrents"]];
+    }
+    else
+        [previousTorrents setArray: fDisplayedTorrents];
     
     NSArray * selectedValues = [fTableView selectedValues];
     
@@ -1790,7 +1816,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     int i = -1;
-    BOOL isActive;
     while ((torrent = [enumerator nextObject]))
     {
         i++;
@@ -1801,7 +1826,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             if ([torrent isSeeding])
             {
                 seeding++;
-                isActive = ![torrent isStalled];
+                BOOL isActive = ![torrent isStalled];
                 if (isActive)
                     active++;
                 
@@ -1811,7 +1836,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             else
             {
                 downloading++;
-                isActive = ![torrent isStalled];
+                BOOL isActive = ![torrent isStalled];
                 if (isActive)
                     active++;
                 
@@ -1874,53 +1899,45 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fPauseFilterButton setCount: paused];
     
     //clear display cache for not-shown torrents
-    [previousTorrents removeObjectsInArray: fDisplayedTorrents]; //neither array should currently have group items
-    
+    [previousTorrents removeObjectsInArray: fDisplayedTorrents];
     enumerator = [previousTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
         [torrent setPreviousAmountFinished: NULL];
     
-    [previousTorrents release];
-    
-    //add group items
-    [fDisplayedGroupIndexes removeAllIndexes];
-    if ([fDefaults boolForKey: @"SortByGroup"] && [fDisplayedTorrents count] > 0 && [NSApp isOnLeopardOrBetter])
+    //place torrents into groups
+    BOOL groupRows = [fDefaults boolForKey: @"SortByGroup"];
+    if (groupRows && [fDisplayedTorrents count] > 0 && [NSApp isOnLeopardOrBetter])
     {
         NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: YES] autorelease];
         [fDisplayedTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
         
+        NSMutableArray * groups = [NSMutableArray array], * groupTorrents;
         int i, oldGroupValue = -2;
         for (i = 0; i < [fDisplayedTorrents count]; i++)
         {
-            int groupValue = [[fDisplayedTorrents objectAtIndex: i] groupValue];
+            Torrent * torrent = [fDisplayedTorrents objectAtIndex: i];
+            int groupValue = [torrent groupValue];
             if (groupValue != oldGroupValue)
             {
-                [fDisplayedTorrents insertObject: [NSNumber numberWithInt: groupValue] atIndex: i];
-                [fDisplayedGroupIndexes addIndex: i];
+                groupTorrents = [NSMutableArray array];
+                NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt: groupValue], @"Group",
+                                        groupTorrents, @"Torrents", nil];
+                [groups addObject: dict];
                 
-                i++;
                 oldGroupValue = groupValue;
             }
+            
+            [groupTorrents addObject: torrent];
         }
+        
+        [fDisplayedTorrents setArray: groups];
     }
     
     //actually sort
     [self sortTorrentsIgnoreSelected];
     [fTableView selectValues: selectedValues];
     
-    //set status bar torrent count text
-    NSString * totalTorrentsString;
-    int totalCount = [fTorrents count];
-    if (totalCount != 1)
-        totalTorrentsString = [NSString stringWithFormat: NSLocalizedString(@"%d transfers", "Status bar transfer count"), totalCount];
-    else
-        totalTorrentsString = NSLocalizedString(@"1 transfer", "Status bar transfer count");
-    
-    if (filterStatus || filterGroup || filterText)
-        totalTorrentsString = [NSString stringWithFormat: NSLocalizedString(@"%d of %@", "Status bar transfer count"),
-                                [fDisplayedTorrents count] - [fDisplayedGroupIndexes count], totalTorrentsString];
-    
-    [fTotalTorrentsField setStringValue: totalTorrentsString];
+    [self setBottomCountTextFiltering: groupRows || filterStatus || filterGroup || filterText];
 
     [self setWindowSizeToFit];
 }
@@ -2397,20 +2414,39 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [fAutoImportedNames addObject: [location lastPathComponent]];
 }
 
-- (int) numberOfRowsInTableView: (NSTableView *) tableview
+- (NSInteger) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
 {
-    return [fDisplayedTorrents count];
+    if (item)
+        return [[item objectForKey: @"Torrents"] count];
+    else
+        return [fDisplayedTorrents count];
 }
 
-- (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (int) row
+- (id) outlineView: (NSOutlineView *) outlineView child: (NSInteger) index ofItem: (id) item
 {
-    if (![fDisplayedGroupIndexes containsIndex: row])
-        return nil;
-    
-    int group = [[fDisplayedTorrents objectAtIndex: row] intValue];
-    return group != -1 ? [[GroupsWindowController groups] nameForIndex: group] : NSLocalizedString(@"No Group", "Group table row");
+    if (item)
+        return [[item objectForKey: @"Torrents"] objectAtIndex: index];
+    else
+        return [fDisplayedTorrents objectAtIndex: index];
 }
 
+- (BOOL) outlineView: (NSOutlineView *) outlineView isItemExpandable: (id) item
+{
+    return ![item isKindOfClass: [Torrent class]];
+}
+
+- (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
+{
+    if (![item isKindOfClass: [Torrent class]])
+    {
+        int group = [[item objectForKey: @"Group"] intValue];
+        return group != -1 ? [[GroupsWindowController groups] nameForIndex: group] : NSLocalizedString(@"No Group", "Group table row");
+    }
+    else
+        return [item hashString];
+}
+
+#warning fix
 - (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) indexes toPasteboard: (NSPasteboard *) pasteboard
 {
     //only allow reordering of rows if sorting by order
@@ -2626,15 +2662,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fTableView setRowHeight: makeSmall ? ROW_HEIGHT_SMALL : ROW_HEIGHT_REGULAR];
     
-    //non-group rows are being resized
-    NSMutableIndexSet * indexes = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTableView numberOfRows])];
-    [indexes removeIndexes: fDisplayedGroupIndexes];
-    [fTableView noteHeightOfRowsWithIndexesChanged: indexes];
+    [fTableView noteHeightOfRowsWithIndexesChanged: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTableView numberOfRows])]];
     
     //window min height
     NSSize contentMinSize = [fWindow contentMinSize],
             contentSize = [[fWindow contentView] frame].size;
-    contentMinSize.height = contentSize.height - [fScrollView frame].size.height
+    contentMinSize.height = contentSize.height - [[fTableView enclosingScrollView] frame].size.height
                             + [fTableView rowHeight] + [fTableView intercellSpacing].height;
     [fWindow setContentMinSize: contentMinSize];
     
@@ -2675,20 +2708,22 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (NSRect) windowFrameByAddingHeight: (float) height checkLimits: (BOOL) check
 {
+    NSScrollView * scrollView = [fTableView enclosingScrollView];
+    
     //convert pixels to points
     NSRect windowFrame = [fWindow frame];
-    NSSize windowSize = [fScrollView convertSize: windowFrame.size fromView: nil];
+    NSSize windowSize = [scrollView convertSize: windowFrame.size fromView: nil];
     windowSize.height += height;
     
     if (check)
     {
-        NSSize minSize = [fScrollView convertSize: [fWindow minSize] fromView: nil];
+        NSSize minSize = [scrollView convertSize: [fWindow minSize] fromView: nil];
         
         if (windowSize.height < minSize.height)
             windowSize.height = minSize.height;
         else
         {
-            NSSize maxSize = [fScrollView convertSize: [[fWindow screen] visibleFrame].size fromView: nil];
+            NSSize maxSize = [scrollView convertSize: [[fWindow screen] visibleFrame].size fromView: nil];
             if ([fStatusBar isHidden])
                 maxSize.height -= [fStatusBar frame].size.height;
             if ([fFilterBar isHidden]) 
@@ -2699,7 +2734,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
 
     //convert points to pixels
-    windowSize = [fScrollView convertSize: windowSize toView: nil];
+    windowSize = [scrollView convertSize: windowSize toView: nil];
 
     windowFrame.origin.y -= (windowSize.height - windowFrame.size.height);
     windowFrame.size.height = windowSize.height;
@@ -2735,13 +2770,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
     [self updateUI];
     
+    NSScrollView * scrollView = [fTableView enclosingScrollView];
+    
     //set views to not autoresize
     unsigned int statsMask = [fStatusBar autoresizingMask];
     unsigned int filterMask = [fFilterBar autoresizingMask];
-    unsigned int scrollMask = [fScrollView autoresizingMask];
+    unsigned int scrollMask = [scrollView autoresizingMask];
     [fStatusBar setAutoresizingMask: NSViewNotSizable];
     [fFilterBar setAutoresizingMask: NSViewNotSizable];
-    [fScrollView setAutoresizingMask: NSViewNotSizable];
+    [scrollView setAutoresizingMask: NSViewNotSizable];
     
     frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
     [fWindow setFrame: frame display: YES animate: animate]; 
@@ -2749,7 +2786,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //re-enable autoresize
     [fStatusBar setAutoresizingMask: statsMask];
     [fFilterBar setAutoresizingMask: filterMask];
-    [fScrollView setAutoresizingMask: scrollMask];
+    [scrollView setAutoresizingMask: scrollMask];
     
     //change min size
     NSSize minSize = [fWindow contentMinSize];
@@ -2800,19 +2837,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             [fWindow setFrame: frame display: NO animate: NO];
         }
     }
+    
+    NSScrollView * scrollView = [fTableView enclosingScrollView];
 
     //set views to not autoresize
     unsigned int filterMask = [fFilterBar autoresizingMask];
-    unsigned int scrollMask = [fScrollView autoresizingMask];
+    unsigned int scrollMask = [scrollView autoresizingMask];
     [fFilterBar setAutoresizingMask: NSViewNotSizable];
-    [fScrollView setAutoresizingMask: NSViewNotSizable];
+    [scrollView setAutoresizingMask: NSViewNotSizable];
     
     frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
     [fWindow setFrame: frame display: YES animate: animate];
     
     //re-enable autoresize
     [fFilterBar setAutoresizingMask: filterMask];
-    [fScrollView setAutoresizingMask: scrollMask];
+    [scrollView setAutoresizingMask: scrollMask];
     
     //change min size
     NSSize minSize = [fWindow contentMinSize];
@@ -3622,19 +3661,30 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     if ([fDefaults boolForKey: @"AutoSize"])
     {
-        [fScrollView setHasVerticalScroller: NO];
+        NSScrollView * scrollView = [fTableView enclosingScrollView];
+        
+        [scrollView setHasVerticalScroller: NO];
         [fWindow setFrame: [self sizedWindowFrame] display: YES animate: YES];
-        [fScrollView setHasVerticalScroller: YES];
+        [scrollView setHasVerticalScroller: YES];
     }
 }
 
 - (NSRect) sizedWindowFrame
 {
-    float heightChange = (GROUP_SEPARATOR_HEIGHT + [fTableView intercellSpacing].height) * [fDisplayedGroupIndexes count]
-                        + ([fTableView rowHeight] + [fTableView intercellSpacing].height) * ([fDisplayedTorrents count]
-                            - [fDisplayedGroupIndexes count]) - [fScrollView frame].size.height;
+    int groups = ([fDisplayedTorrents count] > 0 && ![[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [Torrent class]])
+                    ? [fDisplayedTorrents count] : 0;
+    
+    float heightChange = (GROUP_SEPARATOR_HEIGHT + [fTableView intercellSpacing].height) * groups
+                        + ([fTableView rowHeight] + [fTableView intercellSpacing].height) * ([fTableView numberOfRows] - groups)
+                        - [[fTableView enclosingScrollView] frame].size.height;
     
     return [self windowFrameByAddingHeight: heightChange checkLimits: YES];
+}
+
+- (void) updateForExpandCollape
+{
+    [self setWindowSizeToFit];
+    [self setBottomCountTextFiltering: YES];
 }
 
 - (void) showMainWindow: (id) sender

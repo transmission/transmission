@@ -56,6 +56,8 @@ typedef enum
 
     NSImage * fIcon;
     
+    NSString * fHashString;
+    
     tr_file_stat * fileStat;
     NSArray * fFileList;
     

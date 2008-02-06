@@ -52,7 +52,6 @@ typedef enum
     tr_handle                       * fLib;
     
     NSMutableArray                  * fTorrents, * fDisplayedTorrents;
-    NSMutableIndexSet               * fDisplayedGroupIndexes;
     
     PrefsController                 * fPrefsController;
     InfoWindowController            * fInfoController;
@@ -63,7 +62,6 @@ typedef enum
     
     IBOutlet NSWindow               * fWindow;
     DragOverlayWindow               * fOverlayWindow;
-    IBOutlet NSScrollView           * fScrollView;
     IBOutlet TorrentTableView       * fTableView;
     
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
@@ -183,6 +181,8 @@ typedef enum
 
 - (void) updateUI;
 
+- (void) setBottomCountTextFiltering: (BOOL) filtering;
+
 - (void) updateTorrentsInQueue;
 - (int) numToStartFromQueue: (BOOL) downloadQueue;
 
@@ -246,6 +246,8 @@ typedef enum
 
 - (void) setWindowSizeToFit;
 - (NSRect) sizedWindowFrame;
+
+- (void) updateForExpandCollape;
 
 - (void) showMainWindow: (id) sender;
 

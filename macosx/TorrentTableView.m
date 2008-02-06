@@ -24,7 +24,6 @@
 
 #import "TorrentTableView.h"
 #import "TorrentCell.h"
-#import "Controller.h"
 #import "Torrent.h"
 #import "NSApplicationAdditions.h"
 #import "NSMenuAdditions.h"
@@ -75,90 +74,86 @@
     return self;
 }
 
-- (void) awakeFromNib
-{
-    [self setGridStyleMask: NSTableViewSolidVerticalGridLineMask]; //weird redrawing issues if set to none
-}
-
 - (void) dealloc
 {
     [fPiecesBarTimer invalidate];
+    [fMenuTorrent release];
     
     [fSelectedValues release];
-    
-    [fKeyStrokes release];
-    [fMenuTorrent release];
     
     [fTorrentCell release];
     
     [super dealloc];
 }
 
-- (void) setTorrents: (NSArray *) torrents
+- (BOOL) outlineView: (NSOutlineView *) outlineView isGroupItem: (id) item
 {
-    fTorrents = torrents;
+    return ![item isKindOfClass: [Torrent class]];
 }
 
-- (void) setGroupIndexes: (NSIndexSet *) indexes
+- (CGFloat) outlineView: (NSOutlineView *) outlineView heightOfRowByItem: (id) item
 {
-    fGroupIndexes = indexes;
+    return [item isKindOfClass: [Torrent class]] ? [self rowHeight] : GROUP_SEPARATOR_HEIGHT;
 }
 
-- (BOOL) tableView: (NSTableView *) tableView isGroupRow: (NSInteger) row
+- (NSCell *) outlineView: (NSOutlineView *) outlineView dataCellForTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
-    return [fGroupIndexes containsIndex: row];
+    if (!tableColumn)
+        return nil;
+    return [item isKindOfClass: [Torrent class]] ? fTorrentCell : nil;
 }
 
-- (CGFloat) tableView: (NSTableView *) tableView heightOfRow: (NSInteger) row
+- (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn
+    item: (id) item
 {
-    return ![fGroupIndexes containsIndex: row] ? [self rowHeight] : GROUP_SEPARATOR_HEIGHT;
-}
-
-- (NSCell *) tableView: (NSTableView *) tableView dataCellForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
-{
-    return ![fGroupIndexes containsIndex: row] ? fTorrentCell : nil;
-}
-
-- (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn row: (int) row
-{
-    if ([fGroupIndexes containsIndex: row])
+    if (![item isKindOfClass: [Torrent class]])
         return;
     
-    [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
+    [cell setRepresentedObject: item];
     
+    int row = [self rowForItem: item];
     [cell setControlHover: row == fMouseControlRow];
     [cell setRevealHover: row == fMouseRevealRow];
     [cell setActionHover: row == fMouseActionRow];
     [cell setActionPushed: row == fActionPushedRow];
 }
 
-- (NSString *) tableView: (NSTableView *) tableView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn row: (int) row
+- (NSRect) frameOfCellAtColumn: (NSInteger) column row: (NSInteger) row
 {
-    return ![fGroupIndexes containsIndex: row] ? [[fTorrents objectAtIndex: row] name]
-                                                : [[self preparedCellAtColumn: 0 row: row] stringValue];
+    NSRect rect = [super frameOfCellAtColumn: column row: row];
+    
+    if ([[self itemAtRow: row] isKindOfClass: [Torrent class]])
+    {
+        rect.size.width += rect.origin.x;
+        rect.origin.x = 0.0;
+    }
+    
+    return rect;
 }
 
-- (BOOL) tableView: (NSTableView *) tableView shouldEditTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
+- (NSString *) outlineView: (NSOutlineView *) outlineView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
-    return NO;
+    return [item isKindOfClass: [Torrent class]] ? [item name]
+            : [[self preparedCellAtColumn: 0 row: [self rowForItem: item]] stringValue];
 }
 
 - (void) updateTrackingAreas
 {
     [super updateTrackingAreas];
-    
     [self removeButtonTrackingAreas];
     
-    NSMutableIndexSet * indexes = [NSMutableIndexSet indexSetWithIndexesInRange: [self rowsInRect: [self visibleRect]]];
-    [indexes removeIndexes: fGroupIndexes];
-    if ([indexes count] == 0)
+    NSRange rows = [self rowsInRect: [self visibleRect]];
+    if (rows.length == 0)
         return;
     
     NSPoint mouseLocation = [self convertPoint: [[self window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil];
     
     NSUInteger row;
-    for (row = [indexes firstIndex]; row != NSNotFound; row = [indexes indexGreaterThanIndex: row])
+    for (row = rows.location; row < NSMaxRange(rows); row++)
     {
+        if (![[self itemAtRow: row] isKindOfClass: [Torrent class]])
+            continue;
+        
         NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: row] forKey: @"Row"];
         TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: 0 row: row];
         [cell addTrackingAreasForView: self inRect: [self frameOfCellAtColumn: 0 row: row] withUserInfo: userInfo
@@ -244,10 +239,20 @@
     }
 }
 
-- (void) tableViewSelectionIsChanging: (NSNotification *) notification
+- (void) outlineViewSelectionIsChanging: (NSNotification *) notification
 {
     if (fSelectedValues)
         [self selectValues: fSelectedValues];
+}
+
+- (void) outlineViewItemDidExpand: (NSNotification *) notification
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"OutlineExpandCollapse" object: self];
+}
+
+- (void) outlineViewItemDidCollapse: (NSNotification *) notification
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"OutlineExpandCollapse" object: self];
 }
 
 - (void) mouseDown: (NSEvent *) event
@@ -280,7 +285,19 @@
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
     }
     else if (!pushed && [event clickCount] == 2) //double click
-        [fController showInfo: nil];
+    {
+        id item = [self itemAtRow: [self rowAtPoint: point]];
+        
+        if ([item isKindOfClass: [Torrent class]])
+            [fController showInfo: nil];
+        else
+        {
+            if ([self isItemExpanded: item])
+                [self collapseItem: item];
+            else
+                [self expandItem: item];
+        }
+    }
     else;
 }
 
@@ -289,12 +306,25 @@
     NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSet];
     
     NSEnumerator * enumerator = [values objectEnumerator];
-    id object;
-    while ((object = [enumerator nextObject]))
+    id item;
+    while ((item = [enumerator nextObject]))
     {
-        unsigned index = [fTorrents indexOfObject: object]; //works with torrents and groups
-        if (index != NSNotFound)
-            [indexSet addIndex: index];
+        if ([item isKindOfClass: [Torrent class]])
+        {
+            NSUInteger index = [self rowForItem: item];
+            if (index != -1)
+                [indexSet addIndex: index];
+        }
+        else
+        {
+            int group = [[item objectForKey: @"Group"] intValue], i;
+            for (i = 0; i < [self numberOfRows]; i++)
+            {
+                id tableItem = [self itemAtRow: i];
+                if (![tableItem isKindOfClass: [Torrent class]] && [[tableItem objectForKey: @"Group"] intValue] == group)
+                    [indexSet addIndex: i];
+            }
+        }
     }
     
     [self selectRowIndexes: indexSet byExtendingSelection: NO];
@@ -302,31 +332,35 @@
 
 - (NSArray *) selectedValues
 {
-    return [fTorrents objectsAtIndexes: [self selectedRowIndexes]];
+    NSIndexSet * selectedIndexes = [self selectedRowIndexes];
+    NSMutableArray * values = [NSMutableArray arrayWithCapacity: [selectedIndexes count]];
+    
+    NSUInteger i;
+    for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
+        [values addObject: [self itemAtRow: i]];
+    
+    return values;
 }
 
 - (NSArray *) selectedTorrents
 {
     NSIndexSet * selectedIndexes = [self selectedRowIndexes];
-    NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSet];
+    NSMutableArray * torrents = [NSMutableArray array];
     
     NSUInteger i;
     for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
     {
-        if (![fGroupIndexes containsIndex: i])
-            [indexSet addIndex: i];
-        else
+        id item = [self itemAtRow: i];
+        if ([item isKindOfClass: [Torrent class]])
         {
-            NSUInteger nextGroup = [fGroupIndexes indexGreaterThanIndex: i];
-            if (nextGroup == NSNotFound)
-                nextGroup = [fTorrents count];
-            
-            [indexSet addIndexesInRange: NSMakeRange(i+1, nextGroup - i - 1)];
-            
-             i = nextGroup - 1;
+            if (![torrents containsObject: item])
+                [torrents addObject: item];
         }
+        else
+            [torrents addObjectsFromArray: [item objectForKey: @"Torrents"]];
     }
-    [fTorrents objectsAtIndexes: indexSet];
+    
+    return torrents;
 }
 
 - (NSMenu *) menuForEvent: (NSEvent *) event
@@ -352,66 +386,6 @@
     [super flagsChanged: event];
 }
 
-- (void) keyDown: (NSEvent *) event
-{
-    //this is handled by the delegate in Leopard
-    if ([NSApp isOnLeopardOrBetter])
-    {
-        [super keyDown: event];
-        return;
-    }
-    
-    if (!fKeyStrokes)
-        fKeyStrokes = [[NSMutableArray alloc] init];
-    
-    unichar newChar = [[event characters] characterAtIndex: 0];
-    if (newChar == ' ' || [[NSCharacterSet alphanumericCharacterSet] characterIsMember: newChar]
-        || [[NSCharacterSet symbolCharacterSet] characterIsMember: newChar]
-        || [[NSCharacterSet punctuationCharacterSet] characterIsMember: newChar])
-    {
-        if ([fKeyStrokes count] > 0 && [event timestamp] - [[fKeyStrokes lastObject] timestamp] > 1.0)
-            [fKeyStrokes removeAllObjects];
-        [fKeyStrokes addObject: event];
-    
-        [self interpretKeyEvents: fKeyStrokes];
-    }
-    else
-    {
-        [fKeyStrokes removeAllObjects];
-        [super keyDown: event];
-    }
-}
-
-- (void) insertText: (NSString *) text
-{
-    //this is handled by the delegate in Leopard
-    if ([NSApp isOnLeopardOrBetter])
-    {
-        [super insertText: text];
-        return;
-    }
-    
-    //sort torrents by name before finding closest match
-    NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: YES
-                                            selector: @selector(caseInsensitiveCompare:)] autorelease];
-
-    NSArray * tempTorrents = [fTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: nameDescriptor]];
-    
-    text = [text lowercaseString];
-    
-    //select torrent closest to text that isn't before text alphabetically
-    NSEnumerator * enumerator = [tempTorrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
-        if ([[[torrent name] lowercaseString] hasPrefix: text])
-        {
-            int row = [fTorrents indexOfObject: torrent];
-            [self selectRow: row byExtendingSelection: NO];
-            [self scrollRowToVisible: row];
-            return;
-        }
-}
-
 - (void) toggleControlForTorrent: (Torrent *) torrent
 {
     if ([torrent isActive])
@@ -434,7 +408,7 @@
         return;
     
     //get and update file menu
-    fMenuTorrent = [[fTorrents objectAtIndex: row] retain];
+    fMenuTorrent = [[self itemAtRow: row] retain];
     NSMenu * fileMenu = [fMenuTorrent fileMenu];
     [self updateFileMenu: fileMenu forFiles: [fMenuTorrent fileList]];
     
@@ -494,7 +468,7 @@
         item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
         [item setState: mode == TR_SPEEDLIMIT_SINGLE ? NSOnState : NSOffState];
         [item setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
-                    "torrent action menu -> upload/download limit"), [fMenuTorrent speedLimit: upload]]];
+                            "torrent action menu -> upload/download limit"), [fMenuTorrent speedLimit: upload]]];
         
         item = [menu itemWithTag: ACTION_MENU_UNLIMITED_TAG];
         [item setState: mode == TR_SPEEDLIMIT_UNLIMITED ? NSOnState : NSOffState];
@@ -638,7 +612,7 @@
 - (BOOL) pointInControlRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0 || [fGroupIndexes containsIndex: row])
+    if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]])
         return NO;
     
     return NSPointInRect(point, [fTorrentCell controlButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
@@ -647,7 +621,7 @@
 - (BOOL) pointInRevealRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0 || [fGroupIndexes containsIndex: row])
+    if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]])
         return NO;
     
     return NSPointInRect(point, [fTorrentCell revealButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
@@ -656,7 +630,7 @@
 - (BOOL) pointInActionRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0 || [fGroupIndexes containsIndex: row])
+    if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]])
         return NO;
     
     return NSPointInRect(point, [fTorrentCell iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
@@ -665,7 +639,7 @@
 - (BOOL) pointInProgressRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0 || [fGroupIndexes containsIndex: row] || [fDefaults boolForKey: @"SmallView"])
+    if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]] || [fDefaults boolForKey: @"SmallView"])
         return NO;
     
     TorrentCell * cell;
@@ -674,7 +648,7 @@
     else
     {
         cell = fTorrentCell;
-        [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
+        [cell setRepresentedObject: [self itemAtRow: row]];
     }
     return NSPointInRect(point, [cell progressRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
@@ -682,7 +656,7 @@
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0 || [fGroupIndexes containsIndex: row] || ![fDefaults boolForKey: @"SmallView"])
+    if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]] || ![fDefaults boolForKey: @"SmallView"])
         return NO;
     
     TorrentCell * cell;
@@ -691,7 +665,7 @@
     else
     {
         cell = fTorrentCell;
-        [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
+        [cell setRepresentedObject: [self itemAtRow: row]];
     }
     return NSPointInRect(point, [cell minimalStatusRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }

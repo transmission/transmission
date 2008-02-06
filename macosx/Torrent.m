@@ -175,6 +175,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         free(fPreviousFinishedPieces);
     [fFinishedPiecesDate release];
     
+    [fHashString release];
+    
     [fDownloadFolder release];
     [fIncompleteFolder release];
     
@@ -732,7 +734,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) hashString
 {
-    return [NSString stringWithUTF8String: fInfo->hashString];
+    return fHashString;
 }
 
 - (BOOL) privateTorrent
@@ -1571,7 +1573,9 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     tr_torrentSetStatusCallback(fHandle, completenessChangeCallback, self);
     
     fInfo = tr_torrentInfo(fHandle);
-
+    
+    fHashString = [[NSString alloc] initWithUTF8String: fInfo->hashString];
+    
     fDateAdded = dateAdded ? [dateAdded retain] : [[NSDate alloc] init];
 	if (dateCompleted)
 		fDateCompleted = [dateCompleted retain];
