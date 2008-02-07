@@ -19,6 +19,7 @@ noinst_HEADERS = \
     io.h \
     ipc.h \
     lock.h \
+    logo.h \
     makemeta-ui.h \
     msgwin.h \
     stats.h \
