@@ -19,6 +19,7 @@
 #include "tr_core.h"
 #include "tr_prefs.h"
 #include "lock.h"
+#include "logo.h"
 
 #define UNUSED G_GNUC_UNUSED
 
@@ -170,35 +171,40 @@ typedef struct
 }
 BuiltinIconInfo;
 
-const BuiltinIconInfo my_builtin_icons [] =
+const BuiltinIconInfo my_fallback_icons [] =
 {
+    { tr_icon_logo, "transmission" },
     { tr_icon_lock, "transmission-lock" }
 };
 
 static void
 register_my_icons ( void )
 {
-   int i;
-   const int n = G_N_ELEMENTS( my_builtin_icons );
-   GtkIconFactory * factory = gtk_icon_factory_new ();
-   gtk_icon_factory_add_default( factory );
+    int i;
+    const int n = G_N_ELEMENTS( my_fallback_icons );
+    GtkIconFactory * factory = gtk_icon_factory_new( );
+    GtkIconTheme * theme = gtk_icon_theme_get_default( );
+    gtk_icon_factory_add_default( factory );
 
-   for( i=0; i<n; ++i )
-   {
-       GdkPixbuf * p;
-       int width;
-       GtkIconSet * icon_set;
+    for( i=0; i<n; ++i )
+    {
+        const char * name = my_fallback_icons[i].name;
 
-       p = gdk_pixbuf_new_from_inline( -1, my_builtin_icons[i].raw, FALSE, 0 );
-       width = gdk_pixbuf_get_width( p );
-       gtk_icon_theme_add_builtin_icon (my_builtin_icons[i].name, width, p );
+        if( !gtk_icon_theme_has_icon( theme, name ) )
+        {
+            int width;
+            GdkPixbuf * p;
+            GtkIconSet * icon_set;
 
-       icon_set = gtk_icon_set_new_from_pixbuf( p );
-       gtk_icon_factory_add( factory, my_builtin_icons[i].name, icon_set );
+            p = gdk_pixbuf_new_from_inline( -1, my_fallback_icons[i].raw, FALSE, 0 );
+            width = gdk_pixbuf_get_width( p );
+            icon_set = gtk_icon_set_new_from_pixbuf( p );
+            gtk_icon_theme_add_builtin_icon( name, width, p );
+            gtk_icon_factory_add( factory, name, icon_set );
 
-       g_object_unref( p );
-       gdk_pixbuf_unref( p );
-       gtk_icon_set_unref (icon_set);
+            g_object_unref( p );
+            gtk_icon_set_unref( icon_set );
+        }
     }
 
     g_object_unref (G_OBJECT (factory));
