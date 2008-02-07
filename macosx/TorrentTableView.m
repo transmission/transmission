@@ -28,7 +28,7 @@
 #import "NSApplicationAdditions.h"
 #import "NSMenuAdditions.h"
 
-#define MAX_GROUP (INT_MAX-100)
+#define MAX_GROUP (INT_MAX-10)
 
 #define ACTION_MENU_GLOBAL_TAG 101
 #define ACTION_MENU_UNLIMITED_TAG 102

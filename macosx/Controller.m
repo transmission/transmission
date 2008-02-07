@@ -1915,8 +1915,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [torrent setPreviousAmountFinished: NULL];
     
     //place torrents into groups
-    BOOL groupRows = [fDefaults boolForKey: @"SortByGroup"];
-    if (groupRows && [fDisplayedTorrents count] > 0 && [NSApp isOnLeopardOrBetter])
+    BOOL groupRows = [fDefaults boolForKey: @"SortByGroup"] && [NSApp isOnLeopardOrBetter];
+    if (groupRows)
     {
         NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: YES] autorelease];
         [fDisplayedTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
@@ -1948,7 +1948,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fTableView selectValues: selectedValues];
     
     //reset expanded/collapsed rows
-    if (groupRows && [fDisplayedTorrents count] > 0 && [NSApp isOnLeopardOrBetter])
+    if (groupRows)
     {
         enumerator = [fDisplayedTorrents objectEnumerator];
         NSDictionary * dict;
