@@ -19,7 +19,6 @@
 #include "tr_core.h"
 #include "tr_prefs.h"
 #include "lock.h"
-#include "logo.h"
 
 #define UNUSED G_GNUC_UNUSED
 
@@ -173,7 +172,6 @@ BuiltinIconInfo;
 
 const BuiltinIconInfo my_builtin_icons [] =
 {
-    { tr_icon_logo, "transmission-logo" },
     { tr_icon_lock, "transmission-lock" }
 };
 

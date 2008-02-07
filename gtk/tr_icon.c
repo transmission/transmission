@@ -59,7 +59,7 @@ popup ( GtkStatusIcon  * self,
 gpointer
 tr_icon_new( void )
 {
-    GtkStatusIcon * ret = gtk_status_icon_new_from_stock ("transmission-logo");
+    GtkStatusIcon * ret = gtk_status_icon_new_from_stock ("transmission");
     g_signal_connect( ret, "activate", G_CALLBACK( activated ), NULL );
     g_signal_connect( ret, "popup-menu", G_CALLBACK( popup ), NULL );
     return ret;
