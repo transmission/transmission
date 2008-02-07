@@ -880,12 +880,15 @@ activity_page_new (TrTorrent * gtor)
     l = a->err_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, _("Error:"), l, NULL);
 
+  hig_workarea_add_section_divider (t, &row);
+  hig_workarea_add_section_title (t, &row, _("Completeness"));
+  hig_workarea_add_section_spacer (t, row, 1);
+
     w = a->availability_da = gtk_drawing_area_new ();
     gtk_widget_set_size_request (w, 0u, 100u);
     g_object_set_data (G_OBJECT(w), "draw-mode", GINT_TO_POINTER(DRAW_PROG));
     g_signal_connect (w, "expose-event", G_CALLBACK(refresh_pieces), gtor);
-    l = hig_workarea_add_row (t, &row, _("Completeness:"), w, NULL);
-    gtk_misc_set_alignment (GTK_MISC(l), 0.0f, 0.0f);
+    hig_workarea_add_wide_control( t, &row, w );
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Dates"));
