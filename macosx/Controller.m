@@ -46,7 +46,8 @@
 #import <Sparkle/Sparkle.h>
 
 #define TOOLBAR_CREATE                  @"Toolbar Create"
-#define TOOLBAR_OPEN                    @"Toolbar Open"
+#define TOOLBAR_OPEN_FILE               @"Toolbar Open"
+#define TOOLBAR_OPEN_WEB                @"Toolbar Open Web"
 #define TOOLBAR_REMOVE                  @"Toolbar Remove"
 #define TOOLBAR_INFO                    @"Toolbar Info"
 #define TOOLBAR_PAUSE_ALL               @"Toolbar Pause All"
@@ -1467,7 +1468,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         if (rows > 0 && ![[fTableView itemAtRow: 0] isKindOfClass: [Torrent class]])
         {
             int i;
-            for (i = 1; i < [fTableView numberOfRows]; i++)
+            for (i = 1; i < rows; i++)
                 if ([[fTableView itemAtRow: i] isKindOfClass: [Torrent class]])
                     count++;
         }
@@ -2936,7 +2937,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         return item;
     }
-    else if ([ident isEqualToString: TOOLBAR_OPEN])
+    else if ([ident isEqualToString: TOOLBAR_OPEN_FILE])
     {
         ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
         
@@ -2946,6 +2947,20 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setImage: [NSImage imageNamed: @"Open.png"]];
         [item setTarget: self];
         [item setAction: @selector(openShowSheet:)];
+        [item setAutovalidates: NO];
+        
+        return item;
+    }
+    else if ([ident isEqualToString: TOOLBAR_OPEN_WEB])
+    {
+        ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
+        
+        [item setLabel: NSLocalizedString(@"Open Address", "Open address toolbar item -> label")];
+        [item setPaletteLabel: NSLocalizedString(@"Open Torrent Address", "Open address toolbar item -> palette label")];
+        [item setToolTip: NSLocalizedString(@"Open torrent web address", "Open address toolbar item -> tooltip")];
+        [item setImage: [NSImage imageNamed: @"Open.png"]];
+        [item setTarget: self];
+        [item setAction: @selector(openURLShowSheet:)];
         [item setAutovalidates: NO];
         
         return item;
@@ -3104,8 +3119,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
     return [NSArray arrayWithObjects:
-            TOOLBAR_CREATE, TOOLBAR_OPEN, TOOLBAR_REMOVE,
-            TOOLBAR_PAUSE_RESUME_SELECTED, TOOLBAR_PAUSE_RESUME_ALL,
+            TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_OPEN_WEB,
+            TOOLBAR_REMOVE, TOOLBAR_PAUSE_RESUME_SELECTED, TOOLBAR_PAUSE_RESUME_ALL,
             TOOLBAR_FILTER, TOOLBAR_INFO,
             NSToolbarSeparatorItemIdentifier,
             NSToolbarSpaceItemIdentifier,
@@ -3116,7 +3131,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
 {
     return [NSArray arrayWithObjects:
-            TOOLBAR_CREATE, TOOLBAR_OPEN, TOOLBAR_REMOVE,
+            TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_REMOVE,
             NSToolbarSeparatorItemIdentifier,
             TOOLBAR_PAUSE_RESUME_ALL,
             NSToolbarFlexibleSpaceItemIdentifier,
