@@ -103,6 +103,11 @@
     [fCollapsedGroups removeIndex: value];
 }
 
+- (void) removeAllCollapsedGroups
+{
+    [fCollapsedGroups removeAllIndexes];
+}
+
 - (BOOL) outlineView: (NSOutlineView *) outlineView isGroupItem: (id) item
 {
     return ![item isKindOfClass: [Torrent class]];

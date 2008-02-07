@@ -1167,7 +1167,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     enumerator = [torrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
-        //expand the group, since either the whole group is being removed or it is already expanded
+        //expand the group, since either the whole group is being removed, it is already expanded, or not showing groups
         [fTableView removeCollapsedGroup: [torrent groupValue]];
         
         if (deleteData)
@@ -1664,7 +1664,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) setSortByGroup: (id) sender
 {
-    [fDefaults setBool: ![fDefaults boolForKey: @"SortByGroup"] forKey: @"SortByGroup"];
+    BOOL sortByGroup = ![fDefaults boolForKey: @"SortByGroup"];
+    [fDefaults setBool: sortByGroup forKey: @"SortByGroup"];
+    
+    //expand all groups
+    if (sortByGroup)
+        [fTableView removeAllCollapsedGroups];
+    
     [self applyFilter: nil];
 }
 
