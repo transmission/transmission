@@ -1955,9 +1955,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         while ((dict = [enumerator nextObject]))
         {
             if ([fTableView isGroupCollapsed: [[dict objectForKey: @"Group"] intValue]])
-                [fTableView expandItem: dict];
-            else
                 [fTableView collapseItem: dict];
+            else
+                [fTableView expandItem: dict];
         }
     }
     

@@ -33,11 +33,12 @@
 @interface TorrentTableView : NSOutlineView
 {
     IBOutlet Controller * fController;
-    NSMutableIndexSet * fCollapsedGroups;
     
     TorrentCell * fTorrentCell;
     
     NSUserDefaults * fDefaults;
+    
+    NSMutableIndexSet * fCollapsedGroups;
     
     IBOutlet NSMenu * fContextRow, * fContextNoRow;
     
