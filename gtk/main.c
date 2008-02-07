@@ -456,7 +456,11 @@ toggleMainWindow( struct cbdata * cbdata )
         gtk_window_set_skip_taskbar_hint( window, FALSE );
         gtk_widget_show( GTK_WIDGET( window ) );
         gtk_window_deiconify( window );
+#if GTK_CHECK_VERSION(2,8,0)
         gtk_window_present_with_time( window, gtk_get_current_event_time( ) );
+#else
+        gtk_window_present( window );
+#endif
     }
 }
 
