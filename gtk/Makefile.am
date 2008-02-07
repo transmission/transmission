@@ -1,3 +1,5 @@
+SUBDIRS = icons
+
 AM_CPPFLAGS = \
     -I$(top_srcdir) \
     -I$(top_srcdir)/third-party/ \
@@ -17,7 +19,6 @@ noinst_HEADERS = \
     io.h \
     ipc.h \
     lock.h \
-    logo.h \
     makemeta-ui.h \
     msgwin.h \
     stats.h \

@@ -277,7 +277,7 @@ main( int argc, char ** argv )
     actions_init ( myUIManager, cbdata );
     gtk_ui_manager_add_ui_from_string (myUIManager, fallback_ui_file, -1, NULL);
     gtk_ui_manager_ensure_update (myUIManager);
-    gtk_window_set_default_icon_name ( "transmission-logo" );
+    gtk_window_set_default_icon_name ( "transmission" );
 
     argfiles = checkfilenames( argc-1, argv+1 );
     didlock = didinit && sendremote( argfiles, sendquit );
@@ -901,7 +901,7 @@ about ( GtkWindow * parent )
         "version", LONG_VERSION_STRING,
         "website", "http://www.transmissionbt.com/",
         "copyright",_("Copyright 2005-2008 The Transmission Project"),
-        "logo-icon-name", "transmission-logo",
+        "logo-icon-name", "transmission",
 #ifdef SHOW_LICENSE
         "license", LICENSE,
         "wrap-license", TRUE,

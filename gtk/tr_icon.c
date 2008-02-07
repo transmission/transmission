@@ -88,7 +88,7 @@ gpointer
 tr_icon_new( TrCore * core )
 {
     guint id;
-    GtkStatusIcon * icon = gtk_status_icon_new_from_stock ("transmission-logo");
+    GtkStatusIcon * icon = gtk_status_icon_new_from_stock ("transmission");
     g_signal_connect( icon, "activate", G_CALLBACK( activated ), NULL );
     g_signal_connect( icon, "popup-menu", G_CALLBACK( popup ), NULL );
     id = g_timeout_add( 1000, refresh_tooltip_cb, icon );
