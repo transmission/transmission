@@ -2155,10 +2155,16 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) setGroup: (id) sender
 {
+    NSIndexSet * collapsedGroupsIndexes = [fTableView collapsedGroupsIndexes];
+    
     NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
+    {
+        [fTableView removeCollapsedGroup: [torrent groupValue]]; //remove old collapsed group
+        
         [torrent setGroupValue: [sender tag]];
+    }
     
     [self applyFilter: nil];
     [self updateUI];
@@ -2514,7 +2520,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
-        //remember selected rows if needed
+        //remember selected rows
         NSArray * selectedValues = [fTableView selectedValues];
     
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData:
