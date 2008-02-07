@@ -45,20 +45,20 @@ enum
 
 #define DEFAULT_BAR_HEIGHT 12
 
-#define DEFAULT_COLOR_VERIFIED       "#77aaff"
-#define DEFAULT_COLOR_VERIFIED_2     "#002277"
-#define DEFAULT_COLOR_SEEDING        "#77ff88"
-#define DEFAULT_COLOR_SEEDING_2      "#007700"
-#define DEFAULT_COLOR_MISSING        "#fcfcfc" 
-#define DEFAULT_COLOR_MISSING_2      "#acacac" 
-#define DEFAULT_COLOR_UNWANTED       "#e0e0e0" 
-#define DEFAULT_COLOR_UNWANTED_2     "#808080" 
-#define DEFAULT_COLOR_UNAVAILABLE    "#ff7788"
-#define DEFAULT_COLOR_UNAVAILABLE_2  "#770000"
-#define DEFAULT_COLOR_PAUSED         "#959595"
-#define DEFAULT_COLOR_PAUSED_2       "#555555"
-#define DEFAULT_COLOR_VERIFYING      "#ffff77"
-#define DEFAULT_COLOR_VERIFYING_2    "#777700"
+#define DEFAULT_COLOR_VERIFIED       "#729fcf"
+#define DEFAULT_COLOR_VERIFIED_2     "#204a87"
+#define DEFAULT_COLOR_SEEDING        "#8ae234"
+#define DEFAULT_COLOR_SEEDING_2      "#4e9a06"
+#define DEFAULT_COLOR_MISSING        "#fcaf3e"
+#define DEFAULT_COLOR_MISSING_2      "#ce5c00"
+#define DEFAULT_COLOR_UNWANTED       "#eeeeec"
+#define DEFAULT_COLOR_UNWANTED_2     "#babdb6"
+#define DEFAULT_COLOR_UNAVAILABLE    "#ef2929"
+#define DEFAULT_COLOR_UNAVAILABLE_2  "#a40000"
+#define DEFAULT_COLOR_PAUSED         "#888a85"
+#define DEFAULT_COLOR_PAUSED_2       "#2e3436"
+#define DEFAULT_COLOR_VERIFYING      "#fce94f"
+#define DEFAULT_COLOR_VERIFYING_2    "#c4a000"
 
 /***
 ****
