@@ -61,6 +61,8 @@
         if (![NSApp isOnLeopardOrBetter])
             [[self tableColumnWithIdentifier: @"Torrent"] setDataCell: fTorrentCell];
         
+        fCollapsedGroups = [[NSMutableIndexSet alloc] init];
+        
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
         fMouseActionRow = -1;
@@ -76,6 +78,8 @@
 
 - (void) dealloc
 {
+    [fCollapsedGroups release];
+    
     [fPiecesBarTimer invalidate];
     [fMenuTorrent release];
     
@@ -84,6 +88,11 @@
     [fTorrentCell release];
     
     [super dealloc];
+}
+
+- (NSIndexSet *) collapsedGroupsIndexes
+{
+    return fCollapsedGroups;
 }
 
 - (BOOL) outlineView: (NSOutlineView *) outlineView isGroupItem: (id) item
@@ -247,11 +256,17 @@
 
 - (void) outlineViewItemDidExpand: (NSNotification *) notification
 {
+    int value = [[[[notification userInfo] objectForKey: @"NSObject"] objectForKey: @"Group"] intValue];
+    [fCollapsedGroups removeIndex: value >= 0 ? value : INT_MAX];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"OutlineExpandCollapse" object: self];
 }
 
 - (void) outlineViewItemDidCollapse: (NSNotification *) notification
 {
+    int value = [[[[notification userInfo] objectForKey: @"NSObject"] objectForKey: @"Group"] intValue];
+    [fCollapsedGroups addIndex: value >= 0 ? value : INT_MAX];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"OutlineExpandCollapse" object: self];
 }
 
@@ -322,7 +337,10 @@
             {
                 id tableItem = [self itemAtRow: i];
                 if (![tableItem isKindOfClass: [Torrent class]] && [[tableItem objectForKey: @"Group"] intValue] == group)
+                {
                     [indexSet addIndex: i];
+                    break;
+                }
             }
         }
     }

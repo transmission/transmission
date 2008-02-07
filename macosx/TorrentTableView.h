@@ -33,7 +33,7 @@
 @interface TorrentTableView : NSOutlineView
 {
     IBOutlet Controller * fController;
-    NSIndexSet * fGroupIndexes;
+    NSMutableIndexSet * fCollapsedGroups;
     
     TorrentCell * fTorrentCell;
     
@@ -50,6 +50,8 @@
     float fPiecesBarPercent;
     NSTimer * fPiecesBarTimer;
 }
+
+- (NSIndexSet *) collapsedGroupsIndexes;
 
 - (void) removeButtonTrackingAreas;
 - (void) setControlButtonHover: (int) row;

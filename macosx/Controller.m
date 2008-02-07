@@ -1912,7 +1912,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [fDisplayedTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
         
         NSMutableArray * groups = [NSMutableArray array], * groupTorrents;
-        int i, oldGroupValue = -2;
+        int oldGroupValue = -2;
         for (i = 0; i < [fDisplayedTorrents count]; i++)
         {
             Torrent * torrent = [fDisplayedTorrents objectAtIndex: i];
@@ -1936,6 +1936,22 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //actually sort
     [self sortTorrentsIgnoreSelected];
     [fTableView selectValues: selectedValues];
+    
+    //reset expanded/collapsed rows
+    if (groupRows && [fDisplayedTorrents count] > 0 && [NSApp isOnLeopardOrBetter])
+    {
+        NSIndexSet * collapsed = [fTableView collapsedGroupsIndexes];
+        enumerator = [fDisplayedTorrents objectEnumerator];
+        NSDictionary * dict;
+        while ((dict = [enumerator nextObject]))
+        {
+            int value = [[dict objectForKey: @"Group"] intValue];
+            if ([collapsed containsIndex: value >= 0 ? value : INT_MAX])
+                [fTableView collapseItem: dict];
+            else
+                [fTableView expandItem: dict];
+        }
+    }
     
     [self setBottomCountTextFiltering: groupRows || filterStatus || filterGroup || filterText];
 
