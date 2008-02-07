@@ -28,6 +28,8 @@
 #import "NSApplicationAdditions.h"
 #import "NSMenuAdditions.h"
 
+#define MAX_GROUP (INT_MAX-100)
+
 #define ACTION_MENU_GLOBAL_TAG 101
 #define ACTION_MENU_UNLIMITED_TAG 102
 #define ACTION_MENU_LIMIT_TAG 103
@@ -90,15 +92,18 @@
     [super dealloc];
 }
 
-- (NSIndexSet *) collapsedGroupsIndexes
+- (BOOL) isGroupCollapsed: (int) value
 {
-    return fCollapsedGroups;
+    if (value < 0)
+        value = MAX_GROUP;
+    
+    return [fCollapsedGroups containsIndex: value];
 }
 
 - (void) removeCollapsedGroup: (int) value
 {
     if (value < 0)
-        value = INT_MAX;
+        value = MAX_GROUP;
     
     [fCollapsedGroups removeIndex: value];
 }
@@ -270,7 +275,7 @@
 - (void) outlineViewItemDidExpand: (NSNotification *) notification
 {
     int value = [[[[notification userInfo] objectForKey: @"NSObject"] objectForKey: @"Group"] intValue];
-    [fCollapsedGroups removeIndex: value >= 0 ? value : INT_MAX];
+    [fCollapsedGroups removeIndex: value >= 0 ? value : MAX_GROUP];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"OutlineExpandCollapse" object: self];
 }
@@ -278,7 +283,7 @@
 - (void) outlineViewItemDidCollapse: (NSNotification *) notification
 {
     int value = [[[[notification userInfo] objectForKey: @"NSObject"] objectForKey: @"Group"] intValue];
-    [fCollapsedGroups addIndex: value >= 0 ? value : INT_MAX];
+    [fCollapsedGroups addIndex: value >= 0 ? value : MAX_GROUP];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"OutlineExpandCollapse" object: self];
 }

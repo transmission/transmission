@@ -459,8 +459,6 @@
     
     BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
-    #warning use inset instead of edges
-    
     //group coloring
     NSRect iconRect = [self iconRectForBounds: cellFrame];
     

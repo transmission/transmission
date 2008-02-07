@@ -1948,19 +1948,16 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fTableView selectValues: selectedValues];
     
     //reset expanded/collapsed rows
-    #warning redo to not require storing an indexset?
     if (groupRows && [fDisplayedTorrents count] > 0 && [NSApp isOnLeopardOrBetter])
     {
-        NSIndexSet * collapsed = [fTableView collapsedGroupsIndexes];
         enumerator = [fDisplayedTorrents objectEnumerator];
         NSDictionary * dict;
         while ((dict = [enumerator nextObject]))
         {
-            int value = [[dict objectForKey: @"Group"] intValue];
-            if ([collapsed containsIndex: value >= 0 ? value : INT_MAX])
-                [fTableView collapseItem: dict];
-            else
+            if ([fTableView isGroupCollapsed: [[dict objectForKey: @"Group"] intValue]])
                 [fTableView expandItem: dict];
+            else
+                [fTableView collapseItem: dict];
         }
     }
     
@@ -2155,8 +2152,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) setGroup: (id) sender
 {
-    NSIndexSet * collapsedGroupsIndexes = [fTableView collapsedGroupsIndexes];
-    
     NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))

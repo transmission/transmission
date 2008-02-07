@@ -51,7 +51,7 @@
     NSTimer * fPiecesBarTimer;
 }
 
-- (NSIndexSet *) collapsedGroupsIndexes;
+- (BOOL) isGroupCollapsed: (int) value;
 - (void) removeCollapsedGroup: (int) value;
 - (void) removeAllCollapsedGroups;
 
