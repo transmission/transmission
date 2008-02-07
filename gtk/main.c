@@ -35,6 +35,12 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
+#include <gdk/gdk.h>
+#ifdef GDK_WINDOWING_X11
+#include <X11/Xatom.h>
+#include <gdk/gdkx.h>
+#endif
+
 #include "actions.h"
 #include "conf.h"
 #include "dialogs.h"
@@ -98,9 +104,10 @@ static const char * LICENSE =
 
 struct cbdata
 {
+    guint          idle_hide_mainwindow_tag;
     GtkWindow    * wind;
     TrCore       * core;
-    GtkWidget    * icon;
+    gpointer       icon;
     GtkWidget    * msgwin;
     GtkWidget    * prefs;
     guint          timer;
@@ -376,26 +383,81 @@ appsetup( TrWindow * wind, GList * args,
     updatemodel( cbdata );
 
     /* show the window */
-    if( minimized )
+    if( minimized ) {
         gtk_window_iconify( wind );
+        gtk_window_set_skip_taskbar_hint( cbdata->wind, cbdata->icon != NULL );
+    }
     gtk_widget_show( GTK_WIDGET( wind ) );
 }
 
-static void
-setMainWindowMinimized( struct cbdata * data, gboolean minimized )
-{
-    GtkWindow * window = GTK_WINDOW( data->wind );
 
-    if(( data->minimized = minimized ))
-        gtk_window_iconify( window );
-    else
-        gtk_window_deiconify( window );
+/**
+ * hideMainWindow, and the timeout hack in toggleMainWindow,
+ * are loosely cribbed from Colin Walters' tr-shell.c in Rhythmbox
+ */
+static gboolean
+idle_hide_mainwindow( gpointer window )
+{
+    gtk_widget_hide( window );
+    return FALSE;
+}
+static void
+hideMainWindow( struct cbdata * cbdata )
+{
+#if defined(STATUS_ICON_SUPPORTED) && defined(GDK_WINDOWING_X11)
+    GdkRectangle  bounds;
+    gulong        data[4];
+    Display      *dpy;
+    GdkWindow    *gdk_window;
+
+    gtk_status_icon_get_geometry( GTK_STATUS_ICON( cbdata->icon ), NULL, &bounds, NULL );
+    gdk_window = GTK_WIDGET (cbdata->wind)->window;
+    dpy = gdk_x11_drawable_get_xdisplay (gdk_window);
+
+    data[0] = bounds.x;
+    data[1] = bounds.y;
+    data[2] = bounds.width;
+    data[3] = bounds.height;
+
+    XChangeProperty (dpy,
+                     GDK_WINDOW_XID (gdk_window),
+                     gdk_x11_get_xatom_by_name_for_display (gdk_drawable_get_display (gdk_window),
+                     "_NET_WM_ICON_GEOMETRY"),
+                     XA_CARDINAL, 32, PropModeReplace,
+                     (guchar*)&data, 4);
+
+    gtk_window_set_skip_taskbar_hint( cbdata->wind, TRUE );
+#endif
+    gtk_window_iconify( cbdata->wind );
 }
 
 static void
-toggleMainWindow( struct cbdata * data )
+clearTag( guint * tag )
 {
-    setMainWindowMinimized( data, !data->minimized );
+    if( *tag )
+        g_source_remove( *tag );
+    *tag = 0;
+}
+
+static void
+toggleMainWindow( struct cbdata * cbdata )
+{
+    GtkWindow * window = GTK_WINDOW( cbdata->wind );
+    const int hide = cbdata->minimized = !cbdata->minimized;
+
+    if( hide )
+    {
+        clearTag( &cbdata->idle_hide_mainwindow_tag );
+        hideMainWindow( cbdata );
+        cbdata->idle_hide_mainwindow_tag = g_timeout_add( 250, idle_hide_mainwindow, window );
+    }
+    else
+    {
+        gtk_window_set_skip_taskbar_hint( window, FALSE );
+        gtk_widget_show( GTK_WIDGET( window ) );
+        gtk_window_deiconify( window );
+        gtk_window_present_with_time( window, gtk_get_current_event_time( ) );
+    }
 }
 
 static gboolean
@@ -404,7 +466,7 @@ winclose( GtkWidget * w UNUSED, GdkEvent * event UNUSED, gpointer gdata )
     struct cbdata * cbdata = gdata;
 
     if( cbdata->icon != NULL )
-        setMainWindowMinimized( cbdata, TRUE );
+        action_activate ("toggle-main-window");
     else
         askquit( cbdata->core, cbdata->wind, wannaquit, cbdata );
 
