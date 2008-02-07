@@ -883,30 +883,32 @@ getselection( struct cbdata * cbdata )
 }
 
 static void
-about ( void )
+about ( GtkWindow * parent )
 {
-  GtkWidget * w = gtk_about_dialog_new ();
-  GtkAboutDialog * a = GTK_ABOUT_DIALOG (w);
-  const char *authors[] = { "Charles Kerr (Backend; GTK+)",
-                            "Mitchell Livingston (Backend; OS X)",
-                            "Eric Petit (Backend; OS X)",
-                            "Josh Elsasser (Daemon; Backend; GTK+)",
-                            "Bryan Varner (BeOS)", 
-                            NULL };
-  gtk_about_dialog_set_version (a, LONG_VERSION_STRING );
+    const char *authors[] =
+    {
+        "Charles Kerr (Backend; GTK+)",
+        "Mitchell Livingston (Backend; OS X)",
+        "Eric Petit (Backend; OS X)",
+        "Josh Elsasser (Daemon; Backend; GTK+)",
+        "Bryan Varner (BeOS)", 
+        NULL
+    };
+
+    gtk_show_about_dialog( parent,
+        "name", g_get_application_name(),
+        "comments", _("A fast and easy BitTorrent client"),
+        "version", LONG_VERSION_STRING,
+        "website", "http://www.transmissionbt.com/",
+        "copyright",_("Copyright 2005-2008 The Transmission Project"),
+        "logo-icon-name", "transmission-logo",
 #ifdef SHOW_LICENSE
-  gtk_about_dialog_set_license (a, LICENSE);
-  gtk_about_dialog_set_wrap_license (a, TRUE);
+        "license", LICENSE,
+        "wrap-license", TRUE,
 #endif
-  gtk_about_dialog_set_logo_icon_name( a, "transmission-logo" );
-  gtk_about_dialog_set_comments( a, _("A fast and easy BitTorrent client") );
-  gtk_about_dialog_set_website( a, "http://www.transmissionbt.com/" );
-  gtk_about_dialog_set_copyright( a, _("Copyright 2005-2008 The Transmission Project") );
-  gtk_about_dialog_set_authors( a, authors );
-  /* note to translators: put yourself here for credit in the "About" dialog */
-  gtk_about_dialog_set_translator_credits( a, _("translator-credits") );
-  g_signal_connect_swapped( w, "response", G_CALLBACK (gtk_widget_destroy), w );
-  gtk_widget_show_all( w );
+        "authors", authors,
+        "translator-credits", _("translator-credits"),
+        NULL );
 }
 
 static void
@@ -1115,7 +1117,7 @@ doAction ( const char * action_name, gpointer user_data )
     }
     else if (!strcmp (action_name, "show-about-dialog"))
     {
-        about();
+        about( data->wind );
     }
     else if (!strcmp (action_name, "toggle-main-window"))
     {
