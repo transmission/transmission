@@ -1167,6 +1167,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     enumerator = [torrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
+        //expand the group, since either the whole group is being removed or it is already expanded
+        [fTableView removeCollapsedGroup: [torrent groupValue]];
+        
         if (deleteData)
             [torrent trashData];
         if (deleteTorrent)
@@ -1938,6 +1941,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fTableView selectValues: selectedValues];
     
     //reset expanded/collapsed rows
+    #warning redo to not require storing an indexset?
     if (groupRows && [fDisplayedTorrents count] > 0 && [NSApp isOnLeopardOrBetter])
     {
         NSIndexSet * collapsed = [fTableView collapsedGroupsIndexes];

@@ -52,6 +52,7 @@
 }
 
 - (NSIndexSet *) collapsedGroupsIndexes;
+- (void) removeCollapsedGroup: (int) value;
 
 - (void) removeButtonTrackingAreas;
 - (void) setControlButtonHover: (int) row;

@@ -95,6 +95,14 @@
     return fCollapsedGroups;
 }
 
+- (void) removeCollapsedGroup: (int) value
+{
+    if (value < 0)
+        value = INT_MAX;
+    
+    [fCollapsedGroups removeIndex: value];
+}
+
 - (BOOL) outlineView: (NSOutlineView *) outlineView isGroupItem: (id) item
 {
     return ![item isKindOfClass: [Torrent class]];
