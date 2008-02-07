@@ -718,7 +718,8 @@ static GtkWidget* info_page_new (tr_torrent * tor)
     fr = gtk_frame_new (NULL);
     gtk_frame_set_shadow_type (GTK_FRAME(fr), GTK_SHADOW_IN);
     gtk_container_add (GTK_CONTAINER(fr), w);
-    hig_workarea_add_row (t, &row, name, fr, NULL);
+    w = hig_workarea_add_row (t, &row, name, fr, NULL);
+    gtk_misc_set_alignment (GTK_MISC(w), 0.0f, 0.0f);
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Created by"));
@@ -883,7 +884,8 @@ activity_page_new (TrTorrent * gtor)
     gtk_widget_set_size_request (w, 0u, 100u);
     g_object_set_data (G_OBJECT(w), "draw-mode", GINT_TO_POINTER(DRAW_PROG));
     g_signal_connect (w, "expose-event", G_CALLBACK(refresh_pieces), gtor);
-    hig_workarea_add_row (t, &row, _("Completeness:"), w, NULL);
+    l = hig_workarea_add_row (t, &row, _("Completeness:"), w, NULL);
+    gtk_misc_set_alignment (GTK_MISC(l), 0.0f, 0.0f);
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Dates"));
@@ -1268,6 +1270,7 @@ file_page_new ( TrTorrent * gtor )
 
     /* create the view */
     view = gtk_tree_view_new_with_model( GTK_TREE_MODEL( store ) );
+    gtk_container_set_border_width( GTK_CONTAINER( view ), GUI_PAD_BIG );
     g_object_set_data (G_OBJECT(view), "torrent-handle", tor );
 
     /* add file column */
@@ -1469,7 +1472,7 @@ options_page_new ( TrTorrent * gtor )
     g_signal_connect (tb, "toggled", G_CALLBACK(sensitize_from_check_cb), w);
     sensitize_from_check_cb (GTK_TOGGLE_BUTTON(tb), w);
     gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (w), FALSE, TRUE, 0);
-    mis = gtk_label_new (_("kiB/s"));
+    mis = gtk_label_new (_("KiB/s"));
     gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (mis), FALSE, TRUE, 0);
     hig_workarea_add_row_w (t, &row, tb, hb, NULL);
 
@@ -1486,7 +1489,7 @@ options_page_new ( TrTorrent * gtor )
     g_signal_connect (tb, "toggled", G_CALLBACK(sensitize_from_check_cb), w);
     sensitize_from_check_cb (GTK_TOGGLE_BUTTON(tb), w);
     gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (w), FALSE, TRUE, 0);
-    mis = gtk_label_new (_("kiB/s"));
+    mis = gtk_label_new (_("KiB/s"));
     gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (mis), FALSE, TRUE, 0);    
     hig_workarea_add_row_w (t, &row, tb, hb, NULL);
 
@@ -1501,7 +1504,7 @@ options_page_new ( TrTorrent * gtor )
     gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (w), FALSE, TRUE, 0);
     mis = gtk_label_new (_("peers"));
     gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (mis), FALSE, TRUE, 0);    
-    hig_workarea_add_row( t, &row, _( "Connect at maximum to:" ), hb, NULL );
+    hig_workarea_add_row( t, &row, _( "Connect at _maximum to:" ), hb, w );
     g_signal_connect( w, "value-changed", G_CALLBACK( max_peers_spun_cb ), gtor );
 
 #if 0
