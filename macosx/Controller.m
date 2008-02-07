@@ -322,8 +322,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fPrefsController setUpdater: fUpdater];
     
-    #warning fix
-    //[fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
+    [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
 
     //register for sleep notifications
@@ -1632,7 +1631,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         case SORT_ORDER_TAG:
             sortType = SORT_ORDER;
             [fDefaults setBool: NO forKey: @"SortReverse"];
+            
             [fDefaults setBool: NO forKey: @"SortByGroup"];
+            [fTableView removeAllCollapsedGroups];
             
             [self applyFilter: nil]; //ensure groups are removed
             break;
@@ -2472,34 +2473,43 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         return [item hashString];
 }
 
-#warning fix
-- (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) indexes toPasteboard: (NSPasteboard *) pasteboard
+- (BOOL) outlineView: (NSOutlineView *) outlineView writeItems: (NSArray *) items toPasteboard: (NSPasteboard *) pasteboard
 {
     //only allow reordering of rows if sorting by order
     if ([[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER])
     {
         [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self];
-        [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexes] forType: TORRENT_TABLE_VIEW_DATA_TYPE];
+        
+        NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSet];
+        NSEnumerator * enumerator = [items objectEnumerator];
+        Torrent * torrent;
+        while ((torrent = [enumerator nextObject]))
+            [indexSet addIndex: [fTableView rowForItem: torrent]];
+        
+        [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexSet] forType: TORRENT_TABLE_VIEW_DATA_TYPE];
         return YES;
     }
     return NO;
 }
 
-- (NSDragOperation) tableView: (NSTableView *) tableView validateDrop: (id <NSDraggingInfo>) info
-    proposedRow: (int) row proposedDropOperation: (NSTableViewDropOperation) operation
+- (NSDragOperation) outlineView: (NSOutlineView *) outlineView validateDrop: (id < NSDraggingInfo >) info proposedItem: (id) item
+    proposedChildIndex: (NSInteger) index
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
-        [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
+        if (item)
+            index = [fTableView rowForItem: item] + 1;
+        
+        [fTableView setDropItem: nil dropChildIndex: index];
         return NSDragOperationGeneric;
     }
     
     return NSDragOperationNone;
 }
 
-- (BOOL) tableView: (NSTableView *) t acceptDrop: (id <NSDraggingInfo>) info
-    row: (int) newRow dropOperation: (NSTableViewDropOperation) operation
+- (BOOL) outlineView: (NSOutlineView *) outlineView acceptDrop: (id < NSDraggingInfo >) info item: (id) item
+    childIndex: (NSInteger) newRow
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
