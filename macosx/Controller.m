@@ -580,6 +580,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //save history
     [self updateTorrentHistory];
+    [fTableView saveCollapsedGroups];
     
     //remaining calls the same as dealloc 
     [fInfoController release];

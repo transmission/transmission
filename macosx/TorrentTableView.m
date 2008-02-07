@@ -63,7 +63,11 @@
         if (![NSApp isOnLeopardOrBetter])
             [[self tableColumnWithIdentifier: @"Torrent"] setDataCell: fTorrentCell];
         
-        fCollapsedGroups = [[NSMutableIndexSet alloc] init];
+        NSData * groupData = [fDefaults dataForKey: @"CollapsedGroups"];
+        if (groupData)
+            fCollapsedGroups = [[NSUnarchiver unarchiveObjectWithData: groupData] retain];
+        else
+            fCollapsedGroups = [[NSMutableIndexSet alloc] init];
         
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
@@ -111,6 +115,11 @@
 - (void) removeAllCollapsedGroups
 {
     [fCollapsedGroups removeAllIndexes];
+}
+
+- (void) saveCollapsedGroups
+{
+    [fDefaults setObject: [NSArchiver archivedDataWithRootObject: fCollapsedGroups] forKey: @"CollapsedGroups"];
 }
 
 - (BOOL) outlineView: (NSOutlineView *) outlineView isGroupItem: (id) item
