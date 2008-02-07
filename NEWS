@@ -1,8 +1,18 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.05 (2008/xx/yy)
+1.05 (2008/02/yy)
+- All Platforms:
+   + Fix 1.04 crash
+   + Packaging improvements
 - Mac
    + Fix bug remembering reordered groups
+- GTK+
+   + Fix glitch that occurred when specifying which files to download
+   + Fix "Sort by Progress"
+   + Various interface and HIG improvements
+   + Updated Swedish, Italian translations
+- Daemon
+   + Fix "transmission-remote -x"
 
 1.04 (2008/01/31)
 - All Platforms:
