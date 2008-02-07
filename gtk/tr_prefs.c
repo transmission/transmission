@@ -214,33 +214,57 @@ target_invert_cb( GtkWidget * widget, gpointer target )
     gtk_widget_set_sensitive( GTK_WIDGET(target), !gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(widget) ) );
 }
 
-static gpointer
-test_port( gpointer l )
+struct test_port_data
 {
-    GObject * o = G_OBJECT( l );
-    GtkSpinButton * spin = GTK_SPIN_BUTTON( g_object_get_data( o, "tr-port-spin" ) );
+    GtkWidget * label;
+    gboolean * alive;
+};
 
-    const int port = gtk_spin_button_get_value_as_int( spin );
-    int isOpen;
-    int size;
-    char * text;
-    char url[256];
+static gpointer
+test_port( gpointer data_gpointer )
+{
+    struct test_port_data * data = data_gpointer;
 
-    g_usleep( G_USEC_PER_SEC * 3 ); /* give portmapping time to kick in */
-    snprintf( url, sizeof(url), "http://portcheck.transmissionbt.com/%d", port );
-    text = miniwget( url, &size );
-    /*g_message(" got len %d, [%*.*s]", size, size, size, text );*/
-    isOpen = text && *text=='1';
-    gtk_label_set_markup( GTK_LABEL(l), isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>") );
+    if( *data->alive )
+    {
+        GObject * o = G_OBJECT( data->label );
+        GtkSpinButton * spin = GTK_SPIN_BUTTON( g_object_get_data( o, "tr-port-spin" ) );
+        const int port = gtk_spin_button_get_value_as_int( spin );
+        int isOpen;
+        int size;
+        char * text;
+        char url[256];
 
+        g_usleep( G_USEC_PER_SEC * 3 ); /* give portmapping time to kick in */
+        snprintf( url, sizeof(url), "http://portcheck.transmissionbt.com/%d", port );
+        text = miniwget( url, &size );
+        /*g_message(" got len %d, [%*.*s]", size, size, size, text );*/
+        isOpen = text && *text=='1';
+
+        if( *data->alive )
+            gtk_label_set_markup( GTK_LABEL(data->label), isOpen
+                ? _("Port is <b>open</b>")
+                : _("Port is <b>closed</b>") );
+    }
+
+    g_free( data );
     return NULL;
 }
 
 static void
 testing_port_cb( GtkWidget * unused UNUSED, gpointer l )
 {
+    struct test_port_data * data = g_new0( struct test_port_data, 1 );
+    data->alive = g_object_get_data( G_OBJECT( l ), "alive" );
+    data->label = l;
     gtk_label_set_markup( GTK_LABEL(l), _( "<i>Testing port...</i>" ) );
-    g_thread_create( test_port, l, FALSE, NULL );
+    g_thread_create( test_port, data, FALSE, NULL );
+}
+
+static void
+dialogDestroyed( gpointer alive, GObject * dialog UNUSED )
+{
+    *(gboolean*)alive = FALSE;
 }
 
 GtkWidget *
@@ -254,6 +278,10 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     GtkWidget * h;
     GtkWidget * d;
     GtkTooltips * tips;
+    gboolean * alive;
+
+    alive = g_new( gboolean, 1 );
+    *alive = TRUE;
 
     tips = gtk_tooltips_new( );
 
@@ -264,6 +292,7 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     gtk_window_set_role( GTK_WINDOW(d), "transmission-preferences-dialog" );
     gtk_dialog_set_has_separator( GTK_DIALOG( d ), FALSE );
     gtk_container_set_border_width( GTK_CONTAINER( d ), GUI_PAD );
+    g_object_weak_ref( G_OBJECT( d ), dialogDestroyed, alive );
 
     g_signal_connect( d, "response", G_CALLBACK(response_cb), core );
 
@@ -332,7 +361,7 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
         hig_workarea_add_row( t, &row, _("Incoming TCP _Port"), h, w );
 
         g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
-        g_object_set_data( G_OBJECT(l), "tr-core", core );
+        g_object_set_data( G_OBJECT(l), "alive", alive );
         testing_port_cb( NULL, l );
 
         g_signal_connect( w, "toggled", G_CALLBACK(toggled_cb), l );
