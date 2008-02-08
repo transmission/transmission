@@ -47,16 +47,22 @@ enum
 
 #define DEFAULT_COLOR_VERIFIED       "#729fcf"
 #define DEFAULT_COLOR_VERIFIED_2     "#204a87"
+
 #define DEFAULT_COLOR_SEEDING        "#8ae234"
 #define DEFAULT_COLOR_SEEDING_2      "#4e9a06"
-#define DEFAULT_COLOR_MISSING        "#fcaf3e"
-#define DEFAULT_COLOR_MISSING_2      "#ce5c00"
-#define DEFAULT_COLOR_UNWANTED       "#eeeeec"
-#define DEFAULT_COLOR_UNWANTED_2     "#babdb6"
+
+#define DEFAULT_COLOR_MISSING        "#eeeeec" /* aluminum 1 */
+#define DEFAULT_COLOR_MISSING_2      "#babdb6" /* aluminum 3 */
+
+#define DEFAULT_COLOR_UNWANTED       "#babdb6" /* aluminum 3 */
+#define DEFAULT_COLOR_UNWANTED_2     "#2e3436" /* aluminum 6 */
+
 #define DEFAULT_COLOR_UNAVAILABLE    "#ef2929"
 #define DEFAULT_COLOR_UNAVAILABLE_2  "#a40000"
-#define DEFAULT_COLOR_PAUSED         "#888a85"
-#define DEFAULT_COLOR_PAUSED_2       "#2e3436"
+
+#define DEFAULT_COLOR_PAUSED         "#d3d7cf" /* aluminum 2 */
+#define DEFAULT_COLOR_PAUSED_2       "#555753" /* aluminum 5 */
+
 #define DEFAULT_COLOR_VERIFYING      "#fce94f"
 #define DEFAULT_COLOR_VERIFYING_2    "#c4a000"
 
