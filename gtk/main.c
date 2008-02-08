@@ -444,9 +444,11 @@ toggleMainWindow( struct cbdata * cbdata )
 {
     GtkWindow * window = GTK_WINDOW( cbdata->wind );
     const int hide = cbdata->minimized = !cbdata->minimized;
+    static int x=0, y=0;
 
     if( hide )
     {
+        gtk_window_get_position( window, &x, &y );
         clearTag( &cbdata->idle_hide_mainwindow_tag );
         hideMainWindow( cbdata );
         cbdata->idle_hide_mainwindow_tag = g_timeout_add( 250, idle_hide_mainwindow, window );
@@ -454,6 +456,7 @@ toggleMainWindow( struct cbdata * cbdata )
     else
     {
         gtk_window_set_skip_taskbar_hint( window, FALSE );
+        gtk_window_move( window, x, y );
         gtk_widget_show( GTK_WIDGET( window ) );
         gtk_window_deiconify( window );
 #if GTK_CHECK_VERSION(2,8,0)
