@@ -479,7 +479,7 @@ tr_core_insert( TrCore * self, TrTorrent * tor )
 }
 
 int
-tr_core_load( TrCore * self, gboolean paused )
+tr_core_load( TrCore * self, gboolean forcePaused )
 {
     int i;
     int count = 0;
@@ -492,7 +492,8 @@ tr_core_load( TrCore * self, gboolean paused )
     path = getdownloaddir( );
 
     ctor = tr_ctorNew( self->handle );
-    tr_ctorSetPaused( ctor, TR_FORCE, paused );
+    if( forcePaused )
+        tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
     tr_ctorSetDestination( ctor, TR_FALLBACK, path );
     tr_ctorSetMaxConnectedPeers( ctor, TR_FALLBACK, pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
 
