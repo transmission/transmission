@@ -184,7 +184,7 @@ realized_cb ( GtkWidget * wind, gpointer unused UNUSED )
     sizingmagic( GTK_WINDOW(wind),
                  GTK_SCROLLED_WINDOW( p->scroll ),
                  GTK_POLICY_NEVER,
-                 GTK_POLICY_ALWAYS );
+                 GTK_POLICY_AUTOMATIC );
 }
 
 static void
