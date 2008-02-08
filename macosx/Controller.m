@@ -261,6 +261,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [[fTotalTorrentsField cell] setBackgroundStyle: NSBackgroundStyleRaised];
         
         [[[fActionButton menu] itemAtIndex: 0] setImage: [NSImage imageNamed: NSImageNameActionTemplate]]; //set in nib if Leopard-only
+        
+        [fBottomTigerBar removeFromSuperview];
+        [fBottomTigerLine removeFromSuperview];
+        [fStatusTigerField removeFromSuperview];
+        [fStatusTigerImageView removeFromSuperview];
     }
     else
     {
