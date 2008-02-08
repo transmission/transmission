@@ -13,6 +13,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Updated Swedish, Italian translations
 - Daemon
    + Fix "transmission-remote -x"
+   + Fix PEX enable/disable bug
 
 1.04 (2008/01/31)
 - All Platforms:
