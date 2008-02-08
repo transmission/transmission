@@ -374,8 +374,10 @@ torrent_set_pex( int pex )
     assert( NULL != gl_handle );
     assert( !gl_exiting );
 
-    if( pex != gl_pex )
+    if( gl_pex != pex )
     {
+        gl_pex = pex;
+
         tr_setPexEnabled( gl_handle, gl_pex );
 
         savestate( );
