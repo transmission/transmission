@@ -100,6 +100,23 @@ getProgressString( const tr_info * info, const tr_stat * torStat )
                   tr_strlsize( buf2, torStat->uploadedEver, sizeof(buf2) ),
                   tr_strlratio( buf3, torStat->ratio, sizeof( buf3 ) ) );
 
+    // add time when downloading
+    if( torStat->status == TR_STATUS_DOWNLOAD )
+    {
+        const int eta = torStat->eta;
+        GString * gstr = g_string_new( str );
+        g_string_append( gstr, " - " );
+        if( eta < 0 )
+            g_string_append( gstr, _( "Stalled" ) );
+        else {
+            char timestr[128];
+            tr_strltime( timestr, eta, sizeof( timestr ) );
+            g_string_append_printf( gstr, _( "%s remaining" ), timestr );
+        }
+        g_free( str );
+        str = g_string_free( gstr, FALSE );
+    }
+
     return str;
 }
 
