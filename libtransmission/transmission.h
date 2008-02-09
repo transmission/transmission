@@ -48,14 +48,6 @@ extern "C" {
 # define MAX_PATH_LENGTH  1024
 #endif
 
-#if defined(WIN32)
-#define TR_PATH_DELIMITER '\\'
-#define TR_PATH_DELIMITER_STR "\\"
-#else
-#define TR_PATH_DELIMITER '/'
-#define TR_PATH_DELIMITER_STR "/"
-#endif
-
 #define TR_DEFAULT_PORT   51413
 
 enum

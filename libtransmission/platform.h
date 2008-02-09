@@ -24,6 +24,14 @@
 #ifndef TR_PLATFORM_H
 #define TR_PLATFORM_H
 
+#if defined(WIN32)
+#define TR_PATH_DELIMITER '\\'
+#define TR_PATH_DELIMITER_STR "\\"
+#else
+#define TR_PATH_DELIMITER '/'
+#define TR_PATH_DELIMITER_STR "/"
+#endif
+
 typedef struct tr_lock   tr_lock;
 typedef struct tr_thread tr_thread;
 
