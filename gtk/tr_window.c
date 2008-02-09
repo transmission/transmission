@@ -71,6 +71,7 @@ filter_mode_t;
 
 typedef struct
 {
+    GtkTooltips * tooltips;
     GtkWidget * scroll;
     GtkWidget * view;
     GtkWidget * toolbar;
@@ -81,6 +82,7 @@ typedef struct
     GtkWidget * dl_lb;
     GtkWidget * stats_lb;
     GtkWidget * gutter_lb;
+    GtkWidget * update_tracker_button;
     GtkTreeSelection  * selection;
     GtkCellRenderer   * renderer;
     GtkTreeViewColumn * column;
@@ -423,7 +425,7 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     int i, n;
     int status_stats_mode;
     char * pch;
-    PrivateData * p = g_new( PrivateData, 1 );
+    PrivateData * p;
     GtkWidget *vbox, *w, *self, *h, *c, *s, *image, *menu;
     GSList * l;
     GSList * toggles;
@@ -435,6 +437,7 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
         N_("Name"), N_("Files"), N_("Tracker")
     };
 
+    p = g_new0( PrivateData, 1 );
     p->filter_mode = FILTER_MODE_ALL;
     p->filter_text_mode = FILTER_TEXT_MODE_NAME;
     p->filter_text = NULL;
@@ -455,6 +458,8 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     /* main menu */
     w = action_get_widget( "/main-window-menu" );
     gtk_box_pack_start( GTK_BOX(vbox), w, FALSE, FALSE, 0 ); 
+    w = action_get_widget( "/main-window-menu/torrent-menu/update-tracker" );
+    p->update_tracker_button = w;
 
     /* toolbar */
     w = p->toolbar = action_get_widget( "/main-window-toolbar" );
@@ -643,6 +648,45 @@ updateSpeeds( PrivateData * p )
     gtk_label_set_text( GTK_LABEL( p->ul_lb ), buf );
 }
 
+static void
+findMaxAnnounceTime( GtkTreeModel * model,
+                     GtkTreePath  * path UNUSED,
+                     GtkTreeIter  * iter,
+                     gpointer       gmaxTime )
+{
+    tr_torrent * tor;
+    const tr_stat * torStat;
+    time_t * maxTime = gmaxTime;
+
+    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
+    torStat = tr_torrentStatCached( tor );
+    *maxTime = MAX( *maxTime, torStat->manualAnnounceTime );
+}
+
+static void
+updateAskForPeers( PrivateData * p )
+{
+    char buf[128];
+    time_t maxTime = 0;
+    const time_t now = time( NULL );
+
+    gtk_tree_selection_selected_foreach( p->selection,
+                                         findMaxAnnounceTime,
+                                         &maxTime );
+
+    if( maxTime <= now )
+        *buf = '\0';
+    else {
+        char secbuf[32];
+        const int seconds = maxTime - time( NULL );
+        tr_strltime( secbuf, seconds, sizeof( secbuf ) );
+        g_snprintf( buf, sizeof( buf ), _( "Tracker will allow requests in %s" ), secbuf );
+    }
+
+    if( !p->tooltips )
+        p->tooltips = gtk_tooltips_new( );
+    gtk_tooltips_set_tip( p->tooltips, p->update_tracker_button, buf, NULL );
+}
 
 void
 tr_window_update( TrWindow * self )
@@ -653,6 +697,7 @@ tr_window_update( TrWindow * self )
         updateSpeeds( p );
         updateTorrentCount( p );
         updateStats( p );
+        updateAskForPeers( p );
         refilter( p );
     }
 }
