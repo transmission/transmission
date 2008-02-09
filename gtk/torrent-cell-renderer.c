@@ -744,12 +744,17 @@ static void
 torrent_cell_renderer_dispose( GObject * o )
 {
     TorrentCellRenderer * r = TORRENT_CELL_RENDERER( o );
+    GObjectClass * parent;
+
     if( r && r->priv )
     {
         g_object_unref( G_OBJECT( r->priv->text_renderer ) );
         g_object_unref( G_OBJECT( r->priv->text_renderer_err ) );
         r->priv = NULL;
     }
+
+    parent = g_type_class_peek( g_type_parent( TORRENT_CELL_RENDERER_TYPE ) );
+    parent->dispose( o );
 }
 
 static void
