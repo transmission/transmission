@@ -2,7 +2,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.05 (2008/02/yy)
 - All Platforms:
-   + Fix 1.04 crash
+   + Fix 1.04 crash when parsing torrent files
    + Packaging improvements
 - Mac
    + Fix bug remembering reordered groups
