@@ -38,6 +38,15 @@
 #include "tr_torrent.h"
 #include "util.h"
 
+struct TrCorePrivate
+{
+    GtkTreeModel     * model;
+    tr_handle        * handle;
+    int                nextid;
+    gboolean           quitting;
+    struct core_stats  stats;
+};
+
 static void
 tr_core_marshal_err( GClosure * closure, GValue * ret UNUSED, guint count,
                      const GValue * vals, gpointer hint UNUSED,
@@ -117,17 +126,24 @@ tr_core_marshal_data( GClosure * closure, GValue * ret UNUSED, guint count,
     callback( inst, data, size, paused, gdata );
 }
 
+static int
+isDisposed( const TrCore * core )
+{
+    return !core || !core->priv;
+}
+
 static void
 tr_core_dispose( GObject * obj )
 {
-    TrCore       * self = (TrCore *) obj;
+    TrCore * core = TR_CORE( obj );
     GObjectClass * parent;
 
-    if( self->disposed )
-        return;
+    if( !isDisposed( core ) )
+    {
+        pref_save( NULL );
+        core->priv = NULL;
+    }
 
-    self->disposed = TRUE;
-    pref_save( NULL );
     parent = g_type_class_peek( g_type_parent( TR_CORE_TYPE ) );
     parent->dispose( obj );
 }
@@ -141,6 +157,10 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
 
     gobject_class = G_OBJECT_CLASS( g_class );
     gobject_class->dispose = tr_core_dispose;
+
+    g_type_class_add_private( g_class,
+                              sizeof(struct TrCorePrivate) );
+
 
     core_class = TR_CORE_CLASS( g_class );
     core_class->errsig = g_signal_new( "error", G_TYPE_FROM_CLASS( g_class ),
@@ -291,7 +311,8 @@ setSort( TrCore * core, const char * mode, gboolean isReversed  )
 {
     int col = MC_TORRENT_RAW;
     GtkSortType type = isReversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
-    GtkTreeSortable * sortable = GTK_TREE_SORTABLE( core->model );
+    GtkTreeModel * model = tr_core_model( core );
+    GtkTreeSortable * sortable = GTK_TREE_SORTABLE( model );
 
     if( !strcmp( mode, "sort-by-activity" ) )
         gtk_tree_sortable_set_sort_func( sortable, col, compareByActivity, NULL, NULL );
@@ -324,7 +345,7 @@ prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
     else if( !strcmp( key, PREF_KEY_MAX_PEERS_GLOBAL ) )
     {
         const uint16_t val = pref_int_get( key );
-        tr_setGlobalPeerLimit( core->handle, val );
+        tr_setGlobalPeerLimit( tr_core_handle( core ), val );
     }
 }
 
@@ -334,6 +355,7 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
     tr_handle * h;
     TrCore * self = (TrCore *) instance;
     GtkListStore * store;
+    struct TrCorePrivate * p;
 
     /* column types for the model used to store torrent information */
     /* keep this in sync with the enum near the bottom of tr_core.h */
@@ -346,6 +368,11 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
         G_TYPE_INT,       /* tr_stat()->status */
         G_TYPE_INT        /* ID for IPC */
     };
+
+    p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE( self,
+                                                  TR_CORE_TYPE,
+                                                  struct TrCorePrivate );
+
 
     h = tr_initFull( "gtk",
                      pref_flag_get( PREF_KEY_PEX ),
@@ -366,11 +393,10 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
     g_assert( ALEN( types ) == MC_ROW_COUNT );
     store = gtk_list_store_newv( MC_ROW_COUNT, types );
 
-    self->model    = GTK_TREE_MODEL( store );
-    self->handle   = h;
-    self->nextid   = 1;
-    self->quitting = FALSE;
-    self->disposed = FALSE;
+    p->model    = GTK_TREE_MODEL( store );
+    p->handle   = h;
+    p->nextid   = 1;
+    p->quitting = FALSE;
 }
 
 GType
@@ -418,19 +444,22 @@ tr_core_new( void )
 }
 
 GtkTreeModel *
-tr_core_model( TrCore * self )
+tr_core_model( TrCore * core )
 {
-    g_return_val_if_fail (TR_IS_CORE(self), NULL);
-
-    return self->disposed ? NULL : self->model;
+    return isDisposed( core ) ? NULL : core->priv->model;
 }
 
 tr_handle *
-tr_core_handle( TrCore * self )
+tr_core_handle( TrCore * core )
 {
-    g_return_val_if_fail (TR_IS_CORE(self), NULL);
+    return isDisposed( core ) ? NULL : core->priv->handle;
+}
 
-    return self->disposed ? NULL : self->handle;
+
+const struct core_stats*
+tr_core_get_stats( const TrCore * core )
+{
+    return isDisposed( core ) ? NULL : &core->priv->stats;
 }
 
 static char*
@@ -463,17 +492,18 @@ tr_core_insert( TrCore * self, TrTorrent * tor )
     const tr_info * inf = tr_torrent_info( tor );
     const tr_stat * torStat = tr_torrent_stat( tor );
     char * collated = doCollate( inf->name );
+    GtkListStore * store = GTK_LIST_STORE( tr_core_model( self ) );
     GtkTreeIter unused;
-    gtk_list_store_insert_with_values( GTK_LIST_STORE( self->model ), &unused, 0, 
+    gtk_list_store_insert_with_values( store, &unused, 0, 
                                        MC_NAME,          inf->name,
                                        MC_NAME_COLLATED, collated,
                                        MC_HASH,          inf->hashString,
                                        MC_TORRENT,       tor,
                                        MC_TORRENT_RAW,   tor->handle,
                                        MC_STATUS,        torStat->status,
-                                       MC_ID,            self->nextid,
+                                       MC_ID,            self->priv->nextid,
                                        -1);
-    self->nextid++;
+    self->priv->nextid++;
     g_object_unref( tor );
     g_free( collated );
 }
@@ -491,13 +521,13 @@ tr_core_load( TrCore * self, gboolean forcePaused )
 
     path = getdownloaddir( );
 
-    ctor = tr_ctorNew( self->handle );
+    ctor = tr_ctorNew( tr_core_handle( self ) );
     if( forcePaused )
         tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
     tr_ctorSetDestination( ctor, TR_FALLBACK, path );
     tr_ctorSetMaxConnectedPeers( ctor, TR_FALLBACK, pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
 
-    torrents = tr_loadTorrents ( self->handle, ctor, &count );
+    torrents = tr_loadTorrents ( tr_core_handle( self ), ctor, &count );
     for( i=0; i<count; ++i )
         tr_core_insert( self, tr_torrent_new_preexisting( torrents[i] ) );
 
@@ -543,7 +573,7 @@ tr_core_add_dir( TrCore * self, const char * path, const char * dir,
     TR_IS_CORE( self );
 
     errstr = NULL;
-    tor = tr_torrent_new( self->handle, path, dir, act, paused, &errstr );
+    tor = tr_torrent_new( tr_core_handle( self ), path, dir, act, paused, &errstr );
     if( NULL == tor )
     {
         tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );
@@ -612,7 +642,7 @@ tr_core_add_data_dir( TrCore * self, uint8_t * data, size_t size,
 
     TR_IS_CORE( self );
 
-    tor = tr_torrent_new_with_data( self->handle, data, size, dir,
+    tor = tr_torrent_new_with_data( tr_core_handle( self ), data, size, dir,
                                     paused, &errstr );
     if( NULL == tor )
     {
@@ -640,15 +670,20 @@ void
 tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter )
 {
     TrTorrent * tor;
+    GtkTreeModel * model = tr_core_model( self );
 
     TR_IS_CORE( self );
 
-    gtk_tree_model_get( self->model, iter, MC_TORRENT, &tor, -1 );
-    gtk_list_store_remove( GTK_LIST_STORE( self->model ), iter );
+    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
+    gtk_list_store_remove( GTK_LIST_STORE( model ), iter );
     tr_torrentRemoveSaved( tr_torrent_handle( tor ) );
 
     g_object_unref( G_OBJECT( tor ) );
 }
+
+/***
+****
+***/
 
 static gboolean
 update_foreach( GtkTreeModel * model,
@@ -693,15 +728,16 @@ tr_core_update( TrCore * self )
     int column;
     GtkSortType order;
     GtkTreeSortable * sortable;
+    GtkTreeModel * model = tr_core_model( self );
 
     /* pause sorting */
-    sortable = GTK_TREE_SORTABLE( self->model );
+    sortable = GTK_TREE_SORTABLE( model );
     gtk_tree_sortable_get_sort_column_id( sortable, &column, &order );
     gtk_tree_sortable_set_sort_column_id( sortable, GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, order );
 
     /* refresh the model */
-    memset( &self->stats, 0, sizeof( struct core_stats ) );
-    gtk_tree_model_foreach( self->model, update_foreach, &self->stats );
+    memset( &self->priv->stats, 0, sizeof( struct core_stats ) );
+    gtk_tree_model_foreach( model, update_foreach, &self->priv->stats );
 
     /* resume sorting */
     gtk_tree_sortable_set_sort_column_id( sortable, column, order );

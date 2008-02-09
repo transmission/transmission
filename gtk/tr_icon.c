@@ -68,7 +68,7 @@ refresh_tooltip_cb( gpointer data )
 {
     GtkStatusIcon * icon = GTK_STATUS_ICON( data );
     TrCore * core = g_object_get_data( G_OBJECT( icon ), "tr-core" );
-    const struct core_stats * stats = &core->stats;
+    const struct core_stats * stats = tr_core_get_stats( core );
     char downStr[32], upStr[32];
     char tip[256];
 

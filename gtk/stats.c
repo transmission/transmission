@@ -51,8 +51,8 @@ updateStats( gpointer gdata )
 
     struct stat_ui * ui = gdata;
     tr_session_stats one, all;
-    tr_getSessionStats( ui->core->handle, &one );
-    tr_getCumulativeSessionStats( ui->core->handle, &all );
+    tr_getSessionStats( tr_core_handle( ui->core ), &one );
+    tr_getCumulativeSessionStats( tr_core_handle( ui->core ), &all );
 
     setLabel( ui->one_up_lb, tr_strlsize( buf, one.uploadedBytes, sizeof(buf) ) );
     setLabel( ui->one_down_lb, tr_strlsize( buf, one.downloadedBytes, sizeof(buf) ) );

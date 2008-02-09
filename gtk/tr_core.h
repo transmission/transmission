@@ -52,8 +52,6 @@
 #define TR_CORE_GET_CLASS( obj )                                              \
   ( G_TYPE_INSTANCE_GET_CLASS(  (obj),   TR_CORE_TYPE, TrCoreClass ) )
 
-typedef struct _TrCore TrCore;
-typedef struct _TrCoreClass TrCoreClass;
 
 struct core_stats
 {
@@ -64,37 +62,38 @@ struct core_stats
 };
 
 /* treat the contents of this structure as private */
-struct _TrCore
+typedef struct TrCore
 {
-    GObject            parent;
-    GtkTreeModel     * model;
-    tr_handle        * handle;
-    int                nextid;
-    gboolean           quitting;
-    gboolean           disposed;
-    struct core_stats  stats;
-};
+    GObject                 parent;
+    struct TrCorePrivate  * priv;
+}
+TrCore;
 
-struct _TrCoreClass
+typedef struct TrCoreClass
 {
-    GObjectClass        parent;
+    GObjectClass parent;
+
     /* "error" signal:
        void handler( TrCore *, enum tr_core_err, const char *, gpointer ) */
-    int                 errsig;
+    int errsig;
+
     /* "directory-prompt" signal:
-       void handler( TrCore *, GList *, enum tr_torrent_action, gboolean,
-                     gpointer ) */
-    int                 promptsig;
+       void handler( TrCore *, GList *, enum tr_torrent_action, gboolean, gpointer ) */
+    int promptsig;
+
     /* "directory-prompt-data" signal:
        void handler( TrCore *, uint8_t *, size_t, gboolean, gpointer ) */
-    int                 promptdatasig;
+    int promptdatasig;
+
     /* "quit" signal:
        void handler( TrCore *, gpointer ) */
-    int                 quitsig;
+    int quitsig;
+
     /* "prefs-changed" signal:
        void handler( TrCore *, int, gpointer ) */
-    int                 prefsig;
-};
+    int prefsig;
+}
+TrCoreClass;
 
 enum tr_core_err
 {
@@ -117,6 +116,9 @@ tr_core_model( TrCore * self );
 /* Returns the libtransmission handle */
 tr_handle *
 tr_core_handle( TrCore * self );
+
+const struct core_stats*
+tr_core_get_stats( const TrCore * self );
 
 /* Load saved state, return number of torrents added. May trigger one
    or more "error" signals with TR_CORE_ERR_ADD_TORRENT */
