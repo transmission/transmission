@@ -593,6 +593,8 @@ tr_torrentStat( tr_torrent * tor )
                             &s->peersGettingFromUs,
                              s->peersFrom );
 
+    s->manualAnnounceTime = tr_trackerGetManualAnnounceTime( tor->tracker );
+
     s->percentComplete = tr_cpPercentComplete ( tor->completion );
 
     s->percentDone = tr_cpPercentDone( tor->completion );

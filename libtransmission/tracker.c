@@ -1108,11 +1108,17 @@ tr_trackerGetAddress( const tr_tracker   * t )
     return getCurrentAddress( t );
 }
 
+time_t
+tr_trackerGetManualAnnounceTime( const struct tr_tracker * t )
+{
+    return t->isRunning ? t->manualAnnounceAllowedAt : 0;
+}
+
 int
 tr_trackerCanManualAnnounce ( const tr_tracker * t)
 {
-    return t->isRunning
-            && ( time(NULL) >= t->manualAnnounceAllowedAt );
+    const time_t allow = tr_trackerGetManualAnnounceTime( t );
+    return allow && ( allow <= time( NULL ) );
 }
 
 void

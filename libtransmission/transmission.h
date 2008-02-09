@@ -727,6 +727,11 @@ struct tr_stat
     int                 leechers;
     int                 completedFromTracker;
 
+    /* if the torrent is running, this is the time at which
+     * the client can manually ask the torrent's tracker
+     * for more peers.  otherwise, the value is zero. */
+    time_t              manualAnnounceTime;
+
     /* Byte count of how much data is left to be downloaded until
      * we're done -- that is, until we've got all the pieces we wanted. */
     uint64_t            leftUntilDone;
