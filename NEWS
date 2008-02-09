@@ -7,9 +7,9 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Use the file icon as the per-torrent action button
    + Updated images in the inspector
 
-1.05 (2008/02/yy)
+1.05 (2008/02/08)
 - All Platforms:
-   + Fix 1.04 crash
+   + Fix 1.04 crash when parsing bencoded data
    + Packaging improvements
 - Mac
    + Fix bug remembering reordered groups
