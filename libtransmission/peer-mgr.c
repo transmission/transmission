@@ -547,6 +547,18 @@ getConnectedPeers( Torrent * t, int * setmeCount )
     return ret;
 }
 
+static int
+clientIsDownloadingFrom( const tr_peer * peer )
+{
+    return peer->clientIsInterested && !peer->clientIsChoked;
+}
+
+static int
+clientIsUploadingTo( const tr_peer * peer )
+{
+    return peer->peerIsInterested && !peer->peerIsChoked;
+}
+
 /***
 ****  Refill
 ***/
@@ -554,7 +566,7 @@ getConnectedPeers( Torrent * t, int * setmeCount )
 struct tr_refill_piece
 {
     tr_priority_t priority;
-    int percentDone;
+    int missingBlockCount;
     uint16_t random;
     uint32_t piece;
     uint32_t peerCount;
@@ -567,14 +579,14 @@ compareRefillPiece (const void * aIn, const void * bIn)
 {
     const struct tr_refill_piece * a = aIn;
     const struct tr_refill_piece * b = bIn;
+
+    /* fewer missing pieces goes first */
+    if( a->missingBlockCount != b->missingBlockCount )
+        return a->missingBlockCount < b->missingBlockCount ? -1 : 1;
     
     /* if one piece has a higher priority, it goes first */
     if( a->priority != b->priority )
         return a->priority > b->priority ? -1 : 1;
-
-    /* try to fill partial pieces */
-    if( a->percentDone != b->percentDone )
-        return a->percentDone > b->percentDone ? -1 : 1;
     
     /* if one *might be* fastallowed to us, get it first...
      * I'm putting it on top so we prioritize those pieces at
@@ -645,7 +657,7 @@ getPreferredPieces( Torrent     * t,
             setme->peerCount = 0;
             setme->fastAllowed = 0;
             setme->random = tr_rand( UINT16_MAX );
-            setme->percentDone = (int)( 100.0 * tr_cpPercentBlocksInPiece( tor->completion, piece ) );
+            setme->missingBlockCount = tr_cpMissingBlocksInPiece( tor->completion, piece );
 
             for( k=0; k<peerCount; ++k ) {
                 const tr_peer * peer = peers[k];
@@ -761,6 +773,35 @@ getPreferredBlocks( Torrent * t, uint64_t * setmeCount )
     return ret;
 }
 
+static tr_peer**
+getPeersUploadingToClient( Torrent * t, int * setmeCount )
+{
+    int i;
+    int peerCount = 0;
+    int retCount = 0;
+    tr_peer ** peers = (tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
+    tr_peer ** ret = tr_new( tr_peer*, peerCount );
+
+    /* get a list of peers we're downloading from */
+    for( i=0; i<peerCount; ++i )
+        if( clientIsDownloadingFrom( peers[i] ) )
+            ret[retCount++] = peers[i];
+
+    /* pick a different starting point each time so all peers
+     * get a chance at the first blocks in the queue */
+    if( retCount ) {
+        tr_peer ** tmp = tr_new( tr_peer*, retCount );
+        i = tr_rand( retCount );
+        memcpy( tmp, ret, sizeof(tr_peer*) * retCount );
+        memcpy( ret, tmp+i, sizeof(tr_peer*) * (retCount-i) );
+        memcpy( ret+(retCount-i), tmp, sizeof(tr_peer*) * i );
+        tr_free( tmp );
+    }
+
+    *setmeCount = retCount;
+    return ret;
+}
+
 static int
 refillPulse( void * vtorrent )
 {
@@ -781,15 +822,17 @@ refillPulse( void * vtorrent )
     tordbg( t, "Refilling Request Buffers..." );
 
     blocks = getPreferredBlocks( t, &blockCount );
-    peers = getConnectedPeers( t, &peerCount );
+    peers = getPeersUploadingToClient( t, &peerCount );
 
     for( i=0; peerCount && i<blockCount; ++i )
     {
+        int j;
+
         const uint64_t block = blocks[i];
         const uint32_t index = tr_torBlockPiece( tor, block );
         const uint32_t begin = (block * tor->blockSize) - (index * tor->info.pieceSize);
         const uint32_t length = tr_torBlockCountBytes( tor, (int)block );
-        int j;
+
         assert( _tr_block( tor, index, begin ) == (int)block );
         assert( begin < (uint32_t)tr_torPieceCountBytes( tor, (int)index ) );
         assert( (begin + length) <= (uint32_t)tr_torPieceCountBytes( tor, (int)index ) );
@@ -1405,18 +1448,6 @@ tr_peerMgrHasConnections( const tr_peerMgr * manager,
 
     managerUnlock( (tr_peerMgr*)manager );
     return ret;
-}
-
-static int
-clientIsDownloadingFrom( const tr_peer * peer )
-{
-    return peer->clientIsInterested && !peer->clientIsChoked;
-}
-
-static int
-clientIsUploadingTo( const tr_peer * peer )
-{
-    return peer->peerIsInterested && !peer->peerIsChoked;
 }
 
 void

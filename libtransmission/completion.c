@@ -259,6 +259,14 @@ float tr_cpPercentBlocksInPiece( const tr_completion * cp, int piece )
     return (double)cp->completeBlocks[piece] / tr_torPieceCountBlocks(cp->tor,piece);
 }
 
+int
+tr_cpMissingBlocksInPiece( const tr_completion * cp, int piece )
+{
+    assert( cp != NULL );
+
+    return tr_torPieceCountBlocks(cp->tor,piece) - cp->completeBlocks[piece];
+}
+
 /***
 ****
 ***/

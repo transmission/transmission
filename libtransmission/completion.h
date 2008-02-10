@@ -54,6 +54,8 @@ int              tr_cpBlockIsComplete( const tr_completion *, int block );
 void             tr_cpBlockAdd( tr_completion *, int block );
 void             tr_cpBlockBitfieldSet( tr_completion *, struct tr_bitfield * );
 float            tr_cpPercentBlocksInPiece( const tr_completion * cp, int piece );
+int              tr_cpMissingBlocksInPiece( const tr_completion * cp, int piece );
+
 
 const struct tr_bitfield * tr_cpPieceBitfield( const tr_completion* );
 const struct tr_bitfield * tr_cpBlockBitfield( const tr_completion * );

@@ -76,7 +76,9 @@ enum
     MAX_FAST_ALLOWED_COUNT   = 10,          /* max. number of pieces we fast-allow to another peer */
     MAX_FAST_ALLOWED_THRESHOLD = 10,        /* max threshold for allowing fast-pieces requests */
 
-    REQUEST_TTL_SECS = 120
+    QUEUED_REQUEST_TTL_SECS = 20,
+
+    SENT_REQUEST_TTL_SECS = 90
 
 };
 
@@ -589,7 +591,7 @@ expireOldRequests( tr_peermsgs * msgs )
        "time_requested" here is when the request was queued */
     for( l=msgs->clientWillAskFor; l!=NULL; l=l->next ) {
         struct peer_request * req = l->data;
-        if( req->time_requested + REQUEST_TTL_SECS < now )
+        if( req->time_requested + QUEUED_REQUEST_TTL_SECS < now )
             tr_list_prepend( &prune, req );
     }
 
@@ -597,7 +599,7 @@ expireOldRequests( tr_peermsgs * msgs )
        "time_requested" here is when the request was sent */
     for( l=msgs->clientAskedFor; l!=NULL; l=l->next ) {
         struct peer_request * req = l->data;
-        if( req->time_requested + REQUEST_TTL_SECS < now )
+        if( req->time_requested + SENT_REQUEST_TTL_SECS < now )
             tr_list_prepend( &prune, req );
     }
 
@@ -1550,7 +1552,7 @@ ratePulse( void * vmsgs )
     tr_peermsgs * msgs = (tr_peermsgs *) vmsgs;
     msgs->info->rateToClient = tr_rcRate( msgs->info->rcToClient );
     msgs->info->rateToPeer = tr_rcRate( msgs->info->rcToPeer );
-    msgs->maxActiveRequests = MIN( 8 + (int)(msgs->info->rateToClient/5), 100 );
+    msgs->maxActiveRequests = MIN( 4 + (int)(msgs->info->rateToClient/4), 100 );
     msgs->minActiveRequests = msgs->maxActiveRequests / 3;
     return TRUE;
 }
