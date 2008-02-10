@@ -1793,16 +1793,18 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) applyFilter: (id) sender
 {
     //get all the torrents in the table
-    NSMutableArray * previousTorrents = [NSMutableArray array];
+    NSMutableArray * previousTorrents;
     if ([fDisplayedTorrents count] > 0 && ![[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [Torrent class]])
     {
+        previousTorrents = [NSMutableArray array];
+        
         NSEnumerator * enumerator = [fDisplayedTorrents objectEnumerator];
         NSDictionary * dict;
         while ((dict = [enumerator nextObject]))
             [previousTorrents addObjectsFromArray: [dict objectForKey: @"Torrents"]];
     }
     else
-        [previousTorrents setArray: fDisplayedTorrents];
+        previousTorrents = [NSMutableArray arrayWithArray: fDisplayedTorrents];
     
     NSArray * selectedValues = [fTableView selectedValues];
     

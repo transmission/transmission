@@ -65,7 +65,7 @@
         
         NSData * groupData = [fDefaults dataForKey: @"CollapsedGroups"];
         if (groupData)
-            fCollapsedGroups = [[NSUnarchiver unarchiveObjectWithData: groupData] retain];
+            fCollapsedGroups = [[NSUnarchiver unarchiveObjectWithData: groupData] mutableCopy];
         else
             fCollapsedGroups = [[NSMutableIndexSet alloc] init];
         
@@ -359,11 +359,12 @@
         }
         else
         {
-            int group = [[item objectForKey: @"Group"] intValue], i;
+            NSNumber * group = [item objectForKey: @"Group"];
+            int i;
             for (i = 0; i < [self numberOfRows]; i++)
             {
                 id tableItem = [self itemAtRow: i];
-                if (![tableItem isKindOfClass: [Torrent class]] && [[tableItem objectForKey: @"Group"] intValue] == group)
+                if (![tableItem isKindOfClass: [Torrent class]] && [group isEqualToNumber: [tableItem objectForKey: @"Group"]])
                 {
                     [indexSet addIndex: i];
                     break;
