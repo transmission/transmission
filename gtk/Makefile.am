@@ -18,6 +18,7 @@ noinst_HEADERS = \
     hig.h \
     io.h \
     ipc.h \
+    file-list.h \
     lock.h \
     logo.h \
     makemeta-ui.h \
@@ -40,6 +41,7 @@ transmission_SOURCES = \
     actions.c \
     conf.c \
     dialogs.c \
+    file-list.c \
     hig.c \
     io.c \
     ipc.c \
