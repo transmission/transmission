@@ -146,6 +146,11 @@ char * tr_clientForId( const uint8_t * id )
                       charToInt( id[3] ), charToInt( id[4] ),
                       charToInt( id[5] ), charToInt( id[6] ) );
         }
+        else if( !memcmp( &id[1], "LH", 2 ) )
+        {
+            tr_asprintf( &ret, "LH-ABC %c.%c.%c",
+                      id[3], id[4], id[5] );
+        }
         else if( !memcmp( &id[1], "TT", 2 ) )
         {
             tr_asprintf( &ret, "TuoTu %c.%c.%c",
