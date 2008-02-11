@@ -1804,7 +1804,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             [previousTorrents addObjectsFromArray: [dict objectForKey: @"Torrents"]];
     }
     else
-        previousTorrents = [NSMutableArray arrayWithArray: fDisplayedTorrents];
+        previousTorrents = fDisplayedTorrents;
     
     NSArray * selectedValues = [fTableView selectedValues];
     
@@ -1908,7 +1908,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [indexes addIndex: i];
     }
     
-    [fDisplayedTorrents setArray: [fTorrents objectsAtIndexes: indexes]];
+    NSArray * allTorrents = [fTorrents objectsAtIndexes: indexes];
     
     //set button tooltips
     [fNoFilterButton setCount: [fTorrents count]];
@@ -1918,7 +1918,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fPauseFilterButton setCount: paused];
     
     //clear display cache for not-shown torrents
-    [previousTorrents removeObjectsInArray: fDisplayedTorrents];
+    [previousTorrents removeObjectsInArray: allTorrents];
     enumerator = [previousTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
         [torrent setPreviousAmountFinished: NULL];
@@ -1928,13 +1928,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (groupRows)
     {
         NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: YES] autorelease];
-        [fDisplayedTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
+        allTorrents = [allTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
         
         NSMutableArray * groups = [NSMutableArray array], * groupTorrents;
         int oldGroupValue = -2;
-        for (i = 0; i < [fDisplayedTorrents count]; i++)
+        for (i = 0; i < [allTorrents count]; i++)
         {
-            Torrent * torrent = [fDisplayedTorrents objectAtIndex: i];
+            Torrent * torrent = [allTorrents objectAtIndex: i];
             int groupValue = [torrent groupValue];
             if (groupValue != oldGroupValue)
             {
@@ -1951,6 +1951,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         [fDisplayedTorrents setArray: groups];
     }
+    else
+        [fDisplayedTorrents setArray: allTorrents];
     
     //actually sort
     [self sortTorrentsIgnoreSelected];
