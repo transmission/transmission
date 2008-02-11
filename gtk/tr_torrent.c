@@ -35,50 +35,63 @@
 #include "conf.h"
 #include "util.h"
 
+struct TrTorrentPrivate
+{
+   tr_torrent * handle;
+   char * delfile;
+   gboolean seeding_cap_enabled;
+   gdouble seeding_cap; /* ratio to stop seeding at */
+};
+
+
 static void
 tr_torrent_init(GTypeInstance *instance, gpointer g_class UNUSED )
 {
-  TrTorrent *self = (TrTorrent *)instance;
+    TrTorrent * self = TR_TORRENT( instance );
+    struct TrTorrentPrivate * p;
+
+    p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE( self,
+                                                  TR_TORRENT_TYPE,
+                                                  struct TrTorrentPrivate );
+    p->handle = NULL;
+    p->delfile = NULL;
+    p->seeding_cap = 2.0;
 
 #ifdef REFDBG
-  fprintf( stderr, "torrent %p init\n", self );
+    g_message( "torrent %p init", self );
 #endif
+}
 
-  self->handle = NULL;
-  self->delfile = NULL;
-  self->severed = FALSE;
-  self->disposed = FALSE;
-  self->seeding_cap = 2.0;
+static int
+isDisposed( const TrTorrent * self )
+{
+    return !self || !self->priv;
 }
 
 static void
-tr_torrent_dispose(GObject *obj)
+tr_torrent_dispose( GObject * o )
 {
-  GObjectClass *parent = g_type_class_peek(g_type_parent(TR_TORRENT_TYPE));
-  TrTorrent *self = (TrTorrent*)obj;
+    GObjectClass * parent = g_type_class_peek(g_type_parent(TR_TORRENT_TYPE));
+    TrTorrent * self = TR_TORRENT( o );
 
-  if(self->disposed)
-    return;
-  self->disposed = TRUE;
+    if( !isDisposed( self ) )
+    {
+        if( self->priv->handle )
+            tr_torrentClose( self->priv->handle );
+        g_free( self->priv->delfile );
+        self->priv = NULL;
+    }
 
-#ifdef REFDBG
-  fprintf( stderr, "torrent %p dispose\n", self );
-#endif
-
-  if( !self->severed )
-      tr_torrent_sever( self );
-
-  g_free (self->delfile);
-
-  /* Chain up to the parent class */
-  parent->dispose(obj);
+    /* chain up to the parent class */
+    parent->dispose( o );
 }
 
 static void
 tr_torrent_class_init(gpointer g_class, gpointer g_class_data UNUSED )
 {
-  GObjectClass *gobject_class = G_OBJECT_CLASS(g_class);
-  gobject_class->dispose = tr_torrent_dispose;
+    GObjectClass *gobject_class = G_OBJECT_CLASS(g_class);
+    gobject_class->dispose = tr_torrent_dispose;
+    g_type_class_add_private( g_class, sizeof(struct TrTorrentPrivate) );
 }
 
 GType
@@ -104,67 +117,49 @@ tr_torrent_get_type(void)
   return type;
 }
 
-void
-tr_torrent_sever( TrTorrent * self )
-{
-    g_return_if_fail (TR_IS_TORRENT( self ));
-
-    if( !self->severed )
-    {
-        self->severed = TRUE;
-
-        if( self->handle )
-            tr_torrentClose( self->handle );
-    }
-}
-
 tr_torrent *
 tr_torrent_handle(TrTorrent *tor)
 {
     g_assert( TR_IS_TORRENT(tor) );
 
-    return tor->severed ? NULL : tor->handle;
+    return isDisposed( tor ) ? NULL : tor->priv->handle;
 }
 
 const tr_stat *
 tr_torrent_stat(TrTorrent *tor)
 {
-    return tor && !tor->severed ? tr_torrentStatCached( tor->handle ) : NULL;
+    tr_torrent * handle = tr_torrent_handle( tor );
+    return handle ? tr_torrentStatCached( handle ) : NULL;
 }
 
 const tr_info *
-tr_torrent_info(TrTorrent *tor) {
-  TR_IS_TORRENT(tor);
-
-  if(tor->severed)
-    return NULL;
-
-  return tr_torrentInfo(tor->handle);
+tr_torrent_info( TrTorrent * tor )
+{
+    tr_torrent * handle = tr_torrent_handle( tor );
+    return handle ? tr_torrentInfo( handle ) : NULL;
 }
 
 void
 tr_torrent_start( TrTorrent * self )
 {
-    TR_IS_TORRENT( self );
-
-    if( !self->severed )
-        tr_torrentStart( self->handle );
+    tr_torrent * handle = tr_torrent_handle( self );
+    if( handle )
+        tr_torrentStart( handle );
 }
 
 void
 tr_torrent_stop( TrTorrent * self )
 {
-    TR_IS_TORRENT( self );
-
-    if( !self->severed )
-        tr_torrentStop( self->handle );
+    tr_torrent * handle = tr_torrent_handle( self );
+    if( handle )
+        tr_torrentStop( handle );
 }
 
 static TrTorrent *
 maketorrent( tr_torrent * handle )
 {
     TrTorrent * tor = g_object_new( TR_TORRENT_TYPE, NULL );
-    tor->handle = handle;
+    tor->priv->handle = handle;
     return tor;
 }
 
@@ -216,7 +211,7 @@ tr_torrent_new( tr_handle               * handle,
 
   ret = maketorrent( tor );
   if( TR_TOR_MOVE == act )
-    ret->delfile = g_strdup( metainfo_filename );
+    ret->priv->delfile = g_strdup( metainfo_filename );
   return ret;
 }
 
@@ -265,19 +260,19 @@ void
 tr_torrent_check_seeding_cap ( TrTorrent *gtor)
 {
   const tr_stat * st = tr_torrent_stat( gtor );
-  if ((gtor->seeding_cap_enabled) && (st->ratio >= gtor->seeding_cap))
+  if ((gtor->priv->seeding_cap_enabled) && (st->ratio >= gtor->priv->seeding_cap))
     tr_torrent_stop (gtor);
 }
 void
 tr_torrent_set_seeding_cap_ratio ( TrTorrent *gtor, gdouble ratio )
 {
-  gtor->seeding_cap = ratio;
+  gtor->priv->seeding_cap = ratio;
   tr_torrent_check_seeding_cap (gtor);
 }
 void
 tr_torrent_set_seeding_cap_enabled ( TrTorrent *gtor, gboolean b )
 {
-  if ((gtor->seeding_cap_enabled = b))
+  if ((gtor->priv->seeding_cap_enabled = b))
     tr_torrent_check_seeding_cap (gtor);
 }
 

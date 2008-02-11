@@ -42,25 +42,18 @@
 #define TR_TORRENT_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), TR_TORRENT_TYPE, TrTorrentClass))
 
-typedef struct _TrTorrent TrTorrent;
-typedef struct _TrTorrentClass TrTorrentClass;
+typedef struct _TrTorrent
+{
+    GObject                    parent;
+    struct TrTorrentPrivate  * priv;
+}
+TrTorrent;
 
-/* treat the contents of this structure as private */
-struct _TrTorrent {
-  GObject parent;
-  tr_torrent *handle;
-  char *delfile;
-
-  /* FIXME: hm, are these heavyweight enough to deserve their own properties? */
-  gboolean severed;
-  gboolean disposed;
-  gboolean seeding_cap_enabled;
-  gdouble seeding_cap; /* ratio to stop seeding at */
-};
-
-struct _TrTorrentClass {
-  GObjectClass parent;
-};
+typedef struct TrTorrentClass
+{
+    GObjectClass parent;
+}
+TrTorrentClass;
 
 GType
 tr_torrent_get_type(void);
@@ -100,8 +93,5 @@ tr_torrent_new( tr_handle * handle, const char * path, const char * dir,
 TrTorrent *
 tr_torrent_new_with_data( tr_handle * handle, uint8_t * data, size_t size,
                           const char * dir, gboolean paused, char ** err );
-
-void
-tr_torrent_sever( TrTorrent * tor );
 
 #endif

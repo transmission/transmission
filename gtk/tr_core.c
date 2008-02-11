@@ -499,7 +499,7 @@ tr_core_insert( TrCore * self, TrTorrent * tor )
                                        MC_NAME_COLLATED, collated,
                                        MC_HASH,          inf->hashString,
                                        MC_TORRENT,       tor,
-                                       MC_TORRENT_RAW,   tor->handle,
+                                       MC_TORRENT_RAW,   tr_torrent_handle( tor ),
                                        MC_STATUS,        torStat->status,
                                        MC_ID,            self->priv->nextid,
                                        -1);
