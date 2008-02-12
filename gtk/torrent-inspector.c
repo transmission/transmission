@@ -1075,8 +1075,6 @@ periodic_refresh (gpointer data)
   refresh_peers     (g_object_get_data (G_OBJECT(data), "peers-top"));
   refresh_activity  (g_object_get_data (G_OBJECT(data), "activity-top"));
   refresh_options   (g_object_get_data (G_OBJECT(data), "options-top"));
-  file_list_refresh (g_object_get_data (G_OBJECT(data), "files-top"));
-
   return TRUE;
 }
 
@@ -1123,6 +1121,7 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
                             gtk_label_new (_("Info")));
 
   w = file_list_new( gtor );
+  gtk_container_set_border_width( GTK_CONTAINER( w ), GUI_PAD_BIG );
   g_object_set_data (G_OBJECT(d), "files-top", w);
   gtk_notebook_append_page (GTK_NOTEBOOK(n), w,
                             gtk_label_new (_("Files")));

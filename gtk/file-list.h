@@ -29,9 +29,8 @@
 #include "tr_torrent.h"
 
 /* create a new file list */
-GtkWidget * file_list_new( TrTorrent * gtor );
+GtkWidget * file_list_new( TrTorrent * );
 
-/* updates the 'percent complete' column */
-void file_list_refresh( GtkWidget* );
+void file_list_set_torrent( GtkWidget *, TrTorrent * );
 
 #endif

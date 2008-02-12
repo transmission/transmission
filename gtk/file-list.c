@@ -30,16 +30,8 @@
 
 #include <libtransmission/transmission.h>
 
-#include "actions.h"
-#include "tr_torrent.h"
+#include "file-list.h"
 #include "hig.h"
-#include "torrent-inspector.h"
-#include "util.h"
-
-#define UPDATE_INTERVAL_MSEC 2000
-
-#define STRIPROOT( path ) \
-    ( g_path_is_absolute( (path) ) ? g_path_skip_root( (path) ) : (path) )
 
 enum
 {
@@ -57,8 +49,11 @@ enum
 typedef struct
 {
   TrTorrent * gtor;
+  GtkWidget * top;
+  GtkWidget * view;
   GtkTreeModel * model; /* same object as store, but recast */
   GtkTreeStore * store; /* same object as model, but recast */
+  guint timeout_tag;
 }
 FileData;
 
@@ -362,23 +357,59 @@ enabled_toggled (GtkCellRendererToggle  * cell UNUSED,
   gtk_tree_path_free( path );
 }
 
-GtkWidget *
-file_list_new( TrTorrent * gtor )
+static void
+freeData( gpointer gdata )
 {
-    GtkWidget           * ret;
-    FileData            * data;
-    const tr_info       * inf;
-    tr_torrent          * tor;
-    GtkTreeStore        * store;
-    int                   ii;
-    GtkWidget           * view, * scroll;
-    GtkCellRenderer     * rend;
-    GtkCellRenderer     * priority_rend;
-    GtkCellRenderer     * enabled_rend;
-    GtkTreeViewColumn   * col;
-    GtkTreeSelection    * sel;
-    GtkTreeModel        * model;
+    FileData * data = gdata;
 
+    if( data->timeout_tag ) {
+        g_source_remove( data->timeout_tag );
+        data->timeout_tag = 0;
+    }
+
+    g_free( data );
+}
+
+static void
+torrentDestroyed( gpointer gdata, GObject * deadTorrent UNUSED )
+{
+    FileData * data = gdata;
+    file_list_set_torrent( data->top, NULL );
+}
+
+static gboolean
+refreshModel( gpointer gdata )
+{
+    FileData * data  = gdata;
+
+    g_assert( data != NULL );
+
+    if( data->gtor )
+    {
+        guint64 foo, bar;
+        int fileCount;
+        tr_torrent * tor;
+        tr_file_stat * fileStats;
+
+        tor = tr_torrent_handle( data->gtor );
+        fileCount = 0;
+        fileStats = tr_torrentFiles( tor, &fileCount );
+        updateprogress (data->model, data->store, NULL, fileStats, &foo, &bar);
+        tr_torrentFilesFree( fileStats, fileCount );
+    }
+
+    return TRUE;
+}
+
+void
+file_list_set_torrent( GtkWidget * w, TrTorrent * gtor )
+{
+    GtkTreeStore        * store;
+    FileData            * data;
+
+    data = g_object_get_data( G_OBJECT( w ), "file-data" );
+
+    /* instantiate the model */
     store = gtk_tree_store_new ( N_FILE_COLS,
                                  G_TYPE_STRING,    /* stock */
                                  G_TYPE_STRING,    /* label */
@@ -388,21 +419,55 @@ file_list_new( TrTorrent * gtor )
                                  G_TYPE_UINT64,    /* size */
                                  G_TYPE_STRING,    /* priority */
                                  G_TYPE_BOOLEAN ); /* dl enabled */
+    data->store = store;
+    data->model = GTK_TREE_MODEL( store );
+    data->gtor = gtor;
 
-    /* set up the model */
-    tor = tr_torrent_handle( gtor );
-    inf = tr_torrent_info( gtor );
-    for( ii = 0; ii < inf->fileCount; ii++ )
-    {
-        parsepath( tor, store, NULL, STRIPROOT( inf->files[ii].name ),
-                   ii, inf->files[ii].length );
+    if( data->timeout_tag ) {
+        g_source_remove( data->timeout_tag );
+        data->timeout_tag = 0;
     }
-    getdirtotals( store, NULL );
+
+    /* populate the model */
+    if( gtor )
+    {
+        int i;
+        const tr_info * inf = tr_torrent_info( gtor );
+        tr_torrent * tor = tr_torrent_handle( gtor );
+        g_object_weak_ref( G_OBJECT( gtor ), torrentDestroyed, data );
+
+        for( i=0; inf && i<inf->fileCount; ++i )
+        {
+            const char * path = inf->files[i].name;
+            const char * base = g_path_is_absolute( path ) ? g_path_skip_root( path ) : path;
+            parsepath( tor, store, NULL, base, i, inf->files[i].length );
+        }
+
+        getdirtotals( store, NULL );
+
+        data->timeout_tag = g_timeout_add( 1000, refreshModel, data );
+    }
+
+    gtk_tree_view_set_model( GTK_TREE_VIEW( data->view ), GTK_TREE_MODEL( store ) );
+    gtk_tree_view_expand_all( GTK_TREE_VIEW( data->view ) );
+}
+
+GtkWidget *
+file_list_new( TrTorrent * gtor )
+{
+    GtkWidget           * ret;
+    FileData            * data;
+    GtkWidget           * view, * scroll;
+    GtkCellRenderer     * rend;
+    GtkCellRenderer     * priority_rend;
+    GtkCellRenderer     * enabled_rend;
+    GtkTreeViewColumn   * col;
+    GtkTreeSelection    * sel;
+    GtkTreeModel        * model;
 
     /* create the view */
-    view = gtk_tree_view_new_with_model( GTK_TREE_MODEL( store ) );
+    view = gtk_tree_view_new( );
     gtk_container_set_border_width( GTK_CONTAINER( view ), GUI_PAD_BIG );
-    g_object_set_data (G_OBJECT(view), "torrent-handle", tor );
 
     /* add file column */
     
@@ -475,27 +540,15 @@ file_list_new( TrTorrent * gtor )
                                          GTK_SHADOW_IN);
     gtk_container_add( GTK_CONTAINER( scroll ), view );
     gtk_widget_set_size_request (scroll, 0u, 200u);
-    gtk_container_set_border_width (GTK_CONTAINER(scroll), GUI_PAD);
 
     ret = scroll;
-    data = g_new (FileData, 1);
-    data->gtor = gtor;
-    data->model = GTK_TREE_MODEL(store);
-    data->store = store;
-    g_object_set_data_full (G_OBJECT(ret), "file-data", data, g_free);
+    data = g_new0( FileData, 1 );
+    data->view = view;
+    data->top = scroll;
     g_signal_connect (G_OBJECT(priority_rend), "edited", G_CALLBACK(priority_changed_cb), data);
     g_signal_connect(enabled_rend, "toggled", G_CALLBACK(enabled_toggled), data );
-    return ret;
-}
+    g_object_set_data_full( G_OBJECT( ret ), "file-data", data, freeData );
+    file_list_set_torrent( ret, gtor );
 
-void
-file_list_refresh( GtkWidget * top )
-{
-    guint64 foo, bar;
-    int fileCount = 0;
-    FileData * data = g_object_get_data (G_OBJECT(top), "file-data");
-    tr_torrent * tor = tr_torrent_handle( data->gtor );
-    tr_file_stat * fileStats = tr_torrentFiles( tor, &fileCount );
-    updateprogress (data->model, data->store, NULL, fileStats, &foo, &bar);
-    tr_torrentFilesFree( fileStats, fileCount );
+    return ret;
 }
