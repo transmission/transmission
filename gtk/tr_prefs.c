@@ -299,32 +299,30 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     t = hig_workarea_create ();
 
     hig_workarea_add_section_title (t, &row, _("Speed Limits"));
-    hig_workarea_add_section_spacer (t, row, 2);
 
         s = _("_Limit upload speed (KiB/s)");
         w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
-        hig_workarea_add_double_control( t, &row, w, w2 );
+        hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
         s = _("Li_mit download speed (KiB/s)");
         w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_DL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
-        hig_workarea_add_double_control( t, &row, w, w2 );
+        hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title (t, &row, _("Downloads"));
-    hig_workarea_add_section_spacer (t, row, 3);
 
         s = _("P_rompt for download directory");
         w = new_check_button( s, PREF_KEY_DIR_ASK, core );
         w2 = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), !pref_flag_get( PREF_KEY_DIR_ASK ) );
         g_signal_connect( w, "toggled", G_CALLBACK(target_invert_cb), w2 );
-        hig_workarea_add_double_control( t, &row, w, w2 );
+        hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
         w = new_action_combo( PREF_KEY_ADDSTD, core );
         s = _("For torrents added _normally:");
@@ -336,7 +334,6 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Peer Connections" ) );
-    hig_workarea_add_section_spacer(t , row, 2 );
   
         w = new_spin_button( PREF_KEY_MAX_PEERS_GLOBAL, core, 1, 3000, 5 );
         hig_workarea_add_row( t, &row, _( "Global maximum connected peers:" ), w, NULL );
@@ -345,7 +342,6 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title (t, &row, _("Network"));
-    hig_workarea_add_section_spacer (t, row, 2);
         
         s = _("_Automatically map port" );
         w = new_check_button( s, PREF_KEY_NAT, core );
@@ -369,7 +365,6 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title (t, &row, _("Options"));
-    hig_workarea_add_section_spacer (t, row, 3);
         
         s = _("Use peer _exchange if possible");
         w = new_check_button( s, PREF_KEY_PEX, core );

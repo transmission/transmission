@@ -247,7 +247,6 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
     t = hig_workarea_create ();
 
     hig_workarea_add_section_title (t, &row, _("Files"));
-    hig_workarea_add_section_spacer (t, row, 3);
 
         g_snprintf( name, sizeof(name), "%s:", _("File _Type"));
         h = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
@@ -285,7 +284,6 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title (t, &row, _("Torrent"));
-    hig_workarea_add_section_spacer (t, row, 3);
 
         g_snprintf( name, sizeof(name), _("Private to this Tracker") );
         w = ui->private_check = hig_workarea_add_wide_checkbutton( t, &row, name, FALSE );

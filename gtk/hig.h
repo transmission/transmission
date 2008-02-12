@@ -32,20 +32,9 @@ hig_workarea_add_section_title (GtkWidget   * table,
                                 const char  * section_title);
 
 void
-hig_workarea_add_section_spacer (GtkWidget   * table,
-                                 int           row,
-                                 int           items_in_section);
-
-void
 hig_workarea_add_wide_control (GtkWidget   * table,
                                int         * row,
                                GtkWidget   * w);
-
-void
-hig_workarea_add_double_control (GtkWidget * table,
-                               int       * row,
-                               GtkWidget * wl,
-                               GtkWidget * wr);
 
 GtkWidget*
 hig_workarea_add_wide_checkbutton (GtkWidget   * table,

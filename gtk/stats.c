@@ -94,7 +94,6 @@ stats_dialog_create( GtkWindow * parent, TrCore * core )
     ui->core = core;
 
     hig_workarea_add_section_title( t, &row, _( "Current Session" ) );
-    hig_workarea_add_section_spacer( t, row, 4 );
         l = ui->one_up_lb = gtk_label_new( NULL );
         hig_workarea_add_row( t, &row, _("Uploaded:"), l, NULL );
         l = ui->one_down_lb = gtk_label_new( NULL );
@@ -105,7 +104,6 @@ stats_dialog_create( GtkWindow * parent, TrCore * core )
         hig_workarea_add_row( t, &row, _("Duration:"), l, NULL );
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _("Cumulative") );
-    hig_workarea_add_section_spacer( t, row, 5 );
         l = ui->all_sessions_lb = gtk_label_new( _("Program started %d times") );
         hig_workarea_add_label_w( t, row++, l );
         l = ui->all_up_lb = gtk_label_new( NULL );

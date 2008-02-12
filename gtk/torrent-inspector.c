@@ -666,7 +666,6 @@ static GtkWidget* info_page_new (tr_torrent * tor)
   const tr_info * info = tr_torrentInfo(tor);
 
   hig_workarea_add_section_title (t, &row, _("Torrent Information"));
-  hig_workarea_add_section_spacer (t, row, 5);
 
     g_snprintf (name, sizeof(name), namefmt, _("Tracker"));
     track = info->trackerList->list;
@@ -712,7 +711,6 @@ static GtkWidget* info_page_new (tr_torrent * tor)
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Created by"));
-  hig_workarea_add_section_spacer (t, row, 2);
   
     g_snprintf (name, sizeof(name), namefmt, _("Creator"));
     l = gtk_label_new (*info->creator ? info->creator : _("N/A"));
@@ -726,7 +724,6 @@ static GtkWidget* info_page_new (tr_torrent * tor)
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Location"));
-  hig_workarea_add_section_spacer (t, row, 3);
 
     g_snprintf (name, sizeof(name), namefmt, _("Downloaded data"));
     l = gtk_label_new (tr_torrentGetFolder (tor));
@@ -840,7 +837,6 @@ activity_page_new (TrTorrent * gtor)
   a->gtor = gtor;
 
   hig_workarea_add_section_title (t, &row, _("Transfer"));
-  hig_workarea_add_section_spacer (t, row, 8);
 
     l = a->state_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, _("State:"), l, NULL);
@@ -871,7 +867,6 @@ activity_page_new (TrTorrent * gtor)
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Completeness"));
-  hig_workarea_add_section_spacer (t, row, 1);
 
     w = a->availability_da = gtk_drawing_area_new ();
     gtk_widget_set_size_request (w, 0u, 100u);
@@ -881,7 +876,6 @@ activity_page_new (TrTorrent * gtor)
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Dates"));
-  hig_workarea_add_section_spacer (t, row, 3);
 
     l = a->date_added_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, _("Date added:"), l, NULL);
@@ -983,7 +977,6 @@ options_page_new ( TrTorrent * gtor )
   row = 0;
   t = hig_workarea_create ();
   hig_workarea_add_section_title (t, &row, _("Speed Limits") );
-  hig_workarea_add_section_spacer (t, row, 2);
 
     tb = gtk_check_button_new_with_mnemonic (_("Limit _download speed to:"));
     b = tr_torrentGetSpeedMode(tor,TR_DOWN) == TR_SPEEDLIMIT_SINGLE;
@@ -1021,7 +1014,6 @@ options_page_new ( TrTorrent * gtor )
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Peer Connections"));
-  hig_workarea_add_section_spacer (t, row, 1);
 
     maxConnectedPeers = tr_torrentGetMaxConnectedPeers( tor );
     w = gtk_spin_button_new_with_range( 1, 3000, 5 );
