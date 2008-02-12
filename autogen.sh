@@ -1,4 +1,10 @@
 #!/bin/sh
+srcdir=`dirname $0`
+test -z "$srcdir" && srcdir=.
+
+ORIGDIR=`pwd`
+cd $srcdir
+PROJECT=Transmission
 
 GETTEXTIZE="glib-gettextize"
 $GETTEXTIZE --version < /dev/null > /dev/null 2>&1
@@ -26,3 +32,10 @@ if test "$GETTEXTIZE"; then
   intltoolize --copy --force --automake
 fi
 
+cd $ORIGDIR || exit $?
+
+if test -z "$AUTOGEN_SUBDIR_MODE"; then
+  $srcdir/configure --enable-maintainer-mode $AUTOGEN_CONFIGURE_ARGS "$@" || exit $?
+  echo 
+  echo "Now type 'make' to compile $PROJECT."
+fi
