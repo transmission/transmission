@@ -374,9 +374,7 @@ static void
 torrentDestroyed( gpointer gdata, GObject * deadTorrent UNUSED )
 {
     FileData * data = gdata;
-
-    g_object_weak_unref( G_OBJECT( data->gtor ), torrentDestroyed, data );
-
+    data->gtor = NULL;
     file_list_set_torrent( data->top, NULL );
 }
 
