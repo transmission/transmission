@@ -68,7 +68,7 @@ tr_getLog( void )
     if( !initialized )
     {
         const char * str = getenv( "TR_DEBUG_FD" );
-        int fd;
+        int fd = 0;
         if( str && *str )
             fd = atoi( str );
         switch( fd ) {

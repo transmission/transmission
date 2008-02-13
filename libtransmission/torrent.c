@@ -969,6 +969,7 @@ tr_torrentRecheck( tr_torrent * tor )
 {
     tr_globalLock( tor->handle );
 
+    tr_ioRecheckRemove( tor );
     tr_torrentUncheck( tor );
     tr_ioRecheckAdd( tor, torrentRecheckDoneCB );
 
@@ -1023,12 +1024,13 @@ tr_torrentClose( tr_torrent * tor )
 {
     if( tor != NULL )
     {
-        tr_globalLock( tor->handle );
+        tr_handle * handle = tor->handle;
+        tr_globalLock( handle );
 
         tr_torrentClearStatusCallback( tor );
-        tr_runInEventThread( tor->handle, closeTorrent, tor );
+        tr_runInEventThread( handle, closeTorrent, tor );
 
-        tr_globalUnlock( tor->handle );
+        tr_globalUnlock( handle );
     }
 }
 
