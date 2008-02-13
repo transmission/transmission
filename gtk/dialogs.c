@@ -143,7 +143,8 @@ promptfordir( GtkWindow * parent, TrCore * core, GList * files, tr_ctor * ctor )
     gtk_file_chooser_set_select_multiple( GTK_FILE_CHOOSER( wind ), FALSE );
     if( tr_ctorGetDestination( ctor, TR_FORCE, &str ) )
         g_assert_not_reached( );
-    gtk_file_chooser_set_uri( GTK_FILE_CHOOSER( wind ), str );
+    if( !gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( wind ), str ) )
+        g_warning( "couldn't set destination '%s'", str );
 
     v = gtk_vbox_new( FALSE, GUI_PAD );
 
