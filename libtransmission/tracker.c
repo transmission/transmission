@@ -282,7 +282,7 @@ parseBencResponse( struct evhttp_request * req, benc_val_t * setme )
 }
 
 static const char*
-updateAddresses( tr_tracker * t, const struct evhttp_request * req )
+updateAddresses( tr_tracker * t, const struct evhttp_request * req, int * tryAgain )
 {
     const char * ret = NULL;
     int moveToNextAddress = FALSE;
@@ -336,9 +336,19 @@ updateAddresses( tr_tracker * t, const struct evhttp_request * req )
         moveToNextAddress = TRUE;
     }
 
+    *tryAgain = moveToNextAddress;
+
     if( moveToNextAddress )
-        if ( ++t->addressIndex >= t->addressCount )
+    {
+        if ( ++t->addressIndex >= t->addressCount ) /* we've tried them all */
+        {
+            *tryAgain = FALSE;
             t->addressIndex = 0;
+            ret = "Tracker hasn't responded yet.  Retrying...";
+            tr_inf( ret );
+        }
+    }
+
 
     return ret;
 }
@@ -386,6 +396,7 @@ static void
 onTrackerResponse( struct evhttp_request * req, void * vhash )
 {
     const char * warning;
+    int tryAgain;
     int responseCode;
     struct torrent_hash * torrent_hash = (struct torrent_hash*) vhash;
     tr_tracker * t = findTrackerFromHash( torrent_hash );
@@ -473,7 +484,7 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
             tr_bencFree( &benc );
     }
 
-    if (( warning = updateAddresses( t, req ) )) {
+    if (( warning = updateAddresses( t, req, &tryAgain ) )) {
         publishWarning( t, warning );
         tr_err( warning );
     }
@@ -482,7 +493,12 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
     ***
     **/
 
-    responseCode = req ? req->response_code : 503;
+    if( tryAgain )
+        responseCode = 300;
+    else if( req )
+        responseCode = req->response_code;
+    else
+        responseCode = 503;
 
     if( 200<=responseCode && responseCode<=299 )
     {
@@ -543,6 +559,7 @@ static void
 onScrapeResponse( struct evhttp_request * req, void * vhash )
 {
     const char * warning;
+    int tryAgain;
     time_t nextScrapeSec = 60;
     struct torrent_hash * torrent_hash = (struct torrent_hash*) vhash;
     tr_tracker * t = findTrackerFromHash( torrent_hash );
@@ -606,12 +623,16 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
             tr_bencFree( &benc );
     }
 
-    if (( warning = updateAddresses( t, req ) )) {
+    if (( warning = updateAddresses( t, req, &tryAgain ) ))
+    {
         tr_err( warning );
         publishWarning( t, warning );
     }
 
-    t->scrapeAt = time( NULL ) + t->randOffset + nextScrapeSec;
+    if( tryAgain ) 
+        t->scrapeAt = time( NULL );
+    else
+        t->scrapeAt = time( NULL ) + t->randOffset + nextScrapeSec;
 }
 
 /***
@@ -850,12 +871,11 @@ invokeRequest( tr_handle * handle, const struct tr_tracker_request * req )
     tr_tracker * t = findTracker( handle, req->torrent_hash );
     dbgmsg( t, "sending '%s' to tracker %s:%d, timeout is %d", req->uri, req->address, req->port, (int)req->timeout );
     evhttp_connection_set_timeout( evcon, req->timeout );
+    ++handle->tracker->socketCount;
     if( evhttp_make_request( evcon, req->req, EVHTTP_REQ_GET, req->uri ))
-        publishErrorMessageAndStop( t, "Tracker could not be reached." );
-    else {
-        ++handle->tracker->socketCount;
+        (*req->req->cb)(req->req, req->req->cb_arg);
+    else
         dbgmsg( t, "incremented socket count to %d", handle->tracker->socketCount );
-    }
 }
 
 static void
