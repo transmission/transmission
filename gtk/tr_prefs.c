@@ -284,16 +284,19 @@ peerPage( GObject * core )
 }
 
 static GtkWidget*
-bandwidthPage( GObject * core )
+networkPage( GObject * core, gpointer alive )
 {
     int row = 0;
     const char * s;
     GtkWidget * t;
     GtkWidget * w, * w2;
+    GtkWidget * l;
+    GtkWidget * h;
+    GtkTooltips * tips = gtk_tooltips_new( );
 
     t = hig_workarea_create ();
 
-    hig_workarea_add_section_title (t, &row, _("Speed Limits"));
+    hig_workarea_add_section_title (t, &row, _("Bandwidth"));
 
         s = _("Limit _upload speed (KiB/s)");
         w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
@@ -309,25 +312,7 @@ bandwidthPage( GObject * core )
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
-    hig_workarea_finish (t, &row);
-    return t;
-}
-
-static GtkWidget*
-networkPage( GObject * core, gpointer alive )
-{
-    int row = 0;
-    const char * s;
-    GtkWidget * t;
-    GtkWidget * w, * w2;
-    GtkWidget * l;
-    GtkWidget * h;
-    GtkTooltips * tips;
-
-    tips = gtk_tooltips_new( );
-
-    t = hig_workarea_create ();
-    hig_workarea_add_section_title (t, &row, _("Network"));
+    hig_workarea_add_section_title (t, &row, _("Ports"));
         
         s = _("Automatically _map port" );
         w = new_check_button( s, PREF_KEY_NAT, core );
@@ -379,8 +364,6 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("Torrents")) );
     w = peerPage( core );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("Peers")) );
-    w = bandwidthPage( core );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("Bandwidth")) );
     w = networkPage( core, alive );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("Network")) );
     w = generalPage( core );
