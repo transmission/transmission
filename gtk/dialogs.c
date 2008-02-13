@@ -141,20 +141,25 @@ promptfordir( GtkWindow * parent, TrCore * core, GList * files, tr_ctor * ctor )
                                          NULL );
     gtk_file_chooser_set_local_only( GTK_FILE_CHOOSER( wind ), TRUE );
     gtk_file_chooser_set_select_multiple( GTK_FILE_CHOOSER( wind ), FALSE );
-    tr_ctorGetDestination( ctor, TR_FORCE, &str );
+    if( tr_ctorGetDestination( ctor, TR_FORCE, &str ) )
+        g_assert_not_reached( );
     gtk_file_chooser_set_uri( GTK_FILE_CHOOSER( wind ), str );
 
     v = gtk_vbox_new( FALSE, GUI_PAD );
 
+        flag = 0;
         w = gtk_check_button_new_with_mnemonic( _( "_Delete original torrent file" ) );
         g_signal_connect( w, "toggled", G_CALLBACK( deleteToggled ), ctor );
-        tr_ctorGetDeleteSource( ctor, &flag );
+        if( tr_ctorGetDeleteSource( ctor, &flag ) )
+            g_assert_not_reached( );
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), flag );
         gtk_box_pack_start( GTK_BOX( v ), w, FALSE, FALSE, 0 );
 
+        flag = 1;
         w = gtk_check_button_new_with_mnemonic( _( "_Start when added" ) );
         g_signal_connect( w, "toggled", G_CALLBACK( startToggled ), ctor );
-        tr_ctorGetPaused( ctor, TR_FORCE, &flag );
+        if( tr_ctorGetPaused( ctor, TR_FORCE, &flag ) )
+            g_assert_not_reached( );
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), !flag );
         gtk_box_pack_start( GTK_BOX( v ), w, FALSE, FALSE, 0 );
 

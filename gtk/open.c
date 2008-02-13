@@ -145,7 +145,8 @@ makeaddwind( GtkWindow  * parent,
                                      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
                                      NULL );
 
-    tr_ctorGetDestination( ctor, TR_FORCE, &str );
+    if( tr_ctorGetDestination( ctor, TR_FORCE, &str ) )
+        g_assert_not_reached( );
     data = g_new0( struct OpenData, 1 );
     data->core = core;
     data->ctor = ctor;
@@ -206,7 +207,8 @@ makeaddwind( GtkWindow  * parent,
     ++row;
     col = 0;
     w = gtk_check_button_new_with_mnemonic( _( "_Delete original torrent file" ) );
-    tr_ctorGetDeleteSource( ctor, &flag );
+    if( tr_ctorGetDeleteSource( ctor, &flag ) )
+        g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), flag );
     gtk_table_attach( GTK_TABLE( t ), w, col, col+2, row, row+1, GTK_FILL, 0, 0, 0 );
 
@@ -214,7 +216,8 @@ makeaddwind( GtkWindow  * parent,
     col = 0;
     w = gtk_check_button_new_with_mnemonic( _( "_Start when added" ) );
     data->run_check = w;
-    tr_ctorGetPaused( ctor, TR_FORCE, &flag );
+    if( tr_ctorGetPaused( ctor, TR_FORCE, &flag ) )
+        g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), !flag );
     gtk_table_attach( GTK_TABLE( t ), w, col, col+2, row, row+1, GTK_FILL, 0, 0, 0 );
 
