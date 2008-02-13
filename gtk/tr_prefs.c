@@ -236,7 +236,7 @@ torrentPage( GObject * core )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Adding Torrents" ) );
 
-        s = _( "Show _options window" );
+        s = _( "Show _options dialog" );
         w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );
         hig_workarea_add_wide_control( t, &row, w );
 
@@ -275,9 +275,9 @@ peerPage( GObject * core )
     hig_workarea_add_section_title( t, &row, _( "Limits" ) );
   
         w = new_spin_button( PREF_KEY_MAX_PEERS_GLOBAL, core, 1, 3000, 5 );
-        hig_workarea_add_row( t, &row, _( "_Total peer limit:" ), w, NULL );
+        hig_workarea_add_row( t, &row, _( "Maximum peers _overall:" ), w, NULL );
         w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300, 5 );
-        hig_workarea_add_row( t, &row, _( "_Per-torrent peer limit:" ), w, NULL );
+        hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
 
     hig_workarea_finish (t, &row);
     return t;
@@ -298,14 +298,14 @@ networkPage( GObject * core, gpointer alive )
 
     hig_workarea_add_section_title (t, &row, _("Bandwidth"));
 
-        s = _("Limit _upload speed (KiB/s)");
+        s = _("Limit _upload speed (KiB/s):");
         w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
-        s = _("Limit _download speed (KiB/s)");
+        s = _("Limit _download speed (KiB/s):");
         w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_DL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ) );

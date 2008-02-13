@@ -18,7 +18,7 @@ hig_workarea_create (void)
 {
     GtkWidget * t = gtk_table_new( 1, 2, FALSE );
     gtk_container_set_border_width( GTK_CONTAINER( t ), 12 );
-    gtk_table_set_col_spacings( GTK_TABLE( t ), 12 );
+    gtk_table_set_col_spacing( GTK_TABLE( t ), 0, 12 );
     gtk_table_set_row_spacings( GTK_TABLE( t ), 6 );
     return t;
 }
@@ -155,10 +155,6 @@ void
 hig_workarea_finish( GtkWidget   * t,
                      int         * row)
 {
-    GtkWidget * w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
-    gtk_widget_set_size_request( w, 0u, 6u );
-    gtk_table_attach_defaults( GTK_TABLE( t ), w, 0, 4, *row, *row+1 );
-    ++*row;
     gtk_table_resize( GTK_TABLE( t ), *row, 2 );
 }
 
