@@ -47,6 +47,7 @@
 #include "ipc.h"
 #include "makemeta-ui.h"
 #include "msgwin.h"
+#include "open.h"
 #include "stats.h"
 #include "torrent-inspector.h"
 #include "tr_core.h"
@@ -146,9 +147,7 @@ static void
 coreerr( TrCore * core, enum tr_core_err code, const char * msg,
          gpointer gdata );
 static void
-coreprompt( TrCore *, GList *, enum tr_torrent_action, gboolean, gpointer );
-static void
-corepromptdata( TrCore *, uint8_t *, size_t, gboolean, gpointer );
+coreprompt( TrCore *, GList *, gpointer, gpointer );
 static void
 initializeFromPrefs( struct cbdata * cbdata );
 static void
@@ -329,10 +328,8 @@ sendremote( GList * files, gboolean sendquit )
 static void
 appsetup( TrWindow * wind, GList * args,
           struct cbdata * cbdata,
-          gboolean paused, gboolean minimized )
+          gboolean forcepause, gboolean minimized )
 {
-    enum tr_torrent_action action;
-
     /* fill out cbdata */
     cbdata->wind       = NULL;
     cbdata->icon       = NULL;
@@ -349,8 +346,6 @@ appsetup( TrWindow * wind, GList * args,
     g_signal_connect( cbdata->core, "error", G_CALLBACK( coreerr ), cbdata );
     g_signal_connect( cbdata->core, "directory-prompt",
                       G_CALLBACK( coreprompt ), cbdata );
-    g_signal_connect( cbdata->core, "directory-prompt-data",
-                      G_CALLBACK( corepromptdata ), cbdata );
     g_signal_connect_swapped( cbdata->core, "quit",
                               G_CALLBACK( wannaquit ), cbdata );
     g_signal_connect( cbdata->core, "prefs-changed",
@@ -363,12 +358,14 @@ appsetup( TrWindow * wind, GList * args,
     initializeFromPrefs( cbdata );
 
     /* add torrents from command-line and saved state */
-    tr_core_load( cbdata->core, paused );
+    tr_core_load( cbdata->core, forcepause );
 
     if( NULL != args )
     {
-        action = tr_prefs_get_action( PREF_KEY_ADDIPC );
-        tr_core_add_list( cbdata->core, args, action, paused );
+        tr_ctor * ctor = tr_ctorNew( tr_core_handle( cbdata->core ) );
+        if( forcepause )
+            tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
+        tr_core_add_list( cbdata->core, args, ctor );
     }
     tr_core_torrents_added( cbdata->core );
 
@@ -625,7 +622,8 @@ gotdrag( GtkWidget         * widget UNUSED,
     GList * paths = NULL;
     GList * freeme = NULL;
 
-#ifdef DND_DEBUG
+#if 0
+    int i;
     char *sele = gdk_atom_name(sel->selection);
     char *targ = gdk_atom_name(sel->target);
     char *type = gdk_atom_name(sel->type);
@@ -683,9 +681,9 @@ gotdrag( GtkWidget         * widget UNUSED,
         /* try to add any torrents we found */
         if( paths != NULL )
         {
-            enum tr_torrent_action action = tr_prefs_get_action( PREF_KEY_ADDSTD );
+            tr_ctor * ctor = tr_ctorNew( tr_core_handle( data->core ) );
             paths = g_list_reverse( paths );
-            tr_core_add_list( data->core, paths, action, FALSE );
+            tr_core_add_list( data->core, paths, ctor );
             tr_core_torrents_added( data->core );
             g_list_free( paths );
         }
@@ -748,22 +746,20 @@ coreerr( TrCore * core UNUSED, enum tr_core_err code, const char * msg,
     g_assert_not_reached();
 }
 
-void
-coreprompt( TrCore * core, GList * paths, enum tr_torrent_action act,
-            gboolean paused, gpointer gdata )
+static void
+coreprompt( TrCore                 * core,
+            GList                  * paths,
+            gpointer                 ctor,
+            gpointer                 gdata )
 {
     struct cbdata * cbdata = gdata;
 
-    promptfordir( cbdata->wind, core, paths, NULL, 0, act, paused );
-}
-
-void
-corepromptdata( TrCore * core, uint8_t * data, size_t size,
-                gboolean paused, gpointer gdata )
-{
-    struct cbdata * cbdata = gdata;
-
-    promptfordir( cbdata->wind, core, NULL, data, size, TR_TOR_LEAVE, paused );
+    if( g_list_length( paths ) != 1 )
+        promptfordir( cbdata->wind, core, paths, ctor );
+    else {
+        tr_ctorSetMetainfoFromFile( ctor, paths->data );
+        makeaddwind( cbdata->wind, core, ctor );
+    }
 }
 
 static void
@@ -1013,7 +1009,7 @@ doAction ( const char * action_name, gpointer user_data )
 
     if ( !strcmp (action_name, "open-torrent-menu") || !strcmp( action_name, "open-torrent-toolbar" ))
     {
-        makeaddwind( data->wind, data->core );
+        makeaddwind( data->wind, data->core, tr_ctorNew( tr_core_handle( data->core ) ) );
     }
     else if (!strcmp (action_name, "show-stats"))
     {

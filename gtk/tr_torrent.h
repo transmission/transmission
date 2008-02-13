@@ -87,11 +87,6 @@ TrTorrent *
 tr_torrent_new_preexisting( tr_torrent * tor );
 
 TrTorrent *
-tr_torrent_new( tr_handle * handle, const char * path, const char * dir,
-                enum tr_torrent_action act, gboolean paused, char ** err);
-
-TrTorrent *
-tr_torrent_new_with_data( tr_handle * handle, uint8_t * data, size_t size,
-                          const char * dir, gboolean paused, char ** err );
+tr_torrent_new_ctor( tr_handle * handle, tr_ctor * ctor, char ** err );
 
 #endif

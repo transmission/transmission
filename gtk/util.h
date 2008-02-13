@@ -34,9 +34,6 @@
 /* NULL-safe version of strcmp */
 int tr_strcmp( const char*, const char * );
 
-/* XXX this shouldn't be here */
-enum tr_torrent_action { TR_TOR_LEAVE, TR_TOR_COPY, TR_TOR_MOVE };
-
 /* return number of items in array */
 #define ALEN(a) ((signed)G_N_ELEMENTS(a))
 
@@ -81,14 +78,6 @@ decode_uri( const char * uri );
 /* return a list of cleaned-up paths, with invalid directories removed */
 GList *
 checkfilenames( int argc, char ** argv );
-
-/* returns the flag for an action string */
-enum tr_torrent_action
-toraddaction( const char * action );
-
-/* returns the action string for a flag */
-const char *
-toractionname( enum tr_torrent_action action );
 
 /* retrieve the global download directory */
 char *

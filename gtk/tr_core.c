@@ -77,53 +77,23 @@ tr_core_marshal_prompt( GClosure * closure, GValue * ret UNUSED, guint count,
                         const GValue * vals, gpointer hint UNUSED,
                         gpointer marshal )
 {
-    typedef void (*TRMarshalPrompt)
-        ( gpointer, GList *, enum tr_torrent_action, gboolean, gpointer );
+    typedef void (*TRMarshalPrompt)( gpointer, GList *, gpointer, gpointer );
     TRMarshalPrompt        callback;
     GCClosure            * cclosure = (GCClosure*) closure;
     GList                * paths;
-    enum tr_torrent_action action;
-    gboolean               paused;
+    gpointer               ctor;
     gpointer               inst, gdata;
 
-    g_return_if_fail( 4 == count );
+    g_return_if_fail( 3 == count );
 
-    inst    = g_value_peek_pointer( vals );
-    paths   = g_value_get_pointer( vals + 1 );
-    action  = g_value_get_int( vals + 2 );
-    paused  = g_value_get_boolean( vals + 3 );
-    gdata   = closure->data;
+    inst      = g_value_peek_pointer( vals );
+    paths     = g_value_get_pointer( vals + 1 );
+    ctor      = g_value_get_pointer( vals + 2 );
+    gdata     = closure->data;
 
     callback = (TRMarshalPrompt) ( NULL == marshal ?
                                    cclosure->callback : marshal );
-    callback( inst, paths, action, paused, gdata );
-}
-
-static void
-tr_core_marshal_data( GClosure * closure, GValue * ret UNUSED, guint count,
-                      const GValue * vals, gpointer hint UNUSED,
-                      gpointer marshal )
-{
-    typedef void (*TRMarshalPrompt)
-        ( gpointer, uint8_t *, size_t, gboolean, gpointer );
-    TRMarshalPrompt        callback;
-    GCClosure            * cclosure = (GCClosure*) closure;
-    uint8_t              * data;
-    size_t                 size;
-    gboolean               paused;
-    gpointer               inst, gdata;
-
-    g_return_if_fail( 4 == count );
-
-    inst    = g_value_peek_pointer( vals );
-    data    = (uint8_t *) g_value_get_string( vals + 1 );
-    size    = g_value_get_uint( vals + 2 );
-    paused  = g_value_get_boolean( vals + 3 );
-    gdata   = closure->data;
-
-    callback = (TRMarshalPrompt) ( NULL == marshal ?
-                                   cclosure->callback : marshal );
-    callback( inst, data, size, paused, gdata );
+    callback( inst, paths, ctor, gdata );
 }
 
 static int
@@ -171,14 +141,7 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
                                           G_TYPE_FROM_CLASS( g_class ),
                                           G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                           tr_core_marshal_prompt, G_TYPE_NONE,
-                                          3, G_TYPE_POINTER, G_TYPE_INT,
-                                          G_TYPE_BOOLEAN );
-    core_class->promptdatasig = g_signal_new( "directory-prompt-data",
-                                              G_TYPE_FROM_CLASS( g_class ),
-                                              G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                              tr_core_marshal_data,
-                                              G_TYPE_NONE, 3, G_TYPE_STRING,
-                                              G_TYPE_UINT, G_TYPE_BOOLEAN );
+                                          2, G_TYPE_POINTER, G_TYPE_POINTER );
     core_class->quitsig = g_signal_new( "quit", G_TYPE_FROM_CLASS( g_class ),
                                         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                         g_cclosure_marshal_VOID__VOID,
@@ -486,14 +449,15 @@ doCollate( const char * in )
     return ret;
 }
 
-static void
-tr_core_insert( TrCore * self, TrTorrent * tor )
+void
+tr_core_add_torrent( TrCore * self, TrTorrent * tor )
 {
     const tr_info * inf = tr_torrent_info( tor );
     const tr_stat * torStat = tr_torrent_stat( tor );
     char * collated = doCollate( inf->name );
     GtkListStore * store = GTK_LIST_STORE( tr_core_model( self ) );
     GtkTreeIter unused;
+
     gtk_list_store_insert_with_values( store, &unused, 0, 
                                        MC_NAME,          inf->name,
                                        MC_NAME_COLLATED, collated,
@@ -503,8 +467,10 @@ tr_core_insert( TrCore * self, TrTorrent * tor )
                                        MC_STATUS,        torStat->status,
                                        MC_ID,            self->priv->nextid,
                                        -1);
-    self->priv->nextid++;
-    g_object_unref( tor );
+    ++self->priv->nextid;
+
+    /* cleanup */
+    g_object_unref( G_OBJECT( tor ) );
     g_free( collated );
 }
 
@@ -529,29 +495,13 @@ tr_core_load( TrCore * self, gboolean forcePaused )
 
     torrents = tr_loadTorrents ( tr_core_handle( self ), ctor, &count );
     for( i=0; i<count; ++i )
-        tr_core_insert( self, tr_torrent_new_preexisting( torrents[i] ) );
+        tr_core_add_torrent( self, tr_torrent_new_preexisting( torrents[i] ) );
 
     tr_free( torrents );
     tr_ctorFree( ctor );
     g_free( path );
 
     return count;
-}
-
-gboolean
-tr_core_add( TrCore * self, const char * path, enum tr_torrent_action act,
-             gboolean paused )
-{
-    GList * list;
-    int     ret;
-
-    TR_IS_CORE( self );
-
-    list = g_list_append( NULL, (void *) path );
-    ret  = tr_core_add_list( self, list, act, paused );
-    g_list_free( list );
-
-    return 1 == ret;
 }
 
 static void
@@ -563,105 +513,72 @@ tr_core_errsig( TrCore * self, enum tr_core_err type, const char * msg )
     g_signal_emit( self, class->errsig, 0, type, msg );
 }
 
-gboolean
-tr_core_add_dir( TrCore * self, const char * path, const char * dir,
-                 enum tr_torrent_action act, gboolean paused )
+static void
+tr_core_apply_defaults( tr_ctor * ctor )
+{
+    if( tr_ctorGetPaused( ctor, TR_FORCE, NULL ) )
+        tr_ctorSetPaused( ctor, TR_FORCE, !pref_flag_get( PREF_KEY_START ) );
+
+    if( tr_ctorGetDeleteSource( ctor, NULL ) )
+        tr_ctorSetDeleteSource( ctor, pref_flag_get( PREF_KEY_DELETE_ORIGINAL ) );
+
+    if( tr_ctorGetMaxConnectedPeers( ctor, TR_FORCE, NULL ) )
+        tr_ctorSetMaxConnectedPeers( ctor, TR_FORCE, pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
+
+    if( tr_ctorGetDestination( ctor, TR_FORCE, NULL ) ) {
+        char * path = pref_string_get( PREF_KEY_DIR_DEFAULT );
+        tr_ctorSetDestination( ctor, TR_FORCE, path );
+        g_free( path );
+    }
+}
+
+void
+tr_core_add_ctor( TrCore * self, tr_ctor * ctor )
 {
     TrTorrent * tor;
     char      * errstr;
 
-    TR_IS_CORE( self );
-
     errstr = NULL;
-    tor = tr_torrent_new( tr_core_handle( self ), path, dir, act, paused, &errstr );
-    if( NULL == tor )
+
+    tr_core_apply_defaults( ctor );
+    tor = tr_torrent_new_ctor( tr_core_handle( self ), ctor, &errstr );
+    if( !tor )
     {
         tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );
         g_free( errstr );
-        return FALSE;
+        errstr = NULL;
     }
-    g_assert( NULL == errstr );
-
-    tr_core_insert( self, tor );
-
-    return TRUE;
+    else
+    {
+        g_assert( !errstr );
+        tr_core_add_torrent( self, tor );
+    }
 }
 
-int
-tr_core_add_list( TrCore * self, GList * paths, enum tr_torrent_action act,
-                  gboolean paused )
+void
+tr_core_add_list( TrCore   * self,
+                  GList    * paths,
+                  tr_ctor  * ctor )
 {
-    char * dir;
-    int count;
+    tr_core_apply_defaults( ctor );
 
-    TR_IS_CORE( self );
-
-    if( pref_flag_get( PREF_KEY_DIR_ASK ) )
+    if( pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) )
     {
         TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
-        g_signal_emit( self, class->promptsig, 0, paths, act, paused );
-        return 0;
+        g_signal_emit( self, class->promptsig, 0, paths, ctor );
     }
-
-    dir = getdownloaddir();
-    count = 0;
-    for( ; paths; paths=paths->next )
-        if( tr_core_add_dir( self, paths->data, dir, act, paused ) )
-            count++;
-
-    g_free( dir );
-    return count;
-}
-
-gboolean
-tr_core_add_data( TrCore * self, uint8_t * data, size_t size, gboolean paused )
-{
-    gboolean ret;
-    char * path;
-    TR_IS_CORE( self );
-
-    if( pref_flag_get( PREF_KEY_DIR_ASK ) )
+    else
     {
-        TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
-        g_signal_emit( self, class->promptdatasig, 0, data, size, paused );
-        return FALSE;
+        for( ; paths; paths=paths->next )
+            if( !tr_ctorSetMetainfoFromFile( ctor, paths->data ) )
+                tr_core_add_ctor( self, ctor );
+        tr_ctorFree( ctor );
     }
-
-    path = getdownloaddir( );
-    ret = tr_core_add_data_dir( self, data, size, path, paused );
-    g_free( path );
-    return ret;
-}
-
-gboolean
-tr_core_add_data_dir( TrCore * self, uint8_t * data, size_t size,
-                      const char * dir, gboolean paused )
-{
-    TrTorrent * tor;
-    char      * errstr = NULL;
-
-    TR_IS_CORE( self );
-
-    tor = tr_torrent_new_with_data( tr_core_handle( self ), data, size, dir,
-                                    paused, &errstr );
-    if( NULL == tor )
-    {
-        tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );
-        g_free( errstr );
-        return FALSE;
-    }
-    g_assert( NULL == errstr );
-
-    tr_core_insert( self, tor );
-
-    return TRUE;
 }
 
 void
 tr_core_torrents_added( TrCore * self )
 {
-    TR_IS_CORE( self );
-
     tr_core_update( self );
     tr_core_errsig( self, TR_CORE_ERR_NO_MORE_TORRENTS, NULL );
 }
@@ -671,8 +588,6 @@ tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter )
 {
     TrTorrent * tor;
     GtkTreeModel * model = tr_core_model( self );
-
-    TR_IS_CORE( self );
 
     gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
     gtk_list_store_remove( GTK_LIST_STORE( model ), iter );
@@ -746,11 +661,7 @@ tr_core_update( TrCore * self )
 void
 tr_core_quit( TrCore * self )
 {
-    TrCoreClass * class;
-
-    TR_IS_CORE( self );
-
-    class = g_type_class_peek( TR_CORE_TYPE );
+    TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
     g_signal_emit( self, class->quitsig, 0 );
 }
 

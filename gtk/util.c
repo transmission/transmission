@@ -222,34 +222,6 @@ checkfilenames( int argc, char **argv )
     return ret;
 }
 
-enum tr_torrent_action
-toraddaction( const char * action )
-{
-    if( !action || !strcmp( "copy", action ) )
-        return TR_TOR_COPY;
-
-    if( !strcmp( "move", action ) )
-        return TR_TOR_MOVE;
-
-    return TR_TOR_LEAVE;
-}
-
-const char *
-toractionname( enum tr_torrent_action action )
-{
-    switch( action )
-    {
-        case TR_TOR_COPY:
-            return "copy";
-
-        case TR_TOR_MOVE:
-            return "move";
-
-        default:
-            return "leave";
-    }
-}
-
 char *
 getdownloaddir( void )
 {

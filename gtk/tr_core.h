@@ -30,28 +30,17 @@
 #include <glib-object.h>
 #include <gtk/gtk.h>
 
-#include <libtransmission/bencode.h>
 #include <libtransmission/transmission.h>
 
+#include "tr_torrent.h"
 #include "util.h"
 
-#define TR_CORE_TYPE		( tr_core_get_type() )
-
-#define TR_CORE( obj )                                                        \
-  ( G_TYPE_CHECK_INSTANCE_CAST( (obj),   TR_CORE_TYPE, TrCore ) )
-
-#define TR_CORE_CLASS( class )                                                \
-  ( G_TYPE_CHECK_CLASS_CAST(    (class), TR_CORE_TYPE, TrCoreClass ) )
-
-#define TR_IS_CORE( obj )                                                     \
-  ( G_TYPE_CHECK_INSTANCE_TYPE( (obj),   TR_CORE_TYPE ) )
-
-#define TR_IS_CORE_CLASS( class )                                             \
-  ( G_TYPE_CHECK_CLASS_TYPE(    (class), TR_CORE_TYPE ) )
-
-#define TR_CORE_GET_CLASS( obj )                                              \
-  ( G_TYPE_INSTANCE_GET_CLASS(  (obj),   TR_CORE_TYPE, TrCoreClass ) )
-
+#define TR_CORE_TYPE (tr_core_get_type())
+#define TR_CORE(o) G_TYPE_CHECK_INSTANCE_CAST((o),TR_CORE_TYPE,TrCore)
+#define TR_IS_CORE(o) G_TYPE_CHECK_INSTANCE_TYPE((o),TR_CORE_TYPE)
+#define TR_CORE_CLASS(k) G_TYPE_CHECK_CLASS_CAST((k),TR_CORE_TYPE,TrCoreClass)
+#define TR_IS_CORE_CLASS(k) G_TYPE_CHECK_CLASS_TYPE((k),TR_CORE_TYPE)
+#define TR_CORE_GET_CLASS(o) G_TYPE_INSTANCE_GET_CLASS((o),TR_CORE_TYPE,TrCoreClass)
 
 struct core_stats
 {
@@ -61,7 +50,6 @@ struct core_stats
     float clientUploadSpeed;
 };
 
-/* treat the contents of this structure as private */
 typedef struct TrCore
 {
     GObject                 parent;
@@ -78,12 +66,8 @@ typedef struct TrCoreClass
     int errsig;
 
     /* "directory-prompt" signal:
-       void handler( TrCore *, GList *, enum tr_torrent_action, gboolean, gpointer ) */
+       void handler( TrCore *, GList *, gpointer ctor, gpointer userData ) */
     int promptsig;
-
-    /* "directory-prompt-data" signal:
-       void handler( TrCore *, uint8_t *, size_t, gboolean, gpointer ) */
-    int promptdatasig;
 
     /* "quit" signal:
        void handler( TrCore *, gpointer ) */
@@ -120,41 +104,45 @@ tr_core_handle( TrCore * self );
 const struct core_stats*
 tr_core_get_stats( const TrCore * self );
 
-/* Load saved state, return number of torrents added. May trigger one
-   or more "error" signals with TR_CORE_ERR_ADD_TORRENT */
-int
-tr_core_load( TrCore * self, gboolean forcepaused );
+/******
+*******
+******/
 
-/* Any the tr_core_add functions below may trigger an "error" signal
-   with TR_CORE_ERR_ADD_TORRENT */
+/**
+ * Load saved state and return number of torrents added.
+ * May trigger one or more "error" signals with TR_CORE_ERR_ADD_TORRENT
+ */
+int tr_core_load( TrCore * self, gboolean forcepaused );
 
-/* Add the torrent at the given path */
-gboolean
-tr_core_add( TrCore * self, const char * path, enum tr_torrent_action act,
-             gboolean paused );
+/**
+ * Add a torrent.
+ * May trigger an "error" signal with TR_CORE_ERR_ADD_TORRENT
+ * Caller must free the ctor.
+ */
+void tr_core_add_ctor( TrCore * self, tr_ctor * ctor );
 
-/* Add the torrent at the given path with the given download directory */
-gboolean
-tr_core_add_dir( TrCore * self, const char * path, const char * dir,
-                 enum tr_torrent_action act, gboolean paused );
+/**
+ * Add a list of torrents.
+ * May trigger one or more "error" signals with TR_CORE_ERR_ADD_TORRENT
+ */
+void tr_core_add_list( TrCore   * self,
+                       GList    * torrentFiles,
+                       tr_ctor  * ctor );
 
-/* Add a list of torrents with the given paths */
-int
-tr_core_add_list( TrCore * self, GList * paths, enum tr_torrent_action act,
-                  gboolean paused );
+/**
+ * Add a torrent.
+ */
+void tr_core_add_torrent( TrCore*, TrTorrent* );
 
-/* Add the torrent data in the given buffer */
-gboolean
-tr_core_add_data( TrCore * self, uint8_t * data, size_t size, gboolean paused );
+/**
+ * Notifies listeners that torrents have been added.
+ * This should be called after one or more tr_core_add*() calls.
+ */
+void tr_core_torrents_added( TrCore * self );
 
-/* Add the torrent data in the given buffer with the given download directory */
-gboolean
-tr_core_add_data_dir( TrCore * self, uint8_t * data, size_t size,
-                      const char * dir, gboolean paused );
-
-/* Save state, update model, and signal the end of a torrent cluster */
-void
-tr_core_torrents_added( TrCore * self );
+/******
+*******
+******/
 
 /* remove a torrent, waiting for it to pause if necessary */
 void

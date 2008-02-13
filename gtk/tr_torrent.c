@@ -38,7 +38,6 @@
 struct TrTorrentPrivate
 {
    tr_torrent * handle;
-   char * delfile;
    gboolean seeding_cap_enabled;
    gdouble seeding_cap; /* ratio to stop seeding at */
 };
@@ -54,7 +53,6 @@ tr_torrent_init(GTypeInstance *instance, gpointer g_class UNUSED )
                                                   TR_TORRENT_TYPE,
                                                   struct TrTorrentPrivate );
     p->handle = NULL;
-    p->delfile = NULL;
     p->seeding_cap = 2.0;
 
 #ifdef REFDBG
@@ -71,35 +69,35 @@ isDisposed( const TrTorrent * self )
 static void
 tr_torrent_dispose( GObject * o )
 {
-    GObjectClass * parent = g_type_class_peek(g_type_parent(TR_TORRENT_TYPE));
+    GObjectClass * parent;
     TrTorrent * self = TR_TORRENT( o );
 
     if( !isDisposed( self ) )
     {
         if( self->priv->handle )
             tr_torrentClose( self->priv->handle );
-        g_free( self->priv->delfile );
         self->priv = NULL;
     }
 
-    /* chain up to the parent class */
+    parent = g_type_class_peek(g_type_parent(TR_TORRENT_TYPE));
     parent->dispose( o );
 }
 
 static void
-tr_torrent_class_init(gpointer g_class, gpointer g_class_data UNUSED )
+tr_torrent_class_init( gpointer g_class, gpointer g_class_data UNUSED )
 {
     GObjectClass *gobject_class = G_OBJECT_CLASS(g_class);
     gobject_class->dispose = tr_torrent_dispose;
-    g_type_class_add_private( g_class, sizeof(struct TrTorrentPrivate) );
+    g_type_class_add_private( g_class, sizeof( struct TrTorrentPrivate ) );
 }
 
 GType
-tr_torrent_get_type(void)
+tr_torrent_get_type( void )
 {
   static GType type = 0;
 
-  if(0 == type) {
+  if( !type )
+  {
     static const GTypeInfo info = {
       sizeof (TrTorrentClass),
       NULL,   /* base_init */
@@ -170,90 +168,41 @@ tr_torrent_new_preexisting( tr_torrent * tor )
 }
 
 TrTorrent *
-tr_torrent_new( tr_handle               * handle,
-                const char              * metainfo_filename,
-                const char              * destination,
-                enum tr_torrent_action    act,
-                gboolean                  paused,
-                char                   ** err )
+tr_torrent_new_ctor( tr_handle  * handle,
+                     tr_ctor    * ctor,
+                     char      ** err )
 {
-  TrTorrent * ret;
-  tr_torrent * tor;
-  tr_ctor * ctor;
-  int errcode = -1;
+    tr_torrent * tor;
+    int errcode;
 
-  g_assert( destination );
+    errcode = -1;
+    *err = NULL;
 
-  *err = NULL;
-
-  ctor = tr_ctorNew( handle );
-  tr_ctorSetMetainfoFromFile( ctor, metainfo_filename );
-  tr_ctorSetDestination( ctor, TR_FORCE, destination );
-  tr_ctorSetPaused( ctor, TR_FORCE, paused );
-  tr_ctorSetMaxConnectedPeers( ctor, TR_FORCE, pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
-  tor = tr_torrentNew( handle, ctor, &errcode );
-  tr_ctorFree( ctor );
+    tor = tr_torrentNew( handle, ctor, &errcode );
   
-  if( tor == NULL ) {
-    switch( errcode ) {
-      case TR_EINVALID:
-        *err = g_strdup_printf(_("%s: not a valid torrent file"), metainfo_filename );
-        break;
-      case TR_EDUPLICATE:
-        *err = g_strdup_printf(_("%s: torrent is already open"), metainfo_filename );
-        break;
-      default:
-        *err = g_strdup( metainfo_filename );
-        break;
+    if( !tor )
+    {
+        const char * filename = tr_ctorGetSourceFile( ctor );
+        if( !filename )
+            filename = "(null)";
+
+        switch( errcode )
+        {
+            case TR_EINVALID:
+                *err = g_strdup_printf( _("%s: not a valid torrent file"), filename );
+                 break;
+            case TR_EDUPLICATE:
+                *err = g_strdup_printf( _("%s: torrent is already open"), filename );
+                break;
+            default:
+                *err = g_strdup( filename );
+                break;
+        }
+
+        return NULL;
     }
-    return NULL;
-  }
 
-  ret = maketorrent( tor );
-  if( TR_TOR_MOVE == act )
-    ret->priv->delfile = g_strdup( metainfo_filename );
-  return ret;
-}
-
-TrTorrent *
-tr_torrent_new_with_data( tr_handle    * handle,
-                          uint8_t      * metainfo,
-                          size_t         size,
-                          const char   * destination,
-                          gboolean       paused,
-                          char        ** err )
-{
-  tr_torrent * tor;
-  tr_ctor * ctor;
-  int errcode = -1;  
-
-  g_assert( destination );
-
-  *err = NULL;
-
-  ctor = tr_ctorNew( handle );
-  tr_ctorSetMetainfo( ctor, metainfo, size );
-  tr_ctorSetDestination( ctor, TR_FORCE, destination );
-  tr_ctorSetPaused( ctor, TR_FORCE, paused );
-  tr_ctorSetMaxConnectedPeers( ctor, TR_FORCE, pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
-  tor = tr_torrentNew( handle, ctor, &errcode );
-  
-  if( tor == NULL ) {
-    switch( errcode ) {
-      case TR_EINVALID:
-        *err = g_strdup( _("not a valid torrent file") );
-        break;
-      case TR_EDUPLICATE:
-        *err = g_strdup( _("torrent is already open") );
-        break;
-      default:
-        *err = g_strdup( "" );
-        break;
-    }
-    return NULL;
-  }
-
-  return maketorrent( tor );
+    return maketorrent( tor );
 }
 
 void

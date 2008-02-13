@@ -42,7 +42,7 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_UL_LIMIT_ENABLED, FALSE );
     pref_int_set_default    ( PREF_KEY_UL_LIMIT, 50 );
 
-    pref_flag_set_default   ( PREF_KEY_DIR_ASK, FALSE );
+    pref_flag_set_default   ( PREF_KEY_OPTIONS_PROMPT, TRUE );
     pref_string_set_default ( PREF_KEY_DIR_DEFAULT, g_get_home_dir() );
 
     pref_int_set_default    ( PREF_KEY_PORT, TR_DEFAULT_PORT );
@@ -53,35 +53,16 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_ASKQUIT, TRUE );
     pref_flag_set_default   ( PREF_KEY_ENCRYPTED_ONLY, FALSE );
 
-    pref_string_set_default ( PREF_KEY_ADDSTD, toractionname(TR_TOR_COPY) );
-    pref_string_set_default ( PREF_KEY_ADDIPC, toractionname(TR_TOR_COPY) );
-
     pref_int_set_default    ( PREF_KEY_MSGLEVEL, TR_MSG_INF );
 
     pref_string_set_default ( PREF_KEY_SORT_MODE, "sort-by-name" );
     pref_flag_set_default   ( PREF_KEY_SORT_REVERSED, FALSE );
     pref_flag_set_default   ( PREF_KEY_MINIMAL_VIEW, FALSE );
 
+    pref_flag_set_default   ( PREF_KEY_START, TRUE );
+    pref_flag_set_default   ( PREF_KEY_DELETE_ORIGINAL, FALSE );
+
     pref_save( NULL );
-}
-
-/**
-***
-**/
-
-int
-tr_prefs_get_action( const char * key )
-{
-    char * val = pref_string_get( key );
-    const int ret = toraddaction( val );
-    g_free( val );
-    return ret;
-}
-
-void
-tr_prefs_set_action( const char * key, int action )
-{
-    pref_string_set( key, toractionname(action) );
 }
 
 /**
@@ -155,63 +136,9 @@ new_path_chooser_button( const char * key, gpointer core )
 }
 
 static void
-action_cb( GtkComboBox * w, gpointer core )
-{
-    const char * key = g_object_get_data( G_OBJECT(w), PREFS_KEY );
-    GtkTreeIter iter;
-    if( gtk_combo_box_get_active_iter( GTK_COMBO_BOX(w), &iter ) )
-    {
-        int action;
-        GtkTreeModel * model = gtk_combo_box_get_model( GTK_COMBO_BOX(w) );
-        gtk_tree_model_get( model, &iter, 1, &action, -1 );
-        tr_core_set_pref( core, key, toractionname(action) );
-    }
-}
-
-static GtkWidget*
-new_action_combo( const char * key, gpointer core )
-{
-    const char * s;
-    GtkTreeIter iter;
-    GtkCellRenderer * rend;
-    GtkListStore * model;
-    GtkWidget * w;
-
-    model = gtk_list_store_new( 2, G_TYPE_STRING, G_TYPE_INT );
-
-    s = _("Use the torrent file where it is");
-    gtk_list_store_append( model, &iter );
-    gtk_list_store_set( model, &iter, 1, TR_TOR_LEAVE, 0, s, -1 );
-
-    s = _("Keep a copy of the torrent file");
-    gtk_list_store_append( model, &iter );
-    gtk_list_store_set( model, &iter, 1, TR_TOR_COPY, 0, s, -1 );
-
-    s = _("Keep a copy and remove the original");
-    gtk_list_store_append( model, &iter );
-    gtk_list_store_set( model, &iter, 1, TR_TOR_MOVE, 0, s, -1 );
-
-    w = gtk_combo_box_new_with_model( GTK_TREE_MODEL(model) ); 
-    gtk_combo_box_set_active( GTK_COMBO_BOX(w), tr_prefs_get_action(key) );
-    g_object_set_data_full( G_OBJECT(w), PREFS_KEY, g_strdup(key), g_free );
-    rend = gtk_cell_renderer_text_new( );
-    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT(w), rend, TRUE );
-    gtk_cell_layout_add_attribute( GTK_CELL_LAYOUT(w), rend, "text", 0 );
-    g_signal_connect( w, "changed", G_CALLBACK(action_cb), core );
-
-    return w;
-}
-
-static void
 target_cb( GtkWidget * widget, gpointer target )
 {
     gtk_widget_set_sensitive( GTK_WIDGET(target), gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(widget) ) );
-}
-
-static void
-target_invert_cb( GtkWidget * widget, gpointer target )
-{
-    gtk_widget_set_sensitive( GTK_WIDGET(target), !gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(widget) ) );
 }
 
 struct test_port_data
@@ -267,34 +194,102 @@ dialogDestroyed( gpointer alive, GObject * dialog UNUSED )
     *(gboolean*)alive = FALSE;
 }
 
-GtkWidget *
-tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
+static GtkWidget*
+generalPage( GObject * core )
+{
+    int row = 0;
+    const char * s;
+    GtkWidget * t;
+    GtkWidget * w;
+
+    t = hig_workarea_create ();
+
+    hig_workarea_add_section_title (t, &row, _("Windows"));
+        
+        s = _("Show an icon in the system _tray");
+        w = new_check_button( s, PREF_KEY_SYSTRAY, core );
+        hig_workarea_add_wide_control( t, &row, w );
+        
+        s = _("Confirm _quit");
+        w = new_check_button( s, PREF_KEY_ASKQUIT, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+    hig_workarea_finish (t, &row);
+    return t;
+}
+
+static GtkWidget*
+torrentPage( GObject * core )
+{
+    int row = 0;
+    const char * s;
+    GtkWidget * t;
+    GtkWidget * w;
+
+    t = hig_workarea_create ();
+
+    hig_workarea_add_section_title( t, &row, _( "Location" ) );
+
+        w = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
+        hig_workarea_add_row( t, &row, _( "Default download location:" ), w, NULL );
+
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Adding Torrents" ) );
+
+        s = _( "Show _options window" );
+        w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+        s = _( "_Start transfers when added" );
+        w = new_check_button( s, PREF_KEY_START, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+        s = _( "_Delete original torrent file" );
+        w = new_check_button( s, PREF_KEY_DELETE_ORIGINAL, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+    hig_workarea_finish (t, &row);
+    return t;
+}
+
+static GtkWidget*
+peerPage( GObject * core )
+{
+    int row = 0;
+    const char * s;
+    GtkWidget * t;
+    GtkWidget * w;
+
+    t = hig_workarea_create ();
+    hig_workarea_add_section_title (t, &row, _("Options"));
+        
+        s = _("Use peer _exchange if possible");
+        w = new_check_button( s, PREF_KEY_PEX, core );
+        hig_workarea_add_wide_control( t, &row, w );
+        
+        s = _("_Ignore unencrypted peers");
+        w = new_check_button( s, PREF_KEY_ENCRYPTED_ONLY, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Limits" ) );
+  
+        w = new_spin_button( PREF_KEY_MAX_PEERS_GLOBAL, core, 1, 3000, 5 );
+        hig_workarea_add_row( t, &row, _( "Total max peers:" ), w, NULL );
+        w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300, 5 );
+        hig_workarea_add_row( t, &row, _( "Per-torrent max peers:" ), w, NULL );
+
+    hig_workarea_finish (t, &row);
+    return t;
+}
+
+static GtkWidget*
+bandwidthPage( GObject * core )
 {
     int row = 0;
     const char * s;
     GtkWidget * t;
     GtkWidget * w, * w2;
-    GtkWidget * l;
-    GtkWidget * h;
-    GtkWidget * d;
-    GtkTooltips * tips;
-    gboolean * alive;
-
-    alive = g_new( gboolean, 1 );
-    *alive = TRUE;
-
-    tips = gtk_tooltips_new( );
-
-    d = gtk_dialog_new_with_buttons( _("Preferences"), parent,
-                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-                                     NULL );
-    gtk_window_set_role( GTK_WINDOW(d), "transmission-preferences-dialog" );
-    gtk_dialog_set_has_separator( GTK_DIALOG( d ), FALSE );
-    gtk_container_set_border_width( GTK_CONTAINER( d ), GUI_PAD );
-    g_object_weak_ref( G_OBJECT( d ), dialogDestroyed, alive );
-
-    g_signal_connect( d, "response", G_CALLBACK(response_cb), core );
 
     t = hig_workarea_create ();
 
@@ -314,33 +309,24 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _("Downloads"));
+    hig_workarea_finish (t, &row);
+    return t;
+}
 
-        s = _("P_rompt for download directory");
-        w = new_check_button( s, PREF_KEY_DIR_ASK, core );
-        w2 = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
-        gtk_widget_set_sensitive( GTK_WIDGET(w2), !pref_flag_get( PREF_KEY_DIR_ASK ) );
-        g_signal_connect( w, "toggled", G_CALLBACK(target_invert_cb), w2 );
-        hig_workarea_add_row_w( t, &row, w, w2, NULL );
+static GtkWidget*
+networkPage( GObject * core, gpointer alive )
+{
+    int row = 0;
+    const char * s;
+    GtkWidget * t;
+    GtkWidget * w, * w2;
+    GtkWidget * l;
+    GtkWidget * h;
+    GtkTooltips * tips;
 
-        w = new_action_combo( PREF_KEY_ADDSTD, core );
-        s = _("For torrents added _normally:");
-        l = hig_workarea_add_row( t, &row, s, w, NULL );
+    tips = gtk_tooltips_new( );
 
-        w = new_action_combo( PREF_KEY_ADDIPC, core );
-        s = _("For torrents added from _command-line:");
-        l = hig_workarea_add_row( t, &row, s, w, NULL );
-
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Peer Connections" ) );
-  
-        w = new_spin_button( PREF_KEY_MAX_PEERS_GLOBAL, core, 1, 3000, 5 );
-        hig_workarea_add_row( t, &row, _( "Global maximum connected peers:" ), w, NULL );
-        w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300, 5 );
-        hig_workarea_add_row( t, &row, _( "Maximum connected peers for new torrents:" ), w, NULL );
-
-    hig_workarea_add_section_divider( t, &row );
+    t = hig_workarea_create ();
     hig_workarea_add_section_title (t, &row, _("Network"));
         
         s = _("_Automatically map port" );
@@ -363,27 +349,46 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
         g_signal_connect( w, "toggled", G_CALLBACK(toggled_cb), l );
         g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
 
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _("Options"));
-        
-        s = _("Use peer _exchange if possible");
-        w = new_check_button( s, PREF_KEY_PEX, core );
-        hig_workarea_add_wide_control( t, &row, w );
-        
-        s = _("_Ignore unencrypted peers");
-        w = new_check_button( s, PREF_KEY_ENCRYPTED_ONLY, core );
-        hig_workarea_add_wide_control( t, &row, w );
-        
-        s = _("Show an icon in the system _tray");
-        w = new_check_button( s, PREF_KEY_SYSTRAY, core );
-        hig_workarea_add_wide_control( t, &row, w );
-        
-        s = _("Confirm _quit");
-        w = new_check_button( s, PREF_KEY_ASKQUIT, core );
-        hig_workarea_add_wide_control( t, &row, w );
-
     hig_workarea_finish (t, &row);
-    gtk_box_pack_start_defaults( GTK_BOX(GTK_DIALOG(d)->vbox), t );
+    return t;
+}
+
+GtkWidget *
+tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
+{
+    GtkWidget * d;
+    GtkWidget * n;
+    GtkWidget * w;
+    gboolean * alive;
+
+    alive = g_new( gboolean, 1 );
+    *alive = TRUE;
+
+    d = gtk_dialog_new_with_buttons( _("Preferences"), parent,
+                                     GTK_DIALOG_DESTROY_WITH_PARENT,
+                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                                     NULL );
+    gtk_window_set_role( GTK_WINDOW(d), "transmission-preferences-dialog" );
+    gtk_dialog_set_has_separator( GTK_DIALOG( d ), FALSE );
+    gtk_container_set_border_width( GTK_CONTAINER( d ), GUI_PAD );
+    g_object_weak_ref( G_OBJECT( d ), dialogDestroyed, alive );
+
+    n = gtk_notebook_new( );
+
+    w = torrentPage( core );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("Torrents")) );
+    w = peerPage( core );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("Peers")) );
+    w = bandwidthPage( core );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("Bandwidth")) );
+    w = networkPage( core, alive );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("Network")) );
+    w = generalPage( core );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("General")) );
+
+
+    g_signal_connect( d, "response", G_CALLBACK(response_cb), core );
+    gtk_box_pack_start_defaults( GTK_BOX(GTK_DIALOG(d)->vbox), n );
     gtk_widget_show_all( GTK_DIALOG(d)->vbox );
     return d;
 }

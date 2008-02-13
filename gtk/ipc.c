@@ -579,9 +579,10 @@ smsg_add( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 {
     struct constate      * con = arg;
     struct constate_serv * srv = &con->u.serv;
-    enum tr_torrent_action action;
     benc_val_t           * path;
     int                    ii;
+    tr_ctor              * ctor;
+    GList                * list = NULL;
 
     if( NULL == val || TYPE_LIST != val->type )
     {
@@ -589,7 +590,8 @@ smsg_add( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
         return;
     }
 
-    action = tr_prefs_get_action( PREF_KEY_ADDIPC );
+    ctor = tr_ctorNew( srv->core );
+
     for( ii = 0; ii < val->val.l.count; ii++ )
     {
         path = val->val.l.vals + ii;
@@ -597,10 +599,14 @@ smsg_add( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
             /* XXX somehow escape invalid utf-8 */
             g_utf8_validate( path->val.s.s, path->val.s.i, NULL ) )
         {
-            tr_core_add( TR_CORE( srv->core ), path->val.s.s, action, FALSE );
+            list = g_list_append( list, g_strndup( path->val.s.s, path->val.s.i ) );
         }
     }
-    tr_core_torrents_added( TR_CORE( srv->core ) );
+
+    if( list ) {
+        tr_core_add_list( srv->core, list, ctor );
+        tr_core_torrents_added( TR_CORE( srv->core ) );
+    }
 
     /* XXX should send info response back with torrent ids */
     simpleresp( con, tag, IPC_MSG_OK );
@@ -612,9 +618,8 @@ smsg_addone( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag,
 {
     struct constate      * con = arg;
     struct constate_serv * srv = &con->u.serv;
-    enum tr_torrent_action action;
     benc_val_t           * file, * data, * dir, * start;
-    gboolean               paused;
+    tr_ctor              * ctor;
 
     if( NULL == val || TYPE_DICT != val->type )
     {
@@ -636,33 +641,18 @@ smsg_addone( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag,
         return;
     }
 
-    action = tr_prefs_get_action( PREF_KEY_ADDIPC );
-    paused = ( NULL == start || start->val.i ? FALSE : TRUE );
-    if( NULL != file )
-    {
-        if( NULL == dir )
-        {
-            tr_core_add( srv->core, file->val.s.s, action, paused );
-        }
-        else
-        {
-            tr_core_add_dir( srv->core, file->val.s.s, dir->val.s.s,
-                             action, paused );
-        }
-    }
-    else
-    {
-        if( NULL == dir )
-        {
-            tr_core_add_data( srv->core, (uint8_t *) data->val.s.s,
-                              data->val.s.i, paused );
-        }
-        else
-        {
-            tr_core_add_data_dir( srv->core, (uint8_t *) data->val.s.s,
-                                  data->val.s.i, dir->val.s.s, paused );
-        }
-    }
+    ctor = tr_ctorNew( tr_core_handle( srv->core ) );
+    if( dir )
+        tr_ctorSetDestination( ctor, TR_FORCE, dir->val.s.s );
+    if( file )
+        tr_ctorSetMetainfoFromFile( ctor, file->val.s.s );
+    if( data )
+        tr_ctorSetMetainfo( ctor, (uint8_t*)data->val.s.s, data->val.s.i );
+    if( start )
+        tr_ctorSetPaused( ctor, TR_FORCE, !start->val.i );
+
+    tr_core_add_ctor( TR_CORE( srv->core ), ctor );
+
     tr_core_torrents_added( TR_CORE( srv->core ) );
 
     /* XXX should send info response back with torrent ids */
@@ -998,7 +988,7 @@ smsg_pref( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag, void * arg )
             break;
         case IPC_MSG_GETDIR:
             /* XXX sending back "" when we're prompting is kind of bogus */
-            pref = pref_flag_get( PREF_KEY_DIR_ASK ) ? "" : getdownloaddir();
+            pref = pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) ? "" : getdownloaddir();
             buf = ipc_mkstr( con->ipc, &size, IPC_MSG_DIR, tag, pref );
             break;
         case IPC_MSG_GETDOWNLIMIT:

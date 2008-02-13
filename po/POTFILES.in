@@ -3,12 +3,14 @@ gtk/transmission.desktop.in
 gtk/actions.c
 gtk/conf.c
 gtk/dialogs.c
+gtk/file-list.c
 gtk/hig.c
 gtk/io.c
 gtk/ipc.c
 gtk/main.c
 gtk/makemeta-ui.c
 gtk/msgwin.c
+gtk/open.c
 gtk/stats.c
 gtk/torrent-cell-renderer.c
 gtk/torrent-inspector.c

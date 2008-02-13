@@ -23,6 +23,7 @@ noinst_HEADERS = \
     logo.h \
     makemeta-ui.h \
     msgwin.h \
+    open.h \
     stats.h \
     sexy-icon-entry.h \
     torrent-cell-renderer.h \
@@ -48,6 +49,7 @@ transmission_SOURCES = \
     main.c \
     makemeta-ui.c \
     msgwin.c \
+    open.c \
     sexy-icon-entry.c \
     stats.c \
     torrent-cell-renderer.c \

@@ -24,10 +24,10 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_DL_LIMIT               "download-limit"
 #define PREF_KEY_UL_LIMIT_ENABLED       "upload-limit-enabled"
 #define PREF_KEY_UL_LIMIT               "upload-limit"
-#define PREF_KEY_DIR_ASK                "prompt-for-download-directory"
+#define PREF_KEY_OPTIONS_PROMPT         "show-options-window"
 #define PREF_KEY_DIR_DEFAULT            "default-download-directory"
-#define PREF_KEY_ADDSTD                 "add-behavior-standard"
-#define PREF_KEY_ADDIPC                 "add-behavior-ipc"
+#define PREF_KEY_START                  "start-added-torrents"
+#define PREF_KEY_DELETE_ORIGINAL        "delete-original-torrent-files"
 #define PREF_KEY_PORT                   "listening-port"
 #define PREF_KEY_NAT                    "nat-traversal-enabled"
 #define PREF_KEY_PEX                    "pex-enabled"
@@ -47,8 +47,5 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 
 
 void tr_prefs_init_global( void );
-
-int  tr_prefs_get_action( const char * key );
-void tr_prefs_set_action( const char * key, int action );
 
 #endif

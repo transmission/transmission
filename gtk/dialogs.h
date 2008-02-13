@@ -29,17 +29,10 @@
 #include "tr_torrent.h"
 #include "util.h"
 
-/* show the "add a torrent" dialog */
-void
-makeaddwind( GtkWindow * parent, TrCore * core );
-
 /* prompt for a download directory for torrents, then add them */
-void
-promptfordir( GtkWindow * parent, TrCore * core, GList * files, uint8_t * data,
-              size_t size, enum tr_torrent_action act, gboolean paused );
+void promptfordir( GtkWindow* parent, TrCore*, GList* filenames, tr_ctor* );
 
 /* prompt if the user wants to quit, calls func with cbdata if they do */
-void
-askquit( TrCore*, GtkWindow* parent, callbackfunc_t func, void * cbdata );
+void askquit( TrCore*, GtkWindow* parent, callbackfunc_t func, void* cbdata );
 
 #endif /* TG_PREFS_H */
