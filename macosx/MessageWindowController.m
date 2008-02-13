@@ -116,13 +116,12 @@
     if ((messages = tr_getQueuedMessages()) == NULL)
         return;
     
-    NSMutableDictionary * message;
     for (currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
-        message  = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                    [NSString stringWithUTF8String: currentMessage->message], @"Message",
-                    [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
-                    [NSNumber numberWithInt: currentMessage->level], @"Level", nil];
+        NSMutableDictionary * message  = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                        [NSString stringWithUTF8String: currentMessage->message], @"Message",
+                                        [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
+                                        [NSNumber numberWithInt: currentMessage->level], @"Level", nil];
         
         if (currentMessage->file != NULL)
         {

@@ -200,7 +200,10 @@
     [fTimer invalidate];
     fTimer = nil;
     
+    [fFileController setTorrent: nil]; //avoid a crash when window tries to update
+    
     [fController askOpenConfirmed: self add: NO];
+    return YES;
 }
 
 - (void) verifyLocalData: (id) sender
@@ -240,8 +243,10 @@
     if ([fDeleteCheck state] == NSOnState)
         [fTorrent trashTorrent];
     
-    //ensure last, since it releases this controller
-    [fController askOpenConfirmed: self add: YES];
+    [fFileController setTorrent: nil]; //avoid a crash when window tries to update
+    
+    [self close];
+    [fController askOpenConfirmed: self add: YES]; //ensure last, since it releases this controller
 }
 
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) contextInfo
