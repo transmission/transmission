@@ -304,8 +304,8 @@ checkFilterMode( filter_mode_t       filter_mode,
                  const tr_stat     * torStat )
 {
     int ret = 0;
-    const int haveDown = ((int)( torStat->rateDownload * 1024 )) > 1.0;
-    const int haveUp = ((int)( torStat->rateUpload * 1024 )) > 1.0;
+    const int haveDown = torStat->peersSendingToUs > 0;
+    const int haveUp = torStat->peersGettingFromUs > 0;
 
     switch( filter_mode )
     {

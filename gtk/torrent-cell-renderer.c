@@ -124,8 +124,8 @@ static char*
 getShortTransferString( const tr_stat * torStat, char * buf, size_t buflen )
 {
     char downStr[32], upStr[32];
-    const int haveDown = ( torStat->rateDownload * 1024 ) > 1.0;
-    const int haveUp = ( torStat->rateUpload * 1024 ) > 1.0;
+    const int haveDown = torStat->peersSendingToUs > 0;
+    const int haveUp = torStat->peersGettingFromUs > 0;
 
     if( haveDown )
         tr_strlspeed( downStr, torStat->rateDownload, sizeof(downStr) );
