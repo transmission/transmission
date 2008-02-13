@@ -177,7 +177,8 @@ makeaddwind( GtkWindow  * parent,
     gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( w ), filter );
     g_signal_connect( w, "selection-changed", G_CALLBACK( sourceChanged ), data );
     if( data->filename )
-        gtk_file_chooser_set_uri( GTK_FILE_CHOOSER( w ), data->filename );
+        if( !gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ), data->filename ) )
+            g_warning( "couldn't select '%s'", data->filename );
 
     ++row;
     col = 0;
@@ -186,7 +187,8 @@ makeaddwind( GtkWindow  * parent,
     gtk_table_attach( GTK_TABLE( t ), l, col, col+1, row, row+1, GTK_FILL, 0, 0, 0 );
     ++col;
     w = gtk_file_chooser_button_new( _( "Destination" ), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
-    gtk_file_chooser_set_uri( GTK_FILE_CHOOSER( w ), data->destination );
+    if( !gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ), data->destination ) )
+        g_warning( "couldn't select '%s'", data->destination );
     gtk_table_attach( GTK_TABLE( t ), w, col, col+1, row, row+1, ~0, 0, 0, 0 );
     gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
     g_signal_connect( w, "selection-changed", G_CALLBACK( destinationChanged ), data );
