@@ -753,11 +753,12 @@ coreprompt( TrCore                 * core,
             gpointer                 gdata )
 {
     struct cbdata * cbdata = gdata;
-
-    if( g_list_length( paths ) != 1 )
+    const int len = g_list_length( paths );
+    if( len > 1 )
         promptfordir( cbdata->wind, core, paths, ctor );
     else {
-        tr_ctorSetMetainfoFromFile( ctor, paths->data );
+        if( len == 1 )
+            tr_ctorSetMetainfoFromFile( ctor, paths->data );
         makeaddwind( cbdata->wind, core, ctor );
     }
 }
@@ -1009,7 +1010,7 @@ doAction ( const char * action_name, gpointer user_data )
 
     if ( !strcmp (action_name, "open-torrent-menu") || !strcmp( action_name, "open-torrent-toolbar" ))
     {
-        makeaddwind( data->wind, data->core, tr_ctorNew( tr_core_handle( data->core ) ) );
+        tr_core_add_list( data->core, NULL, tr_ctorNew( tr_core_handle( data->core ) ) );
     }
     else if (!strcmp (action_name, "show-stats"))
     {
