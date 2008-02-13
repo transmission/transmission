@@ -34,9 +34,12 @@ struct tr_ctor
 {
     const tr_handle * handle;
     unsigned int saveInOurTorrentsDir : 1;
+    unsigned int doDelete : 1;
 
     unsigned int isSet_metainfo : 1;
+    unsigned int isSet_delete : 1;
     benc_val_t metainfo;
+    char * sourceFile;
 
     struct optional_args optionalArgs[2];
 };
@@ -46,12 +49,21 @@ struct tr_ctor
 ***/
 
 static void
+setSourceFile( tr_ctor * ctor, const char * sourceFile )
+{
+    tr_free( ctor->sourceFile );
+    ctor->sourceFile = tr_strdup( sourceFile );
+}
+
+static void
 clearMetainfo( tr_ctor * ctor )
 {
     if( ctor->isSet_metainfo ) {
         ctor->isSet_metainfo = 0;
         tr_bencFree( &ctor->metainfo );
     }
+
+    setSourceFile( ctor, NULL );
 }
 
 int
@@ -64,6 +76,12 @@ tr_ctorSetMetainfo( tr_ctor        * ctor,
     err = tr_bencLoad( metainfo, len, &ctor->metainfo, NULL );
     ctor->isSet_metainfo = !err;
     return err;
+}
+
+const char*
+tr_ctorGetSourceFile( const tr_ctor * ctor )
+{
+    return ctor->sourceFile;
 }
 
 int
@@ -81,6 +99,8 @@ tr_ctorSetMetainfoFromFile( tr_ctor        * ctor,
         clearMetainfo( ctor );
         err = 1;
     }
+
+    setSourceFile( ctor, filename );
 
     /* if no `name' field was set, then set it from the filename */
     if( ctor->isSet_metainfo ) {
@@ -119,6 +139,32 @@ tr_ctorSetMetainfoFromHash( tr_ctor        * ctor,
         tr_buildPath( filename, sizeof(filename), tr_getTorrentsDirectory(), hashString, NULL );
         err = tr_ctorSetMetainfoFromFile( ctor, filename );
     }
+
+    return err;
+}
+
+/***
+****
+***/
+
+void
+tr_ctorSetDeleteSource( tr_ctor  * ctor,
+                        uint8_t    deleteSource )
+{
+    ctor->doDelete = deleteSource ? 1 : 0;
+    ctor->isSet_delete = 1;
+}
+
+int
+tr_ctorGetDeleteSource( const tr_ctor  * ctor,
+                        uint8_t        * setme )
+{
+    int err = 0;
+
+    if( !ctor->isSet_delete )
+        err = 1;
+    else if( setme )
+        *setme = ctor->doDelete ? 1 : 0;
 
     return err;
 }
@@ -178,26 +224,26 @@ tr_ctorGetMaxConnectedPeers( const tr_ctor  * ctor,
     int err = 0;
     const struct optional_args * args = &ctor->optionalArgs[mode];
 
-    if( args->isSet_connected )
-        *setmeCount = args->maxConnectedPeers;
-    else
+    if( !args->isSet_connected )
         err = 1;
+    else if( setmeCount )
+        *setmeCount = args->maxConnectedPeers;
 
     return err;
 }
 
 int
-tr_ctorGetIsPaused( const tr_ctor  * ctor,
-                    tr_ctorMode      mode,
-                    uint8_t        * setmeIsPaused )
+tr_ctorGetPaused( const tr_ctor  * ctor,
+                  tr_ctorMode      mode,
+                  uint8_t        * setmeIsPaused )
 {
     int err = 0;
     const struct optional_args * args = &ctor->optionalArgs[mode];
 
-    if( args->isSet_paused )
-        *setmeIsPaused = args->isPaused ? 1 : 0;
-    else
+    if( !args->isSet_paused )
         err = 1;
+    else if( setmeIsPaused )
+        *setmeIsPaused = args->isPaused ? 1 : 0;
 
     return err;
 }
@@ -210,10 +256,10 @@ tr_ctorGetDestination( const tr_ctor  * ctor,
     int err = 0;
     const struct optional_args * args = &ctor->optionalArgs[mode];
 
-    if( args->isSet_destination )
-        *setmeDestination = args->destination;
-    else
+    if( !args->isSet_destination )
         err = 1;
+    else if( setmeDestination )
+        *setmeDestination = args->destination;
 
     return err;
 }
@@ -224,10 +270,10 @@ tr_ctorGetMetainfo( const tr_ctor              * ctor,
 {
     int err = 0;
 
-    if( ctor->isSet_metainfo )
-        *setme = &ctor->metainfo;
-    else
+    if( !ctor->isSet_metainfo )
         err = 1;
+    else if( setme )
+        *setme = &ctor->metainfo;
 
     return err;
 }

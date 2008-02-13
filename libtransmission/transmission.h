@@ -354,6 +354,9 @@ void     tr_ctorFree                   ( tr_ctor        * ctor );
 void     tr_ctorSetSave                ( tr_ctor        * ctor,
                                          int     saveMetadataInOurTorrentsDir );
 
+void     tr_ctorSetDeleteSource       ( tr_ctor        * ctor,
+                                         uint8_t          doDelete );
+
 int      tr_ctorSetMetainfo            ( tr_ctor        * ctor,
                                          const uint8_t  * metainfo,
                                          size_t           len );
@@ -380,7 +383,7 @@ int      tr_ctorGetMaxConnectedPeers   ( const tr_ctor  * ctor,
                                          tr_ctorMode      mode,
                                          uint16_t       * setmeCount );
 
-int      tr_ctorGetIsPaused            ( const tr_ctor  * ctor,
+int      tr_ctorGetPaused              ( const tr_ctor  * ctor,
                                          tr_ctorMode      mode,
                                          uint8_t        * setmeIsPaused );
 
@@ -392,6 +395,13 @@ int      tr_ctorGetMetainfo            ( const tr_ctor  * ctor,
                                          const struct benc_val_s ** setme );
 
 int      tr_ctorGetSave                ( const tr_ctor  * ctor );
+ 
+int      tr_ctorGetDeleteSource        ( const tr_ctor  * ctor,
+                                         uint8_t        * setmeDoDelete );
+
+/* returns NULL if tr_ctorSetMetainfoFromFile() wasn't used */
+const char* tr_ctorGetSourceFile       ( const tr_ctor  * ctor );
+
 
 typedef struct tr_info tr_info;
 
