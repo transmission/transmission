@@ -206,7 +206,7 @@ generalPage( GObject * core )
 
     hig_workarea_add_section_title (t, &row, _("Windows"));
         
-        s = _("Show an icon in the system _tray");
+        s = _("Show an _icon in the system tray");
         w = new_check_button( s, PREF_KEY_SYSTRAY, core );
         hig_workarea_add_wide_control( t, &row, w );
         
@@ -231,7 +231,7 @@ torrentPage( GObject * core )
     hig_workarea_add_section_title( t, &row, _( "Location" ) );
 
         w = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
-        hig_workarea_add_row( t, &row, _( "Default download location:" ), w, NULL );
+        hig_workarea_add_row( t, &row, _( "Default download _location:" ), w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Adding Torrents" ) );
@@ -275,9 +275,9 @@ peerPage( GObject * core )
     hig_workarea_add_section_title( t, &row, _( "Limits" ) );
   
         w = new_spin_button( PREF_KEY_MAX_PEERS_GLOBAL, core, 1, 3000, 5 );
-        hig_workarea_add_row( t, &row, _( "Total max peers:" ), w, NULL );
+        hig_workarea_add_row( t, &row, _( "_Total peer limit:" ), w, NULL );
         w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300, 5 );
-        hig_workarea_add_row( t, &row, _( "Per-torrent max peers:" ), w, NULL );
+        hig_workarea_add_row( t, &row, _( "_Per-torrent peer limit:" ), w, NULL );
 
     hig_workarea_finish (t, &row);
     return t;
@@ -295,14 +295,14 @@ bandwidthPage( GObject * core )
 
     hig_workarea_add_section_title (t, &row, _("Speed Limits"));
 
-        s = _("_Limit upload speed (KiB/s)");
+        s = _("Limit _upload speed (KiB/s)");
         w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
-        s = _("Li_mit download speed (KiB/s)");
+        s = _("Limit _download speed (KiB/s)");
         w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_DL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ) );
@@ -329,7 +329,7 @@ networkPage( GObject * core, gpointer alive )
     t = hig_workarea_create ();
     hig_workarea_add_section_title (t, &row, _("Network"));
         
-        s = _("_Automatically map port" );
+        s = _("Automatically _map port" );
         w = new_check_button( s, PREF_KEY_NAT, core );
         hig_workarea_add_wide_control( t, &row, w );
         gtk_tooltips_set_tip( GTK_TOOLTIPS( tips ), w, _( "NAT traversal uses either NAT-PMP or UPnP" ), NULL );
