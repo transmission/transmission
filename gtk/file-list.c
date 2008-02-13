@@ -358,6 +358,14 @@ enabled_toggled (GtkCellRendererToggle  * cell UNUSED,
 }
 
 static void
+torrentDestroyed( gpointer gdata, GObject * deadTorrent UNUSED )
+{
+    FileData * data = gdata;
+    data->gtor = NULL;
+    file_list_set_torrent( data->top, NULL );
+}
+
+static void
 freeData( gpointer gdata )
 {
     FileData * data = gdata;
@@ -367,15 +375,10 @@ freeData( gpointer gdata )
         data->timeout_tag = 0;
     }
 
-    g_free( data );
-}
+    if( data->gtor != NULL )
+        g_object_weak_unref( G_OBJECT( data->gtor ), torrentDestroyed, data );
 
-static void
-torrentDestroyed( gpointer gdata, GObject * deadTorrent UNUSED )
-{
-    FileData * data = gdata;
-    data->gtor = NULL;
-    file_list_set_torrent( data->top, NULL );
+    g_free( data );
 }
 
 static gboolean

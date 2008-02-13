@@ -1065,6 +1065,7 @@ doAction ( const char * action_name, gpointer user_data )
             GtkTreePath * path = gtk_tree_row_reference_get_path( reference );
             gtk_tree_model_get_iter( model, &iter, path );
             tr_core_delete_torrent( data->core, &iter );
+            gtk_tree_path_free( path );
             gtk_tree_row_reference_free( reference );
             changed = TRUE;
         }
