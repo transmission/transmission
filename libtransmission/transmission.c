@@ -368,8 +368,11 @@ tr_closeImpl( void * vh )
     tr_sharedShuttingDown( h->shared );
     tr_trackerShuttingDown( h );
 
-    for( t=h->torrentList; t!=NULL; t=t->next )
-        tr_torrentClose( t );
+    for( t=h->torrentList; t!=NULL; ) {
+        tr_torrent * tmp = t;
+        t = t->next;
+        tr_torrentClose( tmp );
+    }
 
     tr_peerMgrFree( h->peerMgr );
 
