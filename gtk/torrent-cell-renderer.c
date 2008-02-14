@@ -162,6 +162,7 @@ getShortStatusString( const tr_stat * torStat )
         case TR_STATUS_CHECK:
             g_string_append_printf( gstr, _("Verifying local data (%.1f%% tested)"),
                                     torStat->recheckProgress * 100.0 );
+            break;
 
         case TR_STATUS_DOWNLOAD:
         case TR_STATUS_SEED:
