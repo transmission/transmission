@@ -645,8 +645,8 @@ struct tr_info
     char               * primaryAddress;
 
     /* Torrent info */
-    char                 comment[MAX_PATH_LENGTH];
-    char                 creator[MAX_PATH_LENGTH];
+    char               * comment;
+    char               * creator;
     int                  dateCreated;
 
     /* Pieces info */

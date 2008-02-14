@@ -200,14 +200,22 @@ tr_metainfoParse( tr_info * inf, const benc_val_t * meta_in, const char * tag )
     val = tr_bencDictFindFirst( meta, "comment.utf-8", "comment", NULL );
     if( NULL != val && TYPE_STR == val->type )
     {
-        strlcat_utf8( inf->comment, val->val.s.s, sizeof( inf->comment ), 0 );
+        char buf[4096];
+        memset( buf, 0, sizeof( buf ) );
+        strlcat_utf8( buf, val->val.s.s, sizeof( buf ), 0 );
+        tr_free( inf->comment );
+        inf->comment = tr_strdup( buf );
     }
     
     /* Creator info */
     val = tr_bencDictFindFirst( meta, "created by.utf-8", "created by", NULL );
     if( NULL != val && TYPE_STR == val->type )
     {
-        strlcat_utf8( inf->creator, val->val.s.s, sizeof( inf->creator ), 0 );
+        char buf[4096];
+        memset( buf, 0, sizeof( buf ) );
+        strlcat_utf8( buf, val->val.s.s, sizeof( buf ), 0 );
+        tr_free( inf->creator );
+        inf->creator = tr_strdup( buf );
     }
     
     /* Date created */
@@ -310,6 +318,8 @@ void tr_metainfoFree( tr_info * inf )
 
     tr_free( inf->pieces );
     tr_free( inf->files );
+    tr_free( inf->comment );
+    tr_free( inf->creator );
     tr_free( inf->primaryAddress );
     
     for( i=0; i<inf->trackerTiers; ++i ) {
