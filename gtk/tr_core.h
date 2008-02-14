@@ -87,22 +87,16 @@ enum tr_core_err
     TR_CORE_ERR_SAVE_STATE      /* error saving state */
 };
 
-GType
-tr_core_get_type( void );
+GType tr_core_get_type( void );
 
-TrCore *
-tr_core_new( void );
+TrCore * tr_core_new( void );
 
 /* Return the model used without incrementing the reference count */
-GtkTreeModel *
-tr_core_model( TrCore * self );
+GtkTreeModel * tr_core_model( TrCore * self );
 
-/* Returns the libtransmission handle */
-tr_handle *
-tr_core_handle( TrCore * self );
+tr_handle * tr_core_handle( TrCore * self );
 
-const struct core_stats*
-tr_core_get_stats( const TrCore * self );
+const struct core_stats* tr_core_get_stats( const TrCore * self );
 
 /******
 *******
@@ -144,32 +138,29 @@ void tr_core_torrents_added( TrCore * self );
 *******
 ******/
 
-/* remove a torrent, waiting for it to pause if necessary */
-void
-tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter /* XXX */ );
+void tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter );
 
 /* update the model with current torrent status */
-void
-tr_core_update( TrCore * self );
+void tr_core_update( TrCore * self );
 
 /* emit the "quit" signal */
-void
-tr_core_quit( TrCore * self );
+void tr_core_quit( TrCore * self );
 
 /* Set a preference value, save the prefs file, and emit the
    "prefs-changed" signal */
-void
-tr_core_set_pref( TrCore * self, const char * key, const char * val );
+void tr_core_set_pref( TrCore * self, const char * key, const char * val );
 
 /* Set a boolean preference value, save the prefs file, and emit the
    "prefs-changed" signal */
-void
-tr_core_set_pref_bool( TrCore * self, const char * key, gboolean val );
+void tr_core_set_pref_bool( TrCore * self, const char * key, gboolean val );
 
 /* Set an integer preference value, save the prefs file, and emit the
    "prefs-changed" signal */
-void
-tr_core_set_pref_int( TrCore * self, const char * key, int val );
+void tr_core_set_pref_int( TrCore * self, const char * key, int val );
+
+/**
+***
+**/
 
 /* column names for the model used to store torrent information */
 /* keep this in sync with the type array in tr_core_init() in tr_core.c */

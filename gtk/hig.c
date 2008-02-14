@@ -17,9 +17,9 @@ GtkWidget*
 hig_workarea_create (void)
 {
     GtkWidget * t = gtk_table_new( 1, 2, FALSE );
-    gtk_container_set_border_width( GTK_CONTAINER( t ), 12 );
-    gtk_table_set_col_spacing( GTK_TABLE( t ), 0, 12 );
-    gtk_table_set_row_spacings( GTK_TABLE( t ), 6 );
+    gtk_container_set_border_width( GTK_CONTAINER( t ), GUI_PAD_BIG );
+    gtk_table_set_col_spacing( GTK_TABLE( t ), 0, GUI_PAD_BIG );
+    gtk_table_set_row_spacings( GTK_TABLE( t ), GUI_PAD );
     return t;
 }
 
@@ -45,12 +45,12 @@ hig_workarea_add_section_title( GtkWidget   * t,
     l = gtk_label_new( buf );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
     gtk_label_set_use_markup( GTK_LABEL( l ), TRUE );
-    gtk_table_attach( GTK_TABLE( t ), l, 0, 2, *row, *row+1, GTK_FILL, 0, 0, 0 );
+    gtk_table_attach( GTK_TABLE( t ), l, 0, 2, *row, *row+1, ~0, 0, 0, 0 );
     ++*row;
 }
 
 static GtkWidget*
-control_row_new( GtkWidget * w )
+rowNew( GtkWidget * w )
 {
     GtkWidget * a;
     GtkWidget * h = gtk_hbox_new( FALSE, 0 );
@@ -75,7 +75,7 @@ hig_workarea_add_wide_control( GtkWidget * t,
                                int       * row,
                                GtkWidget * w )
 {
-    GtkWidget * r = control_row_new( w );
+    GtkWidget * r = rowNew( w );
     gtk_table_attach( GTK_TABLE( t ), r, 0, 2, *row, *row+1, GTK_FILL, 0, 0, 0 );
     ++*row;
 }
@@ -97,7 +97,7 @@ hig_workarea_add_label_w( GtkWidget   * t,
                           int           row,
                           GtkWidget   * l )
 {
-    GtkWidget * w = control_row_new( l );
+    GtkWidget * w = rowNew( l );
     gtk_table_attach( GTK_TABLE( t ), w, 0, 1, row, row+1, GTK_FILL, GTK_FILL, 0, 0 );
 }
 
@@ -117,7 +117,7 @@ hig_workarea_add_control( GtkWidget   * t,
                           GtkWidget   * control )
 {
     if ( GTK_IS_MISC( control ) )
-        gtk_misc_set_alignment( GTK_MISC(control), 0.0f, 0.5f );
+        gtk_misc_set_alignment( GTK_MISC( control ), 0.0f, 0.5f );
 
     gtk_table_attach( GTK_TABLE( t ), control,
                       1, 2, row, row+1,

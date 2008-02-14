@@ -69,7 +69,7 @@ tr_prefs_init_global( void )
 ***
 **/
 
-#define PREFS_KEY "prefs-key"
+#define PREF_KEY "pref-key"
 
 static void
 response_cb( GtkDialog * dialog, int response UNUSED, gpointer unused UNUSED )
@@ -80,7 +80,7 @@ response_cb( GtkDialog * dialog, int response UNUSED, gpointer unused UNUSED )
 static void
 toggled_cb( GtkToggleButton * w, gpointer core )
 {
-    const char * key = g_object_get_data( G_OBJECT(w), PREFS_KEY );
+    const char * key = g_object_get_data( G_OBJECT(w), PREF_KEY );
     const gboolean flag = gtk_toggle_button_get_active( w );
     tr_core_set_pref_bool( TR_CORE(core), key, flag );
 }
@@ -89,7 +89,7 @@ static GtkWidget*
 new_check_button( const char * mnemonic, const char * key, gpointer core )
 {
     GtkWidget * w = gtk_check_button_new_with_mnemonic( mnemonic );
-    g_object_set_data_full( G_OBJECT(w), PREFS_KEY, g_strdup(key), g_free );
+    g_object_set_data_full( G_OBJECT(w), PREF_KEY, g_strdup(key), g_free );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(w), pref_flag_get(key) );
     g_signal_connect( w, "toggled", G_CALLBACK(toggled_cb), core );
     return w;
@@ -98,7 +98,7 @@ new_check_button( const char * mnemonic, const char * key, gpointer core )
 static void
 spun_cb( GtkSpinButton * w, gpointer core )
 {
-    const char * key = g_object_get_data( G_OBJECT(w), PREFS_KEY );
+    const char * key = g_object_get_data( G_OBJECT(w), PREF_KEY );
     const int value = gtk_spin_button_get_value_as_int( w );
     tr_core_set_pref_int( TR_CORE(core), key, value );
 }
@@ -107,7 +107,7 @@ static GtkWidget*
 new_spin_button( const char * key, gpointer core, int low, int high, int step )
 {
     GtkWidget * w = gtk_spin_button_new_with_range( low, high, step );
-    g_object_set_data_full( G_OBJECT(w), PREFS_KEY, g_strdup(key), g_free );
+    g_object_set_data_full( G_OBJECT(w), PREF_KEY, g_strdup(key), g_free );
     gtk_spin_button_set_digits( GTK_SPIN_BUTTON(w), 0 );
     gtk_spin_button_set_value( GTK_SPIN_BUTTON(w), pref_int_get(key) );
     g_signal_connect( w, "value-changed", G_CALLBACK(spun_cb), core );
@@ -117,7 +117,7 @@ new_spin_button( const char * key, gpointer core, int low, int high, int step )
 static void
 chosen_cb( GtkFileChooser * w, gpointer core )
 {
-    const char * key = g_object_get_data( G_OBJECT(w), PREFS_KEY );
+    const char * key = g_object_get_data( G_OBJECT(w), PREF_KEY );
     char * value = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER(w) );
     tr_core_set_pref( TR_CORE(core), key, value );
     g_free( value );
@@ -129,16 +129,17 @@ new_path_chooser_button( const char * key, gpointer core )
     GtkWidget * w = gtk_file_chooser_button_new( NULL,
                                     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
     char * path = pref_string_get( key );
-    g_object_set_data_full( G_OBJECT(w), PREFS_KEY, g_strdup(key), g_free );
+    g_object_set_data_full( G_OBJECT(w), PREF_KEY, g_strdup(key), g_free );
     g_signal_connect( w, "selection-changed", G_CALLBACK(chosen_cb), core );
     gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER(w), path );
     return w;
 }
 
 static void
-target_cb( GtkWidget * widget, gpointer target )
+target_cb( GtkWidget * tb, gpointer target )
 {
-    gtk_widget_set_sensitive( GTK_WIDGET(target), gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(widget) ) );
+    const gboolean b = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( tb ) );
+    gtk_widget_set_sensitive( GTK_WIDGET(target), b );
 }
 
 struct test_port_data
@@ -155,7 +156,7 @@ test_port( gpointer data_gpointer )
     if( *data->alive )
     {
         GObject * o = G_OBJECT( data->label );
-        GtkSpinButton * spin = GTK_SPIN_BUTTON( g_object_get_data( o, "tr-port-spin" ) );
+        GtkSpinButton * spin = g_object_get_data( o, "tr-port-spin" );
         const int port = gtk_spin_button_get_value_as_int( spin );
         int isOpen;
         int size;
@@ -202,9 +203,8 @@ generalPage( GObject * core )
     GtkWidget * t;
     GtkWidget * w;
 
-    t = hig_workarea_create ();
-
-    hig_workarea_add_section_title (t, &row, _("Windows"));
+    t = hig_workarea_create( );
+    hig_workarea_add_section_title( t, &row, _( "Windows" ) );
         
         s = _("Show an _icon in the system tray");
         w = new_check_button( s, PREF_KEY_SYSTRAY, core );
@@ -214,7 +214,7 @@ generalPage( GObject * core )
         w = new_check_button( s, PREF_KEY_ASKQUIT, core );
         hig_workarea_add_wide_control( t, &row, w );
 
-    hig_workarea_finish (t, &row);
+    hig_workarea_finish( t, &row );
     return t;
 }
 
@@ -226,8 +226,7 @@ torrentPage( GObject * core )
     GtkWidget * t;
     GtkWidget * w;
 
-    t = hig_workarea_create ();
-
+    t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Location" ) );
 
         w = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
@@ -248,7 +247,7 @@ torrentPage( GObject * core )
         w = new_check_button( s, PREF_KEY_DELETE_ORIGINAL, core );
         hig_workarea_add_wide_control( t, &row, w );
 
-    hig_workarea_finish (t, &row);
+    hig_workarea_finish( t, &row );
     return t;
 }
 
@@ -260,7 +259,7 @@ peerPage( GObject * core )
     GtkWidget * t;
     GtkWidget * w;
 
-    t = hig_workarea_create ();
+    t = hig_workarea_create( );
     hig_workarea_add_section_title (t, &row, _("Options"));
         
         s = _("Use peer _exchange if possible");
@@ -279,7 +278,7 @@ peerPage( GObject * core )
         w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300, 5 );
         hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
 
-    hig_workarea_finish (t, &row);
+    hig_workarea_finish( t, &row );
     return t;
 }
 
@@ -292,9 +291,8 @@ networkPage( GObject * core, gpointer alive )
     GtkWidget * w, * w2;
     GtkWidget * l;
     GtkWidget * h;
-    GtkTooltips * tips = gtk_tooltips_new( );
 
-    t = hig_workarea_create ();
+    t = hig_workarea_create( );
 
     hig_workarea_add_section_title (t, &row, _("Bandwidth"));
 
@@ -314,10 +312,9 @@ networkPage( GObject * core, gpointer alive )
 
     hig_workarea_add_section_title (t, &row, _("Ports"));
         
-        s = _("Automatically _map port" );
+        s = _("_Map port with UPnP or NAT-PMP" );
         w = new_check_button( s, PREF_KEY_NAT, core );
         hig_workarea_add_wide_control( t, &row, w );
-        gtk_tooltips_set_tip( GTK_TOOLTIPS( tips ), w, _( "NAT traversal uses either NAT-PMP or UPnP" ), NULL );
 
         h = gtk_hbox_new( FALSE, GUI_PAD );
         w2 = new_spin_button( PREF_KEY_PORT, core, 1, INT_MAX, 1 );
@@ -334,7 +331,7 @@ networkPage( GObject * core, gpointer alive )
         g_signal_connect( w, "toggled", G_CALLBACK(toggled_cb), l );
         g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
 
-    hig_workarea_finish (t, &row);
+    hig_workarea_finish( t, &row );
     return t;
 }
 
@@ -343,7 +340,6 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 {
     GtkWidget * d;
     GtkWidget * n;
-    GtkWidget * w;
     gboolean * alive;
 
     alive = g_new( gboolean, 1 );
@@ -360,15 +356,18 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 
     n = gtk_notebook_new( );
 
-    w = torrentPage( core );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("Torrents")) );
-    w = peerPage( core );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("Peers")) );
-    w = networkPage( core, alive );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("Network")) );
-    w = generalPage( core );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, gtk_label_new (_("General")) );
-
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              torrentPage( core ),
+                              gtk_label_new (_("Torrents")) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              peerPage( core ),
+                              gtk_label_new (_("Peers")) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              networkPage( core, alive ),
+                              gtk_label_new (_("Network")) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              generalPage( core ),
+                              gtk_label_new (_("General")) );
 
     g_signal_connect( d, "response", G_CALLBACK(response_cb), core );
     gtk_box_pack_start_defaults( GTK_BOX(GTK_DIALOG(d)->vbox), n );

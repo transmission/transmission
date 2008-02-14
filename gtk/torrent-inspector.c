@@ -698,7 +698,8 @@ static GtkWidget* info_page_new (tr_torrent * tor)
 
     g_snprintf (name, sizeof(name), namefmt, _("Comment"));
     b = gtk_text_buffer_new (NULL);
-    gtk_text_buffer_set_text (b, info->comment, -1);
+    if( info->comment )
+        gtk_text_buffer_set_text (b, info->comment, -1);
     w = gtk_text_view_new_with_buffer (b);
     gtk_widget_set_size_request (w, 0u, 100u);
     gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(w), GTK_WRAP_WORD); 

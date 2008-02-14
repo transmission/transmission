@@ -16,74 +16,58 @@
 #include <gtk/gtkwidget.h>
 
 /**
-*** utility code to make it slightly less painful to create
-*** dialogs compliant with Gnome's Human Interface Guidelines
+*** utility code for making dialog layout that follows the Gnome HIG.
+*** see section 8.2.2, Visual Design > Window Layout > Dialogs.
 **/
 
-GtkWidget* hig_workarea_create (void);
+GtkWidget* hig_workarea_create( void );
 
-void
-hig_workarea_add_section_divider (GtkWidget   * table,
-                                  int         * row);
+void hig_workarea_add_section_divider( GtkWidget   * table,
+                                       int         * row );
 
-void
-hig_workarea_add_section_title (GtkWidget   * table,
-                                int         * row,
-                                const char  * section_title);
+void hig_workarea_add_section_title( GtkWidget   * table,
+                                     int         * row,
+                                     const char  * section_title );
 
-void
-hig_workarea_add_wide_control (GtkWidget   * table,
-                               int         * row,
-                               GtkWidget   * w);
+void hig_workarea_add_wide_control( GtkWidget   * table,
+                                    int         * row,
+                                    GtkWidget   * w );
 
-GtkWidget*
-hig_workarea_add_wide_checkbutton (GtkWidget   * table,
-                                   int         * row,
-                                   const char  * mnemonic_string,
-                                   gboolean      is_active);
+GtkWidget* hig_workarea_add_wide_checkbutton( GtkWidget   * table,
+                                              int         * row,
+                                              const char  * mnemonic_string,
+                                              gboolean      is_active );
 
-GtkWidget*
-hig_workarea_add_label (GtkWidget   * table,
-                        int           row,
-                        const char  * mnemonic_string);
+GtkWidget* hig_workarea_add_label( GtkWidget   * table,
+                                   int           row,
+                                   const char  * mnemonic_string );
 
-void
-hig_workarea_add_label_w (GtkWidget   * table,
-                          int           row,
-                          GtkWidget   * label_widget);
+void hig_workarea_add_label_w( GtkWidget   * table,
+                               int           row,
+                               GtkWidget   * label_widget );
 
-void
-hig_workarea_add_control (GtkWidget   * table,
-                          int           row,
-                          GtkWidget   * control);
+void hig_workarea_add_control( GtkWidget   * table,
+                               int           row,
+                               GtkWidget   * control );
 
-GtkWidget*
-hig_workarea_add_row (GtkWidget   * table,
-                      int         * row,
-                      const char  * mnemonic_string,
-                      GtkWidget   * control,
-                      GtkWidget   * mnemonic_or_null_if_control_is_mnemonic);
+GtkWidget* hig_workarea_add_row (GtkWidget   * table,
+                                 int         * row,
+                                 const char  * mnemonic_string,
+                                 GtkWidget   * control,
+                                 GtkWidget   * mnemonic_or_null_for_control );
 
-void
-hig_workarea_add_row_w (GtkWidget   * table,
-                        int         * row,
-                        GtkWidget   * label,
-                        GtkWidget   * control,
-                        GtkWidget   * mnemonic_or_null_if_control_is_mnemonic);
+void hig_workarea_add_row_w( GtkWidget   * table,
+                             int         * row,
+                             GtkWidget   * label,
+                             GtkWidget   * control,
+                             GtkWidget   * mnemonic_or_null_for_control );
 
-void
-hig_workarea_finish (GtkWidget   * table,
-                     int         * row);
+void hig_workarea_finish( GtkWidget   * table,
+                          int         * row );
 
-void
-hig_message_dialog_set_text (GtkMessageDialog * dialog,
-                             const char       * primary,
-                             const char       * secondary);
-
-
-/**
-***
-**/
+void hig_message_dialog_set_text( GtkMessageDialog * dialog,
+                                  const char       * primary,
+                                  const char       * secondary );
 
 enum
 {

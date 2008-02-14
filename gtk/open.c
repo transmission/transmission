@@ -11,6 +11,7 @@
  */
 
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
 #include <gtk/gtk.h>
 #include "file-list.h"
 #include "hig.h"
@@ -20,7 +21,8 @@ struct OpenData
 {
     TrCore * core;
     GtkWidget * list;
-    GtkWidget * run_check;
+    GtkToggleButton * run_check;
+    GtkToggleButton * delete_check;
     char * filename;
     char * destination;
     TrTorrent * gtor;
@@ -50,9 +52,11 @@ openResponseCB( GtkDialog * dialog, gint response, gpointer gdata )
         if( response != GTK_RESPONSE_ACCEPT )
             deleteOldTorrent( data );
         else {
-            if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->run_check ) ) )
+            if( gtk_toggle_button_get_active( data->run_check ) )
                 tr_torrentStart( tr_torrent_handle( data->gtor ) );
             tr_core_add_torrent( data->core, data->gtor );
+            if( gtk_toggle_button_get_active( data->delete_check ) )
+                g_unlink( data->filename );
         }
     }
 
@@ -64,12 +68,12 @@ openResponseCB( GtkDialog * dialog, gint response, gpointer gdata )
 }
 
 static void
-updateTorrent( struct OpenData * data )
+updateTorrent( struct OpenData * o )
 {
-    if( data->gtor )
-        tr_torrentSetFolder( tr_torrent_handle( data->gtor ), data->destination );
+    if( o->gtor )
+        tr_torrentSetFolder( tr_torrent_handle( o->gtor ), o->destination );
 
-    file_list_set_torrent( data->list, data->gtor );
+    file_list_set_torrent( o->list, o->gtor );
 }
 
 static void
@@ -79,7 +83,6 @@ sourceChanged( GtkFileChooserButton * b, gpointer gdata )
 
     deleteOldTorrent( data );
 
-    /* update the filename */
     g_free( data->filename );
     data->filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( b ) );
 
@@ -89,8 +92,9 @@ sourceChanged( GtkFileChooserButton * b, gpointer gdata )
         tr_torrent * torrent;
         tr_handle * handle = tr_core_handle( data->core );
         tr_ctorSetMetainfoFromFile( data->ctor, data->filename );
-        tr_ctorSetPaused( data->ctor, TR_FORCE, TRUE );
         tr_ctorSetDestination( data->ctor, TR_FORCE, data->destination );
+        tr_ctorSetPaused( data->ctor, TR_FORCE, TRUE );
+        tr_ctorSetDeleteSource( data->ctor, FALSE );
         if(( torrent = tr_torrentNew( handle, data->ctor, &err )))
             data->gtor = tr_torrent_new_preexisting( torrent );
     }
@@ -110,6 +114,7 @@ static void
 destinationChanged( GtkFileChooserButton * b, gpointer gdata )
 {
     struct OpenData * data = gdata;
+
     g_free( data->destination );
     data->destination = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( b ) );
 
@@ -138,12 +143,11 @@ makeaddwind( GtkWindow  * parent,
     uint8_t flag;
 
     /* make the dialog */
-    d = gtk_dialog_new_with_buttons( _( "Open Torrent" ),
-                                     parent,
-                                     GTK_DIALOG_DESTROY_WITH_PARENT|GTK_DIALOG_NO_SEPARATOR,
-                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-                                     NULL );
+    d = gtk_dialog_new_with_buttons( _( "Open Torrent" ), parent,
+            GTK_DIALOG_DESTROY_WITH_PARENT|GTK_DIALOG_NO_SEPARATOR,
+            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+            GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+            NULL );
 
     if( tr_ctorGetDestination( ctor, TR_FORCE, &str ) )
         g_assert_not_reached( );
@@ -152,7 +156,8 @@ makeaddwind( GtkWindow  * parent,
     data->ctor = ctor;
     data->filename = g_strdup( tr_ctorGetSourceFile( ctor ) );
     data->destination = g_strdup( str );
-    g_signal_connect( G_OBJECT( d ), "response", G_CALLBACK( openResponseCB ), data );
+    g_signal_connect( G_OBJECT( d ), "response",
+                      G_CALLBACK( openResponseCB ), data );
 
     t = gtk_table_new( 6, 2, FALSE );
     gtk_container_set_border_width( GTK_CONTAINER( t ), GUI_PAD_BIG );
@@ -164,7 +169,8 @@ makeaddwind( GtkWindow  * parent,
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
     gtk_table_attach( GTK_TABLE( t ), l, col, col+1, row, row+1, GTK_FILL, 0, 0, 0 );
     ++col;
-    w = gtk_file_chooser_button_new( _( "Select Torrent" ), GTK_FILE_CHOOSER_ACTION_OPEN );
+    w = gtk_file_chooser_button_new( _( "Select Torrent" ),
+                                     GTK_FILE_CHOOSER_ACTION_OPEN );
     gtk_table_attach( GTK_TABLE( t ), w, col, col+1, row, row+1, ~0, 0, 0, 0 );
     gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
     filter = gtk_file_filter_new( );
@@ -175,7 +181,8 @@ makeaddwind( GtkWindow  * parent,
     gtk_file_filter_set_name( filter, _( "All files" ) );
     gtk_file_filter_add_pattern( filter, "*" );
     gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( w ), filter );
-    g_signal_connect( w, "selection-changed", G_CALLBACK( sourceChanged ), data );
+    g_signal_connect( w, "selection-changed",
+                      G_CALLBACK( sourceChanged ), data );
     if( data->filename )
         if( !gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ), data->filename ) )
             g_warning( "couldn't select '%s'", data->filename );
@@ -209,6 +216,7 @@ makeaddwind( GtkWindow  * parent,
     ++row;
     col = 0;
     w = gtk_check_button_new_with_mnemonic( _( "_Delete original torrent file" ) );
+    data->delete_check = GTK_TOGGLE_BUTTON( w );
     if( tr_ctorGetDeleteSource( ctor, &flag ) )
         g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), flag );
@@ -217,7 +225,7 @@ makeaddwind( GtkWindow  * parent,
     ++row;
     col = 0;
     w = gtk_check_button_new_with_mnemonic( _( "_Start when added" ) );
-    data->run_check = w;
+    data->run_check = GTK_TOGGLE_BUTTON( w );
     if( tr_ctorGetPaused( ctor, TR_FORCE, &flag ) )
         g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), !flag );

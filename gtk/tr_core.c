@@ -22,15 +22,13 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <inttypes.h>
-#include <stdio.h>
-#include <string.h>
+#include <string.h> /* strcmp, strlen */
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
+#include <libtransmission/utils.h> /* tr_strcmp */
 
 #include "conf.h"
 #include "tr_core.h"
@@ -43,14 +41,13 @@ struct TrCorePrivate
     GtkTreeModel     * model;
     tr_handle        * handle;
     int                nextid;
-    gboolean           quitting;
     struct core_stats  stats;
 };
 
 static void
-tr_core_marshal_err( GClosure * closure, GValue * ret UNUSED, guint count,
-                     const GValue * vals, gpointer hint UNUSED,
-                     gpointer marshal )
+tr_core_marshal_err( GClosure * closure, GValue * ret UNUSED,
+                     guint count, const GValue * vals,
+                     gpointer hint UNUSED, gpointer marshal )
 {
     typedef void (*TRMarshalErr)
         ( gpointer, enum tr_core_err, const char *, gpointer );
@@ -60,22 +57,21 @@ tr_core_marshal_err( GClosure * closure, GValue * ret UNUSED, guint count,
     const char     * errstr;
     gpointer         inst, gdata;
 
-    g_return_if_fail( 3 == count );
+    g_return_if_fail( count == 3 );
 
     inst    = g_value_peek_pointer( vals );
     errcode = g_value_get_int( vals + 1 );
     errstr  = g_value_get_string( vals + 2 );
     gdata   = closure->data;
 
-    callback = (TRMarshalErr) ( NULL == marshal ?
-                                cclosure->callback : marshal );
+    callback = (TRMarshalErr)( marshal ? marshal : cclosure->callback );
     callback( inst, errcode, errstr, gdata );
 }
 
 static void
-tr_core_marshal_prompt( GClosure * closure, GValue * ret UNUSED, guint count,
-                        const GValue * vals, gpointer hint UNUSED,
-                        gpointer marshal )
+tr_core_marshal_prompt( GClosure * closure, GValue * ret UNUSED,
+                        guint count, const GValue * vals,
+                        gpointer hint UNUSED, gpointer marshal )
 {
     typedef void (*TRMarshalPrompt)( gpointer, GList *, gpointer, gpointer );
     TRMarshalPrompt        callback;
@@ -84,15 +80,14 @@ tr_core_marshal_prompt( GClosure * closure, GValue * ret UNUSED, guint count,
     gpointer               ctor;
     gpointer               inst, gdata;
 
-    g_return_if_fail( 3 == count );
+    g_return_if_fail( count == 3 );
 
     inst      = g_value_peek_pointer( vals );
-    paths     = g_value_get_pointer( vals + 1 );
-    ctor      = g_value_get_pointer( vals + 2 );
+    paths     = g_value_peek_pointer( vals + 1 );
+    ctor      = g_value_peek_pointer( vals + 2 );
     gdata     = closure->data;
 
-    callback = (TRMarshalPrompt) ( NULL == marshal ?
-                                   cclosure->callback : marshal );
+    callback = (TRMarshalPrompt)( marshal ? marshal : cclosure->callback );
     callback( inst, paths, ctor, gdata );
 }
 
@@ -106,18 +101,18 @@ static void
 tr_core_dispose( GObject * obj )
 {
     TrCore * core = TR_CORE( obj );
-    GObjectClass * parent;
 
     if( !isDisposed( core ) )
     {
+        GObjectClass * parent;
+
         pref_save( NULL );
         core->priv = NULL;
+
+        parent = g_type_class_peek( g_type_parent( TR_CORE_TYPE ) );
+        parent->dispose( obj );
     }
-
-    parent = g_type_class_peek( g_type_parent( TR_CORE_TYPE ) );
-    parent->dispose( obj );
 }
-
 
 static void
 tr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
@@ -125,11 +120,10 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
     GObjectClass * gobject_class;
     TrCoreClass  * core_class;
 
+    g_type_class_add_private( g_class, sizeof(struct TrCorePrivate) );
+
     gobject_class = G_OBJECT_CLASS( g_class );
     gobject_class->dispose = tr_core_dispose;
-
-    g_type_class_add_private( g_class,
-                              sizeof(struct TrCorePrivate) );
 
 
     core_class = TR_CORE_CLASS( g_class );
@@ -153,11 +147,15 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
                                         G_TYPE_NONE, 1, G_TYPE_STRING );
 }
 
+/***
+****  SORTING
+***/
+
 static int
 compareDouble( double a, double b )
 {
     if( a < b ) return -1;
-    if( b < a ) return 1;
+    if( a > b ) return 1;
     return 0;
 }
 
@@ -185,15 +183,6 @@ compareByActivity( GtkTreeModel * model,
         return sa->uploadedEver < sa->uploadedEver ? -1 : 1;
 
     return 0;
-}
-
-static int
-compareByDateAdded( GtkTreeModel   * model UNUSED,
-                    GtkTreeIter    * a UNUSED,
-                    GtkTreeIter    * b UNUSED,
-                    gpointer         user_data UNUSED )
-{
-    return 0; /* FIXME */
 }
 
 static int
@@ -264,11 +253,6 @@ compareByTracker( GtkTreeModel   * model,
                    tr_torrentInfo(tb)->primaryAddress );
 }
 
-/***
-****
-***/
-
-
 static void
 setSort( TrCore * core, const char * mode, gboolean isReversed  )
 {
@@ -279,8 +263,6 @@ setSort( TrCore * core, const char * mode, gboolean isReversed  )
 
     if( !strcmp( mode, "sort-by-activity" ) )
         gtk_tree_sortable_set_sort_func( sortable, col, compareByActivity, NULL, NULL );
-    else if( !strcmp( mode, "sort-by-date-added" ) )
-        gtk_tree_sortable_set_sort_func( sortable, col, compareByDateAdded, NULL, NULL );
     else if( !strcmp( mode, "sort-by-progress" ) )
         gtk_tree_sortable_set_sort_func( sortable, col, compareByProgress, NULL, NULL );
     else if( !strcmp( mode, "sort-by-state" ) )
@@ -298,7 +280,8 @@ setSort( TrCore * core, const char * mode, gboolean isReversed  )
 static void
 prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
 {
-    if( !strcmp( key, PREF_KEY_SORT_MODE ) || !strcmp( key, PREF_KEY_SORT_REVERSED ) )
+    if( !strcmp( key, PREF_KEY_SORT_MODE ) ||
+        !strcmp( key, PREF_KEY_SORT_REVERSED ) )
     {
         char * mode = pref_string_get( PREF_KEY_SORT_MODE );
         gboolean isReversed = pref_flag_get( PREF_KEY_SORT_REVERSED );
@@ -350,7 +333,7 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
                      pref_int_get( PREF_KEY_DL_LIMIT ),
                      pref_int_get( PREF_KEY_MAX_PEERS_GLOBAL ),
                      pref_int_get( PREF_KEY_MSGLEVEL ),
-                     TRUE );
+                     TRUE /* message queueing */ );
 
     /* create the model used to store torrent data */
     g_assert( ALEN( types ) == MC_ROW_COUNT );
@@ -359,7 +342,6 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
     p->model    = GTK_TREE_MODEL( store );
     p->handle   = h;
     p->nextid   = 1;
-    p->quitting = FALSE;
 }
 
 GType
@@ -446,6 +428,7 @@ doCollate( const char * in )
     casefold = g_utf8_casefold( in, end-in );
     ret = g_utf8_collate_key( casefold, -1 );
     g_free( casefold );
+
     return ret;
 }
 
@@ -483,15 +466,14 @@ tr_core_load( TrCore * self, gboolean forcePaused )
     char * path;
     tr_ctor * ctor;
 
-    TR_IS_CORE( self );
-
     path = getdownloaddir( );
 
     ctor = tr_ctorNew( tr_core_handle( self ) );
     if( forcePaused )
         tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
     tr_ctorSetDestination( ctor, TR_FALLBACK, path );
-    tr_ctorSetMaxConnectedPeers( ctor, TR_FALLBACK, pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
+    tr_ctorSetMaxConnectedPeers( ctor, TR_FALLBACK,
+                                 pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
 
     torrents = tr_loadTorrents ( tr_core_handle( self ), ctor, &count );
     for( i=0; i<count; ++i )
@@ -507,9 +489,7 @@ tr_core_load( TrCore * self, gboolean forcePaused )
 static void
 tr_core_errsig( TrCore * self, enum tr_core_err type, const char * msg )
 {
-    TrCoreClass * class;
-
-    class = g_type_class_peek( TR_CORE_TYPE );
+    TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
     g_signal_emit( self, class->errsig, 0, type, msg );
 }
 
@@ -520,10 +500,12 @@ tr_core_apply_defaults( tr_ctor * ctor )
         tr_ctorSetPaused( ctor, TR_FORCE, !pref_flag_get( PREF_KEY_START ) );
 
     if( tr_ctorGetDeleteSource( ctor, NULL ) )
-        tr_ctorSetDeleteSource( ctor, pref_flag_get( PREF_KEY_DELETE_ORIGINAL ) );
+        tr_ctorSetDeleteSource( ctor,
+                                pref_flag_get( PREF_KEY_DELETE_ORIGINAL ) );
 
     if( tr_ctorGetMaxConnectedPeers( ctor, TR_FORCE, NULL ) )
-        tr_ctorSetMaxConnectedPeers( ctor, TR_FORCE, pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
+        tr_ctorSetMaxConnectedPeers( ctor, TR_FORCE,
+                              pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
 
     if( tr_ctorGetDestination( ctor, TR_FORCE, NULL ) ) {
         char * path = pref_string_get( PREF_KEY_DIR_DEFAULT );
@@ -536,22 +518,15 @@ void
 tr_core_add_ctor( TrCore * self, tr_ctor * ctor )
 {
     TrTorrent * tor;
-    char      * errstr;
-
-    errstr = NULL;
+    char      * errstr = NULL;
 
     tr_core_apply_defaults( ctor );
-    tor = tr_torrent_new_ctor( tr_core_handle( self ), ctor, &errstr );
-    if( !tor )
-    {
+
+    if(( tor = tr_torrent_new_ctor( tr_core_handle( self ), ctor, &errstr )))
+        tr_core_add_torrent( self, tor );
+    else{ 
         tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );
         g_free( errstr );
-        errstr = NULL;
-    }
-    else
-    {
-        g_assert( !errstr );
-        tr_core_add_torrent( self, tor );
     }
 }
 
