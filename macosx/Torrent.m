@@ -708,12 +708,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) comment
 {
-    return [NSString stringWithUTF8String: fInfo->comment];
+    return fInfo->comment != NULL ? [NSString stringWithUTF8String: fInfo->comment] : @"";
 }
 
 - (NSString *) creator
 {
-    return [NSString stringWithUTF8String: fInfo->creator];
+    return fInfo->creator != NULL ? [NSString stringWithUTF8String: fInfo->creator] : @"";
 }
 
 - (NSDate *) dateCreated
