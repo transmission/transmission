@@ -594,13 +594,13 @@ void tr_torrentClose( tr_torrent * );
 
 typedef struct tr_file
 {
-    uint64_t length;                /* Length of the file, in bytes */
-    char     name[MAX_PATH_LENGTH]; /* Path to the file */
-    int8_t   priority;              /* TR_PRI_HIGH, _NORMAL, or _LOW */
-    int8_t   dnd;                   /* nonzero if the file shouldn't be downloaded */
-    int      firstPiece;            /* We need pieces [firstPiece... */
-    int      lastPiece;             /* ...lastPiece] to dl this file */
-    uint64_t offset;                /* file begins at the torrent's nth byte */
+    uint64_t   length;      /* Length of the file, in bytes */
+    char     * name;        /* Path to the file */
+    int8_t     priority;    /* TR_PRI_HIGH, _NORMAL, or _LOW */
+    int8_t     dnd;         /* nonzero if the file shouldn't be downloaded */
+    int        firstPiece;  /* We need pieces [firstPiece... */
+    int        lastPiece;   /* ...lastPiece] to dl this file */
+    uint64_t   offset;      /* file begins at the torrent's nth byte */
 }
 tr_file;
 

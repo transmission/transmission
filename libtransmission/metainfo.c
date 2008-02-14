@@ -305,6 +305,9 @@ void tr_metainfoFree( tr_info * inf )
 {
     int i, j;
 
+    for( i=0; i<inf->fileCount; ++i )
+        tr_free( inf->files[i].name );
+
     tr_free( inf->pieces );
     tr_free( inf->files );
     tr_free( inf->primaryAddress );
@@ -319,12 +322,13 @@ void tr_metainfoFree( tr_info * inf )
     memset( inf, '\0', sizeof(tr_info) );
 }
 
-static int getfile( char * buf, int size,
+static int getfile( char ** setme,
                     const char * prefix, benc_val_t * name )
 {
     benc_val_t  * dir;
     const char ** list;
     int           ii, jj;
+    char          buf[4096];
 
     if( TYPE_LIST != name->type )
     {
@@ -364,13 +368,17 @@ static int getfile( char * buf, int size,
         return TR_EINVALID;
     }
 
-    strlcat_utf8( buf, prefix, size, 0 );
+    memset( buf, 0, sizeof( buf ) );
+    strlcat_utf8( buf, prefix, sizeof(buf), 0 );
     for( ii = 0; jj > ii; ii++ )
     {
-        strlcat_utf8( buf, TR_PATH_DELIMITER_STR, size, 0 );
-        strlcat_utf8( buf, list[ii], size, TR_PATH_DELIMITER );
+        strlcat_utf8( buf, TR_PATH_DELIMITER_STR, sizeof(buf), 0 );
+        strlcat_utf8( buf, list[ii], sizeof(buf), TR_PATH_DELIMITER );
     }
     free( list );
+
+    tr_free( *setme );
+    *setme = tr_strdup( buf );
 
     return TR_OK;
 }
@@ -639,17 +647,14 @@ parseFiles( tr_info * inf, benc_val_t * name,
         inf->fileCount = files->val.l.count;
         inf->files     = calloc( inf->fileCount, sizeof( inf->files[0] ) );
 
-        if( NULL == inf->files )
-        {
+        if( !inf->files )
             return TR_EINVALID;
-        }
 
         for( ii = 0; files->val.l.count > ii; ii++ )
         {
             item = &files->val.l.vals[ii];
             path = tr_bencDictFindFirst( item, "path.utf-8", "path", NULL );
-            if( getfile( inf->files[ii].name, sizeof( inf->files[0].name ),
-                         inf->name, path ) )
+            if( getfile( &inf->files[ii].name, inf->name, path ) )
             {
                 tr_err( "%s \"path\" entry",
                         ( path ? "Invalid" : "Missing" ) );
@@ -668,18 +673,20 @@ parseFiles( tr_info * inf, benc_val_t * name,
     }
     else if( NULL != length && TYPE_INT == length->type )
     {
+        char buf[4096];
+
         /* Single-file mode */
         inf->isMultifile = 0;
         inf->fileCount = 1;
         inf->files     = calloc( 1, sizeof( inf->files[0] ) );
 
-        if( NULL == inf->files )
-        {
+        if( !inf->files )
             return TR_EINVALID;
-        }
 
-        strlcat_utf8( inf->files[0].name, name->val.s.s,
-                      sizeof( inf->files[0].name ), TR_PATH_DELIMITER );
+        memset( buf, 0, sizeof( buf ) );
+        strlcat_utf8( buf, name->val.s.s, sizeof(buf), TR_PATH_DELIMITER );
+        tr_free( inf->files[0].name );
+        inf->files[0].name = tr_strdup( buf );
 
         inf->files[0].length = length->val.i;
         inf->totalSize      += length->val.i;
