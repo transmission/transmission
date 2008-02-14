@@ -1461,6 +1461,7 @@ clientGotBlock( tr_peermsgs                * msgs,
             return 0;
         }
 
+        tr_torrentSetPieceChecked( tor, req->index, TRUE );
         fireClientHave( msgs, req->index );
     }
 
