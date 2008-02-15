@@ -32,31 +32,35 @@ struct tr_torrent;
  * @return 0 on success, TR_ERROR_ASSERT if the arguments are incorrect,
  * or TR_ERROR_IO_* otherwise.
  */
-int tr_ioRead  ( struct tr_torrent*, int index, int begin, int len, uint8_t * );
+int tr_ioRead  ( const struct tr_torrent  * tor,
+                 int                        pieceIndex,
+                 int                        offset,
+                 int                        len,
+                 uint8_t                  * setme );
 
 /**
  * Writes the block specified by the piece index, offset, and length.
  * @return 0 on success, TR_ERROR_ASSERT if the arguments are incorrect,
  * or TR_ERROR_IO_* otherwise.
  */
-tr_errno tr_ioWrite ( struct tr_torrent *, int index, int begin, int len, const uint8_t * );
+tr_errno tr_ioWrite ( struct tr_torrent  * tor,
+                      int                  pieceIndex,
+                      int                  offset,
+                      int                  len,
+                      const uint8_t      * writeme );
 
-/* hashes the specified piece and updates the completion accordingly. */
+/**
+ * returns true if the piece matches its metainfo's SHA1 checksum,
+ * false otherwise.
+ */
+int tr_ioTestPiece( const tr_torrent*, int piece );
+
+
+/**
+ * tests the specified piece and uses the results to
+ * update the torrent's "completion" and "blame" fields.
+ */
 int tr_ioHash ( tr_torrent*, int piece );
 
-/**
-***
-**/
-
-typedef void (*tr_recheck_done_cb)( tr_torrent * tor );
-
-void tr_ioRecheckAdd( tr_torrent          * tor,
-                      tr_recheck_done_cb    recheck_done_cb );
-
-void tr_ioRecheckRemove( tr_torrent * tor );
-
-/**
-***
-**/
 
 #endif

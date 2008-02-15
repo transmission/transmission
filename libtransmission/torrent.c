@@ -48,6 +48,7 @@
 #include "trcompat.h" /* for strlcpy */
 #include "trevent.h"
 #include "utils.h"
+#include "verify.h"
 
 /***
 ****
@@ -600,9 +601,9 @@ tr_torrentStat( tr_torrent * tor )
     s->percentDone = tr_cpPercentDone( tor->completion );
     s->leftUntilDone = tr_cpLeftUntilDone( tor->completion );
 
-    if( tor->recheckState == TR_RECHECK_NOW )
+    if( tor->verifyState == TR_VERIFY_NOW )
         s->status = TR_STATUS_CHECK;
-    else if( tor->recheckState == TR_RECHECK_WAIT )
+    else if( tor->verifyState == TR_VERIFY_WAIT )
         s->status = TR_STATUS_CHECK_WAIT;
     else if( !tor->isRunning )
         s->status = TR_STATUS_STOPPED;
@@ -948,7 +949,7 @@ tr_torrentStart( tr_torrent * tor )
     {
         tr_fastResumeLoad( tor, TR_FR_PROGRESS, NULL );
         tor->isRunning = 1;
-        tr_ioRecheckAdd( tor, checkAndStartCB );
+        tr_verifyAdd( tor, checkAndStartCB );
     }
 
     tr_globalUnlock( tor->handle );
@@ -969,9 +970,9 @@ tr_torrentRecheck( tr_torrent * tor )
 {
     tr_globalLock( tor->handle );
 
-    tr_ioRecheckRemove( tor );
+    tr_verifyRemove( tor );
     tr_torrentUncheck( tor );
-    tr_ioRecheckAdd( tor, torrentRecheckDoneCB );
+    tr_verifyAdd( tor, torrentRecheckDoneCB );
 
     tr_globalUnlock( tor->handle );
 }
@@ -983,7 +984,7 @@ stopTorrent( void * vtor )
     int i;
 
     tr_torrent * tor = vtor;
-    tr_ioRecheckRemove( tor );
+    tr_verifyRemove( tor );
     tr_peerMgrStopTorrent( tor->handle->peerMgr, tor->info.hash );
     tr_trackerStop( tor->tracker );
     fireActiveChange( tor, 0 );

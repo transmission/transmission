@@ -33,7 +33,8 @@ libtransmission_a_SOURCES = \
     transmission.c \
     trevent.c \
     upnp.c \
-    utils.c
+    utils.c \
+    verify.c
 
 noinst_HEADERS = \
     bencode.h \
@@ -68,7 +69,8 @@ noinst_HEADERS = \
     trcompat.h \
     trevent.h \
     upnp.h \
-    utils.h
+    utils.h \
+    verify.h
 
 
 

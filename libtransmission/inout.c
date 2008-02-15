@@ -198,13 +198,13 @@ readOrWritePiece( tr_torrent  * tor,
 }
 
 tr_errno
-tr_ioRead( tr_torrent  * tor,
-           int           pieceIndex,
-           int           begin,
-           int           len,
-           uint8_t     * buf )
+tr_ioRead( const tr_torrent  * tor,
+           int                 pieceIndex,
+           int                 begin,
+           int                 len,
+           uint8_t           * buf )
 {
-    return readOrWritePiece( tor, TR_IO_READ, pieceIndex, begin, buf, len );
+    return readOrWritePiece( (tr_torrent*)tor, TR_IO_READ, pieceIndex, begin, buf, len );
 }
 
 tr_errno
@@ -222,9 +222,9 @@ tr_ioWrite( tr_torrent     * tor,
 ****/
 
 static int
-tr_ioRecalculateHash( tr_torrent  * tor,
-                      int           pieceIndex,
-                      uint8_t     * setme )
+tr_ioRecalculateHash( const tr_torrent  * tor,
+                      int                 pieceIndex,
+                      uint8_t           * setme )
 {
     int offset;
     int bytesLeft;
@@ -256,8 +256,8 @@ tr_ioRecalculateHash( tr_torrent  * tor,
     return 0;
 }
 
-static int
-checkPiece( tr_torrent * tor, int pieceIndex )
+int
+tr_ioTestPiece( const tr_torrent * tor, int pieceIndex )
 {
     uint8_t hash[SHA_DIGEST_LENGTH];
     const int ret = tr_ioRecalculateHash( tor, pieceIndex, hash )
@@ -267,44 +267,11 @@ checkPiece( tr_torrent * tor, int pieceIndex )
     return ret;
 }
 
-static void
-checkFile( tr_torrent   * tor,
-           int            fileIndex,
-           int          * abortFlag )
-{
-    int i;
-    int nofile;
-    struct stat sb;
-    char path[MAX_PATH_LENGTH];
-    const tr_file * file = &tor->info.files[fileIndex];
-
-    tr_buildPath ( path, sizeof(path), tor->destination, file->name, NULL );
-    nofile = stat( path, &sb ) || !S_ISREG( sb.st_mode );
-
-    for( i=file->firstPiece; i<=file->lastPiece && i<tor->info.pieceCount && (!*abortFlag); ++i )
-    {
-        if( nofile )
-        {
-            tr_torrentSetHasPiece( tor, i, 0 );
-        }
-        else if( !tr_torrentIsPieceChecked( tor, i ) )
-        {
-            const int check = checkPiece( tor, i );
-            tr_torrentSetHasPiece( tor, i, !check );
-            tr_torrentSetPieceChecked( tor, i, TRUE );
-        }
-    }
-}
-
-/**
-***
-**/
-
 int
 tr_ioHash( tr_torrent * tor, int pieceIndex )
 {
     int ret;
-    const int success = !checkPiece( tor, pieceIndex );
+    const int success = !tr_ioTestPiece( tor, pieceIndex );
 
     if( success )
     {
@@ -323,148 +290,4 @@ tr_ioHash( tr_torrent * tor, int pieceIndex )
                         pieceIndex, success );
 
     return ret;
-}
-
-/**
-***
-**/
-
-struct recheck_node
-{
-    tr_torrent * torrent;
-    tr_recheck_done_cb recheck_done_cb;
-};
-
-static void
-fireCheckDone( tr_torrent          * torrent,
-               tr_recheck_done_cb    recheck_done_cb )
-{
-    if( recheck_done_cb != NULL )
-        (*recheck_done_cb)( torrent );
-}
-
-static struct recheck_node currentNode;
-
-static tr_list * recheckList = NULL;
-
-static tr_thread * recheckThread = NULL;
-
-static int stopCurrent = FALSE;
-
-static tr_lock* getRecheckLock( void )
-{
-    static tr_lock * lock = NULL;
-    if( lock == NULL )
-        lock = tr_lockNew( );
-    return lock;
-}
-
-static void
-recheckThreadFunc( void * unused UNUSED )
-{
-    for( ;; )
-    {
-        int i;
-        tr_torrent * tor;
-        struct recheck_node * node;
-
-        tr_lockLock( getRecheckLock( ) );
-        stopCurrent = FALSE;
-        node = (struct recheck_node*) recheckList ? recheckList->data : NULL;
-        if( node == NULL ) {
-            currentNode.torrent = NULL;
-            break;
-        }
-
-        currentNode = *node;
-        tor = currentNode.torrent;
-        tr_list_remove_data( &recheckList, node );
-        tr_free( node );
-        tr_lockUnlock( getRecheckLock( ) );
-
-        tor->recheckState = TR_RECHECK_NOW;
-
-        /* remove the unchecked pieces from completion... */
-        for( i=0; i<tor->info.pieceCount; ++i ) 
-            if( !tr_torrentIsPieceChecked( tor, i ) )
-                tr_cpPieceRem( tor->completion, i );
-
-        tr_inf( "Verifying some pieces of \"%s\"", tor->info.name );
-        for( i=0; i<tor->info.fileCount && !stopCurrent; ++i )
-            checkFile( tor, i, &stopCurrent );
-
-        tor->recheckState = TR_RECHECK_NONE;
-
-        if( !stopCurrent )
-        {
-            tr_fastResumeSave( tor );
-            fireCheckDone( tor, currentNode.recheck_done_cb );
-        }
-    }
-
-    recheckThread = NULL;
-    tr_lockUnlock( getRecheckLock( ) );
-}
-
-void
-tr_ioRecheckAdd( tr_torrent          * tor,
-                 tr_recheck_done_cb    recheck_done_cb )
-{
-    const int uncheckedCount = tr_torrentCountUncheckedPieces( tor );
-
-    if( !uncheckedCount )
-    {
-        /* doesn't need to be checked... */
-        recheck_done_cb( tor );
-    }
-    else
-    {
-        struct recheck_node * node;
-
-        tr_inf( "Queueing %s to verify %d local file pieces", tor->info.name, uncheckedCount );
-
-        node = tr_new( struct recheck_node, 1 );
-        node->torrent = tor;
-        node->recheck_done_cb = recheck_done_cb;
-
-        tr_lockLock( getRecheckLock( ) );
-        tor->recheckState = recheckList ? TR_RECHECK_WAIT : TR_RECHECK_NOW;
-        tr_list_append( &recheckList, node );
-        if( recheckThread == NULL )
-            recheckThread = tr_threadNew( recheckThreadFunc, NULL, "recheckThreadFunc" );
-        tr_lockUnlock( getRecheckLock( ) );
-    }
-}
-
-static int
-compareRecheckByTorrent( const void * va, const void * vb )
-{
-    const struct recheck_node * a = va;
-    const tr_torrent * b = vb;
-    return a->torrent - b;
-}
-
-void
-tr_ioRecheckRemove( tr_torrent * tor )
-{
-    tr_lock * lock = getRecheckLock( );
-    tr_lockLock( lock );
-
-    if( tor == currentNode.torrent )
-    {
-        stopCurrent = TRUE;
-        while( stopCurrent )
-        {
-            tr_lockUnlock( lock );
-            tr_wait( 100 );
-            tr_lockLock( lock );
-        }
-    }
-    else
-    {
-        tr_free( tr_list_remove( &recheckList, tor, compareRecheckByTorrent ) );
-        tor->recheckState = TR_RECHECK_NONE;
-    }
-
-    tr_lockUnlock( lock );
 }

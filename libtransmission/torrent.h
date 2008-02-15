@@ -91,11 +91,11 @@ void tr_torrentUncheck             ( tr_torrent * );
 
 typedef enum
 {
-   TR_RECHECK_NONE,
-   TR_RECHECK_WAIT,
-   TR_RECHECK_NOW
+   TR_VERIFY_NONE,
+   TR_VERIFY_WAIT,
+   TR_VERIFY_NOW
 }
-tr_recheck_state;
+tr_verify_state;
 
 struct tr_torrent
 {
@@ -156,7 +156,7 @@ struct tr_torrent
 
     uint16_t                   maxConnectedPeers;
 
-    tr_recheck_state           recheckState;
+    tr_verify_state           verifyState;
 
     time_t                     lastStatTime;
     tr_stat                    stats[2];
