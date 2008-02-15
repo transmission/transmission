@@ -172,6 +172,7 @@ tr_metainfoParse( tr_info * inf, const benc_val_t * meta_in, const char * tag )
     int i;
     benc_val_t * beInfo, * val, * val2;
     benc_val_t * meta = (benc_val_t *) meta_in;
+    char buf[4096];
 
     /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
      * from the Metainfo file. Note that the value will be a bencoded 
@@ -196,27 +197,21 @@ tr_metainfoParse( tr_info * inf, const benc_val_t * meta_in, const char * tag )
     }
     savedname( inf->torrent, sizeof( inf->torrent ), inf->hashString, tag );
 
-    /* Comment info */
+    /* comment */
+    memset( buf, '\0', sizeof( buf ) );
     val = tr_bencDictFindFirst( meta, "comment.utf-8", "comment", NULL );
-    if( NULL != val && TYPE_STR == val->type )
-    {
-        char buf[4096];
-        memset( buf, 0, sizeof( buf ) );
+    if( val && val->type == TYPE_STR )
         strlcat_utf8( buf, val->val.s.s, sizeof( buf ), 0 );
-        tr_free( inf->comment );
-        inf->comment = tr_strdup( buf );
-    }
+    tr_free( inf->comment );
+    inf->comment = tr_strdup( buf );
     
-    /* Creator info */
+    /* creator */
+    memset( buf, '\0', sizeof( buf ) );
     val = tr_bencDictFindFirst( meta, "created by.utf-8", "created by", NULL );
-    if( NULL != val && TYPE_STR == val->type )
-    {
-        char buf[4096];
-        memset( buf, 0, sizeof( buf ) );
+    if( val && val->type == TYPE_STR )
         strlcat_utf8( buf, val->val.s.s, sizeof( buf ), 0 );
-        tr_free( inf->creator );
-        inf->creator = tr_strdup( buf );
-    }
+    tr_free( inf->creator );
+    inf->creator = tr_strdup( buf );
     
     /* Date created */
     inf->dateCreated = 0;
