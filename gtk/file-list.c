@@ -357,30 +357,6 @@ enabled_toggled (GtkCellRendererToggle  * cell UNUSED,
   gtk_tree_path_free( path );
 }
 
-static void
-torrentDestroyed( gpointer gdata, GObject * deadTorrent UNUSED )
-{
-    FileData * data = gdata;
-    data->gtor = NULL;
-    file_list_set_torrent( data->top, NULL );
-}
-
-static void
-freeData( gpointer gdata )
-{
-    FileData * data = gdata;
-
-    if( data->timeout_tag ) {
-        g_source_remove( data->timeout_tag );
-        data->timeout_tag = 0;
-    }
-
-    if( data->gtor != NULL )
-        g_object_weak_unref( G_OBJECT( data->gtor ), torrentDestroyed, data );
-
-    g_free( data );
-}
-
 static gboolean
 refreshModel( gpointer gdata )
 {
@@ -405,6 +381,17 @@ refreshModel( gpointer gdata )
     return TRUE;
 }
 
+static void
+clearData( FileData * data )
+{
+    data->gtor = NULL;
+
+    if( data->timeout_tag ) {
+        g_source_remove( data->timeout_tag );
+        data->timeout_tag = 0;
+    }
+}
+
 void
 file_list_set_torrent( GtkWidget * w, TrTorrent * gtor )
 {
@@ -412,6 +399,9 @@ file_list_set_torrent( GtkWidget * w, TrTorrent * gtor )
     FileData            * data;
 
     data = g_object_get_data( G_OBJECT( w ), "file-data" );
+
+    /* unset the old fields */
+    clearData( data );
 
     /* instantiate the model */
     store = gtk_tree_store_new ( N_FILE_COLS,
@@ -427,10 +417,6 @@ file_list_set_torrent( GtkWidget * w, TrTorrent * gtor )
     data->model = GTK_TREE_MODEL( store );
     data->gtor = gtor;
 
-    if( data->timeout_tag ) {
-        g_source_remove( data->timeout_tag );
-        data->timeout_tag = 0;
-    }
 
     /* populate the model */
     if( gtor )
@@ -438,7 +424,6 @@ file_list_set_torrent( GtkWidget * w, TrTorrent * gtor )
         int i;
         const tr_info * inf = tr_torrent_info( gtor );
         tr_torrent * tor = tr_torrent_handle( gtor );
-        g_object_weak_ref( G_OBJECT( gtor ), torrentDestroyed, data );
 
         for( i=0; inf && i<inf->fileCount; ++i )
         {
@@ -454,6 +439,14 @@ file_list_set_torrent( GtkWidget * w, TrTorrent * gtor )
 
     gtk_tree_view_set_model( GTK_TREE_VIEW( data->view ), GTK_TREE_MODEL( store ) );
     gtk_tree_view_expand_all( GTK_TREE_VIEW( data->view ) );
+}
+
+static void
+freeData( gpointer gdata )
+{
+    FileData * data = gdata;
+    clearData( data );
+    g_free( data );
 }
 
 GtkWidget *
