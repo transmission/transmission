@@ -221,7 +221,7 @@ tr_ioWrite( tr_torrent     * tor,
 *****
 ****/
 
-static int
+static tr_errno
 tr_ioRecalculateHash( const tr_torrent  * tor,
                       int                 pieceIndex,
                       uint8_t           * setme )
@@ -244,7 +244,7 @@ tr_ioRecalculateHash( const tr_torrent  * tor,
     while( bytesLeft > 0 )
     {
         const int bytesThisPass = MIN( bytesLeft, (int)sizeof(buf) );
-        int err = tr_ioRead( tor, pieceIndex, offset, bytesThisPass, buf );
+        tr_errno err = tr_ioRead( tor, pieceIndex, offset, bytesThisPass, buf );
         if( err )
             return err;
         SHA1_Update( &sha, buf, bytesThisPass );
@@ -256,38 +256,19 @@ tr_ioRecalculateHash( const tr_torrent  * tor,
     return 0;
 }
 
-int
+tr_errno
 tr_ioTestPiece( const tr_torrent * tor, int pieceIndex )
 {
+    int err;
     uint8_t hash[SHA_DIGEST_LENGTH];
-    const int ret = tr_ioRecalculateHash( tor, pieceIndex, hash )
-        || memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH );
+
+    err  = tr_ioRecalculateHash( tor, pieceIndex, hash );
+
+    if( !err && memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH ) )
+        err = TR_ERROR;
+
     tr_dbg ("torrent [%s] piece %d hash check: %s",
-            tor->info.name, pieceIndex, ( ret ? "FAILED" : "OK" ));
-    return ret;
-}
+            tor->info.name, pieceIndex, ( err ? "FAILED" : "OK" ));
 
-int
-tr_ioHash( tr_torrent * tor, int pieceIndex )
-{
-    int ret;
-    const int success = !tr_ioTestPiece( tor, pieceIndex );
-
-    if( success )
-    {
-        tr_dbg( "Piece %d hash OK", pieceIndex );
-        tr_cpPieceAdd( tor->completion, pieceIndex );
-        ret = TR_OK;
-    }
-    else
-    {
-        tr_err( "Piece %d hash FAILED", pieceIndex );
-        tr_cpPieceRem( tor->completion, pieceIndex );
-        ret = TR_ERROR;
-    }
-
-    tr_peerMgrSetBlame( tor->handle->peerMgr, tor->info.hash,
-                        pieceIndex, success );
-
-    return ret;
+    return err;
 }

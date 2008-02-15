@@ -50,17 +50,11 @@ tr_errno tr_ioWrite ( struct tr_torrent  * tor,
                       const uint8_t      * writeme );
 
 /**
- * returns true if the piece matches its metainfo's SHA1 checksum,
- * false otherwise.
+ * returns 0 if the piece matches its metainfo's SHA1 checksum,
+ * or TR_ERROR_IO_* if there was a problem reading the piece,
+ * or TR_ERROR if the checksum didn't match.
  */
-int tr_ioTestPiece( const tr_torrent*, int piece );
-
-
-/**
- * tests the specified piece and uses the results to
- * update the torrent's "completion" and "blame" fields.
- */
-int tr_ioHash ( tr_torrent*, int piece );
+tr_errno tr_ioTestPiece( const tr_torrent*, int piece );
 
 
 #endif

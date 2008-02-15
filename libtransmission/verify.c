@@ -90,8 +90,23 @@ checkFile( tr_torrent   * tor,
         }
         else if( !tr_torrentIsPieceChecked( tor, i ) )
         {
-            const int check = tr_ioTestPiece( tor, i );
-            tr_torrentSetHasPiece( tor, i, !check );
+            const tr_errno err = tr_ioTestPiece( tor, i );
+
+            if( !err ) /* yay */
+            {
+                tr_torrentSetHasPiece( tor, i, TRUE );
+            }
+            else
+            {
+                /* if we were wrong about it being complete,
+                 * reset and start again.  if we were right about
+                 * it being incomplete, do nothing -- we don't
+                 * want to lose blocks in those incomplete pieces */
+
+                if( tr_cpPieceIsComplete( tor->completion, i ) )
+                    tr_torrentSetHasPiece( tor, i, FALSE );
+            }
+               
             tr_torrentSetPieceChecked( tor, i, TRUE );
         }
     }

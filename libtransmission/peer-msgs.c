@@ -1455,14 +1455,16 @@ clientGotBlock( tr_peermsgs                * msgs,
 
     if( tr_cpPieceIsComplete( tor->completion, req->index ) )
     {
-        if( tr_ioHash( tor, req->index ) )
-        {
-            gotBadPiece( msgs, req->index );
-            return 0;
-        }
+        const tr_errno err = tr_ioTestPiece( tor, req->index );
 
+        tr_torrentSetHasPiece( tor, req->index, !err );
         tr_torrentSetPieceChecked( tor, req->index, TRUE );
-        fireClientHave( msgs, req->index );
+        tr_peerMgrSetBlame( tor->handle->peerMgr, tor->info.hash, req->index, !err );
+
+        if( !err )
+            fireClientHave( msgs, req->index );
+        else
+            gotBadPiece( msgs, req->index );
     }
 
     return 0;
