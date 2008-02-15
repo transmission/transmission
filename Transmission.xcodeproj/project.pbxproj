@@ -156,6 +156,7 @@
 		A2BF07910B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */; };
 		A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */; };
 		A2D0E0490A54A97C003C72CF /* Bandwidth.png in Resources */ = {isa = PBXBuildFile; fileRef = A2D0E0480A54A97C003C72CF /* Bandwidth.png */; };
+		A2D22A130D65EEE700007D5F /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D22A100D65EED100007D5F /* verify.c */; };
 		A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36270CBC674900C2ED41 /* InfoActivity.png */; };
 		A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36280CBC674900C2ED41 /* InfoFiles.png */; };
 		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
@@ -577,6 +578,8 @@
 		A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SpeedLimitToTurtleIconTransformer.m; path = macosx/SpeedLimitToTurtleIconTransformer.m; sourceTree = "<group>"; };
 		A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ButtonToolbarItem.m; path = macosx/ButtonToolbarItem.m; sourceTree = "<group>"; };
 		A2D0E0480A54A97C003C72CF /* Bandwidth.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Bandwidth.png; path = macosx/Images/Bandwidth.png; sourceTree = "<group>"; };
+		A2D22A100D65EED100007D5F /* verify.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = verify.c; path = libtransmission/verify.c; sourceTree = "<group>"; };
+		A2D22A110D65EED100007D5F /* verify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verify.h; path = libtransmission/verify.h; sourceTree = "<group>"; };
 		A2D688A70CB4986A009BEC3A /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2D6891B0CB4990E009BEC3A /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2DA36270CBC674900C2ED41 /* InfoActivity.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoActivity.png; path = macosx/Images/InfoActivity.png; sourceTree = "<group>"; };
@@ -1073,6 +1076,8 @@
 				BEFC1E260C07861A00B0BB3C /* trcompat.h */,
 				A25D2CBA0CF4C7190096A262 /* stats.h */,
 				A25D2CBB0CF4C7190096A262 /* stats.c */,
+				A2D22A110D65EED100007D5F /* verify.h */,
+				A2D22A100D65EED100007D5F /* verify.c */,
 			);
 			name = libtransmission;
 			sourceTree = "<group>";
@@ -1732,6 +1737,7 @@
 				4D36BA790CA2F00800A63CA5 /* peer-msgs.c in Sources */,
 				A25D2CBD0CF4C73E0096A262 /* stats.c in Sources */,
 				A201527E0D1C270F0081714F /* torrent-ctor.c in Sources */,
+				A2D22A130D65EEE700007D5F /* verify.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
