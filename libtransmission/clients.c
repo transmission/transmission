@@ -252,9 +252,7 @@ char * tr_clientForId( const uint8_t * id )
         }
         else if( !memcmp( &id[1], "NX", 2 ) )
         {
-            tr_asprintf( &ret, "Net Transport %d.%c.%c",
-                      charToInt( id[3] ) * 10 + charToInt( id[4] ),
-                      id[5], id[6] );
+            tr_asprintf( &ret, "Net Transport" );
         }
         else if( !memcmp( &id[1], "LW", 2 ) )
         {
