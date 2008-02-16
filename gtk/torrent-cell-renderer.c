@@ -403,6 +403,7 @@ drawRegularBar( TorrentCellRenderer * self,
                 GtkWidget           * widget,
                 const GdkRectangle  * area )
 {
+    const gboolean rtl = gtk_widget_get_direction( widget ) == GTK_TEXT_DIR_RTL;
 #if 1
     const double verified = torStat->haveValid / (double)info->totalSize;
     const double unverified = torStat->haveUnchecked / (double)info->totalSize;
@@ -429,7 +430,7 @@ drawRegularBar( TorrentCellRenderer * self,
     const gboolean isChecking = torStat->status == TR_STATUS_CHECK
                              || torStat->status == TR_STATUS_CHECK_WAIT;
 
-    int x = area->x;
+    int x = rtl ? area->x + area->width : area->x;
     int w = 0;
     GdkGC * gc = gdk_gc_new( drawable );
     GdkRectangle rect = *area;
@@ -442,43 +443,43 @@ drawRegularBar( TorrentCellRenderer * self,
             colors = self->priv->color_verified;
         else
             colors = self->priv->color_seeding;
-        rect.x = x;
         rect.width = w;
+        rect.x = rtl ? x-w : x;
         fillRect( self, gc, drawable, &rect, colors, 2 );
-        x += w;
+        x += rtl ? -w : w;
     }
 
     if(( w = unverifiedWidth )) {
         const GdkColor * colors = isActive ? self->priv->color_verifying
                                            : self->priv->color_paused;
-        rect.x = x;
         rect.width = w;
+        rect.x = rtl ? x-w : x;
         fillRect( self, gc, drawable, &rect, colors, 2 );
-        x += w;
+        x += rtl ? -w : w;
     }
 
     if(( w = missingWidth )) {
-        rect.x = x;
         rect.width = w;
+        rect.x = rtl ? x-w : x;
         fillRect( self, gc, drawable, &rect, self->priv->color_missing, 2 );
-        x += w;
+        x += rtl ? -w : w;
     }
 
     if(( w = unwantedWidth )) {
-        rect.x = x;
         rect.width = w;
+        rect.x = rtl ? x-w : x;
         fillRect( self, gc, drawable, &rect, self->priv->color_unwanted, 2 );
-        x += w;
+        x += rtl ? -w : w;
     }
 
     if(( w = unavailableWidth )) {
         const GdkColor * colors = isActive && self->priv->show_unavailable
                                 ? self->priv->color_unavailable
                                 : self->priv->color_missing;
-        rect.x = x;
         rect.width = w;
+        rect.x = rtl ? x-w : x;
         fillRect( self, gc, drawable, &rect, colors, 2 );
-        x += w;
+        x += rtl ? -w : w;
     }
 
     if( isChecking ) {
