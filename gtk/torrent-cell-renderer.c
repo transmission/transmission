@@ -20,6 +20,8 @@
 #include "tr_torrent.h"
 #include "util.h"
 
+/* #define TEST_RTL */
+
 enum
 {
     P_TORRENT = 1,
@@ -515,6 +517,12 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
                               GtkCellRendererState   flags)
 {
     TorrentCellRenderer * self = TORRENT_CELL_RENDERER( cell );
+
+#ifdef TEST_RTL
+    GtkTextDirection real_dir = gtk_widget_get_direction( widget );
+    gtk_widget_set_direction( widget, GTK_TEXT_DIR_RTL );
+#endif
+
     if( self && self->priv->tor )
     {
         const tr_torrent * tor = self->priv->tor;
@@ -649,6 +657,10 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
             g_free( statusString );
         }
     }
+
+#ifdef TEST_RTL
+    gtk_widget_set_direction( widget, real_dir );
+#endif
 }
 
 static void

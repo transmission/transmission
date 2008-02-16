@@ -63,7 +63,7 @@ release_gobject_array (gpointer data)
 }
 
 static gboolean
-refresh_pieces (GtkWidget * da, GdkEventExpose * event UNUSED, gpointer gtor)
+refresh_pieces( GtkWidget * da, GdkEventExpose * event UNUSED, gpointer gtor )
 {
   tr_torrent * tor = tr_torrent_handle( TR_TORRENT(gtor) );
   const tr_info * info = tr_torrent_info( TR_TORRENT(gtor) );
@@ -79,6 +79,8 @@ refresh_pieces (GtkWidget * da, GdkEventExpose * event UNUSED, gpointer gtor)
   const double piece_h = grid_bounds.height / (double)n_rows;
   const int piece_w_int = (int) (piece_w + 1); /* pad for roundoff */
   const int piece_h_int = (int) (piece_h + 1); /* pad for roundoff */
+  const gboolean rtl = gtk_widget_get_direction( da ) == GTK_TEXT_DIR_RTL;
+
   guint8 * prev_color = NULL;
   gboolean first_time = FALSE;
 
@@ -157,10 +159,16 @@ refresh_pieces (GtkWidget * da, GdkEventExpose * event UNUSED, gpointer gtor)
   i = 0; 
   for (y=0; y<n_rows; ++y) {
     for (x=0; x<n_cols; ++x) {
-      const int draw_x = grid_bounds.x + (int)(x * piece_w);
-      const int draw_y = grid_bounds.y + (int)(y * piece_h);
+      int draw_x = grid_bounds.x + (int)(x * piece_w);
+      int draw_y = grid_bounds.y + (int)(y * piece_h);
       int color = BLACK;
       int border = BLACK;
+
+      if( rtl )
+          draw_x = grid_bounds.x + grid_bounds.width - (int)((x+1) * piece_w);
+      else
+          draw_x = grid_bounds.x + (int)(x * piece_w);
+      draw_y = grid_bounds.y + (int)(y * piece_h);
 
       if (i < n_cells)
       {
