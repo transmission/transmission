@@ -10,28 +10,16 @@
  * $Id: inout.c 4886 2008-02-01 01:54:04Z charles $
  */
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
-
-#include <openssl/sha.h>
 
 #include "transmission.h"
 #include "completion.h"
-#include "crypto.h"
-#include "fastresume.h"
-#include "fdlimit.h"
+#include "fastresume.h" /* tr_fastResumeSave() */
 #include "inout.h"
 #include "list.h"
 #include "platform.h"
-#include "peer-mgr.h"
-#include "stats.h"
 #include "torrent.h"
-#include "utils.h"
+#include "utils.h" /* tr_buildPath */
 #include "verify.h"
 
 /**
@@ -106,9 +94,9 @@ checkFile( tr_torrent   * tor,
                 if( tr_cpPieceIsComplete( tor->completion, i ) )
                     tr_torrentSetHasPiece( tor, i, FALSE );
             }
-               
-            tr_torrentSetPieceChecked( tor, i, TRUE );
         }
+
+        tr_torrentSetPieceChecked( tor, i, TRUE );
     }
 }
 
