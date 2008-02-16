@@ -175,6 +175,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         free(fPreviousFinishedPieces);
     [fFinishedPiecesDate release];
     
+    [fNameString release];
     [fHashString release];
     
     [fDownloadFolder release];
@@ -660,7 +661,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) name
 {
-    return [NSString stringWithUTF8String: fInfo->name];
+    return fNameString;
 }
 
 - (BOOL) folder
@@ -708,12 +709,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) comment
 {
-    return fInfo->comment != NULL ? [NSString stringWithUTF8String: fInfo->comment] : @"";
+    return [NSString stringWithUTF8String: fInfo->comment];
 }
 
 - (NSString *) creator
 {
-    return fInfo->creator != NULL ? [NSString stringWithUTF8String: fInfo->creator] : @"";
+    return [NSString stringWithUTF8String: fInfo->creator];
 }
 
 - (NSDate *) dateCreated
@@ -1085,19 +1086,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) remainingTimeString
 {
-    switch (fStat->status)
-    {
-        case TR_STATUS_DOWNLOAD:
-            return [self eta] >= 0 ? [self etaString: [self eta]] : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
-        
-        case TR_STATUS_SEED:
-        case TR_STATUS_DONE:
-            return [NSLocalizedString(@"Ratio: ", "Torrent -> status string") stringByAppendingString:
-                                                                            [NSString stringForRatio: [self ratio]]];
-        
-        default:
-            return [self shortStatusString];
-    }
+    if (![self isActive] || ([self isSeeding]
+        && !(fRatioSetting == NSOnState || (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]))))
+        return [self shortStatusString];
+    
+    int eta = fStat->status == TR_STATUS_DOWNLOAD ? [self eta] : [self etaRatio];
+    return eta >= 0 ? [self etaString: eta] : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
 }
 
 - (NSString *) stateString
@@ -1574,6 +1568,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     fInfo = tr_torrentInfo(fHandle);
     
+    fNameString = [[NSString alloc] initWithUTF8String: fInfo->name];
     fHashString = [[NSString alloc] initWithUTF8String: fInfo->hashString];
     
     fDateAdded = dateAdded ? [dateAdded retain] : [[NSDate alloc] init];
@@ -1712,7 +1707,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         case TR_CP_DONE:
         case TR_CP_COMPLETE:
             canMove = YES;
-        
+            
             //move file from incomplete folder to download folder
             if (fUseIncompleteFolder && ![[self downloadFolder] isEqualToString: fDownloadFolder]
                 && (canMove = [self alertForMoveFolderAvailable]))
