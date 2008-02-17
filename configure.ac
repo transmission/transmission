@@ -220,9 +220,15 @@ AC_ARG_ENABLE([daemon],
 AM_CONDITIONAL([BUILD_DAEMON],[test "x$build_daemon" = "xyes"])
 
 
-AC_DEFINE([HAVE_BEOS],[test "x$have_beos" = "xyes"])
-AC_DEFINE([HAVE_DARWIN],[test "x$have_darwin" = "xyes"])
-AC_DEFINE([HAVE_WINDOWS],[test "x$have_msw" = "xyes"])
+if test "x$have_beos" = "xyes"; then
+    AC_DEFINE([HAVE_BEOS], 1)
+fi
+if test "x$have_darwin" = "xyes"; then
+    AC_DEFINE([HAVE_DARWIN], 1)
+fi
+if test "x$have_msw" = "xyes"; then
+    AC_DEFINE([HAVE_MSW], 1)
+fi
 
 
 dnl ----------------------------------------------------------------------------
