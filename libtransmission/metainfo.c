@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <assert.h>
+#include <ctype.h> /* isspace */
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,6 +39,7 @@
 #include "crypto.h" /* tr_sha1 */
 #include "metainfo.h"
 #include "platform.h"
+#include "trcompat.h" /* strlcpy */
 #include "utils.h"
 
 
@@ -494,9 +496,13 @@ static int getannounce( tr_info * inf, benc_val_t * meta )
 
     if( !inf->trackerTiers )
     {
+        char buf[4096], *pch;
+        strlcpy( buf, val->val.s.s, sizeof( buf ) );
+        pch = buf;
+        while( isspace( *pch ) )
+            ++pch;
 
-        if( tr_httpParseUrl( val->val.s.s, val->val.s.i,
-                             &address, &port, &announce ) )
+        if( tr_httpParseUrl( pch, -1, &address, &port, &announce ) )
         {
             tr_err( "Invalid announce URL (%s)", val->val.s.s );
             return TR_EINVALID;
