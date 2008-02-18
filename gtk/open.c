@@ -40,7 +40,6 @@ deleteOldTorrent( struct OpenData * data )
 
         tor = tr_torrent_handle( data->gtor );
         tr_torrentRemoveSaved( tor );
-        tr_torrentClose( tor );
 
         g_object_unref( G_OBJECT( data->gtor ) );
         data->gtor = NULL;
