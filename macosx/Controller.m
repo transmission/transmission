@@ -2486,9 +2486,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                 : NSLocalizedString(@"No Group", "Group table row");
         }
         else if ([ident isEqualToString: @"UL Image"])
-            return [NSImage imageNamed: @"UpArrowTemplate.png"];
+            return [NSImage imageNamed: @"UpArrowGroupTemplate.png"];
         else if ([ident isEqualToString: @"DL Image"])
-            return [NSImage imageNamed: @"DownArrowTemplate.png"];
+            return [NSImage imageNamed: @"DownArrowGroupTemplate.png"];
         else
         {
             BOOL upload = [ident isEqualToString: @"UL"];

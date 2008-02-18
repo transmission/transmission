@@ -96,6 +96,8 @@
 		A23F4FF20D1D98AD002FCB97 /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23F4FF00D1D98AD002FCB97 /* PrefsWindow.xib */; };
 		A23F50020D1D99D7002FCB97 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23F50000D1D99D7002FCB97 /* MainMenu.xib */; };
 		A241528B0C0261B8007DD3B4 /* Globe.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FB06950BFF484A0095564D /* Globe.png */; };
+		A245030C0D6A1FB000B49D00 /* UpArrowGroupTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A245030B0D6A1FB000B49D00 /* UpArrowGroupTemplate.png */; };
+		A245030E0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A245030D0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png */; };
 		A24621410C769D0900088E81 /* trevent.h in Headers */ = {isa = PBXBuildFile; fileRef = A24621350C769CF400088E81 /* trevent.h */; };
 		A24621420C769D0900088E81 /* trevent.c in Sources */ = {isa = PBXBuildFile; fileRef = A24621360C769CF400088E81 /* trevent.c */; };
 		A24872B60C9B6BB9000F5B92 /* Advanced.png in Resources */ = {isa = PBXBuildFile; fileRef = A24872B50C9B6BB9000F5B92 /* Advanced.png */; };
@@ -473,6 +475,8 @@
 		A2399CCC0CD3852300225B2B /* NSApplicationAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSApplicationAdditions.m; path = macosx/NSApplicationAdditions.m; sourceTree = "<group>"; };
 		A23F4FF10D1D98AD002FCB97 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = macosx/English.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A23F50010D1D99D7002FCB97 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = macosx/English.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		A245030B0D6A1FB000B49D00 /* UpArrowGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpArrowGroupTemplate.png; path = macosx/Images/UpArrowGroupTemplate.png; sourceTree = "<group>"; };
+		A245030D0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownArrowGroupTemplate.png; path = macosx/Images/DownArrowGroupTemplate.png; sourceTree = "<group>"; };
 		A24621350C769CF400088E81 /* trevent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trevent.h; path = libtransmission/trevent.h; sourceTree = "<group>"; };
 		A24621360C769CF400088E81 /* trevent.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = trevent.c; path = libtransmission/trevent.c; sourceTree = "<group>"; };
 		A24872B50C9B6BB9000F5B92 /* Advanced.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Advanced.png; path = macosx/Images/Advanced.png; sourceTree = "<group>"; };
@@ -921,6 +925,8 @@
 				A2FB06950BFF484A0095564D /* Globe.png */,
 				A261A8250C6A0D68003BAFDA /* Error.png */,
 				A2F1511F0CD438BA001F3B0E /* Lock.png */,
+				A245030B0D6A1FB000B49D00 /* UpArrowGroupTemplate.png */,
+				A245030D0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png */,
 				A29AF4F80D01BAEB00D097EC /* UpArrowTemplate.png */,
 				A29AF4F60D01BADC00D097EC /* DownArrowTemplate.png */,
 				A2F41DAA0D0B916B006CE378 /* YingYangTemplate.png */,
@@ -1652,6 +1658,8 @@
 				A2623B4E0D3DC6DF0045D19A /* ActionHover.png in Resources */,
 				A24B65600D3F30870079EA4D /* QuitBadge.png in Resources */,
 				A2BB67790D5BA74600AB0618 /* OpenWeb.png in Resources */,
+				A245030C0D6A1FB000B49D00 /* UpArrowGroupTemplate.png in Resources */,
+				A245030E0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

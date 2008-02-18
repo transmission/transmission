@@ -61,7 +61,7 @@
         
         fTorrentCell = [[TorrentCell alloc] init];
         if (![NSApp isOnLeopardOrBetter])
-            [[self tableColumnWithIdentifier: @"Torrent"] setDataCell: fTorrentCell];
+            [[self tableColumnWithIdentifier: @"Group"] setDataCell: fTorrentCell];
         
         NSData * groupData = [fDefaults dataForKey: @"CollapsedGroups"];
         if (groupData)
@@ -134,27 +134,37 @@
 
 - (NSCell *) outlineView: (NSOutlineView *) outlineView dataCellForTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
-    return !tableColumn && [item isKindOfClass: [Torrent class]] ? fTorrentCell : nil;
+    BOOL group = ![item isKindOfClass: [Torrent class]];
+    if (!tableColumn)
+        return !group ? fTorrentCell : nil;
+    else
+        return group ? [tableColumn dataCellForRow: [self rowForItem: item]] : nil;
 }
 
 - (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn
     item: (id) item
 {
-    if (![item isKindOfClass: [Torrent class]] || tableColumn)
-        return;
-    
-    [cell setRepresentedObject: item];
-    
-    int row = [self rowForItem: item];
-    [cell setControlHover: row == fMouseControlRow];
-    [cell setRevealHover: row == fMouseRevealRow];
-    [cell setActionHover: row == fMouseActionRow];
-    [cell setActionPushed: row == fActionPushedRow];
+    if ([item isKindOfClass: [Torrent class]])
+    {
+        [cell setRepresentedObject: item];
+        
+        int row = [self rowForItem: item];
+        [cell setControlHover: row == fMouseControlRow];
+        [cell setRevealHover: row == fMouseRevealRow];
+        [cell setActionHover: row == fMouseActionRow];
+        [cell setActionPushed: row == fActionPushedRow];
+    }
+    else
+    {
+        if (([[tableColumn identifier] isEqualToString: @"UL Image"] || [[tableColumn identifier] isEqualToString: @"DL Image"])
+            && [NSApp isOnLeopardOrBetter])
+            [[cell image] setTemplate: [cell backgroundStyle] == NSBackgroundStyleLowered]; //ensure white only when selected
+    }
 }
 
 - (NSRect) frameOfCellAtColumn: (NSInteger) column row: (NSInteger) row
 {
-    if ([[self itemAtRow: row] isKindOfClass: [Torrent class]])
+    if (column == -1 || (![NSApp isOnLeopardOrBetter] && [[self itemAtRow: row] isKindOfClass: [Torrent class]]))
         return [self rectOfRow: row];
     else
         return [super frameOfCellAtColumn: column row: row];
@@ -185,7 +195,7 @@
         
         NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: row] forKey: @"Row"];
         TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: -1 row: row];
-        [cell addTrackingAreasForView: self inRect: [self frameOfCellAtColumn: 0 row: row] withUserInfo: userInfo
+        [cell addTrackingAreasForView: self inRect: [self rectOfRow: row] withUserInfo: userInfo
                 mouseLocation: mouseLocation];
     }
 }
@@ -456,7 +466,7 @@
     [fActionMenu appendItemsFromMenu: fileMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range] atBottom: YES];
     
     //place menu below button
-    NSRect rect = [fTorrentCell iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]];
+    NSRect rect = [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
     NSPoint location = rect.origin;
     location.y += rect.size.height + 5.0;
     location = [self convertPoint: location toView: nil];
@@ -654,7 +664,7 @@
     if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]])
         return NO;
     
-    return NSPointInRect(point, [fTorrentCell controlButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    return NSPointInRect(point, [fTorrentCell controlButtonRectForBounds: [self rectOfRow: row]]);
 }
 
 - (BOOL) pointInRevealRect: (NSPoint) point
@@ -663,7 +673,7 @@
     if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]])
         return NO;
     
-    return NSPointInRect(point, [fTorrentCell revealButtonRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    return NSPointInRect(point, [fTorrentCell revealButtonRectForBounds: [self rectOfRow: row]]);
 }
 
 - (BOOL) pointInActionRect: (NSPoint) point
@@ -672,7 +682,7 @@
     if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]])
         return NO;
     
-    return NSPointInRect(point, [fTorrentCell iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    return NSPointInRect(point, [fTorrentCell iconRectForBounds: [self rectOfRow: row]]);
 }
 
 - (BOOL) pointInProgressRect: (NSPoint) point
@@ -689,7 +699,7 @@
         cell = fTorrentCell;
         [cell setRepresentedObject: [self itemAtRow: row]];
     }
-    return NSPointInRect(point, [cell progressRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    return NSPointInRect(point, [cell progressRectForBounds: [self rectOfRow: row]]);
 }
 
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point
@@ -706,7 +716,7 @@
         cell = fTorrentCell;
         [cell setRepresentedObject: [self itemAtRow: row]];
     }
-    return NSPointInRect(point, [cell minimalStatusRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+    return NSPointInRect(point, [cell minimalStatusRectForBounds: [self rectOfRow: row]]);
 }
 
 - (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files
