@@ -122,6 +122,9 @@
 /* Define to 1 if you have the `strsep' function. */
 #define _EVENT_HAVE_STRSEP 1
 
+/* Define to 1 if you have the `strtoll' function. */
+#define HAVE_STRTOLL 1
+
 /* Define to 1 if you have the `strtok_r' function. */
 #define _EVENT_HAVE_STRTOK_R 1
 
