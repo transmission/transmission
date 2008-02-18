@@ -2478,8 +2478,29 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     if (![item isKindOfClass: [Torrent class]])
     {
-        int group = [[item objectForKey: @"Group"] intValue];
-        return group != -1 ? [[GroupsWindowController groups] nameForIndex: group] : NSLocalizedString(@"No Group", "Group table row");
+        NSString * ident = [tableColumn identifier];
+        if ([ident isEqualToString: @"Group"])
+        {
+            int group = [[item objectForKey: @"Group"] intValue];
+            return group != -1 ? [[GroupsWindowController groups] nameForIndex: group]
+                                : NSLocalizedString(@"No Group", "Group table row");
+        }
+        else if ([ident isEqualToString: @"UL Image"])
+            return [NSImage imageNamed: @"UpArrowTemplate.png"];
+        else if ([ident isEqualToString: @"DL Image"])
+            return [NSImage imageNamed: @"DownArrowTemplate.png"];
+        else
+        {
+            BOOL upload = [ident isEqualToString: @"UL"];
+            
+            float rate = 0.0;
+            NSEnumerator * enumerator = [[item objectForKey: @"Torrents"] objectEnumerator];
+            Torrent * torrent;
+            while ((torrent = [enumerator nextObject]))
+                rate += upload ? [torrent uploadRate] : [torrent downloadRate];
+            
+            return [NSString stringForSpeed: rate];
+        }
     }
     else
         return [item hashString];

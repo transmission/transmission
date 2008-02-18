@@ -134,15 +134,13 @@
 
 - (NSCell *) outlineView: (NSOutlineView *) outlineView dataCellForTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
-    if (!tableColumn)
-        return nil;
-    return [item isKindOfClass: [Torrent class]] ? fTorrentCell : nil;
+    return !tableColumn && [item isKindOfClass: [Torrent class]] ? fTorrentCell : nil;
 }
 
 - (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn
     item: (id) item
 {
-    if (![item isKindOfClass: [Torrent class]])
+    if (![item isKindOfClass: [Torrent class]] || tableColumn)
         return;
     
     [cell setRepresentedObject: item];
@@ -156,21 +154,16 @@
 
 - (NSRect) frameOfCellAtColumn: (NSInteger) column row: (NSInteger) row
 {
-    NSRect rect = [super frameOfCellAtColumn: column row: row];
-    
     if ([[self itemAtRow: row] isKindOfClass: [Torrent class]])
-    {
-        rect.size.width += rect.origin.x;
-        rect.origin.x = 0.0;
-    }
-    
-    return rect;
+        return [self rectOfRow: row];
+    else
+        return [super frameOfCellAtColumn: column row: row];
 }
 
 - (NSString *) outlineView: (NSOutlineView *) outlineView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
     return [item isKindOfClass: [Torrent class]] ? [item name]
-            : [[self preparedCellAtColumn: 0 row: [self rowForItem: item]] stringValue];
+            : [[self preparedCellAtColumn: -1 row: [self rowForItem: item]] stringValue];
 }
 
 - (void) updateTrackingAreas
@@ -191,7 +184,7 @@
             continue;
         
         NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: row] forKey: @"Row"];
-        TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: 0 row: row];
+        TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: -1 row: row];
         [cell addTrackingAreasForView: self inRect: [self frameOfCellAtColumn: 0 row: row] withUserInfo: userInfo
                 mouseLocation: mouseLocation];
     }
@@ -690,7 +683,7 @@
     
     TorrentCell * cell;
     if ([NSApp isOnLeopardOrBetter])
-        cell = (TorrentCell *)[self preparedCellAtColumn: 0 row: row];
+        cell = (TorrentCell *)[self preparedCellAtColumn: -1 row: row];
     else
     {
         cell = fTorrentCell;
@@ -707,7 +700,7 @@
     
     TorrentCell * cell;
     if ([NSApp isOnLeopardOrBetter])
-        cell = (TorrentCell *)[self preparedCellAtColumn: 0 row: row];
+        cell = (TorrentCell *)[self preparedCellAtColumn: -1 row: row];
     else
     {
         cell = fTorrentCell;

@@ -137,8 +137,8 @@
 		A29576030D11D63C0093B167 /* Creator.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576010D11D63C0093B167 /* Creator.xib */; };
 		A29576080D11D70E0093B167 /* MessageWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576060D11D70E0093B167 /* MessageWindow.xib */; };
 		A29576130D11D8DD0093B167 /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576110D11D8DD0093B167 /* InfoWindow.xib */; };
-		A29AF4F70D01BADC00D097EC /* DownArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F60D01BADC00D097EC /* DownArrow.png */; };
-		A29AF4F90D01BAEB00D097EC /* UpArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F80D01BAEB00D097EC /* UpArrow.png */; };
+		A29AF4F70D01BADC00D097EC /* DownArrowTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F60D01BADC00D097EC /* DownArrowTemplate.png */; };
+		A29AF4F90D01BAEB00D097EC /* UpArrowTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F80D01BAEB00D097EC /* UpArrowTemplate.png */; };
 		A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = A2F8951E0A2D4BA500ED2127 /* Credits.rtf */; };
 		A29C8B370ACC6EB3000ED9F9 /* PortChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */; };
 		A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */; };
@@ -548,8 +548,8 @@
 		A29576020D11D63C0093B167 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = macosx/English.lproj/Creator.xib; sourceTree = "<group>"; };
 		A29576070D11D70E0093B167 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = macosx/English.lproj/MessageWindow.xib; sourceTree = "<group>"; };
 		A29576120D11D8DD0093B167 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = macosx/English.lproj/InfoWindow.xib; sourceTree = "<group>"; };
-		A29AF4F60D01BADC00D097EC /* DownArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownArrow.png; path = macosx/Images/DownArrow.png; sourceTree = "<group>"; };
-		A29AF4F80D01BAEB00D097EC /* UpArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpArrow.png; path = macosx/Images/UpArrow.png; sourceTree = "<group>"; };
+		A29AF4F60D01BADC00D097EC /* DownArrowTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownArrowTemplate.png; path = macosx/Images/DownArrowTemplate.png; sourceTree = "<group>"; };
+		A29AF4F80D01BAEB00D097EC /* UpArrowTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpArrowTemplate.png; path = macosx/Images/UpArrowTemplate.png; sourceTree = "<group>"; };
 		A29C8B340ACC6EB3000ED9F9 /* PortChecker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PortChecker.h; path = macosx/PortChecker.h; sourceTree = "<group>"; };
 		A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PortChecker.m; path = macosx/PortChecker.m; sourceTree = "<group>"; };
 		A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PeerProgressIndicatorCell.h; path = macosx/PeerProgressIndicatorCell.h; sourceTree = "<group>"; };
@@ -921,8 +921,8 @@
 				A2FB06950BFF484A0095564D /* Globe.png */,
 				A261A8250C6A0D68003BAFDA /* Error.png */,
 				A2F1511F0CD438BA001F3B0E /* Lock.png */,
-				A29AF4F80D01BAEB00D097EC /* UpArrow.png */,
-				A29AF4F60D01BADC00D097EC /* DownArrow.png */,
+				A29AF4F80D01BAEB00D097EC /* UpArrowTemplate.png */,
+				A29AF4F60D01BADC00D097EC /* DownArrowTemplate.png */,
 				A2F41DAA0D0B916B006CE378 /* YingYangTemplate.png */,
 				A20152630D1C1BE70081714F /* PinTemplate.png */,
 				A2F151150CD438A4001F3B0E /* YellowDot.png */,
@@ -1627,8 +1627,8 @@
 				A25892770CF1FCE800CCCDDF /* StatsWindow.xib in Resources */,
 				A22D3AA60D00D1790079CFED /* Turtle.png in Resources */,
 				A22D3AA70D00D1790079CFED /* TurtleBlue.png in Resources */,
-				A29AF4F70D01BADC00D097EC /* DownArrow.png in Resources */,
-				A29AF4F90D01BAEB00D097EC /* UpArrow.png in Resources */,
+				A29AF4F70D01BADC00D097EC /* DownArrowTemplate.png in Resources */,
+				A29AF4F90D01BAEB00D097EC /* UpArrowTemplate.png in Resources */,
 				A2F41DA90D0B9152006CE378 /* ActionGear.png in Resources */,
 				A2F41DAB0D0B916B006CE378 /* YingYangTemplate.png in Resources */,
 				A2F41DBC0D0B96C0006CE378 /* FilterBlue.png in Resources */,
