@@ -5,7 +5,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Removing a transfer will remove the associated cache file
 - Mac:
    + Window when adding torrents to select files and other settings
-   + Leopard: Group dividers
+   + Leopard: Collapsable group dividers
    + Use the file icon as the per-torrent action button
    + Updated images in the inspector
    + Optional display of remaining time while seeding in Minimal View 

@@ -251,9 +251,11 @@ char * tr_clientForId( const uint8_t * id )
                       id[3], id[4], id[5], id[6] );
         }
         else if( !memcmp( &id[1], "NX", 2 ) )
-        {
-            tr_asprintf( &ret, "Net Transport" );
-        }
+        { 
+            tr_asprintf( &ret, "Net Transport %d.%c.%c", 
+                      charToInt( id[3] ) * 10 + charToInt( id[4] ), 
+                      id[5], id[6] ); 
+        } 
         else if( !memcmp( &id[1], "LW", 2 ) )
         {
             tr_asprintf( &ret, "LimeWire" );
@@ -326,6 +328,10 @@ char * tr_clientForId( const uint8_t * id )
         {
             return ret;
         }
+    }
+    if( !memcmp( id, "S3", 2 ) && id[2] == '-' && id[4] == '-' && id6] == '-' )
+    {
+        tr_asprintf( &ret, "Amazon S3 %c.%c.%c", id[3], id[5], id[7] );
     }
     
     /* All versions of each client are formatted the same */
