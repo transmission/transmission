@@ -2485,6 +2485,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             return group != -1 ? [[GroupsWindowController groups] nameForIndex: group]
                                 : NSLocalizedString(@"No Group", "Group table row");
         }
+        else if ([ident isEqualToString: @"Color"])
+        {
+            int group = [[item objectForKey: @"Group"] intValue];
+            return [[GroupsWindowController groups] imageForIndex: group isSmall: YES];
+        }
         else if ([ident isEqualToString: @"UL Image"])
             return [NSImage imageNamed: @"UpArrowGroupTemplate.png"];
         else if ([ident isEqualToString: @"DL Image"])
@@ -2499,6 +2504,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             while ((torrent = [enumerator nextObject]))
                 rate += upload ? [torrent uploadRate] : [torrent downloadRate];
             
+            return @"999.9 KB/s";
             return [NSString stringForSpeed: rate];
         }
     }

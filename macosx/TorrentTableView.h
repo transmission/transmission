@@ -28,7 +28,7 @@
 
 @class TorrentCell;
 
-#define GROUP_SEPARATOR_HEIGHT 18.0
+#define GROUP_SEPARATOR_HEIGHT 20.0
 
 @interface TorrentTableView : NSOutlineView
 {
