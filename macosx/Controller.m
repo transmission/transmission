@@ -2476,7 +2476,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
 {
-    if (tableColumn)
+    if (![item isKindOfClass: [Torrent class]])
     {
         NSString * ident = [tableColumn identifier];
         if ([ident isEqualToString: @"Group"])
