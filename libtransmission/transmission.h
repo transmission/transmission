@@ -588,6 +588,13 @@ void tr_torrentRecheck( tr_torrent * );
  */
 void tr_torrentClose( tr_torrent * );
 
+/**
+ * Like tr_torrentClose() but also deletes
+ * the fastresume file and our copy of the
+ * torrent file
+ */
+void tr_torrentDelete( tr_torrent * );
+
 /***********************************************************************
  * tr_info
  **********************************************************************/

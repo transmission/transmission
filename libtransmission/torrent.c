@@ -826,9 +826,12 @@ tr_torrentSetHasPiece( tr_torrent * tor, int pieceIndex, int has )
     tr_torrentUnlock( tor );
 }
 
-void tr_torrentRemoveSaved( tr_torrent * tor )
+void
+tr_torrentRemoveSaved( tr_torrent * tor )
 {
     tr_metainfoRemoveSaved( tor->info.hashString, tor->handle->tag );
+
+    tr_fastResumeRemove( tor );
 }
 
 /***
@@ -1003,7 +1006,8 @@ tr_torrentStop( tr_torrent * tor )
 {
     tr_globalLock( tor->handle );
 
-    saveFastResumeNow( tor );
+    if( !tor->isDeleting )
+        saveFastResumeNow( tor );
     tor->isRunning = 0;
     tr_runInEventThread( tor->handle, stopTorrent, tor );
 
@@ -1017,6 +1021,8 @@ closeTorrent( void * vtor )
     saveFastResumeNow( tor );
     tor->isRunning = 0;
     stopTorrent( tor );
+    if( tor->isDeleting )
+        tr_torrentRemoveSaved( tor );
     freeTorrent( tor );
 }
 
@@ -1034,6 +1040,14 @@ tr_torrentClose( tr_torrent * tor )
         tr_globalUnlock( handle );
     }
 }
+
+void
+tr_torrentDelete( tr_torrent * tor )
+{
+    tor->isDeleting = 1;
+    tr_torrentClose( tor );
+}
+
 
 /**
 ***  Completeness

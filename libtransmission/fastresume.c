@@ -709,3 +709,24 @@ tr_fastResumeLoad( tr_torrent     * tor,
 
     return ret;
 }
+
+void
+tr_fastResumeRemove( const tr_torrent * tor )
+{
+    char path[MAX_PATH_LENGTH];
+    const char * cacheDir = tr_getCacheDirectory ();
+    const char * hash = tor->info.hashString;
+
+    if( tor->handle->tag )
+    {
+        char base[1024];
+        snprintf( base, sizeof(base), "%s-%s", hash, tor->handle->tag );
+        tr_buildPath( path, sizeof(path), cacheDir, base, NULL );
+        unlink( path );
+    }
+    else
+    {
+        tr_buildPath( path, sizeof(path), cacheDir, hash, NULL );
+        unlink( path );
+    }
+}

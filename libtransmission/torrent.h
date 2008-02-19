@@ -153,6 +153,7 @@ struct tr_torrent
 
     unsigned int               statCur : 1;
     unsigned int               isRunning : 1;
+    unsigned int               isDeleting : 1;
 
     uint16_t                   maxConnectedPeers;
 

@@ -608,7 +608,7 @@ tr_core_remove_torrent( TrCore * self, TrTorrent * gtor, int deleteFiles )
         tr_torrent_delete_files( gtor );
 
     /* delete the torrent */
-    tr_torrentRemoveSaved( tr_torrent_handle( gtor ) );
+    tr_torrent_set_delete_flag( gtor, TRUE );
     g_object_unref( G_OBJECT( gtor ) );
 }
 

@@ -92,4 +92,7 @@ tr_torrent_new_preexisting( tr_torrent * tor );
 TrTorrent *
 tr_torrent_new_ctor( tr_handle * handle, tr_ctor * ctor, char ** err );
 
+void
+tr_torrent_set_delete_flag( TrTorrent *, gboolean );
+
 #endif

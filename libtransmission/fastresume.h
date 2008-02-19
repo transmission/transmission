@@ -48,4 +48,6 @@ uint64_t tr_fastResumeLoad( tr_torrent          * tor,
                             uint64_t              fieldsToLoad,
                             const tr_ctor       * ctor );
 
+void tr_fastResumeRemove( const tr_torrent * tor );
+
 #endif
