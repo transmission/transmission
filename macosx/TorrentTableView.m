@@ -59,6 +59,20 @@
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         
+        if (![NSApp isOnLeopardOrBetter])
+        {
+            //remove all unnecessary columns
+            int i;
+            for (i = [[self tableColumns] count]-1; i >= 0; i--)
+            {
+                NSTableColumn * column = [[self tableColumns] objectAtIndex: i];
+                if (![[column identifier] isEqualToString: @"Group"])
+                    [self removeTableColumn: column];
+            }
+            
+            [self sizeLastColumnToFit];
+        }
+        
         fTorrentCell = [[TorrentCell alloc] init];
         if (![NSApp isOnLeopardOrBetter])
             [[self tableColumnWithIdentifier: @"Group"] setDataCell: fTorrentCell];
@@ -80,23 +94,6 @@
     }
     
     return self;
-}
-
-- (void) awakeFromNib
-{
-    if (![NSApp isOnLeopardOrBetter])
-    {
-        //remove all unnecessary columns
-        int i;
-        for (i = [[self tableColumns] count]-1; i >= 0; i--)
-        {
-            NSTableColumn * column = [[self tableColumns] objectAtIndex: i];
-            if (![[column identifier] isEqualToString: @"Group"])
-                [self removeTableColumn: column];
-        }
-        
-        [self sizeLastColumnToFit];
-    }
 }
 
 - (void) dealloc
