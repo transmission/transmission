@@ -2476,7 +2476,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
 {
-    if (![item isKindOfClass: [Torrent class]])
+    if (tableColumn)
     {
         NSString * ident = [tableColumn identifier];
         if ([ident isEqualToString: @"Group"])
@@ -2488,10 +2488,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         else if ([ident isEqualToString: @"Color"])
         {
             int group = [[item objectForKey: @"Group"] intValue];
-            if (group == -1)
-                return [NSImage imageNamed: NSImageNameStopProgressTemplate];
-            else
-                return [[GroupsWindowController groups] imageForIndex: group isSmall: YES];
+            return group != -1 ? [[GroupsWindowController groups] imageForIndex: group isSmall: YES]
+                                : [NSImage imageNamed: NSImageNameStopProgressTemplate];
         }
         else if ([ident isEqualToString: @"UL Image"])
             return [NSImage imageNamed: @"UpArrowGroupTemplate.png"];
