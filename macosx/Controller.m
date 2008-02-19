@@ -2486,10 +2486,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                 : NSLocalizedString(@"No Group", "Group table row");
         }
         else if ([ident isEqualToString: @"Color"])
-        {
-            int group = [[item objectForKey: @"Group"] intValue];
-            return [[GroupsWindowController groups] imageForIndex: group isSmall: YES];
-        }
+            return [[GroupsWindowController groups] imageForIndex: [[item objectForKey: @"Group"] intValue] isSmall: YES];
         else if ([ident isEqualToString: @"UL Image"])
             return [NSImage imageNamed: @"UpArrowGroupTemplate.png"];
         else if ([ident isEqualToString: @"DL Image"])

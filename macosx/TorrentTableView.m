@@ -156,9 +156,18 @@
     }
     else
     {
-        if (([[tableColumn identifier] isEqualToString: @"UL Image"] || [[tableColumn identifier] isEqualToString: @"DL Image"])
-            && [NSApp isOnLeopardOrBetter])
-            [[cell image] setTemplate: [cell backgroundStyle] == NSBackgroundStyleLowered]; //ensure white only when selected
+        if ([[tableColumn identifier] isEqualToString: @"UL Image"] || [[tableColumn identifier] isEqualToString: @"DL Image"])
+        {
+            //ensure white only when selected
+            NSImage * image = [cell image];
+            BOOL template = [cell backgroundStyle] == NSBackgroundStyleLowered;
+            if ([image isTemplate] != template)
+            {
+                [image setTemplate: template];
+                [cell setImage: nil];
+                [cell setImage: image];
+            }
+        }
     }
 }
 
