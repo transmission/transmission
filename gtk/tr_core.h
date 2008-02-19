@@ -140,6 +140,8 @@ void tr_core_torrents_added( TrCore * self );
 
 void tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter );
 
+void tr_core_remove_torrent( TrCore * self, TrTorrent * gtor, int deleteFiles );
+
 /* update the model with current torrent status */
 void tr_core_update( TrCore * self );
 

@@ -19,10 +19,10 @@
 #include <libtransmission/transmission.h>
 
 #include "actions.h"
+#include "details.h"
 #include "file-list.h"
 #include "tr_torrent.h"
 #include "hig.h"
-#include "torrent-inspector.h"
 #include "util.h"
 
 #define UPDATE_INTERVAL_MSEC 2000

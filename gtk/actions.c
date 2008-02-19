@@ -15,7 +15,6 @@
 #include <gtk/gtk.h>
 #include <libtransmission/transmission.h>
 #include "conf.h"
-#include "torrent-inspector.h"
 #include "tr_core.h"
 #include "tr_prefs.h"
 #include "lock.h"
@@ -115,7 +114,7 @@ static GtkActionEntry entries[] =
   { "pause-torrent", GTK_STOCK_MEDIA_PAUSE,
     N_("_Pause"), "<control>P", NULL, G_CALLBACK(action_cb) },
   { "remove-torrent", GTK_STOCK_REMOVE,
-    N_("_Remove"), "<control>Delete", NULL, G_CALLBACK(action_cb) },
+    N_("_Remove"), "Delete", NULL, G_CALLBACK(action_cb) },
   { "new-torrent", GTK_STOCK_NEW, N_("_New..."), NULL,
     N_("Create a new torrent"),
     G_CALLBACK(action_cb) },

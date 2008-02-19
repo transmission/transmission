@@ -35,4 +35,6 @@ void promptfordir( GtkWindow* parent, TrCore*, GList* filenames, tr_ctor* );
 /* prompt if the user wants to quit, calls func with cbdata if they do */
 void askquit( TrCore*, GtkWindow* parent, callbackfunc_t func, void* cbdata );
 
+void confirmDelete( GtkWindow * parent, TrCore * core, GList * torrents );
+
 #endif /* TG_PREFS_H */

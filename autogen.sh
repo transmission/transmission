@@ -34,8 +34,3 @@ fi
 
 cd $ORIGDIR || exit $?
 
-if test -z "$AUTOGEN_SUBDIR_MODE"; then
-  $srcdir/configure --enable-maintainer-mode $AUTOGEN_CONFIGURE_ARGS "$@" || exit $?
-  echo 
-  echo "Now type 'make' to compile $PROJECT."
-fi

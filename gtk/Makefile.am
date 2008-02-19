@@ -14,6 +14,7 @@ AM_CFLAGS = \
 noinst_HEADERS = \
     actions.h \
     conf.h \
+    details.h \
     dialogs.h \
     hig.h \
     io.h \
@@ -23,11 +24,10 @@ noinst_HEADERS = \
     logo.h \
     makemeta-ui.h \
     msgwin.h \
-    open.h \
+    open-dialog.h \
     stats.h \
     sexy-icon-entry.h \
     torrent-cell-renderer.h \
-    torrent-inspector.h \
     tr_core.h \
     tr_icon.h \
     tr_prefs.h \
@@ -41,6 +41,7 @@ bin_PROGRAMS = transmission
 transmission_SOURCES = \
     actions.c \
     conf.c \
+    details.c \
     dialogs.c \
     file-list.c \
     hig.c \
@@ -49,11 +50,10 @@ transmission_SOURCES = \
     main.c \
     makemeta-ui.c \
     msgwin.c \
-    open.c \
+    open-dialog.c \
     sexy-icon-entry.c \
     stats.c \
     torrent-cell-renderer.c \
-    torrent-inspector.c \
     tr_core.c \
     tr_icon.c \
     tr_prefs.c \

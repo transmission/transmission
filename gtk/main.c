@@ -43,13 +43,13 @@
 
 #include "actions.h"
 #include "conf.h"
+#include "details.h"
 #include "dialogs.h"
 #include "ipc.h"
 #include "makemeta-ui.h"
 #include "msgwin.h"
-#include "open.h"
+#include "open-dialog.h"
 #include "stats.h"
-#include "torrent-inspector.h"
 #include "tr_core.h"
 #include "tr_icon.h"
 #include "tr_prefs.h"
@@ -154,8 +154,6 @@ static void
 prefschanged( TrCore * core, const char * key, gpointer data );
 static gboolean
 updatemodel(gpointer gdata);
-static GList *
-getselection( struct cbdata * cbdata );
 
 static void
 setupsighandlers(void);
@@ -853,35 +851,6 @@ updatemodel(gpointer gdata) {
   return TRUE;
 }
 
-/* returns a GList of GtkTreeRowReferences to each selected row */
-static GList *
-getselection( struct cbdata * cbdata )
-{
-    GList * rows = NULL;
-
-    if( NULL != cbdata->wind )
-    {
-        GList * l;
-        GtkTreeSelection *s = tr_window_get_selection(cbdata->wind);
-        GtkTreeModel * filter_model;
-        GtkTreeModel * store_model;
-        rows = gtk_tree_selection_get_selected_rows( s, &filter_model );
-        store_model = gtk_tree_model_filter_get_model(
-                                                 GTK_TREE_MODEL_FILTER( filter_model ) );
-        for( l=rows; l!=NULL; l=l->next )
-        {
-            GtkTreePath * path = gtk_tree_model_filter_convert_path_to_child_path(
-                                        GTK_TREE_MODEL_FILTER( filter_model ), l->data );
-            GtkTreeRowReference * ref = gtk_tree_row_reference_new( store_model, path );
-            gtk_tree_path_free( path );
-            gtk_tree_path_free( l->data );
-            l->data = ref;
-        }
-    }
-
-    return rows;
-}
-
 static void
 about ( GtkWindow * parent )
 {
@@ -933,6 +902,18 @@ stopTorrentForeach (GtkTreeModel * model,
     gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
     tr_torrent_stop( tor );
     g_object_unref( G_OBJECT( tor ) );
+}
+
+static void
+accumulateSelectedTorrents( GtkTreeModel * model,
+                            GtkTreePath  * path UNUSED,
+                            GtkTreeIter  * iter,
+                            gpointer       gdata )
+{
+    GList ** data = ( GList** ) gdata;
+    TrTorrent * tor = NULL;
+    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
+    *data = g_list_append( *data, tor );
 }
 
 static void
@@ -1054,22 +1035,11 @@ doAction ( const char * action_name, gpointer user_data )
     }
     else if (!strcmp (action_name, "remove-torrent"))
     {
-        /* this modifies the model's contents, so can't use foreach */
-        GList *l, *sel = getselection( data );
-        GtkTreeModel *model = tr_core_model( data->core );
-        gtk_tree_selection_unselect_all( tr_window_get_selection( data->wind) );
-        for( l=sel; l!=NULL; l=l->next )
-        {
-            GtkTreeIter iter;
-            GtkTreeRowReference * reference = l->data;
-            GtkTreePath * path = gtk_tree_row_reference_get_path( reference );
-            gtk_tree_model_get_iter( model, &iter, path );
-            tr_core_delete_torrent( data->core, &iter );
-            gtk_tree_path_free( path );
-            gtk_tree_row_reference_free( reference );
-            changed = TRUE;
-        }
-        g_list_free( sel );
+        GList * l = NULL;
+        GtkTreeSelection * s = tr_window_get_selection(data->wind);
+        gtk_tree_selection_selected_foreach( s, accumulateSelectedTorrents, &l );
+        if( l != NULL )
+            confirmDelete( data->wind, data->core, l );
     }
     else if (!strcmp (action_name, "close"))
     {

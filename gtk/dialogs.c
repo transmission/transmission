@@ -274,3 +274,105 @@ askquit( TrCore          * core,
 
     gtk_widget_show_all( wind );
 }
+
+/***
+****
+***/
+
+struct DeleteData
+{
+    GtkWidget * delete_files_tb;
+    GList * torrents;
+    TrCore * core;
+};
+
+static void
+deleteDownloadedToggled( GtkToggleButton * tb, gpointer warn )
+{
+    GtkWidget * w = GTK_WIDGET( warn );
+
+    if( gtk_toggle_button_get_active( tb ) )
+        gtk_widget_show( w );
+    else
+        gtk_widget_hide( w );
+}
+
+static void
+deleteResponse( GtkDialog * dialog, gint response, gpointer gdata )
+{
+    struct DeleteData * data = gdata;
+    const int del = response == GTK_RESPONSE_YES;
+    const int deleteFiles = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->delete_files_tb ) );
+    GList * l;
+
+    for( l=data->torrents; l!=NULL; l=l->next )
+    {
+        TrTorrent * gtor = TR_TORRENT( l->data );
+
+        if( del )
+            tr_core_remove_torrent( data->core, gtor, deleteFiles );
+        else
+            g_object_unref( G_OBJECT( gtor ) );
+    }
+
+    gtk_widget_destroy( GTK_WIDGET( dialog ) );
+    g_list_free( data->torrents );
+    g_free( data );
+}
+
+void
+confirmDelete( GtkWindow * parent,
+               TrCore    * core,
+               GList     * torrents )
+{
+    char buf[1024];
+    GtkWidget * t;
+    GtkWidget * d;
+    GtkWidget * w;
+    GtkWidget * warn;
+    struct DeleteData * dd = g_new0( struct DeleteData, 1 );
+
+    dd->core = core;
+    dd->torrents = torrents;
+
+    d = gtk_dialog_new_with_buttons( _( "Remove Torrent" ),
+                                     parent,
+                                     GTK_DIALOG_DESTROY_WITH_PARENT|GTK_DIALOG_NO_SEPARATOR,
+                                     GTK_STOCK_NO, GTK_RESPONSE_NO,
+                                     GTK_STOCK_YES, GTK_RESPONSE_YES,
+                                     NULL );
+    g_signal_connect( d, "response", G_CALLBACK( deleteResponse ), dd );
+
+    t = gtk_table_new( 3, 2, FALSE );
+    gtk_container_set_border_width( GTK_CONTAINER( t ), GUI_PAD_BIG );
+    gtk_table_set_col_spacing( GTK_TABLE( t ), 0, GUI_PAD_BIG );
+    gtk_table_set_row_spacings( GTK_TABLE( t ), GUI_PAD_BIG );
+
+    w = gtk_image_new_from_stock( GTK_STOCK_DIALOG_WARNING, GTK_ICON_SIZE_DIALOG );
+    gtk_table_attach( GTK_TABLE( t ), w, 0, 1, 0, 3, GTK_FILL, GTK_FILL, 0, 0 );
+    gtk_widget_show( w );
+
+    g_snprintf( buf, sizeof(buf), "<b>%s</b>", _( "Remove the selected torrent(s)?" ) );
+    w = gtk_label_new( buf );
+    gtk_misc_set_alignment( GTK_MISC( w ), 0.0, 0.5 );
+    gtk_label_set_use_markup( GTK_LABEL( w ), TRUE );
+    gtk_table_attach( GTK_TABLE( t ), w, 1, 2, 0, 1, GTK_FILL, 0, 0, 0 );
+    gtk_widget_show( w );
+
+    g_snprintf( buf, sizeof( buf ), "<i>%s</i>",
+                _( "All downloaded files for this torrent will be deleted!" ) );
+    warn = gtk_label_new( buf );
+    gtk_label_set_use_markup( GTK_LABEL( warn ), TRUE );
+    gtk_table_attach( GTK_TABLE( t ), warn, 1, 2, 2, 3, GTK_FILL, 0, 0, 0 );
+   
+    w = gtk_check_button_new_with_mnemonic( _( "Delete _downloaded files" ) );
+    dd->delete_files_tb = w;
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), FALSE );
+    gtk_table_attach( GTK_TABLE( t ), w, 1, 2, 1, 2, GTK_FILL, 0, 0, 0 );
+    g_signal_connect( w, "toggled", G_CALLBACK(deleteDownloadedToggled), warn );
+    gtk_widget_show( w );
+
+    gtk_widget_show( t );
+    gtk_container_add( GTK_CONTAINER( GTK_DIALOG( d )->vbox ), t );
+    gtk_widget_show( d );
+}

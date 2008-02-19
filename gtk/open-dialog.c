@@ -15,7 +15,7 @@
 #include <gtk/gtk.h>
 #include "file-list.h"
 #include "hig.h"
-#include "open.h"
+#include "open-dialog.h"
 
 struct OpenData
 {

@@ -22,11 +22,13 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <errno.h>
 #include <string.h>
 #include <unistd.h>
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
 
 #include <libtransmission/transmission.h>
 
@@ -284,4 +286,25 @@ tr_torrent_status_str ( TrTorrent * gtor )
     }
 
     return top;
+}
+
+void
+tr_torrent_delete_files( TrTorrent * gtor )
+{
+    int i;
+    const tr_info * info = tr_torrent_info( gtor );
+    const char * stop = tr_torrentGetFolder( tr_torrent_handle( gtor ) );
+
+    for( i=0; info && i<info->fileCount; ++i )
+    {
+        char * file = g_build_filename( stop, info->files[i].name, NULL );
+        while( strcmp( stop, file ) && strlen(stop) < strlen(file) )
+        {
+            char * swap = g_path_get_dirname( file );
+            g_unlink( file );
+            g_free( file );
+            file = swap;
+        }
+        g_free( file );
+    }
 }

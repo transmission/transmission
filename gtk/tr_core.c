@@ -571,6 +571,48 @@ tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter )
     g_object_unref( G_OBJECT( tor ) );
 }
 
+static gboolean
+findTorrentInModel( TrCore * core, const TrTorrent * gtor, GtkTreeIter * setme )
+{
+    int match = 0;
+    GtkTreeIter iter;
+    GtkTreeModel * model = tr_core_model( core );
+
+    if( gtk_tree_model_iter_children( model, &iter, NULL ) ) do
+    {
+        TrTorrent * tmp;
+        gtk_tree_model_get( model, &iter, MC_TORRENT, &tmp, -1 );
+        match = tmp == gtor;
+        g_object_unref( G_OBJECT( tmp ) );
+    }
+    while( !match && gtk_tree_model_iter_next( model, &iter ) );
+
+    if( match )
+        *setme = iter;
+
+    return match;
+}
+
+void
+tr_core_remove_torrent( TrCore * self, TrTorrent * gtor, int deleteFiles )
+{
+    GtkTreeIter iter;
+    GtkTreeModel * model = tr_core_model( self );
+
+    /* remove from the gui */
+    if( findTorrentInModel( self, gtor, &iter ) )
+        gtk_list_store_remove( GTK_LIST_STORE( model ), &iter );
+
+    /* maybe delete the downloaded files */
+    if( deleteFiles )
+        tr_torrent_delete_files( gtor );
+
+    /* delete the torrent */
+    tr_torrentRemoveSaved( tr_torrent_handle( gtor ) );
+    g_object_unref( G_OBJECT( gtor ) );
+}
+
+
 /***
 ****
 ***/
