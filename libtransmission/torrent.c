@@ -23,11 +23,7 @@
  *****************************************************************************/
 
 #include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <sys/types.h>
+#include <string.h> /* memcmp */
 
 #include "transmission.h"
 #include "bencode.h"
@@ -35,14 +31,9 @@
 #include "crypto.h" /* for tr_sha1 */
 #include "fastresume.h"
 #include "fdlimit.h" /* tr_fdFileClose */
-#include "handshake.h"
-#include "inout.h"
 #include "metainfo.h"
-#include "net.h" /* tr_netNtop */
 #include "peer-mgr.h"
-#include "platform.h"
 #include "ratecontrol.h"
-#include "shared.h"
 #include "torrent.h"
 #include "tracker.h"
 #include "trcompat.h" /* for strlcpy */

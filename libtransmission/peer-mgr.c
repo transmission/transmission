@@ -30,10 +30,8 @@
 #include "peer-mgr.h"
 #include "peer-mgr-private.h"
 #include "peer-msgs.h"
-#include "platform.h"
 #include "ptrarray.h"
 #include "ratecontrol.h"
-#include "shared.h"
 #include "torrent.h"
 #include "trcompat.h" /* strlcpy */
 #include "trevent.h"

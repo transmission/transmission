@@ -12,8 +12,7 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdlib.h>
-#include <string.h>
+#include <string.h> /* memcmp */
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -22,14 +21,8 @@
 #include <openssl/sha.h>
 
 #include "transmission.h"
-#include "completion.h"
-#include "crypto.h"
-#include "fastresume.h"
 #include "fdlimit.h"
 #include "inout.h"
-#include "list.h"
-#include "platform.h"
-#include "peer-mgr.h"
 #include "stats.h"
 #include "torrent.h"
 #include "utils.h"

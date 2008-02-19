@@ -43,20 +43,16 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include <stdlib.h> /* calloc */
+#include <string.h> /* strcpy, memset, memcmp */
 
 #include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-#include <event.h>
+#include <sys/stat.h> /* stat */
+#include <unistd.h> /* unlink */
 
 #include "transmission.h"
 #include "completion.h"
 #include "fastresume.h"
-#include "internal.h" /* tr_torrentInitFileDLs */
 #include "peer-mgr.h"
 #include "platform.h"
 #include "torrent.h"

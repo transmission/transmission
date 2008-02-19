@@ -47,10 +47,10 @@
 #include <evutil.h>
 
 #include "transmission.h"
-#include "trcompat.h"
 #include "list.h"
 #include "net.h"
-#include "platform.h"
+#include "platform.h" /* tr_lock */
+#include "trcompat.h" /* strlcpy */
 #include "utils.h"
 
 #if SIZEOF_VOIDP==8

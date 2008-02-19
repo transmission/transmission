@@ -23,9 +23,8 @@
  *****************************************************************************/
 
 #include <assert.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string.h> /* memcpy */
 
 #include <signal.h>
 #include <sys/types.h> /* stat */
@@ -38,7 +37,7 @@
 #include "list.h"
 #include "net.h"
 #include "peer-mgr.h"
-#include "platform.h"
+#include "platform.h" /* tr_lock */
 #include "ratecontrol.h"
 #include "shared.h"
 #include "stats.h"

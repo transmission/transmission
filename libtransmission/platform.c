@@ -50,8 +50,6 @@
 #include <unistd.h> /* getuid getpid close */
 
 #include "transmission.h"
-#include "list.h"
-#include "net.h"
 #include "platform.h"
 #include "trcompat.h"
 #include "utils.h"

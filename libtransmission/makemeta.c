@@ -12,9 +12,8 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <math.h>
 #include <stdio.h> /* FILE, snprintf, stderr */
-#include <stdlib.h>
+#include <stdlib.h> /* qsort */
 
 #include <sys/types.h>
 #include <sys/stat.h>
