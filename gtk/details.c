@@ -489,6 +489,7 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
 
   m  = peer_model_new (tor);
   v = gtk_tree_view_new_with_model (m);
+  gtk_widget_set_size_request( v, 550, 0 );
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW(v), TRUE);
   g_object_unref (G_OBJECT(m));
 
@@ -504,13 +505,11 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
     {
       case PEER_COL_ADDRESS:
         r = gtk_cell_renderer_text_new ();
-        g_object_set( G_OBJECT( r ), "ellipsize", PANGO_ELLIPSIZE_END, NULL );
         c = gtk_tree_view_column_new_with_attributes (t, r, "text", col, NULL);
         break;
 
       case PEER_COL_CLIENT:
         r = gtk_cell_renderer_text_new ();
-        g_object_set( G_OBJECT( r ), "ellipsize", PANGO_ELLIPSIZE_END, NULL );
         c = gtk_tree_view_column_new_with_attributes (t, r, "text", col, NULL);
         gtk_tree_view_column_set_cell_data_func (c, r, render_client,
                                                  NULL, NULL);
