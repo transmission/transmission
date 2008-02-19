@@ -173,8 +173,6 @@
         //adjust placement for proper vertical alignment
         if (column == [self columnWithIdentifier: @"Group"])
             rect.size.height -= 1.0;
-        else if (column == [self columnWithIdentifier: @"UL"] || column == [self columnWithIdentifier: @"DL"])
-            rect.size.height += 1.0;
         
         return rect;
     }
