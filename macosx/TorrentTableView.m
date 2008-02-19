@@ -77,7 +77,7 @@
             
             [self sizeLastColumnToFit];
             
-            [[self tableColumnWithIdentifier: @"Group"] setDataCell: fTorrentCell];
+            [groupColumn setDataCell: fTorrentCell];
         }
         
         NSData * groupData = [fDefaults dataForKey: @"CollapsedGroups"];

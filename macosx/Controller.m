@@ -473,7 +473,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //timer to auto toggle speed limit
     [self autoSpeedLimitChange: nil];
     fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self
-        selector: @selector(autoSpeedLimit) userInfo: nil repeats: YES];
+                        selector: @selector(autoSpeedLimit) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSEventTrackingRunLoopMode];
 }
@@ -483,8 +483,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [NSApp setServicesProvider: self];
     
     //register for dock icon drags
-    [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self
-        andSelector: @selector(handleOpenContentsEvent:replyEvent:)
+    [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self andSelector: @selector(handleOpenContentsEvent:replyEvent:)
         forEventClass: kCoreEventClass andEventID: kAEOpenContents];
     
     //auto importing
