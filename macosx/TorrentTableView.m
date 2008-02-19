@@ -207,7 +207,7 @@
 - (NSString *) outlineView: (NSOutlineView *) outlineView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
     return [item isKindOfClass: [Torrent class]] ? [item name]
-            : [[self preparedCellAtColumn: -1 row: [self rowForItem: item]] stringValue];
+            : [[self preparedCellAtColumn: [self columnWithIdentifier: @"Group"] row: [self rowForItem: item]] stringValue];
 }
 
 - (void) updateTrackingAreas
