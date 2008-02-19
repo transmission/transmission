@@ -82,6 +82,23 @@
     return self;
 }
 
+- (void) awakeFromNib
+{
+    if (![NSApp isOnLeopardOrBetter])
+    {
+        //remove all unnecessary columns
+        int i;
+        for (i = [[self tableColumns] count]-1; i >= 0; i--)
+        {
+            NSTableColumn * column = [[self tableColumns] objectAtIndex: i];
+            if (![[column identifier] isEqualToString: @"Group"])
+                [self removeTableColumn: column];
+        }
+        
+        [self sizeLastColumnToFit];
+    }
+}
+
 - (void) dealloc
 {
     [fCollapsedGroups release];
@@ -158,7 +175,7 @@
     {
         if ([[tableColumn identifier] isEqualToString: @"UL Image"] || [[tableColumn identifier] isEqualToString: @"DL Image"])
         {
-            //ensure white only when selected
+            //ensure arrows are white only when selected
             NSImage * image = [cell image];
             BOOL template = [cell backgroundStyle] == NSBackgroundStyleLowered;
             if ([image isTemplate] != template)
@@ -173,7 +190,7 @@
 
 - (NSRect) frameOfCellAtColumn: (NSInteger) column row: (NSInteger) row
 {
-    if (column == -1 || (![NSApp isOnLeopardOrBetter] && [[self itemAtRow: row] isKindOfClass: [Torrent class]]))
+    if (column == -1 || ![NSApp isOnLeopardOrBetter])
         return [self rectOfRow: row];
     else
     {
