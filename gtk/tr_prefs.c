@@ -43,7 +43,13 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_UL_LIMIT, 50 );
 
     pref_flag_set_default   ( PREF_KEY_DIR_ASK, FALSE );
+#if GLIB_CHECK_VERSION(2,14,0)
+    pref_string_set_default ( PREF_KEY_DIR_DEFAULT,
+                              g_get_user_special_dir(
+                                  G_USER_DIRECTORY_DOWNLOAD ) );
+#else
     pref_string_set_default ( PREF_KEY_DIR_DEFAULT, g_get_home_dir() );
+#endif
 
     pref_int_set_default    ( PREF_KEY_PORT, TR_DEFAULT_PORT );
 
