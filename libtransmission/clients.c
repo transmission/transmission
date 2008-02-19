@@ -329,13 +329,13 @@ char * tr_clientForId( const uint8_t * id )
             return ret;
         }
     }
-    if( !memcmp( id, "S3", 2 ) && id[2] == '-' && id[4] == '-' && id6] == '-' )
+    
+    /* All versions of each client are formatted the same */
+    if( !memcmp( id, "S3", 2 ) && id[2] == '-' && id[4] == '-' && id[6] == '-' )
     {
         tr_asprintf( &ret, "Amazon S3 %c.%c.%c", id[3], id[5], id[7] );
     }
-    
-    /* All versions of each client are formatted the same */
-    if( !memcmp( id, "exbc", 4 ) )
+    else if( !memcmp( id, "exbc", 4 ) )
     {
         tr_asprintf( &ret, "%s %d.%02d",
                     !memcmp( &id[6], "LORD", 4 ) ? "BitLord" : "BitComet",
