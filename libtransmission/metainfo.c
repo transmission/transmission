@@ -614,13 +614,13 @@ tr_metainfoSave( const char * hash, const char * tag,
     file = fopen( path, "wb+" );
     if( !file )
     {
-        tr_err( "Could not open file (%s) (%s)", path, strerror( errno ) );
+        tr_err( "Could not open file (%s) (%s)", path, tr_strerror( errno ) );
         return TR_EINVALID;
     }
     fseek( file, 0, SEEK_SET );
     if( fwrite( buf, 1, buflen, file ) != buflen )
     {
-        tr_err( "Could not write file (%s) (%s)", path, strerror( errno ) );
+        tr_err( "Could not write file (%s) (%s)", path, tr_strerror( errno ) );
         fclose( file );
         return TR_EINVALID;
     }

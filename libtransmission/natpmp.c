@@ -14,7 +14,6 @@
 #include <errno.h>
 #include <time.h>
 #include <inttypes.h>
-#include <string.h> /* strerror */
 
 #ifdef WIN32
 #include <winsock2.h> /* inet_ntoa */
@@ -70,7 +69,7 @@ logVal( const char * func, int ret )
     else if( ret >= 0 )
         tr_dbg( KEY "%s returned success (%d)", func, ret );
     else
-        tr_err( KEY "%s returned error %d, errno is %d (%s)", func, ret, errno, strerror(errno) );
+        tr_err( KEY "%s returned error %d, errno is %d (%s)", func, ret, errno, tr_strerror(errno) );
 }
 
 struct tr_natpmp*

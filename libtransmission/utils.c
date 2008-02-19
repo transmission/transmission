@@ -27,7 +27,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string.h> /* strerror */
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -360,7 +360,7 @@ tr_loadFile( const char * path, size_t * size )
     errno = 0;
     if( stat( path, &sb ) )
     {
-        tr_err( "Couldn't get information for file \"%s\" %s", path, strerror(errno) );
+        tr_err( "Couldn't get information for file \"%s\" %s", path, tr_strerror(errno) );
         return NULL;
     }
 
@@ -374,7 +374,7 @@ tr_loadFile( const char * path, size_t * size )
     file = fopen( path, "rb" );
     if( !file )
     {
-        tr_err( "Couldn't open file \"%s\" %s", path, strerror(errno) );
+        tr_err( "Couldn't open file \"%s\" %s", path, tr_strerror(errno) );
         return NULL;
     }
     buf = malloc( sb.st_size );
@@ -387,7 +387,7 @@ tr_loadFile( const char * path, size_t * size )
     fseek( file, 0, SEEK_SET );
     if( fread( buf, sb.st_size, 1, file ) != 1 )
     {
-        tr_err( "Error reading \"%s\" %s", path, strerror(errno) );
+        tr_err( "Error reading \"%s\" %s", path, tr_strerror(errno) );
         free( buf );
         fclose( file );
         return NULL;
@@ -440,7 +440,7 @@ tr_mkdirp( const char * path_in, int permissions )
             /* Folder doesn't exist yet */
             if( tr_mkdir( path, permissions ) ) {
                 const int err = errno;
-                tr_err( "Couldn't create directory %s (%s)", path, strerror( err ) );
+                tr_err( "Couldn't create directory %s (%s)", path, tr_strerror( err ) );
                 tr_free( path );
                 errno = err;
                 return -1;
@@ -504,7 +504,7 @@ tr_ioErrorFromErrno( int err )
         case EFBIG:
             return TR_ERROR_IO_FILE_TOO_BIG;
         default:
-            tr_dbg( "generic i/o errno from errno: %s", strerror( errno ) );
+            tr_dbg( "generic i/o errno from errno: %s", tr_strerror( errno ) );
             return TR_ERROR_IO_OTHER;
     }
 }
@@ -595,6 +595,15 @@ tr_free( void * p )
 {
     if( p )
         free( p );
+}
+
+const char*
+tr_strerror( int i )
+{
+    const char * ret = strerror( i );
+    if( ret == NULL )
+        ret = "Unknown Error";
+    return ret;
 }
 
 /****

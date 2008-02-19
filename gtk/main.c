@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #include <sys/param.h>
-#include <errno.h>
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>

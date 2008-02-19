@@ -13,7 +13,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h> /* snprintf */
-#include <string.h> /* strerror */
 
 #include <miniupnp/miniwget.h>
 #include <miniupnp/miniupnpc.h>
@@ -89,7 +88,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
         errno = 0;
         devlist = upnpDiscover( 2000, NULL, NULL );
         if( devlist == NULL ) {
-            tr_err( KEY "upnpDiscover returned NULL (errno %d - %s)", errno, strerror(errno) );
+            tr_err( KEY "upnpDiscover returned NULL (errno %d - %s)", errno, tr_strerror(errno) );
         }
         errno = 0;
         if( UPNP_GetValidIGD( devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr))) {
@@ -99,7 +98,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
             handle->hasDiscovered = 1;
         } else {
             handle->state = TR_UPNP_ERR;
-            tr_err( KEY "UPNP_GetValidIGD failed.  (errno %d - %s)", errno, strerror(errno) );
+            tr_err( KEY "UPNP_GetValidIGD failed.  (errno %d - %s)", errno, tr_strerror(errno) );
             tr_err( KEY "If your router supports UPnP, please make sure UPnP is enabled!" );
         }
         freeUPNPDevlist( devlist );
@@ -154,7 +153,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
             handle->port = port;
             handle->state = TR_UPNP_IDLE;
         } else {
-            tr_err( KEY "Port forwarding failed with err %d (%d - %s)", err, errno, strerror(errno) );
+            tr_err( KEY "Port forwarding failed with err %d (%d - %s)", err, errno, tr_strerror(errno) );
             tr_err( KEY "If your router supports UPnP, please make sure UPnP is enabled!" );
             handle->port = -1;
             handle->state = TR_UPNP_ERR;

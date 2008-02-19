@@ -57,7 +57,7 @@ getFiles( const char        * dir,
     tr_buildPath( buf, sizeof(buf), dir, base, NULL );
     i = stat( buf, &sb );
     if( i ) {
-        tr_err("makemeta couldn't stat \"%s\"; skipping. (%s)", buf, strerror(errno));
+        tr_err("makemeta couldn't stat \"%s\"; skipping. (%s)", buf, tr_strerror(errno));
         return list;
     }
 

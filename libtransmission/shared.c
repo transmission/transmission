@@ -116,7 +116,7 @@ incomingPeersPulse( tr_shared * s )
             listen( s->bindSocket, 5 );
         } else {
             tr_err( NATKEY "unable to open port %d to listen for incoming peer connections (errno is %d - %s)",
-                    s->publicPort, errno, strerror(errno) );
+                    s->publicPort, errno, tr_strerror(errno) );
             s->bindPort = -1;
             s->bindSocket = -1;
         }

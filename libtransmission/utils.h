@@ -118,6 +118,8 @@ void  tr_free    ( void* );
 char* tr_strdup( const char * str );
 char* tr_strndup( const char * str, int len );
 
+const char* tr_strerror( int );
+
 /***
 ****
 ***/

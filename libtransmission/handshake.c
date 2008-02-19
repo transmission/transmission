@@ -1024,7 +1024,7 @@ gotError( struct bufferevent * evbuf UNUSED, short what, void * arg )
     else
     {
         dbgmsg( handshake, "libevent got an error what==%d, errno=%d (%s)",
-                (int)what, errno, strerror(errno) );
+                (int)what, errno, tr_strerror(errno) );
         tr_handshakeDone( handshake, FALSE );
     }
 }

@@ -93,7 +93,7 @@ makeSocketNonBlocking( int fd )
 #endif
         {
             tr_err( "Couldn't set socket to non-blocking mode (%s)",
-                    strerror( sockerrno ) );
+                    tr_strerror( sockerrno ) );
             tr_netClose( fd );
             fd = -1;
         }
@@ -134,7 +134,7 @@ tr_netOpen( const struct in_addr * addr, tr_port_t port,
     {
         tr_err( "Couldn't connect socket %d to %s, port %d (errno %d - %s)",
                 s, inet_ntoa(*addr), port,
-                sockerrno, strerror(sockerrno) );
+                sockerrno, tr_strerror(sockerrno) );
         tr_netClose( s );
         s = -1;
     }
@@ -176,7 +176,7 @@ tr_netBind( int port, int type )
     if( bind( s, (struct sockaddr *) &sock,
                sizeof( struct sockaddr_in ) ) )
     {
-        tr_err( "Couldn't bind port %d: %s", port, strerror(sockerrno) );
+        tr_err( "Couldn't bind port %d: %s", port, tr_strerror(sockerrno) );
         tr_netClose( s );
         return -1;
     }
