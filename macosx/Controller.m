@@ -2504,7 +2504,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             while ((torrent = [enumerator nextObject]))
                 rate += upload ? [torrent uploadRate] : [torrent downloadRate];
             
-            return @"999.9 KB/s";
             return [NSString stringForSpeed: rate];
         }
     }
