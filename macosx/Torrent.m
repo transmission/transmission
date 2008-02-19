@@ -202,8 +202,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     //allow the file to be index by Time Machine
     [self setTimeMachineExclude: NO forPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
     
-    tr_torrentRemoveSaved(fHandle);
-    tr_torrentClose(fHandle);
+    tr_torrentDelete(fHandle);
 }
 
 - (void) changeIncompleteDownloadFolder: (NSString *) folder
