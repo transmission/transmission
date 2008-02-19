@@ -59,23 +59,26 @@
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         
+        fTorrentCell = [[TorrentCell alloc] init];
+        
         if (![NSApp isOnLeopardOrBetter])
         {
+            NSTableColumn * groupColumn = [self tableColumnWithIdentifier: @"Group"];
+            [self setOutlineTableColumn: groupColumn];
+            
             //remove all unnecessary columns
             int i;
             for (i = [[self tableColumns] count]-1; i >= 0; i--)
             {
                 NSTableColumn * column = [[self tableColumns] objectAtIndex: i];
-                if (![[column identifier] isEqualToString: @"Group"])
+                if (column != groupColumn)
                     [self removeTableColumn: column];
             }
             
             [self sizeLastColumnToFit];
-        }
-        
-        fTorrentCell = [[TorrentCell alloc] init];
-        if (![NSApp isOnLeopardOrBetter])
+            
             [[self tableColumnWithIdentifier: @"Group"] setDataCell: fTorrentCell];
+        }
         
         NSData * groupData = [fDefaults dataForKey: @"CollapsedGroups"];
         if (groupData)
