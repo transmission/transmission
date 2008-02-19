@@ -16,8 +16,8 @@
 #include <gtk/gtkwindow.h>
 #include "tr_core.h"
 
-void makeaddwind( GtkWindow  * parent,
-                  TrCore     * core,
-                  tr_ctor    * ctor );
+GtkWidget* makeaddwind( GtkWindow  * parent,
+                        TrCore     * core,
+                        tr_ctor    * ctor );
 
 #endif /* TR_GTK_OPEN_DIALOG */

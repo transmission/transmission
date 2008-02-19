@@ -30,7 +30,10 @@
 #include "util.h"
 
 /* prompt for a download directory for torrents, then add them */
-void promptfordir( GtkWindow* parent, TrCore*, GList* filenames, tr_ctor* );
+GtkWidget* promptfordir( GtkWindow  * parent,
+                         TrCore     * core,
+                         GList      * filenames,
+                         tr_ctor    * ctor );
 
 /* prompt if the user wants to quit, calls func with cbdata if they do */
 void askquit( TrCore*, GtkWindow* parent, callbackfunc_t func, void* cbdata );

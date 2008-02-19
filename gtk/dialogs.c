@@ -117,7 +117,7 @@ startToggled( GtkToggleButton * tb, gpointer ctor )
     tr_ctorSetPaused( ctor, TR_FORCE, !gtk_toggle_button_get_active( tb ) );
 }
 
-void
+GtkWidget*
 promptfordir( GtkWindow * parent, TrCore * core, GList * files, tr_ctor * ctor )
 {
     uint8_t          flag = 0;
@@ -171,7 +171,8 @@ promptfordir( GtkWindow * parent, TrCore * core, GList * files, tr_ctor * ctor )
     g_signal_connect( G_OBJECT( wind ), "response",
                       G_CALLBACK( promptresp ), stuff );
 
-    gtk_widget_show_all(wind);
+    gtk_widget_show_all( wind );
+    return wind;
 }
 
 /***

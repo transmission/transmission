@@ -126,7 +126,7 @@ destinationChanged( GtkFileChooserButton * b, gpointer gdata )
 *****
 ****/
 
-void
+GtkWidget*
 makeaddwind( GtkWindow  * parent,
              TrCore     * core,
              tr_ctor    * ctor )
@@ -233,4 +233,5 @@ makeaddwind( GtkWindow  * parent,
 
     gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( d )->vbox ), t );
     gtk_widget_show_all( d );
+    return d;
 }

@@ -743,6 +743,17 @@ coreerr( TrCore * core UNUSED, enum tr_core_err code, const char * msg,
     g_assert_not_reached();
 }
 
+#if GTK_CHECK_VERSION(2,8,0)
+static void
+on_main_window_focus_in( GtkWidget      * widget UNUSED,
+                         GdkEventFocus  * event UNUSED,
+                         gpointer         gdata )
+{
+    struct cbdata * cbdata = gdata;
+    gtk_window_set_urgency_hint( GTK_WINDOW( cbdata->wind ), FALSE );
+}
+#endif
+
 static void
 coreprompt( TrCore                 * core,
             GList                  * paths,
@@ -751,13 +762,21 @@ coreprompt( TrCore                 * core,
 {
     struct cbdata * cbdata = gdata;
     const int len = g_list_length( paths );
+    GtkWidget * w;
+
     if( len > 1 )
-        promptfordir( cbdata->wind, core, paths, ctor );
+        w = promptfordir( cbdata->wind, core, paths, ctor );
     else {
         if( len == 1 )
             tr_ctorSetMetainfoFromFile( ctor, paths->data );
-        makeaddwind( cbdata->wind, core, ctor );
+        w = makeaddwind( cbdata->wind, core, ctor );
     }
+
+#if GTK_CHECK_VERSION(2,8,0)
+    gtk_window_set_urgency_hint( GTK_WINDOW( cbdata->wind ), TRUE );
+    g_signal_connect( w, "focus-in-event",
+                      G_CALLBACK(on_main_window_focus_in),  cbdata );
+#endif
 }
 
 static void
@@ -990,7 +1009,8 @@ doAction ( const char * action_name, gpointer user_data )
 
     if ( !strcmp (action_name, "open-torrent-menu") || !strcmp( action_name, "open-torrent-toolbar" ))
     {
-        tr_core_add_list( data->core, NULL, tr_ctorNew( tr_core_handle( data->core ) ) );
+        tr_core_add_list( data->core, NULL,
+                          tr_ctorNew( tr_core_handle( data->core ) ) );
     }
     else if (!strcmp (action_name, "show-stats"))
     {
