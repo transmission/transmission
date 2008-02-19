@@ -167,7 +167,17 @@
     if (column == -1 || (![NSApp isOnLeopardOrBetter] && [[self itemAtRow: row] isKindOfClass: [Torrent class]]))
         return [self rectOfRow: row];
     else
-        return [super frameOfCellAtColumn: column row: row];
+    {
+        NSRect rect = [super frameOfCellAtColumn: column row: row];
+        
+        //adjust placement for proper vertical alignment
+        if (column == [self columnWithIdentifier: @"Group"])
+            rect.size.height -= 1.0;
+        else if (column == [self columnWithIdentifier: @"UL"] || column == [self columnWithIdentifier: @"DL"])
+            rect.size.height += 1.0;
+        
+        return rect;
+    }
 }
 
 - (NSString *) outlineView: (NSOutlineView *) outlineView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn item: (id) item
