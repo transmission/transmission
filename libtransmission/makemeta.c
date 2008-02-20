@@ -73,7 +73,10 @@ getFiles( const char        * dir,
     {
         struct FileList * node = tr_new( struct FileList, 1 );
         node->size = sb.st_size;
-        node->filename = tr_strdup( buf );
+        if( ( buf[0]=='.' ) && ( buf[1]=='/' ) )
+            node->filename = tr_strdup( buf + 2 );
+        else
+            node->filename = tr_strdup( buf );
         node->next = list;
         list = node;
     }
