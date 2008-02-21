@@ -1,4 +1,4 @@
-/* $Id: miniupnpc.c,v 1.49 2007/12/19 14:58:54 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.50 2008/02/03 22:19:45 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2007 Thomas Bernard
@@ -665,37 +665,39 @@ UPNP_GetValidIGD(struct UPNPDev * devlist,
 		{
 			/* we should choose an internet gateway device.
 		 	* with st == urn:schemas-upnp-org:device:InternetGatewayDevice:1 */
-			if((state >= 3) || strstr(dev->st, "InternetGatewayDevice"))
-			{
-				descXML = miniwget_getaddr(dev->descURL, &descXMLsize,
+			descXML = miniwget_getaddr(dev->descURL, &descXMLsize,
 			   	                        lanaddr, lanaddrlen);
-				if(descXML)
+			if(descXML)
+			{
+				ndev++;
+				memset(data, 0, sizeof(struct IGDdatas));
+				memset(urls, 0, sizeof(struct UPNPUrls));
+				parserootdesc(descXML, descXMLsize, data);
+				free(descXML);
+				descXML = NULL;
+				if(0==strcmp(data->servicetype_CIF,
+				   "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1")
+				   || state >= 3 )
 				{
-					ndev++;
-					memset(data, 0, sizeof(struct IGDdatas));
-					memset(urls, 0, sizeof(struct UPNPUrls));
-					parserootdesc(descXML, descXMLsize, data);
-					free(descXML);
-					descXML = NULL;
-					GetUPNPUrls(urls, data, dev->descURL);
+				  GetUPNPUrls(urls, data, dev->descURL);
 
 #ifdef DEBUG
-					printf("UPNPIGD_IsConnected(%s) = %d\n",
-					   urls->controlURL,
-				       UPNPIGD_IsConnected(urls, data));
+				  printf("UPNPIGD_IsConnected(%s) = %d\n",
+				     urls->controlURL,
+			         UPNPIGD_IsConnected(urls, data));
 #endif
-					if((state >= 2) || UPNPIGD_IsConnected(urls, data))
-						return state;
-					FreeUPNPUrls(urls);
-					memset(data, 0, sizeof(struct IGDdatas));
+				  if((state >= 2) || UPNPIGD_IsConnected(urls, data))
+					return state;
+				  FreeUPNPUrls(urls);
 				}
-#ifdef DEBUG
-				else
-				{
-					printf("error getting XML description %s\n", dev->descURL);
-				}
-#endif
+				memset(data, 0, sizeof(struct IGDdatas));
 			}
+#ifdef DEBUG
+			else
+			{
+				printf("error getting XML description %s\n", dev->descURL);
+			}
+#endif
 		}
 	}
 	return 0;
