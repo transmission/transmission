@@ -577,6 +577,8 @@ tr_torrentStat( tr_torrent * tor )
     tc = tor->tracker;
     s->tracker = tr_trackerGetAddress( tor->tracker );
 
+    tr_trackerStat( tor->tracker, &s->tracker_stat );
+
     tr_peerMgrTorrentStats( tor->handle->peerMgr,
                             tor->info.hash,
                             &s->peersKnown,

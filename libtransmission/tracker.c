@@ -28,6 +28,7 @@
 #include "shared.h"
 #include "torrent.h"
 #include "tracker.h"
+#include "trcompat.h" /* strlcpy */
 #include "trevent.h"
 #include "utils.h"
 
@@ -114,6 +115,12 @@ struct tr_tracker
     time_t manualAnnounceAllowedAt;
     time_t reannounceAt;
     time_t scrapeAt;
+
+    time_t lastScrapeTime;
+    char lastScrapeResponse[512];
+
+    time_t lastAnnounceTime;
+    char lastAnnounceResponse[512];
 
     int randOffset;
 
@@ -255,7 +262,7 @@ publishNewPeers( tr_tracker * t, int count, uint8_t * peers )
     event.messageType = TR_TRACKER_PEERS;
     event.peerCount = count;
     event.peerCompact = peers;
-    tr_inf( "Torrent \"%s\" got %d new peers", t->name, count );
+    tr_dbg( "Torrent \"%s\" got %d new peers", t->name, count );
     if( count )
         tr_publisherPublish( t->publisher, t, &event );
 }
@@ -411,7 +418,11 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
             ( req && req->response_code_line ) ?  req->response_code_line
                                                : "(null)" );
 
-    tr_inf( "Torrent \"%s\" tracker response: %s",
+    *t->lastAnnounceResponse = '\0';
+    if( req && req->response_code_line )
+        strlcpy( t->lastAnnounceResponse, req->response_code_line, sizeof( t->lastAnnounceResponse ) );
+
+    tr_dbg( "Torrent \"%s\" tracker response: %s",
             t->name,
             ( req ? req->response_code_line : "(null)") );
 
@@ -572,7 +583,11 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
     if( t == NULL ) /* tracker's been closed... */
         return;
 
-    tr_inf( "Got scrape response for  '%s': %s",
+    *t->lastScrapeResponse = '\0';
+    if( req && req->response_code_line )
+        strlcpy( t->lastScrapeResponse, req->response_code_line, sizeof( t->lastScrapeResponse ) );
+
+    tr_dbg( "Got scrape response for  '%s': %s",
             t->name,
             ( ( req && req->response_code_line ) ? req->response_code_line
                                                  : "(null)") );
@@ -867,11 +882,28 @@ getConnection( tr_handle * handle, const char * address, int port )
 static void
 invokeRequest( tr_handle * handle, const struct tr_tracker_request * req )
 {
+    const time_t now = time( NULL );
     struct evhttp_connection * evcon = getConnection( handle, req->address, req->port );
     tr_tracker * t = findTracker( handle, req->torrent_hash );
     dbgmsg( t, "sending '%s' to tracker %s:%d, timeout is %d", req->uri, req->address, req->port, (int)req->timeout );
     evhttp_connection_set_timeout( evcon, req->timeout );
     ++handle->tracker->socketCount;
+
+    if( t != NULL )
+    {
+        if( req->reqtype == TR_REQ_SCRAPE )
+        {
+            t->lastScrapeTime = now;
+            t->scrapeAt = 0;
+        }
+        else
+        {
+            t->lastAnnounceTime = now;
+            t->reannounceAt = 0;
+            t->manualAnnounceAllowedAt = 0;
+        }
+    }
+
     if( evhttp_make_request( evcon, req->req, EVHTTP_REQ_GET, req->uri ))
         (*req->req->cb)(req->req, req->req->cb_arg);
     else
@@ -1187,6 +1219,7 @@ tr_trackerStop( tr_tracker * t )
 {
     if( t->isRunning ) {
         t->isRunning = 0;
+        t->reannounceAt = t->manualAnnounceAllowedAt = 0;
         enqueueRequest( t->handle, t, TR_REQ_STOPPED );
     }
 }
@@ -1196,4 +1229,25 @@ tr_trackerChangeMyPort( tr_tracker * t )
 {
     if( t->isRunning )
         tr_trackerReannounce( t );
+}
+
+void
+tr_trackerStat( const tr_tracker * t,
+                struct tr_tracker_stat * setme)
+{
+    assert( t != NULL );
+    assert( setme != NULL );
+
+    strlcpy( setme->scrapeResponse,
+             t->lastScrapeResponse,
+             sizeof( setme->scrapeResponse ) );
+    setme->lastScrapeTime = t->lastScrapeTime;
+    setme->nextScrapeTime = t->scrapeAt;
+
+    strlcpy( setme->announceResponse,
+             t->lastAnnounceResponse,
+             sizeof( setme->announceResponse ) );
+    setme->lastAnnounceTime = t->lastAnnounceTime;
+    setme->nextAnnounceTime = t->reannounceAt;
+    setme->nextManualAnnounceTime = t->manualAnnounceAllowedAt;
 }

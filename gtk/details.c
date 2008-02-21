@@ -1055,6 +1055,149 @@ refresh_options (GtkWidget * top UNUSED)
 }
 
 /****
+*****  TRACKER
+****/
+
+#define TRACKER_PAGE "tracker-page"
+
+struct tracker_page
+{
+    TrTorrent * gtor;
+
+    GtkWidget * last_scrape_time_lb;
+    GtkWidget * last_scrape_response_lb;
+    GtkWidget * next_scrape_countdown_lb;
+
+    GtkWidget * last_announce_time_lb;
+    GtkWidget * last_announce_response_lb;
+    GtkWidget * next_announce_countdown_lb;
+    GtkWidget * manual_announce_countdown_lb;
+};
+
+GtkWidget*
+tracker_page_new( TrTorrent * gtor )
+{
+    GtkWidget * t;
+    GtkWidget * l;
+    int row = 0;
+    const char * s;
+    struct tracker_page * page = g_new0( struct tracker_page, 1 );
+
+    page->gtor = gtor;
+
+    t = hig_workarea_create( );
+    hig_workarea_add_section_title( t, &row, _( "Scrape" ) );
+
+        s = _( "Last scrape at:" );
+        l = gtk_label_new( NULL );
+        page->last_scrape_time_lb = l;
+        hig_workarea_add_row( t, &row, s, l, NULL );
+
+        s = _( "Tracker responded: ");
+        l = gtk_label_new( NULL );
+        page->last_scrape_response_lb = l;
+        hig_workarea_add_row( t, &row, s, l, NULL );
+
+        s = _( "Next scrape in:" );
+        l = gtk_label_new( NULL );
+        page->next_scrape_countdown_lb = l;
+        hig_workarea_add_row( t, &row, s, l, NULL );
+
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Announce" ) );
+
+        s = _( "Last announce at:" );
+        l = gtk_label_new( NULL );
+        page->last_announce_time_lb = l;
+        hig_workarea_add_row( t, &row, s, l, NULL );
+
+        s = _( "Tracker responded: ");
+        l = gtk_label_new( NULL );
+        page->last_announce_response_lb = l;
+        hig_workarea_add_row( t, &row, s, l, NULL );
+
+        s = _( "Next announce in:" );
+        l = gtk_label_new( NULL );
+        page->next_announce_countdown_lb = l;
+        hig_workarea_add_row( t, &row, s, l, NULL );
+
+        s = _( "Manual announce allowed in:" );
+        l = gtk_label_new( NULL );
+        page->manual_announce_countdown_lb = l;
+        hig_workarea_add_row( t, &row, s, l, NULL );
+
+    g_object_set_data_full( G_OBJECT( t ), TRACKER_PAGE, page, g_free );
+    hig_workarea_finish( t, &row );
+    return t;
+}
+
+static void
+refresh_countdown_lb( GtkWidget * l, time_t t )
+{
+    const char * n_a = _( "N/A" );
+    const time_t now = time( NULL );
+    char buf[1024];
+
+    if( !t )
+        gtk_label_set_text( GTK_LABEL( l ), n_a );
+    else if( t < now )
+        gtk_label_set_text( GTK_LABEL( l ), n_a );
+    else {
+        const int seconds = t - now;
+        tr_strltime( buf, seconds, sizeof( buf ) );
+        gtk_label_set_text( GTK_LABEL( l ), buf );
+    }
+}
+
+static void
+refresh_time_lb( GtkWidget * l, time_t t )
+{
+    const char * never = _( "Never" );
+    if( !t )
+        gtk_label_set_text( GTK_LABEL( l ), never );
+    else {
+        char * str = rfc822date( t * 1000 );
+        gtk_label_set_text( GTK_LABEL( l ), str );
+        g_free( str );
+    }
+}
+
+static void
+refresh_tracker( GtkWidget * w )
+{
+    GtkWidget * l;
+    time_t t;
+    struct tracker_page * page = g_object_get_data( G_OBJECT( w ), TRACKER_PAGE );
+    const tr_stat * torStat = tr_torrent_stat( page->gtor );
+
+    l = page->last_scrape_time_lb;
+    t = torStat->tracker_stat.lastScrapeTime;
+    refresh_time_lb( l, t );
+
+    l = page->last_scrape_response_lb;
+    gtk_label_set_text( GTK_LABEL( l ), torStat->tracker_stat.scrapeResponse );
+
+    l = page->next_scrape_countdown_lb;
+    t = torStat->tracker_stat.nextScrapeTime;
+    refresh_countdown_lb( l, t );
+
+    l = page->last_announce_time_lb;
+    t = torStat->tracker_stat.lastAnnounceTime;
+    refresh_time_lb( l, t );
+
+    l = page->last_announce_response_lb;
+    gtk_label_set_text( GTK_LABEL( l ), torStat->tracker_stat.announceResponse );
+
+    l = page->next_announce_countdown_lb;
+    t = torStat->tracker_stat.nextAnnounceTime;
+    refresh_countdown_lb( l, t );
+
+    l = page->manual_announce_countdown_lb;
+    t = torStat->tracker_stat.nextManualAnnounceTime;
+    refresh_countdown_lb( l, t );
+}
+
+/****
 *****  DIALOG
 ****/
 
@@ -1080,6 +1223,7 @@ response_cb (GtkDialog *dialog, int response UNUSED, gpointer gtor)
 static gboolean
 periodic_refresh (gpointer data)
 {
+  refresh_tracker   (g_object_get_data (G_OBJECT(data), "tracker-top"));
   refresh_peers     (g_object_get_data (G_OBJECT(data), "peers-top"));
   refresh_activity  (g_object_get_data (G_OBJECT(data), "activity-top"));
   refresh_options   (g_object_get_data (G_OBJECT(data), "options-top"));
@@ -1133,6 +1277,11 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
   g_object_set_data (G_OBJECT(d), "files-top", w);
   gtk_notebook_append_page (GTK_NOTEBOOK(n), w,
                             gtk_label_new (_("Files")));
+
+  w = tracker_page_new( gtor );
+  g_object_set_data( G_OBJECT( d ), "tracker-top", w );
+  gtk_notebook_append_page( GTK_NOTEBOOK( n ), w,
+                            gtk_label_new( _( "Tracker" ) ) );
 
   w = options_page_new (gtor);
   g_object_set_data (G_OBJECT(d), "options-top", w);

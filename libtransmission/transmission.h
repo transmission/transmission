@@ -157,9 +157,19 @@ const char * tr_getPrefsDirectory( void );
 void tr_setMessageLevel( int );
 int tr_getMessageLevel( void );
 
+typedef struct tr_msg_list
+{
+    uint8_t              level;
+    time_t               when;
+    char               * message;
+    const char         * file;
+    int                  line;
+    struct tr_msg_list * next;
+}
+tr_msg_list;
+
 void tr_setMessageQueuing( int enable );
 
-typedef struct tr_msg_list tr_msg_list;
 tr_msg_list * tr_getQueuedMessages( void );
 void tr_freeMessageList( tr_msg_list * freeme );
 
@@ -712,77 +722,91 @@ tr_errno;
 #define TR_ERROR_IS_IO(e) (TR_ERROR_IO_PARENT<=(e) && (e)<=TR_ERROR_IO_OTHER)
 #define TR_ERROR_IS_TC(e) (TR_ERROR_TC_ERROR<=(e) && (e)<=TR_ERROR_TC_WARNING)
 
+struct tr_tracker_stat
+{
+    char scrapeResponse[512];
+    char announceResponse[512];
+    time_t lastScrapeTime;
+    time_t lastAnnounceTime;
+    time_t nextScrapeTime;
+    time_t nextAnnounceTime;
+    time_t nextManualAnnounceTime;
+};
+
 struct tr_stat
 {
-    tr_torrent_status   status;
+    tr_torrent_status status;
 
-    tr_errno            error;
-    char                errorString[128];
-
+    struct tr_tracker_stat tracker_stat;
     const tr_tracker_info * tracker;
 
-    float               recheckProgress;
-    float               percentComplete;
-    float               percentDone;
-    float               rateDownload;
-    float               rateUpload;
-    int                 eta;
-    int                 peersKnown;
-    int                 peersConnected;
-    int                 peersFrom[TR_PEER_FROM__MAX];
-    int                 peersSendingToUs;
-    int                 peersGettingFromUs;
-    int                 seeders;
-    int                 leechers;
-    int                 completedFromTracker;
+    tr_errno error;
+    char errorString[128];
+
+
+    float recheckProgress;
+    float percentComplete;
+    float percentDone;
+    float rateDownload;
+    float rateUpload;
+
+    int eta;
+    int peersKnown;
+    int peersConnected;
+    int peersFrom[TR_PEER_FROM__MAX];
+    int peersSendingToUs;
+    int peersGettingFromUs;
+    int seeders;
+    int leechers;
+    int completedFromTracker;
 
     /* if the torrent is running, this is the time at which
      * the client can manually ask the torrent's tracker
      * for more peers.  otherwise, the value is zero. */
-    time_t              manualAnnounceTime;
+    time_t manualAnnounceTime;
 
     /* Byte count of how much data is left to be downloaded until
      * we're done -- that is, until we've got all the pieces we wanted. */
-    uint64_t            leftUntilDone;
+    uint64_t leftUntilDone;
 
     /* Byte count of all the corrupt data you've ever downloaded for
      * this torrent.  If you're on a poisoned torrent, this number can
      * grow very large. */
-    uint64_t            corruptEver;
+    uint64_t corruptEver;
 
     /* Byte count of all data you've ever uploaded for this torrent. */
-    uint64_t            uploadedEver;
+    uint64_t uploadedEver;
 
     /* Byte count of all the non-corrupt data you've ever downloaded
      * for this torrent.  If you deleted the files and downloaded a second time,
      * this will be 2*totalSize.. */
-    uint64_t            downloadedEver;
+    uint64_t downloadedEver;
 
     /* Byte count of all the checksum-verified data we have for this torrent. */
-    uint64_t            haveValid;
+    uint64_t haveValid;
 
     /* Byte count of all the partial piece data we have for this torrent.
      * As pieces become complete, this value may decrease as portions of it are
      * moved to `corrupt' or `haveValid'. */
-    uint64_t            haveUnchecked;
+    uint64_t haveUnchecked;
 
     /* Byte count of all the non-DND piece data that either we already have,
      * or that a peer we're connected to has. [0...desiredSize] */
-    uint64_t            desiredAvailable;
+    uint64_t desiredAvailable;
 
     /* Byte count of all the piece data we want, whether we currently
      * have it nor not. [0...tr_info.totalSize] */
-    uint64_t            desiredSize;
+    uint64_t desiredSize;
 
-    float               swarmspeed;
+    float swarmspeed;
 
 #define TR_RATIO_NA  -1
 #define TR_RATIO_INF -2
     /* TR_RATIO_INF, TR_RATIO_NA, or a regular ratio */
-    float               ratio;
+    float ratio;
     
-    uint64_t            startDate;
-    uint64_t            activityDate;
+    uint64_t startDate;
+    uint64_t activityDate;
 };
 
 struct tr_file_stat
@@ -814,16 +838,6 @@ struct tr_peer_stat
     float progress;
     float downloadFromRate;
     float uploadToRate;
-};
-
-struct tr_msg_list
-{
-    uint8_t              level;
-    time_t               when;
-    char               * message;
-    const char         * file;
-    int                  line;
-    struct tr_msg_list * next;
 };
 
 
