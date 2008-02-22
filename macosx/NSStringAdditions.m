@@ -102,6 +102,44 @@
         return [NSString stringWithFormat: @"%.0f", ratio];
 }
 
++ (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds
+{
+    return [NSString timeString: seconds showSeconds:showSeconds maxDigits: INT_MAX];
+}
+
++ (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds maxDigits: (NSUInteger) max
+{
+    NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: 3];
+    uint64_t remaining = seconds;
+    
+    if (seconds >= 86400) //24 * 60 * 60
+    {
+        int days = remaining / 86400;
+        if (days == 1)
+            [timeArray addObject: NSLocalizedString(@"1 day", "time string")];
+        else
+            [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d days", "time string"), days]];
+        remaining %= 86400;
+        max--;
+    }
+    if (max > 0 && seconds >= 3600) //60 * 60
+    {
+        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d hr", "time string"), remaining / 3600]];
+        remaining %= 3600;
+        max--;
+    }
+    if (max > 0 && (!showSeconds || seconds >= 60))
+    {
+        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d min", "time string"), remaining / 60]];
+        remaining %= 60;
+        max--;
+    }
+    if (max > 0 && showSeconds)
+        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d sec", "time string"), remaining]];
+    
+    return [timeArray componentsJoinedByString: @" "];
+}
+
 - (NSComparisonResult) compareIP: (NSString *) string
 {
     NSArray * selfSections = [self componentsSeparatedByString: @"."],

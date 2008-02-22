@@ -30,7 +30,6 @@
 @interface StatsWindowController (Private)
 
 - (void) updateStats;
-- (NSString *) timeString: (uint64_t) seconds;
 
 @end
 
@@ -101,8 +100,8 @@ tr_handle * fLib;
         : NSLocalizedString(@"Total N/A", "stats total");
     [fRatioAllField setStringValue: totalRatioString];
     
-    [fTimeField setStringValue: [self timeString: statsSession.secondsActive]];
-    [fTimeAllField setStringValue: [[self timeString: statsAll.secondsActive]
+    [fTimeField setStringValue: [NSString timeString: statsSession.secondsActive showSeconds: NO]];
+    [fTimeAllField setStringValue: [[NSString timeString: statsAll.secondsActive showSeconds: NO]
                                     stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
     
     if (statsAll.sessionCount == 1)
@@ -110,31 +109,6 @@ tr_handle * fLib;
     else
         [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d times", "stats window -> times opened"),
                                         statsAll.sessionCount]];
-}
-
-- (NSString *) timeString: (uint64_t) seconds
-{
-    NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: 3];
-    uint64_t remaining = seconds;
-    
-    if (seconds >= 86400) //24 * 60 * 60
-    {
-        int days = remaining / 86400;
-        if (days == 1)
-            [timeArray addObject: NSLocalizedString(@"1 day", "stats window -> running time")];
-        else
-            [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d days", "stats window -> running time"), days]];
-        remaining %= 86400;
-    }
-    if (seconds >= 3600) //60 * 60
-    {
-        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d hr", "stats window -> running time"),
-                                remaining / 3600]];
-        remaining %= 3600;
-    }
-    [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d min", "stats window -> running time"), remaining / 60]];
-    
-    return [timeArray componentsJoinedByString: @" "];
 }
 
 @end

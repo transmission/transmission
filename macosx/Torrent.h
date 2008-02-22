@@ -178,7 +178,6 @@ typedef enum
 
 - (int) eta;
 - (int) etaRatio;
-- (NSString *) etaString: (int) eta;
 
 - (float) notAvailableDesired;
 

@@ -293,7 +293,6 @@ typedef enum
         [fAnnounceResponseField setToolTip: nil];
         [fAnnounceResponseField setSelectable: NO];
         [fAnnounceNextField setStringValue: @""];
-        [fAnnounceManualField setStringValue: @""];
         
         [fScrapeAddressField setStringValue: @""];
         [fScrapeAddressField setToolTip: nil];
@@ -1086,11 +1085,8 @@ typedef enum
     [fAnnounceResponseField setToolTip: announceResponse];
     [fAnnounceResponseField setSelectable: ![announceResponse isEqualToString: @""]];
     
-    #warning format into minutes, etc.
     int announceNext = [torrent nextAnnounceTime];
-    [fAnnounceNextField setStringValue: announceNext > 0 ? [NSString stringWithFormat: @"%d sec", announceNext] : @""];
-    
-    [fAnnounceManualField setStringValue: @""];
+    [fAnnounceNextField setStringValue: announceNext > 0 ? [NSString timeString: announceNext showSeconds: YES] : @""];
     
     //scrape fields
     NSString * scrapeAddress = [[torrent trackerAddress] stringByAppendingString: [torrent trackerAddressScrape]];
@@ -1105,7 +1101,7 @@ typedef enum
     [fScrapeResponseField setSelectable: ![scrapeResponse isEqualToString: @""]];
     
     int scrapeNext = [torrent nextScrapeTime];
-    [fScrapeNextField setStringValue: scrapeNext > 0 ? [NSString stringWithFormat: @"%d sec", scrapeNext] : @""];
+    [fScrapeNextField setStringValue: scrapeNext > 0 ? [NSString timeString: scrapeNext showSeconds: YES] : @""];
 }
 
 - (void) updateInfoPeers

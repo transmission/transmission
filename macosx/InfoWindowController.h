@@ -49,8 +49,7 @@
     IBOutlet NSTextView * fCommentView;
     IBOutlet NSButton * fRevealDataButton, * fRevealTorrentButton;
     
-    IBOutlet NSTextField * fAnnounceAddressField, * fAnnounceLastField, * fAnnounceResponseField,
-                            * fAnnounceNextField, * fAnnounceManualField,
+    IBOutlet NSTextField * fAnnounceAddressField, * fAnnounceLastField, * fAnnounceResponseField, * fAnnounceNextField,
                             * fScrapeAddressField, * fScrapeLastField, * fScrapeResponseField, * fScrapeNextField;
 
     IBOutlet NSTableView * fPeerTable;
