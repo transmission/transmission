@@ -688,6 +688,57 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return [NSString stringWithUTF8String: fStat->tracker->announce];
 }
 
+- (NSDate *) lastAnnounceTime
+{
+    int date = fStat->tracker_stat.lastAnnounceTime;
+    return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
+}
+
+- (int) nextAnnounceTime
+{
+    int date = fStat->tracker_stat.nextAnnounceTime;
+    if (date <= 0)
+        return -1;
+    
+    NSTimeInterval difference = [[NSDate dateWithTimeIntervalSince1970: date] timeIntervalSinceNow];
+    return difference > 0 ? (int)difference : -1;
+}
+
+- (int) manualAnnounceTime
+{
+    return 666;
+}
+
+- (NSString *) announceResponse
+{
+    return [NSString stringWithUTF8String: fStat->tracker_stat.announceResponse];
+}
+
+- (NSString *) trackerAddressScrape
+{
+    return [NSString stringWithUTF8String: fStat->tracker->scrape];
+}
+
+- (NSDate *) lastScrapeTime
+{
+    int date = fStat->tracker_stat.lastScrapeTime;
+    return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
+}
+
+- (int) nextScrapeTime
+{
+    int date = fStat->tracker_stat.nextScrapeTime;
+    if (date <= 0)
+        return -1;
+    
+    NSTimeInterval difference = [[NSDate dateWithTimeIntervalSince1970: date] timeIntervalSinceNow];
+    return difference > 0 ? (int)difference : -1;
+}
+- (NSString *) scrapeResponse
+{
+    return [NSString stringWithUTF8String: fStat->tracker_stat.scrapeResponse];
+}
+
 - (NSArray *) allTrackers
 {
     NSMutableArray * trackers = [NSMutableArray arrayWithCapacity: fInfo->trackerTiers], * subTrackers;

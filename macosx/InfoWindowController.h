@@ -32,7 +32,7 @@
 {
     NSArray * fTorrents, * fPeers;
     
-    IBOutlet NSView * fInfoView, * fActivityView, * fPeersView, * fFilesView, * fOptionsView;
+    IBOutlet NSView * fInfoView, * fActivityView, * fTrackerView, * fPeersView, * fFilesView, * fOptionsView;
     int fCurrentTabTag;
     IBOutlet NSMatrix * fTabMatrix;
 
@@ -48,6 +48,10 @@
                         * fRatioField, * fSwarmSpeedField;
     IBOutlet NSTextView * fCommentView;
     IBOutlet NSButton * fRevealDataButton, * fRevealTorrentButton;
+    
+    IBOutlet NSTextField * fAnnounceAddressField, * fAnnounceLastField, * fAnnounceResponseField,
+                            * fAnnounceNextField, * fAnnounceManualField,
+                            * fScrapeAddressField, * fScrapeLastField, * fScrapeResponseField, * fScrapeNextField;
 
     IBOutlet NSTableView * fPeerTable;
     IBOutlet NSTextField * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField, * fKnownField,

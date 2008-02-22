@@ -29,6 +29,7 @@
 
 #define TAB_INFO_IDENT @"Info"
 #define TAB_ACTIVITY_IDENT @"Activity"
+#define TAB_TRACKER_IDENT @"Tracker"
 #define TAB_PEERS_IDENT @"Peers"
 #define TAB_FILES_IDENT @"Files"
 #define TAB_OPTIONS_IDENT @"Options"
@@ -48,15 +49,17 @@ typedef enum
 {
     TAB_INFO_TAG = 0,
     TAB_ACTIVITY_TAG = 1,
-    TAB_PEERS_TAG = 2,
-    TAB_FILES_TAG = 3,
-    TAB_OPTIONS_TAG = 4
+    TAB_TRACKER_TAG = 2,
+    TAB_PEERS_TAG = 3,
+    TAB_FILES_TAG = 4,
+    TAB_OPTIONS_TAG = 5
 } tabTag;
 
 @interface InfoWindowController (Private)
 
 - (void) updateInfoGeneral;
 - (void) updateInfoActivity;
+- (void) updateInfoTracker;
 - (void) updateInfoPeers;
 - (void) updateInfoFiles;
 
@@ -92,6 +95,7 @@ typedef enum
     //set tab images and tooltips
     [[fTabMatrix cellWithTag: TAB_INFO_TAG] setIcon: [NSImage imageNamed: @"InfoGeneral.png"]];
     [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setIcon: [NSImage imageNamed: @"InfoActivity.png"]];
+    //[[fTabMatrix cellWithTag: TAB_TRACKER_TAG] setIcon: [NSImage imageNamed: @"InfoTracker.png"]];
     [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setIcon: [NSImage imageNamed: @"InfoPeers.png"]];
     [[fTabMatrix cellWithTag: TAB_FILES_TAG] setIcon: [NSImage imageNamed: @"InfoFiles.png"]];
     [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setIcon: [NSImage imageNamed: @"InfoOptions.png"]];
@@ -104,6 +108,8 @@ typedef enum
         tag = TAB_INFO_TAG;
     else if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
         tag = TAB_ACTIVITY_TAG;
+    else if ([identifier isEqualToString: TAB_TRACKER_IDENT])
+        tag = TAB_TRACKER_TAG;
     else if ([identifier isEqualToString: TAB_PEERS_IDENT])
         tag = TAB_PEERS_TAG;
     else if ([identifier isEqualToString: TAB_FILES_IDENT])
@@ -279,6 +285,21 @@ typedef enum
         [fErrorMessageView setString: @""];
         [fErrorMessageView setSelectable: NO];
         
+        [fAnnounceAddressField setStringValue: @""];
+        [fAnnounceAddressField setToolTip: nil];
+        [fAnnounceAddressField setSelectable: NO];
+        [fAnnounceLastField setStringValue: @""];
+        [fAnnounceResponseField setStringValue: @""];
+        [fAnnounceNextField setStringValue: @""];
+        [fAnnounceManualField setStringValue: @""];
+        
+        [fScrapeAddressField setStringValue: @""];
+        [fScrapeAddressField setToolTip: nil];
+        [fScrapeAddressField setSelectable: NO];
+        [fScrapeLastField setStringValue: @""];
+        [fScrapeResponseField setStringValue: @""];
+        [fScrapeNextField setStringValue: @""];
+        
         [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
         [fDownloadingFromField setStringValue: @""];
         [fUploadingToField setStringValue: @""];
@@ -378,6 +399,8 @@ typedef enum
         [fCreatorField setSelectable: ![creatorString isEqualToString: @""]];
         [fTorrentLocationField setSelectable: YES];
         [fDataLocationField setSelectable: YES];
+        [fAnnounceAddressField setSelectable: YES];
+        [fScrapeAddressField setSelectable: YES];
         
         //set pieces view
         BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
@@ -403,6 +426,9 @@ typedef enum
             break;
         case TAB_ACTIVITY_TAG:
             [self updateInfoActivity];
+            break;
+        case TAB_TRACKER_TAG:
+            [self updateInfoTracker];
             break;
         case TAB_PEERS_TAG:
             [self updateInfoPeers];
@@ -572,6 +598,12 @@ typedef enum
             canResizeVertical = NO;
             
             [fPiecesView updateView: YES];
+            break;
+        case TAB_TRACKER_TAG:
+            view = fTrackerView;
+            identifier = TAB_TRACKER_IDENT;
+            title = NSLocalizedString(@"Tracker", "Inspector -> title");
+            canResizeVertical = NO;
             break;
         case TAB_PEERS_TAG:
             view = fPeersView;
@@ -970,8 +1002,7 @@ typedef enum
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
-    NSString * tracker = [[torrent trackerAddress] stringByAppendingString: [torrent trackerAddressAnnounce]];
-    [fTrackerField setStringValue: tracker];
+    [fTrackerField setStringValue: [torrent trackerAddress]];
     
     NSString * location = [torrent dataLocation];
     [fDataLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
@@ -1031,6 +1062,40 @@ typedef enum
         
         [fPiecesView updateView: NO];
     }
+}
+
+- (void) updateInfoTracker
+{
+    if ([fTorrents count] != 1)
+        return;
+    
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    
+    //announce fields
+    NSString * announceAddress = [[torrent trackerAddress] stringByAppendingString: [torrent trackerAddressAnnounce]];
+    [fAnnounceAddressField setStringValue: announceAddress];
+    [fAnnounceAddressField setToolTip: announceAddress];
+    
+    [fAnnounceLastField setObjectValue: [torrent lastAnnounceTime]];
+    #warning make selectable/tooltip
+    [fAnnounceResponseField setStringValue: [torrent announceResponse]];
+    
+    #warning format into minutes, etc.
+    int announceNext = [torrent nextAnnounceTime];
+    [fAnnounceNextField setStringValue: announceNext > 0 ? [NSString stringWithFormat: @"%d sec", announceNext] : @""];
+    
+    [fAnnounceManualField setStringValue: @""];
+    
+    //scrape fields
+    NSString * scrapeAddress = [[torrent trackerAddress] stringByAppendingString: [torrent trackerAddressScrape]];
+    [fScrapeAddressField setStringValue: scrapeAddress];
+    [fScrapeAddressField setToolTip: scrapeAddress];
+    
+    [fScrapeLastField setObjectValue: [torrent lastScrapeTime]];
+    [fScrapeResponseField setStringValue: [torrent scrapeResponse]];
+    
+    int scrapeNext = [torrent nextScrapeTime];
+    [fScrapeNextField setStringValue: scrapeNext > 0 ? [NSString stringWithFormat: @"%d sec", scrapeNext] : @""];
 }
 
 - (void) updateInfoPeers
@@ -1106,6 +1171,8 @@ typedef enum
             return fInfoView;
         case TAB_ACTIVITY_TAG:
             return fActivityView;
+        case TAB_TRACKER_TAG:
+            return fTrackerView;
         case TAB_PEERS_TAG:
             return fPeersView;
         case TAB_FILES_TAG:

@@ -141,8 +141,19 @@ typedef enum
 - (BOOL) folder;
 - (uint64_t) size;
 - (uint64_t) sizeLeft;
+
 - (NSString *) trackerAddress;
 - (NSString *) trackerAddressAnnounce;
+- (NSDate *) lastAnnounceTime;
+- (int) nextAnnounceTime;
+- (int) manualAnnounceTime;
+- (NSString *) announceResponse;
+
+- (NSString *) trackerAddressScrape;
+- (NSDate *) lastScrapeTime;
+- (int) nextScrapeTime;
+- (NSString *) scrapeResponse;
+
 - (NSArray *) allTrackers;
 
 - (NSString *) comment;
