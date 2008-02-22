@@ -724,12 +724,39 @@ tr_errno;
 
 struct tr_tracker_stat
 {
+    /* This is the unmodified string returned by the tracker in response
+     * to the torrent's most recent scrape request.  If no request was
+     * sent or there was no response, this string is empty. */
     char scrapeResponse[512];
+
+    /* The unmodified string returned by the tracker in response
+     * to the torrent's most recent scrape request.  If no request was
+     * sent or there was no response, this string is empty. */
     char announceResponse[512];
+
+    /* Time the most recent scrape request was sent,
+     * or zero if one hasn't been sent yet. */
     time_t lastScrapeTime;
-    time_t lastAnnounceTime;
+
+    /* Time when the next scrape request will be sent.
+     * This value is always a valid time. */
     time_t nextScrapeTime;
+
+    /* Time the most recent announce request was sent,
+     * or zero if one hasn't been sent yet. */
+    time_t lastAnnounceTime;
+
+    /* Time when the next reannounce request will be sent,
+     * or zero if the torrent is stopped. */
     time_t nextAnnounceTime;
+
+    /* When the tracker will allow a human-driven "manual" announce to be sent,
+     * derived from the "min interval" field given by the tracker.
+     * This value is 0 when the torrent is stopped.
+     * This value is ~(time_t)0 if the tracker returned a serious error.
+     * Otherwise, the value is a valid time.
+     * @see tr_manualUpdate( tr_torrent * );
+     * @see tr_torrentCanManualUpdate( const tr_torrent * ); */
     time_t nextManualAnnounceTime;
 };
 
