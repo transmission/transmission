@@ -95,7 +95,7 @@ typedef enum
     //set tab images and tooltips
     [[fTabMatrix cellWithTag: TAB_INFO_TAG] setIcon: [NSImage imageNamed: @"InfoGeneral.png"]];
     [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setIcon: [NSImage imageNamed: @"InfoActivity.png"]];
-    //[[fTabMatrix cellWithTag: TAB_TRACKER_TAG] setIcon: [NSImage imageNamed: @"InfoTracker.png"]];
+    [[fTabMatrix cellWithTag: TAB_TRACKER_TAG] setIcon: [NSImage imageNamed: @"InfoTracker.png"]];
     [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setIcon: [NSImage imageNamed: @"InfoPeers.png"]];
     [[fTabMatrix cellWithTag: TAB_FILES_TAG] setIcon: [NSImage imageNamed: @"InfoFiles.png"]];
     [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setIcon: [NSImage imageNamed: @"InfoOptions.png"]];
@@ -290,6 +290,8 @@ typedef enum
         [fAnnounceAddressField setSelectable: NO];
         [fAnnounceLastField setStringValue: @""];
         [fAnnounceResponseField setStringValue: @""];
+        [fAnnounceResponseField setToolTip: nil];
+        [fAnnounceResponseField setSelectable: NO];
         [fAnnounceNextField setStringValue: @""];
         [fAnnounceManualField setStringValue: @""];
         
@@ -298,6 +300,8 @@ typedef enum
         [fScrapeAddressField setSelectable: NO];
         [fScrapeLastField setStringValue: @""];
         [fScrapeResponseField setStringValue: @""];
+        [fScrapeResponseField setToolTip: nil];
+        [fScrapeResponseField setSelectable: NO];
         [fScrapeNextField setStringValue: @""];
         
         [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
@@ -1068,7 +1072,6 @@ typedef enum
 {
     if ([fTorrents count] != 1)
         return;
-    
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
     //announce fields
@@ -1077,8 +1080,11 @@ typedef enum
     [fAnnounceAddressField setToolTip: announceAddress];
     
     [fAnnounceLastField setObjectValue: [torrent lastAnnounceTime]];
-    #warning make selectable/tooltip
-    [fAnnounceResponseField setStringValue: [torrent announceResponse]];
+    
+    NSString * announceResponse = [torrent announceResponse];
+    [fAnnounceResponseField setStringValue: announceResponse];
+    [fAnnounceResponseField setToolTip: announceResponse];
+    [fAnnounceResponseField setSelectable: ![announceResponse isEqualToString: @""]];
     
     #warning format into minutes, etc.
     int announceNext = [torrent nextAnnounceTime];
@@ -1092,7 +1098,11 @@ typedef enum
     [fScrapeAddressField setToolTip: scrapeAddress];
     
     [fScrapeLastField setObjectValue: [torrent lastScrapeTime]];
-    [fScrapeResponseField setStringValue: [torrent scrapeResponse]];
+    
+    NSString * scrapeResponse = [torrent scrapeResponse];
+    [fScrapeResponseField setStringValue: scrapeResponse];
+    [fScrapeResponseField setToolTip: scrapeResponse];
+    [fScrapeResponseField setSelectable: ![scrapeResponse isEqualToString: @""]];
     
     int scrapeNext = [torrent nextScrapeTime];
     [fScrapeNextField setStringValue: scrapeNext > 0 ? [NSString stringWithFormat: @"%d sec", scrapeNext] : @""];
