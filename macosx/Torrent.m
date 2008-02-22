@@ -992,11 +992,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     if ([self isError])
     {
+        string = NSLocalizedString(@"Error", "Torrent -> status string");
         NSString * errorString = [self errorMessage];
-        if (!errorString || [errorString isEqualToString: @""])
-            string = NSLocalizedString(@"Error", "Torrent -> status string");
-        else
-            string = [NSLocalizedString(@"Error: ", "Torrent -> status string") stringByAppendingString: errorString];
+        if (errorString && ![errorString isEqualToString: @""])
+            string = [NSString stringWithFormat: @"%@: %@", string, errorString];
     }
     else
     {

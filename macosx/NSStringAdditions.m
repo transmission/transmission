@@ -104,7 +104,7 @@
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds
 {
-    return [NSString timeString: seconds showSeconds:showSeconds maxDigits: INT_MAX];
+    return [NSString timeString: seconds showSeconds:showSeconds maxDigits: UINT_MAX];
 }
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds maxDigits: (NSUInteger) max
