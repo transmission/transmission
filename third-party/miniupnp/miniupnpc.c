@@ -1,4 +1,4 @@
-/* $Id: miniupnpc.c,v 1.49 2007/12/19 14:58:54 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.52 2008/02/18 13:28:33 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2007 Thomas Bernard
@@ -128,7 +128,9 @@ getContentLengthAndHeaderLength(char * p, int n,
 
 /* simpleUPnPcommand :
  * not so simple !
- * TODO: return some error codes */
+ * return values :
+ *   0 - OK
+ *  -1 - error */
 int simpleUPnPcommand(int s, const char * url, const char * service,
                       const char * action, struct UPNParg * args,
                       char * buffer, int * bufsize)
@@ -221,18 +223,32 @@ int simpleUPnPcommand(int s, const char * url, const char * service,
 	if(s<0)
 	{
 		s = socket(PF_INET, SOCK_STREAM, 0);
+		if(s<0)
+		{
+			PRINT_SOCKET_ERROR("socket");
+			*bufsize = 0;
+			return -1;
+		}
 		dest.sin_family = AF_INET;
 		dest.sin_port = htons(port);
 		dest.sin_addr.s_addr = inet_addr(hostname);
 		if(connect(s, (struct sockaddr *)&dest, sizeof(struct sockaddr))<0)
 		{
 			PRINT_SOCKET_ERROR("connect");
+			closesocket(s);
 			*bufsize = 0;
 			return -1;
 		}
 	}
 
 	n = soapPostSubmit(s, path, hostname, port, soapact, soapbody);
+	if(n<=0) {
+#ifdef DEBUG
+		printf("Error sending SOAP request\n");
+#endif
+		closesocket(s);
+		return -1;
+	}
 
 	contentlen = -1;
 	headerlen = -1;
@@ -246,15 +262,16 @@ int simpleUPnPcommand(int s, const char * url, const char * service,
 		getContentLengthAndHeaderLength(buffer, *bufsize,
 		                                &contentlen, &headerlen);
 #ifdef DEBUG
-		printf("n=%d bufsize=%d ContLen=%d HeadLen=%d\n",
+		printf("received n=%dbytes bufsize=%d ContLen=%d HeadLen=%d\n",
 		       n, *bufsize, contentlen, headerlen);
 #endif
+		/* break if we received everything */
 		if(contentlen > 0 && headerlen > 0 && *bufsize >= contentlen+headerlen)
 			break;
 	}
 	
 	closesocket(s);
-	return -1;
+	return 0;
 }
 
 /* parseMSEARCHReply()
@@ -619,7 +636,8 @@ UPNPIGD_IsConnected(struct UPNPUrls * urls, struct IGDdatas * data)
 	char status[64];
 	unsigned int uptime;
 	status[0] = '\0';
-	UPNP_GetStatusInfo(urls->controlURL, data->servicetype, status, &uptime);
+	UPNP_GetStatusInfo(urls->controlURL, data->servicetype,
+	                   status, &uptime, NULL);
 	if(0 == strcmp("Connected", status))
 	{
 		return 1;
@@ -665,37 +683,39 @@ UPNP_GetValidIGD(struct UPNPDev * devlist,
 		{
 			/* we should choose an internet gateway device.
 		 	* with st == urn:schemas-upnp-org:device:InternetGatewayDevice:1 */
-			if((state >= 3) || strstr(dev->st, "InternetGatewayDevice"))
-			{
-				descXML = miniwget_getaddr(dev->descURL, &descXMLsize,
+			descXML = miniwget_getaddr(dev->descURL, &descXMLsize,
 			   	                        lanaddr, lanaddrlen);
-				if(descXML)
+			if(descXML)
+			{
+				ndev++;
+				memset(data, 0, sizeof(struct IGDdatas));
+				memset(urls, 0, sizeof(struct UPNPUrls));
+				parserootdesc(descXML, descXMLsize, data);
+				free(descXML);
+				descXML = NULL;
+				if(0==strcmp(data->servicetype_CIF,
+				   "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1")
+				   || state >= 3 )
 				{
-					ndev++;
-					memset(data, 0, sizeof(struct IGDdatas));
-					memset(urls, 0, sizeof(struct UPNPUrls));
-					parserootdesc(descXML, descXMLsize, data);
-					free(descXML);
-					descXML = NULL;
-					GetUPNPUrls(urls, data, dev->descURL);
+				  GetUPNPUrls(urls, data, dev->descURL);
 
 #ifdef DEBUG
-					printf("UPNPIGD_IsConnected(%s) = %d\n",
-					   urls->controlURL,
-				       UPNPIGD_IsConnected(urls, data));
+				  printf("UPNPIGD_IsConnected(%s) = %d\n",
+				     urls->controlURL,
+			         UPNPIGD_IsConnected(urls, data));
 #endif
-					if((state >= 2) || UPNPIGD_IsConnected(urls, data))
-						return state;
-					FreeUPNPUrls(urls);
-					memset(data, 0, sizeof(struct IGDdatas));
+				  if((state >= 2) || UPNPIGD_IsConnected(urls, data))
+					return state;
+				  FreeUPNPUrls(urls);
 				}
-#ifdef DEBUG
-				else
-				{
-					printf("error getting XML description %s\n", dev->descURL);
-				}
-#endif
+				memset(data, 0, sizeof(struct IGDdatas));
 			}
+#ifdef DEBUG
+			else
+			{
+				printf("error getting XML description %s\n", dev->descURL);
+			}
+#endif
 		}
 	}
 	return 0;

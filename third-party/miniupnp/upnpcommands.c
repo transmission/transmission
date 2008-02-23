@@ -1,4 +1,4 @@
-/* $Id: upnpcommands.c,v 1.18 2007/12/19 14:56:14 nanard Exp $ */
+/* $Id: upnpcommands.c,v 1.19 2008/02/18 13:27:23 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005 Thomas Bernard
@@ -14,7 +14,7 @@
 static unsigned int
 my_atoui(const char * s)
 {
-	return (unsigned int)strtoul(s, NULL, 0);
+	return s ? ((unsigned int)strtoul(s, NULL, 0)) : 0;
 }
 
 /*
@@ -32,8 +32,7 @@ UPNP_GetTotalBytesSent(const char * controlURL,
 	ParseNameValue(buffer, bufsize, &pdata);
 	/*DisplayNameValueList(buffer, bufsize);*/
 	p = GetValueFromNameValueList(&pdata, "NewTotalBytesSent");
-	if(p)
-		r = my_atoui(p);
+	r = my_atoui(p);
 	ClearNameValueList(&pdata);
 	return r;
 }
@@ -53,8 +52,7 @@ UPNP_GetTotalBytesReceived(const char * controlURL,
 	ParseNameValue(buffer, bufsize, &pdata);
 	/*DisplayNameValueList(buffer, bufsize);*/
 	p = GetValueFromNameValueList(&pdata, "NewTotalBytesReceived");
-	if(p)
-		r = my_atoui(p);
+	r = my_atoui(p);
 	ClearNameValueList(&pdata);
 	return r;
 }
@@ -74,8 +72,7 @@ UPNP_GetTotalPacketsSent(const char * controlURL,
 	ParseNameValue(buffer, bufsize, &pdata);
 	/*DisplayNameValueList(buffer, bufsize);*/
 	p = GetValueFromNameValueList(&pdata, "NewTotalPacketsSent");
-	if(p)
-		r = my_atoui(p);
+	r = my_atoui(p);
 	ClearNameValueList(&pdata);
 	return r;
 }
@@ -95,36 +92,40 @@ UPNP_GetTotalPacketsReceived(const char * controlURL,
 	ParseNameValue(buffer, bufsize, &pdata);
 	/*DisplayNameValueList(buffer, bufsize);*/
 	p = GetValueFromNameValueList(&pdata, "NewTotalPacketsReceived");
-	if(p)
-		r = my_atoui(p);
+	r = my_atoui(p);
 	ClearNameValueList(&pdata);
 	return r;
 }
 
 /* UPNP_GetStatusInfo() call the corresponding UPNP method
  * returns the current status and uptime */
-void UPNP_GetStatusInfo(const char * controlURL,
-												const char * servicetype,
-												char * status, 
-												unsigned int * uptime)
+int UPNP_GetStatusInfo(const char * controlURL,
+					const char * servicetype,
+					char * status, 
+					unsigned int * uptime,
+					char * lastconnerror)
 {
 	struct NameValueParserData pdata;
 	char buffer[4096];
 	int bufsize = 4096;
 	char * p;
-	char* up;
+	char * up;
+	char * err;
+	int ret = UPNPCOMMAND_UNKNOWN_ERROR;
 
 	if(!status && !uptime)
-		return;
+		return UPNPCOMMAND_INVALID_ARGS;
 
 	simpleUPnPcommand(-1, controlURL, servicetype, "GetStatusInfo", 0, buffer, &bufsize);
 	ParseNameValue(buffer, bufsize, &pdata);
 	/*DisplayNameValueList(buffer, bufsize);*/
 	up = GetValueFromNameValueList(&pdata, "NewUptime");
 	p = GetValueFromNameValueList(&pdata, "NewConnectionStatus");
+	err = GetValueFromNameValueList(&pdata, "NewLastConnectionError");
+	if(p && up)
+	  ret = UPNPCOMMAND_SUCCESS;
 
-	if(status)
-	{
+	if(status) {
 		if(p){
 			strncpy(status, p, 64 );
 			status[63] = '\0';
@@ -132,30 +133,44 @@ void UPNP_GetStatusInfo(const char * controlURL,
 			status[0]= '\0';
 	}
 
-	if(uptime){
+	if(uptime) {
 		if(up)
 			sscanf(up,"%u",uptime);
 		else
 			uptime = 0;
 	}
 
+	if(lastconnerror) {
+		if(err) {
+			strncpy(lastconnerror, err, 64 );
+			lastconnerror[63] = '\0';
+		} else
+			lastconnerror[0] = '\0';
+	}
+
+	p = GetValueFromNameValueList(&pdata, "errorCode");
+	if(p) {
+		ret = UPNPCOMMAND_UNKNOWN_ERROR;
+		sscanf(p, "%d", &ret);
+	}
 	ClearNameValueList(&pdata);
+	return ret;
 }
 
 /* UPNP_GetConnectionTypeInfo() call the corresponding UPNP method
  * returns the connection type */
-void UPNP_GetConnectionTypeInfo(const char * controlURL,
-                                const char * servicetype,
-								char * connectionType)
+int UPNP_GetConnectionTypeInfo(const char * controlURL,
+                               const char * servicetype,
+                               char * connectionType)
 {
 	struct NameValueParserData pdata;
 	char buffer[4096];
 	int bufsize = 4096;
 	char * p;
+	int ret = UPNPCOMMAND_UNKNOWN_ERROR;
 
 	if(!connectionType)
-		return;
-
+		return UPNPCOMMAND_INVALID_ARGS;
 
 	simpleUPnPcommand(-1, controlURL, servicetype,
 	                  "GetConnectionTypeInfo", 0, buffer, &bufsize);
@@ -163,15 +178,19 @@ void UPNP_GetConnectionTypeInfo(const char * controlURL,
 	p = GetValueFromNameValueList(&pdata, "NewConnectionType");
 	/*p = GetValueFromNameValueList(&pdata, "NewPossibleConnectionTypes");*/
 	/* PossibleConnectionTypes will have several values.... */
-	if(connectionType)
-	{
-		if(p){
-			strncpy(connectionType, p, 64 );
-			connectionType[63] = '\0';
-		}	else
-			connectionType[0] = '\0';
+	if(p) {
+		strncpy(connectionType, p, 64 );
+		connectionType[63] = '\0';
+		ret = UPNPCOMMAND_SUCCESS;
+	} else
+		connectionType[0] = '\0';
+	p = GetValueFromNameValueList(&pdata, "errorCode");
+	if(p) {
+		ret = UPNPCOMMAND_UNKNOWN_ERROR;
+		sscanf(p, "%d", &ret);
 	}
 	ClearNameValueList(&pdata);
+	return ret;
 }
 
 /* UPNP_GetLinkLayerMaxBitRate() call the corresponding UPNP method.
@@ -179,16 +198,18 @@ void UPNP_GetConnectionTypeInfo(const char * controlURL,
  * One of the values can be null 
  * Note : GetLinkLayerMaxBitRates belongs to WANPPPConnection:1 only 
  * We can use the GetCommonLinkProperties from WANCommonInterfaceConfig:1 */
-void UPNP_GetLinkLayerMaxBitRates(const char * controlURL, const char * servicetype, unsigned int * bitrateDown, unsigned int* bitrateUp)
+int UPNP_GetLinkLayerMaxBitRates(const char * controlURL, const char * servicetype, unsigned int * bitrateDown, unsigned int* bitrateUp)
 {
 	struct NameValueParserData pdata;
 	char buffer[4096];
 	int bufsize = 4096;
+	int ret = UPNPCOMMAND_UNKNOWN_ERROR;
 	char * down;
-	char* up;
+	char * up;
+	char * p;
 
 	if(!bitrateDown && !bitrateUp)
-		return;
+		return UPNPCOMMAND_INVALID_ARGS;
 
 	/* shouldn't we use GetCommonLinkProperties ? */
 	simpleUPnPcommand(-1, controlURL, servicetype,
@@ -202,6 +223,8 @@ void UPNP_GetLinkLayerMaxBitRates(const char * controlURL, const char * servicet
 	up = GetValueFromNameValueList(&pdata, "NewLayer1UpstreamMaxBitRate");
 	/*GetValueFromNameValueList(&pdata, "NewWANAccessType");*/
 	/*GetValueFromNameValueList(&pdata, "NewPhysicalLinkSatus");*/
+	if(down && up)
+		ret = UPNPCOMMAND_SUCCESS;
 
 	if(bitrateDown)
 	{
@@ -218,7 +241,13 @@ void UPNP_GetLinkLayerMaxBitRates(const char * controlURL, const char * servicet
 		else
 			*bitrateUp = 0;
 	}
+	p = GetValueFromNameValueList(&pdata, "errorCode");
+	if(p) {
+		ret = UPNPCOMMAND_UNKNOWN_ERROR;
+		sscanf(p, "%d", &ret);
+	}
 	ClearNameValueList(&pdata);
+	return ret;
 }
 
 
@@ -247,7 +276,6 @@ int UPNP_GetExternalIPAddress(const char * controlURL,
 		return UPNPCOMMAND_INVALID_ARGS;
 
 	simpleUPnPcommand(-1, controlURL, servicetype, "GetExternalIPAddress", 0, buffer, &bufsize);
-	/*fd = simpleUPnPcommand(fd, controlURL, data.servicetype, "GetExternalIPAddress", 0, buffer, &bufsize);*/
 	/*DisplayNameValueList(buffer, bufsize);*/
 	ParseNameValue(buffer, bufsize, &pdata);
 	/*printf("external ip = %s\n", GetValueFromNameValueList(&pdata, "NewExternalIPAddress") );*/
@@ -304,7 +332,6 @@ UPNP_AddPortMapping(const char * controlURL, const char * servicetype,
 	AddPortMappingArgs[7].elt = "NewLeaseDuration";
 	AddPortMappingArgs[7].val = "0";
 	simpleUPnPcommand(-1, controlURL, servicetype, "AddPortMapping", AddPortMappingArgs, buffer, &bufsize);
-	/*fd = simpleUPnPcommand(fd, controlURL, data.servicetype, "AddPortMapping", AddPortMappingArgs, buffer, &bufsize);*/
 	/*DisplayNameValueList(buffer, bufsize);*/
 	/*buffer[bufsize] = '\0';*/
 	/*puts(buffer);*/

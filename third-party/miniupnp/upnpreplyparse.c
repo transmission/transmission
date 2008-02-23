@@ -1,4 +1,4 @@
-/* $Id: upnpreplyparse.c,v 1.9 2007/05/15 18:14:08 nanard Exp $ */
+/* $Id: upnpreplyparse.c,v 1.10 2008/02/21 13:05:27 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2006 Thomas Bernard 
@@ -108,6 +108,7 @@ GetValueFromNameValueListIgnoreNS(struct NameValueParserData * pdata,
 
 /* debug all-in-one function 
  * do parsing then display to stdout */
+#ifdef DEBUG
 void
 DisplayNameValueList(char * buffer, int bufsize)
 {
@@ -122,4 +123,5 @@ DisplayNameValueList(char * buffer, int bufsize)
     }
     ClearNameValueList(&pdata);
 }
+#endif
 
