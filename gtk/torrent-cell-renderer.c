@@ -13,6 +13,7 @@
 #include "assert.h"
 #include <gtk/gtk.h>
 #include <gtk/gtkcellrenderertext.h>
+#include <gtk/gtkcellrendererprogress.h>
 #include <glib/gi18n.h>
 #include <libtransmission/transmission.h>
 #include "hig.h"
@@ -29,6 +30,7 @@ enum
     P_MINIMAL,
     P_SHOW_UNAVAILABLE,
     P_GRADIENT,
+    P_NATIVE_PROGRESS,
     P_COLOR_VERIFIED,
     P_COLOR_VERIFIED_2,
     P_COLOR_MISSING,
@@ -251,10 +253,12 @@ struct TorrentCellRendererPrivate
     tr_torrent * tor;
     GtkCellRenderer * text_renderer;
     GtkCellRenderer * text_renderer_err;
+    GtkCellRenderer * progress_renderer;
     int bar_height;
     gboolean minimal;
     gboolean show_unavailable;
     gboolean gradient;
+    gboolean use_native_progress;
     GdkColor color_paused[2];
     GdkColor color_verified[2];
     GdkColor color_verifying[2];
@@ -538,6 +542,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         GtkCellRenderer * text_renderer = torStat->error != 0
             ? p->text_renderer_err
             : p->text_renderer;
+        const gboolean isActive = torStat->status != TR_STATUS_STOPPED;
 
         g_object_get( self, "xpad", &xpad, "ypad", &ypad, NULL );
 
@@ -546,6 +551,9 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         my_bg.y += ypad;
         my_bg.width -= xpad*2;
         my_cell = my_expose = my_bg;
+
+        g_object_set( text_renderer, "sensitive", isActive, NULL );
+        g_object_set( p->progress_renderer, "sensitive", isActive, NULL );
 
         /* above the progressbar */
         if( !p->minimal )
@@ -630,7 +638,22 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
 
         /* the progressbar */
         my_cell.height = p->bar_height;
-        drawRegularBar( self, info, torStat, window, widget, &my_cell );
+        if( p->use_native_progress )
+        {
+            const double havePercent = ( torStat->haveValid + torStat->haveUnchecked )
+                                                              / (double)info->totalSize;
+            g_object_set( p->progress_renderer, "value", (int)(havePercent*100.0), 
+                                                "text", "",
+                                                NULL );
+            gtk_cell_renderer_render( p->progress_renderer,
+                                      window, widget,
+                                      &my_cell, &my_cell, &my_cell, flags );
+ 
+        }
+        else
+        {
+            drawRegularBar( self, info, torStat, window, widget, &my_cell );
+        }
         my_bg.y     += my_cell.height;
         my_cell.y   += my_cell.height;
         my_expose.y += my_cell.height;
@@ -698,6 +721,7 @@ torrent_cell_renderer_set_property( GObject      * object,
         case P_BAR_HEIGHT:  p->bar_height = g_value_get_int( v ); break;
         case P_MINIMAL:     p->minimal  = g_value_get_boolean( v ); break;
         case P_GRADIENT:    p->gradient = g_value_get_boolean( v ); break;
+        case P_NATIVE_PROGRESS: p->use_native_progress = g_value_get_boolean( v ); break;
         case P_SHOW_UNAVAILABLE:
                             p->show_unavailable = g_value_get_boolean( v ); break;
         default:
@@ -746,6 +770,7 @@ torrent_cell_renderer_get_property( GObject      * object,
         case P_BAR_HEIGHT:  g_value_set_int( v, p->bar_height ); break;
         case P_MINIMAL:     g_value_set_boolean( v, p->minimal ); break;
         case P_GRADIENT:    g_value_set_boolean( v, p->gradient ); break;
+        case P_NATIVE_PROGRESS: g_value_set_boolean( v, p->use_native_progress ); break;
         case P_SHOW_UNAVAILABLE:
                             g_value_set_boolean( v, p->show_unavailable ); break;
         default:
@@ -764,6 +789,7 @@ torrent_cell_renderer_dispose( GObject * o )
     {
         g_object_unref( G_OBJECT( r->priv->text_renderer ) );
         g_object_unref( G_OBJECT( r->priv->text_renderer_err ) );
+        g_object_unref( G_OBJECT( r->priv->progress_renderer ) );
         r->priv = NULL;
     }
 
@@ -802,6 +828,10 @@ torrent_cell_renderer_class_init( TorrentCellRendererClass * klass )
 
     g_object_class_install_property( gobject_class, P_GRADIENT,
         g_param_spec_boolean( "gradient", NULL, "Render Progress as a Gradient",
+                              TRUE, G_PARAM_READWRITE ) );
+
+    g_object_class_install_property( gobject_class, P_NATIVE_PROGRESS,
+        g_param_spec_boolean( "use-native-progress", NULL, "Use Native GtkProgressBars",
                               TRUE, G_PARAM_READWRITE ) );
 
     g_object_class_install_property( gobject_class, P_SHOW_UNAVAILABLE,
@@ -878,12 +908,15 @@ torrent_cell_renderer_init( GTypeInstance * instance, gpointer g_class UNUSED )
     p->tor = NULL;
     p->text_renderer = gtk_cell_renderer_text_new( );
     p->text_renderer_err = gtk_cell_renderer_text_new(  );
+    p->progress_renderer = gtk_cell_renderer_progress_new(  );
     g_object_set( p->text_renderer_err, "foreground", "red", NULL );
     tr_object_ref_sink( p->text_renderer );
     tr_object_ref_sink( p->text_renderer_err );
+    tr_object_ref_sink( p->progress_renderer );
 
     p->gradient = TRUE;
     p->show_unavailable = TRUE;
+    p->use_native_progress = TRUE;
     p->bar_height = DEFAULT_BAR_HEIGHT;
 
     gdk_color_parse( DEFAULT_COLOR_VERIFIED,      &p->color_verified[0] );
