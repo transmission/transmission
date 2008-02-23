@@ -1,5 +1,17 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.06 (2008/xx/yy)
+- All Platforms:
+   + Fix support for multitracker torrents
+   + Improvements and bugfixes to "Verify Local Data"
+   + Updated UPnP code to miniupnpc-1.0
+   + Fix two shutdown memory errors
+- GTK+
+   + Fix small memory leak
+   + GUI error when verifying local data
+- CLI:
+   + Torrent creation error on non-absolute pathnames
+
 1.05 (2008/02/08)
 - All Platforms:
    + Fix 1.04 crash when parsing bencoded data
