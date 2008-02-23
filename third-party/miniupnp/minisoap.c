@@ -1,4 +1,4 @@
-/* $Id: minisoap.c,v 1.14 2008/02/16 23:46:11 nanard Exp $ */
+/* $Id: minisoap.c,v 1.15 2008/02/17 17:57:07 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005 Thomas Bernard
@@ -44,6 +44,8 @@ httpWrite(int fd, const char * body, int bodysize,
 	char * p;
 	/* TODO: AVOID MALLOC */
 	p = malloc(headerssize+bodysize);
+	if(!p)
+	  return 0;
 	memcpy(p, headers, headerssize);
 	memcpy(p+headerssize, body, bodysize);
 	/*n = write(fd, p, headerssize+bodysize);*/
@@ -75,24 +77,35 @@ int soapPostSubmit(int fd,
 				   const char * body)
 {
 	int bodysize;
-	char headerbuf[1024];
+	char headerbuf[512];
 	int headerssize;
+	char portstr[8];
 	bodysize = (int)strlen(body);
 	/* We are not using keep-alive HTTP connections.
 	 * HTTP/1.1 needs the header Connection: close to do that.
 	 * This is the default with HTTP/1.0 */
     /* Connection: Close is normally there only in HTTP/1.1 but who knows */
+	portstr[0] = '\0';
+	if(port != 80)
+		snprintf(portstr, sizeof(portstr), ":%hu", port);
 	headerssize = snprintf(headerbuf, sizeof(headerbuf),
-/*                       "POST %s HTTP/1.1\r\n"*/
-                       "POST %s HTTP/1.0\r\n"
-	                   "Host: %s:%d\r\n"
+                       "POST %s HTTP/1.1\r\n"
+/*                       "POST %s HTTP/1.0\r\n"*/
+	                   "Host: %s%s\r\n"
 					   "User-Agent: POSIX, UPnP/1.0, miniUPnPc/1.0\r\n"
 	                   "Content-Length: %d\r\n"
 					   "Content-Type: text/xml\r\n"
 					   "SOAPAction: \"%s\"\r\n"
 					   "Connection: Close\r\n"
+					   "Cache-Control: no-cache\r\n"	/* ??? */
+					   "Pragma: no-cache\r\n"
 					   "\r\n",
-					   url, host, port, bodysize, action);
+					   url, host, portstr, bodysize, action);
+#ifdef DEBUG
+	printf("SOAP request : headersize=%d bodysize=%d\n",
+	       headerssize, bodysize);
+	/*printf("%s", headerbuf);*/
+#endif
 	return httpWrite(fd, body, bodysize, headerbuf, headerssize);
 }
 
