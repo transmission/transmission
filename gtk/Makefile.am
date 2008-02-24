@@ -9,7 +9,8 @@ AM_CPPFLAGS = \
 AM_CFLAGS = \
     $(GTK_CFLAGS) \
     $(OPENSSL_CFLAGS) \
-    $(PTHREAD_CFLAGS)
+    $(PTHREAD_CFLAGS) \
+    $(LIBNOTIFY_CFLAGS)
 
 noinst_HEADERS = \
     actions.h \
@@ -50,6 +51,7 @@ transmission_SOURCES = \
     main.c \
     makemeta-ui.c \
     msgwin.c \
+    notify.c \
     open-dialog.c \
     sexy-icon-entry.c \
     stats.c \
@@ -69,6 +71,7 @@ transmission_LDADD = \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(GTK_LIBS) \
+    $(LIBNOTIFY_LIBS) \
     $(OPENSSL_LIBS) \
     $(PTHREAD_LIBS) -lm
 

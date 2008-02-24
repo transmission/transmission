@@ -47,6 +47,7 @@
 #include "ipc.h"
 #include "makemeta-ui.h"
 #include "msgwin.h"
+#include "notify.h"
 #include "open-dialog.h"
 #include "stats.h"
 #include "tr_core.h"
@@ -266,6 +267,8 @@ main( int argc, char ** argv )
         g_clear_error( &gerr );
         return 0;
     }
+
+    tr_notify_init( );
 
     didinit = cf_init( tr_getPrefsDirectory(), NULL ); /* must come before actions_init */
     tr_prefs_init_global( );

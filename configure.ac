@@ -13,9 +13,11 @@ AC_PROG_LIBTOOL
 GLIB_MINIMUM=2.6.0
 GTK_MINIMUM=2.6.0
 WX_MINIMUM=2.6.0
+LIBNOTIFY_MINIMUM=0.4.4
 AC_SUBST(GLIB_MINIMUM)
 AC_SUBST(GTK_MINIMUM)
 AC_SUBST(WX_MINIMUM)
+AC_SUBST(LIBNOTIFY_MINIMUM)
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -91,6 +93,16 @@ fi
 AM_CONDITIONAL([BUILD_GTK],[test "x$build_gtk" = "xyes"])
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
+
+PKG_CHECK_MODULES([LIBNOTIFY],
+                  [libnotify >= $LIBNOTIFY_MINIMUM],
+                  [use_libnotify=yes],
+                  [use_libnotify=no])
+AC_SUBST(LIBNOTIFY_LIBS)
+AC_SUBST(LIBNOTIFY_CFLAGS)
+if test "x$use_libnotify" = "xyes"; then
+    AC_DEFINE([HAVE_LIBNOTIFY], 1)
+fi
 
 IT_PROG_INTLTOOL([0.23],[no-xml])
 GETTEXT_PACKAGE=transmission
@@ -264,6 +276,7 @@ Configuration:
         Build Daemon:               ${build_daemon}
         Build BeOS client:          ${build_beos}
         Build GTK+ client:          ${build_gtk}
+          ... libnotify support:    ${use_libnotify}
         Build OS X client:          ${build_darwin}
         Build wxWidgets client:     ${build_wx}
 

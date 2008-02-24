@@ -34,6 +34,7 @@
 #include "tr_prefs.h"
 #include "tr_torrent.h"
 #include "conf.h"
+#include "notify.h"
 #include "util.h"
 
 struct TrTorrentPrivate
@@ -161,11 +162,29 @@ tr_torrent_stop( TrTorrent * self )
         tr_torrentStop( handle );
 }
 
+
+static gboolean
+notifyInMainThread( gpointer user_data )
+{
+g_message( "calling tr_notify_send on %p", user_data );
+    tr_notify_send( TR_TORRENT( user_data ) );
+    return FALSE;
+}
+static void
+statusChangedCallback( tr_torrent   * tor UNUSED,
+                       cp_status_t    status,
+                       void         * user_data )
+{
+g_message( "status changed! new status is %d, user_data is %p", status, user_data );
+    if( status == TR_CP_COMPLETE )
+        g_idle_add( notifyInMainThread, user_data );
+}
 static TrTorrent *
 maketorrent( tr_torrent * handle )
 {
     TrTorrent * tor = g_object_new( TR_TORRENT_TYPE, NULL );
     tor->priv->handle = handle;
+    tr_torrentSetStatusCallback( handle, statusChangedCallback, tor );
     return tor;
 }
 
