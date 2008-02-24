@@ -104,7 +104,7 @@ PrivateData;
 PrivateData*
 get_private_data( TrWindow * w )
 {
-    return (PrivateData*) g_object_get_data (G_OBJECT(w), PRIVATE_DATA_KEY);
+    return g_object_get_data (G_OBJECT(w), PRIVATE_DATA_KEY);
 }
 
 /***
@@ -224,7 +224,7 @@ prefsChanged( TrCore * core UNUSED, const char * key, gpointer wind )
 static void
 privateFree( gpointer vprivate )
 {
-    PrivateData * p = ( PrivateData * ) vprivate;
+    PrivateData * p = vprivate;
     g_signal_handler_disconnect( p->core, p->pref_handler_id );
     g_free( p->filter_text );
     g_free( p );
@@ -233,7 +233,7 @@ privateFree( gpointer vprivate )
 static void
 onYinYangReleased( GtkWidget * w UNUSED, GdkEventButton * button UNUSED, gpointer vprivate )
 {
-    PrivateData * p = ( PrivateData * ) vprivate;
+    PrivateData * p = vprivate;
     gtk_menu_popup( GTK_MENU( p->status_menu ), 0, 0, 0, 0, 0, gtk_get_current_event_time( ) );
 }
 
@@ -254,7 +254,7 @@ status_menu_toggled_cb( GtkCheckMenuItem  * menu_item,
 {
     if( gtk_check_menu_item_get_active( menu_item ) )
     {
-        PrivateData * p = (PrivateData*) vprivate;
+        PrivateData * p = vprivate;
         const char * val = g_object_get_data( G_OBJECT( menu_item ), STATS_MODE );
         tr_core_set_pref( p->core, PREF_KEY_STATUS_BAR_STATS, val );
     }
@@ -358,7 +358,7 @@ filter_text_toggled_cb( GtkCheckMenuItem  * menu_item,
 {
     if( gtk_check_menu_item_get_active( menu_item ) )
     {
-        PrivateData * p = (PrivateData*) vprivate;
+        PrivateData * p = vprivate;
         p->filter_text_mode = GPOINTER_TO_UINT( g_object_get_data( G_OBJECT( menu_item ),
                                                                    FILTER_TEXT_MODE_KEY ) );
         refilter( p );
@@ -368,7 +368,7 @@ filter_text_toggled_cb( GtkCheckMenuItem  * menu_item,
 static void
 filter_toggled_cb( GtkToggleButton * toggle, gpointer vprivate )
 {
-    PrivateData * p = (PrivateData*) vprivate;
+    PrivateData * p = vprivate;
     GSList * l;
     GSList * toggles = g_object_get_data( G_OBJECT( toggle ), FILTER_TOGGLES_KEY );
     const gboolean isActive = gtk_toggle_button_get_active( toggle );
@@ -396,7 +396,7 @@ static void
 filter_entry_changed( GtkEditable * e, gpointer vprivate )
 {
     char * pch;
-    PrivateData * p = (PrivateData*) vprivate;
+    PrivateData * p = vprivate;
 
     pch = gtk_editable_get_chars( e, 0, -1 );
     g_free( p->filter_text );
