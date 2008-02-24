@@ -109,10 +109,10 @@
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds maxDigits: (NSUInteger) max
 {
-    NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: 3];
+    NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 4)];
     uint64_t remaining = seconds;
     
-    if (seconds >= 86400) //24 * 60 * 60
+    if (max > 0 && seconds >= 86400) //24 * 60 * 60
     {
         int days = remaining / 86400;
         if (days == 1)

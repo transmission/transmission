@@ -146,7 +146,6 @@ typedef enum
 - (NSString *) trackerAddressAnnounce;
 - (NSDate *) lastAnnounceTime;
 - (int) nextAnnounceTime;
-- (int) manualAnnounceTime;
 - (NSString *) announceResponse;
 
 - (NSString *) trackerAddressScrape;

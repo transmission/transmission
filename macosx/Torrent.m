@@ -704,11 +704,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return difference > 0 ? (int)difference : -1;
 }
 
-- (int) manualAnnounceTime
-{
-    return 666;
-}
-
 - (NSString *) announceResponse
 {
     return [NSString stringWithUTF8String: fStat->tracker_stat.announceResponse];
