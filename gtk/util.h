@@ -93,21 +93,13 @@ sizingmagic( GtkWindow * wind, GtkScrolledWindow * scroll,
 /* create an error dialog, if wind is NULL or mapped then show dialog now,
    otherwise show it when wind becomes mapped */
 void
-errmsg( GtkWindow * wind, const char * format, ... )
-#ifdef __GNUC__
-    __attribute__ (( format ( printf, 2, 3 ) ))
-#endif
-    ;
+errmsg( GtkWindow * wind, const char * format, ... ) G_GNUC_PRINTF(2,3);
 
 /* create an error dialog but do not gtk_widget_show() it,
    calls func( data ) when the dialog is closed */
 GtkWidget *
 errmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
-             const char * format, ... )
-#ifdef __GNUC__
-    __attribute__ (( format ( printf, 4, 5 ) ))
-#endif
-    ;
+             const char * format, ... ) G_GNUC_PRINTF(4,5);
 
 /* varargs version of errmsg_full() */
 GtkWidget *
