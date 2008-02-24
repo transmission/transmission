@@ -53,6 +53,8 @@ tr_prefs_init_global( void )
 
     pref_int_set_default    ( PREF_KEY_PORT, TR_DEFAULT_PORT );
 
+    pref_flag_set_default   ( PREF_KEY_NOTIFY, TRUE );
+
     pref_flag_set_default   ( PREF_KEY_NAT, TRUE );
     pref_flag_set_default   ( PREF_KEY_PEX, TRUE );
     pref_flag_set_default   ( PREF_KEY_SYSTRAY, TRUE );
@@ -233,13 +235,10 @@ torrentPage( GObject * core )
     GtkWidget * w;
 
     t = hig_workarea_create( );
-    hig_workarea_add_section_title( t, &row, _( "Location" ) );
+    hig_workarea_add_section_title( t, &row, _( "Adding" ) );
 
         w = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
         hig_workarea_add_row( t, &row, _( "Default download _location:" ), w, NULL );
-
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Adding Torrents" ) );
 
         s = _( "Show _options dialog" );
         w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );
@@ -252,6 +251,15 @@ torrentPage( GObject * core )
         s = _( "_Delete original torrent file" );
         w = new_check_button( s, PREF_KEY_DELETE_ORIGINAL, core );
         hig_workarea_add_wide_control( t, &row, w );
+
+#ifdef HAVE_LIBNOTIFY
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Notification" ) );
+
+        s = _( "_Popup message when a torrent finishes" );
+        w = new_check_button( s, PREF_KEY_NOTIFY, core );
+        hig_workarea_add_wide_control( t, &row, w );
+#endif
 
     hig_workarea_finish( t, &row );
     return t;

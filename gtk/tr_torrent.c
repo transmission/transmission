@@ -166,8 +166,8 @@ tr_torrent_stop( TrTorrent * self )
 static gboolean
 notifyInMainThread( gpointer user_data )
 {
-g_message( "calling tr_notify_send on %p", user_data );
-    tr_notify_send( TR_TORRENT( user_data ) );
+    if( pref_flag_get( PREF_KEY_NOTIFY ) )
+        tr_notify_send( TR_TORRENT( user_data ) );
     return FALSE;
 }
 static void
@@ -175,7 +175,6 @@ statusChangedCallback( tr_torrent   * tor UNUSED,
                        cp_status_t    status,
                        void         * user_data )
 {
-g_message( "status changed! new status is %d, user_data is %p", status, user_data );
     if( status == TR_CP_COMPLETE )
         g_idle_add( notifyInMainThread, user_data );
 }
