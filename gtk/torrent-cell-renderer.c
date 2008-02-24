@@ -27,48 +27,10 @@ enum
 {
     P_TORRENT = 1,
     P_BAR_HEIGHT,
-    P_MINIMAL,
-    P_SHOW_UNAVAILABLE,
-    P_GRADIENT,
-    P_NATIVE_PROGRESS,
-    P_COLOR_VERIFIED,
-    P_COLOR_VERIFIED_2,
-    P_COLOR_MISSING,
-    P_COLOR_MISSING_2,
-    P_COLOR_UNWANTED,
-    P_COLOR_UNWANTED_2,
-    P_COLOR_UNAVAILABLE,
-    P_COLOR_UNAVAILABLE_2,
-    P_COLOR_PAUSED,
-    P_COLOR_PAUSED_2,
-    P_COLOR_VERIFYING,
-    P_COLOR_VERIFYING_2,
-    P_COLOR_SEEDING,
-    P_COLOR_SEEDING_2
+    P_MINIMAL
 };
 
 #define DEFAULT_BAR_HEIGHT 12
-
-#define DEFAULT_COLOR_VERIFIED       "#729fcf"
-#define DEFAULT_COLOR_VERIFIED_2     "#204a87"
-
-#define DEFAULT_COLOR_SEEDING        "#8ae234"
-#define DEFAULT_COLOR_SEEDING_2      "#4e9a06"
-
-#define DEFAULT_COLOR_MISSING        "#eeeeec" /* aluminum 1 */
-#define DEFAULT_COLOR_MISSING_2      "#babdb6" /* aluminum 3 */
-
-#define DEFAULT_COLOR_UNWANTED       "#babdb6" /* aluminum 3 */
-#define DEFAULT_COLOR_UNWANTED_2     "#2e3436" /* aluminum 6 */
-
-#define DEFAULT_COLOR_UNAVAILABLE    "#ef2929"
-#define DEFAULT_COLOR_UNAVAILABLE_2  "#a40000"
-
-#define DEFAULT_COLOR_PAUSED         "#d3d7cf" /* aluminum 2 */
-#define DEFAULT_COLOR_PAUSED_2       "#555753" /* aluminum 5 */
-
-#define DEFAULT_COLOR_VERIFYING      "#fce94f"
-#define DEFAULT_COLOR_VERIFYING_2    "#c4a000"
 
 /***
 ****
@@ -256,16 +218,6 @@ struct TorrentCellRendererPrivate
     GtkCellRenderer * progress_renderer;
     int bar_height;
     gboolean minimal;
-    gboolean show_unavailable;
-    gboolean gradient;
-    gboolean use_native_progress;
-    GdkColor color_paused[2];
-    GdkColor color_verified[2];
-    GdkColor color_verifying[2];
-    GdkColor color_missing[2];
-    GdkColor color_unwanted[2];
-    GdkColor color_unavailable[2];
-    GdkColor color_seeding[2];
 };
 
 static void
@@ -356,159 +308,6 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
         *width = w + xpad*2;
         *height = h + ypad*2;
     }
-}
-
-static void
-fillRect( TorrentCellRenderer * self,
-          GdkGC               * gc,
-          GdkDrawable         * drawable,
-          const GdkRectangle  * area_in,
-          const GdkColor      * colors,
-          size_t                n_colors )
-{
-    const int drawGradient = self->priv->gradient && ( n_colors > 1 );
-    assert( n_colors==1 || n_colors==2 );
-
-    if( !drawGradient )
-    {
-        gdk_gc_set_rgb_fg_color( gc, colors );
-        gdk_draw_rectangle( drawable, gc, TRUE,
-                            area_in->x, area_in->y,
-                            area_in->width, area_in->height );
-    }
-    else
-    {
-        int i;
-        const int steps = area_in->height;
-        const int step_height = area_in->height / steps;
-        const int r_inc = ((int)colors[1].red   - (int)colors[0].red) / steps;
-        const int g_inc = ((int)colors[1].green - (int)colors[0].green) / steps;
-        const int b_inc = ((int)colors[1].blue  - (int)colors[0].blue) / steps;
-
-        GdkRectangle area = *area_in;
-        GdkColor color = colors[0];
-     
-        area.height = step_height;
-        for( i=0; i<steps; ++i ) {
-            gdk_gc_set_rgb_fg_color( gc, &color );
-            gdk_draw_rectangle( drawable, gc, TRUE,
-                                area.x, area.y, area.width, area.height );
-            area.y += step_height;
-            color.red   += r_inc;
-            color.green += g_inc;
-            color.blue  += b_inc;
-        }
-    }
-}
-
-static void
-drawRegularBar( TorrentCellRenderer * self,
-                const tr_info       * info,
-                const tr_stat       * torStat,
-                GdkDrawable         * drawable,
-                GtkWidget           * widget,
-                const GdkRectangle  * area )
-{
-    const gboolean rtl = gtk_widget_get_direction( widget ) == GTK_TEXT_DIR_RTL;
-#if 1
-    const double verified = torStat->haveValid / (double)info->totalSize;
-    const double unverified = torStat->haveUnchecked / (double)info->totalSize;
-    const double unavailable = ( torStat->desiredSize
-                       - torStat->desiredAvailable ) / (double)info->totalSize;
-    const double unwanted = ( info->totalSize
-                            - torStat->desiredSize ) / (double)info->totalSize;
-#else /* for testing */
-    const double verified = 0.5;
-    const double unverified = 0.1;
-    const double unavailable = 0.1;
-    const double unwanted = 0.1;
-#endif
-    const double missing = 1.0 - verified - unverified - unavailable - unwanted;
-    const int verifiedWidth = (int)( verified * area->width );
-    const int unverifiedWidth = (int)( unverified * area->width );
-    const int unavailableWidth = (int)( unavailable * area->width );
-    const int unwantedWidth = (int)( unwanted * area->width );
-    const int missingWidth = (int)( missing * area->width );
-
-    const gboolean isActive = torStat->status == TR_STATUS_DOWNLOAD
-                           || torStat->status == TR_STATUS_DONE
-                           || torStat->status == TR_STATUS_SEED;
-    const gboolean isChecking = torStat->status == TR_STATUS_CHECK
-                             || torStat->status == TR_STATUS_CHECK_WAIT;
-
-    int x = rtl ? area->x + area->width : area->x;
-    int w = 0;
-    GdkGC * gc = gdk_gc_new( drawable );
-    GdkRectangle rect = *area;
-
-    if(( w = verifiedWidth )) {
-        const GdkColor * colors;
-        if( !isActive )
-            colors = self->priv->color_paused;
-        else if( torStat->status == TR_STATUS_DOWNLOAD )
-            colors = self->priv->color_verified;
-        else
-            colors = self->priv->color_seeding;
-        rect.width = w;
-        rect.x = rtl ? x-w : x;
-        fillRect( self, gc, drawable, &rect, colors, 2 );
-        x += rtl ? -w : w;
-    }
-
-    if(( w = unverifiedWidth )) {
-        const GdkColor * colors = isActive ? self->priv->color_verifying
-                                           : self->priv->color_paused;
-        rect.width = w;
-        rect.x = rtl ? x-w : x;
-        fillRect( self, gc, drawable, &rect, colors, 2 );
-        x += rtl ? -w : w;
-    }
-
-    if(( w = missingWidth )) {
-        rect.width = w;
-        rect.x = rtl ? x-w : x;
-        fillRect( self, gc, drawable, &rect, self->priv->color_missing, 2 );
-        x += rtl ? -w : w;
-    }
-
-    if(( w = unwantedWidth )) {
-        rect.width = w;
-        rect.x = rtl ? x-w : x;
-        fillRect( self, gc, drawable, &rect, self->priv->color_unwanted, 2 );
-        x += rtl ? -w : w;
-    }
-
-    if(( w = unavailableWidth )) {
-        const GdkColor * colors = isActive && self->priv->show_unavailable
-                                ? self->priv->color_unavailable
-                                : self->priv->color_missing;
-        rect.width = w;
-        rect.x = rtl ? x-w : x;
-        fillRect( self, gc, drawable, &rect, colors, 2 );
-        x += rtl ? -w : w;
-    }
-
-    if( isChecking ) {
-        const int checkedWidth = torStat->recheckProgress * area->width;
-        const int h2 = area->height / 2;
-        rect = *area;
-        rect.y += h2;
-        rect.height -= h2;
-        fillRect( self, gc, drawable, &rect, self->priv->color_missing, 2 );
-        rect.width = checkedWidth;
-        fillRect( self, gc, drawable, &rect, self->priv->color_verifying, 2 );
-    }
-
-    gtk_paint_shadow( gtk_widget_get_style( widget ),
-                      drawable,
-                      GTK_STATE_NORMAL,
-                      GTK_SHADOW_IN,
-                      NULL,
-                      widget,
-                      NULL,
-                      area->x, area->y, area->width, area->height );
-
-    gdk_gc_unref( gc );
 }
 
 static void
@@ -638,7 +437,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
 
         /* the progressbar */
         my_cell.height = p->bar_height;
-        if( p->use_native_progress )
+        if( 1 )
         {
             const double havePercent = ( torStat->haveValid + torStat->haveUnchecked )
                                                               / (double)info->totalSize;
@@ -649,10 +448,6 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
                                       window, widget,
                                       &my_cell, &my_cell, &my_cell, flags );
  
-        }
-        else
-        {
-            drawRegularBar( self, info, torStat, window, widget, &my_cell );
         }
         my_bg.y     += my_cell.height;
         my_cell.y   += my_cell.height;
@@ -687,12 +482,6 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
 }
 
 static void
-v2c( GdkColor * color, const GValue * value )
-{
-    gdk_color_parse( g_value_get_string( value ), color );
-}
-
-static void
 torrent_cell_renderer_set_property( GObject      * object,
                                     guint          property_id,
                                     const GValue * v,
@@ -703,42 +492,13 @@ torrent_cell_renderer_set_property( GObject      * object,
 
     switch( property_id )
     {
-        case P_COLOR_MISSING:       v2c( &p->color_missing[0],     v ); break;
-        case P_COLOR_MISSING_2:     v2c( &p->color_missing[1],     v ); break;
-        case P_COLOR_UNWANTED:      v2c( &p->color_unwanted[0],    v ); break;
-        case P_COLOR_UNWANTED_2:    v2c( &p->color_unwanted[1],    v ); break;
-        case P_COLOR_PAUSED:        v2c( &p->color_paused[0],      v ); break;
-        case P_COLOR_PAUSED_2:      v2c( &p->color_paused[1],      v ); break;
-        case P_COLOR_VERIFIED:      v2c( &p->color_verified[0],    v ); break;
-        case P_COLOR_VERIFIED_2:    v2c( &p->color_verified[1],    v ); break;
-        case P_COLOR_UNAVAILABLE:   v2c( &p->color_unavailable[0], v ); break;
-        case P_COLOR_UNAVAILABLE_2: v2c( &p->color_unavailable[1], v ); break;
-        case P_COLOR_VERIFYING:     v2c( &p->color_verifying[0],   v ); break;
-        case P_COLOR_VERIFYING_2:   v2c( &p->color_verifying[1],   v ); break;
-        case P_COLOR_SEEDING:       v2c( &p->color_seeding[0],     v ); break;
-        case P_COLOR_SEEDING_2:     v2c( &p->color_seeding[1],     v ); break;
         case P_TORRENT:     p->tor = g_value_get_pointer( v ); break;
         case P_BAR_HEIGHT:  p->bar_height = g_value_get_int( v ); break;
         case P_MINIMAL:     p->minimal  = g_value_get_boolean( v ); break;
-        case P_GRADIENT:    p->gradient = g_value_get_boolean( v ); break;
-        case P_NATIVE_PROGRESS: p->use_native_progress = g_value_get_boolean( v ); break;
-        case P_SHOW_UNAVAILABLE:
-                            p->show_unavailable = g_value_get_boolean( v ); break;
         default:
             G_OBJECT_WARN_INVALID_PROPERTY_ID( object, property_id, pspec );
             break;
     }
-}
-
-static void
-c2v( GValue * value, const GdkColor * color )
-{
-    char buf[16];
-    g_snprintf( buf, sizeof(buf), "#%2.2x%2.2x%2.2x",
-                (color->red >> 8) & 0xff,
-                (color->green >> 8) & 0xff,
-                (color->blue >> 8) & 0xff );
-    g_value_set_string( value, buf );
 }
 
 static void
@@ -752,27 +512,9 @@ torrent_cell_renderer_get_property( GObject      * object,
 
     switch( property_id )
     {
-        case P_COLOR_MISSING:       c2v( v, &p->color_missing[0] ); break;
-        case P_COLOR_MISSING_2:     c2v( v, &p->color_missing[1] ); break;
-        case P_COLOR_UNWANTED:      c2v( v, &p->color_unwanted[0] ); break;
-        case P_COLOR_UNWANTED_2:    c2v( v, &p->color_unwanted[1] ); break;
-        case P_COLOR_PAUSED:        c2v( v, &p->color_paused[0] ); break;
-        case P_COLOR_PAUSED_2:      c2v( v, &p->color_paused[1] ); break;
-        case P_COLOR_VERIFIED:      c2v( v, &p->color_verified[0] ); break;
-        case P_COLOR_VERIFIED_2:    c2v( v, &p->color_verified[1] ); break;
-        case P_COLOR_UNAVAILABLE:   c2v( v, &p->color_unavailable[0] ); break;
-        case P_COLOR_UNAVAILABLE_2: c2v( v, &p->color_unavailable[1] ); break;
-        case P_COLOR_VERIFYING:     c2v( v, &p->color_verifying[0] ); break;
-        case P_COLOR_VERIFYING_2:   c2v( v, &p->color_verifying[1] ); break;
-        case P_COLOR_SEEDING:       c2v( v, &p->color_seeding[0] ); break;
-        case P_COLOR_SEEDING_2:     c2v( v, &p->color_seeding[1] ); break;
         case P_TORRENT:     g_value_set_pointer( v, p->tor ); break;
         case P_BAR_HEIGHT:  g_value_set_int( v, p->bar_height ); break;
         case P_MINIMAL:     g_value_set_boolean( v, p->minimal ); break;
-        case P_GRADIENT:    g_value_set_boolean( v, p->gradient ); break;
-        case P_NATIVE_PROGRESS: g_value_set_boolean( v, p->use_native_progress ); break;
-        case P_SHOW_UNAVAILABLE:
-                            g_value_set_boolean( v, p->show_unavailable ); break;
         default:
             G_OBJECT_WARN_INVALID_PROPERTY_ID( object, property_id, pspec );
             break;
@@ -825,74 +567,6 @@ torrent_cell_renderer_class_init( TorrentCellRendererClass * klass )
     g_object_class_install_property( gobject_class, P_MINIMAL,
         g_param_spec_boolean( "minimal", NULL, "Minimal Mode",
                               FALSE, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_GRADIENT,
-        g_param_spec_boolean( "gradient", NULL, "Render Progress as a Gradient",
-                              TRUE, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_NATIVE_PROGRESS,
-        g_param_spec_boolean( "use-native-progress", NULL, "Use Native GtkProgressBars",
-                              TRUE, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_SHOW_UNAVAILABLE,
-        g_param_spec_boolean( "unavailable", NULL, "Show Unavailable",
-                              FALSE, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_MISSING,
-        g_param_spec_string( "missing-color", NULL, "Color for Missing Data",
-                             DEFAULT_COLOR_MISSING, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_MISSING,
-        g_param_spec_string( "missing-color-2", NULL, "Gradient Color for Missing Data",
-                             DEFAULT_COLOR_MISSING_2, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_UNWANTED,
-        g_param_spec_string( "unwanted-color", NULL, "Color for Unwanted Data",
-                             DEFAULT_COLOR_UNWANTED, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_UNWANTED_2,
-        g_param_spec_string( "unwanted-color-2", NULL, "Gradient Color for Unwanted Data",
-                             DEFAULT_COLOR_UNWANTED_2, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_PAUSED,
-        g_param_spec_string( "paused-color", NULL, "Color for Paused Data",
-                             DEFAULT_COLOR_PAUSED, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_PAUSED_2,
-        g_param_spec_string( "paused-color-2", NULL, "Gradient Color for Paused Data",
-                             DEFAULT_COLOR_PAUSED_2, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_VERIFIED,
-        g_param_spec_string( "verified-color", NULL, "Color for Verified Data",
-                             DEFAULT_COLOR_VERIFIED, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_VERIFIED_2,
-        g_param_spec_string( "verified-color-2", NULL, "Gradient Color for Verified Data",
-                             DEFAULT_COLOR_VERIFIED_2, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_UNAVAILABLE,
-        g_param_spec_string( "unavailable-color", NULL, "Color for Unavailable Data",
-                             DEFAULT_COLOR_UNAVAILABLE, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_UNAVAILABLE_2,
-        g_param_spec_string( "unavailable-color-2", NULL, "Gradient Color for Unavailable Data",
-                             DEFAULT_COLOR_UNAVAILABLE_2, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_VERIFYING,
-        g_param_spec_string( "verifying-color", NULL, "Color for Verifying Data",
-                             DEFAULT_COLOR_VERIFYING, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_VERIFYING_2,
-        g_param_spec_string( "verifying-color-2", NULL, "Gradient Color for Verifying Data",
-                             DEFAULT_COLOR_VERIFYING_2, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_SEEDING,
-        g_param_spec_string( "seeding-color", NULL, "Color for Seeding Data",
-                             DEFAULT_COLOR_SEEDING, G_PARAM_READWRITE ) );
-
-    g_object_class_install_property( gobject_class, P_COLOR_SEEDING_2,
-        g_param_spec_string( "seeding-color-2", NULL, "Second Color for Seeding Data",
-                             DEFAULT_COLOR_SEEDING_2, G_PARAM_READWRITE ) );
 }
 
 static void
@@ -914,25 +588,7 @@ torrent_cell_renderer_init( GTypeInstance * instance, gpointer g_class UNUSED )
     tr_object_ref_sink( p->text_renderer_err );
     tr_object_ref_sink( p->progress_renderer );
 
-    p->gradient = TRUE;
-    p->show_unavailable = TRUE;
-    p->use_native_progress = TRUE;
     p->bar_height = DEFAULT_BAR_HEIGHT;
-
-    gdk_color_parse( DEFAULT_COLOR_VERIFIED,      &p->color_verified[0] );
-    gdk_color_parse( DEFAULT_COLOR_VERIFIED_2,    &p->color_verified[1] );
-    gdk_color_parse( DEFAULT_COLOR_MISSING,       &p->color_missing[0] );
-    gdk_color_parse( DEFAULT_COLOR_MISSING_2,     &p->color_missing[1] );
-    gdk_color_parse( DEFAULT_COLOR_UNWANTED,      &p->color_unwanted[0] );
-    gdk_color_parse( DEFAULT_COLOR_UNWANTED_2,    &p->color_unwanted[1] );
-    gdk_color_parse( DEFAULT_COLOR_UNAVAILABLE,   &p->color_unavailable[0] );
-    gdk_color_parse( DEFAULT_COLOR_UNAVAILABLE_2, &p->color_unavailable[1] );
-    gdk_color_parse( DEFAULT_COLOR_VERIFYING,     &p->color_verifying[0] );
-    gdk_color_parse( DEFAULT_COLOR_VERIFYING_2,   &p->color_verifying[1] );
-    gdk_color_parse( DEFAULT_COLOR_SEEDING,       &p->color_seeding[0] );
-    gdk_color_parse( DEFAULT_COLOR_SEEDING_2,     &p->color_seeding[1] );
-    gdk_color_parse( DEFAULT_COLOR_PAUSED,        &p->color_paused[0] );
-    gdk_color_parse( DEFAULT_COLOR_PAUSED_2,      &p->color_paused[1] );
 }
 
 GType
