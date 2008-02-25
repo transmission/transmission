@@ -37,16 +37,17 @@ notifyCallback( NotifyNotification * n UNUSED,
 
     if( !strcmp( action, "folder" ) )
     {
-     	char *argv[] = { "xdg-open", (char*)tr_torrentGetFolder(tor), NULL }; 
- 	g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, NULL); 
+        char * folder = g_build_filename( tr_torrentGetFolder(tor), info->name, NULL );
+        char * argv[] = { "xdg-open", folder, NULL };
+        g_spawn_async( NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, NULL ); 
+        g_free( folder );
     }
     else if( !strcmp( action, "file" ) )
     { 
-        char * path = g_build_filename(tr_torrentGetFolder(tor), info->files[0].name, NULL);  
-        char *argv[] = { "xdg-open", path, NULL }; 
-        g_message( "path: %s", path );
- 	g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, NULL); 
- 	g_free(path); 
+        char * path = g_build_filename( tr_torrentGetFolder(tor), info->files[0].name, NULL );
+        char * argv[] = { "xdg-open", path, NULL }; 
+        g_spawn_async( NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, NULL ); 
+        g_free( path ); 
     } 
 }
 
