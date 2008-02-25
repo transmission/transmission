@@ -661,6 +661,8 @@ getPreferredPieces( Torrent     * t,
                 const tr_peer * peer = peers[k];
                 if( peer->peerIsInterested && !peer->clientIsChoked && tr_bitfieldHas( peer->have, piece ) )
                     ++setme->peerCount;
+#if 0
+/* FIXME: this code is too expensive! */
                 /* The fast peer extension doesn't force a peer to actually HAVE a fast-allowed piece,
                     but we're guaranteed to get the same pieces from different peers, 
                     so we'll build a list and pray one actually have this one */
@@ -668,6 +670,7 @@ getPreferredPieces( Torrent     * t,
                 /* Also, if someone SUGGESTed a piece to us, prioritize it over non-suggested others
                  */
                 setme->suggested   = tr_peerMsgsIsPieceSuggested( peer->msgs, i );
+#endif
             }
         }
 
