@@ -36,7 +36,7 @@
 + (NSString *) stringForRatio: (float) ratio;
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds;
-+ (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds maxDigits: (NSUInteger) max;
++ (NSString *) timeString: (NSUInteger) seconds showSeconds: (BOOL) showSeconds maxDigits: (NSUInteger) max;
 
 - (NSComparisonResult) compareIP: (NSString *) string;
 

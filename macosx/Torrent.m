@@ -1113,7 +1113,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     int eta = [self isSeeding] ? [self etaRatio] : [self eta];
     return eta >= 0 ? [NSString timeString: eta showSeconds: YES maxDigits: 2]
-            : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
+                    : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
 }
 
 - (NSString *) stateString

@@ -104,11 +104,12 @@
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds
 {
-    return [NSString timeString: seconds showSeconds:showSeconds maxDigits: UINT_MAX];
+    return [NSString timeString: seconds showSeconds: showSeconds maxDigits: UINT_MAX];
 }
 
-+ (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds maxDigits: (NSUInteger) max
++ (NSString *) timeString: (NSUInteger) seconds showSeconds: (BOOL) showSeconds maxDigits: (NSUInteger) max
 {
+    NSLog(@"seconds: %u max digits: %u", seconds, max);
     NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 4)];
     uint64_t remaining = seconds;
     
