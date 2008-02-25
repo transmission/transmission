@@ -1701,7 +1701,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "";
+			shellScript = "if [ ! -e ./third-party/libevent/config.h -a ! ./third-party/macosx-libevent-config.h -ef ./third-party/libevent/config.h ]; then ln -s ../macosx-libevent-config.h ./third-party/libevent/config.h; fi\n\nif [ ! -e ./third-party/libevent/event-config.h -a ! ./third-party/macosx-libevent-event-config.h -ef ./third-party/libevent/event-config.h ]; then ln -s ../macosx-libevent-event-config.h ./third-party/libevent/event-config.h; fi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
