@@ -568,8 +568,6 @@ struct tr_refill_piece
     uint16_t random;
     uint32_t piece;
     uint32_t peerCount;
-    uint32_t fastAllowed;
-    uint32_t suggested;
 };
 
 static int
@@ -585,17 +583,6 @@ compareRefillPiece (const void * aIn, const void * bIn)
     /* if one piece has a higher priority, it goes first */
     if( a->priority != b->priority )
         return a->priority > b->priority ? -1 : 1;
-    
-    /* if one *might be* fastallowed to us, get it first...
-     * I'm putting it on top so we prioritize those pieces at
-     * startup, then we'll have them, and we'll be denied access
-     * to them */
-    if (a->fastAllowed != b->fastAllowed)
-        return a->fastAllowed < b->fastAllowed ? -1 : 1;
-    
-    /* otherwise if one was suggested to us, get it */
-    if (a->suggested != b->suggested)
-        return a->suggested < b->suggested ? -1 : 1;
     
     /* otherwise if one has fewer peers, it goes first */
     if (a->peerCount != b->peerCount)
@@ -653,7 +640,6 @@ getPreferredPieces( Torrent     * t,
             setme->piece = piece;
             setme->priority = inf->pieces[piece].priority;
             setme->peerCount = 0;
-            setme->fastAllowed = 0;
             setme->random = tr_rand( UINT16_MAX );
             setme->missingBlockCount = tr_cpMissingBlocksInPiece( tor->completion, piece );
 
@@ -661,16 +647,6 @@ getPreferredPieces( Torrent     * t,
                 const tr_peer * peer = peers[k];
                 if( peer->peerIsInterested && !peer->clientIsChoked && tr_bitfieldHas( peer->have, piece ) )
                     ++setme->peerCount;
-#if 0
-/* FIXME: this code is too expensive! */
-                /* The fast peer extension doesn't force a peer to actually HAVE a fast-allowed piece,
-                    but we're guaranteed to get the same pieces from different peers, 
-                    so we'll build a list and pray one actually have this one */
-                setme->fastAllowed = tr_peerMsgsIsPieceFastAllowed( peer->msgs, i );
-                /* Also, if someone SUGGESTed a piece to us, prioritize it over non-suggested others
-                 */
-                setme->suggested   = tr_peerMsgsIsPieceSuggested( peer->msgs, i );
-#endif
             }
         }
 
