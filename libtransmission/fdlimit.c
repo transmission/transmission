@@ -486,7 +486,7 @@ tr_fdInit( int globalPeerLimit )
                (rlim_t)(globalPeerLimit + NOFILE_BUFFER) );
         setrlimit( RLIMIT_NOFILE, &rlim );
         gFd->normalMax = rlim.rlim_cur - NOFILE_BUFFER;
-        tr_dbg( "setrlimit( RLIMIT_NOFILE, %d )", rlim.rlim_cur );
+        tr_dbg( "setrlimit( RLIMIT_NOFILE, %d )", (int)rlim.rlim_cur );
     }
 #else
     gFd->normalMax = globalPeerLimit;
