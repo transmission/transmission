@@ -378,7 +378,7 @@ parseCommandLine( int argc, char ** argv )
             { "upload",   required_argument,    NULL, 'u' },
             { "download", required_argument,    NULL, 'd' },
             { "finish",   required_argument,    NULL, 'f' },
-            { "create",   required_argument,    NULL, 'c' },
+            { "create-from", required_argument, NULL, 'c' },
             { "comment",  required_argument,    NULL, 'm' },
             { "announce", required_argument,    NULL, 'a' },
             { "nat-traversal", no_argument,     NULL, 'n' },
