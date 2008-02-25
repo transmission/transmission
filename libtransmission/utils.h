@@ -138,6 +138,8 @@ void tr_set_compare( const void * a, size_t aCount,
 int tr_compareUint16( uint16_t a, uint16_t b );
 int tr_compareUint32( uint32_t a, uint32_t b );
 
+void tr_sha1_to_hex( char * out, const uint8_t * sha1 );
+
 /***
 ****
 ***/

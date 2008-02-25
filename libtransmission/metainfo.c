@@ -192,11 +192,7 @@ tr_metainfoParse( tr_info * inf, const benc_val_t * meta_in, const char * tag )
         return TR_EINVALID;
     }
 
-    for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
-    {
-        snprintf( inf->hashString + i * 2, sizeof( inf->hashString ) - i * 2,
-                  "%02x", inf->hash[i] );
-    }
+    tr_sha1_to_hex( inf->hashString, inf->hash );
     savedname( inf->torrent, sizeof( inf->torrent ), inf->hashString, tag );
 
     /* comment */

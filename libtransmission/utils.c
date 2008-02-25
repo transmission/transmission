@@ -883,3 +883,16 @@ tr_getRatio( double numerator, double denominator )
 
     return ratio;
 }
+
+void
+tr_sha1_to_hex( char * out, const uint8_t * sha1 )
+{
+    static const char hex[] = "0123456789abcdef";
+    int i;
+    for (i = 0; i < 20; i++) {
+        unsigned int val = *sha1++;
+        *out++ = hex[val >> 4];
+        *out++ = hex[val & 0xf];
+    }
+    *out = '\0';
+}
