@@ -40,9 +40,9 @@
 #include <libtransmission/ipcparse.h>
 
 #include "conf.h"
-#include "io.h"
 #include "ipc.h"
 #include "tr_core.h"
+#include "tr-io.h"
 #include "tr_prefs.h"
 #include "tr_torrent.h"
 #include "util.h"

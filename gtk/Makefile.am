@@ -18,7 +18,6 @@ noinst_HEADERS = \
     details.h \
     dialogs.h \
     hig.h \
-    io.h \
     ipc.h \
     file-list.h \
     lock.h \
@@ -31,6 +30,7 @@ noinst_HEADERS = \
     torrent-cell-renderer.h \
     tr_core.h \
     tr_icon.h \
+    tr-io.h \
     tr_prefs.h \
     tr_torrent.h \
     tr_window.h \
@@ -58,6 +58,7 @@ transmission_SOURCES = \
     torrent-cell-renderer.c \
     tr_core.c \
     tr_icon.c \
+    tr-io.c \
     tr_prefs.c \
     tr_torrent.c \
     tr_window.c \
