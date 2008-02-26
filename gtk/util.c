@@ -35,9 +35,9 @@
 
 #include <libevent/evhttp.h>
 
-#include "tr_prefs.h"
-#include "tr_torrent.h"
 #include "conf.h"
+#include "tr-prefs.h"
+#include "tr-torrent.h"
 #include "util.h"
 
 static void

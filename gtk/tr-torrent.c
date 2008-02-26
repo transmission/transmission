@@ -31,8 +31,8 @@
 
 #include <libtransmission/transmission.h>
 
-#include "tr_prefs.h"
-#include "tr_torrent.h"
+#include "tr-prefs.h"
+#include "tr-torrent.h"
 #include "conf.h"
 #include "notify.h"
 #include "util.h"

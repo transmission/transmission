@@ -32,7 +32,7 @@
 
 #include <libtransmission/transmission.h>
 
-#include "tr_torrent.h"
+#include "tr-torrent.h"
 #include "util.h"
 
 #define TR_CORE_TYPE (tr_core_get_type())

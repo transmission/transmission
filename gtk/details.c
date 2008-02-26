@@ -21,7 +21,7 @@
 #include "actions.h"
 #include "details.h"
 #include "file-list.h"
-#include "tr_torrent.h"
+#include "tr-torrent.h"
 #include "hig.h"
 #include "util.h"
 

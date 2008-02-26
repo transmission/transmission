@@ -25,7 +25,7 @@
 #ifndef TG_MSGWIN_H
 #define TG_MSGWIN_H
 
-#include "tr_core.h"
+#include "tr-core.h"
 
 void
 msgwin_init( void );

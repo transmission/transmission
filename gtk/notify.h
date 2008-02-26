@@ -13,7 +13,7 @@
 #ifndef __TR_NOTIFY_H__
 #define __TR_NOTIFY_H__
 
-#include "tr_torrent.h"
+#include "tr-torrent.h"
 
 void tr_notify_init( void ); 
 void tr_notify_send( TrTorrent * tor ); 

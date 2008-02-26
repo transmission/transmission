@@ -15,7 +15,7 @@
 
 #include <gtk/gtkwidget.h>
 #include <gtk/gtkwindow.h>
-#include "tr_core.h"
+#include "tr-core.h"
 
 GtkWidget* stats_dialog_create( GtkWindow * parent,
                                 TrCore    * core );

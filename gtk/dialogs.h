@@ -25,8 +25,8 @@
 #ifndef TG_PREFS_H
 #define TG_PREFS_H
 
-#include "tr_core.h"
-#include "tr_torrent.h"
+#include "tr-core.h"
+#include "tr-torrent.h"
 #include "util.h"
 
 /* prompt for a download directory for torrents, then add them */

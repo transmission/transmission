@@ -14,7 +14,7 @@
 #include <gtk/gtk.h>
 #include "hig.h"
 #include "stats.h"
-#include "tr_core.h"
+#include "tr-core.h"
 
 struct stat_ui
 {

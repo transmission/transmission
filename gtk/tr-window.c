@@ -34,9 +34,9 @@
 #include "hig.h"
 #include "sexy-icon-entry.h"
 #include "torrent-cell-renderer.h"
-#include "tr_prefs.h"
-#include "tr_torrent.h"
-#include "tr_window.h"
+#include "tr-prefs.h"
+#include "tr-torrent.h"
+#include "tr-window.h"
 #include "util.h"
 
 #if !GTK_CHECK_VERSION(2,8,0)

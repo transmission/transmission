@@ -28,12 +28,12 @@ noinst_HEADERS = \
     stats.h \
     sexy-icon-entry.h \
     torrent-cell-renderer.h \
-    tr_core.h \
-    tr_icon.h \
+    tr-core.h \
+    tr-icon.h \
     tr-io.h \
-    tr_prefs.h \
-    tr_torrent.h \
-    tr_window.h \
+    tr-prefs.h \
+    tr-torrent.h \
+    tr-window.h \
     ui.h \
     util.h
 
@@ -55,12 +55,12 @@ transmission_SOURCES = \
     sexy-icon-entry.c \
     stats.c \
     torrent-cell-renderer.c \
-    tr_core.c \
-    tr_icon.c \
+    tr-core.c \
+    tr-icon.c \
     tr-io.c \
-    tr_prefs.c \
-    tr_torrent.c \
-    tr_window.c \
+    tr-prefs.c \
+    tr-torrent.c \
+    tr-window.c \
     util.c
 
 dist_man_MANS = transmission.1

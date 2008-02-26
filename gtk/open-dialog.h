@@ -14,7 +14,7 @@
 #define TR_GTK_OPEN_DIALOG_H
 
 #include <gtk/gtkwindow.h>
-#include "tr_core.h"
+#include "tr-core.h"
 
 GtkWidget* makeaddwind( GtkWindow  * parent,
                         TrCore     * core,

@@ -27,7 +27,7 @@
 
 #include <gtk/gtk.h>
 
-#include "tr_core.h"
+#include "tr-core.h"
 
 void
 ipc_socket_setup( GtkWindow * wind, TrCore * core );

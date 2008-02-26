@@ -22,18 +22,16 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef TR_WINDOW_H
-#define TR_WINDOW_H
+#ifndef TR_ICON_H
+#define TR_ICON_H
 
 #include <gtk/gtk.h>
-#include "tr_core.h"
+#include "tr-core.h"
 
-typedef GtkWindow TrWindow;
+#if GTK_CHECK_VERSION(2,10,0)
+#define STATUS_ICON_SUPPORTED
+#endif
 
-GtkTreeSelection * tr_window_get_selection( TrWindow* wind );
-
-GtkWidget * tr_window_new( GtkUIManager*, TrCore * core );
-
-void tr_window_update( TrWindow * wind );
+gpointer tr_icon_new( TrCore * core );
 
 #endif

@@ -18,7 +18,7 @@
 #include <libtransmission/transmission.h>
 #include "hig.h"
 #include "torrent-cell-renderer.h"
-#include "tr_torrent.h"
+#include "tr-torrent.h"
 #include "util.h"
 
 /* #define TEST_RTL */

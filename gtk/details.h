@@ -14,7 +14,7 @@
 #define GTK_TORRENT_INSPECTOR_H
 
 #include <gtk/gtkwindow.h>
-#include "tr_torrent.h"
+#include "tr-torrent.h"
 
 GtkWidget* torrent_inspector_new ( GtkWindow * parent, TrTorrent * tor );
 

@@ -41,10 +41,10 @@
 
 #include "conf.h"
 #include "ipc.h"
-#include "tr_core.h"
+#include "tr-core.h"
 #include "tr-io.h"
-#include "tr_prefs.h"
-#include "tr_torrent.h"
+#include "tr-prefs.h"
+#include "tr-torrent.h"
 #include "util.h"
 
 #ifndef AF_LOCAL

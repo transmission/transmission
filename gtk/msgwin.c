@@ -34,7 +34,7 @@
 #include "conf.h"
 #include "hig.h"
 #include "msgwin.h"
-#include "tr_prefs.h"
+#include "tr-prefs.h"
 #include "util.h"
 
 #define MAX_MSGCOUNT 5000

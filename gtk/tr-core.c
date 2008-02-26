@@ -31,9 +31,9 @@
 #include <libtransmission/utils.h> /* tr_strcmp */
 
 #include "conf.h"
-#include "tr_core.h"
-#include "tr_prefs.h"
-#include "tr_torrent.h"
+#include "tr-core.h"
+#include "tr-prefs.h"
+#include "tr-torrent.h"
 #include "util.h"
 
 struct TrCorePrivate

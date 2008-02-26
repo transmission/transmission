@@ -25,7 +25,7 @@
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 #include "actions.h"
-#include "tr_icon.h"
+#include "tr-icon.h"
 #include "util.h"
 
 #ifndef STATUS_ICON_SUPPORTED

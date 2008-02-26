@@ -15,8 +15,8 @@
 #include <gtk/gtk.h>
 #include <libtransmission/transmission.h>
 #include "conf.h"
-#include "tr_core.h"
-#include "tr_prefs.h"
+#include "tr-core.h"
+#include "tr-prefs.h"
 #include "lock.h"
 #include "logo.h"
 
