@@ -90,125 +90,210 @@ struct constate
     } u;
 };
 
-static void
-serv_bind(struct constate *con);
-static void
-rmsock(void);
-static gboolean
-client_connect(char *path, struct constate *con);
-static void
-srv_io_accept(GSource *source, int fd, struct sockaddr *sa, socklen_t len,
-              void *vdata);
-static size_t
-srv_io_received( GSource * source, void * data, size_t len, void * vdata );
-static size_t
-cli_io_received( GSource * source, void * data, size_t len, void * vdata );
-static void
-client_sendmsg( struct constate * con );
-static void
-destroycon(struct constate *con);
-static void
-all_io_closed(GSource *source, void *vdata);
-static void
-cli_io_sent( GSource * source, size_t id, void * vdata );
-static void
-smsg_add( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static void
-smsg_addone( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static void
-smsg_quit( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static void
-smsg_noop( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static void
-smsg_info( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static void
-smsg_infoall( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static int
-addinfo( TrTorrent * tor, enum ipc_msg msgid, int torid, int types,
-         benc_val_t * val );
-static void
-smsg_look( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static void
-smsg_tor( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static void
-smsg_torall( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static void
-smsg_pref( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static void
-smsg_int( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static void
-smsg_str( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static void
-smsg_sup( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static void
-all_default( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
-static gboolean
-simpleresp( struct constate * con, int64_t tag, enum ipc_msg id );
-static TrTorrent *
-findtorid( TrCore * core, int id, GtkTreeIter * iter );
-static TrTorrent *
-findtorhash( TrCore * core, const char * hash, int * id );
-
 /* this is only used on the server */
 static char *gl_sockpath = NULL;
 
-void
-ipc_socket_setup( GtkWindow * parent, TrCore * core )
+static gboolean
+simpleresp( struct constate * con, int64_t tag, enum ipc_msg id )
 {
-  struct constate *con;
+    uint8_t         * buf;
+    size_t            size;
 
-  con = g_new0(struct constate, 1);
+    buf = ipc_mkempty( con->ipc, &size, id, tag );
+    if( NULL == buf )
+    {
+        return FALSE;
+    }
+
+    io_send_keepdata( con->source, buf, size );
+
+    return TRUE;
+}
+
+static void
+all_default( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag, void * arg )
+{
+    switch( id )
+    {
+        case IPC_MSG_FAIL:
+        case IPC_MSG_NOTSUP:
+        case IPC_MSG_BAD:
+        case IPC_MSG_OK:
+            break;
+        default:
+            simpleresp( arg, tag, IPC_MSG_NOTSUP );
+            break;
+    }
+}
+
+static void
+destroycon(struct constate *con) {
   con->source = NULL;
-  con->fd = -1;
-  con->type = CON_SERV;
 
-  con->msgs = ipc_initmsgs();
-  if( NULL == con->msgs ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_ADDMANYFILES, smsg_add ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_ADDONEFILE,   smsg_addone ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_AUTOMAP,      smsg_int ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_AUTOSTART,    smsg_int ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_DIR,          smsg_str ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_DOWNLIMIT,    smsg_int ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETAUTOMAP,   smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETAUTOSTART, smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETDIR,       smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETDOWNLIMIT, smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETINFO,      smsg_info ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETINFOALL,   smsg_infoall ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETPEX,       smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETPORT,      smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTAT,      smsg_info ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTATALL,   smsg_infoall ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETUPLIMIT,   smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_LOOKUP,       smsg_look ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_NOOP,         smsg_noop ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_PEX,          smsg_int ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_PORT,         smsg_int ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_QUIT,         smsg_quit ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVE,       smsg_tor ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVEALL,    smsg_torall ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_START,        smsg_tor ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_STARTALL,     smsg_torall ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_STOP,         smsg_tor ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_STOPALL,      smsg_torall ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_SUP,          smsg_sup ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_UPLIMIT,      smsg_int ) )
-  {
-      errmsg( con->u.serv.wind, _("Failed to set up IPC: %s"),
-              g_strerror( errno ) );
-      g_free( con );
-      return;
+  if(0 <= con->fd)
+    EVUTIL_CLOSESOCKET(con->fd);
+  con->fd = -1;
+  ipc_freecon( con->ipc );
+
+  switch(con->type) {
+    case CON_SERV:
+      break;
+    case CON_CLIENT:
+      ipc_freemsgs( con->msgs );
+      freestrlist(con->u.client.files);
+      g_main_loop_quit(con->u.client.loop);
+      break;
+  }
+}
+
+static void
+cli_io_sent( GSource * source UNUSED, size_t id, void *vdata )
+{
+  struct constate_client *cli = &((struct constate*)vdata)->u.client;
+
+  if(0 < id && cli->msgid == id) {
+    *(cli->succeeded) = TRUE;
+    destroycon(vdata);
+  }
+}
+
+static void
+client_sendmsg( struct constate * con )
+{
+    struct constate_client * cli = &con->u.client;
+    GList                  * ii;
+    uint8_t                * buf;
+    size_t                   size;
+    benc_val_t               packet, * val;
+    int                      saved;
+
+    switch( cli->msg )
+    {
+        case IPC_MSG_ADDMANYFILES:
+            val = ipc_initval( con->ipc, cli->msg, -1, &packet, TYPE_LIST );
+            if( NULL == val ||
+                tr_bencListReserve( val, g_list_length( cli->files ) ) )
+            {
+                perror( "malloc" );
+                destroycon( con );
+                return;
+            }
+            for( ii = cli->files; NULL != ii; ii = ii->next )
+            {
+                tr_bencInitStr( tr_bencListAdd( val ), ii->data, -1, 0 );
+            }
+            buf = ipc_mkval( &packet, &size );
+            saved = errno;
+            tr_bencFree( &packet );
+            g_list_free( cli->files );
+            cli->files = NULL;
+            break;
+        case IPC_MSG_QUIT:
+            buf = ipc_mkempty( con->ipc, &size, cli->msg, -1 );
+            saved = errno;
+            break;
+        default:
+            g_assert_not_reached();
+            return;
+    }
+
+    if( NULL == buf )
+    {
+        errno = saved;
+        perror( "malloc" );
+        destroycon( con );
+        return;
+    }
+
+    cli->msgid = io_send_keepdata( con->source, buf, size );
+}
+
+static size_t
+cli_io_received( GSource * source UNUSED, void * data, size_t len,
+                 void * vdata )
+{
+    struct constate        * con = vdata;
+    struct constate_client * cli = &con->u.client;
+    ssize_t                  res;
+
+    if( IPC_MIN_MSG_LEN > len )
+    {
+        return 0;
+    }
+
+    res = ipc_parse( con->ipc, data, len, con );
+
+    if( 0 > res )
+    {
+        switch( errno )
+        {
+            case EPERM:
+                g_message( _("Bad IPC protocol version") );
+                break;
+            case EINVAL:
+                g_message( _("IPC protocol parse error") );
+                break;
+            default:
+                g_message( _("IPC parsing failed: %s"), g_strerror( errno ) );
+                break;
+        }
+        destroycon( con );
+        return 0;
+    }
+
+    if( HASVERS( con->ipc ) && 0 == cli->msgid )
+    {
+        client_sendmsg( con );
+    }
+
+    return res;
+}
+
+static void
+all_io_closed(GSource *source UNUSED, void *vdata) {
+  struct constate *con = vdata;
+
+  destroycon(con);
+}
+
+static gboolean
+client_connect(char *path, struct constate *con) {
+  struct sockaddr_un addr;
+  uint8_t          * buf;
+  size_t             size;
+
+  if(0 > (con->fd = socket(AF_UNIX, SOCK_STREAM, 0))) {
+    g_message( _("Failed to create socket: %s"), g_strerror(errno));
+    return FALSE;
   }
 
-  ipc_setdefmsg( con->msgs, all_default );
+  memset(&addr, 0,  sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
 
-  con->u.serv.wind = parent;
-  con->u.serv.core = core;
+  if(0 > connect(con->fd, (struct sockaddr*)&addr, SUN_LEN(&addr))) {
+    g_message( _("Failed to connect to %s: %s"), path, g_strerror(errno));
+    return FALSE;
+  }
 
-  g_object_add_weak_pointer( G_OBJECT( core ), &con->u.serv.core );
+  con->source = io_new(con->fd, cli_io_sent, cli_io_received,
+                       all_io_closed, con);
+  if( NULL == con->source )
+  {
+      EVUTIL_CLOSESOCKET( con->fd );
+      return FALSE;
+  }
 
-  serv_bind(con);
+  buf = ipc_mkvers( &size, "Transmission GTK+ " LONG_VERSION_STRING );
+  if( NULL == buf )
+  {
+      EVUTIL_CLOSESOCKET( con->fd );
+      return FALSE;
+  }
+
+  io_send_keepdata( con->source, buf, size );
+
+  return TRUE;
 }
 
 static gboolean
@@ -272,136 +357,12 @@ ipc_sendquit_blocking( void )
     return blocking_client( IPC_MSG_QUIT, NULL );
 }
 
-/* open a local socket for clients connections */
-static void
-serv_bind(struct constate *con) {
-  struct sockaddr_un sa;
-
-  rmsock();
-  gl_sockpath = cf_sockname();
-
-  if(0 > (con->fd = socket(AF_LOCAL, SOCK_STREAM, 0)))
-    goto fail;
-
-  memset(&sa, 0,  sizeof(sa));
-  sa.sun_family = AF_LOCAL;
-  strncpy(sa.sun_path, gl_sockpath, sizeof(sa.sun_path) - 1);
-
-  /* unlink any existing socket file before trying to create ours */
-  unlink(gl_sockpath);
-  if(0 > bind(con->fd, (struct sockaddr *)&sa, SUN_LEN(&sa))) {
-    /* bind may fail if there was already a socket, so try twice */
-    unlink(gl_sockpath);
-    if(0 > bind(con->fd, (struct sockaddr *)&sa, SUN_LEN(&sa)))
-      goto fail;
-  }
-
-  if(0 > listen(con->fd, 5))
-    goto fail;
-
-  con->source = io_new_listening(con->fd, sizeof(struct sockaddr_un),
-                                 srv_io_accept, all_io_closed, con);
-
-  g_atexit(rmsock);
-
-  return;
-
- fail:
-  errmsg(con->u.serv.wind, _("Failed to set up socket: %s"),
-         g_strerror(errno));
-  if(0 <= con->fd)
-    EVUTIL_CLOSESOCKET(con->fd);
-  con->fd = -1;
-  rmsock();
-}
-
 static void
 rmsock(void) {
   if(NULL != gl_sockpath) {
     unlink(gl_sockpath);
     g_free(gl_sockpath);
   }
-}
-
-static gboolean
-client_connect(char *path, struct constate *con) {
-  struct sockaddr_un addr;
-  uint8_t          * buf;
-  size_t             size;
-
-  if(0 > (con->fd = socket(AF_UNIX, SOCK_STREAM, 0))) {
-    g_message( _("Failed to create socket: %s"), g_strerror(errno));
-    return FALSE;
-  }
-
-  memset(&addr, 0,  sizeof(addr));
-  addr.sun_family = AF_UNIX;
-  strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
-
-  if(0 > connect(con->fd, (struct sockaddr*)&addr, SUN_LEN(&addr))) {
-    g_message( _("Failed to connect to %s: %s"), path, g_strerror(errno));
-    return FALSE;
-  }
-
-  con->source = io_new(con->fd, cli_io_sent, cli_io_received,
-                       all_io_closed, con);
-  if( NULL == con->source )
-  {
-      EVUTIL_CLOSESOCKET( con->fd );
-      return FALSE;
-  }
-
-  buf = ipc_mkvers( &size, "Transmission GTK+ " LONG_VERSION_STRING );
-  if( NULL == buf )
-  {
-      EVUTIL_CLOSESOCKET( con->fd );
-      return FALSE;
-  }
-
-  io_send_keepdata( con->source, buf, size );
-
-  return TRUE;
-}
-
-static void
-srv_io_accept(GSource *source UNUSED, int fd, struct sockaddr *sa UNUSED,
-              socklen_t len UNUSED, void *vdata) {
-  struct constate *con = vdata;
-  struct constate *newcon;
-  uint8_t        * buf;
-  size_t           size;
-
-  newcon = g_new(struct constate, 1);
-  memcpy(newcon, con, sizeof(*newcon));
-  newcon->fd = fd;
-
-  newcon->ipc = ipc_newcon( con->msgs );
-  if( NULL == newcon->ipc )
-  {
-      g_free( newcon );
-      EVUTIL_CLOSESOCKET( fd );
-      return;
-  }
-
-  newcon->source = io_new(fd, NULL, srv_io_received, all_io_closed, newcon);
-  if( NULL == newcon->source )
-  {
-      ipc_freecon( newcon->ipc );
-      g_free( newcon );
-      EVUTIL_CLOSESOCKET( fd );
-      return;
-  }
-
-  buf = ipc_mkvers( &size, "Transmission GTK+ " LONG_VERSION_STRING );
-  if( NULL == buf )
-  {
-      ipc_freecon( newcon->ipc );
-      g_free( newcon );
-      EVUTIL_CLOSESOCKET( fd );
-      return;
-  }
-
-  io_send_keepdata( newcon->source, buf, size );
 }
 
 static size_t
@@ -445,134 +406,88 @@ srv_io_received( GSource * source UNUSED, void * data, size_t len,
     return res;
 }
 
-static size_t
-cli_io_received( GSource * source UNUSED, void * data, size_t len,
-                 void * vdata )
-{
-    struct constate        * con = vdata;
-    struct constate_client * cli = &con->u.client;
-    ssize_t                  res;
+static void
+srv_io_accept(GSource *source UNUSED, int fd, struct sockaddr *sa UNUSED,
+              socklen_t len UNUSED, void *vdata) {
+  struct constate *con = vdata;
+  struct constate *newcon;
+  uint8_t        * buf;
+  size_t           size;
 
-    if( IPC_MIN_MSG_LEN > len )
-    {
-        return 0;
-    }
+  newcon = g_new(struct constate, 1);
+  memcpy(newcon, con, sizeof(*newcon));
+  newcon->fd = fd;
 
-    res = ipc_parse( con->ipc, data, len, con );
+  newcon->ipc = ipc_newcon( con->msgs );
+  if( NULL == newcon->ipc )
+  {
+      g_free( newcon );
+      EVUTIL_CLOSESOCKET( fd );
+      return;
+  }
 
-    if( 0 > res )
-    {
-        switch( errno )
-        {
-            case EPERM:
-                g_message( _("Bad IPC protocol version") );
-                break;
-            case EINVAL:
-                g_message( _("IPC protocol parse error") );
-                break;
-            default:
-                g_message( _("IPC parsing failed: %s"), g_strerror( errno ) );
-                break;
-        }
-        destroycon( con );
-        return 0;
-    }
+  newcon->source = io_new(fd, NULL, srv_io_received, all_io_closed, newcon);
+  if( NULL == newcon->source )
+  {
+      ipc_freecon( newcon->ipc );
+      g_free( newcon );
+      EVUTIL_CLOSESOCKET( fd );
+      return;
+  }
 
-    if( HASVERS( con->ipc ) && 0 == cli->msgid )
-    {
-        client_sendmsg( con );
-    }
+  buf = ipc_mkvers( &size, "Transmission GTK+ " LONG_VERSION_STRING );
+  if( NULL == buf )
+  {
+      ipc_freecon( newcon->ipc );
+      g_free( newcon );
+      EVUTIL_CLOSESOCKET( fd );
+      return;
+  }
 
-    return res;
+  io_send_keepdata( newcon->source, buf, size );
 }
 
+/* open a local socket for clients connections */
 static void
-client_sendmsg( struct constate * con )
-{
-    struct constate_client * cli = &con->u.client;
-    GList                  * ii;
-    uint8_t                * buf;
-    size_t                   size;
-    benc_val_t               packet, * val;
-    int                      saved;
+serv_bind(struct constate *con) {
+  struct sockaddr_un sa;
 
-    switch( cli->msg )
-    {
-        case IPC_MSG_ADDMANYFILES:
-            val = ipc_initval( con->ipc, cli->msg, -1, &packet, TYPE_LIST );
-            if( NULL == val ||
-                tr_bencListReserve( val, g_list_length( cli->files ) ) )
-            {
-                perror( "malloc" );
-                destroycon( con );
-                return;
-            }
-            for( ii = cli->files; NULL != ii; ii = ii->next )
-            {
-                tr_bencInitStr( tr_bencListAdd( val ), ii->data, -1, 0 );
-            }
-            buf = ipc_mkval( &packet, &size );
-            saved = errno;
-            tr_bencFree( &packet );
-            g_list_free( cli->files );
-            cli->files = NULL;
-            break;
-        case IPC_MSG_QUIT:
-            buf = ipc_mkempty( con->ipc, &size, cli->msg, -1 );
-            saved = errno;
-            break;
-        default:
-            g_assert_not_reached();
-            return;
-    }
+  rmsock();
+  gl_sockpath = cf_sockname();
 
-    if( NULL == buf )
-    {
-        errno = saved;
-        perror( "malloc" );
-        destroycon( con );
-        return;
-    }
+  if(0 > (con->fd = socket(AF_LOCAL, SOCK_STREAM, 0)))
+    goto fail;
 
-    cli->msgid = io_send_keepdata( con->source, buf, size );
-}
+  memset(&sa, 0,  sizeof(sa));
+  sa.sun_family = AF_LOCAL;
+  strncpy(sa.sun_path, gl_sockpath, sizeof(sa.sun_path) - 1);
 
-static void
-destroycon(struct constate *con) {
-  con->source = NULL;
+  /* unlink any existing socket file before trying to create ours */
+  unlink(gl_sockpath);
+  if(0 > bind(con->fd, (struct sockaddr *)&sa, SUN_LEN(&sa))) {
+    /* bind may fail if there was already a socket, so try twice */
+    unlink(gl_sockpath);
+    if(0 > bind(con->fd, (struct sockaddr *)&sa, SUN_LEN(&sa)))
+      goto fail;
+  }
 
+  if(0 > listen(con->fd, 5))
+    goto fail;
+
+  con->source = io_new_listening(con->fd, sizeof(struct sockaddr_un),
+                                 srv_io_accept, all_io_closed, con);
+
+  g_atexit(rmsock);
+
+  return;
+
+ fail:
+  errmsg(con->u.serv.wind, _("Failed to set up socket: %s"),
+         g_strerror(errno));
   if(0 <= con->fd)
     EVUTIL_CLOSESOCKET(con->fd);
   con->fd = -1;
-  ipc_freecon( con->ipc );
-
-  switch(con->type) {
-    case CON_SERV:
-      break;
-    case CON_CLIENT:
-      ipc_freemsgs( con->msgs );
-      freestrlist(con->u.client.files);
-      g_main_loop_quit(con->u.client.loop);
-      break;
-  }
-}
-
-static void
-all_io_closed(GSource *source UNUSED, void *vdata) {
-  struct constate *con = vdata;
-
-  destroycon(con);
-}
-
-static void
-cli_io_sent( GSource * source UNUSED, size_t id, void *vdata )
-{
-  struct constate_client *cli = &((struct constate*)vdata)->u.client;
-
-  if(0 < id && cli->msgid == id) {
-    *(cli->succeeded) = TRUE;
-    destroycon(vdata);
-  }
+  rmsock();
 }
 
 static void
@@ -675,6 +590,54 @@ smsg_noop( enum ipc_msg id UNUSED, benc_val_t * val UNUSED, int64_t tag,
            void * arg )
 {
     simpleresp( arg, tag, IPC_MSG_OK );
+}
+
+static TrTorrent *
+findtorid( TrCore * core, int id, GtkTreeIter * iter )
+{
+    GtkTreeModel * model;
+    GtkTreeIter    myiter;
+    int            rowid;
+    TrTorrent    * tor;
+
+    if( NULL == iter )
+    {
+        iter = &myiter;
+    }
+
+    model = tr_core_model( core );
+    if( gtk_tree_model_get_iter_first( model, iter ) )
+    {
+        do
+        {
+            gtk_tree_model_get( model, iter, MC_ID, &rowid, -1 );
+            if( rowid == id )
+            {
+                gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
+                g_object_unref( tor );
+                return tor;
+            }
+        }
+        while( gtk_tree_model_iter_next( model, iter ) );
+    }
+
+    return NULL;
+}
+
+static int
+addinfo( TrTorrent * tor, enum ipc_msg msgid, int torid, int types,
+         benc_val_t * val )
+{
+    if( IPC_MSG_INFO == msgid )
+    {
+        const tr_info * inf = tr_torrent_info( tor );
+        return ipc_addinfo( val, torid, inf, types );
+    }
+    else
+    {
+        const tr_stat * st = tr_torrent_stat( tor );
+        return ipc_addstat( val, torid, st, types );
+    }
 }
 
 static void
@@ -801,20 +764,32 @@ smsg_infoall( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     }
 }
 
-static int
-addinfo( TrTorrent * tor, enum ipc_msg msgid, int torid, int types,
-         benc_val_t * val )
+static TrTorrent *
+findtorhash( TrCore * core, const char * hash, int * torid )
 {
-    if( IPC_MSG_INFO == msgid )
+    GtkTreeModel * model;
+    GtkTreeIter    iter;
+    char         * rowhash;
+    TrTorrent    * tor;
+
+    model = tr_core_model( core );
+    if( gtk_tree_model_get_iter_first( model, &iter ) )
     {
-        const tr_info * inf = tr_torrent_info( tor );
-        return ipc_addinfo( val, torid, inf, types );
+        do
+        {
+            gtk_tree_model_get( model, &iter, MC_HASH, &rowhash, -1 );
+            if( 0 == strcmp( hash, rowhash ) )
+            {
+                gtk_tree_model_get( model, &iter, MC_ID, torid,
+                                    MC_TORRENT, &tor, -1 );
+                g_object_unref( tor );
+                return tor;
+            }
+        }
+        while( gtk_tree_model_iter_next( model, &iter ) );
     }
-    else
-    {
-        const tr_stat * st = tr_torrent_stat( tor );
-        return ipc_addstat( val, torid, st, types );
-    }
+
+    return NULL;
 }
 
 static void
@@ -1157,95 +1132,61 @@ smsg_sup( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
     }
 }
 
-static void
-all_default( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag, void * arg )
+void
+ipc_socket_setup( GtkWindow * parent, TrCore * core )
 {
-    switch( id )
-    {
-        case IPC_MSG_FAIL:
-        case IPC_MSG_NOTSUP:
-        case IPC_MSG_BAD:
-        case IPC_MSG_OK:
-            break;
-        default:
-            simpleresp( arg, tag, IPC_MSG_NOTSUP );
-            break;
-    }
-}
+  struct constate *con;
 
-static gboolean
-simpleresp( struct constate * con, int64_t tag, enum ipc_msg id )
-{
-    uint8_t         * buf;
-    size_t            size;
+  con = g_new0(struct constate, 1);
+  con->source = NULL;
+  con->fd = -1;
+  con->type = CON_SERV;
 
-    buf = ipc_mkempty( con->ipc, &size, id, tag );
-    if( NULL == buf )
-    {
-        return FALSE;
-    }
+  con->msgs = ipc_initmsgs();
+  if( NULL == con->msgs ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_ADDMANYFILES, smsg_add ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_ADDONEFILE,   smsg_addone ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_AUTOMAP,      smsg_int ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_AUTOSTART,    smsg_int ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_DIR,          smsg_str ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_DOWNLIMIT,    smsg_int ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETAUTOMAP,   smsg_pref ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETAUTOSTART, smsg_pref ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETDIR,       smsg_pref ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETDOWNLIMIT, smsg_pref ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETINFO,      smsg_info ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETINFOALL,   smsg_infoall ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETPEX,       smsg_pref ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETPORT,      smsg_pref ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTAT,      smsg_info ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTATALL,   smsg_infoall ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETUPLIMIT,   smsg_pref ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_LOOKUP,       smsg_look ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_NOOP,         smsg_noop ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_PEX,          smsg_int ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_PORT,         smsg_int ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_QUIT,         smsg_quit ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVE,       smsg_tor ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVEALL,    smsg_torall ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_START,        smsg_tor ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_STARTALL,     smsg_torall ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_STOP,         smsg_tor ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_STOPALL,      smsg_torall ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_SUP,          smsg_sup ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_UPLIMIT,      smsg_int ) )
+  {
+      errmsg( con->u.serv.wind, _("Failed to set up IPC: %s"),
+              g_strerror( errno ) );
+      g_free( con );
+      return;
+  }
 
-    io_send_keepdata( con->source, buf, size );
+  ipc_setdefmsg( con->msgs, all_default );
 
-    return TRUE;
-}
+  con->u.serv.wind = parent;
+  con->u.serv.core = core;
 
-static TrTorrent *
-findtorid( TrCore * core, int id, GtkTreeIter * iter )
-{
-    GtkTreeModel * model;
-    GtkTreeIter    myiter;
-    int            rowid;
-    TrTorrent    * tor;
+  g_object_add_weak_pointer( G_OBJECT( core ), &con->u.serv.core );
 
-    if( NULL == iter )
-    {
-        iter = &myiter;
-    }
-
-    model = tr_core_model( core );
-    if( gtk_tree_model_get_iter_first( model, iter ) )
-    {
-        do
-        {
-            gtk_tree_model_get( model, iter, MC_ID, &rowid, -1 );
-            if( rowid == id )
-            {
-                gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
-                g_object_unref( tor );
-                return tor;
-            }
-        }
-        while( gtk_tree_model_iter_next( model, iter ) );
-    }
-
-    return NULL;
-}
-
-static TrTorrent *
-findtorhash( TrCore * core, const char * hash, int * torid )
-{
-    GtkTreeModel * model;
-    GtkTreeIter    iter;
-    char         * rowhash;
-    TrTorrent    * tor;
-
-    model = tr_core_model( core );
-    if( gtk_tree_model_get_iter_first( model, &iter ) )
-    {
-        do
-        {
-            gtk_tree_model_get( model, &iter, MC_HASH, &rowhash, -1 );
-            if( 0 == strcmp( hash, rowhash ) )
-            {
-                gtk_tree_model_get( model, &iter, MC_ID, torid,
-                                    MC_TORRENT, &tor, -1 );
-                g_object_unref( tor );
-                return tor;
-            }
-        }
-        while( gtk_tree_model_iter_next( model, &iter ) );
-    }
-
-    return NULL;
+  serv_bind(con);
 }
