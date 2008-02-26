@@ -173,15 +173,6 @@ newsource(void) {
 }
 
 unsigned int
-io_send(GSource *source, const void *data, size_t len) {
-  char *new = g_new(char, len);
-
-  memcpy(new, data, len);
-
-  return io_send_keepdata(source, new, len);
-}
-
-unsigned int
 io_send_keepdata(GSource *source, void *data, size_t len) {
   struct iosource *io = (struct iosource*)source;
   struct iooutbuf *buf = g_new(struct iooutbuf, 1);

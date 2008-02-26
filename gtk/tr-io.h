@@ -39,9 +39,6 @@ io_new_listening(int fd, socklen_t len, ionewfunc_t accepted,
                  iofunc_t closed, void *cbdata);
 
 unsigned int
-io_send(GSource *source, const void *data, size_t len);
-
-unsigned int
 io_send_keepdata(GSource *source, void *data, size_t len);
 
 #endif /* TG_IO_H */
