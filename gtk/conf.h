@@ -47,8 +47,6 @@ void      pref_save               ( char **errstr );
 ***
 **/
 
-struct benc_val_s;
-
 gboolean
 cf_init(const char *confdir, char **errstr);
 gboolean

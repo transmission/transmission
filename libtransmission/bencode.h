@@ -28,7 +28,7 @@
 #include <inttypes.h> /* for int64_t */
 #include <string.h> /* for memset */
 
-typedef struct benc_val_s
+typedef struct tr_benc
 {
 #define TYPE_INT  1
 #define TYPE_STR  2
@@ -48,34 +48,36 @@ typedef struct benc_val_s
         {
             int alloc;
             int count;
-            struct benc_val_s * vals;
+            struct tr_benc * vals;
         } l;
     } val;
-} benc_val_t;
+} tr_benc;
 
+/* backwards compatability */
+typedef tr_benc benc_val_t;
 
-int          tr_bencParse( const void      * buf,
-                           const void      * bufend,
-                           benc_val_t      * setme_benc,
-                           const uint8_t  ** setme_end );
+int tr_bencParse( const void      * buf,
+                  const void      * bufend,
+                  tr_benc         * setme_benc,
+                  const uint8_t  ** setme_end );
 
-int          tr_bencLoad( const void  * buf,
-                          int           buflen,
-                          benc_val_t  * setme_benc,
-                          char       ** setme_end );
+int tr_bencLoad( const void  * buf,
+                 int           buflen,
+                 tr_benc     * setme_benc,
+                 char       ** setme_end );
 
-void         tr_bencPrint( benc_val_t * val );
-void         tr_bencFree( benc_val_t * val );
-benc_val_t * tr_bencDictFind( benc_val_t * val, const char * key );
-benc_val_t * tr_bencDictFindType( benc_val_t * val, const char * key, int type );
-benc_val_t * tr_bencDictFindFirst( benc_val_t * val, ... );
+void      tr_bencPrint( const tr_benc * );
+void      tr_bencFree( tr_benc * );
+tr_benc * tr_bencDictFind( tr_benc * dict, const char * key );
+tr_benc * tr_bencDictFindType( tr_benc * dict, const char * key, int type );
+tr_benc * tr_bencDictFindFirst( tr_benc * dict, ... );
 
 /* marks a string as 'do not free' and returns it */
-char *       tr_bencStealStr( benc_val_t * val );
+char * tr_bencStealStr( tr_benc * val );
 
-/* convenience functions for building benc_val_t structures */
+/* convenience functions for building tr_benc    structures */
 
-static inline void tr_bencInit( benc_val_t * val, int type )
+static inline void tr_bencInit( tr_benc    * val, int type )
 {
     memset( val, 0, sizeof( *val ) );
     val->type = type;
@@ -83,19 +85,19 @@ static inline void tr_bencInit( benc_val_t * val, int type )
 
 #define tr_bencInitStr( a, b, c, d ) \
     _tr_bencInitStr( (a), ( char * )(b), (c), (d) )
-void   _tr_bencInitStr( benc_val_t * val, char * str, int len, int nofree );
-int    tr_bencInitStrDup( benc_val_t * val, const char * str );
-void   tr_bencInitInt( benc_val_t * val, int64_t num );
-int   tr_bencListReserve( benc_val_t * list, int count );
+void   _tr_bencInitStr( tr_benc * val, char * str, int len, int nofree );
+int    tr_bencInitStrDup( tr_benc * val, const char * str );
+void   tr_bencInitInt( tr_benc * val, int64_t num );
+int   tr_bencListReserve( tr_benc * list, int count );
 /* note that for one key-value pair, count should be 1, not 2 */
-int   tr_bencDictReserve( benc_val_t * dict, int count );
-benc_val_t * tr_bencListAdd( benc_val_t * list );
+int   tr_bencDictReserve( tr_benc * dict, int count );
+tr_benc    * tr_bencListAdd( tr_benc  * list );
 /* note: key must not be freed or modified while val is in use */
-benc_val_t * tr_bencDictAdd( benc_val_t * dict, const char * key );
+tr_benc    * tr_bencDictAdd( tr_benc  * dict, const char * key );
 
-char*  tr_bencSave( const benc_val_t * val, int * len );
+char*  tr_bencSave( const tr_benc * val, int * len );
 
-int64_t  tr_bencGetInt ( const benc_val_t * val );
+int64_t tr_bencGetInt( const tr_benc * val );
 
 
 /**
@@ -118,9 +120,7 @@ int  tr_bencParseStr( const uint8_t  * buf,
 ***
 **/
 
-benc_val_t* tr_bencListGetNthChild( benc_val_t * val, int i );
-
-
+tr_benc * tr_bencListGetNthChild( tr_benc * list, int n );
 
 
 #endif

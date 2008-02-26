@@ -41,7 +41,7 @@
 **/
 
 static int
-isType( const benc_val_t * val, int type )
+isType( const tr_benc * val, int type )
 {
     return ( ( val != NULL ) && ( val->type == type ) );
 }
@@ -52,12 +52,12 @@ isType( const benc_val_t * val, int type )
 #define isDict(v)   ( isType( ( v ), TYPE_DICT ) )
 
 static int
-isContainer( const benc_val_t * val )
+isContainer( const tr_benc * val )
 {
     return isList(val) || isDict(val);
 }
 static int
-isSomething( const benc_val_t * val )
+isSomething( const tr_benc * val )
 {
     return isContainer(val) || isInt(val) || isString(val);
 }
@@ -158,7 +158,7 @@ tr_bencParseStr( const uint8_t  * buf,
 #define LIST_SIZE 8 /* number of items to increment list/dict buffer by */
 
 static int
-makeroom( benc_val_t * val, int count )
+makeroom( tr_benc * val, int count )
 {
     assert( TYPE_LIST == val->type || TYPE_DICT == val->type );
 
@@ -167,7 +167,7 @@ makeroom( benc_val_t * val, int count )
         /* We need a bigger boat */
         const int len = val->val.l.alloc + count +
             ( count % LIST_SIZE ? LIST_SIZE - ( count % LIST_SIZE ) : 0 );
-        void * new = realloc( val->val.l.vals, len * sizeof( benc_val_t ) );
+        void * new = realloc( val->val.l.vals, len * sizeof( tr_benc ) );
         if( NULL == new )
             return 1;
 
@@ -178,10 +178,10 @@ makeroom( benc_val_t * val, int count )
     return 0;
 }
 
-static benc_val_t*
-getNode( benc_val_t * top, tr_ptrArray * parentStack, int type )
+static tr_benc*
+getNode( tr_benc * top, tr_ptrArray * parentStack, int type )
 {
-    benc_val_t * parent;
+    tr_benc * parent;
 
     assert( top != NULL );
     assert( parentStack != NULL );
@@ -210,7 +210,7 @@ getNode( benc_val_t * top, tr_ptrArray * parentStack, int type )
 int
 tr_bencParse( const void     * buf_in,
               const void     * bufend_in,
-              benc_val_t     * top,
+              tr_benc     * top,
               const uint8_t ** setme_end )
 {
     int err;
@@ -230,7 +230,7 @@ tr_bencParse( const void     * buf_in,
             int64_t val;
             const uint8_t * end;
             int err;
-            benc_val_t * node;
+            tr_benc * node;
 
             if(( err = tr_bencParseInt( buf, bufend, &end, &val )))
                 return err;
@@ -247,7 +247,7 @@ tr_bencParse( const void     * buf_in,
         }
         else if( *buf=='l' ) /* list */
         {
-            benc_val_t * node = getNode( top, parentStack, TYPE_LIST );
+            tr_benc * node = getNode( top, parentStack, TYPE_LIST );
             if( !node )
                 return TR_ERROR;
             tr_bencInit( node, TYPE_LIST );
@@ -256,7 +256,7 @@ tr_bencParse( const void     * buf_in,
         }
         else if( *buf=='d' ) /* dict */
         {
-            benc_val_t * node = getNode( top, parentStack, TYPE_DICT );
+            tr_benc * node = getNode( top, parentStack, TYPE_DICT );
             if( !node )
                 return TR_ERROR;
             tr_bencInit( node, TYPE_DICT );
@@ -265,7 +265,7 @@ tr_bencParse( const void     * buf_in,
         }
         else if( *buf=='e' ) /* end of list or dict */
         {
-            benc_val_t * node;
+            tr_benc * node;
             ++buf;
             if( tr_ptrArrayEmpty( parentStack ) )
                 return TR_ERROR;
@@ -284,7 +284,7 @@ tr_bencParse( const void     * buf_in,
             uint8_t * str;
             size_t str_len;
             int err;
-            benc_val_t * node;
+            tr_benc * node;
 
             if(( err = tr_bencParseStr( buf, bufend, &end, &str, &str_len )))
                 return err;
@@ -317,7 +317,7 @@ tr_bencParse( const void     * buf_in,
 int
 tr_bencLoad( const void  * buf_in,
              int           buflen,
-             benc_val_t  * setme_benc,
+             tr_benc  * setme_benc,
              char       ** setme_end )
 {
     const uint8_t * buf = buf_in;
@@ -332,8 +332,8 @@ tr_bencLoad( const void  * buf_in,
 ****
 ***/
 
-benc_val_t *
-tr_bencDictFind( benc_val_t * val, const char * key )
+tr_benc *
+tr_bencDictFind( tr_benc * val, const char * key )
 {
     int len, ii;
 
@@ -356,18 +356,18 @@ tr_bencDictFind( benc_val_t * val, const char * key )
     return NULL;
 }
 
-benc_val_t*
-tr_bencDictFindType( benc_val_t * val, const char * key, int type )
+tr_benc*
+tr_bencDictFindType( tr_benc * val, const char * key, int type )
 {
-    benc_val_t * ret = tr_bencDictFind( val, key );
+    tr_benc * ret = tr_bencDictFind( val, key );
     return ret && ret->type == type ? ret : NULL;
 }
 
-benc_val_t *
-tr_bencDictFindFirst( benc_val_t * val, ... )
+tr_benc *
+tr_bencDictFindFirst( tr_benc * val, ... )
 {
     const char * key;
-    benc_val_t * ret;
+    tr_benc * ret;
     va_list      ap;
 
     ret = NULL;
@@ -380,24 +380,24 @@ tr_bencDictFindFirst( benc_val_t * val, ... )
     return ret;
 }
 
-benc_val_t*
-tr_bencListGetNthChild( benc_val_t * val, int i )
+tr_benc*
+tr_bencListGetNthChild( tr_benc * val, int i )
 {
-    benc_val_t * ret = NULL;
+    tr_benc * ret = NULL;
     if( isList( val ) && ( i >= 0 ) && ( i < val->val.l.count ) )
         ret = val->val.l.vals + i;
     return ret;
 }
 
 int64_t
-tr_bencGetInt ( const benc_val_t * val )
+tr_bencGetInt ( const tr_benc * val )
 {
     assert( isInt( val ) );
     return val->val.i;
 }
 
 char *
-tr_bencStealStr( benc_val_t * val )
+tr_bencStealStr( tr_benc * val )
 {
     assert( isString( val ) );
     val->val.s.nofree = 1;
@@ -409,7 +409,7 @@ tr_bencStealStr( benc_val_t * val )
 ***/
 
 void
-_tr_bencInitStr( benc_val_t * val, char * str, int len, int nofree )
+_tr_bencInitStr( tr_benc * val, char * str, int len, int nofree )
 {
     tr_bencInit( val, TYPE_STR );
     val->val.s.s      = str;
@@ -422,7 +422,7 @@ _tr_bencInitStr( benc_val_t * val, char * str, int len, int nofree )
 }
 
 int
-tr_bencInitStrDup( benc_val_t * val, const char * str )
+tr_bencInitStrDup( tr_benc * val, const char * str )
 {
     char * newStr = tr_strdup( str );
     if( newStr == NULL )
@@ -433,14 +433,14 @@ tr_bencInitStrDup( benc_val_t * val, const char * str )
 }
 
 void
-tr_bencInitInt( benc_val_t * val, int64_t num )
+tr_bencInitInt( tr_benc * val, int64_t num )
 {
     tr_bencInit( val, TYPE_INT );
     val->val.i = num;
 }
 
 int
-tr_bencListReserve( benc_val_t * val, int count )
+tr_bencListReserve( tr_benc * val, int count )
 {
     assert( isList( val ) );
 
@@ -448,17 +448,17 @@ tr_bencListReserve( benc_val_t * val, int count )
 }
 
 int
-tr_bencDictReserve( benc_val_t * val, int count )
+tr_bencDictReserve( tr_benc * val, int count )
 {
     assert( isDict( val ) );
 
     return makeroom( val, count * 2 );
 }
 
-benc_val_t *
-tr_bencListAdd( benc_val_t * list )
+tr_benc *
+tr_bencListAdd( tr_benc * list )
 {
-    benc_val_t * item;
+    tr_benc * item;
 
     assert( isList( list ) );
     assert( list->val.l.count < list->val.l.alloc );
@@ -470,10 +470,10 @@ tr_bencListAdd( benc_val_t * list )
     return item;
 }
 
-benc_val_t *
-tr_bencDictAdd( benc_val_t * dict, const char * key )
+tr_benc *
+tr_bencDictAdd( tr_benc * dict, const char * key )
 {
-    benc_val_t * keyval, * itemval;
+    tr_benc * keyval, * itemval;
 
     assert( isDict( dict ) );
     assert( dict->val.l.count + 2 <= dict->val.l.alloc );
@@ -507,7 +507,7 @@ compareKeyIndex( const void * va, const void * vb )
 
 struct SaveNode
 {
-    const benc_val_t * val;
+    const tr_benc * val;
     int valIsVisited;
     int childCount;
     int childIndex;
@@ -515,7 +515,7 @@ struct SaveNode
 };
 
 static struct SaveNode*
-nodeNewDict( const benc_val_t * val )
+nodeNewDict( const tr_benc * val )
 {
     int i, j;
     int nKeys;
@@ -548,7 +548,7 @@ nodeNewDict( const benc_val_t * val )
 }
 
 static struct SaveNode*
-nodeNewList( const benc_val_t * val )
+nodeNewList( const tr_benc * val )
 {
     int i, n;
     struct SaveNode * node;
@@ -567,7 +567,7 @@ nodeNewList( const benc_val_t * val )
 }
 
 static struct SaveNode*
-nodeNewLeaf( const benc_val_t * val )
+nodeNewLeaf( const tr_benc * val )
 {
     struct SaveNode * node;
 
@@ -579,7 +579,7 @@ nodeNewLeaf( const benc_val_t * val )
 }
 
 static struct SaveNode*
-nodeNew( const benc_val_t * val )
+nodeNew( const tr_benc * val )
 {
     struct SaveNode * node;
 
@@ -593,7 +593,7 @@ nodeNew( const benc_val_t * val )
     return node;
 }
 
-typedef void (*BencWalkFunc)( const benc_val_t * val, void * user_data );
+typedef void (*BencWalkFunc)( const tr_benc * val, void * user_data );
 
 struct WalkFuncs
 {
@@ -610,7 +610,7 @@ struct WalkFuncs
  * attack via maliciously-crafted bencoded data. (#667)
  */
 static void
-bencWalk( const benc_val_t   * top,
+bencWalk( const tr_benc   * top,
           struct WalkFuncs   * walkFuncs,
           void               * user_data )
 {
@@ -620,7 +620,7 @@ bencWalk( const benc_val_t   * top,
     while( !tr_ptrArrayEmpty( stack ) )
     {
         struct SaveNode * node = tr_ptrArrayBack( stack );
-        const benc_val_t * val;
+        const tr_benc * val;
 
         if( !node->valIsVisited )
         {
@@ -681,34 +681,34 @@ bencWalk( const benc_val_t   * top,
 ****/
 
 static void
-saveIntFunc( const benc_val_t * val, void * evbuf )
+saveIntFunc( const tr_benc * val, void * evbuf )
 {
     evbuffer_add_printf( evbuf, "i%"PRId64"e", tr_bencGetInt(val) );
 }
 static void
-saveStringFunc( const benc_val_t * val, void * vevbuf )
+saveStringFunc( const tr_benc * val, void * vevbuf )
 {
     struct evbuffer * evbuf = vevbuf;
     evbuffer_add_printf( evbuf, "%i:", val->val.s.i );
     evbuffer_add( evbuf, val->val.s.s, val->val.s.i );
 }
 static void
-saveDictBeginFunc( const benc_val_t * val UNUSED, void * evbuf )
+saveDictBeginFunc( const tr_benc * val UNUSED, void * evbuf )
 {
     evbuffer_add_printf( evbuf, "d" );
 }
 static void
-saveListBeginFunc( const benc_val_t * val UNUSED, void * evbuf )
+saveListBeginFunc( const tr_benc * val UNUSED, void * evbuf )
 {
     evbuffer_add_printf( evbuf, "l" );
 }
 static void
-saveContainerEndFunc( const benc_val_t * val UNUSED, void * evbuf )
+saveContainerEndFunc( const tr_benc * val UNUSED, void * evbuf )
 {
     evbuffer_add_printf( evbuf, "e" );
 }
 char*
-tr_bencSave( const benc_val_t * top, int * len )
+tr_bencSave( const tr_benc * top, int * len )
 {
     char * ret;
     struct WalkFuncs walkFuncs;
@@ -733,22 +733,22 @@ tr_bencSave( const benc_val_t * top, int * len )
 ***/
 
 static void
-freeDummyFunc( const benc_val_t * val UNUSED, void * buf UNUSED  )
+freeDummyFunc( const tr_benc * val UNUSED, void * buf UNUSED  )
 {
 }
 static void
-freeStringFunc( const benc_val_t * val, void * freeme )
+freeStringFunc( const tr_benc * val, void * freeme )
 {
     if( !val->val.s.nofree )
         tr_ptrArrayAppend( freeme, val->val.s.s );
 }
 static void
-freeContainerBeginFunc( const benc_val_t * val, void * freeme )
+freeContainerBeginFunc( const tr_benc * val, void * freeme )
 {
     tr_ptrArrayAppend( freeme, val->val.l.vals );
 }
 void
-tr_bencFree( benc_val_t * val )
+tr_bencFree( tr_benc * val )
 {
     if( val != NULL )
     {
@@ -782,14 +782,14 @@ printLeadingSpaces( struct WalkPrint * data )
     fprintf( data->out, "%*.*s", width, width, " " );
 }
 static void
-printIntFunc( const benc_val_t * val, void * vdata )
+printIntFunc( const tr_benc * val, void * vdata )
 {
     struct WalkPrint * data = vdata;
     printLeadingSpaces( data );
     fprintf( data->out, "int:  %"PRId64"\n", tr_bencGetInt(val) );
 }
 static void
-printStringFunc( const benc_val_t * val, void * vdata )
+printStringFunc( const tr_benc * val, void * vdata )
 {
     int ii;
     struct WalkPrint * data = vdata;
@@ -809,7 +809,7 @@ printStringFunc( const benc_val_t * val, void * vdata )
     fprintf( data->out, "\n" );
 }
 static void
-printListBeginFunc( const benc_val_t * val UNUSED, void * vdata )
+printListBeginFunc( const tr_benc * val UNUSED, void * vdata )
 {
     struct WalkPrint * data = vdata;
     printLeadingSpaces( data );
@@ -817,7 +817,7 @@ printListBeginFunc( const benc_val_t * val UNUSED, void * vdata )
     ++data->depth;
 }
 static void
-printDictBeginFunc( const benc_val_t * val UNUSED, void * vdata )
+printDictBeginFunc( const tr_benc * val UNUSED, void * vdata )
 {
     struct WalkPrint * data = vdata;
     printLeadingSpaces( data );
@@ -825,13 +825,13 @@ printDictBeginFunc( const benc_val_t * val UNUSED, void * vdata )
     ++data->depth;
 }
 static void
-printContainerEndFunc( const benc_val_t * val UNUSED, void * vdata )
+printContainerEndFunc( const tr_benc * val UNUSED, void * vdata )
 {
     struct WalkPrint * data = vdata;
     --data->depth;
 }
 void
-tr_bencPrint( benc_val_t * val )
+tr_bencPrint( const tr_benc * val )
 {
     struct WalkFuncs walkFuncs;
     struct WalkPrint walkPrint;

@@ -376,7 +376,7 @@ torrentRealInit( tr_handle     * h,
 
     /* maybe save our own copy of the metainfo */
     if( tr_ctorGetSave( ctor ) ) {
-        const benc_val_t * val;
+        const tr_benc * val;
         if( !tr_ctorGetMetainfo( ctor, &val ) ) {
             int len;
             uint8_t * text = (uint8_t*) tr_bencSave( val, &len );
@@ -412,7 +412,7 @@ tr_torrentParse( const tr_handle  * handle,
     int err = 0;
     int doFree;
     tr_info tmp;
-    const benc_val_t * metainfo;
+    const tr_benc * metainfo;
 
     if( setmeInfo == NULL )
         setmeInfo = &tmp;

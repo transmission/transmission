@@ -27,9 +27,9 @@
 
 #include "transmission.h"
 
-struct benc_val_t;
+struct tr_benc;
 
-int tr_metainfoParse( tr_info *, const struct benc_val_s *, const char * tag );
+int tr_metainfoParse( tr_info *, const struct tr_benc *, const char * tag );
 void tr_metainfoFree( tr_info * inf );
 void tr_metainfoRemoveSaved( const char * hashString, const char * tag );
 

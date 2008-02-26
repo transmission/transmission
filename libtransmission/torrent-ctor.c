@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 #include <libgen.h> /* basename */
@@ -38,7 +38,7 @@ struct tr_ctor
 
     unsigned int isSet_metainfo : 1;
     unsigned int isSet_delete : 1;
-    benc_val_t metainfo;
+    tr_benc metainfo;
     char * sourceFile;
 
     struct optional_args optionalArgs[2];
@@ -104,9 +104,9 @@ tr_ctorSetMetainfoFromFile( tr_ctor        * ctor,
 
     /* if no `name' field was set, then set it from the filename */
     if( ctor->isSet_metainfo ) {
-        benc_val_t * info = tr_bencDictFindType( &ctor->metainfo, "info", TYPE_DICT );
+        tr_benc * info = tr_bencDictFindType( &ctor->metainfo, "info", TYPE_DICT );
         if( info != NULL ) {
-            benc_val_t * name = tr_bencDictFindFirst( info, "name.utf-8", "name", NULL );
+            tr_benc * name = tr_bencDictFindFirst( info, "name.utf-8", "name", NULL );
             if( name == NULL )
                 name = tr_bencDictAdd( info, "name" );
             if( name->type!=TYPE_STR || !name->val.s.s || !*name->val.s.s ) {
@@ -265,8 +265,8 @@ tr_ctorGetDestination( const tr_ctor  * ctor,
 }
 
 int
-tr_ctorGetMetainfo( const tr_ctor              * ctor,
-                    const struct benc_val_s   ** setme )
+tr_ctorGetMetainfo( const tr_ctor    * ctor,
+                    const tr_benc   ** setme )
 {
     int err = 0;
 

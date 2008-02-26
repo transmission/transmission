@@ -258,10 +258,10 @@ getHashInfo ( tr_metainfo_builder * b )
 static void
 getFileInfo( const char                      * topFile,
              const tr_metainfo_builder_file  * file,
-             benc_val_t                      * uninitialized_length,
-             benc_val_t                      * uninitialized_path )
+             tr_benc                         * uninitialized_length,
+             tr_benc                         * uninitialized_path )
 {
-    benc_val_t *sub;
+    tr_benc *sub;
     const char *pch, *prev;
     const size_t topLen = strlen(topFile) + 1; /* +1 for '/' */
     int n;
@@ -296,7 +296,7 @@ getFileInfo( const char                      * topFile,
 }
 
 static void
-makeFilesList( benc_val_t                 * list,
+makeFilesList( tr_benc                    * list,
                const tr_metainfo_builder  * builder )
 {
     uint32_t i = 0;
@@ -305,8 +305,8 @@ makeFilesList( benc_val_t                 * list,
 
     for( i=0; i<builder->fileCount; ++i )
     {
-        benc_val_t * dict = tr_bencListAdd( list );
-        benc_val_t *length, *pathVal;
+        tr_benc * dict = tr_bencListAdd( list );
+        tr_benc *length, *pathVal;
 
         tr_bencInit( dict, TYPE_DICT );
         tr_bencDictReserve( dict, 2 );
@@ -317,11 +317,11 @@ makeFilesList( benc_val_t                 * list,
 }
 
 static void
-makeInfoDict ( benc_val_t           * dict,
+makeInfoDict ( tr_benc              * dict,
                tr_metainfo_builder  * builder )
 {
     uint8_t * pch;
-    benc_val_t * val;
+    tr_benc * val;
     char base[MAX_PATH_LENGTH];
 
     tr_bencDictReserve( dict, 5 );
@@ -356,7 +356,7 @@ makeInfoDict ( benc_val_t           * dict,
 static void tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
 {
     int n = 5;
-    benc_val_t top, *val;
+    tr_benc top, *val;
 
     tr_bencInit ( &top, TYPE_DICT );
     if ( builder->comment && *builder->comment ) ++n;

@@ -28,11 +28,6 @@
 #include <inttypes.h>
 #include <unistd.h> /* for ssize_t */
 
-/* yay for typedefs, we can't forward declare benc_val_t or tr_info
-   like with structs */
-#include "bencode.h"
-#include "transmission.h"
-
 #define IPC_MIN_MSG_LEN         ( 8 )
 #define IPC_MAX_MSG_LEN         ( 0x7fffffff - IPC_MIN_MSG_LEN )
 
@@ -125,6 +120,9 @@ enum ipc_msg
 struct ipc_funcs;
 struct ipc_info;
 struct strlist;
+struct tr_info;
+struct tr_benc;
+struct tr_stat;
 
 struct ipc_info
 {
@@ -138,7 +136,7 @@ struct ipc_info
 
 #define TORRENT_ID_VALID( id )  ( 0 < (id) && INT_MAX > (id) )
 
-typedef void ( *trd_msgfunc )( enum ipc_msg, benc_val_t *, int64_t, void * );
+typedef void ( *trd_msgfunc )( enum ipc_msg, struct tr_benc *, int64_t, void * );
 
 /* any of these functions that can fail may set errno for any of the
    errors set by malloc() or calloc() */
@@ -153,9 +151,9 @@ void         ipc_freecon  ( struct ipc_info * );
 
 /* message creation */
 /* sets errno to EPERM if requested message not supported by protocol vers */
-benc_val_t * ipc_initval  ( struct ipc_info *, enum ipc_msg, int64_t,
-                            benc_val_t *, int );
-uint8_t *    ipc_mkval    ( benc_val_t *, size_t * );
+struct tr_benc * ipc_initval  ( struct ipc_info *, enum ipc_msg, int64_t,
+                            struct tr_benc *, int );
+uint8_t *    ipc_mkval    ( struct tr_benc *, size_t * );
 uint8_t *    ipc_mkempty  ( struct ipc_info *, size_t *, enum ipc_msg,
                             int64_t );
 uint8_t *    ipc_mkint    ( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
@@ -165,8 +163,8 @@ uint8_t *    ipc_mkstr    ( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
 uint8_t *    ipc_mkvers   ( size_t *, const char * );
 uint8_t *    ipc_mkgetinfo( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
                             int, const int * );
-int          ipc_addinfo  ( benc_val_t *, int, const tr_info *, int );
-int          ipc_addstat  ( benc_val_t *, int, const tr_stat *, int );
+int          ipc_addinfo  ( struct tr_benc *, int, const struct tr_info *, int );
+int          ipc_addstat  ( struct tr_benc *, int, const struct tr_stat *, int );
 
 /* sets errno to EINVAL on parse error or
    EPERM for unsupported protocol version */
@@ -177,7 +175,7 @@ int          ipc_havemsg  ( struct ipc_info *, enum ipc_msg );
 enum ipc_msg ipc_msgid    ( struct ipc_info *, const char * );
 int          ipc_ishandled( struct ipc_info *, enum ipc_msg );
 int          ipc_havetags ( struct ipc_info * );
-int          ipc_infotypes( enum ipc_msg, benc_val_t * );
+int          ipc_infotypes( enum ipc_msg, struct tr_benc * );
 const char * ipc_infoname ( enum ipc_msg, int );
 
 #endif /* TR_DAEMON_IPC_H */

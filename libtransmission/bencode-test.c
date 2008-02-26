@@ -139,7 +139,7 @@ testStr( void )
 static int
 testString( const char * str, int isGood )
 {
-    benc_val_t val;
+    tr_benc val;
     const uint8_t * end = NULL;
     char * saved;
     const size_t len = strlen( str );
@@ -162,9 +162,9 @@ testString( const char * str, int isGood )
 static int
 testParse( void )
 {
-    benc_val_t val;
-    benc_val_t * child;
-    benc_val_t * child2;
+    tr_benc val;
+    tr_benc * child;
+    tr_benc * child2;
     uint8_t buf[512];
     const uint8_t * end;
     int err;
@@ -274,7 +274,7 @@ testStackSmash( void )
     int err;
     uint8_t * in;
     const uint8_t * end;
-    benc_val_t val;
+    tr_benc val;
     char * saved;
 
     depth = 1000000;

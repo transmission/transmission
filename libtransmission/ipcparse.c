@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include "transmission.h"
+#include "bencode.h"
 #include "utils.h"
 
 #include "ipcparse.h"
@@ -218,14 +219,14 @@ static struct inf gl_stat[] =
     { "upload-total",           IPC_ST_UPTOTAL,       RB_ENTRY_INITIALIZER() },
 };
 
-static int          handlevers ( struct ipc_info *, benc_val_t * );
-static int          handlemsgs ( struct ipc_info *, benc_val_t *, void * );
-static int          gotmsg     ( struct ipc_info *, benc_val_t *, benc_val_t *,
-                                 benc_val_t *, void * );
+static int          handlevers ( struct ipc_info *, tr_benc * );
+static int          handlemsgs ( struct ipc_info *, tr_benc *, void * );
+static int          gotmsg     ( struct ipc_info *, tr_benc *, tr_benc *,
+                                 tr_benc *, void * );
 static int          msgcmp     ( struct msg *, struct msg * );
 static int          infcmp     ( struct inf *, struct inf * );
 static struct msg * msglookup  ( const char * );
-static int          filltracker( benc_val_t *, const tr_tracker_info * );
+static int          filltracker( tr_benc *, const tr_tracker_info * );
 static int          handlercmp ( struct msgfunc *, struct msgfunc * );
 
 RB_GENERATE_STATIC( msgtree, msg, link, msgcmp )
@@ -320,11 +321,11 @@ ipc_freecon( struct ipc_info * info )
     }
 }
 
-benc_val_t *
+tr_benc *
 ipc_initval( struct ipc_info * info, enum ipc_msg id, int64_t tag,
-             benc_val_t * pk, int type )
+             tr_benc * pk, int type )
 {
-    benc_val_t * ret;
+    tr_benc * ret;
 
     assert( MSGVALID( id ) );
 
@@ -364,7 +365,7 @@ ipc_initval( struct ipc_info * info, enum ipc_msg id, int64_t tag,
 }
 
 uint8_t *
-ipc_mkval( benc_val_t * pk, size_t * setmeSize )
+ipc_mkval( tr_benc * pk, size_t * setmeSize )
 {
     int bencSize = 0;
     char * benc = tr_bencSave( pk, &bencSize );
@@ -388,7 +389,7 @@ uint8_t *
 ipc_mkempty( struct ipc_info * info, size_t * len, enum ipc_msg id,
              int64_t tag )
 {
-    benc_val_t pk;
+    tr_benc pk;
     uint8_t  * ret;
 
     if( NULL == ipc_initval( info, id, tag, &pk, TYPE_STR ) )
@@ -406,7 +407,7 @@ uint8_t *
 ipc_mkint( struct ipc_info * info, size_t * len, enum ipc_msg id, int64_t tag,
            int64_t num )
 {
-    benc_val_t pk, * val;
+    tr_benc pk, * val;
     uint8_t  * ret;
 
     val = ipc_initval( info, id, tag, &pk, TYPE_INT );
@@ -426,7 +427,7 @@ uint8_t *
 ipc_mkstr( struct ipc_info * info, size_t * len, enum ipc_msg id, int64_t tag,
            const char * str )
 {
-    benc_val_t pk, * val;
+    tr_benc pk, * val;
     uint8_t  * ret;
 
     val = ipc_initval( info, id, tag, &pk, TYPE_STR );
@@ -445,7 +446,7 @@ ipc_mkstr( struct ipc_info * info, size_t * len, enum ipc_msg id, int64_t tag,
 uint8_t *
 ipc_mkvers( size_t * len, const char * label )
 {
-    benc_val_t pk, * dict;
+    tr_benc pk, * dict;
     uint8_t  * ret;
   
     tr_bencInit( &pk, TYPE_DICT );
@@ -476,7 +477,7 @@ uint8_t *
 ipc_mkgetinfo( struct ipc_info * info, size_t * len, enum ipc_msg id,
                int64_t tag, int types, const int * ids )
 {
-    benc_val_t   pk, * top, * idlist, * typelist;
+    tr_benc   pk, * top, * idlist, * typelist;
     size_t       ii, typecount, used;
     struct inf * typearray;
     uint8_t    * ret;
@@ -571,9 +572,9 @@ ipc_mkgetinfo( struct ipc_info * info, size_t * len, enum ipc_msg id,
 }
 
 int
-ipc_addinfo( benc_val_t * list, int tor, const tr_info * inf, int types )
+ipc_addinfo( tr_benc * list, int tor, const tr_info * inf, int types )
 {
-    benc_val_t * dict, * item, * file, * tier;
+    tr_benc * dict, * item, * file, * tier;
     int          ii, jj, kk;
 
     /* always send torrent id */
@@ -707,10 +708,10 @@ ipc_addinfo( benc_val_t * list, int tor, const tr_info * inf, int types )
 }
 
 int
-ipc_addstat( benc_val_t * list, int tor,
+ipc_addstat( tr_benc * list, int tor,
              const tr_stat * st, int types )
 {
-    benc_val_t  * dict, * item;
+    tr_benc  * dict, * item;
     int           ii, used;
     tr_errno      error;
 
@@ -915,7 +916,7 @@ ipc_parse( struct ipc_info * info, uint8_t * buf, ssize_t total, void * arg )
 {
     char        hex[IPC_MIN_MSG_LEN+1], * end;
     ssize_t     off, len;
-    benc_val_t  benc;
+    tr_benc  benc;
 
     for( off = 0; off + IPC_MIN_MSG_LEN < total; off += IPC_MIN_MSG_LEN + len )
     {
@@ -955,9 +956,9 @@ ipc_parse( struct ipc_info * info, uint8_t * buf, ssize_t total, void * arg )
 }
 
 static int
-handlevers( struct ipc_info * info, benc_val_t * dict )
+handlevers( struct ipc_info * info, tr_benc * dict )
 {
-    benc_val_t * vers, * num;
+    tr_benc * vers, * num;
     int64_t      min, max;
 
     if( TYPE_DICT != dict->type )
@@ -1015,9 +1016,9 @@ handlevers( struct ipc_info * info, benc_val_t * dict )
 }
 
 static int
-handlemsgs( struct ipc_info * info, benc_val_t * pay, void * arg )
+handlemsgs( struct ipc_info * info, tr_benc * pay, void * arg )
 {
-    benc_val_t * name, * val, * tag;
+    tr_benc * name, * val, * tag;
     int          ii;
 
     assert( HASVERS( info ) );
@@ -1062,8 +1063,8 @@ handlemsgs( struct ipc_info * info, benc_val_t * pay, void * arg )
 }
 
 static int
-gotmsg( struct ipc_info * info, benc_val_t * name, benc_val_t * val,
-        benc_val_t * tagval, void * arg )
+gotmsg( struct ipc_info * info, tr_benc * name, tr_benc * val,
+        tr_benc * tagval, void * arg )
 {
     struct msgfunc key, * handler;
     struct msg   * msg;
@@ -1152,12 +1153,12 @@ ipc_havetags( struct ipc_info * info )
 }
 
 int
-ipc_infotypes( enum ipc_msg id, benc_val_t * list )
+ipc_infotypes( enum ipc_msg id, tr_benc * list )
 {
     static struct inftree infotree = RB_INITIALIZER( &tree );
     static struct inftree stattree = RB_INITIALIZER( &tree );
     struct inftree * tree;
-    benc_val_t     * name;
+    tr_benc     * name;
     struct inf     * array, * inf, key;
     size_t           len, ii;
     int              ret, jj;
@@ -1286,7 +1287,7 @@ msglookup( const char * name )
 }
 
 static int
-filltracker( benc_val_t * val, const tr_tracker_info * tk )
+filltracker( tr_benc * val, const tr_tracker_info * tk )
 {
     tr_bencInit( val, TYPE_DICT );
     if( tr_bencDictReserve( val, ( NULL == tk->scrape ? 3 : 4 ) ) )

@@ -69,10 +69,10 @@ tr_httpParseUrl( const char * url_in, int len,
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
-static int getannounce( tr_info * inf, benc_val_t * meta );
+static int getannounce( tr_info * inf, tr_benc * meta );
 static char * announceToScrape( const char * announce );
-static int parseFiles( tr_info * inf, benc_val_t * name,
-                       benc_val_t * files, benc_val_t * length );
+static int parseFiles( tr_info * inf, tr_benc * name,
+                       tr_benc * files, tr_benc * length );
 
 /***
 ****
@@ -169,11 +169,11 @@ savedname( char * name, size_t len, const char * hash, const char * tag )
 
 
 int
-tr_metainfoParse( tr_info * inf, const benc_val_t * meta_in, const char * tag )
+tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
 {
     int i;
-    benc_val_t * beInfo, * val, * val2;
-    benc_val_t * meta = (benc_val_t *) meta_in;
+    tr_benc * beInfo, * val, * val2;
+    tr_benc * meta = (tr_benc *) meta_in;
     char buf[4096];
 
     /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
@@ -325,10 +325,10 @@ void tr_metainfoFree( tr_info * inf )
     memset( inf, '\0', sizeof(tr_info) );
 }
 
-static int getfile( char ** setme,
-                    const char * prefix, benc_val_t * name )
+static int
+getfile( char ** setme, const char * prefix, tr_benc * name )
 {
-    benc_val_t  * dir;
+    tr_benc     * dir;
     const char ** list;
     int           ii, jj;
     char          buf[4096];
@@ -386,9 +386,9 @@ static int getfile( char ** setme,
     return TR_OK;
 }
 
-static int getannounce( tr_info * inf, benc_val_t * meta )
+static int getannounce( tr_info * inf, tr_benc * meta )
 {
-    benc_val_t        * val, * subval, * urlval;
+    tr_benc           * val, * subval, * urlval;
     char              * address, * announce;
     int                 ii, jj, port, random, subcount;
     tr_tracker_info   * sublist;
@@ -626,10 +626,10 @@ tr_metainfoSave( const char * hash, const char * tag,
 }
 
 static int
-parseFiles( tr_info * inf, benc_val_t * name,
-            benc_val_t * files, benc_val_t * length )
+parseFiles( tr_info * inf, tr_benc * name,
+            tr_benc * files, tr_benc * length )
 {
-    benc_val_t * item, * path;
+    tr_benc * item, * path;
     int ii;
 
     if( NULL == name || TYPE_STR != name->type )

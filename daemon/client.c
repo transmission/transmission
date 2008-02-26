@@ -39,6 +39,7 @@
 #include <libtransmission/bencode.h>
 #include <libtransmission/ipcparse.h>
 #include <libtransmission/trcompat.h>
+#include <libtransmission/version.h>
 
 #include "bsdqueue.h"
 #include "client.h"

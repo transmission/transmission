@@ -767,7 +767,7 @@ tr_peerMsgsCancel( tr_peermsgs * msgs,
 static void
 sendLtepHandshake( tr_peermsgs * msgs )
 {
-    benc_val_t val, *m;
+    tr_benc val, *m;
     char * buf;
     int len;
     int pex;
@@ -826,7 +826,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
 static void
 parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
 {
-    benc_val_t val, * sub;
+    tr_benc val, * sub;
     uint8_t * tmp = tr_new( uint8_t, len );
 
     tr_peerIoReadBytes( msgs->io, inbuf, tmp, len );
@@ -875,7 +875,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
 {
     int gotval = 0;
     uint8_t * tmp = tr_new( uint8_t, msglen );
-    benc_val_t val, *sub;
+    tr_benc val, *sub;
     tr_peerIoReadBytes( msgs->io, inbuf, tmp, msglen );
 
     if( tr_torrentAllowsPex( msgs->torrent )
@@ -1734,7 +1734,7 @@ sendPex( tr_peermsgs * msgs )
         tr_pex * newPex = NULL;
         const int newCount = tr_peerMgrGetPeers( msgs->handle->peerMgr, msgs->torrent->info.hash, &newPex );
         PexDiffs diffs;
-        benc_val_t val, *added, *dropped, *flags;
+        tr_benc val, *added, *dropped, *flags;
         uint8_t *tmp, *walk;
         char * benc;
         int bencLen;

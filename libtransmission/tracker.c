@@ -281,7 +281,7 @@ onStoppedResponse( struct evhttp_request * req UNUSED, void * handle )
 }
 
 static int
-parseBencResponse( struct evhttp_request * req, benc_val_t * setme )
+parseBencResponse( struct evhttp_request * req, tr_benc * setme )
 {
     const unsigned char * body = EVBUFFER_DATA( req->input_buffer );
     const int bodylen = EVBUFFER_LENGTH( req->input_buffer );
@@ -362,7 +362,7 @@ updateAddresses( tr_tracker * t, const struct evhttp_request * req, int * tryAga
 
 /* Convert to compact form */
 static uint8_t *
-parseOldPeers( benc_val_t * bePeers, int * setmePeerCount )
+parseOldPeers( tr_benc * bePeers, int * setmePeerCount )
 {
     int i;
     uint8_t *compact, *walk;
@@ -376,8 +376,8 @@ parseOldPeers( benc_val_t * bePeers, int * setmePeerCount )
     {
         struct in_addr addr;
         tr_port_t port;
-        benc_val_t * val;
-        benc_val_t * peer = &bePeers->val.l.vals[i];
+        tr_benc * val;
+        tr_benc * peer = &bePeers->val.l.vals[i];
 
         val = tr_bencDictFind( peer, "ip" );
         if( !val || val->type!=TYPE_STR || tr_netResolve(val->val.s.s, &addr) )
@@ -428,14 +428,14 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
 
     if( req && ( req->response_code == HTTP_OK ) )
     {
-        benc_val_t benc;
+        tr_benc benc;
         const int bencLoaded = !parseBencResponse( req, &benc );
 
         publishErrorClear( t );
 
         if( bencLoaded && benc.type==TYPE_DICT )
         {
-            benc_val_t * tmp;
+            tr_benc * tmp;
 
             if(( tmp = tr_bencDictFind( &benc, "failure reason" ))) {
                 dbgmsg( t, "got failure message [%s]", tmp->val.s.s );
@@ -594,7 +594,7 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
 
     if( req && ( req->response_code == HTTP_OK ) )
     {
-        benc_val_t benc, *files;
+        tr_benc benc, *files;
         const int bencLoaded = !parseBencResponse( req, &benc );
 
         if( bencLoaded
@@ -606,8 +606,8 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
             {
                 const uint8_t* hash =
                         (const uint8_t*) files->val.l.vals[i].val.s.s;
-                benc_val_t *tmp, *flags;
-                benc_val_t *tordict = &files->val.l.vals[i+1];
+                tr_benc *tmp, *flags;
+                tr_benc *tordict = &files->val.l.vals[i+1];
                 if( memcmp( t->hash, hash, SHA_DIGEST_LENGTH ) )
                     continue;
 

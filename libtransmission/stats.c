@@ -33,11 +33,11 @@ parseCumulativeStats( tr_session_stats  * setme,
                       const uint8_t     * content,
                       size_t              len )
 {
-    benc_val_t top;
+    tr_benc top;
 
     if( !tr_bencLoad( content, len, &top, NULL ) )
     {
-        const benc_val_t * val;
+        const tr_benc * val;
 
         if(( val = tr_bencDictFindType( &top, "uploaded-bytes", TYPE_INT )))
             setme->uploadedBytes = (uint64_t) tr_bencGetInt( val );
@@ -87,7 +87,7 @@ saveCumulativeStats( const tr_session_stats * stats )
     char * str;
     char filename[MAX_PATH_LENGTH];
     int len;
-    benc_val_t top;
+    tr_benc top;
 
     tr_bencInit( &top, TYPE_DICT );
     tr_bencDictReserve( &top, 5 );

@@ -300,9 +300,9 @@ translate_08_to_09( const char* oldfile, const char* newfile )
     GString * out = g_string_new( NULL );
     gchar * contents = NULL;
     gsize contents_len = 0;
-    benc_val_t top;
+    tr_benc top;
 
-    memset( &top, 0, sizeof(benc_val_t) );
+    memset( &top, 0, sizeof(tr_benc) );
 
     if( g_file_get_contents( oldfile, &contents, &contents_len, NULL )
         && !tr_bencLoad( contents, contents_len, &top, NULL )
@@ -311,7 +311,7 @@ translate_08_to_09( const char* oldfile, const char* newfile )
         unsigned int i;
         g_string_append( out, "\n[general]\n" );
         for ( i=0; i<G_N_ELEMENTS(pref_table); ++i ) {
-            const benc_val_t * val = tr_bencDictFind( &top, pref_table[i].oldkey );
+            const tr_benc * val = tr_bencDictFind( &top, pref_table[i].oldkey );
             if( val != NULL ) {
                 const char * valstr = val->val.s.s;
                 if( !strcmp( valstr, "yes" ) ) valstr = "true";

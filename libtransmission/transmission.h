@@ -355,7 +355,7 @@ typedef enum
 tr_ctorMode;
 
 typedef struct tr_ctor tr_ctor;
-struct benc_val_s;
+struct tr_benc;
 
 tr_ctor* tr_ctorNew                    ( const tr_handle  * handle);
 
@@ -402,7 +402,7 @@ int      tr_ctorGetDestination         ( const tr_ctor  * ctor,
                                          const char    ** setmeDestination );
 
 int      tr_ctorGetMetainfo            ( const tr_ctor  * ctor,
-                                         const struct benc_val_s ** setme );
+                                         const struct tr_benc ** setme );
 
 int      tr_ctorGetSave                ( const tr_ctor  * ctor );
  
