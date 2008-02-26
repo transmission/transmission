@@ -26,7 +26,6 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <errno.h>
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,6 +33,8 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+
+#include <libevent/evutil.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
@@ -309,7 +310,7 @@ serv_bind(struct constate *con) {
   errmsg(con->u.serv.wind, _("Failed to set up socket: %s"),
          g_strerror(errno));
   if(0 <= con->fd)
-    close(con->fd);
+    EVUTIL_CLOSESOCKET(con->fd);
   con->fd = -1;
   rmsock();
 }
@@ -346,14 +347,14 @@ client_connect(char *path, struct constate *con) {
                        all_io_closed, con);
   if( NULL == con->source )
   {
-      close( con->fd );
+      EVUTIL_CLOSESOCKET( con->fd );
       return FALSE;
   }
 
   buf = ipc_mkvers( &size, "Transmission GTK+ " LONG_VERSION_STRING );
   if( NULL == buf )
   {
-      close( con->fd );
+      EVUTIL_CLOSESOCKET( con->fd );
       return FALSE;
   }
 
@@ -378,7 +379,7 @@ srv_io_accept(GSource *source UNUSED, int fd, struct sockaddr *sa UNUSED,
   if( NULL == newcon->ipc )
   {
       g_free( newcon );
-      close( fd );
+      EVUTIL_CLOSESOCKET( fd );
       return;
   }
 
@@ -387,7 +388,7 @@ srv_io_accept(GSource *source UNUSED, int fd, struct sockaddr *sa UNUSED,
   {
       ipc_freecon( newcon->ipc );
       g_free( newcon );
-      close( fd );
+      EVUTIL_CLOSESOCKET( fd );
       return;
   }
 
@@ -396,7 +397,7 @@ srv_io_accept(GSource *source UNUSED, int fd, struct sockaddr *sa UNUSED,
   {
       ipc_freecon( newcon->ipc );
       g_free( newcon );
-      close( fd );
+      EVUTIL_CLOSESOCKET( fd );
       return;
   }
 
@@ -541,7 +542,7 @@ destroycon(struct constate *con) {
   con->source = NULL;
 
   if(0 <= con->fd)
-    close(con->fd);
+    EVUTIL_CLOSESOCKET(con->fd);
   con->fd = -1;
   ipc_freecon( con->ipc );
 

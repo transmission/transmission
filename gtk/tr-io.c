@@ -24,18 +24,18 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/uio.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <string.h>
-#include <unistd.h>
+#include <string.h> /* memset, memmove */
+#include <unistd.h> /* read, write */
 
 #include <glib.h>
+
+#include <libevent/evutil.h> /* evutil_make_socket_nonblocking */
 
 #include "tr-io.h"
 #include "util.h"
 
-#define IO_BLOCKSIZE            (1024)
+#define IO_BLOCKSIZE (1024)
 
 struct iosource {
   GSource source;
@@ -60,8 +60,6 @@ struct iooutbuf {
   unsigned int id;
 };
 
-static gboolean
-nonblock(int fd);
 static struct iosource *
 newsource(void);
 static void
@@ -92,12 +90,19 @@ static GSourceFuncs sourcefuncs = {
   NULL
 };
 
+static int
+nonblock(int fd)
+{
+    const int err = evutil_make_socket_nonblocking( fd );
+    return err;
+}
+
 GSource *
 io_new(int fd, ioidfunc_t sent, iodatafunc_t received,
        iofunc_t closed, void *cbdata) {
   struct iosource *io;
 
-  if(!nonblock(fd))
+  if( nonblock( fd ) )
     return NULL;
 
   io = newsource();
@@ -125,7 +130,7 @@ io_new_listening(int fd, socklen_t len, ionewfunc_t accepted,
 
   g_assert(NULL != accepted);
 
-  if(!nonblock(fd))
+  if( nonblock( fd ) )
     return NULL;
 
   io = newsource();
@@ -142,17 +147,6 @@ io_new_listening(int fd, socklen_t len, ionewfunc_t accepted,
   g_source_attach((GSource*)io, NULL);
 
   return (GSource*)io;
-}
-
-static gboolean
-nonblock(int fd) {
-  int flags;
-
-  if(0 > (flags = fcntl(fd, F_GETFL)) ||
-     0 > fcntl(fd, F_SETFL, flags | O_NONBLOCK))
-    return FALSE;
-
-  return TRUE;
 }
 
 static struct iosource *
