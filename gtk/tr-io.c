@@ -32,7 +32,7 @@
 
 #include <glib.h>
 
-#include "io.h"
+#include "tr-io.h"
 #include "util.h"
 
 #define IO_BLOCKSIZE            (1024)

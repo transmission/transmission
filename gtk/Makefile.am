@@ -46,7 +46,6 @@ transmission_SOURCES = \
     dialogs.c \
     file-list.c \
     hig.c \
-    io.c \
     ipc.c \
     main.c \
     makemeta-ui.c \
