@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: peer-msgs.h 3818 2007-11-13 05:36:43Z charles $
+ * $Id$
  */
 
 #ifndef TR_STATS_H

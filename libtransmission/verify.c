@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: inout.c 4886 2008-02-01 01:54:04Z charles $
+ * $Id$
  */
 
 #include <sys/stat.h>

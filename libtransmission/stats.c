@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: peer-msgs.c 3906 2007-11-20 17:29:56Z charles $
+ * $Id$
  */
 
 #include <string.h> /* memset */

@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  * 
- * $Id: hig.h 4404 2008-01-01 17:20:20Z charles $
+ * $Id$
  */
 
 #ifndef TR_GTK_OPEN_DIALOG_H

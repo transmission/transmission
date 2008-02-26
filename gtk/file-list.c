@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: torrent-inspector.c 4962 2008-02-07 17:44:26Z charles $
+ * $Id$
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
