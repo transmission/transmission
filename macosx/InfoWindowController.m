@@ -168,7 +168,7 @@ typedef enum
 - (void) dealloc
 {
     //save resizeable view height
-    if (fCurrentTabTag == TAB_PEERS_TAG || fCurrentTabTag == TAB_FILES_TAG)
+    if (fCurrentTabTag == TAB_TRACKER_TAG || fCurrentTabTag == TAB_PEERS_TAG || fCurrentTabTag == TAB_FILES_TAG)
         [[NSUserDefaults standardUserDefaults] setFloat: [[self tabViewForTag: fCurrentTabTag] frame].size.height
             forKey: @"InspectorContentHeight"];
     
@@ -251,7 +251,6 @@ typedef enum
         [fNameField setToolTip: nil];
 
         [fTrackerField setStringValue: @""];
-        [fTrackerField setToolTip: nil];
         [fPiecesField setStringValue: @""];
         [fHashField setStringValue: @""];
         [fHashField setToolTip: nil];
@@ -357,13 +356,6 @@ typedef enum
         [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes",
                                         "Inspector -> above tabs -> selected torrents"), [torrent size]]];
         
-        NSArray * allTrackers = [torrent allTrackers], * subTrackers;
-        NSMutableArray * trackerStrings = [NSMutableArray arrayWithCapacity: [allTrackers count]];
-        NSEnumerator * enumerator = [allTrackers objectEnumerator];
-        while ((subTrackers = [enumerator nextObject]))
-            [trackerStrings addObject: [subTrackers componentsJoinedByString: @", "]];
-        [fTrackerField setToolTip: [trackerStrings componentsJoinedByString: @"\n"]];
-        
         NSString * hashString = [torrent hashString];
         [fPiecesField setStringValue: [NSString stringWithFormat: @"%d, %@", [torrent pieceCount],
                                         [NSString stringForFileSize: [torrent pieceSize]]]];
@@ -417,6 +409,7 @@ typedef enum
     [self updateInfoStats];
     [self updateOptions];
     
+    [fTrackerTable reloadData];
     [fPeerTable reloadData];
 }
 
@@ -580,12 +573,13 @@ typedef enum
 {
     [self updateInfoStats];
     
-    BOOL oldCanResizeVertical = fCurrentTabTag == TAB_PEERS_TAG || fCurrentTabTag == TAB_FILES_TAG, canResizeVertical;
+    BOOL oldCanResizeVertical = fCurrentTabTag == TAB_TRACKER_TAG || fCurrentTabTag == TAB_PEERS_TAG || fCurrentTabTag == TAB_FILES_TAG,
+        canResizeVertical;
     int oldTabTag = fCurrentTabTag;
     fCurrentTabTag = [fTabMatrix selectedTag];
     
     NSView * view;
-    NSString * identifier, * title;;
+    NSString * identifier, * title;
     switch (fCurrentTabTag)
     {
         case TAB_INFO_TAG:
@@ -606,7 +600,7 @@ typedef enum
             view = fTrackerView;
             identifier = TAB_TRACKER_IDENT;
             title = NSLocalizedString(@"Tracker", "Inspector -> title");
-            canResizeVertical = NO;
+            canResizeVertical = YES;
             break;
         case TAB_PEERS_TAG:
             view = fPeersView;
@@ -719,6 +713,12 @@ typedef enum
 {
     if (tableView == fPeerTable)
         return fPeers ? [fPeers count] : 0;
+    else if (tableView == fTrackerTable)
+    {
+        if ([fTorrents count] != 1)
+            return 0;
+        return [[[fTorrents objectAtIndex: 0] allTrackers] count];
+    }
     return 0;
 }
 
@@ -748,6 +748,14 @@ typedef enum
         else
             return [peer objectForKey: @"IP"];
     }
+    else if (tableView == fTrackerTable)
+    {
+        id item = [[[fTorrents objectAtIndex: 0] allTrackers] objectAtIndex: row];
+        if ([item isKindOfClass: [NSNumber class]])
+            return [NSString stringWithFormat: @"Tier %d", [item intValue]+1];
+        else
+            return item;
+    }
     return nil;
 }
 
@@ -767,7 +775,14 @@ typedef enum
 
 - (BOOL) tableView: (NSTableView *) tableView shouldSelectRow: (int) row
 {
-    return tableView != fPeerTable;
+    return NO;
+}
+
+- (BOOL) tableView: (NSTableView *) tableView isGroupRow: (NSInteger) row
+{
+    if (tableView == fTrackerTable)
+        return [[[[fTorrents objectAtIndex: 0] allTrackers] objectAtIndex: row] isKindOfClass: [NSNumber class]];
+    return NO;
 }
 
 - (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect

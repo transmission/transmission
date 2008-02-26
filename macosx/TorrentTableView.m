@@ -35,7 +35,7 @@
 #define ACTION_MENU_LIMIT_TAG 103
 
 #define PIECE_CHANGE 0.1
-#define PIECE_TIME 0.01
+#define PIECE_TIME 0.005
 
 @interface TorrentTableView (Private)
 

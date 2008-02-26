@@ -7,6 +7,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Window when adding torrents to select files and other settings
    + Leopard: Collapsable group dividers
    + Use the file icon as the per-torrent action button
+   + Tracker tab in the inspector
    + Updated images in the inspector
    + Optional display of remaining time while seeding in Minimal View 
 

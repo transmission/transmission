@@ -49,6 +49,7 @@
     IBOutlet NSTextView * fCommentView;
     IBOutlet NSButton * fRevealDataButton, * fRevealTorrentButton;
     
+    IBOutlet NSTableView * fTrackerTable;
     IBOutlet NSTextField * fAnnounceAddressField, * fAnnounceLastField, * fAnnounceResponseField, * fAnnounceNextField,
                             * fScrapeAddressField, * fScrapeLastField, * fScrapeResponseField, * fScrapeNextField;
 
