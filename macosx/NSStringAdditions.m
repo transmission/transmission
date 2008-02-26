@@ -109,9 +109,8 @@
 
 + (NSString *) timeString: (NSUInteger) seconds showSeconds: (BOOL) showSeconds maxDigits: (NSUInteger) max
 {
-    NSLog(@"seconds: %u max digits: %u", seconds, max);
     NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 4)];
-    uint64_t remaining = seconds;
+    NSUInteger remaining = seconds;
     
     if (max > 0 && seconds >= 86400) //24 * 60 * 60
     {
@@ -119,24 +118,24 @@
         if (days == 1)
             [timeArray addObject: NSLocalizedString(@"1 day", "time string")];
         else
-            [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d days", "time string"), days]];
+            [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u days", "time string"), days]];
         remaining %= 86400;
         max--;
     }
     if (max > 0 && seconds >= 3600) //60 * 60
     {
-        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d hr", "time string"), remaining / 3600]];
+        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u hr", "time string"), remaining / 3600]];
         remaining %= 3600;
         max--;
     }
     if (max > 0 && (!showSeconds || seconds >= 60))
     {
-        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d min", "time string"), remaining / 60]];
+        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u min", "time string"), remaining / 60]];
         remaining %= 60;
         max--;
     }
     if (max > 0 && showSeconds)
-        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d sec", "time string"), remaining]];
+        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u sec", "time string"), remaining]];
     
     return [timeArray componentsJoinedByString: @" "];
 }
