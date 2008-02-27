@@ -418,7 +418,7 @@ typedef struct tr_info tr_info;
 /**
  * Parses the specified metainfo.
  * Returns TR_OK if it parsed and can be added to Transmission.
- * Returns TR_INVALID if it couldn't be parsed.
+ * Returns TR_EINVALID if it couldn't be parsed.
  * Returns TR_EDUPLICATE if it parsed but can't be added. 
  *     "destination" must be set to test for TR_EDUPLICATE.
  *
