@@ -195,6 +195,9 @@ typedef enum
 
 - (void) setInfoForTorrents: (NSArray *) torrents
 {
+    if (fTorrents && [fTorrents isEqualToArray: torrents])
+        return;
+    
     [fTorrents release];
     fTorrents = [torrents retain];
 
