@@ -122,7 +122,6 @@ enum ipc_msg
 
 struct ipc_funcs;
 struct ipc_info;
-struct strlist;
 struct tr_info;
 struct tr_benc;
 struct tr_stat;
@@ -131,7 +130,6 @@ struct ipc_info
 {
     struct ipc_funcs * funcs;
     int                vers;
-    char             * label;
 };
 
 #define HASVERS( info )         ( 0 < (info)->vers )
@@ -144,11 +142,11 @@ typedef void ( *trd_msgfunc )( enum ipc_msg, struct tr_benc *, int64_t, void * )
 
 /* setup */
 struct ipc_funcs * ipc_initmsgs ( void );
-void         ipc_addmsg   ( struct ipc_funcs *, enum ipc_msg, trd_msgfunc );
-void         ipc_setdefmsg( struct ipc_funcs *, trd_msgfunc );
-void         ipc_freemsgs ( struct ipc_funcs * );
-struct ipc_info * ipc_newcon( struct ipc_funcs * );
-void         ipc_freecon  ( struct ipc_info * );
+void               ipc_addmsg   ( struct ipc_funcs *, enum ipc_msg, trd_msgfunc );
+void               ipc_setdefmsg( struct ipc_funcs *, trd_msgfunc );
+void               ipc_freemsgs ( struct ipc_funcs * );
+struct ipc_info *  ipc_newcon   ( struct ipc_funcs * );
+void               ipc_freecon  ( struct ipc_info * );
 
 /* message creation */
 /* sets errno to EPERM if requested message not supported by protocol vers */
@@ -169,10 +167,9 @@ int          ipc_addstat  ( struct tr_benc *, int, const struct tr_stat *, int )
 
 /* sets errno to EINVAL on parse error or
    EPERM for unsupported protocol version */
-ssize_t      ipc_parse    ( struct ipc_info *, uint8_t *, ssize_t, void * );
+ssize_t      ipc_parse    ( struct ipc_info *, const uint8_t *, ssize_t, void * );
 
 /* misc info functions, these will always succeed */
-int          ipc_havemsg  ( struct ipc_info *, enum ipc_msg );
 enum ipc_msg ipc_msgid    ( struct ipc_info *, const char * );
 int          ipc_ishandled( struct ipc_info *, enum ipc_msg );
 int          ipc_havetags ( struct ipc_info * );

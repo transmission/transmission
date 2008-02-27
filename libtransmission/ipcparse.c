@@ -205,25 +205,25 @@ ipc_freemsgs( struct ipc_funcs * tree )
 struct ipc_info *
 ipc_newcon( struct ipc_funcs * funcs )
 {
-    struct ipc_info * info;
-
-    if(( info = calloc( 1, sizeof *info )))
-    {
-        info->funcs = funcs;
-        info->vers  = -1;
-    }
-
+    struct ipc_info * info = tr_new0( struct ipc_info, 1 );
+    info->funcs = funcs;
+    info->vers  = -1;
     return info;
 }
 
 void
 ipc_freecon( struct ipc_info * info )
 {
-    if( info )
-    {
-        free( info->label );
-        free( info );
-    }
+    tr_free( info );
+}
+
+static int
+ipc_havemsg( struct ipc_info * info, enum ipc_msg id )
+{
+    assert( MSGVALID( id ) );
+    assert( HASVERS( info ) );
+
+    return gl_msgs[id].minvers <= info->vers;
 }
 
 tr_benc *
@@ -987,7 +987,7 @@ handlemsgs( struct ipc_info * info, tr_benc * pay, void * arg )
 }
 
 ssize_t
-ipc_parse( struct ipc_info * info, uint8_t * buf, ssize_t total, void * arg )
+ipc_parse( struct ipc_info * info, const uint8_t * buf, ssize_t total, void * arg )
 {
     char        hex[IPC_MIN_MSG_LEN+1], * end;
     ssize_t     off, len;
@@ -1028,15 +1028,6 @@ ipc_parse( struct ipc_info * info, uint8_t * buf, ssize_t total, void * arg )
     }
 
     return off;
-}
-
-int
-ipc_havemsg( struct ipc_info * info, enum ipc_msg id )
-{
-    assert( MSGVALID( id ) );
-    assert( HASVERS( info ) );
-
-    return gl_msgs[id].minvers <= info->vers;
 }
 
 enum ipc_msg
