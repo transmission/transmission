@@ -167,7 +167,8 @@ typedef enum
 
 - (void) announceSelectedTorrents: (id) sender;
 
-- (void) resetCacheForSelectedTorrents: (id) sender;
+- (void) verifySelectedTorrents: (id) sender;
+- (void) verifyTorrents: (NSArray *) torrents;
 
 - (void) showPreferenceWindow: (id) sender;
 

@@ -1061,11 +1061,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self updateTorrentHistory];
 }
 
-- (void) verifyTorrents: (NSArray *) torrents
-{
-    // FIXME BentMyWookie
-}
-
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
 {
     [torrents retain];
@@ -1336,9 +1331,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
 }
 
-- (void) resetCacheForSelectedTorrents: (id) sender
+- (void) verifySelectedTorrents: (id) sender
 {
-    NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
+    [self verifyTorrents: [fTableView selectedTorrents]];
+}
+
+- (void) verifyTorrents: (NSArray *) torrents
+{
+    NSEnumerator * enumerator = [torrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
         [torrent resetCache];
@@ -3572,7 +3572,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     //enable reset cache item
-    if (action == @selector(resetCacheForSelectedTorrents:))
+    if (action == @selector(verifySelectedTorrents:))
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
     
     //enable move torrent file item
@@ -4088,7 +4088,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (!torrents)
         return NO;
 
-    [self startTorrents: torrents];
+    [self verifyTorrents: torrents];
     return YES;
 }
 
