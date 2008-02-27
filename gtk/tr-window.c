@@ -451,6 +451,15 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
                                 gtk_ui_manager_get_accel_group (ui_manager));
     g_signal_connect( self, "realize", G_CALLBACK(realized_cb), NULL);
 
+#ifdef GTK_CHECK_VERSION(2,10,0)
+    {
+        GdkScreen * screen = gtk_widget_get_screen( self );
+        GdkColormap * colormap = gdk_screen_get_rgba_colormap( screen );
+        if( colormap && gdk_screen_is_composited( screen ) )
+            gtk_widget_set_default_colormap( colormap );
+    }
+#endif
+
     /* window's main container */
     vbox = gtk_vbox_new (FALSE, 0);
     gtk_container_add (GTK_CONTAINER(self), vbox);
