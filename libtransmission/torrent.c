@@ -422,10 +422,11 @@ tr_torrentParse( const tr_handle  * handle,
         return TR_EINVALID;
 
     err = tr_metainfoParse( setmeInfo, metainfo, handle->tag );
-    doFree = !err && ( setmeInfo == &tmp );
 
     if( !err && hashExists( handle, setmeInfo->hash ) )
         err = TR_EDUPLICATE;
+
+    doFree = ( !err || err==TR_EDUPLICATE ) && ( setmeInfo == &tmp );
 
     if( doFree )
         tr_metainfoFree( setmeInfo );
