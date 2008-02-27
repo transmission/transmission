@@ -71,10 +71,6 @@ static void         starttimer ( int );
 static void         timerfunc  ( int, short, void * );
 static int          loadstate  ( void );
 static int          savestate  ( void );
-static int          toridcmp   ( struct tor *, struct tor * );
-static int          torhashcmp ( struct tor *, struct tor * );
-static struct tor * hashlookup ( const uint8_t * );
-static struct tor * iterate    ( struct tor * );
 
 static struct event_base * gl_base      = NULL;
 static tr_handle         * gl_handle    = NULL;
@@ -96,9 +92,16 @@ static int                 gl_downlimit = -1;
 static char                gl_dir[MAXPATHLEN];
 static tr_encryption_mode  gl_crypto    = TR_ENCRYPTION_PREFERRED;
 
-RB_GENERATE_STATIC( tortree, tor, idlinks, toridcmp )
+static int
+torhashcmp( struct tor * left, struct tor * right )
+{
+    return memcmp( left->hash, right->hash, sizeof left->hash );
+}
+
 RB_GENERATE_STATIC( hashtree, tor, hashlinks, torhashcmp )
+
 INTCMP_FUNC( toridcmp, tor, id )
+RB_GENERATE_STATIC( tortree, tor, idlinks, toridcmp )
 
 void
 torrent_init( struct event_base * base )
@@ -241,6 +244,18 @@ torrent_stat( int id )
     return tor ? tr_torrentStat( tor->tor ) : NULL;
 }
 
+static struct tor *
+hashlookup( const uint8_t * hash )
+{
+    struct tor key, * found;
+
+    memset( &key, 0, sizeof key );
+    memcpy( key.hash, hash, sizeof key.hash );
+    found = RB_FIND( hashtree, &gl_hashes, &key );
+
+    return found;
+}
+
 int
 torrent_lookup( const uint8_t * hashstr )
 {
@@ -272,22 +287,25 @@ torrent_lookup( const uint8_t * hashstr )
     return tor->id;
 }
 
-void *
-torrent_iter( void * iter, int * id )
+static struct tor *
+iterate( struct tor * tor )
 {
-    struct tor * tor = iter;
+    struct tor * next = NULL;
 
-    assert( NULL != gl_handle );
-    assert( !gl_exiting );
+    if( gl_handle && !gl_exiting )
+        next = tor ? RB_NEXT( tortree, &gl_tree, tor )
+                   : RB_MIN( tortree, &gl_tree );
 
-    tor = iterate( tor );
+    return next;
+}
 
-    if( NULL != tor )
-    {
-        *id = tor->id;
-    }
-
-    return tor;
+void *
+torrent_iter( void * cur, int * id )
+{
+    struct tor * next = iterate( cur );
+    if( next )
+        *id = next->id;
+    return next;
 }
 
 void
@@ -847,40 +865,4 @@ savestate( void )
     }
 
     return 0;
-}
-
-int
-torhashcmp( struct tor * left, struct tor * right )
-{
-    return memcmp( left->hash, right->hash, sizeof left->hash );
-}
-
-struct tor *
-hashlookup( const uint8_t * hash )
-{
-    struct tor key, * found;
-
-    memset( &key, 0, sizeof key );
-    memcpy( key.hash, hash, sizeof key.hash );
-    found = RB_FIND( hashtree, &gl_hashes, &key );
-
-    return found;
-}
-
-struct tor *
-iterate( struct tor * tor )
-{
-    assert( NULL != gl_handle );
-    assert( !gl_exiting );
-
-    if( NULL == tor )
-    {
-        tor = RB_MIN( tortree, &gl_tree );
-    }
-    else
-    {
-        tor = RB_NEXT( tortree, &gl_tree, tor );
-    }
-
-    return tor;
 }

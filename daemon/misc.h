@@ -107,21 +107,14 @@ struct bufferevent;
     while( 0 )
 
 #define INTCMP_FUNC( name, type, id )                                         \
-int                                                                           \
+static int                                                                    \
 name( struct type * _icf_first, struct type * _icf_second )                   \
 {                                                                             \
     if( _icf_first->id < _icf_second->id )                                    \
-    {                                                                         \
         return -1;                                                            \
-    }                                                                         \
-    else if( _icf_first->id > _icf_second->id )                               \
-    {                                                                         \
+    if( _icf_first->id > _icf_second->id )                                    \
         return 1;                                                             \
-    }                                                                         \
-    else                                                                      \
-    {                                                                         \
-        return 0;                                                             \
-    }                                                                         \
+    return 0;                                                                 \
 }
 
 struct stritem

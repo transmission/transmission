@@ -34,6 +34,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/trcompat.h>
+#include <libtransmission/utils.h> /* tr_loadFile() */
 
 #include "errors.h"
 #include "misc.h"
@@ -154,54 +155,9 @@ writefile( const char * name, uint8_t * buf, ssize_t len )
 }
 
 uint8_t *
-readfile( const char * name, size_t * len )
+readfile( const char * filename, size_t * len )
 {
-    struct stat sb;
-    int         fd;
-    uint8_t   * buf;
-    ssize_t     res;
-
-    fd = open( name, O_RDONLY );
-    if( 0 > fd )
-    {
-        if( ENOENT != errno )
-        {
-            errnomsg( "failed to open %s for reading", name );
-        }
-        return NULL;
-    }
-
-    if( 0 > fstat( fd, &sb ) )
-    {
-        errnomsg( "failed to stat %s", name );
-        return NULL;
-    }
-
-    buf = malloc( sb.st_size );
-    if( NULL == buf )
-    {
-        mallocmsg( sb.st_size );
-        return NULL;
-    }
-
-    res = read( fd, buf, sb.st_size );
-    if( 0 > res )
-    {
-        errnomsg( "failed to read from %s", name );
-        free( buf );
-        return NULL;
-    }
-    if( res < sb.st_size )
-    {
-        errmsg( "failed to read all data from %s", name );
-        free( buf );
-        return NULL;
-    }
-
-    close( fd );
-    *len = res;
-
-    return buf;
+    return tr_loadFile( filename, len );
 }
 
 #ifndef HAVE_DAEMON
