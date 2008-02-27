@@ -208,18 +208,16 @@
 {
     NSString * statusString = [NSString stringForFileSize: [fTorrent size]];
     if ([fTorrent folder])
-        statusString = [statusString stringByAppendingFormat: NSLocalizedString(@" (%@ selected)", "Add torrent -> info"),
-                        [NSString stringForFileSize: [fTorrent totalSizeSelected]]];
-    
-    if ([fTorrent folder])
     {
         NSString * fileString;
         int count = [fTorrent fileCount];
         if (count != 1)
-            fileString = [NSString stringWithFormat: NSLocalizedString(@"%d Files, ", "Add torrent -> info"), count];
+            fileString = [NSString stringWithFormat: NSLocalizedString(@"%d Files", "Add torrent -> info"), count];
         else
-            fileString = NSLocalizedString(@"1 File, ", "Add torrent -> info");
-        statusString = [fileString stringByAppendingString: statusString];
+            fileString = NSLocalizedString(@"1 File", "Add torrent -> info");
+        
+        statusString = [NSString stringWithFormat: NSLocalizedString(@"%@, %@ (%@ selected)", "Add torrent -> info"), fileString,
+                        statusString, [NSString stringForFileSize: [fTorrent totalSizeSelected]]];
     }
     
     [fStatusField setStringValue: statusString];
