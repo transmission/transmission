@@ -38,7 +38,6 @@ libtransmission_a_SOURCES = \
 
 noinst_HEADERS = \
     bencode.h \
-    bsdtree.h \
     clients.h \
     crypto.h \
     completion.h \

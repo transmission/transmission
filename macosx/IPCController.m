@@ -145,43 +145,44 @@ PrefsController         * fPrefsController;
     if( nil  == _sock    ||
         nil  == _listen  ||
         NULL == _funcs   ||
-        nil  == _clients ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_ADDMANYFILES, msg_addold    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_ADDONEFILE,   msg_addnew    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_AUTOMAP,      msg_setbool   ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_AUTOSTART,    msg_setbool   ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_CRYPTO,       msg_setstr    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_DIR,          msg_setstr    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_DOWNLIMIT,    msg_setint    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_GETAUTOMAP,   msg_getbool   ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_GETAUTOSTART, msg_getbool   ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_GETCRYPTO,    msg_getstr    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_GETDIR,       msg_getstr    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_GETDOWNLIMIT, msg_getint    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_GETINFO,      msg_info      ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_GETINFOALL,   msg_infoall   ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_GETPEX,       msg_getbool   ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_GETPORT,      msg_getint    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_GETSTAT,      msg_info      ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_GETSTATALL,   msg_infoall   ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_GETUPLIMIT,   msg_getint    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_LOOKUP,       msg_lookup    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_NOOP,         msg_empty     ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_PEX,          msg_setbool   ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_PORT,         msg_setint    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_QUIT,         msg_empty     ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_REMOVE,       msg_action    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_REMOVEALL,    msg_actionall ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_START,        msg_action    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_STARTALL,     msg_actionall ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_STOP,         msg_action    ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_STOPALL,      msg_actionall ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_SUP,          msg_sup       ) ||
-        0 > ipc_addmsg( _funcs, IPC_MSG_UPLIMIT,      msg_setint    ) )
+        nil  == _clients )
     {
         [self release];
         return nil;
     }
+
+    ipc_addmsg( _funcs, IPC_MSG_ADDMANYFILES, msg_addold    );
+    ipc_addmsg( _funcs, IPC_MSG_ADDONEFILE,   msg_addnew    );
+    ipc_addmsg( _funcs, IPC_MSG_AUTOMAP,      msg_setbool   );
+    ipc_addmsg( _funcs, IPC_MSG_AUTOSTART,    msg_setbool   );
+    ipc_addmsg( _funcs, IPC_MSG_CRYPTO,       msg_setstr    );
+    ipc_addmsg( _funcs, IPC_MSG_DIR,          msg_setstr    );
+    ipc_addmsg( _funcs, IPC_MSG_DOWNLIMIT,    msg_setint    );
+    ipc_addmsg( _funcs, IPC_MSG_GETAUTOMAP,   msg_getbool   );
+    ipc_addmsg( _funcs, IPC_MSG_GETAUTOSTART, msg_getbool   );
+    ipc_addmsg( _funcs, IPC_MSG_GETCRYPTO,    msg_getstr    );
+    ipc_addmsg( _funcs, IPC_MSG_GETDIR,       msg_getstr    );
+    ipc_addmsg( _funcs, IPC_MSG_GETDOWNLIMIT, msg_getint    );
+    ipc_addmsg( _funcs, IPC_MSG_GETINFO,      msg_info      );
+    ipc_addmsg( _funcs, IPC_MSG_GETINFOALL,   msg_infoall   );
+    ipc_addmsg( _funcs, IPC_MSG_GETPEX,       msg_getbool   );
+    ipc_addmsg( _funcs, IPC_MSG_GETPORT,      msg_getint    );
+    ipc_addmsg( _funcs, IPC_MSG_GETSTAT,      msg_info      );
+    ipc_addmsg( _funcs, IPC_MSG_GETSTATALL,   msg_infoall   );
+    ipc_addmsg( _funcs, IPC_MSG_GETUPLIMIT,   msg_getint    );
+    ipc_addmsg( _funcs, IPC_MSG_LOOKUP,       msg_lookup    );
+    ipc_addmsg( _funcs, IPC_MSG_NOOP,         msg_empty     );
+    ipc_addmsg( _funcs, IPC_MSG_PEX,          msg_setbool   );
+    ipc_addmsg( _funcs, IPC_MSG_PORT,         msg_setint    );
+    ipc_addmsg( _funcs, IPC_MSG_QUIT,         msg_empty     );
+    ipc_addmsg( _funcs, IPC_MSG_REMOVE,       msg_action    );
+    ipc_addmsg( _funcs, IPC_MSG_REMOVEALL,    msg_actionall );
+    ipc_addmsg( _funcs, IPC_MSG_START,        msg_action    );
+    ipc_addmsg( _funcs, IPC_MSG_STARTALL,     msg_actionall );
+    ipc_addmsg( _funcs, IPC_MSG_STOP,         msg_action    );
+    ipc_addmsg( _funcs, IPC_MSG_STOPALL,      msg_actionall );
+    ipc_addmsg( _funcs, IPC_MSG_SUP,          msg_sup       );
+    ipc_addmsg( _funcs, IPC_MSG_UPLIMIT,      msg_setint    );
     ipc_setdefmsg( _funcs, msg_default );
 
     [[NSNotificationCenter defaultCenter]

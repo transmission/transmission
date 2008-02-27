@@ -39,11 +39,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <libtransmission/bsdtree.h>
 #include <libtransmission/bencode.h>
 #include <libtransmission/transmission.h>
 #include <libtransmission/trcompat.h>
 
+#include "bsdtree.h"
 #include "errors.h"
 #include "misc.h"
 #include "torrents.h"

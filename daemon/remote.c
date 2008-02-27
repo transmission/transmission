@@ -36,11 +36,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <libtransmission/bsdtree.h>
 #include <libtransmission/ipcparse.h>
 #include <libtransmission/transmission.h>
 #include <libtransmission/trcompat.h>
 
+#include "bsdtree.h"
 #include "bsdqueue.h"
 #include "client.h"
 #include "errors.h"

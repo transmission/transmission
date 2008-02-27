@@ -36,10 +36,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <libtransmission/bsdtree.h>
 #include <libtransmission/bencode.h>
 #include <libtransmission/ipcparse.h>
 
+#include "bsdtree.h"
 #include "errors.h"
 #include "misc.h"
 #include "server.h"
@@ -100,41 +100,38 @@ server_init( struct event_base * base )
         return -1;
     }
 
-    if( 0 > ipc_addmsg( gl_tree, IPC_MSG_ADDMANYFILES, addmsg1 ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_ADDONEFILE,   addmsg2 ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_AUTOMAP,      intmsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_AUTOSTART,    intmsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_CRYPTO,       strmsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_DOWNLIMIT,    intmsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_DIR,          strmsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETAUTOMAP,   prefmsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETAUTOSTART, prefmsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETCRYPTO,    prefmsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETDOWNLIMIT, prefmsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETDIR,       prefmsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETINFO,      infomsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETINFOALL,   infomsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETPEX,       prefmsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETPORT,      prefmsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETSTAT,      infomsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETSTATALL,   infomsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETUPLIMIT,   prefmsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_GETSUP,       supmsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_LOOKUP,       lookmsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_NOOP,         noopmsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_PEX,          intmsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_PORT,         intmsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_QUIT,         quitmsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_REMOVE,       tormsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_REMOVEALL,    tormsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_START,        tormsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_STARTALL,     tormsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_STOP,         tormsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_STOPALL,      tormsg  ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_UPLIMIT,      intmsg  ) )
-    {
-        return -1;
-    }
+    ipc_addmsg( gl_tree, IPC_MSG_ADDMANYFILES, addmsg1 );
+    ipc_addmsg( gl_tree, IPC_MSG_ADDONEFILE,   addmsg2 );
+    ipc_addmsg( gl_tree, IPC_MSG_AUTOMAP,      intmsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_AUTOSTART,    intmsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_CRYPTO,       strmsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_DOWNLIMIT,    intmsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_DIR,          strmsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_GETAUTOMAP,   prefmsg );
+    ipc_addmsg( gl_tree, IPC_MSG_GETAUTOSTART, prefmsg );
+    ipc_addmsg( gl_tree, IPC_MSG_GETCRYPTO,    prefmsg );
+    ipc_addmsg( gl_tree, IPC_MSG_GETDOWNLIMIT, prefmsg );
+    ipc_addmsg( gl_tree, IPC_MSG_GETDIR,       prefmsg );
+    ipc_addmsg( gl_tree, IPC_MSG_GETINFO,      infomsg );
+    ipc_addmsg( gl_tree, IPC_MSG_GETINFOALL,   infomsg );
+    ipc_addmsg( gl_tree, IPC_MSG_GETPEX,       prefmsg );
+    ipc_addmsg( gl_tree, IPC_MSG_GETPORT,      prefmsg );
+    ipc_addmsg( gl_tree, IPC_MSG_GETSTAT,      infomsg );
+    ipc_addmsg( gl_tree, IPC_MSG_GETSTATALL,   infomsg );
+    ipc_addmsg( gl_tree, IPC_MSG_GETUPLIMIT,   prefmsg );
+    ipc_addmsg( gl_tree, IPC_MSG_GETSUP,       supmsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_LOOKUP,       lookmsg );
+    ipc_addmsg( gl_tree, IPC_MSG_NOOP,         noopmsg );
+    ipc_addmsg( gl_tree, IPC_MSG_PEX,          intmsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_PORT,         intmsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_QUIT,         quitmsg );
+    ipc_addmsg( gl_tree, IPC_MSG_REMOVE,       tormsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_REMOVEALL,    tormsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_START,        tormsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_STARTALL,     tormsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_STOP,         tormsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_STOPALL,      tormsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_UPLIMIT,      intmsg  );
 
     ipc_setdefmsg( gl_tree, defmsg );
 

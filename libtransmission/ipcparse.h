@@ -31,22 +31,23 @@
 #define IPC_MIN_MSG_LEN         ( 8 )
 #define IPC_MAX_MSG_LEN         ( 0x7fffffff - IPC_MIN_MSG_LEN )
 
+/* These need to be in the same order as ipcparse.c's gl_msgs array. */
 enum ipc_msg
 {
-    IPC_MSG_ADDMANYFILES = 0,
-    IPC_MSG_ADDONEFILE,
+    IPC_MSG_ADDONEFILE = 0,
+    IPC_MSG_ADDMANYFILES,
     IPC_MSG_AUTOMAP,
     IPC_MSG_AUTOSTART,
     IPC_MSG_BAD,
-    IPC_MSG_CRYPTO,
     IPC_MSG_DIR,
     IPC_MSG_DOWNLIMIT,
+    IPC_MSG_CRYPTO,
     IPC_MSG_FAIL,
     IPC_MSG_GETAUTOMAP,
     IPC_MSG_GETAUTOSTART,
-    IPC_MSG_GETCRYPTO,
     IPC_MSG_GETDIR,
     IPC_MSG_GETDOWNLIMIT,
+    IPC_MSG_GETCRYPTO,
     IPC_MSG_GETINFO,
     IPC_MSG_GETINFOALL,
     IPC_MSG_GETPEX,
@@ -55,8 +56,8 @@ enum ipc_msg
     IPC_MSG_GETSTATALL,
     IPC_MSG_GETSUP,
     IPC_MSG_GETUPLIMIT,
-    IPC_MSG_LOOKUP,
     IPC_MSG_INFO,
+    IPC_MSG_LOOKUP,
     IPC_MSG_NOOP,
     IPC_MSG_NOTSUP,
     IPC_MSG_PEX,
@@ -77,9 +78,9 @@ enum ipc_msg
     IPC__MSG_UNKNOWN
 };
 
-/* If you add or delete a constant here then you need to renumber the
-   ones after it. They need to be in ascending order starting at zero,
-   with no gaps. */
+/* If you add or delete a constant here, to renumber the ones after it.
+ * They need to be in ascending order starting at zero, with no gaps.
+ * They also need to be in the same order as ipcparse.c's gl_inf array. */
 #define IPC_INF_COMMENT         ( 1 << 0 )
 #define IPC_INF_CREATOR         ( 1 << 1 )
 #define IPC_INF_DATE            ( 1 << 2 )
@@ -93,7 +94,9 @@ enum ipc_msg
 #define IPC_INF_TRACKERS        ( 1 << 10 )
 #define IPC_INF__MAX            ( 1 << 11 )
 
-/* Ditto for these */
+/* If you add or delete a constant here, to renumber the ones after it.
+ * They need to be in ascending order starting at zero, with no gaps.
+ * They also need to be in the same order as ipcparse.c's gl_stat array. */
 #define IPC_ST_COMPLETED        ( 1 << 0 )
 #define IPC_ST_DOWNSPEED        ( 1 << 1 )
 #define IPC_ST_DOWNTOTAL        ( 1 << 2 )
@@ -107,12 +110,12 @@ enum ipc_msg
 #define IPC_ST_PEERTOTAL        ( 1 << 10 )
 #define IPC_ST_PEERUP           ( 1 << 11 )
 #define IPC_ST_RUNNING          ( 1 << 12 )
-#define IPC_ST_STATE            ( 1 << 13 )
-#define IPC_ST_SWARM            ( 1 << 14 )
-#define IPC_ST_TRACKER          ( 1 << 15 )
-#define IPC_ST_TKDONE           ( 1 << 16 )
-#define IPC_ST_TKLEECH          ( 1 << 17 )
-#define IPC_ST_TKSEED           ( 1 << 18 )
+#define IPC_ST_TKDONE           ( 1 << 13 )
+#define IPC_ST_TKLEECH          ( 1 << 14 )
+#define IPC_ST_TKSEED           ( 1 << 15 )
+#define IPC_ST_STATE            ( 1 << 16 )
+#define IPC_ST_SWARM            ( 1 << 17 )
+#define IPC_ST_TRACKER          ( 1 << 18 )
 #define IPC_ST_UPSPEED          ( 1 << 19 )
 #define IPC_ST_UPTOTAL          ( 1 << 20 )
 #define IPC_ST__MAX             ( 1 << 21 )
@@ -132,8 +135,6 @@ struct ipc_info
 };
 
 #define HASVERS( info )         ( 0 < (info)->vers )
-#define VERSLABEL( info )       ( (info)->label )
-
 #define TORRENT_ID_VALID( id )  ( 0 < (id) && INT_MAX > (id) )
 
 typedef void ( *trd_msgfunc )( enum ipc_msg, struct tr_benc *, int64_t, void * );
@@ -143,7 +144,7 @@ typedef void ( *trd_msgfunc )( enum ipc_msg, struct tr_benc *, int64_t, void * )
 
 /* setup */
 struct ipc_funcs * ipc_initmsgs ( void );
-int          ipc_addmsg   ( struct ipc_funcs *, enum ipc_msg, trd_msgfunc );
+void         ipc_addmsg   ( struct ipc_funcs *, enum ipc_msg, trd_msgfunc );
 void         ipc_setdefmsg( struct ipc_funcs *, trd_msgfunc );
 void         ipc_freemsgs ( struct ipc_funcs * );
 struct ipc_info * ipc_newcon( struct ipc_funcs * );
@@ -153,7 +154,7 @@ void         ipc_freecon  ( struct ipc_info * );
 /* sets errno to EPERM if requested message not supported by protocol vers */
 struct tr_benc * ipc_initval  ( struct ipc_info *, enum ipc_msg, int64_t,
                             struct tr_benc *, int );
-uint8_t *    ipc_mkval    ( struct tr_benc *, size_t * );
+uint8_t *    ipc_mkval    ( const struct tr_benc *, size_t * );
 uint8_t *    ipc_mkempty  ( struct ipc_info *, size_t *, enum ipc_msg,
                             int64_t );
 uint8_t *    ipc_mkint    ( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
@@ -175,7 +176,7 @@ int          ipc_havemsg  ( struct ipc_info *, enum ipc_msg );
 enum ipc_msg ipc_msgid    ( struct ipc_info *, const char * );
 int          ipc_ishandled( struct ipc_info *, enum ipc_msg );
 int          ipc_havetags ( struct ipc_info * );
-int          ipc_infotypes( enum ipc_msg, struct tr_benc * );
+int          ipc_infotypes( enum ipc_msg, const struct tr_benc * );
 const char * ipc_infoname ( enum ipc_msg, int );
 
 #endif /* TR_DAEMON_IPC_H */

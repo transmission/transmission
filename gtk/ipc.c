@@ -537,7 +537,7 @@ smsg_addone( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag,
     tr_benc           * file, * data, * dir, * start;
     tr_ctor              * ctor;
 
-    if( NULL == val || TYPE_DICT != val->type )
+    if( !val || ( val->type != TYPE_DICT ) )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
@@ -1143,43 +1143,44 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
   con->type = CON_SERV;
 
   con->msgs = ipc_initmsgs();
-  if( NULL == con->msgs ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_ADDMANYFILES, smsg_add ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_ADDONEFILE,   smsg_addone ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_AUTOMAP,      smsg_int ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_AUTOSTART,    smsg_int ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_DIR,          smsg_str ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_DOWNLIMIT,    smsg_int ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETAUTOMAP,   smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETAUTOSTART, smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETDIR,       smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETDOWNLIMIT, smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETINFO,      smsg_info ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETINFOALL,   smsg_infoall ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETPEX,       smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETPORT,      smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTAT,      smsg_info ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTATALL,   smsg_infoall ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_GETUPLIMIT,   smsg_pref ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_LOOKUP,       smsg_look ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_NOOP,         smsg_noop ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_PEX,          smsg_int ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_PORT,         smsg_int ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_QUIT,         smsg_quit ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVE,       smsg_tor ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVEALL,    smsg_torall ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_START,        smsg_tor ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_STARTALL,     smsg_torall ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_STOP,         smsg_tor ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_STOPALL,      smsg_torall ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_SUP,          smsg_sup ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_UPLIMIT,      smsg_int ) )
+  if( NULL == con->msgs )
   {
       errmsg( con->u.serv.wind, _("Failed to set up IPC: %s"),
               g_strerror( errno ) );
       g_free( con );
       return;
   }
+
+  ipc_addmsg( con->msgs, IPC_MSG_ADDMANYFILES, smsg_add );
+  ipc_addmsg( con->msgs, IPC_MSG_ADDONEFILE,   smsg_addone );
+  ipc_addmsg( con->msgs, IPC_MSG_AUTOMAP,      smsg_int );
+  ipc_addmsg( con->msgs, IPC_MSG_AUTOSTART,    smsg_int );
+  ipc_addmsg( con->msgs, IPC_MSG_DIR,          smsg_str );
+  ipc_addmsg( con->msgs, IPC_MSG_DOWNLIMIT,    smsg_int );
+  ipc_addmsg( con->msgs, IPC_MSG_GETAUTOMAP,   smsg_pref );
+  ipc_addmsg( con->msgs, IPC_MSG_GETAUTOSTART, smsg_pref );
+  ipc_addmsg( con->msgs, IPC_MSG_GETDIR,       smsg_pref );
+  ipc_addmsg( con->msgs, IPC_MSG_GETDOWNLIMIT, smsg_pref );
+  ipc_addmsg( con->msgs, IPC_MSG_GETINFO,      smsg_info );
+  ipc_addmsg( con->msgs, IPC_MSG_GETINFOALL,   smsg_infoall );
+  ipc_addmsg( con->msgs, IPC_MSG_GETPEX,       smsg_pref );
+  ipc_addmsg( con->msgs, IPC_MSG_GETPORT,      smsg_pref );
+  ipc_addmsg( con->msgs, IPC_MSG_GETSTAT,      smsg_info );
+  ipc_addmsg( con->msgs, IPC_MSG_GETSTATALL,   smsg_infoall );
+  ipc_addmsg( con->msgs, IPC_MSG_GETUPLIMIT,   smsg_pref );
+  ipc_addmsg( con->msgs, IPC_MSG_LOOKUP,       smsg_look );
+  ipc_addmsg( con->msgs, IPC_MSG_NOOP,         smsg_noop );
+  ipc_addmsg( con->msgs, IPC_MSG_PEX,          smsg_int );
+  ipc_addmsg( con->msgs, IPC_MSG_PORT,         smsg_int );
+  ipc_addmsg( con->msgs, IPC_MSG_QUIT,         smsg_quit );
+  ipc_addmsg( con->msgs, IPC_MSG_REMOVE,       smsg_tor );
+  ipc_addmsg( con->msgs, IPC_MSG_REMOVEALL,    smsg_torall );
+  ipc_addmsg( con->msgs, IPC_MSG_START,        smsg_tor );
+  ipc_addmsg( con->msgs, IPC_MSG_STARTALL,     smsg_torall );
+  ipc_addmsg( con->msgs, IPC_MSG_STOP,         smsg_tor );
+  ipc_addmsg( con->msgs, IPC_MSG_STOPALL,      smsg_torall );
+  ipc_addmsg( con->msgs, IPC_MSG_SUP,          smsg_sup );
+  ipc_addmsg( con->msgs, IPC_MSG_UPLIMIT,      smsg_int );
 
   ipc_setdefmsg( con->msgs, all_default );
 

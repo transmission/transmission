@@ -35,12 +35,12 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <libtransmission/bsdtree.h>
 #include <libtransmission/bencode.h>
 #include <libtransmission/ipcparse.h>
 #include <libtransmission/trcompat.h>
 #include <libtransmission/version.h>
 
+#include "bsdtree.h"
 #include "bsdqueue.h"
 #include "client.h"
 #include "errors.h"
@@ -122,12 +122,8 @@ client_init( struct event_base * base )
         return -1;
     }
 
-    if( 0 > ipc_addmsg( gl_tree, IPC_MSG_INFO, infomsg ) ||
-        0 > ipc_addmsg( gl_tree, IPC_MSG_STAT, statmsg ) )
-    {
-        return -1;
-    }
-
+    ipc_addmsg( gl_tree, IPC_MSG_INFO, infomsg );
+    ipc_addmsg( gl_tree, IPC_MSG_STAT, statmsg );
     ipc_setdefmsg( gl_tree, defmsg );
 
     return 0;

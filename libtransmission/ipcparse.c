@@ -34,66 +34,26 @@
 #include "utils.h"
 
 #include "ipcparse.h"
-#include "bsdtree.h"
 
-/* begin copy-paste from daemon/misc.h */
+#define TR_N_ELEMENTS( ary ) ( sizeof( ary ) / sizeof( (ary)[0] ) )
 
-#define ARRAYLEN( ary )         ( sizeof( ary ) / sizeof( (ary)[0] ) )
-
-#ifndef MIN
-#define MIN( aa, bb )           ( (aa) < (bb) ? (aa) : (bb) )
-#endif
-#ifndef MAX
-#define MAX( aa, bb )           ( (aa) > (bb) ? (aa) : (bb) )
-#endif
-
-#undef NULL
-#define NULL                    ( ( void * )0 )
-
-#define SAFEFREE( ptr )                                                       \
-    do                                                                        \
-    {                                                                         \
-        int saved = errno;                                                    \
-        free( ptr );                                                          \
-        errno = saved;                                                        \
-    }                                                                         \
-    while( 0 )
-#define SAFEFREESTRLIST( ptr )                                                \
-    do                                                                        \
-    {                                                                         \
-        int saved = errno;                                                    \
-        FREESTRLIST( ptr );                                                   \
-        errno = saved;                                                        \
-    }                                                                         \
-    while( 0 )
-#define SAFEBENCFREE( val )                                                   \
-    do                                                                        \
-    {                                                                         \
-        int saved = errno;                                                    \
-        tr_bencFree( val );                                                   \
-        errno = saved;                                                        \
-    }                                                                         \
+#define SAFEFREE( ptr )      \
+    do                       \
+    {                        \
+        int saved = errno;   \
+        free( ptr );         \
+        errno = saved;       \
+    }                        \
     while( 0 )
 
-#define INTCMP_FUNC( name, type, id )                                         \
-int                                                                           \
-name( struct type * _icf_first, struct type * _icf_second )                   \
-{                                                                             \
-    if( _icf_first->id < _icf_second->id )                                    \
-    {                                                                         \
-        return -1;                                                            \
-    }                                                                         \
-    else if( _icf_first->id > _icf_second->id )                               \
-    {                                                                         \
-        return 1;                                                             \
-    }                                                                         \
-    else                                                                      \
-    {                                                                         \
-        return 0;                                                             \
-    }                                                                         \
-}
-
-/* end copy-paste from daemon/misc.h */
+#define SAFEBENCFREE( val )  \
+    do                       \
+    {                        \
+        int saved = errno;   \
+        tr_bencFree( val );  \
+        errno = saved;       \
+    }                        \
+    while( 0 )
 
 /* IPC protocol version */
 #define PROTO_VERS_MIN          ( 1 )
@@ -106,174 +66,128 @@ name( struct type * _icf_first, struct type * _icf_second )                   \
 struct msg
 {
     const char        * name;
-    const int          minvers;
-    const enum ipc_msg id;
-    RB_ENTRY( msg )    link;
+    const int           minvers;
+    const enum ipc_msg  id;
 };
 
 struct inf
 {
     const char    * name;
     const int       type;
-    RB_ENTRY( inf ) link;
 };
 
 struct msgfunc
 {
     int             id;
     trd_msgfunc     func;
-    RB_ENTRY( msgfunc ) link;
 };
-
-RB_HEAD( msgtree, msg );
-RB_HEAD( inftree, inf );
-RB_HEAD( functree, msgfunc );
 
 struct ipc_funcs
 {
-    struct functree msgs;
-    trd_msgfunc    def;
+    trd_msgfunc msgs[IPC__MSG_COUNT];
+    trd_msgfunc def;
 };
 
-static struct msg gl_msgs[] =
+/* these names must be sorted for strcmp() */
+static const struct msg gl_msgs[] =
 {
-    { "addfiles",            1, IPC_MSG_ADDMANYFILES, RB_ENTRY_INITIALIZER() },
-    { "addfile-detailed",    2, IPC_MSG_ADDONEFILE,   RB_ENTRY_INITIALIZER() },
-    { "automap",             2, IPC_MSG_AUTOMAP,      RB_ENTRY_INITIALIZER() },
-    { "autostart",           2, IPC_MSG_AUTOSTART,    RB_ENTRY_INITIALIZER() },
-    { "bad-format",          2, IPC_MSG_BAD,          RB_ENTRY_INITIALIZER() },
-    { "encryption",          2, IPC_MSG_CRYPTO,       RB_ENTRY_INITIALIZER() },
-    { "directory",           2, IPC_MSG_DIR,          RB_ENTRY_INITIALIZER() },
-    { "downlimit",           2, IPC_MSG_DOWNLIMIT,    RB_ENTRY_INITIALIZER() },
-    { "failed",              2, IPC_MSG_FAIL,         RB_ENTRY_INITIALIZER() },
-    { "get-automap",         2, IPC_MSG_GETAUTOMAP,   RB_ENTRY_INITIALIZER() },
-    { "get-autostart",       2, IPC_MSG_GETAUTOSTART, RB_ENTRY_INITIALIZER() },
-    { "get-encryption",      2, IPC_MSG_GETCRYPTO,    RB_ENTRY_INITIALIZER() },
-    { "get-directory",       2, IPC_MSG_GETDIR,       RB_ENTRY_INITIALIZER() },
-    { "get-downlimit",       2, IPC_MSG_GETDOWNLIMIT, RB_ENTRY_INITIALIZER() },
-    { "get-info",            2, IPC_MSG_GETINFO,      RB_ENTRY_INITIALIZER() },
-    { "get-info-all",        2, IPC_MSG_GETINFOALL,   RB_ENTRY_INITIALIZER() },
-    { "get-pex",             2, IPC_MSG_GETPEX,       RB_ENTRY_INITIALIZER() },
-    { "get-port",            2, IPC_MSG_GETPORT,      RB_ENTRY_INITIALIZER() },
-    { "get-status",          2, IPC_MSG_GETSTAT,      RB_ENTRY_INITIALIZER() },
-    { "get-status-all",      2, IPC_MSG_GETSTATALL,   RB_ENTRY_INITIALIZER() },
-    { "get-supported",       2, IPC_MSG_GETSUP,       RB_ENTRY_INITIALIZER() },
-    { "get-uplimit",         2, IPC_MSG_GETUPLIMIT,   RB_ENTRY_INITIALIZER() },
-    { "lookup",              2, IPC_MSG_LOOKUP,       RB_ENTRY_INITIALIZER() },
-    { "info",                2, IPC_MSG_INFO,         RB_ENTRY_INITIALIZER() },
-    { "noop",                2, IPC_MSG_NOOP,         RB_ENTRY_INITIALIZER() },
-    { "not-supported",       2, IPC_MSG_NOTSUP,       RB_ENTRY_INITIALIZER() },
-    { "pex",                 2, IPC_MSG_PEX,          RB_ENTRY_INITIALIZER() },
-    { "port",                2, IPC_MSG_PORT,         RB_ENTRY_INITIALIZER() },
-    { "quit",                1, IPC_MSG_QUIT,         RB_ENTRY_INITIALIZER() },
-    { "remove",              2, IPC_MSG_REMOVE,       RB_ENTRY_INITIALIZER() },
-    { "remove-all",          2, IPC_MSG_REMOVEALL,    RB_ENTRY_INITIALIZER() },
-    { "start",               2, IPC_MSG_START,        RB_ENTRY_INITIALIZER() },
-    { "start-all",           2, IPC_MSG_STARTALL,     RB_ENTRY_INITIALIZER() },
-    { "status",              2, IPC_MSG_STAT,         RB_ENTRY_INITIALIZER() },
-    { "stop",                2, IPC_MSG_STOP,         RB_ENTRY_INITIALIZER() },
-    { "stop-all",            2, IPC_MSG_STOPALL,      RB_ENTRY_INITIALIZER() },
-    { "succeeded",           2, IPC_MSG_OK,           RB_ENTRY_INITIALIZER() },
-    { "supported",           2, IPC_MSG_SUP,          RB_ENTRY_INITIALIZER() },
-    { "uplimit",             2, IPC_MSG_UPLIMIT,      RB_ENTRY_INITIALIZER() },
-    { "version",             1, IPC_MSG_VERSION,      RB_ENTRY_INITIALIZER() },
+    { "addfile-detailed",    2, IPC_MSG_ADDONEFILE    },
+    { "addfiles",            1, IPC_MSG_ADDMANYFILES  },
+    { "automap",             2, IPC_MSG_AUTOMAP       },
+    { "autostart",           2, IPC_MSG_AUTOSTART     },
+    { "bad-format",          2, IPC_MSG_BAD           },
+    { "directory",           2, IPC_MSG_DIR           },
+    { "downlimit",           2, IPC_MSG_DOWNLIMIT     },
+    { "encryption",          2, IPC_MSG_CRYPTO        },
+    { "failed",              2, IPC_MSG_FAIL          },
+    { "get-automap",         2, IPC_MSG_GETAUTOMAP    },
+    { "get-autostart",       2, IPC_MSG_GETAUTOSTART  },
+    { "get-directory",       2, IPC_MSG_GETDIR        },
+    { "get-downlimit",       2, IPC_MSG_GETDOWNLIMIT  },
+    { "get-encryption",      2, IPC_MSG_GETCRYPTO     },
+    { "get-info",            2, IPC_MSG_GETINFO       },
+    { "get-info-all",        2, IPC_MSG_GETINFOALL    },
+    { "get-pex",             2, IPC_MSG_GETPEX        },
+    { "get-port",            2, IPC_MSG_GETPORT       },
+    { "get-status",          2, IPC_MSG_GETSTAT       },
+    { "get-status-all",      2, IPC_MSG_GETSTATALL    },
+    { "get-supported",       2, IPC_MSG_GETSUP        },
+    { "get-uplimit",         2, IPC_MSG_GETUPLIMIT    },
+    { "info",                2, IPC_MSG_INFO          },
+    { "lookup",              2, IPC_MSG_LOOKUP        },
+    { "noop",                2, IPC_MSG_NOOP          },
+    { "not-supported",       2, IPC_MSG_NOTSUP        },
+    { "pex",                 2, IPC_MSG_PEX           },
+    { "port",                2, IPC_MSG_PORT          },
+    { "quit",                1, IPC_MSG_QUIT          },
+    { "remove",              2, IPC_MSG_REMOVE        },
+    { "remove-all",          2, IPC_MSG_REMOVEALL     },
+    { "start",               2, IPC_MSG_START         },
+    { "start-all",           2, IPC_MSG_STARTALL      },
+    { "status",              2, IPC_MSG_STAT          },
+    { "stop",                2, IPC_MSG_STOP          },
+    { "stop-all",            2, IPC_MSG_STOPALL       },
+    { "succeeded",           2, IPC_MSG_OK            },
+    { "supported",           2, IPC_MSG_SUP           },
+    { "uplimit",             2, IPC_MSG_UPLIMIT       },
+    { "version",             1, IPC_MSG_VERSION       }
 };
 
-static struct inf gl_inf[] =
+/* these names must be sorted for strcmp() */
+static const struct inf gl_inf[] =
 {
-    { "comment",                IPC_INF_COMMENT,      RB_ENTRY_INITIALIZER() },
-    { "creator",                IPC_INF_CREATOR,      RB_ENTRY_INITIALIZER() },
-    { "date",                   IPC_INF_DATE,         RB_ENTRY_INITIALIZER() },
-    { "files",                  IPC_INF_FILES,        RB_ENTRY_INITIALIZER() },
-    { "hash",                   IPC_INF_HASH,         RB_ENTRY_INITIALIZER() },
-    { "id",                     IPC_INF_ID,           RB_ENTRY_INITIALIZER() },
-    { "name",                   IPC_INF_NAME,         RB_ENTRY_INITIALIZER() },
-    { "path",                   IPC_INF_PATH,         RB_ENTRY_INITIALIZER() },
-    { "private",                IPC_INF_PRIVATE,      RB_ENTRY_INITIALIZER() },
-    { "size",                   IPC_INF_SIZE,         RB_ENTRY_INITIALIZER() },
-    { "trackers",               IPC_INF_TRACKERS,     RB_ENTRY_INITIALIZER() },
+    { "comment",                IPC_INF_COMMENT   },
+    { "creator",                IPC_INF_CREATOR   },
+    { "date",                   IPC_INF_DATE      },
+    { "files",                  IPC_INF_FILES     },
+    { "hash",                   IPC_INF_HASH      },
+    { "id",                     IPC_INF_ID        },
+    { "name",                   IPC_INF_NAME      },
+    { "path",                   IPC_INF_PATH      },
+    { "private",                IPC_INF_PRIVATE   },
+    { "size",                   IPC_INF_SIZE      },
+    { "trackers",               IPC_INF_TRACKERS  }
 };
 
-static struct inf gl_stat[] =
+/* these names must be sorted for strcmp() */
+static const struct inf gl_stat[] =
 {
-    { "completed",              IPC_ST_COMPLETED,     RB_ENTRY_INITIALIZER() },
-    { "download-speed",         IPC_ST_DOWNSPEED,     RB_ENTRY_INITIALIZER() },
-    { "download-total",         IPC_ST_DOWNTOTAL,     RB_ENTRY_INITIALIZER() },
-    { "download-valid",         IPC_ST_DOWNVALID,     RB_ENTRY_INITIALIZER() },
-    { "error",                  IPC_ST_ERROR,         RB_ENTRY_INITIALIZER() },
-    { "error-message",          IPC_ST_ERRMSG,        RB_ENTRY_INITIALIZER() },
-    { "eta",                    IPC_ST_ETA,           RB_ENTRY_INITIALIZER() },
-    { "id",                     IPC_ST_ID,            RB_ENTRY_INITIALIZER() },
-    { "peers-downloading",      IPC_ST_PEERDOWN,      RB_ENTRY_INITIALIZER() },
-    { "peers-from",             IPC_ST_PEERFROM,      RB_ENTRY_INITIALIZER() },
-    { "peers-total",            IPC_ST_PEERTOTAL,     RB_ENTRY_INITIALIZER() },
-    { "peers-uploading",        IPC_ST_PEERUP,        RB_ENTRY_INITIALIZER() },
-    { "running",                IPC_ST_RUNNING,       RB_ENTRY_INITIALIZER() },
-    { "state",                  IPC_ST_STATE,         RB_ENTRY_INITIALIZER() },
-    { "swarm-speed",            IPC_ST_SWARM,         RB_ENTRY_INITIALIZER() },
-    { "tracker",                IPC_ST_TRACKER,       RB_ENTRY_INITIALIZER() },
-    { "scrape-completed",       IPC_ST_TKDONE,        RB_ENTRY_INITIALIZER() },
-    { "scrape-leechers",        IPC_ST_TKLEECH,       RB_ENTRY_INITIALIZER() },
-    { "scrape-seeders",         IPC_ST_TKSEED,        RB_ENTRY_INITIALIZER() },
-    { "upload-speed",           IPC_ST_UPSPEED,       RB_ENTRY_INITIALIZER() },
-    { "upload-total",           IPC_ST_UPTOTAL,       RB_ENTRY_INITIALIZER() },
+    { "completed",              IPC_ST_COMPLETED },
+    { "download-speed",         IPC_ST_DOWNSPEED },
+    { "download-total",         IPC_ST_DOWNTOTAL },
+    { "download-valid",         IPC_ST_DOWNVALID },
+    { "error",                  IPC_ST_ERROR     },
+    { "error-message",          IPC_ST_ERRMSG    },
+    { "eta",                    IPC_ST_ETA       },
+    { "id",                     IPC_ST_ID        },
+    { "peers-downloading",      IPC_ST_PEERDOWN  },
+    { "peers-from",             IPC_ST_PEERFROM  },
+    { "peers-total",            IPC_ST_PEERTOTAL },
+    { "peers-uploading",        IPC_ST_PEERUP    },
+    { "running",                IPC_ST_RUNNING   },
+    { "scrape-completed",       IPC_ST_TKDONE    },
+    { "scrape-leechers",        IPC_ST_TKLEECH   },
+    { "scrape-seeders",         IPC_ST_TKSEED    },
+    { "state",                  IPC_ST_STATE     },
+    { "swarm-speed",            IPC_ST_SWARM     },
+    { "tracker",                IPC_ST_TRACKER   },
+    { "upload-speed",           IPC_ST_UPSPEED   },
+    { "upload-total",           IPC_ST_UPTOTAL   }
 };
-
-static int          handlevers ( struct ipc_info *, tr_benc * );
-static int          handlemsgs ( struct ipc_info *, tr_benc *, void * );
-static int          gotmsg     ( struct ipc_info *, tr_benc *, tr_benc *,
-                                 tr_benc *, void * );
-static int          msgcmp     ( struct msg *, struct msg * );
-static int          infcmp     ( struct inf *, struct inf * );
-static struct msg * msglookup  ( const char * );
-static int          filltracker( tr_benc *, const tr_tracker_info * );
-static int          handlercmp ( struct msgfunc *, struct msgfunc * );
-
-RB_GENERATE_STATIC( msgtree, msg, link, msgcmp )
-RB_GENERATE_STATIC( inftree, inf, link, infcmp )
-RB_GENERATE_STATIC( functree, msgfunc, link, handlercmp )
-INTCMP_FUNC( handlercmp, msgfunc, id )
 
 struct ipc_funcs *
 ipc_initmsgs( void )
 {
-    struct ipc_funcs * tree;
-
-    tree = malloc( sizeof *tree );
-    if( NULL != tree )
-    {
-        RB_INIT( &tree->msgs );
-        tree->def = (trd_msgfunc) NULL;
-    }
-
-    return tree;
+    return tr_new0( struct ipc_funcs, 1 );
 }
 
-int
+void
 ipc_addmsg( struct ipc_funcs * tree, enum ipc_msg id, trd_msgfunc func )
 {
-    struct msgfunc key, * entry;
-
     assert( MSGVALID( id ) );
     assert( IPC_MSG_VERSION != id );
 
-    memset( &key, 0, sizeof key );
-    key.id = id;
-    entry = RB_FIND( functree, &tree->msgs, &key );
-    assert( NULL == entry );
-
-    entry = calloc( 1, sizeof *entry );
-    if( NULL == entry )
-    {
-        return -1;
-    }
-
-    entry->id   = id;
-    entry->func = func;
-    entry = RB_INSERT( functree, &tree->msgs, entry );
-    assert( NULL == entry );
-
-    return 0;
+    tree->msgs[id] = func;
 }
 
 void
@@ -285,15 +199,7 @@ ipc_setdefmsg( struct ipc_funcs * tree, trd_msgfunc func )
 void
 ipc_freemsgs( struct ipc_funcs * tree )
 {
-    struct msgfunc * ii, * next;
-
-    for( ii = RB_MIN( functree, &tree->msgs ); NULL != ii; ii = next )
-    {
-        next = RB_NEXT( functree, &tree->msgs, ii );
-        RB_REMOVE( functree, &tree->msgs, ii );
-        free( ii );
-    }
-    free( tree );
+    tr_free( tree );
 }
 
 struct ipc_info *
@@ -301,8 +207,7 @@ ipc_newcon( struct ipc_funcs * funcs )
 {
     struct ipc_info * info;
 
-    info = calloc( 1, sizeof *info );
-    if( NULL != info )
+    if(( info = calloc( 1, sizeof *info )))
     {
         info->funcs = funcs;
         info->vers  = -1;
@@ -314,7 +219,7 @@ ipc_newcon( struct ipc_funcs * funcs )
 void
 ipc_freecon( struct ipc_info * info )
 {
-    if( NULL != info )
+    if( info )
     {
         free( info->label );
         free( info );
@@ -365,7 +270,7 @@ ipc_initval( struct ipc_info * info, enum ipc_msg id, int64_t tag,
 }
 
 uint8_t *
-ipc_mkval( tr_benc * pk, size_t * setmeSize )
+ipc_mkval( const tr_benc * pk, size_t * setmeSize )
 {
     int bencSize = 0;
     char * benc = tr_bencSave( pk, &bencSize );
@@ -393,9 +298,7 @@ ipc_mkempty( struct ipc_info * info, size_t * len, enum ipc_msg id,
     uint8_t  * ret;
 
     if( NULL == ipc_initval( info, id, tag, &pk, TYPE_STR ) )
-    {
         return NULL;
-    }
 
     ret = ipc_mkval( &pk, len );
     SAFEBENCFREE( &pk );
@@ -411,10 +314,8 @@ ipc_mkint( struct ipc_info * info, size_t * len, enum ipc_msg id, int64_t tag,
     uint8_t  * ret;
 
     val = ipc_initval( info, id, tag, &pk, TYPE_INT );
-    if( NULL == val )
-    {
+    if( !val )
         return NULL;
-    }
 
     val->val.i = num;
     ret = ipc_mkval( &pk, len );
@@ -431,10 +332,8 @@ ipc_mkstr( struct ipc_info * info, size_t * len, enum ipc_msg id, int64_t tag,
     uint8_t  * ret;
 
     val = ipc_initval( info, id, tag, &pk, TYPE_STR );
-    if( NULL == val )
-    {
+    if( !val )
         return NULL;
-    }
 
     tr_bencInitStr( val, str, -1, 1 );
     ret = ipc_mkval( &pk, len );
@@ -479,7 +378,7 @@ ipc_mkgetinfo( struct ipc_info * info, size_t * len, enum ipc_msg id,
 {
     tr_benc   pk, * top, * idlist, * typelist;
     size_t       ii, typecount, used;
-    struct inf * typearray;
+    const struct inf * typearray;
     uint8_t    * ret;
 
     /* no ID list, send an -all message */
@@ -527,12 +426,12 @@ ipc_mkgetinfo( struct ipc_info * info, size_t * len, enum ipc_msg id,
     {
         case IPC_MSG_GETINFO:
         case IPC_MSG_GETINFOALL:
-            typecount = ARRAYLEN( gl_inf );
+            typecount = TR_N_ELEMENTS( gl_inf );
             typearray = gl_inf;
             break;
         case IPC_MSG_GETSTAT:
         case IPC_MSG_GETSTATALL:
-            typecount = ARRAYLEN( gl_stat );
+            typecount = TR_N_ELEMENTS( gl_stat );
             typearray = gl_stat;
             break;
         default:
@@ -571,6 +470,22 @@ ipc_mkgetinfo( struct ipc_info * info, size_t * len, enum ipc_msg id,
     return ret;
 }
 
+static int
+filltracker( tr_benc * val, const tr_tracker_info * tk )
+{
+    tr_bencInit( val, TYPE_DICT );
+    if( tr_bencDictReserve( val, ( NULL == tk->scrape ? 3 : 4 ) ) )
+        return -1;
+
+    tr_bencInitStr( tr_bencDictAdd( val, "address" ),  tk->address,  -1, 1 );
+    tr_bencInitInt( tr_bencDictAdd( val, "port" ),     tk->port );
+    tr_bencInitStr( tr_bencDictAdd( val, "announce" ), tk->announce, -1, 1 );
+    if( NULL != tk->scrape )
+        tr_bencInitStr( tr_bencDictAdd( val, "scrape" ), tk->scrape, -1, 1 );
+
+    return 0;
+}
+
 int
 ipc_addinfo( tr_benc * list, int tor, const tr_info * inf, int types )
 {
@@ -593,11 +508,11 @@ ipc_addinfo( tr_benc * list, int tor, const tr_info * inf, int types )
         {
             continue;
         }
-        assert( ARRAYLEN( gl_inf ) > ( unsigned )ii );
+        assert( TR_N_ELEMENTS( gl_inf ) > ( unsigned )ii );
         assert( gl_inf[ii].type == ( 1 << ii ) );
         /* check for missing optional info */
-        if( ( IPC_INF_COMMENT == ( 1 << ii ) && '\0' == inf->comment ) ||
-            ( IPC_INF_CREATOR == ( 1 << ii ) && '\0' == inf->creator ) ||
+        if( ( IPC_INF_COMMENT == ( 1 << ii ) && !*inf->comment ) ||
+            ( IPC_INF_CREATOR == ( 1 << ii ) && !*inf->creator ) ||
             ( IPC_INF_DATE    == ( 1 << ii ) &&   0  >= inf->dateCreated ) )
         {
             continue;
@@ -616,8 +531,8 @@ ipc_addinfo( tr_benc * list, int tor, const tr_info * inf, int types )
             continue;
         }
         /* check for missing optional info */
-        if( ( IPC_INF_COMMENT == ( 1 << ii ) && '\0' == inf->comment ) ||
-            ( IPC_INF_CREATOR == ( 1 << ii ) && '\0' == inf->creator ) ||
+        if( ( IPC_INF_COMMENT == ( 1 << ii ) && !*inf->comment ) ||
+            ( IPC_INF_CREATOR == ( 1 << ii ) && !*inf->creator ) ||
             ( IPC_INF_DATE    == ( 1 << ii ) && 0 >= inf->dateCreated ) )
         {
             continue;
@@ -719,31 +634,24 @@ ipc_addstat( tr_benc * list, int tor,
     types |= IPC_ST_ID;
 
     if( tr_bencListReserve( list, 1 ) )
-    {
         return -1;
-    }
+
     dict = tr_bencListAdd( list );
 
     for( ii = used = 0; IPC_ST__MAX > 1 << ii; ii++ )
-    {
         if( types & ( 1 << ii ) )
-        {
             used++;
-        }
-    }
+
     tr_bencInit( dict, TYPE_DICT );
     if( tr_bencDictReserve( dict, used ) )
-    {
         return -1;
-    }
 
     for( ii = 0; IPC_ST__MAX > 1 << ii; ii++ )
     {
         if( !( types & ( 1 << ii ) ) )
-        {
             continue;
-        }
-        assert( ARRAYLEN( gl_stat ) > ( unsigned )ii );
+
+        assert( TR_N_ELEMENTS( gl_stat ) > ( unsigned )ii );
         assert( gl_stat[ii].type == ( 1 << ii ) );
         item = tr_bencDictAdd( dict, gl_stat[ii].name );
         switch( 1 << ii )
@@ -911,50 +819,6 @@ ipc_addstat( tr_benc * list, int tor,
     return 0;
 }
 
-ssize_t
-ipc_parse( struct ipc_info * info, uint8_t * buf, ssize_t total, void * arg )
-{
-    char        hex[IPC_MIN_MSG_LEN+1], * end;
-    ssize_t     off, len;
-    tr_benc  benc;
-
-    for( off = 0; off + IPC_MIN_MSG_LEN < total; off += IPC_MIN_MSG_LEN + len )
-    {
-        memcpy( hex, buf + off, IPC_MIN_MSG_LEN );
-        hex[IPC_MIN_MSG_LEN] = '\0';
-        end = NULL;
-        len = strtol( hex, &end, 16 );
-        if( hex + IPC_MIN_MSG_LEN != end ||
-            0 > len || IPC_MAX_MSG_LEN < len )
-        {
-            errno = EINVAL;
-            return -1;
-        }
-        if( off + IPC_MIN_MSG_LEN + len > total )
-        {
-            break;
-        }
-        errno = 0;
-        if( tr_bencLoad( buf + off + IPC_MIN_MSG_LEN, len, &benc, NULL ) )
-        {
-            if( 0 == errno )
-            {
-                errno = EINVAL;
-            }
-            return -1;
-        }
-        if( 0 > ( HASVERS( info ) ? handlemsgs( info, &benc, arg ) :
-                                    handlevers( info, &benc ) ) )
-        {
-            SAFEBENCFREE( &benc );
-            return -1;
-        }
-        tr_bencFree( &benc );
-    }
-
-    return off;
-}
-
 static int
 handlevers( struct ipc_info * info, tr_benc * dict )
 {
@@ -1016,6 +880,66 @@ handlevers( struct ipc_info * info, tr_benc * dict )
 }
 
 static int
+compareNameToMsg( const void * a, const void * b )
+{
+    const struct msg * msg = b;
+    return strcmp( a, msg->name );
+}
+
+static const struct msg *
+msglookup( const char * name )
+{
+    return bsearch( name,
+                    gl_msgs, TR_N_ELEMENTS( gl_msgs ), sizeof( struct msg ),
+                    compareNameToMsg );
+}
+
+static int
+gotmsg( struct ipc_info * info, tr_benc * name, tr_benc * val,
+        tr_benc * tagval, void * arg )
+{
+    const struct msg * msg;
+    int64_t            tag;
+
+    if( TYPE_STR != name->type )
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if( NULL == tagval )
+    {
+        tag = -1;
+    }
+    else
+    {
+        if( TYPE_INT != tagval->type )
+        {
+            errno = EINVAL;
+            return -1;
+        }
+        tag = tagval->val.i;
+    }
+
+    msg = msglookup( name->val.s.s );
+    if( msg && msg->minvers <= info->vers )
+    {
+        if( info->funcs->msgs[msg->id] != NULL )
+        {
+            (*info->funcs->msgs[msg->id])( msg->id, val, tag, arg );
+        }
+        else if( info->funcs->def )
+        {
+            info->funcs->def( msg->id, val, tag, arg );
+        }
+    }
+    else if( NULL != info->funcs->def )
+        info->funcs->def( IPC__MSG_UNKNOWN, NULL, tag, arg );
+
+    return 0;
+}
+
+static int
 handlemsgs( struct ipc_info * info, tr_benc * pay, void * arg )
 {
     tr_benc * name, * val, * tag;
@@ -1062,53 +986,48 @@ handlemsgs( struct ipc_info * info, tr_benc * pay, void * arg )
     return 0;
 }
 
-static int
-gotmsg( struct ipc_info * info, tr_benc * name, tr_benc * val,
-        tr_benc * tagval, void * arg )
+ssize_t
+ipc_parse( struct ipc_info * info, uint8_t * buf, ssize_t total, void * arg )
 {
-    struct msgfunc key, * handler;
-    struct msg   * msg;
-    int64_t        tag;
+    char        hex[IPC_MIN_MSG_LEN+1], * end;
+    ssize_t     off, len;
+    tr_benc  benc;
 
-    if( TYPE_STR != name->type )
+    for( off = 0; off + IPC_MIN_MSG_LEN < total; off += IPC_MIN_MSG_LEN + len )
     {
-        errno = EINVAL;
-        return -1;
-    }
-
-    if( NULL == tagval )
-    {
-        tag = -1;
-    }
-    else
-    {
-        if( TYPE_INT != tagval->type )
+        memcpy( hex, buf + off, IPC_MIN_MSG_LEN );
+        hex[IPC_MIN_MSG_LEN] = '\0';
+        end = NULL;
+        len = strtol( hex, &end, 16 );
+        if( hex + IPC_MIN_MSG_LEN != end ||
+            0 > len || IPC_MAX_MSG_LEN < len )
         {
             errno = EINVAL;
             return -1;
         }
-        tag = tagval->val.i;
+        if( off + IPC_MIN_MSG_LEN + len > total )
+        {
+            break;
+        }
+        errno = 0;
+        if( tr_bencLoad( buf + off + IPC_MIN_MSG_LEN, len, &benc, NULL ) )
+        {
+            if( 0 == errno )
+            {
+                errno = EINVAL;
+            }
+            return -1;
+        }
+        if( 0 > ( HASVERS( info ) ? handlemsgs( info, &benc, arg ) :
+                                    handlevers( info, &benc ) ) )
+        {
+            SAFEBENCFREE( &benc );
+            return -1;
+        }
+        tr_bencFree( &benc );
     }
 
-    msg = msglookup( name->val.s.s );
-    if( NULL != msg && msg->minvers <= info->vers )
-    {
-        memset( &key, 0, sizeof key );
-        key.id  = msg->id;
-        handler = RB_FIND( functree, &info->funcs->msgs, &key );
-        if( NULL != handler )
-        {
-            handler->func( msg->id, val, tag, arg );
-        }
-        else if( NULL != info->funcs->def )
-        {
-            info->funcs->def( msg->id, val, tag, arg );
-        }
-    }
-    else if( NULL != info->funcs->def )
-        info->funcs->def( IPC__MSG_UNKNOWN, NULL, tag, arg );
-
-    return 0;
+    return off;
 }
 
 int
@@ -1117,33 +1036,25 @@ ipc_havemsg( struct ipc_info * info, enum ipc_msg id )
     assert( MSGVALID( id ) );
     assert( HASVERS( info ) );
 
-    return ( gl_msgs[id].minvers <= info->vers );
+    return gl_msgs[id].minvers <= info->vers;
 }
 
 enum ipc_msg
 ipc_msgid( struct ipc_info * info, const char * name )
 {
-    struct msg * msg;
+    const struct msg * msg = msglookup( name );
 
-    msg = msglookup( name );
-    if( NULL == msg || !ipc_havemsg( info, msg->id ) )
-    {
-        return IPC__MSG_COUNT;
-    }
-
-    return msg->id;
+    return msg && ipc_havemsg( info, msg->id )
+        ? msg->id
+        : IPC__MSG_COUNT;
 }
 
 int
 ipc_ishandled( struct ipc_info * info, enum ipc_msg id )
 {
-    struct msgfunc key;
-
     assert( MSGVALID( id ) );
 
-    memset( &key, 0, sizeof key );
-    key.id = id;
-    return ( NULL != RB_FIND( functree, &info->funcs->msgs, &key ) );
+    return info->funcs->msgs[id] != NULL;
 }
 
 int
@@ -1152,42 +1063,34 @@ ipc_havetags( struct ipc_info * info )
     return !DICTPAYLOAD( info );
 }
 
-int
-ipc_infotypes( enum ipc_msg id, tr_benc * list )
+static int
+compareNameToInf( const void * a, const void * b )
 {
-    static struct inftree infotree = RB_INITIALIZER( &tree );
-    static struct inftree stattree = RB_INITIALIZER( &tree );
-    struct inftree * tree;
-    tr_benc     * name;
-    struct inf     * array, * inf, key;
-    size_t           len, ii;
-    int              ret, jj;
+    const struct inf * inf = b;
+    return strcmp( a, inf->name );
+}
+
+int
+ipc_infotypes( enum ipc_msg id, const tr_benc * list )
+{
+    const struct inf     * array;
+    size_t                 len;
+    int                    i;
+    int                    ret;
 
     switch( id )
     {
         case IPC_MSG_INFO:
-            tree  = &infotree;
             array = gl_inf;
-            len   = ARRAYLEN( gl_inf );
+            len   = TR_N_ELEMENTS( gl_inf );
             break;
         case IPC_MSG_STAT:
-            tree  = &stattree;
             array = gl_stat;
-            len   = ARRAYLEN( gl_stat );
+            len   = TR_N_ELEMENTS( gl_stat );
             break;
         default:
             assert( 0 );
             break;
-    }
-
-    if( RB_EMPTY( tree ) )
-    {
-        for( ii = 0; len > ii; ii++ )
-        {
-            assert( 1 << ii == array[ii].type );
-            inf = RB_INSERT( inftree, tree, &array[ii] );
-            assert( NULL == inf );
-        }
     }
 
     ret = IPC_INF_ID;
@@ -1197,20 +1100,19 @@ ipc_infotypes( enum ipc_msg id, tr_benc * list )
         return ret;
     }
 
-    memset( &key, 0, sizeof key );
-    for( jj = 0; list->val.l.count > jj; jj++ )
+    for( i=0; i<list->val.l.count; ++i )
     {
-        name = &list->val.l.vals[jj];
+        const tr_benc * name = &list->val.l.vals[i];
+        const struct inf * inf;
+
         if( TYPE_STR != name->type )
-        {
             continue;
-        }
-        key.name = name->val.s.s;
-        inf = RB_FIND( inftree, tree, &key );
-        if( NULL != inf )
-        {
+
+        inf = bsearch( name->val.s.s,
+                       array, len, sizeof( struct inf ),
+                       compareNameToInf );
+        if( inf )
             ret |= inf->type;
-        }
     }
 
     return ret;
@@ -1219,18 +1121,18 @@ ipc_infotypes( enum ipc_msg id, tr_benc * list )
 const char *
 ipc_infoname( enum ipc_msg id, int type )
 {
-    struct inf * array;
+    const struct inf * array;
     size_t len, ii;
 
     switch( id )
     {
         case IPC_MSG_INFO:
             array = gl_inf;
-            len   = ARRAYLEN( gl_inf );
+            len   = TR_N_ELEMENTS( gl_inf );
             break;
         case IPC_MSG_STAT:
             array = gl_stat;
-            len   = ARRAYLEN( gl_stat );
+            len   = TR_N_ELEMENTS( gl_stat );
             break;
         default:
             assert( 0 );
@@ -1238,70 +1140,9 @@ ipc_infoname( enum ipc_msg id, int type )
     }
 
     for( ii = 0; len > ii; ii++ )
-    {
         if( array[ii].type == type )
-        {
             return array[ii].name;
-        }
-    }
 
     assert( 0 );
-
     return NULL;
-}
-
-static int
-msgcmp( struct msg * first, struct msg * second )
-{
-    return strcmp( first->name, second->name );
-}
-
-static int
-infcmp( struct inf * first, struct inf * second )
-{
-    return strcmp( first->name, second->name );
-}
-
-static struct msg *
-msglookup( const char * name )
-{
-    static struct msgtree tree = RB_INITIALIZER( &tree );
-    struct msg          * ret, key;
-    size_t                ii;
-
-    assert( IPC__MSG_COUNT == ARRAYLEN( gl_msgs ) );
-
-    if( RB_EMPTY( &tree ) )
-    {
-        for( ii = 0; ARRAYLEN( gl_msgs ) > ii; ii++ )
-        {
-            assert( ii == gl_msgs[ii].id );
-            ret = RB_INSERT( msgtree, &tree, &gl_msgs[ii] );
-            assert( NULL == ret );
-        }
-    }
-
-    memset( &key, 0, sizeof key );
-    key.name = name;
-    return RB_FIND( msgtree, &tree, &key );
-}
-
-static int
-filltracker( tr_benc * val, const tr_tracker_info * tk )
-{
-    tr_bencInit( val, TYPE_DICT );
-    if( tr_bencDictReserve( val, ( NULL == tk->scrape ? 3 : 4 ) ) )
-    {
-        return -1;
-    }
-
-    tr_bencInitStr( tr_bencDictAdd( val, "address" ),  tk->address,  -1, 1 );
-    tr_bencInitInt( tr_bencDictAdd( val, "port" ),     tk->port );
-    tr_bencInitStr( tr_bencDictAdd( val, "announce" ), tk->announce, -1, 1 );
-    if( NULL != tk->scrape )
-    {
-        tr_bencInitStr( tr_bencDictAdd( val, "scrape" ), tk->scrape, -1, 1 );
-    }
-
-    return 0;
 }
