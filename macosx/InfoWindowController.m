@@ -752,7 +752,7 @@ typedef enum
     {
         id item = [[[fTorrents objectAtIndex: 0] allTrackers] objectAtIndex: row];
         if ([item isKindOfClass: [NSNumber class]])
-            return [NSString stringWithFormat: @"Tier %d", [item intValue]+1];
+            return [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), [item intValue]+1];
         else
             return item;
     }
