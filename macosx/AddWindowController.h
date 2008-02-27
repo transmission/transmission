@@ -60,6 +60,8 @@
 
 - (void) verifyLocalData: (id) sender;
 
+- (void) updateStatusField: (NSNotification *) notification;
+
 - (void) updateGroupMenu: (NSNotification *) notification;
 - (void) showGroupsWindow: (id) sender;
 

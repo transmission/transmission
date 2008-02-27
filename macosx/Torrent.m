@@ -809,7 +809,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (float) progress
 {
     return fStat->percentComplete;
-    //return (float)[self haveTotal] / [self size];
 }
 
 - (float) progressDone
@@ -939,9 +938,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     {
         if ([fDefaults boolForKey: @"DisplayStatusProgressSelected"])
         {
-            uint64_t have = [self haveTotal];
             string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@ selected (%.2f%%)", "Torrent -> progress string"),
-                            [NSString stringForFileSize: have], [NSString stringForFileSize: have + [self sizeLeft]],
+                            [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self totalSizeSelected]],
                             100.0 * [self progressDone]];
         }
         else
@@ -1220,6 +1218,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return [self haveVerified] + fStat->haveUnchecked;
 }
 
+- (uint64_t) totalSizeSelected
+{
+    return [self haveTotal] + [self sizeLeft];
+}
+
 - (uint64_t) downloadedTotal
 {
     return fStat->downloadedEver;
@@ -1352,6 +1355,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     free(files);
     
     [self update];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFileCheckChange" object: self];
 }
 
 - (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet

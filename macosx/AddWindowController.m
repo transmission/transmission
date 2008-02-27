@@ -69,6 +69,9 @@
 
 - (void) awakeFromNib
 {
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateStatusField:)
+        name: @"TorrentFileCheckChange" object: fTorrent];
+    
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateGroupMenu:)
         name: @"UpdateGroups" object: nil];
     
@@ -83,18 +86,7 @@
     [fIconView setImage: icon];
     [icon release];
     
-    NSString * statusString = [NSString stringForFileSize: [fTorrent size]];
-    if ([fTorrent folder])
-    {
-        NSString * fileString;
-        int count = [fTorrent fileCount];
-        if (count != 1)
-            fileString = [NSString stringWithFormat: NSLocalizedString(@"%d Files, ", "Add torrent -> info"), count];
-        else
-            fileString = NSLocalizedString(@"1 File, ", "Add torrent -> info");
-        statusString = [fileString stringByAppendingString: statusString];
-    }
-    [fStatusField setStringValue: statusString];
+    [self updateStatusField: nil];
     
     [self setGroupsMenu];
     [fGroupPopUp selectItemWithTag: -1];
@@ -210,6 +202,27 @@
 {
     [fTorrent resetCache];
     [fFileController reloadData];
+}
+
+- (void) updateStatusField: (NSNotification *) notification
+{
+    NSString * statusString = [NSString stringForFileSize: [fTorrent size]];
+    if ([fTorrent folder])
+        statusString = [statusString stringByAppendingFormat: NSLocalizedString(@" (%@ selected)", "Add torrent -> info"),
+                        [NSString stringForFileSize: [fTorrent totalSizeSelected]]];
+    
+    if ([fTorrent folder])
+    {
+        NSString * fileString;
+        int count = [fTorrent fileCount];
+        if (count != 1)
+            fileString = [NSString stringWithFormat: NSLocalizedString(@"%d Files, ", "Add torrent -> info"), count];
+        else
+            fileString = NSLocalizedString(@"1 File, ", "Add torrent -> info");
+        statusString = [fileString stringByAppendingString: statusString];
+    }
+    
+    [fStatusField setStringValue: statusString];
 }
 
 - (void) updateGroupMenu: (NSNotification *) notification
