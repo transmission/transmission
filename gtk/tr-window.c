@@ -451,7 +451,7 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
                                 gtk_ui_manager_get_accel_group (ui_manager));
     g_signal_connect( self, "realize", G_CALLBACK(realized_cb), NULL);
 
-#ifdef GTK_CHECK_VERSION(2,10,0)
+#if GTK_CHECK_VERSION(2,10,0)
     {
         GdkScreen * screen = gtk_widget_get_screen( self );
         GdkColormap * colormap = gdk_screen_get_rgba_colormap( screen );
