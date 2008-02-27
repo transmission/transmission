@@ -224,6 +224,16 @@ selectionChangedCB( GtkTreeSelection * s, gpointer unused UNUSED )
     refreshTorrentActions( s );
 }
 
+static void
+windowStateChanged( GtkWidget * widget UNUSED, GdkEventWindowState * event, gpointer gdata )
+{
+    if( event->changed_mask & GDK_WINDOW_STATE_ICONIFIED )
+    {
+        struct cbdata * cbdata = gdata;
+        cbdata->minimized = ( event->new_window_state & GDK_WINDOW_STATE_ICONIFIED ) ? 1 : 0;
+    }
+}
+
 int
 main( int argc, char ** argv )
 {
@@ -289,6 +299,7 @@ main( int argc, char ** argv )
 
         /* create main window now to be a parent to any error dialogs */
         GtkWindow * mainwind = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
+        g_signal_connect( mainwind, "window-state-event", G_CALLBACK(windowStateChanged), cbdata );
 
         /* set message level here before tr_init() */
         msgwin_loadpref( );
@@ -440,7 +451,7 @@ static void
 toggleMainWindow( struct cbdata * cbdata )
 {
     GtkWindow * window = GTK_WINDOW( cbdata->wind );
-    const int hide = cbdata->minimized = !cbdata->minimized;
+    const int hide = !cbdata->minimized;
     static int x=0, y=0;
 
     if( hide )
