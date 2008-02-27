@@ -168,9 +168,21 @@ typedef enum
 - (void) dealloc
 {
     //save resizeable view height
-    if (fCurrentTabTag == TAB_TRACKER_TAG || fCurrentTabTag == TAB_PEERS_TAG || fCurrentTabTag == TAB_FILES_TAG)
-        [[NSUserDefaults standardUserDefaults] setFloat: [[self tabViewForTag: fCurrentTabTag] frame].size.height
-            forKey: @"InspectorContentHeight"];
+    NSString * resizeSaveKey = nil;
+    switch (fCurrentTabTag)
+    {
+        case TAB_TRACKER_TAG:
+            resizeSaveKey = @"InspectorContentHeightTracker";
+            break;
+        case TAB_PEERS_TAG:
+            resizeSaveKey = @"InspectorContentHeightPeers";
+            break;
+        case TAB_FILES_TAG:
+            resizeSaveKey = @"InspectorContentHeightFiles";
+            break;
+    }
+    if (resizeSaveKey)
+        [[NSUserDefaults standardUserDefaults] setFloat: [[self tabViewForTag: fCurrentTabTag] frame].size.height forKey: resizeSaveKey];
     
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
@@ -573,9 +585,40 @@ typedef enum
 {
     [self updateInfoStats];
     
-    BOOL oldCanResizeVertical = fCurrentTabTag == TAB_TRACKER_TAG || fCurrentTabTag == TAB_PEERS_TAG || fCurrentTabTag == TAB_FILES_TAG,
-        canResizeVertical;
+    //save old heights
     int oldTabTag = fCurrentTabTag;
+    NSView * oldView = [self tabViewForTag: oldTabTag];
+    
+    BOOL oldCanResizeVertical;
+    NSString * oldResizeSaveKey;
+    switch (fCurrentTabTag)
+    {
+        case TAB_TRACKER_TAG:
+            oldResizeSaveKey = @"InspectorContentHeightTracker";
+            oldCanResizeVertical = YES;
+            break;
+        case TAB_PEERS_TAG:
+            oldResizeSaveKey = @"InspectorContentHeightPeers";
+            oldCanResizeVertical = YES;
+            break;
+        case TAB_FILES_TAG:
+            oldResizeSaveKey = @"InspectorContentHeightFiles";
+            oldCanResizeVertical = YES;
+            break;
+        default:
+            oldCanResizeVertical = NO;
+    }
+    
+    float oldHeight = 0;
+    
+    if (oldTabTag != INVALID)
+        oldHeight = [oldView frame].size.height;
+    if (oldCanResizeVertical)
+        [[NSUserDefaults standardUserDefaults] setFloat: [oldView frame].size.height forKey: oldResizeSaveKey];
+    
+    //set current tag
+    BOOL canResizeVertical;
+    NSString * resizeSaveKey;
     fCurrentTabTag = [fTabMatrix selectedTag];
     
     NSView * view;
@@ -600,18 +643,24 @@ typedef enum
             view = fTrackerView;
             identifier = TAB_TRACKER_IDENT;
             title = NSLocalizedString(@"Tracker", "Inspector -> title");
+            
+            resizeSaveKey = @"InspectorContentHeightTracker";
             canResizeVertical = YES;
             break;
         case TAB_PEERS_TAG:
             view = fPeersView;
             identifier = TAB_PEERS_IDENT;
             title = NSLocalizedString(@"Peers", "Inspector -> title");
+            
+            resizeSaveKey = @"InspectorContentHeightPeers";
             canResizeVertical = YES;
             break;
         case TAB_FILES_TAG:
             view = fFilesView;
             identifier = TAB_FILES_IDENT;
             title = NSLocalizedString(@"Files", "Inspector -> title");
+            
+            resizeSaveKey = @"InspectorContentHeightFiles";
             canResizeVertical = YES;
             break;
         case TAB_OPTIONS_TAG:
@@ -628,25 +677,18 @@ typedef enum
     
     NSWindow * window = [self window];
     
-    float oldHeight = 0;
+    /*if (fCurrentTabTag == oldTabTag)
+        return;*/
+    
+    #warning move?
     if (oldTabTag != INVALID)
     {
-        if (fCurrentTabTag == oldTabTag)
-            return;
-        
         //deselect old tab item
         [(InfoTabButtonCell *)[fTabMatrix cellWithTag: oldTabTag] setSelectedTab: NO];
         
         //get old view
-        NSView * oldView = [self tabViewForTag: oldTabTag];
         [oldView setHidden: YES];
         [oldView removeFromSuperview];
-        
-        oldHeight = [oldView frame].size.height;
-        
-        //save old size
-        if (oldCanResizeVertical)
-            [[NSUserDefaults standardUserDefaults] setFloat: [oldView frame].size.height forKey: @"InspectorContentHeight"];
     }
     
     [window setTitle: [NSString stringWithFormat: @"%@ - %@", title, NSLocalizedString(@"Torrent Inspector", "Inspector -> title")]];
@@ -658,7 +700,7 @@ typedef enum
     
     if (canResizeVertical)
     {
-        float height = [[NSUserDefaults standardUserDefaults] floatForKey: @"InspectorContentHeight"];
+        float height = [[NSUserDefaults standardUserDefaults] floatForKey: resizeSaveKey];
         if (height != 0)
             viewRect.size.height = MAX(height, TAB_MIN_HEIGHT);
     }
