@@ -340,7 +340,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (void) resetCache
 {
-    tr_torrentRecheck(fHandle);
+    tr_torrentVerify(fHandle);
     [self update];
 }
 

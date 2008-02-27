@@ -68,6 +68,7 @@ int  client_crypto   ( const char * );
 int  client_start    ( size_t, const int * );
 int  client_stop     ( size_t, const int * );
 int  client_remove   ( size_t, const int * );
+int  client_verify   ( size_t, const int * );
 int  client_list     ( cl_infofunc );
 int  client_info     ( cl_infofunc );
 int  client_hashids  ( cl_infofunc );

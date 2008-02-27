@@ -183,6 +183,7 @@ PrefsController         * fPrefsController;
     ipc_addmsg( _funcs, IPC_MSG_STOPALL,      msg_actionall );
     ipc_addmsg( _funcs, IPC_MSG_SUP,          msg_sup       );
     ipc_addmsg( _funcs, IPC_MSG_UPLIMIT,      msg_setint    );
+    ipc_addmsg( _funcs, IPC_MSG_VERIFY,       msg_action    );
     ipc_setdefmsg( _funcs, msg_default );
 
     [[NSNotificationCenter defaultCenter]
@@ -641,6 +642,9 @@ void msg_action( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
             break;
         case IPC_MSG_STOP:
             res = [delegate ipcStopTorrents: tors];
+            break;
+        case IPC_MSG_VERIFY:
+            res = [delegate ipcVerifyTorrents: tors];
             break;
         default:
             assert( 0 );

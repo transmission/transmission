@@ -36,6 +36,7 @@ int          torrent_add_file            ( const char *, const char *, int );
 int          torrent_add_data            ( uint8_t *, size_t, const char *, int );
 void         torrent_start               ( int );
 void         torrent_stop                ( int );
+void         torrent_verify              ( int );
 void         torrent_remove              ( int );
 const tr_info  * torrent_info          ( int );
 const tr_stat  * torrent_stat          ( int );

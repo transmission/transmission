@@ -107,7 +107,7 @@ verifyRequested( GtkButton * button UNUSED, gpointer gdata )
 {
     struct OpenData * data = gdata;
     if( data->gtor )
-        tr_torrentRecheck( tr_torrent_handle( data->gtor ) );
+        tr_torrentVerify( tr_torrent_handle( data->gtor ) );
 }
 
 static void

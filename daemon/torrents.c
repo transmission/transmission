@@ -73,7 +73,6 @@ static int          loadstate  ( void );
 static int          savestate  ( void );
 static int          toridcmp   ( struct tor *, struct tor * );
 static int          torhashcmp ( struct tor *, struct tor * );
-static struct tor * idlookup   ( int );
 static struct tor * hashlookup ( const uint8_t * );
 static struct tor * iterate    ( struct tor * );
 
@@ -173,24 +172,29 @@ torrent_add_data( uint8_t * data, size_t size, const char * dir, int autostart )
     return tor->id;
 }
 
+static struct tor *
+idlookup( int id )
+{
+    struct tor * found = NULL;
+
+    if( gl_handle && !gl_exiting )
+    {
+        struct tor key;
+        memset( &key, 0, sizeof key );
+        key.id = id;
+        found = RB_FIND( tortree, &gl_tree, &key );
+    }
+
+    return found;
+}
+
 void
 torrent_start( int id )
 {
-    struct tor * tor;
-
-    assert( NULL != gl_handle );
-    assert( !gl_exiting );
-
-    tor = idlookup( id );
-    if( tor != NULL )
-    {
-        const tr_stat  * st = tr_torrentStat( tor->tor );
-
-        if( !TR_STATUS_IS_ACTIVE( st->status ) )
-        {
-            tr_torrentStart( tor->tor );
-            savestate();
-        }
+    struct tor * tor = idlookup( id );
+    if( tor && !TR_STATUS_IS_ACTIVE( tr_torrentStat( tor->tor )->status ) ) {
+        tr_torrentStart( tor->tor );
+        savestate();
     }
 
 }
@@ -198,35 +202,26 @@ torrent_start( int id )
 void
 torrent_stop( int id )
 {
-    struct tor * tor;
-
-    assert( NULL != gl_handle );
-    assert( !gl_exiting );
-
-    tor = idlookup( id );
-    if( tor != NULL )
-    {
-        const tr_stat  * st = tr_torrentStat( tor->tor );
-
-        if( TR_STATUS_IS_ACTIVE( st->status ) )
-        {
-            tr_torrentStop( tor->tor );
-            savestate();
-        }
+    struct tor * tor = idlookup( id );
+    if( tor && TR_STATUS_IS_ACTIVE( tr_torrentStat( tor->tor )->status ) ) {
+        tr_torrentStop( tor->tor );
+        savestate( );
     }
+}
+
+void
+torrent_verify( int id )
+{
+    struct tor * tor = idlookup( id );
+    if( tor )
+        tr_torrentVerify( tor->tor );
 }
 
 void
 torrent_remove( int id )
 {
-    struct tor * tor;
-
-    assert( NULL != gl_handle );
-    assert( !gl_exiting );
-
-    tor = idlookup( id );
-    if( tor != NULL )
-    {
+    struct tor * tor = idlookup( id );
+    if( tor ) {
         closetor( tor, 1 );
         savestate();
     }
@@ -235,35 +230,15 @@ torrent_remove( int id )
 const tr_info *
 torrent_info( int id )
 {
-    struct tor * tor;
-
-    assert( NULL != gl_handle );
-    assert( !gl_exiting );
-
-    tor = idlookup( id );
-    if( NULL == tor )
-    {
-        return NULL;
-    }
-
-    return tr_torrentInfo( tor->tor );
+    const struct tor * tor = idlookup( id );
+    return tor ? tr_torrentInfo( tor->tor ) : NULL;
 }
 
 const tr_stat *
 torrent_stat( int id )
 {
-    struct tor * tor;
-
-    assert( NULL != gl_handle );
-    assert( !gl_exiting );
-
-    tor = idlookup( id );
-    if( NULL == tor )
-    {
-        return NULL;
-    }
-
-    return tr_torrentStat( tor->tor );
+    struct tor * tor = idlookup( id );
+    return tor ? tr_torrentStat( tor->tor ) : NULL;
 }
 
 int
@@ -878,18 +853,6 @@ int
 torhashcmp( struct tor * left, struct tor * right )
 {
     return memcmp( left->hash, right->hash, sizeof left->hash );
-}
-
-struct tor *
-idlookup( int id )
-{
-    struct tor key, * found;
-
-    memset( &key, 0, sizeof key );
-    key.id = id;
-    found = RB_FIND( tortree, &gl_tree, &key );
-
-    return found;
 }
 
 struct tor *

@@ -555,31 +555,28 @@ addintlistreq( enum ipc_msg which, size_t len, const int * list )
 int
 client_start( size_t len, const int * list )
 {
-    enum ipc_msg id;
-
-    id = ( NULL == list ? IPC_MSG_STARTALL : IPC_MSG_START );
-
+    const enum ipc_msg id = list ? IPC_MSG_START : IPC_MSG_STARTALL;
     return addintlistreq( id, len, list );
 }
 
 int
 client_stop( size_t len, const int * list )
 {
-    enum ipc_msg id;
-
-    id = ( NULL == list ? IPC_MSG_STOPALL : IPC_MSG_STOP );
-
+    const enum ipc_msg id = list ? IPC_MSG_STOP : IPC_MSG_STOPALL;
     return addintlistreq( id, len, list );
 }
 
 int
 client_remove( size_t len, const int * list )
 {
-    enum ipc_msg id;
-
-    id = ( NULL == list ? IPC_MSG_REMOVEALL : IPC_MSG_REMOVE );
-
+    const enum ipc_msg id = list ? IPC_MSG_REMOVE : IPC_MSG_REMOVEALL;
     return addintlistreq( id, len, list );
+}
+
+int
+client_verify( size_t len, const int * list )
+{
+    return list ? addintlistreq( IPC_MSG_VERIFY, len, list ) : -1;
 }
 
 int

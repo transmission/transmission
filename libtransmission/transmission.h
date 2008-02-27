@@ -590,7 +590,7 @@ void tr_torrentAmountFinished( const tr_torrent * tor, float * tab, int size );
  **********************************************************************/
 void tr_torrentRemoveSaved( tr_torrent * );
 
-void tr_torrentRecheck( tr_torrent * );
+void tr_torrentVerify( tr_torrent * );
 
 /**
  * Frees memory allocated by tr_torrentNew().

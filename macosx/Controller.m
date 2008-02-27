@@ -1061,6 +1061,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self updateTorrentHistory];
 }
 
+- (void) verifyTorrents: (NSArray *) torrents
+{
+    // FIXME BentMyWookie
+}
+
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
 {
     [torrents retain];
@@ -4075,6 +4080,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     else
         [self stopTorrents: torrents];
 
+    return YES;
+}
+
+- (BOOL) ipcVerifyTorrents: (NSArray *) torrents
+{
+    if (!torrents)
+        return NO;
+
+    [self startTorrents: torrents];
     return YES;
 }
 

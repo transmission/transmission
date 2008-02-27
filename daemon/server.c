@@ -132,6 +132,7 @@ server_init( struct event_base * base )
     ipc_addmsg( gl_tree, IPC_MSG_STOP,         tormsg  );
     ipc_addmsg( gl_tree, IPC_MSG_STOPALL,      tormsg  );
     ipc_addmsg( gl_tree, IPC_MSG_UPLIMIT,      intmsg  );
+    ipc_addmsg( gl_tree, IPC_MSG_VERIFY,       tormsg  );
 
     ipc_setdefmsg( gl_tree, defmsg );
 
@@ -809,6 +810,10 @@ tormsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
             /* FALLTHROUGH */
         case IPC_MSG_STOP:
             func = torrent_stop;
+            break;
+        case IPC_MSG_VERIFY:
+            all = 0;
+            func = torrent_verify;
             break;
         default:
             assert( 0 );

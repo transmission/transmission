@@ -962,7 +962,7 @@ torrentRecheckDoneCB( tr_torrent * tor )
     tr_runInEventThread( tor->handle, torrentRecheckDoneImpl, tor );
 }
 void
-tr_torrentRecheck( tr_torrent * tor )
+tr_torrentVerify( tr_torrent * tor )
 {
     tr_globalLock( tor->handle );
 

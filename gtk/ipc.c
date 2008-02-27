@@ -883,6 +883,9 @@ smsg_tor( enum ipc_msg id, tr_benc * val, int64_t tag, void * arg )
             case IPC_MSG_STOP:
                 tr_torrent_stop( tor );
                 break;
+            case IPC_MSG_VERIFY:
+                tr_torrentVerify( tr_torrent_handle( tor ) );
+                break;
             default:
                 g_assert_not_reached();
                 break;
@@ -1181,6 +1184,7 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
   ipc_addmsg( con->msgs, IPC_MSG_STOPALL,      smsg_torall );
   ipc_addmsg( con->msgs, IPC_MSG_SUP,          smsg_sup );
   ipc_addmsg( con->msgs, IPC_MSG_UPLIMIT,      smsg_int );
+  ipc_addmsg( con->msgs, IPC_MSG_VERIFY,       smsg_tor );
 
   ipc_setdefmsg( con->msgs, all_default );
 

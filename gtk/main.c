@@ -993,7 +993,7 @@ recheckTorrentForeach (GtkTreeModel * model,
 {
     TrTorrent * gtor = NULL;
     gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, -1 );
-    tr_torrentRecheck( tr_torrent_handle( gtor ) );
+    tr_torrentVerify( tr_torrent_handle( gtor ) );
     g_object_unref( G_OBJECT( gtor ) );
 }
 

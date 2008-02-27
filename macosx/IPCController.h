@@ -44,6 +44,7 @@
                           autostart: (BOOL) autostart;
 - (BOOL)           ipcStartTorrents: (NSArray *) torrents;
 - (BOOL)            ipcStopTorrents: (NSArray *) torrents;
+- (BOOL)          ipcVerifyTorrents: (NSArray *) torrents;
 - (BOOL)          ipcRemoveTorrents: (NSArray *) torrents;
 /* XXX how to get and set prefs nicely? */
 

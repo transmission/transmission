@@ -64,6 +64,7 @@ struct opts
     int               down;
     int               listquick;
     int               listfull;
+    struct strlist    verify;
     int               startall;
     struct strlist    start;
     int               stopall;
@@ -129,6 +130,7 @@ static struct torlist   gl_torinfo      = RB_INITIALIZER( &gl_torinfo );
 static struct strlist * gl_starthashes  = NULL;
 static struct strlist * gl_stophashes   = NULL;
 static struct strlist * gl_removehashes = NULL;
+static struct strlist * gl_verifyhashes = NULL;
 static struct torhashes gl_hashids      = RB_INITIALIZER( &gl_hashids );
 static int              gl_gotlistinfo  = 0;
 static int              gl_gotliststat  = 0;
@@ -191,9 +193,10 @@ main( int argc, char ** argv )
         exit( 1 );
     }
 
-    if( ( !o.startall  && !SLIST_EMPTY( &o.start  ) ) ||
-        ( !o.stopall   && !SLIST_EMPTY( &o.stop   ) ) ||
-        ( !o.removeall && !SLIST_EMPTY( &o.remove ) ) )
+    if( ( !o.startall   && !SLIST_EMPTY( &o.start  ) ) ||
+        ( !o.stopall    && !SLIST_EMPTY( &o.stop   ) ) ||
+        (                  !SLIST_EMPTY( &o.verify ) ) ||
+        ( !o.removeall  && !SLIST_EMPTY( &o.remove ) ) )
     {
         if( 0 > client_hashids( hashmsg ) )
         {
@@ -202,6 +205,7 @@ main( int argc, char ** argv )
         gl_starthashes  = ( o.startall  ? NULL : &o.start  );
         gl_stophashes   = ( o.stopall   ? NULL : &o.stop   );
         gl_removehashes = ( o.removeall ? NULL : &o.remove );
+        gl_verifyhashes = ( &o.verify );
     }
 
     event_dispatch();
@@ -288,6 +292,7 @@ readargs( int argc, char ** argv, struct opts * opts )
         { "type",               required_argument, NULL, 't' },
         { "upload-limit",       required_argument, NULL, 'u' },
         { "upload-unlimited",   no_argument,       NULL, 'U' },
+        { "verify",             required_argument, NULL, 'v' },
         { "proxy",              no_argument,       NULL, 'x' },
         { NULL, 0, NULL, 0 }
     };
@@ -410,6 +415,12 @@ readargs( int argc, char ** argv, struct opts * opts )
                 opts->uplimit   = 1;
                 opts->up        = -1;
                 break;
+            case 'v':
+                if( 0 > hasharg( optarg, &opts->verify, NULL ) )
+                {
+                    return -1;
+                }
+                break;
             case 'x':
                 opts->proxy     = 1;
                 continue; /* don't set gotmsg, -x isn't a message */
@@ -466,7 +477,8 @@ hasharg( const char * arg, struct strlist * list, int * all )
     /* check for special "all" value */
     if( 0 == strcasecmp( "all", arg ) )
     {
-        *all = 1;
+        if( all )
+            *all = 1;
         return 0;
     }
 
@@ -849,6 +861,7 @@ sendidreqs( void )
         { gl_starthashes,  client_start  },
         { gl_stophashes,   client_stop   },
         { gl_removehashes, client_remove },
+        { gl_verifyhashes, client_verify },
     };
     struct stritem * jj;
     size_t           ii;

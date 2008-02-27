@@ -142,6 +142,7 @@ static const struct msg gl_msgs[] =
     { "succeeded",           2, IPC_MSG_OK            },
     { "supported",           2, IPC_MSG_SUP           },
     { "uplimit",             2, IPC_MSG_UPLIMIT       },
+    { "verify",              2, IPC_MSG_VERIFY        },
     { "version",             1, IPC_MSG_VERSION       }
 };
 

@@ -288,7 +288,7 @@ main( int argc, char ** argv )
         if( recheckData )
         {
             recheckData = 0;
-            tr_torrentRecheck( tor );
+            tr_torrentVerify( tor );
         }
 
         s = tr_torrentStat( tor );
