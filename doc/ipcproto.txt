@@ -475,7 +475,7 @@ Key:     "verify"
 Version: 2
 Format:  list of torrent ID ints
 Replies: "succeeded", "failed", "not-supported", "bad-format"
-Example: 7:verifyli3ei8ei6ee
+Example: 6:verifyli3ei8ei6ee
          "verify", (3, 8, 6)
 Details: List of torrent IDs to stop.
 
