@@ -342,7 +342,7 @@ networkPage( GObject * core, gpointer alive )
         g_object_set_data( G_OBJECT(l), "alive", alive );
         testing_port_cb( NULL, l );
 
-        g_signal_connect( w, "toggled", G_CALLBACK(toggled_cb), l );
+        g_signal_connect( w, "toggled", G_CALLBACK(testing_port_cb), l );
         g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
 
     hig_workarea_finish( t, &row );
