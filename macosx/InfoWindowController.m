@@ -188,6 +188,7 @@ typedef enum
     
     [fTorrents release];
     [fPeers release];
+    [fTrackers release];
     
     [super dealloc];
 }
@@ -331,11 +332,11 @@ typedef enum
         [fPiecesControl setEnabled: NO];
         [fPiecesView setTorrent: nil];
         
-        if (fPeers)
-        {
-            [fPeers release];
-            fPeers = nil;
-        }
+        [fPeers release];
+        fPeers = nil;
+        
+        [fTrackers release];
+        fTrackers = nil;
     }
     else
     {    
@@ -415,6 +416,10 @@ typedef enum
         [fPiecesControl setSelected: !piecesAvailableSegment forSegment: PIECES_CONTROL_PROGRESS];
         [fPiecesControl setEnabled: YES];
         [fPiecesView setTorrent: torrent];
+        
+        //get trackers for table
+        [fTrackers release];
+        fTrackers = [[torrent allTrackers] retain];
     }
     
     //update stats and settings
@@ -604,6 +609,9 @@ typedef enum
                 oldResizeSaveKey = @"InspectorContentHeightTracker";
                 break;
             case TAB_PEERS_TAG:
+                [fPeers release];
+                fPeers = nil;
+                
                 oldResizeSaveKey = @"InspectorContentHeightPeers";
                 break;
             case TAB_FILES_TAG:
@@ -616,50 +624,44 @@ typedef enum
         if (oldResizeSaveKey)
             [[NSUserDefaults standardUserDefaults] setFloat: oldHeight forKey: oldResizeSaveKey];
         
-        //get old view
+        //remove old view
         [oldView setHidden: YES];
         [oldView removeFromSuperview];
     }
     
-    //set current tag
-    NSString * resizeSaveKey = nil;
+    //set new tab item
+    NSView * view = [self tabViewForTag: fCurrentTabTag];
     
-    NSView * view;
+    NSString * resizeSaveKey = nil;
     NSString * identifier, * title;
     switch (fCurrentTabTag)
     {
         case TAB_INFO_TAG:
-            view = fInfoView;
             identifier = TAB_INFO_IDENT;
             title = NSLocalizedString(@"General Info", "Inspector -> title");
             break;
         case TAB_ACTIVITY_TAG:
-            view = fActivityView;
             identifier = TAB_ACTIVITY_IDENT;
             title = NSLocalizedString(@"Activity", "Inspector -> title");
             
             [fPiecesView updateView: YES];
             break;
         case TAB_TRACKER_TAG:
-            view = fTrackerView;
             identifier = TAB_TRACKER_IDENT;
             title = NSLocalizedString(@"Tracker", "Inspector -> title");
             resizeSaveKey = @"InspectorContentHeightTracker";
             break;
         case TAB_PEERS_TAG:
-            view = fPeersView;
             identifier = TAB_PEERS_IDENT;
             title = NSLocalizedString(@"Peers", "Inspector -> title");
             resizeSaveKey = @"InspectorContentHeightPeers";
             break;
         case TAB_FILES_TAG:
-            view = fFilesView;
             identifier = TAB_FILES_IDENT;
             title = NSLocalizedString(@"Files", "Inspector -> title");
             resizeSaveKey = @"InspectorContentHeightFiles";
             break;
         case TAB_OPTIONS_TAG:
-            view = fOptionsView;
             identifier = TAB_OPTIONS_IDENT;
             title = NSLocalizedString(@"Options", "Inspector -> title");
             break;
@@ -736,11 +738,7 @@ typedef enum
     if (tableView == fPeerTable)
         return fPeers ? [fPeers count] : 0;
     else if (tableView == fTrackerTable)
-    {
-        if ([fTorrents count] != 1)
-            return 0;
-        return [[[fTorrents objectAtIndex: 0] allTrackers] count];
-    }
+        return fTrackers ? [fTrackers count] : 0;
     return 0;
 }
 
@@ -772,7 +770,7 @@ typedef enum
     }
     else if (tableView == fTrackerTable)
     {
-        id item = [[[fTorrents objectAtIndex: 0] allTrackers] objectAtIndex: row];
+        id item = [fTrackers objectAtIndex: row];
         if ([item isKindOfClass: [NSNumber class]])
             return [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), [item intValue]+1];
         else
@@ -803,7 +801,7 @@ typedef enum
 - (BOOL) tableView: (NSTableView *) tableView isGroupRow: (NSInteger) row
 {
     if (tableView == fTrackerTable)
-        return [[[[fTorrents objectAtIndex: 0] allTrackers] objectAtIndex: row] isKindOfClass: [NSNumber class]];
+        return [[fTrackers objectAtIndex: row] isKindOfClass: [NSNumber class]];
     return NO;
 }
 

@@ -58,8 +58,6 @@ typedef enum
     
     NSString * fNameString, * fHashString;
     
-    NSArray * fAllTrackers;
-    
     tr_file_stat * fileStat;
     NSArray * fFileList;
     

@@ -189,8 +189,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     [fIcon release];
     
-    [fAllTrackers release];
-    
     [fFileList release];
     [fFileMenu release];
     
@@ -738,23 +736,18 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSArray *) allTrackers
 {
-    if (!fAllTrackers)
+    NSMutableArray * allTrackers = [NSMutableArray array];
+    
+    int i, j;
+    for (i = 0; i < fInfo->trackerTiers; i++)
     {
-        NSMutableArray * allTrackers = [NSMutableArray array];
-        
-        int i, j;
-        for (i = 0; i < fInfo->trackerTiers; i++)
-        {
-            [allTrackers addObject: [NSNumber numberWithInt: i]];
-            for (j = 0; j < fInfo->trackerList[i].count; j++)
-                [allTrackers addObject: [NSString stringWithFormat: @"http://%s:%d",
-                    fInfo->trackerList[i].list[j].address, fInfo->trackerList[i].list[j].port]];
-        }
-        
-        fAllTrackers = [[NSArray alloc] initWithArray: allTrackers];
+        [allTrackers addObject: [NSNumber numberWithInt: i]];
+        for (j = 0; j < fInfo->trackerList[i].count; j++)
+            [allTrackers addObject: [NSString stringWithFormat: @"http://%s:%d",
+                fInfo->trackerList[i].list[j].address, fInfo->trackerList[i].list[j].port]];
     }
     
-    return fAllTrackers;
+    return allTrackers;
 }
 
 - (NSString *) comment
