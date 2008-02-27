@@ -125,6 +125,9 @@
 /* Define to 1 if you have the `strtok_r' function. */
 #define _EVENT_HAVE_STRTOK_R 1
 
+/* Define to 1 if you have the `strtoll' function. */
+#define _EVENT_HAVE_STRTOLL 1
+
 /* Define to 1 if the system has the type `struct in6_addr'. */
 #define _EVENT_HAVE_STRUCT_IN6_ADDR 1
 
@@ -139,6 +142,9 @@
 
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #define _EVENT_HAVE_SYS_IOCTL_H 1
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#define _EVENT_HAVE_SYS_PARAM_H 1
 
 /* Define to 1 if you have the <sys/queue.h> header file. */
 #define _EVENT_HAVE_SYS_QUEUE_H 1
@@ -173,6 +179,18 @@
 /* Define if timerisset is defined in <sys/time.h> */
 #define _EVENT_HAVE_TIMERISSET 1
 
+/* Define to 1 if the system has the type `uint16_t'. */
+#define _EVENT_HAVE_UINT16_T 1
+
+/* Define to 1 if the system has the type `uint32_t'. */
+#define _EVENT_HAVE_UINT32_T 1
+
+/* Define to 1 if the system has the type `uint64_t'. */
+#define _EVENT_HAVE_UINT64_T 1
+
+/* Define to 1 if the system has the type `uint8_t'. */
+#define _EVENT_HAVE_UINT8_T 1
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #define _EVENT_HAVE_UNISTD_H 1
 
@@ -200,6 +218,18 @@
 /* Define to the version of this package. */
 #define _EVENT_PACKAGE_VERSION ""
 
+/* The size of `int', as computed by sizeof. */
+#define _EVENT_SIZEOF_INT 4
+
+/* The size of `long', as computed by sizeof. */
+#define _EVENT_SIZEOF_LONG 4
+
+/* The size of `long long', as computed by sizeof. */
+#define _EVENT_SIZEOF_LONG_LONG 8
+
+/* The size of `short', as computed by sizeof. */
+#define _EVENT_SIZEOF_SHORT 2
+
 /* Define to 1 if you have the ANSI C header files. */
 #define _EVENT_STDC_HEADERS 1
 
@@ -207,7 +237,7 @@
 #define _EVENT_TIME_WITH_SYS_TIME 1
 
 /* Version number of package */
-#define _EVENT_VERSION "1.3.99-trunk"
+#define _EVENT_VERSION "1.4.1-beta"
 
 /* Define to appropriate substitue if compiler doesnt have __func__ */
 /* #undef _EVENT___func__ */
@@ -229,16 +259,4 @@
 
 /* Define to unsigned int if you dont have it */
 /* #undef _EVENT_socklen_t */
-
-/* Define to `unsigned short' if <sys/types.h> does not define. */
-/* #undef _EVENT_uint16_t */
-
-/* Define to `unsigned int' if <sys/types.h> does not define. */
-/* #undef _EVENT_uint32_t */
-
-/* Define to `unsigned long long' if <sys/types.h> does not define. */
-/* #undef _EVENT_uint64_t */
-
-/* Define to `unsigned char' if <sys/types.h> does not define. */
-/* #undef _EVENT_uint8_t */
 #endif
