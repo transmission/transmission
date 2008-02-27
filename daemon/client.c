@@ -169,7 +169,6 @@ client_new_sock( const char * path )
     con->ipc = ipc_newcon( gl_tree );
     if( NULL == con->ipc )
     {
-        mallocmsg( sizeof *con->ipc );
         close( fd );
         free( con );
     }
@@ -292,7 +291,6 @@ client_new_cmd( char * const * cmd )
     con->ipc = ipc_newcon( gl_tree );
     if( NULL == con->ipc )
     {
-        mallocmsg( sizeof *con->ipc );
         bufferevent_free( con->evin );
         bufferevent_free( con->evout );
         free( con );
@@ -762,7 +760,7 @@ flushreqs( struct con * con )
     benc_val_t       pk, * val;
     struct stritem * jj;
 
-    if( !HASVERS( con->ipc ) )
+    if( !ipc_hasvers( con->ipc ) )
     {
         return;
     }

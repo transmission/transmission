@@ -244,7 +244,6 @@ newclient( int fd, short event UNUSED, void * arg )
         client->ipc = ipc_newcon( gl_tree );
         if( NULL == client->ipc )
         {
-            mallocmsg( sizeof *client->ipc );
             close( clfd );
             free( client );
             return;

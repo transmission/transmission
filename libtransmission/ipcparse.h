@@ -126,53 +126,55 @@ struct tr_info;
 struct tr_benc;
 struct tr_stat;
 
-struct ipc_info
-{
-    struct ipc_funcs * funcs;
-    int                vers;
-};
 
-#define HASVERS( info )         ( 0 < (info)->vers )
-#define TORRENT_ID_VALID( id )  ( 0 < (id) && INT_MAX > (id) )
+#define TORRENT_ID_VALID( id )  ( ( 0 < (id) ) && ( (id) < INT_MAX ) )
 
-typedef void ( *trd_msgfunc )( enum ipc_msg, struct tr_benc *, int64_t, void * );
+typedef void ( *trd_msgfunc )( enum ipc_msg      msg_id,
+                               struct tr_benc  * benc,
+                               int64_t           tag,
+                               void            * arg );
 
 /* any of these functions that can fail may set errno for any of the
    errors set by malloc() or calloc() */
 
 /* setup */
 struct ipc_funcs * ipc_initmsgs ( void );
-void               ipc_addmsg   ( struct ipc_funcs *, enum ipc_msg, trd_msgfunc );
+void               ipc_addmsg   ( struct ipc_funcs *, enum ipc_msg,
+                                  trd_msgfunc );
 void               ipc_setdefmsg( struct ipc_funcs *, trd_msgfunc );
 void               ipc_freemsgs ( struct ipc_funcs * );
 struct ipc_info *  ipc_newcon   ( struct ipc_funcs * );
 void               ipc_freecon  ( struct ipc_info * );
+int                ipc_hasvers  ( const struct ipc_info * );
 
 /* message creation */
 /* sets errno to EPERM if requested message not supported by protocol vers */
-struct tr_benc * ipc_initval  ( struct ipc_info *, enum ipc_msg, int64_t,
-                            struct tr_benc *, int );
+struct tr_benc * ipc_initval  ( const struct ipc_info *, enum ipc_msg,
+                                int64_t tag, struct tr_benc *, int );
 uint8_t *    ipc_mkval    ( const struct tr_benc *, size_t * );
-uint8_t *    ipc_mkempty  ( struct ipc_info *, size_t *, enum ipc_msg,
+uint8_t *    ipc_mkempty  ( const struct ipc_info *, size_t *, enum ipc_msg,
                             int64_t );
-uint8_t *    ipc_mkint    ( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
-                            int64_t );
-uint8_t *    ipc_mkstr    ( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
-                            const char * );
+uint8_t *    ipc_mkint    ( const struct ipc_info *, size_t *, enum ipc_msg,
+                            int64_t tag, int64_t val );
+uint8_t *    ipc_mkstr    ( const struct ipc_info *, size_t *, enum ipc_msg,
+                            int64_t tag, const char * val );
 uint8_t *    ipc_mkvers   ( size_t *, const char * );
-uint8_t *    ipc_mkgetinfo( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
-                            int, const int * );
-int          ipc_addinfo  ( struct tr_benc *, int, const struct tr_info *, int );
-int          ipc_addstat  ( struct tr_benc *, int, const struct tr_stat *, int );
+uint8_t *    ipc_mkgetinfo( const struct ipc_info *, size_t *, enum ipc_msg,
+                            int64_t, int, const int * );
+int          ipc_addinfo  ( struct tr_benc *, int,
+                            const struct tr_info *, int );
+int          ipc_addstat  ( struct tr_benc *, int,
+                            const struct tr_stat *, int );
 
 /* sets errno to EINVAL on parse error or
    EPERM for unsupported protocol version */
-ssize_t      ipc_parse    ( struct ipc_info *, const uint8_t *, ssize_t, void * );
+ssize_t      ipc_parse    ( struct ipc_info *, const uint8_t *,
+                            ssize_t, void * );
 
 /* misc info functions, these will always succeed */
-enum ipc_msg ipc_msgid    ( struct ipc_info *, const char * );
-int          ipc_ishandled( struct ipc_info *, enum ipc_msg );
-int          ipc_havetags ( struct ipc_info * );
+enum ipc_msg ipc_msgid    ( const struct ipc_info *, const char * );
+int          ipc_ishandled( const struct ipc_info *, enum ipc_msg );
+int          ipc_havetags ( const struct ipc_info * );
 int          ipc_infotypes( enum ipc_msg, const struct tr_benc * );
 const char * ipc_infoname ( enum ipc_msg, int );
 

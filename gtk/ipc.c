@@ -241,7 +241,7 @@ cli_io_received( GSource * source UNUSED, void * data, size_t len,
         return 0;
     }
 
-    if( HASVERS( con->ipc ) && 0 == cli->msgid )
+    if( ipc_hasvers( con->ipc ) && 0 == cli->msgid )
     {
         client_sendmsg( con );
     }

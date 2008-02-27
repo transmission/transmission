@@ -63,6 +63,18 @@
 #define MSGNAME( id )           ( gl_msgs[(id)].name )
 #define DICTPAYLOAD( info )     ( 2 > (info)->vers )
 
+struct ipc_info
+{
+    struct ipc_funcs * funcs;
+    int                vers;
+};
+
+int
+ipc_hasvers( const struct ipc_info * inf )
+{
+    return inf && ( inf->vers > 0 );
+}
+
 struct msg
 {
     const char        * name;
@@ -218,16 +230,16 @@ ipc_freecon( struct ipc_info * info )
 }
 
 static int
-ipc_havemsg( struct ipc_info * info, enum ipc_msg id )
+ipc_havemsg( const struct ipc_info * info, enum ipc_msg id )
 {
     assert( MSGVALID( id ) );
-    assert( HASVERS( info ) );
+    assert( ipc_hasvers( info ) );
 
     return gl_msgs[id].minvers <= info->vers;
 }
 
 tr_benc *
-ipc_initval( struct ipc_info * info, enum ipc_msg id, int64_t tag,
+ipc_initval( const struct ipc_info * info, enum ipc_msg id, int64_t tag,
              tr_benc * pk, int type )
 {
     tr_benc * ret;
@@ -291,7 +303,7 @@ ipc_mkval( const tr_benc * pk, size_t * setmeSize )
 }
 
 uint8_t *
-ipc_mkempty( struct ipc_info * info, size_t * len, enum ipc_msg id,
+ipc_mkempty( const struct ipc_info * info, size_t * len, enum ipc_msg id,
              int64_t tag )
 {
     tr_benc pk;
@@ -307,8 +319,8 @@ ipc_mkempty( struct ipc_info * info, size_t * len, enum ipc_msg id,
 }
 
 uint8_t *
-ipc_mkint( struct ipc_info * info, size_t * len, enum ipc_msg id, int64_t tag,
-           int64_t num )
+ipc_mkint( const struct ipc_info * info, size_t * len, enum ipc_msg id,
+           int64_t tag, int64_t num )
 {
     tr_benc pk, * val;
     uint8_t  * ret;
@@ -325,8 +337,8 @@ ipc_mkint( struct ipc_info * info, size_t * len, enum ipc_msg id, int64_t tag,
 }
 
 uint8_t *
-ipc_mkstr( struct ipc_info * info, size_t * len, enum ipc_msg id, int64_t tag,
-           const char * str )
+ipc_mkstr( const struct ipc_info * info, size_t * len, enum ipc_msg id,
+           int64_t tag, const char * str )
 {
     tr_benc pk, * val;
     uint8_t  * ret;
@@ -373,7 +385,7 @@ ipc_mkvers( size_t * len, const char * label )
 }
 
 uint8_t *
-ipc_mkgetinfo( struct ipc_info * info, size_t * len, enum ipc_msg id,
+ipc_mkgetinfo( const struct ipc_info * info, size_t * len, enum ipc_msg id,
                int64_t tag, int types, const int * ids )
 {
     tr_benc   pk, * top, * idlist, * typelist;
@@ -895,7 +907,7 @@ msglookup( const char * name )
 }
 
 static int
-gotmsg( struct ipc_info * info, tr_benc * name, tr_benc * val,
+gotmsg( const struct ipc_info * info, tr_benc * name, tr_benc * val,
         tr_benc * tagval, void * arg )
 {
     const struct msg * msg;
@@ -940,12 +952,12 @@ gotmsg( struct ipc_info * info, tr_benc * name, tr_benc * val,
 }
 
 static int
-handlemsgs( struct ipc_info * info, tr_benc * pay, void * arg )
+handlemsgs( const struct ipc_info * info, tr_benc * pay, void * arg )
 {
     tr_benc * name, * val, * tag;
     int          ii;
 
-    assert( HASVERS( info ) );
+    assert( ipc_hasvers( info ) );
 
     if( DICTPAYLOAD( info ) )
     {
@@ -1018,8 +1030,8 @@ ipc_parse( struct ipc_info * info, const uint8_t * buf, ssize_t total, void * ar
             }
             return -1;
         }
-        if( 0 > ( HASVERS( info ) ? handlemsgs( info, &benc, arg ) :
-                                    handlevers( info, &benc ) ) )
+        if( 0 > ( ipc_hasvers( info ) ? handlemsgs( info, &benc, arg ) :
+                                        handlevers( info, &benc ) ) )
         {
             SAFEBENCFREE( &benc );
             return -1;
@@ -1031,7 +1043,7 @@ ipc_parse( struct ipc_info * info, const uint8_t * buf, ssize_t total, void * ar
 }
 
 enum ipc_msg
-ipc_msgid( struct ipc_info * info, const char * name )
+ipc_msgid( const struct ipc_info * info, const char * name )
 {
     const struct msg * msg = msglookup( name );
 
@@ -1041,7 +1053,7 @@ ipc_msgid( struct ipc_info * info, const char * name )
 }
 
 int
-ipc_ishandled( struct ipc_info * info, enum ipc_msg id )
+ipc_ishandled( const struct ipc_info * info, enum ipc_msg id )
 {
     assert( MSGVALID( id ) );
 
@@ -1049,7 +1061,7 @@ ipc_ishandled( struct ipc_info * info, enum ipc_msg id )
 }
 
 int
-ipc_havetags( struct ipc_info * info )
+ipc_havetags( const struct ipc_info * info )
 {
     return !DICTPAYLOAD( info );
 }
