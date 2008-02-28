@@ -28,9 +28,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
 
 #include <glib.h>
@@ -39,6 +36,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
+#include <libtransmission/platform.h>
 
 #include "conf.h"
 #include "util.h"
@@ -72,47 +70,27 @@ cf_init(const char *dir, char **errstr)
 ***/
 
 /* errstr may be NULL, this might be called before GTK is initialized */
-static int
-lockfile(const char *file, char **errstr)
+static gboolean
+lockfile(const char * filename, char **errstr)
 {
-    int fd;
-    struct flock lk;
+    const int state = tr_lockfile( filename );
+    const gboolean success = state == TR_LOCKFILE_SUCCESS;
 
-    if( errstr )
-        *errstr = NULL;
-
-    fd = open( file, O_RDWR | O_CREAT, 0666 );
-    if( fd < 0 )
-    { 
-        const int savederr = errno;
-        if( errstr )
-            *errstr = g_strdup_printf(
-                          _("Failed to open the file %s for writing:\n%s"),
-                          file, g_strerror( errno ) );
-        errno = savederr;
-        return -1;
+    if( errstr ) switch( state ) {
+        case TR_LOCKFILE_EOPEN:
+            *errstr = g_strdup_printf( _("Failed to open lockfile %s: %s"),
+                                       filename, g_strerror( errno ) );
+            break;
+        case TR_LOCKFILE_ELOCK:
+            *errstr = g_strdup_printf( _( "%s is already running." ),
+                                       g_get_application_name( ) );
+            break;
+        case TR_LOCKFILE_SUCCESS:
+            *errstr = NULL;
+            break;
     }
 
-    memset( &lk, 0,  sizeof( lk ) );
-    lk.l_start = 0;
-    lk.l_len = 0;
-    lk.l_type = F_WRLCK;
-    lk.l_whence = SEEK_SET;
-    if( -1 == fcntl( fd, F_SETLK, &lk ) )
-    {
-        const int savederr = errno;
-        if( errstr )
-            *errstr = ( errno == EAGAIN )
-                ? g_strdup_printf( _( "Another copy of %s is already running." ),
-                                   g_get_application_name( ) )
-                : g_strdup_printf( _( "Failed to lock the file %s:\n%s" ),
-                                  file, g_strerror( errno ) );
-        close( fd );
-        errno = savederr;
-        return -1;
-    }
-
-    return fd;
+    return success;
 }
 
 static char*
@@ -134,12 +112,12 @@ gboolean
 cf_lock( char ** errstr )
 {
     char * path = getLockFilename( );
-    int fd = lockfile( path, errstr );
-    if( fd >= 0 )
+    const gboolean didLock = lockfile( path, errstr );
+    if( didLock )
         gl_lockpath = g_strdup( path );
     g_atexit( cf_removelocks );
     g_free( path );
-    return fd >= 0;
+    return didLock;
 }
 
 char*

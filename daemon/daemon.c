@@ -32,7 +32,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <event.h>
-#include <fcntl.h>
 #include <getopt.h>
 #include <signal.h>
 #include <stdarg.h>
@@ -42,6 +41,7 @@
 #include <unistd.h>
 
 #include <libtransmission/trcompat.h>
+#include <libtransmission/platform.h>
 #include <libtransmission/version.h>
 
 #include "errors.h"
@@ -52,14 +52,12 @@
 static void usage       ( const char *, ... );
 static void readargs    ( int, char **, int *, int *, char **, char ** );
 static int  trylocksock ( const char * );
-static int  getlock     ( const char * );
 static int  getsock     ( const char * );
 static void exitcleanup ( void );
 static void setupsigs   ( struct event_base * );
 static void gotsig      ( int, short, void * );
 static int  savepid     ( const char * );
 
-static int  gl_lockfd               = -1;
 static char gl_lockpath[MAXPATHLEN] = "";
 static int  gl_sockfd               = -1;
 static char gl_sockpath[MAXPATHLEN] = "";
@@ -183,6 +181,28 @@ readargs( int argc, char ** argv, int * nofork, int * debug, char ** sock,
     }
 }
 
+static int
+getlock( const char * filename )
+{
+    const int state = tr_lockfile( filename );
+    const int success = state == TR_LOCKFILE_SUCCESS;
+
+    if( !success ) switch( state ) {
+        case TR_LOCKFILE_EOPEN:
+            errnomsg( "failed to open file: %s", filename );
+            break;
+        case TR_LOCKFILE_ELOCK:
+            errmsg( "another copy of %s is already running", getmyname() );
+            break;
+        default:
+            errmsg( "unhandled tr_lockfile error: %d", state );
+            break;
+    }
+
+    return success;
+}
+
+
 int
 trylocksock( const char * sockpath )
 {
@@ -197,12 +217,8 @@ trylocksock( const char * sockpath )
     }
 
     confpath( path, sizeof path, CONF_FILE_LOCK, 0 );
-    fd = getlock( path );
-    if( 0 > fd )
-    {
+    if( !getlock( path ) )
         return -1;
-    }
-    gl_lockfd = fd;
     strlcpy( gl_lockpath, path, sizeof gl_lockpath );
 
     if( NULL == sockpath )
@@ -217,46 +233,6 @@ trylocksock( const char * sockpath )
     }
     gl_sockfd = fd;
     strlcpy( gl_sockpath, sockpath, sizeof gl_sockpath );
-
-    return fd;
-}
-
-int
-getlock( const char * path )
-{
-    struct flock lk;
-    int          fd;
-    char         pid[64];
-
-    fd = open( path, O_RDWR | O_CREAT, 0666 );
-    if( 0 > fd )
-    {
-        errnomsg( "failed to open file: %s", path );
-        return -1;
-    }
-
-    memset( &lk, 0, sizeof lk );
-    lk.l_start  = 0;
-    lk.l_len    = 0;
-    lk.l_type   = F_WRLCK;
-    lk.l_whence = SEEK_SET;
-    if( 0 > fcntl( fd, F_SETLK, &lk ) )
-    {
-        if( EAGAIN == errno )
-        {
-            errmsg( "another copy of %s is already running", getmyname() );
-        }
-        else
-        {
-            errnomsg( "failed to obtain lock on file: %s", path );
-        }
-        close( fd );
-        return -1;
-    }
-
-    ftruncate( fd, 0 );
-    snprintf( pid, sizeof pid, "%i\n", getpid() );
-    write( fd, pid, strlen( pid ) );
 
     return fd;
 }
@@ -305,11 +281,9 @@ exitcleanup( void )
     {
         unlink( gl_pidfile );
     }
-    if( 0 <= gl_lockfd )
-    {
+
+    if( *gl_lockpath )
         unlink( gl_lockpath );
-        close( gl_lockfd );
-    }
 }
 
 void
