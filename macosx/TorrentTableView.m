@@ -48,6 +48,8 @@
 
 - (BOOL) pointInGroupStatusRect: (NSPoint) point;
 
+- (void) setGroupStatusColumns;
+
 - (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files;
 
 - (void) resizePiecesBarIncrement;
@@ -88,6 +90,10 @@
             fCollapsedGroups = [[NSUnarchiver unarchiveObjectWithData: groupData] mutableCopy];
         else
             fCollapsedGroups = [[NSMutableIndexSet alloc] init];
+        
+        //set group columns to show ratio (nib is set to speeds)
+        if ([fDefaults boolForKey: @"DisplayGroupRowRatio"])
+            [self setGroupStatusColumns];
         
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
@@ -345,7 +351,8 @@
     if ([self pointInGroupStatusRect: point])
     {
         [fDefaults setBool: ![fDefaults boolForKey: @"DisplayGroupRowRatio"] forKey: @"DisplayGroupRowRatio"];
-        [self reloadData];
+        [self setGroupStatusColumns];
+        
         return;
     }
     
@@ -774,6 +781,23 @@
     return [ident isEqualToString: @"UL"] || [ident isEqualToString: @"UL Image"]
             || (([ident isEqualToString: @"DL"] || [ident isEqualToString: @"DL Image"])
             && ![fDefaults boolForKey: @"DisplayGroupRowRatio"]);
+}
+
+- (void) setGroupStatusColumns
+{
+    BOOL ratio = [fDefaults boolForKey: @"DisplayGroupRowRatio"];
+    
+    NSTableColumn * dlTableColumn = [self tableColumnWithIdentifier: @"DL"];
+    if ([dlTableColumn isHidden] == ratio)
+        return;
+    
+    [dlTableColumn setHidden: ratio];
+    [[self tableColumnWithIdentifier: @"DL Image"] setHidden: ratio];
+    
+    [[self tableColumnWithIdentifier: @"UL Image"] setWidth: ratio ? 10.0 : 8.0];
+    
+    NSTableColumn * groupTableColumn = [self tableColumnWithIdentifier: @"Group"];
+    [groupTableColumn setWidth: [groupTableColumn width] + (ratio ? -2.0 : 2.0)];
 }
 
 - (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files

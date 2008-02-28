@@ -2497,18 +2497,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                 : [NSImage imageNamed: NSImageNameStopProgressTemplate];
         }
         else if ([ident isEqualToString: @"DL Image"])
-            return ![fDefaults boolForKey: @"DisplayGroupRowRatio"] ? [NSImage imageNamed: @"DownArrowGroupTemplate.png"] : nil;
+            return [NSImage imageNamed: @"DownArrowGroupTemplate.png"];
         else if ([ident isEqualToString: @"UL Image"])
             return [NSImage imageNamed: [fDefaults boolForKey: @"DisplayGroupRowRatio"]
                                         ? @"YingYangGroupTemplate.png" : @"UpArrowGroupTemplate.png"];
         else
         {
-            BOOL upload = [ident isEqualToString: @"UL"];
             if ([fDefaults boolForKey: @"DisplayGroupRowRatio"])
             {
-                if (!upload)
-                    return nil;
-                
                 uint64_t uploaded = 0, downloaded = 0;
                 NSEnumerator * enumerator = [[item objectForKey: @"Torrents"] objectEnumerator];
                 Torrent * torrent;
@@ -2522,6 +2518,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             }
             else
             {
+                BOOL upload = [ident isEqualToString: @"UL"];
+                
                 float rate = 0.0;
                 NSEnumerator * enumerator = [[item objectForKey: @"Torrents"] objectEnumerator];
                 Torrent * torrent;
