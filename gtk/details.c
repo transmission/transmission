@@ -886,10 +886,10 @@ activity_page_new (TrTorrent * gtor)
   hig_workarea_add_section_title (t, &row, _("Dates"));
 
     l = a->date_added_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, _("Date added:"), l, NULL);
+    hig_workarea_add_row (t, &row, _("Started at:"), l, NULL);
 
     l = a->last_activity_lb = gtk_label_new (NULL);
-    hig_workarea_add_row (t, &row, _("Last activity"), l, NULL);
+    hig_workarea_add_row (t, &row, _("Last activity at:"), l, NULL);
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_finish (t, &row);
