@@ -22,26 +22,20 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <signal.h>
 #include <stdarg.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <stdlib.h> /* free() */
+#include <string.h> /* strcmp() */
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
 #include <libevent/evhttp.h>
 
+#include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
+
 #include "conf.h"
 #include "tr-prefs.h"
-#include "tr-torrent.h"
 #include "util.h"
-
-static void
-errcb(GtkWidget *wind, int resp, gpointer data);
 
 int
 tr_strcmp( const char * a, const char * b )
@@ -266,6 +260,50 @@ sizingmagic( GtkWindow         * wind,
     gtk_scrolled_window_set_policy( scroll, hscroll, vscroll );
 }
 
+static void
+errcb(GtkWidget *widget, int resp UNUSED, gpointer data) {
+  GList *funcdata;
+  callbackfunc_t func;
+
+  if(NULL != data) {
+    funcdata = g_list_first(data);
+    func = (callbackfunc_t) funcdata->data;
+    data = funcdata->next->data;
+    func(data);
+    g_list_free(funcdata);
+  }
+
+  gtk_widget_destroy(widget);
+}
+
+static GtkWidget *
+verrmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
+              const char * format, va_list ap )
+{
+  GtkWidget *dialog;
+  char *msg;
+  GList *funcdata;
+
+  msg = g_strdup_vprintf(format, ap);
+
+  if(NULL == wind)
+    dialog = gtk_message_dialog_new(
+      NULL, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", msg);
+  else
+    dialog = gtk_message_dialog_new(wind,
+      GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+      GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", msg);
+
+  if(NULL == func)
+    funcdata = NULL;
+  else
+      funcdata = g_list_append(g_list_append(NULL, (void *) func), data);
+  g_signal_connect(dialog, "response", G_CALLBACK(errcb), funcdata);
+  g_free(msg);
+
+  return dialog;
+}
+
 void
 errmsg( GtkWindow * wind, const char * format, ... )
 {
@@ -299,50 +337,6 @@ errmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
     va_end( ap );
 
     return dialog;
-}
-
-GtkWidget *
-verrmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
-              const char * format, va_list ap )
-{
-  GtkWidget *dialog;
-  char *msg;
-  GList *funcdata;
-
-  msg = g_strdup_vprintf(format, ap);
-
-  if(NULL == wind)
-    dialog = gtk_message_dialog_new(
-      NULL, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", msg);
-  else
-    dialog = gtk_message_dialog_new(wind,
-      GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-      GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", msg);
-
-  if(NULL == func)
-    funcdata = NULL;
-  else
-      funcdata = g_list_append(g_list_append(NULL, (void *) func), data);
-  g_signal_connect(dialog, "response", G_CALLBACK(errcb), funcdata);
-  g_free(msg);
-
-  return dialog;
-}
-
-static void
-errcb(GtkWidget *widget, int resp UNUSED, gpointer data) {
-  GList *funcdata;
-  callbackfunc_t func;
-
-  if(NULL != data) {
-    funcdata = g_list_first(data);
-    func = (callbackfunc_t) funcdata->data;
-    data = funcdata->next->data;
-    func(data);
-    g_list_free(funcdata);
-  }
-
-  gtk_widget_destroy(widget);
 }
 
 typedef void (PopupFunc)(GtkWidget*, GdkEventButton*); 

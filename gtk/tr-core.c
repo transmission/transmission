@@ -28,7 +28,7 @@
 #include <glib/gi18n.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_strcmp */
+#include <libtransmission/utils.h> /* tr_free */
 
 #include "conf.h"
 #include "tr-core.h"

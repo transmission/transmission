@@ -101,11 +101,6 @@ GtkWidget *
 errmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
              const char * format, ... ) G_GNUC_PRINTF(4,5);
 
-/* varargs version of errmsg_full() */
-GtkWidget *
-verrmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
-              const char * format, va_list ap );
-
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
 gboolean
