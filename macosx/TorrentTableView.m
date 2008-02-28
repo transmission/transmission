@@ -779,8 +779,7 @@
     
     NSString * ident = [[[self tableColumns] objectAtIndex: [self columnAtPoint: point]] identifier];
     return [ident isEqualToString: @"UL"] || [ident isEqualToString: @"UL Image"]
-            || (([ident isEqualToString: @"DL"] || [ident isEqualToString: @"DL Image"])
-            && ![fDefaults boolForKey: @"DisplayGroupRowRatio"]);
+            || [ident isEqualToString: @"DL"] || [ident isEqualToString: @"DL Image"];
 }
 
 - (void) setGroupStatusColumns
