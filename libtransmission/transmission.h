@@ -422,8 +422,9 @@ typedef struct tr_info tr_info;
  * Returns TR_EDUPLICATE if it parsed but can't be added. 
  *     "destination" must be set to test for TR_EDUPLICATE.
  *
- * If "setme_info" is non-NULL, the parsed metainfo is stored there
- * and will need to be freed by the caller via tr_metainfoFree().
+ * If parsing is successful and setme_info is non-NULL, the parsed
+ * metainfo is stored there and will need to be freed by the caller
+ * via tr_metainfoFree().
  */
 int tr_torrentParse( const tr_handle  * handle,
                      const tr_ctor    * ctor,
