@@ -1071,6 +1071,7 @@ doAction ( const char * action_name, gpointer user_data )
         GList * l = NULL;
         GtkTreeSelection * s = tr_window_get_selection(data->wind);
         gtk_tree_selection_selected_foreach( s, accumulateSelectedTorrents, &l );
+        gtk_tree_selection_unselect_all( s );
         if( l != NULL )
             confirmDelete( data->wind, data->core, l );
     }
