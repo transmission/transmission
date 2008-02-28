@@ -45,6 +45,9 @@
 
 - (BOOL) pointInProgressRect: (NSPoint) point;
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point;
+
+- (BOOL) pointInGroupStatusRect: (NSPoint) point;
+
 - (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files;
 
 - (void) resizePiecesBarIncrement;
@@ -337,6 +340,14 @@
 - (void) mouseDown: (NSEvent *) event
 {
     NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+    
+    //check to toggle group status before anything else
+    if ([self pointInGroupStatusRect: point])
+    {
+        [fDefaults setBool: ![fDefaults boolForKey: @"DisplayGroupRowRatio"] forKey: @"DisplayGroupRowRatio"];
+        [self reloadData];
+        return;
+    }
     
     BOOL pushed = [self pointInControlRect: point] || [self pointInRevealRect: point] || [self pointInActionRect: point]
                     || [self pointInProgressRect: point] || [self pointInMinimalStatusRect: point];
@@ -751,6 +762,18 @@
         [cell setRepresentedObject: [self itemAtRow: row]];
     }
     return NSPointInRect(point, [cell minimalStatusRectForBounds: [self rectOfRow: row]]);
+}
+
+- (BOOL) pointInGroupStatusRect: (NSPoint) point
+{
+    int row = [self rowAtPoint: point];
+    if (row < 0 || [[self itemAtRow: row] isKindOfClass: [Torrent class]])
+        return NO;
+    
+    NSString * ident = [[[self tableColumns] objectAtIndex: [self columnAtPoint: point]] identifier];
+    return [ident isEqualToString: @"UL"] || [ident isEqualToString: @"UL Image"]
+            || (([ident isEqualToString: @"DL"] || [ident isEqualToString: @"DL Image"])
+            && ![fDefaults boolForKey: @"DisplayGroupRowRatio"]);
 }
 
 - (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files

@@ -42,6 +42,7 @@
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 #import "SpeedLimitToTurtleIconTransformer.h"
+#include "utils.h" //tr_getRatio()
 
 #import <Sparkle/Sparkle.h>
 
@@ -2495,21 +2496,40 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             return group != -1 ? [[GroupsWindowController groups] imageForIndex: group isSmall: YES]
                                 : [NSImage imageNamed: NSImageNameStopProgressTemplate];
         }
-        else if ([ident isEqualToString: @"UL Image"])
-            return [NSImage imageNamed: @"UpArrowGroupTemplate.png"];
         else if ([ident isEqualToString: @"DL Image"])
-            return [NSImage imageNamed: @"DownArrowGroupTemplate.png"];
+            return ![fDefaults boolForKey: @"DisplayGroupRowRatio"] ? [NSImage imageNamed: @"DownArrowGroupTemplate.png"] : nil;
+        else if ([ident isEqualToString: @"UL Image"])
+            return [NSImage imageNamed: [fDefaults boolForKey: @"DisplayGroupRowRatio"]
+                                        ? @"YingYangTemplate.png" : @"UpArrowGroupTemplate.png"];
         else
         {
             BOOL upload = [ident isEqualToString: @"UL"];
-            
-            float rate = 0.0;
-            NSEnumerator * enumerator = [[item objectForKey: @"Torrents"] objectEnumerator];
-            Torrent * torrent;
-            while ((torrent = [enumerator nextObject]))
-                rate += upload ? [torrent uploadRate] : [torrent downloadRate];
-            
-            return [NSString stringForSpeed: rate];
+            if ([fDefaults boolForKey: @"DisplayGroupRowRatio"])
+            {
+                if (!upload)
+                    return nil;
+                
+                uint64_t uploaded = 0, downloaded = 0;
+                NSEnumerator * enumerator = [[item objectForKey: @"Torrents"] objectEnumerator];
+                Torrent * torrent;
+                while ((torrent = [enumerator nextObject]))
+                {
+                    uploaded += [torrent uploadedTotal];
+                    downloaded += [torrent downloadedTotal];
+                }
+                
+                return [NSString stringForRatio: tr_getRatio(uploaded, downloaded)];
+            }
+            else
+            {
+                float rate = 0.0;
+                NSEnumerator * enumerator = [[item objectForKey: @"Torrents"] objectEnumerator];
+                Torrent * torrent;
+                while ((torrent = [enumerator nextObject]))
+                    rate += upload ? [torrent uploadRate] : [torrent downloadRate];
+                
+                return [NSString stringForSpeed: rate];
+            }
         }
     }
     else
