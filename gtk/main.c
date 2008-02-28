@@ -67,9 +67,6 @@
 /* interval in milliseconds to check for stopped torrents and update display */
 #define EXIT_CHECK_INTERVAL     500
 
-/* number of fatal signals required to cause an immediate exit */
-#define SIGCOUNT_MAX            3
-
 #if GTK_CHECK_VERSION(2,8,0)
 #define SHOW_LICENSE
 static const char * LICENSE = 
@@ -123,8 +120,6 @@ struct cbdata
 
 static GtkUIManager * myUIManager = NULL;
 
-static sig_atomic_t global_sigcount = 0;
-
 static gboolean
 sendremote( GList * files, gboolean sendquit );
 static void
@@ -154,11 +149,6 @@ static void
 prefschanged( TrCore * core, const char * key, gpointer data );
 static gboolean
 updatemodel(gpointer gdata);
-
-static void
-setupsighandlers(void);
-static void
-fatalsig(int sig);
 
 struct counts_data
 {
@@ -232,6 +222,35 @@ windowStateChanged( GtkWidget * widget UNUSED, GdkEventWindowState * event, gpoi
         struct cbdata * cbdata = gdata;
         cbdata->minimized = ( event->new_window_state & GDK_WINDOW_STATE_ICONIFIED ) ? 1 : 0;
     }
+}
+
+static sig_atomic_t global_sigcount = 0;
+
+static void
+fatalsig( int sig )
+{
+    static const int SIGCOUNT_MAX = 3; /* revert to default handler after this many */
+
+    if( ++global_sigcount >= SIGCOUNT_MAX )
+    {
+        signal( sig, SIG_DFL );
+        raise( sig );
+    }
+}
+
+
+static void
+setupsighandlers( void )
+{
+#ifdef G_OS_WIN32
+  const int sigs[] = { SIGINT, SIGTERM };
+#else
+  const int sigs[] = { SIGHUP, SIGINT, SIGQUIT, SIGTERM };
+#endif
+  guint i;
+
+  for( i=0; i<G_N_ELEMENTS(sigs); ++i )
+      signal( sigs[i], fatalsig );
 }
 
 int
@@ -1132,29 +1151,4 @@ doAction ( const char * action_name, gpointer user_data )
 
     if( changed )
         updatemodel( data );
-}
-
-
-static void
-setupsighandlers(void) {
-  int sigs[] = {SIGHUP, SIGINT, SIGQUIT, SIGTERM};
-  struct sigaction sa;
-  int ii;
-
-  memset(&sa, 0,  sizeof(sa));
-  sa.sa_handler = fatalsig;
-  for(ii = 0; ii < ALEN(sigs); ii++)
-    sigaction(sigs[ii], &sa, NULL);
-}
-
-static void
-fatalsig(int sig) {
-  struct sigaction sa;
-
-  if(SIGCOUNT_MAX <= ++global_sigcount) {
-    memset(&sa, 0,  sizeof(sa));
-    sa.sa_handler = SIG_DFL;
-    sigaction(sig, &sa, NULL);
-    raise(sig);
-  }
 }
