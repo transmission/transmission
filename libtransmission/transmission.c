@@ -212,7 +212,7 @@ tr_globalUnlock( struct tr_handle * handle )
 int
 tr_globalIsLocked( const struct tr_handle * handle )
 {
-    return tr_lockHave( handle->lock );
+    return handle && tr_lockHave( handle->lock );
 }
 
 /***********************************************************************

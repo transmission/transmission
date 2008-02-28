@@ -95,16 +95,10 @@ struct tr_thread
     void          (* func ) ( void * );
     void           * arg;
     const char     * name;
-
-#ifdef __BEOS__
-    thread_id        thread;
-#elif defined(WIN32)
-    HANDLE           thread;
-    unsigned int     thread_id;
-#else
-    pthread_t        thread;
+    tr_thread_id     thread;
+#ifdef WIN32
+    HANDLE           thread_handle;
 #endif
-
 };
 
 int
@@ -147,18 +141,20 @@ tr_threadNew( void (*func)(void *),
               const char * name )
 {
     tr_thread * t = tr_new0( tr_thread, 1 );
-    t->func = func;
-    t->arg  = arg;
-    t->name = name;
 
 #ifdef __BEOS__
     t->thread = spawn_thread( (void*)ThreadFunc, name, B_NORMAL_PRIORITY, t );
     resume_thread( t->thread );
 #elif defined(WIN32)
-    t->thread = (HANDLE) _beginthreadex( NULL, 0, &ThreadFunc, t, 0, &t->thread_id );
+    unsigned id;
+    t->thread_handle = (HANDLE) _beginthreadex( NULL, 0, &ThreadFunc, t, 0, &id );
+    t->thread = (DWORD) id;
 #else
     pthread_create( &t->thread, NULL, (void * (*) (void *)) ThreadFunc, t );
 #endif
+    t->func = func;
+    t->arg  = arg;
+    t->name = name;
 
     return t;
 }
@@ -172,8 +168,8 @@ tr_threadJoin( tr_thread * t )
         long exit;
         wait_for_thread( t->thread, &exit );
 #elif defined(WIN32)
-        WaitForSingleObject( t->thread, INFINITE );
-        CloseHandle( t->thread );
+        WaitForSingleObject( t->thread_handle, INFINITE );
+        CloseHandle( t->thread_handle );
 #else
         pthread_join( t->thread, NULL );
 #endif
