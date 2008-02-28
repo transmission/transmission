@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <assert.h>
+#include <ctype.h> /* isalpha */
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -195,8 +196,8 @@ tr_msg( const char * file, int line, int level, const char * fmt, ... )
 {
     FILE * fp;
 
-    assert( NULL != messageLock );
-    tr_lockLock( messageLock );
+    if( messageLock )
+        tr_lockLock( messageLock );
 
     fp = tr_getLog( );
 
@@ -243,7 +244,8 @@ tr_msg( const char * file, int line, int level, const char * fmt, ... )
         }
     }
 
-    tr_lockUnlock( messageLock );
+    if( messageLock )
+        tr_lockUnlock( messageLock );
 }
 
 int tr_rand( int sup )
@@ -407,6 +409,8 @@ tr_mkdir( const char * path, int permissions
                                                     )
 {
 #ifdef WIN32
+    if( path && isalpha(path[0]) && path[1]==':' && !path[2] )
+        return 0;
     return mkdir( path );
 #else
     return mkdir( path, permissions );
