@@ -219,6 +219,19 @@
             : [[self preparedCellAtColumn: [self columnWithIdentifier: @"Group"] row: [self rowForItem: item]] stringValue];
 }
 
+- (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
+                tableColumn: (NSTableColumn *) column item: (id) item mouseLocation: (NSPoint) mouseLocation
+{
+    NSString * ident = [column identifier];
+    if ([ident isEqualToString: @"DL"] || [ident isEqualToString: @"DL Image"])
+        return NSLocalizedString(@"Download speed", "Torrent table -> group row -> tooltip");
+    else if ([ident isEqualToString: @"UL"] || [ident isEqualToString: @"UL Image"])
+        return [fDefaults boolForKey: @"DisplayGroupRowRatio"] ? NSLocalizedString(@"Ratio", "Torrent table -> group row -> tooltip")
+                : NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
+    else
+        return nil;
+}
+
 - (void) updateTrackingAreas
 {
     [super updateTrackingAreas];
