@@ -2500,7 +2500,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             return ![fDefaults boolForKey: @"DisplayGroupRowRatio"] ? [NSImage imageNamed: @"DownArrowGroupTemplate.png"] : nil;
         else if ([ident isEqualToString: @"UL Image"])
             return [NSImage imageNamed: [fDefaults boolForKey: @"DisplayGroupRowRatio"]
-                                        ? @"YingYangTemplate.png" : @"UpArrowGroupTemplate.png"];
+                                        ? @"YingYangGroupTemplate.png" : @"UpArrowGroupTemplate.png"];
         else
         {
             BOOL upload = [ident isEqualToString: @"UL"];

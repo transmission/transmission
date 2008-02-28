@@ -67,6 +67,7 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A200B9200A22798F007BBB1E /* InfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A200B83A0A2263BA007BBB1E /* InfoWindowController.m */; };
+		A2012AE20D77151D0056FD71 /* YingYangGroupTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2012AE10D77151D0056FD71 /* YingYangGroupTemplate.png */; };
 		A20152640D1C1BE70081714F /* PinTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A20152630D1C1BE70081714F /* PinTemplate.png */; };
 		A201527E0D1C270F0081714F /* torrent-ctor.c in Sources */ = {isa = PBXBuildFile; fileRef = A20152790D1C26EB0081714F /* torrent-ctor.c */; };
 		A2085DDC0C53BC74000BC3B7 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */; };
@@ -426,6 +427,7 @@
 		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
+		A2012AE10D77151D0056FD71 /* YingYangGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = YingYangGroupTemplate.png; path = macosx/Images/YingYangGroupTemplate.png; sourceTree = "<group>"; };
 		A20152630D1C1BE70081714F /* PinTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PinTemplate.png; path = macosx/Images/PinTemplate.png; sourceTree = "<group>"; };
 		A20152790D1C26EB0081714F /* torrent-ctor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "torrent-ctor.c"; path = "libtransmission/torrent-ctor.c"; sourceTree = "<group>"; };
 		A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = macosx/AboutWindowController.h; sourceTree = "<group>"; };
@@ -929,6 +931,7 @@
 				A2F1511F0CD438BA001F3B0E /* Lock.png */,
 				A245030B0D6A1FB000B49D00 /* UpArrowGroupTemplate.png */,
 				A245030D0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png */,
+				A2012AE10D77151D0056FD71 /* YingYangGroupTemplate.png */,
 				A29AF4F80D01BAEB00D097EC /* UpArrowTemplate.png */,
 				A29AF4F60D01BADC00D097EC /* DownArrowTemplate.png */,
 				A2F41DAA0D0B916B006CE378 /* YingYangTemplate.png */,
@@ -1664,6 +1667,7 @@
 				A245030C0D6A1FB000B49D00 /* UpArrowGroupTemplate.png in Resources */,
 				A245030E0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png in Resources */,
 				A2F41F8E0D73595100B82116 /* InfoTracker.png in Resources */,
+				A2012AE20D77151D0056FD71 /* YingYangGroupTemplate.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
