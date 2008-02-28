@@ -197,12 +197,12 @@ myDebug( const char * file, int line, const Torrent * t, const char * fmt, ... )
 **/
 
 static void
-managerLock( struct tr_peerMgr * manager )
+managerLock( const struct tr_peerMgr * manager )
 {
     tr_globalLock( manager->handle );
 }
 static void
-managerUnlock( struct tr_peerMgr * manager )
+managerUnlock( const struct tr_peerMgr * manager )
 {
     tr_globalUnlock( manager->handle );
 }
@@ -1214,7 +1214,7 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
     tr_pex * pex;
     tr_pex * walk;
 
-    torrentLock( (Torrent*)t );
+    managerLock( manager );
 
     peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
     pex = walk = tr_new( tr_pex, peerCount );
@@ -1236,7 +1236,7 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
     qsort( pex, peerCount, sizeof(tr_pex), tr_pexCompare );
     *setme_pex = pex;
 
-    torrentUnlock( (Torrent*)t );
+    managerUnlock( manager );
 
     return peerCount;
 }
