@@ -139,6 +139,10 @@ promptfordir( GtkWindow * parent, TrCore * core, GList * files, tr_ctor * ctor )
                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                          GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
                                          NULL );
+    gtk_dialog_set_alternative_button_order( GTK_DIALOG( wind ),
+                                             GTK_RESPONSE_ACCEPT,
+                                             GTK_RESPONSE_CANCEL,
+                                             -1 );
     gtk_file_chooser_set_local_only( GTK_FILE_CHOOSER( wind ), TRUE );
     gtk_file_chooser_set_select_multiple( GTK_FILE_CHOOSER( wind ), FALSE );
     if( tr_ctorGetDestination( ctor, TR_FORCE, &str ) )
@@ -259,11 +263,14 @@ askquit( TrCore          * core,
     gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG(wind),
                                               _("This will close all active torrents."));
     gtk_dialog_add_buttons( GTK_DIALOG(wind),
-                            GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+                            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                             GTK_STOCK_QUIT, GTK_RESPONSE_ACCEPT,
                             NULL );
     gtk_dialog_set_default_response( GTK_DIALOG( wind ),
                                      GTK_RESPONSE_ACCEPT );
+    gtk_dialog_set_alternative_button_order( GTK_DIALOG( wind ),
+                                     GTK_RESPONSE_ACCEPT,
+                                     GTK_RESPONSE_CANCEL );
 
     dontask = gtk_check_button_new_with_mnemonic( _("_Don't Ask Me This Again") );
     stuff->dontask = dontask;
@@ -302,7 +309,7 @@ static void
 deleteResponse( GtkDialog * dialog, gint response, gpointer gdata )
 {
     struct DeleteData * data = gdata;
-    const int del = response == GTK_RESPONSE_YES;
+    const int del = response == GTK_RESPONSE_ACCEPT;
     const int deleteFiles = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->delete_files_tb ) );
     GList * l;
 
@@ -339,9 +346,13 @@ confirmDelete( GtkWindow * parent,
     d = gtk_dialog_new_with_buttons( _( "Remove Torrent" ),
                                      parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT|GTK_DIALOG_NO_SEPARATOR,
-                                     GTK_STOCK_NO, GTK_RESPONSE_NO,
-                                     GTK_STOCK_YES, GTK_RESPONSE_YES,
+                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                     GTK_STOCK_REMOVE, GTK_RESPONSE_ACCEPT,
                                      NULL );
+    gtk_dialog_set_alternative_button_order( GTK_DIALOG( d ),
+                                             GTK_RESPONSE_ACCEPT,
+                                             GTK_RESPONSE_CANCEL,
+                                             -1 );
     g_signal_connect( d, "response", G_CALLBACK( deleteResponse ), dd );
 
     t = gtk_table_new( 3, 2, FALSE );

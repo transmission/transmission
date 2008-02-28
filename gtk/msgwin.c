@@ -193,6 +193,10 @@ save_cb( GtkWidget * w, GtkTextBuffer * textbuf )
                                                GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                                GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
                                                NULL );
+  gtk_dialog_set_alternative_button_order( GTK_DIALOG( d ),
+                                           GTK_RESPONSE_ACCEPT,
+                                           GTK_RESPONSE_CANCEL,
+                                           -1 );
   g_signal_connect( d, "response",
                     G_CALLBACK( save_dialog_response_cb ), textbuf );
   gtk_widget_show( d );

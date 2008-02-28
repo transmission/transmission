@@ -148,6 +148,12 @@ makeaddwind( GtkWindow  * parent,
             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
             GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
             NULL );
+    gtk_dialog_set_default_response( GTK_DIALOG( d ),
+                                     GTK_RESPONSE_ACCEPT );
+    gtk_dialog_set_alternative_button_order( GTK_DIALOG( d ),
+                                             GTK_RESPONSE_ACCEPT,
+                                             GTK_RESPONSE_CANCEL,
+                                             -1 );
 
     if( tr_ctorGetDestination( ctor, TR_FORCE, &str ) )
         g_assert_not_reached( );
