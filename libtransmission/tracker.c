@@ -288,17 +288,13 @@ parseBencResponse( struct evhttp_request * req, tr_benc * setme )
     return tr_bencLoad( body, bodylen, setme, NULL );
 }
 
-static const char*
+static void
 updateAddresses( tr_tracker * t, const struct evhttp_request * req, int * tryAgain )
 {
-    const char * ret = NULL;
     int moveToNextAddress = FALSE;
 
-    if( !req )
+    if( !req ) /* tracker didn't respond */
     {
-        ret = "Tracker hasn't responded yet.  Retrying...";
-        tr_inf( ret );
-
         moveToNextAddress = TRUE;
     }
     else if( req->response_code == HTTP_OK )
@@ -351,13 +347,8 @@ updateAddresses( tr_tracker * t, const struct evhttp_request * req, int * tryAga
         {
             *tryAgain = FALSE;
             t->addressIndex = 0;
-            ret = "Tracker hasn't responded yet.  Retrying...";
-            tr_inf( ret );
         }
     }
-
-
-    return ret;
 }
 
 /* Convert to compact form */
@@ -402,7 +393,6 @@ parseOldPeers( tr_benc * bePeers, int * setmePeerCount )
 static void
 onTrackerResponse( struct evhttp_request * req, void * vhash )
 {
-    const char * warning;
     int tryAgain;
     int responseCode;
     struct torrent_hash * torrent_hash = (struct torrent_hash*) vhash;
@@ -495,10 +485,7 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
             tr_bencFree( &benc );
     }
 
-    if (( warning = updateAddresses( t, req, &tryAgain ) )) {
-        publishWarning( t, warning );
-        tr_err( warning );
-    }
+    updateAddresses( t, req, &tryAgain );
 
     /**
     ***
@@ -569,7 +556,6 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
 static void
 onScrapeResponse( struct evhttp_request * req, void * vhash )
 {
-    const char * warning;
     int tryAgain;
     time_t nextScrapeSec = 60;
     struct torrent_hash * torrent_hash = (struct torrent_hash*) vhash;
@@ -638,11 +624,7 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
             tr_bencFree( &benc );
     }
 
-    if (( warning = updateAddresses( t, req, &tryAgain ) ))
-    {
-        tr_err( warning );
-        publishWarning( t, warning );
-    }
+    updateAddresses( t, req, &tryAgain );
 
     if( tryAgain ) 
         t->scrapeAt = time( NULL );
