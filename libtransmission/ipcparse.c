@@ -308,13 +308,13 @@ ipc_mkempty( const struct ipc_info * info, size_t * len, enum ipc_msg id,
              int64_t tag )
 {
     tr_benc pk;
-    uint8_t  * ret;
+    uint8_t  * ret = NULL;
 
-    if( NULL == ipc_initval( info, id, tag, &pk, TYPE_STR ) )
-        return NULL;
-
-    ret = ipc_mkval( &pk, len );
-    SAFEBENCFREE( &pk );
+    if( ipc_initval( info, id, tag, &pk, TYPE_STR ) )
+    {
+        ret = ipc_mkval( &pk, len );
+        SAFEBENCFREE( &pk );
+    }
 
     return ret;
 }
@@ -324,15 +324,14 @@ ipc_mkint( const struct ipc_info * info, size_t * len, enum ipc_msg id,
            int64_t tag, int64_t num )
 {
     tr_benc pk, * val;
-    uint8_t  * ret;
+    uint8_t  * ret = NULL;
 
-    val = ipc_initval( info, id, tag, &pk, TYPE_INT );
-    if( !val )
-        return NULL;
-
-    val->val.i = num;
-    ret = ipc_mkval( &pk, len );
-    SAFEBENCFREE( &pk );
+    if(( val = ipc_initval( info, id, tag, &pk, TYPE_INT )))
+    {
+        val->val.i = num;
+        ret = ipc_mkval( &pk, len );
+        SAFEBENCFREE( &pk );
+    }
 
     return ret;
 }
@@ -342,15 +341,14 @@ ipc_mkstr( const struct ipc_info * info, size_t * len, enum ipc_msg id,
            int64_t tag, const char * str )
 {
     tr_benc pk, * val;
-    uint8_t  * ret;
+    uint8_t  * ret = NULL;
 
-    val = ipc_initval( info, id, tag, &pk, TYPE_STR );
-    if( !val )
-        return NULL;
-
-    tr_bencInitStr( val, str, -1, 1 );
-    ret = ipc_mkval( &pk, len );
-    SAFEBENCFREE( &pk );
+    if(( val = ipc_initval( info, id, tag, &pk, TYPE_STR )))
+    {
+        tr_bencInitStr( val, str, -1, 1 );
+        ret = ipc_mkval( &pk, len );
+        SAFEBENCFREE( &pk );
+    }
 
     return ret;
 }
