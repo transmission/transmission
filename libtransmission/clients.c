@@ -69,6 +69,11 @@ char * tr_clientForId( const uint8_t * id )
             tr_asprintf( &ret, "Azureus %c.%c.%c.%c",
                       id[3], id[4], id[5], id[6] );
         }
+        else if( !memcmp( &id[1], "XL", 2 ) )
+        {
+            tr_asprintf( &ret, "Xunlei %c.%c.%c.%c",
+                         id[3], id[4], id[5], id[6] );
+        }
         else if( !memcmp( &id[1], "UT", 2 ) )
         {
             tr_asprintf( &ret, "\xc2\xb5Torrent %c.%d", id[3],
