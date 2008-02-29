@@ -1571,23 +1571,26 @@ static ReadState
 canRead( struct bufferevent * evin, void * vmsgs )
 {
     ReadState ret;
-    tr_peermsgs * msgs = (tr_peermsgs *) vmsgs;
-    struct evbuffer * inbuf = EVBUFFER_INPUT ( evin );
-    const size_t buflen = EVBUFFER_LENGTH( inbuf );
-    const size_t downloadMax = getDownloadMax( msgs );
-    const size_t n = MIN( buflen, downloadMax );
+    tr_peermsgs * msgs = vmsgs;
+    struct evbuffer * in = EVBUFFER_INPUT ( evin );
+    const size_t inlen = EVBUFFER_LENGTH( in );
 
-    if( !n )
+    if( !inlen )
     {
         ret = READ_DONE;
     }
+    else if( msgs->state == AWAITING_BT_PIECE )
+    {
+        const size_t downloadMax = getDownloadMax( msgs );
+        const size_t n = MIN( inlen, downloadMax );
+        ret = n ? readBtPiece( msgs, in, n ) : READ_DONE;
+    }
     else switch( msgs->state )
     {
-        case AWAITING_BT_LENGTH:  ret = readBtLength ( msgs, inbuf, n ); break;
-        case AWAITING_BT_ID:      ret = readBtId     ( msgs, inbuf, n ); break;
-        case AWAITING_BT_MESSAGE: ret = readBtMessage( msgs, inbuf, n ); break;
-        case AWAITING_BT_PIECE:   ret = readBtPiece  ( msgs, inbuf, n ); break;
-        default: assert( 0 );
+        case AWAITING_BT_LENGTH:  ret = readBtLength ( msgs, in, inlen ); break;
+        case AWAITING_BT_ID:      ret = readBtId     ( msgs, in, inlen ); break;
+        case AWAITING_BT_MESSAGE: ret = readBtMessage( msgs, in, inlen ); break;
+        default:                  assert( 0 );
     }
 
     return ret;
