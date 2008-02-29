@@ -141,20 +141,22 @@ tr_threadNew( void (*func)(void *),
               const char * name )
 {
     tr_thread * t = tr_new0( tr_thread, 1 );
+    t->func = func;
+    t->arg  = arg;
+    t->name = name;
 
 #ifdef __BEOS__
     t->thread = spawn_thread( (void*)ThreadFunc, name, B_NORMAL_PRIORITY, t );
     resume_thread( t->thread );
 #elif defined(WIN32)
-    unsigned id;
-    t->thread_handle = (HANDLE) _beginthreadex( NULL, 0, &ThreadFunc, t, 0, &id );
-    t->thread = (DWORD) id;
+    {
+        unsigned int id;
+        t->thread_handle = (HANDLE) _beginthreadex( NULL, 0, &ThreadFunc, t, 0, &id );
+        t->thread = (DWORD) id;
+    }
 #else
     pthread_create( &t->thread, NULL, (void * (*) (void *)) ThreadFunc, t );
 #endif
-    t->func = func;
-    t->arg  = arg;
-    t->name = name;
 
     return t;
 }
