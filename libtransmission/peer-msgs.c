@@ -60,27 +60,35 @@ enum
 
     TR_LTEP_PEX             = 1,
 
-    MAX_REQUEST_BYTE_COUNT  = (16 * 1024), /* drop requests who want too much */
+    /* drop requests who want too much */
+    MAX_REQUEST_BYTE_COUNT  = (16 * 1024),
+
+    MIN_CHOKE_PERIOD_SEC    = (10),
 
     /* idle seconds before we send a keepalive */
     KEEPALIVE_INTERVAL_SECS = 90,
 
-    PEX_INTERVAL            = (60 * 1000), /* msec between calls to sendPex() */
-    PEER_PULSE_INTERVAL     = (100),       /* msec between calls to pulse() */
-    RATE_PULSE_INTERVAL     = (250),       /* msec between calls to ratePulse() */
+    PEX_INTERVAL            = (60 * 1000), /* msec between sendPex() calls */
+    PEER_PULSE_INTERVAL     = (100),       /* msec between pulse() calls */
+    RATE_PULSE_INTERVAL     = (250),       /* msec between ratePulse() calls */
 
     MAX_QUEUE_SIZE          = (100),
-
     MAX_OUTBUF_SIZE         = (1024),
      
-    /* Fast Peers Extension constants */
-    MAX_FAST_ALLOWED_COUNT   = 10,          /* max. number of pieces we fast-allow to another peer */
-    MAX_FAST_ALLOWED_THRESHOLD = 10,        /* max threshold for allowing fast-pieces requests */
+    /* (fast peers) max number of pieces we fast-allow to another peer */
+    MAX_FAST_ALLOWED_COUNT   = 10,
+
+    /* (fast peers) max threshold for allowing fast-pieces requests */
+    MAX_FAST_ALLOWED_THRESHOLD = 10,
 
     QUEUED_REQUEST_TTL_SECS = 20,
 
     SENT_REQUEST_TTL_SECS = 90
 };
+
+/**
+***  REQUEST MANAGEMENT
+**/
 
 enum
 {
@@ -125,7 +133,9 @@ reqListReserve( struct request_list * list, uint16_t max )
     if( list->max < max )
     {
         list->max = max;
-        list->requests = tr_renew( struct peer_request, list->requests, list->max );
+        list->requests = tr_renew( struct peer_request,
+                                   list->requests,
+                                   list->max );
     }
 }
 
@@ -218,22 +228,40 @@ reqListPrune( struct request_list * list,
     list->count = k;
 
     reqListReserve( pruned, pruned->count + p );
-    memcpy( pruned->requests + pruned->count, prune, sizeof(struct peer_request) * p );
+    memcpy( pruned->requests + pruned->count,
+            prune,
+            sizeof(struct peer_request) * p );
     pruned->count += p;
 }
+
+/**
+***
+**/
 
 /* this is raw, unchanged data from the peer regarding
  * the current message that it's sending us. */
 struct tr_incoming
 {
-    uint32_t length; /* includes the +1 for id length */
     uint8_t id;
+    uint32_t length; /* includes the +1 for id length */
     struct peer_request blockReq; /* metadata for incoming blocks */
     struct evbuffer * block; /* piece data for incoming blocks */
 };
 
 struct tr_peermsgs
 {
+    unsigned int peerSentBitfield         : 1;
+    unsigned int peerSupportsPex          : 1;
+    unsigned int clientSentLtepHandshake  : 1;
+    unsigned int peerSentLtepHandshake    : 1;
+    unsigned int sendingBlock             : 1;
+    
+    uint8_t state;
+    uint8_t ut_pex_id;
+    uint16_t pexCount;
+    uint32_t maxActiveRequests;
+    uint32_t minActiveRequests;
+
     tr_peer * info;
 
     tr_handle * handle;
@@ -244,6 +272,7 @@ struct tr_peermsgs
 
     struct evbuffer * outBlock;    /* buffer of all the current piece message */
     struct evbuffer * outMessages; /* buffer of all the non-piece messages */
+
     struct request_list peerAskedFor;
     struct request_list peerAskedForFast;
     struct request_list clientAskedFor;
@@ -256,26 +285,12 @@ struct tr_peermsgs
     time_t lastReqAddedAt;
     time_t clientSentPexAt;
     time_t clientSentAnythingAt;
-
     time_t clientSentPieceDataAt;
     time_t peerSentPieceDataAt;
-
-    unsigned int peerSentBitfield         : 1;
-    unsigned int peerSupportsPex          : 1;
-    unsigned int clientSentLtepHandshake  : 1;
-    unsigned int peerSentLtepHandshake    : 1;
-    unsigned int sendingBlock             : 1;
     
     tr_bitfield * clientAllowedPieces;
     tr_bitfield * peerAllowedPieces;
-    
     tr_bitfield * clientSuggestedPieces;
-    
-    uint8_t state;
-    uint8_t ut_pex_id;
-    uint16_t pexCount;
-    uint32_t maxActiveRequests;
-    uint32_t minActiveRequests;
 
     struct tr_incoming incoming; 
 
@@ -458,15 +473,11 @@ isPieceInteresting( const tr_peermsgs   * peer,
                     int                   piece )
 {
     const tr_torrent * torrent = peer->torrent;
-    if( torrent->info.pieces[piece].dnd ) /* we don't want it */
-        return FALSE;
-    if( tr_cpPieceIsComplete( torrent->completion, piece ) ) /* we have it */
-        return FALSE;
-    if( !tr_bitfieldHas( peer->info->have, piece ) ) /* peer doesn't have it */
-        return FALSE;
-    if( tr_bitfieldHas( peer->info->banned, piece ) ) /* peer is banned */
-        return FALSE;
-    return TRUE;
+
+    return ( ( !torrent->info.pieces[piece].dnd )               /* we want it */
+          && ( !tr_cpPieceIsComplete( torrent->completion, piece ) ) /* !have */
+          && ( tr_bitfieldHas( peer->info->have, piece ) )     /* peer has it */
+          && ( !tr_bitfieldHas( peer->info->banned, piece ) ) );   /* !banned */
 }
 
 /* "interested" means we'll ask for piece data if they unchoke us */
@@ -519,8 +530,6 @@ updateInterest( tr_peermsgs * msgs )
     if( i )
         fireNeedReq( msgs );
 }
-
-#define MIN_CHOKE_PERIOD_SEC 10
 
 static void
 cancelAllRequestsToClientExceptFast( tr_peermsgs * msgs )
@@ -717,12 +726,12 @@ expireOldRequests( tr_peermsgs * msgs )
 static void
 pumpRequestQueue( tr_peermsgs * msgs )
 {
-    struct peer_request req;
     const int max = msgs->maxActiveRequests;
     const int min = msgs->minActiveRequests;
     const time_t now = time( NULL );
-    int count = msgs->clientAskedFor.count;
     int sent = 0;
+    int count = msgs->clientAskedFor.count;
+    struct peer_request req;
 
     if( count > min )
         return;
@@ -973,13 +982,13 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
 static void
 parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
 {
-    int gotval = 0;
+    int loaded = 0;
     uint8_t * tmp = tr_new( uint8_t, msglen );
     tr_benc val, *sub;
     tr_peerIoReadBytes( msgs->io, inbuf, tmp, msglen );
 
     if( tr_torrentAllowsPex( msgs->torrent )
-        && (( gotval = !tr_bencLoad( tmp, msglen, &val, NULL )))
+        && (( loaded = !tr_bencLoad( tmp, msglen, &val, NULL )))
         && (( sub = tr_bencDictFindType( &val, "added", TYPE_STR ))))
     {
         const int n = sub->val.s.i / 6 ;
@@ -990,7 +999,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
                             (uint8_t*)sub->val.s.s, n );
     }
 
-    if( gotval )
+    if( loaded )
         tr_bencFree( &val );
     tr_free( tmp );
 }
@@ -1079,7 +1088,8 @@ readBtId( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 static void
 updatePeerProgress( tr_peermsgs * msgs )
 {
-    msgs->info->progress = tr_bitfieldCountTrueBits( msgs->info->have ) / (float)msgs->torrent->info.pieceCount;
+    msgs->info->progress = tr_bitfieldCountTrueBits( msgs->info->have )
+                         / (float)msgs->torrent->info.pieceCount;
     dbgmsg( msgs, "peer progress is %f", msgs->info->progress );
     updateInterest( msgs );
     firePeerProgress( msgs );
@@ -1088,7 +1098,7 @@ updatePeerProgress( tr_peermsgs * msgs )
 static int
 clientCanSendFastBlock( const tr_peermsgs * msgs UNUSED )
 {
-    /* We can't send a fast piece if a peer has more than MAX_FAST_ALLOWED_THRESHOLD pieces */
+    /* don't send a fast piece if peer has MAX_FAST_ALLOWED_THRESHOLD pieces */
     if( tr_bitfieldCountTrueBits( msgs->info->have ) > MAX_FAST_ALLOWED_THRESHOLD )
         return FALSE;
     
@@ -1184,11 +1194,12 @@ clientGotBlock( tr_peermsgs * msgs, const uint8_t * block, const struct peer_req
 static void
 clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
 {
+    const time_t now = time( NULL );
     tr_torrent * tor = msgs->torrent;
     tor->activityDate = tr_date( );
     tor->downloadedCur += byteCount;
-    msgs->peerSentPieceDataAt = time( NULL );
-    msgs->info->pieceDataActivityDate = time( NULL );
+    msgs->peerSentPieceDataAt = now;
+    msgs->info->pieceDataActivityDate = now;
     msgs->info->credit += (int)(byteCount * SWIFT_REPAYMENT_RATIO);
     tr_rcTransferred( msgs->info->rcToClient, byteCount );
     tr_rcTransferred( tor->download, byteCount );
@@ -1322,28 +1333,28 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         }
 
         case BT_REQUEST: {
-            struct peer_request req;
-            tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
-            tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
-            tr_peerIoReadUint32( msgs->io, inbuf, &req.length );
-            dbgmsg( msgs, "got Request: %u:%u->%u", req.index, req.offset, req.length );
-            peerMadeRequest( msgs, &req );
+            struct peer_request r;
+            tr_peerIoReadUint32( msgs->io, inbuf, &r.index );
+            tr_peerIoReadUint32( msgs->io, inbuf, &r.offset );
+            tr_peerIoReadUint32( msgs->io, inbuf, &r.length );
+            dbgmsg( msgs, "got Request: %u:%u->%u", r.index, r.offset, r.length );
+            peerMadeRequest( msgs, &r );
             break;
         }
 
         case BT_CANCEL: {
-            struct peer_request req;
-            tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
-            tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
-            tr_peerIoReadUint32( msgs->io, inbuf, &req.length );
-            dbgmsg( msgs, "got a Cancel %u:%u->%u", req.index, req.offset, req.length );
-            reqListRemove( &msgs->peerAskedForFast, &req );
-            reqListRemove( &msgs->peerAskedFor, &req );
+            struct peer_request r;
+            tr_peerIoReadUint32( msgs->io, inbuf, &r.index );
+            tr_peerIoReadUint32( msgs->io, inbuf, &r.offset );
+            tr_peerIoReadUint32( msgs->io, inbuf, &r.length );
+            dbgmsg( msgs, "got a Cancel %u:%u->%u", r.index, r.offset, r.length );
+            reqListRemove( &msgs->peerAskedForFast, &r );
+            reqListRemove( &msgs->peerAskedFor, &r );
             break;
         }
 
         case BT_PIECE:
-            assert( 0 ); /* should be handled elsewhere! */
+            assert( 0 ); /* handled elsewhere! */
             break;
         
         case BT_PORT:
@@ -1352,10 +1363,9 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             break;
             
         case BT_SUGGEST: {
-            const tr_bitfield * bt = tr_cpPieceBitfield( msgs->torrent->completion );
             dbgmsg( msgs, "Got a BT_SUGGEST" );
             tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
-            if( tr_bitfieldHas( bt, ui32 ) )
+            if( tr_cpPieceIsComplete( msgs->torrent->completion, ui32 ) )
                 tr_bitfieldAdd( msgs->clientSuggestedPieces, ui32 );
             break;
         }
@@ -1376,12 +1386,12 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             break;
         
         case BT_REJECT: {
-            struct peer_request req;
+            struct peer_request r;
             dbgmsg( msgs, "Got a BT_REJECT" );
-            tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
-            tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
-            tr_peerIoReadUint32( msgs->io, inbuf, &req.length );
-            reqListRemove( &msgs->clientAskedFor, &req );
+            tr_peerIoReadUint32( msgs->io, inbuf, &r.index );
+            tr_peerIoReadUint32( msgs->io, inbuf, &r.offset );
+            tr_peerIoReadUint32( msgs->io, inbuf, &r.length );
+            reqListRemove( &msgs->clientAskedFor, &r );
             break;
         }
 
@@ -1413,11 +1423,12 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 static void
 peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
 {
+    const time_t now = time( NULL );
     tr_torrent * tor = msgs->torrent;
     tor->activityDate = tr_date( );
     tor->uploadedCur += byteCount;
-    msgs->clientSentPieceDataAt = time( NULL );
-    msgs->info->pieceDataActivityDate = time( NULL );
+    msgs->clientSentPieceDataAt = now;
+    msgs->info->pieceDataActivityDate = now;
     msgs->info->credit -= byteCount;
     tr_rcTransferred( msgs->info->rcToPeer, byteCount );
     tr_rcTransferred( tor->upload, byteCount );
@@ -1451,10 +1462,7 @@ reassignBytesToCorrupt( tr_peermsgs * msgs, uint32_t byteCount )
     tor->corruptCur += byteCount;
 
     /* decrement the `downloaded' field */
-    if( tor->downloadedCur >= byteCount )
-        tor->downloadedCur -= byteCount;
-    else
-        tor->downloadedCur = 0;
+    tor->downloadedCur -= MIN( tor->downloadedCur, byteCount );
 }
 
 
