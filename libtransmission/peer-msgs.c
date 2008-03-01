@@ -476,8 +476,7 @@ isPieceInteresting( const tr_peermsgs   * peer,
 
     return ( ( !torrent->info.pieces[piece].dnd )               /* we want it */
           && ( !tr_cpPieceIsComplete( torrent->completion, piece ) ) /* !have */
-          && ( tr_bitfieldHas( peer->info->have, piece ) )     /* peer has it */
-          && ( !tr_bitfieldHas( peer->info->banned, piece ) ) );   /* !banned */
+          && ( tr_bitfieldHas( peer->info->have, piece ) ) );  /* peer has it */
 }
 
 /* "interested" means we'll ask for piece data if they unchoke us */

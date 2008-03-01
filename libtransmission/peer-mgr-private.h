@@ -71,7 +71,6 @@ typedef struct tr_peer
     struct in_addr in_addr;
     struct tr_peerIo * io;
 
-    struct tr_bitfield * banned;
     struct tr_bitfield * blame;
     struct tr_bitfield * have;
     float progress;
