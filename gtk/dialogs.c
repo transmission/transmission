@@ -289,36 +289,25 @@ askquit( TrCore          * core,
 
 struct DeleteData
 {
-    GtkWidget * delete_files_tb;
+    gboolean delete_files;
     GList * torrents;
     TrCore * core;
 };
 
 static void
-deleteDownloadedToggled( GtkToggleButton * tb, gpointer warn )
-{
-    GtkWidget * w = GTK_WIDGET( warn );
-
-    if( gtk_toggle_button_get_active( tb ) )
-        gtk_widget_show( w );
-    else
-        gtk_widget_hide( w );
-}
-
-static void
-deleteResponse( GtkDialog * dialog, gint response, gpointer gdata )
+removeResponse( GtkDialog * dialog, gint response, gpointer gdata )
 {
     struct DeleteData * data = gdata;
-    const int del = response == GTK_RESPONSE_ACCEPT;
-    const int deleteFiles = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->delete_files_tb ) );
+    const int doRemove = response == GTK_RESPONSE_ACCEPT;
+    const int doDelete = data->delete_files;
     GList * l;
 
     for( l=data->torrents; l!=NULL; l=l->next )
     {
         TrTorrent * gtor = TR_TORRENT( l->data );
 
-        if( del )
-            tr_core_remove_torrent( data->core, gtor, deleteFiles );
+        if( doRemove )
+            tr_core_remove_torrent( data->core, gtor, doDelete );
         else
             g_object_unref( G_OBJECT( gtor ) );
     }
@@ -329,62 +318,77 @@ deleteResponse( GtkDialog * dialog, gint response, gpointer gdata )
 }
 
 void
-confirmDelete( GtkWindow * parent,
+confirmRemove( GtkWindow * parent,
                TrCore    * core,
                GList     * torrents )
 {
-    char buf[1024];
-    GtkWidget * t;
     GtkWidget * d;
-    GtkWidget * w;
-    GtkWidget * warn;
+    char text[128];
     struct DeleteData * dd = g_new0( struct DeleteData, 1 );
 
     dd->core = core;
     dd->torrents = torrents;
+    dd->delete_files = FALSE;
 
-    d = gtk_dialog_new_with_buttons( _( "Remove Torrent" ),
-                                     parent,
-                                     GTK_DIALOG_DESTROY_WITH_PARENT|GTK_DIALOG_NO_SEPARATOR,
-                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                     GTK_STOCK_REMOVE, GTK_RESPONSE_ACCEPT,
-                                     NULL );
+    g_snprintf( text, sizeof( text ),
+                ngettext( "Remove torrent?",
+                          "Remove torrents?",
+                          g_list_length( torrents ) ) );
+    d = gtk_message_dialog_new_with_markup( parent,
+                                            GTK_DIALOG_DESTROY_WITH_PARENT,
+                                            GTK_MESSAGE_QUESTION,
+                                            GTK_BUTTONS_NONE,
+                                            "<b>%s</b>", text );
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ),
+                         _( "This removes the torrent, not its downloads." ) );
+    gtk_dialog_add_buttons( GTK_DIALOG( d ),
+                            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                            GTK_STOCK_REMOVE, GTK_RESPONSE_ACCEPT,
+                            NULL );
+    gtk_dialog_set_default_response( GTK_DIALOG ( d ),
+                                     GTK_RESPONSE_ACCEPT );
     gtk_dialog_set_alternative_button_order( GTK_DIALOG( d ),
                                              GTK_RESPONSE_ACCEPT,
                                              GTK_RESPONSE_CANCEL,
                                              -1 );
-    g_signal_connect( d, "response", G_CALLBACK( deleteResponse ), dd );
+    g_signal_connect( d, "response", G_CALLBACK( removeResponse ), dd );
+    gtk_widget_show_all( d );
+}
 
-    t = gtk_table_new( 3, 2, FALSE );
-    gtk_container_set_border_width( GTK_CONTAINER( t ), GUI_PAD_BIG );
-    gtk_table_set_col_spacing( GTK_TABLE( t ), 0, GUI_PAD_BIG );
-    gtk_table_set_row_spacings( GTK_TABLE( t ), GUI_PAD_BIG );
+void
+confirmDelete( GtkWindow * parent,
+               TrCore    * core,
+               GList     * torrents )
+{
+    GtkWidget * d;
+    char text[128];
+    struct DeleteData * dd = g_new0( struct DeleteData, 1 );
 
-    w = gtk_image_new_from_stock( GTK_STOCK_DIALOG_WARNING, GTK_ICON_SIZE_DIALOG );
-    gtk_table_attach( GTK_TABLE( t ), w, 0, 1, 0, 3, GTK_FILL, GTK_FILL, 0, 0 );
-    gtk_widget_show( w );
+    dd->core = core;
+    dd->torrents = torrents;
+    dd->delete_files = TRUE;
 
-    g_snprintf( buf, sizeof(buf), "<b>%s</b>", _( "Remove the selected torrent(s)?" ) );
-    w = gtk_label_new( buf );
-    gtk_misc_set_alignment( GTK_MISC( w ), 0.0, 0.5 );
-    gtk_label_set_use_markup( GTK_LABEL( w ), TRUE );
-    gtk_table_attach( GTK_TABLE( t ), w, 1, 2, 0, 1, GTK_FILL, 0, 0, 0 );
-    gtk_widget_show( w );
-
-    g_snprintf( buf, sizeof( buf ), "<i>%s</i>",
-                _( "All downloaded files for this torrent will be deleted!" ) );
-    warn = gtk_label_new( buf );
-    gtk_label_set_use_markup( GTK_LABEL( warn ), TRUE );
-    gtk_table_attach( GTK_TABLE( t ), warn, 1, 2, 2, 3, GTK_FILL, 0, 0, 0 );
-   
-    w = gtk_check_button_new_with_mnemonic( _( "Delete _downloaded files" ) );
-    dd->delete_files_tb = w;
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), FALSE );
-    gtk_table_attach( GTK_TABLE( t ), w, 1, 2, 1, 2, GTK_FILL, 0, 0, 0 );
-    g_signal_connect( w, "toggled", G_CALLBACK(deleteDownloadedToggled), warn );
-    gtk_widget_show( w );
-
-    gtk_widget_show( t );
-    gtk_container_add( GTK_CONTAINER( GTK_DIALOG( d )->vbox ), t );
-    gtk_widget_show( d );
+    g_snprintf( text, sizeof( text ),
+                ngettext( "Delete torrent?",
+                          "Delete torrents?",
+                          g_list_length( torrents ) ) );
+    d = gtk_message_dialog_new_with_markup( parent,
+                                            GTK_DIALOG_DESTROY_WITH_PARENT,
+                                            GTK_MESSAGE_WARNING,
+                                            GTK_BUTTONS_NONE,
+                                            "<b>%s</b>", text );
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ),
+                  _( "This removes the torrent and deletes its downloads!" ) );
+    gtk_dialog_add_buttons( GTK_DIALOG( d ),
+                            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                            GTK_STOCK_DELETE, GTK_RESPONSE_ACCEPT,
+                            NULL );
+    gtk_dialog_set_default_response( GTK_DIALOG ( d ),
+                                     GTK_RESPONSE_CANCEL );
+    gtk_dialog_set_alternative_button_order( GTK_DIALOG( d ),
+                                             GTK_RESPONSE_ACCEPT,
+                                             GTK_RESPONSE_CANCEL,
+                                             -1 );
+    g_signal_connect( d, "response", G_CALLBACK( removeResponse ), dd );
+    gtk_widget_show_all( d );
 }

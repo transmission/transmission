@@ -200,6 +200,7 @@ refreshTorrentActions( GtkTreeSelection * s )
     action_sensitize( "pause-torrent", counts.activeCount!=0 );
     action_sensitize( "start-torrent", counts.inactiveCount!=0 );
     action_sensitize( "remove-torrent", counts.totalCount!=0 );
+    action_sensitize( "delete-torrent", counts.totalCount!=0 );
     action_sensitize( "verify-torrent", counts.totalCount!=0 );
     action_sensitize( "show-torrent-details", counts.totalCount==1 );
 
@@ -806,7 +807,8 @@ coreprompt( TrCore                 * core,
     }
 
 #if GTK_CHECK_VERSION(2,8,0)
-    gtk_window_set_urgency_hint( GTK_WINDOW( cbdata->wind ), TRUE );
+    if( cbdata->wind )
+        gtk_window_set_urgency_hint( GTK_WINDOW( cbdata->wind ), TRUE );
     g_signal_connect( w, "focus-in-event",
                       G_CALLBACK(on_main_window_focus_in),  cbdata );
 #endif
@@ -956,18 +958,6 @@ stopTorrentForeach (GtkTreeModel * model,
 }
 
 static void
-accumulateSelectedTorrents( GtkTreeModel * model,
-                            GtkTreePath  * path UNUSED,
-                            GtkTreeIter  * iter,
-                            gpointer       gdata )
-{
-    GList ** data = ( GList** ) gdata;
-    TrTorrent * tor = NULL;
-    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
-    *data = g_list_append( *data, tor );
-}
-
-static void
 updateTrackerForeach (GtkTreeModel * model,
                       GtkTreePath  * path UNUSED,
                       GtkTreeIter  * iter,
@@ -1028,10 +1018,37 @@ recheckTorrentForeach (GtkTreeModel * model,
 }
 
 static gboolean 
-msgwinclosed()
+msgwinclosed( void )
 {
   action_toggle( "toggle-message-log", FALSE );
   return FALSE;
+}
+
+static void
+accumulateSelectedTorrents( GtkTreeModel * model,
+                            GtkTreePath  * path UNUSED,
+                            GtkTreeIter  * iter,
+                            gpointer       gdata )
+{
+    GList ** data = ( GList** ) gdata;
+    TrTorrent * tor = NULL;
+    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
+    *data = g_list_append( *data, tor );
+}
+
+static void
+removeSelected( struct cbdata * data, gboolean doDelete )
+{
+    GList * l = NULL;
+    GtkTreeSelection * s = tr_window_get_selection( data->wind );
+    gtk_tree_selection_selected_foreach( s, accumulateSelectedTorrents, &l );
+    gtk_tree_selection_unselect_all( s );
+    if( l ) {
+        if( doDelete )
+            confirmDelete( data->wind, data->core, l );
+        else
+            confirmRemove( data->wind, data->core, l );
+    }
 }
 
 void
@@ -1085,14 +1102,13 @@ doAction ( const char * action_name, gpointer user_data )
                                       tr_core_handle( data->core ) );
         gtk_widget_show_all( w );
     }
-    else if (!strcmp (action_name, "remove-torrent"))
+    else if( !strcmp( action_name, "remove-torrent" ) )
     {
-        GList * l = NULL;
-        GtkTreeSelection * s = tr_window_get_selection(data->wind);
-        gtk_tree_selection_selected_foreach( s, accumulateSelectedTorrents, &l );
-        gtk_tree_selection_unselect_all( s );
-        if( l != NULL )
-            confirmDelete( data->wind, data->core, l );
+        removeSelected( data, FALSE );
+    }
+    else if( !strcmp( action_name, "delete-torrent" ) )
+    {
+        removeSelected( data, TRUE );
     }
     else if (!strcmp (action_name, "close"))
     {
