@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  * 
- * $Id:$
+ * $Id$
  */
 
 #include "notify.h"
@@ -55,8 +55,7 @@ void
 tr_notify_send(TrTorrent *tor) 
 { 
     const tr_info * info = tr_torrent_info( tor ); 
-    char * buf = g_strdup_printf( "%s was downloaded", info->name );
-    NotifyNotification * n = notify_notification_new( "Torrent Complete", buf, "transmission", NULL ); 
+    NotifyNotification * n = notify_notification_new( "Torrent Complete", info->name, "transmission", NULL ); 
  
     if (info->fileCount == 1) 
         notify_notification_add_action( n, "file", "Open File",
@@ -64,8 +63,6 @@ tr_notify_send(TrTorrent *tor)
     notify_notification_add_action( n, "folder", "Open Containing Folder",
                                     NOTIFY_ACTION_CALLBACK(notifyCallback), tor, NULL );
     notify_notification_show( n, NULL ); 
-
-    g_free( buf );
 }
 
 #endif
