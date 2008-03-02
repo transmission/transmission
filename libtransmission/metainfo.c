@@ -54,8 +54,9 @@ tr_httpParseUrl( const char * url_in, int len,
     int success;
 
     success = parseURL( url, host, &port, &path );
-
-    if( success ) {
+    if( !success )
+        tr_err( "Can't parse URL \"%s\"", url );
+    else {
         *setme_host = tr_strdup( host );
         *setme_port = port;
         *setme_path = tr_strdup( path );
@@ -176,6 +177,7 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     tr_benc * meta = (tr_benc *) meta_in;
     char buf[4096];
 
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
      * from the Metainfo file. Note that the value will be a bencoded 
      * dictionary, given the definition of the info key above. */
@@ -185,70 +187,89 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
         char * str = tr_bencSave( beInfo, &len );
         tr_sha1( inf->hash, str, len, NULL );
         tr_free( str );
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     }
     else
     {
         tr_err( "info dictionary not found!" );
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         return TR_EINVALID;
     }
 
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     tr_sha1_to_hex( inf->hashString, inf->hash );
     savedname( inf->torrent, sizeof( inf->torrent ), inf->hashString, tag );
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
 
     /* comment */
     memset( buf, '\0', sizeof( buf ) );
     val = tr_bencDictFindFirst( meta, "comment.utf-8", "comment", NULL );
     if( val && val->type == TYPE_STR )
         strlcat_utf8( buf, val->val.s.s, sizeof( buf ), 0 );
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     tr_free( inf->comment );
     inf->comment = tr_strdup( buf );
     
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     /* creator */
     memset( buf, '\0', sizeof( buf ) );
     val = tr_bencDictFindFirst( meta, "created by.utf-8", "created by", NULL );
     if( val && val->type == TYPE_STR )
         strlcat_utf8( buf, val->val.s.s, sizeof( buf ), 0 );
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     tr_free( inf->creator );
     inf->creator = tr_strdup( buf );
     
     /* Date created */
     inf->dateCreated = 0;
     val = tr_bencDictFind( meta, "creation date" );
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     if( NULL != val && TYPE_INT == val->type )
     {
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         inf->dateCreated = val->val.i;
     }
     
     /* Private torrent */
     val  = tr_bencDictFind( beInfo, "private" );
     val2 = tr_bencDictFind( meta,  "private" );
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     if( ( NULL != val  && ( TYPE_INT != val->type  || 0 != val->val.i ) ) ||
         ( NULL != val2 && ( TYPE_INT != val2->type || 0 != val2->val.i ) ) )
     {
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         inf->isPrivate = 1;
     }
     
     /* Piece length */
     val = tr_bencDictFind( beInfo, "piece length" );
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     if( NULL == val || TYPE_INT != val->type )
     {
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         tr_err( "%s \"piece length\" entry", ( val ? "Invalid" : "Missing" ) );
         goto fail;
     }
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     inf->pieceSize = val->val.i;
 
     /* Hashes */
     val = tr_bencDictFind( beInfo, "pieces" );
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     if( NULL == val || TYPE_STR != val->type )
     {
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         tr_err( "%s \"pieces\" entry", ( val ? "Invalid" : "Missing" ) );
         goto fail;
     }
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     if( val->val.s.i % SHA_DIGEST_LENGTH )
     {
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         tr_err( "Invalid \"piece\" string (size is %d)", val->val.s.i );
         goto fail;
     }
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     inf->pieceCount = val->val.s.i / SHA_DIGEST_LENGTH;
 
     inf->pieces = calloc ( inf->pieceCount, sizeof(tr_piece) );
@@ -260,43 +281,56 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
 
     /* get file or top directory name */
     val = tr_bencDictFindFirst( beInfo, "name.utf-8", "name", NULL );
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     if( parseFiles( inf, tr_bencDictFindFirst( beInfo,
                                                "name.utf-8", "name", NULL ),
                     tr_bencDictFind( beInfo, "files" ),
                     tr_bencDictFind( beInfo, "length" ) ) )
     {
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         goto fail;
     }
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
 
     if( !inf->fileCount )
     {
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         tr_err( "Torrent has no files." );
         goto fail;
     }
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
 
     if( !inf->totalSize )
     {
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         tr_err( "Torrent is zero bytes long." );
         goto fail;
     }
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
 
     /* TODO add more tests so we don't crash on weird files */
 
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     if( (uint64_t) inf->pieceCount !=
         ( inf->totalSize + inf->pieceSize - 1 ) / inf->pieceSize )
     {
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         tr_err( "Size of hashes and files don't match" );
         goto fail;
     }
 
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     /* get announce or announce-list */
     if( getannounce( inf, meta ) )
     {
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         goto fail;
     }
 
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
     return TR_OK;
 
+fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
   fail:
     tr_metainfoFree( inf );
     return TR_EINVALID;
@@ -499,10 +533,8 @@ static int getannounce( tr_info * inf, tr_benc * meta )
             ++pch;
 
         if( tr_httpParseUrl( pch, -1, &address, &port, &announce ) )
-        {
-            tr_err( "Invalid announce URL (%s)", val->val.s.s );
             return TR_EINVALID;
-        }
+
         sublist                   = calloc( 1, sizeof( sublist[0] ) );
         sublist[0].address        = address;
         sublist[0].port           = port;

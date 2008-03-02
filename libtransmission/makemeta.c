@@ -204,6 +204,12 @@ getHashInfo ( tr_metainfo_builder * b )
     b->pieceIndex = 0;
     totalRemain = b->totalSize;
     fp = fopen( b->files[fileIndex].filename, "rb" );
+    if( !fp ) {
+        tr_err( "Unable to open \"%s\": %s", b->files[fileIndex].filename, tr_strerror( errno ) );
+        tr_free( ret );
+        b->failed = 1;
+        return NULL;
+    }
     while ( totalRemain )
     {
         uint8_t *bufptr = buf;
@@ -227,6 +233,12 @@ getHashInfo ( tr_metainfo_builder * b )
                 fp = NULL;
                 if( ++fileIndex < b->fileCount ) {
                     fp = fopen( b->files[fileIndex].filename, "rb" );
+                    if( !fp ) {
+                        tr_err( "Unable to open \"%s\": %s", b->files[fileIndex].filename, tr_strerror( errno ) );
+                        tr_free( ret );
+                        b->failed = 1;
+                        return NULL;
+                    }
                 }
             }
         }
@@ -345,9 +357,10 @@ makeInfoDict ( tr_benc              * dict,
     val = tr_bencDictAdd( dict, "piece length" );
     tr_bencInitInt( val, builder->pieceSize );
 
-    pch = getHashInfo( builder );
-    val = tr_bencDictAdd( dict, "pieces" );
-    tr_bencInitStr( val, pch, SHA_DIGEST_LENGTH * builder->pieceCount, 0 );
+    if( ( pch = getHashInfo( builder ) ) ) {
+        val = tr_bencDictAdd( dict, "pieces" );
+        tr_bencInitStr( val, pch, SHA_DIGEST_LENGTH * builder->pieceCount, 0 );
+    }
 
     val = tr_bencDictAdd( dict, "private" );
     tr_bencInitInt( val, builder->isPrivate ? 1 : 0 );
@@ -385,7 +398,7 @@ static void tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
     makeInfoDict( val, builder );
 
     /* save the file */
-    if ( !builder->abortFlag ) {
+    if ( !builder->failed && !builder->abortFlag ) {
         size_t nmemb;
         char * pch = tr_bencSave( &top, &n );
         FILE * fp = fopen( builder->outputFile, "wb+" );

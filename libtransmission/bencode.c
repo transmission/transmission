@@ -95,15 +95,24 @@ tr_bencParseInt( const uint8_t  * buf,
 
     begin = buf + 1;
     end = memchr( begin, 'e', (bufend-buf)-1 );
-    if( end == NULL )
+    if( end == NULL ) {
+        fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         return TR_ERROR;
+    }
 
     errno = 0;
     val = strtoll( begin, &endptr, 10 );
-    if( errno || ( endptr != end ) ) /* incomplete parse */
+    if( errno || ( endptr != end ) ) { /* incomplete parse */
+        fprintf( stderr, "Unable to parse int [%*.*s]\n", (int)(end-begin), (int)(end-begin), (const char*)begin );
+        if( errno )
+            fprintf( stderr, "errno is %d (%s)\n", errno, strerror(errno) );
+        fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         err = TR_ERROR;
-    else if( val && *(const char*)begin=='0' ) /* no leading zeroes! */
+    }
+    else if( val && *(const char*)begin=='0' ) { /* no leading zeroes! */
+        fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         err = TR_ERROR;
+    }
     else {
         *setme_end = end + 1;
         *setme_val = val;
@@ -137,16 +146,22 @@ tr_bencParseStr( const uint8_t  * buf,
         return TR_ERROR;
 
     end = memchr( buf, ':', bufend-buf );
-    if( end == NULL )
+    if( end == NULL ) {
+        fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         return TR_ERROR;
+    }
 
     errno = 0;
     len = strtoul( (const char*)buf, &endptr, 10 );
-    if( errno || endptr!=end )
+    if( errno || endptr!=end ) {
+        fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         return TR_ERROR;
+    }
 
-    if( (const uint8_t*)end + 1 + len > bufend )
+    if( (const uint8_t*)end + 1 + len > bufend ) {
+        fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
         return TR_ERROR;
+    }
 
     *setme_end = end + 1 + len;
     *setme_str = (uint8_t*) tr_strndup( end + 1, len );
@@ -317,14 +332,16 @@ tr_bencParse( const void     * buf_in,
 int
 tr_bencLoad( const void  * buf_in,
              int           buflen,
-             tr_benc  * setme_benc,
+             tr_benc     * setme_benc,
              char       ** setme_end )
 {
     const uint8_t * buf = buf_in;
     const uint8_t * end;
     const int ret = tr_bencParse( buf, buf+buflen, setme_benc, &end );
+fprintf( stderr, "tried to parse len %d\n", buflen );
     if( !ret && setme_end )
         *setme_end = (char*) end;
+fprintf( stderr, "tr_bencLoad returning %d\n", ret );
     return ret;
 }
 

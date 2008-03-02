@@ -418,20 +418,25 @@ tr_torrentParse( const tr_handle  * handle,
         setmeInfo = &tmp;
     memset( setmeInfo, 0, sizeof( tr_info ) );
 
-    if( !err && tr_ctorGetMetainfo( ctor, &metainfo ) )
+    if( !err && tr_ctorGetMetainfo( ctor, &metainfo ) ) {
+fprintf( stderr, "%s:%d can't get metainfo\n", __FILE__, __LINE__ );
         return TR_EINVALID;
+    }
 
     err = tr_metainfoParse( setmeInfo, metainfo, handle->tag );
+fprintf( stderr, "%s:%d err %d\n", __FILE__, __LINE__, err );
     doFree = !err && ( setmeInfo == &tmp );
 
     if( !err && hashExists( handle, setmeInfo->hash ) ) {
         err = TR_EDUPLICATE;
+fprintf( stderr, "%s:%d err %d\n", __FILE__, __LINE__, err );
         doFree = 1;
     }
 
     if( doFree )
         tr_metainfoFree( setmeInfo );
 
+fprintf( stderr, "%s:%d err %d\n", __FILE__, __LINE__, err );
     return err;
 }
 
@@ -445,14 +450,18 @@ tr_torrentNew( tr_handle      * handle,
     tr_torrent * tor = NULL;
 
     err = tr_torrentParse( handle, ctor, &tmpInfo );
+fprintf( stderr, "%s:%d, err %d\n", __FILE__, __LINE__, err );
     if( !err ) {
         tor = tr_new0( tr_torrent, 1 );
         tor->info = tmpInfo;
         torrentRealInit( handle, tor, ctor );
+fprintf( stderr, "%s:%d, tor %p\n", __FILE__, __LINE__, tor );
     } else if( setmeError ) {
+fprintf( stderr, "err is %d\n", err );
         *setmeError = err;
     }
 
+fprintf( stderr, "returning torrent %p\n", tor );
     return tor;
 }
 
