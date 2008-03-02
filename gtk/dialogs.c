@@ -340,7 +340,7 @@ confirmRemove( GtkWindow * parent,
                                             GTK_BUTTONS_NONE,
                                             "<b>%s</b>", text );
     gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ),
-                         _( "This removes the torrent, not its downloads." ) );
+                   _( "This removes the torrent, not the downloaded files." ) );
     gtk_dialog_add_buttons( GTK_DIALOG( d ),
                             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                             GTK_STOCK_REMOVE, GTK_RESPONSE_ACCEPT,
@@ -378,7 +378,7 @@ confirmDelete( GtkWindow * parent,
                                             GTK_BUTTONS_NONE,
                                             "<b>%s</b>", text );
     gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ),
-                  _( "This removes the torrent and deletes its downloads!" ) );
+            _( "This removes the torrent and deletes the downloaded files!" ) );
     gtk_dialog_add_buttons( GTK_DIALOG( d ),
                             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                             GTK_STOCK_DELETE, GTK_RESPONSE_ACCEPT,
