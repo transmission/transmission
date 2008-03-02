@@ -716,7 +716,10 @@ typedef enum tr_errno
 
     /* tracker errors */
     TR_ERROR_TC_ERROR = -300,
-    TR_ERROR_TC_WARNING
+    TR_ERROR_TC_WARNING,
+
+    /* peer errors */
+    TR_ERROR_PEER_MESSAGE = -400
 }
 tr_errno;
 

@@ -158,10 +158,10 @@ tr_bitfield* tr_bitfieldDup( const tr_bitfield* );
 void tr_bitfieldFree( tr_bitfield*);
 
 void tr_bitfieldClear( tr_bitfield* );
-void tr_bitfieldAdd( tr_bitfield*, size_t bit );
-void tr_bitfieldRem( tr_bitfield*, size_t bit );
-void tr_bitfieldAddRange( tr_bitfield *, size_t begin, size_t end );
-void tr_bitfieldRemRange ( tr_bitfield*, size_t begin, size_t end );
+int  tr_bitfieldAdd( tr_bitfield*, size_t bit );
+int  tr_bitfieldRem( tr_bitfield*, size_t bit );
+int  tr_bitfieldAddRange( tr_bitfield *, size_t begin, size_t end );
+int  tr_bitfieldRemRange ( tr_bitfield*, size_t begin, size_t end );
 
 int    tr_bitfieldHas( const tr_bitfield*, size_t bit );
 int    tr_bitfieldIsEmpty( const tr_bitfield* );

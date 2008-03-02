@@ -1311,10 +1311,12 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_HAVE:
             tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
             dbgmsg( msgs, "got Have: %u", ui32 );
-            tr_bitfieldAdd( msgs->info->have, ui32 );
+            if( tr_bitfieldAdd( msgs->info->have, ui32 ) )
+                fireError( msgs, TR_ERROR_PEER_MESSAGE );
             /* If this is a fast-allowed piece for this peer, mark it as normal now */
             if( msgs->clientAllowedPieces != NULL && tr_bitfieldHas( msgs->clientAllowedPieces, ui32 ) )
-                tr_bitfieldRem( msgs->clientAllowedPieces, ui32 );
+                if( tr_bitfieldRem( msgs->clientAllowedPieces, ui32 ) )
+                    fireError( msgs, TR_ERROR_PEER_MESSAGE );
             updatePeerProgress( msgs );
             tr_rcTransferred( msgs->torrent->swarmspeed, msgs->torrent->info.pieceSize );
             break;
@@ -1365,7 +1367,8 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             dbgmsg( msgs, "Got a BT_SUGGEST" );
             tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
             if( tr_cpPieceIsComplete( msgs->torrent->completion, ui32 ) )
-                tr_bitfieldAdd( msgs->clientSuggestedPieces, ui32 );
+                if( tr_bitfieldAdd( msgs->clientSuggestedPieces, ui32 ) )
+                    fireError( msgs, TR_ERROR_PEER_MESSAGE );
             break;
         }
             
@@ -1397,7 +1400,8 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_ALLOWED_FAST: {
             dbgmsg( msgs, "Got a BT_ALLOWED_FAST" );
             tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
-            tr_bitfieldAdd( msgs->clientAllowedPieces, ui32 );
+            if( tr_bitfieldAdd( msgs->clientAllowedPieces, ui32 ) )
+                fireError( msgs, TR_ERROR_PEER_MESSAGE );
             break;
         }
 

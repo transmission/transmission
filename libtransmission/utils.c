@@ -541,6 +541,14 @@ tr_errorString( int code )
         case TR_ERROR_IO_OTHER:
             return "Generic I/O error";
 
+        case TR_ERROR_TC_ERROR:
+            return "Tracker error";
+        case TR_ERROR_TC_WARNING:
+            return "Tracker warning";
+
+        case TR_ERROR_PEER_MESSAGE:
+            return "Peer sent a bad message";
+
         default:
             return "Unknown error";
     }
@@ -673,49 +681,72 @@ int
 tr_bitfieldHas( const tr_bitfield * bitfield, size_t nth )
 {
     static const uint8_t ands[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
-    return bitfield!=NULL && (bitfield->bits[nth>>3u] & ands[nth&7u] );
+    const size_t i = nth >> 3u;
+    return ( bitfield != NULL )
+        && ( bitfield->bits != NULL )
+        && ( i < bitfield->len )
+        && ( ( bitfield->bits[i] & ands[nth&7u] ) != 0 );
 }
 
-void
+int
 tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
 {
     static const uint8_t ands[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
-    bitfield->bits[nth>>3u] |= ands[nth&7u];
+    const size_t i = nth >> 3u;
+
+    assert( bitfield != NULL );
+    assert( bitfield->bits != NULL );
+
+    if( i >= bitfield->len )
+        return -1;
+
+    bitfield->bits[i] |= ands[nth&7u];
     assert( tr_bitfieldHas( bitfield, nth ) );
+    return 0;
 }
 
-void
+int
 tr_bitfieldAddRange( tr_bitfield  * bitfield,
                      size_t         begin,
                      size_t         end )
 {
-    /* TODO: there are faster ways to do this */
+    int err = 0;
     size_t i;
     for( i=begin; i<end; ++i )
-        tr_bitfieldAdd( bitfield, i );
+        if(( err = tr_bitfieldAdd( bitfield, i )))
+            break;
+    return err;
 }
 
-void
+int
 tr_bitfieldRem( tr_bitfield   * bitfield,
                 size_t          nth )
 {
     static const uint8_t rems[8] = { 127, 191, 223, 239, 247, 251, 253, 254 };
+    const size_t i = nth >> 3u;
 
-    if( bitfield != NULL )
-        bitfield->bits[nth>>3u] &= rems[nth&7u];
+    assert( bitfield != NULL );
+    assert( bitfield->bits != NULL );
 
+    if( i >= bitfield->len )
+        return -1;
+
+    bitfield->bits[i] &= rems[nth&7u];
     assert( !tr_bitfieldHas( bitfield, nth ) );
+    return 0;
 }
 
-void
+int
 tr_bitfieldRemRange ( tr_bitfield  * b,
                       size_t         begin,
                       size_t         end )
 {
-    /* TODO: there are faster ways to do this */
+    int err = 0;
     size_t i;
     for( i=begin; i<end; ++i )
-        tr_bitfieldRem( b, i );
+        if(( err = tr_bitfieldRem( b, i )))
+            break;
+    return err;
 }
 
 tr_bitfield*
