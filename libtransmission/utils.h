@@ -33,9 +33,9 @@
 void tr_msgInit( void );
 
 #if defined(SYS_DARWIN)
-  #include <CFBundle.h>
-  #define _(a) CFCopyLocalizedStringFromTable( \
-               CFSTR( a ), "LibraryLocalizable", "comment" )
+  #include <CoreFoundation/CFBundle.h>
+  #define _(a) CFStringGetCStringPtr(CFCopyLocalizedStringFromTable( \
+               CFSTR( a ), CFSTR("LibraryLocalizable"), "comment" ), kCFStringEncodingMacRoman)
 #else
   #include <libintl.h>
   #define _(a) gettext (a)
