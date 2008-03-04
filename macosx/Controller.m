@@ -42,8 +42,6 @@
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 #import "SpeedLimitToTurtleIconTransformer.h"
-
-#define SYS_DARWIN
 #include "utils.h" //tr_getRatio()
 
 #import <Sparkle/Sparkle.h>
@@ -2516,7 +2514,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     downloaded += [torrent downloadedTotal];
                 }
                 
-                #warning fix
                 return [NSString stringForRatio: tr_getRatio(uploaded, downloaded)];
             }
             else

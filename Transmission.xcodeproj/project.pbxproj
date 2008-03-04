@@ -2089,6 +2089,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				INFOPLIST_FILE = macosx/Info.plist;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DSYS_DARWIN",
+				);
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2152,6 +2156,7 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
+				IBC_FLATTEN_NIBS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "$(inherited)";
 				PREBINDING = NO;
