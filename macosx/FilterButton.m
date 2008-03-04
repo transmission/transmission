@@ -41,8 +41,8 @@
         return;
     
     fCount = count;
-    [self setToolTip: fCount == 1 ? NSLocalizedString(@"1 Transfer", "Filter Button -> tool tip")
-        : [NSString stringWithFormat: NSLocalizedString(@"%d Transfers", "Filter Bar Button -> tool tip"), fCount]];
+    [self setToolTip: fCount == 1 ? NSLocalizedString(@"1 transfer", "Filter Button -> tool tip")
+        : [NSString stringWithFormat: NSLocalizedString(@"%d transfers", "Filter Bar Button -> tool tip"), fCount]];
 }
 
 @end
