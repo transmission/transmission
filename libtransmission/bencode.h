@@ -96,6 +96,8 @@ tr_benc    * tr_bencListAdd( tr_benc  * list );
 tr_benc    * tr_bencDictAdd( tr_benc  * dict, const char * key );
 
 char*  tr_bencSave( const tr_benc * val, int * len );
+char*   tr_bencSaveAsSerializedPHP( const tr_benc * top, int * len );
+
 
 int64_t tr_bencGetInt( const tr_benc * val );
 

@@ -33,6 +33,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "list.h"
 #include "ptrarray.h"
 #include "utils.h" /* tr_new(), tr_free() */
 
@@ -845,4 +846,109 @@ tr_bencPrint( const tr_benc * val )
     walkPrint.out = stderr;
     walkPrint.depth = 0;
     bencWalk( val, &walkFuncs, &walkPrint );
+}
+
+/***
+****
+***/
+
+struct ParentState
+{
+    int type;
+    int index;
+};
+ 
+struct phpWalk
+{
+    tr_list * parents;
+    struct evbuffer * out;
+};
+
+static void
+phpChildFunc( struct phpWalk * data )
+{
+    if( data->parents )
+    {
+        struct ParentState * parentState = data->parents->data;
+
+        if( parentState->type == TYPE_LIST )
+            evbuffer_add_printf( data->out, "i:%d;", parentState->index++ );
+    }
+}
+
+static void
+phpPushParent( struct phpWalk * data, int type )
+{
+    struct ParentState * parentState = tr_new( struct ParentState, 1 );
+    parentState->type = type;
+    parentState->index = 0;
+    tr_list_prepend( &data->parents, parentState );
+}
+
+static void
+phpPopParent( struct phpWalk * data )
+{
+    tr_free( tr_list_pop_front( &data->parents ) );
+}
+
+static void
+phpIntFunc( const tr_benc * val, void * vdata )
+{
+    struct phpWalk * data = vdata;
+    phpChildFunc( data );
+    evbuffer_add_printf( data->out, "i:%"PRId64";", tr_bencGetInt(val) );
+}
+static void
+phpStringFunc( const tr_benc * val, void * vdata )
+{
+    struct phpWalk * data = vdata;
+    phpChildFunc( data );
+    evbuffer_add_printf( data->out, "s:%d:\"%s\";", val->val.s.i, val->val.s.s );
+}
+static void
+phpDictBeginFunc( const tr_benc * val, void * vdata )
+{
+    struct phpWalk * data = vdata;
+    phpChildFunc( data );
+    phpPushParent( data, TYPE_DICT );
+    evbuffer_add_printf( data->out, "a:%d:{", val->val.l.count/2 );
+}
+static void
+phpListBeginFunc( const tr_benc * val, void * vdata )
+{
+    struct phpWalk * data = vdata;
+    phpChildFunc( data );
+    phpPushParent( data, TYPE_LIST );
+    evbuffer_add_printf( data->out, "a:%d:{", val->val.l.count );
+}
+static void
+phpContainerEndFunc( const tr_benc * val UNUSED, void * vdata )
+{
+    struct phpWalk * data = vdata;
+    phpPopParent( data );
+    evbuffer_add_printf( data->out, "}" );
+}
+char*
+tr_bencSaveAsSerializedPHP( const tr_benc * top, int * len )
+{
+    char * ret;
+    struct WalkFuncs walkFuncs;
+    struct phpWalk data;
+
+    data.out = evbuffer_new( );
+    data.parents = NULL;
+
+    walkFuncs.intFunc = phpIntFunc;
+    walkFuncs.stringFunc = phpStringFunc;
+    walkFuncs.dictBeginFunc = phpDictBeginFunc;
+    walkFuncs.listBeginFunc = phpListBeginFunc;
+    walkFuncs.containerEndFunc = phpContainerEndFunc;
+
+    bencWalk( top, &walkFuncs, &data );
+    
+    if( len != NULL )
+        *len = EVBUFFER_LENGTH( data.out );
+    ret = tr_strndup( (char*) EVBUFFER_DATA( data.out ), EVBUFFER_LENGTH( data.out ) );
+    evbuffer_free( data.out );
+    return ret;
 }

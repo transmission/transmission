@@ -266,6 +266,44 @@ testParse( void )
 }
 
 static int
+testPHPSnippet( const char * benc_str, const char * expected )
+{
+    tr_benc top;
+    char * serialized;
+    tr_bencLoad( benc_str, strlen( benc_str ), &top, NULL );
+    serialized = tr_bencSaveAsSerializedPHP( &top, NULL );
+    check( !strcmp( serialized, expected ) );
+    tr_free( serialized );
+    tr_bencFree( &top );
+    return 0;
+}
+
+static int
+testPHP( void )
+{
+    int val;
+    const char * benc_str;
+    const char * expected;
+
+    benc_str = "i6e";
+    expected = "i:6;";
+    if(( val = testPHPSnippet( benc_str, expected )))
+        return val;
+
+    benc_str = "d3:cow3:moo4:spam4:eggse";
+    expected = "a:2:{s:3:\"cow\";s:3:\"moo\";s:4:\"spam\";s:4:\"eggs\";}";
+    if(( val = testPHPSnippet( benc_str, expected )))
+        return val;
+
+    benc_str = "l3:cow3:moo4:spam4:eggse";
+    expected = "a:4:{i:0;s:3:\"cow\";i:1;s:3:\"moo\";i:2;s:4:\"spam\";i:3;s:4:\"eggs\";}";
+    if(( val = testPHPSnippet( benc_str, expected )))
+        return val;
+
+    return 0;
+}
+
+static int
 testStackSmash( void )
 {
     int i;
@@ -309,6 +347,9 @@ main( void )
         return i;
 
     if(( i = testParse( )))
+        return i;
+
+    if(( i = testPHP( )))
         return i;
 
     if(( i = testStackSmash( )))
