@@ -285,8 +285,6 @@ struct tr_peermsgs
     time_t lastReqAddedAt;
     time_t clientSentPexAt;
     time_t clientSentAnythingAt;
-    time_t clientSentPieceDataAt;
-    time_t peerSentPieceDataAt;
     
     tr_bitfield * clientAllowedPieces;
     tr_bitfield * peerAllowedPieces;
@@ -1210,7 +1208,6 @@ clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tr_torrent * tor = msgs->torrent;
     tor->activityDate = tr_date( );
     tor->downloadedCur += byteCount;
-    msgs->peerSentPieceDataAt = now;
     msgs->info->pieceDataActivityDate = now;
     msgs->info->credit += (int)(byteCount * SWIFT_REPAYMENT_RATIO);
     tr_rcTransferred( msgs->info->rcToClient, byteCount );
@@ -1443,7 +1440,6 @@ peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tr_torrent * tor = msgs->torrent;
     tor->activityDate = tr_date( );
     tor->uploadedCur += byteCount;
-    msgs->clientSentPieceDataAt = now;
     msgs->info->pieceDataActivityDate = now;
     msgs->info->credit -= byteCount;
     tr_rcTransferred( msgs->info->rcToPeer, byteCount );
@@ -2042,18 +2038,3 @@ tr_peerMsgsUnsubscribe( tr_peermsgs       * peer,
 {
     tr_publisherUnsubscribe( peer->publisher, tag );
 }
-
-int
-tr_peerMsgsIsPieceFastAllowed( const tr_peermsgs * peer,
-                               uint32_t            index )
-{
-    return tr_bitfieldHas( peer->clientAllowedPieces, index );
-}
-
-int
-tr_peerMsgsIsPieceSuggested( const tr_peermsgs * peer,
-                             uint32_t            index )
-{
-    return tr_bitfieldHas( peer->clientSuggestedPieces, index );
-}
-
