@@ -692,7 +692,7 @@ reqIsValid( const tr_peermsgs   * msgs,
     else if( tr_pieceOffset( tor, index, offset, length ) > tor->info.totalSize )
         err = 4;
 
-    if( !err )
+    if( err )
     {
         fprintf( stderr, "(ticket #751) err is %d\n", err );
         fprintf( stderr, "(ticket #751) req.index is %"PRIu32"\n", index );
