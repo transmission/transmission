@@ -170,7 +170,7 @@ tr_initFull( const char * tag,
     h->shared = tr_sharedInit( h, isNatEnabled, publicPort );
     h->isPortSet = publicPort >= 0;
 
-    tr_inf( TR_NAME " " LONG_VERSION_STRING " started" );
+    tr_inf( _( TR_NAME " " LONG_VERSION_STRING " started" ) );
 
     tr_statsInit( h );
 
@@ -456,7 +456,7 @@ tr_loadTorrents ( tr_handle   * h,
     tr_list_free( &list, NULL );
 
     *setmeCount = n;
-    tr_inf( "Loaded %d torrents from disk", *setmeCount );
+    tr_inf( _( "Loaded %d torrents from disk" ), *setmeCount );
     return torrents;
 }
 

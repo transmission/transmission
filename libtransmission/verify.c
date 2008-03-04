@@ -125,7 +125,7 @@ verifyThreadFunc( void * unused UNUSED )
 
         tor->verifyState = TR_VERIFY_NOW;
 
-        tr_inf( "Verifying some pieces of \"%s\"", tor->info.name );
+        tr_inf( _( "Verifying some pieces of \"%s\"" ), tor->info.name );
         for( i=0; i<tor->info.fileCount && !stopCurrent; ++i )
             checkFile( tor, i, &stopCurrent );
 
@@ -157,7 +157,7 @@ tr_verifyAdd( tr_torrent          * tor,
     {
         struct verify_node * node;
 
-        tr_inf( "Queueing %s to verify %d local file pieces", tor->info.name, uncheckedCount );
+        tr_inf( _( "Queueing %s to verify %d local file pieces" ), tor->info.name, uncheckedCount );
 
         node = tr_new( struct verify_node, 1 );
         node->torrent = tor;

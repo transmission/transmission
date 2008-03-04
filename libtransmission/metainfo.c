@@ -188,7 +188,7 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     }
     else
     {
-        tr_err( "info dictionary not found!" );
+        tr_err( _( "info dictionary not found!" ) );
         return TR_EINVALID;
     }
 
@@ -232,7 +232,10 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     val = tr_bencDictFind( beInfo, "piece length" );
     if( NULL == val || TYPE_INT != val->type )
     {
-        tr_err( "%s \"piece length\" entry", ( val ? "Invalid" : "Missing" ) );
+        if( val )
+            tr_err( _( "Invalid benc entry \"%s\"" ), "piece length" );
+        else
+            tr_err( _( "Missing benc entry \"%s\"" ), "piece length" );
         goto fail;
     }
     inf->pieceSize = val->val.i;
@@ -241,12 +244,15 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     val = tr_bencDictFind( beInfo, "pieces" );
     if( NULL == val || TYPE_STR != val->type )
     {
-        tr_err( "%s \"pieces\" entry", ( val ? "Invalid" : "Missing" ) );
+        if( val )
+            tr_err( _( "Invalid benc entry \"%s\"" ), "pieces" );
+        else
+            tr_err( _( "Missing benc entry \"%s\"" ), "pieces" );
         goto fail;
     }
     if( val->val.s.i % SHA_DIGEST_LENGTH )
     {
-        tr_err( "Invalid \"piece\" string (size is %d)", val->val.s.i );
+        tr_err( _( "Invalid benc entry \"%s\"" ), "pieces" );
         goto fail;
     }
     inf->pieceCount = val->val.s.i / SHA_DIGEST_LENGTH;
@@ -270,13 +276,13 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
 
     if( !inf->fileCount )
     {
-        tr_err( "Torrent has no files." );
+        tr_err( _( "Torrent has no files." ) );
         goto fail;
     }
 
     if( !inf->totalSize )
     {
-        tr_err( "Torrent is zero bytes long." );
+        tr_err( _( "Torrent is zero bytes long." ) );
         goto fail;
     }
 
@@ -285,7 +291,7 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     if( (uint64_t) inf->pieceCount !=
         ( inf->totalSize + inf->pieceSize - 1 ) / inf->pieceSize )
     {
-        tr_err( "Size of hashes and files don't match" );
+        tr_err( _( "Size of hashes and files don't match" ) );
         goto fail;
     }
 
@@ -466,7 +472,7 @@ static int getannounce( tr_info * inf, tr_benc * meta )
         /* did we use any of the tiers? */
         if( 0 == inf->trackerTiers )
         {
-            tr_inf( "No valid entries in \"announce-list\"" );
+            tr_inf( _( "No valid entries in \"announce-list\"" )  );
             free( inf->trackerList );
             inf->trackerList = NULL;
         }
@@ -486,7 +492,7 @@ static int getannounce( tr_info * inf, tr_benc * meta )
     val = tr_bencDictFind( meta, "announce" );
     if( NULL == val || TYPE_STR != val->type )
     {
-        tr_err( "No \"announce\" entry" );
+        tr_err( _( "No \"announce\" entry" ) );
         return TR_EINVALID;
     }
 
@@ -500,7 +506,7 @@ static int getannounce( tr_info * inf, tr_benc * meta )
 
         if( tr_httpParseUrl( pch, -1, &address, &port, &announce ) )
         {
-            tr_err( "Invalid announce URL (%s)", val->val.s.s );
+            tr_err( _( "Invalid announce URL \"%s\"" ), val->val.s.s );
             return TR_EINVALID;
         }
         sublist                   = calloc( 1, sizeof( sublist[0] ) );
@@ -610,13 +616,13 @@ tr_metainfoSave( const char * hash, const char * tag,
     file = fopen( path, "wb+" );
     if( !file )
     {
-        tr_err( "Could not open file (%s) (%s)", path, tr_strerror( errno ) );
+        tr_err( _( "Couldn't open file \"%s\": %s" ), path, tr_strerror( errno ) );
         return TR_EINVALID;
     }
     fseek( file, 0, SEEK_SET );
     if( fwrite( buf, 1, buflen, file ) != buflen )
     {
-        tr_err( "Could not write file (%s) (%s)", path, tr_strerror( errno ) );
+        tr_err( _( "Couldn't write file \"%s\": %s" ), path, tr_strerror( errno ) );
         fclose( file );
         return TR_EINVALID;
     }
@@ -634,7 +640,10 @@ parseFiles( tr_info * inf, tr_benc * name,
 
     if( NULL == name || TYPE_STR != name->type )
     {
-        tr_err( "%s \"name\" string", ( name ? "Invalid" : "Missing" ) );
+        if( name )
+            tr_err( _( "Invalid benc entry \"%s\"" ), "name" );
+        else
+            tr_err( _( "Missing benc entry \"%s\"" ), "name" );
         return TR_EINVALID;
     }
 
@@ -642,7 +651,7 @@ parseFiles( tr_info * inf, tr_benc * name,
                   TR_PATH_DELIMITER );
     if( '\0' == inf->name[0] )
     {
-        tr_err( "Invalid \"name\" string" );
+        tr_err( _( "Invalid benc entry \"%s\"" ), "name" );
         return TR_EINVALID;
     }
     inf->totalSize = 0;
@@ -663,15 +672,19 @@ parseFiles( tr_info * inf, tr_benc * name,
             path = tr_bencDictFindFirst( item, "path.utf-8", "path", NULL );
             if( getfile( &inf->files[ii].name, inf->name, path ) )
             {
-                tr_err( "%s \"path\" entry",
-                        ( path ? "Invalid" : "Missing" ) );
+                if( path )
+                    tr_err( _( "Invalid benc entry \"%s\"" ), "path" );
+                else
+                    tr_err( _( "Missing benc entry \"%s\"" ), "path" );
                 return TR_EINVALID;
             }
             length = tr_bencDictFind( item, "length" );
             if( NULL == length || TYPE_INT != length->type )
             {
-                tr_err( "%s \"length\" entry",
-                        ( length ? "Invalid" : "Missing" ) );
+                if( length )
+                    tr_err( _( "Invalid benc entry \"%s\"" ), "length" );
+                else
+                    tr_err( _( "Missing benc entry \"%s\"" ), "length" );
                 return TR_EINVALID;
             }
             inf->files[ii].length = length->val.i;
@@ -700,9 +713,7 @@ parseFiles( tr_info * inf, tr_benc * name,
     }
     else
     {
-        tr_err( "%s \"files\" entry and %s \"length\" entry",
-                ( files ? "Invalid" : "Missing" ),
-                ( length ? "invalid" : "missing" ) );
+        tr_err( _( "Invalid or missing benc entries \"length\" and \"files\"" ) );
     }
 
     return TR_OK;

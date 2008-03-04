@@ -56,7 +56,7 @@ getFiles( const char        * dir,
     tr_buildPath( buf, sizeof(buf), dir, base, NULL );
     i = stat( buf, &sb );
     if( i ) {
-        tr_err("makemeta couldn't stat \"%s\"; skipping. (%s)", buf, tr_strerror(errno));
+        tr_err( _( "makemeta couldn't stat \"%s\"; skipping. (%s)" ), buf, tr_strerror(errno));
         return list;
     }
 
@@ -205,7 +205,7 @@ getHashInfo ( tr_metainfo_builder * b )
     totalRemain = b->totalSize;
     fp = fopen( b->files[fileIndex].filename, "rb" );
     if( !fp ) {
-        tr_err( "Unable to open \"%s\": %s", b->files[fileIndex].filename, tr_strerror( errno ) );
+        tr_err( _( "Couldn't open \"%s\": %s" ), b->files[fileIndex].filename, tr_strerror( errno ) );
         tr_free( ret );
         b->failed = 1;
         return NULL;
@@ -234,7 +234,7 @@ getHashInfo ( tr_metainfo_builder * b )
                 if( ++fileIndex < b->fileCount ) {
                     fp = fopen( b->files[fileIndex].filename, "rb" );
                     if( !fp ) {
-                        tr_err( "Unable to open \"%s\": %s", b->files[fileIndex].filename, tr_strerror( errno ) );
+                        tr_err( _( "Couldn't open \"%s\": %s" ), b->files[fileIndex].filename, tr_strerror( errno ) );
                         tr_free( ret );
                         b->failed = 1;
                         return NULL;

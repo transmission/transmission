@@ -92,7 +92,7 @@ makeSocketNonBlocking( int fd )
         if( evutil_make_socket_nonblocking( fd ) )
 #endif
         {
-            tr_err( "Couldn't set socket to non-blocking mode (%s)",
+            tr_err( _( "Couldn't set socket to non-blocking mode: %s" ),
                     tr_strerror( sockerrno ) );
             tr_netClose( fd );
             fd = -1;
@@ -132,7 +132,7 @@ tr_netOpen( const struct in_addr * addr, tr_port_t port,
 #endif
         && ( sockerrno != EINPROGRESS ) )
     {
-        tr_err( "Couldn't connect socket %d to %s, port %d (errno %d - %s)",
+        tr_err( _( "Couldn't connect socket %d to %s, port %d (errno %d - %s)" ),
                 s, inet_ntoa(*addr), port,
                 sockerrno, tr_strerror(sockerrno) );
         tr_netClose( s );
@@ -159,7 +159,7 @@ tr_netBind( int port, int type )
 
     if( ( s = createSocket( type, 1 ) ) < 0 )
     {
-        tr_err( "Couldn't create socket of type %d", type );
+        tr_err( _( "Couldn't create socket of type %d" ), type );
         return -1;
     }
 
@@ -176,12 +176,12 @@ tr_netBind( int port, int type )
     if( bind( s, (struct sockaddr *) &sock,
                sizeof( struct sockaddr_in ) ) )
     {
-        tr_err( "Couldn't bind port %d: %s", port, tr_strerror(sockerrno) );
+        tr_err( _( "Couldn't bind port %d: %s" ), port, tr_strerror(sockerrno) );
         tr_netClose( s );
         return -1;
     }
      
-    tr_inf( "Bound socket %d to port %d", s, port );
+    tr_inf( _( "Bound socket %d to port %d" ), s, port );
     return s;
 }
 

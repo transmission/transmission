@@ -89,7 +89,7 @@ natPulse( tr_shared * s )
     if( status == TR_NAT_TRAVERSAL_ERROR )
         status = tr_upnpPulse( s->upnp, port, isEnabled );
     if( status != s->natStatus ) {
-        tr_inf( NATKEY "mapping state changed from '%s' to '%s'", getNatStateStr(s->natStatus), getNatStateStr(status) );
+        tr_inf( _( NATKEY "mapping state changed from '%s' to '%s'" ), getNatStateStr(s->natStatus), getNatStateStr(status) );
         s->natStatus = status;
     }
 }
@@ -99,7 +99,7 @@ incomingPeersPulse( tr_shared * s )
 {
     if( s->bindSocket >= 0 && ( s->bindPort != s->publicPort ) )
     {
-        tr_inf( NATKEY "closing port %d", s->bindPort );
+        tr_inf( _( NATKEY "closing port %d" ), s->bindPort );
         tr_netClose( s->bindSocket );
         s->bindSocket = -1;
     }
@@ -110,12 +110,12 @@ incomingPeersPulse( tr_shared * s )
         errno = 0;
         socket = tr_netBindTCP( s->publicPort );
         if( socket >= 0 ) {
-            tr_inf( NATKEY "opened port %d to listen for incoming peer connections", s->publicPort );
+            tr_inf( _( NATKEY "opened port %d to listen for incoming peer connections" ), s->publicPort );
             s->bindPort = s->publicPort;
             s->bindSocket = socket;
             listen( s->bindSocket, 5 );
         } else {
-            tr_err( NATKEY "unable to open port %d to listen for incoming peer connections (errno is %d - %s)",
+            tr_err( _( NATKEY "unable to open port %d to listen for incoming peer connections (errno is %d - %s)" ),
                     s->publicPort, errno, tr_strerror(errno) );
             s->bindPort = -1;
             s->bindSocket = -1;

@@ -362,13 +362,13 @@ tr_loadFile( const char * path, size_t * size )
     errno = 0;
     if( stat( path, &sb ) )
     {
-        tr_err( "Couldn't get information for file \"%s\" %s", path, tr_strerror(errno) );
+        tr_err( _( "Couldn't get information for file \"%s\": %s" ), path, tr_strerror(errno) );
         return NULL;
     }
 
     if( ( sb.st_mode & S_IFMT ) != S_IFREG )
     {
-        tr_err( "Not a regular file (%s)", path );
+        tr_err( _( "Not a regular file (%s)" ), path );
         return NULL;
     }
 
@@ -376,20 +376,20 @@ tr_loadFile( const char * path, size_t * size )
     file = fopen( path, "rb" );
     if( !file )
     {
-        tr_err( "Couldn't open file \"%s\" %s", path, tr_strerror(errno) );
+        tr_err( _( "Couldn't open file \"%s\": %s" ), path, tr_strerror(errno) );
         return NULL;
     }
     buf = malloc( sb.st_size );
     if( NULL == buf )
     {
-        tr_err( "Couldn't allocate memory (%"PRIu64" bytes)",
-                ( uint64_t )sb.st_size );
+        tr_err( _( "Couldn't read file \"%s\": memory allocation failed" ) );
         fclose( file );
+        return NULL;
     }
     fseek( file, 0, SEEK_SET );
     if( fread( buf, sb.st_size, 1, file ) != 1 )
     {
-        tr_err( "Error reading \"%s\" %s", path, tr_strerror(errno) );
+        tr_err( _( "Couldn't read file \"%s\": %s" ), path, tr_strerror(errno) );
         free( buf );
         fclose( file );
         return NULL;
@@ -444,7 +444,7 @@ tr_mkdirp( const char * path_in, int permissions )
             /* Folder doesn't exist yet */
             if( tr_mkdir( path, permissions ) ) {
                 const int err = errno;
-                tr_err( "Couldn't create directory %s (%s)", path, tr_strerror( err ) );
+                tr_err( _( "Couldn't create \"%s\": %s" ), path, tr_strerror( err ) );
                 tr_free( path );
                 errno = err;
                 return -1;
@@ -453,7 +453,7 @@ tr_mkdirp( const char * path_in, int permissions )
         else if( ( sb.st_mode & S_IFMT ) != S_IFDIR )
         {
             /* Node exists but isn't a folder */
-            tr_err( "Remove %s, it's in the way.", path );
+            tr_err( _( "Remove \"%s\", it's in the way." ), path );
             tr_free( path );
             errno = ENOTDIR;
             return -1;
@@ -519,38 +519,38 @@ tr_errorString( int code )
     switch( code )
     {
         case TR_OK:
-            return "No error";
+            return _( "No error" );
 
         case TR_ERROR:
-            return "Generic error";
+            return _( "Generic error" );
         case TR_ERROR_ASSERT:
-            return "Assert error";
+            return _( "Assert error" );
 
         case TR_ERROR_IO_PARENT:
-            return "Download folder does not exist";
+            return _( "Download folder does not exist" );
         case TR_ERROR_IO_PERMISSIONS:
-            return "Insufficient permissions";
+            return _( "Insufficient permissions" );
         case TR_ERROR_IO_SPACE:
-            return "Insufficient free space";
+            return _( "Insufficient free space" );
         case TR_ERROR_IO_FILE_TOO_BIG:
-            return "File too large";
+            return _( "File too large" );
         case TR_ERROR_IO_OPEN_FILES:
-            return "Too many open files";
+            return _( "Too many open files" );
         case TR_ERROR_IO_DUP_DOWNLOAD:
-            return "Already active transfer with same name and download folder";
+            return _( "Already active transfer with same name and download folder" );
         case TR_ERROR_IO_OTHER:
-            return "Generic I/O error";
+            return _( "Generic I/O error" );
 
         case TR_ERROR_TC_ERROR:
-            return "Tracker error";
+            return _( "Tracker error" );
         case TR_ERROR_TC_WARNING:
-            return "Tracker warning";
+            return _( "Tracker warning" );
 
         case TR_ERROR_PEER_MESSAGE:
-            return "Peer sent a bad message";
+            return _( "Peer sent a bad message" );
 
         default:
-            return "Unknown error";
+            return _( "Unknown error" );
     }
 }
 

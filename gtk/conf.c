@@ -57,7 +57,7 @@ cf_init(const char *dir, char **errstr)
         return TRUE;
 
     if( errstr != NULL )
-        *errstr = g_strdup_printf( _("Failed to create the directory %s:\n%s"),
+        *errstr = g_strdup_printf( _( "Couldn't create \"%s\": %s" ),
                                    gl_confdir, g_strerror(errno) );
 
     return FALSE;
@@ -78,8 +78,8 @@ lockfile(const char * filename, char **errstr)
 
     if( errstr ) switch( state ) {
         case TR_LOCKFILE_EOPEN:
-            *errstr = g_strdup_printf( _("Failed to open lockfile %s: %s"),
-                                       filename, g_strerror( errno ) );
+        *errstr = g_strdup_printf( _( "Couldn't open \"%s\": %s" ),
+                                   filename, g_strerror( errno ) );
             break;
         case TR_LOCKFILE_ELOCK:
             *errstr = g_strdup_printf( _( "%s is already running." ),

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-29 10:21-0600\n"
+"POT-Creation-Date: 2008-03-03 19:53-0600\n"
 "PO-Revision-Date: 2007-12-30 02:13+0100\n"
 "Last-Translator: Gabor Kelemen <kelemeng@gnome.hu>\n"
 "Language-Team:  <hu@li.org>\n"
@@ -17,6 +17,377 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 "X-Generator: KBabel 1.11.4\n"
+
+#: ../libtransmission/peer-msgs.c:1007
+#, c-format
+msgid "torrent %s got %d peers from uT pex"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:166 ../libtransmission/makemeta.c:208
+#: ../libtransmission/makemeta.c:237
+#, c-format
+msgid "Couldn't open \"%s\": %s"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:390
+#, fuzzy, c-format
+msgid "Couldn't create socket: %s"
+msgstr "A socket létrehozása sikertelen: %s"
+
+#: ../libtransmission/utils.c:365
+#, c-format
+msgid "Couldn't get information for file \"%s\": %s"
+msgstr ""
+
+#: ../libtransmission/utils.c:371
+#, c-format
+msgid "Not a regular file (%s)"
+msgstr ""
+
+#: ../libtransmission/utils.c:379 ../libtransmission/metainfo.c:619
+#, fuzzy, c-format
+msgid "Couldn't open file \"%s\": %s"
+msgstr ""
+"Nem sikerült zárolni a fájlt: %s\n"
+"%s"
+
+#: ../libtransmission/utils.c:385
+#, c-format
+msgid "Couldn't allocate memory (%<PRIu64> bytes)"
+msgstr ""
+
+#: ../libtransmission/utils.c:392
+#, fuzzy, c-format
+msgid "Error reading \"%s\": %s"
+msgstr "Nem sikerült írni ide: \"%s\": %s"
+
+#: ../libtransmission/utils.c:447
+#, fuzzy, c-format
+msgid "Couldn't create directory \"%s\": %s"
+msgstr ""
+"Nem sikerült a könyvtárat létrehozni: %s:\n"
+"%s"
+
+#. Node exists but isn't a folder
+#: ../libtransmission/utils.c:456
+#, c-format
+msgid "Remove %s, it's in the way."
+msgstr ""
+
+#: ../libtransmission/utils.c:522
+#, fuzzy
+msgid "No error"
+msgstr "Hiba"
+
+#: ../libtransmission/utils.c:525
+msgid "Generic error"
+msgstr ""
+
+#: ../libtransmission/utils.c:527
+msgid "Assert error"
+msgstr ""
+
+#: ../libtransmission/utils.c:530
+msgid "Download folder does not exist"
+msgstr ""
+
+#: ../libtransmission/utils.c:532
+msgid "Insufficient permissions"
+msgstr ""
+
+#: ../libtransmission/utils.c:534
+msgid "Insufficient free space"
+msgstr ""
+
+#: ../libtransmission/utils.c:536
+msgid "File too large"
+msgstr ""
+
+#: ../libtransmission/utils.c:538
+#, fuzzy
+msgid "Too many open files"
+msgstr "Torrentfájlok"
+
+#: ../libtransmission/utils.c:540
+msgid "Already active transfer with same name and download folder"
+msgstr ""
+
+#: ../libtransmission/utils.c:542
+msgid "Generic I/O error"
+msgstr ""
+
+#: ../libtransmission/utils.c:545
+#, fuzzy
+msgid "Tracker error"
+msgstr "Követő"
+
+#: ../libtransmission/utils.c:547
+#, fuzzy
+msgid "Tracker warning"
+msgstr "Követő"
+
+#: ../libtransmission/utils.c:550
+msgid "Peer sent a bad message"
+msgstr ""
+
+#: ../libtransmission/utils.c:553
+msgid "Unknown error"
+msgstr ""
+
+#: ../libtransmission/verify.c:128
+#, c-format
+msgid "Verifying some pieces of \"%s\""
+msgstr ""
+
+#: ../libtransmission/verify.c:160
+#, c-format
+msgid "Queueing %s to verify %d local file pieces"
+msgstr ""
+
+#. did caller give us an uninitialized val?
+#: ../libtransmission/bencode.c:671
+#, c-format
+msgid "Invalid benc type %d"
+msgstr ""
+
+#: ../libtransmission/makemeta.c:59
+#, c-format
+msgid "makemeta couldn't stat \"%s\"; skipping. (%s)"
+msgstr ""
+
+#: ../libtransmission/torrent.c:158
+#, c-format
+msgid "Tracker: Warning - %s"
+msgstr ""
+
+#: ../libtransmission/torrent.c:164
+#, c-format
+msgid "Tracker: Error - %s"
+msgstr ""
+
+#: ../libtransmission/torrent.c:876
+#, c-format
+msgid "Closing torrent %s... %d torrents left"
+msgstr ""
+
+#: ../libtransmission/shared.c:92
+#, c-format
+msgid "mapping state changed from '%s' to '%s'"
+msgstr ""
+
+#: ../libtransmission/shared.c:102
+#, c-format
+msgid "closing port %d"
+msgstr ""
+
+#: ../libtransmission/shared.c:113
+#, c-format
+msgid "opened port %d to listen for incoming peer connections"
+msgstr ""
+
+#: ../libtransmission/shared.c:118
+#, c-format
+msgid ""
+"unable to open port %d to listen for incoming peer connections (errno is %d "
+"- %s)"
+msgstr ""
+
+#: ../libtransmission/upnp.c:91
+#, c-format
+msgid "upnpDiscover returned NULL (errno %d - %s)"
+msgstr ""
+
+#: ../libtransmission/upnp.c:95
+#, c-format
+msgid "Found Internet Gateway Device '%s'"
+msgstr ""
+
+#: ../libtransmission/upnp.c:96
+#, c-format
+msgid "Local LAN IP Address is '%s'"
+msgstr ""
+
+#: ../libtransmission/upnp.c:101
+#, c-format
+msgid "UPNP_GetValidIGD failed.  (errno %d - %s)"
+msgstr ""
+
+#: ../libtransmission/upnp.c:102 ../libtransmission/upnp.c:157
+msgid "If your router supports UPnP, please make sure UPnP is enabled!"
+msgstr ""
+
+#: ../libtransmission/upnp.c:149
+#, c-format
+msgid "Port forwarding via '%s', service '%s'.  (local address: %s:%d)"
+msgstr ""
+
+#: ../libtransmission/upnp.c:152
+msgid "Port forwarding successful!"
+msgstr ""
+
+#: ../libtransmission/upnp.c:156
+#, c-format
+msgid "Port forwarding failed with err %d (%d - %s)"
+msgstr ""
+
+#: ../libtransmission/metainfo.c:191
+msgid "info dictionary not found!"
+msgstr ""
+
+#: ../libtransmission/metainfo.c:236 ../libtransmission/metainfo.c:248
+#: ../libtransmission/metainfo.c:255 ../libtransmission/metainfo.c:644
+#: ../libtransmission/metainfo.c:654 ../libtransmission/metainfo.c:676
+#: ../libtransmission/metainfo.c:685
+#, c-format
+msgid "Invalid benc entry \"%s\""
+msgstr ""
+
+#: ../libtransmission/metainfo.c:238 ../libtransmission/metainfo.c:250
+#: ../libtransmission/metainfo.c:646 ../libtransmission/metainfo.c:678
+#: ../libtransmission/metainfo.c:687
+#, c-format
+msgid "Missing benc entry \"%s\""
+msgstr ""
+
+#: ../libtransmission/metainfo.c:279
+#, fuzzy
+msgid "Torrent has no files."
+msgstr "Torrentfájlok"
+
+#: ../libtransmission/metainfo.c:285
+#, fuzzy
+msgid "Torrent is zero bytes long."
+msgstr "a torrent már nyitva van"
+
+#: ../libtransmission/metainfo.c:294
+msgid "Size of hashes and files don't match"
+msgstr ""
+
+#: ../libtransmission/metainfo.c:475
+msgid "No valid entries in \"announce-list\""
+msgstr ""
+
+#: ../libtransmission/metainfo.c:495
+msgid "No \"announce\" entry"
+msgstr ""
+
+#: ../libtransmission/metainfo.c:509
+#, c-format
+msgid "Invalid announce URL \"%s\""
+msgstr ""
+
+#: ../libtransmission/metainfo.c:625
+#, fuzzy, c-format
+msgid "Couldn't write file \"%s\": %s"
+msgstr "Nem sikerült írni ide: \"%s\": %s"
+
+#: ../libtransmission/metainfo.c:716
+msgid "Invalid or missing benc entries \"length\" and \"files\""
+msgstr ""
+
+#: ../libtransmission/natpmp.c:68
+#, c-format
+msgid "%s returned 'try again'"
+msgstr ""
+
+#: ../libtransmission/natpmp.c:70
+#, c-format
+msgid "%s returned success (%d)"
+msgstr ""
+
+#: ../libtransmission/natpmp.c:72
+#, c-format
+msgid "%s returned error %d, errno is %d (%s)"
+msgstr ""
+
+#: ../libtransmission/natpmp.c:112
+msgid "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!"
+msgstr ""
+
+#: ../libtransmission/natpmp.c:113
+msgid "NAT-PMP port forwarding unsuccessful, trying UPnP next"
+msgstr ""
+
+#: ../libtransmission/natpmp.c:139
+#, c-format
+msgid "found public address %s"
+msgstr ""
+
+#: ../libtransmission/natpmp.c:166
+#, c-format
+msgid "port %d has been unmapped."
+msgstr ""
+
+#: ../libtransmission/natpmp.c:202
+#, c-format
+msgid "port %d mapped successfully"
+msgstr ""
+
+#: ../libtransmission/net.c:95
+#, c-format
+msgid "Couldn't set socket to non-blocking mode: %s"
+msgstr ""
+
+#: ../libtransmission/net.c:135
+#, c-format
+msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
+msgstr ""
+
+#: ../libtransmission/net.c:162
+#, fuzzy, c-format
+msgid "Couldn't create socket of type %d"
+msgstr "A socket létrehozása sikertelen: %s"
+
+#: ../libtransmission/net.c:179
+#, c-format
+msgid "Couldn't bind port %d: %s"
+msgstr ""
+
+#: ../libtransmission/net.c:184
+#, c-format
+msgid "Bound socket %d to port %d"
+msgstr ""
+
+#: ../libtransmission/transmission.c:173
+msgid " "
+msgstr ""
+
+#: ../libtransmission/transmission.c:459
+#, c-format
+msgid "Loaded %d torrents from disk"
+msgstr ""
+
+#: ../libtransmission/fastresume.c:190
+#, fuzzy, c-format
+msgid "Couldn't open \"%s\" for writing"
+msgstr ""
+"Nem sikerült megnyitni a fájlt íráshoz: %s\n"
+"%s"
+
+#: ../libtransmission/fastresume.c:421
+#, c-format
+msgid "File '%s' recheck needed"
+msgstr ""
+
+#: ../libtransmission/fastresume.c:544
+#, c-format
+msgid "found %i peers in resume file"
+msgstr ""
+
+#: ../libtransmission/fastresume.c:590
+#, c-format
+msgid "Skipping unknown resume code %d"
+msgstr ""
+
+#: ../libtransmission/fastresume.c:633
+#, c-format
+msgid "Couldn't read resume file for '%s'"
+msgstr ""
+
+#: ../libtransmission/fastresume.c:643
+#, c-format
+msgid "Unsupported resume file %d for '%s'"
+msgstr ""
 
 #: ../gtk/transmission.desktop.in.h:1
 msgid "BitTorrent Client"
@@ -142,49 +513,54 @@ msgstr "_Felfüggesztés"
 msgid "_Remove"
 msgstr "_Eltávolítás"
 
-#: ../gtk/actions.c:118
+#: ../gtk/actions.c:119
+#, fuzzy
+msgid "_Delete Files"
+msgstr "Rés_zletek"
+
+#: ../gtk/actions.c:120
 msgid "_New..."
 msgstr ""
 
-#: ../gtk/actions.c:119
+#: ../gtk/actions.c:121
 #, fuzzy
 msgid "Create a new torrent"
 msgstr "Új torrent létrehozása"
 
-#: ../gtk/actions.c:121
+#: ../gtk/actions.c:123
 msgid "_Close"
 msgstr "_Bezárás"
 
-#: ../gtk/actions.c:122
+#: ../gtk/actions.c:124
 #, fuzzy
 msgid "Close main window"
 msgstr "_Fő ablak megjelenítése"
 
-#: ../gtk/actions.c:125
+#: ../gtk/actions.c:127
 msgid "_Quit"
 msgstr "_Kilépés"
 
-#: ../gtk/actions.c:127
+#: ../gtk/actions.c:129
 msgid "Select _All"
 msgstr "M_inden kijelölése"
 
-#: ../gtk/actions.c:129
+#: ../gtk/actions.c:131
 msgid "Dese_lect All"
 msgstr "Kije_lölések megszüntetése"
 
-#: ../gtk/actions.c:133
+#: ../gtk/actions.c:135
 msgid "_Details"
 msgstr "Rés_zletek"
 
-#: ../gtk/actions.c:133
+#: ../gtk/actions.c:135
 msgid "Torrent Details"
 msgstr "Torrent részletei"
 
-#: ../gtk/actions.c:135
+#: ../gtk/actions.c:137
 msgid "_About Transmission"
 msgstr "A _Transmission névjegye"
 
-#: ../gtk/actions.c:137
+#: ../gtk/actions.c:139
 msgid "Ask Tracker for _More Peers"
 msgstr "_Több partner kérése a követőtől"
 
@@ -524,23 +900,27 @@ msgstr "Ez lezárja az összes aktív torrentet."
 msgid "_Don't Ask Me This Again"
 msgstr "Ne kér_dezze meg többet"
 
-#: ../gtk/dialogs.c:346
-#, fuzzy
-msgid "Remove Torrent"
-msgstr "Torrent megnyitása"
+#: ../gtk/dialogs.c:334
+#, fuzzy, c-format
+msgid "Remove torrent?"
+msgid_plural "Remove torrents?"
+msgstr[0] "Torrent megnyitása"
+msgstr[1] "Torrent megnyitása"
 
-#: ../gtk/dialogs.c:367
-msgid "Remove the selected torrent(s)?"
+#: ../gtk/dialogs.c:343
+msgid "This removes the torrent, not the downloaded files."
 msgstr ""
 
-#: ../gtk/dialogs.c:375
-msgid "All downloaded files for this torrent will be deleted!"
-msgstr ""
+#: ../gtk/dialogs.c:372
+#, fuzzy, c-format
+msgid "Delete torrent?"
+msgid_plural "Delete torrents?"
+msgstr[0] "Publikus torrent"
+msgstr[1] "Publikus torrent"
 
-#: ../gtk/dialogs.c:380
-#, fuzzy
-msgid "Delete _downloaded files"
-msgstr "Mási_k letöltési könyvtár használata"
+#: ../gtk/dialogs.c:381
+msgid "This removes the torrent and deletes the downloaded files!"
+msgstr ""
 
 #: ../gtk/file-list.c:64 ../gtk/file-list.c:74 ../gtk/file-list.c:245
 msgid "High"
@@ -612,39 +992,39 @@ msgstr "Az IPC beállítása sikertelen: %s"
 msgid "Failed to set up socket: %s"
 msgstr "A socket beállítása sikertelen: %s"
 
-#: ../gtk/main.c:271
+#: ../gtk/main.c:272
 msgid "Start with all torrents paused"
 msgstr "Az összes torrent indítása felfüggesztettként"
 
-#: ../gtk/main.c:273
+#: ../gtk/main.c:274
 msgid "Request that the running instance quit"
 msgstr "A futó példányból való kilépés kérése"
 
-#: ../gtk/main.c:276
+#: ../gtk/main.c:277
 msgid "Start minimized in system tray"
 msgstr ""
 
-#: ../gtk/main.c:289
+#: ../gtk/main.c:290
 msgid "Transmission"
 msgstr "Transmission"
 
-#: ../gtk/main.c:294
+#: ../gtk/main.c:295
 msgid "[torrent files]"
 msgstr "[torrentfájlok]"
 
-#: ../gtk/main.c:620
+#: ../gtk/main.c:621
 msgid "Closing Connections"
 msgstr "Kapcsolatok lezárása"
 
-#: ../gtk/main.c:620
+#: ../gtk/main.c:621
 msgid "Sending upload/download totals to tracker..."
 msgstr "Az összesített le/feltöltési adat elküldése a követőnek..."
 
-#: ../gtk/main.c:626
+#: ../gtk/main.c:627
 msgid "_Quit Immediately"
 msgstr "A_zonnali kilépés"
 
-#: ../gtk/main.c:761
+#: ../gtk/main.c:762
 #, c-format
 msgid ""
 "Failed to load torrent file:\n"
@@ -659,16 +1039,16 @@ msgstr[1] ""
 "A torrentfájlok betöltése sikertelen:\n"
 "%s"
 
-#: ../gtk/main.c:920
+#: ../gtk/main.c:922
 msgid "A fast and easy BitTorrent client"
 msgstr "Gyors és egyszerű  BitTorrent kliens"
 
-#: ../gtk/main.c:923
+#: ../gtk/main.c:925
 #, fuzzy
 msgid "Copyright 2005-2008 The Transmission Project"
 msgstr "Copyright 2005-2007 The Transmission Project"
 
-#: ../gtk/main.c:930
+#: ../gtk/main.c:932
 msgid "translator-credits"
 msgstr "Kéménczy Kálmán <kkemenczy@openscope.org>"
 
@@ -727,6 +1107,7 @@ msgid "Torrent"
 msgstr "Torrent"
 
 #: ../gtk/makemeta-ui.c:288
+#, c-format
 msgid "Private to this Tracker"
 msgstr "Privát ennek a követőnek"
 
@@ -766,6 +1147,21 @@ msgstr "Szint "
 #: ../gtk/msgwin.c:263 ../gtk/msgwin.c:294
 msgid "Select the debug filter level."
 msgstr "Válassza ki a nyomkövetés szintjét."
+
+#: ../gtk/notify.c:59
+#, fuzzy
+msgid "Torrent Complete"
+msgstr "A torrent elkészült"
+
+#: ../gtk/notify.c:62
+#, fuzzy
+msgid "Open File"
+msgstr "Fájl"
+
+#: ../gtk/notify.c:64
+#, fuzzy
+msgid "Open Folder"
+msgstr "Torrent megnyitása"
 
 #. make the dialog
 #: ../gtk/open-dialog.c:146
@@ -1227,6 +1623,10 @@ msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
 
+#, fuzzy
+#~ msgid "Delete _downloaded files"
+#~ msgstr "Mási_k letöltési könyvtár használata"
+
 #~ msgid "Transfer files via Peer to Peer"
 #~ msgstr "Partnerek közötti adatátvitel"
 
@@ -1247,13 +1647,6 @@ msgstr[1] "nap"
 
 #~ msgid "Create _New Torrent"
 #~ msgstr "Új torrent _létrehozása"
-
-#~ msgid ""
-#~ "Failed to open the file %s for writing:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Nem sikerült megnyitni a fájlt íráshoz: %s\n"
-#~ "%s"
 
 #~ msgid "Automatically _start torrent"
 #~ msgstr "Torrent automatiku_s indítása"
@@ -1362,9 +1755,6 @@ msgstr[1] "nap"
 
 #~ msgid "NAT traversal uses either NAT-PMP or UPnP"
 #~ msgstr "A NAT-fordítás NAT-PMP-t vagy UPnP-t használ"
-
-#~ msgid "torrent is already open"
-#~ msgstr "a torrent már nyitva van"
 
 #~ msgid "%d of %d Transfers"
 #~ msgstr "%d / %d átvitel"

@@ -1004,7 +1004,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
         && (( sub = tr_bencDictFindType( &val, "added", TYPE_STR ))))
     {
         const int n = sub->val.s.i / 6 ;
-        tr_inf( "torrent %s got %d peers from uT pex", msgs->torrent->info.name, n );
+        tr_inf( _( "torrent %s got %d peers from uT pex" ), msgs->torrent->info.name, n );
         tr_peerMgrAddPeers( msgs->handle->peerMgr,
                             msgs->torrent->info.hash,
                             TR_PEER_FROM_PEX,

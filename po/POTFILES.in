@@ -1,5 +1,4 @@
 [encoding: UTF-8]
-gtk/transmission.desktop.in
 gtk/actions.c
 gtk/conf.c
 gtk/details.c
@@ -15,6 +14,7 @@ gtk/open-dialog.c
 gtk/sexy-icon-entry.c
 gtk/stats.c
 gtk/torrent-cell-renderer.c
+gtk/transmission.desktop.in
 gtk/tr-core.c
 gtk/tr-icon.c
 gtk/tr-io.c
@@ -22,3 +22,17 @@ gtk/tr-prefs.c
 gtk/tr-torrent.c
 gtk/tr-window.c
 gtk/util.c
+libtransmission/bencode.c
+libtransmission/fastresume.c
+libtransmission/fdlimit.c
+libtransmission/makemeta.c
+libtransmission/metainfo.c
+libtransmission/natpmp.c
+libtransmission/net.c
+libtransmission/peer-msgs.c
+libtransmission/shared.c
+libtransmission/torrent.c
+libtransmission/transmission.c
+libtransmission/upnp.c
+libtransmission/utils.c
+libtransmission/verify.c

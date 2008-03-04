@@ -32,6 +32,15 @@
 
 void tr_msgInit( void );
 
+#if defined(SYS_DARWIN)
+  #include <CFBundle.h>
+  #define _(a) CFCopyLocalizedStringFromTable( \
+               CFSTR( a ), "LibraryLocalizable", "comment" )
+#else
+  #include <libintl.h>
+  #define _(a) gettext (a)
+#endif
+
 #define tr_err( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, ## a )
 #define tr_inf( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, ## a )
 #define tr_dbg( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, ## a )

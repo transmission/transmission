@@ -163,7 +163,7 @@ TrOpenFile( int           i,
     file->fd = open( filename, flags, 0666 );
     if( file->fd == -1 ) {
         const int err = errno;
-        tr_err( "Couldn't open '%s': %s", filename, tr_strerror(err) );
+        tr_err( _( "Couldn't open \"%s\": %s" ), filename, tr_strerror(err) );
         return tr_ioErrorFromErrno( err );
     }
 
@@ -387,7 +387,7 @@ tr_fdSocketCreate( int type, int isReserved )
 
     if( isReserved || ( gFd->normal < getSocketMax( gFd ) ) )
         if( ( s = socket( AF_INET, type, 0 ) ) < 0 )
-            tr_err( "Couldn't create socket (%s)", tr_strerror( sockerrno ) );
+            tr_err( _( "Couldn't create socket: %s" ), tr_strerror( sockerrno ) );
 
     if( s > -1 )
     {
