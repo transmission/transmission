@@ -527,15 +527,15 @@ tr_errorString( int code )
             return _( "Assert error" );
 
         case TR_ERROR_IO_PARENT:
-            return _( "Download folder does not exist" );
+            return _( "Download folder doesn't exist" );
         case TR_ERROR_IO_PERMISSIONS:
-            return _( "Insufficient permissions" );
+            return tr_strerror( EACCES );
         case TR_ERROR_IO_SPACE:
-            return _( "Insufficient free space" );
+            return tr_strerror( ENOSPC );
         case TR_ERROR_IO_FILE_TOO_BIG:
-            return _( "File too large" );
+            return tr_strerror( EFBIG );
         case TR_ERROR_IO_OPEN_FILES:
-            return _( "Too many open files" );
+            return tr_strerror( EMFILE );
         case TR_ERROR_IO_DUP_DOWNLOAD:
             return _( "Already active transfer with same name and download folder" );
         case TR_ERROR_IO_OTHER:

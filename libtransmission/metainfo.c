@@ -472,7 +472,7 @@ static int getannounce( tr_info * inf, tr_benc * meta )
         /* did we use any of the tiers? */
         if( 0 == inf->trackerTiers )
         {
-            tr_inf( _( "No valid entries in \"announce-list\"" )  );
+            tr_inf( _( "Incomplete benc entry \"%s\"" ), "announce-list" );
             free( inf->trackerList );
             inf->trackerList = NULL;
         }
@@ -492,7 +492,7 @@ static int getannounce( tr_info * inf, tr_benc * meta )
     val = tr_bencDictFind( meta, "announce" );
     if( NULL == val || TYPE_STR != val->type )
     {
-        tr_err( _( "No \"announce\" entry" ) );
+        tr_err( _( "Missing benc entry \"%s\"" ), "announce" );
         return TR_EINVALID;
     }
 
