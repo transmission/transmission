@@ -259,8 +259,8 @@ struct tr_peermsgs
     uint8_t state;
     uint8_t ut_pex_id;
     uint16_t pexCount;
-    uint32_t maxActiveRequests;
-    uint32_t minActiveRequests;
+    uint16_t maxActiveRequests;
+    uint16_t minActiveRequests;
 
     tr_peer * info;
 
@@ -270,7 +270,7 @@ struct tr_peermsgs
 
     tr_publisher_t * publisher;
 
-    struct evbuffer * outBlock;    /* buffer of all the current piece message */
+    struct evbuffer * outBlock;    /* buffer of the current piece message */
     struct evbuffer * outMessages; /* buffer of all the non-piece messages */
 
     struct request_list peerAskedFor;
@@ -282,13 +282,10 @@ struct tr_peermsgs
     tr_timer * pulseTimer;
     tr_timer * pexTimer;
 
-    time_t lastReqAddedAt;
     time_t clientSentPexAt;
     time_t clientSentAnythingAt;
     
-    tr_bitfield * clientAllowedPieces;
     tr_bitfield * peerAllowedPieces;
-    tr_bitfield * clientSuggestedPieces;
 
     struct tr_incoming incoming; 
 
@@ -754,7 +751,7 @@ pumpRequestQueue( tr_peermsgs * msgs )
         assert( tr_bitfieldHas( msgs->info->have, req.index ) );
 
         protocolSendRequest( msgs, &req );
-        req.time_requested = msgs->lastReqAddedAt = now;
+        req.time_requested = now;
         reqListAppend( &msgs->clientAskedFor, &req );
 
         ++count;
@@ -1323,10 +1320,6 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             dbgmsg( msgs, "got Have: %u", ui32 );
             if( tr_bitfieldAdd( msgs->info->have, ui32 ) )
                 fireError( msgs, TR_ERROR_PEER_MESSAGE );
-            /* If this is a fast-allowed piece for this peer, mark it as normal now */
-            if( msgs->clientAllowedPieces != NULL && tr_bitfieldHas( msgs->clientAllowedPieces, ui32 ) )
-                if( tr_bitfieldRem( msgs->clientAllowedPieces, ui32 ) )
-                    fireError( msgs, TR_ERROR_PEER_MESSAGE );
             updatePeerProgress( msgs );
             tr_rcTransferred( msgs->torrent->swarmspeed, msgs->torrent->info.pieceSize );
             break;
@@ -1376,9 +1369,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_SUGGEST: {
             dbgmsg( msgs, "Got a BT_SUGGEST" );
             tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
-            if( tr_cpPieceIsComplete( msgs->torrent->completion, ui32 ) )
-                if( tr_bitfieldAdd( msgs->clientSuggestedPieces, ui32 ) )
-                    fireError( msgs, TR_ERROR_PEER_MESSAGE );
+            /* we don't do anything with this yet */
             break;
         }
             
@@ -1410,8 +1401,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_ALLOWED_FAST: {
             dbgmsg( msgs, "Got a BT_ALLOWED_FAST" );
             tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
-            if( tr_bitfieldAdd( msgs->clientAllowedPieces, ui32 ) )
-                fireError( msgs, TR_ERROR_PEER_MESSAGE );
+            /* we don't do anything with this yet */
             break;
         }
 
@@ -1969,8 +1959,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->peerAskedForFast = REQUEST_LIST_INIT;
     m->clientAskedFor = REQUEST_LIST_INIT;
     m->clientWillAskFor = REQUEST_LIST_INIT;
-    m->clientAllowedPieces = tr_bitfieldNew( m->torrent->info.pieceCount );
-    m->clientSuggestedPieces = tr_bitfieldNew( m->torrent->info.pieceCount );
     *setme = tr_publisherSubscribe( m->publisher, func, userData );
 
     if ( tr_peerIoSupportsLTEP( m->io ) )
@@ -2012,8 +2000,6 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
         reqListClear( &msgs->peerAskedForFast );
         reqListClear( &msgs->peerAskedFor );
         tr_bitfieldFree( msgs->peerAllowedPieces );
-        tr_bitfieldFree( msgs->clientAllowedPieces );
-        tr_bitfieldFree( msgs->clientSuggestedPieces );
         evbuffer_free( msgs->incoming.block );
         evbuffer_free( msgs->outMessages );
         evbuffer_free( msgs->outBlock );
