@@ -228,6 +228,14 @@
     else if ([ident isEqualToString: @"UL"] || [ident isEqualToString: @"UL Image"])
         return [fDefaults boolForKey: @"DisplayGroupRowRatio"] ? NSLocalizedString(@"Ratio", "Torrent table -> group row -> tooltip")
                 : NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
+    else if (ident)
+    {
+        int count = [[item objectForKey: @"Torrents"] count];
+        if (count == 1)
+            return NSLocalizedString(@"1 transfer", "Torrent table -> group row -> tooltip");
+        else
+            return [NSString stringWithFormat: NSLocalizedString(@"%d transfers", "Torrent table -> group row -> tooltip"), count];
+    }
     else
         return nil;
 }
