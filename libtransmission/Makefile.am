@@ -71,28 +71,30 @@ noinst_HEADERS = \
     utils.h \
     verify.h
 
+bin_PROGRAMS = benc2php
 
-
-noinst_PROGRAMS = \
+TESTS = \
     bencode-test \
     test-fastset \
     test-peer-id
 
-TESTS = $(noinst_PROGRAMS)
+noinst_PROGRAMS = $(TESTS)
 
-TEST_LDADD = \
+APPS_LDADD = \
     ./libtransmission.a  \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/libevent/libevent.la \
     $(OPENSSL_LIBS) $(PTHREAD_LIBS) -lm
 
+benc2php_SOURCES = benc2php.c
+benc2php_LDADD = $(APPS_LDADD)
 bencode_test_SOURCES = bencode-test.c
-bencode_test_LDADD = $(TEST_LDADD)
+bencode_test_LDADD = $(APPS_LDADD)
 test_fastset_SOURCES = test-fastset.c
-test_fastset_LDADD = $(TEST_LDADD)
+test_fastset_LDADD = $(APPS_LDADD)
 test_peer_id_SOURCES = test-peer-id.c
-test_peer_id_LDADD = $(TEST_LDADD)
+test_peer_id_LDADD = $(APPS_LDADD)
 
 
 
