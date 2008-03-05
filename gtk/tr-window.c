@@ -456,7 +456,7 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
         GdkScreen * screen = gtk_widget_get_screen( self );
         GdkColormap * colormap = gdk_screen_get_rgba_colormap( screen );
         if( colormap && gdk_screen_is_composited( screen ) )
-            gtk_widget_set_default_colormap( colormap );
+            gtk_widget_set_colormap( self, colormap );
     }
 #endif
 
