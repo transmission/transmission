@@ -20,6 +20,7 @@ main( int argc, char *argv[] )
 {
     if( argc != 2 )
     {
+        fprintf( stderr, "Convert bencoded text to serialized php.\n" );
         fprintf( stderr, "Usage: benc2php bencoded-text\n" );
         return -1;
     }

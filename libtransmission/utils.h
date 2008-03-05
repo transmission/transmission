@@ -32,6 +32,7 @@
 
 void tr_msgInit( void );
 
+#if !defined(_)
 #if defined(SYS_DARWIN)
   #include <CoreFoundation/CFBundle.h>
   #define _(a) CFStringGetCStringPtr(CFCopyLocalizedStringFromTable( \
@@ -39,6 +40,7 @@ void tr_msgInit( void );
 #else
   #include <libintl.h>
   #define _(a) gettext (a)
+#endif
 #endif
 
 #define tr_err( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, ## a )
