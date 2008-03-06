@@ -239,6 +239,7 @@ typedef enum
             [fDownloadedTotalField setStringValue: @""];
             [fUploadedTotalField setStringValue: @""];
             [fFailedHashField setStringValue: @""];
+            [fDateActivityField setStringValue: @""];
             
             //options fields
             [fUploadLimitPopUp setEnabled: NO];
@@ -328,7 +329,6 @@ typedef enum
         
         [fDateAddedField setStringValue: @""];
         [fDateCompletedField setStringValue: @""];
-        [fDateActivityField setStringValue: @""];
         
         [fPiecesControl setSelected: NO forSegment: PIECES_CONTROL_AVAILABLE];
         [fPiecesControl setSelected: NO forSegment: PIECES_CONTROL_PROGRESS];
@@ -1057,6 +1057,7 @@ typedef enum
         return;
     
     uint64_t have = 0, haveVerified = 0, downloadedTotal = 0, uploadedTotal = 0, failedHash = 0;
+    NSDate * lastActivity = nil;
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
@@ -1066,6 +1067,10 @@ typedef enum
         downloadedTotal += [torrent downloadedTotal];
         uploadedTotal += [torrent uploadedTotal];
         failedHash += [torrent failedHash];
+        
+        NSDate * nextLastActivity;
+        if ((nextLastActivity = [torrent dateActivity]))
+            lastActivity = [nextLastActivity laterDate: lastActivity];
     }
     
     if (have == 0)
@@ -1080,6 +1085,8 @@ typedef enum
     [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
     [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
     [fFailedHashField setStringValue: [NSString stringForFileSize: failedHash]];
+    
+    [fDateActivityField setObjectValue: lastActivity];
     
     if (numberSelected == 1)
     {
@@ -1099,7 +1106,6 @@ typedef enum
         }
         
         [fDateCompletedField setObjectValue: [torrent dateCompleted]];
-        [fDateActivityField setObjectValue: [torrent dateActivity]];
         
         [fPiecesView updateView: NO];
     }
