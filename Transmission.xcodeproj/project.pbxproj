@@ -2240,6 +2240,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				INFOPLIST_FILE = macosx/Info.plist;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DSYS_DARWIN",
+				);
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2284,6 +2288,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				INFOPLIST_FILE = macosx/Info.plist;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DSYS_DARWIN",
+				);
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
