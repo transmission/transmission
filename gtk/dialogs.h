@@ -29,7 +29,7 @@
 #include "tr-torrent.h"
 #include "util.h"
 
-/* prompt for a download directory for torrents, then add them */
+/* prompt for a download folder for torrents, then add them */
 GtkWidget* promptfordir( GtkWindow  * parent,
                          TrCore     * core,
                          GList      * filenames,

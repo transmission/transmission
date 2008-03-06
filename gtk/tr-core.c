@@ -131,7 +131,7 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                        tr_core_marshal_err, G_TYPE_NONE,
                                        2, G_TYPE_INT, G_TYPE_STRING );
-    core_class->promptsig = g_signal_new( "directory-prompt",
+    core_class->promptsig = g_signal_new( "destination-prompt",
                                           G_TYPE_FROM_CLASS( g_class ),
                                           G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                           tr_core_marshal_prompt, G_TYPE_NONE,

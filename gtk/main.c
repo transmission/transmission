@@ -375,7 +375,7 @@ appsetup( TrWindow * wind, GList * args,
 
     /* set up core handlers */
     g_signal_connect( cbdata->core, "error", G_CALLBACK( coreerr ), cbdata );
-    g_signal_connect( cbdata->core, "directory-prompt",
+    g_signal_connect( cbdata->core, "destination-prompt",
                       G_CALLBACK( coreprompt ), cbdata );
     g_signal_connect_swapped( cbdata->core, "quit",
                               G_CALLBACK( wannaquit ), cbdata );

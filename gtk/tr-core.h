@@ -65,7 +65,7 @@ typedef struct TrCoreClass
        void handler( TrCore *, enum tr_core_err, const char *, gpointer ) */
     int errsig;
 
-    /* "directory-prompt" signal:
+    /* "destination-prompt" signal:
        void handler( TrCore *, GList *, gpointer ctor, gpointer userData ) */
     int promptsig;
 
