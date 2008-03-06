@@ -810,6 +810,7 @@ refillPulse( void * vtorrent )
         const uint32_t begin = (block * tor->blockSize) - (index * tor->info.pieceSize);
         const uint32_t length = tr_torBlockCountBytes( tor, (int)block );
 
+        assert( tr_torrentReqIsValid( tor, index, begin, length ) );
         assert( _tr_block( tor, index, begin ) == (int)block );
         assert( begin < (uint32_t)tr_torPieceCountBytes( tor, (int)index ) );
         assert( (begin + length) <= (uint32_t)tr_torPieceCountBytes( tor, (int)index ) );

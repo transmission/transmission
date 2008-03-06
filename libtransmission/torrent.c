@@ -1281,12 +1281,47 @@ tr_torrentGetMaxConnectedPeers( const tr_torrent  * tor )
 ****
 ***/
 
-int _tr_block( const tr_torrent * tor, int index, int begin )
+int
+_tr_block( const tr_torrent * tor, int index, int begin )
 {
     const tr_info * inf = &tor->info;
     return index * ( inf->pieceSize / tor->blockSize ) +
         begin / tor->blockSize;
 }
+
+int
+tr_torrentReqIsValid( const tr_torrent * tor,
+                      uint32_t           index,
+                      uint32_t           offset,
+                      uint32_t           length )
+{
+    static const uint32_t MAX_REQUEST_BYTE_COUNT  = (16 * 1024);
+    int err = 0;
+
+    if( index >= (uint32_t) tor->info.pieceCount )
+        err = 1;
+    else if ( (int)offset >= tr_torPieceCountBytes( tor, (int)index ) )
+        err = 2;
+    else if( length > MAX_REQUEST_BYTE_COUNT )
+        err = 3;
+    else if( tr_pieceOffset( tor, index, offset, length ) > tor->info.totalSize )
+        err = 4;
+
+    if( err )
+    {
+        fprintf( stderr, "(ticket #751) err is %d\n", err );
+        fprintf( stderr, "(ticket #751) req.index is %"PRIu32"\n", index );
+        fprintf( stderr, "(ticket #751) req.offset is %"PRIu32"\n", offset );
+        fprintf( stderr, "(ticket #751) req.length is %"PRIu32"\n", length );
+        fprintf( stderr, "(ticket #751) tor->info.totalSize is %"PRIu64"\n", tor->info.totalSize );
+        fprintf( stderr, "(ticket #751) tor->info.pieceCount is %d\n", tor->info.pieceCount );
+        fprintf( stderr, "(ticket #751) tr_torPieceCountBytes is %d\n", tr_torPieceCountBytes( tor, (int)index ) );
+        fprintf( stderr, "(ticket #751) tr_pieceOffset is %"PRIu64"\n", tr_pieceOffset( tor, index, offset, length ) );
+    }
+
+    return !err;
+}
+
 
 uint64_t
 tr_pieceOffset( const tr_torrent * tor, int index, int begin, int length )

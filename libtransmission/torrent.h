@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id:$
+ * $Id$
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
@@ -74,6 +74,11 @@ int tr_torrentAllowsPex( const tr_torrent * );
 
 #define tr_block(a,b) _tr_block(tor,a,b)
 int _tr_block( const tr_torrent * tor, int index, int begin );
+
+int tr_torrentReqIsValid( const tr_torrent * tor,
+                          uint32_t           index,
+                          uint32_t           offset,
+                          uint32_t           length );
 
 uint64_t tr_pieceOffset( const tr_torrent * tor, int index, int begin, int length );
 

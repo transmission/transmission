@@ -60,9 +60,6 @@ enum
 
     TR_LTEP_PEX             = 1,
 
-    /* drop requests who want too much */
-    MAX_REQUEST_BYTE_COUNT  = (16 * 1024),
-
     MIN_CHOKE_PERIOD_SEC    = (10),
 
     /* idle seconds before we send a keepalive */
@@ -675,31 +672,7 @@ reqIsValid( const tr_peermsgs   * msgs,
             uint32_t              offset,
             uint32_t              length )
 {
-    const tr_torrent * tor = msgs->torrent;
-    int err = 0;
-
-    if( index >= (uint32_t) tor->info.pieceCount )
-        err = 1;
-    else if ( (int)offset >= tr_torPieceCountBytes( tor, (int)index ) )
-        err = 2;
-    else if( length > MAX_REQUEST_BYTE_COUNT )
-        err = 3;
-    else if( tr_pieceOffset( tor, index, offset, length ) > tor->info.totalSize )
-        err = 4;
-
-    if( err )
-    {
-        fprintf( stderr, "(ticket #751) err is %d\n", err );
-        fprintf( stderr, "(ticket #751) req.index is %"PRIu32"\n", index );
-        fprintf( stderr, "(ticket #751) req.offset is %"PRIu32"\n", offset );
-        fprintf( stderr, "(ticket #751) req.length is %"PRIu32"\n", length );
-        fprintf( stderr, "(ticket #751) tor->info.totalSize is %"PRIu64"\n", tor->info.totalSize );
-        fprintf( stderr, "(ticket #751) tor->info.pieceCount is %d\n", tor->info.pieceCount );
-        fprintf( stderr, "(ticket #751) tr_torPieceCountBytes is %d\n", tr_torPieceCountBytes( tor, (int)index ) );
-        fprintf( stderr, "(ticket #751) tr_pieceOffset is %"PRIu64"\n", tr_pieceOffset( tor, index, offset, length ) );
-    }
-
-    return !err;
+    return tr_torrentReqIsValid( msgs->torrent, index, offset, length );
 }
 
 static int
