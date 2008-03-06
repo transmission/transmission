@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  * 
- * $Id:$
+ * $Id$
  */
 
 #include "assert.h"
@@ -122,7 +122,7 @@ getShortStatusString( const tr_stat * torStat )
             break;
 
         case TR_STATUS_CHECK_WAIT:
-            g_string_assign( gstr, _( "Waiting to Verify local data" ) );
+            g_string_assign( gstr, _( "Waiting to verify local data" ) );
             break;
 
         case TR_STATUS_CHECK:

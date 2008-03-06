@@ -157,7 +157,7 @@ tr_verifyAdd( tr_torrent          * tor,
     {
         struct verify_node * node;
 
-        tr_inf( _( "Queueing %s to verify %d local file pieces" ), tor->info.name, uncheckedCount );
+        tr_inf( _( "Queueing \"%s\" for verification" ), tor->info.name );
 
         node = tr_new( struct verify_node, 1 );
         node->torrent = tor;

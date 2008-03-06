@@ -158,10 +158,7 @@ tr_netBind( int port, int type )
 #endif
 
     if( ( s = createSocket( type, 1 ) ) < 0 )
-    {
-        tr_err( _( "Couldn't create socket of type %d" ), type );
         return -1;
-    }
 
 #ifdef SO_REUSEADDR
     optval = 1;

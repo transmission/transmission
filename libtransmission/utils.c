@@ -382,7 +382,7 @@ tr_loadFile( const char * path, size_t * size )
     buf = malloc( sb.st_size );
     if( NULL == buf )
     {
-        tr_err( _( "Couldn't read file \"%s\": memory allocation failed" ) );
+        tr_err( _( "Couldn't read file \"%s\": %s" ), path, _( "Memory allocation failed" ) );
         fclose( file );
         return NULL;
     }
@@ -527,7 +527,7 @@ tr_errorString( int code )
             return _( "Assert error" );
 
         case TR_ERROR_IO_PARENT:
-            return _( "Download folder doesn't exist" );
+            return _( "Download directory doesn't exist" );
         case TR_ERROR_IO_PERMISSIONS:
             return tr_strerror( EACCES );
         case TR_ERROR_IO_SPACE:

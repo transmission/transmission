@@ -42,6 +42,7 @@
  **********************************************************************/
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h> /* calloc */
 #include <string.h> /* strcpy, memset, memcmp */
@@ -186,8 +187,8 @@ tr_fastResumeSave( const tr_torrent * tor )
 
     fastResumeFileName( path, sizeof path, tor, 1 );
     file = fopen( path, "wb+" );
-    if( NULL == file ) {
-        tr_err( _( "Couldn't open \"%s\" for writing" ), path );
+    if( !file ) {
+        tr_err( _( "Couldn't open \"%s\": %s" ), path, tr_strerror( errno ) );
         return;
     }
     

@@ -31,8 +31,6 @@
 #define LIFETIME_SECS 3600
 #define COMMAND_WAIT_SECS 8
 
-#define KEY "Port Mapping (NAT-PMP): "
-
 typedef enum
 {
     TR_NATPMP_IDLE,
@@ -65,11 +63,11 @@ static void
 logVal( const char * func, int ret )
 {
     if( ret==NATPMP_TRYAGAIN )
-        tr_dbg( _( KEY "%s returned 'try again'" ), func );
+        tr_dbg( _( "Port Mapping (NAT-PMP): %s returned 'try again'" ), func );
     else if( ret >= 0 )
-        tr_dbg( _( KEY "%s returned success (%d)" ), func, ret );
+        tr_dbg( _( "Port Mapping (NAT-PMP): %s returned success (%d)" ), func, ret );
     else
-        tr_err( _( KEY "%s returned error %d, errno is %d (%s)" ), func, ret, errno, tr_strerror(errno) );
+        tr_err( _( "Port Mapping (NAT-PMP): %s returned error %d, errno is %d (%s)" ), func, ret, errno, tr_strerror(errno) );
 }
 
 struct tr_natpmp*
@@ -109,8 +107,8 @@ setCommandTime( struct tr_natpmp * nat )
 static void
 setErrorState( struct tr_natpmp * nat )
 {
-    tr_err( _( KEY "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!" ) );
-    tr_err( _( KEY "NAT-PMP port forwarding unsuccessful, trying UPnP next" ) );
+    tr_err( _( "Port Mapping (NAT-PMP): If your router supports NAT-PMP, please make sure NAT-PMP is enabled!" ) );
+    tr_err( _( "Port Mapping (NAT-PMP): NAT-PMP port forwarding unsuccessful, trying UPnP next" ) );
     nat->state = TR_NATPMP_ERR;
 }
 
@@ -136,7 +134,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
         const int val = readnatpmpresponseorretry( &nat->natpmp, &response );
         logVal( "readnatpmpresponseorretry", val );
         if( val >= 0 ) {
-            tr_inf( _( KEY "found public address %s" ), inet_ntoa( response.publicaddress.addr ) );
+            tr_inf( _( "Port Mapping (NAT-PMP): found public address %s" ), inet_ntoa( response.publicaddress.addr ) );
             nat->state = TR_NATPMP_IDLE;
         } else if( val != NATPMP_TRYAGAIN ) {
             setErrorState( nat );
@@ -163,7 +161,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
         const int val = readnatpmpresponseorretry( &nat->natpmp, &resp );
         logVal( "readnatpmpresponseorretry", val );
         if( val >= 0 ) {
-            tr_inf( _( KEY "port %d has been unmapped." ), nat->port );
+            tr_inf( _( "Port Mapping (NAT-PMP): port %d has been unmapped." ), nat->port );
             nat->state = TR_NATPMP_IDLE;
             nat->port = -1;
             nat->isMapped = 0;
@@ -199,7 +197,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
             nat->isMapped = 1;
             nat->renewTime = time( NULL ) + LIFETIME_SECS;
             nat->port = resp.newportmapping.privateport;
-            tr_inf( _( KEY "port %d mapped successfully" ), nat->port );
+            tr_inf( _( "Port Mapping (NAT-PMP): port %d mapped successfully" ), nat->port );
         } else if( val != NATPMP_TRYAGAIN ) {
             setErrorState( nat );
         }

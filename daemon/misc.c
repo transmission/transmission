@@ -133,7 +133,7 @@ writefile( const char * name, uint8_t * buf, ssize_t len )
     fd = open( name, O_WRONLY | O_CREAT | O_TRUNC, 0666 );
     if( 0 > fd )
     {
-        errnomsg( "failed to open %s for writing", name );
+        errnomsg( "Couldn't open \"%s\": %s", name, tr_strerror( errno ) );
         return -1;
     }
 

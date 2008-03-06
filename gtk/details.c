@@ -657,13 +657,13 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
 *****  INFO TAB
 ****/
 
-static GtkWidget* info_page_new (tr_torrent * tor)
+static GtkWidget*
+info_page_new (tr_torrent * tor)
 {
   int row = 0;
   GtkWidget *t = hig_workarea_create ();
   GtkWidget *l, *w, *fr;
   char *pch;
-  char *dname, *bname;
   char sizeStr[128];
   char buf[256];
   char name[128];
@@ -696,7 +696,7 @@ static GtkWidget* info_page_new (tr_torrent * tor)
     gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
     hig_workarea_add_row (t, &row, name, l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Secure"));
+    g_snprintf (name, sizeof(name), namefmt, _("Privacy"));
     pch = (info->isPrivate )
       ? _("Private Torrent, PEX disabled")
       : _("Public Torrent");
@@ -733,24 +733,15 @@ static GtkWidget* info_page_new (tr_torrent * tor)
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Location"));
 
-    g_snprintf (name, sizeof(name), namefmt, _("Downloaded data"));
+    g_snprintf (name, sizeof(name), namefmt, _("Destination directory"));
     l = gtk_label_new (tr_torrentGetFolder (tor));
     gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
     hig_workarea_add_row (t, &row, name, l, NULL); 
 
-    g_snprintf (name, sizeof(name), namefmt, _("Torrent file path"));
-    dname = g_path_get_dirname (info->torrent);
-    l = gtk_label_new ( dname );
+    g_snprintf (name, sizeof(name), namefmt, _("Torrent"));
+    l = gtk_label_new ( info->torrent );
     gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
     hig_workarea_add_row (t, &row, name, l, NULL); 
-    g_free (dname);
-
-    g_snprintf (name, sizeof(name), namefmt, _("Torrent file name"));
-    bname = g_path_get_basename (info->torrent);
-    l = gtk_label_new (bname);
-    gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
-    hig_workarea_add_row (t, &row, name, l, NULL); 
-    g_free (bname);
 
   hig_workarea_finish (t, &row);
   return t;
@@ -986,7 +977,7 @@ options_page_new ( TrTorrent * gtor )
   t = hig_workarea_create ();
   hig_workarea_add_section_title (t, &row, _("Speed Limits") );
 
-    tb = gtk_check_button_new_with_mnemonic (_("Limit _download speed to:"));
+    tb = gtk_check_button_new_with_mnemonic (_("Limit _download speed (KiB/s):"));
     b = tr_torrentGetSpeedMode(tor,TR_DOWN) == TR_SPEEDLIMIT_SINGLE;
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(tb), b );
     g_signal_connect (tb, "toggled", G_CALLBACK(dl_speed_toggled_cb), gtor);
@@ -1003,7 +994,7 @@ options_page_new ( TrTorrent * gtor )
     gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (mis), FALSE, TRUE, 0);
     hig_workarea_add_row_w (t, &row, tb, hb, NULL);
 
-    tb = gtk_check_button_new_with_mnemonic (_("Limit _upload speed to:"));
+    tb = gtk_check_button_new_with_mnemonic (_("Limit _upload speed (KiB/s):"));
     b = tr_torrentGetSpeedMode(tor,TR_UP) == TR_SPEEDLIMIT_SINGLE;
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(tb), b );
     g_signal_connect (tb, "toggled", G_CALLBACK(ul_speed_toggled_cb), gtor);
