@@ -430,8 +430,12 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     GSList * l;
     GSList * toggles;
     const char * filter_names[FILTER_MODE_QTY] = {
-        N_( "A_ll"), N_("_Active"),
-        N_("_Downloading"), N_("_Seeding"), N_("_Paused")
+        /* Translators: "All" refers to "all torrents" */
+        N_( "A_ll"),
+        N_("_Active"),
+        N_("_Downloading"),
+        N_("_Seeding"),
+        N_("_Paused")
     };
     const char * filter_text_names[FILTER_TEXT_MODE_QTY] = {
         N_("Name"), N_("Files"), N_("Tracker")

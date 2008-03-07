@@ -542,7 +542,7 @@ parsePeers( tr_torrent * tor, const uint8_t * buf, uint32_t len )
             tr_peerMgrAddPex( tor->handle->peerMgr, tor->info.hash, TR_PEER_FROM_CACHE, &pex );
         }
 
-        tr_dbg( _( "Fead %i peers from resume file" ), count );
+        tr_dbg( _( "Loaded %i peers from resume file" ), count );
         ret = TR_FR_PEERS;
     }
 

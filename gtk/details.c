@@ -241,10 +241,12 @@ static const char* peer_column_names[N_PEER_COLS] =
 {
   N_("Address"),
   N_("Client"),
-  /* percentage */
+  /* Translators: this is a 'percent done' column whose title is terse to keep the column narrow */
   N_("%"),
   " ",
+  /* Translators: this is a 'download speed' column whose title is terse to keep the column narrow */
   N_("Down"),
+  /* Translators: this is a 'upload speed' column whose title is terse to keep the column narrow */
   N_("Up"),
   N_("Status")
 };
@@ -845,6 +847,7 @@ activity_page_new (TrTorrent * gtor)
     hig_workarea_add_row (t, &row, _("Progress:"), l, NULL);
 
     l = a->have_lb = gtk_label_new (NULL);
+    /* Translators: "Have" refers to the size of the files we have */
     hig_workarea_add_row (t, &row, _("Have:"), l, NULL);
 
     l = a->dl_lb = gtk_label_new (NULL);
@@ -1231,6 +1234,7 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
 
   /* create the dialog */
   tr_strlsize( sizeStr, info->totalSize, sizeof(sizeStr) );
+  /* Translators: first %s is torrent name, second is file size */
   g_snprintf( title, sizeof(title), _( "Details for %s (%s)" ), info->name, sizeStr );
   d = gtk_dialog_new_with_buttons (title, parent, 0,
                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,

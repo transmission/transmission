@@ -231,6 +231,7 @@ msgwin_create( TrCore * core )
   GtkWidget * levels;
   GtkWidget * toolbar;
   GtkWidget * w;
+  GtkWidget * l;
   GtkCellRenderer * renderer;
   int ii, curlevel;
 
@@ -258,8 +259,10 @@ msgwin_create( TrCore * core )
   gtk_toolbar_insert_space(GTK_TOOLBAR(toolbar), -1);
 
 
+  l = gtk_label_new( _( "Level" ) );
+  gtk_misc_set_padding( GTK_MISC( l ), GUI_PAD, 0 );
   gtk_toolbar_append_element(GTK_TOOLBAR(toolbar),
-                             GTK_TOOLBAR_CHILD_WIDGET, gtk_label_new(_("Level ")),
+                             GTK_TOOLBAR_CHILD_WIDGET, l,
                              NULL, _("Set the verbosity level"),
                              NULL, NULL, NULL, NULL);
 
