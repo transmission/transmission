@@ -263,7 +263,7 @@ client_connect(char *path, struct constate *con) {
   size_t             size;
 
   if(0 > (con->fd = socket(AF_UNIX, SOCK_STREAM, 0))) {
-    g_message( _("Failed to create socket: %s"), g_strerror(errno));
+    g_message( _("Couldn't create socket: %s"), g_strerror(errno));
     return FALSE;
   }
 
@@ -272,7 +272,7 @@ client_connect(char *path, struct constate *con) {
   strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
 
   if(0 > connect(con->fd, (struct sockaddr*)&addr, SUN_LEN(&addr))) {
-    g_message( _("Failed to connect to %s: %s"), path, g_strerror(errno));
+    g_message( _("Couldn't connect to \"%s\": %s"), path, g_strerror(errno));
     return FALSE;
   }
 
@@ -312,7 +312,7 @@ blocking_client( enum ipc_msg msgid, GList * files )
   con->msgs = ipc_initmsgs();
   if( NULL == con->msgs )
   {
-      g_message( _("Failed to set up IPC: %s"), g_strerror( errno ) );
+      g_message( _("Couldn't set up IPC: %s"), g_strerror( errno ) );
       g_free( con );
       return FALSE;
   }
@@ -482,7 +482,7 @@ serv_bind(struct constate *con) {
   return;
 
  fail:
-  errmsg(con->u.serv.wind, _("Failed to set up socket: %s"),
+  errmsg(con->u.serv.wind, _("Couldn't set up socket: %s"),
          g_strerror(errno));
   if(0 <= con->fd)
     EVUTIL_CLOSESOCKET(con->fd);
@@ -1148,7 +1148,7 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
   con->msgs = ipc_initmsgs();
   if( NULL == con->msgs )
   {
-      errmsg( con->u.serv.wind, _("Failed to set up IPC: %s"),
+      errmsg( con->u.serv.wind, _("Couldn't set up IPC: %s"),
               g_strerror( errno ) );
       g_free( con );
       return;

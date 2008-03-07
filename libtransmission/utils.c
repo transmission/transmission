@@ -376,7 +376,7 @@ tr_loadFile( const char * path, size_t * size )
     file = fopen( path, "rb" );
     if( !file )
     {
-        tr_err( _( "Couldn't open file \"%s\": %s" ), path, tr_strerror(errno) );
+        tr_err( _( "Couldn't open \"%s\": %s" ), path, tr_strerror(errno) );
         return NULL;
     }
     buf = malloc( sb.st_size );

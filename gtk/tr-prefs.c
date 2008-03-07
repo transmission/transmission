@@ -244,7 +244,7 @@ torrentPage( GObject * core )
         w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );
         hig_workarea_add_wide_control( t, &row, w );
 
-        s = _( "_Start transfers when added" );
+        s = _( "_Start when added" );
         w = new_check_button( s, PREF_KEY_START, core );
         hig_workarea_add_wide_control( t, &row, w );
 
@@ -336,7 +336,7 @@ networkPage( GObject * core, gpointer alive )
         l = gtk_label_new( NULL );
         gtk_misc_set_alignment( GTK_MISC(l), 0.0f, 0.5f );
         gtk_box_pack_start( GTK_BOX(h), l, FALSE, FALSE, 0 );
-        hig_workarea_add_row( t, &row, _("Incoming TCP _Port"), h, w );
+        hig_workarea_add_row( t, &row, _("Incoming TCP _port"), h, w );
 
         g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
         g_object_set_data( G_OBJECT(l), "alive", alive );

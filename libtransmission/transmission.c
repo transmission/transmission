@@ -127,6 +127,7 @@ tr_initFull( const char * tag,
              int          isMessageQueueingEnabled )
 {
     tr_handle * h;
+    char buf[128];
 
 #ifndef WIN32
     /* Don't exit when writing on a broken socket */
@@ -170,7 +171,9 @@ tr_initFull( const char * tag,
     h->shared = tr_sharedInit( h, isNatEnabled, publicPort );
     h->isPortSet = publicPort >= 0;
 
-    tr_inf( _( TR_NAME " " LONG_VERSION_STRING " started" ) );
+    snprintf( buf, sizeof( buf ), _( "%s %s started" ),
+              TR_NAME, LONG_VERSION_STRING );
+    tr_inf( "%s", buf );
 
     tr_statsInit( h );
 
@@ -456,7 +459,7 @@ tr_loadTorrents ( tr_handle   * h,
     tr_list_free( &list, NULL );
 
     *setmeCount = n;
-    tr_inf( _( "Loaded %d torrents from disk" ), *setmeCount );
+    tr_inf( _( "Loaded %d torrents" ), *setmeCount );
     return torrents;
 }
 

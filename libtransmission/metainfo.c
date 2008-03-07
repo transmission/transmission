@@ -233,9 +233,9 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     if( NULL == val || TYPE_INT != val->type )
     {
         if( val )
-            tr_err( _( "Invalid benc entry \"%s\"" ), "piece length" );
+            tr_err( _( "Invalid metadata entry \"%s\"" ), "piece length" );
         else
-            tr_err( _( "Missing benc entry \"%s\"" ), "piece length" );
+            tr_err( _( "Missing metadata entry \"%s\"" ), "piece length" );
         goto fail;
     }
     inf->pieceSize = val->val.i;
@@ -245,14 +245,14 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     if( NULL == val || TYPE_STR != val->type )
     {
         if( val )
-            tr_err( _( "Invalid benc entry \"%s\"" ), "pieces" );
+            tr_err( _( "Invalid metadata entry \"%s\"" ), "pieces" );
         else
-            tr_err( _( "Missing benc entry \"%s\"" ), "pieces" );
+            tr_err( _( "Missing metadata entry \"%s\"" ), "pieces" );
         goto fail;
     }
     if( val->val.s.i % SHA_DIGEST_LENGTH )
     {
-        tr_err( _( "Invalid benc entry \"%s\"" ), "pieces" );
+        tr_err( _( "Invalid metadata entry \"%s\"" ), "pieces" );
         goto fail;
     }
     inf->pieceCount = val->val.s.i / SHA_DIGEST_LENGTH;
@@ -492,7 +492,7 @@ static int getannounce( tr_info * inf, tr_benc * meta )
     val = tr_bencDictFind( meta, "announce" );
     if( NULL == val || TYPE_STR != val->type )
     {
-        tr_err( _( "Missing benc entry \"%s\"" ), "announce" );
+        tr_err( _( "Missing metadata entry \"%s\"" ), "announce" );
         return TR_EINVALID;
     }
 
@@ -616,7 +616,7 @@ tr_metainfoSave( const char * hash, const char * tag,
     file = fopen( path, "wb+" );
     if( !file )
     {
-        tr_err( _( "Couldn't open file \"%s\": %s" ), path, tr_strerror( errno ) );
+        tr_err( _( "Couldn't open \"%s\": %s" ), path, tr_strerror( errno ) );
         return TR_EINVALID;
     }
     fseek( file, 0, SEEK_SET );
@@ -641,9 +641,9 @@ parseFiles( tr_info * inf, tr_benc * name,
     if( NULL == name || TYPE_STR != name->type )
     {
         if( name )
-            tr_err( _( "Invalid benc entry \"%s\"" ), "name" );
+            tr_err( _( "Invalid metadata entry \"%s\"" ), "name" );
         else
-            tr_err( _( "Missing benc entry \"%s\"" ), "name" );
+            tr_err( _( "Missing metadata entry \"%s\"" ), "name" );
         return TR_EINVALID;
     }
 
@@ -651,7 +651,7 @@ parseFiles( tr_info * inf, tr_benc * name,
                   TR_PATH_DELIMITER );
     if( '\0' == inf->name[0] )
     {
-        tr_err( _( "Invalid benc entry \"%s\"" ), "name" );
+        tr_err( _( "Invalid metadata entry \"%s\"" ), "name" );
         return TR_EINVALID;
     }
     inf->totalSize = 0;
@@ -673,18 +673,18 @@ parseFiles( tr_info * inf, tr_benc * name,
             if( getfile( &inf->files[ii].name, inf->name, path ) )
             {
                 if( path )
-                    tr_err( _( "Invalid benc entry \"%s\"" ), "path" );
+                    tr_err( _( "Invalid metadata entry \"%s\"" ), "path" );
                 else
-                    tr_err( _( "Missing benc entry \"%s\"" ), "path" );
+                    tr_err( _( "Missing metadata entry \"%s\"" ), "path" );
                 return TR_EINVALID;
             }
             length = tr_bencDictFind( item, "length" );
             if( NULL == length || TYPE_INT != length->type )
             {
                 if( length )
-                    tr_err( _( "Invalid benc entry \"%s\"" ), "length" );
+                    tr_err( _( "Invalid metadata entry \"%s\"" ), "length" );
                 else
-                    tr_err( _( "Missing benc entry \"%s\"" ), "length" );
+                    tr_err( _( "Missing metadata entry \"%s\"" ), "length" );
                 return TR_EINVALID;
             }
             inf->files[ii].length = length->val.i;

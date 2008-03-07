@@ -39,6 +39,5 @@ GtkWidget* promptfordir( GtkWindow  * parent,
 void askquit( TrCore*, GtkWindow* parent, callbackfunc_t func, void* cbdata );
 
 void confirmDelete( GtkWindow * parent, TrCore * core, GList * torrents );
-void confirmRemove( GtkWindow * parent, TrCore * core, GList * torrents );
 
 #endif /* TG_PREFS_H */

@@ -215,10 +215,10 @@ tr_torrent_new_ctor( tr_handle  * handle,
         switch( errcode )
         {
             case TR_EINVALID:
-                *err = g_strdup_printf( _("%s: not a valid torrent file"), filename );
+                *err = g_strdup_printf( _( "File \"%s\" is not a valid torrent" ), filename );
                  break;
             case TR_EDUPLICATE:
-                *err = g_strdup_printf( _("%s: torrent is already open"), filename );
+                *err = g_strdup_printf( _( "File \"%s\" is already open" ), filename );
                 break;
             default:
                 *err = g_strdup( filename );

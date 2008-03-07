@@ -241,6 +241,7 @@ static const char* peer_column_names[N_PEER_COLS] =
 {
   N_("Address"),
   N_("Client"),
+  /* percentage */
   N_("%"),
   " ",
   N_("Down"),
@@ -581,7 +582,7 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
   vbox = gtk_vbox_new (FALSE, GUI_PAD);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), GUI_PAD_BIG);
 
-    g_snprintf (name, sizeof(name), "<b>%s</b>", _("Piece Availability"));
+    g_snprintf (name, sizeof(name), "<b>%s</b>", _("Availability"));
     l = gtk_label_new (NULL);
     gtk_misc_set_alignment (GTK_MISC(l), 0.0f, 0.5f);
     gtk_label_set_markup (GTK_LABEL(l), name);
@@ -865,7 +866,7 @@ activity_page_new (TrTorrent * gtor)
     hig_workarea_add_row (t, &row, _("Error:"), l, NULL);
 
   hig_workarea_add_section_divider (t, &row);
-  hig_workarea_add_section_title (t, &row, _("Completeness"));
+  hig_workarea_add_section_title (t, &row, _("Completion"));
 
     w = a->availability_da = gtk_drawing_area_new ();
     gtk_widget_set_size_request (w, 0u, 100u);

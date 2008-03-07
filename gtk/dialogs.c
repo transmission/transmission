@@ -272,7 +272,7 @@ askquit( TrCore          * core,
                                      GTK_RESPONSE_ACCEPT,
                                      GTK_RESPONSE_CANCEL );
 
-    dontask = gtk_check_button_new_with_mnemonic( _("_Don't Ask Me This Again") );
+    dontask = gtk_check_button_new_with_mnemonic( _("_Don't ask me this again") );
     stuff->dontask = dontask;
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(wind)->vbox), dontask, FALSE, FALSE, GUI_PAD );
@@ -315,44 +315,6 @@ removeResponse( GtkDialog * dialog, gint response, gpointer gdata )
     gtk_widget_destroy( GTK_WIDGET( dialog ) );
     g_list_free( data->torrents );
     g_free( data );
-}
-
-void
-confirmRemove( GtkWindow * parent,
-               TrCore    * core,
-               GList     * torrents )
-{
-    GtkWidget * d;
-    char text[128];
-    struct DeleteData * dd = g_new0( struct DeleteData, 1 );
-
-    dd->core = core;
-    dd->torrents = torrents;
-    dd->delete_files = FALSE;
-
-    g_snprintf( text, sizeof( text ),
-                ngettext( "Remove torrent?",
-                          "Remove torrents?",
-                          g_list_length( torrents ) ) );
-    d = gtk_message_dialog_new_with_markup( parent,
-                                            GTK_DIALOG_DESTROY_WITH_PARENT,
-                                            GTK_MESSAGE_QUESTION,
-                                            GTK_BUTTONS_NONE,
-                                            "<b>%s</b>", text );
-    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ),
-                   _( "This removes the torrent, not the downloaded files." ) );
-    gtk_dialog_add_buttons( GTK_DIALOG( d ),
-                            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                            GTK_STOCK_REMOVE, GTK_RESPONSE_ACCEPT,
-                            NULL );
-    gtk_dialog_set_default_response( GTK_DIALOG ( d ),
-                                     GTK_RESPONSE_ACCEPT );
-    gtk_dialog_set_alternative_button_order( GTK_DIALOG( d ),
-                                             GTK_RESPONSE_ACCEPT,
-                                             GTK_RESPONSE_CANCEL,
-                                             -1 );
-    g_signal_connect( d, "response", G_CALLBACK( removeResponse ), dd );
-    gtk_widget_show_all( d );
 }
 
 void
