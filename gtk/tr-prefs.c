@@ -27,6 +27,8 @@
 void
 tr_prefs_init_global( void )
 {
+    const char * str;
+
     cf_check_older_configs( );
 
     pref_int_set_default    ( PREF_KEY_MAX_PEERS_GLOBAL, 200 );
@@ -41,15 +43,16 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_DL_LIMIT, 100 );
     pref_flag_set_default   ( PREF_KEY_UL_LIMIT_ENABLED, FALSE );
     pref_int_set_default    ( PREF_KEY_UL_LIMIT, 50 );
-
     pref_flag_set_default   ( PREF_KEY_OPTIONS_PROMPT, TRUE );
+
+    str = NULL;
 #if GLIB_CHECK_VERSION(2,14,0)
-    pref_string_set_default ( PREF_KEY_DIR_DEFAULT,
-                              g_get_user_special_dir(
-                                  G_USER_DIRECTORY_DOWNLOAD ) );
-#else
-    pref_string_set_default ( PREF_KEY_DIR_DEFAULT, g_get_home_dir() );
+    if( !str )
+        str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
 #endif
+    if( !str )
+        str = g_get_home_dir( );
+    pref_string_set_default ( PREF_KEY_DIR_DEFAULT, str );
 
     pref_int_set_default    ( PREF_KEY_PORT, TR_DEFAULT_PORT );
 
