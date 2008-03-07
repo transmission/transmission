@@ -1037,6 +1037,13 @@ accumulateSelectedTorrents( GtkTreeModel * model,
 }
 
 static void
+closeSelectedForeach( gpointer gtor, gpointer gdata )
+{
+    struct cbdata * data = gdata;
+    tr_core_remove_torrent( data->core, gtor, FALSE );
+}
+
+static void
 closeSelected( struct cbdata * data, gboolean doDelete )
 {
     GList * l = NULL;
@@ -1047,13 +1054,9 @@ closeSelected( struct cbdata * data, gboolean doDelete )
         if( doDelete )
             confirmDelete( data->wind, data->core, l );
         else {
-            GList * m;
-            for( m=l; m; m=m->next )
-                tr_core_remove_torrent( data->core, m->data, FALSE );
-            g_list_foreach( l, (GFunc)g_object_unref, NULL );
+            g_list_foreach( l, closeSelectedForeach, data );
             g_list_free( l );
         }
-         
     }
 }
 
