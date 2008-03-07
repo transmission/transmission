@@ -71,7 +71,6 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_MINIMAL_VIEW, FALSE );
 
     pref_flag_set_default   ( PREF_KEY_START, TRUE );
-    pref_flag_set_default   ( PREF_KEY_DELETE_ORIGINAL, FALSE );
 
     pref_save( NULL );
 }
@@ -207,29 +206,6 @@ dialogDestroyed( gpointer alive, GObject * dialog UNUSED )
 }
 
 static GtkWidget*
-generalPage( GObject * core )
-{
-    int row = 0;
-    const char * s;
-    GtkWidget * t;
-    GtkWidget * w;
-
-    t = hig_workarea_create( );
-    hig_workarea_add_section_title( t, &row, _( "Windows" ) );
-        
-        s = _("Show an _icon in the system tray");
-        w = new_check_button( s, PREF_KEY_SYSTRAY, core );
-        hig_workarea_add_wide_control( t, &row, w );
-        
-        s = _("Confirm _quit");
-        w = new_check_button( s, PREF_KEY_ASKQUIT, core );
-        hig_workarea_add_wide_control( t, &row, w );
-
-    hig_workarea_finish( t, &row );
-    return t;
-}
-
-static GtkWidget*
 torrentPage( GObject * core )
 {
     int row = 0;
@@ -249,10 +225,6 @@ torrentPage( GObject * core )
 
         s = _( "_Start when added" );
         w = new_check_button( s, PREF_KEY_START, core );
-        hig_workarea_add_wide_control( t, &row, w );
-
-        s = _( "_Delete original torrent file" );
-        w = new_check_button( s, PREF_KEY_DELETE_ORIGINAL, core );
         hig_workarea_add_wide_control( t, &row, w );
 
 #ifdef HAVE_LIBNOTIFY
@@ -382,9 +354,6 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               networkPage( core, alive ),
                               gtk_label_new (_("Network")) );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              generalPage( core ),
-                              gtk_label_new (_("General")) );
 
     g_signal_connect( d, "response", G_CALLBACK(response_cb), core );
     gtk_box_pack_start_defaults( GTK_BOX(GTK_DIALOG(d)->vbox), n );

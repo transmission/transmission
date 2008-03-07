@@ -499,10 +499,6 @@ tr_core_apply_defaults( tr_ctor * ctor )
     if( tr_ctorGetPaused( ctor, TR_FORCE, NULL ) )
         tr_ctorSetPaused( ctor, TR_FORCE, !pref_flag_get( PREF_KEY_START ) );
 
-    if( tr_ctorGetDeleteSource( ctor, NULL ) )
-        tr_ctorSetDeleteSource( ctor,
-                                pref_flag_get( PREF_KEY_DELETE_ORIGINAL ) );
-
     if( tr_ctorGetMaxConnectedPeers( ctor, TR_FORCE, NULL ) )
         tr_ctorSetMaxConnectedPeers( ctor, TR_FORCE,
                               pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );

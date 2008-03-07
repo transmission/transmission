@@ -27,7 +27,6 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_OPTIONS_PROMPT         "show-options-window"
 #define PREF_KEY_DIR_DEFAULT            "default-download-directory"
 #define PREF_KEY_START                  "start-added-torrents"
-#define PREF_KEY_DELETE_ORIGINAL        "delete-original-torrent-files"
 #define PREF_KEY_PORT                   "listening-port"
 #define PREF_KEY_NAT                    "nat-traversal-enabled"
 #define PREF_KEY_PEX                    "pex-enabled"
