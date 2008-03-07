@@ -271,7 +271,7 @@ main( int argc, char ** argv )
         { "paused", 'p', 0, G_OPTION_ARG_NONE, &startpaused,
           _("Start with all torrents paused"), NULL },
         { "quit", 'q', 0, G_OPTION_ARG_NONE, &sendquit,
-          _( "Request that the running instance quit"), NULL },
+          _( "Ask the running instance to quit"), NULL },
 #ifdef STATUS_ICON_SUPPORTED
         { "minimized", 'm', 0, G_OPTION_ARG_NONE, &startminimized,
           _( "Start minimized in system tray"), NULL },

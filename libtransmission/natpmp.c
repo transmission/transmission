@@ -65,11 +65,11 @@ static void
 logVal( const char * func, int ret )
 {
     if( ret==NATPMP_TRYAGAIN )
-        tr_dbg( _( "%s: %s returned 'try again'" ), getKey(), func );
+        tr_dbg( _( "%s: %s responded 'try again'" ), getKey(), func );
     else if( ret >= 0 )
-        tr_dbg( _( "%s: %s returned success (%d)" ), getKey(), func, ret );
+        tr_dbg( _( "%s: %s succeeded (%d)" ), getKey(), func, ret );
     else
-        tr_err( _( "%s: %s returned error %d, errno is %d (%s)" ), getKey(), func, ret, errno, tr_strerror(errno) );
+        tr_err( _( "%s: %s failed (%d): %s (%d)" ), getKey(), func, ret, tr_strerror(errno), errno );
 }
 
 struct tr_natpmp*
@@ -163,7 +163,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
         const int val = readnatpmpresponseorretry( &nat->natpmp, &resp );
         logVal( "readnatpmpresponseorretry", val );
         if( val >= 0 ) {
-            tr_inf( _( "%s: port %d has been unmapped." ), getKey(), nat->port );
+            tr_inf( _( "%s: port %d has been unmapped" ), getKey(), nat->port );
             nat->state = TR_NATPMP_IDLE;
             nat->port = -1;
             nat->isMapped = 0;

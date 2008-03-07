@@ -669,7 +669,7 @@ bencWalk( const tr_benc   * top,
 
             default:
                 /* did caller give us an uninitialized val? */
-                tr_err( _( "Invalid benc type %d" ), val->type );
+                tr_err( _( "Invalid metadata" ) );
                 break;
         }
     }

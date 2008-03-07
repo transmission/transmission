@@ -188,7 +188,7 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     }
     else
     {
-        tr_err( _( "info dictionary not found!" ) );
+        tr_err( _( "Missing metadata entry \"%s\"" ), "info" );
         return TR_EINVALID;
     }
 
@@ -274,15 +274,9 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
         goto fail;
     }
 
-    if( !inf->fileCount )
+    if( !inf->fileCount || !inf->totalSize )
     {
-        tr_err( _( "Torrent has no files." ) );
-        goto fail;
-    }
-
-    if( !inf->totalSize )
-    {
-        tr_err( _( "Torrent is zero bytes long." ) );
+        tr_err( _( "Torrent is empty" ) );
         goto fail;
     }
 
@@ -291,7 +285,7 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     if( (uint64_t) inf->pieceCount !=
         ( inf->totalSize + inf->pieceSize - 1 ) / inf->pieceSize )
     {
-        tr_err( _( "Size of hashes and files don't match" ) );
+        tr_err( _( "Torrent is corrupt" ) ); /* size of hashes and files don't match */
         goto fail;
     }
 
@@ -472,7 +466,7 @@ static int getannounce( tr_info * inf, tr_benc * meta )
         /* did we use any of the tiers? */
         if( 0 == inf->trackerTiers )
         {
-            tr_inf( _( "Incomplete benc entry \"%s\"" ), "announce-list" );
+            tr_inf( _( "Invalid metadata entry \"%s\"" ), "announce-list" );
             free( inf->trackerList );
             inf->trackerList = NULL;
         }
@@ -713,7 +707,7 @@ parseFiles( tr_info * inf, tr_benc * name,
     }
     else
     {
-        tr_err( _( "Invalid or missing benc entries \"length\" and \"files\"" ) );
+        tr_err( _( "Invalid or missing metadata entries \"length\" and \"files\"" ) );
     }
 
     return TR_OK;

@@ -157,7 +157,7 @@ save_dialog_response_cb( GtkWidget * d, int response, GtkTextBuffer * textbuf )
       if( !fp )
       {
           errmsg( GTK_WINDOW(d),
-                  _("Error writing to \"%s\": %s"),
+                  _("Couldn't write file \"%s\": %s"),
                   filename, g_strerror( errno ) );
       }
       else
@@ -171,7 +171,7 @@ save_dialog_response_cb( GtkWidget * d, int response, GtkTextBuffer * textbuf )
               const size_t len = strlen( buf );
               if( len > fwrite( buf, 1, len, fp ) ) {
                   errmsg( GTK_WINDOW( d ),
-                          _("Error writing to \"%s\": %s"),
+                          _("Couldn't write file \"%s\": %s"),
                           filename, g_strerror( errno ) );
               }
               g_free( buf );
@@ -260,7 +260,7 @@ msgwin_create( TrCore * core )
 
   gtk_toolbar_append_element(GTK_TOOLBAR(toolbar),
                              GTK_TOOLBAR_CHILD_WIDGET, gtk_label_new(_("Level ")),
-                             NULL, _("Select the debug filter level."),
+                             NULL, _("Set the verbosity level"),
                              NULL, NULL, NULL, NULL);
 
   w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );

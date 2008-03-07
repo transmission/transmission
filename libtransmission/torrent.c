@@ -155,13 +155,13 @@ onTrackerResponse( void * tracker UNUSED, void * vevent, void * user_data )
             break;
 
         case TR_TRACKER_WARNING:
-            tr_err( _( "Tracker: Warning - %s" ), event->text );
+            tr_err( _( "Tracker warning: %s" ), event->text );
             tor->error = TR_ERROR_TC_WARNING;
             strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
             break;
 
         case TR_TRACKER_ERROR:
-            tr_err( _( "Tracker: Error - %s" ), event->text );
+            tr_err( _( "Tracker error: %s" ), event->text );
             tor->error = TR_ERROR_TC_ERROR;
             strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
             break;

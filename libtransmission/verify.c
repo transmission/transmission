@@ -125,7 +125,7 @@ verifyThreadFunc( void * unused UNUSED )
 
         tor->verifyState = TR_VERIFY_NOW;
 
-        tr_inf( _( "Verifying some pieces of \"%s\"" ), tor->info.name );
+        tr_inf( _( "Verifying torrent \"%s\"" ), tor->info.name );
         for( i=0; i<tor->info.fileCount && !stopCurrent; ++i )
             checkFile( tor, i, &stopCurrent );
 

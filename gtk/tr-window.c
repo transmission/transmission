@@ -523,7 +523,7 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     /* status */
     h = p->status = gtk_hbox_new( FALSE, GUI_PAD );
     gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD );
-    w = p->gutter_lb = gtk_label_new( "N transfers" );
+    w = p->gutter_lb = gtk_label_new( "N Torrents" );
     gtk_box_pack_start( GTK_BOX(h), w, 0, 0, 0 );
     w = p->ul_lb = gtk_label_new( NULL );
     gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
@@ -597,13 +597,13 @@ updateTorrentCount( PrivateData * p )
         const int visibleCount = gtk_tree_model_iter_n_children( p->filter_model, NULL );
 
         if( torrentCount != visibleCount )
-            g_snprintf( buf, sizeof( buf ), ngettext( "%d of %d Transfer",
-                                                      "%d of %d Transfers",
+            g_snprintf( buf, sizeof( buf ), ngettext( "%d of %d Torrent",
+                                                      "%d of %d Torrents",
                                                       torrentCount ),
                                             visibleCount, torrentCount );
         else
-            g_snprintf( buf, sizeof( buf ), ngettext( "%d Transfer",
-                                                      "%d Transfers",
+            g_snprintf( buf, sizeof( buf ), ngettext( "%d Torrent",
+                                                      "%d Torrents",
                                                       torrentCount ),
                                             torrentCount );
         gtk_label_set_text( GTK_LABEL( p->gutter_lb ), buf );

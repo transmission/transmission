@@ -719,10 +719,10 @@ info_page_new (tr_torrent * tor)
     gtk_misc_set_alignment (GTK_MISC(w), 0.0f, 0.0f);
 
   hig_workarea_add_section_divider (t, &row);
-  hig_workarea_add_section_title (t, &row, _("Created by"));
+  hig_workarea_add_section_title (t, &row, _("Origins"));
   
     g_snprintf (name, sizeof(name), namefmt, _("Creator"));
-    l = gtk_label_new (*info->creator ? info->creator : _("N/A"));
+    l = gtk_label_new (*info->creator ? info->creator : _("Unknown"));
     hig_workarea_add_row (t, &row, name, l, NULL);
 
     g_snprintf (name, sizeof(name), namefmt, _("Date"));
@@ -739,7 +739,7 @@ info_page_new (tr_torrent * tor)
     gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
     hig_workarea_add_row (t, &row, name, l, NULL); 
 
-    g_snprintf (name, sizeof(name), namefmt, _("Torrent"));
+    g_snprintf (name, sizeof(name), namefmt, _("Torrent file"));
     l = gtk_label_new ( info->torrent );
     gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
     hig_workarea_add_row (t, &row, name, l, NULL); 
@@ -934,8 +934,8 @@ static void
 setSpeedLimit( GtkSpinButton* spin, gpointer gtor, int up_or_down )
 {
   tr_torrent * tor = tr_torrent_handle (gtor);
-  int KiB_sec = gtk_spin_button_get_value_as_int (spin);
-  tr_torrentSetSpeedLimit( tor, up_or_down, KiB_sec );
+  int kb_sec = gtk_spin_button_get_value_as_int (spin);
+  tr_torrentSetSpeedLimit( tor, up_or_down, kb_sec );
 }
 static void
 ul_speed_spun_cb (GtkSpinButton *spin, gpointer gtor)
@@ -978,7 +978,7 @@ options_page_new ( TrTorrent * gtor )
   t = hig_workarea_create ();
   hig_workarea_add_section_title (t, &row, _("Speed Limits") );
 
-    tb = gtk_check_button_new_with_mnemonic (_("Limit _download speed (KiB/s):"));
+    tb = gtk_check_button_new_with_mnemonic (_("Limit _download speed (KB/s):"));
     b = tr_torrentGetSpeedMode(tor,TR_DOWN) == TR_SPEEDLIMIT_SINGLE;
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(tb), b );
     g_signal_connect (tb, "toggled", G_CALLBACK(dl_speed_toggled_cb), gtor);
@@ -991,11 +991,11 @@ options_page_new ( TrTorrent * gtor )
     g_signal_connect (tb, "toggled", G_CALLBACK(sensitize_from_check_cb), w);
     sensitize_from_check_cb (GTK_TOGGLE_BUTTON(tb), w);
     gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (w), FALSE, TRUE, 0);
-    mis = gtk_label_new (_("KiB/s"));
+    mis = gtk_label_new (_("KB/s"));
     gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (mis), FALSE, TRUE, 0);
     hig_workarea_add_row_w (t, &row, tb, hb, NULL);
 
-    tb = gtk_check_button_new_with_mnemonic (_("Limit _upload speed (KiB/s):"));
+    tb = gtk_check_button_new_with_mnemonic (_("Limit _upload speed (KB/s):"));
     b = tr_torrentGetSpeedMode(tor,TR_UP) == TR_SPEEDLIMIT_SINGLE;
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(tb), b );
     g_signal_connect (tb, "toggled", G_CALLBACK(ul_speed_toggled_cb), gtor);
@@ -1008,7 +1008,7 @@ options_page_new ( TrTorrent * gtor )
     g_signal_connect (tb, "toggled", G_CALLBACK(sensitize_from_check_cb), w);
     sensitize_from_check_cb (GTK_TOGGLE_BUTTON(tb), w);
     gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (w), FALSE, TRUE, 0);
-    mis = gtk_label_new (_("KiB/s"));
+    mis = gtk_label_new (_("KB/s"));
     gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (mis), FALSE, TRUE, 0);    
     hig_workarea_add_row_w (t, &row, tb, hb, NULL);
 
@@ -1126,15 +1126,12 @@ tracker_page_new( TrTorrent * gtor )
 static void
 refresh_countdown_lb( GtkWidget * l, time_t t )
 {
-    const char * n_a = _( "N/A" );
     const time_t now = time( NULL );
-    char buf[1024];
 
-    if( !t )
-        gtk_label_set_text( GTK_LABEL( l ), n_a );
-    else if( t < now )
-        gtk_label_set_text( GTK_LABEL( l ), n_a );
+    if( !t || ( t < now ) )
+        gtk_label_set_text( GTK_LABEL( l ), _( "Never" ) );
     else {
+        char buf[1024];
         const int seconds = t - now;
         tr_strltime( buf, seconds, sizeof( buf ) );
         gtk_label_set_text( GTK_LABEL( l ), buf );

@@ -93,8 +93,8 @@ refresh_cb ( gpointer user_data )
         if( ui->builder->failed )
         {
             const char * reason = ui->builder->abortFlag
-                ? _("Torrent creation cancelled.")
-                : _("Torrent creation failed.");
+                ? _("Torrent creation cancelled")
+                : _("Torrent creation failed");
 
             gtk_progress_bar_set_text( p, reason );
             gtk_progress_bar_set_fraction( p, 0 );
@@ -269,7 +269,7 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
         g_signal_connect( w, "selection-changed", G_CALLBACK(file_selection_changed_cb), ui );
         hig_workarea_add_row (t, &row, name, w, NULL);
 
-        g_snprintf( name, sizeof(name), "<i>%s</i>", _("No Files Selected"));
+        g_snprintf( name, sizeof(name), "<i>%s</i>", _("No files selected"));
         h = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
         w = ui->size_lb = gtk_label_new (NULL);
         gtk_label_set_markup ( GTK_LABEL(w), name );
@@ -305,7 +305,7 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
     gtk_container_set_border_width( GTK_CONTAINER( w ), GUI_PAD_BIG );
     
         ui->progressbar = gtk_progress_bar_new( );
-        gtk_progress_bar_set_text( GTK_PROGRESS_BAR( ui->progressbar), _( "No Files Selected" ) );
+        gtk_progress_bar_set_text( GTK_PROGRESS_BAR( ui->progressbar), _( "No files selected" ) );
         gtk_container_add( GTK_CONTAINER( w ), ui->progressbar );
 
     gtk_box_pack_start( main_vbox, w, FALSE, FALSE, GUI_PAD_BIG );

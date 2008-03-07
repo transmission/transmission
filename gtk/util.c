@@ -98,9 +98,9 @@ tr_strlsize( char * buf, guint64 size, size_t buflen )
 }
 
 char*
-tr_strlspeed( char * buf, double KiBps, size_t buflen )
+tr_strlspeed( char * buf, double kb_sec, size_t buflen )
 {
-    const double speed = KiBps;
+    const double speed = kb_sec;
 
     if ( speed < 1000.0 ) /* 0.0 KB to 999.9 KB */
         g_snprintf( buf, buflen, _( "%.1f KB/s" ), speed );

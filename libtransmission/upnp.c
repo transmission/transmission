@@ -93,12 +93,12 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
         errno = 0;
         if( UPNP_GetValidIGD( devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr))) {
             tr_inf( _( "%s: Found Internet Gateway Device '%s'" ), getKey(), handle->urls.controlURL );
-            tr_inf( _( "%s: Local LAN IP Address is '%s'" ), getKey(), handle->lanaddr );
+            tr_inf( _( "%s: Local Address is '%s'" ), getKey(), handle->lanaddr );
             handle->state = TR_UPNP_IDLE;
             handle->hasDiscovered = 1;
         } else {
             handle->state = TR_UPNP_ERR;
-            tr_err( _( "%s: UPNP_GetValidIGD failed.  (errno %d - %s)" ), getKey(), errno, tr_strerror(errno) );
+            tr_err( _( "%s: UPNP_GetValidIGD failed (errno %d - %s)" ), getKey(), errno, tr_strerror(errno) );
             tr_err( _( "%s: If your router supports UPnP, please make sure UPnP is enabled!" ), getKey() );
         }
         freeUPNPDevlist( devlist );
@@ -153,7 +153,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
             handle->port = port;
             handle->state = TR_UPNP_IDLE;
         } else {
-            tr_err( _( "%s: Port forwarding failed with err %d (%d - %s)" ), getKey(), err, errno, tr_strerror(errno) );
+            tr_err( _( "%s: Port forwarding failed with error %d (%d - %s)" ), getKey(), err, errno, tr_strerror(errno) );
             tr_err( _( "%s: If your router supports UPnP, please make sure UPnP is enabled!" ), getKey() );
             handle->port = -1;
             handle->state = TR_UPNP_ERR;

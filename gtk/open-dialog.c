@@ -223,8 +223,6 @@ makeaddwind( GtkWindow  * parent,
     col = 0;
     w = gtk_check_button_new_with_mnemonic( _( "_Delete original torrent file" ) );
     data->delete_check = GTK_TOGGLE_BUTTON( w );
-    if( tr_ctorGetDeleteSource( ctor, &flag ) )
-        g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), flag );
     gtk_table_attach( GTK_TABLE( t ), w, col, col+2, row, row+1, GTK_FILL, 0, 0, 0 );
 

@@ -56,7 +56,7 @@ getFiles( const char        * dir,
     tr_buildPath( buf, sizeof(buf), dir, base, NULL );
     i = stat( buf, &sb );
     if( i ) {
-        tr_err( _( "makemeta couldn't stat \"%s\"; skipping. (%s)" ), buf, tr_strerror(errno));
+        tr_err( _( "Torrent Creator is skipping file \"%s\": %s" ), buf, tr_strerror(errno));
         return list;
     }
 

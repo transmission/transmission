@@ -362,13 +362,13 @@ tr_loadFile( const char * path, size_t * size )
     errno = 0;
     if( stat( path, &sb ) )
     {
-        tr_err( _( "Couldn't get information for file \"%s\": %s" ), path, tr_strerror(errno) );
+        tr_err( _( "Couldn't read file \"%s\": %s" ), path, tr_strerror(errno) );
         return NULL;
     }
 
     if( ( sb.st_mode & S_IFMT ) != S_IFREG )
     {
-        tr_err( _( "Not a regular file (%s)" ), path );
+        tr_err( _( "Couldn't read file \"%s\": %s" ), path, _( "Not a regular file" ) );
         return NULL;
     }
 
@@ -376,7 +376,7 @@ tr_loadFile( const char * path, size_t * size )
     file = fopen( path, "rb" );
     if( !file )
     {
-        tr_err( _( "Couldn't open \"%s\": %s" ), path, tr_strerror(errno) );
+        tr_err( _( "Couldn't read file \"%s\": %s" ), path, tr_strerror(errno) );
         return NULL;
     }
     buf = malloc( sb.st_size );
@@ -453,7 +453,9 @@ tr_mkdirp( const char * path_in, int permissions )
         else if( ( sb.st_mode & S_IFMT ) != S_IFDIR )
         {
             /* Node exists but isn't a folder */
-            tr_err( _( "Remove \"%s\", it's in the way." ), path );
+            char buf[MAX_PATH_LENGTH];
+            snprintf( buf, sizeof( buf ), _( "File \"%s\" is in the way" ), path );
+            tr_err( _( "Couldn't create \"%s\": %s" ), path_in, buf );
             tr_free( path );
             errno = ENOTDIR;
             return -1;
@@ -838,6 +840,9 @@ strlcpy(char *dst, const char *src, size_t siz)
 	char *d = dst;
 	const char *s = src;
 	size_t n = siz;
+
+	assert( s != NULL );
+	assert( d != NULL );
 
 	/* Copy as many bytes as will fit */
 	if (n != 0) {

@@ -324,7 +324,7 @@ tr_fastResumeSave( const tr_torrent * tor )
 
     fclose( file );
 
-    /*tr_dbg( "Wrote resume file for '%s'", tor->info.name );*/
+    /*tr_dbg( "Wrote resume file for \"%s\"", tor->info.name );*/
 }
 
 /***
@@ -419,7 +419,7 @@ parseProgress( tr_torrent     * tor,
                 tr_torrentSetFileChecked( tor, i, TRUE );
             else {
                 tr_torrentSetFileChecked( tor, i, FALSE );
-                tr_dbg( _( "File '%s' recheck needed" ), tor->info.files[i].name );
+                tr_dbg( _( "Torrent \"%s\" needs to be verified" ), tor->info.files[i].name );
             }
         }
         free( curMTimes );
@@ -542,7 +542,7 @@ parsePeers( tr_torrent * tor, const uint8_t * buf, uint32_t len )
             tr_peerMgrAddPex( tor->handle->peerMgr, tor->info.hash, TR_PEER_FROM_CACHE, &pex );
         }
 
-        tr_dbg( _( "found %i peers in resume file" ), count );
+        tr_dbg( _( "Fead %i peers from resume file" ), count );
         ret = TR_FR_PEERS;
     }
 
@@ -631,7 +631,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
     uint8_t * buf = loadResumeFile( tor, &size );
 
     if( !buf )
-        tr_inf( _( "Couldn't read resume file for '%s'" ), tor->info.name );
+        tr_inf( _( "Couldn't read resume file for \"%s\"" ), tor->info.name );
     else {
         const uint8_t * walk = buf;
         const uint8_t * end = walk + size;
@@ -641,7 +641,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
             if( version == 1 )
                 ret |= parseVersion1 ( tor, walk, end, fieldsToLoad );
             else
-                tr_inf( _( "Unsupported resume file %d for '%s'" ), version, tor->info.name );
+                tr_inf( _( "Skipping invalid resume file for \"%s\"" ), tor->info.name );
         }
 
         tr_free( buf );
