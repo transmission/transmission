@@ -292,58 +292,98 @@ struct DeleteData
     gboolean delete_files;
     GList * torrents;
     TrCore * core;
+    int busyCount;
 };
+
+static void
+removeTorrents( struct DeleteData * data )
+{
+    GList * l;
+    for( l=data->torrents; l!=NULL; l=l->next )
+        tr_core_remove_torrent( data->core, l->data, data->delete_files );
+    g_list_free( data->torrents );
+}
+
 
 static void
 removeResponse( GtkDialog * dialog, gint response, gpointer gdata )
 {
     struct DeleteData * data = gdata;
-    const int doRemove = response == GTK_RESPONSE_ACCEPT;
-    const int doDelete = data->delete_files;
-    GList * l;
 
-    for( l=data->torrents; l!=NULL; l=l->next )
-    {
-        TrTorrent * gtor = TR_TORRENT( l->data );
-
-        if( doRemove )
-            tr_core_remove_torrent( data->core, gtor, doDelete );
-        else
-            g_object_unref( G_OBJECT( gtor ) );
-    }
+    if( response == GTK_RESPONSE_ACCEPT )
+        removeTorrents( data );
+    else
+        g_list_foreach( data->torrents, (GFunc)g_object_unref, NULL );
 
     gtk_widget_destroy( GTK_WIDGET( dialog ) );
-    g_list_free( data->torrents );
     g_free( data );
 }
 
+static void
+tabulateTorrents( gpointer gtor, gpointer gdata )
+{
+    struct DeleteData * data = gdata;
+    const tr_stat * stat = tr_torrent_stat( gtor );
+
+    if( stat->leftUntilDone || stat->peersConnected )
+        ++data->busyCount;
+}
+
 void
-confirmDelete( GtkWindow * parent,
+confirmRemove( GtkWindow * parent,
                TrCore    * core,
-               GList     * torrents )
+               GList     * torrents,
+               gboolean    delete_files )
 {
     GtkWidget * d;
-    char text[128];
-    struct DeleteData * dd = g_new0( struct DeleteData, 1 );
+    struct DeleteData * dd;
+    const int count = g_list_length( torrents );
+    const char * primary_text;
+    const char * secondary_text;
 
+    if( !count )
+        return;
+
+    dd = g_new0( struct DeleteData, 1 );
     dd->core = core;
     dd->torrents = torrents;
-    dd->delete_files = TRUE;
+    dd->delete_files = delete_files;
 
-    g_snprintf( text, sizeof( text ),
-                ngettext( "Delete torrent?",
-                          "Delete torrents?",
-                          g_list_length( torrents ) ) );
+    g_list_foreach( torrents, tabulateTorrents, dd );
+
+    if( !dd->busyCount && !delete_files ) /* don't prompt boring torrents */
+    {
+        removeTorrents( dd );
+        g_free( dd );
+        return;
+    }
+
+    if( !delete_files )
+        primary_text = ngettext( "Remove torrent?", "Remove torrents?", count );
+    else
+        primary_text = ngettext( "Delete this torrent's downloaded files?",
+                                 "Delete these torrents' downloaded files?",
+                                 count );
+
+    if( dd->busyCount > 1 )
+        secondary_text = _( "Some of these torrents are incomplete or connected to peers." );
+    else if( dd->busyCount == 0 )
+        secondary_text = NULL;
+    else
+        secondary_text = ngettext( "This torrent is incomplete or connected to peers.",
+                                   "One of these torrents is incomplete or connected to peers.",
+                                   count );
+
     d = gtk_message_dialog_new_with_markup( parent,
                                             GTK_DIALOG_DESTROY_WITH_PARENT,
-                                            GTK_MESSAGE_WARNING,
+                                            ( delete_files ? GTK_MESSAGE_WARNING : GTK_MESSAGE_QUESTION ),
                                             GTK_BUTTONS_NONE,
-                                            "<b>%s</b>", text );
-    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ),
-            _( "This removes the torrent and deletes the downloaded files!" ) );
+                                            "<b>%s</b>", primary_text );
+    if( secondary_text )
+        gtk_message_dialog_format_secondary_markup( GTK_MESSAGE_DIALOG( d ), secondary_text );
     gtk_dialog_add_buttons( GTK_DIALOG( d ),
                             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                            GTK_STOCK_DELETE, GTK_RESPONSE_ACCEPT,
+                            (delete_files ? GTK_STOCK_DELETE : GTK_STOCK_REMOVE), GTK_RESPONSE_ACCEPT,
                             NULL );
     gtk_dialog_set_default_response( GTK_DIALOG ( d ),
                                      GTK_RESPONSE_CANCEL );

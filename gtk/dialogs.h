@@ -38,6 +38,9 @@ GtkWidget* promptfordir( GtkWindow  * parent,
 /* prompt if the user wants to quit, calls func with cbdata if they do */
 void askquit( TrCore*, GtkWindow* parent, callbackfunc_t func, void* cbdata );
 
-void confirmDelete( GtkWindow * parent, TrCore * core, GList * torrents );
+void confirmRemove( GtkWindow * parent,
+                    TrCore    * core,
+                    GList     * gtorrents,
+                    gboolean    doDelete );
 
 #endif /* TG_PREFS_H */

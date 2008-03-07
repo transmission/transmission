@@ -199,7 +199,7 @@ refreshTorrentActions( GtkTreeSelection * s )
     gtk_tree_selection_selected_foreach( s, accumulateStatusForeach, &counts );
     action_sensitize( "pause-torrent", counts.activeCount!=0 );
     action_sensitize( "start-torrent", counts.inactiveCount!=0 );
-    action_sensitize( "close-torrent", counts.totalCount!=0 );
+    action_sensitize( "remove-torrent", counts.totalCount!=0 );
     action_sensitize( "delete-torrent", counts.totalCount!=0 );
     action_sensitize( "verify-torrent", counts.totalCount!=0 );
     action_sensitize( "show-torrent-details", counts.totalCount==1 );
@@ -1037,27 +1037,14 @@ accumulateSelectedTorrents( GtkTreeModel * model,
 }
 
 static void
-closeSelectedForeach( gpointer gtor, gpointer gdata )
-{
-    struct cbdata * data = gdata;
-    tr_core_remove_torrent( data->core, gtor, FALSE );
-}
-
-static void
-closeSelected( struct cbdata * data, gboolean doDelete )
+removeSelected( struct cbdata * data, gboolean delete_files )
 {
     GList * l = NULL;
     GtkTreeSelection * s = tr_window_get_selection( data->wind );
     gtk_tree_selection_selected_foreach( s, accumulateSelectedTorrents, &l );
     gtk_tree_selection_unselect_all( s );
-    if( l ) {
-        if( doDelete )
-            confirmDelete( data->wind, data->core, l );
-        else {
-            g_list_foreach( l, closeSelectedForeach, data );
-            g_list_free( l );
-        }
-    }
+    if( l )
+        confirmRemove( data->wind, data->core, l, delete_files );
 }
 
 void
@@ -1111,13 +1098,13 @@ doAction ( const char * action_name, gpointer user_data )
                                       tr_core_handle( data->core ) );
         gtk_widget_show_all( w );
     }
-    else if( !strcmp( action_name, "close-torrent" ) )
+    else if( !strcmp( action_name, "remove-torrent" ) )
     {
-        closeSelected( data, FALSE );
+        removeSelected( data, FALSE );
     }
     else if( !strcmp( action_name, "delete-torrent" ) )
     {
-        closeSelected( data, TRUE );
+        removeSelected( data, TRUE );
     }
     else if (!strcmp (action_name, "close"))
     {
