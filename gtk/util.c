@@ -62,74 +62,92 @@ tr_strlratio( char * buf, double ratio, size_t buflen )
     return buf;
 }
 
+#define KILOBYTE_FACTOR 1024.0
+#define MEGABYTE_FACTOR (1024.0 * 1024.0)
+#define GIGABYTE_FACTOR (1024.0 * 1024.0 * 1024.0)
+
 char*
 tr_strlsize( char * buf, guint64 size, size_t buflen )
 {
-    if( !size )
-        g_strlcpy( buf, _( "None" ), buflen );
+    const goffset s = (goffset)size;
+#if GLIB_CHECK_VERSION(2,16,0)
+    char * tmp = g_format_size_for_display( s );
+    g_strlcpy( buf, tmp, buflen );
+    g_free( tmp );
+#else
+    if ( s < (goffset)KILOBYTE_FACTOR )
+        g_snprintf( buf, buflen, ngettext("%u byte", "%u bytes", (guint)s), (guint)s );
     else {
-        static const char *units[] = {
-            N_("B"), N_("KiB"), N_("MiB"), N_("GiB"), N_("TiB"),
-            N_("PiB"), N_("EiB"), N_("ZiB"), N_("YiB")
-        };
-        unsigned int i;
-        double small = size;
-        for( i=0; i<G_N_ELEMENTS(units) && (small>=1024.0); ++i )
-            small /= 1024.0;
-        if( i < 2 ) /* B & KiB */
-            g_snprintf( buf, buflen, "%d %s", (int)small, _(units[i]) );
-        else
-            g_snprintf( buf, buflen, "%.1f %s", small, _(units[i]) );
+        gdouble displayed_size;
+        if (size < (goffset) MEGABYTE_FACTOR) {
+            displayed_size = (gdouble) size / KILOBYTE_FACTOR;
+            g_snprintf( buf, buflen, _("%.1f KB"), displayed_size );
+        } else if (size < (goffset) GIGABYTE_FACTOR) {
+            displayed_size = (gdouble) size / MEGABYTE_FACTOR;
+            g_snprintf( buf, buflen, _("%.1f MB"), displayed_size );
+        } else {
+            displayed_size = (gdouble) size / GIGABYTE_FACTOR;
+            g_snprintf( buf, buflen, _("%.1f GB"), displayed_size );
+        }
     }
+#endif
     return buf;
 }
 
 char*
 tr_strlspeed( char * buf, double KiBps, size_t buflen )
 {
-    const guint64 bps = KiBps * 1024;
-    if( !bps )
-        g_strlcpy( buf, _( "None" ), buflen );
-    else {
-        char bbuf[64];
-        tr_strlsize( bbuf, (guint64)(KiBps*1024), sizeof(bbuf) );
-        g_snprintf( buf, buflen, _("%s/s"), bbuf );
-    }
+    const double speed = KiBps;
+
+    if ( speed < 1000.0 ) /* 0.0 KB to 999.9 KB */
+        g_snprintf( buf, buflen, _( "%.1f KB/s" ), speed );
+    else if( speed < 102400.0 ) /* 0.98 MB to 99.99 MB */
+        g_snprintf( buf, buflen, _( "%.2f MB/s" ), (speed/1024) );
+    else if( speed < 1024000.0 ) /* 100.0 MB to 999.9 MB */
+        g_snprintf( buf, buflen, _( "%.1f MB/s" ), (speed/1024) );
+    else /* insane speeds */
+        g_snprintf( buf, buflen, _( "%.2f GB/s" ), (speed/1048576) );
+
     return buf;
 }
 
-#define SECONDS(s)              ((s) % 60)
-#define MINUTES(s)              ((s) / 60 % 60)
-#define HOURS(s)                ((s) / 60 / 60 % 24)
-#define DAYS(s)                 ((s) / 60 / 60 / 24 % 7)
-
 char*
-tr_strltime( char * buf, int secs, size_t buflen )
+tr_strltime( char * buf, int seconds, size_t buflen )
 {
-    if( secs < 60 )
+    int hours;
+
+    if( seconds < 0 )
+        seconds = 0;
+
+    if( seconds < 60 )
     {
-        g_snprintf( buf, buflen, _( "%i %s" ),
-                    SECONDS(secs), ngettext("sec", "secs", SECONDS(secs)));
-    }
-    else if( secs < 60*60 )
-    {
-        g_snprintf( buf, buflen, _("%i %s %i %s"),
-                    MINUTES(secs), ngettext("min", "mins", MINUTES(secs)),
-                    SECONDS(secs), ngettext("sec", "secs", SECONDS(secs)));
-    }
-    else if( secs < 60*60*24 )
-    {
-        g_snprintf( buf, buflen, _("%i %s %i %s"),
-                    HOURS(secs),   ngettext("hr", "hrs", HOURS(secs)),
-                    MINUTES(secs), ngettext("min", "mins", MINUTES(secs)));
-    }
-    else
-    {
-        g_snprintf( buf, buflen, _("%i %s %i %s"),
-                    DAYS(secs),  ngettext("day", "days", DAYS(secs)),
-                    HOURS(secs), ngettext("hr", "hrs", HOURS(secs)));
+        g_snprintf( buf, sizeof( buf ), ngettext( "%'d second", "%'d seconds", (int)seconds ), (int) seconds );
+        return buf;
     }
 
+    if( seconds < ( 60 * 60 ) )
+    {
+        const int minutes = ( seconds + 30 ) / 60;
+        g_snprintf( buf, sizeof( buf ), ngettext( "%'d minute", "%'d minutes", minutes ), minutes );
+        return buf;
+    }
+
+    hours = seconds / ( 60 *60 );
+
+    if( seconds < ( 60 * 60 * 4 ) )
+    {
+        char h[64];
+        char m[64];
+
+        const int minutes = ( seconds - hours * 60 * 60 + 30 ) / 60;
+
+        g_snprintf( h, sizeof(h), ngettext( "%'d hour", "%'d hours", hours ), hours );
+        g_snprintf( m, sizeof(m), ngettext( "%'d minute", "%'d minutes", minutes ), minutes );
+        g_snprintf( buf, buflen, "%s, %s", h, m );
+        return buf;
+    }
+
+    g_snprintf( buf, sizeof( buf ), ngettext( "%'d hour", "%'d hours", hours ), hours );
     return buf;
 }
 
