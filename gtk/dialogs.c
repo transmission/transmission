@@ -292,7 +292,6 @@ struct DeleteData
     gboolean delete_files;
     GList * torrents;
     TrCore * core;
-    int busyCount;
 };
 
 static void
@@ -320,13 +319,12 @@ removeResponse( GtkDialog * dialog, gint response, gpointer gdata )
 }
 
 static void
-tabulateTorrents( gpointer gtor, gpointer gdata )
+countBusyTorrents( gpointer gtor, gpointer busyCount )
 {
-    struct DeleteData * data = gdata;
     const tr_stat * stat = tr_torrent_stat( gtor );
 
     if( stat->leftUntilDone || stat->peersConnected )
-        ++data->busyCount;
+        ++(*(int*)busyCount);
 }
 
 void
@@ -337,6 +335,7 @@ confirmRemove( GtkWindow * parent,
 {
     GtkWidget * d;
     struct DeleteData * dd;
+    int busyCount;
     const int count = g_list_length( torrents );
     const char * primary_text;
     const char * secondary_text;
@@ -349,9 +348,10 @@ confirmRemove( GtkWindow * parent,
     dd->torrents = torrents;
     dd->delete_files = delete_files;
 
-    g_list_foreach( torrents, tabulateTorrents, dd );
+    busyCount = 0;
+    g_list_foreach( torrents, countBusyTorrents, &busyCount );
 
-    if( !dd->busyCount && !delete_files ) /* don't prompt boring torrents */
+    if( !busyCount && !delete_files ) /* don't prompt boring torrents */
     {
         removeTorrents( dd );
         g_free( dd );
@@ -365,9 +365,9 @@ confirmRemove( GtkWindow * parent,
                                  "Delete these torrents' downloaded files?",
                                  count );
 
-    if( dd->busyCount > 1 )
+    if( busyCount > 1 )
         secondary_text = _( "Some of these torrents are incomplete or connected to peers." );
-    else if( dd->busyCount == 0 )
+    else if( busyCount == 0 )
         secondary_text = NULL;
     else
         secondary_text = ngettext( "This torrent is incomplete or connected to peers.",
