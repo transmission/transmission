@@ -759,8 +759,8 @@ coreerr( TrCore * core UNUSED, enum tr_core_err code, const char * msg,
             {
                 joined = joinstrlist( cbdata->errqueue, "\n" );
                 errmsg( cbdata->wind,
-                        ngettext( "Failed to load torrent file:\n%s",
-                                  "Failed to load torrent files:\n%s",
+                        ngettext( "Failed to load torrent file: %s",
+                                  "Failed to load torrent files: %s",
                                   g_list_length( cbdata->errqueue ) ),
                         joined );
                 g_list_foreach( cbdata->errqueue, (GFunc) g_free, NULL );

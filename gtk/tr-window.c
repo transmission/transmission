@@ -632,12 +632,14 @@ updateStats( PrivateData * p )
         tr_getSessionStats( handle, &stats );
         tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
         tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
-        g_snprintf( buf, sizeof( buf ), _( "Down: %s, Up: %s" ), down, up );
+        /* Translators: %1$s is downloaded byte count, %2$s is uploaded byte count*/
+        g_snprintf( buf, sizeof( buf ), _( "Down: %1$s, Up: %2$s" ), down, up );
     } else if( !strcmp( pch, "total-transfer" ) ) { 
         tr_getCumulativeSessionStats( handle, &stats );
         tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
         tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
-        g_snprintf( buf, sizeof( buf ), _( "Down: %s, Up: %s" ), down, up );
+        /* Translators: %1$s is downloaded byte count, %2$s is uploaded byte count*/
+        g_snprintf( buf, sizeof( buf ), _( "Down: %1$s, Up: %2$s" ), down, up );
     } else { /* default is total-ratio */
         tr_getCumulativeSessionStats( handle, &stats );
         tr_strlratio( ratio, stats.ratio, sizeof( ratio ) );

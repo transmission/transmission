@@ -786,13 +786,16 @@ refresh_activity (GtkWidget * top)
   gtk_label_set_text (GTK_LABEL(a->state_lb), pch);
   g_free (pch);
 
-  pch = g_strdup_printf( _( "%.1f%% (%.1f%% selected)" ), stat->percentComplete*100.0, stat->percentDone*100.0 );
+  /* Translators: %1$.1f is percent of how much of what we want has been downloaded,
+                  %2$.1f is percent of how much of the whole torrent we've downloaded */
+  pch = g_strdup_printf( _( "%1$.1f%% (%2$.1f%% selected)" ), stat->percentComplete*100.0, stat->percentDone*100.0 );
   gtk_label_set_text (GTK_LABEL(a->progress_lb), pch);
   g_free (pch);
 
   tr_strlsize( sizeStr,  stat->haveValid + stat->haveUnchecked, sizeof(sizeStr) );
   tr_strlsize( sizeStr2, stat->haveValid,                       sizeof(sizeStr2) );
-  g_snprintf( buf, sizeof(buf), _("%s (%s verified)"), sizeStr, sizeStr2 );
+  /* Translators: %1$s is total size of what we've saved to disk, %2$s is how much of it's passed the checksum test */
+  g_snprintf( buf, sizeof(buf), _("%1$s (%2$s verified)"), sizeStr, sizeStr2 );
   gtk_label_set_text( GTK_LABEL( a->have_lb ), buf );
 
   tr_strlsize( sizeStr, stat->downloadedEver, sizeof(sizeStr) );
@@ -1234,8 +1237,8 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
 
   /* create the dialog */
   tr_strlsize( sizeStr, info->totalSize, sizeof(sizeStr) );
-  /* Translators: first %s is torrent name, second is file size */
-  g_snprintf( title, sizeof(title), _( "Details for %s (%s)" ), info->name, sizeStr );
+  /* Translators: %1$s is torrent name, %2$s is file size */
+  g_snprintf( title, sizeof(title), _( "Details for %1$s (%2$s)" ), info->name, sizeStr );
   d = gtk_dialog_new_with_buttons (title, parent, 0,
                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                    NULL);
