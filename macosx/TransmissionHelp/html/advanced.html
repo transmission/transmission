@@ -1,0 +1,51 @@
+<html>
+	
+	<a name="AdvancedPrefs"></a>
+
+	<head>
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
+		<title>Frequently Asked Questions</title>
+	</head>
+	<body>
+		<div id="mainbox">
+		<A NAME="TransFAQ"></A>
+		<div id="banner">
+				<a name="menus"></a>
+				<div id="machelp"><a class="bread" href="../index.html">Transmission Help</a>
+				</div>
+				<div id="index">
+				<a class="leftborder" href="../html/Index2.html">Index</a></div>
+				</div>
+			</div>
+			<div id="pagetitle">
+				<h1>Why do I see a red dot and "Port is closed"? </h1>
+			</div>
+				<p>You haven't port forwarded correctly. Port forwarding opens a port in your firewall or router so that incoming connections from the outside world can be made with Transmission. If the port is forwarded, other people in the torrent can see you, thus increasing your potential number of connections, which more importantly, may increase the speed of your download.
+				<p>You need to port forward if you share your internet connection with a router, or if your broadband modem is a router itself. In most cases Transmission can do this automatically, see <a href="portforward.html">this page</a> for instructions on port forwarding.
+
+				<p>
+			<div id="pagetitle">
+				<h1>What is 'peer exchange'? </h1>
+			</div>
+				<p>Peer Exchange (PEX) is a method of discovering new peers via other peers, rather than the tracker. It allows Transmission to attach to the swarm much quicker. 
+				PEX is automatically disabled for privately tracked torrents. The feature is compatible with both Azureus and µTorrent peers.
+				<p>
+			<div id="pagetitle">
+				<h1>What is encryption? </h1>
+			</div>
+				<p>Transmission encrypts the connections it makes with other peers when necessary, using the RC4 cipher. The implementation is compatible with other clients such as Azureus and µTorrent. It is always enabled, however you can set Transmission (Preferences >> Advanced) to prefer encrypted peers, or only accept encrypted peers.
+				<p>Note that the latter option may make Transmission unconnectable in some swarms. The encryption feature does not mean your session is secure or anonymous, it is merely a way to avoid the traffic shaping measures some ISPs have implemented.
+				<p>
+			<div id="pagetitle">
+				<h1>What are 'connections'?</h1>
+			</div>
+				<p><i>Global maximum connections</i> (Preferences >> Advanced) is the total number of peers that Transmission will connect to across all of your transfers. Connections per torrent can also be adjusted here, as well as in the Inspector.
+				<p>It is recommended that these values are left at their default setting, as allowing too many connections will severely hinder web browsing and other online activities, as well as possibly crashing your router. For most people, 60 peers per torrent will maximize Transmission's download speed. Increase this value at your own risk!
+				<p>
+
+
+		</div>
+	</body>
+	
+</html>

@@ -558,7 +558,7 @@
 
 - (void) helpForNetwork: (id) sender
 {
-    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"PortForwarding"
+    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"AdvancedPrefs"
         inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
