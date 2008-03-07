@@ -69,12 +69,16 @@ tr_strlratio( char * buf, double ratio, size_t buflen )
 char*
 tr_strlsize( char * buf, guint64 size, size_t buflen )
 {
+    if( !size )
+        g_strlcpy( buf, _( "None" ), buflen );
 #if GLIB_CHECK_VERSION(2,16,0)
-    char * tmp = g_format_size_for_display( s );
-    g_strlcpy( buf, tmp, buflen );
-    g_free( tmp );
+    else{ 
+        char * tmp = g_format_size_for_display( s );
+        g_strlcpy( buf, tmp, buflen );
+        g_free( tmp );
+    }
 #else
-    if( size < (guint64)KILOBYTE_FACTOR )
+    else if( size < (guint64)KILOBYTE_FACTOR )
         g_snprintf( buf, buflen, ngettext("%u byte", "%u bytes", (guint)size), (guint)size );
     else {
         gdouble displayed_size;
@@ -120,14 +124,14 @@ tr_strltime( char * buf, int seconds, size_t buflen )
 
     if( seconds < 60 )
     {
-        g_snprintf( buf, sizeof( buf ), ngettext( "%'d second", "%'d seconds", (int)seconds ), (int) seconds );
+        g_snprintf( buf, buflen, ngettext( "%'d second", "%'d seconds", (int)seconds ), (int) seconds );
         return buf;
     }
 
     if( seconds < ( 60 * 60 ) )
     {
         const int minutes = ( seconds + 30 ) / 60;
-        g_snprintf( buf, sizeof( buf ), ngettext( "%'d minute", "%'d minutes", minutes ), minutes );
+        g_snprintf( buf, buflen, ngettext( "%'d minute", "%'d minutes", minutes ), minutes );
         return buf;
     }
 
@@ -146,7 +150,7 @@ tr_strltime( char * buf, int seconds, size_t buflen )
         return buf;
     }
 
-    g_snprintf( buf, sizeof( buf ), ngettext( "%'d hour", "%'d hours", hours ), hours );
+    g_snprintf( buf, buflen, ngettext( "%'d hour", "%'d hours", hours ), hours );
     return buf;
 }
 
