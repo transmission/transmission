@@ -1070,7 +1070,7 @@ typedef enum
         
         NSDate * nextLastActivity;
         if ((nextLastActivity = [torrent dateActivity]))
-            lastActivity = [nextLastActivity laterDate: lastActivity];
+            lastActivity = lastActivity ? [lastActivity laterDate: nextLastActivity] : nextLastActivity;
     }
     
     if (have == 0)
