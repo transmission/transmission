@@ -69,20 +69,19 @@ tr_strlratio( char * buf, double ratio, size_t buflen )
 char*
 tr_strlsize( char * buf, guint64 size, size_t buflen )
 {
-    const goffset s = (goffset)size;
 #if GLIB_CHECK_VERSION(2,16,0)
     char * tmp = g_format_size_for_display( s );
     g_strlcpy( buf, tmp, buflen );
     g_free( tmp );
 #else
-    if ( s < (goffset)KILOBYTE_FACTOR )
-        g_snprintf( buf, buflen, ngettext("%u byte", "%u bytes", (guint)s), (guint)s );
+    if( size < (guint64)KILOBYTE_FACTOR )
+        g_snprintf( buf, buflen, ngettext("%u byte", "%u bytes", (guint)size), (guint)size );
     else {
         gdouble displayed_size;
-        if (size < (goffset) MEGABYTE_FACTOR) {
+        if (size < (guint64)MEGABYTE_FACTOR) {
             displayed_size = (gdouble) size / KILOBYTE_FACTOR;
             g_snprintf( buf, buflen, _("%.1f KB"), displayed_size );
-        } else if (size < (goffset) GIGABYTE_FACTOR) {
+        } else if (size < (guint64)GIGABYTE_FACTOR) {
             displayed_size = (gdouble) size / MEGABYTE_FACTOR;
             g_snprintf( buf, buflen, _("%.1f MB"), displayed_size );
         } else {
