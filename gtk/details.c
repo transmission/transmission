@@ -1253,7 +1253,7 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
 
   gtk_notebook_append_page (GTK_NOTEBOOK(n),
                             info_page_new (tor),
-                            gtk_label_new (_("Info")));
+                            gtk_label_new (_("Information")));
 
   w = file_list_new( gtor );
   gtk_container_set_border_width( GTK_CONTAINER( w ), GUI_PAD_BIG );

@@ -118,6 +118,7 @@ char*
 tr_strltime( char * buf, int seconds, size_t buflen )
 {
     int hours;
+    int days;
 
     if( seconds < 0 )
         seconds = 0;
@@ -135,7 +136,7 @@ tr_strltime( char * buf, int seconds, size_t buflen )
         return buf;
     }
 
-    hours = seconds / ( 60 *60 );
+    hours = seconds / ( 60 * 60 );
 
     if( seconds < ( 60 * 60 * 4 ) )
     {
@@ -150,7 +151,14 @@ tr_strltime( char * buf, int seconds, size_t buflen )
         return buf;
     }
 
-    g_snprintf( buf, buflen, ngettext( "%'d hour", "%'d hours", hours ), hours );
+    if( hours < 24 )
+    {
+        g_snprintf( buf, buflen, ngettext( "%'d hour", "%'d hours", hours ), hours );
+        return buf;
+    }
+
+    days = seconds / ( 60 * 60 * 24 );
+    g_snprintf( buf, buflen, ngettext( "'%d day", "%'d days", days ), days );
     return buf;
 }
 

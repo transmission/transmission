@@ -218,7 +218,7 @@ static struct {
   int id;
 } trLevels[] = {
   { N_("Error"), "error", "ERR", TR_MSG_ERR },
-  { N_("Info"),  "info",  "INF", TR_MSG_INF },
+  { N_("Information"),  "info",  "INF", TR_MSG_INF },
   { N_("Debug"), "debug", "DBG", TR_MSG_DBG },
 };
 
