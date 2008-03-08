@@ -539,7 +539,7 @@ tr_errorString( int code )
         case TR_ERROR_IO_OPEN_FILES:
             return tr_strerror( EMFILE );
         case TR_ERROR_IO_DUP_DOWNLOAD:
-            return _( "Already active transfer with same name and download folder" );
+            return _( "A torrent with this name and destination directory already exists." );
         case TR_ERROR_IO_OTHER:
             return _( "Generic I/O error" );
 

@@ -200,16 +200,20 @@ file_selection_changed_cb( GtkFileChooser *chooser, gpointer user_data )
     refreshButtons( ui );
 
     tr_strlsize( sizeStr, totalSize, sizeof(sizeStr) );
-    g_snprintf( buf, sizeof(buf), "<i>%s; %d %s</i>",
-                sizeStr, fileCount,
-                ngettext("File", "Files", fileCount) );
+    g_snprintf( buf, sizeof( buf ),
+                /* %1$s is the torrent size, %2$s is its number of files */
+                ngettext( "<i>%1$s; %2$d File</i>",
+                          "<i>%1$s; %2$d Files</i>", fileCount ),
+                sizeStr, fileCount );
     gtk_label_set_markup ( GTK_LABEL(ui->size_lb), buf );
 
     tr_strlsize( sizeStr, pieceSize, sizeof(sizeStr) );
-    g_snprintf( buf, sizeof(buf), "<i>%d %s @ %s</i>",
-                pieceCount,
-                ngettext("Piece", "Pieces", pieceCount),
-                sizeStr );
+    g_snprintf( buf, sizeof( buf ),
+                /* %1$s is number of pieces; %2$s is how big each piece is */
+                ngettext( "<i>%1$d Piece @ %2$s</i>",
+                          "<i>%1$d Pieces @ %2$s</i>",
+                          pieceCount ),
+                pieceCount, sizeStr );
     gtk_label_set_markup ( GTK_LABEL(ui->pieces_lb), buf );
 }
 

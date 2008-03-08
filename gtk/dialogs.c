@@ -255,11 +255,8 @@ askquit( TrCore          * core,
                                                GTK_DIALOG_DESTROY_WITH_PARENT,
                                                GTK_MESSAGE_QUESTION,
                                                GTK_BUTTONS_NONE,
-                                               _("<b>Really Quit %s?</b>"),
-                                               g_get_application_name() );
+                                               _("<b>Really Quit?</b>") );
 
-    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG(wind),
-                                              _("This will close all active torrents."));
     gtk_dialog_add_buttons( GTK_DIALOG(wind),
                             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                             GTK_STOCK_QUIT, GTK_RESPONSE_ACCEPT,

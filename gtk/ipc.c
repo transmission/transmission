@@ -393,7 +393,7 @@ srv_io_received( GSource * source UNUSED, void * data, size_t len,
                 errmsg( con->u.serv.wind, _("Bad IPC protocol version") );
                 break;
             case EINVAL:
-                errmsg( con->u.serv.wind, _("IPC protocol parse error") );
+                errmsg( con->u.serv.wind, _("IPC parsing failed") );
                 break;
             default:
                 errmsg( con->u.serv.wind, _("IPC parsing failed: %s"),

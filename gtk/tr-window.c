@@ -430,11 +430,15 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     GSList * l;
     GSList * toggles;
     const char * filter_names[FILTER_MODE_QTY] = {
-        /* Translators: "All" refers to "all torrents" */
+        /* show all torrents */
         N_( "A_ll"),
+        /* show only torrents that have connected peers */
         N_("_Active"),
+        /* show only torrents that are trying to download */
         N_("_Downloading"),
+        /* show only torrents that are trying to upload */
         N_("_Seeding"),
+        /* show only torrents that are paused */
         N_("_Paused")
     };
     const char * filter_text_names[FILTER_TEXT_MODE_QTY] = {
@@ -601,8 +605,8 @@ updateTorrentCount( PrivateData * p )
         const int visibleCount = gtk_tree_model_iter_n_children( p->filter_model, NULL );
 
         if( torrentCount != visibleCount )
-            g_snprintf( buf, sizeof( buf ), ngettext( "%d of %d Torrent",
-                                                      "%d of %d Torrents",
+            g_snprintf( buf, sizeof( buf ), ngettext( "%1$d of %2$d Torrent",
+                                                      "%1$d of %2$d Torrents",
                                                       torrentCount ),
                                             visibleCount, torrentCount );
         else
@@ -632,14 +636,18 @@ updateStats( PrivateData * p )
         tr_getSessionStats( handle, &stats );
         tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
         tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
-        /* Translators: %1$s is downloaded byte count, %2$s is uploaded byte count*/
-        g_snprintf( buf, sizeof( buf ), _( "Down: %1$s, Up: %2$s" ), down, up );
+        /* Translators: do not translate the "size|" disambiguation prefix.
+         * %1$s is the size of the data we've downloaded
+         * %2$s is the size of the data we've uploaded */
+        g_snprintf( buf, sizeof( buf ), Q_( "size|Down: %1$s, Up: %2$s" ), down, up );
     } else if( !strcmp( pch, "total-transfer" ) ) { 
         tr_getCumulativeSessionStats( handle, &stats );
         tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
         tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
-        /* Translators: %1$s is downloaded byte count, %2$s is uploaded byte count*/
-        g_snprintf( buf, sizeof( buf ), _( "Down: %1$s, Up: %2$s" ), down, up );
+        /* Translators: do not translate the "size|" disambiguation prefix.
+         * %1$s is the size of the data we've downloaded
+         * %2$s is the size of the data we've uploaded */
+        g_snprintf( buf, sizeof( buf ), Q_( "size|Down: %1$s, Up: %2$s" ), down, up );
     } else { /* default is total-ratio */
         tr_getCumulativeSessionStats( handle, &stats );
         tr_strlratio( ratio, stats.ratio, sizeof( ratio ) );

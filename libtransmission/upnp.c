@@ -24,7 +24,7 @@
 #include "utils.h"
 #include "upnp.h"
 
-static const char * getKey( void ) { return _( "Port Mapping (UPnP)" ); }
+static const char * getKey( void ) { return _( "Port Forwarding (UPnP)" ); }
 
 typedef enum
 {

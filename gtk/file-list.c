@@ -61,8 +61,11 @@ static const char*
 priorityToString( const int priority )
 {
     switch( priority ) {
+        /* Translators: this refers to priority */
         case TR_PRI_HIGH:   return _("High");
+        /* Translators: this refers to priority */
         case TR_PRI_NORMAL: return _("Normal");
+        /* Translators: this refers to priority */
         case TR_PRI_LOW:    return _("Low");
         default:            return "BUG!";
     }

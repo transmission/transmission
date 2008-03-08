@@ -251,7 +251,7 @@ peerPage( GObject * core )
     t = hig_workarea_create( );
     hig_workarea_add_section_title (t, &row, _("Options"));
         
-        s = _("Use peer _exchange if possible");
+        s = _("Use peer e_xchange");
         w = new_check_button( s, PREF_KEY_PEX, core );
         hig_workarea_add_wide_control( t, &row, w );
         
@@ -260,6 +260,7 @@ peerPage( GObject * core )
         hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_add_section_divider( t, &row );
+    /* section header for the "maximum number of peers" section */
     hig_workarea_add_section_title( t, &row, _( "Limits" ) );
   
         w = new_spin_button( PREF_KEY_MAX_PEERS_GLOBAL, core, 1, 3000, 5 );
@@ -301,7 +302,7 @@ networkPage( GObject * core, gpointer alive )
 
     hig_workarea_add_section_title (t, &row, _("Ports"));
         
-        s = _("_Map port with UPnP or NAT-PMP" );
+        s = _("_Forward port from router with UPnP or NAT-PMP" );
         w = new_check_button( s, PREF_KEY_NAT, core );
         hig_workarea_add_wide_control( t, &row, w );
 

@@ -241,12 +241,12 @@ static const char* peer_column_names[N_PEER_COLS] =
 {
   N_("Address"),
   N_("Client"),
-  /* Translators: this is a 'percent done' column whose title is terse to keep the column narrow */
+  /* 'percent done' column header. terse to keep the column narrow. */
   N_("%"),
   " ",
-  /* Translators: this is a 'download speed' column whose title is terse to keep the column narrow */
+  /* 'download speed' column header. terse to keep the column narrow. */
   N_("Down"),
-  /* Translators: this is a 'upload speed' column whose title is terse to keep the column narrow */
+  /* 'upload speed' column header.  terse to keep the column narrow. */
   N_("Up"),
   N_("Status")
 };
@@ -701,7 +701,7 @@ info_page_new (tr_torrent * tor)
 
     g_snprintf (name, sizeof(name), namefmt, _("Privacy"));
     pch = (info->isPrivate )
-      ? _("Private Torrent, PEX disabled")
+      ? _("Private Torrent: PEX disabled")
       : _("Public Torrent");
     l = gtk_label_new (pch);
     hig_workarea_add_row (t, &row, name, l, NULL);
@@ -786,15 +786,16 @@ refresh_activity (GtkWidget * top)
   gtk_label_set_text (GTK_LABEL(a->state_lb), pch);
   g_free (pch);
 
-  /* Translators: %1$.1f is percent of how much of what we want has been downloaded,
-                  %2$.1f is percent of how much of the whole torrent we've downloaded */
+  /* %1$.1f is percent of how much of what we want's been downloaded,
+   * %2$.1f is percent of how much of the whole torrent we've downloaded */
   pch = g_strdup_printf( _( "%1$.1f%% (%2$.1f%% selected)" ), stat->percentComplete*100.0, stat->percentDone*100.0 );
   gtk_label_set_text (GTK_LABEL(a->progress_lb), pch);
   g_free (pch);
 
   tr_strlsize( sizeStr,  stat->haveValid + stat->haveUnchecked, sizeof(sizeStr) );
   tr_strlsize( sizeStr2, stat->haveValid,                       sizeof(sizeStr2) );
-  /* Translators: %1$s is total size of what we've saved to disk, %2$s is how much of it's passed the checksum test */
+  /* %1$s is total size of what we've saved to disk
+   * %2$s is how much of it's passed the checksum test */
   g_snprintf( buf, sizeof(buf), _("%1$s (%2$s verified)"), sizeStr, sizeStr2 );
   gtk_label_set_text( GTK_LABEL( a->have_lb ), buf );
 
@@ -850,7 +851,7 @@ activity_page_new (TrTorrent * gtor)
     hig_workarea_add_row (t, &row, _("Progress:"), l, NULL);
 
     l = a->have_lb = gtk_label_new (NULL);
-    /* Translators: "Have" refers to the size of the files we have */
+    /* "Have" refers to how much of the torrent we have */
     hig_workarea_add_row (t, &row, _("Have:"), l, NULL);
 
     l = a->dl_lb = gtk_label_new (NULL);
@@ -859,6 +860,7 @@ activity_page_new (TrTorrent * gtor)
     l = a->ul_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, _("Uploaded:"), l, NULL);
 
+    /* how much downloaded data was corrupt */
     l = a->failed_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, _("Failed DL:"), l, NULL);
 
@@ -977,7 +979,7 @@ options_page_new ( TrTorrent * gtor )
   int i, row;
   gboolean b;
   GtkAdjustment *a;
-  GtkWidget *t, *w, *tb, *hb, *mis;
+  GtkWidget *t, *w, *tb;
   tr_torrent * tor = tr_torrent_handle (gtor);
 
   row = 0;
@@ -990,16 +992,12 @@ options_page_new ( TrTorrent * gtor )
     g_signal_connect (tb, "toggled", G_CALLBACK(dl_speed_toggled_cb), gtor);
 
     i = tr_torrentGetSpeedLimit( tor, TR_DOWN );
-    hb = gtk_hbox_new ( FALSE, 6 );
     a = (GtkAdjustment*) gtk_adjustment_new (i, 0.0, G_MAXDOUBLE, 1, 1, 1);
     w = gtk_spin_button_new (a, 1, 0);
     g_signal_connect (w, "value-changed", G_CALLBACK(dl_speed_spun_cb), gtor);
     g_signal_connect (tb, "toggled", G_CALLBACK(sensitize_from_check_cb), w);
     sensitize_from_check_cb (GTK_TOGGLE_BUTTON(tb), w);
-    gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (w), FALSE, TRUE, 0);
-    mis = gtk_label_new (_("KB/s"));
-    gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (mis), FALSE, TRUE, 0);
-    hig_workarea_add_row_w (t, &row, tb, hb, NULL);
+    hig_workarea_add_row_w (t, &row, tb, w, NULL);
 
     tb = gtk_check_button_new_with_mnemonic (_("Limit _upload speed (KB/s):"));
     b = tr_torrentGetSpeedMode(tor,TR_UP) == TR_SPEEDLIMIT_SINGLE;
@@ -1007,16 +1005,12 @@ options_page_new ( TrTorrent * gtor )
     g_signal_connect (tb, "toggled", G_CALLBACK(ul_speed_toggled_cb), gtor);
 
     i = tr_torrentGetSpeedLimit( tor, TR_UP );
-    hb = gtk_hbox_new ( FALSE, 6 );
     a = (GtkAdjustment*) gtk_adjustment_new (i, 0.0, G_MAXDOUBLE, 1, 1, 1);
     w = gtk_spin_button_new (a, 1, 0);
     g_signal_connect (w, "value-changed", G_CALLBACK(ul_speed_spun_cb), gtor);
     g_signal_connect (tb, "toggled", G_CALLBACK(sensitize_from_check_cb), w);
     sensitize_from_check_cb (GTK_TOGGLE_BUTTON(tb), w);
-    gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (w), FALSE, TRUE, 0);
-    mis = gtk_label_new (_("KB/s"));
-    gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (mis), FALSE, TRUE, 0);    
-    hig_workarea_add_row_w (t, &row, tb, hb, NULL);
+    hig_workarea_add_row_w (t, &row, tb, w, NULL);
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Peer Connections"));
@@ -1024,11 +1018,7 @@ options_page_new ( TrTorrent * gtor )
     maxConnectedPeers = tr_torrentGetMaxConnectedPeers( tor );
     w = gtk_spin_button_new_with_range( 1, 3000, 5 );
     gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), maxConnectedPeers );
-    hb = gtk_hbox_new ( FALSE, 6 );
-    gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (w), FALSE, TRUE, 0);
-    mis = gtk_label_new (_("peers"));
-    gtk_box_pack_start ( GTK_BOX (hb), GTK_WIDGET (mis), FALSE, TRUE, 0);    
-    hig_workarea_add_row( t, &row, _( "Connect at _maximum to:" ), hb, w );
+    hig_workarea_add_row( t, &row, _( "_Maximum number of peers:" ), w, w );
     g_signal_connect( w, "value-changed", G_CALLBACK( max_peers_spun_cb ), gtor );
 
 #if 0
@@ -1091,7 +1081,7 @@ tracker_page_new( TrTorrent * gtor )
         page->last_scrape_time_lb = l;
         hig_workarea_add_row( t, &row, s, l, NULL );
 
-        s = _( "Tracker responded: ");
+        s = _( "Tracker responded:");
         l = gtk_label_new( NULL );
         page->last_scrape_response_lb = l;
         hig_workarea_add_row( t, &row, s, l, NULL );
@@ -1109,7 +1099,7 @@ tracker_page_new( TrTorrent * gtor )
         page->last_announce_time_lb = l;
         hig_workarea_add_row( t, &row, s, l, NULL );
 
-        s = _( "Tracker responded: ");
+        s = _( "Tracker responded:");
         l = gtk_label_new( NULL );
         page->last_announce_response_lb = l;
         hig_workarea_add_row( t, &row, s, l, NULL );
@@ -1119,6 +1109,8 @@ tracker_page_new( TrTorrent * gtor )
         page->next_announce_countdown_lb = l;
         hig_workarea_add_row( t, &row, s, l, NULL );
 
+        /* when tracker will honor user pressing
+         * the "ask for more peers" button */
         s = _( "Manual announce allowed in:" );
         l = gtk_label_new( NULL );
         page->manual_announce_countdown_lb = l;
@@ -1237,7 +1229,7 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
 
   /* create the dialog */
   tr_strlsize( sizeStr, info->totalSize, sizeof(sizeStr) );
-  /* Translators: %1$s is torrent name, %2$s is file size */
+  /* %1$s is torrent name; %2$s its file size */
   g_snprintf( title, sizeof(title), _( "Details for %1$s (%2$s)" ), info->name, sizeStr );
   d = gtk_dialog_new_with_buttons (title, parent, 0,
                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,

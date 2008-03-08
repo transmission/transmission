@@ -281,21 +281,23 @@ tr_torrent_status_str ( TrTorrent * gtor )
             else {
                 char timestr[128];
                 tr_strltime( timestr, eta, sizeof( timestr ) );
-                top = g_strdup_printf( _("%s remaining (%.1f%%)"), timestr, prog );
+                /* %1$s is # of minutes
+                 * %2$.1f is a percentage of how much of the torrent is done */
+                top = g_strdup_printf( _("%1$s remaining (%2$.1f%%)"), timestr, prog );
             }
             break;
 
         case TR_STATUS_DONE:
             top = g_strdup_printf(
-                ngettext( "Uploading to %d of %d connected peer",
-                          "Uploading to %d of %d connected peers", tpeers ),
+                ngettext( "Uploading to %1$d of %2$d connected peer",
+                          "Uploading to %1$d of %2$d connected peers", tpeers ),
                           upeers, tpeers );
             break;
 
         case TR_STATUS_SEED:
             top = g_strdup_printf(
-                ngettext( "Seeding to %d of %d connected peer",
-                          "Seeding to %d of %d connected peers", tpeers ),
+                ngettext( "Seeding to %1$d of %2$d connected peer",
+                          "Seeding to %1$d of %2$d connected peers", tpeers ),
                           upeers, tpeers );
             break;
 
@@ -304,7 +306,7 @@ tr_torrent_status_str ( TrTorrent * gtor )
             break;
 
         default:
-            top = g_strdup_printf( _("Unrecognized state: %d"), st->status );
+            top = g_strdup_printf( "???" );
             break;
 
     }

@@ -38,7 +38,7 @@
 #include "upnp.h"
 #include "utils.h"
 
-static const char * getKey( void ) { return _( "Port Mapping" ); }
+static const char * getKey( void ) { return _( "Port Forwarding" ); }
 
 struct tr_shared
 {
@@ -68,11 +68,15 @@ getNatStateStr( int state )
 {
     switch( state )
     {
-        case TR_NAT_TRAVERSAL_MAPPING:   return "mapping";
-        case TR_NAT_TRAVERSAL_MAPPED:    return "mapped";
-        case TR_NAT_TRAVERSAL_UNMAPPING: return "unmapping";
-        case TR_NAT_TRAVERSAL_UNMAPPED:  return "not mapped";
-        case TR_NAT_TRAVERSAL_ERROR:     return "error";
+        /* we're in the process of trying to set up port forwarding */
+        case TR_NAT_TRAVERSAL_MAPPING:   return _( "forwarding" );
+        /* we've successfully forwarded the port */
+        case TR_NAT_TRAVERSAL_MAPPED:    return _( "forwarded" );
+        /* we're cancelling the port forwarding */
+        case TR_NAT_TRAVERSAL_UNMAPPING: return _( "unforwarding" );
+        /* the port isn't forwarded */
+        case TR_NAT_TRAVERSAL_UNMAPPED:  return _( "not forwarded" );
+        case TR_NAT_TRAVERSAL_ERROR:     return "???";
     }
 
     return "notfound";
@@ -89,7 +93,7 @@ natPulse( tr_shared * s )
     if( status == TR_NAT_TRAVERSAL_ERROR )
         status = tr_upnpPulse( s->upnp, port, isEnabled );
     if( status != s->natStatus ) {
-        tr_inf( _( "%s: Mapping state changed from \"%s\" to \"%s\"" ), getKey(), getNatStateStr(s->natStatus), getNatStateStr(status) );
+        tr_inf( _( "%s: state changed from \"%s\" to \"%s\"" ), getKey(), getNatStateStr(s->natStatus), getNatStateStr(status) );
         s->natStatus = status;
     }
 }
@@ -115,7 +119,7 @@ incomingPeersPulse( tr_shared * s )
             s->bindSocket = socket;
             listen( s->bindSocket, 5 );
         } else {
-            tr_err( _( "%s: Unable to open port %d to listen for incoming peer connections (errno is %d - %s)" ),
+            tr_err( _( "%s: Unable to open port %d to listen for incoming peer connections (errno %d - %s)" ),
                     getKey(), s->publicPort, errno, tr_strerror(errno) );
             s->bindPort = -1;
             s->bindSocket = -1;
@@ -153,7 +157,7 @@ sharedPulse( void * vshared )
     }
     else if( ( shared->natStatus == TR_NAT_TRAVERSAL_ERROR ) || ( shared->natStatus == TR_NAT_TRAVERSAL_UNMAPPED ) )
     {
-        tr_dbg( _( "%s: Port mapping shut down" ), getKey() );
+        tr_dbg( _( "%s: stopped" ), getKey() );
         shared->h->shared = NULL;
         tr_netClose( shared->bindSocket );
         tr_natpmpClose( shared->natpmp );

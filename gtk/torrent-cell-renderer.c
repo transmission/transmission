@@ -47,15 +47,20 @@ getProgressString( const tr_info * info, const tr_stat * torStat )
 
     if( !isDone )
         str = g_strdup_printf(
-                  /* Translators: %1$s is how much we've got, %2$s is how much we'll have when done, %3$.2f%% is a percentage of the two */
+                  /* %1$s is how much we've got,
+                   * %2$s is how much we'll have when done,
+                   * %3$.2f%% is a percentage of the two */
                   _("%1$s of %2$s (%3$.2f%%)"),
                   tr_strlsize( buf1, haveTotal, sizeof(buf1) ),
                   tr_strlsize( buf2, torStat->desiredSize, sizeof(buf2) ),
                   torStat->percentDone * 100.0 );
     else if( !isSeed )
         str = g_strdup_printf(
-                  /* Translators: %1$s is how much we've got, %2$s is the torrent's total size, %3$.2f%% is a percentage of the two,
-                     %4$s is how much we've uploaded, %5$s is our upload-to-download ratio */
+                  /* %1$s is how much we've got,
+                   * %2$s is the torrent's total size,
+                   * %3$.2f%% is a percentage of the two,
+                   * %4$s is how much we've uploaded,
+                   * %5$s is our upload-to-download ratio */
                   _("%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"),
                   tr_strlsize( buf1, haveTotal, sizeof(buf1) ),
                   tr_strlsize( buf2, info->totalSize, sizeof(buf2) ),
@@ -64,8 +69,9 @@ getProgressString( const tr_info * info, const tr_stat * torStat )
                   tr_strlratio( buf4, torStat->ratio, sizeof( buf4 ) ) );
     else
         str = g_strdup_printf(
-                  /* Translators: %1$s is the torrent's total size, %2$s is how much we've uploaded,
-                     %3$s is our upload-to-download ratio */
+                  /* %1$s is the torrent's total size,
+                   * %2$s is how much we've uploaded,
+                   * %3$s is our upload-to-download ratio */
                   _("%1$s, uploaded %2$s (Ratio: %3$s)"),
                   tr_strlsize( buf1, info->totalSize, sizeof(buf1) ),
                   tr_strlsize( buf2, torStat->uploadedEver, sizeof(buf2) ),
@@ -104,8 +110,10 @@ getShortTransferString( const tr_stat * torStat, char * buf, size_t buflen )
         tr_strlspeed( upStr, torStat->rateUpload, sizeof(upStr) );
 
     if( haveDown && haveUp )
-        /* Translators: %1$s is download speed, %2$s is upload speed */
-        g_snprintf( buf, buflen, _( "Down: %1$s, Up: %2$s"), downStr, upStr );
+        /* Translators: do not translate the "speed|" disambiguation prefix.
+         * %1$s is the download speed
+         * %2$s is the upload speed */
+        g_snprintf( buf, buflen, Q_( "speed|Down: %1$s, Up: %2$s"), downStr, upStr );
     else if( haveDown )
         /* Translators: this refers to download speed */
         g_snprintf( buf, buflen, _( "Down: %s" ), downStr );

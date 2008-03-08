@@ -31,7 +31,7 @@
 #define LIFETIME_SECS 3600
 #define COMMAND_WAIT_SECS 8
 
-static const char * getKey( void ) { return _( "Port Mapping (NAT-PMP)" ); }
+static const char * getKey( void ) { return _( "Port Forwarding (NAT-PMP)" ); }
 
 typedef enum
 {
@@ -163,7 +163,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
         const int val = readnatpmpresponseorretry( &nat->natpmp, &resp );
         logVal( "readnatpmpresponseorretry", val );
         if( val >= 0 ) {
-            tr_inf( _( "%s: port %d has been unmapped" ), getKey(), nat->port );
+            tr_inf( _( "%s: no longer forwarding port %d" ), getKey(), nat->port );
             nat->state = TR_NATPMP_IDLE;
             nat->port = -1;
             nat->isMapped = 0;
@@ -199,7 +199,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
             nat->isMapped = 1;
             nat->renewTime = time( NULL ) + LIFETIME_SECS;
             nat->port = resp.newportmapping.privateport;
-            tr_inf( _( "%s: port %d mapped successfully" ), getKey(), nat->port );
+            tr_inf( _( "%s: port %d forwarded successfully" ), getKey(), nat->port );
         } else if( val != NATPMP_TRYAGAIN ) {
             setErrorState( nat );
         }

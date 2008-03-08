@@ -873,7 +873,7 @@ freeTorrent( tr_torrent * tor )
     assert( h->torrentCount >= 1 );
     h->torrentCount--;
 
-    tr_inf( _( "Closing torrent %s... %d torrents left" ), 
+    tr_inf( _( "Closing torrent %s; %d torrents left" ), 
             tor->info.name, h->torrentCount );
 
     tr_metainfoFree( inf );

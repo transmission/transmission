@@ -631,6 +631,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
     uint8_t * buf = loadResumeFile( tor, &size );
 
     if( !buf )
+        /* %s is the torrent name */
         tr_inf( _( "Couldn't read resume file for \"%s\"" ), tor->info.name );
     else {
         const uint8_t * walk = buf;
@@ -641,6 +642,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
             if( version == 1 )
                 ret |= parseVersion1 ( tor, walk, end, fieldsToLoad );
             else
+                /* %s is the torrent name */
                 tr_inf( _( "Skipping invalid resume file for \"%s\"" ), tor->info.name );
         }
 

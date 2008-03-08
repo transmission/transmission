@@ -171,7 +171,9 @@ tr_initFull( const char * tag,
     h->shared = tr_sharedInit( h, isNatEnabled, publicPort );
     h->isPortSet = publicPort >= 0;
 
-    /* Translators: first %s is the application name, second %s is the version number */
+    /* Translators:
+     * first %s is the application name
+     * second %s is the version number */
     snprintf( buf, sizeof( buf ), _( "%s %s started" ),
               TR_NAME, LONG_VERSION_STRING );
     tr_inf( "%s", buf );
