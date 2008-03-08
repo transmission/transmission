@@ -144,8 +144,6 @@ coreerr( TrCore * core, enum tr_core_err code, const char * msg,
 static void
 coreprompt( TrCore *, GList *, gpointer, gpointer );
 static void
-initializeFromPrefs( struct cbdata * cbdata );
-static void
 prefschanged( TrCore * core, const char * key, gpointer data );
 static gboolean
 updatemodel(gpointer gdata);
@@ -382,12 +380,6 @@ appsetup( TrWindow * wind, GList * args,
     g_signal_connect( cbdata->core, "prefs-changed",
                       G_CALLBACK( prefschanged ), cbdata );
 
-    /* apply a few prefs */
-
-    if( minimized )
-        tr_core_set_pref_bool( cbdata->core, PREF_KEY_SYSTRAY, TRUE );
-    initializeFromPrefs( cbdata );
-
     /* add torrents from command-line and saved state */
     tr_core_load( cbdata->core, forcepause );
 
@@ -405,6 +397,9 @@ appsetup( TrWindow * wind, GList * args,
 
     /* set up main window */
     winsetup( cbdata, wind );
+
+    /* set up the system tray */
+    makeicon( cbdata );
 
     /* start model update timer */
     cbdata->timer = g_timeout_add( UPDATE_INTERVAL, updatemodel, cbdata );
@@ -815,12 +810,6 @@ coreprompt( TrCore                 * core,
 }
 
 static void
-initializeFromPrefs( struct cbdata * cbdata )
-{
-    prefschanged( NULL, PREF_KEY_SYSTRAY, cbdata );
-}
-
-static void
 prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
 {
     struct cbdata * cbdata = data;
@@ -861,18 +850,6 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     {
         const gboolean enabled = pref_flag_get( key );
         tr_natTraversalEnable( tr, enabled );
-    }
-    else if( !strcmp( key, PREF_KEY_SYSTRAY ) )
-    {
-        if( pref_flag_get( key ) )
-        {
-            makeicon( cbdata );
-        }
-        else if( cbdata->icon )
-        {
-            g_object_unref( cbdata->icon );
-            cbdata->icon = NULL;
-        }
     }
     else if( !strcmp( key, PREF_KEY_PEX ) )
     {

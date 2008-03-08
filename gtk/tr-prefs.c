@@ -60,7 +60,6 @@ tr_prefs_init_global( void )
 
     pref_flag_set_default   ( PREF_KEY_NAT, TRUE );
     pref_flag_set_default   ( PREF_KEY_PEX, TRUE );
-    pref_flag_set_default   ( PREF_KEY_SYSTRAY, TRUE );
     pref_flag_set_default   ( PREF_KEY_ASKQUIT, TRUE );
     pref_flag_set_default   ( PREF_KEY_ENCRYPTED_ONLY, FALSE );
 

@@ -30,7 +30,6 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_PORT                   "listening-port"
 #define PREF_KEY_NAT                    "nat-traversal-enabled"
 #define PREF_KEY_PEX                    "pex-enabled"
-#define PREF_KEY_SYSTRAY                "system-tray-icon-enabled"
 #define PREF_KEY_ASKQUIT                "prompt-before-exit"
 #define PREF_KEY_ENCRYPTED_ONLY         "encrypted-connections-only"
 #define PREF_KEY_MSGLEVEL               "debug-message-level"
