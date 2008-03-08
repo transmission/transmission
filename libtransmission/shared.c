@@ -69,11 +69,11 @@ getNatStateStr( int state )
     switch( state )
     {
         /* we're in the process of trying to set up port forwarding */
-        case TR_NAT_TRAVERSAL_MAPPING:   return _( "forwarding" );
+        case TR_NAT_TRAVERSAL_MAPPING:   return _( "starting" );
         /* we've successfully forwarded the port */
         case TR_NAT_TRAVERSAL_MAPPED:    return _( "forwarded" );
         /* we're cancelling the port forwarding */
-        case TR_NAT_TRAVERSAL_UNMAPPING: return _( "unforwarding" );
+        case TR_NAT_TRAVERSAL_UNMAPPING: return _( "stopping" );
         /* the port isn't forwarded */
         case TR_NAT_TRAVERSAL_UNMAPPED:  return _( "not forwarded" );
         case TR_NAT_TRAVERSAL_ERROR:     return "???";

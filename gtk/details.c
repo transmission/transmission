@@ -672,25 +672,18 @@ info_page_new (tr_torrent * tor)
   char name[128];
   const char * namefmt = "%s:";
   GtkTextBuffer * b;
-  tr_tracker_info * track;
   const tr_info * info = tr_torrentInfo(tor);
 
   hig_workarea_add_section_title (t, &row, _("Torrent Information"));
 
-    g_snprintf (name, sizeof(name), namefmt, _("Tracker"));
-    track = info->trackerList->list;
-    pch = track->port==80
-      ? g_strdup_printf( "http://%s%s", track->address, track->announce )
-      : g_strdup_printf( "http://%s:%d%s", track->address, track->port, track->announce );
-    l = gtk_label_new( pch );
-    gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
-
-    hig_workarea_add_row (t, &row, name, l, NULL);
-    g_free (pch);
-
     g_snprintf (name, sizeof(name), namefmt, _("Pieces"));
     tr_strlsize( sizeStr, info->pieceSize, sizeof(sizeStr) );
-    g_snprintf( buf, sizeof(buf), "%d (%s)", info->pieceCount, sizeStr );
+    g_snprintf( buf, sizeof( buf ),
+                /* %1$s is number of pieces; %2$s is how big each piece is */
+                ngettext( "%1$d Piece @ %2$s",
+                          "%1$d Pieces @ %2$s",
+                          info->pieceCount ),
+                info->pieceCount, sizeStr );
     l = gtk_label_new (buf);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
@@ -1069,7 +1062,12 @@ tracker_page_new( TrTorrent * gtor )
     GtkWidget * l;
     int row = 0;
     const char * s;
+    char * tmp;
     struct tracker_page * page = g_new0( struct tracker_page, 1 );
+    const tr_tracker_info * track;
+    char name[128];
+    const char * namefmt = "%s:";
+    const tr_info * info = tr_torrent_info (gtor);
 
     page->gtor = gtor;
 
@@ -1093,6 +1091,16 @@ tracker_page_new( TrTorrent * gtor )
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Announce" ) );
+
+        g_snprintf (name, sizeof(name), namefmt, _("Tracker"));
+        track = info->trackerList->list;
+        tmp = track->port==80
+          ? g_strdup_printf( "http://%s%s", track->address, track->announce )
+          : g_strdup_printf( "http://%s:%d%s", track->address, track->port, track->announce );
+        l = gtk_label_new( tmp );
+        gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
+        hig_workarea_add_row (t, &row, name, l, NULL);
+        g_free( tmp );
 
         s = _( "Last announce at:" );
         l = gtk_label_new( NULL );
