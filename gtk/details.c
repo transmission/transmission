@@ -31,6 +31,9 @@
 *****  PIECES VIEW
 ****/
 
+/* define SHOW_PIECES */
+
+#ifdef SHOW_PIECES
 static int
 getGridSize (int pieceCount, int * n_rows, int * n_cols)
 {
@@ -220,6 +223,7 @@ refresh_pieces( GtkWidget * da, GdkEventExpose * event UNUSED, gpointer gtor )
   g_free (completeness);
   return FALSE;
 }
+#endif
 
 /****
 *****  PEERS TAB
@@ -462,8 +466,10 @@ refresh_peers (GtkWidget * top)
 
   append_peers_to_model (store, peers, n_peers);  /* all these are new */
 
+#ifdef SHOW_PIECES
   if (GDK_IS_DRAWABLE (p->completeness->window))
     refresh_pieces (p->completeness, NULL, p->gtor);
+#endif
 
   fmtpeercount (p->seeders_lb, stat->seeders);
   fmtpeercount (p->leechers_lb, stat->leechers);
@@ -476,10 +482,9 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
 {
   guint i;
   GtkTreeModel *m;
-  GtkWidget *h, *v, *w, *ret, *da, *sw, *l, *vbox, *hbox;
+  GtkWidget *h, *v, *w, *ret, *sw, *l, *vbox, *hbox;
   tr_torrent * tor = tr_torrent_handle (gtor);
   PeerData * p = g_new (PeerData, 1);
-  char name[64];
 
   /* TODO: make this configurable? */
   int view_columns[] = { PEER_COL_IS_ENCRYPTED,
@@ -584,10 +589,10 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
   vbox = gtk_vbox_new (FALSE, GUI_PAD);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), GUI_PAD_BIG);
 
-    g_snprintf (name, sizeof(name), "<b>%s</b>", _("Availability"));
+#ifdef SHOW_PIECES
     l = gtk_label_new (NULL);
     gtk_misc_set_alignment (GTK_MISC(l), 0.0f, 0.5f);
-    gtk_label_set_markup (GTK_LABEL(l), name);
+    gtk_label_set_markup (GTK_LABEL(l), _( "<b>Availability</b>" ) );
     gtk_box_pack_start (GTK_BOX(vbox), l, FALSE, FALSE, 0);
 
     w = da = p->completeness = gtk_drawing_area_new ();
@@ -607,42 +612,33 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
     gtk_widget_set_size_request (w, 0u, GUI_PAD);
     gtk_box_pack_start (GTK_BOX(vbox), w, FALSE, FALSE, 0);
 
-    g_snprintf (name, sizeof(name), "<b>%s</b>", _("Connected Peers"));
     l = gtk_label_new (NULL);
     gtk_misc_set_alignment (GTK_MISC(l), 0.0f, 0.5f);
-    gtk_label_set_markup (GTK_LABEL(l), name);
+    gtk_label_set_markup (GTK_LABEL(l), _( "<b>Connected Peers</b>" ) );
     gtk_box_pack_start (GTK_BOX(vbox), l, FALSE, FALSE, 0);
+#endif
 
     h = gtk_hbox_new (FALSE, GUI_PAD);
-    w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request (w, GUI_PAD_BIG, 0);
-    gtk_box_pack_start (GTK_BOX(h), w, FALSE, FALSE, 0);
     gtk_box_pack_start_defaults (GTK_BOX(h), sw);
     gtk_box_pack_start_defaults (GTK_BOX(vbox), h);
 
     hbox = gtk_hbox_new (FALSE, GUI_PAD);
-    w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request (w, GUI_PAD_BIG, 0);
-    gtk_box_pack_start (GTK_BOX(hbox), w, FALSE, FALSE, 0);
-        g_snprintf (name, sizeof(name), "<b>%s:</b>", _("Seeders"));
         l = gtk_label_new (NULL);
-        gtk_label_set_markup (GTK_LABEL(l), name);
+        gtk_label_set_markup (GTK_LABEL(l), _( "<b>Seeders:</b>" ) );
         gtk_box_pack_start (GTK_BOX(hbox), l, FALSE, FALSE, 0);
         l = p->seeders_lb = gtk_label_new (NULL);
         gtk_box_pack_start (GTK_BOX(hbox), l, FALSE, FALSE, 0);
     gtk_box_pack_start_defaults (GTK_BOX(hbox),
                                  gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f));
-        g_snprintf (name, sizeof(name), "<b>%s:</b>", _("Leechers"));
         l = gtk_label_new (NULL);
-        gtk_label_set_markup (GTK_LABEL(l), name);
+        gtk_label_set_markup (GTK_LABEL(l), _( "<b>Leechers:</b>" ) );
         gtk_box_pack_start (GTK_BOX(hbox), l, FALSE, FALSE, 0);
         l = p->leechers_lb = gtk_label_new (NULL);
         gtk_box_pack_start (GTK_BOX(hbox), l, FALSE, FALSE, 0);
     gtk_box_pack_start_defaults (GTK_BOX(hbox),
                                  gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f));
-        g_snprintf (name, sizeof(name), "<b>%s:</b>", _("Completed"));
         l = gtk_label_new (NULL);
-        gtk_label_set_markup (GTK_LABEL(l), name);
+        gtk_label_set_markup (GTK_LABEL(l), _( "<b>Completed:</b>" ) );
         gtk_box_pack_start (GTK_BOX(hbox), l, FALSE, FALSE, 0);
         l = p->completed_lb = gtk_label_new (NULL);
         gtk_box_pack_start (GTK_BOX(hbox), l, FALSE, FALSE, 0);
@@ -669,14 +665,11 @@ info_page_new (tr_torrent * tor)
   char *pch;
   char sizeStr[128];
   char buf[256];
-  char name[128];
-  const char * namefmt = "%s:";
   GtkTextBuffer * b;
   const tr_info * info = tr_torrentInfo(tor);
 
   hig_workarea_add_section_title (t, &row, _("Torrent Information"));
 
-    g_snprintf (name, sizeof(name), namefmt, _("Pieces"));
     tr_strlsize( sizeStr, info->pieceSize, sizeof(sizeStr) );
     g_snprintf( buf, sizeof( buf ),
                 /* %1$s is number of pieces; %2$s is how big each piece is */
@@ -685,21 +678,18 @@ info_page_new (tr_torrent * tor)
                           info->pieceCount ),
                 info->pieceCount, sizeStr );
     l = gtk_label_new (buf);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Pieces:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Hash"));
     l = gtk_label_new (info->hashString);
     gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Hash:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Privacy"));
     pch = (info->isPrivate )
       ? _("Private Torrent: PEX disabled")
       : _("Public Torrent");
     l = gtk_label_new (pch);
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Privacy:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Comment"));
     b = gtk_text_buffer_new (NULL);
     if( info->comment )
         gtk_text_buffer_set_text (b, info->comment, -1);
@@ -710,34 +700,30 @@ info_page_new (tr_torrent * tor)
     fr = gtk_frame_new (NULL);
     gtk_frame_set_shadow_type (GTK_FRAME(fr), GTK_SHADOW_IN);
     gtk_container_add (GTK_CONTAINER(fr), w);
-    w = hig_workarea_add_row (t, &row, name, fr, NULL);
+    w = hig_workarea_add_row (t, &row, _("Comment:"), fr, NULL);
     gtk_misc_set_alignment (GTK_MISC(w), 0.0f, 0.0f);
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Origins"));
   
-    g_snprintf (name, sizeof(name), namefmt, _("Creator"));
     l = gtk_label_new (*info->creator ? info->creator : _("Unknown"));
-    hig_workarea_add_row (t, &row, name, l, NULL);
+    hig_workarea_add_row (t, &row, _("Creator:"), l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Date"));
     pch = rfc822date ((guint64)info->dateCreated * 1000u);
     l = gtk_label_new (pch);
-    hig_workarea_add_row (t, &row, name, l, NULL); 
+    hig_workarea_add_row (t, &row, _("Date:"), l, NULL); 
     g_free (pch);
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Location"));
 
-    g_snprintf (name, sizeof(name), namefmt, _("Destination directory"));
     l = gtk_label_new (tr_torrentGetFolder (tor));
     gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
-    hig_workarea_add_row (t, &row, name, l, NULL); 
+    hig_workarea_add_row (t, &row, _( "Destination folder" ), l, NULL); 
 
-    g_snprintf (name, sizeof(name), namefmt, _("Torrent file"));
     l = gtk_label_new ( info->torrent );
     gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
-    hig_workarea_add_row (t, &row, name, l, NULL); 
+    hig_workarea_add_row (t, &row, _( "Torrent file" ), l, NULL); 
 
   hig_workarea_finish (t, &row);
   return t;
@@ -780,7 +766,7 @@ refresh_activity (GtkWidget * top)
   g_free (pch);
 
   /* %1$.1f is percent of how much of what we want's been downloaded,
-   * %2$.1f is percent of how much of the whole torrent we've downloaded */
+     %2$.1f is percent of how much of the whole torrent we've downloaded */
   pch = g_strdup_printf( _( "%1$.1f%% (%2$.1f%% selected)" ), stat->percentComplete*100.0, stat->percentDone*100.0 );
   gtk_label_set_text (GTK_LABEL(a->progress_lb), pch);
   g_free (pch);
@@ -788,7 +774,7 @@ refresh_activity (GtkWidget * top)
   tr_strlsize( sizeStr,  stat->haveValid + stat->haveUnchecked, sizeof(sizeStr) );
   tr_strlsize( sizeStr2, stat->haveValid,                       sizeof(sizeStr2) );
   /* %1$s is total size of what we've saved to disk
-   * %2$s is how much of it's passed the checksum test */
+     %2$s is how much of it's passed the checksum test */
   g_snprintf( buf, sizeof(buf), _("%1$s (%2$s verified)"), sizeStr, sizeStr2 );
   gtk_label_set_text( GTK_LABEL( a->have_lb ), buf );
 
@@ -810,18 +796,20 @@ refresh_activity (GtkWidget * top)
   gtk_label_set_text (GTK_LABEL(a->err_lb),
                       *stat->errorString ? stat->errorString : _("None"));
 
-  pch = stat->startDate ? rfc822date (stat->startDate)
-                        : g_strdup_printf ("?");
+  pch = stat->startDate ? rfc822date( stat->startDate )
+                        : g_strdup_printf( _( "Unknown" ) );
   gtk_label_set_text (GTK_LABEL(a->date_added_lb), pch);
   g_free (pch);
 
-  pch = stat->activityDate ? rfc822date (stat->activityDate)
-                           : g_strdup_printf ("?");
+  pch = stat->activityDate ? rfc822date( stat->activityDate )
+                           : g_strdup_printf( _( "Unknown" ) );
   gtk_label_set_text (GTK_LABEL(a->last_activity_lb), pch);
   g_free (pch);
 
+#ifdef SHOW_PIECES
   if (GDK_IS_DRAWABLE (a->availability_da->window))
     refresh_pieces (a->availability_da, NULL, a->gtor);
+#endif
 }
   
 
@@ -831,7 +819,7 @@ activity_page_new (TrTorrent * gtor)
   Activity * a = g_new (Activity, 1);
   int row = 0;
   GtkWidget *t = hig_workarea_create ();
-  GtkWidget *l, *w;
+  GtkWidget *l;
 
   a->gtor = gtor;
 
@@ -866,6 +854,7 @@ activity_page_new (TrTorrent * gtor)
     l = a->err_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, _("Error:"), l, NULL);
 
+#ifdef SHOW_PIECES
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Completion"));
 
@@ -874,6 +863,7 @@ activity_page_new (TrTorrent * gtor)
     g_object_set_data (G_OBJECT(w), "draw-mode", GINT_TO_POINTER(DRAW_PROG));
     g_signal_connect (w, "expose-event", G_CALLBACK(refresh_pieces), gtor);
     hig_workarea_add_wide_control( t, &row, w );
+#endif
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Dates"));
@@ -1065,8 +1055,6 @@ tracker_page_new( TrTorrent * gtor )
     char * tmp;
     struct tracker_page * page = g_new0( struct tracker_page, 1 );
     const tr_tracker_info * track;
-    char name[128];
-    const char * namefmt = "%s:";
     const tr_info * info = tr_torrent_info (gtor);
 
     page->gtor = gtor;
@@ -1092,14 +1080,13 @@ tracker_page_new( TrTorrent * gtor )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Announce" ) );
 
-        g_snprintf (name, sizeof(name), namefmt, _("Tracker"));
         track = info->trackerList->list;
         tmp = track->port==80
           ? g_strdup_printf( "http://%s%s", track->address, track->announce )
           : g_strdup_printf( "http://%s:%d%s", track->address, track->port, track->announce );
         l = gtk_label_new( tmp );
         gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
-        hig_workarea_add_row (t, &row, name, l, NULL);
+        hig_workarea_add_row (t, &row, _( "Tracker:" ), l, NULL);
         g_free( tmp );
 
         s = _( "Last announce at:" );
@@ -1117,8 +1104,8 @@ tracker_page_new( TrTorrent * gtor )
         page->next_announce_countdown_lb = l;
         hig_workarea_add_row( t, &row, s, l, NULL );
 
-        /* when tracker will honor user pressing
-         * the "ask for more peers" button */
+        /* how long until the tracker will honor user
+         * pressing the "ask for more peers" button */
         s = _( "Manual announce allowed in:" );
         l = gtk_label_new( NULL );
         page->manual_announce_countdown_lb = l;

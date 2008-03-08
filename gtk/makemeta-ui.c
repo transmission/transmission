@@ -254,7 +254,7 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
 
         g_snprintf( name, sizeof(name), "%s:", _("File _Type"));
         h = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
-        w = rb_dir = gtk_radio_button_new_with_mnemonic( NULL, _("Directory"));
+        w = rb_dir = gtk_radio_button_new_with_mnemonic( NULL, _("Folder"));
         gtk_box_pack_start ( GTK_BOX(h), w, FALSE, FALSE, 0 );
         w = rb_file = gtk_radio_button_new_with_mnemonic_from_widget( GTK_RADIO_BUTTON(w), _("Single File") );
         gtk_box_pack_start ( GTK_BOX(h), w, FALSE, FALSE, 0 );
@@ -289,7 +289,7 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title (t, &row, _("Torrent"));
 
-        g_snprintf( name, sizeof(name), _("Private to this Tracker") );
+        g_snprintf( name, sizeof(name), _("Private to this tracker") );
         w = ui->private_check = hig_workarea_add_wide_checkbutton( t, &row, name, FALSE );
 
         g_snprintf( name, sizeof(name), "%s:", _("Announce _URL"));

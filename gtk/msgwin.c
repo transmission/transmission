@@ -294,7 +294,7 @@ msgwin_create( TrCore * core )
 
   gtk_toolbar_append_element(GTK_TOOLBAR(toolbar),
                              GTK_TOOLBAR_CHILD_WIDGET, levels,
-                             NULL, _("Select the debug filter level."),
+                             NULL, _("Set the verbosity level"),
                              NULL, NULL, NULL, NULL);
 
   gtk_box_pack_start( GTK_BOX( vbox ), toolbar, FALSE, FALSE, 0 );

@@ -529,7 +529,7 @@ tr_errorString( int code )
             return _( "Assert error" );
 
         case TR_ERROR_IO_PARENT:
-            return _( "Download directory doesn't exist" );
+            return _( "Destination folder doesn't exist" );
         case TR_ERROR_IO_PERMISSIONS:
             return tr_strerror( EACCES );
         case TR_ERROR_IO_SPACE:
@@ -539,7 +539,7 @@ tr_errorString( int code )
         case TR_ERROR_IO_OPEN_FILES:
             return tr_strerror( EMFILE );
         case TR_ERROR_IO_DUP_DOWNLOAD:
-            return _( "A torrent with this name and destination directory already exists." );
+            return _( "A torrent with this name and destination folder already exists." );
         case TR_ERROR_IO_OTHER:
             return _( "Generic I/O error" );
 

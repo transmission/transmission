@@ -215,7 +215,7 @@ tr_torrent_new_ctor( tr_handle  * handle,
         switch( errcode )
         {
             case TR_EINVALID:
-                *err = g_strdup_printf( _( "File \"%s\" is not a valid torrent" ), filename );
+                *err = g_strdup_printf( _( "File \"%s\" isn't a valid torrent" ), filename );
                  break;
             case TR_EDUPLICATE:
                 *err = g_strdup_printf( _( "File \"%s\" is already open" ), filename );
@@ -282,7 +282,7 @@ tr_torrent_status_str ( TrTorrent * gtor )
                 char timestr[128];
                 tr_strltime( timestr, eta, sizeof( timestr ) );
                 /* %1$s is # of minutes
-                 * %2$.1f is a percentage of how much of the torrent is done */
+                   %2$.1f is a percentage of how much of the torrent is done */
                 top = g_strdup_printf( _("%1$s remaining (%2$.1f%%)"), timestr, prog );
             }
             break;

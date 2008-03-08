@@ -134,7 +134,7 @@ promptfordir( GtkWindow * parent, TrCore * core, GList * files, tr_ctor * ctor )
 
     g_object_weak_ref( G_OBJECT( core ), promptdirnocore, stuff );
 
-    wind =  gtk_file_chooser_dialog_new( _("Destination directory"), parent,
+    wind =  gtk_file_chooser_dialog_new( _("Destination folder"), parent,
                                          GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                          GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,

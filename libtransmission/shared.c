@@ -119,7 +119,7 @@ incomingPeersPulse( tr_shared * s )
             s->bindSocket = socket;
             listen( s->bindSocket, 5 );
         } else {
-            tr_err( _( "%s: Unable to open port %d to listen for incoming peer connections (errno %d - %s)" ),
+            tr_err( _( "%s: Couldn't open port %d to listen for incoming peer connections (errno %d - %s)" ),
                     getKey(), s->publicPort, errno, tr_strerror(errno) );
             s->bindPort = -1;
             s->bindSocket = -1;

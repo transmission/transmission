@@ -195,7 +195,7 @@ makeaddwind( GtkWindow  * parent,
 
     ++row;
     col = 0;
-    l = gtk_label_new_with_mnemonic( _( "Destination _directory:" ) );
+    l = gtk_label_new_with_mnemonic( _( "Destination _folder:" ) );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
     gtk_table_attach( GTK_TABLE( t ), l, col, col+1, row, row+1, GTK_FILL, 0, 0, 0 );
     ++col;

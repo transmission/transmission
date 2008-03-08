@@ -217,7 +217,7 @@ torrentPage( GObject * core )
     hig_workarea_add_section_title( t, &row, _( "Adding" ) );
 
         w = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
-        hig_workarea_add_row( t, &row, _( "Default download _location:" ), w, NULL );
+        hig_workarea_add_row( t, &row, _( "Default destination _folder:" ), w, NULL );
 
         s = _( "Show _options dialog" );
         w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );

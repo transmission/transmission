@@ -112,7 +112,7 @@ static GtkActionEntry entries[] =
   { "remove-torrent", GTK_STOCK_REMOVE, NULL, "Delete", NULL, G_CALLBACK(action_cb) },
   { "delete-torrent", GTK_STOCK_DELETE, N_("_Delete Files and Remove"), "<control>Delete", NULL, G_CALLBACK(action_cb) },
   { "new-torrent", GTK_STOCK_NEW, N_("_New..."), NULL,
-    N_("Create a new torrent"),
+    N_("Create a torrent"),
     G_CALLBACK(action_cb) },
   { "close", GTK_STOCK_CLOSE, N_("Close _Window"), "<control>W",
     N_("Close main window"),
@@ -123,7 +123,7 @@ static GtkActionEntry entries[] =
     N_("Dese_lect All"), "<shift><control>A", NULL, G_CALLBACK(action_cb) },
   { "edit-preferences", GTK_STOCK_PREFERENCES, NULL, NULL, NULL, G_CALLBACK(action_cb) },
   { "show-torrent-details", GTK_STOCK_INFO,
-    N_("_Details"), "<alt>Return", N_("Torrent Details"), G_CALLBACK(action_cb) },
+    N_("_Details"), "<alt>Return", NULL, G_CALLBACK(action_cb) },
   { "show-about-dialog", GTK_STOCK_ABOUT, NULL, NULL, NULL, G_CALLBACK(action_cb) },
   { "update-tracker", GTK_STOCK_NETWORK,
     N_("Ask Tracker for _More Peers"), NULL, NULL, G_CALLBACK(action_cb) }

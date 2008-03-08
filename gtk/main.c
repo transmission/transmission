@@ -929,8 +929,8 @@ about ( GtkWindow * parent )
         "wrap-license", TRUE,
 #endif
         "authors", authors,
-        /* Translators: translate "translator-credits" with your name
-         * to have it appear in the credits in the "About" dialog */
+        /* Translators: translate "translator-credits" as your name
+           to have it appear in the credits in the "About" dialog */
         "translator-credits", _("translator-credits"),
         NULL );
 }

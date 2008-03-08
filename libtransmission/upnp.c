@@ -88,12 +88,12 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
         errno = 0;
         devlist = upnpDiscover( 2000, NULL, NULL );
         if( devlist == NULL ) {
-            tr_err( _( "%s: upnpDiscover returned NULL (errno %d - %s)" ), getKey(), errno, tr_strerror(errno) );
+            tr_err( _( "%s: upnpDiscover failed (errno %d - %s)" ), getKey(), errno, tr_strerror(errno) );
         }
         errno = 0;
         if( UPNP_GetValidIGD( devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr))) {
-            tr_inf( _( "%s: Found Internet Gateway Device '%s'" ), getKey(), handle->urls.controlURL );
-            tr_inf( _( "%s: Local Address is '%s'" ), getKey(), handle->lanaddr );
+            tr_inf( _( "%s: Found Internet Gateway Device \"%s\"" ), getKey(), handle->urls.controlURL );
+            tr_inf( _( "%s: Local Address is \"%s\"" ), getKey(), handle->lanaddr );
             handle->state = TR_UPNP_IDLE;
             handle->hasDiscovered = 1;
         } else {
@@ -117,7 +117,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
         UPNP_DeletePortMapping( handle->urls.controlURL,
                                 handle->data.servicetype,
                                 portStr, "TCP" );
-        tr_dbg( _( "%s: Stopping port forwarding of '%s', service '%s'" ),
+        tr_dbg( _( "%s: Stopping port forwarding of \"%s\", service \"%s\"" ),
                 getKey(), handle->urls.controlURL, handle->data.servicetype );
         handle->isMapped = 0;
         handle->state = TR_UPNP_IDLE;
@@ -146,7 +146,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
                                        "Transmission", "TCP" );
             handle->isMapped = !err;
         }
-        tr_inf( _( "%s: Port forwarding via '%s', service '%s'.  (local address: %s:%d)" ),
+        tr_inf( _( "%s: Port forwarding via \"%s\", service \"%s\".  (local address: %s:%d)" ),
                 getKey(), handle->urls.controlURL, handle->data.servicetype, handle->lanaddr, port );
         if( handle->isMapped ) {
             tr_inf( _( "%s: Port forwarding successful!" ), getKey() );

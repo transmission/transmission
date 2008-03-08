@@ -231,10 +231,10 @@ cli_io_received( GSource * source UNUSED, void * data, size_t len,
                 g_message( _("Bad IPC protocol version") );
                 break;
             case EINVAL:
-                g_message( _("IPC protocol parse error") );
+                g_message( _("IPC parse error") );
                 break;
             default:
-                g_message( _("IPC parsing failed: %s"), g_strerror( errno ) );
+                g_message( _("IPC parse error: %s"), g_strerror( errno ) );
                 break;
         }
         destroycon( con );
