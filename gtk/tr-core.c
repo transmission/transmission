@@ -43,6 +43,8 @@ struct TrCorePrivate
 {
 #ifdef HAVE_GIO
     GFileMonitor     * monitor;
+    gulong             monitor_tag;
+    char             * monitor_path;
 #endif
     GtkTreeModel     * model;
     tr_handle        * handle;
@@ -283,7 +285,39 @@ setSort( TrCore * core, const char * mode, gboolean isReversed  )
     gtk_tree_sortable_set_sort_column_id( sortable, col, type );
 }
 
+static void
+tr_core_apply_defaults( tr_ctor * ctor )
+{
+    if( tr_ctorGetPaused( ctor, TR_FORCE, NULL ) )
+        tr_ctorSetPaused( ctor, TR_FORCE, !pref_flag_get( PREF_KEY_START ) );
+
+    if( tr_ctorGetDeleteSource( ctor, NULL ) ) 
+        tr_ctorSetDeleteSource( ctor, pref_flag_get( PREF_KEY_TRASH_ORIGINAL ) ); 
+
+    if( tr_ctorGetMaxConnectedPeers( ctor, TR_FORCE, NULL ) )
+        tr_ctorSetMaxConnectedPeers( ctor, TR_FORCE,
+                              pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
+
+    if( tr_ctorGetDestination( ctor, TR_FORCE, NULL ) ) {
+        char * path = pref_string_get( PREF_KEY_DIR_DEFAULT );
+        tr_ctorSetDestination( ctor, TR_FORCE, path );
+        g_free( path );
+    }
+}
+
 #ifdef HAVE_GIO
+static gboolean
+canAddTorrent( TrCore * core, const char * filename )
+{
+    gboolean canAdd;
+    tr_ctor * ctor = tr_ctorNew( core->priv->handle );
+    tr_core_apply_defaults( ctor );
+    tr_ctorSetMetainfoFromFile( ctor, filename );
+    canAdd = !tr_torrentParse( core->priv->handle, ctor, NULL );
+    tr_ctorFree( ctor );
+    return canAdd;
+}
+
 static void
 watchFolderChanged( GFileMonitor       * monitor UNUSED,
                     GFile              * file,
@@ -296,11 +330,13 @@ watchFolderChanged( GFileMonitor       * monitor UNUSED,
         TrCore * core = TR_CORE( gcore );
         char * filename = g_file_get_path( file );
         const gboolean isTorrent = g_str_has_suffix( filename, ".torrent" );
-        if( isTorrent )
+
+        if( isTorrent && canAddTorrent( core, filename ) )
         {
             tr_ctor * ctor = tr_ctorNew( core->priv->handle );
             tr_core_add_list( core, g_list_append( NULL, g_strdup( filename ) ), ctor );
         }
+
         g_free( filename );
     }
 }
@@ -330,21 +366,25 @@ updateWatchDir( TrCore * core )
     char * filename = pref_string_get( PREF_KEY_DIR_WATCH );
     const gboolean isEnabled = pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED );
 
-    if( core->priv->monitor && !isEnabled )
+    if( core->priv->monitor && ( !isEnabled || tr_strcmp( filename, core->priv->monitor_path ) ) )
     {
-        GFileMonitor * m = core->priv->monitor;
+        g_signal_handler_disconnect( core->priv->monitor, core->priv->monitor_tag );
+        g_free( core->priv->monitor_path );
+        g_file_monitor_cancel( core->priv->monitor );
+        g_object_unref( G_OBJECT( core->priv->monitor ) );
+        core->priv->monitor_path = NULL;
         core->priv->monitor = NULL;
-        g_signal_handlers_disconnect_by_func( m, watchFolderChanged, core );
-        g_file_monitor_cancel( m );
-        g_object_unref( G_OBJECT( m ) );
+        core->priv->monitor_tag = 0;
     }
-    else if( isEnabled && !core->priv->monitor )
+
+    if( isEnabled && !core->priv->monitor )
     {
         GFile * file = g_file_new_for_path( filename );
         GFileMonitor * m = g_file_monitor_directory( file, 0, NULL, NULL );
         scanWatchDir( core );
-        g_signal_connect( m, "changed", G_CALLBACK (watchFolderChanged), core );
         core->priv->monitor = m;
+        core->priv->monitor_path = g_strdup( filename );
+        core->priv->monitor_tag = g_signal_connect( m, "changed", G_CALLBACK (watchFolderChanged), core );
     }
 
     g_free( filename );
@@ -573,26 +613,6 @@ tr_core_errsig( TrCore * self, enum tr_core_err type, const char * msg )
 {
     TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
     g_signal_emit( self, class->errsig, 0, type, msg );
-}
-
-static void
-tr_core_apply_defaults( tr_ctor * ctor )
-{
-    if( tr_ctorGetPaused( ctor, TR_FORCE, NULL ) )
-        tr_ctorSetPaused( ctor, TR_FORCE, !pref_flag_get( PREF_KEY_START ) );
-
-    if( tr_ctorGetDeleteSource( ctor, NULL ) ) 
-        tr_ctorSetDeleteSource( ctor, pref_flag_get( PREF_KEY_TRASH_ORIGINAL ) ); 
-
-    if( tr_ctorGetMaxConnectedPeers( ctor, TR_FORCE, NULL ) )
-        tr_ctorSetMaxConnectedPeers( ctor, TR_FORCE,
-                              pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
-
-    if( tr_ctorGetDestination( ctor, TR_FORCE, NULL ) ) {
-        char * path = pref_string_get( PREF_KEY_DIR_DEFAULT );
-        tr_ctorSetDestination( ctor, TR_FORCE, path );
-        g_free( path );
-    }
 }
 
 void
