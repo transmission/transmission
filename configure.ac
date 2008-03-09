@@ -10,10 +10,12 @@ AC_CONFIG_SRCDIR(libtransmission/transmission.h)
 AM_INIT_AUTOMAKE([1.9 tar-ustar])
 AC_PROG_LIBTOOL
 
+GIO_MINIMUM=2.15.5
 GLIB_MINIMUM=2.6.0
 GTK_MINIMUM=2.6.0
 WX_MINIMUM=2.6.0
 LIBNOTIFY_MINIMUM=0.4.4
+AC_SUBST(GIO_MINIMUM)
 AC_SUBST(GLIB_MINIMUM)
 AC_SUBST(GTK_MINIMUM)
 AC_SUBST(WX_MINIMUM)
@@ -93,6 +95,16 @@ fi
 AM_CONDITIONAL([BUILD_GTK],[test "x$build_gtk" = "xyes"])
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
+
+PKG_CHECK_MODULES([GIO],
+                  [gio-2.0 >= $GIO_MINIMUM],
+                  [use_gio=yes],
+                  [use_gio=no])
+AC_SUBST(GIO_LIBS)
+AC_SUBST(GIO_CFLAGS)
+if test "x$use_gio" = "xyes"; then
+    AC_DEFINE([HAVE_GIO], 1)
+fi
 
 PKG_CHECK_MODULES([LIBNOTIFY],
                   [libnotify >= $LIBNOTIFY_MINIMUM],
@@ -277,6 +289,7 @@ Configuration:
         Build BeOS client:          ${build_beos}
         Build GTK+ client:          ${build_gtk}
           ... libnotify support:    ${use_libnotify}
+          ... gio support:          ${use_gio}
         Build OS X client:          ${build_darwin}
         Build wxWidgets client:     ${build_wx}
 

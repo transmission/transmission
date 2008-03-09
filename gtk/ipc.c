@@ -33,6 +33,7 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+#include <glib/gstdio.h> /* g_unlink */
 
 #include <libevent/evutil.h>
 
@@ -359,8 +360,8 @@ ipc_sendquit_blocking( void )
 
 static void
 rmsock(void) {
-  if(NULL != gl_sockpath) {
-    unlink(gl_sockpath);
+  if( gl_sockpath) {
+    g_unlink(gl_sockpath);
     g_free(gl_sockpath);
   }
 }
@@ -463,10 +464,10 @@ serv_bind(struct constate *con) {
   strncpy(sa.sun_path, gl_sockpath, sizeof(sa.sun_path) - 1);
 
   /* unlink any existing socket file before trying to create ours */
-  unlink(gl_sockpath);
+  g_unlink(gl_sockpath);
   if(0 > bind(con->fd, (struct sockaddr *)&sa, SUN_LEN(&sa))) {
     /* bind may fail if there was already a socket, so try twice */
-    unlink(gl_sockpath);
+    g_unlink(gl_sockpath);
     if(0 > bind(con->fd, (struct sockaddr *)&sa, SUN_LEN(&sa)))
       goto fail;
   }

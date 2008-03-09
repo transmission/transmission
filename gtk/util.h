@@ -110,6 +110,8 @@ on_tree_view_button_pressed (GtkWidget       * view,
 
 gpointer tr_object_ref_sink (gpointer object);
 
+void tr_file_trash_or_unlink( const char * filename );
+
 #endif /* GTK_MAJOR_VERSION */
 
 #endif /* TG_UTIL_H */

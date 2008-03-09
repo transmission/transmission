@@ -31,6 +31,14 @@ tr_prefs_init_global( void )
 
     cf_check_older_configs( );
 
+#if HAVE_GIO
+    str = NULL;
+    if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DESKTOP );
+    if( !str ) str = g_get_home_dir( );
+    pref_string_set_default ( PREF_KEY_DIR_WATCH, str );
+    pref_flag_set_default   ( PREF_KEY_DIR_WATCH_ENABLED, FALSE );
+#endif
+
     pref_int_set_default    ( PREF_KEY_MAX_PEERS_GLOBAL, 200 );
     pref_int_set_default    ( PREF_KEY_MAX_PEERS_PER_TORRENT, 50 );
 
@@ -47,11 +55,9 @@ tr_prefs_init_global( void )
 
     str = NULL;
 #if GLIB_CHECK_VERSION(2,14,0)
-    if( !str )
-        str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
+    if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
 #endif
-    if( !str )
-        str = g_get_home_dir( );
+    if( !str ) str = g_get_home_dir( );
     pref_string_set_default ( PREF_KEY_DIR_DEFAULT, str );
 
     pref_int_set_default    ( PREF_KEY_PORT, TR_DEFAULT_PORT );
@@ -70,6 +76,7 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_MINIMAL_VIEW, FALSE );
 
     pref_flag_set_default   ( PREF_KEY_START, TRUE );
+    pref_flag_set_default   ( PREF_KEY_TRASH_ORIGINAL, FALSE );
 
     pref_save( NULL );
 }
@@ -211,26 +218,40 @@ torrentPage( GObject * core )
     const char * s;
     GtkWidget * t;
     GtkWidget * w;
+    GtkWidget * l;
 
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Adding" ) );
 
-        w = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
-        hig_workarea_add_row( t, &row, _( "Default destination _folder:" ), w, NULL );
+#ifdef HAVE_GIO
+        s = _( "Automatically add torrents from:" );
+        l = new_check_button( s, PREF_KEY_DIR_WATCH_ENABLED, core );
+        w = new_path_chooser_button( PREF_KEY_DIR_WATCH, core );
+        gtk_widget_set_sensitive( GTK_WIDGET(w), pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED ) );
+        g_signal_connect( l, "toggled", G_CALLBACK(target_cb), w );
+        hig_workarea_add_row_w( t, &row, l, w, NULL );
+#endif
 
         s = _( "Show _options dialog" );
         w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );
         hig_workarea_add_wide_control( t, &row, w );
 
-        s = _( "_Start when added" );
+        s = _( "_Start torrents when added" );
         w = new_check_button( s, PREF_KEY_START, core );
         hig_workarea_add_wide_control( t, &row, w );
+
+        s = _( "_Trash original torrent files" ); 
+        w = new_check_button( s, PREF_KEY_TRASH_ORIGINAL, core ); 
+        hig_workarea_add_wide_control( t, &row, w );
+
+        w = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
+        hig_workarea_add_row( t, &row, _( "Default destination _folder:" ), w, NULL );
 
 #ifdef HAVE_LIBNOTIFY
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Notification" ) );
 
-        s = _( "_Popup message when a torrent finishes" );
+        s = _( "_Display a message when torrents finish" );
         w = new_check_button( s, PREF_KEY_NOTIFY, core );
         hig_workarea_add_wide_control( t, &row, w );
 #endif

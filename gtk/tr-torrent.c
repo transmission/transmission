@@ -27,7 +27,6 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
-#include <glib/gstdio.h>
 
 #include <libtransmission/transmission.h>
 
@@ -204,7 +203,16 @@ tr_torrent_new_ctor( tr_handle  * handle,
     errcode = -1;
     *err = NULL;
 
+    tr_ctorSetDeleteSource( ctor, FALSE );
     tor = tr_torrentNew( handle, ctor, &errcode );
+
+    if( tor )
+    {
+        uint8_t doTrash = FALSE;
+        tr_ctorGetDeleteSource( ctor, &doTrash );
+        if( doTrash )
+            tr_file_trash_or_unlink( tr_ctorGetSourceFile( ctor ) );
+    }
   
     if( !tor )
     {
@@ -334,7 +342,7 @@ tr_torrent_delete_files( TrTorrent * gtor )
         while( strcmp( stop, file ) && strlen(stop) < strlen(file) )
         {
             char * swap = g_path_get_dirname( file );
-            g_unlink( file );
+            tr_file_trash_or_unlink( file );
             g_free( file );
             file = swap;
         }

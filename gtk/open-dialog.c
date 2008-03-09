@@ -11,7 +11,6 @@
  */
 
 #include <glib/gi18n.h>
-#include <glib/gstdio.h>
 #include <gtk/gtk.h>
 #include "file-list.h"
 #include "hig.h"
@@ -22,7 +21,7 @@ struct OpenData
     TrCore * core;
     GtkWidget * list;
     GtkToggleButton * run_check;
-    GtkToggleButton * delete_check;
+    GtkToggleButton * trash_check;
     char * filename;
     char * destination;
     TrTorrent * gtor;
@@ -55,8 +54,8 @@ openResponseCB( GtkDialog * dialog, gint response, gpointer gdata )
             if( gtk_toggle_button_get_active( data->run_check ) )
                 tr_torrentStart( tr_torrent_handle( data->gtor ) );
             tr_core_add_torrent( data->core, data->gtor );
-            if( gtk_toggle_button_get_active( data->delete_check ) )
-                g_unlink( data->filename );
+            if( gtk_toggle_button_get_active( data->trash_check ) )
+                tr_file_trash_or_unlink( data->filename );
         }
     }
 
@@ -221,8 +220,10 @@ makeaddwind( GtkWindow  * parent,
 
     ++row;
     col = 0;
-    w = gtk_check_button_new_with_mnemonic( _( "_Delete original torrent file" ) );
-    data->delete_check = GTK_TOGGLE_BUTTON( w );
+    w = gtk_check_button_new_with_mnemonic( _( "_Trash original torrent file" ) );
+    data->trash_check = GTK_TOGGLE_BUTTON( w );
+    if( tr_ctorGetDeleteSource( ctor, &flag ) )
+        g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), flag );
     gtk_table_attach( GTK_TABLE( t ), w, col, col+2, row, row+1, GTK_FILL, 0, 0, 0 );
 

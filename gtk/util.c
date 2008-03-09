@@ -28,6 +28,10 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+#include <glib/gstdio.h> /* g_unlink() */
+#ifdef HAVE_GIO
+#include <gio/gio.h> /* g_file_trash() */
+#endif
 
 #include <libevent/evhttp.h>
 
@@ -415,4 +419,21 @@ tr_object_ref_sink( gpointer object )
     gtk_object_sink( GTK_OBJECT( object ) );
 #endif
     return object;
+}
+
+void
+tr_file_trash_or_unlink( const char * filename )
+{
+    if( filename && *filename )
+    {
+        gboolean trashed = FALSE;
+#ifdef HAVE_GIO
+        GError * err = NULL;
+        GFile * file = g_file_new_for_path( filename );
+        trashed = g_file_trash( file, NULL, &err );
+        g_object_unref( G_OBJECT( file ) );
+#endif 
+        if( !trashed )
+            g_unlink( filename );
+    }
 }

@@ -153,8 +153,10 @@ promptfordir( GtkWindow * parent, TrCore * core, GList * files, tr_ctor * ctor )
     v = gtk_vbox_new( FALSE, GUI_PAD );
 
         flag = 0;
-        w = gtk_check_button_new_with_mnemonic( _( "_Delete original torrent file" ) );
+        w = gtk_check_button_new_with_mnemonic( _( "_Trash original torrent files" ) );
         g_signal_connect( w, "toggled", G_CALLBACK( deleteToggled ), ctor );
+        if( tr_ctorGetDeleteSource( ctor, &flag ) ) 
+            g_assert_not_reached( );
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), flag );
         gtk_box_pack_start( GTK_BOX( v ), w, FALSE, FALSE, 0 );
 

@@ -26,6 +26,9 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+#ifdef HAVE_GIO
+#include <gio/gio.h>
+#endif
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> /* tr_free */
@@ -38,6 +41,9 @@
 
 struct TrCorePrivate
 {
+#ifdef HAVE_GIO
+    GFileMonitor     * monitor;
+#endif
     GtkTreeModel     * model;
     tr_handle        * handle;
     int                nextid;
@@ -277,6 +283,74 @@ setSort( TrCore * core, const char * mode, gboolean isReversed  )
     gtk_tree_sortable_set_sort_column_id( sortable, col, type );
 }
 
+#ifdef HAVE_GIO
+static void
+watchFolderChanged( GFileMonitor       * monitor UNUSED,
+                    GFile              * file,
+                    GFile              * other_type UNUSED,
+                    GFileMonitorEvent    event_type,
+                    gpointer             gcore )
+{
+    if( event_type == G_FILE_MONITOR_EVENT_CREATED )
+    {
+        TrCore * core = TR_CORE( gcore );
+        char * filename = g_file_get_path( file );
+        const gboolean isTorrent = g_str_has_suffix( filename, ".torrent" );
+        if( isTorrent )
+        {
+            tr_ctor * ctor = tr_ctorNew( core->priv->handle );
+            tr_core_add_list( core, g_list_append( NULL, g_strdup( filename ) ), ctor );
+        }
+        g_free( filename );
+    }
+}
+
+static void
+scanWatchDir( TrCore * core )
+{
+    const gboolean isEnabled = pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED );
+    if( isEnabled )
+    {
+        GList * torrents = NULL;
+        char * dirname = pref_string_get( PREF_KEY_DIR_WATCH );
+        GDir * dir = g_dir_open( dirname, 0, NULL );
+        const char * basename;
+        while(( basename = g_dir_read_name( dir )))
+            if( g_str_has_suffix( basename, ".torrent" ) )
+                torrents = g_list_append( torrents, g_build_filename( dirname, basename, NULL ) );
+        if( torrents )
+            tr_core_add_list( core, torrents, tr_ctorNew( core->priv->handle ) );
+        g_free( dirname );
+    }
+}
+
+static void
+updateWatchDir( TrCore * core )
+{
+    char * filename = pref_string_get( PREF_KEY_DIR_WATCH );
+    const gboolean isEnabled = pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED );
+
+    if( core->priv->monitor && !isEnabled )
+    {
+        GFileMonitor * m = core->priv->monitor;
+        core->priv->monitor = NULL;
+        g_signal_handlers_disconnect_by_func( m, watchFolderChanged, core );
+        g_file_monitor_cancel( m );
+        g_object_unref( G_OBJECT( m ) );
+    }
+    else if( isEnabled && !core->priv->monitor )
+    {
+        GFile * file = g_file_new_for_path( filename );
+        GFileMonitor * m = g_file_monitor_directory( file, 0, NULL, NULL );
+        scanWatchDir( core );
+        g_signal_connect( m, "changed", G_CALLBACK (watchFolderChanged), core );
+        core->priv->monitor = m;
+    }
+
+    g_free( filename );
+}
+#endif
+
 static void
 prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
 {
@@ -293,6 +367,13 @@ prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
         const uint16_t val = pref_int_get( key );
         tr_setGlobalPeerLimit( tr_core_handle( core ), val );
     }
+#ifdef HAVE_GIO
+    else if( !strcmp( key, PREF_KEY_DIR_WATCH ) ||
+             !strcmp( key, PREF_KEY_DIR_WATCH_ENABLED ) )
+    {
+        updateWatchDir( core );
+    }
+#endif
 }
 
 static void
@@ -382,6 +463,7 @@ tr_core_new( void )
     /* init from prefs & listen to pref changes */
     prefsChanged( core, PREF_KEY_SORT_MODE, NULL );
     prefsChanged( core, PREF_KEY_SORT_REVERSED, NULL );
+    prefsChanged( core, PREF_KEY_DIR_WATCH_ENABLED, NULL );
     prefsChanged( core, PREF_KEY_MAX_PEERS_GLOBAL, NULL );
     g_signal_connect( core, "prefs-changed", G_CALLBACK(prefsChanged), NULL );
 
@@ -498,6 +580,9 @@ tr_core_apply_defaults( tr_ctor * ctor )
 {
     if( tr_ctorGetPaused( ctor, TR_FORCE, NULL ) )
         tr_ctorSetPaused( ctor, TR_FORCE, !pref_flag_get( PREF_KEY_START ) );
+
+    if( tr_ctorGetDeleteSource( ctor, NULL ) ) 
+        tr_ctorSetDeleteSource( ctor, pref_flag_get( PREF_KEY_TRASH_ORIGINAL ) ); 
 
     if( tr_ctorGetMaxConnectedPeers( ctor, TR_FORCE, NULL ) )
         tr_ctorSetMaxConnectedPeers( ctor, TR_FORCE,

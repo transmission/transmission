@@ -10,6 +10,7 @@ AM_CFLAGS = \
     $(GTK_CFLAGS) \
     $(OPENSSL_CFLAGS) \
     $(PTHREAD_CFLAGS) \
+    $(GIO_CFLAGS) \
     $(LIBNOTIFY_CFLAGS)
 
 noinst_HEADERS = \
@@ -71,6 +72,7 @@ transmission_LDADD = \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(GTK_LIBS) \
+    $(GIO_LIBS) \
     $(LIBNOTIFY_LIBS) \
     $(OPENSSL_LIBS) \
     $(PTHREAD_LIBS) -lm
