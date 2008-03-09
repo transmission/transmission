@@ -10,6 +10,9 @@
  * $Id$
  */
 
+#ifdef HAVE_GIO
+#include <gio/gio.h>
+#endif
 #include <glib/gi18n.h>
 #include "notify.h"
 
@@ -55,8 +58,18 @@ notifyCallback( NotifyNotification * n UNUSED,
 
     if( path )
     {
-        char * argv[] = { "xdg-open", path, NULL }; 
-        g_spawn_async( NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, NULL ); 
+        gboolean opened = FALSE;
+#ifdef HAVE_GIO
+        GFile * file = g_file_new_for_path( path );
+        char * uri = g_file_get_uri( file );
+        opened = g_app_info_launch_default_for_uri( uri, NULL, NULL );
+        g_free( uri );
+        g_object_unref( G_OBJECT( file ) );
+#endif
+        if( !opened ) {
+            char * argv[] = { "xdg-open", path, NULL }; 
+            g_spawn_async( NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, NULL );
+        }
         g_free( path ); 
     }
 }
