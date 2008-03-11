@@ -61,8 +61,6 @@ typedef enum
     tr_file_stat * fileStat;
     NSArray * fFileList;
     
-    NSMenu * fFileMenu;
-    
     float * fPreviousFinishedPieces;
     NSDate * fFinishedPiecesDate;
     
@@ -243,8 +241,6 @@ typedef enum
 - (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;
 - (BOOL) hasFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;
 - (NSSet *) filePrioritiesForIndexes: (NSIndexSet *) indexSet;
-
-- (NSMenu *) fileMenu;
 
 - (NSDate *) dateAdded;
 - (NSDate *) dateCompleted;

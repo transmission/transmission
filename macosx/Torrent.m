@@ -190,7 +190,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     [fIcon release];
     
     [fFileList release];
-    [fFileMenu release];
     
     [fQuickPauseDict release];
     
@@ -284,7 +283,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     //check if stalled (stored because based on time and needs to check if it was previously stalled)
     fStalled = [self isActive] && [fDefaults boolForKey: @"CheckStalled"]
-                && [fDefaults integerForKey: @"StalledMinutes"] < [self stalledMinutes];
+                && [self stalledMinutes] > [fDefaults integerForKey: @"StalledMinutes"];
     
     //update queue for checking (from downloading to seeding), stalled, or error
     if ((wasChecking && ![self isChecking]) || (wasStalled != fStalled) || (!wasError && [self isError] && [self isActive]))
@@ -1419,16 +1418,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return priorities;
 }
 
-- (NSMenu *) fileMenu
-{
-    if (!fFileMenu)
-    {
-        fFileMenu = [[NSMenu alloc] initWithTitle: [@"TorrentMenu:" stringByAppendingString: [self name]]];
-        [fFileMenu setAutoenablesItems: NO];
-    }
-    return fFileMenu;
-}
-
 - (NSDate *) dateAdded
 {
     return fDateAdded;
@@ -1460,7 +1449,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     NSDate * started = [NSDate dateWithTimeIntervalSince1970: start / 1000],
             * activity = [self dateActivity];
     
-    NSDate * laterDate = (!activity || [started compare: activity] == NSOrderedDescending) ? started : activity;
+    NSDate * laterDate = activity ? [started laterDate: activity] : started;
     return -1 * [laterDate timeIntervalSinceNow] / 60;
 }
 

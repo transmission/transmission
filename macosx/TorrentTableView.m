@@ -50,7 +50,7 @@
 
 - (void) setGroupStatusColumns;
 
-- (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files;
+- (void) createFileMenu: (NSMenu *) menu forFiles: (NSArray *) files;
 
 - (void) resizePiecesBarIncrement;
 
@@ -531,12 +531,16 @@
     
     //get and update file menu
     fMenuTorrent = [[self itemAtRow: row] retain];
-    NSMenu * fileMenu = [fMenuTorrent fileMenu];
-    [self updateFileMenu: fileMenu forFiles: [fMenuTorrent fileList]];
+    
+    NSMenu * fileMenu = [[NSMenu alloc] initWithTitle: @"TorrentMenu"];
+    [fileMenu setAutoenablesItems: NO];
+    [self createFileMenu: fileMenu forFiles: [fMenuTorrent fileList]];
     
     //add file menu items to action menu
-    NSRange range = NSMakeRange(0, [fileMenu numberOfItems]);
-    [fActionMenu appendItemsFromMenu: fileMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range] atBottom: YES];
+    NSInteger numberOfItems = [fileMenu numberOfItems];
+    [fActionMenu appendItemsFromMenu: fileMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, numberOfItems)]
+        atBottom: YES];
+    [fileMenu release];
     
     //place menu below button
     NSRect rect = [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
@@ -550,9 +554,9 @@
     
     [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: self];
     
-    //move file menu items back to the torrent's file menu
-    range.location = [fActionMenu numberOfItems] - range.length;
-    [fileMenu appendItemsFromMenu: fActionMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range] atBottom: YES];
+    NSInteger i;
+    for (i = 0; i < numberOfItems; i++)
+        [fActionMenu removeItemAtIndex: [fActionMenu numberOfItems]-1];
     
     [fMenuTorrent release];
     fMenuTorrent = nil;
@@ -633,7 +637,7 @@
     else  //assume the menu is part of the file list
     {
         NSMenu * supermenu = [menu supermenu];
-        [self updateFileMenu: menu forFiles: [[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]]
+        [self createFileMenu: menu forFiles: [[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]]
                                                     representedObject] objectForKey: @"Children"]];
     }
 }
@@ -820,9 +824,10 @@
     [groupTableColumn setWidth: [groupTableColumn width] + (ratio ? -2.0 : 2.0)];
 }
 
-- (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files
+- (void) createFileMenu: (NSMenu *) menu forFiles: (NSArray *) files
 {
-    BOOL create = [menu numberOfItems] <= 0;
+    if ([menu numberOfItems] > 0)
+        return;
     
     NSEnumerator * enumerator = [files objectEnumerator];
     NSDictionary * dict;
@@ -831,35 +836,30 @@
     {
         NSString * name = [dict objectForKey: @"Name"];
         
-        if (create)
-        {
-            item = [[NSMenuItem alloc] initWithTitle: name action: @selector(checkFile:) keyEquivalent: @""];
-            
-            NSImage * icon;
-            if (![[dict objectForKey: @"IsFolder"] boolValue])
-                icon = [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]];
-            else
-            {
-                NSMenu * itemMenu = [[NSMenu alloc] initWithTitle: name];
-                [itemMenu setAutoenablesItems: NO];
-                [item setSubmenu: itemMenu];
-                [itemMenu setDelegate: self];
-                [itemMenu release];
-                
-                icon = [[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')];
-            }
-            
-            [item setRepresentedObject: dict];
-            
-            [icon setScalesWhenResized: YES];
-            [icon setSize: NSMakeSize(16.0, 16.0)];
-            [item setImage: icon];
-            
-            [menu addItem: item];
-            [item release];
-        }
+        item = [[NSMenuItem alloc] initWithTitle: name action: @selector(checkFile:) keyEquivalent: @""];
+        
+        NSImage * icon;
+        if (![[dict objectForKey: @"IsFolder"] boolValue])
+            icon = [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]];
         else
-            item = [menu itemWithTitle: name];
+        {
+            NSMenu * itemMenu = [[NSMenu alloc] initWithTitle: name];
+            [itemMenu setAutoenablesItems: NO];
+            [item setSubmenu: itemMenu];
+            [itemMenu setDelegate: self];
+            [itemMenu release];
+            
+            icon = [[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')];
+        }
+        
+        [item setRepresentedObject: dict];
+        
+        [icon setScalesWhenResized: YES];
+        [icon setSize: NSMakeSize(16.0, 16.0)];
+        [item setImage: icon];
+        
+        [menu addItem: item];
+        [item release];
         
         NSIndexSet * indexSet = [dict objectForKey: @"Indexes"];
         [item setState: [fMenuTorrent checkForFiles: indexSet]];
