@@ -529,18 +529,11 @@
     if (row < 0)
         return;
     
-    //get and update file menu
+    NSInteger numberOfNonFileItems = [fActionMenu numberOfItems];
+    
+    //update file action menu
     fMenuTorrent = [[self itemAtRow: row] retain];
-    
-    NSMenu * fileMenu = [[NSMenu alloc] initWithTitle: @"TorrentMenu"];
-    [fileMenu setAutoenablesItems: NO];
-    [self createFileMenu: fileMenu forFiles: [fMenuTorrent fileList]];
-    
-    //add file menu items to action menu
-    NSInteger numberOfItems = [fileMenu numberOfItems];
-    [fActionMenu appendItemsFromMenu: fileMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, numberOfItems)]
-        atBottom: YES];
-    [fileMenu release];
+    [self createFileMenu: fActionMenu forFiles: [fMenuTorrent fileList]];
     
     //place menu below button
     NSRect rect = [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
@@ -555,8 +548,8 @@
     [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: self];
     
     NSInteger i;
-    for (i = 0; i < numberOfItems; i++)
-        [fActionMenu removeItemAtIndex: [fActionMenu numberOfItems]-1];
+    for (i = [fActionMenu numberOfItems]-1; i >= numberOfNonFileItems; i--)
+        [fActionMenu removeItemAtIndex: i];
     
     [fMenuTorrent release];
     fMenuTorrent = nil;
@@ -636,6 +629,9 @@
     }
     else  //assume the menu is part of the file list
     {
+        if ([menu numberOfItems] > 0)
+            return;
+        
         NSMenu * supermenu = [menu supermenu];
         [self createFileMenu: menu forFiles: [[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]]
                                                     representedObject] objectForKey: @"Children"]];
@@ -826,9 +822,6 @@
 
 - (void) createFileMenu: (NSMenu *) menu forFiles: (NSArray *) files
 {
-    if ([menu numberOfItems] > 0)
-        return;
-    
     NSEnumerator * enumerator = [files objectEnumerator];
     NSDictionary * dict;
     NSMenuItem * item;
