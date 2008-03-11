@@ -306,17 +306,17 @@ networkPage( GObject * core, gpointer alive )
 
     hig_workarea_add_section_title (t, &row, _("Bandwidth"));
 
-        s = _("Limit _upload speed (KB/s):");
-        w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
-        w2 = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX, 5 );
-        gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ) );
-        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
-        hig_workarea_add_row_w( t, &row, w, w2, NULL );
-
         s = _("Limit _download speed (KB/s):");
         w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_DL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ) );
+        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
+        hig_workarea_add_row_w( t, &row, w, w2, NULL );
+
+        s = _("Limit _upload speed (KB/s):");
+        w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
+        w2 = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX, 5 );
+        gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 

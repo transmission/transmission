@@ -967,7 +967,7 @@ options_page_new ( TrTorrent * gtor )
 
   row = 0;
   t = hig_workarea_create ();
-  hig_workarea_add_section_title (t, &row, _("Speed Limits") );
+  hig_workarea_add_section_title (t, &row, _("Bandwidth") );
 
     tb = gtk_check_button_new_with_mnemonic (_("Limit _download speed (KB/s):"));
     b = tr_torrentGetSpeedMode(tor,TR_DOWN) == TR_SPEEDLIMIT_SINGLE;
