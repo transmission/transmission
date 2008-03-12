@@ -77,7 +77,7 @@ tr_strlsize( char * buf, guint64 size, size_t buflen )
         g_strlcpy( buf, _( "None" ), buflen );
 #if GLIB_CHECK_VERSION(2,16,0)
     else{ 
-        char * tmp = g_format_size_for_display( s );
+        char * tmp = g_format_size_for_display( size );
         g_strlcpy( buf, tmp, buflen );
         g_free( tmp );
     }
