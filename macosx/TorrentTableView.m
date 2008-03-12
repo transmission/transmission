@@ -26,7 +26,6 @@
 #import "TorrentCell.h"
 #import "Torrent.h"
 #import "NSApplicationAdditions.h"
-#import "NSMenuAdditions.h"
 
 #define MAX_GROUP (INT_MAX-10)
 
@@ -824,12 +823,11 @@
 {
     NSEnumerator * enumerator = [files objectEnumerator];
     NSDictionary * dict;
-    NSMenuItem * item;
     while ((dict = [enumerator nextObject]))
     {
         NSString * name = [dict objectForKey: @"Name"];
         
-        item = [[NSMenuItem alloc] initWithTitle: name action: @selector(checkFile:) keyEquivalent: @""];
+        NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: name action: @selector(checkFile:) keyEquivalent: @""];
         
         NSImage * icon;
         if (![[dict objectForKey: @"IsFolder"] boolValue])
@@ -851,12 +849,12 @@
         [icon setSize: NSMakeSize(16.0, 16.0)];
         [item setImage: icon];
         
-        [menu addItem: item];
-        [item release];
-        
         NSIndexSet * indexSet = [dict objectForKey: @"Indexes"];
         [item setState: [fMenuTorrent checkForFiles: indexSet]];
         [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
+        
+        [menu addItem: item];
+        [item release];
     }
 }
 
