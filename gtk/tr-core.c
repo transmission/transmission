@@ -45,6 +45,8 @@ struct TrCorePrivate
     GFileMonitor     * monitor;
     gulong             monitor_tag;
     char             * monitor_path;
+    GList            * monitor_files;
+    guint              monitor_idle_tag;
 #endif
     GtkTreeModel     * model;
     tr_handle        * handle;
@@ -307,15 +309,20 @@ tr_core_apply_defaults( tr_ctor * ctor )
 
 #ifdef HAVE_GIO
 static gboolean
-canAddTorrent( TrCore * core, const char * filename )
+watchFolderIdle( gpointer gcore )
 {
-    gboolean canAdd;
-    tr_ctor * ctor = tr_ctorNew( core->priv->handle );
-    tr_core_apply_defaults( ctor );
-    tr_ctorSetMetainfoFromFile( ctor, filename );
-    canAdd = !tr_torrentParse( core->priv->handle, ctor, NULL );
-    tr_ctorFree( ctor );
-    return canAdd;
+    TrCore * core;
+    tr_ctor * ctor;
+
+    /* add these files */
+    core = TR_CORE( gcore );
+    ctor = tr_ctorNew( core->priv->handle );
+    tr_core_add_list( core, core->priv->monitor_files, ctor );
+
+    /* cleanup */
+    core->priv->monitor_files = NULL;
+    core->priv->monitor_idle_tag = 0;
+    return FALSE;
 }
 
 static void
@@ -323,18 +330,21 @@ watchFolderChanged( GFileMonitor       * monitor UNUSED,
                     GFile              * file,
                     GFile              * other_type UNUSED,
                     GFileMonitorEvent    event_type,
-                    gpointer             gcore )
+                    gpointer             core )
 {
     if( event_type == G_FILE_MONITOR_EVENT_CREATED )
     {
-        TrCore * core = TR_CORE( gcore );
         char * filename = g_file_get_path( file );
         const gboolean isTorrent = g_str_has_suffix( filename, ".torrent" );
 
-        if( isTorrent && canAddTorrent( core, filename ) )
+        if( isTorrent )
         {
-            tr_ctor * ctor = tr_ctorNew( core->priv->handle );
-            tr_core_add_list( core, g_list_append( NULL, g_strdup( filename ) ), ctor );
+            struct TrCorePrivate * p = TR_CORE( core )->priv;
+
+            if( !g_list_find_custom( p->monitor_files, filename, (GCompareFunc)strcmp ) )
+                p->monitor_files = g_list_append( p->monitor_files, g_strdup( filename ) );
+            if( !p->monitor_idle_tag )
+                p->monitor_idle_tag = g_timeout_add( 1000, watchFolderIdle, core );
         }
 
         g_free( filename );
@@ -365,26 +375,28 @@ updateWatchDir( TrCore * core )
 {
     char * filename = pref_string_get( PREF_KEY_DIR_WATCH );
     const gboolean isEnabled = pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED );
+    struct TrCorePrivate * p = TR_CORE( core )->priv;
 
-    if( core->priv->monitor && ( !isEnabled || tr_strcmp( filename, core->priv->monitor_path ) ) )
+    if( p->monitor && ( !isEnabled || tr_strcmp( filename, p->monitor_path ) ) )
     {
-        g_signal_handler_disconnect( core->priv->monitor, core->priv->monitor_tag );
-        g_free( core->priv->monitor_path );
-        g_file_monitor_cancel( core->priv->monitor );
-        g_object_unref( G_OBJECT( core->priv->monitor ) );
-        core->priv->monitor_path = NULL;
-        core->priv->monitor = NULL;
-        core->priv->monitor_tag = 0;
+        g_signal_handler_disconnect( p->monitor, p->monitor_tag );
+        g_free( p->monitor_path );
+        g_file_monitor_cancel( p->monitor );
+        g_object_unref( G_OBJECT( p->monitor ) );
+        p->monitor_path = NULL;
+        p->monitor = NULL;
+        p->monitor_tag = 0;
     }
 
-    if( isEnabled && !core->priv->monitor )
+    if( isEnabled && !p->monitor )
     {
         GFile * file = g_file_new_for_path( filename );
         GFileMonitor * m = g_file_monitor_directory( file, 0, NULL, NULL );
         scanWatchDir( core );
-        core->priv->monitor = m;
-        core->priv->monitor_path = g_strdup( filename );
-        core->priv->monitor_tag = g_signal_connect( m, "changed", G_CALLBACK (watchFolderChanged), core );
+        p->monitor = m;
+        p->monitor_path = g_strdup( filename );
+        p->monitor_tag = g_signal_connect( m, "changed",
+                                           G_CALLBACK( watchFolderChanged ), core );
     }
 
     g_free( filename );

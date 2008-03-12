@@ -802,8 +802,9 @@ coreprompt( TrCore                 * core,
     }
 
 #if GTK_CHECK_VERSION(2,8,0)
+    if( w )
     if( cbdata->wind )
-        gtk_window_set_urgency_hint( GTK_WINDOW( cbdata->wind ), TRUE );
+        gtk_window_set_urgency_hint( GTK_WINDOW( w ), TRUE );
     g_signal_connect( w, "focus-in-event",
                       G_CALLBACK(on_main_window_focus_in),  cbdata );
 #endif
