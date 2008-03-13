@@ -12,17 +12,18 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdlib.h> /* realloc */
 #include <string.h> /* memcmp */
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <openssl/sha.h>
-
 #include "transmission.h"
+#include "crypto.h"
 #include "fdlimit.h"
 #include "inout.h"
+#include "platform.h"
 #include "stats.h"
 #include "torrent.h"
 #include "utils.h"
@@ -220,33 +221,38 @@ tr_ioRecalculateHash( const tr_torrent  * tor,
                       int                 pieceIndex,
                       uint8_t           * setme )
 {
-    int offset;
-    int bytesLeft;
-    uint8_t buf[4096];
+    static uint8_t * buf = NULL;
+    static int buflen = 0;
+    static tr_lock * lock = NULL;
+
+    int n;
+    tr_errno err;
     const tr_info * info;
-    SHA_CTX sha;
+
+    /* only check one block at a time to prevent disk thrashing.
+     * this also lets us reuse the same buffer each time. */
+    if( lock == NULL )
+        lock = tr_lockNew( );
+
+    tr_lockLock( lock );
 
     assert( tor != NULL );
     assert( setme != NULL );
     assert( 0<=pieceIndex && pieceIndex<tor->info.pieceCount );
 
     info = &tor->info;
-    offset = 0;
-    bytesLeft = tr_torPieceCountBytes( tor, pieceIndex );
-    SHA1_Init( &sha );
+    n = tr_torPieceCountBytes( tor, pieceIndex );
 
-    while( bytesLeft > 0 )
-    {
-        const int bytesThisPass = MIN( bytesLeft, (int)sizeof(buf) );
-        tr_errno err = tr_ioRead( tor, pieceIndex, offset, bytesThisPass, buf );
-        if( err )
-            return err;
-        SHA1_Update( &sha, buf, bytesThisPass );
-        bytesLeft -= bytesThisPass;
-        offset += bytesThisPass;
+    if( buflen < n ) {
+        buflen = n;
+        buf = tr_renew( uint8_t, buf, buflen );
     }
+        
+    err = tr_ioRead( tor, pieceIndex, 0, n, buf );
+    if( !err )
+        tr_sha1( setme, buf, n, NULL );
 
-    SHA1_Final( setme, &sha );
+    tr_lockUnlock( lock );
     return 0;
 }
 

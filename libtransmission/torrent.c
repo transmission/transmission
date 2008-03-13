@@ -41,6 +41,8 @@
 #include "utils.h"
 #include "verify.h"
 
+#define MAX_BLOCK_SIZE (1024*16)
+
 /***
 ****
 ***/
@@ -289,7 +291,7 @@ torrentRealInit( tr_handle     * h,
      * (2) pieceSize must be a multiple of block size
      */
     tor->blockSize = info->pieceSize;
-    while( tor->blockSize > (1024*16) )
+    while( tor->blockSize > MAX_BLOCK_SIZE )
         tor->blockSize /= 2;
 
     tor->lastPieceSize = info->totalSize % info->pieceSize;
@@ -1295,14 +1297,13 @@ tr_torrentReqIsValid( const tr_torrent * tor,
                       uint32_t           offset,
                       uint32_t           length )
 {
-    static const uint32_t MAX_REQUEST_BYTE_COUNT  = (16 * 1024);
     int err = 0;
 
     if( index >= (uint32_t) tor->info.pieceCount )
         err = 1;
     else if ( (int)offset >= tr_torPieceCountBytes( tor, (int)index ) )
         err = 2;
-    else if( length > MAX_REQUEST_BYTE_COUNT )
+    else if( length > MAX_BLOCK_SIZE )
         err = 3;
     else if( tr_pieceOffset( tor, index, offset, length ) > tor->info.totalSize )
         err = 4;
