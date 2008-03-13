@@ -262,7 +262,7 @@ publishNewPeers( tr_tracker * t, int count, uint8_t * peers )
     event.messageType = TR_TRACKER_PEERS;
     event.peerCount = count;
     event.peerCompact = peers;
-    tr_ndbg( t->name, "Torrent got %d new peers", t->name, count );
+    tr_ndbg( t->name, "Torrent got %d new peers", count );
     if( count )
         tr_publisherPublish( t->publisher, t, &event );
 }
