@@ -44,6 +44,7 @@
 #include "conf.h"
 #include "details.h"
 #include "dialogs.h"
+#include "hig.h"
 #include "ipc.h"
 #include "makemeta-ui.h"
 #include "msgwin.h"
@@ -590,7 +591,6 @@ do_exit_cb( GtkWidget *w UNUSED, gpointer data UNUSED )
 static void
 wannaquit( void * vdata )
 {
-    char * str;
     GtkWidget * r, * p, * b, * w, *c;
     struct cbdata * cbdata = vdata;
 
@@ -606,24 +606,28 @@ wannaquit( void * vdata )
     r = gtk_alignment_new(0.5, 0.5, 0.01, 0.01);
     gtk_container_add(GTK_CONTAINER(c), r);
 
-    p = gtk_table_new(2, 2, FALSE);
-    gtk_container_add(GTK_CONTAINER(r), p);
+    p = gtk_table_new(3, 2, FALSE);
+    gtk_table_set_col_spacings( GTK_TABLE( p ), GUI_PAD_BIG );
+    gtk_container_add( GTK_CONTAINER( r ), p );
 
     w = gtk_image_new_from_stock( GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG );
-    gtk_table_attach(GTK_TABLE(p), w, 0, 1, 0, 1, GTK_FILL, GTK_FILL, 2, 2);
+    gtk_table_attach_defaults(GTK_TABLE(p), w, 0, 1, 0, 2 );
 
-    w = gtk_label_new("");
-    str = g_strdup_printf( "<b>%s</b>\n%s", _("Closing Connections"), _("Sending upload/download totals to tracker...") );
-    gtk_label_set_markup(GTK_LABEL(w), str );
-    gtk_table_attach(GTK_TABLE(p), w, 1, 2, 0, 1, GTK_FILL, GTK_FILL, 10, 0);
-    g_free( str );
+    w = gtk_label_new( NULL );
+    gtk_label_set_markup( GTK_LABEL( w ), _( "<b>Closing Connections</b>" ) );
+    gtk_misc_set_alignment( GTK_MISC( w ), 0.0, 0.5 );
+    gtk_table_attach_defaults( GTK_TABLE( p ), w, 1, 2, 0, 1 );
+
+    w = gtk_label_new( _( "Sending upload/download totals to tracker..." ) );
+    gtk_misc_set_alignment( GTK_MISC( w ), 0.0, 0.5 );
+    gtk_table_attach_defaults( GTK_TABLE( p ), w, 1, 2, 1, 2 );
 
     b = gtk_alignment_new(0.0, 1.0, 0.01, 0.01);
     w = gtk_button_new_with_label( _( "_Quit Immediately" ) );
     gtk_button_set_image( GTK_BUTTON(w), gtk_image_new_from_stock( GTK_STOCK_QUIT, GTK_ICON_SIZE_BUTTON ) );
     g_signal_connect(w, "clicked", G_CALLBACK(do_exit_cb), NULL);
     gtk_container_add(GTK_CONTAINER(b), w);
-    gtk_table_attach(GTK_TABLE(p), b, 1, 2, 1, 2, GTK_FILL, GTK_FILL, 10, 0);
+    gtk_table_attach(GTK_TABLE(p), b, 1, 2, 2, 3, GTK_FILL, GTK_FILL, 0, 10 );
 
     gtk_widget_show_all(r);
 

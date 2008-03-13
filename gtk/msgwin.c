@@ -227,6 +227,7 @@ renderText( GtkTreeViewColumn  * column UNUSED,
     gtk_tree_model_get( tree_model, iter, col, &str, COL_LEVEL, &level, -1 );
     g_object_set( renderer, "text", str,
                             "foreground", getForegroundColor( level ),
+                            "ellipsize", PANGO_ELLIPSIZE_END,
                             NULL );
     g_free( str );
 }
@@ -256,7 +257,6 @@ renderTime( GtkTreeViewColumn  * column UNUSED,
 static void
 appendColumn( GtkTreeView * view, int col )
 {
-    gboolean resizable;
     GtkCellRenderer * r;
     GtkTreeViewColumn * c;
     int sort_col = col;
@@ -275,34 +275,44 @@ appendColumn( GtkTreeView * view, int col )
     switch( col )
     {
         case COL_LEVEL:
-            resizable = FALSE;
             r = gtk_cell_renderer_pixbuf_new( );
             c = gtk_tree_view_column_new_with_attributes( title, r, NULL );
             gtk_tree_view_column_set_sizing( c, GTK_TREE_VIEW_COLUMN_FIXED );
             gtk_tree_view_column_set_fixed_width( c, 20 );
             gtk_tree_view_column_set_cell_data_func( c, r, renderLevel, NULL, NULL );
-            break;
-
-        case COL_FILE:
-            resizable = TRUE;
-            r = gtk_cell_renderer_text_new( );
-            c = gtk_tree_view_column_new_with_attributes( title, r, "text", col, NULL );
+            gtk_tree_view_column_set_resizable( c, FALSE );
             break;
 
         case COL_LINE:
+            r = gtk_cell_renderer_text_new( );
+            c = gtk_tree_view_column_new_with_attributes( title, r, "text", col, NULL );
+            gtk_tree_view_column_set_resizable( c, FALSE );
+            break;
+
+        case COL_FILE:
         case COL_CATEGORY:
-        case COL_MESSAGE:
-            resizable = TRUE;
             r = gtk_cell_renderer_text_new( );
             c = gtk_tree_view_column_new_with_attributes( title, r, NULL );
             gtk_tree_view_column_set_cell_data_func( c, r, renderText, GINT_TO_POINTER(col), NULL );
+            gtk_tree_view_column_set_sizing( c, GTK_TREE_VIEW_COLUMN_FIXED );
+            gtk_tree_view_column_set_fixed_width( c, 200 );
+            gtk_tree_view_column_set_resizable( c, TRUE );
+            break;
+
+        case COL_MESSAGE:
+            r = gtk_cell_renderer_text_new( );
+            c = gtk_tree_view_column_new_with_attributes( title, r, NULL );
+            gtk_tree_view_column_set_cell_data_func( c, r, renderText, GINT_TO_POINTER(col), NULL );
+            gtk_tree_view_column_set_sizing( c, GTK_TREE_VIEW_COLUMN_FIXED );
+            gtk_tree_view_column_set_fixed_width( c, 500 );
+            gtk_tree_view_column_set_resizable( c, TRUE );
             break;
 
         case COL_TIME:
-            resizable = TRUE;
             r = gtk_cell_renderer_text_new( );
             c = gtk_tree_view_column_new_with_attributes( title, r, NULL );
             gtk_tree_view_column_set_cell_data_func( c, r, renderTime, NULL, NULL );
+            gtk_tree_view_column_set_resizable( c, TRUE );
             sort_col = COL_SEQUENCE;
             break;
 
@@ -311,7 +321,6 @@ appendColumn( GtkTreeView * view, int col )
             break;
     }
 
-    gtk_tree_view_column_set_resizable( c, resizable );
     gtk_tree_view_column_set_sort_column_id( c, sort_col );
     gtk_tree_view_append_column( view, c );
 }
@@ -429,7 +438,7 @@ msgwin_create( TrCore * core )
   appendColumn( data->view, COL_MESSAGE );
   w = gtk_scrolled_window_new( NULL, NULL );
   gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( w ),
-                                  GTK_POLICY_NEVER,
+                                  GTK_POLICY_AUTOMATIC,
                                   GTK_POLICY_AUTOMATIC );
   gtk_scrolled_window_set_shadow_type( GTK_SCROLLED_WINDOW( w ),
                                        GTK_SHADOW_IN);
