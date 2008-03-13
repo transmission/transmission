@@ -326,6 +326,22 @@ watchFolderIdle( gpointer gcore )
 }
 
 static void
+maybeAddTorrent( TrCore * core, const char * filename )
+{
+    const gboolean isTorrent = g_str_has_suffix( filename, ".torrent" );
+
+    if( isTorrent )
+    {
+        struct TrCorePrivate * p = core->priv;
+
+        if( !g_list_find_custom( p->monitor_files, filename, (GCompareFunc)strcmp ) )
+            p->monitor_files = g_list_append( p->monitor_files, g_strdup( filename ) );
+        if( !p->monitor_idle_tag )
+            p->monitor_idle_tag = g_timeout_add( 1000, watchFolderIdle, core );
+    }
+}
+
+static void
 watchFolderChanged( GFileMonitor       * monitor UNUSED,
                     GFile              * file,
                     GFile              * other_type UNUSED,
@@ -335,18 +351,7 @@ watchFolderChanged( GFileMonitor       * monitor UNUSED,
     if( event_type == G_FILE_MONITOR_EVENT_CREATED )
     {
         char * filename = g_file_get_path( file );
-        const gboolean isTorrent = g_str_has_suffix( filename, ".torrent" );
-
-        if( isTorrent )
-        {
-            struct TrCorePrivate * p = TR_CORE( core )->priv;
-
-            if( !g_list_find_custom( p->monitor_files, filename, (GCompareFunc)strcmp ) )
-                p->monitor_files = g_list_append( p->monitor_files, g_strdup( filename ) );
-            if( !p->monitor_idle_tag )
-                p->monitor_idle_tag = g_timeout_add( 1000, watchFolderIdle, core );
-        }
-
+        maybeAddTorrent( core, filename );
         g_free( filename );
     }
 }
@@ -357,15 +362,14 @@ scanWatchDir( TrCore * core )
     const gboolean isEnabled = pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED );
     if( isEnabled )
     {
-        GList * torrents = NULL;
         char * dirname = pref_string_get( PREF_KEY_DIR_WATCH );
         GDir * dir = g_dir_open( dirname, 0, NULL );
         const char * basename;
-        while(( basename = g_dir_read_name( dir )))
-            if( g_str_has_suffix( basename, ".torrent" ) )
-                torrents = g_list_append( torrents, g_build_filename( dirname, basename, NULL ) );
-        if( torrents )
-            tr_core_add_list( core, torrents, tr_ctorNew( core->priv->handle ) );
+        while(( basename = g_dir_read_name( dir ))) {
+            char * filename = g_build_filename( dirname, basename, NULL );
+            maybeAddTorrent( core, filename );
+            g_free( filename );
+        }
         g_free( dirname );
     }
 }
