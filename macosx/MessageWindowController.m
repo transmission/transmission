@@ -128,6 +128,9 @@
             [message setObject: [NSString stringWithUTF8String: currentMessage->file] forKey: @"File"];
             [message setObject: [NSNumber numberWithInt: currentMessage->line] forKey: @"Line"];
         }
+        
+        if (currentMessage->name != NULL)
+            [message setObject: [NSString stringWithUTF8String: currentMessage->name] forKey: @"Name"];
                                 
         [fMessages addObject: message];
     }
@@ -183,6 +186,8 @@
                 return nil;
         }
     }
+    else if ([ident isEqualToString: @"Name"])
+        return [message objectForKey: @"Name"];
     else
         return [message objectForKey: @"Message"];
 }
@@ -344,6 +349,11 @@
     
     NSMutableArray * strings = [NSMutableArray arrayWithObjects: [message objectForKey: @"Date"], level,
                                 [message objectForKey: @"Message"], nil];
+    
+    NSString * torrent;
+    if ((torrent = [message objectForKey: @"Name"]))
+        [strings insertObject: [torrent stringByAppendingString: @":"] atIndex: 2];
+    
     NSString * file;
     if ((file = [self fileForMessage: message]))
         [strings insertObject: file atIndex: 1];
