@@ -93,7 +93,7 @@ natPulse( tr_shared * s )
     if( status == TR_NAT_TRAVERSAL_ERROR )
         status = tr_upnpPulse( s->upnp, port, isEnabled );
     if( status != s->natStatus ) {
-        tr_inf( _( "%s: state changed from \"%s\" to \"%s\"" ), getKey(), getNatStateStr(s->natStatus), getNatStateStr(status) );
+        tr_ninf( getKey(), _( "state changed from \"%s\" to \"%s\"" ), getNatStateStr(s->natStatus), getNatStateStr(status) );
         s->natStatus = status;
     }
 }
@@ -103,7 +103,7 @@ incomingPeersPulse( tr_shared * s )
 {
     if( s->bindSocket >= 0 && ( s->bindPort != s->publicPort ) )
     {
-        tr_inf( _( "%s: Closing port %d" ), getKey(), s->bindPort );
+        tr_ninf( getKey(), _( "Closing port %d" ), s->bindPort );
         tr_netClose( s->bindSocket );
         s->bindSocket = -1;
     }
@@ -114,13 +114,13 @@ incomingPeersPulse( tr_shared * s )
         errno = 0;
         socket = tr_netBindTCP( s->publicPort );
         if( socket >= 0 ) {
-            tr_inf( _( "%s: Opened port %d to listen for incoming peer connections" ), getKey(), s->publicPort );
+            tr_ninf( getKey(), _( "Opened port %d to listen for incoming peer connections" ), s->publicPort );
             s->bindPort = s->publicPort;
             s->bindSocket = socket;
             listen( s->bindSocket, 5 );
         } else {
-            tr_err( _( "%s: Couldn't open port %d to listen for incoming peer connections (errno %d - %s)" ),
-                    getKey(), s->publicPort, errno, tr_strerror(errno) );
+            tr_nerr( getKey(), _( "Couldn't open port %d to listen for incoming peer connections (errno %d - %s)" ),
+                     s->publicPort, errno, tr_strerror(errno) );
             s->bindPort = -1;
             s->bindSocket = -1;
         }
@@ -157,7 +157,7 @@ sharedPulse( void * vshared )
     }
     else if( ( shared->natStatus == TR_NAT_TRAVERSAL_ERROR ) || ( shared->natStatus == TR_NAT_TRAVERSAL_UNMAPPED ) )
     {
-        tr_dbg( _( "%s: stopped" ), getKey() );
+        tr_ndbg( getKey(), _( "Stopped" ) );
         shared->h->shared = NULL;
         tr_netClose( shared->bindSocket );
         tr_natpmpClose( shared->natpmp );

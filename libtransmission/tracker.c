@@ -262,7 +262,7 @@ publishNewPeers( tr_tracker * t, int count, uint8_t * peers )
     event.messageType = TR_TRACKER_PEERS;
     event.peerCount = count;
     event.peerCompact = peers;
-    tr_dbg( "Torrent \"%s\" got %d new peers", t->name, count );
+    tr_ndbg( t->name, "Torrent got %d new peers", t->name, count );
     if( count )
         tr_publisherPublish( t->publisher, t, &event );
 }
@@ -412,9 +412,8 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
     if( req && req->response_code_line )
         strlcpy( t->lastAnnounceResponse, req->response_code_line, sizeof( t->lastAnnounceResponse ) );
 
-    tr_dbg( "Torrent \"%s\" tracker response: %s",
-            t->name,
-            ( req ? req->response_code_line : "(null)") );
+    tr_ndbg( t->name, "tracker response: %s",
+             ( req ? req->response_code_line : "(null)") );
 
     if( req && ( req->response_code == HTTP_OK ) )
     {
@@ -573,10 +572,8 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
     if( req && req->response_code_line )
         strlcpy( t->lastScrapeResponse, req->response_code_line, sizeof( t->lastScrapeResponse ) );
 
-    tr_dbg( "Got scrape response for  '%s': %s",
-            t->name,
-            ( ( req && req->response_code_line ) ? req->response_code_line
-                                                 : "(null)") );
+    tr_ndbg( t->name, "Got scrape response: \"%s\"",
+            ( ( req && req->response_code_line ) ? req->response_code_line : "(null)") );
 
     if( req && ( req->response_code == HTTP_OK ) )
     {
@@ -612,9 +609,8 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
                     if(( tmp = tr_bencDictFind( flags, "min_request_interval")))
                         t->scrapeIntervalSec = tmp->val.i;
 
-                tr_dbg( "Torrent '%s' scrape successful."
-                        "  Rescraping in %d seconds",
-                        t->name, t->scrapeIntervalSec );
+                tr_ndbg( t->name, "Scrape successful.  Rescraping in %d seconds.",
+                         t->scrapeIntervalSec );
 
                 nextScrapeSec = t->scrapeIntervalSec;
             }

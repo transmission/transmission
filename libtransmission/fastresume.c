@@ -188,7 +188,7 @@ tr_fastResumeSave( const tr_torrent * tor )
     fastResumeFileName( path, sizeof path, tor, 1 );
     file = fopen( path, "wb+" );
     if( !file ) {
-        tr_err( _( "Couldn't open \"%s\": %s" ), path, tr_strerror( errno ) );
+        tr_torerr( tor, _( "Couldn't open \"%s\": %s" ), path, tr_strerror( errno ) );
         return;
     }
     
@@ -323,8 +323,6 @@ tr_fastResumeSave( const tr_torrent * tor )
     }
 
     fclose( file );
-
-    /*tr_dbg( "Wrote resume file for \"%s\"", tor->info.name );*/
 }
 
 /***
@@ -419,7 +417,7 @@ parseProgress( tr_torrent     * tor,
                 tr_torrentSetFileChecked( tor, i, TRUE );
             else {
                 tr_torrentSetFileChecked( tor, i, FALSE );
-                tr_dbg( _( "Torrent \"%s\" needs to be verified" ), tor->info.files[i].name );
+                tr_tordbg( tor, _( "Torrent needs to be verified" ) );
             }
         }
         free( curMTimes );
@@ -542,7 +540,7 @@ parsePeers( tr_torrent * tor, const uint8_t * buf, uint32_t len )
             tr_peerMgrAddPex( tor->handle->peerMgr, tor->info.hash, TR_PEER_FROM_CACHE, &pex );
         }
 
-        tr_dbg( _( "Loaded %i peers from resume file" ), count );
+        tr_tordbg( tor, _( "Loaded %i peers from resume file" ), count );
         ret = TR_FR_PEERS;
     }
 
@@ -588,7 +586,7 @@ parseVersion1( tr_torrent * tor, const uint8_t * buf, const uint8_t * end,
             case FR_ID_PEERS:        ret |= parsePeers( tor, buf, len ); break;
             case FR_ID_MAX_PEERS:    ret |= parseConnections( tor, buf, len ); break;
             case FR_ID_DESTINATION:  ret |= parseDestination( tor, buf, len ); break;
-            default:                 tr_dbg( _( "Skipping unknown resume code %d" ), (int)id ); break;
+            default:                 tr_tordbg( tor, _( "Skipping unknown resume code %d" ), (int)id ); break;
         }
 
         buf += len;
@@ -632,7 +630,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
 
     if( !buf )
         /* %s is the torrent name */
-        tr_inf( _( "Couldn't read resume file for \"%s\"" ), tor->info.name );
+        tr_torinf( tor, _( "Couldn't read resume file for \"%s\"" ), tor->info.name );
     else {
         const uint8_t * walk = buf;
         const uint8_t * end = walk + size;
@@ -643,7 +641,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
                 ret |= parseVersion1 ( tor, walk, end, fieldsToLoad );
             else
                 /* %s is the torrent name */
-                tr_inf( _( "Skipping invalid resume file for \"%s\"" ), tor->info.name );
+                tr_torinf( tor, _( "Skipping invalid resume file for \"%s\"" ), tor->info.name );
         }
 
         tr_free( buf );

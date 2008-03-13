@@ -157,13 +157,13 @@ onTrackerResponse( void * tracker UNUSED, void * vevent, void * user_data )
             break;
 
         case TR_TRACKER_WARNING:
-            tr_err( _( "Tracker warning: %s" ), event->text );
+            tr_torerr( tor, _( "Tracker warning: %s" ), event->text );
             tor->error = TR_ERROR_TC_WARNING;
             strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
             break;
 
         case TR_TRACKER_ERROR:
-            tr_err( _( "Tracker error: %s" ), event->text );
+            tr_torerr( tor, _( "Tracker error: %s" ), event->text );
             tor->error = TR_ERROR_TC_ERROR;
             strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
             break;
@@ -875,8 +875,8 @@ freeTorrent( tr_torrent * tor )
     assert( h->torrentCount >= 1 );
     h->torrentCount--;
 
-    tr_inf( _( "Closing torrent %s; %d torrents left" ), 
-            tor->info.name, h->torrentCount );
+    tr_torinf( tor, _( "Closing torrent %s; %d torrents left" ), 
+               h->torrentCount );
 
     tr_metainfoFree( inf );
     tr_free( tor );

@@ -159,11 +159,27 @@ int tr_getMessageLevel( void );
 
 typedef struct tr_msg_list
 {
-    uint8_t              level;
-    time_t               when;
-    char               * message;
-    const char         * file;
-    int                  line;
+    /* TR_MSG_ERR, TR_MSG_INF, or TR_MSG_DBG */
+    uint8_t level;
+
+    /* Time the message was generated */
+    time_t when;
+
+    /* The torrent associated with this message,
+     * or a module name such as "Port Forwarding" for non-torrent messages,
+     * or NULL. */
+    char * name;
+
+    /* The message */
+    char * message;
+
+    /* The source file where this message originated */
+    const char * file;
+
+    /* The line number in the source file where this message originated */
+    int line;
+
+    /* linked list of messages */
     struct tr_msg_list * next;
 }
 tr_msg_list;

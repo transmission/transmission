@@ -972,7 +972,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
         && (( sub = tr_bencDictFindType( &val, "added", TYPE_STR ))))
     {
         const int n = sub->val.s.i / 6 ;
-        tr_inf( _( "Torrent \"%s\" got %d peers from peer exchange" ), msgs->torrent->info.name, n );
+        tr_torinf( msgs->torrent, _( "Got %d peers from peer exchange" ), n );
         tr_peerMgrAddPeers( msgs->handle->peerMgr,
                             msgs->torrent->info.hash,
                             TR_PEER_FROM_PEX,

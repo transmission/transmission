@@ -110,7 +110,9 @@ msgwin_update( void )
       case TR_MSG_DBG: tag = "debug"; break;
     }
 
-    line = g_strdup_printf( "%02i:%02i:%02i %s\n", tm->tm_hour, tm->tm_min, tm->tm_sec, ii->message );
+    line = ( ii->name != NULL )
+        ? g_strdup_printf( "%02i:%02i:%02i [%s] %s\n", tm->tm_hour, tm->tm_min, tm->tm_sec, ii->name, ii->message )
+        : g_strdup_printf( "%02i:%02i:%02i %s\n", tm->tm_hour, tm->tm_min, tm->tm_sec, ii->message );
     len = strlen( line );
 
     gtk_text_buffer_get_end_iter( textbuf, &mark_end );

@@ -116,7 +116,8 @@ tr_setMessageLevel( int level )
     tr_lockUnlock( messageLock );
 }
 
-int tr_getMessageLevel( void )
+int
+tr_getMessageLevel( void )
 {
     int ret;
 
@@ -128,7 +129,8 @@ int tr_getMessageLevel( void )
     return ret;
 }
 
-void tr_setMessageQueuing( int enabled )
+void
+tr_setMessageQueuing( int enabled )
 {
     tr_msgInit();
     tr_lockLock( messageLock );
@@ -136,7 +138,8 @@ void tr_setMessageQueuing( int enabled )
     tr_lockUnlock( messageLock );
 }
 
-tr_msg_list * tr_getQueuedMessages( void )
+tr_msg_list *
+tr_getQueuedMessages( void )
 {
     tr_msg_list * ret;
 
@@ -150,7 +153,8 @@ tr_msg_list * tr_getQueuedMessages( void )
     return ret;
 }
 
-void tr_freeMessageList( tr_msg_list * list )
+void
+tr_freeMessageList( tr_msg_list * list )
 {
     tr_msg_list * next;
 
@@ -158,6 +162,7 @@ void tr_freeMessageList( tr_msg_list * list )
     {
         next = list->next;
         free( list->message );
+        free( list->name );
         free( list );
         list = next;
     }
@@ -192,7 +197,9 @@ tr_asprintf( char **strp, const char *fmt, ...)
 }
 
 void
-tr_msg( const char * file, int line, int level, const char * fmt, ... )
+tr_msg( const char * file, int line, int level,
+        const char * name,
+        const char * fmt, ... )
 {
     FILE * fp;
 
@@ -229,6 +236,7 @@ tr_msg( const char * file, int line, int level, const char * fmt, ... )
                 newmsg->message = text;
                 newmsg->file = file;
                 newmsg->line = line;
+                newmsg->name = tr_strdup( name );
 
                 *messageQueueTail = newmsg;
                 messageQueueTail = &newmsg->next;

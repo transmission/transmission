@@ -65,11 +65,11 @@ static void
 logVal( const char * func, int ret )
 {
     if( ret==NATPMP_TRYAGAIN )
-        tr_dbg( _( "%s: %s responded 'try again'" ), getKey(), func );
+        tr_ndbg( getKey(), _( "%s responded 'try again'" ), func );
     else if( ret >= 0 )
-        tr_dbg( _( "%s: %s succeeded (%d)" ), getKey(), func, ret );
+        tr_ndbg( getKey(), _( "%s succeeded (%d)" ), func, ret );
     else
-        tr_err( _( "%s: %s failed (%d): %s (%d)" ), getKey(), func, ret, tr_strerror(errno), errno );
+        tr_nerr( getKey(), _( "%s failed (%d): %s (%d)" ), func, ret, tr_strerror(errno), errno );
 }
 
 struct tr_natpmp*
@@ -109,8 +109,8 @@ setCommandTime( struct tr_natpmp * nat )
 static void
 setErrorState( struct tr_natpmp * nat )
 {
-    tr_err( _( "%s: If your router supports NAT-PMP, please make sure NAT-PMP is enabled!" ), getKey() );
-    tr_err( _( "%s: NAT-PMP port forwarding unsuccessful, trying UPnP next" ), getKey() );
+    tr_nerr( getKey(), _( "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!" ) );
+    tr_nerr( getKey(), _( "NAT-PMP port forwarding unsuccessful, trying UPnP next" ) );
     nat->state = TR_NATPMP_ERR;
 }
 
@@ -136,7 +136,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
         const int val = readnatpmpresponseorretry( &nat->natpmp, &response );
         logVal( "readnatpmpresponseorretry", val );
         if( val >= 0 ) {
-            tr_inf( _( "%s: found public address %s" ), getKey(), inet_ntoa( response.publicaddress.addr ) );
+            tr_ninf( getKey(), _( "found public address %s" ), inet_ntoa( response.publicaddress.addr ) );
             nat->state = TR_NATPMP_IDLE;
         } else if( val != NATPMP_TRYAGAIN ) {
             setErrorState( nat );
@@ -163,7 +163,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
         const int val = readnatpmpresponseorretry( &nat->natpmp, &resp );
         logVal( "readnatpmpresponseorretry", val );
         if( val >= 0 ) {
-            tr_inf( _( "%s: no longer forwarding port %d" ), getKey(), nat->port );
+            tr_ninf( getKey(), _( "no longer forwarding port %d" ), nat->port );
             nat->state = TR_NATPMP_IDLE;
             nat->port = -1;
             nat->isMapped = 0;
@@ -199,7 +199,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
             nat->isMapped = 1;
             nat->renewTime = time( NULL ) + LIFETIME_SECS;
             nat->port = resp.newportmapping.privateport;
-            tr_inf( _( "%s: port %d forwarded successfully" ), getKey(), nat->port );
+            tr_ninf( getKey(), _( "port %d forwarded successfully" ), nat->port );
         } else if( val != NATPMP_TRYAGAIN ) {
             setErrorState( nat );
         }

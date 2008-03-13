@@ -43,10 +43,18 @@ void tr_msgInit( void );
 #endif
 #endif
 
-#define tr_err( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, ## a )
-#define tr_inf( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, ## a )
-#define tr_dbg( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, ## a )
-void tr_msg  ( const char * file, int line, int level, const char * msg, ... );
+#define tr_nerr( n, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, n, ## a )
+#define tr_ninf( n, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, n, ## a )
+#define tr_ndbg( n, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, n, ## a )
+
+#define tr_torerr( tor, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, tor->info.name, ## a )
+#define tr_torinf( tor, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, tor->info.name, ## a )
+#define tr_tordbg( tor, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, tor->info.name, ## a )
+
+#define tr_err( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, NULL, ## a )
+#define tr_inf( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, NULL, ## a )
+#define tr_dbg( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, NULL, ## a )
+void tr_msg  ( const char * file, int line, int level, const char * torrent, const char * msg, ... );
 FILE* tr_getLog( void );
 
 char* tr_getLogTimeStr( char * buf, int buflen );
