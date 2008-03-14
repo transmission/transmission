@@ -180,27 +180,6 @@ static struct {
   { N_("Debug"), "debug", TR_MSG_DBG },
 };
 
-static void
-renderLevel( GtkTreeViewColumn  * column UNUSED,
-             GtkCellRenderer    * renderer,
-             GtkTreeModel       * model,
-             GtkTreeIter        * iter,
-             gpointer             data UNUSED )
-{
-    int level;
-    const char * stock;
-    gtk_tree_model_get( model, iter, COL_LEVEL, &level, -1 );
-    switch( level ) {
-        case TR_MSG_ERR: stock = GTK_STOCK_DIALOG_ERROR; break;
-        case TR_MSG_DBG: stock = GTK_STOCK_INFO; break;
-        default: stock = NULL; break;
-    }
-    g_object_set (renderer, "xalign", (gfloat)0.5,
-                            "yalign", (gfloat)0.5,
-                            "stock-id", stock,
-                            NULL);
-}
-
 static const char*
 getForegroundColor( int msgLevel )
 {
@@ -274,15 +253,6 @@ appendColumn( GtkTreeView * view, int col )
 
     switch( col )
     {
-        case COL_LEVEL:
-            r = gtk_cell_renderer_pixbuf_new( );
-            c = gtk_tree_view_column_new_with_attributes( title, r, NULL );
-            gtk_tree_view_column_set_sizing( c, GTK_TREE_VIEW_COLUMN_FIXED );
-            gtk_tree_view_column_set_fixed_width( c, 20 );
-            gtk_tree_view_column_set_cell_data_func( c, r, renderLevel, NULL, NULL );
-            gtk_tree_view_column_set_resizable( c, FALSE );
-            break;
-
         case COL_LINE:
             r = gtk_cell_renderer_text_new( );
             c = gtk_tree_view_column_new_with_attributes( title, r, "text", col, NULL );
