@@ -1424,9 +1424,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     statusString = [NSLocalizedString(@"Ratio: ", "status bar -> status label")
                                     stringByAppendingString: [NSString stringForRatio: stats.ratio]];
                 }
-                else if ((total = [statusLabel isEqualToString: STATUS_TRANSFER_TOTAL])
-                            || [statusLabel isEqualToString: STATUS_TRANSFER_SESSION])
+                else //STATUS_TRANSFER_TOTAL or STATUS_TRANSFER_SESSION
                 {
+                    total = [statusLabel isEqualToString: STATUS_TRANSFER_TOTAL];
+                    
                     tr_session_stats stats;
                     if (total)
                         tr_getCumulativeSessionStats(fLib, &stats);
@@ -1437,8 +1438,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                         "status bar -> status label (2 spaces between)"),
                         [NSString stringForFileSize: stats.downloadedBytes], [NSString stringForFileSize: stats.uploadedBytes]];
                 }
-                else
-                    statusString = @"";
                 
                 if ([NSApp isOnLeopardOrBetter])
                 {
