@@ -4,7 +4,7 @@
 #
 # tracker	rastrejador
 # peer		client
-# seeder	client que només comparteixen
+# seeder	client que només comparteix
 # seeding	compartir
 # leecher	client que només baixa
 # swarm		eixam
@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-03-10 08:08-0500\n"
-"PO-Revision-Date: 2008-02-29 16:56+0100\n"
+"PO-Revision-Date: 2008-03-15 14:33+0100\n"
 "Last-Translator: Joan Duran <jodufi@gmail.com>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "MIME-Version: 1.0\n"
@@ -48,14 +48,12 @@ msgid "Sort by _Tracker"
 msgstr "Ordena pel _rastrejador"
 
 #: ../gtk/actions.c:69
-#, fuzzy
 msgid "_Main Window"
-msgstr "Mostral la _finestra principal"
+msgstr "Finestra _principal"
 
 #: ../gtk/actions.c:71
-#, fuzzy
 msgid "Message _Log"
-msgstr "Registre de missatges"
+msgstr "_Registre de missatges"
 
 #: ../gtk/actions.c:85
 msgid "_Minimal View"
@@ -63,22 +61,19 @@ msgstr "_Mode reduït"
 
 #: ../gtk/actions.c:87
 msgid "_Reverse Sort Order"
-msgstr "_Inverteix el mode d'ordenar"
+msgstr "_Inverteix el mode d'ordenació"
 
 #: ../gtk/actions.c:89
-#, fuzzy
 msgid "_Filter Bar"
-msgstr "Mostra la _barra de filtre"
+msgstr "Barra de _filtre"
 
 #: ../gtk/actions.c:91
-#, fuzzy
 msgid "_Status Bar"
-msgstr "Mostra la _barra d'estat"
+msgstr "Barra d'e_stat"
 
 #: ../gtk/actions.c:93
-#, fuzzy
 msgid "_Toolbar"
-msgstr "Mostra la _barra d'eines"
+msgstr "Barra d'_eines"
 
 #: ../gtk/actions.c:98
 msgid "_Torrent"
@@ -101,13 +96,12 @@ msgid "_Help"
 msgstr "_Ajuda"
 
 #: ../gtk/actions.c:103 ../gtk/actions.c:104
-#, fuzzy
 msgid "Open a torrent"
 msgstr "Obre un torrent"
 
 #: ../gtk/actions.c:104
 msgid "_Open..."
-msgstr ""
+msgstr "_Obre..."
 
 #: ../gtk/actions.c:106
 msgid "_Start"
@@ -126,36 +120,33 @@ msgid "_Pause"
 msgstr "_Pausa"
 
 #: ../gtk/actions.c:113
-#, fuzzy
 msgid "_Delete Files and Remove"
-msgstr "_Detalls"
+msgstr "_Esborra els fitxers i suprimeix-los"
 
 #: ../gtk/actions.c:114
 msgid "_New..."
-msgstr ""
+msgstr "_Nou..."
 
 #: ../gtk/actions.c:115
-#, fuzzy
 msgid "Create a torrent"
-msgstr "Crea un torrent nou"
+msgstr "Crea un torrent"
 
 #: ../gtk/actions.c:117
-#, fuzzy
 msgid "Close _Window"
-msgstr "Mostral la _finestra principal"
+msgstr "Tanca la _finestra"
 
 #: ../gtk/actions.c:118
-#, fuzzy
 msgid "Close main window"
-msgstr "Mostral la _finestra principal"
+msgstr "Tanca la finestra principal"
 
 #: ../gtk/actions.c:120
 msgid "_Quit"
 msgstr "_Surt"
 
+# Potser millor «No seleccionis res» o «No en seleccionis cap» (dpm)
 #: ../gtk/actions.c:123
 msgid "Dese_lect All"
-msgstr "Dese_lecciona-ho tot"
+msgstr "Desse_lecciona-ho tot"
 
 #: ../gtk/actions.c:126
 msgid "_Details"
@@ -167,21 +158,21 @@ msgstr "Demaneu _més clients al rastrejador"
 
 #: ../gtk/conf.c:60 ../libtransmission/utils.c:447
 #: ../libtransmission/utils.c:458
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't create \"%s\": %s"
-msgstr "No s'ha pogut crear el sòcol: %s"
+msgstr "No s'ha pogut crear «%s»: %s"
 
 #: ../gtk/conf.c:81 ../libtransmission/fastresume.c:191
 #: ../libtransmission/fdlimit.c:166 ../libtransmission/makemeta.c:208
 #: ../libtransmission/makemeta.c:237 ../libtransmission/metainfo.c:613
 #, c-format
 msgid "Couldn't open \"%s\": %s"
-msgstr ""
+msgstr "No s'ha pogut obrir «%s»: %s"
 
 #: ../gtk/conf.c:85
-#, fuzzy, c-format
+#, c-format
 msgid "%s is already running."
-msgstr "Ja s'està executant una altra copia de %s."
+msgstr "Ja s'està executant %s."
 
 #: ../gtk/details.c:246
 msgid "Address"
@@ -194,47 +185,41 @@ msgstr "Client"
 #. 'percent done' column header. terse to keep the column narrow.
 #: ../gtk/details.c:249
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:252
-#, fuzzy
 msgid "Down"
-msgstr "Baixada:%s"
+msgstr "Baixada"
 
 #. 'upload speed' column header.  terse to keep the column narrow.
 #: ../gtk/details.c:254
 msgid "Up"
-msgstr ""
+msgstr "Pujada"
 
 #: ../gtk/details.c:255
 msgid "Status"
 msgstr "Estat"
 
 #: ../gtk/details.c:595
-#, fuzzy
 msgid "<b>Availability</b>"
-msgstr "Disponibilitat de peces"
+msgstr "<b>Disponibilitat</b>"
 
 #: ../gtk/details.c:617
-#, fuzzy
 msgid "<b>Connected Peers</b>"
-msgstr "Clients connectats"
+msgstr "<b>Clients connectats</b>"
 
 #: ../gtk/details.c:627
-#, fuzzy
 msgid "<b>Seeders:</b>"
-msgstr "Clients que només comparteixen"
+msgstr "<b>Clients que només comparteixen:</b>"
 
 #: ../gtk/details.c:634
-#, fuzzy
 msgid "<b>Leechers:</b>"
-msgstr "Clients que només baixen"
+msgstr "<b>Clients que només baixen:</b>"
 
 #: ../gtk/details.c:641
-#, fuzzy
 msgid "<b>Completed:</b>"
-msgstr "Completat"
+msgstr "<b>Completat:</b>"
 
 #: ../gtk/details.c:671
 msgid "Torrent Information"
@@ -245,23 +230,20 @@ msgstr "Informació del torrent"
 #, c-format
 msgid "%1$d Piece @ %2$s"
 msgid_plural "%1$d Pieces @ %2$s"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d tros de %2$s"
+msgstr[1] "%1$d trossos de %2$s"
 
 #: ../gtk/details.c:681
-#, fuzzy
 msgid "Pieces:"
-msgstr "Peces"
+msgstr "Trossos:"
 
 #: ../gtk/details.c:685
-#, fuzzy
 msgid "Hash:"
-msgstr "Resum"
+msgstr "Resum:"
 
 #: ../gtk/details.c:688
-#, fuzzy
 msgid "Private Torrent: PEX disabled"
-msgstr "Torrent privat, PEX desactivat"
+msgstr "Torrent privat: PEX desactivat"
 
 #: ../gtk/details.c:689
 msgid "Public Torrent"
@@ -269,59 +251,54 @@ msgstr "Torrent públic"
 
 #: ../gtk/details.c:691
 msgid "Privacy:"
-msgstr ""
+msgstr "Privadesa:"
 
 #: ../gtk/details.c:703
-#, fuzzy
 msgid "Comment:"
-msgstr "Comentari"
+msgstr "Comentari:"
 
 #: ../gtk/details.c:707
 msgid "Origins"
-msgstr ""
+msgstr "Orígens"
 
 #: ../gtk/details.c:709 ../gtk/details.c:800 ../gtk/details.c:805
 #, c-format
 msgid "Unknown"
-msgstr ""
+msgstr "Desconegut"
 
 #: ../gtk/details.c:710
-#, fuzzy
 msgid "Creator:"
-msgstr "Creador"
+msgstr "Creador:"
 
 #: ../gtk/details.c:714
-#, fuzzy
 msgid "Date:"
-msgstr "Data"
+msgstr "Data:"
 
 #: ../gtk/details.c:718
 msgid "Location"
 msgstr "Ubicació"
 
 #: ../gtk/details.c:722 ../gtk/dialogs.c:137
-#, fuzzy
 msgid "Destination folder"
-msgstr "Relació de la sessió"
+msgstr "Carpeta de destinació"
 
 #: ../gtk/details.c:726
-#, fuzzy
 msgid "Torrent file"
-msgstr "Fitxers torrent"
+msgstr "Fitxer torrent"
 
 #. %1$.1f is percent of how much of what we want's been downloaded,
 #. %2$.1f is percent of how much of the whole torrent we've downloaded
 #: ../gtk/details.c:770
-#, fuzzy, c-format
+#, c-format
 msgid "%1$.1f%% (%2$.1f%% selected)"
-msgstr "%.1f%% (%.1f%% seleccionat)"
+msgstr "%1$.1f%% (%2$.1f%% seleccionat)"
 
 #. %1$s is total size of what we've saved to disk
 #. %2$s is how much of it's passed the checksum test
 #: ../gtk/details.c:778
-#, fuzzy, c-format
+#, c-format
 msgid "%1$s (%2$s verified)"
-msgstr "%s (%s verificat)"
+msgstr "%1$s (%2$s verificat)"
 
 #: ../gtk/details.c:797 ../gtk/util.c:57 ../gtk/util.c:77
 msgid "None"
@@ -342,7 +319,7 @@ msgstr "Progrés:"
 #. "Have" refers to how much of the torrent we have
 #: ../gtk/details.c:836
 msgid "Have:"
-msgstr "Completat:"
+msgstr "Rebut:"
 
 #: ../gtk/details.c:839 ../gtk/stats.c:102 ../gtk/stats.c:114
 msgid "Downloaded:"
@@ -361,16 +338,14 @@ msgid "Ratio:"
 msgstr "Relació:"
 
 #: ../gtk/details.c:852
-#, fuzzy
 msgid "Swarm rate:"
 msgstr "Velocitat de l'eixam:"
 
 #: ../gtk/details.c:855
 msgid "Error:"
-msgstr "Error: "
+msgstr "Error:"
 
 #: ../gtk/details.c:859
-#, fuzzy
 msgid "Completion"
 msgstr "Completat"
 
@@ -379,109 +354,96 @@ msgid "Dates"
 msgstr "Dates"
 
 #: ../gtk/details.c:872
-#, fuzzy
 msgid "Started at:"
-msgstr "Estat:"
+msgstr "Iniciat a les:"
 
 #: ../gtk/details.c:875
-#, fuzzy
 msgid "Last activity at:"
-msgstr "Última activitat"
+msgstr "Última activitat a les:"
 
 #: ../gtk/details.c:970
 msgid "Speed Limits"
 msgstr "Límits de velocitat"
 
 #: ../gtk/details.c:972 ../gtk/tr-prefs.c:316
-#, fuzzy
 msgid "Limit _download speed (KB/s):"
-msgstr "Limita la velocitat de _baixada (KiB/s):"
+msgstr "Limita la velocitat de _baixada (KB/s):"
 
 #: ../gtk/details.c:985 ../gtk/tr-prefs.c:309
-#, fuzzy
 msgid "Limit _upload speed (KB/s):"
-msgstr "Limita la velocitat de _pujada (KiB/s):"
+msgstr "Limita la velocitat de _pujada (KB/s):"
 
 #: ../gtk/details.c:999
 msgid "Peer Connections"
 msgstr "Connexions de clients"
 
 #: ../gtk/details.c:1004
-#, fuzzy
 msgid "_Maximum number of peers:"
-msgstr "Número màxim de clients connectats:"
+msgstr "Número _màxim de clients connectats:"
 
 #: ../gtk/details.c:1008
-#, fuzzy
 msgid "_Stop seeding at ratio:"
-msgstr "_Deixa de compartir amb la relació:"
+msgstr "_Deixa de compartir a partir de la relació:"
 
 #: ../gtk/details.c:1063
-#, fuzzy
 msgid "Scrape"
-msgstr "Seguretat"
+msgstr "Fregament"
 
 #: ../gtk/details.c:1065
 msgid "Last scrape at:"
-msgstr ""
+msgstr "Últim fregament a les:"
 
 #: ../gtk/details.c:1070 ../gtk/details.c:1097
-#, fuzzy
 msgid "Tracker responded:"
-msgstr "Rastrejador"
+msgstr "El rastrejador ha respost:"
 
 #: ../gtk/details.c:1075
 msgid "Next scrape in:"
-msgstr ""
+msgstr "Següent fregament en:"
 
 #: ../gtk/details.c:1081
-#, fuzzy
 msgid "Announce"
-msgstr "Avisa l'_URL"
+msgstr "Anunci"
 
 #: ../gtk/details.c:1089
-#, fuzzy
 msgid "Tracker:"
-msgstr "Rastrejador"
+msgstr "Rastrejador:"
 
 #: ../gtk/details.c:1092
 msgid "Last announce at:"
-msgstr ""
+msgstr "Últim anunci a les:"
 
 #: ../gtk/details.c:1102
 msgid "Next announce in:"
-msgstr ""
+msgstr "Següent anunci en:"
 
 #. how long until the tracker will honor user
 #. * pressing the "ask for more peers" button
 #: ../gtk/details.c:1109
 msgid "Manual announce allowed in:"
-msgstr ""
+msgstr "Anunci manual permès en:"
 
 #: ../gtk/details.c:1125 ../gtk/details.c:1137
 msgid "Never"
-msgstr ""
+msgstr "Mai"
 
 #. %1$s is torrent name; %2$s its file size
 #: ../gtk/details.c:1228
-#, fuzzy, c-format
+#, c-format
 msgid "Details for %1$s (%2$s)"
-msgstr "Detalls per a %s (%s)"
+msgstr "Detalls per a %1$s (%2$s)"
 
 #: ../gtk/details.c:1247
-#, fuzzy
 msgid "Activity"
-msgstr "_Activitat"
+msgstr "Activitat"
 
 #: ../gtk/details.c:1252 ../gtk/tr-prefs.c:374
-#, fuzzy
 msgid "Peers"
-msgstr "_Clients"
+msgstr "Clients"
 
 #: ../gtk/details.c:1256 ../gtk/msgwin.c:221
-#, fuzzy
 msgid "Information"
-msgstr "Informació del torrent"
+msgstr "Informació"
 
 #: ../gtk/details.c:1262 ../gtk/makemeta-ui.c:253 ../gtk/tr-window.c:445
 msgid "Files"
@@ -496,46 +458,42 @@ msgid "Options"
 msgstr "Opcions"
 
 #: ../gtk/dialogs.c:156 ../gtk/tr-prefs.c:243
-#, fuzzy
 msgid "_Trash original torrent files"
-msgstr "no és un fitxer torrent vàlid"
+msgstr "_Envia a la paperera els fitxers torrent originals"
 
 #: ../gtk/dialogs.c:164 ../gtk/open-dialog.c:232
 msgid "_Start when added"
-msgstr ""
+msgstr "_Inicia quan s'afegeixi"
 
 #: ../gtk/dialogs.c:260
-#, fuzzy
 msgid "<b>Really Quit?</b>"
-msgstr "<b>Segur que voleu treure %s?</b>"
+msgstr "<b>Segur que voleu sortir?</b>"
 
 #: ../gtk/dialogs.c:272
-#, fuzzy
 msgid "_Don't ask me this again"
 msgstr "_No ho tornis a preguntar"
 
 #: ../gtk/dialogs.c:359
 msgid "Remove torrent?"
 msgid_plural "Remove torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Voleu suprimir el torrent?"
+msgstr[1] "Voleu suprimir els torrents?"
 
 #: ../gtk/dialogs.c:361
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these torrents' downloaded files?"
-msgstr[0] "no és un fitxer torrent vàlid"
-msgstr[1] "no és un fitxer torrent vàlid"
+msgstr[0] "Voleu suprimir els fitxers baixats d'aquest torrent?"
+msgstr[1] "Voleu suprimir els fitxers baixats d'aquests torrents?"
 
 #: ../gtk/dialogs.c:366
 msgid "Some of these torrents are incomplete or connected to peers."
-msgstr ""
+msgstr "Alguns d'aquests torrents estan incomplets o connectats a clients."
 
 #: ../gtk/dialogs.c:370
 msgid "This torrent is incomplete or connected to peers."
 msgid_plural "One of these torrents is incomplete or connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Aquest torrent està incomplet o connectat a clients."
+msgstr[1] "Aquests torrents estan incomplets o connectats a clients."
 
 #. this refers to priority
 #: ../gtk/file-list.c:65 ../gtk/file-list.c:77 ../gtk/file-list.c:248
@@ -556,85 +514,80 @@ msgstr "Baixa"
 #. Don't include the prefix "filedetails|" in the translation.
 #: ../gtk/file-list.c:478
 msgid "filedetails|File"
-msgstr ""
+msgstr "Fitxer"
 
 #. Translators: this is a column header in Files tab, Details dialog;
 #. Don't include the prefix "filedetails|" in the translation.
 #: ../gtk/file-list.c:493
 msgid "filedetails|Progress"
-msgstr ""
+msgstr "Progrés"
 
 #. Translators: this is a column header in Files tab, Details dialog;
 #. Don't include the prefix "filedetails|" in the translation.
 #. Please note the items for this column are checkboxes (yes/no)
 #: ../gtk/file-list.c:511
 msgid "filedetails|Download"
-msgstr ""
+msgstr "Baixada"
 
 #. Translators: this is a column header in Files tab, Details dialog;
 #. Don't include the prefix "filedetails|" in the translation.
 #: ../gtk/file-list.c:523
 msgid "filedetails|Priority"
-msgstr ""
+msgstr "Prioritat"
 
 #: ../gtk/ipc.c:232 ../gtk/ipc.c:394
 msgid "Bad IPC protocol version"
 msgstr "Versió del protocol IPC incorrecta"
 
 #: ../gtk/ipc.c:235
-#, fuzzy
 msgid "IPC parse error"
-msgstr "S'ha produït un error en analitzar el protocol IPC"
+msgstr "S'ha produït un error en analitzar l'IPC"
 
 #: ../gtk/ipc.c:238
-#, fuzzy, c-format
+#, c-format
 msgid "IPC parse error: %s"
-msgstr "S'ha produït un error en analitzar el protocol IPC"
+msgstr "S'ha produït un error en analitzar l'IPC: %s"
 
 #: ../gtk/ipc.c:267 ../libtransmission/fdlimit.c:390
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't create socket: %s"
 msgstr "No s'ha pogut crear el sòcol: %s"
 
 #: ../gtk/ipc.c:276
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't connect to \"%s\": %s"
-msgstr ""
-"No s'ha pogut crear el directori %s:\n"
-"%s"
+msgstr "No s'ha pogut connectar a «%s»: %s"
 
 #: ../gtk/ipc.c:316 ../gtk/ipc.c:1152
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't set up IPC: %s"
-msgstr "No s'ha pogut configurar el IPC: %s"
+msgstr "No s'ha pogut configurar l'IPC: %s"
 
 #: ../gtk/ipc.c:397
-#, fuzzy
 msgid "IPC parsing failed"
-msgstr "No s'ha pogut analitzar el IPC: %s"
+msgstr "No s'ha pogut analitzar l'IPC"
 
 #: ../gtk/ipc.c:400
 #, c-format
 msgid "IPC parsing failed: %s"
-msgstr "No s'ha pogut analitzar el IPC: %s"
+msgstr "No s'ha pogut analitzar l'IPC: %s"
 
 #: ../gtk/ipc.c:486
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't set up socket: %s"
-msgstr "No s'ha pogut crear el sòcol: %s"
+msgstr "No s'ha pogut configurar el sòcol: %s"
 
 #: ../gtk/main.c:270
 msgid "Start with all torrents paused"
 msgstr "Inicia amb tots els torrents en pausa"
 
 #: ../gtk/main.c:272
-#, fuzzy
 msgid "Ask the running instance to quit"
 msgstr "Sol·licita que es tanqui la instància que s'està executant"
 
 #: ../gtk/main.c:275
 msgid "Start minimized in system tray"
-msgstr ""
+msgstr "Inicia minimitzat a l'àrea de notificació"
 
 #: ../gtk/main.c:288
 msgid "Transmission"
@@ -657,24 +610,19 @@ msgid "_Quit Immediately"
 msgstr "_Surt immediatament"
 
 #: ../gtk/main.c:757
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to load torrent file: %s"
 msgid_plural "Failed to load torrent files: %s"
-msgstr[0] ""
-"No s'ha pogut carregar el fitxer torrent:\n"
-"%s"
-msgstr[1] ""
-"No s'han pogut carregar els fitxers torrent:\n"
-"%s"
+msgstr[0] "No s'ha pogut carregar el fitxer torrent: %s"
+msgstr[1] "No s'han pogut carregar els fitxers torrent: %s"
 
 #: ../gtk/main.c:899
 msgid "A fast and easy BitTorrent client"
-msgstr "Un client BitTorrent ràpid i senzill"
+msgstr "Un client de BitTorrent ràpid i senzill"
 
 #: ../gtk/main.c:902
-#, fuzzy
 msgid "Copyright 2005-2008 The Transmission Project"
-msgstr "Copyright 2005-2007 el projecte Transmission"
+msgstr "Copyright 2005-2008 el projecte Transmission"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About" dialog
@@ -683,48 +631,44 @@ msgid "translator-credits"
 msgstr "Joan Duran <jodufi@gmail.com>, 2008"
 
 #: ../gtk/makemeta-ui.c:96
-#, fuzzy
 msgid "Torrent creation cancelled"
-msgstr "No s'ha pogut crear el torrent."
+msgstr "S'ha cancel·lat la creació del torrent"
 
 #: ../gtk/makemeta-ui.c:97
-#, fuzzy
 msgid "Torrent creation failed"
-msgstr "No s'ha pogut crear el torrent."
+msgstr "No s'ha pogut crear el torrent"
 
 #: ../gtk/makemeta-ui.c:104
 msgid "Torrent Created"
-msgstr "Torrent creat"
+msgstr "S'ha creat el torrent"
 
 #. %1$s is the torrent size, %2$s is its number of files
 #: ../gtk/makemeta-ui.c:205
 #, c-format
 msgid "<i>%1$s; %2$d File</i>"
 msgid_plural "<i>%1$s; %2$d Files</i>"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "<i>%1$s; %2$d fitxer</i>"
+msgstr[1] "<i>%1$s; %2$d fitxers</i>"
 
 #. %1$s is number of pieces; %2$s is how big each piece is
 #: ../gtk/makemeta-ui.c:213
 #, c-format
 msgid "<i>%1$d Piece @ %2$s</i>"
 msgid_plural "<i>%1$d Pieces @ %2$s</i>"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "<i>%1$d peça de %2$s</i>"
+msgstr[1] "<i>%1$d peces de %2$s</i>"
 
 #: ../gtk/makemeta-ui.c:239
-#, fuzzy
 msgid "New Torrent"
-msgstr "Obre un torrent"
+msgstr "Torrent nou"
 
 #: ../gtk/makemeta-ui.c:255
 msgid "File _Type"
 msgstr "_Tipus de fitxer"
 
 #: ../gtk/makemeta-ui.c:257
-#, fuzzy
 msgid "Folder"
-msgstr "Obre un torrent"
+msgstr "Carpeta"
 
 #: ../gtk/makemeta-ui.c:259
 msgid "Single File"
@@ -735,16 +679,15 @@ msgid "_File"
 msgstr "_Fitxer"
 
 #: ../gtk/makemeta-ui.c:276 ../gtk/makemeta-ui.c:312
-#, fuzzy
 msgid "No files selected"
-msgstr "No hi ha cap fitxer seleccionat"
+msgstr "No hi ha fitxers seleccionats"
 
 #: ../gtk/makemeta-ui.c:290 ../gtk/tr-window.c:150
 msgid "Torrent"
 msgstr "Torrent"
 
 #: ../gtk/makemeta-ui.c:292
-#, fuzzy, c-format
+#, c-format
 msgid "Private to this tracker"
 msgstr "Denegat a aquest rastrejador"
 
@@ -757,9 +700,9 @@ msgid "Commen_t"
 msgstr "Comen_tari"
 
 #: ../gtk/msgwin.c:160 ../gtk/msgwin.c:174 ../libtransmission/metainfo.c:619
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't write file \"%s\": %s"
-msgstr "S'ha produït un error al escriure a «%s»: %s"
+msgstr "No s'ha pogut escriure el fitxer «%s»: %s"
 
 #: ../gtk/msgwin.c:191
 msgid "Save Log"
@@ -778,29 +721,24 @@ msgid "Message Log"
 msgstr "Registre de missatges"
 
 #: ../gtk/msgwin.c:262
-#, fuzzy
 msgid "Level"
 msgstr "Nivell"
 
 #: ../gtk/msgwin.c:266 ../gtk/msgwin.c:297
-#, fuzzy
 msgid "Set the verbosity level"
-msgstr "Selecciona el nivell del filtre de depuració."
+msgstr "Estableix el nivell de detall"
 
 #: ../gtk/notify.c:81
-#, fuzzy
 msgid "Torrent Complete"
-msgstr "Torrent creat"
+msgstr "S'ha completat el torrent"
 
 #: ../gtk/notify.c:84
-#, fuzzy
 msgid "Open File"
-msgstr "Fitxer"
+msgstr "Obre un fitxer"
 
 #: ../gtk/notify.c:86
-#, fuzzy
 msgid "Open Folder"
-msgstr "Obre un torrent"
+msgstr "Obre una carpeta"
 
 #. make the dialog
 #: ../gtk/open-dialog.c:145
@@ -808,14 +746,12 @@ msgid "Open Torrent"
 msgstr "Obre un torrent"
 
 #: ../gtk/open-dialog.c:173
-#, fuzzy
 msgid "_Torrent file:"
-msgstr "Fitxers torrent"
+msgstr "Fitxer _torrent:"
 
 #: ../gtk/open-dialog.c:177
-#, fuzzy
 msgid "Select Torrent"
-msgstr "Torrent públic"
+msgstr "Seleccioneu un torrent"
 
 #: ../gtk/open-dialog.c:182
 msgid "Torrent files"
@@ -826,24 +762,20 @@ msgid "All files"
 msgstr "Tots els fitxers"
 
 #: ../gtk/open-dialog.c:197
-#, fuzzy
 msgid "Destination _folder:"
-msgstr "Relació de la sessió"
+msgstr "_Carpeta de destinació:"
 
 #: ../gtk/open-dialog.c:201
-#, fuzzy
 msgid "Destination"
-msgstr "Relació de la sessió"
+msgstr "Destinació"
 
 #: ../gtk/open-dialog.c:217
-#, fuzzy
 msgid "Verify Local Data"
-msgstr "_Verifica les dades locals"
+msgstr "Verifica les dades locals"
 
 #: ../gtk/open-dialog.c:223
-#, fuzzy
 msgid "_Trash original torrent file"
-msgstr "no és un fitxer torrent vàlid"
+msgstr "_Envia a la paperera el fitxer torrent original"
 
 #: ../gtk/stats.c:62
 #, c-format
@@ -860,12 +792,11 @@ msgstr "Sessió actual"
 
 #: ../gtk/stats.c:106 ../gtk/stats.c:118
 msgid "Duration:"
-msgstr "Duració:"
+msgstr "Durada:"
 
 #: ../gtk/stats.c:108
-#, fuzzy
 msgid "Total"
-msgstr "Relació total"
+msgstr "Total"
 
 #: ../gtk/stats.c:109
 #, c-format
@@ -876,9 +807,9 @@ msgstr "El programa s'ha iniciat %d cops"
 #. %2$s is how much we'll have when done,
 #. %3$.2f%% is a percentage of the two
 #: ../gtk/torrent-cell-renderer.c:53
-#, fuzzy, c-format
+#, c-format
 msgid "%1$s of %2$s (%3$.2f%%)"
-msgstr "%s de %s (%.2f%%)"
+msgstr "%1$s de %2$s (%3$.2f%%)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -886,42 +817,41 @@ msgstr "%s de %s (%.2f%%)"
 #. %4$s is how much we've uploaded,
 #. %5$s is our upload-to-download ratio
 #: ../gtk/torrent-cell-renderer.c:64
-#, fuzzy, c-format
+#, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
-msgstr "%s de %s (%.2f%%), pujat %s (Relació: %.1f"
+msgstr "%1$s de %2$s (%3$.2f%%), pujat %4$s (Relació: %5$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
 #. %3$s is our upload-to-download ratio
 #: ../gtk/torrent-cell-renderer.c:75
-#, fuzzy, c-format
+#, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-msgstr "%s, pujat %s (Relació: %.1f)"
+msgstr "%1$s, pujat %2$s (relació: %3$s)"
 
 #: ../gtk/torrent-cell-renderer.c:87
-#, fuzzy
 msgid "Stalled"
-msgstr "Estat:"
+msgstr "Encallat"
 
 #. time remaining
 #: ../gtk/torrent-cell-renderer.c:92
-#, fuzzy, c-format
+#, c-format
 msgid "%s remaining"
-msgstr "%s falta (%.1f%%)"
+msgstr "manca %s"
 
 #. Translators: do not translate the "speed|" disambiguation prefix.
 #. %1$s is the download speed
 #. %2$s is the upload speed
 #: ../gtk/torrent-cell-renderer.c:117
-#, fuzzy, c-format
+#, c-format
 msgid "speed|Down: %1$s, Up: %2$s"
-msgstr "Baixada: %s, Pujada: %s"
+msgstr "Baixada: %1$s, Pujada: %2$s"
 
 #. download speed
 #: ../gtk/torrent-cell-renderer.c:120
 #, c-format
 msgid "Down: %s"
-msgstr "Baixada:%s"
+msgstr "Baixada: %s"
 
 #. upload speed
 #: ../gtk/torrent-cell-renderer.c:123
@@ -939,9 +869,8 @@ msgid "Paused"
 msgstr "En pausa"
 
 #: ../gtk/torrent-cell-renderer.c:143
-#, fuzzy
 msgid "Waiting to verify local data"
-msgstr "S'està esperant per a verificar les dades locals"
+msgstr "S'està esperant a verificar les dades locals"
 
 #. [0...100]
 #: ../gtk/torrent-cell-renderer.c:147 ../gtk/tr-torrent.c:283
@@ -951,36 +880,35 @@ msgstr "S'estan verificant les dades locals (%.1f%% verificat)"
 
 #: ../gtk/torrent-cell-renderer.c:157 ../gtk/tr-window.c:625
 #: ../gtk/tr-window.c:645
-#, fuzzy, c-format
+#, c-format
 msgid "Ratio: %s"
-msgstr "Relació:"
+msgstr "Relació: %s"
 
 #: ../gtk/torrent-cell-renderer.c:198
-#, fuzzy, c-format
+#, c-format
 msgid "Downloading from %1$d of %2$d connected peer"
 msgid_plural "Downloading from %1$d of %2$d connected peers"
-msgstr[0] "S'està baixant des de %d de %d client connectat"
-msgstr[1] "S'està baixant des de %d de %d client connectat"
+msgstr[0] "S'està baixant des de %1$d de %2$d client connectat"
+msgstr[1] "S'està baixant des de %1$d de %2$d clients connectats"
 
 #: ../gtk/torrent-cell-renderer.c:208 ../gtk/tr-torrent.c:307
-#, fuzzy, c-format
+#, c-format
 msgid "Seeding to %1$d of %2$d connected peer"
 msgid_plural "Seeding to %1$d of %2$d connected peers"
-msgstr[0] "S'està compartint a %d de %d client connectat"
-msgstr[1] "S'està compartint a %d de %d client connectat"
+msgstr[0] "S'està compartint a %1$d de %2$d client connectat"
+msgstr[1] "S'està compartint a %1$d de %2$d clients connectats"
 
 #: ../gtk/transmission.desktop.in.h:1
 msgid "BitTorrent Client"
-msgstr "Client BitTorrent"
+msgstr "Client de BitTorrent"
 
 #: ../gtk/transmission.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
-msgstr ""
+msgstr "Baixeu i compartiu fitxers mitjançant el BitTorrent"
 
 #: ../gtk/transmission.desktop.in.h:3
-#, fuzzy
 msgid "Transmission BitTorrent Client"
-msgstr "Client BitTorrent"
+msgstr "Client de BitTorrent Transmission"
 
 #. %1$d is the number of torrents we're seeding,
 #. %2$d is the number of torrents we're downloading,
@@ -992,6 +920,8 @@ msgid ""
 "%1$d Seeding, %2$d Downloading\n"
 "Down: %3$s, Up: %4$s"
 msgstr ""
+"%1$d compartint, %2$d baixant\n"
+"Baixada: %3$s, pujada: %4$s"
 
 #: ../gtk/tr-prefs.c:190
 msgid "Port is <b>open</b>"
@@ -1007,100 +937,90 @@ msgstr "<i>S'està comprovant el port...</i>"
 
 #: ../gtk/tr-prefs.c:224
 msgid "Adding"
-msgstr ""
+msgstr "Afegint"
 
 #: ../gtk/tr-prefs.c:227
-#, fuzzy
 msgid "Automatically add torrents from:"
-msgstr "_Inicia automàticament el torrent"
+msgstr "Afegeix torrents automàticament de:"
 
 #: ../gtk/tr-prefs.c:235
 msgid "Show _options dialog"
-msgstr ""
+msgstr "Mostra el diàleg d'_opcions"
 
 #: ../gtk/tr-prefs.c:239
-#, fuzzy
 msgid "_Start torrents when added"
-msgstr "Inicia amb tots els torrents en pausa"
+msgstr "_Inicia els torrents quan s'afegeixin"
 
 #: ../gtk/tr-prefs.c:248
 msgid "Default destination _folder:"
-msgstr ""
+msgstr "_Carpeta de destinació predeterminada:"
 
 #: ../gtk/tr-prefs.c:252
-#, fuzzy
 msgid "Notification"
-msgstr "Ubicació"
+msgstr "Notificació"
 
 #: ../gtk/tr-prefs.c:254
 msgid "_Display a message when torrents finish"
-msgstr ""
+msgstr "_Mostra un missatge quan finalitzin els torrents"
 
 #: ../gtk/tr-prefs.c:274
-#, fuzzy
 msgid "Use peer e_xchange"
-msgstr "Utilitza l'int_ercanvi de clients si és possible"
+msgstr "Utilitza l'int_ercanvi de clients"
 
 #: ../gtk/tr-prefs.c:278
-#, fuzzy
 msgid "_Ignore unencrypted peers"
 msgstr "_Ignora els clients no xifrats"
 
 #. section header for the "maximum number of peers" section
 #: ../gtk/tr-prefs.c:284
-#, fuzzy
 msgid "Limits"
-msgstr "Límits de velocitat"
+msgstr "Límits"
 
 #: ../gtk/tr-prefs.c:287
 msgid "Maximum peers _overall:"
-msgstr ""
+msgstr "Número _màxim de clients:"
 
 #: ../gtk/tr-prefs.c:289
-#, fuzzy
 msgid "Maximum peers per _torrent:"
-msgstr "Número màxim de clients connectats per a torrents nous:"
+msgstr "Número màxim de clients per _torrent:"
 
 #: ../gtk/tr-prefs.c:307
 msgid "Bandwidth"
-msgstr ""
+msgstr "Amplada de banda"
 
 #: ../gtk/tr-prefs.c:323
-#, fuzzy
 msgid "Ports"
-msgstr "Port"
+msgstr "Ports"
 
 #: ../gtk/tr-prefs.c:325
 msgid "_Forward port from router with UPnP or NAT-PMP"
-msgstr ""
+msgstr "_Redirecciona el port de l'encaminador amb UPnP o NAT-PMP"
 
 #: ../gtk/tr-prefs.c:335
-#, fuzzy
 msgid "Incoming TCP _port"
-msgstr "S'està escoltant el _port TCP"
+msgstr "_Port TCP d'entrada"
 
 #: ../gtk/tr-prefs.c:358
 msgid "Preferences"
 msgstr "Preferències"
 
 #: ../gtk/tr-prefs.c:371
-#, fuzzy
 msgid "Torrents"
-msgstr "Torrent"
+msgstr "Torrents"
 
 #: ../gtk/tr-prefs.c:377
 msgid "Network"
 msgstr "Xarxa"
 
 #: ../gtk/tr-torrent.c:226
-#, fuzzy, c-format
+#, c-format
 msgid "File \"%s\" isn't a valid torrent"
-msgstr "%s: no és un fitxer torrent vàlid"
+msgstr "El fitxer «%s» no és un torrent vàlid"
 
 #: ../gtk/tr-torrent.c:229
-#, fuzzy, c-format
+#, c-format
 msgid "File \"%s\" is already open"
-msgstr "%s: el torrent ja està obert"
+msgstr "El fitxer «%s» ja està obert"
 
 #. [0...100]
 #: ../gtk/tr-torrent.c:278
@@ -1116,16 +1036,16 @@ msgstr "Encallat (%.1f%%)"
 #. %1$s is # of minutes
 #. %2$.1f is a percentage of how much of the torrent is done
 #: ../gtk/tr-torrent.c:294
-#, fuzzy, c-format
+#, c-format
 msgid "%1$s remaining (%2$.1f%%)"
-msgstr "%s falta (%.1f%%)"
+msgstr "manquen %1$s (%2$.1f%%)"
 
 #: ../gtk/tr-torrent.c:300
-#, fuzzy, c-format
+#, c-format
 msgid "Uploading to %1$d of %2$d connected peer"
 msgid_plural "Uploading to %1$d of %2$d connected peers"
-msgstr[0] "S'està compartint a %d de %d client connectat"
-msgstr[1] "S'està compartint a %d de %d client connectat"
+msgstr[0] "S'està pujant a %1$d de %2$d client connectat"
+msgstr[1] "S'està pujant a %1$d de %2$d clients connectats"
 
 #: ../gtk/tr-torrent.c:313
 #, c-format
@@ -1178,142 +1098,142 @@ msgid "Name"
 msgstr "Nom"
 
 #: ../gtk/tr-window.c:599
-#, fuzzy, c-format
+#, c-format
 msgid "%1$d of %2$d Torrent"
 msgid_plural "%1$d of %2$d Torrents"
-msgstr[0] "%d de %d transferit"
-msgstr[1] "%d de %d transferit"
+msgstr[0] "%1$d de %2$d torrent"
+msgstr[1] "%1$d de %2$d torrents"
 
 #: ../gtk/tr-window.c:604
-#, fuzzy, c-format
+#, c-format
 msgid "%d Torrent"
 msgid_plural "%d Torrents"
-msgstr[0] "Torrent"
-msgstr[1] "Torrent"
+msgstr[0] "%d torrent"
+msgstr[1] "%d torrents"
 
 #. Translators: do not translate the "size|" disambiguation prefix.
 #. %1$s is the size of the data we've downloaded
 #. %2$s is the size of the data we've uploaded
 #: ../gtk/tr-window.c:633 ../gtk/tr-window.c:641
-#, fuzzy, c-format
+#, c-format
 msgid "size|Down: %1$s, Up: %2$s"
-msgstr "Baixada: %s, Pujada: %s"
+msgstr "Baixada: %1$s, Pujada: %2$s"
 
 #: ../gtk/tr-window.c:697
 #, c-format
 msgid "Tracker will allow requests in %s"
-msgstr ""
+msgstr "El rastrejador permetrà més sol·licituds en %s"
 
 #: ../gtk/util.c:86
 #, c-format
 msgid "%u byte"
 msgid_plural "%u bytes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%u byte"
+msgstr[1] "%u bytes"
 
 #: ../gtk/util.c:91
 #, c-format
 msgid "%.1f KB"
-msgstr ""
+msgstr "%.1f KB"
 
 #: ../gtk/util.c:94
 #, c-format
 msgid "%.1f MB"
-msgstr ""
+msgstr "%.1f MB"
 
 #: ../gtk/util.c:97
 #, c-format
 msgid "%.1f GB"
-msgstr ""
+msgstr "%.1f GB"
 
 #. 0.0 KB to 999.9 KB
 #: ../gtk/util.c:110
 #, c-format
 msgid "%.1f KB/s"
-msgstr ""
+msgstr "%.1f KB/s"
 
 #. 0.98 MB to 99.99 MB
 #: ../gtk/util.c:112
 #, c-format
 msgid "%.2f MB/s"
-msgstr ""
+msgstr "%.2f MB/s"
 
 #. 100.0 MB to 999.9 MB
 #: ../gtk/util.c:114
 #, c-format
 msgid "%.1f MB/s"
-msgstr ""
+msgstr "%.1f MB/s"
 
 #. insane speeds
 #: ../gtk/util.c:116
 #, c-format
 msgid "%.2f GB/s"
-msgstr ""
+msgstr "%.2f GB/s"
 
 #: ../gtk/util.c:132
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d segon"
+msgstr[1] "%'d segons"
 
 #: ../gtk/util.c:139 ../gtk/util.c:153
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d minut"
+msgstr[1] "%'d minuts"
 
 #: ../gtk/util.c:152 ../gtk/util.c:160
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d hora"
+msgstr[1] "%'d hores"
 
 #: ../gtk/util.c:165
-#, fuzzy, c-format
+#, c-format
 msgid "'%d day"
 msgid_plural "%'d days"
-msgstr[0] "dia"
-msgstr[1] "dies"
+msgstr[0] "'%d dia"
+msgstr[1] "'%d dies"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:672
 msgid "Invalid metadata"
-msgstr ""
+msgstr "Metadades invàlides"
 
 #: ../libtransmission/fastresume.c:422
 #, c-format
 msgid "Torrent \"%s\" needs to be verified"
-msgstr ""
+msgstr "Cal verificar el torrent «%s»"
 
 #: ../libtransmission/fastresume.c:545
 #, c-format
 msgid "Loaded %i peers from resume file"
-msgstr ""
+msgstr "S'han carregat %i clients del fitxer de reprendre"
 
 #: ../libtransmission/fastresume.c:591
 #, c-format
 msgid "Skipping unknown resume code %d"
-msgstr ""
+msgstr "S'està ometent el codi de reprendre desconegut %d"
 
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:635
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't read resume file for \"%s\""
-msgstr "S'ha produït un error al escriure a «%s»: %s"
+msgstr "No es pot llegir el fitxer de reprendre per a «%s»"
 
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:646
 #, c-format
 msgid "Skipping invalid resume file for \"%s\""
-msgstr ""
+msgstr "S'està ometent el fitxer de reprendre desconegut per a «%s»"
 
 #: ../libtransmission/makemeta.c:59
 #, c-format
 msgid "Torrent Creator is skipping file \"%s\": %s"
-msgstr ""
+msgstr "El creador de fitxers torrent està ometent el fitxer «%s»: %s"
 
 #: ../libtransmission/metainfo.c:191 ../libtransmission/metainfo.c:238
 #: ../libtransmission/metainfo.c:250 ../libtransmission/metainfo.c:489
@@ -1321,7 +1241,7 @@ msgstr ""
 #: ../libtransmission/metainfo.c:681
 #, c-format
 msgid "Missing metadata entry \"%s\""
-msgstr ""
+msgstr "Falta l'entrada de metadades «%s»"
 
 #: ../libtransmission/metainfo.c:236 ../libtransmission/metainfo.c:248
 #: ../libtransmission/metainfo.c:255 ../libtransmission/metainfo.c:469
@@ -1329,655 +1249,289 @@ msgstr ""
 #: ../libtransmission/metainfo.c:670 ../libtransmission/metainfo.c:679
 #, c-format
 msgid "Invalid metadata entry \"%s\""
-msgstr ""
+msgstr "Entrada de metadades «%s» invàlida"
 
 #: ../libtransmission/metainfo.c:279
-#, fuzzy
 msgid "Torrent is empty"
-msgstr "Camí al fitxer torrent"
+msgstr "El torrent està buit"
 
 #: ../libtransmission/metainfo.c:288
-#, fuzzy
 msgid "Torrent is corrupt"
-msgstr "Camí al fitxer torrent"
+msgstr "El torrent està malmès"
 
 #: ../libtransmission/metainfo.c:503
 #, c-format
 msgid "Invalid announce URL \"%s\""
-msgstr ""
+msgstr "URL d'anunci «%s» invàlid"
 
 #: ../libtransmission/metainfo.c:710
 msgid "Invalid or missing metadata entries \"length\" and \"files\""
-msgstr ""
+msgstr "Falten o són invàlides les entrades de metadades «length» (longitud) i «files» (fitxers)"
 
 #: ../libtransmission/natpmp.c:34
 msgid "Port Forwarding (NAT-PMP)"
-msgstr ""
+msgstr "Redireccionament del port (NAT-PMP)"
 
 #: ../libtransmission/natpmp.c:68
 #, c-format
 msgid "%s: %s responded 'try again'"
-msgstr ""
+msgstr "%s: %s ha respost «torna a intentar-ho»"
 
 #: ../libtransmission/natpmp.c:70
 #, c-format
 msgid "%s: %s succeeded (%d)"
-msgstr ""
+msgstr "%s: %s se n'ha sortit (%d)"
 
 #: ../libtransmission/natpmp.c:72
 #, c-format
 msgid "%s: %s failed (%d): %s (%d)"
-msgstr ""
+msgstr "%s: %s ha fallat (%d): %s (%d)"
 
 #: ../libtransmission/natpmp.c:112
 #, c-format
 msgid ""
 "%s: If your router supports NAT-PMP, please make sure NAT-PMP is enabled!"
-msgstr ""
+msgstr "%s: si el vostre encaminador admet NAT-PMP, assegureu-vos que el NAT-PMP està habilitat."
 
 #: ../libtransmission/natpmp.c:113
 #, c-format
 msgid "%s: NAT-PMP port forwarding unsuccessful, trying UPnP next"
-msgstr ""
+msgstr "%s: ha fallat el redireccionament del port NAT-PMP, s'intentarà amb UPnP"
 
 #: ../libtransmission/natpmp.c:139
 #, c-format
 msgid "%s: found public address %s"
-msgstr ""
+msgstr "%s: s'ha trobat l'adreça pública %s"
 
 #: ../libtransmission/natpmp.c:166
 #, c-format
 msgid "%s: no longer forwarding port %d"
-msgstr ""
+msgstr "%s: ja no es redirecciona més el port %d"
 
 #: ../libtransmission/natpmp.c:202
 #, c-format
 msgid "%s: port %d forwarded successfully"
-msgstr ""
+msgstr "%s: redireccionament del port %d completat"
 
 #: ../libtransmission/net.c:95
 #, c-format
 msgid "Couldn't set socket to non-blocking mode: %s"
-msgstr ""
+msgstr "No s'ha pogut establir el sòcol a mode sense blocatge: %s"
 
 #: ../libtransmission/net.c:135
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
-msgstr ""
+msgstr "No s'ha pogut connectar el sòcol %d a %s, port %d (error %d -%s)"
 
 #: ../libtransmission/net.c:176
 #, c-format
 msgid "Couldn't bind port %d: %s"
-msgstr ""
+msgstr "No s'ha pogut vincular el port %d: %s"
 
 #: ../libtransmission/net.c:181
 #, c-format
 msgid "Bound socket %d to port %d"
-msgstr ""
+msgstr "S'ha vinculat el sòcol %d al port %d"
 
 #: ../libtransmission/peer-msgs.c:975
 #, c-format
 msgid "Torrent \"%s\" got %d peers from peer exchange"
-msgstr ""
+msgstr "El torrent «%s» ha obtingut %d clients de l'intercanvi de clients"
 
 #: ../libtransmission/shared.c:41
 msgid "Port Forwarding"
-msgstr ""
+msgstr "Redireccionament de ports"
 
 #. we're in the process of trying to set up port forwarding
 #: ../libtransmission/shared.c:72
-#, fuzzy
 msgid "starting"
-msgstr "Relació de la sessió"
+msgstr "s'està iniciant"
 
 #. we've successfully forwarded the port
 #: ../libtransmission/shared.c:74
-#, fuzzy
 msgid "forwarded"
-msgstr "Baixat:"
+msgstr "redireccionat"
 
 #. we're cancelling the port forwarding
 #: ../libtransmission/shared.c:76
 msgid "stopping"
-msgstr ""
+msgstr "s'està aturant"
 
 #. the port isn't forwarded
 #: ../libtransmission/shared.c:78
 msgid "not forwarded"
-msgstr ""
+msgstr "no redireccionat"
 
 #: ../libtransmission/shared.c:96
 #, c-format
 msgid "%s: state changed from \"%s\" to \"%s\""
-msgstr ""
+msgstr "%s: l'estat ha canviat de «%s» a «%s»"
 
 #: ../libtransmission/shared.c:106
 #, c-format
 msgid "%s: Closing port %d"
-msgstr ""
+msgstr "%s: s'està tancant el port %d"
 
 #: ../libtransmission/shared.c:117
 #, c-format
 msgid "%s: Opened port %d to listen for incoming peer connections"
-msgstr ""
+msgstr "%s: s'ha obert el port %d per a escoltar connexions de clients d'entrada"
 
 #: ../libtransmission/shared.c:122
 #, c-format
 msgid ""
 "%s: Couldn't open port %d to listen for incoming peer connections (errno %d "
 "- %s)"
-msgstr ""
+msgstr "%s: no s'ha pogut obrir el port %d per a escoltar connexions de clients d'entrada (error %d - %s)"
 
 #: ../libtransmission/shared.c:160
 #, c-format
 msgid "%s: stopped"
-msgstr ""
+msgstr "%s: aturat"
 
 #: ../libtransmission/torrent.c:158
-#, fuzzy, c-format
+#, c-format
 msgid "Tracker warning: %s"
-msgstr "Rastrejador"
+msgstr "Avís del rastrejador: %s"
 
 #: ../libtransmission/torrent.c:164
-#, fuzzy, c-format
+#, c-format
 msgid "Tracker error: %s"
-msgstr "Rastrejador"
+msgstr "Error del rastrejador: %s"
 
 #: ../libtransmission/torrent.c:876
 #, c-format
 msgid "Closing torrent %s; %d torrents left"
-msgstr ""
+msgstr "S'està tancant el torrent %s. Queden %d torrents"
 
 #. first %s is the application name
 #. second %s is the version number
 #: ../libtransmission/transmission.c:176
-#, fuzzy, c-format
+#, c-format
 msgid "%s %s started"
-msgstr "%s (%s verificat)"
+msgstr "%s %s iniciat"
 
 #: ../libtransmission/transmission.c:464
 #, c-format
 msgid "Loaded %d torrents"
-msgstr ""
+msgstr "S'han carregat %d torrents"
 
 #: ../libtransmission/upnp.c:27
 msgid "Port Forwarding (UPnP)"
-msgstr ""
+msgstr "Redireccionament de ports (UPnP)"
 
 #: ../libtransmission/upnp.c:91
 #, c-format
 msgid "%s: upnpDiscover failed (errno %d - %s)"
-msgstr ""
+msgstr "%s: ha fallat l'upnpDiscover (error %d - %s)"
 
 #: ../libtransmission/upnp.c:95
 #, c-format
 msgid "%s: Found Internet Gateway Device \"%s\""
-msgstr ""
+msgstr "%s: s'ha trobat un dispositiu de porta d'enllaç a Internet «%s»"
 
 #: ../libtransmission/upnp.c:96
 #, c-format
 msgid "%s: Local Address is \"%s\""
-msgstr ""
+msgstr "%s: l'adreça local és «%s»"
 
 #: ../libtransmission/upnp.c:101
 #, c-format
 msgid "%s: UPNP_GetValidIGD failed (errno %d - %s)"
-msgstr ""
+msgstr "%s: ha fallat l'UPNP_GetValidIGD (error %d - %s)"
 
 #: ../libtransmission/upnp.c:102 ../libtransmission/upnp.c:157
 #, c-format
 msgid "%s: If your router supports UPnP, please make sure UPnP is enabled!"
-msgstr ""
+msgstr "%s: si el vostre encaminador admet UPnP, assegureu-vos que el UPnP està habilitat."
 
 #: ../libtransmission/upnp.c:120
 #, c-format
 msgid "%s: Stopping port forwarding of \"%s\", service \"%s\""
-msgstr ""
+msgstr "%s: s'està aturant el redireccionament del port «%s», servei «%s»"
 
 #: ../libtransmission/upnp.c:149
 #, c-format
 msgid "%s: Port forwarding via \"%s\", service \"%s\".  (local address: %s:%d)"
-msgstr ""
+msgstr "%s: redireccionament del port mitjançant «%s», servei «%s». (adreça local: %s:%d)"
 
 #: ../libtransmission/upnp.c:152
 #, c-format
 msgid "%s: Port forwarding successful!"
-msgstr ""
+msgstr "%s: redireccionament del port completat"
 
 #: ../libtransmission/upnp.c:156
 #, c-format
 msgid "%s: Port forwarding failed with error %d (%d - %s)"
-msgstr ""
+msgstr "%s: el redireccionament del port ha fallat amb l'error %d (%d - %s)"
 
 #: ../libtransmission/utils.c:365 ../libtransmission/utils.c:371
 #: ../libtransmission/utils.c:379 ../libtransmission/utils.c:385
 #: ../libtransmission/utils.c:392
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't read file \"%s\": %s"
-msgstr "S'ha produït un error al escriure a «%s»: %s"
+msgstr "No s'ha pogut llegir el fitxer «%s»: %s"
 
 #: ../libtransmission/utils.c:371
 msgid "Not a regular file"
-msgstr ""
+msgstr "No és un fitxer normal"
 
 #: ../libtransmission/utils.c:385
-#, fuzzy
 msgid "Memory allocation failed"
-msgstr "No s'ha pogut crear el torrent."
+msgstr "Ha fallat l'assignació de memòria"
 
 #: ../libtransmission/utils.c:457
 #, c-format
 msgid "File \"%s\" is in the way"
-msgstr ""
+msgstr "El fitxer «%s» està en camí"
 
 #: ../libtransmission/utils.c:524
-#, fuzzy
 msgid "No error"
-msgstr "Errors"
+msgstr "Cap error"
 
 #: ../libtransmission/utils.c:527
 msgid "Generic error"
-msgstr ""
+msgstr "Error genèric"
 
 #: ../libtransmission/utils.c:529
 msgid "Assert error"
-msgstr ""
+msgstr "Error d'asserció"
 
 #: ../libtransmission/utils.c:532
 msgid "Destination folder doesn't exist"
-msgstr ""
+msgstr "La carpeta de destinació no existeix"
 
 #: ../libtransmission/utils.c:542
 msgid "A torrent with this name and destination folder already exists."
-msgstr ""
+msgstr "Ja existeix un torrent amb aquest nom i carpeta de destinació."
 
 #: ../libtransmission/utils.c:544
 msgid "Generic I/O error"
-msgstr ""
+msgstr "Error d'E/S genèric"
 
 #: ../libtransmission/utils.c:547
-#, fuzzy
 msgid "Tracker error"
-msgstr "Rastrejador"
+msgstr "Error del rastrejador"
 
 #: ../libtransmission/utils.c:549
-#, fuzzy
 msgid "Tracker warning"
-msgstr "Rastrejador"
+msgstr "Avis del rastrejador"
 
 #: ../libtransmission/utils.c:552
 msgid "Peer sent a bad message"
-msgstr ""
+msgstr "El client ha enviat un missatge incorrecte"
 
 #: ../libtransmission/utils.c:555
 msgid "Unknown error"
-msgstr ""
+msgstr "Error desconegut"
 
 #: ../libtransmission/verify.c:128
 #, c-format
 msgid "Verifying torrent \"%s\""
-msgstr ""
+msgstr "S'està verificant el torrent «%s»"
 
 #: ../libtransmission/verify.c:160
-#, fuzzy, c-format
+#, c-format
 msgid "Queueing \"%s\" for verification"
 msgstr ""
-"No s'ha pogut obrir el fitxer %s per a escriure-hi:\n"
-"%s"
-
-#, fuzzy
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr "S'ha produït un error al escriure a «%s»: %s"
-
-#, fuzzy
-#~ msgid "Too many open files"
-#~ msgstr "Fitxers torrent"
-
-#, fuzzy
-#~ msgid "Torrent has no files."
-#~ msgstr "Fitxers torrent"
-
-#, fuzzy
-#~ msgid "Torrent is zero bytes long."
-#~ msgstr "el torrent ja està obert"
-
-#, fuzzy
-#~ msgid "Couldn't create socket of type %d"
-#~ msgstr "No s'ha pogut crear el sòcol: %s"
-
-#, fuzzy
-#~ msgid "_Open"
-#~ msgstr "_Opcions"
-
-#, fuzzy
-#~ msgid "Open an existing torrent"
-#~ msgstr "Obre un torrent"
-
-#~ msgid "_Remove"
-#~ msgstr "_Suprimeix"
-
-#~ msgid "_Close"
-#~ msgstr "_Tanca"
-
-#~ msgid "Select _All"
-#~ msgstr "Selecciona-ho _tot"
-
-#~ msgid "Torrent Details"
-#~ msgstr "Detalls del torrent"
-
-#~ msgid "_About Transmission"
-#~ msgstr "_Quant al Transmission"
-
-#~ msgid ""
-#~ "Failed to create the directory %s:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "No s'ha pogut crear el directori %s:\n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid "Failed to open lockfile %s: %s"
-#~ msgstr ""
-#~ "No s'ha pogut bloquejar el fitxer %s:\n"
-#~ "%s"
-
-#~ msgid "Secure"
-#~ msgstr "Seguretat"
-
-#, fuzzy
-#~ msgid "Created by"
-#~ msgstr "Creat per"
-
-#~ msgid "N/A"
-#~ msgstr "N/D"
-
-#, fuzzy
-#~ msgid "Downloaded data"
-#~ msgstr "Dades baixades"
-
-#, fuzzy
-#~ msgid "Torrent file name"
-#~ msgstr "Nom del fitxer torrent"
-
-#, fuzzy
-#~ msgid "Completeness"
-#~ msgstr "Finalitzat:"
-
-#, fuzzy
-#~ msgid "Limit _download speed to:"
-#~ msgstr "Limita la velocitat de _baixada (KiB/s):"
-
-#, fuzzy
-#~ msgid "KiB/s"
-#~ msgstr "KiB"
-
-#, fuzzy
-#~ msgid "Limit _upload speed to:"
-#~ msgstr "Limita la velocitat de _pujada (KiB/s):"
-
-#, fuzzy
-#~ msgid "peers"
-#~ msgstr "_Clients"
-
-#~ msgid "Info"
-#~ msgstr "Informació"
-
-#~ msgid "Choose a directory"
-#~ msgstr "Seleccioneu un directori"
-
-#~ msgid "This will close all active torrents."
-#~ msgstr "Això tancarà tots els torrents actius."
-
-#, fuzzy
-#~ msgid "Delete torrent?"
-#~ msgid_plural "Delete torrents?"
-#~ msgstr[0] "Crea un torrent nou"
-#~ msgstr[1] "Crea un torrent nou"
-
-#~ msgid "Failed to create socket: %s"
-#~ msgstr "No s'ha pogut crear el sòcol: %s"
-
-#~ msgid "Failed to connect to %s: %s"
-#~ msgstr "No s'ha pogut connectar amb %s: %s"
-
-#~ msgid "Failed to set up socket: %s"
-#~ msgstr "No s'ha pogut configurar el sòcol: %s"
-
-#~ msgid "File"
-#~ msgid_plural "Files"
-#~ msgstr[0] "Fitxer"
-#~ msgstr[1] "Fitxers"
-
-#~ msgid "Piece"
-#~ msgid_plural "Pieces"
-#~ msgstr[0] "Peça"
-#~ msgstr[1] "Peces"
-
-#~ msgid "Directory"
-#~ msgstr "Directori"
-
-#~ msgid "Error writing to \"%s\": %s"
-#~ msgstr "S'ha produït un error al escriure a «%s»: %s"
-
-#, fuzzy
-#~ msgid "Download _to:"
-#~ msgstr "Baixa"
-
-#~ msgid "Cumulative"
-#~ msgstr "Acumulatiu"
-
-#, fuzzy
-#~ msgid "Ratio: %s, "
-#~ msgstr "Relació: %.1f, "
-
-#, fuzzy
-#~ msgid "Show an _icon in the system tray"
-#~ msgstr "Mostra una icona en la _safata del sistema"
-
-#~ msgid "Confirm _quit"
-#~ msgstr "_Demana confirmació per a sortir"
-
-#~ msgid "Uploading to %d of %d peer"
-#~ msgid_plural "Uploading to %d of %d peers"
-#~ msgstr[0] "S'està pujant a %d de %d client"
-#~ msgstr[1] "S'està pujant a %d de %d clients"
-
-#~ msgid "Seeding to %d of %d peer"
-#~ msgid_plural "Seeding to %d of %d peers"
-#~ msgstr[0] "S'està compartint a %d de %d client"
-#~ msgstr[1] "S'està compartint a %d de %d clients"
-
-#~ msgid "Unrecognized state: %d"
-#~ msgstr "Estat no reconegut: %d"
-
-#, fuzzy
-#~ msgid "%d Transfer"
-#~ msgid_plural "%d Transfers"
-#~ msgstr[0] "%d transferit"
-#~ msgstr[1] "%d transferit"
-
-#~ msgid "Down: %s  Up: %s"
-#~ msgstr "Baixada: %s  Pujada: %s"
-
-#~ msgid "B"
-#~ msgstr "B"
-
-#~ msgid "KiB"
-#~ msgstr "KiB"
-
-#~ msgid "MiB"
-#~ msgstr "MiB"
-
-#~ msgid "GiB"
-#~ msgstr "GiB"
-
-#~ msgid "TiB"
-#~ msgstr "TiB"
-
-#~ msgid "PiB"
-#~ msgstr "PiB"
-
-#~ msgid "EiB"
-#~ msgstr "EiB"
-
-#~ msgid "ZiB"
-#~ msgstr "ZiB"
-
-#~ msgid "YiB"
-#~ msgstr "YiB"
-
-#~ msgid "%i %s"
-#~ msgstr "%i %s"
-
-#~ msgid "sec"
-#~ msgid_plural "secs"
-#~ msgstr[0] "segon"
-#~ msgstr[1] "segons"
-
-#~ msgid "%i %s %i %s"
-#~ msgstr "%i %s %i %s"
-
-#~ msgid "min"
-#~ msgid_plural "mins"
-#~ msgstr[0] "minut"
-#~ msgstr[1] "minuts"
-
-#~ msgid "hr"
-#~ msgid_plural "hrs"
-#~ msgstr[0] "hora"
-#~ msgstr[1] "hores"
-
-#~ msgid "Transfer files via Peer to Peer"
-#~ msgstr "Transfereix fitxers mitjançant P2P"
-
-#~ msgid "_High"
-#~ msgstr "_Alta"
-
-#~ msgid "_Normal"
-#~ msgstr "_Normal"
-
-#~ msgid "_Low"
-#~ msgstr "_Baixa"
-
-#~ msgid "Show Message _Log"
-#~ msgstr "Mostra el registre de _missatges"
-
-#~ msgid "_Priority"
-#~ msgstr "_Prioritat"
-
-#~ msgid "Create _New Torrent"
-#~ msgstr "Crea un torrent _nou"
-
-#~ msgid "Use alternate _download directory"
-#~ msgstr "Utilitza un altre directori de _baixada"
-
-#~ msgid "Choose a download directory"
-#~ msgstr "Seleccioneu un directori de baixada"
-
-#~ msgid "Torrent creation aborted."
-#~ msgstr "Creació del torrent interrompuda."
-
-#~ msgid "Making Torrent..."
-#~ msgstr "S'està creant el Torrent..."
-
-#~ msgid "Downloading from %d of %d connected peers"
-#~ msgstr "S'està baixant des de %d de %d clients connectats"
-
-#~ msgid "Seeding to %d of %d connected peers"
-#~ msgstr "S'està compartint a %d de %d clients connectats"
-
-#~ msgid "Progress"
-#~ msgstr "Progrés"
-
-#~ msgid "Downloading"
-#~ msgstr "S'està baixant"
-
-#~ msgid "DL Rate"
-#~ msgstr "Velocitat baixada"
-
-#~ msgid "Uploading"
-#~ msgstr "S'està pujant"
-
-#~ msgid "UL Rate"
-#~ msgstr "Velocitat pujada"
-
-#~ msgid "Handshaking"
-#~ msgstr "S'està confirmant la connexió"
-
-#~ msgid "Uploading to peer"
-#~ msgstr "S'està pujant al client"
-
-#~ msgid "Peer wants our data"
-#~ msgstr "Clients que volen dades"
-
-#~ msgid "Refusing to send data to peer"
-#~ msgstr "S'està refusant enviar dades al client"
-
-#~ msgid "Downloading from peer"
-#~ msgstr "S'està baixant des del client"
-
-#~ msgid "Requesting data from peer"
-#~ msgstr "S'estan sol·licitant dades del client"
-
-#~ msgid "Waiting to request data from peer"
-#~ msgstr "S'està esperant per a sol·licitar dades des del client"
-
-#~ msgid "Peer will not send us data"
-#~ msgstr "El client no ens enviarà dades"
-
-#~ msgid "Added:"
-#~ msgstr "Afegit:"
-
-#~ msgid "Priority"
-#~ msgstr "Prioritat"
-
-#~ msgid "_Info"
-#~ msgstr "_Info"
-
-#~ msgid "_Files"
-#~ msgstr "_Fitxers"
-
-#~ msgid "Use the torrent file where it is"
-#~ msgstr "Utilitza el fitxer torrent on estigui"
-
-#~ msgid "Keep a copy of the torrent file"
-#~ msgstr "Emmagatzema una copia del fitxer torrent"
-
-#~ msgid "Keep a copy and remove the original"
-#~ msgstr "Emmagatzema una copia i suprimeix l'original"
-
-#~ msgid "_Limit Upload Speed (KiB/s)"
-#~ msgstr "_Limita la velocitat de pujada (KiB/s):"
-
-#~ msgid "Li_mit Download Speed (KiB/s)"
-#~ msgstr "Li_mita la velocitat de baixada (KiB/s):"
-
-#~ msgid "Downloads"
-#~ msgstr "Baixades"
-
-#~ msgid "P_rompt for download directory"
-#~ msgstr "P_regunta el directori de baixada"
-
-#~ msgid "For torrents added _normally:"
-#~ msgstr "Per a torrents afegits _normalment:"
-
-#~ msgid "For torrents added from _command-line:"
-#~ msgstr "Per a torrents afegits des de la línia d'_ordres:"
-
-#~ msgid "Global maximum connected peers:"
-#~ msgstr "Número màxim de clients globals connectats:"
-
-#~ msgid "_Automatically map port"
-#~ msgstr "Mapeja _automàticament el port"
-
-#~ msgid "NAT traversal uses either NAT-PMP or UPnP"
-#~ msgstr "El NAT transversal utilitza el NAT-PMP o UPnP"
-
-#~ msgid "%d of %d Transfers"
-#~ msgstr "%d de %d transferits"
-
-#~ msgid "%d Transfers"
-#~ msgstr "%d transferits"
-
-#~ msgid "Ratio: %.1f"
-#~ msgstr "Relació: %.1f"
+"S'està encuant «%s» per a verificar-lo"
