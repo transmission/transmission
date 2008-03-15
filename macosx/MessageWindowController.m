@@ -76,6 +76,8 @@
     fInfoImage = [NSImage imageNamed: @"YellowDot.png"];
     fDebugImage = [NSImage imageNamed: @"PurpleDot.png"];
     
+    [[self window] setTitle: NSLocalizedString(@"Message Log", "Message window -> title")];
+    
     //set images and text for popup button items
     [[fLevelButton itemAtIndex: LEVEL_ERROR] setImage: fErrorImage];
     [[fLevelButton itemAtIndex: LEVEL_ERROR] setTitle: NSLocalizedString(@"Error", "Message window -> level string")];
