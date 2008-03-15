@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "MessageWindowController.h"
+#import "NSStringAdditions.h"
 #import <transmission.h>
 
 #define LEVEL_ERROR 0
@@ -75,10 +76,39 @@
     fInfoImage = [NSImage imageNamed: @"YellowDot.png"];
     fDebugImage = [NSImage imageNamed: @"PurpleDot.png"];
     
-    //set images to popup button items
+    //set images and text for popup button items
     [[fLevelButton itemAtIndex: LEVEL_ERROR] setImage: fErrorImage];
+    [[fLevelButton itemAtIndex: LEVEL_ERROR] setTitle: NSLocalizedString(@"Error", "Message window -> level string")];
     [[fLevelButton itemAtIndex: LEVEL_INFO] setImage: fInfoImage];
+    [[fLevelButton itemAtIndex: LEVEL_INFO] setTitle: NSLocalizedString(@"Info", "Message window -> level string")];
     [[fLevelButton itemAtIndex: LEVEL_DEBUG] setImage: fDebugImage];
+    [[fLevelButton itemAtIndex: LEVEL_DEBUG] setTitle: NSLocalizedString(@"Debug", "Message window -> level string")];
+    
+    //set table column text
+    [[[fMessageTable tableColumnWithIdentifier: @"Date"] headerCell] setTitle: NSLocalizedString(@"Date",
+        "Message window -> table column")];
+    [[[fMessageTable tableColumnWithIdentifier: @"Name"] headerCell] setTitle: NSLocalizedString(@"Process",
+        "Message window -> table column")];
+    [[[fMessageTable tableColumnWithIdentifier: @"Message"] headerCell] setTitle: NSLocalizedString(@"Message",
+        "Message window -> table column")];
+    
+    //set and size buttons
+    [fSaveButton setTitle: [NSLocalizedString(@"Save", "Message window -> save button") stringByAppendingEllipsis]];
+    [fSaveButton sizeToFit];
+    
+    NSRect saveButtonFrame = [fSaveButton frame];
+    saveButtonFrame.size.width += 10.0;
+    [fSaveButton setFrame: saveButtonFrame];
+    
+    float oldClearButtonWidth = [fClearButton frame].size.width;
+    
+    [fClearButton setTitle: NSLocalizedString(@"Clear", "Message window -> save button")];
+    [fClearButton sizeToFit];
+    
+    NSRect clearButtonFrame = [fClearButton frame];
+    clearButtonFrame.size.width = MAX(clearButtonFrame.size.width + 10.0, saveButtonFrame.size.width);
+    clearButtonFrame.origin.x -= clearButtonFrame.size.width - oldClearButtonWidth;
+    [fClearButton setFrame: clearButtonFrame];
     
     //select proper level in popup button
     switch (tr_getMessageLevel())
