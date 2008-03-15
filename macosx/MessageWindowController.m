@@ -367,24 +367,24 @@
     switch ([[message objectForKey: @"Level"] intValue])
     {
         case TR_MSG_ERR:
-            level = @"[Error]";
+            level = NSLocalizedString(@"Error", "Message window -> level");
             break;
         case TR_MSG_INF:
-            level = @"[Info]";
+            level = NSLocalizedString(@"Info", "Message window -> level");
             break;
         case TR_MSG_DBG:
-            level = @"[Debug]";
+            level = NSLocalizedString(@"Debug", "Message window -> level");
             break;
         default:
             level = @"";
     }
     
-    NSMutableArray * strings = [NSMutableArray arrayWithObjects: [message objectForKey: @"Date"], level,
-                                [message objectForKey: @"Message"], nil];
+    NSMutableArray * strings = [NSMutableArray arrayWithObjects: [message objectForKey: @"Date"],
+                                [NSString stringWithFormat: @"[%@]", level], [message objectForKey: @"Message"], nil];
     
-    NSString * torrent;
-    if ((torrent = [message objectForKey: @"Name"]))
-        [strings insertObject: [torrent stringByAppendingString: @":"] atIndex: 2];
+    NSString * name;
+    if ((name = [message objectForKey: @"Name"]))
+        [strings insertObject: [name stringByAppendingString: @":"] atIndex: 2];
     
     NSString * file;
     if ((file = [self fileForMessage: message]))
