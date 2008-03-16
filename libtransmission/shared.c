@@ -93,7 +93,7 @@ natPulse( tr_shared * s )
     if( status == TR_NAT_TRAVERSAL_ERROR )
         status = tr_upnpPulse( s->upnp, port, isEnabled );
     if( status != s->natStatus ) {
-        tr_ninf( getKey(), _( "state changed from \"%s\" to \"%s\"" ), getNatStateStr(s->natStatus), getNatStateStr(status) );
+        tr_ninf( getKey(), _( "State changed from \"%s\" to \"%s\"" ), getNatStateStr(s->natStatus), getNatStateStr(status) );
         s->natStatus = status;
     }
 }

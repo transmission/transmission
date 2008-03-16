@@ -427,6 +427,9 @@ msgwin_new( TrCore * core )
 
     data->filter = gtk_tree_model_filter_new( GTK_TREE_MODEL( data->store ), NULL );
     data->sort = gtk_tree_model_sort_new_with_model( data->filter );
+    gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( data->sort ),
+                                          COL_SEQUENCE,
+                                          GTK_SORT_ASCENDING );
     data->maxLevel = pref_int_get( PREF_KEY_MSGLEVEL );
     gtk_tree_model_filter_set_visible_func( GTK_TREE_MODEL_FILTER( data->filter ),
                                             isRowVisible, data, NULL );
