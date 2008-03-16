@@ -57,6 +57,95 @@ tr_handle * fLib;
                 selector: @selector(updateStats) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
+    
+    //set label text
+    [fUploadedLabelField setStringValue: NSLocalizedString(@"Uploaded:", "Stats window -> label")];
+    [fDownloadedLabelField setStringValue: NSLocalizedString(@"Downloaded:", "Stats window -> label")];
+    [fRatioLabelField setStringValue: NSLocalizedString(@"Ratio:", "Stats window -> label")];
+    [fTimeLabelField setStringValue: NSLocalizedString(@"Running Time:", "Stats window -> label")];
+    [fNumOpenedLabelField setStringValue: NSLocalizedString(@"Program Started:", "Stats window -> label")];
+    
+    //size all elements
+    float oldWidth = [fUploadedLabelField frame].size.width;
+    
+    [fUploadedLabelField sizeToFit];
+    [fDownloadedLabelField sizeToFit];
+    [fRatioLabelField sizeToFit];
+    [fTimeLabelField sizeToFit];
+    [fNumOpenedLabelField sizeToFit];
+    
+    float maxWidth = MAX([fUploadedLabelField frame].size.width, [fDownloadedLabelField frame].size.width);
+    maxWidth = MAX(maxWidth, [fRatioLabelField frame].size.width);
+    maxWidth = MAX(maxWidth, [fTimeLabelField frame].size.width);
+    maxWidth = MAX(maxWidth, [fNumOpenedLabelField frame].size.width);
+    
+    NSRect frame = [fUploadedLabelField frame];
+    frame.size.width = maxWidth;
+    [fUploadedLabelField setFrame: frame];
+    
+    frame = [fDownloadedLabelField frame];
+    frame.size.width = maxWidth;
+    [fDownloadedLabelField setFrame: frame];
+    
+    frame = [fRatioLabelField frame];
+    frame.size.width = maxWidth;
+    [fRatioLabelField setFrame: frame];
+    
+    frame = [fTimeLabelField frame];
+    frame.size.width = maxWidth;
+    [fTimeLabelField setFrame: frame];
+    
+    frame = [fNumOpenedLabelField frame];
+    frame.size.width = maxWidth;
+    [fNumOpenedLabelField setFrame: frame];
+    
+    //size fields to correspond with labels
+    float change = maxWidth - oldWidth;
+    
+    frame = [fUploadedField frame];
+    frame.size.width -= change;
+    frame.origin.x += change;
+    [fUploadedField setFrame: frame];
+    
+    frame = [fUploadedAllField frame];
+    frame.size.width -= change;
+    frame.origin.x += change;
+    [fUploadedAllField setFrame: frame];
+    
+    frame = [fDownloadedField frame];
+    frame.size.width -= change;
+    frame.origin.x += change;
+    [fDownloadedField setFrame: frame];
+    
+    frame = [fDownloadedAllField frame];
+    frame.size.width -= change;
+    frame.origin.x += change;
+    [fDownloadedAllField setFrame: frame];
+    
+    frame = [fRatioField frame];
+    frame.size.width -= change;
+    frame.origin.x += change;
+    [fRatioField setFrame: frame];
+    
+    frame = [fRatioAllField frame];
+    frame.size.width -= change;
+    frame.origin.x += change;
+    [fRatioAllField setFrame: frame];
+    
+    frame = [fTimeField frame];
+    frame.size.width -= change;
+    frame.origin.x += change;
+    [fTimeField setFrame: frame];
+    
+    frame = [fTimeAllField frame];
+    frame.size.width -= change;
+    frame.origin.x += change;
+    [fTimeAllField setFrame: frame];
+    
+    frame = [fNumOpenedField frame];
+    frame.size.width -= change;
+    frame.origin.x += change;
+    [fNumOpenedField setFrame: frame];
 }
 
 - (void) windowWillClose: (id)sender
