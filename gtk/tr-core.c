@@ -554,7 +554,7 @@ doCollate( const char * in )
 
     while( in < end ) {
         const gunichar ch = g_utf8_get_char( in );
-        if (!g_unichar_isalnum (ch)) // eat everything before the first alnum
+        if (!g_unichar_isalnum (ch)) /* eat everything before the first alnum */
             in += g_unichar_to_utf8( ch, NULL );
         else
             break;

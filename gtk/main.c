@@ -63,7 +63,7 @@
 #include <libtransmission/version.h>
 
 /* interval in milliseconds to update the torrent list display */
-#define UPDATE_INTERVAL         1000
+#define UPDATE_INTERVAL         1666
 
 /* interval in milliseconds to check for stopped torrents and update display */
 #define EXIT_CHECK_INTERVAL     500
@@ -319,9 +319,6 @@ main( int argc, char ** argv )
         /* create main window now to be a parent to any error dialogs */
         GtkWindow * mainwind = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
         g_signal_connect( mainwind, "window-state-event", G_CALLBACK(windowStateChanged), cbdata );
-
-        /* set message level here before tr_init() */
-        msgwin_loadpref( );
 
         appsetup( mainwind, argfiles, cbdata, startpaused, startminimized );
     }
@@ -880,9 +877,6 @@ updatemodel(gpointer gdata) {
   if( data->wind )
       tr_window_update( data->wind );
 
-  /* update the message window */
-  msgwin_update();
-
   return TRUE;
 }
 
@@ -1123,7 +1117,7 @@ doAction ( const char * action_name, gpointer user_data )
     {
         if( !data->msgwin )
         {
-            GtkWidget * win = msgwin_create( data->core );
+            GtkWidget * win = msgwin_new( data->core );
             g_signal_connect( win, "destroy", G_CALLBACK( msgwinclosed ), 
                              NULL );
             data->msgwin = win;

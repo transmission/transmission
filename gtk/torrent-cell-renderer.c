@@ -77,7 +77,7 @@ getProgressString( const tr_info * info, const tr_stat * torStat )
                   tr_strlsize( buf2, torStat->uploadedEver, sizeof(buf2) ),
                   tr_strlratio( buf3, torStat->ratio, sizeof( buf3 ) ) );
 
-    // add time when downloading
+    /* add time when downloading */
     if( torStat->status == TR_STATUS_DOWNLOAD )
     {
         const int eta = torStat->eta;
