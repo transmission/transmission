@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  * 
- * $Id:$
+ * $Id$
  */
 
 #include <errno.h>
@@ -28,13 +28,10 @@
 
 enum
 {
-    COL_LEVEL,
-    COL_LINE,
-    COL_FILE,
-    COL_TIME,
+    COL_SEQUENCE,
     COL_CATEGORY,
     COL_MESSAGE,
-    COL_SEQUENCE,
+    COL_TR_MSG,
     N_COLUMNS
 };
 
@@ -92,31 +89,22 @@ doSave( GtkWindow      * parent,
         GtkTreeModel * model = GTK_TREE_MODEL( data->sort );
         if( gtk_tree_model_iter_children( model, &iter, NULL ) ) do
         {
-            int level;
-            uint64_t time;
-            char * category;
-            char * message;
             char * date;
             const char * levelStr;
+            const struct tr_msg_list * node;
 
             gtk_tree_model_get( model, &iter,
-                                COL_LEVEL, &level,
-                                COL_TIME, &time,
-                                COL_CATEGORY, &category,
-                                COL_MESSAGE, &message,
+                                COL_TR_MSG, &node,
                                 -1 );
-            date = rfc822date( time*1000u );
-            switch( level ) {
+            date = rfc822date( node->when*1000u );
+            switch( node->level ) {
                 case TR_MSG_DBG: levelStr = "debug"; break;
                 case TR_MSG_ERR: levelStr = "error"; break;
                 default:         levelStr = "     "; break;
             }
-            fprintf( fp, "%s\t%s\t%s\t%s\n", date, levelStr, category, message );
+            fprintf( fp, "%s\t%s\t%s\t%s\n", date, levelStr, node->name, node->message );
 
-            /* cleanup */
             g_free( date );
-            g_free( message );
-            g_free( category );
         }
         while( gtk_tree_model_iter_next( model, &iter ) );
         fclose( fp );
@@ -193,15 +181,14 @@ renderText( GtkTreeViewColumn  * column UNUSED,
             GtkTreeIter        * iter,
             gpointer             gcol )
 {
-    int col = GPOINTER_TO_INT( gcol );
-    int level;
+    const int col = GPOINTER_TO_INT( gcol );
     char * str = NULL;
-    gtk_tree_model_get( tree_model, iter, col, &str, COL_LEVEL, &level, -1 );
+    const struct tr_msg_list * node;
+    gtk_tree_model_get( tree_model, iter, col, &str, COL_TR_MSG, &node, -1 );
     g_object_set( renderer, "text", str,
-                            "foreground", getForegroundColor( level ),
+                            "foreground", getForegroundColor( node->level ),
                             "ellipsize", PANGO_ELLIPSIZE_END,
                             NULL );
-    g_free( str );
 }
 
 static void
@@ -211,18 +198,15 @@ renderTime( GtkTreeViewColumn  * column UNUSED,
             GtkTreeIter        * iter,
             gpointer             data UNUSED )
 {
-    int level;
-    uint64_t tmp;
-    time_t time;
     struct tm tm;
     char buf[16];
+    const struct tr_msg_list * node;
 
-    gtk_tree_model_get(tree_model, iter, COL_TIME, &tmp, COL_LEVEL, &level, -1 );
-    time = tmp;
-    tm = *localtime( &time );
+    gtk_tree_model_get(tree_model, iter, COL_TR_MSG, &node, -1 );
+    tm = *localtime( &node->when );
     g_snprintf( buf, sizeof( buf ), "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec );
     g_object_set (renderer, "text", buf,
-                            "foreground", getForegroundColor( level ),
+                            "foreground", getForegroundColor( node->level ),
                             NULL );
 }
 
@@ -231,14 +215,10 @@ appendColumn( GtkTreeView * view, int col )
 {
     GtkCellRenderer * r;
     GtkTreeViewColumn * c;
-    int sort_col = col;
     const char * title = NULL;
 
     switch( col ) {
-        case COL_LEVEL:    title = NULL; break;
-        case COL_LINE:     title = NULL; break;
-        case COL_FILE:     title = _( "Filename" ); break;
-        case COL_TIME:     title = _( "Time" ); break;
+        case COL_SEQUENCE: title = _( "Time" ); break;
         case COL_CATEGORY: title = _( "Name"); break;
         case COL_MESSAGE:  title = _( "Message" ); break;
         default: g_assert_not_reached( );
@@ -246,13 +226,6 @@ appendColumn( GtkTreeView * view, int col )
 
     switch( col )
     {
-        case COL_LINE:
-            r = gtk_cell_renderer_text_new( );
-            c = gtk_tree_view_column_new_with_attributes( title, r, "text", col, NULL );
-            gtk_tree_view_column_set_resizable( c, FALSE );
-            break;
-
-        case COL_FILE:
         case COL_CATEGORY:
             r = gtk_cell_renderer_text_new( );
             c = gtk_tree_view_column_new_with_attributes( title, r, NULL );
@@ -271,12 +244,11 @@ appendColumn( GtkTreeView * view, int col )
             gtk_tree_view_column_set_resizable( c, TRUE );
             break;
 
-        case COL_TIME:
+        case COL_SEQUENCE:
             r = gtk_cell_renderer_text_new( );
             c = gtk_tree_view_column_new_with_attributes( title, r, NULL );
             gtk_tree_view_column_set_cell_data_func( c, r, renderTime, NULL, NULL );
             gtk_tree_view_column_set_resizable( c, TRUE );
-            sort_col = COL_SEQUENCE;
             break;
 
         default:
@@ -284,17 +256,17 @@ appendColumn( GtkTreeView * view, int col )
             break;
     }
 
-    gtk_tree_view_column_set_sort_column_id( c, sort_col );
+    gtk_tree_view_column_set_sort_column_id( c, col );
     gtk_tree_view_append_column( view, c );
 }
 
 static gboolean
 isRowVisible( GtkTreeModel * model, GtkTreeIter * iter, gpointer gdata )
 {
-    struct MsgData * data = gdata;
-    int level;
-    gtk_tree_model_get( model, iter, COL_LEVEL, &level, -1 );
-    return level <= data->maxLevel;
+    const struct MsgData * data = gdata;
+    const struct tr_msg_list * node;
+    gtk_tree_model_get( model, iter, COL_TR_MSG, &node, -1 );
+    return node->level <= data->maxLevel;
 }
 
 static void
@@ -317,10 +289,7 @@ addMessages( GtkListStore * store, struct tr_msg_list * head )
         GtkTreeIter unused;
 
         gtk_list_store_insert_with_values( store, &unused, 0,
-                                           COL_LEVEL, (int)i->level,
-                                           COL_LINE, i->line,
-                                           COL_FILE, i->file,
-                                           COL_TIME, (uint64_t)i->when,
+                                           COL_TR_MSG, i,
                                            COL_CATEGORY, ( i->name ? i->name : default_category ),
                                            COL_MESSAGE, i->message,
                                            COL_SEQUENCE, sequence++,
@@ -448,13 +417,11 @@ msgwin_new( TrCore * core )
     **/
 
     data->store = gtk_list_store_new( N_COLUMNS,
-                                      G_TYPE_INT,       /* level */
-                                      G_TYPE_INT,       /* line number */
-                                      G_TYPE_STRING,    /* file */
-                                      G_TYPE_UINT64,    /* time */
-                                      G_TYPE_STRING,    /* category */
-                                      G_TYPE_STRING,    /* message */
-                                      G_TYPE_INT );     /* sequence */
+                                      G_TYPE_INT,        /* sequence */
+                                      G_TYPE_POINTER,    /* category */
+                                      G_TYPE_POINTER,    /* message */
+                                      G_TYPE_POINTER);   /* struct tr_msg_list */
+
     addMessages( data->store, myHead );
     onRefresh( data ); /* much faster to populate *before* it has listeners */
 
@@ -468,7 +435,7 @@ msgwin_new( TrCore * core )
     view = gtk_tree_view_new_with_model( data->sort );
     data->view = GTK_TREE_VIEW( view );
     gtk_tree_view_set_rules_hint( data->view, TRUE );
-    appendColumn( data->view, COL_TIME );
+    appendColumn( data->view, COL_SEQUENCE );
     appendColumn( data->view, COL_CATEGORY );
     appendColumn( data->view, COL_MESSAGE );
     w = gtk_scrolled_window_new( NULL, NULL );
