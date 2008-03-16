@@ -37,7 +37,6 @@
 
 - (void) resizeColumn;
 - (NSString *) stringForMessage: (NSDictionary *) message;
-- (NSString *) fileForMessage: (NSDictionary *) message;
 
 @end
 
@@ -242,7 +241,8 @@
 - (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
                 tableColumn: (NSTableColumn *) column row: (int) row mouseLocation: (NSPoint) mouseLocation
 {
-    return [self fileForMessage: [fMessages objectAtIndex: row]];
+    NSDictionary * message = [fMessages objectAtIndex: row];
+    return [NSString stringWithFormat: @"%@:%@", [[message objectForKey: @"File"] lastPathComponent], [message objectForKey: @"Line"]];
 }
 
 - (void) copy: (id) sender
@@ -376,18 +376,9 @@
             level = @"";
     }
     
-    return [NSString stringWithFormat: @"%@ %@ %@: [%@] %@", [message objectForKey: @"Date"], [self fileForMessage: message],
-            [message objectForKey: @"Name"], level, [message objectForKey: @"Message"], nil];
-}
-
-- (NSString *) fileForMessage: (NSDictionary *) message
-{
-    NSString * file;
-    if ((file = [message objectForKey: @"File"]))
-        return [NSString stringWithFormat: @"%@:%@", [[message objectForKey: @"File"] lastPathComponent],
-                [message objectForKey: @"Line"]];
-    else
-        return nil;
+    return [NSString stringWithFormat: @"%@ %@:%@ [%@] %@: %@", [message objectForKey: @"Date"],
+            [[message objectForKey: @"File"] lastPathComponent], [message objectForKey: @"Line"], level,
+            [message objectForKey: @"Name"], [message objectForKey: @"Message"], nil];
 }
 
 @end
