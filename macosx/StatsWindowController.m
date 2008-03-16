@@ -30,6 +30,7 @@
 @interface StatsWindowController (Private)
 
 - (void) updateStats;
+- (void) trimRect: (float) shiftLeft forView: (NSView *) view;
 
 @end
 
@@ -102,50 +103,15 @@ tr_handle * fLib;
     //size fields to correspond with labels
     float change = maxWidth - oldWidth;
     
-    frame = [fUploadedField frame];
-    frame.size.width -= change;
-    frame.origin.x += change;
-    [fUploadedField setFrame: frame];
-    
-    frame = [fUploadedAllField frame];
-    frame.size.width -= change;
-    frame.origin.x += change;
-    [fUploadedAllField setFrame: frame];
-    
-    frame = [fDownloadedField frame];
-    frame.size.width -= change;
-    frame.origin.x += change;
-    [fDownloadedField setFrame: frame];
-    
-    frame = [fDownloadedAllField frame];
-    frame.size.width -= change;
-    frame.origin.x += change;
-    [fDownloadedAllField setFrame: frame];
-    
-    frame = [fRatioField frame];
-    frame.size.width -= change;
-    frame.origin.x += change;
-    [fRatioField setFrame: frame];
-    
-    frame = [fRatioAllField frame];
-    frame.size.width -= change;
-    frame.origin.x += change;
-    [fRatioAllField setFrame: frame];
-    
-    frame = [fTimeField frame];
-    frame.size.width -= change;
-    frame.origin.x += change;
-    [fTimeField setFrame: frame];
-    
-    frame = [fTimeAllField frame];
-    frame.size.width -= change;
-    frame.origin.x += change;
-    [fTimeAllField setFrame: frame];
-    
-    frame = [fNumOpenedField frame];
-    frame.size.width -= change;
-    frame.origin.x += change;
-    [fNumOpenedField setFrame: frame];
+    [self trimRect: change forView: fUploadedField];
+    [self trimRect: change forView: fUploadedAllField];
+    [self trimRect: change forView: fDownloadedField];
+    [self trimRect: change forView: fDownloadedAllField];
+    [self trimRect: change forView: fRatioField];
+    [self trimRect: change forView: fRatioAllField];
+    [self trimRect: change forView: fTimeField];
+    [self trimRect: change forView: fTimeAllField];
+    [self trimRect: change forView: fNumOpenedField];
 }
 
 - (void) windowWillClose: (id)sender
@@ -198,6 +164,14 @@ tr_handle * fLib;
     else
         [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d times", "stats window -> times opened"),
                                         statsAll.sessionCount]];
+}
+
+- (void) trimRect: (float) shiftLeft forView: (NSView *) view
+{
+    NSRect frame = [view frame];
+    frame.size.width -= shiftLeft;
+    frame.origin.x += shiftLeft;
+    [view setFrame: frame];
 }
 
 @end
