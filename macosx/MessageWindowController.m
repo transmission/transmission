@@ -150,19 +150,16 @@
     
     for (currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
-        NSMutableDictionary * message  = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                        [NSString stringWithUTF8String: currentMessage->message], @"Message",
-                                        [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
-                                        [NSNumber numberWithInt: currentMessage->level], @"Level", nil];
+        NSString * name = currentMessage->name != NULL ? [NSString stringWithUTF8String: currentMessage->name]
+                            : [[NSProcessInfo processInfo] processName];
         
-        if (currentMessage->file != NULL)
-        {
-            [message setObject: [NSString stringWithUTF8String: currentMessage->file] forKey: @"File"];
-            [message setObject: [NSNumber numberWithInt: currentMessage->line] forKey: @"Line"];
-        }
-        
-        if (currentMessage->name != NULL)
-            [message setObject: [NSString stringWithUTF8String: currentMessage->name] forKey: @"Name"];
+        NSDictionary * message  = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    [NSString stringWithUTF8String: currentMessage->message], @"Message",
+                                    [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
+                                    [NSNumber numberWithInt: currentMessage->level], @"Level",
+                                    name, @"Name",
+                                    [NSString stringWithUTF8String: currentMessage->file], @"File",
+                                    [NSNumber numberWithInt: currentMessage->line], @"Line", nil];
                                 
         [fMessages addObject: message];
     }
@@ -379,18 +376,8 @@
             level = @"";
     }
     
-    NSMutableArray * strings = [NSMutableArray arrayWithObjects: [message objectForKey: @"Date"],
-                                [NSString stringWithFormat: @"[%@]", level], [message objectForKey: @"Message"], nil];
-    
-    NSString * name;
-    if ((name = [message objectForKey: @"Name"]))
-        [strings insertObject: [name stringByAppendingString: @":"] atIndex: 2];
-    
-    NSString * file;
-    if ((file = [self fileForMessage: message]))
-        [strings insertObject: file atIndex: 1];
-    
-    return [strings componentsJoinedByString: @" "];
+    return [NSString stringWithFormat: @"%@ %@ %@: [%@] %@", [message objectForKey: @"Date"], [self fileForMessage: message],
+            [message objectForKey: @"Name"], level, [message objectForKey: @"Message"], nil];
 }
 
 - (NSString *) fileForMessage: (NSDictionary *) message
