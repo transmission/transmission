@@ -2796,12 +2796,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fTableView display];
 }
 
-- (void) toggleStatusBar: (id) sender
-{
-    [self showStatusBar: [fStatusBar isHidden] animate: YES];
-    [fDefaults setBool: ![fStatusBar isHidden] forKey: @"StatusBar"];
-}
-
 - (NSRect) windowFrameByAddingHeight: (float) height checkLimits: (BOOL) check
 {
     NSScrollView * scrollView = [fTableView enclosingScrollView];
@@ -2837,6 +2831,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     return windowFrame;
 }
 
+- (void) toggleStatusBar: (id) sender
+{
+    [self showStatusBar: [fStatusBar isHidden] animate: YES];
+    [fDefaults setBool: ![fStatusBar isHidden] forKey: @"StatusBar"];
+}
+
+//doesn't save shown state
 - (void) showStatusBar: (BOOL) show animate: (BOOL) animate
 {
     if (show != [fStatusBar isHidden])
@@ -2907,6 +2908,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fDefaults setBool: ![fFilterBar isHidden] forKey: @"FilterBar"];
 }
 
+//doesn't save shown state
 - (void) showFilterBar: (BOOL) show animate: (BOOL) animate
 {
     if (show != [fFilterBar isHidden])
@@ -2959,6 +2961,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [fFilterBar setHidden: YES];
         [fWindow makeFirstResponder: fTableView];
     }
+}
+
+- (void) focusFilterField
+{
+    [fWindow makeFirstResponder: fSearchFilterField];
+    if ([fFilterBar isHidden])
+        [self toggleFilterBar: self];
 }
 
 - (ButtonToolbarItem *) standardToolbarButtonWithIdentifier: (NSString *) ident

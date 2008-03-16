@@ -507,6 +507,16 @@
     [super flagsChanged: event];
 }
 
+//option-command-f will focus the filter bar's search field
+- (void) keyDown: (NSEvent *) event
+{
+    if ([[event charactersIgnoringModifiers] isEqualToString: @"f"] && [event modifierFlags] & NSAlternateKeyMask
+        && [event modifierFlags] & NSCommandKeyMask)
+        [fController focusFilterField];
+    else
+        [super keyDown: event];
+}
+
 - (void) toggleControlForTorrent: (Torrent *) torrent
 {
     if ([torrent isActive])

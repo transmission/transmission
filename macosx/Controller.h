@@ -241,6 +241,7 @@ typedef enum
 - (void) showStatusBar: (BOOL) show animate: (BOOL) animate;
 - (void) toggleFilterBar: (id) sender;
 - (void) showFilterBar: (BOOL) show animate: (BOOL) animate;
+- (void) focusFilterField;
 
 - (void) allToolbarClicked: (id) sender;
 - (void) selectedToolbarClicked: (id) sender;
