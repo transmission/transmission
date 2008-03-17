@@ -64,7 +64,7 @@
     [window setFrameUsingName: @"MessageWindowFrame"];
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeColumn)
-                    name: @"NSTableViewColumnDidResizeNotification" object: fMessageTable];
+        name: @"NSTableViewColumnDidResizeNotification" object: fMessageTable];
     
     //initially sort peer table by IP
     if ([[fMessageTable sortDescriptors] count] == 0)

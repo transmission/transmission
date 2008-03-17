@@ -168,8 +168,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
-    if (fileStat)
-        tr_torrentFilesFree(fileStat, [self fileCount]);
+    if (fFileStat)
+        tr_torrentFilesFree(fFileStat, [self fileCount]);
     
     if (fPreviousFinishedPieces != NULL)
         free(fPreviousFinishedPieces);
@@ -539,9 +539,38 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if ((volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: [self downloadFolder]] objectAtIndex: 0]))
     {
         NSDictionary * systemAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self downloadFolder]];
-        uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
+        uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue], neededSpace = 0;
         
-        if (remainingSpace <= [self sizeLeft])
+        [self updateFileStat];
+        
+        //determine amount needed
+        int i;
+        for (i = 0; i < [self fileCount]; i++)
+        {
+            if (tr_torrentGetFileDL(fHandle, i))
+            {
+                tr_file * file = &fInfo->files[i];
+                
+                NSString * path = [[self downloadFolder] stringByAppendingPathComponent: [NSString stringWithUTF8String: file->name]];
+                if ([[NSFileManager defaultManager] fileExistsAtPath: path])
+                {
+                    NSDictionary * fileAttributes = [NSApp isOnLeopardOrBetter]
+                        ? [[NSFileManager defaultManager] attributesOfItemAtPath: path error: NULL]
+                        : [[NSFileManager defaultManager] fileAttributesAtPath: path traverseLink: NO];
+                    if (!fileAttributes)
+                    {
+                        NSLog(@"Problems getting attributes for \"%@\".", path);
+                        continue;
+                    }
+                    
+                    neededSpace += file->length - [[fileAttributes objectForKey: NSFileSize] unsignedLongLongValue];
+                }
+                else
+                    neededSpace += file->length;
+            }
+        }
+        
+        if (remainingSpace < neededSpace)
         {
             NSAlert * alert = [[NSAlert alloc] init];
             [alert setMessageText: [NSString stringWithFormat:
@@ -1285,27 +1314,27 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (void) updateFileStat
 {
-    if (fileStat)
-        tr_torrentFilesFree(fileStat, [self fileCount]);
+    if (fFileStat)
+        tr_torrentFilesFree(fFileStat, [self fileCount]);
     
     int count;
-    fileStat = tr_torrentFiles(fHandle, &count);
+    fFileStat = tr_torrentFiles(fHandle, &count);
 }
 
 - (float) fileProgress: (int) index
 {
-    if (!fileStat)
+    if (!fFileStat)
         [self updateFileStat];
         
-    return fileStat[index].progress;
+    return fFileStat[index].progress;
 }
 
 - (BOOL) canChangeDownloadCheckForFile: (int) index
 {
-    if (!fileStat)
+    if (!fFileStat)
         [self updateFileStat];
     
-    return [self fileCount] > 1 && fileStat[index].progress < 1.0;
+    return [self fileCount] > 1 && fFileStat[index].progress < 1.0;
 }
 
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet
@@ -1313,12 +1342,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if ([self fileCount] <= 1 || [self isComplete])
         return NO;
     
-    if (!fileStat)
+    if (!fFileStat)
         [self updateFileStat];
     
     int index;
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
-        if (fileStat[index].progress < 1.0)
+        if (fFileStat[index].progress < 1.0)
             return YES;
     return NO;
 }

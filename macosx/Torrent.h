@@ -58,7 +58,7 @@ typedef enum
     
     NSString * fNameString, * fHashString;
     
-    tr_file_stat * fileStat;
+    tr_file_stat * fFileStat;
     NSArray * fFileList;
     
     float * fPreviousFinishedPieces;
