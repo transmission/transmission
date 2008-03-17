@@ -451,7 +451,7 @@ msgwin_new( TrCore * core )
     gtk_box_pack_start( GTK_BOX( vbox ), w, TRUE, TRUE, 0 );
     gtk_container_add( GTK_CONTAINER( win ), vbox );
 
-    data->refresh_tag = g_timeout_add( 1000, onRefresh, data );
+    data->refresh_tag = g_timeout_add( 1666, onRefresh, data );
     g_object_weak_ref( G_OBJECT( win ), onWindowDestroyed, data );
 
     gtk_widget_show_all( win );
