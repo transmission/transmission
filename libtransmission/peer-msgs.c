@@ -965,16 +965,18 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
     int loaded = 0;
     uint8_t * tmp = tr_new( uint8_t, msglen );
     tr_benc val, *sub;
+    const tr_torrent * tor = msgs->torrent;
     tr_peerIoReadBytes( msgs->io, inbuf, tmp, msglen );
 
-    if( tr_torrentAllowsPex( msgs->torrent )
+    if( tr_torrentAllowsPex( tor )
         && (( loaded = !tr_bencLoad( tmp, msglen, &val, NULL )))
         && (( sub = tr_bencDictFindType( &val, "added", TYPE_STR ))))
     {
         const int n = sub->val.s.i / 6 ;
-        tr_torinf( msgs->torrent, _( "Got %d peers from peer exchange" ), n );
+        if( n )
+            tr_torinf( tor, _( "Got %d peers from peer exchange" ), n );
         tr_peerMgrAddPeers( msgs->handle->peerMgr,
-                            msgs->torrent->info.hash,
+                            tor->info.hash,
                             TR_PEER_FROM_PEX,
                             (uint8_t*)sub->val.s.s, n );
     }
