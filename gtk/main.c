@@ -103,18 +103,18 @@ static const char * LICENSE =
 
 struct cbdata
 {
+    gboolean       minimized;
+    gboolean       closing;
+    guint          timer;
     guint          idle_hide_mainwindow_tag;
+    gpointer       icon;
     GtkWindow    * wind;
     TrCore       * core;
-    gpointer       icon;
     GtkWidget    * msgwin;
     GtkWidget    * prefs;
-    guint          timer;
-    gboolean       closing;
     GList        * errqueue;
     GHashTable   * tor2details;
     GHashTable   * details2tor;
-    gboolean       minimized;
 };
 
 #define CBDATA_PTR "callback-data-pointer"
@@ -129,8 +129,6 @@ appsetup( TrWindow * wind, GList * args,
           gboolean paused, gboolean minimized );
 static void
 winsetup( struct cbdata * cbdata, TrWindow * wind );
-static void
-makeicon( struct cbdata * cbdata );
 static void
 wannaquit( void * vdata );
 static void
@@ -397,7 +395,7 @@ appsetup( TrWindow * wind, GList * args,
     winsetup( cbdata, wind );
 
     /* set up the system tray */
-    makeicon( cbdata );
+    cbdata->icon = tr_icon_new( cbdata->core );
 
     /* start model update timer */
     cbdata->timer = g_timeout_add( UPDATE_INTERVAL, updatemodel, cbdata );
@@ -529,13 +527,6 @@ winsetup( struct cbdata * cbdata, TrWindow * wind )
     refreshTorrentActions( sel );
     
     setupdrag( GTK_WIDGET(wind), cbdata );
-}
-
-static void
-makeicon( struct cbdata * cbdata )
-{
-    if( cbdata->icon == NULL )
-        cbdata->icon = tr_icon_new( cbdata->core );
 }
 
 static gpointer
