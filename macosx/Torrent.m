@@ -537,11 +537,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     NSFileManager * fileManager = [NSFileManager defaultManager];
     NSString * downloadFolder = [self downloadFolder];
-    BOOL onLeopard = [NSApp isOnLeopardOrBetter];
     
     NSString * volumeName;
     if ((volumeName = [[fileManager componentsToDisplayForPath: downloadFolder] objectAtIndex: 0]))
     {
+        BOOL onLeopard = [NSApp isOnLeopardOrBetter];
+        
         NSDictionary * systemAttributes = onLeopard ? [fileManager attributesOfFileSystemForPath: downloadFolder error: NULL]
                                             : [fileManager fileSystemAttributesAtPath: downloadFolder];
         uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue], neededSpace = 0;
@@ -578,7 +579,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file disk space alert -> button")];
             [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent file disk space alert -> button")];
             
-            BOOL onLeopard = [NSApp isOnLeopardOrBetter];
             if (onLeopard)
                 [alert setShowsSuppressionButton: YES];
             else

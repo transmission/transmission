@@ -36,6 +36,9 @@
 #define PIECE_CHANGE 0.1
 #define PIECE_TIME 0.005
 
+#define GROUP_SPEED_IMAGE_COLUMN_WIDTH 8.0
+#define GROUP_RATIO_IMAGE_COLUMN_WIDTH 10.0
+
 @interface TorrentTableView (Private)
 
 - (BOOL) pointInControlRect: (NSPoint) point;
@@ -90,10 +93,6 @@
         else
             fCollapsedGroups = [[NSMutableIndexSet alloc] init];
         
-        //set group columns to show ratio (nib is set to speeds)
-        if ([fDefaults boolForKey: @"DisplayGroupRowRatio"])
-            [self setGroupStatusColumns];
-        
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
         fMouseActionRow = -1;
@@ -119,6 +118,12 @@
     [fTorrentCell release];
     
     [super dealloc];
+}
+
+- (void) awakeFromNib
+{
+    //set group columns to show ratio, needs to be in awakeFromNib to size columns correctly
+    [self setGroupStatusColumns];
 }
 
 - (BOOL) isGroupCollapsed: (int) value
@@ -817,16 +822,20 @@
     BOOL ratio = [fDefaults boolForKey: @"DisplayGroupRowRatio"];
     
     NSTableColumn * dlTableColumn = [self tableColumnWithIdentifier: @"DL"];
-    if ([dlTableColumn isHidden] == ratio)
-        return;
     
     [dlTableColumn setHidden: ratio];
     [[self tableColumnWithIdentifier: @"DL Image"] setHidden: ratio];
     
-    [[self tableColumnWithIdentifier: @"UL Image"] setWidth: ratio ? 10.0 : 8.0];
-    
-    NSTableColumn * groupTableColumn = [self tableColumnWithIdentifier: @"Group"];
-    [groupTableColumn setWidth: [groupTableColumn width] + (ratio ? -2.0 : 2.0)];
+    //change size of image column
+    NSTableColumn * ulImageTableColumn = [self tableColumnWithIdentifier: @"UL Image"];
+    float oldWidth = [ulImageTableColumn width], newWidth = ratio ? GROUP_RATIO_IMAGE_COLUMN_WIDTH : GROUP_SPEED_IMAGE_COLUMN_WIDTH;
+    if (oldWidth != newWidth)
+    {
+        [ulImageTableColumn setWidth: newWidth];
+        
+        NSTableColumn * groupTableColumn = [self tableColumnWithIdentifier: @"Group"];
+        [groupTableColumn setWidth: [groupTableColumn width] - (newWidth - oldWidth)];
+    }
 }
 
 - (void) createFileMenu: (NSMenu *) menu forFiles: (NSArray *) files
