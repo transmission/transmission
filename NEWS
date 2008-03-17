@@ -10,7 +10,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Tracker tab in the inspector
    + Message log specifies the torrent/activity the message relates to
    + Updated images in the inspector
-   + Optional display of remaining time while seeding in Minimal View 
+   + Optional display of remaining time while seeding in Minimal View
+   + Improved accuracy for displaying the remaining disk space warning
 
 1.06 (2008/02/26)
 - All Platforms:

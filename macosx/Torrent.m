@@ -535,10 +535,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if ([self allDownloaded] || ![fDefaults boolForKey: @"WarningRemainingSpace"])
         return YES;
     
+    NSFileManager * fileManager = [NSFileManager defaultManager];
+    
     NSString * volumeName;
-    if ((volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: [self downloadFolder]] objectAtIndex: 0]))
+    if ((volumeName = [[fileManager componentsToDisplayForPath: [self downloadFolder]] objectAtIndex: 0]))
     {
-        NSDictionary * systemAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self downloadFolder]];
+        NSDictionary * systemAttributes = [fileManager fileSystemAttributesAtPath: [self downloadFolder]];
         uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue], neededSpace = 0;
         
         [self updateFileStat];
@@ -552,14 +554,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 tr_file * file = &fInfo->files[i];
                 
                 NSString * path = [[self downloadFolder] stringByAppendingPathComponent: [NSString stringWithUTF8String: file->name]];
-                if ([[NSFileManager defaultManager] fileExistsAtPath: path])
+                if ([fileManager fileExistsAtPath: path])
                 {
-                    NSDictionary * fileAttributes = [NSApp isOnLeopardOrBetter]
-                        ? [[NSFileManager defaultManager] attributesOfItemAtPath: path error: NULL]
-                        : [[NSFileManager defaultManager] fileAttributesAtPath: path traverseLink: NO];
+                    NSDictionary * fileAttributes = [NSApp isOnLeopardOrBetter] ? [fileManager attributesOfItemAtPath: path error: NULL]
+                                                    : [fileManager fileAttributesAtPath: path traverseLink: NO];
                     if (!fileAttributes)
                     {
-                        NSLog(@"Problems getting attributes for \"%@\".", path);
+                        NSLog(@"Problems getting file information for \"%@\".", path);
                         continue;
                     }
                     
