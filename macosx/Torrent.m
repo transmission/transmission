@@ -536,11 +536,14 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         return YES;
     
     NSFileManager * fileManager = [NSFileManager defaultManager];
+    NSString * downloadFolder = [self downloadFolder];
+    BOOL onLeopard = [NSApp isOnLeopardOrBetter];
     
     NSString * volumeName;
-    if ((volumeName = [[fileManager componentsToDisplayForPath: [self downloadFolder]] objectAtIndex: 0]))
+    if ((volumeName = [[fileManager componentsToDisplayForPath: downloadFolder] objectAtIndex: 0]))
     {
-        NSDictionary * systemAttributes = [fileManager fileSystemAttributesAtPath: [self downloadFolder]];
+        NSDictionary * systemAttributes = onLeopard ? [fileManager attributesOfFileSystemForPath: downloadFolder error: NULL]
+                                            : [fileManager fileSystemAttributesAtPath: downloadFolder];
         uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue], neededSpace = 0;
         
         [self updateFileStat];
@@ -553,21 +556,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             {
                 tr_file * file = &fInfo->files[i];
                 
-                NSString * path = [[self downloadFolder] stringByAppendingPathComponent: [NSString stringWithUTF8String: file->name]];
-                if ([fileManager fileExistsAtPath: path])
-                {
-                    NSDictionary * fileAttributes = [NSApp isOnLeopardOrBetter] ? [fileManager attributesOfItemAtPath: path error: NULL]
+                neededSpace += file->length;
+                
+                NSString * path = [downloadFolder stringByAppendingPathComponent: [NSString stringWithUTF8String: file->name]];
+                NSDictionary * fileAttributes = onLeopard ? [fileManager attributesOfItemAtPath: path error: NULL]
                                                     : [fileManager fileAttributesAtPath: path traverseLink: NO];
-                    if (!fileAttributes)
-                    {
-                        NSLog(@"Problems getting file information for \"%@\".", path);
-                        continue;
-                    }
-                    
-                    neededSpace += file->length - [[fileAttributes objectForKey: NSFileSize] unsignedLongLongValue];
-                }
-                else
-                    neededSpace += file->length;
+                if (fileAttributes)
+                    neededSpace -= [[fileAttributes objectForKey: NSFileSize] unsignedLongLongValue];
             }
         }
         
