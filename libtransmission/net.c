@@ -92,7 +92,7 @@ makeSocketNonBlocking( int fd )
         if( evutil_make_socket_nonblocking( fd ) )
 #endif
         {
-            tr_err( _( "Couldn't set socket to non-blocking mode: %s" ),
+            tr_err( _( "Couldn't create socket: %s" ),
                     tr_strerror( sockerrno ) );
             tr_netClose( fd );
             fd = -1;

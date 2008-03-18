@@ -221,10 +221,12 @@ torrentPage( GObject * core )
     const char * s;
     GtkWidget * t;
     GtkWidget * w;
+#ifdef HAVE_GIO
     GtkWidget * l;
+#endif
 
     t = hig_workarea_create( );
-    hig_workarea_add_section_title( t, &row, _( "Adding" ) );
+    hig_workarea_add_section_title( t, &row, _( "Opening Torrents" ) );
 
 #ifdef HAVE_GIO
         s = _( "Automatically add torrents from:" );
@@ -235,15 +237,15 @@ torrentPage( GObject * core )
         hig_workarea_add_row_w( t, &row, l, w, NULL );
 #endif
 
-        s = _( "_Prompt for file selections and priorities" );
+        s = _( "Display _options dialog" );
         w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );
         hig_workarea_add_wide_control( t, &row, w );
 
-        s = _( "_Start torrents when added" );
+        s = _( "_Start when opened" );
         w = new_check_button( s, PREF_KEY_START, core );
         hig_workarea_add_wide_control( t, &row, w );
 
-        s = _( "_Trash original torrent files" ); 
+        s = _( "Mo_ve source files to Trash" );
         w = new_check_button( s, PREF_KEY_TRASH_ORIGINAL, core ); 
         hig_workarea_add_wide_control( t, &row, w );
 
@@ -325,17 +327,17 @@ networkPage( GObject * core, gpointer alive )
 
     hig_workarea_add_section_title (t, &row, _("Ports"));
         
-        s = _("_Forward port from router with UPnP or NAT-PMP" );
+        s = _("_Forward port from router" );
         w = new_check_button( s, PREF_KEY_NAT, core );
         hig_workarea_add_wide_control( t, &row, w );
 
-        h = gtk_hbox_new( FALSE, GUI_PAD );
+        h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
         w2 = new_spin_button( PREF_KEY_PORT, core, 1, INT_MAX, 1 );
         gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
         l = gtk_label_new( NULL );
         gtk_misc_set_alignment( GTK_MISC(l), 0.0f, 0.5f );
         gtk_box_pack_start( GTK_BOX(h), l, FALSE, FALSE, 0 );
-        hig_workarea_add_row( t, &row, _("Incoming TCP _port"), h, w );
+        hig_workarea_add_row( t, &row, _("Incoming TCP _port:"), h, w );
 
         g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
         g_object_set_data( G_OBJECT(l), "alive", alive );

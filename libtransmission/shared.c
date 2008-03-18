@@ -96,7 +96,7 @@ natPulse( tr_shared * s )
         tr_ninf( getKey(), _( "State changed from \"%s\" to \"%s\"" ), getNatStateStr(s->natStatus), getNatStateStr(status) );
         s->natStatus = status;
         if( status == TR_NAT_TRAVERSAL_ERROR )
-            tr_nerr( getKey(), _( "Port forwarding failed.  Turn on debug messages and restart for more information." ) );
+            tr_nerr( getKey(), _( "Port forwarding failed." ) );
     }
 }
 
@@ -159,7 +159,7 @@ sharedPulse( void * vshared )
     }
     else if( ( shared->natStatus == TR_NAT_TRAVERSAL_ERROR ) || ( shared->natStatus == TR_NAT_TRAVERSAL_UNMAPPED ) )
     {
-        tr_ndbg( getKey(), _( "Stopped" ) );
+        tr_ninf( getKey(), _( "Stopped" ) );
         shared->h->shared = NULL;
         tr_netClose( shared->bindSocket );
         tr_natpmpClose( shared->natpmp );

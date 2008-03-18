@@ -65,11 +65,11 @@ static void
 logVal( const char * func, int ret )
 {
     if( ret==NATPMP_TRYAGAIN )
-        tr_ndbg( getKey(), _( "%s responded 'try again'" ), func );
+        tr_ninf( getKey(), _( "%s responded 'try again'" ), func );
     else if( ret >= 0 )
-        tr_ndbg( getKey(), _( "%s succeeded (%d)" ), func, ret );
+        tr_ninf( getKey(), _( "%s succeeded (%d)" ), func, ret );
     else
-        tr_ndbg( getKey(), _( "%s failed (%d): %s (%d)" ), func, ret, tr_strerror(errno), errno );
+        tr_ninf( getKey(), _( "%s failed (%d): %s (%d)" ), func, ret, tr_strerror(errno), errno );
 }
 
 struct tr_natpmp*
@@ -109,8 +109,8 @@ setCommandTime( struct tr_natpmp * nat )
 static void
 setErrorState( struct tr_natpmp * nat )
 {
-    tr_ndbg( getKey(), _( "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!" ) );
-    tr_ndbg( getKey(), _( "NAT-PMP port forwarding unsuccessful, trying UPnP next" ) );
+    tr_ninf( getKey(), _( "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!" ) );
+    tr_ninf( getKey(), _( "NAT-PMP port forwarding unsuccessful, trying UPnP next" ) );
     nat->state = TR_NATPMP_ERR;
 }
 

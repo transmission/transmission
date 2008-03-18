@@ -74,8 +74,8 @@ priorityToString( const int priority )
 static tr_priority_t
 stringToPriority( const char* str )
 {
-    if( !strcmp( str, _( "High" ) ) ) return TR_PRI_HIGH;
-    if( !strcmp( str, _( "Low" ) ) ) return TR_PRI_LOW;
+    if( !strcmp( str, priorityToString( TR_PRI_HIGH ) ) ) return TR_PRI_HIGH;
+    if( !strcmp( str, priorityToString( TR_PRI_LOW ) ) ) return TR_PRI_LOW;
     return TR_PRI_NORMAL;
 }
 
@@ -245,11 +245,11 @@ priority_model_new (void)
   GtkTreeIter iter;
   GtkListStore * store = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_INT);
   gtk_list_store_append (store, &iter);
-  gtk_list_store_set (store, &iter, 0, _("High"), 1, TR_PRI_HIGH, -1);
+  gtk_list_store_set (store, &iter, 0, priorityToString( TR_PRI_HIGH ), 1, TR_PRI_HIGH, -1);
   gtk_list_store_append (store, &iter);
-  gtk_list_store_set (store, &iter, 0, _("Normal"), 1, TR_PRI_NORMAL, -1);
+  gtk_list_store_set (store, &iter, 0, priorityToString( TR_PRI_NORMAL ), 1, TR_PRI_NORMAL, -1);
   gtk_list_store_append (store, &iter);
-  gtk_list_store_set (store, &iter, 0, _("Low"), 1, TR_PRI_LOW, -1);
+  gtk_list_store_set (store, &iter, 0, priorityToString( TR_PRI_LOW ), 1, TR_PRI_LOW, -1);
   return GTK_TREE_MODEL (store);
 }
 

@@ -616,7 +616,7 @@ tr_metainfoSave( const char * hash, const char * tag,
     fseek( file, 0, SEEK_SET );
     if( fwrite( buf, 1, buflen, file ) != buflen )
     {
-        tr_err( _( "Couldn't write file \"%s\": %s" ), path, tr_strerror( errno ) );
+        tr_err( _( "Couldn't save file \"%s\": %s" ), path, tr_strerror( errno ) );
         fclose( file );
         return TR_EINVALID;
     }

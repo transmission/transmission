@@ -29,7 +29,7 @@
 enum
 {
     COL_SEQUENCE,
-    COL_CATEGORY,
+    COL_NAME,
     COL_MESSAGE,
     COL_TR_MSG,
     N_COLUMNS
@@ -80,7 +80,7 @@ doSave( GtkWindow      * parent,
     if( !fp )
     {
         errmsg( parent,
-                _("Couldn't write file \"%s\": %s"),
+                _("Couldn't save file \"%s\": %s"),
                 filename, g_strerror( errno ) );
     }
     else
@@ -219,14 +219,16 @@ appendColumn( GtkTreeView * view, int col )
 
     switch( col ) {
         case COL_SEQUENCE: title = _( "Time" ); break;
-        case COL_CATEGORY: title = _( "Name"); break;
+        /* noun.  column title for a list */
+        case COL_NAME: title = _( "Name"); break;
+        /* noun.  column title for a list */
         case COL_MESSAGE:  title = _( "Message" ); break;
         default: g_assert_not_reached( );
     }
 
     switch( col )
     {
-        case COL_CATEGORY:
+        case COL_NAME:
             r = gtk_cell_renderer_text_new( );
             c = gtk_tree_view_column_new_with_attributes( title, r, NULL );
             gtk_tree_view_column_set_cell_data_func( c, r, renderText, GINT_TO_POINTER(col), NULL );
@@ -280,7 +282,7 @@ onWindowDestroyed( gpointer gdata, GObject * deadWindow UNUSED )
 static tr_msg_list *
 addMessages( GtkListStore * store, struct tr_msg_list * head )
 {
-    const char * default_category = g_get_application_name( );
+    const char * default_name = g_get_application_name( );
     static int sequence = 1;
     tr_msg_list * i;
 
@@ -290,7 +292,7 @@ addMessages( GtkListStore * store, struct tr_msg_list * head )
 
         gtk_list_store_insert_with_values( store, &unused, 0,
                                            COL_TR_MSG, i,
-                                           COL_CATEGORY, ( i->name ? i->name : default_category ),
+                                           COL_NAME, ( i->name ? i->name : default_name ),
                                            COL_MESSAGE, i->message,
                                            COL_SEQUENCE, sequence++,
                                            -1 );
@@ -439,7 +441,7 @@ msgwin_new( TrCore * core )
     data->view = GTK_TREE_VIEW( view );
     gtk_tree_view_set_rules_hint( data->view, TRUE );
     appendColumn( data->view, COL_SEQUENCE );
-    appendColumn( data->view, COL_CATEGORY );
+    appendColumn( data->view, COL_NAME );
     appendColumn( data->view, COL_MESSAGE );
     w = gtk_scrolled_window_new( NULL, NULL );
     gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( w ),

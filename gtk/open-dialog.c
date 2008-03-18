@@ -163,8 +163,8 @@ openSingleTorrentDialog( GtkWindow  * parent,
     data->filename = g_strdup( tr_ctorGetSourceFile( ctor ) );
     data->destination = g_strdup( str );
     data->list = file_list_new( NULL );
-    data->trash_check = gtk_check_button_new_with_mnemonic( _( "_Trash original torrent file" ) );
-    data->run_check = gtk_check_button_new_with_mnemonic( _( "_Start when added" ) );
+    data->trash_check = gtk_check_button_new_with_mnemonic( _( "Mo_ve source file to Trash" ) );
+    data->run_check = gtk_check_button_new_with_mnemonic( _( "_Start when opened" ) );
 
     g_signal_connect( G_OBJECT( d ), "response",
                       G_CALLBACK( openResponseCB ), data );
@@ -175,7 +175,7 @@ openSingleTorrentDialog( GtkWindow  * parent,
     gtk_table_set_col_spacings( GTK_TABLE( t ), GUI_PAD_BIG );
 
     row = col = 0;
-    l = gtk_label_new_with_mnemonic( _( "_Torrent file:" ) );
+    l = gtk_label_new_with_mnemonic( _( "_Source file:" ) );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
     gtk_table_attach( GTK_TABLE( t ), l, col, col+1, row, row+1, GTK_FILL, 0, 0, 0 );
     ++col;
@@ -224,18 +224,18 @@ openSingleTorrentDialog( GtkWindow  * parent,
 
     ++row;
     col = 0;
-    w = data->trash_check;
-    if( tr_ctorGetDeleteSource( ctor, &flag ) )
-        g_assert_not_reached( );
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), flag );
-    gtk_table_attach( GTK_TABLE( t ), w, col, col+2, row, row+1, GTK_FILL, 0, 0, 0 );
-
-    ++row;
-    col = 0;
     w = data->run_check;
     if( tr_ctorGetPaused( ctor, TR_FORCE, &flag ) )
         g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), !flag );
+    gtk_table_attach( GTK_TABLE( t ), w, col, col+2, row, row+1, GTK_FILL, 0, 0, 0 );
+
+    ++row;
+    col = 0;
+    w = data->trash_check;
+    if( tr_ctorGetDeleteSource( ctor, &flag ) )
+        g_assert_not_reached( );
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), flag );
     gtk_table_attach( GTK_TABLE( t ), w, col, col+2, row, row+1, GTK_FILL, 0, 0, 0 );
 
     gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( d )->vbox ), t );
