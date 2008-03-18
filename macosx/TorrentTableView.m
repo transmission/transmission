@@ -821,9 +821,7 @@
 {
     BOOL ratio = [fDefaults boolForKey: @"DisplayGroupRowRatio"];
     
-    NSTableColumn * dlTableColumn = [self tableColumnWithIdentifier: @"DL"];
-    
-    [dlTableColumn setHidden: ratio];
+    [[self tableColumnWithIdentifier: @"DL"] setHidden: ratio];
     [[self tableColumnWithIdentifier: @"DL Image"] setHidden: ratio];
     
     //change size of image column
