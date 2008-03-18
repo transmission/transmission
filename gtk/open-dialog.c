@@ -12,9 +12,11 @@
 
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+#include "conf.h"
 #include "file-list.h"
 #include "hig.h"
 #include "open-dialog.h"
+#include "tr-prefs.h"
 
 struct OpenData
 {
@@ -250,8 +252,11 @@ openSingleTorrentDialog( GtkWindow  * parent,
 static void
 onOpenDialogResponse( GtkDialog * dialog, int response, gpointer core )
 {
-    if( response == GTK_RESPONSE_ACCEPT )
-    {
+    char * folder = gtk_file_chooser_get_current_folder( GTK_FILE_CHOOSER( dialog ) );
+    pref_string_set( PREF_KEY_OPEN_DIALOG_FOLDER, folder );
+    g_free( folder );
+
+    if( response == GTK_RESPONSE_ACCEPT ) {
         GSList * l = gtk_file_chooser_get_filenames( GTK_FILE_CHOOSER( dialog ) );
         tr_core_add_list( core, l, FALSE );
     }
@@ -265,7 +270,7 @@ openDialog( GtkWindow * parent,
 {
     GtkWidget * w;
     GtkFileFilter * filter;
-
+    char * folder;
 
     w = gtk_file_chooser_dialog_new( _( "Select Torrents" ), parent,
                                      GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -289,6 +294,12 @@ openDialog( GtkWindow * parent,
     gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( w ), filter );
 
     g_signal_connect( w, "response", G_CALLBACK(onOpenDialogResponse), core );
+
+    if(( folder = pref_string_get( PREF_KEY_OPEN_DIALOG_FOLDER ))) {
+        gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ), folder );
+        g_free( folder );
+    }
+    
 
     gtk_widget_show( w );
     return w;

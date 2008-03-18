@@ -40,6 +40,8 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_DIR_WATCH_ENABLED, FALSE );
 #endif
 
+    pref_string_set_default ( PREF_KEY_OPEN_DIALOG_FOLDER, g_get_home_dir( ) );
+
     pref_int_set_default    ( PREF_KEY_MAX_PEERS_GLOBAL, 200 );
     pref_int_set_default    ( PREF_KEY_MAX_PEERS_PER_TORRENT, 50 );
 
