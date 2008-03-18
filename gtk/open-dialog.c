@@ -20,8 +20,8 @@ struct OpenData
 {
     TrCore * core;
     GtkWidget * list;
-    GtkToggleButton * run_check;
-    GtkToggleButton * trash_check;
+    GtkWidget * run_check;
+    GtkWidget * trash_check;
     char * filename;
     char * destination;
     TrTorrent * gtor;
@@ -51,10 +51,10 @@ openResponseCB( GtkDialog * dialog, gint response, gpointer gdata )
         if( response != GTK_RESPONSE_ACCEPT )
             deleteOldTorrent( data );
         else {
-            if( gtk_toggle_button_get_active( data->run_check ) )
+            if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->run_check ) ) )
                 tr_torrentStart( tr_torrent_handle( data->gtor ) );
             tr_core_add_torrent( data->core, data->gtor );
-            if( gtk_toggle_button_get_active( data->trash_check ) )
+            if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->trash_check ) ) )
                 tr_file_trash_or_unlink( data->filename );
         }
     }
@@ -156,11 +156,16 @@ openSingleTorrentDialog( GtkWindow  * parent,
 
     if( tr_ctorGetDestination( ctor, TR_FORCE, &str ) )
         g_assert_not_reached( );
+
     data = g_new0( struct OpenData, 1 );
     data->core = core;
     data->ctor = ctor;
     data->filename = g_strdup( tr_ctorGetSourceFile( ctor ) );
     data->destination = g_strdup( str );
+    data->list = file_list_new( NULL );
+    data->trash_check = gtk_check_button_new_with_mnemonic( _( "_Trash original torrent file" ) );
+    data->run_check = gtk_check_button_new_with_mnemonic( _( "_Start when added" ) );
+
     g_signal_connect( G_OBJECT( d ), "response",
                       G_CALLBACK( openResponseCB ), data );
 
@@ -207,9 +212,8 @@ openSingleTorrentDialog( GtkWindow  * parent,
 
     ++row;
     col = 0;
-    w = file_list_new( NULL );
+    w = data->list;
     gtk_widget_set_size_request ( w, 466u, 300u );
-    data->list = w;
     gtk_table_attach_defaults( GTK_TABLE( t ), w, col, col+2, row, row+1 );
 
     ++row;
@@ -220,8 +224,7 @@ openSingleTorrentDialog( GtkWindow  * parent,
 
     ++row;
     col = 0;
-    w = gtk_check_button_new_with_mnemonic( _( "_Trash original torrent file" ) );
-    data->trash_check = GTK_TOGGLE_BUTTON( w );
+    w = data->trash_check;
     if( tr_ctorGetDeleteSource( ctor, &flag ) )
         g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), flag );
@@ -229,8 +232,7 @@ openSingleTorrentDialog( GtkWindow  * parent,
 
     ++row;
     col = 0;
-    w = gtk_check_button_new_with_mnemonic( _( "_Start when added" ) );
-    data->run_check = GTK_TOGGLE_BUTTON( w );
+    w = data->run_check;
     if( tr_ctorGetPaused( ctor, TR_FORCE, &flag ) )
         g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), !flag );
@@ -262,6 +264,8 @@ openDialog( GtkWindow * parent,
             TrCore    * core )
 {
     GtkWidget * w;
+    GtkFileFilter * filter;
+
 
     w = gtk_file_chooser_dialog_new( _( "Select Torrents" ), parent,
                                      GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -273,6 +277,16 @@ openDialog( GtkWindow * parent,
                                              GTK_RESPONSE_CANCEL,
                                              -1 );
     gtk_file_chooser_set_select_multiple( GTK_FILE_CHOOSER( w ), TRUE );
+
+    filter = gtk_file_filter_new( );
+    gtk_file_filter_set_name( filter, _( "Torrent files" ) );
+    gtk_file_filter_add_pattern( filter, "*.torrent" );
+    gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( w ), filter );
+
+    filter = gtk_file_filter_new( );
+    gtk_file_filter_set_name( filter, _( "All files" ) );
+    gtk_file_filter_add_pattern( filter, "*" );
+    gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( w ), filter );
 
     g_signal_connect( w, "response", G_CALLBACK(onOpenDialogResponse), core );
 
