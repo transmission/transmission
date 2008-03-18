@@ -1533,6 +1533,11 @@ clientGotBlock( tr_peermsgs                * msgs,
     {
         const tr_errno err = tr_ioTestPiece( tor, req->index );
 
+        if( err )
+            tr_torerr( tor, _( "Downloaded piece %lu failed its checksum test: %s" ),
+                       (unsigned long)req->index,
+                       tr_errorString( err ) );
+
         tr_torrentSetHasPiece( tor, req->index, !err );
         tr_torrentSetPieceChecked( tor, req->index, TRUE );
         tr_peerMgrSetBlame( tor->handle->peerMgr, tor->info.hash, req->index, !err );
