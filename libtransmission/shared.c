@@ -96,7 +96,7 @@ natPulse( tr_shared * s )
         tr_ninf( getKey(), _( "State changed from \"%s\" to \"%s\"" ), getNatStateStr(s->natStatus), getNatStateStr(status) );
         s->natStatus = status;
         if( status == TR_NAT_TRAVERSAL_ERROR )
-            tr_nerr( getKey(), _( "Port forwarding failed.  See debug messages for more information." ) );
+            tr_nerr( getKey(), _( "Port forwarding failed.  Turn on debug messages and restart for more information." ) );
     }
 }
 
