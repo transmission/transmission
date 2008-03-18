@@ -60,6 +60,33 @@ void tr_msgInit( void )
          messageLock = tr_lockNew( );
 }
 
+/*
+#if defined(SYS_DARWIN)
+
+const char * tr_getMacLocalizedCString(CFStringRef string)
+{
+    //if you need to be thread safe, add proper locks around that
+    static CFMutableDictionaryRef mapping = NULL;
+    if( mapping == NULL )
+    {
+        mapping = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, NULL);
+    }
+    
+    const char * result = (const char *)CFDictionaryGetValue(mapping, string);
+    if( result == NULL )
+    {
+        CFStringRef localizedString = CFCopyLocalizedStringFromTable(string, CFSTR("LibraryLocalizable"), NULL);
+        result = (const char *)malloc(CFStringGetMaximumSizeForEncoding(CFStringGetLength(localizedString), kCFStringEncodingUTF8));
+        CFStringGetCString(localizedString, (char *)result, CFStringGetLength(localizedString)+1, kCFStringEncodingUTF8);
+        CFDictionarySetValue(mapping, string, result);
+    }
+    
+    return result;
+}
+
+#endif
+*/
+
 FILE*
 tr_getLog( void )
 {
