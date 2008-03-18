@@ -148,18 +148,10 @@ pumpList( int i UNUSED, short s UNUSED, void * veh )
 static void
 logFunc( int severity, const char * message )
 {
-    switch( severity )
-    {
-        case _EVENT_LOG_DEBUG: 
-            tr_dbg( "%s", message );
-            break;
-        case _EVENT_LOG_ERR:
-            tr_err( "%s", message );
-            break;
-        default:
-            tr_inf( "%s", message );
-            break;
-    }
+    if( severity >= _EVENT_LOG_ERR )
+        tr_nerr( "%s", message );
+    else
+        tr_ndbg( "%s", message );
 }
 
 static void
@@ -174,6 +166,7 @@ libeventThreadFunc( void * veh )
 #endif
 
     eh->base = event_init( );
+    event_set_log_callback( logFunc );
     timeout_set( &eh->pulse, pumpList, veh );
     timeout_add( &eh->pulse, &eh->pulseInterval );
     eh->h->events = eh;
