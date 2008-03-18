@@ -512,7 +512,7 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
     }
     else if( 300<=responseCode && responseCode<=399 )
     {
-        const int interval = 20;
+        const int interval = 5;
         dbgmsg( t, "got a redirect. retrying in %d seconds", interval );
 
         /* it's a redirect... updateAddresses() has already
