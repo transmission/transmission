@@ -1047,6 +1047,17 @@ tr_torrentDelete( tr_torrent * tor )
 ***  Completeness
 **/
 
+static const char *
+getCompletionString( int type )
+{
+    switch( type )
+    {
+        case TR_CP_DONE:     return _( "Done" );
+        case TR_CP_COMPLETE: return _( "Complete" );
+        default:             return _( "Incomplete" );
+    }
+}
+
 static void
 fireStatusChange( tr_torrent * tor, cp_status_t status )
 {
@@ -1081,15 +1092,27 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
     tr_torrentLock( tor );
 
     cpStatus = tr_cpGetStatus( tor->completion );
-    if( cpStatus != tor->cpStatus ) {
+
+    if( cpStatus != tor->cpStatus )
+    {
+        const int recentChange = tor->downloadedCur != 0;
+
+        if( recentChange )
+        {
+            tr_torinf( tor, _( "State changed from \"%s\" to \"%s\"" ),
+                            getCompletionString( tor->cpStatus ),
+                            getCompletionString( cpStatus ) );
+        }
+
         tor->cpStatus = cpStatus;
         fireStatusChange( tor, cpStatus );
-        if( (cpStatus == TR_CP_COMPLETE) /* ...and if we're complete */
-            && tor->downloadedCur ) {        /* and it just happened */
-            tr_trackerCompleted( tor->tracker ); /* tell the tracker */
-        }
+
+        if( recentChange && ( cpStatus == TR_CP_COMPLETE ) )
+            tr_trackerCompleted( tor->tracker );
+
         saveFastResumeNow( tor );
     }
+
     tr_torrentUnlock( tor );
 }
 

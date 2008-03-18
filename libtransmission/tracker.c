@@ -162,7 +162,7 @@ myDebug( const char * file, int line, const tr_tracker * t, const char * fmt, ..
 ****
 ***/
 
-static tr_tracker_info *
+static const tr_tracker_info *
 getCurrentAddress( const tr_tracker * t )
 {
     assert( t->addresses != NULL );
@@ -295,6 +295,7 @@ updateAddresses( tr_tracker * t, const struct evhttp_request * req, int * tryAga
 
     if( !req ) /* tracker didn't respond */
     {
+        tr_ninf( t->name, _( "Tracker hasn't responded yet.  Retrying..." ) );
         moveToNextAddress = TRUE;
     }
     else if( req->response_code == HTTP_OK )
@@ -347,6 +348,11 @@ updateAddresses( tr_tracker * t, const struct evhttp_request * req, int * tryAga
         {
             *tryAgain = FALSE;
             t->addressIndex = 0;
+        }
+        else
+        {
+            const tr_tracker_info * n = getCurrentAddress( t );
+            tr_ninf( t->name, _( "Trying next tracker \"%s:%d\"" ), n->address, n->port );
         }
     }
 }
@@ -684,7 +690,7 @@ buildTrackerRequestURI( const tr_tracker  * t,
     struct evbuffer * buf = evbuffer_new( );
     char * ret;
 
-    char * ann = getCurrentAddress(t)->announce;
+    const char * ann = getCurrentAddress(t)->announce;
     
     evbuffer_add_printf( buf, "%s"
                               "%cinfo_hash=%s"

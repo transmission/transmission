@@ -974,7 +974,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
     {
         const int n = sub->val.s.i / 6 ;
         if( n )
-            tr_torinf( tor, _( "Got %d peers from peer exchange" ), n );
+            tr_tordbg( tor, _( "Got %d peers from peer exchange" ), n );
         tr_peerMgrAddPeers( msgs->handle->peerMgr,
                             tor->info.hash,
                             TR_PEER_FROM_PEX,
