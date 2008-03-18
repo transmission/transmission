@@ -112,7 +112,7 @@ struct cbdata
     TrCore       * core;
     GtkWidget    * msgwin;
     GtkWidget    * prefs;
-    GList        * errqueue;
+    GSList       * errqueue;
     GHashTable   * tor2details;
     GHashTable   * details2tor;
 };
@@ -122,9 +122,9 @@ struct cbdata
 static GtkUIManager * myUIManager = NULL;
 
 static gboolean
-sendremote( GList * files, gboolean sendquit );
+sendremote( GSList * files, gboolean sendquit );
 static void
-appsetup( TrWindow * wind, GList * args,
+appsetup( TrWindow * wind, GSList * args,
           struct cbdata *,
           gboolean paused, gboolean minimized );
 static void
@@ -141,7 +141,7 @@ static void
 coreerr( TrCore * core, enum tr_core_err code, const char * msg,
          gpointer gdata );
 static void
-coreprompt( TrCore *, GList *, gpointer, gpointer );
+onAddTorrent( TrCore *, tr_ctor *, gpointer );
 static void
 prefschanged( TrCore * core, const char * key, gpointer data );
 static gboolean
@@ -256,7 +256,7 @@ main( int argc, char ** argv )
 {
     char * err;
     struct cbdata * cbdata;
-    GList * argfiles;
+    GSList * argfiles;
     GError * gerr;
     gboolean didinit = FALSE;
     gboolean didlock = FALSE;
@@ -335,7 +335,7 @@ main( int argc, char ** argv )
 }
 
 static gboolean
-sendremote( GList * files, gboolean sendquit )
+sendremote( GSList * files, gboolean sendquit )
 {
     const gboolean didlock = cf_lock( NULL );
 
@@ -351,7 +351,7 @@ sendremote( GList * files, gboolean sendquit )
 }
 
 static void
-appsetup( TrWindow * wind, GList * args,
+appsetup( TrWindow * wind, GSList * torrentFiles,
           struct cbdata * cbdata,
           gboolean forcepause, gboolean minimized )
 {
@@ -369,8 +369,8 @@ appsetup( TrWindow * wind, GList * args,
 
     /* set up core handlers */
     g_signal_connect( cbdata->core, "error", G_CALLBACK( coreerr ), cbdata );
-    g_signal_connect( cbdata->core, "destination-prompt",
-                      G_CALLBACK( coreprompt ), cbdata );
+    g_signal_connect( cbdata->core, "add-torrent-prompt",
+                      G_CALLBACK( onAddTorrent ), cbdata );
     g_signal_connect_swapped( cbdata->core, "quit",
                               G_CALLBACK( wannaquit ), cbdata );
     g_signal_connect( cbdata->core, "prefs-changed",
@@ -378,14 +378,8 @@ appsetup( TrWindow * wind, GList * args,
 
     /* add torrents from command-line and saved state */
     tr_core_load( cbdata->core, forcepause );
-
-    if( NULL != args )
-    {
-        tr_ctor * ctor = tr_ctorNew( tr_core_handle( cbdata->core ) );
-        if( forcepause )
-            tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
-        tr_core_add_list( cbdata->core, args, ctor );
-    }
+    tr_core_add_list( cbdata->core, torrentFiles, forcepause );
+    torrentFiles = NULL;
     tr_core_torrents_added( cbdata->core );
 
     /* set up the ipc socket */
@@ -545,8 +539,8 @@ quitThreadFunc( gpointer gdata )
     if( cbdata->icon )
         g_object_unref( cbdata->icon );
     if( cbdata->errqueue ) {
-        g_list_foreach( cbdata->errqueue, (GFunc)g_free, NULL );
-        g_list_free( cbdata->errqueue );
+        g_slist_foreach( cbdata->errqueue, (GFunc)g_free, NULL );
+        g_slist_free( cbdata->errqueue );
     }
 
     g_hash_table_destroy( cbdata->details2tor );
@@ -637,8 +631,8 @@ gotdrag( GtkWidget         * widget UNUSED,
          gpointer            gdata )
 {
     struct cbdata * data = gdata;
-    GList * paths = NULL;
-    GList * freeme = NULL;
+    GSList * paths = NULL;
+    GSList * freeme = NULL;
 
 #if 0
     int i;
@@ -672,7 +666,7 @@ gotdrag( GtkWidget         * widget UNUSED,
 
             /* decode the filename */
             filename = decode_uri( files[i] );
-            freeme = g_list_prepend( freeme, filename );
+            freeme = g_slist_prepend( freeme, filename );
             if( !g_utf8_validate( filename, -1, NULL ) )
                 continue;
 
@@ -693,17 +687,15 @@ gotdrag( GtkWidget         * widget UNUSED,
 
             /* finally, add it to the list of torrents to try adding */
             if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
-                paths = g_list_prepend( paths, filename );
+                paths = g_slist_prepend( paths, g_strdup( filename ) );
         }
 
         /* try to add any torrents we found */
-        if( paths != NULL )
+        if( paths )
         {
-            tr_ctor * ctor = tr_ctorNew( tr_core_handle( data->core ) );
-            paths = g_list_reverse( paths );
-            tr_core_add_list( data->core, paths, ctor );
+            paths = g_slist_reverse( paths );
+            tr_core_add_list( data->core, paths, FALSE );
             tr_core_torrents_added( data->core );
-            g_list_free( paths );
         }
 
         freestrlist( freeme );
@@ -738,20 +730,20 @@ coreerr( TrCore * core UNUSED, enum tr_core_err code, const char * msg,
     switch( code )
     {
         case TR_CORE_ERR_ADD_TORRENT:
-            cbdata->errqueue = g_list_append( cbdata->errqueue,
-                                              g_strdup( msg ) );
+            cbdata->errqueue = g_slist_append( cbdata->errqueue,
+                                               g_strdup( msg ) );
             return;
         case TR_CORE_ERR_NO_MORE_TORRENTS:
-            if( NULL != cbdata->errqueue )
+            if( cbdata->errqueue )
             {
                 joined = joinstrlist( cbdata->errqueue, "\n" );
                 errmsg( cbdata->wind,
                         ngettext( "Failed to load torrent file: %s",
                                   "Failed to load torrent files: %s",
-                                  g_list_length( cbdata->errqueue ) ),
+                                  g_slist_length( cbdata->errqueue ) ),
                         joined );
-                g_list_foreach( cbdata->errqueue, (GFunc) g_free, NULL );
-                g_list_free( cbdata->errqueue );
+                g_slist_foreach( cbdata->errqueue, (GFunc) g_free, NULL );
+                g_slist_free( cbdata->errqueue );
                 cbdata->errqueue = NULL;
                 g_free( joined );
             }
@@ -776,29 +768,13 @@ on_main_window_focus_in( GtkWidget      * widget UNUSED,
 #endif
 
 static void
-coreprompt( TrCore                 * core,
-            GList                  * paths,
-            gpointer                 ctor,
-            gpointer                 gdata )
+onAddTorrent( TrCore * core, tr_ctor * ctor, gpointer gdata )
 {
     struct cbdata * cbdata = gdata;
-    const int len = g_list_length( paths );
-    GtkWidget * w;
-
-    if( len > 1 )
-        w = promptfordir( cbdata->wind, core, paths, ctor );
-    else {
-        if( len == 1 )
-            tr_ctorSetMetainfoFromFile( ctor, paths->data );
-        w = makeaddwind( cbdata->wind, core, ctor );
-    }
-
+    GtkWidget * w = openSingleTorrentDialog( cbdata->wind, core, ctor );
 #if GTK_CHECK_VERSION(2,8,0)
-    if( w )
-    if( cbdata->wind )
-        gtk_window_set_urgency_hint( GTK_WINDOW( w ), TRUE );
-    g_signal_connect( w, "focus-in-event",
-                      G_CALLBACK(on_main_window_focus_in),  cbdata );
+    g_signal_connect( w, "focus-in-event", G_CALLBACK(on_main_window_focus_in),  cbdata );
+    gtk_window_set_urgency_hint( cbdata->wind, TRUE );
 #endif
 }
 
@@ -999,21 +975,23 @@ accumulateSelectedTorrents( GtkTreeModel * model,
                             GtkTreeIter  * iter,
                             gpointer       gdata )
 {
-    GList ** data = ( GList** ) gdata;
+    GSList ** data = ( GSList** ) gdata;
     TrTorrent * tor = NULL;
     gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
-    *data = g_list_append( *data, tor );
+    *data = g_slist_prepend( *data, tor );
 }
 
 static void
 removeSelected( struct cbdata * data, gboolean delete_files )
 {
-    GList * l = NULL;
+    GSList * l = NULL;
     GtkTreeSelection * s = tr_window_get_selection( data->wind );
     gtk_tree_selection_selected_foreach( s, accumulateSelectedTorrents, &l );
     gtk_tree_selection_unselect_all( s );
-    if( l )
+    if( l ) {
+        l = g_slist_reverse( l );
         confirmRemove( data->wind, data->core, l, delete_files );
+    }
 }
 
 void
@@ -1024,8 +1002,7 @@ doAction ( const char * action_name, gpointer user_data )
 
     if ( !strcmp (action_name, "open-torrent-menu") || !strcmp( action_name, "open-torrent-toolbar" ))
     {
-        tr_core_add_list( data->core, NULL,
-                          tr_ctorNew( tr_core_handle( data->core ) ) );
+        openDialog( data->wind, data->core );
     }
     else if (!strcmp (action_name, "show-stats"))
     {

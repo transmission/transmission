@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <stdlib.h> /* free() */
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 #include <third-party/miniupnp/miniwget.h>

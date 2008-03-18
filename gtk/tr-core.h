@@ -65,8 +65,9 @@ typedef struct TrCoreClass
        void handler( TrCore *, enum tr_core_err, const char *, gpointer ) */
     int errsig;
 
-    /* "destination-prompt" signal:
-       void handler( TrCore *, GList *, gpointer ctor, gpointer userData ) */
+    /* "add-torrent-prompt" signal:
+       void handler( TrCore *, gpointer ctor, gpointer userData )
+       The handler assumes ownership of ctor and must free when done */
     int promptsig;
 
     /* "quit" signal:
@@ -110,18 +111,22 @@ int tr_core_load( TrCore * self, gboolean forcepaused );
 
 /**
  * Add a torrent.
+ * This function assumes ownership of ctor
+ *
  * May trigger an "error" signal with TR_CORE_ERR_ADD_TORRENT
- * Caller must free the ctor.
  */
 void tr_core_add_ctor( TrCore * self, tr_ctor * ctor );
 
 /**
  * Add a list of torrents.
+ * This function assumes ownership of torrentFiles
+ *
+ * May pop up dialogs for each torrent if that preference is enabled.
  * May trigger one or more "error" signals with TR_CORE_ERR_ADD_TORRENT
  */
-void tr_core_add_list( TrCore   * self,
-                       GList    * torrentFiles,
-                       tr_ctor  * ctor );
+void tr_core_add_list( TrCore  * self,
+                       GSList  * torrentFiles,
+                       gboolean  forcePaused );
 
 /**
  * Add a torrent.

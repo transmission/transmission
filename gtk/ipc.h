@@ -33,7 +33,7 @@ void
 ipc_socket_setup( GtkWindow * wind, TrCore * core );
 
 gboolean
-ipc_sendfiles_blocking( GList * files );
+ipc_sendfiles_blocking( GSList * files );
 
 gboolean
 ipc_sendquit_blocking( void );

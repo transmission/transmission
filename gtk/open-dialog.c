@@ -126,9 +126,9 @@ destinationChanged( GtkFileChooserButton * b, gpointer gdata )
 ****/
 
 GtkWidget*
-makeaddwind( GtkWindow  * parent,
-             TrCore     * core,
-             tr_ctor    * ctor )
+openSingleTorrentDialog( GtkWindow  * parent,
+                         TrCore     * core,
+                         tr_ctor    * ctor )
 {
     int row;
     int col;
@@ -239,4 +239,43 @@ makeaddwind( GtkWindow  * parent,
     gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( d )->vbox ), t );
     gtk_widget_show_all( d );
     return d;
+}
+
+/****
+*****
+****/
+
+static void
+onOpenDialogResponse( GtkDialog * dialog, int response, gpointer core )
+{
+    if( response == GTK_RESPONSE_ACCEPT )
+    {
+        GSList * l = gtk_file_chooser_get_filenames( GTK_FILE_CHOOSER( dialog ) );
+        tr_core_add_list( core, l, FALSE );
+    }
+
+    gtk_widget_destroy( GTK_WIDGET( dialog ) );
+}
+
+GtkWidget*
+openDialog( GtkWindow * parent,
+            TrCore    * core )
+{
+    GtkWidget * w;
+
+    w = gtk_file_chooser_dialog_new( _( "Select Torrents" ), parent,
+                                     GTK_FILE_CHOOSER_ACTION_OPEN,
+                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                     NULL );
+    gtk_dialog_set_alternative_button_order( GTK_DIALOG( w ),
+                                             GTK_RESPONSE_ACCEPT,
+                                             GTK_RESPONSE_CANCEL,
+                                             -1 );
+    gtk_file_chooser_set_select_multiple( GTK_FILE_CHOOSER( w ), TRUE );
+
+    g_signal_connect( w, "response", G_CALLBACK(onOpenDialogResponse), core );
+
+    gtk_widget_show( w );
+    return w;
 }

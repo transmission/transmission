@@ -29,18 +29,12 @@
 #include "tr-torrent.h"
 #include "util.h"
 
-/* prompt for a download folder for torrents, then add them */
-GtkWidget* promptfordir( GtkWindow  * parent,
-                         TrCore     * core,
-                         GList      * filenames,
-                         tr_ctor    * ctor );
-
 /* prompt if the user wants to quit, calls func with cbdata if they do */
 void askquit( TrCore*, GtkWindow* parent, callbackfunc_t func, void* cbdata );
 
 void confirmRemove( GtkWindow * parent,
                     TrCore    * core,
-                    GList     * gtorrents,
+                    GSList    * gtorrents,
                     gboolean    doDelete );
 
 #endif /* TG_PREFS_H */

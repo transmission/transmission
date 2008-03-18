@@ -16,8 +16,12 @@
 #include <gtk/gtkwindow.h>
 #include "tr-core.h"
 
-GtkWidget* makeaddwind( GtkWindow  * parent,
-                        TrCore     * core,
-                        tr_ctor    * ctor );
+/* This dialog assumes ownership of the ctor */
+GtkWidget* openSingleTorrentDialog( GtkWindow  * parent,
+                                    TrCore     * core,
+                                    tr_ctor    * ctor );
+
+GtkWidget* openDialog( GtkWindow * parent,
+                       TrCore    * core );
 
 #endif /* TR_GTK_OPEN_DIALOG */

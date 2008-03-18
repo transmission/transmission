@@ -72,7 +72,7 @@ struct constate_client
 {
     GMainLoop  * loop;
     enum ipc_msg msg;
-    GList      * files;
+    GSList     * files;
     gboolean   * succeeded;
     unsigned int msgid;
 };
@@ -162,7 +162,7 @@ static void
 client_sendmsg( struct constate * con )
 {
     struct constate_client * cli = &con->u.client;
-    GList                  * ii;
+    GSList                 * ii;
     uint8_t                * buf;
     size_t                   size;
     tr_benc               packet, * val;
@@ -173,7 +173,7 @@ client_sendmsg( struct constate * con )
         case IPC_MSG_ADDMANYFILES:
             val = ipc_initval( con->ipc, cli->msg, -1, &packet, TYPE_LIST );
             if( NULL == val ||
-                tr_bencListReserve( val, g_list_length( cli->files ) ) )
+                tr_bencListReserve( val, g_slist_length( cli->files ) ) )
             {
                 perror( "malloc" );
                 destroycon( con );
@@ -186,7 +186,7 @@ client_sendmsg( struct constate * con )
             buf = ipc_mkval( &packet, &size );
             saved = errno;
             tr_bencFree( &packet );
-            g_list_free( cli->files );
+            g_slist_free( cli->files );
             cli->files = NULL;
             break;
         case IPC_MSG_QUIT:
@@ -298,7 +298,7 @@ client_connect(char *path, struct constate *con) {
 }
 
 static gboolean
-blocking_client( enum ipc_msg msgid, GList * files )
+blocking_client( enum ipc_msg msgid, GSList * files )
 {
 
   struct constate *con;
@@ -347,7 +347,7 @@ blocking_client( enum ipc_msg msgid, GList * files )
 }
 
 gboolean
-ipc_sendfiles_blocking( GList * files )
+ipc_sendfiles_blocking( GSList * files )
 {
     return blocking_client( IPC_MSG_ADDMANYFILES, files );
 }
@@ -498,16 +498,13 @@ smsg_add( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag, void * arg )
     struct constate_serv * srv = &con->u.serv;
     tr_benc           * path;
     int                    ii;
-    tr_ctor              * ctor;
-    GList                * list = NULL;
+    GSList               * list = NULL;
 
     if( NULL == val || TYPE_LIST != val->type )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
     }
-
-    ctor = tr_ctorNew( srv->core );
 
     for( ii = 0; ii < val->val.l.count; ii++ )
     {
@@ -516,12 +513,13 @@ smsg_add( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag, void * arg )
             /* XXX somehow escape invalid utf-8 */
             g_utf8_validate( path->val.s.s, path->val.s.i, NULL ) )
         {
-            list = g_list_append( list, g_strndup( path->val.s.s, path->val.s.i ) );
+            list = g_slist_prepend( list, g_strndup( path->val.s.s, path->val.s.i ) );
         }
     }
 
     if( list ) {
-        tr_core_add_list( srv->core, list, ctor );
+        list = g_slist_reverse( list );
+        tr_core_add_list( srv->core, list, FALSE );
         tr_core_torrents_added( TR_CORE( srv->core ) );
     }
 

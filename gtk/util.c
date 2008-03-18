@@ -187,19 +187,19 @@ mkdir_p( const char * path, mode_t mode )
 #endif
 }
 
-GList *
-dupstrlist( GList * l )
+GSList *
+dupstrlist( GSList * l )
 {
-    GList * ret = NULL;
+    GSList * ret = NULL;
     for( ; l!=NULL; l=l->next )
-        ret = g_list_prepend( ret, g_strdup( l->data ) );
-    return g_list_reverse( ret );
+        ret = g_slist_prepend( ret, g_strdup( l->data ) );
+    return g_slist_reverse( ret );
 }
 
 char *
-joinstrlist(GList *list, char *sep)
+joinstrlist(GSList *list, char *sep)
 {
-  GList *l;
+  GSList *l;
   GString *gstr = g_string_new (NULL);
   for (l=list; l!=NULL; l=l->next) {
     g_string_append (gstr, (char*)l->data);
@@ -210,10 +210,10 @@ joinstrlist(GList *list, char *sep)
 }
 
 void
-freestrlist(GList *list)
+freestrlist(GSList *list)
 {
-  g_list_foreach (list, (GFunc)g_free, NULL);
-  g_list_free (list);
+  g_slist_foreach (list, (GFunc)g_free, NULL);
+  g_slist_free (list);
 }
 
 char *
@@ -225,11 +225,11 @@ decode_uri( const char * uri )
     return ret;
 }
 
-GList *
+GSList *
 checkfilenames( int argc, char **argv )
 {
     int i;
-    GList * ret = NULL;
+    GSList * ret = NULL;
     char * pwd = g_get_current_dir( );
 
     for( i=0; i<argc; ++i )
@@ -239,13 +239,13 @@ checkfilenames( int argc, char **argv )
             : g_build_filename( pwd, argv[i], NULL );
 
         if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
-            ret = g_list_append( ret, filename );
+            ret = g_slist_prepend( ret, filename );
         else
             g_free( filename );
     }
 
     g_free( pwd );
-    return ret;
+    return g_slist_reverse( ret );
 }
 
 char *
@@ -294,19 +294,18 @@ sizingmagic( GtkWindow         * wind,
 }
 
 static void
-errcb(GtkWidget *widget, int resp UNUSED, gpointer data) {
-  GList *funcdata;
-  callbackfunc_t func;
+onErrorResponse(GtkWidget * dialog, int resp UNUSED, gpointer glist)
+{
+    GSList * list = glist;
+    if( list )
+    {
+        callbackfunc_t func = list->data;
+        gpointer user_data = list->next->data;
+        func( user_data );
+        g_slist_free( list );
+    }
 
-  if(NULL != data) {
-    funcdata = g_list_first(data);
-    func = (callbackfunc_t) funcdata->data;
-    data = funcdata->next->data;
-    func(data);
-    g_list_free(funcdata);
-  }
-
-  gtk_widget_destroy(widget);
+    gtk_widget_destroy( dialog );
 }
 
 static GtkWidget *
@@ -315,7 +314,7 @@ verrmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
 {
   GtkWidget *dialog;
   char *msg;
-  GList *funcdata;
+  GSList *funcdata = NULL;
 
   msg = g_strdup_vprintf(format, ap);
 
@@ -327,11 +326,11 @@ verrmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
       GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
       GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", msg);
 
-  if(NULL == func)
-    funcdata = NULL;
-  else
-      funcdata = g_list_append(g_list_append(NULL, (void *) func), data);
-  g_signal_connect(dialog, "response", G_CALLBACK(errcb), funcdata);
+  if( func ) {
+    funcdata = g_slist_append( funcdata, (gpointer)func );
+    funcdata = g_slist_append( funcdata, data );
+  }
+  g_signal_connect(dialog, "response", G_CALLBACK(onErrorResponse), funcdata);
   g_free(msg);
 
   return dialog;

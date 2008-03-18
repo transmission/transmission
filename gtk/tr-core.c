@@ -45,7 +45,7 @@ struct TrCorePrivate
     GFileMonitor     * monitor;
     gulong             monitor_tag;
     char             * monitor_path;
-    GList            * monitor_files;
+    GSList           * monitor_files;
     guint              monitor_idle_tag;
 #endif
     GtkTreeModel     * model;
@@ -83,22 +83,20 @@ tr_core_marshal_prompt( GClosure * closure, GValue * ret UNUSED,
                         guint count, const GValue * vals,
                         gpointer hint UNUSED, gpointer marshal )
 {
-    typedef void (*TRMarshalPrompt)( gpointer, GList *, gpointer, gpointer );
+    typedef void (*TRMarshalPrompt)( gpointer, tr_ctor *, gpointer );
     TRMarshalPrompt        callback;
     GCClosure            * cclosure = (GCClosure*) closure;
-    GList                * paths;
     gpointer               ctor;
     gpointer               inst, gdata;
 
-    g_return_if_fail( count == 3 );
+    g_return_if_fail( count == 2 );
 
     inst      = g_value_peek_pointer( vals );
-    paths     = g_value_peek_pointer( vals + 1 );
-    ctor      = g_value_peek_pointer( vals + 2 );
+    ctor      = g_value_peek_pointer( vals + 1 );
     gdata     = closure->data;
 
     callback = (TRMarshalPrompt)( marshal ? marshal : cclosure->callback );
-    callback( inst, paths, ctor, gdata );
+    callback( inst, ctor, gdata );
 }
 
 static int
@@ -141,11 +139,11 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                        tr_core_marshal_err, G_TYPE_NONE,
                                        2, G_TYPE_INT, G_TYPE_STRING );
-    core_class->promptsig = g_signal_new( "destination-prompt",
+    core_class->promptsig = g_signal_new( "add-torrent-prompt",
                                           G_TYPE_FROM_CLASS( g_class ),
                                           G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                           tr_core_marshal_prompt, G_TYPE_NONE,
-                                          2, G_TYPE_POINTER, G_TYPE_POINTER );
+                                          1, G_TYPE_POINTER );
     core_class->quitsig = g_signal_new( "quit", G_TYPE_FROM_CLASS( g_class ),
                                         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                         g_cclosure_marshal_VOID__VOID,
@@ -311,13 +309,8 @@ tr_core_apply_defaults( tr_ctor * ctor )
 static gboolean
 watchFolderIdle( gpointer gcore )
 {
-    TrCore * core;
-    tr_ctor * ctor;
-
-    /* add these files */
-    core = TR_CORE( gcore );
-    ctor = tr_ctorNew( core->priv->handle );
-    tr_core_add_list( core, core->priv->monitor_files, ctor );
+    TrCore * core = TR_CORE( gcore );
+    tr_core_add_list( core, core->priv->monitor_files, FALSE );
 
     /* cleanup */
     core->priv->monitor_files = NULL;
@@ -334,8 +327,8 @@ maybeAddTorrent( TrCore * core, const char * filename )
     {
         struct TrCorePrivate * p = core->priv;
 
-        if( !g_list_find_custom( p->monitor_files, filename, (GCompareFunc)strcmp ) )
-            p->monitor_files = g_list_append( p->monitor_files, g_strdup( filename ) );
+        if( !g_slist_find_custom( p->monitor_files, filename, (GCompareFunc)strcmp ) )
+            p->monitor_files = g_slist_append( p->monitor_files, g_strdup( filename ) );
         if( !p->monitor_idle_tag )
             p->monitor_idle_tag = g_timeout_add( 1000, watchFolderIdle, core );
     }
@@ -625,10 +618,9 @@ tr_core_load( TrCore * self, gboolean forcePaused )
 }
 
 static void
-tr_core_errsig( TrCore * self, enum tr_core_err type, const char * msg )
+tr_core_errsig( TrCore * core, enum tr_core_err type, const char * msg )
 {
-    TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
-    g_signal_emit( self, class->errsig, 0, type, msg );
+    g_signal_emit( core, TR_CORE_GET_CLASS(core)->errsig, 0, type, msg );
 }
 
 void
@@ -645,27 +637,37 @@ tr_core_add_ctor( TrCore * self, tr_ctor * ctor )
         tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );
         g_free( errstr );
     }
+
+    /* cleanup */
+    tr_ctorFree( ctor );
 }
 
 void
-tr_core_add_list( TrCore   * self,
-                  GList    * paths,
-                  tr_ctor  * ctor )
+tr_core_add_list( TrCore   * core,
+                  GSList   * torrentFiles,
+                  gboolean   forcePaused )
 {
-    tr_core_apply_defaults( ctor );
+    if( torrentFiles && !isDisposed( core ) )
+    {
+        GSList * l;
+        const gboolean doPrompt = pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
 
-    if( pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) )
-    {
-        TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
-        g_signal_emit( self, class->promptsig, 0, paths, ctor );
+        for( l=torrentFiles; l!=NULL; l=l->next )
+        {
+            tr_ctor * ctor = tr_ctorNew( core->priv->handle );
+            tr_core_apply_defaults( ctor );
+            if( forcePaused )
+                tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
+            if( tr_ctorSetMetainfoFromFile( ctor, l->data ) )
+                tr_ctorFree( ctor );
+            else if( doPrompt )
+                g_signal_emit( core, TR_CORE_GET_CLASS(core)->promptsig, 0, ctor );
+            else
+                tr_core_add_ctor( core, ctor );
+        }
     }
-    else
-    {
-        for( ; paths; paths=paths->next )
-            if( !tr_ctorSetMetainfoFromFile( ctor, paths->data ) )
-                tr_core_add_ctor( self, ctor );
-        tr_ctorFree( ctor );
-    }
+
+    freestrlist( torrentFiles );
 }
 
 void
@@ -793,10 +795,9 @@ tr_core_update( TrCore * self )
 }
 
 void
-tr_core_quit( TrCore * self )
+tr_core_quit( TrCore * core )
 {
-    TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
-    g_signal_emit( self, class->quitsig, 0 );
+    g_signal_emit( core, TR_CORE_GET_CLASS(core)->quitsig, 0 );
 }
 
 /**
@@ -804,11 +805,10 @@ tr_core_quit( TrCore * self )
 **/
 
 static void
-commitPrefsChange( TrCore * self, const char * key )
+commitPrefsChange( TrCore * core, const char * key )
 {
-    TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
     pref_save( NULL );
-    g_signal_emit( self, class->prefsig, 0, key );
+    g_signal_emit( core, TR_CORE_GET_CLASS(core)->prefsig, 0, key );
 }
 
 void

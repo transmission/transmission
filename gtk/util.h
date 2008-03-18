@@ -59,24 +59,24 @@ rfc822date (guint64 epoch_msec);
 gboolean
 mkdir_p(const char *name, mode_t mode);
 
-/* create a copy of a GList of strings, this dups the actual strings too */
-GList *
-dupstrlist( GList * list );
+/* create a copy of a GSList of strings, this dups the actual strings too */
+GSList *
+dupstrlist( GSList * list );
 
-/* joins a GList of strings into one string using an optional separator */
+/* joins a GSList of strings into one string using an optional separator */
 char *
-joinstrlist(GList *list, char *sep);
+joinstrlist(GSList *list, char *sep);
 
-/* free a GList of strings */
+/* free a GSList of strings */
 void
-freestrlist(GList *list);
+freestrlist(GSList *list);
 
 /* decodes a string that has been urlencoded */
 char *
 decode_uri( const char * uri );
 
 /* return a list of cleaned-up paths, with invalid directories removed */
-GList *
+GSList *
 checkfilenames( int argc, char ** argv );
 
 /* retrieve the global download directory */

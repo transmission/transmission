@@ -49,7 +49,7 @@ struct iosource {
   char *inbuf;
   size_t inused;
   size_t inmax;
-  GList *outbufs;
+  GSList *outbufs;
   unsigned int lastid;
 };
 
@@ -183,7 +183,7 @@ io_write(struct iosource *io) {
     }
 
     if(buf->off >= buf->len) {
-      io->outbufs = g_list_remove(io->outbufs, buf);
+      io->outbufs = g_slist_remove(io->outbufs, buf);
       if(NULL == io->outbufs)
         g_source_remove_poll((GSource*)io, &io->outfd);
       if(NULL != io->sent)
@@ -220,13 +220,12 @@ static void
 io_finalize(GSource *source UNUSED) {
   struct iosource *io = (struct iosource*)source;
 
-  if(NULL != io->outbufs) {
-    g_list_foreach(io->outbufs, (GFunc)freeoutbuf, NULL);
-    g_list_free(io->outbufs);
-  }
+  g_slist_foreach(io->outbufs, (GFunc)freeoutbuf, NULL);
+  g_slist_free(io->outbufs);
+  g_free(io->inbuf);
 
-  if(NULL != io->inbuf)
-    g_free(io->inbuf);
+  io->outbufs = NULL;
+  io->inbuf = NULL;
 }
 
 static GSourceFuncs sourcefuncs = {
@@ -325,9 +324,9 @@ io_send_keepdata(GSource *source, void *data, size_t len) {
   buf->id = io->lastid;
 
   if(NULL != io->outbufs)
-    io->outbufs = g_list_append(io->outbufs, buf);
+    io->outbufs = g_slist_append(io->outbufs, buf);
   else {
-    io->outbufs = g_list_append(io->outbufs, buf);
+    io->outbufs = g_slist_append(io->outbufs, buf);
     g_source_add_poll(source, &io->outfd);
   }
 
