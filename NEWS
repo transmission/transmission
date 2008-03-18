@@ -14,7 +14,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Updated images in the inspector
    + Optional display of remaining time while seeding in Minimal View
    + Improved accuracy for displaying the remaining disk space warning
-- Gtk+:
+- GTK+:
    + New "watch directory" for auto-adding torrents
    + New system tray popup to notify when a torrent is completed
    + Add file selection and prioritization to the "open torrent" dialog

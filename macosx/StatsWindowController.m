@@ -60,11 +60,12 @@ tr_handle * fLib;
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
     //set label text
-    [fUploadedLabelField setStringValue: NSLocalizedString(@"Uploaded:", "Stats window -> label")];
-    [fDownloadedLabelField setStringValue: NSLocalizedString(@"Downloaded:", "Stats window -> label")];
-    [fRatioLabelField setStringValue: NSLocalizedString(@"Ratio:", "Stats window -> label")];
-    [fTimeLabelField setStringValue: NSLocalizedString(@"Running Time:", "Stats window -> label")];
-    [fNumOpenedLabelField setStringValue: NSLocalizedString(@"Program Started:", "Stats window -> label")];
+    [fUploadedLabelField setStringValue: [NSLocalizedString(@"Uploaded", "Stats window -> label") stringByAppendingString: @":"]];
+    [fDownloadedLabelField setStringValue: [NSLocalizedString(@"Downloaded", "Stats window -> label") stringByAppendingString: @":"]];
+    [fRatioLabelField setStringValue: [NSLocalizedString(@"Ratio", "Stats window -> label") stringByAppendingString: @":"]];
+    [fTimeLabelField setStringValue: [NSLocalizedString(@"Running Time", "Stats window -> label") stringByAppendingString: @":"]];
+    [fNumOpenedLabelField setStringValue: [NSLocalizedString(@"Program Started", "Stats window -> label")
+                                            stringByAppendingString: @":"]];
     
     //size all elements
     float oldWidth = [fUploadedLabelField frame].size.width;

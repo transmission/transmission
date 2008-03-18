@@ -928,34 +928,32 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     int totalPeers, i;
     tr_peer_stat * peers = tr_torrentPeers(fHandle, &totalPeers);
     
-    NSMutableArray * peerDics = [NSMutableArray arrayWithCapacity: totalPeers];
-    NSMutableDictionary * dic;
+    NSMutableArray * peerDicts = [NSMutableArray arrayWithCapacity: totalPeers];
     
-    tr_peer_stat * peer;
     for (i = 0; i < totalPeers; i++)
     {
-        peer = &peers[i];
+        tr_peer_stat * peer = &peers[i];
+        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 9];
         
-        dic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-            [NSNumber numberWithInt: peer->from], @"From",
-            [NSString stringWithUTF8String: peer->addr], @"IP",
-            [NSNumber numberWithInt: peer->port], @"Port",
-            [NSNumber numberWithFloat: peer->progress], @"Progress",
-            [NSNumber numberWithBool: peer->isEncrypted], @"Encryption",
-            [NSString stringWithUTF8String: peer->client], @"Client",
-            [NSString stringWithUTF8String: peer->flagStr], @"Flags", nil];
+        [dict setObject: [NSNumber numberWithInt: peer->from] forKey: @"From"];
+        [dict setObject: [NSString stringWithUTF8String: peer->addr] forKey: @"IP"];
+        [dict setObject: [NSNumber numberWithInt: peer->port] forKey: @"Port"];
+        [dict setObject: [NSNumber numberWithFloat: peer->progress] forKey: @"Progress"];
+        [dict setObject: [NSNumber numberWithBool: peer->isEncrypted] forKey: @"Encryption"];
+        [dict setObject: [NSString stringWithUTF8String: peer->client] forKey: @"Client"];
+        [dict setObject: [NSString stringWithUTF8String: peer->flagStr] forKey: @"Flags"];
         
         if (peer->isUploadingTo)
-            [dic setObject: [NSNumber numberWithFloat: peer->uploadToRate] forKey: @"UL To Rate"];
+            [dict setObject: [NSNumber numberWithFloat: peer->uploadToRate] forKey: @"UL To Rate"];
         if (peer->isDownloadingFrom)
-            [dic setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];
+            [dict setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];
         
-        [peerDics addObject: dic];
+        [peerDicts addObject: dict];
     }
     
     tr_torrentPeersFree(peers, totalPeers);
     
-    return peerDics;
+    return peerDicts;
 }
 
 - (NSString *) progressString
@@ -1073,11 +1071,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if ([self isActive] && ![self isChecking])
     {
         if (fStat->status == TR_STATUS_DOWNLOAD)
-            string = [string stringByAppendingFormat: NSLocalizedString(@" - DL: %@, UL: %@", "Torrent -> status string"),
-                    [NSString stringForSpeed: [self downloadRate]], [NSString stringForSpeed: [self uploadRate]]];
+            string = [string stringByAppendingFormat: @" - %@: %@, %@: %@",
+                        NSLocalizedString(@"DL", "Torrent -> status string"), [NSString stringForSpeed: [self downloadRate]],
+                        NSLocalizedString(@"UL", "Torrent -> status string"), [NSString stringForSpeed: [self uploadRate]]];
         else
-            string = [string stringByAppendingFormat: NSLocalizedString(@" - UL: %@", "Torrent -> status string"),
-                        [NSString stringForSpeed: [self uploadRate]]];
+            string = [string stringByAppendingFormat: @" - %@: %@",
+                        NSLocalizedString(@"UL", "Torrent -> status string"), [NSString stringForSpeed: [self uploadRate]]];
     }
     
     return string;
@@ -1112,14 +1111,16 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             break;
         
         case TR_STATUS_DOWNLOAD:
-            string = [NSString stringWithFormat: NSLocalizedString(@"DL: %@, UL: %@", "Torrent -> status string"),
-                            [NSString stringForSpeed: [self downloadRate]], [NSString stringForSpeed: [self uploadRate]]];
+            string = [NSString stringWithFormat: @"%@: %@, %@: %@",
+                            NSLocalizedString(@"DL", "Torrent -> status string"), [NSString stringForSpeed: [self downloadRate]],
+                            NSLocalizedString(@"UL", "Torrent -> status string"), [NSString stringForSpeed: [self uploadRate]]];
             break;
         
         case TR_STATUS_SEED:
         case TR_STATUS_DONE:
-            string = [NSString stringWithFormat: NSLocalizedString(@"Ratio: %@, UL: %@", "Torrent -> status string"),
-                            [NSString stringForRatio: [self ratio]], [NSString stringForSpeed: [self uploadRate]]];
+            string = [NSString stringWithFormat: @"%@: %@, %@: %@",
+                            NSLocalizedString(@"Ratio", "Torrent -> status string"), [NSString stringForRatio: [self ratio]],
+                            NSLocalizedString(@"UL", "Torrent -> status string"), [NSString stringForSpeed: [self uploadRate]]];
             break;
         
         default:

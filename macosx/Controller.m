@@ -1421,8 +1421,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     else
                         tr_getSessionStats(fLib, &stats);
                     
-                    statusString = [NSLocalizedString(@"Ratio: ", "status bar -> status label")
-                                    stringByAppendingString: [NSString stringForRatio: stats.ratio]];
+                    statusString = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Ratio", "status bar -> status label"),
+                                    [NSString stringForRatio: stats.ratio]];
                 }
                 else //STATUS_TRANSFER_TOTAL or STATUS_TRANSFER_SESSION
                 {
@@ -1434,9 +1434,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     else
                         tr_getSessionStats(fLib, &stats);
                     
-                    statusString = [NSString stringWithFormat: NSLocalizedString(@"DL: %@  UL: %@",
-                        "status bar -> status label (2 spaces between)"),
-                        [NSString stringForFileSize: stats.downloadedBytes], [NSString stringForFileSize: stats.uploadedBytes]];
+                    statusString = [NSString stringWithFormat: @"%@: %@  %@: %@",
+                            NSLocalizedString(@"DL", "status bar -> status label"), [NSString stringForFileSize: stats.downloadedBytes],
+                            NSLocalizedString(@"UL", "status bar -> status label"), [NSString stringForFileSize: stats.uploadedBytes]];
                 }
                 
                 if ([NSApp isOnLeopardOrBetter])
