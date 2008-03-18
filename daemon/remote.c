@@ -261,6 +261,7 @@ usage( const char * msg, ... )
   "  -t --type mac             Use the MacOS X frontend\n"
   "  -u --upload-limit <int>   Max upload rate in KiB/s\n"
   "  -U --upload-unlimited     No upload rate limit\n"
+  "  -v --verify <hash>        Verify the torrent's local data\n"
   "  -x --proxy                Use proxy command to connect to frontend\n",
             getmyname(), getmyname(), LONG_VERSION_STRING );
     exit( 0 );
@@ -269,7 +270,7 @@ usage( const char * msg, ... )
 int
 readargs( int argc, char ** argv, struct opts * opts )
 {
-    char optstr[] = "a:c:d:DeEf:hilmMp:qr:s:S:t:u:Ux";
+    char optstr[] = "a:c:d:DeEf:hilmMp:qr:s:S:t:u:Uxv:";
     struct option longopts[] =
     {
         { "add",                required_argument, NULL, 'a' },
