@@ -651,14 +651,17 @@ tr_core_add_list( TrCore   * core,
     {
         GSList * l;
         const gboolean doPrompt = pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
+        tr_handle * handle = core->priv->handle;
 
         for( l=torrentFiles; l!=NULL; l=l->next )
         {
-            tr_ctor * ctor = tr_ctorNew( core->priv->handle );
+            tr_ctor * ctor = tr_ctorNew( handle );
             tr_core_apply_defaults( ctor );
             if( forcePaused )
                 tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
             if( tr_ctorSetMetainfoFromFile( ctor, l->data ) )
+                tr_ctorFree( ctor );
+            else if( tr_torrentParse( handle, ctor, NULL ) )
                 tr_ctorFree( ctor );
             else if( doPrompt )
                 g_signal_emit( core, TR_CORE_GET_CLASS(core)->promptsig, 0, ctor );
