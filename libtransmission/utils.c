@@ -548,6 +548,8 @@ tr_errorString( int code )
             return tr_strerror( EMFILE );
         case TR_ERROR_IO_DUP_DOWNLOAD:
             return _( "A torrent with this name and destination folder already exists." );
+        case TR_ERROR_IO_CHECKSUM:
+            return _( "Checksum failed" );
         case TR_ERROR_IO_OTHER:
             return _( "Generic I/O error" );
 

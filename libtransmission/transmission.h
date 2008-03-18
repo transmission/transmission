@@ -729,6 +729,7 @@ typedef enum tr_errno
     TR_ERROR_IO_FILE_TOO_BIG,
     TR_ERROR_IO_OPEN_FILES,
     TR_ERROR_IO_DUP_DOWNLOAD,
+    TR_ERROR_IO_CHECKSUM,
     TR_ERROR_IO_OTHER,
 
     /* tracker errors */

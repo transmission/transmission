@@ -265,7 +265,7 @@ tr_ioTestPiece( const tr_torrent * tor, int pieceIndex )
     err  = tr_ioRecalculateHash( tor, pieceIndex, hash );
 
     if( !err && memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH ) )
-        err = TR_ERROR;
+        err = TR_ERROR_IO_CHECKSUM;
 
     tr_tordbg (tor, "piece %d hash check: %s",
             pieceIndex, ( err ? "FAILED" : "OK" ));
