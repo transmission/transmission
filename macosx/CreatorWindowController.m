@@ -122,10 +122,10 @@
         NSString * fileString;
         int count = fInfo->fileCount;
         if (count != 1)
-            fileString = [NSString stringWithFormat: NSLocalizedString(@"%d Files, ", "Create torrent -> info"), count];
+            fileString = [NSString stringWithFormat: NSLocalizedString(@"%d Files", "Create torrent -> info"), count];
         else
-            fileString = NSLocalizedString(@"1 File, ", "Create torrent -> info");
-        statusString = [fileString stringByAppendingString: statusString];
+            fileString = NSLocalizedString(@"1 File", "Create torrent -> info");
+        statusString = [NSString stringWithFormat: @"%@, %@", fileString, statusString];
     }
     [fStatusField setStringValue: statusString];
     

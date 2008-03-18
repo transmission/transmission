@@ -118,10 +118,10 @@
     {
         NSString * fileString;
         if (fileCount == 1)
-            fileString = NSLocalizedString(@"1 File, ", "Drag overlay -> torrents");
+            fileString = NSLocalizedString(@"1 File", "Drag overlay -> torrents");
         else
-            fileString= [NSString stringWithFormat: NSLocalizedString(@"%d Files, ", "Drag overlay -> torrents"), fileCount];
-        secondString = [fileString stringByAppendingString: secondString];
+            fileString= [NSString stringWithFormat: NSLocalizedString(@"%d Files", "Drag overlay -> torrents"), fileCount];
+        secondString = [NSString stringWithFormat: @"%@, %@", fileString, secondString];
     }
     
     NSImage * icon;
