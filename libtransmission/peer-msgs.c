@@ -78,9 +78,13 @@ enum
     /* (fast peers) max threshold for allowing fast-pieces requests */
     MAX_FAST_ALLOWED_THRESHOLD = 10,
 
+    /* how long an unsent request can stay queued before it's returned
+       back to the peer-mgr's pool of requests */
     QUEUED_REQUEST_TTL_SECS = 20,
 
-    SENT_REQUEST_TTL_SECS = 90
+    /* how long a sent request can stay queued before it's returned
+       back to the peer-mgr's pool of requests */
+    SENT_REQUEST_TTL_SECS = 120
 };
 
 /**
@@ -144,6 +148,15 @@ reqListClear( struct request_list * list )
 }
 
 static void
+reqListCopy( struct request_list * dest, const struct request_list * src )
+{
+    dest->count = src->count;
+    dest->max = src->max;
+    dest->requests = tr_new( struct peer_request, dest->max );
+    memcpy( dest->requests, src->requests, sizeof( struct peer_request ) * dest->count );
+}
+
+static void
 reqListRemoveOne( struct request_list * list, int i )
 {
     assert( 0<=i && i<list->count );
@@ -202,33 +215,6 @@ reqListRemove( struct request_list * list, const struct peer_request * key )
     }
 
     return err;
-}
-
-static void
-reqListPrune( struct request_list * list,
-              struct request_list * pruned,
-              time_t                cutoff )
-{
-    int i, k=0, p=0;
-    struct peer_request keep[MAX_QUEUE_SIZE];
-    struct peer_request prune[MAX_QUEUE_SIZE];
-
-    for( i=0; i<list->count; ++i ) {
-        const struct peer_request * req = list->requests + i;
-        if( req->time_requested > cutoff )
-            keep[k++] = *req;
-        else
-            prune[p++] = *req;
-    }
-
-    memcpy( list->requests, keep, sizeof(struct peer_request) * k );
-    list->count = k;
-
-    reqListReserve( pruned, pruned->count + p );
-    memcpy( pruned->requests + pruned->count,
-            prune,
-            sizeof(struct peer_request) * p );
-    pruned->count += p;
 }
 
 /**
@@ -685,22 +671,28 @@ static void
 expireOldRequests( tr_peermsgs * msgs )
 {
     int i;
-    const time_t now = time( NULL );
-    const time_t queued_cutoff = now - QUEUED_REQUEST_TTL_SECS;
-    const time_t sent_cutoff   = now - SENT_REQUEST_TTL_SECS;
-    struct request_list pruned = REQUEST_LIST_INIT;
+    time_t oldestAllowed;
+    struct request_list tmp = REQUEST_LIST_INIT;
 
-    reqListPrune( &msgs->clientWillAskFor, &pruned, queued_cutoff );
-    reqListPrune( &msgs->clientAskedFor, &pruned, sent_cutoff );
-
-    /* expire the old requests */
-    for( i=0; i<pruned.count; ++i ) {
-        const struct peer_request * req = &pruned.requests[i];
-        tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
+    /* cancel requests that have been queued for too long */
+    oldestAllowed = time( NULL ) - QUEUED_REQUEST_TTL_SECS;
+    reqListCopy( &tmp, &msgs->clientWillAskFor );
+    for( i=0; i<tmp.count; ++i ) {
+        const struct peer_request * req = &tmp.requests[i];
+        if( req->time_requested < oldestAllowed )
+            tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
     }
+    reqListClear( &tmp );
 
-    /* cleanup */
-    reqListClear( &pruned );
+    /* cancel requests that were sent too long ago */
+    oldestAllowed = time( NULL ) - SENT_REQUEST_TTL_SECS;
+    reqListCopy( &tmp, &msgs->clientAskedFor );
+    for( i=0; i<tmp.count; ++i ) {
+        const struct peer_request * req = &tmp.requests[i];
+        if( req->time_requested < oldestAllowed )
+            tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
+    }
+    reqListClear( &tmp );
 }
 
 static void
@@ -1431,17 +1423,21 @@ getDownloadMax( const tr_peermsgs * msgs )
 }
 
 static void
+decrementDownloadedCount( tr_peermsgs * msgs, uint32_t byteCount )
+{
+    tr_torrent * tor = msgs->torrent;
+    tor->downloadedCur -= MIN( tor->downloadedCur, byteCount );
+}
+
+static void
 reassignBytesToCorrupt( tr_peermsgs * msgs, uint32_t byteCount )
 {
     tr_torrent * tor = msgs->torrent;
 
-    /* increment the `corrupt' field */
     tor->corruptCur += byteCount;
 
-    /* decrement the `downloaded' field */
-    tor->downloadedCur -= MIN( tor->downloadedCur, byteCount );
+    decrementDownloadedCount( msgs, byteCount );
 }
-
 
 static void
 gotBadPiece( tr_peermsgs * msgs, uint32_t pieceIndex )
@@ -1454,7 +1450,7 @@ gotBadPiece( tr_peermsgs * msgs, uint32_t pieceIndex )
 static void
 clientGotUnwantedBlock( tr_peermsgs * msgs, const struct peer_request * req )
 {
-    reassignBytesToCorrupt( msgs, req->length );
+    decrementDownloadedCount( msgs, req->length );
 }
 
 static void
