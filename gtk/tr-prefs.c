@@ -148,6 +148,7 @@ new_path_chooser_button( const char * key, gpointer core )
     g_object_set_data_full( G_OBJECT(w), PREF_KEY, g_strdup(key), g_free );
     g_signal_connect( w, "selection-changed", G_CALLBACK(chosen_cb), core );
     gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER(w), path );
+    g_free( path );
     return w;
 }
 
@@ -184,6 +185,7 @@ test_port( gpointer data_gpointer )
         text = miniwget( url, &size );
         /*g_message(" got len %d, [%*.*s]", size, size, size, text );*/
         isOpen = text && *text=='1';
+        free( text );
 
         if( *data->alive )
             gtk_label_set_markup( GTK_LABEL(data->label), isOpen
@@ -232,7 +234,7 @@ torrentPage( GObject * core )
         hig_workarea_add_row_w( t, &row, l, w, NULL );
 #endif
 
-        s = _( "Show _options dialog" );
+        s = _( "_Prompt for file selections and priorities" );
         w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );
         hig_workarea_add_wide_control( t, &row, w );
 
