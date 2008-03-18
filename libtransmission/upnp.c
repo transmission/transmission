@@ -88,18 +88,18 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
         errno = 0;
         devlist = upnpDiscover( 2000, NULL, NULL );
         if( devlist == NULL ) {
-            tr_nerr( getKey(), _( "upnpDiscover failed (errno %d - %s)" ), errno, tr_strerror(errno) );
+            tr_ndbg( getKey(), _( "upnpDiscover failed (errno %d - %s)" ), errno, tr_strerror(errno) );
         }
         errno = 0;
         if( UPNP_GetValidIGD( devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr))) {
-            tr_ninf( getKey(), _( "Found Internet Gateway Device \"%s\"" ), handle->urls.controlURL );
-            tr_ninf( getKey(), _( "Local Address is \"%s\"" ), handle->lanaddr );
+            tr_ndbg( getKey(), _( "Found Internet Gateway Device \"%s\"" ), handle->urls.controlURL );
+            tr_ndbg( getKey(), _( "Local Address is \"%s\"" ), handle->lanaddr );
             handle->state = TR_UPNP_IDLE;
             handle->hasDiscovered = 1;
         } else {
             handle->state = TR_UPNP_ERR;
-            tr_nerr( getKey(), _( "UPNP_GetValidIGD failed (errno %d - %s)" ), errno, tr_strerror(errno) );
-            tr_nerr( getKey(), _( "If your router supports UPnP, please make sure UPnP is enabled!" ) );
+            tr_ndbg( getKey(), _( "UPNP_GetValidIGD failed (errno %d - %s)" ), errno, tr_strerror(errno) );
+            tr_ndbg( getKey(), _( "If your router supports UPnP, please make sure UPnP is enabled!" ) );
         }
         freeUPNPDevlist( devlist );
     }
@@ -153,8 +153,8 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
             handle->port = port;
             handle->state = TR_UPNP_IDLE;
         } else {
-            tr_nerr( getKey(), _( "Port forwarding failed with error %d (%d - %s)" ), err, errno, tr_strerror(errno) );
-            tr_nerr( getKey(), _( "If your router supports UPnP, please make sure UPnP is enabled!" ) );
+            tr_ndbg( getKey(), _( "Port forwarding failed with error %d (%d - %s)" ), err, errno, tr_strerror(errno) );
+            tr_ndbg( getKey(), _( "If your router supports UPnP, please make sure UPnP is enabled!" ) );
             handle->port = -1;
             handle->state = TR_UPNP_ERR;
         }
