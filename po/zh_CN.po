@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-10 08:08-0500\n"
+"POT-Creation-Date: 2008-03-18 12:52-0500\n"
 "PO-Revision-Date: 2008-01-07 14:11+0800\n"
 "Last-Translator: weiyh <weiyh2006@gmail.com>\n"
 "Language-Team: weiyh <>\n"
@@ -154,8 +154,8 @@ msgstr "细节"
 msgid "Ask Tracker for _More Peers"
 msgstr "向 Traker 要求更多的连接"
 
-#: ../gtk/conf.c:60 ../libtransmission/utils.c:447
-#: ../libtransmission/utils.c:458
+#: ../gtk/conf.c:60 ../libtransmission/utils.c:455
+#: ../libtransmission/utils.c:466
 #, fuzzy, c-format
 msgid "Couldn't create \"%s\": %s"
 msgstr "socket 创建失败: %s"
@@ -270,7 +270,6 @@ msgid "Origins"
 msgstr ""
 
 #: ../gtk/details.c:709 ../gtk/details.c:800 ../gtk/details.c:805
-#, c-format
 msgid "Unknown"
 msgstr ""
 
@@ -288,7 +287,7 @@ msgstr "日期"
 msgid "Location"
 msgstr "位置"
 
-#: ../gtk/details.c:722 ../gtk/dialogs.c:137
+#: ../gtk/details.c:722
 #, fuzzy
 msgid "Destination folder"
 msgstr "会话分享率"
@@ -377,16 +376,16 @@ msgstr "状态："
 msgid "Last activity at:"
 msgstr "上次活动时间"
 
-#: ../gtk/details.c:970
-msgid "Speed Limits"
-msgstr "速度限制"
+#: ../gtk/details.c:970 ../gtk/tr-prefs.c:310
+msgid "Bandwidth"
+msgstr ""
 
-#: ../gtk/details.c:972 ../gtk/tr-prefs.c:316
+#: ../gtk/details.c:972 ../gtk/tr-prefs.c:312
 #, fuzzy
 msgid "Limit _download speed (KB/s):"
 msgstr "下载速度限制 (KB/s):"
 
-#: ../gtk/details.c:985 ../gtk/tr-prefs.c:309
+#: ../gtk/details.c:985 ../gtk/tr-prefs.c:319
 #, fuzzy
 msgid "Limit _upload speed (KB/s):"
 msgstr "上传速度限制 (KB/s):"
@@ -461,12 +460,12 @@ msgstr ""
 msgid "Activity"
 msgstr "活动"
 
-#: ../gtk/details.c:1252 ../gtk/tr-prefs.c:374
+#: ../gtk/details.c:1252 ../gtk/tr-prefs.c:377
 #, fuzzy
 msgid "Peers"
 msgstr "分片"
 
-#: ../gtk/details.c:1256 ../gtk/msgwin.c:221
+#: ../gtk/details.c:1256 ../gtk/msgwin.c:160
 #, fuzzy
 msgid "Information"
 msgstr "Torrent 信息"
@@ -479,48 +478,39 @@ msgstr "文件"
 msgid "Tracker"
 msgstr ""
 
-#: ../gtk/details.c:1272 ../gtk/tr-prefs.c:272
+#: ../gtk/details.c:1272 ../gtk/tr-prefs.c:275
 msgid "Options"
 msgstr "选项"
 
-#: ../gtk/dialogs.c:156 ../gtk/tr-prefs.c:243
-#, fuzzy
-msgid "_Trash original torrent files"
-msgstr "不是有效 torrent 文件"
-
-#: ../gtk/dialogs.c:164 ../gtk/open-dialog.c:232
-msgid "_Start when added"
-msgstr ""
-
-#: ../gtk/dialogs.c:260
+#: ../gtk/dialogs.c:114
 #, fuzzy
 msgid "<b>Really Quit?</b>"
 msgstr "是否退出 %s ?"
 
-#: ../gtk/dialogs.c:272
+#: ../gtk/dialogs.c:126
 #, fuzzy
 msgid "_Don't ask me this again"
 msgstr "不用再次问我"
 
-#: ../gtk/dialogs.c:359
+#: ../gtk/dialogs.c:213
 #, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove torrents?"
 msgstr[0] "打开 Torrent"
 msgstr[1] "打开 Torrent"
 
-#: ../gtk/dialogs.c:361
+#: ../gtk/dialogs.c:215
 #, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these torrents' downloaded files?"
 msgstr[0] "可选的下载目录"
 msgstr[1] "可选的下载目录"
 
-#: ../gtk/dialogs.c:366
+#: ../gtk/dialogs.c:220
 msgid "Some of these torrents are incomplete or connected to peers."
 msgstr ""
 
-#: ../gtk/dialogs.c:370
+#: ../gtk/dialogs.c:224
 msgid "This torrent is incomplete or connected to peers."
 msgid_plural "One of these torrents is incomplete or connected to peers."
 msgstr[0] ""
@@ -592,7 +582,7 @@ msgstr ""
 "创建文件夹失败 %s:\n"
 "%s"
 
-#: ../gtk/ipc.c:316 ../gtk/ipc.c:1152
+#: ../gtk/ipc.c:316 ../gtk/ipc.c:1150
 #, fuzzy, c-format
 msgid "Couldn't set up IPC: %s"
 msgstr "IPC 设置失败 : %s"
@@ -612,40 +602,41 @@ msgstr "IPC 分析失败: %s"
 msgid "Couldn't set up socket: %s"
 msgstr "socket 创建失败: %s"
 
-#: ../gtk/main.c:270
+#: ../gtk/main.c:269
 msgid "Start with all torrents paused"
 msgstr "启动时所有任务暂停"
 
-#: ../gtk/main.c:272
+#: ../gtk/main.c:271
 #, fuzzy
 msgid "Ask the running instance to quit"
 msgstr "需要退出正在运行的实例"
 
-#: ../gtk/main.c:275
+#: ../gtk/main.c:274
 msgid "Start minimized in system tray"
 msgstr ""
 
-#: ../gtk/main.c:288
+#: ../gtk/main.c:287
 msgid "Transmission"
 msgstr ""
 
-#: ../gtk/main.c:293
+#: ../gtk/main.c:292
 msgid "[torrent files]"
 msgstr "[torrent 文件]"
 
-#: ../gtk/main.c:616
-msgid "Closing Connections"
+#: ../gtk/main.c:599
+#, fuzzy
+msgid "<b>Closing Connections</b>"
 msgstr "关闭连接"
 
-#: ../gtk/main.c:616
+#: ../gtk/main.c:603
 msgid "Sending upload/download totals to tracker..."
 msgstr "向 tracker 发送上传/下载总量"
 
-#: ../gtk/main.c:622
+#: ../gtk/main.c:608
 msgid "_Quit Immediately"
 msgstr "立即退出"
 
-#: ../gtk/main.c:757
+#: ../gtk/main.c:741
 #, fuzzy, c-format
 msgid "Failed to load torrent file: %s"
 msgid_plural "Failed to load torrent files: %s"
@@ -656,17 +647,17 @@ msgstr[1] ""
 "锁住文件失败 ： %s:\n"
 "%s"
 
-#: ../gtk/main.c:899
+#: ../gtk/main.c:865
 msgid "A fast and easy BitTorrent client"
 msgstr "一个快速简单的 BitTorrent 客户端"
 
-#: ../gtk/main.c:902
+#: ../gtk/main.c:868
 msgid "Copyright 2005-2008 The Transmission Project"
 msgstr ""
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About" dialog
-#: ../gtk/main.c:911
+#: ../gtk/main.c:877
 msgid "translator-credits"
 msgstr ""
 
@@ -732,7 +723,7 @@ msgid "Torrent"
 msgstr ""
 
 #: ../gtk/makemeta-ui.c:292
-#, fuzzy, c-format
+#, fuzzy
 msgid "Private to this tracker"
 msgstr "只对当前 Tracker"
 
@@ -744,33 +735,46 @@ msgstr "发布 URL"
 msgid "Commen_t"
 msgstr "注释"
 
-#: ../gtk/msgwin.c:160 ../gtk/msgwin.c:174 ../libtransmission/metainfo.c:619
+#: ../gtk/msgwin.c:83 ../libtransmission/metainfo.c:619
 #, fuzzy, c-format
 msgid "Couldn't write file \"%s\": %s"
 msgstr "写入错误 \"%s\":%s"
 
-#: ../gtk/msgwin.c:191
+#: ../gtk/msgwin.c:131
 msgid "Save Log"
 msgstr "保存日志"
 
-#: ../gtk/msgwin.c:220
+#: ../gtk/msgwin.c:159
 msgid "Error"
 msgstr "错误"
 
-#: ../gtk/msgwin.c:222
+#: ../gtk/msgwin.c:161
 msgid "Debug"
 msgstr ""
 
-#: ../gtk/msgwin.c:239
+#: ../gtk/msgwin.c:221
+msgid "Time"
+msgstr ""
+
+#: ../gtk/msgwin.c:222 ../gtk/tr-window.c:445
+msgid "Name"
+msgstr ""
+
+#: ../gtk/msgwin.c:223
+#, fuzzy
+msgid "Message"
+msgstr "消息日志"
+
+#: ../gtk/msgwin.c:348
 msgid "Message Log"
 msgstr "消息日志"
 
-#: ../gtk/msgwin.c:262
+#: ../gtk/msgwin.c:370
 #, fuzzy
 msgid "Level"
 msgstr "级别"
 
-#: ../gtk/msgwin.c:266 ../gtk/msgwin.c:297
+#: ../gtk/msgwin.c:374 ../gtk/msgwin.c:410
 #, fuzzy
 msgid "Set the verbosity level"
 msgstr "选择 debug 过滤级别"
@@ -795,43 +799,52 @@ msgstr "打开 Torrent"
 msgid "Open Torrent"
 msgstr "打开 Torrent"
 
-#: ../gtk/open-dialog.c:173
+#: ../gtk/open-dialog.c:166
+#, fuzzy
+msgid "_Trash original torrent file"
+msgstr "不是有效 torrent 文件"
+
+#: ../gtk/open-dialog.c:167
+msgid "_Start when added"
+msgstr ""
+
+#: ../gtk/open-dialog.c:178
 #, fuzzy
 msgid "_Torrent file:"
 msgstr "种子文件"
 
-#: ../gtk/open-dialog.c:177
+#: ../gtk/open-dialog.c:182
 #, fuzzy
 msgid "Select Torrent"
 msgstr "公共 Torrent"
 
-#: ../gtk/open-dialog.c:182
+#: ../gtk/open-dialog.c:187 ../gtk/open-dialog.c:282
 msgid "Torrent files"
 msgstr "种子文件"
 
-#: ../gtk/open-dialog.c:186
+#: ../gtk/open-dialog.c:191 ../gtk/open-dialog.c:287
 msgid "All files"
 msgstr "所有文件"
 
-#: ../gtk/open-dialog.c:197
+#: ../gtk/open-dialog.c:202
 #, fuzzy
 msgid "Destination _folder:"
 msgstr "会话分享率"
 
-#: ../gtk/open-dialog.c:201
+#: ../gtk/open-dialog.c:206
 #, fuzzy
 msgid "Destination"
 msgstr "会话分享率"
 
-#: ../gtk/open-dialog.c:217
+#: ../gtk/open-dialog.c:221
 #, fuzzy
 msgid "Verify Local Data"
 msgstr "校验本地数据"
 
-#: ../gtk/open-dialog.c:223
+#: ../gtk/open-dialog.c:270
 #, fuzzy
-msgid "_Trash original torrent file"
-msgstr "不是有效 torrent 文件"
+msgid "Select Torrents"
+msgstr "公共 Torrent"
 
 #: ../gtk/stats.c:62
 #, c-format
@@ -981,102 +994,103 @@ msgid ""
 "Down: %3$s, Up: %4$s"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:190
+#: ../gtk/tr-prefs.c:193
 msgid "Port is <b>open</b>"
 msgstr "端口<b>打开</b>"
 
-#: ../gtk/tr-prefs.c:191
+#: ../gtk/tr-prefs.c:194
 msgid "Port is <b>closed</b>"
 msgstr "端口<b>关闭</b>"
 
-#: ../gtk/tr-prefs.c:204
+#: ../gtk/tr-prefs.c:207
 msgid "<i>Testing port...</i>"
 msgstr "<i>测试端口</i>"
 
-#: ../gtk/tr-prefs.c:224
+#: ../gtk/tr-prefs.c:227
 msgid "Adding"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:227
+#: ../gtk/tr-prefs.c:230
 #, fuzzy
 msgid "Automatically add torrents from:"
 msgstr "自动开始任务"
 
-#: ../gtk/tr-prefs.c:235
-msgid "Show _options dialog"
+#: ../gtk/tr-prefs.c:238
+msgid "_Prompt for file selections and priorities"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:239
+#: ../gtk/tr-prefs.c:242
 #, fuzzy
 msgid "_Start torrents when added"
 msgstr "启动时所有任务暂停"
 
-#: ../gtk/tr-prefs.c:248
+#: ../gtk/tr-prefs.c:246
+#, fuzzy
+msgid "_Trash original torrent files"
+msgstr "不是有效 torrent 文件"
+
+#: ../gtk/tr-prefs.c:251
 msgid "Default destination _folder:"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:252
+#: ../gtk/tr-prefs.c:255
 #, fuzzy
 msgid "Notification"
 msgstr "位置"
 
-#: ../gtk/tr-prefs.c:254
+#: ../gtk/tr-prefs.c:257
 msgid "_Display a message when torrents finish"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:274
+#: ../gtk/tr-prefs.c:277
 #, fuzzy
 msgid "Use peer e_xchange"
 msgstr "尽可能使用 Peer 交换"
 
-#: ../gtk/tr-prefs.c:278
+#: ../gtk/tr-prefs.c:281
 #, fuzzy
 msgid "_Ignore unencrypted peers"
 msgstr "忽略非加密 Peers"
 
 #. section header for the "maximum number of peers" section
-#: ../gtk/tr-prefs.c:284
+#: ../gtk/tr-prefs.c:287
 #, fuzzy
 msgid "Limits"
 msgstr "速度限制"
 
-#: ../gtk/tr-prefs.c:287
+#: ../gtk/tr-prefs.c:290
 msgid "Maximum peers _overall:"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:289
+#: ../gtk/tr-prefs.c:292
 #, fuzzy
 msgid "Maximum peers per _torrent:"
 msgstr "新任务最大连接 Peers "
 
-#: ../gtk/tr-prefs.c:307
-msgid "Bandwidth"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:323
+#: ../gtk/tr-prefs.c:326
 #, fuzzy
 msgid "Ports"
 msgstr "端口"
 
-#: ../gtk/tr-prefs.c:325
+#: ../gtk/tr-prefs.c:328
 msgid "_Forward port from router with UPnP or NAT-PMP"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:335
+#: ../gtk/tr-prefs.c:338
 #, fuzzy
 msgid "Incoming TCP _port"
 msgstr "TCP 端口( Incoming )"
 
-#: ../gtk/tr-prefs.c:358
+#: ../gtk/tr-prefs.c:361
 msgid "Preferences"
 msgstr "参数"
 
-#: ../gtk/tr-prefs.c:371
+#: ../gtk/tr-prefs.c:374
 #, fuzzy
 msgid "Torrents"
 msgstr "文件"
 
-#: ../gtk/tr-prefs.c:377
+#: ../gtk/tr-prefs.c:380
 msgid "Network"
 msgstr "网络"
 
@@ -1160,10 +1174,6 @@ msgstr "做种"
 #: ../gtk/tr-window.c:442
 msgid "_Paused"
 msgstr "暂停"
-
-#: ../gtk/tr-window.c:445
-msgid "Name"
-msgstr ""
 
 #: ../gtk/tr-window.c:599
 #, c-format
@@ -1271,29 +1281,29 @@ msgstr[1] ""
 msgid "Invalid metadata"
 msgstr ""
 
-#: ../libtransmission/fastresume.c:422
-#, c-format
-msgid "Torrent \"%s\" needs to be verified"
-msgstr ""
+#: ../libtransmission/fastresume.c:420
+#, fuzzy
+msgid "Torrent needs to be verified"
+msgstr "创建 Torrent 失败"
 
-#: ../libtransmission/fastresume.c:545
+#: ../libtransmission/fastresume.c:543
 #, c-format
 msgid "Loaded %i peers from resume file"
 msgstr ""
 
-#: ../libtransmission/fastresume.c:591
+#: ../libtransmission/fastresume.c:589
 #, c-format
 msgid "Skipping unknown resume code %d"
 msgstr ""
 
 #. %s is the torrent name
-#: ../libtransmission/fastresume.c:635
+#: ../libtransmission/fastresume.c:633
 #, fuzzy, c-format
 msgid "Couldn't read resume file for \"%s\""
 msgstr "写入错误 \"%s\":%s"
 
 #. %s is the torrent name
-#: ../libtransmission/fastresume.c:646
+#: ../libtransmission/fastresume.c:644
 #, c-format
 msgid "Skipping invalid resume file for \"%s\""
 msgstr ""
@@ -1346,43 +1356,40 @@ msgstr ""
 
 #: ../libtransmission/natpmp.c:68
 #, c-format
-msgid "%s: %s responded 'try again'"
+msgid "%s responded 'try again'"
 msgstr ""
 
 #: ../libtransmission/natpmp.c:70
 #, c-format
-msgid "%s: %s succeeded (%d)"
+msgid "%s succeeded (%d)"
 msgstr ""
 
 #: ../libtransmission/natpmp.c:72
 #, c-format
-msgid "%s: %s failed (%d): %s (%d)"
+msgid "%s failed (%d): %s (%d)"
 msgstr ""
 
 #: ../libtransmission/natpmp.c:112
-#, c-format
-msgid ""
-"%s: If your router supports NAT-PMP, please make sure NAT-PMP is enabled!"
+msgid "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!"
 msgstr ""
 
 #: ../libtransmission/natpmp.c:113
-#, c-format
-msgid "%s: NAT-PMP port forwarding unsuccessful, trying UPnP next"
+msgid "NAT-PMP port forwarding unsuccessful, trying UPnP next"
 msgstr ""
 
 #: ../libtransmission/natpmp.c:139
 #, c-format
-msgid "%s: found public address %s"
+msgid "found public address %s"
 msgstr ""
 
 #: ../libtransmission/natpmp.c:166
 #, c-format
-msgid "%s: no longer forwarding port %d"
+msgid "no longer forwarding port %d"
 msgstr ""
 
 #: ../libtransmission/natpmp.c:202
 #, c-format
-msgid "%s: port %d forwarded successfully"
+msgid "port %d forwarded successfully"
 msgstr ""
 
 #: ../libtransmission/net.c:95
@@ -1405,9 +1412,14 @@ msgstr ""
 msgid "Bound socket %d to port %d"
 msgstr ""
 
-#: ../libtransmission/peer-msgs.c:975
+#: ../libtransmission/peer-msgs.c:969
+#, fuzzy, c-format
+msgid "Got %d peers from peer exchange"
+msgstr "尽可能使用 Peer 交换"
+
+#: ../libtransmission/peer-msgs.c:1533
 #, c-format
-msgid "Torrent \"%s\" got %d peers from peer exchange"
+msgid "Downloaded piece %lu failed its checksum test: %s"
 msgstr ""
 
 #: ../libtransmission/shared.c:41
@@ -1436,47 +1448,66 @@ msgstr ""
 msgid "not forwarded"
 msgstr ""
 
-#: ../libtransmission/shared.c:96
+#: ../libtransmission/shared.c:96 ../libtransmission/torrent.c:1102
 #, c-format
-msgid "%s: state changed from \"%s\" to \"%s\""
+msgid "State changed from \"%s\" to \"%s\""
 msgstr ""
 
-#: ../libtransmission/shared.c:106
-#, c-format
-msgid "%s: Closing port %d"
+#: ../libtransmission/shared.c:99
+msgid ""
+"Port forwarding failed.  Turn on debug messages and restart for more "
+"information."
 msgstr ""
 
-#: ../libtransmission/shared.c:117
+#: ../libtransmission/shared.c:108
 #, c-format
-msgid "%s: Opened port %d to listen for incoming peer connections"
+msgid "Closing port %d"
 msgstr ""
 
-#: ../libtransmission/shared.c:122
+#: ../libtransmission/shared.c:119
+#, c-format
+msgid "Opened port %d to listen for incoming peer connections"
+msgstr ""
+
+#: ../libtransmission/shared.c:124
 #, c-format
 msgid ""
-"%s: Couldn't open port %d to listen for incoming peer connections (errno %d "
-"- %s)"
+"Couldn't open port %d to listen for incoming peer connections (errno %d - %s)"
 msgstr ""
 
-#: ../libtransmission/shared.c:160
-#, c-format
-msgid "%s: stopped"
+#: ../libtransmission/shared.c:162
+msgid "Stopped"
 msgstr ""
 
-#: ../libtransmission/torrent.c:158
+#: ../libtransmission/torrent.c:160
 #, c-format
 msgid "Tracker warning: %s"
 msgstr ""
 
-#: ../libtransmission/torrent.c:164
+#: ../libtransmission/torrent.c:166
 #, c-format
 msgid "Tracker error: %s"
 msgstr ""
 
 #: ../libtransmission/torrent.c:876
 #, c-format
-msgid "Closing torrent %s; %d torrents left"
+msgid "Closing torrent; %d left"
 msgstr ""
+
+#: ../libtransmission/torrent.c:1055
+#, fuzzy
+msgid "Done"
+msgstr "下载"
+
+#: ../libtransmission/torrent.c:1056
+#, fuzzy
+msgid "Complete"
+msgstr "已完成"
+
+#: ../libtransmission/torrent.c:1057
+#, fuzzy
+msgid "Incomplete"
+msgstr "已完成"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -1496,122 +1527,127 @@ msgstr ""
 
 #: ../libtransmission/upnp.c:91
 #, c-format
-msgid "%s: upnpDiscover failed (errno %d - %s)"
+msgid "upnpDiscover failed (errno %d - %s)"
 msgstr ""
 
 #: ../libtransmission/upnp.c:95
 #, c-format
-msgid "%s: Found Internet Gateway Device \"%s\""
+msgid "Found Internet Gateway Device \"%s\""
 msgstr ""
 
 #: ../libtransmission/upnp.c:96
 #, c-format
-msgid "%s: Local Address is \"%s\""
+msgid "Local Address is \"%s\""
 msgstr ""
 
 #: ../libtransmission/upnp.c:101
 #, c-format
-msgid "%s: UPNP_GetValidIGD failed (errno %d - %s)"
+msgid "UPNP_GetValidIGD failed (errno %d - %s)"
 msgstr ""
 
 #: ../libtransmission/upnp.c:102 ../libtransmission/upnp.c:157
-#, c-format
-msgid "%s: If your router supports UPnP, please make sure UPnP is enabled!"
+msgid "If your router supports UPnP, please make sure UPnP is enabled!"
 msgstr ""
 
 #: ../libtransmission/upnp.c:120
 #, c-format
-msgid "%s: Stopping port forwarding of \"%s\", service \"%s\""
+msgid "Stopping port forwarding of \"%s\", service \"%s\""
 msgstr ""
 
 #: ../libtransmission/upnp.c:149
 #, c-format
-msgid "%s: Port forwarding via \"%s\", service \"%s\".  (local address: %s:%d)"
+msgid "Port forwarding via \"%s\", service \"%s\".  (local address: %s:%d)"
 msgstr ""
 
 #: ../libtransmission/upnp.c:152
-#, c-format
-msgid "%s: Port forwarding successful!"
+msgid "Port forwarding successful!"
 msgstr ""
 
 #: ../libtransmission/upnp.c:156
 #, c-format
-msgid "%s: Port forwarding failed with error %d (%d - %s)"
+msgid "Port forwarding failed with error %d (%d - %s)"
 msgstr ""
 
-#: ../libtransmission/utils.c:365 ../libtransmission/utils.c:371
-#: ../libtransmission/utils.c:379 ../libtransmission/utils.c:385
-#: ../libtransmission/utils.c:392
+#: ../libtransmission/utils.c:373 ../libtransmission/utils.c:379
+#: ../libtransmission/utils.c:387 ../libtransmission/utils.c:393
+#: ../libtransmission/utils.c:400
 #, fuzzy, c-format
 msgid "Couldn't read file \"%s\": %s"
 msgstr "写入错误 \"%s\":%s"
 
-#: ../libtransmission/utils.c:371
+#: ../libtransmission/utils.c:379
 msgid "Not a regular file"
 msgstr ""
 
-#: ../libtransmission/utils.c:385
+#: ../libtransmission/utils.c:393
 #, fuzzy
 msgid "Memory allocation failed"
 msgstr "创建 Torrent 失败"
 
-#: ../libtransmission/utils.c:457
+#: ../libtransmission/utils.c:465
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr ""
 
-#: ../libtransmission/utils.c:524
+#: ../libtransmission/utils.c:532
 #, fuzzy
 msgid "No error"
 msgstr "错误"
 
-#: ../libtransmission/utils.c:527
+#: ../libtransmission/utils.c:535
 msgid "Generic error"
 msgstr ""
 
-#: ../libtransmission/utils.c:529
+#: ../libtransmission/utils.c:537
 msgid "Assert error"
 msgstr ""
 
-#: ../libtransmission/utils.c:532
+#: ../libtransmission/utils.c:540
 msgid "Destination folder doesn't exist"
 msgstr ""
 
-#: ../libtransmission/utils.c:542
+#: ../libtransmission/utils.c:550
 msgid "A torrent with this name and destination folder already exists."
 msgstr ""
 
-#: ../libtransmission/utils.c:544
+#: ../libtransmission/utils.c:552
+msgid "Checksum failed"
+msgstr ""
+
+#: ../libtransmission/utils.c:554
 msgid "Generic I/O error"
 msgstr ""
 
-#: ../libtransmission/utils.c:547
+#: ../libtransmission/utils.c:557
 msgid "Tracker error"
 msgstr ""
 
-#: ../libtransmission/utils.c:549
+#: ../libtransmission/utils.c:559
 msgid "Tracker warning"
 msgstr ""
 
-#: ../libtransmission/utils.c:552
+#: ../libtransmission/utils.c:562
 msgid "Peer sent a bad message"
 msgstr ""
 
-#: ../libtransmission/utils.c:555
+#: ../libtransmission/utils.c:565
 msgid "Unknown error"
 msgstr ""
 
 #: ../libtransmission/verify.c:128
-#, c-format
-msgid "Verifying torrent \"%s\""
-msgstr ""
+#, fuzzy
+msgid "Verifying torrent"
+msgstr "打开 Torrent"
 
 #: ../libtransmission/verify.c:160
-#, fuzzy, c-format
-msgid "Queueing \"%s\" for verification"
+#, fuzzy
+msgid "Queued for verification"
 msgstr ""
 "打开文件写失败 %s\n"
 "%s"
+
+#~ msgid "Speed Limits"
+#~ msgstr "速度限制"
 
 #, fuzzy
 #~ msgid "Error reading \"%s\": %s"
@@ -1677,10 +1713,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Torrent file name"
 #~ msgstr "Torrent 文件名"
-
-#, fuzzy
-#~ msgid "Completeness"
-#~ msgstr "已完成"
 
 #, fuzzy
 #~ msgid "Limit _download speed to:"
