@@ -28,9 +28,9 @@
 .Nd a bittorrent client
 .Sh SYNOPSIS
 .Nm transmission
-.Fl h
+.Fl ?
 .Nm
-.Op Fl pq
+.Op Fl pqm
 .Op Ar torrent-file ...
 .Sh DESCRIPTION
 .Nm
@@ -43,14 +43,16 @@ information on the BitTorrent protocol see http://www.bittorrent.org/
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
-.It Fl h Fl -help
-Print command-line option descriptions.
+.It Fl ? Fl -help
+Show help options
 .It Fl p Fl -paused
 Start with all torrents paused
 .It Fl q Fl -quit
-Quit a running
+Ask the running
 .Nm
-instance
+instance to quit
+.It Fl m Fl -minimized
+Start minimized in system tray
 .El
 .Pp
 Only one instance of
