@@ -316,7 +316,6 @@ static gboolean
 onRefresh( gpointer gdata )
 {
     struct MsgData * data = gdata;
-g_message( "paused: %d", data->isPaused );
     if( !data->isPaused )
     {
         tr_msg_list * msgs = tr_getQueuedMessages( );
