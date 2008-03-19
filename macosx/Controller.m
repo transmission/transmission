@@ -1844,7 +1844,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         i++;
         
         //check status
-        if ([torrent isActive])
+        if ([torrent isActive] && ![torrent isCheckingWaiting])
         {
             if ([torrent isSeeding])
             {

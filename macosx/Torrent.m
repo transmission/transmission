@@ -895,6 +895,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fStat->status == TR_STATUS_CHECK || fStat->status == TR_STATUS_CHECK_WAIT;
 }
 
+- (BOOL) isCheckingWaiting
+{
+    return fStat->status == TR_STATUS_CHECK_WAIT;
+}
+
 - (BOOL) allDownloaded
 {
     return [self progressDone] >= 1.0;

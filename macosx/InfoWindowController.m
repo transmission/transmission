@@ -210,7 +210,7 @@ typedef enum
                                     ? NSImageNameMultipleDocuments : @"NSApplicationIcon"]];
             
             [fNameField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Torrents Selected",
-                                            "Inspector -> above tabs -> selected torrents"), numberSelected]];
+                                            "Inspector -> selected torrents"), numberSelected]];
         
             uint64_t size = 0;
             int fileCount = 0;
@@ -226,14 +226,14 @@ typedef enum
                 [NSString stringWithFormat: NSLocalizedString(@"%d Files", "Inspector -> selected torrents"), fileCount],
                 [NSString stringWithFormat: NSLocalizedString(@"%@ Total", "Inspector -> selected torrents"),
                 [NSString stringForFileSize: size]]]];
-            [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes",
-                                            "Inspector -> above tabs -> selected torrents"), size]];
+            [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes", "Inspector -> selected torrents"),
+                                            size]];
         }
         else
         {
             [fImageView setImage: [NSImage imageNamed: @"NSApplicationIcon"]];
             
-            [fNameField setStringValue: NSLocalizedString(@"No Torrents Selected", "Inspector -> above tabs -> selected torrents")];
+            [fNameField setStringValue: NSLocalizedString(@"No Torrents Selected", "Inspector -> selected torrents")];
             [fBasicInfoField setStringValue: @""];
             [fBasicInfoField setToolTip: @""];
     
@@ -364,15 +364,14 @@ typedef enum
             NSString * fileString;
             int fileCount = [torrent fileCount];
             if (fileCount == 1)
-                fileString = NSLocalizedString(@"1 File", "Inspector -> above tabs -> selected torrents");
+                fileString = NSLocalizedString(@"1 File", "Inspector -> selected torrents");
             else
-                fileString= [NSString stringWithFormat: NSLocalizedString(@"%d Files",
-                                "Inspector -> above tabs -> selected torrents"), fileCount];
+                fileString= [NSString stringWithFormat: NSLocalizedString(@"%d Files", "Inspector -> selected torrents"), fileCount];
             basicString = [NSString stringWithFormat: @"%@, %@", fileString, basicString];
         }
         [fBasicInfoField setStringValue: basicString];
-        [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes",
-                                        "Inspector -> above tabs -> selected torrents"), [torrent size]]];
+        [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes", "Inspector -> selected torrents"),
+                                        [torrent size]]];
         
         NSString * hashString = [torrent hashString];
         [fPiecesField setStringValue: [NSString stringWithFormat: @"%d, %@", [torrent pieceCount],

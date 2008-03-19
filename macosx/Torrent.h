@@ -181,6 +181,7 @@ typedef enum
 - (BOOL) isActive;
 - (BOOL) isSeeding;
 - (BOOL) isChecking;
+- (BOOL) isCheckingWaiting;
 - (BOOL) allDownloaded;
 - (BOOL) isComplete;
 - (BOOL) isError;
