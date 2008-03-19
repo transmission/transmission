@@ -43,6 +43,7 @@ struct MsgData
     GtkTreeModel * filter;
     GtkTreeModel * sort;
     int maxLevel;
+    gboolean isPaused;
     guint refresh_tag;
 };
 
@@ -149,6 +150,13 @@ onClearRequest( GtkWidget * w UNUSED, gpointer gdata )
     gtk_list_store_clear( data->store );
     tr_freeMessageList( myHead );
     myHead = myTail = NULL;
+}
+
+static void
+onPauseToggled( GtkToggleToolButton * w, gpointer gdata )
+{
+    struct MsgData * data = gdata;
+    data->isPaused = gtk_toggle_tool_button_get_active( w );
 }
 
 static struct {
@@ -283,7 +291,7 @@ static tr_msg_list *
 addMessages( GtkListStore * store, struct tr_msg_list * head )
 {
     const char * default_name = g_get_application_name( );
-    static int sequence = 1;
+    static unsigned int sequence = 1;
     tr_msg_list * i;
 
     for( i=head; i; i=i->next )
@@ -307,80 +315,35 @@ addMessages( GtkListStore * store, struct tr_msg_list * head )
 static gboolean
 onRefresh( gpointer gdata )
 {
-    tr_msg_list * msgs = tr_getQueuedMessages( );
-    if( msgs )
+    struct MsgData * data = gdata;
+g_message( "paused: %d", data->isPaused );
+    if( !data->isPaused )
     {
-        /* add the new messages and append them to the end of
-         * our persistent list */
-        struct MsgData * data = gdata;
-        tr_msg_list * tail = addMessages( data->store, msgs );
-        if( myTail )
-            myTail->next = msgs;
-        else
-            myHead = msgs;
-        myTail = tail;
+        tr_msg_list * msgs = tr_getQueuedMessages( );
+        if( msgs )
+        {
+            /* add the new messages and append them to the end of
+             * our persistent list */
+            tr_msg_list * tail = addMessages( data->store, msgs );
+            if( myTail )
+                myTail->next = msgs;
+            else
+                myHead = msgs;
+            myTail = tail;
+        }
     }
     return TRUE;
 }
 
-/**
-***  Public Functions
-**/
-
-GtkWidget *
-msgwin_new( TrCore * core )
+static GtkWidget*
+debug_level_combo_new( void )
 {
     unsigned int i;
-    GtkListStore * store;
-    GtkWidget * win;
-    GtkWidget * vbox;
+    int ii;
+    int curlevel;
     GtkWidget * levels;
-    GtkWidget * toolbar;
-    GtkWidget * w;
-    GtkWidget * view;
-    GtkWidget * l;
+    GtkListStore * store;
     GtkCellRenderer * renderer;
-    int ii, curlevel;
-    struct MsgData * data;
-
-    data = g_new0( struct MsgData, 1 );
-    data->core = core;
-
-    win = gtk_window_new( GTK_WINDOW_TOPLEVEL );
-    gtk_window_set_title( GTK_WINDOW( win ), _( "Message Log" ) );
-    gtk_window_set_default_size( GTK_WINDOW( win ), 600, 400 );
-    gtk_window_set_role( GTK_WINDOW( win ), "message-log" );
-    vbox = gtk_vbox_new( FALSE, 0 );
-
-    /**
-    ***  toolbar
-    **/
-
-    toolbar = gtk_toolbar_new( );
-
-    gtk_toolbar_insert_stock( GTK_TOOLBAR(toolbar), GTK_STOCK_SAVE,
-                              NULL, NULL,
-                              G_CALLBACK(onSaveRequest), data, -1);
-
-    gtk_toolbar_insert_stock( GTK_TOOLBAR(toolbar), GTK_STOCK_CLEAR,
-                              NULL, NULL,
-                              G_CALLBACK(onClearRequest), data, -1);
-
-    gtk_toolbar_insert_space(GTK_TOOLBAR(toolbar), -1);
-
-
-    l = gtk_label_new( _( "Level" ) );
-    gtk_misc_set_padding( GTK_MISC( l ), GUI_PAD, 0 );
-    gtk_toolbar_append_element( GTK_TOOLBAR(toolbar),
-                                GTK_TOOLBAR_CHILD_WIDGET, l,
-                                NULL, _("Set the verbosity level"),
-                                NULL, NULL, NULL, NULL);
-
-    w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
-    gtk_widget_set_size_request( w, GUI_PAD_SMALL, GUI_PAD_SMALL );
-    gtk_toolbar_append_element( GTK_TOOLBAR(toolbar),
-                                GTK_TOOLBAR_CHILD_WIDGET, w,
-                                NULL, NULL, NULL, NULL, NULL, NULL);
 
     store = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_INT);
 
@@ -404,13 +367,75 @@ msgwin_new( TrCore * core )
                                     "text", 0,
                                     NULL );
     gtk_combo_box_set_active( GTK_COMBO_BOX( levels ), ii );
-    g_signal_connect( levels, "changed",
-                      G_CALLBACK(level_combo_changed_cb), data );
 
-    gtk_toolbar_append_element( GTK_TOOLBAR( toolbar ),
-                                GTK_TOOLBAR_CHILD_WIDGET, levels,
-                                NULL, _("Set the verbosity level"),
-                                NULL, NULL, NULL, NULL);
+    return levels;
+}
+
+
+/**
+***  Public Functions
+**/
+
+GtkWidget *
+msgwin_new( TrCore * core )
+{
+    GtkWidget * win;
+    GtkWidget * vbox;
+    GtkWidget * toolbar;
+    GtkWidget * w;
+    GtkWidget * view;
+    GtkToolItem * item;
+    struct MsgData * data;
+
+    data = g_new0( struct MsgData, 1 );
+    data->core = core;
+
+    win = gtk_window_new( GTK_WINDOW_TOPLEVEL );
+    gtk_window_set_title( GTK_WINDOW( win ), _( "Message Log" ) );
+    gtk_window_set_default_size( GTK_WINDOW( win ), 600, 400 );
+    gtk_window_set_role( GTK_WINDOW( win ), "message-log" );
+    vbox = gtk_vbox_new( FALSE, 0 );
+
+    /**
+    ***  toolbar
+    **/
+
+    toolbar = gtk_toolbar_new( );
+    gtk_toolbar_set_orientation( GTK_TOOLBAR( toolbar ), GTK_ORIENTATION_HORIZONTAL );
+    gtk_toolbar_set_style( GTK_TOOLBAR( toolbar ), GTK_TOOLBAR_BOTH_HORIZ );
+
+      item = gtk_tool_button_new_from_stock( GTK_STOCK_SAVE );
+      g_object_set( G_OBJECT( item ), "is-important", TRUE, NULL );
+      g_signal_connect( item, "clicked", G_CALLBACK(onSaveRequest), data );
+      gtk_toolbar_insert( GTK_TOOLBAR( toolbar ), item, -1 );
+
+      item = gtk_tool_button_new_from_stock( GTK_STOCK_CLEAR );
+      g_object_set( G_OBJECT( item ), "is-important", TRUE, NULL );
+      g_signal_connect( item, "clicked", G_CALLBACK(onClearRequest), data );
+      gtk_toolbar_insert( GTK_TOOLBAR( toolbar ), item, -1 );
+
+    item = gtk_separator_tool_item_new( );
+    gtk_toolbar_insert( GTK_TOOLBAR( toolbar ), item, -1 );
+
+      item = gtk_toggle_tool_button_new_from_stock( GTK_STOCK_MEDIA_PAUSE );
+      g_object_set( G_OBJECT( item ), "is-important", TRUE, NULL );
+      g_signal_connect( item, "toggled", G_CALLBACK(onPauseToggled), data );
+      gtk_toolbar_insert( GTK_TOOLBAR( toolbar ), item, -1 );
+
+    item = gtk_separator_tool_item_new( );
+    gtk_toolbar_insert( GTK_TOOLBAR( toolbar ), item, -1 );
+
+      w = gtk_label_new( _( "Level" ) );
+      gtk_misc_set_padding( GTK_MISC( w ), GUI_PAD, 0 );
+      item = gtk_tool_item_new( );
+      gtk_container_add( GTK_CONTAINER( item ), w );
+      gtk_toolbar_insert( GTK_TOOLBAR( toolbar ), item, -1 );
+
+      w = debug_level_combo_new( );
+      g_signal_connect( w, "changed", G_CALLBACK(level_combo_changed_cb), data );
+      item = gtk_tool_item_new( );
+      gtk_container_add( GTK_CONTAINER( item ), w );
+      gtk_toolbar_insert( GTK_TOOLBAR( toolbar ), item, -1 );
 
     gtk_box_pack_start( GTK_BOX( vbox ), toolbar, FALSE, FALSE, 0 );
 
@@ -419,7 +444,7 @@ msgwin_new( TrCore * core )
     **/
 
     data->store = gtk_list_store_new( N_COLUMNS,
-                                      G_TYPE_INT,        /* sequence */
+                                      G_TYPE_UINT,       /* sequence */
                                       G_TYPE_POINTER,    /* category */
                                       G_TYPE_POINTER,    /* message */
                                       G_TYPE_POINTER);   /* struct tr_msg_list */
