@@ -58,11 +58,11 @@ tr_strlratio( char * buf, double ratio, size_t buflen )
     else if( (int)ratio == TR_RATIO_INF )
         g_strlcpy( buf, "\xE2\x88\x9E", buflen );
     else if( ratio < 10.0 )
-        g_snprintf( buf, buflen, "%.2f", ratio );
+        g_snprintf( buf, buflen, "%'.2f", ratio );
     else if( ratio < 100.0 )
-        g_snprintf( buf, buflen, "%.1f", ratio );
+        g_snprintf( buf, buflen, "%'.1f", ratio );
     else
-        g_snprintf( buf, buflen, "%.0f", ratio );
+        g_snprintf( buf, buflen, "%'.0f", ratio );
     return buf;
 }
 
@@ -83,18 +83,18 @@ tr_strlsize( char * buf, guint64 size, size_t buflen )
     }
 #else
     else if( size < (guint64)KILOBYTE_FACTOR )
-        g_snprintf( buf, buflen, ngettext("%u byte", "%u bytes", (guint)size), (guint)size );
+        g_snprintf( buf, buflen, ngettext("%'u byte", "%'u bytes", (guint)size), (guint)size );
     else {
         gdouble displayed_size;
         if (size < (guint64)MEGABYTE_FACTOR) {
             displayed_size = (gdouble) size / KILOBYTE_FACTOR;
-            g_snprintf( buf, buflen, _("%.1f KB"), displayed_size );
+            g_snprintf( buf, buflen, _("%'.1f KB"), displayed_size );
         } else if (size < (guint64)GIGABYTE_FACTOR) {
             displayed_size = (gdouble) size / MEGABYTE_FACTOR;
-            g_snprintf( buf, buflen, _("%.1f MB"), displayed_size );
+            g_snprintf( buf, buflen, _("%'.1f MB"), displayed_size );
         } else {
             displayed_size = (gdouble) size / GIGABYTE_FACTOR;
-            g_snprintf( buf, buflen, _("%.1f GB"), displayed_size );
+            g_snprintf( buf, buflen, _("%'.1f GB"), displayed_size );
         }
     }
 #endif

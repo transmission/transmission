@@ -252,7 +252,7 @@ torrentPage( GObject * core )
         hig_workarea_add_wide_control( t, &row, w );
 
         w = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
-        hig_workarea_add_row( t, &row, _( "Default destination _folder:" ), w, NULL );
+        hig_workarea_add_row( t, &row, _( "_Destination folder:" ), w, NULL );
 
 #ifdef HAVE_LIBNOTIFY
     hig_workarea_add_section_divider( t, &row );
@@ -339,7 +339,7 @@ networkPage( GObject * core, gpointer alive )
         l = gtk_label_new( NULL );
         gtk_misc_set_alignment( GTK_MISC(l), 0.0f, 0.5f );
         gtk_box_pack_start( GTK_BOX(h), l, FALSE, FALSE, 0 );
-        hig_workarea_add_row( t, &row, _("Incoming TCP _port:"), h, w );
+        hig_workarea_add_row( t, &row, _("Incoming _port:"), h, w );
 
         g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
         g_object_set_data( G_OBJECT(l), "alive", alive );

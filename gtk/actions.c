@@ -38,6 +38,10 @@ action_cb ( GtkAction * a, gpointer user_data )
 #define GTK_STOCK_INFO GTK_STOCK_PROPERTIES
 #endif
 
+#if !GTK_CHECK_VERSION(2,10,0)
+#define GTK_STOCK_SELECT_ALL NULL
+#endif
+
 static GtkRadioActionEntry sort_radio_entries[] =
 {
   { "sort-by-activity",   NULL, N_("Sort by _Activity"),   NULL, NULL, 0 },
@@ -113,7 +117,7 @@ static GtkActionEntry entries[] =
     N_("Close main window"),
     G_CALLBACK(action_cb) },
   { "quit", GTK_STOCK_QUIT, N_("_Quit"), NULL, NULL, G_CALLBACK(action_cb) },
-  { "select-all", NULL,
+  { "select-all", GTK_STOCK_SELECT_ALL,
     N_( "Select _All" ), "<control>A", NULL, G_CALLBACK(action_cb) },
   { "unselect-all", NULL,
     N_("Dese_lect All"), "<shift><control>A", NULL, G_CALLBACK(action_cb) },
