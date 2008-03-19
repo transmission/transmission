@@ -34,7 +34,7 @@ struct verify_node
 
 static void
 fireCheckDone( tr_torrent          * torrent,
-               tr_verify_done_cb    verify_done_cb )
+               tr_verify_done_cb     verify_done_cb )
 {
     if( verify_done_cb != NULL )
         (*verify_done_cb)( torrent );
@@ -151,7 +151,7 @@ tr_verifyAdd( tr_torrent          * tor,
     if( !uncheckedCount )
     {
         /* doesn't need to be checked... */
-        verify_done_cb( tor );
+        fireCheckDone( tor, verify_done_cb );
     }
     else
     {
