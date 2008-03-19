@@ -84,10 +84,10 @@ static GtkToggleActionEntry pref_toggle_entries[] =
     N_("_Minimal View"), "<alt>M", NULL, G_CALLBACK(toggle_pref_cb), FALSE },
   { "sort-reversed", NULL,
     N_("_Reverse Sort Order"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
-  { "show-filter-bar", NULL,
-    N_("_Filter Bar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
-  { "show-status-bar", NULL,
-    N_("_Status Bar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
+  { "show-filterbar", NULL,
+    N_("_Filterbar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
+  { "show-statusbar", NULL,
+    N_("_Statusbar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
   { "show-toolbar", NULL,
     N_("_Toolbar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE }
 };

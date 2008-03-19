@@ -391,7 +391,7 @@ msgwin_new( TrCore * core )
 
     win = gtk_window_new( GTK_WINDOW_TOPLEVEL );
     gtk_window_set_title( GTK_WINDOW( win ), _( "Message Log" ) );
-    gtk_window_set_default_size( GTK_WINDOW( win ), 600, 400 );
+    gtk_window_set_default_size( GTK_WINDOW( win ), 560, 350 );
     gtk_window_set_role( GTK_WINDOW( win ), "message-log" );
     vbox = gtk_vbox_new( FALSE, 0 );
 

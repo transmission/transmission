@@ -200,12 +200,12 @@ prefsChanged( TrCore * core UNUSED, const char * key, gpointer wind )
        gtk_tree_view_column_queue_resize( p->column );
        gtk_widget_queue_draw( p->view );
     }
-    else if( !strcmp( key, PREF_KEY_STATUS_BAR ) )
+    else if( !strcmp( key, PREF_KEY_STATUSBAR ) )
     {
         const gboolean isEnabled = pref_flag_get( key );
         g_object_set( p->status, "visible", isEnabled, NULL );
     }
-    else if( !strcmp( key, PREF_KEY_FILTER_BAR ) )
+    else if( !strcmp( key, PREF_KEY_FILTERBAR ) )
     {
         const gboolean isEnabled = pref_flag_get( key );
         g_object_set( p->filter, "visible", isEnabled, NULL );
@@ -215,7 +215,7 @@ prefsChanged( TrCore * core UNUSED, const char * key, gpointer wind )
         const gboolean isEnabled = pref_flag_get( key );
         g_object_set( p->toolbar, "visible", isEnabled, NULL );
     }
-    else if( !strcmp( key, PREF_KEY_STATUS_BAR_STATS ) )
+    else if( !strcmp( key, PREF_KEY_STATUSBAR_STATS ) )
     {
         tr_window_update( (TrWindow*)wind );
     }
@@ -256,7 +256,7 @@ status_menu_toggled_cb( GtkCheckMenuItem  * menu_item,
     {
         PrivateData * p = vprivate;
         const char * val = g_object_get_data( G_OBJECT( menu_item ), STATS_MODE );
-        tr_core_set_pref( p->core, PREF_KEY_STATUS_BAR_STATS, val );
+        tr_core_set_pref( p->core, PREF_KEY_STATUSBAR_STATS, val );
     }
 }
 
@@ -505,7 +505,7 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     menu = p->status_menu = gtk_menu_new( );
     status_stats_mode = 0;
     l = NULL;
-    pch = pref_string_get( PREF_KEY_STATUS_BAR_STATS );
+    pch = pref_string_get( PREF_KEY_STATUSBAR_STATS );
     for( i=0, n=G_N_ELEMENTS(stats_modes); i<n; ++i )
     {
         const char * val = stats_modes[i].val;
@@ -575,9 +575,9 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     /* listen for prefs changes that affect the window */
     p->core = core;
     prefsChanged( core, PREF_KEY_MINIMAL_VIEW, self );
-    prefsChanged( core, PREF_KEY_FILTER_BAR, self );
-    prefsChanged( core, PREF_KEY_STATUS_BAR, self );
-    prefsChanged( core, PREF_KEY_STATUS_BAR_STATS, self );
+    prefsChanged( core, PREF_KEY_FILTERBAR, self );
+    prefsChanged( core, PREF_KEY_STATUSBAR, self );
+    prefsChanged( core, PREF_KEY_STATUSBAR_STATS, self );
     prefsChanged( core, PREF_KEY_TOOLBAR, self );
     p->pref_handler_id = g_signal_connect( core, "prefs-changed",
                                            G_CALLBACK(prefsChanged), self );
@@ -618,7 +618,7 @@ updateStats( PrivateData * p )
     tr_handle * handle = tr_core_handle( p->core );
 
     /* update the stats */
-    pch = pref_string_get( PREF_KEY_STATUS_BAR_STATS );
+    pch = pref_string_get( PREF_KEY_STATUSBAR_STATS );
     if( !strcmp( pch, "session-ratio" ) ) {
         tr_getSessionStats( handle, &stats );
         tr_strlratio( ratio, stats.ratio, sizeof( ratio ) );
