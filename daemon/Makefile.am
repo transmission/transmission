@@ -13,6 +13,7 @@ libdaemon_a_SOURCES = \
     misc.c
 
 noinst_HEADERS = \
+    bsdtree.h \
     bsdqueue.h \
     client.h \
     errors.h \
