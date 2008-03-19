@@ -170,7 +170,7 @@ response_cb( GtkDialog* d, int response, gpointer user_data )
 ***/
 
 static void
-file_selection_changed_cb( GtkFileChooser *chooser, gpointer user_data )
+onSelectionChanged( GtkFileChooser *chooser, gpointer user_data )
 {
     MakeMetaUI * ui = (MakeMetaUI *) user_data;
     char * filename;
@@ -199,40 +199,48 @@ file_selection_changed_cb( GtkFileChooser *chooser, gpointer user_data )
     gtk_progress_bar_set_text( GTK_PROGRESS_BAR( ui->progressbar ), buf );
     refreshButtons( ui );
 
-    tr_strlsize( sizeStr, totalSize, sizeof(sizeStr) );
-    g_snprintf( buf, sizeof( buf ),
-                /* %1$s is the torrent size, %2$s is its number of files */
-                ngettext( "<i>%1$s; %2$d File</i>",
-                          "<i>%1$s; %2$d Files</i>", fileCount ),
-                sizeStr, fileCount );
+    if( !filename )
+        g_snprintf( buf, sizeof( buf ), _( "<i>No files selected</i>" ) );
+    else {
+        tr_strlsize( sizeStr, totalSize, sizeof(sizeStr) );
+        g_snprintf( buf, sizeof( buf ),
+                    /* %1$s is the torrent size, %2$s is its number of files */
+                    ngettext( "<i>%1$s; %2$d File</i>",
+                              "<i>%1$s; %2$d Files</i>", fileCount ),
+                    sizeStr, fileCount );
+    }
     gtk_label_set_markup ( GTK_LABEL(ui->size_lb), buf );
 
-    tr_strlsize( sizeStr, pieceSize, sizeof(sizeStr) );
-    g_snprintf( buf, sizeof( buf ),
-                /* %1$s is number of pieces; %2$s is how big each piece is */
-                ngettext( "<i>%1$d Piece @ %2$s</i>",
-                          "<i>%1$d Pieces @ %2$s</i>",
-                          pieceCount ),
-                pieceCount, sizeStr );
+    if( !filename )
+        *buf = '\0';
+    else {
+        tr_strlsize( sizeStr, pieceSize, sizeof(sizeStr) );
+        g_snprintf( buf, sizeof( buf ),
+                    /* %1$s is number of pieces; %2$s is how big each piece is */
+                    ngettext( "<i>%1$d Piece @ %2$s</i>",
+                              "<i>%1$d Pieces @ %2$s</i>",
+                              pieceCount ),
+                    pieceCount, sizeStr );
+    }
     gtk_label_set_markup ( GTK_LABEL(ui->pieces_lb), buf );
 }
 
 static void
-file_chooser_shown_cb( GtkWidget *w, gpointer folder_toggle )
+onFileModeToggled( GtkToggleButton * t, gpointer w )
 {
-    const gboolean isFolder = gtk_toggle_button_get_active( folder_toggle );
-    gtk_file_chooser_set_action (GTK_FILE_CHOOSER(w), isFolder
-        ? GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER
-        : GTK_FILE_CHOOSER_ACTION_OPEN );
+    const gboolean active = gtk_toggle_button_get_active( t );
+    gtk_widget_set_sensitive( w, active );
+    if( active )
+        g_signal_emit_by_name( w, "selection-changed", NULL );
 }
-
+    
 GtkWidget*
 make_meta_ui( GtkWindow * parent, tr_handle * handle )
 {
+    GSList * group;
     int row = 0;
-    GtkWidget *d, *t, *w, *h, *rb_file, *rb_dir;
+    GtkWidget *l, *d, *t, *w, *h;
     GtkBox * main_vbox;
-    char name[256];
     MakeMetaUI * ui = g_new0 ( MakeMetaUI, 1 );
     ui->handle = handle;
 
@@ -250,33 +258,25 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
 
     t = hig_workarea_create ();
 
-    hig_workarea_add_section_title (t, &row, _("Files"));
+    hig_workarea_add_section_title (t, &row, _( "Content" ));
 
-        g_snprintf( name, sizeof(name), "%s:", _("File _Type"));
-        h = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
-        w = rb_dir = gtk_radio_button_new_with_mnemonic( NULL, _("Folder"));
-        gtk_box_pack_start ( GTK_BOX(h), w, FALSE, FALSE, 0 );
-        w = rb_file = gtk_radio_button_new_with_mnemonic_from_widget( GTK_RADIO_BUTTON(w), _("Single File") );
-        gtk_box_pack_start ( GTK_BOX(h), w, FALSE, FALSE, 0 );
-        hig_workarea_add_row (t, &row, name, h, NULL);
+        l = gtk_radio_button_new_with_mnemonic( NULL, _( "_Single File:" ) );
+        w = gtk_file_chooser_button_new( NULL, GTK_FILE_CHOOSER_ACTION_OPEN );
+        hig_workarea_add_row_w( t, &row, l, w, NULL );
+        group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( l ) );
+        g_signal_connect( l, "toggled", G_CALLBACK(onFileModeToggled), w );
+        g_signal_connect( w, "selection-changed", G_CALLBACK(onSelectionChanged), ui );
 
-        g_snprintf( name, sizeof(name), "%s:", _("_File"));
+        l = gtk_radio_button_new_with_mnemonic( group, _( "_Folder:" ) );
+        w = gtk_file_chooser_button_new( NULL, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
+        hig_workarea_add_row_w( t, &row, l, w, NULL );
+        g_signal_connect( l, "toggled", G_CALLBACK(onFileModeToggled), w );
+        g_signal_connect( w, "selection-changed", G_CALLBACK(onSelectionChanged), ui );
+        gtk_widget_set_sensitive( w, FALSE );
 
-        w = gtk_file_chooser_dialog_new ( NULL,
-                                          NULL,
-                                          GTK_FILE_CHOOSER_ACTION_OPEN,
-                                          GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
-                                          GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-                                          NULL );
-        g_signal_connect( w, "map", G_CALLBACK(file_chooser_shown_cb), rb_dir );
-        w = gtk_file_chooser_button_new_with_dialog( w );
-        g_signal_connect( w, "selection-changed", G_CALLBACK(file_selection_changed_cb), ui );
-        hig_workarea_add_row (t, &row, name, w, NULL);
-
-        g_snprintf( name, sizeof(name), "<i>%s</i>", _("No files selected"));
         h = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
         w = ui->size_lb = gtk_label_new (NULL);
-        gtk_label_set_markup ( GTK_LABEL(w), name );
+        gtk_label_set_markup ( GTK_LABEL(w), _( "<i>No files selected</i>" ) );
         gtk_box_pack_start( GTK_BOX(h), w, FALSE, FALSE, 0 );
         w = ui->pieces_lb = gtk_label_new (NULL);
         gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
@@ -287,19 +287,16 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
         
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _("Torrent"));
+    hig_workarea_add_section_title (t, &row, _("Metainfo"));
 
-        g_snprintf( name, sizeof(name), _("Private to this tracker") );
-        w = ui->private_check = hig_workarea_add_wide_checkbutton( t, &row, name, FALSE );
+        w = ui->private_check = hig_workarea_add_wide_checkbutton( t, &row, _( "_Private to this tracker" ), FALSE );
 
-        g_snprintf( name, sizeof(name), "%s:", _("Announce _URL"));
         w = ui->announce_entry = gtk_entry_new( );
         gtk_entry_set_text(GTK_ENTRY(w), "http://");
-        hig_workarea_add_row (t, &row, name, w, NULL );
+        hig_workarea_add_row (t, &row, _( "Announce _URL:" ), w, NULL );
 
-        g_snprintf( name, sizeof(name), "%s:", _("Commen_t"));
         w = ui->comment_entry = gtk_entry_new( );
-        hig_workarea_add_row (t, &row, name, w, NULL );
+        hig_workarea_add_row (t, &row, _( "Commen_t:" ), w, NULL );
 
     hig_workarea_finish( t, &row );
     gtk_box_pack_start_defaults( main_vbox, t );
