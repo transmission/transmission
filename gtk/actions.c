@@ -38,18 +38,13 @@ action_cb ( GtkAction * a, gpointer user_data )
 #define GTK_STOCK_INFO GTK_STOCK_PROPERTIES
 #endif
 
-#if !GTK_CHECK_VERSION(2,10,0)
-#define GTK_STOCK_SELECT_ALL NULL
-#endif
-
 static GtkRadioActionEntry sort_radio_entries[] =
 {
   { "sort-by-activity",   NULL, N_("Sort by _Activity"),   NULL, NULL, 0 },
-  { "sort-by-date-added", NULL, N_("Sort by _Date Added"), NULL, NULL, 1 },
-  { "sort-by-name",       NULL, N_("Sort by _Name"),       NULL, NULL, 2 },
-  { "sort-by-progress",   NULL, N_("Sort by _Progress"),   NULL, NULL, 3 },
-  { "sort-by-state",      NULL, N_("Sort by _State"),      NULL, NULL, 4 },
-  { "sort-by-tracker",    NULL, N_("Sort by _Tracker"),    NULL, NULL, 5 }
+  { "sort-by-name",       NULL, N_("Sort by _Name"),       NULL, NULL, 1 },
+  { "sort-by-progress",   NULL, N_("Sort by _Progress"),   NULL, NULL, 2 },
+  { "sort-by-state",      NULL, N_("Sort by _State"),      NULL, NULL, 3 },
+  { "sort-by-tracker",    NULL, N_("Sort by _Tracker"),    NULL, NULL, 4 }
 };
 
 static void
@@ -118,7 +113,8 @@ static GtkActionEntry entries[] =
     N_("Close main window"),
     G_CALLBACK(action_cb) },
   { "quit", GTK_STOCK_QUIT, N_("_Quit"), NULL, NULL, G_CALLBACK(action_cb) },
-  { "select-all", GTK_STOCK_SELECT_ALL, NULL, "<control>A", NULL, G_CALLBACK(action_cb) },
+  { "select-all", NULL,
+    N_( "Select _All" ), "<control>A", NULL, G_CALLBACK(action_cb) },
   { "unselect-all", NULL,
     N_("Dese_lect All"), "<shift><control>A", NULL, G_CALLBACK(action_cb) },
   { "edit-preferences", GTK_STOCK_PREFERENCES, NULL, NULL, NULL, G_CALLBACK(action_cb) },

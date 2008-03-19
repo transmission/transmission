@@ -719,11 +719,11 @@ info_page_new (tr_torrent * tor)
 
     l = gtk_label_new (tr_torrentGetFolder (tor));
     gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
-    hig_workarea_add_row (t, &row, _( "Destination folder" ), l, NULL); 
+    hig_workarea_add_row (t, &row, _( "Destination folder:" ), l, NULL); 
 
     l = gtk_label_new ( info->torrent );
     gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
-    hig_workarea_add_row (t, &row, _( "Torrent file" ), l, NULL); 
+    hig_workarea_add_row (t, &row, _( "Torrent file:" ), l, NULL); 
 
   hig_workarea_finish (t, &row);
   return t;
@@ -1001,7 +1001,7 @@ options_page_new ( TrTorrent * gtor )
     maxConnectedPeers = tr_torrentGetMaxConnectedPeers( tor );
     w = gtk_spin_button_new_with_range( 1, 3000, 5 );
     gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), maxConnectedPeers );
-    hig_workarea_add_row( t, &row, _( "_Maximum number of peers:" ), w, w );
+    hig_workarea_add_row( t, &row, _( "_Maximum peers:" ), w, w );
     g_signal_connect( w, "value-changed", G_CALLBACK( max_peers_spun_cb ), gtor );
 
 #if 0

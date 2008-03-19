@@ -144,7 +144,7 @@ openSingleTorrentDialog( GtkWindow  * parent,
     uint8_t flag;
 
     /* make the dialog */
-    d = gtk_dialog_new_with_buttons( _( "Open Torrent" ), parent,
+    d = gtk_dialog_new_with_buttons( _( "Torrent Options" ), parent,
             GTK_DIALOG_DESTROY_WITH_PARENT|GTK_DIALOG_NO_SEPARATOR,
             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
             GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
@@ -272,7 +272,7 @@ openDialog( GtkWindow * parent,
     GtkFileFilter * filter;
     char * folder;
 
-    w = gtk_file_chooser_dialog_new( _( "Select Torrents" ), parent,
+    w = gtk_file_chooser_dialog_new( _( "Open a Torrent" ), parent,
                                      GTK_FILE_CHOOSER_ACTION_OPEN,
                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
