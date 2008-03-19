@@ -18,7 +18,7 @@ const char * fallback_ui_file =
 "    </menu>\n"
 "    <menu action='edit-menu'>\n"
 "      <menuitem action='select-all'/>\n"
-"      <menuitem action='unselect-all'/>\n"
+"      <menuitem action='deselect-all'/>\n"
 "      <separator/>\n"
 "      <menuitem action='edit-preferences'/>\n"
 "    </menu>\n"

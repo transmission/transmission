@@ -289,7 +289,7 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
         
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _("Metainfo"));
+    hig_workarea_add_section_title (t, &row, _("Details"));
 
         w = ui->private_check = hig_workarea_add_wide_checkbutton( t, &row, _( "_Private to this tracker" ), FALSE );
 

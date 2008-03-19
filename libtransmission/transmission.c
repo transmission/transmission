@@ -460,8 +460,10 @@ tr_loadTorrents ( tr_handle   * h,
 
     tr_list_free( &list, NULL );
 
+    if( n )
+        tr_inf( _( "Loaded %d torrents" ), n );
+
     *setmeCount = n;
-    tr_inf( _( "Loaded %d torrents" ), *setmeCount );
     return torrents;
 }
 

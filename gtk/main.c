@@ -204,6 +204,14 @@ refreshTorrentActions( GtkTreeSelection * s )
     canUpdate = 0;
     gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach, &canUpdate );
     action_sensitize( "update-tracker", canUpdate!=0 );
+
+    {
+        GtkTreeView * view = gtk_tree_selection_get_tree_view( s );
+        GtkTreeModel * model = gtk_tree_view_get_model( view );
+        const int torrentCount = gtk_tree_model_iter_n_children( model, NULL ) != 0;
+        action_sensitize( "select-all", torrentCount!=0 );
+        action_sensitize( "deselect-all", torrentCount!=0 );
+    }
 }
 
 static void
@@ -1069,7 +1077,7 @@ doAction ( const char * action_name, gpointer user_data )
         GtkTreeSelection * s = tr_window_get_selection(data->wind);
         gtk_tree_selection_select_all( s );
     }
-    else if (!strcmp (action_name, "unselect-all"))
+    else if (!strcmp (action_name, "deselect-all"))
     {
         GtkTreeSelection * s = tr_window_get_selection(data->wind);
         gtk_tree_selection_unselect_all( s );

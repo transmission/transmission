@@ -119,7 +119,7 @@ static GtkActionEntry entries[] =
   { "quit", GTK_STOCK_QUIT, N_("_Quit"), NULL, NULL, G_CALLBACK(action_cb) },
   { "select-all", GTK_STOCK_SELECT_ALL,
     N_( "Select _All" ), "<control>A", NULL, G_CALLBACK(action_cb) },
-  { "unselect-all", NULL,
+  { "deselect-all", NULL,
     N_("Dese_lect All"), "<shift><control>A", NULL, G_CALLBACK(action_cb) },
   { "edit-preferences", GTK_STOCK_PREFERENCES, NULL, NULL, NULL, G_CALLBACK(action_cb) },
   { "show-torrent-details", GTK_STOCK_INFO,

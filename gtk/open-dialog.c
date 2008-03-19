@@ -123,6 +123,22 @@ destinationChanged( GtkFileChooserButton * b, gpointer gdata )
     verifyRequested( NULL, data );
 }
 
+static void
+addTorrentFilters( GtkFileChooser * chooser )
+{
+    GtkFileFilter * filter;
+
+    filter = gtk_file_filter_new( );
+    gtk_file_filter_set_name( filter, _( "Torrent files" ) );
+    gtk_file_filter_add_pattern( filter, "*.torrent" );
+    gtk_file_chooser_add_filter( chooser, filter );
+
+    filter = gtk_file_filter_new( );
+    gtk_file_filter_set_name( filter, _( "All files" ) );
+    gtk_file_filter_add_pattern( filter, "*" );
+    gtk_file_chooser_add_filter( chooser, filter );
+}
+
 /****
 *****
 ****/
@@ -139,7 +155,6 @@ openSingleTorrentDialog( GtkWindow  * parent,
     GtkWidget * d;
     GtkWidget * t;
     GtkWidget * l;
-    GtkFileFilter * filter;
     struct OpenData * data;
     uint8_t flag;
 
@@ -181,18 +196,11 @@ openSingleTorrentDialog( GtkWindow  * parent,
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
     gtk_table_attach( GTK_TABLE( t ), l, col, col+1, row, row+1, GTK_FILL, 0, 0, 0 );
     ++col;
-    w = gtk_file_chooser_button_new( _( "Select Torrent" ),
+    w = gtk_file_chooser_button_new( _( "Select Source File" ),
                                      GTK_FILE_CHOOSER_ACTION_OPEN );
     gtk_table_attach( GTK_TABLE( t ), w, col, col+1, row, row+1, ~0, 0, 0, 0 );
     gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
-    filter = gtk_file_filter_new( );
-    gtk_file_filter_set_name( filter, _( "Torrent files" ) );
-    gtk_file_filter_add_pattern( filter, "*.torrent" );
-    gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( w ), filter );
-    filter = gtk_file_filter_new( );
-    gtk_file_filter_set_name( filter, _( "All files" ) );
-    gtk_file_filter_add_pattern( filter, "*" );
-    gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( w ), filter );
+    addTorrentFilters( GTK_FILE_CHOOSER( w ) );
     g_signal_connect( w, "selection-changed",
                       G_CALLBACK( sourceChanged ), data );
     if( data->filename )
@@ -205,7 +213,7 @@ openSingleTorrentDialog( GtkWindow  * parent,
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
     gtk_table_attach( GTK_TABLE( t ), l, col, col+1, row, row+1, GTK_FILL, 0, 0, 0 );
     ++col;
-    w = gtk_file_chooser_button_new( _( "Destination" ), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
+    w = gtk_file_chooser_button_new( _( "Select Destination Folder" ), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
     if( !gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ), data->destination ) )
         g_warning( "couldn't select '%s'", data->destination );
     gtk_table_attach( GTK_TABLE( t ), w, col, col+1, row, row+1, ~0, 0, 0, 0 );
@@ -278,7 +286,6 @@ openDialog( GtkWindow * parent,
 {
     GtkWidget * w;
     GtkWidget * c;
-    GtkFileFilter * filter;
     char * folder;
 
     w = gtk_file_chooser_dialog_new( _( "Open a Torrent" ), parent,
@@ -291,17 +298,7 @@ openDialog( GtkWindow * parent,
                                              GTK_RESPONSE_CANCEL,
                                              -1 );
     gtk_file_chooser_set_select_multiple( GTK_FILE_CHOOSER( w ), TRUE );
-
-    filter = gtk_file_filter_new( );
-    gtk_file_filter_set_name( filter, _( "Torrent files" ) );
-    gtk_file_filter_add_pattern( filter, "*.torrent" );
-    gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( w ), filter );
-
-    filter = gtk_file_filter_new( );
-    gtk_file_filter_set_name( filter, _( "All files" ) );
-    gtk_file_filter_add_pattern( filter, "*" );
-    gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( w ), filter );
-
+    addTorrentFilters( GTK_FILE_CHOOSER( w ) );
     g_signal_connect( w, "response", G_CALLBACK(onOpenDialogResponse), core );
 
     if(( folder = pref_string_get( PREF_KEY_OPEN_DIALOG_FOLDER ))) {

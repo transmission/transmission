@@ -686,8 +686,8 @@ info_page_new (tr_torrent * tor)
     hig_workarea_add_row (t, &row, _("Hash:"), l, NULL);
 
     pch = (info->isPrivate )
-      ? _("Private Torrent: PEX disabled")
-      : _("Public Torrent");
+      ? _("Private to this tracker -- PEX disabled")
+      : _("Public torrent");
     l = gtk_label_new (pch);
     hig_workarea_add_row (t, &row, _("Privacy:"), l, NULL);
 
