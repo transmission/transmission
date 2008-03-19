@@ -157,13 +157,13 @@ onTrackerResponse( void * tracker UNUSED, void * vevent, void * user_data )
             break;
 
         case TR_TRACKER_WARNING:
-            tr_torerr( tor, _( "Tracker warning: %s" ), event->text );
+            tr_torerr( tor, _( "Tracker warning: \"%s\"" ), event->text );
             tor->error = TR_ERROR_TC_WARNING;
             strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
             break;
 
         case TR_TRACKER_ERROR:
-            tr_torerr( tor, _( "Tracker error: %s" ), event->text );
+            tr_torerr( tor, _( "Tracker error: \"%s\"" ), event->text );
             tor->error = TR_ERROR_TC_ERROR;
             strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
             break;
@@ -1052,6 +1052,10 @@ getCompletionString( int type )
 {
     switch( type )
     {
+        /* Translators: this is a minor point that's safe to skip over, but FYI:
+           "Complete" and "Done" are specific, different terms in Transmission:
+           "Complete" means we've downloaded every file in the torrent.
+           "Done" means we're done downloading the files we wanted, but NOT all that exist */
         case TR_CP_DONE:     return _( "Done" );
         case TR_CP_COMPLETE: return _( "Complete" );
         default:             return _( "Incomplete" );

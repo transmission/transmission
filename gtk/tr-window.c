@@ -596,13 +596,13 @@ updateTorrentCount( PrivateData * p )
         const int visibleCount = gtk_tree_model_iter_n_children( p->filter_model, NULL );
 
         if( torrentCount != visibleCount )
-            g_snprintf( buf, sizeof( buf ), ngettext( "%1$d of %2$d Torrent",
-                                                      "%1$d of %2$d Torrents",
+            g_snprintf( buf, sizeof( buf ), ngettext( "%1$'d of %2$'d Torrent",
+                                                      "%1$'d of %2$'d Torrents",
                                                       torrentCount ),
                                             visibleCount, torrentCount );
         else
-            g_snprintf( buf, sizeof( buf ), ngettext( "%d Torrent",
-                                                      "%d Torrents",
+            g_snprintf( buf, sizeof( buf ), ngettext( "%'d Torrent",
+                                                      "%'d Torrents",
                                                       torrentCount ),
                                             torrentCount );
         gtk_label_set_text( GTK_LABEL( p->gutter_lb ), buf );

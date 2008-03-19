@@ -276,7 +276,7 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
 
     if( !inf->fileCount || !inf->totalSize )
     {
-        tr_err( _( "Torrent is empty" ) );
+        tr_err( _( "Torrent is corrupt" ) ); /* the content is missing! */
         goto fail;
     }
 

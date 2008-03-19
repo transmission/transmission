@@ -108,7 +108,7 @@ stats_dialog_create( GtkWindow * parent, TrCore * core )
         hig_workarea_add_row( t, &row, _("Duration:"), l, NULL );
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _("Total") );
-        l = ui->all_sessions_lb = gtk_label_new( _("Program started %d times") );
+        l = ui->all_sessions_lb = gtk_label_new( _("Started %'d time") );
         hig_workarea_add_label_w( t, row++, l );
         l = ui->all_up_lb = gtk_label_new( NULL );
         hig_workarea_add_row( t, &row, _("Uploaded:"), l, NULL );

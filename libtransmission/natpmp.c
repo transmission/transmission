@@ -136,7 +136,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
         const int val = readnatpmpresponseorretry( &nat->natpmp, &response );
         logVal( "readnatpmpresponseorretry", val );
         if( val >= 0 ) {
-            tr_ninf( getKey(), _( "found public address %s" ), inet_ntoa( response.publicaddress.addr ) );
+            tr_ninf( getKey(), _( "Found public address \"%s\"" ), inet_ntoa( response.publicaddress.addr ) );
             nat->state = TR_NATPMP_IDLE;
         } else if( val != NATPMP_TRYAGAIN ) {
             setErrorState( nat );

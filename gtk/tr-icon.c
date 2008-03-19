@@ -63,11 +63,11 @@ refresh_tooltip_cb( gpointer data )
     tr_strlspeed( downStr, stats->clientDownloadSpeed, sizeof( downStr ) );
     tr_strlspeed( upStr, stats->clientUploadSpeed, sizeof( upStr ) );
     g_snprintf( tip, sizeof( tip ),
-                /* %1$d is the number of torrents we're seeding,
-                   %2$d is the number of torrents we're downloading,
+                /* %1$'d is the number of torrents we're seeding,
+                   %2$'d is the number of torrents we're downloading,
                    %3$s is our download speed,
                    %4$s is our upload speed */
-                _( "%1$d Seeding, %2$d Downloading\nDown: %3$s, Up: %4$s" ), 
+                _( "%1$'d Seeding, %2$'d Downloading\nDown: %3$s, Up: %4$s" ), 
                 stats->seedingCount,
                 stats->downloadCount,
                 downStr, upStr );

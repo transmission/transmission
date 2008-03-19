@@ -668,13 +668,14 @@ info_page_new (tr_torrent * tor)
   GtkTextBuffer * b;
   const tr_info * info = tr_torrentInfo(tor);
 
-  hig_workarea_add_section_title (t, &row, _("Torrent Information"));
+  hig_workarea_add_section_title (t, &row, _("Details"));
 
     tr_strlsize( sizeStr, info->pieceSize, sizeof(sizeStr) );
     g_snprintf( buf, sizeof( buf ),
-                /* %1$s is number of pieces; %2$s is how big each piece is */
-                ngettext( "%1$d Piece @ %2$s",
-                          "%1$d Pieces @ %2$s",
+                /* %1$'d is number of pieces
+                   %2$s is how big each piece is */
+                ngettext( "%1$'d Piece @ %2$s",
+                          "%1$'d Pieces @ %2$s",
                           info->pieceCount ),
                 info->pieceCount, sizeStr );
     l = gtk_label_new (buf);
@@ -1224,7 +1225,8 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
 
   /* create the dialog */
   tr_strlsize( sizeStr, info->totalSize, sizeof(sizeStr) );
-  /* %1$s is torrent name; %2$s its file size */
+  /* %1$s is torrent name 
+     %2$s its file size */
   g_snprintf( title, sizeof(title), _( "Details for %1$s (%2$s)" ), info->name, sizeStr );
   d = gtk_dialog_new_with_buttons (title, parent, 0,
                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,

@@ -186,7 +186,7 @@ onSelectionChanged( GtkFileChooser *chooser, gpointer user_data )
 
     filename = gtk_file_chooser_get_filename( chooser );
     if( !filename )
-        *buf = '\0';
+        g_snprintf( buf, sizeof( buf ), _( "No files selected" ) );
     else {
         ui->builder = tr_metaInfoBuilderCreate( ui->handle, filename );
         g_snprintf( buf, sizeof(buf), "%s.torrent (%d%%)", filename, 0 );
@@ -204,9 +204,10 @@ onSelectionChanged( GtkFileChooser *chooser, gpointer user_data )
     else {
         tr_strlsize( sizeStr, totalSize, sizeof(sizeStr) );
         g_snprintf( buf, sizeof( buf ),
-                    /* %1$s is the torrent size, %2$s is its number of files */
-                    ngettext( "<i>%1$s; %2$d File</i>",
-                              "<i>%1$s; %2$d Files</i>", fileCount ),
+                    /* %1$s is the torrent size
+                       %2$'d is its number of files */
+                    ngettext( "<i>%1$s; %2$'d File</i>",
+                              "<i>%1$s; %2$'d Files</i>", fileCount ),
                     sizeStr, fileCount );
     }
     gtk_label_set_markup ( GTK_LABEL(ui->size_lb), buf );
@@ -216,9 +217,10 @@ onSelectionChanged( GtkFileChooser *chooser, gpointer user_data )
     else {
         tr_strlsize( sizeStr, pieceSize, sizeof(sizeStr) );
         g_snprintf( buf, sizeof( buf ),
-                    /* %1$s is number of pieces; %2$s is how big each piece is */
-                    ngettext( "<i>%1$d Piece @ %2$s</i>",
-                              "<i>%1$d Pieces @ %2$s</i>",
+                    /* %1$'s is number of pieces;
+                       %2$s is how big each piece is */
+                    ngettext( "<i>%1$'d Piece @ %2$s</i>",
+                              "<i>%1$'d Pieces @ %2$s</i>",
                               pieceCount ),
                     pieceCount, sizeStr );
     }

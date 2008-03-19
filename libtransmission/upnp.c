@@ -117,7 +117,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
         UPNP_DeletePortMapping( handle->urls.controlURL,
                                 handle->data.servicetype,
                                 portStr, "TCP" );
-        tr_ninf( getKey(), _( "Stopping port forwarding of \"%s\", service \"%s\"" ),
+        tr_ninf( getKey(), _( "Stopping port forwarding through \"%s\", service \"%s\"" ),
                 handle->urls.controlURL, handle->data.servicetype );
         handle->isMapped = 0;
         handle->state = TR_UPNP_IDLE;
@@ -146,7 +146,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
                                        "Transmission", "TCP" );
             handle->isMapped = !err;
         }
-        tr_ninf( getKey(), _( "Port forwarding via \"%s\", service \"%s\".  (local address: %s:%d)" ),
+        tr_ninf( getKey(), _( "Port forwarding through \"%s\", service \"%s\".  (local address: %s:%d)" ),
                  handle->urls.controlURL, handle->data.servicetype, handle->lanaddr, port );
         if( handle->isMapped ) {
             tr_ninf( getKey(), _( "Port forwarding successful!" ) );

@@ -641,7 +641,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
                 ret |= parseVersion1 ( tor, walk, end, fieldsToLoad );
             else
                 /* %s is the torrent name */
-                tr_torinf( tor, _( "Skipping invalid resume file for \"%s\"" ), tor->info.name );
+                tr_torinf( tor, _( "Couldn't read resume file for \"%s\"" ), tor->info.name );
         }
 
         tr_free( buf );
