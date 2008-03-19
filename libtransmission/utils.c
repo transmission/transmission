@@ -559,7 +559,7 @@ tr_errorString( int code )
             return _( "No error" );
 
         case TR_ERROR:
-            return _( "Generic error" );
+            return _( "Unspecified error" );
         case TR_ERROR_ASSERT:
             return _( "Assert error" );
 
@@ -578,7 +578,7 @@ tr_errorString( int code )
         case TR_ERROR_IO_CHECKSUM:
             return _( "Checksum failed" );
         case TR_ERROR_IO_OTHER:
-            return _( "Generic I/O error" );
+            return _( "Unspecified I/O error" );
 
         case TR_ERROR_TC_ERROR:
             return _( "Tracker error" );

@@ -65,7 +65,7 @@ static void
 logVal( const char * func, int ret )
 {
     if( ret==NATPMP_TRYAGAIN )
-        tr_ndbg( getKey(), _( "%s responded 'try again'" ), func );
+        tr_ndbg( getKey(), _( "%s responded \"try again\"" ), func );
     else if( ret >= 0 )
         tr_ninf( getKey(), _( "%s succeeded (%d)" ), func, ret );
     else

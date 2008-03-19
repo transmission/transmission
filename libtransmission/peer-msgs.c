@@ -1530,7 +1530,7 @@ clientGotBlock( tr_peermsgs                * msgs,
         const tr_errno err = tr_ioTestPiece( tor, req->index );
 
         if( err )
-            tr_torerr( tor, _( "Downloaded piece %lu failed its checksum test: %s" ),
+            tr_torerr( tor, _( "Piece %lu, which was just downloaded, failed its checksum test: %s" ),
                        (unsigned long)req->index,
                        tr_errorString( err ) );
 

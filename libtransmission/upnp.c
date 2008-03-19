@@ -153,7 +153,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
             handle->port = port;
             handle->state = TR_UPNP_IDLE;
         } else {
-            tr_ninf( getKey(), _( "Port forwarding failed with error %d (%d - %s)" ), err, errno, tr_strerror(errno) );
+            tr_ninf( getKey(), _( "Port forwarding failed with error %d (errno %d - %s)" ), err, errno, tr_strerror(errno) );
             tr_ninf( getKey(), _( "If your router supports UPnP, please make sure UPnP is enabled!" ) );
             handle->port = -1;
             handle->state = TR_UPNP_ERR;
