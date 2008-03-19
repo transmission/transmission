@@ -162,7 +162,7 @@ tr_strltime( char * buf, int seconds, size_t buflen )
     }
 
     days = seconds / ( 60 * 60 * 24 );
-    g_snprintf( buf, buflen, ngettext( "'%d day", "%'d days", days ), days );
+    g_snprintf( buf, buflen, ngettext( "%'d day", "%'d days", days ), days );
     return buf;
 }
 
