@@ -310,7 +310,7 @@ static gboolean
 watchFolderIdle( gpointer gcore )
 {
     TrCore * core = TR_CORE( gcore );
-    tr_core_add_list( core, core->priv->monitor_files, FALSE );
+    tr_core_add_list_defaults( core, core->priv->monitor_files );
 
     /* cleanup */
     core->priv->monitor_files = NULL;
@@ -643,22 +643,24 @@ tr_core_add_ctor( TrCore * self, tr_ctor * ctor )
 }
 
 void
-tr_core_add_list( TrCore   * core,
-                  GSList   * torrentFiles,
-                  gboolean   forcePaused )
+tr_core_add_list( TrCore      * core,
+                  GSList      * torrentFiles,
+                  pref_flag_t   start,
+                  pref_flag_t   prompt )
 {
+    const gboolean doStart = pref_flag_eval( start, PREF_KEY_START );
+    const gboolean doPrompt = pref_flag_eval( prompt, PREF_KEY_OPTIONS_PROMPT );
+
     if( torrentFiles && !isDisposed( core ) )
     {
         GSList * l;
-        const gboolean doPrompt = pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
         tr_handle * handle = core->priv->handle;
 
         for( l=torrentFiles; l!=NULL; l=l->next )
         {
             tr_ctor * ctor = tr_ctorNew( handle );
             tr_core_apply_defaults( ctor );
-            if( forcePaused )
-                tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
+            tr_ctorSetPaused( ctor, TR_FORCE, !doStart );
             if( tr_ctorSetMetainfoFromFile( ctor, l->data ) )
                 tr_ctorFree( ctor );
             else if( tr_torrentParse( handle, ctor, NULL ) )

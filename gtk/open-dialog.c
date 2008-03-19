@@ -252,13 +252,21 @@ openSingleTorrentDialog( GtkWindow  * parent,
 static void
 onOpenDialogResponse( GtkDialog * dialog, int response, gpointer core )
 {
-    char * folder = gtk_file_chooser_get_current_folder( GTK_FILE_CHOOSER( dialog ) );
+    char * folder;
+
+    /* remember this folder the next time we use this dialog */
+    folder = gtk_file_chooser_get_current_folder( GTK_FILE_CHOOSER( dialog ) );
     pref_string_set( PREF_KEY_OPEN_DIALOG_FOLDER, folder );
     g_free( folder );
 
-    if( response == GTK_RESPONSE_ACCEPT ) {
+    if( response == GTK_RESPONSE_ACCEPT )
+    {
+        GtkWidget * w = gtk_file_chooser_get_extra_widget( GTK_FILE_CHOOSER( dialog ) );
+        const gboolean showOptions = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON ( w ) );
+        const pref_flag_t start = PREF_FLAG_DEFAULT;
+        const pref_flag_t prompt = showOptions ? PREF_FLAG_TRUE : PREF_FLAG_FALSE;
         GSList * l = gtk_file_chooser_get_filenames( GTK_FILE_CHOOSER( dialog ) );
-        tr_core_add_list( core, l, FALSE );
+        tr_core_add_list( core, l, start, prompt );
     }
 
     gtk_widget_destroy( GTK_WIDGET( dialog ) );
@@ -269,6 +277,7 @@ openDialog( GtkWindow * parent,
             TrCore    * core )
 {
     GtkWidget * w;
+    GtkWidget * c;
     GtkFileFilter * filter;
     char * folder;
 
@@ -299,7 +308,11 @@ openDialog( GtkWindow * parent,
         gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ), folder );
         g_free( folder );
     }
-    
+
+    c = gtk_check_button_new_with_mnemonic( _( "Display _options dialog" ) );
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( c ), pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) );
+    gtk_file_chooser_set_extra_widget( GTK_FILE_CHOOSER( w ), c );
+    gtk_widget_show( c );
 
     gtk_widget_show( w );
     return w;

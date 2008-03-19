@@ -176,6 +176,14 @@ gboolean
 pref_flag_get ( const char * key ) {
     return g_key_file_get_boolean( getPrefsKeyFile( ), GROUP, key, NULL );
 }
+gboolean
+pref_flag_eval( pref_flag_t val, const char * key ) {
+    switch( val ) {
+        case PREF_FLAG_TRUE: return TRUE;
+        case PREF_FLAG_FALSE: return FALSE;
+        default: return pref_flag_get( key );
+    }
+}
 void
 pref_flag_set( const char * key, gboolean value ) {
     g_key_file_set_boolean( getPrefsKeyFile( ), GROUP, key, value );

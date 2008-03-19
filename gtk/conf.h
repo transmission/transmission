@@ -47,6 +47,22 @@ void      pref_save               ( char **errstr );
 ***
 **/
 
+enum
+{
+    PREF_FLAG_DEFAULT = 0,
+    PREF_FLAG_FALSE = 1,
+    PREF_FLAG_TRUE = 2
+};
+
+typedef int pref_flag_t;
+
+gboolean pref_flag_eval( pref_flag_t val, const char * key );
+
+
+/**
+***
+**/
+
 gboolean
 cf_init(const char *confdir, char **errstr);
 gboolean

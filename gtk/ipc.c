@@ -513,7 +513,7 @@ smsg_add( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag, void * arg )
 
     if( list ) {
         list = g_slist_reverse( list );
-        tr_core_add_list( srv->core, list, FALSE );
+        tr_core_add_list_defaults( srv->core, list );
         tr_core_torrents_added( TR_CORE( srv->core ) );
     }
 

@@ -355,6 +355,9 @@ appsetup( TrWindow * wind, GSList * torrentFiles,
           struct cbdata * cbdata,
           gboolean forcepause, gboolean minimized )
 {
+    const pref_flag_t start = forcepause ? PREF_FLAG_FALSE : PREF_FLAG_DEFAULT;
+    const pref_flag_t prompt = PREF_FLAG_DEFAULT;
+
     /* fill out cbdata */
     cbdata->wind       = NULL;
     cbdata->icon       = NULL;
@@ -378,7 +381,7 @@ appsetup( TrWindow * wind, GSList * torrentFiles,
 
     /* add torrents from command-line and saved state */
     tr_core_load( cbdata->core, forcepause );
-    tr_core_add_list( cbdata->core, torrentFiles, forcepause );
+    tr_core_add_list( cbdata->core, torrentFiles, start, prompt );
     torrentFiles = NULL;
     tr_core_torrents_added( cbdata->core );
 
@@ -694,7 +697,7 @@ gotdrag( GtkWidget         * widget UNUSED,
         if( paths )
         {
             paths = g_slist_reverse( paths );
-            tr_core_add_list( data->core, paths, FALSE );
+            tr_core_add_list_defaults( data->core, paths );
             tr_core_torrents_added( data->core );
         }
 
