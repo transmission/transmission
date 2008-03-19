@@ -231,9 +231,6 @@ cli_io_received( GSource * source UNUSED, void * data, size_t len,
             case EPERM:
                 g_message( _("Bad IPC protocol version") );
                 break;
-            case EINVAL:
-                g_message( _("IPC parse error") );
-                break;
             default:
                 g_message( _("IPC parse error: %s"), g_strerror( errno ) );
                 break;
@@ -393,12 +390,9 @@ srv_io_received( GSource * source UNUSED, void * data, size_t len,
             case EPERM:
                 errmsg( con->u.serv.wind, _("Bad IPC protocol version") );
                 break;
-            case EINVAL:
-                errmsg( con->u.serv.wind, _("IPC parsing failed") );
-                break;
             default:
-                errmsg( con->u.serv.wind, _("IPC parsing failed: %s"),
-                        g_strerror( errno ) );
+                errmsg( con->u.serv.wind, _("IPC parse error: %s"), g_strerror( errno ) );
+                break;
         }
         destroycon( con );
         return 0;

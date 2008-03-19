@@ -123,7 +123,7 @@ askquit( TrCore          * core,
                                      GTK_RESPONSE_ACCEPT,
                                      GTK_RESPONSE_CANCEL );
 
-    dontask = gtk_check_button_new_with_mnemonic( _("_Don't ask me this again") );
+    dontask = gtk_check_button_new_with_mnemonic( _("_Don't ask me again") );
     stuff->dontask = dontask;
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(wind)->vbox), dontask, FALSE, FALSE, GUI_PAD );

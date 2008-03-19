@@ -101,7 +101,7 @@ refresh_cb ( gpointer user_data )
         }
         else
         {
-            gtk_progress_bar_set_text( p, _("Torrent Created") );
+            gtk_progress_bar_set_text( p, _("Torrent created") );
         }
 
         setIsBuilding( ui, FALSE );
