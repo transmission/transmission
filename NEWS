@@ -1,11 +1,11 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.10 (2008/xx/yy)
-- All Platforms:
-   + Removing a transfer will remove the associated cache file
-   + Lower memory use in cases where lots of torrents are loaded
+- All Platforms
+   + Smaller memory footprint per-torrent and per-peer
    + Stop torrents when downloading and the disk becomes full
-- Mac:
+   + Various backend bugfixes & improvements
+- Mac
    + Window when adding torrents to select files and other settings
    + Leopard: Collapsable group dividers
    + Use the file icon as the per-torrent action button
@@ -14,16 +14,17 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Updated images in the inspector
    + Optional display of remaining time while seeding in Minimal View
    + Improved accuracy for displaying the remaining disk space warning
-- GTK+:
-   + New "watch directory" for auto-adding torrents
-   + New system tray popup to notify when a torrent is completed
-   + Add file selection and prioritization to the "open torrent" dialog
-   + Tracker tab in the inspector
-   + New "delete torrent" (as opposed to "remove torrent") dialog
-   + Simplified preferences dialog
-   + Improved message log window
-   + Dozens of Gnome HIG, I18N, and packaging improvements
-   + Support KDE button ordering 
+- GTK+
+   + Window for selecting files & priorities when opening torrents
+   + Display a system tray popup when a torrent finishes downloading
+   + Watch folder for auto-adding torrents
+   + Improved preferences dialog and message log window
+   + Tracker tab in the Details window
+   + Dozens of usability, Gnome HIG, and i18n improvements
+   + Support KDE button ordering
+   + Option to delete a torrent and its downloaded files
+- Daemon
+   + Ability to force a "Verify Local Data" for a torrent
 
 1.06 (2008/02/26)
 - All Platforms:
