@@ -25,6 +25,7 @@ noinst_HEADERS = \
     logo.h \
     makemeta-ui.h \
     msgwin.h \
+    notify.h \
     open-dialog.h \
     stats.h \
     sexy-icon-entry.h \
