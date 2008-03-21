@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-03-19 19:09-0500\n"
-"PO-Revision-Date: 2008-03-20 09:34+0100\n"
+"PO-Revision-Date: 2008-03-21 20:34+0100\n"
 "Last-Translator: Festor Wailon Dacoba <festor90@gmail.com>\n"
 "Language-Team: Spanish <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -368,7 +368,7 @@ msgstr "Fechas"
 
 #: ../gtk/details.c:873
 msgid "Started at:"
-msgstr "Comenzado:"
+msgstr "Iniciada el:"
 
 #: ../gtk/details.c:876
 msgid "Last activity at:"
@@ -636,7 +636,7 @@ msgstr "Copyright 2005-2008 The Transmission Project"
 #. to have it appear in the credits in the "About" dialog
 #: ../gtk/main.c:888
 msgid "translator-credits"
-msgstr "créditos-traductores"
+msgstr "Festor Wailon Dacoba <festor90@gmail.com>"
 
 #: ../gtk/makemeta-ui.c:96
 msgid "Torrent creation cancelled"
@@ -781,7 +781,7 @@ msgstr "Mo_ver archivo fuente a la Papelera"
 #: ../gtk/open-dialog.c:184
 #: ../gtk/tr-prefs.c:246
 msgid "_Start when opened"
-msgstr "_Comenzar cuando se añaden"
+msgstr "_Iniciar descargas al añadir los torrents"
 
 #: ../gtk/open-dialog.c:195
 msgid "_Source file:"
@@ -811,7 +811,7 @@ msgstr "Abrir un Torrent"
 #: ../gtk/open-dialog.c:309
 #: ../gtk/tr-prefs.c:242
 msgid "Display _options dialog"
-msgstr "Mostrar _opciones de diálogo"
+msgstr "Mostrar _ventana de opciones en las descargas"
 
 #: ../gtk/stats.c:63
 #: ../gtk/stats.c:111
@@ -999,7 +999,7 @@ msgstr "Usar intercambio de peer"
 
 #: ../gtk/tr-prefs.c:285
 msgid "_Ignore unencrypted peers"
-msgstr "_Ignorar peers no sin encriptar"
+msgstr "_Ignorar peers sin encriptar"
 
 #. section header for the "maximum number of peers" section
 #: ../gtk/tr-prefs.c:291
