@@ -1253,6 +1253,11 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
   gtk_notebook_append_page (GTK_NOTEBOOK(n),  w,
                             gtk_label_new (_("Peers")));
 
+  w = tracker_page_new( gtor );
+  g_object_set_data( G_OBJECT( d ), "tracker-top", w );
+  gtk_notebook_append_page( GTK_NOTEBOOK( n ), w,
+                            gtk_label_new( _( "Tracker" ) ) );
+
   gtk_notebook_append_page (GTK_NOTEBOOK(n),
                             info_page_new (tor),
                             gtk_label_new (_("Information")));
@@ -1262,11 +1267,6 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
   g_object_set_data (G_OBJECT(d), "files-top", w);
   gtk_notebook_append_page (GTK_NOTEBOOK(n), w,
                             gtk_label_new (_("Files")));
-
-  w = tracker_page_new( gtor );
-  g_object_set_data( G_OBJECT( d ), "tracker-top", w );
-  gtk_notebook_append_page( GTK_NOTEBOOK( n ), w,
-                            gtk_label_new( _( "Tracker" ) ) );
 
   w = options_page_new (gtor);
   g_object_set_data (G_OBJECT(d), "options-top", w);
