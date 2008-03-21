@@ -681,8 +681,8 @@ info_page_new (tr_torrent * tor)
     l = gtk_label_new (buf);
     hig_workarea_add_row (t, &row, _("Pieces:"), l, NULL);
 
-    l = gtk_label_new (info->hashString);
-    gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
+    l = g_object_new( GTK_TYPE_LABEL, "label", info->hashString, "selectable", TRUE,
+                                      "ellipsize", PANGO_ELLIPSIZE_END, NULL );
     hig_workarea_add_row (t, &row, _("Hash:"), l, NULL);
 
     pch = (info->isPrivate )
@@ -718,12 +718,12 @@ info_page_new (tr_torrent * tor)
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Location"));
 
-    l = gtk_label_new (tr_torrentGetFolder (tor));
-    gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
+    l = g_object_new( GTK_TYPE_LABEL, "label", tr_torrentGetFolder( tor ), "selectable", TRUE,
+                                      "ellipsize", PANGO_ELLIPSIZE_END, NULL );
     hig_workarea_add_row (t, &row, _( "Destination folder:" ), l, NULL); 
 
-    l = gtk_label_new ( info->torrent );
-    gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
+    l = g_object_new( GTK_TYPE_LABEL, "label", info->torrent, "selectable", TRUE,
+                                      "ellipsize", PANGO_ELLIPSIZE_END, NULL );
     hig_workarea_add_row (t, &row, _( "Torrent file:" ), l, NULL); 
 
   hig_workarea_finish (t, &row);
