@@ -1463,7 +1463,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fBadger updateBadge];
 }
 
-- (void) setBottomCountTextFiltering: (BOOL) filtering
+- (void) setBottomCountText: (BOOL) filtering
 {
     NSString * totalTorrentsString;
     int totalCount = [fTorrents count];
@@ -1885,18 +1885,16 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             if (filterTracker)
             {
                 BOOL removeTextField = YES;
-                NSEnumerator * trackerEnumerator = [[torrent allTrackers] objectEnumerator], * subTrackerEnumerator;
-                NSArray * subTrackers;
-                while (removeTextField && (subTrackers = [trackerEnumerator nextObject]))
+                NSEnumerator * trackerEnumerator = [[torrent allTrackers] objectEnumerator];
+                id tracker;
+                while (tracker = [trackerEnumerator nextObject])
                 {
-                    NSEnumerator * subTrackerEnumerator = [subTrackers objectEnumerator];
-                    NSString * tracker;
-                    while ((tracker = [subTrackerEnumerator nextObject]))
-                        if ([tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location != NSNotFound)
-                        {
-                            removeTextField = NO;
-                            break;
-                        }
+                    if (![tracker isKindOfClass: [NSNumber class]]
+                        && [tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location != NSNotFound)
+                    {
+                        removeTextField = NO;
+                        break;
+                    }
                 }
                 
                 if (removeTextField)
@@ -1976,7 +1974,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         }
     }
     
-    [self setBottomCountTextFiltering: groupRows || filterStatus || filterGroup || filterText];
+    [self setBottomCountText: groupRows || filterStatus || filterGroup || filterText];
 
     [self setWindowSizeToFit];
 }
@@ -3803,7 +3801,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) updateForExpandCollape
 {
     [self setWindowSizeToFit];
-    [self setBottomCountTextFiltering: YES];
+    [self setBottomCountText: YES];
 }
 
 - (void) showMainWindow: (id) sender

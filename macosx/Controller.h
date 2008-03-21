@@ -182,7 +182,7 @@ typedef enum
 
 - (void) updateUI;
 
-- (void) setBottomCountTextFiltering: (BOOL) filtering;
+- (void) setBottomCountText: (BOOL) filtering;
 
 - (void) updateTorrentsInQueue;
 - (int) numToStartFromQueue: (BOOL) downloadQueue;
