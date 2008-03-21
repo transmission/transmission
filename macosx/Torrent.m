@@ -762,14 +762,15 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return [NSString stringWithUTF8String: fStat->tracker_stat.scrapeResponse];
 }
 
-- (NSArray *) allTrackers
+- (NSArray *) allTrackers: (BOOL) separators
 {
     NSMutableArray * allTrackers = [NSMutableArray array];
     
     int i, j;
     for (i = 0; i < fInfo->trackerTiers; i++)
     {
-        [allTrackers addObject: [NSNumber numberWithInt: i]];
+        if (separators)
+            [allTrackers addObject: [NSNumber numberWithInt: i]];
         for (j = 0; j < fInfo->trackerList[i].count; j++)
             [allTrackers addObject: [NSString stringWithFormat: @"http://%s:%d",
                 fInfo->trackerList[i].list[j].address, fInfo->trackerList[i].list[j].port]];

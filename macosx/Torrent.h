@@ -151,7 +151,7 @@ typedef enum
 - (int) nextScrapeTime;
 - (NSString *) scrapeResponse;
 
-- (NSArray *) allTrackers;
+- (NSArray *) allTrackers: (BOOL) separators;
 
 - (NSString *) comment;
 - (NSString *) creator;

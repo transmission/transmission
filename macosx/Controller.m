@@ -1885,12 +1885,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             if (filterTracker)
             {
                 BOOL removeTextField = YES;
-                NSEnumerator * trackerEnumerator = [[torrent allTrackers] objectEnumerator];
+                NSEnumerator * trackerEnumerator = [[torrent allTrackers: NO] objectEnumerator];
                 id tracker;
-                while (tracker = [trackerEnumerator nextObject])
+                while ((tracker = [trackerEnumerator nextObject]))
                 {
-                    if (![tracker isKindOfClass: [NSNumber class]]
-                        && [tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location != NSNotFound)
+                    if ([tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location != NSNotFound)
                     {
                         removeTextField = NO;
                         break;

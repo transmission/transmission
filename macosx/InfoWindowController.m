@@ -423,7 +423,7 @@ typedef enum
         
         //get trackers for table
         [fTrackers release];
-        fTrackers = [[torrent allTrackers] retain];
+        fTrackers = [[torrent allTrackers: YES] retain];
     }
     
     //update stats and settings
