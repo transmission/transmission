@@ -1327,8 +1327,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (fFileStat)
         tr_torrentFilesFree(fFileStat, [self fileCount]);
     
-    tr_file_index_t count;
-    fFileStat = tr_torrentFiles(fHandle, &count);
+    fFileStat = tr_torrentFiles(fHandle, NULL);
 }
 
 - (float) fileProgress: (int) index
