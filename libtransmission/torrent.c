@@ -733,7 +733,8 @@ tr_torrentFiles( const tr_torrent * tor, tr_file_index_t * fileCount )
             : 1.0;
     }
 
-    *fileCount = n;
+    if( fileCount )
+        *fileCount = n;
 
     return files;
 }
