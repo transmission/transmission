@@ -26,10 +26,10 @@
 #define TR_TORRENT_H 1
 
 /* just like tr_torrentSetFileDLs but doesn't trigger a fastresume save */
-void tr_torrentInitFileDLs( tr_torrent   * tor,
-                            int          * files,
-                            int            fileCount,
-                            int            do_download );
+void tr_torrentInitFileDLs( tr_torrent       * tor,
+                            tr_file_index_t  * files,
+                            tr_file_index_t    fileCount,
+                            int                do_download );
 
 int tr_torrentIsPrivate( const tr_torrent * );
 
@@ -37,7 +37,9 @@ void tr_torrentRecheckCompleteness( tr_torrent * );
 
 void tr_torrentResetTransferStats( tr_torrent * );
 
-void tr_torrentSetHasPiece( tr_torrent * tor, int pieceIndex, int has );
+void tr_torrentSetHasPiece( tr_torrent       * tor,
+                            tr_piece_index_t   pieceIndex,
+                            int                has );
 
 void tr_torrentLock    ( const tr_torrent * );
 void tr_torrentUnlock  ( const tr_torrent * );
@@ -73,25 +75,30 @@ int tr_torrentAllowsPex( const tr_torrent * );
     ( ((block)==((tor)->blockCount-1)) ? (tor)->lastBlockSize : (tor)->blockSize )
 
 #define tr_block(a,b) _tr_block(tor,a,b)
-int _tr_block( const tr_torrent * tor, int index, int begin );
+tr_block_index_t _tr_block( const tr_torrent * tor,
+                            tr_piece_index_t   index,
+                            uint32_t           offset );
 
 int tr_torrentReqIsValid( const tr_torrent * tor,
-                          uint32_t           index,
+                          tr_piece_index_t   index,
                           uint32_t           offset,
                           uint32_t           length );
 
-uint64_t tr_pieceOffset( const tr_torrent * tor, int index, int begin, int length );
+uint64_t tr_pieceOffset( const tr_torrent * tor,
+                         tr_piece_index_t   index,
+                         uint32_t           offset,
+                         uint32_t           length );
 
-void tr_torrentInitFilePriority( tr_torrent   * tor,
-                                 int            fileIndex,
-                                 tr_priority_t  priority );
+void tr_torrentInitFilePriority( tr_torrent       * tor,
+                                 tr_file_index_t    fileIndex,
+                                 tr_priority_t      priority );
 
 
 int  tr_torrentCountUncheckedPieces( const tr_torrent * );
-int  tr_torrentIsPieceChecked      ( const tr_torrent *, int piece );
-int  tr_torrentIsFileChecked       ( const tr_torrent *, int file );
-void tr_torrentSetPieceChecked     ( tr_torrent *, int piece, int isChecked );
-void tr_torrentSetFileChecked      ( tr_torrent *, int file, int isChecked );
+int  tr_torrentIsPieceChecked      ( const tr_torrent *, tr_piece_index_t piece );
+int  tr_torrentIsFileChecked       ( const tr_torrent *, tr_file_index_t file );
+void tr_torrentSetPieceChecked     ( tr_torrent *, tr_piece_index_t piece, int isChecked );
+void tr_torrentSetFileChecked      ( tr_torrent *, tr_file_index_t file, int isChecked );
 void tr_torrentUncheck             ( tr_torrent * );
 
 typedef enum
@@ -122,14 +129,14 @@ struct tr_torrent
     char                     * destination;
     
     /* How many bytes we ask for per request */
-    int                        blockSize;
-    int                        blockCount;
+    uint32_t                   blockSize;
+    tr_block_index_t           blockCount;
 
-    int                        lastBlockSize;
-    int                        lastPieceSize;
+    uint32_t                   lastBlockSize;
+    uint32_t                   lastPieceSize;
 
-    int                        blockCountInPiece;
-    int                        blockCountInLastPiece;
+    uint32_t                   blockCountInPiece;
+    uint32_t                   blockCountInLastPiece;
     
     struct tr_completion     * completion;
 

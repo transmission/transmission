@@ -33,9 +33,9 @@ struct tr_torrent;
  * or TR_ERROR_IO_* otherwise.
  */
 int tr_ioRead  ( const struct tr_torrent  * tor,
-                 int                        pieceIndex,
-                 int                        offset,
-                 int                        len,
+                 tr_piece_index_t           pieceIndex,
+                 uint32_t                   offset,
+                 uint32_t                   len,
                  uint8_t                  * setme );
 
 /**
@@ -44,9 +44,9 @@ int tr_ioRead  ( const struct tr_torrent  * tor,
  * or TR_ERROR_IO_* otherwise.
  */
 tr_errno tr_ioWrite ( struct tr_torrent  * tor,
-                      int                  pieceIndex,
-                      int                  offset,
-                      int                  len,
+                      tr_piece_index_t     pieceIndex,
+                      uint32_t             offset,
+                      uint32_t             len,
                       const uint8_t      * writeme );
 
 /**

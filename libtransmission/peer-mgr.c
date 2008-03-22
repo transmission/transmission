@@ -594,7 +594,7 @@ compareRefillPiece (const void * aIn, const void * bIn)
 
 static int
 isPieceInteresting( const tr_torrent  * tor,
-                    int                 piece )
+                    tr_piece_index_t    piece )
 {
     if( tor->info.pieces[piece].dnd ) /* we don't want it */
         return 0;
@@ -611,7 +611,7 @@ getPreferredPieces( Torrent     * t,
 {
     const tr_torrent * tor = t->tor;
     const tr_info * inf = &tor->info;
-    int i;
+    tr_piece_index_t i;
     uint32_t poolSize = 0;
     uint32_t * pool = tr_new( uint32_t, inf->pieceCount );
     int peerCount;
@@ -665,7 +665,7 @@ getPreferredPieces( Torrent     * t,
 }
 
 static uint64_t*
-getPreferredBlocks( Torrent * t, uint64_t * setmeCount )
+getPreferredBlocks( Torrent * t, tr_block_index_t * setmeCount )
 {
     int s;
     uint32_t i;
@@ -703,11 +703,11 @@ getPreferredBlocks( Torrent * t, uint64_t * setmeCount )
     /* sort the blocks into our temp bins */
     for( i=blockCount=0; i<pieceCount; ++i )
     {
-        const uint32_t index = pieces[i];
+        const tr_piece_index_t index = pieces[i];
         const int priorityIndex = tor->info.pieces[index].priority + 1;
-        const int begin = tr_torPieceFirstBlock( tor, index );
-        const int end = begin + tr_torPieceCountBlocks( tor, (int)index );
-        int block;
+        const tr_block_index_t begin = tr_torPieceFirstBlock( tor, index );
+        const tr_block_index_t end = begin + tr_torPieceCountBlocks( tor, index );
+        tr_block_index_t block;
 
         for( block=begin; block<end; ++block )
         {
@@ -784,10 +784,10 @@ refillPulse( void * vtorrent )
 {
     Torrent * t = vtorrent;
     tr_torrent * tor = t->tor;
-    uint32_t i;
+    tr_block_index_t i;
     int peerCount;
     tr_peer ** peers;
-    uint64_t blockCount;
+    tr_block_index_t blockCount;
     uint64_t * blocks;
 
     if( !t->isRunning )
@@ -805,15 +805,15 @@ refillPulse( void * vtorrent )
     {
         int j;
 
-        const uint64_t block = blocks[i];
-        const uint32_t index = tr_torBlockPiece( tor, block );
+        const tr_block_index_t block = blocks[i];
+        const tr_piece_index_t index = tr_torBlockPiece( tor, block );
         const uint32_t begin = (block * tor->blockSize) - (index * tor->info.pieceSize);
-        const uint32_t length = tr_torBlockCountBytes( tor, (int)block );
+        const uint32_t length = tr_torBlockCountBytes( tor, block );
 
         assert( tr_torrentReqIsValid( tor, index, begin, length ) );
-        assert( _tr_block( tor, index, begin ) == (int)block );
-        assert( begin < (uint32_t)tr_torPieceCountBytes( tor, (int)index ) );
-        assert( (begin + length) <= (uint32_t)tr_torPieceCountBytes( tor, (int)index ) );
+        assert( _tr_block( tor, index, begin ) == block );
+        assert( begin < tr_torPieceCountBytes( tor, index ) );
+        assert( (begin + length) <= tr_torPieceCountBytes( tor, index ) );
 
         /* find a peer who can ask for this block */
         for( j=0; j<peerCount; )

@@ -57,11 +57,11 @@ static tr_lock* getVerifyLock( void )
 }
 
 static void
-checkFile( tr_torrent   * tor,
-           int            fileIndex,
-           int          * abortFlag )
+checkFile( tr_torrent       * tor,
+           tr_file_index_t    fileIndex,
+           int              * abortFlag )
 {
-    int i;
+    tr_piece_index_t i;
     int nofile;
     struct stat sb;
     char path[MAX_PATH_LENGTH];
@@ -105,7 +105,7 @@ verifyThreadFunc( void * unused UNUSED )
 {
     for( ;; )
     {
-        int i;
+        tr_file_index_t i;
         tr_torrent * tor;
         struct verify_node * node;
 

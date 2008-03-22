@@ -265,8 +265,10 @@ subtree_walk_dnd( GtkTreeStore   * store,
  
     /* update this node */ 
     gtk_tree_model_get( GTK_TREE_MODEL(store), iter, FC_INDEX, &index, -1  );
-    if (index >= 0)
-      g_array_append_val( indices, index );
+    if (index >= 0) {
+      tr_file_index_t fi = index;
+      g_array_append_val( indices, fi );
+    }
     gtk_tree_store_set( store, iter, FC_ENABLED, enabled, -1 );
 
     /* visit the children */
@@ -281,9 +283,9 @@ set_subtree_dnd( GtkTreeStore   * store,
                  tr_torrent     * tor,
                  gboolean         enabled )
 {
-    GArray * indices = g_array_new( FALSE, FALSE, sizeof(int) );
+    GArray * indices = g_array_new( FALSE, FALSE, sizeof(tr_file_index_t) );
     subtree_walk_dnd( store, iter, tor, enabled, indices );
-    tr_torrentSetFileDLs( tor, (int*)indices->data, (int)indices->len, enabled );
+    tr_torrentSetFileDLs( tor, (tr_file_index_t*)indices->data, (tr_file_index_t)indices->len, enabled );
     g_array_free( indices, TRUE );
 }
 
@@ -318,7 +320,7 @@ set_subtree_priority( GtkTreeStore * store,
 {
     GArray * indices = g_array_new( FALSE, FALSE, sizeof(int) );
     subtree_walk_priority( store, iter, tor, priority, indices );
-    tr_torrentSetFilePriorities( tor, (int*)indices->data, (int)indices->len, priority );
+    tr_torrentSetFilePriorities( tor, (tr_file_index_t*)indices->data, (tr_file_index_t)indices->len, priority );
     g_array_free( indices, TRUE );
 }
 
@@ -370,7 +372,7 @@ refreshModel( gpointer gdata )
     if( data->gtor )
     {
         guint64 foo, bar;
-        int fileCount;
+        tr_file_index_t fileCount;
         tr_torrent * tor;
         tr_file_stat * fileStats;
 
@@ -424,7 +426,7 @@ file_list_set_torrent( GtkWidget * w, TrTorrent * gtor )
     /* populate the model */
     if( gtor )
     {
-        int i;
+        tr_file_index_t i;
         const tr_info * inf = tr_torrent_info( gtor );
         tr_torrent * tor = tr_torrent_handle( gtor );
 

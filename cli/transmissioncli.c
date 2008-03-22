@@ -178,6 +178,8 @@ main( int argc, char ** argv )
 
         if( !tr_torrentParse( h, ctor, &info ) )
         {
+            tr_file_index_t ff;
+
             printf( "hash:\t" );
             for( i=0; i<SHA_DIGEST_LENGTH; ++i )
                 printf( "%02x", info.hash[i] );
@@ -208,8 +210,8 @@ main( int argc, char ** argv )
                 printf( "private flag set\n" );
 
             printf( "file(s):\n" );
-            for( i=0; i<info.fileCount; ++i )
-                printf( "\t%s (%"PRIu64")\n", info.files[i].name, info.files[i].length );
+            for( ff=0; ff<info.fileCount; ++ff )
+                printf( "\t%s (%"PRIu64")\n", info.files[ff].name, info.files[ff].length );
 
             tr_metainfoFree( &info );
         }

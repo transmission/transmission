@@ -45,16 +45,16 @@ float            tr_cpPercentDone( const tr_completion * );
 void             tr_cpInvalidateDND ( tr_completion * );
 
 /* Pieces */
-int              tr_cpPieceIsComplete( const tr_completion *, int piece );
-void             tr_cpPieceAdd( tr_completion *, int piece );
-void             tr_cpPieceRem( tr_completion *, int piece );
+int              tr_cpPieceIsComplete( const tr_completion *, tr_piece_index_t piece );
+void             tr_cpPieceAdd( tr_completion *, tr_piece_index_t piece );
+void             tr_cpPieceRem( tr_completion *, tr_piece_index_t piece );
 
 /* Blocks */
-int              tr_cpBlockIsComplete( const tr_completion *, int block );
-void             tr_cpBlockAdd( tr_completion *, int block );
+int              tr_cpBlockIsComplete( const tr_completion *, tr_block_index_t block );
+void             tr_cpBlockAdd( tr_completion *, tr_block_index_t block );
 void             tr_cpBlockBitfieldSet( tr_completion *, struct tr_bitfield * );
-float            tr_cpPercentBlocksInPiece( const tr_completion * cp, int piece );
-int              tr_cpMissingBlocksInPiece( const tr_completion * cp, int piece );
+float            tr_cpPercentBlocksInPiece( const tr_completion * cp, tr_piece_index_t piece );
+int              tr_cpMissingBlocksInPiece( const tr_completion * cp, tr_piece_index_t piece );
 
 
 const struct tr_bitfield * tr_cpPieceBitfield( const tr_completion* );

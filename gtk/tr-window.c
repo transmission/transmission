@@ -269,7 +269,7 @@ checkFilterText( filter_text_mode_t    filter_text_mode,
                  const tr_info       * torInfo,
                  const char          * text )
 {
-    int i;
+    tr_file_index_t i;
     int ret = 0;
     char * pch;
 

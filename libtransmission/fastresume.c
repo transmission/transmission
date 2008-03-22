@@ -399,11 +399,11 @@ parseProgress( tr_torrent     * tor,
                const uint8_t  * buf,
                uint32_t         len )
 {
-    int i;
     uint64_t ret = 0;
    
     if( len == FR_PROGRESS_LEN( tor ) )
     {
+        int i;
         int n;
         tr_bitfield bitfield;
 
@@ -433,9 +433,12 @@ parseProgress( tr_torrent     * tor,
 
     /* the files whose mtimes are wrong,
        remove from completion pending a recheck... */
-    for( i=0; i<tor->info.pieceCount; ++i )
-        if( !tr_torrentIsPieceChecked( tor, i ) )
-            tr_cpPieceRem( tor->completion, i );
+    {
+        tr_piece_index_t i;
+        for( i=0; i<tor->info.pieceCount; ++i )
+            if( !tr_torrentIsPieceChecked( tor, i ) )
+                tr_cpPieceRem( tor->completion, i );
+    }
 
     return ret;
 }
@@ -449,8 +452,8 @@ parsePriorities( tr_torrent * tor, const uint8_t * buf, uint32_t len )
     {
         const size_t n = tor->info.fileCount;
         const size_t len = 2 * n;
-        int *dnd = NULL, dndCount = 0;
-        int *dl = NULL, dlCount = 0;
+        tr_file_index_t *dnd = NULL, dndCount = 0;
+        tr_file_index_t *dl = NULL, dlCount = 0;
         size_t i;
         const uint8_t * walk = buf;
 
@@ -467,8 +470,8 @@ parsePriorities( tr_torrent * tor, const uint8_t * buf, uint32_t len )
         }
 
         /* set the dnd flags */
-        dl = tr_new( int, len );
-        dnd = tr_new( int, len );
+        dl = tr_new( tr_file_index_t, len );
+        dnd = tr_new( tr_file_index_t, len );
         for( i=0; i<n; ++i )
             if( *walk++ == 't' ) /* 't' means the DND flag is true */
                 dnd[dndCount++] = i;

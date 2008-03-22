@@ -191,13 +191,13 @@ getBytePiece( const tr_info * info, uint64_t byteOffset )
 }
 
 static void
-initFilePieces ( tr_info * info, int fileIndex )
+initFilePieces ( tr_info * info, tr_file_index_t fileIndex )
 {
     tr_file * file = &info->files[fileIndex];
     uint64_t firstByte, lastByte;
 
     assert( info != NULL );
-    assert( 0<=fileIndex && fileIndex<info->fileCount );
+    assert( fileIndex < info->fileCount );
 
     file = &info->files[fileIndex];
     firstByte = file->offset;
@@ -207,17 +207,17 @@ initFilePieces ( tr_info * info, int fileIndex )
 }
 
 static int
-pieceHasFile( int piece, const tr_file * file )
+pieceHasFile( tr_piece_index_t piece, const tr_file * file )
 {
     return ( file->firstPiece <= piece ) && ( piece <= file->lastPiece );
 }
 
 static tr_priority_t
 calculatePiecePriority ( const tr_torrent * tor,
-                         int                piece,
+                         tr_piece_index_t   piece,
                          int                fileHint )
 {
-    int i;
+    tr_file_index_t i;
     int priority = TR_PRI_LOW;
 
     /* find the first file that has data in this piece */
@@ -256,19 +256,20 @@ calculatePiecePriority ( const tr_torrent * tor,
 static void
 tr_torrentInitFilePieces( tr_torrent * tor )
 {
-    int i;
+    tr_file_index_t ff;
+    tr_piece_index_t pp;
     uint64_t offset = 0;
 
     assert( tor != NULL );
 
-    for( i=0; i<tor->info.fileCount; ++i ) {
-      tor->info.files[i].offset = offset;
-      offset += tor->info.files[i].length;
-      initFilePieces( &tor->info, i );
+    for( ff=0; ff<tor->info.fileCount; ++ff ) {
+      tor->info.files[ff].offset = offset;
+      offset += tor->info.files[ff].length;
+      initFilePieces( &tor->info, ff );
     }
 
-    for( i=0; i<tor->info.pieceCount; ++i )
-        tor->info.pieces[i].priority = calculatePiecePriority( tor, i, -1 );
+    for( pp=0; pp<tor->info.pieceCount; ++pp )
+        tor->info.pieces[pp].priority = calculatePiecePriority( tor, pp, -1 );
 }
 
 static void
@@ -636,7 +637,7 @@ tr_torrentStat( tr_torrent * tor )
 
 
     {
-        int i;
+        tr_piece_index_t i;
         tr_bitfield * availablePieces = tr_peerMgrGetAvailable( tor->handle->peerMgr,
                                                                 tor->info.hash );
         s->desiredSize = 0;
@@ -671,24 +672,24 @@ tr_torrentStat( tr_torrent * tor )
 ***/
 
 static uint64_t
-fileBytesCompleted ( const tr_torrent * tor, int fileIndex )
+fileBytesCompleted ( const tr_torrent * tor, tr_file_index_t fileIndex )
 {
     const tr_file * file     =  &tor->info.files[fileIndex];
-    const uint64_t firstBlock       =  file->offset / tor->blockSize;
+    const tr_block_index_t firstBlock       =  file->offset / tor->blockSize;
     const uint64_t firstBlockOffset =  file->offset % tor->blockSize;
     const uint64_t lastOffset       =  file->length ? (file->length-1) : 0;
-    const uint64_t lastBlock        = (file->offset + lastOffset) / tor->blockSize;
+    const tr_block_index_t lastBlock        = (file->offset + lastOffset) / tor->blockSize;
     const uint64_t lastBlockOffset  = (file->offset + lastOffset) % tor->blockSize;
     uint64_t haveBytes = 0;
 
     assert( tor != NULL );
-    assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
+    assert( fileIndex < tor->info.fileCount );
     assert( file->offset + file->length <= tor->info.totalSize );
-    assert( ( (int)firstBlock < tor->blockCount ) || (!file->length && file->offset==tor->info.totalSize) );
-    assert( ( (int)lastBlock < tor->blockCount ) || (!file->length && file->offset==tor->info.totalSize) );
+    assert( ( firstBlock < tor->blockCount ) || (!file->length && file->offset==tor->info.totalSize) );
+    assert( ( lastBlock < tor->blockCount ) || (!file->length && file->offset==tor->info.totalSize) );
     assert( firstBlock <= lastBlock );
-    assert( (int)tr_torBlockPiece( tor, firstBlock ) == file->firstPiece );
-    assert( (int)tr_torBlockPiece( tor, lastBlock ) == file->lastPiece );
+    assert( tr_torBlockPiece( tor, firstBlock ) == file->firstPiece );
+    assert( tr_torBlockPiece( tor, lastBlock ) == file->lastPiece );
 
     if( firstBlock == lastBlock )
     {
@@ -697,7 +698,7 @@ fileBytesCompleted ( const tr_torrent * tor, int fileIndex )
     }
     else
     {
-        uint64_t i;
+        tr_block_index_t i;
 
         if( tr_cpBlockIsComplete( tor->completion, firstBlock ) )
             haveBytes += tor->blockSize - firstBlockOffset;
@@ -714,10 +715,10 @@ fileBytesCompleted ( const tr_torrent * tor, int fileIndex )
 }
 
 tr_file_stat *
-tr_torrentFiles( const tr_torrent * tor, int * fileCount )
+tr_torrentFiles( const tr_torrent * tor, tr_file_index_t * fileCount )
 {
-    int i;
-    const int n = tor->info.fileCount;
+    tr_file_index_t i;
+    const tr_file_index_t n = tor->info.fileCount;
     tr_file_stat * files = tr_new0( tr_file_stat, n );
     tr_file_stat * walk = files;
 
@@ -738,7 +739,7 @@ tr_torrentFiles( const tr_torrent * tor, int * fileCount )
 }
 
 void
-tr_torrentFilesFree( tr_file_stat * files, int fileCount UNUSED )
+tr_torrentFilesFree( tr_file_stat * files, tr_file_index_t fileCount UNUSED )
 {
     tr_free( files );
 }
@@ -805,12 +806,11 @@ tr_torrentResetTransferStats( tr_torrent * tor )
 
 
 void
-tr_torrentSetHasPiece( tr_torrent * tor, int pieceIndex, int has )
+tr_torrentSetHasPiece( tr_torrent * tor, tr_piece_index_t pieceIndex, int has )
 {
     tr_torrentLock( tor );
 
     assert( tor != NULL );
-    assert( pieceIndex >= 0 );
     assert( pieceIndex < tor->info.pieceCount );
 
     if( has )
@@ -978,7 +978,7 @@ tr_torrentVerify( tr_torrent * tor )
 static void
 stopTorrent( void * vtor )
 {
-    int i;
+    tr_file_index_t i;
 
     tr_torrent * tor = vtor;
     tr_verifyRemove( tor );
@@ -1131,15 +1131,15 @@ tr_torrentIsSeed( const tr_torrent * tor )
 **/
 
 void
-tr_torrentInitFilePriority( tr_torrent   * tor,
-                            int            fileIndex,
-                            tr_priority_t  priority )
+tr_torrentInitFilePriority( tr_torrent      * tor,
+                            tr_file_index_t   fileIndex,
+                            tr_priority_t     priority )
 {
-    int i;
+    tr_piece_index_t i;
     tr_file * file;
 
     assert( tor != NULL );
-    assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
+    assert( fileIndex < tor->info.fileCount );
     assert( priority==TR_PRI_LOW || priority==TR_PRI_NORMAL || priority==TR_PRI_HIGH );
 
     file = &tor->info.files[fileIndex];
@@ -1149,12 +1149,12 @@ tr_torrentInitFilePriority( tr_torrent   * tor,
 }
 
 void
-tr_torrentSetFilePriorities( tr_torrent     * tor,
-                             int            * files,
-                             int              fileCount,
-                             tr_priority_t    priority )
+tr_torrentSetFilePriorities( tr_torrent       * tor,
+                             tr_file_index_t  * files,
+                             tr_file_index_t    fileCount,
+                             tr_priority_t      priority )
 {
-    int i;
+    tr_file_index_t i;
     tr_torrentLock( tor );
 
     for( i=0; i<fileCount; ++i )
@@ -1165,13 +1165,13 @@ tr_torrentSetFilePriorities( tr_torrent     * tor,
 }
 
 tr_priority_t
-tr_torrentGetFilePriority( const tr_torrent *  tor, int file )
+tr_torrentGetFilePriority( const tr_torrent *  tor, tr_file_index_t file )
 {
     tr_priority_t ret;
 
     tr_torrentLock( tor );
     assert( tor != NULL );
-    assert( 0<=file && file<tor->info.fileCount );
+    assert( file < tor->info.fileCount );
     ret = tor->info.files[file].priority;
     tr_torrentUnlock( tor );
 
@@ -1181,7 +1181,7 @@ tr_torrentGetFilePriority( const tr_torrent *  tor, int file )
 tr_priority_t*
 tr_torrentGetFilePriorities( const tr_torrent * tor )
 {
-    int i;
+    tr_file_index_t i;
     tr_priority_t * p;
 
     tr_torrentLock( tor );
@@ -1199,12 +1199,12 @@ tr_torrentGetFilePriorities( const tr_torrent * tor )
 
 int
 tr_torrentGetFileDL( const tr_torrent * tor,
-                     int                file )
+                     tr_file_index_t    file )
 {
     int doDownload;
     tr_torrentLock( tor );
 
-    assert( 0<=file && file<tor->info.fileCount );
+    assert( file < tor->info.fileCount );
     doDownload = !tor->info.files[file].dnd;
 
     tr_torrentUnlock( tor );
@@ -1212,15 +1212,15 @@ tr_torrentGetFileDL( const tr_torrent * tor,
 }
 
 static void
-setFileDND( tr_torrent  * tor,
-            int           fileIndex,
-            int           doDownload )
+setFileDND( tr_torrent      * tor,
+            tr_file_index_t   fileIndex,
+            int               doDownload )
 {
     tr_file * file;
     const int dnd = !doDownload;
-    int firstPiece, firstPieceDND;
-    int lastPiece, lastPieceDND;
-    int i;
+    tr_piece_index_t firstPiece, firstPieceDND;
+    tr_piece_index_t lastPiece, lastPieceDND;
+    tr_file_index_t i;
 
     file = &tor->info.files[fileIndex];
     file->dnd = dnd;
@@ -1230,10 +1230,12 @@ setFileDND( tr_torrent  * tor,
     /* can't set the first piece to DND unless
        every file using that piece is DND */
     firstPieceDND = dnd;
-    for( i=fileIndex-1; firstPieceDND && i>=0; --i ) {
+    for( i=fileIndex-1; firstPieceDND; --i ) {
         if( tor->info.files[i].lastPiece != firstPiece )
             break;
         firstPieceDND = tor->info.files[i].dnd;
+        if( !i )
+            break;
     }
 
     /* can't set the last piece to DND unless
@@ -1251,20 +1253,21 @@ setFileDND( tr_torrent  * tor,
     }
     else
     {
+        tr_piece_index_t pp;
         tor->info.pieces[firstPiece].dnd = firstPieceDND;
         tor->info.pieces[lastPiece].dnd = lastPieceDND;
-        for( i=firstPiece+1; i<lastPiece; ++i )
-            tor->info.pieces[i].dnd = dnd;
+        for( pp=firstPiece+1; pp<lastPiece; ++pp )
+            tor->info.pieces[pp].dnd = dnd;
     }
 }
 
 void
-tr_torrentInitFileDLs ( tr_torrent   * tor,
-                        int          * files,
-                        int            fileCount,
-                        int            doDownload )
+tr_torrentInitFileDLs ( tr_torrent       * tor,
+                        tr_file_index_t  * files,
+                        tr_file_index_t    fileCount,
+                        int                doDownload )
 {
-    int i;
+    tr_file_index_t i;
     tr_torrentLock( tor );
 
     for( i=0; i<fileCount; ++i )
@@ -1275,10 +1278,10 @@ tr_torrentInitFileDLs ( tr_torrent   * tor,
 }
 
 void
-tr_torrentSetFileDLs ( tr_torrent  * tor,
-                       int         * files,
-                       int           fileCount,
-                       int           doDownload )
+tr_torrentSetFileDLs ( tr_torrent      * tor,
+                       tr_file_index_t * files,
+                       tr_file_index_t   fileCount,
+                       int               doDownload )
 {
     tr_torrentLock( tor );
     tr_torrentInitFileDLs( tor, files, fileCount, doDownload );
@@ -1307,25 +1310,30 @@ tr_torrentGetMaxConnectedPeers( const tr_torrent  * tor )
 ****
 ***/
 
-int
-_tr_block( const tr_torrent * tor, int index, int begin )
+tr_block_index_t
+_tr_block( const tr_torrent  * tor,
+           tr_piece_index_t    index,
+           uint32_t            offset )
 {
     const tr_info * inf = &tor->info;
-    return index * ( inf->pieceSize / tor->blockSize ) +
-        begin / tor->blockSize;
+    tr_block_index_t ret;
+    ret = index;
+    ret *= ( inf->pieceSize / tor->blockSize );
+    ret += offset / tor->blockSize;
+    return ret;
 }
 
 int
 tr_torrentReqIsValid( const tr_torrent * tor,
-                      uint32_t           index,
+                      tr_piece_index_t   index,
                       uint32_t           offset,
                       uint32_t           length )
 {
     int err = 0;
 
-    if( index >= (uint32_t) tor->info.pieceCount )
+    if( index >= tor->info.pieceCount )
         err = 1;
-    else if ( (int)offset >= tr_torPieceCountBytes( tor, (int)index ) )
+    else if ( offset >= tr_torPieceCountBytes( tor, index ) )
         err = 2;
     else if( length > MAX_BLOCK_SIZE )
         err = 3;
@@ -1340,7 +1348,7 @@ tr_torrentReqIsValid( const tr_torrent * tor,
         fprintf( stderr, "(ticket #751) req.length is %"PRIu32"\n", length );
         fprintf( stderr, "(ticket #751) tor->info.totalSize is %"PRIu64"\n", tor->info.totalSize );
         fprintf( stderr, "(ticket #751) tor->info.pieceCount is %d\n", tor->info.pieceCount );
-        fprintf( stderr, "(ticket #751) tr_torPieceCountBytes is %d\n", tr_torPieceCountBytes( tor, (int)index ) );
+        fprintf( stderr, "(ticket #751) tr_torPieceCountBytes is %d\n", tr_torPieceCountBytes( tor, index ) );
         fprintf( stderr, "(ticket #751) tr_pieceOffset is %"PRIu64"\n", tr_pieceOffset( tor, index, offset, length ) );
     }
 
@@ -1349,12 +1357,15 @@ tr_torrentReqIsValid( const tr_torrent * tor,
 
 
 uint64_t
-tr_pieceOffset( const tr_torrent * tor, int index, int begin, int length )
+tr_pieceOffset( const tr_torrent * tor,
+                tr_piece_index_t   index,
+                uint32_t           offset,
+                uint32_t           length )
 {
     uint64_t ret;
     ret = tor->info.pieceSize;
     ret *= index;
-    ret += begin;
+    ret += offset;
     ret += length;
     return ret;
 }
@@ -1364,13 +1375,13 @@ tr_pieceOffset( const tr_torrent * tor, int index, int begin, int length )
 ***/
 
 int
-tr_torrentIsPieceChecked( const tr_torrent * tor, int piece )
+tr_torrentIsPieceChecked( const tr_torrent * tor, tr_piece_index_t piece )
 {
     return tr_bitfieldHas( tor->checkedPieces, piece );
 }
 
 void
-tr_torrentSetPieceChecked( tr_torrent * tor, int piece, int isChecked )
+tr_torrentSetPieceChecked( tr_torrent * tor, tr_piece_index_t piece, int isChecked )
 {
     if( isChecked )
         tr_bitfieldAdd( tor->checkedPieces, piece );
@@ -1379,11 +1390,11 @@ tr_torrentSetPieceChecked( tr_torrent * tor, int piece, int isChecked )
 }
 
 void
-tr_torrentSetFileChecked( tr_torrent * tor, int fileIndex, int isChecked )
+tr_torrentSetFileChecked( tr_torrent * tor, tr_file_index_t fileIndex, int isChecked )
 {
     const tr_file * file = &tor->info.files[fileIndex];
-    const size_t begin = file->firstPiece;
-    const size_t end = file->lastPiece + 1;
+    const tr_piece_index_t begin = file->firstPiece;
+    const tr_piece_index_t end = file->lastPiece + 1;
 
     if( isChecked )
         tr_bitfieldAddRange ( tor->checkedPieces, begin, end );
@@ -1392,12 +1403,12 @@ tr_torrentSetFileChecked( tr_torrent * tor, int fileIndex, int isChecked )
 }
 
 int
-tr_torrentIsFileChecked( const tr_torrent * tor, int fileIndex )
+tr_torrentIsFileChecked( const tr_torrent * tor, tr_file_index_t fileIndex )
 {
     const tr_file * file = &tor->info.files[fileIndex];
-    const size_t begin = file->firstPiece;
-    const size_t end = file->lastPiece + 1;
-    size_t i;
+    const tr_piece_index_t begin = file->firstPiece;
+    const tr_piece_index_t end = file->lastPiece + 1;
+    tr_piece_index_t i;
     int isChecked = TRUE;
 
     for( i=begin; isChecked && i<end; ++i )

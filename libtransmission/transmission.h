@@ -50,6 +50,10 @@ extern "C" {
 
 #define TR_DEFAULT_PORT   51413
 
+typedef uint32_t tr_file_index_t;
+typedef uint32_t tr_piece_index_t;
+typedef uint64_t tr_block_index_t;
+
 enum
 {
     TR_PEER_FROM_INCOMING  = 0,  /* connections made to the listening port */
@@ -303,8 +307,8 @@ typedef int8_t tr_priority_t;
 /* set a batch of files to a particular priority.
  * priority must be one of TR_PRI_NORMAL, _HIGH, or _LOW */
 void tr_torrentSetFilePriorities( tr_torrent        * tor,
-                                  int               * files,
-                                  int                 fileCount,
+                                  tr_file_index_t   * files,
+                                  tr_file_index_t     fileCount,
                                   tr_priority_t       priority );
 
 /* returns a malloc()ed array of tor->info.fileCount items,
@@ -314,16 +318,16 @@ tr_priority_t* tr_torrentGetFilePriorities( const tr_torrent * );
 
 /* single-file form of tr_torrentGetFilePriorities.
  * returns one of TR_PRI_NORMAL, _HIGH, or _LOW. */
-tr_priority_t tr_torrentGetFilePriority( const tr_torrent *, int file );
+tr_priority_t tr_torrentGetFilePriority( const tr_torrent *, tr_file_index_t file );
 
 /* returns true if the file's `download' flag is set */
-int tr_torrentGetFileDL( const tr_torrent *, int file );
+int tr_torrentGetFileDL( const tr_torrent *, tr_file_index_t file );
 
 /* set a batch of files to be downloaded or not. */
-void tr_torrentSetFileDLs ( tr_torrent   * tor,
-                            int          * files,
-                            int            fileCount,
-                            int            do_download );
+void tr_torrentSetFileDLs ( tr_torrent      * tor,
+                            tr_file_index_t * files,
+                            tr_file_index_t   fileCount,
+                            int               do_download );
 
 /***********************************************************************
  * tr_torrentRates
@@ -584,8 +588,8 @@ tr_peer_stat * tr_torrentPeers( const tr_torrent *, int * peerCount );
 void tr_torrentPeersFree( tr_peer_stat *, int peerCount );
 
 typedef struct tr_file_stat tr_file_stat;
-tr_file_stat * tr_torrentFiles( const tr_torrent *, int * fileCount );
-void tr_torrentFilesFree( tr_file_stat *, int fileCount );
+tr_file_stat * tr_torrentFiles( const tr_torrent *, tr_file_index_t * fileCount );
+void tr_torrentFilesFree( tr_file_stat *, tr_file_index_t fileCount );
 
 
 /***********************************************************************
@@ -629,13 +633,13 @@ void tr_torrentDelete( tr_torrent * );
 
 typedef struct tr_file
 {
-    uint64_t   length;      /* Length of the file, in bytes */
-    char     * name;        /* Path to the file */
-    int8_t     priority;    /* TR_PRI_HIGH, _NORMAL, or _LOW */
-    int8_t     dnd;         /* nonzero if the file shouldn't be downloaded */
-    int        firstPiece;  /* We need pieces [firstPiece... */
-    int        lastPiece;   /* ...lastPiece] to dl this file */
-    uint64_t   offset;      /* file begins at the torrent's nth byte */
+    uint64_t          length;      /* Length of the file, in bytes */
+    char            * name;        /* Path to the file */
+    int8_t            priority;    /* TR_PRI_HIGH, _NORMAL, or _LOW */
+    int8_t            dnd;         /* nonzero if the file shouldn't be downloaded */
+    tr_piece_index_t  firstPiece;  /* We need pieces [firstPiece... */
+    tr_piece_index_t  lastPiece;   /* ...lastPiece] to dl this file */
+    uint64_t          offset;      /* file begins at the torrent's nth byte */
 }
 tr_file;
 
@@ -685,13 +689,13 @@ struct tr_info
     int                  dateCreated;
 
     /* Pieces info */
-    int                  pieceSize;
-    int                  pieceCount;
+    uint32_t             pieceSize;
+    tr_piece_index_t     pieceCount;
     uint64_t             totalSize;
     tr_piece           * pieces;
 
     /* Files info */
-    int                  fileCount;
+    tr_file_index_t      fileCount;
     tr_file            * files;
 };
 
@@ -791,7 +795,6 @@ struct tr_stat
 
     tr_errno error;
     char errorString[128];
-
 
     float recheckProgress;
     float percentComplete;

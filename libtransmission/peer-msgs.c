@@ -461,7 +461,7 @@ isPieceInteresting( const tr_peermsgs   * peer,
 static int
 isPeerInteresting( const tr_peermsgs * msgs )
 {
-    int i;
+    tr_piece_index_t i;
     const tr_torrent * torrent;
     const tr_bitfield * bitfield;
     const int clientIsSeed = tr_torrentIsSeed( msgs->torrent );
@@ -630,7 +630,7 @@ sendFastAllowed( tr_peermsgs * msgs,
 static void
 sendFastAllowedSet( tr_peermsgs * msgs )
 {
-    int i = 0;
+    tr_piece_index_t i = 0;
 
     while (i <= msgs->torrent->info.pieceCount )
     {
@@ -1440,10 +1440,10 @@ reassignBytesToCorrupt( tr_peermsgs * msgs, uint32_t byteCount )
 }
 
 static void
-gotBadPiece( tr_peermsgs * msgs, uint32_t pieceIndex )
+gotBadPiece( tr_peermsgs * msgs, tr_piece_index_t pieceIndex )
 {
     const uint32_t byteCount =
-        tr_torPieceCountBytes( msgs->torrent, (int)pieceIndex );
+        tr_torPieceCountBytes( msgs->torrent, pieceIndex );
     reassignBytesToCorrupt( msgs, byteCount );
 }
 
@@ -1468,12 +1468,12 @@ clientGotBlock( tr_peermsgs                * msgs,
 {
     int err;
     tr_torrent * tor = msgs->torrent;
-    const int block = _tr_block( tor, req->index, req->offset );
+    const tr_block_index_t block = _tr_block( tor, req->index, req->offset );
 
     assert( msgs != NULL );
     assert( req != NULL );
 
-    if( req->length != (uint32_t)tr_torBlockCountBytes( msgs->torrent, block ) )
+    if( req->length != tr_torBlockCountBytes( msgs->torrent, block ) )
     {
         dbgmsg( msgs, "wrong block size -- expected %u, got %d",
                 tr_torBlockCountBytes( msgs->torrent, block ), req->length );

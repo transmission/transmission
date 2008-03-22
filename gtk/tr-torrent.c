@@ -332,7 +332,7 @@ tr_torrent_set_delete_flag( TrTorrent * gtor, gboolean do_delete )
 void
 tr_torrent_delete_files( TrTorrent * gtor )
 {
-    int i;
+    tr_file_index_t i;
     const tr_info * info = tr_torrent_info( gtor );
     const char * stop = tr_torrentGetFolder( tr_torrent_handle( gtor ) );
 

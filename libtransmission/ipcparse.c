@@ -502,6 +502,7 @@ ipc_addinfo( tr_benc * list, int tor, const tr_info * inf, int types )
 {
     tr_benc * dict, * item, * file, * tier;
     int          ii, jj, kk;
+    tr_file_index_t ff;
 
     /* always send torrent id */
     types |= IPC_INF_ID;
@@ -567,7 +568,7 @@ ipc_addinfo( tr_benc * list, int tor, const tr_info * inf, int types )
                 {
                     return -1;
                 }
-                for( jj = 0; inf->fileCount > jj; jj++ )
+                for( ff = 0; inf->fileCount > ff; ff++ )
                 {
                     file = tr_bencListAdd( item );
                     tr_bencInit( file, TYPE_DICT );
@@ -576,9 +577,9 @@ ipc_addinfo( tr_benc * list, int tor, const tr_info * inf, int types )
                         return -1;
                     }
                     tr_bencInitStr( tr_bencDictAdd( file, "name" ),
-                                    inf->files[jj].name, -1, 1 );
+                                    inf->files[ff].name, -1, 1 );
                     tr_bencInitInt( tr_bencDictAdd( file, "size" ),
-                                    inf->files[jj].length );
+                                    inf->files[ff].length );
                 }
                 break;
             case IPC_INF_HASH:

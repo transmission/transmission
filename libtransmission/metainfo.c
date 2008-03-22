@@ -171,7 +171,7 @@ savedname( char * name, size_t len, const char * hash, const char * tag )
 int
 tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
 {
-    int i;
+    tr_piece_index_t i;
     tr_benc * beInfo, * val, * val2;
     tr_benc * meta = (tr_benc *) meta_in;
     char buf[4096];
@@ -304,10 +304,11 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
 
 void tr_metainfoFree( tr_info * inf )
 {
+    tr_file_index_t ff;
     int i, j;
 
-    for( i=0; i<inf->fileCount; ++i )
-        tr_free( inf->files[i].name );
+    for( ff=0; ff<inf->fileCount; ++ff )
+        tr_free( inf->files[ff].name );
 
     tr_free( inf->pieces );
     tr_free( inf->files );

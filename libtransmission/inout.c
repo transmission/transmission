@@ -41,7 +41,7 @@ enum { TR_IO_READ, TR_IO_WRITE };
 static tr_errno
 readOrWriteBytes( const tr_torrent  * tor,
                   int                 ioMode,
-                  int                 fileIndex,
+                  tr_file_index_t     fileIndex,
                   uint64_t            fileOffset,
                   void              * buf,
                   size_t              buflen )
@@ -56,7 +56,7 @@ readOrWriteBytes( const tr_torrent  * tor,
     int err;
     int fileExists;
 
-    assert( 0<=fileIndex && fileIndex<info->fileCount );
+    assert( fileIndex < info->fileCount );
     assert( !file->length || (fileOffset < file->length));
     assert( fileOffset + buflen <= file->length );
 
@@ -88,17 +88,17 @@ readOrWriteBytes( const tr_torrent  * tor,
 
 static tr_errno
 findFileLocation( const tr_torrent * tor,
-                  int                pieceIndex,
-                  int                pieceOffset,
-                  int              * fileIndex,
+                  tr_piece_index_t   pieceIndex,
+                  uint32_t           pieceOffset,
+                  tr_file_index_t  * fileIndex,
                   uint64_t         * fileOffset )
 {
     const tr_info * info = &tor->info;
 
-    int i;
+    tr_file_index_t i;
     uint64_t piecePos = ((uint64_t)pieceIndex * info->pieceSize) + pieceOffset;
 
-    if( pieceIndex < 0 || pieceIndex >= info->pieceCount )
+    if( pieceIndex >= info->pieceCount )
         return TR_ERROR_ASSERT;
     if( pieceOffset >= tr_torPieceCountBytes( tor, pieceIndex ) )
         return TR_ERROR_ASSERT;
@@ -111,7 +111,7 @@ findFileLocation( const tr_torrent * tor,
     *fileIndex = i;
     *fileOffset = piecePos;
 
-    assert( 0<=*fileIndex && *fileIndex<info->fileCount );
+    assert( *fileIndex < info->fileCount );
     assert( *fileOffset < info->files[i].length );
     return 0;
 }
@@ -119,7 +119,7 @@ findFileLocation( const tr_torrent * tor,
 #ifdef WIN32
 static tr_errno
 ensureMinimumFileSize( const tr_torrent  * tor,
-                       int                 fileIndex,
+                       tr_file_index_t     fileIndex,
                        uint64_t            minBytes )
 {
     int fd;
@@ -150,19 +150,19 @@ ensureMinimumFileSize( const tr_torrent  * tor,
 #endif
 
 static tr_errno
-readOrWritePiece( tr_torrent  * tor,
-                  int           ioMode,
-                  int           pieceIndex,
-                  int           pieceOffset,
-                  uint8_t     * buf,
-                  size_t        buflen )
+readOrWritePiece( tr_torrent        * tor,
+                  int                 ioMode,
+                  tr_piece_index_t    pieceIndex,
+                  uint32_t            pieceOffset,
+                  uint8_t           * buf,
+                  size_t              buflen )
 {
     tr_errno err = 0;
-    int fileIndex;
+    tr_file_index_t fileIndex;
     uint64_t fileOffset;
     const tr_info * info = &tor->info;
 
-    if( pieceIndex < 0 || pieceIndex >= tor->info.pieceCount )
+    if( pieceIndex >= tor->info.pieceCount )
         err = TR_ERROR_ASSERT;
     else if( buflen > ( size_t ) tr_torPieceCountBytes( tor, pieceIndex ) )
         err = TR_ERROR_ASSERT;
@@ -194,20 +194,20 @@ readOrWritePiece( tr_torrent  * tor,
 
 tr_errno
 tr_ioRead( const tr_torrent  * tor,
-           int                 pieceIndex,
-           int                 begin,
-           int                 len,
+           tr_piece_index_t    pieceIndex,
+           uint32_t            begin,
+           uint32_t            len,
            uint8_t           * buf )
 {
     return readOrWritePiece( (tr_torrent*)tor, TR_IO_READ, pieceIndex, begin, buf, len );
 }
 
 tr_errno
-tr_ioWrite( tr_torrent     * tor,
-            int              pieceIndex,
-            int              begin,
-            int              len,
-            const uint8_t  * buf )
+tr_ioWrite( tr_torrent        * tor,
+            tr_piece_index_t    pieceIndex,
+            uint32_t            begin,
+            uint32_t            len,
+            const uint8_t     * buf )
 {
     return readOrWritePiece( tor, TR_IO_WRITE, pieceIndex, begin, (uint8_t*)buf, len );
 }
@@ -218,7 +218,7 @@ tr_ioWrite( tr_torrent     * tor,
 
 static tr_errno
 tr_ioRecalculateHash( const tr_torrent  * tor,
-                      int                 pieceIndex,
+                      tr_piece_index_t    pieceIndex,
                       uint8_t           * setme )
 {
     static uint8_t * buf = NULL;
@@ -238,7 +238,7 @@ tr_ioRecalculateHash( const tr_torrent  * tor,
 
     assert( tor != NULL );
     assert( setme != NULL );
-    assert( 0<=pieceIndex && pieceIndex<tor->info.pieceCount );
+    assert( pieceIndex < tor->info.pieceCount );
 
     info = &tor->info;
     n = tr_torPieceCountBytes( tor, pieceIndex );
