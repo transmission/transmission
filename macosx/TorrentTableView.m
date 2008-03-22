@@ -723,6 +723,11 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
 }
 
+- (void) moveDataFile: (id) sender
+{
+    [fController moveDataFiles: [NSArray arrayWithObject: fMenuTorrent]];
+}
+
 - (void) togglePiecesBar
 {
     [self resizePiecesBarIncrement];

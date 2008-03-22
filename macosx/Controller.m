@@ -1224,7 +1224,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self removeTorrents: [fTableView selectedTorrents] deleteData: YES deleteTorrent: YES];
 }
 
-- (void) moveDataFiles: (id) sender
+- (void) moveDataFilesSelected: (id) sender
+{
+    [self moveDataFiles: [fTableView selectedTorrents]];
+}
+
+- (void) moveDataFiles: (NSArray *) torrents
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
     [panel setPrompt: NSLocalizedString(@"Select", "Move torrent -> prompt")];
@@ -1233,7 +1238,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
     
-    NSArray * torrents = [[fTableView selectedTorrents] retain];
+    torrents = [torrents retain];
     int count = [torrents count];
     if (count == 1)
         [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for \"%@\".",
@@ -1886,7 +1891,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             {
                 BOOL removeTextField = YES;
                 NSEnumerator * trackerEnumerator = [[torrent allTrackers: NO] objectEnumerator];
-                id tracker;
+                NSString * tracker;
                 while ((tracker = [trackerEnumerator nextObject]))
                 {
                     if ([tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location != NSNotFound)
@@ -3599,7 +3604,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
     
     //enable move torrent file item
-    if (action == @selector(moveDataFiles:))
+    if (action == @selector(moveDataFilesSelected:))
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
     
     //enable copy torrent file item

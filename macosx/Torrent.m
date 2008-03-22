@@ -757,6 +757,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     NSTimeInterval difference = [[NSDate dateWithTimeIntervalSince1970: date] timeIntervalSinceNow];
     return difference > 0 ? (int)difference : -1;
 }
+
 - (NSString *) scrapeResponse
 {
     return [NSString stringWithUTF8String: fStat->tracker_stat.scrapeResponse];
@@ -766,11 +767,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 {
     NSMutableArray * allTrackers = [NSMutableArray array];
     
-    int i, j;
+    int i;
     for (i = 0; i < fInfo->trackerTiers; i++)
     {
         if (separators)
             [allTrackers addObject: [NSNumber numberWithInt: i]];
+        
+        int j;
         for (j = 0; j < fInfo->trackerList[i].count; j++)
             [allTrackers addObject: [NSString stringWithFormat: @"http://%s:%d",
                 fInfo->trackerList[i].list[j].address, fInfo->trackerList[i].list[j].port]];

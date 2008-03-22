@@ -77,6 +77,7 @@
 - (void) setQuickRatio: (id) sender;
 
 - (void) checkFile: (id) sender;
+- (void) moveDataFile: (id) sender;
 
 - (void) togglePiecesBar;
 - (float) piecesBarPercent;
