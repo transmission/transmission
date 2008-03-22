@@ -1382,7 +1382,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (void) setFileCheckState: (int) state forIndexes: (NSIndexSet *) indexSet
 {
     NSUInteger count = [indexSet count], i = 0, index;
-    tr_file_index_t * files = malloc(count * sizeof(int));
+    tr_file_index_t * files = malloc(count * sizeof(tr_file_index_t));
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
         files[i] = index;
@@ -1399,7 +1399,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet
 {
     NSUInteger count = [indexSet count], i = 0, index;
-    tr_file_index_t * files = malloc(count * sizeof(int));
+    tr_file_index_t * files = malloc(count * sizeof(tr_file_index_t));
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
         files[i] = index;
