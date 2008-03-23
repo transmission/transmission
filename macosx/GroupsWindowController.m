@@ -69,7 +69,6 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 
 - (void) windowWillClose: (id) sender
 {
-    #warning remove when streamlined
     [[NSColorPanel sharedColorPanel] close];
     
 	[fGroupsWindowInstance release];
@@ -98,11 +97,11 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         [[GroupsController groups] setName: object forRowIndex: row];
     else if ([identifier isEqualToString: @"Button"])
     {
-        fCurrentColorRow = row;
+        fCurrentColorIndex = [[GroupsController groups] indexForRow: row];
         
         NSColorPanel * colorPanel = [NSColorPanel sharedColorPanel];
         [colorPanel setContinuous: YES];
-        [colorPanel setColor: [[GroupsController groups] colorForRowIndex: row]];
+        [colorPanel setColor: [[GroupsController groups] colorForIndex: fCurrentColorIndex]];
         
         [colorPanel setTarget: self];
         [colorPanel setAction: @selector(changeColor:)];
@@ -148,16 +147,16 @@ GroupsWindowController * fGroupsWindowInstance = nil;
                                         oldSelected: [fTableView selectedRowIndexes]];
         
         [fTableView selectRowIndexes: selectedIndexes byExtendingSelection: NO];
-        
         [fTableView reloadData];
     }
     
     return YES;
 }
 
-#warning make the color picker a nicer experience
 - (void) addRemoveGroup: (id) sender
 {
+    NSIndexSet * indexes;
+    
     switch ([[sender cell] tagForSegment: [sender selectedSegment]])
     {
         case ADD_TAG:
@@ -171,18 +170,18 @@ GroupsWindowController * fGroupsWindowInstance = nil;
             break;
         
         case REMOVE_TAG:
-            //safety: when removing a row, just close the color picker
-            [[NSColorPanel sharedColorPanel] close];
+            //close color picker if corresponding row is removed
+            indexes = [fTableView selectedRowIndexes];
+            if ([[NSColorPanel sharedColorPanel] isVisible]
+                && [indexes containsIndex: [[GroupsController groups] rowValueForIndex: fCurrentColorIndex]])
+                [[NSColorPanel sharedColorPanel] close];
             
-            [[GroupsController groups] removeGroupWithRowIndexes: [fTableView selectedRowIndexes]];
+            [[GroupsController groups] removeGroupWithRowIndexes: indexes];
             
             [fTableView deselectAll: self];
             [fTableView reloadData];
             
             break;
-        
-        default:
-            return;
     }
 }
 
@@ -192,7 +191,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 
 - (void) changeColor: (id) sender
 {
-    [[GroupsController groups] setColor: [sender color] forRowIndex: fCurrentColorRow];
+    [[GroupsController groups] setColor: [sender color] forIndex: fCurrentColorIndex];
     [fTableView reloadData];
 }
 

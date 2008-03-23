@@ -42,14 +42,14 @@ typedef enum
     
     int fID;
     
-    BOOL         fResumeOnWake;
-    NSDate       * fDateAdded, * fDateCompleted, * fDateActivity;
+    BOOL fResumeOnWake;
+    NSDate * fDateAdded, * fDateCompleted, * fDateActivity;
     
-    BOOL        fUseIncompleteFolder;
-    NSString    * fDownloadFolder, * fIncompleteFolder;
+    BOOL fUseIncompleteFolder;
+    NSString * fDownloadFolder, * fIncompleteFolder;
     
-    BOOL        fPublicTorrent;
-    NSString    * fPublicTorrentLocation;
+    BOOL fPublicTorrent;
+    NSString * fPublicTorrentLocation;
 	
     NSUserDefaults * fDefaults;
 

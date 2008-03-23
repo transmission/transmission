@@ -112,7 +112,7 @@ GroupsController * fGroupsInstance = nil;
     return [fGroups count];
 }
 
-- (int) orderValueForIndex: (int) index
+- (int) rowValueForIndex: (int) index
 {
     if (index != -1)
     {
@@ -124,16 +124,21 @@ GroupsController * fGroupsInstance = nil;
     return -1;
 }
 
+- (int) indexForRow: (int) row
+{
+    return [[[fGroups objectAtIndex: row] objectForKey: @"Index"] intValue];
+}
+
 - (CTGradient *) gradientForIndex: (int) index
 {
-    int orderIndex = [self orderValueForIndex: index];
+    int orderIndex = [self rowValueForIndex: index];
     return orderIndex != -1 ? [self gradientForColor: [[fGroups objectAtIndex: orderIndex] objectForKey: @"Color"]] : nil;
 }
 
 - (NSString *) nameForIndex: (int) index
 {
-    int orderIndex = [self orderValueForIndex: index];
-    return orderIndex != -1 ? [self nameForRowIndex: [self orderValueForIndex: orderIndex]] : nil;
+    int orderIndex = [self rowValueForIndex: index];
+    return orderIndex != -1 ? [self nameForRowIndex: orderIndex] : nil;
 }
 
 - (NSString *) nameForRowIndex: (int) index
@@ -151,7 +156,7 @@ GroupsController * fGroupsInstance = nil;
 
 - (NSImage *) imageForIndex: (int) index isSmall: (BOOL) small
 {
-    int orderIndex = [self orderValueForIndex: index];
+    int orderIndex = [self rowValueForIndex: index];
     return orderIndex != -1 ? [self imageForRowIndex: orderIndex isSmall: small] : nil;
 }
 
@@ -160,14 +165,15 @@ GroupsController * fGroupsInstance = nil;
     return [self imageForGroup: [fGroups objectAtIndex: row] isSmall: small];
 }
 
-- (NSColor *) colorForRowIndex: (int) row
+- (NSColor *) colorForIndex: (int) index
 {
-    return [[fGroups objectAtIndex: row] objectForKey: @"Color"];
+    int orderIndex = [self rowValueForIndex: index];
+    return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"Color"] : nil;
 }
 
-- (NSColor *) setColor: (NSColor *) color forRowIndex: (int) row
+- (NSColor *) setColor: (NSColor *) color forIndex: (int) index
 {
-    [[fGroups objectAtIndex: row] setObject: color forKey: @"Color"];
+    [[fGroups objectAtIndex: [self rowValueForIndex: index]] setObject: color forKey: @"Color"];
     
     [[GroupsController groups] saveGroups];
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
@@ -212,7 +218,6 @@ GroupsController * fGroupsInstance = nil;
     [[NSNotificationCenter defaultCenter] postNotificationName: @"GroupValueRemoved" object: self userInfo:
         [NSDictionary dictionaryWithObject: indexes forKey: @"Indexes"]];
     
-    #warning move to controller?
     if ([indexes containsIndex: [[NSUserDefaults standardUserDefaults] integerForKey: @"FilterGroup"]])
         [[NSUserDefaults standardUserDefaults] setInteger: -2 forKey: @"FilterGroup"];
     

@@ -31,7 +31,7 @@
     IBOutlet NSTableView * fTableView;
     IBOutlet NSSegmentedControl * fAddRemoveControl;
     
-    int fCurrentColorRow;
+    int fCurrentColorIndex;
 }
 
 + (GroupsWindowController *) groupsWindow;

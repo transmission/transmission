@@ -35,7 +35,9 @@
 
 - (int) numberOfGroups;
 
-- (int) orderValueForIndex: (int) index;
+- (int) rowValueForIndex: (int) index;
+- (int) indexForRow: (int) row;
+
 - (CTGradient *) gradientForIndex: (int) index;
 
 - (NSString *) nameForIndex: (int) index;
@@ -45,8 +47,8 @@
 - (NSImage *) imageForIndex: (int) index isSmall: (BOOL) small;
 - (NSImage *) imageForRowIndex: (int) row isSmall: (BOOL) small;
 
-- (NSColor *) colorForRowIndex: (int) row;
-- (NSColor *) setColor: (NSColor *) color forRowIndex: (int) row;
+- (NSColor *) colorForIndex: (int) index;
+- (NSColor *) setColor: (NSColor *) color forIndex: (int) index;
 
 - (void) addGroupWithName: (NSString *) name color: (NSColor *) color;
 - (void) removeGroupWithRowIndexes: (NSIndexSet *) rowIndexes;
