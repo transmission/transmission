@@ -239,15 +239,14 @@
 
 - (NSRect) actionButtonRectForBounds: (NSRect) bounds
 {
-    NSRect iconRect = [self iconRectForBounds: bounds];
-    if ([fDefaults boolForKey: @"SmallView"])
-        return iconRect;
-    
-    NSRect result = iconRect;
-    result.origin.x += (iconRect.size.width - ACTION_BUTTON_WIDTH) * 0.5;
-    result.origin.y += (iconRect.size.height - ACTION_BUTTON_WIDTH) * 0.5;
-    result.size.width = ACTION_BUTTON_WIDTH;
-    result.size.height = ACTION_BUTTON_WIDTH;
+    NSRect result = [self iconRectForBounds: bounds];
+    if (![fDefaults boolForKey: @"SmallView"])
+    {
+        result.origin.x += (result.size.width - ACTION_BUTTON_WIDTH) * 0.5;
+        result.origin.y += (result.size.height - ACTION_BUTTON_WIDTH) * 0.5;
+        result.size.width = ACTION_BUTTON_WIDTH;
+        result.size.height = ACTION_BUTTON_WIDTH;
+    }
     
     return result;
 }
@@ -435,17 +434,17 @@
 
 - (void) setControlHover: (BOOL) hover
 {
-    fHoverControl = [NSApp isOnLeopardOrBetter] ? hover : NO;
+    fHoverControl = hover;
 }
 
 - (void) setRevealHover: (BOOL) hover
 {
-    fHoverReveal = [NSApp isOnLeopardOrBetter] ? hover : NO;
+    fHoverReveal = hover;
 }
 
 - (void) setActionHover: (BOOL) hover
 {
-    fHoverAction = [NSApp isOnLeopardOrBetter] ? hover : NO;
+    fHoverAction = hover;
 }
 
 - (void) setActionPushed: (BOOL) pushed

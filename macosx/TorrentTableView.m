@@ -179,9 +179,12 @@
         [cell setRepresentedObject: item];
         
         int row = [self rowForItem: item];
-        [cell setControlHover: row == fMouseControlRow];
-        [cell setRevealHover: row == fMouseRevealRow];
-        [cell setActionHover: row == fMouseActionRow];
+        if ([NSApp isOnLeopardOrBetter])
+        {
+            [cell setControlHover: row == fMouseControlRow];
+            [cell setRevealHover: row == fMouseRevealRow];
+            [cell setActionHover: row == fMouseActionRow];
+        }
         [cell setActionPushed: row == fActionPushedRow];
     }
     else
