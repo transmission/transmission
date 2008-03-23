@@ -22,6 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+//TIGER-ONLY
+
 #import <Cocoa/Cocoa.h>
 
 @interface MenuLabel : NSTextField

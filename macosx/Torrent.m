@@ -1542,7 +1542,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     static_lastid++;
     fID = static_lastid;
     
-    fLib = lib;
     fDefaults = [NSUserDefaults standardUserDefaults];
 
     fPublicTorrent = path && (publicTorrent ? [publicTorrent boolValue] : ![fDefaults boolForKey: @"DeleteOriginalTorrent"]);
@@ -1561,7 +1560,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     }
     
     //set libtransmission settings for initialization
-    tr_ctor * ctor = tr_ctorNew(fLib);
+    tr_ctor * ctor = tr_ctorNew(lib);
     tr_ctorSetPaused(ctor, TR_FORCE, YES);
     tr_ctorSetMaxConnectedPeers(ctor, TR_FALLBACK, [fDefaults integerForKey: @"PeersTorrent"]);
     
@@ -1570,39 +1569,39 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (hashString)
     {
         tr_ctorSetMetainfoFromHash(ctor, [hashString UTF8String]);
-        if (tr_torrentParse(fLib, ctor, &info) == TR_OK)
+        if (tr_torrentParse(lib, ctor, &info) == TR_OK)
         {
             NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                                 ? fIncompleteFolder : fDownloadFolder;
             tr_ctorSetDestination(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
             
-            fHandle = tr_torrentNew(fLib, ctor, &error);
+            fHandle = tr_torrentNew(lib, ctor, &error);
         }
         tr_metainfoFree(&info);
     }
     if (!fHandle && path)
     {
         tr_ctorSetMetainfoFromFile(ctor, [path UTF8String]);
-        if (tr_torrentParse(fLib, ctor, &info) == TR_OK)
+        if (tr_torrentParse(lib, ctor, &info) == TR_OK)
         {
             NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                                 ? fIncompleteFolder : fDownloadFolder;
             tr_ctorSetDestination(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
             
-            fHandle = tr_torrentNew(fLib, ctor, &error);
+            fHandle = tr_torrentNew(lib, ctor, &error);
         }
         tr_metainfoFree(&info);
     }
     if (!fHandle && data)
     {
         tr_ctorSetMetainfo(ctor, [data bytes], [data length]);
-        if (tr_torrentParse(fLib, ctor, &info) == TR_OK)
+        if (tr_torrentParse(lib, ctor, &info) == TR_OK)
         {
             NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                                 ? fIncompleteFolder : fDownloadFolder;
             tr_ctorSetDestination(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
             
-            fHandle = tr_torrentNew(fLib, ctor, &error);
+            fHandle = tr_torrentNew(lib, ctor, &error);
         }
         tr_metainfoFree(&info);
     }
@@ -1634,7 +1633,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     fWaitToStart = waitToStart && [waitToStart boolValue];
     
-    fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
+    fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(lib) - 1;
     fGroupValue = groupValue ? [groupValue intValue] : -1;
     
     [self createFileList];

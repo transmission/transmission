@@ -36,7 +36,6 @@ typedef enum
 
 @interface Torrent : NSObject
 {
-    tr_handle * fLib;
     tr_torrent * fHandle;
     const tr_info * fInfo;
     const tr_stat * fStat;

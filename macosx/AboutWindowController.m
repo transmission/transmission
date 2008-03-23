@@ -63,7 +63,7 @@ AboutWindowController * fAboutBoxInstance = nil;
     [[self window] center];
 }
 
-- (void) windowWillClose: (id)sender
+- (void) windowWillClose: (id) sender
 {
 	[fAboutBoxInstance release];
     fAboutBoxInstance = nil;

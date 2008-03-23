@@ -67,8 +67,11 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     [fAddRemoveControl setEnabled: NO forSegment: REMOVE_TAG];
 }
 
-- (void) windowWillClose: (id)sender
+- (void) windowWillClose: (id) sender
 {
+    #warning remove when streamlined
+    [[NSColorPanel sharedColorPanel] close];
+    
 	[fGroupsWindowInstance release];
     fGroupsWindowInstance = nil;
 }
