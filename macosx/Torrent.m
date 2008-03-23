@@ -67,7 +67,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 @implementation Torrent
 
-
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (torrentFileState) torrentDelete
         lib: (tr_handle *) lib
 {

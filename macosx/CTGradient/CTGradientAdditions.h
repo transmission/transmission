@@ -24,11 +24,6 @@
 
 #import "CTGradient.h"
 
-@interface CTGradient (ActionBarView)
-+ (CTGradient *)actionNormalGradient;
-+ (CTGradient *)actionPressedGradient;
-@end
-
 @interface CTGradient (ProgressBar)
 + (CTGradient *)progressWhiteGradient;
 + (CTGradient *)progressGrayGradient;

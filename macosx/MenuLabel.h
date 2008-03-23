@@ -27,6 +27,5 @@
 #import <Cocoa/Cocoa.h>
 
 @interface MenuLabel : NSTextField
-{
-}
+
 @end

@@ -22,6 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#warning treat hovering the same as in the table?
+
 #import "FileOutlineView.h"
 #import "FileNameCell.h"
 #import "FilePriorityCell.h"
