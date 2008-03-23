@@ -407,7 +407,7 @@ fmtpeercount (GtkWidget * l, int count)
     gtk_label_set_text( GTK_LABEL(l), "?" );
   } else {
     char str[16];
-    g_snprintf( str, sizeof str, "%i", count );
+    g_snprintf( str, sizeof str, "%'d", count );
     gtk_label_set_text( GTK_LABEL(l), str );
   }
 }
@@ -755,20 +755,25 @@ Activity;
 static void
 refresh_activity (GtkWidget * top)
 {
-  Activity * a = (Activity*) g_object_get_data (G_OBJECT(top), "activity-data");
-  const tr_stat * stat = tr_torrent_stat( a->gtor );
+  Activity * a = g_object_get_data (G_OBJECT(top), "activity-data");
   char *pch;
   char sizeStr[64];
   char sizeStr2[64];
   char buf[128];
+  const tr_stat * stat = tr_torrent_stat( a->gtor );
+  const double complete = stat->percentComplete * 100.0;
+  const double done = stat->percentDone * 100.0;
 
   pch = tr_torrent_status_str( a->gtor );
   gtk_label_set_text (GTK_LABEL(a->state_lb), pch);
   g_free (pch);
 
-  /* %1$.1f is percent of how much of what we want's been downloaded,
-     %2$.1f is percent of how much of the whole torrent we've downloaded */
-  pch = g_strdup_printf( _( "%1$.1f%% (%2$.1f%% selected)" ), stat->percentComplete*100.0, stat->percentDone*100.0 );
+  if( (int)complete == (int)done )
+    pch = g_strdup_printf( _( "%.1f%%" ), complete );
+  else
+    /* %1$.1f is percent of how much of what we want's been downloaded,
+       %2$.1f is percent of how much of the whole torrent we've downloaded */
+    pch = g_strdup_printf( _( "%1$.1f%% (%2$.1f%% selected)" ), complete, done );
   gtk_label_set_text (GTK_LABEL(a->progress_lb), pch);
   g_free (pch);
 
