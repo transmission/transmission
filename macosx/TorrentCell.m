@@ -24,7 +24,7 @@
 
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
-#import "GroupsWindowController.h"
+#import "GroupsController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSBezierPathAdditions.h"
@@ -472,7 +472,7 @@
             groupRect.origin.y--;
         }
         
-        [[[GroupsWindowController groups] gradientForIndex: groupValue] fillBezierPath:
+        [[[GroupsController groups] gradientForIndex: groupValue] fillBezierPath:
             [NSBezierPath bezierPathWithRoundedRect: groupRect radius: 6.0] angle: 90.0];
     }
     

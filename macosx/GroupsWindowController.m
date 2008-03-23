@@ -23,12 +23,8 @@
  *****************************************************************************/
 
 #import "GroupsWindowController.h"
-#import "CTGradient.h"
-#import "NSBezierPathAdditions.h"
+#import "GroupsController.h"
 #import "NSApplicationAdditions.h"
-
-#define ICON_WIDTH 16.0
-#define ICON_WIDTH_SMALL 12.0
 
 #define GROUP_TABLE_VIEW_DATA_TYPE @"GroupTableViewDataType"
 
@@ -40,75 +36,18 @@ typedef enum
 
 @interface GroupsWindowController (Private)
 
-- (void) saveGroups;
-
-- (CTGradient *) gradientForColor: (NSColor *) color;
 - (void) changeColor: (id) sender;
-- (NSImage *) imageForGroup: (NSDictionary *) dict isSmall: (BOOL) small;
 
 @end
 
 @implementation GroupsWindowController
 
 GroupsWindowController * fGroupsWindowInstance = nil;
-+ (GroupsWindowController *) groups
++ (GroupsWindowController *) groupsWindow
 {
     if (!fGroupsWindowInstance)
-        fGroupsWindowInstance = [[GroupsWindowController alloc] init];
+        fGroupsWindowInstance = [[GroupsWindowController alloc] initWithWindowNibName: @"GroupsWindow"];
     return fGroupsWindowInstance;
-}
-
-- (id) init
-{
-    if ((self = [super initWithWindowNibName: @"GroupsWindow"]))
-    {
-        NSData * data;
-        if ((data = [[NSUserDefaults standardUserDefaults] dataForKey: @"Groups"]))
-            fGroups = [[NSUnarchiver unarchiveObjectWithData: data] retain];
-        else
-        {
-            //default groups
-            NSMutableDictionary * red = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor redColor], @"Color",
-                                            NSLocalizedString(@"Red", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 0], @"Index", nil];
-            
-            NSMutableDictionary * orange = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor orangeColor], @"Color",
-                                            NSLocalizedString(@"Orange", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 1], @"Index", nil];
-            
-            NSMutableDictionary * yellow = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor yellowColor], @"Color",
-                                            NSLocalizedString(@"Yellow", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 2], @"Index", nil];
-            
-            NSMutableDictionary * green = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor greenColor], @"Color",
-                                            NSLocalizedString(@"Green", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 3], @"Index", nil];
-            
-            NSMutableDictionary * blue = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor blueColor], @"Color",
-                                            NSLocalizedString(@"Blue", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 4], @"Index", nil];
-            
-            NSMutableDictionary * purple = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor purpleColor], @"Color",
-                                            NSLocalizedString(@"Purple", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 5], @"Index", nil];
-            
-            NSMutableDictionary * gray = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor grayColor], @"Color",
-                                            NSLocalizedString(@"Gray", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 6], @"Index", nil];
-            
-            fGroups = [[NSMutableArray alloc] initWithObjects: red, orange, yellow, green, blue, purple, gray, nil];
-            [self saveGroups]; //make sure this is saved right away
-        }
-    }
-    
-    return self;
 }
 
 - (void) awakeFromNib
@@ -128,54 +67,24 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     [fAddRemoveControl setEnabled: NO forSegment: REMOVE_TAG];
 }
 
-- (void) dealloc
+- (void) windowWillClose: (id)sender
 {
-    [fGroups release];
-    [super dealloc];
-}
-
-- (int) orderValueForIndex: (int) index
-{
-    if (index != -1)
-    {
-        int i;
-        for (i = 0; i < [fGroups count]; i++)
-            if (index == [[[fGroups objectAtIndex: i] objectForKey: @"Index"] intValue])
-                return i;
-    }
-    return -1;
-}
-
-- (CTGradient *) gradientForIndex: (int) index
-{
-    int orderIndex = [self orderValueForIndex: index];
-    return orderIndex != -1 ? [self gradientForColor: [[fGroups objectAtIndex: orderIndex] objectForKey: @"Color"]] : nil;
-}
-
-- (NSString *) nameForIndex: (int) index
-{
-    int orderIndex = [self orderValueForIndex: index];
-    return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"Name"] : nil;
-}
-
-- (NSImage *) imageForIndex: (int) index isSmall: (BOOL) small
-{
-    int orderIndex = [self orderValueForIndex: index];
-    return orderIndex != -1 ? [self imageForGroup: [fGroups objectAtIndex: orderIndex] isSmall: small] : nil;
+	[fGroupsWindowInstance release];
+    fGroupsWindowInstance = nil;
 }
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableview
 {
-    return [fGroups count];
+    return [[GroupsController groups] numberOfGroups];
 }
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Color"])
-        return [self imageForGroup: [fGroups objectAtIndex: row] isSmall: NO];
+        return [[GroupsController groups] imageForRowIndex: row isSmall: NO];
     else
-        return [[fGroups objectAtIndex: row] objectForKey: @"Name"];
+        return [[GroupsController groups] nameForRowIndex: row];
 }
 
 - (void) tableView: (NSTableView *) tableView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn
@@ -183,19 +92,14 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 {
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Name"])
-    {
-        [[fGroups objectAtIndex: row] setObject: object forKey: @"Name"];
-        [self saveGroups];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
-    }
+        [[GroupsController groups] setName: object forRowIndex: row];
     else if ([identifier isEqualToString: @"Button"])
     {
-        fCurrentColorDict = [fGroups objectAtIndex: row];
+        fCurrentColorRow = row;
         
         NSColorPanel * colorPanel = [NSColorPanel sharedColorPanel];
         [colorPanel setContinuous: YES];
-        [colorPanel setColor: [[fGroups objectAtIndex: row] objectForKey: @"Color"]];
+        [colorPanel setColor: [[GroupsController groups] colorForRowIndex: row]];
         
         [colorPanel setTarget: self];
         [colorPanel setAction: @selector(changeColor:)];
@@ -230,83 +134,32 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     return NSDragOperationNone;
 }
 
-- (BOOL) tableView: (NSTableView *) t acceptDrop: (id <NSDraggingInfo>) info
-    row: (int) newRow dropOperation: (NSTableViewDropOperation) operation
+- (BOOL) tableView: (NSTableView *) t acceptDrop: (id <NSDraggingInfo>) info row: (int) newRow
+    dropOperation: (NSTableViewDropOperation) operation
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: GROUP_TABLE_VIEW_DATA_TYPE])
     {
-        NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: GROUP_TABLE_VIEW_DATA_TYPE]];
+        NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: GROUP_TABLE_VIEW_DATA_TYPE]],
+            * selectedIndexes = [[GroupsController groups] moveGroupsAtIndexes: indexes toRow: newRow
+                                        oldSelected: [fTableView selectedRowIndexes]];
         
-        NSArray * selectedGroups = [fGroups objectsAtIndexes: [fTableView selectedRowIndexes]];
-        
-        //determine where to move them
-        int i, originalRow = newRow;
-        for (i = [indexes firstIndex]; i < originalRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
-            newRow--;
-        
-        //remove objects to reinsert
-        NSArray * movingGroups = [[fGroups objectsAtIndexes: indexes] retain];
-        [fGroups removeObjectsAtIndexes: indexes];
-        
-        //insert objects at new location
-        for (i = 0; i < [movingGroups count]; i++)
-            [fGroups insertObject: [movingGroups objectAtIndex: i] atIndex: newRow + i];
-        
-        [movingGroups release];
-        
-        [self saveGroups];
-        
-        if ([selectedGroups count] > 0)
-        {
-            NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSet];
-            NSEnumerator * enumerator = [selectedGroups objectEnumerator];
-            NSDictionary * dict;
-            while ((dict = [enumerator nextObject]))
-                [indexSet addIndex: [fGroups indexOfObject: dict]];
-            
-            [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
-        }
+        [fTableView selectRowIndexes: selectedIndexes byExtendingSelection: NO];
         
         [fTableView reloadData];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
     }
     
     return YES;
 }
 
+#warning make the color picker a nicer experience
 - (void) addRemoveGroup: (id) sender
 {
-    NSEnumerator * enumerator;
-    NSDictionary * dict;
-    int index;
-    BOOL found;
-    NSIndexSet * rowIndexes;
-    NSMutableIndexSet * indexes;
-    
     switch ([[sender cell] tagForSegment: [sender selectedSegment]])
     {
         case ADD_TAG:
+            [[GroupsController groups] addGroupWithName: @"" color: [NSColor cyanColor]];
             
-            //find the lowest index
-            for (index = 0; index < [fGroups count]; index++)
-            {
-                found = NO;
-                enumerator = [fGroups objectEnumerator];
-                while ((dict = [enumerator nextObject]))
-                    if ([[dict objectForKey: @"Index"] intValue] == index)
-                    {
-                        found = YES;
-                        break;
-                    }
-                
-                if (!found)
-                    break;
-            }
-            
-            [fGroups addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt: index], @"Index",
-                                    [NSColor cyanColor], @"Color", @"", @"Name", nil]];
             [fTableView reloadData];
             [fTableView deselectAll: self];
             
@@ -315,96 +168,29 @@ GroupsWindowController * fGroupsWindowInstance = nil;
             break;
         
         case REMOVE_TAG:
+            //safety: when removing a row, just close the color picker
+            [[NSColorPanel sharedColorPanel] close];
             
-            rowIndexes = [fTableView selectedRowIndexes];
-            indexes = [NSMutableIndexSet indexSet];
-            for (index = [rowIndexes firstIndex]; index != NSNotFound; index = [rowIndexes indexGreaterThanIndex: index])
-                [indexes addIndex: [[[fGroups objectAtIndex: index] objectForKey: @"Index"] intValue]];
+            [[GroupsController groups] removeGroupWithRowIndexes: [fTableView selectedRowIndexes]];
             
-            [fGroups removeObjectsAtIndexes: rowIndexes];
             [fTableView deselectAll: self];
             [fTableView reloadData];
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"GroupValueRemoved" object: self userInfo:
-                [NSDictionary dictionaryWithObject: indexes forKey: @"Indexes"]];
-            
-            if ([indexes containsIndex: [[NSUserDefaults standardUserDefaults] integerForKey: @"FilterGroup"]])
-                [[NSUserDefaults standardUserDefaults] setInteger: -2 forKey: @"FilterGroup"];
             
             break;
         
         default:
             return;
     }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
-    [self saveGroups];
-}
-
-- (NSMenu *) groupMenuWithTarget: (id) target action: (SEL) action isSmall: (BOOL) small
-{
-    NSMenu * menu = [[NSMenu alloc] initWithTitle: @"Groups"];
-    
-    NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"None", "Groups -> Menu") action: action
-                            keyEquivalent: @""];
-    [item setTarget: target];
-    [item setTag: -1];
-    [menu addItem: item];
-    [item release];
-    
-    NSEnumerator * enumerator = [fGroups objectEnumerator];
-    NSDictionary * dict;
-    while ((dict = [enumerator nextObject]))
-    {
-        item = [[NSMenuItem alloc] initWithTitle: [dict objectForKey: @"Name"] action: action keyEquivalent: @""];
-        [item setTarget: target];
-        
-        [item setImage: [self imageForGroup: dict isSmall: small]];
-        [item setTag: [[dict objectForKey: @"Index"] intValue]];
-        
-        [menu addItem: item];
-        [item release];
-    }
-    
-    return [menu autorelease];
 }
 
 @end
 
 @implementation GroupsWindowController (Private)
 
-- (void) saveGroups
-{
-    [[NSUserDefaults standardUserDefaults] setObject: [NSArchiver archivedDataWithRootObject: fGroups] forKey: @"Groups"];
-}
-
-- (CTGradient *) gradientForColor: (NSColor *) color
-{
-    return [CTGradient gradientWithBeginningColor: [color blendedColorWithFraction: 0.65 ofColor: [NSColor whiteColor]]
-            endingColor: [color blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]]];
-}
-
 - (void) changeColor: (id) sender
 {
-    [fCurrentColorDict setObject: [sender color] forKey: @"Color"];
+    [[GroupsController groups] setColor: [sender color] forRowIndex: fCurrentColorRow];
     [fTableView reloadData];
-    
-    [self saveGroups];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
-}
-
-- (NSImage *) imageForGroup: (NSDictionary *) dict isSmall: (BOOL) small
-{
-    float width = small ? ICON_WIDTH_SMALL : ICON_WIDTH;
-    NSRect rect = NSMakeRect(0.0, 0.0, width, width);
-    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: rect radius: 4.0];
-    NSImage * icon = [[NSImage alloc] initWithSize: rect.size];
-    
-    [icon lockFocus];
-    [[self gradientForColor: [dict objectForKey: @"Color"]] fillBezierPath: bp angle: 270.0];
-    [icon unlockFocus];
-    
-    return [icon autorelease];
 }
 
 @end

@@ -26,16 +26,33 @@
 
 @class CTGradient;
 
-@interface GroupsWindowController : NSWindowController
+@interface GroupsController : NSObject
 {
-    IBOutlet NSTableView * fTableView;
-    IBOutlet NSSegmentedControl * fAddRemoveControl;
-    
-    int fCurrentColorRow;
+    NSMutableArray * fGroups;
 }
 
-+ (GroupsWindowController *) groupsWindow;
++ (GroupsController *) groups;
 
-- (void) addRemoveGroup: (id) sender;
+- (int) numberOfGroups;
+
+- (int) orderValueForIndex: (int) index;
+- (CTGradient *) gradientForIndex: (int) index;
+
+- (NSString *) nameForIndex: (int) index;
+- (NSString *) nameForRowIndex: (int) row;
+- (void) setName: (NSString *) name forRowIndex: (int) index;
+
+- (NSImage *) imageForIndex: (int) index isSmall: (BOOL) small;
+- (NSImage *) imageForRowIndex: (int) row isSmall: (BOOL) small;
+
+- (NSColor *) colorForRowIndex: (int) row;
+- (NSColor *) setColor: (NSColor *) color forRowIndex: (int) row;
+
+- (void) addGroupWithName: (NSString *) name color: (NSColor *) color;
+- (void) removeGroupWithRowIndexes: (NSIndexSet *) rowIndexes;
+
+- (NSIndexSet *) moveGroupsAtIndexes: (NSIndexSet *) indexes toRow: (int) newRow oldSelected: (NSIndexSet *) selectedIndexes;
+
+- (NSMenu *) groupMenuWithTarget: (id) target action: (SEL) action isSmall: (BOOL) small;
 
 @end

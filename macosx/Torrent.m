@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "Torrent.h"
-#import "GroupsWindowController.h"
+#import "GroupsController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
@@ -1303,7 +1303,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (int) groupOrderValue
 {
-    return [[GroupsWindowController groups] orderValueForIndex: fGroupValue];
+    return [[GroupsController groups] orderValueForIndex: fGroupValue];
 }
 
 - (void) checkGroupValueForRemoval: (NSNotification *) notification

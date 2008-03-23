@@ -24,7 +24,7 @@
 
 #import "AddWindowController.h"
 #import "Controller.h"
-#import "GroupsWindowController.h"
+#import "GroupsController.h"
 #import "NSStringAdditions.h"
 #import "NSMenuAdditions.h"
 #import "NSApplicationAdditions.h"
@@ -291,7 +291,7 @@
     for (i = [menu numberOfItems]-1 - 2; i >= 0; i--)
         [menu removeItemAtIndex: i];
         
-    NSMenu * groupMenu = [[GroupsWindowController groups] groupMenuWithTarget: self action: @selector(changeGroupValue:) isSmall: NO];
+    NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(changeGroupValue:) isSmall: NO];
     [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange:
             NSMakeRange(0, [groupMenu numberOfItems])] atBottom: NO];
 }
