@@ -663,12 +663,12 @@ tr_tracker_info;
 struct tr_info
 {
     /* Path to torrent */
-    char                 torrent[MAX_PATH_LENGTH];
+    char               * torrent;
 
     /* General info */
     uint8_t              hash[SHA_DIGEST_LENGTH];
     char                 hashString[2*SHA_DIGEST_LENGTH+1];
-    char                 name[MAX_PATH_LENGTH];
+    char               * name;
 
     /* Flags */
     unsigned int isPrivate : 1;

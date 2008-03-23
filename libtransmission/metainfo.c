@@ -193,7 +193,9 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     }
 
     tr_sha1_to_hex( inf->hashString, inf->hash );
-    savedname( inf->torrent, sizeof( inf->torrent ), inf->hashString, tag );
+    savedname( buf, sizeof( buf ), inf->hashString, tag );
+    tr_free( inf->torrent );
+    inf->torrent = tr_strdup( buf );
 
     /* comment */
     memset( buf, '\0', sizeof( buf ) );
@@ -314,6 +316,8 @@ void tr_metainfoFree( tr_info * inf )
     tr_free( inf->files );
     tr_free( inf->comment );
     tr_free( inf->creator );
+    tr_free( inf->torrent );
+    tr_free( inf->name );
     tr_free( inf->primaryAddress );
     
     for( i=0; i<inf->trackerTiers; ++i ) {
@@ -642,9 +646,9 @@ parseFiles( tr_info * inf, tr_benc * name,
         return TR_EINVALID;
     }
 
-    strlcat_utf8( inf->name, name->val.s.s, sizeof( inf->name ),
-                  TR_PATH_DELIMITER );
-    if( '\0' == inf->name[0] )
+    tr_free( inf->name );
+    inf->name = tr_strdup( name->val.s.s );
+    if( !inf->name || !*inf->name )
     {
         tr_err( _( "Invalid metadata entry \"%s\"" ), "name" );
         return TR_EINVALID;
