@@ -1231,12 +1231,14 @@ setFileDND( tr_torrent      * tor,
     /* can't set the first piece to DND unless
        every file using that piece is DND */
     firstPieceDND = dnd;
-    for( i=fileIndex-1; firstPieceDND; --i ) {
-        if( tor->info.files[i].lastPiece != firstPiece )
-            break;
-        firstPieceDND = tor->info.files[i].dnd;
-        if( !i )
-            break;
+    if( fileIndex > 0 ) {
+        for( i=fileIndex-1; firstPieceDND; --i ) {
+            if( tor->info.files[i].lastPiece != firstPiece )
+                break;
+            firstPieceDND = tor->info.files[i].dnd;
+            if( !i )
+                break;
+        }
     }
 
     /* can't set the last piece to DND unless
