@@ -2157,7 +2157,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         int i;
         for (i = 0; ratioLimitActionValue[i] != -1; i++)
         {
-            item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%.2f", ratioLimitActionValue[i]]
+            item = [[NSMenuItem alloc] initWithTitle: [NSString localizedStringWithFormat: @"%.2f", ratioLimitActionValue[i]]
                     action: @selector(setQuickRatioGlobal:) keyEquivalent: @""];
             [item setTarget: self];
             [item setRepresentedObject: [NSNumber numberWithFloat: ratioLimitActionValue[i]]];
@@ -3415,7 +3415,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         BOOL check = menuItem == fCheckRatioItem;
         if (check)
-            [menuItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
+            [menuItem setTitle: [NSString localizedStringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
                                     "Action menu -> ratio stop"), [fDefaults floatForKey: @"RatioLimit"]]];
         
         [menuItem setState: [fDefaults boolForKey: @"RatioCheck"] ? check : !check];
@@ -3720,8 +3720,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     if (seeding > 0)
     {
-        NSString * title = [NSString stringWithFormat: NSLocalizedString(@"%d Seeding",
-                                                        "Dock item - Seeding"), seeding];
+        NSString * title = [NSString stringWithFormat: NSLocalizedString(@"%d Seeding", "Dock item - Seeding"), seeding];
         if (!seedingItem)
         {
             seedingItem = [[[NSMenuItem alloc] initWithTitle: title action: nil keyEquivalent: @""] autorelease];
@@ -3739,8 +3738,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     if (downloading > 0)
     {
-        NSString * title = [NSString stringWithFormat: NSLocalizedString(@"%d Downloading",
-                                                        "Dock item - Downloading"), downloading];
+        NSString * title = [NSString stringWithFormat: NSLocalizedString(@"%d Downloading", "Dock item - Downloading"), downloading];
         if (!downloadingItem)
         {
             downloadingItem = [[[NSMenuItem alloc] initWithTitle: title action: nil keyEquivalent: @""] autorelease];

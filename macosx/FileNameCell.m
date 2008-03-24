@@ -216,7 +216,7 @@
     Torrent * torrent = [(FileOutlineView *)[self controlView] torrent];
     float percent = [torrent fileProgress: [[[self objectValue] objectForKey: @"Indexes"] firstIndex]] * 100.0;
     
-    NSString * status = [NSString stringWithFormat: NSLocalizedString(@"%.2f%% of %@",
+    NSString * status = [NSString localizedStringWithFormat: NSLocalizedString(@"%.2f%% of %@",
                             "Inspector -> Files tab -> file status string"), percent,
                             [NSString stringForFileSize: [[[self objectValue] objectForKey: @"Size"] unsignedLongLongValue]]];
     

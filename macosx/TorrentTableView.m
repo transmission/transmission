@@ -622,7 +622,7 @@
             int i;
             for (i = 0; ratioLimitActionValue[i] != -1.0; i++)
             {
-                item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%.2f", ratioLimitActionValue[i]]
+                item = [[NSMenuItem alloc] initWithTitle: [NSString localizedStringWithFormat: @"%.2f", ratioLimitActionValue[i]]
                         action: @selector(setQuickRatio:) keyEquivalent: @""];
                 [item setTarget: self];
                 [item setRepresentedObject: [NSNumber numberWithFloat: ratioLimitActionValue[i]]];
@@ -635,8 +635,8 @@
         
         item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
         [item setState: mode == NSOnState ? NSOnState : NSOffState];
-        [item setTitle: [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)", "torrent action menu -> ratio stop"),
-                            [fMenuTorrent ratioLimit]]];
+        [item setTitle: [NSString localizedStringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
+            "torrent action menu -> ratio stop"), [fMenuTorrent ratioLimit]]];
         
         item = [menu itemWithTag: ACTION_MENU_UNLIMITED_TAG];
         [item setState: mode == NSOffState ? NSOnState : NSOffState];

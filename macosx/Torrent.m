@@ -972,12 +972,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     {
         if ([fDefaults boolForKey: @"DisplayStatusProgressSelected"])
         {
-            string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@ selected (%.2f%%)", "Torrent -> progress string"),
-                            [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self totalSizeSelected]],
-                            100.0 * [self progressDone]];
+            string = [NSString localizedStringWithFormat: NSLocalizedString(@"%@ of %@ selected (%.2f%%)",
+                            "Torrent -> progress string"), [NSString stringForFileSize: [self haveTotal]],
+                            [NSString stringForFileSize: [self totalSizeSelected]], 100.0 * [self progressDone]];
         }
         else
-            string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
+            string = [NSString localizedStringWithFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
                             [NSString stringForFileSize: [self haveTotal]],
                             [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
     }
@@ -1044,7 +1044,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 break;
 
             case TR_STATUS_CHECK:
-                string = [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
+                string = [NSString localizedStringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
                                         "Torrent -> status string"), 100.0 * [self checkingProgress]];
                 break;
 
@@ -1114,7 +1114,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             break;
 
         case TR_STATUS_CHECK:
-            string = [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
+            string = [NSString localizedStringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
                                     "Torrent -> status string"), 100.0 * [self checkingProgress]];
             break;
         
@@ -1157,7 +1157,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             return NSLocalizedString(@"Paused", "Torrent -> status string");
 
         case TR_STATUS_CHECK:
-            return [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
+            return [NSString localizedStringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
                                     "Torrent -> status string"), 100.0 * [self checkingProgress]];
         
         case TR_STATUS_CHECK_WAIT:

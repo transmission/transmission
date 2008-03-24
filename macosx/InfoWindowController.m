@@ -817,7 +817,7 @@ typedef enum
         NSDictionary * peer = [fPeers objectAtIndex: row];
         NSMutableArray * components = [NSMutableArray arrayWithCapacity: 5];
         
-        [components addObject: [NSString stringWithFormat: NSLocalizedString(@"Progress: %.1f%%",
+        [components addObject: [NSString localizedStringWithFormat: NSLocalizedString(@"Progress: %.1f%%",
             "Inspector -> Peers tab -> table row tooltip"), [[peer objectForKey: @"Progress"] floatValue] * 100.0]];
         
         if ([[peer objectForKey: @"Encryption"] boolValue])
@@ -1094,7 +1094,7 @@ typedef enum
         torrent = [fTorrents objectAtIndex: 0];
         
         [fStateField setStringValue: [torrent stateString]];
-        [fProgressField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%.2f%% (%.2f%% selected)",
+        [fProgressField setStringValue: [NSString localizedStringWithFormat: NSLocalizedString(@"%.2f%% (%.2f%% selected)",
                     "Inspector -> Activity tab -> progress"), 100.0 * [torrent progress], 100.0 * [torrent progressDone]]];
         [fRatioField setStringValue: [NSString stringForRatio: [torrent ratio]]];
         [fSwarmSpeedField setStringValue: [torrent isActive] ? [NSString stringForSpeed: [torrent swarmSpeed]] : @""];

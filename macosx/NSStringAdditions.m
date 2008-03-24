@@ -66,7 +66,7 @@
     }
     
     //attempt to have minimum of 3 digits with at least 1 decimal
-    return [NSString stringWithFormat: convertedSize < 10.0 ? @"%.2f %@" : @"%.1f %@", convertedSize, unit];
+    return [NSString localizedStringWithFormat: convertedSize < 10.0 ? @"%.2f %@" : @"%.1f %@", convertedSize, unit];
 }
 
 + (NSString *) stringForSpeed: (float) speed
@@ -77,13 +77,13 @@
 + (NSString *) stringForSpeedAbbrev: (float) speed
 {
     if (speed < 1000.0) //0.0 K to 999.9 K
-        return [NSString stringWithFormat: @"%.1f K", speed];
+        return [NSString localizedStringWithFormat: @"%.1f K", speed];
     else if (speed < 102400.0) //0.98 M to 99.99 M
-        return [NSString stringWithFormat: @"%.2f M", speed / 1024.0];
+        return [NSString localizedStringWithFormat: @"%.2f M", speed / 1024.0];
     else if (speed < 1024000.0) //100.0 M to 999.9 M
-        return [NSString stringWithFormat: @"%.1f M", speed / 1024.0];
+        return [NSString localizedStringWithFormat: @"%.1f M", speed / 1024.0];
     else //insane speeds
-        return [NSString stringWithFormat: @"%.2f G", speed / 1048576.0];
+        return [NSString localizedStringWithFormat: @"%.2f G", speed / 1048576.0];
 }
 
 + (NSString *) stringForRatio: (float) ratio
@@ -95,11 +95,11 @@
     else;
     
     if (ratio < 10.0)
-        return [NSString stringWithFormat: @"%.2f", ratio];
+        return [NSString localizedStringWithFormat: @"%.2f", ratio];
     else if (ratio < 100.0)
-        return [NSString stringWithFormat: @"%.1f", ratio];
+        return [NSString localizedStringWithFormat: @"%.1f", ratio];
     else
-        return [NSString stringWithFormat: @"%.0f", ratio];
+        return [NSString localizedStringWithFormat: @"%.0f", ratio];
 }
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds
