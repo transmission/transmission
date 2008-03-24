@@ -155,16 +155,16 @@ main( int argc, char ** argv )
 
     if( sourceFile && *sourceFile ) /* creating a torrent */
     {
-        int ret;
+        int err;
         tr_metainfo_builder * builder = tr_metaInfoBuilderCreate( h, sourceFile );
         tr_makeMetaInfo( builder, torrentPath, announce, comment, isPrivate );
         while( !builder->isDone ) {
             tr_wait( 1000 );
             printf( "." );
         }
-        ret = !builder->failed;
+        err = builder->result;
         tr_metaInfoBuilderFree( builder );
-        return ret;
+        return err;
     }
 
     ctor = tr_ctorNew( h );
