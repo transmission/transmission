@@ -380,7 +380,7 @@ tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
 
     val = tr_bencDictAdd( &top, "announce" );
     tr_bencInitStrDup( val, builder->announce );
-    if( tr_httpParseUrl( builder->announce, -1, NULL, NULL, NULL ) )
+    if( tr_httpParseURL( builder->announce, -1, NULL, NULL, NULL ) )
     {
         builder->result = TR_MAKEMETA_URL;
     }

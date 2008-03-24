@@ -477,7 +477,7 @@ static int getannounce( tr_info * inf, tr_benc * meta )
         while( isspace( *pch ) )
             ++pch;
 
-        if( tr_httpParseUrl( pch, -1, &address, &port, &announce ) )
+        if( tr_httpParseURL( pch, -1, &address, &port, &announce ) )
         {
             tr_err( _( "Invalid announce URL \"%s\"" ), val->val.s.s );
             return TR_EINVALID;
@@ -550,7 +550,7 @@ tr_trackerInfoInit( tr_tracker_info  * info,
                     const char       * address,
                     int                address_len )
 {
-    int ret = tr_httpParseUrl( address, address_len,
+    int ret = tr_httpParseURL( address, address_len,
                                &info->address,
                                &info->port,
                                &info->announce );

@@ -981,7 +981,7 @@ tr_sha1_to_hex( char * out, const uint8_t * sha1 )
 ***/
 
 int
-tr_httpParseUrl( const char * url_in, int len,
+tr_httpParseURL( const char * url_in, int len,
                  char ** setme_host,
                  int * setme_port,
                  char ** setme_path )

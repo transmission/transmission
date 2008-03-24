@@ -163,7 +163,7 @@ int tr_compareUint32( uint32_t a, uint32_t b );
 void tr_sha1_to_hex( char * out, const uint8_t * sha1 );
 
 
-int tr_httpParseUrl( const char * url,
+int tr_httpParseURL( const char * url,
                      int          url_len,
                      char     ** setme_host,
                      int       * setme_port,
