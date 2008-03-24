@@ -41,11 +41,9 @@
 - (CTGradient *) gradientForIndex: (int) index;
 
 - (NSString *) nameForIndex: (int) index;
-- (NSString *) nameForRowIndex: (int) row;
-- (void) setName: (NSString *) name forRowIndex: (int) index;
+- (void) setName: (NSString *) name forIndex: (int) index;
 
 - (NSImage *) imageForIndex: (int) index isSmall: (BOOL) small;
-- (NSImage *) imageForRowIndex: (int) row isSmall: (BOOL) small;
 
 - (NSColor *) colorForIndex: (int) index;
 - (NSColor *) setColor: (NSColor *) color forIndex: (int) index;
@@ -53,7 +51,7 @@
 - (void) addGroupWithName: (NSString *) name color: (NSColor *) color;
 - (void) removeGroupWithRowIndexes: (NSIndexSet *) rowIndexes;
 
-- (NSIndexSet *) moveGroupsAtIndexes: (NSIndexSet *) indexes toRow: (int) newRow oldSelected: (NSIndexSet *) selectedIndexes;
+- (NSIndexSet *) moveGroupsAtRowIndexes: (NSIndexSet *) indexes toRow: (int) newRow oldSelected: (NSIndexSet *) selectedIndexes;
 
 - (NSMenu *) groupMenuWithTarget: (id) target action: (SEL) action isSmall: (BOOL) small;
 

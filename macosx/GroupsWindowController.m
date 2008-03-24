@@ -82,11 +82,14 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
+    GroupsController * groupsController = [GroupsController groups];
+    int groupsIndex = [groupsController indexForRow: row];
+    
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Color"])
-        return [[GroupsController groups] imageForRowIndex: row isSmall: NO];
+        return [groupsController imageForIndex: groupsIndex isSmall: NO];
     else
-        return [[GroupsController groups] nameForRowIndex: row];
+        return [groupsController nameForIndex: groupsIndex];
 }
 
 - (void) tableView: (NSTableView *) tableView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn
@@ -94,7 +97,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 {
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Name"])
-        [[GroupsController groups] setName: object forRowIndex: row];
+        [[GroupsController groups] setName: object forIndex: [[GroupsController groups] indexForRow: row]];
     else if ([identifier isEqualToString: @"Button"])
     {
         fCurrentColorIndex = [[GroupsController groups] indexForRow: row];
@@ -143,7 +146,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     if ([[pasteboard types] containsObject: GROUP_TABLE_VIEW_DATA_TYPE])
     {
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: GROUP_TABLE_VIEW_DATA_TYPE]],
-            * selectedIndexes = [[GroupsController groups] moveGroupsAtIndexes: indexes toRow: newRow
+            * selectedIndexes = [[GroupsController groups] moveGroupsAtRowIndexes: indexes toRow: newRow
                                         oldSelected: [fTableView selectedRowIndexes]];
         
         [fTableView selectRowIndexes: selectedIndexes byExtendingSelection: NO];

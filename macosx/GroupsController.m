@@ -138,17 +138,13 @@ GroupsController * fGroupsInstance = nil;
 - (NSString *) nameForIndex: (int) index
 {
     int orderIndex = [self rowValueForIndex: index];
-    return orderIndex != -1 ? [self nameForRowIndex: orderIndex] : nil;
+    return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"Name"] : nil;
 }
 
-- (NSString *) nameForRowIndex: (int) index
+- (void) setName: (NSString *) name forIndex: (int) index
 {
-    return [[fGroups objectAtIndex: index] objectForKey: @"Name"];
-}
-
-- (void) setName: (NSString *) name forRowIndex: (int) row
-{
-    [[fGroups objectAtIndex: row] setObject: name forKey: @"Name"];
+    int orderIndex = [self rowValueForIndex: index];
+    [[fGroups objectAtIndex: orderIndex] setObject: name forKey: @"Name"];
     [self saveGroups];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
@@ -157,12 +153,7 @@ GroupsController * fGroupsInstance = nil;
 - (NSImage *) imageForIndex: (int) index isSmall: (BOOL) small
 {
     int orderIndex = [self rowValueForIndex: index];
-    return orderIndex != -1 ? [self imageForRowIndex: orderIndex isSmall: small] : nil;
-}
-
-- (NSImage *) imageForRowIndex: (int) row isSmall: (BOOL) small
-{
-    return [self imageForGroup: [fGroups objectAtIndex: row] isSmall: small];
+    return orderIndex != -1 ? [self imageForGroup: [fGroups objectAtIndex: orderIndex] isSmall: small] : nil;
 }
 
 - (NSColor *) colorForIndex: (int) index
@@ -225,7 +216,7 @@ GroupsController * fGroupsInstance = nil;
     [self saveGroups];
 }
 
-- (NSIndexSet *) moveGroupsAtIndexes: (NSIndexSet *) indexes toRow: (int) newRow oldSelected: (NSIndexSet *) selectedIndexes
+- (NSIndexSet *) moveGroupsAtRowIndexes: (NSIndexSet *) indexes toRow: (int) newRow oldSelected: (NSIndexSet *) selectedIndexes
 {
     NSArray * selectedGroups = [fGroups objectsAtIndexes: selectedIndexes];
     
