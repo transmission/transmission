@@ -32,8 +32,6 @@
 #include <sys/stat.h>
 #include <unistd.h> /* unlink, stat */
 
-#include <miniupnp/miniwget.h> /* parseURL */
-
 #include "transmission.h"
 #include "bencode.h"
 #include "crypto.h" /* tr_sha1 */
@@ -41,30 +39,6 @@
 #include "platform.h"
 #include "trcompat.h" /* strlcpy */
 #include "utils.h"
-
-
-static int
-tr_httpParseUrl( const char * url_in, int len,
-                 char ** setme_host, int * setme_port, char ** setme_path )
-{
-    char * url = tr_strndup( url_in, len );
-    char * path;
-    char host[4096+1];
-    unsigned short port;
-    int success;
-
-    success = parseURL( url, host, &port, &path );
-
-    if( success ) {
-        *setme_host = tr_strdup( host );
-        *setme_port = port;
-        *setme_path = tr_strdup( path );
-    }
-
-    tr_free( url );
-
-    return !success;
-}
 
 /***********************************************************************
  * Local prototypes

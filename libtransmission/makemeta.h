@@ -58,6 +58,7 @@ typedef struct tr_metainfo_builder
     int abortFlag;
     int isDone;
     int failed; /* only meaningful if isDone is set */
+    char error[1024]; /* only meaningful if failed is set */
 
     /**
     ***  This is an implementation detail.

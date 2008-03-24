@@ -205,7 +205,8 @@ getHashInfo ( tr_metainfo_builder * b )
     totalRemain = b->totalSize;
     fp = fopen( b->files[fileIndex].filename, "rb" );
     if( !fp ) {
-        tr_err( _( "Couldn't open \"%s\": %s" ), b->files[fileIndex].filename, tr_strerror( errno ) );
+        snprintf( b->error, sizeof( b->error ), _( "Couldn't open \"%s\": %s" ), b->files[fileIndex].filename, tr_strerror( errno ) );
+        tr_err( "%s", b->error );
         tr_free( ret );
         b->failed = 1;
         return NULL;
@@ -234,7 +235,10 @@ getHashInfo ( tr_metainfo_builder * b )
                 if( ++fileIndex < b->fileCount ) {
                     fp = fopen( b->files[fileIndex].filename, "rb" );
                     if( !fp ) {
-                        tr_err( _( "Couldn't open \"%s\": %s" ), b->files[fileIndex].filename, tr_strerror( errno ) );
+                        snprintf( b->error, sizeof( b->error ),
+                                  _( "Couldn't open \"%s\": %s" ),
+                                  b->files[fileIndex].filename, tr_strerror( errno ) ); 
+                        tr_err( "%s", b->error );
                         tr_free( ret );
                         b->failed = 1;
                         return NULL;
@@ -249,6 +253,7 @@ getHashInfo ( tr_metainfo_builder * b )
         walk += SHA_DIGEST_LENGTH;
 
         if( b->abortFlag ) {
+            snprintf( b->error, sizeof( b->error ), _( "Torrent creation cancelled" ) );
             b->failed = 1;
             break;
         }
@@ -366,7 +371,8 @@ makeInfoDict ( tr_benc              * dict,
     tr_bencInitInt( val, builder->isPrivate ? 1 : 0 );
 }
 
-static void tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
+static void
+tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
 {
     int n = 5;
     tr_benc top, *val;
@@ -377,25 +383,34 @@ static void tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
 
     val = tr_bencDictAdd( &top, "announce" );
     tr_bencInitStrDup( val, builder->announce );
-    
-    if( builder->comment && *builder->comment ) {
-        val = tr_bencDictAdd( &top, "comment" );
-        tr_bencInitStrDup( val, builder->comment );
+    if( tr_httpParseUrl( builder->announce, -1, NULL, NULL, NULL ) )
+    {
+        snprintf( builder->error, sizeof( builder->error ), _( "Invalid announce URL" ) );
+        tr_err( "%s", builder->error );
+        builder->failed = 1;
     }
+    
+    if( !builder->failed && !builder->abortFlag )
+    {
+        if( builder->comment && *builder->comment ) {
+            val = tr_bencDictAdd( &top, "comment" );
+            tr_bencInitStrDup( val, builder->comment );
+        }
 
-    val = tr_bencDictAdd( &top, "created by" );
-    tr_bencInitStrDup( val, TR_NAME "/" LONG_VERSION_STRING );
+        val = tr_bencDictAdd( &top, "created by" );
+        tr_bencInitStrDup( val, TR_NAME "/" LONG_VERSION_STRING );
 
-    val = tr_bencDictAdd( &top, "creation date" );
-    tr_bencInitInt( val, time(0) );
+        val = tr_bencDictAdd( &top, "creation date" );
+        tr_bencInitInt( val, time(0) );
 
-    val = tr_bencDictAdd( &top, "encoding" );
-    tr_bencInitStrDup( val, "UTF-8" );
+        val = tr_bencDictAdd( &top, "encoding" );
+        tr_bencInitStrDup( val, "UTF-8" );
 
-    val = tr_bencDictAdd( &top, "info" );
-    tr_bencInit( val, TYPE_DICT );
-    tr_bencDictReserve( val, 666 );
-    makeInfoDict( val, builder );
+        val = tr_bencDictAdd( &top, "info" );
+        tr_bencInit( val, TYPE_DICT );
+        tr_bencDictReserve( val, 666 );
+        makeInfoDict( val, builder );
+    }
 
     /* save the file */
     if ( !builder->failed && !builder->abortFlag ) {
@@ -403,12 +418,17 @@ static void tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
         char * pch = tr_bencSave( &top, &n );
         FILE * fp = fopen( builder->outputFile, "wb+" );
         nmemb = n;
-        if( fp == NULL )
+        if( fp == NULL ) {
+            snprintf( builder->error, sizeof( builder->error ), _( "Couldn't open \"%s\": %s" ), builder->outputFile, tr_strerror( errno ) );
+            tr_err( "%s", builder->error );
             builder->failed = 1;
-        else if( fwrite( pch, 1, nmemb, fp ) != nmemb )
+        } else if( fwrite( pch, 1, nmemb, fp ) != nmemb ) {
+            snprintf( builder->error, sizeof( builder->error ), _( "Couldn't save file \"%s\": %s" ), builder->outputFile, tr_strerror( errno ) );
+            tr_err( "%s", builder->error ); 
             builder->failed = 1;
+            fclose( fp );
+        }
         tr_free( pch );
-        fclose( fp );
     }
 
     /* cleanup */

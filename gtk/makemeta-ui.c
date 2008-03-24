@@ -92,12 +92,12 @@ refresh_cb ( gpointer user_data )
     {
         if( ui->builder->failed )
         {
-            const char * reason = ui->builder->abortFlag
-                ? _("Torrent creation cancelled")
-                : _("Torrent creation failed");
-
+            char * reason = ui->builder->abortFlag
+                ? g_strdup( _( "Torrent creation cancelled" ) )
+                : g_strdup_printf( _( "Torrent creation failed: %s" ), ui->builder->error );
             gtk_progress_bar_set_text( p, reason );
             gtk_progress_bar_set_fraction( p, 0 );
+            g_free( reason );
         }
         else
         {
