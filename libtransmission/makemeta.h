@@ -20,6 +20,18 @@ typedef struct tr_metainfo_builder_file
 }
 tr_metainfo_builder_file;
 
+typedef enum
+{
+    TR_MAKEMETA_OK,
+    TR_MAKEMETA_URL,
+    TR_MAKEMETA_CANCELLED,
+    TR_MAKEMETA_IO_READ,   /* see builder.errfile, builder.errno */
+    TR_MAKEMETA_IO_WRITE   /* see builder.errfile, builder.errno */
+}
+tr_metainfo_builder_err;
+
+    
+
 typedef struct tr_metainfo_builder
 {
     /**
@@ -57,8 +69,13 @@ typedef struct tr_metainfo_builder
     uint32_t pieceIndex;
     int abortFlag;
     int isDone;
-    int failed; /* only meaningful if isDone is set */
-    char error[1024]; /* only meaningful if failed is set */
+    tr_metainfo_builder_err result;
+
+    /* file in use when result was set to _IO_READ or _IO_WRITE */
+    char errfile[2048];
+
+    /* errno encountered when result was set to _IO_READ or _IO_WRITE */
+    int my_errno;
 
     /**
     ***  This is an implementation detail.

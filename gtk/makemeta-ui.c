@@ -65,7 +65,7 @@ setIsBuilding( MakeMetaUI * ui, gboolean isBuilding )
     ui->isBuilding = isBuilding;
 
     if( ui->builder != NULL )
-        ui->builder->failed = FALSE;
+        ui->builder->result = TR_MAKEMETA_OK;
 
     if( !isBuilding )
         gtk_progress_bar_set_fraction( GTK_PROGRESS_BAR( ui->progressbar ), 0 );
@@ -90,21 +90,41 @@ refresh_cb ( gpointer user_data )
 
     if( ui->builder->isDone )
     {
-        if( ui->builder->failed )
+        char * txt = NULL;
+
+        switch( ui->builder->result )
         {
-            char * reason = ui->builder->abortFlag
-                ? g_strdup( _( "Torrent creation cancelled" ) )
-                : g_strdup_printf( _( "Torrent creation failed: %s" ), ui->builder->error );
-            gtk_progress_bar_set_text( p, reason );
-            gtk_progress_bar_set_fraction( p, 0 );
-            g_free( reason );
-        }
-        else
-        {
-            gtk_progress_bar_set_text( p, _("Torrent created") );
+            case TR_MAKEMETA_OK:
+                txt = g_strdup( _( "Torrent created" ) );
+                break;
+
+            case TR_MAKEMETA_URL:
+                txt = g_strdup_printf( _( "Torrent creation failed: %s" ), _( "Invalid URL" ) );
+                break;
+
+            case TR_MAKEMETA_CANCELLED:
+                txt = g_strdup_printf( _( "Torrent creation cancelled" ) );
+                break;
+
+            case TR_MAKEMETA_IO_READ: {
+                char * tmp = g_strdup_printf( _( "Couldn't read \"%s\": %s" ), ui->builder->errfile, g_strerror( ui->builder->my_errno ) );
+                txt = g_strdup_printf( _( "Torrent creation failed: %s" ), tmp );
+                g_free( tmp  );
+                break;
+            }
+
+            case TR_MAKEMETA_IO_WRITE: {
+                char * tmp = g_strdup_printf( _( "Couldn't write \"%s\": %s" ), ui->builder->errfile, g_strerror( ui->builder->my_errno ) );
+                txt = g_strdup_printf( _( "Torrent creation failed: %s" ), tmp );
+                g_free( tmp  );
+                break;
+            }
         }
 
+        gtk_progress_bar_set_fraction( p, ui->builder->result==TR_MAKEMETA_OK ? 1.0 : 0.0 );
+        gtk_progress_bar_set_text( p, txt );
         setIsBuilding( ui, FALSE );
+        g_free( txt );
     }
 
     return !ui->builder->isDone;

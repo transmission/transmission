@@ -205,10 +205,10 @@ getHashInfo ( tr_metainfo_builder * b )
     totalRemain = b->totalSize;
     fp = fopen( b->files[fileIndex].filename, "rb" );
     if( !fp ) {
-        snprintf( b->error, sizeof( b->error ), _( "Couldn't open \"%s\": %s" ), b->files[fileIndex].filename, tr_strerror( errno ) );
-        tr_err( "%s", b->error );
+        b->my_errno = errno;
+        snprintf( b->errfile, sizeof( b->errfile ), b->files[fileIndex].filename );
+        b->result = TR_MAKEMETA_IO_READ;
         tr_free( ret );
-        b->failed = 1;
         return NULL;
     }
     while ( totalRemain )
@@ -235,12 +235,10 @@ getHashInfo ( tr_metainfo_builder * b )
                 if( ++fileIndex < b->fileCount ) {
                     fp = fopen( b->files[fileIndex].filename, "rb" );
                     if( !fp ) {
-                        snprintf( b->error, sizeof( b->error ),
-                                  _( "Couldn't open \"%s\": %s" ),
-                                  b->files[fileIndex].filename, tr_strerror( errno ) ); 
-                        tr_err( "%s", b->error );
+                        b->my_errno = errno;
+                        snprintf( b->errfile, sizeof( b->errfile ), b->files[fileIndex].filename );
+                        b->result = TR_MAKEMETA_IO_READ;
                         tr_free( ret );
-                        b->failed = 1;
                         return NULL;
                     }
                 }
@@ -253,8 +251,7 @@ getHashInfo ( tr_metainfo_builder * b )
         walk += SHA_DIGEST_LENGTH;
 
         if( b->abortFlag ) {
-            snprintf( b->error, sizeof( b->error ), _( "Torrent creation cancelled" ) );
-            b->failed = 1;
+            b->result = TR_MAKEMETA_CANCELLED;
             break;
         }
 
@@ -385,12 +382,10 @@ tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
     tr_bencInitStrDup( val, builder->announce );
     if( tr_httpParseUrl( builder->announce, -1, NULL, NULL, NULL ) )
     {
-        snprintf( builder->error, sizeof( builder->error ), _( "Invalid announce URL" ) );
-        tr_err( "%s", builder->error );
-        builder->failed = 1;
+        builder->result = TR_MAKEMETA_URL;
     }
     
-    if( !builder->failed && !builder->abortFlag )
+    if( !builder->result && !builder->abortFlag )
     {
         if( builder->comment && *builder->comment ) {
             val = tr_bencDictAdd( &top, "comment" );
@@ -413,27 +408,24 @@ tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
     }
 
     /* save the file */
-    if ( !builder->failed && !builder->abortFlag ) {
-        size_t nmemb;
+    if ( !builder->result && !builder->abortFlag ) {
         char * pch = tr_bencSave( &top, &n );
         FILE * fp = fopen( builder->outputFile, "wb+" );
-        nmemb = n;
-        if( fp == NULL ) {
-            snprintf( builder->error, sizeof( builder->error ), _( "Couldn't open \"%s\": %s" ), builder->outputFile, tr_strerror( errno ) );
-            tr_err( "%s", builder->error );
-            builder->failed = 1;
-        } else if( fwrite( pch, 1, nmemb, fp ) != nmemb ) {
-            snprintf( builder->error, sizeof( builder->error ), _( "Couldn't save file \"%s\": %s" ), builder->outputFile, tr_strerror( errno ) );
-            tr_err( "%s", builder->error ); 
-            builder->failed = 1;
-            fclose( fp );
+        size_t nmemb = n;
+        if( !fp || ( fwrite( pch, 1, nmemb, fp ) != nmemb ) ) {
+            builder->my_errno = errno;
+            strlcpy( builder->errfile, builder->outputFile, sizeof( builder->errfile ) );
+            builder->result = TR_MAKEMETA_IO_WRITE;
         }
+        if( fp )
+            fclose( fp );
         tr_free( pch );
     }
 
     /* cleanup */
     tr_bencFree( & top );
-    builder->failed |= builder->abortFlag;
+    if( builder->abortFlag )
+        builder->result = TR_MAKEMETA_CANCELLED;
     builder->isDone = 1;
 }
 
