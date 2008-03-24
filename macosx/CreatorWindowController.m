@@ -24,6 +24,7 @@
 
 #import "CreatorWindowController.h"
 #import "NSStringAdditions.h"
+#include "utils.h" //tr_httpParseURL
 
 @interface CreatorWindowController (Private)
 
@@ -188,37 +189,28 @@
 
 - (void) create: (id) sender
 {
-    //parse tracker string
     NSString * trackerString = [fTrackerField stringValue];
-    if ([trackerString rangeOfString: @"://"].location != NSNotFound)
-    {
-        if (![trackerString hasPrefix: @"http://"])
-        {
-            NSAlert * alert = [[[NSAlert alloc] init] autorelease];
-            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> http warning -> button")];
-            [alert setMessageText: NSLocalizedString(@"The tracker address must begin with \"http://\".",
-                                                    "Create torrent -> http warning -> title")];
-            [alert setInformativeText: NSLocalizedString(@"Change the tracker address to create the torrent.",
-                                                        "Create torrent -> http warning -> warning")];
-            [alert setAlertStyle: NSWarningAlertStyle];
-            
-            [alert beginSheetModalForWindow: [self window] modalDelegate: self didEndSelector: nil contextInfo: nil];
-            return;
-        }
-    }
-    else
+    if ([trackerString rangeOfString: @"://"].location == NSNotFound)
         trackerString = [@"http://" stringByAppendingString: trackerString];
     
-    //don't allow blank addresses
-    if ([trackerString length] <= 7)
+    //parse tracker string
+    if (tr_httpParseURL([trackerString UTF8String], -1, NULL, NULL, NULL))
     {
         NSAlert * alert = [[[NSAlert alloc] init] autorelease];
-        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> no url warning -> button")];
-        [alert setMessageText: NSLocalizedString(@"The tracker address cannot be blank.",
-                                                "Create torrent -> no url warning -> title")];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> warning -> button")];
+        [alert setMessageText: NSLocalizedString(@"The tracker address cannot be blank.", "Create torrent -> warning -> title")];
         [alert setInformativeText: NSLocalizedString(@"Change the tracker address to create the torrent.",
-                                                    "Create torrent -> no url warning -> warning")];
+                                                    "Create torrent -> warning -> info")];
         [alert setAlertStyle: NSWarningAlertStyle];
+        
+        //check common reasons for failure
+        if (![trackerString hasPrefix: @"http://"])
+            [alert setMessageText: NSLocalizedString(@"The tracker address must begin with \"http://\".",
+                                                    "Create torrent -> warning -> message")];
+        else if ([trackerString length] <= 7) //don't allow blank addresses
+            [alert setMessageText: NSLocalizedString(@"The tracker address cannot be blank.", "Create torrent -> warning -> message")];
+        else
+            [alert setMessageText: NSLocalizedString(@"The tracker address is invalid.", "Create torrent -> warning -> message")];
         
         [alert beginSheetModalForWindow: [self window] modalDelegate: self didEndSelector: nil contextInfo: nil];
         return;
@@ -317,34 +309,42 @@
         [fTimer invalidate];
         fTimer = nil;
         
-        if (fInfo->failed)
+        NSAlert * alert;
+        switch (fInfo->result)
         {
-            if (!fInfo->abortFlag)
-            {
-                NSAlert * alert = [[[NSAlert alloc] init] autorelease];
+            case TR_MAKEMETA_OK:
+                if (fOpenTorrent)
+                {
+                    NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: fLocation, @"File",
+                                            [fPath stringByDeletingLastPathComponent], @"Path", nil];
+                    [[NSNotificationCenter defaultCenter] postNotificationName: @"OpenCreatedTorrentFile" object: self userInfo: dict];
+                }
+                
+                [[self window] close];
+                break;
+            
+            case TR_MAKEMETA_CANCELLED:
+                [[self window] close];
+                break;
+            
+            default:
+                alert = [[[NSAlert alloc] init] autorelease];
                 [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> failed -> button")];
                 [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Creation of \"%@\" failed.",
                                                 "Create torrent -> failed -> title"), [fLocation lastPathComponent]]];
-                [alert setInformativeText: NSLocalizedString(@"There was an error parsing the data file. "
-                                            "The torrent file was not created.", "Create torrent -> failed -> warning")];
                 [alert setAlertStyle: NSWarningAlertStyle];
+                
+                if (fInfo->result == TR_MAKEMETA_IO_READ)
+                    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"Could not read \"%s\": %s",
+                        "Create torrent -> failed -> warning"), fInfo->errfile, fInfo->my_errno]];
+                else if (fInfo->result == TR_MAKEMETA_IO_WRITE)
+                    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"Could not write \"%s\": %s",
+                        "Create torrent -> failed -> warning"), fInfo->errfile, fInfo->my_errno]];
+                else; //invalid url should have been caught before creating
                 
                 [alert beginSheetModalForWindow: [self window] modalDelegate: self
                         didEndSelector: @selector(failureSheetClosed:returnCode:contextInfo:) contextInfo: nil];
-                return;
-            }
         }
-        else
-        {
-            if (fOpenTorrent)
-            {
-                NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: fLocation, @"File",
-                                        [fPath stringByDeletingLastPathComponent], @"Path", nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName: @"OpenCreatedTorrentFile" object: self userInfo: dict];
-            }
-        }
-        
-        [[self window] close];
     }
     else
     {
@@ -352,6 +352,8 @@
         
         if (!fStarted)
         {
+            fStarted = YES;
+            
             NSWindow * window = [self window];
             
             NSRect windowRect = [window frame];
@@ -369,8 +371,6 @@
             [fProgressView setHidden: NO];
             
             [[window standardWindowButton:NSWindowCloseButton] setEnabled: NO];
-            
-            fStarted = YES;
         }
     }
 }
