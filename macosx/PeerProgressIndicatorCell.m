@@ -40,47 +40,33 @@
     [super dealloc];
 }
 
-- (BOOL) hidden
-{
-    return fIsHidden;
-}
-
-- (void) setHidden: (BOOL) isHidden
-{
-    fIsHidden = isHidden;
-}
-
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
-    if (!fIsHidden)
+    if ([[NSUserDefaults standardUserDefaults] boolForKey: @"DisplayPeerProgressBarNumber"])
     {
-        if ([[NSUserDefaults standardUserDefaults] boolForKey: @"DisplayPeerProgressBarNumber"])
+        if (!fAttributes)
+            fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys: [NSFont systemFontOfSize: 11.0], NSFontAttributeName, nil];
+        [[NSString localizedStringWithFormat: @"%.1f%%", [self floatValue] * 100.0] drawInRect: cellFrame withAttributes: fAttributes];
+    }
+    else
+    {
+        //attributes not needed anymore
+        if (fAttributes)
         {
-            if (!fAttributes)
-                fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys: [NSFont systemFontOfSize: 11.0], NSFontAttributeName, nil];
-            [[NSString localizedStringWithFormat: @"%.1f%%", [self floatValue] * 100.0] drawInRect: cellFrame
-                withAttributes: fAttributes];
+            [fAttributes release];
+            fAttributes = nil;
         }
-        else
+        
+        [super drawWithFrame: cellFrame inView: controlView];
+        if ([self floatValue] >= 1.0)
         {
-            //attributes not needed anymore
-            if (fAttributes)
-            {
-                [fAttributes release];
-                fAttributes = nil;
-            }
+            NSImage * checkImage = [NSImage imageNamed: @"CompleteCheck.png"];
+            [checkImage setFlipped: YES];
             
-            [super drawWithFrame: cellFrame inView: controlView];
-            if ([self floatValue] >= 1.0)
-            {
-                NSImage * checkImage = [NSImage imageNamed: @"CompleteCheck.png"];
-                [checkImage setFlipped: YES];
-                
-                NSSize imageSize = [checkImage size];
-                NSRect rect = NSMakeRect(cellFrame.origin.x + (cellFrame.size.width - imageSize.width) * 0.5,
-                            cellFrame.origin.y + (cellFrame.size.height - imageSize.height) * 0.5, imageSize.width, imageSize.height);
-                [checkImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
-            }
+            NSSize imageSize = [checkImage size];
+            NSRect rect = NSMakeRect(cellFrame.origin.x + (cellFrame.size.width - imageSize.width) * 0.5,
+                        cellFrame.origin.y + (cellFrame.size.height - imageSize.height) * 0.5, imageSize.width, imageSize.height);
+            [checkImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
         }
     }
 }

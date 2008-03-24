@@ -1,5 +1,9 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.20 (2008/xx/yy)
+- Mac
+   + Display of decimal numbers matches system international settings
+
 1.10 (2008/xx/yy)
 - All Platforms
    + Stop torrents when downloading and the disk becomes full

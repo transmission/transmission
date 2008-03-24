@@ -40,29 +40,29 @@
 + (NSString *) stringForFileSize: (uint64_t) size
 {
     if (size < 1024)
-        return [NSString stringWithFormat: NSLocalizedString(@"%lld bytes", "File size"), size];
+        return [NSString stringWithFormat: @"%lld %@", size, NSLocalizedString(@"bytes", "File size - bytes")];
 
     float convertedSize;
     NSString * unit;
     if (size < 1048576)
     {
         convertedSize = size / 1024.0;
-        unit = NSLocalizedString(@"KB", "File size");
+        unit = NSLocalizedString(@"KB", "File size - kilobytes");
     }
     else if (size < 1073741824)
     {
         convertedSize = size / 1048576.0;
-        unit = NSLocalizedString(@"MB", "File size");
+        unit = NSLocalizedString(@"MB", "File size - megabytes");
     }
     else if (size < 1099511627776.0)
     {
         convertedSize = size / 1073741824.0;
-        unit = NSLocalizedString(@"GB", "File size");
+        unit = NSLocalizedString(@"GB", "File size - gigabytes");
     }
     else
     {
         convertedSize = size / 1099511627776.0;
-        unit = NSLocalizedString(@"TB", "File size");
+        unit = NSLocalizedString(@"TB", "File size - terabytes");
     }
     
     //attempt to have minimum of 3 digits with at least 1 decimal

@@ -25,6 +25,5 @@
 #import <Cocoa/Cocoa.h>
 
 @interface PeerTableView : NSTableView
-{
-}
+
 @end
