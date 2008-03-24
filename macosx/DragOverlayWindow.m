@@ -172,7 +172,8 @@
         [fFadeInAnimation stopAnimation];
         [fFadeOutAnimation setCurrentProgress: 1.0 - [fFadeInAnimation currentProgress]];
     }
-    [fFadeOutAnimation startAnimation];
+    if ([self alphaValue] > 0.0)
+        [fFadeOutAnimation startAnimation];
 }
 
 @end
