@@ -611,6 +611,7 @@
 		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
 		A2FB057D0BFEB6800095564D /* DragOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayView.m; path = macosx/DragOverlayView.m; sourceTree = "<group>"; };
 		A2FB06950BFF484A0095564D /* Globe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Globe.png; path = macosx/Images/Globe.png; sourceTree = "<group>"; };
+		A2FB71D20D97FC6D0001F331 /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2FE61D70CD3D0A500D683E1 /* InfoTabBackGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBackGraphite.png; path = macosx/Images/InfoTabBackGraphite.png; sourceTree = "<group>"; };
 		BE1183480CE160960002D0F3 /* libminiupnp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libminiupnp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE11834D0CE160C50002D0F3 /* bsdqueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bsdqueue.h; path = "third-party/miniupnp/bsdqueue.h"; sourceTree = "<group>"; };
@@ -1984,6 +1985,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A26AF27D0D2DBDDF00FF7140 /* English */,
+				A2FB71D20D97FC6D0001F331 /* it */,
 			);
 			name = AddWindow.xib;
 			sourceTree = "<group>";
