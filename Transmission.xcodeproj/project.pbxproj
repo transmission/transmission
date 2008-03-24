@@ -614,6 +614,7 @@
 		A2FB06950BFF484A0095564D /* Globe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Globe.png; path = macosx/Images/Globe.png; sourceTree = "<group>"; };
 		A2FB701A0D95CAEA0001F331 /* GroupsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GroupsController.h; path = macosx/GroupsController.h; sourceTree = "<group>"; };
 		A2FB701B0D95CAEA0001F331 /* GroupsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GroupsController.m; path = macosx/GroupsController.m; sourceTree = "<group>"; };
+		A2FB719E0D97FC0C0001F331 /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2FE61D70CD3D0A500D683E1 /* InfoTabBackGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBackGraphite.png; path = macosx/Images/InfoTabBackGraphite.png; sourceTree = "<group>"; };
 		BE1183480CE160960002D0F3 /* libminiupnp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libminiupnp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE11834D0CE160C50002D0F3 /* bsdqueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bsdqueue.h; path = "third-party/miniupnp/bsdqueue.h"; sourceTree = "<group>"; };
@@ -1990,6 +1991,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A26AF27D0D2DBDDF00FF7140 /* English */,
+				A2FB719E0D97FC0C0001F331 /* it */,
 			);
 			name = AddWindow.xib;
 			sourceTree = "<group>";
