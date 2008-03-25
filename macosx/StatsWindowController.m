@@ -136,29 +136,29 @@ tr_handle * fLib;
     [fUploadedField setStringValue: [NSString stringForFileSize: statsSession.uploadedBytes]];
     [fUploadedField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes", "stats -> bytes"),
                                     statsSession.uploadedBytes]];
-    [fUploadedAllField setStringValue: [[NSString stringForFileSize: statsAll.uploadedBytes]
-                                        stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
+    [fUploadedAllField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ total", "stats total"),
+                                        [NSString stringForFileSize: statsAll.uploadedBytes]]];
     [fUploadedAllField setToolTip: [NSString stringWithFormat:NSLocalizedString(@"%u bytes", "stats -> bytes"),
                                     statsAll.uploadedBytes]];
     
     [fDownloadedField setStringValue: [NSString stringForFileSize: statsSession.downloadedBytes]];
     [fDownloadedField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes", "stats -> bytes"),
                                     statsSession.downloadedBytes]];
-    [fDownloadedAllField setStringValue: [[NSString stringForFileSize: statsAll.downloadedBytes]
-                                            stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
+    [fDownloadedAllField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ total", "stats total"),
+                                        [NSString stringForFileSize: statsAll.downloadedBytes]]];
     [fDownloadedAllField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes", "stats -> bytes"),
                                         statsAll.downloadedBytes]];
     
     [fRatioField setStringValue: [NSString stringForRatio: statsSession.ratio]];
     
     NSString * totalRatioString = statsAll.ratio != TR_RATIO_NA
-        ? [[NSString stringForRatio: statsAll.ratio] stringByAppendingString: NSLocalizedString(@" total", "stats total")]
+        ? [NSString stringWithFormat: NSLocalizedString(@"%@ total", "stats total"), [NSString stringForRatio: statsAll.ratio]]
         : NSLocalizedString(@"Total N/A", "stats total");
     [fRatioAllField setStringValue: totalRatioString];
     
     [fTimeField setStringValue: [NSString timeString: statsSession.secondsActive showSeconds: NO]];
-    [fTimeAllField setStringValue: [[NSString timeString: statsAll.secondsActive showSeconds: NO]
-                                    stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
+    [fTimeAllField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ total", "stats total"),
+                                        [NSString timeString: statsAll.secondsActive showSeconds: NO]]];
     
     if (statsAll.sessionCount == 1)
         [fNumOpenedField setStringValue: NSLocalizedString(@"1 time", "stats window -> times opened")];
