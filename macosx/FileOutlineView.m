@@ -22,8 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#warning treat hovering the same as in the table?
-
 #import "FileOutlineView.h"
 #import "FileNameCell.h"
 #import "FilePriorityCell.h"
@@ -65,8 +63,6 @@
     [fHighPriorityGradient release];
     [fLowPriorityGradient release];
     [fMixedPriorityGradient release];
-    
-    [fMouseCell release];
     
     [super dealloc];
 }
@@ -132,24 +128,18 @@
     }
 }
 
+- (int) hoveredRow
+{
+    return fMouseRow;
+}
+
 - (void) mouseEntered: (NSEvent *) event
 {
     NSNumber * row;
     if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
     {
-        int rowVal = [row intValue];
-        FilePriorityCell * cell = (FilePriorityCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Priority"] row: rowVal];
-        if (fMouseCell != cell)
-        {
-            [fMouseCell release];
-            
-            fMouseRow = rowVal;
-            fMouseCell = [cell copy];
-            
-            [fMouseCell setControlView: self];
-            [fMouseCell mouseEntered: event];
-            [fMouseCell setRepresentedObject: [cell representedObject]];
-        }
+        fMouseRow = [row intValue];
+        [self setNeedsDisplayInRect: [self rectOfRow: fMouseRow]];
     }
 }
 
@@ -158,31 +148,9 @@
     NSNumber * row;
     if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
     {
-        FilePriorityCell * cell = (FilePriorityCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Priority"]
-                                                        row: [row intValue]];
-        [cell setControlView: self];
-        [cell mouseExited: event];
-        
-        [fMouseCell release];
-        fMouseCell = nil;
+        [self setNeedsDisplayInRect: [self rectOfRow: [row intValue]]];
         fMouseRow = -1;
     }
-}
-
-- (NSCell *) preparedCellAtColumn: (NSInteger) column row: (NSInteger) row
-{
-    if (![self selectedCell] && row == fMouseRow && column == [self columnWithIdentifier: @"Priority"])
-        return fMouseCell;
-    else
-        return [super preparedCellAtColumn: column row: row];
-}
-
-- (void) updateCell: (NSCell *) cell
-{
-    if (cell == fMouseCell)
-        [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Priority"] row: fMouseRow]];
-    else
-        [super updateCell: cell];
 }
 
 - (void) drawRow: (int) row clipRect: (NSRect) clipRect

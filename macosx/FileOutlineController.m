@@ -25,6 +25,7 @@
 #import "FileOutlineController.h"
 #import "Torrent.h"
 #import "FileOutlineView.h"
+#import "FilePriorityCell.h"
 #import "NSApplicationAdditions.h"
 
 #define ROW_SMALL_HEIGHT 18.0
@@ -117,7 +118,10 @@ typedef enum
     if ([identifier isEqualToString: @"Check"])
         [cell setEnabled: [fTorrent canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]]];
     else if ([identifier isEqualToString: @"Priority"])
+    {
         [cell setRepresentedObject: item];
+        [(FilePriorityCell *)cell setHovered: [NSApp isOnLeopardOrBetter] ? [fOutline hoveredRow] == [fOutline rowForItem: item] : NO];
+    }
     else;
 }
 

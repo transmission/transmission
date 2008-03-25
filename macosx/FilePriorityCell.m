@@ -93,16 +93,9 @@
     [area release];
 }
 
-- (void) mouseEntered: (NSEvent *) event
+- (void) setHovered: (BOOL) hovered
 {
-    fHoverRow = YES;
-    [(NSControl *)[self controlView] updateCell: self];
-}
-
-- (void) mouseExited: (NSEvent *) event
-{
-    fHoverRow = NO;
-    [(NSControl *)[self controlView] updateCell: self];
+    fHoverRow = hovered;
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView

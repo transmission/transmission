@@ -25,7 +25,6 @@
 #import <Cocoa/Cocoa.h>
 
 @class Torrent;
-@class FilePriorityCell;
 @class CTGradient;
 
 @interface FileOutlineView : NSOutlineView
@@ -35,10 +34,11 @@
     CTGradient * fHighPriorityGradient, * fLowPriorityGradient, * fMixedPriorityGradient;
     
     int fMouseRow;
-    FilePriorityCell * fMouseCell;
 }
 
 - (void) setTorrent: (Torrent *) torrent;
 - (Torrent *) torrent;
+
+- (int) hoveredRow;
 
 @end
