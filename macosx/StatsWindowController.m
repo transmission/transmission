@@ -30,7 +30,6 @@
 @interface StatsWindowController (Private)
 
 - (void) updateStats;
-- (void) trimRect: (float) shiftLeft forView: (NSView *) view;
 
 @end
 
@@ -101,18 +100,10 @@ tr_handle * fLib;
     frame.size.width = maxWidth;
     [fNumOpenedLabelField setFrame: frame];
     
-    //size fields to correspond with labels
-    float change = maxWidth - oldWidth;
-    
-    [self trimRect: change forView: fUploadedField];
-    [self trimRect: change forView: fUploadedAllField];
-    [self trimRect: change forView: fDownloadedField];
-    [self trimRect: change forView: fDownloadedAllField];
-    [self trimRect: change forView: fRatioField];
-    [self trimRect: change forView: fRatioAllField];
-    [self trimRect: change forView: fTimeField];
-    [self trimRect: change forView: fTimeAllField];
-    [self trimRect: change forView: fNumOpenedField];
+    //resize window for new label width - fields are set in nib to adjust correctly
+    NSRect windowRect = [[self window] frame];
+    windowRect.size.width += maxWidth - oldWidth;
+    [[self window] setFrame: windowRect display: YES];
 }
 
 - (void) windowWillClose: (id)sender
@@ -165,14 +156,6 @@ tr_handle * fLib;
     else
         [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d times", "stats window -> times opened"),
                                         statsAll.sessionCount]];
-}
-
-- (void) trimRect: (float) shiftLeft forView: (NSView *) view
-{
-    NSRect frame = [view frame];
-    frame.size.width -= shiftLeft;
-    frame.origin.x += shiftLeft;
-    [view setFrame: frame];
 }
 
 @end
