@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-24 19:16+0100\n"
-"PO-Revision-Date: 2008-03-24 19:18+0100\n"
+"POT-Creation-Date: 2008-03-24 22:05+0100\n"
+"PO-Revision-Date: 2008-03-24 22:05+0100\n"
 "Last-Translator: Milo Casagrande <milo_casagrande@yahoo.it>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
@@ -163,15 +163,14 @@ msgstr "De_ttagli"
 msgid "Ask Tracker for _More Peers"
 msgstr "Chiedi più peer al server tracc_ia"
 
-#: ../gtk/conf.c:60 ../libtransmission/utils.c:482
-#: ../libtransmission/utils.c:493
+#: ../gtk/conf.c:60 ../libtransmission/utils.c:484
+#: ../libtransmission/utils.c:495
 #, c-format
 msgid "Couldn't create \"%s\": %s"
 msgstr "Impossibile creare «%s»: %s"
 
 #: ../gtk/conf.c:81 ../libtransmission/fastresume.c:191
-#: ../libtransmission/fdlimit.c:166 ../libtransmission/makemeta.c:208
-#: ../libtransmission/makemeta.c:237 ../libtransmission/metainfo.c:618
+#: ../libtransmission/fdlimit.c:166 ../libtransmission/metainfo.c:592
 #, c-format
 msgid "Couldn't open \"%s\": %s"
 msgstr "Impossibile aprire «%s»: %s"
@@ -228,7 +227,7 @@ msgstr "<b>Fonti parziali:</b>"
 msgid "<b>Completed:</b>"
 msgstr "<b>Completato:</b>"
 
-#: ../gtk/details.c:671 ../gtk/makemeta-ui.c:292
+#: ../gtk/details.c:671 ../gtk/makemeta-ui.c:312
 msgid "Details"
 msgstr "Dettagli"
 
@@ -630,31 +629,47 @@ msgstr ""
 "Milo Casagrande <milo_casagrande@yahoo.it>\n"
 "Calorì Alessandro"
 
-#: ../gtk/makemeta-ui.c:96
-msgid "Torrent creation cancelled"
-msgstr "Creazione del torrent annullata"
-
-#: ../gtk/makemeta-ui.c:97
-msgid "Torrent creation failed"
-msgstr "Creazione del torrent fallita"
-
-#: ../gtk/makemeta-ui.c:104
+#: ../gtk/makemeta-ui.c:98
 msgid "Torrent created"
 msgstr "Torrent creato"
 
-#: ../gtk/makemeta-ui.c:189 ../gtk/makemeta-ui.c:311
+#: ../gtk/makemeta-ui.c:102 ../gtk/makemeta-ui.c:111 ../gtk/makemeta-ui.c:118
+#, c-format
+msgid "Torrent creation failed: %s"
+msgstr "Creazione del torrent fallita: %s"
+
+#: ../gtk/makemeta-ui.c:102
+msgid "Invalid URL"
+msgstr "URL non valido"
+
+#: ../gtk/makemeta-ui.c:106
+#, c-format
+msgid "Torrent creation cancelled"
+msgstr "Creazione del torrent annullata"
+
+#: ../gtk/makemeta-ui.c:110
+#, c-format
+msgid "Couldn't read \"%s\": %s"
+msgstr "Impossibile leggere «%s»: %s"
+
+#: ../gtk/makemeta-ui.c:117
+#, c-format
+msgid "Couldn't write \"%s\": %s"
+msgstr "Impossibile scrivere «%s»: %s"
+
+#: ../gtk/makemeta-ui.c:209 ../gtk/makemeta-ui.c:331
 #, c-format
 msgid "No files selected"
 msgstr "Nessun file selezionato"
 
-#: ../gtk/makemeta-ui.c:203 ../gtk/makemeta-ui.c:281
+#: ../gtk/makemeta-ui.c:223 ../gtk/makemeta-ui.c:301
 #, c-format
 msgid "<i>No files selected</i>"
 msgstr "<i>Nessun file selezionato</i>"
 
 #. %1$s is the torrent size
 #. %2$'d is its number of files
-#: ../gtk/makemeta-ui.c:209
+#: ../gtk/makemeta-ui.c:229
 #, c-format
 msgid "<i>%1$s; %2$'d File</i>"
 msgid_plural "<i>%1$s; %2$'d Files</i>"
@@ -663,7 +678,7 @@ msgstr[1] "<i>%1$s; %2$'d file</i>"
 
 #. %1$'s is number of pieces;
 #. %2$s is how big each piece is
-#: ../gtk/makemeta-ui.c:222
+#: ../gtk/makemeta-ui.c:242
 #, c-format
 msgid "<i>%1$'d Piece @ %2$s</i>"
 msgid_plural "<i>%1$'d Pieces @ %2$s</i>"
@@ -671,35 +686,35 @@ msgstr[0] "<i>%1$'d pezzo di %2$s</i>"
 msgstr[1] "<i>%1$'d pezzi di %2$s</i>"
 
 # (ndt) titolo finestra
-#: ../gtk/makemeta-ui.c:249
+#: ../gtk/makemeta-ui.c:269
 msgid "New Torrent"
 msgstr "Nuovo torrent"
 
-#: ../gtk/makemeta-ui.c:263
+#: ../gtk/makemeta-ui.c:283
 msgid "Content"
 msgstr "Contenuto"
 
-#: ../gtk/makemeta-ui.c:265
+#: ../gtk/makemeta-ui.c:285
 msgid "_Single File:"
 msgstr "File _singolo:"
 
-#: ../gtk/makemeta-ui.c:272
+#: ../gtk/makemeta-ui.c:292
 msgid "_Folder:"
 msgstr "Carte_lla:"
 
-#: ../gtk/makemeta-ui.c:294
+#: ../gtk/makemeta-ui.c:314
 msgid "_Private to this tracker"
 msgstr "_Privato su questo server traccia"
 
-#: ../gtk/makemeta-ui.c:298
+#: ../gtk/makemeta-ui.c:318
 msgid "Announce _URL:"
 msgstr "_URL di annuncio:"
 
-#: ../gtk/makemeta-ui.c:301
+#: ../gtk/makemeta-ui.c:321
 msgid "Commen_t:"
 msgstr "Commen_to:"
 
-#: ../gtk/msgwin.c:84 ../libtransmission/metainfo.c:624
+#: ../gtk/msgwin.c:84 ../libtransmission/metainfo.c:598
 #, c-format
 msgid "Couldn't save file \"%s\": %s"
 msgstr "Impossibile salvare il file «%s»: %s"
@@ -1242,32 +1257,32 @@ msgstr "Impossibile leggere il file di ripristino di «%s»"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "L'autore del torrent ha saltato il file «%s»: %s"
 
-#: ../libtransmission/metainfo.c:191 ../libtransmission/metainfo.c:240
-#: ../libtransmission/metainfo.c:252 ../libtransmission/metainfo.c:494
-#: ../libtransmission/metainfo.c:645 ../libtransmission/metainfo.c:677
-#: ../libtransmission/metainfo.c:686
+#: ../libtransmission/metainfo.c:165 ../libtransmission/metainfo.c:214
+#: ../libtransmission/metainfo.c:226 ../libtransmission/metainfo.c:468
+#: ../libtransmission/metainfo.c:619 ../libtransmission/metainfo.c:651
+#: ../libtransmission/metainfo.c:660
 #, c-format
 msgid "Missing metadata entry \"%s\""
 msgstr "Voce meta-dati «%s» mancante"
 
-#: ../libtransmission/metainfo.c:238 ../libtransmission/metainfo.c:250
-#: ../libtransmission/metainfo.c:257 ../libtransmission/metainfo.c:474
-#: ../libtransmission/metainfo.c:643 ../libtransmission/metainfo.c:653
-#: ../libtransmission/metainfo.c:675 ../libtransmission/metainfo.c:684
+#: ../libtransmission/metainfo.c:212 ../libtransmission/metainfo.c:224
+#: ../libtransmission/metainfo.c:231 ../libtransmission/metainfo.c:448
+#: ../libtransmission/metainfo.c:617 ../libtransmission/metainfo.c:627
+#: ../libtransmission/metainfo.c:649 ../libtransmission/metainfo.c:658
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "Voce meta-dati «%s» non valida"
 
-#: ../libtransmission/metainfo.c:281 ../libtransmission/metainfo.c:290
+#: ../libtransmission/metainfo.c:255 ../libtransmission/metainfo.c:264
 msgid "Torrent is corrupt"
 msgstr "Il torrent è danneggiato"
 
-#: ../libtransmission/metainfo.c:508
+#: ../libtransmission/metainfo.c:482
 #, c-format
 msgid "Invalid announce URL \"%s\""
 msgstr "URL di annuncio «%s» non valido"
 
-#: ../libtransmission/metainfo.c:715
+#: ../libtransmission/metainfo.c:689
 msgid "Invalid or missing metadata entries \"length\" and \"files\""
 msgstr "Voci meta-dati \"length\" e \"files\" non valide o mancanti"
 
@@ -1487,68 +1502,68 @@ msgstr "Inoltro della porta riuscito."
 msgid "Port forwarding failed with error %d (errno %d - %s)"
 msgstr "Inoltro della porta fallito con errore %d (errore %d - %s)"
 
-#: ../libtransmission/utils.c:400 ../libtransmission/utils.c:406
-#: ../libtransmission/utils.c:414 ../libtransmission/utils.c:420
-#: ../libtransmission/utils.c:427
+#: ../libtransmission/utils.c:402 ../libtransmission/utils.c:408
+#: ../libtransmission/utils.c:416 ../libtransmission/utils.c:422
+#: ../libtransmission/utils.c:429
 #, c-format
 msgid "Couldn't read file \"%s\": %s"
 msgstr "Impossibile leggere il file «%s»: %s"
 
-#: ../libtransmission/utils.c:406
+#: ../libtransmission/utils.c:408
 msgid "Not a regular file"
 msgstr "Non è un file regolare"
 
-#: ../libtransmission/utils.c:420
+#: ../libtransmission/utils.c:422
 msgid "Memory allocation failed"
 msgstr "Allocazione memoria fallita"
 
-#: ../libtransmission/utils.c:492
+#: ../libtransmission/utils.c:494
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "Il file «%s» è in arrivo"
 
-#: ../libtransmission/utils.c:559
+#: ../libtransmission/utils.c:561
 msgid "No error"
 msgstr "Nessun errore"
 
-#: ../libtransmission/utils.c:562
+#: ../libtransmission/utils.c:564
 msgid "Unspecified error"
 msgstr "Errore non specificato"
 
-#: ../libtransmission/utils.c:564
+#: ../libtransmission/utils.c:566
 msgid "Assert error"
 msgstr "Errore di asserzione"
 
-#: ../libtransmission/utils.c:567
+#: ../libtransmission/utils.c:569
 msgid "Destination folder doesn't exist"
 msgstr "La cartella di destinazione non esiste"
 
-#: ../libtransmission/utils.c:577
+#: ../libtransmission/utils.c:579
 msgid "A torrent with this name and destination folder already exists."
 msgstr ""
 "Un torrent con questo nome e questa cartella di destinazione esiste già."
 
-#: ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:581
 msgid "Checksum failed"
 msgstr "Checksum fallito"
 
-#: ../libtransmission/utils.c:581
+#: ../libtransmission/utils.c:583
 msgid "Unspecified I/O error"
 msgstr "Errore I/O non specificato"
 
-#: ../libtransmission/utils.c:584
+#: ../libtransmission/utils.c:586
 msgid "Tracker error"
 msgstr "Errore server traccia"
 
-#: ../libtransmission/utils.c:586
+#: ../libtransmission/utils.c:588
 msgid "Tracker warning"
 msgstr "Avviso server traccia"
 
-#: ../libtransmission/utils.c:589
+#: ../libtransmission/utils.c:591
 msgid "Peer sent a bad message"
 msgstr "Il peer ha inviato un messaggio errato"
 
-#: ../libtransmission/utils.c:592
+#: ../libtransmission/utils.c:594
 msgid "Unknown error"
 msgstr "Errore sconosciuto"
 
