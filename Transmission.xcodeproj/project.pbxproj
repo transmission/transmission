@@ -563,6 +563,7 @@
 		A2A6321A0CD9751700E3DA60 /* BadgeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BadgeView.m; path = macosx/BadgeView.m; sourceTree = "<group>"; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
+		A2AC82020D987E6D00A2878C /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileOutlineView.h; path = macosx/FileOutlineView.h; sourceTree = "<group>"; };
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileOutlineView.m; path = macosx/FileOutlineView.m; sourceTree = "<group>"; };
 		A2BB67780D5BA74600AB0618 /* OpenWeb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = OpenWeb.png; path = macosx/Images/OpenWeb.png; sourceTree = "<group>"; };
@@ -1986,6 +1987,7 @@
 			children = (
 				A26AF27D0D2DBDDF00FF7140 /* English */,
 				A2FB71D20D97FC6D0001F331 /* it */,
+				A2AC82020D987E6D00A2878C /* nl */,
 			);
 			name = AddWindow.xib;
 			sourceTree = "<group>";
