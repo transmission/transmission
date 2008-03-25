@@ -120,7 +120,9 @@ typedef enum
     else if ([identifier isEqualToString: @"Priority"])
     {
         [cell setRepresentedObject: item];
-        [(FilePriorityCell *)cell setHovered: [NSApp isOnLeopardOrBetter] ? [fOutline hoveredRow] == [fOutline rowForItem: item] : NO];
+        
+        int hoveredRow = [fOutline hoveredRow];
+        [(FilePriorityCell *)cell setHovered: hoveredRow != -1 && hoveredRow == [fOutline rowForItem: item]];
     }
     else;
 }

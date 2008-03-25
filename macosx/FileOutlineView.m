@@ -139,7 +139,7 @@
     if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
     {
         fMouseRow = [row intValue];
-        [self setNeedsDisplayInRect: [self rectOfRow: fMouseRow]];
+        [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Priority"] row: fMouseRow]];
     }
 }
 
@@ -148,7 +148,7 @@
     NSNumber * row;
     if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
     {
-        [self setNeedsDisplayInRect: [self rectOfRow: [row intValue]]];
+        [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Priority"] row: [row intValue]]];
         fMouseRow = -1;
     }
 }
