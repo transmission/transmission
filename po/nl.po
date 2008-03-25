@@ -1325,7 +1325,7 @@ msgstr "Torrent is corrupt"
 #: ../libtransmission/metainfo.c:503
 #, c-format
 msgid "Invalid announce URL \"%s\""
-msgstr "Ongeldige announce URL \"%s\"
+msgstr "Ongeldige announce URL \"%s\""
 
 #: ../libtransmission/metainfo.c:710
 msgid "Invalid or missing metadata entries \"length\" and \"files\""
