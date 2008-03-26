@@ -170,7 +170,7 @@ GroupsController * fGroupsInstance = nil;
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
 }
 
-- (void) addGroupWithName: (NSString *) name color: (NSColor *) color
+- (void) addNewGroup
 {
     //find the lowest index
     int index;

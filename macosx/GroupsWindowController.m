@@ -164,7 +164,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     switch ([[sender cell] tagForSegment: [sender selectedSegment]])
     {
         case ADD_TAG:
-            [[GroupsController groups] addGroupWithName: @"" color: [NSColor cyanColor]];
+            [[GroupsController groups] addNewGroup];
             
             [fTableView reloadData];
             [fTableView deselectAll: self];
