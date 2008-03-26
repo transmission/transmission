@@ -113,6 +113,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 
 - (void) awakeFromNib
 {
+    [[self window] setTitle: NSLocalizedString(@"Groups", "Groups -> window title")];
     [[[fTableView tableColumnWithIdentifier: @"Button"] dataCell] setTitle: NSLocalizedString(@"Color", "Groups -> Color Button")];
     
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: GROUP_TABLE_VIEW_DATA_TYPE]];
