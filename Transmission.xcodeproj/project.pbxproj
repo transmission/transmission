@@ -577,6 +577,7 @@
 		A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SpeedLimitToTurtleIconTransformer.m; path = macosx/SpeedLimitToTurtleIconTransformer.m; sourceTree = "<group>"; };
 		A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ButtonToolbarItem.m; path = macosx/ButtonToolbarItem.m; sourceTree = "<group>"; };
 		A2CBDED80D993E4500BB22BC /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/AddWindow.xib; sourceTree = "<group>"; };
+		A2CBDF9E0D9AD08100BB22BC /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2D0E0480A54A97C003C72CF /* Bandwidth.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Bandwidth.png; path = macosx/Images/Bandwidth.png; sourceTree = "<group>"; };
 		A2D22A100D65EED100007D5F /* verify.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = verify.c; path = libtransmission/verify.c; sourceTree = "<group>"; };
 		A2D22A110D65EED100007D5F /* verify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verify.h; path = libtransmission/verify.h; sourceTree = "<group>"; };
@@ -1996,6 +1997,7 @@
 				A2FB719E0D97FC0C0001F331 /* it */,
 				A2AC81D60D987E2D00A2878C /* nl */,
 				A2CBDED80D993E4500BB22BC /* fr */,
+				A2CBDF9E0D9AD08100BB22BC /* ru */,
 			);
 			name = AddWindow.xib;
 			sourceTree = "<group>";
