@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Transmission-1.1x 5367\n"
+"Project-Id-Version: Transmission-1.1x 5399\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-03-24 20:42+0100\n"
-"PO-Revision-Date: 2008-03-24 21:58+0100\n"
+"PO-Revision-Date: 2008-03-26 22:21+0100\n"
 "Last-Translator: Arnout Lok <arnout.lok@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -180,12 +180,12 @@ msgstr "%"
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:252
 msgid "Down"
-msgstr "Download"
+msgstr "Down"
 
 #. 'upload speed' column header.  terse to keep the column narrow.
 #: ../gtk/details.c:254
 msgid "Up"
-msgstr "Upload"
+msgstr "Up"
 
 #: ../gtk/details.c:255
 msgid "Status"
@@ -478,13 +478,13 @@ msgstr[1] "De gedownloade bestanden van deze torrents verwijderen?"
 
 #: ../gtk/dialogs.c:220
 msgid "Some of these torrents are incomplete or connected to peers."
-msgstr "Sommige van deze torrents zijn incompleet of nog verbonden met peers."
+msgstr "Sommige van deze torrents zijn onvolledig of nog verbonden met peers."
 
 #: ../gtk/dialogs.c:224
 msgid "This torrent is incomplete or connected to peers."
 msgid_plural "One of these torrents is incomplete or connected to peers."
-msgstr[0] "Deze torrent is incompleet of nog verbonden met peers."
-msgstr[1] "Één van deze torrent is incompleet of nog verbonden met peers."
+msgstr[0] "Deze torrent is onvolledig of nog verbonden met peers."
+msgstr[1] "Één van deze torrent is onvolledig of nog verbonden met peers."
 
 #. this refers to priority
 #: ../gtk/file-list.c:65
@@ -610,7 +610,8 @@ msgstr "Copyright 2005-2008 Het Transmission Project"
 msgid "translator-credits"
 msgstr ""
 "Jan Geboers\n"
-"Arnout Lok"
+"Arnout Lok\n"
+"Maarten Van Coile"
 
 #: ../gtk/makemeta-ui.c:96
 msgid "Torrent creation cancelled"
@@ -669,10 +670,10 @@ msgid "_Folder:"
 msgstr "_Map:"
 
 # Dit zou nog enigzins verbeterd kunnen worden.
-# Was: "Privé voor deze Tracker" 
+# Was: "Privé voor deze Tracker"
 #: ../gtk/makemeta-ui.c:294
 msgid "_Private to this tracker"
-msgstr "Aleen voor deze tracker"
+msgstr "_Privé voor deze tracker"
 
 #: ../gtk/makemeta-ui.c:298
 msgid "Announce _URL:"
@@ -866,7 +867,7 @@ msgstr "Upload: %s"
 #. the torrent isn't uploading or downloading
 #: ../gtk/torrent-cell-renderer.c:126
 msgid "Idle"
-msgstr "Rust"
+msgstr "Inactief"
 
 #: ../gtk/torrent-cell-renderer.c:139
 msgid "Paused"
@@ -975,7 +976,7 @@ msgstr "Limieten"
 
 #: ../gtk/tr-prefs.c:294
 msgid "Maximum peers _overall:"
-msgstr "T_otaal maximum aantal peers:"
+msgstr "Gl_obaal maximum aantal peers:"
 
 #: ../gtk/tr-prefs.c:296
 msgid "Maximum peers per _torrent:"
@@ -1314,7 +1315,7 @@ msgstr "Socket %d gekoppeld aan poort %d"
 #: ../libtransmission/peer-msgs.c:969
 #, c-format
 msgid "Got %d peers from peer exchange"
-msgstr "%d peers ontvangen via peeruitwisseling"
+msgstr "%d peers verkregen via peeruitwisseling"
 
 #: ../libtransmission/peer-msgs.c:1533
 #, c-format
