@@ -1651,17 +1651,14 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (void) createFileList
 {
     int count = [self fileCount], i;
-    tr_file * file;
-    NSMutableArray * pathComponents;
-    NSString * path;
-    
     NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count];
     
     for (i = 0; i < count; i++)
     {
-        file = &fInfo->files[i];
+        tr_file * file = &fInfo->files[i];
         
-        pathComponents = [[[NSString stringWithUTF8String: file->name] pathComponents] mutableCopy];
+        NSMutableArray * pathComponents = [[[NSString stringWithUTF8String: file->name] pathComponents] mutableCopy];
+        NSString * path;
         if ([self folder])
         {
             path = [pathComponents objectAtIndex: 0];

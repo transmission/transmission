@@ -3864,46 +3864,25 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         searchFrame.origin.x += searchFrame.size.width - SEARCH_FILTER_MIN_WIDTH;
         searchFrame.size.width = SEARCH_FILTER_MIN_WIDTH;
         
-        //resize each button until they don't overlap search
-        int download = 0;
-        BOOL seeding = NO, paused = NO;
-        do
-        {
-            if (download < 8)
-            {
-                download++;
-                downloadRect.size.width--;
-                
-                seedRect.origin.x--;
-                pauseRect.origin.x--;
-            }
-            else if (!seeding)
-            {
-                seeding = YES;
-                seedRect.size.width--;
-                
-                pauseRect.origin.x--;
-            }
-            else if (!paused)
-            {
-                paused = YES;
-                pauseRect.size.width--;
-            }
-            else
-            {
-                activeRect.size.width--;
-                
-                downloadRect.origin.x--;
-                seedRect.origin.x--;
-                pauseRect.origin.x--;
-                
-                //reset
-                download = 0;
-                seeding = NO;
-                paused = NO;
-            }
-        }
-        while (NSMaxX(pauseRect) + 5.0 > searchFrame.origin.x);
+        //resize the buttons so they don't overlay
+        int difference = (NSMaxX(pauseRect) + 5.0) - searchFrame.origin.x;
+        
+        //decrease downloading by 8, seeding by 1, paused by 1, active by 1, repeat
+        int download = (difference / 11 * 8) + MIN(difference % 11 + 1, 8); //8 for every 11
+        int seed = (difference / 11) + (difference % 11 >= 8 ? 1 : 0);
+        int paused = (difference / 11) + (difference % 11 >= 9 ? 1 : 0);
+        int active = (difference / 11) + (difference % 11 >= 10 ? 1 : 0);
+        
+        activeRect.size.width -= active;
+        
+        downloadRect.size.width -= download;
+        downloadRect.origin.x -= active;
+        
+        seedRect.size.width -= seed;
+        seedRect.origin.x -= active + download;
+        
+        pauseRect.size.width -= paused;
+        pauseRect.origin.x -= active + download + seed;
     }
     else;
     
