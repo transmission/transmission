@@ -3865,7 +3865,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         searchFrame.size.width = SEARCH_FILTER_MIN_WIDTH;
         
         //resize the buttons so they don't overlay
-        int difference = (NSMaxX(pauseRect) + 5.0) - searchFrame.origin.x;
+        int difference = (NSMaxX(pauseRect) + 5.0) - searchFrame.origin.x - 1; //subtract 1, since 0 will be counted
         
         //decrease downloading by 8, seeding by 1, paused by 1, active by 1, repeat
         int download = (difference / 11 * 8) + MIN(difference % 11 + 1, 8); //8 for every 11
