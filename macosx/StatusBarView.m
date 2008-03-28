@@ -58,16 +58,13 @@
 {
     if (fShow)
     {
-        [[NSColor controlColor] set];
-        NSRectFill(rect);
-        
-        NSRect bounds = [self bounds];
-        
-        NSRect lineBorderRect = NSMakeRect(bounds.origin.x, NSMaxY(bounds) - 1.0, bounds.size.width, 1.0);
+        NSRect lineBorderRect = NSMakeRect(rect.origin.x, NSMaxY([self bounds]) - 1.0, rect.size.width, 1.0);
         if (NSIntersectsRect(lineBorderRect, rect))
         {
             [[NSColor whiteColor] set];
             NSRectFill(lineBorderRect);
+            
+            rect.size.height--;
         }
         
         lineBorderRect.origin.y = 0.0;
@@ -75,7 +72,13 @@
         {
             [fGrayBorderColor set];
             NSRectFill(lineBorderRect);
+            
+            rect.origin.y++;
+            rect.size.height--;
         }
+        
+        [[NSColor controlColor] set];
+        NSRectFill(rect);
     }
 }
 
