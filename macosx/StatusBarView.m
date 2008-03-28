@@ -60,7 +60,11 @@
 - (void) drawRect: (NSRect) rect
 {
     if (fShow)
+    {
+        rect.origin.y = 0;
+        rect.size.height = [self bounds].size.height;
         [fGradient fillRect: rect angle: 90];
+    }
 }
 
 @end
