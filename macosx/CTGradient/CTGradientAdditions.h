@@ -37,9 +37,3 @@
 + (CTGradient *)progressYellowGradient;
 + (CTGradient *)progressTransparentGradient;
 @end
-
-@interface CTGradient (MiddleColour)
-+ (CTGradient *)gradientWithBeginningColor:(NSColor *)begin middleColor:(NSColor *)middle endingColor:(NSColor *)end;
-+ (CTGradient *)gradientWithBeginningColor:(NSColor *)begin middleColor1:(NSColor *)middle1
-                middleColor2:(NSColor *)middle2 endingColor:(NSColor *)end;
-@end

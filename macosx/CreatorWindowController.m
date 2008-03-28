@@ -203,6 +203,7 @@
                                                     "Create torrent -> warning -> info")];
         [alert setAlertStyle: NSWarningAlertStyle];
         
+        //check common reasons for failure
         if (![trackerString hasPrefix: @"http://"])
             [alert setMessageText: NSLocalizedString(@"The tracker address must begin with \"http://\".",
                                                     "Create torrent -> warning -> message")];
