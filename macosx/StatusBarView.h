@@ -24,13 +24,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class CTGradient;
-
 @interface StatusBarView : NSView
 {
     BOOL fShow;
     
-    CTGradient * fGradient;
     NSColor * fGrayBorderColor;
 }
 

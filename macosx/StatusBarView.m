@@ -24,7 +24,6 @@
 
 #import "StatusBarView.h"
 #import "NSApplicationAdditions.h"
-#import "CTGradient.h"
 
 @implementation StatusBarView
 
@@ -33,11 +32,6 @@
     if ((self = [super initWithFrame: rect]))
     {
         fShow = [NSApp isOnLeopardOrBetter];
-        
-        #warning possible remove (don't forget import, etc)
-        /*NSColor * startingColor = [NSColor colorWithCalibratedRed: 208.0/255.0 green: 208.0/255.0 blue: 208.0/255.0 alpha: 1.0];
-        NSColor * endingColor = [NSColor colorWithCalibratedRed: 233.0/255.0 green: 233.0/255.0 blue: 233.0/255.0 alpha: 1.0];
-        fGradient = [[CTGradient gradientWithBeginningColor: startingColor endingColor: endingColor] retain];*/
         
         fGrayBorderColor = [[NSColor colorWithCalibratedRed: 171.0/255.0 green: 171.0/255.0 blue: 171.0/255.0 alpha: 1.0] retain];
     }
@@ -64,7 +58,6 @@
 {
     if (fShow)
     {
-        //[fGradient fillRect: rect angle: 90];
         [[NSColor controlColor] set];
         NSRectFill(rect);
         
