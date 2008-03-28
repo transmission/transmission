@@ -58,7 +58,7 @@
 {
     if (fShow)
     {
-        NSRect lineBorderRect = NSMakeRect(rect.origin.x, NSMaxY([self bounds]) - 1.0, rect.size.width, 1.0);
+        NSRect lineBorderRect = NSMakeRect(rect.origin.x, [self bounds].size.height - 1.0, rect.size.width, 1.0);
         if (NSIntersectsRect(lineBorderRect, rect))
         {
             [[NSColor whiteColor] set];
