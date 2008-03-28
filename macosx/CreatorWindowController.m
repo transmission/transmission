@@ -335,11 +335,11 @@
                 [alert setAlertStyle: NSWarningAlertStyle];
                 
                 if (fInfo->result == TR_MAKEMETA_IO_READ)
-                    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"Could not read \"%s\" (%d)",
-                        "Create torrent -> failed -> warning"), fInfo->errfile, fInfo->my_errno]];
+                    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"Could not read \"%s\": %s.",
+                        "Create torrent -> failed -> warning"), fInfo->errfile, strerror(fInfo->my_errno)]];
                 else if (fInfo->result == TR_MAKEMETA_IO_WRITE)
-                    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"Could not write \"%s\" (%d)",
-                        "Create torrent -> failed -> warning"), fInfo->errfile, fInfo->my_errno]];
+                    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"Could not write \"%s\": %s.",
+                        "Create torrent -> failed -> warning"), fInfo->errfile, strerror(fInfo->my_errno)]];
                 else; //invalid url should have been caught before creating
                 
                 [alert beginSheetModalForWindow: [self window] modalDelegate: self
