@@ -77,6 +77,7 @@ typedef enum
     IBOutlet MenuLabel              * fStatusTigerField;
     IBOutlet NSImageView            * fStatusTigerImageView;
     IBOutlet NSTextField            * fTotalDLField, * fTotalULField;
+    IBOutlet NSImageView            * fTotalDLImageView;
     
     IBOutlet StatusBarView          * fFilterBar;
     IBOutlet FilterButton           * fNoFilterButton, * fActiveFilterButton, * fDownloadFilterButton,
@@ -183,6 +184,7 @@ typedef enum
 
 - (void) updateUI;
 
+- (void) resizeStatusButton;
 - (void) setBottomCountText: (BOOL) filtering;
 
 - (void) updateTorrentsInQueue;

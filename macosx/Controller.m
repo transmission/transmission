@@ -1448,12 +1448,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 if ([NSApp isOnLeopardOrBetter])
                 {
                     [fStatusButton setTitle: statusString];
-                    [fStatusButton sizeToFit];
-                    
-                    //width ends up being too long
-                    NSRect statusFrame = [fStatusButton frame];
-                    statusFrame.size.width -= 25.0;
-                    [fStatusButton setFrame: statusFrame];
+                    [self resizeStatusButton];
                 }
                 else
                     [fStatusTigerField setStringValue: statusString];
@@ -1467,6 +1462,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //badge dock
     [fBadger updateBadge];
+}
+
+- (void) resizeStatusButton
+{
+    [fStatusButton sizeToFit];
+    
+    //width ends up being too long
+    NSRect statusFrame = [fStatusButton frame];
+    statusFrame.size.width -= 25.0;
+    
+    float difference = NSMaxX(statusFrame) + 5.0 - [fTotalDLImageView frame].origin.x;
+    if (difference > 0)
+        statusFrame.size.width -= difference;
+    
+    [fStatusButton setFrame: statusFrame];
 }
 
 - (void) setBottomCountText: (BOOL) filtering
@@ -3828,6 +3838,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) windowDidResize: (NSNotification *) notification
 {
+    if (![fStatusBar isHidden])
+        [self resizeStatusButton];
+    
     if ([fFilterBar isHidden])
         return;
     
@@ -3875,14 +3888,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         activeRect.size.width -= active;
         
-        downloadRect.size.width -= download;
         downloadRect.origin.x -= active;
+        downloadRect.size.width -= download;
         
-        seedRect.size.width -= seed;
         seedRect.origin.x -= active + download;
+        seedRect.size.width -= seed;
         
-        pauseRect.size.width -= paused;
         pauseRect.origin.x -= active + download + seed;
+        pauseRect.size.width -= paused;
     }
     else;
     
