@@ -272,7 +272,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     else
     {
         //bottom bar
-        [fBottomTigerBar setShowOnTiger: YES];
         [fBottomTigerBar setHidden: NO];
         [fBottomTigerLine setHidden: NO];
         
@@ -280,7 +279,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [fSpeedLimitButton setBezelStyle: NSSmallSquareBezelStyle];
         
         //status bar
-        [fStatusBar setShowOnTiger: YES];
         [fStatusButton setHidden: YES];
         [fStatusTigerField setHidden: NO];
         [fStatusTigerImageView setHidden: NO];

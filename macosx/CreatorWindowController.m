@@ -203,11 +203,10 @@
                                                     "Create torrent -> warning -> info")];
         [alert setAlertStyle: NSWarningAlertStyle];
         
-        //check common reasons for failure
         if (![trackerString hasPrefix: @"http://"])
             [alert setMessageText: NSLocalizedString(@"The tracker address must begin with \"http://\".",
                                                     "Create torrent -> warning -> message")];
-        else if ([trackerString length] <= 7) //don't allow blank addresses
+        else if ([trackerString length] == 7) //don't allow blank addresses
             [alert setMessageText: NSLocalizedString(@"The tracker address cannot be blank.", "Create torrent -> warning -> message")];
         else
             [alert setMessageText: NSLocalizedString(@"The tracker address is invalid.", "Create torrent -> warning -> message")];

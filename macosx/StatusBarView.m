@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "StatusBarView.h"
-#import "NSApplicationAdditions.h"
 
 @implementation StatusBarView
 
@@ -31,8 +30,6 @@
 {
     if ((self = [super initWithFrame: rect]))
     {
-        fShow = [NSApp isOnLeopardOrBetter];
-        
         fGrayBorderColor = [[NSColor colorWithCalibratedRed: 171.0/255.0 green: 171.0/255.0 blue: 171.0/255.0 alpha: 1.0] retain];
     }
     return self;
@@ -44,42 +41,29 @@
     [super dealloc];
 }
 
-- (void) setShowOnTiger: (BOOL) show
-{
-    fShow = show || [NSApp isOnLeopardOrBetter];
-}
-
-- (BOOL) isOpaque
-{
-    return fShow;
-}
-
 - (void) drawRect: (NSRect) rect
 {
-    if (fShow)
+    NSRect lineBorderRect = NSMakeRect(rect.origin.x, [self bounds].size.height - 1.0, rect.size.width, 1.0);
+    if (NSIntersectsRect(lineBorderRect, rect))
     {
-        NSRect lineBorderRect = NSMakeRect(rect.origin.x, [self bounds].size.height - 1.0, rect.size.width, 1.0);
-        if (NSIntersectsRect(lineBorderRect, rect))
-        {
-            [[NSColor whiteColor] set];
-            NSRectFill(lineBorderRect);
-            
-            rect.size.height--;
-        }
+        [[NSColor whiteColor] set];
+        NSRectFill(lineBorderRect);
         
-        lineBorderRect.origin.y = 0.0;
-        if (NSIntersectsRect(lineBorderRect, rect))
-        {
-            [fGrayBorderColor set];
-            NSRectFill(lineBorderRect);
-            
-            rect.origin.y++;
-            rect.size.height--;
-        }
-        
-        [[NSColor controlColor] set];
-        NSRectFill(rect);
+        rect.size.height--;
     }
+    
+    lineBorderRect.origin.y = 0.0;
+    if (NSIntersectsRect(lineBorderRect, rect))
+    {
+        [fGrayBorderColor set];
+        NSRectFill(lineBorderRect);
+        
+        rect.origin.y++;
+        rect.size.height--;
+    }
+    
+    [[NSColor controlColor] set];
+    NSRectFill(rect);
 }
 
 @end
