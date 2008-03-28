@@ -33,17 +33,12 @@
     if ((self = [super initWithFrame: rect]))
     {
         fShow = [NSApp isOnLeopardOrBetter];
-            
-        NSColor * startingColor = [NSColor colorWithCalibratedRed: 208.0/255.0 green: 208.0/255.0 blue: 208.0/255.0 alpha: 1.0];
-        NSColor * endingColor = [NSColor colorWithCalibratedRed: 233.0/255.0 green: 233.0/255.0 blue: 233.0/255.0 alpha: 1.0];
-        fGradient = [[CTGradient gradientWithBeginningColor: startingColor endingColor: endingColor] retain];
     }
     return self;
 }
 
 - (void) dealloc
 {
-    [fGradient release];
     [super dealloc];
 }
 
@@ -60,7 +55,24 @@
 - (void) drawRect: (NSRect) rect
 {
     if (fShow)
-        [fGradient fillRect: rect angle: 90];
+    {
+        [[NSColor controlColor] set];
+        NSRectFill(rect);
+        
+        NSRect whiteBorderRect = NSMakeRect([self bounds].origin.x, NSMaxY([self bounds]) - 1, [self bounds].size.width, 1);
+        if (NSIntersectsRect(whiteBorderRect, rect))
+        {
+            [[NSColor whiteColor] set];
+            NSRectFill(whiteBorderRect);
+        }
+        
+        NSRect grayBorderRect = NSMakeRect([self bounds].origin.x, 0, [self bounds].size.width, 1);
+        if (NSIntersectsRect(grayBorderRect, rect))
+        {
+            [[NSColor colorWithCalibratedRed: 188.0/255.0 green: 188.0/255.0 blue: 188.0/255.0 alpha: 1.0] set];
+            NSRectFill(grayBorderRect);
+        }
+    }
 }
 
 @end

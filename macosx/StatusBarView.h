@@ -29,8 +29,6 @@
 @interface StatusBarView : NSView
 {
     BOOL fShow;
-    
-    CTGradient * fGradient;
 }
 
 - (void) setShowOnTiger: (BOOL) show;
