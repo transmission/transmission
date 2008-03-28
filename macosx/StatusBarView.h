@@ -29,6 +29,9 @@
 @interface StatusBarView : NSView
 {
     BOOL fShow;
+    
+    CTGradient * fGradient;
+    NSColor * fGrayBorderColor;
 }
 
 - (void) setShowOnTiger: (BOOL) show;
