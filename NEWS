@@ -4,7 +4,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - Mac
    + Display of decimal numbers matches system international settings
 
-1.10 (2008/xx/yy)
+1.10 (2008/03/28)
 - All Platforms
    + Stop torrents when downloading and the disk becomes full
    + Removing a torrent also removes it from the cache
