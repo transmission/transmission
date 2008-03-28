@@ -5,24 +5,34 @@
     <link>http://www.transmissionbt.com/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Thu, 4 Jan 2008 15:30:00 -0400</pubDate>
-    <lastBuildDate>Tue, 26 Feb 2008 20:07:00 -0400</lastBuildDate>
+    <pubDate>Fri, 28 Mar 2008 13:46:00 -0400</pubDate>
+    <lastBuildDate>Fri, 28 Mar 2008 13:46:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 1.06 Released</title>
+      <title>Transmission 1.10 Released</title>
       <description><![CDATA[
 <h4>Core Changes:</h4>
 <ul>
- <li>Improvements and bugfixes to "Verify Local Data"</li>
- <li>Use less CPU</li>
- <li>Fix support for multitracker torrents</li>
- <li>Updated UPnP code to miniupnpc-1.0</li>
- <li>Fix two shutdown memory errors</li>
+ <li>Stop torrents when downloading and the disk becomes full</li>
+ <li>Removing a torrent also removes it from the cache</li>
+ <li>Smaller memory footprint per-torrent and per-peer</li>
+ <li>Various backend bugfixes & improvements</li>
+</ul>
+<h4>Mac-specific Changes:</h4>
+<ul>
+ <li>Window when adding torrents to select files and other settings</li>
+ <li>Leopard: Collapsable group dividers</li>
+ <li>Use the file icon as the per-torrent action button</li>
+ <li>Tracker tab in the inspector</li>
+ <li>Message log specifies the torrent/activity the message relates to</li>
+ <li>Updated images in the inspector</li>
+ <li>Optional display of remaining time while seeding in Minimal View</li>
+ <li>Improved accuracy for displaying the remaining disk space warning</li>
 </ul>
 
 Transmission 0.72 and earlier: Complete your downloads before upgrading or you will lose data!]]></description>
-      <pubDate>Tue, 26 Feb 2008 20:07:00 -0400</pubDate>
-      <enclosure sparkle:version="5115" sparkle:shortVersionString="1.06" url="http://mirrors.m0k.org/transmission/files/Transmission-1.06.dmg" length="2402771" type="application/octet-stream"/>
+      <pubDate>Fri, 28 Mar 2008 13:46:00 -0400</pubDate>
+      <enclosure sparkle:version="5392" sparkle:shortVersionString="1.10" url="http://mirrors.m0k.org/transmission/files/Transmission-1.10.dmg" length="2757723" type="application/octet-stream"/>
     </item>
     
   </channel>
