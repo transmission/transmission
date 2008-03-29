@@ -24,16 +24,24 @@
 #include "ggets.h"
 
 #include "transmission.h"
-#include "net.h" /* inet_aton() */
+#include "internal.h"
+#include "net.h" /* tr_netResolve */
 #include "platform.h" /* tr_getPrefsDirectory() */
 #include "utils.h" /* tr_buildPath() */
 
-static void * blocklist = NULL;
-static size_t blocklistSize = 0;
+struct tr_ip_range
+{
+  uint32_t begin;
+  uint32_t end;
+};
+
+static struct tr_ip_range * blocklist = NULL;
+static size_t blocklistItemCount = 0;
+static size_t blocklistByteCount = 0;
 static int blocklistFd = -1;
 
-static void
-getFilename( char * buf, size_t buflen )
+void
+tr_getBlocklistFilename( char * buf, size_t buflen )
 {
     tr_buildPath( buf, buflen, tr_getPrefsDirectory(), "blocklist", NULL ); 
 }
@@ -43,10 +51,11 @@ closeBlocklist( void )
 {
     if( blocklist )
     {
-        munmap( blocklist, blocklistSize );
+        munmap( blocklist, blocklistByteCount );
         close( blocklistFd );
         blocklist = NULL;
-        blocklistSize = 0;
+        blocklistItemCount = 0;
+        blocklistByteCount = 0;
         blocklistFd  = -1;
     }
 }
@@ -57,7 +66,7 @@ loadBlocklist( void )
     int fd;
     struct stat st;
     char filename[MAX_PATH_LENGTH];
-    getFilename( filename, sizeof( filename ) );
+    tr_getBlocklistFilename( filename, sizeof( filename ) );
 
     closeBlocklist( );
 
@@ -78,25 +87,50 @@ loadBlocklist( void )
         return;
     }
 
-    blocklistSize = st.st_size;
+    blocklistByteCount = st.st_size;
+    blocklistItemCount = blocklistByteCount / sizeof( struct tr_ip_range );
     blocklistFd = fd;
+    tr_inf( _( "Blocklist contains %'d IP ranges" ), blocklistItemCount );
+}
+
+static int
+compareAddressToRange( const void * va, const void * vb )
+{
+    const uint32_t * a = va;
+    const struct tr_ip_range * b = vb;
+    if( *a < b->begin ) return -1;
+    if( *a > b->end ) return 1;
+    return 0;
 }
 
 int
-tr_isInBlocklist( const struct in_addr * addr UNUSED )
+tr_peerIsBlocked( tr_handle * handle UNUSED, const struct in_addr * addr )
 {
-    if( !blocklist )
+    uint32_t needle;
+    const struct tr_ip_range * range;
+
+    if( !blocklist ) {
         loadBlocklist( );
+        if( !blocklist )
+            return FALSE;
+    }
 
-    return FALSE; /* FIXME */
+    needle = ntohl( addr->s_addr );
+
+    range = bsearch( &needle,
+                     blocklist,
+                     blocklistItemCount,
+                     sizeof( struct tr_ip_range ), 
+                     compareAddressToRange );
+
+    return range != NULL;
 }
-
 
 static void
 deleteBlocklist( tr_handle * handle UNUSED )
 {
     char filename[MAX_PATH_LENGTH];
-    getFilename( filename, sizeof( filename ) );
+    tr_getBlocklistFilename( filename, sizeof( filename ) );
     closeBlocklist( );
     unlink( filename );
 }
@@ -109,6 +143,7 @@ tr_setBlocklist( tr_handle  * handle,
     FILE * out;
     char * line;
     char outfile[MAX_PATH_LENGTH];
+    int lineCount = 0;
 
     if( filename == NULL ) {
         deleteBlocklist( handle );
@@ -123,8 +158,7 @@ tr_setBlocklist( tr_handle  * handle,
 
     closeBlocklist( );
   
-    getFilename( outfile, sizeof( outfile ) );
-fprintf( stderr, "outfile is [%s]\n", outfile );
+    tr_getBlocklistFilename( outfile, sizeof( outfile ) );
     out = fopen( outfile, "wb+" );
     if( !out ) {
         tr_err( _( "Couldn't save file \"%s\": %s" ), outfile, tr_strerror( errno ) );
@@ -137,33 +171,38 @@ fprintf( stderr, "outfile is [%s]\n", outfile );
         char * rangeBegin;
         char * rangeEnd;
         struct in_addr in_addr;
-        uint32_t range[2];
-//fprintf( stderr, "got line [%s]\n", line );
+        struct tr_ip_range range;
 
         rangeBegin = strrchr( line, ':' );
-        if( !rangeBegin ) continue;
+        if( !rangeBegin ) { free(line); continue; }
         ++rangeBegin;
 
         rangeEnd = strchr( rangeBegin, '-' );
-        if( !rangeEnd ) continue;
+        if( !rangeEnd ) { free(line); continue; }
         *rangeEnd++ = '\0';
 
-        //fprintf( stderr, "rangeBegin [%s] rangeEnd [%s]\n", rangeBegin, rangeEnd );
-        if( !inet_aton( rangeBegin, &in_addr ) )
-            fprintf( stderr, "skipping invalid address [%s]\n", rangeBegin );
-        range[0] = ntohl( in_addr.s_addr );
-        if( !inet_aton( rangeEnd, &in_addr ) )
-            fprintf( stderr, "skipping invalid address [%s]\n", rangeEnd );
-        range[1] = ntohl( in_addr.s_addr );
+        if( tr_netResolve( rangeBegin, &in_addr ) )
+            tr_err( "blocklist skipped invalid address [%s]\n", rangeBegin );
+        range.begin = ntohl( in_addr.s_addr );
+
+        if( tr_netResolve( rangeEnd, &in_addr ) )
+            tr_err( "blocklist skipped invalid address [%s]\n", rangeEnd );
+        range.end = ntohl( in_addr.s_addr );
 
         free( line );
 
-        if( fwrite( range, sizeof(uint32_t), 2, out ) != 2 ) {
+        if( fwrite( &range, sizeof(struct tr_ip_range), 1, out ) != 1 ) {
           tr_err( _( "Couldn't save file \"%s\": %s" ), outfile, tr_strerror( errno ) );
           break;
         }
+
+        ++lineCount;
     }
+
+    tr_inf( _( "Blocklist updated with %'d IP ranges" ), lineCount );
 
     fclose( out );
     fclose( in );
+
+    loadBlocklist( );
 }

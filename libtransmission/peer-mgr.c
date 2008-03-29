@@ -21,6 +21,7 @@
 #include <event.h>
 
 #include "transmission.h"
+#include "blocklist.h"
 #include "clients.h"
 #include "completion.h"
 #include "crypto.h"
@@ -1080,7 +1081,8 @@ tr_peerMgrAddIncoming( tr_peerMgr      * manager,
 {
     managerLock( manager );
 
-    if( getExistingHandshake( manager->incomingHandshakes, addr ) )
+    if( tr_peerIsBlocked( manager->handle, addr )
+        || getExistingHandshake( manager->incomingHandshakes, addr ) )
     {
         tr_netClose( socket );
     }
@@ -1863,6 +1865,10 @@ getPeerCandidates( Torrent * t, int * setmeSize )
                 continue;
             }
         }
+
+        /* Don't connect to peers in our blocklist */
+        if( tr_peerIsBlocked( t->manager->handle, &atom->addr ) )
+            continue;
 
         ret[retCount++] = atom;
     }

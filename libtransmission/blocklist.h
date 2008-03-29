@@ -13,8 +13,10 @@
 #ifndef TR_BLOCKLIST_H
 #define TR_BLOCKLIST_H
 
+struct tr_handle;
 struct in_addr;
 
-int tr_isInBlocklist( const struct in_addr * );
+int tr_peerIsBlocked( const struct tr_handle *,
+                      const struct in_addr   * );
 
 #endif

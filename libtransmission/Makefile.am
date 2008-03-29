@@ -78,6 +78,7 @@ noinst_HEADERS = \
 bin_PROGRAMS = benc2php
 
 TESTS = \
+    blocklist-test \
     bencode-test \
     test-fastset \
     test-peer-id
@@ -95,6 +96,8 @@ benc2php_SOURCES = benc2php.c
 benc2php_LDADD = $(APPS_LDADD)
 bencode_test_SOURCES = bencode-test.c
 bencode_test_LDADD = $(APPS_LDADD)
+blocklist_test_SOURCES = blocklist-test.c
+blocklist_test_LDADD = $(APPS_LDADD)
 test_fastset_SOURCES = test-fastset.c
 test_fastset_LDADD = $(APPS_LDADD)
 test_peer_id_SOURCES = test-peer-id.c
