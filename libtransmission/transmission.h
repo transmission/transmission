@@ -289,6 +289,26 @@ void tr_setGlobalPeerLimit( tr_handle * handle,
 uint16_t tr_getGlobalPeerLimit( const tr_handle * handle );
 
 
+/**
+ * Specify a range of IPs for Transmission to block.
+ *
+ * filename must be an uncompressed ascii file,
+ * using the same format as the bluetack level1 file.
+ *
+ * libtransmission does not keep a handle to `filename'
+ * after this call returns, so the caller is free to
+ * keep or delete `filename' as it wishes.
+ * libtransmission makes its own copy of the file
+ * massaged into a format easier to search.
+ *
+ * The caller only needs to invoke this when the blocklist
+ * has changed.
+ *
+ * Passing NULL for a filename will clear the blocklist.
+ */
+void tr_setBlocklist( tr_handle  * handle,
+                      const char * filename );
+
 
 
 /***********************************************************************

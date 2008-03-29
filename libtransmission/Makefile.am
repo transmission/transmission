@@ -5,11 +5,13 @@ noinst_LIBRARIES = libtransmission.a
 
 libtransmission_a_SOURCES = \
     bencode.c \
+    blocklist.c \
     clients.c \
     completion.c \
     crypto.c \
     fastresume.c \
     fdlimit.c \
+    ggets.c \
     handshake.c \
     inout.c \
     ipcparse.c \
@@ -38,11 +40,13 @@ libtransmission_a_SOURCES = \
 
 noinst_HEADERS = \
     bencode.h \
+    blocklist.h \
     clients.h \
     crypto.h \
     completion.h \
     fastresume.h \
     fdlimit.h \
+    ggets.h \
     handshake.h \
     inout.h \
     internal.h \
