@@ -160,6 +160,8 @@
 		A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */; };
 		A2D0E0490A54A97C003C72CF /* Bandwidth.png in Resources */ = {isa = PBXBuildFile; fileRef = A2D0E0480A54A97C003C72CF /* Bandwidth.png */; };
 		A2D22A130D65EEE700007D5F /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D22A100D65EED100007D5F /* verify.c */; };
+		A2D3078F0D9EC45F0051FD27 /* blocklist.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D3078E0D9EC45F0051FD27 /* blocklist.c */; };
+		A2D307910D9EC46B0051FD27 /* ggets.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D307900D9EC46B0051FD27 /* ggets.c */; };
 		A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36270CBC674900C2ED41 /* InfoActivity.png */; };
 		A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36280CBC674900C2ED41 /* InfoFiles.png */; };
 		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
@@ -271,7 +273,6 @@
 		BEFC1E560C07861A00B0BB3C /* completion.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1D0C07861A00B0BB3C /* completion.c */; };
 		BEFC1E570C07861A00B0BB3C /* clients.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E1E0C07861A00B0BB3C /* clients.h */; };
 		BEFC1E580C07861A00B0BB3C /* clients.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1F0C07861A00B0BB3C /* clients.c */; };
-		BEFC1E5B0C07861A00B0BB3C /* bsdtree.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E220C07861A00B0BB3C /* bsdtree.h */; };
 		BEFC1E5C0C07861A00B0BB3C /* bencode.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E230C07861A00B0BB3C /* bencode.h */; };
 		BEFC1E5D0C07861A00B0BB3C /* bencode.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E240C07861A00B0BB3C /* bencode.c */; };
 		BEFC1E5F0C07861A00B0BB3C /* trcompat.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E260C07861A00B0BB3C /* trcompat.h */; };
@@ -582,6 +583,11 @@
 		A2D0E0480A54A97C003C72CF /* Bandwidth.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Bandwidth.png; path = macosx/Images/Bandwidth.png; sourceTree = "<group>"; };
 		A2D22A100D65EED100007D5F /* verify.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = verify.c; path = libtransmission/verify.c; sourceTree = "<group>"; };
 		A2D22A110D65EED100007D5F /* verify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verify.h; path = libtransmission/verify.h; sourceTree = "<group>"; };
+		A2D3078E0D9EC45F0051FD27 /* blocklist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = blocklist.c; path = libtransmission/blocklist.c; sourceTree = "<group>"; };
+		A2D307900D9EC46B0051FD27 /* ggets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ggets.c; path = libtransmission/ggets.c; sourceTree = "<group>"; };
+		A2D307920D9EC4800051FD27 /* ggets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ggets.h; path = libtransmission/ggets.h; sourceTree = "<group>"; };
+		A2D307930D9EC4860051FD27 /* blocklist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = blocklist.h; path = libtransmission/blocklist.h; sourceTree = "<group>"; };
+		A2D307950D9EC4C10051FD27 /* bsdtree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bsdtree.h; path = daemon/bsdtree.h; sourceTree = "<group>"; };
 		A2D688A70CB4986A009BEC3A /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2D6891B0CB4990E009BEC3A /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2DA36270CBC674900C2ED41 /* InfoActivity.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoActivity.png; path = macosx/Images/InfoActivity.png; sourceTree = "<group>"; };
@@ -707,7 +713,6 @@
 		BEFC1E1D0C07861A00B0BB3C /* completion.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = completion.c; path = libtransmission/completion.c; sourceTree = "<group>"; };
 		BEFC1E1E0C07861A00B0BB3C /* clients.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = clients.h; path = libtransmission/clients.h; sourceTree = "<group>"; };
 		BEFC1E1F0C07861A00B0BB3C /* clients.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = clients.c; path = libtransmission/clients.c; sourceTree = "<group>"; };
-		BEFC1E220C07861A00B0BB3C /* bsdtree.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bsdtree.h; path = libtransmission/bsdtree.h; sourceTree = "<group>"; };
 		BEFC1E230C07861A00B0BB3C /* bencode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bencode.h; path = libtransmission/bencode.h; sourceTree = "<group>"; };
 		BEFC1E240C07861A00B0BB3C /* bencode.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = bencode.c; path = libtransmission/bencode.c; sourceTree = "<group>"; };
 		BEFC1E260C07861A00B0BB3C /* trcompat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trcompat.h; path = libtransmission/trcompat.h; sourceTree = "<group>"; };
@@ -1082,7 +1087,6 @@
 				BEFC1E1D0C07861A00B0BB3C /* completion.c */,
 				BEFC1E1E0C07861A00B0BB3C /* clients.h */,
 				BEFC1E1F0C07861A00B0BB3C /* clients.c */,
-				BEFC1E220C07861A00B0BB3C /* bsdtree.h */,
 				BEFC1E230C07861A00B0BB3C /* bencode.h */,
 				BEFC1E240C07861A00B0BB3C /* bencode.c */,
 				BEFC1E260C07861A00B0BB3C /* trcompat.h */,
@@ -1090,6 +1094,10 @@
 				A25D2CBB0CF4C7190096A262 /* stats.c */,
 				A2D22A110D65EED100007D5F /* verify.h */,
 				A2D22A100D65EED100007D5F /* verify.c */,
+				A2D307930D9EC4860051FD27 /* blocklist.h */,
+				A2D3078E0D9EC45F0051FD27 /* blocklist.c */,
+				A2D307920D9EC4800051FD27 /* ggets.h */,
+				A2D307900D9EC46B0051FD27 /* ggets.c */,
 			);
 			name = libtransmission;
 			sourceTree = "<group>";
@@ -1204,6 +1212,7 @@
 		BEFC1C0B0C07754700B0BB3C /* daemon */ = {
 			isa = PBXGroup;
 			children = (
+				A2D307950D9EC4C10051FD27 /* bsdtree.h */,
 				A2BC19E30CA9D8F400DD302A /* bsdqueue.h */,
 				BEFC1C0C0C07756200B0BB3C /* client.c */,
 				BEFC1C0D0C07756200B0BB3C /* client.h */,
@@ -1324,7 +1333,6 @@
 				BEFC1E540C07861A00B0BB3C /* fastresume.h in Headers */,
 				BEFC1E550C07861A00B0BB3C /* completion.h in Headers */,
 				BEFC1E570C07861A00B0BB3C /* clients.h in Headers */,
-				BEFC1E5B0C07861A00B0BB3C /* bsdtree.h in Headers */,
 				BEFC1E5C0C07861A00B0BB3C /* bencode.h in Headers */,
 				BEFC1E5F0C07861A00B0BB3C /* trcompat.h in Headers */,
 				A2BE9C530C1E4AF7002D16E6 /* makemeta.h in Headers */,
@@ -1820,6 +1828,8 @@
 				A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */,
 				A26AF2840D2DC27C00FF7140 /* AddWindowController.m in Sources */,
 				A2FB701C0D95CAEA0001F331 /* GroupsController.m in Sources */,
+				A2D3078F0D9EC45F0051FD27 /* blocklist.c in Sources */,
+				A2D307910D9EC46B0051FD27 /* ggets.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
