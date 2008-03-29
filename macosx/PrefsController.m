@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "PrefsController.h"
+#import "BlocklistDownloader.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
@@ -153,6 +154,9 @@
     [fQueueDownloadField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
     [fQueueSeedField setIntValue: [fDefaults integerForKey: @"QueueSeedNumber"]];
     [fStalledField setIntValue: [fDefaults integerForKey: @"StalledMinutes"]];
+    
+    //set blocklist
+    [self updateBlocklistFields];
 }
 
 - (void) setUpdater: (SUUpdater *) updater
@@ -354,6 +358,30 @@
         ([fDefaults boolForKey: @"EncryptionRequire"] ? TR_ENCRYPTION_REQUIRED : TR_ENCRYPTION_PREFERRED) : TR_PLAINTEXT_PREFERRED);
 }
 
+- (void) setBlocklistEnabled: (id) sender
+{
+    BOOL enable = [sender state] == NSOnState;
+    [fDefaults setBool: enable forKey: @"Blocklist"];
+    tr_blocklistSetEnabled(fHandle, enable);
+}
+
+- (void) updateBlocklist: (id) sender
+{
+    [BlocklistDownloader downloadWithPrefsController: self withHandle: fHandle];
+}
+
+- (void) updateBlocklistFields
+{
+    BOOL exists = tr_blocklistExists(fHandle);
+    
+    [fBlocklistMessageField setStringValue: exists
+        ? NSLocalizedString(@"Blocklist is loaded", "Prefs -> blocklist -> message")
+        : NSLocalizedString(@"A blocklist must first be downloaded", "Prefs -> blocklist -> message")];
+    
+    [fBlocklistEnableCheck setEnabled: exists];
+    [fBlocklistEnableCheck setState: exists && [fDefaults boolForKey: @"Blocklist"]];
+}
+
 - (void) applySpeedSettings: (id) sender
 {
     if ([fDefaults boolForKey: @"SpeedLimit"])
@@ -443,7 +471,7 @@
 }
 
 - (void) setBadge: (id) sender
-{   
+{
     [[NSNotificationCenter defaultCenter] postNotificationName: @"DockBadgeChange" object: self];
 }
 

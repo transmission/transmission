@@ -14,6 +14,8 @@
 	<true/>
 	<key>BindPort</key>
 	<integer>51413</integer>
+	<key>Blocklist</key>
+	<false/>
 	<key>CheckDownload</key>
 	<false/>
 	<key>CheckForUpdates</key>

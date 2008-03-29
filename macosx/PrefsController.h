@@ -31,30 +31,31 @@
 {
     tr_handle * fHandle;
     
-    NSUserDefaults          * fDefaults;
-    BOOL                    fHasLoaded;
+    NSUserDefaults * fDefaults;
+    BOOL fHasLoaded;
     
-    IBOutlet NSView         * fGeneralView, * fTransfersView, * fBandwidthView, * fAdvancedView;
+    IBOutlet NSView * fGeneralView, * fTransfersView, * fBandwidthView, * fAdvancedView;
     
     NSString * fInitialString;
     
-    IBOutlet NSPopUpButton  * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp;
-    IBOutlet NSTextField    * fRatioStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
+    IBOutlet NSPopUpButton * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp;
+    IBOutlet NSTextField * fRatioStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
     
-    SUUpdater               * fUpdater;
+    SUUpdater * fUpdater;
 
-    IBOutlet NSTextField    * fUploadField, * fDownloadField,
-                            * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
+    IBOutlet NSTextField * fUploadField, * fDownloadField,
+                        * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
     
-    IBOutlet NSTextField    * fPeersGlobalField, * fPeersTorrentField;
+    IBOutlet NSTextField * fPeersGlobalField, * fPeersTorrentField, * fBlocklistMessageField;
+    IBOutlet NSButton * fBlocklistEnableCheck;
     
-    PortChecker                     * fPortChecker;
-    IBOutlet NSTextField            * fPortField, * fPortStatusField;
-    IBOutlet NSButton               * fNatCheck;
-    IBOutlet NSImageView            * fPortStatusImage;
-    IBOutlet NSProgressIndicator    * fPortStatusProgress;
-    NSTimer                         * fPortStatusTimer;
-    int                             fPublicPort, fNatStatus;
+    PortChecker * fPortChecker;
+    IBOutlet NSTextField * fPortField, * fPortStatusField;
+    IBOutlet NSButton * fNatCheck;
+    IBOutlet NSImageView * fPortStatusImage;
+    IBOutlet NSProgressIndicator * fPortStatusProgress;
+    NSTimer * fPortStatusTimer;
+    int fPublicPort, fNatStatus;
 }
 
 - (id) initWithHandle: (tr_handle *) handle;
@@ -75,6 +76,10 @@
 - (void) setPEX: (id) sender;
 
 - (void) setEncryptionMode: (id) sender;
+
+- (void) setBlocklistEnabled: (id) sender;
+- (void) updateBlocklist: (id) sender;
+- (void) updateBlocklistFields;
 
 - (void) setBadge: (id) sender;
 - (void) resetWarnings: (id) sender;

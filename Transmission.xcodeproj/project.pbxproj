@@ -162,6 +162,8 @@
 		A2D22A130D65EEE700007D5F /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D22A100D65EED100007D5F /* verify.c */; };
 		A2D3078F0D9EC45F0051FD27 /* blocklist.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D3078E0D9EC45F0051FD27 /* blocklist.c */; };
 		A2D307910D9EC46B0051FD27 /* ggets.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D307900D9EC46B0051FD27 /* ggets.c */; };
+		A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D307A30D9EC6870051FD27 /* BlocklistDownloader.m */; };
+		A2D307B10D9EC9F50051FD27 /* BlocklistStatusWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */; };
 		A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36270CBC674900C2ED41 /* InfoActivity.png */; };
 		A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36280CBC674900C2ED41 /* InfoFiles.png */; };
 		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
@@ -588,6 +590,9 @@
 		A2D307920D9EC4800051FD27 /* ggets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ggets.h; path = libtransmission/ggets.h; sourceTree = "<group>"; };
 		A2D307930D9EC4860051FD27 /* blocklist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = blocklist.h; path = libtransmission/blocklist.h; sourceTree = "<group>"; };
 		A2D307950D9EC4C10051FD27 /* bsdtree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bsdtree.h; path = daemon/bsdtree.h; sourceTree = "<group>"; };
+		A2D307A20D9EC6870051FD27 /* BlocklistDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlocklistDownloader.h; path = macosx/BlocklistDownloader.h; sourceTree = "<group>"; };
+		A2D307A30D9EC6870051FD27 /* BlocklistDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BlocklistDownloader.m; path = macosx/BlocklistDownloader.m; sourceTree = "<group>"; };
+		A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = BlocklistStatusWindow.xib; path = macosx/BlocklistStatusWindow.xib; sourceTree = "<group>"; };
 		A2D688A70CB4986A009BEC3A /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2D6891B0CB4990E009BEC3A /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2DA36270CBC674900C2ED41 /* InfoActivity.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoActivity.png; path = macosx/Images/InfoActivity.png; sourceTree = "<group>"; };
@@ -868,6 +873,8 @@
 				A22180970D148A71007D09ED /* GroupsWindowController.m */,
 				A2FB701A0D95CAEA0001F331 /* GroupsController.h */,
 				A2FB701B0D95CAEA0001F331 /* GroupsController.m */,
+				A2D307A20D9EC6870051FD27 /* BlocklistDownloader.h */,
+				A2D307A30D9EC6870051FD27 /* BlocklistDownloader.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -923,6 +930,7 @@
 				A233BD680D8CF2C7007EE7B4 /* StatsWindow.xib */,
 				A22180B50D148F0F007D09ED /* GroupsWindow.xib */,
 				A231274B0D11D0B7003F9AFF /* AboutWindow.xib */,
+				A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */,
 				A20B6FA40C4D97840034AB1D /* PriorityNone.png */,
 				A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */,
 				A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */,
@@ -1676,6 +1684,7 @@
 				A2012AE20D77151D0056FD71 /* YingYangGroupTemplate.png in Resources */,
 				A233BD330D8C6585007EE7B4 /* MessageWindow.xib in Resources */,
 				A233BD690D8CF2C7007EE7B4 /* StatsWindow.xib in Resources */,
+				A2D307B10D9EC9F50051FD27 /* BlocklistStatusWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1830,6 +1839,7 @@
 				A2FB701C0D95CAEA0001F331 /* GroupsController.m in Sources */,
 				A2D3078F0D9EC45F0051FD27 /* blocklist.c in Sources */,
 				A2D307910D9EC46B0051FD27 /* ggets.c in Sources */,
+				A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

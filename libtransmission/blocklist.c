@@ -28,6 +28,7 @@
 #include "net.h" /* tr_netResolve */
 #include "platform.h" /* tr_getPrefsDirectory() */
 #include "utils.h" /* tr_buildPath() */
+#include "internal.h"
 
 struct tr_ip_range
 {

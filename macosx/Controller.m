@@ -47,6 +47,7 @@
 
 #import <Sparkle/Sparkle.h>
 
+
 #define TOOLBAR_CREATE                  @"Toolbar Create"
 #define TOOLBAR_OPEN_FILE               @"Toolbar Open"
 #define TOOLBAR_OPEN_WEB                @"Toolbar Open Web"
@@ -178,16 +179,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [[NSBundle mainBundle] pathForResource: @"Defaults" ofType: @"plist"]]];
     
     //set custom value transformers
-    ExpandedPathToPathTransformer * pathTransformer =
-                        [[[ExpandedPathToPathTransformer alloc] init] autorelease];
+    ExpandedPathToPathTransformer * pathTransformer = [[[ExpandedPathToPathTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer: pathTransformer forName: @"ExpandedPathToPathTransformer"];
     
-    ExpandedPathToIconTransformer * iconTransformer =
-                        [[[ExpandedPathToIconTransformer alloc] init] autorelease];
+    ExpandedPathToIconTransformer * iconTransformer = [[[ExpandedPathToIconTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer: iconTransformer forName: @"ExpandedPathToIconTransformer"];
     
-    SpeedLimitToTurtleIconTransformer * speedLimitIconTransformer =
-                        [[[SpeedLimitToTurtleIconTransformer alloc] init] autorelease];
+    SpeedLimitToTurtleIconTransformer * speedLimitIconTransformer = [[[SpeedLimitToTurtleIconTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer: speedLimitIconTransformer forName: @"SpeedLimitToTurtleIconTransformer"];
 }
 
@@ -208,7 +206,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                         -1, /* reset in prefs */
                         [fDefaults integerForKey: @"PeersTotal"],
                         [fDefaults integerForKey: @"MessageLevel"],
-                        YES);
+                        YES,
+                        [fDefaults boolForKey: @"Blocklist"]);
         
         [NSApp setDelegate: self];
         
