@@ -306,8 +306,10 @@ uint16_t tr_getGlobalPeerLimit( const tr_handle * handle );
  *
  * Passing NULL for a filename will clear the blocklist.
  */
-void tr_setBlocklist( tr_handle  * handle,
+void tr_blocklistSet( tr_handle  * handle,
                       const char * filename );
+
+int tr_blocklistExists( const tr_handle * handle );
 
 
 

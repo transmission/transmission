@@ -59,7 +59,7 @@ main( void )
 
     /* create our own dummy blocklist */
     createTestBlocklist( tmpfile );
-    tr_setBlocklist( handle, tmpfile );
+    tr_blocklistSet( handle, tmpfile );
 
     /* now run some tests */
     check( !tr_netResolve( "216.16.1.143", &addr ) );

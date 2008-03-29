@@ -135,8 +135,18 @@ deleteBlocklist( tr_handle * handle UNUSED )
     unlink( filename );
 }
 
+int
+tr_blocklistExists( const tr_handle * handle UNUSED )
+{
+    struct stat st;
+    char filename[MAX_PATH_LENGTH];
+    tr_getBlocklistFilename( filename, sizeof( filename ) );
+    return !stat( filename, &st );
+}
+
+
 void
-tr_setBlocklist( tr_handle  * handle,
+tr_blocklistSet( tr_handle  * handle,
                  const char * filename )
 {
     FILE * in;
