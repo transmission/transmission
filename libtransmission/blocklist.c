@@ -39,6 +39,7 @@ static struct tr_ip_range * blocklist = NULL;
 static size_t blocklistItemCount = 0;
 static size_t blocklistByteCount = 0;
 static int blocklistFd = -1;
+static int isEnabled = FALSE;
 
 void
 tr_getBlocklistFilename( char * buf, size_t buflen )
@@ -104,10 +105,25 @@ compareAddressToRange( const void * va, const void * vb )
 }
 
 int
+tr_blocklistIsEnabled( const tr_handle * handle UNUSED )
+{
+    return isEnabled;
+}
+
+void
+tr_blocklistSetEnabled( tr_handle * handle UNUSED, int flag )
+{
+    isEnabled = flag ? 1 : 0;
+}
+
+int
 tr_peerIsBlocked( tr_handle * handle UNUSED, const struct in_addr * addr )
 {
     uint32_t needle;
     const struct tr_ip_range * range;
+
+    if( !isEnabled )
+        return FALSE;
 
     if( !blocklist ) {
         loadBlocklist( );

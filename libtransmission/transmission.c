@@ -124,7 +124,8 @@ tr_initFull( const char * tag,
              int          downloadLimit,
              int          globalPeerLimit,
              int          messageLevel,
-             int          isMessageQueueingEnabled )
+             int          isMessageQueueingEnabled,
+             int          isBlocklistEnabled )
 {
     tr_handle * h;
     char buf[128];
@@ -177,6 +178,8 @@ tr_initFull( const char * tag,
               TR_NAME, LONG_VERSION_STRING );
     tr_inf( "%s", buf );
 
+    tr_blocklistSetEnabled( h, isBlocklistEnabled );
+
     tr_statsInit( h );
 
     return h;
@@ -195,7 +198,8 @@ tr_handle * tr_init( const char * tag )
                         -1, /* download speed limit */
                         200, /* globalPeerLimit */
                         TR_MSG_INF, /* message level */
-                        FALSE ); /* is message queueing enabled? */
+                        FALSE, /* is message queueing enabled? */
+                        FALSE ); /* is the blocklist enabled? */
 }
 
 /***

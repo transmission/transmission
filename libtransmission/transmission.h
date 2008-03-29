@@ -87,7 +87,8 @@ tr_handle * tr_initFull( const char * tag,
                          int          downloadLimit,
                          int          globalPeerLimit,
                          int          messageLevel,
-                         int          isMessageQueueingEnabled );
+                         int          isMessageQueueingEnabled,
+                         int          isBlocklistEnabled );
 
 /**
  * Like tr_initFull() but with default values supplied.
@@ -310,6 +311,11 @@ void tr_blocklistSet( tr_handle  * handle,
                       const char * filename );
 
 int tr_blocklistExists( const tr_handle * handle );
+
+int tr_blocklistIsEnabled( const tr_handle * handle );
+
+void tr_blocklistSetEnabled( tr_handle * handle,
+                             int         isEnabled );
 
 
 
