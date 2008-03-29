@@ -80,9 +80,9 @@
         fCurrentSize += length;
     
     #warning factor for unknown size, combine 2 strings - make a single private method
-    [fTextField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"Downloading blocklist (%d%%)", "Blocklist -> message"),
-                                    100 * (fCurrentSize / fExpectedSize)]];
-    [fProgressBar setDoubleValue: fCurrentSize / fExpectedSize];
+    [fTextField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"Downloading blocklist (%.1f%%)",
+        "Blocklist -> message"), 100.0 * ((double)fCurrentSize / fExpectedSize)]];
+    [fProgressBar setDoubleValue: (double)fCurrentSize / fExpectedSize];
 }
 
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
@@ -119,7 +119,8 @@
     [[NSFileManager defaultManager] removeItemAtPath: DESTINATION error: NULL];
     
     [fPrefsController updateBlocklistFields];
-    
+
+    #warning update sheet to show 100%
     [NSApp endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
     [self release];
