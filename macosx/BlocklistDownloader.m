@@ -80,7 +80,7 @@
         fCurrentSize += length;
     
     #warning factor for unknown size, combine 2 strings - make a single private method
-    [fTextField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"Downloading blocklist (%.1f%%)",
+    [fTextField setStringValue: [NSString localizedStringWithFormat: NSLocalizedString(@"Downloading blocklist (%.1f%%)",
         "Blocklist -> message"), 100.0 * ((double)fCurrentSize / fExpectedSize)]];
     [fProgressBar setDoubleValue: (double)fCurrentSize / fExpectedSize];
 }

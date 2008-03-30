@@ -374,9 +374,19 @@
 {
     BOOL exists = tr_blocklistExists(fHandle);
     
-    [fBlocklistMessageField setStringValue: exists
-        ? NSLocalizedString(@"Blocklist is loaded", "Prefs -> blocklist -> message")
-        : NSLocalizedString(@"A blocklist must first be downloaded", "Prefs -> blocklist -> message")];
+    if (exists)
+    {
+        NSNumberFormatter * numberFormatter = [[NSNumberFormatter alloc] init];
+        [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
+        NSString * countString = [numberFormatter stringFromNumber: [NSNumber numberWithInt: tr_blocklistGetRuleCount(fHandle)]];
+        [numberFormatter release];
+        
+        [fBlocklistMessageField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ blocked IP addresses",
+            "Prefs -> blocklist -> message"), countString]];
+    }
+    else 
+        [fBlocklistMessageField setStringValue: NSLocalizedString(@"A blocklist must first be downloaded",
+            "Prefs -> blocklist -> message")];
     
     [fBlocklistEnableCheck setEnabled: exists];
     [fBlocklistEnableCheck setState: exists && [fDefaults boolForKey: @"Blocklist"]];
