@@ -1134,9 +1134,18 @@ typedef enum
     [fAnnounceNextField setStringValue: announceNext > 0 ? [NSString timeString: announceNext showSeconds: YES] : @""];
     
     //scrape fields
-    NSString * scrapeAddress = [[torrent trackerAddress] stringByAppendingString: [torrent trackerAddressScrape]];
-    [fScrapeAddressField setStringValue: scrapeAddress];
-    [fScrapeAddressField setToolTip: scrapeAddress];
+    NSString * scrapeAddressTail;
+    if ((scrapeAddressTail = [torrent trackerAddressScrape]))
+    {
+        NSString * scrapeAddress = [[torrent trackerAddress] stringByAppendingString: scrapeAddressTail];
+        [fScrapeAddressField setStringValue: scrapeAddress];
+        [fScrapeAddressField setToolTip: scrapeAddress];
+    }
+    else
+    {
+        [fScrapeAddressField setStringValue: @""];
+        [fScrapeAddressField setToolTip: @""];
+    }
     
     [fScrapeLastField setObjectValue: [torrent lastScrapeTime]];
     
