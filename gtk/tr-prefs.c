@@ -11,6 +11,7 @@
  */
 
 #include <stdlib.h> /* free() */
+#include <unistd.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 #include <third-party/miniupnp/miniwget.h>
@@ -39,6 +40,8 @@ tr_prefs_init_global( void )
     pref_string_set_default ( PREF_KEY_DIR_WATCH, str );
     pref_flag_set_default   ( PREF_KEY_DIR_WATCH_ENABLED, FALSE );
 #endif
+
+    pref_flag_set_default   ( PREF_KEY_BLOCKLIST_ENABLED, FALSE );
 
     pref_string_set_default ( PREF_KEY_OPEN_DIALOG_FOLDER, g_get_home_dir( ) );
 
@@ -267,6 +270,147 @@ torrentPage( GObject * core )
     return t;
 }
 
+/***
+****
+***/
+
+struct blocklist_data
+{
+    GtkWidget * dialog;
+    TrCore * core;
+    int abortFlag;
+    char secondary[512];
+};
+
+static gboolean
+blocklistDialogSetSecondary( gpointer vdata )
+{
+    struct blocklist_data * data = vdata;
+    GtkMessageDialog * md = GTK_MESSAGE_DIALOG( data->dialog );
+    gtk_message_dialog_format_secondary_text( md, data->secondary );
+    return FALSE;
+}
+
+static gboolean
+blocklistDialogAllowClose( gpointer dialog )
+{
+    GtkDialog * d = GTK_DIALOG( dialog );
+    gtk_dialog_set_response_sensitive( GTK_DIALOG( d ), GTK_RESPONSE_CANCEL, FALSE );
+    gtk_dialog_set_response_sensitive( GTK_DIALOG( d ), GTK_RESPONSE_CLOSE, TRUE );
+    return FALSE;
+}
+
+static gpointer
+updateBlocklist( gpointer vdata )
+{
+    struct blocklist_data * data = vdata;
+    int size = 0;
+    int rules = 0;
+    const char * url;
+    char * text = NULL;
+    gchar * filename = NULL;
+    GError * err = NULL;
+    int fd = -1;
+    int ok = 1;
+
+    url = "http://download.m0k.org/transmission/files/level1.gz";
+
+    if( ok && !data->abortFlag )
+    {
+        g_snprintf( data->secondary, sizeof( data->secondary ),
+                    _( "Retrieving blocklist..." ) );
+        g_idle_add( blocklistDialogSetSecondary, data );
+        text = miniwget( url, &size );
+        if( !data->abortFlag && ( !text || !size ) ) {
+            ok = FALSE;
+            g_snprintf( data->secondary, sizeof( data->secondary ),
+                        _( "Unable to get blocklist." ) );
+            g_idle_add( blocklistDialogSetSecondary, data );
+        }      
+    }
+
+    if( ok && !data->abortFlag )
+    {
+        fd = g_file_open_tmp( "transmission-blockfile-XXXXXX.gz", &filename, &err );
+        if( err ) {
+            g_snprintf( data->secondary, sizeof( data->secondary ),
+                        _( "Unable to get blocklist: %s" ), err->message );
+            g_idle_add( blocklistDialogSetSecondary, data );
+            g_clear_error( &err );
+        } else {
+            write( fd, text, size );
+            close( fd );
+        }
+    }
+    if( ok && !data->abortFlag )
+    {
+        g_snprintf( data->secondary, sizeof( data->secondary ),
+                    _( "Uncompressing blocklist..." ) );
+        g_idle_add( blocklistDialogSetSecondary, data );
+        char * cmd = g_strdup_printf( "gunzip %s", filename );
+        system( cmd );
+        g_free( cmd );
+    }
+    if( ok && !data->abortFlag )
+    {
+        g_snprintf( data->secondary, sizeof( data->secondary ),
+                    _( "Parsing blocklist..." ) );
+        g_idle_add( blocklistDialogSetSecondary, data );
+        filename[ strlen(filename) - 3 ] = '\0';
+        rules = tr_blocklistSetContent( tr_core_handle( data->core ), filename );
+    }
+    if( ok && !data->abortFlag )
+    {
+        g_snprintf( data->secondary, sizeof( data->secondary ),
+                    _( "Blocklist now has %'d rules" ), rules );
+        g_idle_add( blocklistDialogSetSecondary, data );
+        g_idle_add( blocklistDialogAllowClose, data->dialog );
+    }
+
+    free( text );
+    /* g_free( data ); */
+    unlink( filename );
+    return NULL;
+}
+
+static void
+onUpdateBlocklistResponseCB( GtkDialog * dialog, int response, gpointer vdata )
+{
+    struct blocklist_data * data = vdata;
+
+    if( response == GTK_RESPONSE_CANCEL )
+        data->abortFlag = 1;
+
+    data->dialog = NULL;
+    gtk_widget_destroy( GTK_WIDGET( dialog ) );
+}
+
+static void
+onUpdateBlocklistCB( GtkButton * w, gpointer core )
+{
+    GtkWidget * d;
+    struct blocklist_data * data;
+    
+    d = gtk_message_dialog_new( GTK_WINDOW( gtk_widget_get_toplevel( GTK_WIDGET( w ) ) ),
+                                GTK_DIALOG_DESTROY_WITH_PARENT,
+                                GTK_MESSAGE_INFO,
+                                GTK_BUTTONS_NONE,
+                                _( "Updating Blocklist" ) );
+    gtk_dialog_add_buttons( GTK_DIALOG( d ),
+                            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                            GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                            NULL );
+    gtk_dialog_set_response_sensitive( GTK_DIALOG( d ), GTK_RESPONSE_CLOSE, FALSE );
+
+    data = g_new0( struct blocklist_data, 1 );
+    data->dialog = d;
+    data->core = core;
+
+    g_signal_connect( d, "response", G_CALLBACK(onUpdateBlocklistResponseCB), data );
+    gtk_widget_show( d );
+    g_thread_create( updateBlocklist, data, FALSE, NULL );
+}
+
 static GtkWidget*
 peerPage( GObject * core )
 {
@@ -274,6 +418,8 @@ peerPage( GObject * core )
     const char * s;
     GtkWidget * t;
     GtkWidget * w;
+    GtkWidget * b;
+    GtkWidget * h;
 
     t = hig_workarea_create( );
     hig_workarea_add_section_title (t, &row, _("Options"));
@@ -294,6 +440,21 @@ peerPage( GObject * core )
         hig_workarea_add_row( t, &row, _( "Maximum peers _overall:" ), w, NULL );
         w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300, 5 );
         hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
+
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Blocklist" ) );
+
+        s = _("Use IP _blocklist from bluetack.co.uk" );
+        w = new_check_button( s, PREF_KEY_BLOCKLIST_ENABLED, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+        b = gtk_button_new_with_mnemonic( _( "_Update Blocklist" ) );
+        g_signal_connect( b, "clicked", G_CALLBACK(onUpdateBlocklistCB), core );
+        gtk_widget_set_sensitive( GTK_WIDGET(b), pref_flag_get( PREF_KEY_BLOCKLIST_ENABLED ) );
+        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), b );
+        h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
+        gtk_box_pack_start( GTK_BOX(h), b, FALSE, FALSE, 0 );
+        hig_workarea_add_wide_control( t, &row, h );
 
     hig_workarea_finish( t, &row );
     return t;

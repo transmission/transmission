@@ -463,7 +463,8 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
                      pref_int_get( PREF_KEY_DL_LIMIT ),
                      pref_int_get( PREF_KEY_MAX_PEERS_GLOBAL ),
                      pref_int_get( PREF_KEY_MSGLEVEL ),
-                     TRUE /* message queueing */ );
+                     TRUE, /* message queueing */
+                     pref_flag_get( PREF_KEY_BLOCKLIST_ENABLED ) );
 
     /* create the model used to store torrent data */
     g_assert( ALEN( types ) == MC_ROW_COUNT );
