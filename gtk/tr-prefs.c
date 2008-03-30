@@ -444,14 +444,12 @@ peerPage( GObject * core )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Blocklist" ) );
 
-        s = _("Use IP _blocklist from bluetack.co.uk" );
+        s = _( "Prevent peers in the _blocklist from connecting" );
         w = new_check_button( s, PREF_KEY_BLOCKLIST_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
 
         b = gtk_button_new_with_mnemonic( _( "_Update Blocklist" ) );
         g_signal_connect( b, "clicked", G_CALLBACK(onUpdateBlocklistCB), core );
-        gtk_widget_set_sensitive( GTK_WIDGET(b), pref_flag_get( PREF_KEY_BLOCKLIST_ENABLED ) );
-        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), b );
         h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
         gtk_box_pack_start( GTK_BOX(h), b, FALSE, FALSE, 0 );
         hig_workarea_add_wide_control( t, &row, h );
