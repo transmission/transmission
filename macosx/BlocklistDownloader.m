@@ -113,7 +113,7 @@
     fDownload = nil;
  
     //process data
-    tr_blocklistSet(fHandle, [DESTINATION UTF8String]);
+    tr_blocklistSetContent(fHandle, [DESTINATION UTF8String]);
     
     //delete downloaded file
     [[NSFileManager defaultManager] removeItemAtPath: DESTINATION error: NULL];
