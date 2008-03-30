@@ -589,13 +589,13 @@ tr_metainfoSave( const char * hash, const char * tag,
     file = fopen( path, "wb+" );
     if( !file )
     {
-        tr_err( _( "Couldn't open \"%s\": %s" ), path, tr_strerror( errno ) );
+        tr_err( _( "Couldn't open \"%1$s\": %2$s" ), path, tr_strerror( errno ) );
         return TR_EINVALID;
     }
     fseek( file, 0, SEEK_SET );
     if( fwrite( buf, 1, buflen, file ) != buflen )
     {
-        tr_err( _( "Couldn't save file \"%s\": %s" ), path, tr_strerror( errno ) );
+        tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), path, tr_strerror( errno ) );
         fclose( file );
         return TR_EINVALID;
     }

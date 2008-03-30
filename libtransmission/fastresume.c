@@ -188,7 +188,7 @@ tr_fastResumeSave( const tr_torrent * tor )
     fastResumeFileName( path, sizeof path, tor, 1 );
     file = fopen( path, "wb+" );
     if( !file ) {
-        tr_torerr( tor, _( "Couldn't open \"%s\": %s" ), path, tr_strerror( errno ) );
+        tr_torerr( tor, _( "Couldn't open \"%1$s\": %2$s" ), path, tr_strerror( errno ) );
         return;
     }
     
@@ -543,7 +543,7 @@ parsePeers( tr_torrent * tor, const uint8_t * buf, uint32_t len )
             tr_peerMgrAddPex( tor->handle->peerMgr, tor->info.hash, TR_PEER_FROM_CACHE, &pex );
         }
 
-        tr_tordbg( tor, _( "Loaded %i peers from resume file" ), count );
+        tr_tordbg( tor, _( "Loaded %d peers from resume file" ), count );
         ret = TR_FR_PEERS;
     }
 

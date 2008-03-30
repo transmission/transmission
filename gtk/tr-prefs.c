@@ -368,7 +368,7 @@ updateBlocklist( gpointer vdata )
     if( ok && !data->abortFlag )
     {
         g_snprintf( data->secondary, sizeof( data->secondary ),
-                    _( "Blocklist now has %'d rules" ), rules );
+                    _( "Blocklist updated with %'d rules" ), rules );
         g_idle_add( blocklistDialogSetSecondary, data );
         g_idle_add( blocklistDialogAllowClose, data->dialog );
     }

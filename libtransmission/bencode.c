@@ -690,7 +690,7 @@ static void
 saveStringFunc( const tr_benc * val, void * vevbuf )
 {
     struct evbuffer * evbuf = vevbuf;
-    evbuffer_add_printf( evbuf, "%i:", val->val.s.i );
+    evbuffer_add_printf( evbuf, "%d:", val->val.s.i );
     evbuffer_add( evbuf, val->val.s.s, val->val.s.i );
 }
 static void

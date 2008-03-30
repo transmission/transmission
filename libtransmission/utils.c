@@ -394,18 +394,19 @@ tr_loadFile( const char * path, size_t * size )
     uint8_t    * buf;
     struct stat  sb;
     FILE       * file;
+    const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
 
     /* try to stat the file */
     errno = 0;
     if( stat( path, &sb ) )
     {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), path, tr_strerror(errno) );
+        tr_dbg( err_fmt, path, tr_strerror(errno) );
         return NULL;
     }
 
     if( ( sb.st_mode & S_IFMT ) != S_IFREG )
     {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), path, _( "Not a regular file" ) );
+        tr_err( err_fmt, path, _( "Not a regular file" ) );
         return NULL;
     }
 
@@ -413,20 +414,20 @@ tr_loadFile( const char * path, size_t * size )
     file = fopen( path, "rb" );
     if( !file )
     {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), path, tr_strerror(errno) );
+        tr_err( err_fmt, path, tr_strerror(errno) );
         return NULL;
     }
     buf = malloc( sb.st_size );
     if( NULL == buf )
     {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), path, _( "Memory allocation failed" ) );
+        tr_err( err_fmt, path, _( "Memory allocation failed" ) );
         fclose( file );
         return NULL;
     }
     fseek( file, 0, SEEK_SET );
     if( fread( buf, sb.st_size, 1, file ) != 1 )
     {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), path, tr_strerror(errno) );
+        tr_err( err_fmt, path, tr_strerror(errno) );
         free( buf );
         fclose( file );
         return NULL;
@@ -481,7 +482,7 @@ tr_mkdirp( const char * path_in, int permissions )
             /* Folder doesn't exist yet */
             if( tr_mkdir( path, permissions ) ) {
                 const int err = errno;
-                tr_err( _( "Couldn't create \"%s\": %s" ), path, tr_strerror( err ) );
+                tr_err( _( "Couldn't create \"%1$s\": %2$s" ), path, tr_strerror( err ) );
                 tr_free( path );
                 errno = err;
                 return -1;
@@ -492,7 +493,7 @@ tr_mkdirp( const char * path_in, int permissions )
             /* Node exists but isn't a folder */
             char buf[MAX_PATH_LENGTH];
             snprintf( buf, sizeof( buf ), _( "File \"%s\" is in the way" ), path );
-            tr_err( _( "Couldn't create \"%s\": %s" ), path_in, buf );
+            tr_err( _( "Couldn't create \"%1$s\": %2$s" ), path_in, buf );
             tr_free( path );
             errno = ENOTDIR;
             return -1;

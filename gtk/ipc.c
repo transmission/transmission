@@ -270,7 +270,7 @@ client_connect(char *path, struct constate *con) {
   strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
 
   if(0 > connect(con->fd, (struct sockaddr*)&addr, SUN_LEN(&addr))) {
-    g_message( _("Couldn't connect to \"%s\": %s"), path, g_strerror(errno));
+    g_message( _("Couldn't connect to \"%1$s\": %2$s"), path, g_strerror(errno));
     return FALSE;
   }
 
@@ -477,7 +477,7 @@ serv_bind(struct constate *con) {
   return;
 
  fail:
-  errmsg(con->u.serv.wind, _("Couldn't set up socket: %s"),
+  errmsg(con->u.serv.wind, _("Couldn't create socket: %s"),
          g_strerror(errno));
   if(0 <= con->fd)
     EVUTIL_CLOSESOCKET(con->fd);

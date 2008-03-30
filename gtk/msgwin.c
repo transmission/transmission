@@ -81,7 +81,7 @@ doSave( GtkWindow      * parent,
     if( !fp )
     {
         errmsg( parent,
-                _("Couldn't save file \"%s\": %s"),
+                _("Couldn't save file \"%1$s\": %2$s"),
                 filename, g_strerror( errno ) );
     }
     else

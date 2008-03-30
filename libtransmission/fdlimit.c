@@ -163,7 +163,7 @@ TrOpenFile( int           i,
     file->fd = open( filename, flags, 0666 );
     if( file->fd == -1 ) {
         const int err = errno;
-        tr_err( _( "Couldn't open \"%s\": %s" ), filename, tr_strerror(err) );
+        tr_err( _( "Couldn't open \"%1$s\": %2$s" ), filename, tr_strerror(err) );
         return tr_ioErrorFromErrno( err );
     }
 

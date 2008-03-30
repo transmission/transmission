@@ -70,22 +70,23 @@ blocklistLoad( tr_blocklist * b )
 {
     int fd;
     struct stat st;
+    const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
 
     blocklistClose( b );
 
     fd = open( b->filename, O_RDONLY );
     if( fd == -1 ) {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), b->filename, tr_strerror(errno) );
+        tr_err( err_fmt, b->filename, tr_strerror(errno) );
         return;
     }
     if( fstat( fd, &st ) == -1 ) {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), b->filename, tr_strerror(errno) );
+        tr_err( err_fmt, b->filename, tr_strerror(errno) );
         close( fd );
         return;
     }
     b->rules = mmap( 0, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0 );
     if( !b->rules ) {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), b->filename, tr_strerror(errno) );
+        tr_err( err_fmt, b->filename, tr_strerror(errno) );
         close( fd );
         return;
     }
@@ -93,7 +94,7 @@ blocklistLoad( tr_blocklist * b )
     b->byteCount = st.st_size;
     b->ruleCount = st.st_size / sizeof( struct tr_ip_range );
     b->fd = fd;
-    tr_inf( _( "Blocklist contains %'d IP ranges" ), b->ruleCount );
+    tr_inf( _( "Blocklist contains %'d rules" ), b->ruleCount );
 }
 
 static void
@@ -212,6 +213,7 @@ tr_blocklistSetContent( tr_handle  * handle,
     FILE * out;
     char * line;
     int lineCount = 0;
+    const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
 
     if( !filename ) {
         blocklistDelete( b );
@@ -220,7 +222,7 @@ tr_blocklistSetContent( tr_handle  * handle,
 
     in = fopen( filename, "r" );
     if( !in ) {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), filename, tr_strerror(errno) );
+        tr_err( err_fmt, filename, tr_strerror(errno) );
         return 0;
     }
 
@@ -228,7 +230,7 @@ tr_blocklistSetContent( tr_handle  * handle,
   
     out = fopen( b->filename, "wb+" );
     if( !out ) {
-        tr_err( _( "Couldn't save file \"%s\": %s" ), b->filename, tr_strerror( errno ) );
+        tr_err( err_fmt, b->filename, tr_strerror( errno ) );
         fclose( in );
         return 0;
     }
@@ -259,14 +261,14 @@ tr_blocklistSetContent( tr_handle  * handle,
         free( line );
 
         if( fwrite( &range, sizeof(struct tr_ip_range), 1, out ) != 1 ) {
-          tr_err( _( "Couldn't save file \"%s\": %s" ), b->filename, tr_strerror( errno ) );
+          tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), b->filename, tr_strerror( errno ) );
           break;
         }
 
         ++lineCount;
     }
 
-    tr_inf( _( "Blocklist updated with %'d IP ranges" ), lineCount );
+    tr_inf( _( "Blocklist updated with %'d rules" ), lineCount );
 
     fclose( out );
     fclose( in );
