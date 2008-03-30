@@ -13,6 +13,13 @@
 #ifndef TR_BLOCKLIST_H
 #define TR_BLOCKLIST_H
 
+typedef struct tr_blocklist tr_blocklist;
+
+tr_blocklist * tr_blocklistNew( int isEnabled );
+
+void tr_blocklistFree( tr_blocklist * );
+
+
 struct tr_handle;
 struct in_addr;
 

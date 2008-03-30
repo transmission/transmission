@@ -24,89 +24,83 @@
 #include "ggets.h"
 
 #include "transmission.h"
-#include "internal.h"
-#include "net.h" /* tr_netResolve */
-#include "platform.h" /* tr_getPrefsDirectory() */
-#include "utils.h" /* tr_buildPath() */
+#include "blocklist.h"
+#include "net.h"            /* tr_netResolve() */
+#include "platform.h"       /* tr_getPrefsDirectory() */
+#include "utils.h"          /* tr_buildPath() */
 
 struct tr_ip_range
 {
-  uint32_t begin;
-  uint32_t end;
+    uint32_t begin;
+    uint32_t end;
 };
 
-static struct tr_ip_range * blocklist = NULL;
-static size_t blocklistItemCount = 0;
-static size_t blocklistByteCount = 0;
-static int blocklistFd = -1;
-static int isEnabled = FALSE;
+struct tr_blocklist
+{
+    struct tr_ip_range * rules;
+    size_t ruleCount;
+    size_t byteCount;
+    int fd;
+    int isEnabled;
+    char * filename;
+};
 
 void
-tr_getBlocklistFilename( char * buf, size_t buflen )
+blocklistFilename( char * buf, size_t buflen )
 {
     tr_buildPath( buf, buflen, tr_getPrefsDirectory(), "blocklist", NULL ); 
 }
 
 static void
-closeBlocklist( void )
+blocklistClose( tr_blocklist * b )
 {
-    if( blocklist )
+    if( b->rules )
     {
-        munmap( blocklist, blocklistByteCount );
-        close( blocklistFd );
-        blocklist = NULL;
-        blocklistItemCount = 0;
-        blocklistByteCount = 0;
-        blocklistFd  = -1;
+        munmap( b->rules, b->byteCount );
+        close( b->fd );
+        b->rules = NULL;
+        b->ruleCount = 0;
+        b->byteCount = 0;
+        b->fd = -1;
     }
 }
 
 static void
-loadBlocklist( void )
+blocklistLoad( tr_blocklist * b )
 {
     int fd;
     struct stat st;
-    char filename[MAX_PATH_LENGTH];
-    tr_getBlocklistFilename( filename, sizeof( filename ) );
 
-    closeBlocklist( );
+    blocklistClose( b );
 
-    fd = open( filename, O_RDONLY );
+    fd = open( b->filename, O_RDONLY );
     if( fd == -1 ) {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), filename, tr_strerror(errno) );
+        tr_err( _( "Couldn't read file \"%s\": %s" ), b->filename, tr_strerror(errno) );
         return;
     }
     if( fstat( fd, &st ) == -1 ) {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), filename, tr_strerror(errno) );
+        tr_err( _( "Couldn't read file \"%s\": %s" ), b->filename, tr_strerror(errno) );
         close( fd );
         return;
     }
-    blocklist = mmap( 0, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0 );
-    if( !blocklist ) {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), filename, tr_strerror(errno) );
+    b->rules = mmap( 0, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0 );
+    if( !b->rules ) {
+        tr_err( _( "Couldn't read file \"%s\": %s" ), b->filename, tr_strerror(errno) );
         close( fd );
         return;
     }
 
-    blocklistByteCount = st.st_size;
-    blocklistItemCount = blocklistByteCount / sizeof( struct tr_ip_range );
-    blocklistFd = fd;
-    tr_inf( _( "Blocklist contains %'d IP ranges" ), blocklistItemCount );
+    b->byteCount = st.st_size;
+    b->ruleCount = st.st_size / sizeof( struct tr_ip_range );
+    b->fd = fd;
+    tr_inf( _( "Blocklist contains %'d IP ranges" ), b->ruleCount );
 }
 
 static void
-ensureBlocklistIsLoaded( tr_handle * handle UNUSED )
+ensureBlocklistIsLoaded( tr_blocklist * b )
 {
-    if( !blocklist )
-        loadBlocklist( );
-}
-
-int
-tr_blocklistGetRuleCount( tr_handle * handle )
-{
-    ensureBlocklistIsLoaded( handle );
-
-    return blocklistItemCount;
+    if( !b->rules )
+        blocklistLoad( b );
 }
 
 static int
@@ -119,73 +113,108 @@ compareAddressToRange( const void * va, const void * vb )
     return 0;
 }
 
-int
-tr_blocklistIsEnabled( const tr_handle * handle UNUSED )
+static void
+blocklistDelete( tr_blocklist * b )
 {
-    return isEnabled;
+    blocklistClose( b );
+    unlink( b->filename );
+}
+
+/***
+****
+***/
+
+tr_blocklist *
+tr_blocklistNew( int isEnabled )
+{
+    tr_blocklist * b;
+    char filename[MAX_PATH_LENGTH];
+
+    blocklistFilename( filename, sizeof( filename ) );
+
+    b = tr_new0( tr_blocklist, 1 );
+    b->fd = -1;
+    b->filename = tr_strdup( filename );
+    b->isEnabled = isEnabled;
+
+    return b;
 }
 
 void
-tr_blocklistSetEnabled( tr_handle * handle UNUSED, int flag )
+tr_blocklistFree( tr_blocklist * b )
 {
-    isEnabled = flag ? 1 : 0;
+    blocklistClose( b );
+    tr_free( b->filename );
+    tr_free( b );
+}
+
+
+int
+tr_blocklistGetRuleCount( tr_handle * handle )
+{
+    tr_blocklist * b = handle->blocklist;
+
+    ensureBlocklistIsLoaded( b );
+
+    return b->ruleCount;
 }
 
 int
-tr_peerIsBlocked( tr_handle * handle, const struct in_addr * addr )
+tr_blocklistIsEnabled( const tr_handle * handle )
+{
+    return handle->blocklist->isEnabled;
+}
+
+void
+tr_blocklistSetEnabled( tr_handle * handle, int isEnabled )
+{
+    handle->blocklist->isEnabled = isEnabled ? 1 : 0;
+}
+
+int
+tr_peerIsBlocked( const tr_handle * handle, const struct in_addr * addr )
 {
     uint32_t needle;
     const struct tr_ip_range * range;
+    tr_blocklist * b = handle->blocklist;
 
-    if( !isEnabled )
-        return FALSE;
+    if( !b->isEnabled )
+        return 0;
 
-    ensureBlocklistIsLoaded( handle );
-    if( !blocklist )
-        return FALSE;
+    ensureBlocklistIsLoaded( b );
+    if( !b->rules )
+        return 0;
 
     needle = ntohl( addr->s_addr );
 
     range = bsearch( &needle,
-                     blocklist,
-                     blocklistItemCount,
+                     b->rules,
+                     b->ruleCount,
                      sizeof( struct tr_ip_range ), 
                      compareAddressToRange );
 
     return range != NULL;
 }
 
-static void
-deleteBlocklist( tr_handle * handle UNUSED )
-{
-    char filename[MAX_PATH_LENGTH];
-    tr_getBlocklistFilename( filename, sizeof( filename ) );
-    closeBlocklist( );
-    unlink( filename );
-}
-
 int
-tr_blocklistExists( const tr_handle * handle UNUSED )
+tr_blocklistExists( const tr_handle * handle )
 {
     struct stat st;
-    char filename[MAX_PATH_LENGTH];
-    tr_getBlocklistFilename( filename, sizeof( filename ) );
-    return !stat( filename, &st );
+    return !stat( handle->blocklist->filename, &st );
 }
-
 
 int
 tr_blocklistSetContent( tr_handle  * handle,
                         const char * filename )
 {
+    tr_blocklist * b = handle->blocklist;
     FILE * in;
     FILE * out;
     char * line;
-    char outfile[MAX_PATH_LENGTH];
     int lineCount = 0;
 
-    if( filename == NULL ) {
-        deleteBlocklist( handle );
+    if( !filename ) {
+        blocklistDelete( b );
         return 0;
     }
 
@@ -195,12 +224,11 @@ tr_blocklistSetContent( tr_handle  * handle,
         return 0;
     }
 
-    closeBlocklist( );
+    blocklistClose( b );
   
-    tr_getBlocklistFilename( outfile, sizeof( outfile ) );
-    out = fopen( outfile, "wb+" );
+    out = fopen( b->filename, "wb+" );
     if( !out ) {
-        tr_err( _( "Couldn't save file \"%s\": %s" ), outfile, tr_strerror( errno ) );
+        tr_err( _( "Couldn't save file \"%s\": %s" ), b->filename, tr_strerror( errno ) );
         fclose( in );
         return 0;
     }
@@ -231,7 +259,7 @@ tr_blocklistSetContent( tr_handle  * handle,
         free( line );
 
         if( fwrite( &range, sizeof(struct tr_ip_range), 1, out ) != 1 ) {
-          tr_err( _( "Couldn't save file \"%s\": %s" ), outfile, tr_strerror( errno ) );
+          tr_err( _( "Couldn't save file \"%s\": %s" ), b->filename, tr_strerror( errno ) );
           break;
         }
 
@@ -243,7 +271,7 @@ tr_blocklistSetContent( tr_handle  * handle,
     fclose( out );
     fclose( in );
 
-    loadBlocklist( );
+    blocklistLoad( b );
 
     return lineCount;
 }

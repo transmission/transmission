@@ -33,6 +33,7 @@
 #include <dirent.h> /* opendir */
 
 #include "transmission.h"
+#include "blocklist.h"
 #include "fdlimit.h"
 #include "list.h"
 #include "net.h"
@@ -178,7 +179,7 @@ tr_initFull( const char * tag,
               TR_NAME, LONG_VERSION_STRING );
     tr_inf( "%s", buf );
 
-    tr_blocklistSetEnabled( h, isBlocklistEnabled );
+    h->blocklist = tr_blocklistNew( isBlocklistEnabled );
 
     tr_statsInit( h );
 
@@ -375,6 +376,9 @@ tr_closeImpl( void * vh )
 
     tr_sharedShuttingDown( h->shared );
     tr_trackerShuttingDown( h );
+
+    tr_blocklistFree( h->blocklist );
+    h->blocklist = NULL;
 
     for( t=h->torrentList; t!=NULL; ) {
         tr_torrent * tmp = t;

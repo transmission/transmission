@@ -71,6 +71,7 @@ struct tr_handle
     struct tr_ratecontrol    * upload;
     struct tr_ratecontrol    * download;
 
+    struct tr_blocklist      * blocklist;
     struct tr_peerMgr        * peerMgr;
     struct tr_shared         * shared;
 

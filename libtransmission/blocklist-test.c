@@ -20,7 +20,7 @@
     } \
 }
 
-extern void tr_getBlocklistFilename( char * buf, size_t buflen );
+extern void blocklistFilename( char * buf, size_t buflen );
 
 static void
 createTestBlocklist( const char * tmpfile )
@@ -53,7 +53,7 @@ main( void )
     handle = tr_init( "unit-tests" );
 
     /* backup the real blocklist */
-    tr_getBlocklistFilename( fname, sizeof( fname ) );
+    blocklistFilename( fname, sizeof( fname ) );
     snprintf( bak, sizeof( bak ), "%s.bak", fname );
     rename( fname, bak );
 
