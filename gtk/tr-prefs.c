@@ -309,7 +309,6 @@ updateBlocklist( gpointer vdata )
     const char * url;
     char * text = NULL;
     gchar * filename = NULL;
-    GError * err = NULL;
     int fd = -1;
     int ok = 1;
 
@@ -325,18 +324,22 @@ updateBlocklist( gpointer vdata )
             ok = FALSE;
             g_snprintf( data->secondary, sizeof( data->secondary ),
                         _( "Unable to get blocklist." ) );
+            g_message( data->secondary );
             g_idle_add( blocklistDialogSetSecondary, data );
         }      
     }
 
     if( ok && !data->abortFlag )
     {
+        GError * err = NULL;
         fd = g_file_open_tmp( "transmission-blockfile-XXXXXX.gz", &filename, &err );
         if( err ) {
             g_snprintf( data->secondary, sizeof( data->secondary ),
                         _( "Unable to get blocklist: %s" ), err->message );
+            g_warning( data->secondary );
             g_idle_add( blocklistDialogSetSecondary, data );
             g_clear_error( &err );
+            ok = FALSE;
         } else {
             write( fd, text, size );
             close( fd );
