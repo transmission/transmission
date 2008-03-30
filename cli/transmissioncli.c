@@ -151,7 +151,8 @@ main( int argc, char ** argv )
                      downloadLimit,           /* download speed limit */
                      512,                     /* globalPeerLimit */
                      verboseLevel + 1,        /* messageLevel */
-                     0 );                     /* is message queueing enabled? */
+                     0,                       /* is message queueing enabled? */
+                     0 );                     /* use the blocklist? */
 
     if( sourceFile && *sourceFile ) /* creating a torrent */
     {
