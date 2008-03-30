@@ -739,7 +739,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) trackerAddressScrape
 {
-    return [NSString stringWithUTF8String: fStat->tracker->scrape];
+    return fStat->tracker->scrape ? [NSString stringWithUTF8String: fStat->tracker->scrape] : nil;
 }
 
 - (NSDate *) lastScrapeTime
