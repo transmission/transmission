@@ -978,6 +978,26 @@ ensureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8
     }
 }
 
+static void
+maybeEnsureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8_t flags, uint8_t from )
+{
+    if( tr_peerIsBlocked( t->manager->handle, addr ) )
+    {
+        char * fmt = NULL;
+        switch( from ) {
+            case TR_PEER_FROM_TRACKER:  fmt = _( "Banned IP address \"%s\" was given to us by the tracker" ); break;
+            case TR_PEER_FROM_CACHE:    fmt = _( "Banned IP address \"%s\" was found in the cache" ); break;
+            case TR_PEER_FROM_PEX:      fmt = _( "Banned IP address \"%s\" was given to us by another peer" ); break;
+            case TR_PEER_FROM_INCOMING: fmt = _( "Banned IP address \"%s\" tried to connect to us" ); break;
+        }
+        tr_torinf( t->tor, fmt, inet_ntoa( *addr ) );
+    }
+    else
+    {
+        ensureAtomExists( t, addr, port, flags, from );
+    }
+}
+
 static int
 getMaxPeerCount( const tr_torrent * tor UNUSED )
 {
@@ -1081,8 +1101,13 @@ tr_peerMgrAddIncoming( tr_peerMgr      * manager,
 {
     managerLock( manager );
 
-    if( tr_peerIsBlocked( manager->handle, addr )
-        || getExistingHandshake( manager->incomingHandshakes, addr ) )
+    if( tr_peerIsBlocked( manager->handle, addr ) )
+    {
+        tr_inf( _( "Banned IP address \"%s\" tried to connect to us" ),
+                inet_ntoa( *addr ) );
+        tr_netClose( socket );
+    }
+    else if( getExistingHandshake( manager->incomingHandshakes, addr ) )
     {
         tr_netClose( socket );
     }
@@ -1116,7 +1141,7 @@ tr_peerMgrAddPex( tr_peerMgr     * manager,
     managerLock( manager );
 
     t = getExistingTorrent( manager, torrentHash );
-    ensureAtomExists( t, &pex->in_addr, pex->port, pex->flags, from );
+    maybeEnsureAtomExists( t, &pex->in_addr, pex->port, pex->flags, from );
 
     managerUnlock( manager );
 }
@@ -1141,7 +1166,7 @@ tr_peerMgrAddPeers( tr_peerMgr    * manager,
         uint16_t port;
         memcpy( &addr, walk, 4 ); walk += 4;
         memcpy( &port, walk, 2 ); walk += 2;
-        ensureAtomExists( t, &addr, port, 0, from );
+        maybeEnsureAtomExists( t, &addr, port, 0, from );
     }
 
     managerUnlock( manager );
