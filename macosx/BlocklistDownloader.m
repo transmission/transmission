@@ -33,6 +33,7 @@
 
 - (id) initWithPrefsController: (PrefsController *) prefsController withHandle: (tr_handle *) handle;
 - (void) startDownload;
+- (void) updateProcessString;
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info;
 
 @end
@@ -68,21 +69,14 @@
     
     //change from indeterminate to progress
     
-    [fProgressBar setIndeterminate: NO];
-    [fTextField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"Downloading blocklist (%d%%)", "Blocklist -> message"),
-                                    0]];
-    [fProgressBar setDoubleValue: 0];
+    [fProgressBar setIndeterminate: fExpectedSize == NSURLResponseUnknownLength];
+    [self updateProcessString];
 }
 
 - (void) download: (NSURLDownload *) download didReceiveDataOfLength: (NSUInteger) length
 {
-    if (fExpectedSize != NSURLResponseUnknownLength)
-        fCurrentSize += length;
-    
-    #warning factor for unknown size, combine 2 strings - make a single private method
-    [fTextField setStringValue: [NSString localizedStringWithFormat: NSLocalizedString(@"Downloading blocklist (%.1f%%)",
-        "Blocklist -> message"), 100.0 * ((double)fCurrentSize / fExpectedSize)]];
-    [fProgressBar setDoubleValue: (double)fCurrentSize / fExpectedSize];
+    fCurrentSize += length;
+    [self updateProcessString];
 }
 
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
@@ -97,11 +91,11 @@
     
     NSAlert * alert = [[[NSAlert alloc] init] autorelease];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Blocklist -> button")];
-    [alert setMessageText: NSLocalizedString(@"Download failed!", "Blocklist -> message")];
+    [alert setMessageText: NSLocalizedString(@"Download of the blocklist failed.", "Blocklist -> message")];
     [alert setAlertStyle: NSWarningAlertStyle];
     
-    [alert setInformativeText: [NSString stringWithFormat: @"%@ - %@ %@", NSLocalizedString(@"Error", "Blocklist -> message"),
-        [error localizedDescription], [[error userInfo] objectForKey:NSErrorFailingURLStringKey]]];
+    [alert setInformativeText: [NSString stringWithFormat: @"%@ - %@", NSLocalizedString(@"Error", "Blocklist -> message"),
+        [error localizedDescription]]];
     
     [alert beginSheetModalForWindow: [fPrefsController window] modalDelegate: self
         didEndSelector: @selector(failureSheetClosed:returnCode:contextInfo:) contextInfo: nil];
@@ -111,7 +105,11 @@
 {
     [fDownload release];
     fDownload = nil;
- 
+    
+    //display progress as 100%
+    fCurrentSize = fExpectedSize;
+    [self updateProcessString];
+    
     //process data
     tr_blocklistSetContent(fHandle, [DESTINATION UTF8String]);
     
@@ -119,8 +117,7 @@
     [[NSFileManager defaultManager] removeItemAtPath: DESTINATION error: NULL];
     
     [fPrefsController updateBlocklistFields];
-
-    #warning update sheet to show 100%
+    
     [NSApp endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
     [self release];
@@ -154,6 +151,19 @@
     [fTextField setStringValue: [NSLocalizedString(@"Connecting to site", "Blocklist -> message") stringByAppendingEllipsis]];
     
     [NSApp beginSheet: fStatusWindow modalForWindow: [fPrefsController window] modalDelegate: nil didEndSelector: nil contextInfo: nil];
+}
+
+- (void) updateProcessString
+{
+    NSString * string = NSLocalizedString(@"Downloading blocklist", "Blocklist -> message");
+    if (fExpectedSize != NSURLResponseUnknownLength)
+    {
+        double progress = (double)fCurrentSize / fExpectedSize;
+        string = [string stringByAppendingString: [NSString localizedStringWithFormat: @" (%.1f%%)", 100.0 * progress]];
+        [fProgressBar setDoubleValue: progress];
+    }
+    
+    [fTextField setStringValue: string];
 }
 
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info
