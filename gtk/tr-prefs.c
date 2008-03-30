@@ -16,6 +16,7 @@
 #include <gtk/gtk.h>
 #include <third-party/miniupnp/miniwget.h>
 #include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
 #include "conf.h"
 #include "hig.h"
 #include "tr-core.h"
@@ -309,6 +310,7 @@ updateBlocklist( gpointer vdata )
     const char * url;
     char * text = NULL;
     gchar * filename = NULL;
+    gchar * filename2 = NULL;
     int fd = -1;
     int ok = 1;
 
@@ -332,7 +334,7 @@ updateBlocklist( gpointer vdata )
     if( ok && !data->abortFlag )
     {
         GError * err = NULL;
-        fd = g_file_open_tmp( "transmission-blockfile-XXXXXX.gz", &filename, &err );
+        fd = g_file_open_tmp( "transmission-blockfile-XXXXXX", &filename, &err );
         if( err ) {
             g_snprintf( data->secondary, sizeof( data->secondary ),
                         _( "Unable to get blocklist: %s" ), err->message );
@@ -347,10 +349,12 @@ updateBlocklist( gpointer vdata )
     }
     if( ok && !data->abortFlag )
     {
+        filename2 = g_strdup_printf( "%s.txt", filename );
         g_snprintf( data->secondary, sizeof( data->secondary ),
                     _( "Uncompressing blocklist..." ) );
         g_idle_add( blocklistDialogSetSecondary, data );
-        char * cmd = g_strdup_printf( "gunzip %s", filename );
+        char * cmd = g_strdup_printf( "zcat %s > %s ", filename, filename2 );
+        tr_dbg( "%s", cmd );
         system( cmd );
         g_free( cmd );
     }
@@ -359,8 +363,7 @@ updateBlocklist( gpointer vdata )
         g_snprintf( data->secondary, sizeof( data->secondary ),
                     _( "Parsing blocklist..." ) );
         g_idle_add( blocklistDialogSetSecondary, data );
-        filename[ strlen(filename) - 3 ] = '\0';
-        rules = tr_blocklistSetContent( tr_core_handle( data->core ), filename );
+        rules = tr_blocklistSetContent( tr_core_handle( data->core ), filename2 );
     }
     if( ok && !data->abortFlag )
     {
@@ -372,7 +375,14 @@ updateBlocklist( gpointer vdata )
 
     free( text );
     /* g_free( data ); */
-    unlink( filename );
+    if( filename2 ) {
+        unlink( filename2 );
+        g_free( filename2 );
+    }
+    if( filename ) {
+        unlink( filename );
+        g_free( filename );
+    }
     return NULL;
 }
 
