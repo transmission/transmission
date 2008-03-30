@@ -381,7 +381,7 @@
         NSString * countString = [numberFormatter stringFromNumber: [NSNumber numberWithInt: tr_blocklistGetRuleCount(fHandle)]];
         [numberFormatter release];
         
-        [fBlocklistMessageField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ blocked IP addresses",
+        [fBlocklistMessageField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ IP addresses in list",
             "Prefs -> blocklist -> message"), countString]];
     }
     else 

@@ -2665,13 +2665,13 @@ AAABAAAAAQ</bytes>
 					<object class="NSButton" id="506423467">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{135, 101}, {313, 18}}</string>
+						<string key="NSFrame">{{135, 101}, {289, 18}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="432256369">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">Prevent peers in the blocklist from connecting</string>
+							<string key="NSContents">Prevent known bad peers from connecting</string>
 							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="506423467"/>
 							<int key="NSButtonFlags">1211912703</int>
