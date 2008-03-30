@@ -94,6 +94,21 @@ loadBlocklist( void )
     tr_inf( _( "Blocklist contains %'d IP ranges" ), blocklistItemCount );
 }
 
+static void
+ensureBlocklistIsLoaded( tr_handle * handle UNUSED )
+{
+    if( !blocklist )
+        loadBlocklist( );
+}
+
+int
+tr_blocklistGetRuleCount( tr_handle * handle )
+{
+    ensureBlocklistIsLoaded( handle );
+
+    return blocklistItemCount;
+}
+
 static int
 compareAddressToRange( const void * va, const void * vb )
 {
@@ -117,7 +132,7 @@ tr_blocklistSetEnabled( tr_handle * handle UNUSED, int flag )
 }
 
 int
-tr_peerIsBlocked( tr_handle * handle UNUSED, const struct in_addr * addr )
+tr_peerIsBlocked( tr_handle * handle, const struct in_addr * addr )
 {
     uint32_t needle;
     const struct tr_ip_range * range;
@@ -125,11 +140,9 @@ tr_peerIsBlocked( tr_handle * handle UNUSED, const struct in_addr * addr )
     if( !isEnabled )
         return FALSE;
 
-    if( !blocklist ) {
-        loadBlocklist( );
-        if( !blocklist )
-            return FALSE;
-    }
+    ensureBlocklistIsLoaded( handle );
+    if( !blocklist )
+        return FALSE;
 
     needle = ntohl( addr->s_addr );
 
@@ -161,9 +174,9 @@ tr_blocklistExists( const tr_handle * handle UNUSED )
 }
 
 
-void
-tr_blocklistSet( tr_handle  * handle,
-                 const char * filename )
+int
+tr_blocklistSetContent( tr_handle  * handle,
+                        const char * filename )
 {
     FILE * in;
     FILE * out;
@@ -173,13 +186,13 @@ tr_blocklistSet( tr_handle  * handle,
 
     if( filename == NULL ) {
         deleteBlocklist( handle );
-        return;
+        return 0;
     }
 
     in = fopen( filename, "r" );
     if( !in ) {
         tr_err( _( "Couldn't read file \"%s\": %s" ), filename, tr_strerror(errno) );
-        return;
+        return 0;
     }
 
     closeBlocklist( );
@@ -189,7 +202,7 @@ tr_blocklistSet( tr_handle  * handle,
     if( !out ) {
         tr_err( _( "Couldn't save file \"%s\": %s" ), outfile, tr_strerror( errno ) );
         fclose( in );
-        return;
+        return 0;
     }
 
     while( !fggets( &line, in ) )
@@ -231,4 +244,6 @@ tr_blocklistSet( tr_handle  * handle,
     fclose( in );
 
     loadBlocklist( );
+
+    return lineCount;
 }

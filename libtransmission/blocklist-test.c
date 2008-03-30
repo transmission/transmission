@@ -6,7 +6,7 @@
 #include "net.h"
 #include "utils.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 #define check(A) { \
     ++test; \
@@ -59,7 +59,8 @@ main( void )
 
     /* create our own dummy blocklist */
     createTestBlocklist( tmpfile );
-    tr_blocklistSet( handle, tmpfile );
+    tr_blocklistSetContent( handle, tmpfile );
+    tr_blocklistSetEnabled( handle, TRUE );
 
     /* now run some tests */
     check( !tr_netResolve( "216.16.1.143", &addr ) );

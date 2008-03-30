@@ -3,7 +3,7 @@
 #include "bencode.h"
 #include "utils.h" /* tr_free */
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 int test = 0;
 
