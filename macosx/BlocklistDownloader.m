@@ -25,6 +25,7 @@
 #import "BlocklistDownloader.h"
 #import "PrefsController.h"
 #import "NSStringAdditions.h"
+#import "NSApplicationAdditions.h"
 
 #define LIST_URL @"http://download.m0k.org/transmission/files/level1.gz"
 #define DESTINATION [NSTemporaryDirectory() stringByAppendingPathComponent: @"level1.gz"]
@@ -114,7 +115,10 @@
     tr_blocklistSetContent(fHandle, [DESTINATION UTF8String]);
     
     //delete downloaded file
-    [[NSFileManager defaultManager] removeItemAtPath: DESTINATION error: NULL];
+    if ([NSApp isOnLeopardOrBetter])
+        [[NSFileManager defaultManager] removeItemAtPath: DESTINATION error: NULL];
+    else
+        [[NSFileManager defaultManager] removeFileAtPath: DESTINATION handler: nil];
     
     [fPrefsController updateBlocklistFields];
     
