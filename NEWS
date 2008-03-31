@@ -3,6 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.11 (2008/xx/yy)
 - Mac
    + Fix visual glitch with the tracker inspector tab when there is no scrape address
+   + Only make progress status string clickable on multi-file torrents
 
 1.10 (2008/03/28)
 - All Platforms

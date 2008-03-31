@@ -775,7 +775,8 @@
 - (BOOL) pointInProgressRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]] || [fDefaults boolForKey: @"SmallView"])
+    if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]] || [fDefaults boolForKey: @"SmallView"]
+        || ![[self itemAtRow: row] folder])
         return NO;
     
     TorrentCell * cell;

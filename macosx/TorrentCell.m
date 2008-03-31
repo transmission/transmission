@@ -258,7 +258,7 @@
     
     if (NSMouseInRect(point, [self controlButtonRectForBounds: cellFrame], [controlView isFlipped])
         || NSMouseInRect(point, [self revealButtonRectForBounds: cellFrame], [controlView isFlipped])
-        || NSMouseInRect(point, [self progressRectForBounds: cellFrame], [controlView isFlipped])
+        || (NSMouseInRect(point, [self progressRectForBounds: cellFrame], [controlView isFlipped]) && [[self representedObject] folder])
         || NSMouseInRect(point, [self minimalStatusRectForBounds: cellFrame], [controlView isFlipped]))
         return NSCellHitContentArea | NSCellHitTrackableArea;
     
@@ -285,7 +285,7 @@
     BOOL checkReveal = NSMouseInRect(point, revealRect, [controlView isFlipped]);
     
     NSRect progressRect = [self progressRectForBounds: cellFrame];
-    BOOL checkProgress = NSMouseInRect(point, progressRect, [controlView isFlipped]);
+    BOOL checkProgress = NSMouseInRect(point, progressRect, [controlView isFlipped]) && [[self representedObject] folder];
     
     NSRect minimalStatusRect = [self minimalStatusRectForBounds: cellFrame];
     BOOL checkMinStatus = NSMouseInRect(point, minimalStatusRect, [controlView isFlipped]);
