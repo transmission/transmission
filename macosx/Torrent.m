@@ -890,7 +890,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (BOOL) isSeeding
 {
-    return fStat->status == TR_STATUS_SEED || fStat->status == TR_STATUS_DONE;
+    return fStat->status == TR_STATUS_SEED;
 }
 
 - (BOOL) isChecking
@@ -1058,7 +1058,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 break;
 
             case TR_STATUS_SEED:
-            case TR_STATUS_DONE:
                 if ([self totalPeersConnected] != 1)
                     string = [NSString stringWithFormat: NSLocalizedString(@"Seeding to %d of %d peers", "Torrent -> status string"),
                                                     [self peersGettingFromUs], [self totalPeersConnected]];
@@ -1125,7 +1124,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             break;
         
         case TR_STATUS_SEED:
-        case TR_STATUS_DONE:
             string = [NSString stringWithFormat: @"%@: %@, %@: %@",
                             NSLocalizedString(@"Ratio", "Torrent -> status string"), [NSString stringForRatio: [self ratio]],
                             NSLocalizedString(@"UL", "Torrent -> status string"), [NSString stringForSpeed: [self uploadRate]]];
@@ -1167,7 +1165,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             return NSLocalizedString(@"Downloading", "Torrent -> status string");
 
         case TR_STATUS_SEED:
-        case TR_STATUS_DONE:
             return NSLocalizedString(@"Seeding", "Torrent -> status string");
         
         default:

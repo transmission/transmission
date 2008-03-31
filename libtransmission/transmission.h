@@ -734,11 +734,8 @@ typedef enum
     TR_STATUS_CHECK_WAIT   = (1<<0), /* Waiting in queue to check files */
     TR_STATUS_CHECK        = (1<<1), /* Checking files */
     TR_STATUS_DOWNLOAD     = (1<<2), /* Downloading */
-    TR_STATUS_DONE         = (1<<3), /* not at 100% so can't tell the tracker
-                                        we're a seeder, but due to DND files
-                                        there's nothing we want right now */
-    TR_STATUS_SEED         = (1<<4), /* Seeding */
-    TR_STATUS_STOPPED      = (1<<5)  /* Torrent is stopped */
+    TR_STATUS_SEED         = (1<<3), /* Seeding */
+    TR_STATUS_STOPPED      = (1<<4)  /* Torrent is stopped */
 }
 tr_torrent_status;
 

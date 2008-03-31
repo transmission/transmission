@@ -20,7 +20,7 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id:$
+ * $Id$
  */
 
 #include "TRTransfer.h"
@@ -154,8 +154,6 @@ void TRTransfer::DrawItem(BView *owner, BRect frame, bool) {
 		} else if (fStatus->status & TR_STATUS_CHECK ) {
 			sprintf(fTimeStr, "Checking Existing Files (%.2f %%)",
 			        100 * fStatus->percentDone);
-		} else if (fStatus->status & TR_STATUS_DONE ) {
-			sprintf(fTimeStr, "Done...");
 		} else if (fStatus->status & TR_STATUS_DOWNLOAD) {
 			if (fStatus->eta < 0 ) {
 				sprintf(fTimeStr, "--:--:-- Remaining (%.2f %%Complete)",

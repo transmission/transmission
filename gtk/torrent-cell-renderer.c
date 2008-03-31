@@ -149,8 +149,7 @@ getShortStatusString( const tr_stat * torStat )
             break;
 
         case TR_STATUS_DOWNLOAD:
-        case TR_STATUS_SEED:
-        case TR_STATUS_DONE: {
+        case TR_STATUS_SEED: {
             char buf[128];
             if( torStat->status != TR_STATUS_DOWNLOAD ) {
                 tr_strlratio( buf, torStat->ratio, sizeof( buf ) );
@@ -202,7 +201,6 @@ getStatusString( const tr_stat * torStat )
                 torStat->peersConnected );
             break;
 
-        case TR_STATUS_DONE:
         case TR_STATUS_SEED:
             g_string_append_printf( gstr,
                 ngettext( "Seeding to %1$'d of %2$'d connected peer",

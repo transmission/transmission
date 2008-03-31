@@ -295,13 +295,6 @@ tr_torrent_status_str ( TrTorrent * gtor )
             }
             break;
 
-        case TR_STATUS_DONE:
-            top = g_strdup_printf(
-                ngettext( "Uploading to %1$'d of %2$'d connected peer",
-                          "Uploading to %1$'d of %2$'d connected peers", tpeers ),
-                          upeers, tpeers );
-            break;
-
         case TR_STATUS_SEED:
             top = g_strdup_printf(
                 ngettext( "Seeding to %1$'d of %2$'d connected peer",

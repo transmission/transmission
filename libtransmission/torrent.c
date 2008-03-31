@@ -605,8 +605,6 @@ tr_torrentStat( tr_torrent * tor )
         s->status = TR_STATUS_STOPPED;
     else if( tor->cpStatus == TR_CP_INCOMPLETE )
         s->status = TR_STATUS_DOWNLOAD;
-    else if( tor->cpStatus == TR_CP_DONE )
-        s->status = TR_STATUS_DONE;
     else
         s->status = TR_STATUS_SEED;
 

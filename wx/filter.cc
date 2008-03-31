@@ -33,7 +33,6 @@ TorrentFilter :: GetFlags( const tr_torrent * tor )
             flags |= FLAG_LEECHING;
             break;
 
-        case TR_STATUS_DONE:
         case TR_STATUS_SEED:
             flags |= FLAG_SEEDING;
             break;

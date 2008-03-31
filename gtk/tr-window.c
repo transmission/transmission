@@ -316,8 +316,7 @@ checkFilterMode( filter_mode_t       filter_mode,
             ret = torStat->status == TR_STATUS_DOWNLOAD;
             break;
         case FILTER_MODE_SEEDING:
-            ret =    ( torStat->status == TR_STATUS_DONE )
-                  || ( torStat->status == TR_STATUS_SEED );
+            ret = torStat->status == TR_STATUS_SEED;
             break;
         case FILTER_MODE_PAUSED:
             ret = torStat->status == TR_STATUS_STOPPED;

@@ -785,7 +785,7 @@ ipc_addstat( tr_benc * list, int tor,
                 {
                     tr_bencInitStr( item, "downloading", -1, 1 );
                 }
-                else if( ( TR_STATUS_DONE | TR_STATUS_SEED ) & st->status )
+                else if( TR_STATUS_SEED & st->status )
                 {
                     tr_bencInitStr( item, "seeding", -1, 1 );
                 }

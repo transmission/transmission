@@ -307,7 +307,6 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent   * tor,
                     case TR_STATUS_CHECK:       xstr = wxString::Format ( _("Checking Files (%.0f)"), s->recheckProgress );  break;
                     case TR_STATUS_CHECK_WAIT:  xstr = _("Waiting to Check"); break;
                     case TR_STATUS_DOWNLOAD:    xstr = _("Downloading"); break;
-                    case TR_STATUS_DONE:
                     case TR_STATUS_SEED:        xstr = _("Seeding"); break;
                     default: assert( 0 );
                 }
