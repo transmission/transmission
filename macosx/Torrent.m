@@ -981,22 +981,29 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                             [NSString stringForFileSize: [self haveTotal]],
                             [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
     }
-    else if (![self isComplete])
-    {
-        if ([self folder] && [fDefaults boolForKey: @"DisplayStatusProgressSelected"])
-            string = [NSString stringWithFormat: NSLocalizedString(@"%@ selected, uploaded %@ (Ratio: %@)",
-                "Torrent -> progress string"), [NSString stringForFileSize: [self haveTotal]],
-                [NSString stringForFileSize: [self uploadedTotal]], [NSString stringForRatio: [self ratio]]];
-        else
-            string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)",
-                "Torrent -> progress string"), [NSString stringForFileSize: [self haveTotal]],
-                [NSString stringForFileSize: [self size]], 100.0 * [self progress],
-                [NSString stringForFileSize: [self uploadedTotal]], [NSString stringForRatio: [self ratio]]];
-    }
     else
-        string = [NSString stringWithFormat: NSLocalizedString(@"%@, uploaded %@ (Ratio: %@)", "Torrent -> progress string"),
-                [NSString stringForFileSize: [self size]], [NSString stringForFileSize: [self uploadedTotal]],
-                [NSString stringForRatio: [self ratio]]];
+    {
+        NSString * downloadString;
+        if (![self isComplete]) //only multifile possible
+        {
+            
+            if ([fDefaults boolForKey: @"DisplayStatusProgressSelected"])
+                downloadString = [NSString stringWithFormat: NSLocalizedString(@"%@ selected", "Torrent -> progress string"),
+                                [NSString stringForFileSize: [self haveTotal]]];
+            else
+                downloadString = [NSString localizedStringWithFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)",
+                                    "Torrent -> progress string"), [NSString stringForFileSize: [self haveTotal]],
+                                    [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
+        }
+        else
+            downloadString = [NSString stringForFileSize: [self size]];
+        
+        NSString * uploadString = [NSString stringWithFormat: NSLocalizedString(@"uploaded %@ (Ratio: %@)",
+                                    "Torrent -> progress string"), [NSString stringForFileSize: [self uploadedTotal]],
+                                    [NSString stringForRatio: [self ratio]]];
+        
+        string = [NSString stringWithFormat: @"%@, %@", downloadString, uploadString];
+    }
     
     //add time when downloading
     if (fStat->status == TR_STATUS_DOWNLOAD || ([self isSeeding]
