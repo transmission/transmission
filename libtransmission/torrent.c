@@ -554,9 +554,8 @@ tr_torrentStatCached( tr_torrent * tor )
 {
     const time_t now = time( NULL );
 
-    return now == tor->lastStatTime
-        ? &tor->stats[tor->statCur]
-        : tr_torrentStat( tor );
+    return now == tor->lastStatTime ? &tor->stats
+                                    : tr_torrentStat( tor );
 }
 
 const tr_stat *
@@ -570,8 +569,7 @@ tr_torrentStat( tr_torrent * tor )
     tor->lastStatTime = time( NULL );
     tr_torrentRecheckCompleteness( tor );
 
-    tor->statCur = !tor->statCur;
-    s = &tor->stats[tor->statCur];
+    s = &tor->stats;
 
     s->error  = tor->error;
     memcpy( s->errorString, tor->errorString,

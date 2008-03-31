@@ -780,12 +780,12 @@ struct tr_tracker_stat
     /* This is the unmodified string returned by the tracker in response
      * to the torrent's most recent scrape request.  If no request was
      * sent or there was no response, this string is empty. */
-    char scrapeResponse[512];
+    char scrapeResponse[256];
 
     /* The unmodified string returned by the tracker in response
      * to the torrent's most recent scrape request.  If no request was
      * sent or there was no response, this string is empty. */
-    char announceResponse[512];
+    char announceResponse[256];
 
     /* Time the most recent scrape request was sent,
      * or zero if one hasn't been sent yet. */

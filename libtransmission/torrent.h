@@ -111,14 +111,14 @@ tr_verify_state;
 
 struct tr_torrent
 {
-    tr_handle                 * handle;
-    tr_info                     info;
+    tr_handle                * handle;
+    tr_info                    info;
 
-    tr_speedlimit               uploadLimitMode;
-    tr_speedlimit               downloadLimitMode;
-    struct tr_ratecontrol     * upload;
-    struct tr_ratecontrol     * download;
-    struct tr_ratecontrol     * swarmspeed;
+    tr_speedlimit              uploadLimitMode;
+    tr_speedlimit              downloadLimitMode;
+    struct tr_ratecontrol    * upload;
+    struct tr_ratecontrol    * download;
+    struct tr_ratecontrol    * swarmspeed;
 
     int                        error;
     char                       errorString[128];
@@ -163,16 +163,15 @@ struct tr_torrent
     tr_torrent_active_func   * active_func;
     void                     * active_func_user_data;
 
-    unsigned int               statCur : 1;
     unsigned int               isRunning : 1;
     unsigned int               isDeleting : 1;
 
     uint16_t                   maxConnectedPeers;
 
-    tr_verify_state           verifyState;
+    tr_verify_state            verifyState;
 
     time_t                     lastStatTime;
-    tr_stat                    stats[2];
+    tr_stat                    stats;
 
     tr_torrent               * next;
 };
