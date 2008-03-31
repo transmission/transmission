@@ -1010,9 +1010,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         && (fRatioSetting == NSOnState || (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]))))
     {
         int eta = fStat->status == TR_STATUS_DOWNLOAD ? [self eta] : [self etaRatio];
-        string = eta >= 0 ? [string stringByAppendingFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"),
-                                [NSString timeString: eta showSeconds: YES maxDigits: 2]]
-            : [string stringByAppendingString: NSLocalizedString(@" - remaining time unknown", "Torrent -> progress string")];
+        NSString * etaString = eta >= 0 ? [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> progress string"),
+                                            [NSString timeString: eta showSeconds: YES maxDigits: 2]]
+                                        : NSLocalizedString(@"remaining time unknown", "Torrent -> progress string");
+        
+        string = [NSString stringWithFormat: @"%@ - %@", string, etaString];
     }
     
     return string;
