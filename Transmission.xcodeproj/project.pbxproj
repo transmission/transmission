@@ -38,6 +38,7 @@
 		4D36BA7C0CA2F00800A63CA5 /* publish.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA6D0CA2F00800A63CA5 /* publish.h */; };
 		4D36BBC90CA309AA00A63CA5 /* evutil.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BBC80CA309AA00A63CA5 /* evutil.c */; };
 		4D3EA0AA08AE13C600EA10C2 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D3EA0A908AE13C600EA10C2 /* IOKit.framework */; };
+		4D4ADFC70DA1631500A68297 /* blocklist.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D3078E0D9EC45F0051FD27 /* blocklist.c */; };
 		4D4B7F6109E055660053C1EB /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
 		4D6DAAC6090CE00500F43C22 /* RevealOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D6DAAC4090CE00500F43C22 /* RevealOff.png */; };
 		4D6DAAC7090CE00500F43C22 /* RevealOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D6DAAC5090CE00500F43C22 /* RevealOn.png */; };
@@ -160,7 +161,6 @@
 		A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */; };
 		A2D0E0490A54A97C003C72CF /* Bandwidth.png in Resources */ = {isa = PBXBuildFile; fileRef = A2D0E0480A54A97C003C72CF /* Bandwidth.png */; };
 		A2D22A130D65EEE700007D5F /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D22A100D65EED100007D5F /* verify.c */; };
-		A2D3078F0D9EC45F0051FD27 /* blocklist.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D3078E0D9EC45F0051FD27 /* blocklist.c */; };
 		A2D307910D9EC46B0051FD27 /* ggets.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D307900D9EC46B0051FD27 /* ggets.c */; };
 		A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D307A30D9EC6870051FD27 /* BlocklistDownloader.m */; };
 		A2D307B10D9EC9F50051FD27 /* BlocklistStatusWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */; };
@@ -1771,6 +1771,7 @@
 				A25D2CBD0CF4C73E0096A262 /* stats.c in Sources */,
 				A201527E0D1C270F0081714F /* torrent-ctor.c in Sources */,
 				A2D22A130D65EEE700007D5F /* verify.c in Sources */,
+				4D4ADFC70DA1631500A68297 /* blocklist.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1837,7 +1838,6 @@
 				A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */,
 				A26AF2840D2DC27C00FF7140 /* AddWindowController.m in Sources */,
 				A2FB701C0D95CAEA0001F331 /* GroupsController.m in Sources */,
-				A2D3078F0D9EC45F0051FD27 /* blocklist.c in Sources */,
 				A2D307910D9EC46B0051FD27 /* ggets.c in Sources */,
 				A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */,
 			);
