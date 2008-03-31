@@ -3,6 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.20 (2008/xx/yy)
 - Mac
    + Display of decimal numbers matches system international settings
+   + Only make progress status string clickable on multi-file torrents
 
 1.11 (2008/xx/yy)
 - Mac

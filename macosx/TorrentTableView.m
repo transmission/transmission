@@ -780,7 +780,6 @@
     return NSPointInRect(point, [fTorrentCell iconRectForBounds: [self rectOfRow: row]]);
 }
 
-#warning finish folder check
 - (BOOL) pointInProgressRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
