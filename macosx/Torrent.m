@@ -970,7 +970,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     if (![self allDownloaded])
     {
-        if ([fDefaults boolForKey: @"DisplayStatusProgressSelected"])
+        if ([self folder] && [fDefaults boolForKey: @"DisplayStatusProgressSelected"])
         {
             string = [NSString localizedStringWithFormat: NSLocalizedString(@"%@ of %@ selected (%.2f%%)",
                             "Torrent -> progress string"), [NSString stringForFileSize: [self haveTotal]],
@@ -983,7 +983,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     }
     else if (![self isComplete])
     {
-        if ([fDefaults boolForKey: @"DisplayStatusProgressSelected"])
+        if ([self folder] && [fDefaults boolForKey: @"DisplayStatusProgressSelected"])
             string = [NSString stringWithFormat: NSLocalizedString(@"%@ selected, uploaded %@ (Ratio: %@)",
                 "Torrent -> progress string"), [NSString stringForFileSize: [self haveTotal]],
                 [NSString stringForFileSize: [self uploadedTotal]], [NSString stringForRatio: [self ratio]]];
