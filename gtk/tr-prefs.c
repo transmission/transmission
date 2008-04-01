@@ -266,16 +266,35 @@ torrentPage( GObject * core )
 
 struct blocklist_data
 {
+    GtkWidget * check;
     GtkWidget * dialog;
     TrCore * core;
     int abortFlag;
-    char secondary[512];
+    char secondary[256];
 };
 
-static gboolean
-blocklistDialogSetSecondary( gpointer vdata )
+static void
+updateBlocklistText( GtkWidget * w, TrCore * core )
 {
-    struct blocklist_data * data = vdata;
+    const int n = tr_blocklistGetRuleCount( tr_core_handle( core ) );
+    char buf[512];
+    g_snprintf( buf, sizeof( buf ),
+                ngettext( "Don't talk to the %'d _blocklisted peer",
+                          "Don't talk to the %'d _blocklisted peers", n ), n );
+    gtk_button_set_label( GTK_BUTTON( w ), buf );
+}
+static gboolean
+updateBlocklistTextFromData( gpointer gdata )
+{
+    struct blocklist_data * data = gdata;
+    updateBlocklistText( data->check, data->core );
+    return FALSE;
+}
+
+static gboolean
+blocklistDialogSetSecondary( gpointer gdata )
+{
+    struct blocklist_data * data = gdata;
     GtkMessageDialog * md = GTK_MESSAGE_DIALOG( data->dialog );
     gtk_message_dialog_format_secondary_text( md, data->secondary );
     return FALSE;
@@ -357,9 +376,10 @@ updateBlocklist( gpointer vdata )
     if( ok && !data->abortFlag )
     {
         g_snprintf( data->secondary, sizeof( data->secondary ),
-                    _( "Blocklist updated with %'d rules" ), rules );
+                    _( "Blocklist updated with %'d entries" ), rules );
         g_idle_add( blocklistDialogSetSecondary, data );
         g_idle_add( blocklistDialogAllowClose, data->dialog );
+        g_idle_add( updateBlocklistTextFromData, data );
     }
 
     free( text );
@@ -388,10 +408,10 @@ onUpdateBlocklistResponseCB( GtkDialog * dialog, int response, gpointer vdata )
 }
 
 static void
-onUpdateBlocklistCB( GtkButton * w, gpointer core )
+onUpdateBlocklistCB( GtkButton * w, gpointer gdata )
 {
     GtkWidget * d;
-    struct blocklist_data * data;
+    struct blocklist_data * data = gdata;
     
     d = gtk_message_dialog_new( GTK_WINDOW( gtk_widget_get_toplevel( GTK_WIDGET( w ) ) ),
                                 GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -404,9 +424,7 @@ onUpdateBlocklistCB( GtkButton * w, gpointer core )
                             NULL );
     gtk_dialog_set_response_sensitive( GTK_DIALOG( d ), GTK_RESPONSE_CLOSE, FALSE );
 
-    data = g_new0( struct blocklist_data, 1 );
     data->dialog = d;
-    data->core = core;
 
     g_signal_connect( d, "response", G_CALLBACK(onUpdateBlocklistResponseCB), data );
     gtk_widget_show( d );
@@ -422,6 +440,7 @@ peerPage( GObject * core )
     GtkWidget * w;
     GtkWidget * b;
     GtkWidget * h;
+    struct blocklist_data * data;
 
     t = hig_workarea_create( );
     hig_workarea_add_section_title (t, &row, _("Options"));
@@ -434,17 +453,20 @@ peerPage( GObject * core )
         w = new_check_button( s, PREF_KEY_ENCRYPTED_ONLY, core );
         hig_workarea_add_wide_control( t, &row, w );
 
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Blocklist" ) );
-
-        s = _( "Don't talk to _blocklisted peers" );
-        w = new_check_button( s, PREF_KEY_BLOCKLIST_ENABLED, core );
-        hig_workarea_add_wide_control( t, &row, w );
-
-        b = gtk_button_new_with_mnemonic( _( "_Update Blocklist" ) );
-        g_signal_connect( b, "clicked", G_CALLBACK(onUpdateBlocklistCB), core );
+        w = new_check_button( "", PREF_KEY_BLOCKLIST_ENABLED, core );
+        updateBlocklistText( w, TR_CORE( core ) );
         h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
+        gtk_box_pack_start_defaults( GTK_BOX(h), w );
+        b = gtk_button_new_with_mnemonic( _( "_Update Blocklist" ) );
+
+        data = g_new0( struct blocklist_data, 1 );
+        data->core = TR_CORE( core );
+        data->check = w;
+
+        g_signal_connect( b, "clicked", G_CALLBACK(onUpdateBlocklistCB), data );
         gtk_box_pack_start( GTK_BOX(h), b, FALSE, FALSE, 0 );
+        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), b );
+        target_cb( w, b );
         hig_workarea_add_wide_control( t, &row, h );
 
     hig_workarea_add_section_divider( t, &row );
