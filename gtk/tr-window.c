@@ -301,26 +301,26 @@ checkFilterText( filter_text_mode_t    filter_text_mode,
 
 static int
 checkFilterMode( filter_mode_t       filter_mode,
-                 const tr_stat     * torStat )
+                 tr_torrent        * tor )
 {
     int ret = 0;
-    const int haveDown = torStat->peersSendingToUs > 0;
-    const int haveUp = torStat->peersGettingFromUs > 0;
 
     switch( filter_mode )
     {
-        case FILTER_MODE_ACTIVE:
-            ret = haveUp || haveDown;
-            break;
         case FILTER_MODE_DOWNLOADING:
-            ret = torStat->status == TR_STATUS_DOWNLOAD;
+            ret = tr_torrentGetStatus( tor ) == TR_STATUS_DOWNLOAD;
             break;
         case FILTER_MODE_SEEDING:
-            ret = torStat->status == TR_STATUS_SEED;
+            ret = tr_torrentGetStatus( tor ) == TR_STATUS_SEED;
             break;
         case FILTER_MODE_PAUSED:
-            ret = torStat->status == TR_STATUS_STOPPED;
+            ret = tr_torrentGetStatus( tor ) == TR_STATUS_STOPPED;
             break;
+        case FILTER_MODE_ACTIVE: {
+            const tr_stat * s = tr_torrentStatCached( tor );
+            ret = s->peersSendingToUs>0 || s->peersGettingFromUs>0;
+            break;
+        }
         default: /* all */
             ret = 1;
     }
@@ -337,7 +337,7 @@ is_row_visible( GtkTreeModel   * model,
     tr_torrent * tor;
     gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
 
-    return checkFilterMode( p->filter_mode, tr_torrentStatCached( tor ) )
+    return checkFilterMode( p->filter_mode, tor )
         && checkFilterText( p->filter_text_mode, tr_torrentInfo( tor ), p->filter_text );
 }
 
