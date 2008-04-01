@@ -156,9 +156,12 @@ const char * tr_getPrefsDirectory( void );
 ** Message Logging
 */
 
-#define TR_MSG_ERR 1
-#define TR_MSG_INF 2
-#define TR_MSG_DBG 3
+enum
+{
+    TR_MSG_ERR = 1,
+    TR_MSG_INF = 2,
+    TR_MSG_DBG = 3
+};
 void tr_setMessageLevel( int );
 int tr_getMessageLevel( void );
 
@@ -319,6 +322,10 @@ int tr_blocklistIsEnabled( const tr_handle * handle );
 void tr_blocklistSetEnabled( tr_handle * handle,
                              int         isEnabled );
 
+struct in_addr;
+
+int tr_blocklistHasAddress( tr_handle             * handle,
+                            const struct in_addr  * addr);
 
 
 /***********************************************************************

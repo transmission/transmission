@@ -15,7 +15,6 @@
 #include <string.h>
 
 #include <sys/mman.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -25,9 +24,12 @@
 
 #include "transmission.h"
 #include "blocklist.h"
-#include "net.h"            /* tr_netResolve() */
-#include "platform.h"       /* tr_getPrefsDirectory() */
-#include "utils.h"          /* tr_buildPath() */
+#include "net.h" /* tr_netResolve() */
+#include "utils.h"
+
+/***
+****  PRIVATE
+***/
 
 struct tr_ip_range
 {
@@ -37,19 +39,13 @@ struct tr_ip_range
 
 struct tr_blocklist
 {
-    struct tr_ip_range * rules;
+    unsigned int isEnabled : 1;
+    int fd;
     size_t ruleCount;
     size_t byteCount;
-    int fd;
-    int isEnabled;
     char * filename;
+    struct tr_ip_range * rules;
 };
-
-void
-blocklistFilename( char * buf, size_t buflen )
-{
-    tr_buildPath( buf, buflen, tr_getPrefsDirectory(), "blocklist", NULL ); 
-}
 
 static void
 blocklistClose( tr_blocklist * b )
@@ -94,11 +90,11 @@ blocklistLoad( tr_blocklist * b )
     b->byteCount = st.st_size;
     b->ruleCount = st.st_size / sizeof( struct tr_ip_range );
     b->fd = fd;
-    tr_inf( _( "Blocklist contains %'d rules" ), b->ruleCount );
+    tr_inf( _( "Blocklist contains %'d entries" ), b->ruleCount );
 }
 
 static void
-ensureBlocklistIsLoaded( tr_blocklist * b )
+blocklistEnsureLoaded( tr_blocklist * b )
 {
     if( !b->rules )
         blocklistLoad( b );
@@ -122,16 +118,13 @@ blocklistDelete( tr_blocklist * b )
 }
 
 /***
-****
+****  PACKAGE-VISIBLE
 ***/
 
 tr_blocklist *
-tr_blocklistNew( int isEnabled )
+_tr_blocklistNew( const char * filename, int isEnabled )
 {
     tr_blocklist * b;
-    char filename[MAX_PATH_LENGTH];
-
-    blocklistFilename( filename, sizeof( filename ) );
 
     b = tr_new0( tr_blocklist, 1 );
     b->fd = -1;
@@ -142,47 +135,43 @@ tr_blocklistNew( int isEnabled )
 }
 
 void
-tr_blocklistFree( tr_blocklist * b )
+_tr_blocklistFree( tr_blocklist * b )
 {
     blocklistClose( b );
     tr_free( b->filename );
     tr_free( b );
 }
 
-
 int
-tr_blocklistGetRuleCount( tr_handle * handle )
+_tr_blocklistGetRuleCount( tr_blocklist * b )
 {
-    tr_blocklist * b = handle->blocklist;
-
-    ensureBlocklistIsLoaded( b );
+    blocklistEnsureLoaded( b );
 
     return b->ruleCount;
 }
 
 int
-tr_blocklistIsEnabled( const tr_handle * handle )
+_tr_blocklistIsEnabled( tr_blocklist * b )
 {
-    return handle->blocklist->isEnabled;
+    return b->isEnabled;
 }
 
 void
-tr_blocklistSetEnabled( tr_handle * handle, int isEnabled )
+_tr_blocklistSetEnabled( tr_blocklist * b, int isEnabled )
 {
-    handle->blocklist->isEnabled = isEnabled ? 1 : 0;
+    b->isEnabled = isEnabled ? 1 : 0;
 }
 
 int
-tr_peerIsBlocked( const tr_handle * handle, const struct in_addr * addr )
+_tr_blocklistHasAddress( tr_blocklist * b, const struct in_addr * addr )
 {
     uint32_t needle;
     const struct tr_ip_range * range;
-    tr_blocklist * b = handle->blocklist;
 
     if( !b->isEnabled )
         return 0;
 
-    ensureBlocklistIsLoaded( b );
+    blocklistEnsureLoaded( b );
     if( !b->rules )
         return 0;
 
@@ -198,17 +187,16 @@ tr_peerIsBlocked( const tr_handle * handle, const struct in_addr * addr )
 }
 
 int
-tr_blocklistExists( const tr_handle * handle )
+_tr_blocklistExists( const tr_blocklist * b )
 {
     struct stat st;
-    return !stat( handle->blocklist->filename, &st );
+    return !stat( b->filename, &st );
 }
 
 int
-tr_blocklistSetContent( tr_handle  * handle,
-                        const char * filename )
+_tr_blocklistSetContent( tr_blocklist * b,
+                         const char   * filename )
 {
-    tr_blocklist * b = handle->blocklist;
     FILE * in;
     FILE * out;
     char * line;
@@ -268,7 +256,7 @@ tr_blocklistSetContent( tr_handle  * handle,
         ++lineCount;
     }
 
-    tr_inf( _( "Blocklist updated with %'d rules" ), lineCount );
+    tr_inf( _( "Blocklist updated with %'d entries" ), lineCount );
 
     fclose( out );
     fclose( in );

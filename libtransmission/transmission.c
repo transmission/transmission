@@ -130,6 +130,7 @@ tr_initFull( const char * tag,
 {
     tr_handle * h;
     char buf[128];
+    char filename[MAX_PATH_LENGTH];
 
 #ifndef WIN32
     /* Don't exit when writing on a broken socket */
@@ -179,7 +180,11 @@ tr_initFull( const char * tag,
               TR_NAME, LONG_VERSION_STRING );
     tr_inf( "%s", buf );
 
-    h->blocklist = tr_blocklistNew( isBlocklistEnabled );
+    /* initialize the blocklist */
+    tr_buildPath( filename, sizeof( filename ), tr_getPrefsDirectory(), "blocklists", NULL );
+    tr_mkdirp( filename, 0777 );
+    tr_buildPath( filename, sizeof( filename ), tr_getPrefsDirectory(), "blocklists", "level1.bin", NULL );
+    h->blocklist = _tr_blocklistNew( filename, isBlocklistEnabled );
 
     tr_statsInit( h );
 
@@ -372,7 +377,7 @@ tr_closeImpl( void * vh )
     tr_sharedShuttingDown( h->shared );
     tr_trackerShuttingDown( h );
 
-    tr_blocklistFree( h->blocklist );
+    _tr_blocklistFree( h->blocklist );
     h->blocklist = NULL;
 
     for( t=h->torrentList; t!=NULL; ) {
@@ -484,4 +489,44 @@ int
 tr_isPexEnabled( const tr_handle * handle )
 {
     return handle->isPexEnabled;
+}
+
+/***
+****
+***/
+
+int
+tr_blocklistGetRuleCount( tr_handle * handle )
+{
+    return _tr_blocklistGetRuleCount( handle->blocklist );
+}
+
+int
+tr_blocklistIsEnabled( const tr_handle * handle )
+{
+    return _tr_blocklistIsEnabled( handle->blocklist );
+}
+
+void
+tr_blocklistSetEnabled( tr_handle * handle, int isEnabled )
+{
+    _tr_blocklistSetEnabled( handle->blocklist, isEnabled );
+}
+
+int
+tr_blocklistExists( const tr_handle * handle )
+{
+    return _tr_blocklistExists( handle->blocklist );
+}
+
+int
+tr_blocklistSetContent( tr_handle  * handle, const char * filename )
+{
+    return _tr_blocklistSetContent( handle->blocklist, filename );
+}
+
+int
+tr_blocklistHasAddress( tr_handle * handle, const struct in_addr * addr )
+{
+    return _tr_blocklistHasAddress( handle->blocklist, addr );
 }

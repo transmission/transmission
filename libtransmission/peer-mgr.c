@@ -981,7 +981,7 @@ ensureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8
 static void
 maybeEnsureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8_t flags, uint8_t from )
 {
-    if( tr_peerIsBlocked( t->manager->handle, addr ) )
+    if( tr_blocklistHasAddress( t->manager->handle, addr ) )
     {
         char * fmt = NULL;
         switch( from ) {
@@ -1101,7 +1101,7 @@ tr_peerMgrAddIncoming( tr_peerMgr      * manager,
 {
     managerLock( manager );
 
-    if( tr_peerIsBlocked( manager->handle, addr ) )
+    if( tr_blocklistHasAddress( manager->handle, addr ) )
     {
         tr_inf( _( "Banned IP address \"%s\" tried to connect to us" ),
                 inet_ntoa( *addr ) );
@@ -1892,7 +1892,7 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         }
 
         /* Don't connect to peers in our blocklist */
-        if( tr_peerIsBlocked( t->manager->handle, &atom->addr ) )
+        if( tr_blocklistHasAddress( t->manager->handle, &atom->addr ) )
             continue;
 
         ret[retCount++] = atom;

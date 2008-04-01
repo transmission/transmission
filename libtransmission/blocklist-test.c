@@ -20,8 +20,6 @@
     } \
 }
 
-extern void blocklistFilename( char * buf, size_t buflen );
-
 static void
 createTestBlocklist( const char * tmpfile )
 {
@@ -43,55 +41,49 @@ createTestBlocklist( const char * tmpfile )
 int
 main( void )
 {
-    tr_handle * handle;
-    char fname[MAX_PATH_LENGTH];
-    char bak[MAX_PATH_LENGTH];
-    char * tmpfile = "/tmp/transmission-blocklist-test.txt";
+    char * tmpfile_txt = "/tmp/transmission-blocklist-test.txt";
+    char * tmpfile_bin = "/tmp/transmission-blocklist-test.bin";
     struct in_addr addr;
     int test = 0;
+    tr_blocklist * b;
 
-    handle = tr_init( "unit-tests" );
+    remove( tmpfile_txt );
+    remove( tmpfile_bin );
 
-    /* backup the real blocklist */
-    blocklistFilename( fname, sizeof( fname ) );
-    snprintf( bak, sizeof( bak ), "%s.bak", fname );
-    rename( fname, bak );
-
-    /* create our own dummy blocklist */
-    createTestBlocklist( tmpfile );
-    tr_blocklistSetContent( handle, tmpfile );
-    tr_blocklistSetEnabled( handle, TRUE );
+    b = _tr_blocklistNew( tmpfile_bin, TRUE );
+    createTestBlocklist( tmpfile_txt );
+    _tr_blocklistSetContent( b, tmpfile_txt );
 
     /* now run some tests */
     check( !tr_netResolve( "216.16.1.143", &addr ) );
-    check( !tr_peerIsBlocked( handle, &addr ) );
+    check( !_tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.144", &addr ) );
-    check(  tr_peerIsBlocked( handle, &addr ) );
+    check(  _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.145", &addr ) );
-    check(  tr_peerIsBlocked( handle, &addr ) );
+    check(  _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.146", &addr ) );
-    check(  tr_peerIsBlocked( handle, &addr ) );
+    check(  _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.147", &addr ) );
-    check(  tr_peerIsBlocked( handle, &addr ) );
+    check(  _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.148", &addr ) );
-    check(  tr_peerIsBlocked( handle, &addr ) );
+    check(  _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.149", &addr ) );
-    check(  tr_peerIsBlocked( handle, &addr ) );
+    check(  _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.150", &addr ) );
-    check(  tr_peerIsBlocked( handle, &addr ) );
+    check(  _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.151", &addr ) );
-    check(  tr_peerIsBlocked( handle, &addr ) );
+    check(  _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.152", &addr ) );
-    check( !tr_peerIsBlocked( handle, &addr ) );
+    check( !_tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.153", &addr ) );
-    check( !tr_peerIsBlocked( handle, &addr ) );
+    check( !_tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "217.0.0.1", &addr ) );
-    check( !tr_peerIsBlocked( handle, &addr ) );
+    check( !_tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "255.0.0.1", &addr ) );
 
-    /* restore the real blocklist */
-    remove( tmpfile );
-    remove( fname );
-    rename( bak, fname );
+    /* cleanup */
+    _tr_blocklistFree( b );
+    remove( tmpfile_txt );
+    remove( tmpfile_bin );
     return 0;
 }

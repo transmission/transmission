@@ -13,17 +13,16 @@
 #ifndef TR_BLOCKLIST_H
 #define TR_BLOCKLIST_H
 
+struct in_addr;
 typedef struct tr_blocklist tr_blocklist;
 
-tr_blocklist * tr_blocklistNew( int isEnabled );
-
-void tr_blocklistFree( tr_blocklist * );
-
-
-struct tr_handle;
-struct in_addr;
-
-int tr_peerIsBlocked( const struct tr_handle *,
-                      const struct in_addr   * );
+tr_blocklist* _tr_blocklistNew         ( const char * filename, int isEnabled );
+void          _tr_blocklistFree        ( tr_blocklist * b );
+int           _tr_blocklistGetRuleCount( tr_blocklist * b );
+int           _tr_blocklistIsEnabled   ( tr_blocklist * b );
+void          _tr_blocklistSetEnabled  ( tr_blocklist * b, int isEnabled );
+int           _tr_blocklistHasAddress  ( tr_blocklist * b, const struct in_addr * addr );
+int           _tr_blocklistExists      ( const tr_blocklist * b );
+int           _tr_blocklistSetContent  ( tr_blocklist * b, const char * filename );
 
 #endif
