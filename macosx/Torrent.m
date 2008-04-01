@@ -254,6 +254,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fFinishedPiecesDate = tab != NULL ? [[NSDate alloc] init] : nil;
 }
 
+#warning when queue and seeding options are folded into libt, no need to call this on all torrents - use tr_torrentGetStatus
 - (void) update
 {
     //get previous status values before update
@@ -986,7 +987,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         NSString * downloadString;
         if (![self isComplete]) //only multifile possible
         {
-            
             if ([fDefaults boolForKey: @"DisplayStatusProgressSelected"])
                 downloadString = [NSString stringWithFormat: NSLocalizedString(@"%@ selected", "Torrent -> progress string"),
                                 [NSString stringForFileSize: [self haveTotal]]];
@@ -1080,7 +1080,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         }
         
         if (fStalled)
-            string = [NSLocalizedString(@"Stalled, ", "Torrent -> status string") stringByAppendingString: string];
+            string = [NSString stringWithFormat: @"%@, %@", NSLocalizedString(@"Stalled", "Torrent -> status string"), string];
     }
     
     //append even if error

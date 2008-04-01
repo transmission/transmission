@@ -823,12 +823,14 @@ typedef enum
         if ([[peer objectForKey: @"Encryption"] boolValue])
             [components addObject: NSLocalizedString(@"Encrypted Connection", "Inspector -> Peers tab -> table row tooltip")];
         
+        NSString * portString;
         int port;
         if ((port = [[peer objectForKey: @"Port"] intValue]) > 0)
-            [components addObject: [NSString stringWithFormat:
-                                    NSLocalizedString(@"Port: %d", "Inspector -> Peers tab -> table row tooltip"), port]];
+            portString = [NSString stringWithFormat: @"%d", port];
         else
-            [components addObject: NSLocalizedString(@"Port: N/A", "Inspector -> Peers tab -> table row tooltip")];
+            portString = NSLocalizedString(@"N/A", "Inspector -> Peers tab -> table row tooltip");
+        [components addObject: [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Port",
+            "Inspector -> Peers tab -> table row tooltip"), portString]];
         
         switch ([[peer objectForKey: @"From"] intValue])
         {

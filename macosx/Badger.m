@@ -48,8 +48,6 @@
         fLib = lib;
         
         fCompleted = 0;
-        fCompletedBadged = 0;
-        fSpeedBadge = NO;
         
         if ([NSApp isOnLeopardOrBetter])
         {
@@ -58,7 +56,11 @@
             [view release];
         }
         else
+        {
             fQuittingTiger = NO;
+            fSpeedBadge = NO;
+            fCompletedBadged = 0;
+        }
         
         //change that just impacts the dock badge
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBadge) name: @"DockBadgeChange" object: nil];

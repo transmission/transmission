@@ -64,7 +64,7 @@
     {
         NSImage * quitBadge = [NSImage imageNamed: @"QuitBadge.png"];
         [self badge: quitBadge string: NSLocalizedString(@"Quitting", "Dock Badger -> quit")
-                atHeight:  (rect.size.height - [quitBadge size].height) * 0.5];
+                atHeight: (rect.size.height - [quitBadge size].height) * 0.5];
         return;
     }
     
@@ -75,16 +75,19 @@
         float downloadRate, uploadRate;
         tr_torrentRates(fLib, &downloadRate, &uploadRate);
         
-        BOOL upload = checkUpload && uploadRate >= 0.1;
+        BOOL upload = checkUpload && uploadRate >= 0.1,
+            download = checkDownload && downloadRate >= 0.1;
+        float bottom = 0.0;
         if (upload)
-            [self badge: [NSImage imageNamed: @"UploadBadge.png"] string: [NSString stringForSpeedAbbrev: uploadRate] atHeight: 0.0];
-        if (checkDownload && downloadRate >= 0.1)
         {
-            //download rate above upload rate
-            float bottom = upload ? [[NSImage imageNamed: @"UploadBadge.png"] size].height + BETWEEN_PADDING : 0.0;
+            NSImage * uploadBadge = [NSImage imageNamed: @"UploadBadge.png"];
+            [self badge: uploadBadge string: [NSString stringForSpeedAbbrev: uploadRate] atHeight: bottom];
+            if (download)
+                bottom += [uploadBadge size].height + BETWEEN_PADDING; //download rate above upload rate
+        }
+        if (download)
             [self badge: [NSImage imageNamed: @"DownloadBadge.png"] string: [NSString stringForSpeedAbbrev: downloadRate]
                     atHeight: bottom];
-        }
     }
 }
 
@@ -108,7 +111,7 @@
         [stringShadow release];
     }
     
-    NSRect badgeRect = NSZeroRect;
+    NSRect badgeRect;
     badgeRect.size = [badge size];
     badgeRect.origin.y = height;
     
@@ -117,7 +120,7 @@
     //string is in center of image
     NSSize stringSize = [string sizeWithAttributes: fAttributes];
     
-    NSRect stringRect = badgeRect;
+    NSRect stringRect;
     stringRect.origin.x += (badgeRect.size.width - stringSize.width) * 0.5;
     stringRect.origin.y += (badgeRect.size.height - stringSize.height) * 0.5 + 1.0; //adjust for shadow
     stringRect.size = stringSize;
