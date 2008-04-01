@@ -63,7 +63,6 @@
 
 
 
-
 "%d Files" = "%d файлов";
 
 /* Inspector -> Peers tab -> peers */
@@ -277,13 +276,13 @@
 /* Drag overlay -> file */
 "Create a Torrent File" = "Создать торрент-файл";
 
-/* Create toolbar item -> tooltip */
-"Create torrent file" = "Создать торрент-файл";
-
 /* Create torrent -> select file
    Create toolbar item -> palette label */
 
 "Create Torrent File" = "Создать торрент-файл";
+
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "Создать торрент-файл";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Ошибка во время создания «%@»";
@@ -397,6 +396,9 @@
 
 /* Groups -> Button */
 "Group: No Label" = "Этикетка: нет";
+
+/* Groups -> window title */
+"Groups" = "Этикетки";
 
 /* View menu -> Filter Bar */
 "Hide Filter Bar" = "Скрыть фильтр";
@@ -687,11 +689,11 @@
 /* Torrent -> status string */
 "Seeding" = "Раздаю";
 
-/* Growl notification title */
-"Seeding Complete" = "Раздача завершена";
-
 /* Torrent -> status string */
 "Seeding complete" = "Раздача завершена";
+
+/* Growl notification title */
+"Seeding Complete" = "Раздача завершена";
 
 /* Torrent -> status string */
 "Seeding to %d of %d peers" = "Раздаю к %1$d из %2$d пользователей";
@@ -756,6 +758,9 @@
 
 /* Torrent -> status string */
 "Stalled, " = "Прервано, ";
+
+/* Stats window -> title */
+"Statistics" = "Статистика";
 
 /* torrent action menu -> ratio stop
    Action menu -> ratio stop */
@@ -834,7 +839,7 @@
 "There was an error moving the data file." = "Ошибка при перемещении данных.";
 
 /* Create torrent -> failed -> warning */
-"There was an error parsing the data file. The torrent file was not created." = "Ошибка во время анализа данных. Торрент-файл не был создан.";
+"There was an error parsing the data file. The torrent file was not created." = "Ошибка при чтении данных. Торрент-файл не был создан.";
 
 /* Create torrent -> no files -> title */
 "This folder contains no files." = "Эта папка не содержит файлов.";
