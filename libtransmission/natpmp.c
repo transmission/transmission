@@ -86,9 +86,6 @@ void
 tr_natpmpClose( tr_natpmp * nat )
 {
     assert( !nat->isMapped );
-    assert( ( nat->state == TR_NATPMP_IDLE )
-         || ( nat->state == TR_NATPMP_ERR )
-         || ( nat->state == TR_NATPMP_DISCOVER ) );
 
     closenatpmp( &nat->natpmp );
     tr_free( nat );

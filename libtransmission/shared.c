@@ -157,13 +157,14 @@ sharedPulse( void * vshared )
     {
         incomingPeersPulse( shared );
     }
-    else if( ( shared->natStatus == TR_NAT_TRAVERSAL_ERROR ) || ( shared->natStatus == TR_NAT_TRAVERSAL_UNMAPPED ) )
+    else
     {
         tr_ninf( getKey(), _( "Stopped" ) );
-        shared->h->shared = NULL;
+        tr_timerFree( &shared->pulseTimer );
         tr_netClose( shared->bindSocket );
         tr_natpmpClose( shared->natpmp );
         tr_upnpClose( shared->upnp );
+        shared->h->shared = NULL;
         tr_free( shared );
         keepPulsing = 0;
     }
