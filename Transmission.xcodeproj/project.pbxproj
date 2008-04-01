@@ -462,6 +462,13 @@
 		A223AABA0D22ECE800840069 /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileNameCell.h; path = macosx/FileNameCell.h; sourceTree = "<group>"; };
 		A2265F400B5EF5F40093DDA5 /* FileNameCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileNameCell.m; path = macosx/FileNameCell.m; sourceTree = "<group>"; };
+		A2268FA20DA1C628006DD07E /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/AddWindow.xib; sourceTree = "<group>"; };
+		A2268FA30DA1C628006DD07E /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/Creator.xib; sourceTree = "<group>"; };
+		A2268FA40DA1C628006DD07E /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = macosx/zh_TW.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2268FA50DA1C628006DD07E /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/InfoWindow.xib; sourceTree = "<group>"; };
+		A2268FA60DA1C628006DD07E /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = macosx/zh_TW.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A2268FA70DA1C628006DD07E /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		A2268FA80DA1C628006DD07E /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A22D3AA30D00D1790079CFED /* Turtle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Turtle.png; path = macosx/Images/Turtle.png; sourceTree = "<group>"; };
 		A22D3AA40D00D1790079CFED /* TurtleBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TurtleBlue.png; path = macosx/Images/TurtleBlue.png; sourceTree = "<group>"; };
 		A231274B0D11D0B7003F9AFF /* AboutWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = AboutWindow.xib; path = macosx/AboutWindow.xib; sourceTree = "<group>"; };
@@ -1552,6 +1559,7 @@
 				ko,
 				nl,
 				ru,
+				zh_TW,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -1942,6 +1950,7 @@
 				A2EA8E540CC3DAB80081201C /* it */,
 				A223AA7E0D220CEB00840069 /* nl */,
 				A26AF1050D2855FC00FF7140 /* ru */,
+				A2268FA40DA1C628006DD07E /* zh_TW */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1955,6 +1964,7 @@
 				A2EA8E560CC3DAB80081201C /* it */,
 				A223AA800D220CEB00840069 /* nl */,
 				A26AF1070D2855FC00FF7140 /* ru */,
+				A2268FA60DA1C628006DD07E /* zh_TW */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1968,6 +1978,7 @@
 				A265A3320D25767700198AC8 /* fr */,
 				A265A3C20D25AE7800198AC8 /* es */,
 				A26AF10A0D2855FC00FF7140 /* ru */,
+				A2268FA80DA1C628006DD07E /* zh_TW */,
 			);
 			name = PrefsWindow.xib;
 			sourceTree = "<group>";
@@ -1981,6 +1992,7 @@
 				A265A3300D25767700198AC8 /* fr */,
 				A265A3C00D25AE7800198AC8 /* es */,
 				A26AF1080D2855FC00FF7140 /* ru */,
+				A2268FA70DA1C628006DD07E /* zh_TW */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -1994,6 +2006,7 @@
 				A2CBDF050D993E5E00BB22BC /* fr */,
 				A2CBDFA50D9AD09F00BB22BC /* ru */,
 				A2B5BBA70D9C7C5000FCB650 /* es */,
+				A2268FA20DA1C628006DD07E /* zh_TW */,
 			);
 			name = AddWindow.xib;
 			sourceTree = "<group>";
@@ -2007,6 +2020,7 @@
 				A265A32E0D25767700198AC8 /* fr */,
 				A265A3BE0D25AE7800198AC8 /* es */,
 				A26AF1040D2855FC00FF7140 /* ru */,
+				A2268FA30DA1C628006DD07E /* zh_TW */,
 			);
 			name = Creator.xib;
 			sourceTree = "<group>";
@@ -2020,6 +2034,7 @@
 				A265A32F0D25767700198AC8 /* fr */,
 				A265A3BF0D25AE7800198AC8 /* es */,
 				A26AF1060D2855FC00FF7140 /* ru */,
+				A2268FA50DA1C628006DD07E /* zh_TW */,
 			);
 			name = InfoWindow.xib;
 			sourceTree = "<group>";
