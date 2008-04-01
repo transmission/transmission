@@ -279,8 +279,8 @@ updateBlocklistText( GtkWidget * w, TrCore * core )
     const int n = tr_blocklistGetRuleCount( tr_core_handle( core ) );
     char buf[512];
     g_snprintf( buf, sizeof( buf ),
-                ngettext( "Don't talk to the %'d _blocklisted peer",
-                          "Don't talk to the %'d _blocklisted peers", n ), n );
+                ngettext( "Ignore the %'d _blocklisted peer",
+                          "Ignore the %'d _blocklisted peers", n ), n );
     gtk_button_set_label( GTK_BUTTON( w ), buf );
 }
 static gboolean
@@ -444,14 +444,6 @@ peerPage( GObject * core )
 
     t = hig_workarea_create( );
     hig_workarea_add_section_title (t, &row, _("Options"));
-        
-        s = _("Use peer e_xchange");
-        w = new_check_button( s, PREF_KEY_PEX, core );
-        hig_workarea_add_wide_control( t, &row, w );
-        
-        s = _("_Ignore unencrypted peers");
-        w = new_check_button( s, PREF_KEY_ENCRYPTED_ONLY, core );
-        hig_workarea_add_wide_control( t, &row, w );
 
         w = new_check_button( "", PREF_KEY_BLOCKLIST_ENABLED, core );
         updateBlocklistText( w, TR_CORE( core ) );
@@ -468,7 +460,15 @@ peerPage( GObject * core )
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), b );
         target_cb( w, b );
         hig_workarea_add_wide_control( t, &row, h );
+        
+        s = _("Ignore _unencrypted peers");
+        w = new_check_button( s, PREF_KEY_ENCRYPTED_ONLY, core );
+        hig_workarea_add_wide_control( t, &row, w );
 
+        s = _("Use peer e_xchange");
+        w = new_check_button( s, PREF_KEY_PEX, core );
+        hig_workarea_add_wide_control( t, &row, w );
+        
     hig_workarea_add_section_divider( t, &row );
     /* section header for the "maximum number of peers" section */
     hig_workarea_add_section_title( t, &row, _( "Limits" ) );
