@@ -558,6 +558,23 @@ tr_torrentStatCached( tr_torrent * tor )
                                     : tr_torrentStat( tor );
 }
 
+tr_torrent_status
+tr_torrentGetStatus( tr_torrent * tor )
+{
+    tr_torrentRecheckCompleteness( tor );
+
+    if( tor->verifyState == TR_VERIFY_NOW )
+        return TR_STATUS_CHECK;
+    if( tor->verifyState == TR_VERIFY_WAIT )
+        return TR_STATUS_CHECK_WAIT;
+    if( !tor->isRunning )
+        return TR_STATUS_STOPPED;
+    if( tor->cpStatus == TR_CP_INCOMPLETE )
+        return TR_STATUS_DOWNLOAD;
+
+    return TR_STATUS_SEED;
+}
+
 const tr_stat *
 tr_torrentStat( tr_torrent * tor )
 {
@@ -567,10 +584,9 @@ tr_torrentStat( tr_torrent * tor )
     tr_torrentLock( tor );
 
     tor->lastStatTime = time( NULL );
-    tr_torrentRecheckCompleteness( tor );
 
     s = &tor->stats;
-
+    s->status = tr_torrentGetStatus( tor );
     s->error  = tor->error;
     memcpy( s->errorString, tor->errorString,
             sizeof( s->errorString ) );
@@ -594,17 +610,6 @@ tr_torrentStat( tr_torrent * tor )
 
     s->percentDone = tr_cpPercentDone( tor->completion );
     s->leftUntilDone = tr_cpLeftUntilDone( tor->completion );
-
-    if( tor->verifyState == TR_VERIFY_NOW )
-        s->status = TR_STATUS_CHECK;
-    else if( tor->verifyState == TR_VERIFY_WAIT )
-        s->status = TR_STATUS_CHECK_WAIT;
-    else if( !tor->isRunning )
-        s->status = TR_STATUS_STOPPED;
-    else if( tor->cpStatus == TR_CP_INCOMPLETE )
-        s->status = TR_STATUS_DOWNLOAD;
-    else
-        s->status = TR_STATUS_SEED;
 
     s->recheckProgress =
         1.0 - (tr_torrentCountUncheckedPieces( tor ) / (double) tor->info.pieceCount);

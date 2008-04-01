@@ -813,6 +813,8 @@ struct tr_tracker_stat
     time_t nextManualAnnounceTime;
 };
 
+tr_torrent_status tr_torrentGetStatus( tr_torrent * );
+
 struct tr_stat
 {
     tr_torrent_status status;
