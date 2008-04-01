@@ -120,7 +120,7 @@
     //string is in center of image
     NSSize stringSize = [string sizeWithAttributes: fAttributes];
     
-    NSRect stringRect;
+    NSRect stringRect = badgeRect;
     stringRect.origin.x += (badgeRect.size.width - stringSize.width) * 0.5;
     stringRect.origin.y += (badgeRect.size.height - stringSize.height) * 0.5 + 1.0; //adjust for shadow
     stringRect.size = stringSize;
