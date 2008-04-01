@@ -1014,7 +1014,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                                             [NSString timeString: eta showSeconds: YES maxDigits: 2]]
                                         : NSLocalizedString(@"remaining time unknown", "Torrent -> progress string");
         
-        string = [NSString stringWithFormat: @"%@ - %@", string, etaString];
+        string = [string stringByAppendingFormat: @" - %@", etaString];
     }
     
     return string;
@@ -1029,7 +1029,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         string = NSLocalizedString(@"Error", "Torrent -> status string");
         NSString * errorString = [self errorMessage];
         if (errorString && ![errorString isEqualToString: @""])
-            string = [NSString stringWithFormat: @"%@: %@", string, errorString];
+            string = [string stringByAppendingFormat: @": %@", errorString];
     }
     else
     {
