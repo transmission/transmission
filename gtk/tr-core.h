@@ -96,7 +96,8 @@ GtkTreeModel * tr_core_model( TrCore * self );
 
 tr_handle * tr_core_handle( TrCore * self );
 
-const struct core_stats* tr_core_get_stats( const TrCore * self );
+void tr_core_get_stats( const TrCore      * core, 
+                        struct core_stats * setme );
 
 /******
 *******

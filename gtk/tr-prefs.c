@@ -258,6 +258,7 @@ torrentPage( GObject * core )
         w = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
         hig_workarea_add_row( t, &row, _( "_Destination folder:" ), w, NULL );
 
+#if 0
 #ifdef HAVE_LIBNOTIFY
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Notification" ) );
@@ -265,6 +266,7 @@ torrentPage( GObject * core )
         s = _( "_Display a message when torrents finish" );
         w = new_check_button( s, PREF_KEY_NOTIFY, core );
         hig_workarea_add_wide_control( t, &row, w );
+#endif
 #endif
 
     hig_workarea_finish( t, &row );
@@ -446,18 +448,9 @@ peerPage( GObject * core )
         hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_add_section_divider( t, &row );
-    /* section header for the "maximum number of peers" section */
-    hig_workarea_add_section_title( t, &row, _( "Limits" ) );
-  
-        w = new_spin_button( PREF_KEY_MAX_PEERS_GLOBAL, core, 1, 3000, 5 );
-        hig_workarea_add_row( t, &row, _( "Maximum peers _overall:" ), w, NULL );
-        w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300, 5 );
-        hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
-
-    hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Blocklist" ) );
 
-        s = _( "Prevent peers in the _blocklist from connecting" );
+        s = _( "Don't talk to _blocklisted peers" );
         w = new_check_button( s, PREF_KEY_BLOCKLIST_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
 
@@ -466,6 +459,15 @@ peerPage( GObject * core )
         h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
         gtk_box_pack_start( GTK_BOX(h), b, FALSE, FALSE, 0 );
         hig_workarea_add_wide_control( t, &row, h );
+
+    hig_workarea_add_section_divider( t, &row );
+    /* section header for the "maximum number of peers" section */
+    hig_workarea_add_section_title( t, &row, _( "Limits" ) );
+  
+        w = new_spin_button( PREF_KEY_MAX_PEERS_GLOBAL, core, 1, 3000, 5 );
+        hig_workarea_add_row( t, &row, _( "Maximum peers _overall:" ), w, NULL );
+        w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300, 5 );
+        hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
 
     hig_workarea_finish( t, &row );
     return t;
