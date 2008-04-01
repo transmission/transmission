@@ -69,8 +69,6 @@ tr_prefs_init_global( void )
 
     pref_int_set_default    ( PREF_KEY_PORT, TR_DEFAULT_PORT );
 
-    pref_flag_set_default   ( PREF_KEY_NOTIFY, TRUE );
-
     pref_flag_set_default   ( PREF_KEY_NAT, TRUE );
     pref_flag_set_default   ( PREF_KEY_PEX, TRUE );
     pref_flag_set_default   ( PREF_KEY_ASKQUIT, TRUE );
@@ -257,17 +255,6 @@ torrentPage( GObject * core )
 
         w = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
         hig_workarea_add_row( t, &row, _( "_Destination folder:" ), w, NULL );
-
-#if 0
-#ifdef HAVE_LIBNOTIFY
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Notification" ) );
-
-        s = _( "_Display a message when torrents finish" );
-        w = new_check_button( s, PREF_KEY_NOTIFY, core );
-        hig_workarea_add_wide_control( t, &row, w );
-#endif
-#endif
 
     hig_workarea_finish( t, &row );
     return t;

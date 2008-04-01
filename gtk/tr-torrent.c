@@ -165,8 +165,7 @@ tr_torrent_stop( TrTorrent * self )
 static gboolean
 notifyInMainThread( gpointer user_data )
 {
-    if( pref_flag_get( PREF_KEY_NOTIFY ) )
-        tr_notify_send( TR_TORRENT( user_data ) );
+    tr_notify_send( TR_TORRENT( user_data ) );
     return FALSE;
 }
 static void
