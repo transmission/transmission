@@ -89,7 +89,7 @@ parsepath( const tr_torrent  * tor,
 {
     GtkTreeModel * model;
     GtkTreeIter  * parent, start, iter;
-    char         * file, * lower, * mykey, *escaped=0;
+    char         * file, * lower, * mykey;
     const char   * stock;
     int            priority = 0;
     gboolean       enabled = TRUE;
@@ -135,16 +135,14 @@ parsepath( const tr_torrent  * tor,
         enabled  = tr_torrentGetFileDL( tor, index );
     }
 
-    escaped = g_markup_escape_text (file, -1); 
     gtk_tree_store_set( store, &iter, FC_INDEX, index,
-                                      FC_LABEL, escaped,
+                                      FC_LABEL, file,
                                       FC_KEY, mykey,
                                       FC_STOCK, stock,
                                       FC_PRIORITY, priorityToString(priority),
                                       FC_ENABLED, enabled,
                                       FC_SIZE, size, -1 );
   done:
-    g_free( escaped );
     g_free( mykey );
     g_free( lower );
     g_free( file );
