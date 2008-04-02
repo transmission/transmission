@@ -1,0 +1,40 @@
+<html>
+
+	<head>
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
+		<title>Tracker Information</title>
+	</head>
+	<body>
+		<div id="mainbox">
+		<A NAME="TransFAQ"></A>
+		<div id="banner">
+				<a name="menus"></a>
+				<div id="machelp"><a class="bread" href="../index.html">Transmission Help</a>
+				</div>
+				<div id="index">
+				<a class="leftborder" href="../html/Index2.html">Index</a></div>
+				</div>
+			</div>
+			<div id="pagetitle">
+				<h1>What is 'Tier 1', 'Tier 2' etc? </h1>
+			</div>
+				<p>Transmission supports multitracker torrents. These are torrents which have multiple trackers as a fallback in case one doesn't respond. All of a given torrent's trackers are divided into 'Tiers'. Transmission randomly chooses a tracker from Tier 1 until it finds one that works. If it doesn't it moves on to Tier 2, and so on. This system prevents any one tracker from being overloaded.
+				<p>It is not possible to edit the tracker entries.
+				<p>
+			<div id="pagetitle">
+				<h1>What does 'announce' mean? </h1>
+			</div>
+				<p>When Transmission <i>announces</i>, it is updating its presence to the tracker and asking for more peers. This happens periodically, at the discretion of the tracker, however can be manually invoked via Transfers menu >> Update tracker.
+				<p>
+			<div id="pagetitle">
+				<h1>What does 'scrape' mean? </h1>
+			</div>
+				<p><i>Scraping</i> the tracker simply means asking for information about the swarm itself. Information typically received involves the total number of seeders, total number of leechers, and total number of complete downloads of the data.
+				<p>
+
+
+		</div>
+	</body>
+	
+</html>
