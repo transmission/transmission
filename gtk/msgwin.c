@@ -97,7 +97,7 @@ doSave( GtkWindow      * parent,
             gtk_tree_model_get( model, &iter,
                                 COL_TR_MSG, &node,
                                 -1 );
-            date = rfc822date( node->when*1000u );
+            date = rfc822date( (guint64)node->when * 1000u );
             switch( node->level ) {
                 case TR_MSG_DBG: levelStr = "debug"; break;
                 case TR_MSG_ERR: levelStr = "error"; break;
