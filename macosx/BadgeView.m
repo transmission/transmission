@@ -111,7 +111,7 @@
         [stringShadow release];
     }
     
-    NSRect badgeRect;
+    NSRect badgeRect = NSZeroRect;
     badgeRect.size = [badge size];
     badgeRect.origin.y = height;
     
