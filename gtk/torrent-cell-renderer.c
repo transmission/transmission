@@ -249,8 +249,6 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
                                 gint             * height)
 {
     TorrentCellRenderer * self = TORRENT_CELL_RENDERER( cell );
-    int xpad, ypad;
-    g_object_get( self, "xpad", &xpad, "ypad", &ypad, NULL );
 
     if( self && self->priv->tor )
     {
@@ -319,13 +317,13 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
         if( cell_area ) {
             if( x_offset ) *x_offset = 0;
             if( y_offset ) {
-                *y_offset = 0.5 * (cell_area->height - (h + (2 * ypad)));
+                *y_offset = 0.5 * (cell_area->height - (h + (2 * cell->ypad)));
                 *y_offset = MAX( *y_offset, 0 );
             }
         }
 
-        *width = w + xpad*2;
-        *height = h + ypad*2;
+        *width = w + cell->xpad*2;
+        *height = h + cell->ypad*2;
     }
 }
 
@@ -354,7 +352,6 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         GdkRectangle my_bg;
         GdkRectangle my_cell;
         GdkRectangle my_expose;
-        int xpad, ypad;
         int w, h;
         struct TorrentCellRendererPrivate * p = self->priv;
         GtkCellRenderer * text_renderer = torStat->error != 0
@@ -362,12 +359,10 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
             : p->text_renderer;
         const gboolean isActive = torStat->status != TR_STATUS_STOPPED;
 
-        g_object_get( self, "xpad", &xpad, "ypad", &ypad, NULL );
-
         my_bg = *background_area; 
-        my_bg.x += xpad;
-        my_bg.y += ypad;
-        my_bg.width -= xpad*2;
+        my_bg.x += cell->xpad;
+        my_bg.y += cell->ypad;
+        my_bg.width -= cell->xpad*2;
         my_cell = my_expose = my_bg;
 
         g_object_set( text_renderer, "sensitive", isActive, NULL );
