@@ -335,8 +335,6 @@ main( int argc, char ** argv )
         g_free( err );
     }
 
-    freestrlist(argfiles);
-
     gtk_main();
 
     return 0;
