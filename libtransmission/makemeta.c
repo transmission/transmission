@@ -288,8 +288,7 @@ getFileInfo( const char                      * topFile,
     for( pch=file->filename+topLen; *pch; ++pch )
         if (*pch == TR_PATH_DELIMITER)
             ++n;
-    tr_bencInit( uninitialized_path, TYPE_LIST );
-    tr_bencListReserve( uninitialized_path, n );
+    tr_bencInitList( uninitialized_path, n );
     for( prev=pch=file->filename+topLen; ; ++pch )
     {
         char buf[MAX_PATH_LENGTH];
@@ -322,8 +321,7 @@ makeFilesList( tr_benc                    * list,
         tr_benc * dict = tr_bencListAdd( list );
         tr_benc *length, *pathVal;
 
-        tr_bencInit( dict, TYPE_DICT );
-        tr_bencDictReserve( dict, 2 );
+        tr_bencInitDict( dict, 2 );
         length = tr_bencDictAdd( dict, "length" );
         pathVal = tr_bencDictAdd( dict, "path" );
         getFileInfo( builder->top, &builder->files[i], length, pathVal );
@@ -374,9 +372,8 @@ tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
     int n = 5;
     tr_benc top, *val;
 
-    tr_bencInit ( &top, TYPE_DICT );
     if ( builder->comment && *builder->comment ) ++n;
-    tr_bencDictReserve( &top, n );
+    tr_bencInitDict( &top, n );
 
     val = tr_bencDictAdd( &top, "announce" );
     tr_bencInitStrDup( val, builder->announce );
@@ -402,8 +399,7 @@ tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
         tr_bencInitStrDup( val, "UTF-8" );
 
         val = tr_bencDictAdd( &top, "info" );
-        tr_bencInit( val, TYPE_DICT );
-        tr_bencDictReserve( val, 666 );
+        tr_bencInitDict( val, 666 );
         makeInfoDict( val, builder );
     }
 

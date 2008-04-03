@@ -89,8 +89,7 @@ saveCumulativeStats( const tr_session_stats * stats )
     int len;
     tr_benc top;
 
-    tr_bencInit( &top, TYPE_DICT );
-    tr_bencDictReserve( &top, 5 );
+    tr_bencInitDict( &top, 5 );
     tr_bencInitInt( tr_bencDictAdd( &top, "uploaded-bytes" ), stats->uploadedBytes );
     tr_bencInitInt( tr_bencDictAdd( &top, "downloaded-bytes" ), stats->downloadedBytes );
     tr_bencInitInt( tr_bencDictAdd( &top, "files-added" ), stats->filesAdded );

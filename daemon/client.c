@@ -794,7 +794,7 @@ flushreqs( struct con * con )
                         tr_bencInitStr( tr_bencListAdd( val ),
                                         jj->str, -1, 1 );
                     }
-                    buf = ipc_mkval( &pk, &buflen );
+                    buf = ipc_serialize( &pk, &buflen );
                     SAFEBENCFREE( &pk );
                 }
                 SAFEFREESTRLIST( req->strs );
@@ -805,7 +805,7 @@ flushreqs( struct con * con )
                 {
                     tr_bencInitStr( tr_bencDictAdd( val, "data" ),
                                     req->buf, req->listlen, 1 );
-                    buf = ipc_mkval( &pk, &buflen );
+                    buf = ipc_serialize( &pk, &buflen );
                     SAFEBENCFREE( &pk );
                 }
                 SAFEFREE( req->buf );
@@ -833,7 +833,7 @@ flushreqs( struct con * con )
                         tr_bencInitInt( tr_bencListAdd( val ),
                                         req->numlist[ii] );
                     }
-                    buf = ipc_mkval( &pk, &buflen );
+                    buf = ipc_serialize( &pk, &buflen );
                     SAFEBENCFREE( &pk );
                 }
                 SAFEFREE( req->numlist );

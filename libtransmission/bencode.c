@@ -441,18 +441,30 @@ tr_bencInitInt( tr_benc * val, int64_t num )
 }
 
 int
+tr_bencInitList( tr_benc * val, int reserveCount )
+{
+    tr_bencInit( val, TYPE_LIST );
+    return tr_bencListReserve( val, reserveCount );
+}
+
+int
 tr_bencListReserve( tr_benc * val, int count )
 {
     assert( isList( val ) );
-
     return makeroom( val, count );
+}
+
+int
+tr_bencInitDict( tr_benc * val, int reserveCount )
+{
+    tr_bencInit( val, TYPE_DICT );
+    return tr_bencDictReserve( val, reserveCount );
 }
 
 int
 tr_bencDictReserve( tr_benc * val, int count )
 {
     assert( isDict( val ) );
-
     return makeroom( val, count * 2 );
 }
 

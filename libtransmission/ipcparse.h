@@ -152,20 +152,20 @@ int                ipc_hasvers  ( const struct ipc_info * );
 /* sets errno to EPERM if requested message not supported by protocol vers */
 struct tr_benc * ipc_initval  ( const struct ipc_info *, enum ipc_msg,
                                 int64_t tag, struct tr_benc *, int );
-uint8_t *    ipc_mkval    ( const struct tr_benc *, size_t * );
-uint8_t *    ipc_mkempty  ( const struct ipc_info *, size_t *, enum ipc_msg,
-                            int64_t );
-uint8_t *    ipc_mkint    ( const struct ipc_info *, size_t *, enum ipc_msg,
-                            int64_t tag, int64_t val );
-uint8_t *    ipc_mkstr    ( const struct ipc_info *, size_t *, enum ipc_msg,
-                            int64_t tag, const char * val );
-uint8_t *    ipc_mkvers   ( size_t *, const char * );
-uint8_t *    ipc_mkgetinfo( const struct ipc_info *, size_t *, enum ipc_msg,
+uint8_t *    ipc_serialize ( const struct tr_benc *, size_t * );
+uint8_t *    ipc_mkempty   ( const struct ipc_info *, size_t *, enum ipc_msg,
+                             int64_t );
+uint8_t *    ipc_mkint     ( const struct ipc_info *, size_t *, enum ipc_msg,
+                             int64_t tag, int64_t val );
+uint8_t *    ipc_mkstr     ( const struct ipc_info *, size_t *, enum ipc_msg,
+                             int64_t tag, const char * val );
+uint8_t *    ipc_mkvers    ( size_t *, const char * );
+uint8_t *    ipc_mkgetinfo ( const struct ipc_info *, size_t *, enum ipc_msg,
                             int64_t, int, const int * );
-int          ipc_addinfo  ( struct tr_benc *, int,
-                            const struct tr_info *, int );
-int          ipc_addstat  ( struct tr_benc *, int,
-                            const struct tr_stat *, int );
+int          ipc_addinfo   ( struct tr_benc *, int,
+                             const struct tr_info *, int );
+int          ipc_addstat   ( struct tr_benc *, int,
+                             const struct tr_stat *, int );
 
 /* sets errno to EINVAL on parse error or
    EPERM for unsupported protocol version */

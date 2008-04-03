@@ -94,40 +94,41 @@ void tr_cpClose( tr_completion * cp )
 static void
 tr_cpEnsureDoneValid( const tr_completion * ccp )
 {
-    const tr_torrent * tor = ccp->tor;
-    const tr_info * info = &tor->info;
-    uint64_t have=0, total=0;
-    tr_piece_index_t i;
-    tr_completion * cp ;
+    if( ccp->doneDirty )
+    {
+        const tr_torrent * tor = ccp->tor;
+        const tr_info * info = &tor->info;
+        uint64_t have = 0;
+        uint64_t total = 0;
+        tr_piece_index_t i;
+        tr_completion * cp ;
 
-    if( !ccp->doneDirty )
-        return;
+        /* too bad C doesn't have 'mutable' */
+        cp = (tr_completion*) ccp;
+        cp->doneDirty = FALSE;
 
-    /* too bad C doesn't have 'mutable' */
-    cp = (tr_completion*) ccp;
-    cp->doneDirty = FALSE;
-
-    for( i=0; i<info->pieceCount; ++i ) {
-        if( !info->pieces[i].dnd ) {
-            total += info->pieceSize;
-            have += cp->completeBlocks[ i ];
+        for( i=0; i<info->pieceCount; ++i ) {
+            if( !info->pieces[i].dnd ) {
+                total += info->pieceSize;
+                have += cp->completeBlocks[ i ];
+            }
         }
+
+        have *= tor->blockSize;
+
+        /* the last piece/block is probably smaller than the others */
+        if( !info->pieces[info->pieceCount-1].dnd ) {
+            total -= ( info->pieceSize - tr_torPieceCountBytes(tor,info->pieceCount-1) );
+            if( tr_cpBlockIsComplete( cp, tor->blockCount-1 ) )
+                have -= ( tor->blockSize - tr_torBlockCountBytes(tor,tor->blockCount-1) );
+        }
+
+        assert( have <= total );
+        assert( total <= info->totalSize );
+
+        cp->doneHave = have;
+        cp->doneTotal = total;
     }
-
-    have *= tor->blockSize;
-
-    /* the last piece/block is probably smaller than the others */
-    if( !info->pieces[info->pieceCount-1].dnd ) {
-        total -= ( info->pieceSize - tr_torPieceCountBytes(tor,info->pieceCount-1) );
-        if( tr_cpBlockIsComplete( cp, tor->blockCount-1 ) )
-            have -= ( tor->blockSize - tr_torBlockCountBytes(tor,tor->blockCount-1) );
-    }
-
-    assert( have <= total );
-    assert( total <= info->totalSize );
-
-    cp->doneHave = have;
-    cp->doneTotal = total;
 }
 
 void
@@ -311,10 +312,8 @@ tr_cpGetStatus ( const tr_completion * cp )
 
     tr_cpEnsureDoneValid( cp );
 
-    if( cp->doneHave >= cp->doneTotal )
-        return TR_CP_DONE;
-
-    return TR_CP_INCOMPLETE;
+    return cp->doneHave >= cp->doneTotal ? TR_CP_DONE
+                                         : TR_CP_INCOMPLETE;
 }
 
 uint64_t

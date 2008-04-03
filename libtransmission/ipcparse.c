@@ -195,24 +195,24 @@ ipc_initmsgs( void )
 }
 
 void
-ipc_addmsg( struct ipc_funcs * tree, enum ipc_msg id, trd_msgfunc func )
+ipc_addmsg( struct ipc_funcs * funcs, enum ipc_msg msg_id, trd_msgfunc func )
 {
-    assert( MSGVALID( id ) );
-    assert( IPC_MSG_VERSION != id );
+    assert( MSGVALID( msg_id ) );
+    assert( IPC_MSG_VERSION != msg_id );
 
-    tree->msgs[id] = func;
+    funcs->msgs[msg_id] = func;
 }
 
 void
-ipc_setdefmsg( struct ipc_funcs * tree, trd_msgfunc func )
+ipc_setdefmsg( struct ipc_funcs * funcs, trd_msgfunc func )
 {
-    tree->def = func;
+    funcs->def = func;
 }
 
 void
-ipc_freemsgs( struct ipc_funcs * tree )
+ipc_freemsgs( struct ipc_funcs * funcs )
 {
-    tr_free( tree );
+    tr_free( funcs );
 }
 
 struct ipc_info *
@@ -230,8 +230,28 @@ ipc_freecon( struct ipc_info * info )
     tr_free( info );
 }
 
+int
+ipc_ishandled( const struct ipc_info * info, enum ipc_msg id )
+{
+    assert( MSGVALID( id ) );
+
+    return info->funcs->msgs[id] != NULL;
+}
+
+int
+ipc_havetags( const struct ipc_info * info )
+{
+    return !DICTPAYLOAD( info );
+}
+
 static int
-ipc_havemsg( const struct ipc_info * info, enum ipc_msg id )
+sessionSupportsTags( const struct ipc_info * session )
+{
+    return session->vers >= 2;
+}
+
+static int
+sessionSupportsMessage( const struct ipc_info * info, enum ipc_msg id )
 {
     assert( MSGVALID( id ) );
     assert( ipc_hasvers( info ) );
@@ -239,51 +259,61 @@ ipc_havemsg( const struct ipc_info * info, enum ipc_msg id )
     return gl_msgs[id].minvers <= info->vers;
 }
 
+/**
+ * Creates the benc metainfo structure for a message
+ * and returns its child where payload should be set.
+ *
+ * In protocol version 1, the metainfo is a single-entry
+ * dictionary with a string from gl_msgs as the key
+ * and the return tr_benc pointer as the value.
+ *
+ * In protocol version 2, the metainfo is a list
+ * holding a string from gl_msgs, the return benc pointer,
+ * and (optionally) the integer tag.
+ */
 tr_benc *
-ipc_initval( const struct ipc_info * info, enum ipc_msg id, int64_t tag,
-             tr_benc * pk, int type )
+ipc_initval( const struct ipc_info * session,
+             enum ipc_msg            msg_id,
+             int64_t                 tag,
+             tr_benc               * pk,
+             int                     benc_type )
 {
     tr_benc * ret;
 
-    assert( MSGVALID( id ) );
+    assert( MSGVALID( msg_id ) );
 
-    if( !ipc_havemsg( info, id ) || ( 0 < tag && !ipc_havetags( info ) ) )
+    if( !sessionSupportsMessage( session, msg_id )
+        || ( (tag>0) && !sessionSupportsTags( session ) ) )
     {
         errno = EPERM;
         return NULL;
     }
 
-    if( DICTPAYLOAD( info ) )
+    if( DICTPAYLOAD( session ) )
     {
-        tr_bencInit( pk, TYPE_DICT );
-        if( tr_bencDictReserve( pk, 1 ) )
-        {
-            return NULL;
-        }
-        ret = tr_bencDictAdd( pk, MSGNAME( id ) );
+        tr_bencInitDict( pk, 1 );
+        ret = tr_bencDictAdd( pk, MSGNAME( msg_id ) );
     }
     else
     {
-        tr_bencInit( pk, TYPE_LIST );
-        if( tr_bencListReserve( pk, ( 0 < tag ? 3 : 2 ) ) )
-        {
-            return NULL;
-        }
-        tr_bencInitStr( tr_bencListAdd( pk ), MSGNAME( id ), -1, 1 );
+        tr_bencInitList( pk, 3 );
+        tr_bencInitStr( tr_bencListAdd( pk ), MSGNAME( msg_id ), -1, 1 );
         ret = tr_bencListAdd( pk );
         if( 0 < tag )
-        {
             tr_bencInitInt( tr_bencListAdd( pk ), tag );
-        }
     }
 
-    tr_bencInit( ret, type );
-
+    tr_bencInit( ret, benc_type );
     return ret;
 }
 
+/**
+ * Serialize a benc message into a string appended to a
+ * printf()'ed string IPC_MIN_MSG_LEN bytes long that
+ * gives the length of the string.
+ */
 uint8_t *
-ipc_mkval( const tr_benc * pk, size_t * setmeSize )
+ipc_serialize( const tr_benc * pk, size_t * setmeSize )
 {
     int bencSize = 0;
     char * benc = tr_bencSave( pk, &bencSize );
@@ -303,137 +333,161 @@ ipc_mkval( const tr_benc * pk, size_t * setmeSize )
     return ret;
 }
 
+/**
+ * Create a serialized message whose payload is a NULL string
+ */
 uint8_t *
-ipc_mkempty( const struct ipc_info * info, size_t * len, enum ipc_msg id,
-             int64_t tag )
+ipc_mkempty( const struct ipc_info * session,
+             size_t                * setmeSize,
+             enum ipc_msg            msg_id,
+             int64_t                 tag )
 {
-    tr_benc pk;
-    uint8_t  * ret = NULL;
-
-    if( ipc_initval( info, id, tag, &pk, TYPE_STR ) )
-    {
-        ret = ipc_mkval( &pk, len );
-        SAFEBENCFREE( &pk );
-    }
-
-    return ret;
+    return ipc_mkstr( session, setmeSize, msg_id, tag, NULL );
 }
 
+/**
+ * Create a serialized message whose payload is an integer
+ */
 uint8_t *
-ipc_mkint( const struct ipc_info * info, size_t * len, enum ipc_msg id,
-           int64_t tag, int64_t num )
+ipc_mkint( const struct ipc_info  * session,
+           size_t                 * setmeSize,
+           enum ipc_msg             msg_id,
+           int64_t                  tag,
+           int64_t                  num )
 {
     tr_benc pk, * val;
     uint8_t  * ret = NULL;
 
-    if(( val = ipc_initval( info, id, tag, &pk, TYPE_INT )))
+    if(( val = ipc_initval( session, msg_id, tag, &pk, TYPE_INT )))
     {
         val->val.i = num;
-        ret = ipc_mkval( &pk, len );
+        ret = ipc_serialize( &pk, setmeSize );
         SAFEBENCFREE( &pk );
     }
 
     return ret;
 }
 
+/**
+ * Create a serialized message whose payload is a string
+ */
 uint8_t *
-ipc_mkstr( const struct ipc_info * info, size_t * len, enum ipc_msg id,
-           int64_t tag, const char * str )
+ipc_mkstr( const struct ipc_info  * session,
+           size_t                 * setmeSize,
+           enum ipc_msg             msg_id,
+           int64_t                  tag,
+           const char             * str )
 {
     tr_benc pk, * val;
     uint8_t  * ret = NULL;
 
-    if(( val = ipc_initval( info, id, tag, &pk, TYPE_STR )))
+    if(( val = ipc_initval( session, msg_id, tag, &pk, TYPE_STR )))
     {
         tr_bencInitStr( val, str, -1, 1 );
-        ret = ipc_mkval( &pk, len );
+        ret = ipc_serialize( &pk, setmeSize );
         SAFEBENCFREE( &pk );
     }
 
     return ret;
 }
 
+/**
+ * Create a serialized message whose payload is a dictionary
+ * giving the minimum and maximum protocol version we support,
+ * and (optionally) the label passed in.
+ *
+ * Note that this message is just the dictionary payload.
+ * It doesn't contain metainfo as the other ipc_mk*() functions do.
+ */
 uint8_t *
 ipc_mkvers( size_t * len, const char * label )
 {
     tr_benc pk, * dict;
     uint8_t  * ret;
   
-    tr_bencInit( &pk, TYPE_DICT );
-    if( tr_bencDictReserve( &pk, 1 ) )
-    {
-        return NULL;
-    }
+    tr_bencInitDict( &pk, 1 );
     dict = tr_bencDictAdd( &pk, MSGNAME( IPC_MSG_VERSION ) );
 
-    tr_bencInit( dict, TYPE_DICT );
-    if( tr_bencDictReserve( dict, ( NULL == label ? 2 : 3 ) ) )
-    {
-        SAFEBENCFREE( &pk );
-        return NULL;
-    }
+    tr_bencInitDict( dict, 3 );
     tr_bencInitInt( tr_bencDictAdd( dict, "min" ), PROTO_VERS_MIN );
     tr_bencInitInt( tr_bencDictAdd( dict, "max" ), PROTO_VERS_MAX );
-    if( NULL != label )
+    if( label )
         tr_bencInitStr( tr_bencDictAdd( dict, "label" ), label, -1, 1 );
 
-    ret = ipc_mkval( &pk, len );
+    ret = ipc_serialize( &pk, len );
     SAFEBENCFREE( &pk );
 
     return ret;
 }
 
+/**
+ * Create a serialized message that is used to request
+ * torrent information or statistics.
+ *
+ * msg_id must be one of:
+ *   IPC_MSG_GETINFO
+ *   IPC_MSG_GETINFOALL
+ *   IPC_MSG_GETSTAT
+ *   IPC_MSG_GETSTATALL
+ *
+ * "ids" is an optional array of torrent IDs.
+ * The array, if included, must be terminated by a 0 torrent id.
+ *
+ * "types" is a bitwise-and'ed set of fields from either
+ * the IPC_INF_* or IPC_ST_* enums in ipc-parse.h.
+ * Which enums are used is dependent on the value of msg_id.
+ *
+ * If torrent ids are specified in the "ids" array,
+ * the payload is a dictionary of two lists, "id" and "type".
+ * The "id" list holds the torrent IDs, and
+ * the "type" list holds string keys from either
+ * gl_inf or gl_stat, depending on the value of msg_id
+ *
+ * If no torrent ids are specified, the payload is
+ * a single list identical to the "type" list described above.
+ */
 uint8_t *
-ipc_mkgetinfo( const struct ipc_info * info, size_t * len, enum ipc_msg id,
-               int64_t tag, int types, const int * ids )
+ipc_mkgetinfo( const struct ipc_info * session,
+               size_t                * setmeSize,
+               enum ipc_msg            msg_id,
+               int64_t                 tag,
+               int                     types,
+               const int             * ids )
 {
-    tr_benc   pk, * top, * idlist, * typelist;
+    tr_benc   pk;
+    tr_benc * typelist;
     size_t       ii, typecount, used;
     const struct inf * typearray;
     uint8_t    * ret;
 
     /* no ID list, send an -all message */
-    if( NULL == ids )
-    {
-        typelist = ipc_initval( info, id, tag, &pk, TYPE_LIST );
-        if( NULL == typelist )
-        {
+    if( !ids ) {
+        typelist = ipc_initval( session, msg_id, tag, &pk, TYPE_LIST );
+        if( !typelist )
             return NULL;
-        }
     }
     else
     {
-        top = ipc_initval( info, id, tag, &pk, TYPE_DICT );
-        if( NULL == top )
-        {
+        tr_benc * top;
+        tr_benc * idlist;
+
+        top = ipc_initval( session, msg_id, tag, &pk, TYPE_DICT );
+        if( !top )
             return NULL;
-        }
+
         /* add the requested IDs */
-        if( tr_bencDictReserve( top, 2 ) )
-        {
-            SAFEBENCFREE( &pk );
-            return NULL;
-        }
+        tr_bencDictReserve( top, 2 );
         idlist   = tr_bencDictAdd( top, "id" );
         typelist = tr_bencDictAdd( top, "type" );
-        tr_bencInit( idlist, TYPE_LIST );
         tr_bencInit( typelist, TYPE_LIST );
+        for( ii = 0; TORRENT_ID_VALID( ids[ii] ); ii++ ) { }
+        tr_bencInitList( idlist, ii );
         for( ii = 0; TORRENT_ID_VALID( ids[ii] ); ii++ )
-        {
-        }
-        if( tr_bencListReserve( idlist, ii ) )
-        {
-            SAFEBENCFREE( &pk );
-            return NULL;
-        }
-        for( ii = 0; TORRENT_ID_VALID( ids[ii] ); ii++ )
-        {
             tr_bencInitInt( tr_bencListAdd( idlist ), ids[ii] );
-        }
     }
 
     /* get the type name array */
-    switch( id )
+    switch( msg_id )
     {
         case IPC_MSG_GETINFO:
         case IPC_MSG_GETINFOALL:
@@ -452,53 +506,51 @@ ipc_mkgetinfo( const struct ipc_info * info, size_t * len, enum ipc_msg id,
 
     /* add the type names */
     for( ii = used = 0; typecount > ii; ii++ )
-    {
         if( types & ( 1 << ii ) )
-        {
             used++;
-        }
-    }
-    if( tr_bencListReserve( typelist, used ) )
-    {
-        SAFEBENCFREE( &pk );
-        return NULL;
-    }
+    tr_bencListReserve( typelist, used );
+
     for( ii = 0; typecount > ii; ii++ )
     {
         if( !( types & ( 1 << ii ) ) )
-        {
             continue;
-        }
         assert( typearray[ii].type == ( 1 << ii ) );
         tr_bencInitStr( tr_bencListAdd( typelist ),
                         typearray[ii].name, -1, 1 );
     }
 
     /* generate packet */
-    ret = ipc_mkval( &pk, len );
+    ret = ipc_serialize( &pk, setmeSize );
     SAFEBENCFREE( &pk );
 
     return ret;
 }
 
-static int
+static void
 filltracker( tr_benc * val, const tr_tracker_info * tk )
 {
-    tr_bencInit( val, TYPE_DICT );
-    if( tr_bencDictReserve( val, ( NULL == tk->scrape ? 3 : 4 ) ) )
-        return -1;
-
+    tr_bencInitDict( val, 4 );
     tr_bencInitStr( tr_bencDictAdd( val, "address" ),  tk->address,  -1, 1 );
     tr_bencInitInt( tr_bencDictAdd( val, "port" ),     tk->port );
     tr_bencInitStr( tr_bencDictAdd( val, "announce" ), tk->announce, -1, 1 );
     if( NULL != tk->scrape )
         tr_bencInitStr( tr_bencDictAdd( val, "scrape" ), tk->scrape, -1, 1 );
-
-    return 0;
 }
 
+/**
+ * append to "list" a dictionary whose keys are
+ * the string keys from gl_inf and whose values are
+ * torrent info set from "torrent_id" and "inf".
+ *
+ * "types" is a bitwise-and'ed set of fields
+ * from the IPC_INF_* enum in ipcparse.h.
+ * It specifies what to put in the dictionary.
+ */
 int
-ipc_addinfo( tr_benc * list, int tor, const tr_info * inf, int types )
+ipc_addinfo( tr_benc         * list,
+             int               torrent_id,
+             const tr_info   * inf,
+             int               types )
 {
     tr_benc * dict, * item, * file, * tier;
     int          ii, jj, kk;
@@ -507,75 +559,47 @@ ipc_addinfo( tr_benc * list, int tor, const tr_info * inf, int types )
     /* always send torrent id */
     types |= IPC_INF_ID;
 
-    if( tr_bencListReserve( list, 1 ) )
-    {
-        return -1;
-    }
+    tr_bencListReserve( list, 1 );
 
     dict = tr_bencListAdd( list );
-    tr_bencInit( dict, TYPE_DICT );
+
+    /* count the number of info keys and allocate a dict for them */
     for( ii = jj = 0; IPC_INF__MAX > 1 << ii; ii++ )
     {
         if( !( types & ( 1 << ii ) ) )
-        {
             continue;
-        }
+
         assert( TR_N_ELEMENTS( gl_inf ) > ( unsigned )ii );
         assert( gl_inf[ii].type == ( 1 << ii ) );
-        /* check for missing optional info */
-        if( ( IPC_INF_COMMENT == ( 1 << ii ) && !*inf->comment ) ||
-            ( IPC_INF_CREATOR == ( 1 << ii ) && !*inf->creator ) ||
-            ( IPC_INF_DATE    == ( 1 << ii ) &&   0  >= inf->dateCreated ) )
-        {
-            continue;
-        }
         jj++;
     }
-    if( tr_bencDictReserve( dict, jj ) )
-    {
-        return -1;
-    }
 
+    tr_bencInitDict( dict, jj );
+
+    /* populate the dict with info key->value pairs */
     for( ii = 0; IPC_INF__MAX > 1 << ii; ii++ )
     {
         if( !( types & ( 1 << ii ) ) )
-        {
             continue;
-        }
-        /* check for missing optional info */
-        if( ( IPC_INF_COMMENT == ( 1 << ii ) && !*inf->comment ) ||
-            ( IPC_INF_CREATOR == ( 1 << ii ) && !*inf->creator ) ||
-            ( IPC_INF_DATE    == ( 1 << ii ) && 0 >= inf->dateCreated ) )
-        {
-            continue;
-        }
 
         item = tr_bencDictAdd( dict, gl_inf[ii].name );
         switch( 1 << ii )
         {
             case IPC_INF_COMMENT:
-                tr_bencInitStr( item, inf->comment, -1, 1 );
+                tr_bencInitStr( item, inf->comment ? inf->comment : "", -1, 1 );
                 break;
             case IPC_INF_CREATOR:
-                tr_bencInitStr( item, inf->creator, -1, 1 );
+                tr_bencInitStr( item, inf->creator ? inf->creator : "", -1, 1 );
                 break;
             case IPC_INF_DATE:
                 tr_bencInitInt( item, inf->dateCreated );
                 break;
             case IPC_INF_FILES:
-                tr_bencInit( item, TYPE_LIST );
-                if( tr_bencListReserve( item, inf->fileCount ) )
-                {
-                    return -1;
-                }
+                tr_bencInitList( item, inf->fileCount );
                 for( ff = 0; inf->fileCount > ff; ff++ )
                 {
                     file = tr_bencListAdd( item );
-                    tr_bencInit( file, TYPE_DICT );
-                    if( tr_bencDictReserve( file, 2 ) )
-                    {
-                        return -1;
-                    }
+                    tr_bencInitDict( file, 2 );
                     tr_bencInitStr( tr_bencDictAdd( file, "name" ),
                                     inf->files[ff].name, -1, 1 );
                     tr_bencInitInt( tr_bencDictAdd( file, "size" ),
@@ -586,7 +610,7 @@ ipc_addinfo( tr_benc * list, int tor, const tr_info * inf, int types )
                 tr_bencInitStr( item, inf->hashString, -1, 1 );
                 break;
             case IPC_INF_ID:
-                tr_bencInitInt( item, tor );
+                tr_bencInitInt( item, torrent_id );
                 break;
             case IPC_INF_NAME:
                 tr_bencInitStr( item, inf->name, -1, 1 );
@@ -601,28 +625,14 @@ ipc_addinfo( tr_benc * list, int tor, const tr_info * inf, int types )
                 tr_bencInitInt( item, inf->totalSize );
                 break;
             case IPC_INF_TRACKERS:
-                tr_bencInit( item, TYPE_LIST );
-                if( tr_bencListReserve( item, inf->trackerTiers ) )
-                {
-                    return -1;
-                }
+                tr_bencInitList( item, inf->trackerTiers );
                 for( jj = 0; inf->trackerTiers > jj; jj++ )
                 {
                     tier = tr_bencListAdd( item );
-                    tr_bencInit( tier, TYPE_LIST );
-                    if( tr_bencListReserve( tier,
-                                            inf->trackerList[jj].count ) )
-                    {
-                        return -1;
-                    }
+                    tr_bencInitList( tier, inf->trackerList[jj].count );
                     for( kk = 0; inf->trackerList[jj].count > kk; kk++ )
-                    {
-                        if( 0 > filltracker( tr_bencListAdd( tier ),
-                                             &inf->trackerList[jj].list[kk] ) )
-                        {
-                            return -1;
-                        }
-                    }
+                        filltracker( tr_bencListAdd( tier ),
+                                     &inf->trackerList[jj].list[kk] );
                 }
                 break;
             default:
@@ -634,32 +644,42 @@ ipc_addinfo( tr_benc * list, int tor, const tr_info * inf, int types )
     return 0;
 }
 
+/**
+ * append to "list" a dictionary whose keys are
+ * the string keys from gl_stat and whose values
+ * are torrent statistics set from "st".
+ *
+ * "types" is a bitwise-and'ed set of fields
+ * from the IPC_INF_* enum in ipcparse.h.
+ * It specifies what to put in the dictionary.
+ */
 int
-ipc_addstat( tr_benc * list, int tor,
-             const tr_stat * st, int types )
+ipc_addstat( tr_benc        * list,
+             int              torrent_id,
+             const tr_stat  * st,
+             int              types )
 {
-    tr_benc  * dict, * item;
-    int           ii, used;
-    tr_errno      error;
+    tr_benc   * dict;
+    int         ii, used;
+
+    /* add the dictionary child */
+    tr_bencListReserve( list, 1 );
+    dict = tr_bencListAdd( list );
 
     /* always send torrent id */
     types |= IPC_ST_ID;
 
-    if( tr_bencListReserve( list, 1 ) )
-        return -1;
-
-    dict = tr_bencListAdd( list );
-
+    /* count the number of stat keys and allocate a dict for them */
     for( ii = used = 0; IPC_ST__MAX > 1 << ii; ii++ )
         if( types & ( 1 << ii ) )
             used++;
+    tr_bencInitDict( dict, used );
 
-    tr_bencInit( dict, TYPE_DICT );
-    if( tr_bencDictReserve( dict, used ) )
-        return -1;
-
+    /* populate the dict */
     for( ii = 0; IPC_ST__MAX > 1 << ii; ii++ )
     {
+        tr_benc * item;
+
         if( !( types & ( 1 << ii ) ) )
             continue;
 
@@ -678,8 +698,8 @@ ipc_addstat( tr_benc * list, int tor,
             case IPC_ST_DOWNTOTAL:
                 tr_bencInitInt( item, st->downloadedEver );
                 break;
-            case IPC_ST_ERROR:
-                error = st->error;
+            case IPC_ST_ERROR: {
+                const tr_errno error = st->error;
                 if( TR_OK == error )
                 {
                     tr_bencInitStr( item, "", -1, 1 );
@@ -725,6 +745,7 @@ ipc_addstat( tr_benc * list, int tor,
                     tr_bencInitStr( item, "other", -1, 1 );
                 }
                 break;
+            }
             case IPC_ST_ERRMSG:
                 if( TR_OK == st->error )
                 {
@@ -743,17 +764,13 @@ ipc_addstat( tr_benc * list, int tor,
                 tr_bencInitInt( item, st->eta );
                 break;
             case IPC_ST_ID:
-                tr_bencInitInt( item, tor );
+                tr_bencInitInt( item, torrent_id );
                 break;
             case IPC_ST_PEERDOWN:
                 tr_bencInitInt( item, st->peersSendingToUs );
                 break;
             case IPC_ST_PEERFROM:
-                tr_bencInit( item, TYPE_DICT );
-                if( tr_bencDictReserve( item, 4 ) )
-                {
-                    return -1;
-                }
+                tr_bencInitDict( item, 4 );
                 tr_bencInitInt( tr_bencDictAdd( item, "incoming" ),
                                 st->peersFrom[TR_PEER_FROM_INCOMING] );
                 tr_bencInitInt( tr_bencDictAdd( item, "tracker" ),
@@ -802,10 +819,7 @@ ipc_addstat( tr_benc * list, int tor,
                 tr_bencInitInt( item, st->swarmspeed * 1024 );
                 break;
             case IPC_ST_TRACKER:
-                if( 0 > filltracker( item, st->tracker ) )
-                {
-                    return -1;
-                }
+                filltracker( item, st->tracker );
                 break;
             case IPC_ST_TKDONE:
                 tr_bencInitInt( item, st->completedFromTracker );
@@ -904,6 +918,16 @@ msglookup( const char * name )
     return bsearch( name,
                     gl_msgs, TR_N_ELEMENTS( gl_msgs ), sizeof( struct msg ),
                     compareNameToMsg );
+}
+
+enum ipc_msg
+ipc_msgid( const struct ipc_info * info, const char * name )
+{
+    const struct msg * msg = msglookup( name );
+
+    return msg && sessionSupportsMessage( info, msg->id )
+        ? msg->id
+        : IPC__MSG_COUNT;
 }
 
 static int
@@ -1040,30 +1064,6 @@ ipc_parse( struct ipc_info * info, const uint8_t * buf, ssize_t total, void * ar
     }
 
     return off;
-}
-
-enum ipc_msg
-ipc_msgid( const struct ipc_info * info, const char * name )
-{
-    const struct msg * msg = msglookup( name );
-
-    return msg && ipc_havemsg( info, msg->id )
-        ? msg->id
-        : IPC__MSG_COUNT;
-}
-
-int
-ipc_ishandled( const struct ipc_info * info, enum ipc_msg id )
-{
-    assert( MSGVALID( id ) );
-
-    return info->funcs->msgs[id] != NULL;
-}
-
-int
-ipc_havetags( const struct ipc_info * info )
-{
-    return !DICTPAYLOAD( info );
 }
 
 static int

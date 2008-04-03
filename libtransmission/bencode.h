@@ -88,6 +88,8 @@ static inline void tr_bencInit( tr_benc    * val, int type )
 void   _tr_bencInitStr( tr_benc * val, char * str, int len, int nofree );
 int    tr_bencInitStrDup( tr_benc * val, const char * str );
 void   tr_bencInitInt( tr_benc * val, int64_t num );
+int   tr_bencInitDict( tr_benc * val, int reserveCount );
+int   tr_bencInitList( tr_benc * val, int reserveCount );
 int   tr_bencListReserve( tr_benc * list, int count );
 /* note that for one key-value pair, count should be 1, not 2 */
 int   tr_bencDictReserve( tr_benc * dict, int count );

@@ -498,7 +498,7 @@ addmsg1( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
         }
     }
 
-    buf = ipc_mkval( &pk, &buflen );
+    buf = ipc_serialize( &pk, &buflen );
     tr_bencFree( &pk );
     queuemsg( client, buf, buflen );
     free( buf );
@@ -562,7 +562,7 @@ addmsg2( enum ipc_msg id UNUSED, benc_val_t * dict, int64_t tag, void * arg )
             byebye( client->ev, EVBUFFER_EOF, NULL );
             return;
         }
-        buf = ipc_mkval( &pk, &buflen );
+        buf = ipc_serialize( &pk, &buflen );
         tr_bencFree( &pk );
         queuemsg( client, buf, buflen );
         free( buf );
@@ -761,7 +761,7 @@ infomsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     }
 
     /* generate packet data and send it */
-    buf = ipc_mkval( &pk, &buflen );
+    buf = ipc_serialize( &pk, &buflen );
     tr_bencFree( &pk );
     queuemsg( client, buf, buflen );
     free( buf );
@@ -906,7 +906,7 @@ lookmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
         }
     }
 
-    buf = ipc_mkval( &pk, &buflen );
+    buf = ipc_serialize( &pk, &buflen );
     tr_bencFree( &pk );
     queuemsg( client, buf, buflen );
     free( buf );
@@ -1027,7 +1027,7 @@ supmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
                         name->val.s.s, name->val.s.i, 1 );
     }
 
-    buf = ipc_mkval( &pk, &buflen );
+    buf = ipc_serialize( &pk, &buflen );
     tr_bencFree( &pk );
     queuemsg( client, buf, buflen );
     free( buf );

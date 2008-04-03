@@ -723,7 +723,7 @@ struct tr_info
     /* Torrent info */
     char               * comment;
     char               * creator;
-    int                  dateCreated;
+    time_t               dateCreated;
 
     /* Pieces info */
     uint32_t             pieceSize;

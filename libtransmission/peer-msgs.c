@@ -871,8 +871,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
     else
         pex = 1;
 
-    tr_bencInit( &val, TYPE_DICT );
-    tr_bencDictReserve( &val, 4 );
+    tr_bencInitDict( &val, 4 );
     tr_bencInitInt( tr_bencDictAdd( &val, "e" ), 1 );
     m  = tr_bencDictAdd( &val, "m" );
     tr_bencInit( m, TYPE_DICT );
@@ -1840,8 +1839,7 @@ sendPex( tr_peermsgs * msgs )
         msgs->pexCount = diffs.elementCount;
 
         /* build the pex payload */
-        tr_bencInit( &val, TYPE_DICT );
-        tr_bencDictReserve( &val, 3 );
+        tr_bencInitDict( &val, 3 );
 
         /* "added" */
         added = tr_bencDictAdd( &val, "added" );

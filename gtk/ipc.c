@@ -183,7 +183,7 @@ client_sendmsg( struct constate * con )
             {
                 tr_bencInitStr( tr_bencListAdd( val ), ii->data, -1, 0 );
             }
-            buf = ipc_mkval( &packet, &size );
+            buf = ipc_serialize( &packet, &size );
             saved = errno;
             tr_bencFree( &packet );
             g_slist_free( cli->files );
@@ -684,7 +684,7 @@ smsg_info( enum ipc_msg id, tr_benc * val, int64_t tag, void * arg )
         }
     }
 
-    buf = ipc_mkval( &packet, &size );
+    buf = ipc_serialize( &packet, &size );
     tr_bencFree( &packet );
     if( NULL == buf )
     {
@@ -745,7 +745,7 @@ smsg_infoall( enum ipc_msg id, tr_benc * val, int64_t tag, void * arg )
         while( gtk_tree_model_iter_next( model, &iter ) );
     }
 
-    buf = ipc_mkval( &packet, &size );
+    buf = ipc_serialize( &packet, &size );
     tr_bencFree( &packet );
     if( NULL == buf )
     {
@@ -829,7 +829,7 @@ smsg_look( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag,
         }
     }
 
-    buf = ipc_mkval( &packet, &size );
+    buf = ipc_serialize( &packet, &size );
     tr_bencFree( &packet );
     if( NULL == buf )
     {
@@ -1116,7 +1116,7 @@ smsg_sup( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag, void * arg )
                         name->val.s.s, name->val.s.i, 1 );
     }
 
-    buf = ipc_mkval( &packet, &size );
+    buf = ipc_serialize( &packet, &size );
     tr_bencFree( &packet );
     if( NULL == buf )
     {
