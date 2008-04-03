@@ -258,7 +258,7 @@ addSingleTorrentDialog( GtkWindow  * parent,
 ****/
 
 static void
-onOpenDialogResponse( GtkDialog * dialog, int response, gpointer core )
+onAddDialogResponse( GtkDialog * dialog, int response, gpointer core )
 {
     char * folder;
 
@@ -288,7 +288,7 @@ addDialog( GtkWindow * parent,
     GtkWidget * c;
     char * folder;
 
-    w = gtk_file_chooser_dialog_new( _( "Open a Torrent" ), parent,
+    w = gtk_file_chooser_dialog_new( _( "Add a Torrent" ), parent,
                                      GTK_FILE_CHOOSER_ACTION_OPEN,
                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                      GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
@@ -299,7 +299,7 @@ addDialog( GtkWindow * parent,
                                              -1 );
     gtk_file_chooser_set_select_multiple( GTK_FILE_CHOOSER( w ), TRUE );
     addTorrentFilters( GTK_FILE_CHOOSER( w ) );
-    g_signal_connect( w, "response", G_CALLBACK(onOpenDialogResponse), core );
+    g_signal_connect( w, "response", G_CALLBACK(onAddDialogResponse), core );
 
     if(( folder = pref_string_get( PREF_KEY_OPEN_DIALOG_FOLDER ))) {
         gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ), folder );
