@@ -495,7 +495,7 @@ PrefsController         * fPrefsController;
         }
     }
 
-    buf = ipc_mkval( &packet, &size );
+    buf = ipc_serialize( &packet, &size );
     tr_bencFree( &packet );
     if( NULL == buf )
         goto fail;
@@ -1052,7 +1052,7 @@ void msg_sup( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
                         name->val.s.s, name->val.s.i, 1 );
     }
 
-    buf = ipc_mkval( &packet, &size );
+    buf = ipc_serialize( &packet, &size );
     tr_bencFree( &packet );
     if( NULL == buf )
         goto fail;
