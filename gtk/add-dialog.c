@@ -12,13 +12,13 @@
 
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+#include "add-dialog.h"
 #include "conf.h"
 #include "file-list.h"
 #include "hig.h"
-#include "open-dialog.h"
 #include "tr-prefs.h"
 
-struct OpenData
+struct AddData
 {
     TrCore * core;
     GtkWidget * list;
@@ -31,7 +31,7 @@ struct OpenData
 };
 
 static void
-deleteOldTorrent( struct OpenData * data )
+deleteOldTorrent( struct AddData * data )
 {
     if( data->gtor )
     {
@@ -44,9 +44,9 @@ deleteOldTorrent( struct OpenData * data )
 }
 
 static void
-openResponseCB( GtkDialog * dialog, gint response, gpointer gdata )
+addResponseCB( GtkDialog * dialog, gint response, gpointer gdata )
 {
-    struct OpenData * data = gdata;
+    struct AddData * data = gdata;
 
     if( data->gtor )
     {
@@ -69,7 +69,7 @@ openResponseCB( GtkDialog * dialog, gint response, gpointer gdata )
 }
 
 static void
-updateTorrent( struct OpenData * o )
+updateTorrent( struct AddData * o )
 {
     if( o->gtor )
         tr_torrentSetFolder( tr_torrent_handle( o->gtor ), o->destination );
@@ -80,7 +80,7 @@ updateTorrent( struct OpenData * o )
 static void
 sourceChanged( GtkFileChooserButton * b, gpointer gdata )
 {
-    struct OpenData * data = gdata;
+    struct AddData * data = gdata;
 
     deleteOldTorrent( data );
 
@@ -106,7 +106,7 @@ sourceChanged( GtkFileChooserButton * b, gpointer gdata )
 static void
 verifyRequested( GtkButton * button UNUSED, gpointer gdata )
 {
-    struct OpenData * data = gdata;
+    struct AddData * data = gdata;
     if( data->gtor )
         tr_torrentVerify( tr_torrent_handle( data->gtor ) );
 }
@@ -114,7 +114,7 @@ verifyRequested( GtkButton * button UNUSED, gpointer gdata )
 static void
 destinationChanged( GtkFileChooserButton * b, gpointer gdata )
 {
-    struct OpenData * data = gdata;
+    struct AddData * data = gdata;
 
     g_free( data->destination );
     data->destination = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( b ) );
@@ -144,9 +144,9 @@ addTorrentFilters( GtkFileChooser * chooser )
 ****/
 
 GtkWidget*
-openSingleTorrentDialog( GtkWindow  * parent,
-                         TrCore     * core,
-                         tr_ctor    * ctor )
+addSingleTorrentDialog( GtkWindow  * parent,
+                        TrCore     * core,
+                        tr_ctor    * ctor )
 {
     int row;
     int col;
@@ -155,14 +155,14 @@ openSingleTorrentDialog( GtkWindow  * parent,
     GtkWidget * d;
     GtkWidget * t;
     GtkWidget * l;
-    struct OpenData * data;
+    struct AddData * data;
     uint8_t flag;
 
     /* make the dialog */
     d = gtk_dialog_new_with_buttons( _( "Torrent Options" ), parent,
             GTK_DIALOG_DESTROY_WITH_PARENT|GTK_DIALOG_NO_SEPARATOR,
             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-            GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+            GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
             NULL );
     gtk_dialog_set_default_response( GTK_DIALOG( d ),
                                      GTK_RESPONSE_ACCEPT );
@@ -174,17 +174,17 @@ openSingleTorrentDialog( GtkWindow  * parent,
     if( tr_ctorGetDestination( ctor, TR_FORCE, &str ) )
         g_assert_not_reached( );
 
-    data = g_new0( struct OpenData, 1 );
+    data = g_new0( struct AddData, 1 );
     data->core = core;
     data->ctor = ctor;
     data->filename = g_strdup( tr_ctorGetSourceFile( ctor ) );
     data->destination = g_strdup( str );
     data->list = file_list_new( NULL );
     data->trash_check = gtk_check_button_new_with_mnemonic( _( "Mo_ve source file to Trash" ) );
-    data->run_check = gtk_check_button_new_with_mnemonic( _( "_Start when opened" ) );
+    data->run_check = gtk_check_button_new_with_mnemonic( _( "_Start when added" ) );
 
     g_signal_connect( G_OBJECT( d ), "response",
-                      G_CALLBACK( openResponseCB ), data );
+                      G_CALLBACK( addResponseCB ), data );
 
     t = gtk_table_new( 6, 2, FALSE );
     gtk_container_set_border_width( GTK_CONTAINER( t ), GUI_PAD_BIG );
@@ -281,8 +281,8 @@ onOpenDialogResponse( GtkDialog * dialog, int response, gpointer core )
 }
 
 GtkWidget*
-openDialog( GtkWindow * parent,
-            TrCore    * core )
+addDialog( GtkWindow * parent,
+           TrCore    * core )
 {
     GtkWidget * w;
     GtkWidget * c;
@@ -291,7 +291,7 @@ openDialog( GtkWindow * parent,
     w = gtk_file_chooser_dialog_new( _( "Open a Torrent" ), parent,
                                      GTK_FILE_CHOOSER_ACTION_OPEN,
                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                     GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
                                      NULL );
     gtk_dialog_set_alternative_button_order( GTK_DIALOG( w ),
                                              GTK_RESPONSE_ACCEPT,

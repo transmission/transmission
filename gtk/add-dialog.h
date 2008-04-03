@@ -10,18 +10,18 @@
  * $Id$
  */
 
-#ifndef TR_GTK_OPEN_DIALOG_H
-#define TR_GTK_OPEN_DIALOG_H
+#ifndef TR_GTK_ADD_DIALOG_H
+#define TR_GTK_ADD_DIALOG_H
 
 #include <gtk/gtkwindow.h>
 #include "tr-core.h"
 
 /* This dialog assumes ownership of the ctor */
-GtkWidget* openSingleTorrentDialog( GtkWindow  * parent,
-                                    TrCore     * core,
-                                    tr_ctor    * ctor );
+GtkWidget* addSingleTorrentDialog( GtkWindow  * parent,
+                                   TrCore     * core,
+                                   tr_ctor    * ctor );
 
-GtkWidget* openDialog( GtkWindow * parent,
-                       TrCore    * core );
+GtkWidget* addDialog( GtkWindow * parent,
+                      TrCore    * core );
 
-#endif /* TR_GTK_OPEN_DIALOG */
+#endif /* TR_GTK_ADD_DIALOG */

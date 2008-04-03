@@ -15,6 +15,7 @@ AM_CFLAGS = \
 
 noinst_HEADERS = \
     actions.h \
+    add-dialog.h \
     conf.h \
     details.h \
     dialogs.h \
@@ -26,7 +27,6 @@ noinst_HEADERS = \
     makemeta-ui.h \
     msgwin.h \
     notify.h \
-    open-dialog.h \
     stats.h \
     sexy-icon-entry.h \
     torrent-cell-renderer.h \
@@ -43,6 +43,7 @@ bin_PROGRAMS = transmission
 
 transmission_SOURCES = \
     actions.c \
+    add-dialog.c \
     conf.c \
     details.c \
     dialogs.c \
@@ -53,7 +54,6 @@ transmission_SOURCES = \
     makemeta-ui.c \
     msgwin.c \
     notify.c \
-    open-dialog.c \
     sexy-icon-entry.c \
     stats.c \
     torrent-cell-renderer.c \

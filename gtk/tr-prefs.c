@@ -230,7 +230,7 @@ torrentPage( GObject * core )
 #endif
 
     t = hig_workarea_create( );
-    hig_workarea_add_section_title( t, &row, _( "Opening Torrents" ) );
+    hig_workarea_add_section_title( t, &row, _( "Adding Torrents" ) );
 
 #ifdef HAVE_GIO
         s = _( "Automatically add torrents from:" );
@@ -245,7 +245,7 @@ torrentPage( GObject * core )
         w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );
         hig_workarea_add_wide_control( t, &row, w );
 
-        s = _( "_Start when opened" );
+        s = _( "_Start when added" );
         w = new_check_button( s, PREF_KEY_START, core );
         hig_workarea_add_wide_control( t, &row, w );
 

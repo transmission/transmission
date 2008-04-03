@@ -41,6 +41,7 @@
 #endif
 
 #include "actions.h"
+#include "add-dialog.h"
 #include "conf.h"
 #include "details.h"
 #include "dialogs.h"
@@ -49,7 +50,6 @@
 #include "makemeta-ui.h"
 #include "msgwin.h"
 #include "notify.h"
-#include "open-dialog.h"
 #include "stats.h"
 #include "tr-core.h"
 #include "tr-icon.h"
@@ -780,7 +780,7 @@ static void
 onAddTorrent( TrCore * core, tr_ctor * ctor, gpointer gdata )
 {
     struct cbdata * cbdata = gdata;
-    GtkWidget * w = openSingleTorrentDialog( cbdata->wind, core, ctor );
+    GtkWidget * w = addSingleTorrentDialog( cbdata->wind, core, ctor );
 #if GTK_CHECK_VERSION(2,8,0)
     g_signal_connect( w, "focus-in-event", G_CALLBACK(on_main_window_focus_in),  cbdata );
     gtk_window_set_urgency_hint( cbdata->wind, TRUE );
@@ -1009,9 +1009,10 @@ doAction ( const char * action_name, gpointer user_data )
     struct cbdata * data = user_data;
     gboolean changed = FALSE;
 
-    if ( !strcmp (action_name, "open-torrent-menu") || !strcmp( action_name, "open-torrent-toolbar" ))
+    if ( !strcmp (action_name, "add-torrent-menu") ||
+         !strcmp( action_name, "add-torrent-toolbar" ))
     {
-        openDialog( data->wind, data->core );
+        addDialog( data->wind, data->core );
     }
     else if (!strcmp (action_name, "show-stats"))
     {

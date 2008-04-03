@@ -1,5 +1,6 @@
 [encoding: UTF-8]
 gtk/actions.c
+gtk/add-dialog.c
 gtk/conf.c
 gtk/details.c
 gtk/dialogs.c
@@ -10,7 +11,6 @@ gtk/main.c
 gtk/makemeta-ui.c
 gtk/msgwin.c
 gtk/notify.c
-gtk/open-dialog.c
 gtk/sexy-icon-entry.c
 gtk/stats.c
 gtk/torrent-cell-renderer.c
