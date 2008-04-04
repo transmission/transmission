@@ -36,6 +36,7 @@
     typedef unsigned short tr_port_t;
     typedef int socklen_t;
 #else
+    #include <sys/types.h>
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>

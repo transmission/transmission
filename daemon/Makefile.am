@@ -32,7 +32,7 @@ COMMON_LDADD = \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/libevent/libevent.la \
-    $(OPENSSL_LIBS) $(PTHREAD_LIBS) -lm
+    $(INTLLIBS) $(OPENSSL_LIBS) $(PTHREAD_LIBS) -lm
 
 transmission_daemon_SOURCES = daemon.c server.c torrents.c
 transmission_daemon_LDADD = $(COMMON_LDADD)
