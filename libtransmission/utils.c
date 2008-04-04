@@ -397,7 +397,7 @@ tr_loadFile( const char * path, size_t * size )
     errno = 0;
     if( stat( path, &sb ) )
     {
-        tr_err( _( "Couldn't read file \"%s\": %s" ), path, tr_strerror(errno) );
+        tr_dbg( _( "Couldn't read file \"%s\": %s" ), path, tr_strerror(errno) );
         return NULL;
     }
 
