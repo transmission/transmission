@@ -64,21 +64,17 @@ char * tr_clientForId( const uint8_t * id )
                         id[6] == 'Z' || id[6] == 'X' ? "+" : "" );
             }
         }
-        else if( !memcmp( &id[1], "AZ", 2 ) )
-        {
-            tr_asprintf( &ret, "Azureus %c.%c.%c.%c",
-                      id[3], id[4], id[5], id[6] );
-        }
-        else if( !memcmp( &id[1], "XL", 2 ) )
-        {
-            tr_asprintf( &ret, "Xunlei %c.%c.%c.%c",
-                         id[3], id[4], id[5], id[6] );
-        }
         else if( !memcmp( &id[1], "UT", 2 ) )
         {
             tr_asprintf( &ret, "\xc2\xb5Torrent %c.%d", id[3],
                       charToInt( id[4] ) * 10 + charToInt( id[5] ) );
         }
+        else if( !memcmp( &id[1], "AZ", 2 ) )
+        {
+            tr_asprintf( &ret, "Azureus %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
+        }
+        
         else if( !memcmp( &id[1], "BC", 2 ) )
         {
             tr_asprintf( &ret, "BitComet %d.%c%c",
@@ -89,6 +85,11 @@ char * tr_clientForId( const uint8_t * id )
         {
             tr_asprintf( &ret, "Shareaza %c.%c.%c.%c",
                       id[3], id[4], id[5], id[6] );
+        }
+        else if( !memcmp( &id[1], "XL", 2 ) )
+        {
+            tr_asprintf( &ret, "Xunlei %c.%c.%c.%c",
+                         id[3], id[4], id[5], id[6] );
         }
         else if( !memcmp( &id[1], "BOW", 3 ) )
         {
