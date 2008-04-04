@@ -6,7 +6,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Only make the progress status string clickable on multi-file torrents
    + Traditional Chinese localization, updated Russian localization
 - GTK+
-   + Fix a couple of minor display issues.
+   + Fix a couple of minor display issues
 
 1.10 (2008/03/28)
 - All Platforms
