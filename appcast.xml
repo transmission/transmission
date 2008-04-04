@@ -6,33 +6,21 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Fri, 28 Mar 2008 13:46:00 -0400</pubDate>
-    <lastBuildDate>Fri, 28 Mar 2008 13:46:00 -0400</lastBuildDate>
+    <lastBuildDate>Fri, 4 Apr 2008 14:54:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 1.10 Released</title>
+      <title>Transmission 1.11 Released</title>
       <description><![CDATA[
-<h4>Core Changes:</h4>
-<ul>
- <li>Stop torrents when downloading and the disk becomes full</li>
- <li>Removing a torrent also removes it from the cache</li>
- <li>Smaller memory footprint per-torrent and per-peer</li>
- <li>Various backend bugfixes & improvements</li>
-</ul>
 <h4>Mac-specific Changes:</h4>
 <ul>
- <li>Window when adding torrents to select files and other settings</li>
- <li>Leopard: Collapsable group dividers</li>
- <li>Use the file icon as the per-torrent action button</li>
- <li>Tracker tab in the inspector</li>
- <li>Message log specifies the torrent/activity the message relates to</li>
- <li>Updated images in the inspector</li>
- <li>Optional display of remaining time while seeding in Minimal View</li>
- <li>Improved accuracy for displaying the remaining disk space warning</li>
+ <li>Fix visual glitch with the tracker inspector tab when there is no scrape address</li>
+ <li>Only make the progress status string clickable on multi-file torrents</li>
+ <li>Traditional Chinese localization, updated Russian localization</li>
 </ul>
 
 Transmission 0.72 and earlier: Complete your downloads before upgrading or you will lose data!]]></description>
-      <pubDate>Fri, 28 Mar 2008 13:46:00 -0400</pubDate>
-      <enclosure sparkle:version="5422" sparkle:shortVersionString="1.10" url="http://mirrors.m0k.org/transmission/files/Transmission-1.10.dmg" length="2776781" type="application/octet-stream"/>
+      <pubDate>Fri, 4 Apr 2008 14:54:00 -0400</pubDate>
+      <enclosure sparkle:version="5504" sparkle:shortVersionString="1.11" url="http://mirrors.m0k.org/transmission/files/Transmission-1.11.dmg" length="2923743" type="application/octet-stream"/>
     </item>
     
   </channel>
