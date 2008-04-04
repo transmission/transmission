@@ -41,26 +41,21 @@
 ***
 **/
 
-static int
-isType( const tr_benc * val, int type )
+int
+tr_bencIsType( const tr_benc * val, int type )
 {
     return ( ( val != NULL ) && ( val->type == type ) );
 }
 
-#define isInt(v)    ( isType( ( v ), TYPE_INT ) )
-#define isString(v) ( isType( ( v ), TYPE_STR ) )
-#define isList(v)   ( isType( ( v ), TYPE_LIST ) )
-#define isDict(v)   ( isType( ( v ), TYPE_DICT ) )
-
 static int
 isContainer( const tr_benc * val )
 {
-    return isList(val) || isDict(val);
+    return tr_bencIsList(val) || tr_bencIsDict(val);
 }
 static int
 isSomething( const tr_benc * val )
 {
-    return isContainer(val) || isInt(val) || isString(val);
+    return isContainer(val) || tr_bencIsInt(val) || tr_bencIsString(val);
 }
 
 /***
@@ -272,7 +267,7 @@ tr_bencParse( const void     * buf_in,
                 return TR_ERROR;
 
             node = tr_ptrArrayBack( parentStack );
-            if( isDict( node ) && ( node->val.l.count % 2 ) )
+            if( tr_bencIsDict( node ) && ( node->val.l.count % 2 ) )
                 return TR_ERROR; /* odd # of children in dict */
 
             tr_ptrArrayPop( parentStack );
@@ -338,7 +333,7 @@ tr_bencDictFind( tr_benc * val, const char * key )
 {
     int len, ii;
 
-    if( !isDict( val ) )
+    if( !tr_bencIsDict( val ) )
         return NULL;
 
     len = strlen( key );
@@ -385,7 +380,7 @@ tr_benc*
 tr_bencListGetNthChild( tr_benc * val, int i )
 {
     tr_benc * ret = NULL;
-    if( isList( val ) && ( i >= 0 ) && ( i < val->val.l.count ) )
+    if( tr_bencIsList( val ) && ( i >= 0 ) && ( i < val->val.l.count ) )
         ret = val->val.l.vals + i;
     return ret;
 }
@@ -393,14 +388,14 @@ tr_bencListGetNthChild( tr_benc * val, int i )
 int64_t
 tr_bencGetInt ( const tr_benc * val )
 {
-    assert( isInt( val ) );
+    assert( tr_bencIsInt( val ) );
     return val->val.i;
 }
 
 char *
 tr_bencStealStr( tr_benc * val )
 {
-    assert( isString( val ) );
+    assert( tr_bencIsString( val ) );
     val->val.s.nofree = 1;
     return val->val.s.s;
 }
@@ -450,7 +445,7 @@ tr_bencInitList( tr_benc * val, int reserveCount )
 int
 tr_bencListReserve( tr_benc * val, int count )
 {
-    assert( isList( val ) );
+    assert( tr_bencIsList( val ) );
     return makeroom( val, count );
 }
 
@@ -464,7 +459,7 @@ tr_bencInitDict( tr_benc * val, int reserveCount )
 int
 tr_bencDictReserve( tr_benc * val, int count )
 {
-    assert( isDict( val ) );
+    assert( tr_bencIsDict( val ) );
     return makeroom( val, count * 2 );
 }
 
@@ -473,7 +468,7 @@ tr_bencListAdd( tr_benc * list )
 {
     tr_benc * item;
 
-    assert( isList( list ) );
+    assert( tr_bencIsList( list ) );
     assert( list->val.l.count < list->val.l.alloc );
 
     item = &list->val.l.vals[list->val.l.count];
@@ -488,7 +483,7 @@ tr_bencDictAdd( tr_benc * dict, const char * key )
 {
     tr_benc * keyval, * itemval;
 
-    assert( isDict( dict ) );
+    assert( tr_bencIsDict( dict ) );
     assert( dict->val.l.count + 2 <= dict->val.l.alloc );
 
     keyval = dict->val.l.vals + dict->val.l.count++;
@@ -535,7 +530,7 @@ nodeNewDict( const tr_benc * val )
     struct SaveNode * node;
     struct KeyIndex * indices;
 
-    assert( isDict( val ) );
+    assert( tr_bencIsDict( val ) );
 
     nKeys = val->val.l.count / 2;
     node = tr_new0( struct SaveNode, 1 );
@@ -566,7 +561,7 @@ nodeNewList( const tr_benc * val )
     int i, n;
     struct SaveNode * node;
 
-    assert( isList( val ) );
+    assert( tr_bencIsList( val ) );
 
     n = val->val.l.count;
     node = tr_new0( struct SaveNode, 1 );
@@ -596,9 +591,9 @@ nodeNew( const tr_benc * val )
 {
     struct SaveNode * node;
 
-    if( isList( val ) )
+    if( tr_bencIsList( val ) )
         node = nodeNewList( val );
-    else if( isDict( val ) )
+    else if( tr_bencIsDict( val ) )
         node = nodeNewDict( val );
     else
         node = nodeNewLeaf( val );

@@ -222,7 +222,7 @@ cli_io_received( GSource * source UNUSED, void * data, size_t len,
         return 0;
     }
 
-    res = ipc_parse( con->ipc, data, len, con );
+    res = ipc_handleMessages( con->ipc, data, len, con );
 
     if( 0 > res )
     {
@@ -381,7 +381,7 @@ srv_io_received( GSource * source UNUSED, void * data, size_t len,
         destroycon( con );
     }
 
-    res = ipc_parse( con->ipc, data, len, con );
+    res = ipc_handleMessages( con->ipc, data, len, con );
 
     if( 0 > res )
     {
@@ -494,7 +494,7 @@ smsg_add( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag, void * arg )
     int                    ii;
     GSList               * list = NULL;
 
-    if( NULL == val || TYPE_LIST != val->type )
+    if( !tr_bencIsList( val ) )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
@@ -530,7 +530,7 @@ smsg_addone( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag,
     tr_benc           * file, * data, * dir, * start;
     tr_ctor              * ctor;
 
-    if( !val || ( val->type != TYPE_DICT ) )
+    if( !tr_bencIsDict( val ) )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
@@ -541,10 +541,10 @@ smsg_addone( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag,
     dir   = tr_bencDictFind( val, "directory" );
     start = tr_bencDictFind( val, "autostart" );
 
-    if( ( NULL != file  && TYPE_STR != file->type  ) ||
-        ( NULL != data  && TYPE_STR != data->type  ) ||
-        ( NULL != dir   && TYPE_STR != dir->type   ) ||
-        ( NULL != start && TYPE_INT != start->type ) )
+    if( ( file  && !tr_bencIsString( file ) ) ||
+        ( data  && !tr_bencIsString( data ) ) ||
+        ( dir   && !tr_bencIsString( dir ) )  ||
+        ( start && !tr_bencIsInt( start ) ) )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
@@ -645,7 +645,7 @@ smsg_info( enum ipc_msg id, tr_benc * val, int64_t tag, void * arg )
     uint8_t              * buf;
     size_t                 size;
 
-    if( NULL == val || TYPE_DICT != val->type )
+    if( !tr_bencIsDict( val ) )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
@@ -654,8 +654,7 @@ smsg_info( enum ipc_msg id, tr_benc * val, int64_t tag, void * arg )
     respid = ( IPC_MSG_GETINFO == id ? IPC_MSG_INFO : IPC_MSG_STAT );
     ids    = tr_bencDictFind( val, "id" );
     types  = tr_bencDictFind( val, "types" );
-    if( NULL == ids   || TYPE_LIST != ids->type ||
-        NULL == types || TYPE_LIST != types->type )
+    if( !tr_bencIsList(ids) || !tr_bencIsList(types) )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
@@ -711,7 +710,7 @@ smsg_infoall( enum ipc_msg id, tr_benc * val, int64_t tag, void * arg )
     uint8_t              * buf;
     size_t                 size;
 
-    if( NULL == val || TYPE_LIST != val->type )
+    if( !tr_bencIsList( val ) )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
@@ -798,7 +797,7 @@ smsg_look( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag,
     uint8_t              * buf;
     size_t                 size;
 
-    if( NULL == val || TYPE_LIST != val->type )
+    if( !tr_bencIsList( val ) )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
@@ -851,7 +850,7 @@ smsg_tor( enum ipc_msg id, tr_benc * val, int64_t tag, void * arg )
     GtkTreeIter            iter;
     int                    ii;
 
-    if( NULL == val || TYPE_LIST != val->type )
+    if( !tr_bencIsList( val ) )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
@@ -1000,7 +999,7 @@ smsg_int( enum ipc_msg id, tr_benc * val, int64_t tag, void * arg )
     struct constate      * con = arg;
     struct constate_serv * srv = &con->u.serv;
 
-    if( NULL == val || TYPE_INT != val->type || INT_MAX < val->val.i )
+    if( !tr_bencIsInt( val ) || INT_MAX < val->val.i )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
@@ -1054,7 +1053,7 @@ smsg_str( enum ipc_msg id, tr_benc * val, int64_t tag, void * arg )
     struct constate      * con = arg;
     struct constate_serv * srv = &con->u.serv;
 
-    if( NULL == val || TYPE_STR != val->type )
+    if( !tr_bencIsString( val ) )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
@@ -1075,13 +1074,13 @@ static void
 smsg_sup( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag, void * arg )
 {
     struct constate      * con = arg;
-    tr_benc                packet, * pkval, * name;
+    tr_benc                packet, * pkval;
     int                    ii;
     enum ipc_msg           found;
     uint8_t              * buf;
     size_t                 size;
 
-    if( NULL == val || TYPE_LIST != val->type )
+    if( !tr_bencIsList( val ) )
     {
         simpleresp( con, tag, IPC_MSG_BAD );
         return;
@@ -1102,30 +1101,26 @@ smsg_sup( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag, void * arg )
 
     for( ii = 0; val->val.l.count > ii; ii++ )
     {
-        name = &val->val.l.vals[ii];
-        if( NULL == name || TYPE_STR != name->type )
-        {
+        tr_benc * name = &val->val.l.vals[ii];
+
+        if( !tr_bencIsString( name ) )
             continue;
-        }
+
         found = ipc_msgid( con->ipc, name->val.s.s );
         if( IPC__MSG_COUNT == found || !ipc_ishandled( con->ipc, found ) )
-        {
             continue;
-        }
+
         tr_bencInitStr( tr_bencListAdd( pkval ),
                         name->val.s.s, name->val.s.i, 1 );
     }
 
     buf = ipc_serialize( &packet, &size );
     tr_bencFree( &packet );
-    if( NULL == buf )
-    {
+
+    if( !buf )
         simpleresp( con, tag, IPC_MSG_FAIL );
-    }
     else
-    {
         io_send_keepdata( con->source, buf, size );
-    }
 }
 
 void

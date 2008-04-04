@@ -174,7 +174,7 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     /* comment */
     memset( buf, '\0', sizeof( buf ) );
     val = tr_bencDictFindFirst( meta, "comment.utf-8", "comment", NULL );
-    if( val && val->type == TYPE_STR )
+    if( tr_bencIsString( val ) )
         strlcat_utf8( buf, val->val.s.s, sizeof( buf ), 0 );
     tr_free( inf->comment );
     inf->comment = tr_strdup( buf );
@@ -182,7 +182,7 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     /* creator */
     memset( buf, '\0', sizeof( buf ) );
     val = tr_bencDictFindFirst( meta, "created by.utf-8", "created by", NULL );
-    if( val && val->type == TYPE_STR )
+    if( tr_bencIsString( val ) )
         strlcat_utf8( buf, val->val.s.s, sizeof( buf ), 0 );
     tr_free( inf->creator );
     inf->creator = tr_strdup( buf );
@@ -190,23 +190,21 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     /* Date created */
     inf->dateCreated = 0;
     val = tr_bencDictFind( meta, "creation date" );
-    if( NULL != val && TYPE_INT == val->type )
-    {
+    if( tr_bencIsInt( val ) )
         inf->dateCreated = val->val.i;
-    }
     
     /* Private torrent */
     val  = tr_bencDictFind( beInfo, "private" );
     val2 = tr_bencDictFind( meta,  "private" );
-    if( ( NULL != val  && ( TYPE_INT != val->type  || 0 != val->val.i ) ) ||
-        ( NULL != val2 && ( TYPE_INT != val2->type || 0 != val2->val.i ) ) )
+    if( ( tr_bencIsInt(val) && val->val.i ) ||
+        ( tr_bencIsInt(val2) && val2->val.i ) )
     {
         inf->isPrivate = 1;
     }
     
     /* Piece length */
     val = tr_bencDictFind( beInfo, "piece length" );
-    if( NULL == val || TYPE_INT != val->type )
+    if( !tr_bencIsInt( val ) )
     {
         if( val )
             tr_err( _( "Invalid metadata entry \"%s\"" ), "piece length" );
@@ -218,7 +216,7 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
 
     /* Hashes */
     val = tr_bencDictFind( beInfo, "pieces" );
-    if( NULL == val || TYPE_STR != val->type )
+    if( !tr_bencIsString( val ) )
     {
         if( val )
             tr_err( _( "Invalid metadata entry \"%s\"" ), "pieces" );
@@ -307,29 +305,24 @@ void tr_metainfoFree( tr_info * inf )
 static int
 getfile( char ** setme, const char * prefix, tr_benc * name )
 {
-    tr_benc     * dir;
     const char ** list;
     int           ii, jj;
     char          buf[4096];
 
-    if( TYPE_LIST != name->type )
-    {
+    if( !tr_bencIsList( name ) )
         return TR_EINVALID;
-    }
 
     list = calloc( name->val.l.count, sizeof( list[0] ) );
-    if( NULL == list )
-    {
+    if( !list )
         return TR_EINVALID;
-    }
 
     for( ii = jj = 0; name->val.l.count > ii; ii++ )
     {
-        dir = &name->val.l.vals[ii];
-        if( TYPE_STR != dir->type )
-        {
+        tr_benc * dir = &name->val.l.vals[ii];
+
+        if( !tr_bencIsString( dir ) )
             continue;
-        }
+
         if( 0 == strcmp( "..", dir->val.s.s ) )
         {
             if( 0 < jj )
@@ -367,15 +360,15 @@ getfile( char ** setme, const char * prefix, tr_benc * name )
 
 static int getannounce( tr_info * inf, tr_benc * meta )
 {
-    tr_benc           * val, * subval, * urlval;
+    tr_benc           * val, * urlval;
     char              * address, * announce;
-    int                 ii, jj, port, random, subcount;
+    int                 ii, jj, port, random;
     tr_tracker_info   * sublist;
     void * swapping;
 
     /* Announce-list */
     val = tr_bencDictFind( meta, "announce-list" );
-    if( NULL != val && TYPE_LIST == val->type && 0 < val->val.l.count )
+    if( tr_bencIsList(val) && 0 < val->val.l.count )
     {
         inf->trackerTiers = 0;
         inf->trackerList = calloc( val->val.l.count,
@@ -384,12 +377,12 @@ static int getannounce( tr_info * inf, tr_benc * meta )
         /* iterate through the announce-list's tiers */
         for( ii = 0; ii < val->val.l.count; ii++ )
         {
-            subval = &val->val.l.vals[ii];
-            if( TYPE_LIST != subval->type || 0 >= subval->val.l.count )
-            {
+            int subcount = 0;
+            tr_benc * subval = &val->val.l.vals[ii];
+
+            if( !tr_bencIsList(subval) || 0 >= subval->val.l.count )
                 continue;
-            }
-            subcount = 0;
+
             sublist = calloc( subval->val.l.count, sizeof( sublist[0] ) );
 
             /* iterate through the tier's items */
@@ -463,7 +456,7 @@ static int getannounce( tr_info * inf, tr_benc * meta )
 
     /* Regular announce value */
     val = tr_bencDictFind( meta, "announce" );
-    if( NULL == val || TYPE_STR != val->type )
+    if( !tr_bencIsString( val ) )
     {
         tr_err( _( "Missing metadata entry \"%s\"" ), "announce" );
         return TR_EINVALID;
@@ -611,7 +604,7 @@ parseFiles( tr_info * inf, tr_benc * name,
     tr_benc * item, * path;
     int ii;
 
-    if( NULL == name || TYPE_STR != name->type )
+    if( !tr_bencIsString( name ) )
     {
         if( name )
             tr_err( _( "Invalid metadata entry \"%s\"" ), "name" );
@@ -629,7 +622,7 @@ parseFiles( tr_info * inf, tr_benc * name,
     }
     inf->totalSize = 0;
 
-    if( files && TYPE_LIST == files->type )
+    if( tr_bencIsList( files ) )
     {
         /* Multi-file mode */
         inf->isMultifile = 1;
@@ -652,7 +645,7 @@ parseFiles( tr_info * inf, tr_benc * name,
                 return TR_EINVALID;
             }
             length = tr_bencDictFind( item, "length" );
-            if( NULL == length || TYPE_INT != length->type )
+            if( !tr_bencIsInt( length ) )
             {
                 if( length )
                     tr_err( _( "Invalid metadata entry \"%s\"" ), "length" );
@@ -664,7 +657,7 @@ parseFiles( tr_info * inf, tr_benc * name,
             inf->totalSize         += length->val.i;
         }
     }
-    else if( NULL != length && TYPE_INT == length->type )
+    else if( tr_bencIsInt( length ) )
     {
         char buf[4096];
 

@@ -358,7 +358,7 @@ doread( struct bufferevent * ev, void * arg )
         return;
     }
 
-    res = ipc_parse( client->ipc, buf, len, client );
+    res = ipc_handleMessages( client->ipc, buf, len, client );
 
     if( gl_exiting )
     {
@@ -457,12 +457,12 @@ void
 addmsg1( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 {
     struct client * client = arg;
-    benc_val_t      pk, * added, * file;
+    benc_val_t      pk, * added;
     int             ii, tor;
     size_t          buflen;
     uint8_t       * buf;
 
-    if( NULL == val || TYPE_LIST != val->type )
+    if( !tr_bencIsList( val ) )
     {
         msgresp( client, tag, IPC_MSG_BAD );
         return;
@@ -478,11 +478,10 @@ addmsg1( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 
     for( ii = 0; ii < val->val.l.count; ii++ )
     {
-        file = &val->val.l.vals[ii];
-        if( TYPE_STR != file->type )
-        {
+        tr_benc * file = &val->val.l.vals[ii];
+        if( !tr_bencIsString( file ) )
             continue;
-        }
+
         /* XXX need to somehow inform client of skipped or failed files */
         tor = torrent_add_file( file->val.s.s, NULL, -1 );
         if( TORRENT_ID_VALID( tor ) )
@@ -514,19 +513,18 @@ addmsg2( enum ipc_msg id UNUSED, benc_val_t * dict, int64_t tag, void * arg )
     uint8_t       * buf;
     const char    * dir;
 
-    if( NULL == dict || TYPE_DICT != dict->type )
+    if( !tr_bencIsDict( dict ) )
     {
         msgresp( client, tag, IPC_MSG_BAD );
         return;
     }
 
     val   = tr_bencDictFind( dict, "directory" );
-    dir   = ( NULL == val || TYPE_STR != val->type ? NULL : val->val.s.s );
+    dir   = tr_bencIsString( val ) ? val->val.s.s : NULL;
     val   = tr_bencDictFind( dict, "autostart" );
-    start = ( NULL == val || TYPE_INT != val->type ? -1 :
-              ( val->val.i ? 1 : 0 ) );
+    start = tr_bencIsInt( val ) ? (val->val.i!=0) : -1;
     val   = tr_bencDictFind( dict, "data" );
-    if( NULL != val && TYPE_STR == val->type )
+    if( tr_bencIsString( val ) )
     {
         /* XXX detect duplicates and return a message indicating so */
         tor = torrent_add_data( ( uint8_t * )val->val.s.s, val->val.s.i,
@@ -535,7 +533,7 @@ addmsg2( enum ipc_msg id UNUSED, benc_val_t * dict, int64_t tag, void * arg )
     else
     {
         val = tr_bencDictFind( dict, "file" );
-        if( NULL == val || TYPE_STR != val->type )
+        if( !tr_bencIsString( val ) )
         {
             msgresp( client, tag, IPC_MSG_BAD );
             return;
@@ -586,7 +584,7 @@ intmsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     struct client * client = arg;
     int             num;
 
-    if( NULL == val || TYPE_INT != val->type )
+    if( !tr_bencIsInt( val ) )
     {
         msgresp( client, tag, IPC_MSG_BAD );
         return;
@@ -626,7 +624,7 @@ strmsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 {
     struct client * client = arg;
 
-    if( NULL == val || TYPE_STR != val->type )
+    if( !tr_bencIsString( val ) )
     {
         msgresp( client, tag, IPC_MSG_BAD );
         return;
@@ -704,7 +702,7 @@ infomsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     /* add info/status for all torrents */
     if( all )
     {
-        if( NULL == val || TYPE_LIST != val->type )
+        if( !tr_bencIsList( val ) )
         {
             msgresp( client, tag, IPC_MSG_BAD );
             tr_bencFree( &pk );
@@ -726,7 +724,7 @@ infomsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     /* add info/status for the requested IDs */
     else
     {
-        if( NULL == val || TYPE_DICT != val->type )
+        if( !tr_bencIsDict( val ) )
         {
             msgresp( client, tag, IPC_MSG_BAD );
             tr_bencFree( &pk );
@@ -734,8 +732,7 @@ infomsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
         }
         typelist = tr_bencDictFind( val, "type" );
         idlist   = tr_bencDictFind( val, "id" );
-        if( NULL == typelist || TYPE_LIST != typelist->type ||
-            NULL == idlist   || TYPE_LIST != idlist->type )
+        if( !tr_bencIsList(typelist) || !tr_bencIsList(idlist) )
         {
             msgresp( client, tag, IPC_MSG_BAD );
             tr_bencFree( &pk );
@@ -836,7 +833,7 @@ tormsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     /* remove/start/stop requested list of torrents */
     else
     {
-        if( NULL == val || TYPE_LIST != val->type )
+        if( !tr_bencIsList( val ) )
         {
             msgresp( client, tag, IPC_MSG_BAD );
             return;
@@ -865,7 +862,7 @@ lookmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
     benc_val_t    * hash, pk, * pkinf;
     int64_t         found;
 
-    if( NULL == val || TYPE_LIST != val->type )
+    if( !tr_bencIsList( val ) )
     {
         msgresp( client, tag, IPC_MSG_BAD );
         return;
@@ -883,8 +880,7 @@ lookmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
     {
         const tr_info * inf;
         hash = &val->val.l.vals[ii];
-        if( NULL == hash || TYPE_STR != hash->type ||
-            SHA_DIGEST_LENGTH * 2 != hash->val.s.i )
+        if( !tr_bencIsString(hash) || SHA_DIGEST_LENGTH * 2 != hash->val.s.i )
         {
             tr_bencFree( &pk );
             msgresp( client, tag, IPC_MSG_BAD );
@@ -984,10 +980,10 @@ supmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
     uint8_t        * buf;
     size_t           buflen;
     int              ii;
-    benc_val_t       pk, *pkval, * name;
+    benc_val_t       pk, *pkval;
     enum ipc_msg     found;
 
-    if( NULL == val || TYPE_LIST != val->type )
+    if( !tr_bencIsList( val ) )
     {
         msgresp( client, tag, IPC_MSG_BAD );
         return;
@@ -1011,8 +1007,8 @@ supmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 
     for( ii = 0; val->val.l.count > ii; ii++ )
     {
-        name = &val->val.l.vals[ii];
-        if( NULL == name || TYPE_STR != name->type )
+        tr_benc * name = &val->val.l.vals[ii];
+        if( !tr_bencIsString( name ) )
         {
             tr_bencFree( &pk );
             msgresp( client, tag, IPC_MSG_BAD );

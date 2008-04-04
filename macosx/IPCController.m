@@ -355,7 +355,7 @@ PrefsController         * fPrefsController;
     if( IPC_MIN_MSG_LEN > [_buf length] )
         return;
 
-    res = ipc_parse( _ipc, [_buf mutableBytes], [_buf length], self );
+    res = ipc_handleMessages( _ipc, [_buf mutableBytes], [_buf length], self );
 
     if( 0 > res )
     {

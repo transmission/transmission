@@ -655,7 +655,7 @@ loadstate( void )
 {
     uint8_t   *  buf;
     size_t       len;
-    benc_val_t   top, * num, * str, * list, * dict;
+    benc_val_t   top, * num, * str, * list;
     int          ii;
     struct tor * tor;
     const char * dir;
@@ -675,56 +675,43 @@ loadstate( void )
     free( buf );
 
     num = tr_bencDictFind( &top, "autostart" );
-    if( NULL != num && TYPE_INT == num->type )
-    {
+    if( tr_bencIsInt( num ) )
         gl_autostart = ( num->val.i ? 1 : 0 );
-    }
 
     num = tr_bencDictFind( &top, "port" );
-    if( NULL != num && TYPE_INT == num->type &&
-        0 < num->val.i && 0xffff > num->val.i )
+    if( tr_bencIsInt( num ) && 0 < num->val.i && 0xffff > num->val.i )
     {
         gl_port = num->val.i;
     }
     tr_setBindPort( gl_handle, gl_port );
 
     num = tr_bencDictFind( &top, "default-pex" );
-    if( NULL != num && TYPE_INT == num->type )
-    {
+    if( tr_bencIsInt( num ) )
         gl_pex = ( num->val.i ? 1 : 0 );
-    }
 
     num = tr_bencDictFind( &top, "port-mapping" );
-    if( NULL != num && TYPE_INT == num->type )
-    {
+    if( tr_bencIsInt( num ) )
         gl_mapping = ( num->val.i ? 1 : 0 );
-    }
     tr_natTraversalEnable( gl_handle, gl_mapping );
 
     num = tr_bencDictFind( &top, "upload-limit" );
-    if( NULL != num && TYPE_INT == num->type )
-    {
+    if( tr_bencIsInt( num ) )
         gl_uplimit = num->val.i;
-    }
     tr_setGlobalSpeedLimit( gl_handle, TR_UP, gl_uplimit );
     tr_setUseGlobalSpeedLimit( gl_handle, TR_UP, gl_uplimit > 0 );
 
     num = tr_bencDictFind( &top, "download-limit" );
-    if( NULL != num && TYPE_INT == num->type )
-    {
+    if( tr_bencIsInt( num ) )
         gl_downlimit = num->val.i;
-    }
     tr_setGlobalSpeedLimit( gl_handle, TR_DOWN, gl_downlimit );
     tr_setUseGlobalSpeedLimit( gl_handle, TR_DOWN, gl_downlimit > 0 );
 
     str = tr_bencDictFind( &top, "default-directory" );
-    if( NULL != str && TYPE_STR == str->type )
-    {
+    if( tr_bencIsString( str ) )
         strlcpy( gl_dir, str->val.s.s, sizeof gl_dir );
-    }
 
     str = tr_bencDictFind( &top, "encryption-mode" );
-    if( NULL != str && TYPE_STR == str->type )
+    if( tr_bencIsString( str ) )
     {
         if(!strcasecmp(str->val.s.s, "preferred"))
             gl_crypto = TR_ENCRYPTION_PREFERRED;
@@ -735,46 +722,33 @@ loadstate( void )
     tr_setEncryptionMode(gl_handle, gl_crypto);
 
     list = tr_bencDictFind( &top, "torrents" );
-    if( NULL == list || TYPE_LIST != list->type )
-    {
+    if( !tr_bencIsList( list ) )
         return 0;
-    }
 
     for( ii = 0; ii < list->val.l.count; ii++ )
     {
-        dict = &list->val.l.vals[ii];
-        if( TYPE_DICT != dict->type )
-        {
+        tr_benc * dict = &list->val.l.vals[ii];
+        if( !tr_bencIsDict( dict ) )
             continue;
-        }
 
         str = tr_bencDictFind( dict, "directory" );
-        dir = ( NULL != str && TYPE_STR == str->type ? str->val.s.s : NULL );
+        dir = tr_bencIsString( str ) ? str->val.s.s : NULL;
 
         str = tr_bencDictFind( dict, "hash" );
-        if( NULL == str || TYPE_STR != str->type ||
-            2 * SHA_DIGEST_LENGTH != str->val.s.i )
-        {
+        if( !tr_bencIsString( str ) || 2 * SHA_DIGEST_LENGTH != str->val.s.i )
             continue;
-        }
 
         tor = opentor( NULL, str->val.s.s, NULL, 0, dir );
-        if( NULL == tor )
-        {
+        if( !tor )
             continue;
-        }
 
         num = tr_bencDictFind( dict, "pex" );
-        if( NULL != num && TYPE_INT == num->type )
-        {
+        if( tr_bencIsInt( num ) )
             fprintf( stderr, "warning: obsolete command 'pex'\n" );
-        }
 
         num = tr_bencDictFind( dict, "paused" );
-        if( NULL != num && TYPE_INT == num->type && !num->val.i )
-        {
+        if( tr_bencIsInt( num ) && !num->val.i )
             tr_torrentStart( tor->tor );
-        }
     }
 
     return 0;

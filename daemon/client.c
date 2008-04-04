@@ -723,7 +723,7 @@ canread( struct bufferevent * evin, void * arg )
         return;
     }
 
-    res = ipc_parse( con->ipc, buf, len, con );
+    res = ipc_handleMessages( con->ipc, buf, len, con );
     if( 0 > res )
     {
         switch( errno )
@@ -840,8 +840,8 @@ flushreqs( struct con * con )
                 break;
             case IPC_MSG_GETINFOALL:
             case IPC_MSG_GETSTATALL:
-                buf = ipc_mkgetinfo( con->ipc, &buflen, req->id, req->tag,
-                                     req->types, NULL );
+                buf = ipc_createInfoRequest( con->ipc, &buflen, req->id, req->tag,
+                                             req->types, NULL );
                 break;
             default:
                 assert( 0 );
@@ -906,7 +906,6 @@ void
 infomsg( enum ipc_msg msgid, benc_val_t * list, int64_t tag,
          void * arg UNUSED )
 {
-    benc_val_t   * dict;
     int            ii;
     struct cl_info inf;
     int64_t        id;
@@ -914,10 +913,8 @@ infomsg( enum ipc_msg msgid, benc_val_t * list, int64_t tag,
 
     assert( IPC_MSG_INFO == msgid );
 
-    if( TYPE_LIST != list->type )
-    {
+    if( !tr_bencIsList( list ) )
         return;
-    }
 
     memset( &key, 0, sizeof key );
     key.tag = tag;
@@ -930,11 +927,10 @@ infomsg( enum ipc_msg msgid, benc_val_t * list, int64_t tag,
 
     for( ii = 0; list->val.l.count > ii; ii++ )
     {
-        dict = &list->val.l.vals[ii];
-        if( TYPE_DICT != dict->type )
-        {
+        tr_benc * dict = &list->val.l.vals[ii];
+
+        if( !tr_bencIsDict( dict ) )
             continue;
-        }
 
         id       = getinfoint( msgid, dict, IPC_INF_ID,   -1   );
         inf.name = getinfostr( msgid, dict, IPC_INF_NAME, NULL );
@@ -958,7 +954,6 @@ void
 statmsg( enum ipc_msg msgid, benc_val_t * list, int64_t tag,
          void * arg UNUSED )
 {
-    benc_val_t   * dict;
     int            ii;
     int64_t        id;
     struct cl_stat st;
@@ -966,10 +961,8 @@ statmsg( enum ipc_msg msgid, benc_val_t * list, int64_t tag,
 
     assert( IPC_MSG_STAT == msgid );
 
-    if( TYPE_LIST != list->type )
-    {
+    if( !tr_bencIsList( list ) )
         return;
-    }
 
     memset( &key, 0, sizeof key );
     key.tag = tag;
@@ -982,11 +975,10 @@ statmsg( enum ipc_msg msgid, benc_val_t * list, int64_t tag,
 
     for( ii = 0; list->val.l.count > ii; ii++ )
     {
-        dict   = &list->val.l.vals[ii];
-        if( TYPE_DICT != dict->type )
-        {
+        tr_benc * dict = &list->val.l.vals[ii];
+
+        if( !tr_bencIsDict( dict ) )
             continue;
-        }
 
         id           = getinfoint( msgid, dict, IPC_ST_ID,        -1   );
         st.state     = getinfostr( msgid, dict, IPC_ST_STATE,     NULL );
@@ -1052,11 +1044,11 @@ defmsg( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg UNUSED )
 void
 cbdone( struct resp * resp )
 {
-    if( NULL != resp->infocb )
+    if( resp->infocb )
     {
         resp->infocb( NULL );
     }
-    else if( NULL != resp->statcb )
+    else if( resp->statcb )
     {
         resp->statcb( NULL );
     }
@@ -1065,29 +1057,15 @@ cbdone( struct resp * resp )
 int64_t
 getinfoint( enum ipc_msg msgid, benc_val_t * dict, int type, int64_t defval  )
 {
-    benc_val_t * val;
-
-    val = tr_bencDictFind( dict, ipc_infoname( msgid, type ) );
-
-    if( NULL != val && TYPE_INT == val->type )
-    {
-        return val->val.i;
-    }
-
-    return defval;
+    const char * key = ipc_infoname( msgid, type );
+    benc_val_t * val = tr_bencDictFind( dict, key );
+    return tr_bencIsInt( val ) ? val->val.i : defval;
 }
 
 char *
 getinfostr( enum ipc_msg msgid, benc_val_t * dict, int type, char * defval  )
 {
-    benc_val_t * val;
-
-    val = tr_bencDictFind( dict, ipc_infoname( msgid, type ) );
-
-    if( NULL != val && TYPE_STR == val->type )
-    {
-        return val->val.s.s ;
-    }
-
-    return defval;
+    const char * key = ipc_infoname( msgid, type );
+    benc_val_t * val = tr_bencDictFind( dict, key );
+    return tr_bencIsString( val ) ? val->val.s.s : defval;
 }

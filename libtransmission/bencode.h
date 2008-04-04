@@ -103,6 +103,11 @@ char*   tr_bencSaveAsSerializedPHP( const tr_benc * top, int * len );
 
 int64_t tr_bencGetInt( const tr_benc * val );
 
+int tr_bencIsType( const tr_benc *, int type );
+#define tr_bencIsInt(b) (tr_bencIsType(b,TYPE_INT))
+#define tr_bencIsDict(b) (tr_bencIsType(b,TYPE_DICT))
+#define tr_bencIsList(b) (tr_bencIsType(b,TYPE_LIST))
+#define tr_bencIsString(b) (tr_bencIsType(b,TYPE_STR))
 
 /**
 ***  Treat these as private -- they're only made public here

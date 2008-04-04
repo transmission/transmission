@@ -160,8 +160,14 @@ uint8_t *    ipc_mkint     ( const struct ipc_info *, size_t *, enum ipc_msg,
 uint8_t *    ipc_mkstr     ( const struct ipc_info *, size_t *, enum ipc_msg,
                              int64_t tag, const char * val );
 uint8_t *    ipc_mkvers    ( size_t *, const char * );
-uint8_t *    ipc_mkgetinfo ( const struct ipc_info *, size_t *, enum ipc_msg,
-                            int64_t, int, const int * );
+
+uint8_t *    ipc_createInfoRequest( const struct ipc_info * session,
+                                    size_t                * setme_len,
+                                    enum ipc_msg            msg_id,
+                                    int64_t                 tag,
+                                    int                     types,
+                                    const int             * ids );
+
 int          ipc_addinfo   ( struct tr_benc *, int,
                              const struct tr_info *, int );
 int          ipc_addstat   ( struct tr_benc *, int,
@@ -169,8 +175,10 @@ int          ipc_addstat   ( struct tr_benc *, int,
 
 /* sets errno to EINVAL on parse error or
    EPERM for unsupported protocol version */
-ssize_t      ipc_parse    ( struct ipc_info *, const uint8_t *,
-                            ssize_t, void * );
+ssize_t      ipc_handleMessages( struct ipc_info * session,
+                                 const uint8_t   * serializedMessages ,
+                                 ssize_t           serializedLength,
+                                 void            * user_data );
 
 /* misc info functions, these will always succeed */
 enum ipc_msg ipc_msgid    ( const struct ipc_info *, const char * );

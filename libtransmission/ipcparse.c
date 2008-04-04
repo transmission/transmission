@@ -63,6 +63,12 @@
 #define MSGNAME( id )           ( gl_msgs[(id)].name )
 #define DICTPAYLOAD( info )     ( 2 > (info)->vers )
 
+struct ipc_funcs
+{
+    trd_msgfunc msgs[IPC__MSG_COUNT];
+    trd_msgfunc def;
+};
+
 struct ipc_info
 {
     struct ipc_funcs * funcs;
@@ -80,24 +86,6 @@ struct msg
     const char        * name;
     const int           minvers;
     const enum ipc_msg  id;
-};
-
-struct inf
-{
-    const char    * name;
-    const int       type;
-};
-
-struct msgfunc
-{
-    int             id;
-    trd_msgfunc     func;
-};
-
-struct ipc_funcs
-{
-    trd_msgfunc msgs[IPC__MSG_COUNT];
-    trd_msgfunc def;
 };
 
 /* these names must be sorted for strcmp() */
@@ -144,6 +132,12 @@ static const struct msg gl_msgs[] =
     { "uplimit",             2, IPC_MSG_UPLIMIT       },
     { "verify",              2, IPC_MSG_VERIFY        },
     { "version",             1, IPC_MSG_VERSION       }
+};
+
+struct inf
+{
+    const char    * name;
+    const int       type;
 };
 
 /* these names must be sorted for strcmp() */
@@ -195,7 +189,9 @@ ipc_initmsgs( void )
 }
 
 void
-ipc_addmsg( struct ipc_funcs * funcs, enum ipc_msg msg_id, trd_msgfunc func )
+ipc_addmsg( struct ipc_funcs  * funcs,
+            enum ipc_msg        msg_id,
+            trd_msgfunc         func )
 {
     assert( MSGVALID( msg_id ) );
     assert( IPC_MSG_VERSION != msg_id );
@@ -225,23 +221,23 @@ ipc_newcon( struct ipc_funcs * funcs )
 }
 
 void
-ipc_freecon( struct ipc_info * info )
+ipc_freecon( struct ipc_info * session )
 {
-    tr_free( info );
+    tr_free( session );
 }
 
 int
-ipc_ishandled( const struct ipc_info * info, enum ipc_msg id )
+ipc_ishandled( const struct ipc_info * session, enum ipc_msg msg_id )
 {
-    assert( MSGVALID( id ) );
+    assert( MSGVALID( msg_id ) );
 
-    return info->funcs->msgs[id] != NULL;
+    return session->funcs->msgs[msg_id] != NULL;
 }
 
 int
-ipc_havetags( const struct ipc_info * info )
+ipc_havetags( const struct ipc_info * session )
 {
-    return !DICTPAYLOAD( info );
+    return !DICTPAYLOAD( session );
 }
 
 static int
@@ -251,12 +247,12 @@ sessionSupportsTags( const struct ipc_info * session )
 }
 
 static int
-sessionSupportsMessage( const struct ipc_info * info, enum ipc_msg id )
+sessionSupportsMessage( const struct ipc_info * session, enum ipc_msg id )
 {
     assert( MSGVALID( id ) );
-    assert( ipc_hasvers( info ) );
+    assert( ipc_hasvers( session ) );
 
-    return gl_msgs[id].minvers <= info->vers;
+    return gl_msgs[id].minvers <= session->vers;
 }
 
 /**
@@ -313,23 +309,23 @@ ipc_initval( const struct ipc_info * session,
  * gives the length of the string.
  */
 uint8_t *
-ipc_serialize( const tr_benc * pk, size_t * setmeSize )
+ipc_serialize( const tr_benc * benc, size_t * setmeSize )
 {
-    int bencSize = 0;
-    char * benc = tr_bencSave( pk, &bencSize );
     uint8_t * ret = NULL;
+    int len = 0;
+    char * str = tr_bencSave( benc, &len );
 
-    if( bencSize > IPC_MAX_MSG_LEN )
+    if( len > IPC_MAX_MSG_LEN )
         errno = EFBIG;
     else {
-        const size_t size = IPC_MIN_MSG_LEN + bencSize;
+        const size_t size = IPC_MIN_MSG_LEN + len;
         ret = tr_new( uint8_t, size );
-        snprintf( (char*)ret, size, "%0*X", IPC_MIN_MSG_LEN, bencSize );
-        memcpy( ret + IPC_MIN_MSG_LEN, benc, bencSize );
+        snprintf( (char*)ret, size, "%0*X", IPC_MIN_MSG_LEN, len );
+        memcpy( ret + IPC_MIN_MSG_LEN, str, len );
         *setmeSize = size;
     }
 
-    tr_free( benc );
+    tr_free( str );
     return ret;
 }
 
@@ -398,6 +394,10 @@ ipc_mkstr( const struct ipc_info  * session,
  *
  * Note that this message is just the dictionary payload.
  * It doesn't contain metainfo as the other ipc_mk*() functions do.
+ * That's because the metainfo is dependent on the protocol version,
+ * and this is a handshake message to negotiate protocol versions.
+ *
+ * @see handlevers()
  */
 uint8_t *
 ipc_mkvers( size_t * len, const char * label )
@@ -447,12 +447,12 @@ ipc_mkvers( size_t * len, const char * label )
  * a single list identical to the "type" list described above.
  */
 uint8_t *
-ipc_mkgetinfo( const struct ipc_info * session,
-               size_t                * setmeSize,
-               enum ipc_msg            msg_id,
-               int64_t                 tag,
-               int                     types,
-               const int             * ids )
+ipc_createInfoRequest( const struct ipc_info * session,
+                       size_t                * setmeSize,
+                       enum ipc_msg            msg_id,
+                       int64_t                 tag,
+                       int                     types,
+                       const int             * ids )
 {
     tr_benc   pk;
     tr_benc * typelist;
@@ -533,7 +533,7 @@ filltracker( tr_benc * val, const tr_tracker_info * tk )
     tr_bencInitStr( tr_bencDictAdd( val, "address" ),  tk->address,  -1, 1 );
     tr_bencInitInt( tr_bencDictAdd( val, "port" ),     tk->port );
     tr_bencInitStr( tr_bencDictAdd( val, "announce" ), tk->announce, -1, 1 );
-    if( NULL != tk->scrape )
+    if( tk->scrape )
         tr_bencInitStr( tr_bencDictAdd( val, "scrape" ), tk->scrape, -1, 1 );
 }
 
@@ -552,7 +552,7 @@ ipc_addinfo( tr_benc         * list,
              const tr_info   * inf,
              int               types )
 {
-    tr_benc * dict, * item, * file, * tier;
+    tr_benc * dict;
     int          ii, jj, kk;
     tr_file_index_t ff;
 
@@ -579,6 +579,8 @@ ipc_addinfo( tr_benc         * list,
     /* populate the dict with info key->value pairs */
     for( ii = 0; IPC_INF__MAX > 1 << ii; ii++ )
     {
+        tr_benc * item;
+
         if( !( types & ( 1 << ii ) ) )
             continue;
 
@@ -598,7 +600,7 @@ ipc_addinfo( tr_benc         * list,
                 tr_bencInitList( item, inf->fileCount );
                 for( ff = 0; inf->fileCount > ff; ff++ )
                 {
-                    file = tr_bencListAdd( item );
+                    tr_benc * file = tr_bencListAdd( item );
                     tr_bencInitDict( file, 2 );
                     tr_bencInitStr( tr_bencDictAdd( file, "name" ),
                                     inf->files[ff].name, -1, 1 );
@@ -628,7 +630,7 @@ ipc_addinfo( tr_benc         * list,
                 tr_bencInitList( item, inf->trackerTiers );
                 for( jj = 0; inf->trackerTiers > jj; jj++ )
                 {
-                    tier = tr_bencListAdd( item );
+                    tr_benc * tier = tr_bencListAdd( item );
                     tr_bencInitList( tier, inf->trackerList[jj].count );
                     for( kk = 0; inf->trackerList[jj].count > kk; kk++ )
                         filltracker( tr_bencListAdd( tier ),
@@ -845,13 +847,21 @@ ipc_addstat( tr_benc        * list,
     return 0;
 }
 
+/**
+ * This reads a handshake message from the client to decide
+ * which IPC protocol version to use.
+ * Returns 0 on success; otherwise, returns -1 and sets errno.
+ *
+ * @see ipc_handleMessages()
+ * @see ipc_mkvers()
+ */
 static int
 handlevers( struct ipc_info * info, tr_benc * dict )
 {
-    tr_benc * vers, * num;
+    tr_benc * vers;
     int64_t      min, max;
 
-    if( TYPE_DICT != dict->type )
+    if( !tr_bencIsDict( dict ) )
     {
         errno = EINVAL;
         return -1;
@@ -870,12 +880,13 @@ handlevers( struct ipc_info * info, tr_benc * dict )
             min = vers->val.i;
             max = vers->val.i;
             break;
-        case TYPE_DICT:
-            num = tr_bencDictFind( vers, "min" );
-            min = ( NULL == num || TYPE_INT != num->type ? -1 : num->val.i );
+        case TYPE_DICT: {
+            tr_benc * num = tr_bencDictFind( vers, "min" );
+            min = tr_bencIsInt( num ) ? num->val.i : -1;
             num = tr_bencDictFind( vers, "max" );
-            max = ( NULL == num || TYPE_INT != num->type ? -1 : num->val.i );
+            max = tr_bencIsInt( num ) ? num->val.i : -1;
             break;
+        }
         default:
             min = -1;
             max = -1;
@@ -930,108 +941,113 @@ ipc_msgid( const struct ipc_info * info, const char * name )
         : IPC__MSG_COUNT;
 }
 
+/**
+ * Invokes the trd_msgfunc for the message passed in.
+ * Returns 0 on success; otherwise, returns -1 and sets errno.
+ */
 static int
-gotmsg( const struct ipc_info * info, tr_benc * name, tr_benc * val,
-        tr_benc * tagval, void * arg )
+callmsgfunc( const struct ipc_info  * info,
+             tr_benc                * name,
+             tr_benc                * val,
+             tr_benc                * tagval,
+             void                   * user_data )
 {
     const struct msg * msg;
     int64_t            tag;
 
-    if( TYPE_STR != name->type )
-    {
+    /* extract tag from tagval */
+    if( !tagval )
+        tag = -1;
+    else if( tr_bencIsInt( tagval ) )
+        tag = tagval->val.i;
+    else {
         errno = EINVAL;
         return -1;
     }
 
-    if( NULL == tagval )
-    {
-        tag = -1;
+    /* find the msg corresponding to `name' */
+    if( !tr_bencIsString( name ) ) {
+        errno = EINVAL;
+        return -1;
     }
-    else
-    {
-        if( TYPE_INT != tagval->type )
-        {
-            errno = EINVAL;
-            return -1;
-        }
-        tag = tagval->val.i;
-    }
-
     msg = msglookup( name->val.s.s );
+
     if( msg && msg->minvers <= info->vers )
     {
         if( info->funcs->msgs[msg->id] != NULL )
         {
-            (*info->funcs->msgs[msg->id])( msg->id, val, tag, arg );
+            (*info->funcs->msgs[msg->id])( msg->id, val, tag, user_data );
         }
         else if( info->funcs->def )
         {
-            info->funcs->def( msg->id, val, tag, arg );
+            info->funcs->def( msg->id, val, tag, user_data );
         }
     }
     else if( NULL != info->funcs->def )
-        info->funcs->def( IPC__MSG_UNKNOWN, NULL, tag, arg );
+        info->funcs->def( IPC__MSG_UNKNOWN, NULL, tag, user_data );
 
     return 0;
 }
 
 static int
-handlemsgs( const struct ipc_info * info, tr_benc * pay, void * arg )
+handlemsgs( const struct ipc_info  * session,
+            tr_benc                * message,
+            void                   * user_data )
 {
     tr_benc * name, * val, * tag;
-    int          ii;
 
-    assert( ipc_hasvers( info ) );
+    assert( ipc_hasvers( session ) );
 
-    if( DICTPAYLOAD( info ) )
+    if( DICTPAYLOAD( session ) )
     {
-        if( TYPE_DICT != pay->type || pay->val.l.count % 2 )
+        int ii;
+
+        if( TYPE_DICT != message->type || message->val.l.count % 2 )
         {
             errno = EINVAL;
             return -1;
         }
 
-        for( ii = 0; ii < pay->val.l.count; ii += 2 )
+        for( ii = 0; ii < message->val.l.count; ii += 2 )
         {
-            assert( ii + 1 < pay->val.l.count );
-            name = &pay->val.l.vals[ii];
-            val  = &pay->val.l.vals[ii+1];
-            if( 0 > gotmsg( info, name, val, NULL, arg ) )
-            {
+            assert( ii + 1 < message->val.l.count );
+            name = &message->val.l.vals[ii];
+            val  = &message->val.l.vals[ii+1];
+            if( 0 > callmsgfunc( session, name, val, NULL, user_data ) )
                 return -1;
-            }
         }
     }
     else
     {
-        if( TYPE_LIST != pay->type || 2 > pay->val.l.count )
+        if( TYPE_LIST != message->type || 2 > message->val.l.count )
         {
             errno = EINVAL;
             return -1;
         }
 
-        name = &pay->val.l.vals[0];
-        val  = &pay->val.l.vals[1];
-        tag  = ( 2 == pay->val.l.count ? NULL : &pay->val.l.vals[2] );
-        if( 0 > gotmsg( info, name, val, tag, arg ) )
-        {
+        name = &message->val.l.vals[0];
+        val  = &message->val.l.vals[1];
+        tag  = ( 2 == message->val.l.count ? NULL : &message->val.l.vals[2] );
+        if( 0 > callmsgfunc( session, name, val, tag, user_data ) )
             return -1;
-        }
     }
 
     return 0;
 }
 
 ssize_t
-ipc_parse( struct ipc_info * info, const uint8_t * buf, ssize_t total, void * arg )
+ipc_handleMessages( struct ipc_info  * info,
+                    const uint8_t    * msgs,
+                    ssize_t            msgslen,
+                    void             * user_data )
 {
     char        hex[IPC_MIN_MSG_LEN+1], * end;
     ssize_t     off, len;
     tr_benc  benc;
 
-    for( off = 0; off + IPC_MIN_MSG_LEN < total; off += IPC_MIN_MSG_LEN + len )
+    for( off = 0; off + IPC_MIN_MSG_LEN < msgslen; off += IPC_MIN_MSG_LEN + len )
     {
-        memcpy( hex, buf + off, IPC_MIN_MSG_LEN );
+        memcpy( hex, msgs + off, IPC_MIN_MSG_LEN );
         hex[IPC_MIN_MSG_LEN] = '\0';
         end = NULL;
         len = strtol( hex, &end, 16 );
@@ -1041,12 +1057,12 @@ ipc_parse( struct ipc_info * info, const uint8_t * buf, ssize_t total, void * ar
             errno = EINVAL;
             return -1;
         }
-        if( off + IPC_MIN_MSG_LEN + len > total )
+        if( off + IPC_MIN_MSG_LEN + len > msgslen )
         {
             break;
         }
         errno = 0;
-        if( tr_bencLoad( buf + off + IPC_MIN_MSG_LEN, len, &benc, NULL ) )
+        if( tr_bencLoad( msgs + off + IPC_MIN_MSG_LEN, len, &benc, NULL ) )
         {
             if( 0 == errno )
             {
@@ -1054,7 +1070,7 @@ ipc_parse( struct ipc_info * info, const uint8_t * buf, ssize_t total, void * ar
             }
             return -1;
         }
-        if( 0 > ( ipc_hasvers( info ) ? handlemsgs( info, &benc, arg ) :
+        if( 0 > ( ipc_hasvers( info ) ? handlemsgs( info, &benc, user_data ) :
                                         handlevers( info, &benc ) ) )
         {
             SAFEBENCFREE( &benc );
@@ -1073,6 +1089,12 @@ compareNameToInf( const void * a, const void * b )
     return strcmp( a, inf->name );
 }
 
+/**
+ * Convert a benc list of string keys from gl_inf or gl_stat
+ * into a bitwise-or'ed int representation.
+ * msg_id must be either IPC_MSG_INFO or IPC_MSG_STAT.
+ * @see ipc_infoname()
+ */
 int
 ipc_infotypes( enum ipc_msg id, const tr_benc * list )
 {
@@ -1098,17 +1120,15 @@ ipc_infotypes( enum ipc_msg id, const tr_benc * list )
 
     ret = IPC_INF_ID;
 
-    if( NULL == list || TYPE_LIST != list->type )
-    {
+    if( !tr_bencIsList( list ) )
         return ret;
-    }
 
     for( i=0; i<list->val.l.count; ++i )
     {
         const tr_benc * name = &list->val.l.vals[i];
         const struct inf * inf;
 
-        if( TYPE_STR != name->type )
+        if( !tr_bencIsString( name ) )
             continue;
 
         inf = bsearch( name->val.s.s,
@@ -1121,6 +1141,13 @@ ipc_infotypes( enum ipc_msg id, const tr_benc * list )
     return ret;
 }
 
+/**
+ * This function is the reverse of ipc_infotypes:
+ * it returns the string key that corresponds to the type passed in.
+ * Type is one of the IPC_INF_* or IPC_ST_* enums from ipcparse.h.
+ * msg_id must be either IPC_MSG_INFO or IPC_MSG_STAT.
+ * @see ipc_infotypes()
+ */
 const char *
 ipc_infoname( enum ipc_msg id, int type )
 {
