@@ -2,11 +2,11 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.20 (2008/xx/yy)
 - All Platforms
-   + IP Blocking using the Bluetack Level1 blocklist
+   + IP blocking using the Bluetack Level1 blocklist
 - Mac
    + Display of decimal numbers matches system international settings
 
-1.11 (2008/xx/yy)
+1.11 (2008/04/04)
 - Mac
    + Fix visual glitch with the tracker inspector tab when there is no scrape address
    + Only make the progress status string clickable on multi-file torrents
