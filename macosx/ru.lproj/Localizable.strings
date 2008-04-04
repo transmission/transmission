@@ -11,7 +11,7 @@
 " total" = " всего";
 
 /* Inspector -> Activity tab -> progress */
-"%.2f%% (%.2f%% selected)" = "%1$.2f%% (%2$.2f%% выбрано)";
+"%.2f%% (%.2f%% selected)" = "%1$.2f%% (%2$.2f%% выбранного)";
 
 /* Inspector -> Files tab -> file status string */
 "%.2f%% of %@" = "%1$.2f%% из %2$@";
@@ -26,7 +26,7 @@
 "%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)" = "%1$@ из %2$@ (%3$.2f%%), роздано %4$@ (Рейтинг: %5$@)";
 
 /* Torrent -> progress string */
-"%@ of %@ selected (%.2f%%)" = "%1$@ из %2$@ выбрано (%3$.2f%%)";
+"%@ of %@ selected (%.2f%%)" = "%1$@ из %2$@ выбранного (%3$.2f%%)";
 
 /* Torrent -> progress string */
 "%@ selected, uploaded %@ (Ratio: %@)" = "%1$@ выбрано, роздано %2$@ (Рейтинг: %3$@)";
@@ -304,7 +304,7 @@
 /* Torrent -> status string
    status bar -> status label */
 
-"DL" = "скачиваю";
+"DL" = "Скачиваю";
 
 /* Open duplicate alert -> button
    Add torrent -> same name -> button */
@@ -897,7 +897,7 @@
 /* Torrent -> status string
    status bar -> status label */
 
-"UL" = "раздаю";
+"UL" = "Раздаю";
 
 /* Preferences -> Advanced -> port status */
 "Unable to check port status" = "Не могу проверить состояние порта";
