@@ -70,16 +70,15 @@ blocklistLoad( tr_blocklist * b )
 
     blocklistClose( b );
 
+    if( stat( b->filename, &st ) == -1 )
+        return;
+
     fd = open( b->filename, O_RDONLY );
     if( fd == -1 ) {
         tr_err( err_fmt, b->filename, tr_strerror(errno) );
         return;
     }
-    if( fstat( fd, &st ) == -1 ) {
-        tr_err( err_fmt, b->filename, tr_strerror(errno) );
-        close( fd );
-        return;
-    }
+
     b->rules = mmap( 0, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0 );
     if( !b->rules ) {
         tr_err( err_fmt, b->filename, tr_strerror(errno) );
