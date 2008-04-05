@@ -603,6 +603,10 @@ void tr_manualUpdate( tr_torrent * );
 
 int tr_torrentCanManualUpdate( const tr_torrent * );
 
+void tr_setScrapeEnabled( tr_handle * , int isEnabled );
+
+int tr_isScrapeEnabled( const tr_handle * );
+
 /***********************************************************************
  * tr_torrentStat
  ***********************************************************************

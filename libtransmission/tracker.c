@@ -178,7 +178,8 @@ trackerSupportsScrape( const tr_tracker * t )
 {
     const tr_tracker_info * info = getCurrentAddress( t );
 
-    return ( info != NULL )
+    return ( t->handle->isScrapeEnabled )
+        && ( info != NULL )
         && ( info->scrape != NULL )
         && ( info->scrape[0] != '\0' );
 }

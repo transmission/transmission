@@ -305,9 +305,10 @@ tr_setUseGlobalSpeedLimit( tr_handle  * h,
                            int          up_or_down,
                            int          use_flag )
 {
-    char * ch = up_or_down==TR_UP ? &h->useUploadLimit
-                                  : &h->useDownloadLimit;
-    *ch = use_flag;
+    if( up_or_down == TR_UP )
+        h->useUploadLimit = use_flag ? 1 : 0;
+    else
+        h->useDownloadLimit = use_flag ? 1 : 0;
 }
 
 void
@@ -529,4 +530,20 @@ int
 tr_blocklistHasAddress( tr_handle * handle, const struct in_addr * addr )
 {
     return _tr_blocklistHasAddress( handle->blocklist, addr );
+}
+
+/***
+****
+***/
+
+void
+tr_setScrapeEnabled( tr_handle * handle, int isEnabled )
+{
+    handle->isScrapeEnabled = isEnabled ? 1 : 0;
+}
+
+int
+tr_isScrapeEnabled( const tr_handle * handle )
+{
+    return handle->isScrapeEnabled;
 }

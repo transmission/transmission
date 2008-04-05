@@ -55,6 +55,13 @@ const uint8_t* tr_getPeerId( void );
 
 struct tr_handle
 {
+    unsigned int               isScrapeEnabled  : 1;
+    unsigned int               isPortSet        : 1;
+    unsigned int               isPexEnabled     : 1;
+    unsigned int               isClosed         : 1;
+    unsigned int               useUploadLimit   : 1;
+    unsigned int               useDownloadLimit : 1;
+
     tr_encryption_mode         encryptionMode;
 
     struct tr_event_handle   * events;
@@ -63,11 +70,7 @@ struct tr_handle
     tr_torrent               * torrentList;
 
     char                     * tag;
-    unsigned int               isPortSet : 1;
-    unsigned int               isPexEnabled : 1;
 
-    char                       useUploadLimit;
-    char                       useDownloadLimit;
     struct tr_ratecontrol    * upload;
     struct tr_ratecontrol    * download;
 
@@ -79,8 +82,6 @@ struct tr_handle
 
     tr_handle_status           stats[2];
     int                        statCur;
-
-    uint8_t                    isClosed;
 
     struct tr_stats_handle   * sessionStats;
     struct tr_tracker_handle * tracker;
