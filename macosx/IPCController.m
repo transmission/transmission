@@ -514,7 +514,7 @@ void getaddr( struct sockaddr_un * sun )
 {
     bzero( sun, sizeof *sun );
     sun->sun_family = AF_LOCAL;
-    strlcpy( sun->sun_path, tr_getPrefsDirectory(), sizeof sun->sun_path );
+    strlcpy( sun->sun_path, tr_getDefaultConfigDir(), sizeof sun->sun_path );
     strlcat( sun->sun_path, "/socket", sizeof sun->sun_path );
 }
 

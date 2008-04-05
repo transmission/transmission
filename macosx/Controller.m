@@ -195,7 +195,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         
-        fLib = tr_initFull("macosx",
+        fLib = tr_initFull(NULL, /* use default config directory (Application Support) */
+                        "macosx",
                         [fDefaults boolForKey: @"PEXGlobal"],
                         [fDefaults boolForKey: @"NatTraversal"],
                         [fDefaults integerForKey: @"BindPort"],
