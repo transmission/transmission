@@ -825,6 +825,7 @@ flushreqs( struct con * con )
             case IPC_MSG_START:
             case IPC_MSG_STOP:
             case IPC_MSG_REMOVE:
+            case IPC_MSG_VERIFY:
                 val = ipc_initval( con->ipc, req->id, -1, &pk, TYPE_LIST );
                 if( NULL != val && !tr_bencListReserve( val, req->listlen ) )
                 {
