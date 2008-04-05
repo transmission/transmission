@@ -116,6 +116,7 @@ if test "x$use_libnotify" = "xyes"; then
     AC_DEFINE([HAVE_LIBNOTIFY], 1)
 fi
 
+AC_CHECK_HEADERS([libintl.h])
 IT_PROG_INTLTOOL([0.23],[no-xml])
 GETTEXT_PACKAGE=transmission
 AC_SUBST(GETTEXT_PACKAGE)
