@@ -272,6 +272,8 @@ main( int argc, char ** argv )
     gboolean startpaused = FALSE;
     gboolean startminimized = FALSE;
     char * domain = "transmission";
+    const char * configDir = tr_getDefaultConfigDir( );
+
     GOptionEntry entries[] = {
         { "paused", 'p', 0, G_OPTION_ARG_NONE, &startpaused,
           _("Start with all torrents paused"), NULL },
@@ -305,7 +307,7 @@ main( int argc, char ** argv )
 
     tr_notify_init( );
 
-    didinit = cf_init( tr_getPrefsDirectory(), NULL ); /* must come before actions_init */
+    didinit = cf_init( configDir, NULL ); /* must come before actions_init */
     tr_prefs_init_global( );
     myUIManager = gtk_ui_manager_new ();
     actions_init ( myUIManager, cbdata );
@@ -317,7 +319,7 @@ main( int argc, char ** argv )
     didlock = didinit && sendremote( argfiles, sendquit );
     setupsighandlers( ); /* set up handlers for fatal signals */
 
-    if( ( didinit || cf_init( tr_getPrefsDirectory(), &err ) ) &&
+    if( ( didinit || cf_init( configDir, &err ) ) &&
         ( didlock || cf_lock( &err ) ) )
     {
         cbdata->core = tr_core_new( );

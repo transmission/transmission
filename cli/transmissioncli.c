@@ -140,7 +140,8 @@ main( int argc, char ** argv )
     }
 
     /* Initialize libtransmission */
-    h = tr_initFull( "cli",
+    h = tr_initFull( tr_getDefaultConfigDir(),
+                     "cli",                   /* tag */
                      1,                       /* pex enabled */
                      natTraversal,            /* nat enabled */
                      bindPort,                /* public port */

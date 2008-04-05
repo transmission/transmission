@@ -449,7 +449,8 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
                                                   struct TrCorePrivate );
 
 
-    h = tr_initFull( "gtk",
+    h = tr_initFull( tr_getDefaultConfigDir( ),
+                     "gtk",
                      pref_flag_get( PREF_KEY_PEX ),
                      pref_flag_get( PREF_KEY_NAT ),
                      pref_int_get( PREF_KEY_PORT ),

@@ -79,7 +79,7 @@ pushdir( char * path, const char * file, size_t size )
 void
 confpath( char * buf, size_t len, const char * file, enum confpathtype type )
 {
-    strlcpy( buf, tr_getPrefsDirectory(), len );
+    strlcpy( buf, tr_getDefaultConfigDir(), len );
 
     switch( type )
     {

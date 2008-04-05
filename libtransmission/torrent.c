@@ -383,8 +383,8 @@ torrentRealInit( tr_handle     * h,
         if( !tr_ctorGetMetainfo( ctor, &val ) ) {
             int len;
             uint8_t * text = (uint8_t*) tr_bencSave( val, &len );
-            tr_metainfoSave( tor->info.hashString,
-                             tor->handle->tag,
+            tr_metainfoSave( tor->handle,
+                             tor->info.hashString,
                              text, len );
             tr_free( text );
         }
@@ -424,7 +424,7 @@ tr_torrentParse( const tr_handle  * handle,
     if( !err && tr_ctorGetMetainfo( ctor, &metainfo ) )
         return TR_EINVALID;
 
-    err = tr_metainfoParse( setmeInfo, metainfo, handle->tag );
+    err = tr_metainfoParse( handle, setmeInfo, metainfo );
     doFree = !err && ( setmeInfo == &tmp );
 
     if( !err && hashExists( handle, setmeInfo->hash ) )
@@ -826,7 +826,7 @@ tr_torrentSetHasPiece( tr_torrent * tor, tr_piece_index_t pieceIndex, int has )
 void
 tr_torrentRemoveSaved( tr_torrent * tor )
 {
-    tr_metainfoRemoveSaved( tor->info.hashString, tor->handle->tag );
+    tr_metainfoRemoveSaved( tor->handle, tor->info.hashString );
 
     tr_fastResumeRemove( tor );
 }

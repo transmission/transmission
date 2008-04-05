@@ -125,25 +125,30 @@ strlcat_utf8( void * dest, const void * src, size_t len, char skip )
 }
 
 static void
-savedname( char * name, size_t len, const char * hash, const char * tag )
+savedname( const tr_handle * handle,
+           char            * name,
+           size_t            len,
+           const char      * hash )
 {
-    const char * torDir = tr_getTorrentsDirectory ();
+    const char * torDir = tr_getTorrentDir( handle );
 
-    if( tag == NULL )
+    if( !handle->tag )
     {
         tr_buildPath( name, len, torDir, hash, NULL );
     }
     else
     {
         char base[1024];
-        snprintf( base, sizeof(base), "%s-%s", hash, tag );
+        snprintf( base, sizeof(base), "%s-%s", hash, handle->tag );
         tr_buildPath( name, len, torDir, base, NULL );
     }
 }
 
 
 int
-tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
+tr_metainfoParse( const tr_handle  * handle,
+                  tr_info          * inf,
+                  const tr_benc    * meta_in )
 {
     tr_piece_index_t i;
     tr_benc * beInfo, * val, * val2;
@@ -167,7 +172,7 @@ tr_metainfoParse( tr_info * inf, const tr_benc * meta_in, const char * tag )
     }
 
     tr_sha1_to_hex( inf->hashString, inf->hash );
-    savedname( buf, sizeof( buf ), inf->hashString, tag );
+    savedname( handle, buf, sizeof( buf ), inf->hashString );
     tr_free( inf->torrent );
     inf->torrent = tr_strdup( buf );
 
@@ -563,22 +568,25 @@ tr_trackerInfoClear( tr_tracker_info * info )
 }
 
 void
-tr_metainfoRemoveSaved( const char * hashString, const char * tag )
+tr_metainfoRemoveSaved( const tr_handle * handle,
+                        const char      * hashString )
 {
     char file[MAX_PATH_LENGTH];
-    savedname( file, sizeof file, hashString, tag );
+    savedname( handle, file, sizeof file, hashString );
     unlink( file );
 }
 
 /* Save a copy of the torrent file in the saved torrent directory */
 int
-tr_metainfoSave( const char * hash, const char * tag,
-                 const uint8_t * buf, size_t buflen )
+tr_metainfoSave( const tr_handle  * handle,
+                 const char       * hash,
+                 const uint8_t    * buf,
+                 size_t             buflen )
 {
     char   path[MAX_PATH_LENGTH];
     FILE * file;
 
-    savedname( path, sizeof path, hash, tag );
+    savedname( handle, path, sizeof path, hash );
     file = fopen( path, "wb+" );
     if( !file )
     {

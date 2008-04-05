@@ -109,7 +109,7 @@ torrent_init( struct event_base * base )
     assert( NULL == gl_handle && NULL == gl_base );
 
     gl_base   = base;
-    gl_handle = tr_init( "daemon" );
+    gl_handle = tr_init( tr_getDefaultConfigDir(), "daemon" );
 
     confpath( gl_state, sizeof gl_state, CONF_FILE_STATE, 0 );
     strlcpy( gl_newstate, gl_state, sizeof gl_state );

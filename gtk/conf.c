@@ -258,7 +258,14 @@ static char*
 getCompat08PrefsFilename( void )
 {
     assert( gl_confdir != NULL );
-    return g_build_filename( gl_confdir, "prefs", NULL );
+    return g_build_filename( g_get_home_dir(), ".transmission", "gtk", "prefs", NULL );
+}
+
+static char*
+getCompat09PrefsFilename( void )
+{
+    assert( gl_confdir != NULL );
+    return g_build_filename( g_get_home_dir(), ".transmission", "gtk", "prefs.ini", NULL );
 }
 
 static void
@@ -317,11 +324,17 @@ cf_check_older_configs( void )
 {
     char * cfn = getPrefsFilename( );
     char * cfn08 = getCompat08PrefsFilename( );
+    char * cfn09 = getCompat09PrefsFilename( );
+
+    if( !g_file_test( cfn,   G_FILE_TEST_IS_REGULAR )
+      && g_file_test( cfn09, G_FILE_TEST_IS_REGULAR ) )
+      g_rename( cfn09, cfn );
 
     if( !g_file_test( cfn,   G_FILE_TEST_IS_REGULAR )
       && g_file_test( cfn08, G_FILE_TEST_IS_REGULAR ) )
         translate_08_to_09( cfn08, cfn );
 
+    g_free( cfn09 );
     g_free( cfn08 );
     g_free( cfn );
 }

@@ -71,6 +71,10 @@ struct tr_handle
 
     char                     * tag;
 
+    char                     * configDir;
+    char                     * torrentDir;
+    char                     * resumeDir;
+
     struct tr_ratecontrol    * upload;
     struct tr_ratecontrol    * download;
 

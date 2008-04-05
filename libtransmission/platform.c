@@ -284,172 +284,245 @@ tr_lockUnlock( tr_lock * l )
 #endif
 
 static const char *
-tr_getHomeDirectory( void )
+getHomeDir( void )
 {
-    static char buf[MAX_PATH_LENGTH];
-    static int init = 0;
-    const char * envHome;
+    static char * home = NULL;
 
-    if( init )
-        return buf;
-
-    envHome = getenv( "HOME" );
-    if( envHome )
-        snprintf( buf, sizeof(buf), "%s", envHome );
-    else {
-#ifdef WIN32
-        SHGetFolderPath( NULL, CSIDL_PROFILE, NULL, 0, buf );
-#elif defined(__BEOS__) || defined(__AMIGAOS4__)
-        *buf = '\0';
-#else
-        struct passwd * pw = getpwuid( getuid() );
-        endpwent();
-        if( pw != NULL )
-            snprintf( buf, sizeof(buf), "%s", pw->pw_dir );
-#endif
-    }
-
-    init = 1;
-    return buf;
-}
-
-
-static void
-tr_migrateResume( const char *oldDirectory, const char *newDirectory )
-{
-    DIR * dirh = opendir( oldDirectory );
-
-    if( dirh != NULL )
+    if( !home )
     {
-        struct dirent * dirp;
+        home = tr_strdup( getenv( "HOME" ) );
 
-        while( ( dirp = readdir( dirh ) ) )
+        if( !home )
         {
-            if( !strncmp( "resume.", dirp->d_name, 7 ) )
-            {
-                char o[MAX_PATH_LENGTH];
-                char n[MAX_PATH_LENGTH];
-                tr_buildPath( o, sizeof(o), oldDirectory, dirp->d_name, NULL );
-                tr_buildPath( n, sizeof(n), newDirectory, dirp->d_name, NULL );
-                rename( o, n );
-            }
+#ifdef WIN32
+            SHGetFolderPath( NULL, CSIDL_PROFILE, NULL, 0, buf );
+#elif defined(__BEOS__) || defined(__AMIGAOS4__)
+            home = tr_strdup( "" );
+#else
+            struct passwd * pw = getpwuid( getuid() );
+            endpwent( );
+            if( pw )
+                home = tr_strdup( pw->pw_dir );
+#endif
         }
 
-        closedir( dirh );
+        if( !home )
+            home = tr_strdup( "" );
     }
+
+    return home;
 }
 
-const char *
-tr_getPrefsDirectory( void )
+static const char *
+getOldConfigDir( void )
 {
-    static char   buf[MAX_PATH_LENGTH];
-    static int    init = 0;
-    const char * trhome;
+    static char * path = NULL;
 
-    if( init )
-        return buf;
-
-    trhome = getenv( "TRANSMISSION_HOME" );
-    if( trhome != NULL )
+    if( !path )
     {
-        strlcpy( buf, trhome, sizeof( buf ) );
-    }
-    else
-    {
+        char buf[MAX_PATH_LENGTH];
 #ifdef __BEOS__
         find_directory( B_USER_SETTINGS_DIRECTORY,
                         dev_for_path("/boot"), true,
                         buf, sizeof( buf ) );
         strcat( buf, "/Transmission" );
 #elif defined( SYS_DARWIN )
-        tr_buildPath ( buf, sizeof( buf ),
-                       tr_getHomeDirectory( ),
-                       "Library",
-                       "Application Support",
-                       "Transmission",
-                       NULL );
+        tr_buildPath ( buf, sizeof( buf ), getHomeDir( ),
+                       "Library", "Application Support",
+                       "Transmission", NULL );
 #elif defined(__AMIGAOS4__)
         strlcpy( buf, "PROGDIR:.transmission", sizeof( buf ) );
 #elif defined(WIN32)
         char appdata[MAX_PATH_LENGTH];
         SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
         tr_buildPath( buf, sizeof(buf),
-                      appdata,
-                      "Transmission",
-                      NULL );
+                      appdata, "Transmission", NULL );
 #else
-        tr_buildPath ( buf, sizeof(buf), tr_getHomeDirectory( ), ".transmission", NULL );
+        tr_buildPath ( buf, sizeof(buf),
+                       getHomeDir( ), ".transmission", NULL );
 #endif
+        path = tr_strdup( buf );
     }
 
-    tr_mkdirp( buf, 0777 );
-    init = 1;
+    return path;
+}
+
+static const char *
+getOldTorrentsDir( void )
+{
+    static char * path = NULL;
+
+    if( !path )
+    {
+        char buf[MAX_PATH_LENGTH];
+        const char * p = getOldConfigDir();
+#if defined(__BEOS__) || defined(WIN32) || defined(SYS_DARWIN)
+        tr_buildPath( buf, sizeof( buf ), p, "Torrents", NULL );
+#else
+        tr_buildPath( buf, sizeof( buf ), p, "torrents", NULL );
+#endif
+
+        path = tr_strdup( buf );
+    }
+
+    return path;
+}
+static const char *
+getOldCacheDir( void )
+{
+    static char * path = NULL;
+
+    if( !path )
+    {
+        char buf[MAX_PATH_LENGTH];
+        const char * p = getOldConfigDir( );
+#if defined(__BEOS__) || defined(WIN32)
+        tr_buildPath( buf, sizeof( buf ), p, "Cache", NULL );
+#elif defined( SYS_DARWIN )
+        tr_buildPath( buf, sizeof( buf ), getHomeDir(),
+                      "Library", "Caches", "Transmission", NULL );
+#else
+        tr_buildPath( buf, sizeof( buf ), p, "cache", NULL );
+#endif
+        path = tr_strdup( buf );
+    }
+
+    return path;
+}
+
+static void
+moveFiles( const char * oldDir, const char * newDir )
+{
+    if( oldDir && newDir && strcmp( oldDir, newDir ) )
+    {
+        DIR * dirh = opendir( oldDir );
+        if( dirh )
+        {
+            int count = 0;
+            struct dirent * dirp;
+            while(( dirp = readdir( dirh )))
+            {
+                if( strcmp( dirp->d_name, "." ) && strcmp( dirp->d_name, ".." ) )
+                {
+                    char o[MAX_PATH_LENGTH];
+                    char n[MAX_PATH_LENGTH];
+                    tr_buildPath( o, sizeof(o), oldDir, dirp->d_name, NULL );
+                    tr_buildPath( n, sizeof(n), newDir, dirp->d_name, NULL );
+                    rename( o, n );
+                    ++count;
+                }
+            }
+            tr_inf( _( "Migrated %1$d files from \"%2$s\" to \"%3$s\"" ),
+                    count, oldDir, newDir );
+            closedir( dirh );
+        }
+    }
+}
+
+static void
+migrateFiles( const tr_handle * handle )
+{
+    static int migrated = FALSE;
+
+    if( !migrated )
+    {
+        const char * oldDir;
+        const char * newDir;
+        migrated = TRUE;
+
+        oldDir = getOldTorrentsDir( );
+        newDir = tr_getTorrentDir( handle );
+        moveFiles( oldDir, newDir );
+
+        oldDir = getOldCacheDir( );
+        newDir = tr_getResumeDir( handle );
+        moveFiles( oldDir, newDir );
+    }
+}
 
 #ifdef SYS_DARWIN
-    char old[MAX_PATH_LENGTH];
-    tr_buildPath ( old, sizeof(old),
-                   tr_getHomeDirectory(), ".transmission", NULL );
-    tr_migrateResume( old, buf );
-    rmdir( old );
+#define RESUME_SUBDIR  "Resume"
+#define TORRENT_SUBDIR "Torrents"
+#else
+#define RESUME_SUBDIR  "resume"
+#define TORRENT_SUBDIR "torrents"
 #endif
 
-    return buf;
+void
+tr_setConfigDir( tr_handle * handle, const char * configDir )
+{
+    char buf[MAX_PATH_LENGTH];
+
+    handle->configDir = tr_strdup( configDir );
+
+    tr_buildPath( buf, sizeof( buf ), configDir, RESUME_SUBDIR, NULL );
+    tr_mkdirp( buf, 0777 );
+    handle->resumeDir = tr_strdup( buf );
+
+    tr_buildPath( buf, sizeof( buf ), configDir, TORRENT_SUBDIR, NULL );
+    tr_mkdirp( buf, 0777 );
+    handle->torrentDir = tr_strdup( buf );
+
+    migrateFiles( handle );
 }
 
 const char *
-tr_getCacheDirectory( void )
+tr_getConfigDir( const tr_handle * handle )
 {
-    static char buf[MAX_PATH_LENGTH];
-    static int  init = 0;
-    static const size_t buflen = sizeof(buf);
-    const char * p;
+    return handle->configDir;
+}
 
-    if( init )
-        return buf;
 
-    p = tr_getPrefsDirectory();
-#if defined(__BEOS__) || defined(WIN32)
-    tr_buildPath( buf, buflen, p, "Cache", NULL );
-#elif defined( SYS_DARWIN )
-    tr_buildPath( buf, buflen, tr_getHomeDirectory(),
-                  "Library", "Caches", "Transmission", NULL );
-#else
-    tr_buildPath( buf, buflen, p, "cache", NULL );
-#endif
-
-    tr_mkdirp( buf, 0777 );
-    init = 1;
-
-    if( strcmp( p, buf ) )
-        tr_migrateResume( p, buf );
-
-    return buf;
+const char *
+tr_getTorrentDir( const tr_handle * handle )
+{
+    return handle->torrentDir;
 }
 
 const char *
-tr_getTorrentsDirectory( void )
+tr_getResumeDir( const tr_handle * handle )
 {
-    static char buf[MAX_PATH_LENGTH];
-    static int  init = 0;
-    static const size_t buflen = sizeof(buf);
-    const char * p;
+    return handle->resumeDir;
+}
 
-    if( init )
-        return buf;
+const char*
+tr_getDefaultConfigDir( void )
+{
+    static char * s = NULL;
 
-    p = tr_getPrefsDirectory ();
+    if( !s )
+    {
+        char path[MAX_PATH_LENGTH];
 
-#if defined(__BEOS__) || defined(WIN32)
-    tr_buildPath( buf, buflen, p, "Torrents", NULL );
-#elif defined( SYS_DARWIN )
-    tr_buildPath( buf, buflen, p, "Torrents", NULL );
+        if(( s = getenv( "TRANSMISSION_HOME" )))
+        {
+            snprintf( path, sizeof( path ), s );
+        }
+        else
+        {
+#ifdef DARWIN
+            tr_buildPath( path, sizeof( path ),
+                          getHomeDir( ), "Library", "Application Support",
+                          "Transmission", NULL );
+#elif defined(WIN32)
+            char appdata[MAX_PATH_LENGTH];
+            SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
+            tr_buildPath( path, sizeof( path ),
+                          appdata, "Transmission", NULL );
 #else
-    tr_buildPath( buf, buflen, p, "torrents", NULL );
+            if(( s = getenv( "XDG_CONFIG_HOME" )))
+                tr_buildPath( path, sizeof( path ),
+                              s, "transmission", NULL );
+            else
+                tr_buildPath( path, sizeof( path ),
+                              getHomeDir(), ".config", "transmission", NULL );
 #endif
+        }
 
-    tr_mkdirp( buf, 0777 );
-    init = 1;
-    return buf;
+        s = tr_strdup( path );
+    }
+
+    return s;
 }
 
 /***

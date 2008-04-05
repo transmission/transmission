@@ -131,12 +131,12 @@ tr_ctorSetMetainfoFromHash( tr_ctor        * ctor,
 
     if( err && ( ctor->handle->tag != NULL ) ) {
         snprintf( basename, sizeof(basename), "%s-%s", hashString, ctor->handle->tag );
-        tr_buildPath( filename, sizeof(filename), tr_getTorrentsDirectory(), basename, NULL );
+        tr_buildPath( filename, sizeof(filename), tr_getTorrentDir( ctor->handle ), basename, NULL );
         err = tr_ctorSetMetainfoFromFile( ctor, filename );
     }
 
     if( err ) {
-        tr_buildPath( filename, sizeof(filename), tr_getTorrentsDirectory(), hashString, NULL );
+        tr_buildPath( filename, sizeof(filename), tr_getTorrentDir( ctor->handle ), hashString, NULL );
         err = tr_ctorSetMetainfoFromFile( ctor, filename );
     }
 

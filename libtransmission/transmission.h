@@ -76,7 +76,10 @@ enum
 
 typedef struct tr_handle tr_handle;
 
-tr_handle * tr_initFull( const char * tag,
+const char* tr_getDefaultConfigDir( void );
+
+tr_handle * tr_initFull( const char * configDir,
+                         const char * tag,
                          int          isPexEnabled,
                          int          isNatEnabled,
                          int          publicPort,
@@ -93,7 +96,8 @@ tr_handle * tr_initFull( const char * tag,
 /**
  * Like tr_initFull() but with default values supplied.
  */ 
-tr_handle * tr_init( const char * tag );
+tr_handle * tr_init( const char * configDir,
+                     const char * tag );
 
 /**
  * Shut down a libtransmission instance created by tr_init*()
@@ -147,7 +151,7 @@ void tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode );
  * Returns the full path to a directory which can be used to store
  * preferences. The string belongs to libtransmission, do not free it.
  **********************************************************************/
-const char * tr_getPrefsDirectory( void );
+const char * tr_getConfigDir( const tr_handle * );
 
 
 
@@ -501,7 +505,7 @@ tr_torrent * tr_torrentNew( tr_handle      * handle,
 
 
 /**
- *  Load all the torrents in tr_getTorrentsDirectory().
+ *  Load all the torrents in tr_getTorrentDir().
  *  This can be used at startup to kickstart all the torrents
  *  from the previous session.
  */
@@ -649,7 +653,7 @@ void tr_torrentAmountFinished( const tr_torrent * tor, float * tab, int size );
  * tr_torrentRemoveSaved
  ***********************************************************************
  * delete's Transmission's copy of the torrent's metadata from
- * tr_getTorrentsDirectory().
+ * tr_getTorrentDir().
  **********************************************************************/
 void tr_torrentRemoveSaved( tr_torrent * );
 

@@ -114,7 +114,8 @@ tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode )
 ***/
 
 tr_handle *
-tr_initFull( const char * tag,
+tr_initFull( const char * configDir,
+             const char * tag,
              int          isPexEnabled,
              int          isNatEnabled,
              int          publicPort,
@@ -137,6 +138,9 @@ tr_initFull( const char * tag,
     signal( SIGPIPE, SIG_IGN );
 #endif
 
+    if( configDir == NULL )
+        configDir = tr_getDefaultConfigDir( );
+
     tr_msgInit( );
     tr_setMessageLevel( messageLevel );
     tr_setMessageQueuing( isMessageQueueingEnabled );
@@ -145,6 +149,9 @@ tr_initFull( const char * tag,
     h->lock = tr_lockNew( );
     h->isPexEnabled = isPexEnabled ? 1 : 0;
     h->encryptionMode = encryptionMode;
+    h->configDir = tr_strdup( configDir );
+
+    tr_setConfigDir( h, configDir );
 
     tr_netInit(); /* must go before tr_eventInit */
 
@@ -181,9 +188,9 @@ tr_initFull( const char * tag,
     tr_inf( "%s", buf );
 
     /* initialize the blocklist */
-    tr_buildPath( filename, sizeof( filename ), tr_getPrefsDirectory(), "blocklists", NULL );
+    tr_buildPath( filename, sizeof( filename ), h->configDir, "blocklists", NULL );
     tr_mkdirp( filename, 0777 );
-    tr_buildPath( filename, sizeof( filename ), tr_getPrefsDirectory(), "blocklists", "level1.bin", NULL );
+    tr_buildPath( filename, sizeof( filename ), h->configDir, "blocklists", "level1.bin", NULL );
     h->blocklist = _tr_blocklistNew( filename, isBlocklistEnabled );
 
     tr_statsInit( h );
@@ -191,9 +198,12 @@ tr_initFull( const char * tag,
     return h;
 }
 
-tr_handle * tr_init( const char * tag )
+tr_handle *
+tr_init( const char * configDir,
+         const char * tag )
 {
-    return tr_initFull( tag,
+    return tr_initFull( configDir,
+                        tag,
                         TRUE, /* pex enabled */
                         FALSE, /* nat enabled */
                         -1, /* public port */
@@ -433,7 +443,7 @@ tr_loadTorrents ( tr_handle   * h,
     int i, n = 0;
     struct stat sb;
     DIR * odir = NULL;
-    const char * dirname = tr_getTorrentsDirectory( );
+    const char * dirname = tr_getTorrentDir( h );
     tr_torrent ** torrents;
     tr_list *l=NULL, *list=NULL;
 

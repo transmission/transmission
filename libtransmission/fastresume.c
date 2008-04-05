@@ -123,7 +123,7 @@ enum
 static void
 fastResumeFileName( char * buf, size_t buflen, const tr_torrent * tor, int tag )
 {
-    const char * cacheDir = tr_getCacheDirectory ();
+    const char * cacheDir = tr_getResumeDir( tor->handle );
     const char * hash = tor->info.hashString;
 
     if( !tag )
@@ -603,7 +603,7 @@ loadResumeFile( const tr_torrent * tor, size_t * len )
 {
     uint8_t * ret = NULL;
     char path[MAX_PATH_LENGTH];
-    const char * cacheDir = tr_getCacheDirectory ();
+    const char * cacheDir = tr_getResumeDir( tor->handle );
     const char * hash = tor->info.hashString;
 
     if( !ret && tor->handle->tag )
@@ -714,7 +714,7 @@ void
 tr_fastResumeRemove( const tr_torrent * tor )
 {
     char path[MAX_PATH_LENGTH];
-    const char * cacheDir = tr_getCacheDirectory ();
+    const char * cacheDir = tr_getResumeDir( tor->handle );
     const char * hash = tor->info.hashString;
 
     if( tor->handle->tag )

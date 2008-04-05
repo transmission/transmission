@@ -14,7 +14,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
-#include "platform.h" /* tr_getPrefsDirectory */
+#include "platform.h" /* tr_getConfigDir() */
 #include "utils.h" /* tr_buildPath */
 
 /***
@@ -59,20 +59,20 @@ parseCumulativeStats( tr_session_stats  * setme,
 }
 
 static char*
-getFilename( char * buf, size_t buflen )
+getFilename( const tr_handle * handle, char * buf, size_t buflen )
 {
-    tr_buildPath( buf, buflen, tr_getPrefsDirectory(), "stats.benc", NULL );
+    tr_buildPath( buf, buflen, tr_getConfigDir(handle), "stats.benc", NULL );
     return buf;
 }
 
 static void
-loadCumulativeStats( tr_session_stats * setme )
+loadCumulativeStats( const tr_handle * handle, tr_session_stats * setme )
 {
     size_t len;
     uint8_t * content;
     char filename[MAX_PATH_LENGTH];
 
-    getFilename( filename, sizeof(filename) );
+    getFilename( handle, filename, sizeof(filename) );
     content = tr_loadFile( filename, &len );
     if( content != NULL )
         parseCumulativeStats( setme, content, len );
@@ -81,7 +81,7 @@ loadCumulativeStats( tr_session_stats * setme )
 }
 
 static void
-saveCumulativeStats( const tr_session_stats * stats )
+saveCumulativeStats( const tr_handle * handle, const tr_session_stats * stats )
 {
     FILE * fp;
     char * str;
@@ -97,7 +97,7 @@ saveCumulativeStats( const tr_session_stats * stats )
     tr_bencInitInt( tr_bencDictAdd( &top, "seconds-active" ), stats->secondsActive );
 
     str = tr_bencSave( &top, &len );
-    getFilename( filename, sizeof(filename) );
+    getFilename( handle, filename, sizeof(filename) );
     fp = fopen( filename, "wb+" );
     fwrite( str, 1, len, fp );
     fclose( fp );
@@ -114,7 +114,7 @@ void
 tr_statsInit( tr_handle * handle )
 {
     struct tr_stats_handle * stats = tr_new0( struct tr_stats_handle, 1 );
-    loadCumulativeStats( &stats->old );
+    loadCumulativeStats( handle, &stats->old );
     stats->single.sessionCount = 1;
     stats->startTime = time( NULL );
     handle->sessionStats = stats;
@@ -125,7 +125,7 @@ tr_statsClose( tr_handle * handle )
 {
     tr_session_stats cumulative;
     tr_getCumulativeSessionStats( handle, &cumulative );
-    saveCumulativeStats( &cumulative );
+    saveCumulativeStats( handle, &cumulative );
 
     tr_free( handle->sessionStats );
     handle->sessionStats = NULL;
