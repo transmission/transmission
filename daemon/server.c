@@ -633,18 +633,18 @@ strmsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     switch( id )
     {
         case IPC_MSG_CRYPTO:
-            if(!strcasecmp(val->val.s.s, "plaintext"))
-                torrent_set_encryption(TR_PLAINTEXT_PREFERRED);
-            else if(!strcasecmp(val->val.s.s, "preferred"))
-                torrent_set_encryption(TR_ENCRYPTION_PREFERRED);
-            else if(!strcasecmp(val->val.s.s, "required"))
-                torrent_set_encryption(TR_ENCRYPTION_REQUIRED);
-            else
-            {
+            if( !strcasecmp( val->val.s.s, "required" ) )
+                torrent_set_encryption( TR_ENCRYPTION_REQUIRED );
+            else if( !strcasecmp( val->val.s.s, "preferred" ) )
+                torrent_set_encryption( TR_ENCRYPTION_PREFERRED );
+            else if( !strcasecmp( val->val.s.s, "tolerated" ) )
+                torrent_set_encryption( TR_PLAINTEXT_PREFERRED );
+            else {
                 msgresp(client, tag, IPC_MSG_BAD);
                 return;
             }
             break;
+
         case IPC_MSG_DIR:
             torrent_set_directory( val->val.s.s );
             break;
@@ -927,20 +927,11 @@ prefmsg( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag, void * arg )
                              torrent_get_autostart() );
             break;
         case IPC_MSG_GETCRYPTO:
-            switch(torrent_get_encryption())
-            {
-                case TR_PLAINTEXT_PREFERRED:
-                    strval = "plaintext";
-                    break;
-                case TR_ENCRYPTION_PREFERRED:
-                    strval = "preferred";
-                    break;
-                case TR_ENCRYPTION_REQUIRED:
-                    strval = "required";
-                    break;
-                default:
-                    assert(0);
-                    return;
+            switch(torrent_get_encryption()) {
+                case TR_ENCRYPTION_REQUIRED:  strval = "required"; break;
+                case TR_ENCRYPTION_PREFERRED: strval = "preferred"; break;
+                case TR_PLAINTEXT_PREFERRED:  strval = "tolerated"; break;
+                default: assert(0); return;
             }
             buf = ipc_mkstr(client->ipc, &buflen, IPC_MSG_CRYPTO, tag, strval);
             break;

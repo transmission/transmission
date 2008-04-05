@@ -236,8 +236,9 @@ usage( const char * msg, ... )
   "A fast and easy BitTorrent client\n"
   "\n"
   "  -a --add <torrent>        Add a torrent\n"
-  "  -c --encryption preferred Prefer peers to use encryption\n"
   "  -c --encryption required  Require encryption for all peers\n"
+  "  -c --encryption preferred Prefer peers to use encryption\n"
+  "  -c --encryption tolerated Prefer peers to use plaintext\n"
   "  -d --download-limit <int> Max download rate in KiB/s\n"
   "  -D --download-unlimited   No download rate limit\n"
   "  -e --enable-pex           Enable peer exchange\n"
@@ -320,10 +321,12 @@ readargs( int argc, char ** argv, struct opts * opts )
                 }
                 break;
             case 'c':
-                if(!strcasecmp(optarg, "preferred"))
-                    opts->crypto = "preferred";
-                else if(!strcasecmp(optarg, "required"))
+                if(!strcasecmp(optarg, "required"))
                     opts->crypto = "required";
+                else if(!strcasecmp(optarg, "preferred"))
+                    opts->crypto = "preferred";
+                else if(!strcasecmp(optarg, "tolerated"))
+                    opts->crypto = "tolerated";
                 else
                     usage("invalid encryption mode: %s", optarg);
                 break;

@@ -268,7 +268,7 @@ Format:  list of strings
 Replies: "failed", "not-supported", "bad-format", "info"
 Example: 12:get-info-alll4:hash4:namee
          "get-info-all", ("hash", "name")
-Details: Same as "getinfo" message with all torrent IDs specified.
+Details: Same as "get-info" message with all torrent IDs specified.
 
 Key:     "get-pex"
 Version: 2
@@ -374,6 +374,14 @@ Example: 4:porti51413e
          "port", 51413
 Details: Change the port the server uses to listen for incoming peer
          connections.
+
+Key:     "encryption"
+Version: 2
+Format:  string
+Example: 10:encryption9:preferred
+         "encryption", "preferred"
+Details: Returns thestring is one of:
+         "required", "preferred", "tolerated"
 
 Key:     "quit"
 Version: 1
