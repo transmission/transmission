@@ -500,7 +500,7 @@ tr_getDefaultConfigDir( void )
         }
         else
         {
-#ifdef DARWIN
+#ifdef SYS_DARWIN
             tr_buildPath( path, sizeof( path ),
                           getHomeDir( ), "Library", "Application Support",
                           "Transmission", NULL );
