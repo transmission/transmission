@@ -36,7 +36,8 @@
 #define TOOLBAR_GENERAL     @"TOOLBAR_GENERAL"
 #define TOOLBAR_TRANSFERS   @"TOOLBAR_TRANSFERS"
 #define TOOLBAR_BANDWIDTH   @"TOOLBAR_BANDWIDTH"
-#define TOOLBAR_ADVANCED    @"TOOLBAR_ADVANCED"
+#define TOOLBAR_PEERS       @"TOOLBAR_PEERS"
+#define TOOLBAR_NETWORK     @"TOOLBAR_NETWORK"
 
 @interface PrefsController (Private)
 
@@ -171,7 +172,7 @@
 
     if ([ident isEqualToString: TOOLBAR_GENERAL])
     {
-        [item setLabel: NSLocalizedString(@"General", "Preferences -> General toolbar item title")];
+        [item setLabel: NSLocalizedString(@"General", "Preferences -> toolbar item title")];
         [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNamePreferencesGeneral : @"Preferences.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
@@ -179,7 +180,7 @@
     }
     else if ([ident isEqualToString: TOOLBAR_TRANSFERS])
     {
-        [item setLabel: NSLocalizedString(@"Transfers", "Preferences -> Transfers toolbar item title")];
+        [item setLabel: NSLocalizedString(@"Transfers", "Preferences -> toolbar item title")];
         [item setImage: [NSImage imageNamed: @"Transfers.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
@@ -187,16 +188,25 @@
     }
     else if ([ident isEqualToString: TOOLBAR_BANDWIDTH])
     {
-        [item setLabel: NSLocalizedString(@"Bandwidth", "Preferences -> Bandwidth toolbar item title")];
+        [item setLabel: NSLocalizedString(@"Bandwidth", "Preferences -> toolbar item title")];
         [item setImage: [NSImage imageNamed: @"Bandwidth.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
     }
-    else if ([ident isEqualToString: TOOLBAR_ADVANCED])
+    #warning update tiger images
+    else if ([ident isEqualToString: TOOLBAR_PEERS])
     {
-        [item setLabel: NSLocalizedString(@"Advanced", "Preferences -> Advanced toolbar item title")];
-        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNameAdvanced : @"Advanced.png"]];
+        [item setLabel: NSLocalizedString(@"Peers", "Preferences -> toolbar item title")];
+        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNameUserGroup : @"Advanced.png"]];
+        [item setTarget: self];
+        [item setAction: @selector(setPrefView:)];
+        [item setAutovalidates: NO];
+    }
+    else if ([ident isEqualToString: TOOLBAR_NETWORK])
+    {
+        [item setLabel: NSLocalizedString(@"Network", "Preferences -> toolbar item title")];
+        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNameNetwork : @"Advanced.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
@@ -222,7 +232,7 @@
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
-    return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_BANDWIDTH, TOOLBAR_ADVANCED, nil];
+    return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_BANDWIDTH, TOOLBAR_PEERS, TOOLBAR_NETWORK, nil];
 }
 
 //used by ipc
@@ -258,7 +268,7 @@
         fPublicPort = stat->publicPort;
         
         [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status",
-                                            "Preferences -> Advanced -> port status") stringByAppendingEllipsis]];
+                                            "Preferences -> Network -> port status") stringByAppendingEllipsis]];
         [fPortStatusImage setImage: nil];
         [fPortStatusProgress startAnimation: self];
         
@@ -277,20 +287,20 @@
     switch ([fPortChecker status])
     {
         case PORT_STATUS_OPEN:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Port is open", "Preferences -> Advanced -> port status")];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Port is open", "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"GreenDot.png"]];
             break;
         case PORT_STATUS_CLOSED:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Port is closed", "Preferences -> Advanced -> port status")];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Port is closed", "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
             break;
         case PORT_STATUS_STEALTH:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Port is stealth", "Preferences -> Advanced -> port status")];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Port is stealth", "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
             break;
         case PORT_STATUS_ERROR:
             [fPortStatusField setStringValue: NSLocalizedString(@"Unable to check port status",
-                                                "Preferences -> Advanced -> port status")];
+                                                "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.png"]];
             break;
     }
@@ -595,6 +605,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSizeSettingChange" object: self];
 }
 
+#warning have one for peers, one for network?
 - (void) helpForNetwork: (id) sender
 {
     [[NSHelpManager sharedHelpManager] openHelpAnchor: @"AdvancedPrefs"
@@ -615,9 +626,11 @@
             view = fTransfersView;
         else if ([identifier isEqualToString: TOOLBAR_BANDWIDTH])
             view = fBandwidthView;
-        else if ([identifier isEqualToString: TOOLBAR_ADVANCED])
-            view = fAdvancedView;
-        else;
+        else if ([identifier isEqualToString: TOOLBAR_PEERS])
+            view = fPeersView;
+        else if ([identifier isEqualToString: TOOLBAR_NETWORK])
+            view = fNetworkView;
+        else; //general view already selected
     }
     
     NSWindow * window = [self window];
@@ -651,8 +664,8 @@
             }
     }
     
-    //for advanced view make sure progress indicator hides itself
-    if (view == fAdvancedView && [fPortStatusImage image])
+    //for network view make sure progress indicator hides itself
+    if (view == fNetworkView && [fPortStatusImage image])
         [fPortStatusProgress setDisplayedWhenStopped: NO];
 }
 

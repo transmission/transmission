@@ -1842,9 +1842,18 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             source: [path stringByDeletingLastPathComponent] destination: @""
             files: [NSArray arrayWithObject: [path lastPathComponent]] tag: nil])
     {
-        //if cannot trash, just delete it (will work if it is on a remote volume)
-        if (![[NSFileManager defaultManager] removeFileAtPath: path handler: nil])
-            NSLog(@"Could not trash %@", path);
+        if ([NSApp isOnLeopardOrBetter])
+        {
+            NSError * error;
+            if (![[NSFileManager defaultManager] removeItemAtPath: path error: &error])
+                NSLog(@"Could not trash %@: %@", path, [error localizedDescription]);
+        }
+        else
+        {
+            //if cannot trash, just delete it (will work if it is on a remote volume)
+            if (![[NSFileManager defaultManager] removeFileAtPath: path handler: nil])
+                NSLog(@"Could not trash %@", path);
+        }
     }
 }
 
