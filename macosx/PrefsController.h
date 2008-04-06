@@ -112,6 +112,7 @@
 
 - (void) setAutoSize: (id) sender;
 
+- (void) helpForPeers: (id) sender;
 - (void) helpForNetwork: (id) sender;
 
 @end

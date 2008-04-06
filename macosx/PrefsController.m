@@ -605,10 +605,15 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSizeSettingChange" object: self];
 }
 
-#warning have one for peers, one for network?
+- (void) helpForPeers: (id) sender
+{
+    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"PeersPrefs"
+        inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
+}
+
 - (void) helpForNetwork: (id) sender
 {
-    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"AdvancedPrefs"
+    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"NetworkPrefs"
         inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
