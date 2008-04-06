@@ -2220,7 +2220,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         default:
             icon = [[GroupsController groups] imageForIndex: index isSmall: YES];
             toolTip = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Group", "Groups -> Button"),
-                         [[GroupsController groups] nameForIndex: index]];
+                        [[GroupsController groups] nameForIndex: index]];
     }
     
     [[fGroupFilterMenu itemAtIndex: 0] setImage: icon];
