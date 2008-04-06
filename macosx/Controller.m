@@ -2214,12 +2214,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         case -1:
             if ([NSApp isOnLeopardOrBetter])
                 icon = [NSImage imageNamed: NSImageNameStopProgressTemplate];
-            toolTip = NSLocalizedString(@"Group: No Label", "Groups -> Button");
+            toolTip = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Group", "Groups -> Button"),
+                        NSLocalizedString(@"No Label", "Groups -> Button")];
             break;
         default:
             icon = [[GroupsController groups] imageForIndex: index isSmall: YES];
-            toolTip = [NSLocalizedString(@"Group: ", "Groups -> Button") stringByAppendingString:
-                        [[GroupsController groups] nameForIndex: index]];
+            toolTip = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Group", "Groups -> Button"),
+                         [[GroupsController groups] nameForIndex: index]];
     }
     
     [[fGroupFilterMenu itemAtIndex: 0] setImage: icon];

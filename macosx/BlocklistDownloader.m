@@ -47,7 +47,6 @@
     [downloader startDownload];
 }
 
-
 - (void) awakeFromNib
 {
     [fButton setTitle: NSLocalizedString(@"Cancel", "Blocklist -> cancel button")];

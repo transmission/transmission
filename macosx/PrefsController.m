@@ -267,8 +267,8 @@
         fNatStatus = stat->natTraversalStatus;
         fPublicPort = stat->publicPort;
         
-        [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status",
-                                            "Preferences -> Network -> port status") stringByAppendingEllipsis]];
+        [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status", "Preferences -> Network -> port status")
+            stringByAppendingEllipsis]];
         [fPortStatusImage setImage: nil];
         [fPortStatusProgress startAnimation: self];
         
