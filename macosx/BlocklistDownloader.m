@@ -55,6 +55,8 @@
 
 - (void) cancelDownload: (id) sender
 {
+    [fDownload cancel];
+    
     [fDownload release];
     fDownload = nil;
     
