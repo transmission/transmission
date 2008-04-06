@@ -194,7 +194,7 @@
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
     }
-    #warning update tiger images
+    #warning update tiger image
     else if ([ident isEqualToString: TOOLBAR_PEERS])
     {
         [item setLabel: NSLocalizedString(@"Peers", "Preferences -> toolbar item title")];
@@ -206,7 +206,7 @@
     else if ([ident isEqualToString: TOOLBAR_NETWORK])
     {
         [item setLabel: NSLocalizedString(@"Network", "Preferences -> toolbar item title")];
-        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNameNetwork : @"Advanced.png"]];
+        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNameNetwork : @"Network.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
