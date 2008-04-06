@@ -139,6 +139,11 @@ main( int argc, char ** argv )
         return EXIT_FAILURE;
     }
 
+    /* don't bind the port if we're just running the CLI 
+     * to get metainfo or to create a torrent */
+    if( showInfo || ( sourceFile != NULL ) )
+        bindPort = -1;
+
     /* Initialize libtransmission */
     h = tr_initFull( tr_getDefaultConfigDir(),
                      "cli",                   /* tag */
