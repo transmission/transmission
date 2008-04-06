@@ -546,7 +546,7 @@ tr_torrentGetRates( const tr_torrent * tor,
 const tr_info *
 tr_torrentInfo( const tr_torrent * tor )
 {
-    return &tor->info;
+    return tor ? &tor->info : NULL;
 }
 
 const tr_stat *
@@ -554,8 +554,8 @@ tr_torrentStatCached( tr_torrent * tor )
 {
     const time_t now = time( NULL );
 
-    return now == tor->lastStatTime ? &tor->stats
-                                    : tr_torrentStat( tor );
+    return tor && ( now == tor->lastStatTime ) ? &tor->stats
+                                               : tr_torrentStat( tor );
 }
 
 tr_torrent_status
@@ -580,6 +580,9 @@ tr_torrentStat( tr_torrent * tor )
 {
     tr_stat * s;
     struct tr_tracker * tc;
+
+    if( !tor )
+        return NULL;
 
     tr_torrentLock( tor );
 

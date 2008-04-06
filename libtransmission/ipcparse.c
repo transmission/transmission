@@ -31,6 +31,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "torrent.h"
 #include "utils.h"
 
 #include "ipcparse.h"
@@ -117,6 +118,7 @@ static const struct msg gl_msgs[] =
     { "lookup",              2, IPC_MSG_LOOKUP        },
     { "noop",                2, IPC_MSG_NOOP          },
     { "not-supported",       2, IPC_MSG_NOTSUP        },
+    { "peer-max",            2, IPC_MSG_PEERMAX       },
     { "pex",                 2, IPC_MSG_PEX           },
     { "port",                2, IPC_MSG_PORT          },
     { "quit",                1, IPC_MSG_QUIT          },
@@ -169,6 +171,7 @@ static const struct inf gl_stat[] =
     { "id",                     IPC_ST_ID        },
     { "peers-downloading",      IPC_ST_PEERDOWN  },
     { "peers-from",             IPC_ST_PEERFROM  },
+    { "peers-max",              IPC_ST_PEERMAX   },
     { "peers-total",            IPC_ST_PEERTOTAL },
     { "peers-uploading",        IPC_ST_PEERUP    },
     { "running",                IPC_ST_RUNNING   },
@@ -656,13 +659,14 @@ ipc_addinfo( tr_benc         * list,
  * It specifies what to put in the dictionary.
  */
 int
-ipc_addstat( tr_benc        * list,
-             int              torrent_id,
-             const tr_stat  * st,
-             int              types )
+ipc_addstat( tr_benc      * list,
+             int            torrent_id,
+             tr_torrent   * tor,
+             int            types )
 {
-    tr_benc   * dict;
-    int         ii, used;
+    const tr_stat * st = tr_torrentStatCached( tor );
+    tr_benc  * dict;
+    int ii, used;
 
     /* add the dictionary child */
     tr_bencListReserve( list, 1 );
@@ -781,6 +785,9 @@ ipc_addstat( tr_benc        * list,
                                 st->peersFrom[TR_PEER_FROM_CACHE] );
                 tr_bencInitInt( tr_bencDictAdd( item, "pex" ),
                                 st->peersFrom[TR_PEER_FROM_PEX] );
+                break;
+            case IPC_ST_PEERMAX:
+                tr_bencInitInt( item, tor->maxConnectedPeers );
                 break;
             case IPC_ST_PEERTOTAL:
                 tr_bencInitInt( item, st->peersConnected );

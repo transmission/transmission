@@ -115,7 +115,6 @@ incomingPeersPulse( tr_shared * s )
         int socket;
         errno = 0;
         socket = tr_netBindTCP( s->publicPort );
-fprintf( stderr, "opening socket on %d to listen\n", s->publicPort );
         if( socket >= 0 ) {
             tr_ninf( getKey(), _( "Opened port %d to listen for incoming peer connections" ), s->publicPort );
             s->bindPort = s->publicPort;

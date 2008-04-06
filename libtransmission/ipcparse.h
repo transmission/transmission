@@ -60,6 +60,7 @@ enum ipc_msg
     IPC_MSG_LOOKUP,
     IPC_MSG_NOOP,
     IPC_MSG_NOTSUP,
+    IPC_MSG_PEERMAX,
     IPC_MSG_PEX,
     IPC_MSG_PORT,
     IPC_MSG_QUIT,
@@ -108,18 +109,19 @@ enum ipc_msg
 #define IPC_ST_ID               ( 1 << 7 )
 #define IPC_ST_PEERDOWN         ( 1 << 8 )
 #define IPC_ST_PEERFROM         ( 1 << 9 )
-#define IPC_ST_PEERTOTAL        ( 1 << 10 )
-#define IPC_ST_PEERUP           ( 1 << 11 )
-#define IPC_ST_RUNNING          ( 1 << 12 )
-#define IPC_ST_TKDONE           ( 1 << 13 )
-#define IPC_ST_TKLEECH          ( 1 << 14 )
-#define IPC_ST_TKSEED           ( 1 << 15 )
-#define IPC_ST_STATE            ( 1 << 16 )
-#define IPC_ST_SWARM            ( 1 << 17 )
-#define IPC_ST_TRACKER          ( 1 << 18 )
-#define IPC_ST_UPSPEED          ( 1 << 19 )
-#define IPC_ST_UPTOTAL          ( 1 << 20 )
-#define IPC_ST__MAX             ( 1 << 21 )
+#define IPC_ST_PEERMAX          ( 1 << 10 )
+#define IPC_ST_PEERTOTAL        ( 1 << 11 )
+#define IPC_ST_PEERUP           ( 1 << 12 )
+#define IPC_ST_RUNNING          ( 1 << 13 )
+#define IPC_ST_TKDONE           ( 1 << 14 )
+#define IPC_ST_TKLEECH          ( 1 << 15 )
+#define IPC_ST_TKSEED           ( 1 << 16 )
+#define IPC_ST_STATE            ( 1 << 17 )
+#define IPC_ST_SWARM            ( 1 << 18 )
+#define IPC_ST_TRACKER          ( 1 << 19 )
+#define IPC_ST_UPSPEED          ( 1 << 20 )
+#define IPC_ST_UPTOTAL          ( 1 << 21 )
+#define IPC_ST__MAX             ( 1 << 22 )
 
 struct ipc_funcs;
 struct ipc_info;
@@ -170,8 +172,13 @@ uint8_t *    ipc_createInfoRequest( const struct ipc_info * session,
 
 int          ipc_addinfo   ( struct tr_benc *, int,
                              const struct tr_info *, int );
-int          ipc_addstat   ( struct tr_benc *, int,
-                             const struct tr_stat *, int );
+
+struct tr_torrent;
+
+int          ipc_addstat   ( struct tr_benc     * appendme_list,
+                             int                  torrent_id,
+                             struct tr_torrent  * tor,
+                             int                  stat_types );
 
 /* sets errno to EINVAL on parse error or
    EPERM for unsupported protocol version */
