@@ -66,9 +66,6 @@
 {
     [fDownload cancel];
     
-    [fDownload release];
-    fDownload = nil;
-    
     [NSApp endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
     [self release];
@@ -92,9 +89,6 @@
 
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
 {
-    [fDownload release];
-    fDownload = nil;
-    
     [fProgressBar setHidden: YES];
     
     [NSApp endSheet: fStatusWindow];
@@ -114,9 +108,6 @@
 
 - (void) downloadDidFinish: (NSURLDownload *) download
 {
-    [fDownload release];
-    fDownload = nil;
-    
     //change to indeterminate while processing
     [fProgressBar setIndeterminate: YES];
     [fProgressBar startAnimation: self];
