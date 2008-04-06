@@ -113,6 +113,7 @@
     [fProgressBar startAnimation: self];
     
     [fTextField setStringValue: [NSLocalizedString(@"Processing blocklist", "Blocklist -> message") stringByAppendingEllipsis]];
+    [fButton setEnabled: NO];
     [fStatusWindow display]; //force window to be updated
     
     //process data
