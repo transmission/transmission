@@ -83,7 +83,9 @@ getProgressString( const tr_info * info, const tr_stat * torStat )
         const int eta = torStat->eta;
         GString * gstr = g_string_new( str );
         g_string_append( gstr, " - " );
-        if( eta < 0 )
+        if( eta == TR_ETA_NOT_AVAIL )
+            g_string_append( gstr, _( "Not available" ) );
+         else if( eta == TR_ETA_UNKNOWN )
             g_string_append( gstr, _( "Stalled" ) );
         else {
             char timestr[128];

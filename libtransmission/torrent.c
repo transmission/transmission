@@ -624,10 +624,6 @@ tr_torrentStat( tr_torrent * tor )
     s->startDate = tor->startDate;
     s->activityDate = tor->activityDate;
 
-    s->eta = s->rateDownload < 0.1
-        ? -1.0f
-        : (s->leftUntilDone / s->rateDownload / 1024.0);
-
     s->corruptEver     = tor->corruptCur    + tor->corruptPrev;
     s->downloadedEver  = tor->downloadedCur + tor->downloadedPrev;
     s->uploadedEver    = tor->uploadedCur   + tor->uploadedPrev;
@@ -657,6 +653,13 @@ tr_torrentStat( tr_torrent * tor )
 
         tr_bitfieldFree( availablePieces );
     }
+
+    if( s->desiredAvailable != s->leftUntilDone )
+        s->eta = TR_ETA_NOT_AVAIL;
+    else if( s->rateDownload < 0.1 )
+        s->eta = TR_ETA_UNKNOWN;
+    else
+        s->eta = s->leftUntilDone / (s->rateDownload / 1024.0);
 
     s->ratio = tr_getRatio( s->uploadedEver,
                             s->downloadedEver ? s->downloadedEver : s->haveValid );
