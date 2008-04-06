@@ -47,6 +47,15 @@
     [downloader startDownload];
 }
 
+
+- (void) awakeFromNib
+{
+    [fButton setTitle: NSLocalizedString(@"Cancel", "Blocklist -> cancel button")];
+    [fTextField setStringValue: [NSLocalizedString(@"Connecting to site", "Blocklist -> message") stringByAppendingEllipsis]];
+    
+    [fProgressBar setUsesThreadedAnimation: YES];
+}
+
 - (void) dealloc
 {
     [fDownload release];
@@ -71,7 +80,6 @@
     fExpectedSize = [response expectedContentLength];
     
     //change from indeterminate to progress
-    
     [fProgressBar setIndeterminate: fExpectedSize == NSURLResponseUnknownLength];
     [self updateProcessString];
 }
@@ -109,9 +117,12 @@
     [fDownload release];
     fDownload = nil;
     
-    //display progress as 100%
-    fCurrentSize = fExpectedSize;
-    [self updateProcessString];
+    //change to indeterminate while processing
+    [fProgressBar setIndeterminate: YES];
+    [fProgressBar startAnimation: self];
+    
+    [fTextField setStringValue: [NSLocalizedString(@"Processing blocklist", "Blocklist -> message") stringByAppendingEllipsis]];
+    [fStatusWindow display]; //force window to be updated
     
     //process data
     tr_blocklistSetContent(fHandle, [DESTINATION UTF8String]);
@@ -146,17 +157,15 @@
 
 - (void) startDownload
 {
+    //load window and show as sheet
+    [NSBundle loadNibNamed: @"BlocklistStatusWindow" owner: self];
+    [NSApp beginSheet: fStatusWindow modalForWindow: [fPrefsController window] modalDelegate: nil didEndSelector: nil contextInfo: nil];
+    
+    //start the download
     NSURLRequest * request = [NSURLRequest requestWithURL: [NSURL URLWithString: LIST_URL]];
     
     fDownload = [[NSURLDownload alloc] initWithRequest: request delegate: self];
     [fDownload setDestination: DESTINATION allowOverwrite: YES];
-    
-    [NSBundle loadNibNamed: @"BlocklistStatusWindow" owner: self];
-    
-    [fButton setTitle: NSLocalizedString(@"Cancel", "Blocklist -> cancel button")];
-    [fTextField setStringValue: [NSLocalizedString(@"Connecting to site", "Blocklist -> message") stringByAppendingEllipsis]];
-    
-    [NSApp beginSheet: fStatusWindow modalForWindow: [fPrefsController window] modalDelegate: nil didEndSelector: nil contextInfo: nil];
 }
 
 - (void) updateProcessString
