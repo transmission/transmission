@@ -162,9 +162,10 @@
     NSString * string = NSLocalizedString(@"Downloading blocklist", "Blocklist -> message");
     if (fExpectedSize != NSURLResponseUnknownLength)
     {
-        double progress = (double)fCurrentSize / fExpectedSize;
-        string = [string stringByAppendingString: [NSString localizedStringWithFormat: @" (%.1f%%)", 100.0 * progress]];
-        [fProgressBar setDoubleValue: progress];
+        NSString * substring = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Blocklist -> message"),
+                                [NSString stringForFileSize: fCurrentSize], [NSString stringForFileSize: fExpectedSize]];
+        string = [string stringByAppendingFormat: @" (%@)",  substring];
+        [fProgressBar setDoubleValue: (double)fCurrentSize / fExpectedSize];
     }
     
     [fTextField setStringValue: string];

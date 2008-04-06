@@ -927,7 +927,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     NSString * error;
     if (!(error = [NSString stringWithUTF8String: fStat->errorString])
         && !(error = [NSString stringWithCString: fStat->errorString encoding: NSISOLatin1StringEncoding]))
-        error = NSLocalizedString(@"(unreadable error)", "Torrent -> error string unreadable");
+        error = [NSString stringWithFormat: @"(%@)", NSLocalizedString(@"unreadable error", "Torrent -> error string unreadable")];
     
     return error;
 }
