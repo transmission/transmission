@@ -78,7 +78,7 @@
 + (NSString *) stringForSpeedAbbrev: (float) speed
 {
     if (speed < 1000.0) //0.0 K to 999.9 K
-        return [NSString localizedStringWithFormat: @"%.1f K", speed - .05];
+        return [NSString localizedStringWithFormat: @"%.1f K", MAX(0.0, speed - .05)];
     else if (speed < 102400.0) //0.98 M to 99.99 M
         return [NSString localizedStringWithFormat: @"%.2f M", (speed / 1024.0) - .005];
     else if (speed < 1024000.0) //100.0 M to 999.9 M
