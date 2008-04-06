@@ -66,9 +66,8 @@
     }
     
     //attempt to have minimum of 3 digits with at least 1 decimal
-    NSString * formattedSize = convertedSize < 10.0 ? [NSString localizedStringWithFormat: @"%.2f", convertedSize - .005]
-                                : [NSString localizedStringWithFormat: @"%.1f", convertedSize - .05];
-    return [formattedSize stringByAppendingFormat: @" %@", unit];
+    return convertedSize < 10.0 ? [NSString localizedStringWithFormat: @"%.2f %@", convertedSize - .005, unit]
+                                : [NSString localizedStringWithFormat: @"%.1f %@", convertedSize - .05, unit];
 }
 
 + (NSString *) stringForSpeed: (float) speed
@@ -79,7 +78,7 @@
 + (NSString *) stringForSpeedAbbrev: (float) speed
 {
     if (speed < 1000.0) //0.0 K to 999.9 K
-        return [NSString localizedStringWithFormat: @"%.1f K", speed];
+        return [NSString localizedStringWithFormat: @"%.1f K", speed - .05];
     else if (speed < 102400.0) //0.98 M to 99.99 M
         return [NSString localizedStringWithFormat: @"%.2f M", (speed / 1024.0) - .005];
     else if (speed < 1024000.0) //100.0 M to 999.9 M

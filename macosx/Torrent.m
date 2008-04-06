@@ -870,11 +870,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     float uploadRate = [self uploadRate];
     if (uploadRate < 0.1)
-        return -1;
+        return TR_ETA_UNKNOWN;
     
     float stopRatio = [self actualStopRatio], ratio = [self ratio];
     if (stopRatio == INVALID || ratio >= stopRatio)
-        return -1;
+        return TR_ETA_UNKNOWN;
     
     return (float)MAX([self downloadedTotal], [self haveVerified]) * (stopRatio - ratio) / uploadRate / 1024.0;
 }
@@ -1010,9 +1010,19 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         && (fRatioSetting == NSOnState || (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]))))
     {
         int eta = fStat->status == TR_STATUS_DOWNLOAD ? [self eta] : [self etaRatio];
-        NSString * etaString = eta >= 0 ? [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> progress string"),
-                                            [NSString timeString: eta showSeconds: YES maxDigits: 2]]
-                                        : NSLocalizedString(@"remaining time unknown", "Torrent -> progress string");
+        NSString * etaString;
+        switch (eta)
+        {
+            case TR_ETA_UNKNOWN:
+                etaString = NSLocalizedString(@"remaining time unknown", "Torrent -> progress string");
+                break;
+            case TR_ETA_NOT_AVAIL:
+                etaString = NSLocalizedString(@"not all available", "Torrent -> progress string");
+                break;
+            default:
+                etaString = [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> progress string"),
+                                [NSString timeString: eta showSeconds: YES maxDigits: 2]];
+        }
         
         string = [string stringByAppendingFormat: @" - %@", etaString];
     }
@@ -1152,8 +1162,17 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         return [self shortStatusString];
     
     int eta = [self isSeeding] ? [self etaRatio] : [self eta];
-    return eta >= 0 ? [NSString timeString: eta showSeconds: YES maxDigits: 2]
-                    : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
+    switch (eta)
+    {
+        case TR_ETA_UNKNOWN:
+            return NSLocalizedString(@"Unknown", "Torrent -> remaining time string");
+            break;
+        case TR_ETA_NOT_AVAIL:
+            return NSLocalizedString(@"Not all available", "Torrent -> remaining time string");
+        default:
+            return [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> remaining time string"),
+                            [NSString timeString: eta showSeconds: YES maxDigits: 2]];
+    }
 }
 
 - (NSString *) stateString
