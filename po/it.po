@@ -1573,6 +1573,4 @@ msgstr "Verifica torrent"
 
 #: ../libtransmission/verify.c:160
 msgid "Queued for verification"
-msgstr ""
-"Impossibile aprire il file %s in scrittura:\n"
-"%s"
+msgstr "In coda per la verifica"
