@@ -840,13 +840,26 @@ struct tr_stat
     tr_errno error;
     char errorString[128];
 
+    /* [0..1] */
     float recheckProgress;
+
+    /* [0..1] */
     float percentComplete;
+
+    /* [0..1] */
     float percentDone;
+
+    /* KiB/s */
     float rateDownload;
+
+    /* KiB/s */
     float rateUpload;
 
-    int eta;
+ #define TR_ETA_NOT_AVAIL -1
+ #define TR_ETA_UNKNOWN -2
+     /* seconds */
+     int eta;
+
     int peersKnown;
     int peersConnected;
     int peersFrom[TR_PEER_FROM__MAX];
