@@ -25,6 +25,8 @@
 #import "NSStringAdditions.h"
 #import <transmission.h>
 
+#warning better rounding
+
 @implementation NSString (NSStringAdditions)
 
 + (NSString *) ellipsis
@@ -96,9 +98,9 @@
     else;
     
     if (ratio < 10.0)
-        return [NSString localizedStringWithFormat: @"%.2f", ratio];
+        return [NSString localizedStringWithFormat: @"%.2f", MAX(0.0, ratio - .005)];
     else if (ratio < 100.0)
-        return [NSString localizedStringWithFormat: @"%.1f", ratio];
+        return [NSString localizedStringWithFormat: @"%.1f", ratio - .05];
     else
         return [NSString localizedStringWithFormat: @"%.0f", ratio];
 }
