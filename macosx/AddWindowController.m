@@ -216,8 +216,10 @@
         else
             fileString = NSLocalizedString(@"1 File", "Add torrent -> info");
         
-        statusString = [NSString stringWithFormat: NSLocalizedString(@"%@, %@ (%@ selected)", "Add torrent -> info"), fileString,
-                        statusString, [NSString stringForFileSize: [fTorrent totalSizeSelected]]];
+        NSString * selectedString = [NSString stringWithFormat: NSLocalizedString(@"%@ selected", "Add torrent -> info"),
+                                        [NSString stringForFileSize: [fTorrent totalSizeSelected]]];
+        
+        statusString = [NSString stringWithFormat: @"%@, %@ (%@)", fileString, statusString, selectedString];
     }
     
     [fStatusField setStringValue: statusString];

@@ -8,8 +8,8 @@
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="66"/>
 			<integer value="1361"/>
+			<integer value="66"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -857,7 +857,7 @@
 														<object class="NSMutableArray" key="dict.values">
 															<bool key="EncodedWithXMLCoder">YES</bool>
 															<integer value="0" id="8"/>
-															<integer value="1040" id="863968936"/>
+															<integer value="1040" id="172630586"/>
 															<real value="1.000000e+04" id="723159675"/>
 															<real value="1.000000e+00" id="1361"/>
 															<reference ref="1361"/>
@@ -998,7 +998,7 @@
 														<object class="NSMutableArray" key="dict.values">
 															<bool key="EncodedWithXMLCoder">YES</bool>
 															<reference ref="1361"/>
-															<reference ref="863968936"/>
+															<reference ref="172630586"/>
 															<reference ref="723159675"/>
 															<integer value="2" id="10"/>
 															<reference ref="8"/>
@@ -1131,7 +1131,7 @@
 														<object class="NSMutableArray" key="dict.values">
 															<bool key="EncodedWithXMLCoder">YES</bool>
 															<reference ref="8"/>
-															<reference ref="863968936"/>
+															<reference ref="172630586"/>
 															<reference ref="723159675"/>
 															<reference ref="1361"/>
 															<reference ref="1361"/>
@@ -1233,7 +1233,7 @@
 														<object class="NSMutableArray" key="dict.values">
 															<bool key="EncodedWithXMLCoder">YES</bool>
 															<reference ref="8"/>
-															<reference ref="863968936"/>
+															<reference ref="172630586"/>
 															<reference ref="723159675"/>
 															<reference ref="1361"/>
 															<reference ref="1361"/>
@@ -1524,7 +1524,7 @@
 									<object class="NSMutableArray" key="dict.values">
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
-										<reference ref="863968936"/>
+										<reference ref="172630586"/>
 										<reference ref="723159675"/>
 										<reference ref="8"/>
 										<reference ref="1361"/>
@@ -1610,7 +1610,7 @@
 									<object class="NSMutableArray" key="dict.values">
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
-										<reference ref="863968936"/>
+										<reference ref="172630586"/>
 										<reference ref="723159675"/>
 										<reference ref="8"/>
 										<reference ref="1361"/>
@@ -1744,7 +1744,7 @@
 									<object class="NSMutableArray" key="dict.values">
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
-										<reference ref="863968936"/>
+										<reference ref="172630586"/>
 										<reference ref="723159675"/>
 										<reference ref="8"/>
 										<reference ref="1361"/>
@@ -1808,7 +1808,7 @@
 									<object class="NSMutableArray" key="dict.values">
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
-										<reference ref="863968936"/>
+										<reference ref="172630586"/>
 										<reference ref="723159675"/>
 										<reference ref="8"/>
 										<reference ref="1361"/>
@@ -2216,10 +2216,10 @@ AAABAAAAAQ</bytes>
 									<object class="NSMutableArray" key="dict.values">
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
-										<integer value="1040" id="172630586"/>
+										<reference ref="172630586"/>
 										<real value="3.000000e+03" id="405526216"/>
-										<real value="1.000000e+00" id="202320426"/>
-										<reference ref="202320426"/>
+										<reference ref="1361"/>
+										<reference ref="1361"/>
 										<reference ref="8"/>
 									</object>
 								</object>
@@ -2237,7 +2237,7 @@ AAABAAAAAQ</bytes>
 									<string key="NSString">NaN</string>
 									<reference key="NSAttributes" ref="700878619"/>
 								</object>
-								<reference key="NS.min" ref="202320426"/>
+								<reference key="NS.min" ref="1361"/>
 								<reference key="NS.max" ref="405526216"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
@@ -2316,8 +2316,8 @@ AAABAAAAAQ</bytes>
 										<reference ref="8"/>
 										<reference ref="172630586"/>
 										<reference ref="405526216"/>
-										<reference ref="202320426"/>
-										<reference ref="202320426"/>
+										<reference ref="1361"/>
+										<reference ref="1361"/>
 										<reference ref="8"/>
 									</object>
 								</object>
@@ -2335,7 +2335,7 @@ AAABAAAAAQ</bytes>
 									<string key="NSString">NaN</string>
 									<reference key="NSAttributes" ref="700878619"/>
 								</object>
-								<reference key="NS.min" ref="202320426"/>
+								<reference key="NS.min" ref="1361"/>
 								<reference key="NS.max" ref="405526216"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
@@ -2450,12 +2450,12 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="326257173">
 						<reference key="NSNextResponder" ref="538122014"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{214, 22}, {263, 17}}</string>
+						<string key="NSFrame">{{214, 22}, {308, 17}}</string>
 						<reference key="NSSuperview" ref="538122014"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="234963311">
-							<int key="NSCellFlags">67239424</int>
-							<int key="NSCellFlags2">4194304</int>
+							<int key="NSCellFlags">67239488</int>
+							<int key="NSCellFlags2">4196352</int>
 							<string key="NSContents">blocklist loaded/not loaded</string>
 							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="326257173"/>
@@ -2535,7 +2535,7 @@ AAABAAAAAQ</bytes>
 									<object class="NSMutableArray" key="dict.values">
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
-										<reference ref="863968936"/>
+										<reference ref="172630586"/>
 										<real value="6.553500e+04" id="526469767"/>
 										<reference ref="1361"/>
 										<reference ref="1361"/>
@@ -2755,12 +2755,6 @@ AAABAAAAAQ</bytes>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSUserDefaultsController" id="356871564">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>PEXGlobal</string>
-					<string>EncryptionPrefer</string>
-					<string>EncryptionRequire</string>
-				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 		</object>
@@ -6501,44 +6495,44 @@ AAABAAAAAQ</bytes>
 					<reference ref="1361"/>
 					<string>{{493, 304}, {539, 244}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<real value="1.000000e+00"/>
+					<reference ref="1361"/>
 					<string>{{281, 577}, {539, 315}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="202320426"/>
+					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="1361"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
