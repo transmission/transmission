@@ -167,6 +167,33 @@ compareDouble( double a, double b )
 }
 
 static int
+compareRatio( double a, double b )
+{
+    if( (int)a == TR_RATIO_INF && (int)b == TR_RATIO_INF ) return 0;
+    if( (int)a == TR_RATIO_INF ) return 1;
+    if( (int)b == TR_RATIO_INF ) return -1;
+    return compareDouble( a, b );
+}
+
+static int
+compareByRatio( GtkTreeModel * model,
+                GtkTreeIter  * a,
+                GtkTreeIter  * b,
+                gpointer       user_data UNUSED )
+{
+    tr_torrent *ta, *tb;
+    const tr_stat *sa, *sb;
+
+    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
+    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
+
+    sa = tr_torrentStatCached( ta );
+    sb = tr_torrentStatCached( tb );
+
+    return compareRatio( sa->ratio, sb->ratio );
+}
+
+static int
 compareByActivity( GtkTreeModel * model,
                    GtkTreeIter  * a,
                    GtkTreeIter  * b,
@@ -223,7 +250,7 @@ compareByProgress( GtkTreeModel   * model,
     sb = tr_torrentStatCached( tb );
     ret = compareDouble( sa->percentDone, sb->percentDone );
     if( !ret )
-        ret = compareDouble( sa->ratio, sb->ratio );
+        ret = compareRatio( sa->ratio, sb->ratio );
     return ret;
 }
 
@@ -263,24 +290,27 @@ compareByTracker( GtkTreeModel   * model,
 static void
 setSort( TrCore * core, const char * mode, gboolean isReversed  )
 {
-    int col = MC_TORRENT_RAW;
+    const int col = MC_TORRENT_RAW;
+    GtkTreeIterCompareFunc sort_func;
     GtkSortType type = isReversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
-    GtkTreeModel * model = tr_core_model( core );
-    GtkTreeSortable * sortable = GTK_TREE_SORTABLE( model );
+    GtkTreeSortable * sortable = GTK_TREE_SORTABLE( tr_core_model( core )  );
 
     if( !strcmp( mode, "sort-by-activity" ) )
-        gtk_tree_sortable_set_sort_func( sortable, col, compareByActivity, NULL, NULL );
+        sort_func = compareByActivity;
     else if( !strcmp( mode, "sort-by-progress" ) )
-        gtk_tree_sortable_set_sort_func( sortable, col, compareByProgress, NULL, NULL );
+        sort_func = compareByProgress;
+    else if( !strcmp( mode, "sort-by-ratio" ) )
+        sort_func = compareByRatio;
     else if( !strcmp( mode, "sort-by-state" ) )
-        gtk_tree_sortable_set_sort_func( sortable, col, compareByState, NULL, NULL );
+        sort_func = compareByState;
     else if( !strcmp( mode, "sort-by-tracker" ) )
-        gtk_tree_sortable_set_sort_func( sortable, col, compareByTracker, NULL, NULL );
+        sort_func = compareByTracker;
     else {
+        sort_func = compareByName;
         type = isReversed ? GTK_SORT_DESCENDING : GTK_SORT_ASCENDING;
-        gtk_tree_sortable_set_sort_func( sortable, col, compareByName, NULL, NULL );
     }
-
+ 
+    gtk_tree_sortable_set_sort_func( sortable, col, sort_func, NULL, NULL );
     gtk_tree_sortable_set_sort_column_id( sortable, col, type );
 }
 

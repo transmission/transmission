@@ -461,7 +461,7 @@ peerPage( GObject * core )
         target_cb( w, b );
         hig_workarea_add_wide_control( t, &row, h );
         
-        s = _("Ignore _unencrypted peers");
+        s = _("_Ignore unencrypted peers");
         w = new_check_button( s, PREF_KEY_ENCRYPTED_ONLY, core );
         hig_workarea_add_wide_control( t, &row, w );
 

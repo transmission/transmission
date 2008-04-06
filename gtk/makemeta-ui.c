@@ -114,7 +114,7 @@ refresh_cb ( gpointer user_data )
             }
 
             case TR_MAKEMETA_IO_WRITE: {
-                char * tmp = g_strdup_printf( _( "Couldn't write \"%s\": %s" ), ui->builder->errfile, g_strerror( ui->builder->my_errno ) );
+                char * tmp = g_strdup_printf( _( "Couldn't create \"%1$s\": %2$s" ), ui->builder->errfile, g_strerror( ui->builder->my_errno ) );
                 txt = g_strdup_printf( _( "Torrent creation failed: %s" ), tmp );
                 g_free( tmp  );
                 break;
