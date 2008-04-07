@@ -25,8 +25,6 @@
 #import "NSStringAdditions.h"
 #import <transmission.h>
 
-#warning better rounding
-
 @implementation NSString (NSStringAdditions)
 
 + (NSString *) ellipsis
@@ -68,8 +66,8 @@
     }
     
     //attempt to have minimum of 3 digits with at least 1 decimal
-    return convertedSize < 10.0 ? [NSString localizedStringWithFormat: @"%.2f %@", convertedSize - .005, unit]
-                                : [NSString localizedStringWithFormat: @"%.1f %@", convertedSize - .05, unit];
+    return convertedSize <= 9.995 ? [NSString localizedStringWithFormat: @"%.2f %@", convertedSize, unit]
+                                : [NSString localizedStringWithFormat: @"%.1f %@", convertedSize, unit];
 }
 
 + (NSString *) stringForSpeed: (float) speed
@@ -79,14 +77,17 @@
 
 + (NSString *) stringForSpeedAbbrev: (float) speed
 {
-    if (speed < 1000.0) //0.0 K to 999.9 K
-        return [NSString localizedStringWithFormat: @"%.1f K", MAX(0.0, speed - .05)];
-    else if (speed < 102400.0) //0.98 M to 99.99 M
-        return [NSString localizedStringWithFormat: @"%.2f M", (speed / 1024.0) - .005];
-    else if (speed < 1024000.0) //100.0 M to 999.9 M
-        return [NSString localizedStringWithFormat: @"%.1f M", (speed / 1024.0) - .05];
+    if (speed <= 999.95) //0.0 K to 999.9 K
+        return [NSString localizedStringWithFormat: @"%.1f K", speed];
+    
+    speed /= 1024.0;
+    
+    if (speed <= 99.995) //0.98 M to 99.99 M
+        return [NSString localizedStringWithFormat: @"%.2f M", speed];
+    else if (speed <= 999.95) //100.0 M to 999.9 M
+        return [NSString localizedStringWithFormat: @"%.1f M", speed];
     else //insane speeds
-        return [NSString localizedStringWithFormat: @"%.2f G", (speed / 1048576.0) - .005];
+        return [NSString localizedStringWithFormat: @"%.2f G", (speed / 1024.0)];
 }
 
 + (NSString *) stringForRatio: (float) ratio
@@ -97,12 +98,12 @@
         return [NSString stringWithUTF8String: "\xE2\x88\x9E"];
     else;
     
-    if (ratio < 10.0)
-        return [NSString localizedStringWithFormat: @"%.2f", MAX(0.0, ratio - .005)];
-    else if (ratio < 100.0)
-        return [NSString localizedStringWithFormat: @"%.1f", ratio - .05];
-    else
-        return [NSString localizedStringWithFormat: @"%.0f", ratio];
+    if (ratio <= 9.995) //0.00 to 9.99
+        return [NSString localizedStringWithFormat: @"%.2f", ratio];
+    else if (ratio <= 99.95) //10.0 to 99.9
+        return [NSString localizedStringWithFormat: @"%.1f", ratio];
+    else //rest are single digit
+        return [NSString stringWithFormat: @"%d", ratio];
 }
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds
