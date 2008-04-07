@@ -467,6 +467,7 @@ file_list_new( TrTorrent * gtor )
 
     /* create the view */
     view = gtk_tree_view_new( );
+    gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( view ), TRUE );
     gtk_container_set_border_width( GTK_CONTAINER( view ), GUI_PAD_BIG );
 
     /* add file column */
