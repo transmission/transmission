@@ -212,9 +212,9 @@
         NSString * fileString;
         int count = [fTorrent fileCount];
         if (count != 1)
-            fileString = [NSString stringWithFormat: NSLocalizedString(@"%d Files", "Add torrent -> info"), count];
+            fileString = [NSString stringWithFormat: NSLocalizedString(@"%d files", "Add torrent -> info"), count];
         else
-            fileString = NSLocalizedString(@"1 File", "Add torrent -> info");
+            fileString = NSLocalizedString(@"1 file", "Add torrent -> info");
         
         NSString * selectedString = [NSString stringWithFormat: NSLocalizedString(@"%@ selected", "Add torrent -> info"),
                                         [NSString stringForFileSize: [fTorrent totalSizeSelected]]];
