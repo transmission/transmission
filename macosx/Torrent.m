@@ -1512,14 +1512,14 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fID;
 }
 
+- (tr_torrent *) torrentStruct
+{
+    return fHandle;
+}
+
 - (const tr_info *) torrentInfo
 {
     return fInfo;
-}
-
-- (const tr_stat *) torrentStat
-{
-    return fStat;
 }
 
 @end

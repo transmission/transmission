@@ -487,7 +487,7 @@ PrefsController         * fPrefsController;
         if( IPC_MSG_INFO == respid )
             res = ipc_addinfo( pkinf, [tor torrentID], [tor torrentInfo], types );
         else
-            res = ipc_addstat( pkinf, [tor torrentID], [tor torrentStat], types );
+            res = ipc_addstat( pkinf, [tor torrentID], [tor torrentStruct], types );
         if( 0 > res )
         {
             tr_bencFree( &packet );
