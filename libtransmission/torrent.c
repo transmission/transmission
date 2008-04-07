@@ -659,7 +659,7 @@ tr_torrentStat( tr_torrent * tor )
         tr_bitfieldFree( availablePieces );
     }
 
-    if( s->desiredAvailable != s->leftUntilDone )
+    if( s->desiredSize > s->desiredAvailable )
         s->eta = TR_ETA_NOT_AVAIL;
     else if( s->rateDownload < 0.1 )
         s->eta = TR_ETA_UNKNOWN;

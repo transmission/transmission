@@ -1841,7 +1841,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             return NSLocalizedString(@"full download not available", "Torrent -> eta string");
         default:
             return [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> eta string"),
-                            [NSString timeString: eta showSeconds: YES maxDigits: 2]];
+                        [NSString timeString: eta showSeconds: YES maxDigits: 2]];
     }
 }
 
