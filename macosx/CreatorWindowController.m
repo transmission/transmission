@@ -370,7 +370,7 @@
             [window setFrame: windowRect display: YES animate: YES];
             [fProgressView setHidden: NO];
             
-            [[window standardWindowButton:NSWindowCloseButton] setEnabled: NO];
+            [[window standardWindowButton: NSWindowCloseButton] setEnabled: NO];
         }
     }
 }

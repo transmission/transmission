@@ -1017,7 +1017,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 etaString = NSLocalizedString(@"remaining time unknown", "Torrent -> progress string");
                 break;
             case TR_ETA_NOT_AVAIL:
-                etaString = NSLocalizedString(@"not all available", "Torrent -> progress string");
+                etaString = NSLocalizedString(@"full download not available", "Torrent -> progress string");
                 break;
             default:
                 etaString = [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> progress string"),
