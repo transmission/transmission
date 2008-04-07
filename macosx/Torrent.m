@@ -974,15 +974,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (![self allDownloaded])
     {
         if ([self folder] && [fDefaults boolForKey: @"DisplayStatusProgressSelected"])
-        {
-            string = [NSString localizedStringWithFormat: NSLocalizedString(@"%@ of %@ selected (%.2f%%)",
-                            "Torrent -> progress string"), [NSString stringForFileSize: [self haveTotal]],
-                            [NSString stringForFileSize: [self totalSizeSelected]], 100.0 * [self progressDone]];
-        }
+            string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@ selected", "Torrent -> progress string"),
+                        [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self totalSizeSelected]]];
         else
-            string = [NSString localizedStringWithFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
-                            [NSString stringForFileSize: [self haveTotal]],
-                            [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
+            string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Torrent -> progress string"),
+                        [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self size]]];
+        
+        string = [NSString localizedStringWithFormat: @"%@ (%.2f%%)", string, 100.0 * [self progress]];
     }
     else
     {
@@ -991,11 +989,14 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         {
             if ([fDefaults boolForKey: @"DisplayStatusProgressSelected"])
                 downloadString = [NSString stringWithFormat: NSLocalizedString(@"%@ selected", "Torrent -> progress string"),
-                                [NSString stringForFileSize: [self haveTotal]]];
+                                    [NSString stringForFileSize: [self haveTotal]]];
             else
-                downloadString = [NSString localizedStringWithFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)",
-                                    "Torrent -> progress string"), [NSString stringForFileSize: [self haveTotal]],
-                                    [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
+            {
+                downloadString = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Torrent -> progress string"),
+                                    [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self size]]];
+                
+                downloadString = [NSString localizedStringWithFormat: @"%@ (%.2f%%)", downloadString, 100.0 * [self progress]];
+            }
         }
         else
             downloadString = [NSString stringForFileSize: [self size]];
