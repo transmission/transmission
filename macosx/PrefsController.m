@@ -167,8 +167,7 @@
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) toolbar itemForItemIdentifier: (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
 {
-    NSToolbarItem * item;
-    item = [[NSToolbarItem alloc] initWithItemIdentifier: ident];
+    NSToolbarItem * item = [[NSToolbarItem alloc] initWithItemIdentifier: ident];
 
     if ([ident isEqualToString: TOOLBAR_GENERAL])
     {

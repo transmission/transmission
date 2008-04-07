@@ -29,7 +29,7 @@
 
 @interface BadgeView (Private)
 
-- (void) badge: (NSImage *) badge string: (NSString *) string atHeight: (float) height;
+- (void) badge: (NSImage *) badge string: (NSString *) string atHeight: (float) height adjustForQuit: (BOOL) quit;
 
 @end
 
@@ -64,7 +64,7 @@
     {
         NSImage * quitBadge = [NSImage imageNamed: @"QuitBadge.png"];
         [self badge: quitBadge string: NSLocalizedString(@"Quitting", "Dock Badger -> quit")
-                atHeight: (rect.size.height - [quitBadge size].height) * 0.5];
+                atHeight: (rect.size.height - [quitBadge size].height) * 0.5 adjustForQuit: YES];
         return;
     }
     
@@ -81,13 +81,13 @@
         if (upload)
         {
             NSImage * uploadBadge = [NSImage imageNamed: @"UploadBadge.png"];
-            [self badge: uploadBadge string: [NSString stringForSpeedAbbrev: uploadRate] atHeight: bottom];
+            [self badge: uploadBadge string: [NSString stringForSpeedAbbrev: uploadRate] atHeight: bottom adjustForQuit: NO];
             if (download)
                 bottom += [uploadBadge size].height + BETWEEN_PADDING; //download rate above upload rate
         }
         if (download)
             [self badge: [NSImage imageNamed: @"DownloadBadge.png"] string: [NSString stringForSpeedAbbrev: downloadRate]
-                    atHeight: bottom];
+                    atHeight: bottom adjustForQuit: NO];
     }
 }
 
@@ -96,7 +96,7 @@
 @implementation BadgeView (Private)
 
 //dock icon must have locked focus
-- (void) badge: (NSImage *) badge string: (NSString *) string atHeight: (float) height
+- (void) badge: (NSImage *) badge string: (NSString *) string atHeight: (float) height adjustForQuit: (BOOL) quit
 {
     if (!fAttributes)
     {
@@ -122,7 +122,7 @@
     
     NSRect stringRect = badgeRect;
     stringRect.origin.x += (badgeRect.size.width - stringSize.width) * 0.5;
-    stringRect.origin.y += (badgeRect.size.height - stringSize.height) * 0.5 + 1.0; //adjust for shadow
+    stringRect.origin.y += (badgeRect.size.height - stringSize.height) * 0.5 + (quit ? 2.0 : 1.0); //adjust for shadow, extra for quit
     stringRect.size = stringSize;
     
     [string drawInRect: stringRect withAttributes: fAttributes];
