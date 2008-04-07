@@ -1005,7 +1005,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                                     "Torrent -> progress string"), [NSString stringForFileSize: [self uploadedTotal]],
                                     [NSString stringForRatio: [self ratio]]];
         
-        string = [NSString stringWithFormat: @"%@, %@", downloadString, uploadString];
+        string = [downloadString stringByAppendingFormat: @", %@", uploadString];
     }
     
     //add time when downloading
@@ -1072,10 +1072,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 else
                     string = [NSString stringWithFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
                                                     [self peersGettingFromUs]];
-                break;
-            
-            default:
-                string = @"";
         }
         
         if (fStalled)
@@ -1135,10 +1131,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             string = [NSString stringWithFormat: @"%@: %@, %@: %@",
                             NSLocalizedString(@"Ratio", "Torrent -> status string"), [NSString stringForRatio: [self ratio]],
                             NSLocalizedString(@"UL", "Torrent -> status string"), [NSString stringForSpeed: [self uploadRate]]];
-            break;
-        
-        default:
-            string = @"";
     }
     
     return string;
@@ -1172,9 +1164,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
         case TR_STATUS_SEED:
             return NSLocalizedString(@"Seeding", "Torrent -> status string");
-        
-        default:
-            return NSLocalizedString(@"N/A", "Torrent -> status string");
     }
 }
 
