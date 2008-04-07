@@ -103,7 +103,7 @@
     else if (ratio <= 99.95) //10.0 to 99.9
         return [NSString localizedStringWithFormat: @"%.1f", ratio];
     else //rest are single digit
-        return [NSString stringWithFormat: @"%d", ratio];
+        return [NSString stringWithFormat: @"%.0f", ratio];
 }
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds
