@@ -194,11 +194,10 @@
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
     }
-    #warning update tiger image
     else if ([ident isEqualToString: TOOLBAR_PEERS])
     {
         [item setLabel: NSLocalizedString(@"Peers", "Preferences -> toolbar item title")];
-        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNameUserGroup : @"Advanced.png"]];
+        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNameUserGroup : @"Peers.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
