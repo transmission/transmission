@@ -1849,9 +1849,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 {
     //attempt to move to trash
     if (![[NSWorkspace sharedWorkspace] performFileOperation: NSWorkspaceRecycleOperation
-            source: [path stringByDeletingLastPathComponent] destination: @""
-            files: [NSArray arrayWithObject: [path lastPathComponent]] tag: nil])
+        source: [path stringByDeletingLastPathComponent] destination: @""
+        files: [NSArray arrayWithObject: [path lastPathComponent]] tag: nil])
     {
+        //if cannot trash, just delete it (will work if it's on a remote volume)
         if ([NSApp isOnLeopardOrBetter])
         {
             NSError * error;
@@ -1860,7 +1861,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         }
         else
         {
-            //if cannot trash, just delete it (will work if it is on a remote volume)
             if (![[NSFileManager defaultManager] removeFileAtPath: path handler: nil])
                 NSLog(@"Could not trash %@", path);
         }

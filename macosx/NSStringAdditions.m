@@ -54,7 +54,7 @@
         convertedSize = size / 1048576.0;
         unit = NSLocalizedString(@"MB", "File size - megabytes");
     }
-    else if (size < 1099511627776.0)
+    else if (size < 1099511627776)
     {
         convertedSize = size / 1073741824.0;
         unit = NSLocalizedString(@"GB", "File size - gigabytes");
@@ -103,7 +103,7 @@
     else if (ratio <= 99.95) //10.0 to 99.9
         return [NSString localizedStringWithFormat: @"%.1f", ratio];
     else //rest are single digit
-        return [NSString stringWithFormat: @"%.0f", ratio];
+        return [NSString localizedStringWithFormat: @"%.0f", ratio];
 }
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds
