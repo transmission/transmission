@@ -54,7 +54,7 @@
         convertedSize = size / 1048576.0;
         unit = NSLocalizedString(@"MB", "File size - megabytes");
     }
-    else if (size < 1099511627776)
+    else if (size < 1099511627776.0)
     {
         convertedSize = size / 1073741824.0;
         unit = NSLocalizedString(@"GB", "File size - gigabytes");

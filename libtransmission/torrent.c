@@ -664,7 +664,7 @@ tr_torrentStat( tr_torrent * tor )
     else if( s->rateDownload < 0.1 )
         s->eta = TR_ETA_UNKNOWN;
     else
-        s->eta = s->leftUntilDone / (s->rateDownload / 1024.0);
+        s->eta = s->leftUntilDone / s->rateDownload / 1024.0;
 
     s->ratio = tr_getRatio( s->uploadedEver,
                             s->downloadedEver ? s->downloadedEver : s->haveValid );
