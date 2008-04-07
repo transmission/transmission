@@ -53,6 +53,8 @@ static int static_lastid = 0;
 - (void) quickPause;
 - (void) endQuickPause;
 
+- (NSString *) etaString: (int) eta;
+
 - (void) trashFile: (NSString *) path;
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path;
@@ -1010,21 +1012,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         && (fRatioSetting == NSOnState || (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]))))
     {
         int eta = fStat->status == TR_STATUS_DOWNLOAD ? [self eta] : [self etaRatio];
-        NSString * etaString;
-        switch (eta)
-        {
-            case TR_ETA_UNKNOWN:
-                etaString = NSLocalizedString(@"remaining time unknown", "Torrent -> progress string");
-                break;
-            case TR_ETA_NOT_AVAIL:
-                etaString = NSLocalizedString(@"full download not available", "Torrent -> progress string");
-                break;
-            default:
-                etaString = [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> progress string"),
-                                [NSString timeString: eta showSeconds: YES maxDigits: 2]];
-        }
-        
-        string = [string stringByAppendingFormat: @" - %@", etaString];
+        string = [string stringByAppendingFormat: @" - %@", [self etaString: eta]];
     }
     
     return string;
@@ -1161,18 +1149,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         && !(fRatioSetting == NSOnState || (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]))))
         return [self shortStatusString];
     
-    int eta = [self isSeeding] ? [self etaRatio] : [self eta];
-    switch (eta)
-    {
-        case TR_ETA_UNKNOWN:
-            return NSLocalizedString(@"Unknown", "Torrent -> remaining time string");
-            break;
-        case TR_ETA_NOT_AVAIL:
-            return NSLocalizedString(@"Not all available", "Torrent -> remaining time string");
-        default:
-            return [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> remaining time string"),
-                            [NSString timeString: eta showSeconds: YES maxDigits: 2]];
-    }
+    return [self etaString: [self isSeeding] ? [self etaRatio] : [self eta]];
 }
 
 - (NSString *) stateString
@@ -1852,6 +1829,20 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     [fQuickPauseDict release];
     fQuickPauseDict = nil;
+}
+
+- (NSString *) etaString: (int) eta
+{
+    switch (eta)
+    {
+        case TR_ETA_UNKNOWN:
+            return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
+        case TR_ETA_NOT_AVAIL:
+            return NSLocalizedString(@"full download not available", "Torrent -> eta string");
+        default:
+            return [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> eta string"),
+                            [NSString timeString: eta showSeconds: YES maxDigits: 2]];
+    }
 }
 
 - (void) trashFile: (NSString *) path
