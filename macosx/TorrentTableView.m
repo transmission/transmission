@@ -411,9 +411,10 @@
     }
     else if (!pushed && [event clickCount] == 2) //double click
     {
-        id item = [self itemAtRow: [self rowAtPoint: point]];
+        int row = [self rowAtPoint: point];
+        id item = [self itemAtRow: row];
         
-        if ([item isKindOfClass: [Torrent class]])
+        if (row == -1 || [item isKindOfClass: [Torrent class]])
             [fController showInfo: nil];
         else
         {
