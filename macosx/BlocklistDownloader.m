@@ -53,6 +53,7 @@
     [fTextField setStringValue: [NSLocalizedString(@"Connecting to site", "Blocklist -> message") stringByAppendingEllipsis]];
     
     [fProgressBar setUsesThreadedAnimation: YES];
+    [fProgressBar startAnimation: self];
 }
 
 - (void) dealloc

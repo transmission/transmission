@@ -1833,7 +1833,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     switch (eta)
     {
         case TR_ETA_NOT_AVAIL:
-            //return NSLocalizedString(@"full download not available", "Torrent -> eta string");
         case TR_ETA_UNKNOWN:
             return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
         default:
