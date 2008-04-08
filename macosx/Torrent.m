@@ -973,14 +973,21 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     if (![self allDownloaded])
     {
+        float progress;
         if ([self folder] && [fDefaults boolForKey: @"DisplayStatusProgressSelected"])
+        {
             string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@ selected", "Torrent -> progress string"),
                         [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self totalSizeSelected]]];
+            progress = 100.0 * [self progressDone];
+        }
         else
+        {
             string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Torrent -> progress string"),
                         [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self size]]];
+            progress = 100.0 * [self progress];
+        }
         
-        string = [NSString localizedStringWithFormat: @"%@ (%.2f%%)", string, 100.0 * [self progress]];
+        string = [NSString localizedStringWithFormat: @"%@ (%.2f%%)", string, progress];
     }
     else
     {
