@@ -568,7 +568,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                     NSDictionary * fileAttributes = onLeopard ? [fileManager attributesOfItemAtPath: path error: NULL]
                                                         : [fileManager fileAttributesAtPath: path traverseLink: NO];
                     if (fileAttributes)
-                        neededSpace -= [[fileAttributes objectForKey: NSFileSize] unsignedLongLongValue];
+                    {
+                        unsigned long long fileSize = [[fileAttributes objectForKey: NSFileSize] unsignedLongLongValue];
+                        if (fileSize < neededSpace)
+                            neededSpace -= fileSize;
+                        else
+                            neededSpace = 0;
+                    }
                 }
             }
             

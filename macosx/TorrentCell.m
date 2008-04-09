@@ -497,6 +497,7 @@
         [fErrorImage drawInRect: errorRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     }
     
+    #warning alter
     //text color
     NSColor * titleColor, * statusColor;
     if ([NSApp isOnLeopardOrBetter] ? [self backgroundStyle] == NSBackgroundStyleDark : [self isHighlighted]
