@@ -182,7 +182,7 @@ tr_initFull( const char * configDir,
 
     /* first %s is the application name
        second %s is the version number */
-    tr_inf( "%s %s started", TR_NAME, LONG_VERSION_STRING );
+    tr_inf( _( "%s %s started" ), TR_NAME, LONG_VERSION_STRING );
 
     /* initialize the blocklist */
     tr_buildPath( filename, sizeof( filename ), h->configDir, "blocklists", NULL );
