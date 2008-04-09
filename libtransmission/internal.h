@@ -55,7 +55,6 @@ const uint8_t* tr_getPeerId( void );
 
 struct tr_handle
 {
-    unsigned int               isScrapeEnabled  : 1;
     unsigned int               isPortSet        : 1;
     unsigned int               isPexEnabled     : 1;
     unsigned int               isClosed         : 1;

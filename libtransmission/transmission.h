@@ -607,10 +607,6 @@ void tr_manualUpdate( tr_torrent * );
 
 int tr_torrentCanManualUpdate( const tr_torrent * );
 
-void tr_setScrapeEnabled( tr_handle * , int isEnabled );
-
-int tr_isScrapeEnabled( const tr_handle * );
-
 /***********************************************************************
  * tr_torrentStat
  ***********************************************************************
@@ -857,8 +853,8 @@ struct tr_stat
 
  #define TR_ETA_NOT_AVAIL -1
  #define TR_ETA_UNKNOWN -2
-     /* seconds */
-     int eta;
+    /* seconds */
+    int eta;
 
     int peersKnown;
     int peersConnected;

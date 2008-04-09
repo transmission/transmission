@@ -130,7 +130,6 @@ tr_initFull( const char * configDir,
              int          isBlocklistEnabled )
 {
     tr_handle * h;
-    char buf[128];
     char filename[MAX_PATH_LENGTH];
 
 #ifndef WIN32
@@ -183,9 +182,7 @@ tr_initFull( const char * configDir,
 
     /* first %s is the application name
        second %s is the version number */
-    snprintf( buf, sizeof( buf ), _( "%s %s started" ),
-              TR_NAME, LONG_VERSION_STRING );
-    tr_inf( "%s", buf );
+    tr_inf( "%s %s started", TR_NAME, LONG_VERSION_STRING );
 
     /* initialize the blocklist */
     tr_buildPath( filename, sizeof( filename ), h->configDir, "blocklists", NULL );
@@ -540,20 +537,4 @@ int
 tr_blocklistHasAddress( tr_handle * handle, const struct in_addr * addr )
 {
     return _tr_blocklistHasAddress( handle->blocklist, addr );
-}
-
-/***
-****
-***/
-
-void
-tr_setScrapeEnabled( tr_handle * handle, int isEnabled )
-{
-    handle->isScrapeEnabled = isEnabled ? 1 : 0;
-}
-
-int
-tr_isScrapeEnabled( const tr_handle * handle )
-{
-    return handle->isScrapeEnabled;
 }
