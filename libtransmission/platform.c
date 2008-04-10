@@ -412,8 +412,10 @@ moveFiles( const char * oldDir, const char * newDir )
                     ++count;
                 }
             }
-            tr_inf( _( "Migrated %1$d files from \"%2$s\" to \"%3$s\"" ),
-                    count, oldDir, newDir );
+
+            if( count )
+                tr_inf( _( "Migrated %1$d files from \"%2$s\" to \"%3$s\"" ),
+                        count, oldDir, newDir );
             closedir( dirh );
         }
     }
