@@ -310,25 +310,24 @@
 {
     NSMutableArray * sounds = [NSMutableArray array];
     
-    //until Apple can fix soundNamed to not crash on invalid sound files, don't use custom sounds
-    NSArray * directories = [NSArray arrayWithObjects: @"/System/Library/Sounds", @"/Library/Sounds",
-                                /*[NSHomeDirectory() stringByAppendingPathComponent: @"Library/Sounds"],*/ nil];
-    BOOL isDirectory;
-    NSEnumerator * soundEnumerator;
-    NSString * sound;
+    NSMutableArray * directories = [NSMutableArray arrayWithObjects: @"/System/Library/Sounds", @"/Library/Sounds", nil];
+    if ([NSApp isOnLeopardOrBetter])
+        [directories addObject: [NSHomeDirectory() stringByAppendingPathComponent: @"Library/Sounds"]];
     
+    BOOL isDirectory;
     NSString * directory;
     NSEnumerator * enumerator = [directories objectEnumerator];
     while ((directory = [enumerator nextObject]))
         if ([[NSFileManager defaultManager] fileExistsAtPath: directory isDirectory: &isDirectory] && isDirectory)
         {
-                soundEnumerator = [[[NSFileManager defaultManager] directoryContentsAtPath: directory] objectEnumerator];
-                while ((sound = [soundEnumerator nextObject]))
-                {
-                    sound = [sound stringByDeletingPathExtension];
-                    if ([NSSound soundNamed: sound])
-                        [sounds addObject: sound];
-                }
+            NSString * sound;
+            NSEnumerator * soundEnumerator = [[[NSFileManager defaultManager] directoryContentsAtPath: directory] objectEnumerator];
+            while ((sound = [soundEnumerator nextObject]))
+            {
+                sound = [sound stringByDeletingPathExtension];
+                if ([NSSound soundNamed: sound])
+                    [sounds addObject: sound];
+            }
         }
     
     return sounds;
