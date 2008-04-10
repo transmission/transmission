@@ -114,7 +114,9 @@ typedef enum
     
     NSMutableDictionary             * fPendingTorrentDownloads;
     NSMutableArray                  * fTempTorrentFiles;
-
+    
+    BOOL                            fSoundPlaying;
+    
     BOOL                            fRemoteQuit;
 }
 
