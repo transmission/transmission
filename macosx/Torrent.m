@@ -1520,11 +1520,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fHandle;
 }
 
-- (const tr_info *) torrentInfo
-{
-    return fInfo;
-}
-
 @end
 
 @implementation Torrent (Private)

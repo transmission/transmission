@@ -254,6 +254,5 @@ typedef enum
 
 - (int) torrentID;
 - (tr_torrent *) torrentStruct;
-- (const tr_info *) torrentInfo;
 
 @end

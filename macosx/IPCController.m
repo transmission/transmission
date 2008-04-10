@@ -485,7 +485,7 @@ PrefsController         * fPrefsController;
     while( nil != ( tor = [enumerator nextObject] ) )
     {
         if( IPC_MSG_INFO == respid )
-            res = ipc_addinfo( pkinf, [tor torrentID], [tor torrentInfo], types );
+            res = ipc_addinfo( pkinf, [tor torrentID], [tor torrentStruct], types );
         else
             res = ipc_addstat( pkinf, [tor torrentID], [tor torrentStruct], types );
         if( 0 > res )
