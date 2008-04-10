@@ -548,7 +548,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         NSDictionary * systemAttributes = onLeopard ? [fileManager attributesOfFileSystemForPath: downloadFolder error: NULL]
                                             : [fileManager fileSystemAttributesAtPath: downloadFolder];
         uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue], neededSpace = 0;
-        remainingSpace=0;
         
         //if the size left is less then remaining space, then there is enough space regardless of preallocation
         if (remainingSpace < [self sizeLeft])
@@ -579,7 +578,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 }
             }
             
-            if (/*remainingSpace < neededSpace*/YES)
+            if (remainingSpace < neededSpace)
             {
                 NSAlert * alert = [[NSAlert alloc] init];
                 [alert setMessageText: [NSString stringWithFormat:
