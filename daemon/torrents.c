@@ -230,18 +230,23 @@ torrent_remove( int id )
     }
 }
 
+tr_torrent *
+torrent_handle( int id )
+{
+    const struct tor * tor = idlookup( id );
+    return tor ? tor->tor : NULL;
+}
+   
 const tr_info *
 torrent_info( int id )
 {
-    const struct tor * tor = idlookup( id );
-    return tor ? tr_torrentInfo( tor->tor ) : NULL;
+    return tr_torrentInfo( torrent_handle( id ) );
 }
 
 const tr_stat *
 torrent_stat( int id )
 {
-    struct tor * tor = idlookup( id );
-    return tor ? tr_torrentStat( tor->tor ) : NULL;
+    return tr_torrentStat( torrent_handle( id ) );
 }
 
 static struct tor *

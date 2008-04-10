@@ -486,8 +486,7 @@ addmsg1( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
         tor = torrent_add_file( file->val.s.s, NULL, -1 );
         if( TORRENT_ID_VALID( tor ) )
         {
-            const tr_info * inf = torrent_info( tor );
-            if( 0 > ipc_addinfo( added, tor, inf, 0 ) )
+            if( 0 > ipc_addinfo( added, tor, torrent_handle( tor ), 0 ) )
             {
                 errnomsg( "failed to build message" );
                 tr_bencFree( &pk );
@@ -544,7 +543,6 @@ addmsg2( enum ipc_msg id UNUSED, benc_val_t * dict, int64_t tag, void * arg )
 
     if( TORRENT_ID_VALID( tor ) )
     {
-        const tr_info * inf;
         val = ipc_initval( client->ipc, IPC_MSG_INFO, tag, &pk, TYPE_LIST );
         if( NULL == val )
         {
@@ -552,8 +550,7 @@ addmsg2( enum ipc_msg id UNUSED, benc_val_t * dict, int64_t tag, void * arg )
             byebye( client->ev, EVBUFFER_EOF, NULL );
             return;
         }
-        inf = torrent_info( tor );
-        if( 0 > ipc_addinfo( val, tor, inf, 0 ) )
+        if( 0 > ipc_addinfo( val, tor, torrent_handle( tor ), 0 ) )
         {
             errnomsg( "failed to build message" );
             tr_bencFree( &pk );
@@ -767,15 +764,15 @@ infomsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 int
 addinfo( benc_val_t * list, int id, int types )
 {
-    const tr_info * inf = torrent_info( id );
-    return inf ? ipc_addinfo( list, id, inf, types ) : 0;
+    tr_torrent * tor = torrent_handle( id );
+    return tor ? ipc_addinfo( list, id, tor, types ) : 0;
 }
 
 int
 addstat( benc_val_t * list, int id, int types )
 {
-    const tr_stat * st = torrent_stat( id );
-    return st ? ipc_addstat( list, id, st, types ) : 0;
+    tr_torrent * tor = torrent_handle( id );
+    return tor ? ipc_addstat( list, id, tor, types ) : 0;
 }
 
 void
@@ -878,7 +875,6 @@ lookmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 
     for( ii = 0; val->val.l.count > ii; ii++ )
     {
-        const tr_info * inf;
         hash = &val->val.l.vals[ii];
         if( !tr_bencIsString(hash) || SHA_DIGEST_LENGTH * 2 != hash->val.s.i )
         {
@@ -891,9 +887,7 @@ lookmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
         {
             continue;
         }
-        inf = torrent_info( found );
-        assert( NULL != inf );
-        if( 0 > ipc_addinfo( pkinf, found, inf, IPC_INF_HASH ) )
+        if( 0 > ipc_addinfo( pkinf, found, torrent_handle( found ), IPC_INF_HASH ) )
         {
             errnomsg( "failed to build message" );
             tr_bencFree( &pk );

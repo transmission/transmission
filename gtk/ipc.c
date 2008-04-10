@@ -618,19 +618,15 @@ findtorid( TrCore * core, int id, GtkTreeIter * iter )
 }
 
 static int
-addinfo( TrTorrent * tor, enum ipc_msg msgid, int torid, int types,
+addinfo( TrTorrent * gtor, enum ipc_msg msgid, int torid, int types,
          tr_benc * val )
 {
+    tr_torrent * tor = tr_torrent_handle( gtor );
+
     if( IPC_MSG_INFO == msgid )
-    {
-        const tr_info * inf = tr_torrent_info( tor );
-        return ipc_addinfo( val, torid, inf, types );
-    }
+        return ipc_addinfo( val, torid, tor, types );
     else
-    {
-        const tr_stat * st = tr_torrent_stat( tor );
-        return ipc_addstat( val, torid, st, types );
-    }
+        return ipc_addstat( val, torid, tor, types );
 }
 
 static void
@@ -793,7 +789,6 @@ smsg_look( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag,
     tr_benc             packet, * pkval, * hash;
     int                    ii, torid;
     TrTorrent            * tor;
-    const tr_info        * inf;
     uint8_t              * buf;
     size_t                 size;
 
@@ -819,8 +814,7 @@ smsg_look( enum ipc_msg id UNUSED, tr_benc * val, int64_t tag,
         {
             continue;
         }
-        inf = tr_torrent_info( tor );
-        if( 0 > ipc_addinfo( pkval, torid, inf, IPC_INF_HASH ) )
+        if( 0 > ipc_addinfo( pkval, torid, tr_torrent_handle( tor ), IPC_INF_HASH ) )
         {
             tr_bencFree( &packet );
             simpleresp( con, tag, IPC_MSG_FAIL );

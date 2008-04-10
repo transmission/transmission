@@ -552,12 +552,13 @@ filltracker( tr_benc * val, const tr_tracker_info * tk )
 int
 ipc_addinfo( tr_benc         * list,
              int               torrent_id,
-             const tr_info   * inf,
+             tr_torrent      * tor,
              int               types )
 {
     tr_benc * dict;
     int          ii, jj, kk;
     tr_file_index_t ff;
+    const tr_info * inf = tr_torrentInfo( tor );
 
     /* always send torrent id */
     types |= IPC_INF_ID;

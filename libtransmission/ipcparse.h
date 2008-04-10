@@ -170,10 +170,12 @@ uint8_t *    ipc_createInfoRequest( const struct ipc_info * session,
                                     int                     types,
                                     const int             * ids );
 
-int          ipc_addinfo   ( struct tr_benc *, int,
-                             const struct tr_info *, int );
-
 struct tr_torrent;
+
+int          ipc_addinfo   ( struct tr_benc     * appendme_list,
+                             int                  torrent_id,
+                             struct tr_torrent  * tor,
+                             int                  info_types );
 
 int          ipc_addstat   ( struct tr_benc     * appendme_list,
                              int                  torrent_id,
