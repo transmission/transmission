@@ -678,10 +678,10 @@
                 && [fDefaults boolForKey: @"DisplayProgressBarAvailable"])
             {
                 int notAvailableWidth = MIN(ceil(barRect.size.width * [torrent notAvailableDesired]), rightWidth);
-                rightWidth -= notAvailableWidth;
-                
                 if (notAvailableWidth > 0)
                 {
+                    rightWidth -= notAvailableWidth;
+                    
                     NSRect notAvailableRect = barRect;
                     notAvailableRect.origin.x += leftWidth + rightWidth;
                     notAvailableRect.size.width = notAvailableWidth;

@@ -3977,17 +3977,16 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (!idlist)
         return fTorrents;
     
-    NSMutableArray * torrents = [NSMutableArray array];
+    NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [idlist count]];
     
-    NSEnumerator * torrentEnum = [fTorrents objectEnumerator], * idEnum;
-    int torId;
+    NSEnumerator * torrentEnum = [fTorrents objectEnumerator];
     Torrent * torrent;
-    NSNumber * tempId;
     while ((torrent = [torrentEnum nextObject]))
     {
-        torId = [torrent torrentID];
+        int torId = [torrent torrentID];
         
-        idEnum = [idlist objectEnumerator];
+        NSEnumerator * idEnum = [idlist objectEnumerator];
+        NSNumber * tempId;
         while ((tempId = [idEnum nextObject]))
         {
             if ([tempId intValue] == torId)
@@ -4006,16 +4005,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (!hashlist)
         return fTorrents;
     
-    NSMutableArray * torrents = [NSMutableArray array];
+    NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [hashlist count]];
     
-    NSEnumerator * torrentEnum = [fTorrents objectEnumerator], * hashEnum;
-    NSString * torHash, * tempHash;
+    NSEnumerator * torrentEnum = [fTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [torrentEnum nextObject]))
     {
-        torHash = [torrent hashString];
+        NSString * torHash = [torrent hashString], * tempHash;
         
-        hashEnum = [hashlist objectEnumerator];
+        NSEnumerator * hashEnum = [hashlist objectEnumerator];
         while ((tempHash = [hashEnum nextObject]))
         {
             if ([torHash caseInsensitiveCompare: tempHash] == NSOrderedSame)
