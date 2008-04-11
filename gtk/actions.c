@@ -101,7 +101,7 @@ static GtkActionEntry entries[] =
   { "edit-menu", NULL, N_("_Edit"), NULL, NULL, NULL },
   { "help-menu", NULL, N_("_Help"), NULL, NULL, NULL },
   { "add-torrent-toolbar", GTK_STOCK_ADD, NULL, NULL, N_("Add a torrent"), G_CALLBACK(action_cb) },
-  { "add-torrent-menu", GTK_STOCK_ADD, N_("_Add..."), NULL, N_("Add a torrent"), G_CALLBACK(action_cb) },
+  { "add-torrent-menu", GTK_STOCK_ADD, N_("_Add..."), "<control>D", N_("Add a torrent"), G_CALLBACK(action_cb) },
   { "start-torrent", GTK_STOCK_MEDIA_PLAY,
     N_("_Start"), "<control>S", N_("Start torrent"), G_CALLBACK(action_cb) },
   { "show-stats", NULL, N_("_Statistics"), NULL, NULL, G_CALLBACK(action_cb) },
@@ -125,6 +125,8 @@ static GtkActionEntry entries[] =
   { "edit-preferences", GTK_STOCK_PREFERENCES, NULL, NULL, NULL, G_CALLBACK(action_cb) },
   { "show-torrent-details", GTK_STOCK_INFO,
     N_("_Details"), "<alt>Return", N_("Torrent details"), G_CALLBACK(action_cb) },
+  { "open-torrent-folder", GTK_STOCK_OPEN,
+    N_("_Open Folder"), NULL, NULL, G_CALLBACK(action_cb) },
   { "show-about-dialog", GTK_STOCK_ABOUT, NULL, NULL, NULL, G_CALLBACK(action_cb) },
   { "update-tracker", GTK_STOCK_NETWORK,
     N_("Ask Tracker for _More Peers"), NULL, NULL, G_CALLBACK(action_cb) }

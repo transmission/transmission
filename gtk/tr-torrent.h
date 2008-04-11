@@ -80,6 +80,9 @@ void
 tr_torrent_delete_files( TrTorrent * tor );
 
 void
+tr_torrent_open_folder( TrTorrent * tor );
+
+void
 tr_torrent_check_seeding_cap ( TrTorrent* );
 void
 tr_torrent_set_seeding_cap_ratio ( TrTorrent*, gdouble ratio );

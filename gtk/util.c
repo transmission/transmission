@@ -436,3 +436,28 @@ tr_file_trash_or_unlink( const char * filename )
             g_unlink( filename );
     }
 }
+
+void
+gtr_open_file( const char * path )
+{
+    if( path )
+    {
+        gboolean opened = FALSE;
+#ifdef HAVE_GIO
+        if( !opened )
+        {
+            GFile * file = g_file_new_for_path( path );
+            char * uri = g_file_get_uri( file );
+            opened = g_app_info_launch_default_for_uri( uri, NULL, NULL );
+            g_free( uri );
+            g_object_unref( G_OBJECT( file ) );
+        }
+#endif
+        if( !opened )
+        {
+            char * argv[] = { "xdg-open", (char*)path, NULL };
+            g_spawn_async( NULL, argv, NULL, G_SPAWN_SEARCH_PATH,
+                           NULL, NULL, NULL, NULL );
+        }
+    }
+}

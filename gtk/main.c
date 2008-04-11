@@ -199,6 +199,7 @@ refreshTorrentActions( GtkTreeSelection * s )
     action_sensitize( "remove-torrent", counts.totalCount!=0 );
     action_sensitize( "delete-torrent", counts.totalCount!=0 );
     action_sensitize( "verify-torrent", counts.totalCount!=0 );
+    action_sensitize( "open-torrent-folder", counts.totalCount==1 );
     action_sensitize( "show-torrent-details", counts.totalCount==1 );
 
     canUpdate = 0;
@@ -935,6 +936,18 @@ detailsClosed( gpointer user_data, GObject * details )
 }
 
 static void
+openFolderForeach( GtkTreeModel * model,
+                   GtkTreePath  * path UNUSED,
+                   GtkTreeIter  * iter,
+                   gpointer       user_data UNUSED )
+{
+    TrTorrent * gtor = NULL;
+    gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, -1 );
+    tr_torrent_open_folder( gtor );
+    g_object_unref( G_OBJECT( gtor ) );
+}
+
+static void
 showInfoForeach (GtkTreeModel * model,
                  GtkTreePath  * path UNUSED,
                  GtkTreeIter  * iter,
@@ -1039,6 +1052,11 @@ doAction ( const char * action_name, gpointer user_data )
         GtkTreeSelection * s = tr_window_get_selection(data->wind);
         gtk_tree_selection_selected_foreach( s, recheckTorrentForeach, NULL );
         changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
+    }
+    else if (!strcmp (action_name, "open-torrent-folder"))
+    {
+        GtkTreeSelection * s = tr_window_get_selection(data->wind);
+        gtk_tree_selection_selected_foreach( s, openFolderForeach, data );
     }
     else if (!strcmp (action_name, "show-torrent-details"))
     {

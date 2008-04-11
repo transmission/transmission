@@ -344,3 +344,15 @@ tr_torrent_delete_files( TrTorrent * gtor )
         g_free( file );
     }
 }
+
+void
+tr_torrent_open_folder( TrTorrent * gtor )
+{
+    tr_torrent * tor = tr_torrent_handle( gtor );
+    const tr_info * info = tr_torrent_info( gtor );
+    char * path = info->fileCount == 1
+        ? g_build_filename( tr_torrentGetFolder(tor), NULL )
+        : g_build_filename( tr_torrentGetFolder(tor), info->name, NULL );
+    gtr_open_file( path );
+    g_free( path );
+}

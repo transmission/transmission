@@ -83,6 +83,8 @@ checkfilenames( int argc, char ** argv );
 char *
 getdownloaddir( void );
 
+void gtr_open_file( const char * path );
+
 #ifdef GTK_MAJOR_VERSION
 
 /* here there be dragons */
