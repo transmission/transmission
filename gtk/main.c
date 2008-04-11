@@ -407,12 +407,13 @@ appsetup( TrWindow * wind, GSList * torrentFiles,
     cbdata->timer = g_timeout_add( UPDATE_INTERVAL, updatemodel, cbdata );
     updatemodel( cbdata );
 
-    /* show the window */
-    if( minimized ) {
+    /* either show the window or iconify it */
+    if( !minimized )
+        gtk_widget_show( GTK_WIDGET( wind ) );
+    else {
         gtk_window_iconify( wind );
         gtk_window_set_skip_taskbar_hint( cbdata->wind, cbdata->icon != NULL );
     }
-    gtk_widget_show( GTK_WIDGET( wind ) );
 }
 
 
