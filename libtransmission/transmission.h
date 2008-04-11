@@ -895,13 +895,13 @@ struct tr_stat
      * moved to `corrupt' or `haveValid'. */
     uint64_t haveUnchecked;
 
-    /* Byte count of all the non-DND piece data that either we already have,
-     * or that a peer we're connected to has. [0...desiredSize] */
-    uint64_t desiredAvailable;
+    /* Byte count of all the piece data we'll have downloaded when we're done.
+     * whether or not we have it yet. [0...tr_info.totalSize] */
+    uint64_t sizeWhenDone;
 
-    /* Byte count of all the piece data we want, whether we currently
-     * have it nor not. [0...tr_info.totalSize] */
-    uint64_t desiredSize;
+    /* Byte count of all the piece data we want and don't have yet,
+     * but that a connected peer does have. [0...sizeWhenDone] */
+    uint64_t desiredAvailable;
 
     float swarmspeed;
 

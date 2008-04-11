@@ -638,28 +638,24 @@ tr_torrentStat( tr_torrent * tor )
 
     {
         tr_piece_index_t i;
-        tr_bitfield * availablePieces = tr_peerMgrGetAvailable( tor->handle->peerMgr,
-                                                                tor->info.hash );
-        s->desiredSize = 0;
+        tr_bitfield * peerPieces = tr_peerMgrGetAvailable( tor->handle->peerMgr,
+                                                           tor->info.hash );
+        s->sizeWhenDone = 0;
         s->desiredAvailable = 0;
 
         for( i=0; i<tor->info.pieceCount; ++i ) {
             if( !tor->info.pieces[i].dnd ) {
-                const uint64_t byteCount = tr_torPieceCountBytes( tor, i );
-                s->desiredSize += byteCount;
-                if( tr_bitfieldHas( availablePieces, i ) )
-                    s->desiredAvailable += byteCount;
+                s->sizeWhenDone += tor->info.pieceSize;
+                if( tr_bitfieldHas( peerPieces, i ) )
+                    s->desiredAvailable += tr_cpMissingBlocksInPiece( tor->completion, i );
             }
         }
 
-        /* "availablePieces" can miss our unverified blocks... */
-        if( s->desiredAvailable < s->haveValid + s->haveUnchecked )
-            s->desiredAvailable = s->haveValid + s->haveUnchecked;
-
-        tr_bitfieldFree( availablePieces );
+        s->desiredAvailable *= tor->blockSize;
+        tr_bitfieldFree( peerPieces );
     }
 
-    if( s->desiredSize > s->desiredAvailable )
+    if( s->leftUntilDone > s->desiredAvailable )
         s->eta = TR_ETA_NOT_AVAIL;
     else if( s->rateDownload < 0.1 )
         s->eta = TR_ETA_UNKNOWN;

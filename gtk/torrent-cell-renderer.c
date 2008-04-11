@@ -52,7 +52,7 @@ getProgressString( const tr_info * info, const tr_stat * torStat )
                      %3$.2f%% is a percentage of the two */
                   _("%1$s of %2$s (%3$.2f%%)"),
                   tr_strlsize( buf1, haveTotal, sizeof(buf1) ),
-                  tr_strlsize( buf2, torStat->desiredSize, sizeof(buf2) ),
+                  tr_strlsize( buf2, torStat->sizeWhenDone, sizeof(buf2) ),
                   torStat->percentDone * 100.0 );
     else if( !isSeed )
         str = g_strdup_printf(

@@ -1417,26 +1417,25 @@ tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
     managerUnlock( (tr_peerMgr*)manager );
 }
 
-/* Returns the pieces that we and/or a connected peer has */
+/* Returns the pieces that are available from peers */
 tr_bitfield*
 tr_peerMgrGetAvailable( const tr_peerMgr * manager,
                         const uint8_t    * torrentHash )
 {
     int i, size;
-    const Torrent * t;
-    const tr_peer ** peers;
+    Torrent * t;
+    tr_peer ** peers;
     tr_bitfield * pieces;
-
     managerLock( (tr_peerMgr*)manager );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
-    peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &size );
-    pieces = tr_bitfieldDup( tr_cpPieceBitfield( t->tor->completion ) );
+    pieces = tr_bitfieldNew( t->tor->info.pieceCount );
+    peers = getConnectedPeers( t, &size );
     for( i=0; i<size; ++i )
-        if( peers[i]->io != NULL )
-            tr_bitfieldOr( pieces, peers[i]->have );
+        tr_bitfieldOr( pieces, peers[i]->have );
 
     managerUnlock( (tr_peerMgr*)manager );
+    tr_free( peers );
     return pieces;
 }
 
