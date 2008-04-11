@@ -27,7 +27,6 @@
 #include "bencode.h"
 #include "makemeta.h"
 #include "platform.h" /* threads, locks */
-#include "shared.h" /* shared lock */
 #include "utils.h" /* buildpath */
 #include "version.h"
 

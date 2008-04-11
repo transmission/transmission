@@ -947,7 +947,7 @@ struct tr_peer_stat
 
 
 #ifdef __TRANSMISSION__
-#  include "internal.h"
+#  include "session.h"
 #endif
 
 #ifdef __cplusplus

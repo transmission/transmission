@@ -25,7 +25,7 @@
 
 #include "transmission.h"
 #include "natpmp.h"
-#include "shared.h"
+#include "port-forwarding.h"
 #include "utils.h"
 
 #define LIFETIME_SECS 3600

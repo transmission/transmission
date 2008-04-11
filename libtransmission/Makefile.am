@@ -24,15 +24,15 @@ libtransmission_a_SOURCES = \
     peer-mgr.c \
     peer-msgs.c \
     platform.c \
+    port-forwarding.c \
     ptrarray.c \
     publish.c \
     ratecontrol.c \
-    shared.c \
+    session.c \
     stats.c \
     torrent.c \
     torrent-ctor.c \
     tracker.c \
-    transmission.c \
     trevent.c \
     upnp.c \
     utils.c \
@@ -49,7 +49,6 @@ noinst_HEADERS = \
     ggets.h \
     handshake.h \
     inout.h \
-    internal.h \
     ipcparse.h \
     list.h \
     makemeta.h \
@@ -61,10 +60,11 @@ noinst_HEADERS = \
     peer-mgr-private.h \
     peer-msgs.h \
     platform.h \
+    port-forwarding.h \
     ptrarray.h \
     publish.h \
     ratecontrol.h \
-    shared.h \
+    session.h \
     stats.h \
     torrent.h \
     tracker.h \

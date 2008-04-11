@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * $Id:$
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
@@ -32,7 +32,7 @@
 #include "natpmp.h"
 #include "net.h"
 #include "peer-mgr.h"
-#include "shared.h"
+#include "port-forwarding.h"
 #include "torrent.h"
 #include "trevent.h"
 #include "upnp.h"

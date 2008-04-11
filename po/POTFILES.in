@@ -31,9 +31,9 @@ libtransmission/metainfo.c
 libtransmission/natpmp.c
 libtransmission/net.c
 libtransmission/peer-msgs.c
-libtransmission/shared.c
+libtransmission/port-forwarding.c
+libtransmission/session.c
 libtransmission/torrent.c
-libtransmission/transmission.c
 libtransmission/upnp.c
 libtransmission/utils.c
 libtransmission/verify.c

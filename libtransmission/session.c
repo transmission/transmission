@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * $Id:$
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
@@ -39,8 +39,8 @@
 #include "net.h"
 #include "peer-mgr.h"
 #include "platform.h" /* tr_lock */
+#include "port-forwarding.h"
 #include "ratecontrol.h"
-#include "shared.h"
 #include "stats.h"
 #include "torrent.h"
 #include "tracker.h"

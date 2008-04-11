@@ -24,8 +24,8 @@
 #include "completion.h"
 #include "list.h"
 #include "net.h"
+#include "port-forwarding.h"
 #include "publish.h"
-#include "shared.h"
 #include "torrent.h"
 #include "tracker.h"
 #include "trcompat.h" /* strlcpy */

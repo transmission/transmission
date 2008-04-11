@@ -19,8 +19,8 @@
 #include <miniupnp/upnpcommands.h>
 
 #include "transmission.h"
-#include "internal.h"
-#include "shared.h"
+#include "port-forwarding.h"
+#include "session.h"
 #include "utils.h"
 #include "upnp.h"
 
