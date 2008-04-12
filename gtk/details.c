@@ -506,10 +506,10 @@ onPeerViewQueryTooltip( GtkWidget  * widget,
                 case 'D': txt = _( "Downloading from peer" ); break;
                 case 'd': txt = _( "We'd download from peer if they'd let us" ); break;
                 case 'U': txt = _( "Uploading to peer" ); break;
-                case 'u': txt = _( "Peer would download from us if we'd let them" ); break;
+                case 'u': txt = _( "We'd upload to peer if they'd ask us" ); break;
                 case 'K': txt = _( "Peer has unchoked us, but we're not interested" ); break;
                 case '?': txt = _( "We unchoked the peer, but they're not interested" ); break;
-                case 'E': txt = _( "Using encryption to communicate with peer" ); break;
+                case 'E': txt = _( "Encrypted connection" ); break;
                 case 'X': txt = _( "Peer was discovered through Peer Exchange (PEX)" ); break;
                 case 'I': txt = _( "Peer is an incoming connection" ); break;
             }
