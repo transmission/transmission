@@ -1078,12 +1078,15 @@ typedef enum
     
     if (have == 0)
         [fHaveField setStringValue: [NSString stringForFileSize: 0]];
-    else if (have == haveVerified)
-        [fHaveField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ verified",
-                "Inspector -> Activity tab -> have"), [NSString stringForFileSize: haveVerified]]];
     else
-        [fHaveField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ (%@ verified)",
-                "Inspector -> Activity tab -> have"), [NSString stringForFileSize: have], [NSString stringForFileSize: haveVerified]]];
+    {
+        NSString * verifiedString = [NSString stringWithFormat: NSLocalizedString(@"%@ verified", "Inspector -> Activity tab -> have"),
+                                        [NSString stringForFileSize: haveVerified]];
+        if (have == haveVerified)
+            [fHaveField setStringValue: verifiedString];
+        else
+            [fHaveField setStringValue: [NSString stringWithFormat: @"%@ (%@)", [NSString stringForFileSize: have], verifiedString]];
+    }
     
     [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
     [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
