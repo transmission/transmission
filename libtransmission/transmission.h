@@ -48,8 +48,6 @@ extern "C" {
 # define MAX_PATH_LENGTH  1024
 #endif
 
-#define TR_DEFAULT_PORT   51413
-
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
 typedef uint64_t tr_block_index_t;
@@ -78,10 +76,17 @@ typedef struct tr_handle tr_handle;
 
 const char* tr_getDefaultConfigDir( void );
 
+#define TR_DEFAULT_CONFIG_DIR                  tr_getDefaultConfigDir()
+#define TR_DEFAULT_PEX_ENABLED                 1
+#define TR_DEFAULT_PORT_FORWARDING_ENABLED     0
+#define TR_DEFAULT_PORT                        51413
+#define TR_DEFAULT_GLOBAL_PEER_LIMIT           200
+#define TR_DEFAULT_PEER_SOCKET_TOS             8
+
 tr_handle * tr_initFull( const char * configDir,
                          const char * tag,
                          int          isPexEnabled,
-                         int          isNatEnabled,
+                         int          isPortForwardingEnabled,
                          int          publicPort,
                          int          encryptionMode,
                          int          isUploadLimitEnabled,
@@ -91,7 +96,8 @@ tr_handle * tr_initFull( const char * configDir,
                          int          globalPeerLimit,
                          int          messageLevel,
                          int          isMessageQueueingEnabled,
-                         int          isBlocklistEnabled );
+                         int          isBlocklistEnabled,
+                         int          peerSocketTOS );
 
 /**
  * Like tr_initFull() but with default values supplied.

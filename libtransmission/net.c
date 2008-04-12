@@ -79,6 +79,16 @@ int tr_netResolve( const char * address, struct in_addr * addr )
  * TCP/UDP sockets
  **********************************************************************/
 
+int
+tr_netSetTOS( int s, int tos )
+{
+#ifdef IP_TOS
+    return setsockopt( s, IPPROTO_IP, IP_TOS, (char*)&tos, sizeof( tos ) );
+#else
+    return 0;
+#endif
+}
+
 static int
 makeSocketNonBlocking( int fd )
 {

@@ -42,11 +42,13 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_DIR_WATCH_ENABLED, FALSE );
 #endif
 
+    pref_int_set_default    ( PREF_KEY_PEER_SOCKET_TOS, TR_DEFAULT_PEER_SOCKET_TOS );
+
     pref_flag_set_default   ( PREF_KEY_BLOCKLIST_ENABLED, FALSE );
 
     pref_string_set_default ( PREF_KEY_OPEN_DIALOG_FOLDER, g_get_home_dir( ) );
 
-    pref_int_set_default    ( PREF_KEY_MAX_PEERS_GLOBAL, 200 );
+    pref_int_set_default    ( PREF_KEY_MAX_PEERS_GLOBAL, TR_DEFAULT_GLOBAL_PEER_LIMIT );
     pref_int_set_default    ( PREF_KEY_MAX_PEERS_PER_TORRENT, 50 );
 
     pref_flag_set_default   ( PREF_KEY_TOOLBAR, TRUE );
@@ -70,7 +72,7 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_PORT, TR_DEFAULT_PORT );
 
     pref_flag_set_default   ( PREF_KEY_NAT, TRUE );
-    pref_flag_set_default   ( PREF_KEY_PEX, TRUE );
+    pref_flag_set_default   ( PREF_KEY_PEX, TR_DEFAULT_PEX_ENABLED );
     pref_flag_set_default   ( PREF_KEY_ASKQUIT, TRUE );
     pref_flag_set_default   ( PREF_KEY_ENCRYPTED_ONLY, FALSE );
 

@@ -31,6 +31,7 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_DIR_WATCH_ENABLED      "watch-folder-enabled"
 #define PREF_KEY_START                  "start-added-torrents"
 #define PREF_KEY_TRASH_ORIGINAL         "trash-original-torrent-files" 
+#define PREF_KEY_PEER_SOCKET_TOS        "peer-socket-tos"
 #define PREF_KEY_PORT                   "listening-port"
 #define PREF_KEY_NAT                    "nat-traversal-enabled"
 #define PREF_KEY_PEX                    "pex-enabled"

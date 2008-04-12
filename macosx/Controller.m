@@ -208,7 +208,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                         [fDefaults integerForKey: @"PeersTotal"],
                         [fDefaults integerForKey: @"MessageLevel"],
                         YES,
-                        [fDefaults boolForKey: @"Blocklist"]);
+                        [fDefaults boolForKey: @"Blocklist"],
+                        TR_DEFAULT_PEER_SOCKET_TOS );
         
         [NSApp setDelegate: self];
         

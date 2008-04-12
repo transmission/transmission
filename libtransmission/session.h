@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id:$
+ * $Id$
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
@@ -64,6 +64,8 @@ struct tr_handle
     tr_encryption_mode         encryptionMode;
 
     struct tr_event_handle   * events;
+
+    int                        peerSocketTOS;
 
     int                        torrentCount;
     tr_torrent               * torrentList;

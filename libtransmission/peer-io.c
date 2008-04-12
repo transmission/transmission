@@ -139,6 +139,10 @@ tr_peerIoNew( struct tr_handle     * handle,
               int                    socket )
 {
     tr_peerIo * c;
+
+    if( socket >= 0 )
+        tr_netSetTOS( socket, handle->peerSocketTOS );
+
     c = tr_new0( tr_peerIo, 1 );
     c->crypto = tr_cryptoNew( torrentHash, isIncoming );
     c->handle = handle;
@@ -292,6 +296,8 @@ tr_peerIoReconnect( tr_peerIo * io )
   
     if( io->socket >= 0 )
     {
+        tr_netSetTOS( io->socket, io->handle->peerSocketTOS );
+
         bufferevent_free( io->bufev );
 
         io->bufev = bufferevent_new( io->socket,

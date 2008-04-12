@@ -145,20 +145,21 @@ main( int argc, char ** argv )
         bindPort = -1;
 
     /* Initialize libtransmission */
-    h = tr_initFull( tr_getDefaultConfigDir(),
-                     "cli",                   /* tag */
-                     1,                       /* pex enabled */
-                     natTraversal,            /* nat enabled */
-                     bindPort,                /* public port */
-                     TR_ENCRYPTION_PREFERRED, /* encryption mode */
-                     uploadLimit >= 0,        /* use upload speed limit? */
-                     uploadLimit,             /* upload speed limit */
-                     downloadLimit >= 0,      /* use download speed limit? */
-                     downloadLimit,           /* download speed limit */
-                     512,                     /* globalPeerLimit */
-                     verboseLevel + 1,        /* messageLevel */
-                     0,                       /* is message queueing enabled? */
-                     0 );                     /* use the blocklist? */
+    h = tr_initFull( TR_DEFAULT_CONFIG_DIR,
+                     "cli",                         /* tag */
+                     1,                             /* pex enabled */
+                     natTraversal,                  /* nat enabled */
+                     bindPort,                      /* public port */
+                     TR_ENCRYPTION_PREFERRED,       /* encryption mode */
+                     uploadLimit >= 0,              /* use upload speed limit? */
+                     uploadLimit,                   /* upload speed limit */
+                     downloadLimit >= 0,            /* use download speed limit? */
+                     downloadLimit,                 /* download speed limit */
+                     TR_DEFAULT_GLOBAL_PEER_LIMIT,
+                     verboseLevel + 1,              /* messageLevel */
+                     0,                             /* is message queueing enabled? */
+                     0,                             /* use the blocklist? */
+                     TR_DEFAULT_PEER_SOCKET_TOS );
 
     if( sourceFile && *sourceFile ) /* creating a torrent */
     {

@@ -73,6 +73,7 @@ int  tr_netOpenUDP  ( const struct in_addr * addr, tr_port_t port, int priority 
 int  tr_netBindTCP  ( int port );
 int  tr_netBindUDP  ( int port );
 int  tr_netAccept   ( int s, struct in_addr *, tr_port_t * );
+int  tr_netSetTOS   ( int s, int tos );
 void tr_netClose    ( int s );
 
 #define TR_NET_BLOCK 0x80000000

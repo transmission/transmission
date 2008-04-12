@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id:$
+ * $Id$
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
@@ -117,7 +117,7 @@ tr_handle *
 tr_initFull( const char * configDir,
              const char * tag,
              int          isPexEnabled,
-             int          isNatEnabled,
+             int          isPortForwardingEnabled,
              int          publicPort,
              int          encryptionMode,
              int          isUploadLimitEnabled,
@@ -127,7 +127,8 @@ tr_initFull( const char * configDir,
              int          globalPeerLimit,
              int          messageLevel,
              int          isMessageQueueingEnabled,
-             int          isBlocklistEnabled )
+             int          isBlocklistEnabled,
+             int          peerSocketTOS )
 {
     tr_handle * h;
     char filename[MAX_PATH_LENGTH];
@@ -149,6 +150,7 @@ tr_initFull( const char * configDir,
     h->isPexEnabled = isPexEnabled ? 1 : 0;
     h->encryptionMode = encryptionMode;
     h->configDir = tr_strdup( configDir );
+    h->peerSocketTOS = peerSocketTOS;
 
     tr_setConfigDir( h, configDir );
 
@@ -177,7 +179,7 @@ tr_initFull( const char * configDir,
     h->useDownloadLimit = isDownloadLimitEnabled;
 
     tr_fdInit( globalPeerLimit );
-    h->shared = tr_sharedInit( h, isNatEnabled, publicPort );
+    h->shared = tr_sharedInit( h, isPortForwardingEnabled, publicPort );
     h->isPortSet = publicPort >= 0;
 
     /* first %s is the application name
@@ -201,18 +203,19 @@ tr_init( const char * configDir,
 {
     return tr_initFull( configDir,
                         tag,
-                        TRUE, /* pex enabled */
-                        FALSE, /* nat enabled */
+                        TR_DEFAULT_PEX_ENABLED,
+                        TR_DEFAULT_PORT_FORWARDING_ENABLED,
                         -1, /* public port */
                         TR_ENCRYPTION_PREFERRED, /* encryption mode */
                         FALSE, /* use upload speed limit? */ 
                         -1, /* upload speed limit */
                         FALSE, /* use download speed limit? */
                         -1, /* download speed limit */
-                        200, /* globalPeerLimit */
+                        TR_DEFAULT_GLOBAL_PEER_LIMIT,
                         TR_MSG_INF, /* message level */
                         FALSE, /* is message queueing enabled? */
-                        FALSE ); /* is the blocklist enabled? */
+                        FALSE, /* is the blocklist enabled? */
+                        TR_DEFAULT_PEER_SOCKET_TOS );
 }
 
 /***
