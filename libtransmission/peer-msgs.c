@@ -65,7 +65,7 @@ enum
     /* idle seconds before we send a keepalive */
     KEEPALIVE_INTERVAL_SECS = 90,
 
-    PEX_INTERVAL            = (60 * 1000), /* msec between sendPex() calls */
+    PEX_INTERVAL            = (90 * 1000), /* msec between sendPex() calls */
     PEER_PULSE_INTERVAL     = (100),       /* msec between pulse() calls */
     RATE_PULSE_INTERVAL     = (250),       /* msec between ratePulse() calls */
 
@@ -1753,8 +1753,10 @@ sendBitfield( tr_peermsgs * msgs )
 **/
 
 /* some peers give us error messages if we send
-   more than this many peers in a single pex message */
-#define MAX_PEX_DIFFS 200
+   more than this many peers in a single pex message
+   http://wiki.theory.org/BitTorrentPeerExchangeConventions */
+#define MAX_PEX_ADDED 50
+#define MAX_PEX_DROPPED 50
 
 typedef struct
 {
@@ -1764,31 +1766,28 @@ typedef struct
     int addedCount;
     int droppedCount;
     int elementCount;
-    int diffCount;
 }
 PexDiffs;
 
 static void
 pexAddedCb( void * vpex, void * userData )
 {
-    PexDiffs * diffs = (PexDiffs *) userData;
-    tr_pex * pex = (tr_pex *) vpex;
-    if( diffs->diffCount < MAX_PEX_DIFFS )
+    PexDiffs * diffs = userData;
+    tr_pex * pex = vpex;
+    if( diffs->addedCount < MAX_PEX_ADDED )
     {
-        diffs->diffCount++;
         diffs->added[diffs->addedCount++] = *pex;
         diffs->elements[diffs->elementCount++] = *pex;
     }
 }
 
 static void
-pexRemovedCb( void * vpex, void * userData )
+pexDroppedCb( void * vpex, void * userData )
 {
-    PexDiffs * diffs = (PexDiffs *) userData;
-    tr_pex * pex = (tr_pex *) vpex;
-    if( diffs->diffCount < MAX_PEX_DIFFS )
+    PexDiffs * diffs = userData;
+    tr_pex * pex = vpex;
+    if( diffs->droppedCount < MAX_PEX_DROPPED )
     {
-        diffs->diffCount++;
         diffs->dropped[diffs->droppedCount++] = *pex;
     }
 }
@@ -1796,13 +1795,9 @@ pexRemovedCb( void * vpex, void * userData )
 static void
 pexElementCb( void * vpex, void * userData )
 {
-    PexDiffs * diffs = (PexDiffs *) userData;
-    tr_pex * pex = (tr_pex *) vpex;
-    if( diffs->diffCount < MAX_PEX_DIFFS )
-    {
-        diffs->diffCount++;
-        diffs->elements[diffs->elementCount++] = *pex;
-    }
+    PexDiffs * diffs = userData;
+    tr_pex * pex = vpex;
+    diffs->elements[diffs->elementCount++] = *pex;
 }
 
 static void
@@ -1826,11 +1821,10 @@ sendPex( tr_peermsgs * msgs )
         diffs.droppedCount = 0;
         diffs.elements = tr_new( tr_pex, newCount + msgs->pexCount );
         diffs.elementCount = 0;
-        diffs.diffCount = 0;
         tr_set_compare( msgs->pex, msgs->pexCount,
                         newPex, newCount,
                         tr_pexCompare, sizeof(tr_pex),
-                        pexRemovedCb, pexAddedCb, pexElementCb, &diffs );
+                        pexDroppedCb, pexAddedCb, pexElementCb, &diffs );
         dbgmsg( msgs, "pex: old peer count %d, new peer count %d, added %d, removed %d", msgs->pexCount, newCount, diffs.addedCount, diffs.droppedCount );
 
         /* update peer */
