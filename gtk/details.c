@@ -478,7 +478,59 @@ refresh_peers (GtkWidget * top)
   free( peers );
 }
 
-static GtkWidget* peer_page_new ( TrTorrent * gtor )
+#if GTK_CHECK_VERSION(2,12,0)
+static gboolean
+onPeerViewQueryTooltip( GtkWidget  * widget,
+                        gint         x,
+                        gint         y,
+                        gboolean     keyboard_tip,
+                        GtkTooltip * tooltip,
+                        gpointer     user_data UNUSED )
+{
+    gboolean show_tip = FALSE;
+    GtkTreeModel * model;
+    GtkTreeIter iter;
+
+    if( gtk_tree_view_get_tooltip_context( GTK_TREE_VIEW( widget ),
+                                           &x, &y, keyboard_tip,
+                                           &model, NULL, &iter ) )
+    {
+        const char * pch;
+        char * str = NULL;
+        GString * gstr = g_string_new( NULL );
+        gtk_tree_model_get( model, &iter, PEER_COL_STATUS, &str, -1 );
+        for( pch=str; pch && *pch; ++pch ) {
+            const char * txt = NULL;
+            switch( *pch ) {
+                case 'O': txt = _( "Optimistic unchoke" ); break;
+                case 'D': txt = _( "Downloading from peer" ); break;
+                case 'd': txt = _( "We'd download from peer if they'd let us" ); break;
+                case 'U': txt = _( "Uploading to peer" ); break;
+                case 'u': txt = _( "Peer would download from us if we'd let them" ); break;
+                case 'K': txt = _( "Peer has unchoked use, but we're not interested" ); break;
+                case '?': txt = _( "We unchoked the peer, but they're not interested" ); break;
+                case 'E': txt = _( "Using encryption to communicate with peer" ); break;
+                case 'X': txt = _( "Peer was discovered through Peer Exchange (PEX)" ); break;
+                case 'I': txt = _( "Peer is an incoming connection" ); break;
+            }
+            if( txt )
+                g_string_append_printf( gstr, "%c: %s\n", *pch, txt );
+        }
+        if( gstr->len ) /* remove the last linefeed */
+            g_string_set_size( gstr, gstr->len-1 );
+        gtk_tooltip_set_text( tooltip, gstr->str );
+        g_string_free( gstr, TRUE );
+        g_free( str );
+        show_tip = TRUE;
+    }
+
+    return show_tip;
+
+}
+#endif
+
+static GtkWidget*
+peer_page_new ( TrTorrent * gtor )
 {
   guint i;
   GtkTreeModel *m;
@@ -496,9 +548,18 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
                          PEER_COL_CLIENT };
 
   m  = peer_model_new (tor);
-  v = gtk_tree_view_new_with_model (m);
+  v = GTK_WIDGET( g_object_new( GTK_TYPE_TREE_VIEW,
+                                "model", m,
+                                "rules-hint", TRUE,
+#if GTK_CHECK_VERSION(2,12,0)
+                                "has-tooltip", TRUE,
+#endif
+                                NULL ) );
+#if GTK_CHECK_VERSION(2,12,0)
+  g_signal_connect( v, "query-tooltip",
+                    G_CALLBACK(onPeerViewQueryTooltip), NULL );
+#endif
   gtk_widget_set_size_request( v, 550, 0 );
-  gtk_tree_view_set_rules_hint (GTK_TREE_VIEW(v), TRUE);
   g_object_unref (G_OBJECT(m));
 
   for (i=0; i<G_N_ELEMENTS(view_columns); ++i)
