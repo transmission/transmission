@@ -1300,14 +1300,13 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
   gtk_window_set_role (GTK_WINDOW(d), "tr-info" );
   g_signal_connect (d, "response", G_CALLBACK (response_cb), gtor);
   gtk_dialog_set_has_separator( GTK_DIALOG( d ), FALSE );
-  gtk_container_set_border_width (GTK_CONTAINER (d), 5);
-  gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (d)->vbox), 2);
+  gtk_container_set_border_width( GTK_CONTAINER( d ), GUI_PAD );
   g_object_weak_ref (G_OBJECT(gtor), torrent_destroyed, d);
   
 
   /* add the notebook */
   n = gtk_notebook_new ();
-  gtk_container_set_border_width ( GTK_CONTAINER ( n ), 5 );
+  gtk_container_set_border_width ( GTK_CONTAINER ( n ), GUI_PAD );
 
   w = activity_page_new (gtor);
   g_object_set_data (G_OBJECT(d), "activity-top", w);

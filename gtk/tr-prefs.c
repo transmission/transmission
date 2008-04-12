@@ -547,7 +547,7 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     alive = g_new( gboolean, 1 );
     *alive = TRUE;
 
-    d = gtk_dialog_new_with_buttons( _("Preferences"), parent,
+    d = gtk_dialog_new_with_buttons( _( "Transmission Preferences" ), parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      NULL );
@@ -557,6 +557,7 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     g_object_weak_ref( G_OBJECT( d ), dialogDestroyed, alive );
 
     n = gtk_notebook_new( );
+    gtk_container_set_border_width ( GTK_CONTAINER ( n ), GUI_PAD );
 
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               torrentPage( core ),
