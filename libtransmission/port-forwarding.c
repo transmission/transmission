@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id:$
+ * $Id$
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
@@ -42,21 +42,22 @@ static const char * getKey( void ) { return _( "Port Forwarding" ); }
 
 struct tr_shared
 {
+    unsigned int isEnabled      : 1;
+    unsigned int isShuttingDown : 1;
+
+    tr_nat_traversal_status natpmpStatus;
+    tr_nat_traversal_status upnpStatus;
+
+    int bindPort;
+    int bindSocket;
+    int publicPort;
+
     tr_handle * h;
     tr_timer  * pulseTimer;
 
-    /* Incoming connections */
-    int bindPort;
-    int bindSocket;
-
-    /* port forwarding */
-    int isEnabled;
-    int publicPort;
-    tr_nat_traversal_status natStatus;
-    tr_upnp * upnp;
+    tr_upnp    * upnp;
     tr_natpmp  * natpmp;
 
-    int isShuttingDown;
 };
 
 /***
@@ -85,19 +86,20 @@ getNatStateStr( int state )
 static void
 natPulse( tr_shared * s )
 {
-    tr_nat_traversal_status status;
     const int port = s->publicPort;
     const int isEnabled = s->isEnabled && !s->isShuttingDown;
+    int oldStatus;
+    int newStatus;
+    
+    oldStatus = tr_sharedTraversalStatus( s );
+    s->natpmpStatus = tr_natpmpPulse( s->natpmp, port, isEnabled );
+    s->upnpStatus = tr_upnpPulse( s->upnp, port, isEnabled );
+    newStatus = tr_sharedTraversalStatus( s );
 
-    status = tr_natpmpPulse( s->natpmp, port, isEnabled );
-    if( status == TR_NAT_TRAVERSAL_ERROR )
-        status = tr_upnpPulse( s->upnp, port, isEnabled );
-    if( status != s->natStatus ) {
-        tr_ninf( getKey(), _( "State changed from \"%s\" to \"%s\"" ), getNatStateStr(s->natStatus), getNatStateStr(status) );
-        s->natStatus = status;
-        if( status == TR_NAT_TRAVERSAL_ERROR )
-            tr_nerr( getKey(), _( "Port forwarding failed." ) );
-    }
+    if( newStatus != oldStatus )
+        tr_ninf( getKey(), _( "State changed from \"%s\" to \"%s\"" ),
+                 getNatStateStr(oldStatus),
+                 getNatStateStr(newStatus) );
 }
 
 static void
@@ -189,7 +191,8 @@ tr_sharedInit( tr_handle * h, int isEnabled, int publicPort )
     s->upnp         = tr_upnpInit();
     s->pulseTimer   = tr_timerNew( h, sharedPulse, s, 500 );
     s->isEnabled    = isEnabled ? 1 : 0;
-    s->natStatus    = TR_NAT_TRAVERSAL_UNMAPPED;
+    s->upnpStatus   = TR_NAT_TRAVERSAL_UNMAPPED;
+    s->natpmpStatus = TR_NAT_TRAVERSAL_UNMAPPED;
 
     return s;
 }
@@ -226,5 +229,5 @@ tr_sharedTraversalEnable( tr_shared * s, int isEnabled )
 int
 tr_sharedTraversalStatus( const tr_shared * s )
 {
-    return s->natStatus;
+    return MAX( s->natpmpStatus, s->upnpStatus );
 }

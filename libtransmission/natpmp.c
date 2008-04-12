@@ -69,7 +69,7 @@ logVal( const char * func, int ret )
     else if( ret >= 0 )
         tr_ninf( getKey(), _( "%s succeeded (%d)" ), func, ret );
     else
-        tr_ninf( getKey(), _( "%s failed (%d): %s (%d)" ), func, ret, tr_strerror(errno), errno );
+        tr_ndbg( getKey(), "%s failed (%d): %s (%d)", func, ret, tr_strerror(errno), errno );
 }
 
 struct tr_natpmp*
@@ -104,14 +104,6 @@ setCommandTime( struct tr_natpmp * nat )
     nat->commandTime = time(NULL) + COMMAND_WAIT_SECS;
 }
 
-static void
-setErrorState( struct tr_natpmp * nat )
-{
-    tr_ninf( getKey(), _( "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!" ) );
-    tr_ninf( getKey(), _( "NAT-PMP port forwarding unsuccessful, trying UPnP next" ) );
-    nat->state = TR_NATPMP_ERR;
-}
-
 int
 tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
 {
@@ -137,7 +129,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
             tr_ninf( getKey(), _( "Found public address \"%s\"" ), inet_ntoa( response.publicaddress.addr ) );
             nat->state = TR_NATPMP_IDLE;
         } else if( val != NATPMP_TRYAGAIN ) {
-            setErrorState( nat );
+            nat->state = TR_NATPMP_ERR;
         }
     }
 
@@ -166,7 +158,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
             nat->port = -1;
             nat->isMapped = 0;
         } else if( val != NATPMP_TRYAGAIN ) {
-            setErrorState( nat );
+            nat->state = TR_NATPMP_ERR;
         }
     }
 
@@ -197,9 +189,9 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
             nat->isMapped = 1;
             nat->renewTime = time( NULL ) + LIFETIME_SECS;
             nat->port = resp.newportmapping.privateport;
-            tr_ninf( getKey(), _( "port %d forwarded successfully" ), nat->port );
+            tr_ninf( getKey(), _( "Port %d forwarded successfully" ), nat->port );
         } else if( val != NATPMP_TRYAGAIN ) {
-            setErrorState( nat );
+            nat->state = TR_NATPMP_ERR;
         }
     }
 
