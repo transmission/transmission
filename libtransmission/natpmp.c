@@ -85,10 +85,11 @@ tr_natpmpInit( void )
 void
 tr_natpmpClose( tr_natpmp * nat )
 {
-    assert( !nat->isMapped );
-
-    closenatpmp( &nat->natpmp );
-    tr_free( nat );
+    if( nat )
+    {
+        closenatpmp( &nat->natpmp );
+        tr_free( nat );
+    }
 }
 
 static int
