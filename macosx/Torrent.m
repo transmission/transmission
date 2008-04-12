@@ -889,7 +889,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (float) notAvailableDesired
 {
-    return (float)(fStat->sizeWhenDone - fStat->desiredAvailable) / [self size];
+    return (float)(fStat->leftUntilDone - fStat->desiredAvailable) / [self size];
 }
 
 - (BOOL) isActive
