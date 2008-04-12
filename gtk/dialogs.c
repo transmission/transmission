@@ -109,9 +109,9 @@ askquit( TrCore          * core,
 
     wind = gtk_message_dialog_new_with_markup( parent,
                                                GTK_DIALOG_DESTROY_WITH_PARENT,
-                                               GTK_MESSAGE_QUESTION,
+                                               GTK_MESSAGE_WARNING,
                                                GTK_BUTTONS_NONE,
-                                               _("<b>Really Quit?</b>") );
+                                               _("<big><b>Quit Transmission?</b></big>") );
 
     gtk_dialog_add_buttons( GTK_DIALOG(wind),
                             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -227,9 +227,9 @@ confirmRemove( GtkWindow * parent,
 
     d = gtk_message_dialog_new_with_markup( parent,
                                             GTK_DIALOG_DESTROY_WITH_PARENT,
-                                            ( delete_files ? GTK_MESSAGE_WARNING : GTK_MESSAGE_QUESTION ),
+                                            GTK_MESSAGE_WARNING,
                                             GTK_BUTTONS_NONE,
-                                            "<b>%s</b>", primary_text );
+                                            "<big><b>%s</b></big>", primary_text );
     if( secondary_text )
         gtk_message_dialog_format_secondary_markup( GTK_MESSAGE_DIALOG( d ), secondary_text );
     gtk_dialog_add_buttons( GTK_DIALOG( d ),
