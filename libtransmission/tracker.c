@@ -80,6 +80,7 @@ struct tr_tracker
     int announceIntervalSec;
     int announceMinIntervalSec;
     int scrapeIntervalSec;
+    int retryScrapeIntervalSec;
 
     tr_tracker_info * redirect;
     tr_tracker_info * addresses;
@@ -563,7 +564,7 @@ static void
 onScrapeResponse( struct evhttp_request * req, void * vhash )
 {
     int tryAgain;
-    time_t nextScrapeSec = 60;
+    int responseCode;
     struct torrent_hash * torrent_hash = (struct torrent_hash*) vhash;
     tr_tracker * t = findTrackerFromHash( torrent_hash );
 
@@ -619,7 +620,7 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
                 tr_ndbg( t->name, "Scrape successful.  Rescraping in %d seconds.",
                          t->scrapeIntervalSec );
 
-                nextScrapeSec = t->scrapeIntervalSec;
+                t->retryScrapeIntervalSec = 30;
             }
         }
 
@@ -629,10 +630,36 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
 
     updateAddresses( t, req, &tryAgain );
 
-    if( tryAgain ) 
-        t->scrapeAt = time( NULL );
+    /**
+    ***
+    **/
+
+    if( tryAgain )
+        responseCode = 300;
+    else if( req )
+        responseCode = req->response_code;
     else
-        t->scrapeAt = time( NULL ) + t->randOffset + nextScrapeSec;
+        responseCode = 503;
+
+    if( 200<=responseCode && responseCode<=299 )
+    {
+        const int interval = t->scrapeIntervalSec + t->randOffset;
+        dbgmsg( t, "request succeeded. rescraping in %d seconds", interval );
+        t->scrapeAt = time( NULL ) + interval;
+    }
+    else if( 300<=responseCode && responseCode<=399 )
+    {
+        const int interval = 5;
+        dbgmsg( t, "got a redirect. retrying in %d seconds", interval );
+        t->scrapeAt = time( NULL ) + interval;
+    }
+    else
+    {
+        const int interval = t->retryScrapeIntervalSec + t->randOffset;
+        dbgmsg( t, "Tracker responded to scrape with %d.  Retrying in %d seconds.", responseCode,  interval );
+        t->retryScrapeIntervalSec *= 2;
+        t->scrapeAt = time( NULL ) + interval;
+    }
 }
 
 /***
@@ -1041,6 +1068,7 @@ tr_trackerNew( const tr_torrent * torrent )
     t = tr_new0( tr_tracker, 1 );
     t->handle = torrent->handle;
     t->scrapeIntervalSec       = DEFAULT_SCRAPE_INTERVAL_SEC;
+    t->retryScrapeIntervalSec  = 60;
     t->announceIntervalSec     = DEFAULT_ANNOUNCE_INTERVAL_SEC;
     t->announceMinIntervalSec  = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
     generateKeyParam( t->key_param, KEYLEN );
