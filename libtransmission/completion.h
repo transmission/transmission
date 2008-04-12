@@ -40,6 +40,7 @@ uint64_t         tr_cpHaveTotal( const tr_completion * );
 uint64_t         tr_cpHaveValid( const tr_completion * );
 uint64_t         tr_cpLeftUntilComplete( const tr_completion * );
 uint64_t         tr_cpLeftUntilDone( const tr_completion * );
+uint64_t         tr_cpSizeWhenDone( const tr_completion * );
 float            tr_cpPercentComplete( const tr_completion * );
 float            tr_cpPercentDone( const tr_completion * );
 void             tr_cpInvalidateDND ( tr_completion * );

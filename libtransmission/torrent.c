@@ -613,6 +613,7 @@ tr_torrentStat( tr_torrent * tor )
 
     s->percentDone = tr_cpPercentDone( tor->completion );
     s->leftUntilDone = tr_cpLeftUntilDone( tor->completion );
+    s->sizeWhenDone = tr_cpSizeWhenDone( tor->completion );
 
     s->recheckProgress =
         1.0 - (tr_torrentCountUncheckedPieces( tor ) / (double) tor->info.pieceCount);
@@ -640,17 +641,10 @@ tr_torrentStat( tr_torrent * tor )
         tr_piece_index_t i;
         tr_bitfield * peerPieces = tr_peerMgrGetAvailable( tor->handle->peerMgr,
                                                            tor->info.hash );
-        s->sizeWhenDone = 0;
         s->desiredAvailable = 0;
-
-        for( i=0; i<tor->info.pieceCount; ++i ) {
-            if( !tor->info.pieces[i].dnd ) {
-                s->sizeWhenDone += tor->info.pieceSize;
-                if( tr_bitfieldHas( peerPieces, i ) )
-                    s->desiredAvailable += tr_cpMissingBlocksInPiece( tor->completion, i );
-            }
-        }
-
+        for( i=0; i<tor->info.pieceCount; ++i )
+            if( !tor->info.pieces[i].dnd && tr_bitfieldHas( peerPieces, i ) )
+                s->desiredAvailable += tr_cpMissingBlocksInPiece( tor->completion, i );
         s->desiredAvailable *= tor->blockSize;
         tr_bitfieldFree( peerPieces );
     }

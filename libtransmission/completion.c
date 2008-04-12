@@ -302,6 +302,14 @@ tr_cpLeftUntilDone ( const tr_completion * cp )
     return cp->doneTotal - cp->doneHave;
 }
 
+uint64_t
+tr_cpSizeWhenDone( const tr_completion * cp )
+{
+    tr_cpEnsureDoneValid( cp );
+
+    return cp->doneTotal;
+}
+
 cp_status_t
 tr_cpGetStatus ( const tr_completion * cp )
 {

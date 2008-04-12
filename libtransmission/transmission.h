@@ -876,9 +876,18 @@ struct tr_stat
      * for more peers.  otherwise, the value is zero. */
     time_t manualAnnounceTime;
 
+    /* Byte count of all the piece data we'll have downloaded when we're done.
+     * whether or not we have it yet. [0...tr_info.totalSize] */
+    uint64_t sizeWhenDone;
+
     /* Byte count of how much data is left to be downloaded until
-     * we're done -- that is, until we've got all the pieces we wanted. */
+     * we're done -- that is, until we've got all the pieces we wanted.
+     * [0...tr_info.sizeWhenDone] */
     uint64_t leftUntilDone;
+
+    /* Byte count of all the piece data we want and don't have yet,
+     * but that a connected peer does have. [0...leftUntilDone] */
+    uint64_t desiredAvailable;
 
     /* Byte count of all the corrupt data you've ever downloaded for
      * this torrent.  If you're on a poisoned torrent, this number can
@@ -900,14 +909,6 @@ struct tr_stat
      * As pieces become complete, this value may decrease as portions of it are
      * moved to `corrupt' or `haveValid'. */
     uint64_t haveUnchecked;
-
-    /* Byte count of all the piece data we'll have downloaded when we're done.
-     * whether or not we have it yet. [0...tr_info.totalSize] */
-    uint64_t sizeWhenDone;
-
-    /* Byte count of all the piece data we want and don't have yet,
-     * but that a connected peer does have. [0...sizeWhenDone] */
-    uint64_t desiredAvailable;
 
     float swarmspeed;
 
