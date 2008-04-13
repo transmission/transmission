@@ -145,6 +145,12 @@
 		A29AF4F90D01BAEB00D097EC /* UpArrowTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F80D01BAEB00D097EC /* UpArrowTemplate.png */; };
 		A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = A2F8951E0A2D4BA500ED2127 /* Credits.rtf */; };
 		A29C8B370ACC6EB3000ED9F9 /* PortChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */; };
+		A29DF8B90DB2544C00D04E5A /* resume.c in Sources */ = {isa = PBXBuildFile; fileRef = A29DF8B60DB2544C00D04E5A /* resume.c */; };
+		A29DF8BA0DB2544C00D04E5A /* resume.h in Headers */ = {isa = PBXBuildFile; fileRef = A29DF8B70DB2544C00D04E5A /* resume.h */; };
+		A29DF8BB0DB2544C00D04E5A /* torrent.h in Headers */ = {isa = PBXBuildFile; fileRef = A29DF8B80DB2544C00D04E5A /* torrent.h */; };
+		A29DF8BC0DB2545900D04E5A /* ggets.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D307900D9EC46B0051FD27 /* ggets.c */; };
+		A29DF8BD0DB2545A00D04E5A /* ggets.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D307920D9EC4800051FD27 /* ggets.h */; };
+		A29DF8BE0DB2545F00D04E5A /* verify.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D22A110D65EED100007D5F /* verify.h */; };
 		A29E04B50DA8764100705643 /* Network.png in Resources */ = {isa = PBXBuildFile; fileRef = A29E04B40DA8764100705643 /* Network.png */; };
 		A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */; };
 		A2A3065C0AAD24A80049E2AC /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306540AAD24A80049E2AC /* UKFileWatcher.m */; };
@@ -162,7 +168,6 @@
 		A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */; };
 		A2D0E0490A54A97C003C72CF /* Bandwidth.png in Resources */ = {isa = PBXBuildFile; fileRef = A2D0E0480A54A97C003C72CF /* Bandwidth.png */; };
 		A2D22A130D65EEE700007D5F /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D22A100D65EED100007D5F /* verify.c */; };
-		A2D307910D9EC46B0051FD27 /* ggets.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D307900D9EC46B0051FD27 /* ggets.c */; };
 		A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D307A30D9EC6870051FD27 /* BlocklistDownloader.m */; };
 		A2D307B10D9EC9F50051FD27 /* BlocklistStatusWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */; };
 		A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36270CBC674900C2ED41 /* InfoActivity.png */; };
@@ -561,6 +566,9 @@
 		A29AF4F80D01BAEB00D097EC /* UpArrowTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpArrowTemplate.png; path = macosx/Images/UpArrowTemplate.png; sourceTree = "<group>"; };
 		A29C8B340ACC6EB3000ED9F9 /* PortChecker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PortChecker.h; path = macosx/PortChecker.h; sourceTree = "<group>"; };
 		A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PortChecker.m; path = macosx/PortChecker.m; sourceTree = "<group>"; };
+		A29DF8B60DB2544C00D04E5A /* resume.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = resume.c; path = libtransmission/resume.c; sourceTree = "<group>"; };
+		A29DF8B70DB2544C00D04E5A /* resume.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resume.h; path = libtransmission/resume.h; sourceTree = "<group>"; };
+		A29DF8B80DB2544C00D04E5A /* torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = torrent.h; path = libtransmission/torrent.h; sourceTree = "<group>"; };
 		A29E04B40DA8764100705643 /* Network.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Network.png; path = macosx/Images/Network.png; sourceTree = "<group>"; };
 		A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PeerProgressIndicatorCell.h; path = macosx/PeerProgressIndicatorCell.h; sourceTree = "<group>"; };
 		A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PeerProgressIndicatorCell.m; path = macosx/PeerProgressIndicatorCell.m; sourceTree = "<group>"; };
@@ -1046,6 +1054,9 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
+				A29DF8B60DB2544C00D04E5A /* resume.c */,
+				A29DF8B70DB2544C00D04E5A /* resume.h */,
+				A29DF8B80DB2544C00D04E5A /* torrent.h */,
 				4D36BA600CA2F00800A63CA5 /* crypto.c */,
 				4D36BA610CA2F00800A63CA5 /* crypto.h */,
 				4D36BA630CA2F00800A63CA5 /* handshake.c */,
@@ -1365,6 +1376,10 @@
 				4D36BA7B0CA2F00800A63CA5 /* ptrarray.h in Headers */,
 				4D36BA7C0CA2F00800A63CA5 /* publish.h in Headers */,
 				A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */,
+				A29DF8BA0DB2544C00D04E5A /* resume.h in Headers */,
+				A29DF8BB0DB2544C00D04E5A /* torrent.h in Headers */,
+				A29DF8BD0DB2545A00D04E5A /* ggets.h in Headers */,
+				A29DF8BE0DB2545F00D04E5A /* verify.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1784,6 +1799,8 @@
 				A201527E0D1C270F0081714F /* torrent-ctor.c in Sources */,
 				A2D22A130D65EEE700007D5F /* verify.c in Sources */,
 				4D4ADFC70DA1631500A68297 /* blocklist.c in Sources */,
+				A29DF8B90DB2544C00D04E5A /* resume.c in Sources */,
+				A29DF8BC0DB2545900D04E5A /* ggets.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1850,7 +1867,6 @@
 				A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */,
 				A26AF2840D2DC27C00FF7140 /* AddWindowController.m in Sources */,
 				A2FB701C0D95CAEA0001F331 /* GroupsController.m in Sources */,
-				A2D307910D9EC46B0051FD27 /* ggets.c in Sources */,
 				A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
