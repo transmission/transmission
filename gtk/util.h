@@ -85,6 +85,10 @@ getdownloaddir( void );
 
 void gtr_open_file( const char * path );
 
+guint gtr_inhibit_hibernation( void );
+
+void gtr_uninhibit_hibernation( guint );
+
 #ifdef GTK_MAJOR_VERSION
 
 /* here there be dragons */

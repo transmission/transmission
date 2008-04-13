@@ -263,6 +263,8 @@ setupsighandlers( void )
 int
 main( int argc, char ** argv )
 {
+    gboolean do_inhibit;
+    guint inhibit_cookie;
     char * err;
     struct cbdata * cbdata;
     GSList * argfiles;
@@ -338,7 +340,14 @@ main( int argc, char ** argv )
         g_free( err );
     }
 
+    do_inhibit = pref_flag_get( PREF_KEY_INHIBIT_HIBERNATION );
+    if( do_inhibit ) 
+        inhibit_cookie = gtr_inhibit_hibernation( );
+
     gtk_main();
+
+    if( do_inhibit ) 
+        gtr_uninhibit_hibernation( inhibit_cookie );
 
     return 0;
 }

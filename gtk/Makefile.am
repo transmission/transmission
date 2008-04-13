@@ -11,6 +11,7 @@ AM_CFLAGS = \
     $(OPENSSL_CFLAGS) \
     $(PTHREAD_CFLAGS) \
     $(GIO_CFLAGS) \
+    $(DBUS_GLIB_CFLAGS) \
     $(LIBNOTIFY_CFLAGS)
 
 noinst_HEADERS = \
@@ -75,6 +76,7 @@ transmission_LDADD = \
     $(GTK_LIBS) \
     $(GIO_LIBS) \
     $(LIBNOTIFY_LIBS) \
+    $(DBUS_GLIB_LIBS) \
     $(OPENSSL_LIBS) \
     $(PTHREAD_LIBS) -lm
 

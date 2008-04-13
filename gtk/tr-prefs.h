@@ -27,6 +27,7 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_OPTIONS_PROMPT         "show-options-window"
 #define PREF_KEY_DIR_DEFAULT            "default-download-directory"
 #define PREF_KEY_OPEN_DIALOG_FOLDER     "open-dialog-folder"
+#define PREF_KEY_INHIBIT_HIBERNATION    "inhibit-hibernation"
 #define PREF_KEY_DIR_WATCH              "watch-folder"
 #define PREF_KEY_DIR_WATCH_ENABLED      "watch-folder-enabled"
 #define PREF_KEY_START                  "start-added-torrents"

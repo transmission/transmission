@@ -15,11 +15,13 @@ GLIB_MINIMUM=2.6.0
 GTK_MINIMUM=2.6.0
 WX_MINIMUM=2.6.0
 LIBNOTIFY_MINIMUM=0.4.4
+DBUS_GLIB_MINIMUM=0.70
 AC_SUBST(GIO_MINIMUM)
 AC_SUBST(GLIB_MINIMUM)
 AC_SUBST(GTK_MINIMUM)
 AC_SUBST(WX_MINIMUM)
 AC_SUBST(LIBNOTIFY_MINIMUM)
+AC_SUBST(DBUS_GLIB_MINIMUM)
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -114,6 +116,16 @@ AC_SUBST(LIBNOTIFY_LIBS)
 AC_SUBST(LIBNOTIFY_CFLAGS)
 if test "x$use_libnotify" = "xyes"; then
     AC_DEFINE([HAVE_LIBNOTIFY], 1)
+fi
+
+PKG_CHECK_MODULES([DBUS_GLIB],
+                  [dbus-glib-1 >= $DBUS_GLIB_MINIMUM],
+                  [use_dbus_glib=yes],
+                  [use_dbus_glib=no])
+AC_SUBST(DBUS_GLIB_LIBS)
+AC_SUBST(DBUS_GLIB_CFLAGS)
+if test "x$use_dbus_glib" = "xyes"; then
+    AC_DEFINE([HAVE_DBUS_GLIB], 1)
 fi
 
 AC_CHECK_HEADERS([libintl.h])
@@ -289,8 +301,9 @@ Configuration:
         Build Daemon:               ${build_daemon}
         Build BeOS client:          ${build_beos}
         Build GTK+ client:          ${build_gtk}
-          ... libnotify support:    ${use_libnotify}
           ... gio support:          ${use_gio}
+          ... dbus-glib support:    ${use_dbus_glib}
+          ... libnotify support:    ${use_libnotify}
         Build OS X client:          ${build_darwin}
         Build wxWidgets client:     ${build_wx}
 

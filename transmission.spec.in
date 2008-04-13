@@ -15,10 +15,12 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires: glib2-devel >= @GLIB_REQUIRED@
 BuildRequires: gtk2-devel >= @GTK_REQUIRED@
 BuildRequires: libnotify-devel >= @LIBNOTIFY_REQUIRED@
+BuildRequires: dbus-glib-devel >= @DBUS_GLIB_REQUIRED@
 
 Requires: glib2 >= @GLIB_REQUIRED@
 Requires: gtk2 >= @GTK_REQUIRED@
 Requires: libnotify >= @LIBNOTIFY_REQUIRED@
+Requires: dbus-glib >= @DBUS_GLIB_REQUIRED@
 
 Provides: %{name}
 

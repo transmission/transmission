@@ -32,10 +32,14 @@
 #ifdef HAVE_GIO
 #include <gio/gio.h> /* g_file_trash() */
 #endif
+#ifdef HAVE_DBUS_GLIB
+#include <dbus/dbus-glib.h>
+#endif
 
 #include <libevent/evhttp.h>
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
+#include <libtransmission/utils.h> /* tr_inf */
 
 #include "conf.h"
 #include "tr-prefs.h"
@@ -460,4 +464,78 @@ gtr_open_file( const char * path )
                            NULL, NULL, NULL, NULL );
         }
     }
+}
+
+#ifdef HAVE_DBUS_GLIB
+static DBusGProxy*
+get_hibernation_inhibit_proxy( void )
+{
+    GError * error = NULL;
+    DBusGConnection * conn;
+
+    conn = dbus_g_bus_get( DBUS_BUS_SESSION, &error );
+    if( error )
+    {
+        g_warning ("DBUS cannot connect : %s", error->message);
+        g_error_free (error);
+        return NULL;
+    }
+
+    return dbus_g_proxy_new_for_name (conn,
+               "org.freedesktop.PowerManagement",
+               "/org/freedesktop/PowerManagement/Inhibit",
+               "org.freedesktop.PowerManagement.Inhibit" );
+}
+#endif
+
+guint
+gtr_inhibit_hibernation( void )
+{
+    guint inhibit_cookie = 0;
+#ifdef HAVE_DBUS_GLIB
+    DBusGProxy * proxy = get_hibernation_inhibit_proxy( );
+    if( proxy )
+    {
+        GError * error = NULL;
+        const char * application = _( "Transmission Bittorrent Client" );
+        const char * reason = _( "BitTorrent Activity" );
+        gboolean success = dbus_g_proxy_call( proxy, "Inhibit", &error,
+                                              G_TYPE_STRING, application,
+                                              G_TYPE_STRING, reason,
+                                              G_TYPE_INVALID,
+                                              G_TYPE_UINT, &inhibit_cookie,
+                                              G_TYPE_INVALID );
+        if( success )
+            tr_inf( _( "Desktop hibernation disabled while Transmission is running" ) );
+        else {
+            tr_err( _( "Couldn't disable desktop hibernation: %s." ), error->message );
+            g_error_free( error );
+        }
+
+        g_object_unref( G_OBJECT( proxy ) );
+    }
+#endif
+    return inhibit_cookie;
+}
+
+void
+gtr_uninhibit_hibernation( guint inhibit_cookie )
+{
+#ifdef HAVE_DBUS_GLIB
+    DBusGProxy * proxy = get_hibernation_inhibit_proxy( );
+    if( proxy )
+    {
+        GError * error = NULL;
+        gboolean success = dbus_g_proxy_call( proxy, "UnInhibit", &error,
+                                              G_TYPE_UINT, inhibit_cookie,
+                                              G_TYPE_INVALID,
+                                              G_TYPE_INVALID );
+        if( !success ) {
+            g_warning( "Couldn't uninhibit the system from suspending: %s.", error->message );
+            g_error_free( error );
+        }
+
+        g_object_unref( G_OBJECT( proxy ) );
+    }
+#endif
 }
