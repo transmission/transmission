@@ -169,12 +169,14 @@ testParse( void )
     const uint8_t * end;
     int err;
     int len;
+    int64_t i;
     char * saved;
 
     snprintf( (char*)buf, sizeof( buf ), "i64e" );
     err = tr_bencParse( buf, buf + sizeof( buf ), &val, &end );
     check( !err );
-    check( tr_bencGetInt( &val ) == 64 );
+    check( tr_bencGetInt( &val, &i ) );
+    check( i == 64 );
     check( end == buf + 4 );
     tr_bencFree( &val );
 
@@ -183,9 +185,12 @@ testParse( void )
     check( !err );
     check( end == buf + strlen( (char*)buf ) );
     check( val.val.l.count == 3 );
-    check( tr_bencGetInt( &val.val.l.vals[0] ) == 64 );
-    check( tr_bencGetInt( &val.val.l.vals[1] ) == 32 );
-    check( tr_bencGetInt( &val.val.l.vals[2] ) == 16 );
+    check( tr_bencGetInt( &val.val.l.vals[0], &i ) );
+    check( i == 64 );
+    check( tr_bencGetInt( &val.val.l.vals[1], &i ) );
+    check( i == 32 );
+    check( tr_bencGetInt( &val.val.l.vals[2], &i ) );
+    check( i == 16 );
     saved = tr_bencSave( &val, &len );
     check( !strcmp( saved, (char*)buf ) );
     tr_free( saved );

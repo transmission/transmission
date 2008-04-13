@@ -385,11 +385,15 @@ tr_bencListGetNthChild( tr_benc * val, int i )
     return ret;
 }
 
-int64_t
-tr_bencGetInt ( const tr_benc * val )
+int
+tr_bencGetInt ( const tr_benc * val, int64_t * setme )
 {
-    assert( tr_bencIsInt( val ) );
-    return val->val.i;
+    int success = FALSE;
+    if( tr_bencIsInt( val )) {
+        *setme = val->val.i ;
+        success = TRUE;
+    }
+    return success;
 }
 
 char *
@@ -398,6 +402,84 @@ tr_bencStealStr( tr_benc * val )
     assert( tr_bencIsString( val ) );
     val->val.s.nofree = 1;
     return val->val.s.s;
+}
+
+int
+tr_bencDictFindInt( tr_benc * dict, const char * key, int64_t * setme )
+{
+    int found = FALSE;
+    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_INT );
+    if( child )
+        found = tr_bencGetInt( child, setme );
+    return found;
+}
+
+int
+tr_bencDictFindList( tr_benc * dict, const char * key, tr_benc ** setme )
+{
+    int found = FALSE;
+    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_LIST );
+    if( child ) {
+        *setme = child;
+        found = TRUE;
+    }
+    return found;
+}
+
+int
+tr_bencDictFindDict( tr_benc * dict, const char * key, tr_benc ** setme )
+{
+    int found = FALSE;
+    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_DICT );
+    if( child ) {
+        *setme = child;
+        found = TRUE;
+    }
+    return found;
+}
+
+int
+tr_bencDictFindStr( tr_benc * dict, const char * key, const char ** setme )
+{
+    int found = FALSE;
+    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_STR );
+    if( child ) {
+        *setme = child->val.s.s;
+        found = TRUE;
+    }
+    return found;
+}
+
+tr_benc*
+tr_bencDictAddInt( tr_benc * dict, const char * key, int64_t val )
+{
+    tr_benc * child = tr_bencDictAdd( dict, key );
+    tr_bencInitInt( child, val );
+    return child;
+}
+
+tr_benc*
+tr_bencDictAddStr( tr_benc * dict, const char * key, const char * val )
+{
+    tr_benc * child = tr_bencDictAdd( dict, key );
+    tr_bencInitStrDup( child, val );
+    return child;
+}
+
+tr_benc*
+tr_bencDictAddList( tr_benc * dict, const char * key, int reserveCount )
+{
+    tr_benc * child = tr_bencDictAdd( dict, key );
+    tr_bencInitList( child, reserveCount );
+    return child;
+}
+
+tr_benc*
+tr_bencDictAddDict( tr_benc * dict, const char * key, int reserveCount )
+{
+    tr_benc * child = tr_bencDictAdd( dict, key );
+    tr_bencInitDict( child, reserveCount );
+    return child;
 }
 
 /***
@@ -418,14 +500,20 @@ _tr_bencInitStr( tr_benc * val, char * str, int len, int nofree )
 }
 
 int
-tr_bencInitStrDup( tr_benc * val, const char * str )
+tr_bencInitStrDupLen( tr_benc * val, const char * str, int len )
 {
-    char * newStr = tr_strdup( str );
+    char * newStr = tr_strndup( str, len );
     if( newStr == NULL )
         return 1;
 
     _tr_bencInitStr( val, newStr, 0, 0 );
     return 0;
+}
+
+int
+tr_bencInitStrDup( tr_benc * val, const char * str )
+{
+    return tr_bencInitStrDupLen( val, str, -1 );
 }
 
 void
@@ -469,6 +557,10 @@ tr_bencListAdd( tr_benc * list )
     tr_benc * item;
 
     assert( tr_bencIsList( list ) );
+
+    if( list->val.l.count == list->val.l.alloc )
+        tr_bencListReserve( list, LIST_SIZE );
+
     assert( list->val.l.count < list->val.l.alloc );
 
     item = &list->val.l.vals[list->val.l.count];
@@ -691,7 +783,7 @@ bencWalk( const tr_benc   * top,
 static void
 saveIntFunc( const tr_benc * val, void * evbuf )
 {
-    evbuffer_add_printf( evbuf, "i%"PRId64"e", tr_bencGetInt(val) );
+    evbuffer_add_printf( evbuf, "i%"PRId64"e", val->val.i );
 }
 static void
 saveStringFunc( const tr_benc * val, void * vevbuf )
@@ -794,7 +886,7 @@ printIntFunc( const tr_benc * val, void * vdata )
 {
     struct WalkPrint * data = vdata;
     printLeadingSpaces( data );
-    fprintf( data->out, "int:  %"PRId64"\n", tr_bencGetInt(val) );
+    fprintf( data->out, "int:  %"PRId64"\n", val->val.i );
 }
 static void
 printStringFunc( const tr_benc * val, void * vdata )
@@ -903,7 +995,7 @@ phpIntFunc( const tr_benc * val, void * vdata )
 {
     struct phpWalk * data = vdata;
     phpChildFunc( data );
-    evbuffer_add_printf( data->out, "i:%"PRId64";", tr_bencGetInt(val) );
+    evbuffer_add_printf( data->out, "i:%"PRId64";", val->val.i );
 }
 static void
 phpStringFunc( const tr_benc * val, void * vdata )

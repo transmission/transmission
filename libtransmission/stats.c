@@ -37,22 +37,22 @@ parseCumulativeStats( tr_session_stats  * setme,
 
     if( !tr_bencLoad( content, len, &top, NULL ) )
     {
-        const tr_benc * val;
+        int64_t i;
 
-        if(( val = tr_bencDictFindType( &top, "uploaded-bytes", TYPE_INT )))
-            setme->uploadedBytes = (uint64_t) tr_bencGetInt( val );
+        if( tr_bencDictFindInt( &top, "uploaded-bytes", &i ) )
+            setme->uploadedBytes = (uint64_t) i;
 
-        if(( val = tr_bencDictFindType( &top, "downloaded-bytes", TYPE_INT )))
-            setme->downloadedBytes = (uint64_t) tr_bencGetInt( val );
+        if( tr_bencDictFindInt( &top, "downloaded-bytes", &i ) )
+            setme->downloadedBytes = (uint64_t) i;
 
-        if(( val = tr_bencDictFindType( &top, "files-added", TYPE_INT )))
-            setme->filesAdded = (uint64_t) tr_bencGetInt( val );
+        if( tr_bencDictFindInt( &top, "files-added", &i ) )
+            setme->filesAdded = (uint64_t) i;
 
-        if(( val = tr_bencDictFindType( &top, "session-count", TYPE_INT )))
-            setme->sessionCount = (uint64_t) tr_bencGetInt( val );
+        if( tr_bencDictFindInt( &top, "session-count", &i ) )
+            setme->sessionCount = (uint64_t) i;
 
-        if(( val = tr_bencDictFindType( &top, "seconds-active", TYPE_INT )))
-            setme->secondsActive = (uint64_t) tr_bencGetInt( val );
+        if( tr_bencDictFindInt( &top, "seconds-active", &i ) )
+            setme->secondsActive = (uint64_t) i;
 
         tr_bencFree( &top );
     }

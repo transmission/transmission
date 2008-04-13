@@ -68,6 +68,10 @@ int tr_bencLoad( const void  * buf,
 
 void      tr_bencPrint( const tr_benc * );
 void      tr_bencFree( tr_benc * );
+int       tr_bencDictFindInt( tr_benc * dict, const char * key, int64_t * setme );
+int       tr_bencDictFindStr( tr_benc * dict, const char * key, const char ** setme );
+int       tr_bencDictFindList( tr_benc * dict, const char * key, tr_benc ** setme );
+int       tr_bencDictFindDict( tr_benc * dict, const char * key, tr_benc ** setme );
 tr_benc * tr_bencDictFind( tr_benc * dict, const char * key );
 tr_benc * tr_bencDictFindType( tr_benc * dict, const char * key, int type );
 tr_benc * tr_bencDictFindFirst( tr_benc * dict, ... );
@@ -87,6 +91,7 @@ static inline void tr_bencInit( tr_benc    * val, int type )
     _tr_bencInitStr( (a), ( char * )(b), (c), (d) )
 void   _tr_bencInitStr( tr_benc * val, char * str, int len, int nofree );
 int    tr_bencInitStrDup( tr_benc * val, const char * str );
+int    tr_bencInitStrDupLen( tr_benc * val, const char * str, int len );
 void   tr_bencInitInt( tr_benc * val, int64_t num );
 int   tr_bencInitDict( tr_benc * val, int reserveCount );
 int   tr_bencInitList( tr_benc * val, int reserveCount );
@@ -95,13 +100,16 @@ int   tr_bencListReserve( tr_benc * list, int count );
 int   tr_bencDictReserve( tr_benc * dict, int count );
 tr_benc    * tr_bencListAdd( tr_benc  * list );
 /* note: key must not be freed or modified while val is in use */
-tr_benc    * tr_bencDictAdd( tr_benc  * dict, const char * key );
+tr_benc    * tr_bencDictAdd( tr_benc * dict, const char * key );
+tr_benc    * tr_bencDictAddInt( tr_benc * dict, const char * key, int64_t val );
+tr_benc    * tr_bencDictAddStr( tr_benc * dict, const char * key, const char * val );
+tr_benc    * tr_bencDictAddList( tr_benc * dict, const char * key, int reserveCount );
+tr_benc    * tr_bencDictAddDict( tr_benc * dict, const char * key, int reserveCount );
 
 char*  tr_bencSave( const tr_benc * val, int * len );
 char*   tr_bencSaveAsSerializedPHP( const tr_benc * top, int * len );
 
-
-int64_t tr_bencGetInt( const tr_benc * val );
+int tr_bencGetInt( const tr_benc * val, int64_t * setme );
 
 int tr_bencIsType( const tr_benc *, int type );
 #define tr_bencIsInt(b) (tr_bencIsType(b,TYPE_INT))
