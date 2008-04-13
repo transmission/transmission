@@ -114,13 +114,16 @@ verifyRequested( GtkButton * button UNUSED, gpointer gdata )
 static void
 destinationChanged( GtkFileChooserButton * b, gpointer gdata )
 {
-    struct AddData * data = gdata;
+    char * fname = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( b ) );
+    if( fname )
+    {
+        struct AddData * data = gdata;
+        g_free( data->destination );
+        data->destination = fname;
 
-    g_free( data->destination );
-    data->destination = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( b ) );
-
-    updateTorrent( data );
-    verifyRequested( NULL, data );
+        updateTorrent( data );
+        verifyRequested( NULL, data );
+    }
 }
 
 static void
@@ -173,6 +176,7 @@ addSingleTorrentDialog( GtkWindow  * parent,
 
     if( tr_ctorGetDestination( ctor, TR_FORCE, &str ) )
         g_assert_not_reached( );
+    g_assert( str );
 
     data = g_new0( struct AddData, 1 );
     data->core = core;
