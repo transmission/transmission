@@ -237,19 +237,20 @@ const tr_bitfield * tr_cpBlockBitfield( const tr_completion * cp )
     return cp->blockBitfield;
 }
 
-void
+tr_errno
 tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * bitfield )
 {
     tr_block_index_t i;
 
-    assert( cp != NULL );
-    assert( bitfield != NULL );
+    if( !cp || !bitfield || ( bitfield->len != cp->blockBitfield->len ) )
+        return TR_ERROR_ASSERT;
 
     tr_cpReset( cp );
-
     for( i=0; i < cp->tor->blockCount; ++i )
         if( tr_bitfieldHas( bitfield, i ) )
             tr_cpBlockAdd( cp, i );
+
+    return 0;
 }
 
 float

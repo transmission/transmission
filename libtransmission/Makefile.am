@@ -28,6 +28,7 @@ libtransmission_a_SOURCES = \
     ptrarray.c \
     publish.c \
     ratecontrol.c \
+    resume.c \
     session.c \
     stats.c \
     torrent.c \
@@ -64,6 +65,7 @@ noinst_HEADERS = \
     ptrarray.h \
     publish.h \
     ratecontrol.h \
+    resume.h \
     session.h \
     stats.h \
     torrent.h \

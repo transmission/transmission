@@ -56,6 +56,7 @@
 #include "fastresume.h"
 #include "peer-mgr.h"
 #include "platform.h"
+#include "resume.h" /* TR_FR_ bitwise enum */
 #include "torrent.h"
 #include "utils.h"
 
@@ -115,7 +116,7 @@ enum
 #define FR_MTIME_LEN( t ) \
   ( sizeof(tr_time_t) * (t)->info.fileCount )
 #define FR_BLOCK_BITFIELD_LEN( t ) \
-  ( ( (t)->blockCount + 7 ) / 8 )
+  ( ( (t)->blockCount + 7u ) / 8u )
 #define FR_PROGRESS_LEN( t ) \
   ( FR_MTIME_LEN( t ) + FR_BLOCK_BITFIELD_LEN( t ) )
 #define FR_SPEED_LEN (2 * (sizeof(uint16_t) + sizeof(uint8_t) ) )
@@ -426,9 +427,12 @@ parseProgress( tr_torrent     * tor,
         memset( &bitfield, 0, sizeof bitfield );
         bitfield.len = FR_BLOCK_BITFIELD_LEN( tor );
         bitfield.bits = (uint8_t*) walk;
-        tr_cpBlockBitfieldSet( tor->completion, &bitfield );
-
-        ret = TR_FR_PROGRESS;
+        if( !tr_cpBlockBitfieldSet( tor->completion, &bitfield ) )
+            ret = TR_FR_PROGRESS;
+        else {
+            tr_torrentUncheck( tor );
+            tr_tordbg( tor, "Torrent needs to be verified" );
+        }
     }
 
     /* the files whose mtimes are wrong,

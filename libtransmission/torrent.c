@@ -29,7 +29,7 @@
 #include "bencode.h"
 #include "completion.h"
 #include "crypto.h" /* for tr_sha1 */
-#include "fastresume.h"
+#include "resume.h"
 #include "fdlimit.h" /* tr_fdFileClose */
 #include "metainfo.h"
 #include "peer-mgr.h"
@@ -353,7 +353,7 @@ torrentRealInit( tr_handle     * h,
 
     tor->checkedPieces = tr_bitfieldNew( tor->info.pieceCount );
     tr_torrentUncheck( tor );
-    loaded = tr_fastResumeLoad( tor, ~0, ctor );
+    loaded = tr_torrentLoadResume( tor, ~0, ctor );
     
     doStart = tor->isRunning;
     tor->isRunning = 0;
@@ -457,16 +457,6 @@ tr_torrentNew( tr_handle      * handle,
     return tor;
 }
 
-/***
-****
-***/
-
-static void
-saveFastResumeNow( tr_torrent * tor )
-{
-    tr_fastResumeSave( tor );
-}
-
 /**
 ***
 **/
@@ -476,7 +466,7 @@ tr_torrentSetFolder( tr_torrent * tor, const char * path )
 {
     tr_free( tor->destination );
     tor->destination = tr_strdup( path );
-    saveFastResumeNow( tor );
+    tr_torrentSaveResume( tor );
 }
 
 const char*
@@ -824,7 +814,7 @@ tr_torrentRemoveSaved( tr_torrent * tor )
 {
     tr_metainfoRemoveSaved( tor->handle, tor->info.hashString );
 
-    tr_fastResumeRemove( tor );
+    tr_torrentRemoveResume( tor );
 }
 
 /***
@@ -921,7 +911,7 @@ checkAndStartImpl( void * vtor )
     *tor->errorString = '\0';
     tr_torrentResetTransferStats( tor );
     tor->cpStatus = tr_cpGetStatus( tor->completion );
-    saveFastResumeNow( tor );
+    tr_torrentSaveResume( tor );
     tor->startDate = tr_date( );
     tr_trackerStart( tor->tracker );
     tr_peerMgrStartTorrent( tor->handle->peerMgr, tor->info.hash );
@@ -942,7 +932,7 @@ tr_torrentStart( tr_torrent * tor )
 
     if( !tor->isRunning )
     {
-        tr_fastResumeLoad( tor, TR_FR_PROGRESS, NULL );
+        tr_torrentLoadResume( tor, TR_FR_PROGRESS, NULL );
         tor->isRunning = 1;
         tr_verifyAdd( tor, checkAndStartCB );
     }
@@ -999,7 +989,7 @@ tr_torrentStop( tr_torrent * tor )
     tr_globalLock( tor->handle );
 
     if( !tor->isDeleting )
-        saveFastResumeNow( tor );
+        tr_torrentSaveResume( tor );
     tor->isRunning = 0;
     tr_runInEventThread( tor->handle, stopTorrent, tor );
 
@@ -1010,7 +1000,7 @@ static void
 closeTorrent( void * vtor )
 {
     tr_torrent * tor = vtor;
-    saveFastResumeNow( tor );
+    tr_torrentSaveResume( tor );
     tor->isRunning = 0;
     stopTorrent( tor );
     if( tor->isDeleting )
@@ -1112,7 +1102,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         if( recentChange && ( cpStatus == TR_CP_COMPLETE ) )
             tr_trackerCompleted( tor->tracker );
 
-        saveFastResumeNow( tor );
+        tr_torrentSaveResume( tor );
     }
 
     tr_torrentUnlock( tor );
@@ -1158,7 +1148,7 @@ tr_torrentSetFilePriorities( tr_torrent       * tor,
     for( i=0; i<fileCount; ++i )
         tr_torrentInitFilePriority( tor, files[i], priority );
 
-    saveFastResumeNow( tor );
+    tr_torrentSaveResume( tor );
     tr_torrentUnlock( tor );
 }
 
@@ -1285,7 +1275,7 @@ tr_torrentSetFileDLs ( tr_torrent      * tor,
 {
     tr_torrentLock( tor );
     tr_torrentInitFileDLs( tor, files, fileCount, doDownload );
-    saveFastResumeNow( tor );
+    tr_torrentSaveResume( tor );
     tr_torrentUnlock( tor );
 }
 

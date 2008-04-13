@@ -14,7 +14,7 @@
 
 #include "transmission.h"
 #include "completion.h"
-#include "fastresume.h" /* tr_fastResumeSave() */
+#include "resume.h" /* tr_torrentSaveResume() */
 #include "inout.h"
 #include "list.h"
 #include "platform.h"
@@ -133,7 +133,7 @@ verifyThreadFunc( void * unused UNUSED )
 
         if( !stopCurrent )
         {
-            tr_fastResumeSave( tor );
+            tr_torrentSaveResume( tor );
             fireCheckDone( tor, currentNode.verify_done_cb );
         }
     }
