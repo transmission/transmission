@@ -346,7 +346,7 @@ main( int argc, char ** argv )
 
     gtk_main();
 
-    if( do_inhibit ) 
+    if( do_inhibit && inhibit_cookie ) 
         gtr_uninhibit_hibernation( inhibit_cookie );
 
     return 0;
