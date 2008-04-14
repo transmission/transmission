@@ -121,6 +121,7 @@ enum
   ( FR_MTIME_LEN( t ) + FR_BLOCK_BITFIELD_LEN( t ) )
 #define FR_SPEED_LEN (2 * (sizeof(uint16_t) + sizeof(uint8_t) ) )
 
+#if 0
 static void
 fastResumeFileName( char * buf, size_t buflen, const tr_torrent * tor, int tag )
 {
@@ -138,6 +139,7 @@ fastResumeFileName( char * buf, size_t buflen, const tr_torrent * tor, int tag )
         tr_buildPath( buf, buflen, cacheDir, base, NULL );
     }
 }
+#endif
 
 static tr_time_t*
 getMTimes( const tr_torrent * tor, int * setme_n )
@@ -164,6 +166,7 @@ getMTimes( const tr_torrent * tor, int * setme_n )
     return m;
 }
 
+#if 0
 static void
 fastResumeWriteData( uint8_t       id,
                      const void  * data,
@@ -325,6 +328,7 @@ tr_fastResumeSave( const tr_torrent * tor )
 
     fclose( file );
 }
+#endif
 
 /***
 ****

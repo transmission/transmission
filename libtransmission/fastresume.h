@@ -25,8 +25,6 @@
 #ifndef TR_FAST_RESUME_H
 #define TR_FAST_RESUME_H
 
-void tr_fastResumeSave( const tr_torrent * tor );
-
 /**
  * Returns a bitwise-or'ed set of the data loaded from fastresume
  */
