@@ -409,7 +409,7 @@ tr_torrentLoadResume( tr_torrent    * tor,
         fieldsLoaded |= TR_FR_CORRUPT;
     }
 
-    if( ( fieldsToLoad & TR_FR_DESTINATION )
+    if( ( fieldsToLoad & ( TR_FR_PROGRESS | TR_FR_DESTINATION ) )
             && tr_bencDictFindStr( &top, KEY_DESTINATION, &str ) ) {
         tr_free( tor->destination );
         tor->destination = tr_strdup( str );
