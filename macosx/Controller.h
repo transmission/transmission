@@ -194,6 +194,7 @@ typedef enum
 
 - (void) torrentFinishedDownloading: (NSNotification *) notification;
 - (void) torrentRestartedDownloading: (NSNotification *) notification;
+- (void) torrentStoppedForRatio: (NSNotification *) notification;
 
 - (void) updateTorrentHistory;
 
@@ -226,8 +227,6 @@ typedef enum
 
 - (void) setRatioGlobalEnabled: (id) sender;
 - (void) setQuickRatioGlobal: (id) sender;
-
-- (void) torrentStoppedForRatio: (NSNotification *) notification;
 
 - (void) changeAutoImport;
 - (void) checkAutoImportDirectory;

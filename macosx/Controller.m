@@ -1593,32 +1593,33 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     return desired;
 }
 
+#warning migrate to Torrent.m
 - (void) torrentFinishedDownloading: (NSNotification *) notification
 {
     Torrent * torrent = [notification object];
     
-    if (!fSoundPlaying && [fDefaults boolForKey: @"PlayDownloadSound"])
-    {
-        NSSound * sound;
-        if ((sound = [NSSound soundNamed: [fDefaults stringForKey: @"DownloadSound"]]))
-        {
-            [sound setDelegate: self];
-            fSoundPlaying = YES;
-            [sound play];
-        }
-    }
-    
-    NSDictionary * clickContext = [NSDictionary dictionaryWithObjectsAndKeys: GROWL_DOWNLOAD_COMPLETE, @"Type",
-                                    [torrent dataLocation] , @"Location", nil];
-    [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Download Complete", "Growl notification title")
-                                description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE
-                                iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
-    
-    if (![fWindow isMainWindow])
-        [fBadger incrementCompleted];
-    
     if ([torrent isActive])
     {
+        if (!fSoundPlaying && [fDefaults boolForKey: @"PlayDownloadSound"])
+        {
+            NSSound * sound;
+            if ((sound = [NSSound soundNamed: [fDefaults stringForKey: @"DownloadSound"]]))
+            {
+                [sound setDelegate: self];
+                fSoundPlaying = YES;
+                [sound play];
+            }
+        }
+        
+        NSDictionary * clickContext = [NSDictionary dictionaryWithObjectsAndKeys: GROWL_DOWNLOAD_COMPLETE, @"Type",
+                                        [torrent dataLocation] , @"Location", nil];
+        [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Download Complete", "Growl notification title")
+                                    description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE
+                                    iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
+        
+        if (![fWindow isMainWindow])
+            [fBadger incrementCompleted];
+        
         if ([fDefaults boolForKey: @"QueueSeed"] && [self numToStartFromQueue: NO] <= 0)
         {
             [torrent stopTransfer];
@@ -1642,6 +1643,32 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     [self updateTorrentsInQueue];
+}
+
+- (void) torrentStoppedForRatio: (NSNotification *) notification
+{
+    Torrent * torrent = [notification object];
+    
+    [self updateTorrentsInQueue];
+    [fInfoController updateInfoStats];
+    [fInfoController updateOptions];
+    
+    if (!fSoundPlaying && [fDefaults boolForKey: @"PlaySeedingSound"])
+    {
+        NSSound * sound;
+        if ((sound = [NSSound soundNamed: [fDefaults stringForKey: @"SeedingSound"]]))
+        {
+            [sound setDelegate: self];
+            fSoundPlaying = YES;
+            [sound play];
+        }
+    }
+    
+    NSDictionary * clickContext = [NSDictionary dictionaryWithObjectsAndKeys: GROWL_SEEDING_COMPLETE, @"Type",
+                                    [torrent dataLocation], @"Location", nil];
+    [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Seeding Complete", "Growl notification title")
+                        description: [torrent name] notificationName: GROWL_SEEDING_COMPLETE
+                        iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
 }
 
 - (void) updateTorrentHistory
@@ -2339,32 +2366,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fDefaults setFloat: [[sender representedObject] floatValue] forKey: @"RatioLimit"];
     
     [fPrefsController updateRatioStopField];
-}
-
-- (void) torrentStoppedForRatio: (NSNotification *) notification
-{
-    Torrent * torrent = [notification object];
-    
-    [self updateTorrentsInQueue];
-    [fInfoController updateInfoStats];
-    [fInfoController updateOptions];
-    
-    if (!fSoundPlaying && [fDefaults boolForKey: @"PlaySeedingSound"])
-    {
-        NSSound * sound;
-        if ((sound = [NSSound soundNamed: [fDefaults stringForKey: @"SeedingSound"]]))
-        {
-            [sound setDelegate: self];
-            fSoundPlaying = YES;
-            [sound play];
-        }
-    }
-    
-    NSDictionary * clickContext = [NSDictionary dictionaryWithObjectsAndKeys: GROWL_SEEDING_COMPLETE, @"Type",
-                                    [torrent dataLocation], @"Location", nil];
-    [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Seeding Complete", "Growl notification title")
-                        description: [torrent name] notificationName: GROWL_SEEDING_COMPLETE
-                        iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
 }
 
 - (void) sound: (NSSound *) sound didFinishPlaying: (BOOL) finishedPlaying
