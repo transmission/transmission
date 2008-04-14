@@ -81,27 +81,20 @@ loadCumulativeStats( const tr_handle * handle, tr_session_stats * setme )
 }
 
 static void
-saveCumulativeStats( const tr_handle * handle, const tr_session_stats * stats )
+saveCumulativeStats( const tr_handle * handle, const tr_session_stats * s )
 {
-    FILE * fp;
-    char * str;
     char filename[MAX_PATH_LENGTH];
-    int len;
     tr_benc top;
 
     tr_bencInitDict( &top, 5 );
-    tr_bencInitInt( tr_bencDictAdd( &top, "uploaded-bytes" ), stats->uploadedBytes );
-    tr_bencInitInt( tr_bencDictAdd( &top, "downloaded-bytes" ), stats->downloadedBytes );
-    tr_bencInitInt( tr_bencDictAdd( &top, "files-added" ), stats->filesAdded );
-    tr_bencInitInt( tr_bencDictAdd( &top, "session-count" ), stats->sessionCount );
-    tr_bencInitInt( tr_bencDictAdd( &top, "seconds-active" ), stats->secondsActive );
+    tr_bencInitInt( tr_bencDictAdd( &top, "uploaded-bytes" ), s->uploadedBytes );
+    tr_bencInitInt( tr_bencDictAdd( &top, "downloaded-bytes" ), s->downloadedBytes );
+    tr_bencInitInt( tr_bencDictAdd( &top, "files-added" ), s->filesAdded );
+    tr_bencInitInt( tr_bencDictAdd( &top, "session-count" ), s->sessionCount );
+    tr_bencInitInt( tr_bencDictAdd( &top, "seconds-active" ), s->secondsActive );
 
-    str = tr_bencSave( &top, &len );
     getFilename( handle, filename, sizeof(filename) );
-    fp = fopen( filename, "wb+" );
-    fwrite( str, 1, len, fp );
-    fclose( fp );
-    tr_free( str );
+    tr_bencSaveFile( filename, &top );
 
     tr_bencFree( &top );
 }

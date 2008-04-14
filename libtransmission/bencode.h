@@ -99,6 +99,7 @@ int   tr_bencListReserve( tr_benc * list, int count );
 /* note that for one key-value pair, count should be 1, not 2 */
 int   tr_bencDictReserve( tr_benc * dict, int count );
 tr_benc    * tr_bencListAdd( tr_benc  * list );
+tr_benc    * tr_bencListAddInt( tr_benc  * list, int64_t val );
 /* note: key must not be freed or modified while val is in use */
 tr_benc    * tr_bencDictAdd( tr_benc * dict, const char * key );
 tr_benc    * tr_bencDictAddInt( tr_benc * dict, const char * key, int64_t val );
@@ -107,7 +108,9 @@ tr_benc    * tr_bencDictAddList( tr_benc * dict, const char * key, int reserveCo
 tr_benc    * tr_bencDictAddDict( tr_benc * dict, const char * key, int reserveCount );
 
 char*  tr_bencSave( const tr_benc * val, int * len );
-char*   tr_bencSaveAsSerializedPHP( const tr_benc * top, int * len );
+char*  tr_bencSaveAsSerializedPHP( const tr_benc * top, int * len );
+int    tr_bencSaveFile( const char * filename, const tr_benc * );
+int    tr_bencLoadFile( const char * filename, tr_benc * );
 
 int tr_bencGetInt( const tr_benc * val, int64_t * setme );
 

@@ -125,25 +125,64 @@ strlcat_utf8( void * dest, const void * src, size_t len, char skip )
 }
 
 static void
-savedname( const tr_handle * handle,
-           char            * name,
-           size_t            len,
-           const char      * hash )
+getTorrentFilename( const tr_handle  * handle,
+                    const tr_info    * inf,
+                    char             * buf,
+                    size_t             buflen )
+{
+    const char * dir = tr_getTorrentDir( handle );
+    char base[MAX_PATH_LENGTH];
+    snprintf( base, sizeof( base ), "%s.%16.16s.torrent", inf->name, inf->hashString );
+    tr_buildPath( buf, buflen, dir, base, NULL );
+}
+
+static void
+getTorrentOldFilename( const tr_handle * handle,
+                       const tr_info   * info,
+                       char            * name,
+                       size_t            len )
 {
     const char * torDir = tr_getTorrentDir( handle );
 
     if( !handle->tag )
     {
-        tr_buildPath( name, len, torDir, hash, NULL );
+        tr_buildPath( name, len, torDir, info->hashString, NULL );
     }
     else
     {
         char base[1024];
-        snprintf( base, sizeof(base), "%s-%s", hash, handle->tag );
+        snprintf( base, sizeof(base), "%s-%s", info->hashString, handle->tag );
         tr_buildPath( name, len, torDir, base, NULL );
     }
 }
 
+void
+tr_metainfoMigrate( const tr_handle * handle,
+                    const tr_info   * inf )
+{
+    struct stat new_sb;
+    char new_name[MAX_PATH_LENGTH];
+
+    getTorrentFilename( handle, inf, new_name, sizeof( new_name ) );
+
+    if( stat( new_name, &new_sb ) || ( ( new_sb.st_mode & S_IFMT ) != S_IFREG ) )
+    {
+        char old_name[MAX_PATH_LENGTH];
+        size_t contentLen;
+        uint8_t * content;
+
+        getTorrentOldFilename( handle, inf, old_name, sizeof( old_name ) );
+        if(( content = tr_loadFile( old_name, &contentLen )))
+        {
+            FILE * out = fopen( new_name, "wb+" );
+            if( fwrite( content, sizeof( uint8_t ), contentLen, out ) == contentLen )
+                unlink( old_name );
+            fclose( out );
+        }
+
+        tr_free( content );
+    }
+}
 
 int
 tr_metainfoParse( const tr_handle  * handle,
@@ -172,9 +211,6 @@ tr_metainfoParse( const tr_handle  * handle,
     }
 
     tr_sha1_to_hex( inf->hashString, inf->hash );
-    savedname( handle, buf, sizeof( buf ), inf->hashString );
-    tr_free( inf->torrent );
-    inf->torrent = tr_strdup( buf );
 
     /* comment */
     memset( buf, '\0', sizeof( buf ) );
@@ -273,6 +309,12 @@ tr_metainfoParse( const tr_handle  * handle,
     {
         goto fail;
     }
+
+    /* filename of Transmission's copy */
+    getTorrentFilename( handle, inf, buf, sizeof( buf ) );
+    tr_free( inf->torrent );
+    inf->torrent = tr_strdup( buf );
+fprintf( stderr, "inf->torrent is [%s]\n", inf->torrent );
 
     return TR_OK;
 
@@ -569,40 +611,15 @@ tr_trackerInfoClear( tr_tracker_info * info )
 
 void
 tr_metainfoRemoveSaved( const tr_handle * handle,
-                        const char      * hashString )
+                        const tr_info   * inf )
 {
-    char file[MAX_PATH_LENGTH];
-    savedname( handle, file, sizeof file, hashString );
-    unlink( file );
-}
+    char filename[MAX_PATH_LENGTH];
 
-/* Save a copy of the torrent file in the saved torrent directory */
-int
-tr_metainfoSave( const tr_handle  * handle,
-                 const char       * hash,
-                 const uint8_t    * buf,
-                 size_t             buflen )
-{
-    char   path[MAX_PATH_LENGTH];
-    FILE * file;
+    getTorrentFilename( handle, inf, filename, sizeof( filename ) );
+    unlink( filename );
 
-    savedname( handle, path, sizeof path, hash );
-    file = fopen( path, "wb+" );
-    if( !file )
-    {
-        tr_err( _( "Couldn't open \"%1$s\": %2$s" ), path, tr_strerror( errno ) );
-        return TR_EINVALID;
-    }
-    fseek( file, 0, SEEK_SET );
-    if( fwrite( buf, 1, buflen, file ) != buflen )
-    {
-        tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), path, tr_strerror( errno ) );
-        fclose( file );
-        return TR_EINVALID;
-    }
-    fclose( file );
-
-    return TR_OK;
+    getTorrentOldFilename( handle, inf, filename, sizeof( filename ) );
+    unlink( filename );
 }
 
 static int

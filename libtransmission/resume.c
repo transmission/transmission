@@ -10,9 +10,7 @@
  * $Id:$
  */
 
-#include <sys/types.h> /* stat */
-#include <sys/stat.h> /* stat */
-#include <unistd.h> /* unlink, stat */
+#include <unistd.h> /* unlink */
 
 #include <string.h>
 
@@ -45,41 +43,14 @@
 #define KEY_PROGRESS_MTIMES "mtimes"
 #define KEY_PROGRESS_BITFIELD "bitfield"
 
-/***
-****
-***/
-
-static time_t*
-getMTimes( const tr_torrent * tor, int * setme_n )
-{
-    int i;
-    const int n = tor->info.fileCount;
-    time_t * m = tr_new( time_t, n );
-
-    for( i=0; i<n; ++i ) {
-        char fname[MAX_PATH_LENGTH];
-        struct stat sb;
-        tr_buildPath( fname, sizeof(fname),
-                      tor->destination, tor->info.files[i].name, NULL );
-        if ( !stat( fname, &sb ) && S_ISREG( sb.st_mode ) ) {
-#ifdef SYS_DARWIN
-            m[i] = sb.st_mtimespec.tv_sec;
-#else
-            m[i] = sb.st_mtime;
-#endif
-        }
-    }
-
-    *setme_n = n;
-    return m;
-}
-
 static void
 getResumeFilename( char * buf, size_t buflen, const tr_torrent * tor )
 {
     const char * dir = tr_getResumeDir( tor->handle );
     char base[4096];
-    snprintf( base, sizeof( base ), "%s.%16.16s.resume", tor->info.name, tor->info.hashString );
+    snprintf( base, sizeof( base ), "%s.%16.16s.resume",
+              tor->info.name,
+              tor->info.hashString );
     tr_buildPath( buf, buflen, dir, base, NULL );
 }
 
@@ -91,7 +62,8 @@ static void
 savePeers( tr_benc * dict, const tr_torrent * tor )
 {
     tr_pex * pex;
-    const int count = tr_peerMgrGetPeers( tor->handle->peerMgr, tor->info.hash, &pex );
+    const int count = tr_peerMgrGetPeers( tor->handle->peerMgr,
+                                          tor->info.hash, &pex );
     if( count > 0 ) {
         tr_benc * child = tr_bencDictAdd( dict, KEY_PEERS );
         tr_bencInitStrDupLen( child, (const char*)pex, sizeof(tr_pex)*count );
@@ -114,7 +86,8 @@ loadPeers( tr_benc * dict, tr_torrent * tor )
         for( i=0; i<count; ++i ) {
             tr_pex pex;
             memcpy( &pex, str + (i*sizeof(tr_pex)), sizeof(tr_pex) );
-            tr_peerMgrAddPex( tor->handle->peerMgr, tor->info.hash, TR_PEER_FROM_CACHE, &pex );
+            tr_peerMgrAddPex( tor->handle->peerMgr,
+                              tor->info.hash, TR_PEER_FROM_CACHE, &pex );
         }
         tr_tordbg( tor, "Loaded %d peers from resume file", count );
         ret = TR_FR_PEERS;
@@ -122,6 +95,10 @@ loadPeers( tr_benc * dict, tr_torrent * tor )
 
     return ret;
 }
+
+/***
+****
+***/
 
 static void
 savePriorities( tr_benc * dict, const tr_torrent * tor )
@@ -144,7 +121,8 @@ loadPriorities( tr_benc * dict, tr_torrent * tor )
     const tr_file_index_t n = inf->fileCount;
     tr_benc * list;
 
-    if( tr_bencDictFindList( dict, KEY_PRIORITY, &list ) && ( list->val.l.count == (int)n ) )
+    if( tr_bencDictFindList( dict, KEY_PRIORITY, &list )
+        && ( list->val.l.count == (int)n ) )
     {
         int64_t tmp;
         tr_file_index_t i;
@@ -156,6 +134,10 @@ loadPriorities( tr_benc * dict, tr_torrent * tor )
 
     return ret;
 }
+
+/***
+****
+***/
 
 static void
 saveSpeedLimits( tr_benc * dict, const tr_torrent * tor )
@@ -194,6 +176,10 @@ loadSpeedLimits( tr_benc * dict, tr_torrent * tor )
     return ret;
 }
 
+/***
+****
+***/
+
 static void
 saveProgress( tr_benc * dict, const tr_torrent * tor )
 {
@@ -209,13 +195,12 @@ saveProgress( tr_benc * dict, const tr_torrent * tor )
     tr_bencInitDict( p, 2 );
 
     /* add the mtimes */
-    m = tr_bencDictAdd( p, KEY_PROGRESS_MTIMES );
-    mtimes = getMTimes( tor, &n );
-    tr_bencInitList( m, n );
+    mtimes = tr_torrentGetMTimes( tor, &n );
+    m = tr_bencDictAddList( p, KEY_PROGRESS_MTIMES, n );
     for( i=0; i<n; ++i ) {
         if( !tr_torrentIsFileChecked( tor, i ) )
             mtimes[i] = ~(time_t)0; /* force a recheck next time */
-        tr_bencInitInt( tr_bencListAdd( m ), mtimes[i] );
+        tr_bencListAddInt( m, mtimes[i] );
     }
 
     /* add the bitfield */
@@ -238,19 +223,19 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
         tr_benc * m;
         tr_benc * b;
         int n;
-        time_t * curMTimes = getMTimes( tor, &n );
+        time_t * curMTimes = tr_torrentGetMTimes( tor, &n );
 
         if( tr_bencDictFindList( p, KEY_PROGRESS_MTIMES, &m )
             && ( m->val.l.count == (int64_t)tor->info.fileCount )
             && ( m->val.l.count == n ) )
         {
             int i;
+            const time_t recheck = ~(time_t)0;
             for( i=0; i<m->val.l.count; ++i ) 
             {
-                int64_t tmp;
-                const time_t t = tr_bencGetInt( &m->val.l.vals[i], &tmp )
-                               ? tmp : ~(time_t)0;
-                if( curMTimes[i] == t )
+                int64_t x;
+                time_t t = tr_bencGetInt( &m->val.l.vals[i], &x ) ? x : recheck;
+                if( ( t != recheck ) && ( curMTimes[i] == t ) )
                     tr_torrentSetFileChecked( tor, i, TRUE );
                 else {
                     tr_torrentSetFileChecked( tor, i, FALSE );
@@ -287,19 +272,24 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
     return ret;
 }
 
+/***
+****
+***/
+
 void
 tr_torrentSaveResume( const tr_torrent * tor )
 {
     tr_benc top;
-    char * encoded;
-    int len;
+    char filename[MAX_PATH_LENGTH];
 
     /* populate the bencoded data */
     tr_bencInitDict( &top, 10 );
     tr_bencDictAddInt( &top, KEY_CORRUPT, tor->corruptPrev + tor->corruptCur );
     tr_bencDictAddStr( &top, KEY_DESTINATION, tor->destination );
-    tr_bencDictAddInt( &top, KEY_DOWNLOADED, tor->downloadedPrev + tor->downloadedCur );
-    tr_bencDictAddInt( &top, KEY_UPLOADED, tor->uploadedPrev + tor->uploadedCur );
+    tr_bencDictAddInt( &top, KEY_DOWNLOADED,
+                       tor->downloadedPrev + tor->downloadedCur );
+    tr_bencDictAddInt( &top, KEY_UPLOADED,
+                             tor->uploadedPrev + tor->uploadedCur );
     tr_bencDictAddInt( &top, KEY_MAX_PEERS, tor->maxConnectedPeers );
     tr_bencDictAddInt( &top, KEY_PAUSED, tor->isRunning?0:1 );
     savePeers( &top, tor );
@@ -307,19 +297,9 @@ tr_torrentSaveResume( const tr_torrent * tor )
     saveProgress( &top, tor );
     saveSpeedLimits( &top, tor );
 
-    /* save the bencoded data */
-    if(( encoded = tr_bencSave( &top, &len )))
-    {
-        char filename[MAX_PATH_LENGTH];
-        FILE * fp;
-        getResumeFilename( filename, sizeof( filename ), tor );
-        fp = fopen( filename, "wb+" );
-        fwrite( encoded, len, 1, fp );
-        fclose( fp );
-        tr_free( encoded );
-    }
+    getResumeFilename( filename, sizeof( filename ), tor );
+    tr_bencSaveFile( filename, &top );
 
-    /* cleanup */
     tr_bencFree( &top );
 }
 
@@ -330,21 +310,15 @@ tr_torrentLoadResume( tr_torrent    * tor,
 {
     int64_t i;
     const char * str;
-    int benc_loaded = FALSE;
     uint64_t fieldsLoaded = 0;
-    uint8_t * content = NULL;
-    size_t contentLen;
     char filename[MAX_PATH_LENGTH];
     tr_benc top;
 
     getResumeFilename( filename, sizeof( filename ), tor );
 
-    content = tr_loadFile( filename, &contentLen );
-    benc_loaded = content && !tr_bencLoad( content, contentLen, &top, NULL );
-    if( !benc_loaded )
+    if( tr_bencLoadFile( filename, &top ) )
     {
-        tr_free( content );
-        tr_tordbg( tor, "Couldn't read \"%s\"; trying old resume file format.", filename );
+        tr_tordbg( tor, "Couldn't read \"%s\"; trying old format.", filename );
         fieldsLoaded = tr_fastResumeLoad( tor, fieldsToLoad, ctor );
 
         if( ( fieldsLoaded != 0 ) && ( fieldsToLoad == ~(uint64_t)0 ) )
@@ -359,41 +333,54 @@ tr_torrentLoadResume( tr_torrent    * tor,
 
     tr_tordbg( tor, "Read resume file \"%s\"", filename );
 
-    if( tr_bencDictFindInt( &top, KEY_CORRUPT, &i ) ) {
+    if( ( fieldsToLoad & TR_FR_CORRUPT )
+            && tr_bencDictFindInt( &top, KEY_CORRUPT, &i ) ) {
         tor->corruptPrev = i;
         fieldsLoaded |= TR_FR_CORRUPT;
     }
 
-    if( tr_bencDictFindStr( &top, KEY_DESTINATION, &str ) ) {
+    if( ( fieldsToLoad & TR_FR_DESTINATION )
+            && tr_bencDictFindStr( &top, KEY_DESTINATION, &str ) ) {
         tr_free( tor->destination );
         tor->destination = tr_strdup( str );
         fieldsLoaded |= TR_FR_DESTINATION;
     }
 
-    if( tr_bencDictFindInt( &top, KEY_DOWNLOADED, &i ) ) {
+    if( ( fieldsToLoad & TR_FR_DOWNLOADED )
+            && tr_bencDictFindInt( &top, KEY_DOWNLOADED, &i ) ) {
         tor->downloadedPrev = i;
         fieldsLoaded |= TR_FR_DOWNLOADED;
     }
 
-    if( tr_bencDictFindInt( &top, KEY_UPLOADED, &i ) ) {
+    if( ( fieldsToLoad & TR_FR_UPLOADED )
+            && tr_bencDictFindInt( &top, KEY_UPLOADED, &i ) ) {
         tor->uploadedPrev = i;
         fieldsLoaded |= TR_FR_UPLOADED;
     }
 
-    if( tr_bencDictFindInt( &top, KEY_MAX_PEERS, &i ) ) {
+    if( ( fieldsToLoad & TR_FR_MAX_PEERS )
+            && tr_bencDictFindInt( &top, KEY_MAX_PEERS, &i ) ) {
         tor->maxConnectedPeers = i;
         fieldsLoaded |= TR_FR_MAX_PEERS;
     }
 
-    if( tr_bencDictFindInt( &top, KEY_PAUSED, &i ) ) {
+    if( ( fieldsToLoad & TR_FR_RUN )
+            && tr_bencDictFindInt( &top, KEY_PAUSED, &i ) ) {
         tor->isRunning = i ? 0 : 1;
         fieldsLoaded |= TR_FR_RUN;
     }
 
-    fieldsLoaded |= loadPeers( &top, tor );
-    fieldsLoaded |= loadPriorities( &top, tor );
-    fieldsLoaded |= loadProgress( &top, tor );
-    fieldsLoaded |= loadSpeedLimits( &top, tor );
+    if( fieldsToLoad & TR_FR_PEERS )
+        fieldsLoaded |= loadPeers( &top, tor );
+
+    if( fieldsToLoad & TR_FR_PRIORITY )
+        fieldsLoaded |= loadPriorities( &top, tor );
+
+    if( fieldsToLoad & TR_FR_PROGRESS )
+        fieldsLoaded |= loadProgress( &top, tor );
+
+    if( fieldsToLoad & TR_FR_SPEEDLIMIT )
+        fieldsLoaded |= loadSpeedLimits( &top, tor );
 
     tr_bencFree( &top );
     return fieldsLoaded;

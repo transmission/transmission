@@ -22,6 +22,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <sys/types.h> /* stat */
+#include <sys/stat.h> /* stat */
+#include <unistd.h> /* stat */
+
 #include <assert.h>
 #include <string.h> /* memcmp */
 
@@ -381,14 +385,12 @@ torrentRealInit( tr_handle     * h,
     if( tr_ctorGetSave( ctor ) ) {
         const tr_benc * val;
         if( !tr_ctorGetMetainfo( ctor, &val ) ) {
-            int len;
-            uint8_t * text = (uint8_t*) tr_bencSave( val, &len );
-            tr_metainfoSave( tor->handle,
-                             tor->info.hashString,
-                             text, len );
-            tr_free( text );
+            const char * filename = tor->info.torrent;
+            tr_bencSaveFile( filename, val );
         }
     }
+
+    tr_metainfoMigrate( h, &tor->info );
 
     if( doStart )
         tr_torrentStart( tor );
@@ -812,7 +814,7 @@ tr_torrentSetHasPiece( tr_torrent * tor, tr_piece_index_t pieceIndex, int has )
 void
 tr_torrentRemoveSaved( tr_torrent * tor )
 {
-    tr_metainfoRemoveSaved( tor->handle, tor->info.hashString );
+    tr_metainfoRemoveSaved( tor->handle, &tor->info );
 
     tr_torrentRemoveResume( tor );
 }
@@ -1418,4 +1420,29 @@ int
 tr_torrentCountUncheckedPieces( const tr_torrent * tor )
 {
     return tor->info.pieceCount - tr_bitfieldCountTrueBits( tor->checkedPieces );
+}
+
+time_t*
+tr_torrentGetMTimes( const tr_torrent * tor, int * setme_n )
+{
+    int i;
+    const int n = tor->info.fileCount;
+    time_t * m = tr_new( time_t, n );
+
+    for( i=0; i<n; ++i ) {
+        char fname[MAX_PATH_LENGTH];
+        struct stat sb;
+        tr_buildPath( fname, sizeof(fname),
+                      tor->destination, tor->info.files[i].name, NULL );
+        if ( !stat( fname, &sb ) && S_ISREG( sb.st_mode ) ) {
+#ifdef SYS_DARWIN
+            m[i] = sb.st_mtimespec.tv_sec;
+#else
+            m[i] = sb.st_mtime;
+#endif
+        }
+    }
+
+    *setme_n = n;
+    return m;
 }

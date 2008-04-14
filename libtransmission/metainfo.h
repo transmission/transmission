@@ -36,11 +36,9 @@ int tr_metainfoParse( const tr_handle       * handle,
 void tr_metainfoFree( tr_info * inf );
 
 void tr_metainfoRemoveSaved( const tr_handle  * handle,
-                             const char       * hashString );
+                             const tr_info    * info );
 
-int tr_metainfoSave( const tr_handle  * handle,
-                     const char       * hashString,
-                     const uint8_t    * metainfo,
-                     size_t             len );
+void tr_metainfoMigrate( const tr_handle * handle,
+                         const tr_info   * inf );
 
 #endif

@@ -101,6 +101,8 @@ void tr_torrentSetPieceChecked     ( tr_torrent *, tr_piece_index_t piece, int i
 void tr_torrentSetFileChecked      ( tr_torrent *, tr_file_index_t file, int isChecked );
 void tr_torrentUncheck             ( tr_torrent * );
 
+time_t* tr_torrentGetMTimes        ( const tr_torrent *, int * setmeCount );
+
 typedef enum
 {
    TR_VERIFY_NONE,

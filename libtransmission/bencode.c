@@ -313,7 +313,7 @@ tr_bencParse( const void     * buf_in,
 int
 tr_bencLoad( const void  * buf_in,
              int           buflen,
-             tr_benc  * setme_benc,
+             tr_benc     * setme_benc,
              char       ** setme_end )
 {
     const uint8_t * buf = buf_in;
@@ -568,6 +568,14 @@ tr_bencListAdd( tr_benc * list )
     tr_bencInit( item, TYPE_INT );
 
     return item;
+}
+
+tr_benc *
+tr_bencListAddInt( tr_benc * list, int64_t i )
+{
+    tr_benc * node = tr_bencListAdd( list );
+    tr_bencInitInt( node, i );
+    return node;
 }
 
 tr_benc *
@@ -1049,5 +1057,50 @@ tr_bencSaveAsSerializedPHP( const tr_benc * top, int * len )
         *len = EVBUFFER_LENGTH( data.out );
     ret = tr_strndup( (char*) EVBUFFER_DATA( data.out ), EVBUFFER_LENGTH( data.out ) );
     evbuffer_free( data.out );
+    return ret;
+}
+
+/***
+****
+***/
+
+int
+tr_bencSaveFile( const char * filename,  const tr_benc * b )
+{
+    int ret = TR_OK;
+    int len;
+    char * content = tr_bencSave( b, &len );
+    FILE * out = NULL;
+
+    out = fopen( filename, "wb+" );
+    if( !out )
+    {
+        tr_err( _( "Couldn't open \"%1$s\": %2$s" ),
+                filename, tr_strerror( errno ) );
+        ret = TR_EINVALID;
+    }
+    else if( fwrite( content, sizeof( char ), len, out ) != (size_t)len )
+    {
+        tr_err( _( "Couldn't save file \"%1$s\": %2$s" ),
+                filename, tr_strerror( errno ) );
+        ret = TR_EINVALID;
+    }
+
+    tr_dbg( "tr_bencSaveFile returned %d when saving \"%s\"", ret, filename );
+    tr_free( content );
+    if( out )
+        fclose( out );
+    return ret;
+}
+
+int
+tr_bencLoadFile( const char * filename, tr_benc * b )
+{
+    int ret = TR_ERROR;
+    size_t contentLen;
+    uint8_t * content = tr_loadFile( filename, &contentLen );
+    ret = content ? tr_bencLoad( content, contentLen, b, NULL )
+                  : TR_ERROR_IO_OTHER;
+    tr_free( content );
     return ret;
 }
