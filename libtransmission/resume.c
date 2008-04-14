@@ -341,10 +341,20 @@ tr_torrentLoadResume( tr_torrent    * tor,
 
     content = tr_loadFile( filename, &contentLen );
     benc_loaded = content && !tr_bencLoad( content, contentLen, &top, NULL );
-    if( !benc_loaded ) {
+    if( !benc_loaded )
+    {
         tr_free( content );
         tr_tordbg( tor, "Couldn't read \"%s\"; trying old resume file format.", filename );
-        return tr_fastResumeLoad( tor, fieldsToLoad, ctor );
+        fieldsLoaded = tr_fastResumeLoad( tor, fieldsToLoad, ctor );
+
+        if( ( fieldsLoaded != 0 ) && ( fieldsToLoad == ~(uint64_t)0 ) )
+        {
+            tr_torrentSaveResume( tor );
+            tr_fastResumeRemove( tor );
+            tr_tordbg( tor, "Migrated resume file to \"%s\"", filename );
+        }
+
+        return fieldsLoaded;
     }
 
     tr_tordbg( tor, "Read resume file \"%s\"", filename );
