@@ -1745,6 +1745,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 //status has been retained
 - (void) completenessChange: (NSNumber *) status
 {
+deliberately break the mac build for a couple of hours because the last svn commit probably isn't nightly-user-friendly
     [self update];
     
     BOOL canMove;
