@@ -26,6 +26,7 @@
 
 #define KEY_CORRUPT     "corrupt"
 #define KEY_DESTINATION "destination"
+#define KEY_DND         "dnd"
 #define KEY_DOWNLOADED  "downloaded"
 #define KEY_MAX_PEERS   "max-peers"
 #define KEY_PAUSED      "paused"
@@ -100,6 +101,59 @@ loadPeers( tr_benc * dict, tr_torrent * tor )
 ***/
 
 static void
+saveDND( tr_benc * dict, const tr_torrent * tor )
+{
+    const tr_info * inf = &tor->info;
+    const tr_file_index_t n = inf->fileCount;
+    tr_file_index_t i;
+    tr_benc * list;
+
+    list = tr_bencDictAddList( dict, KEY_DND, n );
+    for( i=0; i<n; ++i )
+        tr_bencInitInt( tr_bencListAdd( list ), inf->files[i].dnd ? 1 : 0 );
+}
+
+static uint64_t
+loadDND( tr_benc * dict, tr_torrent * tor )
+{
+    uint64_t ret = 0;
+    tr_info * inf = &tor->info;
+    const tr_file_index_t n = inf->fileCount;
+    tr_benc * list;
+
+    if( tr_bencDictFindList( dict, KEY_DND, &list )
+        && ( list->val.l.count == (int)n ) )
+    {
+        int64_t tmp;
+        tr_file_index_t * dl = tr_new( tr_file_index_t, n );
+        tr_file_index_t * dnd = tr_new( tr_file_index_t, n );
+        tr_file_index_t i, dlCount=0, dndCount=0;
+
+        for( i=0; i<n; ++i ) {
+            if( tr_bencGetInt( &list->val.l.vals[i], &tmp ) && tmp )
+                dnd[dndCount++] = i;
+            else
+                dl[dlCount++] = i;
+        }
+
+        if( dndCount )
+            tr_torrentInitFileDLs ( tor, dnd, dndCount, FALSE );
+        if( dlCount )
+            tr_torrentInitFileDLs ( tor, dl, dlCount, TRUE );
+
+        tr_free( dnd );
+        tr_free( dl );
+        ret = TR_FR_PRIORITY;
+    }
+
+    return ret;
+}
+
+/***
+****
+***/
+
+static void
 savePriorities( tr_benc * dict, const tr_torrent * tor )
 {
     const tr_info * inf = &tor->info;
@@ -107,7 +161,7 @@ savePriorities( tr_benc * dict, const tr_torrent * tor )
     tr_file_index_t i;
     tr_benc * list;
 
-    list = tr_bencDictAddList( dict, KEY_PRIORITY, tor->info.fileCount );
+    list = tr_bencDictAddList( dict, KEY_PRIORITY, n );
     for( i=0; i<n; ++i )
         tr_bencInitInt( tr_bencListAdd( list ), inf->files[i].priority );
 }
@@ -296,6 +350,7 @@ tr_torrentSaveResume( const tr_torrent * tor )
                              tor->isRunning ? 0 : 1 );
     savePeers( &top, tor );
     savePriorities( &top, tor );
+    saveDND( &top, tor );
     saveProgress( &top, tor );
     saveSpeedLimits( &top, tor );
 
@@ -380,6 +435,9 @@ tr_torrentLoadResume( tr_torrent    * tor,
 
     if( fieldsToLoad & TR_FR_PROGRESS )
         fieldsLoaded |= loadProgress( &top, tor );
+
+    if( fieldsToLoad & TR_FR_DND )
+        fieldsLoaded |= loadDND( &top, tor );
 
     if( fieldsToLoad & TR_FR_SPEEDLIMIT )
         fieldsLoaded |= loadSpeedLimits( &top, tor );
