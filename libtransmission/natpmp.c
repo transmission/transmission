@@ -64,9 +64,9 @@ struct tr_natpmp
 static void
 logVal( const char * func, int ret )
 {
-    if( ret==NATPMP_TRYAGAIN )
-        tr_ndbg( getKey(),  "%s responded \"try again\"", func );
-    else if( ret >= 0 )
+    if( ret == NATPMP_TRYAGAIN )
+        return;
+    if( ret >= 0 )
         tr_ninf( getKey(), _( "%s succeeded (%d)" ), func, ret );
     else
         tr_ndbg( getKey(), "%s failed (%d): %s (%d)", func, ret, tr_strerror(errno), errno );

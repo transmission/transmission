@@ -1067,7 +1067,7 @@ tr_bencSaveAsSerializedPHP( const tr_benc * top, int * len )
 int
 tr_bencSaveFile( const char * filename,  const tr_benc * b )
 {
-    int ret = TR_OK;
+    int err = TR_OK;
     int len;
     char * content = tr_bencSave( b, &len );
     FILE * out = NULL;
@@ -1077,20 +1077,21 @@ tr_bencSaveFile( const char * filename,  const tr_benc * b )
     {
         tr_err( _( "Couldn't open \"%1$s\": %2$s" ),
                 filename, tr_strerror( errno ) );
-        ret = TR_EINVALID;
+        err = TR_EINVALID;
     }
     else if( fwrite( content, sizeof( char ), len, out ) != (size_t)len )
     {
         tr_err( _( "Couldn't save file \"%1$s\": %2$s" ),
                 filename, tr_strerror( errno ) );
-        ret = TR_EINVALID;
+        err = TR_EINVALID;
     }
 
-    tr_dbg( "tr_bencSaveFile returned %d when saving \"%s\"", ret, filename );
+    if( !err )
+        tr_dbg( "tr_bencSaveFile saved \"%s\"", filename );
     tr_free( content );
     if( out )
         fclose( out );
-    return ret;
+    return err;
 }
 
 int
