@@ -242,8 +242,6 @@ loadSpeedLimits( tr_benc * dict, tr_torrent * tor )
 ****
 ***/
 
-static const time_t verifyNeeded = ~(time_t)0;
-
 static void
 saveProgress( tr_benc * dict, const tr_torrent * tor )
 {
@@ -261,9 +259,11 @@ saveProgress( tr_benc * dict, const tr_torrent * tor )
     /* add the mtimes */
     mtimes = tr_torrentGetMTimes( tor, &n );
     m = tr_bencDictAddList( p, KEY_PROGRESS_MTIMES, n );
-    for( i=0; i<n; ++i )
-        tr_bencListAddInt( m, tr_torrentIsFileChecked( tor, i )
-                              ? mtimes[i] : verifyNeeded );
+    for( i=0; i<n; ++i ) {
+        if( tr_torrentIsFileChecked( tor, i ) )
+            mtimes[i] = ~(time_t)0; /* force a recheck */
+        tr_bencListAddInt( m, mtimes[i] );
+    }
 
     /* add the bitfield */
     bitfield = tr_cpBlockBitfield( tor->completion );
@@ -292,16 +292,20 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
             && ( m->val.l.count == n ) )
         {
             int i;
-            for( i=0; i<m->val.l.count; ++i ) 
+            for( i=0; i<n; ++i )
             {
-                int64_t x;
-                const time_t t = tr_bencGetInt( &m->val.l.vals[i], &x )
-                                 ? x : verifyNeeded;
-                if( ( t != verifyNeeded ) && ( t == curMTimes[i] ) )
-                    tr_torrentSetFileChecked( tor, i, TRUE );
-                else {
+                int64_t tmp;
+                if( !tr_bencGetInt( &m->val.l.vals[i], &tmp ) ) {
+                    tr_tordbg( tor, "File #%d needs to be verified - couldn't find benc entry", i );
                     tr_torrentSetFileChecked( tor, i, FALSE );
-                    tr_tordbg( tor, "File #%d needs to be verified", i );
+                } else {
+                    const time_t t = (time_t) tmp;
+                    if( t == curMTimes[i] )
+                        tr_torrentSetFileChecked( tor, i, TRUE );
+                    else {
+                        tr_tordbg( tor, "File #%d needs to be verified - times %lu and %lu don't match", t, curMTimes[i] );
+                        tr_torrentSetFileChecked( tor, i, FALSE );
+                    }
                 }
             }
         }

@@ -1428,14 +1428,14 @@ tr_torrentGetMTimes( const tr_torrent * tor, int * setme_n )
 {
     int i;
     const int n = tor->info.fileCount;
-    time_t * m = tr_new( time_t, n );
+    time_t * m = tr_new0( time_t, n );
 
     for( i=0; i<n; ++i ) {
         char fname[MAX_PATH_LENGTH];
         struct stat sb;
         tr_buildPath( fname, sizeof(fname),
                       tor->destination, tor->info.files[i].name, NULL );
-        if ( !stat( fname, &sb ) && S_ISREG( sb.st_mode ) ) {
+        if ( !stat( fname, &sb ) ) {
 #ifdef SYS_DARWIN
             m[i] = sb.st_mtimespec.tv_sec;
 #else
