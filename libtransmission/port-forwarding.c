@@ -57,7 +57,6 @@ struct tr_shared
 
     tr_upnp    * upnp;
     tr_natpmp  * natpmp;
-
 };
 
 /***

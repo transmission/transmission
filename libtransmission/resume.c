@@ -119,7 +119,7 @@ loadDND( tr_benc * dict, tr_torrent * tor )
     uint64_t ret = 0;
     tr_info * inf = &tor->info;
     const tr_file_index_t n = inf->fileCount;
-    tr_benc * list;
+    tr_benc * list = NULL;
 
     if( tr_bencDictFindList( dict, KEY_DND, &list )
         && ( list->val.l.count == (int)n ) )
@@ -136,14 +136,23 @@ loadDND( tr_benc * dict, tr_torrent * tor )
                 dl[dlCount++] = i;
         }
 
-        if( dndCount )
+        if( dndCount ) {
             tr_torrentInitFileDLs ( tor, dnd, dndCount, FALSE );
-        if( dlCount )
+            tr_tordbg( tor, "Resume file found %d files listed as dnd", dndCount );
+        }
+        if( dlCount ) {
             tr_torrentInitFileDLs ( tor, dl, dlCount, TRUE );
+            tr_tordbg( tor, "Resume file found %d files marked for download", dlCount );
+        }
 
         tr_free( dnd );
         tr_free( dl );
         ret = TR_FR_PRIORITY;
+    }
+    else
+    {
+        tr_tordbg( tor, "Couldn't load DND flags.  dnd list (%p) has %d children; torrent has %d files",
+                   ( list ? list->val.l.count : -1 ), (int)n );
     }
 
     return ret;
