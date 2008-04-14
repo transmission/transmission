@@ -53,43 +53,59 @@ uint8_t* tr_peerIdNew( void );
 
 const uint8_t* tr_getPeerId( void );
 
+struct tr_metainfo_lookup
+{
+    char hashString[2*SHA_DIGEST_LENGTH+1];
+    char * filename;
+};
+
+const char * tr_sessionFindTorrentFile( const tr_handle  * h,
+                                        const char       * hashString );
+
+void tr_sessionSetTorrentFile( tr_handle    * h,
+                               const char   * hashString,
+                               const char   * filename );
+
 struct tr_handle
 {
-    unsigned int               isPortSet        : 1;
-    unsigned int               isPexEnabled     : 1;
-    unsigned int               isClosed         : 1;
-    unsigned int               useUploadLimit   : 1;
-    unsigned int               useDownloadLimit : 1;
+    unsigned int                 isPortSet        : 1;
+    unsigned int                 isPexEnabled     : 1;
+    unsigned int                 isClosed         : 1;
+    unsigned int                 useUploadLimit   : 1;
+    unsigned int                 useDownloadLimit : 1;
 
-    tr_encryption_mode         encryptionMode;
+    tr_encryption_mode           encryptionMode;
 
-    struct tr_event_handle   * events;
+    struct tr_event_handle     * events;
 
-    int                        peerSocketTOS;
+    int                          peerSocketTOS;
 
-    int                        torrentCount;
-    tr_torrent               * torrentList;
+    int                          torrentCount;
+    tr_torrent                 * torrentList;
 
-    char                     * tag;
+    char                       * tag;
 
-    char                     * configDir;
-    char                     * torrentDir;
-    char                     * resumeDir;
+    char                       * configDir;
+    char                       * torrentDir;
+    char                       * resumeDir;
 
-    struct tr_ratecontrol    * upload;
-    struct tr_ratecontrol    * download;
+    struct tr_ratecontrol      * upload;
+    struct tr_ratecontrol      * download;
 
-    struct tr_blocklist      * blocklist;
-    struct tr_peerMgr        * peerMgr;
-    struct tr_shared         * shared;
+    struct tr_blocklist        * blocklist;
+    struct tr_peerMgr          * peerMgr;
+    struct tr_shared           * shared;
 
-    struct tr_lock           * lock;
+    struct tr_lock             * lock;
 
-    tr_handle_status           stats[2];
-    int                        statCur;
+    tr_handle_status             stats[2];
+    int                          statCur;
 
-    struct tr_stats_handle   * sessionStats;
-    struct tr_tracker_handle * tracker;
+    struct tr_stats_handle     * sessionStats;
+    struct tr_tracker_handle   * tracker;
+
+    struct tr_metainfo_lookup  * metainfoLookup;
+    int                          metainfoLookupCount;
 };
 
 void tr_globalLock       ( struct tr_handle * );

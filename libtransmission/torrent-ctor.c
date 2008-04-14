@@ -14,6 +14,7 @@
 #include "transmission.h"
 #include "bencode.h"
 #include "platform.h"
+#include "session.h" /* tr_sessionFindTorrentFile */
 #include "trcompat.h" /* strlcpy */
 #include "utils.h"
 
@@ -125,20 +126,13 @@ int
 tr_ctorSetMetainfoFromHash( tr_ctor        * ctor,
                             const char     * hashString )
 {
-    int err = -1;
-    char basename[2048];
-    char filename[MAX_PATH_LENGTH];
+    int err;
+    const char * filename;
 
-    if( err && ( ctor->handle->tag != NULL ) ) {
-        snprintf( basename, sizeof(basename), "%s-%s", hashString, ctor->handle->tag );
-        tr_buildPath( filename, sizeof(filename), tr_getTorrentDir( ctor->handle ), basename, NULL );
-        err = tr_ctorSetMetainfoFromFile( ctor, filename );
-    }
-
-    if( err ) {
-        tr_buildPath( filename, sizeof(filename), tr_getTorrentDir( ctor->handle ), hashString, NULL );
-        err = tr_ctorSetMetainfoFromFile( ctor, filename );
-    }
+    if(( filename = tr_sessionFindTorrentFile( ctor->handle, hashString )))
+        err = tr_ctorSetMetainfoFromFile( ctor, filename ); 
+    else
+        err = TR_ERROR;
 
     return err;
 }

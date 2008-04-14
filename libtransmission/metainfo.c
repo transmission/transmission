@@ -157,8 +157,8 @@ getTorrentOldFilename( const tr_handle * handle,
 }
 
 void
-tr_metainfoMigrate( const tr_handle * handle,
-                    const tr_info   * inf )
+tr_metainfoMigrate( tr_handle * handle,
+                    tr_info   * inf )
 {
     struct stat new_sb;
     char new_name[MAX_PATH_LENGTH];
@@ -176,7 +176,12 @@ tr_metainfoMigrate( const tr_handle * handle,
         {
             FILE * out = fopen( new_name, "wb+" );
             if( fwrite( content, sizeof( uint8_t ), contentLen, out ) == contentLen )
+            {
+                tr_free( inf->torrent );
+                inf->torrent = tr_strdup( new_name );
+                tr_sessionSetTorrentFile( handle, inf->hashString, new_name );
                 unlink( old_name );
+            }
             fclose( out );
         }
 
@@ -314,7 +319,6 @@ tr_metainfoParse( const tr_handle  * handle,
     getTorrentFilename( handle, inf, buf, sizeof( buf ) );
     tr_free( inf->torrent );
     inf->torrent = tr_strdup( buf );
-fprintf( stderr, "inf->torrent is [%s]\n", inf->torrent );
 
     return TR_OK;
 

@@ -387,6 +387,7 @@ torrentRealInit( tr_handle     * h,
         if( !tr_ctorGetMetainfo( ctor, &val ) ) {
             const char * filename = tor->info.torrent;
             tr_bencSaveFile( filename, val );
+            tr_sessionSetTorrentFile( tor->handle, tor->info.hashString, filename );
         }
     }
 

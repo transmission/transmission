@@ -38,7 +38,7 @@ void tr_metainfoFree( tr_info * inf );
 void tr_metainfoRemoveSaved( const tr_handle  * handle,
                              const tr_info    * info );
 
-void tr_metainfoMigrate( const tr_handle * handle,
-                         const tr_info   * inf );
+void tr_metainfoMigrate( tr_handle * handle,
+                         tr_info   * inf );
 
 #endif

@@ -36,6 +36,7 @@
 #include "blocklist.h"
 #include "fdlimit.h"
 #include "list.h"
+#include "metainfo.h" /* tr_metainfoFree */
 #include "net.h"
 #include "peer-mgr.h"
 #include "platform.h" /* tr_lock */
@@ -112,6 +113,8 @@ tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode )
 /***
 ****
 ***/
+
+static void metainfoLookupRescan( tr_handle * h );
 
 tr_handle *
 tr_initFull( const char * configDir,
@@ -193,6 +196,8 @@ tr_initFull( const char * configDir,
     h->blocklist = _tr_blocklistNew( filename, isBlocklistEnabled );
 
     tr_statsInit( h );
+
+    metainfoLookupRescan( h );
 
     return h;
 }
@@ -463,7 +468,7 @@ tr_loadTorrents ( tr_handle   * h,
                 tr_buildPath( filename, sizeof(filename), dirname, d->d_name, NULL );
                 tr_ctorSetMetainfoFromFile( ctor, filename );
                 tor = tr_torrentNew( h, ctor, NULL );
-                if( tor != NULL ) {
+                if( tor ) {
                     tr_list_append( &list, tor );
                     n++;
                 }
@@ -540,4 +545,131 @@ int
 tr_blocklistHasAddress( tr_handle * handle, const struct in_addr * addr )
 {
     return _tr_blocklistHasAddress( handle->blocklist, addr );
+}
+
+/***
+****
+***/
+
+static int
+compareLookupEntries( const void * va, const void * vb )
+{
+    const struct tr_metainfo_lookup * a = va;
+    const struct tr_metainfo_lookup * b = vb;
+    return strcmp( a->hashString, b->hashString );
+}
+
+static void
+metainfoLookupResort( tr_handle * h )
+{
+    qsort( h->metainfoLookup, 
+           h->metainfoLookupCount,
+           sizeof( struct tr_metainfo_lookup ),
+           compareLookupEntries );
+}
+
+static int
+compareHashStringToLookupEntry( const void * va, const void * vb )
+{
+    const char * a = va;
+    const struct tr_metainfo_lookup * b = vb;
+    return strcmp( a, b->hashString );
+}
+
+const char*
+tr_sessionFindTorrentFile( const tr_handle  * h,
+                           const char       * hashStr )
+{
+    struct tr_metainfo_lookup * l = bsearch( hashStr,
+                                             h->metainfoLookup,
+                                             h->metainfoLookupCount,
+                                             sizeof( struct tr_metainfo_lookup ),
+                                             compareHashStringToLookupEntry );
+    return l ? l->filename : NULL;
+}
+
+static void
+metainfoLookupRescan( tr_handle * h )
+{
+    int i;
+    int n;
+    struct stat sb;
+    const char * dirname = tr_getTorrentDir( h );
+    DIR * odir = NULL;
+    tr_ctor * ctor = NULL;
+    tr_list * list = NULL;
+
+    /* walk through the directory and find the mappings */
+    ctor = tr_ctorNew( h );
+    tr_ctorSetSave( ctor, FALSE ); /* since we already have them */
+    if( !stat( dirname, &sb ) && S_ISDIR( sb.st_mode ) && (( odir = opendir( dirname ))))
+    {
+        struct dirent *d;
+        for (d = readdir( odir ); d!=NULL; d=readdir( odir ) )
+        {
+            if( d->d_name && d->d_name[0]!='.' ) /* skip dotfiles, ., and .. */
+            {
+                tr_info inf;
+                char filename[MAX_PATH_LENGTH];
+                tr_buildPath( filename, sizeof(filename), dirname, d->d_name, NULL );
+                tr_ctorSetMetainfoFromFile( ctor, filename );
+                if( !tr_torrentParse( h, ctor, &inf ) )
+                {
+                    tr_list_append( &list, tr_strdup( inf.hashString ) );
+                    tr_list_append( &list, tr_strdup( filename ) );
+                    tr_metainfoFree( &inf );
+                }
+            }
+        }
+        closedir( odir );
+    }
+    tr_ctorFree( ctor );
+
+    n = tr_list_size( list ) / 2;
+    h->metainfoLookup = tr_new0( struct tr_metainfo_lookup, n );
+    h->metainfoLookupCount = n;
+    for( i=0; i<n; ++i )
+    {
+        char * hashString = tr_list_pop_front( &list );
+        char * filename = tr_list_pop_front( &list );
+
+        memcpy( h->metainfoLookup[i].hashString, hashString, 2*SHA_DIGEST_LENGTH+1 );
+        tr_free( hashString );
+        h->metainfoLookup[i].filename = filename;
+    }
+
+    metainfoLookupResort( h );
+    tr_dbg( "Found %d torrents in \"%s\"", n, dirname );
+}
+
+void
+tr_sessionSetTorrentFile( tr_handle    * h,
+                          const char   * hashString,
+                          const char   * filename )
+{
+    struct tr_metainfo_lookup * l = bsearch( hashString,
+                                             h->metainfoLookup,
+                                             h->metainfoLookupCount,
+                                             sizeof( struct tr_metainfo_lookup ),
+                                             compareHashStringToLookupEntry );
+    if( l != NULL )
+    {
+        if( l->filename != filename )
+        {
+            tr_free( l->filename );
+            l->filename = tr_strdup( filename );
+        }
+    }
+    else
+    {
+        const int n = h->metainfoLookupCount++;
+        struct tr_metainfo_lookup * node;
+        h->metainfoLookup = tr_renew( struct tr_metainfo_lookup,
+                                      h->metainfoLookup,
+                                      h->metainfoLookupCount );
+        node = h->metainfoLookup + n;
+        memcpy( node->hashString, hashString, 2*SHA_DIGEST_LENGTH+1 );
+        node->filename = tr_strdup( filename );
+        metainfoLookupResort( h );
+    }
 }
