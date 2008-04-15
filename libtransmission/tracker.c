@@ -1141,16 +1141,16 @@ onTrackerFreeNow( void * vt )
     tr_free( t );
 }
 
-void
-tr_trackerFree( tr_tracker * t )
-{
-    tr_runInEventThread( t->handle, onTrackerFreeNow, t );
-}
-
-
 /***
 ****  PUBLIC
 ***/
+
+void
+tr_trackerFree( tr_tracker * t )
+{
+    if( t )
+        tr_runInEventThread( t->handle, onTrackerFreeNow, t );
+}
 
 tr_publisher_tag
 tr_trackerSubscribe( tr_tracker          * t,
@@ -1164,7 +1164,8 @@ void
 tr_trackerUnsubscribe( tr_tracker        * t,
                        tr_publisher_tag    tag )
 {
-    tr_publisherUnsubscribe( t->publisher, tag );
+    if( t )
+        tr_publisherUnsubscribe( t->publisher, tag );
 }
 
 const tr_tracker_info *
@@ -1206,12 +1207,15 @@ tr_trackerGetCounts( const tr_tracker  * t,
 void
 tr_trackerStart( tr_tracker * t )
 {
-    tr_free( t->peer_id );
-    t->peer_id = tr_peerIdNew( );
+    if( t )
+    {
+        tr_free( t->peer_id );
+        t->peer_id = tr_peerIdNew( );
 
-    if( t->isRunning == 0 ) {
-        t->isRunning = 1;
-        enqueueRequest( t->handle, t, TR_REQ_STARTED );
+        if( t->isRunning == 0 ) {
+            t->isRunning = 1;
+            enqueueRequest( t->handle, t, TR_REQ_STARTED );
+        }
     }
 }
 
@@ -1230,7 +1234,7 @@ tr_trackerCompleted( tr_tracker * t )
 void
 tr_trackerStop( tr_tracker * t )
 {
-    if( t->isRunning ) {
+    if( t && t->isRunning ) {
         t->isRunning = 0;
         t->reannounceAt = t->manualAnnounceAllowedAt = 0;
         enqueueRequest( t->handle, t, TR_REQ_STOPPED );
