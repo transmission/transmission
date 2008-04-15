@@ -152,7 +152,7 @@ loadDND( tr_benc * dict, tr_torrent * tor )
     else
     {
         tr_tordbg( tor, "Couldn't load DND flags.  dnd list (%p) has %d children; torrent has %d files",
-                   ( list ? list->val.l.count : -1 ), (int)n );
+                   list, ( list ? list->val.l.count : -1 ), (int)n );
     }
 
     return ret;
@@ -260,7 +260,7 @@ saveProgress( tr_benc * dict, const tr_torrent * tor )
     mtimes = tr_torrentGetMTimes( tor, &n );
     m = tr_bencDictAddList( p, KEY_PROGRESS_MTIMES, n );
     for( i=0; i<n; ++i ) {
-        if( tr_torrentIsFileChecked( tor, i ) )
+        if( !tr_torrentIsFileChecked( tor, i ) )
             mtimes[i] = ~(time_t)0; /* force a recheck */
         tr_bencListAddInt( m, mtimes[i] );
     }
@@ -303,7 +303,7 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
                     if( t == curMTimes[i] )
                         tr_torrentSetFileChecked( tor, i, TRUE );
                     else {
-                        tr_tordbg( tor, "File #%d needs to be verified - times %lu and %lu don't match", t, curMTimes[i] );
+                        tr_tordbg( tor, "File #%d needs to be verified - times %lu and %lu don't match", i, t, curMTimes[i] );
                         tr_torrentSetFileChecked( tor, i, FALSE );
                     }
                 }
