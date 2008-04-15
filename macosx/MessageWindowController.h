@@ -32,6 +32,7 @@
     IBOutlet NSButton * fSaveButton, * fClearButton;
     
     NSMutableArray * fMessages;
+    unsigned int fIndex;
     
     NSDictionary * fAttributes;
     

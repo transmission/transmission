@@ -884,9 +884,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (stopRatio == INVALID || ratio >= stopRatio)
         return TR_ETA_UNKNOWN;
     
-    return (float)MAX([self downloadedTotal], [self haveVerified]) * (stopRatio - ratio) / uploadRate / 1024.0;
+    return (float)MAX([self downloadedTotal], [self haveTotal]) * (stopRatio - ratio) / uploadRate / 1024.0;
 }
 
+#warning when stats change, elliminate the use of size and make use of just the 2 fields
 - (float) notAvailableDesired
 {
     return (float)(fStat->leftUntilDone - fStat->desiredAvailable) / [self size];
