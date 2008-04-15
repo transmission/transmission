@@ -249,7 +249,6 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * bitfield )
     assert( cp );
     assert( bitfield );
     assert( cp->blockBitfield );
-    assert( cp->blockBitfield->len == bitfield->len );
 
     if( !cp || !bitfield || ( bitfield->len != cp->blockBitfield->len ) )
         return TR_ERROR_ASSERT;
