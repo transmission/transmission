@@ -499,21 +499,25 @@ _tr_bencInitStr( tr_benc * val, char * str, int len, int nofree )
     val->val.s.i = len;
 }
 
-int
-tr_bencInitStrDupLen( tr_benc * val, const char * str, int len )
+void
+tr_bencInitRaw( tr_benc * val, const void * src, size_t byteCount )
 {
-    char * newStr = tr_strndup( str, len );
-    if( newStr == NULL )
-        return 1;
-
-    _tr_bencInitStr( val, newStr, 0, 0 );
-    return 0;
+    tr_bencInit( val, TYPE_STR );
+    val->val.s.i = byteCount;
+    val->val.s.s = tr_new( char, byteCount );
+    val->val.s.nofree = 0;
+    memcpy( val->val.s.s, src, byteCount );
 }
 
 int
 tr_bencInitStrDup( tr_benc * val, const char * str )
 {
-    return tr_bencInitStrDupLen( val, str, -1 );
+    char * newStr = tr_strdup( str );
+    if( newStr == NULL )
+        return 1;
+
+    _tr_bencInitStr( val, newStr, 0, 0 );
+    return 0;
 }
 
 void

@@ -991,9 +991,9 @@ tr_torrentStop( tr_torrent * tor )
 {
     tr_globalLock( tor->handle );
 
+    tor->isRunning = 0;
     if( !tor->isDeleting )
         tr_torrentSaveResume( tor );
-    tor->isRunning = 0;
     tr_runInEventThread( tor->handle, stopTorrent, tor );
 
     tr_globalUnlock( tor->handle );

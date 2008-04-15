@@ -230,9 +230,13 @@ tr_cpBlockAdd( tr_completion * cp, tr_block_index_t block )
     assert( cp->doneHave <= cp->completeHave );
 }
 
-const tr_bitfield * tr_cpBlockBitfield( const tr_completion * cp )
+const tr_bitfield *
+tr_cpBlockBitfield( const tr_completion * cp )
 {
-    assert( cp != NULL );
+    assert( cp );
+    assert( cp->blockBitfield );
+    assert( cp->blockBitfield->bits );
+    assert( cp->blockBitfield->len );
 
     return cp->blockBitfield;
 }
@@ -241,6 +245,11 @@ tr_errno
 tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * bitfield )
 {
     tr_block_index_t i;
+
+    assert( cp );
+    assert( bitfield );
+    assert( cp->blockBitfield );
+    assert( cp->blockBitfield->len == bitfield->len );
 
     if( !cp || !bitfield || ( bitfield->len != cp->blockBitfield->len ) )
         return TR_ERROR_ASSERT;
