@@ -666,8 +666,8 @@
             }
     }
     
-    //for network view make sure progress indicator hides itself
-    if (view == fNetworkView && [fPortStatusImage image])
+    //for network view make sure progress indicator hides itself (get around a Tiger bug)
+    if (![NSApp isOnLeopardOrBetter] && view == fNetworkView && [fPortStatusImage image])
         [fPortStatusProgress setDisplayedWhenStopped: NO];
 }
 

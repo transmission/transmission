@@ -874,7 +874,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (int) etaRatio
 {
     if (![self isSeeding])
-        return -1;
+        return TR_ETA_UNKNOWN;
     
     float uploadRate = [self uploadRate];
     if (uploadRate < 0.1)
@@ -887,10 +887,9 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return (float)MAX([self downloadedTotal], [self haveTotal]) * (stopRatio - ratio) / uploadRate / 1024.0;
 }
 
-#warning when stats change, elliminate the use of size and make use of just the 2 fields
 - (float) notAvailableDesired
 {
-    return (float)(fStat->leftUntilDone - fStat->desiredAvailable) / [self size];
+    return 1.0 - (float)fStat->desiredAvailable / [self sizeLeft];
 }
 
 - (BOOL) isActive
