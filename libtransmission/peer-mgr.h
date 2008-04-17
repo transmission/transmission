@@ -41,6 +41,10 @@ tr_peerMgr* tr_peerMgrNew( struct tr_handle * );
 
 void tr_peerMgrFree( tr_peerMgr * manager );
 
+int tr_peerMgrPeerIsSeed( const tr_peerMgr      * mgr,
+                          const uint8_t         * torrentHash,
+                          const struct in_addr  * addr );
+
 void tr_peerMgrAddIncoming( tr_peerMgr      * manager,
                             struct in_addr  * addr,
                             uint16_t          port,

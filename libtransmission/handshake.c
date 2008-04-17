@@ -26,6 +26,7 @@
 #include "crypto.h"
 #include "handshake.h"
 #include "peer-io.h"
+#include "peer-mgr.h"
 #include "torrent.h"
 #include "trevent.h"
 #include "utils.h"
@@ -810,11 +811,22 @@ readCryptoProvide( tr_handshake * handshake, struct evbuffer * inbuf )
     tr_sha1( req3, "req3", 4, handshake->mySecret, KEY_LEN, NULL );
     for( i=0; i<SHA_DIGEST_LENGTH; ++i )
         obfuscatedTorrentHash[i] = req2[i] ^ req3[i];
-    tor = tr_torrentFindFromObfuscatedHash( handshake->handle, obfuscatedTorrentHash );
-    if( tor != NULL ) {
+    if(( tor = tr_torrentFindFromObfuscatedHash( handshake->handle, obfuscatedTorrentHash )))
+    {
         dbgmsg( handshake, "found the torrent; it's [%s]", tor->info.name );
         tr_peerIoSetTorrentHash( handshake->io, tor->info.hash );
-    } else {
+        if( !tr_torrentAllowsPex( tor ) &&
+            tr_peerMgrPeerIsSeed( handshake->handle->peerMgr,
+                                  tor->info.hash,
+                                  tr_peerIoGetAddress( handshake->io, NULL )))
+        {
+            dbgmsg( handshake, "a peer has tried to reconnect to us!" );
+            tr_handshakeDone( handshake, FALSE );
+            return READ_DONE;
+        }
+    }
+    else
+    {
         dbgmsg( handshake, "can't find that torrent..." );
         tr_handshakeDone( handshake, FALSE );
         return READ_DONE;

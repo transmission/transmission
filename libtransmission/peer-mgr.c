@@ -559,6 +559,28 @@ clientIsUploadingTo( const tr_peer * peer )
 }
 
 /***
+****
+***/
+
+int
+tr_peerMgrPeerIsSeed( const tr_peerMgr       * mgr,
+                      const uint8_t          * torrentHash,
+                      const struct in_addr   * addr )
+{
+    int isSeed = FALSE;
+    const Torrent * t = NULL;
+    const struct peer_atom * atom = NULL;
+
+    t = getExistingTorrent( (tr_peerMgr*)mgr, torrentHash );
+    if( t )
+        atom = getExistingAtom( t, addr );
+    if( atom )
+        isSeed = ( atom->flags & ADDED_F_SEED_FLAG ) != 0;
+
+    return isSeed;
+}
+
+/***
 ****  Refill
 ***/
 
