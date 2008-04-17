@@ -362,14 +362,17 @@ tr_getGlobalPeerLimit( const tr_handle * handle UNUSED )
 void
 tr_torrentRates( tr_handle * h, float * toClient, float * toPeer )
 {
-    tr_globalLock( h );
+    if( h )
+    {
+        tr_globalLock( h );
 
-    if( toClient )
-        *toClient = tr_rcRate( h->download );
-    if( toPeer )
-        *toPeer = tr_rcRate( h->upload );
+        if( toClient )
+            *toClient = tr_rcRate( h->download );
+        if( toPeer )
+            *toPeer = tr_rcRate( h->upload );
 
-    tr_globalUnlock( h );
+        tr_globalUnlock( h );
+    }
 }
 
 int

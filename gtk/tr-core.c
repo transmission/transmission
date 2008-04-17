@@ -551,6 +551,17 @@ tr_core_new( void )
     return core;
 }
 
+void
+tr_core_close( TrCore * core )
+{
+    tr_handle * handle = tr_core_handle( core );
+    if( handle )
+    {
+        core->priv->handle = NULL;
+        tr_close( handle ); 
+    }
+}
+
 GtkTreeModel *
 tr_core_model( TrCore * core )
 {
@@ -595,6 +606,7 @@ tr_core_get_stats( const TrCore       * core,
         tr_torrentRates( core->priv->handle,
                          &setme->clientDownloadSpeed,
                          &setme->clientUploadSpeed );
+
         gtk_tree_model_foreach( core->priv->model,
                                 statsForeach,
                                 setme );

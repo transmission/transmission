@@ -550,7 +550,7 @@ quitThreadFunc( gpointer gdata )
 {
     struct cbdata * cbdata = gdata;
 
-    tr_close( tr_core_handle( cbdata->core ) );
+    tr_core_close( cbdata->core );
 
     /* shutdown the gui */
     if( cbdata->prefs )

@@ -91,6 +91,8 @@ GType tr_core_get_type( void );
 
 TrCore * tr_core_new( void );
 
+void tr_core_close( TrCore* );
+
 /* Return the model used without incrementing the reference count */
 GtkTreeModel * tr_core_model( TrCore * self );
 
