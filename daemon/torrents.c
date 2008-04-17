@@ -658,12 +658,13 @@ timerfunc( int fd UNUSED, short event UNUSED, void * arg UNUSED )
 int
 loadstate( void )
 {
+    const char * str;
+    int64_t      tmp;
     uint8_t   *  buf;
     size_t       len;
-    benc_val_t   top, * num, * str, * list;
+    benc_val_t   top, * list;
     int          ii;
     struct tor * tor;
-    const char * dir;
 
     buf = readfile( gl_state, &len );
     if( NULL == buf )
@@ -679,48 +680,38 @@ loadstate( void )
     }
     free( buf );
 
-    num = tr_bencDictFind( &top, "autostart" );
-    if( tr_bencIsInt( num ) )
-        gl_autostart = ( num->val.i ? 1 : 0 );
+    if( tr_bencDictFindInt( &top, "autostart", &tmp ) )
+        gl_autostart = tmp != 0;
 
-    num = tr_bencDictFind( &top, "port" );
-    if( tr_bencIsInt( num ) && 0 < num->val.i && 0xffff > num->val.i )
-    {
-        gl_port = num->val.i;
-    }
+    if( tr_bencDictFindInt( &top, "port", &tmp ) && ( 0 < tmp ) && ( tmp <= 0xffff ) )
+        gl_port = tmp;
     tr_setBindPort( gl_handle, gl_port );
 
-    num = tr_bencDictFind( &top, "default-pex" );
-    if( tr_bencIsInt( num ) )
-        gl_pex = ( num->val.i ? 1 : 0 );
+    if( tr_bencDictFindInt( &top, "default-pex", &tmp ) )
+        gl_pex = tmp != 0;
 
-    num = tr_bencDictFind( &top, "port-mapping" );
-    if( tr_bencIsInt( num ) )
-        gl_mapping = ( num->val.i ? 1 : 0 );
+    if( tr_bencDictFindInt( &top, "port-mapping", &tmp ) )
+        gl_mapping = tmp != 0;
     tr_natTraversalEnable( gl_handle, gl_mapping );
 
-    num = tr_bencDictFind( &top, "upload-limit" );
-    if( tr_bencIsInt( num ) )
-        gl_uplimit = num->val.i;
+    if( tr_bencDictFindInt( &top, "upload-limit", &tmp ) )
+        gl_uplimit = tmp;
     tr_setGlobalSpeedLimit( gl_handle, TR_UP, gl_uplimit );
     tr_setUseGlobalSpeedLimit( gl_handle, TR_UP, gl_uplimit > 0 );
 
-    num = tr_bencDictFind( &top, "download-limit" );
-    if( tr_bencIsInt( num ) )
-        gl_downlimit = num->val.i;
+    if( tr_bencDictFindInt( &top, "download-limit", &tmp ) )
+        gl_downlimit = tmp;
     tr_setGlobalSpeedLimit( gl_handle, TR_DOWN, gl_downlimit );
     tr_setUseGlobalSpeedLimit( gl_handle, TR_DOWN, gl_downlimit > 0 );
 
-    str = tr_bencDictFind( &top, "default-directory" );
-    if( tr_bencIsString( str ) )
-        strlcpy( gl_dir, str->val.s.s, sizeof gl_dir );
+    if( tr_bencDictFindStr( &top, "default-directory", &str ) )
+        strlcpy( gl_dir, str, sizeof gl_dir );
 
-    str = tr_bencDictFind( &top, "encryption-mode" );
-    if( tr_bencIsString( str ) )
+    if( tr_bencDictFindStr( &top, "encryption-mode", &str ) )
     {
-        if(!strcasecmp(str->val.s.s, "preferred"))
+        if(!strcasecmp( str, "preferred"))
             gl_crypto = TR_ENCRYPTION_PREFERRED;
-        else if(!strcasecmp(str->val.s.s, "required"))
+        else if(!strcasecmp( str, "required"))
             gl_crypto = TR_ENCRYPTION_REQUIRED;
     }
 
@@ -732,27 +723,25 @@ loadstate( void )
 
     for( ii = 0; ii < list->val.l.count; ii++ )
     {
+        const char * directory = NULL;
+        const char * hash = NULL;
+
         tr_benc * dict = &list->val.l.vals[ii];
         if( !tr_bencIsDict( dict ) )
             continue;
 
-        str = tr_bencDictFind( dict, "directory" );
-        dir = tr_bencIsString( str ) ? str->val.s.s : NULL;
-
-        str = tr_bencDictFind( dict, "hash" );
-        if( !tr_bencIsString( str ) || 2 * SHA_DIGEST_LENGTH != str->val.s.i )
+        if( !tr_bencDictFindStr( dict, "directory", &directory ) ||
+            !tr_bencDictFindStr( dict, "hash", &hash ) )
             continue;
 
-        tor = opentor( NULL, str->val.s.s, NULL, 0, dir );
+        tor = opentor( NULL, hash, NULL, 0, directory );
         if( !tor )
             continue;
 
-        num = tr_bencDictFind( dict, "pex" );
-        if( tr_bencIsInt( num ) )
+        if( tr_bencDictFindInt( dict, "pex", &tmp ) )
             fprintf( stderr, "warning: obsolete command 'pex'\n" );
 
-        num = tr_bencDictFind( dict, "paused" );
-        if( tr_bencIsInt( num ) && !num->val.i )
+        if( tr_bencDictFindInt( dict, "paused", &tmp ) && !tmp )
             tr_torrentStart( tor->tor );
     }
 
