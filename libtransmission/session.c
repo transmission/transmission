@@ -163,12 +163,7 @@ tr_initFull( const char * configDir,
     while( !h->events )
         tr_wait( 50 );
 
-    h->tag = strdup( tag );
-    if( !h->tag ) {
-        free( h );
-        return NULL;
-    }
-
+    h->tag = tr_strdup( tag );
     h->peerMgr = tr_peerMgrNew( h );
 
     /* Initialize rate and file descripts controls */
@@ -436,7 +431,10 @@ tr_close( tr_handle * h )
 
     tr_fdClose( );
     tr_lockFree( h->lock );
-    free( h->tag );
+    tr_free( h->tag );
+    tr_free( h->configDir );
+    tr_free( h->resumeDir );
+    tr_free( h->torrentDir );
     free( h );
 }
 
