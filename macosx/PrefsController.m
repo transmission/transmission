@@ -98,6 +98,11 @@
     return self;
 }
 
+- (tr_handle *) handle
+{
+    return fHandle;
+}
+
 - (void) dealloc
 {
     if (fPortStatusTimer)
@@ -374,7 +379,7 @@
 
 - (void) updateBlocklist: (id) sender
 {
-    [BlocklistDownloader downloadWithPrefsController: self withHandle: fHandle];
+    [BlocklistDownloader downloadWithPrefsController: self];
 }
 
 - (void) updateBlocklistFields

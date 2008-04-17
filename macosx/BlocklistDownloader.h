@@ -30,7 +30,6 @@
 @interface BlocklistDownloader : NSObject
 {    
     PrefsController * fPrefsController;
-    tr_handle * fHandle;
     
     IBOutlet NSWindow * fStatusWindow;
     IBOutlet NSProgressIndicator * fProgressBar;
@@ -43,7 +42,7 @@
     long long fExpectedSize;
 }
 
-+ (id) downloadWithPrefsController: (PrefsController *) prefsController withHandle: (tr_handle *) handle;
++ (id) downloadWithPrefsController: (PrefsController *) prefsController;
 
 - (void) cancelDownload: (id) sender;
 

@@ -59,6 +59,7 @@
 }
 
 - (id) initWithHandle: (tr_handle *) handle;
+- (tr_handle *) handle;
 - (void) setUpdater: (SUUpdater *) updater;
 
 - (void) updatePortField;

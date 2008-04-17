@@ -386,7 +386,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     float stopRatio, ratio;
     if ((stopRatio = [self actualStopRatio]) == INVALID || (ratio = [self ratio]) >= stopRatio)
         return 1.0;
-    else if (ratio > 0 && stopRatio > 0)
+    else if (stopRatio > 0)
         return ratio / stopRatio;
     else
         return 0;

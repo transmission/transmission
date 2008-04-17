@@ -32,7 +32,7 @@
 
 @interface BlocklistDownloader (Private)
 
-- (id) initWithPrefsController: (PrefsController *) prefsController withHandle: (tr_handle *) handle;
+- (id) initWithPrefsController: (PrefsController *) prefsController;
 - (void) startDownload;
 - (void) updateProcessString;
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info;
@@ -41,9 +41,9 @@
 
 @implementation BlocklistDownloader
 
-+ (id) downloadWithPrefsController: (PrefsController *) prefsController withHandle: (tr_handle *) handle
++ (id) downloadWithPrefsController: (PrefsController *) prefsController
 {
-    BlocklistDownloader * downloader = [[BlocklistDownloader alloc] initWithPrefsController: prefsController withHandle: handle];
+    BlocklistDownloader * downloader = [[BlocklistDownloader alloc] initWithPrefsController: prefsController];
     [downloader startDownload];
 }
 
@@ -117,7 +117,7 @@
     [fStatusWindow display]; //force window to be updated
     
     //process data
-    tr_blocklistSetContent(fHandle, [DESTINATION UTF8String]);
+    tr_blocklistSetContent([fPrefsController handle], [DESTINATION UTF8String]);
     
     //delete downloaded file
     if ([NSApp isOnLeopardOrBetter])
@@ -136,12 +136,11 @@
 
 @implementation BlocklistDownloader (Private)
 
-- (id) initWithPrefsController: (PrefsController *) prefsController withHandle: (tr_handle *) handle
+- (id) initWithPrefsController: (PrefsController *) prefsController
 {
     if ((self = [super init]))
     {
         fPrefsController = prefsController;
-        fHandle = handle;
     }
     
     return self;
