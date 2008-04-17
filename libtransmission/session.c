@@ -152,7 +152,6 @@ tr_initFull( const char * configDir,
     h->lock = tr_lockNew( );
     h->isPexEnabled = isPexEnabled ? 1 : 0;
     h->encryptionMode = encryptionMode;
-    h->configDir = tr_strdup( configDir );
     h->peerSocketTOS = peerSocketTOS;
 
     tr_setConfigDir( h, configDir );
