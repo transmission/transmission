@@ -564,7 +564,6 @@ sendFastSuggest( tr_peermsgs * msgs,
         tr_peerIoWriteUint32( msgs->io, msgs->outMessages, pieceIndex );
     }
 }
-#endif
 static void
 sendFastHave( tr_peermsgs * msgs, int all )
 {
@@ -578,6 +577,7 @@ sendFastHave( tr_peermsgs * msgs, int all )
         updateInterest( msgs );
     }
 }
+#endif
 
 static void
 sendFastReject( tr_peermsgs * msgs,
@@ -852,8 +852,6 @@ sendLtepHandshake( tr_peermsgs * msgs )
     char * buf;
     int len;
     int pex;
-    const char * v = TR_NAME " " USERAGENT_PREFIX;
-    const int port = tr_getPublicPort( msgs->handle );
     struct evbuffer * outbuf;
 
     if( msgs->clientSentLtepHandshake )
@@ -872,16 +870,12 @@ sendLtepHandshake( tr_peermsgs * msgs )
         pex = 1;
 
     tr_bencInitDict( &val, 4 );
-    tr_bencInitInt( tr_bencDictAdd( &val, "e" ), 1 );
-    m  = tr_bencDictAdd( &val, "m" );
-    tr_bencInit( m, TYPE_DICT );
-    if( pex ) {
-        tr_bencDictReserve( m, 1 );
-        tr_bencInitInt( tr_bencDictAdd( m, "ut_pex" ), TR_LTEP_PEX );
-    }
-    if( port > 0 )
-        tr_bencInitInt( tr_bencDictAdd( &val, "p" ), port );
-    tr_bencInitStr( tr_bencDictAdd( &val, "v" ), v, 0, 1 );
+    tr_bencDictAddInt( &val, "e", msgs->handle->encryptionMode != TR_PLAINTEXT_PREFERRED );
+    tr_bencDictAddInt( &val, "p", tr_getPublicPort( msgs->handle ) );
+    tr_bencDictAddStr( &val, "v", TR_NAME " " USERAGENT_PREFIX );
+    m  = tr_bencDictAddDict( &val, "m", 1 );
+    if( pex )
+        tr_bencDictAddInt( m, "ut_pex", TR_LTEP_PEX );
     buf = tr_bencSave( &val, &len );
 
     tr_peerIoWriteUint32( msgs->io, outbuf, 2*sizeof(uint8_t) + len );
@@ -891,11 +885,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
 
     tr_peerIoWriteBuf( msgs->io, outbuf );
 
-#if 0
-    dbgmsg( msgs, "here is the ltep handshake we sent:" );
-    tr_bencPrint( &val );
-    dbgmsg( msgs, "here is the ltep handshake we read [%s]:", tr_bencSave( &val, NULL ) );
-#endif
+    dbgmsg( msgs, "here is the ltep handshake we sent [%*.*s]", len, len, buf );
 
     /* cleanup */
     tr_bencFree( &val );
@@ -918,11 +908,7 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
         return;
     }
 
-#if 0
-    dbgmsg( msgs, "here is the ltep handshake we read:" );
-    tr_bencPrint( &val );
-    dbgmsg( msgs, "here is the ltep handshake we read [%s]:", tr_bencSave( &val, NULL ) );
-#endif
+    dbgmsg( msgs, "here is the ltep handshake we got [%*.*s]", len, len, tmp );
 
     /* does the peer prefer encrypted connections? */
     if(( sub = tr_bencDictFindType( &val, "e", TYPE_INT )))
@@ -1929,23 +1915,10 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->clientWillAskFor = REQUEST_LIST_INIT;
     *setme = tr_publisherSubscribe( m->publisher, func, userData );
 
+    sendBitfield( m );
+
     if ( tr_peerIoSupportsLTEP( m->io ) )
         sendLtepHandshake( m );
-
-    /* bitfield/have-all/have-none must preceed other non-handshake messages... */
-    if ( !tr_peerIoSupportsFEXT( m->io ) )
-        sendBitfield( m );
-    else {
-        /* This peer is fastpeer-enabled, send it have-all or have-none if appropriate */
-        float completion = tr_cpPercentComplete( m->torrent->completion );
-        if ( completion == 0.0f ) {
-            sendFastHave( m, 0 );
-        } else if ( completion == 1.0f ) {
-            sendFastHave( m, 1 );
-        } else {
-            sendBitfield( m );
-        }
-    }
     
     tr_peerIoSetTimeoutSecs( m->io, 150 ); /* timeout after N seconds of inactivity */
     tr_peerIoSetIOFuncs( m->io, canRead, didWrite, gotError, m );
