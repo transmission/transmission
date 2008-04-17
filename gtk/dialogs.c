@@ -152,6 +152,7 @@ removeTorrents( struct DeleteData * data )
     for( l=data->torrents; l!=NULL; l=l->next )
         tr_core_remove_torrent( data->core, l->data, data->delete_files );
     g_slist_free( data->torrents );
+    data->torrents = NULL;
 }
 
 
@@ -166,6 +167,7 @@ removeResponse( GtkDialog * dialog, gint response, gpointer gdata )
         g_slist_foreach( data->torrents, (GFunc)g_object_unref, NULL );
 
     gtk_widget_destroy( GTK_WIDGET( dialog ) );
+    g_slist_free( data->torrents );
     g_free( data );
 }
 

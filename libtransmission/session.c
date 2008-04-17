@@ -415,6 +415,7 @@ deadlineReached( const uint64_t deadline )
 void
 tr_close( tr_handle * h )
 {
+    int i;
     const int maxwait_msec = SHUTDOWN_MAX_SECONDS * 1000;
     const uint64_t deadline = tr_date( ) + maxwait_msec;
 
@@ -430,6 +431,9 @@ tr_close( tr_handle * h )
 
     tr_fdClose( );
     tr_lockFree( h->lock );
+    for( i=0; i<h->metainfoLookupCount; ++i )
+        tr_free( h->metainfoLookup[i].filename );
+    tr_free( h->metainfoLookup );
     tr_free( h->tag );
     tr_free( h->configDir );
     tr_free( h->resumeDir );

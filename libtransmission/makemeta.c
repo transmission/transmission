@@ -167,7 +167,7 @@ tr_metaInfoBuilderCreate( tr_handle * handle, const char * topFile )
 void
 tr_metaInfoBuilderFree( tr_metainfo_builder * builder )
 {
-    if( builder != NULL )
+    if( builder )
     {
         uint32_t i;
         for( i=0; i<builder->fileCount; ++i )
@@ -482,6 +482,12 @@ tr_makeMetaInfo( tr_metainfo_builder  * builder,
 {
     tr_lock * lock;
 
+    /* free any variables from a previous run */
+    tr_free( builder->announce );
+    tr_free( builder->comment );
+    tr_free( builder->outputFile );
+
+    /* initialize the builder variables */
     builder->abortFlag = 0;
     builder->isDone = 0;
     builder->announce = tr_strdup( announce );

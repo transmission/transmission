@@ -474,7 +474,6 @@ tr_getConfigDir( const tr_handle * handle )
     return handle->configDir;
 }
 
-
 const char *
 tr_getTorrentDir( const tr_handle * handle )
 {
