@@ -274,7 +274,6 @@ getFileInfo( const char                      * topFile,
              tr_benc                         * uninitialized_length,
              tr_benc                         * uninitialized_path )
 {
-    tr_benc *sub;
     const char *pch, *prev;
     const size_t topLen = strlen(topFile) + 1; /* +1 for '/' */
     int n;
@@ -298,8 +297,7 @@ getFileInfo( const char                      * topFile,
         memcpy( buf, prev, pch-prev );
         buf[pch-prev] = '\0';
 
-        sub = tr_bencListAdd( uninitialized_path );
-        tr_bencInitStrDup( sub, buf );
+        tr_bencListAddStr( uninitialized_path, buf );
 
         prev = pch + 1;
         if (!*pch)
@@ -308,113 +306,71 @@ getFileInfo( const char                      * topFile,
 }
 
 static void
-makeFilesList( tr_benc                    * list,
-               const tr_metainfo_builder  * builder )
-{
-    uint32_t i = 0;
-
-    tr_bencListReserve( list, builder->fileCount );
-
-    for( i=0; i<builder->fileCount; ++i )
-    {
-        tr_benc * dict = tr_bencListAdd( list );
-        tr_benc *length, *pathVal;
-
-        tr_bencInitDict( dict, 2 );
-        length = tr_bencDictAdd( dict, "length" );
-        pathVal = tr_bencDictAdd( dict, "path" );
-        getFileInfo( builder->top, &builder->files[i], length, pathVal );
-    }
-}
-
-static void
 makeInfoDict ( tr_benc              * dict,
                tr_metainfo_builder  * builder )
 {
     uint8_t * pch;
-    tr_benc * val;
     char base[MAX_PATH_LENGTH];
 
     tr_bencDictReserve( dict, 5 );
     
     if ( builder->isSingleFile )
-    {
-        val = tr_bencDictAdd( dict, "length" );
-        tr_bencInitInt( val, builder->files[0].size );
-    }
-    else
-    {
-        val = tr_bencDictAdd( dict, "files" );
-        tr_bencInit( val, TYPE_LIST );
-        makeFilesList( val, builder );
+        tr_bencDictAddInt( dict, "length", builder->files[0].size );
+    else {
+        uint32_t i;
+        tr_benc * list = tr_bencDictAddList( dict, "files", builder->fileCount );
+        for( i=0; i<builder->fileCount; ++i ) {
+            tr_benc * dict = tr_bencListAddDict( list, 2 );
+            tr_benc * length = tr_bencDictAdd( dict, "length" );
+            tr_benc * pathVal = tr_bencDictAdd( dict, "path" );
+            getFileInfo( builder->top, &builder->files[i], length, pathVal );
+        }
     }
 
-    val = tr_bencDictAdd( dict, "name" );
     strlcpy( base, builder->top, sizeof( base ) );
-    tr_bencInitStrDup ( val, basename( base ) );
+    tr_bencDictAddStr( dict, "name", basename( base ) );
 
-    val = tr_bencDictAdd( dict, "piece length" );
-    tr_bencInitInt( val, builder->pieceSize );
+    tr_bencDictAddInt( dict, "piece length", builder->pieceSize );
 
-    if( ( pch = getHashInfo( builder ) ) ) {
-        val = tr_bencDictAdd( dict, "pieces" );
-        tr_bencInitStr( val, pch, SHA_DIGEST_LENGTH * builder->pieceCount, 0 );
+    if(( pch = getHashInfo( builder ))) {
+        tr_bencDictAddRaw( dict, "pieces", pch, SHA_DIGEST_LENGTH * builder->pieceCount );
+        tr_free( pch );
     }
 
-    val = tr_bencDictAdd( dict, "private" );
-    tr_bencInitInt( val, builder->isPrivate ? 1 : 0 );
+    tr_bencDictAddInt( dict, "private", builder->isPrivate ? 1 : 0 );
 }
 
 static void
 tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
 {
     int n = 5;
-    tr_benc top, *val;
+    tr_benc top;
 
     if ( builder->comment && *builder->comment ) ++n;
     tr_bencInitDict( &top, n );
 
-    val = tr_bencDictAdd( &top, "announce" );
-    tr_bencInitStrDup( val, builder->announce );
+    tr_bencDictAddStr( &top, "announce", builder->announce );
+
     if( tr_httpParseURL( builder->announce, -1, NULL, NULL, NULL ) )
-    {
         builder->result = TR_MAKEMETA_URL;
-    }
     
     if( !builder->result && !builder->abortFlag )
     {
-        if( builder->comment && *builder->comment ) {
-            val = tr_bencDictAdd( &top, "comment" );
-            tr_bencInitStrDup( val, builder->comment );
-        }
-
-        val = tr_bencDictAdd( &top, "created by" );
-        tr_bencInitStrDup( val, TR_NAME "/" LONG_VERSION_STRING );
-
-        val = tr_bencDictAdd( &top, "creation date" );
-        tr_bencInitInt( val, time(0) );
-
-        val = tr_bencDictAdd( &top, "encoding" );
-        tr_bencInitStrDup( val, "UTF-8" );
-
-        val = tr_bencDictAdd( &top, "info" );
-        tr_bencInitDict( val, 666 );
-        makeInfoDict( val, builder );
+        if( builder->comment && *builder->comment )
+            tr_bencDictAddStr( &top, "comment", builder->comment );
+        tr_bencDictAddStr( &top, "created by", TR_NAME "/" LONG_VERSION_STRING );
+        tr_bencDictAddInt( &top, "creation date", time(0) );
+        tr_bencDictAddStr( &top, "encoding", "UTF-8" );
+        makeInfoDict( tr_bencDictAddDict( &top, "info", 666 ), builder );
     }
 
     /* save the file */
     if ( !builder->result && !builder->abortFlag ) {
-        char * pch = tr_bencSave( &top, &n );
-        FILE * fp = fopen( builder->outputFile, "wb+" );
-        size_t nmemb = n;
-        if( !fp || ( fwrite( pch, 1, nmemb, fp ) != nmemb ) ) {
+        if( tr_bencSaveFile( builder->outputFile, &top ) ) {
             builder->my_errno = errno;
             strlcpy( builder->errfile, builder->outputFile, sizeof( builder->errfile ) );
             builder->result = TR_MAKEMETA_IO_WRITE;
         }
-        if( fp )
-            fclose( fp );
-        tr_free( pch );
     }
 
     /* cleanup */

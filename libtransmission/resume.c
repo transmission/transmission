@@ -109,7 +109,7 @@ saveDND( tr_benc * dict, const tr_torrent * tor )
 
     list = tr_bencDictAddList( dict, KEY_DND, n );
     for( i=0; i<n; ++i )
-        tr_bencInitInt( tr_bencListAdd( list ), inf->files[i].dnd ? 1 : 0 );
+        tr_bencListAddInt( list, inf->files[i].dnd ? 1 : 0 );
 }
 
 static uint64_t
@@ -171,7 +171,7 @@ savePriorities( tr_benc * dict, const tr_torrent * tor )
 
     list = tr_bencDictAddList( dict, KEY_PRIORITY, n );
     for( i=0; i<n; ++i )
-        tr_bencInitInt( tr_bencListAdd( list ), inf->files[i].priority );
+        tr_bencListAddInt( list, inf->files[i].priority );
 }
 
 static uint64_t

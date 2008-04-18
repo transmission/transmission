@@ -28,14 +28,21 @@ struct tr_stats_handle
     time_t startTime;
 };
 
-static void
-parseCumulativeStats( tr_session_stats  * setme,
-                      const uint8_t     * content,
-                      size_t              len )
+static char*
+getFilename( const tr_handle * handle, char * buf, size_t buflen )
 {
+    tr_buildPath( buf, buflen, tr_getConfigDir(handle), "stats.benc", NULL );
+    return buf;
+}
+
+static void
+loadCumulativeStats( const tr_handle * handle, tr_session_stats * setme )
+{
+    char filename[MAX_PATH_LENGTH];
     tr_benc top;
 
-    if( !tr_bencLoad( content, len, &top, NULL ) )
+    getFilename( handle, filename, sizeof(filename) );
+    if( !tr_bencLoadFile( filename, &top ) )
     {
         int64_t i;
 
@@ -58,28 +65,6 @@ parseCumulativeStats( tr_session_stats  * setme,
     }
 }
 
-static char*
-getFilename( const tr_handle * handle, char * buf, size_t buflen )
-{
-    tr_buildPath( buf, buflen, tr_getConfigDir(handle), "stats.benc", NULL );
-    return buf;
-}
-
-static void
-loadCumulativeStats( const tr_handle * handle, tr_session_stats * setme )
-{
-    size_t len;
-    uint8_t * content;
-    char filename[MAX_PATH_LENGTH];
-
-    getFilename( handle, filename, sizeof(filename) );
-    content = tr_loadFile( filename, &len );
-    if( content != NULL )
-        parseCumulativeStats( setme, content, len );
-
-    tr_free( content );
-}
-
 static void
 saveCumulativeStats( const tr_handle * handle, const tr_session_stats * s )
 {
@@ -87,11 +72,11 @@ saveCumulativeStats( const tr_handle * handle, const tr_session_stats * s )
     tr_benc top;
 
     tr_bencInitDict( &top, 5 );
-    tr_bencInitInt( tr_bencDictAdd( &top, "uploaded-bytes" ), s->uploadedBytes );
-    tr_bencInitInt( tr_bencDictAdd( &top, "downloaded-bytes" ), s->downloadedBytes );
-    tr_bencInitInt( tr_bencDictAdd( &top, "files-added" ), s->filesAdded );
-    tr_bencInitInt( tr_bencDictAdd( &top, "session-count" ), s->sessionCount );
-    tr_bencInitInt( tr_bencDictAdd( &top, "seconds-active" ), s->secondsActive );
+    tr_bencDictAddInt( &top, "uploaded-bytes",   s->uploadedBytes );
+    tr_bencDictAddInt( &top, "downloaded-bytes", s->downloadedBytes );
+    tr_bencDictAddInt( &top, "files-added",      s->filesAdded );
+    tr_bencDictAddInt( &top, "session-count",    s->sessionCount );
+    tr_bencDictAddInt( &top, "seconds-active",   s->secondsActive );
 
     getFilename( handle, filename, sizeof(filename) );
     tr_bencSaveFile( filename, &top );

@@ -660,25 +660,15 @@ loadstate( void )
 {
     const char * str;
     int64_t      tmp;
-    uint8_t   *  buf;
-    size_t       len;
     benc_val_t   top, * list;
     int          ii;
     struct tor * tor;
 
-    buf = readfile( gl_state, &len );
-    if( NULL == buf )
+    if( tr_bencLoadFile( gl_state, &top ) )
     {
-        return -1;
-    }
-
-    if( tr_bencLoad( buf, len, &top, NULL ) )
-    {
-        free( buf );
         errmsg( "failed to load bencoded data from %s", gl_state );
         return -1;
     }
-    free( buf );
 
     if( tr_bencDictFindInt( &top, "autostart", &tmp ) )
         gl_autostart = tmp != 0;
@@ -751,79 +741,41 @@ loadstate( void )
 int
 savestate( void )
 {
-    benc_val_t   top, * list, * tor;
+    benc_val_t   top, * list;
     struct tor * ii;
-    uint8_t    * buf;
-    int          len;
-
-    tr_bencInit( &top, TYPE_DICT );
-    if( tr_bencDictReserve( &top, 9 ) )
-    {
-      nomem:
-        tr_bencFree( &top );
-        errmsg( "failed to save state: failed to allocate memory" );
-        return -1;
-    }
-    tr_bencInitInt( tr_bencDictAdd( &top, "autostart" ),      gl_autostart );
-    tr_bencInitInt( tr_bencDictAdd( &top, "port" ),           gl_port );
-    tr_bencInitInt( tr_bencDictAdd( &top, "default-pex" ),    gl_pex );
-    tr_bencInitInt( tr_bencDictAdd( &top, "port-mapping" ),   gl_mapping );
-    tr_bencInitInt( tr_bencDictAdd( &top, "upload-limit" ),   gl_uplimit );
-    tr_bencInitInt( tr_bencDictAdd( &top, "download-limit" ), gl_downlimit );
-    tr_bencInitStr( tr_bencDictAdd( &top, "default-directory" ),
-                    gl_dir, -1, 1 );
-    if(TR_ENCRYPTION_REQUIRED == gl_crypto)
-        tr_bencInitStr(tr_bencDictAdd(&top, "encryption-mode"), "required", -1, 1);
-    else
-        tr_bencInitStr(tr_bencDictAdd(&top, "encryption-mode"), "preferred", -1, 1);
-    list = tr_bencDictAdd( &top, "torrents" );
-    tr_bencInit( list, TYPE_LIST );
-
-    len = 0;
+    int          torrentCount;
+ 
+    torrentCount = 0;
     RB_FOREACH( ii, tortree, &gl_tree )
-    {
-        len++;
-    }
-    if( tr_bencListReserve( list, len ) )
-    {
-        goto nomem;
-    }
+        ++torrentCount;
+
+    tr_bencInitDict( &top, 9 );
+    tr_bencDictAddInt( &top, "autostart",         gl_autostart );
+    tr_bencDictAddInt( &top, "port",              gl_port );
+    tr_bencDictAddInt( &top, "default-pex",       gl_pex );
+    tr_bencDictAddInt( &top, "port-mapping",      gl_mapping );
+    tr_bencDictAddInt( &top, "upload-limit",      gl_uplimit );
+    tr_bencDictAddInt( &top, "download-limit",    gl_downlimit );
+    tr_bencDictAddStr( &top, "default-directory", gl_dir );
+    tr_bencDictAddStr( &top, "encryption-mode",   TR_ENCRYPTION_REQUIRED == gl_crypto
+                                                  ? "required" : "preferred" );
+    list = tr_bencDictAddList( &top, "torrents", torrentCount );
 
     RB_FOREACH( ii, tortree, &gl_tree )
     {
-        const tr_info * inf;
-        const tr_stat * st;
-        tor = tr_bencListAdd( list );
-        assert( NULL != tor );
-        tr_bencInit( tor, TYPE_DICT );
-        inf    = tr_torrentInfo( ii->tor );
-        st     = tr_torrentStat( ii->tor );
-        if( tr_bencDictReserve( tor, 3 ) )
-        {
-            goto nomem;
-        }
-        tr_bencInitStr( tr_bencDictAdd( tor, "hash" ),
-                        inf->hashString, 2 * SHA_DIGEST_LENGTH, 1 );
-        tr_bencInitInt( tr_bencDictAdd( tor, "paused" ),
-                        !TR_STATUS_IS_ACTIVE( st->status ) );
-        tr_bencInitStr( tr_bencDictAdd( tor, "directory" ),
-                        tr_torrentGetFolder( ii->tor ), -1, 1 );
+        const tr_info * inf = tr_torrentInfo( ii->tor );
+        const tr_stat * st  = tr_torrentStat( ii->tor );
+        tr_benc * tor = tr_bencListAddDict( list, 3 );
+        tr_bencDictAddStr( tor, "hash", inf->hashString );
+        tr_bencDictAddInt( tor, "paused", !TR_STATUS_IS_ACTIVE( st->status ) );
+        tr_bencDictAddStr( tor, "directory", tr_torrentGetFolder( ii->tor ) );
     }
 
-    buf = ( uint8_t * )tr_bencSave( &top, &len );
-    SAFEBENCFREE( &top );
-    if( NULL == buf )
+    if( tr_bencSaveFile( gl_newstate, &top ) )
     {
-        errnomsg( "failed to save state: bencoding failed" );
+        errnomsg( "failed to save state: failed to write to %s", gl_newstate );
         return -1;
     }
-
-    if( 0 > writefile( gl_newstate, buf, len ) )
-    {
-        free( buf );
-        return -1;
-    }
-    free( buf );
 
     if( 0 > rename( gl_newstate, gl_state ) )
     {

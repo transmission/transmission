@@ -450,38 +450,6 @@ tr_bencDictFindStr( tr_benc * dict, const char * key, const char ** setme )
     return found;
 }
 
-tr_benc*
-tr_bencDictAddInt( tr_benc * dict, const char * key, int64_t val )
-{
-    tr_benc * child = tr_bencDictAdd( dict, key );
-    tr_bencInitInt( child, val );
-    return child;
-}
-
-tr_benc*
-tr_bencDictAddStr( tr_benc * dict, const char * key, const char * val )
-{
-    tr_benc * child = tr_bencDictAdd( dict, key );
-    tr_bencInitStrDup( child, val );
-    return child;
-}
-
-tr_benc*
-tr_bencDictAddList( tr_benc * dict, const char * key, int reserveCount )
-{
-    tr_benc * child = tr_bencDictAdd( dict, key );
-    tr_bencInitList( child, reserveCount );
-    return child;
-}
-
-tr_benc*
-tr_bencDictAddDict( tr_benc * dict, const char * key, int reserveCount )
-{
-    tr_benc * child = tr_bencDictAdd( dict, key );
-    tr_bencInitDict( child, reserveCount );
-    return child;
-}
-
 /***
 ****
 ***/
@@ -573,13 +541,33 @@ tr_bencListAdd( tr_benc * list )
 
     return item;
 }
-
 tr_benc *
-tr_bencListAddInt( tr_benc * list, int64_t i )
+tr_bencListAddInt( tr_benc * list, int64_t val )
 {
     tr_benc * node = tr_bencListAdd( list );
-    tr_bencInitInt( node, i );
+    tr_bencInitInt( node, val );
     return node;
+}
+tr_benc *
+tr_bencListAddStr( tr_benc * list, const char * val )
+{
+    tr_benc * node = tr_bencListAdd( list );
+    tr_bencInitStrDup( node, val );
+    return node;
+}
+tr_benc*
+tr_bencListAddList( tr_benc * list, int reserveCount )
+{
+    tr_benc * child = tr_bencListAdd( list );
+    tr_bencInitList( child, reserveCount );
+    return child;
+}
+tr_benc*
+tr_bencListAddDict( tr_benc * list, int reserveCount )
+{
+    tr_benc * child = tr_bencListAdd( list );
+    tr_bencInitDict( child, reserveCount );
+    return child;
 }
 
 tr_benc *
@@ -597,6 +585,41 @@ tr_bencDictAdd( tr_benc * dict, const char * key )
     tr_bencInit( itemval, TYPE_INT );
 
     return itemval;
+}
+tr_benc*
+tr_bencDictAddInt( tr_benc * dict, const char * key, int64_t val )
+{
+    tr_benc * child = tr_bencDictAdd( dict, key );
+    tr_bencInitInt( child, val );
+    return child;
+}
+tr_benc*
+tr_bencDictAddStr( tr_benc * dict, const char * key, const char * val )
+{
+    tr_benc * child = tr_bencDictAdd( dict, key );
+    tr_bencInitStrDup( child, val );
+    return child;
+}
+tr_benc*
+tr_bencDictAddList( tr_benc * dict, const char * key, int reserveCount )
+{
+    tr_benc * child = tr_bencDictAdd( dict, key );
+    tr_bencInitList( child, reserveCount );
+    return child;
+}
+tr_benc*
+tr_bencDictAddDict( tr_benc * dict, const char * key, int reserveCount )
+{
+    tr_benc * child = tr_bencDictAdd( dict, key );
+    tr_bencInitDict( child, reserveCount );
+    return child;
+}
+tr_benc*
+tr_bencDictAddRaw( tr_benc * dict, const char * key, const void * src, size_t len )
+{
+    tr_benc * child = tr_bencDictAdd( dict, key );
+    tr_bencInitRaw( child, src, len );
+    return child;
 }
 
 /***

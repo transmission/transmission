@@ -296,10 +296,10 @@ ipc_initval( const struct ipc_info * session,
     else
     {
         tr_bencInitList( pk, 3 );
-        tr_bencInitStr( tr_bencListAdd( pk ), MSGNAME( msg_id ), -1, 1 );
+        tr_bencListAddStr( pk, MSGNAME( msg_id ) );
         ret = tr_bencListAdd( pk );
         if( 0 < tag )
-            tr_bencInitInt( tr_bencListAdd( pk ), tag );
+            tr_bencListAddInt( pk, tag );
     }
 
     tr_bencInit( ret, benc_type );
@@ -409,13 +409,11 @@ ipc_mkvers( size_t * len, const char * label )
     uint8_t  * ret;
   
     tr_bencInitDict( &pk, 1 );
-    dict = tr_bencDictAdd( &pk, MSGNAME( IPC_MSG_VERSION ) );
-
-    tr_bencInitDict( dict, 3 );
-    tr_bencInitInt( tr_bencDictAdd( dict, "min" ), PROTO_VERS_MIN );
-    tr_bencInitInt( tr_bencDictAdd( dict, "max" ), PROTO_VERS_MAX );
+    dict = tr_bencDictAddDict( &pk, MSGNAME( IPC_MSG_VERSION ), 3 );
+    tr_bencDictAddInt( dict, "min", PROTO_VERS_MIN );
+    tr_bencDictAddInt( dict, "max", PROTO_VERS_MAX );
     if( label )
-        tr_bencInitStr( tr_bencDictAdd( dict, "label" ), label, -1, 1 );
+        tr_bencDictAddStr( dict, "label", label );
 
     ret = ipc_serialize( &pk, len );
     SAFEBENCFREE( &pk );
@@ -486,7 +484,7 @@ ipc_createInfoRequest( const struct ipc_info * session,
         for( ii = 0; TORRENT_ID_VALID( ids[ii] ); ii++ ) { }
         tr_bencInitList( idlist, ii );
         for( ii = 0; TORRENT_ID_VALID( ids[ii] ); ii++ )
-            tr_bencInitInt( tr_bencListAdd( idlist ), ids[ii] );
+            tr_bencListAddInt( idlist, ids[ii] );
     }
 
     /* get the type name array */
@@ -533,11 +531,11 @@ static void
 filltracker( tr_benc * val, const tr_tracker_info * tk )
 {
     tr_bencInitDict( val, 4 );
-    tr_bencInitStr( tr_bencDictAdd( val, "address" ),  tk->address,  -1, 1 );
-    tr_bencInitInt( tr_bencDictAdd( val, "port" ),     tk->port );
-    tr_bencInitStr( tr_bencDictAdd( val, "announce" ), tk->announce, -1, 1 );
+    tr_bencDictAddStr( val, "address",  tk->address );
+    tr_bencDictAddInt( val, "port",     tk->port );
+    tr_bencDictAddStr( val, "announce", tk->announce );
     if( tk->scrape )
-        tr_bencInitStr( tr_bencDictAdd( val, "scrape" ), tk->scrape, -1, 1 );
+        tr_bencDictAddStr( val, "scrape", tk->scrape );
 }
 
 /**
