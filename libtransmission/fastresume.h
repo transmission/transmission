@@ -29,8 +29,7 @@
  * Returns a bitwise-or'ed set of the data loaded from fastresume
  */
 uint64_t tr_fastResumeLoad( tr_torrent          * tor,
-                            uint64_t              fieldsToLoad,
-                            const tr_ctor       * ctor );
+                            uint64_t              fieldsToLoad );
 
 void tr_fastResumeRemove( const tr_torrent * tor );
 

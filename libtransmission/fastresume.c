@@ -661,61 +661,11 @@ fastResumeLoadImpl ( tr_torrent   * tor,
     return ret;
 }
 
-static uint64_t
-setFromCtor( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor, int mode )
-{
-    uint64_t ret = 0;
-
-    if( fields & TR_FR_RUN ) {
-        uint8_t isPaused;
-        if( !tr_ctorGetPaused( ctor, mode, &isPaused ) ) {
-            tor->isRunning = !isPaused;
-            ret |= TR_FR_RUN;
-        }
-    }
-
-    if( fields & TR_FR_MAX_PEERS ) 
-        if( !tr_ctorGetMaxConnectedPeers( ctor, mode, &tor->maxConnectedPeers ) )
-            ret |= TR_FR_MAX_PEERS;
-
-    if( fields & TR_FR_DESTINATION ) {
-        const char * destination;
-        if( !tr_ctorGetDestination( ctor, mode, &destination ) ) {
-            ret |= TR_FR_DESTINATION;
-            tr_free( tor->destination );
-            tor->destination = tr_strdup( destination );
-        }
-    }
-
-    return ret;
-}
-
-static uint64_t
-useManditoryFields( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor )
-{
-    return setFromCtor( tor, fields, ctor, TR_FORCE );
-}
-
-static uint64_t
-useFallbackFields( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor )
-{
-    return setFromCtor( tor, fields, ctor, TR_FALLBACK );
-}
-
 uint64_t
 tr_fastResumeLoad( tr_torrent     * tor,
-                   uint64_t         fieldsToLoad,
-                   const tr_ctor  * ctor )
+                   uint64_t         fieldsToLoad )
 {
-    uint64_t ret = 0;
-
-    ret |= useManditoryFields( tor, fieldsToLoad, ctor );
-    fieldsToLoad &= ~ret;
-    ret |= fastResumeLoadImpl( tor, fieldsToLoad );
-    fieldsToLoad &= ~ret;
-    ret |= useFallbackFields( tor, fieldsToLoad, ctor );
-
-    return ret;
+    return fastResumeLoadImpl( tor, fieldsToLoad );
 }
 
 void
