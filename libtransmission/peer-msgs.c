@@ -1917,10 +1917,10 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->clientWillAskFor = REQUEST_LIST_INIT;
     *setme = tr_publisherSubscribe( m->publisher, func, userData );
 
-    sendBitfield( m );
-
     if ( tr_peerIoSupportsLTEP( m->io ) )
         sendLtepHandshake( m );
+
+    sendBitfield( m );
     
     tr_peerIoSetTimeoutSecs( m->io, 150 ); /* timeout after N seconds of inactivity */
     tr_peerIoSetIOFuncs( m->io, canRead, didWrite, gotError, m );
