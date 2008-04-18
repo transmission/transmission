@@ -93,26 +93,37 @@ findFileLocation( const tr_torrent * tor,
                   tr_file_index_t  * fileIndex,
                   uint64_t         * fileOffset )
 {
-    const tr_info * info = &tor->info;
+    size_t len;
+    tr_file_index_t first, last;
+    const tr_info * inf = &tor->info;
+    uint64_t offset = tr_pieceOffset( tor, pieceIndex, pieceOffset, 0 );
 
-    tr_file_index_t i;
-    uint64_t piecePos = ((uint64_t)pieceIndex * info->pieceSize) + pieceOffset;
+    assert( pieceIndex < inf->pieceCount );
+    assert( pieceOffset < tr_torPieceCountBytes( tor, pieceIndex ) );
+    assert( offset < inf->totalSize );
+   
+    /* use a lower-bound bsearch to find the file that matches */
+    first = 0;
+    last = inf->fileCount;
+    len = last - first;
+    while( len > 0 ) {
+        size_t half = len / 2;
+        size_t middle = first + half;
+        if( inf->files[middle].offset + inf->files[middle].length < offset ) {
+            first = middle;
+            ++first;
+            len = len - half - 1;
+        }
+        else len = half;
+    }
+   
+    *fileIndex = first;
+    *fileOffset = offset - inf->files[first].offset;
 
-    if( pieceIndex >= info->pieceCount )
-        return TR_ERROR_ASSERT;
-    if( pieceOffset >= tr_torPieceCountBytes( tor, pieceIndex ) )
-        return TR_ERROR_ASSERT;
-    if( piecePos >= info->totalSize )
-        return TR_ERROR_ASSERT;
-
-    for( i=0; info->files[i].length<=piecePos; ++i )
-        piecePos -= info->files[i].length;
-
-    *fileIndex = i;
-    *fileOffset = piecePos;
-
-    assert( *fileIndex < info->fileCount );
-    assert( *fileOffset < info->files[i].length );
+    assert( inf->files[first].offset <= offset );
+    assert( offset < inf->files[first].offset + inf->files[first].length );
+    assert( *fileIndex < inf->fileCount );
+    assert( *fileOffset < inf->files[first].length );
     return 0;
 }
 
@@ -162,10 +173,8 @@ readOrWritePiece( tr_torrent        * tor,
     uint64_t fileOffset;
     const tr_info * info = &tor->info;
 
-    if( pieceIndex >= tor->info.pieceCount )
-        err = TR_ERROR_ASSERT;
-    else if( buflen > ( size_t ) tr_torPieceCountBytes( tor, pieceIndex ) )
-        err = TR_ERROR_ASSERT;
+    assert( pieceIndex < tor->info.pieceCount );
+    assert( pieceOffset + buflen <= tr_torPieceCountBytes( tor, pieceIndex ) );
 
     if( !err )
         err = findFileLocation ( tor, pieceIndex, pieceOffset, &fileIndex, &fileOffset );
@@ -253,7 +262,7 @@ tr_ioRecalculateHash( const tr_torrent  * tor,
         tr_sha1( setme, buf, n, NULL );
 
     tr_lockUnlock( lock );
-    return 0;
+    return err;
 }
 
 tr_errno
