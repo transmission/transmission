@@ -66,7 +66,7 @@ savePeers( tr_benc * dict, const tr_torrent * tor )
     const int count = tr_peerMgrGetPeers( tor->handle->peerMgr,
                                           tor->info.hash, &pex );
     if( count > 0 )
-        tr_bencInitRaw( tr_bencDictAdd( dict, KEY_PEERS ), pex, sizeof(tr_pex)*count );
+        tr_bencDictAddRaw( dict, KEY_PEERS, pex, sizeof(tr_pex)*count );
     tr_free( pex );
 }
 
@@ -249,7 +249,6 @@ saveProgress( tr_benc * dict, const tr_torrent * tor )
     time_t * mtimes;
     tr_benc * p;
     tr_benc * m;
-    tr_benc * b;
     const tr_bitfield * bitfield;
 
     p = tr_bencDictAdd( dict, KEY_PROGRESS );
@@ -266,8 +265,8 @@ saveProgress( tr_benc * dict, const tr_torrent * tor )
 
     /* add the bitfield */
     bitfield = tr_cpBlockBitfield( tor->completion );
-    b = tr_bencDictAdd( p, KEY_PROGRESS_BITFIELD );
-    tr_bencInitRaw( b, bitfield->bits, bitfield->len );
+    tr_bencDictAddRaw( p, KEY_PROGRESS_BITFIELD,
+                       bitfield->bits, bitfield->len );
 
     /* cleanup */
     tr_free( mtimes );

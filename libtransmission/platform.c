@@ -161,28 +161,6 @@ tr_threadNew( void (*func)(void *),
     return t;
 }
     
-void
-tr_threadJoin( tr_thread * t )
-{
-    if( t != NULL )
-    {
-#ifdef __BEOS__
-        long exit;
-        wait_for_thread( t->thread, &exit );
-#elif defined(WIN32)
-        WaitForSingleObject( t->thread_handle, INFINITE );
-        CloseHandle( t->thread_handle );
-#else
-        pthread_join( t->thread, NULL );
-#endif
-
-        tr_dbg( "Thread '%s' joined", t->name );
-        t->name = NULL;
-        t->func = NULL;
-        tr_free( t );
-    }
-}
-
 /***
 ****  LOCKS
 ***/
@@ -210,7 +188,7 @@ tr_lockNew( void )
 #ifdef __BEOS__
     l->lock = create_sem( 1, "" );
 #elif defined(WIN32)
-    InitializeCriticalSection( &l->lock ); /* critical sections support recursion */
+    InitializeCriticalSection( &l->lock ); /* supports recursion */
 #else
     pthread_mutexattr_t attr;
     pthread_mutexattr_init( &attr );
@@ -300,9 +278,9 @@ getHomeDir( void )
             home = tr_strdup( "" );
 #else
             struct passwd * pw = getpwuid( getuid() );
-            endpwent( );
             if( pw )
                 home = tr_strdup( pw->pw_dir );
+            endpwent( );
 #endif
         }
 
