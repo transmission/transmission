@@ -295,7 +295,7 @@ getHomeDir( void )
         if( !home )
         {
 #ifdef WIN32
-            SHGetFolderPath( NULL, CSIDL_PROFILE, NULL, 0, buf );
+            SHGetFolderPath( NULL, CSIDL_PROFILE, NULL, 0, home );
 #elif defined(__BEOS__) || defined(__AMIGAOS4__)
             home = tr_strdup( "" );
 #else
