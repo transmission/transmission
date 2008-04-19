@@ -639,6 +639,7 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
     {
         const int interval = t->scrapeIntervalSec + t->randOffset;
         dbgmsg( t, "request succeeded. rescraping in %d seconds", interval );
+        tr_ndbg( t->name, "request succeeded. rescraping in %d seconds", interval );
         t->scrapeAt = time( NULL ) + interval;
     }
     else if( 300<=responseCode && responseCode<=399 )

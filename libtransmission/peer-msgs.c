@@ -70,7 +70,6 @@ enum
     RATE_PULSE_INTERVAL     = (250),       /* msec between ratePulse() calls */
 
     MAX_QUEUE_SIZE          = (100),
-    MAX_OUTBUF_SIZE         = (1024),
      
     /* (fast peers) max number of pieces we fast-allow to another peer */
     MAX_FAST_ALLOWED_COUNT   = 10,
@@ -1600,8 +1599,8 @@ getUploadMax( const tr_peermsgs * msgs )
     const tr_torrent * tor = msgs->torrent;
     const int useSwift = isSwiftEnabled( msgs );
     const size_t swiftLeft = msgs->info->credit;
-    size_t speedLeft;
-    size_t bufLeft;
+    int speedLeft;
+    int bufLeft;
     size_t ret;
 
     if( tor->uploadLimitMode == TR_SPEEDLIMIT_GLOBAL )
@@ -1609,9 +1608,12 @@ getUploadMax( const tr_peermsgs * msgs )
     else if( tor->uploadLimitMode == TR_SPEEDLIMIT_SINGLE )
         speedLeft = tr_rcBytesLeft( tor->upload );
     else
-        speedLeft = ~0;
+        speedLeft = INT_MAX;
 
-    bufLeft = MAX_OUTBUF_SIZE - tr_peerIoWriteBytesWaiting( msgs->io );
+    /* this basically says the outbuf shouldn't have more than one block
+     * queued up in it... blocksize, +13 for the size of the BT protocol's
+     * block message overhead */
+    bufLeft = tor->blockSize + 13 - tr_peerIoWriteBytesWaiting( msgs->io );
     ret = MIN( speedLeft, bufLeft );
     if( useSwift)
         ret = MIN( ret, swiftLeft );

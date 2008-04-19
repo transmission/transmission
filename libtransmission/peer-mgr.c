@@ -994,26 +994,6 @@ ensureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8
     }
 }
 
-static void
-maybeEnsureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8_t flags, uint8_t from )
-{
-    if( tr_blocklistHasAddress( t->manager->handle, addr ) )
-    {
-        char * fmt = NULL;
-        switch( from ) {
-            case TR_PEER_FROM_TRACKER:  fmt = _( "Banned IP address \"%s\" was given to us by the tracker" ); break;
-            case TR_PEER_FROM_CACHE:    fmt = _( "Banned IP address \"%s\" was found in the cache" ); break;
-            case TR_PEER_FROM_PEX:      fmt = _( "Banned IP address \"%s\" was given to us by another peer" ); break;
-            case TR_PEER_FROM_INCOMING: fmt = _( "Banned IP address \"%s\" tried to connect to us" ); break;
-        }
-        tr_torinf( t->tor, fmt, inet_ntoa( *addr ) );
-    }
-    else
-    {
-        ensureAtomExists( t, addr, port, flags, from );
-    }
-}
-
 static int
 getMaxPeerCount( const tr_torrent * tor UNUSED )
 {
@@ -1119,7 +1099,7 @@ tr_peerMgrAddIncoming( tr_peerMgr      * manager,
 
     if( tr_blocklistHasAddress( manager->handle, addr ) )
     {
-        tr_inf( _( "Banned IP address \"%s\" tried to connect to us" ),
+        tr_dbg( "Banned IP address \"%s\" tried to connect to us",
                 inet_ntoa( *addr ) );
         tr_netClose( socket );
     }
@@ -1157,7 +1137,8 @@ tr_peerMgrAddPex( tr_peerMgr     * manager,
     managerLock( manager );
 
     t = getExistingTorrent( manager, torrentHash );
-    maybeEnsureAtomExists( t, &pex->in_addr, pex->port, pex->flags, from );
+    if( !tr_blocklistHasAddress( t->manager->handle, &pex->in_addr ) )
+        ensureAtomExists( t, &pex->in_addr, pex->port, pex->flags, from );
 
     managerUnlock( manager );
 }
