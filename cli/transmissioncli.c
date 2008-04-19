@@ -43,23 +43,24 @@
 #endif
 
 const char * USAGE =
-"Usage: %s [-car[-m]] [-dfinpsuv] [-h] file.torrent [output-dir]\n\n"
+"Usage: %s [-car[-m]] [-dfginpsuv] [-h] file.torrent [output-dir]\n\n"
 "Options:\n"
+"  -h, --help                Print this help and exit\n" 
+"  -i, --info                Print metainfo and exit\n"
+"  -s, --scrape              Print counts of seeders/leechers and exit\n"
+"  -V, --version             Print the version number and exit\n"
 "  -c, --create-from <file>  Create torrent from the specified source file.\n"
-"  -a, --announce <url> Used in conjunction with -c.\n"
-"  -r, --private        Used in conjunction with -c.\n"
-"  -m, --comment <text> Adds an optional comment when creating a torrent.\n"
-"  -d, --download <int> Maximum download rate (-1 = no limit, default = -1)\n"
-"  -f, --finish <shell script> Command you wish to run on completion\n" 
-"  -h, --help           Print this help and exit\n" 
-"  -i, --info           Print metainfo and exit\n"
-"  -n  --nat-traversal  Attempt NAT traversal using NAT-PMP or UPnP IGD\n"
-"  -p, --port <int>     Port we should listen on (default = %d)\n"
-"  -s, --scrape         Print counts of seeders/leechers and exit\n"
-"  -u, --upload <int>   Maximum upload rate (-1 = no limit, default = 20)\n"
-"  -v, --verbose <int>  Verbose level (0 to 2, default = 0)\n"
-"  -V, --version        Print the version number and exit\n"
-"  -y, --recheck        Force a recheck of the torrent data\n";
+"  -a, --announce <url>      Used in conjunction with -c.\n"
+"  -g, --config-dir <path>   Where to look for configuration files\n"
+"  -r, --private             Used in conjunction with -c.\n"
+"  -m, --comment <text>      Adds an optional comment when creating a torrent.\n"
+"  -d, --download <int>      Max download rate (-1 = no limit, default = -1)\n"
+"  -f, --finish <script>     Command you wish to run on completion\n" 
+"  -n  --nat-traversal       Attempt NAT traversal using NAT-PMP or UPnP IGD\n"
+"  -p, --port <int>          Port we should listen on (default = %d)\n"
+"  -u, --upload <int>        Maximum upload rate (-1 = no limit, default = 20)\n"
+"  -v, --verbose <int>       Verbose level (0 to 2, default = 0)\n"
+"  -y, --recheck             Force a recheck of the torrent data\n";
 
 static int           showHelp      = 0;
 static int           showInfo      = 0;
@@ -79,6 +80,7 @@ static sig_atomic_t  manualUpdate  = 0;
 
 static char          * finishCall   = NULL;
 static char          * announce     = NULL;
+static char          * configdir    = NULL;
 static char          * sourceFile   = NULL;
 static char          * comment      = NULL;
 
@@ -144,8 +146,11 @@ main( int argc, char ** argv )
     if( showInfo || showScrape || ( sourceFile != NULL ) )
         bindPort = -1;
 
+    if( configdir == NULL )
+        configdir = strdup( tr_getDefaultConfigDir( ) );
+
     /* Initialize libtransmission */
-    h = tr_initFull( TR_DEFAULT_CONFIG_DIR,
+    h = tr_initFull( configdir,
                      "cli",                         /* tag */
                      1,                             /* pex enabled */
                      natTraversal,                  /* nat enabled */
@@ -377,83 +382,53 @@ parseCommandLine( int argc, char ** argv )
 {
     for( ;; )
     {
-        static struct option long_options[] =
-          { { "help",     no_argument,          NULL, 'h' },
-            { "info",     no_argument,          NULL, 'i' },
-            { "scrape",   no_argument,          NULL, 's' },
-            { "private",  no_argument,          NULL, 'r' },
-            { "version",  no_argument,          NULL, 'V' },
-            { "verbose",  required_argument,    NULL, 'v' },
-            { "port",     required_argument,    NULL, 'p' },
-            { "upload",   required_argument,    NULL, 'u' },
-            { "download", required_argument,    NULL, 'd' },
-            { "finish",   required_argument,    NULL, 'f' },
-            { "create-from", required_argument, NULL, 'c' },
-            { "comment",  required_argument,    NULL, 'm' },
-            { "announce", required_argument,    NULL, 'a' },
-            { "nat-traversal", no_argument,     NULL, 'n' },
-            { "recheck",  no_argument,          NULL, 'y' },
-            { "output-dir", required_argument,  NULL, 'o' },
+        static const struct option long_options[] = {
+            { "announce",      required_argument, NULL, 'a' },
+            { "create-from",   required_argument, NULL, 'c' },
+            { "download",      required_argument, NULL, 'd' },
+            { "finish",        required_argument, NULL, 'f' },
+            { "config-dir",    required_argument, NULL, 'g' },
+            { "help",          no_argument,       NULL, 'h' },
+            { "info",          no_argument,       NULL, 'i' },
+            { "comment",       required_argument, NULL, 'm' },
+            { "nat-traversal", no_argument,       NULL, 'n' },
+            { "output-dir",    required_argument, NULL, 'o' },
+            { "port",          required_argument, NULL, 'p' },
+            { "private",       no_argument,       NULL, 'r' },
+            { "scrape",        no_argument,       NULL, 's' },
+            { "upload",        required_argument, NULL, 'u' },
+            { "verbose",       required_argument, NULL, 'v' },
+            { "version",       no_argument,       NULL, 'V' },
+            { "recheck",       no_argument,       NULL, 'y' },
             { 0, 0, 0, 0} };
-
-        int c, optind = 0;
-        c = getopt_long( argc, argv, "hisrVv:p:u:d:f:c:m:a:no:y",
-                         long_options, &optind );
+        int optind = 0;
+        int c = getopt_long( argc, argv,
+                             "a:c:d:f:g:him:no:p:rsu:v:Vy",
+                             long_options, &optind );
         if( c < 0 )
         {
             break;
         }
         switch( c )
         {
-            case 'h':
-                showHelp = 1;
-                break;
-            case 'i':
-                showInfo = 1;
-                break;
-            case 's':
-                showScrape = 1;
-                break;
-            case 'r':
-                isPrivate = 1;
-                break;
-            case 'v':
-                verboseLevel = atoi( optarg );
-                break;
-            case 'V':
-                showVersion = 1;
-                break;
-            case 'p':
-                bindPort = atoi( optarg );
-                break;
-            case 'u':
-                uploadLimit = atoi( optarg );
-                break;
-            case 'd':
-                downloadLimit = atoi( optarg );
-                break;
-            case 'f':
-                finishCall = optarg;
-                break;
-            case 'c':
-                sourceFile = optarg;
-                break;
-            case 'm':
-                comment = optarg;
-                break;
-            case 'a':
-                announce = optarg;
-                break;
-            case 'n':
-                natTraversal = 1;
-                break;
-            case 'y':
-                recheckData = 1;
-                break;
-            case 'o':
-                savePath = optarg;
-            default:
-                return 1;
+            case 'a': announce = optarg; break;
+            case 'c': sourceFile = optarg; break;
+            case 'd': downloadLimit = atoi( optarg ); break;
+            case 'f': finishCall = optarg; break;
+            case 'g': configdir = strdup( optarg ); break;
+            case 'h': showHelp = 1; break;
+            case 'i': showInfo = 1; break;
+            case 'm': comment = optarg; break;
+            case 'n': natTraversal = 1; break;
+            case 'o': savePath = optarg;
+            case 'p': bindPort = atoi( optarg ); break;
+            case 'r': isPrivate = 1; break;
+            case 's': showScrape = 1; break;
+            case 'u': uploadLimit = atoi( optarg ); break;
+            case 'v': verboseLevel = atoi( optarg ); break;
+            case 'V': showVersion = 1; break;
+            case 'y': recheckData = 1; break;
+            default: return 1;
         }
     }
 

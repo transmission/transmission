@@ -50,8 +50,8 @@
 #include "torrents.h"
 
 static void usage       ( const char *, ... );
-static void readargs    ( int, char **, int *, int *, char **, char ** );
-static int  trylocksock ( const char * );
+static void readargs    ( int, char **, int *, int *, char **, char **, char ** );
+static int  trylocksock ( const char * configdir, const char * sockpath );
 static int  getsock     ( const char * );
 static void exitcleanup ( void );
 static void setupsigs   ( struct event_base * );
@@ -68,23 +68,24 @@ main( int argc, char ** argv )
 {
     struct event_base * evbase;
     int                 nofork, debug, sockfd;
-    char              * sockpath, * pidfile;
+    char              * configdir, * sockpath, * pidfile;
 
     setmyname( argv[0] );
-    readargs( argc, argv, &nofork, &debug, &sockpath, &pidfile );
+    readargs( argc, argv, &nofork, &debug, &configdir, &sockpath, &pidfile );
 
-    if( !nofork )
-    {
-        if( 0 > daemon( 1, 0 ) )
-        {
+    if( !nofork ) {
+        if( 0 > daemon( 1, 0 ) ) {
             errnomsg( "failed to daemonize" );
             exit( 1 );
         }
         errsyslog( 1 );
     }
 
+    if( configdir == NULL )
+        configdir = (char*) tr_getDefaultConfigDir( );
+
     atexit( exitcleanup );
-    sockfd = trylocksock( sockpath );
+    sockfd = trylocksock( configdir, sockpath );
     if( 0 > sockfd )
     {
         exit( 1 );
@@ -96,7 +97,7 @@ main( int argc, char ** argv )
 
     evbase = event_init();
     setupsigs( evbase );
-    torrent_init( evbase );
+    torrent_init( configdir, evbase );
     server_init( evbase );
     server_debug( debug );
     server_listen( sockfd );
@@ -128,6 +129,7 @@ usage( const char * msg, ... )
   "\n"
   "  -d --debug                Print data send and received, implies -f\n"
   "  -f --foreground           Run in the foreground and log to stderr\n"
+  "  -g --config-dir <path>    Where to look for configuration files\n"
   "  -h --help                 Display this message and exit\n"
   "  -p --pidfile <path>       Save the process id in a file at <path>\n"
   "  -s --socket <path>        Place the socket file at <path>\n"
@@ -138,14 +140,15 @@ usage( const char * msg, ... )
 }
 
 void
-readargs( int argc, char ** argv, int * nofork, int * debug, char ** sock,
-          char ** pidfile )
+readargs( int argc, char ** argv, int * nofork, int * debug,
+          char ** configdir, char ** sock, char ** pidfile )
 {
-    char optstr[] = "dfhp:s:";
+    char optstr[] = "dfg:hp:s:";
     struct option longopts[] =
     {
         { "debug",              no_argument,       NULL, 'd' },
         { "foreground",         no_argument,       NULL, 'f' },
+        { "config-dir",         required_argument, NULL, 'g' },
         { "help",               no_argument,       NULL, 'h' },
         { "pidfile",            required_argument, NULL, 'p' },
         { "socket",             required_argument, NULL, 's' },
@@ -157,26 +160,16 @@ readargs( int argc, char ** argv, int * nofork, int * debug, char ** sock,
     *debug     = 0;
     *sock      = NULL;
     *pidfile   = NULL;
+    *configdir = NULL;
 
-    while( 0 <= ( opt = getopt_long( argc, argv, optstr, longopts, NULL ) ) )
-    {
-        switch( opt )
-        {
-            case 'd':
-                *debug = 1;
-                /* FALLTHROUGH */
-            case 'f':
-                *nofork = 1;
-                break;
-            case 'p':
-                *pidfile = optarg;
-                break;
-            case 's':
-                *sock   = optarg;
-                break;
-            default:
-                usage( NULL );
-                break;
+    while( 0 <= ( opt = getopt_long( argc, argv, optstr, longopts, NULL ) ) ) {
+        switch( opt ) {
+            case 'd': *debug = 1; /* FALLTHROUGH */
+            case 'f': *nofork = 1; break;
+            case 'g': *configdir = strdup( optarg ); break;
+            case 'p': *pidfile = optarg; break;
+            case 's': *sock   = optarg; break;
+            default: usage( NULL ); break;
         }
     }
 }
@@ -204,26 +197,26 @@ getlock( const char * filename )
 
 
 int
-trylocksock( const char * sockpath )
+trylocksock( const char * configdir, const char * sockpath )
 {
-    char path[MAXPATHLEN];
     int  fd;
+    char path[MAXPATHLEN];
 
-    confpath( path, sizeof path, NULL, CONF_PATH_TYPE_DAEMON );
+    confpath( path, sizeof path, configdir, NULL, CONF_PATH_TYPE_DAEMON );
     if( 0 > mkdir( path, 0777 ) && EEXIST != errno )
     {
         errnomsg( "failed to create directory: %s", path );
         return -1;
     }
 
-    confpath( path, sizeof path, CONF_FILE_LOCK, 0 );
+    confpath( path, sizeof path, configdir, CONF_FILE_LOCK, 0 );
     if( !getlock( path ) )
         return -1;
     strlcpy( gl_lockpath, path, sizeof gl_lockpath );
 
-    if( NULL == sockpath )
+    if( !sockpath )
     {
-        confpath( path, sizeof path, CONF_FILE_SOCKET, 0 );
+        confpath( path, sizeof path, configdir, CONF_FILE_SOCKET, 0 );
         sockpath = path;
     }
     fd = getsock( sockpath );

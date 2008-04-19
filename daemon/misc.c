@@ -77,9 +77,13 @@ pushdir( char * path, const char * file, size_t size )
 }
 
 void
-confpath( char * buf, size_t len, const char * file, enum confpathtype type )
+confpath( char               * buf,
+          size_t               len,
+          const char         * configDir,
+          const char         * file,
+          enum confpathtype    type )
 {
-    strlcpy( buf, tr_getDefaultConfigDir(), len );
+    strlcpy( buf, configDir, len );
 
     switch( type )
     {

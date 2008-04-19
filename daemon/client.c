@@ -136,9 +136,9 @@ client_new_sock( const char * path )
     int                fd;
     struct con       * con;
 
-    assert( NULL != gl_base );
+    assert( gl_base );
+    assert( path );
     assert( 0 > gl_proxy );
-    assert( NULL != path );
 
     gl_proxy = 0;
 

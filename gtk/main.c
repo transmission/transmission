@@ -275,7 +275,7 @@ main( int argc, char ** argv )
     gboolean startpaused = FALSE;
     gboolean startminimized = FALSE;
     char * domain = "transmission";
-    const char * configDir = tr_getDefaultConfigDir( );
+    char * configDir = NULL;
 
     GOptionEntry entries[] = {
         { "paused", 'p', 0, G_OPTION_ARG_NONE, &startpaused,
@@ -286,6 +286,8 @@ main( int argc, char ** argv )
         { "minimized", 'm', 0, G_OPTION_ARG_NONE, &startminimized,
           _( "Start minimized in system tray"), NULL },
 #endif
+        { "config-dir", 'g', 0, G_OPTION_ARG_FILENAME, &configDir,
+          _( "Where to look for configuration files" ), NULL },
         { NULL, 0, 0, 0, NULL, NULL, NULL }
     };
 
@@ -307,6 +309,8 @@ main( int argc, char ** argv )
         g_clear_error( &gerr );
         return 0;
     }
+    if( !configDir )
+        configDir = (char*) tr_getDefaultConfigDir( );
 
     tr_notify_init( );
 
@@ -325,7 +329,24 @@ main( int argc, char ** argv )
     if( ( didinit || cf_init( configDir, &err ) ) &&
         ( didlock || cf_lock( &err ) ) )
     {
-        cbdata->core = tr_core_new( );
+        tr_handle * h = tr_initFull( configDir,
+                                     "gtk",
+                                     pref_flag_get( PREF_KEY_PEX ),
+                                     pref_flag_get( PREF_KEY_NAT ),
+                                     pref_int_get( PREF_KEY_PORT ),
+                                     pref_flag_get( PREF_KEY_ENCRYPTED_ONLY )
+                                         ? TR_ENCRYPTION_REQUIRED
+                                         : TR_ENCRYPTION_PREFERRED,
+                                     pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ),
+                                     pref_int_get( PREF_KEY_UL_LIMIT ),
+                                     pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ),
+                                     pref_int_get( PREF_KEY_DL_LIMIT ),
+                                     pref_int_get( PREF_KEY_MAX_PEERS_GLOBAL ),
+                                     pref_int_get( PREF_KEY_MSGLEVEL ),
+                                     TRUE, /* message queueing */
+                                     pref_flag_get( PREF_KEY_BLOCKLIST_ENABLED ),
+                                     pref_int_get( PREF_KEY_PEER_SOCKET_TOS ) );
+        cbdata->core = tr_core_new( h );
 
         /* create main window now to be a parent to any error dialogs */
         GtkWindow * mainwind = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );

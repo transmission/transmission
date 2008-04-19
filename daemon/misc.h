@@ -136,7 +136,7 @@ SLIST_HEAD( strlist, stritem );
 
 void         setmyname ( const char * );
 const char * getmyname ( void );
-void         confpath  ( char *, size_t, const char *, enum confpathtype );
+void         confpath  ( char *, size_t, const char *, const char *, enum confpathtype );
 void         absolutify( char *, size_t, const char * );
 int          writefile ( const char *, uint8_t *, ssize_t );
 uint8_t *    readfile  ( const char *, size_t * );

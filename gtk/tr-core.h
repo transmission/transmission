@@ -89,7 +89,7 @@ enum tr_core_err
 
 GType tr_core_get_type( void );
 
-TrCore * tr_core_new( void );
+TrCore * tr_core_new( tr_handle * );
 
 void tr_core_close( TrCore* );
 

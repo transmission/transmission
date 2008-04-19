@@ -457,7 +457,6 @@ prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
 static void
 tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
 {
-    tr_handle * h;
     TrCore * self = (TrCore *) instance;
     GtkListStore * store;
     struct TrCorePrivate * p;
@@ -478,31 +477,11 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
                                                   TR_CORE_TYPE,
                                                   struct TrCorePrivate );
 
-
-    h = tr_initFull( tr_getDefaultConfigDir( ),
-                     "gtk",
-                     pref_flag_get( PREF_KEY_PEX ),
-                     pref_flag_get( PREF_KEY_NAT ),
-                     pref_int_get( PREF_KEY_PORT ),
-                     pref_flag_get( PREF_KEY_ENCRYPTED_ONLY )
-                         ? TR_ENCRYPTION_REQUIRED
-                         : TR_ENCRYPTION_PREFERRED,
-                     pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ),
-                     pref_int_get( PREF_KEY_UL_LIMIT ),
-                     pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ),
-                     pref_int_get( PREF_KEY_DL_LIMIT ),
-                     pref_int_get( PREF_KEY_MAX_PEERS_GLOBAL ),
-                     pref_int_get( PREF_KEY_MSGLEVEL ),
-                     TRUE, /* message queueing */
-                     pref_flag_get( PREF_KEY_BLOCKLIST_ENABLED ),
-                     pref_int_get( PREF_KEY_PEER_SOCKET_TOS ) );
-
     /* create the model used to store torrent data */
     g_assert( ALEN( types ) == MC_ROW_COUNT );
     store = gtk_list_store_newv( MC_ROW_COUNT, types );
 
     p->model    = GTK_TREE_MODEL( store );
-    p->handle   = h;
     p->nextid   = 1;
 }
 
@@ -537,9 +516,10 @@ tr_core_get_type( void )
 **/
 
 TrCore *
-tr_core_new( void )
+tr_core_new( tr_handle * h )
 {
     TrCore * core = TR_CORE( g_object_new( TR_CORE_TYPE, NULL ) );
+    core->priv->handle   = h;
 
     /* init from prefs & listen to pref changes */
     prefsChanged( core, PREF_KEY_SORT_MODE, NULL );

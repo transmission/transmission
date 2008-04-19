@@ -104,14 +104,14 @@ INTCMP_FUNC( toridcmp, tor, id )
 RB_GENERATE_STATIC( tortree, tor, idlinks, toridcmp )
 
 void
-torrent_init( struct event_base * base )
+torrent_init( const char * configdir, struct event_base * base )
 {
     assert( NULL == gl_handle && NULL == gl_base );
 
     gl_base   = base;
-    gl_handle = tr_init( tr_getDefaultConfigDir(), "daemon" );
+    gl_handle = tr_init( configdir, "daemon" );
 
-    confpath( gl_state, sizeof gl_state, CONF_FILE_STATE, 0 );
+    confpath( gl_state, sizeof gl_state, configdir, CONF_FILE_STATE, 0 );
     strlcpy( gl_newstate, gl_state, sizeof gl_state );
     strlcat( gl_newstate, ".new", sizeof gl_state );
     absolutify( gl_dir, sizeof gl_dir, "." );

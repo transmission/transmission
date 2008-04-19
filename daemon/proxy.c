@@ -42,8 +42,8 @@
 #include "misc.h"
 
 static void              usage    ( const char *, ... );
-static enum confpathtype readargs ( int, char **, char ** );
-static int               makesock ( enum confpathtype, const char * );
+static enum confpathtype readargs ( int, char **, char **, char ** );
+static int               makesock ( enum confpathtype, const char *, const char * );
 static void              inread   ( struct bufferevent *, void * );
 static void              noop     ( struct bufferevent *, void * );
 static void              inerr    ( struct bufferevent *, short, void * );
@@ -62,14 +62,18 @@ main( int argc, char ** argv )
 {
     struct event_base  * base;
     enum confpathtype    type;
+    char               * configdir;
     char               * sockpath;
     int                  sockfd;
 
     setmyname( argv[0] );
-    type = readargs( argc, argv, &sockpath );
+    type = readargs( argc, argv, &configdir, &sockpath );
+    if( configdir == NULL )
+        configdir = strdup( tr_getDefaultConfigDir( ) );
+
     base = event_init();
 
-    sockfd = makesock( type, sockpath );
+    sockfd = makesock( type, configdir, sockpath );
     if( 0 > sockfd )
     {
         return EXIT_FAILURE;
@@ -132,6 +136,7 @@ usage( const char * msg, ... )
   "A fast and easy BitTorrent client\n"
   "\n"
   "  -h --help                 Display this message and exit\n"
+  "  -g --config-dir <path>    Where to look for configuration files\n"
   "  -t --type daemon          Use the daemon frontend, transmission-daemon\n"
   "  -t --type gtk             Use the GTK+ frontend, transmission\n"
   "  -t --type mac             Use the Mac OS X frontend\n",
@@ -140,11 +145,12 @@ usage( const char * msg, ... )
 }
 
 enum confpathtype
-readargs( int argc, char ** argv, char ** sockpath )
+readargs( int argc, char ** argv, char ** configdir, char ** sockpath )
 {
-    char optstr[] = "ht:";
+    char optstr[] = "g:ht:";
     struct option longopts[] =
     {
+        { "config-dir",         required_argument, NULL, 'g' },
         { "help",               no_argument,       NULL, 'h' },
         { "type",               required_argument, NULL, 't' },
         { NULL, 0, NULL, 0 }
@@ -152,13 +158,18 @@ readargs( int argc, char ** argv, char ** sockpath )
     enum confpathtype type;
     int opt;
 
-    type      = CONF_PATH_TYPE_DAEMON;
-    *sockpath = NULL;
+    type       = CONF_PATH_TYPE_DAEMON;
+    *configdir = NULL;
+    *sockpath  = NULL;
 
     while( 0 <= ( opt = getopt_long( argc, argv, optstr, longopts, NULL ) ) )
     {
         switch( opt )
         {
+            case 'g':
+                *configdir = strdup( optarg );
+                break;
+
             case 't':
                 if( 0 == strcasecmp( "daemon", optarg ) )
                 {
@@ -193,20 +204,22 @@ readargs( int argc, char ** argv, char ** sockpath )
 }
 
 int
-makesock( enum confpathtype type, const char * path )
+makesock( enum confpathtype type,
+          const char * configdir,
+          const char * sockpath )
 {
     struct sockaddr_un sa;
     int                fd;
 
     memset( &sa, 0, sizeof sa );
     sa.sun_family = AF_LOCAL;
-    if( NULL == path )
+    if( !sockpath )
     {
-        confpath( sa.sun_path, sizeof sa.sun_path, CONF_FILE_SOCKET, type );
+        confpath( sa.sun_path, sizeof sa.sun_path, configdir, CONF_FILE_SOCKET, type );
     }
     else
     {
-        strlcpy( sa.sun_path, path, sizeof sa.sun_path );
+        strlcpy( sa.sun_path, sockpath, sizeof sa.sun_path );
     }
 
     fd = socket( AF_UNIX, SOCK_STREAM, 0 );

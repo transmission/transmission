@@ -74,6 +74,7 @@ struct opts
     char              dir[MAXPATHLEN];
     int               pex;
     const char *      crypto;
+    const char *      configdir;
 };
 
 struct torinfo
@@ -144,13 +145,14 @@ main( int argc, char ** argv )
 {
     struct event_base * evbase;
     struct opts         o;
-    char                sockpath[MAXPATHLEN];
 
     setmyname( argv[0] );
+
     if( 0 > readargs( argc, argv, &o ) )
-    {
         exit( 1 );
-    }
+
+    if( o.configdir == NULL )
+        o.configdir = strdup( tr_getDefaultConfigDir( ) );
 
     signal( SIGPIPE, SIG_IGN );
 
@@ -163,14 +165,12 @@ main( int argc, char ** argv )
     }
     else
     {
-        if( NULL == o.sock )
-        {
-            confpath( sockpath, sizeof sockpath, CONF_FILE_SOCKET, o.type );
-            client_new_sock( sockpath );
-        }
-        else
-        {
+        if( o.sock )
             client_new_sock( o.sock );
+        else {
+            char sockpath[MAXPATHLEN];
+            confpath( sockpath, sizeof sockpath, o.configdir, CONF_FILE_SOCKET, o.type );
+            client_new_sock( sockpath );
         }
     }
 
@@ -244,6 +244,7 @@ usage( const char * msg, ... )
   "  -e --enable-pex           Enable peer exchange\n"
   "  -E --disable-pex          Disable peer exchange\n"
   "  -f --folder <path>        Folder to set for new torrents\n"
+  "  -g --config-dir <path>    Where to look for configuration files\n"
   "  -h --help                 Display this message and exit\n"
   "  -i --info                 List all torrents with info hashes\n"
   "  -l --list                 List all torrents with status\n"
@@ -271,7 +272,7 @@ usage( const char * msg, ... )
 int
 readargs( int argc, char ** argv, struct opts * opts )
 {
-    char optstr[] = "a:c:d:DeEf:hilmMp:qr:s:S:t:u:Uxv:";
+    char optstr[] = "a:c:d:DeEf:g:hilmMp:qr:s:S:t:u:Uxv:";
     struct option longopts[] =
     {
         { "add",                required_argument, NULL, 'a' },
@@ -281,6 +282,7 @@ readargs( int argc, char ** argv, struct opts * opts )
         { "enable-pex",         no_argument,       NULL, 'e' },
         { "disable-pex",        no_argument,       NULL, 'E' },
         { "folder",             required_argument, NULL, 'f' },
+        { "config-dir",         required_argument, NULL, 'g' },
         { "help",               no_argument,       NULL, 'h' },
         { "info",               no_argument,       NULL, 'i' },
         { "list",               no_argument,       NULL, 'l' },
@@ -306,6 +308,7 @@ readargs( int argc, char ** argv, struct opts * opts )
     SLIST_INIT( &opts->files );
     opts->map = -1;
     opts->pex = -1;
+    opts->configdir = NULL;
     SLIST_INIT( &opts->start );
     SLIST_INIT( &opts->stop );
     SLIST_INIT( &opts->remove );
@@ -346,6 +349,9 @@ readargs( int argc, char ** argv, struct opts * opts )
                 break;
             case 'f':
                 absolutify( opts->dir, sizeof opts->dir, optarg );
+                break;
+            case 'g':
+                opts->configdir = strdup( optarg );
                 break;
             case 'i':
                 opts->listquick = 1;
