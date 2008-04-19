@@ -1,0 +1,1911 @@
+# Norwegian translations for transmission package.
+# Copyright (C) 2008 THE transmission'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the transmission package.
+# Geir Hauge <geir.hauge@gmail.com>, 2008.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: transmission 1.06\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2008-04-12 10:12-0500\n"
+"PO-Revision-Date: 2008-04-19 12:27+0200\n"
+"Last-Translator: Geir Hauge <geir.hauge@gmail.com>\n"
+"Language-Team: Norwegian <en@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../gtk/actions.c:47
+msgid "Sort by _Activity"
+msgstr "Sorter etter _aktivitet"
+
+#: ../gtk/actions.c:48
+msgid "Sort by _Name"
+msgstr "Sorter etter _navn"
+
+#: ../gtk/actions.c:49
+msgid "Sort by _Progress"
+msgstr "Sorter etter _fremdrift"
+
+#: ../gtk/actions.c:50
+#, fuzzy
+msgid "Sort by _Ratio"
+msgstr "Sorter etter delings_rate"
+
+#: ../gtk/actions.c:51
+msgid "Sort by _State"
+msgstr "Sorter etter _tilstand"
+
+#: ../gtk/actions.c:52
+msgid "Sort by _Tracker"
+msgstr "Sorter etter _stifinder"
+
+#: ../gtk/actions.c:69
+msgid "_Main Window"
+msgstr "_Hovedviduet"
+
+#: ../gtk/actions.c:71
+msgid "Message _Log"
+msgstr "Meldingslogg"
+
+#: ../gtk/actions.c:85
+msgid "_Minimal View"
+msgstr "_Kompakt visning"
+
+#: ../gtk/actions.c:87
+msgid "_Reverse Sort Order"
+msgstr "_Snu sorteringsrekkefølgen"
+
+#: ../gtk/actions.c:89
+msgid "_Filterbar"
+msgstr "_Filtreringsfelt"
+
+#: ../gtk/actions.c:91
+msgid "_Statusbar"
+msgstr "Statusfelt"
+
+#: ../gtk/actions.c:93
+msgid "_Toolbar"
+msgstr "_Verktøylinje"
+
+#: ../gtk/actions.c:98
+msgid "_Torrent"
+msgstr "_Torrent"
+
+#: ../gtk/actions.c:99
+msgid "_View"
+msgstr "_Vis"
+
+#: ../gtk/actions.c:100
+msgid "_Sort Torrents By"
+msgstr "_Sorter torrentene etter"
+
+#: ../gtk/actions.c:101
+msgid "_Edit"
+msgstr "_Rediger"
+
+#: ../gtk/actions.c:102
+msgid "_Help"
+msgstr "_Hjelp"
+
+#: ../gtk/actions.c:103 ../gtk/actions.c:104
+msgid "Add a torrent"
+msgstr "Legg til en torrent"
+
+#: ../gtk/actions.c:104
+msgid "_Add..."
+msgstr "_Legg til ..."
+
+#: ../gtk/actions.c:106
+msgid "_Start"
+msgstr "_Start"
+
+#: ../gtk/actions.c:106
+msgid "Start torrent"
+msgstr "_Start torrent"
+
+#: ../gtk/actions.c:107
+msgid "_Statistics"
+msgstr "_Statistikk"
+
+#: ../gtk/actions.c:109
+msgid "_Verify Local Data"
+msgstr "_Verifiser lokal data"
+
+#: ../gtk/actions.c:111
+msgid "_Pause"
+msgstr "Sto_pp"
+
+#: ../gtk/actions.c:111
+msgid "Pause torrent"
+msgstr "Stopp torrent"
+
+#: ../gtk/actions.c:112
+#, fuzzy
+msgid "Remove torrent"
+msgstr "Fjern torrent"
+
+#: ../gtk/actions.c:113
+msgid "_Delete Files and Remove"
+msgstr "_Slett filene og fjern"
+
+#: ../gtk/actions.c:114
+msgid "_New..."
+msgstr "_Ny"
+
+#: ../gtk/actions.c:115
+msgid "Create a torrent"
+msgstr "Opprett ny torrent"
+
+#: ../gtk/actions.c:117
+msgid "Close _Window"
+msgstr "Lukk _vindu"
+
+#: ../gtk/actions.c:118
+msgid "Close main window"
+msgstr "Lukk hovedviduet"
+
+#: ../gtk/actions.c:120
+msgid "_Quit"
+msgstr "Avslu_tt"
+
+#: ../gtk/actions.c:122
+msgid "Select _All"
+msgstr "Marker _alle"
+
+#: ../gtk/actions.c:124
+msgid "Dese_lect All"
+msgstr "A_vmarker alle"
+
+#: ../gtk/actions.c:127
+msgid "_Details"
+msgstr "_Informasjon"
+
+#: ../gtk/actions.c:127
+msgid "Torrent details"
+msgstr "Informasjon om torrenten"
+
+#: ../gtk/actions.c:129
+msgid "_Open Folder"
+msgstr "_Åpne mappe"
+
+#: ../gtk/actions.c:132
+msgid "Ask Tracker for _More Peers"
+msgstr "Be stifinner om å få _flere tilkoblinger"
+
+#: ../gtk/add-dialog.c:132
+msgid "Torrent files"
+msgstr "Torrent-filer"
+
+#: ../gtk/add-dialog.c:137
+msgid "All files"
+msgstr "Alle filtyper"
+
+#. make the dialog
+#: ../gtk/add-dialog.c:162
+msgid "Torrent Options"
+msgstr "Torrentvalg"
+
+#: ../gtk/add-dialog.c:183
+msgid "Mo_ve source file to Trash"
+msgstr "Flytt kildefilen til papirkurven"
+
+#: ../gtk/add-dialog.c:184 ../gtk/tr-prefs.c:250
+msgid "_Start when added"
+msgstr "Start når den er lagt til"
+
+#: ../gtk/add-dialog.c:195
+msgid "_Source file:"
+msgstr "_Kildefil:"
+
+#: ../gtk/add-dialog.c:199
+msgid "Select Source File"
+msgstr "Velg kildefil"
+
+#: ../gtk/add-dialog.c:212 ../gtk/tr-prefs.c:259
+msgid "_Destination folder:"
+msgstr "_Målmappe:"
+
+#: ../gtk/add-dialog.c:216
+msgid "Select Destination Folder"
+msgstr "Velg målmappe"
+
+#: ../gtk/add-dialog.c:231
+msgid "Verify Local Data"
+msgstr "_Verifiser lokal data"
+
+#: ../gtk/add-dialog.c:291
+msgid "Add a Torrent"
+msgstr "Legg til en torrent"
+
+#: ../gtk/add-dialog.c:309 ../gtk/tr-prefs.c:246
+msgid "Display _options dialog"
+msgstr "Vis _valgvindu"
+
+#: ../gtk/conf.c:60 ../gtk/makemeta-ui.c:117 ../libtransmission/utils.c:458
+#: ../libtransmission/utils.c:469
+#, c-format
+msgid "Couldn't create \"%1$s\": %2$s"
+msgstr "Klarte ikke å opprette «%1$s»: %2$s"
+
+#: ../gtk/conf.c:81 ../libtransmission/fastresume.c:191
+#: ../libtransmission/fdlimit.c:166 ../libtransmission/metainfo.c:593
+#, c-format
+msgid "Couldn't open \"%1$s\": %2$s"
+msgstr "Klarte ikke å åpne «%1$s»: %2$s"
+
+#: ../gtk/conf.c:85
+#, c-format
+msgid "%s is already running."
+msgstr "Det kjører allerede en annen instans av «%s»"
+
+#: ../gtk/details.c:246
+msgid "Address"
+msgstr "Adresse"
+
+#: ../gtk/details.c:247
+msgid "Client"
+msgstr "Klient"
+
+#. 'percent done' column header. terse to keep the column narrow.
+#: ../gtk/details.c:249
+msgid "%"
+msgstr "%"
+
+#. 'download speed' column header. terse to keep the column narrow.
+#: ../gtk/details.c:252
+msgid "Down"
+msgstr "Ned"
+
+#. 'upload speed' column header.  terse to keep the column narrow.
+#: ../gtk/details.c:254
+msgid "Up"
+msgstr "Opp"
+
+#: ../gtk/details.c:255
+msgid "Status"
+msgstr "Status"
+
+#: ../gtk/details.c:505
+msgid "Optimistic unchoke"
+msgstr "Optimistisk fjerning av struping"
+
+#: ../gtk/details.c:506
+msgid "Downloading from peer"
+msgstr "Laster ned fra nedlaster"
+
+#: ../gtk/details.c:507
+msgid "We'd download from peer if they'd let us"
+msgstr "Ville lastet ned fra nedlaster hvis nedlaster hadde tillat det"
+
+#: ../gtk/details.c:508
+msgid "Uploading to peer"
+msgstr "Laster opp til nedlaster"
+
+#: ../gtk/details.c:509
+msgid "We'd upload to peer if they'd ask us"
+msgstr "Ville lastet opp til nedlaster hvis nedlaster hadde bett om det"
+
+#: ../gtk/details.c:510
+msgid "Peer has unchoked us, but we're not interested"
+msgstr "Nedlaster har fjernet strupingen mot oss, men vi er ikke interessert"
+
+#: ../gtk/details.c:511
+msgid "We unchoked the peer, but they're not interested"
+msgstr "Struping mot nedlaster fjernet, men nedlaster er ikke interessert"
+
+#: ../gtk/details.c:512
+#, fuzzy
+msgid "Encrypted connection"
+msgstr "Tilkoblinger til nedlastere"
+
+#: ../gtk/details.c:513
+msgid "Peer was discovered through Peer Exchange (PEX)"
+msgstr "Nedlaster oppdaget via Peer Exchange (PEX)"
+
+#: ../gtk/details.c:514
+msgid "Peer is an incoming connection"
+msgstr "Nedlaster kontaktet oss"
+
+#: ../gtk/details.c:656
+msgid "<b>Availability</b>"
+msgstr "<b>Tilgjengelighet</b>"
+
+#: ../gtk/details.c:678
+msgid "<b>Connected Peers</b>"
+msgstr "<b>Tilkoblede nedlastere</b>"
+
+#: ../gtk/details.c:688
+msgid "<b>Seeders:</b>"
+msgstr "<b>Delere:</b>"
+
+#: ../gtk/details.c:695
+msgid "<b>Leechers:</b>"
+msgstr "<b>Snyltere:</b>"
+
+#: ../gtk/details.c:702
+msgid "<b>Completed:</b>"
+msgstr "<b>Ferdig:</b>"
+
+#: ../gtk/details.c:732 ../gtk/makemeta-ui.c:312
+msgid "Details"
+msgstr "Informasjon"
+
+#. %1$'d is number of pieces
+#. %2$s is how big each piece is
+#: ../gtk/details.c:738
+#, c-format
+msgid "%1$'d Piece @ %2$s"
+msgid_plural "%1$'d Pieces @ %2$s"
+msgstr[0] "%1$'d bruddstykke på %2$s"
+msgstr[1] "%1$'d bruddstykker á %2$s"
+
+#: ../gtk/details.c:743
+msgid "Pieces:"
+msgstr "Bruddstykker:"
+
+#: ../gtk/details.c:747
+msgid "Hash:"
+msgstr "Hash:"
+
+#: ../gtk/details.c:750
+msgid "Private to this tracker -- PEX disabled"
+msgstr "Kun for denne stifinneren -- PEX avskrudd"
+
+#: ../gtk/details.c:751
+msgid "Public torrent"
+msgstr "Offentlig torrent"
+
+#: ../gtk/details.c:753
+msgid "Privacy:"
+msgstr "Fortrolighet:"
+
+#: ../gtk/details.c:765
+#, fuzzy
+msgid "Comment:"
+msgstr "Kommentar"
+
+#: ../gtk/details.c:769
+msgid "Origins"
+msgstr "Opprinnelser"
+
+#: ../gtk/details.c:771 ../gtk/details.c:867 ../gtk/details.c:872
+#, c-format
+msgid "Unknown"
+msgstr "Ukjent"
+
+#: ../gtk/details.c:772
+msgid "Creator:"
+msgstr "Oppretter:"
+
+#: ../gtk/details.c:776
+msgid "Date:"
+msgstr "Dato:"
+
+#: ../gtk/details.c:780
+msgid "Location"
+msgstr "Sted"
+
+#: ../gtk/details.c:784
+msgid "Destination folder:"
+msgstr "Målmappe:"
+
+#: ../gtk/details.c:788
+msgid "Torrent file:"
+msgstr "Torrent-fil:"
+
+#: ../gtk/details.c:833
+#, c-format
+msgid "%.1f%%"
+msgstr "%.1f%%"
+
+#. %1$.1f is percent of how much of what we want's been downloaded,
+#. %2$.1f is percent of how much of the whole torrent we've downloaded
+#: ../gtk/details.c:837
+#, c-format
+msgid "%1$.1f%% (%2$.1f%% selected)"
+msgstr "%1$.1f%% (%2$.1f%% valgt)"
+
+#. %1$s is total size of what we've saved to disk
+#. %2$s is how much of it's passed the checksum test
+#: ../gtk/details.c:845
+#, c-format
+msgid "%1$s (%2$s verified)"
+msgstr "%1$s (%2$s verifisert)"
+
+#: ../gtk/details.c:864 ../gtk/util.c:57 ../gtk/util.c:77
+msgid "None"
+msgstr "Ingen"
+
+#: ../gtk/details.c:893
+msgid "Transfer"
+msgstr "Overføring"
+
+#: ../gtk/details.c:896
+msgid "State:"
+msgstr "Tilstand:"
+
+#: ../gtk/details.c:899
+msgid "Progress:"
+msgstr "Fremdrift"
+
+#. "Have" refers to how much of the torrent we have
+#: ../gtk/details.c:903
+msgid "Have:"
+msgstr "Har:"
+
+#: ../gtk/details.c:906 ../gtk/stats.c:104 ../gtk/stats.c:116
+msgid "Downloaded:"
+msgstr "Nedlastet:"
+
+#: ../gtk/details.c:909 ../gtk/stats.c:102 ../gtk/stats.c:114
+msgid "Uploaded:"
+msgstr "Opplastet:"
+
+#: ../gtk/details.c:913
+msgid "Failed DL:"
+msgstr "Feilnedlasting:"
+
+#: ../gtk/details.c:916 ../gtk/stats.c:106 ../gtk/stats.c:118
+msgid "Ratio:"
+msgstr "Delingsrate:"
+
+#: ../gtk/details.c:919
+msgid "Swarm rate:"
+msgstr "Total hastighet:"
+
+#: ../gtk/details.c:922
+msgid "Error:"
+msgstr "Feil:"
+
+#: ../gtk/details.c:926
+#, fuzzy
+msgid "Completion"
+msgstr "Ferdigstillelse"
+
+#: ../gtk/details.c:936
+msgid "Dates"
+msgstr "Datoer"
+
+#: ../gtk/details.c:939
+msgid "Started at:"
+msgstr "Påbegynt:"
+
+#: ../gtk/details.c:942
+msgid "Last activity at:"
+msgstr "Sist aktivitet:"
+
+#: ../gtk/details.c:1037 ../gtk/tr-prefs.c:499
+msgid "Bandwidth"
+msgstr "Båndbredde"
+
+#: ../gtk/details.c:1039 ../gtk/tr-prefs.c:501
+msgid "Limit _download speed (KB/s):"
+msgstr "Begrens _nedlastingshastighet til (KiB/s):"
+
+#: ../gtk/details.c:1052 ../gtk/tr-prefs.c:508
+msgid "Limit _upload speed (KB/s):"
+msgstr "Begrens _opplastingshastighet til (KiB/s):"
+
+#: ../gtk/details.c:1066
+msgid "Peer Connections"
+msgstr "Tilkoblinger til nedlastere"
+
+#: ../gtk/details.c:1071
+msgid "_Maximum peers:"
+msgstr "_Maksimalt tilkoblede nedlastere:"
+
+#: ../gtk/details.c:1075
+msgid "_Stop seeding at ratio:"
+msgstr "_Slutt å dele ved delingsratio på:"
+
+#: ../gtk/details.c:1130
+msgid "Scrape"
+msgstr "Stryk"
+
+#: ../gtk/details.c:1132
+msgid "Last scrape at:"
+msgstr "Sist stryk:"
+
+#: ../gtk/details.c:1137 ../gtk/details.c:1164
+msgid "Tracker responded:"
+msgstr "Stifinner svarte:"
+
+#: ../gtk/details.c:1142
+msgid "Next scrape in:"
+msgstr "Neste stryk:"
+
+#: ../gtk/details.c:1148
+msgid "Announce"
+msgstr "Annonsering"
+
+#: ../gtk/details.c:1156
+msgid "Tracker:"
+msgstr "Stifinner:"
+
+#: ../gtk/details.c:1159
+msgid "Last announce at:"
+msgstr "Sist annonsering:"
+
+#: ../gtk/details.c:1169
+msgid "Next announce in:"
+msgstr "Neste annonsering:"
+
+#. how long until the tracker will honor user
+#. * pressing the "ask for more peers" button
+#: ../gtk/details.c:1176
+msgid "Manual announce allowed in:"
+msgstr "Manuell annonsering tillat i:"
+
+#: ../gtk/details.c:1192 ../gtk/details.c:1204
+msgid "Never"
+msgstr "Aldri"
+
+#. %1$s is torrent name
+#. %2$s its file size
+#: ../gtk/details.c:1296
+#, c-format
+msgid "Details for %1$s (%2$s)"
+msgstr "Detaljer for %1$s (%2$s)"
+
+#: ../gtk/details.c:1314
+msgid "Activity"
+msgstr "Aktivitet"
+
+#: ../gtk/details.c:1319 ../gtk/tr-prefs.c:567
+msgid "Peers"
+msgstr "Nedlastere"
+
+#: ../gtk/details.c:1324 ../gtk/tr-window.c:444
+msgid "Tracker"
+msgstr "Stifinner"
+
+#: ../gtk/details.c:1328 ../gtk/msgwin.c:168
+msgid "Information"
+msgstr "Informasjon"
+
+#: ../gtk/details.c:1334 ../gtk/tr-window.c:444
+msgid "Files"
+msgstr "Filer"
+
+#: ../gtk/details.c:1339 ../gtk/tr-prefs.c:448
+msgid "Options"
+msgstr "Valg"
+
+#: ../gtk/dialogs.c:114
+msgid "<big><b>Quit Transmission?</b></big>"
+msgstr "<big><b>Avslutte Transmission?</b></big>"
+
+#: ../gtk/dialogs.c:126
+msgid "_Don't ask me again"
+msgstr "_Ikke spør meg om dette igjen"
+
+#: ../gtk/dialogs.c:213
+msgid "Remove torrent?"
+msgid_plural "Remove torrents?"
+msgstr[0] "Fjerne torrent?"
+msgstr[1] "Fjerne torrentene?"
+
+#: ../gtk/dialogs.c:215
+msgid "Delete this torrent's downloaded files?"
+msgid_plural "Delete these torrents' downloaded files?"
+msgstr[0] "Fjerne denne torrentens nedlastede filer?"
+msgstr[1] "Fjerne disse torrentenes nedlastede filer?"
+
+#: ../gtk/dialogs.c:220
+msgid "Some of these torrents are incomplete or connected to peers."
+msgstr "Noen av disse torrentene er ufullstendige eller tilkoblet nedlastere"
+
+#: ../gtk/dialogs.c:224
+msgid "This torrent is incomplete or connected to peers."
+msgid_plural "One of these torrents is incomplete or connected to peers."
+msgstr[0] "Denne torrenten er ufullstendig eller tilkoblet nedlastere."
+msgstr[1] "En av disse torrentene er ufullstendig eller tilkoblet nedlastere."
+
+#. this refers to priority
+#: ../gtk/file-list.c:65
+msgid "High"
+msgstr "Høy"
+
+#. this refers to priority
+#: ../gtk/file-list.c:67
+msgid "Normal"
+msgstr "Middels"
+
+#. this refers to priority
+#: ../gtk/file-list.c:69
+msgid "Low"
+msgstr "Lav"
+
+#. Translators: this is a column header in Files tab, Details dialog;
+#. Don't include the prefix "filedetails|" in the translation.
+#: ../gtk/file-list.c:479
+msgid "filedetails|File"
+msgstr "Fil"
+
+#. Translators: this is a column header in Files tab, Details dialog;
+#. Don't include the prefix "filedetails|" in the translation.
+#: ../gtk/file-list.c:494
+msgid "filedetails|Progress"
+msgstr "Fremdrift"
+
+#. Translators: this is a column header in Files tab, Details dialog;
+#. Don't include the prefix "filedetails|" in the translation.
+#. Please note the items for this column are checkboxes (yes/no)
+#: ../gtk/file-list.c:512
+msgid "filedetails|Download"
+msgstr "Last ned"
+
+#. Translators: this is a column header in Files tab, Details dialog;
+#. Don't include the prefix "filedetails|" in the translation.
+#: ../gtk/file-list.c:524
+msgid "filedetails|Priority"
+msgstr "Prioritet"
+
+#: ../gtk/ipc.c:232 ../gtk/ipc.c:391
+msgid "Bad IPC protocol version"
+msgstr "Gal versjon av IPC-protokoll"
+
+#: ../gtk/ipc.c:235 ../gtk/ipc.c:394
+#, c-format
+msgid "IPC parse error: %s"
+msgstr "Tolkningsfeil i IPC-protokollen: %s"
+
+#: ../gtk/ipc.c:264 ../gtk/ipc.c:480 ../libtransmission/fdlimit.c:390
+#: ../libtransmission/net.c:105
+#, c-format
+msgid "Couldn't create socket: %s"
+msgstr "Klarte ikke å opprette socket: %s"
+
+#: ../gtk/ipc.c:273
+#, c-format
+msgid "Couldn't connect to \"%1$s\": %2$s"
+msgstr "Klarte ikke å koble til «%1$s»: %2$s"
+
+#: ../gtk/ipc.c:313 ../gtk/ipc.c:1133
+#, c-format
+msgid "Couldn't set up IPC: %s"
+msgstr "Klarte ikke å konfigurere IPC: %s"
+
+#: ../gtk/main.c:280
+msgid "Start with all torrents paused"
+msgstr "Start med alle torrentene stoppet"
+
+#: ../gtk/main.c:282
+msgid "Ask the running instance to quit"
+msgstr "Be den allerede kjørende instansen om å avslutte"
+
+#: ../gtk/main.c:285
+msgid "Start minimized in system tray"
+msgstr "Start minimert (med ikon i varslingsområdet)"
+
+#: ../gtk/main.c:298
+msgid "Transmission"
+msgstr "Transmission"
+
+#: ../gtk/main.c:303
+msgid "[torrent files]"
+msgstr "[torrent-filer]"
+
+#: ../gtk/main.c:612
+msgid "<b>Closing Connections</b>"
+msgstr "<b>Lukker tilkoblinger</b>"
+
+#: ../gtk/main.c:616
+msgid "Sending upload/download totals to tracker..."
+msgstr "Sender opplasting- og nedlastingsmengde til stifinder ..."
+
+#: ../gtk/main.c:621
+msgid "_Quit Immediately"
+msgstr "_Avslutt nå"
+
+#: ../gtk/main.c:754
+#, c-format
+msgid "Failed to load torrent file: %s"
+msgid_plural "Failed to load torrent files: %s"
+msgstr[0] "Klarte ikke å laste inn torrent-filen: %s"
+msgstr[1] "Klarte ikke å laste inn torrent-filene: %s"
+
+#: ../gtk/main.c:878
+msgid "A fast and easy BitTorrent client"
+msgstr "En rask og enkel BitTorrent-klient"
+
+#: ../gtk/main.c:881
+msgid "Copyright 2005-2008 The Transmission Project"
+msgstr "Copyright 2005-2008 The Transmission Project"
+
+#. Translators: translate "translator-credits" as your name
+#. to have it appear in the credits in the "About" dialog
+#: ../gtk/main.c:890
+msgid "translator-credits"
+msgstr "oversettere"
+
+#: ../gtk/makemeta-ui.c:98
+#, fuzzy
+msgid "Torrent created"
+msgstr "Torrent-fil opprettet"
+
+#: ../gtk/makemeta-ui.c:102 ../gtk/makemeta-ui.c:111 ../gtk/makemeta-ui.c:118
+#, c-format
+msgid "Torrent creation failed: %s"
+msgstr "Opprettelse av torrent-fil feilet: %s"
+
+#: ../gtk/makemeta-ui.c:102
+msgid "Invalid URL"
+msgstr "Ugyldig URL"
+
+#: ../gtk/makemeta-ui.c:106
+#, c-format
+msgid "Torrent creation cancelled"
+msgstr "Opprettelse av torrent-fil avbrutt."
+
+#: ../gtk/makemeta-ui.c:110 ../libtransmission/blocklist.c:69
+#: ../libtransmission/blocklist.c:203 ../libtransmission/utils.c:370
+#, c-format
+msgid "Couldn't read \"%1$s\": %2$s"
+msgstr "Klarte ikke å lese «%1$s»: %2$s"
+
+#: ../gtk/makemeta-ui.c:209 ../gtk/makemeta-ui.c:331
+#, c-format
+msgid "No files selected"
+msgstr "Ingen filer er valgt"
+
+#: ../gtk/makemeta-ui.c:223 ../gtk/makemeta-ui.c:301
+#, c-format
+msgid "<i>No files selected</i>"
+msgstr "<i>Ingen filer er valgt</i>"
+
+#. %1$s is the torrent size
+#. %2$'d is its number of files
+#: ../gtk/makemeta-ui.c:229
+#, c-format
+msgid "<i>%1$s; %2$'d File</i>"
+msgid_plural "<i>%1$s; %2$'d Files</i>"
+msgstr[0] "<i>%1$s i %2$'d fil</i>"
+msgstr[1] "<i>%1$s i %2$'d filer</i>"
+
+#. %1$'s is number of pieces;
+#. %2$s is how big each piece is
+#: ../gtk/makemeta-ui.c:242
+#, c-format
+msgid "<i>%1$'d Piece @ %2$s</i>"
+msgid_plural "<i>%1$'d Pieces @ %2$s</i>"
+msgstr[0] "<i>%1$'d bruddstykke på %2$s</i>"
+msgstr[1] "<i>%1$'d bruddstykker á %2$s</i>"
+
+#: ../gtk/makemeta-ui.c:269
+msgid "New Torrent"
+msgstr "Ny torrent-fil"
+
+#: ../gtk/makemeta-ui.c:283
+msgid "Content"
+msgstr "Innhold"
+
+#: ../gtk/makemeta-ui.c:285
+msgid "_Single File:"
+msgstr "_Enkeltfil:"
+
+#: ../gtk/makemeta-ui.c:292
+msgid "_Folder:"
+msgstr "_Mappe:"
+
+#: ../gtk/makemeta-ui.c:314
+msgid "_Private to this tracker"
+msgstr "_Kun for denne stifinneren"
+
+#: ../gtk/makemeta-ui.c:318
+msgid "Announce _URL:"
+msgstr "Annonserings-_URL"
+
+#: ../gtk/makemeta-ui.c:321
+msgid "Commen_t:"
+msgstr "Kommen_tar:"
+
+#: ../gtk/msgwin.c:84 ../libtransmission/blocklist.c:251
+#: ../libtransmission/metainfo.c:599
+#, c-format
+msgid "Couldn't save file \"%1$s\": %2$s"
+msgstr "Klarte ikke å lagre filen «%1$s»: %2$s"
+
+#: ../gtk/msgwin.c:132
+msgid "Save Log"
+msgstr "Lagre logg"
+
+#: ../gtk/msgwin.c:167
+msgid "Error"
+msgstr "Feil"
+
+#: ../gtk/msgwin.c:169
+msgid "Debug"
+msgstr "Avlus"
+
+#: ../gtk/msgwin.c:229
+msgid "Time"
+msgstr "Tid"
+
+#. noun.  column title for a list
+#: ../gtk/msgwin.c:231 ../gtk/tr-window.c:444
+msgid "Name"
+msgstr "Navn"
+
+#. noun.  column title for a list
+#: ../gtk/msgwin.c:233
+msgid "Message"
+msgstr "Melding"
+
+#: ../gtk/msgwin.c:393
+msgid "Message Log"
+msgstr "Meldingslogg"
+
+#: ../gtk/msgwin.c:427
+msgid "Level"
+msgstr "Nivå"
+
+#: ../gtk/notify.c:59
+msgid "Torrent Complete"
+msgstr "Torrent ferdigstilt"
+
+#: ../gtk/notify.c:62
+msgid "Open File"
+msgstr "Åpne fil"
+
+#: ../gtk/notify.c:64
+msgid "Open Folder"
+msgstr "Åpne mappe"
+
+#: ../gtk/stats.c:63 ../gtk/stats.c:111
+#, c-format
+msgid "Started %'d time"
+msgid_plural "Started %'d times"
+msgstr[0] "Startet opp %'d gang"
+msgstr[1] "Startet opp %'d ganger"
+
+#: ../gtk/stats.c:91
+msgid "Statistics"
+msgstr "Statistikk"
+
+#: ../gtk/stats.c:100
+msgid "Current Session"
+msgstr "Denne sesjonen"
+
+#: ../gtk/stats.c:108 ../gtk/stats.c:120
+msgid "Duration:"
+msgstr "Varighet:"
+
+#: ../gtk/stats.c:110
+msgid "Total"
+msgstr "Totalt"
+
+#. %1$s is how much we've got,
+#. %2$s is how much we'll have when done,
+#. %3$.2f%% is a percentage of the two
+#: ../gtk/torrent-cell-renderer.c:53
+#, c-format
+msgid "%1$s of %2$s (%3$.2f%%)"
+msgstr "%1$s av %2$s (%3$.2f%%)"
+
+#. %1$s is how much we've got,
+#. %2$s is the torrent's total size,
+#. %3$.2f%% is a percentage of the two,
+#. %4$s is how much we've uploaded,
+#. %5$s is our upload-to-download ratio
+#: ../gtk/torrent-cell-renderer.c:64
+#, c-format
+msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
+msgstr "%1$s av %2$s (%3$.2f%%), %4$s opplastet (delingsrate: %5$s)"
+
+#. %1$s is the torrent's total size,
+#. %2$s is how much we've uploaded,
+#. %3$s is our upload-to-download ratio
+#: ../gtk/torrent-cell-renderer.c:75
+#, c-format
+msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
+msgstr "%1$s, %2$s opplastet (delingsrate: %3$s)"
+
+#: ../gtk/torrent-cell-renderer.c:87
+msgid "Not available"
+msgstr "Ikke tilgjengelig"
+
+#: ../gtk/torrent-cell-renderer.c:89
+msgid "Stalled"
+msgstr "Stoppet opp"
+
+#. time remaining
+#: ../gtk/torrent-cell-renderer.c:94
+#, c-format
+msgid "%s remaining"
+msgstr "%s gjenstår"
+
+#. Translators: do not translate the "speed|" disambiguation prefix.
+#. %1$s is the download speed
+#. %2$s is the upload speed
+#: ../gtk/torrent-cell-renderer.c:119
+#, c-format
+msgid "speed|Down: %1$s, Up: %2$s"
+msgstr "Ned: %1$s, Opp: %2$s"
+
+#. download speed
+#: ../gtk/torrent-cell-renderer.c:122
+#, c-format
+msgid "Down: %s"
+msgstr "Ned: %s"
+
+#. upload speed
+#: ../gtk/torrent-cell-renderer.c:125
+#, c-format
+msgid "Up: %s"
+msgstr "Opp: %s"
+
+#. the torrent isn't uploading or downloading
+#: ../gtk/torrent-cell-renderer.c:128
+msgid "Idle"
+msgstr "Inaktiv"
+
+#: ../gtk/torrent-cell-renderer.c:141
+msgid "Paused"
+msgstr "Stoppet"
+
+#: ../gtk/torrent-cell-renderer.c:145
+msgid "Waiting to verify local data"
+msgstr "Venter på å få verifisert lokal data"
+
+#. [0...100]
+#: ../gtk/torrent-cell-renderer.c:149 ../gtk/tr-torrent.c:282
+#, c-format
+msgid "Verifying local data (%.1f%% tested)"
+msgstr "Verifiserer lokal data (%.1f%% verifisert)"
+
+#: ../gtk/torrent-cell-renderer.c:158 ../gtk/tr-window.c:624
+#: ../gtk/tr-window.c:644
+#, c-format
+msgid "Ratio: %s"
+msgstr "Delingsrate: %s"
+
+#: ../gtk/torrent-cell-renderer.c:199
+#, c-format
+msgid "Downloading from %1$'d of %2$'d connected peer"
+msgid_plural "Downloading from %1$'d of %2$'d connected peers"
+msgstr[0] "Laster ned fra %1$'d av %2$'d tilkoblet nedlaster"
+msgstr[1] "Laster ned fra %1$'d av %2$'d tilkoblede nedlastere"
+
+#: ../gtk/torrent-cell-renderer.c:208 ../gtk/tr-torrent.c:302
+#, c-format
+msgid "Seeding to %1$'d of %2$'d connected peer"
+msgid_plural "Seeding to %1$'d of %2$'d connected peers"
+msgstr[0] "Deler med %1$'d av %2$'d tilkoblet nedlaster"
+msgstr[1] "Deler med %1$'d av %2$'d tilkoblede nedlastere"
+
+#: ../gtk/transmission.desktop.in.h:1
+msgid "BitTorrent Client"
+msgstr "BitTorrent-klient"
+
+#: ../gtk/transmission.desktop.in.h:2
+msgid "Download and share files over BitTorrent"
+msgstr "Last ned og del filer med BitTorrent"
+
+#: ../gtk/transmission.desktop.in.h:3
+msgid "Transmission BitTorrent Client"
+msgstr "Transmission BitTorrent-klient"
+
+#. %1$'d is the number of torrents we're seeding,
+#. %2$'d is the number of torrents we're downloading,
+#. %3$s is our download speed,
+#. %4$s is our upload speed
+#: ../gtk/tr-icon.c:74
+#, c-format
+msgid ""
+"%1$'d Seeding, %2$'d Downloading\n"
+"Down: %3$s, Up: %4$s"
+msgstr ""
+"%1$'d deles, %2$'d lastes ned\n"
+"Ned: %3$s, Opp: %4$s" 
+
+#: ../gtk/tr-prefs.c:199
+msgid "Port is <b>open</b>"
+msgstr "Porten er <b>åpen</b>"
+
+#: ../gtk/tr-prefs.c:200
+msgid "Port is <b>closed</b>"
+msgstr "Porten er <b>lukket</b>"
+
+#: ../gtk/tr-prefs.c:213
+msgid "<i>Testing port...</i>"
+msgstr "<i>Tester port ...</i>"
+
+#: ../gtk/tr-prefs.c:235
+msgid "Adding Torrents"
+msgstr "Legger til torrenter"
+
+#: ../gtk/tr-prefs.c:238
+msgid "Automatically add torrents from:"
+msgstr "Legg til torrenter automatisk fra:"
+
+#: ../gtk/tr-prefs.c:254
+msgid "Mo_ve source files to Trash"
+msgstr "_Flytt kildefilene til papirkurven"
+
+#: ../gtk/tr-prefs.c:284
+#, c-format
+msgid "Ignore the %'d _blocklisted peer"
+msgid_plural "Ignore the %'d _blocklisted peers"
+msgstr[0] "Ignorer %'d blokkeringslistet nedlaster"
+msgstr[1] "Ignorer de %'d blokkeringslistede nedlasterene"
+
+#: ../gtk/tr-prefs.c:332
+#, c-format
+msgid "Retrieving blocklist..."
+msgstr "Henter blokkeringsliste ..."
+
+#: ../gtk/tr-prefs.c:338
+#, c-format
+msgid "Unable to get blocklist."
+msgstr "Klarte ikke å hente blokkeringsliste."
+
+#: ../gtk/tr-prefs.c:350
+#, c-format
+msgid "Unable to get blocklist: %s"
+msgstr "Klarte ikke å hente blokkeringsliste: %s"
+
+#: ../gtk/tr-prefs.c:364
+#, c-format
+msgid "Uncompressing blocklist..."
+msgstr "Dekomprimerer blokkeringsliste ..."
+
+#: ../gtk/tr-prefs.c:374
+#, c-format
+msgid "Parsing blocklist..."
+msgstr "Tolker blokkeringsliste ..."
+
+#: ../gtk/tr-prefs.c:381 ../libtransmission/blocklist.c:258
+#, c-format
+msgid "Blocklist updated with %'d entries"
+msgstr "Blokkeringsliste er oppdatert med %'d oppføringer"
+
+#: ../gtk/tr-prefs.c:422
+msgid "Updating Blocklist"
+msgstr "Oppdaterer blokkeringsliste"
+
+#: ../gtk/tr-prefs.c:454
+msgid "_Update Blocklist"
+msgstr "_Oppdater blokkeringsliste"
+
+#: ../gtk/tr-prefs.c:466
+msgid "_Ignore unencrypted peers"
+msgstr "_Ignorer ukrypterte nedlastere"
+
+#: ../gtk/tr-prefs.c:470
+msgid "Use peer e_xchange"
+msgstr "Bruk nedlaster_utveksling"
+
+#. section header for the "maximum number of peers" section
+#: ../gtk/tr-prefs.c:476
+msgid "Limits"
+msgstr "Begrensninger"
+
+#: ../gtk/tr-prefs.c:479
+msgid "Maximum peers _overall:"
+msgstr "Maksimalt antall nedlastere t_otalt:"
+
+#: ../gtk/tr-prefs.c:481
+#, fuzzy
+msgid "Maximum peers per _torrent:"
+msgstr "Maksimalt antall tilkoblede nedlastere per _torrent:"
+
+#: ../gtk/tr-prefs.c:515
+msgid "Ports"
+msgstr "Porter"
+
+#: ../gtk/tr-prefs.c:517
+msgid "_Forward port from router"
+msgstr "_Viderefør port fra ruter"
+
+#: ../gtk/tr-prefs.c:527
+msgid "Incoming _port:"
+msgstr "Innkommende _port:"
+
+#: ../gtk/tr-prefs.c:550
+msgid "Transmission Preferences"
+msgstr "Brukervalg for Transmission"
+
+#: ../gtk/tr-prefs.c:564
+msgid "Torrents"
+msgstr "Torrenter"
+
+#: ../gtk/tr-prefs.c:570
+msgid "Network"
+msgstr "Nettverk"
+
+#: ../gtk/tr-torrent.c:225
+#, c-format
+msgid "File \"%s\" isn't a valid torrent"
+msgstr "Filen «%s» er ikke en gyldig torrent-fil"
+
+#: ../gtk/tr-torrent.c:228
+#, c-format
+msgid "File \"%s\" is already open"
+msgstr "Filen «%s» er allerede åpnet"
+
+#. [0...100]
+#: ../gtk/tr-torrent.c:277
+#, c-format
+msgid "Waiting to verify local data (%.1f%% tested)"
+msgstr "Venter på å få verifisert lokal data (%.1f%% verifisert)"
+
+#: ../gtk/tr-torrent.c:288
+#, c-format
+msgid "Not available (%.1f%%)"
+msgstr "Ikke tilgjengelig (%.1f%%)"
+
+#: ../gtk/tr-torrent.c:290
+#, c-format
+msgid "Stalled (%.1f%%)"
+msgstr "Stoppet opp (%.1f%%)"
+
+#. %1$s is # of minutes
+#. %2$.1f is a percentage of how much of the torrent is done
+#: ../gtk/tr-torrent.c:296
+#, c-format
+msgid "%1$s remaining (%2$.1f%%)"
+msgstr "%1$s gjenstår (%2$.1f%%)"
+
+#: ../gtk/tr-torrent.c:308
+#, c-format
+msgid "Stopped (%.1f%%)"
+msgstr "Stoppet (%.1f%%)"
+
+#: ../gtk/tr-window.c:150
+msgid "Torrent"
+msgstr "Torrent"
+
+#: ../gtk/tr-window.c:245
+msgid "Total Ratio"
+msgstr "Total delingsrate"
+
+#: ../gtk/tr-window.c:246
+msgid "Session Ratio"
+msgstr "Delingsrate denne sesjonen"
+
+#: ../gtk/tr-window.c:247
+msgid "Total Transfer"
+msgstr "Total overføring"
+
+#: ../gtk/tr-window.c:248
+msgid "Session Transfer"
+msgstr "Overføring denne sesjonen"
+
+#. show all torrents
+#: ../gtk/tr-window.c:433
+msgid "A_ll"
+msgstr "A_lle"
+
+#. show only torrents that have connected peers
+#: ../gtk/tr-window.c:435
+msgid "_Active"
+msgstr "_Aktive"
+
+#. show only torrents that are trying to download
+#: ../gtk/tr-window.c:437
+msgid "_Downloading"
+msgstr "_Laster ned"
+
+#. show only torrents that are trying to upload
+#: ../gtk/tr-window.c:439
+msgid "_Seeding"
+msgstr "_Deler"
+
+#. show only torrents that are paused
+#: ../gtk/tr-window.c:441
+msgid "_Paused"
+msgstr "_Stoppet"
+
+#: ../gtk/tr-window.c:598
+#, c-format
+msgid "%1$'d of %2$'d Torrent"
+msgid_plural "%1$'d of %2$'d Torrents"
+msgstr[0] "%1$d av %2$d torrent"
+msgstr[1] "%1$d av %2$d torrenter"
+
+#: ../gtk/tr-window.c:603
+#, c-format
+msgid "%'d Torrent"
+msgid_plural "%'d Torrents"
+msgstr[0] "$'d torrent"
+msgstr[1] "$'d torrenter"
+
+#. Translators: do not translate the "size|" disambiguation prefix.
+#. %1$s is the size of the data we've downloaded
+#. %2$s is the size of the data we've uploaded
+#: ../gtk/tr-window.c:632 ../gtk/tr-window.c:640
+#, c-format
+msgid "size|Down: %1$s, Up: %2$s"
+msgstr "Ned: %1$s, Opp: %2$s"
+
+#: ../gtk/tr-window.c:696
+#, c-format
+msgid "Tracker will allow requests in %s"
+msgstr "Stifinner vil tillate anmodninger om %s"
+
+#: ../gtk/util.c:86
+#, c-format
+msgid "%'u byte"
+msgid_plural "%'u bytes"
+msgstr[0] "%'u byte"
+msgstr[1] "%'u bytes"
+
+#: ../gtk/util.c:91
+#, c-format
+msgid "%'.1f KB"
+msgstr "%'.1f KiB"
+
+#: ../gtk/util.c:94
+#, c-format
+msgid "%'.1f MB"
+msgstr "%'.1f MiB"
+
+#: ../gtk/util.c:97
+#, c-format
+msgid "%'.1f GB"
+msgstr "%'.1f GiB"
+
+#. 0.0 KB to 999.9 KB
+#: ../gtk/util.c:110
+#, c-format
+msgid "%'.1f KB/s"
+msgstr "%'.1f KiB/s"
+
+#. 0.98 MB to 99.99 MB
+#: ../gtk/util.c:112
+#, c-format
+msgid "%'.2f MB/s"
+msgstr "%'.2f MiB/s"
+
+#. 100.0 MB to 999.9 MB
+#: ../gtk/util.c:114
+#, c-format
+msgid "%'.1f MB/s"
+msgstr "%'.1f MiB/s"
+
+#. insane speeds
+#: ../gtk/util.c:116
+#, c-format
+msgid "%'.2f GB/s"
+msgstr "%'.2f GiB/s"
+
+#: ../gtk/util.c:132
+#, c-format
+msgid "%'d second"
+msgid_plural "%'d seconds"
+msgstr[0] "%'d sekund"
+msgstr[1] "%'d sekund"
+
+#: ../gtk/util.c:139 ../gtk/util.c:153
+#, c-format
+msgid "%'d minute"
+msgid_plural "%'d minutes"
+msgstr[0] "%'d minutt"
+msgstr[1] "%'d minutt"
+
+#: ../gtk/util.c:152 ../gtk/util.c:160
+#, c-format
+msgid "%'d hour"
+msgid_plural "%'d hours"
+msgstr[0] "%'d time"
+msgstr[1] "%'d timer"
+
+#: ../gtk/util.c:165
+#, c-format
+msgid "%'d day"
+msgid_plural "%'d days"
+msgstr[0] "%'d døgn"
+msgstr[1] "%'d døgn"
+
+#. did caller give us an uninitialized val?
+#: ../libtransmission/bencode.c:679
+msgid "Invalid metadata"
+msgstr "Ugyldig metadata"
+
+#: ../libtransmission/blocklist.c:92
+#, c-format
+msgid "Blocklist contains %'d entries"
+msgstr "Blokkeringslisten inneholder %'d oppføringer"
+
+#. %s is the torrent name
+#: ../libtransmission/fastresume.c:636 ../libtransmission/fastresume.c:647
+#, c-format
+msgid "Couldn't read resume file for \"%s\""
+msgstr "Klare ikke å lese gjenopptakingsfilen for «%s»"
+
+#: ../libtransmission/makemeta.c:58
+#, c-format
+msgid "Torrent Creator is skipping file \"%s\": %s"
+msgstr "Torrent-oppretter hopper over filen «%s»: %s"
+
+#: ../libtransmission/metainfo.c:170 ../libtransmission/metainfo.c:217
+#: ../libtransmission/metainfo.c:229 ../libtransmission/metainfo.c:466
+#: ../libtransmission/metainfo.c:620 ../libtransmission/metainfo.c:652
+#: ../libtransmission/metainfo.c:661
+#, c-format
+msgid "Missing metadata entry \"%s\""
+msgstr "Manglende metadataoppføring «%s»"
+
+#: ../libtransmission/metainfo.c:215 ../libtransmission/metainfo.c:227
+#: ../libtransmission/metainfo.c:234 ../libtransmission/metainfo.c:446
+#: ../libtransmission/metainfo.c:618 ../libtransmission/metainfo.c:628
+#: ../libtransmission/metainfo.c:650 ../libtransmission/metainfo.c:659
+#, c-format
+msgid "Invalid metadata entry \"%s\""
+msgstr "Ugyldig metadataoppføring «%s»"
+
+#: ../libtransmission/metainfo.c:258 ../libtransmission/metainfo.c:267
+msgid "Torrent is corrupt"
+msgstr "Torrent er korrupt"
+
+#: ../libtransmission/metainfo.c:480
+#, c-format
+msgid "Invalid announce URL \"%s\""
+msgstr "Ugyldig annonserings-URL «%s»"
+
+#: ../libtransmission/metainfo.c:690
+msgid "Invalid or missing metadata entries \"length\" and \"files\""
+msgstr "Ugyldig eller manglende metadataoppføringer «lengde» og «filer»"
+
+#: ../libtransmission/natpmp.c:34
+msgid "Port Forwarding (NAT-PMP)"
+msgstr "Videreføring av porter (NAT-PMP)"
+
+#: ../libtransmission/natpmp.c:70
+#, c-format
+msgid "%s succeeded (%d)"
+msgstr "%s lyktes (%d)"
+
+#: ../libtransmission/natpmp.c:72
+#, c-format
+msgid "%s failed (%d): %s (%d)"
+msgstr "%s feilet (%d): %s (%d)"
+
+#: ../libtransmission/natpmp.c:110
+msgid "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!"
+msgstr "Hvis ruteren din støtter NAT-PMP, pass på at NAT-PMP er skrudd på!"
+
+#: ../libtransmission/natpmp.c:111
+msgid "NAT-PMP port forwarding unsuccessful, trying UPnP next"
+msgstr "NAT-PMP-videreføring av porter mislyktes, prøver UPnP i stedet"
+
+#: ../libtransmission/natpmp.c:137
+#, c-format
+msgid "Found public address \"%s\""
+msgstr "Fant offentlig adresse «%s»"
+
+#: ../libtransmission/natpmp.c:164
+#, c-format
+msgid "no longer forwarding port %d"
+msgstr "viderefører ikke lengre port %d"
+
+#: ../libtransmission/natpmp.c:200
+#, c-format
+msgid "port %d forwarded successfully"
+msgstr "port %d videreført uten feil"
+
+#: ../libtransmission/net.c:145
+#, c-format
+msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
+msgstr "Klarte ikke å koble socket %d til %s, port %d (errno %d - %s)"
+
+#: ../libtransmission/net.c:186
+#, c-format
+msgid "Couldn't bind port %d: %s"
+msgstr "Klarte ikke å binde port %d: %s"
+
+#: ../libtransmission/net.c:191
+#, c-format
+msgid "Bound socket %d to port %d"
+msgstr "Bandt socket %d til port %d"
+
+#: ../libtransmission/peer-msgs.c:1532
+#, c-format
+msgid "Piece %lu, which was just downloaded, failed its checksum test: %s"
+msgstr "Bruddstykke %lu, som nettopp ble nedlastet, feilet kontrollsumverifiseringen: %s"
+
+#: ../libtransmission/port-forwarding.c:41
+msgid "Port Forwarding"
+msgstr "Videreføring av porter"
+
+#. we're in the process of trying to set up port forwarding
+#: ../libtransmission/port-forwarding.c:72
+msgid "Starting"
+msgstr "Starter"
+
+#. we've successfully forwarded the port
+#: ../libtransmission/port-forwarding.c:74
+msgid "Forwarded"
+msgstr "Videreført"
+
+#. we're cancelling the port forwarding
+#: ../libtransmission/port-forwarding.c:76
+msgid "Stopping"
+msgstr "Stopper"
+
+#. the port isn't forwarded
+#: ../libtransmission/port-forwarding.c:78
+msgid "Not forwarded"
+msgstr "Ikke videreført"
+
+#: ../libtransmission/port-forwarding.c:96 ../libtransmission/torrent.c:1110
+#, c-format
+msgid "State changed from \"%s\" to \"%s\""
+msgstr "Tilsdand endret fra «%s» til «%s»"
+
+#: ../libtransmission/port-forwarding.c:99
+msgid "Port forwarding failed."
+msgstr "Videreføring av port mislyktes."
+
+#: ../libtransmission/port-forwarding.c:108
+#, c-format
+msgid "Closing port %d"
+msgstr "Stenger port %d"
+
+#: ../libtransmission/port-forwarding.c:119
+#, c-format
+msgid "Opened port %d to listen for incoming peer connections"
+msgstr "Åpnet port %d for å lytte etter inkommende nedlastertilkoblinger"
+
+#: ../libtransmission/port-forwarding.c:124
+#, c-format
+msgid ""
+"Couldn't open port %d to listen for incoming peer connections (errno %d - %s)"
+msgstr ""
+"Klarte ikke å åpne port %d for å lytte etter inkommende nedlastertilkoblinger (errno %d - %s)"
+
+#: ../libtransmission/port-forwarding.c:162
+msgid "Stopped"
+msgstr "Stoppet"
+
+#. first %s is the application name
+#. second %s is the version number
+#: ../libtransmission/session.c:187
+#, c-format
+msgid "%s %s started"
+msgstr "%s %s startet"
+
+#: ../libtransmission/session.c:483
+#, c-format
+msgid "Loaded %d torrents"
+msgstr "%d torrenter lastet inn"
+
+#: ../libtransmission/torrent.c:160
+#, c-format
+msgid "Tracker warning: \"%s\""
+msgstr "Stifinneradvarsel: «%s»"
+
+#: ../libtransmission/torrent.c:166
+#, c-format
+msgid "Tracker error: \"%s\""
+msgstr "Stifinnerfeil: «%s»"
+
+#: ../libtransmission/torrent.c:880
+#, c-format
+msgid "Closing torrent; %d left"
+msgstr "Lukker torrent; %d igjen"
+
+#. Translators: this is a minor point that's safe to skip over, but FYI:
+#. "Complete" and "Done" are specific, different terms in Transmission:
+#. "Complete" means we've downloaded every file in the torrent.
+#. "Done" means we're done downloading the files we wanted, but NOT all that exist
+#: ../libtransmission/torrent.c:1063
+msgid "Done"
+msgstr "Utført"
+
+#: ../libtransmission/torrent.c:1064
+msgid "Complete"
+msgstr "Fullført"
+
+#: ../libtransmission/torrent.c:1065
+msgid "Incomplete"
+msgstr "Uferdig"
+
+#: ../libtransmission/upnp.c:27
+msgid "Port Forwarding (UPnP)"
+msgstr "Videreføring av porter (UPnP)"
+
+#: ../libtransmission/upnp.c:91
+#, c-format
+msgid "upnpDiscover failed (errno %d - %s)"
+msgstr "upnpDiscover feilet (errno %d - %s)"
+
+#: ../libtransmission/upnp.c:95
+#, c-format
+msgid "Found Internet Gateway Device \"%s\""
+msgstr "Fant internettdeleenhet «%s»"
+
+#: ../libtransmission/upnp.c:96
+#, c-format
+msgid "Local Address is \"%s\""
+msgstr "Lokal adresse er «%s»"
+
+#: ../libtransmission/upnp.c:101
+#, c-format
+msgid "UPNP_GetValidIGD failed (errno %d - %s)"
+msgstr "UPNP_GetValidIGD feilet (errno %d - %s)"
+
+#: ../libtransmission/upnp.c:102 ../libtransmission/upnp.c:157
+msgid "If your router supports UPnP, please make sure UPnP is enabled!"
+msgstr "Hvis ruteren din støtter UPnP, pass på at UPnP er skrudd på!"
+
+#: ../libtransmission/upnp.c:120
+#, c-format
+msgid "Stopping port forwarding through \"%s\", service \"%s\""
+msgstr "Stopper videreføring av porter gjennom «%s», tjeneste «%s»"
+
+#: ../libtransmission/upnp.c:149
+#, c-format
+msgid "Port forwarding through \"%s\", service \"%s\".  (local address: %s:%d)"
+msgstr "Videreføring av porter gjennom «%s», tjeneste «%s». (local adresse: %s:%d)"
+
+#: ../libtransmission/upnp.c:152
+msgid "Port forwarding successful!"
+msgstr "Videreføring av porter fungerte feilfritt!"
+
+#: ../libtransmission/upnp.c:156
+#, c-format
+msgid "Port forwarding failed with error %d (errno %d - %s)"
+msgstr "Videreføring av porter feilet med feil %d (errno %d - %s)"
+
+#: ../libtransmission/utils.c:382
+msgid "Not a regular file"
+msgstr "Ikke en vanlig fil"
+
+#: ../libtransmission/utils.c:396
+msgid "Memory allocation failed"
+msgstr "Minnetildeling feilet."
+
+#: ../libtransmission/utils.c:468
+#, c-format
+msgid "File \"%s\" is in the way"
+msgstr "Fil «%s» er i veien"
+
+#: ../libtransmission/utils.c:535
+msgid "No error"
+msgstr "Ingen feil"
+
+#: ../libtransmission/utils.c:538
+msgid "Unspecified error"
+msgstr "Uspesifisert feil"
+
+#: ../libtransmission/utils.c:540
+msgid "Assert error"
+msgstr "«Assert»-feil"
+
+#: ../libtransmission/utils.c:543
+msgid "Destination folder doesn't exist"
+msgstr "Målmappe eksisterer ikke"
+
+#: ../libtransmission/utils.c:553
+msgid "A torrent with this name and destination folder already exists."
+msgstr "En torrent med dette navnet og målmappe eksisterer allerede."
+
+#: ../libtransmission/utils.c:555
+msgid "Checksum failed"
+msgstr "Kontrollsumverifisering feilet"
+
+#: ../libtransmission/utils.c:557
+msgid "Unspecified I/O error"
+msgstr "Uspesifisert lese/skrive-feil"
+
+#: ../libtransmission/utils.c:560
+msgid "Tracker error"
+msgstr "Stifinnerfeil"
+
+#: ../libtransmission/utils.c:562
+#, fuzzy
+msgid "Tracker warning"
+msgstr "Stifinneradvarsel"
+
+#: ../libtransmission/utils.c:565
+msgid "Peer sent a bad message"
+msgstr "Nedlaster sendte en gal melding"
+
+#: ../libtransmission/utils.c:568
+msgid "Unknown error"
+msgstr "Ukjent feil"
+
+#: ../libtransmission/verify.c:128
+msgid "Verifying torrent"
+msgstr "Verifiserer torrent"
+
+#: ../libtransmission/verify.c:160
+msgid "Queued for verification"
+msgstr "Køet for verifisering"
+
+#~ msgid "Transfer files via Peer to Peer"
+#~ msgstr "Overfør filer via likenett"
+
+#~ msgid "_High"
+#~ msgstr "_Høy"
+
+#~ msgid "_Normal"
+#~ msgstr "_Normal"
+
+#~ msgid "_Low"
+#~ msgstr "_Lav"
+
+#~ msgid "Sort by _Date Added"
+#~ msgstr "Sorter etter sist _lagt til"
+
+#~ msgid "Show Message _Log"
+#~ msgstr "Vis _loggvinduet"
+
+#~ msgid "Show _Status Bar"
+#~ msgstr "Vis _statusfelt"
+
+#~ msgid "_Priority"
+#~ msgstr "_Prioritet"
+
+#~ msgid "_Remove"
+#~ msgstr "_Fjern"
+
+#~ msgid "Create _New Torrent"
+#~ msgstr "Lag _ny torrentfil"
+
+#~ msgid "_Close"
+#~ msgstr "_Lukk"
+
+#~ msgid "_About Transmission"
+#~ msgstr "_Om Transmission"
+
+#~ msgid ""
+#~ "Failed to create the directory %s:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Klarte ikke å opprette mappen «%s»:\n"
+#~ "%s"
+
+#~ msgid ""
+#~ "Failed to open the file %s for writing:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Klarte ikke å åpne filen «%s» med skrivetilgang:\n"
+#~ "%s"
+
+#~ msgid "Use alternate _download directory"
+#~ msgstr "Last ned til en annen _mappe"
+
+#~ msgid "Choose a download directory"
+#~ msgstr "Velg mappe å laste ned til"
+
+#~ msgid "Choose a directory"
+#~ msgstr "Velg en mappe"
+
+#~ msgid "<b>Really Quit %s?</b>"
+#~ msgstr "<b>Er du sikker på at du vil avslutte «%s»?</b>"
+
+#~ msgid "This will close all active torrents."
+#~ msgstr "Dette vil lukke alle aktive torrenter."
+
+#~ msgid "IPC parsing failed: %s"
+#~ msgstr "IPC-tolkning feilet: %s"
+
+#~ msgid ""
+#~ "Failed to load torrent file:\n"
+#~ "%sFailed to load torrent files:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Klarte ikke å laste inn torrent-fil:\n"
+#~ "%sKlarte ikke å laste inn torrent-filene:\n"
+#~ "%s"
+
+#~ msgid "Torrent creation aborted."
+#~ msgstr "Opprettelse av torrent-fil ble avbrutt."
+
+#~ msgid "Piece"
+#~ msgid_plural "Pieces"
+#~ msgstr[0] "Bruddstykke"
+#~ msgstr[1] "Bruddstykker"
+
+#~ msgid "File _Type"
+#~ msgstr "_Type"
+
+#~ msgid "Directory"
+#~ msgstr "Mappe"
+
+#~ msgid "Error writing to \"%s\": %s"
+#~ msgstr "Klarte ikke å skrive til «%s»: %s"
+
+#~ msgid "Info"
+#~ msgstr "Informasjon"
+
+#~ msgid "Select the debug filter level."
+#~ msgstr "Velg filtreringsnivået for avlusningsmeldinger."
+
+#~ msgid "Cumulative"
+#~ msgstr "Kumulativ"
+
+#~ msgid "Program started %d times"
+#~ msgstr "Programmet har vært startet opp %d ganger"
+
+#~ msgid "Ratio: %.1f, "
+#~ msgstr "Delingsrate: %.1f, "
+
+#~ msgid "Handshaking"
+#~ msgstr "Håndhilsing"
+
+#~ msgid "Peer wants our data"
+#~ msgstr "Nedlaster vil ha vår data"
+
+#~ msgid "Refusing to send data to peer"
+#~ msgstr "Nekter å sende data til nedlaster"
+
+#~ msgid "Requesting data from peer"
+#~ msgstr "Ber om data fra nedlaster"
+
+#~ msgid "Waiting to request data from peer"
+#~ msgstr "Venter på å be om data fra nedlaster"
+
+#~ msgid "Peer will not send us data"
+#~ msgstr "Nedlaster nekter å sende oss data"
+
+#~ msgid "Private Torrent, PEX disabled"
+#~ msgstr "Privat torrent, PEX avskrudd"
+
+#~ msgid "Created By"
+#~ msgstr "Opprettet av"
+
+#~ msgid "N/A"
+#~ msgstr "Ikke tilgjengelig"
+
+#~ msgid "Downloaded Data"
+#~ msgstr "Nedlastet data"
+
+#~ msgid "Torrent File Path"
+#~ msgstr "Torrent-filsti"
+
+#~ msgid "Torrent File Name"
+#~ msgstr "Torrent-filnavn"
+
+#~ msgid "Completeness:"
+#~ msgstr "Ferdigstillelse"
+
+#~ msgid "Added:"
+#~ msgstr "Lagt til:"
+
+#~ msgid "Download"
+#~ msgstr "Nedlasting"
+
+#~ msgid "Priority"
+#~ msgstr "Prioritet"
+
+#~ msgid "_Info"
+#~ msgstr "_Informasjon"
+
+#~ msgid "_Files"
+#~ msgstr "_Filer"
+
+#~ msgid "_Options"
+#~ msgstr "_Valg"
+
+#~ msgid "Use the torrent file where it is"
+#~ msgstr "Bruk torrent-filen der den er"
+
+#~ msgid "Keep a copy of the torrent file"
+#~ msgstr "Behold en kopi av torrent-filen"
+
+#~ msgid "Keep a copy and remove the original"
+#~ msgstr "Behold en kopi og fjern originalen"
+
+#~ msgid "Preferences"
+#~ msgstr "Brukervalg"
+
+#~ msgid "_Limit Upload Speed (KiB/s)"
+#~ msgstr "_Begrens opplastingshastigheten til (KiB/s)"
+
+#~ msgid "Li_mit Download Speed (KiB/s)"
+#~ msgstr "Be_grens nedlastingshastigheten til (KiB/s)"
+
+#~ msgid "Downloads"
+#~ msgstr "Nedlastinger"
+
+#~ msgid "P_rompt for download directory"
+#~ msgstr "Spør hvor nedlastinger skal lagres"
+
+#~ msgid "For torrents added _normally:"
+#~ msgstr "For torrenter lagt til på _normalt vis:"
+
+#~ msgid "For torrents added from _command-line:"
+#~ msgstr "For torrenter lagt til fra _kommandolinja:"
+
+#~ msgid "Global maximum connected peers:"
+#~ msgstr "Globalbegrensning på maksimalt tilkoblede nedlastere"
+
+#~ msgid "_Automatically map port"
+#~ msgstr "Kartlegg port _automatisk"
+
+#~ msgid "NAT traversal uses either NAT-PMP or UPnP"
+#~ msgstr "NAT-traversering bruker enten NAT-PMP eller UPnP"
+
+#~ msgid "Show an Icon in the System _Tray"
+#~ msgstr "Vis ikon i varslingsområdet"
+
+#~ msgid "Confirm _quit"
+#~ msgstr "Bekreft _avsluttning"
+
+#~ msgid "%s: torrent is already open"
+#~ msgstr "%s: torrent-filen er allerede åpen"
+
+#~ msgid "not a valid torrent file"
+#~ msgstr "ikke en gyldig torrent-fil"
+
+#~ msgid "Uploading to %d of %d peer"
+#~ msgid_plural "Uploading to %d of %d peers"
+#~ msgstr[0] "Laster opp til %d av %d nedlaster"
+#~ msgstr[1] "Laster opp til %d av %d nedlastere"
+
+#~ msgid "Seeding to %d of %d peer"
+#~ msgid_plural "Seeding to %d of %d peers"
+#~ msgstr[0] "Deler med %d av %d nedlaster"
+#~ msgstr[1] "Deler med %d av %d nedlastere"
+
+#~ msgid "Unrecognized state: %d"
+#~ msgstr "Tilstanden er ikke gyldig: %d"
+
+#~ msgid "%d Transfer"
+#~ msgid_plural "%d Transfers"
+#~ msgstr[0] "%d overføring"
+#~ msgstr[1] "%d overføringer"
+
+#~ msgid "Ratio: %.1f"
+#~ msgstr "Delingsrate: %.1f"
+
+#~ msgid "Down: %s  Up: %s"
+#~ msgstr "Ned: %s  Opp: %s"
+
+#~ msgid "B"
+#~ msgstr "B"
+
+#~ msgid "KiB"
+#~ msgstr "KiB"
+
+#~ msgid "MiB"
+#~ msgstr "MiB"
+
+#~ msgid "GiB"
+#~ msgstr "GiB"
+
+#~ msgid "TiB"
+#~ msgstr "TiB"
+
+#~ msgid "PiB"
+#~ msgstr "PiB"
+
+#~ msgid "EiB"
+#~ msgstr "EiB"
+
+#~ msgid "ZiB"
+#~ msgstr "ZiB"
+
+#~ msgid "YiB"
+#~ msgstr "YiB"
+
+#~ msgid "%s/s"
+#~ msgstr "%s/s"
+
+#~ msgid "%i %s"
+#~ msgstr "%i %s"
+
+#~ msgid "sec"
+#~ msgid_plural "secs"
+#~ msgstr[0] "sekund"
+#~ msgstr[1] "sekund"
+
+#~ msgid "%i %s %i %s"
+#~ msgstr "%i %s %i %s"
+
+#~ msgid "min"
+#~ msgid_plural "mins"
+#~ msgstr[0] "minutt"
+#~ msgstr[1] "minutt"
+
+#~ msgid "hr"
+#~ msgid_plural "hrs"
+#~ msgstr[0] "time"
+#~ msgstr[1] "timer"
