@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h> /* INT_MAX */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
