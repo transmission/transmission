@@ -98,12 +98,6 @@ enum
     /* number of unchoked peers per torrent */
     MAX_UNCHOKED_PEERS = 12,
 
-    /* corresponds to ut_pex's added.f flags */
-    ADDED_F_ENCRYPTION_FLAG = 1,
-
-    /* corresponds to ut_pex's added.f flags */
-    ADDED_F_SEED_FLAG = 2,
-
     /* number of bad pieces a peer is allowed to send before we ban them */
     MAX_BAD_PIECES_PER_PEER = 3,
 
@@ -1168,30 +1162,24 @@ tr_peerMgrAddPex( tr_peerMgr     * manager,
     managerUnlock( manager );
 }
 
-void
-tr_peerMgrAddPeers( tr_peerMgr    * manager,
-                    const uint8_t * torrentHash,
-                    uint8_t         from,
-                    const uint8_t * peerCompact,
-                    int             peerCount )
+tr_pex *
+tr_peerMgrCompactToPex( const void  * compact,
+                        size_t        compactLen,
+                        const char  * added_f,
+                        size_t      * pexCount )
 {
-    int i;
-    const uint8_t * walk = peerCompact;
-    Torrent * t;
-
-    managerLock( manager );
-
-    t = getExistingTorrent( manager, torrentHash );
-    for( i=0; t!=NULL && i<peerCount; ++i )
-    {
-        struct in_addr addr;
-        uint16_t port;
-        memcpy( &addr, walk, 4 ); walk += 4;
-        memcpy( &port, walk, 2 ); walk += 2;
-        maybeEnsureAtomExists( t, &addr, port, 0, from );
+    size_t i;
+    size_t n = compactLen / 6;
+    const uint8_t * walk = compact;
+    tr_pex * pex = tr_new0( tr_pex, n );
+    for( i=0; i<n; ++i ) {
+        memcpy( &pex[i].in_addr, walk, 4 ); walk += 4;
+        memcpy( &pex[i].port, walk, 2 ); walk += 2;
+        if( added_f )
+            pex[i].flags = added_f[i];
     }
-
-    managerUnlock( manager );
+    *pexCount = n;
+    return pex;
 }
 
 /**

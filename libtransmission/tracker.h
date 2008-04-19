@@ -54,8 +54,9 @@ typedef struct
     const char * text;
 
     /* for TR_TRACKER_PEERS */
-    const uint8_t * peerCompact;
-    int peerCount;
+    const uint8_t * compact;
+    int compactLen;
+    int allAreSeeds;
 }
 tr_tracker_event;
 

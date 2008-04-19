@@ -941,21 +941,23 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
 {
     int loaded = 0;
     uint8_t * tmp = tr_new( uint8_t, msglen );
-    tr_benc val, *sub;
+    tr_benc val, *added;
     const tr_torrent * tor = msgs->torrent;
     tr_peerIoReadBytes( msgs->io, inbuf, tmp, msglen );
 
     if( tr_torrentAllowsPex( tor )
         && (( loaded = !tr_bencLoad( tmp, msglen, &val, NULL )))
-        && (( sub = tr_bencDictFindType( &val, "added", TYPE_STR ))))
+        && (( added = tr_bencDictFindType( &val, "added", TYPE_STR ))))
     {
-        const int n = sub->val.s.i / 6 ;
-        if( n )
-            tr_tordbg( tor, "Got %d peers from peer exchange", n );
-        tr_peerMgrAddPeers( msgs->handle->peerMgr,
-                            tor->info.hash,
-                            TR_PEER_FROM_PEX,
-                            (uint8_t*)sub->val.s.s, n );
+        const char * added_f = NULL;
+        tr_pex * pex;
+        size_t i, n;
+        tr_bencDictFindStr( &val, "added.f", &added_f );
+        pex = tr_peerMgrCompactToPex( added->val.s.s, added->val.s.i, added_f, &n );
+        for( i=0; i<n; ++i )
+            tr_peerMgrAddPex( msgs->handle->peerMgr, tor->info.hash,
+                              TR_PEER_FROM_PEX, pex+i );
+        tr_free( pex );
     }
 
     if( loaded )
@@ -1797,7 +1799,7 @@ sendPex( tr_peermsgs * msgs )
         tr_pex * newPex = NULL;
         const int newCount = tr_peerMgrGetPeers( msgs->handle->peerMgr, msgs->torrent->info.hash, &newPex );
         PexDiffs diffs;
-        tr_benc val, *added, *dropped, *flags;
+        tr_benc val, *added, *dropped;
         uint8_t *tmp, *walk;
         char * benc;
         int bencLen;
@@ -1834,12 +1836,11 @@ sendPex( tr_peermsgs * msgs )
         tr_bencInitStr( added, tmp, walk-tmp, FALSE );
 
         /* "added.f" */
-        flags = tr_bencDictAdd( &val, "added.f" );
         tmp = walk = tr_new( uint8_t, diffs.addedCount );
         for( i=0; i<diffs.addedCount; ++i )
             *walk++ = diffs.added[i].flags;
         assert( ( walk - tmp ) == diffs.addedCount );
-        tr_bencInitStr( flags, tmp, walk-tmp, FALSE );
+        tr_bencDictAddRaw( &val, "added.f", tmp, walk-tmp );
 
         /* "dropped" */
         dropped = tr_bencDictAdd( &val, "dropped" );

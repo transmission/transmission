@@ -152,13 +152,26 @@ onTrackerResponse( void * tracker UNUSED, void * vevent, void * user_data )
 
     switch( event->messageType )
     {
-        case TR_TRACKER_PEERS:
-            tr_peerMgrAddPeers( tor->handle->peerMgr,
-                                tor->info.hash,
-                                TR_PEER_FROM_TRACKER,
-                                event->peerCompact,
-                                event->peerCount );
+        case TR_TRACKER_PEERS: {
+            size_t i, n;
+            tr_pex * pex = tr_peerMgrCompactToPex( event->compact,
+                                                   event->compactLen,
+                                                   NULL, &n );
+            if( event->allAreSeeds )
+                tr_tordbg( tor, "Got %d seeds from tracker", (int)n );
+            else
+                tr_torinf( tor, _( "Got %d peers from tracker" ), (int)n );
+
+            for( i=0; i<n; ++i ) {
+                if( event->allAreSeeds )
+                    pex[i].flags |= ADDED_F_SEED_FLAG;
+                tr_peerMgrAddPex( tor->handle->peerMgr, tor->info.hash,
+                                  TR_PEER_FROM_TRACKER, pex+i );
+            }
+
+            tr_free( pex );
             break;
+        }
 
         case TR_TRACKER_WARNING:
             tr_torerr( tor, _( "Tracker warning: \"%s\"" ), event->text );

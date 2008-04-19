@@ -221,7 +221,7 @@ findTracker( tr_handle * handle, const uint8_t * hash )
 ****  PUBLISH
 ***/
 
-static const tr_tracker_event emptyEvent = { 0, NULL, NULL, NULL, 0 };
+static const tr_tracker_event emptyEvent = { 0, NULL, NULL, NULL, 0, 0 };
 
 static void
 publishMessage( tr_tracker * t, const char * msg, int type )
@@ -256,15 +256,15 @@ publishWarning( tr_tracker * t, const char * msg )
 }
 
 static void
-publishNewPeers( tr_tracker * t, int count, uint8_t * peers )
+publishNewPeers( tr_tracker * t, int allAreSeeds, void * compact, int compactLen )
 {
     tr_tracker_event event = emptyEvent;
     event.hash = t->hash;
     event.messageType = TR_TRACKER_PEERS;
-    event.peerCount = count;
-    event.peerCompact = peers;
-    tr_ndbg( t->name, "Torrent got %d new peers", count );
-    if( count )
+    event.allAreSeeds = allAreSeeds;
+    event.compact = compact;
+    event.compactLen = compactLen;
+    if( compactLen )
         tr_publisherPublish( t->publisher, t, &event );
 }
 
@@ -360,7 +360,7 @@ updateAddresses( tr_tracker * t, const struct evhttp_request * req, int * tryAga
 
 /* Convert to compact form */
 static uint8_t *
-parseOldPeers( tr_benc * bePeers, int * setmePeerCount )
+parseOldPeers( tr_benc * bePeers, size_t * byteCount )
 {
     int i;
     uint8_t *compact, *walk;
@@ -393,7 +393,7 @@ parseOldPeers( tr_benc * bePeers, int * setmePeerCount )
         walk += 2;
     }
 
-    *setmePeerCount = peerCount;
+    *byteCount = peerCount * 6;
     return compact;
 }
 
@@ -432,6 +432,7 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
         if( bencLoaded && benc.type==TYPE_DICT )
         {
             tr_benc * tmp;
+            int incomplete = -1;
 
             if(( tmp = tr_bencDictFind( &benc, "failure reason" ))) {
                 dbgmsg( t, "got failure message [%s]", tmp->val.s.s );
@@ -460,30 +461,23 @@ onTrackerResponse( struct evhttp_request * req, void * vhash )
                 t->seederCount = tmp->val.i;
 
             if(( tmp = tr_bencDictFind( &benc, "incomplete" )))
-                t->leecherCount = tmp->val.i;
+                t->leecherCount = incomplete = tmp->val.i;
 
             if(( tmp = tr_bencDictFind( &benc, "peers" )))
             {
-                int peerCount = 0;
-                uint8_t * peerCompact = NULL;
+                const int allAreSeeds = incomplete == 0;
 
-                if( tmp->type == TYPE_LIST ) /* original protocol */
+                if( tmp->type == TYPE_STR ) /* "compact" extension */
                 {
-                    if( tmp->val.l.count > 0 )
-                        peerCompact = parseOldPeers( tmp, &peerCount );
+                    publishNewPeers( t, allAreSeeds, tmp->val.s.s, tmp->val.s.i );
                 }
-                else if( tmp->type == TYPE_STR ) /* "compact" extension */
+                else if( tmp->type == TYPE_LIST ) /* original protocol */
                 {
-                    if( tmp->val.s.i >= 6 )
-                    {
-                        peerCount = tmp->val.s.i / 6;
-                        peerCompact = tr_new( uint8_t, tmp->val.s.i );
-                        memcpy( peerCompact, tmp->val.s.s, tmp->val.s.i );
-                    }
+                    size_t byteCount = 0;
+                    uint8_t * compact = parseOldPeers( tmp, &byteCount );
+                    publishNewPeers( t, allAreSeeds, compact, byteCount );
+                    tr_free( compact );
                 }
-
-                publishNewPeers( t, peerCount, peerCompact );
-                tr_free( peerCompact );
             }
         }
 

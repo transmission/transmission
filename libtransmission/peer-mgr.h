@@ -27,6 +27,15 @@ struct tr_peer_stat;
 struct tr_torrent;
 typedef struct tr_peerMgr tr_peerMgr;
 
+enum
+{
+    /* corresponds to ut_pex's added.f flags */
+    ADDED_F_ENCRYPTION_FLAG = 1,
+
+    /* corresponds to ut_pex's added.f flags */
+    ADDED_F_SEED_FLAG = 2,
+};
+
 typedef struct tr_pex
 {
     struct in_addr in_addr;
@@ -50,12 +59,11 @@ void tr_peerMgrAddIncoming( tr_peerMgr      * manager,
                             uint16_t          port,
                             int               socket );
 
-void tr_peerMgrAddPeers( tr_peerMgr     * manager,
-                         const uint8_t  * torrentHash,
-                         uint8_t          from,
-                         const uint8_t  * peerCompact,
-                         int              peerCount );
-
+tr_pex * tr_peerMgrCompactToPex( const void  * compact,
+                                 size_t        compactLen,
+                                 const char  * added_f,
+                                 size_t      * pexCount );
+                             
 void tr_peerMgrAddPex( tr_peerMgr     * manager,
                        const uint8_t  * torrentHash,
                        uint8_t          from,
