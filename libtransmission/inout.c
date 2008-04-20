@@ -95,7 +95,7 @@ compareOffsetToFile( const void * a, const void * b )
     const tr_file * file = b;
 
     if( offset < file->offset ) return -1;
-    if( offset > file->offset + file->length ) return 1;
+    if( offset >= file->offset + file->length ) return 1;
     return 0;
 }
 
