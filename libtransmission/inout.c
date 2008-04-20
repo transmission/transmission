@@ -88,6 +88,17 @@ readOrWriteBytes( const tr_torrent  * tor,
     return err;
 }
 
+static int
+compareOffsetToFile( const void * a, const void * b )
+{
+    const uint64_t offset = *(const uint64_t*)a;
+    const tr_file * file = b;
+
+    if( offset < file->offset ) return -1;
+    if( offset > file->offset + file->length ) return 1;
+    return 0;
+}
+
 static void
 findFileLocation( const tr_torrent * tor,
                   tr_piece_index_t   pieceIndex,
@@ -95,50 +106,19 @@ findFileLocation( const tr_torrent * tor,
                   tr_file_index_t  * fileIndex,
                   uint64_t         * fileOffset )
 {
-    size_t len;
-    tr_file_index_t first, last;
-    const tr_info * inf = &tor->info;
-    uint64_t offset = tr_pieceOffset( tor, pieceIndex, pieceOffset, 0 );
+    const uint64_t offset = tr_pieceOffset( tor, pieceIndex, pieceOffset, 0 );
+    const tr_file * file;
 
-    assert( pieceIndex < inf->pieceCount );
-    assert( pieceOffset < tr_torPieceCountBytes( tor, pieceIndex ) );
-    assert( offset < inf->totalSize );
+    file = bsearch( &offset,
+                    tor->info.files, tor->info.fileCount, sizeof(tr_file),
+                    compareOffsetToFile );
    
-    /* use a lower-bound bsearch to find the file that matches */
-    first = 0;
-    last = inf->fileCount;
-    len = last - first;
-    while( len > 0 ) {
-        size_t half = len / 2;
-        size_t middle = first + half;
-        if( inf->files[middle].offset + inf->files[middle].length < offset )
-        {
-            first = middle;
-            ++first;
-            len = len - half - 1;
-        }
-        else len = half;
-    }
-   
-    *fileIndex = first;
-    *fileOffset = offset - inf->files[first].offset;
+    *fileIndex = file - tor->info.files;
+    *fileOffset = offset - file->offset;
 
-    assert( inf->files[first].offset <= offset );
-    if( offset >= inf->files[first].offset + inf->files[first].length ) {
-        fprintf( stderr, "piece index is %lu\n", (unsigned long)pieceIndex );
-        fprintf( stderr, "piece offset is %lu\n", (unsigned long)pieceOffset );
-        fprintf( stderr, "piece size is %lu\n", (unsigned long)inf->pieceSize );
-        fprintf( stderr, "inf->totalSize is %"PRIu64"\n", inf->totalSize );
-        fprintf( stderr, "offset is %"PRIu64"\n", offset );
-        fprintf( stderr, "first is is %"PRIu64"\n", (uint64_t)first );
-        fprintf( stderr, "inf->fileCount is %"PRIu64"\n", (uint64_t)inf->fileCount );
-        fprintf( stderr, "inf->fileCount is %d\n", (int)inf->fileCount );
-        fprintf( stderr, "inf->files[first].offset is %"PRIu64"\n", inf->files[first].offset );
-        fprintf( stderr, "inf->files[first].length is %"PRIu64"\n", inf->files[first].length );
-        assert( offset < inf->files[first].offset + inf->files[first].length );
-    }
-    assert( *fileIndex < inf->fileCount );
-    assert( *fileOffset < inf->files[first].length );
+    assert( *fileIndex < tor->info.fileCount );
+    assert( *fileOffset < file->length );
+    assert( tor->info.files[*fileIndex].offset + *fileOffset == offset );
 }
 
 #ifdef WIN32

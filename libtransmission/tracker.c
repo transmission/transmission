@@ -1074,7 +1074,7 @@ tr_trackerNew( const tr_torrent * torrent )
     t->leecherCount = -1;
     t->manualAnnounceAllowedAt = ~(time_t)0;
     t->name = tr_strdup( info->name );
-    t->randOffset = tr_rand( 60 );
+    t->randOffset = tr_rand( 120 );
     memcpy( t->hash, info->hash, SHA_DIGEST_LENGTH );
     escape( t->escaped, info->hash, SHA_DIGEST_LENGTH );
 
