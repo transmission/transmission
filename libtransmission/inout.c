@@ -125,7 +125,13 @@ findFileLocation( const tr_torrent * tor,
 
     assert( inf->files[first].offset <= offset );
     if( offset >= inf->files[first].offset + inf->files[first].length ) {
+        fprintf( stderr, "piece index is %lu\n", (unsigned long)pieceIndex );
+        fprintf( stderr, "piece offset is %lu\n", (unsigned long)pieceOffset );
+        fprintf( stderr, "piece size is %lu\n", (unsigned long)inf->pieceSize );
+        fprintf( stderr, "inf->totalSize is %"PRIu64"\n", inf->totalSize );
         fprintf( stderr, "offset is %"PRIu64"\n", offset );
+        fprintf( stderr, "first is is %"PRIu64"\n", (uint64_t)first );
+        fprintf( stderr, "inf->fileCount is %"PRIu64"\n", (uint64_t)inf->fileCount );
         fprintf( stderr, "inf->fileCount is %d\n", (int)inf->fileCount );
         fprintf( stderr, "inf->files[first].offset is %"PRIu64"\n", inf->files[first].offset );
         fprintf( stderr, "inf->files[first].length is %"PRIu64"\n", inf->files[first].length );

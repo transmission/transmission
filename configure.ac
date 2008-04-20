@@ -108,15 +108,15 @@ if test "x$use_gio" = "xyes"; then
     AC_DEFINE([HAVE_GIO], 1)
 fi
 
-PKG_CHECK_MODULES([LIBNOTIFY],
-                  [libnotify >= $LIBNOTIFY_MINIMUM],
-                  [use_libnotify=yes],
-                  [use_libnotify=no])
-AC_SUBST(LIBNOTIFY_LIBS)
-AC_SUBST(LIBNOTIFY_CFLAGS)
-if test "x$use_libnotify" = "xyes"; then
-    AC_DEFINE([HAVE_LIBNOTIFY], 1)
-fi
+AC_ARG_ENABLE([libnotify], 
+              AS_HELP_STRING([--enable-libnotify],[enable notifications]),, 
+              [enable_libnotify=yes]) 
+if test x$enable_libnotify = xyes ; then 
+    PKG_CHECK_MODULES([LIBNOTIFY], [libnotify >= $LIBNOTIFY_MINIMUM]) 
+    AC_SUBST(LIBNOTIFY_LIBS) 
+    AC_SUBST(LIBNOTIFY_CFLAGS) 
+    AC_DEFINE([HAVE_LIBNOTIFY], 1) 
+fi 
 
 PKG_CHECK_MODULES([DBUS_GLIB],
                   [dbus-glib-1 >= $DBUS_GLIB_MINIMUM],
@@ -303,7 +303,7 @@ Configuration:
         Build GTK+ client:          ${build_gtk}
           ... gio support:          ${use_gio}
           ... dbus-glib support:    ${use_dbus_glib}
-          ... libnotify support:    ${use_libnotify}
+          ... libnotify support:    ${enable_libnotify}
         Build OS X client:          ${build_darwin}
         Build wxWidgets client:     ${build_wx}
 
