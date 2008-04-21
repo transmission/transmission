@@ -1262,7 +1262,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (uint64_t) totalSizeSelected
 {
-    return [self haveTotal] + [self sizeLeft];
+    return fStat->sizeWhenDone;
 }
 
 - (uint64_t) downloadedTotal
