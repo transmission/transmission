@@ -5,6 +5,10 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + IP blocking using the Bluetack Level1 blocklist
 - Mac
    + Display of decimal numbers matches system international settings
+- GTK+
+   + Inhibit hibernation when downloading
+   + various bug fixes and usability improvements
+   + Use XDG basedir spec for configuration files
 
 1.12 (2008/mm/dd)
 - Mac
