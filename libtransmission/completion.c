@@ -108,7 +108,7 @@ tr_cpEnsureDoneValid( const tr_completion * ccp )
         cp->doneDirty = FALSE;
 
         for( i=0; i<info->pieceCount; ++i ) {
-            if( !info->pieces[i].dnd ) {
+            if( tr_cpPieceIsComplete( ccp, i ) || !info->pieces[i].dnd ) {
                 total += info->pieceSize;
                 have += cp->completeBlocks[ i ];
             }
