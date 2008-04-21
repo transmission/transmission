@@ -188,7 +188,7 @@ tr_netBind( int port, int type )
         return -1;
     }
      
-    tr_inf( _( "Bound socket %d to port %d" ), s, port );
+    tr_dbg(  "Bound socket %d to port %d", s, port );
     return s;
 }
 

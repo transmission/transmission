@@ -1107,7 +1107,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
 
         if( recentChange )
         {
-            tr_torinf( tor, _( "State changed from \"%s\" to \"%s\"" ),
+            tr_torinf( tor, _( "State changed from \"%1$s\" to \"%2$s\"" ),
                             getCompletionString( tor->cpStatus ),
                             getCompletionString( cpStatus ) );
         }

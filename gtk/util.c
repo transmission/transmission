@@ -508,7 +508,7 @@ gtr_inhibit_hibernation( void )
         if( success )
             tr_inf( _( "Desktop hibernation disabled while Transmission is running" ) );
         else {
-            tr_err( _( "Couldn't disable desktop hibernation: %s." ), error->message );
+            tr_err( _( "Couldn't disable desktop hibernation: %s" ), error->message );
             g_error_free( error );
         }
 
