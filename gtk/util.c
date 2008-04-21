@@ -265,38 +265,6 @@ getdownloaddir( void )
     return dir;
 }
 
-/**
- * don't use more than 50% the height of the screen, nor 80% the width.
- * but don't be too small, either -- set the minimums to 500 x 300
- */
-void
-sizingmagic( GtkWindow         * wind,
-             GtkScrolledWindow * scroll,
-             GtkPolicyType       hscroll,
-             GtkPolicyType       vscroll )
-{
-    int width;
-    int height;
-    GtkRequisition req;
-
-    GdkScreen * screen = gtk_widget_get_screen( GTK_WIDGET( wind ) );
-
-    gtk_scrolled_window_set_policy( scroll, GTK_POLICY_NEVER,
-                                            GTK_POLICY_NEVER );
-
-    gtk_widget_size_request( GTK_WIDGET( wind ), &req );
-    req.height = MAX( req.height, 300 );
-    height = MIN( req.height, gdk_screen_get_height( screen ) / 5 * 4 );
-
-    gtk_scrolled_window_set_policy( scroll, GTK_POLICY_NEVER, vscroll );
-    gtk_widget_size_request( GTK_WIDGET( wind ), &req );
-    req.width = MAX( req.width, 500 );
-    width = MIN( req.width, gdk_screen_get_width( screen ) / 2 );
-
-    gtk_window_set_default_size( wind, width, height );
-    gtk_scrolled_window_set_policy( scroll, hscroll, vscroll );
-}
-
 static void
 onErrorResponse(GtkWidget * dialog, int resp UNUSED, gpointer glist)
 {

@@ -62,6 +62,11 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_UL_LIMIT, 50 );
     pref_flag_set_default   ( PREF_KEY_OPTIONS_PROMPT, TRUE );
 
+    pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_HEIGHT, 500 );
+    pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_WIDTH, 300 );
+    pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_X, 50 );
+    pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_Y, 50 );
+
     str = NULL;
 #if GLIB_CHECK_VERSION(2,14,0)
     if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );

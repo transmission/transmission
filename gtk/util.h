@@ -91,11 +91,6 @@ void gtr_uninhibit_hibernation( guint );
 
 #ifdef GTK_MAJOR_VERSION
 
-/* here there be dragons */
-void
-sizingmagic( GtkWindow * wind, GtkScrolledWindow * scroll,
-             GtkPolicyType hscroll, GtkPolicyType vscroll );
-
 /* create an error dialog, if wind is NULL or mapped then show dialog now,
    otherwise show it when wind becomes mapped */
 void

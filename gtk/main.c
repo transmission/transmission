@@ -222,6 +222,26 @@ selectionChangedCB( GtkTreeSelection * s, gpointer unused UNUSED )
 }
 
 static void
+onMainWindowSizeAllocated( GtkWidget      * window,
+                           GtkAllocation  * alloc UNUSED,
+                           gpointer         gdata UNUSED )
+{
+    const gboolean isMaximized = window->window
+        && ( gdk_window_get_state( window->window ) & GDK_WINDOW_STATE_MAXIMIZED );
+
+    if( !isMaximized )
+    {
+        int x, y, w, h;
+        gtk_window_get_position( GTK_WINDOW( window ), &x, &y );
+        gtk_window_get_size( GTK_WINDOW( window ), &w, &h );
+        pref_int_set( PREF_KEY_MAIN_WINDOW_X, x );
+        pref_int_set( PREF_KEY_MAIN_WINDOW_Y, y );
+        pref_int_set( PREF_KEY_MAIN_WINDOW_WIDTH, w );
+        pref_int_set( PREF_KEY_MAIN_WINDOW_HEIGHT, h );
+    }
+}
+
+static void
 windowStateChanged( GtkWidget * widget UNUSED, GdkEventWindowState * event, gpointer gdata )
 {
     if( event->changed_mask & GDK_WINDOW_STATE_ICONIFIED )
@@ -349,10 +369,11 @@ main( int argc, char ** argv )
         cbdata->core = tr_core_new( h );
 
         /* create main window now to be a parent to any error dialogs */
-        GtkWindow * mainwind = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
-        g_signal_connect( mainwind, "window-state-event", G_CALLBACK(windowStateChanged), cbdata );
+        GtkWindow * win = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
+        g_signal_connect( win, "window-state-event", G_CALLBACK(windowStateChanged), cbdata );
+        g_signal_connect( win, "size-allocate", G_CALLBACK(onMainWindowSizeAllocated), cbdata );
 
-        appsetup( mainwind, argfiles, cbdata, startpaused, startminimized );
+        appsetup( win, argfiles, cbdata, startpaused, startminimized );
     }
     else
     {

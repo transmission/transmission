@@ -180,16 +180,6 @@ makeview( PrivateData * p, TrCore * core )
 }
 
 static void
-realized_cb ( GtkWidget * wind, gpointer unused UNUSED )
-{
-    PrivateData * p = get_private_data( GTK_WINDOW( wind ) );
-    sizingmagic( GTK_WINDOW(wind),
-                 GTK_SCROLLED_WINDOW( p->scroll ),
-                 GTK_POLICY_NEVER,
-                 GTK_POLICY_AUTOMATIC );
-}
-
-static void
 prefsChanged( TrCore * core UNUSED, const char * key, gpointer wind )
 {
     PrivateData * p = get_private_data( GTK_WINDOW( wind ) );
@@ -426,6 +416,7 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     char * pch;
     PrivateData * p;
     GtkWidget *vbox, *w, *self, *h, *c, *s, *image, *menu;
+    GtkWindow *win;
     GSList * l;
     GSList * toggles;
     const char * filter_names[FILTER_MODE_QTY] = {
@@ -452,11 +443,14 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     /* make the window */
     self = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     g_object_set_data_full(G_OBJECT(self), PRIVATE_DATA_KEY, p, privateFree );
-    gtk_window_set_title( GTK_WINDOW( self ), g_get_application_name());
-    gtk_window_set_role( GTK_WINDOW( self ), "tr-main" );
-    gtk_window_add_accel_group (GTK_WINDOW(self),
-                                gtk_ui_manager_get_accel_group (ui_manager));
-    g_signal_connect( self, "realize", G_CALLBACK(realized_cb), NULL);
+    win = GTK_WINDOW( self );
+    gtk_window_set_title( win, g_get_application_name());
+    gtk_window_set_role( win, "tr-main" );
+    gtk_window_set_default_size( win, pref_int_get( PREF_KEY_MAIN_WINDOW_WIDTH ),
+                                      pref_int_get( PREF_KEY_MAIN_WINDOW_HEIGHT ) );
+    gtk_window_move( win, pref_int_get( PREF_KEY_MAIN_WINDOW_X ),
+                          pref_int_get( PREF_KEY_MAIN_WINDOW_Y ) );
+    gtk_window_add_accel_group( win, gtk_ui_manager_get_accel_group( ui_manager ) );
 
     /* window's main container */
     vbox = gtk_vbox_new (FALSE, 0);
@@ -564,6 +558,7 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     /* workarea */
     p->view = makeview( p, core );
     w = p->scroll = gtk_scrolled_window_new( NULL, NULL );
+    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(w), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC );
     gtk_container_add( GTK_CONTAINER(w), p->view );
     gtk_box_pack_start_defaults( GTK_BOX(vbox), w );
     gtk_container_set_focus_child( GTK_CONTAINER( vbox ), w );
