@@ -24,12 +24,16 @@
 
 #import "StatsWindowController.h"
 #import "NSStringAdditions.h"
+#import "NSApplicationAdditions.h"
 
 #define UPDATE_SECONDS 1.0
 
 @interface StatsWindowController (Private)
 
 - (void) updateStats;
+
+- (void) performResetStats;
+- (void) resetSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info;
 
 @end
 
@@ -106,14 +110,50 @@ tr_handle * fLib;
     NSRect windowRect = [[self window] frame];
     windowRect.size.width += maxWidth - oldWidth;
     [[self window] setFrame: windowRect display: YES];
+    
+    //resize reset button
+    float oldButtonWidth = [fResetButton frame].size.width;
+    
+    [fResetButton setTitle: NSLocalizedString(@"Reset", "Stats window -> reset button")];
+    [fResetButton sizeToFit];
+    
+    NSRect buttonFrame = [fResetButton frame];
+    buttonFrame.size.width += 10.0;
+    buttonFrame.origin.x -= buttonFrame.size.width - oldButtonWidth;
+    [fResetButton setFrame: buttonFrame];
 }
 
-- (void) windowWillClose: (id)sender
+- (void) windowWillClose: (id) sender
 {
     [fTimer invalidate];
     
     [fStatsWindowInstance release];
     fStatsWindowInstance = nil;
+}
+
+- (void) resetStats: (id) sender
+{
+    if (![[NSUserDefaults standardUserDefaults] boolForKey: @"WarningResetStats"])
+    {
+        [self performResetStats];
+        return;
+    }
+    
+    NSAlert * alert = [[NSAlert alloc] init];
+    [alert setMessageText: NSLocalizedString(@"Are you sure you want to reset usage statistics?", "Stats reset -> title")];
+    [alert setInformativeText: NSLocalizedString(@"This will clear the global statistics displayed by Transmission. "
+                                "Individual transfer statistics will not be effected.", "Stats reset -> message")];
+    [alert setAlertStyle: NSWarningAlertStyle];
+    [alert addButtonWithTitle: NSLocalizedString(@"Reset", "Stats reset -> button")];
+    [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Stats reset -> button")];
+    
+    if ([NSApp isOnLeopardOrBetter])
+        [alert setShowsSuppressionButton: YES];
+    else
+        [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Open duplicate alert -> button")];
+    
+    [alert beginSheetModalForWindow: [self window] modalDelegate: self
+        didEndSelector: @selector(resetSheetClosed:returnCode:contextInfo:) contextInfo: nil];
 }
 
 @end
@@ -158,6 +198,23 @@ tr_handle * fLib;
     else
         [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d times", "stats window -> times opened"),
                                         statsAll.sessionCount]];
+}
+
+- (void) performResetStats
+{
+    tr_clearSessionStats(fLib);
+    [self updateStats];
+}
+
+- (void) resetSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info
+{
+    [[alert window] orderOut: nil];
+    
+    if (([NSApp isOnLeopardOrBetter] ? [[alert suppressionButton] state] == NSOnState : code == NSAlertThirdButtonReturn))
+        [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningResetStats"];
+    
+    if (code == NSAlertFirstButtonReturn)
+        [self performResetStats];
 }
 
 @end

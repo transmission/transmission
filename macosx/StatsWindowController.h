@@ -30,9 +30,12 @@
     IBOutlet NSTextField * fUploadedField, * fUploadedAllField, * fDownloadedField, * fDownloadedAllField,
                         * fRatioField, * fRatioAllField, * fTimeField, * fTimeAllField, * fNumOpenedField,
                         * fUploadedLabelField, * fDownloadedLabelField, * fRatioLabelField, * fTimeLabelField, * fNumOpenedLabelField;
+    IBOutlet NSButton * fResetButton;
     NSTimer * fTimer;
 }
 
 + (StatsWindowController *) statsWindow: (tr_handle *) lib;
+
+- (void) resetStats: (id) sender;
 
 @end

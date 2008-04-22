@@ -150,5 +150,7 @@
 	<true/>
 	<key>WarningRemainingSpace</key>
 	<true/>
+    <key>WarningResetStats</key>
+	<true/>
 </dict>
 </plist>
