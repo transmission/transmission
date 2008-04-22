@@ -35,7 +35,6 @@
 #import "AboutWindowController.h"
 #import "ButtonToolbarItem.h"
 #import "GroupToolbarItem.h"
-#import "ToolbarSegmentedCell.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSMenuAdditions.h"
@@ -3092,8 +3091,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         GroupToolbarItem * groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier: ident];
         
-        NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
-        [segmentedControl setCell: [[[ToolbarSegmentedCell alloc] init] autorelease]];
+        NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] init];
         [groupItem setView: segmentedControl];
         NSSegmentedCell * segmentedCell = (NSSegmentedCell *)[segmentedControl cell];
         
@@ -3131,8 +3129,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         GroupToolbarItem * groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier: ident];
         
-        NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
-        [segmentedControl setCell: [[[ToolbarSegmentedCell alloc] init] autorelease]];
+        NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] init];
         [groupItem setView: segmentedControl];
         NSSegmentedCell * segmentedCell = (NSSegmentedCell *)[segmentedControl cell];
         

@@ -924,7 +924,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (BOOL) isError
 {
-    return fStat->error != 0;
+    return fStat->error != TR_OK;
 }
 
 - (NSString *) errorMessage
@@ -1088,7 +1088,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         }
         
         if (fStalled)
-            string = [NSString stringWithFormat: @"%@, %@", NSLocalizedString(@"Stalled", "Torrent -> status string"), string];
+            string = [NSLocalizedString(@"Stalled", "Torrent -> status string") stringByAppendingFormat: @", %@", string];
     }
     
     //append even if error
