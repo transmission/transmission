@@ -10,8 +10,6 @@
  * $Id$
  */
 
-#include <string.h> /* memset */
-
 #include "transmission.h"
 #include "bencode.h"
 #include "platform.h" /* tr_getConfigDir() */
@@ -160,6 +158,21 @@ tr_getCumulativeSessionStats( const tr_handle   * handle,
     tr_session_stats current;
     tr_getSessionStats( handle, &current );
     addStats( setme, &getStats(handle)->old, &current );
+}
+
+void
+tr_clearSessionStats( tr_handle * handle )
+{
+    tr_session_stats zero;
+    zero.uploadedBytes = 0;
+    zero.downloadedBytes = 0;
+    zero.ratio = TR_RATIO_NA;
+    zero.filesAdded = 0;
+    zero.sessionCount = 0;
+    zero.secondsActive = 0;
+    handle->sessionStats->single = handle->sessionStats->old = zero;
+
+    handle->sessionStats->startTime = time( NULL );
 }
 
 /**

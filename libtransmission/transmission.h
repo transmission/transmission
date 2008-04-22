@@ -134,6 +134,8 @@ void tr_getSessionStats( const tr_handle   * handle,
 void tr_getCumulativeSessionStats( const tr_handle   * handle,
                                    tr_session_stats  * setme );
 
+void tr_clearSessionStats( tr_handle * handle );
+
 
 /**
 ***

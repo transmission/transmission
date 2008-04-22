@@ -16,6 +16,11 @@
 #include "stats.h"
 #include "tr-core.h"
 
+enum
+{
+    TR_RESPONSE_CLEAR = 1
+};
+
 struct stat_ui
 {
     GtkWidget * one_up_lb;
@@ -72,10 +77,22 @@ updateStats( gpointer gdata )
 }
 
 static void
-dialogResponse( GtkDialog * dialog, gint response UNUSED, gpointer unused UNUSED )
+dialogResponse( GtkDialog * dialog, gint response, gpointer gdata )
 {
-    g_source_remove( GPOINTER_TO_UINT( g_object_get_data( G_OBJECT(dialog), "TrTimer" ) ) );
-    gtk_widget_destroy( GTK_WIDGET( dialog ) );
+    struct stat_ui * ui = gdata;
+
+    if( response == TR_RESPONSE_CLEAR )
+    {
+        tr_handle * handle = tr_core_handle( ui->core );
+        tr_clearSessionStats( handle );
+        updateStats( ui );
+    }
+
+    if( response == GTK_RESPONSE_CLOSE )
+    {
+        g_source_remove( GPOINTER_TO_UINT( g_object_get_data( G_OBJECT(dialog), "TrTimer" ) ) );
+        gtk_widget_destroy( GTK_WIDGET( dialog ) );
+    }
 }
 
 GtkWidget*
@@ -91,6 +108,7 @@ stats_dialog_create( GtkWindow * parent, TrCore * core )
     d = gtk_dialog_new_with_buttons( _("Statistics"),
                                      parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
+                                     GTK_STOCK_CLEAR, TR_RESPONSE_CLEAR,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      NULL );
     t = hig_workarea_create( );
@@ -123,7 +141,7 @@ stats_dialog_create( GtkWindow * parent, TrCore * core )
 
     updateStats( ui );
     g_object_set_data_full( G_OBJECT(d), "data", ui, g_free );
-    g_signal_connect( d, "response", G_CALLBACK(dialogResponse), NULL );
+    g_signal_connect( d, "response", G_CALLBACK(dialogResponse), ui );
     i = g_timeout_add( 1000, updateStats, ui );
     g_object_set_data( G_OBJECT(d), "TrTimer", GUINT_TO_POINTER(i) );
     return d;
