@@ -76,9 +76,6 @@ tr_benc * tr_bencDictFind( tr_benc * dict, const char * key );
 tr_benc * tr_bencDictFindType( tr_benc * dict, const char * key, int type );
 tr_benc * tr_bencDictFindFirst( tr_benc * dict, ... );
 
-/* marks a string as 'do not free' and returns it */
-char * tr_bencStealStr( tr_benc * val );
-
 /* convenience functions for building tr_benc    structures */
 
 static inline void tr_bencInit( tr_benc    * val, int type )

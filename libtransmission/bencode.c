@@ -206,7 +206,7 @@ getNode( tr_benc * top, tr_ptrArray * parentStack, int type )
 int
 tr_bencParse( const void     * buf_in,
               const void     * bufend_in,
-              tr_benc     * top,
+              tr_benc        * top,
               const uint8_t ** setme_end )
 {
     int err;
@@ -394,14 +394,6 @@ tr_bencGetInt ( const tr_benc * val, int64_t * setme )
         success = TRUE;
     }
     return success;
-}
-
-char *
-tr_bencStealStr( tr_benc * val )
-{
-    assert( tr_bencIsString( val ) );
-    val->val.s.nofree = 1;
-    return val->val.s.s;
 }
 
 int
@@ -1124,7 +1116,7 @@ tr_bencSaveFile( const char * filename,  const tr_benc * b )
 int
 tr_bencLoadFile( const char * filename, tr_benc * b )
 {
-    int ret = TR_ERROR;
+    int ret;
     size_t contentLen;
     uint8_t * content = tr_loadFile( filename, &contentLen );
     ret = content ? tr_bencLoad( content, contentLen, b, NULL )

@@ -48,7 +48,7 @@ static void
 getResumeFilename( char * buf, size_t buflen, const tr_torrent * tor )
 {
     const char * dir = tr_getResumeDir( tor->handle );
-    char base[4096];
+    char base[MAX_PATH_LENGTH];
     snprintf( base, sizeof( base ), "%s.%16.16s.resume",
               tor->info.name,
               tor->info.hashString );
@@ -102,7 +102,7 @@ loadPeers( tr_benc * dict, tr_torrent * tor )
 static void
 saveDND( tr_benc * dict, const tr_torrent * tor )
 {
-    const tr_info * inf = &tor->info;
+    const tr_info * inf = tr_torrentInfo( tor );
     const tr_file_index_t n = inf->fileCount;
     tr_file_index_t i;
     tr_benc * list;
@@ -164,7 +164,7 @@ loadDND( tr_benc * dict, tr_torrent * tor )
 static void
 savePriorities( tr_benc * dict, const tr_torrent * tor )
 {
-    const tr_info * inf = &tor->info;
+    const tr_info * inf = tr_torrentInfo( tor );
     const tr_file_index_t n = inf->fileCount;
     tr_file_index_t i;
     tr_benc * list;
@@ -371,7 +371,7 @@ tr_torrentSaveResume( const tr_torrent * tor )
     tr_bencFree( &top );
 }
 
-uint64_t
+static uint64_t
 loadFromFile( tr_torrent    * tor,
               uint64_t        fieldsToLoad )
 {
