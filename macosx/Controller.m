@@ -518,12 +518,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         if ([fDefaults boolForKey: @"CheckQuitDownloading"] ? downloading > 0 : active > 0)
         {
             NSString * message = active == 1
-                ? NSLocalizedString(@"There is an active transfer. Do you really want to quit?",
-                    "Confirm Quit panel -> message")
-                : [NSString stringWithFormat: NSLocalizedString(@"There are %d active transfers. Do you really want to quit?",
-                    "Confirm Quit panel -> message"), active];
+                ? NSLocalizedString(@"There is an active transfer that will be paused on quit."
+                    " The transfer will automatically resume on the next launch.", "Confirm Quit panel -> message")
+                : [NSString stringWithFormat: NSLocalizedString(@"There are %d active transfers that will be paused on quit."
+                    " The transfers will automatically resume on the next launch.", "Confirm Quit panel -> message"), active];
 
-            NSBeginAlertSheet(NSLocalizedString(@"Confirm Quit", "Confirm Quit panel -> title"),
+            NSBeginAlertSheet(NSLocalizedString(@"Are you sure you want to quit?", "Confirm Quit panel -> title"),
                                 NSLocalizedString(@"Quit", "Confirm Quit panel -> button"),
                                 NSLocalizedString(@"Cancel", "Confirm Quit panel -> button"), nil, fWindow, self,
                                 @selector(quitSheetDidEnd:returnCode:contextInfo:), nil, nil, message);
@@ -1096,17 +1096,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 NSString * torrentName = [[torrents objectAtIndex: 0] name];
                 
                 if (!deleteData && !deleteTorrent)
-                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of \"%@\" from the transfer list.",
+                    title = [NSString stringWithFormat:
+                                NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list?",
                                 "Removal confirm panel -> title"), torrentName];
                 else if (deleteData && !deleteTorrent)
-                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of \"%@\" from the transfer list"
-                                " and trash data file.", "Removal confirm panel -> title"), torrentName];
+                    title = [NSString stringWithFormat:
+                                NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list"
+                                " and trash the data file?", "Removal confirm panel -> title"), torrentName];
                 else if (!deleteData && deleteTorrent)
-                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of \"%@\" from the transfer list"
-                                " and trash torrent file.", "Removal confirm panel -> title"), torrentName];
+                    title = [NSString stringWithFormat:
+                                NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list"
+                                " and trash the torrent file?", "Removal confirm panel -> title"), torrentName];
                 else
-                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of \"%@\" from the transfer list"
-                            " and trash both data and torrent files.", "Removal confirm panel -> title"), torrentName];
+                    title = [NSString stringWithFormat:
+                                NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list"
+                                " and trash both the data and torrent files?", "Removal confirm panel -> title"), torrentName];
                 
                 message = NSLocalizedString(@"This transfer is active."
                             " Once removed, continuing the transfer will require the torrent file.",
@@ -1115,18 +1119,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             else
             {
                 if (!deleteData && !deleteTorrent)
-                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of %d transfers"
-                                " from the transfer list.", "Removal confirm panel -> title"), selected];
-                else if (deleteData && !deleteTorrent)
-                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of %d transfers"
-                                " from the transfer list and trash data file.", "Removal confirm panel -> title"), selected];
-                else if (!deleteData && deleteTorrent)
-                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of %d transfers"
-                                " from the transfer list and trash torrent file.", "Removal confirm panel -> title"), selected];
-                else
-                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of %d transfers"
-                                " from the transfer list and trash both data and torrent files.",
+                    title = [NSString stringWithFormat:
+                                NSLocalizedString(@"Are you sure you want to remove %d transfers from the transfer list?",
                                 "Removal confirm panel -> title"), selected];
+                else if (deleteData && !deleteTorrent)
+                    title = [NSString stringWithFormat:
+                                NSLocalizedString(@"Are you sure you want to remove %d transfers from the transfer list"
+                                " and trash the data file?", "Removal confirm panel -> title"), selected];
+                else if (!deleteData && deleteTorrent)
+                    title = [NSString stringWithFormat:
+                                NSLocalizedString(@"Are you sure you want to remove %d transfers from the transfer list"
+                                " and trash the torrent file?", "Removal confirm panel -> title"), selected];
+                else
+                    title = [NSString stringWithFormat:
+                                NSLocalizedString(@"Are you sure you want to remove %d transfers from the transfer list"
+                                " and trash both the data and torrent files?", "Removal confirm panel -> title"), selected];
                 
                 if (selected == active)
                     message = [NSString stringWithFormat: NSLocalizedString(@"There are %d active transfers.",
@@ -1134,8 +1141,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 else
                     message = [NSString stringWithFormat: NSLocalizedString(@"There are %d transfers (%d active).",
                                 "Removal confirm panel -> message part 1"), selected, active];
-                message = [message stringByAppendingString:
-                    NSLocalizedString(@" Once removed, continuing the transfers will require the torrent files.",
+                
+                message = [message stringByAppendingFormat: @" %@",
+                                NSLocalizedString(@"Once removed, continuing the transfers will require the torrent files.",
                                 "Removal confirm panel -> message part 2")];
             }
             
