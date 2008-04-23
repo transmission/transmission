@@ -3,6 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.20 (2008/mm/dd)
 - All Platforms
    + IP blocking using the Bluetack Level1 blocklist
+   + Ability to reset global statistics
 - Mac
    + Display of decimal numbers matches system international settings
    + Updated Dock badge images
