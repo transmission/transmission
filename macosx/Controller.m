@@ -635,9 +635,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         [download cancel];
         
-        NSRunAlertPanel(NSLocalizedString(@"Torrent download failed",
-            @"Download not a torrent -> title"), [NSString stringWithFormat:
-            NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.",
+        NSRunAlertPanel(NSLocalizedString(@"Torrent download failed", @"Download not a torrent -> title"),
+            [NSString stringWithFormat: NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.",
             @"Download not a torrent -> message"), suggestedName,
             [[[[download request] URL] absoluteString] stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding]],
             NSLocalizedString(@"OK", @"Download not a torrent -> button"), nil, nil);
@@ -1141,7 +1140,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 else
                     message = [NSString stringWithFormat: NSLocalizedString(@"There are %d transfers (%d active).",
                                 "Removal confirm panel -> message part 1"), selected, active];
-                
                 message = [message stringByAppendingFormat: @" %@",
                                 NSLocalizedString(@"Once removed, continuing the transfers will require the torrent files.",
                                 "Removal confirm panel -> message part 2")];

@@ -141,8 +141,8 @@ tr_handle * fLib;
     
     NSAlert * alert = [[NSAlert alloc] init];
     [alert setMessageText: NSLocalizedString(@"Are you sure you want to reset usage statistics?", "Stats reset -> title")];
-    [alert setInformativeText: NSLocalizedString(@"This will clear the global statistics displayed by Transmission. "
-                                "Individual transfer statistics will not be effected.", "Stats reset -> message")];
+    [alert setInformativeText: NSLocalizedString(@"This will clear the global statistics displayed by Transmission."
+                                " Individual transfer statistics will not be effected.", "Stats reset -> message")];
     [alert setAlertStyle: NSWarningAlertStyle];
     [alert addButtonWithTitle: NSLocalizedString(@"Reset", "Stats reset -> button")];
     [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Stats reset -> button")];
@@ -150,7 +150,7 @@ tr_handle * fLib;
     if ([NSApp isOnLeopardOrBetter])
         [alert setShowsSuppressionButton: YES];
     else
-        [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Open duplicate alert -> button")];
+        [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Stats reset -> button")];
     
     [alert beginSheetModalForWindow: [self window] modalDelegate: self
         didEndSelector: @selector(resetSheetClosed:returnCode:contextInfo:) contextInfo: nil];
@@ -171,7 +171,7 @@ tr_handle * fLib;
                                     statsSession.uploadedBytes]];
     [fUploadedAllField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ total", "stats total"),
                                         [NSString stringForFileSize: statsAll.uploadedBytes]]];
-    [fUploadedAllField setToolTip: [NSString stringWithFormat:NSLocalizedString(@"%u bytes", "stats -> bytes"),
+    [fUploadedAllField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes", "stats -> bytes"),
                                     statsAll.uploadedBytes]];
     
     [fDownloadedField setStringValue: [NSString stringForFileSize: statsSession.downloadedBytes]];

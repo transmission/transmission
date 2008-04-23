@@ -583,17 +583,21 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 NSAlert * alert = [[NSAlert alloc] init];
                 [alert setMessageText: [NSString stringWithFormat:
                                         NSLocalizedString(@"Not enough remaining disk space to download \"%@\" completely.",
-                                            "Torrent file disk space alert -> title"), [self name]]];
+                                            "Torrent disk space alert -> title"), [self name]]];
                 [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"The transfer will be paused."
                                             " Clear up space on %@ or deselect files in the torrent inspector to continue.",
-                                            "Torrent file disk space alert -> message"), volumeName]];
-                [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file disk space alert -> button")];
-                [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent file disk space alert -> button")];
+                                            "Torrent disk space alert -> message"), volumeName]];
+                [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent disk space alert -> button")];
+                [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent disk space alert -> button")];
                 
                 if (onLeopard)
+                {
                     [alert setShowsSuppressionButton: YES];
+                    [[alert suppressionButton] setTitle: NSLocalizedString(@"Do not check disk space again",
+                                                            "Torrent disk space alert -> button")];
+                }
                 else
-                    [alert addButtonWithTitle: NSLocalizedString(@"Always Download", "Torrent file disk space alert -> button")];
+                    [alert addButtonWithTitle: NSLocalizedString(@"Always Download", "Torrent disk space alert -> button")];
 
                 NSInteger result = [alert runModal];
                 if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertThirdButtonReturn))
