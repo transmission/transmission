@@ -353,13 +353,14 @@ getOldCacheDir( void )
     if( !path )
     {
         char buf[MAX_PATH_LENGTH];
-        const char * p = getOldConfigDir( );
 #if defined(__BEOS__) || defined(WIN32)
+        const char * p = getOldConfigDir( );
         tr_buildPath( buf, sizeof( buf ), p, "Cache", NULL );
 #elif defined( SYS_DARWIN )
         tr_buildPath( buf, sizeof( buf ), getHomeDir(),
                       "Library", "Caches", "Transmission", NULL );
 #else
+        const char * p = getOldConfigDir( );
         tr_buildPath( buf, sizeof( buf ), p, "cache", NULL );
 #endif
         path = tr_strdup( buf );
