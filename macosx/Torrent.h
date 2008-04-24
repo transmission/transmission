@@ -139,7 +139,6 @@ typedef enum
 - (uint64_t) size;
 - (uint64_t) sizeLeft;
 
-- (NSString *) trackerAddress;
 - (NSString *) trackerAddressAnnounce;
 - (NSDate *) lastAnnounceTime;
 - (int) nextAnnounceTime;

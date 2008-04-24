@@ -718,12 +718,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fStat->leftUntilDone;
 }
 
-- (NSString *) trackerAddress
-{
-    return [NSString stringWithUTF8String: fStat->tracker->announce];
-}
-
-#warning now redundant
 - (NSString *) trackerAddressAnnounce
 {
     return [NSString stringWithUTF8String: fStat->tracker->announce];

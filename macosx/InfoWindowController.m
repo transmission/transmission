@@ -1046,7 +1046,7 @@ typedef enum
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
-    [fTrackerField setStringValue: [torrent trackerAddress]];
+    [fTrackerField setStringValue: [torrent trackerAddressAnnounce]];
     
     NSString * location = [torrent dataLocation];
     [fDataLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
@@ -1129,7 +1129,7 @@ typedef enum
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
     //announce fields
-    NSString * announceAddress = [[torrent trackerAddress] stringByAppendingString: [torrent trackerAddressAnnounce]];
+    NSString * announceAddress = [torrent trackerAddressAnnounce];
     [fAnnounceAddressField setStringValue: announceAddress];
     [fAnnounceAddressField setToolTip: announceAddress];
     
@@ -1144,10 +1144,9 @@ typedef enum
     [fAnnounceNextField setStringValue: announceNext > 0 ? [NSString timeString: announceNext showSeconds: YES] : @""];
     
     //scrape fields
-    NSString * scrapeAddressTail;
-    if ((scrapeAddressTail = [torrent trackerAddressScrape]))
+    NSString * scrapeAddress;
+    if ((scrapeAddress = [torrent trackerAddressScrape]))
     {
-        NSString * scrapeAddress = [[torrent trackerAddress] stringByAppendingString: scrapeAddressTail];
         [fScrapeAddressField setStringValue: scrapeAddress];
         [fScrapeAddressField setToolTip: scrapeAddress];
     }
