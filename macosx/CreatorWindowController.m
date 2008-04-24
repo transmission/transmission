@@ -194,6 +194,7 @@
         trackerString = [@"http://" stringByAppendingString: trackerString];
     
     //parse tracker string
+    #warning check if it works with https
     if (tr_httpParseURL([trackerString UTF8String], -1, NULL, NULL, NULL))
     {
         NSAlert * alert = [[[NSAlert alloc] init] autorelease];
@@ -206,8 +207,8 @@
         //check common reasons for failure
         NSRange prefixRange = [trackerString rangeOfString: @"://"];
         NSString * prefix = [trackerString substringToIndex: prefixRange.location];
-        if ([prefix caseInsensitiveCompare: @"http"] != NSOrderedSame)
-            [alert setMessageText: NSLocalizedString(@"The tracker address must begin with \"http://\".",
+        if ([prefix caseInsensitiveCompare: @"http"] != NSOrderedSame && [prefix caseInsensitiveCompare: @"https"] != NSOrderedSame)
+            [alert setMessageText: NSLocalizedString(@"The tracker address must begin with \"http://\" or \"https://\".",
                                                     "Create torrent -> warning -> message")];
         else if ([trackerString length] == NSMaxRange(prefixRange)) //don't allow blank addresses
             [alert setMessageText: NSLocalizedString(@"The tracker address cannot be blank.", "Create torrent -> warning -> message")];

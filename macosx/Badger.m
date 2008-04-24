@@ -85,6 +85,7 @@
 {
     if ([NSApp isOnLeopardOrBetter])
     {
+        #warning only update if change to values
         [[NSApp dockTile] display];
         return;
     }

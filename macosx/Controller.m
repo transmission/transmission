@@ -635,11 +635,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         [download cancel];
         
-        NSRunAlertPanel(NSLocalizedString(@"Torrent download failed", @"Download not a torrent -> title"),
+        NSRunAlertPanel(NSLocalizedString(@"Torrent download failed", "Download not a torrent -> title"),
             [NSString stringWithFormat: NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.",
-            @"Download not a torrent -> message"), suggestedName,
+            "Download not a torrent -> message"), suggestedName,
             [[[[download request] URL] absoluteString] stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding]],
-            NSLocalizedString(@"OK", @"Download not a torrent -> button"), nil, nil);
+            NSLocalizedString(@"OK", "Download not a torrent -> button"), nil, nil);
         
         [download release];
     }
@@ -659,11 +659,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
 {
-    NSRunAlertPanel(NSLocalizedString(@"Torrent download failed", @"Torrent download error -> title"),
-        [NSString stringWithFormat: NSLocalizedString(@"The torrent could not be downloaded from %@ because an error occurred (%@).",
-        @"Torrent download failed -> message"),
+    NSRunAlertPanel(NSLocalizedString(@"Torrent download failed", "Torrent download error -> title"),
+        [NSString stringWithFormat: NSLocalizedString(@"The torrent could not be downloaded from %@: %@.",
+        "Torrent download failed -> message"),
         [[[[download request] URL] absoluteString] stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding],
-        [error localizedDescription]], NSLocalizedString(@"OK", @"Torrent download failed -> button"), nil, nil);
+        [error localizedDescription]], NSLocalizedString(@"OK", "Torrent download failed -> button"), nil, nil);
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
     [download release];
@@ -958,6 +958,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (returnCode != 1)
         return;
     
+    #warning disable OK button when blank
     NSString * urlString = [fURLSheetTextField stringValue];
     if (![urlString isEqualToString: @""])
     {
@@ -971,7 +972,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                     [urlString substringToIndex: beforeCom],
                                     [urlString substringFromIndex: beforeCom + 1]];
                 else
-                    urlString = [NSString stringWithFormat: @"http://www.%@.com", urlString];
+                    urlString = [NSString stringWithFormat: @"http://www.%@.com/", urlString];
             }
             else
                 urlString = [@"http://" stringByAppendingString: urlString];
@@ -3354,9 +3355,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 break;
             case SORT_ACTIVITY_TAG:
                 sortType = SORT_ACTIVITY;
-                break;
-            default:
-                sortType = @"";
         }
         
         [menuItem setState: [sortType isEqualToString: [fDefaults stringForKey: @"Sort"]] ? NSOnState : NSOffState];
@@ -3380,9 +3378,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 break;
             case STATUS_TRANSFER_SESSION_TAG:
                 statusLabel = STATUS_TRANSFER_SESSION;
-                break;
-            default:
-                statusLabel = @"";;
         }
         
         [menuItem setState: [statusLabel isEqualToString: [fDefaults stringForKey: @"StatusLabel"]] ? NSOnState : NSOffState];
