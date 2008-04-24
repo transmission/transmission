@@ -85,8 +85,21 @@
 {
     if ([NSApp isOnLeopardOrBetter])
     {
-        #warning only update if change to values
-        [[NSApp dockTile] display];
+        float downloadRate = 0.0, uploadRate = 0.0;
+        BOOL checkDownload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"],
+            checkUpload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"];
+        if (checkDownload || checkUpload)
+        {
+            tr_torrentRates(fLib, &downloadRate, &uploadRate);
+            
+            downloadRate = checkDownload ? downloadRate : 0.0;
+            uploadRate = checkUpload ? uploadRate : 0.0;
+        }
+        
+        //only update if the badged values change
+        if ([(BadgeView *)[[NSApp dockTile] contentView] setRatesWithDownload: downloadRate upload: uploadRate])
+            [[NSApp dockTile] display];
+        
         return;
     }
     else if (fQuittingTiger)
@@ -235,7 +248,7 @@
     {
         [self clearCompleted];
         [(BadgeView *)[[NSApp dockTile] contentView] setQuitting];
-        [self updateBadge];
+        [[NSApp dockTile] display];
     }
     else
     {

@@ -91,6 +91,10 @@
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A22D3AA60D00D1790079CFED /* Turtle.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA30D00D1790079CFED /* Turtle.png */; };
 		A22D3AA70D00D1790079CFED /* TurtleBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA40D00D1790079CFED /* TurtleBlue.png */; };
+		A22E59A70DC11A1D00F4BE15 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.dylib */; };
+		A22E59A80DC11A1F00F4BE15 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.dylib */; };
+		A22E59A90DC11A2000F4BE15 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.dylib */; };
+		A22E59AA0DC11A2000F4BE15 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.dylib */; };
 		A231274C0D11D0B7003F9AFF /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A231274B0D11D0B7003F9AFF /* AboutWindow.xib */; };
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
 		A233BD330D8C6585007EE7B4 /* MessageWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A233BD320D8C6585007EE7B4 /* MessageWindow.xib */; };
@@ -766,6 +770,7 @@
 			files = (
 				4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */,
 				4D9A2BF909E16D4F002D0FF9 /* libcrypto.0.9.7.dylib in Frameworks */,
+				A22E59A70DC11A1D00F4BE15 /* libcurl.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -813,6 +818,7 @@
 			files = (
 				BEFC1C040C07753100B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */,
 				BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */,
+				A22E59A80DC11A1F00F4BE15 /* libcurl.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -822,6 +828,7 @@
 			files = (
 				BEFC1CF40C07822400B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */,
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
+				A22E59A90DC11A2000F4BE15 /* libcurl.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -831,6 +838,7 @@
 			files = (
 				BEFC1D3E0C0783EE00B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */,
 				BEFC1D3F0C0783EE00B0BB3C /* libtransmission.a in Frameworks */,
+				A22E59AA0DC11A2000F4BE15 /* libcurl.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2209,6 +2217,7 @@
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
+				PRELINK_LIBS = "";
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 			};
 			name = Development;

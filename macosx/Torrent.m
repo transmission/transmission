@@ -770,7 +770,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return [NSString stringWithUTF8String: fStat->tracker_stat.scrapeResponse];
 }
 
-#warning removes separators?
 - (NSArray *) allTrackers: (BOOL) separators
 {
     int count = fInfo->trackerCount, capacity = count;
