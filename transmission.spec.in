@@ -12,15 +12,19 @@ URL:       http://www.transmissionbt.com/
 Epoch:     1
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-BuildRequires: glib2-devel >= @GLIB_REQUIRED@
-BuildRequires: gtk2-devel >= @GTK_REQUIRED@
-BuildRequires: libnotify-devel >= @LIBNOTIFY_REQUIRED@
-BuildRequires: dbus-glib-devel >= @DBUS_GLIB_REQUIRED@
+BuildRequires: curl-devel >= @CURL_MINIMUM@
+BuildRequires: openssl-devel >= @OPENSSL_MINIMUM@
+BuildRequires: glib2-devel >= @GLIB_MINIMUM@
+BuildRequires: gtk2-devel >= @GTK_MINIMUM@
+BuildRequires: libnotify-devel >= @LIBNOTIFY_MINIMUM@
+BuildRequires: dbus-glib-devel >= @DBUS_GLIB_MINIMUM@
 
-Requires: glib2 >= @GLIB_REQUIRED@
-Requires: gtk2 >= @GTK_REQUIRED@
-Requires: libnotify >= @LIBNOTIFY_REQUIRED@
-Requires: dbus-glib >= @DBUS_GLIB_REQUIRED@
+Requires: curl >= @CURL_MINIMUM@
+Requires: openssl >= @OPENSSL_MINIMUM@
+Requires: glib2 >= @GLIB_MINIMUM@
+Requires: gtk2 >= @GTK_MINIMUM@
+Requires: libnotify >= @LIBNOTIFY_MINIMUM@
+Requires: dbus-glib >= @DBUS_GLIB_MINIMUM@
 
 Provides: %{name}
 
