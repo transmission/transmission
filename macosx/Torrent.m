@@ -772,13 +772,17 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSArray *) allTrackers: (BOOL) separators
 {
-    NSMutableArray * allTrackers = [NSMutableArray array];
+    int count = fInfo->trackerCount;
+    NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: count + fInfo->trackers[count-1].tier + 1];
     
     int i, tier = -1;
-    for (i = 0; i < fInfo->trackerCount; i++)
+    for (i = 0; i < count; i++)
     {
         if (tier != fInfo->trackers[i].tier)
-            [allTrackers addObject: [NSNumber numberWithInt: i]];
+        {
+            tier = fInfo->trackers[i].tier;
+            [allTrackers addObject: [NSNumber numberWithInt: tier]];
+        }
         
         [allTrackers addObject: [NSString stringWithUTF8String: fInfo->trackers[i].announce]];
     }
