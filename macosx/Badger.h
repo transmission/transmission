@@ -31,11 +31,12 @@
     
     NSImage * fDockIcon, * fBadge;
     
-    NSDictionary * fAttributes;
-    int fCompleted, fCompletedBadged;
-    BOOL fSpeedBadge;
+    int fCompleted;
     
-    BOOL fQuittingTiger;
+    //tiger-only fields
+    NSDictionary * fAttributes;
+    int fCompletedBadged;
+    BOOL fSpeedBadge, fQuittingTiger;
 }
 
 - (id) initWithLib: (tr_handle *) lib;

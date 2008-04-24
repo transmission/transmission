@@ -73,7 +73,8 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
-    [NSApp setApplicationIconImage: nil]; //needed on 10.4
+    if (![NSApp isOnLeopardOrBetter])
+        [NSApp setApplicationIconImage: nil]; //needed on 10.4
     
     [fDockIcon release];
     [fAttributes release];
@@ -241,7 +242,6 @@
     }
 }
 
-#warning see if it now quits fast enough to not need this?
 - (void) setQuitting
 {
     if ([NSApp isOnLeopardOrBetter])
