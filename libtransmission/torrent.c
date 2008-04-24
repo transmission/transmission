@@ -725,15 +725,10 @@ tr_torrentFiles( const tr_torrent * tor, tr_file_index_t * fileCount )
     tr_file_stat * files = tr_new0( tr_file_stat, n );
     tr_file_stat * walk = files;
 
-    for( i=0; i<n; ++i, ++walk )
-    {
-        const tr_file * file = tor->info.files + i;
-
-        walk->bytesCompleted = fileBytesCompleted( tor, i );
-
-        walk->progress = file->length
-            ? walk->bytesCompleted / (float)file->length
-            : 1.0;
+    for( i=0; i<n; ++i, ++walk ) {
+        const uint64_t b = fileBytesCompleted( tor, i );
+        walk->bytesCompleted = b;
+        walk->progress = tr_getRatio( b, tor->info.files[i].length );
     }
 
     if( fileCount )
@@ -777,19 +772,11 @@ void tr_torrentAvailability( const tr_torrent * tor, int8_t * tab, int size )
                                           tab, size );
 }
 
-void tr_torrentAmountFinished( const tr_torrent * tor, float * tab, int size )
+void
+tr_torrentAmountFinished( const tr_torrent * tor, float * tab, int size )
 {
-    int i;
-    float interval;
     tr_torrentLock( tor );
-
-    interval = (float)tor->info.pieceCount / (float)size;
-    for( i = 0; i < size; i++ )
-    {
-        int piece = i * interval;
-        tab[i] = tr_cpPercentBlocksInPiece( tor->completion, piece );
-    }
-
+    tr_cpGetAmountDone( tor->completion, tab, size );
     tr_torrentUnlock( tor );
 }
 
