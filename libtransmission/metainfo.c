@@ -45,8 +45,6 @@
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
-static int getannounce( tr_info * inf, tr_benc * meta );
-static char * announceToScrape( const char * announce );
 static int parseFiles( tr_info * inf, tr_benc * name,
                        tr_benc * files, tr_benc * length );
 
@@ -191,6 +189,92 @@ tr_metainfoMigrate( tr_handle * handle,
     }
 }
 
+static char *
+announceToScrape( const char * announce )
+{
+    char * scrape = NULL;
+    const char * s;
+
+    /* To derive the scrape URL use the following steps:
+     * Begin with the announce URL. Find the last '/' in it.
+     * If the text immediately following that '/' isn't 'announce'
+     * it will be taken as a sign that that tracker doesn't support
+     * the scrape convention. If it does, substitute 'scrape' for
+     * 'announce' to find the scrape page.  */
+    if((( s = strrchr( announce, '/' ))) && !strncmp( ++s, "announce", 8 ))
+    {
+        struct evbuffer * buf = evbuffer_new( );
+        evbuffer_add( buf, announce, s-announce );
+        evbuffer_add( buf, "scrape", 6 );
+        evbuffer_add_printf( buf, "%s", s+8 );
+        scrape = tr_strdup( ( char * ) EVBUFFER_DATA( buf ) );
+        evbuffer_free( buf );
+    }
+
+    return scrape;
+}
+
+static int
+getannounce( tr_info * inf, tr_benc * meta )
+{
+    const char * str;
+    tr_tracker_info * trackers = NULL;
+    int trackerCount = 0;
+    tr_benc * tiers;
+
+    /* Announce-list */
+    if( tr_bencDictFindList( meta, "announce-list", &tiers ) )
+    {
+        int n;
+        int i, j;
+
+        n = 0;
+        for( i=0; i<tiers->val.l.count; ++i )
+            n += tiers->val.l.vals[i].val.l.count;
+
+        trackers = tr_new0( tr_tracker_info, n );
+        trackerCount = 0;
+
+        for( i=0; i<tiers->val.l.count; ++i ) {
+            const tr_benc * tier = &tiers->val.l.vals[i];
+            for( j=0; tr_bencIsList(tier) && j<tier->val.l.count; ++j ) {
+                const tr_benc * a = &tier->val.l.vals[j];
+                if( tr_bencIsString( a ) && tr_httpIsValidURL( a->val.s.s ) ) {
+                    tr_tracker_info * t = trackers + trackerCount++;
+                    t->tier = i;
+                    t->announce = tr_strndup( a->val.s.s, a->val.s.i );
+                    t->scrape = announceToScrape( a->val.s.s );
+                    /*fprintf( stderr, "tier %d: %s\n", i, a->val.s.s );*/
+                }
+            }
+        }
+
+        /* did we use any of the tiers? */
+        if( !trackerCount ) {
+            tr_inf( _( "Invalid metadata entry \"%s\"" ), "announce-list" );
+            tr_free( trackers );
+            trackers = NULL;
+        }
+    }
+
+    /* Regular announce value */
+    if( !trackerCount
+        && tr_bencDictFindStr( meta, "announce", &str )
+        && tr_httpIsValidURL( str ) )
+    {
+        trackers = tr_new0( tr_tracker_info, 1 );
+        trackers[trackerCount].tier = 0;
+        trackers[trackerCount].announce = tr_strdup( str );
+        trackers[trackerCount++].scrape = announceToScrape( str );
+        /*fprintf( stderr, "single announce: [%s]\n", str );*/
+    }
+
+    inf->trackers = trackers;
+    inf->trackerCount = trackerCount;
+
+    return inf->trackerCount ? TR_OK : TR_ERROR;
+}
+
 int
 tr_metainfoParse( const tr_handle  * handle,
                   tr_info          * inf,
@@ -313,9 +397,7 @@ tr_metainfoParse( const tr_handle  * handle,
 
     /* get announce or announce-list */
     if( getannounce( inf, meta ) )
-    {
         goto fail;
-    }
 
     /* filename of Transmission's copy */
     getTorrentFilename( handle, inf, buf, sizeof( buf ) );
@@ -407,97 +489,6 @@ getfile( char ** setme, const char * prefix, tr_benc * name )
     *setme = tr_strdup( buf );
 
     return TR_OK;
-}
-
-static int getannounce( tr_info * inf, tr_benc * meta )
-{
-    const char * str;
-    tr_tracker_info * trackers = NULL;
-    int trackerCount = 0;
-    tr_benc * tiers;
-
-    /* Announce-list */
-    if( tr_bencDictFindList( meta, "announce-list", &tiers ) )
-    {
-        int n;
-        int i, j;
-
-        n = 0;
-        for( i=0; i<tiers->val.l.count; ++i )
-            n += tiers->val.l.vals[i].val.l.count;
-
-        trackers = tr_new0( tr_tracker_info, n );
-        trackerCount = 0;
-
-        for( i=0; i<tiers->val.l.count; ++i ) {
-            const tr_benc * tier = &tiers->val.l.vals[i];
-            for( j=0; tr_bencIsList(tier) && j<tier->val.l.count; ++j ) {
-                const tr_benc * address = &tier->val.l.vals[j];
-                if( tr_bencIsString( address ) && tr_httpIsValidURL( address->val.s.s ) ) {
-                    trackers[trackerCount].tier = i;
-                    trackers[trackerCount].announce = tr_strndup( address->val.s.s, address->val.s.i );
-                    trackers[trackerCount++].scrape = announceToScrape( address->val.s.s );
-                    /*fprintf( stderr, "tier %d: %s\n", i, address->val.s.s );*/
-                }
-            }
-        }
-
-        /* did we use any of the tiers? */
-        if( !trackerCount ) {
-            tr_inf( _( "Invalid metadata entry \"%s\"" ), "announce-list" );
-            tr_free( trackers );
-            trackers = NULL;
-        }
-    }
-
-    /* Regular announce value */
-    if( !trackerCount
-        && tr_bencDictFindStr( meta, "announce", &str )
-        && tr_httpIsValidURL( str ) )
-    {
-        trackers = tr_new0( tr_tracker_info, 1 );
-        trackers[trackerCount].tier = 0;
-        trackers[trackerCount].announce = tr_strdup( str );
-        trackers[trackerCount++].scrape = announceToScrape( str );
-        /*fprintf( stderr, "single announce: [%s]\n", str );*/
-    }
-
-    inf->trackers = trackers;
-    inf->trackerCount = trackerCount;
-    return TR_OK;
-}
-
-static char *
-announceToScrape( const char * announce )
-{
-    char * scrape = NULL;
-    const char * slash;
-    struct evbuffer * buf;
-
-    /* To derive the scrape URL use the following steps:
-     * Begin with the announce URL. Find the last '/' in it.
-     * If the text immediately following that '/' isn't 'announce'
-     * it will be taken as a sign that that tracker doesn't support
-     * the scrape convention. If it does, substitute 'scrape' for
-     * 'announce' to find the scrape page.  */
-
-    /* is the last slash followed by "announce"? */
-    slash = strrchr( announce, '/' );
-    if( !slash )
-        return NULL;
-    ++slash;
-    if( strncmp( slash, "announce", 8 ) )
-        return NULL;
-
-    /* build the scrape url */
-    buf = evbuffer_new( );
-    evbuffer_add( buf, announce, slash-announce );
-    evbuffer_add( buf, "scrape", 6 );
-    evbuffer_add_printf( buf, "%s", slash+8 );
-    scrape = tr_strdup( ( char * ) EVBUFFER_DATA( buf ) );
-    evbuffer_free( buf );
-
-    return scrape;
 }
 
 void
