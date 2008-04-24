@@ -247,8 +247,8 @@ timer_callback( CURLM *multi UNUSED, long timeout_ms, void * vweb )
     tr_web * web = vweb;
     struct timeval tv = tr_timevalMsec( timeout_ms );
 
-    if( evtimer_initialized( &web->timeout ) )
-        evtimer_del( &web->timeout );
+    if( evtimer_initialized( &web->timer ) )
+        evtimer_del( &web->timer );
 
     evtimer_set( &web->timer, timeout_callback, vweb );
     evtimer_add( &web->timer, &tv );
