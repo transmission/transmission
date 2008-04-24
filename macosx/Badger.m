@@ -228,6 +228,7 @@
     }
 }
 
+#warning see if it now quits fast enough to not need this?
 - (void) setQuitting
 {
     if ([NSApp isOnLeopardOrBetter])

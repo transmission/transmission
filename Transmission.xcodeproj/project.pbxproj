@@ -154,6 +154,7 @@
 		A29E04B50DA8764100705643 /* Network.png in Resources */ = {isa = PBXBuildFile; fileRef = A29E04B40DA8764100705643 /* Network.png */; };
 		A29EBE540DC01FC9006CEE80 /* web.c in Sources */ = {isa = PBXBuildFile; fileRef = A29EBE520DC01FC9006CEE80 /* web.c */; };
 		A29EBE550DC01FC9006CEE80 /* web.h in Headers */ = {isa = PBXBuildFile; fileRef = A29EBE530DC01FC9006CEE80 /* web.h */; };
+		A29EBE710DC06068006CEE80 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.dylib */; };
 		A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */; };
 		A2A3065C0AAD24A80049E2AC /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306540AAD24A80049E2AC /* UKFileWatcher.m */; };
 		A2A3065E0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306560AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m */; };
@@ -574,6 +575,7 @@
 		A29E04B40DA8764100705643 /* Network.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Network.png; path = macosx/Images/Network.png; sourceTree = "<group>"; };
 		A29EBE520DC01FC9006CEE80 /* web.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = web.c; path = libtransmission/web.c; sourceTree = "<group>"; };
 		A29EBE530DC01FC9006CEE80 /* web.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = web.h; path = libtransmission/web.h; sourceTree = "<group>"; };
+		A29EBE700DC06068006CEE80 /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = /usr/lib/libcurl.dylib; sourceTree = "<absolute>"; };
 		A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PeerProgressIndicatorCell.h; path = macosx/PeerProgressIndicatorCell.h; sourceTree = "<group>"; };
 		A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PeerProgressIndicatorCell.m; path = macosx/PeerProgressIndicatorCell.m; sourceTree = "<group>"; };
 		A2A306530AAD24A80049E2AC /* UKFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKFileWatcher.h; path = macosx/UKKQueue/UKFileWatcher.h; sourceTree = "<group>"; };
@@ -777,6 +779,7 @@
 				4D4B7F6109E055660053C1EB /* libcrypto.0.9.7.dylib in Frameworks */,
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
 				A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */,
+				A29EBE710DC06068006CEE80 /* libcurl.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1149,6 +1152,7 @@
 			isa = PBXGroup;
 			children = (
 				4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */,
+				A29EBE700DC06068006CEE80 /* libcurl.dylib */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -2203,6 +2207,7 @@
 				IBC_FLATTEN_NIBS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 			};
@@ -2305,6 +2310,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 			};
@@ -2322,6 +2328,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 			};
