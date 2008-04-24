@@ -59,7 +59,7 @@ pump( tr_web * web )
 {
     CURLMcode rc;
     do {
-#if HAVE_CURL_MULTI_SOCKET
+#ifdef HAVE_CURL_MULTI_SOCKET
         rc = curl_multi_socket_all( web->cm, &web->remain );
 #else
         rc = curl_multi_perform( web->cm, &web->remain );
@@ -99,7 +99,7 @@ fprintf( stderr, "new web tag %u [%s]\n", task->tag, url );
 
     pump( web );
 
-#if !HAVE_CURL_MULTI_SOCKET
+#ifndef HAVE_CURL_MULTI_SOCKET
     if( !evtimer_initialized( &web->timer ) )
     {
         struct timeval tv = tr_timevalMsec( PULSE_MSEC );
@@ -151,7 +151,7 @@ fprintf( stderr, "web task %u done\n", task->tag );
         evtimer_del( &web->timer );
 }
 
-#if HAVE_CURL_MULTI_SOCKET
+#ifdef HAVE_CURL_MULTI_SOCKET
 /* libevent says that sock is ready to be processed, so wake up libcurl */
 static void
 event_callback( int sock, short action, void * vweb )
@@ -290,7 +290,7 @@ tr_webInit( tr_session * session )
     web->session = session;
     web->remain = 0;
 
-#if HAVE_CURL_MULTI_SOCKET
+#ifdef HAVE_CURL_MULTI_SOCKET
     curl_multi_setopt( web->cm, CURLMOPT_SOCKETDATA, web );
     curl_multi_setopt( web->cm, CURLMOPT_SOCKETFUNCTION, socket_callback );
     curl_multi_setopt( web->cm, CURLMOPT_TIMERDATA, web );
