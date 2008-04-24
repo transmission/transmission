@@ -121,7 +121,7 @@ pumpList( int i UNUSED, short s UNUSED, void * veh )
         switch( cmd->mode )
         {
             case TR_EV_TIMER_ADD:
-                timeout_add( &cmd->timer->event, &cmd->timer->tv );
+                evtimer_add( &cmd->timer->event, &cmd->timer->tv );
                 ++eh->timerCount;
                 break;
 
@@ -138,7 +138,7 @@ pumpList( int i UNUSED, short s UNUSED, void * veh )
     }
 
     if( !doDie )
-        timeout_add( &eh->pulse, &eh->pulseInterval );
+        evtimer_add( &eh->pulse, &eh->pulseInterval );
     else {
         assert( eh->timerCount ==  0 );
         event_del( &eh->pulse );
@@ -167,8 +167,8 @@ libeventThreadFunc( void * veh )
 
     eh->base = event_init( );
     event_set_log_callback( logFunc );
-    timeout_set( &eh->pulse, pumpList, veh );
-    timeout_add( &eh->pulse, &eh->pulseInterval );
+    evtimer_set( &eh->pulse, pumpList, veh );
+    evtimer_add( &eh->pulse, &eh->pulseInterval );
     eh->h->events = eh;
 
     event_dispatch( );
@@ -253,7 +253,7 @@ timerCallback( int fd UNUSED, short event UNUSED, void * vtimer )
     }
 
     if( more )
-        timeout_add( &timer->event, &timer->tv );
+        evtimer_add( &timer->event, &timer->tv );
     else
         tr_timerFree( &timer );
 
@@ -286,17 +286,17 @@ tr_timer*
 tr_timerNew( struct tr_handle * handle,
              timer_func         func,
              void             * user_data,
-             uint64_t           timeout_milliseconds )
+             uint64_t           interval_milliseconds )
 {
     tr_timer * timer = tr_new0( tr_timer, 1 );
-    timer->tv = tr_timevalMsec( timeout_milliseconds );
+    timer->tv = tr_timevalMsec( interval_milliseconds );
     timer->func = func;
     timer->user_data = user_data;
     timer->eh = handle->events;
-    timeout_set( &timer->event, timerCallback, timer );
+    evtimer_set( &timer->event, timerCallback, timer );
 
     if( tr_amInThread( handle->events->thread ) ) {
-        timeout_add( &timer->event,  &timer->tv );
+        evtimer_add( &timer->event,  &timer->tv );
         ++handle->events->timerCount;
     } else {
         struct tr_event_command * cmd = tr_new0( struct tr_event_command, 1 );

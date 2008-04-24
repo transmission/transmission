@@ -1,5 +1,4 @@
-/*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+/* * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -17,12 +16,25 @@
 #include "utils.h"
 #include "web.h"
 
+#define CURL_CHECK_VERSION(major,minor,micro)    \
+    (LIBCURL_VERSION_MAJOR > (major) || \
+     (LIBCURL_VERSION_MAJOR == (major) && LIBCURL_VERSION_MINOR > (minor)) || \
+     (LIBCURL_VERSION_MAJOR == (major) && LIBCURL_VERSION_MINOR == (minor) && \
+      LIBCURL_VERSION_PATCH >= (micro)))
+
+#if CURL_CHECK_VERSION(7,16,0)
+#define HAVE_CURL_MULTI_SOCKET
+#else
+#define PULSE_MSEC 200
+static void pulse( int socket UNUSED, short action UNUSED, void * vweb );
+#endif
+
 struct tr_web
 {
     CURLM * cm;
     tr_session * session;
     int remain;
-    struct event timeout;
+    struct event timer;
 };
 
 struct tr_web_task
@@ -42,6 +54,20 @@ writeFunc( void * ptr, size_t size, size_t nmemb, void * vtask )
     return byteCount;
 }
 
+static void
+pump( tr_web * web )
+{
+    CURLMcode rc;
+    do {
+#if HAVE_CURL_MULTI_SOCKET
+        rc = curl_multi_socket_all( web->cm, &web->remain );
+#else
+        rc = curl_multi_perform( web->cm, &web->remain );
+#endif
+fprintf( stderr, "remaining: %d\n", web->remain );
+    } while( rc == CURLM_CALL_MULTI_PERFORM );
+}
+
 void
 tr_webRun( tr_session         * session,
            const char         * url,
@@ -52,7 +78,6 @@ tr_webRun( tr_session         * session,
     struct tr_web_task * task;
     struct tr_web * web = session->web;
     CURL * ch;
-    CURLMcode rc;
 
     task = tr_new0( struct tr_web_task, 1 );
     task->done_func = done_func;
@@ -72,10 +97,17 @@ fprintf( stderr, "new web tag %u [%s]\n", task->tag, url );
 
     curl_multi_add_handle( web->cm, ch );
 
-    do {
-        int tmp;
-        rc = curl_multi_socket_all( web->cm, &tmp );
-    } while( rc == CURLM_CALL_MULTI_PERFORM );
+    pump( web );
+
+#if !HAVE_CURL_MULTI_SOCKET
+    if( !evtimer_initialized( &web->timer ) )
+    {
+        struct timeval tv = tr_timevalMsec( PULSE_MSEC );
+        evtimer_set( &web->timer, pulse, web );
+        fprintf( stderr, "no timer running yet... starting one\n" );
+        evtimer_add( &web->timer, &tv );
+    }
+#endif
 }
 
 static void
@@ -113,8 +145,13 @@ fprintf( stderr, "web task %u done\n", task->tag );
         }
     }
     while( remaining );
+
+    /* remove timeout if there are no transfers left */
+    if( !web->remain && evtimer_initialized( &web->timer ) )
+        evtimer_del( &web->timer );
 }
 
+#if HAVE_CURL_MULTI_SOCKET
 /* libevent says that sock is ready to be processed, so wake up libcurl */
 static void
 event_callback( int sock, short action, void * vweb )
@@ -145,14 +182,6 @@ event_callback( int sock, short action, void * vweb )
         tr_err( "%s (%d)", curl_multi_strerror(rc), (int)sock );
 
     responseHandler( web );
-
-    /* remove timeout if there are no transfers left */
-    if( !web->remain
-        && event_initialized( &web->timeout )
-        && event_pending( &web->timeout, EV_TIMEOUT, NULL ) ) {
-            event_del( &web->timeout );
-            fprintf( stderr, "Removed timeout\n" );
-    }
 }
 
 /* libcurl wants us to tell it when sock is ready to be processed */
@@ -217,13 +246,29 @@ timer_callback( CURLM *multi UNUSED, long timeout_ms, void * vweb )
     tr_web * web = vweb;
     struct timeval tv = tr_timevalMsec( timeout_ms );
 
-    if( event_initialized( &web->timeout )
-        && event_pending( &web->timeout, EV_TIMEOUT, NULL ) )
-            event_del( &web->timeout );
+    if( evtimer_initialized( &web->timeout ) )
+        evtimer_del( &web->timeout );
 
-    event_set( &web->timeout, -1, 0, timeout_callback, vweb );
-    event_add( &web->timeout, &tv );
+    evtimer_set( &web->timer, timeout_callback, vweb );
+    evtimer_add( &web->timer, &tv );
 }
+#else
+
+static void
+pulse( int socket UNUSED, short action UNUSED, void * vweb )
+{
+    tr_web * web = vweb;
+
+    pump( web );
+    responseHandler( web );
+
+    if( web->remain > 0 ) {
+        struct timeval tv = tr_timevalMsec( PULSE_MSEC );
+        evtimer_add( &web->timer, &tv );
+    }
+}
+
+#endif
 
 tr_web*
 tr_webInit( tr_session * session )
@@ -245,12 +290,18 @@ tr_webInit( tr_session * session )
     web->session = session;
     web->remain = 0;
 
+#if HAVE_CURL_MULTI_SOCKET
     curl_multi_setopt( web->cm, CURLMOPT_SOCKETDATA, web );
     curl_multi_setopt( web->cm, CURLMOPT_SOCKETFUNCTION, socket_callback );
     curl_multi_setopt( web->cm, CURLMOPT_TIMERDATA, web );
     curl_multi_setopt( web->cm, CURLMOPT_TIMERFUNCTION, timer_callback );
+#endif
+#if CURL_CHECK_VERSION(7,16,3)
     curl_multi_setopt( web->cm, CURLMOPT_MAXCONNECTS, 20 );
+#endif
+#if CURL_CHECK_VERSION(7,16,0)
     curl_multi_setopt( web->cm, CURLMOPT_PIPELINING, 1 );
+#endif
 
     return web;
 }
