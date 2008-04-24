@@ -191,6 +191,7 @@ main( int argc, char ** argv )
 
         if( !tr_torrentParse( h, ctor, &info ) )
         {
+            int prevTier = -1;
             tr_file_index_t ff;
 
             printf( "hash:\t" );
@@ -200,15 +201,12 @@ main( int argc, char ** argv )
 
             printf( "name:\t%s\n", info.name );
 
-            for( i=0; i<info.trackerTiers; ++i ) {
-                int j;
-                printf( "tracker tier #%d:\n", ( i+1 ) );
-                for( j=0; j<info.trackerList[i].count; ++j ) {
-                    const tr_tracker_info * tracker = &info.trackerList[i].list[j];
-                    printf( "\taddress:\t%s:%d\n", tracker->address, tracker->port );
-                    printf( "\tannounce:\t%s\n", tracker->announce );
-                    printf( "\n" );
+            for( i=0; i<info.trackerCount; ++i ) {
+                if( prevTier != info.trackers[i].tier ) {
+                    prevTier = info.trackers[i].tier;
+                    printf( "\ntracker tier #%d:\n", (prevTier+1) );
                 }
+                printf( "\tannounce:\t%s\n", info.trackers[i].announce );
             }
 
             printf( "size:\t%"PRIu64" (%"PRIu64" * %d + %"PRIu64")\n",
