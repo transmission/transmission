@@ -94,6 +94,7 @@ fprintf( stderr, "new web tag %u [%s]\n", task->tag, url );
     curl_easy_setopt( ch, CURLOPT_WRITEFUNCTION, writeFunc );
     curl_easy_setopt( ch, CURLOPT_WRITEDATA, task );
     curl_easy_setopt( ch, CURLOPT_USERAGENT, TR_NAME "/" LONG_VERSION_STRING );
+    curl_easy_setopt( ch, CURLOPT_SSL_VERIFYPEER, 0 );
 
     curl_multi_add_handle( web->cm, ch );
 
