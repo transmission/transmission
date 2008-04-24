@@ -32,6 +32,8 @@
 #include <sys/stat.h>
 #include <unistd.h> /* unlink, stat */
 
+#include <event.h> /* struct evbuffer */
+
 #include "transmission.h"
 #include "bencode.h"
 #include "crypto.h" /* tr_sha1 */
@@ -330,7 +332,7 @@ tr_metainfoParse( const tr_handle  * handle,
 void tr_metainfoFree( tr_info * inf )
 {
     tr_file_index_t ff;
-    int i, j;
+    int i;
 
     for( ff=0; ff<inf->fileCount; ++ff )
         tr_free( inf->files[ff].name );
@@ -341,14 +343,12 @@ void tr_metainfoFree( tr_info * inf )
     tr_free( inf->creator );
     tr_free( inf->torrent );
     tr_free( inf->name );
-    tr_free( inf->primaryAddress );
     
-    for( i=0; i<inf->trackerTiers; ++i ) {
-        for( j=0; j<inf->trackerList[i].count; ++j )
-            tr_trackerInfoClear( &inf->trackerList[i].list[j] );
-        tr_free( inf->trackerList[i].list );
+    for( i=0; i<inf->trackerCount; ++i ) {
+        tr_free( inf->trackers[i].announce );
+        tr_free( inf->trackers[i].scrape );
     }
-    tr_free( inf->trackerList );
+    tr_free( inf->trackers );
 
     memset( inf, '\0', sizeof(tr_info) );
 }
@@ -411,206 +411,93 @@ getfile( char ** setme, const char * prefix, tr_benc * name )
 
 static int getannounce( tr_info * inf, tr_benc * meta )
 {
-    tr_benc           * val, * urlval;
-    char              * address, * announce;
-    int                 ii, jj, port, random;
-    tr_tracker_info   * sublist;
-    void * swapping;
+    const char * str;
+    tr_tracker_info * trackers = NULL;
+    int trackerCount = 0;
+    tr_benc * tiers;
 
     /* Announce-list */
-    val = tr_bencDictFind( meta, "announce-list" );
-    if( tr_bencIsList(val) && 0 < val->val.l.count )
+    if( tr_bencDictFindList( meta, "announce-list", &tiers ) )
     {
-        inf->trackerTiers = 0;
-        inf->trackerList = calloc( val->val.l.count,
-                                   sizeof( inf->trackerList[0] ) );
+        int n;
+        int i, j;
 
-        /* iterate through the announce-list's tiers */
-        for( ii = 0; ii < val->val.l.count; ii++ )
-        {
-            int subcount = 0;
-            tr_benc * subval = &val->val.l.vals[ii];
+        n = 0;
+        for( i=0; i<tiers->val.l.count; ++i )
+            n += tiers->val.l.vals[i].val.l.count;
 
-            if( !tr_bencIsList(subval) || 0 >= subval->val.l.count )
-                continue;
+        trackers = tr_new0( tr_tracker_info, n );
+        trackerCount = 0;
 
-            sublist = calloc( subval->val.l.count, sizeof( sublist[0] ) );
-
-            /* iterate through the tier's items */
-            for( jj = 0; jj < subval->val.l.count; jj++ )
-            {
-                tr_tracker_info tmp;
-
-                urlval = &subval->val.l.vals[jj];
-                if( TYPE_STR != urlval->type ||
-                    tr_trackerInfoInit( &tmp, urlval->val.s.s, urlval->val.s.i ) )
-                {
-                    continue;
+        for( i=0; i<tiers->val.l.count; ++i ) {
+            const tr_benc * tier = &tiers->val.l.vals[i];
+            for( j=0; tr_bencIsList(tier) && j<tier->val.l.count; ++j ) {
+                const tr_benc * address = &tier->val.l.vals[j];
+                if( tr_bencIsString( address ) && tr_httpIsValidURL( address->val.s.s ) ) {
+                    trackers[trackerCount].tier = i;
+                    trackers[trackerCount].announce = tr_strndup( address->val.s.s, address->val.s.i );
+                    trackers[trackerCount++].scrape = announceToScrape( address->val.s.s );
+                    /*fprintf( stderr, "tier %d: %s\n", i, address->val.s.s );*/
                 }
-
-                if( !inf->primaryAddress ) {
-                     char buf[1024];
-                     snprintf( buf, sizeof(buf), "%s:%d", tmp.address, tmp.port );
-                     inf->primaryAddress = tr_strdup( buf );
-                }
-
-                /* place the item info in a random location in the sublist */
-                random = tr_rand( subcount + 1 );
-                if( random != subcount )
-                    sublist[subcount] = sublist[random];
-                sublist[random] = tmp;
-                subcount++;
-            }
-
-            /* just use sublist as-is if it's full */
-            if( subcount == subval->val.l.count )
-            {
-                inf->trackerList[inf->trackerTiers].list = sublist;
-                inf->trackerList[inf->trackerTiers].count = subcount;
-                inf->trackerTiers++;
-            }
-            /* if we skipped some of the tier's items then trim the sublist */
-            else if( 0 < subcount )
-            {
-                inf->trackerList[inf->trackerTiers].list = calloc( subcount, sizeof( sublist[0] ) );
-                memcpy( inf->trackerList[inf->trackerTiers].list, sublist,
-                        sizeof( sublist[0] ) * subcount );
-                inf->trackerList[inf->trackerTiers].count = subcount;
-                inf->trackerTiers++;
-                free( sublist );
-            }
-            /* drop the whole sublist if we didn't use any items at all */
-            else
-            {
-                free( sublist );
             }
         }
 
         /* did we use any of the tiers? */
-        if( 0 == inf->trackerTiers )
-        {
+        if( !trackerCount ) {
             tr_inf( _( "Invalid metadata entry \"%s\"" ), "announce-list" );
-            free( inf->trackerList );
-            inf->trackerList = NULL;
-        }
-        /* trim unused sublist pointers */
-        else if( inf->trackerTiers < val->val.l.count )
-        {
-            swapping = inf->trackerList;
-            inf->trackerList = calloc( inf->trackerTiers,
-                                       sizeof( inf->trackerList[0] ) );
-            memcpy( inf->trackerList, swapping,
-                    sizeof( inf->trackerList[0] ) * inf->trackerTiers );
-            free( swapping );
+            tr_free( trackers );
+            trackers = NULL;
         }
     }
 
     /* Regular announce value */
-    val = tr_bencDictFind( meta, "announce" );
-    if( !tr_bencIsString( val ) )
+    if( !trackerCount
+        && tr_bencDictFindStr( meta, "announce", &str )
+        && tr_httpIsValidURL( str ) )
     {
-        tr_err( _( "Missing metadata entry \"%s\"" ), "announce" );
-        return TR_EINVALID;
+        trackers = tr_new0( tr_tracker_info, 1 );
+        trackers[trackerCount].tier = 0;
+        trackers[trackerCount].announce = tr_strdup( str );
+        trackers[trackerCount++].scrape = announceToScrape( str );
+        /*fprintf( stderr, "single announce: [%s]\n", str );*/
     }
 
-    if( !inf->trackerTiers )
-    {
-        char buf[4096], *pch;
-        strlcpy( buf, val->val.s.s, sizeof( buf ) );
-        pch = buf;
-        while( isspace( *pch ) )
-            ++pch;
-
-        if( tr_httpParseURL( pch, -1, &address, &port, &announce ) )
-        {
-            tr_err( _( "Invalid announce URL \"%s\"" ), val->val.s.s );
-            return TR_EINVALID;
-        }
-        sublist                   = calloc( 1, sizeof( sublist[0] ) );
-        sublist[0].address        = address;
-        sublist[0].port           = port;
-        sublist[0].announce       = announce;
-        sublist[0].scrape         = announceToScrape( announce );
-        inf->trackerList          = calloc( 1, sizeof( inf->trackerList[0] ) );
-        inf->trackerList[0].list  = sublist;
-        inf->trackerList[0].count = 1;
-        inf->trackerTiers         = 1;
-
-        if( !inf->primaryAddress ) {
-            char buf[1024];
-            snprintf( buf, sizeof(buf), "%s:%d", sublist[0].address, sublist[0].port );
-            inf->primaryAddress = tr_strdup( buf );
-        }
-
-    }
-
+    inf->trackers = trackers;
+    inf->trackerCount = trackerCount;
     return TR_OK;
 }
 
-static char * announceToScrape( const char * announce )
+static char *
+announceToScrape( const char * announce )
 {
-    char old[]  = "announce";
-    int  oldlen = 8;
-    char new[]  = "scrape";
-    int  newlen = 6;
-    char * slash, * scrape;
-    size_t scrapelen, used;
+    char * scrape = NULL;
+    const char * slash;
+    struct evbuffer * buf;
 
+    /* To derive the scrape URL use the following steps:
+     * Begin with the announce URL. Find the last '/' in it.
+     * If the text immediately following that '/' isn't 'announce'
+     * it will be taken as a sign that that tracker doesn't support
+     * the scrape convention. If it does, substitute 'scrape' for
+     * 'announce' to find the scrape page.  */
+
+    /* is the last slash followed by "announce"? */
     slash = strrchr( announce, '/' );
-    if( NULL == slash )
-    {
+    if( !slash )
         return NULL;
-    }
-    slash++;
-    
-    if( 0 != strncmp( slash, old, oldlen ) )
-    {
+    ++slash;
+    if( strncmp( slash, "announce", 8 ) )
         return NULL;
-    }
 
-    scrapelen = strlen( announce ) - oldlen + newlen;
-    scrape = calloc( scrapelen + 1, 1 );
-    if( NULL == scrape )
-    {
-        return NULL;
-    }
-    assert( ( size_t )( slash - announce ) < scrapelen );
-    memcpy( scrape, announce, slash - announce );
-    used = slash - announce;
-    strncat( scrape, new, scrapelen - used );
-    used += newlen;
-    assert( strlen( scrape ) == used );
-    if( used < scrapelen )
-    {
-        assert( strlen( slash + oldlen ) == scrapelen - used );
-        strncat( scrape, slash + oldlen, scrapelen - used );
-    }
+    /* build the scrape url */
+    buf = evbuffer_new( );
+    evbuffer_add( buf, announce, slash-announce );
+    evbuffer_add( buf, "scrape", 6 );
+    evbuffer_add_printf( buf, "%s", slash+8 );
+    scrape = tr_strdup( ( char * ) EVBUFFER_DATA( buf ) );
+    evbuffer_free( buf );
 
     return scrape;
-}
-
-int
-tr_trackerInfoInit( tr_tracker_info  * info,
-                    const char       * address,
-                    int                address_len )
-{
-    int ret = tr_httpParseURL( address, address_len,
-                               &info->address,
-                               &info->port,
-                               &info->announce );
-    if( !ret )
-        info->scrape = announceToScrape( info->announce );
-
-    return ret;
-}
-
-void
-tr_trackerInfoClear( tr_tracker_info * info )
-{
-    tr_free( info->address );
-    tr_free( info->announce );
-    tr_free( info->scrape );
-    memset( info, '\0', sizeof(tr_tracker_info) );
 }
 
 void

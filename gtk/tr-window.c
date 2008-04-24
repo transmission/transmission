@@ -274,7 +274,7 @@ checkFilterText( filter_text_mode_t    filter_text_mode,
             break;
 
         case FILTER_TEXT_MODE_TRACKER:
-            pch = g_ascii_strdown( torInfo->primaryAddress, -1 );
+            pch = g_ascii_strdown( torInfo->trackers[0].announce, -1 );
             ret = !text || ( strstr( pch, text ) != NULL );
             g_free( pch );
             break;

@@ -702,8 +702,7 @@ tr_piece;
     
 typedef struct tr_tracker_info
 {
-    char * address;
-    int    port;
+    int    tier;
     char * announce;
     char * scrape;
 }
@@ -723,14 +722,9 @@ struct tr_info
     unsigned int isPrivate : 1;
     unsigned int isMultifile : 1;
 
-    /* Tracker info */
-    struct
-    {
-        tr_tracker_info  * list;
-        int                 count;
-    }                  * trackerList;
-    int                  trackerTiers;
-    char               * primaryAddress;
+    /* these trackers are sorted by tier */
+    tr_tracker_info    * trackers;
+    int                  trackerCount;
 
     /* Torrent info */
     char               * comment;

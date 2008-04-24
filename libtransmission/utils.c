@@ -43,8 +43,6 @@
     #include <kernel/OS.h>
 #endif
 
-#include <miniupnp/miniwget.h> /* parseURL */
-
 #include "transmission.h"
 #include "trcompat.h"
 #include "utils.h"
@@ -352,7 +350,7 @@ tr_compareUint32( uint32_t a, uint32_t b )
 **/
 
 struct timeval
-timevalMsec( uint64_t milliseconds )
+tr_timevalMsec( uint64_t milliseconds )
 {
     struct timeval ret;
     const uint64_t microseconds = milliseconds * 1000;
@@ -955,27 +953,66 @@ tr_sha1_to_hex( char * out, const uint8_t * sha1 )
 ***/
 
 int
+tr_httpIsValidURL( const char * url )
+{
+    return !tr_httpParseURL( url, -1, NULL, NULL, NULL );
+}
+
+int
 tr_httpParseURL( const char * url_in, int len,
                  char ** setme_host,
                  int * setme_port,
                  char ** setme_path )
 {
-    char * url = tr_strndup( url_in, len );
-    char * path;
-    char host[4096+1];
-    unsigned short port;
-    int success;
+    int err;
+    int port = 0;
+    int n;
+    char * tmp;
+    char * pch;
+    const char * protocol = NULL;
+    const char * host = NULL;
+    const char * path = NULL;
 
-    success = parseURL( url, host, &port, &path );
-
-    if( success ) {
-        if( setme_host ) *setme_host = tr_strdup( host );
-        if( setme_port ) *setme_port = port;
-        if( setme_path ) *setme_path = tr_strdup( path );
+    tmp = tr_strndup( url_in, len );
+    if(( pch = strstr( tmp, "://" )))
+    {
+       *pch = '\0';
+       protocol = tmp;
+       pch += 3;
+/*fprintf( stderr, "protocol is [%s]... what's left is [%s]\n", protocol, pch );*/
+       if(( n = strcspn( pch, ":/" )))
+       {
+           const int havePort = pch[n] == ':';
+           host = pch;
+           pch += n;
+           *pch++ = '\0';
+/*fprintf( stderr, "host is [%s]... what's left is [%s]\n", host, pch );*/
+           if( havePort )
+           {
+               char * end;
+               port = strtol( pch, &end, 10 );
+               pch = end;
+/*fprintf( stderr, "port is [%d]... what's left is [%s]\n", port, pch );*/
+           }
+           path = pch;
+/*fprintf( stderr, "path is [%s]\n", path );*/
+       }
     }
 
-    tr_free( url );
+    err = !host || !path || !protocol || ( strcmp(protocol,"http") && strcmp(protocol,"https") );
 
-    return !success;
+    if( !err && !port ) {
+        if( !strcmp(protocol,"http") ) port = 80;
+        if( !strcmp(protocol,"https") ) port = 443;
+    }
+
+    if( !err ) {
+        if( setme_host) { ((char*)host)[-3]=':'; *setme_host = tr_strdup( protocol ); }
+        if( setme_path) { ((char*)path)[-1]='/'; *setme_path = tr_strdup( path-1 ); }
+        if( setme_port) *setme_port = port;
+    }
+
+
+    tr_free( tmp );
+    return err;
 }
-

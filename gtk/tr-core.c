@@ -283,8 +283,8 @@ compareByTracker( GtkTreeModel   * model,
     const tr_torrent *ta, *tb;
     gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
     gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
-    return strcmp( tr_torrentInfo(ta)->primaryAddress,
-                   tr_torrentInfo(tb)->primaryAddress );
+    return strcmp( tr_torrentInfo(ta)->trackers[0].announce,
+                   tr_torrentInfo(tb)->trackers[0].announce );
 }
 
 static void

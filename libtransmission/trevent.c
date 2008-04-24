@@ -190,7 +190,7 @@ tr_eventInit( tr_handle * handle )
     eh = tr_new0( tr_event_handle, 1 );
     eh->lock = tr_lockNew( );
     eh->h = handle;
-    eh->pulseInterval = timevalMsec( 100 );
+    eh->pulseInterval = tr_timevalMsec( 100 );
     eh->thread = tr_threadNew( libeventThreadFunc, eh, "libeventThreadFunc" );
 }
 
@@ -289,7 +289,7 @@ tr_timerNew( struct tr_handle * handle,
              uint64_t           timeout_milliseconds )
 {
     tr_timer * timer = tr_new0( tr_timer, 1 );
-    timer->tv = timevalMsec( timeout_milliseconds );
+    timer->tv = tr_timevalMsec( timeout_milliseconds );
     timer->func = func;
     timer->user_data = user_data;
     timer->eh = handle->events;

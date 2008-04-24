@@ -43,12 +43,6 @@ typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 #define FALSE 0
 #endif
 
-int tr_trackerInfoInit( struct tr_tracker_info  * info,
-                        const char              * address,
-                        int                       address_len );
-
-void tr_trackerInfoClear( struct tr_tracker_info * info );
-
 uint8_t* tr_peerIdNew( void );
 
 const uint8_t* tr_getPeerId( void );
@@ -58,13 +52,6 @@ struct tr_metainfo_lookup
     char hashString[2*SHA_DIGEST_LENGTH+1];
     char * filename;
 };
-
-const char * tr_sessionFindTorrentFile( const tr_handle  * h,
-                                        const char       * hashString );
-
-void tr_sessionSetTorrentFile( tr_handle    * h,
-                               const char   * hashString,
-                               const char   * filename );
 
 struct tr_handle
 {
@@ -98,6 +85,8 @@ struct tr_handle
 
     struct tr_lock             * lock;
 
+    struct tr_web              * web;
+
     tr_handle_status             stats[2];
     int                          statCur;
 
@@ -108,8 +97,17 @@ struct tr_handle
     int                          metainfoLookupCount;
 };
 
-void tr_globalLock       ( struct tr_handle * );
-void tr_globalUnlock     ( struct tr_handle * );
-int  tr_globalIsLocked   ( const struct tr_handle * );
+typedef struct tr_handle tr_session;
+
+const char * tr_sessionFindTorrentFile( const tr_session * session,
+                                        const char       * hashString );
+
+void tr_sessionSetTorrentFile( tr_session   * session,
+                               const char   * hashString,
+                               const char   * filename );
+
+void tr_globalLock       ( tr_session * );
+void tr_globalUnlock     ( tr_session * );
+int  tr_globalIsLocked   ( const tr_session * );
 
 #endif

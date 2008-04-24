@@ -92,7 +92,7 @@ int tr_asprintf( char **strp, const char *fmt, ...);
 void tr_buildPath( char* buf, size_t buflen,
                    const char * first_element, ... );
 
-struct timeval timevalMsec( uint64_t milliseconds );
+struct timeval tr_timevalMsec( uint64_t milliseconds );
 
 
 int tr_ioErrorFromErrno( int err );
@@ -159,6 +159,8 @@ int tr_compareUint32( uint32_t a, uint32_t b );
 
 void tr_sha1_to_hex( char * out, const uint8_t * sha1 );
 
+
+int tr_httpIsValidURL( const char * url );
 
 int tr_httpParseURL( const char * url,
                      int          url_len,

@@ -9,6 +9,7 @@ AM_CPPFLAGS = \
 AM_CFLAGS = \
     $(GTK_CFLAGS) \
     $(OPENSSL_CFLAGS) \
+    $(LIBCURL_CFLAGS) \
     $(PTHREAD_CFLAGS) \
     $(GIO_CFLAGS) \
     $(DBUS_GLIB_CFLAGS) \
@@ -78,6 +79,7 @@ transmission_LDADD = \
     $(LIBNOTIFY_LIBS) \
     $(DBUS_GLIB_LIBS) \
     $(OPENSSL_LIBS) \
+    $(LIBCURL_LIBS) \
     $(PTHREAD_LIBS) -lm
 
 DESKTOP_IN_FILES=transmission.desktop.in

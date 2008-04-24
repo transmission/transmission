@@ -1119,9 +1119,7 @@ tracker_page_new( TrTorrent * gtor )
     GtkWidget * l;
     int row = 0;
     const char * s;
-    char * tmp;
     struct tracker_page * page = g_new0( struct tracker_page, 1 );
-    const tr_tracker_info * track;
     const tr_info * info = tr_torrent_info (gtor);
 
     page->gtor = gtor;
@@ -1147,14 +1145,9 @@ tracker_page_new( TrTorrent * gtor )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Announce" ) );
 
-        track = info->trackerList->list;
-        tmp = track->port==80
-          ? g_strdup_printf( "http://%s%s", track->address, track->announce )
-          : g_strdup_printf( "http://%s:%d%s", track->address, track->port, track->announce );
-        l = gtk_label_new( tmp );
+        l = gtk_label_new( info->trackers[0].announce );
         gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
         hig_workarea_add_row (t, &row, _( "Tracker:" ), l, NULL);
-        g_free( tmp );
 
         s = _( "Last announce at:" );
         l = gtk_label_new( NULL );

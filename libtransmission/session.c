@@ -47,6 +47,7 @@
 #include "tracker.h"
 #include "trevent.h"
 #include "utils.h"
+#include "web.h"
 
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
    characters, where x is the major version number, y is the
@@ -92,22 +93,22 @@ tr_getPeerId( void )
 ***/
 
 tr_encryption_mode
-tr_getEncryptionMode( tr_handle * handle )
+tr_getEncryptionMode( tr_session * session )
 {
-    assert( handle != NULL );
+    assert( session != NULL );
 
-    return handle->encryptionMode;
+    return session->encryptionMode;
 }
 
 void
-tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode )
+tr_setEncryptionMode( tr_session * session, tr_encryption_mode mode )
 {
-    assert( handle != NULL );
+    assert( session != NULL );
     assert( mode==TR_ENCRYPTION_PREFERRED
          || mode==TR_ENCRYPTION_REQUIRED
          || mode==TR_PLAINTEXT_PREFERRED );
 
-    handle->encryptionMode = mode;
+    session->encryptionMode = mode;
 }
 
 /***
@@ -190,6 +191,8 @@ tr_initFull( const char * configDir,
     h->blocklist = _tr_blocklistNew( filename, isBlocklistEnabled );
 
     tr_statsInit( h );
+
+    h->web = tr_webInit( h );
 
     metainfoLookupRescan( h );
 

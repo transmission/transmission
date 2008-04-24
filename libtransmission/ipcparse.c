@@ -531,8 +531,6 @@ static void
 filltracker( tr_benc * val, const tr_tracker_info * tk )
 {
     tr_bencInitDict( val, 4 );
-    tr_bencDictAddStr( val, "address",  tk->address );
-    tr_bencDictAddInt( val, "port",     tk->port );
     tr_bencDictAddStr( val, "announce", tk->announce );
     if( tk->scrape )
         tr_bencDictAddStr( val, "scrape", tk->scrape );
@@ -554,7 +552,7 @@ ipc_addinfo( tr_benc         * list,
              int               types )
 {
     tr_benc * dict;
-    int          ii, jj, kk;
+    int          ii, jj;
     tr_file_index_t ff;
     const tr_info * inf = tr_torrentInfo( tor );
 
@@ -628,17 +626,19 @@ ipc_addinfo( tr_benc         * list,
             case IPC_INF_SIZE:
                 tr_bencInitInt( item, inf->totalSize );
                 break;
-            case IPC_INF_TRACKERS:
-                tr_bencInitList( item, inf->trackerTiers );
-                for( jj = 0; inf->trackerTiers > jj; jj++ )
-                {
-                    tr_benc * tier = tr_bencListAdd( item );
-                    tr_bencInitList( tier, inf->trackerList[jj].count );
-                    for( kk = 0; inf->trackerList[jj].count > kk; kk++ )
-                        filltracker( tr_bencListAdd( tier ),
-                                     &inf->trackerList[jj].list[kk] );
+            case IPC_INF_TRACKERS: {
+                int prevTier = -1;
+                tr_benc * tier = NULL;
+                tr_bencInitList( item, 0 );
+                for( jj=0; jj<inf->trackerCount; ++jj ) {
+                    if( prevTier != inf->trackers[jj].tier ) {
+                        prevTier = inf->trackers[jj].tier;
+                        tier = tr_bencListAddList( item, 0 );
+                    }
+                    filltracker( tr_bencListAdd( tier ), &inf->trackers[jj] );
                 }
                 break;
+            }
             default:
                 assert( 0 );
                 break;

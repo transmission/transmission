@@ -1,5 +1,5 @@
 AM_CPPFLAGS = -I@top_srcdir@ $(LIBEVENT_CPPFLAGS)
-AM_CFLAGS = $(OPENSSL_CFLAGS) $(PTHREAD_CFLAGS)
+AM_CFLAGS = $(OPENSSL_CFLAGS) $(LIBCURL_CFLAGS) $(PTHREAD_CFLAGS)
 
 noinst_LIBRARIES = libdaemon.a
 
@@ -32,7 +32,10 @@ COMMON_LDADD = \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/libevent/libevent.la \
-    $(INTLLIBS) $(OPENSSL_LIBS) $(PTHREAD_LIBS) -lm
+    $(INTLLIBS) \
+    $(OPENSSL_LIBS) \
+    $(LIBCURL_LIBS) \
+    $(PTHREAD_LIBS) -lm
 
 transmission_daemon_SOURCES = daemon.c server.c torrents.c
 transmission_daemon_LDADD = $(COMMON_LDADD)

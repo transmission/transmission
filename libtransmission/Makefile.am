@@ -1,5 +1,5 @@
 AM_CPPFLAGS = -I. -I$(top_srcdir) -I$(top_srcdir)/third-party/ -D__TRANSMISSION__ $(LIBEVENT_CPPFLAGS)
-AM_CFLAGS = $(OPENSSL_CFLAGS) $(PTHREAD_CFLAGS)
+AM_CFLAGS = $(OPENSSL_CFLAGS) $(LIBCURL_CFLAGS) $(PTHREAD_CFLAGS)
 
 noinst_LIBRARIES = libtransmission.a
 
@@ -37,7 +37,8 @@ libtransmission_a_SOURCES = \
     trevent.c \
     upnp.c \
     utils.c \
-    verify.c
+    verify.c \
+    web.c
 
 noinst_HEADERS = \
     bencode.h \
@@ -75,7 +76,8 @@ noinst_HEADERS = \
     trevent.h \
     upnp.h \
     utils.h \
-    verify.h
+    verify.h \
+    web.h
 
 bin_PROGRAMS = benc2php
 
@@ -92,7 +94,11 @@ APPS_LDADD = \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/libevent/libevent.la \
-    $(INTLLIBS) $(OPENSSL_LIBS) $(PTHREAD_LIBS) -lm
+    $(INTLLIBS) \
+    $(OPENSSL_LIBS) \
+    $(LIBCURL_LIBS) \
+    $(PTHREAD_LIBS) \
+    -lm
 
 benc2php_SOURCES = benc2php.c
 benc2php_LDADD = $(APPS_LDADD)
