@@ -770,15 +770,18 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return [NSString stringWithUTF8String: fStat->tracker_stat.scrapeResponse];
 }
 
+#warning removes separators?
 - (NSArray *) allTrackers: (BOOL) separators
 {
-    int count = fInfo->trackerCount;
-    NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: count + fInfo->trackers[count-1].tier + 1];
+    int count = fInfo->trackerCount, capacity = count;
+    if (separators)
+        capacity += fInfo->trackers[count-1].tier + 1;
+    NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: capacity];
     
     int i, tier = -1;
     for (i = 0; i < count; i++)
     {
-        if (tier != fInfo->trackers[i].tier)
+        if (separators && tier != fInfo->trackers[i].tier)
         {
             tier = fInfo->trackers[i].tier;
             [allTrackers addObject: [NSNumber numberWithInt: tier]];

@@ -194,7 +194,6 @@
         trackerString = [@"http://" stringByAppendingString: trackerString];
     
     //parse tracker string
-    #warning check if it works with https
     if (tr_httpParseURL([trackerString UTF8String], -1, NULL, NULL, NULL))
     {
         NSAlert * alert = [[[NSAlert alloc] init] autorelease];
