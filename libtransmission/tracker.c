@@ -721,17 +721,20 @@ invokeRequest( void * vreq )
 
     if( t )
     {
+        const time_t now = time( NULL );
+
         if( req->reqtype == TR_REQ_SCRAPE )
         {
-            t->lastScrapeTime = time( NULL );
+            t->lastScrapeTime = now;
             t->scrapeAt = 0;
         }
         else
         {
-            t->lastAnnounceTime = time( NULL );
+            t->lastAnnounceTime = now;
             t->reannounceAt = 0;
-            t->scrapeAt = 0;
-            t->manualAnnounceAllowedAt = ~(time_t)0;
+            t->scrapeAt = req->reqtype == TR_REQ_STOPPED
+                        ? now + t->scrapeIntervalSec + t->randOffset
+                        : 0;
         }
     }
 
