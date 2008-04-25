@@ -23,11 +23,13 @@
       LIBCURL_VERSION_PATCH >= (micro)))
 
 #if CURL_CHECK_VERSION(7,16,0)
-#define HAVE_CURL_MULTI_SOCKET
+#define USE_CURL_MULTI_SOCKET
 #else
 #define PULSE_MSEC 200
 static void pulse( int socket UNUSED, short action UNUSED, void * vweb );
 #endif
+
+#define dbgmsg(fmt...) tr_deepLog( __FILE__, __LINE__, "web", ##fmt )
 
 struct tr_web
 {
@@ -39,18 +41,17 @@ struct tr_web
 
 struct tr_web_task
 {
-    unsigned int tag;
+    unsigned long tag;
     struct evbuffer * response;
     tr_web_done_func * done_func;
     void * done_func_user_data;
 };
 
 static size_t
-writeFunc( void * ptr, size_t size, size_t nmemb, void * vtask )
+writeFunc( void * ptr, size_t size, size_t nmemb, void * task )
 {
     const size_t byteCount = size * nmemb;
-    struct tr_web_task * task = vtask;
-    evbuffer_add( task->response, ptr, byteCount );
+    evbuffer_add( ((struct tr_web_task*)task)->response, ptr, byteCount );
     return byteCount;
 }
 
@@ -58,14 +59,16 @@ static void
 pump( tr_web * web )
 {
     CURLMcode rc;
-    do {
-#ifdef HAVE_CURL_MULTI_SOCKET
+    do
+#ifdef USE_CURL_MULTI_SOCKET
         rc = curl_multi_socket_all( web->cm, &web->remain );
 #else
         rc = curl_multi_perform( web->cm, &web->remain );
 #endif
-fprintf( stderr, "remaining: %d\n", web->remain );
-    } while( rc == CURLM_CALL_MULTI_PERFORM );
+    while( rc == CURLM_CALL_MULTI_PERFORM );
+    dbgmsg( "%d tasks remain", web->remain );
+    if ( rc != CURLM_OK  )
+        tr_err( "%s", curl_multi_strerror(rc) );
 }
 
 void
@@ -74,7 +77,7 @@ tr_webRun( tr_session         * session,
            tr_web_done_func   * done_func,
            void               * done_func_user_data )
 {
-    static unsigned int tag = 0;
+    static unsigned long tag = 0;
     struct tr_web_task * task;
     struct tr_web * web = session->web;
     CURL * ch;
@@ -85,7 +88,7 @@ tr_webRun( tr_session         * session,
     task->tag = ++tag;
     task->response = evbuffer_new( );
 
-fprintf( stderr, "new web tag %u [%s]\n", task->tag, url );
+    dbgmsg( "adding task #%lu [%s]", task->tag, url );
     ++web->remain;
 
     ch = curl_easy_init( );
@@ -98,26 +101,25 @@ fprintf( stderr, "new web tag %u [%s]\n", task->tag, url );
 
     curl_multi_add_handle( web->cm, ch );
 
+#ifdef USE_CURL_MULTI_SOCKET
     pump( web );
-
-#ifndef HAVE_CURL_MULTI_SOCKET
+#else
     if( !evtimer_initialized( &web->timer ) )
-    {
-        struct timeval tv = tr_timevalMsec( PULSE_MSEC );
         evtimer_set( &web->timer, pulse, web );
-        fprintf( stderr, "no timer running yet... starting one\n" );
+    if( !evtimer_pending( &web->timer, NULL ) ) {
+        struct timeval tv = tr_timevalMsec( PULSE_MSEC );
         evtimer_add( &web->timer, &tv );
     }
 #endif
 }
 
 static void
-responseHandler( tr_web * web )
+processCompletedTasks( tr_web * web )
 {
-    int remaining = 0;
+    int more = 0;
 
     do {
-        CURLMsg * msg = curl_multi_info_read( web->cm, &remaining );
+        CURLMsg * msg = curl_multi_info_read( web->cm, &more );
         if( msg && ( msg->msg == CURLMSG_DONE ) )
         {
             CURL * ch;
@@ -131,7 +133,7 @@ responseHandler( tr_web * web )
             curl_easy_getinfo( ch, CURLINFO_PRIVATE, &task );
             curl_easy_getinfo( ch, CURLINFO_RESPONSE_CODE, &response_code );
 
-fprintf( stderr, "web task %u done\n", task->tag );
+            dbgmsg( "task #%lu done", task->tag );
             task->done_func( web->session,
                              response_code,
                              EVBUFFER_DATA(task->response),
@@ -145,15 +147,15 @@ fprintf( stderr, "web task %u done\n", task->tag );
             tr_free( task );
         }
     }
-    while( remaining );
+    while( more );
 
     /* remove timeout if there are no transfers left */
     if( !web->remain && evtimer_initialized( &web->timer ) )
         evtimer_del( &web->timer );
 }
 
-#ifdef HAVE_CURL_MULTI_SOCKET
-/* libevent says that sock is ready to be processed, so wake up libcurl */
+#ifdef USE_CURL_MULTI_SOCKET
+/* libevent says that sock is ready to be processed, so tell libcurl */
 static void
 event_callback( int sock, short action, void * vweb )
 {
@@ -161,18 +163,11 @@ event_callback( int sock, short action, void * vweb )
     CURLMcode rc;
     int mask;
 
-#if 0
-    static const char *strings[] = {
-        "NONE","TIMEOUT","READ","TIMEOUT|READ","WRITE","TIMEOUT|WRITE",
-        "READ|WRITE","TIMEOUT|READ|WRITE","SIGNAL" };
-    fprintf( stderr, "Event on socket %d (%s)\n", sock, strings[action] );
-#endif
-
     switch (action & (EV_READ|EV_WRITE)) {
         case EV_READ: mask = CURL_CSELECT_IN; break;
         case EV_WRITE: mask = CURL_CSELECT_OUT; break;
         case EV_READ|EV_WRITE: mask = CURL_CSELECT_IN|CURL_CSELECT_OUT; break;
-        default: tr_err( "Unknown event %d\n", (int)action ); return;
+        default: tr_err( "Unknown event %hd\n", action ); return;
     }
 
     do
@@ -182,7 +177,7 @@ event_callback( int sock, short action, void * vweb )
     if ( rc != CURLM_OK  )
         tr_err( "%s (%d)", curl_multi_strerror(rc), (int)sock );
 
-    responseHandler( web );
+    processCompletedTasks( web );
 }
 
 /* libcurl wants us to tell it when sock is ready to be processed */
@@ -204,13 +199,6 @@ socket_callback( CURL            * easy UNUSED,
         curl_multi_assign( web->cm, sock, ev );
     }
 
-#if 0
-    {
-        static const char *actions[] = {"NONE", "IN", "OUT", "INOUT", "REMOVE"};
-        fprintf( stderr, "Callback on socket %d (%s)\n", (int)sock, actions[action]);
-    }
-#endif
-
     switch (action) {
         case CURL_POLL_IN: events |= EV_READ; break;
         case CURL_POLL_OUT: events |= EV_WRITE; break;
@@ -225,17 +213,15 @@ socket_callback( CURL            * easy UNUSED,
     return 0;
 }
 
-/* libevent says that timeout_ms have passed, so wake up libcurl */
+/* libevent says that timeout_ms have passed, so tell libcurl */
 static void
 timeout_callback( int socket UNUSED, short action UNUSED, void * vweb )
 {
-    CURLMcode rc;
     tr_web * web = vweb;
+    CURLMcode rc;
 
-    do
-        rc = curl_multi_socket( web->cm, CURL_SOCKET_TIMEOUT, &web->remain );
+    do rc = curl_multi_socket( web->cm, CURL_SOCKET_TIMEOUT, &web->remain );
     while( rc == CURLM_CALL_MULTI_PERFORM );
-
     if( rc != CURLM_OK )
         tr_err( "%s", curl_multi_strerror( rc ) );
 }
@@ -261,7 +247,7 @@ pulse( int socket UNUSED, short action UNUSED, void * vweb )
     tr_web * web = vweb;
 
     pump( web );
-    responseHandler( web );
+    processCompletedTasks( web );
 
     if( web->remain > 0 ) {
         struct timeval tv = tr_timevalMsec( PULSE_MSEC );
@@ -289,9 +275,8 @@ tr_webInit( tr_session * session )
     web = tr_new0( struct tr_web, 1 );
     web->cm = curl_multi_init( );
     web->session = session;
-    web->remain = 0;
 
-#ifdef HAVE_CURL_MULTI_SOCKET
+#ifdef USE_CURL_MULTI_SOCKET
     curl_multi_setopt( web->cm, CURLMOPT_SOCKETDATA, web );
     curl_multi_setopt( web->cm, CURLMOPT_SOCKETFUNCTION, socket_callback );
     curl_multi_setopt( web->cm, CURLMOPT_TIMERDATA, web );

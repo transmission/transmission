@@ -16,8 +16,6 @@
 #include <stdio.h> /* printf */
 #include <limits.h> /* INT_MAX */
 
-#include <libgen.h> /* basename */
-
 #include <event.h>
 
 #include "transmission.h"
@@ -156,36 +154,7 @@ struct tr_peerMgr
     tr_ptrArray * incomingHandshakes; /* tr_handshake */
 };
 
-/**
-***
-**/
-
-static void
-myDebug( const char * file, int line, const Torrent * t, const char * fmt, ... )
-{
-    FILE * fp = tr_getLog( );
-    if( fp != NULL )
-    {
-        va_list args;
-        char timestr[64];
-        struct evbuffer * buf = evbuffer_new( );
-        char * myfile = tr_strdup( file );
-
-        evbuffer_add_printf( buf, "[%s] ", tr_getLogTimeStr( timestr, sizeof(timestr) ) );
-        if( t != NULL )
-            evbuffer_add_printf( buf, "%s ", t->tor->info.name );
-        va_start( args, fmt );
-        evbuffer_add_vprintf( buf, fmt, args );
-        va_end( args );
-        evbuffer_add_printf( buf, " (%s:%d)\n", basename(myfile), line );
-        fwrite( EVBUFFER_DATA(buf), 1, EVBUFFER_LENGTH(buf), fp );
-
-        tr_free( myfile );
-        evbuffer_free( buf );
-    }
-}
-
-#define tordbg(t, fmt...) myDebug(__FILE__, __LINE__, t, ##fmt )
+#define tordbg(t, fmt...) tr_deepLog( __FILE__, __LINE__, t->tor->info.name, ##fmt )
 
 /**
 ***
@@ -1111,8 +1080,6 @@ tr_peerMgrAddIncoming( tr_peerMgr      * manager,
     {
         tr_peerIo * io;
         tr_handshake * handshake;
-
-        tordbg( NULL, "Got an INCOMING connection with %s", tr_peerIoAddrStr( addr, port ) );
 
         io = tr_peerIoNewIncoming( manager->handle, addr, port, socket );
 

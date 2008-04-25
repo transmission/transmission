@@ -54,8 +54,10 @@ void tr_msgInit( void );
 #define tr_err( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, NULL, ## a )
 #define tr_inf( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, NULL, ## a )
 #define tr_dbg( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, NULL, ## a )
-void tr_msg  ( const char * file, int line, int level, const char * torrent, const char * msg, ... );
+void tr_msg  ( const char * file, int line, int level, const char * torrent, const char * fmt, ... );
 FILE* tr_getLog( void );
+
+void tr_deepLog( const char * file, int line, const char * name, const char * fmt, ... ); 
 
 char* tr_getLogTimeStr( char * buf, int buflen );
 

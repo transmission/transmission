@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h> /* strerror */
 
+#include <libgen.h> /* basename */
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -81,30 +82,6 @@ tr_getLog( void )
     }
 
     return file;
-}
-
-char*
-tr_getLogTimeStr( char * buf, int buflen )
-{
-    char tmp[64];
-    time_t now;
-    struct tm now_tm;
-    struct timeval tv;
-    int milliseconds;
-
-    now = time( NULL );
-    gettimeofday( &tv, NULL );
-
-#ifdef WIN32
-    now_tm = *localtime( &now );
-#else
-    localtime_r( &now, &now_tm );
-#endif
-    strftime( tmp, sizeof(tmp), "%H:%M:%S", &now_tm );
-    milliseconds = (int)(tv.tv_usec / 1000);
-    snprintf( buf, buflen, "%s.%03d", tmp, milliseconds );
-
-    return buf;
 }
 
 void
@@ -167,6 +144,63 @@ tr_freeMessageList( tr_msg_list * list )
         list = next;
     }
 }
+
+/**
+***
+**/
+
+char*
+tr_getLogTimeStr( char * buf, int buflen )
+{
+    char tmp[64];
+    time_t now;
+    struct tm now_tm;
+    struct timeval tv;
+    int milliseconds;
+
+    now = time( NULL );
+    gettimeofday( &tv, NULL );
+
+#ifdef WIN32
+    now_tm = *localtime( &now );
+#else
+    localtime_r( &now, &now_tm );
+#endif
+    strftime( tmp, sizeof(tmp), "%H:%M:%S", &now_tm );
+    milliseconds = (int)(tv.tv_usec / 1000);
+    snprintf( buf, buflen, "%s.%03d", tmp, milliseconds );
+
+    return buf;
+}
+
+void
+tr_deepLog( const char * file, int line, const char * name, const char * fmt, ... )
+{
+    FILE * fp = tr_getLog( );
+    if( fp != NULL )
+    {
+        va_list args;
+        char timestr[64];
+        struct evbuffer * buf = evbuffer_new( );
+        char * myfile = tr_strdup( file );
+
+        evbuffer_add_printf( buf, "[%s] ", tr_getLogTimeStr( timestr, sizeof(timestr) ) );
+        if( name )
+            evbuffer_add_printf( buf, "%s ", name );
+        va_start( args, fmt );
+        evbuffer_add_vprintf( buf, fmt, args );
+        va_end( args );
+        evbuffer_add_printf( buf, " (%s:%d)\n", basename(myfile), line );
+        fwrite( EVBUFFER_DATA(buf), 1, EVBUFFER_LENGTH(buf), fp );
+
+        tr_free( myfile );
+        evbuffer_free( buf );
+    }
+}
+
+/***
+****
+***/
 
 int
 tr_vasprintf( char **strp, const char *fmt, va_list ap )

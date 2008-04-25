@@ -14,7 +14,6 @@
 #include <stdio.h> /* snprintf */
 #include <stdlib.h>
 #include <string.h> /* strcmp, strchr */
-#include <libgen.h> /* basename */
 
 #include <event.h>
 
@@ -126,36 +125,7 @@ struct tr_tracker
     long lastAnnounceResponse;
 };
 
-/**
-***
-**/
-
-static void
-myDebug( const char * file, int line, const tr_tracker * t, const char * fmt, ... )
-{   
-    FILE * fp = tr_getLog( );
-    if( fp != NULL )
-    {
-        va_list args;
-        char timestr[64];
-        struct evbuffer * buf = evbuffer_new( );
-        char * myfile = tr_strdup( file );
-
-        evbuffer_add_printf( buf, "[%s] ", tr_getLogTimeStr( timestr, sizeof(timestr) ) );
-        if( t )
-            evbuffer_add_printf( buf, "%s ", t->name );
-        va_start( args, fmt );
-        evbuffer_add_vprintf( buf, fmt, args );
-        va_end( args );
-        evbuffer_add_printf( buf, " (%s:%d)\n", basename(myfile), line );
-        fwrite( EVBUFFER_DATA(buf), 1, EVBUFFER_LENGTH(buf), fp );
-
-        tr_free( myfile );
-        evbuffer_free( buf );
-    }
-}
-
-#define dbgmsg(t, fmt...) myDebug(__FILE__, __LINE__, t, ##fmt )
+#define dbgmsg(name, fmt...) tr_deepLog(__FILE__, __LINE__, name, ##fmt )
 
 /***
 ****
@@ -365,7 +335,7 @@ onTrackerResponse( tr_session    * session,
     if( !t ) /* tracker's been closed */
         return;
 
-    dbgmsg( t, "tracker response: %d", responseCode );
+    dbgmsg( t->name, "tracker response: %d", responseCode );
     tr_ndbg( t->name, "tracker response: %d", responseCode );
     t->lastAnnounceResponse = responseCode;
 
@@ -388,12 +358,12 @@ onTrackerResponse( tr_session    * session,
                 publishWarning( t, str );
 
             if(( tr_bencDictFindInt( &benc, "interval", &i ))) {
-                dbgmsg( t, "setting interval to %d", (int)i );
+                dbgmsg( t->name, "setting interval to %d", (int)i );
                 t->announceIntervalSec = i;
             }
 
             if(( tr_bencDictFindInt( &benc, "min interval", &i ))) {
-                dbgmsg( t, "setting min interval to %d", (int)i );
+                dbgmsg( t->name, "setting min interval to %d", (int)i );
                 t->announceMinIntervalSec = i;
             }
 
@@ -440,7 +410,7 @@ onTrackerResponse( tr_session    * session,
     if( 200<=responseCode && responseCode<=299 )
     {
         const int interval = t->announceIntervalSec + t->randOffset;
-        dbgmsg( t, "request succeeded. reannouncing in %d seconds", interval );
+        dbgmsg( t->name, "request succeeded. reannouncing in %d seconds", interval );
         t->reannounceAt = time( NULL ) + interval;
         t->manualAnnounceAllowedAt = time( NULL ) + t->announceMinIntervalSec;
     }
@@ -449,7 +419,7 @@ onTrackerResponse( tr_session    * session,
         /* it's a redirect... updateAddresses() has already
          * parsed the redirect, all that's left is to retry */
         const int interval = 5;
-        dbgmsg( t, "got a redirect. retrying in %d seconds", interval );
+        dbgmsg( t->name, "got a redirect. retrying in %d seconds", interval );
         t->reannounceAt = time( NULL ) + interval;
         t->manualAnnounceAllowedAt = time( NULL ) + t->announceMinIntervalSec;
     }
@@ -474,7 +444,7 @@ onTrackerResponse( tr_session    * session,
     else
     {
         /* WTF did we get?? */
-        dbgmsg( t, "Invalid response from tracker... retrying in two minutes." );
+        dbgmsg( t->name, "Invalid response from tracker... retrying in two minutes." );
         t->manualAnnounceAllowedAt = ~(time_t)0;
         t->reannounceAt = time( NULL ) + t->randOffset + 120;
     }
@@ -496,7 +466,7 @@ onScrapeResponse( tr_session   * session,
     if( !t ) /* tracker's been closed... */
         return;
 
-    dbgmsg( t, "scrape response: %ld\n", responseCode );
+    dbgmsg( t->name, "scrape response: %ld\n", responseCode );
     tr_ndbg( t->name, "scrape response: %d", responseCode );
     t->lastScrapeResponse = responseCode;
 
@@ -555,20 +525,20 @@ onScrapeResponse( tr_session   * session,
     if( 200<=responseCode && responseCode<=299 )
     {
         const int interval = t->scrapeIntervalSec + t->randOffset;
-        dbgmsg( t, "request succeeded. rescraping in %d seconds", interval );
+        dbgmsg( t->name, "request succeeded. rescraping in %d seconds", interval );
         tr_ndbg( t->name, "request succeeded. rescraping in %d seconds", interval );
         t->scrapeAt = time( NULL ) + interval;
     }
     else if( 300<=responseCode && responseCode<=399 )
     {
         const int interval = 5;
-        dbgmsg( t, "got a redirect. retrying in %d seconds", interval );
+        dbgmsg( t->name, "got a redirect. retrying in %d seconds", interval );
         t->scrapeAt = time( NULL ) + interval;
     }
     else
     {
         const int interval = t->retryScrapeIntervalSec + t->randOffset;
-        dbgmsg( t, "Tracker responded to scrape with %d.  Retrying in %d seconds.",
+        dbgmsg( t->name, "Tracker responded to scrape with %d.  Retrying in %d seconds.",
                    responseCode,  interval );
         t->retryScrapeIntervalSec *= 2;
         t->scrapeAt = time( NULL ) + interval;

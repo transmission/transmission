@@ -40,7 +40,7 @@
 #include <sys/resource.h> /* getrlimit */
 #endif
 #include <unistd.h>
-#include <libgen.h> /* basename, dirname */
+#include <libgen.h> /* dirname */
 #include <fcntl.h> /* O_LARGEFILE */
 
 #include <event.h>
@@ -59,34 +59,7 @@
 #define TR_UINT_TO_PTR(i) ((void*)((uint32_t)i))
 #endif
 
-/**
-***
-**/
-
-static void
-myDebug( const char * file, int line, const char * fmt, ... )
-{
-    FILE * fp = tr_getLog( );
-    if( fp != NULL )
-    {
-        va_list args;
-        char s[64];
-        struct evbuffer * buf = evbuffer_new( );
-        char * myfile = tr_strdup( file );
-
-        evbuffer_add_printf( buf, "[%s] ", tr_getLogTimeStr( s, sizeof(s) ) );
-        va_start( args, fmt );
-        evbuffer_add_vprintf( buf, fmt, args );
-        va_end( args );
-        evbuffer_add_printf( buf, " (%s:%d)\n", basename(myfile), line );
-        fwrite( EVBUFFER_DATA(buf), 1, EVBUFFER_LENGTH(buf), fp );
-
-        tr_free( myfile );
-        evbuffer_free( buf );
-    }
-}
-
-#define dbgmsg(fmt...) myDebug(__FILE__, __LINE__, ##fmt )
+#define dbgmsg(fmt...) tr_deepLog( __FILE__, __LINE__, NULL, ##fmt )
 
 /**
 ***

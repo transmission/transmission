@@ -16,7 +16,6 @@
 #include <limits.h> /* UCHAR_MAX */
 #include <string.h>
 #include <stdio.h>
-#include <libgen.h> /* basename */
 
 #include <event.h>
 
@@ -134,32 +133,7 @@ enum
 ***
 **/
 
-static void
-myDebug( const char * file, int line, const tr_handshake * handshake, const char * fmt, ... )
-{
-    FILE * fp = tr_getLog( );
-    if( fp != NULL )
-    {
-        va_list args;
-        char timestr[64];
-        struct evbuffer * buf = evbuffer_new( );
-        char * myfile = tr_strdup( file );
-
-        evbuffer_add_printf( buf, "[%s] %s: ",
-                             tr_getLogTimeStr( timestr, sizeof(timestr) ),
-                             tr_peerIoGetAddrStr( handshake->io ) );
-        va_start( args, fmt );
-        evbuffer_add_vprintf( buf, fmt, args );
-        va_end( args );
-        evbuffer_add_printf( buf, " (%s:%d)\n", basename(myfile), line );
-        fwrite( EVBUFFER_DATA(buf), 1, EVBUFFER_LENGTH(buf), fp );
-
-        tr_free( myfile );
-        evbuffer_free( buf );
-    }
-}
-
-#define dbgmsg(handshake, fmt...) myDebug(__FILE__, __LINE__, handshake, ##fmt )
+#define dbgmsg(handshake, fmt...) tr_deepLog( __FILE__, __LINE__, tr_peerIoGetAddrStr( handshake->io ), ##fmt )
 
 static const char* getStateName( short state )
 {
