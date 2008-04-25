@@ -954,7 +954,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) controlTextDidChange: (NSNotification *) notification
 {
-    [fURLSheetOpenButton setEnabled: ![[fURLSheetTextField stringValue] isEqual: @""]];
+    [fURLSheetOpenButton setEnabled: ![[fURLSheetTextField stringValue] isEqualToString: @""]];
 }
 
 - (void) urlSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo
@@ -964,27 +964,24 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         return;
     
     NSString * urlString = [fURLSheetTextField stringValue];
-    if (![urlString isEqualToString: @""])
+    if ([urlString rangeOfString: @"://"].location == NSNotFound)
     {
-        if ([urlString rangeOfString: @"://"].location == NSNotFound)
+        if ([urlString rangeOfString: @"."].location == NSNotFound)
         {
-            if ([urlString rangeOfString: @"."].location == NSNotFound)
-            {
-                int beforeCom;
-                if ((beforeCom = [urlString rangeOfString: @"/"].location) != NSNotFound)
-                    urlString = [NSString stringWithFormat: @"http://www.%@.com/%@",
-                                    [urlString substringToIndex: beforeCom],
-                                    [urlString substringFromIndex: beforeCom + 1]];
-                else
-                    urlString = [NSString stringWithFormat: @"http://www.%@.com/", urlString];
-            }
+            int beforeCom;
+            if ((beforeCom = [urlString rangeOfString: @"/"].location) != NSNotFound)
+                urlString = [NSString stringWithFormat: @"http://www.%@.com/%@",
+                                [urlString substringToIndex: beforeCom],
+                                [urlString substringFromIndex: beforeCom + 1]];
             else
-                urlString = [@"http://" stringByAppendingString: urlString];
+                urlString = [NSString stringWithFormat: @"http://www.%@.com/", urlString];
         }
-        
-        NSURL * url = [NSURL URLWithString: urlString];
-        [self performSelectorOnMainThread: @selector(openURL:) withObject: url waitUntilDone: NO];
+        else
+            urlString = [@"http://" stringByAppendingString: urlString];
     }
+    
+    NSURL * url = [NSURL URLWithString: urlString];
+    [self performSelectorOnMainThread: @selector(openURL:) withObject: url waitUntilDone: NO];
 }
 
 - (void) createFile: (id) sender
