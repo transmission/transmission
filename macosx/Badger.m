@@ -87,15 +87,10 @@
     if ([NSApp isOnLeopardOrBetter])
     {
         float downloadRate = 0.0, uploadRate = 0.0;
-        BOOL checkDownload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"],
-            checkUpload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"];
-        if (checkDownload || checkUpload)
-        {
-            tr_torrentRates(fLib, &downloadRate, &uploadRate);
-            
-            downloadRate = checkDownload ? downloadRate : 0.0;
-            uploadRate = checkUpload ? uploadRate : 0.0;
-        }
+        BOOL badgeDownload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"],
+            badgeUpload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"];
+        if (badgeDownload || badgeUpload)
+            tr_torrentRates(fLib, badgeDownload ? &downloadRate : NULL, badgeUpload ? &uploadRate : NULL);
         
         //only update if the badged values change
         if ([(BadgeView *)[[NSApp dockTile] contentView] setRatesWithDownload: downloadRate upload: uploadRate])
