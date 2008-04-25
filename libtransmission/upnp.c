@@ -14,7 +14,6 @@
 #include <errno.h>
 #include <stdio.h> /* snprintf */
 
-#include <miniupnp/miniwget.h>
 #include <miniupnp/miniupnpc.h>
 #include <miniupnp/upnpcommands.h>
 

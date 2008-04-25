@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 #include <stdlib.h> /* bsearch */
@@ -306,6 +306,14 @@ tr_webInit( tr_session * session )
     pump( web );
 
     return web;
+}
+
+void
+tr_webClose( tr_web * web )
+{
+    evtimer_del( &web->timer );
+    curl_multi_cleanup( web->cm );
+    tr_free( web );
 }
 
 /***

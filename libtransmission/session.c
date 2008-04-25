@@ -390,6 +390,7 @@ tr_closeImpl( void * vh )
     tr_handle * h = vh;
     tr_torrent * t;
 
+    tr_webClose( h->web );
     tr_sharedShuttingDown( h->shared );
     tr_trackerShuttingDown( h );
 

@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 #ifndef TR_HTTP_H
@@ -17,6 +17,8 @@ struct tr_handle;
 typedef struct tr_web tr_web;
 
 tr_web* tr_webInit( tr_handle * session );
+
+void tr_webClose( tr_web * );
 
 typedef void (tr_web_done_func)( tr_handle    * session,
                                   long          response_code,
