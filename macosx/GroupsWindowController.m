@@ -140,7 +140,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     return NSDragOperationNone;
 }
 
-- (BOOL) tableView: (NSTableView *) t acceptDrop: (id <NSDraggingInfo>) info row: (int) newRow
+- (BOOL) tableView: (NSTableView *) tableView acceptDrop: (id <NSDraggingInfo>) info row: (int) newRow
     dropOperation: (NSTableViewDropOperation) operation
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];

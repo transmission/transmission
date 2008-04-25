@@ -99,6 +99,7 @@ typedef enum
     
     IBOutlet NSWindow               * fURLSheetWindow;
     IBOutlet NSTextField            * fURLSheetTextField;
+    IBOutlet NSButton               * fURLSheetOpenButton;
 
     io_connect_t                    fRootPort;
     NSTimer                         * fTimer;

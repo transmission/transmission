@@ -337,7 +337,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //register for sleep notifications
     IONotificationPortRef notify;
     io_object_t iterator;
-    if ((fRootPort = IORegisterForSystemPower(self, & notify, sleepCallBack, & iterator)) != 0)
+    if ((fRootPort = IORegisterForSystemPower(self, & notify, sleepCallBack, &iterator)))
         CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(notify), kCFRunLoopCommonModes);
     else
         NSLog(@"Could not IORegisterForSystemPower");
@@ -952,13 +952,17 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [NSApp endSheet: fURLSheetWindow returnCode: 0];
 }
 
+- (void) controlTextDidChange: (NSNotification *) notification
+{
+    [fURLSheetOpenButton setEnabled: ![[fURLSheetTextField stringValue] isEqual: @""]];
+}
+
 - (void) urlSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo
 {
     [fURLSheetTextField selectText: self];
     if (returnCode != 1)
         return;
     
-    #warning disable OK button when blank
     NSString * urlString = [fURLSheetTextField stringValue];
     if (![urlString isEqualToString: @""])
     {
@@ -2380,7 +2384,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     fSoundPlaying = NO;
 }
 
--(void) watcher: (id<UKFileWatcher>) watcher receivedNotification: (NSString *) notification forPath: (NSString *) path
+- (void) watcher: (id<UKFileWatcher>) watcher receivedNotification: (NSString *) notification forPath: (NSString *) path
 {
     if ([notification isEqualToString: UKFileWatcherWriteNotification])
     {
@@ -3676,31 +3680,25 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     NSEnumerator * enumerator;
     Torrent * torrent;
-    BOOL allowSleep;
 
     switch (messageType)
     {
         case kIOMessageSystemWillSleep:
-            //close all connections before going to sleep and remember we should resume when we wake up
-            [fTorrents makeObjectsPerformSelector: @selector(sleep)];
-
-            //wait for running transfers to stop (5 second timeout)
-            NSDate * start = [NSDate date];
-            BOOL timeUp = NO;
-            
+            //if there are any running transfers, wait 15 seconds for them to stop
             enumerator = [fTorrents objectEnumerator];
-            while (!timeUp && (torrent = [enumerator nextObject]))
-                while ([torrent isActive] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
+            while ((torrent = [enumerator nextObject]))
+                if ([torrent isActive])
                 {
-                    usleep(100000);
-                    [torrent update];
+                    //stop all transfers (since some are active) before going to sleep and remember to resume when we wake up
+                    [fTorrents makeObjectsPerformSelector: @selector(sleep)];
+                    sleep(15);
+                    break;
                 }
 
             IOAllowPowerChange(fRootPort, (long) messageArgument);
             break;
 
         case kIOMessageCanSystemSleep:
-            allowSleep = YES;
             if ([fDefaults boolForKey: @"SleepPrevent"])
             {
                 //prevent idle sleep unless no torrents are active
@@ -3708,15 +3706,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 while ((torrent = [enumerator nextObject]))
                     if ([torrent isActive] && ![torrent isStalled] && ![torrent isError])
                     {
-                        allowSleep = NO;
-                        break;
+                        IOCancelPowerChange(fRootPort, (long) messageArgument);
+                        return;
                     }
             }
 
-            if (allowSleep)
-                IOAllowPowerChange(fRootPort, (long) messageArgument);
-            else
-                IOCancelPowerChange(fRootPort, (long) messageArgument);
+            IOAllowPowerChange(fRootPort, (long) messageArgument);
             break;
 
         case kIOMessageSystemHasPoweredOn:

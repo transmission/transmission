@@ -1633,6 +1633,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fFinishedSeeding = NO;
     
     fWaitToStart = waitToStart && [waitToStart boolValue];
+    fResumeOnWake = NO;
     
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(lib) - 1;
     fGroupValue = groupValue ? [groupValue intValue] : -1;
