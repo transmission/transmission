@@ -137,6 +137,12 @@ addTask( void * vtask )
     curl_easy_setopt( ch, CURLOPT_WRITEDATA, task );
     curl_easy_setopt( ch, CURLOPT_USERAGENT, TR_NAME "/" LONG_VERSION_STRING );
     curl_easy_setopt( ch, CURLOPT_SSL_VERIFYPEER, 0 );
+    curl_easy_setopt( ch, CURLOPT_FORBID_REUSE, 1 );
+    curl_easy_setopt( ch, CURLOPT_NOSIGNAL, 1 );
+    curl_easy_setopt( ch, CURLOPT_FOLLOWLOCATION, 1 );
+    curl_easy_setopt( ch, CURLOPT_MAXREDIRS, 5 );
+    curl_easy_setopt( ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+    curl_easy_setopt( ch, CURLOPT_ENCODING, "" );
     curl_multi_add_handle( web->cm, ch );
 
     pump( web );
