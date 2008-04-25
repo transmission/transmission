@@ -997,18 +997,19 @@ void
 tr_trackerStat( const tr_tracker       * t,
                 struct tr_tracker_stat * setme)
 {
-    assert( t != NULL );
-    assert( setme != NULL );
+    assert( t );
+    assert( setme );
 
     snprintf( setme->scrapeResponse,
               sizeof( setme->scrapeResponse ),
-              "%ld", t->lastScrapeResponse );
+              "%s (%ld)", tr_webGetResponseStr( t->lastScrapeResponse ), t->lastScrapeResponse );
+
     setme->lastScrapeTime = t->lastScrapeTime;
     setme->nextScrapeTime = t->scrapeAt;
 
     snprintf( setme->announceResponse,
               sizeof( setme->announceResponse ),
-              "%ld", t->lastAnnounceResponse );
+              "%s (%ld)", tr_webGetResponseStr( t->lastAnnounceResponse ), t->lastAnnounceResponse );
 
     setme->lastAnnounceTime = t->lastAnnounceTime;
     setme->nextAnnounceTime = t->reannounceAt;

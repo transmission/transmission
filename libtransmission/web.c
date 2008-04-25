@@ -9,6 +9,8 @@
  * $Id:$
  */
 
+#include <stdlib.h> /* bsearch */
+
 #include <event.h>
 #include <curl/curl.h>
 
@@ -98,6 +100,7 @@ tr_webRun( tr_session         * session,
     curl_easy_setopt( ch, CURLOPT_WRITEDATA, task );
     curl_easy_setopt( ch, CURLOPT_USERAGENT, TR_NAME "/" LONG_VERSION_STRING );
     curl_easy_setopt( ch, CURLOPT_SSL_VERIFYPEER, 0 );
+    curl_easy_setopt( ch, CURLOPT_TIMEOUT, 30 );
 
     curl_multi_add_handle( web->cm, ch );
 
@@ -128,7 +131,7 @@ processCompletedTasks( tr_web * web )
 
             if( msg->data.result != CURLE_OK )
                 tr_err( "%s", curl_easy_strerror( msg->data.result ) );
-			
+            
             ch = msg->easy_handle;
             curl_easy_getinfo( ch, CURLINFO_PRIVATE, &task );
             curl_easy_getinfo( ch, CURLINFO_RESPONSE_CODE, &response_code );
@@ -290,4 +293,74 @@ tr_webInit( tr_session * session )
 #endif
 
     return web;
+}
+
+/***
+****
+***/
+
+static struct http_msg {
+    long code;
+    const char * text;
+} http_msg[] = {
+    { 101, "Switching Protocols" },
+    { 200, "OK" },
+    { 201, "Created" },
+    { 202, "Accepted" },
+    { 203, "Non-Authoritative Information" },
+    { 204, "No Content" },
+    { 205, "Reset Content" },
+    { 206, "Partial Content" },
+    { 300, "Multiple Choices" },
+    { 301, "Moved Permanently" },
+    { 302, "Found" },
+    { 303, "See Other" },
+    { 304, "Not Modified" },
+    { 305, "Use Proxy" },
+    { 306, "(Unused)" },
+    { 307, "Temporary Redirect" },
+    { 400, "Bad Request" },
+    { 401, "Unauthorized" },
+    { 402, "Payment Required" },
+    { 403, "Forbidden" },
+    { 404, "Not Found" },
+    { 405, "Method Not Allowed" },
+    { 406, "Not Acceptable" },
+    { 407, "Proxy Authentication Required" },
+    { 408, "Request Timeout" },
+    { 409, "Conflict" },
+    { 410, "Gone" },
+    { 411, "Length Required" },
+    { 412, "Precondition Failed" },
+    { 413, "Request Entity Too Large" },
+    { 414, "Request-URI Too Long" },
+    { 415, "Unsupported Media Type" },
+    { 416, "Requested Range Not Satisfiable" },
+    { 417, "Expectation Failed" },
+    { 500, "Internal Server Error" },
+    { 501, "Not Implemented" },
+    { 502, "Bad Gateway" },
+    { 503, "Service Unavailable" },
+    { 504, "Gateway Timeout" },
+    { 505, "HTTP Version Not Supported" },
+    { 0, NULL }
+};
+
+static int
+compareResponseCodes( const void * va, const void * vb )
+{
+    const long a = *(const long*) va;
+    const struct http_msg * b = vb;
+    return a - b->code;
+}
+
+const char *
+tr_webGetResponseStr( long code )
+{
+    struct http_msg * msg = bsearch( &code,
+                                     http_msg, 
+                                     sizeof( http_msg ) / sizeof( http_msg[0] ),
+                                     sizeof( http_msg[0] ),
+                                     compareResponseCodes );
+    return msg ? msg->text : "Unknown Error";
 }

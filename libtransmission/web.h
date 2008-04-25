@@ -23,6 +23,8 @@ typedef void (tr_web_done_func)( tr_handle    * session,
                                   const void  * response,
                                   size_t        response_byte_count,
                                   void        * user_data );
+
+const char * tr_webGetResponseStr( long response_code );
                                
 void tr_webRun( tr_handle          * session,
                 const char         * url,
