@@ -279,7 +279,7 @@ tr_msg( const char * file, int line, int level,
             {
                 if( fp == NULL )
                     fp = stderr;
-                fprintf( stderr, "%s\n", text );
+                fprintf( fp, "%s\n", text );
                 tr_free( text );
                 fflush( fp );
             }
