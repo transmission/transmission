@@ -859,6 +859,8 @@ tr_trackerNew( const tr_torrent * torrent )
     t->timesDownloaded          = -1;
     t->seederCount              = -1;
     t->leecherCount             = -1;
+    t->lastAnnounceResponse     = -1;
+    t->lastScrapeResponse       = -1;
     t->manualAnnounceAllowedAt  = ~(time_t)0;
     t->name = tr_strdup( info->name );
     t->randOffset = tr_rand( 120 );
@@ -1000,18 +1002,27 @@ tr_trackerStat( const tr_tracker       * t,
     assert( t );
     assert( setme );
 
-    snprintf( setme->scrapeResponse,
-              sizeof( setme->scrapeResponse ),
-              "%s (%ld)", tr_webGetResponseStr( t->lastScrapeResponse ), t->lastScrapeResponse );
-
     setme->lastScrapeTime = t->lastScrapeTime;
     setme->nextScrapeTime = t->scrapeAt;
-
-    snprintf( setme->announceResponse,
-              sizeof( setme->announceResponse ),
-              "%s (%ld)", tr_webGetResponseStr( t->lastAnnounceResponse ), t->lastAnnounceResponse );
-
     setme->lastAnnounceTime = t->lastAnnounceTime;
     setme->nextAnnounceTime = t->reannounceAt;
     setme->nextManualAnnounceTime = t->manualAnnounceAllowedAt;
+
+    if( t->lastScrapeResponse == -1 ) /* never been scraped */
+        *setme->scrapeResponse = '\0';
+    else
+        snprintf( setme->scrapeResponse,
+                  sizeof( setme->scrapeResponse ),
+                  "%s (%ld)",
+                  tr_webGetResponseStr( t->lastScrapeResponse ),
+                  t->lastScrapeResponse );
+
+    if( t->lastAnnounceResponse == -1 ) /* never been announced */
+        *setme->announceResponse = '\0';
+    else
+        snprintf( setme->announceResponse,
+                  sizeof( setme->announceResponse ),
+                  "%s (%ld)",
+                  tr_webGetResponseStr( t->lastAnnounceResponse ),
+                  t->lastAnnounceResponse );
 }
