@@ -980,7 +980,6 @@ tr_trackerCompleted( tr_tracker * t )
 void
 tr_trackerStop( tr_tracker * t )
 {
-fprintf( stderr, "trackerStop... isRunning %d\n", (int)t->isRunning );
     if( t && t->isRunning ) {
         t->isRunning = 0;
         t->reannounceAt = t->manualAnnounceAllowedAt = 0;
