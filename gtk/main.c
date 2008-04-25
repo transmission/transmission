@@ -285,7 +285,7 @@ main( int argc, char ** argv )
 {
     gboolean do_inhibit;
     guint inhibit_cookie;
-    char * err;
+    char * err = NULL;
     struct cbdata * cbdata;
     GSList * argfiles;
     GError * gerr;
