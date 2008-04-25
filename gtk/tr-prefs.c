@@ -14,9 +14,9 @@
 #include <unistd.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
-#include <third-party/miniupnp/miniwget.h>
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/web.h>
 #include "conf.h"
 #include "hig.h"
 #include "tr-core.h"
@@ -177,46 +177,48 @@ struct test_port_data
     gboolean * alive;
 };
 
-static gpointer
-test_port( gpointer data_gpointer )
+static void
+testing_port_done( tr_handle   * handle         UNUSED,
+                   long          response_code  UNUSED,
+                   const void  * response,
+                   size_t        response_len,
+                   void        * gdata )
 {
-    struct test_port_data * data = data_gpointer;
-
+    struct test_port_data * data = gdata;
     if( *data->alive )
     {
-        GObject * o = G_OBJECT( data->label );
-        GtkSpinButton * spin = g_object_get_data( o, "tr-port-spin" );
-        const int port = gtk_spin_button_get_value_as_int( spin );
-        int isOpen;
-        int size;
-        char * text;
-        char url[256];
-
-        g_usleep( G_USEC_PER_SEC * 3 ); /* give portmapping time to kick in */
-        snprintf( url, sizeof(url), "http://portcheck.transmissionbt.com/%d", port );
-        text = miniwget( url, &size );
-        /*g_message(" got len %d, [%*.*s]", size, size, size, text );*/
-        isOpen = text && *text=='1';
-        free( text );
-
-        if( *data->alive )
-            gtk_label_set_markup( GTK_LABEL(data->label), isOpen
-                ? _("Port is <b>open</b>")
-                : _("Port is <b>closed</b>") );
+        const int isOpen = response_len && *(char*)response=='1';
+        gtk_label_set_markup( GTK_LABEL( data->label ), isOpen
+                              ? _("Port is <b>open</b>")
+                              : _("Port is <b>closed</b>") );
     }
+}
 
-    g_free( data );
-    return NULL;
+static gboolean
+testing_port_begin( gpointer gdata )
+{
+    struct test_port_data * data = gdata;
+    if( *data->alive )
+    {
+        GtkSpinButton * spin = g_object_get_data( G_OBJECT( data->label ), "tr-port-spin" );
+        tr_handle * handle = g_object_get_data( G_OBJECT( data->label ), "handle" );
+        const int port = gtk_spin_button_get_value_as_int( spin );
+        char url[256];
+        snprintf( url, sizeof(url), "http://portcheck.transmissionbt.com/%d", port );
+        gtk_label_set_markup( GTK_LABEL( data->label ), _( "<i>Testing port...</i>" ) );
+        tr_webRun( handle, url, testing_port_done, data );
+    }
+    return FALSE;
 }
 
 static void
 testing_port_cb( GtkWidget * unused UNUSED, gpointer l )
 {
+    /* wait three seconds to give the port forwarding time to kick in */
     struct test_port_data * data = g_new0( struct test_port_data, 1 );
-    data->alive = g_object_get_data( G_OBJECT( l ), "alive" );
     data->label = l;
-    gtk_label_set_markup( GTK_LABEL(l), _( "<i>Testing port...</i>" ) );
-    g_thread_create( test_port, data, FALSE, NULL );
+    data->alive = g_object_get_data( G_OBJECT( l ), "alive" );
+    g_timeout_add( 3000, testing_port_begin, data );
 }
 
 static void
@@ -316,35 +318,30 @@ blocklistDialogAllowClose( gpointer dialog )
     return FALSE;
 }
 
-static gpointer
-updateBlocklist( gpointer vdata )
+static void
+got_blocklist( tr_handle   * handle         UNUSED,
+               long          response_code  UNUSED,
+               const void  * response,
+               size_t        response_len,
+               void        * gdata )
 {
-    struct blocklist_data * data = vdata;
-    int size = 0;
+    struct blocklist_data * data = gdata;
+    const char * text = response;
+    int size = response_len;
     int rules = 0;
-    const char * url;
-    char * text = NULL;
     gchar * filename = NULL;
     gchar * filename2 = NULL;
     int fd = -1;
     int ok = 1;
 
-    url = "http://download.m0k.org/transmission/files/level1.gz";
-
-    if( ok && !data->abortFlag )
+    if( !data->abortFlag && ( !text || !size ) )
     {
+        ok = FALSE;
         g_snprintf( data->secondary, sizeof( data->secondary ),
-                    _( "Retrieving blocklist..." ) );
+                    _( "Unable to get blocklist." ) );
+        g_message( data->secondary );
         g_idle_add( blocklistDialogSetSecondary, data );
-        text = miniwget( url, &size );
-        if( !data->abortFlag && ( !text || !size ) ) {
-            ok = FALSE;
-            g_snprintf( data->secondary, sizeof( data->secondary ),
-                        _( "Unable to get blocklist." ) );
-            g_message( data->secondary );
-            g_idle_add( blocklistDialogSetSecondary, data );
-        }      
-    }
+    }      
 
     if( ok && !data->abortFlag )
     {
@@ -389,7 +386,6 @@ updateBlocklist( gpointer vdata )
         g_idle_add( updateBlocklistTextFromData, data );
     }
 
-    free( text );
     /* g_free( data ); */
     if( filename2 ) {
         unlink( filename2 );
@@ -399,7 +395,6 @@ updateBlocklist( gpointer vdata )
         unlink( filename );
         g_free( filename );
     }
-    return NULL;
 }
 
 static void
@@ -419,12 +414,16 @@ onUpdateBlocklistCB( GtkButton * w, gpointer gdata )
 {
     GtkWidget * d;
     struct blocklist_data * data = gdata;
+    tr_handle * handle = g_object_get_data( G_OBJECT( w ), "handle" );
+    const char * url = "http://download.m0k.org/transmission/files/level1.gz";
     
     d = gtk_message_dialog_new( GTK_WINDOW( gtk_widget_get_toplevel( GTK_WIDGET( w ) ) ),
                                 GTK_DIALOG_DESTROY_WITH_PARENT,
                                 GTK_MESSAGE_INFO,
                                 GTK_BUTTONS_NONE,
                                 _( "Updating Blocklist" ) );
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ),
+                                              _( "Retrieving blocklist..." ) );
     gtk_dialog_add_buttons( GTK_DIALOG( d ),
                             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                             GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
@@ -435,7 +434,8 @@ onUpdateBlocklistCB( GtkButton * w, gpointer gdata )
 
     g_signal_connect( d, "response", G_CALLBACK(onUpdateBlocklistResponseCB), data );
     gtk_widget_show( d );
-    g_thread_create( updateBlocklist, data, FALSE, NULL );
+
+    tr_webRun( handle, url, got_blocklist, data );
 }
 
 static GtkWidget*
@@ -462,6 +462,7 @@ peerPage( GObject * core )
         data->core = TR_CORE( core );
         data->check = w;
 
+        g_object_set_data( G_OBJECT( b ), "handle", tr_core_handle( TR_CORE( core ) ) );
         g_signal_connect( b, "clicked", G_CALLBACK(onUpdateBlocklistCB), data );
         gtk_box_pack_start( GTK_BOX(h), b, FALSE, FALSE, 0 );
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), b );
@@ -533,6 +534,7 @@ networkPage( GObject * core, gpointer alive )
 
         g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
         g_object_set_data( G_OBJECT(l), "alive", alive );
+        g_object_set_data( G_OBJECT(l), "handle", tr_core_handle( TR_CORE( core ) ) );
         testing_port_cb( NULL, l );
 
         g_signal_connect( w, "toggled", G_CALLBACK(testing_port_cb), l );
