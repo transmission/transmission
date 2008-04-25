@@ -205,7 +205,6 @@ testing_port_begin( gpointer gdata )
         const int port = gtk_spin_button_get_value_as_int( spin );
         char url[256];
         snprintf( url, sizeof(url), "http://portcheck.transmissionbt.com/%d", port );
-        gtk_label_set_markup( GTK_LABEL( data->label ), _( "<i>Testing port...</i>" ) );
         tr_webRun( handle, url, testing_port_done, data );
     }
     return FALSE;
@@ -214,6 +213,7 @@ testing_port_begin( gpointer gdata )
 static void
 testing_port_cb( GtkWidget * unused UNUSED, gpointer l )
 {
+    gtk_label_set_markup( GTK_LABEL( l ), _( "<i>Testing port...</i>" ) );
     /* wait three seconds to give the port forwarding time to kick in */
     struct test_port_data * data = g_new0( struct test_port_data, 1 );
     data->label = l;
