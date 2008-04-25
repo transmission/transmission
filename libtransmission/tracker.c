@@ -410,9 +410,11 @@ onTrackerResponse( tr_session    * session,
     if( 200<=responseCode && responseCode<=299 )
     {
         const int interval = t->announceIntervalSec + t->randOffset;
+        const time_t now = time ( NULL );
         dbgmsg( t->name, "request succeeded. reannouncing in %d seconds", interval );
-        t->reannounceAt = time( NULL ) + interval;
-        t->manualAnnounceAllowedAt = time( NULL ) + t->announceMinIntervalSec;
+        t->scrapeAt = now + t->scrapeIntervalSec + t->randOffset;
+        t->reannounceAt = now + interval;
+        t->manualAnnounceAllowedAt = now + t->announceMinIntervalSec;
     }
     else if( 300<=responseCode && responseCode<=399 )
     {
@@ -728,6 +730,7 @@ invokeRequest( void * vreq )
         {
             t->lastAnnounceTime = time( NULL );
             t->reannounceAt = 0;
+            t->scrapeAt = 0;
             t->manualAnnounceAllowedAt = ~(time_t)0;
         }
     }
