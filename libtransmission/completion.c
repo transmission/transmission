@@ -97,13 +97,29 @@ tr_cpSizeWhenDone( const tr_completion * ccp )
     if( ccp->sizeWhenDoneIsDirty )
     {
         tr_completion * cp = (tr_completion *) ccp; /* mutable */
-        const tr_info * info = &cp->tor->info;
+        const tr_torrent * tor = cp->tor;
+        const tr_info * info = &tor->info;
         tr_piece_index_t i;
         uint64_t size = 0;
 
         for( i=0; i<info->pieceCount; ++i )
-            if( !info->pieces[i].dnd || tr_cpPieceIsComplete( cp, i ) )
-                size += tr_torPieceCountBytes( cp->tor, i );
+        {
+            if( !info->pieces[i].dnd ) {
+                // we want the piece...
+                size += tr_torPieceCountBytes( tor, i );
+            } else if( tr_cpPieceIsComplete( cp, i ) ) {
+                // we have the piece...
+                size += tr_torPieceCountBytes( tor, i );
+            } else if( cp->completeBlocks[i] ) {
+                // we have part of the piece...
+                const tr_block_index_t b = tr_torPieceFirstBlock( tor, i );
+                const tr_block_index_t e = b + tr_torPieceCountBlocks( tor, i );
+                tr_block_index_t j;
+                for( j=b; j<e; ++j )
+                    if( tr_cpBlockIsComplete( cp, j ) )
+                        size += tr_torBlockCountBytes( tor, j );
+            }
+        }
 
         cp->sizeWhenDoneLazy = size;
         cp->sizeWhenDoneIsDirty = 0;
