@@ -956,9 +956,10 @@ torrentRecheckDoneCB( tr_torrent * tor )
 void
 tr_torrentVerify( tr_torrent * tor )
 {
+    tr_verifyRemove( tor );
+
     tr_globalLock( tor->handle );
 
-    tr_verifyRemove( tor );
     tr_torrentUncheck( tor );
     tr_verifyAdd( tor, torrentRecheckDoneCB );
 
