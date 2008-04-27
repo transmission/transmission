@@ -123,28 +123,32 @@ static void
 addTask( void * vtask )
 {
     struct tr_web_task * task = vtask;
-    struct tr_web * web = task->session->web;
-    CURL * ch;
 
-    ++web->remain;
-    dbgmsg( "adding task #%lu [%s] (%d remain)", task->tag, task->url, web->remain );
+    if( task->session && task->session->web )
+    {
+        struct tr_web * web = task->session->web;
+        CURL * ch;
 
-    ch = curl_easy_init( );
-    curl_easy_setopt( ch, CURLOPT_PRIVATE, task );
-    curl_easy_setopt( ch, CURLOPT_URL, task->url );
-    curl_easy_setopt( ch, CURLOPT_WRITEFUNCTION, writeFunc );
-    curl_easy_setopt( ch, CURLOPT_WRITEDATA, task );
-    curl_easy_setopt( ch, CURLOPT_USERAGENT, TR_NAME "/" LONG_VERSION_STRING );
-    curl_easy_setopt( ch, CURLOPT_SSL_VERIFYPEER, 0 );
-    curl_easy_setopt( ch, CURLOPT_FORBID_REUSE, 1 );
-    curl_easy_setopt( ch, CURLOPT_NOSIGNAL, 1 );
-    curl_easy_setopt( ch, CURLOPT_FOLLOWLOCATION, 1 );
-    curl_easy_setopt( ch, CURLOPT_MAXREDIRS, 5 );
-    curl_easy_setopt( ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
-    curl_easy_setopt( ch, CURLOPT_ENCODING, "" );
-    curl_multi_add_handle( web->cm, ch );
+        ++web->remain;
+        dbgmsg( "adding task #%lu [%s] (%d remain)", task->tag, task->url, web->remain );
 
-    pump( web );
+        ch = curl_easy_init( );
+        curl_easy_setopt( ch, CURLOPT_PRIVATE, task );
+        curl_easy_setopt( ch, CURLOPT_URL, task->url );
+        curl_easy_setopt( ch, CURLOPT_WRITEFUNCTION, writeFunc );
+        curl_easy_setopt( ch, CURLOPT_WRITEDATA, task );
+        curl_easy_setopt( ch, CURLOPT_USERAGENT, TR_NAME "/" LONG_VERSION_STRING );
+        curl_easy_setopt( ch, CURLOPT_SSL_VERIFYPEER, 0 );
+        curl_easy_setopt( ch, CURLOPT_FORBID_REUSE, 1 );
+        curl_easy_setopt( ch, CURLOPT_NOSIGNAL, 1 );
+        curl_easy_setopt( ch, CURLOPT_FOLLOWLOCATION, 1 );
+        curl_easy_setopt( ch, CURLOPT_MAXREDIRS, 5 );
+        curl_easy_setopt( ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+        curl_easy_setopt( ch, CURLOPT_ENCODING, "" );
+        curl_multi_add_handle( web->cm, ch );
+
+        pump( web );
+    }
 }
 
 void
@@ -153,18 +157,21 @@ tr_webRun( tr_session         * session,
            tr_web_done_func   * done_func,
            void               * done_func_user_data )
 {
-    static unsigned long tag = 0;
-    struct tr_web_task * task;
+    if( session->web )
+    {
+        static unsigned long tag = 0;
+        struct tr_web_task * task;
 
-    task = tr_new0( struct tr_web_task, 1 );
-    task->session = session;
-    task->url = tr_strdup( url );
-    task->done_func = done_func;
-    task->done_func_user_data = done_func_user_data;
-    task->tag = ++tag;
-    task->response = evbuffer_new( );
+        task = tr_new0( struct tr_web_task, 1 );
+        task->session = session;
+        task->url = tr_strdup( url );
+        task->done_func = done_func;
+        task->done_func_user_data = done_func_user_data;
+        task->tag = ++tag;
+        task->response = evbuffer_new( );
 
-    tr_runInEventThread( session, addTask, task );
+        tr_runInEventThread( session, addTask, task );
+    }
 }
 
 #ifdef USE_CURL_MULTI_SOCKET
