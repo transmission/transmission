@@ -26,11 +26,11 @@
      (LIBCURL_VERSION_MAJOR == (major) && LIBCURL_VERSION_MINOR == (minor) && \
       LIBCURL_VERSION_PATCH >= (micro)))
 
-#if CURL_CHECK_VERSION(7,16,0)
-#define USE_CURL_MULTI_SOCKET
-#else
-#define PULSE_MSEC 200
-#endif
+//#if CURL_CHECK_VERSION(7,16,0)
+//#define USE_CURL_MULTI_SOCKET
+//#else
+#define PULSE_MSEC 150
+//#endif
 
 #define dbgmsg(fmt...) tr_deepLog( __FILE__, __LINE__, "web", ##fmt )
 
