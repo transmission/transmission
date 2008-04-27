@@ -62,7 +62,7 @@ enum
     STOP_TIMEOUT_INTERVAL_SEC = 5,
 
     /* the value of the 'numwant' argument passed in tracker requests. */
-    NUMWANT = 150,
+    NUMWANT = 80,
 
     /* the length of the 'key' argument passed in tracker requests */
     KEYLEN = 10

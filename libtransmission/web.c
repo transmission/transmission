@@ -74,7 +74,7 @@ processCompletedTasks( tr_web * web )
         }
         if( easy ) {
             struct tr_web_task * task;
-            int response_code;
+            long response_code;
             curl_easy_getinfo( easy, CURLINFO_PRIVATE, &task );
             curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &response_code );
             --web->remain;
@@ -84,7 +84,6 @@ processCompletedTasks( tr_web * web )
                              EVBUFFER_DATA(task->response),
                              EVBUFFER_LENGTH(task->response),
                              task->done_func_user_data );
-
             curl_multi_remove_handle( web->cm, easy );
             curl_easy_cleanup( easy );
             evbuffer_free( task->response );
@@ -127,8 +126,8 @@ addTask( void * vtask )
     struct tr_web * web = task->session->web;
     CURL * ch;
 
-    dbgmsg( "adding task #%lu [%s]", task->tag, task->url );
     ++web->remain;
+    dbgmsg( "adding task #%lu [%s] (%d remain)", task->tag, task->url, web->remain );
 
     ch = curl_easy_init( );
     curl_easy_setopt( ch, CURLOPT_PRIVATE, task );
@@ -209,6 +208,7 @@ multi_sock_cb( CURL            * easy UNUSED,
 
     if( action == CURL_POLL_REMOVE ) {
         if( ev ) {
+            dbgmsg( "deleting libevent socket polling" );
             event_del( ev );
             tr_free( ev );
             curl_multi_assign( web->cm, sock, NULL );
@@ -306,9 +306,6 @@ tr_webInit( tr_session * session )
 #if CURL_CHECK_VERSION(7,16,3)
     curl_multi_setopt( web->cm, CURLMOPT_MAXCONNECTS, 10 );
 #endif
-#if CURL_CHECK_VERSION(7,16,0)
-    curl_multi_setopt( web->cm, CURLMOPT_PIPELINING, 1 );
-#endif
     pump( web );
 
     return web;
@@ -317,6 +314,7 @@ tr_webInit( tr_session * session )
 void
 tr_webClose( tr_web * web )
 {
+    dbgmsg( "deleting web->timer" );
     evtimer_del( &web->timer );
     curl_multi_cleanup( web->cm );
     tr_free( web );
