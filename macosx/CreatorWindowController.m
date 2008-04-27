@@ -29,6 +29,7 @@
 @interface CreatorWindowController (Private)
 
 + (NSString *) chooseFile;
+- (void) updateEnableCreateButtonForTrackerField;
 - (void) locationSheetClosed: (NSSavePanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 - (void) checkProgress;
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info;
@@ -149,6 +150,7 @@
     NSString * tracker;
     if ((tracker = [fDefaults stringForKey: @"CreatorTracker"]))
         [fTrackerField setStringValue: tracker];
+    [self updateEnableCreateButtonForTrackerField];
     
     if ([fDefaults objectForKey: @"CreatorPrivate"])
         [fPrivateCheck setState: [fDefaults boolForKey: @"CreatorPrivate"] ? NSOnState : NSOffState];
@@ -187,6 +189,14 @@
             contextInfo: nil];
 }
 
+- (void) controlTextDidChange: (NSNotification *) notification
+{
+    if ([notification object] != fTrackerField)
+        return;
+    
+    [self updateEnableCreateButtonForTrackerField];
+}
+
 - (void) create: (id) sender
 {
     NSString * trackerString = [fTrackerField stringValue];
@@ -209,8 +219,6 @@
         if ([prefix caseInsensitiveCompare: @"http"] != NSOrderedSame && [prefix caseInsensitiveCompare: @"https"] != NSOrderedSame)
             [alert setMessageText: NSLocalizedString(@"The tracker address must begin with \"http://\" or \"https://\".",
                                                     "Create torrent -> warning -> message")];
-        else if ([trackerString length] == NSMaxRange(prefixRange)) //don't allow blank addresses
-            [alert setMessageText: NSLocalizedString(@"The tracker address cannot be blank.", "Create torrent -> warning -> message")];
         else
             [alert setMessageText: NSLocalizedString(@"The tracker address is invalid.", "Create torrent -> warning -> message")];
         
@@ -290,6 +298,22 @@
     
     BOOL success = [panel runModal] == NSOKButton;
     return success ? [[panel filenames] objectAtIndex: 0] : nil;
+}
+
+- (void) updateEnableCreateButtonForTrackerField
+{
+    NSString * string = [fTrackerField stringValue];
+    BOOL enable = YES;
+    if ([string isEqualToString: @""])
+        enable = NO;
+    else
+    {
+        NSRange prefixRange = [string rangeOfString: @"://"];
+        if (prefixRange.location != NSNotFound && [string length] == NSMaxRange(prefixRange))
+            enable = NO;
+    }
+    
+    [fCreateButton setEnabled: enable];
 }
 
 - (void) locationSheetClosed: (NSSavePanel *) panel returnCode: (int) code contextInfo: (void *) info

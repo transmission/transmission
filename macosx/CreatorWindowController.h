@@ -31,7 +31,7 @@
     IBOutlet NSImageView * fIconView;
     IBOutlet NSTextField * fNameField, * fStatusField, * fPiecesField, * fTrackerField, * fLocationField;
     IBOutlet NSTextView * fCommentView;
-    IBOutlet NSButton * fPrivateCheck, * fOpenCheck;
+    IBOutlet NSButton *fCreateButton, * fPrivateCheck, * fOpenCheck;
     
     IBOutlet NSView * fProgressView;
     IBOutlet NSProgressIndicator * fProgressIndicator;

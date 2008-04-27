@@ -954,7 +954,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) controlTextDidChange: (NSNotification *) notification
 {
-    [fURLSheetOpenButton setEnabled: ![[fURLSheetTextField stringValue] isEqualToString: @""]];
+    if ([notification object] != fURLSheetTextField)
+        return;
+    
+    NSString * string = [fURLSheetTextField stringValue];
+    BOOL enable = YES;
+    if ([string isEqualToString: @""])
+        enable = NO;
+    else
+    {
+        NSRange prefixRange = [string rangeOfString: @"://"];
+        if (prefixRange.location != NSNotFound && [string length] == NSMaxRange(prefixRange))
+            enable = NO;
+    }
+    
+    [fURLSheetOpenButton setEnabled: enable];
 }
 
 - (void) urlSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo
@@ -3707,7 +3721,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                         return;
                     }
             }
-
+            
             IOAllowPowerChange(fRootPort, (long) messageArgument);
             break;
 
