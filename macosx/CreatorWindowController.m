@@ -202,12 +202,11 @@
         trackerString = [@"http://" stringByAppendingString: trackerString];
     
     //parse tracker string
-    if (tr_httpParseURL([trackerString UTF8String], -1, NULL, NULL, NULL))
+    if (!tr_httpIsValidURL([trackerString UTF8String]))
     {
         NSAlert * alert = [[[NSAlert alloc] init] autorelease];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> warning -> button")];
-        [alert setMessageText: NSLocalizedString(@"The tracker address cannot be blank.", "Create torrent -> warning -> title")];
-        [alert setInformativeText: NSLocalizedString(@"Change the tracker address to create the torrent.",
+        [alert setInformativeText: NSLocalizedString(@"Change the tracker address to create the torrent file.",
                                                     "Create torrent -> warning -> info")];
         [alert setAlertStyle: NSWarningAlertStyle];
         
@@ -235,7 +234,7 @@
                                                 "Create torrent -> file already exists warning -> title")];
         [alert setInformativeText: [NSString stringWithFormat:
                 NSLocalizedString(@"A file with the name \"%@\" already exists in the directory \"%@\". "
-                    "Choose a new name or directory to create the torrent.",
+                    "Choose a new name or directory to create the torrent file.",
                     "Create torrent -> file already exists warning -> warning"),
                     [pathComponents objectAtIndex: count-1], [pathComponents objectAtIndex: count-2]]];
         [alert setAlertStyle: NSWarningAlertStyle];
