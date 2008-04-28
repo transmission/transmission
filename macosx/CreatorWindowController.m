@@ -191,10 +191,8 @@
 
 - (void) controlTextDidChange: (NSNotification *) notification
 {
-    if ([notification object] != fTrackerField)
-        return;
-    
-    [self updateEnableCreateButtonForTrackerField];
+    if ([notification object] == fTrackerField)
+        [self updateEnableCreateButtonForTrackerField];
 }
 
 - (void) create: (id) sender
@@ -214,8 +212,7 @@
         [alert setAlertStyle: NSWarningAlertStyle];
         
         //check common reasons for failure
-        NSRange prefixRange = [trackerString rangeOfString: @"://"];
-        NSString * prefix = [trackerString substringToIndex: prefixRange.location];
+        NSString * prefix = [trackerString substringToIndex: [trackerString rangeOfString: @"://"].location];
         if ([prefix caseInsensitiveCompare: @"http"] != NSOrderedSame && [prefix caseInsensitiveCompare: @"https"] != NSOrderedSame)
             [alert setMessageText: NSLocalizedString(@"The tracker address must begin with \"http://\" or \"https://\".",
                                                     "Create torrent -> warning -> message")];
