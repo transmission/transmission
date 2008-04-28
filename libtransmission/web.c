@@ -319,12 +319,13 @@ tr_webInit( tr_session * session )
 }
 
 void
-tr_webClose( tr_web * web )
+tr_webClose( tr_web ** web )
 {
     dbgmsg( "deleting web->timer" );
-    evtimer_del( &web->timer );
-    curl_multi_cleanup( web->cm );
-    tr_free( web );
+    evtimer_del( &(*web)->timer );
+    curl_multi_cleanup( (*web)->cm );
+    tr_free( *web );
+    *web = NULL;
 }
 
 /***

@@ -18,7 +18,7 @@ typedef struct tr_web tr_web;
 
 tr_web* tr_webInit( tr_handle * session );
 
-void tr_webClose( tr_web * );
+void tr_webClose( tr_web ** );
 
 typedef void (tr_web_done_func)( tr_handle    * session,
                                   long          response_code,

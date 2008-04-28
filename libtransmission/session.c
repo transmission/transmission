@@ -385,17 +385,13 @@ tr_torrentCount( const tr_handle * h )
 }
 
 static void
-tr_closeImpl( void * vh )
+tr_closeAllConnections( void * vh )
 {
     tr_handle * h = vh;
     tr_torrent * t;
 
-    tr_webClose( h->web );
     tr_sharedShuttingDown( h->shared );
     tr_trackerShuttingDown( h );
-
-    _tr_blocklistFree( h->blocklist );
-    h->blocklist = NULL;
 
     for( t=h->torrentList; t!=NULL; ) {
         tr_torrent * tmp = t;
@@ -428,9 +424,13 @@ tr_close( tr_handle * h )
 
     tr_statsClose( h );
 
-    tr_runInEventThread( h, tr_closeImpl, h );
+    tr_runInEventThread( h, tr_closeAllConnections, h );
     while( !h->isClosed && !deadlineReached( deadline ) )
         tr_wait( 100 );
+
+    _tr_blocklistFree( h->blocklist );
+    h->blocklist = NULL;
+    tr_webClose( &h->web );
 
     tr_eventClose( h );
     while( h->events && !deadlineReached( deadline ) )
