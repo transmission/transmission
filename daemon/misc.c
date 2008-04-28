@@ -39,8 +39,6 @@
 #include "errors.h"
 #include "misc.h"
 
-static void pushdir ( char *, const char *, size_t );
-
 static char gl_myname[256];
 
 void
@@ -63,69 +61,39 @@ getmyname( void )
 }
 
 void
-pushdir( char * path, const char * file, size_t size )
-{
-    size_t off;
-
-    off = strlen( path );
-    if( 0 < off && off + 1 < size && '/' != path[off-1] )
-    {
-        path[off]   = '/';
-        path[off+1] = '\0';
-    }
-    strlcat( path, file, size );
-}
-
-void
 confpath( char               * buf,
           size_t               len,
           const char         * configDir,
           const char         * file,
           enum confpathtype    type )
 {
-    strlcpy( buf, configDir, len );
-
     switch( type )
     {
         case CONF_PATH_TYPE_DAEMON:
-            pushdir( buf, "daemon", len );
+            tr_buildPath( buf, len, configDir, "daemon", file, NULL );
             break;
         case CONF_PATH_TYPE_GTK:
-            pushdir( buf, "gtk", len );
+            tr_buildPath( buf, len, configDir, "gtk", file, NULL );
             break;
         case CONF_PATH_TYPE_OSX:
+            tr_buildPath( buf, len, configDir, file, NULL );
             break;
         default:
             assert( 0 );
             break;
-    }
-
-    if( NULL != file )
-    {
-        pushdir( buf, file, len );
     }
 }
 
 void
 absolutify( char * buf, size_t len, const char * path )
 {
-    size_t off;
-
-    if( '/' == path[0] )
-    {
+    if( *path == '/' )
         strlcpy( buf, path, len );
-        return;
+    else {
+        char cwd[MAX_PATH_LENGTH];
+        getcwd( cwd, sizeof( cwd ) );
+        tr_buildPath( buf, len, cwd, path, NULL );
     }
-
-    getcwd( buf, len );
-    off = strlen( buf );
-    if( 0 < off && len > off + 1 && '/' != buf[off] )
-    {
-        buf[off] = '/';
-        off++;
-        buf[off] = '\0';
-    }
-    strlcat( buf, path, len );
 }
 
 int

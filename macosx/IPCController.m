@@ -33,6 +33,7 @@
 #include "bencode.h"
 #include "ipcparse.h"
 #include "transmission.h"
+#include "utils.h"
 
 #import "IPCController.h"
 #import "Torrent.h"
@@ -514,8 +515,7 @@ void getaddr( struct sockaddr_un * sun )
 {
     bzero( sun, sizeof *sun );
     sun->sun_family = AF_LOCAL;
-    strlcpy( sun->sun_path, tr_getDefaultConfigDir(), sizeof sun->sun_path );
-    strlcat( sun->sun_path, "/socket", sizeof sun->sun_path );
+    tr_buildPath( sun->sun_path, sizeof( sun->sun_path ), tr_getDefaultConfigDir(), "socket", NULL );
 }
 
 NSArray * bencarray( benc_val_t * val, int type )

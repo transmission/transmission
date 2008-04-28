@@ -112,8 +112,7 @@ torrent_init( const char * configdir, struct event_base * base )
     gl_handle = tr_init( configdir, "daemon" );
 
     confpath( gl_state, sizeof gl_state, configdir, CONF_FILE_STATE, 0 );
-    strlcpy( gl_newstate, gl_state, sizeof gl_state );
-    strlcat( gl_newstate, ".new", sizeof gl_state );
+    snprintf( gl_newstate, sizeof( gl_newstate ), "%s.new", gl_state );
     absolutify( gl_dir, sizeof gl_dir, "." );
 
     loadstate();

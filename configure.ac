@@ -34,7 +34,7 @@ if test "x$GCC" = "xyes" ; then
 fi
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_FUNCS([lrintf strlcpy strlcat daemon dirname basename])
+AC_CHECK_FUNCS([lrintf strlcpy daemon dirname basename])
 AC_CHECK_SIZEOF([void*])
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
