@@ -321,7 +321,7 @@ typedef enum
         [fScrapeResponseField setSelectable: NO];
         [fScrapeNextField setStringValue: @""];
         
-        [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
+        [fConnectedPeersField setStringValue: @""];
         [fDownloadingFromField setStringValue: @""];
         [fUploadingToField setStringValue: @""];
         [fKnownField setStringValue: @""];
@@ -1213,7 +1213,7 @@ typedef enum
     }
     else
     {
-        [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
+        [fConnectedPeersField setStringValue: @""];
         [fDownloadingFromField setStringValue: @""];
         [fUploadingToField setStringValue: @""];
     }
