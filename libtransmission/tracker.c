@@ -225,10 +225,13 @@ publishNewPeers( tr_tracker * t, int allAreSeeds,
 static void onReqDone( tr_session * session );
 
 static void
-updateAddresses( tr_tracker * t, long response_code, int * tryAgain )
+updateAddresses( tr_tracker  * t,
+                 long          response_code,
+                 int           moveToNextAddress,
+                 int         * tryAgain )
 {
-    int moveToNextAddress = FALSE;
     tr_torrent * torrent = tr_torrentFindFromHash( t->session, t->hash );
+
 
     if( !response_code ) /* tracker didn't respond */
     {
@@ -254,7 +257,6 @@ updateAddresses( tr_tracker * t, long response_code, int * tryAgain )
     }
 
     *tryAgain = moveToNextAddress;
-
     if( moveToNextAddress )
     {
         if ( ++t->trackerIndex >= torrent->info.trackerCount ) /* we've tried them all */
@@ -326,6 +328,7 @@ onTrackerResponse( tr_session    * session,
                    size_t          responseLen,
                    void          * torrent_hash )
 {
+    int moveToNextAddress = FALSE;
     int tryAgain;
     tr_tracker * t;
 
@@ -351,8 +354,11 @@ onTrackerResponse( tr_session    * session,
             int incomplete = -1;
             const char * str;
 
-            if(( tr_bencDictFindStr( &benc, "failure reason", &str )))
-                publishErrorMessageAndStop( t, str );
+            if(( tr_bencDictFindStr( &benc, "failure reason", &str ))) {
+               // publishErrorMessageAndStop( t, str );
+                moveToNextAddress = TRUE;
+                publishMessage( t, str, TR_TRACKER_ERROR );
+            }
 
             if(( tr_bencDictFindStr( &benc, "warning message", &str )))
                 publishWarning( t, str );
@@ -398,7 +404,7 @@ onTrackerResponse( tr_session    * session,
             tr_bencFree( &benc );
     }
 
-    updateAddresses( t, responseCode, &tryAgain );
+    updateAddresses( t, responseCode, moveToNextAddress, &tryAgain );
 
     /**
     ***
@@ -459,6 +465,7 @@ onScrapeResponse( tr_session   * session,
                   size_t         responseLen,
                   void         * torrent_hash )
 {
+    int moveToNextAddress = FALSE;
     int tryAgain;
     tr_tracker * t;
 
@@ -510,12 +517,14 @@ onScrapeResponse( tr_session   * session,
                 t->retryScrapeIntervalSec = 30;
             }
         }
+        else
+            moveToNextAddress = TRUE;
 
         if( bencLoaded )
             tr_bencFree( &benc );
     }
 
-    updateAddresses( t, responseCode, &tryAgain );
+    updateAddresses( t, responseCode, moveToNextAddress, &tryAgain );
 
     /**
     ***
