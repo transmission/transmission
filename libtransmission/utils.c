@@ -202,34 +202,6 @@ tr_deepLog( const char * file, int line, const char * name, const char * fmt, ..
 ****
 ***/
 
-int
-tr_vasprintf( char **strp, const char *fmt, va_list ap )
-{
-    int ret;
-    struct evbuffer * buf = evbuffer_new( );
-    *strp = NULL;
-    if( evbuffer_add_vprintf( buf, fmt, ap ) < 0 )
-        ret = -1;
-    else {
-        ret = EVBUFFER_LENGTH( buf );
-        *strp = tr_strndup( (char*)EVBUFFER_DATA(buf), ret );
-    }
-    evbuffer_free( buf );
-    return ret;
-
-}
-
-int
-tr_asprintf( char **strp, const char *fmt, ...)
-{
-    int ret;
-    va_list ap;
-    va_start( ap, fmt );
-    ret = tr_vasprintf( strp, fmt, ap );
-    va_end( ap );
-    return ret;
-}
-
 void
 tr_msg( const char * file, int line, int level,
         const char * name,
@@ -252,14 +224,14 @@ tr_msg( const char * file, int line, int level,
     if( messageLevel >= level )
     {
         va_list ap;
-        char * text;
+        struct evbuffer * buf = evbuffer_new( );
 
         /* build the text message */
         va_start( ap, fmt );
-        tr_vasprintf( &text, fmt, ap );
+        evbuffer_add_vprintf( buf, fmt, ap );
         va_end( ap );
 
-        if( text != NULL )
+        if( EVBUFFER_LENGTH( buf ) )
         {
             if( messageQueuing )
             {
@@ -267,7 +239,7 @@ tr_msg( const char * file, int line, int level,
                 newmsg = tr_new0( tr_msg_list, 1 );
                 newmsg->level = level;
                 newmsg->when = time( NULL );
-                newmsg->message = text;
+                newmsg->message = tr_strdup( (char*)EVBUFFER_DATA( buf ) );
                 newmsg->file = file;
                 newmsg->line = line;
                 newmsg->name = tr_strdup( name );
@@ -279,10 +251,11 @@ tr_msg( const char * file, int line, int level,
             {
                 if( fp == NULL )
                     fp = stderr;
-                fprintf( fp, "%s\n", text );
-                tr_free( text );
+                fprintf( fp, "%s\n", (char*)EVBUFFER_DATA(buf) );
                 fflush( fp );
             }
+
+            evbuffer_free( buf );
         }
     }
 

@@ -84,6 +84,7 @@ bin_PROGRAMS = benc2php
 TESTS = \
     blocklist-test \
     bencode-test \
+    clients-test \
     test-fastset \
     test-peer-id
 
@@ -106,11 +107,12 @@ bencode_test_SOURCES = bencode-test.c
 bencode_test_LDADD = $(APPS_LDADD)
 blocklist_test_SOURCES = blocklist-test.c
 blocklist_test_LDADD = $(APPS_LDADD)
+clients_test_SOURCES = clients-test.c
+clients_test_LDADD = $(APPS_LDADD)
 test_fastset_SOURCES = test-fastset.c
 test_fastset_LDADD = $(APPS_LDADD)
 test_peer_id_SOURCES = test-peer-id.c
 test_peer_id_LDADD = $(APPS_LDADD)
-
 
 
 EXTRA_libtransmission_a_SOURCES = \

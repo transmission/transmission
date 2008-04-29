@@ -1045,7 +1045,14 @@ myHandshakeDoneCB( tr_handshake    * handshake,
             {
                 peer = getPeer( t, addr );
                 tr_free( peer->client );
-                peer->client = peer_id ? tr_clientForId( peer_id ) : NULL;
+
+                if( !peer_id )
+                    peer->client = NULL;
+                else {
+                    char client[128];
+                    tr_clientForId( client, sizeof( client ), peer_id );
+                    peer->client = tr_strdup( client );
+                }
                 peer->port = port;
                 peer->io = io;
                 peer->msgs = tr_peerMsgsNew( t->tor, peer, msgsCallbackFunc, t, &peer->msgsTag );

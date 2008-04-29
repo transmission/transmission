@@ -665,8 +665,8 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
 static int
 readPeerId( tr_handshake * handshake, struct evbuffer * inbuf )
 {
-    char * client;
     int peerIsGood;
+    char client[128];
 
     if( EVBUFFER_LENGTH(inbuf) < PEER_ID_LEN )
         return READ_MORE;
@@ -675,9 +675,8 @@ readPeerId( tr_handshake * handshake, struct evbuffer * inbuf )
     tr_peerIoReadBytes( handshake->io, inbuf, handshake->peer_id, PEER_ID_LEN );
     tr_peerIoSetPeersId( handshake->io, handshake->peer_id );
     handshake->havePeerID = TRUE;
-    client = tr_clientForId( handshake->peer_id );
+    tr_clientForId( client, sizeof( client ), handshake->peer_id );
     dbgmsg( handshake, "peer-id is [%s] ... isIncoming is %d", client, tr_peerIoIsIncoming( handshake->io ) );
-    tr_free( client );
 
     /* if we've somehow connected to ourselves, don't keep the connection */
     peerIsGood = memcmp( handshake->peer_id, tr_getPeerId(), PEER_ID_LEN ) ? 1 : 0;

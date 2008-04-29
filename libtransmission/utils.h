@@ -84,10 +84,6 @@ int tr_mkdirp( const char * path, int permissions );
 
 uint8_t* tr_loadFile( const char * filename, size_t * size );
 
-int tr_vasprintf( char **strp, const char *fmt, va_list ap );
-
-int tr_asprintf( char **strp, const char *fmt, ...);
-
 
 /* creates a filename from a series of elements using the
    correct separator for filenames. */
