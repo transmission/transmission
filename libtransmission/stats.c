@@ -77,6 +77,7 @@ saveCumulativeStats( const tr_handle * handle, const tr_session_stats * s )
     tr_bencDictAddInt( &top, "seconds-active",   s->secondsActive );
 
     getFilename( handle, filename, sizeof(filename) );
+    tr_deepLog( __FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename );
     tr_bencSaveFile( filename, &top );
 
     tr_bencFree( &top );

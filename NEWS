@@ -11,8 +11,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Updated Dock badge images
 - GTK+
    + Inhibit hibernation when downloading
-   + Various bug fixes and usability improvements
    + Use XDG basedir spec for configuration files
+   + Various bug fixes and usability improvements
 
 1.11 (2008/04/04)
 - Mac

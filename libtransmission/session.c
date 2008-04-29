@@ -422,6 +422,7 @@ tr_close( tr_handle * h )
     const int maxwait_msec = SHUTDOWN_MAX_SECONDS * 1000;
     const uint64_t deadline = tr_date( ) + maxwait_msec;
 
+    tr_deepLog( __FILE__, __LINE__, NULL, "shutting down transmission session %p", h );
     tr_statsClose( h );
 
     tr_runInEventThread( h, tr_closeAllConnections, h );
