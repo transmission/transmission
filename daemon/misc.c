@@ -27,6 +27,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <libgen.h> /* basename */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -44,14 +45,9 @@ static char gl_myname[256];
 void
 setmyname( const char * argv0 )
 {
-    const char * name;
-
-    name = strrchr( argv0, '/' );
-    if( NULL == name || '\0' == *(++name) )
-    {
-        name = argv0;
-    }
-    strlcpy( gl_myname, name, sizeof gl_myname );
+    char tmp[MAX_PATH_LENGTH];
+    strlcpy( tmp, argv0, sizeof( tmp ) );
+    strlcpy( gl_myname, basename( tmp ), sizeof( gl_myname ) );
 }
 
 const char *
