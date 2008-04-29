@@ -36,9 +36,9 @@
 static int
 charint( char ch )
 {
-    if( isdigit( ch ) ) return ch - '0';
-    if( isupper( ch ) ) return 10 + ch - 'A';
-    if( islower( ch ) ) return 36 + ch - 'a';
+    if( '0' <= ch && ch <= '9' ) return      ch - '0';
+    if( 'A' <= ch && ch <= 'Z' ) return 10 + ch - 'A';
+    if( 'a' <= ch && ch <= 'z' ) return 36 + ch - 'a';
     return 0;
 }
 

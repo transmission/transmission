@@ -841,9 +841,9 @@ generateKeyParam( char * msg, int len )
 static int
 is_rfc2396_alnum( char ch )
 {
-    return ( (ch >= 'a' && ch <= 'z' )
-            || (ch >= 'A' && ch <= 'Z' )
-            || (ch >= '0' && ch <= '9' ) );
+    return     ( '0' <= ch && ch <= '9' )
+            || ( 'A' <= ch && ch <= 'Z' )
+            || ( 'a' <= ch && ch <= 'z' );
 }
 
 static void
