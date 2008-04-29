@@ -52,13 +52,13 @@ strint( const void * pch, int span )
 }
 
 static const char*
-getMnemonic( char ch )
+getMnemonicEnd( char ch )
 {
     switch( ch )
     {
-        case 'b': case 'B': return "Beta";
-        case 'd': return "Debug";
-        case 'x': case 'X': case 'Z': return "(Dev)";
+        case 'b': case 'B': return " (Beta)";
+        case 'd': return " (Debug)";
+        case 'x': case 'X': case 'Z': return " (Dev)";
         default: return "";
     }
 }
@@ -130,19 +130,18 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     {
         if( !memcmp( id+1, "UT", 2 ) )
         {
-            snprintf( buf, buflen, "\xc2\xb5Torrent %d.%d.%d %s",
-                      strint(id+3,1), strint(id+4,1), strint(id+5,1), getMnemonic(id[6]) );
+            snprintf( buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s",
+                      strint(id+3,1), strint(id+4,1), strint(id+5,1), getMnemonicEnd(id[6]) );
         }
 
-        /* we win the most fucked-up peer_id award!  hooray! */
         else if( !memcmp( id+1, "TR", 2 ) )
         {
             if( !memcmp( id+3, "000", 3 ) ) /* very old client style: -TR0006- is 0.6 */
                 snprintf( buf, buflen, "Transmission 0.%c", id[6] );
             else if( !memcmp( id+3, "00", 2) ) /* previous client style: -TR0072- is 0.72 */
-                snprintf( buf, buflen, "Transmission %d.%02d", strint(id+3,2), strint(id+5,2) );
+                snprintf( buf, buflen, "Transmission 0.%02d", strint(id+5,2) );
             else /* current client style: -TR072Z- is 0.72 (Dev) */
-                snprintf( buf, buflen, "Transmission %d.%02d %s", strint(id+3,1), strint(id+4,2), getMnemonic(id[6]) );
+                snprintf( buf, buflen, "Transmission %d.%02d%s", strint(id+3,1), strint(id+4,2), getMnemonicEnd(id[6]) );
         }
 
         else if( !memcmp( id+1, "KT", 2 ) )
@@ -300,7 +299,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     }
     else if( !memcmp( id, "XBT", 3 ) )
     {
-        snprintf( buf, buflen, "XBT Client %c.%c.%c %s", id[3], id[4], id[5], getMnemonic(id[6]) );
+        snprintf( buf, buflen, "XBT Client %c.%c.%c%s", id[3], id[4], id[5], getMnemonicEnd(id[6]) );
     }
     else if( !memcmp( id, "Mbrst", 5 ) )
     {
