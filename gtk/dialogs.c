@@ -120,8 +120,9 @@ askquit( TrCore          * core,
     gtk_dialog_set_default_response( GTK_DIALOG( wind ),
                                      GTK_RESPONSE_ACCEPT );
     gtk_dialog_set_alternative_button_order( GTK_DIALOG( wind ),
-                                     GTK_RESPONSE_ACCEPT,
-                                     GTK_RESPONSE_CANCEL );
+                                             GTK_RESPONSE_ACCEPT,
+                                             GTK_RESPONSE_CANCEL,
+                                             -1 );
 
     dontask = gtk_check_button_new_with_mnemonic( _("_Don't ask me again") );
     stuff->dontask = dontask;
