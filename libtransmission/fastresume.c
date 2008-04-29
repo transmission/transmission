@@ -585,7 +585,11 @@ parseVersion1( tr_torrent * tor, const uint8_t * buf, const uint8_t * end,
         readBytes( &id, &buf, sizeof(id) );
         readBytes( &len, &buf, sizeof(len) );
 
-        if( fieldsToLoad & internalIdToPublicBitfield( id ) ) switch( id )
+        if( buf + len > end )
+        {
+            tr_torerr( tor, "Resume file seems to be corrupt.  Skipping." );
+        }
+        else if( fieldsToLoad & internalIdToPublicBitfield( id ) ) switch( id )
         {
             case FR_ID_DOWNLOADED:   ret |= parseDownloaded( tor, buf, len ); break;
             case FR_ID_UPLOADED:     ret |= parseUploaded( tor, buf, len ); break;
