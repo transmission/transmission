@@ -83,8 +83,8 @@ four_digits( char * buf, size_t buflen, const char * name, const uint8_t * digit
 static void
 two_major_two_minor( char * buf, size_t buflen, const char * name, const uint8_t * digits )
 {
-    snprintf( buf, buflen, "%s %02d.%02d", name,
-              strint( digits+0, 2 ),
+    snprintf( buf, buflen, "%s %d.%02d", name,
+              strint( digits, 2 ),
               strint( digits+2, 2 ) );
 }
 static void
