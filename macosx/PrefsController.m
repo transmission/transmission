@@ -538,7 +538,7 @@
 
 - (void) setDownloadLocation: (id) sender
 {
-    [fDefaults setBool: [fFolderPopUp indexOfSelectedItem] ==  DOWNLOAD_FOLDER forKey: @"DownloadLocationConstant"];
+    [fDefaults setBool: [fFolderPopUp indexOfSelectedItem] == DOWNLOAD_FOLDER forKey: @"DownloadLocationConstant"];
 }
 
 - (void) folderSheetShow: (id) sender
