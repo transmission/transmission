@@ -1493,6 +1493,7 @@
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				A24F191B0A3A792300C9C145 /* CopyFiles */,
+				A220D29E0DC8B6030083EDE8 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1756,6 +1757,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "sh macosx/version.sh";
+		};
+		A220D29E0DC8B6030083EDE8 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/Transmission.app/Contents/MacOS/Transmission",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "install_name_tool -change /usr/lib/libcurl.4.dylib /usr/lib/libcurl.3.dylib \"$SCRIPT_INPUT_FILE_0\"";
 		};
 		BE75C3510C729EE100DBEFE0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
