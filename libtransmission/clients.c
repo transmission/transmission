@@ -140,8 +140,9 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
                 snprintf( buf, buflen, "Transmission 0.%c", id[6] );
             else if( !memcmp( id+3, "00", 2) ) /* previous client style: -TR0072- is 0.72 */
                 snprintf( buf, buflen, "Transmission 0.%02d", strint(id+5,2) );
-            else /* current client style: -TR072Z- is 0.72 (Dev) */
-                snprintf( buf, buflen, "Transmission %d.%02d%s", strint(id+3,1), strint(id+4,2), getMnemonicEnd(id[6]) );
+            else /* current client style: -TR111Z- is 1.11+ */
+                snprintf( buf, buflen, "Transmission %d.%02d%s", strint(id+3,1), strint(id+4,2),
+                          id[6]=='Z' || id[6]=='X' ? "+" : "" );
         }
 
         else if( !memcmp( id+1, "KT", 2 ) )
