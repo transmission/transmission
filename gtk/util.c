@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <ctype.h> /* isxdigit() */
 #include <stdarg.h>
 #include <stdlib.h> /* free() */
 #include <string.h> /* strcmp() */
@@ -223,9 +224,27 @@ freestrlist(GSList *list)
 char *
 decode_uri( const char * uri )
 {
-    char * filename = evhttp_decode_uri( uri );
-    char * ret = g_strdup( filename );
-    free( filename );
+    gboolean in_query = FALSE;
+    char * ret = g_new( char, strlen( uri ) + 1 );
+    char * out = ret;
+    for( ; uri && *uri; ) {
+        char ch = *uri;
+        if( ch=='?' )
+            in_query = TRUE;
+        else if( ch=='+' && in_query )
+            ch = ' ';
+        else if( ch=='%' && isxdigit((unsigned char)uri[1])
+                         && isxdigit((unsigned char)uri[2])) {
+            char buf[3] = { uri[1], uri[2], '\0' };
+            ch = (char) g_ascii_strtoull( buf, NULL, 16 );
+            uri += 2;
+       }
+
+       ++uri;
+       *out++ = ch;
+    }
+
+    *out = '\0';
     return ret;
 }
 
