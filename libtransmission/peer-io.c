@@ -34,8 +34,8 @@
 
 #define IO_TIMEOUT_SECS 8
 
-/* arbitrary */
-#define TR_RDBUF (1024*8)
+/* the size of a typical request message */
+#define TR_RDBUF ((1024*16) + 13)
 
 /**
 ***

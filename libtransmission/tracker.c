@@ -878,7 +878,7 @@ tr_trackerNew( const tr_torrent * torrent )
     t->lastScrapeResponse       = -1;
     t->manualAnnounceAllowedAt  = ~(time_t)0;
     t->name = tr_strdup( info->name );
-    t->randOffset = tr_rand( 120 );
+    t->randOffset = tr_rand( 30 );
     memcpy( t->hash, info->hash, SHA_DIGEST_LENGTH );
     escape( t->escaped, info->hash, SHA_DIGEST_LENGTH );
     generateKeyParam( t->key_param, KEYLEN );

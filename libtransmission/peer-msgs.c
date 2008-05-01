@@ -67,7 +67,7 @@ enum
     KEEPALIVE_INTERVAL_SECS = 90,
 
     PEX_INTERVAL            = (90 * 1000), /* msec between sendPex() calls */
-    PEER_PULSE_INTERVAL     = (100),       /* msec between pulse() calls */
+    PEER_PULSE_INTERVAL     = (50),        /* msec between pulse() calls */
     RATE_PULSE_INTERVAL     = (250),       /* msec between ratePulse() calls */
 
     MAX_QUEUE_SIZE          = (100),
@@ -1287,7 +1287,6 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             updatePeerProgress( msgs );
             maybeSendFastAllowedSet( msgs );
             peerIsSeed = msgs->info->progress >= 1.0;
-            tr_peerMsgsSetChoke( msgs, clientIsSeed && peerIsSeed );
             fireNeedReq( msgs );
             break;
         }
