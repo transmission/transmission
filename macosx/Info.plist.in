@@ -45,8 +45,6 @@
 	<string>TR##</string>
 	<key>CFBundleVersion</key>
 	<string>%%BUNDLE_VERSION%%</string>
-	<key>LSMinimumSystemVersion</key>
-	<string>10.4.11</string>
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
 	<key>NSMainNibFile</key>
