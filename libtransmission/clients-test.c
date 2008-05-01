@@ -18,17 +18,21 @@
     } \
 }
 
+#define TEST_CLIENT(A,B) \
+  tr_clientForId( buf, sizeof( buf ), A ); \
+  check( !strcmp( buf, B ) );
+
 int
 main( void )
 {
     int test = 0;
     char buf[128];
 
-    tr_clientForId( buf, sizeof( buf ), "-FC1013-" ); check( !strcmp( buf, "FileCroc 1.0.1.3" ) );
-    tr_clientForId( buf, sizeof( buf ), "-MR1100-" ); check( !strcmp( buf, "Miro 1.1.0.0" ) );
-    tr_clientForId( buf, sizeof( buf ), "-TR0006-" ); check( !strcmp( buf, "Transmission 0.6" ) );
-    tr_clientForId( buf, sizeof( buf ), "-TR0072-" ); check( !strcmp( buf, "Transmission 0.72" ) );
-    tr_clientForId( buf, sizeof( buf ), "-TR111Z-" ); check( !strcmp( buf, "Transmission 1.11 (Dev)" ) );
+    TEST_CLIENT( "-FC1013-", "FileCroc 1.0.1.3" );
+    TEST_CLIENT( "-MR1100-", "Miro 1.1.0.0" );
+    TEST_CLIENT( "-TR0006-", "Transmission 0.6" );
+    TEST_CLIENT( "-TR0072-", "Transmission 0.72" );
+    TEST_CLIENT( "-TR111Z-", "Transmission 1.11+" );
 
     /* cleanup */
     return 0;
