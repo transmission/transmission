@@ -394,8 +394,8 @@ typedef enum
                     ? [[torrent publicTorrentLocation] stringByAbbreviatingWithTildeInPath]
                     : NSLocalizedString(@"Transmission Support Folder", "Torrent -> location when deleting original")];
         if (publicTorrent)
-            [fTorrentLocationField setToolTip: [NSString stringWithFormat: @"%@\n\n%@",
-                        [torrent publicTorrentLocation], [torrent torrentLocation]]];
+            [fTorrentLocationField setToolTip: [[torrent publicTorrentLocation] stringByAppendingFormat: @"\n\n%@",
+                                                [torrent torrentLocation]]];
         else
             [fTorrentLocationField setToolTip: [torrent torrentLocation]];
         

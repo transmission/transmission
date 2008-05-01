@@ -528,6 +528,23 @@
         [super keyDown: event];
 }
 
+- (void) paste: (id) sender
+{
+    NSURL * url;
+    if ((url = [NSURL URLFromPasteboard: [NSPasteboard generalPasteboard]]))
+        [fController openURL: url];
+}
+
+- (BOOL) validateMenuItem: (NSMenuItem *) menuItem
+{
+    SEL action = [menuItem action];
+    
+    if (action == @selector(paste:))
+        return [[[NSPasteboard generalPasteboard] types] containsObject: NSURLPboardType];
+    
+    return YES;
+}
+
 - (void) toggleControlForTorrent: (Torrent *) torrent
 {
     if ([torrent isActive])

@@ -66,6 +66,8 @@
 - (NSArray *) selectedValues;
 - (NSArray *) selectedTorrents;
 
+- (void) paste: (id) sender;
+
 - (void) toggleControlForTorrent: (Torrent *) torrent;
 
 - (void) displayTorrentMenuForEvent: (NSEvent *) event;
