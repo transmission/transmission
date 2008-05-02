@@ -70,7 +70,6 @@
 - (void) setQuitting
 {
     fQuitting = YES;
-    [self display];
 }
 
 - (void) drawRect: (NSRect) rect
