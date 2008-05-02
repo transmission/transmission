@@ -510,6 +510,7 @@ parseFiles( tr_info * inf, tr_benc * name,
 {
     tr_benc * item, * path;
     int ii;
+    char buf[4096];
 
     if( !tr_bencIsString( name ) )
     {
@@ -520,8 +521,10 @@ parseFiles( tr_info * inf, tr_benc * name,
         return TR_EINVALID;
     }
 
+    memset( buf, 0, sizeof( buf ) );
+    strlcat_utf8( buf, name->val.s.s, sizeof( buf ), 0 );
     tr_free( inf->name );
-    inf->name = tr_strdup( name->val.s.s );
+    inf->name = tr_strdup( buf );
     if( !inf->name || !*inf->name )
     {
         tr_err( _( "Invalid metadata entry \"%s\"" ), "name" );
