@@ -1,6 +1,7 @@
-/* $Id: natpmp.h,v 1.6 2007/12/13 14:55:16 nanard Exp $ */
+/* $Id: natpmp.h,v 1.8 2008/04/28 02:58:34 nanard Exp $ */
 /* libnatpmp
- * Copyright (c) 2007, Thomas BERNARD <miniupnp@free.fr>
+ * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
+ * http://miniupnp.free.fr/libnatpmp.html
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,7 +22,11 @@
 
 #include <time.h>
 #include <sys/time.h>
+#ifdef WIN32
+#include <winsock2.h>
+#else
 #include <netinet/in.h>
+#endif
 
 typedef struct {
 	int s;	/* socket */
@@ -170,5 +175,9 @@ int getnatpmprequesttimeout(natpmp_t * p, struct timeval * timeout);
  * NATPMP_ERR_UNSUPPORTEDOPCODE
  * NATPMP_ERR_UNDEFINEDERROR */
 int readnatpmpresponseorretry(natpmp_t * p, natpmpresp_t * response);
+
+#ifdef ENABLE_STRNATPMPERR
+const char * strnatpmperr(int t);
+#endif
 
 #endif

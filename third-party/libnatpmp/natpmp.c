@@ -1,6 +1,7 @@
-/* $Id: natpmp.c,v 1.4 2007/12/02 00:12:47 nanard Exp $ */
+/* $Id: natpmp.c,v 1.6 2008/04/28 02:58:34 nanard Exp $ */
 /* libnatpmp
- * Copyright (c) 2007, Thomas BERNARD <miniupnp@free.fr>
+ * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
+ * http://miniupnp.free.fr/libnatpmp.html
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -13,14 +14,20 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
-#include <errno.h>
 #include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <time.h>
 #include <sys/time.h>
+#ifdef WIN32
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#include <io.h>
+#else
+#include <errno.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#endif
 #include "natpmp.h"
 #include "getgateway.h"
 
@@ -246,4 +253,70 @@ int readnatpmpresponseorretry(natpmp_t * p, natpmpresp_t * response)
 	}
 	return n;
 }
+
+#ifdef ENABLE_STRNATPMPERR
+const char * strnatpmperr(int r)
+{
+	const char * s;
+	switch(r) {
+	case NATPMP_ERR_INVALIDARGS:
+		s = "invalid arguments";
+		break;
+	case NATPMP_ERR_SOCKETERROR:
+		s = "socket() failed";
+		break;
+	case NATPMP_ERR_CANNOTGETGATEWAY:
+		s = "cannot get default gateway ip address";
+		break;
+	case NATPMP_ERR_CLOSEERR:
+		s = "close() failed";
+		break;
+	case NATPMP_ERR_RECVFROM:
+		s = "recvfrom() failed";
+		break;
+	case NATPMP_ERR_NOPENDINGREQ:
+		s = "no pending request";
+		break;
+	case NATPMP_ERR_NOGATEWAYSUPPORT:
+		s = "the gateway does not support nat-pmp";
+		break;
+	case NATPMP_ERR_CONNECTERR:
+		s = "connect() failed";
+		break;
+	case NATPMP_ERR_WRONGPACKETSOURCE:
+		s = "packet not received from the default gateway";
+		break;
+	case NATPMP_ERR_SENDERR:
+		s = "send() failed";
+		break;
+	case NATPMP_ERR_FCNTLERROR:
+		s = "fcntl() failed";
+		break;
+	case NATPMP_ERR_GETTIMEOFDAYERR:
+		s = "gettimeofday() failed";
+		break;
+	case NATPMP_ERR_UNSUPPORTEDVERSION:
+		s = "unsupported nat-pmp version error from server";
+		break;
+	case NATPMP_ERR_UNSUPPORTEDOPCODE:
+		s = "unsupported nat-pmp opcode error from server";
+		break;
+	case NATPMP_ERR_UNDEFINEDERROR:
+		s = "undefined nat-pmp server error";
+		break;
+	case NATPMP_ERR_NOTAUTHORIZED:
+		s = "not authorized";
+		break;
+	case NATPMP_ERR_NETWORKFAILURE:
+		s = "network failure";
+		break;
+	case NATPMP_ERR_OUTOFRESOURCES:
+		s = "nat-pmp server out of resources";
+		break;
+	default:
+		s = "Unknown libnatpmp error";
+	}
+	return s;
+}
+#endif
 
