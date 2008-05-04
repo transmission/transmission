@@ -32,7 +32,7 @@
     
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     [nc addObserver: self selector: @selector(updateControlTint:)
-            name: NSControlTintDidChangeNotification object: nil];
+        name: NSControlTintDidChangeNotification object: nil];
     
     fSelected = NO;
 }
@@ -42,7 +42,6 @@
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
     [fIcon release];
-    
     [super dealloc];
 }
 

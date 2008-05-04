@@ -70,7 +70,7 @@
             [fDefaults setBool: NO forKey: @"CheckDownload"];
         }
         
-        //check for old version download location
+        //check for old version download location (before 1.1)
         NSString * choice;
         if ((choice = [fDefaults stringForKey: @"DownloadChoice"]))
         {
