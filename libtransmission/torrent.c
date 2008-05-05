@@ -27,6 +27,7 @@
 #include <unistd.h> /* stat */
 
 #include <assert.h>
+#include <limits.h> /* INT_MAX */
 #include <string.h> /* memcmp */
 #include <stdlib.h> /* qsort */
 
