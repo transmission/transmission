@@ -224,45 +224,33 @@ publishNewPeers( tr_tracker * t, int allAreSeeds,
 
 static void onReqDone( tr_session * session );
 
-static void
-updateAddresses( tr_tracker  * t,
-                 long          response_code,
-                 int           moveToNextAddress,
-                 int         * tryAgain )
+static int
+updateAddresses( tr_tracker  * t, int success )
 {
+    int retry;
+
     tr_torrent * torrent = tr_torrentFindFromHash( t->session, t->hash );
 
-
-    if( !response_code ) /* tracker didn't respond */
-    {
-        tr_ninf( t->name, _( "Tracker hasn't responded yet.  Retrying..." ) );
-        moveToNextAddress = TRUE;
-    }
-    else if( response_code == HTTP_OK )
+    if( success )
     {
         /* multitracker spec: "if a connection with a tracker is
            successful, it will be moved to the front of the tier." */
         t->trackerIndex = tr_torrentPromoteTracker( torrent, t->trackerIndex );
+        retry = FALSE; /* we succeeded; no need to retry */
     }
-    else 
+    else if ( ++t->trackerIndex >= torrent->info.trackerCount )
     {
-        moveToNextAddress = TRUE;
+        t->trackerIndex = 0;
+        retry = FALSE; /* we've tried them all */
+    }
+    else
+    {
+        const tr_tracker_info * n = getCurrentAddressFromTorrent( t, torrent );
+        tr_ninf( t->name, _( "Trying tracker \"%s\"" ), n->announce );
+        retry = TRUE;
     }
 
-    *tryAgain = moveToNextAddress;
-    if( moveToNextAddress )
-    {
-        if ( ++t->trackerIndex >= torrent->info.trackerCount ) /* we've tried them all */
-        {
-            *tryAgain = FALSE;
-            t->trackerIndex = 0;
-        }
-        else
-        {
-            const tr_tracker_info * n = getCurrentAddressFromTorrent( t, torrent );
-            tr_ninf( t->name, _( "Trying tracker \"%s\"" ), n->announce );
-        }
-    }
+    return retry;
 }
 
 /* Convert to compact form */
@@ -321,8 +309,8 @@ onTrackerResponse( tr_session    * session,
                    size_t          responseLen,
                    void          * torrent_hash )
 {
-    int moveToNextAddress = FALSE;
-    int tryAgain;
+    int retry;
+    int success = FALSE;
     tr_tracker * t;
 
     onReqDone( session );
@@ -347,10 +335,12 @@ onTrackerResponse( tr_session    * session,
             int incomplete = -1;
             const char * str;
 
+            success = TRUE;
+
             if(( tr_bencDictFindStr( &benc, "failure reason", &str ))) {
                // publishErrorMessageAndStop( t, str );
-                moveToNextAddress = TRUE;
                 publishMessage( t, str, TR_TRACKER_ERROR );
+                success = FALSE;
             }
 
             if(( tr_bencDictFindStr( &benc, "warning message", &str )))
@@ -397,13 +387,13 @@ onTrackerResponse( tr_session    * session,
             tr_bencFree( &benc );
     }
 
-    updateAddresses( t, responseCode, moveToNextAddress, &tryAgain );
+    retry = updateAddresses( t, success );
 
     /**
     ***
     **/
 
-    if( tryAgain )
+    if( retry )
         responseCode = 300;
 
     if( 200<=responseCode && responseCode<=299 )
@@ -458,8 +448,8 @@ onScrapeResponse( tr_session   * session,
                   size_t         responseLen,
                   void         * torrent_hash )
 {
-    int moveToNextAddress = FALSE;
-    int tryAgain;
+    int success = FALSE;
+    int retry;
     tr_tracker * t;
 
     onReqDone( session );
@@ -504,26 +494,26 @@ onScrapeResponse( tr_session   * session,
                     if(( tr_bencDictFindInt( flags, "min_request_interval", &itmp )))
                         t->scrapeIntervalSec = i;
 
+                success = TRUE;
+
                 tr_ndbg( t->name, "Scrape successful.  Rescraping in %d seconds.",
                          t->scrapeIntervalSec );
 
                 t->retryScrapeIntervalSec = 30;
             }
         }
-        else
-            moveToNextAddress = TRUE;
 
         if( bencLoaded )
             tr_bencFree( &benc );
     }
 
-    updateAddresses( t, responseCode, moveToNextAddress, &tryAgain );
+    retry = updateAddresses( t, success );
 
     /**
     ***
     **/
 
-    if( tryAgain )
+    if( retry )
         responseCode = 300;
 
     if( 200<=responseCode && responseCode<=299 )

@@ -298,20 +298,21 @@ tr_torrentPromoteTracker( tr_torrent * tor, int pos )
     int tier;
 
     assert( tor != NULL );
-    assert( 0 <= pos && pos < tor->info.trackerCount );
+    assert( ( 0 <= pos ) && ( pos < tor->info.trackerCount ) );
 
+    /* the tier of the tracker we're promoting */
     tier = tor->info.trackers[pos].tier;
 
-    /* find the index of the first tracker in that tier */
+    /* find the index of that tier's first tracker */
     for( i=0; i<tor->info.trackerCount; ++i )
         if( tor->info.trackers[i].tier == tier )
             break;
 
     assert( i < tor->info.trackerCount );
 
-    /* swap them if they're not the same */
+    /* promote the tracker at `pos' to the front of the tier */
     if( i != pos ) {
-        tr_tracker_info tmp = tor->info.trackers[i];
+        const tr_tracker_info tmp = tor->info.trackers[i];
         tor->info.trackers[i] = tor->info.trackers[pos];
         tor->info.trackers[pos] = tmp;
     }
@@ -326,6 +327,8 @@ struct RandomTracker
     int random_value;
 };
 
+/* the tiers will be sorted from lowest to highest,
+ * and trackers are randomized within the tiers */
 static int
 compareRandomTracker( const void * va, const void * vb )
 {
@@ -343,8 +346,7 @@ randomizeTiers( tr_info * info )
 {
     int i;
     const int n = info->trackerCount;
-    struct RandomTracker * r;
-    r = tr_new0( struct RandomTracker, n );
+    struct RandomTracker * r = tr_new0( struct RandomTracker, n );
     for( i=0; i<n; ++i ) {
         r[i].tracker = info->trackers[i];
         r[i].random_value = tr_rand( INT_MAX );
