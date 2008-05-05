@@ -240,16 +240,9 @@ updateAddresses( tr_tracker  * t,
     }
     else if( response_code == HTTP_OK )
     {
-#if 0
-/* FIXME */
         /* multitracker spec: "if a connection with a tracker is
            successful, it will be moved to the front of the tier." */
-        const int i = t->addressIndex;
-        const int j = t->tierFronts[i];
-        const tr_tracker_info swap = t->addresses[i];
-        t->addresses[i] = t->addresses[j];
-        t->addresses[j] = swap;
-#endif
+        t->trackerIndex = tr_torrentPromoteTracker( torrent, t->trackerIndex );
     }
     else 
     {

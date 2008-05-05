@@ -291,6 +291,35 @@ tr_torrentInitFilePieces( tr_torrent * tor )
         tor->info.pieces[pp].priority = calculatePiecePriority( tor, pp, -1 );
 }
 
+int
+tr_torrentPromoteTracker( tr_torrent * tor, int pos )
+{
+    int i;
+    int tier;
+
+    assert( tor != NULL );
+    assert( 0 <= pos && pos < tor->info.trackerCount );
+
+    tier = tor->info.trackers[pos].tier;
+
+    /* find the index of the first tracker in that tier */
+    for( i=0; i<tor->info.trackerCount; ++i )
+        if( tor->info.trackers[i].tier == tier )
+            break;
+
+    assert( i < tor->info.trackerCount );
+
+    /* swap them if they're not the same */
+    if( i != pos ) {
+        tr_tracker_info tmp = tor->info.trackers[i];
+        tor->info.trackers[i] = tor->info.trackers[pos];
+        tor->info.trackers[pos] = tmp;
+    }
+
+    /* return the new position of the tracker that started out at [pos] */
+    return i;
+}
+
 struct RandomTracker
 {
     tr_tracker_info tracker;
