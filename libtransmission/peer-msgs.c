@@ -1279,14 +1279,11 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             break;
 
         case BT_BITFIELD: {
-            const int clientIsSeed = tr_torrentIsSeed( msgs->torrent );
-            int peerIsSeed;
             dbgmsg( msgs, "got a bitfield" );
             msgs->peerSentBitfield = 1;
             tr_peerIoReadBytes( msgs->io, inbuf, msgs->info->have->bits, msglen );
             updatePeerProgress( msgs );
             maybeSendFastAllowedSet( msgs );
-            peerIsSeed = msgs->info->progress >= 1.0;
             fireNeedReq( msgs );
             break;
         }
