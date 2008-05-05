@@ -28,6 +28,7 @@
 
 #include <assert.h>
 #include <string.h> /* memcmp */
+#include <stdlib.h> /* qsort */
 
 #include "transmission.h"
 #include "bencode.h"
@@ -289,6 +290,41 @@ tr_torrentInitFilePieces( tr_torrent * tor )
         tor->info.pieces[pp].priority = calculatePiecePriority( tor, pp, -1 );
 }
 
+struct RandomTracker
+{
+    tr_tracker_info tracker;
+    int random_value;
+};
+
+static int
+compareRandomTracker( const void * va, const void * vb )
+{
+    const struct RandomTracker * a = va;
+    const struct RandomTracker * b = vb;
+
+    if( a->tracker.tier != b->tracker.tier )
+        return a->tracker.tier - b->tracker.tier;
+
+   return a->random_value - b->random_value;
+}
+    
+static void
+randomizeTiers( tr_info * info )
+{
+    int i;
+    const int n = info->trackerCount;
+    struct RandomTracker * r;
+    r = tr_new0( struct RandomTracker, n );
+    for( i=0; i<n; ++i ) {
+        r[i].tracker = info->trackers[i];
+        r[i].random_value = tr_rand( INT_MAX );
+    }
+    qsort( r, n, sizeof( struct RandomTracker ), compareRandomTracker );
+    for( i=0; i<n; ++i )
+        info->trackers[i] = r[i].tracker;
+    tr_free( r );
+}
+
 static void
 torrentRealInit( tr_handle     * h,
                  tr_torrent    * tor,
@@ -302,6 +338,8 @@ torrentRealInit( tr_handle     * h,
     tr_globalLock( h );
 
     tor->handle   = h;
+
+    randomizeTiers( info );
 
     /**
      * Decide on a block size.  constraints:
