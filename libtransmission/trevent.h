@@ -22,18 +22,6 @@ void tr_eventInit( struct tr_handle * tr_handle );
 
 void tr_eventClose( struct tr_handle * tr_handle );
 
-/**
-**/
-
-struct event;
-enum evhttp_cmd_type;
-struct evhttp_request;
-struct evhttp_connection;
-struct bufferevent;
-
-/**
-***
-**/
 
 typedef struct tr_timer  tr_timer;
 

@@ -188,7 +188,7 @@ tr_sharedInit( tr_handle * h, int isEnabled, int publicPort )
     s->bindSocket   = -1;
     s->natpmp       = tr_natpmpInit();
     s->upnp         = tr_upnpInit();
-    s->pulseTimer   = tr_timerNew( h, sharedPulse, s, 500 );
+    s->pulseTimer   = tr_timerNew( h, sharedPulse, s, 1000 );
     s->isEnabled    = isEnabled ? 1 : 0;
     s->upnpStatus   = TR_NAT_TRAVERSAL_UNMAPPED;
     s->natpmpStatus = TR_NAT_TRAVERSAL_UNMAPPED;
