@@ -243,15 +243,14 @@ main( int argc, char ** argv )
 
     if( showScrape )
     {
+        const struct tr_stat * stats;
+        const uint64_t start = tr_date( );
         printf( "Scraping, Please wait...\n" );
-        const tr_stat * stats;
-        
-        uint64_t start = tr_date();
         
         do
         {
             stats = tr_torrentStat( tor );
-            if( stats == NULL || tr_date() - start > 20000 )
+            if( !stats || tr_date() - start > 20000 )
             {
                 printf( "Scrape failed.\n" );
                 goto cleanup;
@@ -276,7 +275,7 @@ main( int argc, char ** argv )
     {
         char string[LINEWIDTH];
         int  chars = 0;
-        const tr_stat * s;
+        const struct tr_stat * s;
 
         tr_wait( 1000 );
 
