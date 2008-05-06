@@ -114,7 +114,7 @@ tr_metaInfoBuilderCreate( tr_handle * handle, const char * topFile )
     tr_metainfo_builder * ret = tr_new0( tr_metainfo_builder, 1 );
     ret->top = tr_strdup( topFile );
     ret->handle = handle; 
-    if (1) {
+    {
         struct stat sb;
         stat( topFile, &sb );
         ret->isSingleFile = !S_ISDIR( sb.st_mode );
@@ -122,7 +122,7 @@ tr_metaInfoBuilderCreate( tr_handle * handle, const char * topFile )
 
     /* build a list of files containing topFile and,
        if it's a directory, all of its children */
-    if (1) {
+    {
         char *dir, *base;
         char dirbuf[MAX_PATH_LENGTH];
         char basebuf[MAX_PATH_LENGTH];

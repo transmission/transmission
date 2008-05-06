@@ -207,7 +207,7 @@ tr_fastResumeSave( const tr_torrent * tor )
     }
 
     /* Write progress data */
-    if (1) {
+    {
         int i, n;
         tr_time_t * mtimes;
         uint8_t * buf = malloc( FR_PROGRESS_LEN( tor ) );

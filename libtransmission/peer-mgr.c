@@ -1749,7 +1749,7 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
 
     /* disconnect if it's been too long since piece data has been transferred.
      * this is on a sliding scale based on number of available peers... */
-    if( 1 ) {
+    {
         const int relaxStrictnessIfFewerThanN = (int)((getMaxPeerCount(tor) * 0.9) + 0.5);
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
