@@ -42,6 +42,7 @@
 
 #include <libtransmission/trcompat.h>
 #include <libtransmission/platform.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
 #include "errors.h"
