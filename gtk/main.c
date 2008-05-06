@@ -40,6 +40,8 @@
 #include <gdk/gdkx.h>
 #endif
 
+#include <libtransmission/version.h>
+
 #include "actions.h"
 #include "add-dialog.h"
 #include "conf.h"
@@ -1185,7 +1187,8 @@ doAction ( const char * action_name, gpointer user_data )
     }
     else if (!strcmp (action_name, "help"))
     {
-        gtr_open_file( "http://www.transmissionbt.com/help/gtk" );
+        gtr_open_file( "http://www.transmissionbt.com/help/gtk/"
+                       SHORT_VERSION_STRING );
     }
     else if (!strcmp (action_name, "toggle-main-window"))
     {
