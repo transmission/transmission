@@ -56,12 +56,13 @@ static tr_lock* getVerifyLock( void )
     return lock;
 }
 
-static void
+static int
 checkFile( tr_torrent       * tor,
            tr_file_index_t    fileIndex,
            int              * abortFlag )
 {
     tr_piece_index_t i;
+    int changed = FALSE;
     int nofile;
     struct stat sb;
     char path[MAX_PATH_LENGTH];
@@ -78,11 +79,14 @@ checkFile( tr_torrent       * tor,
         }
         else if( !tr_torrentIsPieceChecked( tor, i ) )
         {
+            const int wasComplete = tr_cpPieceIsComplete( tor->completion, i );
             const tr_errno err = tr_ioTestPiece( tor, i );
 
             if( !err ) /* yay */
             {
                 tr_torrentSetHasPiece( tor, i, TRUE );
+                if( !wasComplete )
+                    changed = TRUE;
             }
             else
             {
@@ -91,13 +95,17 @@ checkFile( tr_torrent       * tor,
                  * it being incomplete, do nothing -- we don't
                  * want to lose blocks in those incomplete pieces */
 
-                if( tr_cpPieceIsComplete( tor->completion, i ) )
+                if( wasComplete ) {
                     tr_torrentSetHasPiece( tor, i, FALSE );
+                    changed = TRUE;
+                }
             }
         }
 
         tr_torrentSetPieceChecked( tor, i, TRUE );
     }
+
+    return changed;
 }
 
 static void
@@ -105,6 +113,7 @@ verifyThreadFunc( void * unused UNUSED )
 {
     for( ;; )
     {
+        int changed = 0;
         tr_file_index_t i;
         tr_torrent * tor;
         struct verify_node * node;
@@ -127,13 +136,14 @@ verifyThreadFunc( void * unused UNUSED )
 
         tr_torinf( tor, _( "Verifying torrent" ) );
         for( i=0; i<tor->info.fileCount && !stopCurrent; ++i )
-            checkFile( tor, i, &stopCurrent );
+            changed |= checkFile( tor, i, &stopCurrent );
 
         tor->verifyState = TR_VERIFY_NONE;
 
         if( !stopCurrent )
         {
-            tr_torrentSaveResume( tor );
+            if( changed )
+                tr_torrentSaveResume( tor );
             fireCheckDone( tor, currentNode.verify_done_cb );
         }
     }

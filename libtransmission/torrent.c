@@ -357,6 +357,8 @@ randomizeTiers( tr_info * info )
     tr_free( r );
 }
 
+static void torrentStart( tr_torrent * tor, int reloadProgress );
+
 static void
 torrentRealInit( tr_handle     * h,
                  tr_torrent    * tor,
@@ -477,7 +479,7 @@ torrentRealInit( tr_handle     * h,
     tr_metainfoMigrate( h, &tor->info );
 
     if( doStart )
-        tr_torrentStart( tor );
+        torrentStart( tor, FALSE );
 }
 
 static int
@@ -550,9 +552,12 @@ tr_torrentNew( tr_handle      * handle,
 void
 tr_torrentSetFolder( tr_torrent * tor, const char * path )
 {
-    tr_free( tor->destination );
-    tor->destination = tr_strdup( path );
-    tr_torrentSaveResume( tor );
+    if( !path || !tor->destination || strcmp( path, tor->destination ) )
+    {
+        tr_free( tor->destination );
+        tor->destination = tr_strdup( path );
+        tr_torrentSaveResume( tor );
+    }
 }
 
 const char*
@@ -998,19 +1003,26 @@ checkAndStartCB( tr_torrent * tor )
     tr_runInEventThread( tor->handle, checkAndStartImpl, tor );
 }
 
-void
-tr_torrentStart( tr_torrent * tor )
+static void
+torrentStart( tr_torrent * tor, int reloadProgress )
 {
     tr_globalLock( tor->handle );
 
     if( !tor->isRunning )
     {
-        tr_torrentLoadResume( tor, TR_FR_PROGRESS, NULL );
+        if( reloadProgress )
+            tr_torrentLoadResume( tor, TR_FR_PROGRESS, NULL );
         tor->isRunning = 1;
         tr_verifyAdd( tor, checkAndStartCB );
     }
 
     tr_globalUnlock( tor->handle );
+}
+
+void
+tr_torrentStart( tr_torrent * tor )
+{
+    torrentStart( tor, TRUE );
 }
 
 static void

@@ -205,11 +205,11 @@ addSingleTorrentDialog( GtkWindow  * parent,
     gtk_table_attach( GTK_TABLE( t ), w, col, col+1, row, row+1, ~0, 0, 0, 0 );
     gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
     addTorrentFilters( GTK_FILE_CHOOSER( w ) );
-    g_signal_connect( w, "selection-changed",
-                      G_CALLBACK( sourceChanged ), data );
     if( data->filename )
         if( !gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ), data->filename ) )
             g_warning( "couldn't select '%s'", data->filename );
+    g_signal_connect( w, "selection-changed",
+                      G_CALLBACK( sourceChanged ), data );
 
     ++row;
     col = 0;
