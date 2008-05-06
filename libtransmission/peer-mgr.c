@@ -1734,6 +1734,8 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
         int peerHasEverything;
         if( atom->flags & ADDED_F_SEED_FLAG )
             peerHasEverything = TRUE;
+        else if( peer->progress < tr_cpPercentDone( tor->completion ) )
+            peerHasEverything = FALSE;
         else {
             tr_bitfield * tmp = tr_bitfieldDup( tr_cpPieceBitfield( tor->completion ) );
             tr_bitfieldDifference( tmp, peer->have );
