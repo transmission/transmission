@@ -5,6 +5,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Support https tracker connections
    + IP blocking using the Bluetack Level1 blocklist
    + Ability to reset global statistics
+   + Better support of multitracker torrents
    + Various bugfixes
 - Mac
    + Display of decimal numbers matches system international settings

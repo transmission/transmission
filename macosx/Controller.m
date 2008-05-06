@@ -39,14 +39,13 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSMenuAdditions.h"
-#import "UKKQueue.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 #import "SpeedLimitToTurtleIconTransformer.h"
 #include "utils.h" //tr_getRatio()
 
+#import "UKKQueue.h"
 #import <Sparkle/Sparkle.h>
-
 
 #define TOOLBAR_CREATE                  @"Toolbar Create"
 #define TOOLBAR_OPEN_FILE               @"Toolbar Open"
@@ -1816,7 +1815,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
                                                 selector: @selector(caseInsensitiveCompare:)] autorelease],
-                        * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddress" ascending: asc
+                        * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddressAnnounce" ascending: asc
                                                 selector: @selector(caseInsensitiveCompare:)] autorelease];
         
         descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, orderDescriptor, nil];
@@ -2006,7 +2005,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         int oldGroupValue = -2;
         for (i = 0; i < [allTorrents count]; i++)
         {
-            Torrent * torrent = [allTorrents objectAtIndex: i];
+            torrent = [allTorrents objectAtIndex: i];
             int groupValue = [torrent groupValue];
             if (groupValue != oldGroupValue)
             {
@@ -2258,11 +2257,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) updateGroupsFilterButton
 {
-    int index = [fDefaults integerForKey: @"FilterGroup"];
+    int groupIndex = [fDefaults integerForKey: @"FilterGroup"];
     
     NSImage * icon = nil;
     NSString * toolTip;
-    switch (index)
+    switch (groupIndex)
     {
         case GROUP_FILTER_ALL_TAG:
             icon = [NSImage imageNamed: @"PinTemplate.png"];
@@ -2275,9 +2274,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                         NSLocalizedString(@"No Label", "Groups -> Button")];
             break;
         default:
-            icon = [[GroupsController groups] imageForIndex: index isSmall: YES];
+            icon = [[GroupsController groups] imageForIndex: groupIndex isSmall: YES];
             toolTip = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Group", "Groups -> Button"),
-                        [[GroupsController groups] nameForIndex: index]];
+                        [[GroupsController groups] nameForIndex: groupIndex]];
     }
     
     [[fGroupFilterMenu itemAtIndex: 0] setImage: icon];

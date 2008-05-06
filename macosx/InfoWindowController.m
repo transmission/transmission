@@ -1122,6 +1122,7 @@ typedef enum
     }
 }
 
+#warning reload table when necessary?
 - (void) updateInfoTracker
 {
     if ([fTorrents count] != 1)
