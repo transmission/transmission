@@ -128,6 +128,7 @@ static GtkActionEntry entries[] =
   { "open-torrent-folder", GTK_STOCK_OPEN,
     N_("_Open Folder"), NULL, NULL, G_CALLBACK(action_cb) },
   { "show-about-dialog", GTK_STOCK_ABOUT, NULL, NULL, NULL, G_CALLBACK(action_cb) },
+  { "help", GTK_STOCK_HELP, NULL, NULL, NULL, G_CALLBACK(action_cb) },
   { "update-tracker", GTK_STOCK_NETWORK,
     N_("Ask Tracker for _More Peers"), NULL, NULL, G_CALLBACK(action_cb) }
 };

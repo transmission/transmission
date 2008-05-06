@@ -1183,6 +1183,10 @@ doAction ( const char * action_name, gpointer user_data )
     {
         about( data->wind );
     }
+    else if (!strcmp (action_name, "help"))
+    {
+        gtr_open_file( "http://www.transmissionbt.com/help/gtk" );
+    }
     else if (!strcmp (action_name, "toggle-main-window"))
     {
         toggleMainWindow( data );
