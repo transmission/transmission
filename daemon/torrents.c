@@ -65,7 +65,7 @@ RB_HEAD( tortree, tor );
 RB_HEAD( hashtree, tor );
 
 static struct tor * opentor    ( const char *, const char *, uint8_t *, size_t,
-                                  const char * );
+                                 const char *, int start );
 static void         closetor   ( struct tor *, int );
 static void         starttimer ( int );
 static void         timerfunc  ( int, short, void * );
@@ -119,27 +119,19 @@ torrent_init( const char * configdir, struct event_base * base )
 }
 
 int
-torrent_add_file( const char * path, const char * dir, int autostart )
+torrent_add_file( const char * path, const char * dir, int start )
 {
     struct tor * tor;
 
-    assert( NULL != gl_handle );
+    assert( gl_handle );
     assert( !gl_exiting );
 
-    tor = opentor( path, NULL, NULL, 0, dir );
-    if( NULL == tor )
-    {
-        return -1;
-    }
+    if( start < 0 )
+        start = gl_autostart;
 
-    if( 0 > autostart )
-    {
-        autostart = gl_autostart;
-    }
-    if( autostart )
-    {
-        tr_torrentStart( tor->tor );
-    }
+    tor = opentor( path, NULL, NULL, 0, dir, start );
+    if( !tor )
+        return -1;
 
     savestate();
 
@@ -147,27 +139,19 @@ torrent_add_file( const char * path, const char * dir, int autostart )
 }
 
 int
-torrent_add_data( uint8_t * data, size_t size, const char * dir, int autostart )
+torrent_add_data( uint8_t * data, size_t size, const char * dir, int start )
 {
     struct tor * tor;
 
-    assert( NULL != gl_handle );
+    assert( gl_handle );
     assert( !gl_exiting );
 
-    tor = opentor( NULL, NULL, data, size, dir );
-    if( NULL == tor )
-    {
-        return -1;
-    }
+    if( start < 0 )
+        start = gl_autostart;
 
-    if( 0 > autostart )
-    {
-        autostart = gl_autostart;
-    }
-    if( autostart )
-    {
-        tr_torrentStart( tor->tor );
-    }
+    tor = opentor( NULL, NULL, data, size, dir, start );
+    if( !tor )
+        return -1;
 
     savestate();
 
@@ -468,17 +452,19 @@ torrent_get_encryption(void)
 }
 
 struct tor *
-opentor( const char * path, const char * hash, uint8_t * data, size_t size,
-         const char * dir )
+opentor( const char * path,
+         const char * hash,
+         uint8_t    * data,
+         size_t       size,
+         const char * dir, 
+         int          start )
 {
     struct tor * tor, * found;
     int          errcode;
     const tr_info  * inf;
     tr_ctor        * ctor;
 
-    assert( ( NULL != path && NULL == hash && NULL == data ) ||
-            ( NULL == path && NULL != hash && NULL == data ) ||
-            ( NULL == path && NULL == hash && NULL != data ) );
+    assert( (path?1:0) + (hash?1:0) + (data?1:0) == 1 );
 
     /* XXX should probably wrap around back to 1 and avoid duplicates */
     if( INT_MAX == gl_lastid )
@@ -499,7 +485,7 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
         dir = gl_dir;
 
     ctor = tr_ctorNew( gl_handle );
-    tr_ctorSetPaused( ctor, TR_FORCE, 1 );
+    tr_ctorSetPaused( ctor, TR_FORCE, !start );
     tr_ctorSetDestination( ctor, TR_FORCE, dir );
     if( path != NULL )
         tr_ctorSetMetainfoFromFile( ctor, path );
@@ -661,7 +647,6 @@ loadstate( void )
     int64_t      tmp;
     benc_val_t   top, * list;
     int          ii;
-    struct tor * tor;
 
     if( tr_bencLoadFile( gl_state, &top ) )
     {
@@ -712,6 +697,7 @@ loadstate( void )
 
     for( ii = 0; ii < list->val.l.count; ii++ )
     {
+        int start = 0;
         const char * directory = NULL;
         const char * hash = NULL;
 
@@ -723,15 +709,10 @@ loadstate( void )
             !tr_bencDictFindStr( dict, "hash", &hash ) )
             continue;
 
-        tor = opentor( NULL, hash, NULL, 0, directory );
-        if( !tor )
-            continue;
-
-        if( tr_bencDictFindInt( dict, "pex", &tmp ) )
-            fprintf( stderr, "warning: obsolete command 'pex'\n" );
-
         if( tr_bencDictFindInt( dict, "paused", &tmp ) && !tmp )
-            tr_torrentStart( tor->tor );
+            start = 1;
+
+        opentor( NULL, hash, NULL, 0, directory, start );
     }
 
     return 0;

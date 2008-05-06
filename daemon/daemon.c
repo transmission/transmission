@@ -203,7 +203,7 @@ trylocksock( const char * configdir, const char * sockpath )
     char path[MAXPATHLEN];
 
     confpath( path, sizeof path, configdir, NULL, CONF_PATH_TYPE_DAEMON );
-    if( 0 > mkdir( path, 0777 ) && EEXIST != errno )
+    if( tr_mkdirp( path, 0777 ) && EEXIST != errno )
     {
         errnomsg( "failed to create directory: %s", path );
         return -1;
