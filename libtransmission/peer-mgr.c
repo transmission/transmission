@@ -1729,8 +1729,7 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
 
     /* if we're seeding and the peer has everything we have,
      * and enough time has passed for a pex exchange, then disconnect */
-    if( 1 ) {
-        const int clientIsSeed = tr_torrentIsSeed( tor );
+    if( tr_torrentIsSeed( tor ) ) {
         int peerHasEverything;
         if( atom->flags & ADDED_F_SEED_FLAG )
             peerHasEverything = TRUE;
@@ -1742,7 +1741,7 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
             peerHasEverything = tr_bitfieldCountTrueBits( tmp ) == 0;
             tr_bitfieldFree( tmp );
         }
-        if( clientIsSeed && peerHasEverything && ( !tr_torrentAllowsPex(tor) || (now-atom->time>=30) ) ) {
+        if( peerHasEverything && ( !tr_torrentAllowsPex(tor) || (now-atom->time>=30) ) ) {
             tordbg( t, "purging peer %s because we're both seeds", tr_peerIoAddrStr(&atom->addr,atom->port) );
             return TRUE;
         }
