@@ -103,8 +103,10 @@ getLockFilename( void )
 static void
 cf_removelocks( void )
 {
-    g_unlink( gl_lockpath );
-    g_free( gl_lockpath );
+    if( gl_lockpath ) {
+      g_unlink( gl_lockpath );
+      g_free( gl_lockpath );
+    }
 }
 
 /* errstr may be NULL, this might be called before GTK is initialized */
