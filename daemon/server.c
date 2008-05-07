@@ -38,6 +38,7 @@
 
 #include <libtransmission/bencode.h>
 #include <libtransmission/ipcparse.h>
+#include <libtransmission/utils.h> /* tr_free */
 
 #include "bsdtree.h"
 #include "errors.h"
@@ -387,7 +388,7 @@ doread( struct bufferevent * ev, void * arg )
     }
 }
 
-int
+static int
 queuemsg( struct client * client, uint8_t * buf, size_t buflen )
 {
     if( NULL == buf )
@@ -414,6 +415,16 @@ queuemsg( struct client * client, uint8_t * buf, size_t buflen )
     }
 
     return 0;
+}
+
+static int
+queuepkmsg( struct client * client, tr_benc * pk )
+{
+    size_t buflen;
+    uint8_t * buf = ipc_serialize( pk, &buflen );
+    int ret = queuemsg( client, buf, buflen );
+    tr_free( buf );
+    return ret;
 }
 
 int
@@ -459,8 +470,6 @@ addmsg1( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
     struct client * client = arg;
     benc_val_t      pk, * added;
     int             ii, tor;
-    size_t          buflen;
-    uint8_t       * buf;
 
     if( !tr_bencIsList( val ) )
     {
@@ -496,10 +505,8 @@ addmsg1( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
         }
     }
 
-    buf = ipc_serialize( &pk, &buflen );
+    queuepkmsg( client, &pk );
     tr_bencFree( &pk );
-    queuemsg( client, buf, buflen );
-    free( buf );
 }
 
 void
@@ -508,8 +515,6 @@ addmsg2( enum ipc_msg id UNUSED, benc_val_t * dict, int64_t tag, void * arg )
     struct client * client = arg;
     benc_val_t    * val, pk;
     int             tor, start;
-    size_t          buflen;
-    uint8_t       * buf;
     const char    * dir;
 
     if( !tr_bencIsDict( dict ) )
@@ -557,10 +562,9 @@ addmsg2( enum ipc_msg id UNUSED, benc_val_t * dict, int64_t tag, void * arg )
             byebye( client->ev, EVBUFFER_EOF, NULL );
             return;
         }
-        buf = ipc_serialize( &pk, &buflen );
+
+        queuepkmsg( client, &pk );
         tr_bencFree( &pk );
-        queuemsg( client, buf, buflen );
-        free( buf );
     }
     else
     {
@@ -657,8 +661,6 @@ void
 infomsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 {
     struct client * client = arg;
-    uint8_t       * buf;
-    size_t          buflen;
     benc_val_t      pk, * pkinf, * typelist, * idlist, * idval;
     int             all, types, ii, tor;
     void          * iter;
@@ -754,11 +756,8 @@ infomsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
         }
     }
 
-    /* generate packet data and send it */
-    buf = ipc_serialize( &pk, &buflen );
+    queuepkmsg( client, &pk );
     tr_bencFree( &pk );
-    queuemsg( client, buf, buflen );
-    free( buf );
 }
 
 int
@@ -853,8 +852,6 @@ void
 lookmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 {
     struct client * client = arg;
-    uint8_t       * buf;
-    size_t          buflen;
     int             ii;
     benc_val_t    * hash, pk, * pkinf;
     int64_t         found;
@@ -896,10 +893,8 @@ lookmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
         }
     }
 
-    buf = ipc_serialize( &pk, &buflen );
+    queuepkmsg( client, &pk );
     tr_bencFree( &pk );
-    queuemsg( client, buf, buflen );
-    free( buf );
 }
 
 void
@@ -962,8 +957,6 @@ void
 supmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 {
     struct client  * client = arg;
-    uint8_t        * buf;
-    size_t           buflen;
     int              ii;
     benc_val_t       pk, *pkval;
     enum ipc_msg     found;
@@ -1008,8 +1001,6 @@ supmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
                         name->val.s.s, name->val.s.i, 1 );
     }
 
-    buf = ipc_serialize( &pk, &buflen );
+    queuepkmsg( client, &pk );
     tr_bencFree( &pk );
-    queuemsg( client, buf, buflen );
-    free( buf );
 }
