@@ -1,12 +1,13 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.20 (2008/mm/dd)
-http://trac.transmissionbt.com/report/26
+http://trac.transmissionbt.com/query?group=component&milestone=1.20
 - All Platforms
    + Support https tracker connections
    + IP blocking using the Bluetack Level1 blocklist
-   + Ability to reset global statistics
    + Better support of multitracker torrents
+   + Faster UPnP port mapping on startup
+   + Ability to reset global statistics
    + Various bugfixes
 - Mac
    + Display of decimal numbers matches system international settings
@@ -18,7 +19,7 @@ http://trac.transmissionbt.com/report/26
 
 1.11 (2008/04/04)
 - Mac
-   + Fix visual glitch with the tracker inspector tab when there is no scrape address
+   + Fix scrape address visual glitch with the tracker inspector tab
    + Only make the progress status string clickable on multi-file torrents
    + Traditional Chinese localization, updated Russian localization
 - GTK+
