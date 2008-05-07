@@ -1,6 +1,7 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.20 (2008/mm/dd)
+http://trac.transmissionbt.com/report/26
 - All Platforms
    + Support https tracker connections
    + IP blocking using the Bluetack Level1 blocklist
