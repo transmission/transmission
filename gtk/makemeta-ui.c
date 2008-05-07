@@ -24,6 +24,9 @@
 
 #define UPDATE_INTERVAL_MSEC 200
 
+#define BUILDER_KEY "builder"
+#define UI_KEY "ui"
+
 typedef struct
 {
     GtkWidget * size_lb;
@@ -45,7 +48,6 @@ static void
 freeMetaUI( gpointer p )
 {
     MakeMetaUI * ui = p;
-    tr_metaInfoBuilderFree( ui->builder );
     memset( ui, ~0, sizeof(MakeMetaUI) );
     g_free( ui );
 }
@@ -79,7 +81,7 @@ refresh_cb ( gpointer user_data )
     int denom;
     char buf[1024];
     double fraction;
-    MakeMetaUI * ui = (MakeMetaUI *) user_data;
+    MakeMetaUI * ui = user_data;
     GtkProgressBar * p = GTK_PROGRESS_BAR( ui->progressbar );
 
     denom = ui->builder->pieceCount ? ui->builder->pieceCount : 1;
@@ -139,7 +141,7 @@ remove_tag (gpointer tag)
 static void
 response_cb( GtkDialog* d, int response, gpointer user_data )
 {
-    MakeMetaUI * ui = (MakeMetaUI*) user_data;
+    MakeMetaUI * ui = user_data;
     char *tmp;
     char buf[1024];
     guint tag;
@@ -190,61 +192,64 @@ response_cb( GtkDialog* d, int response, gpointer user_data )
 ***/
 
 static void
-onSelectionChanged( GtkFileChooser *chooser, gpointer user_data )
+refreshFromBuilder( MakeMetaUI * ui )
 {
-    MakeMetaUI * ui = (MakeMetaUI *) user_data;
-    char * filename;
     char sizeStr[128];
     char buf[MAX_PATH_LENGTH];
-    uint64_t totalSize=0;
-    int fileCount=0, pieceCount=0, pieceSize=0;
+    tr_metainfo_builder * builder = ui->builder;
+    const char * filename = builder ? builder->top : NULL;
 
-    if( ui->builder ) {
-        tr_metaInfoBuilderFree( ui->builder );
-        ui->builder = NULL;
-    }
-
-    filename = gtk_file_chooser_get_filename( chooser );
     if( !filename )
         g_snprintf( buf, sizeof( buf ), _( "No files selected" ) );
-    else {
-        ui->builder = tr_metaInfoBuilderCreate( ui->handle, filename );
+    else
         g_snprintf( buf, sizeof(buf), "%s.torrent (%d%%)", filename, 0 );
-        g_free( filename );
-        fileCount = ui->builder->fileCount;
-        totalSize = ui->builder->totalSize;
-        pieceCount = ui->builder->pieceCount;
-        pieceSize = ui->builder->pieceSize;
-    }
     gtk_progress_bar_set_text( GTK_PROGRESS_BAR( ui->progressbar ), buf );
     refreshButtons( ui );
 
     if( !filename )
         g_snprintf( buf, sizeof( buf ), _( "<i>No files selected</i>" ) );
     else {
-        tr_strlsize( sizeStr, totalSize, sizeof(sizeStr) );
+        tr_strlsize( sizeStr, builder->totalSize, sizeof(sizeStr) );
         g_snprintf( buf, sizeof( buf ),
                     /* %1$s is the torrent size
                        %2$'d is its number of files */
                     ngettext( "<i>%1$s; %2$'d File</i>",
-                              "<i>%1$s; %2$'d Files</i>", fileCount ),
-                    sizeStr, fileCount );
+                              "<i>%1$s; %2$'d Files</i>", builder->fileCount ),
+                    sizeStr, builder->fileCount );
     }
     gtk_label_set_markup ( GTK_LABEL(ui->size_lb), buf );
 
     if( !filename )
         *buf = '\0';
     else {
-        tr_strlsize( sizeStr, pieceSize, sizeof(sizeStr) );
+        tr_strlsize( sizeStr, builder->pieceSize, sizeof(sizeStr) );
         g_snprintf( buf, sizeof( buf ),
                     /* %1$'s is number of pieces;
                        %2$s is how big each piece is */
                     ngettext( "<i>%1$'d Piece @ %2$s</i>",
                               "<i>%1$'d Pieces @ %2$s</i>",
-                              pieceCount ),
-                    pieceCount, sizeStr );
+                              builder->pieceCount ),
+                    builder->pieceCount, sizeStr );
     }
     gtk_label_set_markup ( GTK_LABEL(ui->pieces_lb), buf );
+}
+
+static void
+onSelectionChanged( GtkFileChooser * chooser, gpointer gui )
+{
+    MakeMetaUI * ui = gui;
+    char * filename = gtk_file_chooser_get_filename( chooser );
+    tr_metainfo_builder * builder = tr_metaInfoBuilderCreate( ui->handle, filename );
+
+    g_object_set_data_full( G_OBJECT( chooser ),
+                            BUILDER_KEY,
+                            builder,
+                            (GDestroyNotify)tr_metaInfoBuilderFree );
+    ui->builder = builder;
+
+    refreshFromBuilder( ui );
+
+    g_free( filename );
 }
 
 static void
@@ -253,7 +258,11 @@ onFileModeToggled( GtkToggleButton * t, gpointer w )
     const gboolean active = gtk_toggle_button_get_active( t );
     gtk_widget_set_sensitive( w, active );
     if( active )
-        g_signal_emit_by_name( w, "selection-changed", NULL );
+    {
+        MakeMetaUI * ui = g_object_get_data( G_OBJECT( w ), UI_KEY );
+        ui->builder = g_object_get_data( G_OBJECT( w ), BUILDER_KEY );
+        refreshFromBuilder( ui );
+    }
 }
     
 GtkWidget*
@@ -284,6 +293,7 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
 
         l = gtk_radio_button_new_with_mnemonic( NULL, _( "_Single File:" ) );
         w = gtk_file_chooser_button_new( NULL, GTK_FILE_CHOOSER_ACTION_OPEN );
+        g_object_set_data( G_OBJECT( w ), UI_KEY, ui );
         hig_workarea_add_row_w( t, &row, l, w, NULL );
         group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( l ) );
         g_signal_connect( l, "toggled", G_CALLBACK(onFileModeToggled), w );
@@ -291,6 +301,7 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
 
         l = gtk_radio_button_new_with_mnemonic( group, _( "_Folder:" ) );
         w = gtk_file_chooser_button_new( NULL, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
+        g_object_set_data( G_OBJECT( w ), UI_KEY, ui );
         hig_workarea_add_row_w( t, &row, l, w, NULL );
         g_signal_connect( l, "toggled", G_CALLBACK(onFileModeToggled), w );
         g_signal_connect( w, "selection-changed", G_CALLBACK(onSelectionChanged), ui );
