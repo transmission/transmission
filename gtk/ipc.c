@@ -340,6 +340,7 @@ blocking_client( enum ipc_msg msgid, GSList * files )
 
   g_main_loop_run(con->u.client.loop);
 
+  sleep( 1 ); /* http://trac.transmissionbt.com/ticket/826#comment:6 */
   return ret;
 }
 
