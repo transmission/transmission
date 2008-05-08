@@ -16,6 +16,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.20
    + Inhibit hibernation when downloading
    + Use XDG basedir spec for configuration files
    + Various bug fixes and usability improvements
+   + Vastly improved translations thanks to the Ubuntu translation team
 
 1.11 (2008/04/04)
 - Mac

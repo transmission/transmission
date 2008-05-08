@@ -1,579 +1,42 @@
-# $Id$
-#
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Norwegian Nynorsk translation for transmission
+# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# This file is distributed under the same license as the transmission package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Project-Id-Version: transmission\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-03-26 14:37+0000\n"
-"Last-Translator: Mircea Suciu <Unknown>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2008-04-27 13:19+0000\n"
+"Last-Translator: Vidar Lillebø <Unknown>\n"
+"Language-Team: Norwegian Nynorsk <nn@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n == 1 ? 0: (((n % 100 > 19) || ((n % 100 "
-"== 0) && (n != 0))) ? 2: 1));\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Launchpad-Export-Date: 2008-05-08 18:40+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
-#, fuzzy
-#~ msgid "Open a torrent"
-#~ msgstr "Adăugaţi un torrent"
-
-#, fuzzy, c-format
-#~ msgid "Couldn't connect to \"%s\": %s"
-#~ msgstr ""
-#~ "Nu s-a putut crea directorul %s:\n"
-#~ "%s"
-
-#, fuzzy, c-format
-#~ msgid "Couldn't set up socket: %s"
-#~ msgstr "nu s-a putut crea socket-ul: %s"
-
-#, fuzzy
-#~ msgid "Torrent creation failed"
-#~ msgstr "Torrente"
-
-#, fuzzy, c-format
-#~ msgid "Couldn't save file \"%s\": %s"
-#~ msgstr ""
-#~ "Eroare la scriere în fişierul %s:\n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid "Open a Torrent"
-#~ msgstr "Adăugaţi un torrent"
-
-#, fuzzy
-#~ msgid "Opening Torrents"
-#~ msgstr "Adăugaţi un torrent"
-
-#, fuzzy
-#~ msgid "Preferences"
-#~ msgstr "Preferinţe %s"
-
-#, fuzzy, c-format
-#~ msgid "Uploading to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Uploading to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "La seed, se uploadează către %d din %d peer"
-#~ msgstr[1] "La seed, se uploadează către %d din %d peer"
-
-#, fuzzy
-#~ msgid "Torrent needs to be verified"
-#~ msgstr "Torrente"
-
-#, fuzzy
-#~ msgid "Port forwarding failed."
-#~ msgstr "Torrente"
-
-#, fuzzy, c-format
-#~ msgid "Couldn't read file \"%s\": %s"
-#~ msgstr ""
-#~ "Eroare la scriere în fişierul %s:\n"
-#~ "%s"
-
-#~ msgid ""
-#~ "Failed to create the directory %s:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Nu s-a putut crea directorul %s:\n"
-#~ "%s"
-
-#~ msgid ""
-#~ "Failed to open the file %s for reading:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Nu s-a putut deschide fişierul %s pentru citire:\n"
-#~ "%s"
-
-#~ msgid ""
-#~ "Error while reading from the file %s:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Eroare la citire din fişierul %s:\n"
-#~ "%s"
-
-#~ msgid ""
-#~ "Failed to rename the file %s to %s:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Nu s-a putut redenumi fişierul %s în %s:\n"
-#~ "%s"
-
-#~ msgid "Choose a download directory"
-#~ msgstr "Alegeţi un director pentru downloaduri"
-
-#, fuzzy
-#~ msgid "%s - Properties for %s"
-#~ msgstr "%s - Proprietăţi pentru %s"
-
-#~ msgid "General"
-#~ msgstr "General"
-
-#~ msgid "Piece Size:"
-#~ msgstr "Dimensiune piesă:"
-
-#~ msgid "?"
-#~ msgstr "?"
-
-#, fuzzy
-#~ msgid "Choose a directory"
-#~ msgstr "Alegeţi un director pentru downloaduri"
-
-#~ msgid "Are you sure you want to quit %s?"
-#~ msgstr "Sunteţi sigur ca vreţi să închideţi %s?"
-
-#~ msgid "  fnord    fnord  "
-#~ msgstr "  i can see the fnords  "
-
-#~ msgid "Start a torrent that is not running"
-#~ msgstr "Porneşte un torrent ce nu rulează"
-
-#~ msgid "Stop a torrent that is running"
-#~ msgstr "Opreşte un torrent ce rulează"
-
-#~ msgid "Show additional information about a torrent"
-#~ msgstr "Afişează informaţii suplimentare despre un torrent"
-
-#~ msgid "Open debug window"
-#~ msgstr "Fereastră debug"
-
-#~ msgid "Customize application behavior"
-#~ msgstr "Personalizează comportamentul aplicaţiei"
-
-#~ msgid "Exit the program"
-#~ msgstr "Iese din program"
-
-#~ msgid ""
-#~ "usage: %s [-hpq] [files...]\n"
-#~ "\n"
-#~ "Transmission %s (r%d) http://transmission.m0k.org/\n"
-#~ "A free, lightweight BitTorrent client with a simple, intuitive interface\n"
-#~ "\n"
-#~ "  -h --help    display this message and exit\n"
-#~ "  -p --paused  start with all torrents paused\n"
-#~ "  -q --quit    request that the running %s instance quit\n"
-#~ "\n"
-#~ "Only one instance of %s may run at one time. Multiple\n"
-#~ "torrent files may be loaded at startup by adding them to the command\n"
-#~ "line. If %s is already running, those torrents will be\n"
-#~ "opened in the running instance.\n"
-#~ msgstr ""
-#~ "folosire: %s [-hpq] [fişiere...]\n"
-#~ "\n"
-#~ "Transmission %s (r%d) http://transmission.m0k.org/\n"
-#~ "Un client BitTorrent liber, neîncărcat, cu o interfaţă simplă şi intuitivă\n"
-#~ "  -h --help    afişează acest mesaj şi iese\n"
-#~ "  -p --paused  porneşte cu toate torrentele în pauză\n"
-#~ "  -q --quit    cere ca instanţa %s să se încheie\n"
-#~ "\n"
-#~ "Poate rula doar o singură instanţă de %s. Pot fi adăugate\n"
-#~ "mai multe torrente la pornire adăugându-le la linia de comandă\n"
-#~ "Dacă deja rulează %s, aceste torrente vor fi\n"
-#~ "deschise în instanţa ce deja rulează.\n"
-
-#~ msgid "Info"
-#~ msgstr "Info"
-
-#~ msgid "???"
-#~ msgstr "???"
-
-#~ msgid "Restrict the download rate"
-#~ msgstr "Limitaţi rata de download"
-
-#~ msgid "Speed in KiB/sec for restricted download rate"
-#~ msgstr "Viteza în KiB/s pentru rata limitată de download"
-
-#~ msgid "Restrict the upload rate"
-#~ msgstr "Limitaţi rata de upload"
-
-#~ msgid "Speed in KiB/sec for restricted upload rate"
-#~ msgstr "Viteza în KiB/s pentru rata limitată de download"
-
-#~ msgid ""
-#~ "When adding a torrent, always prompt for a directory to download data files "
-#~ "into"
-#~ msgstr ""
-#~ "Când se adaugă un torrent, cere întodeauna calea unde să se salveze "
-#~ "fişiereletorrentului"
-
-#~ msgid "Au_tomatic port mapping via NAT-PMP or UPnP"
-#~ msgstr "Mapare automată de port via NAT-PMP sau UPnP"
-
-#~ msgid "Attempt to bypass NAT or firewall to allow incoming peer connections"
-#~ msgstr ""
-#~ "Încearcă ocolirea NAT-ului sau firewall-ului pentru a putea primi conexiuni"
-
-#~ msgid ""
-#~ "Perform Azureus or µTorrent compatible peer exchange with any peers which "
-#~ "support it"
-#~ msgstr ""
-#~ "Utilizează algoritmul de peer exchange al Azureus/µTorrent cu orice peercare "
-#~ "îl înţelege"
-
-#~ msgid "Use a system tray / dock / notification area icon"
-#~ msgstr "Afişează iconiţă în system tray / zona de notificare"
-
-#~ msgid "Confirm _quit"
-#~ msgstr "Confirmarea ieşirii"
-
-#~ msgid "Prompt for confirmation when quitting"
-#~ msgstr "Cere o confirmare la ieşire"
-
-#~ msgid "For torrents added _normally:"
-#~ msgstr "Pentru torrente adăugate _normal:"
-
-#~ msgid "Torrent files added via the toolbar, popup menu, and drag-and-drop"
-#~ msgstr "Torrente adăugate din toolbar, meniu sau prin drag-and-drop"
-
-#~ msgid ""
-#~ "For torrents added e_xternally\n"
-#~ "(via the command-line):"
-#~ msgstr ""
-#~ "Pentru torrente adăugate e_xtern\n"
-#~ "(via linie de comandă):"
-
-#~ msgid "Use the torrent file where it is"
-#~ msgstr "Foloseşte torrent-ul din locaţia curentă"
-
-#~ msgid "Keep a copy of the torrent file"
-#~ msgstr "Păstrează o copie a torrent-ului"
-
-#~ msgid "Keep a copy and remove the original"
-#~ msgstr "Păstrează o copie şi şterge din locaţia curentă"
-
-#~ msgid "     Total DL: %s/s     Total UL: %s/s"
-#~ msgstr "     Total DL: %s/s     Total UL: %s/s"
-
-#~ msgid "Checking existing files (%.1f%%)"
-#~ msgstr "Se verifică fişierele existente (%.1f%%)"
-
-#~ msgid "B"
-#~ msgstr "B"
-
-#~ msgid "KiB"
-#~ msgstr "KiB"
-
-#~ msgid "MiB"
-#~ msgstr "MiB"
-
-#~ msgid "GiB"
-#~ msgstr "GiB"
-
-#~ msgid "TiB"
-#~ msgstr "TiB"
-
-#~ msgid "PiB"
-#~ msgstr "PiB"
-
-#~ msgid "EiB"
-#~ msgstr "EiB"
-
-#~ msgid "%i %s"
-#~ msgstr "%i %s"
-
-#~ msgid "%i %s %i %s"
-#~ msgstr "%i %s %i %s"
-
-#~ msgid "week"
-#~ msgid_plural "weeks"
-#~ msgstr[0] "săptămână"
-#~ msgstr[1] "săptămâni"
-
-#~ msgid "N/A"
-#~ msgstr "indisp."
-
-#~ msgid "∞"
-#~ msgstr "∞"
-
-#, fuzzy
-#~ msgid "Torrent Information"
-#~ msgstr "Torrente"
-
-#, fuzzy
-#~ msgid "Torrent file"
-#~ msgstr "Torrente"
-
-#, fuzzy
-#~ msgid "IPC parse error"
-#~ msgstr "versiune incorectă a protocolului IPC"
-
-#~ msgid "_File"
-#~ msgstr "_Fişier"
-
-#, fuzzy
-#~ msgid "Couldn't write file \"%s\": %s"
-#~ msgstr ""
-#~ "Eroare la scriere în fişierul %s:\n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid "_Trash original torrent file"
-#~ msgstr "%s: torrent nevalid"
-
-#, fuzzy
-#~ msgid "Select Torrents"
-#~ msgstr "Adăugaţi un torrent"
-
-#, fuzzy
-#~ msgid "_Trash original torrent files"
-#~ msgstr "%s: torrent nevalid"
-
-#, fuzzy
-#~ msgid "Torrent is empty"
-#~ msgstr "Torrente"
-
-#, fuzzy
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr ""
-#~ "Eroare la scriere în fişierul %s:\n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid "Too many open files"
-#~ msgstr "Torrente"
-
-#, fuzzy
-#~ msgid "Torrent has no files."
-#~ msgstr "Torrente"
-
-#, fuzzy
-#~ msgid "Torrent is zero bytes long."
-#~ msgstr "%s: torrent-ul este deja deschis"
-
-#, fuzzy
-#~ msgid "Couldn't create socket of type %d"
-#~ msgstr "nu s-a putut crea socket-ul: %s"
-
-#, fuzzy
-#~ msgid "Open an existing torrent"
-#~ msgstr "Adăugaţi un torrent"
-
-#, fuzzy
-#~ msgid "_About Transmission"
-#~ msgstr "Transmission"
-
-#, fuzzy
-#~ msgid "Failed to open lockfile %s: %s"
-#~ msgstr ""
-#~ "Nu s-a putut bloca fişierul %s:\n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid "Secure"
-#~ msgstr "Scrape:"
-
-#, fuzzy
-#~ msgid "Downloaded data"
-#~ msgstr "Downloadat:"
-
-#, fuzzy
-#~ msgid "Torrent file name"
-#~ msgstr "Torrente"
-
-#, fuzzy
-#~ msgid "Limit _download speed to:"
-#~ msgstr "_Limitaţi viteza de download"
-
-#, fuzzy
-#~ msgid "KiB/s"
-#~ msgstr "KiB"
-
-#, fuzzy
-#~ msgid "Limit _upload speed to:"
-#~ msgstr "Viteza maximă de _upload:"
-
-#, fuzzy
-#~ msgid "peers"
-#~ msgstr "Piese:"
-
-#, fuzzy
-#~ msgid "Delete torrent?"
-#~ msgid_plural "Delete torrents?"
-#~ msgstr[0] "Adăugaţi un torrent"
-#~ msgstr[1] "Adăugaţi un torrent"
-
-#, fuzzy
-#~ msgid "Failed to create socket: %s"
-#~ msgstr "nu s-a putut crea socket-ul: %s"
-
-#, fuzzy
-#~ msgid "Failed to connect to %s: %s"
-#~ msgstr "nu s-a putut efectua conexiunea la %s"
-
-#, fuzzy
-#~ msgid "Failed to set up socket: %s"
-#~ msgstr ""
-#~ "Nu s-a putut seta socket-ul:\n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid "File"
-#~ msgid_plural "Files"
-#~ msgstr[0] "Fişier"
-#~ msgstr[1] "Fişier"
-
-#, fuzzy
-#~ msgid "Piece"
-#~ msgid_plural "Pieces"
-#~ msgstr[0] "Piese:"
-#~ msgstr[1] "Piese:"
-
-#, fuzzy
-#~ msgid "Directory"
-#~ msgstr "Director:"
-
-#, fuzzy
-#~ msgid "Error writing to \"%s\": %s"
-#~ msgstr ""
-#~ "Eroare la scriere în fişierul %s:\n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid "Download _to:"
-#~ msgstr "Director downloaduri:"
-
-#, fuzzy
-#~ msgid "Ratio: %s, "
-#~ msgstr ""
-#~ "Ratio: %s\n"
-#~ "UL: %s/s "
-
-#, fuzzy
-#~ msgid "Show an _icon in the system tray"
-#~ msgstr "Afişează icon în zona de notificare"
-
-#, fuzzy
-#~ msgid "Uploading to %d of %d peer"
-#~ msgid_plural "Uploading to %d of %d peers"
-#~ msgstr[0] "La seed, se uploadează către %d din %d peer"
-#~ msgstr[1] "La seed, se uploadează către %d din %d peeri"
-
-#, fuzzy
-#~ msgid "Seeding to %d of %d peer"
-#~ msgid_plural "Seeding to %d of %d peers"
-#~ msgstr[0] "La seed, se uploadează către %d din %d peer"
-#~ msgstr[1] "La seed, se uploadează către %d din %d peeri"
-
-#, fuzzy
-#~ msgid "Down: %s  Up: %s"
-#~ msgstr ""
-#~ "DL: %s/s\n"
-#~ "UL: %s/s"
-
-#, fuzzy
-#~ msgid "ZiB"
-#~ msgstr "KiB"
-
-#, fuzzy
-#~ msgid "YiB"
-#~ msgstr "KiB"
-
-#, fuzzy
-#~ msgid "sec"
-#~ msgid_plural "secs"
-#~ msgstr[0] "secundă"
-#~ msgstr[1] "secunde"
-
-#, fuzzy
-#~ msgid "min"
-#~ msgid_plural "mins"
-#~ msgstr[0] "minut"
-#~ msgstr[1] "minute"
-
-#, fuzzy
-#~ msgid "hr"
-#~ msgid_plural "hrs"
-#~ msgstr[0] "oră"
-#~ msgstr[1] "ore"
-
-#, fuzzy
-#~ msgid "Create _New Torrent"
-#~ msgstr "Adaugă un torrent nou"
-
-#, fuzzy
-#~ msgid "Making Torrent..."
-#~ msgstr "Adăugaţi un torrent"
-
-#, fuzzy
-#~ msgid "Downloading from %d of %d connected peers"
-#~ msgstr "La leech, se downloadează de la %i din %i peer"
-
-#, fuzzy
-#~ msgid "Seeding to %d of %d connected peers"
-#~ msgstr "La seed, se uploadează către %d din %d peer"
-
-#, fuzzy
-#~ msgid "Downloading"
-#~ msgstr "Downloadat:"
-
-#, fuzzy
-#~ msgid "Uploading"
-#~ msgstr "Uploadat:"
-
-#, fuzzy
-#~ msgid "_Info"
-#~ msgstr "Info"
-
-#, fuzzy
-#~ msgid "_Limit Upload Speed (KiB/s)"
-#~ msgstr "Li_mitaţi viteza de upload"
-
-#, fuzzy
-#~ msgid "Li_mit Download Speed (KiB/s)"
-#~ msgstr "_Limitaţi viteza de download"
-
-#, fuzzy
-#~ msgid "Downloads"
-#~ msgstr "Downloadat:"
-
-#, fuzzy
-#~ msgid "P_rompt for download directory"
-#~ msgstr "Cere întodeauna directorul pentru download"
-
-#, fuzzy
-#~ msgid "For torrents added from _command-line:"
-#~ msgstr "Pentru torrente adăugate doar via linia de comandă"
-
-#, fuzzy
-#~ msgid "_Automatically map port"
-#~ msgstr "Porniţi automat torrent-ul"
-
-#~ msgid "Destination directory for downloaded data files"
-#~ msgstr "Calea de salvare a fişierelor downloadate"
-
-#, fuzzy
-#~ msgid "Remove the selected torrent(s)?"
-#~ msgstr "Şterge un torrent"
-
-#~ msgid "Remaining:"
-#~ msgstr "Rămas:"
-
 #: ../gtk/actions.c:47
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "Sorter etter _aktivitet"
 
 #: ../gtk/actions.c:48
 msgid "Sort by _Name"
-msgstr ""
+msgstr "Sorter etter _namn"
 
 #: ../gtk/actions.c:49
-#, fuzzy
 msgid "Sort by _Progress"
-msgstr "Progres"
+msgstr "Sorter etter _framdrift"
 
 #: ../gtk/actions.c:50
 msgid "Sort by _Ratio"
-msgstr ""
+msgstr "Sorter etter _delingsforhold"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _State"
-msgstr ""
+msgstr "Sorter etter _status"
 
 #: ../gtk/actions.c:52
 msgid "Sort by _Tracker"
@@ -581,69 +44,63 @@ msgstr ""
 
 #: ../gtk/actions.c:69
 msgid "_Main Window"
-msgstr ""
+msgstr "_Hovudvindauge"
 
 #: ../gtk/actions.c:71
-#, fuzzy
 msgid "Message _Log"
-msgstr "Salvaţi log-ul"
+msgstr "_Meldingslogg"
 
 #: ../gtk/actions.c:85
 msgid "_Minimal View"
-msgstr ""
+msgstr "_Kompakt visning"
 
 #: ../gtk/actions.c:87
 msgid "_Reverse Sort Order"
 msgstr ""
 
 #: ../gtk/actions.c:89
-#, fuzzy
 msgid "_Filterbar"
-msgstr "_Fişier"
+msgstr ""
 
 #: ../gtk/actions.c:91
-#, fuzzy
 msgid "_Statusbar"
-msgstr "Porniţi"
+msgstr "_Statuslinje"
 
 #: ../gtk/actions.c:93
 msgid "_Toolbar"
-msgstr ""
+msgstr "_Verktylinje"
 
 #: ../gtk/actions.c:98
-#, fuzzy
 msgid "_Torrent"
-msgstr "Adăugaţi un torrent"
+msgstr "_Torrent"
 
 #: ../gtk/actions.c:99
-#, fuzzy
 msgid "_View"
-msgstr "_Fişier"
+msgstr "_Vis"
 
 #: ../gtk/actions.c:100
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Sorter torrentene etter"
 
 #: ../gtk/actions.c:101
 msgid "_Edit"
-msgstr ""
+msgstr "_Endre"
 
 #: ../gtk/actions.c:102
 msgid "_Help"
-msgstr ""
+msgstr "_Hjelp"
 
 #: ../gtk/actions.c:103 ../gtk/actions.c:104
 msgid "Add a torrent"
-msgstr ""
+msgstr "Legg til ein torrent"
 
 #: ../gtk/actions.c:104
 msgid "_Add..."
-msgstr ""
+msgstr "_Legg til ..."
 
 #: ../gtk/actions.c:106
-#, fuzzy
 msgid "_Start"
-msgstr "Porniţi"
+msgstr ""
 
 #: ../gtk/actions.c:106
 msgid "Start torrent"
@@ -670,28 +127,24 @@ msgid "Remove torrent"
 msgstr ""
 
 #: ../gtk/actions.c:113
-#, fuzzy
 msgid "_Delete Files and Remove"
-msgstr "Fişiere"
+msgstr ""
 
 #: ../gtk/actions.c:114
 msgid "_New..."
 msgstr ""
 
 #: ../gtk/actions.c:115
-#, fuzzy
 msgid "Create a torrent"
-msgstr "Adaugă un torrent nou"
+msgstr ""
 
 #: ../gtk/actions.c:117
-#, fuzzy
 msgid "Close _Window"
-msgstr "Închide fereastra principală"
+msgstr ""
 
 #: ../gtk/actions.c:118
-#, fuzzy
 msgid "Close main window"
-msgstr "Închide fereastra principală"
+msgstr ""
 
 #: ../gtk/actions.c:120
 msgid "_Quit"
@@ -723,17 +176,16 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:135
 msgid "Torrent files"
-msgstr "Torrente"
+msgstr ""
 
 #: ../gtk/add-dialog.c:140
 msgid "All files"
-msgstr "Toate fişierele"
+msgstr ""
 
 #. make the dialog
 #: ../gtk/add-dialog.c:165
-#, fuzzy
 msgid "Torrent Options"
-msgstr "Torrente"
+msgstr ""
 
 #: ../gtk/add-dialog.c:187
 msgid "Mo_ve source file to Trash"
@@ -744,14 +196,12 @@ msgid "_Start when added"
 msgstr ""
 
 #: ../gtk/add-dialog.c:199
-#, fuzzy
 msgid "_Source file:"
-msgstr "Torrente"
+msgstr ""
 
 #: ../gtk/add-dialog.c:203
-#, fuzzy
 msgid "Select Source File"
-msgstr "Adăugaţi un torrent"
+msgstr ""
 
 #: ../gtk/add-dialog.c:216 ../gtk/tr-prefs.c:264
 msgid "_Destination folder:"
@@ -786,9 +236,9 @@ msgid "Couldn't open \"%1$s\": %2$s"
 msgstr ""
 
 #: ../gtk/conf.c:85
-#, fuzzy, c-format
+#, c-format
 msgid "%s is already running."
-msgstr "Deja rulează o instanţă a %s."
+msgstr ""
 
 #: ../gtk/details.c:246
 msgid "Address"
@@ -805,9 +255,8 @@ msgstr ""
 
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:252
-#, fuzzy
 msgid "Down"
-msgstr "Downloadat:"
+msgstr ""
 
 #. 'upload speed' column header.  terse to keep the column narrow.
 #: ../gtk/details.c:254
@@ -815,27 +264,24 @@ msgid "Up"
 msgstr ""
 
 #: ../gtk/details.c:255
-#, fuzzy
 msgid "Status"
-msgstr "Porniţi"
+msgstr ""
 
 #: ../gtk/details.c:505
 msgid "Optimistic unchoke"
 msgstr ""
 
 #: ../gtk/details.c:506
-#, fuzzy
 msgid "Downloading from peer"
-msgstr "La leech, se downloadează de la %i din %i peer"
+msgstr ""
 
 #: ../gtk/details.c:507
 msgid "We'd download from peer if they'd let us"
 msgstr ""
 
 #: ../gtk/details.c:508
-#, fuzzy
 msgid "Uploading to peer"
-msgstr "La seed, se uploadează către %d din %d peer"
+msgstr ""
 
 #: ../gtk/details.c:509
 msgid "We'd upload to peer if they'd ask us"
@@ -870,24 +316,20 @@ msgid "<b>Connected Peers</b>"
 msgstr ""
 
 #: ../gtk/details.c:688
-#, fuzzy
 msgid "<b>Seeders:</b>"
-msgstr "Seederi:"
+msgstr ""
 
 #: ../gtk/details.c:695
-#, fuzzy
 msgid "<b>Leechers:</b>"
-msgstr "Leecheri:"
+msgstr ""
 
 #: ../gtk/details.c:702
-#, fuzzy
 msgid "<b>Completed:</b>"
-msgstr "Completaţi"
+msgstr ""
 
 #: ../gtk/details.c:732 ../gtk/makemeta-ui.c:312
-#, fuzzy
 msgid "Details"
-msgstr "Torrente"
+msgstr ""
 
 #. %1$'d is number of pieces
 #. %2$s is how big each piece is
@@ -899,23 +341,20 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../gtk/details.c:743
-#, fuzzy
 msgid "Pieces:"
-msgstr "Piese:"
+msgstr ""
 
 #: ../gtk/details.c:747
-#, fuzzy
 msgid "Hash:"
-msgstr "Info Hash:"
+msgstr ""
 
 #: ../gtk/details.c:750
 msgid "Private to this tracker -- PEX disabled"
 msgstr ""
 
 #: ../gtk/details.c:751
-#, fuzzy
 msgid "Public torrent"
-msgstr "Adăugaţi un torrent"
+msgstr ""
 
 #: ../gtk/details.c:753
 msgid "Privacy:"
@@ -939,9 +378,8 @@ msgid "Creator:"
 msgstr ""
 
 #: ../gtk/details.c:776
-#, fuzzy
 msgid "Date:"
-msgstr "Porniţi"
+msgstr ""
 
 #: ../gtk/details.c:780
 msgid "Location"
@@ -952,9 +390,8 @@ msgid "Destination folder:"
 msgstr ""
 
 #: ../gtk/details.c:788
-#, fuzzy
 msgid "Torrent file:"
-msgstr "Torrente"
+msgstr ""
 
 #: ../gtk/details.c:833
 #, c-format
@@ -980,19 +417,16 @@ msgid "None"
 msgstr ""
 
 #: ../gtk/details.c:893
-#, fuzzy
 msgid "Transfer"
-msgstr "Tracker:"
+msgstr ""
 
 #: ../gtk/details.c:896
-#, fuzzy
 msgid "State:"
-msgstr "Porniţi"
+msgstr ""
 
 #: ../gtk/details.c:899
-#, fuzzy
 msgid "Progress:"
-msgstr "Progres"
+msgstr ""
 
 #. "Have" refers to how much of the torrent we have
 #: ../gtk/details.c:903
@@ -1001,11 +435,11 @@ msgstr ""
 
 #: ../gtk/details.c:906 ../gtk/stats.c:104 ../gtk/stats.c:116
 msgid "Downloaded:"
-msgstr "Downloadat:"
+msgstr ""
 
 #: ../gtk/details.c:909 ../gtk/stats.c:102 ../gtk/stats.c:114
 msgid "Uploaded:"
-msgstr "Uploadat:"
+msgstr ""
 
 #: ../gtk/details.c:913
 msgid "Failed DL:"
@@ -1020,23 +454,20 @@ msgid "Swarm rate:"
 msgstr ""
 
 #: ../gtk/details.c:922
-#, fuzzy
 msgid "Error:"
-msgstr "Eroare:"
+msgstr ""
 
 #: ../gtk/details.c:926
-#, fuzzy
 msgid "Completion"
-msgstr "Completaţi"
+msgstr ""
 
 #: ../gtk/details.c:936
 msgid "Dates"
 msgstr ""
 
 #: ../gtk/details.c:939
-#, fuzzy
 msgid "Started at:"
-msgstr "Porniţi"
+msgstr ""
 
 #: ../gtk/details.c:942
 msgid "Last activity at:"
@@ -1047,55 +478,48 @@ msgid "Bandwidth"
 msgstr ""
 
 #: ../gtk/details.c:1039 ../gtk/tr-prefs.c:506
-#, fuzzy
 msgid "Limit _download speed (KB/s):"
-msgstr "_Limitaţi viteza de download"
+msgstr ""
 
 #: ../gtk/details.c:1052 ../gtk/tr-prefs.c:513
-#, fuzzy
 msgid "Limit _upload speed (KB/s):"
-msgstr "Li_mitaţi viteza de upload"
+msgstr ""
 
 #: ../gtk/details.c:1066
 msgid "Peer Connections"
 msgstr ""
 
 #: ../gtk/details.c:1071
-#, fuzzy
 msgid "_Maximum peers:"
-msgstr "Viteza maximă de _download:"
+msgstr ""
 
 #: ../gtk/details.c:1075
 msgid "_Stop seeding at ratio:"
 msgstr ""
 
 #: ../gtk/details.c:1130
-#, fuzzy
 msgid "Scrape"
-msgstr "Scrape:"
+msgstr ""
 
 #: ../gtk/details.c:1132
 msgid "Last scrape at:"
 msgstr ""
 
 #: ../gtk/details.c:1137 ../gtk/details.c:1164
-#, fuzzy
 msgid "Tracker responded:"
-msgstr "Tracker:"
+msgstr ""
 
 #: ../gtk/details.c:1142
 msgid "Next scrape in:"
 msgstr ""
 
 #: ../gtk/details.c:1148
-#, fuzzy
 msgid "Announce"
-msgstr "Announce:"
+msgstr ""
 
 #: ../gtk/details.c:1156
-#, fuzzy
 msgid "Tracker:"
-msgstr "Tracker:"
+msgstr ""
 
 #: ../gtk/details.c:1159
 msgid "Last announce at:"
@@ -1127,23 +551,20 @@ msgid "Activity"
 msgstr ""
 
 #: ../gtk/details.c:1319 ../gtk/tr-prefs.c:572
-#, fuzzy
 msgid "Peers"
-msgstr "Piese:"
+msgstr ""
 
 #: ../gtk/details.c:1324 ../gtk/tr-window.c:435
-#, fuzzy
 msgid "Tracker"
-msgstr "Tracker:"
+msgstr ""
 
 #: ../gtk/details.c:1328 ../gtk/msgwin.c:168
-#, fuzzy
 msgid "Information"
-msgstr "Torrente"
+msgstr ""
 
 #: ../gtk/details.c:1334 ../gtk/tr-window.c:435
 msgid "Files"
-msgstr "Fişiere"
+msgstr ""
 
 #: ../gtk/details.c:1339 ../gtk/tr-prefs.c:453
 msgid "Options"
@@ -1158,18 +579,16 @@ msgid "_Don't ask me again"
 msgstr ""
 
 #: ../gtk/dialogs.c:215
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove torrents?"
-msgstr[0] "Şterge un torrent"
-msgstr[1] "Şterge un torrent"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/dialogs.c:217
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these torrents' downloaded files?"
-msgstr[0] "Folosiţi director alternativ pentru downloaduri"
-msgstr[1] "Folosiţi director alternativ pentru downloaduri"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/dialogs.c:222
 msgid "Some of these torrents are incomplete or connected to peers."
@@ -1222,9 +641,8 @@ msgid "filedetails|Priority"
 msgstr ""
 
 #: ../gtk/ipc.c:232 ../gtk/ipc.c:391
-#, fuzzy
 msgid "Bad IPC protocol version"
-msgstr "versiune incorectă a protocolului IPC"
+msgstr ""
 
 #: ../gtk/ipc.c:235 ../gtk/ipc.c:394
 #, c-format
@@ -1233,9 +651,9 @@ msgstr ""
 
 #: ../gtk/ipc.c:264 ../gtk/ipc.c:480 ../libtransmission/fdlimit.c:390
 #: ../libtransmission/net.c:105
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't create socket: %s"
-msgstr "nu s-a putut crea socket-ul: %s"
+msgstr ""
 
 #: ../gtk/ipc.c:273
 #, c-format
@@ -1243,11 +661,9 @@ msgid "Couldn't connect to \"%1$s\": %2$s"
 msgstr ""
 
 #: ../gtk/ipc.c:313 ../gtk/ipc.c:1133
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't set up IPC: %s"
 msgstr ""
-"Nu s-a putut seta socket-ul:\n"
-"%s"
 
 #: ../gtk/main.c:302
 msgid "Start with all torrents paused"
@@ -1267,12 +683,11 @@ msgstr ""
 
 #: ../gtk/main.c:322
 msgid "Transmission"
-msgstr "Transmission"
+msgstr ""
 
 #: ../gtk/main.c:327
-#, fuzzy
 msgid "[torrent files]"
-msgstr "Torrente"
+msgstr ""
 
 #: ../gtk/main.c:663
 msgid "<b>Closing Connections</b>"
@@ -1287,15 +702,11 @@ msgid "_Quit Immediately"
 msgstr ""
 
 #: ../gtk/main.c:805
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to load torrent file: %s"
 msgid_plural "Failed to load torrent files: %s"
 msgstr[0] ""
-"Nu s-a putut încărca torrent-ul:\n"
-"%s"
 msgstr[1] ""
-"Nu s-au putut încărca torrentele:\n"
-"%s"
 
 #: ../gtk/main.c:929
 msgid "A fast and easy BitTorrent client"
@@ -1311,12 +722,11 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Mircea Suciu https://launchpad.net/~mircea-gmail"
+"  Vidar Lillebø https://launchpad.net/~vvidar"
 
 #: ../gtk/makemeta-ui.c:98
-#, fuzzy
 msgid "Torrent created"
-msgstr "Torrente"
+msgstr ""
 
 #: ../gtk/makemeta-ui.c:102 ../gtk/makemeta-ui.c:111 ../gtk/makemeta-ui.c:118
 #, c-format
@@ -1328,9 +738,9 @@ msgid "Invalid URL"
 msgstr ""
 
 #: ../gtk/makemeta-ui.c:106
-#, fuzzy, c-format
+#, c-format
 msgid "Torrent creation cancelled"
-msgstr "Torrente"
+msgstr ""
 
 #: ../gtk/makemeta-ui.c:110 ../libtransmission/blocklist.c:69
 #: ../libtransmission/blocklist.c:203 ../libtransmission/utils.c:370
@@ -1367,9 +777,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../gtk/makemeta-ui.c:269
-#, fuzzy
 msgid "New Torrent"
-msgstr "Adăugaţi un torrent"
+msgstr ""
 
 #: ../gtk/makemeta-ui.c:283
 msgid "Content"
@@ -1380,18 +789,16 @@ msgid "_Single File:"
 msgstr ""
 
 #: ../gtk/makemeta-ui.c:292
-#, fuzzy
 msgid "_Folder:"
-msgstr "Adăugaţi un torrent"
+msgstr ""
 
 #: ../gtk/makemeta-ui.c:314
 msgid "_Private to this tracker"
 msgstr ""
 
 #: ../gtk/makemeta-ui.c:318
-#, fuzzy
 msgid "Announce _URL:"
-msgstr "Announce:"
+msgstr ""
 
 #: ../gtk/makemeta-ui.c:321
 msgid "Commen_t:"
@@ -1405,16 +812,15 @@ msgstr ""
 
 #: ../gtk/msgwin.c:132
 msgid "Save Log"
-msgstr "Salvaţi log-ul"
+msgstr ""
 
 #: ../gtk/msgwin.c:167
-#, fuzzy
 msgid "Error"
-msgstr "Eroare:"
+msgstr ""
 
 #: ../gtk/msgwin.c:169
 msgid "Debug"
-msgstr "Debug"
+msgstr ""
 
 #: ../gtk/msgwin.c:229
 msgid "Time"
@@ -1423,44 +829,39 @@ msgstr ""
 #. noun.  column title for a list
 #: ../gtk/msgwin.c:231 ../gtk/tr-window.c:435
 msgid "Name"
-msgstr "Nume"
+msgstr ""
 
 #. noun.  column title for a list
 #: ../gtk/msgwin.c:233
-#, fuzzy
 msgid "Message"
-msgstr "Salvaţi log-ul"
+msgstr ""
 
 #: ../gtk/msgwin.c:393
-#, fuzzy
 msgid "Message Log"
-msgstr "Salvaţi log-ul"
+msgstr ""
 
 #: ../gtk/msgwin.c:427
 msgid "Level"
 msgstr ""
 
 #: ../gtk/notify.c:59
-#, fuzzy
 msgid "Torrent Complete"
-msgstr "Torrente"
+msgstr ""
 
 #: ../gtk/notify.c:62
-#, fuzzy
 msgid "Open File"
-msgstr "Fişier"
+msgstr ""
 
 #: ../gtk/notify.c:64
-#, fuzzy
 msgid "Open Folder"
-msgstr "Adăugaţi un torrent"
+msgstr ""
 
 #: ../gtk/stats.c:63 ../gtk/stats.c:111
-#, fuzzy, c-format
+#, c-format
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
-msgstr[0] "Porniţi"
-msgstr[1] "Porniţi"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/stats.c:91
 msgid "Statistics"
@@ -1475,9 +876,8 @@ msgid "Duration:"
 msgstr ""
 
 #: ../gtk/stats.c:110
-#, fuzzy
 msgid "Total"
-msgstr "Dimensiune totală:"
+msgstr ""
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1510,9 +910,8 @@ msgid "Not available"
 msgstr ""
 
 #: ../gtk/torrent-cell-renderer.c:89
-#, fuzzy
 msgid "Stalled"
-msgstr "Porniţi"
+msgstr ""
 
 #. time remaining
 #: ../gtk/torrent-cell-renderer.c:94
@@ -1524,11 +923,9 @@ msgstr ""
 #. %1$s is the download speed
 #. %2$s is the upload speed
 #: ../gtk/torrent-cell-renderer.c:119
-#, fuzzy, c-format
+#, c-format
 msgid "speed|Down: %1$s, Up: %2$s"
 msgstr ""
-"DL: %s/s\n"
-"UL: %s/s"
 
 #. download speed
 #: ../gtk/torrent-cell-renderer.c:122
@@ -1568,32 +965,30 @@ msgid "Ratio: %s"
 msgstr ""
 
 #: ../gtk/torrent-cell-renderer.c:199
-#, fuzzy, c-format
+#, c-format
 msgid "Downloading from %1$'d of %2$'d connected peer"
 msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] "La leech, se downloadează de la %i din %i peer"
-msgstr[1] "La leech, se downloadează de la %i din %i peer"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/torrent-cell-renderer.c:208 ../gtk/tr-torrent.c:302
-#, fuzzy, c-format
+#, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-msgstr[0] "La seed, se uploadează către %d din %d peer"
-msgstr[1] "La seed, se uploadează către %d din %d peer"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/transmission.desktop.in.h:1
-#, fuzzy
 msgid "BitTorrent Client"
-msgstr "Torrente"
+msgstr ""
 
 #: ../gtk/transmission.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
 msgstr ""
 
 #: ../gtk/transmission.desktop.in.h:3
-#, fuzzy
 msgid "Transmission BitTorrent Client"
-msgstr "Torrente"
+msgstr ""
 
 #. %1$'d is the number of torrents we're seeding,
 #. %2$'d is the number of torrents we're downloading,
@@ -1623,9 +1018,8 @@ msgid "Adding Torrents"
 msgstr ""
 
 #: ../gtk/tr-prefs.c:243
-#, fuzzy
 msgid "Automatically add torrents from:"
-msgstr "Porniţi automat torrent-ul"
+msgstr ""
 
 #: ../gtk/tr-prefs.c:259
 msgid "Mo_ve source files to Trash"
@@ -1681,9 +1075,8 @@ msgid "_Ignore unencrypted peers"
 msgstr ""
 
 #: ../gtk/tr-prefs.c:475
-#, fuzzy
 msgid "Use peer e_xchange"
-msgstr "Foloseşte peer exchange dacă este permis"
+msgstr ""
 
 #. section header for the "maximum number of peers" section
 #: ../gtk/tr-prefs.c:481
@@ -1699,41 +1092,38 @@ msgid "Maximum peers per _torrent:"
 msgstr ""
 
 #: ../gtk/tr-prefs.c:520
-#, fuzzy
 msgid "Ports"
-msgstr "Progres"
+msgstr ""
 
 #: ../gtk/tr-prefs.c:522
 msgid "_Forward port from router"
 msgstr ""
 
 #: ../gtk/tr-prefs.c:532
-#, fuzzy
 msgid "Incoming _port:"
-msgstr "Port:"
+msgstr ""
 
 #: ../gtk/tr-prefs.c:555
 msgid "Transmission Preferences"
 msgstr ""
 
 #: ../gtk/tr-prefs.c:569
-#, fuzzy
 msgid "Torrents"
-msgstr "Adăugaţi un torrent"
+msgstr ""
 
 #: ../gtk/tr-prefs.c:575
 msgid "Network"
 msgstr ""
 
 #: ../gtk/tr-torrent.c:225
-#, fuzzy, c-format
+#, c-format
 msgid "File \"%s\" isn't a valid torrent"
-msgstr "%s: torrent nevalid"
+msgstr ""
 
 #: ../gtk/tr-torrent.c:228
-#, fuzzy, c-format
+#, c-format
 msgid "File \"%s\" is already open"
-msgstr "%s: torrent-ul este deja deschis"
+msgstr ""
 
 #. [0...100]
 #: ../gtk/tr-torrent.c:277
@@ -1747,31 +1137,29 @@ msgid "Not available (%.1f%%)"
 msgstr ""
 
 #: ../gtk/tr-torrent.c:290
-#, fuzzy, c-format
+#, c-format
 msgid "Stalled (%.1f%%)"
-msgstr "Împotmolit (%.1f%%)"
+msgstr ""
 
 #. %1$s is # of minutes
 #. %2$.1f is a percentage of how much of the torrent is done
 #: ../gtk/tr-torrent.c:296
-#, fuzzy, c-format
+#, c-format
 msgid "%1$s remaining (%2$.1f%%)"
-msgstr "Închieiere în %s (%.1f%%)"
+msgstr ""
 
 #: ../gtk/tr-torrent.c:308
 #, c-format
 msgid "Stopped (%.1f%%)"
-msgstr "Oprit (%.1f%%)"
+msgstr ""
 
 #: ../gtk/tr-window.c:150
-#, fuzzy
 msgid "Torrent"
-msgstr "Adăugaţi un torrent"
+msgstr ""
 
 #: ../gtk/tr-window.c:235
-#, fuzzy
 msgid "Total Ratio"
-msgstr "Dimensiune totală:"
+msgstr ""
 
 #: ../gtk/tr-window.c:236
 msgid "Session Ratio"
@@ -1797,9 +1185,8 @@ msgstr ""
 
 #. show only torrents that are trying to download
 #: ../gtk/tr-window.c:428
-#, fuzzy
 msgid "_Downloading"
-msgstr "Downloadat:"
+msgstr ""
 
 #. show only torrents that are trying to upload
 #: ../gtk/tr-window.c:430
@@ -1812,28 +1199,26 @@ msgid "_Paused"
 msgstr ""
 
 #: ../gtk/tr-window.c:593
-#, fuzzy, c-format
+#, c-format
 msgid "%1$'d of %2$'d Torrent"
 msgid_plural "%1$'d of %2$'d Torrents"
-msgstr[0] "Adăugaţi un torrent"
-msgstr[1] "Adăugaţi un torrent"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/tr-window.c:598
-#, fuzzy, c-format
+#, c-format
 msgid "%'d Torrent"
 msgid_plural "%'d Torrents"
-msgstr[0] "Adăugaţi un torrent"
-msgstr[1] "Adăugaţi un torrent"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Translators: do not translate the "size|" disambiguation prefix.
 #. %1$s is the size of the data we've downloaded
 #. %2$s is the size of the data we've uploaded
 #: ../gtk/tr-window.c:627 ../gtk/tr-window.c:635
-#, fuzzy, c-format
+#, c-format
 msgid "size|Down: %1$s, Up: %2$s"
 msgstr ""
-"DL: %s/s\n"
-"UL: %s/s"
 
 #: ../gtk/tr-window.c:691
 #, c-format
@@ -1908,11 +1293,11 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../gtk/util.c:169
-#, fuzzy, c-format
+#, c-format
 msgid "%'d day"
 msgid_plural "%'d days"
-msgstr[0] "zi"
-msgstr[1] "zile"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/util.c:468
 msgid "Transmission Bittorrent Client"
@@ -1947,11 +1332,9 @@ msgid "Couldn't read resume file"
 msgstr ""
 
 #: ../libtransmission/makemeta.c:58
-#, fuzzy, c-format
+#, c-format
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr ""
-"Nu s-a putut bloca fişierul %s:\n"
-"%s"
 
 #: ../libtransmission/metainfo.c:214 ../libtransmission/metainfo.c:258
 #: ../libtransmission/metainfo.c:270 ../libtransmission/metainfo.c:512
@@ -1970,9 +1353,8 @@ msgid "Invalid metadata entry \"%s\""
 msgstr ""
 
 #: ../libtransmission/metainfo.c:299 ../libtransmission/metainfo.c:308
-#, fuzzy
 msgid "Torrent is corrupt"
-msgstr "Torrente"
+msgstr ""
 
 #: ../libtransmission/metainfo.c:526
 #, c-format
@@ -2028,27 +1410,23 @@ msgstr ""
 
 #. we're in the process of trying to set up port forwarding
 #: ../libtransmission/port-forwarding.c:72
-#, fuzzy
 msgid "Starting"
-msgstr "Porniţi"
+msgstr ""
 
 #. we've successfully forwarded the port
 #: ../libtransmission/port-forwarding.c:74
-#, fuzzy
 msgid "Forwarded"
-msgstr "Downloadat:"
+msgstr ""
 
 #. we're cancelling the port forwarding
 #: ../libtransmission/port-forwarding.c:76
-#, fuzzy
 msgid "Stopping"
-msgstr "Se opreşte..."
+msgstr ""
 
 #. the port isn't forwarded
 #: ../libtransmission/port-forwarding.c:78
-#, fuzzy
 msgid "Not forwarded"
-msgstr "Downloadat:"
+msgstr ""
 
 #: ../libtransmission/port-forwarding.c:99
 #, c-format
@@ -2072,9 +1450,8 @@ msgid ""
 msgstr ""
 
 #: ../libtransmission/port-forwarding.c:163
-#, fuzzy
 msgid "Stopped"
-msgstr "Oprit (%.1f%%)"
+msgstr ""
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2113,19 +1490,16 @@ msgstr ""
 #. "Complete" means we've downloaded every file in the torrent.
 #. "Done" means we're done downloading the files we wanted, but NOT all that exist
 #: ../libtransmission/torrent.c:1063
-#, fuzzy
 msgid "Done"
-msgstr "Downloadat:"
+msgstr ""
 
 #: ../libtransmission/torrent.c:1064
-#, fuzzy
 msgid "Complete"
-msgstr "Completaţi"
+msgstr ""
 
 #: ../libtransmission/torrent.c:1065
-#, fuzzy
 msgid "Incomplete"
-msgstr "Completaţi"
+msgstr ""
 
 #: ../libtransmission/torrent.c:1110
 #, c-format
@@ -2166,9 +1540,8 @@ msgid "Not a regular file"
 msgstr ""
 
 #: ../libtransmission/utils.c:396
-#, fuzzy
 msgid "Memory allocation failed"
-msgstr "Torrente"
+msgstr ""
 
 #: ../libtransmission/utils.c:468
 #, c-format
@@ -2176,9 +1549,8 @@ msgid "File \"%s\" is in the way"
 msgstr ""
 
 #: ../libtransmission/utils.c:535
-#, fuzzy
 msgid "No error"
-msgstr "Eroare:"
+msgstr ""
 
 #: ../libtransmission/utils.c:538
 msgid "Unspecified error"
@@ -2205,14 +1577,12 @@ msgid "Unspecified I/O error"
 msgstr ""
 
 #: ../libtransmission/utils.c:560
-#, fuzzy
 msgid "Tracker error"
-msgstr "Tracker:"
+msgstr ""
 
 #: ../libtransmission/utils.c:562
-#, fuzzy
 msgid "Tracker warning"
-msgstr "Tracker:"
+msgstr ""
 
 #: ../libtransmission/utils.c:565
 msgid "Peer sent a bad message"
@@ -2223,13 +1593,9 @@ msgid "Unknown error"
 msgstr ""
 
 #: ../libtransmission/verify.c:128
-#, fuzzy
 msgid "Verifying torrent"
-msgstr "Adăugaţi un torrent"
+msgstr ""
 
 #: ../libtransmission/verify.c:160
-#, fuzzy
 msgid "Queued for verification"
 msgstr ""
-"Nu s-a putut deschide fişierul %s pentru scriere:\n"
-"%s"
