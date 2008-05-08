@@ -1416,18 +1416,6 @@ tr_torrentReqIsValid( const tr_torrent * tor,
     else if( tr_pieceOffset( tor, index, offset, length ) > tor->info.totalSize )
         err = 4;
 
-    if( err )
-    {
-        fprintf( stderr, "(ticket #751) err is %d\n", err );
-        fprintf( stderr, "(ticket #751) req.index is %"PRIu32"\n", index );
-        fprintf( stderr, "(ticket #751) req.offset is %"PRIu32"\n", offset );
-        fprintf( stderr, "(ticket #751) req.length is %"PRIu32"\n", length );
-        fprintf( stderr, "(ticket #751) tor->info.totalSize is %"PRIu64"\n", tor->info.totalSize );
-        fprintf( stderr, "(ticket #751) tor->info.pieceCount is %d\n", tor->info.pieceCount );
-        fprintf( stderr, "(ticket #751) tr_torPieceCountBytes is %d\n", tr_torPieceCountBytes( tor, index ) );
-        fprintf( stderr, "(ticket #751) tr_pieceOffset is %"PRIu64"\n", tr_pieceOffset( tor, index, offset, length ) );
-    }
-
     return !err;
 }
 
