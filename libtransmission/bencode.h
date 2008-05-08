@@ -69,6 +69,7 @@ int tr_bencLoad( const void  * buf,
 void      tr_bencPrint( const tr_benc * );
 void      tr_bencFree( tr_benc * );
 int       tr_bencDictFindInt( tr_benc * dict, const char * key, int64_t * setme );
+int       tr_bencDictFindDouble( tr_benc * dict, const char * key, double * setme );
 int       tr_bencDictFindStr( tr_benc * dict, const char * key, const char ** setme );
 int       tr_bencDictFindList( tr_benc * dict, const char * key, tr_benc ** setme );
 int       tr_bencDictFindDict( tr_benc * dict, const char * key, tr_benc ** setme );
@@ -103,6 +104,7 @@ tr_benc    * tr_bencListAddList( tr_benc  * list, int reserveCount );
 tr_benc    * tr_bencListAddDict( tr_benc  * list, int reserveCount );
 /* note: key must not be freed or modified while val is in use */
 tr_benc    * tr_bencDictAdd( tr_benc * dict, const char * key );
+tr_benc    * tr_bencDictAddDouble( tr_benc * dict, const char * key, double d );
 tr_benc    * tr_bencDictAddInt( tr_benc * dict, const char * key, int64_t val );
 tr_benc    * tr_bencDictAddStr( tr_benc * dict, const char * key, const char * val );
 tr_benc    * tr_bencDictAddList( tr_benc * dict, const char * key, int reserveCount );
@@ -115,6 +117,7 @@ int    tr_bencSaveFile( const char * filename, const tr_benc * );
 int    tr_bencLoadFile( const char * filename, tr_benc * );
 
 int tr_bencGetInt( const tr_benc * val, int64_t * setme );
+int tr_bencGetStr( const tr_benc * val, const char ** setme );
 
 int tr_bencIsType( const tr_benc *, int type );
 #define tr_bencIsInt(b) (tr_bencIsType(b,TYPE_INT))
@@ -142,7 +145,8 @@ int  tr_bencParseStr( const uint8_t  * buf,
 ***
 **/
 
-tr_benc * tr_bencListGetNthChild( tr_benc * list, int n );
+int       tr_bencListSize( const tr_benc * list );
+tr_benc * tr_bencListChild( tr_benc * list, int n );
 
 
 #endif

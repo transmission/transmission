@@ -376,8 +376,14 @@ tr_bencDictFindFirst( tr_benc * val, ... )
     return ret;
 }
 
+int
+tr_bencListSize( const tr_benc * list )
+{
+    return tr_bencIsList( list ) ? list->val.l.count : 0;
+}
+
 tr_benc*
-tr_bencListGetNthChild( tr_benc * val, int i )
+tr_bencListChild( tr_benc * val, int i )
 {
     tr_benc * ret = NULL;
     if( tr_bencIsList( val ) && ( i >= 0 ) && ( i < val->val.l.count ) )
@@ -388,11 +394,18 @@ tr_bencListGetNthChild( tr_benc * val, int i )
 int
 tr_bencGetInt ( const tr_benc * val, int64_t * setme )
 {
-    int success = FALSE;
-    if( tr_bencIsInt( val )) {
+    const int success = tr_bencIsInt( val );
+    if( success )
         *setme = val->val.i ;
-        success = TRUE;
-    }
+    return success;
+}
+
+int
+tr_bencGetStr( const tr_benc * val, const char ** setme )
+{
+    const int success = tr_bencIsString( val );
+    if( success )
+        *setme = val->val.s.s;
     return success;
 }
 
@@ -404,6 +417,16 @@ tr_bencDictFindInt( tr_benc * dict, const char * key, int64_t * setme )
     if( child )
         found = tr_bencGetInt( child, setme );
     return found;
+}
+
+int
+tr_bencDictFindDouble( tr_benc * dict, const char * key, double * setme )
+{
+    const char * str;
+    const int success = tr_bencDictFindStr( dict, key, &str );
+    if( success )
+        *setme = strtod( str, NULL );
+    return success;
 }
 
 int
@@ -591,6 +614,13 @@ tr_bencDictAddStr( tr_benc * dict, const char * key, const char * val )
     tr_benc * child = tr_bencDictAdd( dict, key );
     tr_bencInitStrDup( child, val );
     return child;
+}
+tr_benc*
+tr_bencDictAddDouble( tr_benc * dict, const char * key, double d )
+{
+    char buf[128];
+    snprintf( buf, sizeof( buf ), "%f", d );
+    return tr_bencDictAddStr( dict, key, buf );
 }
 tr_benc*
 tr_bencDictAddList( tr_benc * dict, const char * key, int reserveCount )

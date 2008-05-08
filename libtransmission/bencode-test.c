@@ -237,8 +237,8 @@ testParse( void )
     err = tr_bencParse( buf, buf + sizeof( buf ), &val, &end );
     check( !err );
     check( end == buf + strlen( (const char*)buf ) );
-    check(( child = tr_bencListGetNthChild( &val, 0 )));
-    check(( child2 = tr_bencListGetNthChild( child, 0 )));
+    check(( child = tr_bencListChild( &val, 0 )));
+    check(( child2 = tr_bencListChild( child, 0 )));
     saved = tr_bencSave( &val, &len );
     check( !strcmp( saved, "lld1:ai64e1:bi32eeee" ) );
     tr_free( saved );
