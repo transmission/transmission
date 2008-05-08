@@ -69,7 +69,6 @@ static struct tor * opentor    ( const char *, const char *, uint8_t *, size_t,
 static void         closetor   ( struct tor *, int );
 static void         starttimer ( int );
 static void         timerfunc  ( int, short, void * );
-static int          loadstate  ( void );
 static int          savestate  ( void );
 
 static struct event_base * gl_base      = NULL;
@@ -106,16 +105,83 @@ RB_GENERATE_STATIC( tortree, tor, idlinks, toridcmp )
 void
 torrent_init( const char * configdir, struct event_base * base )
 {
-    assert( NULL == gl_handle && NULL == gl_base );
-
-    gl_base   = base;
-    gl_handle = tr_init( configdir, "daemon" );
+    tr_benc state, * torrents;
+    int have_state;
+    assert( !gl_handle && !gl_base );
 
     confpath( gl_state, sizeof gl_state, configdir, CONF_FILE_STATE, 0 );
     snprintf( gl_newstate, sizeof( gl_newstate ), "%s.new", gl_state );
     absolutify( gl_dir, sizeof gl_dir, "." );
 
-    loadstate();
+    /* initialize the session variables */
+    if(( have_state = !tr_bencLoadFile( gl_state, &state )))
+    {
+        int64_t i;
+        const char * str;
+
+        if( tr_bencDictFindInt( &state, "autostart", &i ) )
+            gl_autostart = i != 0;
+        if( tr_bencDictFindInt( &state, "port", &i ) && ( 0<i ) && ( i<=0xffff ) )
+            gl_port = i;
+        if( tr_bencDictFindInt( &state, "default-pex", &i ) )
+            gl_pex = i != 0;
+        if( tr_bencDictFindInt( &state, "port-mapping", &i ) )
+            gl_mapping = i != 0;
+        if( tr_bencDictFindInt( &state, "upload-limit", &i ) )
+            gl_uplimit = i;
+        if( tr_bencDictFindInt( &state, "download-limit", &i ) )
+            gl_downlimit = i;
+        if( tr_bencDictFindStr( &state, "default-directory", &str ) )
+            strlcpy( gl_dir, str, sizeof gl_dir );
+        if( tr_bencDictFindStr( &state, "encryption-mode", &str ) ) {
+            if( !strcmp( str, "required" ) )
+                gl_crypto = TR_ENCRYPTION_REQUIRED;
+            else
+                gl_crypto = TR_ENCRYPTION_PREFERRED;
+        }
+    }
+
+    /* start the session */
+    gl_base = base;
+    gl_handle = tr_initFull( configdir, "daemon", gl_pex,
+                             gl_mapping, gl_port,
+                             gl_crypto,
+                             gl_uplimit >= 0, gl_uplimit,
+                             gl_downlimit >= 0, gl_downlimit,
+                             TR_DEFAULT_GLOBAL_PEER_LIMIT,
+                             TR_MSG_INF, 0,
+                             0, /* is the blocklist enabled? */
+                             TR_DEFAULT_PEER_SOCKET_TOS );
+
+    /* now load the torrents */
+    if( have_state && tr_bencDictFindList( &state, "torrents", &torrents ) )
+    {
+        int i, n;
+        for( i=0, n=tr_bencListSize(torrents); i<n; ++i )
+        {
+            int start;
+            int64_t paused;
+            const char * directory = NULL;
+            const char * hash = NULL;
+
+            tr_benc * dict = tr_bencListChild( torrents, i );
+            if( !tr_bencIsDict( dict ) ||
+                !tr_bencDictFindStr( dict, "directory", &directory ) ||
+                !tr_bencDictFindStr( dict, "hash", &hash ) )
+                continue;
+
+            if( tr_bencDictFindInt( dict, "paused", &paused ) )
+                start = !paused;
+            else
+                start = gl_autostart;
+
+            opentor( NULL, hash, NULL, 0, directory, start );
+        }
+    }
+
+    /* cleanup */
+    if( have_state )
+        tr_bencFree( &state );
 }
 
 int
@@ -638,84 +704,6 @@ timerfunc( int fd UNUSED, short event UNUSED, void * arg UNUSED )
         tv.tv_usec = TIMER_USECS;
         evtimer_add( &gl_event, &tv );
     }
-}
-
-int
-loadstate( void )
-{
-    const char * str;
-    int64_t      tmp;
-    benc_val_t   top, * list;
-    int          ii;
-
-    if( tr_bencLoadFile( gl_state, &top ) )
-    {
-        errmsg( "failed to load bencoded data from %s", gl_state );
-        return -1;
-    }
-
-    if( tr_bencDictFindInt( &top, "autostart", &tmp ) )
-        gl_autostart = tmp != 0;
-
-    if( tr_bencDictFindInt( &top, "port", &tmp ) && ( 0 < tmp ) && ( tmp <= 0xffff ) )
-        gl_port = tmp;
-    tr_setBindPort( gl_handle, gl_port );
-
-    if( tr_bencDictFindInt( &top, "default-pex", &tmp ) )
-        gl_pex = tmp != 0;
-
-    if( tr_bencDictFindInt( &top, "port-mapping", &tmp ) )
-        gl_mapping = tmp != 0;
-    tr_natTraversalEnable( gl_handle, gl_mapping );
-
-    if( tr_bencDictFindInt( &top, "upload-limit", &tmp ) )
-        gl_uplimit = tmp;
-    tr_setGlobalSpeedLimit( gl_handle, TR_UP, gl_uplimit );
-    tr_setUseGlobalSpeedLimit( gl_handle, TR_UP, gl_uplimit > 0 );
-
-    if( tr_bencDictFindInt( &top, "download-limit", &tmp ) )
-        gl_downlimit = tmp;
-    tr_setGlobalSpeedLimit( gl_handle, TR_DOWN, gl_downlimit );
-    tr_setUseGlobalSpeedLimit( gl_handle, TR_DOWN, gl_downlimit > 0 );
-
-    if( tr_bencDictFindStr( &top, "default-directory", &str ) )
-        strlcpy( gl_dir, str, sizeof gl_dir );
-
-    if( tr_bencDictFindStr( &top, "encryption-mode", &str ) )
-    {
-        if(!strcasecmp( str, "preferred"))
-            gl_crypto = TR_ENCRYPTION_PREFERRED;
-        else if(!strcasecmp( str, "required"))
-            gl_crypto = TR_ENCRYPTION_REQUIRED;
-    }
-
-    tr_setEncryptionMode(gl_handle, gl_crypto);
-
-    list = tr_bencDictFind( &top, "torrents" );
-    if( !tr_bencIsList( list ) )
-        return 0;
-
-    for( ii = 0; ii < list->val.l.count; ii++ )
-    {
-        int start = 0;
-        const char * directory = NULL;
-        const char * hash = NULL;
-
-        tr_benc * dict = &list->val.l.vals[ii];
-        if( !tr_bencIsDict( dict ) )
-            continue;
-
-        if( !tr_bencDictFindStr( dict, "directory", &directory ) ||
-            !tr_bencDictFindStr( dict, "hash", &hash ) )
-            continue;
-
-        if( tr_bencDictFindInt( dict, "paused", &tmp ) && !tmp )
-            start = 1;
-
-        opentor( NULL, hash, NULL, 0, directory, start );
-    }
-
-    return 0;
 }
 
 int
