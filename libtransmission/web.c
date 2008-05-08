@@ -142,7 +142,7 @@ addTask( void * vtask )
         dbgmsg( "adding task #%lu [%s] (%d remain)", task->tag, task->url, web->remain );
 
         ch = curl_easy_init( );
-        curl_easy_setopt( ch, CURLOPT_TIMEOUT, 30 );
+        curl_easy_setopt( ch, CURLOPT_TIMEOUT, 120 );
         curl_easy_setopt( ch, CURLOPT_PRIVATE, task );
         curl_easy_setopt( ch, CURLOPT_URL, task->url );
         curl_easy_setopt( ch, CURLOPT_WRITEFUNCTION, writeFunc );
