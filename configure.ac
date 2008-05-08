@@ -91,6 +91,9 @@ AC_ARG_ENABLE([gtk],
               [want_gtk=${enableval}],
               [want_gtk=${have_gtk}])
 build_gtk=no
+use_gio=no
+use_libnotify=no
+use_dbus_glib=no
 if test "x$want_gtk" = "xyes" ; then
     if test "x$have_gtk" = "xyes"; then
       build_gtk=yes
@@ -102,41 +105,44 @@ AM_CONDITIONAL([BUILD_GTK],[test "x$build_gtk" = "xyes"])
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
 
-PKG_CHECK_MODULES([GIO],
-                  [gio-2.0 >= $GIO_MINIMUM],
-                  [use_gio=yes],
-                  [use_gio=no])
-AC_SUBST(GIO_LIBS)
-AC_SUBST(GIO_CFLAGS)
-if test "x$use_gio" = "xyes"; then
-    AC_DEFINE([HAVE_GIO], 1)
-fi
+if test "x$build_gtk" = "xyes"; then
 
-PKG_CHECK_MODULES([LIBNOTIFY],
-                  [libnotify >= $LIBNOTIFY_MINIMUM],
-                  [have_libnotify=yes],
-                  [have_libnotify=no])
-AC_ARG_ENABLE([libnotify], 
-              AS_HELP_STRING([--enable-libnotify],[enable notifications]),, 
-              [enable_libnotify=yes]) 
-use_libnotify=no
-if test "x$enable_libnotify" = "xyes" ; then
-    if test "x$have_libnotify" = "xyes"; then
-        use_libnotify=yes
-        AC_SUBST(LIBNOTIFY_LIBS) 
-        AC_SUBST(LIBNOTIFY_CFLAGS) 
-        AC_DEFINE([HAVE_LIBNOTIFY], 1) 
+    PKG_CHECK_MODULES([GIO],
+                      [gio-2.0 >= $GIO_MINIMUM],
+                      [use_gio=yes],
+                      [use_gio=no])
+    AC_SUBST(GIO_LIBS)
+    AC_SUBST(GIO_CFLAGS)
+    if test "x$use_gio" = "xyes"; then
+        AC_DEFINE([HAVE_GIO], 1)
     fi
-fi
 
-PKG_CHECK_MODULES([DBUS_GLIB],
-                  [dbus-glib-1 >= $DBUS_GLIB_MINIMUM],
-                  [use_dbus_glib=yes],
-                  [use_dbus_glib=no])
-AC_SUBST(DBUS_GLIB_LIBS)
-AC_SUBST(DBUS_GLIB_CFLAGS)
-if test "x$use_dbus_glib" = "xyes"; then
-    AC_DEFINE([HAVE_DBUS_GLIB], 1)
+    PKG_CHECK_MODULES([LIBNOTIFY],
+                      [libnotify >= $LIBNOTIFY_MINIMUM],
+                      [have_libnotify=yes],
+                      [have_libnotify=no])
+    AC_ARG_ENABLE([libnotify], 
+                  AS_HELP_STRING([--enable-libnotify],[enable notifications]),, 
+                  [enable_libnotify=yes]) 
+    use_libnotify=no
+    if test "x$enable_libnotify" = "xyes" ; then
+        if test "x$have_libnotify" = "xyes"; then
+            use_libnotify=yes
+            AC_SUBST(LIBNOTIFY_LIBS) 
+            AC_SUBST(LIBNOTIFY_CFLAGS) 
+            AC_DEFINE([HAVE_LIBNOTIFY], 1) 
+        fi
+    fi
+
+    PKG_CHECK_MODULES([DBUS_GLIB],
+                      [dbus-glib-1 >= $DBUS_GLIB_MINIMUM],
+                      [use_dbus_glib=yes],
+                      [use_dbus_glib=no])
+    AC_SUBST(DBUS_GLIB_LIBS)
+    AC_SUBST(DBUS_GLIB_CFLAGS)
+    if test "x$use_dbus_glib" = "xyes"; then
+        AC_DEFINE([HAVE_DBUS_GLIB], 1)
+    fi
 fi
 
 AC_CHECK_HEADERS([libintl.h])
