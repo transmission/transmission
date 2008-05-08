@@ -54,13 +54,6 @@ enum
     /* unless the tracker says otherwise, this is the announce min_interval */
     DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC = (60 * 2),
 
-    /* this is how long we'll leave a request hanging before timeout */
-    TIMEOUT_INTERVAL_SEC = 30,
-
-    /* this is how long we'll leave a 'stop' request hanging before timeout.
-       we wait less time for this so it doesn't slow down shutdowns */
-    STOP_TIMEOUT_INTERVAL_SEC = 5,
-
     /* the value of the 'numwant' argument passed in tracker requests. */
     NUMWANT = 80,
 
