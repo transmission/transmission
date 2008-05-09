@@ -16,7 +16,6 @@ EXTRA_DIST = \
     English.lproj \
     es.lproj \
     fr.lproj \
-    it.lproj \
     nl.lproj \
     ru.lproj \
     AboutWindowController.h \
