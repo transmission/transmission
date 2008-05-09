@@ -2268,8 +2268,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             toolTip = NSLocalizedString(@"All Groups", "Groups -> Button");
             break;
         case -1:
-            if ([NSApp isOnLeopardOrBetter])
-                icon = [NSImage imageNamed: NSImageNameStopProgressTemplate];
+            icon = [NSImage imageNamed: @"GroupsNoneTemplate.png"];
             toolTip = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Group", "Groups -> Button"),
                         NSLocalizedString(@"No Label", "Groups -> Button")];
             break;
@@ -2544,7 +2543,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         {
             int group = [[item objectForKey: @"Group"] intValue];
             return group != -1 ? [[GroupsController groups] imageForIndex: group isSmall: YES]
-                                : [NSImage imageNamed: NSImageNameStopProgressTemplate];
+                                : [NSImage imageNamed: @"GroupsNoneTemplate.png"];
         }
         else if ([ident isEqualToString: @"DL Image"])
             return [NSImage imageNamed: @"DownArrowGroupTemplate.png"];

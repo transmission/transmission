@@ -124,6 +124,7 @@
 		A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */; };
 		A25FCDEF0A3769A6002BCBBE /* PauseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDD0A37695F002BCBBE /* PauseSelected.png */; };
 		A25FCDF00A3769AC002BCBBE /* ResumeSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */; };
+		A26146E10DD4A0160060F033 /* GroupsNoneTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A26146E00DD4A0160060F033 /* GroupsNoneTemplate.png */; };
 		A261A8260C6A0D68003BAFDA /* Error.png in Resources */ = {isa = PBXBuildFile; fileRef = A261A8250C6A0D68003BAFDA /* Error.png */; };
 		A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
 		A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
@@ -517,6 +518,7 @@
 		A25E74470AF5089E006F11AE /* ExpandedPathToIconTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ExpandedPathToIconTransformer.h; path = macosx/ExpandedPathToIconTransformer.h; sourceTree = "<group>"; };
 		A25FCDDD0A37695F002BCBBE /* PauseSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseSelected.png; path = macosx/Images/PauseSelected.png; sourceTree = "<group>"; };
 		A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeSelected.png; path = macosx/Images/ResumeSelected.png; sourceTree = "<group>"; };
+		A26146E00DD4A0160060F033 /* GroupsNoneTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GroupsNoneTemplate.png; path = macosx/Images/GroupsNoneTemplate.png; sourceTree = "<group>"; };
 		A261A8250C6A0D68003BAFDA /* Error.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Error.png; path = macosx/Images/Error.png; sourceTree = "<group>"; };
 		A261F1DB0A69A1610002815A /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = macosx/Growl.framework; sourceTree = "<group>"; };
 		A2623B2C0D3DC2EF0045D19A /* PriorityControlNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityControlNormal.png; path = macosx/Images/PriorityControlNormal.png; sourceTree = "<group>"; };
@@ -986,6 +988,7 @@
 				A29E04B40DA8764100705643 /* Network.png */,
 				4D2784360905709500687951 /* Transmission.icns */,
 				4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */,
+				A26146E00DD4A0160060F033 /* GroupsNoneTemplate.png */,
 				A232D29D0A70903E00973B12 /* Filter.png */,
 				A2F41DBA0D0B96C0006CE378 /* FilterBlue.png */,
 				4DF7500808A103AD007B0D70 /* Info.png */,
@@ -1724,6 +1727,7 @@
 				A2D307B10D9EC9F50051FD27 /* BlocklistStatusWindow.xib in Resources */,
 				A29E04B50DA8764100705643 /* Network.png in Resources */,
 				A224D2640DAAC55F000954EA /* Peers.png in Resources */,
+				A26146E10DD4A0160060F033 /* GroupsNoneTemplate.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
