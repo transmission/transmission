@@ -1,50 +1,38 @@
-﻿/* Torrent -> progress string */
-" - %@ remaining" = " - %@ осталось";
-
-/* Torrent -> progress string */
-" - remaining time unknown" = " - оставшееся время неизвестно";
-
-/* Removal confirm panel -> message part 2 */
-" Once removed, continuing the transfers will require the torrent files." = " Для восстановления удаленных раздач потребуется наличие их торрент-файлов.";
-
-/* stats total */
-" total" = " всего";
-
-/* Inspector -> Activity tab -> progress */
+﻿/* Inspector -> Activity tab -> progress */
 "%.2f%% (%.2f%% selected)" = "%1$.2f%% (%2$.2f%% выбранного)";
 
 /* Inspector -> Files tab -> file status string */
 "%.2f%% of %@" = "%1$.2f%% из %2$@";
 
-/* Inspector -> Activity tab -> have */
-"%@ (%@ verified)" = "%1$@ (%2$@ проверено)";
+/* Prefs -> blocklist -> message */
+"%@ IP address rules in list" = "%@ IP адресов в списке";
+
+/* Blocklist -> message
+   Torrent -> progress string */
+
+"%@ of %@" = "%1$@ из %2$@";
 
 /* Torrent -> progress string */
-"%@ of %@ (%.2f%%)" = "%1$@ из %2$@ (%3$.2f%%)";
+"%@ of %@ selected" = "%1$@ из %2$@ выбранного";
 
-/* Torrent -> progress string */
-"%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)" = "%1$@ из %2$@ (%3$.2f%%), роздано %4$@ (Рейтинг: %5$@)";
+/* Torrent -> eta string */
+"%@ remaining" = "%@ осталось";
 
-/* Torrent -> progress string */
-"%@ of %@ selected (%.2f%%)" = "%1$@ из %2$@ выбранного (%3$.2f%%)";
+/* Add torrent -> info
+   Torrent -> progress string */
 
-/* Torrent -> progress string */
-"%@ selected, uploaded %@ (Ratio: %@)" = "%1$@ выбрано, роздано %2$@ (Рейтинг: %3$@)";
+"%@ selected" = "%@ выбрано";
 
-/* Inspector -> selected torrents */
-"%@ Total" = "%@ всего";
+/* stats total
+   Inspector -> selected torrents */
+
+"%@ total" = "%@ всего";
 
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ проверено";
 
-/* Add torrent -> info */
-"%@, %@ (%@ selected)" = "%1$@, %2$@ (%3$@ выбрано)";
-
 /* Create torrent -> info */
 "%@, %@ each" = "%1$@, %2$@ каждая";
-
-/* Torrent -> progress string */
-"%@, uploaded %@ (Ratio: %@)" = "%1$@, роздано %2$@ (Рейтинг: %3$@)";
 
 /* Inspector -> Peers tab -> peers */
 "%d cache" = "%d кеш";
@@ -58,12 +46,11 @@
 /* Inspector -> selected torrents
    Create torrent -> info
    Add torrent -> info
-   Drag overlay -> torrents
-   Inspector -> above tabs -> selected torrents */
+   Drag overlay -> torrents */
 
 
 
-"%d Files" = "%d файлов";
+"%d files" = "%d файлов";
 
 /* Inspector -> Peers tab -> peers */
 "%d incoming" = "%d входящих";
@@ -102,9 +89,6 @@
 
 "%d transfers" = "%d раздач";
 
-/* File size */
-"%lld bytes" = "%lld Б";
-
 /* stats -> bytes
    Inspector -> above tabs -> selected torrents */
 
@@ -122,20 +106,17 @@
 /* time string */
 "%u sec" = "%u с";
 
-/* Torrent -> error string unreadable */
-"(unreadable error)" = "(неизвестная ошибка)";
-
 /* time string */
 "1 day" = "1 день";
 
-/* Create torrent -> info
+/* Inspector -> selected torrents
+   Create torrent -> info
    Add torrent -> info
-   Drag overlay -> torrents
-   Inspector -> above tabs -> selected torrents */
+   Drag overlay -> torrents */
 
 
 
-"1 File" = "1 файл";
+"1 file" = "1 файл";
 
 /* Create torrent -> info */
 "1 piece" = "1 часть";
@@ -156,8 +137,11 @@
 /* Folder cannot be used alert -> message */
 "\"%@\" cannot be used. The transfer will be paused." = "Папка «%@» не может быть использована. Раздача будет приостановлена.";
 
+/* Prefs -> blocklist -> message */
+"A blocklist must first be downloaded" = "Черный список не скачан";
+
 /* Create torrent -> file already exists warning -> warning */
-"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent." = "Файл «%1$@» уже существует в папке «%2$@». Выберите другое имя или папку для создания торрента.";
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "Файл с именем «%1$@» уже есть в папке «%2$@». Выберите новое имя или местоположение, чтобы создать торрент-файл.";
 
 /* Move inside itself alert -> title */
 "A folder cannot be moved to inside itself." = "Папка не может быть перемещена внутрь себя.";
@@ -177,9 +161,6 @@
 /* Add torrent -> same name -> button */
 "Add" = "Добавить";
 
-/* Preferences -> Advanced toolbar item title */
-"Advanced" = "Дополнения";
-
 /* Groups -> Button */
 "All Groups" = "Все группы";
 
@@ -191,6 +172,36 @@
 
 /* Selected toolbar item -> label */
 "Apply Selected" = "Применить выбранные";
+
+/* Confirm Quit panel -> title */
+"Are you sure you want to quit?" = "Вы действительно хотите завершить программу?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %d transfers from the transfer list and trash both the data and torrent files?" = "Вы действительно хотите удалить %d раздач из списка и переместить торрент-файлы и данные в Корзину?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %d transfers from the transfer list and trash the data file?" = "Вы действительно хотите удалить %d раздач из списка и переместить данные в Корзину?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %d transfers from the transfer list and trash the torrent file?" = "Вы действительно хотите удалить %d раздач из списка и переместить торрент-файлы в Корзину?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %d transfers from the transfer list?" = "Вы действительно хотите удалить %d раздач из списка?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list and trash both the data and torrent files?" = "Вы действительно хотите удалить «%@» из списка раздач и переместить торрент-файл и данные в Корзину?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Вы действительно хотите удалить «%@» из списка раздач и переместить данные в Корзину?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list and trash the torrent file?" = "Вы действительно хотите удалить «%@» из списка раздач и переместить торрент-файл в Корзину?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list?" = "Вы действительно хотите удалить «%@» из списка раздач?";
+
+/* Stats reset -> title */
+"Are you sure you want to reset usage statistics?" = "Вы действительно хотите очистить статистику?";
 
 /* inspector -> peer table -> header tool tip */
 "Available" = "Доступен";
@@ -207,17 +218,20 @@
 /* Groups -> Name */
 "Blue" = "Синяя";
 
+/* File size - bytes */
+"bytes" = "Б";
+
 /* Confirm Quit panel -> button
    Removal confirm panel -> button
    Add torrent -> same name -> button */
 
 
+
+
 "Cancel" = "Отменить";
 
-/* Create torrent -> no url warning -> warning
-   Create torrent -> http warning -> warning */
-
-"Change the tracker address to create the torrent." = "Укажите адрес трекера для создания торрента.";
+/* Create torrent -> warning -> info */
+"Change the tracker address to create the torrent file." = "Изменить адрес трекера, чтобы создать торрент-файл.";
 
 /* Torrent Table -> tooltip */
 "Change transfer settings" = "Изменить настройки передачи";
@@ -240,35 +254,17 @@
 /* Groups -> Color Button */
 "Color" = "Цвет";
 
-/* Confirm Quit panel -> title */
-"Confirm Quit" = "Подтвердите завершение программы";
-
-/* Removal confirm panel -> title */
-"Confirm removal of %d transfers from the transfer list and trash both data and torrent files." = "Подтвердите удаление %d раздач из списка и перемещение всех данных и торрент-файлов в корзину.";
-
-/* Removal confirm panel -> title */
-"Confirm removal of %d transfers from the transfer list and trash data file." = "Подтвердите удаление %d раздач из списка и перемещение всех данных в корзину.";
-
-/* Removal confirm panel -> title */
-"Confirm removal of %d transfers from the transfer list and trash torrent file." = "Подтвердите удаление %d раздач из списка и перемещение торрент-файла в корзину.";
-
-/* Removal confirm panel -> title */
-"Confirm removal of %d transfers from the transfer list." = "Подтвердите удаление %d раздач из списка.";
-
-/* Removal confirm panel -> title */
-"Confirm removal of \"%@\" from the transfer list and trash both data and torrent files." = "Подтвердите удаление «%@» из списка и перемещение всех данных и торрент-файла в корзину.";
-
-/* Removal confirm panel -> title */
-"Confirm removal of \"%@\" from the transfer list and trash data file." = "Подтвердите удаление «%@» из списка и перемещение всех данных в корзину.";
-
-/* Removal confirm panel -> title */
-"Confirm removal of \"%@\" from the transfer list and trash torrent file." = "Подтвердите удаление «%@» из списка и перемещение торрент-файла в корзину.";
-
-/* Removal confirm panel -> title */
-"Confirm removal of \"%@\" from the transfer list." = "Подтвердите удаление «%@» из списка.";
+/* Blocklist -> message */
+"Connecting to site" = "Подключаюсь к сайту";
 
 /* Torrent file copy alert -> title */
 "Copy of \"%@\" Cannot Be Created" = "Копия «%@» не может быть создана";
+
+/* Create torrent -> failed -> warning */
+"Could not read \"%s\": %s." = "Не могу прочитать «%1$s»: %2$s.";
+
+/* Create torrent -> failed -> warning */
+"Could not write \"%s\": %s." = "Не могу записать «%1$s»: %2$s.";
 
 /* Create toolbar item -> label */
 "Create" = "Создать";
@@ -276,13 +272,13 @@
 /* Drag overlay -> file */
 "Create a Torrent File" = "Создать торрент-файл";
 
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "Создать торрент-файл";
+
 /* Create torrent -> select file
    Create toolbar item -> palette label */
 
 "Create Torrent File" = "Создать торрент-файл";
-
-/* Create toolbar item -> tooltip */
-"Create torrent file" = "Создать торрент-файл";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Ошибка во время создания «%@»";
@@ -306,8 +302,12 @@
 
 "DL" = "Скачиваю";
 
+/* Torrent disk space alert -> button */
+"Do not check disk space again" = "Не проверять еще раз";
+
 /* Open duplicate alert -> button
    Add torrent -> same name -> button */
+
 
 "Don't Alert Again" = "Больше не предупреждать";
 
@@ -325,6 +325,9 @@
 /* Growl notification title */
 "Download Complete" = "Скачивание завершено";
 
+/* Blocklist -> message */
+"Download of the blocklist failed." = "Не могу скачать черный список.";
+
 /* files tab -> tooltip */
 "Download Some" = "Файлы торрента";
 
@@ -336,6 +339,9 @@
 
 /* Torrent -> status string */
 "Downloading" = "Скачиваю";
+
+/* Blocklist -> message */
+"Downloading blocklist" = "Скачиваю черный список";
 
 /* Torrent -> status string */
 "Downloading from %d of %d peers" = "Скачиваю от %1$d из %2$d пользователей";
@@ -354,6 +360,7 @@
 /* Message window -> level string
    Torrent -> status string
    Message window -> level */
+
 
 
 "Error" = "Ошибка";
@@ -392,10 +399,7 @@
 "Green" = "Зеленая";
 
 /* Groups -> Button */
-"Group: " = "Этикетка:";
-
-/* Groups -> Button */
-"Group: No Label" = "Этикетка: нет";
+"Group" = "Этикетки";
 
 /* Groups -> window title */
 "Groups" = "Этикетки";
@@ -422,9 +426,6 @@
    Message window -> level */
 
 "Info" = "Информация";
-
-/* Inspector -> Peers tab -> peers */
-"info not available" = "Информация недоступна";
 
 /* Inspector toolbar item -> label */
 "Inspector" = "Инспектор";
@@ -469,8 +470,14 @@
 
 "N/A" = "Недоступен";
 
+/* Preferences -> toolbar item title */
+"Network" = "Сеть";
+
 /* Group table row */
 "No Group" = "✕";
+
+/* Groups -> Button */
+"No Label" = "Без имени";
 
 /* Inspector -> above tabs -> selected torrents */
 "No Torrents Selected" = "Ни один торрент не выбран";
@@ -521,6 +528,9 @@
 
 
 "OK" = "OK";
+
+/* Removal confirm panel -> message part 2 */
+"Once removed, continuing the transfers will require the torrent files." = "После удаления продолжение раздач потребует наличия торрент-файла.";
 
 /* File Outline -> Menu */
 "Only Check Selected" = "Проверить только выбранное";
@@ -580,7 +590,11 @@
 "Peer wants you to upload, but you do not want to (interested and choked)" = "Пользователь ждет вашей раздачи, однако вы не отправляете данные (заинтересованы и закрыты)";
 
 /* Inspector -> title */
+
 "Peers" = "Пользователи";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Port" = "Порт";
 
 /* Preferences -> Advanced -> port status */
 "Port is closed" = "Порт закрыт";
@@ -590,12 +604,6 @@
 
 /* Preferences -> Advanced -> port status */
 "Port is stealth" = "Порт неактивен";
-
-/* Inspector -> Peers tab -> table row tooltip */
-"Port: %d" = "Порт: %d";
-
-/* Inspector -> Peers tab -> table row tooltip */
-"Port: N/A" = "Порт: недоступен";
 
 /* file table -> header tool tip
    File Outline -> Menu */
@@ -610,6 +618,9 @@
 
 /* Message window -> table column */
 "Process" = "Процесс";
+
+/* Blocklist -> message */
+"Processing blocklist" = "Обрабатываю черный список";
 
 /* Stats window -> label */
 "Program Started" = "Запущено";
@@ -645,6 +656,9 @@
 /* Groups -> Name */
 "Red" = "Красная";
 
+/* Torrent -> eta string */
+"remaining time unknown" = "оставшееся время неизвестно";
+
 /* Removal confirm panel -> button
    Remove toolbar item -> label */
 
@@ -655,6 +669,11 @@
 
 /* Remove toolbar item -> tooltip */
 "Remove selected transfers" = "Удалить выбранные раздачи";
+
+/* Stats window -> reset button
+   Stats reset -> button */
+
+"Reset" = "Очистить";
 
 /* All toolbar item -> label */
 "Resume All" = "Возобновить все";
@@ -689,11 +708,11 @@
 /* Torrent -> status string */
 "Seeding" = "Раздаю";
 
-/* Torrent -> status string */
-"Seeding complete" = "Раздача завершена";
-
 /* Growl notification title */
 "Seeding Complete" = "Раздача завершена";
+
+/* Torrent -> status string */
+"Seeding complete" = "Раздача завершена";
 
 /* Torrent -> status string */
 "Seeding to %d of %d peers" = "Раздаю к %1$d из %2$d пользователей";
@@ -757,7 +776,7 @@
 "Speed Limit overrides the total bandwidth limits with its own limits." = "Будет использовано ограничение скорости вместо настроек ширины канала";
 
 /* Torrent -> status string */
-"Stalled, " = "Прервано, ";
+"Stalled" = "Неактивна";
 
 /* Stats window -> title */
 "Statistics" = "Статистика";
@@ -794,7 +813,7 @@
 "The move operation of \"%@\" cannot be done." = "Перемещение «%@» не может быть выполнено.";
 
 /* Torrent download failed -> message */
-"The torrent could not be downloaded from %@ because an error occurred (%@)." = "Торрент не может быть скачан из %1$@ вследствие ошибки (%2$@).";
+"The torrent could not be downloaded from %@: %@." = "Торрент не может быть скачан из %1$@: %2$@.";
 
 /* Torrent file copy alert -> message */
 "The torrent file (%@) cannot be found." = "Торрент-файл (%@) не найден.";
@@ -805,20 +824,20 @@
 /* Create torrent -> zero size -> title */
 "The total file size is zero bytes." = "Общий размер файла 0 Б.";
 
-/* Create torrent -> no url warning -> title */
-"The tracker address cannot be blank." = "Введите адрес трекера.";
+/* Create torrent -> warning -> message */
+"The tracker address is invalid." = "Неверный адрес трекера.";
 
-/* Create torrent -> http warning -> title */
-"The tracker address must begin with \"http://\"." = "Адрес трекера должен начинаться с «http://».";
+/* Create torrent -> warning -> message */
+"The tracker address must begin with \"http://\" or \"https://\"." = "Адрес трекера должен начинаться с «http://» или «https://».";
 
 /* Torrent file disk space alert -> message */
-"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Передеча будет приостановлена. Освободите место на диске %@ или отмените скачивание нескольких файлов в инспекторе.";
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Передача будет приостановлена. Освободите место на диске %@ или отмените скачивание нескольких файлов в инспекторе.";
+
+/* Confirm Quit panel -> message */
+"There are %d active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "%d активных раздач будут приостановлены. При следующем запуске они будут автоматически возобновлены.";
 
 /* Removal confirm panel -> message part 1 */
 "There are %d active transfers." = "%d раздач активны в данный момент.";
-
-/* Confirm Quit panel -> message */
-"There are %d active transfers. Do you really want to quit?" = "%d раздач активны в данный момент. Вы действительно хотите завершить программу?";
 
 /* Removal confirm panel -> message part 1 */
 "There are %d transfers (%d active)." = "%1$d раздач (%2$d активных).";
@@ -827,7 +846,7 @@
 "There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Другая копия Transmission уже запущена. Эта копия не может быть запущена, пока не будет завершена существующая.";
 
 /* Confirm Quit panel -> message */
-"There is an active transfer. Do you really want to quit?" = "Некоторые раздачи еще активны. Вы действительно хотите завершить программу?";
+"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Активная раздача будет приостановлена. При следующем запуске она будет автоматически возобновлена.";
 
 /* Create torrent -> no files -> warning */
 "There must be at least one file in a folder to create a torrent file." = "Для создания торрент-файла в папке должен быть хотя бы один файл.";
@@ -838,14 +857,14 @@
 /* Move error alert -> title */
 "There was an error moving the data file." = "Ошибка при перемещении данных.";
 
-/* Create torrent -> failed -> warning */
-"There was an error parsing the data file. The torrent file was not created." = "Ошибка при чтении данных. Торрент-файл не был создан.";
-
 /* Create torrent -> no files -> title */
 "This folder contains no files." = "Эта папка не содержит файлов.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file." = "Раздача активна. Для восстановления удаленной раздачи потребуется наличие торрент-файла.";
+
+/* Stats reset -> message */
+"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be effected." = "Будет очищена общая статистика Transmission. Статистика отдельных раздач не будет затронута.";
 
 /* Inspector -> tracker table */
 "Tier %d" = "%d уров.";
@@ -905,8 +924,8 @@
 /* File Outline -> Menu */
 "Uncheck Selected" = "Снять выбор";
 
-/* Torrent -> remaining time */
-"Unknown" = "Неизвестно";
+/* Torrent -> error string unreadable */
+"unreadable error" = "неопознанная ошибка";
 
 /* Save log panel -> default file name */
 "untitled" = "Новый";
@@ -916,6 +935,9 @@
 
 /* Stats window -> label */
 "Uploaded" = "Роздано";
+
+/* Torrent -> progress string */
+"uploaded %@ (Ratio: %@)" = "роздано %1$@ (Рейтинг: %2$@)";
 
 /* inspector -> peer table -> header tool tip */
 "Uploading To Peer" = "Раздаю к пользователю";
