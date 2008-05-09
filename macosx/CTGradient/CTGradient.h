@@ -36,21 +36,6 @@ typedef enum  _CTBlendingMode
 
 + (id)gradientWithBeginningColor:(NSColor *)begin endingColor:(NSColor *)end;
 
-+ (id)aquaSelectedGradient;
-+ (id)aquaNormalGradient;
-+ (id)aquaPressedGradient;
-
-+ (id)unifiedSelectedGradient;
-+ (id)unifiedNormalGradient;
-+ (id)unifiedPressedGradient;
-+ (id)unifiedDarkGradient;
-
-+ (id)sourceListSelectedGradient;
-+ (id)sourceListUnselectedGradient;
-
-+ (id)rainbowGradient;
-+ (id)hydrogenSpectrumGradient;
-
 - (CTGradient *)gradientWithAlphaComponent:(float)alpha;
 
 - (CTGradient *)addColorStop:(NSColor *)color atPosition:(float)position;	//positions given relative to [0,1]
@@ -69,5 +54,7 @@ typedef enum  _CTBlendingMode
 																	//  gradient from center outwards
 - (void)fillBezierPath:(NSBezierPath *)path angle:(float)angle;
 - (void)radialFillBezierPath:(NSBezierPath *)path;
+
+- (void)addElement:(CTGradientElement*)newElement;
 
 @end
