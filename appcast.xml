@@ -5,22 +5,35 @@
     <link>http://www.transmissionbt.com/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Fri, 28 Mar 2008 13:46:00 -0400</pubDate>
-    <lastBuildDate>Fri, 4 Apr 2008 14:54:00 -0400</lastBuildDate>
+    <pubDate>Fri, 9 May 2008 14:50:00 -0400</pubDate>
+    <lastBuildDate>Fri, 9 May 2008 14:50:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 1.11 Released</title>
+      <title>Transmission 1.20 Released</title>
       <description><![CDATA[
+<h4>Transmission now requires Mac OS X 10.4.11 with Security Update 2008-002. Mac OS X 10.5 or greater is recommended.</h4>
+
+<h4>Core Changes:</h4>
+<ul>
+ <li>Support https tracker connections</li>
+ <li>IP blocking using the Bluetack Level1 blocklist</li>
+ <li>Better support of multitracker torrents</li>
+ <li>Faster UPnP port mapping on startup</li>
+ <li>Ability to reset global statistics</li>
+ <li>Various bugfixes</li>
+</ul>
 <h4>Mac-specific Changes:</h4>
 <ul>
- <li>Fix visual glitch with the tracker inspector tab when there is no scrape address</li>
- <li>Only make the progress status string clickable on multi-file torrents</li>
- <li>Traditional Chinese localization, updated Russian localization</li>
+ <li>Display of decimal numbers matches system international settings</li>
+ <li>Updated Dock badge images</li>
 </ul>
 
+
+<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?group=component&milestone=1.20">click here</a>.</p>
+
 Transmission 0.72 and earlier: Complete your downloads before upgrading or you will lose data!]]></description>
-      <pubDate>Fri, 4 Apr 2008 14:54:00 -0400</pubDate>
-      <enclosure sparkle:version="5504" sparkle:shortVersionString="1.11" url="http://mirrors.m0k.org/transmission/files/Transmission-1.11.dmg" length="2923743" type="application/octet-stream"/>
+      <pubDate>Fri, 9 May 2008 14:50:00 -0400</pubDate>
+      <enclosure sparkle:version="5786" sparkle:shortVersionString="1.20" url="http://mirrors.m0k.org/transmission/files/Transmission-1.20.dmg" length="2522401" type="application/octet-stream"/>
     </item>
     
   </channel>
