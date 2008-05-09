@@ -115,6 +115,9 @@ test_peer_id_SOURCES = test-peer-id.c
 test_peer_id_LDADD = $(APPS_LDADD)
 
 
+clean-local:
+	if test -d .svn; then rm version.h; fi;
+
 EXTRA_libtransmission_a_SOURCES = \
     version.h
 
