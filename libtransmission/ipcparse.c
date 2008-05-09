@@ -38,22 +38,22 @@
 
 #define TR_N_ELEMENTS( ary ) ( sizeof( ary ) / sizeof( (ary)[0] ) )
 
-#define SAFEFREE( ptr )      \
-    do                       \
-    {                        \
-        int saved = errno;   \
-        free( ptr );         \
-        errno = saved;       \
-    }                        \
+#define SAFEFREE( ptr )            \
+    do                             \
+    {                              \
+        const int saved = errno;   \
+        free( ptr );               \
+        errno = saved;             \
+    }                              \
     while( 0 )
 
-#define SAFEBENCFREE( val )  \
-    do                       \
-    {                        \
-        int saved = errno;   \
-        tr_bencFree( val );  \
-        errno = saved;       \
-    }                        \
+#define SAFEBENCFREE( val )        \
+    do                             \
+    {                              \
+        int saved = errno;         \
+        tr_bencFree( val );        \
+        errno = saved;             \
+    }                              \
     while( 0 )
 
 /* IPC protocol version */
@@ -185,9 +185,20 @@ static const struct inf gl_stat[] =
     { "upload-total",           IPC_ST_UPTOTAL   }
 };
 
+#define ASSERT_SORTED(A) \
+  do { \
+    int i, n; \
+    for( i=0, n=TR_N_ELEMENTS(A)-1; i<n; ++i ) \
+      assert( strcmp( A[i].name, A[i+1].name ) < 0 ); \
+  } while( 0 );
+
 struct ipc_funcs *
 ipc_initmsgs( void )
 {
+    ASSERT_SORTED( gl_msgs );
+    ASSERT_SORTED( gl_inf );
+    ASSERT_SORTED( gl_stat );
+
     return tr_new0( struct ipc_funcs, 1 );
 }
 
@@ -359,7 +370,7 @@ ipc_mkint( const struct ipc_info  * session,
 
     if(( val = ipc_initval( session, msg_id, tag, &pk, TYPE_INT )))
     {
-        val->val.i = num;
+        tr_bencInitInt( val, num );
         ret = ipc_serialize( &pk, setmeSize );
         SAFEBENCFREE( &pk );
     }
@@ -382,7 +393,7 @@ ipc_mkstr( const struct ipc_info  * session,
 
     if(( val = ipc_initval( session, msg_id, tag, &pk, TYPE_STR )))
     {
-        tr_bencInitStr( val, str, -1, 1 );
+        tr_bencInitStrDup( val, str );
         ret = ipc_serialize( &pk, setmeSize );
         SAFEBENCFREE( &pk );
     }
@@ -457,7 +468,7 @@ ipc_createInfoRequest( const struct ipc_info * session,
 {
     tr_benc   pk;
     tr_benc * typelist;
-    size_t       ii, typecount, used;
+    size_t       i, typecount;
     const struct inf * typearray;
     uint8_t    * ret;
 
@@ -478,13 +489,12 @@ ipc_createInfoRequest( const struct ipc_info * session,
 
         /* add the requested IDs */
         tr_bencDictReserve( top, 2 );
-        idlist   = tr_bencDictAdd( top, "id" );
         typelist = tr_bencDictAdd( top, "type" );
         tr_bencInit( typelist, TYPE_LIST );
-        for( ii = 0; TORRENT_ID_VALID( ids[ii] ); ii++ ) { }
-        tr_bencInitList( idlist, ii );
-        for( ii = 0; TORRENT_ID_VALID( ids[ii] ); ii++ )
-            tr_bencListAddInt( idlist, ids[ii] );
+        for( i = 0; TORRENT_ID_VALID( ids[i] ); i++ ) { }
+        idlist = tr_bencDictAddList( top, "id", i );
+        for( i = 0; TORRENT_ID_VALID( ids[i] ); i++ )
+            tr_bencListAddInt( idlist, ids[i] );
     }
 
     /* get the type name array */
@@ -505,20 +515,10 @@ ipc_createInfoRequest( const struct ipc_info * session,
             break;
     }        
 
-    /* add the type names */
-    for( ii = used = 0; typecount > ii; ii++ )
-        if( types & ( 1 << ii ) )
-            used++;
-    tr_bencListReserve( typelist, used );
-
-    for( ii = 0; typecount > ii; ii++ )
-    {
-        if( !( types & ( 1 << ii ) ) )
-            continue;
-        assert( typearray[ii].type == ( 1 << ii ) );
-        tr_bencInitStr( tr_bencListAdd( typelist ),
-                        typearray[ii].name, -1, 1 );
-    }
+    tr_bencListReserve( typelist, typecount );
+    for( i=0; i<typecount; ++i )
+        if( types & typearray[i].type )
+            tr_bencListAddStr( typelist, typearray[i].name );
 
     /* generate packet */
     ret = ipc_serialize( &pk, setmeSize );
@@ -551,97 +551,81 @@ ipc_addinfo( tr_benc         * list,
              tr_torrent      * tor,
              int               types )
 {
-    tr_benc * dict;
-    int          ii, jj;
-    tr_file_index_t ff;
     const tr_info * inf = tr_torrentInfo( tor );
+    const struct inf * it;
+    const struct inf * end;
+    tr_benc * dict;
 
     /* always send torrent id */
     types |= IPC_INF_ID;
 
-    tr_bencListReserve( list, 1 );
+    /* create a dict to hold the info */
+    dict = tr_bencListAddDict( list, TR_N_ELEMENTS( gl_inf ) );
 
-    dict = tr_bencListAdd( list );
-
-    /* count the number of info keys and allocate a dict for them */
-    for( ii = jj = 0; IPC_INF__MAX > 1 << ii; ii++ )
+    /* populate the dict */
+    for( it=gl_inf, end=it+TR_N_ELEMENTS(gl_inf); it!=end; ++it )
     {
-        if( !( types & ( 1 << ii ) ) )
-            continue;
-
-        assert( TR_N_ELEMENTS( gl_inf ) > ( unsigned )ii );
-        assert( gl_inf[ii].type == ( 1 << ii ) );
-        jj++;
-    }
-
-    tr_bencInitDict( dict, jj );
-
-    /* populate the dict with info key->value pairs */
-    for( ii = 0; IPC_INF__MAX > 1 << ii; ii++ )
-    {
-        tr_benc * item;
-
-        if( !( types & ( 1 << ii ) ) )
-            continue;
-
-        item = tr_bencDictAdd( dict, gl_inf[ii].name );
-        switch( 1 << ii )
+        if( types & it->type )
         {
-            case IPC_INF_COMMENT:
-                tr_bencInitStr( item, inf->comment ? inf->comment : "", -1, 1 );
-                break;
-            case IPC_INF_CREATOR:
-                tr_bencInitStr( item, inf->creator ? inf->creator : "", -1, 1 );
-                break;
-            case IPC_INF_DATE:
-                tr_bencInitInt( item, inf->dateCreated );
-                break;
-            case IPC_INF_FILES:
-                tr_bencInitList( item, inf->fileCount );
-                for( ff = 0; inf->fileCount > ff; ff++ )
-                {
-                    tr_benc * file = tr_bencListAdd( item );
-                    tr_bencInitDict( file, 2 );
-                    tr_bencInitStr( tr_bencDictAdd( file, "name" ),
-                                    inf->files[ff].name, -1, 1 );
-                    tr_bencInitInt( tr_bencDictAdd( file, "size" ),
-                                    inf->files[ff].length );
-                }
-                break;
-            case IPC_INF_HASH:
-                tr_bencInitStr( item, inf->hashString, -1, 1 );
-                break;
-            case IPC_INF_ID:
-                tr_bencInitInt( item, torrent_id );
-                break;
-            case IPC_INF_NAME:
-                tr_bencInitStr( item, inf->name, -1, 1 );
-                break;
-            case IPC_INF_PATH:
-                tr_bencInitStr( item, inf->torrent, -1, 1 );
-                break;
-            case IPC_INF_PRIVATE:
-                tr_bencInitInt( item, inf->isPrivate ? 1 : 0 );
-                break;
-            case IPC_INF_SIZE:
-                tr_bencInitInt( item, inf->totalSize );
-                break;
-            case IPC_INF_TRACKERS: {
-                int prevTier = -1;
-                tr_benc * tier = NULL;
-                tr_bencInitList( item, 0 );
-                for( jj=0; jj<inf->trackerCount; ++jj ) {
-                    if( prevTier != inf->trackers[jj].tier ) {
-                        prevTier = inf->trackers[jj].tier;
-                        tier = tr_bencListAddList( item, 0 );
+            tr_benc * val = tr_bencDictAdd( dict, it->name );
+
+            switch( it->type )
+            {
+                case IPC_INF_COMMENT:
+                    tr_bencInitStrDup( val, inf->comment ? inf->comment : "" );
+                    break;
+                case IPC_INF_CREATOR:
+                    tr_bencInitStrDup( val, inf->creator ? inf->creator : "" );
+                    break;
+                case IPC_INF_DATE:
+                    tr_bencInitInt( val, inf->dateCreated );
+                    break;
+                case IPC_INF_FILES: {
+                    tr_file_index_t f;
+                    tr_bencInitList( val, inf->fileCount );
+                    for( f=0; f<inf->fileCount; ++f ) {
+                        tr_benc * file = tr_bencListAddDict( val, 2 );
+                        tr_bencDictAddStr( file, "name", inf->files[f].name );
+                        tr_bencDictAddInt( file, "size", inf->files[f].length );
                     }
-                    filltracker( tr_bencListAdd( tier ), &inf->trackers[jj] );
+                    break;
                 }
-                break;
+                case IPC_INF_HASH:
+                    tr_bencInitStr( val, inf->hashString, -1, 1 );
+                    break;
+                case IPC_INF_ID:
+                    tr_bencInitInt( val, torrent_id );
+                    break;
+                case IPC_INF_NAME:
+                    tr_bencInitStrDup( val, inf->name );
+                    break;
+                case IPC_INF_PATH:
+                    tr_bencInitStrDup( val, inf->torrent );
+                    break;
+                case IPC_INF_PRIVATE:
+                    tr_bencInitInt( val, inf->isPrivate ? 1 : 0 );
+                    break;
+                case IPC_INF_SIZE:
+                    tr_bencInitInt( val, inf->totalSize );
+                    break;
+                case IPC_INF_TRACKERS: {
+                    int j;
+                    int prevTier = -1;
+                    tr_benc * tier = NULL;
+                    tr_bencInitList( val, 0 );
+                    for( j=0; j<inf->trackerCount; ++j ) {
+                        if( prevTier != inf->trackers[j].tier ) {
+                            prevTier = inf->trackers[j].tier;
+                            tier = tr_bencListAddList( val, 0 );
+                        }
+                        filltracker( tr_bencListAdd( tier ), &inf->trackers[j] );
+                    }
+                    break;
+                }
+                default:
+                    assert( 0 );
+                    break;
             }
-            default:
-                assert( 0 );
-                break;
         }
     }
 
@@ -664,189 +648,126 @@ ipc_addstat( tr_benc      * list,
              int            types )
 {
     const tr_stat * st = tr_torrentStatCached( tor );
+    const struct inf * it;
+    const struct inf * end;
     tr_benc  * dict;
-    int ii, used;
-
-    /* add the dictionary child */
-    tr_bencListReserve( list, 1 );
-    dict = tr_bencListAdd( list );
 
     /* always send torrent id */
     types |= IPC_ST_ID;
 
-    /* count the number of stat keys and allocate a dict for them */
-    for( ii = used = 0; IPC_ST__MAX > 1 << ii; ii++ )
-        if( types & ( 1 << ii ) )
-            used++;
-    tr_bencInitDict( dict, used );
+    /* add the dictionary child */
+    dict = tr_bencListAddDict( list, TR_N_ELEMENTS( gl_stat ) );
 
     /* populate the dict */
-    for( ii = 0; IPC_ST__MAX > 1 << ii; ii++ )
+    for( it=gl_stat, end=it+TR_N_ELEMENTS(gl_stat); it!=end; ++it )
     {
-        tr_benc * item;
-
-        if( !( types & ( 1 << ii ) ) )
-            continue;
-
-        assert( TR_N_ELEMENTS( gl_stat ) > ( unsigned )ii );
-        assert( gl_stat[ii].type == ( 1 << ii ) );
-        item = tr_bencDictAdd( dict, gl_stat[ii].name );
-        switch( 1 << ii )
+        if( types & it->type )
         {
-            case IPC_ST_COMPLETED:
-            case IPC_ST_DOWNVALID:
-                tr_bencInitInt( item, st->haveValid );
-                break;
-            case IPC_ST_DOWNSPEED:
-                tr_bencInitInt( item, st->rateDownload * 1024 );
-                break;
-            case IPC_ST_DOWNTOTAL:
-                tr_bencInitInt( item, st->downloadedEver );
-                break;
-            case IPC_ST_ERROR: {
-                const tr_errno error = st->error;
-                if( TR_OK == error )
-                {
-                    tr_bencInitStr( item, "", -1, 1 );
+            tr_benc * val = tr_bencDictAdd( dict, it->name );
+
+            switch( it->type )
+            {
+                case IPC_ST_COMPLETED:
+                case IPC_ST_DOWNVALID:
+                    tr_bencInitInt( val, st->haveValid );
+                    break;
+                case IPC_ST_DOWNSPEED:
+                    tr_bencInitInt( val, st->rateDownload * 1024 );
+                    break;
+                case IPC_ST_DOWNTOTAL:
+                    tr_bencInitInt( val, st->downloadedEver );
+                    break;
+                case IPC_ST_ERROR: {
+                    const char * s;
+                    const tr_errno e = st->error;
+                    if( !e ) s = "";
+                    else if( e == TR_ERROR_ASSERT )          s = "assert";
+                    else if( e == TR_ERROR_IO_PERMISSIONS )  s = "io-permissions";
+                    else if( e == TR_ERROR_IO_SPACE )        s = "io-space";
+                    else if( e == TR_ERROR_IO_FILE_TOO_BIG ) s = "io-file-too-big";
+                    else if( e == TR_ERROR_IO_OPEN_FILES )   s = "io-open-files";
+                    else if( TR_ERROR_IS_IO( e ) )           s = "io-other";
+                    else if( e == TR_ERROR_TC_ERROR )        s = "tracker-error";
+                    else if( e == TR_ERROR_TC_WARNING )      s = "tracker-warning";
+                    else if( TR_ERROR_IS_TC( e ) )           s = "tracker-other";
+                    else                                     s = "other";
+                    tr_bencInitStrDup( val, s );
+                    break;
                 }
-                else if( error == TR_ERROR_ASSERT )
-                {
-                    tr_bencInitStr( item, "assert", -1, 1 );
+                case IPC_ST_ERRMSG: {
+                    const char * s;
+                    if( !st->error ) s = "";
+                    else if( !*st->errorString ) s = "other";
+                    else s = st->errorString;
+                    tr_bencInitStrDup( val, s );
+                    break;
                 }
-                else if( error == TR_ERROR_IO_PERMISSIONS )
-                {
-                    tr_bencInitStr( item, "io-permissions", -1, 1 );
+                case IPC_ST_ETA:
+                    tr_bencInitInt( val, st->eta );
+                    break;
+                case IPC_ST_ID:
+                    tr_bencInitInt( val, torrent_id );
+                    break;
+                case IPC_ST_PEERDOWN:
+                    tr_bencInitInt( val, st->peersSendingToUs );
+                    break;
+                case IPC_ST_PEERFROM: {
+                    const int * c = st->peersFrom;
+                    tr_bencInitDict( val, 4 );
+                    tr_bencDictAddInt( val, "cache",    c[TR_PEER_FROM_CACHE] );
+                    tr_bencDictAddInt( val, "incoming", c[TR_PEER_FROM_INCOMING] );
+                    tr_bencDictAddInt( val, "pex",      c[TR_PEER_FROM_PEX] );
+                    tr_bencDictAddInt( val, "tracker",  c[TR_PEER_FROM_TRACKER] );
+                    break;
                 }
-                else if( error == TR_ERROR_IO_SPACE )
-                {
-                    tr_bencInitStr( item, "io-space", -1, 1 );
+                case IPC_ST_PEERMAX:
+                    tr_bencInitInt( val, tor->maxConnectedPeers );
+                    break;
+                case IPC_ST_PEERTOTAL:
+                    tr_bencInitInt( val, st->peersConnected );
+                    break;
+                case IPC_ST_PEERUP:
+                    tr_bencInitInt( val, st->peersGettingFromUs );
+                    break;
+                case IPC_ST_RUNNING:
+                    tr_bencInitInt( val, TR_STATUS_IS_ACTIVE(st->status) );
+                    break;
+                case IPC_ST_STATE: {
+                    const char * s;
+                    if( TR_STATUS_CHECK_WAIT & st->status )    s = "waiting to check";
+                    else if( TR_STATUS_CHECK & st->status )    s = "checking";
+                    else if( TR_STATUS_DOWNLOAD & st->status ) s = "downloading";
+                    else if( TR_STATUS_SEED & st->status )     s = "seeding";
+                    else if( TR_STATUS_STOPPED & st->status )  s = "paused";
+                    else                                       s = "error";
+                    tr_bencInitStr( val, s, -1, 1 );
+                    break;
                 }
-                else if( error == TR_ERROR_IO_FILE_TOO_BIG )
-                {
-                    tr_bencInitStr( item, "io-file-too-big", -1, 1 );
-                }
-                else if( error == TR_ERROR_IO_OPEN_FILES )
-                {
-                    tr_bencInitStr( item, "io-open-files", -1, 1 );
-                }
-                else if( TR_ERROR_IS_IO( error ) )
-                {
-                    tr_bencInitStr( item, "io-other", -1, 1 );
-                }
-                else if( error == TR_ERROR_TC_ERROR )
-                {
-                    tr_bencInitStr( item, "tracker-error", -1, 1 );
-                }
-                else if( error == TR_ERROR_TC_WARNING )
-                {
-                    tr_bencInitStr( item, "tracker-warning", -1, 1 );
-                }
-                else if( TR_ERROR_IS_TC( error ) )
-                {
-                    tr_bencInitStr( item, "tracker-other", -1, 1 );
-                }
-                else
-                {
-                    tr_bencInitStr( item, "other", -1, 1 );
-                }
-                break;
-            }
-            case IPC_ST_ERRMSG:
-                if( TR_OK == st->error )
-                {
-                    tr_bencInitStr( item, "", -1, 1 );
-                }
-                else if( '\0' == st->errorString[0] )
-                {
-                    tr_bencInitStr( item, "other", -1, 1 );
-                }
-                else if( tr_bencInitStrDup( item, st->errorString ) )
-                {
-                    return -1;
-                }
-                break;
-            case IPC_ST_ETA:
-                tr_bencInitInt( item, st->eta );
-                break;
-            case IPC_ST_ID:
-                tr_bencInitInt( item, torrent_id );
-                break;
-            case IPC_ST_PEERDOWN:
-                tr_bencInitInt( item, st->peersSendingToUs );
-                break;
-            case IPC_ST_PEERFROM:
-                tr_bencInitDict( item, 4 );
-                tr_bencInitInt( tr_bencDictAdd( item, "incoming" ),
-                                st->peersFrom[TR_PEER_FROM_INCOMING] );
-                tr_bencInitInt( tr_bencDictAdd( item, "tracker" ),
-                                st->peersFrom[TR_PEER_FROM_TRACKER] );
-                tr_bencInitInt( tr_bencDictAdd( item, "cache" ),
-                                st->peersFrom[TR_PEER_FROM_CACHE] );
-                tr_bencInitInt( tr_bencDictAdd( item, "pex" ),
-                                st->peersFrom[TR_PEER_FROM_PEX] );
-                break;
-            case IPC_ST_PEERMAX:
-                tr_bencInitInt( item, tor->maxConnectedPeers );
-                break;
-            case IPC_ST_PEERTOTAL:
-                tr_bencInitInt( item, st->peersConnected );
-                break;
-            case IPC_ST_PEERUP:
-                tr_bencInitInt( item, st->peersGettingFromUs );
-                break;
-            case IPC_ST_RUNNING:
-                tr_bencInitInt( item, TR_STATUS_IS_ACTIVE(st->status) );
-                break;
-            case IPC_ST_STATE:
-                if( TR_STATUS_CHECK_WAIT & st->status )
-                {
-                    tr_bencInitStr( item, "waiting to checking", -1, 1 );
-                }
-                else if( TR_STATUS_CHECK & st->status )
-                {
-                    tr_bencInitStr( item, "checking", -1, 1 );
-                }
-                else if( TR_STATUS_DOWNLOAD & st->status )
-                {
-                    tr_bencInitStr( item, "downloading", -1, 1 );
-                }
-                else if( TR_STATUS_SEED & st->status )
-                {
-                    tr_bencInitStr( item, "seeding", -1, 1 );
-                }
-                else if( TR_STATUS_STOPPED & st->status )
-                {
-                    tr_bencInitStr( item, "paused", -1, 1 );
-                }
-                else
-                {
+                case IPC_ST_SWARM:
+                    tr_bencInitInt( val, st->swarmspeed * 1024 );
+                    break;
+                case IPC_ST_TRACKER:
+                    filltracker( val, st->tracker );
+                    break;
+                case IPC_ST_TKDONE:
+                    tr_bencInitInt( val, st->completedFromTracker );
+                    break;
+                case IPC_ST_TKLEECH:
+                    tr_bencInitInt( val, st->leechers );
+                    break;
+                case IPC_ST_TKSEED:
+                    tr_bencInitInt( val, st->seeders );
+                    break;
+                case IPC_ST_UPSPEED:
+                    tr_bencInitInt( val, st->rateUpload * 1024 );
+                    break;
+                case IPC_ST_UPTOTAL:
+                    tr_bencInitInt( val, st->uploadedEver );
+                    break;
+                default:
                     assert( 0 );
-                }
-                break;
-            case IPC_ST_SWARM:
-                tr_bencInitInt( item, st->swarmspeed * 1024 );
-                break;
-            case IPC_ST_TRACKER:
-                filltracker( item, st->tracker );
-                break;
-            case IPC_ST_TKDONE:
-                tr_bencInitInt( item, st->completedFromTracker );
-                break;
-            case IPC_ST_TKLEECH:
-                tr_bencInitInt( item, st->leechers );
-                break;
-            case IPC_ST_TKSEED:
-                tr_bencInitInt( item, st->seeders );
-                break;
-            case IPC_ST_UPSPEED:
-                tr_bencInitInt( item, st->rateUpload * 1024 );
-                break;
-            case IPC_ST_UPTOTAL:
-                tr_bencInitInt( item, st->uploadedEver );
-                break;
-            default:
-                assert( 0 );
-                break;
+                    break;
+            }
         }
     }
 
@@ -883,19 +804,15 @@ handlevers( struct ipc_info * info, tr_benc * dict )
     switch( vers->type )
     {
         case TYPE_INT:
-            min = vers->val.i;
-            max = vers->val.i;
+            min = max = vers->val.i;
             break;
-        case TYPE_DICT: {
-            tr_benc * num = tr_bencDictFind( vers, "min" );
-            min = tr_bencIsInt( num ) ? num->val.i : -1;
-            num = tr_bencDictFind( vers, "max" );
-            max = tr_bencIsInt( num ) ? num->val.i : -1;
+        case TYPE_DICT:
+            min = max = -1;
+            tr_bencDictFindInt( vers, "min", &min );
+            tr_bencDictFindInt( vers, "max", &max );
             break;
-        }
         default:
-            min = -1;
-            max = -1;
+            min = max = -1;
             break;
     }
 
@@ -1157,27 +1074,27 @@ ipc_infotypes( enum ipc_msg id, const tr_benc * list )
 const char *
 ipc_infoname( enum ipc_msg id, int type )
 {
-    const struct inf * array;
-    size_t len, ii;
+    const struct inf * it;
+    const struct inf * end;
 
     switch( id )
     {
         case IPC_MSG_INFO:
-            array = gl_inf;
-            len   = TR_N_ELEMENTS( gl_inf );
+            it = gl_inf;
+            end = it + TR_N_ELEMENTS( gl_inf );
             break;
         case IPC_MSG_STAT:
-            array = gl_stat;
-            len   = TR_N_ELEMENTS( gl_stat );
+            it = gl_stat;
+            end = it + TR_N_ELEMENTS( gl_stat );
             break;
         default:
             assert( 0 );
             break;
     }
 
-    for( ii = 0; len > ii; ii++ )
-        if( array[ii].type == type )
-            return array[ii].name;
+    for( ; it!=end; ++it )
+        if( it->type == type )
+            return it->name;
 
     assert( 0 );
     return NULL;
