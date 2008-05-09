@@ -16,6 +16,7 @@
 #include <gtk/gtk.h>
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/version.h>
 #include <libtransmission/web.h>
 #include "conf.h"
 #include "hig.h"
@@ -100,9 +101,14 @@ tr_prefs_init_global( void )
 #define PREF_KEY "pref-key"
 
 static void
-response_cb( GtkDialog * dialog, int response UNUSED, gpointer unused UNUSED )
+response_cb( GtkDialog * dialog, int response, gpointer unused UNUSED )
 {
-    gtk_widget_destroy( GTK_WIDGET(dialog) );
+    if( response == GTK_RESPONSE_HELP )
+        gtr_open_file( "http://www.transmissionbt.com/help/gtk/"
+                       SHORT_VERSION_STRING "/html/preferences.html" );
+
+    if( response == GTK_RESPONSE_CLOSE )
+        gtk_widget_destroy( GTK_WIDGET(dialog) );
 }
 
 static void
@@ -556,6 +562,7 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 
     d = gtk_dialog_new_with_buttons( _( "Transmission Preferences" ), parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
+                                     GTK_STOCK_HELP, GTK_RESPONSE_HELP,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      NULL );
     gtk_window_set_role( GTK_WINDOW(d), "transmission-preferences-dialog" );
