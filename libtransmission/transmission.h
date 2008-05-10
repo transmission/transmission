@@ -248,6 +248,12 @@ typedef struct tr_torrent tr_torrent;
 
 int tr_torrentCount( const tr_handle * h );
 
+/**
+ * Iterate through the torrents.
+ * Pass in in a NULL pointer to get the first torrent.
+ */
+tr_torrent* tr_torrentNext( tr_handle *, tr_torrent * );
+
 /***********************************************************************
 *** Speed Limits
 **/

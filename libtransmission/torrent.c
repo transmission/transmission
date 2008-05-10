@@ -54,19 +54,19 @@
 ***/
 
 int
-tr_torrentExists( tr_handle       * handle,
+tr_torrentExists( const tr_handle * handle,
                   const uint8_t   * torrentHash )
 {
-    return tr_torrentFindFromHash( handle, torrentHash ) != NULL;
+    return tr_torrentFindFromHash( (tr_handle*)handle, torrentHash ) != NULL;
 }
 
 tr_torrent*
 tr_torrentFindFromHash( tr_handle      * handle,
                         const uint8_t  * torrentHash )
 {
-    tr_torrent * tor;
+    tr_torrent * tor = NULL;
 
-    for( tor = handle->torrentList; tor; tor = tor->next )
+    while(( tor = tr_torrentNext( handle, tor )))
         if( !memcmp( tor->info.hash, torrentHash, SHA_DIGEST_LENGTH ) )
             return tor;
 
@@ -77,9 +77,9 @@ tr_torrent*
 tr_torrentFindFromObfuscatedHash( tr_handle      * handle,
                                   const uint8_t  * obfuscatedTorrentHash )
 {
-    tr_torrent * tor;
+    tr_torrent * tor = NULL;
 
-    for( tor = handle->torrentList; tor; tor = tor->next )
+    while(( tor = tr_torrentNext( handle, tor )))
         if( !memcmp( tor->obfuscatedHash, obfuscatedTorrentHash, SHA_DIGEST_LENGTH ) )
             return tor;
 
@@ -482,19 +482,6 @@ torrentRealInit( tr_handle     * h,
         torrentStart( tor, FALSE );
 }
 
-static int
-hashExists( const tr_handle   * h,
-            const uint8_t     * hash )
-{
-    const tr_torrent * tor;
-
-    for( tor=h->torrentList; tor; tor=tor->next )
-        if( !memcmp( hash, tor->info.hash, SHA_DIGEST_LENGTH ) )
-            return TRUE;
-
-    return FALSE;
-}
-
 int
 tr_torrentParse( const tr_handle  * handle,
                  const tr_ctor    * ctor,
@@ -515,7 +502,7 @@ tr_torrentParse( const tr_handle  * handle,
     err = tr_metainfoParse( handle, setmeInfo, metainfo );
     doFree = !err && ( setmeInfo == &tmp );
 
-    if( !err && hashExists( handle, setmeInfo->hash ) )
+    if( !err && tr_torrentExists( handle, setmeInfo->hash ) )
         err = TR_EDUPLICATE;
 
     if( doFree )

@@ -388,16 +388,13 @@ static void
 tr_closeAllConnections( void * vh )
 {
     tr_handle * h = vh;
-    tr_torrent * t;
+    tr_torrent * tor;
 
     tr_sharedShuttingDown( h->shared );
     tr_trackerShuttingDown( h );
 
-    for( t=h->torrentList; t!=NULL; ) {
-        tr_torrent * tmp = t;
-        t = t->next;
-        tr_torrentClose( tmp );
-    }
+    while(( tor = tr_torrentNext( h, NULL )))
+        tr_torrentClose( tor );
 
     tr_peerMgrFree( h->peerMgr );
 
@@ -681,4 +678,10 @@ tr_sessionSetTorrentFile( tr_handle    * h,
         node->filename = tr_strdup( filename );
         metainfoLookupResort( h );
     }
+}
+
+tr_torrent*
+tr_torrentNext( tr_handle * session, tr_torrent * tor )
+{
+    return tor ? tor->next : session->torrentList;
 }

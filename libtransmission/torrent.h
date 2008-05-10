@@ -48,7 +48,7 @@ int  tr_torrentIsSeed  ( const tr_torrent * );
 
 void tr_torrentChangeMyPort  ( tr_torrent * );
 
-int tr_torrentExists( tr_handle *, const uint8_t * );
+int tr_torrentExists( const tr_handle *, const uint8_t * );
 tr_torrent* tr_torrentFindFromHash( tr_handle *, const uint8_t * );
 tr_torrent* tr_torrentFindFromObfuscatedHash( tr_handle *, const uint8_t* );
 

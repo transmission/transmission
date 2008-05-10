@@ -205,11 +205,11 @@ tr_sharedShuttingDown( tr_shared * s )
 void
 tr_sharedSetPort( tr_shared * s, int port )
 {
-    tr_torrent * tor;
+    tr_torrent * tor = NULL;
 
     s->publicPort = port;
 
-    for( tor = s->h->torrentList; tor; tor = tor->next )
+    while(( tor = tr_torrentNext( s->h, tor )))
         tr_torrentChangeMyPort( tor );
 }
 
