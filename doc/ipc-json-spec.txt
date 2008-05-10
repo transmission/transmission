@@ -154,15 +154,15 @@
 
    string             | value type & description
    -------------------+-------------------------------------------------
-   "ids"              | array     see section 3.1
-   "max-peers"        | int       maximum number of peers
-   "speed-limit-down" | int       maximum download speed (in KiB/s)
-   "speed-limit-up"   | int       maximum upload speed (in KiB/s)
+   "id"               | int or string  torrent id or hash string
+   "max-peers"        | int            maximum number of peers
+   "speed-limit-down" | int            maximum download speed (in KiB/s)
+   "speed-limit-up"   | int            maximum upload speed (in KiB/s)
 
 3.6.1.  Mutators
 
    Request name: "torrent-set"
-   Request arguments: one or more of 3.6's arguments
+   Request arguments: "id" from 3.6, plus one or more of 3.6's other arguments
    Response arguments: none
 
 3.6.2.  Accessors
@@ -177,24 +177,24 @@
 
    string             | value type & description
    -------------------+-------------------------------------------------
-   "ids"              | array     see section 3.1
-   "priority-high"    | array     indices of one or more high-priority files
-   "priority-low"     | array     indices of one or more low-priority files
-   "priority-normal"  | array     indices of one or more normal-priority files
-   "download"         | array     indices of one or more file to download
-   "no-download"      | array     indices of one or more file to not download
+   "id"               | int or string  torrent id or hash string
+   "priority-high"    | array          indices of one or more high-priority files
+   "priority-low"     | array          indices of one or more low-priority files
+   "priority-normal"  | array          indices of one or more normal-priority files
+   "download"         | array          indices of one or more file to download
+   "no-download"      | array          indices of one or more file to not download
 
 3.7.1.  Mutators
 
     Request name: "torrent-set-file"
-    Request arguments: one or more of 3.7's arguments
+    Request arguments: "id" from 3.7, plus one or more of 3.7's other arguments
     Response arguments: none
 
 3.7.2.  Accessors
 
     Request name: "torrent-get-file"
     Request arguments: none
-    Response arguments: all of 3.6's arguments    
+    Response arguments: all of 3.7's arguments
    
 4.   Session Status Requests
 
@@ -215,12 +215,12 @@
 4.2.  Mutators
 
    Request name: "session-set"
-   Request arguments: one or more of 4.1's session arguments
+   Request arguments: one or more of 4.1's arguments
    Response arguments: none
 
 4.2.  Accessors
 
    Request name: "session-get"
    Request arguments: none
-   Response arguments: all of 4.1's session arguments
+   Response arguments: all of 4.1's arguments
 
