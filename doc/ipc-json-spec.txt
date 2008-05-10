@@ -77,8 +77,8 @@
             "tag": 666
          },
          "body": {
+            "name": "torrent-info",
             "arguments": {
-               "name": "torrent-info",
                "ids": [ 7, 10 ]
             }
          }
@@ -110,7 +110,7 @@
                      "name": "Ubuntu i386 DVD",
                      ...
                   }
-               }
+               ]
             }
          }
       }
