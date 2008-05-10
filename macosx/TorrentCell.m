@@ -283,12 +283,6 @@
     NSRect revealRect = [self revealButtonRectForBounds: cellFrame];
     BOOL checkReveal = NSMouseInRect(point, revealRect, [controlView isFlipped]);
     
-    NSRect progressRect = [self progressRectForBounds: cellFrame];
-    BOOL checkProgress = NSMouseInRect(point, progressRect, [controlView isFlipped]) && [[self representedObject] folder];
-    
-    NSRect minimalStatusRect = [self minimalStatusRectForBounds: cellFrame];
-    BOOL checkMinStatus = NSMouseInRect(point, minimalStatusRect, [controlView isFlipped]);
-    
     [(TorrentTableView *)controlView removeButtonTrackingAreas];
     
     while ([event type] != NSLeftMouseUp)
@@ -310,24 +304,6 @@
             if (fMouseDownRevealButton != inRevealButton)
             {
                 fMouseDownRevealButton = inRevealButton;
-                [controlView setNeedsDisplayInRect: cellFrame];
-            }
-        }
-        else if (checkProgress)
-        {
-            BOOL inProgressField = NSMouseInRect(point, progressRect, [controlView isFlipped]);
-            if (fMouseDownProgressField != inProgressField)
-            {
-                fMouseDownProgressField = inProgressField;
-                [controlView setNeedsDisplayInRect: cellFrame];
-            }
-        }
-        else if (checkMinStatus)
-        {
-            BOOL inMinStatusField = NSMouseInRect(point, minimalStatusRect, [controlView isFlipped]);
-            if (fMouseDownMinimalStatusField != inMinStatusField)
-            {
-                fMouseDownMinimalStatusField = inMinStatusField;
                 [controlView setNeedsDisplayInRect: cellFrame];
             }
         }
@@ -354,20 +330,6 @@
         [controlView setNeedsDisplayInRect: cellFrame];
         
         [[self representedObject] revealData];
-    }
-    else if (fMouseDownProgressField)
-    {
-        fMouseDownProgressField = NO;
-        
-        [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
-        [(TorrentTableView *)controlView reloadData];
-    }
-    else if (fMouseDownMinimalStatusField)
-    {
-        fMouseDownMinimalStatusField = NO;
-        
-        [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
-        [(TorrentTableView *)controlView reloadData];
     }
     else;
     
@@ -512,17 +474,11 @@
     }
     
     //minimal status
-    NSRect minimalStatusRect;
+    NSRect minimalStatusRect = NSZeroRect;
     if (minimal)
     {
         NSAttributedString * minimalString = [self attributedStatusString: [self minimalStatusString] withColor: statusColor];
         minimalStatusRect = [self rectForMinimalStatusWithString: minimalString inBounds: cellFrame];
-        
-        if (fMouseDownMinimalStatusField)
-        {
-            [fFieldBackColor set];
-            [[NSBezierPath bezierPathWithRoundedRect: NSInsetRect(minimalStatusRect, -2.0, 0.0) radius: 5.0] fill];
-        }
         
         [minimalString drawInRect: minimalStatusRect];
     }
@@ -537,12 +493,6 @@
     {
         NSAttributedString * progressString = [self attributedStatusString: [torrent progressString] withColor: statusColor];
         NSRect progressRect = [self rectForProgressWithString: progressString inBounds: cellFrame];
-        
-        if (fMouseDownProgressField)
-        {
-            [fFieldBackColor set];
-            [[NSBezierPath bezierPathWithRoundedRect: NSInsetRect(progressRect, -2.0, 0.0) radius: 5.0] fill];
-        }
         
         [progressString drawInRect: progressRect];
     }

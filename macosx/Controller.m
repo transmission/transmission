@@ -2846,6 +2846,16 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fTableView display];
 }
 
+- (void) toggleStatusString: (id) sender
+{
+    if ([fDefaults boolForKey: @"SmallView"])
+        [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
+    else
+        [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
+    
+    [fTableView reloadData];
+}
+
 - (NSRect) windowFrameByAddingHeight: (float) height checkLimits: (BOOL) check
 {
     NSScrollView * scrollView = [fTableView enclosingScrollView];
@@ -3430,6 +3440,22 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (action == @selector(togglePiecesBar:))
     {
         [menuItem setState: [fDefaults boolForKey: @"PiecesBar"] ? NSOnState : NSOffState];
+        return [fWindow isVisible];
+    }
+    
+    if (action == @selector(toggleStatusString:))
+    {
+        if ([fDefaults boolForKey: @"SmallView"])
+        {
+            [menuItem setTitle: NSLocalizedString(@"Remaining Time", "Action menu -> status string toggle")];
+            [menuItem setState: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] ? NSOnState : NSOffState];
+        }
+        else
+        {
+            [menuItem setTitle: NSLocalizedString(@"Status of Selected Files", "Action menu -> status string toggle")];
+            [menuItem setState: [fDefaults boolForKey: @"DisplayStatusProgressSelected"] ? NSOnState : NSOffState];
+        }
+        
         return [fWindow isVisible];
     }
     

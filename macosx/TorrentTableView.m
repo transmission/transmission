@@ -45,9 +45,6 @@
 - (BOOL) pointInRevealRect: (NSPoint) point;
 - (BOOL) pointInActionRect: (NSPoint) point;
 
-- (BOOL) pointInProgressRect: (NSPoint) point;
-- (BOOL) pointInMinimalStatusRect: (NSPoint) point;
-
 - (BOOL) pointInGroupStatusRect: (NSPoint) point;
 
 - (void) setGroupStatusColumns;
@@ -384,8 +381,7 @@
         return;
     }
     
-    BOOL pushed = [self pointInControlRect: point] || [self pointInRevealRect: point] || [self pointInActionRect: point]
-                    || [self pointInProgressRect: point] || [self pointInMinimalStatusRect: point];
+    BOOL pushed = [self pointInControlRect: point] || [self pointInRevealRect: point] || [self pointInActionRect: point];
     
     //if pushing a button, don't change the selected rows
     if (pushed)
@@ -798,41 +794,6 @@
         return NO;
     
     return NSPointInRect(point, [fTorrentCell iconRectForBounds: [self rectOfRow: row]]);
-}
-
-- (BOOL) pointInProgressRect: (NSPoint) point
-{
-    int row = [self rowAtPoint: point];
-    if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]] || [fDefaults boolForKey: @"SmallView"]
-        || ![[self itemAtRow: row] folder])
-        return NO;
-    
-    TorrentCell * cell;
-    if ([NSApp isOnLeopardOrBetter])
-        cell = (TorrentCell *)[self preparedCellAtColumn: -1 row: row];
-    else
-    {
-        cell = fTorrentCell;
-        [cell setRepresentedObject: [self itemAtRow: row]];
-    }
-    return NSPointInRect(point, [cell progressRectForBounds: [self rectOfRow: row]]);
-}
-
-- (BOOL) pointInMinimalStatusRect: (NSPoint) point
-{
-    int row = [self rowAtPoint: point];
-    if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]] || ![fDefaults boolForKey: @"SmallView"])
-        return NO;
-    
-    TorrentCell * cell;
-    if ([NSApp isOnLeopardOrBetter])
-        cell = (TorrentCell *)[self preparedCellAtColumn: -1 row: row];
-    else
-    {
-        cell = fTorrentCell;
-        [cell setRepresentedObject: [self itemAtRow: row]];
-    }
-    return NSPointInRect(point, [cell minimalStatusRectForBounds: [self rectOfRow: row]]);
 }
 
 - (BOOL) pointInGroupStatusRect: (NSPoint) point
