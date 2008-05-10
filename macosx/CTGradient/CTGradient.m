@@ -2,11 +2,10 @@
 //  CTGradient.m
 //
 //  Created by Chad Weider on 2/14/07.
-//  Writtin by Chad Weider.
+//  Copyright (c) 2007 Chad Weider.
+//  Some rights reserved: <http://creativecommons.org/licenses/by/2.5/>
 //
-//  Released into public domain on 4/10/08.
-//
-//  Version: 1.8
+//  Version: 1.6
 
 #import "CTGradient.h"
 
@@ -608,9 +607,9 @@ static void resolveHSV(float *color1, float *color2);
 	}
   
   
-  return [NSColor colorWithCalibratedRed:components[0]/components[3]	//undo premultiplication that CG requires
-								   green:components[1]/components[3]
-								    blue:components[2]/components[3]
+  return [NSColor colorWithCalibratedRed:components[0]
+								   green:components[1]
+								    blue:components[2]
 								   alpha:components[3]];
   }
 #pragma mark -
@@ -686,7 +685,7 @@ static void resolveHSV(float *color1, float *color2);
   //Calls to CoreGraphics
   CGContextRef currentContext = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
   CGContextSaveGState(currentContext);
-	  #if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_4
+	  #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 		CGColorSpaceRef colorspace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
 	  #else
 		CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
@@ -703,7 +702,7 @@ static void resolveHSV(float *color1, float *color2);
 
 - (void)radialFillRect:(NSRect)rect
   {
-  CGPoint startPoint, endPoint;
+  CGPoint startPoint , endPoint;
   float startRadius, endRadius;
   float scalex, scaley, transx, transy;
   
@@ -809,7 +808,7 @@ static void resolveHSV(float *color1, float *color2);
   }
 
 - (void)addElement:(CTGradientElement *)newElement
-  {
+{
   if(elementList == nil || newElement->position < elementList->position)	//inserting at beginning of list
 	{
 	CTGradientElement *tmpNext = elementList;
@@ -1008,12 +1007,7 @@ void linearEvaluation (void *info, const float *in, float *out)
   	out[1] = (color2->green - color1->green)*position + color1->green;
   	out[2] = (color2->blue  - color1->blue )*position + color1->blue;
   	out[3] = (color2->alpha - color1->alpha)*position + color1->alpha;
-	}
-  
-  //Premultiply the color by the alpha.
-  out[0] *= out[3];
-  out[1] *= out[3];
-  out[2] *= out[3];
+  	}
   }
 
 
@@ -1102,11 +1096,6 @@ void chromaticEvaluation(void *info, const float *in, float *out)
   	}
     
   transformHSV_RGB(out);
-  
-  //Premultiply the color by the alpha.
-  out[0] *= out[3];
-  out[1] *= out[3];
-  out[2] *= out[3];
   }
 
 
@@ -1189,12 +1178,8 @@ void inverseChromaticEvaluation(void *info, const float *in, float *out)
   	}
     
   transformHSV_RGB(out);
-  
-  //Premultiply the color by the alpha.
-  out[0] *= out[3];
-  out[1] *= out[3];
-  out[2] *= out[3];
   }
+
 
 
 void transformRGB_HSV(float *components) //H,S,B -> R,G,B
