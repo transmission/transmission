@@ -37,9 +37,11 @@
 
 2.3.  Response Body
 
-   Response bodies support two members:
-   (1) An optional "arguments" object of name/value pairs.
-   (2) An optional "error" string which may be omitted on success.
+   All response bodies support two members:
+   (1) A required "result" string whose value must be "success" on success,
+       and may be "no-permission", "bad-format", or "error" on failure.
+   (2) An optional "arguments" object of name/value pairs.
+       The contents of these arguments depend on the request's name.
 
 3.  Torrent Requests
 
@@ -92,6 +94,7 @@
             "tag": 666
          }
          "body": {
+            "result": "success",
             "arguments": {
                "info": [
                   {
@@ -145,6 +148,54 @@
 
    Response arguments: 3.1's "error" if the request failed.
 
+3.6.  Other torrent settings
+
+   Common arguments:
+
+   string             | value type & description
+   -------------------+-------------------------------------------------
+   "ids"              | array     see section 3.1
+   "max-peers"        | int       maximum number of peers
+   "speed-limit-down" | int       maximum download speed (in KiB/s)
+   "speed-limit-up"   | int       maximum upload speed (in KiB/s)
+
+3.6.1.  Mutators
+
+   Request name: "torrent-set"
+   Request arguments: one or more of 3.6's arguments
+   Response arguments: none
+
+3.6.2.  Accessors
+
+   Request name: "torrent-get"
+   Request arguments: none
+   Response arguments: all of 3.6's arguments
+
+3.7  File Priorities
+
+   Common arguments:
+
+   string             | value type & description
+   -------------------+-------------------------------------------------
+   "ids"              | array     see section 3.1
+   "priority-high"    | array     indices of one or more high-priority files
+   "priority-low"     | array     indices of one or more low-priority files
+   "priority-normal"  | array     indices of one or more normal-priority files
+   "download"         | array     indices of one or more file to download
+   "no-download"      | array     indices of one or more file to not download
+
+3.7.1.  Mutators
+
+    Request name: "torrent-set-file"
+    Request arguments: one or more of 3.7's arguments
+    Response arguments: none
+
+3.7.2.  Accessors
+
+    Request name: "torrent-get-file"
+    Request arguments: none
+    Response arguments: all of 3.6's arguments    
+   
 4.   Session Status Requests
 
 4.1.  Session Arguments
