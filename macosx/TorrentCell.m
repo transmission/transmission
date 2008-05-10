@@ -107,8 +107,6 @@
         fOrangeColor = [[NSColor orangeColor] retain];
         
         fBarOverlayColor = [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] retain];
-        
-        fFieldBackColor = [[NSColor colorWithDeviceWhite: 0.65 alpha: 0.7] retain];
     }
 	return self;
 }
@@ -474,7 +472,7 @@
     }
     
     //minimal status
-    NSRect minimalStatusRect = NSZeroRect;
+    NSRect minimalStatusRect;
     if (minimal)
     {
         NSAttributedString * minimalString = [self attributedStatusString: [self minimalStatusString] withColor: statusColor];
