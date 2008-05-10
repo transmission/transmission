@@ -720,7 +720,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) trackerAddressAnnounce
 {
-    return [NSString stringWithUTF8String: fStat->tracker->announce];
+    return fStat->tracker->announce ? [NSString stringWithUTF8String: fStat->tracker->announce] : nil;
 }
 
 - (NSDate *) lastAnnounceTime
