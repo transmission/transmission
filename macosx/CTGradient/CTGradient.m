@@ -2,17 +2,17 @@
 //  CTGradient.m
 //
 //  Created by Chad Weider on 2/14/07.
-//  Writtin by Chad Weider.
+//  Copyright (c) 2007 Chad Weider.
+//  Some rights reserved: <http://creativecommons.org/licenses/by/2.5/>
 //
-//  Released into public domain on 4/10/08.
-//
-//  Version: 1.8
+//  Version: 1.6
 
 #import "CTGradient.h"
 
 @interface CTGradient (Private)
 - (void)_commonInit;
 - (void)setBlendingMode:(CTGradientBlendingMode)mode;
+- (void)addElement:(CTGradientElement*)newElement;
 
 - (CTGradientElement *)elementAtIndex:(unsigned)index;
 
@@ -156,6 +156,343 @@ static void resolveHSV(float *color1, float *color2);
   return [newInstance autorelease];
   }
 
++ (id)aquaSelectedGradient
+  {
+  id newInstance = [[[self class] alloc] init];
+  
+  CTGradientElement color1;
+  color1.red   = 0.58;
+  color1.green = 0.86;
+  color1.blue  = 0.98;
+  color1.alpha = 1.00;
+  color1.position = 0;
+  
+  CTGradientElement color2;
+  color2.red   = 0.42;
+  color2.green = 0.68;
+  color2.blue  = 0.90;
+  color2.alpha = 1.00;
+  color2.position = 11.5/23;
+  
+  CTGradientElement color3;
+  color3.red   = 0.64;
+  color3.green = 0.80;
+  color3.blue  = 0.94;
+  color3.alpha = 1.00;
+  color3.position = 11.5/23;
+  
+  CTGradientElement color4;
+  color4.red   = 0.56;
+  color4.green = 0.70;
+  color4.blue  = 0.90;
+  color4.alpha = 1.00;
+  color4.position = 1;
+  
+  [newInstance addElement:&color1];
+  [newInstance addElement:&color2];
+  [newInstance addElement:&color3];
+  [newInstance addElement:&color4];
+  
+  return [newInstance autorelease];
+  }
+
++ (id)aquaNormalGradient
+  {
+  id newInstance = [[[self class] alloc] init];
+  
+  CTGradientElement color1;
+  color1.red = color1.green = color1.blue  = 0.95;
+  color1.alpha = 1.00;
+  color1.position = 0;
+  
+  CTGradientElement color2;
+  color2.red = color2.green = color2.blue  = 0.83;
+  color2.alpha = 1.00;
+  color2.position = 11.5/23;
+  
+  CTGradientElement color3;
+  color3.red = color3.green = color3.blue  = 0.95;
+  color3.alpha = 1.00;
+  color3.position = 11.5/23;
+  
+  CTGradientElement color4;
+  color4.red = color4.green = color4.blue  = 0.92;
+  color4.alpha = 1.00;
+  color4.position = 1;
+  
+  [newInstance addElement:&color1];
+  [newInstance addElement:&color2];
+  [newInstance addElement:&color3];
+  [newInstance addElement:&color4];
+  
+  return [newInstance autorelease];
+  }
+
++ (id)aquaPressedGradient
+  {
+  id newInstance = [[[self class] alloc] init];
+  
+  CTGradientElement color1;
+  color1.red = color1.green = color1.blue  = 0.80;
+  color1.alpha = 1.00;
+  color1.position = 0;
+  
+  CTGradientElement color2;
+  color2.red = color2.green = color2.blue  = 0.64;
+  color2.alpha = 1.00;
+  color2.position = 11.5/23;
+  
+  CTGradientElement color3;
+  color3.red = color3.green = color3.blue  = 0.80;
+  color3.alpha = 1.00;
+  color3.position = 11.5/23;
+  
+  CTGradientElement color4;
+  color4.red = color4.green = color4.blue  = 0.77;
+  color4.alpha = 1.00;
+  color4.position = 1;
+  
+  [newInstance addElement:&color1];
+  [newInstance addElement:&color2];
+  [newInstance addElement:&color3];
+  [newInstance addElement:&color4];
+  
+  return [newInstance autorelease];
+  }
+
++ (id)unifiedSelectedGradient
+  {
+  id newInstance = [[[self class] alloc] init];
+  
+  CTGradientElement color1;
+  color1.red = color1.green = color1.blue  = 0.85;
+  color1.alpha = 1.00;
+  color1.position = 0;
+  
+  CTGradientElement color2;
+  color2.red = color2.green = color2.blue  = 0.95;
+  color2.alpha = 1.00;
+  color2.position = 1;
+  
+  [newInstance addElement:&color1];
+  [newInstance addElement:&color2];
+  
+  return [newInstance autorelease];
+  }
+
++ (id)unifiedNormalGradient
+  {
+  id newInstance = [[[self class] alloc] init];
+  
+  CTGradientElement color1;
+  color1.red = color1.green = color1.blue  = 0.75;
+  color1.alpha = 1.00;
+  color1.position = 0;
+  
+  CTGradientElement color2;
+  color2.red = color2.green = color2.blue  = 0.90;
+  color2.alpha = 1.00;
+  color2.position = 1;
+  
+  [newInstance addElement:&color1];
+  [newInstance addElement:&color2];
+  
+  return [newInstance autorelease];
+  }
+
++ (id)unifiedPressedGradient
+  {
+  id newInstance = [[[self class] alloc] init];
+  
+  CTGradientElement color1;
+  color1.red = color1.green = color1.blue  = 0.60;
+  color1.alpha = 1.00;
+  color1.position = 0;
+  
+  CTGradientElement color2;
+  color2.red = color2.green = color2.blue  = 0.75;
+  color2.alpha = 1.00;
+  color2.position = 1;
+  
+  [newInstance addElement:&color1];
+  [newInstance addElement:&color2];
+  
+  return [newInstance autorelease];
+  }
+
++ (id)unifiedDarkGradient
+  {
+  id newInstance = [[[self class] alloc] init];
+  
+  CTGradientElement color1;
+  color1.red = color1.green = color1.blue  = 0.68;
+  color1.alpha = 1.00;
+  color1.position = 0;
+  
+  CTGradientElement color2;
+  color2.red = color2.green = color2.blue  = 0.83;
+  color2.alpha = 1.00;
+  color2.position = 1;
+  
+  [newInstance addElement:&color1];
+  [newInstance addElement:&color2];
+  
+  return [newInstance autorelease];
+  }
+
++ (id)sourceListSelectedGradient
+  {
+  id newInstance = [[[self class] alloc] init];
+  
+  CTGradientElement color1;
+  color1.red   = 0.06;
+  color1.green = 0.37;
+  color1.blue  = 0.85;
+  color1.alpha = 1.00;
+  color1.position = 0;
+  
+  CTGradientElement color2;
+  color2.red   = 0.30;
+  color2.green = 0.60;
+  color2.blue  = 0.92;
+  color2.alpha = 1.00;
+  color2.position = 1;
+  
+  [newInstance addElement:&color1];
+  [newInstance addElement:&color2];
+  
+  return [newInstance autorelease];
+  }
+
++ (id)sourceListUnselectedGradient
+  {
+  id newInstance = [[[self class] alloc] init];
+  
+  CTGradientElement color1;
+  color1.red   = 0.43;
+  color1.green = 0.43;
+  color1.blue  = 0.43;
+  color1.alpha = 1.00;
+  color1.position = 0;
+  
+  CTGradientElement color2;
+  color2.red   = 0.60;
+  color2.green = 0.60;
+  color2.blue  = 0.60;
+  color2.alpha = 1.00;
+  color2.position = 1;
+  
+  [newInstance addElement:&color1];
+  [newInstance addElement:&color2];
+  
+  return [newInstance autorelease];
+  }
+
++ (id)rainbowGradient
+  {
+  id newInstance = [[[self class] alloc] init];
+  
+  CTGradientElement color1;
+  color1.red   = 1.00;
+  color1.green = 0.00;
+  color1.blue  = 0.00;
+  color1.alpha = 1.00;
+  color1.position = 0.0;
+  
+  CTGradientElement color2;
+  color2.red   = 0.54;
+  color2.green = 0.00;
+  color2.blue  = 1.00;
+  color2.alpha = 1.00;
+  color2.position = 1.0;
+    
+  [newInstance addElement:&color1];
+  [newInstance addElement:&color2];
+  
+  [newInstance setBlendingMode:CTChromaticBlendingMode];
+  
+  return [newInstance autorelease];
+  }
+
++ (id)hydrogenSpectrumGradient
+  {
+  id newInstance = [[[self class] alloc] init];
+  
+  struct {float hue; float position; float width;} colorBands[4];
+  
+  colorBands[0].hue = 22;
+  colorBands[0].position = .145;
+  colorBands[0].width = .01;
+  
+  colorBands[1].hue = 200;
+  colorBands[1].position = .71;
+  colorBands[1].width = .008;
+  
+  colorBands[2].hue = 253;
+  colorBands[2].position = .885;
+  colorBands[2].width = .005;
+  
+  colorBands[3].hue = 275;
+  colorBands[3].position = .965;
+  colorBands[3].width = .003;
+  
+  int i;
+  /////////////////////////////
+  for(i = 0; i < 4; i++)
+	{	
+	float color[4];
+	color[0] = colorBands[i].hue - 180*colorBands[i].width;
+	color[1] = 1;
+	color[2] = 0.001;
+	color[3] = 1;
+	transformHSV_RGB(color);
+	CTGradientElement fadeIn;
+	fadeIn.red   = color[0];
+	fadeIn.green = color[1];
+	fadeIn.blue  = color[2];
+	fadeIn.alpha = color[3];
+	fadeIn.position = colorBands[i].position - colorBands[i].width;
+	
+	
+	color[0] = colorBands[i].hue;
+	color[1] = 1;
+	color[2] = 1;
+	color[3] = 1;
+	transformHSV_RGB(color);
+	CTGradientElement band;
+	band.red   = color[0];
+	band.green = color[1];
+	band.blue  = color[2];
+	band.alpha = color[3];
+	band.position = colorBands[i].position;
+	
+	color[0] = colorBands[i].hue + 180*colorBands[i].width;
+	color[1] = 1;
+	color[2] = 0.001;
+	color[3] = 1;
+	transformHSV_RGB(color);
+	CTGradientElement fadeOut;
+	fadeOut.red   = color[0];
+	fadeOut.green = color[1];
+	fadeOut.blue  = color[2];
+	fadeOut.alpha = color[3];
+	fadeOut.position = colorBands[i].position + colorBands[i].width;
+	
+	
+	[newInstance addElement:&fadeIn];
+	[newInstance addElement:&band];
+	[newInstance addElement:&fadeOut];
+	}
+  
+  [newInstance setBlendingMode:CTChromaticBlendingMode];
+  
+  return [newInstance autorelease];
+  }
+
+#pragma mark -
+
+
+
 #pragma mark Modification
 - (CTGradient *)gradientWithAlphaComponent:(float)alpha
   {
@@ -270,9 +607,9 @@ static void resolveHSV(float *color1, float *color2);
 	}
   
   
-  return [NSColor colorWithCalibratedRed:components[0]/components[3]	//undo premultiplication that CG requires
-								   green:components[1]/components[3]
-								    blue:components[2]/components[3]
+  return [NSColor colorWithCalibratedRed:components[0]
+								   green:components[1]
+								    blue:components[2]
 								   alpha:components[3]];
   }
 #pragma mark -
@@ -348,7 +685,7 @@ static void resolveHSV(float *color1, float *color2);
   //Calls to CoreGraphics
   CGContextRef currentContext = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
   CGContextSaveGState(currentContext);
-	  #if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_4
+	  #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 		CGColorSpaceRef colorspace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
 	  #else
 		CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
@@ -365,7 +702,7 @@ static void resolveHSV(float *color1, float *color2);
 
 - (void)radialFillRect:(NSRect)rect
   {
-  CGPoint startPoint, endPoint;
+  CGPoint startPoint , endPoint;
   float startRadius, endRadius;
   float scalex, scaley, transx, transy;
   
@@ -471,7 +808,7 @@ static void resolveHSV(float *color1, float *color2);
   }
 
 - (void)addElement:(CTGradientElement *)newElement
-  {
+{
   if(elementList == nil || newElement->position < elementList->position)	//inserting at beginning of list
 	{
 	CTGradientElement *tmpNext = elementList;
@@ -670,12 +1007,7 @@ void linearEvaluation (void *info, const float *in, float *out)
   	out[1] = (color2->green - color1->green)*position + color1->green;
   	out[2] = (color2->blue  - color1->blue )*position + color1->blue;
   	out[3] = (color2->alpha - color1->alpha)*position + color1->alpha;
-	}
-  
-  //Premultiply the color by the alpha.
-  out[0] *= out[3];
-  out[1] *= out[3];
-  out[2] *= out[3];
+  	}
   }
 
 
@@ -764,11 +1096,6 @@ void chromaticEvaluation(void *info, const float *in, float *out)
   	}
     
   transformHSV_RGB(out);
-  
-  //Premultiply the color by the alpha.
-  out[0] *= out[3];
-  out[1] *= out[3];
-  out[2] *= out[3];
   }
 
 
@@ -851,12 +1178,8 @@ void inverseChromaticEvaluation(void *info, const float *in, float *out)
   	}
     
   transformHSV_RGB(out);
-  
-  //Premultiply the color by the alpha.
-  out[0] *= out[3];
-  out[1] *= out[3];
-  out[2] *= out[3];
   }
+
 
 
 void transformRGB_HSV(float *components) //H,S,B -> R,G,B

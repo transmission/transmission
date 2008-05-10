@@ -2,11 +2,10 @@
 //  CTGradient.h
 //
 //  Created by Chad Weider on 2/14/07.
-//  Writtin by Chad Weider.
+//  Copyright (c) 2007 Chad Weider.
+//  Some rights reserved: <http://creativecommons.org/licenses/by/2.5/>
 //
-//  Released into public domain on 4/10/08.
-//  
-//  Version: 1.8
+//  Version: 1.6
 
 #import <Cocoa/Cocoa.h>
 
@@ -36,7 +35,24 @@ typedef enum  _CTBlendingMode
 
 + (id)gradientWithBeginningColor:(NSColor *)begin endingColor:(NSColor *)end;
 
++ (id)aquaSelectedGradient;
++ (id)aquaNormalGradient;
++ (id)aquaPressedGradient;
+
++ (id)unifiedSelectedGradient;
++ (id)unifiedNormalGradient;
++ (id)unifiedPressedGradient;
++ (id)unifiedDarkGradient;
+
++ (id)sourceListSelectedGradient;
++ (id)sourceListUnselectedGradient;
+
++ (id)rainbowGradient;
++ (id)hydrogenSpectrumGradient;
+
 - (CTGradient *)gradientWithAlphaComponent:(float)alpha;
+
+- (void)addElement:(CTGradientElement*)newElement;
 
 - (CTGradient *)addColorStop:(NSColor *)color atPosition:(float)position;	//positions given relative to [0,1]
 - (CTGradient *)removeColorStopAtIndex:(unsigned)index;
@@ -54,7 +70,5 @@ typedef enum  _CTBlendingMode
 																	//  gradient from center outwards
 - (void)fillBezierPath:(NSBezierPath *)path angle:(float)angle;
 - (void)radialFillBezierPath:(NSBezierPath *)path;
-
-- (void)addElement:(CTGradientElement*)newElement;
 
 @end
