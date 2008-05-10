@@ -19,7 +19,7 @@
    booleans are represented as integers where 0 is false and 1 is true.
 
    There are only two message types: request and response.  Both
-   are json objects with two members:  "headers" (described in 2.1)
+   are JSON objects with two members:  "headers" (described in 2.1)
    and "body" (described in 2.2-2.3).
 
 2.1.  Headers
@@ -33,12 +33,12 @@
 
    Request bodies support two members:
    (1) A required "name" string telling the name of the request.
-   (2) An optional "arguments" object of name/value argument pairs.
+   (2) An optional "arguments" object of name/value pairs.
 
 2.3.  Response Body
 
    Response bodies support two members:
-   (1) An optional "arguments" object of argument name/value pairs.
+   (1) An optional "arguments" object of name/value pairs.
    (2) An optional "error" string which may be omitted on success.
 
 3.  Torrent Requests
@@ -54,17 +54,16 @@
 
    Request names: "torrent-start", "torrent-stop",
                   "torrent-remove", "torrent-verify"
-   The only supported argument is 3.1's "ids" argument.
-   The response has no arguments.
+   Request arguments: 3.1's optional "ids" argument.
+   Response arguments: none.
 
 3.3.  Torrent Info Requests
 
    Request name: "torrent-info".
-   The only supported argument is 3.1's "ids" argument.
+   Request arguments: 3.1's optional "ids" argument.
 
-   The response will contain an "info" argument holding an array of
-   tr_info objects.  these are a (nearly) 1-to-1 mapping of
-   libtransmission's tr_info struct, but differ in the following ways:
+   Response arguments: "info", an array of objects based on libtransmission's
+   tr_info struct but differ in the following ways:
 
    (1) tr_info's "hash" field is omitted.
    (2) tr_info's "pieces" field is omitted.
@@ -80,7 +79,7 @@
          "body": {
             "arguments": {
                "name": "torrent-info",
-               "ids": [1, 2]
+               "ids": [ 7, 10 ]
             }
          }
       }
@@ -96,7 +95,7 @@
             "arguments": {
                "info": [
                   {
-                     "id": 1,
+                     "id": 7,
                      "totalSize": 9803930483,
                      "pieceCount": 1209233,
                      "pieceSize": 4096,
@@ -104,7 +103,7 @@
                      ...
                   }
                   {
-                     "id": 2,
+                     "id": 10,
                      "totalSize": 2398480394,
                      "pieceCount": 83943,
                      "pieceSize": 12345,
@@ -119,11 +118,10 @@
 3.4.  Torrent Status Requests
 
    Request name is "torrent-status".
-   The only supported argument is 3.1's "ids" argument.
+   Request arguments: 3.1's optional "ids" argument.
 
-   The response will contain a "status" argument holding an array of
-   tr_stat objects.  these are a (nearly) 1-to-1 mapping of
-   libtransmission's tr_stat struct, but differ in the following ways:
+   Response arguments: "status", an array of objects based on
+   libtransmission's tr_stat struct but which differ the following ways:
 
    (1) tr_stat's "tracker" field is omitted
    (2) a new string, "announce-url", is added
@@ -131,9 +129,8 @@
 
 3.5.  Adding a Torrent
 
-   Request name is "torrent-add".
-   All arguments are optional except "filename".
-   Supported arguments are:
+   Request name: "torrent-add"
+   Request arguments:
 
    string             | value type & description
    -------------------+-------------------------------------------------
@@ -144,13 +141,13 @@
    "speed-limit-down" | int       maximum download speed (in KiB/s)
    "speed-limit-up"   | int       maximum upload speed (in KiB/s)
 
+   The "filename" argument is required; all others are optional.
+
+   Response arguments: 3.1's "error" if the request failed.
 
 4.   Session Status Requests
 
-4.1.  Mutators
-
-   The request name to change the session's state is "session-set".
-   Supported arguments are:
+4.1.  Session Arguments
 
    string             | value type & description
    -------------------+-------------------------------------------------
@@ -164,9 +161,15 @@
    "speed-limit-down" | int       maximum global download speed (in KiB/s)
    "speed-limit-up"   | int       maximum global upload speed (in KiB/s)
 
+4.2.  Mutators
+
+   Request name: "session-set"
+   Request arguments: one or more of 4.1's session arguments
+   Response arguments: none
+
 4.2.  Accessors
 
    Request name: "session-get"
    Request arguments: none
-   Response arguments: all the arguments described in 4.1.
+   Response arguments: all of 4.1's session arguments
 
