@@ -1,0 +1,175 @@
+1.  Introduction
+
+   This document describes a protocol for interacting with Transmission
+   sessions remotely.
+
+   The JSON terminology in RFC 4627 is used. "array" is equivalent
+   to a benc list; "object" is equivalent to a benc dictionary;
+   an object's "strings" are the dictionary's keys,
+   and an object's "members" are its string/value pairs.
+
+2.  Message Format
+
+   The entire protocol is formatted in a subset of JSON that understands
+   arrays, maps, strings, and whole numbers with no exponentials --
+   in short, the subset of JSON easily represented in benc.
+   floating-point numbers are represented as strings.
+   booleans are represented as integers where 0 is false and 1 is true.
+
+   There are only two message types, request and response.  Both have
+   the same format: an object with two members whose strings are
+   "headers" and "body", and whose values are both objects.
+
+2.1.  Headers
+
+   Message headers support two members:
+   (1) A required "type" string whose value must be "request" or "response".
+   (2) An optional "tag" integer that may be supplied by request.
+       Responses MUST return an identical tag member.
+
+2.2.  Request Body
+
+   Request bodies support two members:
+   (1) A required "name" string telling the name of the request.
+   (2) An optional "arguments" object of argument name/value pairs.
+
+2.3.  Response Body
+
+   Response bodies support three members:
+   (1) A required "name" string which matches the request's name.
+   (2) An optional "error" string which may be omitted on success.
+   (3) An optional "arguments" object of argument name/value pairs.
+
+3.  Torrent Requests
+
+3.1.  Common Arguments
+
+   Most torrent requests support an "ids" argument, which is a list
+   containing unique torrent information ids, or torrent sha1 hash strings,
+   or both.  These are the torrents that the request will be applied to.
+   If the ids are omitted, the request is applied to all torrents.
+
+3.2.  Torrent Action Requests
+
+   Request names: "torrent-start", "torrent-stop", "torrent-remove",
+"torrent-verify".
+   The only supported argument is 3.1's "ids" argument.
+   The response has no arguments.
+
+3.3.  Torrent Info Requests
+
+   Request name is "torrent-info".
+   The only supported argument is 3.1's "ids" argument.
+
+   The response's arguments object contains a member whose string
+   is "info" and whose value is an array of tr_info objects.
+   tr_info objects are (nearly) 1-to-1 mappings of libtransmission's
+   tr_info struct, where the members' string in the tr_info field name,
+   and the members' value is the field's value.
+
+   The tr_info object differs from libtransmission's tr_info struct
+   in the following ways:
+   (1) tr_info's "hash" field is omitted.
+   (2) tr_info's "pieces" field is omitted.
+   (3) tr_file's "firstPiece", "lastPiece", and "offset" fields are omitted.
+
+   Example Request: 
+
+      {
+         "headers": {
+            "type": "request"
+         },
+         "body": {
+            "arguments": {
+               "name": "torrent-info",
+               "ids": [1, 2]
+            }
+         }
+      }
+
+   Example Response:
+
+      {
+         "headers": {
+            "type": "response"
+         }
+         "body": {
+            "arguments": {
+               "info": [
+                  {
+                     "id": 1,
+                     "totalSize": 9803930483,
+                     "pieceCount": 1209233,
+                     "pieceSize": 4096,
+                     "name": "Ubuntu x86_64 DVD",
+                     ...
+                  }
+                  {
+                     "id": 2,
+                     "totalSize": 2398480394,
+                     "pieceCount": 83943,
+                     "pieceSize": 12345,
+                     "name": "Ubuntu i386 DVD",
+                     ...
+                  }
+               }
+            }
+         }
+      }
+
+3.4.  Torrent Status Requests
+
+   Request name is "torrent-status".
+   The only supported argument is 3.1's "ids" argument.
+
+   The response's arguments contains a member whose string is "status"
+   and whose value is an array of tr_stat objects.  tr_stat objects
+   are (nearly) 1-to-1 mappings of libtransmission's tr_stat struct,
+   where the members' string in the tr_stat field name, and the
+   members' value is the field's value.
+
+   The tr_stat object differs from libtransmission's tr_stat struct
+   in the following ways:
+
+   (1) tr_stat's "tracker" field is omitted and replaced 
+       with two fields: "announce-url" and "scrape-url"
+
+3.5.  Adding a Torrent
+
+   Request name is "torrent-add".
+   All arguments are optional except "filename".
+   Supported arguments are:
+
+   string             | value type & description
+   -------------------+-------------------------------------------------
+   "autostart"        | boolean.  true means to auto-start torrents.
+   "directory"        | string.   path to download the torrent to.
+   "filename"         | string.   location of the .torrent file.
+   "speed-limit-up"   | int.      speed in KiB/s
+   "speed-limit-down" | int.      speed in KiB/s
+
+
+4.   Session Status Requests
+
+4.1.  Mutators
+
+   The request name to change the session's state is "session-set".
+   Supported arguments are:
+
+   string             | value type & description
+   -------------------+-------------------------------------------------
+   "autostart"        | boolean.  true means to auto-start torrents.
+   "directory"        | string.   path to download torrents to.
+   "encryption"       | string.   "required", "preferred", or "plaintext"
+   "port"             | int.      port number
+   "port-forwarding"  | boolean.  true means enabled.
+   "pex-allowed"      | boolean.  true means allow pex for public torrents.
+   "speed-limit-up"   | int.      speed in KiB/s
+   "speed-limit-down" | int.      speed in KiB/s
+
+4.2.  Accessors
+
+   Request name: "session-get"
+   Request arguments: none
+   Response arguments: all the arguments described in 4.1.
+
