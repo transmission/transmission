@@ -4,6 +4,8 @@ AM_CFLAGS = $(OPENSSL_CFLAGS) $(LIBCURL_CFLAGS) $(PTHREAD_CFLAGS)
 noinst_LIBRARIES = libtransmission.a
 
 libtransmission_a_SOURCES = \
+    ConvertUTF.c \
+    JSON_checker.c \
     bencode.c \
     blocklist.c \
     clients.c \
@@ -15,6 +17,7 @@ libtransmission_a_SOURCES = \
     handshake.c \
     inout.c \
     ipcparse.c \
+    json.c \
     list.c \
     makemeta.c \
     metainfo.c \
@@ -41,6 +44,8 @@ libtransmission_a_SOURCES = \
     web.c
 
 noinst_HEADERS = \
+    ConvertUTF.h \
+    JSON_checker.h \
     bencode.h \
     blocklist.h \
     clients.h \
@@ -85,6 +90,7 @@ TESTS = \
     blocklist-test \
     bencode-test \
     clients-test \
+    json-test \
     test-fastset \
     test-peer-id
 
@@ -109,6 +115,8 @@ blocklist_test_SOURCES = blocklist-test.c
 blocklist_test_LDADD = $(APPS_LDADD)
 clients_test_SOURCES = clients-test.c
 clients_test_LDADD = $(APPS_LDADD)
+json_test_SOURCES = json-test.c
+json_test_LDADD = $(APPS_LDADD)
 test_fastset_SOURCES = test-fastset.c
 test_fastset_LDADD = $(APPS_LDADD)
 test_peer_id_SOURCES = test-peer-id.c

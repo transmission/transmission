@@ -591,10 +591,12 @@ tr_bencDictAdd( tr_benc * dict, const char * key )
     tr_benc * keyval, * itemval;
 
     assert( tr_bencIsDict( dict ) );
+    if( dict->val.l.count + 2 > dict->val.l.alloc )
+        makeroom( dict, 2 );
     assert( dict->val.l.count + 2 <= dict->val.l.alloc );
 
     keyval = dict->val.l.vals + dict->val.l.count++;
-    tr_bencInitStr( keyval, (char*)key, -1, 1 );
+    tr_bencInitStrDup( keyval, key );
 
     itemval = dict->val.l.vals + dict->val.l.count++;
     tr_bencInit( itemval, TYPE_INT );

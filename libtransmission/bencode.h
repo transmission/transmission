@@ -56,6 +56,11 @@ typedef struct tr_benc
 /* backwards compatability */
 typedef tr_benc benc_val_t;
 
+int tr_jsonParse( const void      * buf,
+                  const void      * bufend,
+                  tr_benc         * setme_benc,
+                  const uint8_t  ** setme_end );
+
 int tr_bencParse( const void      * buf,
                   const void      * bufend,
                   tr_benc         * setme_benc,
@@ -102,7 +107,6 @@ tr_benc    * tr_bencListAddInt( tr_benc  * list, int64_t val );
 tr_benc    * tr_bencListAddStr( tr_benc  * list, const char * val );
 tr_benc    * tr_bencListAddList( tr_benc  * list, int reserveCount );
 tr_benc    * tr_bencListAddDict( tr_benc  * list, int reserveCount );
-/* note: key must not be freed or modified while val is in use */
 tr_benc    * tr_bencDictAdd( tr_benc * dict, const char * key );
 tr_benc    * tr_bencDictAddDouble( tr_benc * dict, const char * key, double d );
 tr_benc    * tr_bencDictAddInt( tr_benc * dict, const char * key, int64_t val );
