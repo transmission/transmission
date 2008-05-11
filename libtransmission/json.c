@@ -141,6 +141,7 @@ tr_jsonParse( const void      * vbuf,
     if( setme_end )
         *setme_end = (const uint8_t*) buf;
 
+    delete_JSON_checker( checker );
     tr_ptrArrayFree( data.stack, NULL );
     return err;
 }
