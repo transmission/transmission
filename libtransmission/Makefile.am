@@ -84,8 +84,6 @@ noinst_HEADERS = \
     verify.h \
     web.h
 
-bin_PROGRAMS = benc2php
-
 TESTS = \
     blocklist-test \
     bencode-test \
@@ -107,8 +105,6 @@ APPS_LDADD = \
     $(PTHREAD_LIBS) \
     -lm
 
-benc2php_SOURCES = benc2php.c
-benc2php_LDADD = $(APPS_LDADD)
 bencode_test_SOURCES = bencode-test.c
 bencode_test_LDADD = $(APPS_LDADD)
 blocklist_test_SOURCES = blocklist-test.c
