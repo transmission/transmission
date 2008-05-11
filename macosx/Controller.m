@@ -2520,7 +2520,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (BOOL) outlineView: (NSOutlineView *) outlineView isItemExpandable: (id) item
 {
-
     return ![item isKindOfClass: [Torrent class]];
 }
 
@@ -2665,21 +2664,28 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             while ((torrent = [enumerator nextObject]))
                 [torrent setGroupValue: groupValue];*/
             
-            
             NSArray * groupTorrents = [item objectForKey: @"Torrents"];
-            while (newRow > 0 && [movingTorrents containsObject: [groupTorrents objectAtIndex: newRow-1]])
-                newRow--;
-            
-            if (newRow > 0)
-                topTorrent = [groupTorrents objectAtIndex: newRow-1];
+            for (i = newRow-1; i >= 0; i--)
+            {
+                Torrent * tempTorrent = [groupTorrents objectAtIndex: i];
+                if (![movingTorrents containsObject: tempTorrent])
+                {
+                    topTorrent = tempTorrent;
+                    break;
+                }
+            }
         }
         else
         {
-            while (newRow > 0 && [movingTorrents containsObject: [fDisplayedTorrents objectAtIndex: newRow-1]])
-                newRow--;
-            
-            if (newRow > 0)
-                topTorrent = [fDisplayedTorrents objectAtIndex: newRow-1];
+            for (i = newRow-1; i >= 0; i--)
+            {
+                Torrent * tempTorrent = [fDisplayedTorrents objectAtIndex: i];
+                if (![movingTorrents containsObject: tempTorrent])
+                {
+                    topTorrent = tempTorrent;
+                    break;
+                }
+            }
         }
         
         //get all torrents to reorder

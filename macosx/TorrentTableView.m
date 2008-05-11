@@ -139,11 +139,6 @@
     [fCollapsedGroups removeIndex: value];
 }
 
-- (BOOL)shouldCollapseAutoExpandedItemsForDeposited:(BOOL)deposited
-{
-    return NO;
-}
-
 - (void) removeAllCollapsedGroups
 {
     [fCollapsedGroups removeAllIndexes];
