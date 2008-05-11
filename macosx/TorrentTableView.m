@@ -139,6 +139,11 @@
     [fCollapsedGroups removeIndex: value];
 }
 
+- (BOOL)shouldCollapseAutoExpandedItemsForDeposited:(BOOL)deposited
+{
+    return NO;
+}
+
 - (void) removeAllCollapsedGroups
 {
     [fCollapsedGroups removeAllIndexes];
@@ -355,15 +360,23 @@
 - (void) outlineViewItemDidExpand: (NSNotification *) notification
 {
     int value = [[[[notification userInfo] objectForKey: @"NSObject"] objectForKey: @"Group"] intValue];
-    [fCollapsedGroups removeIndex: value >= 0 ? value : MAX_GROUP];
+    if (value < 0)
+        value = MAX_GROUP;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"OutlineExpandCollapse" object: self];
+    if ([fCollapsedGroups containsIndex: value])
+    {
+        [fCollapsedGroups removeIndex: value];
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"OutlineExpandCollapse" object: self];
+    }
 }
 
 - (void) outlineViewItemDidCollapse: (NSNotification *) notification
 {
     int value = [[[[notification userInfo] objectForKey: @"NSObject"] objectForKey: @"Group"] intValue];
-    [fCollapsedGroups addIndex: value >= 0 ? value : MAX_GROUP];
+    if (value < 0)
+        value = MAX_GROUP;
+    
+    [fCollapsedGroups addIndex: value];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"OutlineExpandCollapse" object: self];
 }

@@ -1712,11 +1712,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         case SORT_ORDER_TAG:
             sortType = SORT_ORDER;
             [fDefaults setBool: NO forKey: @"SortReverse"];
-            
-            [fDefaults setBool: NO forKey: @"SortByGroup"];
-            [fTableView removeAllCollapsedGroups];
-            
-            [self applyFilter: nil]; //ensure groups are removed
             break;
         case SORT_DATE_TAG:
             sortType = SORT_DATE;
@@ -2525,6 +2520,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (BOOL) outlineView: (NSOutlineView *) outlineView isItemExpandable: (id) item
 {
+
     return ![item isKindOfClass: [Torrent class]];
 }
 
@@ -2588,14 +2584,18 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //only allow reordering of rows if sorting by order
     if ([[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER])
     {
-        [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self];
-        
         NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSet];
         NSEnumerator * enumerator = [items objectEnumerator];
-        Torrent * torrent;
+        id torrent;
         while ((torrent = [enumerator nextObject]))
+        {
+            if (![torrent isKindOfClass: [Torrent class]])
+                return NO;
+            
             [indexSet addIndex: [fTableView rowForItem: torrent]];
+        }
         
+        [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self];
         [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexSet] forType: TORRENT_TABLE_VIEW_DATA_TYPE];
         return YES;
     }
@@ -2608,10 +2608,28 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
-        if (item)
-            index = [fTableView rowForItem: item] + 1;
+        if ([fDefaults boolForKey: @"SortByGroup"])
+        {
+            if (!item)
+                return NSDragOperationNone;
+            else if ([item isKindOfClass: [Torrent class]])
+            {
+                NSDictionary * group = [fTableView parentForItem: item];
+                index = [[group objectForKey: @"Torrents"] indexOfObject: item] + 1;
+                item = group;
+            }
+            else;
+        }
+        else
+        {
+            if (item)
+            {
+                index = [fTableView rowForItem: item] + 1;
+                item = nil;
+            }
+        }
         
-        [fTableView setDropItem: nil dropChildIndex: index];
+        [fTableView setDropItem: item dropChildIndex: index];
         return NSDragOperationGeneric;
     }
     
@@ -2627,37 +2645,58 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         //remember selected rows
         NSArray * selectedValues = [fTableView selectedValues];
     
-        NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData:
-                                [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
+        NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
         
-        //determine where to move them
-        int i, originalRow = newRow;
-        for (i = [indexes firstIndex]; i < originalRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
-            newRow--;
+        //get the torrents to move
+        NSMutableArray * movingTorrents = [NSMutableArray arrayWithCapacity: [indexes count]];
+        int i;
+        for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+            [movingTorrents addObject: [fTableView itemAtRow: i]];
         
-        //reinsert into array
-        int insertIndex = newRow > 0 ? [[fDisplayedTorrents objectAtIndex: newRow-1] orderValue] + 1 : 0;
+        //find torrent to place under
+        Torrent * topTorrent = nil;
+        if (item) //sorting by group
+        {
+            #warning get working
+            //change groups
+            /*int groupValue = [[item objectForKey: @"Group"] intValue];
+            NSEnumerator * enumerator = [movingTorrents objectEnumerator];
+            Torrent * torrent;
+            while ((torrent = [enumerator nextObject]))
+                [torrent setGroupValue: groupValue];*/
+            
+            
+            NSArray * groupTorrents = [item objectForKey: @"Torrents"];
+            while (newRow > 0 && [movingTorrents containsObject: [groupTorrents objectAtIndex: newRow-1]])
+                newRow--;
+            
+            if (newRow > 0)
+                topTorrent = [groupTorrents objectAtIndex: newRow-1];
+        }
+        else
+        {
+            while (newRow > 0 && [movingTorrents containsObject: [fDisplayedTorrents objectAtIndex: newRow-1]])
+                newRow--;
+            
+            if (newRow > 0)
+                topTorrent = [fDisplayedTorrents objectAtIndex: newRow-1];
+        }
         
         //get all torrents to reorder
-        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                                @"orderValue" ascending: YES] autorelease];
-        
+        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: YES] autorelease];
         NSMutableArray * sortedTorrents = [[fTorrents sortedArrayUsingDescriptors:
                                             [NSArray arrayWithObject: orderDescriptor]] mutableCopy];
         
         //remove objects to reinsert
-        NSArray * movingTorrents = [[fDisplayedTorrents objectsAtIndexes: indexes] retain];
         [sortedTorrents removeObjectsInArray: movingTorrents];
         
         //insert objects at new location
+        int insertIndex = topTorrent ? [sortedTorrents indexOfObject: topTorrent] + 1 : 0;
         for (i = 0; i < [movingTorrents count]; i++)
             [sortedTorrents insertObject: [movingTorrents objectAtIndex: i] atIndex: insertIndex + i];
         
-        [movingTorrents release];
-        
         //redo order values
-        i = 0;
-        for (i = 0; i < [sortedTorrents count]; i++)
+        for (i = insertIndex; i < [sortedTorrents count]; i++)
             [[sortedTorrents objectAtIndex: i] setOrderValue: i];
         
         [sortedTorrents release];
@@ -3690,7 +3729,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (action == @selector(setSortByGroup:))
     {
         [menuItem setState: [fDefaults boolForKey: @"SortByGroup"] ? NSOnState : NSOffState];
-        return ![[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER];
+        return YES;
     }
     
     //check proper filter search item
