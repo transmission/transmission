@@ -1539,17 +1539,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         desiredSeedActive = [self numToStartFromQueue: NO];
     
     //sort torrents by order value
-    NSArray * sortedTorrents;
     if ([fTorrents count] > 1 && (desiredDownloadActive > 0 || desiredSeedActive > 0))
     {
         NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: YES] autorelease];
-        sortedTorrents = [fTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: orderDescriptor]];
+        [fTorrents sortUsingDescriptors: [NSArray arrayWithObject: orderDescriptor]];
     }
-    else
-        sortedTorrents = fTorrents;
     
     Torrent * torrent;
-    NSEnumerator * enumerator = [sortedTorrents objectEnumerator];
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
         if (![torrent isActive] && ![torrent isChecking] && [torrent waitingToStart])
@@ -2690,22 +2687,19 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         //get all torrents to reorder
         NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: YES] autorelease];
-        NSMutableArray * sortedTorrents = [[fTorrents sortedArrayUsingDescriptors:
-                                            [NSArray arrayWithObject: orderDescriptor]] mutableCopy];
+        [fTorrents sortUsingDescriptors: [NSArray arrayWithObject: orderDescriptor]];
         
         //remove objects to reinsert
-        [sortedTorrents removeObjectsInArray: movingTorrents];
+        [fTorrents removeObjectsInArray: movingTorrents];
         
         //insert objects at new location
-        int insertIndex = topTorrent ? [sortedTorrents indexOfObject: topTorrent] + 1 : 0;
+        int insertIndex = topTorrent ? [fTorrents indexOfObject: topTorrent] + 1 : 0;
         for (i = 0; i < [movingTorrents count]; i++)
-            [sortedTorrents insertObject: [movingTorrents objectAtIndex: i] atIndex: insertIndex + i];
+            [fTorrents insertObject: [movingTorrents objectAtIndex: i] atIndex: insertIndex + i];
         
         //redo order values
-        for (i = 0; i < [sortedTorrents count]; i++)
-            [[sortedTorrents objectAtIndex: i] setOrderValue: i];
-        
-        [sortedTorrents release];
+        for (i = 0; i < [fTorrents count]; i++)
+            [[fTorrents objectAtIndex: i] setOrderValue: i];
         
         [self applyFilter: nil];
         
