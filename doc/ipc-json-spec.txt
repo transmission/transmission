@@ -134,15 +134,14 @@
    string             | value type & description
    -------------------+-------------------------------------------------
    "autostart"        | boolean   true means to auto-start torrents
-   "directory"        | string    path to download the torrent to
+   "destination"      | string    path to download the torrent to
    "filename"         | string    location of the .torrent file
    "max-peers"        | int       maximum number of peers
-   "speed-limit-down" | int       maximum download speed (in KiB/s)
-   "speed-limit-up"   | int       maximum upload speed (in KiB/s)
 
    The "filename" argument is required; all others are optional.
 
-   Response arguments: none.
+   Response arguments: on success, a "torrent-added" object in the
+                       form of one of 3.1's tr_info objects.
 
 3.5.  Other torrent settings
 
@@ -164,9 +163,8 @@
 
    Request name: "torrent-get"
    Request arguments: none
-   Response arguments: "torrents", a list of torrent objects containing
-                       all of 3.5's arguments plus the id passed in
-                       by "torrent-set".
+   Response arguments: A "torrents" list of objects containing all
+                       of 3.5's arguments plus the torrent's "id" int.
                       
 
 3.6  File Priorities
@@ -175,11 +173,11 @@
 
    string             | value type & description
    -------------------+-------------------------------------------------
-   "priority-high"    | array          indices of one or more high-priority files
-   "priority-low"     | array          indices of one or more low-priority files
-   "priority-normal"  | array          indices of one or more normal-priority files
-   "download"         | array          indices of one or more file to download
-   "no-download"      | array          indices of one or more file to not download
+   "priority-high"    | array     indices of one or more high-priority files
+   "priority-low"     | array     indices of one or more low-priority files
+   "priority-normal"  | array     indices of one or more normal-priority files
+   "download"         | array     indices of one or more file to download
+   "no-download"      | array     indices of one or more file to not download
 
 3.6.1.  Mutators
 
@@ -191,9 +189,8 @@
 
     Request name: "torrent-get-file"
     Request arguments: none
-   Response arguments: list of objects, one per torrent, containing
-                       all of 3.6's arguments plus the id passed in
-                       by "torrent-set".
+   Response arguments: A "torrents" list of objects containing all
+                       of 3.6's arguments plus the torrent's "id" int.
    
 4.   Session Status Requests
 
@@ -202,7 +199,7 @@
    string             | value type & description
    -------------------+-------------------------------------------------
    "autostart"        | boolean   true means to auto-start torrents
-   "directory"        | string    path to download torrents to
+   "destination"      | string    path to download torrents to
    "encryption"       | string    "required", "preferred", or "plaintext"
    "max-peers"        | int       maximum global number of peers
    "port"             | int       port number

@@ -510,9 +510,7 @@ int tr_torrentParse( const tr_handle  * handle,
  * Instantiate a single torrent.
  */
 #define TR_EINVALID     1
-#define TR_EUNSUPPORTED 2
-#define TR_EDUPLICATE   3
-#define TR_EOTHER       666
+#define TR_EDUPLICATE   2
 tr_torrent * tr_torrentNew( tr_handle      * handle,
                             const tr_ctor  * ctor,
                             int            * setmeError );
