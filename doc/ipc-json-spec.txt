@@ -12,7 +12,7 @@
 
 2.  Message Format
 
-   The entire protocol is formatted in a subset of JSON that understands
+   Messages are formatted in a subset of JSON that understands
    arrays, maps, strings, and whole numbers with no exponentials --
    in short, the subset of JSON easily represented in benc.
    floating-point numbers are represented as strings.
@@ -20,7 +20,7 @@
 
    There are only two message types: request and response.  Both
    are JSON objects with two members:  "headers" (described in 2.1)
-   and "body" (described in 2.2-2.3).
+   and "body" (described in 2.2 - 2.3).
 
 2.1.  Headers
 
@@ -45,21 +45,17 @@
 
 3.  Torrent Requests
 
-3.1.  Common Arguments
-
-   Most torrent requests support an "ids" argument, which is a list
-   containing unique torrent ids, or torrent sha1 hash strings, or both.
-   These are the torrents that the request will be applied to.
-   If "ids" is omitted, the request is applied to all torrents.
-
-3.2.  Torrent Action Requests
+3.1.  Torrent Action Requests
 
    Request names: "torrent-start", "torrent-stop",
                   "torrent-remove", "torrent-verify"
-   Request arguments: 3.1's optional "ids" argument.
+   Request arguments: "ids", a list of unique torrent ids, sha1 hash strings,
+                      or both.  These are the torrents that the request will
+                      be applied to.  If "ids" is ommitted, the request is
+                      applied to all torrents.
    Response arguments: none.
 
-3.3.  Torrent Info Requests
+3.2.  Torrent Info Requests
 
    Request name: "torrent-info".
    Request arguments: 3.1's optional "ids" argument.
@@ -118,7 +114,7 @@
          }
       }
 
-3.4.  Torrent Status Requests
+3.3.  Torrent Status Requests
 
    Request name is "torrent-status".
    Request arguments: 3.1's optional "ids" argument.
@@ -130,7 +126,7 @@
    (2) a new string, "announce-url", is added
    (3) a new string, "scrape-url", is added
 
-3.5.  Adding a Torrent
+3.4.  Adding a Torrent
 
    Request name: "torrent-add"
    Request arguments:
@@ -146,55 +142,58 @@
 
    The "filename" argument is required; all others are optional.
 
-   Response arguments: 3.1's "error" if the request failed.
+   Response arguments: none.
 
-3.6.  Other torrent settings
+3.5.  Other torrent settings
 
    Common arguments:
 
    string             | value type & description
    -------------------+-------------------------------------------------
-   "id"               | int or string  torrent id or hash string
    "max-peers"        | int            maximum number of peers
    "speed-limit-down" | int            maximum download speed (in KiB/s)
    "speed-limit-up"   | int            maximum upload speed (in KiB/s)
 
-3.6.1.  Mutators
+3.5.1.  Mutators
 
    Request name: "torrent-set"
-   Request arguments: "id" from 3.6, plus one or more of 3.6's other arguments
+   Request arguments: 3.1's "ids", plus one or more of 3.5's arguments
    Response arguments: none
 
-3.6.2.  Accessors
+3.5.2.  Accessors
 
    Request name: "torrent-get"
    Request arguments: none
-   Response arguments: all of 3.6's arguments
+   Response arguments: "torrents", a list of torrent objects containing
+                       all of 3.5's arguments plus the id passed in
+                       by "torrent-set".
+                      
 
-3.7  File Priorities
+3.6  File Priorities
 
    Common arguments:
 
    string             | value type & description
    -------------------+-------------------------------------------------
-   "id"               | int or string  torrent id or hash string
    "priority-high"    | array          indices of one or more high-priority files
    "priority-low"     | array          indices of one or more low-priority files
    "priority-normal"  | array          indices of one or more normal-priority files
    "download"         | array          indices of one or more file to download
    "no-download"      | array          indices of one or more file to not download
 
-3.7.1.  Mutators
+3.6.1.  Mutators
 
     Request name: "torrent-set-file"
-    Request arguments: "id" from 3.7, plus one or more of 3.7's other arguments
+    Request arguments: 3.1's "ids", plus one or more of 3.6's arguments
     Response arguments: none
 
-3.7.2.  Accessors
+3.6.2.  Accessors
 
     Request name: "torrent-get-file"
     Request arguments: none
-    Response arguments: all of 3.7's arguments
+   Response arguments: list of objects, one per torrent, containing
+                       all of 3.6's arguments plus the id passed in
+                       by "torrent-set".
    
 4.   Session Status Requests
 

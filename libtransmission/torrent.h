@@ -49,7 +49,9 @@ int  tr_torrentIsSeed  ( const tr_torrent * );
 void tr_torrentChangeMyPort  ( tr_torrent * );
 
 int tr_torrentExists( const tr_handle *, const uint8_t * );
+tr_torrent* tr_torrentFindFromId( tr_handle *, int id );
 tr_torrent* tr_torrentFindFromHash( tr_handle *, const uint8_t * );
+tr_torrent* tr_torrentFindFromHashString( tr_handle *, const char * );
 tr_torrent* tr_torrentFindFromObfuscatedHash( tr_handle *, const uint8_t* );
 
 void tr_torrentGetRates( const tr_torrent *, float * toClient, float * toPeer );
@@ -178,6 +180,8 @@ struct tr_torrent
     tr_stat                    stats;
 
     tr_torrent               * next;
+
+    int                        uniqueId;
 };
 
 #endif

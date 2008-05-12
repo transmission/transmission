@@ -16,6 +16,7 @@ libtransmission_a_SOURCES = \
     ggets.c \
     handshake.c \
     inout.c \
+    ipc.c \
     ipcparse.c \
     json.c \
     list.c \
@@ -56,6 +57,7 @@ noinst_HEADERS = \
     ggets.h \
     handshake.h \
     inout.h \
+    ipc.h \
     ipcparse.h \
     list.h \
     makemeta.h \

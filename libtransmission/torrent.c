@@ -53,6 +53,30 @@
 ****
 ***/
 
+tr_torrent*
+tr_torrentFindFromId( tr_handle * handle, int id )
+{
+    tr_torrent * tor = NULL;
+
+    while(( tor = tr_torrentNext( handle, tor )))
+        if( tor->uniqueId == id )
+            return tor;
+
+    return NULL;
+}
+
+tr_torrent*
+tr_torrentFindFromHashString( tr_handle * handle, const char * str )
+{
+    tr_torrent * tor = NULL;
+
+    while(( tor = tr_torrentNext( handle, tor )))
+        if( !strcmp( str, tor->info.hashString ) )
+            return tor;
+
+    return NULL;
+}
+
 int
 tr_torrentExists( const tr_handle * handle,
                   const uint8_t   * torrentHash )
@@ -368,10 +392,12 @@ torrentRealInit( tr_handle     * h,
     uint64_t loaded;
     uint64_t t;
     tr_info * info = &tor->info;
+    static int nextUniqueId = 1;
    
     tr_globalLock( h );
 
     tor->handle   = h;
+    tor->uniqueId = nextUniqueId++;
 
     randomizeTiers( info );
 
