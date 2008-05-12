@@ -2650,40 +2650,30 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             [movingTorrents addObject: [fTableView itemAtRow: i]];
         
         //find torrent to place under
+        NSArray * groupTorrents = item ? [item objectForKey: @"Torrents"] : fDisplayedTorrents;
         Torrent * topTorrent = nil;
-        if (item) //sorting by group
+        for (i = newRow-1; i >= 0; i--)
         {
-            #warning get working
+            Torrent * tempTorrent = [groupTorrents objectAtIndex: i];
+            if (![movingTorrents containsObject: tempTorrent])
+            {
+                topTorrent = tempTorrent;
+                break;
+            }
+        }
+        
+        #warning get working
+        //reset groups
+        /*if (item)
+        {
+            
             //change groups
-            /*int groupValue = [[item objectForKey: @"Group"] intValue];
+            int groupValue = [[item objectForKey: @"Group"] intValue];
             NSEnumerator * enumerator = [movingTorrents objectEnumerator];
             Torrent * torrent;
             while ((torrent = [enumerator nextObject]))
-                [torrent setGroupValue: groupValue];*/
-            
-            NSArray * groupTorrents = [item objectForKey: @"Torrents"];
-            for (i = newRow-1; i >= 0; i--)
-            {
-                Torrent * tempTorrent = [groupTorrents objectAtIndex: i];
-                if (![movingTorrents containsObject: tempTorrent])
-                {
-                    topTorrent = tempTorrent;
-                    break;
-                }
-            }
-        }
-        else
-        {
-            for (i = newRow-1; i >= 0; i--)
-            {
-                Torrent * tempTorrent = [fDisplayedTorrents objectAtIndex: i];
-                if (![movingTorrents containsObject: tempTorrent])
-                {
-                    topTorrent = tempTorrent;
-                    break;
-                }
-            }
-        }
+                [torrent setGroupValue: groupValue];
+        }*/
         
         //get all torrents to reorder
         NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: YES] autorelease];
