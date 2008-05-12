@@ -16,7 +16,6 @@ libtransmission_a_SOURCES = \
     ggets.c \
     handshake.c \
     inout.c \
-    ipc.c \
     ipcparse.c \
     json.c \
     list.c \
@@ -33,6 +32,7 @@ libtransmission_a_SOURCES = \
     publish.c \
     ratecontrol.c \
     resume.c \
+    rpc.c \
     session.c \
     stats.c \
     torrent.c \
@@ -57,7 +57,6 @@ noinst_HEADERS = \
     ggets.h \
     handshake.h \
     inout.h \
-    ipc.h \
     ipcparse.h \
     list.h \
     makemeta.h \
@@ -74,6 +73,7 @@ noinst_HEADERS = \
     publish.h \
     ratecontrol.h \
     resume.h \
+    rpc.h \
     session.h \
     stats.h \
     torrent.h \

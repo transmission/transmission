@@ -10,13 +10,13 @@
  * $Id:$
  */
 
-#ifndef TR_IPC_H
-#define TR_IPC_H
+#ifndef TR_RPC_H
+#define TR_RPC_H
 
 struct tr_handle;
 
 char*
-tr_ipc_request_exec( struct tr_handle  * handle,
+tr_rpc_request_exec( struct tr_handle  * handle,
                      const void        * request_json,
                      int                 request_len,
                      int               * response_len );

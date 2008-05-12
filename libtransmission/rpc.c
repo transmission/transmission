@@ -15,7 +15,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
-#include "ipc.h"
+#include "rpc.h"
 #include "torrent.h"
 #include "utils.h"
 
@@ -245,14 +245,20 @@ torrentGet( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
     for( i=0; i<torrentCount; ++i )
     {
         tr_torrent * tor = torrents[i];
-        tr_benc * d = tr_bencListAddDict( list, 4 );
+        tr_benc * d = tr_bencListAddDict( list, 6 );
         tr_bencDictAddInt( d, "id", tor->uniqueId );
         tr_bencDictAddInt( d, "peer-limit",
                            tr_torrentGetPeerLimit( tor ) );
         tr_bencDictAddInt( d, "speed-limit-down",
                            tr_torrentGetSpeedLimit( tor, TR_DOWN ) );
+        tr_bencDictAddInt( d, "speed-limit-down-enabled",
+                           tr_torrentGetSpeedMode( tor, TR_DOWN )
+                               == TR_SPEEDLIMIT_SINGLE );
         tr_bencDictAddInt( d, "speed-limit-up",
                            tr_torrentGetSpeedLimit( tor, TR_UP ) );
+        tr_bencDictAddInt( d, "speed-limit-up-enabled",
+                           tr_torrentGetSpeedMode( tor, TR_UP )
+                               == TR_SPEEDLIMIT_SINGLE );
     }
 
     tr_free( torrents );
@@ -273,8 +279,14 @@ torrentSet( tr_handle * handle, tr_benc * args_in, tr_benc * args_out UNUSED )
             tr_torrentSetPeerLimit( tor, tmp );
         if( tr_bencDictFindInt( args_in, "speed-limit-down", &tmp ) )
             tr_torrentSetSpeedLimit( tor, TR_DOWN, tmp );
+        if( tr_bencDictFindInt( args_in, "speed-limit-down-enabled", &tmp ) )
+            tr_torrentSetSpeedMode( tor, TR_DOWN, tmp ? TR_SPEEDLIMIT_SINGLE
+                                                      : TR_SPEEDLIMIT_GLOBAL );
         if( tr_bencDictFindInt( args_in, "speed-limit-up", &tmp ) )
             tr_torrentSetSpeedLimit( tor, TR_UP, tmp );
+        if( tr_bencDictFindInt( args_in, "speed-limit-up-enabled", &tmp ) )
+            tr_torrentSetSpeedMode( tor, TR_UP, tmp ? TR_SPEEDLIMIT_SINGLE
+                                                    : TR_SPEEDLIMIT_GLOBAL );
     }
 
     tr_free( torrents );
@@ -438,8 +450,8 @@ torrentAdd( tr_handle * h, tr_benc * args_in, tr_benc * args_out )
 
         ctor = tr_ctorNew( h );
         tr_ctorSetMetainfoFromFile( ctor, filename );
-        if( tr_bencDictFindInt( args_in, "autostart", &i ) )
-            tr_ctorSetPaused( ctor, TR_FORCE, !i );
+        if( tr_bencDictFindInt( args_in, "paused", &i ) )
+            tr_ctorSetPaused( ctor, TR_FORCE, i );
         if( tr_bencDictFindInt( args_in, "peer-limit", &i ) )
             tr_ctorSetPeerLimit( ctor, TR_FORCE, i );
         if( tr_bencDictFindStr( args_in, "destination", &str ) )
@@ -538,7 +550,7 @@ typedef const char* (handler)( tr_handle*, tr_benc*, tr_benc* );
 
 struct request_handler
 {
-    const char * name;
+    const char * method;
     handler * func;
 } request_handlers[] = { 
     { "torrent-start", torrentStart },
@@ -565,51 +577,40 @@ request_exec( struct tr_handle * handle,
     const char * str;
     char * out;
     tr_benc response;
-    tr_benc * headers_in = NULL;
-    tr_benc * body_in = NULL;
-    tr_benc * args_in = NULL;
-    tr_benc * headers_out = NULL;
-    tr_benc * body_out = NULL;
+    tr_benc * args_in = tr_bencDictFind( request, "args" );
     tr_benc * args_out = NULL;
     const char * result = NULL;
 
-    headers_in = tr_bencDictFind( request, "headers" );
-    body_in = tr_bencDictFind( request, "body" );
-    args_in = tr_bencDictFind( body_in, "args" );
-
     /* build the response skeleton */
-    tr_bencInitDict( &response, 2 );
-    headers_out = tr_bencDictAddDict( &response, "headers", 2 );
-    tr_bencDictAddStr( headers_out, "type", "response" );
-    if( tr_bencDictFindInt( headers_in, "tag", &i ) )
-        tr_bencDictAddInt( headers_out, "tag", i );
-    body_out = tr_bencDictAddDict( &response, "body", 2 );
-    args_out = tr_bencDictAddDict( body_out, "args", 0 );
+    tr_bencInitDict( &response, 3 );
+    if( tr_bencDictFindInt( request, "tag", &i ) )
+        tr_bencDictAddInt( request, "tag", i );
+    args_out = tr_bencDictAddDict( &response, "args", 0 );
 
     /* parse the request */
-    if( !tr_bencDictFindStr( body_in, "name", &str ) )
-        result = "no request name given";
+    if( !tr_bencDictFindStr( request, "method", &str ) )
+        result = "no method name";
     else {
         const int n = TR_N_ELEMENTS( request_handlers );
         for( i=0; i<n; ++i )
-            if( !strcmp( str, request_handlers[i].name ) )
+            if( !strcmp( str, request_handlers[i].method ) )
                 break;
         result = i==n
-            ? "request name not recognized"
+            ? "method name not recognized"
             : (*request_handlers[i].func)( handle, args_in, args_out );
     }
 
     /* serialize & return the response */
     if( !result )
-        result = "success";
-    tr_bencDictAddStr( body_out, "result", result );
-    out = tr_bencSave( &response, response_len ); /* TODO: json, not benc */
+         result = "success";
+    tr_bencDictAddStr( &response, "result", result );
+    out = tr_bencSaveAsJSON( &response, response_len );
     tr_bencFree( &response );
     return out;
 }
 
 char*
-tr_ipc_request_exec( struct tr_handle  * handle,
+tr_rpc_request_exec( struct tr_handle  * handle,
                      const void        * request_json,
                      int                 request_len,
                      int               * response_len )

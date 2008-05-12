@@ -18,46 +18,45 @@
    floating-point numbers are represented as strings.
    booleans are represented as integers where 0 is false and 1 is true.
 
-   There are only two message types: request and response.  Both
-   are JSON objects with two members:  "headers" (described in 2.1)
-   and "body" (described in 2.2 - 2.3).
+   Messages are represented as a JSON objects.  There are two types:
+   requests (described in 2.1) and responses (described in 2.2).
 
-2.1.  Headers
+2.1.  Requests
 
-   Message headers support two members:
-   (1) A required "type" string whose value must be "request" or "response".
-   (2) An optional "tag" integer supplied by requests for their own use.
-       Responses MUST include the request tag's verbatim.
+   Requests supports three keys:
 
-2.2.  Request Body
+   (1) A required "method" string telling the name of the method to invoke
+   (2) An optional "arguments" object of name/value pairs
+   (3) An optional "tag" integer used for clients to track responses.
+       If provided by a request, the response MUST include the same tag.
 
-   Request bodies support two members:
-   (1) A required "name" string telling the name of the request.
-   (2) An optional "arguments" object of name/value pairs.
+2.2.  Responses
 
-2.3.  Response Body
+   Reponses support three keys:
 
-   All response bodies support two members:
    (1) A required "result" string whose value must be "success" on success,
-       and may be "no-permission", "bad-format", or "error" on failure.
-   (2) An optional "arguments" object of name/value pairs.
-       The contents of these arguments depend on the request's name.
+       or an error string on failure.
+   (2) An optional "arguments" object of name/value pairs
+   (3) An optional "tag" integer as described in 2.1.
 
 3.  Torrent Requests
 
 3.1.  Torrent Action Requests
 
-   Request names: "torrent-start", "torrent-stop",
-                  "torrent-remove", "torrent-verify"
+   Method names: "torrent-start", "torrent-stop",
+                 "torrent-remove", "torrent-verify"
+
    Request arguments: "ids", a list of unique torrent ids, sha1 hash strings,
                       or both.  These are the torrents that the request will
                       be applied to.  If "ids" is ommitted, the request is
                       applied to all torrents.
+
    Response arguments: none.
 
 3.2.  Torrent Info Requests
 
-   Request name: "torrent-info".
+   Method name: "torrent-info".
+
    Request arguments: 3.1's optional "ids" argument.
 
    Response arguments: "info", an array of objects based on libtransmission's
@@ -70,53 +69,42 @@
    Example Request: 
 
       {
-         "headers": {
-            "type": "request",
-            "tag": 666
-         },
-         "body": {
-            "name": "torrent-info",
-            "arguments": {
-               "ids": [ 7, 10 ]
-            }
-         }
+         "arguments": { "ids": [ 7, 10 ] }
+         "method": "torrent-info",
+         "tag": 666
       }
 
    Example Response:
 
       {
-         "headers": {
-            "type": "response",
-            "tag": 666
-         }
-         "body": {
-            "result": "success",
-            "arguments": {
-               "info": [
-                  {
-                     "id": 7,
-                     "totalSize": 9803930483,
-                     "pieceCount": 1209233,
-                     "pieceSize": 4096,
-                     "name": "Ubuntu x86_64 DVD",
-                     ...
-                  }
-                  {
-                     "id": 10,
-                     "totalSize": 2398480394,
-                     "pieceCount": 83943,
-                     "pieceSize": 12345,
-                     "name": "Ubuntu i386 DVD",
-                     ...
-                  }
-               ]
-            }
+         "tag": 666
+         "result": "success",
+         "arguments": {
+            "info": [
+               {
+                  "id": 7,
+                  "totalSize": 9803930483,
+                  "pieceCount": 1209233,
+                  "pieceSize": 4096,
+                  "name": "Ubuntu x86_64 DVD",
+                  ...
+               },
+               {
+                  "id": 10,
+                  "totalSize": 2398480394,
+                  "pieceCount": 83943,
+                  "pieceSize": 12345,
+                  "name": "Ubuntu i386 DVD",
+                  ...
+               }
+            ]
          }
       }
 
 3.3.  Torrent Status Requests
 
-   Request name is "torrent-status".
+   Method name: "torrent-status"
+
    Request arguments: 3.1's optional "ids" argument.
 
    Response arguments: "status", an array of objects based on
@@ -128,12 +116,13 @@
 
 3.4.  Adding a Torrent
 
-   Request name: "torrent-add"
+   Method name: "torrent-add"
+
    Request arguments:
 
    string             | value type & description
    -------------------+-------------------------------------------------
-   "autostart"        | boolean   true means to auto-start torrents
+   "paused"           | boolean   if true, don't start the torrent
    "destination"      | string    path to download the torrent to
    "filename"         | string    location of the .torrent file
    "peer-limit"       | int       maximum number of peers
@@ -147,21 +136,23 @@
 
    Common arguments:
 
-   string             | value type & description
-   -------------------+-------------------------------------------------
-   "peer-limit"       | int            maximum number of peers
-   "speed-limit-down" | int            maximum download speed (in KiB/s)
-   "speed-limit-up"   | int            maximum upload speed (in KiB/s)
+   string                     | value type & description
+   ---------------------------+-------------------------------------------------
+   "peer-limit"               | int       maximum number of peers
+   "speed-limit-down"         | int       maximum download speed (in KiB/s)
+   "speed-limit-down-enabled" | boolean   true if the download speed is limited
+   "speed-limit-up"           | int       maximum upload speed (in KiB/s)
+   "speed-limit-up-enabled"   | boolean   true if the upload speed is limited
 
 3.5.1.  Mutators
 
-   Request name: "torrent-set"
+   Method name: "torrent-set"
    Request arguments: 3.1's "ids", plus one or more of 3.5's arguments
    Response arguments: none
 
 3.5.2.  Accessors
 
-   Request name: "torrent-get"
+   Method name: "torrent-get"
    Request arguments: none
    Response arguments: A "torrents" list of objects containing all
                        of 3.5's arguments plus the torrent's "id" int.
@@ -181,13 +172,13 @@
 
 3.6.1.  Mutators
 
-    Request name: "torrent-set-file"
+    Method name: "torrent-set-file"
     Request arguments: 3.1's "ids", plus one or more of 3.6's arguments
     Response arguments: none
 
 3.6.2.  Accessors
 
-    Request name: "torrent-get-file"
+    Method name: "torrent-get-file"
     Request arguments: none
    Response arguments: A "torrents" list of objects containing all
                        of 3.6's arguments plus the torrent's "id" int.
@@ -210,13 +201,13 @@
 
 4.2.  Mutators
 
-   Request name: "session-set"
+   Method name: "session-set"
    Request arguments: one or more of 4.1's arguments
    Response arguments: none
 
 4.2.  Accessors
 
-   Request name: "session-get"
+   Method name: "session-get"
    Request arguments: none
    Response arguments: all of 4.1's arguments
 
