@@ -577,16 +577,6 @@ opentor( const char * path,
                     errmsg( "invalid torrent file: %s", path );
                 }
                 break;
-            case TR_EUNSUPPORTED:
-                if( NULL == path )
-                {
-                    errmsg( "unsupported torrent file" );
-                }
-                else
-                {
-                    errmsg( "unsupported torrent file: %s", path );
-                }
-                break;
             case TR_EDUPLICATE:
                 /* XXX not yet
                 found = hashlookup( tor->hash, 1 );
