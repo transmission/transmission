@@ -1,0 +1,172 @@
+.\" Process this file with
+.\" groff -man -Tascii shttpd.1
+.\" $Id: shttpd.1,v 1.9 2008/02/13 21:57:27 drozd Exp $
+.Dd Feb 12, 2008
+.Dt SHTTPD 1
+.Sh NAME
+.Nm shttpd
+.Nd lightweight web server
+.Sh SYNOPSIS
+.Nm
+.Op Ar options
+.Op Ar config_file
+.Nm
+.Fl A Ar htpasswd_file domain_name user_name password
+.Sh DESCRIPTION
+.Nm
+is small, fast and easy to use web server with CGI, SSL, Digest Authorization
+support. It can be run as stand-alone server, be managed by
+.Xr inetd 8
+, or be embedded into existing C/C++ application.
+.Pp
+.Nm
+does not detach from terminal, and makes current working directory
+be the web root, unless
+.Fl root
+option is specified.
+.Pp
+Unlike other web servers,
+.Nm
+does not expect CGI scirpts to be put in a special directory. They may be
+anywhere. CGI files are recognized by the file extension.
+.Pp
+SSI files are also recognized by extension. Currently, the only SSI directives
+supported are `<!--#include "url-encoded-path" -->'
+and `<!--#exec "program" -->'. The `url-encoded-path' can be relative to
+.Nm
+working directory, or absolute system path. In the embedded mode, more
+directives are available: #call, #if/#elif/#endif/#else/#endif.
+Unsupported SSI directives are silently ignored.
+.Pp
+It is possible to specify multiple ports to listen on. For example, to
+make
+.Nm
+listen on HTTP port 80 and HTTPS port 443, one should start it as
+.Sq shttpd -ssl_cert cert.pem -ports 80,443s
+.Pp
+.Nm
+can use the configuration file. By default, it is "shttpd.conf", and if it
+is present in the same directory where
+.Nm
+lives, the command line options are read from it. Alternatively, the
+configuration file may be specified as a last argument. The format of the
+configuration file is exactly the same as for the command line options, the
+only difference is that the command line options must be specified on
+separate lines, and dashes for options must be omitted.
+Lines beginning with '#' are regarded as comments and ignored.
+.Pp
+.Sh OPTIONS
+.Bl -tag -width indent
+.It Fl A Ar htpasswd_file domain_name user_name password
+Add/edit user's password in the passwords file. Deleting users can be done
+with any text editor. Functionality similar to Apache's
+.Ic htdigest
+utility.
+.It Fl access_log Ar file
+Access log file. Default: not set, no logging is done.
+.It Fl acl Ar (+|-)x.x.x.x[/x],...
+Specify access control list (ACL). ACL is a comma separated list
+of IP subnets, each subnet is prepended by '-' or '+' sign. Plus means allow,
+minus means deny. If subnet mask is
+omitted, like "-1.2.3.4", then it means single IP address. Mask may vary
+from 0 to 32 inclusive. Default: not set, allow all.
+.It Fl aliases Ar list
+This options gives an ability to serve the directories outside web root
+by sort of symbolic linking to certain URI. The
+.Ar list
+must be comma-separated list of URI=PATH pairs, like this:
+"/etc/=/my_etc,/tmp=/my_tmp". Default: not set.
+.It Fl auth_PUT Ar file
+PUT and DELETE passwords file. This must be specified if PUT or
+DELETE methods are used. Default: not set.
+.It Fl auth_gpass Ar file
+Location of global passwords file. When set, per-directory .htpasswd files are
+ignored, and all accessed must be authorised against global passwords file.
+Default: not set.
+.It Fl auth_realm Ar domain_name
+Authorization realm. Default: "mydomain.com".
+.It Fl cfg_uri Ar uri
+If set,
+.Nm
+creates special administrative URI where options may be changed at runtime.
+This URI probably wants to be password-protected, look at
+.Fl protect
+option, and in the EXAMPLES section on how to do it. Default: not set.
+.It Fl cgi_env Ar list
+Pass environment variables to the CGI script in addition to standard ones.
+The list must be comma-separated list of X=Y pairs, like this:
+"VARIABLE1=VALUE1,VARIABLE2=VALUE2".  Default: not set.
+.It Fl cgi_ext Ar list
+Comma-separated list of CGI extensions.  All files having these extensions
+are treated as CGI scripts. Default: "cgi,pl,php"
+.It Fl cgi_interp Ar file
+Force
+.Ar file
+to be a CGI interpreter for all CGI scripts. By default this option is not
+set, and
+.Nm
+decides which interpreter to use by looking at the first line of CGI script.
+.It Fl dir_list Ar 0|1
+Enable/disable directory listing. Default: "1" (enabled).
+.It Fl error_log Ar file
+Error log file. Default: not set, no errors are logged.
+.It Fl inetd Ar 0|1
+Enable/disable inetd mode. Default: "0" (disabled).
+.It Fl mime_types Ar list
+Additional to builtin mime types, in form "EXTENSION1=TYPE1,EXTENSION2=TYPE2".
+.It Fl ports Ar port_list
+Comma-separated list of ports to listen on. If the port is SSL, a letter 's'
+must be appeneded, for example, "80,443s" will open port 80 and port 443,
+and connections on port 443 will be SSL-ed. Default: 80
+.It Fl protect Ar list
+Comma separated list of URI=PATH pairs, specifying that given URIs
+must the protected with respected password files. Default: not set.
+.It Fl root Ar directory
+Location of the WWW root directory. Default: working directory from which
+.Nm
+has been started.
+.It Fl ssi_ext Ar list
+Comma separated list of SSI extensions. Default: "shtml,shtm".
+.It Fl ssl_cert Ar pem_file
+Location of SSL certificate file. Default: not set.
+.It Fl uid Ar login
+Switch to given user after startup. Default: not set.
+.El
+.Pp
+.Sh EMBEDDING
+.Nm
+can be built as a library to embed web server functionality
+into C/C++ application. The API functions are declared in a header
+file
+.Pa shttpd.h .
+Please refer to the source package for a header file and the examples.
+.Pp
+.Sh EXAMPLES
+.Bl -tag -width indent
+.It Nm Fl root Ar /var/www Fl ports Ar 8080,8043s Fl ssl_cert Ar /etc/cert.pem Fl aliases Ar /aa=/tmp,/bb=/etc
+Start listening on port 8080 for HTTP, and 8043 for HTTPS connections.
+Use /etc/cert.pem as SSL certificate file. Web root is /var/www. In addition,
+map directory /tmp to URI /aa, directory /etc to URI /bb.
+.It Nm Fl acl Ar -0.0.0.0/0,+10.0.0.0/8,+1.2.3.4
+Deny connections from everywhere, allow only IP address 1.2.3.4 and
+all IP addresses from 10.0.0.0/8 subnet to connect.
+.It Nm Fl ports Ar 8080 Fl cfg_uri Ar /ctl Fl protect Ar /ctl=/tmp/passwords.txt
+Start listening on port 8080, create an administrative URI "/ctl" where
+options may be changed at runtime, and protect that URI with authorization.
+.It http stream tcp nowait nobody /bin/shttpd shttpd -inetd 1 -root /var/www
+This line in
+.Pa /etc/inetd.conf
+makes
+.Nm
+run by
+.Xr inetd 8
+daemon.
+.El
+.Pp
+.Sh SEE ALSO
+.Xr inetd 8 .
+.Sh COPYRIGHT
+.Nm
+is licensed under the terms of beerware license.
+.Sh AUTHOR
+.An Sergey Lyubka Aq valenok@gmail.com .
