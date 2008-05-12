@@ -2702,7 +2702,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             [sortedTorrents insertObject: [movingTorrents objectAtIndex: i] atIndex: insertIndex + i];
         
         //redo order values
-        for (i = insertIndex; i < [sortedTorrents count]; i++)
+        for (i = 0; i < [sortedTorrents count]; i++)
             [[sortedTorrents objectAtIndex: i] setOrderValue: i];
         
         [sortedTorrents release];

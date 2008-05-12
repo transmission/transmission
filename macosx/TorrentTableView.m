@@ -372,7 +372,6 @@
         value = MAX_GROUP;
     
     [fCollapsedGroups addIndex: value];
-    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"OutlineExpandCollapse" object: self];
 }
 

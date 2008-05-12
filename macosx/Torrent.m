@@ -197,6 +197,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     [super dealloc];
 }
 
+- (NSString *) description
+{
+    return [@"Torrent: " stringByAppendingString: [self name]];
+}
+
 - (void) closeRemoveTorrent
 {
     //allow the file to be index by Time Machine
