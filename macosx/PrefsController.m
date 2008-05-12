@@ -248,7 +248,7 @@
 {
     int port = [sender intValue];
     [fDefaults setInteger: port forKey: @"BindPort"];
-    tr_setBindPort(fHandle, port);
+    tr_sessionSetPublicPort(fHandle, port);
     
     fPublicPort = -1;
     [self updatePortStatus];
@@ -256,7 +256,7 @@
 
 - (void) setNat: (id) sender
 {
-    tr_natTraversalEnable(fHandle, [fDefaults boolForKey: @"NatTraversal"]);
+    tr_sessionSetPortForwardingEnabled(fHandle, [fDefaults boolForKey: @"NatTraversal"]);
     
     fNatStatus = -1;
     [self updatePortStatus];
@@ -350,7 +350,7 @@
 {
     int count = [sender intValue];
     [fDefaults setInteger: count forKey: @"PeersTotal"];
-    tr_setGlobalPeerLimit(fHandle, count);
+    tr_sessionSetPeerLimit(fHandle, count);
 }
 
 - (void) setPeersTorrent: (id) sender
@@ -361,12 +361,12 @@
 
 - (void) setPEX: (id) sender
 {
-    tr_setPexEnabled(fHandle, [fDefaults boolForKey: @"PEXGlobal"]);
+    tr_sessionSetPexEnabled(fHandle, [fDefaults boolForKey: @"PEXGlobal"]);
 }
 
 - (void) setEncryptionMode: (id) sender
 {
-    tr_setEncryptionMode(fHandle, [fDefaults boolForKey: @"EncryptionPrefer"] ? 
+    tr_sessionSetEncryption(fHandle, [fDefaults boolForKey: @"EncryptionPrefer"] ? 
         ([fDefaults boolForKey: @"EncryptionRequire"] ? TR_ENCRYPTION_REQUIRED : TR_ENCRYPTION_PREFERRED) : TR_PLAINTEXT_PREFERRED);
 }
 
@@ -409,19 +409,19 @@
 {
     if ([fDefaults boolForKey: @"SpeedLimit"])
     {
-        tr_setUseGlobalSpeedLimit(fHandle, TR_UP, 1);
-        tr_setGlobalSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
+        tr_sessionSetSpeedLimitEnabled(fHandle, TR_UP, 1);
+        tr_sessionSetSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
         
-        tr_setUseGlobalSpeedLimit(fHandle, TR_DOWN, 1);
-        tr_setGlobalSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
+        tr_sessionSetSpeedLimitEnabled(fHandle, TR_DOWN, 1);
+        tr_sessionSetSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
     }
     else
     {
-        tr_setUseGlobalSpeedLimit(fHandle, TR_UP, [fDefaults boolForKey: @"CheckUpload"]);
-        tr_setGlobalSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"UploadLimit"]);
+        tr_sessionSetSpeedLimitEnabled(fHandle, TR_UP, [fDefaults boolForKey: @"CheckUpload"]);
+        tr_sessionSetSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"UploadLimit"]);
         
-        tr_setUseGlobalSpeedLimit(fHandle, TR_DOWN, [fDefaults boolForKey: @"CheckDownload"]);
-        tr_setGlobalSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"DownloadLimit"]);
+        tr_sessionSetSpeedLimitEnabled(fHandle, TR_DOWN, [fDefaults boolForKey: @"CheckDownload"]);
+        tr_sessionSetSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"DownloadLimit"]);
     }
 }
 

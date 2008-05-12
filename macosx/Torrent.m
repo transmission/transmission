@@ -420,12 +420,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (void) setMaxPeerConnect: (uint16_t) count
 {
     if (count > 0)
-        tr_torrentSetMaxConnectedPeers(fHandle, count);
+        tr_torrentSetPeerLimit(fHandle, count);
 }
 
 - (uint16_t) maxPeerConnect
 {
-    return tr_torrentGetMaxConnectedPeers(fHandle);
+    return tr_torrentGetPeerLimit(fHandle);
 }
 
 - (void) setWaitToStart: (BOOL) wait
@@ -1568,7 +1568,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     //set libtransmission settings for initialization
     tr_ctor * ctor = tr_ctorNew(lib);
     tr_ctorSetPaused(ctor, TR_FORCE, YES);
-    tr_ctorSetMaxConnectedPeers(ctor, TR_FALLBACK, [fDefaults integerForKey: @"PeersTorrent"]);
+    tr_ctorSetPeerLimit(ctor, TR_FALLBACK, [fDefaults integerForKey: @"PeersTorrent"]);
     
     tr_info info;
     int error;
