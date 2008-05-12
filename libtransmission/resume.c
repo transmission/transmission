@@ -470,7 +470,7 @@ setFromCtor( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor, int mode )
     }
 
     if( fields & TR_FR_MAX_PEERS ) 
-        if( !tr_ctorGetMaxConnectedPeers( ctor, mode, &tor->maxConnectedPeers ) )
+        if( !tr_ctorGetPeerLimit( ctor, mode, &tor->maxConnectedPeers ) )
             ret |= TR_FR_MAX_PEERS;
 
     if( fields & TR_FR_DESTINATION ) {

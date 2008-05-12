@@ -871,7 +871,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
 
     tr_bencInitDict( &val, 4 );
     tr_bencDictAddInt( &val, "e", msgs->handle->encryptionMode != TR_PLAINTEXT_PREFERRED );
-    tr_bencDictAddInt( &val, "p", tr_getPublicPort( msgs->handle ) );
+    tr_bencDictAddInt( &val, "p", tr_sessionGetPublicPort( msgs->handle ) );
     tr_bencDictAddStr( &val, "v", TR_NAME " " USERAGENT_PREFIX );
     m  = tr_bencDictAddDict( &val, "m", 1 );
     if( pex )

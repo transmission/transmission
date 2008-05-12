@@ -323,9 +323,9 @@ tr_core_apply_defaults( tr_ctor * ctor )
     if( tr_ctorGetDeleteSource( ctor, NULL ) ) 
         tr_ctorSetDeleteSource( ctor, pref_flag_get( PREF_KEY_TRASH_ORIGINAL ) ); 
 
-    if( tr_ctorGetMaxConnectedPeers( ctor, TR_FORCE, NULL ) )
-        tr_ctorSetMaxConnectedPeers( ctor, TR_FORCE,
-                              pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
+    if( tr_ctorGetPeerLimit( ctor, TR_FORCE, NULL ) )
+        tr_ctorSetPeerLimit( ctor, TR_FORCE,
+                             pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
 
     if( tr_ctorGetDestination( ctor, TR_FORCE, NULL ) ) {
         char * path = pref_string_get( PREF_KEY_DIR_DEFAULT );
@@ -443,7 +443,7 @@ prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
     else if( !strcmp( key, PREF_KEY_MAX_PEERS_GLOBAL ) )
     {
         const uint16_t val = pref_int_get( key );
-        tr_setGlobalPeerLimit( tr_core_handle( core ), val );
+        tr_sessionSetPeerLimit( tr_core_handle( core ), val );
     }
 #ifdef HAVE_GIO
     else if( !strcmp( key, PREF_KEY_DIR_WATCH ) ||
@@ -658,8 +658,8 @@ tr_core_load( TrCore * self, gboolean forcePaused )
     if( forcePaused )
         tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
     tr_ctorSetDestination( ctor, TR_FALLBACK, path );
-    tr_ctorSetMaxConnectedPeers( ctor, TR_FALLBACK,
-                                 pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
+    tr_ctorSetPeerLimit( ctor, TR_FALLBACK,
+                         pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
 
     torrents = tr_loadTorrents ( tr_core_handle( self ), ctor, &count );
     for( i=0; i<count; ++i )

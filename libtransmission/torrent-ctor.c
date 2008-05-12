@@ -27,7 +27,7 @@ struct optional_args
     unsigned int isSet_destination : 1;
 
     unsigned int isPaused : 1;
-    uint16_t maxConnectedPeers;
+    uint16_t peerLimit;
     char destination[MAX_PATH_LENGTH];
 };
 
@@ -191,13 +191,13 @@ tr_ctorSetPaused( tr_ctor        * ctor,
 }
 
 void
-tr_ctorSetMaxConnectedPeers( tr_ctor        * ctor,
-                             tr_ctorMode      mode,
-                             uint16_t         maxConnectedPeers )
+tr_ctorSetPeerLimit( tr_ctor        * ctor,
+                     tr_ctorMode      mode,
+                     uint16_t         peerLimit )
 {
     struct optional_args * args = &ctor->optionalArgs[mode];
     args->isSet_connected = 1;
-    args->maxConnectedPeers = maxConnectedPeers;
+    args->peerLimit = peerLimit;
 }
 
 void
@@ -211,9 +211,9 @@ tr_ctorSetDestination( tr_ctor        * ctor,
 }
 
 int
-tr_ctorGetMaxConnectedPeers( const tr_ctor  * ctor,
-                             tr_ctorMode      mode,
-                             uint16_t       * setmeCount )
+tr_ctorGetPeerLimit( const tr_ctor  * ctor,
+                     tr_ctorMode      mode,
+                     uint16_t       * setmeCount )
 {
     int err = 0;
     const struct optional_args * args = &ctor->optionalArgs[mode];
@@ -221,7 +221,7 @@ tr_ctorGetMaxConnectedPeers( const tr_ctor  * ctor,
     if( !args->isSet_connected )
         err = 1;
     else if( setmeCount )
-        *setmeCount = args->maxConnectedPeers;
+        *setmeCount = args->peerLimit;
 
     return err;
 }
@@ -281,7 +281,7 @@ tr_ctorNew( const tr_handle * handle )
 {
     tr_ctor * ctor = tr_new0( struct tr_ctor, 1 );
     ctor->handle = handle;
-    tr_ctorSetMaxConnectedPeers( ctor, TR_FALLBACK, DEFAULT_MAX_CONNECTED_PEERS );
+    tr_ctorSetPeerLimit( ctor, TR_FALLBACK, DEFAULT_MAX_CONNECTED_PEERS );
     tr_ctorSetPaused( ctor, TR_FALLBACK, FALSE );
     tr_ctorSetSave( ctor, TRUE );
     return ctor;

@@ -149,9 +149,9 @@ typedef enum
 }
 tr_encryption_mode;
 
-tr_encryption_mode tr_getEncryptionMode( tr_handle * handle );
+tr_encryption_mode tr_sessionGetEncryption( tr_handle * handle );
 
-void tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode );
+void tr_sessionSetEncryption( tr_handle * handle, tr_encryption_mode mode );
 
 /***********************************************************************
  * tr_getPrefsDirectory
@@ -213,11 +213,13 @@ void tr_freeMessageList( tr_msg_list * freeme );
 ** Incoming Peer Connections Port
 */
 
-void tr_setBindPort( tr_handle *, int );
+void tr_sessionSetPortForwardingEnabled( tr_handle *, int enable );
 
-void tr_natTraversalEnable( tr_handle *, int enable );
+int tr_sessionIsPortForwardingEnabled( const tr_handle * );
 
-int tr_getPublicPort( const tr_handle * );
+void tr_sessionSetPublicPort( tr_handle *, int );
+
+int tr_sessionGetPublicPort( const tr_handle * );
 
 typedef enum
 {
@@ -277,38 +279,39 @@ tr_speedlimit tr_torrentGetSpeedMode( const tr_torrent  * tor,
 
 void tr_torrentSetSpeedLimit( tr_torrent   * tor,
                               int            up_or_down,
-                              int            single_KiB_sec );
+                              int            KiB_sec );
 
 int tr_torrentGetSpeedLimit( const tr_torrent  * tor,
                              int                 up_or_down );
 
-void tr_setUseGlobalSpeedLimit( tr_handle * handle,
-                                int           up_or_down,
-                                int           use_flag );
+void tr_sessionSetSpeedLimitEnabled( tr_handle   * session,
+                                     int           up_or_down,
+                                     int           isEnabled );
 
-void tr_setGlobalSpeedLimit( tr_handle * handle,
-                             int           up_or_down,
-                             int           global_KiB_sec );
+int tr_sessionIsSpeedLimitEnabled( const tr_handle   * session,
+                                   int                 up_or_down );
 
-void tr_getGlobalSpeedLimit( tr_handle * handle,
-                             int           up_or_down,
-                             int         * setme_is_enabled,
-                             int         * setme_KiBsec );
+void tr_sessionSetSpeedLimit( tr_handle   * session,
+                              int           up_or_down,
+                              int           KiB_sec );
+
+int tr_sessionGetSpeedLimit( const tr_handle   * session,
+                             int                 up_or_down );
 
 
 /***********************************************************************
 ***  Peer Limits
 **/
 
-void tr_torrentSetMaxConnectedPeers( tr_torrent  * tor,
-                                     uint16_t      maxConnectedPeers);
+void tr_torrentSetPeerLimit( tr_torrent  * tor,
+                             uint16_t      peerLimit );
 
-uint16_t tr_torrentGetMaxConnectedPeers( const tr_torrent  * tor );
+uint16_t tr_torrentGetPeerLimit( const tr_torrent  * tor );
 
-void tr_setGlobalPeerLimit( tr_handle * handle,
-                            uint16_t    maxGlobalPeers );
+void tr_sessionSetPeerLimit( tr_handle * handle,
+                             uint16_t    maxGlobalPeers );
 
-uint16_t tr_getGlobalPeerLimit( const tr_handle * handle );
+uint16_t tr_sessionGetPeerLimit( const tr_handle * handle );
 
 
 /**
@@ -452,9 +455,9 @@ int      tr_ctorSetMetainfoFromFile    ( tr_ctor        * ctor,
 int      tr_ctorSetMetainfoFromHash    ( tr_ctor        * ctor,
                                          const char     * hashString );
 
-void     tr_ctorSetMaxConnectedPeers   ( tr_ctor        * ctor,
+void     tr_ctorSetPeerLimit           ( tr_ctor        * ctor,
                                          tr_ctorMode      mode,
-                                         uint16_t         maxConnectedPeers );
+                                         uint16_t         peerLimit  );
 
 void     tr_ctorSetDestination         ( tr_ctor        * ctor,
                                          tr_ctorMode      mode,
@@ -464,7 +467,7 @@ void     tr_ctorSetPaused              ( tr_ctor        * ctor,
                                          tr_ctorMode      mode,
                                          uint8_t          isPaused );
 
-int      tr_ctorGetMaxConnectedPeers   ( const tr_ctor  * ctor,
+int      tr_ctorGetPeerLimit           ( const tr_ctor  * ctor,
                                          tr_ctorMode      mode,
                                          uint16_t       * setmeCount );
 
@@ -532,9 +535,9 @@ tr_torrent ** tr_loadTorrents ( tr_handle  * h,
  * PEX is always disabled in private torrents regardless of this.
  * In public torrents, PEX is enabled by default.
  */
-void tr_setPexEnabled( tr_handle *, int isEnabled );
+void tr_sessionSetPexEnabled( tr_handle *, int isEnabled );
 
-int tr_isPexEnabled( const tr_handle * );
+int tr_sessionIsPexEnabled( const tr_handle * );
 
 const tr_info * tr_torrentInfo( const tr_torrent * );
 

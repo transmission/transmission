@@ -1019,7 +1019,7 @@ static void
 max_peers_spun_cb( GtkSpinButton * spin, gpointer gtor )
 {
   const uint16_t n = gtk_spin_button_get_value( spin );
-  tr_torrentSetMaxConnectedPeers( tr_torrent_handle( gtor ), n );
+  tr_torrentSetPeerLimit( tr_torrent_handle( gtor ), n );
 }
 
 static GtkWidget*
@@ -1065,7 +1065,7 @@ options_page_new ( TrTorrent * gtor )
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Peer Connections"));
 
-    maxConnectedPeers = tr_torrentGetMaxConnectedPeers( tor );
+    maxConnectedPeers = tr_torrentGetPeerLimit( tor );
     w = gtk_spin_button_new_with_range( 1, 3000, 5 );
     gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), maxConnectedPeers );
     hig_workarea_add_row( t, &row, _( "_Maximum peers:" ), w, w );

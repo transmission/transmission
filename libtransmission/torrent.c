@@ -459,7 +459,7 @@ torrentRealInit( tr_handle     * h,
     tr_peerMgrAddTorrent( h->peerMgr, tor );
 
     if( !h->isPortSet )
-        tr_setBindPort( h, TR_DEFAULT_PORT );
+        tr_sessionSetPublicPort( h, TR_DEFAULT_PORT );
 
     assert( !tor->downloadedCur );
     assert( !tor->uploadedCur );
@@ -474,11 +474,10 @@ torrentRealInit( tr_handle     * h,
     tor->isRunning = 0;
 
     if( !(loaded & TR_FR_SPEEDLIMIT ) ) {
-        int limit, enabled;
-        tr_getGlobalSpeedLimit( tor->handle, TR_UP, &enabled, &limit );
-        tr_torrentSetSpeedLimit( tor, TR_UP, limit );
-        tr_getGlobalSpeedLimit( tor->handle, TR_DOWN, &enabled, &limit );
-        tr_torrentSetSpeedLimit( tor, TR_DOWN, limit );
+        tr_torrentSetSpeedLimit( tor, TR_UP,
+                tr_sessionGetSpeedLimit( tor->handle, TR_UP ) );
+        tr_torrentSetSpeedLimit( tor, TR_DOWN,
+                tr_sessionGetSpeedLimit( tor->handle, TR_DOWN ) );
     }
 
     tor->cpStatus = tr_cpGetStatus( tor->completion );
@@ -1383,14 +1382,14 @@ tr_torrentSetFileDLs ( tr_torrent      * tor,
 ***/
 
 void
-tr_torrentSetMaxConnectedPeers( tr_torrent  * tor,
-                                uint16_t      maxConnectedPeers )
+tr_torrentSetPeerLimit( tr_torrent  * tor,
+                        uint16_t      maxConnectedPeers )
 {
     tor->maxConnectedPeers = maxConnectedPeers;
 }
 
 uint16_t
-tr_torrentGetMaxConnectedPeers( const tr_torrent  * tor )
+tr_torrentGetPeerLimit( const tr_torrent  * tor )
 {
     return tor->maxConnectedPeers;
 }

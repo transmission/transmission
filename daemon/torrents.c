@@ -377,7 +377,7 @@ torrent_exit( int exitval )
         closetor( tor, 0 );
     }
 
-    tr_natTraversalEnable( gl_handle, 0 );
+    tr_sessionSetPortForwardingEnabled( gl_handle, 0 );
     starttimer( 1 );
 }
 
@@ -404,7 +404,7 @@ torrent_set_port( int port )
     if( 0 < port && 0xffff > port )
     {
         gl_port = port;
-        tr_setBindPort( gl_handle, port );
+        tr_sessionSetPublicPort( gl_handle, port );
         savestate();
     }
 }
@@ -425,7 +425,7 @@ torrent_set_pex( int pex )
     {
         gl_pex = pex;
 
-        tr_setPexEnabled( gl_handle, gl_pex );
+        tr_sessionSetPexEnabled( gl_handle, gl_pex );
 
         savestate( );
     }
@@ -443,7 +443,7 @@ torrent_enable_port_mapping( int automap )
     assert( NULL != gl_handle );
     assert( !gl_exiting );
     gl_mapping = ( automap ? 1 : 0 );
-    tr_natTraversalEnable( gl_handle, gl_mapping );
+    tr_sessionSetPortForwardingEnabled( gl_handle, gl_mapping );
     savestate();
 }
 
@@ -459,8 +459,8 @@ torrent_set_uplimit( int uplimit )
     assert( NULL != gl_handle );
     assert( !gl_exiting );
     gl_uplimit = uplimit;
-    tr_setGlobalSpeedLimit   ( gl_handle, TR_UP, uplimit );
-    tr_setUseGlobalSpeedLimit( gl_handle, TR_UP, uplimit > 0 );
+    tr_sessionSetSpeedLimit( gl_handle, TR_UP, uplimit );
+    tr_sessionSetSpeedLimitEnabled( gl_handle, TR_UP, uplimit > 0 );
     savestate();
 }
 
@@ -476,8 +476,8 @@ torrent_set_downlimit( int downlimit )
     assert( NULL != gl_handle );
     assert( !gl_exiting );
     gl_downlimit = downlimit;
-    tr_setGlobalSpeedLimit   ( gl_handle, TR_DOWN, downlimit );
-    tr_setUseGlobalSpeedLimit( gl_handle, TR_DOWN, downlimit > 0 );
+    tr_sessionSetSpeedLimit( gl_handle, TR_DOWN, downlimit );
+    tr_sessionSetSpeedLimitEnabled( gl_handle, TR_DOWN, downlimit > 0 );
     savestate();
 }
 
@@ -506,7 +506,7 @@ torrent_get_directory( void )
 void
 torrent_set_encryption(tr_encryption_mode mode)
 {
-    tr_setEncryptionMode(gl_handle, mode);
+    tr_sessionSetEncryption( gl_handle, mode );
     gl_crypto = mode;
     savestate();
 }
@@ -514,7 +514,7 @@ torrent_set_encryption(tr_encryption_mode mode)
 tr_encryption_mode
 torrent_get_encryption(void)
 {
-    return tr_getEncryptionMode(gl_handle);
+    return tr_sessionGetEncryption( gl_handle );
 }
 
 struct tor *

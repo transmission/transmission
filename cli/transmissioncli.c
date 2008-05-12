@@ -283,7 +283,7 @@ main( int argc, char ** argv )
         {
             gotsig = 0;
             tr_torrentStop( tor );
-            tr_natTraversalEnable( h, 0 );
+            tr_sessionSetPortForwardingEnabled( h, 0 );
         }
         
         if( manualUpdate )
@@ -355,7 +355,7 @@ main( int argc, char ** argv )
     fprintf( stderr, "\n" );
 
     /* Try for 5 seconds to delete any port mappings for nat traversal */
-    tr_natTraversalEnable( h, 0 );
+    tr_sessionSetPortForwardingEnabled( h, 0 );
     for( i = 0; i < 10; i++ )
     {
         const tr_handle_status * hstat = tr_handleStatus( h );

@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id:$
+ * $Id$
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
@@ -29,11 +29,13 @@
 
 typedef struct tr_shared tr_shared;
 
-tr_shared* tr_sharedInit            ( tr_handle *, int isEnabled, int publicPort );
-void       tr_sharedShuttingDown    ( tr_shared * );
-void       tr_sharedSetPort         ( tr_shared *, int publicPort );
-void       tr_sharedTraversalEnable ( tr_shared *, int isEnabled );
-int        tr_sharedGetPublicPort   ( const tr_shared * s );
+tr_shared* tr_sharedInit              ( tr_handle *, int isEnabled,
+                                                     int publicPort );
+void       tr_sharedShuttingDown      ( tr_shared * );
+void       tr_sharedSetPort           ( tr_shared *, int publicPort );
+void       tr_sharedTraversalEnable   ( tr_shared *, int isEnabled );
+int        tr_sharedGetPublicPort     ( const tr_shared * s );
+int        tr_sharedTraversalIsEnabled( const tr_shared * s );
 int        tr_sharedTraversalStatus ( const tr_shared * );
 
 #endif

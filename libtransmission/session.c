@@ -93,7 +93,7 @@ tr_getPeerId( void )
 ***/
 
 tr_encryption_mode
-tr_getEncryptionMode( tr_session * session )
+tr_sessionGetEncryption( tr_session * session )
 {
     assert( session != NULL );
 
@@ -101,7 +101,7 @@ tr_getEncryptionMode( tr_session * session )
 }
 
 void
-tr_setEncryptionMode( tr_session * session, tr_encryption_mode mode )
+tr_sessionSetEncryption( tr_session * session, tr_encryption_mode mode )
 {
     assert( session != NULL );
     assert( mode==TR_ENCRYPTION_PREFERRED
@@ -268,7 +268,7 @@ tr_setBindPortImpl( void * vdata )
 }
 
 void
-tr_setBindPort( tr_handle * handle, int port )
+tr_sessionSetPublicPort( tr_handle * handle, int port )
 {
     struct bind_port_data * data = tr_new( struct bind_port_data, 1 );
     data->handle = handle;
@@ -277,17 +277,10 @@ tr_setBindPort( tr_handle * handle, int port )
 }
 
 int
-tr_getPublicPort( const tr_handle * h )
+tr_sessionGetPublicPort( const tr_handle * h )
 {
     assert( h != NULL );
     return tr_sharedGetPublicPort( h->shared );
-}
-
-void tr_natTraversalEnable( tr_handle * h, int enable )
-{
-    tr_globalLock( h );
-    tr_sharedTraversalEnable( h->shared, enable );
-    tr_globalUnlock( h );
 }
 
 const tr_handle_status *
@@ -313,9 +306,9 @@ tr_handleStatus( tr_handle * h )
 ***/
 
 void
-tr_setUseGlobalSpeedLimit( tr_handle  * h,
-                           int          up_or_down,
-                           int          use_flag )
+tr_sessionSetSpeedLimitEnabled( tr_handle  * h,
+                                int          up_or_down,
+                                int          use_flag )
 {
     if( up_or_down == TR_UP )
         h->useUploadLimit = use_flag ? 1 : 0;
@@ -323,10 +316,16 @@ tr_setUseGlobalSpeedLimit( tr_handle  * h,
         h->useDownloadLimit = use_flag ? 1 : 0;
 }
 
+int
+tr_sessionIsSpeedLimitEnabled( const tr_handle * h, int up_or_down )
+{
+       return up_or_down==TR_UP ? h->useUploadLimit : h->useDownloadLimit;
+}
+
 void
-tr_setGlobalSpeedLimit( tr_handle  * h,
-                        int          up_or_down,
-                        int          KiB_sec )
+tr_sessionSetSpeedLimit( tr_handle  * h,
+                         int          up_or_down,
+                         int          KiB_sec )
 {
     if( up_or_down == TR_DOWN )
         tr_rcSetLimit( h->download, KiB_sec );
@@ -334,33 +333,32 @@ tr_setGlobalSpeedLimit( tr_handle  * h,
         tr_rcSetLimit( h->upload, KiB_sec );
 }
 
-void
-tr_getGlobalSpeedLimit( tr_handle  * h,
-                        int          up_or_down,
-                        int        * setme_enabled,
-                        int          * setme_KiBsec )
+int
+tr_sessionGetSpeedLimit( const tr_handle * h, int up_or_down )
 {
-    if( setme_enabled != NULL )
-       *setme_enabled = up_or_down==TR_UP ? h->useUploadLimit
-                                          : h->useDownloadLimit;
-    if( setme_KiBsec != NULL )
-       *setme_KiBsec = tr_rcGetLimit( up_or_down==TR_UP ? h->upload
-                                                        : h->download );
+    return tr_rcGetLimit( up_or_down==TR_UP ? h->upload : h->download );
 }
 
+/***
+****
+***/
 
 void
-tr_setGlobalPeerLimit( tr_handle * handle UNUSED,
-                       uint16_t    maxGlobalPeers )
+tr_sessionSetPeerLimit( tr_handle * handle UNUSED,
+                        uint16_t    maxGlobalPeers )
 {
     tr_fdSetPeerLimit( maxGlobalPeers );
 }
 
 uint16_t
-tr_getGlobalPeerLimit( const tr_handle * handle UNUSED )
+tr_sessionGetPeerLimit( const tr_handle * handle UNUSED )
 {
     return tr_fdGetPeerLimit( );
 }
+
+/***
+****
+***/
 
 void
 tr_torrentRates( tr_handle * h, float * toClient, float * toPeer )
@@ -502,15 +500,33 @@ tr_loadTorrents ( tr_handle   * h,
 ***/
 
 void
-tr_setPexEnabled( tr_handle * handle, int isPexEnabled )
+tr_sessionSetPexEnabled( tr_handle * handle, int isPexEnabled )
 {
     handle->isPexEnabled = isPexEnabled ? 1 : 0;
 }
 
 int
-tr_isPexEnabled( const tr_handle * handle )
+tr_sessionIsPexEnabled( const tr_handle * handle )
 {
     return handle->isPexEnabled;
+}
+
+/***
+****
+***/
+
+void
+tr_sessionSetPortForwardingEnabled( tr_handle * h, int enable )
+{
+    tr_globalLock( h );
+    tr_sharedTraversalEnable( h->shared, enable );
+    tr_globalUnlock( h );
+}
+
+int
+tr_sessionIsPortForwardingEnabled( const tr_handle * h )
+{
+    return tr_sharedTraversalIsEnabled( h->shared );
 }
 
 /***

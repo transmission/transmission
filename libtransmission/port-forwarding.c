@@ -226,6 +226,12 @@ tr_sharedTraversalEnable( tr_shared * s, int isEnabled )
 }
 
 int
+tr_sharedTraversalIsEnabled( const tr_shared * s )
+{
+    return s->isEnabled;
+}
+
+int
 tr_sharedTraversalStatus( const tr_shared * s )
 {
     return MAX( s->natpmpStatus, s->upnpStatus );

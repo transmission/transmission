@@ -136,7 +136,7 @@
    "autostart"        | boolean   true means to auto-start torrents
    "destination"      | string    path to download the torrent to
    "filename"         | string    location of the .torrent file
-   "max-peers"        | int       maximum number of peers
+   "peer-limit"       | int       maximum number of peers
 
    The "filename" argument is required; all others are optional.
 
@@ -149,7 +149,7 @@
 
    string             | value type & description
    -------------------+-------------------------------------------------
-   "max-peers"        | int            maximum number of peers
+   "peer-limit"       | int            maximum number of peers
    "speed-limit-down" | int            maximum download speed (in KiB/s)
    "speed-limit-up"   | int            maximum upload speed (in KiB/s)
 
@@ -196,17 +196,17 @@
 
 4.1.  Session Arguments
 
-   string             | value type & description
-   -------------------+-------------------------------------------------
-   "autostart"        | boolean   true means to auto-start torrents
-   "destination"      | string    path to download torrents to
-   "encryption"       | string    "required", "preferred", or "plaintext"
-   "max-peers"        | int       maximum global number of peers
-   "port"             | int       port number
-   "port-forwarding"  | boolean   true means enabled.
-   "pex-allowed"      | boolean   true means allow pex for public torrents
-   "speed-limit-down" | int       maximum global download speed (in KiB/s)
-   "speed-limit-up"   | int       maximum global upload speed (in KiB/s)
+   string                     | value type & description
+   ---------------------------+-------------------------------------------------
+   "encryption"               | string   "required", "preferred", "tolerated"
+   "peer-limit"               | int      maximum global number of peers
+   "port"                     | int      port number
+   "port-forwarding-enabled"  | boolean  true means enabled.
+   "pex-allowed"              | boolean  true means allow pex in public torrents
+   "speed-limit-down"         | int      max global download speed (in KiB/s)
+   "speed-limit-down-enabled" | int      max global download speed (in KiB/s)
+   "speed-limit-up"           | int      max global upload speed (in KiB/s)
+   "speed-limit-up-enabled"   | int      max global upload speed (in KiB/s)
 
 4.2.  Mutators
 

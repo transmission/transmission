@@ -853,43 +853,43 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     if( !strcmp( key, PREF_KEY_ENCRYPTED_ONLY ) )
     {
         const gboolean crypto_only = pref_flag_get( key );
-        tr_setEncryptionMode( tr, crypto_only ? TR_ENCRYPTION_REQUIRED
-                                              : TR_ENCRYPTION_PREFERRED );
+        tr_sessionSetEncryption( tr, crypto_only ? TR_ENCRYPTION_REQUIRED
+                                                 : TR_ENCRYPTION_PREFERRED );
     }
     else if( !strcmp( key, PREF_KEY_PORT ) )
     {
         const int port = pref_int_get( key );
-        tr_setBindPort( tr, port );
+        tr_sessionSetPublicPort( tr, port );
     }
     else if( !strcmp( key, PREF_KEY_DL_LIMIT_ENABLED ) )
     {
         const gboolean b = pref_flag_get( key );
-        tr_setUseGlobalSpeedLimit( tr, TR_DOWN, b );
+        tr_sessionSetSpeedLimitEnabled( tr, TR_DOWN, b );
     }
     else if( !strcmp( key, PREF_KEY_DL_LIMIT ) )
     {
         const int limit = pref_int_get( key );
-        tr_setGlobalSpeedLimit( tr, TR_DOWN, limit );
+        tr_sessionSetSpeedLimit( tr, TR_DOWN, limit );
     }
     else if( !strcmp( key, PREF_KEY_UL_LIMIT_ENABLED ) )
     {
         const gboolean b = pref_flag_get( key );
-        tr_setUseGlobalSpeedLimit( tr, TR_UP, b );
+        tr_sessionSetSpeedLimitEnabled( tr, TR_UP, b );
     }
     else if( !strcmp( key, PREF_KEY_UL_LIMIT ) )
     {
         const int limit = pref_int_get( key );
-        tr_setGlobalSpeedLimit( tr, TR_UP, limit );
+        tr_sessionSetSpeedLimit( tr, TR_UP, limit );
     }
     else if( !strcmp( key, PREF_KEY_NAT ) )
     {
         const gboolean enabled = pref_flag_get( key );
-        tr_natTraversalEnable( tr, enabled );
+        tr_sessionSetPortForwardingEnabled( tr, enabled );
     }
     else if( !strcmp( key, PREF_KEY_PEX ) )
     {
-        const gboolean enabled = pref_flag_get( key );
-        tr_setPexEnabled( tr_core_handle( cbdata->core ), enabled );
+        const gboolean b = pref_flag_get( key );
+        tr_sessionSetPortForwardingEnabled( tr_core_handle( cbdata->core ), b );
     }
 }
 
