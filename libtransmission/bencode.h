@@ -116,7 +116,7 @@ tr_benc    * tr_bencDictAddDict( tr_benc * dict, const char * key, int reserveCo
 tr_benc    * tr_bencDictAddRaw( tr_benc * dict, const char * key, const void *, size_t len );
 
 char*  tr_bencSave( const tr_benc * val, int * len );
-char*  tr_bencSaveAsSerializedPHP( const tr_benc * top, int * len );
+char*  tr_bencSaveAsJSON( const tr_benc * top, int * len );
 int    tr_bencSaveFile( const char * filename, const tr_benc * );
 int    tr_bencLoadFile( const char * filename, tr_benc * );
 

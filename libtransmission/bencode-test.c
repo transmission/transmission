@@ -271,12 +271,12 @@ testParse( void )
 }
 
 static int
-testPHPSnippet( const char * benc_str, const char * expected )
+testJSONSnippet( const char * benc_str, const char * expected )
 {
     tr_benc top;
     char * serialized;
     tr_bencLoad( benc_str, strlen( benc_str ), &top, NULL );
-    serialized = tr_bencSaveAsSerializedPHP( &top, NULL );
+    serialized = tr_bencSaveAsJSON( &top, NULL );
     check( !strcmp( serialized, expected ) );
     tr_free( serialized );
     tr_bencFree( &top );
@@ -284,25 +284,30 @@ testPHPSnippet( const char * benc_str, const char * expected )
 }
 
 static int
-testPHP( void )
+testJSON( void )
 {
     int val;
     const char * benc_str;
     const char * expected;
 
     benc_str = "i6e";
-    expected = "i:6;";
-    if(( val = testPHPSnippet( benc_str, expected )))
+    expected = "6";
+    if(( val = testJSONSnippet( benc_str, expected )))
         return val;
 
-    benc_str = "d3:cow3:moo4:spam4:eggse";
-    expected = "a:2:{s:3:\"cow\";s:3:\"moo\";s:4:\"spam\";s:4:\"eggs\";}";
-    if(( val = testPHPSnippet( benc_str, expected )))
+    benc_str = "d5:helloi1e5:worldi2ee";
+    expected = "{ \"hello\": 1, \"world\": 2 }"; 
+    if(( val = testJSONSnippet( benc_str, expected )))
         return val;
 
-    benc_str = "l3:cow3:moo4:spam4:eggse";
-    expected = "a:4:{i:0;s:3:\"cow\";i:1;s:3:\"moo\";i:2;s:4:\"spam\";i:3;s:4:\"eggs\";}";
-    if(( val = testPHPSnippet( benc_str, expected )))
+    benc_str = "d5:helloi1e5:worldi2e3:fooli1ei2ei3ee";
+    expected = "{ \"foo\": [ 1, 2, 3 ], \"hello\": 1, \"world\": 2 }";
+    if(( val = testJSONSnippet( benc_str, expected )))
+        return val;
+
+    benc_str = "d5:helloi1e5:worldi2e3:fooli1ei2ei3ed1:ai0eee";
+    expected = "{ \"foo\": [ 1, 2, 3, { \"a\": 0 } ], \"hello\": 1, \"world\": 2 }";
+    if(( val = testJSONSnippet( benc_str, expected )))
         return val;
 
     return 0;
@@ -354,7 +359,7 @@ main( void )
     if(( i = testParse( )))
         return i;
 
-    if(( i = testPHP( )))
+    if(( i = testJSON( )))
         return i;
 
     if(( i = testStackSmash( )))

@@ -1012,95 +1012,133 @@ tr_bencPrint( const tr_benc * val )
 
 struct ParentState
 {
-    int type;
-    int index;
+    int bencType;
+    int childIndex;
+    int childCount;
 };
  
-struct phpWalk
+struct jsonWalk
 {
     tr_list * parents;
     struct evbuffer * out;
 };
 
 static void
-phpChildFunc( struct phpWalk * data )
+jsonChildFunc( struct jsonWalk * data )
 {
     if( data->parents )
     {
         struct ParentState * parentState = data->parents->data;
 
-        if( parentState->type == TYPE_LIST )
-            evbuffer_add_printf( data->out, "i:%d;", parentState->index++ );
+        switch( parentState->bencType )
+        {
+            case TYPE_DICT: {
+                const int i = parentState->childIndex++;
+                if( ! ( i % 2 ) )
+                    evbuffer_add_printf( data->out, ": " );
+                else if( parentState->childIndex < parentState->childCount )
+                    evbuffer_add_printf( data->out, ", " );
+                else
+                    evbuffer_add_printf( data->out, " }" );
+                break;
+            }
+
+            case TYPE_LIST: {
+                if( ++parentState->childIndex < parentState->childCount )
+                    evbuffer_add_printf( data->out, ", " );
+                else
+                    evbuffer_add_printf( data->out, " ]" );
+                break;
+            }
+
+            default:
+                break;
+        }
     }
 }
 
 static void
-phpPushParent( struct phpWalk * data, int type )
+jsonPushParent( struct jsonWalk * data, const tr_benc * benc )
 {
     struct ParentState * parentState = tr_new( struct ParentState, 1 );
-    parentState->type = type;
-    parentState->index = 0;
+    parentState->bencType = benc->type;
+    parentState->childIndex = 0;
+    parentState->childCount = benc->val.l.count;
     tr_list_prepend( &data->parents, parentState );
 }
 
 static void
-phpPopParent( struct phpWalk * data )
+jsonPopParent( struct jsonWalk * data )
 {
     tr_free( tr_list_pop_front( &data->parents ) );
 }
 
 static void
-phpIntFunc( const tr_benc * val, void * vdata )
+jsonIntFunc( const tr_benc * val, void * vdata )
 {
-    struct phpWalk * data = vdata;
-    phpChildFunc( data );
-    evbuffer_add_printf( data->out, "i:%"PRId64";", val->val.i );
+    struct jsonWalk * data = vdata;
+    evbuffer_add_printf( data->out, "%"PRId64, val->val.i );
+    jsonChildFunc( data );
 }
 static void
-phpStringFunc( const tr_benc * val, void * vdata )
+jsonStringFunc( const tr_benc * val, void * vdata )
 {
-    struct phpWalk * data = vdata;
-    phpChildFunc( data );
-    evbuffer_add_printf( data->out, "s:%d:\"%s\";", val->val.s.i, val->val.s.s );
+    struct jsonWalk * data = vdata;
+    const char *it, *end;
+    evbuffer_add_printf( data->out, "\"" );
+    for( it=val->val.s.s, end=it+val->val.s.i; it!=end; ++it )
+    {
+        switch( *it ) {
+            case '"' : evbuffer_add_printf( data->out, "\\\"" ); break;
+            case '/' : evbuffer_add_printf( data->out, "\\/" ); break;
+            case '\b': evbuffer_add_printf( data->out, "\\b" ); break;
+            case '\f': evbuffer_add_printf( data->out, "\\f" ); break;
+            case '\n': evbuffer_add_printf( data->out, "\\n" ); break;
+            case '\r': evbuffer_add_printf( data->out, "\\n" ); break;
+            case '\t': evbuffer_add_printf( data->out, "\\n" ); break;
+            case '\\': evbuffer_add_printf( data->out, "\\\\" ); break;
+            default:   evbuffer_add_printf( data->out, "%c", *it ); break;
+        }
+    }
+    evbuffer_add_printf( data->out, "\"" );
+    jsonChildFunc( data );
 }
 static void
-phpDictBeginFunc( const tr_benc * val, void * vdata )
+jsonDictBeginFunc( const tr_benc * val, void * vdata )
 {
-    struct phpWalk * data = vdata;
-    phpChildFunc( data );
-    phpPushParent( data, TYPE_DICT );
-    evbuffer_add_printf( data->out, "a:%d:{", val->val.l.count/2 );
+    struct jsonWalk * data = vdata;
+    jsonPushParent( data, val );
+    evbuffer_add_printf( data->out, "{ " );
 }
 static void
-phpListBeginFunc( const tr_benc * val, void * vdata )
+jsonListBeginFunc( const tr_benc * val, void * vdata )
 {
-    struct phpWalk * data = vdata;
-    phpChildFunc( data );
-    phpPushParent( data, TYPE_LIST );
-    evbuffer_add_printf( data->out, "a:%d:{", val->val.l.count );
+    struct jsonWalk * data = vdata;
+    jsonPushParent( data, val );
+    evbuffer_add_printf( data->out, "[ " );
 }
 static void
-phpContainerEndFunc( const tr_benc * val UNUSED, void * vdata )
+jsonContainerEndFunc( const tr_benc * val UNUSED, void * vdata )
 {
-    struct phpWalk * data = vdata;
-    phpPopParent( data );
-    evbuffer_add_printf( data->out, "}" );
+    struct jsonWalk * data = vdata;
+    jsonPopParent( data );
+    jsonChildFunc( data );
 }
 char*
-tr_bencSaveAsSerializedPHP( const tr_benc * top, int * len )
+tr_bencSaveAsJSON( const tr_benc * top, int * len )
 {
     char * ret;
     struct WalkFuncs walkFuncs;
-    struct phpWalk data;
+    struct jsonWalk data;
 
     data.out = evbuffer_new( );
     data.parents = NULL;
 
-    walkFuncs.intFunc = phpIntFunc;
-    walkFuncs.stringFunc = phpStringFunc;
-    walkFuncs.dictBeginFunc = phpDictBeginFunc;
-    walkFuncs.listBeginFunc = phpListBeginFunc;
-    walkFuncs.containerEndFunc = phpContainerEndFunc;
+    walkFuncs.intFunc = jsonIntFunc;
+    walkFuncs.stringFunc = jsonStringFunc;
+    walkFuncs.dictBeginFunc = jsonDictBeginFunc;
+    walkFuncs.listBeginFunc = jsonListBeginFunc;
+    walkFuncs.containerEndFunc = jsonContainerEndFunc;
 
     bencWalk( top, &walkFuncs, &data );
     
