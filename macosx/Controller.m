@@ -1990,10 +1990,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     BOOL groupRows = [fDefaults boolForKey: @"SortByGroup"] && [NSApp isOnLeopardOrBetter];
     if (groupRows)
     {
+        [fDisplayedTorrents removeAllObjects];
+        
         NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: YES] autorelease];
         allTorrents = [allTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
         
-        NSMutableArray * groups = [NSMutableArray array], * groupTorrents;
+        NSMutableArray * groupTorrents;
         int oldGroupValue = -2;
         for (i = 0; i < [allTorrents count]; i++)
         {
@@ -2004,15 +2006,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 groupTorrents = [NSMutableArray array];
                 NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt: groupValue], @"Group",
                                         groupTorrents, @"Torrents", nil];
-                [groups addObject: dict];
+                [fDisplayedTorrents addObject: dict];
                 
                 oldGroupValue = groupValue;
             }
             
             [groupTorrents addObject: torrent];
         }
-        
-        [fDisplayedTorrents setArray: groups];
     }
     else
         [fDisplayedTorrents setArray: allTorrents];
@@ -2036,7 +2036,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     [self setBottomCountText: groupRows || filterStatus || filterGroup || filterText];
-
+    
     [self setWindowSizeToFit];
 }
 
@@ -2662,25 +2662,31 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             }
         }
         
-        #warning get working
         //reset groups
-        /*if (item)
+        if (item)
         {
-            
             //change groups
             int groupValue = [[item objectForKey: @"Group"] intValue];
             NSEnumerator * enumerator = [movingTorrents objectEnumerator];
             Torrent * torrent;
             while ((torrent = [enumerator nextObject]))
+            {
+                //have to reset objects here to avoid weird crash
+                [[[fTableView parentForItem: torrent] objectForKey: @"Torrent"] removeObject: torrent];
+                [[item objectForKey: @"Torrent"] addObject: torrent];
+                
                 [torrent setGroupValue: groupValue];
-        }*/
+            }
+            //part 1 of avoiding weird crash
+            [fTableView reloadItem: nil reloadChildren: YES];
+        }
+        
+        //remove objects to reinsert
+        [fTorrents removeObjectsInArray: movingTorrents];
         
         //get all torrents to reorder
         NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: YES] autorelease];
         [fTorrents sortUsingDescriptors: [NSArray arrayWithObject: orderDescriptor]];
-        
-        //remove objects to reinsert
-        [fTorrents removeObjectsInArray: movingTorrents];
         
         //insert objects at new location
         int insertIndex = topTorrent ? [fTorrents indexOfObject: topTorrent] + 1 : 0;
