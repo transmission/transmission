@@ -3,6 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.30 (2008/mm/dd)
 http://trac.transmissionbt.com/query?group=component&milestone=1.30
 - Mac
+   + Torrents can be dragged to different groups
    + Status strings are toggled from the action button (they are no longer clickable)
 
 1.20 (2008/05/09)
