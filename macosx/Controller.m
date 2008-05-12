@@ -2620,7 +2620,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             }
             else
             {
-                if (![[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER])
+                if ([[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER])
+                    index = [[item objectForKey: @"Torrents"] count];
+                else
                     index = NSOutlineViewDropOnItemIndex;
             }
         }
