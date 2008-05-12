@@ -2609,21 +2609,27 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         {
             if (!item)
                 return NSDragOperationNone;
-            else if ([item isKindOfClass: [Torrent class]])
+            
+            if ([[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER])
             {
-                NSDictionary * group = [fTableView parentForItem: item];
-                if ([[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER])
+                if ([item isKindOfClass: [Torrent class]])
+                {
+                    NSDictionary * group = [fTableView parentForItem: item];
                     index = [[group objectForKey: @"Torrents"] indexOfObject: item] + 1;
+                    item = group;
+                }
                 else
-                    index = NSOutlineViewDropOnItemIndex;
-                item = group;
+                {
+                    if (index == NSOutlineViewDropOnItemIndex)
+                        index = [[item objectForKey: @"Torrents"] count];
+                }
             }
             else
             {
-                if ([[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER])
-                    index = [[item objectForKey: @"Torrents"] count];
-                else
-                    index = NSOutlineViewDropOnItemIndex;
+                if ([item isKindOfClass: [Torrent class]])
+                    item = [fTableView parentForItem: item];
+                
+                index = NSOutlineViewDropOnItemIndex;
             }
         }
         else
