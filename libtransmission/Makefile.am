@@ -58,6 +58,7 @@ noinst_HEADERS = \
     handshake.h \
     inout.h \
     ipcparse.h \
+    json.h \
     list.h \
     makemeta.h \
     metainfo.h \

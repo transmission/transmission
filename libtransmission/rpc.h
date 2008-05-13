@@ -15,10 +15,18 @@
 
 struct tr_handle;
 
+/* http://www.json.org/ */
 char*
-tr_rpc_request_exec( struct tr_handle  * handle,
-                     const void        * request_json,
-                     int                 request_len,
-                     int               * response_len );
+tr_rpc_request_exec_json( struct tr_handle  * handle,
+                          const void        * request_json,
+                          int                 request_len,
+                          int               * response_len );
+
+/* http://mjtemplate.org/examples/rison.html */
+char*
+tr_rpc_request_exec_rison( struct tr_handle  * handle,
+                           const void        * request_rison,
+                           int                 request_len,
+                           int               * response_len );
 
 #endif

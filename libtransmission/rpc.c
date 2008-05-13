@@ -16,6 +16,7 @@
 #include "transmission.h"
 #include "bencode.h"
 #include "rpc.h"
+#include "json.h"
 #include "torrent.h"
 #include "utils.h"
 
@@ -604,21 +605,42 @@ request_exec( struct tr_handle * handle,
     if( !result )
          result = "success";
     tr_bencDictAddStr( &response, "result", result );
+fprintf( stderr, "response [%s]", tr_bencSave( &response, NULL ) );
+tr_bencPrint( &response );
     out = tr_bencSaveAsJSON( &response, response_len );
     tr_bencFree( &response );
     return out;
 }
 
 char*
-tr_rpc_request_exec( struct tr_handle  * handle,
-                     const void        * request_json,
-                     int                 request_len,
-                     int               * response_len )
+tr_rpc_request_exec_json( struct tr_handle  * handle,
+                         const void         * request_json,
+                         int                  request_len,
+                         int                * response_len )
 {
     tr_benc top;
-    int have_content = !tr_jsonParse( request_json, (const char*)request_json + request_len, &top, NULL );
-    char * ret = request_exec( handle, have_content ? &top : NULL, response_len );
+    int have_content;
+    char * ret;
+
+    if( request_len < 0 )
+        request_len = strlen( request_json );
+
+    have_content = !tr_jsonParse( request_json, (const char*)request_json + request_len, &top, NULL );
+    ret = request_exec( handle, have_content ? &top : NULL, response_len );
+
     if( have_content )
         tr_bencFree( &top );
+    return ret;
+}
+
+char*
+tr_rpc_request_exec_rison( struct tr_handle  * handle,
+                           const void        * request_rison,
+                           int                 request_len,
+                           int               * response_len )
+{
+    char * json = tr_rison2json( request_rison, request_len );
+    char * ret = tr_rpc_request_exec_json( handle, json, -1, response_len );
+    tr_free( json );
     return ret;
 }

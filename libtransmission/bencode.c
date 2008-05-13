@@ -1036,18 +1036,14 @@ jsonChildFunc( struct jsonWalk * data )
                 const int i = parentState->childIndex++;
                 if( ! ( i % 2 ) )
                     evbuffer_add_printf( data->out, ": " );
-                else if( parentState->childIndex < parentState->childCount )
-                    evbuffer_add_printf( data->out, ", " );
                 else
-                    evbuffer_add_printf( data->out, " }" );
+                    evbuffer_add_printf( data->out, ", " );
                 break;
             }
 
             case TYPE_LIST: {
-                if( ++parentState->childIndex < parentState->childCount )
-                    evbuffer_add_printf( data->out, ", " );
-                else
-                    evbuffer_add_printf( data->out, " ]" );
+                ++parentState->childIndex;
+                evbuffer_add_printf( data->out, ", " );
                 break;
             }
 
@@ -1109,6 +1105,8 @@ jsonDictBeginFunc( const tr_benc * val, void * vdata )
     struct jsonWalk * data = vdata;
     jsonPushParent( data, val );
     evbuffer_add_printf( data->out, "{ " );
+    if( !val->val.l.count )
+        evbuffer_add_printf( data->out, "  " );
 }
 static void
 jsonListBeginFunc( const tr_benc * val, void * vdata )
@@ -1116,11 +1114,18 @@ jsonListBeginFunc( const tr_benc * val, void * vdata )
     struct jsonWalk * data = vdata;
     jsonPushParent( data, val );
     evbuffer_add_printf( data->out, "[ " );
+    if( !val->val.l.count )
+        evbuffer_add_printf( data->out, "  " );
 }
 static void
-jsonContainerEndFunc( const tr_benc * val UNUSED, void * vdata )
+jsonContainerEndFunc( const tr_benc * val, void * vdata )
 {
     struct jsonWalk * data = vdata;
+    EVBUFFER_LENGTH( data->out ) -= 2;
+    if( tr_bencIsDict( val ) )
+        evbuffer_add_printf( data->out, " }" );
+    else /* list */
+        evbuffer_add_printf( data->out, " ]" );
     jsonPopParent( data );
     jsonChildFunc( data );
 }

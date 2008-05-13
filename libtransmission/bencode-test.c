@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "transmission.h"
 #include "bencode.h"
+#include "json.h"
 #include "utils.h" /* tr_free */
 
 #define VERBOSE 0
@@ -271,12 +272,44 @@ testParse( void )
 }
 
 static int
+testRISONSnippet( const char * rison_str, const char * expected )
+{
+    char * serialized = tr_rison2json( rison_str, -1 );
+#if 0
+fprintf( stderr, " expected: [%s]\n", expected );
+fprintf( stderr, "      got: [%s]\n", serialized );
+#endif
+    check( !strcmp( serialized, expected ) );
+    tr_free( serialized );
+    return 0;
+}
+
+static int
+testRISON( void )
+{
+    int val;
+    const char * rison;
+    const char * expected;
+
+    rison = "(a:0,b:foo,c:'23skidoo')";
+    expected = "{ \"a\": 0, \"b\": \"foo\", \"c\": \"23skidoo\" }";
+    if(( val = testRISONSnippet( rison, expected )))
+        return val;
+
+    return 0;
+}
+
+static int
 testJSONSnippet( const char * benc_str, const char * expected )
 {
     tr_benc top;
     char * serialized;
     tr_bencLoad( benc_str, strlen( benc_str ), &top, NULL );
     serialized = tr_bencSaveAsJSON( &top, NULL );
+#if 0
+fprintf( stderr, " expected: [%s]\n", expected );
+fprintf( stderr, "      got: [%s]\n", serialized );
+#endif
     check( !strcmp( serialized, expected ) );
     tr_free( serialized );
     tr_bencFree( &top );
@@ -307,6 +340,11 @@ testJSON( void )
 
     benc_str = "d5:helloi1e5:worldi2e3:fooli1ei2ei3ed1:ai0eee";
     expected = "{ \"foo\": [ 1, 2, 3, { \"a\": 0 } ], \"hello\": 1, \"world\": 2 }";
+    if(( val = testJSONSnippet( benc_str, expected )))
+        return val;
+
+    benc_str = "d4:argsd6:statuslee6:result7:successe";
+    expected = "{ \"args\": { \"status\": [  ] }, \"result\": \"success\" }";
     if(( val = testJSONSnippet( benc_str, expected )))
         return val;
 
@@ -360,6 +398,9 @@ main( void )
         return i;
 
     if(( i = testJSON( )))
+        return i;
+
+    if(( i = testRISON( )))
         return i;
 
     if(( i = testStackSmash( )))

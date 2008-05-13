@@ -11,11 +11,12 @@
  */
 
 #include <assert.h>
-//#include <string.h> /* memcpy, memcmp, strstr */
-//#include <stdlib.h> /* qsort */
+#include <ctype.h>
+#include <string.h>
 #include <stdio.h> /* printf */
-//#include <limits.h> /* INT_MAX */
-//
+
+#include <event.h> /* evbuffer */
+
 #include "JSON_checker.h"
 
 #include "transmission.h"
@@ -144,4 +145,122 @@ tr_jsonParse( const void      * vbuf,
     delete_JSON_checker( checker );
     tr_ptrArrayFree( data.stack, NULL );
     return err;
+}
+
+/***
+**** RISON-to-JSON converter
+***/
+
+enum { ESCAPE,
+       STRING_BEGIN,
+       STRING, ESCAPE_STRING,
+       UNQUOTED_STRING, ESCAPE_UNQUOTED_STRING,
+       VAL_BEGIN,
+       OTHER };
+
+char*
+tr_rison2json( const char * str, int rison_len )
+{
+    struct evbuffer * out = evbuffer_new( );
+    int stack[1000], *parents=stack;
+    int mode = OTHER;
+    char * ret;
+    const char * end;
+
+    if( rison_len < 0 )
+        end = str + strlen( str );
+    else
+        end = str + rison_len;
+
+#define IN_OBJECT ((parents!=stack) && (parents[-1]=='}'))
+
+    for( ; str!=end; ++str )
+    {
+        if( mode == ESCAPE )
+        {
+            switch( *str )
+            {
+                case '(': evbuffer_add_printf( out, "[ " ); *parents++ = ']'; break;
+                case 't': evbuffer_add_printf( out, " true" ); break;
+                case 'f': evbuffer_add_printf( out, " false" ); break;
+                case 'n': evbuffer_add_printf( out, " null" ); break;
+                default: fprintf( stderr, "invalid escape sequence!\n" ); break;
+            }
+            mode = OTHER;
+        }
+        else if( mode == STRING_BEGIN )
+        {
+            switch( *str )
+            {
+                case '\'': evbuffer_add_printf( out, "\"" ); mode = STRING; break;
+                case ')': evbuffer_add_printf( out, " %c", *--parents ); mode = OTHER; break;
+                default: evbuffer_add_printf( out, "\"%c", *str ); mode = UNQUOTED_STRING; break;
+            }
+        }
+        else if( mode == UNQUOTED_STRING )
+        {
+            switch( *str )
+            {
+                case '\'': evbuffer_add_printf( out, "\"" ); mode = OTHER; break;
+                case ':': evbuffer_add_printf( out, "\": "); mode = VAL_BEGIN; break;
+                case '!': mode = ESCAPE_UNQUOTED_STRING; break;
+                case ',': if( IN_OBJECT ) { evbuffer_add_printf( out, "\", "); mode = STRING_BEGIN; break; }
+                          /* fallthrough */
+                default: evbuffer_add_printf( out, "%c", *str ); break;
+            }
+        }
+        else if( mode == VAL_BEGIN )
+        {
+            if( *str == '\'' ) { evbuffer_add_printf( out, "\"" ); mode = STRING; }
+            else if( isdigit( *str ) ) { evbuffer_add_printf( out, "%c", *str ); mode = OTHER; }
+            else { evbuffer_add_printf( out, "\"%c", *str ); mode = UNQUOTED_STRING; }
+        }
+        else if( mode == STRING )
+        {
+            switch( *str )
+            {
+                case '\'': evbuffer_add_printf( out, "\"" ); mode = OTHER; break;
+                case '!': mode = ESCAPE_STRING; break;
+                default: evbuffer_add_printf( out, "%c", *str ); break;
+            }
+        }
+        else if( mode == ESCAPE_STRING || mode == ESCAPE_UNQUOTED_STRING )
+        {
+            switch( *str )
+            {
+                case '!': evbuffer_add_printf( out, "!" ); break;
+                case '\'': evbuffer_add_printf( out, "'" ); break;
+                default: fprintf( stderr, "invalid string escape sequence\n" ); break;
+            }
+            if( mode == ESCAPE_UNQUOTED_STRING ) mode = UNQUOTED_STRING;
+            if( mode == ESCAPE_STRING ) mode = STRING;
+        }
+        else
+        {
+            switch( *str )
+            {
+                case '(': evbuffer_add_printf( out, "{ " ); mode=STRING_BEGIN; *parents++ = '}'; break;
+                case '!': mode = ESCAPE; break;
+                case ')': evbuffer_add_printf( out, " %c", *--parents ); break;
+                case '\'': evbuffer_add_printf( out, "\"" ); mode = STRING; break;
+                case ':': if( IN_OBJECT ) {
+                              evbuffer_add_printf( out, ": " ); mode = VAL_BEGIN;
+                          } else {
+                              evbuffer_add_printf( out, "%c", *str );
+                          }
+                          break;
+                case ',': if( IN_OBJECT ) {
+                              evbuffer_add_printf( out, ", " ); mode = STRING_BEGIN;
+                          } else {
+                              evbuffer_add_printf( out, "%c", *str );
+                          }
+                          break;
+                default: evbuffer_add_printf( out, "%c", *str ); break;
+            }
+        }
+    }
+
+    ret = tr_strdup( (char*) EVBUFFER_DATA( out ) );
+    evbuffer_free( out );
+    return ret;
 }
