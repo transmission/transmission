@@ -7,18 +7,18 @@
 
    The JSON terminology in RFC 4627 is used. "array" is equivalent
    to a benc list; "object" is equivalent to a benc dictionary;
-   an object's "strings" are the dictionary's keys,
-   and an object's "members" are its string/value pairs.
+   an object's "keys" are the dictionary's string keys,
+   and an object's "members" are its key/value pairs.
 
 2.  Message Format
 
    Messages are formatted in a subset of JSON that understands
    arrays, maps, strings, and whole numbers with no exponentials --
-   in short, the subset of JSON easily represented in benc.
-   floating-point numbers are represented as strings.
-   booleans are represented as integers where 0 is false and 1 is true.
+   in short, the subset of JSON easily represented as bencoded data.
+   Floating-point numbers are represented as strings.
+   Booleans are represented as integers where 0 is false and 1 is true.
 
-   Messages are represented as a JSON objects.  There are two types:
+   Messages are represented as JSON objects.  There are two types:
    requests (described in 2.1) and responses (described in 2.2).
 
 2.1.  Requests
@@ -46,12 +46,12 @@
    Method names: "torrent-start", "torrent-stop",
                  "torrent-remove", "torrent-verify"
 
-   Request arguments: "ids", a list of unique torrent ids, sha1 hash strings,
+   Request arguments: "ids", a list of torrent id integers, sha1 hash strings,
                       or both.  These are the torrents that the request will
                       be applied to.  If "ids" is ommitted, the request is
                       applied to all torrents.
 
-   Response arguments: none.
+   Response arguments: none
 
 3.2.  Torrent Info Requests
 
@@ -71,13 +71,13 @@
       {
          "arguments": { "ids": [ 7, 10 ] }
          "method": "torrent-info",
-         "tag": 666
+         "tag": 39693
       }
 
    Example Response:
 
       {
-         "tag": 666
+         "tag": 39693
          "result": "success",
          "arguments": {
             "info": [
@@ -108,11 +108,11 @@
    Request arguments: 3.1's optional "ids" argument.
 
    Response arguments: "status", an array of objects based on
-   libtransmission's tr_stat struct but which differ the following ways:
+   libtransmission's tr_stat struct but which differ in the following ways:
 
-   (1) tr_stat's "tracker" field is omitted
-   (2) a new string, "announce-url", is added
-   (3) a new string, "scrape-url", is added
+   (1) tr_stat's "tracker" field is omitted.
+   (2) a new string, "announce-url", is added.
+   (3) a new string, "scrape-url", is added.
 
 3.4.  Adding a Torrent
 
@@ -122,15 +122,15 @@
 
    string             | value type & description
    -------------------+-------------------------------------------------
-   "paused"           | boolean   if true, don't start the torrent
    "destination"      | string    path to download the torrent to
    "filename"         | string    location of the .torrent file
+   "paused"           | boolean   if true, don't start the torrent
    "peer-limit"       | int       maximum number of peers
 
    The "filename" argument is required; all others are optional.
 
    Response arguments: on success, a "torrent-added" object in the
-                       form of one of 3.1's tr_info objects.
+                       form of one of 3.2's tr_info objects.
 
 3.5.  Other torrent settings
 
@@ -172,16 +172,16 @@
 
 3.6.1.  Mutators
 
-    Method name: "torrent-set-file"
+    Method name: "torrent-set-priorities"
     Request arguments: 3.1's "ids", plus one or more of 3.6's arguments
     Response arguments: none
 
 3.6.2.  Accessors
 
-    Method name: "torrent-get-file"
+    Method name: "torrent-get-priorities"
     Request arguments: none
-   Response arguments: A "torrents" list of objects containing all
-                       of 3.6's arguments plus the torrent's "id" int.
+    Response arguments: A "torrents" list of objects containing all
+                        of 3.6's arguments plus the torrent's "id" int.
    
 4.   Session Status Requests
 
@@ -191,9 +191,9 @@
    ---------------------------+-------------------------------------------------
    "encryption"               | string   "required", "preferred", "tolerated"
    "peer-limit"               | int      maximum global number of peers
+   "pex-allowed"              | boolean  true means allow pex in public torrents
    "port"                     | int      port number
    "port-forwarding-enabled"  | boolean  true means enabled.
-   "pex-allowed"              | boolean  true means allow pex in public torrents
    "speed-limit-down"         | int      max global download speed (in KiB/s)
    "speed-limit-down-enabled" | int      max global download speed (in KiB/s)
    "speed-limit-up"           | int      max global upload speed (in KiB/s)

@@ -204,6 +204,7 @@ tr_rison2json( const char * str, int rison_len )
                 case '\'': evbuffer_add_printf( out, "\"" ); mode = OTHER; break;
                 case ':': evbuffer_add_printf( out, "\": "); mode = VAL_BEGIN; break;
                 case '!': mode = ESCAPE_UNQUOTED_STRING; break;
+                case ')': if( IN_OBJECT ) { evbuffer_add_printf( out, "\" }"); mode = OTHER; break; }
                 case ',': if( IN_OBJECT ) { evbuffer_add_printf( out, "\", "); mode = STRING_BEGIN; break; }
                           /* fallthrough */
                 default: evbuffer_add_printf( out, "%c", *str ); break;

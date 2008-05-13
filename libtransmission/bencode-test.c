@@ -275,10 +275,8 @@ static int
 testRISONSnippet( const char * rison_str, const char * expected )
 {
     char * serialized = tr_rison2json( rison_str, -1 );
-#if 0
 fprintf( stderr, " expected: [%s]\n", expected );
 fprintf( stderr, "      got: [%s]\n", serialized );
-#endif
     check( !strcmp( serialized, expected ) );
     tr_free( serialized );
     return 0;
@@ -293,6 +291,11 @@ testRISON( void )
 
     rison = "(a:0,b:foo,c:'23skidoo')";
     expected = "{ \"a\": 0, \"b\": \"foo\", \"c\": \"23skidoo\" }";
+    if(( val = testRISONSnippet( rison, expected )))
+        return val;
+
+    rison = "(method:torrent-info)";
+    expected = "{ \"method\": \"torrent-info\" }";
     if(( val = testRISONSnippet( rison, expected )))
         return val;
 
