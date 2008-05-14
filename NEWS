@@ -1,5 +1,11 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.21 (2008/mm/dd)
+http://trac.transmissionbt.com/query?group=component&milestone=1.21
+- Mac
+   + Fix visual glitch with the pieces bar
+   + Italian localization included
+
 1.20 (2008/05/09)
 http://trac.transmissionbt.com/query?group=component&milestone=1.20
 - All Platforms

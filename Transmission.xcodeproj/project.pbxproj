@@ -448,6 +448,13 @@
 		A2012AE10D77151D0056FD71 /* YingYangGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = YingYangGroupTemplate.png; path = macosx/Images/YingYangGroupTemplate.png; sourceTree = "<group>"; };
 		A20152630D1C1BE70081714F /* PinTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PinTemplate.png; path = macosx/Images/PinTemplate.png; sourceTree = "<group>"; };
 		A20152790D1C26EB0081714F /* torrent-ctor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "torrent-ctor.c"; path = "libtransmission/torrent-ctor.c"; sourceTree = "<group>"; };
+		A202FF120DDA91E4009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/AddWindow.xib; sourceTree = "<group>"; };
+		A202FF130DDA91E4009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/Creator.xib; sourceTree = "<group>"; };
+		A202FF140DDA91E4009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = macosx/it.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A202FF150DDA91E4009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/InfoWindow.xib; sourceTree = "<group>"; };
+		A202FF160DDA91E4009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = macosx/it.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A202FF170DDA91E4009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		A202FF180DDA91E4009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = macosx/AboutWindowController.h; sourceTree = "<group>"; };
 		A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = macosx/AboutWindowController.m; sourceTree = "<group>"; };
 		A2085E2F0C53C833000BC3B7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -2013,6 +2020,7 @@
 				A223AA7E0D220CEB00840069 /* nl */,
 				A26AF1050D2855FC00FF7140 /* ru */,
 				A28AFE070DA1C47A00673957 /* zh_TW */,
+				A202FF140DDA91E4009938FF /* it */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -2026,6 +2034,7 @@
 				A223AA800D220CEB00840069 /* nl */,
 				A26AF1070D2855FC00FF7140 /* ru */,
 				A28AFE090DA1C47A00673957 /* zh_TW */,
+				A202FF160DDA91E4009938FF /* it */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2039,6 +2048,7 @@
 				A265A3C20D25AE7800198AC8 /* es */,
 				A26AF10A0D2855FC00FF7140 /* ru */,
 				A28AFE0B0DA1C47A00673957 /* zh_TW */,
+				A202FF180DDA91E4009938FF /* it */,
 			);
 			name = PrefsWindow.xib;
 			sourceTree = "<group>";
@@ -2052,6 +2062,7 @@
 				A265A3C00D25AE7800198AC8 /* es */,
 				A26AF1080D2855FC00FF7140 /* ru */,
 				A28AFE0A0DA1C47A00673957 /* zh_TW */,
+				A202FF170DDA91E4009938FF /* it */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -2065,6 +2076,7 @@
 				A2CBDF9E0D9AD08100BB22BC /* ru */,
 				A2B5BB7A0D9C7C2300FCB650 /* es */,
 				A28AFE050DA1C47A00673957 /* zh_TW */,
+				A202FF120DDA91E4009938FF /* it */,
 			);
 			name = AddWindow.xib;
 			sourceTree = "<group>";
@@ -2078,6 +2090,7 @@
 				A265A3BE0D25AE7800198AC8 /* es */,
 				A26AF1040D2855FC00FF7140 /* ru */,
 				A28AFE060DA1C47A00673957 /* zh_TW */,
+				A202FF130DDA91E4009938FF /* it */,
 			);
 			name = Creator.xib;
 			sourceTree = "<group>";
@@ -2091,6 +2104,7 @@
 				A265A3BF0D25AE7800198AC8 /* es */,
 				A26AF1060D2855FC00FF7140 /* ru */,
 				A28AFE080DA1C47A00673957 /* zh_TW */,
+				A202FF150DDA91E4009938FF /* it */,
 			);
 			name = InfoWindow.xib;
 			sourceTree = "<group>";
