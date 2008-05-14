@@ -2618,17 +2618,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     index = [[group objectForKey: @"Torrents"] indexOfObject: item] + 1;
                     item = group;
                 }
-                else
-                {
-                    if (index == NSOutlineViewDropOnItemIndex)
-                        index = [[item objectForKey: @"Torrents"] count];
-                }
             }
             else
             {
                 if ([item isKindOfClass: [Torrent class]])
                     item = [fTableView parentForItem: item];
-                
                 index = NSOutlineViewDropOnItemIndex;
             }
         }
@@ -2685,7 +2679,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         }
         
         //reorder queue order
-        if ([[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER])
+        if (newRow != NSOutlineViewDropOnItemIndex)
         {
             //find torrent to place under
             NSArray * groupTorrents = item ? [item objectForKey: @"Torrents"] : fDisplayedTorrents;
