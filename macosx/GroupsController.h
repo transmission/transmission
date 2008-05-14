@@ -38,8 +38,6 @@
 - (int) rowValueForIndex: (int) index;
 - (int) indexForRow: (int) row;
 
-- (CTGradient *) gradientForIndex: (int) index;
-
 - (NSString *) nameForIndex: (int) index;
 - (void) setName: (NSString *) name forIndex: (int) index;
 

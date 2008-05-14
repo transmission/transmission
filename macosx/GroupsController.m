@@ -128,13 +128,6 @@ GroupsController * fGroupsInstance = nil;
     return [[[fGroups objectAtIndex: row] objectForKey: @"Index"] intValue];
 }
 
-- (CTGradient *) gradientForIndex: (int) index
-{
-    int orderIndex = [self rowValueForIndex: index];
-    //return orderIndex != -1 ? [self gradientForColor: [[fGroups objectAtIndex: orderIndex] objectForKey: @"Color"]] : nil;
-    return [CTGradient gradientWithBeginningColor: [NSColor blueColor] endingColor: [NSColor redColor]];
-}
-
 - (NSString *) nameForIndex: (int) index
 {
     int orderIndex = [self rowValueForIndex: index];
@@ -301,7 +294,7 @@ GroupsController * fGroupsInstance = nil;
     [icon lockFocus];
     
     //border
-    CTGradient * gradient = [CTGradient gradientWithBeginningColor: [color blendedColorWithFraction: 0.55 ofColor:
+    CTGradient * gradient = [CTGradient gradientWithBeginningColor: [color blendedColorWithFraction: 0.45 ofColor:
                                 [NSColor whiteColor]] endingColor: color];
     [gradient fillBezierPath: bp angle: 270.0];
     

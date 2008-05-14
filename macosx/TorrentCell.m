@@ -435,7 +435,7 @@
         
         //border
         NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: groupRect radius: 6.0];
-        CTGradient * gradient = [CTGradient gradientWithBeginningColor: [groupColor blendedColorWithFraction: 0.55 ofColor:
+        CTGradient * gradient = [CTGradient gradientWithBeginningColor: [groupColor blendedColorWithFraction: 0.45 ofColor:
                                 [NSColor whiteColor]] endingColor: groupColor];
         [gradient fillBezierPath: bp angle: 90.0];
         
