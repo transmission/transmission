@@ -431,8 +431,19 @@
             groupRect.origin.y--;
         }
         
-        [[[GroupsController groups] gradientForIndex: groupValue] fillBezierPath:
-            [NSBezierPath bezierPathWithRoundedRect: groupRect radius: 6.0] angle: 90.0];
+        NSColor * groupColor = [[GroupsController groups] colorForIndex: groupValue];
+        
+        //border
+        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: groupRect radius: 6.0];
+        CTGradient * gradient = [CTGradient gradientWithBeginningColor: [groupColor blendedColorWithFraction: 0.55 ofColor:
+                                [NSColor whiteColor]] endingColor: groupColor];
+        [gradient fillBezierPath: bp angle: 90.0];
+        
+        //inside
+        bp = [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(groupRect, 1.0, 1.0) radius: 6.0];
+        gradient = [CTGradient gradientWithBeginningColor: [groupColor blendedColorWithFraction: 0.65 ofColor: [NSColor whiteColor]]
+                    endingColor: [groupColor blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]]];
+        [gradient fillBezierPath: bp angle: 90.0];
     }
     
     //error image
