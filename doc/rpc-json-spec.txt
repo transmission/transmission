@@ -39,6 +39,26 @@
    (2) An optional "arguments" object of name/value pairs
    (3) An optional "tag" integer as described in 2.1.
 
+2.3.  Request IPC Notation
+
+   As a convenience, a casual URI notation is supported for requests via the
+   query portion of a URI.  The advantage of this is that all current requests
+   can be invoked via a very simple http GET request.  The possible future
+   disadvantage is that it limits nesting and listing structured requests.
+
+   The URI notation works as follows:
+   (1) Any key not "tag" or "method" is assumed to be in "arguments".
+   (2) The "arguments" key isn't needed, since data isn't nested.
+   (3) If the entire value in a key/value pair can be parsed as an integer,
+       it's parsed into a JSON number.
+       Otherwise, if the value can be parsed as comma-delimited integers,
+       it's parsed into a JSON array of integers.
+       Otherwise, the value is treated as a string.
+
+   Examples:
+   ?method=torrent-start&ids=1,2
+   ?method=session-set&speed-limit-down=50&speed-limit-down-enabled=1
+
 3.  Torrent Requests
 
 3.1.  Torrent Action Requests
@@ -113,6 +133,7 @@
    (1) tr_stat's "tracker" field is omitted.
    (2) a new string, "announce-url", is added.
    (3) a new string, "scrape-url", is added.
+   (4) tr_info's "name" field is added.
 
 3.4.  Adding a Torrent
 
@@ -122,7 +143,7 @@
 
    string             | value type & description
    -------------------+-------------------------------------------------
-   "destination"      | string    path to download the torrent to
+   "download-dir"     | string    path to download the torrent to
    "filename"         | string    location of the .torrent file
    "paused"           | boolean   if true, don't start the torrent
    "peer-limit"       | int       maximum number of peers
@@ -164,11 +185,11 @@
 
    string             | value type & description
    -------------------+-------------------------------------------------
+   "files-wanted"     | array     indices of one or more file to download
+   "files-unwanted"   | array     indices of one or more file to not download
    "priority-high"    | array     indices of one or more high-priority files
    "priority-low"     | array     indices of one or more low-priority files
    "priority-normal"  | array     indices of one or more normal-priority files
-   "download"         | array     indices of one or more file to download
-   "no-download"      | array     indices of one or more file to not download
 
 3.6.1.  Mutators
 
@@ -190,6 +211,7 @@
    string                     | value type & description
    ---------------------------+-------------------------------------------------
    "encryption"               | string   "required", "preferred", "tolerated"
+   "download-dir"             | string   default path to download torrents
    "peer-limit"               | int      maximum global number of peers
    "pex-allowed"              | boolean  true means allow pex in public torrents
    "port"                     | int      port number
