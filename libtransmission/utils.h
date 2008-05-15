@@ -30,7 +30,54 @@
 #include <stddef.h> /* for size_t */
 #include <stdio.h> /* FILE* */
 
-void tr_msgInit( void );
+/***
+****
+***/
+
+#ifndef UNUSED
+#ifdef __GNUC__
+#define UNUSED __attribute__((unused))
+#else
+#define UNUSED
+#endif
+#endif
+
+#ifndef TR_GNUC_PRINTF
+#ifdef __GNUC__
+#define TR_GNUC_PRINTF( fmt, args ) __attribute__((format (printf, fmt, args)))
+#else
+#define TR_GNUC_PRINTF( fmt, args )
+#endif
+#endif
+
+#ifndef TR_GNUC_NULL_TERMINATED
+#if __GNUC__ >= 4
+#define TR_GNUC_NULL_TERMINATED __attribute__((__sentinel__))
+#else
+#define TR_GNUC_NULL_TERMINATED
+#endif
+#endif
+
+#ifndef TR_GNUC_NULL_TERMINATED
+#if __GNUC__ >= 4
+#define TR_GNUC_NULL_TERMINATED __attribute__((__sentinel__))
+#else
+#define TR_GNUC_NULL_TERMINATED
+#endif
+#endif
+
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 96)
+#define TR_GNUC_PURE __attribute__((__pure__))
+#define TR_GNUC_MALLOC __attribute__((__malloc__))
+#else
+#define TR_GNUC_PURE
+#define TR_GNUC_MALLOC
+#endif
+
+
+/***
+****
+***/
 
 #if !defined(_)
 #if defined(SYS_DARWIN)
@@ -54,10 +101,18 @@ void tr_msgInit( void );
 #define tr_err( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, NULL, ## a )
 #define tr_inf( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, NULL, ## a )
 #define tr_dbg( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, NULL, ## a )
-void tr_msg  ( const char * file, int line, int level, const char * torrent, const char * fmt, ... );
+
+void tr_msgInit( void );
+
+void tr_msg( const char * file, int line,
+             int level, const char * torrent,
+             const char * fmt, ... ) TR_GNUC_PRINTF( 5, 6 );
+
 FILE* tr_getLog( void );
 
-void tr_deepLog( const char * file, int line, const char * name, const char * fmt, ... ); 
+void tr_deepLog( const char * file, int line,
+                 const char * name,
+                 const char * fmt, ... ) TR_GNUC_PRINTF( 4, 5 );
 
 char* tr_getLogTimeStr( char * buf, int buflen );
 
@@ -82,13 +137,14 @@ int tr_mkdir( const char * path, int permissions );
 int tr_mkdirp( const char * path, int permissions );
 
 
-uint8_t* tr_loadFile( const char * filename, size_t * size );
+uint8_t* tr_loadFile( const char * filename, size_t * size ) TR_GNUC_MALLOC;
 
 
 /* creates a filename from a series of elements using the
    correct separator for filenames. */
 void tr_buildPath( char* buf, size_t buflen,
-                   const char * first_element, ... );
+                   const char * first_element, ... )
+                                      TR_GNUC_NULL_TERMINATED;
 
 struct timeval tr_timevalMsec( uint64_t milliseconds );
 
@@ -127,13 +183,14 @@ void tr_wait( uint64_t delay_milliseconds );
 #define tr_renew(struct_type, mem, n_structs)    \
     ((struct_type *) realloc ((mem), ((size_t) sizeof (struct_type)) * ((size_t) (n_structs))))
 
-void* tr_malloc  ( size_t );
-void* tr_malloc0 ( size_t );
-void* tr_calloc  ( size_t nmemb, size_t size );
+void* tr_malloc  ( size_t ) TR_GNUC_MALLOC;
+void* tr_malloc0 ( size_t ) TR_GNUC_MALLOC;
+void* tr_calloc  ( size_t nmemb, size_t size ) TR_GNUC_MALLOC;
 void  tr_free    ( void* );
 
-char* tr_strdup( const char * str );
-char* tr_strndup( const char * str, int len );
+char* tr_strdup( const char * str ) TR_GNUC_MALLOC;
+char* tr_strndup( const char * str, int len ) TR_GNUC_MALLOC;
+char* tr_strdup_printf( const char * fmt, ... )  TR_GNUC_PRINTF( 1, 2 ) TR_GNUC_MALLOC;
 
 const char* tr_strerror( int );
 
@@ -180,8 +237,8 @@ struct tr_bitfield
 typedef struct tr_bitfield tr_bitfield;
 typedef struct tr_bitfield tr_bitfield_t;
 
-tr_bitfield* tr_bitfieldNew( size_t bitcount );
-tr_bitfield* tr_bitfieldDup( const tr_bitfield* );
+tr_bitfield* tr_bitfieldNew( size_t bitcount ) TR_GNUC_MALLOC;
+tr_bitfield* tr_bitfieldDup( const tr_bitfield* ) TR_GNUC_MALLOC;
 void tr_bitfieldFree( tr_bitfield*);
 
 void tr_bitfieldClear( tr_bitfield* );

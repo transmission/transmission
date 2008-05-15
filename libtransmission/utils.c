@@ -602,6 +602,22 @@ tr_strndup( const char * in, int len )
     return out;
 }
 
+char*
+tr_strdup_printf( const char * fmt, ... )
+{
+    char * ret = NULL;
+    struct evbuffer * buf;
+    va_list ap;
+
+    buf = evbuffer_new( );
+    va_start( ap, fmt );
+    if( evbuffer_add_vprintf( buf, fmt, ap ) != -1 )
+        ret = tr_strdup( (char*)EVBUFFER_DATA( buf ) );
+    evbuffer_free( buf );
+
+    return ret;
+}
+
 void*
 tr_calloc( size_t nmemb, size_t size )
 {
