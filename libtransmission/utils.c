@@ -251,7 +251,10 @@ tr_msg( const char * file, int line, int level,
             {
                 if( fp == NULL )
                     fp = stderr;
-                fprintf( fp, "%s\n", (char*)EVBUFFER_DATA(buf) );
+                if( name )
+                    fprintf( fp, "%s: %s\n", name, (char*)EVBUFFER_DATA(buf) );
+                else
+                    fprintf( fp, "%s\n", (char*)EVBUFFER_DATA(buf) );
                 fflush( fp );
             }
 
