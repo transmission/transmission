@@ -73,14 +73,23 @@
 
    Response arguments: none
 
-3.2.  Torrent Info Requests
+3.2.  Torrent List
+
+   Method name: "torrent-list".
+
+   Request arguments: none.
+
+   Response arguments: "list", an array of objects that contain two keys:
+   a torrent's name string, and its unique torrent id. 
+
+3.3.  Torrent Info Requests
 
    Method name: "torrent-info".
 
-   Request arguments: 3.1's optional "ids" argument.
+   Request arguments: an "id" number specifying a torrent id number
 
    Response arguments: "info", an array of objects based on libtransmission's
-   tr_info struct but differ in the following ways:
+   tr_info struct but different in the following ways:
 
    (1) tr_info's "hash" field is omitted.
    (2) tr_info's "pieces" field is omitted.
@@ -89,7 +98,7 @@
    Example Request: 
 
       {
-         "arguments": { "ids": [ 7, 10 ] }
+         "arguments": { "id": 7 }
          "method": "torrent-info",
          "tag": 39693
       }
@@ -100,42 +109,32 @@
          "tag": 39693
          "result": "success",
          "arguments": {
-            "info": [
-               {
-                  "id": 7,
-                  "totalSize": 9803930483,
-                  "pieceCount": 1209233,
-                  "pieceSize": 4096,
-                  "name": "Ubuntu x86_64 DVD",
-                  ...
-               },
-               {
-                  "id": 10,
-                  "totalSize": 2398480394,
-                  "pieceCount": 83943,
-                  "pieceSize": 12345,
-                  "name": "Ubuntu i386 DVD",
-                  ...
-               }
-            ]
+            "info": {
+               "id": 7,
+               "totalSize": 9803930483,
+               "pieceCount": 1209233,
+               "pieceSize": 4096,
+               "name": "Ubuntu x86_64 DVD",
+               ...
+            }
          }
       }
 
-3.3.  Torrent Status Requests
+3.4.  Torrent Status Requests
 
    Method name: "torrent-status"
 
-   Request arguments: 3.1's optional "ids" argument.
+   Request arguments: an "id" int specifying a torrent id number
 
-   Response arguments: "status", an array of objects based on
-   libtransmission's tr_stat struct but which differ in the following ways:
+   Response arguments: "status", an object based on libtransmission's
+   tr_stat struct but differerent in the following ways:
 
    (1) tr_stat's "tracker" field is omitted.
    (2) a new string, "announce-url", is added.
    (3) a new string, "scrape-url", is added.
    (4) tr_info's "name" field is added.
 
-3.4.  Adding a Torrent
+3.5.  Adding a Torrent
 
    Method name: "torrent-add"
 
@@ -151,9 +150,9 @@
    The "filename" argument is required; all others are optional.
 
    Response arguments: on success, a "torrent-added" object in the
-                       form of one of 3.2's tr_info objects.
+                       form of one of 3.3's tr_info objects.
 
-3.5.  Other torrent settings
+3.6.  Other torrent settings
 
    Common arguments:
 
@@ -165,21 +164,21 @@
    "speed-limit-up"           | int       maximum upload speed (in KiB/s)
    "speed-limit-up-enabled"   | boolean   true if the upload speed is limited
 
-3.5.1.  Mutators
+3.6.1.  Mutators
 
    Method name: "torrent-set"
-   Request arguments: 3.1's "ids", plus one or more of 3.5's arguments
+   Request arguments: 3.1's "ids", plus one or more of 3.6's arguments
    Response arguments: none
 
-3.5.2.  Accessors
+3.6.2.  Accessors
 
    Method name: "torrent-get"
    Request arguments: none
    Response arguments: A "torrents" list of objects containing all
-                       of 3.5's arguments plus the torrent's "id" int.
+                       of 3.6's arguments plus the torrent's "id" int.
                       
 
-3.6  File Priorities
+3.7  File Priorities
 
    Common arguments:
 
@@ -191,18 +190,18 @@
    "priority-low"     | array     indices of one or more low-priority files
    "priority-normal"  | array     indices of one or more normal-priority files
 
-3.6.1.  Mutators
+3.7.1.  Mutators
 
     Method name: "torrent-set-priorities"
-    Request arguments: 3.1's "ids", plus one or more of 3.6's arguments
+    Request arguments: 3.1's "ids", plus one or more of 3.7's arguments
     Response arguments: none
 
-3.6.2.  Accessors
+3.7.2.  Accessors
 
     Method name: "torrent-get-priorities"
     Request arguments: none
     Response arguments: A "torrents" list of objects containing all
-                        of 3.6's arguments plus the torrent's "id" int.
+                        of 3.7's arguments plus the torrent's "id" int.
    
 4.   Session Status Requests
 
