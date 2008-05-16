@@ -34,6 +34,7 @@
 
 - (id) initWithPrefsController: (PrefsController *) prefsController;
 - (void) startDownload;
+- (void) finishDownloadSuccess;
 - (void) updateProcessString;
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info;
 
@@ -108,28 +109,10 @@
 
 - (void) downloadDidFinish: (NSURLDownload *) download
 {
-    //change to indeterminate while processing
-    [fProgressBar setIndeterminate: YES];
-    [fProgressBar startAnimation: self];
-    
-    [fTextField setStringValue: [NSLocalizedString(@"Processing blocklist", "Blocklist -> message") stringByAppendingEllipsis]];
-    [fButton setEnabled: NO];
-    [fStatusWindow display]; //force window to be updated
-    
-    //process data
-    tr_blocklistSetContent([fPrefsController handle], [DESTINATION UTF8String]);
-    
-    //delete downloaded file
     if ([NSApp isOnLeopardOrBetter])
-        [[NSFileManager defaultManager] removeItemAtPath: DESTINATION error: NULL];
+        [self performSelectorInBackground: @selector(finishDownloadSuccess) withObject: nil];
     else
-        [[NSFileManager defaultManager] removeFileAtPath: DESTINATION handler: nil];
-    
-    [fPrefsController updateBlocklistFields];
-    
-    [NSApp endSheet: fStatusWindow];
-    [fStatusWindow orderOut: self];
-    [self release];
+        [self finishDownloadSuccess];
 }
 
 @end
@@ -157,6 +140,32 @@
     
     fDownload = [[NSURLDownload alloc] initWithRequest: request delegate: self];
     [fDownload setDestination: DESTINATION allowOverwrite: YES];
+}
+
+- (void) finishDownloadSuccess
+{
+    //change to indeterminate while processing
+    [fProgressBar setIndeterminate: YES];
+    [fProgressBar startAnimation: self];
+    
+    [fTextField setStringValue: [NSLocalizedString(@"Processing blocklist", "Blocklist -> message") stringByAppendingEllipsis]];
+    [fButton setEnabled: NO];
+    [fStatusWindow display]; //force window to be updated
+    
+    //process data
+    tr_blocklistSetContent([fPrefsController handle], [DESTINATION UTF8String]);
+    
+    //delete downloaded file
+    if ([NSApp isOnLeopardOrBetter])
+        [[NSFileManager defaultManager] removeItemAtPath: DESTINATION error: NULL];
+    else
+        [[NSFileManager defaultManager] removeFileAtPath: DESTINATION handler: nil];
+    
+    [fPrefsController updateBlocklistFields];
+    
+    [NSApp endSheet: fStatusWindow];
+    [fStatusWindow orderOut: self];
+    [self release];
 }
 
 - (void) updateProcessString
