@@ -11,10 +11,11 @@
 #ifndef CONFIG_HEADER_DEFINED
 #define	CONFIG_HEADER_DEFINED
 
+#undef VERSION 
 #define	VERSION		"1.39"		/* Version			*/
 #define	CONFIG_FILE	"shttpd.conf"	/* Configuration file		*/
 #define	HTPASSWD	".htpasswd"	/* Passwords file name		*/
-#define	URI_MAX		16384		/* Default max request size	*/
+#define	URI_MAX		65536		/* Default max request size	*/
 #define	LISTENING_PORTS	"80"		/* Default listening ports	*/
 #define	INDEX_FILES	"index.html,index.htm,index.php,index.cgi"
 #define	CGI_EXT		"cgi,pl,php"	/* Default CGI extensions	*/

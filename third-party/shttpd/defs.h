@@ -241,7 +241,9 @@ struct shttpd_ctx {
 	struct llhead	registered_uris;/* User urls			*/
 	struct llhead	error_handlers;	/* Embedded error handlers	*/
 	struct llhead	acl;		/* Access control list		*/
+#if !defined(NO_SSI)
 	struct llhead	ssi_funcs;	/* SSI callback functions	*/
+#endif
 	struct llhead	listeners;	/* Listening sockets		*/
 
 	FILE	*access_log;		/* Access log stream		*/
@@ -358,8 +360,10 @@ extern void	ssl_handshake(struct stream *stream);
 extern void	setup_embedded_stream(struct conn *, union variant, void *);
 extern struct registered_uri *is_registered_uri(struct shttpd_ctx *,
 		const char *uri);
+#if !defined(NO_SSI)
 extern void	do_ssi(struct conn *);
 extern void	ssi_func_destructor(struct llhead *lp);
+#endif
 
 /*
  * auth.c

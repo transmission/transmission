@@ -296,7 +296,9 @@ struct shttpd_ctx *shttpd_init(void)
 	LL_INIT(&ctx->registered_uris);
 	LL_INIT(&ctx->error_handlers);
 	LL_INIT(&ctx->acl);
+#if !defined(NO_SSI)
 	LL_INIT(&ctx->ssi_funcs);
+#endif
 	LL_INIT(&ctx->listeners);
 
 #ifdef _WIN32

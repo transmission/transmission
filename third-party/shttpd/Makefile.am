@@ -1,16 +1,16 @@
 
-# FIXME: build the compat_*.c files conditionally
-
 noinst_LIBRARIES = libshttpd.a
 
+AM_CPPFLAGS = -DEMBEDDED -DNDEBUG -DNO_CGI -DNO_SSI
+
 libshttpd_a_SOURCES = \
-    string.c shttpd.c log.c auth.c md5.c cgi.c config.c io_ssi.c \
+    string.c shttpd.c log.c auth.c md5.c cgi.c config.c \
     io_file.c io_socket.c io_ssl.c io_emb.c io_dir.c io_cgi.c \
     compat_unix.c
 
 noinst_HEADERS = \
     defs.h llist.h shttpd.h std_includes.h io.h md5.h ssl.h \
-    compat_unix.h compat_win32.h compat_rtems.h config.h
+    compat_unix.h compat_rtems.h config.h
 
 extra_DIST = \
     README \
