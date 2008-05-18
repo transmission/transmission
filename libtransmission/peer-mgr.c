@@ -32,7 +32,6 @@
 #include "ptrarray.h"
 #include "ratecontrol.h"
 #include "torrent.h"
-#include "trcompat.h" /* strlcpy */
 #include "trevent.h"
 #include "utils.h"
 
@@ -932,7 +931,7 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
         case TR_PEERMSG_ERROR:
             if( TR_ERROR_IS_IO( e->err ) ) {
                 t->tor->error = e->err;
-                strlcpy( t->tor->errorString, tr_errorString( e->err ), sizeof(t->tor->errorString) );
+                tr_strlcpy( t->tor->errorString, tr_errorString( e->err ), sizeof(t->tor->errorString) );
                 tr_torrentStop( t->tor );
             } else if( e->err == TR_ERROR_ASSERT ) {
                 addStrike( t, peer );
@@ -1492,7 +1491,7 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
         tr_peer_stat * stat = ret + i;
 
         tr_netNtop( &peer->in_addr, stat->addr, sizeof(stat->addr) );
-        strlcpy( stat->client, (peer->client ? peer->client : ""), sizeof(stat->client) );
+        tr_strlcpy( stat->client, (peer->client ? peer->client : ""), sizeof(stat->client) );
         stat->port               = peer->port;
         stat->from               = atom->from;
         stat->progress           = peer->progress;

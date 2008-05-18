@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -1275,7 +1275,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             if( tr_bitfieldAdd( msgs->info->have, ui32 ) )
                 fireError( msgs, TR_ERROR_PEER_MESSAGE );
             updatePeerProgress( msgs );
-            tr_rcTransferred( msgs->torrent->swarmspeed, msgs->torrent->info.pieceSize );
+            tr_rcTransferred( msgs->torrent->swarmSpeed, msgs->torrent->info.pieceSize );
             break;
 
         case BT_BITFIELD: {

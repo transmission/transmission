@@ -25,7 +25,7 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_UL_LIMIT_ENABLED       "upload-limit-enabled"
 #define PREF_KEY_UL_LIMIT               "upload-limit"
 #define PREF_KEY_OPTIONS_PROMPT         "show-options-window"
-#define PREF_KEY_DIR_DEFAULT            "default-download-directory"
+#define PREF_KEY_DOWNLOAD_DIR           "default-download-directory"
 #define PREF_KEY_OPEN_DIALOG_FOLDER     "open-dialog-folder"
 #define PREF_KEY_INHIBIT_HIBERNATION    "inhibit-hibernation"
 #define PREF_KEY_DIR_WATCH              "watch-folder"
@@ -53,6 +53,9 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_MAIN_WINDOW_WIDTH      "main-window-width"
 #define PREF_KEY_MAIN_WINDOW_X          "main-window-x"
 #define PREF_KEY_MAIN_WINDOW_Y          "main-window-y"
+#define PREF_KEY_RPC_PORT               "rpc-port"
+#define PREF_KEY_RPC_ENABLED            "rpc-enabled"
+#define PREF_KEY_RPC_ACL                "rpc-access-control-list"
 
 
 void tr_prefs_init_global( void );

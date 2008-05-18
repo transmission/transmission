@@ -68,15 +68,15 @@ static int           showScrape    = 0;
 static int           showVersion   = 0;
 static int           isPrivate     = 0;
 static int           verboseLevel  = 0;
-static int           bindPort      = TR_DEFAULT_PORT;
+static int           peerPort      = TR_DEFAULT_PORT;
 static int           uploadLimit   = 20;
 static int           downloadLimit = -1;
 static char        * torrentPath   = NULL;
-static char        * savePath      = ".";
 static int           natTraversal  = 0;
 static int           recheckData   = 0;
 static sig_atomic_t  gotsig        = 0;
 static sig_atomic_t  manualUpdate  = 0;
+static char          downloadDir[MAX_PATH_LENGTH] = { '\0' };
 
 static char          * finishCall   = NULL;
 static char          * announce     = NULL;
@@ -135,36 +135,41 @@ main( int argc, char ** argv )
         return EXIT_SUCCESS;
     }
 
-    if( bindPort < 1 || bindPort > 65535 )
+    if( peerPort < 1 || peerPort > 65535 )
     {
-        printf( "Invalid port '%d'\n", bindPort );
+        printf( "Invalid port '%d'\n", peerPort );
         return EXIT_FAILURE;
     }
 
     /* don't bind the port if we're just running the CLI 
      * to get metainfo or to create a torrent */
     if( showInfo || showScrape || ( sourceFile != NULL ) )
-        bindPort = -1;
+        peerPort = -1;
 
     if( configdir == NULL )
         configdir = strdup( tr_getDefaultConfigDir( ) );
 
     /* Initialize libtransmission */
-    h = tr_initFull( configdir,
-                     "cli",                         /* tag */
-                     1,                             /* pex enabled */
-                     natTraversal,                  /* nat enabled */
-                     bindPort,                      /* public port */
-                     TR_ENCRYPTION_PREFERRED,       /* encryption mode */
-                     uploadLimit >= 0,              /* use upload speed limit? */
-                     uploadLimit,                   /* upload speed limit */
-                     downloadLimit >= 0,            /* use download speed limit? */
-                     downloadLimit,                 /* download speed limit */
-                     TR_DEFAULT_GLOBAL_PEER_LIMIT,
-                     verboseLevel + 1,              /* messageLevel */
-                     0,                             /* is message queueing enabled? */
-                     0,                             /* use the blocklist? */
-                     TR_DEFAULT_PEER_SOCKET_TOS );
+    h = tr_sessionInitFull(
+            configdir,
+            "cli",                         /* tag */
+            downloadDir,                   /* where to download torrents */
+            TR_DEFAULT_PEX_ENABLED,
+            natTraversal,                  /* nat enabled */
+            peerPort,
+            TR_ENCRYPTION_PREFERRED,
+            uploadLimit >= 0,
+            uploadLimit,
+            downloadLimit >= 0,
+            downloadLimit,
+            TR_DEFAULT_GLOBAL_PEER_LIMIT,
+            verboseLevel + 1,              /* messageLevel */
+            0,                             /* is message queueing enabled? */
+            TR_DEFAULT_BLOCKLIST_ENABLED,
+            TR_DEFAULT_PEER_SOCKET_TOS,
+            TR_DEFAULT_RPC_ENABLED,
+            TR_DEFAULT_RPC_PORT,
+            TR_DEFAULT_RPC_ACL );
 
     if( sourceFile && *sourceFile ) /* creating a torrent */
     {
@@ -183,7 +188,7 @@ main( int argc, char ** argv )
     ctor = tr_ctorNew( h );
     tr_ctorSetMetainfoFromFile( ctor, torrentPath );
     tr_ctorSetPaused( ctor, TR_FORCE, 0 );
-    tr_ctorSetDestination( ctor, TR_FORCE, savePath );
+    tr_ctorSetDownloadDir( ctor, TR_FORCE, downloadDir );
 
     if( showInfo )
     {
@@ -237,7 +242,7 @@ main( int argc, char ** argv )
     if( tor == NULL )
     {
         printf( "Failed opening torrent file `%s'\n", torrentPath );
-        tr_close( h );
+        tr_sessionClose( h );
         return EXIT_FAILURE;
     }
 
@@ -369,7 +374,7 @@ main( int argc, char ** argv )
     
 cleanup:
     tr_torrentClose( tor );
-    tr_close( h );
+    tr_sessionClose( h );
 
     return EXIT_SUCCESS;
 }
@@ -417,8 +422,8 @@ parseCommandLine( int argc, char ** argv )
             case 'i': showInfo = 1; break;
             case 'm': comment = optarg; break;
             case 'n': natTraversal = 1; break;
-            case 'o': savePath = optarg;
-            case 'p': bindPort = atoi( optarg ); break;
+            case 'o': tr_strlcpy( downloadDir, optarg, sizeof( downloadDir ) ); break;
+            case 'p': peerPort = atoi( optarg ); break;
             case 'r': isPrivate = 1; break;
             case 's': showScrape = 1; break;
             case 'u': uploadLimit = atoi( optarg ); break;
@@ -428,6 +433,9 @@ parseCommandLine( int argc, char ** argv )
             default: return 1;
         }
     }
+
+    if( !*downloadDir )
+        getcwd( downloadDir, sizeof( downloadDir ) );
 
     if( showHelp || showVersion )
         return 0;

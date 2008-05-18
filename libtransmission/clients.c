@@ -30,7 +30,6 @@
 #include <string.h>
 
 #include "transmission.h"
-#include "trcompat.h" /* strlcpy */
 #include "utils.h"
 
 static int
@@ -90,7 +89,7 @@ two_major_two_minor( char * buf, size_t buflen, const char * name, const uint8_t
 static void
 no_version( char * buf, size_t buflen, const char * name )
 {
-    strlcpy( buf, name, buflen );
+    tr_strlcpy( buf, name, buflen );
 }
 
 static void

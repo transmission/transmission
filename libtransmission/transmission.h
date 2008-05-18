@@ -62,12 +62,12 @@ enum
 };
 
 /***********************************************************************
- * tr_init
+ * tr_sessionInit
  ***********************************************************************
  * Initializes and returns an opaque libtransmission handle
  * to be passed to functions below. The tag argument is a short string
- * unique to the program invoking tr_init(), it is currently used as
- * part of saved torrent files' names to prevent one frontend from
+ * unique to the program invoking tr_sessionInit(), it is currently used
+ * as part of saved torrent files' names to prevent one frontend from
  * deleting a torrent used by another. The following tags are used:
  *   beos cli daemon gtk macosx wx
  **********************************************************************/
@@ -82,33 +82,95 @@ const char* tr_getDefaultConfigDir( void );
 #define TR_DEFAULT_PORT                        51413
 #define TR_DEFAULT_GLOBAL_PEER_LIMIT           200
 #define TR_DEFAULT_PEER_SOCKET_TOS             8
+#define TR_DEFAULT_BLOCKLIST_ENABLED           0
+#define TR_DEFAULT_RPC_ENABLED                 0
+#define TR_DEFAULT_RPC_PORT                    9091
+#define TR_DEFAULT_RPC_PORT_STR                "9091"
+#define TR_DEFAULT_RPC_ACL                     "+127.0.0.1"
 
-tr_handle * tr_initFull( const char * configDir,
-                         const char * tag,
-                         int          isPexEnabled,
-                         int          isPortForwardingEnabled,
-                         int          publicPort,
-                         int          encryptionMode,
-                         int          isUploadLimitEnabled,
-                         int          uploadLimit,
-                         int          isDownloadLimitEnabled,
-                         int          downloadLimit,
-                         int          globalPeerLimit,
-                         int          messageLevel,
-                         int          isMessageQueueingEnabled,
-                         int          isBlocklistEnabled,
-                         int          peerSocketTOS );
+tr_handle * tr_sessionInitFull( const char * configDir,
+                                const char * downloadDir,
+                                const char * tag,
+                                int          isPexEnabled,
+                                int          isPortForwardingEnabled,
+                                int          publicPort,
+                                int          encryptionMode,
+                                int          isUploadLimitEnabled,
+                                int          uploadLimit,
+                                int          isDownloadLimitEnabled,
+                                int          downloadLimit,
+                                int          globalPeerLimit,
+                                int          messageLevel,
+                                int          isMessageQueueingEnabled,
+                                int          isBlocklistEnabled,
+                                int          peerSocketTOS,
+                                int          rpcIsEnabled,
+                                int          rpcPort,
+                                const char * rpcACL );
 
 /**
- * Like tr_initFull() but with default values supplied.
+ * Like tr_sessionInitFull() but with default values supplied.
  */ 
-tr_handle * tr_init( const char * configDir,
-                     const char * tag );
+tr_handle * tr_sessionInit( const char * configDir,
+                            const char * downloadDir,
+                            const char * tag );
 
 /**
- * Shut down a libtransmission instance created by tr_init*()
+ * Shut down a libtransmission instance created by tr_sessionInit*()
  */
-void tr_close( tr_handle * );
+void tr_sessionClose( tr_handle * );
+
+void tr_sessionSetDownloadDir( tr_handle *, const char * downloadDir );
+
+const char * tr_sessionGetDownloadDir( const tr_handle * );
+
+void tr_sessionSetRPCEnabled( tr_handle *, int isEnabled );
+
+int tr_sessionIsRPCEnabled( const tr_handle * handle );
+
+void tr_sessionSetRPCPort( tr_handle *, int port );
+
+int tr_sessionGetRPCPort( const tr_handle * );
+
+/**
+ * Specify access control list (ACL). ACL is a comma separated list
+ * of IP subnets, each subnet is prepended by ’-’ or ’+’ sign. Plus
+ * means allow, minus means deny. If subnet mask is omitted, like
+ * "-1.2.3.4", then it means single IP address. Mask may vary from 0
+ * to 32 inclusive.
+ *
+ * The default string is "+127.0.0.1"
+ *
+ * IMPORTANT: a malformed ACL is likely to cause Transmission to crash.
+ * Client applications need to validate user input, or better yet
+ * generate it from a higher-level interface that doesn't allow user error,
+ * before calling this function.
+ */
+void tr_sessionSetRPCACL( tr_handle *, const char * acl );
+
+const char* tr_sessionGetRPCACL( const tr_handle * );
+
+typedef enum
+{
+    TR_RPC_TORRENT_ADDED,
+    TR_RPC_TORRENT_STARTED,
+    TR_RPC_TORRENT_STOPPED,
+    TR_RPC_TORRENT_CLOSING,
+    TR_RPC_TORRENT_CHANGED,
+    TR_RPC_SESSION_CHANGED
+}
+tr_rpc_callback_type;
+
+struct tr_torrent;
+
+typedef void ( *tr_rpc_func )( tr_handle            * handle,
+                               tr_rpc_callback_type   type,
+                               struct tr_torrent    * tor_or_null,
+                               void                 * user_data );
+
+void tr_sessionSetRPCCallback( tr_handle    * handle,
+                               tr_rpc_func    func,
+                               void         * user_data );
 
 
 /**
@@ -159,7 +221,7 @@ void tr_sessionSetEncryption( tr_handle * handle, tr_encryption_mode mode );
  * Returns the full path to a directory which can be used to store
  * preferences. The string belongs to libtransmission, do not free it.
  **********************************************************************/
-const char * tr_getConfigDir( const tr_handle * );
+const char * tr_sessionGetConfigDir( const tr_handle * );
 
 
 
@@ -459,7 +521,7 @@ void     tr_ctorSetPeerLimit           ( tr_ctor        * ctor,
                                          tr_ctorMode      mode,
                                          uint16_t         peerLimit  );
 
-void     tr_ctorSetDestination         ( tr_ctor        * ctor,
+void     tr_ctorSetDownloadDir         ( tr_ctor        * ctor,
                                          tr_ctorMode      mode,
                                          const char     * directory );
 
@@ -475,9 +537,9 @@ int      tr_ctorGetPaused              ( const tr_ctor  * ctor,
                                          tr_ctorMode      mode,
                                          uint8_t        * setmeIsPaused );
 
-int      tr_ctorGetDestination         ( const tr_ctor  * ctor,
+int      tr_ctorGetDownloadDir         ( const tr_ctor  * ctor,
                                          tr_ctorMode      mode,
-                                         const char    ** setmeDestination );
+                                         const char    ** setmeDownloadDir );
 
 int      tr_ctorGetMetainfo            ( const tr_ctor  * ctor,
                                          const struct tr_benc ** setme );
@@ -490,6 +552,12 @@ int      tr_ctorGetDeleteSource        ( const tr_ctor  * ctor,
 /* returns NULL if tr_ctorSetMetainfoFromFile() wasn't used */
 const char* tr_ctorGetSourceFile       ( const tr_ctor  * ctor );
 
+/**
+ * Returns this torrent's unique ID.
+ * IDs are allocated when the torrent is constructed and are
+ * good until tr_sessionClose() is called.
+ */
+int tr_torrentId( const tr_torrent * );
 
 typedef struct tr_info tr_info;
 
@@ -498,7 +566,7 @@ typedef struct tr_info tr_info;
  * Returns TR_OK if it parsed and can be added to Transmission.
  * Returns TR_EINVALID if it couldn't be parsed.
  * Returns TR_EDUPLICATE if it parsed but can't be added. 
- *     "destination" must be set to test for TR_EDUPLICATE.
+ *     "download-dir" must be set to test for TR_EDUPLICATE.
  *
  * If setme_info is non-NULL and parsing is successful
  * (that is, if TR_EINVALID is not returned), then the parsed
@@ -524,9 +592,9 @@ tr_torrent * tr_torrentNew( tr_handle      * handle,
  *  This can be used at startup to kickstart all the torrents
  *  from the previous session.
  */
-tr_torrent ** tr_loadTorrents ( tr_handle  * h,
-                                tr_ctor    * ctor,
-                                int        * setmeCount );
+tr_torrent ** tr_sessionLoadTorrents ( tr_handle  * h,
+                                       tr_ctor    * ctor,
+                                       int        * setmeCount );
 
 
 
@@ -541,9 +609,9 @@ int tr_sessionIsPexEnabled( const tr_handle * );
 
 const tr_info * tr_torrentInfo( const tr_torrent * );
 
-void tr_torrentSetFolder( tr_torrent *, const char * );
+void tr_torrentSetDownloadDir( tr_torrent *, const char * );
 
-const char * tr_torrentGetFolder( const tr_torrent * );
+const char * tr_torrentGetDownloadDir( const tr_torrent * );
 
 void tr_torrentStart( tr_torrent * );
 
@@ -839,7 +907,7 @@ struct tr_stat
 {
     tr_torrent_status status;
 
-    struct tr_tracker_stat tracker_stat;
+    struct tr_tracker_stat trackerStat;
     const tr_tracker_info * tracker;
 
     tr_errno error;
@@ -913,7 +981,7 @@ struct tr_stat
      * moved to `corrupt' or `haveValid'. */
     uint64_t haveUnchecked;
 
-    float swarmspeed;
+    float swarmSpeed;
 
 #define TR_RATIO_NA  -1
 #define TR_RATIO_INF -2

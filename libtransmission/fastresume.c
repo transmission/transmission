@@ -100,8 +100,8 @@ enum
     /* IPs and ports of connectable peers */
     FR_ID_PEERS = 11,
 
-    /* destination of the torrent: zero-terminated string */
-    FR_ID_DESTINATION = 12,
+    /* download dir of the torrent: zero-terminated string */
+    FR_ID_DOWNLOAD_DIR = 12,
 
     /* pex flag
      * 't' if pex is enabled, 'f' if disabled */
@@ -152,7 +152,7 @@ getMTimes( const tr_torrent * tor, int * setme_n )
         char fname[MAX_PATH_LENGTH];
         struct stat sb;
         tr_buildPath( fname, sizeof(fname),
-                      tor->destination, tor->info.files[i].name, NULL );
+                      tor->downloadDir, tor->info.files[i].name, NULL );
         if ( !stat( fname, &sb ) && S_ISREG( sb.st_mode ) ) {
 #ifdef SYS_DARWIN
             m[i] = sb.st_mtimespec.tv_sec;
@@ -199,11 +199,11 @@ tr_fastResumeSave( const tr_torrent * tor )
     /* Write format version */
     fwrite( &version, 4, 1, file );
 
-    if( TRUE ) /* FR_ID_DESTINATION */
+    if( TRUE ) /* FR_ID_DOWNLOAD_DIR */
     {
-        const char * d = tor->destination ? tor->destination : "";
+        const char * d = tor->downloadDir ? tor->downloadDir : "";
         const int byteCount = strlen( d ) + 1;
-        fastResumeWriteData( FR_ID_DESTINATION, d, 1, byteCount, file );
+        fastResumeWriteData( FR_ID_DOWNLOAD_DIR, d, 1, byteCount, file );
     }
 
     /* Write progress data */
@@ -349,7 +349,7 @@ internalIdToPublicBitfield( uint8_t id )
         case FR_ID_RUN:            ret = TR_FR_RUN;           break;
         case FR_ID_CORRUPT:        ret = TR_FR_CORRUPT;       break;
         case FR_ID_PEERS:          ret = TR_FR_PEERS;         break;
-        case FR_ID_DESTINATION:    ret = TR_FR_DESTINATION;   break;
+        case FR_ID_DOWNLOAD_DIR:   ret = TR_FR_DOWNLOAD_DIR;  break;
         case FR_ID_MAX_PEERS:      ret = TR_FR_MAX_PEERS;     break;
     }
 
@@ -559,14 +559,14 @@ parsePeers( tr_torrent * tor, const uint8_t * buf, uint32_t len )
 }
 
 static uint64_t
-parseDestination( tr_torrent * tor, const uint8_t * buf, uint32_t len )
+parseDownloadDir( tr_torrent * tor, const uint8_t * buf, uint32_t len )
 {
     uint64_t ret = 0;
 
     if( buf && *buf && len ) {
-        tr_free( tor->destination );
-        tor->destination = tr_strndup( (char*)buf, len );
-        ret = TR_FR_DESTINATION;
+        tr_free( tor->downloadDir );
+        tor->downloadDir = tr_strndup( (char*)buf, len );
+        ret = TR_FR_DOWNLOAD_DIR;
     }
 
     return ret;
@@ -600,7 +600,7 @@ parseVersion1( tr_torrent * tor, const uint8_t * buf, const uint8_t * end,
             case FR_ID_CORRUPT:      ret |= parseCorrupt( tor, buf, len ); break;
             case FR_ID_PEERS:        ret |= parsePeers( tor, buf, len ); break;
             case FR_ID_MAX_PEERS:    ret |= parseConnections( tor, buf, len ); break;
-            case FR_ID_DESTINATION:  ret |= parseDestination( tor, buf, len ); break;
+            case FR_ID_DOWNLOAD_DIR: ret |= parseDownloadDir( tor, buf, len ); break;
             default:                 tr_tordbg( tor, "Skipping unknown resume code %d", (int)id ); break;
         }
 

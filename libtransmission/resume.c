@@ -24,17 +24,17 @@
 #include "torrent.h"
 #include "utils.h" /* tr_buildPath */
 
-#define KEY_CORRUPT     "corrupt"
-#define KEY_DESTINATION "destination"
-#define KEY_DND         "dnd"
-#define KEY_DOWNLOADED  "downloaded"
-#define KEY_MAX_PEERS   "max-peers"
-#define KEY_PAUSED      "paused"
-#define KEY_PEERS       "peers"
-#define KEY_PRIORITY    "priority"
-#define KEY_PROGRESS    "progress"
-#define KEY_SPEEDLIMIT  "speed-limit"
-#define KEY_UPLOADED    "uploaded"
+#define KEY_CORRUPT      "corrupt"
+#define KEY_DOWNLOAD_DIR "destination"
+#define KEY_DND          "dnd"
+#define KEY_DOWNLOADED   "downloaded"
+#define KEY_MAX_PEERS    "max-peers"
+#define KEY_PAUSED       "paused"
+#define KEY_PEERS        "peers"
+#define KEY_PRIORITY     "priority"
+#define KEY_PROGRESS     "progress"
+#define KEY_SPEEDLIMIT   "speed-limit"
+#define KEY_UPLOADED     "uploaded"
 
 #define KEY_SPEEDLIMIT_DOWN_SPEED "down-speed"
 #define KEY_SPEEDLIMIT_DOWN_MODE  "down-mode"
@@ -349,8 +349,8 @@ tr_torrentSaveResume( const tr_torrent * tor )
     tr_bencInitDict( &top, 12 );
     tr_bencDictAddInt( &top, KEY_CORRUPT,
                              tor->corruptPrev + tor->corruptCur );
-    tr_bencDictAddStr( &top, KEY_DESTINATION,
-                             tor->destination );
+    tr_bencDictAddStr( &top, KEY_DOWNLOAD_DIR,
+                             tor->downloadDir );
     tr_bencDictAddInt( &top, KEY_DOWNLOADED,
                              tor->downloadedPrev + tor->downloadedCur );
     tr_bencDictAddInt( &top, KEY_UPLOADED,
@@ -406,11 +406,11 @@ loadFromFile( tr_torrent    * tor,
         fieldsLoaded |= TR_FR_CORRUPT;
     }
 
-    if( ( fieldsToLoad & ( TR_FR_PROGRESS | TR_FR_DESTINATION ) )
-            && tr_bencDictFindStr( &top, KEY_DESTINATION, &str ) ) {
-        tr_free( tor->destination );
-        tor->destination = tr_strdup( str );
-        fieldsLoaded |= TR_FR_DESTINATION;
+    if( ( fieldsToLoad & ( TR_FR_PROGRESS | TR_FR_DOWNLOAD_DIR ) )
+            && tr_bencDictFindStr( &top, KEY_DOWNLOAD_DIR, &str ) ) {
+        tr_free( tor->downloadDir );
+        tor->downloadDir = tr_strdup( str );
+        fieldsLoaded |= TR_FR_DOWNLOAD_DIR;
     }
 
     if( ( fieldsToLoad & TR_FR_DOWNLOADED )
@@ -473,12 +473,12 @@ setFromCtor( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor, int mode )
         if( !tr_ctorGetPeerLimit( ctor, mode, &tor->maxConnectedPeers ) )
             ret |= TR_FR_MAX_PEERS;
 
-    if( fields & TR_FR_DESTINATION ) {
-        const char * destination;
-        if( !tr_ctorGetDestination( ctor, mode, &destination ) ) {
-            ret |= TR_FR_DESTINATION;
-            tr_free( tor->destination );
-            tor->destination = tr_strdup( destination );
+    if( fields & TR_FR_DOWNLOAD_DIR ) {
+        const char * downloadDir;
+        if( !tr_ctorGetDownloadDir( ctor, mode, &downloadDir ) ) {
+            ret |= TR_FR_DOWNLOAD_DIR;
+            tr_free( tor->downloadDir );
+            tor->downloadDir = tr_strdup( downloadDir );
         }
     }
 

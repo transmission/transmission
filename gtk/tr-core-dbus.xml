@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<node>
+  <interface name="com.transmissionbt.Transmission">
+    <method name="AddFile">
+      <arg type="b" name="handled" direction="out"/>
+      <arg type="s" name="filename" direction="in"/>
+    </method>
+  </interface>
+</node>
+

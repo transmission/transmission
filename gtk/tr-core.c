@@ -29,12 +29,18 @@
 #ifdef HAVE_GIO
 #include <gio/gio.h>
 #endif
+#ifdef HAVE_DBUS_GLIB
+#include <dbus/dbus-glib.h>
+#endif
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> /* tr_free */
 
 #include "conf.h"
 #include "tr-core.h"
+#ifdef HAVE_DBUS_GLIB
+#include "tr-core-dbus.h"
+#endif
 #include "tr-prefs.h"
 #include "tr-torrent.h"
 #include "util.h"
@@ -50,7 +56,6 @@ struct TrCorePrivate
 #endif
     GtkTreeModel     * model;
     tr_handle        * handle;
-    int                nextid;
 };
 
 static void
@@ -152,6 +157,29 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
                                         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                         g_cclosure_marshal_VOID__STRING,
                                         G_TYPE_NONE, 1, G_TYPE_STRING );
+
+#ifdef HAVE_DBUS_GLIB
+    {
+        DBusGConnection * bus = dbus_g_bus_get( DBUS_BUS_SESSION, NULL );
+        DBusGProxy * bus_proxy = NULL;
+        if( bus )
+            bus_proxy = dbus_g_proxy_new_for_name( bus, "org.freedesktop.DBus",
+                                                        "/org/freedesktop/DBus",
+                                                        "org.freedesktop.DBus" );
+        if( bus_proxy ) {
+            int result = 0;
+            dbus_g_proxy_call( bus_proxy, "RequestName", NULL,
+                               G_TYPE_STRING, "com.transmissionbt.Transmission",
+                               G_TYPE_UINT, 0,
+                               G_TYPE_INVALID,
+                               G_TYPE_UINT, &result,
+                               G_TYPE_INVALID );
+            if( result == 1 )
+                dbus_g_object_type_install_info( TR_CORE_TYPE,
+                                                 &dbus_glib_tr_core_object_info );
+        }
+    }
+#endif
 }
 
 /***
@@ -327,9 +355,9 @@ tr_core_apply_defaults( tr_ctor * ctor )
         tr_ctorSetPeerLimit( ctor, TR_FORCE,
                              pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
 
-    if( tr_ctorGetDestination( ctor, TR_FORCE, NULL ) ) {
-        char * path = pref_string_get( PREF_KEY_DIR_DEFAULT );
-        tr_ctorSetDestination( ctor, TR_FORCE, path );
+    if( tr_ctorGetDownloadDir( ctor, TR_FORCE, NULL ) ) {
+        char * path = pref_string_get( PREF_KEY_DOWNLOAD_DIR );
+        tr_ctorSetDownloadDir( ctor, TR_FORCE, path );
         g_free( path );
     }
 }
@@ -470,7 +498,7 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
         TR_TORRENT_TYPE,  /* TrTorrent object */
         G_TYPE_POINTER,   /* tr_torrent* */
         G_TYPE_INT,       /* tr_stat()->status */
-        G_TYPE_INT        /* ID for IPC */
+        G_TYPE_INT        /* tr_torrentId() */
     };
 
     p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE( self,
@@ -482,7 +510,17 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
     store = gtk_list_store_newv( MC_ROW_COUNT, types );
 
     p->model    = GTK_TREE_MODEL( store );
-    p->nextid   = 1;
+
+#ifdef HAVE_DBUS_GLIB
+    {
+        DBusGConnection * bus = dbus_g_bus_get( DBUS_BUS_SESSION, NULL );
+        if( bus )
+            dbus_g_connection_register_g_object( bus,
+                                                 "/com/transmissionbt/Transmission",
+                                                 G_OBJECT( self ));
+    }
+#endif
+
 }
 
 GType
@@ -538,7 +576,7 @@ tr_core_close( TrCore * core )
     if( handle )
     {
         core->priv->handle = NULL;
-        tr_close( handle ); 
+        tr_sessionClose( handle ); 
     }
 }
 
@@ -619,10 +657,11 @@ doCollate( const char * in )
 }
 
 void
-tr_core_add_torrent( TrCore * self, TrTorrent * tor )
+tr_core_add_torrent( TrCore * self, TrTorrent * gtor )
 {
-    const tr_info * inf = tr_torrent_info( tor );
-    const tr_stat * torStat = tr_torrent_stat( tor );
+    const tr_info * inf = tr_torrent_info( gtor );
+    const tr_stat * torStat = tr_torrent_stat( gtor );
+    tr_torrent * tor = tr_torrent_handle( gtor );
     char * collated = doCollate( inf->name );
     GtkListStore * store = GTK_LIST_STORE( tr_core_model( self ) );
     GtkTreeIter unused;
@@ -631,15 +670,14 @@ tr_core_add_torrent( TrCore * self, TrTorrent * tor )
                                        MC_NAME,          inf->name,
                                        MC_NAME_COLLATED, collated,
                                        MC_HASH,          inf->hashString,
-                                       MC_TORRENT,       tor,
-                                       MC_TORRENT_RAW,   tr_torrent_handle( tor ),
+                                       MC_TORRENT,       gtor,
+                                       MC_TORRENT_RAW,   tor,
                                        MC_STATUS,        torStat->status,
-                                       MC_ID,            self->priv->nextid,
+                                       MC_ID,            tr_torrentId( tor ),
                                        -1);
-    ++self->priv->nextid;
 
     /* cleanup */
-    g_object_unref( G_OBJECT( tor ) );
+    g_object_unref( G_OBJECT( gtor ) );
     g_free( collated );
 }
 
@@ -649,25 +687,20 @@ tr_core_load( TrCore * self, gboolean forcePaused )
     int i;
     int count = 0;
     tr_torrent ** torrents;
-    char * path;
     tr_ctor * ctor;
-
-    path = getdownloaddir( );
 
     ctor = tr_ctorNew( tr_core_handle( self ) );
     if( forcePaused )
         tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
-    tr_ctorSetDestination( ctor, TR_FALLBACK, path );
     tr_ctorSetPeerLimit( ctor, TR_FALLBACK,
                          pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
 
-    torrents = tr_loadTorrents ( tr_core_handle( self ), ctor, &count );
+    torrents = tr_sessionLoadTorrents ( tr_core_handle( self ), ctor, &count );
     for( i=0; i<count; ++i )
         tr_core_add_torrent( self, tr_torrent_new_preexisting( torrents[i] ) );
 
     tr_free( torrents );
     tr_ctorFree( ctor );
-    g_free( path );
 
     return count;
 }
@@ -697,6 +730,43 @@ tr_core_add_ctor( TrCore * self, tr_ctor * ctor )
     tr_ctorFree( ctor );
 }
 
+static void
+add_filename( TrCore       * core,
+              const char   * filename,
+              gboolean       doStart,
+              gboolean       doPrompt )
+{
+    tr_handle * handle = tr_core_handle( core );
+
+    if( filename && handle )
+    {
+        tr_ctor * ctor = tr_ctorNew( handle );
+        tr_core_apply_defaults( ctor );
+        tr_ctorSetPaused( ctor, TR_FORCE, !doStart );
+        if( tr_ctorSetMetainfoFromFile( ctor, filename ) )
+            tr_ctorFree( ctor );
+        else if( tr_torrentParse( handle, ctor, NULL ) )
+            tr_ctorFree( ctor );
+        else if( doPrompt )
+            g_signal_emit( core, TR_CORE_GET_CLASS(core)->promptsig, 0, ctor );
+        else
+            tr_core_add_ctor( core, ctor );
+    }
+}
+
+gboolean
+tr_core_add_file( TrCore      * core,
+                  const char  * filename,
+                  gboolean    * success,
+                  GError     ** err UNUSED )
+{
+    add_filename( core, filename,
+                  pref_flag_get( PREF_KEY_START ),
+                  pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) );
+    *success = TRUE;
+    return TRUE;
+}
+
 void
 tr_core_add_list( TrCore      * core,
                   GSList      * torrentFiles,
@@ -704,29 +774,10 @@ tr_core_add_list( TrCore      * core,
                   pref_flag_t   prompt )
 {
     const gboolean doStart = pref_flag_eval( start, PREF_KEY_START );
-    const gboolean doPrompt = pref_flag_eval( prompt, PREF_KEY_OPTIONS_PROMPT );
-
-    if( torrentFiles && !isDisposed( core ) )
-    {
-        GSList * l;
-        tr_handle * handle = core->priv->handle;
-
-        for( l=torrentFiles; l!=NULL; l=l->next )
-        {
-            tr_ctor * ctor = tr_ctorNew( handle );
-            tr_core_apply_defaults( ctor );
-            tr_ctorSetPaused( ctor, TR_FORCE, !doStart );
-            if( tr_ctorSetMetainfoFromFile( ctor, l->data ) )
-                tr_ctorFree( ctor );
-            else if( tr_torrentParse( handle, ctor, NULL ) )
-                tr_ctorFree( ctor );
-            else if( doPrompt )
-                g_signal_emit( core, TR_CORE_GET_CLASS(core)->promptsig, 0, ctor );
-            else
-                tr_core_add_ctor( core, ctor );
-        }
-    }
-
+    const gboolean doPrompt = pref_flag_eval( prompt,PREF_KEY_OPTIONS_PROMPT );
+    GSList * l;
+    for( l=torrentFiles; l!=NULL; l=l->next )
+        add_filename( core, l->data, doStart, doPrompt );
     freestrlist( torrentFiles );
 }
 
@@ -735,19 +786,6 @@ tr_core_torrents_added( TrCore * self )
 {
     tr_core_update( self );
     tr_core_errsig( self, TR_CORE_ERR_NO_MORE_TORRENTS, NULL );
-}
-
-void
-tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter )
-{
-    TrTorrent * tor;
-    GtkTreeModel * model = tr_core_model( self );
-
-    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
-    gtk_list_store_remove( GTK_LIST_STORE( model ), iter );
-    tr_torrentRemoveSaved( tr_torrent_handle( tor ) );
-
-    g_object_unref( G_OBJECT( tor ) );
 }
 
 static gboolean

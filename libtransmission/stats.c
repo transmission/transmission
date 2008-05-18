@@ -12,7 +12,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
-#include "platform.h" /* tr_getConfigDir() */
+#include "platform.h" /* tr_sessionGetConfigDir() */
 #include "utils.h" /* tr_buildPath */
 
 /***
@@ -29,7 +29,9 @@ struct tr_stats_handle
 static char*
 getFilename( const tr_handle * handle, char * buf, size_t buflen )
 {
-    tr_buildPath( buf, buflen, tr_getConfigDir(handle), "stats.benc", NULL );
+    tr_buildPath( buf, buflen, tr_sessionGetConfigDir(handle),
+                               "stats.benc",
+                               NULL );
     return buf;
 }
 

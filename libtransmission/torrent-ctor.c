@@ -15,7 +15,6 @@
 #include "bencode.h"
 #include "platform.h"
 #include "session.h" /* tr_sessionFindTorrentFile */
-#include "trcompat.h" /* strlcpy */
 #include "utils.h"
 
 #define DEFAULT_MAX_CONNECTED_PEERS 50
@@ -24,11 +23,11 @@ struct optional_args
 {
     unsigned int isSet_paused : 1;
     unsigned int isSet_connected : 1;
-    unsigned int isSet_destination : 1;
+    unsigned int isSet_downloadDir : 1;
 
     unsigned int isPaused : 1;
     uint16_t peerLimit;
-    char destination[MAX_PATH_LENGTH];
+    char downloadDir[MAX_PATH_LENGTH];
 };
 
 struct tr_ctor
@@ -201,13 +200,13 @@ tr_ctorSetPeerLimit( tr_ctor        * ctor,
 }
 
 void
-tr_ctorSetDestination( tr_ctor        * ctor,
+tr_ctorSetDownloadDir( tr_ctor        * ctor,
                        tr_ctorMode      mode,
                        const char     * directory )
 {
     struct optional_args * args = &ctor->optionalArgs[mode];
-    args->isSet_destination = 1;
-    strlcpy( args->destination, directory, sizeof( args->destination ) );
+    args->isSet_downloadDir = 1;
+    tr_strlcpy( args->downloadDir, directory, sizeof( args->downloadDir ) );
 }
 
 int
@@ -243,17 +242,17 @@ tr_ctorGetPaused( const tr_ctor  * ctor,
 }
 
 int
-tr_ctorGetDestination( const tr_ctor  * ctor,
+tr_ctorGetDownloadDir( const tr_ctor  * ctor,
                        tr_ctorMode      mode,
-                       const char    ** setmeDestination )
+                       const char    ** setmeDownloadDir )
 {
     int err = 0;
     const struct optional_args * args = &ctor->optionalArgs[mode];
 
-    if( !args->isSet_destination )
+    if( !args->isSet_downloadDir )
         err = 1;
-    else if( setmeDestination )
-        *setmeDestination = args->destination;
+    else if( setmeDownloadDir )
+        *setmeDownloadDir = args->downloadDir;
 
     return err;
 }
@@ -283,6 +282,7 @@ tr_ctorNew( const tr_handle * handle )
     ctor->handle = handle;
     tr_ctorSetPeerLimit( ctor, TR_FALLBACK, DEFAULT_MAX_CONNECTED_PEERS );
     tr_ctorSetPaused( ctor, TR_FALLBACK, FALSE );
+    tr_ctorSetDownloadDir( ctor, TR_FALLBACK, handle->downloadDir );
     tr_ctorSetSave( ctor, TRUE );
     return ctor;
 }

@@ -25,23 +25,19 @@
 #ifndef TR_INTERNAL_H
 #define TR_INTERNAL_H 1
 
+#include <libtransmission/rpc.h>
+
 #define TR_NAME "Transmission"
 
+#ifndef UNUSED
 #ifdef __GNUC__
 #define UNUSED __attribute__((unused))
 #else
 #define UNUSED
 #endif
+#endif
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
 
 uint8_t* tr_peerIdNew( void );
 
@@ -61,6 +57,9 @@ struct tr_handle
     unsigned int                 useUploadLimit   : 1;
     unsigned int                 useDownloadLimit : 1;
 
+    tr_rpc_func                  rpc_func;
+    void                       * rpc_func_user_data;
+
     tr_encryption_mode           encryptionMode;
 
     struct tr_event_handle     * events;
@@ -73,8 +72,9 @@ struct tr_handle
     char                       * tag;
 
     char                       * configDir;
-    char                       * torrentDir;
+    char                       * downloadDir;
     char                       * resumeDir;
+    char                       * torrentDir;
 
     struct tr_ratecontrol      * upload;
     struct tr_ratecontrol      * download;
@@ -86,6 +86,8 @@ struct tr_handle
     struct tr_lock             * lock;
 
     struct tr_web              * web;
+
+    struct tr_rpc_server       * rpcServer;
 
     tr_handle_status             stats[2];
     int                          statCur;

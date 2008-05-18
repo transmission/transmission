@@ -275,8 +275,10 @@ static int
 testRISONSnippet( const char * rison_str, const char * expected )
 {
     char * serialized = tr_rison2json( rison_str, -1 );
+#if 0
 fprintf( stderr, " expected: [%s]\n", expected );
 fprintf( stderr, "      got: [%s]\n", serialized );
+#endif
     check( !strcmp( serialized, expected ) );
     tr_free( serialized );
     return 0;

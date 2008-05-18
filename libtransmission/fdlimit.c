@@ -50,7 +50,6 @@
 #include "list.h"
 #include "net.h"
 #include "platform.h" /* tr_lock */
-#include "trcompat.h" /* strlcpy */
 #include "utils.h"
 
 #if SIZEOF_VOIDP==8
@@ -264,7 +263,7 @@ tr_fdFileCheckout( const char * folder,
         }
 
         dbgmsg( "opened '%s' in slot %d, write %c", filename, winner, write?'y':'n' );
-        strlcpy( o->filename, filename, sizeof( o->filename ) );
+        tr_strlcpy( o->filename, filename, sizeof( o->filename ) );
         o->isWritable = write;
     }
 

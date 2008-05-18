@@ -779,7 +779,7 @@ info_page_new (tr_torrent * tor)
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Location"));
 
-    l = g_object_new( GTK_TYPE_LABEL, "label", tr_torrentGetFolder( tor ), "selectable", TRUE,
+    l = g_object_new( GTK_TYPE_LABEL, "label", tr_torrentGetDownloadDir( tor ), "selectable", TRUE,
                                       "ellipsize", PANGO_ELLIPSIZE_END, NULL );
     hig_workarea_add_row (t, &row, _( "Destination folder:" ), l, NULL); 
 
@@ -857,7 +857,7 @@ refresh_activity (GtkWidget * top)
   tr_strlratio( buf, stat->ratio, sizeof( buf ) );
   gtk_label_set_text( GTK_LABEL( a->ratio_lb ), buf );
 
-  tr_strlspeed( buf, stat->swarmspeed, sizeof(buf) );
+  tr_strlspeed( buf, stat->swarmSpeed, sizeof(buf) );
   gtk_label_set_text (GTK_LABEL(a->swarm_lb), buf );
 
   gtk_label_set_text (GTK_LABEL(a->err_lb),
@@ -1213,29 +1213,29 @@ refresh_tracker( GtkWidget * w )
     const tr_stat * torStat = tr_torrent_stat( page->gtor );
 
     l = page->last_scrape_time_lb;
-    t = torStat->tracker_stat.lastScrapeTime;
+    t = torStat->trackerStat.lastScrapeTime;
     refresh_time_lb( l, t );
 
     l = page->last_scrape_response_lb;
-    gtk_label_set_text( GTK_LABEL( l ), torStat->tracker_stat.scrapeResponse );
+    gtk_label_set_text( GTK_LABEL( l ), torStat->trackerStat.scrapeResponse );
 
     l = page->next_scrape_countdown_lb;
-    t = torStat->tracker_stat.nextScrapeTime;
+    t = torStat->trackerStat.nextScrapeTime;
     refresh_countdown_lb( l, t );
 
     l = page->last_announce_time_lb;
-    t = torStat->tracker_stat.lastAnnounceTime;
+    t = torStat->trackerStat.lastAnnounceTime;
     refresh_time_lb( l, t );
 
     l = page->last_announce_response_lb;
-    gtk_label_set_text( GTK_LABEL( l ), torStat->tracker_stat.announceResponse );
+    gtk_label_set_text( GTK_LABEL( l ), torStat->trackerStat.announceResponse );
 
     l = page->next_announce_countdown_lb;
-    t = torStat->tracker_stat.nextAnnounceTime;
+    t = torStat->trackerStat.nextAnnounceTime;
     refresh_countdown_lb( l, t );
 
     l = page->manual_announce_countdown_lb;
-    t = torStat->tracker_stat.nextManualAnnounceTime;
+    t = torStat->trackerStat.nextManualAnnounceTime;
     refresh_countdown_lb( l, t );
 }
 

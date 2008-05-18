@@ -11,16 +11,30 @@
  */
 
 #include <assert.h>
+#include <ctype.h> /* isdigit */
+#include <stdlib.h> /* strtol */
 #include <string.h> /* strcmp */
 
 #include "transmission.h"
 #include "bencode.h"
 #include "rpc.h"
 #include "json.h"
+#include "session.h"
 #include "torrent.h"
 #include "utils.h"
 
-#define TR_N_ELEMENTS( ary ) ( sizeof( ary ) / sizeof( (ary)[0] ) )
+#define TR_N_ELEMENTS( ary ) ( sizeof( ary ) / sizeof( *ary ) )
+
+/***
+****
+***/
+
+static void
+notify( tr_handle * session, int type, tr_torrent * tor )
+{
+    if( session->rpc_func != NULL )
+        session->rpc_func( session, type, tor, session->rpc_func_user_data );
+}
 
 /***
 ****
@@ -29,6 +43,7 @@
 static tr_torrent **
 getTorrents( tr_handle * handle, tr_benc * args, int * setmeCount )
 {
+    int64_t id;
     tr_torrent ** torrents = NULL;
     int torrentCount = 0;
     tr_benc * ids;
@@ -54,6 +69,14 @@ getTorrents( tr_handle * handle, tr_benc * args, int * setmeCount )
                 torrents[torrentCount++] = tor;
         }
     }
+    else if( tr_bencDictFindInt( args, "ids", &id ) 
+          || tr_bencDictFindInt( args, "id", &id ) )
+    {
+        tr_torrent * tor;
+        torrents = tr_new0( tr_torrent*, 1 );
+        if(( tor = tr_torrentFindFromId( handle, id )))
+            torrents[torrentCount++] = tor;
+    }
     else /* all of them */
     {
         tr_torrent * tor = NULL;
@@ -67,109 +90,132 @@ getTorrents( tr_handle * handle, tr_benc * args, int * setmeCount )
     return torrents;
 }
 
-typedef void( *tor_func )( tr_torrent * tor );
-
-static void
-callTorrentFunc( tr_handle * h, tr_benc * args_in, tor_func func )
+static const char*
+torrentStart( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
 {
     int i, torrentCount;
     tr_torrent ** torrents = getTorrents( h, args_in, &torrentCount );
     for( i=0; i<torrentCount; ++i )
-        ( *func )( torrents[i] );
+    {
+        tr_torrent * tor = torrents[i];
+        tr_torrentStart( tor );
+        notify( h, TR_RPC_TORRENT_STARTED, tor );
+    }
     tr_free( torrents );
-}
-
-static const char*
-torrentStart( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
-{
-    callTorrentFunc( h, args_in, tr_torrentStart );
     return NULL;
 }
 
 static const char*
 torrentStop( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
 {
-    callTorrentFunc( h, args_in, tr_torrentStop );
+    int i, torrentCount;
+    tr_torrent ** torrents = getTorrents( h, args_in, &torrentCount );
+    for( i=0; i<torrentCount; ++i )
+    {
+        tr_torrent * tor = torrents[i];
+        tr_torrentStop( tor );
+        notify( h, TR_RPC_TORRENT_STOPPED, tor );
+    }
+    tr_free( torrents );
     return NULL;
 }
 
 static const char*
 torrentClose( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
 {
-    callTorrentFunc( h, args_in, tr_torrentClose );
+    int i, torrentCount;
+    tr_torrent ** torrents = getTorrents( h, args_in, &torrentCount );
+    for( i=0; i<torrentCount; ++i )
+    {
+        tr_torrent * tor = torrents[i];
+        notify( h, TR_RPC_TORRENT_CLOSING, tor );
+        tr_torrentClose( tor );
+    }
+    tr_free( torrents );
     return NULL;
 }
 
 static const char*
 torrentVerify( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
 {
-    callTorrentFunc( h, args_in, tr_torrentVerify );
+    int i, torrentCount;
+    tr_torrent ** torrents = getTorrents( h, args_in, &torrentCount );
+    for( i=0; i<torrentCount; ++i )
+    {
+        tr_torrent * tor = torrents[i];
+        tr_torrentVerify( tor );
+        notify( h, TR_RPC_TORRENT_CHANGED, tor );
+    }
+    tr_free( torrents );
     return NULL;
 }
+
+/***
+****
+***/
 
 static const char*
 torrentStatus( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
 {
     int i, torrentCount;
     tr_torrent ** torrents = getTorrents( handle, args_in, &torrentCount );
-    tr_benc * list = tr_bencDictAddList( args_out, "status", torrentCount );
+    tr_benc * list = tr_bencDictAddList( args_out, "torrent-status", torrentCount );
 
     for( i=0; i<torrentCount; ++i )
     {
         tr_torrent * tor = torrents[i];
         const tr_stat * st = tr_torrentStat( tor );
-        tr_benc * d = tr_bencListAddDict( list, 32 );
-        tr_benc * t;
         const int * f = st->peersFrom;
-        const struct tr_tracker_stat * s = &st->tracker_stat;
+        const struct tr_tracker_stat * s = &st->trackerStat;
+        tr_benc * d = tr_bencListAddDict( list, 33 );
+        tr_benc * t;
 
-        tr_bencDictAddInt( d, "id", tor->uniqueId );
-        tr_bencDictAddInt( d, "status", st->status );
+        tr_bencDictAddInt( d, "activityDate", st->activityDate );
+        tr_bencDictAddInt( d, "completedFromTracker", st->completedFromTracker );
+        tr_bencDictAddInt( d, "corruptEver", st->corruptEver );
+        tr_bencDictAddInt( d, "desiredAvailable", st->desiredAvailable );
+        tr_bencDictAddInt( d, "downloadedEver", st->downloadedEver );
         tr_bencDictAddInt( d, "error", st->error );
         tr_bencDictAddStr( d, "errorString", st->errorString );
-        tr_bencDictAddDouble( d, "recheckProgress", st->recheckProgress );
-        tr_bencDictAddDouble( d, "percentComplete", st->percentComplete );
-        tr_bencDictAddDouble( d, "percentDone", st->percentDone );
-        tr_bencDictAddDouble( d, "rateDownload", st->rateDownload );
-        tr_bencDictAddDouble( d, "rateUpload", st->rateUpload );
-        tr_bencDictAddDouble( d, "swarmspeed", st->swarmspeed );
-        tr_bencDictAddDouble( d, "ratio", st->ratio );
         tr_bencDictAddInt( d, "eta", st->eta );
-        tr_bencDictAddInt( d, "peersKnown", st->peersKnown );
-        tr_bencDictAddInt( d, "peersConnected", st->peersConnected );
-        tr_bencDictAddInt( d, "peersSendingToUs", st->peersSendingToUs );
-        tr_bencDictAddInt( d, "peersGettingFromUs", st->peersGettingFromUs );
-        tr_bencDictAddInt( d, "seeders", st->seeders );
-        tr_bencDictAddInt( d, "leechers", st->leechers );
-        tr_bencDictAddInt( d, "completedFromTracker", st->completedFromTracker );
-        tr_bencDictAddInt( d, "manualAnnounceTime", st->manualAnnounceTime );
-        tr_bencDictAddInt( d, "sizeWhenDone", st->sizeWhenDone );
-        tr_bencDictAddInt( d, "leftUntilDone", st->leftUntilDone );
-        tr_bencDictAddInt( d, "desiredAvailable", st->desiredAvailable );
-        tr_bencDictAddInt( d, "corruptEver", st->corruptEver );
-        tr_bencDictAddInt( d, "uploadedEver", st->uploadedEver );
-        tr_bencDictAddInt( d, "downloadedEver", st->downloadedEver );
-        tr_bencDictAddInt( d, "haveValid", st->haveValid );
         tr_bencDictAddInt( d, "haveUnchecked", st->haveUnchecked );
-        tr_bencDictAddInt( d, "startDate", st->startDate );
-        tr_bencDictAddInt( d, "activityDate", st->activityDate );
+        tr_bencDictAddInt( d, "haveValid", st->haveValid );
+        tr_bencDictAddInt( d, "id", tr_torrentId( tor ) );
+        tr_bencDictAddInt( d, "leechers", st->leechers );
+        tr_bencDictAddInt( d, "leftUntilDone", st->leftUntilDone );
+        tr_bencDictAddInt( d, "manualAnnounceTime", st->manualAnnounceTime );
+        tr_bencDictAddStr( d, "name", tor->info.name );
+        tr_bencDictAddInt( d, "peersConnected", st->peersConnected );
         t = tr_bencDictAddDict( d, "peersFrom", 4 );
             tr_bencDictAddInt( t, "cache",    f[TR_PEER_FROM_CACHE] );
             tr_bencDictAddInt( t, "incoming", f[TR_PEER_FROM_INCOMING] );
             tr_bencDictAddInt( t, "pex",      f[TR_PEER_FROM_PEX] );
             tr_bencDictAddInt( t, "tracker",  f[TR_PEER_FROM_TRACKER] );
-        t = tr_bencDictAddDict( d, "tracker_stat", 7 );
-            tr_bencDictAddStr( t, "scrapeResponse", s->scrapeResponse );
+        tr_bencDictAddInt( d, "peersGettingFromUs", st->peersGettingFromUs );
+        tr_bencDictAddInt( d, "peersKnown", st->peersKnown );
+        tr_bencDictAddInt( d, "peersSendingToUs", st->peersSendingToUs );
+        tr_bencDictAddDouble( d, "percentComplete", st->percentComplete );
+        tr_bencDictAddDouble( d, "percentDone", st->percentDone );
+        tr_bencDictAddDouble( d, "rateDownload", st->rateDownload );
+        tr_bencDictAddDouble( d, "rateUpload", st->rateUpload );
+        tr_bencDictAddDouble( d, "ratio", st->ratio );
+        tr_bencDictAddDouble( d, "recheckProgress", st->recheckProgress );
+        tr_bencDictAddInt( d, "seeders", st->seeders );
+        tr_bencDictAddInt( d, "sizeWhenDone", st->sizeWhenDone );
+        tr_bencDictAddInt( d, "startDate", st->startDate );
+        tr_bencDictAddInt( d, "status", st->status );
+        tr_bencDictAddDouble( d, "swarmSpeed", st->swarmSpeed );
+        t = tr_bencDictAddDict( d, "trackerStat", 7 );
             tr_bencDictAddStr( t, "announceResponse", s->announceResponse );
-            tr_bencDictAddInt( t, "lastScrapeTime", s->lastScrapeTime );
-            tr_bencDictAddInt( t, "nextScrapeTime", s->nextScrapeTime );
             tr_bencDictAddInt( t, "lastAnnounceTime", s->lastAnnounceTime );
+            tr_bencDictAddInt( t, "lastScrapeTime", s->lastScrapeTime );
             tr_bencDictAddInt( t, "nextAnnounceTime", s->nextAnnounceTime );
-            tr_bencDictAddInt( t, "nextManualAnnounceTime",
-                                                s->nextManualAnnounceTime );
+            tr_bencDictAddInt( t, "nextScrapeTime", s->nextScrapeTime );
+            tr_bencDictAddInt( t, "nextScrapeTime", s->nextScrapeTime );
+            tr_bencDictAddStr( t, "scrapeResponse", s->scrapeResponse );
+        tr_bencDictAddInt( d, "uploadedEver", st->uploadedEver );
     }
 
-    /* cleanup */
     tr_free( torrents );
     return NULL;
 }
@@ -181,15 +227,15 @@ torrentStatus( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
 static void
 addFiles( const tr_info * info, tr_benc * files )
 {
-    unsigned int i;
+    tr_file_index_t i;
     for( i=0; i<info->fileCount; ++i )
     {
         const tr_file * file = &info->files[i];
         tr_benc * d = tr_bencListAddDict( files, 4 );
+        tr_bencDictAddInt( d, "dnd", file->dnd );
         tr_bencDictAddInt( d, "length", file->length );
         tr_bencDictAddStr( d, "name", file->name );
         tr_bencDictAddInt( d, "priority", file->priority );
-        tr_bencDictAddInt( d, "dnd", file->dnd );
     }
 }
 
@@ -201,9 +247,9 @@ addTrackers( const tr_info * info, tr_benc * trackers )
     {
         const tr_tracker_info * t = &info->trackers[i];
         tr_benc * d = tr_bencListAddDict( trackers, 3 );
-        tr_bencDictAddInt( d, "tier", t->tier );
         tr_bencDictAddStr( d, "announce", t->announce );
         tr_bencDictAddStr( d, "scrape", t->scrape );
+        tr_bencDictAddInt( d, "tier", t->tier );
     }
 }
 
@@ -215,8 +261,9 @@ addInfo( const tr_torrent * tor, tr_benc * d )
     tr_bencDictAddStr( d, "comment", inf->comment ? inf->comment : "" );
     tr_bencDictAddStr( d, "creator", inf->creator ? inf->creator : "" );
     tr_bencDictAddInt( d, "dateCreated", inf->dateCreated );
+    addFiles( inf, tr_bencDictAddList( d, "files", inf->fileCount ) );
     tr_bencDictAddStr( d, "hashString", inf->hashString );
-    tr_bencDictAddInt( d, "id", tor->uniqueId );
+    tr_bencDictAddInt( d, "id", tr_torrentId( tor ) );
     tr_bencDictAddInt( d, "isMultifile", inf->isMultifile );
     tr_bencDictAddInt( d, "isPrivate", inf->isPrivate );
     tr_bencDictAddStr( d, "name", inf->name );
@@ -224,7 +271,6 @@ addInfo( const tr_torrent * tor, tr_benc * d )
     tr_bencDictAddInt( d, "pieceSize", inf->pieceSize );
     tr_bencDictAddStr( d, "torrent", inf->torrent );
     tr_bencDictAddInt( d, "totalSize", inf->totalSize );
-    addFiles   ( inf, tr_bencDictAddList( d, "files", inf->fileCount ) );
     addTrackers( inf, tr_bencDictAddList( d, "trackers", inf->trackerCount ) );
 }
 
@@ -233,10 +279,37 @@ torrentInfo( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
 {
     int i, torrentCount;
     tr_torrent ** torrents = getTorrents( handle, args_in, &torrentCount );
-    tr_benc * list = tr_bencDictAddList( args_out, "info", torrentCount );
+    tr_benc * list = tr_bencDictAddList( args_out, "torrent-info", torrentCount );
 
     for( i=0; i<torrentCount; ++i )
         addInfo( torrents[i], tr_bencListAdd( list ) );
+
+    tr_free( torrents );
+    return NULL;
+}
+
+/**
+***
+**/
+
+static const char*
+torrentList( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
+{
+    int i, torrentCount;
+    tr_torrent ** torrents = getTorrents( handle, args_in, &torrentCount );
+    tr_benc * list = tr_bencDictAddList( args_out, "list", torrentCount );
+
+    for( i=0; i<torrentCount; ++i ) {
+        tr_torrent * tor = torrents[i];
+        const tr_stat * st = tr_torrentStat( tor );
+        tr_benc * d = tr_bencListAddDict( list, 6 );
+        tr_bencDictAddInt( d, "id", tr_torrentId( tor ) );
+        tr_bencDictAddStr( d, "name", tor->info.name );
+        tr_bencDictAddDouble( d, "rateDownload", st->rateDownload );
+        tr_bencDictAddDouble( d, "rateUpload", st->rateUpload );
+        tr_bencDictAddDouble( d, "ratio", st->ratio );
+        tr_bencDictAddInt( d, "status", st->status );
+    }
 
     tr_free( torrents );
     return NULL;
@@ -257,7 +330,7 @@ torrentGet( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
     {
         tr_torrent * tor = torrents[i];
         tr_benc * d = tr_bencListAddDict( list, 6 );
-        tr_bencDictAddInt( d, "id", tor->uniqueId );
+        tr_bencDictAddInt( d, "id", tr_torrentId( tor ) );
         tr_bencDictAddInt( d, "peer-limit",
                            tr_torrentGetPeerLimit( tor ) );
         tr_bencDictAddInt( d, "speed-limit-down",
@@ -277,10 +350,10 @@ torrentGet( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
 }
 
 static const char*
-torrentSet( tr_handle * handle, tr_benc * args_in, tr_benc * args_out UNUSED )
+torrentSet( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
 {
     int i, torrentCount;
-    tr_torrent ** torrents = getTorrents( handle, args_in, &torrentCount );
+    tr_torrent ** torrents = getTorrents( h, args_in, &torrentCount );
 
     for( i=0; i<torrentCount; ++i )
     {
@@ -298,6 +371,7 @@ torrentSet( tr_handle * handle, tr_benc * args_in, tr_benc * args_out UNUSED )
         if( tr_bencDictFindInt( args_in, "speed-limit-up-enabled", &tmp ) )
             tr_torrentSetSpeedMode( tor, TR_UP, tmp ? TR_SPEEDLIMIT_SINGLE
                                                     : TR_SPEEDLIMIT_GLOBAL );
+        notify( h, TR_RPC_TORRENT_CHANGED, tor );
     }
 
     tr_free( torrents );
@@ -355,7 +429,8 @@ buildFileList( const tr_torrent * tor, tr_benc * dict,
 }
 
 static const char*
-torrentGetPriorities( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
+torrentGetPriorities( tr_handle * handle,
+                      tr_benc * args_in, tr_benc * args_out )
 {
     int i, torrentCount;
     tr_torrent ** torrents = getTorrents( handle, args_in, &torrentCount );
@@ -365,9 +440,9 @@ torrentGetPriorities( tr_handle * handle, tr_benc * args_in, tr_benc * args_out 
     {
         const tr_torrent * tor = torrents[i];
         tr_benc * d = tr_bencListAddDict( list, 6 );
-        tr_bencDictAddInt( d, "id", tor->uniqueId );
-        buildFileList( tor, d, "download", testFileDownload );
-        buildFileList( tor, d, "no-download", testFileDND );
+        tr_bencDictAddInt( d, "id", tr_torrentId( tor ) );
+        buildFileList( tor, d, "files-unwanted", testFileDND );
+        buildFileList( tor, d, "files-wanted", testFileDownload );
         buildFileList( tor, d, "priority-low", testFileLow );
         buildFileList( tor, d, "priority-normal", testFileNormal );
         buildFileList( tor, d, "priority-high", testFileHigh );
@@ -387,7 +462,7 @@ setFilePriorities( tr_torrent * tor, int priority, tr_benc * list )
     tr_file_index_t * files = tr_new0( tr_file_index_t, n );
 
     for( i=0; i<n; ++i )
-        if( tr_bencGetInt( tr_bencListChild(list,i), &tmp ) )
+        if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) )
             files[fileCount++] = tmp;
 
     if( fileCount )
@@ -406,7 +481,7 @@ setFileDLs( tr_torrent * tor, int do_download, tr_benc * list )
     tr_file_index_t * files = tr_new0( tr_file_index_t, n );
 
     for( i=0; i<n; ++i )
-        if( tr_bencGetInt( tr_bencListChild(list,i), &tmp ) )
+        if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) )
             files[fileCount++] = tmp;
 
     if( fileCount )
@@ -416,7 +491,8 @@ setFileDLs( tr_torrent * tor, int do_download, tr_benc * list )
 }
 
 static const char*
-torrentSetPriorities( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
+torrentSetPriorities( tr_handle * h,
+                      tr_benc * args_in, tr_benc * args_out UNUSED )
 {
     int i, torrentCount;
     tr_torrent ** torrents = getTorrents( h, args_in, &torrentCount );
@@ -426,16 +502,18 @@ torrentSetPriorities( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSE
         tr_benc * files;
         tr_torrent * tor = torrents[i];
 
+        if( tr_bencDictFindList( args_in, "files-unwanted", &files ) )
+            setFileDLs( tor, FALSE, files );
+        if( tr_bencDictFindList( args_in, "files-wanted", &files ) )
+            setFileDLs( tor, TRUE, files );
         if( tr_bencDictFindList( args_in, "priority-high", &files ) )
             setFilePriorities( tor, TR_PRI_HIGH, files );
         if( tr_bencDictFindList( args_in, "priority-low", &files ) )
             setFilePriorities( tor, TR_PRI_LOW, files );
         if( tr_bencDictFindList( args_in, "priority-normal", &files ) )
             setFilePriorities( tor, TR_PRI_NORMAL, files );
-        if( tr_bencDictFindList( args_in, "download", &files ) )
-            setFileDLs( tor, TRUE, files );
-        if( tr_bencDictFindList( args_in, "no-download", &files ) )
-            setFileDLs( tor, FALSE, files );
+
+        notify( h, TR_RPC_TORRENT_CHANGED, tor );
     }
 
     tr_free( torrents );
@@ -452,7 +530,8 @@ torrentAdd( tr_handle * h, tr_benc * args_in, tr_benc * args_out )
     const char * filename;
     if( !tr_bencDictFindStr( args_in, "filename", &filename ) )
         return "no filename specified";
-    else {
+    else
+    {
         int64_t i;
         int err = 0;
         const char * str;
@@ -461,8 +540,8 @@ torrentAdd( tr_handle * h, tr_benc * args_in, tr_benc * args_out )
 
         ctor = tr_ctorNew( h );
         tr_ctorSetMetainfoFromFile( ctor, filename );
-        if( tr_bencDictFindStr( args_in, "destination", &str ) )
-            tr_ctorSetDestination( ctor, TR_FORCE, str );
+        if( tr_bencDictFindStr( args_in, "download-dir", &str ) )
+            tr_ctorSetDownloadDir( ctor, TR_FORCE, str );
         if( tr_bencDictFindInt( args_in, "paused", &i ) )
             tr_ctorSetPaused( ctor, TR_FORCE, i );
         if( tr_bencDictFindInt( args_in, "peer-limit", &i ) )
@@ -470,12 +549,14 @@ torrentAdd( tr_handle * h, tr_benc * args_in, tr_benc * args_out )
         tor = tr_torrentNew( h, ctor, &err );
         tr_ctorFree( ctor );
 
-        if( tor )
+        if( tor ) {
             addInfo( tor, tr_bencDictAdd( args_out, "torrent-added" ) );
-        else if( err == TR_EDUPLICATE )
+            notify( h, TR_RPC_TORRENT_ADDED, tor );
+        } else if( err == TR_EDUPLICATE ) {
             return "duplicate torrent";
-        else if( err == TR_EINVALID )
+        } else if( err == TR_EINVALID ) {
             return "invalid or corrupt torrent file";
+        }
     }
 
     return NULL;
@@ -491,6 +572,8 @@ sessionSet( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
     int64_t i;
     const char * str;
 
+    if( tr_bencDictFindStr( args_in, "download-dir", &str ) )
+        tr_sessionSetDownloadDir( h, str );
     if( tr_bencDictFindInt( args_in, "peer-limit", &i ) )
         tr_sessionSetPeerLimit( h, i );
     if( tr_bencDictFindInt( args_in, "pex-allowed", &i ) )
@@ -516,6 +599,8 @@ sessionSet( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
             tr_sessionSetEncryption( h, TR_ENCRYPTION_PREFERRED );
     }
 
+    notify( h, TR_RPC_SESSION_CHANGED, NULL );
+
     return NULL;
 }
 
@@ -523,8 +608,10 @@ static const char*
 sessionGet( tr_handle * h, tr_benc * args_in UNUSED, tr_benc * args_out )
 {
     const char * str;
-    tr_benc * d = tr_bencDictAddDict( args_out, "session", 9 );
+    tr_benc * d = tr_bencDictAddDict( args_out, "session", 10 );
 
+    tr_bencDictAddStr( d, "download-dir",
+                          tr_sessionGetDownloadDir( h ) );
     tr_bencDictAddInt( d, "peer-limit",
                           tr_sessionGetPeerLimit( h ) );
     tr_bencDictAddInt( d, "pex-allowed",
@@ -559,24 +646,24 @@ sessionGet( tr_handle * h, tr_benc * args_in UNUSED, tr_benc * args_out )
 
 typedef const char* (handler)( tr_handle*, tr_benc*, tr_benc* );
 
-struct method
-{
+struct method {
     const char * name;
     handler * func;
 } methods[] = { 
-    { "torrent-start", torrentStart },
-    { "torrent-stop", torrentStop },
-    { "torrent-close", torrentClose },
-    { "torrent-verify", torrentVerify },
-    { "torrent-status", torrentStatus },
-    { "torrent-info", torrentInfo },
-    { "torrent-add", torrentAdd },
-    { "torrent-set", torrentSet },
-    { "torrent-get", torrentGet },
-    { "torrent-set-priorities", torrentSetPriorities },
-    { "torrent-get-priorities", torrentGetPriorities },
+    { "session-get", sessionGet },
     { "session-set", sessionSet },
-    { "session-get", sessionGet }
+    { "torrent-add", torrentAdd },
+    { "torrent-close", torrentClose },
+    { "torrent-get-priorities", torrentGetPriorities },
+    { "torrent-get", torrentGet },
+    { "torrent-info", torrentInfo },
+    { "torrent-list", torrentList },
+    { "torrent-set-priorities", torrentSetPriorities },
+    { "torrent-set", torrentSet },
+    { "torrent-start", torrentStart },
+    { "torrent-status", torrentStatus },
+    { "torrent-stop", torrentStop },
+    { "torrent-verify", torrentVerify }
 };
 
 static char*
@@ -588,15 +675,13 @@ request_exec( struct tr_handle * handle,
     const char * str;
     char * out;
     tr_benc response;
-    tr_benc * args_in = tr_bencDictFind( request, "args" );
+    tr_benc * args_in = tr_bencDictFind( request, "arguments" );
     tr_benc * args_out = NULL;
     const char * result = NULL;
 
     /* build the response skeleton */
     tr_bencInitDict( &response, 3 );
-    if( tr_bencDictFindInt( request, "tag", &i ) )
-        tr_bencDictAddInt( request, "tag", i );
-    args_out = tr_bencDictAddDict( &response, "args", 0 );
+    args_out = tr_bencDictAddDict( &response, "arguments", 0 );
 
     /* parse the request */
     if( !tr_bencDictFindStr( request, "method", &str ) )
@@ -615,8 +700,8 @@ request_exec( struct tr_handle * handle,
     if( !result )
          result = "success";
     tr_bencDictAddStr( &response, "result", result );
-fprintf( stderr, "response [%s]", tr_bencSave( &response, NULL ) );
-tr_bencPrint( &response );
+    if( tr_bencDictFindInt( request, "tag", &i ) )
+        tr_bencDictAddInt( &response, "tag", i );
     out = tr_bencSaveAsJSON( &response, response_len );
     tr_bencFree( &response );
     return out;
@@ -624,9 +709,9 @@ tr_bencPrint( &response );
 
 char*
 tr_rpc_request_exec_json( struct tr_handle  * handle,
-                         const void         * request_json,
-                         int                  request_len,
-                         int                * response_len )
+                          const void        * request_json,
+                          int                 request_len,
+                          int               * response_len )
 {
     tr_benc top;
     int have_content;
@@ -635,7 +720,7 @@ tr_rpc_request_exec_json( struct tr_handle  * handle,
     if( request_len < 0 )
         request_len = strlen( request_json );
 
-    have_content = !tr_jsonParse( request_json, (const char*)request_json + request_len, &top, NULL );
+    have_content = !tr_jsonParse( request_json, request_len, &top, NULL );
     ret = request_exec( handle, have_content ? &top : NULL, response_len );
 
     if( have_content )
@@ -644,62 +729,70 @@ tr_rpc_request_exec_json( struct tr_handle  * handle,
 }
 
 char*
-tr_rpc_request_exec_rison( struct tr_handle  * handle,
-                           const void        * request_rison,
-                           int                 request_len,
-                           int               * response_len )
+tr_rpc_request_exec_uri( struct tr_handle  * handle,
+                         const void        * request_uri,
+                         int                 request_len,
+                         int               * response_len )
 {
     char * ret = NULL;
-    tr_benc top;
-    int have_content;
-    char * request = tr_strndup( request_rison, request_len );;
+    tr_benc top, * args;
+    char * request = tr_strndup( request_uri, request_len );
+    const char * pch;
 
-fprintf( stderr, "passed in: --> %s <--\n", request );
-    /* possibly convert o-rison to rison */
-    if( request && ( *request != '(' ) )
+    tr_bencInitDict( &top, 3 );
+    args = tr_bencDictAddDict( &top, "arguments", 0 );
+
+    /* munge the URI into a usable form.
+     * we have very loose typing on this to make the URIs as simple as possible:
+     * - anything not a 'tag' or 'method' is automatically in 'arguments'
+     * - values that are all-digits are numbers
+     * - values that are all-digits or commas are number lists
+     * - all other values are strings
+     */
+
+    pch = strchr( request, '?' );
+    if( !pch ) pch = request;
+    while( pch )
     {
-        const int n = strlen( request );
-        char * tmp = tr_new( char, n + 3 );
-        tmp[0] = '(';
-        memcpy( tmp+1, request, n );
-        tmp[n+1] = ')';
-        tmp[n+2] = '\0';
-        tr_free( request );
-        request = tmp;
-    }
-fprintf( stderr, "after o-rison conversion: --> %s <--\n", request );
-
-    /* convert rison to json */
-    {
-        char * tmp = tr_rison2json( request, strlen( request ) );
-        tr_free( request );
-        request = tmp;
-    }
-fprintf( stderr, "after json conversion: --> %s <--\n", request );
-
-    /* parse the json */
-    have_content = !tr_jsonParse( request, request+strlen(request), &top, NULL );
-    if( have_content )
-    {
-        /* for convenience' sake, our URI rpc notation allows the
-         * `args' object to be declared implicitly... */
-        tr_benc tmp, *args;
-        int64_t i;
-        const char * str;
-        tr_bencInitDict( &tmp, 3 );
-        if( tr_bencDictFindInt( &top, "tag", &i ) )
-            tr_bencDictAddInt( &tmp, "tag", i );
-        if( tr_bencDictFindStr( &top, "method", &str ) )
-            tr_bencDictAddStr( &tmp, "method", str );
-        args = tr_bencDictAdd( &tmp, "args" );
-        *args = top;
-tr_bencPrint( &tmp);
-        ret = request_exec( handle, &tmp, response_len );
-        tr_bencInitInt( args, 0 );
-        tr_bencFree( &tmp );
-        tr_bencFree( &top );
+        const char * delim = strchr( pch, '=' );
+        const char * next = strchr( pch, '&' );
+        if( delim )
+        {
+            int isNum = 1;
+            int isNumList = 1;
+            const char * walk;
+            char * key = tr_strndup( pch, delim-pch );
+            int isArg = strcmp( key, "method" ) && strcmp( key, "tag" );
+            tr_benc * parent = isArg ? args : &top;
+            char * val = next ? tr_strndup( delim+1, next-(delim+1) )
+                              : tr_strdup( delim+1 );
+            for( walk=val; *walk && ( isNumList || isNum ); ++walk ) {
+                if( isNumList ) isNumList = *walk=='-' || isdigit(*walk) || *walk==',';
+                if( isNum     ) isNum     = *walk=='-' || isdigit(*walk);
+            }
+            if( isNum )
+                tr_bencDictAddInt( parent, key, strtol( val, NULL, 10 ) );
+            else if( !isNumList )
+                tr_bencDictAddStr( parent, key, val );
+            else {
+                tr_benc * numList = tr_bencDictAddList( parent, key, 10 );
+                walk = val;
+                for( ;; ) {
+                    char * end;
+                    tr_bencListAddInt( numList, strtol( walk, &end, 10 ) );
+                    if( *end!=',' )
+                        break;
+                    walk = end + 1;
+                }
+            }
+        }
+        pch = next ? next+1 : NULL;
     }
 
+    ret = request_exec( handle, &top, response_len );
+
+    /* cleanup */
+    tr_bencFree( &top );
     tr_free( request );
     return ret;
 }

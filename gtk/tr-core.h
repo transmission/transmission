@@ -134,9 +134,11 @@ void tr_core_add_list( TrCore      * self,
 #define tr_core_add_list_defaults(c,l) \
         tr_core_add_list(c,l,PREF_FLAG_DEFAULT,PREF_FLAG_DEFAULT)
 
-/**
- * Add a torrent.
- */
+
+/** Add a torrent. */
+gboolean tr_core_add_file( TrCore*, const char * filename, gboolean * setme_success, GError ** err );
+
+/** Add a torrent. */
 void tr_core_add_torrent( TrCore*, TrTorrent* );
 
 /**
@@ -148,8 +150,6 @@ void tr_core_torrents_added( TrCore * self );
 /******
 *******
 ******/
-
-void tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter );
 
 void tr_core_remove_torrent( TrCore * self, TrTorrent * gtor, int deleteFiles );
 

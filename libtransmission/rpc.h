@@ -13,6 +13,10 @@
 #ifndef TR_RPC_H
 #define TR_RPC_H
 
+/***
+****  RPC processing
+***/
+
 struct tr_handle;
 
 /* http://www.json.org/ */
@@ -22,11 +26,11 @@ tr_rpc_request_exec_json( struct tr_handle  * handle,
                           int                 request_len,
                           int               * response_len );
 
-/* http://mjtemplate.org/examples/rison.html */
+/* see the RPC spec's "Request URI Notation" section */
 char*
-tr_rpc_request_exec_rison( struct tr_handle  * handle,
-                           const void        * request_rison,
-                           int                 request_len,
-                           int               * response_len );
+tr_rpc_request_exec_uri( struct tr_handle  * handle,
+                         const void        * request_uri,
+                         int                 request_len,
+                         int               * response_len );
 
 #endif

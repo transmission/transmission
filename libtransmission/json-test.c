@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "transmission.h"
 #include "bencode.h"
+#include "json.h"
 #include "utils.h" /* tr_free */
 
 #define VERBOSE 0
@@ -39,7 +40,7 @@ test1( void )
     const char * str;
     int64_t i;
     const uint8_t * end = NULL;
-    const int err = tr_jsonParse( in, in+strlen(in), &top, &end );
+    const int err = tr_jsonParse( in, strlen(in), &top, &end );
 
     check( !err );
     check( tr_bencIsDict( &top ) );

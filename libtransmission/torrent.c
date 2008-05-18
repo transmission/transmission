@@ -42,7 +42,6 @@
 #include "ratecontrol.h"
 #include "torrent.h"
 #include "tracker.h"
-#include "trcompat.h" /* for strlcpy */
 #include "trevent.h"
 #include "utils.h"
 #include "verify.h"
@@ -52,6 +51,12 @@
 /***
 ****
 ***/
+
+int
+tr_torrentId( const tr_torrent * tor )
+{
+    return tor->uniqueId;
+}
 
 tr_torrent*
 tr_torrentFindFromId( tr_handle * handle, int id )
@@ -202,13 +207,13 @@ onTrackerResponse( void * tracker UNUSED, void * vevent, void * user_data )
         case TR_TRACKER_WARNING:
             tr_torerr( tor, _( "Tracker warning: \"%s\"" ), event->text );
             tor->error = TR_ERROR_TC_WARNING;
-            strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
+            tr_strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
             break;
 
         case TR_TRACKER_ERROR:
             tr_torerr( tor, _( "Tracker error: \"%s\"" ), event->text );
             tor->error = TR_ERROR_TC_ERROR;
-            strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
+            tr_strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
             break;
 
         case TR_TRACKER_ERROR_CLEAR:
@@ -450,7 +455,7 @@ torrentRealInit( tr_handle     * h,
 
     tor->upload         = tr_rcInit();
     tor->download       = tr_rcInit();
-    tor->swarmspeed     = tr_rcInit();
+    tor->swarmSpeed     = tr_rcInit();
 
     tr_sha1( tor->obfuscatedHash, "req2", 4,
                                   info->hash, SHA_DIGEST_LENGTH,
@@ -485,9 +490,17 @@ torrentRealInit( tr_handle     * h,
     tor->tracker = tr_trackerNew( tor );
     tor->trackerSubscription = tr_trackerSubscribe( tor->tracker, onTrackerResponse, tor );
 
-    tor->next = h->torrentList;
-    h->torrentList = tor;
-    h->torrentCount++;
+    {
+        tr_torrent * it = NULL;
+        tr_torrent * last = NULL;
+        while(( it = tr_torrentNext( h, it )))
+            last = it;
+        if( !last )
+            h->torrentList = tor;
+        else
+            last->next = tor;
+        ++h->torrentCount;
+    }
 
     tr_globalUnlock( h );
 
@@ -562,20 +575,20 @@ tr_torrentNew( tr_handle      * handle,
 **/
 
 void
-tr_torrentSetFolder( tr_torrent * tor, const char * path )
+tr_torrentSetDownloadDir( tr_torrent * tor, const char * path )
 {
-    if( !path || !tor->destination || strcmp( path, tor->destination ) )
+    if( !path || !tor->downloadDir || strcmp( path, tor->downloadDir ) )
     {
-        tr_free( tor->destination );
-        tor->destination = tr_strdup( path );
+        tr_free( tor->downloadDir );
+        tor->downloadDir = tr_strdup( path );
         tr_torrentSaveResume( tor );
     }
 }
 
 const char*
-tr_torrentGetFolder( const tr_torrent * tor )
+tr_torrentGetDownloadDir( const tr_torrent * tor )
 {
-    return tor->destination;
+    return tor->downloadDir;
 }
 
 void
@@ -690,7 +703,7 @@ tr_torrentStat( tr_torrent * tor )
     tc = tor->tracker;
     s->tracker = tr_trackerGetAddress( tor->tracker );
 
-    tr_trackerStat( tor->tracker, &s->tracker_stat );
+    tr_trackerStat( tor->tracker, &s->trackerStat );
 
     tr_peerMgrTorrentStats( tor->handle->peerMgr,
                             tor->info.hash,
@@ -718,7 +731,7 @@ tr_torrentStat( tr_torrent * tor )
                          &s->leechers, 
                          &s->seeders );
 
-    s->swarmspeed = tr_rcRate( tor->swarmspeed );
+    s->swarmSpeed = tr_rcRate( tor->swarmSpeed );
     
     s->startDate = tor->startDate;
     s->activityDate = tor->activityDate;
@@ -929,7 +942,7 @@ freeTorrent( tr_torrent * tor )
 
     tr_rcClose( tor->upload );
     tr_rcClose( tor->download );
-    tr_rcClose( tor->swarmspeed );
+    tr_rcClose( tor->swarmSpeed );
 
     tr_trackerUnsubscribe( tor->tracker, tor->trackerSubscription );
     tr_trackerFree( tor->tracker );
@@ -937,7 +950,7 @@ freeTorrent( tr_torrent * tor )
 
     tr_bitfieldFree( tor->checkedPieces );
 
-    tr_free( tor->destination );
+    tr_free( tor->downloadDir );
 
     if( tor == h->torrentList )
         h->torrentList = tor->next;
@@ -950,8 +963,6 @@ freeTorrent( tr_torrent * tor )
 
     assert( h->torrentCount >= 1 );
     h->torrentCount--;
-
-    tr_torinf( tor, _( "Closing torrent; %d left" ), h->torrentCount );
 
     tr_metainfoFree( inf );
     tr_free( tor );
@@ -1076,7 +1087,7 @@ stopTorrent( void * vtor )
     {
         char path[MAX_PATH_LENGTH];
         const tr_file * file = &tor->info.files[i];
-        tr_buildPath( path, sizeof(path), tor->destination, file->name, NULL );
+        tr_buildPath( path, sizeof(path), tor->downloadDir, file->name, NULL );
         tr_fdFileClose( path );
     }
 }
@@ -1517,7 +1528,7 @@ tr_torrentGetMTimes( const tr_torrent * tor, int * setme_n )
         char fname[MAX_PATH_LENGTH];
         struct stat sb;
         tr_buildPath( fname, sizeof(fname),
-                      tor->destination, tor->info.files[i].name, NULL );
+                      tor->downloadDir, tor->info.files[i].name, NULL );
         if ( !stat( fname, &sb ) ) {
 #ifdef SYS_DARWIN
             m[i] = sb.st_mtimespec.tv_sec;

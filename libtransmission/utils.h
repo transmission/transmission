@@ -34,6 +34,14 @@
 ****
 ***/
 
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
 #ifndef UNUSED
 #ifdef __GNUC__
 #define UNUSED __attribute__((unused))
@@ -191,6 +199,9 @@ void  tr_free    ( void* );
 char* tr_strdup( const char * str ) TR_GNUC_MALLOC;
 char* tr_strndup( const char * str, int len ) TR_GNUC_MALLOC;
 char* tr_strdup_printf( const char * fmt, ... )  TR_GNUC_PRINTF( 1, 2 ) TR_GNUC_MALLOC;
+size_t tr_strlcpy( char * dst, const char * src, size_t siz );
+
+
 
 const char* tr_strerror( int );
 

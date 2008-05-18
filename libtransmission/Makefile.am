@@ -16,7 +16,6 @@ libtransmission_a_SOURCES = \
     ggets.c \
     handshake.c \
     inout.c \
-    ipcparse.c \
     json.c \
     list.c \
     makemeta.c \
@@ -33,6 +32,7 @@ libtransmission_a_SOURCES = \
     ratecontrol.c \
     resume.c \
     rpc.c \
+    rpc-server.c \
     session.c \
     stats.c \
     torrent.c \
@@ -57,7 +57,6 @@ noinst_HEADERS = \
     ggets.h \
     handshake.h \
     inout.h \
-    ipcparse.h \
     json.h \
     list.h \
     makemeta.h \
@@ -75,12 +74,12 @@ noinst_HEADERS = \
     ratecontrol.h \
     resume.h \
     rpc.h \
+    rpc-server.h \
     session.h \
     stats.h \
     torrent.h \
     tracker.h \
     transmission.h \
-    trcompat.h \
     trevent.h \
     upnp.h \
     utils.h \
@@ -99,6 +98,7 @@ noinst_PROGRAMS = $(TESTS)
 
 APPS_LDADD = \
     ./libtransmission.a  \
+    $(top_builddir)/third-party/shttpd/libshttpd.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/libevent/libevent.la \

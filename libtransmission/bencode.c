@@ -1093,7 +1093,13 @@ jsonStringFunc( const tr_benc * val, void * vdata )
             case '\r': evbuffer_add_printf( data->out, "\\n" ); break;
             case '\t': evbuffer_add_printf( data->out, "\\n" ); break;
             case '\\': evbuffer_add_printf( data->out, "\\\\" ); break;
-            default:   evbuffer_add_printf( data->out, "%c", *it ); break;
+            default: {
+                if( isascii( *it ) )
+                    evbuffer_add_printf( data->out, "%c", *it );
+                else
+                    evbuffer_add_printf( data->out, "\\u%0x", (unsigned int)*it );
+                break;
+            }
         }
     }
     evbuffer_add_printf( data->out, "\"" );

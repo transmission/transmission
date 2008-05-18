@@ -25,7 +25,6 @@
 #include "publish.h"
 #include "torrent.h"
 #include "tracker.h"
-#include "trcompat.h" /* strlcpy */
 #include "trevent.h"
 #include "utils.h"
 #include "web.h"
@@ -312,8 +311,8 @@ onTrackerResponse( tr_session    * session,
     if( !t ) /* tracker's been closed */
         return;
 
-    dbgmsg( t->name, "tracker response: %d", responseCode );
-    tr_ndbg( t->name, "tracker response: %d", responseCode );
+    dbgmsg( t->name, "tracker response: %ld", responseCode );
+    tr_ndbg( t->name, "tracker response: %ld", responseCode );
     t->lastAnnounceResponse = responseCode;
 
     if( responseCode == HTTP_OK )
@@ -452,7 +451,7 @@ onScrapeResponse( tr_session   * session,
         return;
 
     dbgmsg( t->name, "scrape response: %ld\n", responseCode );
-    tr_ndbg( t->name, "scrape response: %d", responseCode );
+    tr_ndbg( t->name, "scrape response: %ld", responseCode );
     t->lastScrapeResponse = responseCode;
 
     if( responseCode == HTTP_OK )
@@ -525,7 +524,7 @@ onScrapeResponse( tr_session   * session,
     else
     {
         const int interval = t->retryScrapeIntervalSec + t->randOffset;
-        dbgmsg( t->name, "Tracker responded to scrape with %d.  Retrying in %d seconds.",
+        dbgmsg( t->name, "Tracker responded to scrape with %ld.  Retrying in %d seconds.",
                    responseCode,  interval );
         t->retryScrapeIntervalSec *= 2;
         t->scrapeAt = time( NULL ) + interval;

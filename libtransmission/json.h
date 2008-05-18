@@ -13,7 +13,7 @@
 #ifndef TR_JSON_H
 
 int tr_jsonParse( const void       * vbuf,
-                  const void       * bufend,
+                  size_t             len,
                   struct tr_benc   * setme_benc,
                   const uint8_t   ** setme_end );
 

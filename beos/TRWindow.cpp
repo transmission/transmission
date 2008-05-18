@@ -20,7 +20,7 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id:$
+ * $Id$
  */
 
 #include "TRWindow.h"
@@ -109,7 +109,7 @@ TRWindow::TRWindow() : BWindow(BRect(10, 40, 350, 110), "Transmission", B_TITLED
 	delete rectFrame;
 	
 	// Bring up the Transmission Engine
-	engine = tr_init( "beos" );
+	engine = tr_sessionInit( "beos" );
 	LoadSettings();
 	
 	UpdateList(-1, true);
@@ -132,7 +132,7 @@ TRWindow::~TRWindow() {
 		snooze(100000);
 	}
 	/* XXX there's no way to make sure the torrent threads are running so this might crash */
-	tr_close(engine);
+	tr_sessionClose(engine);
 	stop_watching(this);
 	delete quitter;
 }

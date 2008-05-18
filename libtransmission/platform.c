@@ -51,7 +51,6 @@
 
 #include "transmission.h"
 #include "platform.h"
-#include "trcompat.h"
 #include "utils.h"
 
 /***
@@ -309,7 +308,7 @@ getOldConfigDir( void )
                        "Library", "Application Support",
                        "Transmission", NULL );
 #elif defined(__AMIGAOS4__)
-        strlcpy( buf, "PROGDIR:.transmission", sizeof( buf ) );
+        tr_strlcpy( buf, "PROGDIR:.transmission", sizeof( buf ) );
 #elif defined(WIN32)
         char appdata[MAX_PATH_LENGTH];
         SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
@@ -448,7 +447,7 @@ tr_setConfigDir( tr_handle * handle, const char * configDir )
 }
 
 const char *
-tr_getConfigDir( const tr_handle * handle )
+tr_sessionGetConfigDir( const tr_handle * handle )
 {
     return handle->configDir;
 }

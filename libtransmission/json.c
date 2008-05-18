@@ -120,12 +120,13 @@ callback( void * vdata, int type, const struct JSON_value_struct * value )
 
 int
 tr_jsonParse( const void      * vbuf,
-              const void      * bufend,
+              size_t            len,
               tr_benc         * setme_benc,
               const uint8_t  ** setme_end )
 {
     int err = 0;
     const char * buf = vbuf;
+    const void * bufend = buf + len;
     struct JSON_checker_struct * checker;
     struct json_benc_data data;
 

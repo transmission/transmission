@@ -39,7 +39,6 @@
 #include "crypto.h" /* tr_sha1 */
 #include "metainfo.h"
 #include "platform.h"
-#include "trcompat.h" /* strlcpy */
 #include "utils.h"
 
 /***********************************************************************

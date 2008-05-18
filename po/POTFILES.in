@@ -6,7 +6,6 @@ gtk/details.c
 gtk/dialogs.c
 gtk/file-list.c
 gtk/hig.c
-gtk/ipc.c
 gtk/main.c
 gtk/makemeta-ui.c
 gtk/msgwin.c

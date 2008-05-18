@@ -271,19 +271,6 @@ checkfilenames( int argc, char **argv )
     return g_slist_reverse( ret );
 }
 
-char *
-getdownloaddir( void )
-{
-    static char * wd = NULL;
-    char * dir = pref_string_get( PREF_KEY_DIR_DEFAULT );
-    if ( dir == NULL ) {
-        if( wd == NULL )
-            wd = g_get_current_dir();
-        dir = g_strdup( wd );
-    }
-    return dir;
-}
-
 static void
 onErrorResponse(GtkWidget * dialog, int resp UNUSED, gpointer glist)
 {
@@ -454,6 +441,7 @@ gtr_open_file( const char * path )
 }
 
 #ifdef HAVE_DBUS_GLIB
+
 static DBusGProxy*
 get_hibernation_inhibit_proxy( void )
 {
@@ -525,4 +513,34 @@ gtr_uninhibit_hibernation( guint inhibit_cookie )
         g_object_unref( G_OBJECT( proxy ) );
     }
 #endif
+}
+
+#define VALUE_SERVICE_NAME        "com.transmissionbt.Transmission"
+#define VALUE_SERVICE_OBJECT_PATH "/com/transmissionbt/Transmission"
+#define VALUE_SERVICE_INTERFACE   "com.transmissionbt.Transmission"
+
+gboolean
+gtr_dbus_add_torrent( const char * filename )
+{
+    static gboolean success = FALSE;
+#ifdef HAVE_DBUS_GLIB
+    DBusGProxy * proxy = NULL;
+    GError * err = NULL;
+    DBusGConnection * conn;
+    if(( conn = dbus_g_bus_get( DBUS_BUS_SESSION, &err )))
+        proxy = dbus_g_proxy_new_for_name (conn, VALUE_SERVICE_NAME,
+                                                 VALUE_SERVICE_OBJECT_PATH,
+                                                 VALUE_SERVICE_INTERFACE );
+    else if( err )
+       g_message( "err: %s", err->message );
+    if( proxy )
+        dbus_g_proxy_call( proxy, "AddFile", &err,
+                           G_TYPE_STRING, filename,
+                           G_TYPE_INVALID,
+                           G_TYPE_BOOLEAN, &success,
+                           G_TYPE_INVALID );
+    if( err )
+       g_message( "err: %s", err->message );
+#endif
+    return success;
 }

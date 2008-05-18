@@ -48,7 +48,6 @@
 #include "details.h"
 #include "dialogs.h"
 #include "hig.h"
-#include "ipc.h"
 #include "makemeta-ui.h"
 #include "msgwin.h"
 #include "notify.h"
@@ -123,8 +122,6 @@ struct cbdata
 
 static GtkUIManager * myUIManager = NULL;
 
-static gboolean
-sendremote( GSList * files, gboolean sendquit );
 static void
 appsetup( TrWindow * wind, GSList * args,
           struct cbdata *,
@@ -282,18 +279,67 @@ setupsighandlers( void )
       signal( sigs[i], fatalsig );
 }
 
+struct rpc_data
+{
+    int type;
+    int torrentId;
+    tr_torrent * tor;
+    struct cbdata * cbdata;
+};
+
+static int
+onRPCIdle( void * vdata )
+{
+    struct rpc_data * data = vdata;
+    switch( data->type )
+    {
+        case TR_RPC_TORRENT_ADDED:
+            tr_core_add_torrent( data->cbdata->core, tr_torrent_new_preexisting( data->tor ) );
+            break;
+        case TR_RPC_TORRENT_STARTED:
+            /* this should be automatic */
+            break;
+        case TR_RPC_TORRENT_STOPPED:
+            /* this should be automatic */
+            break;
+        case TR_RPC_TORRENT_CLOSING:
+            /* FIXME */
+            break;
+        case TR_RPC_TORRENT_CHANGED:
+        case TR_RPC_SESSION_CHANGED:
+            /* nothing interesting to do here */
+            break;
+    }
+    g_free( data );
+    return FALSE;
+}
+
+static void
+onRPCChanged( tr_handle            * handle UNUSED,
+              tr_rpc_callback_type   type,
+              struct tr_torrent    * tor,
+              void                 * cbdata )
+{
+    /* this callback is being invoked from the libtransmission thread,
+     * so let's push the information over to the gtk+ thread where
+     * it's safe to update the gui */
+    struct rpc_data * data = g_new0( struct rpc_data, 1 );
+    data->type = type;
+    data->torrentId = tor ? tr_torrentId( tor ) : -1;
+    data->tor = type == TR_RPC_TORRENT_CLOSING ? NULL : tor;
+    data->cbdata = cbdata;
+    g_idle_add( onRPCIdle, data );
+}
+
 int
 main( int argc, char ** argv )
 {
-    gboolean do_inhibit;
-    guint inhibit_cookie;
     char * err = NULL;
     struct cbdata * cbdata;
     GSList * argfiles;
     GError * gerr;
     gboolean didinit = FALSE;
     gboolean didlock = FALSE;
-    gboolean sendquit = FALSE;
     gboolean startpaused = FALSE;
     gboolean startminimized = FALSE;
     char * domain = "transmission";
@@ -302,8 +348,6 @@ main( int argc, char ** argv )
     GOptionEntry entries[] = {
         { "paused", 'p', 0, G_OPTION_ARG_NONE, &startpaused,
           _("Start with all torrents paused"), NULL },
-        { "quit", 'q', 0, G_OPTION_ARG_NONE, &sendquit,
-          _( "Ask the running instance to quit"), NULL },
 #ifdef STATUS_ICON_SUPPORTED
         { "minimized", 'm', 0, G_OPTION_ARG_NONE, &startminimized,
           _( "Start minimized in system tray"), NULL },
@@ -331,7 +375,7 @@ main( int argc, char ** argv )
         g_clear_error( &gerr );
         return 0;
     }
-    if( !configDir )
+    if( configDir == NULL )
         configDir = (char*) tr_getDefaultConfigDir( );
 
     tr_notify_init( );
@@ -344,30 +388,50 @@ main( int argc, char ** argv )
     gtk_ui_manager_ensure_update (myUIManager);
     gtk_window_set_default_icon_name ( "transmission" );
 
-    argfiles = checkfilenames( argc-1, argv+1 );
-    didlock = didinit && sendremote( argfiles, sendquit );
     setupsighandlers( ); /* set up handlers for fatal signals */
 
-    if( ( didinit || cf_init( configDir, &err ) ) &&
-        ( didlock || cf_lock( &err ) ) )
+    /* either get a lockfile s.t. this is the one instance of
+     * transmission that's running, OR if there are files to
+     * be added, delegate that to the running instance via dbus */
+    didlock = cf_lock( &err );
+    argfiles = checkfilenames( argc-1, argv+1 );
+    if( !didlock && argfiles )
     {
-        tr_handle * h = tr_initFull( configDir,
-                                     "gtk",
-                                     pref_flag_get( PREF_KEY_PEX ),
-                                     pref_flag_get( PREF_KEY_NAT ),
-                                     pref_int_get( PREF_KEY_PORT ),
-                                     pref_flag_get( PREF_KEY_ENCRYPTED_ONLY )
-                                         ? TR_ENCRYPTION_REQUIRED
-                                         : TR_ENCRYPTION_PREFERRED,
-                                     pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ),
-                                     pref_int_get( PREF_KEY_UL_LIMIT ),
-                                     pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ),
-                                     pref_int_get( PREF_KEY_DL_LIMIT ),
-                                     pref_int_get( PREF_KEY_MAX_PEERS_GLOBAL ),
-                                     pref_int_get( PREF_KEY_MSGLEVEL ),
-                                     TRUE, /* message queueing */
-                                     pref_flag_get( PREF_KEY_BLOCKLIST_ENABLED ),
-                                     pref_int_get( PREF_KEY_PEER_SOCKET_TOS ) );
+        GSList * l;
+        gboolean delegated = FALSE;
+        for( l=argfiles; l; l=l->next )
+            delegated |= gtr_dbus_add_torrent( l->data );
+        if( delegated )
+            err = NULL;
+    }
+
+    if( didlock && ( didinit || cf_init( configDir, &err ) ) )
+    {
+        gboolean do_inhibit = FALSE;
+        guint inhibit_cookie = 0;
+
+        tr_handle * h = tr_sessionInitFull(
+                            configDir,
+                            "gtk",
+                            pref_string_get( PREF_KEY_DOWNLOAD_DIR ),
+                            pref_flag_get( PREF_KEY_PEX ),
+                            pref_flag_get( PREF_KEY_NAT ),
+                            pref_int_get( PREF_KEY_PORT ),
+                            pref_flag_get( PREF_KEY_ENCRYPTED_ONLY )
+                                ? TR_ENCRYPTION_REQUIRED
+                                : TR_ENCRYPTION_PREFERRED,
+                            pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ),
+                            pref_int_get( PREF_KEY_UL_LIMIT ),
+                            pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ),
+                            pref_int_get( PREF_KEY_DL_LIMIT ),
+                            pref_int_get( PREF_KEY_MAX_PEERS_GLOBAL ),
+                            pref_int_get( PREF_KEY_MSGLEVEL ),
+                            TRUE, /* message queueing */
+                            pref_flag_get( PREF_KEY_BLOCKLIST_ENABLED ),
+                            pref_int_get( PREF_KEY_PEER_SOCKET_TOS ),
+                            pref_flag_get( PREF_KEY_RPC_ENABLED ),
+                            pref_int_get( PREF_KEY_RPC_PORT ),
+                            pref_string_get( PREF_KEY_RPC_ACL ) );
         cbdata->core = tr_core_new( h );
 
         /* create main window now to be a parent to any error dialogs */
@@ -376,40 +440,25 @@ main( int argc, char ** argv )
         g_signal_connect( win, "size-allocate", G_CALLBACK(onMainWindowSizeAllocated), cbdata );
 
         appsetup( win, argfiles, cbdata, startpaused, startminimized );
+        tr_sessionSetRPCCallback( h, onRPCChanged, cbdata );
+
+        if(( do_inhibit = pref_flag_get( PREF_KEY_INHIBIT_HIBERNATION )))
+            inhibit_cookie = gtr_inhibit_hibernation( );
+
+        gtk_main();
+
+        if( do_inhibit && inhibit_cookie ) 
+            gtr_uninhibit_hibernation( inhibit_cookie );
     }
-    else
+    else if( err )
     {
         gtk_widget_show( errmsg_full( NULL, (callbackfunc_t)gtk_main_quit,
                                       NULL, "%s", err ) );
         g_free( err );
+        gtk_main();
     }
 
-    do_inhibit = pref_flag_get( PREF_KEY_INHIBIT_HIBERNATION );
-    if( do_inhibit ) 
-        inhibit_cookie = gtr_inhibit_hibernation( );
-
-    gtk_main();
-
-    if( do_inhibit && inhibit_cookie ) 
-        gtr_uninhibit_hibernation( inhibit_cookie );
-
     return 0;
-}
-
-static gboolean
-sendremote( GSList * files, gboolean sendquit )
-{
-    const gboolean didlock = cf_lock( NULL );
-
-    /* send files if there's another instance, otherwise start normally */
-    if( !didlock && files )
-        exit( ipc_sendfiles_blocking( files ) ? 0 : 1 );
-
-    /* either send a quit message or exit if no other instance */
-    if( sendquit )
-        exit( didlock ? 0 : !ipc_sendquit_blocking() );
-
-    return didlock;
 }
 
 static void
@@ -446,9 +495,6 @@ appsetup( TrWindow * wind, GSList * torrentFiles,
     tr_core_add_list( cbdata->core, torrentFiles, start, prompt );
     torrentFiles = NULL;
     tr_core_torrents_added( cbdata->core );
-
-    /* set up the ipc socket */
-    ipc_socket_setup( GTK_WINDOW( wind ), cbdata->core );
 
     /* set up main window */
     winsetup( cbdata, wind );
@@ -889,7 +935,19 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     else if( !strcmp( key, PREF_KEY_PEX ) )
     {
         const gboolean b = pref_flag_get( key );
-        tr_sessionSetPortForwardingEnabled( tr_core_handle( cbdata->core ), b );
+        tr_sessionSetPortForwardingEnabled( tr, b );
+    }
+    else if( !strcmp( key, PREF_KEY_RPC_ENABLED ) )
+    {
+        tr_sessonSetRPCEnabled( tr, pref_flag_get( key ) );
+    }
+    else if( !strcmp( key, PREF_KEY_RPC_PORT ) )
+    {
+        tr_sessonSetRPCPort( tr, pref_int_get( key ) );
+    }
+    else if( !strcmp( key, PREF_KEY_RPC_ENABLED ) )
+    {
+        g_message( "preferences option not recognized: %s", key );
     }
 }
 

@@ -124,7 +124,7 @@ struct tr_torrent
     tr_speedlimit              downloadLimitMode;
     struct tr_ratecontrol    * upload;
     struct tr_ratecontrol    * download;
-    struct tr_ratecontrol    * swarmspeed;
+    struct tr_ratecontrol    * swarmSpeed;
 
     int                        error;
     char                       errorString[128];
@@ -132,7 +132,7 @@ struct tr_torrent
     uint8_t                    obfuscatedHash[SHA_DIGEST_LENGTH];
 
     /* Where to download */
-    char                     * destination;
+    char                     * downloadDir;
     
     /* How many bytes we ask for per request */
     uint32_t                   blockSize;

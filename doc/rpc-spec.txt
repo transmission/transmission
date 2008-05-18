@@ -86,19 +86,22 @@
 
    Method name: "torrent-info".
 
-   Request arguments: an "id" number specifying a torrent id number
+   Request arguments: 3.1's optional "ids" argument.
 
-   Response arguments: "info", an array of objects based on libtransmission's
-   tr_info struct but different in the following ways:
+   Response arguments: "torrent-info", an array of objects based on
+   libtransmission's tr_info struct but different in the following ways:
+   (1) the torrent's "id" field is added.
+   (2) tr_info's "hash" field is omitted.
+   (3) tr_info's "pieces" field is omitted.
+   (4) tr_file's "firstPiece", "lastPiece", and "offset" fields are omitted.
 
-   (1) tr_info's "hash" field is omitted.
-   (2) tr_info's "pieces" field is omitted.
-   (3) tr_file's "firstPiece", "lastPiece", and "offset" fields are omitted.
+   Note that this is a fairly high-bandwidth request and that its results
+   don't change.  You should try to cache its results instead of re-calling it.
 
    Example Request: 
 
       {
-         "arguments": { "id": 7 }
+         "arguments": { "ids": [ 7, 10 ] }
          "method": "torrent-info",
          "tag": 39693
       }
@@ -109,14 +112,24 @@
          "tag": 39693
          "result": "success",
          "arguments": {
-            "info": {
-               "id": 7,
-               "totalSize": 9803930483,
-               "pieceCount": 1209233,
-               "pieceSize": 4096,
-               "name": "Ubuntu x86_64 DVD",
-               ...
-            }
+            "torrent-info": [ 
+               { 
+                  "id": 7, 
+                  "name": "Ubuntu x86_64 DVD", 
+                  "pieceCount": 1209233, 
+                  "pieceSize": 4096, 
+                  "totalSize": 9803930483, 
+                  ... 
+               }, 
+               { 
+                  "id": 10, 
+                  "name": "Ubuntu i386 DVD", 
+                  "pieceCount": 83943, 
+                  "pieceSize": 12345, 
+                  "totalSize": 2398480394, 
+                  ... 
+               } 
+            ]
          }
       }
 
@@ -124,15 +137,16 @@
 
    Method name: "torrent-status"
 
-   Request arguments: an "id" int specifying a torrent id number
+   Request arguments: 3.1's optional "ids" argument.
 
-   Response arguments: "status", an object based on libtransmission's
-   tr_stat struct but differerent in the following ways:
+   Response arguments: "torrent-status", an array of objects based
+   on libtransmission's tr_stat struct but differerent in the
+   following ways:
 
-   (1) tr_stat's "tracker" field is omitted.
-   (2) a new string, "announce-url", is added.
-   (3) a new string, "scrape-url", is added.
-   (4) tr_info's "name" field is added.
+   (1) the torrent's "id" field is added.
+   (2) tr_info's "name" field is added.
+   (3) tr_stat's "tracker" field is omitted, and is instead
+       replaced with two strings: "announce-url" and scrape-url"
 
 3.5.  Adding a Torrent
 

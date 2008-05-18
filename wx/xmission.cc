@@ -391,7 +391,7 @@ void MyFrame :: OnOpen( wxCommandEvent& WXUNUSED(event) )
 bool
 MyApp :: OnInit( )
 {
-    handle = tr_init( "wx" );
+    handle = tr_sessionInit( "wx" );
 
     wxCmdLineParser cmdParser( cmdLineDesc, argc, argv );
     if( cmdParser.Parse ( ) )
@@ -700,7 +700,7 @@ MyFrame :: OnExit( wxCommandEvent& WXUNUSED( event ) )
     mySelectedTorrents.clear( );
     ApplyCurrentFilter( );
 
-    tr_close( handle );
+    tr_sessionClose( handle );
 
     /* give the connections a max of 10 seconds to shut themselves down */
     myExitTime = time(0) + 10;

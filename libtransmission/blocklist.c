@@ -89,7 +89,7 @@ blocklistLoad( tr_blocklist * b )
     b->byteCount = st.st_size;
     b->ruleCount = st.st_size / sizeof( struct tr_ip_range );
     b->fd = fd;
-    tr_inf( _( "Blocklist contains %'d entries" ), b->ruleCount );
+    tr_inf( _( "Blocklist contains %'u entries" ), (unsigned int)b->ruleCount );
 }
 
 static void

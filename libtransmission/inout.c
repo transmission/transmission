@@ -60,7 +60,7 @@ readOrWriteBytes( const tr_torrent  * tor,
     assert( !file->length || (fileOffset < file->length));
     assert( fileOffset + buflen <= file->length );
 
-    tr_buildPath ( path, sizeof(path), tor->destination, file->name, NULL );
+    tr_buildPath ( path, sizeof(path), tor->downloadDir, file->name, NULL );
     fileExists = !stat( path, &sb );
 
     if( !file->length )
@@ -68,7 +68,7 @@ readOrWriteBytes( const tr_torrent  * tor,
 
     if ((ioMode==TR_IO_READ) && !fileExists ) /* does file exist? */
         err = tr_ioErrorFromErrno( errno );
-    else if ((fd = tr_fdFileCheckout ( tor->destination,
+    else if ((fd = tr_fdFileCheckout ( tor->downloadDir,
                                        file->name,
                                        ioMode==TR_IO_WRITE )) < 0)
         err = fd;
@@ -135,7 +135,7 @@ ensureMinimumFileSize( const tr_torrent  * tor,
     assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
     assert( minBytes <= file->length );
 
-    fd = tr_fdFileCheckout( tor->destination, file->name, TRUE );
+    fd = tr_fdFileCheckout( tor->downloadDir, file->name, TRUE );
     if( fd < 0 ) /* bad fd */
         err = fd;
     else if (fstat (fd, &sb) ) /* how big is the file? */

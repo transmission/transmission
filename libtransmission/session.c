@@ -42,6 +42,7 @@
 #include "platform.h" /* tr_lock */
 #include "port-forwarding.h"
 #include "ratecontrol.h"
+#include "rpc-server.h"
 #include "stats.h"
 #include "torrent.h"
 #include "tracker.h"
@@ -118,21 +119,25 @@ tr_sessionSetEncryption( tr_session * session, tr_encryption_mode mode )
 static void metainfoLookupRescan( tr_handle * h );
 
 tr_handle *
-tr_initFull( const char * configDir,
-             const char * tag,
-             int          isPexEnabled,
-             int          isPortForwardingEnabled,
-             int          publicPort,
-             int          encryptionMode,
-             int          isUploadLimitEnabled,
-             int          uploadLimit,
-             int          isDownloadLimitEnabled,
-             int          downloadLimit,
-             int          globalPeerLimit,
-             int          messageLevel,
-             int          isMessageQueueingEnabled,
-             int          isBlocklistEnabled,
-             int          peerSocketTOS )
+tr_sessionInitFull( const char * configDir,
+                    const char * downloadDir,
+                    const char * tag,
+                    int          isPexEnabled,
+                    int          isPortForwardingEnabled,
+                    int          publicPort,
+                    int          encryptionMode,
+                    int          isUploadLimitEnabled,
+                    int          uploadLimit,
+                    int          isDownloadLimitEnabled,
+                    int          downloadLimit,
+                    int          globalPeerLimit,
+                    int          messageLevel,
+                    int          isMessageQueueingEnabled,
+                    int          isBlocklistEnabled,
+                    int          peerSocketTOS,
+                    int          rpcIsEnabled,
+                    int          rpcPort,
+                    const char * rpcACL )
 {
     tr_handle * h;
     char filename[MAX_PATH_LENGTH];
@@ -154,6 +159,7 @@ tr_initFull( const char * configDir,
     h->isPexEnabled = isPexEnabled ? 1 : 0;
     h->encryptionMode = encryptionMode;
     h->peerSocketTOS = peerSocketTOS;
+    h->downloadDir = tr_strdup( downloadDir );
 
     tr_setConfigDir( h, configDir );
 
@@ -193,6 +199,7 @@ tr_initFull( const char * configDir,
     tr_statsInit( h );
 
     h->web = tr_webInit( h );
+    h->rpcServer = tr_rpcInit( h, rpcIsEnabled, rpcPort, rpcACL );
 
     metainfoLookupRescan( h );
 
@@ -200,24 +207,49 @@ tr_initFull( const char * configDir,
 }
 
 tr_handle *
-tr_init( const char * configDir,
-         const char * tag )
+tr_sessionInit( const char * configDir,
+                const char * downloadDir,
+                const char * tag )
 {
-    return tr_initFull( configDir,
-                        tag,
-                        TR_DEFAULT_PEX_ENABLED,
-                        TR_DEFAULT_PORT_FORWARDING_ENABLED,
-                        -1, /* public port */
-                        TR_ENCRYPTION_PREFERRED, /* encryption mode */
-                        FALSE, /* use upload speed limit? */ 
-                        -1, /* upload speed limit */
-                        FALSE, /* use download speed limit? */
-                        -1, /* download speed limit */
-                        TR_DEFAULT_GLOBAL_PEER_LIMIT,
-                        TR_MSG_INF, /* message level */
-                        FALSE, /* is message queueing enabled? */
-                        FALSE, /* is the blocklist enabled? */
-                        TR_DEFAULT_PEER_SOCKET_TOS );
+    return tr_sessionInitFull( configDir,
+                               downloadDir,
+                               tag,
+                               TR_DEFAULT_PEX_ENABLED,
+                               TR_DEFAULT_PORT_FORWARDING_ENABLED,
+                               -1, /* public port */
+                               TR_ENCRYPTION_PREFERRED, /* encryption mode */
+                               FALSE, /* use upload speed limit? */ 
+                               -1, /* upload speed limit */
+                               FALSE, /* use download speed limit? */
+                               -1, /* download speed limit */
+                               TR_DEFAULT_GLOBAL_PEER_LIMIT,
+                               TR_MSG_INF, /* message level */
+                               FALSE, /* is message queueing enabled? */
+                               FALSE, /* is the blocklist enabled? */
+                               TR_DEFAULT_PEER_SOCKET_TOS,
+                               TR_DEFAULT_RPC_ENABLED,
+                               TR_DEFAULT_RPC_PORT,
+                               TR_DEFAULT_RPC_ACL );
+}
+
+/***
+****
+***/
+
+void
+tr_sessionSetDownloadDir( tr_handle * handle, const char * dir )
+{
+    if( handle->downloadDir != dir )
+    {
+        tr_free( handle->downloadDir );
+        handle->downloadDir = tr_strdup( dir );
+    }
+}
+
+const char *
+tr_sessionGetDownloadDir( const tr_handle * handle )
+{
+    return handle->downloadDir;
 }
 
 /***
@@ -390,6 +422,7 @@ tr_closeAllConnections( void * vh )
 
     tr_sharedShuttingDown( h->shared );
     tr_trackerShuttingDown( h );
+    tr_rpcClose( &h->rpcServer );
 
     while(( tor = tr_torrentNext( h, NULL )))
         tr_torrentClose( tor );
@@ -411,7 +444,7 @@ deadlineReached( const uint64_t deadline )
 #define SHUTDOWN_MAX_SECONDS 30
 
 void
-tr_close( tr_handle * h )
+tr_sessionClose( tr_handle * h )
 {
     int i;
     const int maxwait_msec = SHUTDOWN_MAX_SECONDS * 1000;
@@ -445,9 +478,9 @@ tr_close( tr_handle * h )
 }
 
 tr_torrent **
-tr_loadTorrents ( tr_handle   * h,
-                  tr_ctor     * ctor,
-                  int         * setmeCount )
+tr_sessionLoadTorrents ( tr_handle   * h,
+                         tr_ctor     * ctor,
+                         int         * setmeCount )
 {
     int i, n = 0;
     struct stat sb;
@@ -491,7 +524,8 @@ tr_loadTorrents ( tr_handle   * h,
     if( n )
         tr_inf( _( "Loaded %d torrents" ), n );
 
-    *setmeCount = n;
+    if( setmeCount )
+        *setmeCount = n;
     return torrents;
 }
 
@@ -700,4 +734,49 @@ tr_torrent*
 tr_torrentNext( tr_handle * session, tr_torrent * tor )
 {
     return tor ? tor->next : session->torrentList;
+}
+
+/***
+****
+***/
+
+void
+tr_sessionSetRPCEnabled( tr_handle * session, int isEnabled )
+{
+    tr_rpcSetEnabled( session->rpcServer, isEnabled );
+}
+int
+tr_sessionIsRPCEnabled( const tr_handle * session )
+{
+    return tr_rpcIsEnabled( session->rpcServer );
+}
+void
+tr_sessionSetRPCPort( tr_handle * session, int port )
+{
+    tr_rpcSetPort( session->rpcServer, port );
+}
+int
+tr_sessionGetRPCPort( const tr_handle * session )
+{
+    return tr_rpcGetPort( session->rpcServer );
+}
+void
+tr_sessionSetRPCCallback( tr_handle    * session,
+                          tr_rpc_func    func,
+                          void         * user_data )
+{
+    session->rpc_func = func;
+    session->rpc_func_user_data = user_data;
+}
+
+void
+tr_sessionSetRPCACL( tr_handle * session, const char * acl )
+{
+    tr_rpcSetACL( session->rpcServer, acl );
+}
+
+const char*
+tr_sessionGetRPCACL( const tr_session * session )
+{
+    return tr_rpcGetACL( session->rpcServer );
 }

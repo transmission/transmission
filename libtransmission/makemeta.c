@@ -22,7 +22,6 @@
 #include <dirent.h>
 
 #include "crypto.h" /* tr_sha1 */
-#include "trcompat.h" /* strlcpy */
 #include "transmission.h"
 #include "bencode.h"
 #include "makemeta.h"
@@ -126,8 +125,8 @@ tr_metaInfoBuilderCreate( tr_handle * handle, const char * topFile )
         char *dir, *base;
         char dirbuf[MAX_PATH_LENGTH];
         char basebuf[MAX_PATH_LENGTH];
-        strlcpy( dirbuf, topFile, sizeof( dirbuf ) );
-        strlcpy( basebuf, topFile, sizeof( basebuf ) );
+        tr_strlcpy( dirbuf, topFile, sizeof( dirbuf ) );
+        tr_strlcpy( basebuf, topFile, sizeof( basebuf ) );
         dir = dirname( dirbuf );
         base = basename( basebuf );
         files = getFiles( dir, base, NULL );
@@ -326,7 +325,7 @@ makeInfoDict ( tr_benc              * dict,
         }
     }
 
-    strlcpy( base, builder->top, sizeof( base ) );
+    tr_strlcpy( base, builder->top, sizeof( base ) );
     tr_bencDictAddStr( dict, "name", basename( base ) );
 
     tr_bencDictAddInt( dict, "piece length", builder->pieceSize );
@@ -367,7 +366,7 @@ tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
     if ( !builder->result && !builder->abortFlag ) {
         if( tr_bencSaveFile( builder->outputFile, &top ) ) {
             builder->my_errno = errno;
-            strlcpy( builder->errfile, builder->outputFile, sizeof( builder->errfile ) );
+            tr_strlcpy( builder->errfile, builder->outputFile, sizeof( builder->errfile ) );
             builder->result = TR_MAKEMETA_IO_WRITE;
         }
     }

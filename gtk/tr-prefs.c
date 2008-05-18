@@ -45,7 +45,7 @@ tr_prefs_init_global( void )
 
     pref_int_set_default    ( PREF_KEY_PEER_SOCKET_TOS, TR_DEFAULT_PEER_SOCKET_TOS );
     pref_flag_set_default   ( PREF_KEY_INHIBIT_HIBERNATION, TRUE );
-    pref_flag_set_default   ( PREF_KEY_BLOCKLIST_ENABLED, FALSE );
+    pref_flag_set_default   ( PREF_KEY_BLOCKLIST_ENABLED, TR_DEFAULT_BLOCKLIST_ENABLED );
 
     pref_string_set_default ( PREF_KEY_OPEN_DIALOG_FOLDER, g_get_home_dir( ) );
 
@@ -73,7 +73,7 @@ tr_prefs_init_global( void )
     if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
 #endif
     if( !str ) str = g_get_home_dir( );
-    pref_string_set_default ( PREF_KEY_DIR_DEFAULT, str );
+    pref_string_set_default ( PREF_KEY_DOWNLOAD_DIR, str );
 
     pref_int_set_default    ( PREF_KEY_PORT, TR_DEFAULT_PORT );
 
@@ -90,6 +90,10 @@ tr_prefs_init_global( void )
 
     pref_flag_set_default   ( PREF_KEY_START, TRUE );
     pref_flag_set_default   ( PREF_KEY_TRASH_ORIGINAL, FALSE );
+
+    pref_flag_set_default   ( PREF_KEY_RPC_ENABLED, TR_DEFAULT_RPC_ENABLED );
+    pref_int_set_default    ( PREF_KEY_RPC_PORT, TR_DEFAULT_RPC_PORT );
+    pref_string_set_default ( PREF_KEY_RPC_ACL, TR_DEFAULT_RPC_ACL );
 
     pref_save( NULL );
 }
@@ -268,7 +272,7 @@ torrentPage( GObject * core )
         w = new_check_button( s, PREF_KEY_TRASH_ORIGINAL, core ); 
         hig_workarea_add_wide_control( t, &row, w );
 
-        w = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
+        w = new_path_chooser_button( PREF_KEY_DOWNLOAD_DIR, core );
         hig_workarea_add_row( t, &row, _( "_Destination folder:" ), w, NULL );
 
     hig_workarea_finish( t, &row );
@@ -524,7 +528,7 @@ networkPage( GObject * core, gpointer alive )
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
-    hig_workarea_add_section_title (t, &row, _("Ports"));
+    hig_workarea_add_section_title (t, &row, _( "Ports" ) );
         
         s = _("_Forward port from router" );
         w = new_check_button( s, PREF_KEY_NAT, core );
@@ -545,6 +549,13 @@ networkPage( GObject * core, gpointer alive )
 
         g_signal_connect( w, "toggled", G_CALLBACK(testing_port_cb), l );
         g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
+
+        s = _( "Listen for _RPC requests on port:" );
+        w = new_check_button( s, PREF_KEY_RPC_ENABLED, core );
+        w2 = new_spin_button( PREF_KEY_RPC_PORT, core, 0, 65535, 1 );
+        gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_RPC_ENABLED ) );
+        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
+        hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
     hig_workarea_finish( t, &row );
     return t;

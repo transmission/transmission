@@ -45,7 +45,6 @@
 #endif
 
 #include "transmission.h"
-#include "trcompat.h"
 #include "utils.h"
 #include "platform.h"
 
@@ -506,7 +505,7 @@ tr_buildPath ( char *buf, size_t buflen, const char *first_element, ... )
         element = (const char*) va_arg( vl, const char* );
     }
     if( EVBUFFER_LENGTH(evbuf) )
-        strlcpy( buf, (char*)EVBUFFER_DATA(evbuf), buflen );
+        tr_strlcpy( buf, (char*)EVBUFFER_DATA(evbuf), buflen );
     else
         *buf = '\0';
     evbuffer_free( evbuf );
@@ -877,44 +876,43 @@ tr_wait( uint64_t delay_milliseconds )
 ****
 ***/
 
-
-#ifndef HAVE_STRLCPY
-
 /*
  * Copy src to string dst of size siz.  At most siz-1 characters
  * will be copied.  Always NUL terminates (unless siz == 0).
  * Returns strlen(src); if retval >= siz, truncation occurred.
  */
 size_t
-strlcpy(char *dst, const char *src, size_t siz)
+tr_strlcpy(char *dst, const char *src, size_t siz)
 {
-	char *d = dst;
-	const char *s = src;
-	size_t n = siz;
+#ifdef HAVE_STRLCPY
+    return strlcpy( dst, src, siz );
+#else
+    char *d = dst;
+    const char *s = src;
+    size_t n = siz;
 
-	assert( s != NULL );
-	assert( d != NULL );
+    assert( s != NULL );
+    assert( d != NULL );
 
-	/* Copy as many bytes as will fit */
-	if (n != 0) {
-		while (--n != 0) {
-			if ((*d++ = *s++) == '\0')
-				break;
-		}
-	}
+    /* Copy as many bytes as will fit */
+    if (n != 0) {
+        while (--n != 0) {
+            if ((*d++ = *s++) == '\0')
+                break;
+        }
+    }
 
-	/* Not enough room in dst, add NUL and traverse rest of src */
-	if (n == 0) {
-		if (siz != 0)
-			*d = '\0';		/* NUL-terminate dst */
-		while (*s++)
-			;
-	}
+    /* Not enough room in dst, add NUL and traverse rest of src */
+    if (n == 0) {
+        if (siz != 0)
+            *d = '\0'; /* NUL-terminate dst */
+        while (*s++)
+            ;
+    }
 
-	return(s - src - 1);	/* count does not include NUL */
+    return(s - src - 1); /* count does not include NUL */
+#endif
 }
-
-#endif /* HAVE_STRLCPY */
 
 /***
 ****

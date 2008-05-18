@@ -29,7 +29,9 @@
 #include <stdarg.h>
 
 /* macro to shut up "unused parameter" warnings */
+#ifndef UNUSED
 #define UNUSED G_GNUC_UNUSED
+#endif
 
 /* NULL-safe version of strcmp */
 int tr_strcmp( const char*, const char * );
@@ -79,15 +81,14 @@ decode_uri( const char * uri );
 GSList *
 checkfilenames( int argc, char ** argv );
 
-/* retrieve the global download directory */
-char *
-getdownloaddir( void );
-
 void gtr_open_file( const char * path );
 
 guint gtr_inhibit_hibernation( void );
 
 void gtr_uninhibit_hibernation( guint );
+
+gboolean gtr_dbus_add_torrent( const char * filename );
+
 
 #ifdef GTK_MAJOR_VERSION
 
