@@ -939,11 +939,11 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     }
     else if( !strcmp( key, PREF_KEY_RPC_ENABLED ) )
     {
-        tr_sessonSetRPCEnabled( tr, pref_flag_get( key ) );
+        tr_sessionSetRPCEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, PREF_KEY_RPC_PORT ) )
     {
-        tr_sessonSetRPCPort( tr, pref_int_get( key ) );
+        tr_sessionSetRPCPort( tr, pref_int_get( key ) );
     }
     else if( !strcmp( key, PREF_KEY_RPC_ENABLED ) )
     {
