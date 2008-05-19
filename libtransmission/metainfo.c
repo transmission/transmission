@@ -170,18 +170,28 @@ tr_metainfoMigrate( tr_handle * handle,
         size_t contentLen;
         uint8_t * content;
 
+        tr_mkdirp( tr_getTorrentDir( handle ), 0777 );
         getTorrentOldFilename( handle, inf, old_name, sizeof( old_name ) );
         if(( content = tr_loadFile( old_name, &contentLen )))
         {
-            FILE * out = fopen( new_name, "wb+" );
-            if( fwrite( content, sizeof( uint8_t ), contentLen, out ) == contentLen )
+            FILE * out;
+            errno = 0;
+            out = fopen( new_name, "wb+" );
+            if( !out )
             {
-                tr_free( inf->torrent );
-                inf->torrent = tr_strdup( new_name );
-                tr_sessionSetTorrentFile( handle, inf->hashString, new_name );
-                unlink( old_name );
+                tr_nerr( inf->name, _( "Couldn't create \"%1$s\": %2$s" ), new_name, tr_strerror( errno ) );
             }
-            fclose( out );
+            else
+            {
+                if( fwrite( content, sizeof( uint8_t ), contentLen, out ) == contentLen )
+                {
+                    tr_free( inf->torrent );
+                    inf->torrent = tr_strdup( new_name );
+                    tr_sessionSetTorrentFile( handle, inf->hashString, new_name );
+                    unlink( old_name );
+                }
+                fclose( out );
+            }
         }
 
         tr_free( content );
