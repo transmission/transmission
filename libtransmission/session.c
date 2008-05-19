@@ -474,6 +474,7 @@ tr_sessionClose( tr_handle * h )
     tr_free( h->configDir );
     tr_free( h->resumeDir );
     tr_free( h->torrentDir );
+    tr_free( h->downloadDir );
     free( h );
 }
 

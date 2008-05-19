@@ -56,13 +56,12 @@ handle_rpc( struct shttpd_arg * arg )
         {
             evbuffer_add( s->in, arg->in.buf, arg->in.len );
             arg->in.num_bytes = arg->in.len;
-            
-            if( ! ( arg->flags & SHTTPD_MORE_POST_DATA ) )
+            if( arg->flags & SHTTPD_MORE_POST_DATA )
                 return;
-            response = tr_rpc_request_exec_uri( s->session,
-                                                EVBUFFER_DATA( s->in ),
-                                                EVBUFFER_LENGTH( s->in ),
-                                                &len );
+            response = tr_rpc_request_exec_json( s->session,
+                                                 EVBUFFER_DATA( s->in ),
+                                                 EVBUFFER_LENGTH( s->in ),
+                                                 &len );
             evbuffer_drain( s->in, EVBUFFER_LENGTH( s->in ) );
         }
 
@@ -206,6 +205,7 @@ tr_rpcClose( tr_rpc_server ** ps )
     stopServer( s );
     evbuffer_free( s->in );
     evbuffer_free( s->out );
+    tr_free( s->acl );
     tr_free( s );
 }
 

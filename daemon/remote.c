@@ -132,42 +132,79 @@ readargs( int argc, char ** argv )
 
     while((( opt = getopt_long( argc, argv, optstr, longopts, NULL ))) != -1 )
     {
-        char * req = NULL;
         char buf[MAX_PATH_LENGTH];
+        tr_benc top, *args;
+        tr_bencInitDict( &top, 3 );
+        args = tr_bencDictAddDict( &top, "args", 0 );
 
         switch( opt )
         {
             case 'g': debug = 1; break;
             case 'h': showUsage( ); break;
-            case 'a': req = tr_strdup_printf( "method=torrent-add&filename=%s", optarg ); break;
-            case 'c': req = tr_strdup_printf( "method=session-set&encryption=%s", optarg ); break;
-            case 'd': req = tr_strdup_printf( "method=session-set&speed-limit-down=%d&speed-limit-down-enabled=1", numarg(optarg) ); break;
-            case 'D': req = tr_strdup( "method=session-set&speed-limit-down-enabled=0" ); break;
-            case 'u': req = tr_strdup_printf( "method=session-set&speed-limit-up=%d&speed-limit-up-enabled:1", numarg(optarg) ); break;
-            case 'U': req = tr_strdup( "method=session-set&speed-limit-up-enabled=0" ); break;
-            case 'e': req = tr_strdup( "method=session-set&pex-allowed=1" ); break;
-            case 'E': req = tr_strdup( "method=session-set&pex-allowed=0" ); break;
-            case 'f': req = tr_strdup_printf( "method=session-set&download-dir=%s", absolutify(buf,sizeof(buf),optarg)); break;
-            case 'l': req = tr_strdup_printf( "method=torrent-list&tag=%d", TAG_LIST ); break;
-            case 'm': req = tr_strdup( "method=session-set&port-forwarding-enabled=1" ); break;
-            case 'M': req = tr_strdup( "method=session-set&port-forwarding-enabled=0" ); break;
-            case 'p': req = tr_strdup_printf( "method=session-set&port=%d", numarg( optarg ) ); break;
-            case 'r': req = strcmp( optarg, "all" )
-                      ? tr_strdup_printf( "method=torrent-remove&ids=%s", optarg )
-                      : tr_strdup       ( "method=torrent-remove" ); break;
-            case 's': req = strcmp( optarg, "all" )
-                      ? tr_strdup_printf( "method=torrent-start&ids=%s", optarg )
-                      : tr_strdup       ( "method=torrent-start" ); break;
-            case 'S': req = strcmp( optarg, "all" )
-                      ? tr_strdup_printf( "method=torrent-stop&ids=%s", optarg )
-                      : tr_strdup       ( "method=torrent-stop" ); break;
-            case 'v': req = strcmp( optarg, "all" )
-                      ? tr_strdup_printf( "method=torrent-verify&ids=%s", optarg )
-                      : tr_strdup       ( "method=torrent-verify" ); break;
+            case 'a': tr_bencDictAddStr( &top, "method", "torrent-add" );
+                      tr_bencDictAddStr( args, "filename", optarg );
+                      break;
+            case 'c': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddStr( args, "encryption", optarg );
+                      break;
+            case 'd': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "speed-limit-down", numarg( optarg ) );
+                      tr_bencDictAddInt( args, "speed-limit-down-enabled", 1 );
+                      break;
+            case 'D': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "speed-limit-down-enabled", 0 );
+                      break;
+            case 'u': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "speed-limit-up", numarg( optarg ) );
+                      tr_bencDictAddInt( args, "speed-limit-up-enabled", 1 );
+                      break;
+            case 'U': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "speed-limit-up-enabled", 0 );
+                      break;
+            case 'e': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "pex-allowed", 1 );
+                      break;
+            case 'E': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "pex-allowed", 0 );
+                      break;
+            case 'f': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddStr( args, "download-dir", absolutify(buf,sizeof(buf),optarg) );
+                      break;
+            case 'l': tr_bencDictAddStr( &top, "method", "torrent-list" );
+                      tr_bencDictAddInt( &top, "tag", TAG_LIST );
+                      break;
+            case 'm': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "port-forwarding-enabled", 1 );
+                      break;
+            case 'M': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "port-forwarding-enabled", 0 );
+                      break;
+            case 'p': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "port", numarg( optarg ) );
+                      break;
+            case 'r': tr_bencDictAddStr( &top, "method", "torrent-remove" );
+                      if( strcmp( optarg, "all" ) )
+                          tr_bencDictAddStr( args, "ids", optarg );
+                      break;
+            case 's': tr_bencDictAddStr( &top, "method", "torrent-start" );
+                      if( strcmp( optarg, "all" ) )
+                          tr_bencDictAddStr( args, "ids", optarg );
+                      break;
+            case 'S': tr_bencDictAddStr( &top, "method", "torrent-stop" );
+                      if( strcmp( optarg, "all" ) )
+                          tr_bencDictAddStr( args, "ids", optarg );
+                      break;
+            case 'v': tr_bencDictAddStr( &top, "method", "torrent-verify" );
+                      if( strcmp( optarg, "all" ) )
+                          tr_bencDictAddStr( args, "ids", optarg );
+                      break;
+            default:
+                      showUsage( );
+                      break;
         }
 
-        if( req )
-            reqs[reqCount++] = req;
+        reqs[reqCount++] = tr_bencSaveAsJSON( &top, NULL );
+        tr_bencFree( &top );
     }
 }
 
@@ -276,29 +313,30 @@ processRequests( const char * host, int port,
     int i;
     CURL * curl;
     struct evbuffer * buf = evbuffer_new( );
+    char * url = tr_strdup_printf( "http://%s:%d/transmission", host, port );
 
     curl = curl_easy_init( );
     curl_easy_setopt( curl, CURLOPT_VERBOSE, debug );
     curl_easy_setopt( curl, CURLOPT_USERAGENT, MY_NAME"/"LONG_VERSION_STRING );
     curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, writeFunc );
     curl_easy_setopt( curl, CURLOPT_WRITEDATA, buf );
+    curl_easy_setopt( curl, CURLOPT_POST, 1 );
+    curl_easy_setopt( curl, CURLOPT_URL, url );
 
     for( i=0; i<reqCount; ++i )
     {
         CURLcode res;
-        char * url = tr_strdup_printf( "http://%s:%d/transmission?%s",
-                                       host, port, reqs[i] );
-        curl_easy_setopt( curl, CURLOPT_URL, url );
+        curl_easy_setopt( curl, CURLOPT_POSTFIELDS, reqs[i] );
         if(( res = curl_easy_perform( curl )))
             tr_nerr( MY_NAME, "%s\n", curl_easy_strerror( res ) );
         else
             processResponse( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
 
         evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
-        tr_free( url );
     }
 
     /* cleanup */
+    tr_free( url );
     evbuffer_free( buf );
     curl_easy_cleanup( curl );
 }
@@ -326,5 +364,6 @@ main( int argc, char ** argv )
     for( i=0; i<reqCount; ++i )
         tr_free( reqs[i] );
 
+    tr_free( host );
     return 0;
 }
