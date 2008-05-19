@@ -115,8 +115,6 @@ typedef enum
     NSMutableArray                  * fTempTorrentFiles;
     
     BOOL                            fSoundPlaying;
-    
-    BOOL                            fRemoteQuit;
 }
 
 - (void) openFiles:             (NSArray *) filenames addType: (addType) type forcePath: (NSString *) path;

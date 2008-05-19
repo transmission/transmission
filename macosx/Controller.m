@@ -227,8 +227,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         fSoundPlaying = NO;
         
-        fRemoteQuit = NO;
-        
         [GrowlApplicationBridge setGrowlDelegate: self];
         [[UKKQueue sharedFileWatcher] setDelegate: self];
     }
@@ -502,7 +500,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (NSApplicationTerminateReply) applicationShouldTerminate: (NSApplication *) sender
 {
-    if (!fUpdateInProgress && !fRemoteQuit && [fDefaults boolForKey: @"CheckQuit"])
+    if (!fUpdateInProgress && [fDefaults boolForKey: @"CheckQuit"])
     {
         int active = 0, downloading = 0;
         Torrent * torrent;
@@ -4048,7 +4046,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
 }
 
-- (void) ipcQuit
+/*- (void) ipcQuit
 {
     fRemoteQuit = YES;
     [NSApp terminate: self];
@@ -4215,6 +4213,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self confirmRemoveTorrents: torrents deleteData: NO deleteTorrent: NO];
 
     return YES;
-}
+}*/
 
 @end
