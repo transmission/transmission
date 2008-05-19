@@ -25,8 +25,6 @@
 #ifndef TR_INTERNAL_H
 #define TR_INTERNAL_H 1
 
-#include <libtransmission/rpc.h>
-
 #define TR_NAME "Transmission"
 
 #ifndef UNUSED
@@ -57,9 +55,6 @@ struct tr_handle
     unsigned int                 useUploadLimit   : 1;
     unsigned int                 useDownloadLimit : 1;
 
-    tr_rpc_func                  rpc_func;
-    void                       * rpc_func_user_data;
-
     tr_encryption_mode           encryptionMode;
 
     struct tr_event_handle     * events;
@@ -88,6 +83,8 @@ struct tr_handle
     struct tr_web              * web;
 
     struct tr_rpc_server       * rpcServer;
+    tr_rpc_func                  rpc_func;
+    void                       * rpc_func_user_data;
 
     tr_handle_status             stats[2];
     int                          statCur;

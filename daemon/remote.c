@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 #include <stdio.h>
@@ -280,8 +280,8 @@ processRequests( const char * host, int port,
     curl = curl_easy_init( );
     curl_easy_setopt( curl, CURLOPT_VERBOSE, debug );
     curl_easy_setopt( curl, CURLOPT_USERAGENT, MY_NAME"/"LONG_VERSION_STRING );
-    curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, writeFunc, 0 );
-    curl_easy_setopt( curl, CURLOPT_WRITEDATA, buf, 0 );
+    curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, writeFunc );
+    curl_easy_setopt( curl, CURLOPT_WRITEDATA, buf );
 
     for( i=0; i<reqCount; ++i )
     {
