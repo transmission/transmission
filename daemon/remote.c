@@ -17,7 +17,7 @@
 #include <getopt.h>
 #include <unistd.h> /* getcwd */
 
-#include <third-party/libevent/event.h>
+#include <libevent/event.h>
 #include <curl/curl.h>
 
 #include <libtransmission/transmission.h>
