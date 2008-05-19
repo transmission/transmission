@@ -196,6 +196,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         fLib = tr_sessionInitFull(NULL, /* use default config directory (Application Support) */
                                 "macosx",
+                                NULL, /* download directory set when adding transfers */
                                 [fDefaults boolForKey: @"PEXGlobal"],
                                 [fDefaults boolForKey: @"NatTraversal"],
                                 [fDefaults integerForKey: @"BindPort"],
@@ -208,7 +209,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                 [fDefaults integerForKey: @"MessageLevel"],
                                 YES,
                                 [fDefaults boolForKey: @"Blocklist"],
-                                TR_DEFAULT_PEER_SOCKET_TOS );
+                                TR_DEFAULT_PEER_SOCKET_TOS,
+                                [fDefaults boolForKey: @"RPC"],
+                                [fDefaults integerForKey: @"RPCPort"],
+                                TR_DEFAULT_RPC_ACL);
         
         [NSApp setDelegate: self];
         

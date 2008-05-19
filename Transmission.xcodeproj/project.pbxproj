@@ -164,6 +164,19 @@
 		A2A306620AAD24A80049E2AC /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */; };
 		A2A4E9210DE0F7E9000CE197 /* web.h in Headers */ = {isa = PBXBuildFile; fileRef = A29EBE530DC01FC9006CEE80 /* web.h */; };
 		A2A4E9220DE0F7EB000CE197 /* web.c in Sources */ = {isa = PBXBuildFile; fileRef = A29EBE520DC01FC9006CEE80 /* web.c */; };
+		A2A4E9870DE10399000CE197 /* json.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A4E9840DE1038C000CE197 /* json.h */; };
+		A2A4E9880DE1039C000CE197 /* json.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A4E9830DE1038C000CE197 /* json.c */; };
+		A2A4E99F0DE10429000CE197 /* JSON_checker.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A4E99B0DE10424000CE197 /* JSON_checker.h */; };
+		A2A4E9A00DE1042A000CE197 /* JSON_checker.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A4E99A0DE10424000CE197 /* JSON_checker.c */; };
+		A2A4E9F40DE10539000CE197 /* shttpd.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB6D60DE0D5A400E04DDA /* shttpd.h */; };
+		A2A4E9FA0DE10623000CE197 /* libshttpd.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AAB6BB0DE0D55D00E04DDA /* libshttpd.dylib */; };
+		A2A4E9FD0DE10643000CE197 /* defs.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A4E9FC0DE10643000CE197 /* defs.h */; };
+		A2A4E9FF0DE1065B000CE197 /* md5.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB6D40DE0D5A400E04DDA /* md5.h */; };
+		A2A4EA000DE1065C000CE197 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB6C80DE0D5A400E04DDA /* config.h */; };
+		A2A4EA010DE1065D000CE197 /* compat_unix.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB6C60DE0D5A400E04DDA /* compat_unix.h */; };
+		A2A4EA0C0DE106E8000CE197 /* ConvertUTF.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */; };
+		A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */; };
+		A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */; };
 		A2A6321B0CD9751700E3DA60 /* BadgeView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A6321A0CD9751700E3DA60 /* BadgeView.m */; };
 		A2AA579D0ADFCAB400CA59F6 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */; };
 		A2AAB65C0DE0CF6200E04DDA /* rpc-server.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB6580DE0CF6200E04DDA /* rpc-server.c */; };
@@ -323,6 +336,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 3C7A118C0D0B2EB800B5701F;
 			remoteInfo = natpmp;
+		};
+		A2A4E9ED0DE104A4000CE197 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2AAB6BA0DE0D55D00E04DDA /* shttpd */;
+			remoteInfo = shttpd;
 		};
 		BE1183750CE161040002D0F3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -595,6 +615,13 @@
 		A2A306580AAD24A80049E2AC /* UKKQueue.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKKQueue.m; path = macosx/UKKQueue/UKKQueue.m; sourceTree = "<group>"; };
 		A2A306590AAD24A80049E2AC /* UKMainThreadProxy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKMainThreadProxy.h; path = macosx/UKKQueue/UKMainThreadProxy.h; sourceTree = "<group>"; };
 		A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKMainThreadProxy.m; path = macosx/UKKQueue/UKMainThreadProxy.m; sourceTree = "<group>"; };
+		A2A4E9830DE1038C000CE197 /* json.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = json.c; path = libtransmission/json.c; sourceTree = "<group>"; };
+		A2A4E9840DE1038C000CE197 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json.h; path = libtransmission/json.h; sourceTree = "<group>"; };
+		A2A4E99A0DE10424000CE197 /* JSON_checker.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = JSON_checker.c; path = libtransmission/JSON_checker.c; sourceTree = "<group>"; };
+		A2A4E99B0DE10424000CE197 /* JSON_checker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON_checker.h; path = libtransmission/JSON_checker.h; sourceTree = "<group>"; };
+		A2A4E9FC0DE10643000CE197 /* defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = defs.h; path = "third-party/shttpd/defs.h"; sourceTree = "<group>"; };
+		A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ConvertUTF.c; path = libtransmission/ConvertUTF.c; sourceTree = "<group>"; };
+		A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConvertUTF.h; path = libtransmission/ConvertUTF.h; sourceTree = "<group>"; };
 		A2A632190CD9751700E3DA60 /* BadgeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BadgeView.h; path = macosx/BadgeView.h; sourceTree = "<group>"; };
 		A2A6321A0CD9751700E3DA60 /* BadgeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BadgeView.m; path = macosx/BadgeView.m; sourceTree = "<group>"; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
@@ -825,6 +852,7 @@
 				BE1183780CE161390002D0F3 /* libminiupnp.a in Frameworks */,
 				BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */,
 				A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */,
+				A2A4E9FA0DE10623000CE197 /* libshttpd.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1160,6 +1188,12 @@
 				A2D307900D9EC46B0051FD27 /* ggets.c */,
 				A29EBE530DC01FC9006CEE80 /* web.h */,
 				A29EBE520DC01FC9006CEE80 /* web.c */,
+				A2A4E9840DE1038C000CE197 /* json.h */,
+				A2A4E9830DE1038C000CE197 /* json.c */,
+				A2A4E99A0DE10424000CE197 /* JSON_checker.c */,
+				A2A4E99B0DE10424000CE197 /* JSON_checker.h */,
+				A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */,
+				A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */,
 			);
 			name = libtransmission;
 			sourceTree = "<group>";
@@ -1230,6 +1264,7 @@
 				A2AAB6C60DE0D5A400E04DDA /* compat_unix.h */,
 				A2AAB6C70DE0D5A400E04DDA /* config.c */,
 				A2AAB6C80DE0D5A400E04DDA /* config.h */,
+				A2A4E9FC0DE10643000CE197 /* defs.h */,
 				A2AAB6CA0DE0D5A400E04DDA /* io_cgi.c */,
 				A2AAB6CB0DE0D5A400E04DDA /* io_dir.c */,
 				A2AAB6CC0DE0D5A400E04DDA /* io_emb.c */,
@@ -1428,6 +1463,9 @@
 				A29DF8BE0DB2545F00D04E5A /* verify.h in Headers */,
 				A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */,
 				A2A4E9210DE0F7E9000CE197 /* web.h in Headers */,
+				A2A4E9870DE10399000CE197 /* json.h in Headers */,
+				A2A4E99F0DE10429000CE197 /* JSON_checker.h in Headers */,
+				A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1435,6 +1473,11 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2A4E9F40DE10539000CE197 /* shttpd.h in Headers */,
+				A2A4E9FD0DE10643000CE197 /* defs.h in Headers */,
+				A2A4E9FF0DE1065B000CE197 /* md5.h in Headers */,
+				A2A4EA000DE1065C000CE197 /* config.h in Headers */,
+				A2A4EA010DE1065D000CE197 /* compat_unix.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1498,6 +1541,7 @@
 				A226FDB10D0CDF6E005A7F71 /* PBXTargetDependency */,
 				BE1183760CE161040002D0F3 /* PBXTargetDependency */,
 				BE75C34F0C729ED300DBEFE0 /* PBXTargetDependency */,
+				A2A4E9EE0DE104A4000CE197 /* PBXTargetDependency */,
 			);
 			name = libtransmission;
 			productName = transmission;
@@ -1877,6 +1921,9 @@
 				A29DF8B90DB2544C00D04E5A /* resume.c in Sources */,
 				A29DF8BC0DB2545900D04E5A /* ggets.c in Sources */,
 				A2A4E9220DE0F7EB000CE197 /* web.c in Sources */,
+				A2A4E9880DE1039C000CE197 /* json.c in Sources */,
+				A2A4E9A00DE1042A000CE197 /* JSON_checker.c in Sources */,
+				A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1964,6 +2011,7 @@
 				A2AAB6ED0DE0D5A500E04DDA /* md5.c in Sources */,
 				A2AAB6EF0DE0D5A500E04DDA /* shttpd.c in Sources */,
 				A2AAB6F40DE0D5A600E04DDA /* string.c in Sources */,
+				A2A4EA0C0DE106E8000CE197 /* ConvertUTF.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2043,6 +2091,11 @@
 			isa = PBXTargetDependency;
 			target = 3C7A118C0D0B2EB800B5701F /* natpmp */;
 			targetProxy = A226FDB00D0CDF6E005A7F71 /* PBXContainerItemProxy */;
+		};
+		A2A4E9EE0DE104A4000CE197 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2AAB6BA0DE0D55D00E04DDA /* shttpd */;
+			targetProxy = A2A4E9ED0DE104A4000CE197 /* PBXContainerItemProxy */;
 		};
 		BE1183760CE161040002D0F3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2513,6 +2566,12 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/lib;
 				MACH_O_TYPE = staticlib;
+				OTHER_CFLAGS = (
+					"-DEMBEDDED",
+					"-DNDEBUG",
+					"-DNO_CGI",
+					"-DNO_SSI",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = shttpd;
 				USER_HEADER_SEARCH_PATHS = "third-party/shttpd";
@@ -2530,6 +2589,12 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/lib;
 				MACH_O_TYPE = staticlib;
+				OTHER_CFLAGS = (
+					"-DEMBEDDED",
+					"-DNDEBUG",
+					"-DNO_CGI",
+					"-DNO_SSI",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = shttpd;
 				USER_HEADER_SEARCH_PATHS = "third-party/shttpd";
@@ -2549,6 +2614,12 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/lib;
 				MACH_O_TYPE = staticlib;
+				OTHER_CFLAGS = (
+					"-DEMBEDDED",
+					"-DNDEBUG",
+					"-DNO_CGI",
+					"-DNO_SSI",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = shttpd;
 				SEPARATE_STRIP = YES;

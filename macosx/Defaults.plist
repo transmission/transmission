@@ -82,6 +82,10 @@
 	<string>Constant</string>
 	<key>NatTraversal</key>
 	<true/>
+	<key>RPC</key>
+	<false/>
+	<key>RPCPort</key>
+	<integer>9091</integer>
 	<key>PEXGlobal</key>
 	<true/>
 	<key>PeersTorrent</key>
@@ -150,7 +154,7 @@
 	<true/>
 	<key>WarningRemainingSpace</key>
 	<true/>
-    <key>WarningResetStats</key>
+	<key>WarningResetStats</key>
 	<true/>
 </dict>
 </plist>

@@ -230,7 +230,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) downloadFolder
 {
-    return [NSString stringWithUTF8String: tr_torrentGetFolder(fHandle)];
+    return [NSString stringWithUTF8String: tr_torrentGetDownloadDir(fHandle)];
 }
 
 - (void) getAvailability: (int8_t *) tab size: (int) size
@@ -619,7 +619,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (BOOL) alertForFolderAvailable
 {
     #warning check for change from incomplete to download folder first
-    if (access(tr_torrentGetFolder(fHandle), 0))
+    if (access(tr_torrentGetDownloadDir(fHandle), 0))
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: [NSString stringWithFormat:
@@ -730,13 +730,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSDate *) lastAnnounceTime
 {
-    int date = fStat->tracker_stat.lastAnnounceTime;
+    int date = fStat->trackerStat.lastAnnounceTime;
     return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
 }
 
 - (int) nextAnnounceTime
 {
-    int date = fStat->tracker_stat.nextAnnounceTime;
+    int date = fStat->trackerStat.nextAnnounceTime;
     if (date <= 0)
         return -1;
     
@@ -746,7 +746,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) announceResponse
 {
-    return [NSString stringWithUTF8String: fStat->tracker_stat.announceResponse];
+    return [NSString stringWithUTF8String: fStat->trackerStat.announceResponse];
 }
 
 - (NSString *) trackerAddressScrape
@@ -756,13 +756,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSDate *) lastScrapeTime
 {
-    int date = fStat->tracker_stat.lastScrapeTime;
+    int date = fStat->trackerStat.lastScrapeTime;
     return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
 }
 
 - (int) nextScrapeTime
 {
-    int date = fStat->tracker_stat.nextScrapeTime;
+    int date = fStat->trackerStat.nextScrapeTime;
     if (date <= 0)
         return -1;
     
@@ -772,7 +772,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) scrapeResponse
 {
-    return [NSString stringWithUTF8String: fStat->tracker_stat.scrapeResponse];
+    return [NSString stringWithUTF8String: fStat->trackerStat.scrapeResponse];
 }
 
 - (NSArray *) allTrackers: (BOOL) separators
@@ -1289,7 +1289,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (float) swarmSpeed
 {
-    return fStat->swarmspeed;
+    return fStat->swarmSpeed;
 }
 
 - (int) orderValue
@@ -1579,7 +1579,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         {
             NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                                 ? fIncompleteFolder : fDownloadFolder;
-            tr_ctorSetDestination(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
+            tr_ctorSetDownloadDir(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
             
             fHandle = tr_torrentNew(lib, ctor, &error);
         }
@@ -1592,7 +1592,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         {
             NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                                 ? fIncompleteFolder : fDownloadFolder;
-            tr_ctorSetDestination(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
+            tr_ctorSetDownloadDir(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
             
             fHandle = tr_torrentNew(lib, ctor, &error);
         }
@@ -1605,7 +1605,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         {
             NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                                 ? fIncompleteFolder : fDownloadFolder;
-            tr_ctorSetDestination(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
+            tr_ctorSetDownloadDir(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
             
             fHandle = tr_torrentNew(lib, ctor, &error);
         }
@@ -1745,7 +1745,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     [self setTimeMachineExclude: NO forPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
     
     NSString * folder = [self shouldUseIncompleteFolderForName: [self name]] ? fIncompleteFolder : fDownloadFolder;
-    tr_torrentSetFolder(fHandle, [folder UTF8String]);
+    tr_torrentSetDownloadDir(fHandle, [folder UTF8String]);
     
     [self setTimeMachineExclude: ![self allDownloaded] forPath: [folder stringByAppendingPathComponent: [self name]]];
 }
