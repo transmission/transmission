@@ -1,26 +1,14 @@
 .\" $Id$
 .\"
-.\" Copyright (c) 2007 Joshua Elsasser
+.\" Copyright (c) 2008 Charles Kerr
 .\"
-.\" Permission is hereby granted, free of charge, to any person obtaining a
-.\" copy of this software and associated documentation files (the "Software"),
-.\" to deal in the Software without restriction, including without limitation
-.\" the rights to use, copy, modify, merge, publish, distribute, sublicense,
-.\" and/or sell copies of the Software, and to permit persons to whom the
-.\" Software is furnished to do so, subject to the following conditions:
-.\"
-.\" The above copyright notice and this permission notice shall be included in
-.\" all copies or substantial portions of the Software.
-.\"
-.\" THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-.\" IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-.\" FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-.\" AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-.\" LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-.\" FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-.\" DEALINGS IN THE SOFTWARE.
+.\" This file is licensed by the GPL version 2.  Works owned by the
+.\" Transmission project are granted a special exemption to clause 2(b)
+.\" so that the bulk of its code can remain under the MIT license. 
+.\" This exemption does not extend to derived works not owned by
+.\" the Transmission project.
 
-.Dd March 30, 2007
+.Dd May 19, 2008
 .Dt TRANSMISSION-DAEMON 1
 .Os
 .Sh NAME
@@ -31,37 +19,41 @@
 .Nm transmission-daemon
 .Fl h
 .Nm
-.Op Fl df
-.Op Fl p Ar pid-file
-.Op Fl s Ar socket-file
+.Op Fl f
+.Op Fl a Ar (+|-)x.x.x.x[/x],...
+.Op Fl g Ar directory
+.Op Fl p Ar port
 .Ek
 .Sh DESCRIPTION
 The
 .Nm
 program is a daemon-based Transmission session that can be controlled
-via IPC commands by
+via RPC commands by
 .Xr transmission-remote 1
+or
+.Xr Clutch 1
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
-.It Fl d Fl -debug
-Print data send and received to and from clients to stdout, also implies
-.Fl f .
+.It Fl a Fl -acl Ar (+|-)x.x.x.x[/x],...
+Specify access control list (ACL) to control which hosts may submit RPC requests.
+ACL is a comma separated list of IP subnets,
+each subnet is prepended by '-' or '+' sign.
+Plus means allow, minus means deny.
+If subnet mask is omitted, like "-1.2.3.4", then it means that single IP address.
+Masks may vary from 0 to 32 inclusive.
+Default: +127.0.0.1
 .It Fl f Fl -foreground
 Run in the foreground and print errors to stderr instead of forking
 and logging errors with syslog.
+.It Fl g Fl -config-dir Ar directory
+Where to look for .torrent files and daemon-config.benc on startup.
 .It Fl h Fl -help
 Print command-line option descriptions.
-.It Fl p Fl -pidfile Ar pid-file
-Save the daemon's process ID in
-.Ar pid-file .
-.It Fl g, Fl -config-dir Ar directory
-Where to look for configuration files.
-.It Fl s Fl -socket Ar socket-file
-Create the unix-domain socket file at
-.Ar socket-file
-instead of the platform-dependent default location.
+.It Fl p Fl -port Ar port
+Port to open and listen for RPC requests on.  Default: 9091
 .El
+
 .Sh FILES
 .Pa ~/.transmission
 .Sh AUTHORS
