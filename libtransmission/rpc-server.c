@@ -13,8 +13,8 @@
 #include <assert.h>
 #include <string.h>
 
-#include <third-party/libevent/event.h>
-#include <third-party/shttpd/shttpd.h>
+#include <libevent/event.h>
+#include <shttpd/shttpd.h>
 
 #include "transmission.h"
 #include "rpc.h"
