@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 #include <assert.h>
@@ -159,7 +159,7 @@ daemonUsage( void )
           "  -f --foreground         Run in the foreground and log to stderr\n"
           "  -g --config-dir <dir>   Where to look for torrents and daemon-config.benc\n"
           "  -h --help               Display this message and exit\n"
-          "  -p --port n             Port to listen to for requests (Default: "TR_DEFAULT_RPC_PORT_STR")\n"
+          "  -p --port n             Port to listen to for requests  (Default: "TR_DEFAULT_RPC_PORT_STR")\n"
           "\n"
           MY_NAME" is a headless Transmission session\n"
           "that can be controlled via transmission-remote or Clutch.\n" );

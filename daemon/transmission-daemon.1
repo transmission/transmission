@@ -10,7 +10,7 @@
 
 .Dd May 19, 2008
 .Dt TRANSMISSION-DAEMON 1
-.Os
+
 .Sh NAME
 .Nm transmission-daemon
 .Nd a bittorrent client
@@ -24,14 +24,14 @@
 .Op Fl g Ar directory
 .Op Fl p Ar port
 .Ek
+
 .Sh DESCRIPTION
-The
 .Nm
-program is a daemon-based Transmission session that can be controlled
-via RPC commands by
+is a daemon-based Transmission session that can be controlled
+via RPC commands from
 .Xr transmission-remote 1
 or
-.Xr Clutch 1
+.Xr Clutch 1 .
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
@@ -54,18 +54,23 @@ Print command-line option descriptions.
 Port to open and listen for RPC requests on.  Default: 9091
 .El
 
+.Sh ENVIRONMENT
+.Bl -tag -width Fl
+.It Ev TRANSMISSION_HOME
+Sets the default config-dir.
+.El
+
 .Sh FILES
-.Pa ~/.transmission
+.Pa ~/.config/transmission-daemon
+
 .Sh AUTHORS
 .An -nosplit
-The
-.Nm
-program was written by
 .An Charles Kerr ,
 .An Josh Elsasser ,
 .An Eric Petit ,
 and
 .An Mitchell Livingston .
+
 .Sh SEE ALSO
 .Xr transmissioncli 1 ,
 .Xr transmission 1 ,
