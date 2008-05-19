@@ -33,7 +33,6 @@
 #import "StatusBarView.h"
 #import "FilterButton.h"
 #import "MenuLabel.h"
-#import "IPCController.h"
 
 #import <Growl/Growl.h>
 
@@ -56,7 +55,6 @@ typedef enum
     PrefsController                 * fPrefsController;
     InfoWindowController            * fInfoController;
     MessageWindowController         * fMessageController;
-    IPCController                   * fIPCController;
     
     NSUserDefaults                  * fDefaults;
     

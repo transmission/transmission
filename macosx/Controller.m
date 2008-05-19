@@ -194,21 +194,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         
-        fLib = tr_initFull(NULL, /* use default config directory (Application Support) */
-                        "macosx",
-                        [fDefaults boolForKey: @"PEXGlobal"],
-                        [fDefaults boolForKey: @"NatTraversal"],
-                        [fDefaults integerForKey: @"BindPort"],
-                        TR_ENCRYPTION_PREFERRED, /* reset in prefs */
-                        FALSE, /* reset in prefs */
-                        -1, /* reset in prefs */
-                        FALSE, /* reset in prefs */
-                        -1, /* reset in prefs */
-                        [fDefaults integerForKey: @"PeersTotal"],
-                        [fDefaults integerForKey: @"MessageLevel"],
-                        YES,
-                        [fDefaults boolForKey: @"Blocklist"],
-                        TR_DEFAULT_PEER_SOCKET_TOS );
+        fLib = tr_sessionInitFull(NULL, /* use default config directory (Application Support) */
+                                "macosx",
+                                [fDefaults boolForKey: @"PEXGlobal"],
+                                [fDefaults boolForKey: @"NatTraversal"],
+                                [fDefaults integerForKey: @"BindPort"],
+                                TR_ENCRYPTION_PREFERRED, /* reset in prefs */
+                                FALSE, /* reset in prefs */
+                                -1, /* reset in prefs */
+                                FALSE, /* reset in prefs */
+                                -1, /* reset in prefs */
+                                [fDefaults integerForKey: @"PeersTotal"],
+                                [fDefaults integerForKey: @"MessageLevel"],
+                                YES,
+                                [fDefaults boolForKey: @"Blocklist"],
+                                TR_DEFAULT_PEER_SOCKET_TOS );
         
         [NSApp setDelegate: self];
         
@@ -223,9 +223,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         fSoundPlaying = NO;
         
-        fIPCController = [[IPCController alloc] init];
-        [fIPCController setDelegate: self];
-        [fIPCController setPrefsController: fPrefsController];
         fRemoteQuit = NO;
         
         [GrowlApplicationBridge setGrowlDelegate: self];
@@ -597,14 +594,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fDisplayedTorrents release];
     
     [fOverlayWindow release];
-    [fIPCController release];
     
     [fAutoImportedNames release];
     [fPendingTorrentDownloads release];
     [fTempTorrentFiles release];
     
     //complete cleanup
-    tr_close(fLib);
+    tr_sessionClose(fLib);
     
     [fBadger release]; //clears dock icon on 10.4
 }
