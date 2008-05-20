@@ -32,6 +32,7 @@ noinst_HEADERS = \
     sexy-icon-entry.h \
     torrent-cell-renderer.h \
     tr-core.h \
+    tr-core-dbus.h \
     tr-icon.h \
     tr-io.h \
     tr-prefs.h \

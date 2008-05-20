@@ -824,8 +824,8 @@ tr_core_remove_torrent( TrCore * self, TrTorrent * gtor, int deleteFiles )
     if( deleteFiles )
         tr_torrent_delete_files( gtor );
 
-    /* delete the torrent */
-    tr_torrent_set_delete_flag( gtor, TRUE );
+    /* remove the torrent */
+    tr_torrent_set_remove_flag( gtor, TRUE );
     g_object_unref( G_OBJECT( gtor ) );
 }
 

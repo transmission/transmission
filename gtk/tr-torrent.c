@@ -39,7 +39,7 @@
 struct TrTorrentPrivate
 {
    tr_torrent * handle;
-   gboolean do_delete;
+   gboolean do_remove;
    gboolean seeding_cap_enabled;
    gdouble seeding_cap; /* ratio to stop seeding at */
 };
@@ -78,8 +78,8 @@ tr_torrent_dispose( GObject * o )
     {
         if( self->priv->handle )
         {
-            if( self->priv->do_delete )
-                tr_torrentDelete( self->priv->handle );
+            if( self->priv->do_remove )
+                tr_torrentRemove( self->priv->handle );
             else
                 tr_torrentClose( self->priv->handle );
         }
@@ -318,10 +318,10 @@ tr_torrent_status_str ( TrTorrent * gtor )
 }
 
 void
-tr_torrent_set_delete_flag( TrTorrent * gtor, gboolean do_delete )
+tr_torrent_set_remove_flag( TrTorrent * gtor, gboolean do_remove )
 {
     if( !isDisposed( gtor ) )
-        gtor->priv->do_delete = do_delete;
+        gtor->priv->do_remove = do_remove;
 }
 
 void

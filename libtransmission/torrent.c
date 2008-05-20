@@ -1133,7 +1133,7 @@ tr_torrentClose( tr_torrent * tor )
 }
 
 void
-tr_torrentDelete( tr_torrent * tor )
+tr_torrentRemove( tr_torrent * tor )
 {
     tor->isDeleting = 1;
     tr_torrentClose( tor );

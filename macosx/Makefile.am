@@ -56,8 +56,6 @@ EXTRA_DIST = \
     InfoTabButtonCell.m \
     InfoWindowController.h \
     InfoWindowController.m \
-    IPCController.h \
-    IPCController.m \
     main.m \
     MenuLabel.h \
     MenuLabel.m \

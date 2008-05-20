@@ -156,6 +156,7 @@ typedef enum
     TR_RPC_TORRENT_STARTED,
     TR_RPC_TORRENT_STOPPED,
     TR_RPC_TORRENT_CLOSING,
+    TR_RPC_TORRENT_REMOVING,
     TR_RPC_TORRENT_CHANGED,
     TR_RPC_SESSION_CHANGED
 }
@@ -468,7 +469,7 @@ void tr_torrentRates( tr_handle *, float *, float * );
  *  To remedy this, a Torrent Constructor (struct tr_ctor) has been introduced:
  *  + Simplifies the API down to two (non-deprecated) functions.
  *  + You can set the fields you want; the system sets defaults for the rest.
- *  + You can specify whether or not your fields should supercede fastresume's.
+ *  + You can specify whether or not your fields should supercede resume's.
  *  + We can add new features to tr_ctor without breaking tr_torrentNew()'s API.
  *
  *  All the tr_ctor{Get,Set}*() functions with a return value return 
@@ -487,10 +488,10 @@ void tr_torrentRates( tr_handle *, float *, float * );
 typedef enum
 {
     TR_FALLBACK, /* indicates the ctor value should be used only
-                    in case of missing fastresume settings */
+                    in case of missing resume settings */
 
     TR_FORCE, /* indicates the ctor value should be used
-                 regardless of what's in the fastresume settings */
+                 regardless of what's in the resume settings */
 }
 tr_ctorMode;
 
@@ -746,10 +747,10 @@ void tr_torrentClose( tr_torrent * );
 
 /**
  * Like tr_torrentClose() but also deletes
- * the fastresume file and our copy of the
+ * the resume file and our copy of the
  * torrent file
  */
-void tr_torrentDelete( tr_torrent * );
+void tr_torrentRemove( tr_torrent * );
 
 /***********************************************************************
  * tr_info

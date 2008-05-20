@@ -31,13 +31,13 @@ struct AddData
 };
 
 static void
-deleteOldTorrent( struct AddData * data )
+removeOldTorrent( struct AddData * data )
 {
     if( data->gtor )
     {
         file_list_set_torrent( data->list, NULL );
 
-        tr_torrent_set_delete_flag( data->gtor, TRUE );
+        tr_torrent_set_remove_flag( data->gtor, TRUE );
         g_object_unref( G_OBJECT( data->gtor ) );
         data->gtor = NULL;
     }
@@ -51,7 +51,7 @@ addResponseCB( GtkDialog * dialog, gint response, gpointer gdata )
     if( data->gtor )
     {
         if( response != GTK_RESPONSE_ACCEPT )
-            deleteOldTorrent( data );
+            removeOldTorrent( data );
         else {
             if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->run_check ) ) )
                 tr_torrentStart( tr_torrent_handle( data->gtor ) );
@@ -82,7 +82,7 @@ sourceChanged( GtkFileChooserButton * b, gpointer gdata )
 {
     struct AddData * data = gdata;
 
-    deleteOldTorrent( data );
+    removeOldTorrent( data );
 
     g_free( data->filename );
     data->filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( b ) );

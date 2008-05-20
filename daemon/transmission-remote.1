@@ -26,18 +26,18 @@ and
 .Op Fl p Ar port
 .Op Fl q
 .Oo
-.Fl r Ar all | Ar torrent-id
+.Fl r Ar all | Ar id | Ar hash
 .Oc
 .Oo
-.Fl s Ar all | Ar torrent-id
+.Fl s Ar all | Ar id | Ar hash
 .Oc
 .Oo
-.Fl S Ar all | Ar torrent-id
+.Fl S Ar all | Ar id | Ar hash
 .Oc
 .Op Fl u Ar upload-rate
 .Op Fl U
 .Oo
-.Fl V Ar all | Ar torrent-id
+.Fl v Ar all | Ar id | Ar hash
 .Oc
 .Ek
 .Sh DESCRIPTION
@@ -83,23 +83,39 @@ Disable automatic port mapping.
 Attempt to bind to
 .Ar port
 for use as a listening port to accept incoming peer connections.
-.It Fl r Fl -remove Ar all | torrent-id
-Remove all torrents, or the torrent with the unique id
-.Ar torrent-id .
-Neither the downloaded data nor the original torrent metainfo file
-will be deleted.
-.It Fl S Fl -stop Ar all | torrent-id
-Stop all torrents from downloading or seeding, or the torrent with the unique id
-.Ar torrent-id .
-.It Fl s Fl -start Ar all | torrent-id
-Start all torrents downloading or seeding, or the torrent with the unique id
-.Ar torrent-id .
+
+.It Fl r Fl -remove Ar all | id | torrent-hash
+Remove all torrents, or the torrent matching the specified
+.Ar id
+or
+.Ar hash .
+This does not delete the downloaded data.
+
+.It Fl S Fl -stop Ar all | id | torrent-hash
+Stop all torrents from downloading or seeding, or the torrent matching the specified
+.Ar id
+or
+.Ar hash .
+
+.It Fl s Fl -start Ar all | id | torrent-hash
+Start all torrents downloading or seeding, or the torrent matching the specified
+.Ar id
+or
+.Ar hash .
+
 .It Fl u Fl -upload-limit Ar upload-rate
 Set maximum upload rate to
 .Ar upload-rate
 in kilobytes per second.
+
 .It Fl U Fl -upload-unlimited
 Remove the upload limit.
+
+.It Fl v Fl -verify Ar all | id | torrent-hash
+Queue all the torrents for verification, or the torrent matching the specified
+.Ar id
+or
+.Ar hash .
 
 .El
 .Sh EXAMPLES
