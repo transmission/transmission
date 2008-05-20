@@ -27,8 +27,6 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
-static int static_lastid = 0;
-
 @interface Torrent (Private)
 
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path data: (NSData *) data lib: (tr_handle *) lib
@@ -1517,11 +1515,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         return [NSNumber numberWithInt: 2];
 }
 
-- (int) torrentID
-{
-    return fID;
-}
-
 - (tr_torrent *) torrentStruct
 {
     return fHandle;
@@ -1544,9 +1537,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 {
     if (!(self = [super init]))
         return nil;
-    
-    static_lastid++;
-    fID = static_lastid;
     
     fDefaults = [NSUserDefaults standardUserDefaults];
 

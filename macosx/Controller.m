@@ -138,9 +138,14 @@ typedef enum
 #define FORUM_URL   @"http://forum.transmissionbt.com/"
 #define DONATE_URL  @"http://www.transmissionbt.com/donate.php"
 
-void sleepCallBack(void * controller, io_service_t y, natural_t messageType, void * messageArgument)
+static void rpcCallback(tr_handle * handle UNUSED, tr_rpc_callback_type type, struct tr_torrent * torrentStruct, void * controller)
 {
-    [(Controller *)controller sleepCallBack: messageType argument: messageArgument];
+    [(Controller *)controller rpcCallback: type forTorrentStruct: torrentStruct];
+}
+
+static void sleepCallback(void * controller, io_service_t y, natural_t messageType, void * messageArgument)
+{
+    [(Controller *)controller sleepCallback: messageType argument: messageArgument];
 }
 
 @implementation Controller
@@ -226,6 +231,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         fBadger = [[Badger alloc] initWithLib: fLib];
         
         fSoundPlaying = NO;
+        
+        tr_sessionSetRPCCallback(fLib, rpcCallback, self);
         
         [GrowlApplicationBridge setGrowlDelegate: self];
         [[UKKQueue sharedFileWatcher] setDelegate: self];
@@ -335,7 +342,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //register for sleep notifications
     IONotificationPortRef notify;
     io_object_t iterator;
-    if ((fRootPort = IORegisterForSystemPower(self, & notify, sleepCallBack, &iterator)))
+    if ((fRootPort = IORegisterForSystemPower(self, & notify, sleepCallback, &iterator)))
         CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(notify), kCFRunLoopCommonModes);
     else
         NSLog(@"Could not IORegisterForSystemPower");
@@ -3758,7 +3765,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     return YES;
 }
 
-- (void) sleepCallBack: (natural_t) messageType argument: (void *) messageArgument
+- (void) sleepCallback: (natural_t) messageType argument: (void *) messageArgument
 {
     NSEnumerator * enumerator;
     Torrent * torrent;
@@ -4044,6 +4051,41 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (([type isEqualToString: GROWL_DOWNLOAD_COMPLETE] || [type isEqualToString: GROWL_SEEDING_COMPLETE])
             && (location = [clickContext objectForKey: @"Location"]))
         [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
+}
+
+- (void) rpcCallback: (tr_rpc_callback_type) type forTorrentStruct: (struct tr_torrent *) torrentStruct
+{
+    //get the torrent
+    if (torrentStruct != NULL)
+    {
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        Torrent * torrent;
+        while ((torrent = [enumerator nextObject]))
+            if (torrentStruct == [torrent torrentStruct])
+                break;
+        
+        if (!torrent)
+        {
+            NSLog(@"No torrent found matching torrent struct given in RPC callback!");
+            return;
+        }
+    }
+    
+    switch (type)
+    {
+        case TR_RPC_TORRENT_ADDED:
+            break;
+        case TR_RPC_TORRENT_STARTED:
+            break;
+        case TR_RPC_TORRENT_STOPPED:
+            break;
+        case TR_RPC_TORRENT_CLOSING:
+            break;
+        case TR_RPC_TORRENT_CHANGED:
+            break;
+        case TR_RPC_SESSION_CHANGED:
+            break;
+    }
 }
 
 /*- (void) ipcQuit

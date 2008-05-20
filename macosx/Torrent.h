@@ -40,8 +40,6 @@ typedef enum
     const tr_info * fInfo;
     const tr_stat * fStat;
     
-    int fID;
-    
     BOOL fResumeOnWake;
     NSDate * fDateAdded, * fDateCompleted, * fDateActivity;
     
@@ -251,7 +249,6 @@ typedef enum
 
 - (NSNumber *) stateSortKey;
 
-- (int) torrentID;
 - (tr_torrent *) torrentStruct;
 
 @end

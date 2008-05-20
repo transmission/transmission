@@ -230,7 +230,7 @@ typedef enum
 
 - (void) beginCreateFile: (NSNotification *) notification;
 
-- (void) sleepCallBack: (natural_t) messageType argument: (void *) messageArgument;
+- (void) sleepCallback: (natural_t) messageType argument: (void *) messageArgument;
 
 - (void) torrentTableViewSelectionDidChange: (NSNotification *) notification;
 
@@ -260,5 +260,7 @@ typedef enum
 - (void) linkDonate: (id) sender;
 
 - (void) prepareForUpdate:  (NSNotification *) notification;
+
+- (void) rpcCallback: (tr_rpc_callback_type) type forTorrentStruct: (struct tr_torrent *) torrentStruct;
 
 @end
