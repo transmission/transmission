@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "FileOutlineView.h"
+#import "FileOutlineController.h"
 #import "FileNameCell.h"
 #import "FilePriorityCell.h"
 #import "Torrent.h"
@@ -81,6 +82,20 @@
 {
     [[self window] makeKeyWindow];
     [super mouseDown: event];
+}
+
+- (void) keyDown: (NSEvent *) event
+{
+    unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
+    if (firstChar == ' ')
+        [(FileOutlineController *)[super delegate] userDidPressSpaceInOutlineView: self];
+    else if (firstChar == NSRightArrowFunctionKey)
+        [(FileOutlineController *)[super delegate] userDidPressRightInOutlineView: self];
+    else if (firstChar == NSLeftArrowFunctionKey)
+        [(FileOutlineController *)[super delegate] userDidPressLeftInOutlineView: self];
+    else;
+    
+    [super keyDown: event];  
 }
 
 - (NSMenu *) menuForEvent: (NSEvent *) event

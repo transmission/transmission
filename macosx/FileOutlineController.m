@@ -28,6 +28,9 @@
 #import "FilePriorityCell.h"
 #import "NSApplicationAdditions.h"
 
+#import "QuickLook.h"
+#define QLPreviewPanel NSClassFromString(@"QLPreviewPanel")
+
 #define ROW_SMALL_HEIGHT 18.0
 
 typedef enum
@@ -62,12 +65,130 @@ typedef enum
         [[fOutline tableColumnWithIdentifier: @"Check"] setHeaderToolTip: NSLocalizedString(@"Download",
                                                                             "file table -> header tool tip")];
         [[fOutline tableColumnWithIdentifier: @"Priority"] setHeaderToolTip: NSLocalizedString(@"Priority",
-                                                                            "file table -> header tool tip")];                                                               
+                                                                            "file table -> header tool tip")];
+        
+        //load the QuickLook framework and set the delegate, no point on trying this on Tiger
+        //animation types: 0 = none; 1 = fade; 2 = zoom
+        fQuickLookAvailable = [[NSBundle bundleWithPath:@"/System/Library/PrivateFrameworks/QuickLookUI.framework"] load];
+        if (fQuickLookAvailable)
+                [[[QLPreviewPanel sharedPreviewPanel] windowController] setDelegate: self];
     }
     
     [fOutline setMenu: [self menu]];
     
     [self setTorrent: nil];
+}
+
+- (void) fileTabClosed
+{
+    if (fQuickLookAvailable)
+    {
+        if ([[QLPreviewPanel sharedPreviewPanel] isOpen])
+            [[QLPreviewPanel sharedPreviewPanel] closeWithEffect: 1];
+    }
+}
+
+// This is the QuickLook delegate method
+// It should return the frame for the item represented by the URL
+// If an empty frame is returned then the panel will fade in/out instead
+- (NSRect) previewPanel: (NSPanel *) panel frameForURL: (NSURL *) url
+{
+    NSRect frame = NSMakeRect(0, 0, 0, 0);
+    int row = [self visibleRowWithURL: url];
+    
+    if (row != -1)
+    {
+        frame = [fOutline rectOfRow:row];
+        frame.origin = [fOutline convertPoint: frame.origin toView: nil];
+        frame.origin = [[fOutline window] convertBaseToScreen: frame.origin];
+        frame.origin.y -= frame.size.height;
+    }
+    
+    return frame;
+}
+
+- (int) visibleRowWithURL: (NSURL *) url
+{
+    NSString * fullPath = [url path];
+    NSString * folder = [fTorrent downloadFolder];
+    NSRange visibleRows = [fOutline rowsInRect: [fOutline bounds]];
+    
+    int row;
+    for (row = visibleRows.location; row <= row + visibleRows.length; row++)
+    {
+        id rowItem = [fOutline itemAtRow: row];
+        if ([[folder stringByAppendingPathComponent: [rowItem objectForKey: @"Path"]] isEqualToString: fullPath])
+            return row;
+    }
+    return -1;
+}
+
+- (void) userDidPressSpaceInOutlineView: (id) outlineView
+{
+    if (fQuickLookAvailable)
+    {
+        if ([[QLPreviewPanel sharedPreviewPanel] isOpen])
+            [[QLPreviewPanel sharedPreviewPanel] closeWithEffect: 2];
+        else
+        {
+            if ([self quickLookSelectedItems])
+            {
+                [[QLPreviewPanel sharedPreviewPanel] makeKeyAndOrderFrontWithEffect: 2];
+                // Restore the focus to our window to demo the selection changing, scrolling (left/right)
+                // and closing (space) functionality
+                [[fOutline window] makeKeyWindow];
+            }
+        }
+    }
+}
+
+- (void) userDidPressRightInOutlineView: (id) outlineView
+{
+    if (fQuickLookAvailable && [[QLPreviewPanel sharedPreviewPanel] isOpen])
+        [[QLPreviewPanel sharedPreviewPanel] selectNextItem];
+}
+
+- (void) userDidPressLeftInOutlineView: (id) outlineView
+{
+    if (fQuickLookAvailable && [[QLPreviewPanel sharedPreviewPanel] isOpen])
+        [[QLPreviewPanel sharedPreviewPanel] selectPreviousItem];
+}
+
+- (BOOL) quickLookSelectedItems
+{
+    if (fQuickLookAvailable)
+    {
+        NSString * folder = [fTorrent downloadFolder];
+        NSIndexSet * indexes = [fOutline selectedRowIndexes];
+        NSMutableArray * urlArray = [NSMutableArray arrayWithCapacity: [indexes count]];
+
+        int i;
+        for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+        {
+            id item = [fOutline itemAtRow: i];
+            if ([[item objectForKey: @"IsFolder"] boolValue]
+                || [fTorrent fileProgress: [[item objectForKey: @"Indexes"] firstIndex]] == 1.0)
+                [urlArray addObject: [NSURL fileURLWithPath: [folder stringByAppendingPathComponent: [item objectForKey: @"Path"]]]];
+        }
+        
+        if ([urlArray count])
+        {
+            [[QLPreviewPanel sharedPreviewPanel] setURLs: urlArray currentIndex: 0 preservingDisplayState: YES];
+            return YES;
+        }
+        else
+            return NO;
+    }
+}
+
+- (void) outlineViewSelectionDidChange: (NSNotification *) notification
+{
+    if (fQuickLookAvailable)
+    {
+        // If the user changes the selection while the panel is open then update the current items
+        if ([[QLPreviewPanel sharedPreviewPanel] isOpen] && ![self quickLookSelectedItems])
+            [[QLPreviewPanel sharedPreviewPanel] closeWithEffect: 1];
+    }
 }
 
 - (void) setTorrent: (Torrent *) torrent

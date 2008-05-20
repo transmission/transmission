@@ -590,6 +590,11 @@ typedef enum
     return windowRect;
 }
 
+- (void) windowWillClose: (NSNotification *) notification
+{
+    [fFileController fileTabClosed];
+}
+
 - (void) setTab: (id) sender
 {
     int oldTabTag = fCurrentTabTag;
@@ -619,6 +624,8 @@ typedef enum
                 oldResizeSaveKey = @"InspectorContentHeightPeers";
                 break;
             case TAB_FILES_TAG:
+                [fFileController fileTabClosed];
+                
                 oldResizeSaveKey = @"InspectorContentHeightFiles";
                 break;
         }
