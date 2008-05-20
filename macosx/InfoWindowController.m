@@ -27,6 +27,9 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
+#import "QuickLook.h"
+#define QLPreviewPanel NSClassFromString(@"QLPreviewPanel")
+
 #define TAB_INFO_IDENT @"Info"
 #define TAB_ACTIVITY_IDENT @"Activity"
 #define TAB_TRACKER_IDENT @"Tracker"
@@ -138,6 +141,12 @@ typedef enum
     [revealOn release];
     [revealOff release];
     
+    //load the QuickLook framework and set the delegate, no point on trying this on Tiger
+    //animation types: 0 = none; 1 = fade; 2 = zoom
+    fQuickLookAvailable = [[NSBundle bundleWithPath: @"/System/Library/PrivateFrameworks/QuickLookUI.framework"] load];
+    if (fQuickLookAvailable)
+        [[[QLPreviewPanel sharedPreviewPanel] windowController] setDelegate: self];
+    
     //initially sort peer table by IP
     if ([[fPeerTable sortDescriptors] count] == 0)
         [fPeerTable setSortDescriptors: [NSArray arrayWithObject: [[fPeerTable tableColumnWithIdentifier: @"IP"]
@@ -163,6 +172,7 @@ typedef enum
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     [nc addObserver: self selector: @selector(updateInfoStats) name: @"UpdateStats" object: nil];
     [nc addObserver: self selector: @selector(updateOptions) name: @"UpdateOptions" object: nil];
+    [nc addObserver: self selector: @selector(updateQuickLook) name: @"UpdateQuickLook" object: nil];
 }
 
 - (void) dealloc
@@ -592,7 +602,8 @@ typedef enum
 
 - (void) windowWillClose: (NSNotification *) notification
 {
-    [fFileController fileTabClosed];
+    if (fQuickLookAvailable)
+        [[QLPreviewPanel sharedPreviewPanel] closeWithEffect: 0];
 }
 
 - (void) setTab: (id) sender
@@ -624,7 +635,7 @@ typedef enum
                 oldResizeSaveKey = @"InspectorContentHeightPeers";
                 break;
             case TAB_FILES_TAG:
-                [fFileController fileTabClosed];
+                [self updateQuickLook];
                 
                 oldResizeSaveKey = @"InspectorContentHeightFiles";
                 break;
@@ -889,6 +900,156 @@ typedef enum
         return [components componentsJoinedByString: @"\n"];
     }
     return nil;
+}
+
+// This is the QuickLook delegate method
+// It should return the frame for the item represented by the URL
+// If an empty frame is returned then the panel will fade in/out instead
+- (NSRect) previewPanel: (NSPanel *) panel frameForURL: (NSURL *) url
+{
+    if (fCurrentTabTag == TAB_FILES_TAG && [[fFileController outlineView] numberOfSelectedRows] > 0)
+    {
+        int row = [self visibleRowWithURL: url];
+        if (row != -1)
+        {
+            FileOutlineView * fileOutlineView = [fFileController outlineView];
+            
+            NSRect frame = [fileOutlineView rectOfRow: row];
+            frame.origin = [fileOutlineView convertPoint: frame.origin toView: nil];
+            frame.origin = [[self window] convertBaseToScreen: frame.origin];
+            frame.origin.y -= frame.size.height;
+            return frame;
+        }
+        else
+            return NSZeroRect;
+    }
+    else
+    {
+        NSRect frame = [fImageView frame];
+        frame.origin = [[self window] convertBaseToScreen: frame.origin];
+        return frame;
+    }
+}
+
+#warning needed?
+- (int) visibleRowWithURL: (NSURL *) url
+{
+    FileOutlineView * fileOutlineView = [fFileController outlineView];
+    
+    NSString * fullPath = [url path];
+    NSString * folder = [[fTorrents objectAtIndex: 0] downloadFolder];
+    NSRange visibleRows = [fileOutlineView rowsInRect: [fileOutlineView bounds]];
+    
+    int row;
+    for (row = visibleRows.location; row <= row + visibleRows.length; row++)
+    {
+        id rowItem = [fileOutlineView itemAtRow: row];
+        if ([[folder stringByAppendingPathComponent: [rowItem objectForKey: @"Path"]] isEqualToString: fullPath])
+            return row;
+    }
+    return -1;
+}
+
+- (BOOL) quickLookSelectItems
+{
+    if (!fQuickLookAvailable)
+        return NO;
+    
+    NSMutableArray * urlArray = nil;
+    
+    FileOutlineView * fileOutlineView = [fFileController outlineView];
+    if (fCurrentTabTag == TAB_FILES_TAG && [fileOutlineView numberOfSelectedRows] > 0)
+    {
+        Torrent * torrent = [fTorrents objectAtIndex: 0];
+        NSString * folder = [torrent downloadFolder];
+        NSIndexSet * indexes = [fileOutlineView selectedRowIndexes];
+        urlArray = [NSMutableArray arrayWithCapacity: [indexes count]];
+
+        int i;
+        for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+        {
+            NSDictionary * item = [fileOutlineView itemAtRow: i];
+            if ([[item objectForKey: @"IsFolder"] boolValue]
+                || [torrent fileProgress: [[item objectForKey: @"Indexes"] firstIndex]] == 1.0)
+                [urlArray addObject: [NSURL fileURLWithPath: [folder stringByAppendingPathComponent: [item objectForKey: @"Path"]]]];
+        }
+    }
+    else
+    {
+        if ([fTorrents count] > 0)
+        {
+            urlArray = [NSMutableArray arrayWithCapacity: [fTorrents count]];
+            NSEnumerator * enumerator = [fTorrents objectEnumerator];
+            Torrent * torrent;
+            while ((torrent = [enumerator nextObject]))
+            {
+                if ([torrent folder] || [torrent progress] == 1.0)
+                    [urlArray addObject: [NSURL fileURLWithPath: [torrent dataLocation]]];
+            }
+        }
+    }
+    
+    if (urlArray && [urlArray count] > 0)
+    {
+        [[QLPreviewPanel sharedPreviewPanel] setURLs: urlArray currentIndex: 0 preservingDisplayState: YES];
+        return YES;
+    }
+    else
+        return NO;
+}
+
+- (void) toggleQuickLook: (id) sender
+{
+    if (!fQuickLookAvailable)
+        return;
+    
+    if ([[QLPreviewPanel sharedPreviewPanel] isOpen])
+        [[QLPreviewPanel sharedPreviewPanel] closeWithEffect: 2];
+    else
+    {
+        if ([self quickLookSelectItems])
+        {
+            [[QLPreviewPanel sharedPreviewPanel] makeKeyAndOrderFrontWithEffect: 2];
+            // Restore the focus to our window to demo the selection changing, scrolling (left/right)
+            // and closing (space) functionality
+            [[self window] makeKeyWindow];
+        }
+    }
+}
+
+- (void) updateQuickLook
+{
+    if (!fQuickLookAvailable || ![[QLPreviewPanel sharedPreviewPanel] isOpen])
+        return;
+    
+    //if the user changes the selection while the panel is open then update the current items
+    if (![self quickLookSelectItems])
+        [[QLPreviewPanel sharedPreviewPanel] closeWithEffect: 1];
+}
+
+- (void) quickLookPressLeft
+{
+    if (fQuickLookAvailable && [[QLPreviewPanel sharedPreviewPanel] isOpen])
+        [[QLPreviewPanel sharedPreviewPanel] selectPreviousItem];
+}
+
+- (void) quickLookPressRight
+{
+    if (fQuickLookAvailable && [[QLPreviewPanel sharedPreviewPanel] isOpen])
+        [[QLPreviewPanel sharedPreviewPanel] selectNextItem];
+}
+
+- (void) keyDown: (NSEvent *) event
+{
+    unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
+    if (firstChar == ' ')
+        [self toggleQuickLook: nil];
+    else if (firstChar == NSRightArrowFunctionKey)
+        [self quickLookPressRight];
+    else if (firstChar == NSLeftArrowFunctionKey)
+        [self quickLookPressLeft];
+    else
+        [super keyDown: event];  
 }
 
 - (void) setPiecesView: (id) sender

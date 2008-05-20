@@ -32,9 +32,9 @@
     Torrent * fTorrent;
     
     IBOutlet FileOutlineView * fOutline;
-	
-	BOOL fQuickLookAvailable;
 }
+
+- (FileOutlineView *) outlineView;
 
 - (void) setTorrent: (Torrent *) torrent;
 
@@ -45,14 +45,5 @@
 - (void) setPriority: (id) sender;
 
 - (void) revealFile: (id) sender;
-
-- (void) userDidPressSpaceInOutlineView: (id) outlineView;
-- (void) userDidPressRightInOutlineView: (id) outlineView;
-- (void) userDidPressLeftInOutlineView: (id) outlineView;
-
-- (BOOL) quickLookSelectedItems;
-- (int) visibleRowWithURL: (NSURL*) url;
-
-- (void) fileTabClosed;
 
 @end

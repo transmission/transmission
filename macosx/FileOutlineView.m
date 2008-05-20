@@ -24,6 +24,7 @@
 
 #import "FileOutlineView.h"
 #import "FileOutlineController.h"
+#import "InfoWindowController.h"
 #import "FileNameCell.h"
 #import "FilePriorityCell.h"
 #import "Torrent.h"
@@ -88,11 +89,11 @@
 {
     unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
     if (firstChar == ' ')
-        [(FileOutlineController *)[super delegate] userDidPressSpaceInOutlineView: self];
+        [(InfoWindowController *)[[self window] windowController] toggleQuickLook: nil];
     else if (firstChar == NSRightArrowFunctionKey)
-        [(FileOutlineController *)[super delegate] userDidPressRightInOutlineView: self];
+        [(InfoWindowController *)[[self window] windowController] quickLookPressRight];
     else if (firstChar == NSLeftArrowFunctionKey)
-        [(FileOutlineController *)[super delegate] userDidPressLeftInOutlineView: self];
+        [(InfoWindowController *)[[self window] windowController] quickLookPressLeft];
     else;
     
     [super keyDown: event];  
