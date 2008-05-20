@@ -20,7 +20,7 @@
 .\" FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 .\" DEALINGS IN THE SOFTWARE.
 
-.Dd April 18, 2007
+.Dd May 20, 2008
 .Dt TRANSMISSION-GTK 1
 .Os
 .Sh NAME
@@ -47,45 +47,47 @@ The options are as follows:
 Show help options
 .It Fl p Fl -paused
 Start with all torrents paused
-.It Fl q Fl -quit
-Ask the running
-.Nm
-instance to quit
 .It Fl m Fl -minimized
 Start minimized in system tray
 .It Fl g, Fl -config-dir Ar directory
 Where to look for configuration files
 .El
 .Pp
-Only one instance of
+Multiple .torrent files may be added at startup
+by appending them on the command line.
+If
 .Nm
-may be run at one time.  Multiple .torrent files may be loaded at
-startup by adding them to the command line.  If
-.Nm
-is already running, those torrents will be opened in the running
-instance.
+is already running, the torrents will be added to the running instance.
+
+.Sh ENVIRONMENT
+.Bl -tag -width Fl
+.It Ev TRANSMISSION_HOME
+Sets the default config-dir.
+.El
+
 .Sh FILES
 .Bl -tag -width Ds -compact
-.It ~/.transmission
-The directory which
-.Nm
-uses to store user preferences, resume information and state, and the
-socket file used for interprocess communication (IPC).
+.It ~/.config/transmission
+The config-dir used when neither
+.Op Ev TRANSMISSION_HOME
+nor
+.Op Fl g
+is specified.
 .El
+
 .Sh AUTHORS
 .An -nosplit
-The
 .Nm
-program was written by
-.An Charles Kerr Aq charles@rebelbase.com ,
-.An Josh Elsasser Aq josh@elsasser.org ,
-.An Eric Petit Aq titer@m0k.org ,
+was written by
+.An Charles Kerr ,
+.An Josh Elsasser ,
+.An Eric Petit ,
 and
-.An Mitchell Livingston Aq livings124@gmail.com .
+.An Mitchell Livingston .
+
 .Sh SEE ALSO
 .Xr transmissioncli 1 ,
 .Xr transmission-daemon 1 ,
-.Xr transmission-proxy 1 ,
 .Xr transmission-remote 1
 .Pp
 http://www.transmissionbt.com/
