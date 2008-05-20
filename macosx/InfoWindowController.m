@@ -735,6 +735,9 @@ typedef enum
     [window setFrame: windowRect display: YES animate: oldTabTag != INVALID];
     [[window contentView] addSubview: view];
     [view setHidden: NO];
+    
+    if (fCurrentTabTag == TAB_FILES_TAG)
+        [self updateQuickLook];
 }
 
 - (void) setNextTab
