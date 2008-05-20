@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "FileOutlineView.h"
-#import "FileOutlineController.h"
 #import "InfoWindowController.h"
 #import "FileNameCell.h"
 #import "FilePriorityCell.h"

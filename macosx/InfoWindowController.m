@@ -464,6 +464,8 @@ typedef enum
             [self updateInfoFiles];
             break;
     }
+    
+    [self updateQuickLook];
 }
 
 - (void) updateOptions
