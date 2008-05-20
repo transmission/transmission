@@ -258,12 +258,13 @@ torrentStatusToString( int i )
 }
 
 static void
-processResponse( const void * response, size_t len )
+processResponse( const char * host, int port,
+                 const void * response, size_t len )
 {
     tr_benc top;
 
     if( tr_jsonParse( response, len, &top, NULL ) )
-       tr_nerr( MY_NAME, "Unable to parse response\n" );
+       tr_nerr( MY_NAME, "Unable to parse response" );
     else
     {
         tr_benc *args, *list;
@@ -272,7 +273,7 @@ processResponse( const void * response, size_t len )
         tr_bencDictFindInt( &top, "tag", &tag );
 
         if( tr_bencDictFindStr( &top, "result", &str ) )
-            printf( "Server responded: \"%s\"\n", str );
+            printf( "%s:%d responded: \"%s\"\n", host, port, str );
 
         if( ( tag == TAG_LIST ) &&
             ( tr_bencDictFindDict( &top, "arguments", &args ) ) &&
@@ -328,9 +329,9 @@ processRequests( const char * host, int port,
         CURLcode res;
         curl_easy_setopt( curl, CURLOPT_POSTFIELDS, reqs[i] );
         if(( res = curl_easy_perform( curl )))
-            tr_nerr( MY_NAME, "%s\n", curl_easy_strerror( res ) );
+            tr_nerr( MY_NAME, "(%s:%d) %s", host, port, curl_easy_strerror( res ) );
         else
-            processResponse( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+            processResponse( host, port, EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
 
         evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
     }

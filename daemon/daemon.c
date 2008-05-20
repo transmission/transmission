@@ -63,7 +63,7 @@ saveState( tr_handle * h )
     }
     tr_bencDictAddStr( &d, "encryption", str );
 
-    tr_ninf( MY_NAME, "saving \"%s\"\n", gl_configfile );
+    tr_ninf( MY_NAME, "saving \"%s\"", gl_configfile );
     tr_bencSaveFile( gl_configfile, &d );
 
     tr_bencFree( &d );
@@ -206,14 +206,14 @@ daemon( int nochdir, int noclose )
         case 0:
             break;
         case -1:
-            tr_nerr( MY_NAME, "Error daemonizing (fork)! %d - %s\n", errno, strerror(errno) );
+            tr_nerr( MY_NAME, "Error daemonizing (fork)! %d - %s", errno, strerror(errno) );
             return -1;
         default:
             _exit(0);
     }
 
     if( setsid() < 0 ) {
-        tr_nerr( MY_NAME, "Error daemonizing (setsid)! %d - %s\n", errno, strerror(errno) );
+        tr_nerr( MY_NAME, "Error daemonizing (setsid)! %d - %s", errno, strerror(errno) );
         return -1;
     }
 
@@ -221,14 +221,14 @@ daemon( int nochdir, int noclose )
         case 0:
             break;
         case -1:
-            tr_nerr( MY_NAME, "Error daemonizing (fork2)! %d - %s\n", errno, strerror(errno) );
+            tr_nerr( MY_NAME, "Error daemonizing (fork2)! %d - %s", errno, strerror(errno) );
             return -1;
         default:
             _exit(0);
     }
 
     if( !nochdir && 0 > chdir( "/" ) ) {
-        tr_nerr( MY_NAME, "Error daemonizing (chdir)! %d - %s\n", errno, strerror(errno) );
+        tr_nerr( MY_NAME, "Error daemonizing (chdir)! %d - %s", errno, strerror(errno) );
         return -1;
     }
 
