@@ -191,6 +191,9 @@ void  tr_free    ( void* );
 char* tr_strdup( const char * str ) TR_GNUC_MALLOC;
 char* tr_strndup( const char * str, int len ) TR_GNUC_MALLOC;
 char* tr_strdup_printf( const char * fmt, ... )  TR_GNUC_PRINTF( 1, 2 ) TR_GNUC_MALLOC;
+char* tr_base64_encode( const void * input, int inlen, int *outlen ) TR_GNUC_MALLOC;
+char* tr_base64_decode( const void * input, int inlen, int *outlen ) TR_GNUC_MALLOC;
+
 size_t tr_strlcpy( char * dst, const char * src, size_t siz );
 
 

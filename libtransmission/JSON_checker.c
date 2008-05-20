@@ -385,6 +385,7 @@ static void parse_buffer_push_back_char(JSON_checker jc, char c)
         jc->parse_buffer_capacity *= 2;
         if (jc->parse_buffer == &jc->static_parse_buffer[0]) {
             jc->parse_buffer = (char*)malloc(jc->parse_buffer_capacity * sizeof(jc->parse_buffer[0]));
+            memcpy( jc->parse_buffer, jc->static_parse_buffer, jc->parse_buffer_count );
         } else {
             jc->parse_buffer = (char*)realloc(jc->parse_buffer, jc->parse_buffer_capacity * sizeof(jc->parse_buffer[0]));
         }

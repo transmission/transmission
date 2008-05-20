@@ -17,7 +17,4 @@ int tr_jsonParse( const void       * vbuf,
                   struct tr_benc   * setme_benc,
                   const uint8_t   ** setme_end );
 
-char* tr_rison2json( const char    * rison,
-                     int             rison_len );
-
 #endif

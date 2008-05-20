@@ -272,39 +272,6 @@ testParse( void )
 }
 
 static int
-testRISONSnippet( const char * rison_str, const char * expected )
-{
-    char * serialized = tr_rison2json( rison_str, -1 );
-#if 0
-fprintf( stderr, " expected: [%s]\n", expected );
-fprintf( stderr, "      got: [%s]\n", serialized );
-#endif
-    check( !strcmp( serialized, expected ) );
-    tr_free( serialized );
-    return 0;
-}
-
-static int
-testRISON( void )
-{
-    int val;
-    const char * rison;
-    const char * expected;
-
-    rison = "(a:0,b:foo,c:'23skidoo')";
-    expected = "{ \"a\": 0, \"b\": \"foo\", \"c\": \"23skidoo\" }";
-    if(( val = testRISONSnippet( rison, expected )))
-        return val;
-
-    rison = "(method:torrent-info)";
-    expected = "{ \"method\": \"torrent-info\" }";
-    if(( val = testRISONSnippet( rison, expected )))
-        return val;
-
-    return 0;
-}
-
-static int
 testJSONSnippet( const char * benc_str, const char * expected )
 {
     tr_benc top;
@@ -403,9 +370,6 @@ main( void )
         return i;
 
     if(( i = testJSON( )))
-        return i;
-
-    if(( i = testRISON( )))
         return i;
 
     if(( i = testStackSmash( )))

@@ -4,12 +4,11 @@ AM_CFLAGS = $(OPENSSL_CFLAGS) $(LIBCURL_CFLAGS) $(PTHREAD_CFLAGS)
 noinst_LIBRARIES = libtransmission.a
 
 libtransmission_a_SOURCES = \
-    ConvertUTF.c \
-    JSON_checker.c \
     bencode.c \
     blocklist.c \
     clients.c \
     completion.c \
+    ConvertUTF.c \
     crypto.c \
     fastresume.c \
     fdlimit.c \
@@ -17,6 +16,7 @@ libtransmission_a_SOURCES = \
     handshake.c \
     inout.c \
     json.c \
+    JSON_checker.c \
     list.c \
     makemeta.c \
     metainfo.c \
@@ -45,11 +45,10 @@ libtransmission_a_SOURCES = \
     web.c
 
 noinst_HEADERS = \
-    ConvertUTF.h \
-    JSON_checker.h \
     bencode.h \
     blocklist.h \
     clients.h \
+    ConvertUTF.h \
     crypto.h \
     completion.h \
     fastresume.h \
@@ -58,6 +57,7 @@ noinst_HEADERS = \
     handshake.h \
     inout.h \
     json.h \
+    JSON_checker.h \
     list.h \
     makemeta.h \
     metainfo.h \
@@ -92,7 +92,8 @@ TESTS = \
     clients-test \
     json-test \
     test-fastset \
-    test-peer-id
+    test-peer-id \
+    utils-test
 
 noinst_PROGRAMS = $(TESTS)
 
@@ -120,6 +121,8 @@ test_fastset_SOURCES = test-fastset.c
 test_fastset_LDADD = $(APPS_LDADD)
 test_peer_id_SOURCES = test-peer-id.c
 test_peer_id_LDADD = $(APPS_LDADD)
+utils_test_SOURCES = utils-test.c
+utils_test_LDADD = $(APPS_LDADD)
 
 
 clean-local:

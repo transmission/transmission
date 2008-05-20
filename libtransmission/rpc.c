@@ -527,9 +527,12 @@ torrentSetPriorities( tr_handle * h,
 static const char*
 torrentAdd( tr_handle * h, tr_benc * args_in, tr_benc * args_out )
 {
-    const char * filename;
-    if( !tr_bencDictFindStr( args_in, "filename", &filename ) )
-        return "no filename specified";
+    const char * filename = NULL;
+    const char * metainfo_base64 = NULL;
+    tr_bencDictFindStr( args_in, "filename", &filename );
+    tr_bencDictFindStr( args_in, "metainfo", &metainfo_base64 );
+    if( !filename && !metainfo_base64 )
+        return "no filename or metainfo specified";
     else
     {
         int64_t i;
@@ -539,13 +542,25 @@ torrentAdd( tr_handle * h, tr_benc * args_in, tr_benc * args_out )
         tr_torrent * tor;
 
         ctor = tr_ctorNew( h );
-        tr_ctorSetMetainfoFromFile( ctor, filename );
+
+        /* set the metainfo */
+        if( filename )
+            tr_ctorSetMetainfoFromFile( ctor, filename );
+        else {
+            int len;
+            char * metainfo = tr_base64_decode( metainfo_base64, -1,  &len );
+            tr_ctorSetMetainfo( ctor, (uint8_t*)metainfo, len );
+            tr_free( metainfo );
+        }
+
+        /* set the optional arguments */
         if( tr_bencDictFindStr( args_in, "download-dir", &str ) )
             tr_ctorSetDownloadDir( ctor, TR_FORCE, str );
         if( tr_bencDictFindInt( args_in, "paused", &i ) )
             tr_ctorSetPaused( ctor, TR_FORCE, i );
         if( tr_bencDictFindInt( args_in, "peer-limit", &i ) )
             tr_ctorSetPeerLimit( ctor, TR_FORCE, i );
+
         tor = tr_torrentNew( h, ctor, &err );
         tr_ctorFree( ctor );
 

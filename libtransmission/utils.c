@@ -601,6 +601,7 @@ tr_strndup( const char * in, int len )
         memcpy( out, in, len );
         out[len] = '\0';
     }
+
     return out;
 }
 
@@ -1013,4 +1014,59 @@ tr_httpParseURL( const char * url_in, int len,
 
     tr_free( tmp );
     return err;
+}
+
+#include <string.h>
+#include <openssl/sha.h>
+#include <openssl/hmac.h>
+#include <openssl/evp.h>
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+
+char *
+tr_base64_encode( const void * input, int length, int * setme_len )
+{
+    char * ret;
+    BIO * b64;
+    BIO * bmem;
+    BUF_MEM * bptr;
+
+    if( length < 1 )
+       length = strlen( input );
+
+    bmem = BIO_new( BIO_s_mem( ) );
+    b64 = BIO_new( BIO_f_base64( ) );
+    b64 = BIO_push( b64, bmem );
+    BIO_write( b64, input, length );
+    (void) BIO_flush( b64 );
+    BIO_get_mem_ptr( b64, &bptr );
+    ret = tr_strndup( bptr->data, bptr->length );
+    if( setme_len )
+        *setme_len = bptr->length;
+
+    BIO_free_all( b64 );
+    return ret;
+}
+
+char *
+tr_base64_decode( const void * input, int length, int * setme_len )
+{
+    char * ret;
+    BIO * b64;
+    BIO * bmem;
+    int retlen;
+
+    if( length < 1 )
+       length = strlen( input );
+
+    ret = tr_new0( char, length );
+    b64 = BIO_new( BIO_f_base64( ) );
+    bmem = BIO_new_mem_buf( (unsigned char*)input, length );
+    bmem = BIO_push( b64, bmem );
+    retlen = BIO_read( bmem, ret, length );
+    if( setme_len )
+        *setme_len = retlen;
+
+    BIO_free_all( bmem );
+    return ret;
 }

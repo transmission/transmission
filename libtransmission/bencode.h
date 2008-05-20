@@ -90,7 +90,6 @@ static inline void tr_bencInit( tr_benc    * val, int type )
 void   _tr_bencInitStr( tr_benc * val, char * str, int len, int nofree );
 int    tr_bencInitStrDup( tr_benc * val, const char * str );
 void   tr_bencInitRaw( tr_benc * val, const void * src, size_t byteCount );
-int    tr_bencInitStrDupLen( tr_benc * val, const char * str, int len );
 void   tr_bencInitInt( tr_benc * val, int64_t num );
 int   tr_bencInitDict( tr_benc * val, int reserveCount );
 int   tr_bencInitList( tr_benc * val, int reserveCount );

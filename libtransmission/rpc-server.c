@@ -66,7 +66,7 @@ handle_rpc( struct shttpd_arg * arg )
         }
 
         evbuffer_add_printf( s->out, "HTTP/1.1 200 OK\r\n"
-                                     "Content-Type: text/x-json\r\n"
+                                     "Content-Type: application/json\r\n"
                                      "Content-Length: %d\r\n"
                                      "\r\n"
                                      "%*.*s\r\n", len, len, len, response );

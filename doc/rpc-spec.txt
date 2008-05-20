@@ -158,10 +158,12 @@
    -------------------+-------------------------------------------------
    "download-dir"     | string    path to download the torrent to
    "filename"         | string    location of the .torrent file
+   "metainfo"         | string    base64-encoded .torrent content
    "paused"           | boolean   if true, don't start the torrent
    "peer-limit"       | int       maximum number of peers
 
-   The "filename" argument is required; all others are optional.
+   Either "filename" OR "metainfo" must be included.
+   All other arguments are optional.
 
    Response arguments: on success, a "torrent-added" object in the
                        form of one of 3.3's tr_info objects.

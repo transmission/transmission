@@ -100,6 +100,16 @@ absolutify( char * buf, size_t len, const char * path )
     return buf;
 }
 
+static char*
+getEncodedMetainfo( const char * filename )
+{
+    size_t len;
+    uint8_t * buf = tr_loadFile( filename, &len );
+    char * b64 = tr_base64_encode( buf, len, NULL );
+    tr_free( buf );
+    return b64;
+}
+
 static void
 readargs( int argc, char ** argv )
 {
@@ -132,17 +142,19 @@ readargs( int argc, char ** argv )
 
     while((( opt = getopt_long( argc, argv, optstr, longopts, NULL ))) != -1 )
     {
+        char * tmp;
         char buf[MAX_PATH_LENGTH];
         tr_benc top, *args;
         tr_bencInitDict( &top, 3 );
-        args = tr_bencDictAddDict( &top, "args", 0 );
+        args = tr_bencDictAddDict( &top, "arguments", 0 );
 
         switch( opt )
         {
             case 'g': debug = 1; break;
             case 'h': showUsage( ); break;
             case 'a': tr_bencDictAddStr( &top, "method", "torrent-add" );
-                      tr_bencDictAddStr( args, "filename", optarg );
+                      tr_bencDictAddStr( args, "metainfo", ((tmp=getEncodedMetainfo(optarg))) );
+                      tr_free( tmp );
                       break;
             case 'c': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddStr( args, "encryption", optarg );
