@@ -442,6 +442,8 @@ typedef enum
     
     [fTrackerTable reloadData];
     [fPeerTable reloadData];
+    
+    [self updateQuickLook];
 }
 
 - (void) updateInfoStats
@@ -464,8 +466,6 @@ typedef enum
             [self updateInfoFiles];
             break;
     }
-    
-    [self updateQuickLook];
 }
 
 - (void) updateOptions
