@@ -69,9 +69,9 @@ typedef enum
         
         //load the QuickLook framework and set the delegate, no point on trying this on Tiger
         //animation types: 0 = none; 1 = fade; 2 = zoom
-        fQuickLookAvailable = [[NSBundle bundleWithPath:@"/System/Library/PrivateFrameworks/QuickLookUI.framework"] load];
+        fQuickLookAvailable = [[NSBundle bundleWithPath: @"/System/Library/PrivateFrameworks/QuickLookUI.framework"] load];
         if (fQuickLookAvailable)
-                [[[QLPreviewPanel sharedPreviewPanel] windowController] setDelegate: self];
+            [[[QLPreviewPanel sharedPreviewPanel] windowController] setDelegate: self];
     }
     
     [fOutline setMenu: [self menu]];
@@ -84,7 +84,7 @@ typedef enum
     if (fQuickLookAvailable)
     {
         if ([[QLPreviewPanel sharedPreviewPanel] isOpen])
-            [[QLPreviewPanel sharedPreviewPanel] closeWithEffect: 1];
+            [[QLPreviewPanel sharedPreviewPanel] closeWithEffect: 0];
     }
 }
 
@@ -93,12 +93,12 @@ typedef enum
 // If an empty frame is returned then the panel will fade in/out instead
 - (NSRect) previewPanel: (NSPanel *) panel frameForURL: (NSURL *) url
 {
-    NSRect frame = NSMakeRect(0, 0, 0, 0);
+    NSRect frame = NSZeroRect;
     int row = [self visibleRowWithURL: url];
     
     if (row != -1)
     {
-        frame = [fOutline rectOfRow:row];
+        frame = [fOutline rectOfRow: row];
         frame.origin = [fOutline convertPoint: frame.origin toView: nil];
         frame.origin = [[fOutline window] convertBaseToScreen: frame.origin];
         frame.origin.y -= frame.size.height;
