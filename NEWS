@@ -14,7 +14,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.21&order=severi
      Polish, Romanian, Thai, Turkish, and Traditional Chinese translations
 
 1.20 (2008/05/09)
-http://trac.transmissionbt.com/query?group=component&milestone=1.20
+http://trac.transmissionbt.com/query?group=component&milestone=1.20&order=severity
 - All Platforms
    + Support https tracker connections
    + IP blocking using the Bluetack Level1 blocklist
