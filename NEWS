@@ -3,7 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.30 (2008/mm/dd)
 http://trac.transmissionbt.com/query?group=component&milestone=1.30
 - Mac
-   + QuickLook integration in the main window and inspector's file tab
+   + Quick Look integration in the main window and inspector's file tab
    + Transfers can be dragged to different groups
    + Status strings are toggled from the action button (they are no longer clickable)
 

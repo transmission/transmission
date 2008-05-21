@@ -92,10 +92,12 @@ QuickLookController * fQuickLookInstance = nil;
     {
         if ([self quickLookSelectItems])
         {
+            NSWindow * keyWindow = [NSApp keyWindow];
+            
             [[QLPreviewPanel sharedPreviewPanel] makeKeyAndOrderFrontWithEffect: 2];
-            // Restore the focus to our window to demo the selection changing, scrolling (left/right)
-            // and closing (space) functionality
-            //[[self window] makeKeyWindow];
+            
+            //restore the focus to previous key window
+            [keyWindow makeKeyWindow];
         }
     }
 }
