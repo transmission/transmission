@@ -113,6 +113,12 @@
     return [self menu];
 }
 
+- (NSRect) iconRectForRow: (int) row
+{
+    FileNameCell * cell = (FileNameCell *)[[self tableColumnWithIdentifier: @"Name"] dataCell];
+    return [cell imageRectForBounds: [self rectOfRow: row]];
+}
+
 - (void) updateTrackingAreas
 {
     [super updateTrackingAreas];

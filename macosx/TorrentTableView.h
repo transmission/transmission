@@ -66,6 +66,8 @@
 - (NSArray *) selectedValues;
 - (NSArray *) selectedTorrents;
 
+- (NSRect) iconRectForRow: (int) row;
+
 - (void) paste: (id) sender;
 
 - (void) toggleControlForTorrent: (Torrent *) torrent;

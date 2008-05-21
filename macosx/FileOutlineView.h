@@ -39,6 +39,8 @@
 - (void) setTorrent: (Torrent *) torrent;
 - (Torrent *) torrent;
 
+- (NSRect) iconRectForRow: (int) row;
+
 - (int) hoveredRow;
 
 @end

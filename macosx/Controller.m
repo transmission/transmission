@@ -4089,7 +4089,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             id item = [fTableView itemAtRow: row];
             if ([item isKindOfClass: [Torrent class]] && [[(Torrent *)item dataLocation] isEqualToString: fullPath])
             {
-                NSRect frame = [fTableView rectOfRow: row];
+                NSRect frame = [fTableView iconRectForRow: row];
                 frame.origin = [fTableView convertPoint: frame.origin toView: nil];
                 frame.origin = [fWindow convertBaseToScreen: frame.origin];
                 frame.origin.y -= frame.size.height;

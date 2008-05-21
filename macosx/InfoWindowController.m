@@ -24,6 +24,7 @@
 
 #import "InfoWindowController.h"
 #import "InfoTabButtonCell.h"
+#import "FileOutlineView.h"
 #import "QuickLookController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
@@ -945,7 +946,7 @@ typedef enum
         id rowItem = [fileOutlineView itemAtRow: row];
         if ([[folder stringByAppendingPathComponent: [rowItem objectForKey: @"Path"]] isEqualToString: fullPath])
         {
-            NSRect frame = [fileOutlineView rectOfRow: row];
+            NSRect frame = [fileOutlineView iconRectForRow: row];
             frame.origin = [fileOutlineView convertPoint: frame.origin toView: nil];
             frame.origin = [[self window] convertBaseToScreen: frame.origin];
             frame.origin.y -= frame.size.height;

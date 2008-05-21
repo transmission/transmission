@@ -545,6 +545,11 @@
     }
 }
 
+- (NSRect) iconRectForRow: (int) row
+{
+    return [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
+}
+
 - (void) paste: (id) sender
 {
     NSURL * url;
