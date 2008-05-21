@@ -68,13 +68,7 @@ QuickLookController * fQuickLookInstance = nil;
     if ([fInfoController shouldQuickLookFileView])
         return [fInfoController quickLookFrameWithURL: url];
     else
-    {
-        /*NSRect frame = [fImageView frame];
-        frame.origin = [[self window] convertBaseToScreen: frame.origin];
-        return frame;*/
-    }
-    
-    return NSZeroRect;
+        return [fMainController quickLookFrameWithURL: url];
 }
 
 - (BOOL) quickLookSelectItems
@@ -87,19 +81,7 @@ QuickLookController * fQuickLookInstance = nil;
     if ([fInfoController shouldQuickLookFileView])
         urlArray = [fInfoController quickLookURLs];
     else
-    {
-        /*if ([fTorrents count] > 0)
-        {
-            urlArray = [NSMutableArray arrayWithCapacity: [fTorrents count]];
-            NSEnumerator * enumerator = [fTorrents objectEnumerator];
-            Torrent * torrent;
-            while ((torrent = [enumerator nextObject]))
-            {
-                if ([torrent folder] || [torrent progress] == 1.0)
-                    [urlArray addObject: [NSURL fileURLWithPath: [torrent dataLocation]]];
-            }
-        }*/
-    }
+        urlArray = [fMainController quickLookURLs];
     
     if (urlArray && [urlArray count] > 0)
     {

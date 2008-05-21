@@ -25,6 +25,7 @@
 #import "TorrentTableView.h"
 #import "TorrentCell.h"
 #import "Torrent.h"
+#import "QuickLookController.h"
 #import "NSApplicationAdditions.h"
 
 #define MAX_GROUP (INT_MAX-10)
@@ -524,11 +525,24 @@
 //option-command-f will focus the filter bar's search field
 - (void) keyDown: (NSEvent *) event
 {
-    if ([[event charactersIgnoringModifiers] isEqualToString: @"f"] && [event modifierFlags] & NSAlternateKeyMask
+    unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
+    
+    if (firstChar == 'f' && [event modifierFlags] & NSAlternateKeyMask
         && [event modifierFlags] & NSCommandKeyMask)
         [fController focusFilterField];
     else
+    {
+        //handle quicklook
+        if (firstChar == ' ')
+            [[QuickLookController quickLook] toggleQuickLook];
+        else if (firstChar == NSRightArrowFunctionKey)
+            [[QuickLookController quickLook] pressRight];
+        else if (firstChar == NSLeftArrowFunctionKey)
+            [[QuickLookController quickLook] pressLeft];
+        else;
+        
         [super keyDown: event];
+    }
 }
 
 - (void) paste: (id) sender

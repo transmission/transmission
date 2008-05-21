@@ -924,7 +924,7 @@ typedef enum
     NSRange visibleRows = [fileOutlineView rowsInRect: [fileOutlineView bounds]];
     
     int row;
-    for (row = visibleRows.location; row <= row + visibleRows.length; row++)
+    for (row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
     {
         id rowItem = [fileOutlineView itemAtRow: row];
         if ([[folder stringByAppendingPathComponent: [rowItem objectForKey: @"Path"]] isEqualToString: fullPath])

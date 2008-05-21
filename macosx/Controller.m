@@ -2730,6 +2730,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) torrentTableViewSelectionDidChange: (NSNotification *) notification
 {
     [fInfoController setInfoForTorrents: [fTableView selectedTorrents]];
+    [[QuickLookController quickLook] updateQuickLook];
 }
 
 - (NSDragOperation) draggingEntered: (id <NSDraggingInfo>) info
@@ -4014,6 +4015,43 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) applicationWillUnhide: (NSNotification *) notification
 {
     [self updateUI];
+}
+
+- (NSArray *) quickLookURLs
+{
+    NSArray * selectedTorrents = [fTableView selectedTorrents];
+    NSMutableArray * urlArray = [NSMutableArray arrayWithCapacity: [selectedTorrents count]];
+    
+    NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
+    Torrent * torrent;
+    
+    while ((torrent = [enumerator nextObject]))
+        [urlArray addObject: [NSURL fileURLWithPath: [torrent dataLocation]]];
+    
+    return urlArray;
+}
+
+- (NSRect) quickLookFrameWithURL: (NSURL *) url
+{
+    NSString * fullPath = [url path];
+    NSRange visibleRows = [fTableView rowsInRect: [fTableView bounds]];
+    
+    //do in reverse to find torrent before group
+    int row;
+    for (row = NSMaxRange(visibleRows) - 1; row >= visibleRows.location; row--)
+    {
+        id item = [fTableView itemAtRow: row];
+        if ([item isKindOfClass: [Torrent class]] && [[(Torrent *)item dataLocation] isEqualToString: fullPath])
+        {
+            NSRect frame = [fTableView rectOfRow: row];
+            frame.origin = [fTableView convertPoint: frame.origin toView: nil];
+            frame.origin = [fWindow convertBaseToScreen: frame.origin];
+            frame.origin.y -= frame.size.height;
+            return frame;
+        }
+    }
+    
+    return NSZeroRect;
 }
 
 - (void) linkHomepage: (id) sender
