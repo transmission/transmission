@@ -985,7 +985,7 @@
 				4DDBB70A09E16B3200284745 /* GUI */,
 				4DDBB71509E16B3F00284745 /* Libraries */,
 				BE75C3570C72A0D600DBEFE0 /* libevent */,
-				A2AAB6C00DE0D57F00E04DDA /* shttpd */,
+				A2AAB6C00DE0D57F00E04DDA /* libshttpd */,
 				BE1183410CE15DF00002D0F3 /* libminiupnp */,
 				3C7A11880D0B2E6700B5701F /* libnatpmp */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
@@ -1261,7 +1261,7 @@
 			name = "File Outline View";
 			sourceTree = "<group>";
 		};
-		A2AAB6C00DE0D57F00E04DDA /* shttpd */ = {
+		A2AAB6C00DE0D57F00E04DDA /* libshttpd */ = {
 			isa = PBXGroup;
 			children = (
 				A2AAB6C10DE0D5A400E04DDA /* auth.c */,
@@ -1284,7 +1284,7 @@
 				A2AAB6D60DE0D5A400E04DDA /* shttpd.h */,
 				A2AAB6DA0DE0D5A400E04DDA /* string.c */,
 			);
-			name = shttpd;
+			name = libshttpd;
 			sourceTree = "<group>";
 		};
 		BE1183410CE15DF00002D0F3 /* libminiupnp */ = {

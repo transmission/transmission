@@ -6,34 +6,31 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Fri, 9 May 2008 14:50:00 -0400</pubDate>
-    <lastBuildDate>Fri, 9 May 2008 14:50:00 -0400</lastBuildDate>
+    <lastBuildDate>Wed, 21 May 2008 17:01:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 1.20 Released</title>
+      <title>Transmission 1.21 Released</title>
       <description><![CDATA[
 <h4>Transmission now requires Mac OS X 10.4.11 with Security Update 2008-002. Mac OS X 10.5 or greater is recommended.</h4>
 
 <h4>Core Changes:</h4>
 <ul>
- <li>Support https tracker connections</li>
- <li>IP blocking using the Bluetack Level1 blocklist</li>
- <li>Better support of multitracker torrents</li>
- <li>Faster UPnP port mapping on startup</li>
- <li>Ability to reset global statistics</li>
- <li>Various bugfixes</li>
+ <li>Fix rare crash-on-startup bug</li>
+ <li>Handle corrupt announce URLs in torrent files more gracefully</li>
+ <li>Fix minor memory leak when closing torrents</li>
 </ul>
 <h4>Mac-specific Changes:</h4>
 <ul>
- <li>Display of decimal numbers matches system international settings</li>
- <li>Updated Dock badge images</li>
+ <li>Fix visual glitch with the pieces bar</li>
+ <li>Italian localization included</li>
 </ul>
 
 
-<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?group=component&milestone=1.20">click here</a>.</p>
+<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?group=component&milestone=1.21&order=severity">click here</a>.</p>
 
 Transmission 0.72 and earlier: Complete your downloads before upgrading or you will lose data!]]></description>
-      <pubDate>Fri, 9 May 2008 14:50:00 -0400</pubDate>
-      <enclosure sparkle:version="5786" sparkle:shortVersionString="1.20" url="http://mirrors.m0k.org/transmission/files/Transmission-1.20.dmg" length="2522401" type="application/octet-stream"/>
+      <pubDate>Wed, 21 May 2008 17:01:00 -0400</pubDate>
+      <enclosure sparkle:version="5890" sparkle:shortVersionString="1.21" url="http://mirrors.m0k.org/transmission/files/Transmission-1.21.dmg" length="2983745" type="application/octet-stream"/>
     </item>
     
   </channel>

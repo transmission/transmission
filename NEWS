@@ -1,20 +1,27 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.30 (2008/mm/dd)
-http://trac.transmissionbt.com/query?group=component&milestone=1.30
+http://trac.transmissionbt.com/query?group=component&milestone=1.30&order=severity
 - Mac
    + Quick Look integration in the main window and inspector's file tab
    + Transfers can be dragged to different groups
    + Status strings are toggled from the action button (they are no longer clickable)
 
-1.21 (2008/mm/dd)
-http://trac.transmissionbt.com/query?group=component&milestone=1.21
+1.21 (2008/05/21)
+http://trac.transmissionbt.com/query?group=component&milestone=1.21&order=severity
+- All Platforms
+   + Fix rare crash-on-startup bug
+   + Handle corrupt announce URLs in torrent files more gracefully
+   + Fix minor memory leak when closing torrents
 - Mac
    + Fix visual glitch with the pieces bar
    + Italian localization included
+- GTK+
+   + Updated Catalan, Danish, German, Spanish, Finnish, Hebrew, Italian, Dutch,
+     Polish, Romanian, Thai, Turkish, and Traditional Chinese translations
 
 1.20 (2008/05/09)
-http://trac.transmissionbt.com/query?group=component&milestone=1.20
+http://trac.transmissionbt.com/query?group=component&milestone=1.20&order=severity
 - All Platforms
    + Support https tracker connections
    + IP blocking using the Bluetack Level1 blocklist
