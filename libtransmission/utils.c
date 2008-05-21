@@ -936,6 +936,20 @@ tr_sha1_to_hex( char * out, const uint8_t * sha1 )
 int
 tr_httpIsValidURL( const char * url )
 {
+    const char * c;
+    static const char * rfc2396_valid_chars =
+        "abcdefghijklmnopqrstuvwxyz" /* lowalpha */
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" /* upalpha */
+        "0123456789"                 /* digit */
+        "-_.!~*'()"                  /* mark */
+        ";/?:@&=+$,"                 /* reserved */
+        "<>#%<\""                    /* delims */
+        "{}|\\^[]`";                 /* unwise */
+
+    for( c=url; c && *c; ++c )
+        if( !strchr( rfc2396_valid_chars, *c ) )
+            return FALSE;
+
     return !tr_httpParseURL( url, -1, NULL, NULL, NULL );
 }
 
