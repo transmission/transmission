@@ -4026,7 +4026,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent;
     
     while ((torrent = [enumerator nextObject]))
-        [urlArray addObject: [NSURL fileURLWithPath: [torrent dataLocation]]];
+    {
+        if ([torrent folder] || [torrent isComplete])
+            [urlArray addObject: [NSURL fileURLWithPath: [torrent dataLocation]]];
+    }
     
     return urlArray;
 }
