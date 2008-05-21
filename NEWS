@@ -1,7 +1,7 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.21 (2008/mm/dd)
-http://trac.transmissionbt.com/query?group=component&milestone=1.21
+http://trac.transmissionbt.com/query?group=component&milestone=1.21&order=severity
 - All Platforms
    + Fix rare crash-on-startup bug
    + Handle corrupt announce URLs in .torrent files more gracefully
@@ -14,7 +14,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.21
      Polish, Romanian, Thai, Turkish, and Traditional Chinese translations
 
 1.20 (2008/05/09)
-http://trac.transmissionbt.com/query?group=component&milestone=1.20
+http://trac.transmissionbt.com/query?group=component&milestone=1.20&order=severity
 - All Platforms
    + Support https tracker connections
    + IP blocking using the Bluetack Level1 blocklist
