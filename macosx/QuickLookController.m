@@ -81,6 +81,14 @@ QuickLookController * fQuickLookInstance = nil;
         return NO;
 }
 
+- (BOOL) canQuickLook
+{
+    if ([fInfoController shouldQuickLookFileView])
+        return [fInfoController canQuickLook];
+    else
+        return [fMainController canQuickLook];
+}
+
 - (void) toggleQuickLook
 {
     if (!fQuickLookAvailable)

@@ -3408,6 +3408,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [toolbarItem setImage: ![fFilterBar isHidden] ? [NSImage imageNamed: @"FilterBlue.png"] : [NSImage imageNamed: @"Filter.png"]];
         return YES;
     }
+    
+    //enable quicklook item
+    if ([ident isEqualToString: TOOLBAR_QUICKLOOK])
+        return [[QuickLookController quickLook] canQuickLook];
 
     return YES;
 }
@@ -3603,7 +3607,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //enable prev/next filter button
     if (action == @selector(switchFilter:))
         return [fWindow isVisible] && ![fFilterBar isHidden];
-
+    
+    //enable quicklook item
+    if (action == @selector(toggleQuickLook:))
+        return [[QuickLookController quickLook] canQuickLook];
+    
     //enable reveal in finder
     if (action == @selector(revealFile:))
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
@@ -4041,7 +4049,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     NSArray * selectedTorrents = [fTableView selectedTorrents];
     NSMutableArray * urlArray = [NSMutableArray arrayWithCapacity: [selectedTorrents count]];
-    
     NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
     Torrent * torrent;
     
@@ -4052,6 +4059,21 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     return urlArray;
+}
+
+- (BOOL) canQuickLook
+{
+    NSArray * selectedTorrents = [fTableView selectedTorrents];
+    NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
+    Torrent * torrent;
+    
+    while ((torrent = [enumerator nextObject]))
+    {
+        if ([torrent folder] || [torrent isComplete])
+            return YES;
+    }
+    
+    return NO;
 }
 
 - (NSRect) quickLookFrameWithURL: (NSURL *) url

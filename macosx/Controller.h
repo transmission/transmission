@@ -256,6 +256,7 @@ typedef enum
 - (void) showMainWindow: (id) sender;
 
 - (NSArray *) quickLookURLs;
+- (BOOL) canQuickLook;
 - (NSRect) quickLookFrameWithURL: (NSURL*) url;
 - (void) toggleQuickLook: (id) sender;
 

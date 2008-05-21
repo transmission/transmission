@@ -80,6 +80,7 @@
 
 - (BOOL) shouldQuickLookFileView;
 - (NSArray *) quickLookURLs;
+- (BOOL) canQuickLook;
 - (NSRect) quickLookFrameWithURL: (NSURL*) url;
 
 - (void) setPiecesView: (id) sender;

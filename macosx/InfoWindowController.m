@@ -907,12 +907,28 @@ typedef enum
     for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
         NSDictionary * item = [fileOutlineView itemAtRow: i];
-        if ([[item objectForKey: @"IsFolder"] boolValue]
-            || [torrent fileProgress: [[item objectForKey: @"Indexes"] firstIndex]] == 1.0)
+        if ([[item objectForKey: @"IsFolder"] boolValue] || [torrent fileProgress: [[item objectForKey: @"Indexes"] firstIndex]] == 1.0)
             [urlArray addObject: [NSURL fileURLWithPath: [folder stringByAppendingPathComponent: [item objectForKey: @"Path"]]]];
     }
     
     return urlArray;
+}
+
+- (BOOL) canQuickLook
+{
+    FileOutlineView * fileOutlineView = [fFileController outlineView];
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    NSIndexSet * indexes = [fileOutlineView selectedRowIndexes];
+
+    int i;
+    for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+    {
+        NSDictionary * item = [fileOutlineView itemAtRow: i];
+        if ([[item objectForKey: @"IsFolder"] boolValue] || [torrent fileProgress: [[item objectForKey: @"Indexes"] firstIndex]] == 1.0)
+            return YES;
+    }
+    
+    return NO;
 }
 
 - (NSRect) quickLookFrameWithURL: (NSURL *) url

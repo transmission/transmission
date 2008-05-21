@@ -42,6 +42,7 @@
 + (QuickLookController *) quickLook;
 
 - (BOOL) quickLookSelectItems;
+- (BOOL) canQuickLook;
 
 - (void) toggleQuickLook;
 - (void) updateQuickLook;
