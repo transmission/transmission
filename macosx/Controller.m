@@ -4085,7 +4085,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         //do in reverse to find torrent before group
         int row;
-        for (row = NSMaxRange(visibleRows) - 1; row >= visibleRows.location; row--)
+        for (row = NSMaxRange(visibleRows) - 1; row >= (int)visibleRows.location; row--)
         {
             id item = [fTableView itemAtRow: row];
             if ([item isKindOfClass: [Torrent class]] && [[(Torrent *)item dataLocation] isEqualToString: fullPath])
