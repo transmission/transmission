@@ -3,6 +3,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.21 (2008/mm/dd)
 http://trac.transmissionbt.com/query?group=component&milestone=1.21
 - All Platforms
+   + Fix rare crash-on-startup bug
+   + Handle corrupt announce URLs in .torrent files more gracefully
    + Fix minor memory leak when closing torrents
 - Mac
    + Fix visual glitch with the pieces bar
