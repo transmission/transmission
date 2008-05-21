@@ -3276,7 +3276,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [item setToolTip: NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> tooltip")];
         [item setImage: [NSImage imageNamed: NSImageNameQuickLookTemplate]];
         [item setTarget: self];
-        [item setAction: @selector(toggleQuickLook)];
+        [item setAction: @selector(toggleQuickLook:)];
         
         return item;
     }
@@ -4077,8 +4077,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     return NSZeroRect;
 }
 
-#warning move to QuickLookController?
-- (void) toggleQuickLook
+- (void) toggleQuickLook: (id) sender
 {
     [[QuickLookController quickLook] toggleQuickLook];
 }

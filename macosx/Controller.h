@@ -257,7 +257,7 @@ typedef enum
 
 - (NSArray *) quickLookURLs;
 - (NSRect) quickLookFrameWithURL: (NSURL*) url;
-- (void) toggleQuickLook;
+- (void) toggleQuickLook: (id) sender;
 
 - (void) linkHomepage: (id) sender;
 - (void) linkForums: (id) sender;
