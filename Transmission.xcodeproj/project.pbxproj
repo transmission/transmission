@@ -166,8 +166,6 @@
 		A2A4E9220DE0F7EB000CE197 /* web.c in Sources */ = {isa = PBXBuildFile; fileRef = A29EBE520DC01FC9006CEE80 /* web.c */; };
 		A2A4E9870DE10399000CE197 /* json.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A4E9840DE1038C000CE197 /* json.h */; };
 		A2A4E9880DE1039C000CE197 /* json.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A4E9830DE1038C000CE197 /* json.c */; };
-		A2A4E99F0DE10429000CE197 /* JSON_checker.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A4E99B0DE10424000CE197 /* JSON_checker.h */; };
-		A2A4E9A00DE1042A000CE197 /* JSON_checker.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A4E99A0DE10424000CE197 /* JSON_checker.c */; };
 		A2A4E9F40DE10539000CE197 /* shttpd.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB6D60DE0D5A400E04DDA /* shttpd.h */; };
 		A2A4E9FA0DE10623000CE197 /* libshttpd.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AAB6BB0DE0D55D00E04DDA /* libshttpd.dylib */; };
 		A2A4E9FD0DE10643000CE197 /* defs.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A4E9FC0DE10643000CE197 /* defs.h */; };
@@ -214,6 +212,8 @@
 		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
 		A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.m */; };
 		A2DF567D0DE323D3000795D5 /* QuickLook.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF567C0DE323D3000795D5 /* QuickLook.h */; };
+		A2DF576C0DE468C6000795D5 /* JSON_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = A2DF576A0DE468C6000795D5 /* JSON_parser.c */; };
+		A2DF576D0DE468C6000795D5 /* JSON_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF576B0DE468C6000795D5 /* JSON_parser.h */; };
 		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */; };
 		A2E9AA760C249AF400085DCF /* Create.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* Create.png */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
@@ -618,8 +618,6 @@
 		A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKMainThreadProxy.m; path = macosx/UKKQueue/UKMainThreadProxy.m; sourceTree = "<group>"; };
 		A2A4E9830DE1038C000CE197 /* json.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = json.c; path = libtransmission/json.c; sourceTree = "<group>"; };
 		A2A4E9840DE1038C000CE197 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json.h; path = libtransmission/json.h; sourceTree = "<group>"; };
-		A2A4E99A0DE10424000CE197 /* JSON_checker.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = JSON_checker.c; path = libtransmission/JSON_checker.c; sourceTree = "<group>"; };
-		A2A4E99B0DE10424000CE197 /* JSON_checker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON_checker.h; path = libtransmission/JSON_checker.h; sourceTree = "<group>"; };
 		A2A4E9FC0DE10643000CE197 /* defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = defs.h; path = "third-party/shttpd/defs.h"; sourceTree = "<group>"; };
 		A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ConvertUTF.c; path = libtransmission/ConvertUTF.c; sourceTree = "<group>"; };
 		A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConvertUTF.h; path = libtransmission/ConvertUTF.h; sourceTree = "<group>"; };
@@ -682,6 +680,8 @@
 		A2DF37040C220D03006523C1 /* CreatorWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CreatorWindowController.h; path = macosx/CreatorWindowController.h; sourceTree = "<group>"; };
 		A2DF37050C220D03006523C1 /* CreatorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CreatorWindowController.m; path = macosx/CreatorWindowController.m; sourceTree = "<group>"; };
 		A2DF567C0DE323D3000795D5 /* QuickLook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = QuickLook.h; path = macosx/QuickLook.h; sourceTree = "<group>"; };
+		A2DF576A0DE468C6000795D5 /* JSON_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = JSON_parser.c; path = libtransmission/JSON_parser.c; sourceTree = "<group>"; };
+		A2DF576B0DE468C6000795D5 /* JSON_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON_parser.h; path = libtransmission/JSON_parser.h; sourceTree = "<group>"; };
 		A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabButtonCell.h; path = macosx/InfoTabButtonCell.h; sourceTree = "<group>"; };
 		A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTabButtonCell.m; path = macosx/InfoTabButtonCell.m; sourceTree = "<group>"; };
 		A2E9AA750C249AF400085DCF /* Create.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Create.png; path = macosx/Images/Create.png; sourceTree = "<group>"; };
@@ -1193,8 +1193,8 @@
 				A29EBE520DC01FC9006CEE80 /* web.c */,
 				A2A4E9840DE1038C000CE197 /* json.h */,
 				A2A4E9830DE1038C000CE197 /* json.c */,
-				A2A4E99A0DE10424000CE197 /* JSON_checker.c */,
-				A2A4E99B0DE10424000CE197 /* JSON_checker.h */,
+				A2DF576A0DE468C6000795D5 /* JSON_parser.c */,
+				A2DF576B0DE468C6000795D5 /* JSON_parser.h */,
 				A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */,
 				A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */,
 			);
@@ -1467,7 +1467,6 @@
 				A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */,
 				A2A4E9210DE0F7E9000CE197 /* web.h in Headers */,
 				A2A4E9870DE10399000CE197 /* json.h in Headers */,
-				A2A4E99F0DE10429000CE197 /* JSON_checker.h in Headers */,
 				A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1482,6 +1481,7 @@
 				A2A4EA000DE1065C000CE197 /* config.h in Headers */,
 				A2A4EA010DE1065D000CE197 /* compat_unix.h in Headers */,
 				A2DF567D0DE323D3000795D5 /* QuickLook.h in Headers */,
+				A2DF576D0DE468C6000795D5 /* JSON_parser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1926,7 +1926,6 @@
 				A29DF8BC0DB2545900D04E5A /* ggets.c in Sources */,
 				A2A4E9220DE0F7EB000CE197 /* web.c in Sources */,
 				A2A4E9880DE1039C000CE197 /* json.c in Sources */,
-				A2A4E9A00DE1042A000CE197 /* JSON_checker.c in Sources */,
 				A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2016,6 +2015,7 @@
 				A2AAB6EF0DE0D5A500E04DDA /* shttpd.c in Sources */,
 				A2AAB6F40DE0D5A600E04DDA /* string.c in Sources */,
 				A2A4EA0C0DE106E8000CE197 /* ConvertUTF.c in Sources */,
+				A2DF576C0DE468C6000795D5 /* JSON_parser.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
