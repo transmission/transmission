@@ -20,6 +20,7 @@ if BUILD_WX
 endif
 
 SUBDIRS = \
+  doc \
   third-party \
   libtransmission \
   $(DAEMON_DIR) \

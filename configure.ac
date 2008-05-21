@@ -295,6 +295,7 @@ AC_CONFIG_FILES([Makefile
                  beos/Makefile
                  cli/Makefile
                  daemon/Makefile
+                 doc/Makefile
                  libtransmission/Makefile
                  third-party/Makefile
                  third-party/miniupnp/Makefile
