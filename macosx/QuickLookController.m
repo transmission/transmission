@@ -29,6 +29,12 @@
 #import "Controller.h"
 #import "InfoWindowController.h"
 
+@interface QuickLookController (Private)
+
+- (id) initWithMainController: (Controller *) controller infoController: (InfoWindowController *) infoController;
+
+@end
+
 @implementation QuickLookController
 
 QuickLookController * fQuickLookInstance = nil;
@@ -41,23 +47,6 @@ QuickLookController * fQuickLookInstance = nil;
 + (QuickLookController *) quickLook
 {
     return fQuickLookInstance;
-}
-
-- (id) initWithMainController: (Controller *) controller infoController: (InfoWindowController *) infoController
-{
-    if ((self = [super init]))
-    {
-        fMainController = controller;
-        fInfoController = infoController;
-        
-        //load the QuickLook framework and set the delegate, no point on trying this on Tiger
-        //animation types: 0 = none; 1 = fade; 2 = zoom
-        fQuickLookAvailable = [[NSBundle bundleWithPath: @"/System/Library/PrivateFrameworks/QuickLookUI.framework"] load];
-        if (fQuickLookAvailable)
-            [[[QLPreviewPanel sharedPreviewPanel] windowController] setDelegate: self];
-    }
-    
-    return self;
 }
 
 // This is the QuickLook delegate method
@@ -131,6 +120,27 @@ QuickLookController * fQuickLookInstance = nil;
 {
     if (fQuickLookAvailable && [[QLPreviewPanel sharedPreviewPanel] isOpen])
         [[QLPreviewPanel sharedPreviewPanel] selectNextItem];
+}
+
+@end
+
+@implementation QuickLookController (Private)
+
+- (id) initWithMainController: (Controller *) controller infoController: (InfoWindowController *) infoController
+{
+    if ((self = [super init]))
+    {
+        fMainController = controller;
+        fInfoController = infoController;
+        
+        //load the QuickLook framework and set the delegate, no point on trying this on Tiger
+        //animation types: 0 = none; 1 = fade; 2 = zoom
+        fQuickLookAvailable = [[NSBundle bundleWithPath: @"/System/Library/PrivateFrameworks/QuickLookUI.framework"] load];
+        if (fQuickLookAvailable)
+            [[[QLPreviewPanel sharedPreviewPanel] windowController] setDelegate: self];
+    }
+    
+    return self;
 }
 
 @end
