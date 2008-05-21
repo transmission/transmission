@@ -16,7 +16,7 @@ libtransmission_a_SOURCES = \
     handshake.c \
     inout.c \
     json.c \
-    JSON_checker.c \
+    JSON_parser.c \
     list.c \
     makemeta.c \
     metainfo.c \
@@ -57,7 +57,7 @@ noinst_HEADERS = \
     handshake.h \
     inout.h \
     json.h \
-    JSON_checker.h \
+    JSON_parser.h \
     list.h \
     makemeta.h \
     metainfo.h \

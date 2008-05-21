@@ -1,4 +1,4 @@
-/* JSON_checker.c */
+/* JSON_parser.c */
 
 /* 2007-08-24 */
 
@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 /*
-    Callbacks, comments, and Unicode handling by Jean Gressmann (jean@0x42.de), 2007.
+    Callbacks, comments, Unicode handling by Jean Gressmann (jean@0x42.de), 2007-2008.
     
     For the added features the license above applies also.
 */
@@ -42,7 +42,7 @@ SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-#include "JSON_checker.h"
+#include "JSON_parser.h"
 #include "ConvertUTF.h"
 
 #if _MSC_VER >= 1400 /* Visual Studio 2005 and up */
@@ -55,31 +55,31 @@ SOFTWARE.
 #define __   -1     /* the universal error code */
 
 /* values chosen so that the object approx. fits into a page (4K) */
-#ifndef JSON_CHECKER_STACK_SIZE
-#   define JSON_CHECKER_STACK_SIZE 128
+#ifndef JSON_PARSER_STACK_SIZE
+#   define JSON_PARSER_STACK_SIZE 128
 #endif
 
-#ifndef JSON_CHECKER_PARSE_BUFFER_SIZE
-#   define JSON_CHECKER_PARSE_BUFFER_SIZE 3500
+#ifndef JSON_PARSER_PARSE_BUFFER_SIZE
+#   define JSON_PARSER_PARSE_BUFFER_SIZE 3500
 #endif
 
 
-typedef struct JSON_checker_struct {
-    JSON_checker_callback* callback;
+typedef struct JSON_parser_struct {
+    JSON_parser_callback callback;
     void* ctx;
-    signed char state, before_comment_state, type, escaped, comment, allow_comments;
+    signed char state, before_comment_state, type, escaped, comment, allow_comments, handle_floats_manually;
     UTF16 utf16_decode_buffer[2];
     long depth;
     long top;
     signed char* stack;
     long stack_capacity;
-    signed char static_stack[JSON_CHECKER_STACK_SIZE];
+    signed char static_stack[JSON_PARSER_STACK_SIZE];
     char* parse_buffer;
     size_t parse_buffer_capacity;
     size_t parse_buffer_count;
     size_t comment_begin_offset;
-    char static_parse_buffer[JSON_CHECKER_PARSE_BUFFER_SIZE];
-} * JSON_checker;
+    char static_parse_buffer[JSON_PARSER_PARSE_BUFFER_SIZE];
+} * JSON_parser;
 
 #define COUNTOF(x) (sizeof(x)/sizeof(x[0])) 
 
@@ -274,7 +274,7 @@ enum modes {
 };
 
 static int
-push(JSON_checker jc, int mode)
+push(JSON_parser jc, int mode)
 {
 /*
     Push a mode onto the stack. Return false if there is overflow.
@@ -302,7 +302,7 @@ push(JSON_checker jc, int mode)
 
 
 static int
-pop(JSON_checker jc, int mode)
+pop(JSON_parser jc, int mode)
 {
 /*
     Pop the stack, assuring that the current mode matches the expectation.
@@ -315,13 +315,21 @@ pop(JSON_checker jc, int mode)
     return true;
 }
 
-static void parse_buffer_clear(JSON_checker jc)
-{
-    jc->parse_buffer_count = 0;
-    jc->parse_buffer[0] = 0;
-}
 
-void delete_JSON_checker(JSON_checker jc)
+#define parse_buffer_clear(jc) \
+    do {\
+        jc->parse_buffer_count = 0;\
+        jc->parse_buffer[0] = 0;\
+    } while (0)
+    
+#define parse_buffer_pop_back_char(jc)\
+    do {\
+        assert(jc->parse_buffer_count >= 1);\
+        --jc->parse_buffer_count;\
+        jc->parse_buffer[jc->parse_buffer_count] = 0;\
+    } while (0)    
+    
+void delete_JSON_parser(JSON_parser jc)
 {
     if (jc) {
         if (jc->stack != &jc->static_stack[0]) {
@@ -334,20 +342,37 @@ void delete_JSON_checker(JSON_checker jc)
      }   
 }
 
-JSON_checker
-new_JSON_checker(int depth, JSON_checker_callback* callback, void* ctx, int allowComments)
+
+JSON_parser
+new_JSON_parser(JSON_config* config)
 {
 /*
-    new_JSON_checker starts the checking process by constructing a JSON_checker
+    new_JSON_parser starts the checking process by constructing a JSON_parser
     object. It takes a depth parameter that restricts the level of maximum
     nesting.
 
-    To continue the process, call JSON_checker_char for each character in the
-    JSON text, and then call JSON_checker_done to obtain the final result.
+    To continue the process, call JSON_parser_char for each character in the
+    JSON text, and then call JSON_parser_done to obtain the final result.
     These functions are fully reentrant.
 */
-    JSON_checker jc = (JSON_checker)malloc(sizeof(struct JSON_checker_struct));
-    memset(jc, 0, sizeof(struct JSON_checker_struct));
+
+    int depth = 0;
+    JSON_config default_config;
+    
+    JSON_parser jc = malloc(sizeof(struct JSON_parser_struct));
+    
+    memset(jc, 0, sizeof(*jc));
+    
+    
+    /* initialize configuration */
+    init_JSON_config(&default_config);
+    
+    /* set to default configuration if none was provided */
+    if (config == NULL) {
+        config = &default_config;
+    }
+
+    depth = config->depth;
     
     /* We need to be able to push at least one object */
     if (depth == 0) {
@@ -356,6 +381,8 @@ new_JSON_checker(int depth, JSON_checker_callback* callback, void* ctx, int allo
     
     jc->state = GO;
     jc->top = -1;
+    
+    /* Do we want non-bound stack? */
     if (depth > 0) {
         jc->stack_capacity = depth;
         jc->depth = depth;
@@ -369,42 +396,43 @@ new_JSON_checker(int depth, JSON_checker_callback* callback, void* ctx, int allo
         jc->depth = -1;
         jc->stack = &jc->static_stack[0];
     }
+    
+    /* set parser to start */
     push(jc, MODE_DONE);
+    
+    /* set up the parse buffer */
     jc->parse_buffer = &jc->static_parse_buffer[0];
     jc->parse_buffer_capacity = COUNTOF(jc->static_parse_buffer);
     parse_buffer_clear(jc);
-    jc->callback = callback;
-    jc->ctx = ctx;
-    jc->allow_comments = allowComments != 0;
+    
+    /* set up callback, comment & float handling */
+    jc->callback = config->callback;
+    jc->ctx = config->callback_ctx;
+    jc->allow_comments = config->allow_comments != 0;
+    jc->handle_floats_manually = config->handle_floats_manually != 0;
     return jc;
 }
 
-static void parse_buffer_push_back_char(JSON_checker jc, char c)
+static void grow_parse_buffer(JSON_parser jc)
 {
-    if (jc->parse_buffer_count + 1 >= jc->parse_buffer_capacity) {
-        jc->parse_buffer_capacity *= 2;
-        if (jc->parse_buffer == &jc->static_parse_buffer[0]) {
-            jc->parse_buffer = (char*)malloc(jc->parse_buffer_capacity * sizeof(jc->parse_buffer[0]));
-            memcpy( jc->parse_buffer, jc->static_parse_buffer, jc->parse_buffer_count );
-        } else {
-            jc->parse_buffer = (char*)realloc(jc->parse_buffer, jc->parse_buffer_capacity * sizeof(jc->parse_buffer[0]));
-        }
+    jc->parse_buffer_capacity *= 2;
+    if (jc->parse_buffer == &jc->static_parse_buffer[0]) {
+        jc->parse_buffer = (char*)malloc(jc->parse_buffer_capacity * sizeof(jc->parse_buffer[0]));
+        memcpy(jc->parse_buffer, jc->static_parse_buffer, jc->parse_buffer_count);
+    } else {
+        jc->parse_buffer = (char*)realloc(jc->parse_buffer, jc->parse_buffer_capacity * sizeof(jc->parse_buffer[0]));
     }
-    
-    jc->parse_buffer[jc->parse_buffer_count++] = c;
-    jc->parse_buffer[jc->parse_buffer_count] = 0;
 }
 
-static void parse_buffer_pop_back_chars(JSON_checker jc, size_t count)
-{
-    assert(jc->parse_buffer_count >= count);
-    jc->parse_buffer_count -= count;
-    jc->parse_buffer[jc->parse_buffer_count] = 0;
-}
+#define parse_buffer_push_back_char(jc, c)\
+    do {\
+        if (jc->parse_buffer_count + 1 >= jc->parse_buffer_capacity) grow_parse_buffer(jc);\
+        jc->parse_buffer[jc->parse_buffer_count++] = c;\
+        jc->parse_buffer[jc->parse_buffer_count] = 0;\
+    } while (0)
 
 
-
-static int parse_parse_buffer(JSON_checker jc)
+static int parse_parse_buffer(JSON_parser jc)
 {
     if (jc->callback) {
         int result = 1;
@@ -423,11 +451,16 @@ static int parse_parse_buffer(JSON_checker jc)
             switch(jc->type) {
                 case JSON_T_FLOAT:
                     arg = &value;
-                    result = sscanf(jc->parse_buffer, "%Lf", &value.float_value);
+                    if (jc->handle_floats_manually) {
+                        value.string_value = jc->parse_buffer;
+                        value.string_length = jc->parse_buffer_count;
+                    } else { 
+                        result = sscanf(jc->parse_buffer, "%Lf", &value.float_value);
+                    }
                     break;
                 case JSON_T_INTEGER:
                     arg = &value;
-                    result = sscanf(jc->parse_buffer, JSON_CHECKER_INTEGER_SSCANF_TOKEN, &value.integer_value);
+                    result = sscanf(jc->parse_buffer, JSON_PARSER_INTEGER_SSCANF_TOKEN, &value.integer_value);
                     break;
                 case JSON_T_STRING:
                     arg = &value;
@@ -442,13 +475,12 @@ static int parse_parse_buffer(JSON_checker jc)
         }
     }
     
-    jc->parse_buffer_count = 0;
-    jc->parse_buffer[0] = 0;
+    parse_buffer_clear(jc);
     
     return true;
 }
 
-static int decode_unicode_char(JSON_checker jc)
+static int decode_unicode_char(JSON_parser jc)
 {
     const unsigned chars = jc->utf16_decode_buffer[0] ? 2 : 1;
     int i;
@@ -518,13 +550,13 @@ static int decode_unicode_char(JSON_checker jc)
 
 
 int
-JSON_checker_char(JSON_checker jc, int next_char)
+JSON_parser_char(JSON_parser jc, int next_char)
 {
 /*
-    After calling new_JSON_checker, call this function for each character (or
+    After calling new_JSON_parser, call this function for each character (or
     partial character) in your JSON text. It can accept UTF-8, UTF-16, or
     UTF-32. It returns true if things are looking ok so far. If it rejects the
-    text, it deletes the JSON_checker object and returns false.
+    text, it returns false.
 */
     int next_class, next_state;
     
@@ -546,7 +578,7 @@ JSON_checker_char(JSON_checker jc, int next_char)
     if (jc->escaped) {
         jc->escaped = 0;
         /* remove the backslash */
-        parse_buffer_pop_back_chars(jc, 1);
+        parse_buffer_pop_back_char(jc);
         switch(next_char) {
         case 'b':
             parse_buffer_push_back_char(jc, '\b');
@@ -693,7 +725,7 @@ JSON_checker_char(JSON_checker jc, int next_char)
             if (!jc->allow_comments) {
                 return false;
             }
-            parse_buffer_pop_back_chars(jc, 1);
+            parse_buffer_pop_back_char(jc);
             if (!parse_parse_buffer(jc)) {
                 return false;
             }
@@ -721,11 +753,8 @@ JSON_checker_char(JSON_checker jc, int next_char)
             jc->comment = 1;
             break;
 /* empty } */
-        case -9:
-            parse_buffer_pop_back_chars(jc, 1);
-            if (!parse_parse_buffer(jc)) {
-                return false;
-            }
+        case -9:        
+            parse_buffer_clear(jc);
             if (jc->callback && !(*jc->callback)(jc->ctx, JSON_T_OBJECT_END, NULL)) {
                 return false;
             }
@@ -736,7 +765,7 @@ JSON_checker_char(JSON_checker jc, int next_char)
             break;
 
 /* } */ case -8:
-            parse_buffer_pop_back_chars(jc, 1);
+            parse_buffer_pop_back_char(jc);
             if (!parse_parse_buffer(jc)) {
                 return false;
             }
@@ -751,7 +780,7 @@ JSON_checker_char(JSON_checker jc, int next_char)
             break;
 
 /* ] */ case -7:
-            parse_buffer_pop_back_chars(jc, 1);
+            parse_buffer_pop_back_char(jc);
             if (!parse_parse_buffer(jc)) {
                 return false;
             }
@@ -767,7 +796,7 @@ JSON_checker_char(JSON_checker jc, int next_char)
             break;
 
 /* { */ case -6:
-            parse_buffer_pop_back_chars(jc, 1);
+            parse_buffer_pop_back_char(jc);
             if (jc->callback && !(*jc->callback)(jc->ctx, JSON_T_OBJECT_BEGIN, NULL)) {
                 return false;
             }
@@ -779,7 +808,7 @@ JSON_checker_char(JSON_checker jc, int next_char)
             break;
 
 /* [ */ case -5:
-            parse_buffer_pop_back_chars(jc, 1);
+            parse_buffer_pop_back_char(jc);
             if (jc->callback && !(*jc->callback)(jc->ctx, JSON_T_ARRAY_BEGIN, NULL)) {
                 return false;
             }
@@ -791,7 +820,7 @@ JSON_checker_char(JSON_checker jc, int next_char)
             break;
 
 /* string end " */ case -4:
-            parse_buffer_pop_back_chars(jc, 1);
+            parse_buffer_pop_back_char(jc);
             switch (jc->stack[jc->top]) {
             case MODE_KEY:
                 assert(jc->type == JSON_T_STRING);
@@ -823,7 +852,7 @@ JSON_checker_char(JSON_checker jc, int next_char)
             break;
 
 /* , */ case -3:
-            parse_buffer_pop_back_chars(jc, 1);
+            parse_buffer_pop_back_char(jc);
             if (!parse_parse_buffer(jc)) {
                 return false;
             }
@@ -853,7 +882,7 @@ JSON_checker_char(JSON_checker jc, int next_char)
 /*
     A colon causes a flip from key mode to object mode.
 */
-            parse_buffer_pop_back_chars(jc, 1);
+            parse_buffer_pop_back_char(jc);
             if (!pop(jc, MODE_KEY) || !push(jc, MODE_OBJECT)) {
                 return false;
             }
@@ -872,7 +901,7 @@ JSON_checker_char(JSON_checker jc, int next_char)
 
 
 int
-JSON_checker_done(JSON_checker jc)
+JSON_parser_done(JSON_parser jc)
 {
     const int result = jc->state == OK && pop(jc, MODE_DONE);
 
@@ -880,7 +909,7 @@ JSON_checker_done(JSON_checker jc)
 }
 
 
-int JSON_checker_is_legal_white_space_string(const char* s)
+int JSON_parser_is_legal_white_space_string(const char* s)
 {
     int c, char_class;
     
@@ -903,4 +932,15 @@ int JSON_checker_is_legal_white_space_string(const char* s)
     }
     
     return true;
+}
+
+
+
+void init_JSON_config(JSON_config* config)
+{
+    if (config) {
+        memset(config, 0, sizeof(*config));
+        
+        config->depth = JSON_PARSER_STACK_SIZE - 1;
+    }
 }

@@ -17,7 +17,7 @@
 
 #include <event.h> /* evbuffer */
 
-#include "JSON_checker.h"
+#include "JSON_parser.h"
 
 #include "transmission.h"
 #include "bencode.h"
@@ -127,15 +127,21 @@ tr_jsonParse( const void      * vbuf,
     int err = 0;
     const char * buf = vbuf;
     const void * bufend = buf + len;
-    struct JSON_checker_struct * checker;
+    struct JSON_config_struct config;
+    struct JSON_parser_struct * checker;
     struct json_benc_data data;
+
+    init_JSON_config( &config );
+    config.callback = callback;
+    config.callback_ctx = &data;
+    config.depth = -1;
 
     data.key = NULL;
     data.top = setme_benc;
     data.stack = tr_ptrArrayNew( );
 
-    checker = new_JSON_checker( -1, callback, &data, 0 );
-    while( ( buf != bufend ) && JSON_checker_char( checker, *buf ) )
+    checker = new_JSON_parser( &config );
+    while( ( buf != bufend ) && JSON_parser_char( checker, *buf ) )
         ++buf;
     if( buf != bufend )
         err = TR_ERROR;
@@ -143,7 +149,7 @@ tr_jsonParse( const void      * vbuf,
     if( setme_end )
         *setme_end = (const uint8_t*) buf;
 
-    delete_JSON_checker( checker );
+    delete_JSON_parser( checker );
     tr_ptrArrayFree( data.stack, NULL );
     return err;
 }
