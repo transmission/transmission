@@ -4056,21 +4056,24 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (NSRect) quickLookFrameWithURL: (NSURL *) url
 {
-    NSString * fullPath = [url path];
-    NSRange visibleRows = [fTableView rowsInRect: [fTableView bounds]];
-    
-    //do in reverse to find torrent before group
-    int row;
-    for (row = NSMaxRange(visibleRows) - 1; row >= visibleRows.location; row--)
+    if ([fWindow isVisible])
     {
-        id item = [fTableView itemAtRow: row];
-        if ([item isKindOfClass: [Torrent class]] && [[(Torrent *)item dataLocation] isEqualToString: fullPath])
+        NSString * fullPath = [url path];
+        NSRange visibleRows = [fTableView rowsInRect: [fTableView bounds]];
+        
+        //do in reverse to find torrent before group
+        int row;
+        for (row = NSMaxRange(visibleRows) - 1; row >= visibleRows.location; row--)
         {
-            NSRect frame = [fTableView rectOfRow: row];
-            frame.origin = [fTableView convertPoint: frame.origin toView: nil];
-            frame.origin = [fWindow convertBaseToScreen: frame.origin];
-            frame.origin.y -= frame.size.height;
-            return frame;
+            id item = [fTableView itemAtRow: row];
+            if ([item isKindOfClass: [Torrent class]] && [[(Torrent *)item dataLocation] isEqualToString: fullPath])
+            {
+                NSRect frame = [fTableView rectOfRow: row];
+                frame.origin = [fTableView convertPoint: frame.origin toView: nil];
+                frame.origin = [fWindow convertBaseToScreen: frame.origin];
+                frame.origin.y -= frame.size.height;
+                return frame;
+            }
         }
     }
     
