@@ -289,9 +289,10 @@ onStoppedResponse( tr_session    * session,
                    long            responseCode  UNUSED,
                    const void    * response      UNUSED,
                    size_t          responseLen   UNUSED,
-                   void          * torrent_hash  UNUSED )
+                   void          * torrent_hash )
 {
     dbgmsg( NULL, "got a response to some `stop' message" );
+    tr_free( torrent_hash );
     onReqDone( session );
 }
 
