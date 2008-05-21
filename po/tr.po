@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-05-03 16:25+0000\n"
-"Last-Translator: Özgür BASKIN <Unknown>\n"
+"PO-Revision-Date: 2008-05-11 22:12+0000\n"
+"Last-Translator: Ramazan AYYILDIZ <rayyildiz@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2008-05-08 18:40+0000\n"
+"X-Launchpad-Export-Date: 2008-05-21 17:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #, fuzzy
@@ -1200,6 +1200,7 @@ msgstr ""
 "\n"
 "Launchpad Contributions:\n"
 "  Mert Bozkurt https://launchpad.net/~pasaboku\n"
+"  Ramazan AYYILDIZ https://launchpad.net/~rayyildiz\n"
 "  charles https://launchpad.net/~charles-rebelbase\n"
 "  Özgür BASKIN https://launchpad.net/~ozgur-baskin"
 
@@ -1657,7 +1658,7 @@ msgstr "Bitirildi (%.1f%%)"
 
 #: ../gtk/tr-window.c:150
 msgid "Torrent"
-msgstr ""
+msgstr "Torrent"
 
 #: ../gtk/tr-window.c:235
 msgid "Total Ratio"
@@ -1729,35 +1730,34 @@ msgstr ""
 #, c-format
 msgid "%'u byte"
 msgid_plural "%'u bytes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'u byte"
 
 #: ../gtk/util.c:95
 #, c-format
 msgid "%'.1f KB"
-msgstr ""
+msgstr "%'.1f KB"
 
 #: ../gtk/util.c:98
 #, c-format
 msgid "%'.1f MB"
-msgstr ""
+msgstr "%'.1f MB"
 
 #: ../gtk/util.c:101
 #, c-format
 msgid "%'.1f GB"
-msgstr ""
+msgstr "%'.1f GB"
 
 #. 0.0 KB to 999.9 KB
 #: ../gtk/util.c:114
 #, c-format
 msgid "%'.1f KB/s"
-msgstr ""
+msgstr "%'.1f KB/s"
 
 #. 0.98 MB to 99.99 MB
 #: ../gtk/util.c:116
 #, c-format
 msgid "%'.2f MB/s"
-msgstr ""
+msgstr "%'.2f MB/s"
 
 #. 100.0 MB to 999.9 MB
 #: ../gtk/util.c:118
@@ -1769,28 +1769,25 @@ msgstr ""
 #: ../gtk/util.c:120
 #, c-format
 msgid "%'.2f GB/s"
-msgstr ""
+msgstr "%'.2f GB/s"
 
 #: ../gtk/util.c:136
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d saniye"
 
 #: ../gtk/util.c:143 ../gtk/util.c:157
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d dakika"
 
 #: ../gtk/util.c:156 ../gtk/util.c:164
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d saat"
 
 #: ../gtk/util.c:169
 #, fuzzy, c-format
@@ -2104,7 +2101,7 @@ msgstr ""
 
 #: ../libtransmission/utils.c:568
 msgid "Unknown error"
-msgstr ""
+msgstr "Bilinmeyen hata"
 
 #: ../libtransmission/verify.c:128
 #, fuzzy

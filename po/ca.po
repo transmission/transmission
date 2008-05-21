@@ -15,14 +15,14 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-04-29 16:15+0000\n"
+"PO-Revision-Date: 2008-05-12 18:19+0000\n"
 "Last-Translator: Javi Rodríguez <Unknown>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-05-08 18:40+0000\n"
+"X-Launchpad-Export-Date: 2008-05-21 17:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #~ msgid "Open a torrent"
@@ -159,7 +159,7 @@ msgstr "Ordena pel _progrés"
 
 #: ../gtk/actions.c:50
 msgid "Sort by _Ratio"
-msgstr "Ordenar per _Relació"
+msgstr "Ordena per la _relació"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _State"
@@ -219,7 +219,7 @@ msgstr "_Ajuda"
 
 #: ../gtk/actions.c:103 ../gtk/actions.c:104
 msgid "Add a torrent"
-msgstr "Afegir un torrent"
+msgstr "Afegeix un torrent"
 
 #: ../gtk/actions.c:104
 msgid "_Add..."
@@ -247,7 +247,7 @@ msgstr "_Pausa"
 
 #: ../gtk/actions.c:111
 msgid "Pause torrent"
-msgstr "Pausa el torrent"
+msgstr "Fes una pausa al torrent"
 
 #: ../gtk/actions.c:112
 msgid "Remove torrent"
@@ -295,7 +295,7 @@ msgstr "Detalls del torrent"
 
 #: ../gtk/actions.c:129
 msgid "_Open Folder"
-msgstr "O_bre la carpeta"
+msgstr "_Obre una carpeta"
 
 #: ../gtk/actions.c:132
 msgid "Ask Tracker for _More Peers"
@@ -344,7 +344,7 @@ msgstr "Verifica les dades locals"
 
 #: ../gtk/add-dialog.c:295
 msgid "Add a Torrent"
-msgstr "Afegeix un Torrent"
+msgstr "Afegeix un torrent"
 
 #: ../gtk/add-dialog.c:313 ../gtk/tr-prefs.c:251
 msgid "Display _options dialog"
@@ -354,13 +354,13 @@ msgstr "Mostra el diàleg d'_opcions"
 #: ../libtransmission/utils.c:469
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr "No es pot crear \"%1$s\": %2$s"
+msgstr "No s'ha pogut crear \"%1$s\": %2$s"
 
 #: ../gtk/conf.c:81 ../libtransmission/bencode.c:1105
 #: ../libtransmission/fastresume.c:195 ../libtransmission/fdlimit.c:166
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr "No es pot obrir \"%1$s\": %2$s"
+msgstr "No s'ha pogut obrir \"%1$s\": %2$s"
 
 #: ../gtk/conf.c:85
 #, c-format
@@ -400,23 +400,23 @@ msgstr "Desobstrucció optimista"
 
 #: ../gtk/details.c:506
 msgid "Downloading from peer"
-msgstr "Baixant del client"
+msgstr "S'està baixand des del client"
 
 #: ../gtk/details.c:507
 msgid "We'd download from peer if they'd let us"
-msgstr "Baixar des del client si ens deixa"
+msgstr "Es baixarà des del client si aquest deixa"
 
 #: ../gtk/details.c:508
 msgid "Uploading to peer"
-msgstr "Pujant al client"
+msgstr "S'està pujant al client"
 
 #: ../gtk/details.c:509
 msgid "We'd upload to peer if they'd ask us"
-msgstr "Pujar al client si ens ho pregunta"
+msgstr "Es pujarà al client si ho pregunta"
 
 #: ../gtk/details.c:510
 msgid "Peer has unchoked us, but we're not interested"
-msgstr "Un client ens ha permès l'entrada, però no estem interessats"
+msgstr "Un client ha permès l'entrada, però no hi estem interessats"
 
 #: ../gtk/details.c:511
 msgid "We unchoked the peer, but they're not interested"
@@ -700,7 +700,7 @@ msgstr "Opcions"
 
 #: ../gtk/dialogs.c:114
 msgid "<big><b>Quit Transmission?</b></big>"
-msgstr "<big><b>Tancar Transmission?</b></big>"
+msgstr "<big><b>Voleu surtir del Transmission?</b></big>"
 
 #: ../gtk/dialogs.c:126
 msgid "_Don't ask me again"
@@ -786,7 +786,7 @@ msgstr "No s'ha pogut crear el sòcol: %s"
 #: ../gtk/ipc.c:273
 #, c-format
 msgid "Couldn't connect to \"%1$s\": %2$s"
-msgstr "No es pot connectar a \"%1$s\": %2$s"
+msgstr "No s'ha pogut connectar a \"%1$s\": %2$s"
 
 #: ../gtk/ipc.c:313 ../gtk/ipc.c:1133
 #, c-format
@@ -877,7 +877,7 @@ msgstr "S'ha cancel·lat la creació del torrent"
 #: ../libtransmission/blocklist.c:203 ../libtransmission/utils.c:370
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
-msgstr "No es pot llegir \"%1$s\": %2$s"
+msgstr "No s'ha pogut llegir \"%1$s\": %2$s"
 
 #: ../gtk/makemeta-ui.c:209 ../gtk/makemeta-ui.c:331
 #, c-format
@@ -939,7 +939,7 @@ msgstr "Comen_tari:"
 #: ../libtransmission/blocklist.c:251
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
-msgstr "No es pot desar el fitxer \"%1$s\": %2$s"
+msgstr "No s'ha pogut desar el fitxer \"%1$s\": %2$s"
 
 #: ../gtk/msgwin.c:132
 msgid "Save Log"
@@ -1038,7 +1038,7 @@ msgstr "%1$s, pujat %2$s (relació: %3$s)"
 
 #: ../gtk/torrent-cell-renderer.c:87
 msgid "Not available"
-msgstr "No disponible"
+msgstr "No està disponible"
 
 #: ../gtk/torrent-cell-renderer.c:89
 msgid "Stalled"
@@ -1148,7 +1148,7 @@ msgstr "<i>S'està comprovant el port...</i>"
 
 #: ../gtk/tr-prefs.c:240
 msgid "Adding Torrents"
-msgstr "Afegint torrents"
+msgstr "S'estan afegint torrents"
 
 #: ../gtk/tr-prefs.c:243
 msgid "Automatically add torrents from:"
@@ -1168,40 +1168,40 @@ msgstr[1] "Ignora els clients bloquejats %'d"
 #: ../gtk/tr-prefs.c:337
 #, c-format
 msgid "Retrieving blocklist..."
-msgstr "Recuperant llista de bloquejats..."
+msgstr "S'està recuperant la llista de bloquejats..."
 
 #: ../gtk/tr-prefs.c:343
 #, c-format
 msgid "Unable to get blocklist."
-msgstr "Incapaç d'aconseguir la llista de bloquejats."
+msgstr "No s'ha pogut obtenir la llista de bloquejats."
 
 #: ../gtk/tr-prefs.c:355
 #, c-format
 msgid "Unable to get blocklist: %s"
-msgstr "Incapaç d'aconseguir la llista de bloquejats: %s"
+msgstr "No s'ha pogut obtenir la llista de bloquejats: %s"
 
 #: ../gtk/tr-prefs.c:369
 #, c-format
 msgid "Uncompressing blocklist..."
-msgstr "Descomprimint llista de bloquejats..."
+msgstr "S'està descomprimint la llista de bloquejats..."
 
 #: ../gtk/tr-prefs.c:379
 #, c-format
 msgid "Parsing blocklist..."
-msgstr "Analitzant llista de bloquejats..."
+msgstr "S'està analitzant la llista de bloquejats..."
 
 #: ../gtk/tr-prefs.c:386 ../libtransmission/blocklist.c:258
 #, c-format
 msgid "Blocklist updated with %'d entries"
-msgstr "Llista de bloquejats actualitzada amb %'d entrades"
+msgstr "S'ha actualitzat la llista de bloquejats amb %'d entrades"
 
 #: ../gtk/tr-prefs.c:427
 msgid "Updating Blocklist"
-msgstr "Actualitzant la llista de bloquejats"
+msgstr "S'està actualitzant la llista de bloquejats"
 
 #: ../gtk/tr-prefs.c:459
 msgid "_Update Blocklist"
-msgstr "_Actualitzar llista de bloquejats"
+msgstr "_Actualitza la llista de bloquejats"
 
 #: ../gtk/tr-prefs.c:471
 msgid "_Ignore unencrypted peers"
@@ -1267,7 +1267,7 @@ msgstr "S'estan verificant les dades locals (%.1f%% verificat)"
 #: ../gtk/tr-torrent.c:288
 #, c-format
 msgid "Not available (%.1f%%)"
-msgstr "No disponible (%.1f%%)"
+msgstr "No està disponible (%.1f%%)"
 
 #: ../gtk/tr-torrent.c:290
 #, c-format
@@ -1438,17 +1438,18 @@ msgstr "Client de Bittorrent Transmission"
 
 #: ../gtk/util.c:469
 msgid "BitTorrent Activity"
-msgstr "Activitat BitTorrent"
+msgstr "Activitat del BitTorrent"
 
 #: ../gtk/util.c:477
 msgid "Desktop hibernation disabled while Transmission is running"
 msgstr ""
-"Hibernació de l'escriptori desactivada mentre el Transmission està obert"
+"Hibernació de l'escriptori desactivada mentre s'està executant el "
+"Transmission"
 
 #: ../gtk/util.c:479
 #, c-format
 msgid "Couldn't disable desktop hibernation: %s"
-msgstr "No es pot desactivar la hibernació de l'escriptori: %s"
+msgstr "No s'ha pogut desactivar la hibernació de l'escriptori: %s"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:806
@@ -1463,7 +1464,7 @@ msgstr "La llista de bloquejats conté %'d entrades"
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:644 ../libtransmission/fastresume.c:655
 msgid "Couldn't read resume file"
-msgstr "No es pot llegir l'historial"
+msgstr "No s'ha pogut llegir l'historial"
 
 #: ../libtransmission/makemeta.c:58
 #, c-format
@@ -1607,7 +1608,7 @@ msgstr "S'han carregat %d torrents"
 #: ../libtransmission/torrent.c:163
 #, c-format
 msgid "Got %d peers from tracker"
-msgstr "Aconseguits %d clients del tracker"
+msgstr "S'han obtingut %d clients del rastrejador"
 
 #: ../libtransmission/torrent.c:177
 #, c-format

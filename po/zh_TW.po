@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-04-17 22:42+0000\n"
-"Last-Translator: Eason Lai <Unknown>\n"
+"PO-Revision-Date: 2008-05-10 04:42+0000\n"
+"Last-Translator: Rick Chen <stuffcorpse@gmail.com>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2008-05-08 18:40+0000\n"
+"X-Launchpad-Export-Date: 2008-05-21 17:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -32,7 +32,7 @@ msgstr "依進展排序(_P)"
 
 #: ../gtk/actions.c:50
 msgid "Sort by _Ratio"
-msgstr ""
+msgstr "依比率排序"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _State"
@@ -43,12 +43,13 @@ msgid "Sort by _Tracker"
 msgstr "依追蹤者排列(_T)"
 
 #: ../gtk/actions.c:69
+#, fuzzy
 msgid "_Main Window"
-msgstr ""
+msgstr "主視窗(_M)"
 
 #: ../gtk/actions.c:71
 msgid "Message _Log"
-msgstr ""
+msgstr "信息(_L)"
 
 #: ../gtk/actions.c:85
 msgid "_Minimal View"
@@ -56,7 +57,7 @@ msgstr "最小化瀏覽(_M)"
 
 #: ../gtk/actions.c:87
 msgid "_Reverse Sort Order"
-msgstr ""
+msgstr "逆向排序(_R)"
 
 #: ../gtk/actions.c:89
 msgid "_Filterbar"
@@ -92,11 +93,11 @@ msgstr "幫助(_H)"
 
 #: ../gtk/actions.c:103 ../gtk/actions.c:104
 msgid "Add a torrent"
-msgstr ""
+msgstr "新增 torrent"
 
 #: ../gtk/actions.c:104
 msgid "_Add..."
-msgstr ""
+msgstr "新增(_A)..."
 
 #: ../gtk/actions.c:106
 msgid "_Start"
@@ -104,7 +105,7 @@ msgstr "開始(_S)"
 
 #: ../gtk/actions.c:106
 msgid "Start torrent"
-msgstr ""
+msgstr "啟動 torrent"
 
 #: ../gtk/actions.c:107
 msgid "_Statistics"
@@ -112,7 +113,7 @@ msgstr "統計(_S)"
 
 #: ../gtk/actions.c:109
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "驗證本地資料(_V)"
 
 #: ../gtk/actions.c:111
 msgid "_Pause"
@@ -120,11 +121,11 @@ msgstr "暫停(_P)"
 
 #: ../gtk/actions.c:111
 msgid "Pause torrent"
-msgstr ""
+msgstr "暫停 torrent"
 
 #: ../gtk/actions.c:112
 msgid "Remove torrent"
-msgstr ""
+msgstr "移除種子"
 
 #: ../gtk/actions.c:113
 msgid "_Delete Files and Remove"
@@ -137,7 +138,7 @@ msgstr "新增(_N)..."
 
 #: ../gtk/actions.c:115
 msgid "Create a torrent"
-msgstr ""
+msgstr "創造種子"
 
 #: ../gtk/actions.c:117
 #, fuzzy
@@ -166,28 +167,29 @@ msgstr "詳細資訊(_D)"
 
 #: ../gtk/actions.c:127
 msgid "Torrent details"
-msgstr ""
+msgstr "種子內容"
 
 #: ../gtk/actions.c:129
 msgid "_Open Folder"
-msgstr ""
+msgstr "開啟資料夾(_O)"
 
 #: ../gtk/actions.c:132
+#, fuzzy
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "向追蹤器求更多端子"
 
 #: ../gtk/add-dialog.c:135
 msgid "Torrent files"
-msgstr ""
+msgstr "種子檔案"
 
 #: ../gtk/add-dialog.c:140
 msgid "All files"
-msgstr ""
+msgstr "所有檔案"
 
 #. make the dialog
 #: ../gtk/add-dialog.c:165
 msgid "Torrent Options"
-msgstr ""
+msgstr "種子選項"
 
 #: ../gtk/add-dialog.c:187
 msgid "Mo_ve source file to Trash"
@@ -199,11 +201,11 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:199
 msgid "_Source file:"
-msgstr ""
+msgstr "原始檔"
 
 #: ../gtk/add-dialog.c:203
 msgid "Select Source File"
-msgstr ""
+msgstr "選擇原始檔"
 
 #: ../gtk/add-dialog.c:216 ../gtk/tr-prefs.c:264
 msgid "_Destination folder:"
@@ -215,11 +217,11 @@ msgstr "選擇目標資料夾"
 
 #: ../gtk/add-dialog.c:235
 msgid "Verify Local Data"
-msgstr ""
+msgstr "校驗本地數據"
 
 #: ../gtk/add-dialog.c:295
 msgid "Add a Torrent"
-msgstr ""
+msgstr "新增種子"
 
 #: ../gtk/add-dialog.c:313 ../gtk/tr-prefs.c:251
 msgid "Display _options dialog"
@@ -244,7 +246,7 @@ msgstr ""
 
 #: ../gtk/details.c:246
 msgid "Address"
-msgstr ""
+msgstr "地址:"
 
 #: ../gtk/details.c:247
 msgid "Client"
@@ -275,7 +277,7 @@ msgstr ""
 
 #: ../gtk/details.c:506
 msgid "Downloading from peer"
-msgstr ""
+msgstr "從節點下載中"
 
 #: ../gtk/details.c:507
 msgid "We'd download from peer if they'd let us"
@@ -283,7 +285,7 @@ msgstr ""
 
 #: ../gtk/details.c:508
 msgid "Uploading to peer"
-msgstr ""
+msgstr "上傳到節點"
 
 #: ../gtk/details.c:509
 msgid "We'd upload to peer if they'd ask us"
@@ -319,7 +321,7 @@ msgstr ""
 
 #: ../gtk/details.c:688
 msgid "<b>Seeders:</b>"
-msgstr ""
+msgstr "<b>種子數: </b>"
 
 #: ../gtk/details.c:695
 msgid "<b>Leechers:</b>"
@@ -331,7 +333,7 @@ msgstr ""
 
 #: ../gtk/details.c:732 ../gtk/makemeta-ui.c:312
 msgid "Details"
-msgstr ""
+msgstr "詳細資訊"
 
 #. %1$'d is number of pieces
 #. %2$s is how big each piece is
@@ -344,7 +346,7 @@ msgstr[1] ""
 
 #: ../gtk/details.c:743
 msgid "Pieces:"
-msgstr ""
+msgstr "格數："
 
 #: ../gtk/details.c:747
 msgid "Hash:"
@@ -364,7 +366,7 @@ msgstr ""
 
 #: ../gtk/details.c:765
 msgid "Comment:"
-msgstr ""
+msgstr "備註:"
 
 #: ../gtk/details.c:769
 msgid "Origins"
@@ -373,27 +375,27 @@ msgstr ""
 #: ../gtk/details.c:771 ../gtk/details.c:867 ../gtk/details.c:872
 #, c-format
 msgid "Unknown"
-msgstr ""
+msgstr "未知"
 
 #: ../gtk/details.c:772
 msgid "Creator:"
-msgstr ""
+msgstr "建立者："
 
 #: ../gtk/details.c:776
 msgid "Date:"
-msgstr ""
+msgstr "日期:"
 
 #: ../gtk/details.c:780
 msgid "Location"
-msgstr ""
+msgstr "位置"
 
 #: ../gtk/details.c:784
 msgid "Destination folder:"
-msgstr ""
+msgstr "目的地資料夾："
 
 #: ../gtk/details.c:788
 msgid "Torrent file:"
-msgstr ""
+msgstr "種子檔"
 
 #: ../gtk/details.c:833
 #, c-format
@@ -416,7 +418,7 @@ msgstr ""
 
 #: ../gtk/details.c:864 ../gtk/util.c:61 ../gtk/util.c:81
 msgid "None"
-msgstr ""
+msgstr "無"
 
 #: ../gtk/details.c:893
 msgid "Transfer"
@@ -433,7 +435,7 @@ msgstr "進度："
 #. "Have" refers to how much of the torrent we have
 #: ../gtk/details.c:903
 msgid "Have:"
-msgstr ""
+msgstr "擁有"
 
 #: ../gtk/details.c:906 ../gtk/stats.c:104 ../gtk/stats.c:116
 msgid "Downloaded:"
@@ -461,7 +463,7 @@ msgstr "錯誤："
 
 #: ../gtk/details.c:926
 msgid "Completion"
-msgstr ""
+msgstr "完成"
 
 #: ../gtk/details.c:936
 msgid "Dates"
@@ -489,11 +491,11 @@ msgstr "限制上傳速度 (KB/s):"
 
 #: ../gtk/details.c:1066
 msgid "Peer Connections"
-msgstr ""
+msgstr "節點連結"
 
 #: ../gtk/details.c:1071
 msgid "_Maximum peers:"
-msgstr ""
+msgstr "最多節點(_M)"
 
 #: ../gtk/details.c:1075
 msgid "_Stop seeding at ratio:"
@@ -521,7 +523,7 @@ msgstr ""
 
 #: ../gtk/details.c:1156
 msgid "Tracker:"
-msgstr ""
+msgstr "追蹤器："
 
 #: ../gtk/details.c:1159
 msgid "Last announce at:"
@@ -539,7 +541,7 @@ msgstr ""
 
 #: ../gtk/details.c:1192 ../gtk/details.c:1204
 msgid "Never"
-msgstr ""
+msgstr "從未"
 
 #. %1$s is torrent name
 #. %2$s its file size
@@ -550,11 +552,11 @@ msgstr ""
 
 #: ../gtk/details.c:1314
 msgid "Activity"
-msgstr ""
+msgstr "活動"
 
 #: ../gtk/details.c:1319 ../gtk/tr-prefs.c:572
 msgid "Peers"
-msgstr ""
+msgstr "用戶數"
 
 #: ../gtk/details.c:1324 ../gtk/tr-window.c:435
 msgid "Tracker"
@@ -562,15 +564,15 @@ msgstr "追蹤者"
 
 #: ../gtk/details.c:1328 ../gtk/msgwin.c:168
 msgid "Information"
-msgstr ""
+msgstr "資訊"
 
 #: ../gtk/details.c:1334 ../gtk/tr-window.c:435
 msgid "Files"
-msgstr ""
+msgstr "檔案"
 
 #: ../gtk/details.c:1339 ../gtk/tr-prefs.c:453
 msgid "Options"
-msgstr ""
+msgstr "選項"
 
 #: ../gtk/dialogs.c:114
 msgid "<big><b>Quit Transmission?</b></big>"
@@ -583,8 +585,7 @@ msgstr "不再顯示本提示"
 #: ../gtk/dialogs.c:215
 msgid "Remove torrent?"
 msgid_plural "Remove torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "除去種子?"
 
 #: ../gtk/dialogs.c:217
 msgid "Delete this torrent's downloaded files?"
@@ -725,7 +726,8 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Eason Lai https://launchpad.net/~eason-freezone\n"
-"  Medical-Wei https://launchpad.net/~medicalwei"
+"  Medical-Wei https://launchpad.net/~medicalwei\n"
+"  Rick Chen https://launchpad.net/~stuffcorpse"
 
 #: ../gtk/makemeta-ui.c:98
 msgid "Torrent created"
@@ -738,7 +740,7 @@ msgstr ""
 
 #: ../gtk/makemeta-ui.c:102
 msgid "Invalid URL"
-msgstr ""
+msgstr "不合法的網址"
 
 #: ../gtk/makemeta-ui.c:106
 #, c-format
@@ -754,7 +756,7 @@ msgstr ""
 #: ../gtk/makemeta-ui.c:209 ../gtk/makemeta-ui.c:331
 #, c-format
 msgid "No files selected"
-msgstr ""
+msgstr "沒有選取任何檔案"
 
 #: ../gtk/makemeta-ui.c:223 ../gtk/makemeta-ui.c:301
 #, c-format
@@ -781,11 +783,11 @@ msgstr[1] ""
 
 #: ../gtk/makemeta-ui.c:269
 msgid "New Torrent"
-msgstr ""
+msgstr "新種子"
 
 #: ../gtk/makemeta-ui.c:283
 msgid "Content"
-msgstr ""
+msgstr "內容"
 
 #: ../gtk/makemeta-ui.c:285
 msgid "_Single File:"
@@ -793,7 +795,7 @@ msgstr ""
 
 #: ../gtk/makemeta-ui.c:292
 msgid "_Folder:"
-msgstr ""
+msgstr "資料夾(_F)："
 
 #: ../gtk/makemeta-ui.c:314
 msgid "_Private to this tracker"
@@ -815,49 +817,49 @@ msgstr ""
 
 #: ../gtk/msgwin.c:132
 msgid "Save Log"
-msgstr ""
+msgstr "儲存日誌"
 
 #: ../gtk/msgwin.c:167
 msgid "Error"
-msgstr ""
+msgstr "錯誤"
 
 #: ../gtk/msgwin.c:169
 msgid "Debug"
-msgstr ""
+msgstr "偵錯"
 
 #: ../gtk/msgwin.c:229
 msgid "Time"
-msgstr ""
+msgstr "時間"
 
 #. noun.  column title for a list
 #: ../gtk/msgwin.c:231 ../gtk/tr-window.c:435
 msgid "Name"
-msgstr ""
+msgstr "檔名"
 
 #. noun.  column title for a list
 #: ../gtk/msgwin.c:233
 msgid "Message"
-msgstr ""
+msgstr "訊息"
 
 #: ../gtk/msgwin.c:393
 msgid "Message Log"
-msgstr ""
+msgstr "訊息日誌"
 
 #: ../gtk/msgwin.c:427
 msgid "Level"
-msgstr ""
+msgstr "階級"
 
 #: ../gtk/notify.c:59
 msgid "Torrent Complete"
-msgstr ""
+msgstr "種子完成"
 
 #: ../gtk/notify.c:62
 msgid "Open File"
-msgstr ""
+msgstr "開啟檔案"
 
 #: ../gtk/notify.c:64
 msgid "Open Folder"
-msgstr ""
+msgstr "開啟資料夾"
 
 #: ../gtk/stats.c:63 ../gtk/stats.c:111
 #, c-format
@@ -868,19 +870,19 @@ msgstr[1] ""
 
 #: ../gtk/stats.c:91
 msgid "Statistics"
-msgstr ""
+msgstr "統計"
 
 #: ../gtk/stats.c:100
 msgid "Current Session"
-msgstr ""
+msgstr "目前的作業階段"
 
 #: ../gtk/stats.c:108 ../gtk/stats.c:120
 msgid "Duration:"
-msgstr ""
+msgstr "時間長度："
 
 #: ../gtk/stats.c:110
 msgid "Total"
-msgstr ""
+msgstr "總計"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -910,17 +912,17 @@ msgstr ""
 
 #: ../gtk/torrent-cell-renderer.c:87
 msgid "Not available"
-msgstr ""
+msgstr "不存在"
 
 #: ../gtk/torrent-cell-renderer.c:89
 msgid "Stalled"
-msgstr ""
+msgstr "失速"
 
 #. time remaining
 #: ../gtk/torrent-cell-renderer.c:94
 #, c-format
 msgid "%s remaining"
-msgstr ""
+msgstr "剩下 %s"
 
 #. Translators: do not translate the "speed|" disambiguation prefix.
 #. %1$s is the download speed
@@ -934,38 +936,38 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:122
 #, c-format
 msgid "Down: %s"
-msgstr ""
+msgstr "下載： %s"
 
 #. upload speed
 #: ../gtk/torrent-cell-renderer.c:125
 #, c-format
 msgid "Up: %s"
-msgstr ""
+msgstr "上傳： %s"
 
 #. the torrent isn't uploading or downloading
 #: ../gtk/torrent-cell-renderer.c:128
 msgid "Idle"
-msgstr ""
+msgstr "閒置"
 
 #: ../gtk/torrent-cell-renderer.c:141
 msgid "Paused"
-msgstr ""
+msgstr "已暫停"
 
 #: ../gtk/torrent-cell-renderer.c:145
 msgid "Waiting to verify local data"
-msgstr ""
+msgstr "等待本地數據校驗"
 
 #. [0...100]
 #: ../gtk/torrent-cell-renderer.c:149 ../gtk/tr-torrent.c:282
 #, c-format
 msgid "Verifying local data (%.1f%% tested)"
-msgstr ""
+msgstr "校驗本地數據 (%.1f%%完成)"
 
 #: ../gtk/torrent-cell-renderer.c:158 ../gtk/tr-window.c:619
 #: ../gtk/tr-window.c:639
 #, c-format
 msgid "Ratio: %s"
-msgstr ""
+msgstr "比率:%s"
 
 #: ../gtk/torrent-cell-renderer.c:199
 #, c-format
@@ -983,7 +985,7 @@ msgstr[1] ""
 
 #: ../gtk/transmission.desktop.in.h:1
 msgid "BitTorrent Client"
-msgstr ""
+msgstr "BitTorrent 用戶端"
 
 #: ../gtk/transmission.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
@@ -1006,19 +1008,19 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:204
 msgid "Port is <b>open</b>"
-msgstr ""
+msgstr "連接阜是 <b>打開</b>"
 
 #: ../gtk/tr-prefs.c:205
 msgid "Port is <b>closed</b>"
-msgstr ""
+msgstr "連接阜是 <b>關閉</b>"
 
 #: ../gtk/tr-prefs.c:218
 msgid "<i>Testing port...</i>"
-msgstr ""
+msgstr "<i>測試連接阜...</i>"
 
 #: ../gtk/tr-prefs.c:240
 msgid "Adding Torrents"
-msgstr ""
+msgstr "加種子"
 
 #: ../gtk/tr-prefs.c:243
 msgid "Automatically add torrents from:"
@@ -1084,7 +1086,7 @@ msgstr ""
 #. section header for the "maximum number of peers" section
 #: ../gtk/tr-prefs.c:481
 msgid "Limits"
-msgstr ""
+msgstr "限制"
 
 #: ../gtk/tr-prefs.c:484
 msgid "Maximum peers _overall:"
@@ -1096,7 +1098,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:520
 msgid "Ports"
-msgstr ""
+msgstr "通訊埠"
 
 #: ../gtk/tr-prefs.c:522
 msgid "_Forward port from router"
@@ -1112,16 +1114,16 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:569
 msgid "Torrents"
-msgstr ""
+msgstr "種子"
 
 #: ../gtk/tr-prefs.c:575
 msgid "Network"
-msgstr ""
+msgstr "網路"
 
 #: ../gtk/tr-torrent.c:225
-#, c-format
+#, fuzzy, c-format
 msgid "File \"%s\" isn't a valid torrent"
-msgstr ""
+msgstr "「%s」不是有效的種子檔"
 
 #: ../gtk/tr-torrent.c:228
 #, c-format
@@ -1158,11 +1160,11 @@ msgstr ""
 
 #: ../gtk/tr-window.c:150
 msgid "Torrent"
-msgstr ""
+msgstr "種子"
 
 #: ../gtk/tr-window.c:235
 msgid "Total Ratio"
-msgstr ""
+msgstr "總比例"
 
 #: ../gtk/tr-window.c:236
 msgid "Session Ratio"
@@ -1170,7 +1172,7 @@ msgstr ""
 
 #: ../gtk/tr-window.c:237
 msgid "Total Transfer"
-msgstr ""
+msgstr "總傳輸"
 
 #: ../gtk/tr-window.c:238
 msgid "Session Transfer"
@@ -1179,27 +1181,27 @@ msgstr ""
 #. show all torrents
 #: ../gtk/tr-window.c:424
 msgid "A_ll"
-msgstr ""
+msgstr "全部(_l)"
 
 #. show only torrents that have connected peers
 #: ../gtk/tr-window.c:426
 msgid "_Active"
-msgstr ""
+msgstr "活動(_A)"
 
 #. show only torrents that are trying to download
 #: ../gtk/tr-window.c:428
 msgid "_Downloading"
-msgstr ""
+msgstr "下載中(_D)"
 
 #. show only torrents that are trying to upload
 #: ../gtk/tr-window.c:430
 msgid "_Seeding"
-msgstr ""
+msgstr "播種中(_S)"
 
 #. show only torrents that are paused
 #: ../gtk/tr-window.c:432
 msgid "_Paused"
-msgstr ""
+msgstr "暫停(_P)"
 
 #: ../gtk/tr-window.c:593
 #, c-format
@@ -1278,29 +1280,25 @@ msgstr ""
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d 秒"
 
 #: ../gtk/util.c:143 ../gtk/util.c:157
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d 分鐘"
 
 #: ../gtk/util.c:156 ../gtk/util.c:164
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d 小時"
 
 #: ../gtk/util.c:169
 #, c-format
 msgid "%'d day"
 msgid_plural "%'d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d 日"
 
 #: ../gtk/util.c:468
 msgid "Transmission Bittorrent Client"

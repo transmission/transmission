@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: Transmission-1.1x 5399\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-04-24 12:06+0000\n"
-"Last-Translator: Jan Klopper <janklopper@innerheight.com>\n"
+"PO-Revision-Date: 2008-05-12 12:38+0000\n"
+"Last-Translator: Arnout Lok <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-05-08 18:40+0000\n"
+"X-Launchpad-Export-Date: 2008-05-21 17:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: NETHERLANDS\n"
 "X-Poedit-Language: Dutch\n"
@@ -154,7 +154,7 @@ msgstr "Sorteren op _voortgang"
 
 #: ../gtk/actions.c:50
 msgid "Sort by _Ratio"
-msgstr "Sorteren op _Ratio"
+msgstr "Sorteren op _ratio"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _State"
@@ -246,7 +246,7 @@ msgstr "Torrent pauzeren"
 
 #: ../gtk/actions.c:112
 msgid "Remove torrent"
-msgstr "Verwijder torrent"
+msgstr "Torrent verwijderen"
 
 #: ../gtk/actions.c:113
 msgid "_Delete Files and Remove"
@@ -339,7 +339,7 @@ msgstr "Lokale data _verifiëren"
 
 #: ../gtk/add-dialog.c:295
 msgid "Add a Torrent"
-msgstr "Voeg een torrent toe"
+msgstr "Torrent toevoegen"
 
 # Evt. iets van "vragen om opties" of
 # "Opties aanpassen bij het openen" i.p.v. Opties-dialoog tonen
@@ -351,13 +351,13 @@ msgstr "_Opties aanpassen bij het openen"
 #: ../libtransmission/utils.c:469
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr "Kan \"%1$s\" niet aanmaken: %2$s"
+msgstr "Kon \"%1$s\" niet aanmaken: %2$s"
 
 #: ../gtk/conf.c:81 ../libtransmission/bencode.c:1105
 #: ../libtransmission/fastresume.c:195 ../libtransmission/fdlimit.c:166
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr "Kan \"%1$s\" niet openen: %2$s"
+msgstr "Kon \"%1$s\" niet openen: %2$s"
 
 #: ../gtk/conf.c:85
 #, c-format
@@ -710,7 +710,7 @@ msgstr "<big><b>Transmission afsluiten?</b></big>"
 
 #: ../gtk/dialogs.c:126
 msgid "_Don't ask me again"
-msgstr "_Vraag dit niet opnieuw"
+msgstr "Niet opnieuw _vragen"
 
 #: ../gtk/dialogs.c:215
 msgid "Remove torrent?"
@@ -814,7 +814,7 @@ msgstr "Geminimaliseerd in het systeemvak starten"
 
 #: ../gtk/main.c:310
 msgid "Where to look for configuration files"
-msgstr "Zoeklocaties voor configuratie bestanden"
+msgstr "Zoeklocaties voor configuratiebestanden"
 
 #: ../gtk/main.c:322
 msgid "Transmission"
@@ -874,7 +874,7 @@ msgstr "Torrent aangemaakt"
 #: ../gtk/makemeta-ui.c:102 ../gtk/makemeta-ui.c:111 ../gtk/makemeta-ui.c:118
 #, c-format
 msgid "Torrent creation failed: %s"
-msgstr "Torrent creatie mislukt: %s"
+msgstr "Aanmaken van torrent mislukt: %s"
 
 #: ../gtk/makemeta-ui.c:102
 msgid "Invalid URL"
@@ -957,7 +957,7 @@ msgstr "Kan bestand \"%1$s\" niet opslaan: %2$s"
 
 #: ../gtk/msgwin.c:132
 msgid "Save Log"
-msgstr "Log opslaan"
+msgstr "Logbestand opslaan"
 
 #: ../gtk/msgwin.c:167
 msgid "Error"
@@ -1177,46 +1177,46 @@ msgstr "Bronbestanden naar de prullenbak verplaatsen"
 #, c-format
 msgid "Ignore the %'d _blocklisted peer"
 msgid_plural "Ignore the %'d _blocklisted peers"
-msgstr[0] "Negeer de %'d _geweigerde peer"
-msgstr[1] "Negeer de %'d _geweigerde peers"
+msgstr[0] "%'d _geblokkeerde peer negeren"
+msgstr[1] "%'d _geblokkeerde peers negeren"
 
 #: ../gtk/tr-prefs.c:337
 #, c-format
 msgid "Retrieving blocklist..."
-msgstr "Ban- lijst aan het ophalen..."
+msgstr "Blokkadelijst aan het ophalen..."
 
 #: ../gtk/tr-prefs.c:343
 #, c-format
 msgid "Unable to get blocklist."
-msgstr "Kan ban- lijst niet ophalen."
+msgstr "Kan blokkadelijst niet ophalen."
 
 #: ../gtk/tr-prefs.c:355
 #, c-format
 msgid "Unable to get blocklist: %s"
-msgstr "Kan ban- lijst niet ophalen: %s"
+msgstr "Kan blokkadelijst niet ophalen: %s"
 
 #: ../gtk/tr-prefs.c:369
 #, c-format
 msgid "Uncompressing blocklist..."
-msgstr "Ban- lijst aan het uitpakken..."
+msgstr "Blokkadelijst aan het uitpakken..."
 
 #: ../gtk/tr-prefs.c:379
 #, c-format
 msgid "Parsing blocklist..."
-msgstr "Ban- lijst samenvoegen"
+msgstr "Blokkadelijst samenvoegen"
 
 #: ../gtk/tr-prefs.c:386 ../libtransmission/blocklist.c:258
 #, c-format
 msgid "Blocklist updated with %'d entries"
-msgstr "Ban- lijst bijgewerkt met %'d items"
+msgstr "Blokkadelijst bijgewerkt met %'d items"
 
 #: ../gtk/tr-prefs.c:427
 msgid "Updating Blocklist"
-msgstr "Ban- lijst aan het bijwerken"
+msgstr "Blokkadelijst aan het bijwerken"
 
 #: ../gtk/tr-prefs.c:459
 msgid "_Update Blocklist"
-msgstr "_Update Ban- lijst"
+msgstr "Blokkadelijst _updaten"
 
 #: ../gtk/tr-prefs.c:471
 msgid "_Ignore unencrypted peers"
@@ -1472,12 +1472,12 @@ msgstr "Ongeldige metadata"
 #: ../libtransmission/blocklist.c:92
 #, c-format
 msgid "Blocklist contains %'d entries"
-msgstr "Ban- lijst bevat %' d items"
+msgstr "Blokkadelijst bevat %' d items"
 
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:644 ../libtransmission/fastresume.c:655
 msgid "Couldn't read resume file"
-msgstr "Kan niet verder gaan vanaf vorige punt"
+msgstr "Kon hervattingsbestand niet lezen"
 
 #: ../libtransmission/makemeta.c:58
 #, c-format
@@ -1635,7 +1635,7 @@ msgstr "Trackerfout: \"%s\""
 #: ../libtransmission/torrent.c:880
 #, c-format
 msgid "Closing torrent; %d left"
-msgstr "Torrent aan het sluiten; %d over"
+msgstr "Torrent aan het sluiten; %d resterend"
 
 #. Translators: this is a minor point that's safe to skip over, but FYI:
 #. "Complete" and "Done" are specific, different terms in Transmission:
@@ -1656,7 +1656,7 @@ msgstr "Incompleet"
 #: ../libtransmission/torrent.c:1110
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
-msgstr "Status aangepast van \"%1$s\" naar \"%2$s\""
+msgstr "Status gewijzigd van \"%1$s\" naar \"%2$s\""
 
 #: ../libtransmission/upnp.c:27
 msgid "Port Forwarding (UPnP)"
@@ -1689,7 +1689,7 @@ msgstr "Port forwarding succesvol!"
 
 #: ../libtransmission/utils.c:382
 msgid "Not a regular file"
-msgstr "Niet een standaardbestand"
+msgstr "Geen regulier bestand"
 
 #: ../libtransmission/utils.c:396
 msgid "Memory allocation failed"
@@ -1698,7 +1698,7 @@ msgstr "Geheugen toewijzing mislukt"
 #: ../libtransmission/utils.c:468
 #, c-format
 msgid "File \"%s\" is in the way"
-msgstr "Bestaand \"%s\" staat in de weg"
+msgstr "Bestand \"%s\" staat in de weg"
 
 #: ../libtransmission/utils.c:535
 msgid "No error"
@@ -1718,7 +1718,7 @@ msgstr "Doelmap bestaat niet"
 
 #: ../libtransmission/utils.c:553
 msgid "A torrent with this name and destination folder already exists."
-msgstr "Een torrent met deze name en doelmap bestaat reeds."
+msgstr "Een torrent met deze naam en doelmap bestaat reeds."
 
 #: ../libtransmission/utils.c:555
 msgid "Checksum failed"

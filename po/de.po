@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: Transmission 0.81\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-05-08 11:21+0000\n"
-"Last-Translator: vinz <Unknown>\n"
+"PO-Revision-Date: 2008-05-19 08:33+0000\n"
+"Last-Translator: Martin Lettner <m.lettner@gmail.com>\n"
 "Language-Team: Michael Färber <0102@gmx.at>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-05-08 18:40+0000\n"
+"X-Launchpad-Export-Date: 2008-05-21 17:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #~ msgid "Open a torrent"
@@ -645,7 +645,7 @@ msgstr "Nach _Aktivität sortieren"
 
 #: ../gtk/actions.c:48
 msgid "Sort by _Name"
-msgstr "Nach _Name sortieren"
+msgstr "Nach _Namen sortieren"
 
 #: ../gtk/actions.c:49
 msgid "Sort by _Progress"
@@ -653,11 +653,11 @@ msgstr "Nach Fortschritt sortieren"
 
 #: ../gtk/actions.c:50
 msgid "Sort by _Ratio"
-msgstr "Nach _Verhältnis sortieren"
+msgstr "Nach_Upload/Download-Verhältnis sortieren"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _State"
-msgstr "Nach Zustand sortieren"
+msgstr "nach Status sortieren"
 
 #: ../gtk/actions.c:52
 msgid "Sort by _Tracker"
@@ -729,7 +729,7 @@ msgstr "Torrent starten"
 
 #: ../gtk/actions.c:107
 msgid "_Statistics"
-msgstr "_Statistik"
+msgstr "_Statistiken"
 
 #: ../gtk/actions.c:109
 msgid "_Verify Local Data"
@@ -773,7 +773,7 @@ msgstr "_Beenden"
 
 #: ../gtk/actions.c:122
 msgid "Select _All"
-msgstr "_Alle auswählen"
+msgstr "_Alles auswählen"
 
 #: ../gtk/actions.c:124
 msgid "Dese_lect All"
@@ -810,10 +810,9 @@ msgstr "Torrent Optionen"
 
 #: ../gtk/add-dialog.c:187
 msgid "Mo_ve source file to Trash"
-msgstr "Quelldatei in den Müll _verschieben"
+msgstr "Quelldatei in den Papierkorb verschieben"
 
 #: ../gtk/add-dialog.c:188 ../gtk/tr-prefs.c:255
-#, fuzzy
 msgid "_Start when added"
 msgstr "_Starten wenn hinzugefügt"
 
@@ -858,9 +857,9 @@ msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "Konnte \"%1$s\" nicht öffnen: %2$s"
 
 #: ../gtk/conf.c:85
-#, fuzzy, c-format
+#, c-format
 msgid "%s is already running."
-msgstr "Eine andere Kopie von %s läuft bereits."
+msgstr "%s läuft bereits."
 
 #: ../gtk/details.c:246
 msgid "Address"
@@ -891,14 +890,13 @@ msgstr "Status"
 
 #: ../gtk/details.c:505
 msgid "Optimistic unchoke"
-msgstr ""
+msgstr "Optimistisches Drosseln"
 
 #: ../gtk/details.c:506
 msgid "Downloading from peer"
 msgstr "Empfange von Peer"
 
 #: ../gtk/details.c:507
-#, fuzzy
 msgid "We'd download from peer if they'd let us"
 msgstr "Wir würden vom Peer herunterladen, wenn man uns ließe"
 
@@ -909,14 +907,15 @@ msgstr "Sende an Peer"
 #: ../gtk/details.c:509
 msgid "We'd upload to peer if they'd ask us"
 msgstr ""
+"Wir würden es zu einem peer hochladen, wenn diese uns gefragt hätten."
 
 #: ../gtk/details.c:510
 msgid "Peer has unchoked us, but we're not interested"
-msgstr ""
+msgstr "Der peer hat uns gedrosselt, aber wir sind daran nicht interessiert."
 
 #: ../gtk/details.c:511
 msgid "We unchoked the peer, but they're not interested"
-msgstr ""
+msgstr "Wir drosselten den peer, aber sie sind nicht daran interessiert."
 
 #: ../gtk/details.c:512
 msgid "Encrypted connection"
@@ -974,7 +973,7 @@ msgstr "Hash:"
 #: ../gtk/details.c:750
 #, fuzzy
 msgid "Private to this tracker -- PEX disabled"
-msgstr "Für diesen Tracker privat"
+msgstr "Privat für diesen tracker -- PEX abgeschaltet"
 
 #: ../gtk/details.c:751
 msgid "Public torrent"
@@ -1025,16 +1024,16 @@ msgstr "%.1f%%"
 #. %1$.1f is percent of how much of what we want's been downloaded,
 #. %2$.1f is percent of how much of the whole torrent we've downloaded
 #: ../gtk/details.c:837
-#, fuzzy, c-format
+#, c-format
 msgid "%1$.1f%% (%2$.1f%% selected)"
-msgstr "%.1f%% (%.1f%% ausgewählt)"
+msgstr "%1$.1f%% (%2$.1f%% ausgewählt)"
 
 #. %1$s is total size of what we've saved to disk
 #. %2$s is how much of it's passed the checksum test
 #: ../gtk/details.c:845
-#, fuzzy, c-format
+#, c-format
 msgid "%1$s (%2$s verified)"
-msgstr "%s (%s überprüft)"
+msgstr "%1$s (%2$s überprüft)"
 
 #: ../gtk/details.c:864 ../gtk/util.c:61 ../gtk/util.c:81
 msgid "None"
@@ -1074,7 +1073,6 @@ msgid "Ratio:"
 msgstr "Verhältnis:"
 
 #: ../gtk/details.c:919
-#, fuzzy
 msgid "Swarm rate:"
 msgstr "Schwarm-Rate:"
 
@@ -1144,7 +1142,6 @@ msgid "Announce"
 msgstr "Ankündigung"
 
 #: ../gtk/details.c:1156
-#, fuzzy
 msgid "Tracker:"
 msgstr "Tracker:"
 
@@ -1169,9 +1166,9 @@ msgstr "Niemals"
 #. %1$s is torrent name
 #. %2$s its file size
 #: ../gtk/details.c:1296
-#, fuzzy, c-format
+#, c-format
 msgid "Details for %1$s (%2$s)"
-msgstr "Details für %s (%s)"
+msgstr "Details für %1$s (%2$s)"
 
 #: ../gtk/details.c:1314
 msgid "Activity"
@@ -1274,7 +1271,7 @@ msgstr "Falsche IPC-Protokoll-Version"
 #: ../gtk/ipc.c:235 ../gtk/ipc.c:394
 #, fuzzy, c-format
 msgid "IPC parse error: %s"
-msgstr "IPC-Übersetzungsfehler: %s"
+msgstr "IPC-Parse-Fehler: %s"
 
 #: ../gtk/ipc.c:264 ../gtk/ipc.c:480 ../libtransmission/fdlimit.c:390
 #: ../libtransmission/net.c:105
@@ -1297,7 +1294,6 @@ msgid "Start with all torrents paused"
 msgstr "Mit allen Torrents pausiert starten"
 
 #: ../gtk/main.c:304
-#, fuzzy
 msgid "Ask the running instance to quit"
 msgstr "Beende die momentan laufende Instanz"
 
@@ -1354,11 +1350,13 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  Data https://launchpad.net/~ubuntuaddress\n"
 "  Dennis Austmann https://launchpad.net/~daustmann\n"
+"  F. Krenn https://launchpad.net/~f-krenn\n"
+"  Fligor https://launchpad.net/~fligor\n"
 "  Martin Lettner https://launchpad.net/~m.lettner\n"
 "  Maximilian Reininghaus https://launchpad.net/~max-reininghaus\n"
 "  Michael Färber https://launchpad.net/~0102-gmx\n"
 "  Philipp Rustemeier https://launchpad.net/~12foo\n"
-"  vinz https://launchpad.net/~v1nz"
+"  Vinzenz Vietzke https://launchpad.net/~v1nz"
 
 #: ../gtk/makemeta-ui.c:98
 msgid "Torrent created"
@@ -2208,8 +2206,9 @@ msgid "Unspecified error"
 msgstr "Unspezifizierter Fehler"
 
 #: ../libtransmission/utils.c:540
+#, fuzzy
 msgid "Assert error"
-msgstr ""
+msgstr "Fehler: Rechte"
 
 #: ../libtransmission/utils.c:543
 msgid "Destination folder doesn't exist"

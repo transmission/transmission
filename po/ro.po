@@ -10,15 +10,15 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-03-26 14:37+0000\n"
-"Last-Translator: Mircea Suciu <Unknown>\n"
+"PO-Revision-Date: 2008-05-20 14:46+0000\n"
+"Last-Translator: Ionuț Jula <ionutjula@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n == 1 ? 0: (((n % 100 > 19) || ((n % 100 "
 "== 0) && (n != 0))) ? 2: 1));\n"
-"X-Launchpad-Export-Date: 2008-05-08 18:40+0000\n"
+"X-Launchpad-Export-Date: 2008-05-21 17:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #, fuzzy
@@ -556,45 +556,45 @@ msgstr ""
 
 #: ../gtk/actions.c:47
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "Sortează după _activitate"
 
 #: ../gtk/actions.c:48
 msgid "Sort by _Name"
-msgstr ""
+msgstr "Sortează după _nume"
 
 #: ../gtk/actions.c:49
 #, fuzzy
 msgid "Sort by _Progress"
-msgstr "Progres"
+msgstr "Sortează după _progres"
 
 #: ../gtk/actions.c:50
 msgid "Sort by _Ratio"
-msgstr ""
+msgstr "Sortează după _rație"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _State"
-msgstr ""
+msgstr "Sortează după _stare"
 
 #: ../gtk/actions.c:52
 msgid "Sort by _Tracker"
-msgstr ""
+msgstr "Sortează după _tracker"
 
 #: ../gtk/actions.c:69
 msgid "_Main Window"
-msgstr ""
+msgstr "Fereastra _principală"
 
 #: ../gtk/actions.c:71
 #, fuzzy
 msgid "Message _Log"
-msgstr "Salvaţi log-ul"
+msgstr "_Istoric mesaje"
 
 #: ../gtk/actions.c:85
 msgid "_Minimal View"
-msgstr ""
+msgstr "Afișaj _minimal"
 
 #: ../gtk/actions.c:87
 msgid "_Reverse Sort Order"
-msgstr ""
+msgstr "Ordine de sortare inve_rsă"
 
 #: ../gtk/actions.c:89
 #, fuzzy
@@ -604,70 +604,70 @@ msgstr "_Fişier"
 #: ../gtk/actions.c:91
 #, fuzzy
 msgid "_Statusbar"
-msgstr "Porniţi"
+msgstr "Bară de _stare"
 
 #: ../gtk/actions.c:93
 msgid "_Toolbar"
-msgstr ""
+msgstr "Bară de unel_te"
 
 #: ../gtk/actions.c:98
 #, fuzzy
 msgid "_Torrent"
-msgstr "Adăugaţi un torrent"
+msgstr "_Torrent"
 
 #: ../gtk/actions.c:99
 #, fuzzy
 msgid "_View"
-msgstr "_Fişier"
+msgstr "_Vizualizare"
 
 #: ../gtk/actions.c:100
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Sortează torrent-ele după"
 
 #: ../gtk/actions.c:101
 msgid "_Edit"
-msgstr ""
+msgstr "_Editare"
 
 #: ../gtk/actions.c:102
 msgid "_Help"
-msgstr ""
+msgstr "_Ajutor"
 
 #: ../gtk/actions.c:103 ../gtk/actions.c:104
 msgid "Add a torrent"
-msgstr ""
+msgstr "Adaugă un torrent"
 
 #: ../gtk/actions.c:104
 msgid "_Add..."
-msgstr ""
+msgstr "_Adaugă..."
 
 #: ../gtk/actions.c:106
 #, fuzzy
 msgid "_Start"
-msgstr "Porniţi"
+msgstr "_Pornire"
 
 #: ../gtk/actions.c:106
 msgid "Start torrent"
-msgstr ""
+msgstr "Pornește torrent"
 
 #: ../gtk/actions.c:107
 msgid "_Statistics"
-msgstr ""
+msgstr "_Statistici"
 
 #: ../gtk/actions.c:109
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "_Verfică datele locale"
 
 #: ../gtk/actions.c:111
 msgid "_Pause"
-msgstr ""
+msgstr "_Pauză"
 
 #: ../gtk/actions.c:111
 msgid "Pause torrent"
-msgstr ""
+msgstr "Oprește pentru un timp torrent-ul"
 
 #: ../gtk/actions.c:112
 msgid "Remove torrent"
-msgstr ""
+msgstr "Elimină torrent-ul"
 
 #: ../gtk/actions.c:113
 #, fuzzy
@@ -676,17 +676,17 @@ msgstr "Fişiere"
 
 #: ../gtk/actions.c:114
 msgid "_New..."
-msgstr ""
+msgstr "_Nou..."
 
 #: ../gtk/actions.c:115
 #, fuzzy
 msgid "Create a torrent"
-msgstr "Adaugă un torrent nou"
+msgstr "Creează un nou torrent"
 
 #: ../gtk/actions.c:117
 #, fuzzy
 msgid "Close _Window"
-msgstr "Închide fereastra principală"
+msgstr "Închide _fereastra"
 
 #: ../gtk/actions.c:118
 #, fuzzy
@@ -695,27 +695,27 @@ msgstr "Închide fereastra principală"
 
 #: ../gtk/actions.c:120
 msgid "_Quit"
-msgstr ""
+msgstr "_Ieşire"
 
 #: ../gtk/actions.c:122
 msgid "Select _All"
-msgstr ""
+msgstr "Selecte_ază tot"
 
 #: ../gtk/actions.c:124
 msgid "Dese_lect All"
-msgstr ""
+msgstr "Dese_lectează tot"
 
 #: ../gtk/actions.c:127
 msgid "_Details"
-msgstr ""
+msgstr "_Detalii"
 
 #: ../gtk/actions.c:127
 msgid "Torrent details"
-msgstr ""
+msgstr "Detalii torrent"
 
 #: ../gtk/actions.c:129
 msgid "_Open Folder"
-msgstr ""
+msgstr "Deschide direct_or"
 
 #: ../gtk/actions.c:132
 msgid "Ask Tracker for _More Peers"
@@ -723,17 +723,17 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:135
 msgid "Torrent files"
-msgstr "Torrente"
+msgstr "Fișiere torrent"
 
 #: ../gtk/add-dialog.c:140
 msgid "All files"
-msgstr "Toate fişierele"
+msgstr "Toate fișierele"
 
 #. make the dialog
 #: ../gtk/add-dialog.c:165
 #, fuzzy
 msgid "Torrent Options"
-msgstr "Torrente"
+msgstr "opțiuni torrent-e"
 
 #: ../gtk/add-dialog.c:187
 msgid "Mo_ve source file to Trash"
@@ -746,16 +746,16 @@ msgstr ""
 #: ../gtk/add-dialog.c:199
 #, fuzzy
 msgid "_Source file:"
-msgstr "Torrente"
+msgstr "Fișiere _sursă:"
 
 #: ../gtk/add-dialog.c:203
 #, fuzzy
 msgid "Select Source File"
-msgstr "Adăugaţi un torrent"
+msgstr "Selectați fișierul sursă"
 
 #: ../gtk/add-dialog.c:216 ../gtk/tr-prefs.c:264
 msgid "_Destination folder:"
-msgstr ""
+msgstr "Director _destinație:"
 
 #: ../gtk/add-dialog.c:220
 msgid "Select Destination Folder"
@@ -767,41 +767,41 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:295
 msgid "Add a Torrent"
-msgstr ""
+msgstr "Adaugă un torrent"
 
 #: ../gtk/add-dialog.c:313 ../gtk/tr-prefs.c:251
 msgid "Display _options dialog"
-msgstr ""
+msgstr "Afișează dialogul cu _opțiuni"
 
 #: ../gtk/conf.c:60 ../gtk/makemeta-ui.c:117 ../libtransmission/utils.c:458
 #: ../libtransmission/utils.c:469
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr ""
+msgstr "Nu s-a putut crea „%1$s\": %2$s"
 
 #: ../gtk/conf.c:81 ../libtransmission/bencode.c:1105
 #: ../libtransmission/fastresume.c:195 ../libtransmission/fdlimit.c:166
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr ""
+msgstr "Nu s-a putut deschide „%1$s\": %2$s"
 
 #: ../gtk/conf.c:85
 #, fuzzy, c-format
 msgid "%s is already running."
-msgstr "Deja rulează o instanţă a %s."
+msgstr "Deja rulează o instanță a %s."
 
 #: ../gtk/details.c:246
 msgid "Address"
-msgstr ""
+msgstr "Adresă"
 
 #: ../gtk/details.c:247
 msgid "Client"
-msgstr ""
+msgstr "Client"
 
 #. 'percent done' column header. terse to keep the column narrow.
 #: ../gtk/details.c:249
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:252
@@ -811,13 +811,14 @@ msgstr "Downloadat:"
 
 #. 'upload speed' column header.  terse to keep the column narrow.
 #: ../gtk/details.c:254
+#, fuzzy
 msgid "Up"
-msgstr ""
+msgstr "Încărcat"
 
 #: ../gtk/details.c:255
 #, fuzzy
 msgid "Status"
-msgstr "Porniţi"
+msgstr "Stare"
 
 #: ../gtk/details.c:505
 msgid "Optimistic unchoke"
@@ -830,7 +831,7 @@ msgstr "La leech, se downloadează de la %i din %i peer"
 
 #: ../gtk/details.c:507
 msgid "We'd download from peer if they'd let us"
-msgstr ""
+msgstr "Vom descărca de la parteneri doar dacă aceștia ne permit"
 
 #: ../gtk/details.c:508
 #, fuzzy
@@ -839,7 +840,7 @@ msgstr "La seed, se uploadează către %d din %d peer"
 
 #: ../gtk/details.c:509
 msgid "We'd upload to peer if they'd ask us"
-msgstr ""
+msgstr "Vom încărca partenerilor doar dacă aceștia ne permit"
 
 #: ../gtk/details.c:510
 msgid "Peer has unchoked us, but we're not interested"
@@ -851,7 +852,7 @@ msgstr ""
 
 #: ../gtk/details.c:512
 msgid "Encrypted connection"
-msgstr ""
+msgstr "Conexiune criptată"
 
 #: ../gtk/details.c:513
 msgid "Peer was discovered through Peer Exchange (PEX)"
@@ -863,11 +864,11 @@ msgstr ""
 
 #: ../gtk/details.c:656
 msgid "<b>Availability</b>"
-msgstr ""
+msgstr "<b>Disponibilitate</b>"
 
 #: ../gtk/details.c:678
 msgid "<b>Connected Peers</b>"
-msgstr ""
+msgstr "<b>Parteneri conectați</b>"
 
 #: ../gtk/details.c:688
 #, fuzzy
@@ -887,7 +888,7 @@ msgstr "Completaţi"
 #: ../gtk/details.c:732 ../gtk/makemeta-ui.c:312
 #, fuzzy
 msgid "Details"
-msgstr "Torrente"
+msgstr "Detalii"
 
 #. %1$'d is number of pieces
 #. %2$s is how big each piece is
@@ -901,7 +902,7 @@ msgstr[1] ""
 #: ../gtk/details.c:743
 #, fuzzy
 msgid "Pieces:"
-msgstr "Piese:"
+msgstr "Bucăți:"
 
 #: ../gtk/details.c:747
 #, fuzzy
@@ -915,101 +916,101 @@ msgstr ""
 #: ../gtk/details.c:751
 #, fuzzy
 msgid "Public torrent"
-msgstr "Adăugaţi un torrent"
+msgstr "Adăugați un torrent"
 
 #: ../gtk/details.c:753
 msgid "Privacy:"
-msgstr ""
+msgstr "Intimitate:"
 
 #: ../gtk/details.c:765
 msgid "Comment:"
-msgstr ""
+msgstr "Comentariu:"
 
 #: ../gtk/details.c:769
 msgid "Origins"
-msgstr ""
+msgstr "Origini"
 
 #: ../gtk/details.c:771 ../gtk/details.c:867 ../gtk/details.c:872
 #, c-format
 msgid "Unknown"
-msgstr ""
+msgstr "Necunoscut"
 
 #: ../gtk/details.c:772
 msgid "Creator:"
-msgstr ""
+msgstr "Creator:"
 
 #: ../gtk/details.c:776
 #, fuzzy
 msgid "Date:"
-msgstr "Porniţi"
+msgstr "Data:"
 
 #: ../gtk/details.c:780
 msgid "Location"
-msgstr ""
+msgstr "Locație"
 
 #: ../gtk/details.c:784
 msgid "Destination folder:"
-msgstr ""
+msgstr "Director destinație:"
 
 #: ../gtk/details.c:788
 #, fuzzy
 msgid "Torrent file:"
-msgstr "Torrente"
+msgstr "Fișiere torrent:"
 
 #: ../gtk/details.c:833
 #, c-format
 msgid "%.1f%%"
-msgstr ""
+msgstr "%.1f%%"
 
 #. %1$.1f is percent of how much of what we want's been downloaded,
 #. %2$.1f is percent of how much of the whole torrent we've downloaded
 #: ../gtk/details.c:837
 #, c-format
 msgid "%1$.1f%% (%2$.1f%% selected)"
-msgstr ""
+msgstr "%1$.1f%% (%2$.1f%% selectectate)"
 
 #. %1$s is total size of what we've saved to disk
 #. %2$s is how much of it's passed the checksum test
 #: ../gtk/details.c:845
 #, c-format
 msgid "%1$s (%2$s verified)"
-msgstr ""
+msgstr "%1$s (%2$s verificate)"
 
 #: ../gtk/details.c:864 ../gtk/util.c:61 ../gtk/util.c:81
 msgid "None"
-msgstr ""
+msgstr "Nici unul"
 
 #: ../gtk/details.c:893
 #, fuzzy
 msgid "Transfer"
-msgstr "Tracker:"
+msgstr "Transfer"
 
 #: ../gtk/details.c:896
 #, fuzzy
 msgid "State:"
-msgstr "Porniţi"
+msgstr "Stare:"
 
 #: ../gtk/details.c:899
 #, fuzzy
 msgid "Progress:"
-msgstr "Progres"
+msgstr "Progres:"
 
 #. "Have" refers to how much of the torrent we have
 #: ../gtk/details.c:903
 msgid "Have:"
-msgstr ""
+msgstr "S-au:"
 
 #: ../gtk/details.c:906 ../gtk/stats.c:104 ../gtk/stats.c:116
 msgid "Downloaded:"
-msgstr "Downloadat:"
+msgstr "Descărcat:"
 
 #: ../gtk/details.c:909 ../gtk/stats.c:102 ../gtk/stats.c:114
 msgid "Uploaded:"
-msgstr "Uploadat:"
+msgstr "Încărcat"
 
 #: ../gtk/details.c:913
 msgid "Failed DL:"
-msgstr ""
+msgstr "DL eșuat:"
 
 #: ../gtk/details.c:916 ../gtk/stats.c:106 ../gtk/stats.c:118
 msgid "Ratio:"
@@ -1031,25 +1032,25 @@ msgstr "Completaţi"
 
 #: ../gtk/details.c:936
 msgid "Dates"
-msgstr ""
+msgstr "Date"
 
 #: ../gtk/details.c:939
 #, fuzzy
 msgid "Started at:"
-msgstr "Porniţi"
+msgstr "Pornit la:"
 
 #: ../gtk/details.c:942
 msgid "Last activity at:"
-msgstr ""
+msgstr "Ultima activitate la:"
 
 #: ../gtk/details.c:1037 ../gtk/tr-prefs.c:504
 msgid "Bandwidth"
-msgstr ""
+msgstr "Lățime de bandă"
 
 #: ../gtk/details.c:1039 ../gtk/tr-prefs.c:506
 #, fuzzy
 msgid "Limit _download speed (KB/s):"
-msgstr "_Limitaţi viteza de download"
+msgstr "Limitează viteza de _descărcare (KO/s):"
 
 #: ../gtk/details.c:1052 ../gtk/tr-prefs.c:513
 #, fuzzy
@@ -1311,6 +1312,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  Ionuț Jula https://launchpad.net/~ionutjula\n"
 "  Mircea Suciu https://launchpad.net/~mircea-gmail"
 
 #: ../gtk/makemeta-ui.c:98
