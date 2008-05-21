@@ -214,6 +214,7 @@
 		A2DF567D0DE323D3000795D5 /* QuickLook.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF567C0DE323D3000795D5 /* QuickLook.h */; };
 		A2DF576C0DE468C6000795D5 /* JSON_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = A2DF576A0DE468C6000795D5 /* JSON_parser.c */; };
 		A2DF576D0DE468C6000795D5 /* JSON_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF576B0DE468C6000795D5 /* JSON_parser.h */; };
+		A2DF57740DE46A6A000795D5 /* QuickLookController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2DF57730DE46A6A000795D5 /* QuickLookController.m */; };
 		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */; };
 		A2E9AA760C249AF400085DCF /* Create.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* Create.png */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
@@ -682,6 +683,8 @@
 		A2DF567C0DE323D3000795D5 /* QuickLook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = QuickLook.h; path = macosx/QuickLook.h; sourceTree = "<group>"; };
 		A2DF576A0DE468C6000795D5 /* JSON_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = JSON_parser.c; path = libtransmission/JSON_parser.c; sourceTree = "<group>"; };
 		A2DF576B0DE468C6000795D5 /* JSON_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON_parser.h; path = libtransmission/JSON_parser.h; sourceTree = "<group>"; };
+		A2DF57720DE46A6A000795D5 /* QuickLookController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = QuickLookController.h; path = macosx/QuickLookController.h; sourceTree = "<group>"; };
+		A2DF57730DE46A6A000795D5 /* QuickLookController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = QuickLookController.m; path = macosx/QuickLookController.m; sourceTree = "<group>"; };
 		A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabButtonCell.h; path = macosx/InfoTabButtonCell.h; sourceTree = "<group>"; };
 		A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTabButtonCell.m; path = macosx/InfoTabButtonCell.m; sourceTree = "<group>"; };
 		A2E9AA750C249AF400085DCF /* Create.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Create.png; path = macosx/Images/Create.png; sourceTree = "<group>"; };
@@ -952,6 +955,8 @@
 				A2D307A20D9EC6870051FD27 /* BlocklistDownloader.h */,
 				A2D307A30D9EC6870051FD27 /* BlocklistDownloader.m */,
 				A2DF567C0DE323D3000795D5 /* QuickLook.h */,
+				A2DF57720DE46A6A000795D5 /* QuickLookController.h */,
+				A2DF57730DE46A6A000795D5 /* QuickLookController.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -1993,6 +1998,7 @@
 				A26AF2840D2DC27C00FF7140 /* AddWindowController.m in Sources */,
 				A2FB701C0D95CAEA0001F331 /* GroupsController.m in Sources */,
 				A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */,
+				A2DF57740DE46A6A000795D5 /* QuickLookController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

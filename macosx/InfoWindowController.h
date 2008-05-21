@@ -66,8 +66,6 @@
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField, * fPeersConnectField,
                         * fUploadLimitLabel, * fDownloadLimitLabel;
     
-    BOOL fQuickLookAvailable;
-    
     NSString * fInitialString;
 }
 
@@ -80,13 +78,9 @@
 - (void) setNextTab;
 - (void) setPreviousTab;
 
-- (int) visibleRowWithURL: (NSURL*) url;
-- (BOOL) quickLookSelectItems;
-- (void) toggleQuickLook: (id) sender;
-- (void) updateQuickLook;
-
-- (void) quickLookPressLeft;
-- (void) quickLookPressRight;
+- (BOOL) shouldQuickLookFileView;
+- (NSArray *) quickLookURLs;
+- (NSRect) quickLookFrameWithURL: (NSURL*) url;
 
 - (void) setPiecesView: (id) sender;
 - (void) setPiecesViewForAvailable: (BOOL) available;

@@ -45,7 +45,7 @@
 						<object class="NSTextField" id="974784210">
 							<reference key="NSNextResponder" ref="429007171"/>
 							<int key="NSvFlags">266</int>
-							<string key="NSFrame">{{47, 47}, {259, 17}}</string>
+							<string key="NSFrame">{{47, 47}, {296, 17}}</string>
 							<reference key="NSSuperview" ref="429007171"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="585844623">
@@ -400,30 +400,6 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 								<bool key="NSAnimates">YES</bool>
 							</object>
 							<bool key="NSEditable">YES</bool>
-						</object>
-						<object class="NSButton" id="624970840">
-							<reference key="NSNextResponder" ref="429007171"/>
-							<int key="NSvFlags">265</int>
-							<string key="NSFrame">{{311, 38}, {29, 17}}</string>
-							<reference key="NSSuperview" ref="429007171"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSButtonCell" key="NSCell" id="269704195">
-								<int key="NSCellFlags">-2080244224</int>
-								<int key="NSCellFlags2">134348800</int>
-								<string key="NSContents"/>
-								<reference key="NSSupport" ref="26"/>
-								<reference key="NSControlView" ref="624970840"/>
-								<int key="NSButtonFlags">-2030288641</int>
-								<int key="NSButtonFlags2">164</int>
-								<object class="NSCustomResource" key="NSNormalImage">
-									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">NSQuickLookTemplate</string>
-								</object>
-								<string key="NSAlternateContents"/>
-								<string key="NSKeyEquivalent"/>
-								<int key="NSPeriodicDelay">400</int>
-								<int key="NSPeriodicInterval">75</int>
-							</object>
 						</object>
 					</object>
 					<string key="NSFrameSize">{350, 75}</string>
@@ -5676,14 +5652,6 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 					</object>
 					<int key="connectionID">1749</int>
 				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">toggleQuickLook:</string>
-						<reference key="source" ref="1016287627"/>
-						<reference key="destination" ref="624970840"/>
-					</object>
-					<int key="connectionID">1752</int>
-				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -5734,7 +5702,6 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 							<reference ref="1020839921"/>
 							<reference ref="80002672"/>
 							<reference ref="843033231"/>
-							<reference ref="624970840"/>
 						</object>
 						<reference key="parent" ref="571546118"/>
 					</object>
@@ -7927,20 +7894,6 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 						<reference key="object" ref="927236344"/>
 						<reference key="parent" ref="876850876"/>
 					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1750</int>
-						<reference key="object" ref="624970840"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="269704195"/>
-						</object>
-						<reference key="parent" ref="429007171"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1751</int>
-						<reference key="object" ref="269704195"/>
-						<reference key="parent" ref="624970840"/>
-					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -8222,8 +8175,6 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 					<string>1747.IBShouldRemoveOnLegacySave</string>
 					<string>1748.IBPluginDependency</string>
 					<string>1748.ImportedFromIB2</string>
-					<string>1750.IBPluginDependency</string>
-					<string>1751.IBPluginDependency</string>
 					<string>28.IBPluginDependency</string>
 					<string>28.ImportedFromIB2</string>
 					<string>29.IBPluginDependency</string>
@@ -8605,8 +8556,6 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
@@ -8828,11 +8777,9 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 							<string>setSpeedLimit:</string>
 							<string>setSpeedMode:</string>
 							<string>setTab:</string>
-							<string>toggleQuickLook:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>

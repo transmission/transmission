@@ -26,6 +26,7 @@
 #import "Torrent.h"
 #import "FileOutlineView.h"
 #import "FilePriorityCell.h"
+#import "QuickLookController.h"
 #import "NSApplicationAdditions.h"
 
 #define ROW_SMALL_HEIGHT 18.0
@@ -77,7 +78,7 @@ typedef enum
 
 - (void) outlineViewSelectionDidChange: (NSNotification *) notification
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQuickLook" object: self];
+    [[QuickLookController quickLook] updateQuickLook];
 }
 
 - (void) setTorrent: (Torrent *) torrent

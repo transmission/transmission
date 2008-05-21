@@ -23,10 +23,10 @@
  *****************************************************************************/
 
 #import "FileOutlineView.h"
-#import "InfoWindowController.h"
 #import "FileNameCell.h"
 #import "FilePriorityCell.h"
 #import "Torrent.h"
+#import "QuickLookController.h"
 #import "CTGradient.h"
 
 @implementation FileOutlineView
@@ -88,11 +88,11 @@
 {
     unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
     if (firstChar == ' ')
-        [(InfoWindowController *)[[self window] windowController] toggleQuickLook: nil];
+        [[QuickLookController quickLook] toggleQuickLook];
     else if (firstChar == NSRightArrowFunctionKey)
-        [(InfoWindowController *)[[self window] windowController] quickLookPressRight];
+        [[QuickLookController quickLook] pressRight];
     else if (firstChar == NSLeftArrowFunctionKey)
-        [(InfoWindowController *)[[self window] windowController] quickLookPressLeft];
+        [[QuickLookController quickLook] pressLeft];
     else;
     
     [super keyDown: event];  

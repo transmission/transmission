@@ -30,6 +30,7 @@
 #import "TorrentTableView.h"
 #import "CreatorWindowController.h"
 #import "StatsWindowController.h"
+#import "QuickLookController.h"
 #import "GroupsWindowController.h"
 #import "GroupsController.h"
 #import "AboutWindowController.h"
@@ -229,6 +230,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         fPrefsController = [[PrefsController alloc] initWithHandle: fLib];
         
         fBadger = [[Badger alloc] initWithLib: fLib];
+        [QuickLookController quickLookControllerInitializeWithController: self infoController: fInfoController];
         
         fSoundPlaying = NO;
         
