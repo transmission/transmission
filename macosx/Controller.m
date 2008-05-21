@@ -60,6 +60,7 @@
 #define TOOLBAR_RESUME_SELECTED         @"Toolbar Resume Selected"
 #define TOOLBAR_PAUSE_RESUME_SELECTED   @"Toolbar Pause / Resume Selected"
 #define TOOLBAR_FILTER                  @"Toolbar Toggle Filter"
+#define TOOLBAR_QUICKLOOK               @"Toolbar QuickLook"
 
 typedef enum
 {
@@ -3266,6 +3267,19 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         return item;
     }
+    else if ([ident isEqualToString: TOOLBAR_QUICKLOOK])
+    {
+        ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
+        
+        [item setLabel: NSLocalizedString(@"QuickLook", "QuickLook toolbar item -> label")];
+        [item setPaletteLabel: NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> palette label")];
+        [item setToolTip: NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> tooltip")];
+        [item setImage: [NSImage imageNamed: NSImageNameQuickLookTemplate]];
+        [item setTarget: self];
+        [item setAction: @selector(toggleQuickLook)];
+        
+        return item;
+    }
     else
         return nil;
 }
@@ -3302,24 +3316,43 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
-    return [NSArray arrayWithObjects:
-            TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_OPEN_WEB,
-            TOOLBAR_REMOVE, TOOLBAR_PAUSE_RESUME_SELECTED, TOOLBAR_PAUSE_RESUME_ALL,
-            TOOLBAR_FILTER, TOOLBAR_INFO,
-            NSToolbarSeparatorItemIdentifier,
-            NSToolbarSpaceItemIdentifier,
-            NSToolbarFlexibleSpaceItemIdentifier,
-            NSToolbarCustomizeToolbarItemIdentifier, nil];
+    NSMutableArray * idents = [NSMutableArray arrayWithObjects:
+                                TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_OPEN_WEB,
+                                TOOLBAR_REMOVE, TOOLBAR_PAUSE_RESUME_SELECTED, TOOLBAR_PAUSE_RESUME_ALL,
+                                TOOLBAR_FILTER, TOOLBAR_INFO,
+                                NSToolbarSeparatorItemIdentifier,
+                                NSToolbarSpaceItemIdentifier,
+                                NSToolbarFlexibleSpaceItemIdentifier,
+                                NSToolbarCustomizeToolbarItemIdentifier, nil];
+    
+    //allow quicklook on leopard
+    if ([NSApp isOnLeopardOrBetter])
+        [idents insertObject: TOOLBAR_QUICKLOOK atIndex: 6];
+    
+    return idents;
 }
 
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
 {
-    return [NSArray arrayWithObjects:
-            TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_REMOVE,
-            NSToolbarSeparatorItemIdentifier,
-            TOOLBAR_PAUSE_RESUME_ALL,
-            NSToolbarFlexibleSpaceItemIdentifier,
-            TOOLBAR_FILTER, TOOLBAR_INFO, nil];
+    //has quicklook on leopard
+    if ([NSApp isOnLeopardOrBetter])
+    {
+        return [NSArray arrayWithObjects:
+                TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_REMOVE,
+                NSToolbarSeparatorItemIdentifier,
+                TOOLBAR_PAUSE_RESUME_ALL,
+                NSToolbarFlexibleSpaceItemIdentifier,
+                TOOLBAR_QUICKLOOK, TOOLBAR_FILTER, TOOLBAR_INFO, nil];
+    }
+    else
+    {
+        return [NSArray arrayWithObjects:
+                TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_REMOVE,
+                NSToolbarSeparatorItemIdentifier,
+                TOOLBAR_PAUSE_RESUME_ALL,
+                NSToolbarFlexibleSpaceItemIdentifier,
+                TOOLBAR_FILTER, TOOLBAR_INFO, nil];
+    }
 }
 
 - (BOOL) validateToolbarItem: (NSToolbarItem *) toolbarItem
@@ -4055,6 +4088,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     return NSZeroRect;
+}
+
+#warning move to QuickLookController?
+- (void) toggleQuickLook
+{
+    [[QuickLookController quickLook] toggleQuickLook];
 }
 
 - (void) linkHomepage: (id) sender
