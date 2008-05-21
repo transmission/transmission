@@ -2,9 +2,14 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.21 (2008/mm/dd)
 http://trac.transmissionbt.com/query?group=component&milestone=1.21
+- All Platforms
+   + Fix minor memory leak when closing torrents
 - Mac
    + Fix visual glitch with the pieces bar
    + Italian localization included
+- GTK+
+   + Updated Catalan, Danish, German, Spanish, Finnish, Hebrew, Italian, Dutch,
+     Polish, Romanian, Thai, Turkish, and Traditional Chinese translations
 
 1.20 (2008/05/09)
 http://trac.transmissionbt.com/query?group=component&milestone=1.20
