@@ -3334,25 +3334,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
 {
-    //has quicklook on leopard
-    if ([NSApp isOnLeopardOrBetter])
-    {
-        return [NSArray arrayWithObjects:
-                TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_REMOVE,
-                NSToolbarSeparatorItemIdentifier,
-                TOOLBAR_PAUSE_RESUME_ALL,
-                NSToolbarFlexibleSpaceItemIdentifier,
-                TOOLBAR_QUICKLOOK, TOOLBAR_FILTER, TOOLBAR_INFO, nil];
-    }
-    else
-    {
-        return [NSArray arrayWithObjects:
-                TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_REMOVE,
-                NSToolbarSeparatorItemIdentifier,
-                TOOLBAR_PAUSE_RESUME_ALL,
-                NSToolbarFlexibleSpaceItemIdentifier,
-                TOOLBAR_FILTER, TOOLBAR_INFO, nil];
-    }
+    return [NSArray arrayWithObjects:
+            TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_REMOVE,
+            NSToolbarSeparatorItemIdentifier,
+            TOOLBAR_PAUSE_RESUME_ALL,
+            NSToolbarFlexibleSpaceItemIdentifier,
+            TOOLBAR_FILTER, TOOLBAR_INFO, nil];
 }
 
 - (BOOL) validateToolbarItem: (NSToolbarItem *) toolbarItem
