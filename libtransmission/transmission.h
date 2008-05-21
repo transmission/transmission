@@ -743,12 +743,11 @@ void tr_torrentVerify( tr_torrent * );
  * Frees memory allocated by tr_torrentNew().
  * Running torrents are stopped first.
  */
-void tr_torrentClose( tr_torrent * );
+void tr_torrentFree( tr_torrent * );
 
 /**
- * Like tr_torrentClose() but also deletes
- * the resume file and our copy of the
- * torrent file
+ * Removes our .torrent and .resume files for this
+ * torrent, then calls tr_torrentFree()
  */
 void tr_torrentRemove( tr_torrent * );
 

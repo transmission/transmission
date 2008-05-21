@@ -373,7 +373,6 @@ main( int argc, char ** argv )
     }
     
 cleanup:
-    tr_torrentClose( tor );
     tr_sessionClose( h );
 
     return EXIT_SUCCESS;

@@ -121,21 +121,6 @@ torrentStop( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
 }
 
 static const char*
-torrentClose( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
-{
-    int i, torrentCount;
-    tr_torrent ** torrents = getTorrents( h, args_in, &torrentCount );
-    for( i=0; i<torrentCount; ++i )
-    {
-        tr_torrent * tor = torrents[i];
-        notify( h, TR_RPC_TORRENT_CLOSING, tor );
-        tr_torrentClose( tor );
-    }
-    tr_free( torrents );
-    return NULL;
-}
-
-static const char*
 torrentRemove( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
 {
     int i, torrentCount;
@@ -683,7 +668,6 @@ struct method {
     { "session-get", sessionGet },
     { "session-set", sessionSet },
     { "torrent-add", torrentAdd },
-    { "torrent-close", torrentClose },
     { "torrent-get-priorities", torrentGetPriorities },
     { "torrent-get", torrentGet },
     { "torrent-info", torrentInfo },

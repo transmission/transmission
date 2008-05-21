@@ -425,7 +425,7 @@ tr_closeAllConnections( void * vh )
     tr_rpcClose( &h->rpcServer );
 
     while(( tor = tr_torrentNext( h, NULL )))
-        tr_torrentClose( tor );
+        tr_torrentFree( tor );
 
     tr_peerMgrFree( h->peerMgr );
 

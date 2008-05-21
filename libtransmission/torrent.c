@@ -1118,7 +1118,7 @@ closeTorrent( void * vtor )
 }
 
 void
-tr_torrentClose( tr_torrent * tor )
+tr_torrentFree( tr_torrent * tor )
 {
     if( tor != NULL )
     {
@@ -1136,7 +1136,7 @@ void
 tr_torrentRemove( tr_torrent * tor )
 {
     tor->isDeleting = 1;
-    tr_torrentClose( tor );
+    tr_torrentFree( tor );
 }
 
 

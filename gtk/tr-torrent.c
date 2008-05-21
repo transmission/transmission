@@ -81,7 +81,7 @@ tr_torrent_dispose( GObject * o )
             if( self->priv->do_remove )
                 tr_torrentRemove( self->priv->handle );
             else
-                tr_torrentClose( self->priv->handle );
+                tr_torrentFree( self->priv->handle );
         }
 
         self->priv = NULL;

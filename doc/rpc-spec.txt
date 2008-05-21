@@ -65,7 +65,6 @@
 
    Method name         | libtransmission function
    --------------------+-------------------------------------------------
-   "torrent-close"     | tr_torrentClose
    "torrent-remove"    | tr_torrentRemove
    "torrent-start"     | tr_torrentStart
    "torrent-stop"      | tr_torrentStop

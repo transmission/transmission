@@ -327,10 +327,8 @@ MyFrame :: OnRemoveUpdate( wxUpdateUIEvent& event )
 void
 MyFrame :: OnRemove( wxCommandEvent& WXUNUSED(unused) )
 {
-    foreach( torrents_v, mySelectedTorrents, it ) {
-        tr_torrentRemoveSaved( *it );
-        tr_torrentClose( *it );
-    }
+    foreach( torrents_v, mySelectedTorrents, it )
+        tr_torrentRemove( *it );
 }
 
 /**

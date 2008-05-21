@@ -119,13 +119,7 @@ TRWindow::TRWindow() : BWindow(BRect(10, 40, 350, 110), "Transmission", B_TITLED
 	Show();
 }
 
-static void torrentclose(tr_torrent_t *torrent, void *)
-{
-	tr_torrentClose(torrent);
-}
-
 TRWindow::~TRWindow() {
-	tr_torrentIterate(engine, torrentclose, NULL);
 	const int MAX_EXIT_WAIT_SECS = 10;
 	const time_t deadline = time(0) + MAX_EXIT_WAIT_SECS;
 	while (tr_torrentCount(engine) && time(NULL) < deadline) {
@@ -353,7 +347,7 @@ void TRWindow::MessageReceived(BMessage *msg) {
 		
 		// Remove the file from the filesystem.
 		TRTransfer *item = (TRTransfer*)transfers->RemoveItem(index);
-		tr_torrentClose(item->GetTorrent());
+		tr_torrentRemove(item->GetTorrent());
 		BEntry *entry = new BEntry(item->GetCachedPath(), true);
 		entry->Remove();
 		delete entry;
