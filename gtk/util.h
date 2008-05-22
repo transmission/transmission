@@ -89,6 +89,7 @@ void gtr_uninhibit_hibernation( guint );
 
 gboolean gtr_dbus_add_torrent( const char * filename );
 
+char* gtr_get_help_url( void );
 
 #ifdef GTK_MAJOR_VERSION
 

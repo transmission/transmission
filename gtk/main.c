@@ -1233,8 +1233,9 @@ doAction ( const char * action_name, gpointer user_data )
     }
     else if (!strcmp (action_name, "help"))
     {
-        gtr_open_file( "http://www.transmissionbt.com/help/gtk/"
-                       SHORT_VERSION_STRING );
+        char * url = gtr_get_help_url( );
+        gtr_open_file( url );
+        g_free( url );
     }
     else if (!strcmp (action_name, "toggle-main-window"))
     {

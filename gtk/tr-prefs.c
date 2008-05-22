@@ -107,9 +107,13 @@ tr_prefs_init_global( void )
 static void
 response_cb( GtkDialog * dialog, int response, gpointer unused UNUSED )
 {
-    if( response == GTK_RESPONSE_HELP )
-        gtr_open_file( "http://www.transmissionbt.com/help/gtk/"
-                       SHORT_VERSION_STRING "/html/preferences.html" );
+    if( response == GTK_RESPONSE_HELP ) {
+        char * base = gtr_get_help_url( );
+        char * url = g_strdup_printf( "%s/html/preferences.html", base );
+        gtr_open_file( url );
+        g_free( url );
+        g_free( base );
+    }
 
     if( response == GTK_RESPONSE_CLOSE )
         gtk_widget_destroy( GTK_WIDGET(dialog) );
