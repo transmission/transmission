@@ -103,7 +103,7 @@ void
 tr_statsClose( tr_handle * handle )
 {
     tr_session_stats cumulative;
-    tr_getCumulativeSessionStats( handle, &cumulative );
+    tr_sessionGetCumulativeStats( handle, &cumulative );
     saveCumulativeStats( handle, &cumulative );
 
     tr_free( handle->sessionStats );
@@ -145,7 +145,7 @@ addStats( tr_session_stats       * setme,
 }
 
 void
-tr_getSessionStats( const tr_handle   * handle,
+tr_sessionGetStats( const tr_handle   * handle,
                     tr_session_stats  * setme )
 {
     const struct tr_stats_handle * stats = getStats( handle );
@@ -155,16 +155,16 @@ tr_getSessionStats( const tr_handle   * handle,
 }
 
 void
-tr_getCumulativeSessionStats( const tr_handle   * handle,
+tr_sessionGetCumulativeStats( const tr_handle   * handle,
                               tr_session_stats  * setme )
 {
     tr_session_stats current;
-    tr_getSessionStats( handle, &current );
+    tr_sessionGetStats( handle, &current );
     addStats( setme, &getStats(handle)->old, &current );
 }
 
 void
-tr_clearSessionStats( tr_handle * handle )
+tr_sessionClearStats( tr_handle * handle )
 {
     tr_session_stats zero;
     zero.uploadedBytes = 0;

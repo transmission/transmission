@@ -298,7 +298,7 @@ main( int argc, char ** argv )
                 fprintf( stderr, "\rReceived SIGHUP, but can't send a manual update now\n" );
             else {
                 fprintf( stderr, "\rReceived SIGHUP: manual update scheduled\n" );
-                tr_manualUpdate( tor );
+                tr_torrentManualUpdate( tor );
             }
         }
         

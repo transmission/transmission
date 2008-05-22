@@ -57,8 +57,8 @@ updateStats( gpointer gdata )
 
     struct stat_ui * ui = gdata;
     tr_session_stats one, all;
-    tr_getSessionStats( tr_core_handle( ui->core ), &one );
-    tr_getCumulativeSessionStats( tr_core_handle( ui->core ), &all );
+    tr_sessionGetStats( tr_core_handle( ui->core ), &one );
+    tr_sessionGetCumulativeStats( tr_core_handle( ui->core ), &all );
 
     setLabel( ui->one_up_lb, tr_strlsize( buf, one.uploadedBytes, sizeof(buf) ) );
     setLabel( ui->one_down_lb, tr_strlsize( buf, one.downloadedBytes, sizeof(buf) ) );
@@ -84,7 +84,7 @@ dialogResponse( GtkDialog * dialog, gint response, gpointer gdata )
     if( response == TR_RESPONSE_CLEAR )
     {
         tr_handle * handle = tr_core_handle( ui->core );
-        tr_clearSessionStats( handle );
+        tr_sessionClearStats( handle );
         updateStats( ui );
     }
 

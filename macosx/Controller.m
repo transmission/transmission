@@ -1453,9 +1453,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 {
                     tr_session_stats stats;
                     if (total)
-                        tr_getCumulativeSessionStats(fLib, &stats);
+                        tr_sessionGetCumulativeStats(fLib, &stats);
                     else
-                        tr_getSessionStats(fLib, &stats);
+                        tr_sessionGetStats(fLib, &stats);
                     
                     statusString = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Ratio", "status bar -> status label"),
                                     [NSString stringForRatio: stats.ratio]];
@@ -1466,9 +1466,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     
                     tr_session_stats stats;
                     if (total)
-                        tr_getCumulativeSessionStats(fLib, &stats);
+                        tr_sessionGetCumulativeStats(fLib, &stats);
                     else
-                        tr_getSessionStats(fLib, &stats);
+                        tr_sessionGetStats(fLib, &stats);
                     
                     statusString = [NSString stringWithFormat: @"%@: %@  %@: %@",
                             NSLocalizedString(@"DL", "status bar -> status label"), [NSString stringForFileSize: stats.downloadedBytes],

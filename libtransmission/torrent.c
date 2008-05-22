@@ -614,16 +614,16 @@ tr_torrentAllowsPex( const tr_torrent * tor )
 }
 
 static void
-tr_manualUpdateImpl( void * vtor )
+tr_torrentManualUpdateImpl( void * vtor )
 {
     tr_torrent * tor = vtor;
     if( tor->isRunning )
         tr_trackerReannounce( tor->tracker );
 }
 void
-tr_manualUpdate( tr_torrent * tor )
+tr_torrentManualUpdate( tr_torrent * tor )
 {
-    tr_runInEventThread( tor->handle, tr_manualUpdateImpl, tor );
+    tr_runInEventThread( tor->handle, tr_torrentManualUpdateImpl, tor );
 }
 int
 tr_torrentCanManualUpdate( const tr_torrent * tor )

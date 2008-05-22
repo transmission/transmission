@@ -120,12 +120,6 @@ TRWindow::TRWindow() : BWindow(BRect(10, 40, 350, 110), "Transmission", B_TITLED
 }
 
 TRWindow::~TRWindow() {
-	const int MAX_EXIT_WAIT_SECS = 10;
-	const time_t deadline = time(0) + MAX_EXIT_WAIT_SECS;
-	while (tr_torrentCount(engine) && time(NULL) < deadline) {
-		snooze(100000);
-	}
-	/* XXX there's no way to make sure the torrent threads are running so this might crash */
 	tr_sessionClose(engine);
 	stop_watching(this);
 	delete quitter;

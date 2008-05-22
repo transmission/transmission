@@ -80,7 +80,7 @@ getTorrents( tr_handle * handle, tr_benc * args, int * setmeCount )
     else /* all of them */
     {
         tr_torrent * tor = NULL;
-        const int n = tr_torrentCount( handle );
+        const int n = tr_sessionCountTorrents( handle );
         torrents = tr_new0( tr_torrent*, n );
         while(( tor = tr_torrentNext( handle, tor )))
             torrents[torrentCount++] = tor;

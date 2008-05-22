@@ -163,8 +163,8 @@ tr_handle * fLib;
 - (void) updateStats
 {
     tr_session_stats statsAll, statsSession;
-    tr_getCumulativeSessionStats(fLib, &statsAll);
-    tr_getSessionStats(fLib, &statsSession);
+    tr_sessionGetCumulativeStats(fLib, &statsAll);
+    tr_sessionGetStats(fLib, &statsSession);
     
     [fUploadedField setStringValue: [NSString stringForFileSize: statsSession.uploadedBytes]];
     [fUploadedField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes", "stats -> bytes"),
@@ -202,7 +202,7 @@ tr_handle * fLib;
 
 - (void) performResetStats
 {
-    tr_clearSessionStats(fLib);
+    tr_sessionClearStats(fLib);
     [self updateStats];
 }
 

@@ -334,7 +334,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (void) manualAnnounce
 {
-    tr_manualUpdate(fHandle);
+    tr_torrentManualUpdate(fHandle);
 }
 
 - (BOOL) canManualAnnounce
@@ -1630,7 +1630,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fWaitToStart = waitToStart && [waitToStart boolValue];
     fResumeOnWake = NO;
     
-    fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(lib) - 1;
+    fOrderValue = orderValue ? [orderValue intValue] : tr_sessionCountTorrents(lib) - 1;
     fGroupValue = groupValue ? [groupValue intValue] : -1;
     
     [self createFileList];

@@ -455,7 +455,7 @@ void
 MyFrame :: OnPulse(wxTimerEvent& WXUNUSED(event) )
 {
     if( myExitTime ) {
-        if ( !tr_torrentCount(handle) ||  myExitTime<time(0) ) {
+        if ( !tr_sessionCountTorrents(handle) ||  myExitTime<time(0) ) {
             delete myTrayIcon;
             myTrayIcon = 0;
             Destroy( );

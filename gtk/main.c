@@ -1022,7 +1022,7 @@ updateTrackerForeach (GtkTreeModel * model,
 {
     TrTorrent * tor = NULL;
     gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
-    tr_manualUpdate( tr_torrent_handle( tor ) );
+    tr_torrentManualUpdate( tr_torrent_handle( tor ) );
     g_object_unref( G_OBJECT( tor ) );
 }
 

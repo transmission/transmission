@@ -614,11 +614,11 @@ updateStats( PrivateData * p )
     /* update the stats */
     pch = pref_string_get( PREF_KEY_STATUSBAR_STATS );
     if( !strcmp( pch, "session-ratio" ) ) {
-        tr_getSessionStats( handle, &stats );
+        tr_sessionGetStats( handle, &stats );
         tr_strlratio( ratio, stats.ratio, sizeof( ratio ) );
         g_snprintf( buf, sizeof(buf), _("Ratio: %s"), ratio );
     } else if( !strcmp( pch, "session-transfer" ) ) {
-        tr_getSessionStats( handle, &stats );
+        tr_sessionGetStats( handle, &stats );
         tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
         tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
         /* Translators: do not translate the "size|" disambiguation prefix.
@@ -626,7 +626,7 @@ updateStats( PrivateData * p )
            %2$s is the size of the data we've uploaded */
         g_snprintf( buf, sizeof( buf ), Q_( "size|Down: %1$s, Up: %2$s" ), down, up );
     } else if( !strcmp( pch, "total-transfer" ) ) { 
-        tr_getCumulativeSessionStats( handle, &stats );
+        tr_sessionGetCumulativeStats( handle, &stats );
         tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
         tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
         /* Translators: do not translate the "size|" disambiguation prefix.
@@ -634,7 +634,7 @@ updateStats( PrivateData * p )
            %2$s is the size of the data we've uploaded */
         g_snprintf( buf, sizeof( buf ), Q_( "size|Down: %1$s, Up: %2$s" ), down, up );
     } else { /* default is total-ratio */
-        tr_getCumulativeSessionStats( handle, &stats );
+        tr_sessionGetCumulativeStats( handle, &stats );
         tr_strlratio( ratio, stats.ratio, sizeof( ratio ) );
         g_snprintf( buf, sizeof(buf), _("Ratio: %s"), ratio );
     }
