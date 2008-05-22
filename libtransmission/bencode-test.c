@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include "transmission.h"
 #include "bencode.h"
@@ -150,6 +151,10 @@ testString( const char * str, int isGood )
         check( err );
     } else {
         check( !err );
+#if 0
+        fprintf( stderr, "in: [%s]\n", str );
+        fprintf( stderr, "out:\n%s", tr_bencSaveAsJSON(&val,NULL) );
+#endif
         check( end == (const uint8_t*)str + len );
         saved = tr_bencSave( &val, &savedLen );
         check( !strcmp( saved, str ) );
@@ -219,6 +224,8 @@ testParse( void )
         return err;
     if(( err = testString( "d4:spaml1:a1:bee", TRUE )))
         return err;
+    if(( err = testString( "d5:greenli1ei2ei3ee4:spamd1:ai123e3:keyi214eee", TRUE )))
+        return err;
     if(( err = testString( "d9:publisher3:bob17:publisher-webpage15:www.example.com18:publisher.location4:homee", TRUE )))
         return err;
     if(( err = testString( "d8:completei1e8:intervali1800e12:min intervali1800e5:peers0:e", TRUE )))
@@ -271,6 +278,16 @@ testParse( void )
     return 0;
 }
 
+static void
+stripWhitespace( char * in )
+{
+    char * out;
+    for( out=in; *in; ++in )
+        if( !isspace( *in ) )
+            *out++ = *in;
+    *out = '\0';
+}
+
 static int
 testJSONSnippet( const char * benc_str, const char * expected )
 {
@@ -278,9 +295,11 @@ testJSONSnippet( const char * benc_str, const char * expected )
     char * serialized;
     tr_bencLoad( benc_str, strlen( benc_str ), &top, NULL );
     serialized = tr_bencSaveAsJSON( &top, NULL );
+    stripWhitespace( serialized );
 #if 0
-fprintf( stderr, " expected: [%s]\n", expected );
-fprintf( stderr, "      got: [%s]\n", serialized );
+fprintf( stderr, "benc: %s\n", benc_str );
+fprintf( stderr, "json: %s\n", serialized );
+fprintf( stderr, "want: %s\n", expected );
 #endif
     check( !strcmp( serialized, expected ) );
     tr_free( serialized );
@@ -301,22 +320,22 @@ testJSON( void )
         return val;
 
     benc_str = "d5:helloi1e5:worldi2ee";
-    expected = "{ \"hello\": 1, \"world\": 2 }"; 
+    expected = "{\"hello\":1,\"world\":2}"; 
     if(( val = testJSONSnippet( benc_str, expected )))
         return val;
 
     benc_str = "d5:helloi1e5:worldi2e3:fooli1ei2ei3ee";
-    expected = "{ \"foo\": [ 1, 2, 3 ], \"hello\": 1, \"world\": 2 }";
+    expected = "{\"foo\":[1,2,3],\"hello\":1,\"world\":2}";
     if(( val = testJSONSnippet( benc_str, expected )))
         return val;
 
     benc_str = "d5:helloi1e5:worldi2e3:fooli1ei2ei3ed1:ai0eee";
-    expected = "{ \"foo\": [ 1, 2, 3, { \"a\": 0 } ], \"hello\": 1, \"world\": 2 }";
+    expected = "{\"foo\":[1,2,3,{\"a\":0}],\"hello\":1,\"world\":2}";
     if(( val = testJSONSnippet( benc_str, expected )))
         return val;
 
-    benc_str = "d4:argsd6:statuslee6:result7:successe";
-    expected = "{ \"args\": { \"status\": [  ] }, \"result\": \"success\" }";
+    benc_str = "d4:argsd6:statusle7:status2lee6:result7:successe";
+    expected = "{\"args\":{\"status\":[],\"status2\":[]},\"result\":\"success\"}";
     if(( val = testJSONSnippet( benc_str, expected )))
         return val;
 
