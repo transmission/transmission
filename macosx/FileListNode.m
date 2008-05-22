@@ -37,6 +37,7 @@
     if ((self = [self initWithFolder: YES name: name path: path]))
     {
         fChildren = [[NSMutableArray alloc] init];
+        fSize = 0;
     }
     
     return self;
@@ -55,16 +56,22 @@
 
 - (void) insertChild: (FileListNode *) child
 {
+    NSAssert(fIsFolder, @"method can only be invoked on files");
+    
     [fChildren addObject: child];
 }
 
-- (void) insertIndex: (NSUInteger) index
+- (void) insertIndex: (NSUInteger) index withSize: (uint64_t) size
 {
+    NSAssert(fIsFolder, @"method can only be invoked on files");
+    
     [fIndexes addIndex: index];
+    fSize += size;
 }
 
 - (id) copyWithZone: (NSZone *) zone
 {
+    //this object is essentially immutable after initial setup
     return [self retain];
 }
 
@@ -103,16 +110,12 @@
 
 - (uint64_t) size
 {
-    NSAssert(!fIsFolder, @"method can only be invoked on files currently");
-    
     return fSize;
 }
 
 - (NSImage *) icon
 {
-    NSAssert(!fIsFolder, @"method can only be invoked on files currently");
-    
-    if (!fIcon)
+    if (!fIsFolder && !fIcon)
     {
         fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: [fName pathExtension]] retain];
         [fIcon setFlipped: YES];
@@ -122,8 +125,6 @@
 
 - (NSArray *) children
 {
-    NSAssert(fIsFolder, @"method can only be invoked on folders");
-    
     return fChildren;
 }
 

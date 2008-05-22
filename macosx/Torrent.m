@@ -1664,11 +1664,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             
             if ([pathComponents count] > 0)
             {
-                //determine if node already exists
+                //determine if folder node already exists
                 NSEnumerator * enumerator = [fileList objectEnumerator];
                 FileListNode * node;
                 while ((node = [enumerator nextObject]))
-                    if ([[node name] isEqualToString: name])
+                    if ([[node name] isEqualToString: name] && [node isFolder])
                         break;
                 
                 if (!node)
@@ -1678,7 +1678,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                     [node release];
                 }
                 
-                [node insertIndex: i];
+                [node insertIndex: i withSize: file->length];
                 [self insertPath: pathComponents forParent: node fileSize: file->length index: i];
             }
             else
@@ -1729,7 +1729,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     if (isFolder)
     {
-        [node insertIndex: index];
+        [node insertIndex: index withSize: size];
         
         [components removeObjectAtIndex: 0];
         [self insertPath: components forParent: node fileSize: size index: index];
