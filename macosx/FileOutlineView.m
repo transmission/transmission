@@ -26,6 +26,7 @@
 #import "FileNameCell.h"
 #import "FilePriorityCell.h"
 #import "Torrent.h"
+#import "FileListNode.h"
 #import "QuickLookController.h"
 #import "CTGradient.h"
 
@@ -179,7 +180,7 @@
     if (![self isRowSelected: row])
     {
         NSDictionary * item = [self itemAtRow: row]; 
-        NSIndexSet * indexes = [item objectForKey: @"Indexes"];
+        NSIndexSet * indexes = [(FileListNode *)item indexes];
         
         if ([fTorrent checkForFiles: indexes] != NSOffState)
         {

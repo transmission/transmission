@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  * 
- * Copyright (c) 2007-2008 Transmission authors and contributors
+ * Copyright (c) 2008 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -49,9 +49,8 @@ QuickLookController * fQuickLookInstance = nil;
     return fQuickLookInstance;
 }
 
-// This is the QuickLook delegate method
-// It should return the frame for the item represented by the URL
-// If an empty frame is returned then the panel will fade in/out instead
+//QuickLook delegate method
+//returns the frame for the item represented by the URL, or an empty frame to fade in/out instead
 - (NSRect) previewPanel: (NSPanel *) panel frameForURL: (NSURL *) url
 {
     if ([fInfoController shouldQuickLookFileView])
@@ -65,8 +64,7 @@ QuickLookController * fQuickLookInstance = nil;
     if (!fQuickLookAvailable)
         return NO;
     
-    NSArray * urlArray = nil;
-    
+    NSArray * urlArray;
     if ([fInfoController shouldQuickLookFileView])
         urlArray = [fInfoController quickLookURLs];
     else
@@ -74,7 +72,7 @@ QuickLookController * fQuickLookInstance = nil;
     
     if (urlArray && [urlArray count] > 0)
     {
-        [[QLPreviewPanel sharedPreviewPanel] setURLs: urlArray currentIndex: 0 preservingDisplayState: YES];
+        [[QLPreviewPanel sharedPreviewPanel] setURLs: urlArray];
         return YES;
     }
     else
@@ -83,6 +81,9 @@ QuickLookController * fQuickLookInstance = nil;
 
 - (BOOL) canQuickLook
 {
+    if (!fQuickLookAvailable)
+        return NO;
+    
     if ([fInfoController shouldQuickLookFileView])
         return [fInfoController canQuickLook];
     else

@@ -24,6 +24,7 @@
 
 #import "Torrent.h"
 #import "GroupsController.h"
+#import "FileListNode.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
@@ -43,8 +44,7 @@
 - (void) updateDownloadFolder;
 
 - (void) createFileList;
-- (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings previousPath: (NSString *) previousPath
-            fileSize: (uint64_t) size index: (int) index;
+- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size index: (int) index;
 
 - (void) completenessChange: (NSNumber *) status;
 
@@ -1648,78 +1648,90 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (void) createFileList
 {
-    int count = [self fileCount], i;
-    NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count];
-    
-    for (i = 0; i < count; i++)
+    if ([self folder])
     {
-        tr_file * file = &fInfo->files[i];
+        int count = [self fileCount], i;
+        NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count];
         
-        NSMutableArray * pathComponents = [[[NSString stringWithUTF8String: file->name] pathComponents] mutableCopy];
-        NSString * path;
-        if ([self folder])
+        for (i = 0; i < count; i++)
         {
-            path = [pathComponents objectAtIndex: 0];
-            [pathComponents removeObjectAtIndex: 0];
+            tr_file * file = &fInfo->files[i];
+            
+            NSMutableArray * pathComponents = [[[NSString stringWithUTF8String: file->name] pathComponents] mutableCopy];
+            NSString * path = [pathComponents objectAtIndex: 0];
+            NSString * name = [pathComponents objectAtIndex: 1];
+            [pathComponents removeObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, 2)]];
+            
+            if ([pathComponents count] > 0)
+            {
+                //determine if node already exists
+                NSEnumerator * enumerator = [fileList objectEnumerator];
+                FileListNode * node;
+                while ((node = [enumerator nextObject]))
+                    if ([[node name] isEqualToString: name])
+                        break;
+                
+                if (!node)
+                {
+                    node = [[FileListNode alloc] initWithFolderName: name path: path];
+                    [fileList addObject: node];
+                    [node release];
+                }
+                
+                [self insertPath: pathComponents forParent: node fileSize: file->length index: i];
+            }
+            else
+            {
+                FileListNode * node = [[FileListNode alloc] initWithFileName: name path: path size: file->length index: i];
+                [fileList addObject: node];
+                [node release];
+            }
+            
+            [pathComponents release];
         }
-        else
-            path = @"";
         
-        [self insertPath: pathComponents forSiblings: fileList previousPath: path fileSize: file->length index: i];
-        [pathComponents release];
+        fFileList = [[NSArray alloc] initWithArray: fileList];
+        [fileList release];
     }
-    
-    fFileList = [[NSArray alloc] initWithArray: fileList];
-    [fileList release];
+    else
+    {
+        FileListNode * node = [[FileListNode alloc] initWithFileName: [self name] path: @"" size: [self size] index: 0];
+        fFileList = [[NSArray arrayWithObject: node] retain];
+        [node release];
+    }
 }
 
-- (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings previousPath: (NSString *) previousPath
-            fileSize: (uint64_t) size index: (int) index
+- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size index: (int) index
 {
     NSString * name = [components objectAtIndex: 0];
     BOOL isFolder = [components count] > 1;
     
-    NSMutableDictionary * dict = nil;
+    FileListNode * node = nil;
     if (isFolder)
     {
-        NSEnumerator * enumerator = [siblings objectEnumerator];
-        while ((dict = [enumerator nextObject]))
-            if ([[dict objectForKey: @"Name"] isEqualToString: name] && [[dict objectForKey: @"IsFolder"] boolValue])
+        NSEnumerator * enumerator = [[parent children] objectEnumerator];
+        while ((node = [enumerator nextObject]))
+            if ([[node name] isEqualToString: name] && [node isFolder])
                 break;
     }
     
-    NSString * currentPath = [previousPath stringByAppendingPathComponent: name];
-    
-    //create new folder or item if it doesn't already exist
-    if (!dict)
+    //create new folder or file if it doesn't already exist
+    if (!node)
     {
-        dict = [NSMutableDictionary dictionaryWithObjectsAndKeys: name, @"Name",
-                [NSNumber numberWithBool: isFolder], @"IsFolder", currentPath, @"Path", nil];
-        [siblings addObject: dict];
-        
         if (isFolder)
-        {
-            [dict setObject: [NSMutableArray array] forKey: @"Children"];
-            [dict setObject: [NSMutableIndexSet indexSetWithIndex: index] forKey: @"Indexes"];
-        }
+            node = [[FileListNode alloc] initWithFolderName: name path: [parent fullPath]];
         else
-        {
-            [dict setObject: [NSIndexSet indexSetWithIndex: index] forKey: @"Indexes"];
-            [dict setObject: [NSNumber numberWithUnsignedLongLong: size] forKey: @"Size"];
-            
-            NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]];
-            [icon setFlipped: YES];
-            [dict setObject: icon forKey: @"Icon"];
-        }
+            node = [[FileListNode alloc] initWithFileName: name path: [parent fullPath] size: size index: index];
+        
+        [parent insertChild: node];
     }
-    else
-        [[dict objectForKey: @"Indexes"] addIndex: index];
     
     if (isFolder)
     {
+        [node insertIndex: index];
+        
         [components removeObjectAtIndex: 0];
-        [self insertPath: components forSiblings: [dict objectForKey: @"Children"] previousPath: currentPath fileSize: size
-                index: index];
+        [self insertPath: components forParent: node fileSize: size index: index];
     }
 }
 

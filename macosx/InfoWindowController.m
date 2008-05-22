@@ -25,6 +25,7 @@
 #import "InfoWindowController.h"
 #import "InfoTabButtonCell.h"
 #import "FileOutlineView.h"
+#import "FileListNode.h"
 #import "QuickLookController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
@@ -907,9 +908,9 @@ typedef enum
     int i;
     for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
-        NSDictionary * item = [fileOutlineView itemAtRow: i];
-        if ([[item objectForKey: @"IsFolder"] boolValue] || [torrent fileProgress: [[item objectForKey: @"Indexes"] firstIndex]] == 1.0)
-            [urlArray addObject: [NSURL fileURLWithPath: [folder stringByAppendingPathComponent: [item objectForKey: @"Path"]]]];
+        FileListNode * item = [fileOutlineView itemAtRow: i];
+        if ([item isFolder] || [torrent fileProgress: [[item indexes] firstIndex]] == 1.0)
+            [urlArray addObject: [NSURL fileURLWithPath: [folder stringByAppendingPathComponent: [item fullPath]]]];
     }
     
     return urlArray;
@@ -924,8 +925,8 @@ typedef enum
     int i;
     for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
-        NSDictionary * item = [fileOutlineView itemAtRow: i];
-        if ([[item objectForKey: @"IsFolder"] boolValue] || [torrent fileProgress: [[item objectForKey: @"Indexes"] firstIndex]] == 1.0)
+        FileListNode * item = [fileOutlineView itemAtRow: i];
+        if ([item isFolder] || [torrent fileProgress: [[item indexes] firstIndex]] == 1.0)
             return YES;
     }
     
@@ -943,8 +944,8 @@ typedef enum
     int row;
     for (row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
     {
-        id rowItem = [fileOutlineView itemAtRow: row];
-        if ([[folder stringByAppendingPathComponent: [rowItem objectForKey: @"Path"]] isEqualToString: fullPath])
+        FileListNode * rowItem = [fileOutlineView itemAtRow: row];
+        if ([[folder stringByAppendingPathComponent: [rowItem fullPath]] isEqualToString: fullPath])
         {
             NSRect frame = [fileOutlineView iconRectForRow: row];
             frame.origin = [fileOutlineView convertPoint: frame.origin toView: nil];

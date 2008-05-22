@@ -1,6 +1,6 @@
 /******************************************************************************
  * $Id$
- * 
+ *
  * Copyright (c) 2008 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -24,30 +24,33 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class Controller;
-@class InfoWindowController;
 
-@interface QuickLookController : NSObject
+@interface FileListNode : NSObject <NSCopying>
 {
-    BOOL fQuickLookAvailable;
+    NSString * fName, * fPath;
+    BOOL fIsFolder;
+    NSMutableIndexSet * fIndexes;
     
-    Controller * fMainController;
-    InfoWindowController * fInfoController;
+    uint64_t fSize;
+    NSImage * fIcon;
+    
+    NSMutableArray * fChildren;
 }
 
-//call once at startup
-+ (void) quickLookControllerInitializeWithController: (Controller *) controller infoController: (InfoWindowController *) infoController;
+- (id) initWithFolderName: (NSString *) name path: (NSString *) path;
+- (id) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (int) index;
 
-//assumes quickLookControllerInitializeWithController:infoController: has already been called!
-+ (QuickLookController *) quickLook;
+- (void) insertChild: (FileListNode *) child;
+- (void) insertIndex: (NSUInteger) index;
 
-- (BOOL) quickLookSelectItems;
-- (BOOL) canQuickLook;
+- (BOOL) isFolder;
+- (NSString *) name;
+- (NSString *) fullPath;
+- (NSIndexSet *) indexes;
 
-- (void) toggleQuickLook;
-- (void) updateQuickLook;
+- (uint64_t) size;
+- (NSImage *) icon;
 
-- (void) pressLeft;
-- (void) pressRight;
+- (NSArray *) children;
 
 @end

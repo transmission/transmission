@@ -24,6 +24,7 @@
 
 #import "FilePriorityCell.h"
 #import "FileOutlineView.h"
+#import "FileListNode.h"
 #import "Torrent.h"
 
 @implementation FilePriorityCell
@@ -73,7 +74,7 @@
     
     FileOutlineView * controlView = (FileOutlineView *)[self controlView];
     Torrent * torrent = [controlView torrent];
-    [torrent setFilePriority: priority forIndexes: [[self representedObject] objectForKey: @"Indexes"]];
+    [torrent setFilePriority: priority forIndexes: [(FileListNode *)[self representedObject] indexes]];
     [controlView reloadData];
 }
 
@@ -101,8 +102,8 @@
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     Torrent * torrent = [(FileOutlineView *)controlView torrent];
-    NSDictionary * dict = [self representedObject];
-    NSSet * priorities = [torrent filePrioritiesForIndexes: [dict objectForKey: @"Indexes"]];
+    FileListNode * node = [self representedObject];
+    NSSet * priorities = [torrent filePrioritiesForIndexes: [node indexes]];
     
     int count = [priorities count];
     if (fHoverRow && count > 0)
