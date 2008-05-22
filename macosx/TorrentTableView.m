@@ -25,6 +25,7 @@
 #import "TorrentTableView.h"
 #import "TorrentCell.h"
 #import "Torrent.h"
+#import "FileListNode.h"
 #import "QuickLookController.h"
 #import "NSApplicationAdditions.h"
 
@@ -692,8 +693,8 @@
             return;
         
         NSMenu * supermenu = [menu supermenu];
-        [self createFileMenu: menu forFiles: [[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]]
-                                                    representedObject] objectForKey: @"Children"]];
+        [self createFileMenu: menu forFiles: [(FileListNode *)[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]]
+                                                representedObject] children]];
     }
 }
 
@@ -762,7 +763,7 @@
 
 - (void) checkFile: (id) sender
 {
-    NSIndexSet * indexSet = [[sender representedObject] objectForKey: @"Indexes"];
+    NSIndexSet * indexSet = [(FileListNode *)[sender representedObject] indexes];
     [fMenuTorrent setFileCheckState: [sender state] != NSOnState ? NSOnState : NSOffState forIndexes: indexSet];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
@@ -855,15 +856,15 @@
 - (void) createFileMenu: (NSMenu *) menu forFiles: (NSArray *) files
 {
     NSEnumerator * enumerator = [files objectEnumerator];
-    NSDictionary * dict;
-    while ((dict = [enumerator nextObject]))
+    FileListNode * node;
+    while ((node = [enumerator nextObject]))
     {
-        NSString * name = [dict objectForKey: @"Name"];
+        NSString * name = [node name];
         
         NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: name action: @selector(checkFile:) keyEquivalent: @""];
         
         NSImage * icon;
-        if (![[dict objectForKey: @"IsFolder"] boolValue])
+        if (![node isFolder])
             icon = [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]];
         else
         {
@@ -876,13 +877,13 @@
             icon = [[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')];
         }
         
-        [item setRepresentedObject: dict];
+        [item setRepresentedObject: node];
         
         [icon setScalesWhenResized: YES];
         [icon setSize: NSMakeSize(16.0, 16.0)];
         [item setImage: icon];
         
-        NSIndexSet * indexSet = [dict objectForKey: @"Indexes"];
+        NSIndexSet * indexSet = [node indexes];
         [item setState: [fMenuTorrent checkForFiles: indexSet]];
         [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
         

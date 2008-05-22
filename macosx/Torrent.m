@@ -1678,6 +1678,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                     [node release];
                 }
                 
+                [node insertIndex: i];
                 [self insertPath: pathComponents forParent: node fileSize: file->length index: i];
             }
             else

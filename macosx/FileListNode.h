@@ -24,7 +24,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-
 @interface FileListNode : NSObject <NSCopying>
 {
     NSString * fName, * fPath;
