@@ -1078,6 +1078,17 @@ tr_base64_decode( const void * input, int length, int * setme_len )
     bmem = BIO_new_mem_buf( (unsigned char*)input, length );
     bmem = BIO_push( b64, bmem );
     retlen = BIO_read( bmem, ret, length );
+    if( !retlen )
+    {
+        /* try again, but with the BIO_FLAGS_BASE64_NO_NL flag */
+        BIO_free_all( bmem );
+        b64 = BIO_new( BIO_f_base64( ) );
+        BIO_set_flags( b64, BIO_FLAGS_BASE64_NO_NL );
+        bmem = BIO_new_mem_buf( (unsigned char*)input, length );
+        bmem = BIO_push( b64, bmem );
+        retlen = BIO_read( bmem, ret, length );
+    }
+
     if( setme_len )
         *setme_len = retlen;
 
