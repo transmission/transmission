@@ -196,14 +196,14 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
     }
 
     switch( nat->state ) {
-        case TR_NATPMP_IDLE:        ret = nat->isMapped ? TR_NAT_TRAVERSAL_MAPPED : TR_NAT_TRAVERSAL_UNMAPPED; break;
-        case TR_NATPMP_DISCOVER:    ret = TR_NAT_TRAVERSAL_UNMAPPED; break;
+        case TR_NATPMP_IDLE:        ret = nat->isMapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED; break;
+        case TR_NATPMP_DISCOVER:    ret = TR_PORT_UNMAPPED; break;
         case TR_NATPMP_RECV_PUB:
         case TR_NATPMP_SEND_MAP:
-        case TR_NATPMP_RECV_MAP:    ret = TR_NAT_TRAVERSAL_MAPPING; break;
+        case TR_NATPMP_RECV_MAP:    ret = TR_PORT_MAPPING; break;
         case TR_NATPMP_SEND_UNMAP:
-        case TR_NATPMP_RECV_UNMAP:  ret = TR_NAT_TRAVERSAL_UNMAPPING; break;
-        default:                    ret = TR_NAT_TRAVERSAL_ERROR; break;
+        case TR_NATPMP_RECV_UNMAP:  ret = TR_PORT_UNMAPPING; break;
+        default:                    ret = TR_PORT_ERROR; break;
     }
     return ret;
 }

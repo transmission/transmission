@@ -86,9 +86,6 @@ struct tr_handle
     tr_rpc_func                  rpc_func;
     void                       * rpc_func_user_data;
 
-    tr_handle_status             stats[2];
-    int                          statCur;
-
     struct tr_stats_handle     * sessionStats;
     struct tr_tracker_handle   * tracker;
 

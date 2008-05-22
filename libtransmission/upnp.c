@@ -161,12 +161,12 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
 
     switch( handle->state )
     {
-        case TR_UPNP_DISCOVER: ret = TR_NAT_TRAVERSAL_UNMAPPED; break;
-        case TR_UPNP_MAP:      ret = TR_NAT_TRAVERSAL_MAPPING; break;
-        case TR_UPNP_UNMAP:    ret = TR_NAT_TRAVERSAL_UNMAPPING; break;
-        case TR_UPNP_IDLE:     ret = handle->isMapped ? TR_NAT_TRAVERSAL_MAPPED
-                                                      : TR_NAT_TRAVERSAL_UNMAPPED; break;
-        default:               ret = TR_NAT_TRAVERSAL_ERROR; break;
+        case TR_UPNP_DISCOVER: ret = TR_PORT_UNMAPPED; break;
+        case TR_UPNP_MAP:      ret = TR_PORT_MAPPING; break;
+        case TR_UPNP_UNMAP:    ret = TR_PORT_UNMAPPING; break;
+        case TR_UPNP_IDLE:     ret = handle->isMapped ? TR_PORT_MAPPED
+                                                      : TR_PORT_UNMAPPED; break;
+        default:               ret = TR_PORT_ERROR; break;
     }
 
     return ret;

@@ -45,8 +45,8 @@ struct tr_shared
     unsigned int isEnabled      : 1;
     unsigned int isShuttingDown : 1;
 
-    tr_nat_traversal_status natpmpStatus;
-    tr_nat_traversal_status upnpStatus;
+    tr_port_forwarding natpmpStatus;
+    tr_port_forwarding upnpStatus;
 
     int bindPort;
     int bindSocket;
@@ -69,14 +69,14 @@ getNatStateStr( int state )
     switch( state )
     {
         /* we're in the process of trying to set up port forwarding */
-        case TR_NAT_TRAVERSAL_MAPPING:   return _( "Starting" );
+        case TR_PORT_MAPPING:   return _( "Starting" );
         /* we've successfully forwarded the port */
-        case TR_NAT_TRAVERSAL_MAPPED:    return _( "Forwarded" );
+        case TR_PORT_MAPPED:    return _( "Forwarded" );
         /* we're cancelling the port forwarding */
-        case TR_NAT_TRAVERSAL_UNMAPPING: return _( "Stopping" );
+        case TR_PORT_UNMAPPING: return _( "Stopping" );
         /* the port isn't forwarded */
-        case TR_NAT_TRAVERSAL_UNMAPPED:  return _( "Not forwarded" );
-        case TR_NAT_TRAVERSAL_ERROR:     return "???";
+        case TR_PORT_UNMAPPED:  return _( "Not forwarded" );
+        case TR_PORT_ERROR:     return "???";
     }
 
     return "notfound";
@@ -190,8 +190,8 @@ tr_sharedInit( tr_handle * h, int isEnabled, int publicPort )
     s->upnp         = tr_upnpInit();
     s->pulseTimer   = tr_timerNew( h, sharedPulse, s, 1000 );
     s->isEnabled    = isEnabled ? 1 : 0;
-    s->upnpStatus   = TR_NAT_TRAVERSAL_UNMAPPED;
-    s->natpmpStatus = TR_NAT_TRAVERSAL_UNMAPPED;
+    s->upnpStatus   = TR_PORT_UNMAPPED;
+    s->natpmpStatus = TR_PORT_UNMAPPED;
 
     return s;
 }

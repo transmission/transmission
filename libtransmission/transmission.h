@@ -199,10 +199,14 @@ void tr_getCumulativeSessionStats( const tr_handle   * handle,
 
 void tr_clearSessionStats( tr_handle * handle );
 
-
 /**
-***
-**/
+ * Set whether or not torrents are allowed to do peer exchanges.
+ * PEX is always disabled in private torrents regardless of this.
+ * In public torrents, PEX is enabled by default.
+ */
+void tr_sessionSetPexEnabled( tr_handle *, int isEnabled );
+
+int tr_sessionIsPexEnabled( const tr_handle * );
 
 typedef enum
 {
@@ -224,6 +228,37 @@ void tr_sessionSetEncryption( tr_handle * handle, tr_encryption_mode mode );
  **********************************************************************/
 const char * tr_sessionGetConfigDir( const tr_handle * );
 
+
+/***********************************************************************
+** Incoming Peer Connections Port
+*/
+
+void tr_sessionSetPortForwardingEnabled( tr_handle *, int enable );
+
+int tr_sessionIsPortForwardingEnabled( const tr_handle * );
+
+void tr_sessionSetPublicPort( tr_handle *, int );
+
+int tr_sessionGetPublicPort( const tr_handle * );
+
+typedef enum
+{
+    TR_PORT_ERROR,
+    TR_PORT_UNMAPPED,
+    TR_PORT_UNMAPPING,
+    TR_PORT_MAPPING,
+    TR_PORT_MAPPED
+}
+tr_port_forwarding;
+
+tr_port_forwarding tr_sessionGetPortForwarding( const tr_handle * );
+
+
+//ccccccc
+
+/**
+***
+**/
 
 
 
@@ -271,37 +306,6 @@ void tr_setMessageQueuing( int enable );
 
 tr_msg_list * tr_getQueuedMessages( void );
 void tr_freeMessageList( tr_msg_list * freeme );
-
-/***********************************************************************
-** Incoming Peer Connections Port
-*/
-
-void tr_sessionSetPortForwardingEnabled( tr_handle *, int enable );
-
-int tr_sessionIsPortForwardingEnabled( const tr_handle * );
-
-void tr_sessionSetPublicPort( tr_handle *, int );
-
-int tr_sessionGetPublicPort( const tr_handle * );
-
-typedef enum
-{
-    TR_NAT_TRAVERSAL_ERROR,
-    TR_NAT_TRAVERSAL_UNMAPPED,
-    TR_NAT_TRAVERSAL_UNMAPPING,
-    TR_NAT_TRAVERSAL_MAPPING,
-    TR_NAT_TRAVERSAL_MAPPED
-}
-tr_nat_traversal_status;
-
-typedef struct tr_handle_status
-{
-    tr_nat_traversal_status natTraversalStatus;
-    int publicPort;
-}
-tr_handle_status;
-
-const tr_handle_status * tr_handleStatus( tr_handle * );
 
 
 /***********************************************************************
@@ -598,15 +602,6 @@ tr_torrent ** tr_sessionLoadTorrents ( tr_handle  * h,
                                        int        * setmeCount );
 
 
-
-/**
- * Set whether or not torrents are allowed to do peer exchanges.
- * PEX is always disabled in private torrents regardless of this.
- * In public torrents, PEX is enabled by default.
- */
-void tr_sessionSetPexEnabled( tr_handle *, int isEnabled );
-
-int tr_sessionIsPexEnabled( const tr_handle * );
 
 const tr_info * tr_torrentInfo( const tr_torrent * );
 

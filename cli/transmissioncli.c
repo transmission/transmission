@@ -359,16 +359,12 @@ main( int argc, char ** argv )
     }
     fprintf( stderr, "\n" );
 
-    /* Try for 5 seconds to delete any port mappings for nat traversal */
+    /* try for 5 seconds to delete any port mappings for nat traversal */
     tr_sessionSetPortForwardingEnabled( h, 0 );
-    for( i = 0; i < 10; i++ )
-    {
-        const tr_handle_status * hstat = tr_handleStatus( h );
-        if( TR_NAT_TRAVERSAL_UNMAPPED == hstat->natTraversalStatus )
-        {
-            /* Port mappings were deleted */
+    for( i=0; i<10; ++i ) {
+        const tr_port_forwarding f = tr_sessionGetPortForwarding( h );
+        if( f == TR_PORT_UNMAPPED )
             break;
-        }
         tr_wait( 500 );
     }
     

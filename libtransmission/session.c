@@ -315,22 +315,10 @@ tr_sessionGetPublicPort( const tr_handle * h )
     return tr_sharedGetPublicPort( h->shared );
 }
 
-const tr_handle_status *
-tr_handleStatus( tr_handle * h )
+tr_port_forwarding
+tr_sessionGetPortForwarding( const tr_handle * h )
 {
-    tr_handle_status * s;
-
-    h->statCur = ( h->statCur + 1 ) % 2;
-    s = &h->stats[h->statCur];
-
-    tr_globalLock( h );
-
-    s->natTraversalStatus = tr_sharedTraversalStatus( h->shared );
-    s->publicPort = tr_sharedGetPublicPort( h->shared );
-
-    tr_globalUnlock( h );
-
-    return s;
+    return tr_sharedTraversalStatus( h->shared );
 }
 
 /***

@@ -264,11 +264,13 @@
 
 - (void) updatePortStatus
 {
-    const tr_handle_status * stat = tr_handleStatus(fHandle);
-    if (fNatStatus != stat->natTraversalStatus || fPublicPort != stat->publicPort)
+    const tr_port_forwarding fwd = tr_sessionGetPortForwarding(fHandle);
+    const int port = tr_sessionGetPublicPort(fHandle);
+
+    if (fNatStatus != fwd || fPublicPort != port )
     {
-        fNatStatus = stat->natTraversalStatus;
-        fPublicPort = stat->publicPort;
+        fNatStatus = fwd;
+        fPublicPort = port;
         
         [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status", "Preferences -> Network -> port status")
             stringByAppendingEllipsis]];
