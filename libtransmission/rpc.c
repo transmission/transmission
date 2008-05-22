@@ -301,7 +301,8 @@ torrentList( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
     for( i=0; i<torrentCount; ++i ) {
         tr_torrent * tor = torrents[i];
         const tr_stat * st = tr_torrentStat( tor );
-        tr_benc * d = tr_bencListAddDict( list, 6 );
+        tr_benc * d = tr_bencListAddDict( list, 7 );
+        tr_bencDictAddStr( d, "hashString", tor->info.hashString );
         tr_bencDictAddInt( d, "id", tr_torrentId( tor ) );
         tr_bencDictAddStr( d, "name", tor->info.name );
         tr_bencDictAddDouble( d, "rateDownload", st->rateDownload );

@@ -38,14 +38,13 @@
    (2) An optional "arguments" object of key/value pairs
    (3) An optional "tag" integer as described in 2.1.
 
-2.3.  Request URL Query Notation
+2.3.  Transport Mechanism
 
-   As a convenience, a casual notation is supported for requests via the
-   query portion of a URL.  The advantage of this is that all current requests
-   can be invoked via a very simple http GET request.  The possible future
-   disadvantage is that it limits nesting and listing structured requests.
+   POSTing a JSON-encoded request is the preferred way of communicating
+   with the Transmission server; however, a simple notation also exists
+   for sending requests in the query portion of a URL.
 
-   The URI notation works as follows:
+   The URL notation works as follows:
    (1) Any key not "tag" or "method" is assumed to be in "arguments".
    (2) The "arguments" key isn't needed, since data isn't nested.
    (3) If the entire value in a key/value pair can be parsed as an integer,
@@ -78,12 +77,22 @@
 
 3.2.  Torrent List
 
+   An overview list of torrents.
+
    Method name: "torrent-list".
 
    Request arguments: none.
 
-   Response arguments: "list", an array of objects that contain two keys:
-   a torrent's name string, and its unique torrent id. 
+   Response arguments: "list", an array of objects that contain seven keys:
+
+   key                 | value type
+   --------------------+-------------------------------------------------
+   "hashString"        | string
+   "id"                | number
+   "name"              | string
+   "rateDownload"      | double
+   "rateUpload"        | double
+   "ratio"             | double
 
 3.3.  Torrent Info Requests
 

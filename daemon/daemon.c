@@ -24,14 +24,14 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
 #include <libtransmission/rpc.h>
-#include <libtransmission/utils.h> /* tr_strdup */
+#include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
 #define MY_NAME "transmission-daemon"
 
 static int closing = FALSE;
-static tr_handle * gl_session;
-static char gl_configfile[MAX_PATH_LENGTH];
+static tr_handle * mySession;
+static char myConfigFilename[MAX_PATH_LENGTH];
 
 static void
 saveState( tr_handle * h )
@@ -48,14 +48,14 @@ saveState( tr_handle * h )
                            tr_sessionIsPortForwardingEnabled( h ) );
     tr_bencDictAddStr( &d, "rpc-acl", tr_sessionGetRPCACL( h ) );
     tr_bencDictAddInt( &d, "rpc-port", tr_sessionGetRPCPort( h ) );
-    tr_bencDictAddInt( &d, "speed-limit-up",
-                           tr_sessionGetSpeedLimit( h, TR_UP ) );
-    tr_bencDictAddInt( &d, "speed-limit-up-enabled",
-                           tr_sessionIsSpeedLimitEnabled( h, TR_UP ) );
     tr_bencDictAddInt( &d, "speed-limit-down",
                            tr_sessionGetSpeedLimit( h, TR_DOWN ) );
     tr_bencDictAddInt( &d, "speed-limit-down-enabled",
                            tr_sessionIsSpeedLimitEnabled( h, TR_DOWN ) );
+    tr_bencDictAddInt( &d, "speed-limit-up",
+                           tr_sessionGetSpeedLimit( h, TR_UP ) );
+    tr_bencDictAddInt( &d, "speed-limit-up-enabled",
+                           tr_sessionIsSpeedLimitEnabled( h, TR_UP ) );
     switch( tr_sessionGetEncryption( h ) ) {
         case TR_PLAINTEXT_PREFERRED: str = "tolerated"; break;
         case TR_ENCRYPTION_REQUIRED: str = "required"; break;
@@ -63,11 +63,10 @@ saveState( tr_handle * h )
     }
     tr_bencDictAddStr( &d, "encryption", str );
 
-    tr_ninf( MY_NAME, "saving \"%s\"", gl_configfile );
-    tr_bencSaveFile( gl_configfile, &d );
+    tr_ninf( MY_NAME, "saving \"%s\"", myConfigFilename );
+    tr_bencSaveFile( myConfigFilename, &d );
 
     tr_bencFree( &d );
-
 }
 
 static void
@@ -90,19 +89,17 @@ session_init( const char * configDir, int rpc_port, const char * rpc_acl )
     tr_ctor * ctor;
     tr_torrent ** torrents;
 
-    assert( !gl_session );
-
-    if(( have_state = !tr_bencLoadFile( gl_configfile, &state )))
+    if(( have_state = !tr_bencLoadFile( myConfigFilename, &state )))
     {
         const char * str;
-        tr_ninf( MY_NAME, "loading settings from \"%s\"", gl_configfile );
+        tr_ninf( MY_NAME, "loading settings from \"%s\"", myConfigFilename );
 
         if( tr_bencDictFindStr( &state, "download-dir", &str ) )
             tr_strlcpy( downloadDir, str, sizeof( downloadDir ) );
-        tr_bencDictFindInt( &state, "port", &peer_port );
-        tr_bencDictFindInt( &state, "port-forwarding-enabled", &fwd_enabled );
         tr_bencDictFindInt( &state, "peer-limit", &peers );
         tr_bencDictFindInt( &state, "pex-allowed", &pex_enabled );
+        tr_bencDictFindInt( &state, "port", &peer_port );
+        tr_bencDictFindInt( &state, "port-forwarding-enabled", &fwd_enabled );
         tr_bencDictFindStr( &state, "rpc-acl", &rpc_acl_fallback );
         tr_bencDictFindInt( &state, "rpc-port", &rpc_port_fallback );
         tr_bencDictFindInt( &state, "speed-limit-down", &down_limit );
@@ -126,20 +123,20 @@ session_init( const char * configDir, int rpc_port, const char * rpc_acl )
         rpc_acl = rpc_acl_fallback;
 
     /* start the session */
-    gl_session = tr_sessionInitFull( configDir, "daemon", downloadDir,
-                                     pex_enabled, fwd_enabled, peer_port,
-                                     encryption,
-                                     up_limit, up_limited,
-                                     down_limit, down_limited,
-                                     peers,
-                                     TR_MSG_INF, 0,
-                                     FALSE, /* is the blocklist enabled? */
-                                     TR_DEFAULT_PEER_SOCKET_TOS,
-                                     TRUE, rpc_port, rpc_acl );
+    mySession = tr_sessionInitFull( configDir, "daemon", downloadDir,
+                                    pex_enabled, fwd_enabled, peer_port,
+                                    encryption,
+                                    up_limit, up_limited,
+                                    down_limit, down_limited,
+                                    peers,
+                                    TR_MSG_INF, 0,
+                                    FALSE, /* is the blocklist enabled? */
+                                    TR_DEFAULT_PEER_SOCKET_TOS,
+                                    TRUE, rpc_port, rpc_acl );
 
     /* load the torrents */
-    ctor = tr_ctorNew( gl_session );
-    torrents = tr_sessionLoadTorrents( gl_session, ctor, NULL );
+    ctor = tr_ctorNew( mySession );
+    torrents = tr_sessionLoadTorrents( mySession, ctor, NULL );
     tr_free( torrents );
     tr_ctorFree( ctor );
 
@@ -269,7 +266,7 @@ main( int argc, char ** argv )
     readargs( argc, argv, &nofork, &port, &acl, &configDir );
     if( configDir == NULL )
         configDir = tr_strdup_printf( "%s-daemon", tr_getDefaultConfigDir() );
-    tr_buildPath( gl_configfile, sizeof( gl_configfile ),
+    tr_buildPath( myConfigFilename, sizeof( myConfigFilename ),
                   configDir, "daemon-config.benc", NULL );
 
     if( !nofork ) {
@@ -284,9 +281,9 @@ main( int argc, char ** argv )
     while( !closing )
         sleep( 1 );
 
-    saveState( gl_session );
+    saveState( mySession );
     printf( "Closing transmission session..." );
-    tr_sessionClose( gl_session );
+    tr_sessionClose( mySession );
     printf( " done.\n" );
 
     tr_free( configDir );

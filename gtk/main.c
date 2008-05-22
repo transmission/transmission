@@ -302,7 +302,7 @@ onRPCIdle( void * vdata )
         case TR_RPC_TORRENT_STOPPED:
             /* this should be automatic */
             break;
-        case TR_RPC_TORRENT_CLOSING:
+        case TR_RPC_TORRENT_REMOVING:
             /* FIXME */
             break;
         case TR_RPC_TORRENT_CHANGED:
@@ -326,7 +326,7 @@ onRPCChanged( tr_handle            * handle UNUSED,
     struct rpc_data * data = g_new0( struct rpc_data, 1 );
     data->type = type;
     data->torrentId = tor ? tr_torrentId( tor ) : -1;
-    data->tor = type == TR_RPC_TORRENT_CLOSING ? NULL : tor;
+    data->tor = type == TR_RPC_TORRENT_REMOVING ? NULL : tor;
     data->cbdata = cbdata;
     g_idle_add( onRPCIdle, data );
 }

@@ -4171,7 +4171,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             break;
         case TR_RPC_TORRENT_STOPPED:
             break;
-        case TR_RPC_TORRENT_CLOSING:
+        case TR_RPC_TORRENT_REMOVING:
             break;
         case TR_RPC_TORRENT_CHANGED:
             break;
