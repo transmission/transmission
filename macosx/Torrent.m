@@ -723,7 +723,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) trackerAddressAnnounce
 {
-    return fStat->tracker->announce ? [NSString stringWithUTF8String: fStat->tracker->announce] : nil;
+    return fStat->announceURL ? [NSString stringWithUTF8String: fStat->announceURL] : nil;
 }
 
 - (NSDate *) lastAnnounceTime
@@ -749,7 +749,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) trackerAddressScrape
 {
-    return fStat->tracker->scrape ? [NSString stringWithUTF8String: fStat->tracker->scrape] : nil;
+    return fStat->scrapeURL ? [NSString stringWithUTF8String: fStat->scrapeURL] : nil;
 }
 
 - (NSDate *) lastScrapeTime

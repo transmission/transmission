@@ -900,10 +900,14 @@ tr_torrent_status tr_torrentGetStatus( tr_torrent * );
 
 struct tr_stat
 {
+    int id;
+
     tr_torrent_status status;
 
     struct tr_tracker_stat trackerStat;
-    const tr_tracker_info * tracker;
+
+    char * announceURL;
+    char * scrapeURL;
 
     tr_errno error;
     char errorString[128];

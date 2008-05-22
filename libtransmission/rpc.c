@@ -167,10 +167,11 @@ torrentStatus( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
         const tr_stat * st = tr_torrentStat( tor );
         const int * f = st->peersFrom;
         const struct tr_tracker_stat * s = &st->trackerStat;
-        tr_benc * d = tr_bencListAddDict( list, 33 );
+        tr_benc * d = tr_bencListAddDict( list, 35 );
         tr_benc * t;
 
         tr_bencDictAddInt( d, "activityDate", st->activityDate );
+        tr_bencDictAddStr( d, "announceURL", st->announceURL );
         tr_bencDictAddInt( d, "completedFromTracker", st->completedFromTracker );
         tr_bencDictAddInt( d, "corruptEver", st->corruptEver );
         tr_bencDictAddInt( d, "desiredAvailable", st->desiredAvailable );
@@ -180,11 +181,10 @@ torrentStatus( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
         tr_bencDictAddInt( d, "eta", st->eta );
         tr_bencDictAddInt( d, "haveUnchecked", st->haveUnchecked );
         tr_bencDictAddInt( d, "haveValid", st->haveValid );
-        tr_bencDictAddInt( d, "id", tr_torrentId( tor ) );
+        tr_bencDictAddInt( d, "id", st->id );
         tr_bencDictAddInt( d, "leechers", st->leechers );
         tr_bencDictAddInt( d, "leftUntilDone", st->leftUntilDone );
         tr_bencDictAddInt( d, "manualAnnounceTime", st->manualAnnounceTime );
-        tr_bencDictAddStr( d, "name", tor->info.name );
         tr_bencDictAddInt( d, "peersConnected", st->peersConnected );
         t = tr_bencDictAddDict( d, "peersFrom", 4 );
             tr_bencDictAddInt( t, "cache",    f[TR_PEER_FROM_CACHE] );
@@ -200,6 +200,7 @@ torrentStatus( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
         tr_bencDictAddDouble( d, "rateUpload", st->rateUpload );
         tr_bencDictAddDouble( d, "ratio", st->ratio );
         tr_bencDictAddDouble( d, "recheckProgress", st->recheckProgress );
+        tr_bencDictAddStr( d, "scrapeURL", st->scrapeURL );
         tr_bencDictAddInt( d, "seeders", st->seeders );
         tr_bencDictAddInt( d, "sizeWhenDone", st->sizeWhenDone );
         tr_bencDictAddInt( d, "startDate", st->startDate );
@@ -231,11 +232,9 @@ addFiles( const tr_info * info, tr_benc * files )
     for( i=0; i<info->fileCount; ++i )
     {
         const tr_file * file = &info->files[i];
-        tr_benc * d = tr_bencListAddDict( files, 4 );
-        tr_bencDictAddInt( d, "dnd", file->dnd );
+        tr_benc * d = tr_bencListAddDict( files, 2 );
         tr_bencDictAddInt( d, "length", file->length );
         tr_bencDictAddStr( d, "name", file->name );
-        tr_bencDictAddInt( d, "priority", file->priority );
     }
 }
 

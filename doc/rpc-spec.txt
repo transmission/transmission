@@ -7,8 +7,7 @@
 
    The JSON terminology in RFC 4627 is used. "array" is equivalent
    to a benc list; "object" is equivalent to a benc dictionary;
-   an object's "keys" are the dictionary's string keys,
-   and an object's "members" are its key/value pairs.
+   and an object's "keys" are the dictionary's string keys.
 
 2.  Message Format
 
@@ -26,8 +25,8 @@
    Requests supports three keys:
 
    (1) A required "method" string telling the name of the method to invoke
-   (2) An optional "arguments" object of name/value pairs
-   (3) An optional "tag" integer used for clients to track responses.
+   (2) An optional "arguments" object of key/value pairs
+   (3) An optional "tag" integer used by clients to track responses.
        If provided by a request, the response MUST include the same tag.
 
 2.2.  Responses
@@ -36,13 +35,13 @@
 
    (1) A required "result" string whose value must be "success" on success,
        or an error string on failure.
-   (2) An optional "arguments" object of name/value pairs
+   (2) An optional "arguments" object of key/value pairs
    (3) An optional "tag" integer as described in 2.1.
 
-2.3.  Request IPC Notation
+2.3.  Request URL Query Notation
 
-   As a convenience, a casual URI notation is supported for requests via the
-   query portion of a URI.  The advantage of this is that all current requests
+   As a convenience, a casual notation is supported for requests via the
+   query portion of a URL.  The advantage of this is that all current requests
    can be invoked via a very simple http GET request.  The possible future
    disadvantage is that it limits nesting and listing structured requests.
 
@@ -97,7 +96,7 @@
    (1) the torrent's "id" field is added.
    (2) tr_info's "hash" field is omitted.
    (3) tr_info's "pieces" field is omitted.
-   (4) tr_file's "firstPiece", "lastPiece", and "offset" fields are omitted.
+   (4) tr_file's only included pieces are "name" and "length".
 
    Note that this is a fairly high-bandwidth request and that its results
    don't change.  You should try to cache its results instead of re-calling it.
@@ -143,14 +142,8 @@
 
    Request arguments: 3.1's optional "ids" argument.
 
-   Response arguments: "torrent-status", an array of objects based
-   on libtransmission's tr_stat struct but differerent in the
-   following ways:
-
-   (1) the torrent's "id" field is added.
-   (2) tr_info's "name" field is added.
-   (3) tr_stat's "tracker" field is omitted, and is instead
-       replaced with two strings: "announce-url" and scrape-url"
+   Response arguments: "torrent-status", an array of objects
+   identical to libtransmission's tr_stat struct.
 
 3.5.  Adding a Torrent
 
@@ -172,7 +165,7 @@
    Response arguments: on success, a "torrent-added" object in the
                        form of one of 3.3's tr_info objects.
 
-3.6.  Other torrent settings
+3.6.  Other Torrent Settings
 
    Common arguments:
 
@@ -195,7 +188,7 @@
    Method name: "torrent-get"
    Request arguments: none
    Response arguments: A "torrents" list of objects containing all
-                       of 3.6's arguments plus the torrent's "id" int.
+                       of 3.6's arguments plus the torrent's "id" field.
                       
 
 3.7  File Priorities

@@ -686,6 +686,7 @@ tr_torrentStat( tr_torrent * tor )
 {
     tr_stat * s;
     struct tr_tracker * tc;
+    const tr_tracker_info * ti;
 
     if( !tor )
         return NULL;
@@ -695,15 +696,20 @@ tr_torrentStat( tr_torrent * tor )
     tor->lastStatTime = time( NULL );
 
     s = &tor->stats;
+    s->id = tor->uniqueId;
     s->status = tr_torrentGetStatus( tor );
     s->error  = tor->error;
     memcpy( s->errorString, tor->errorString,
             sizeof( s->errorString ) );
 
     tc = tor->tracker;
-    s->tracker = tr_trackerGetAddress( tor->tracker );
-
-    tr_trackerStat( tor->tracker, &s->trackerStat );
+    ti = tr_trackerGetAddress( tor->tracker );
+    s->announceURL = ti ? ti->announce : NULL;
+    s->scrapeURL   = ti ? ti->scrape   : NULL;
+    tr_trackerStat( tc, &s->trackerStat );
+    tr_trackerGetCounts( tc, &s->completedFromTracker,
+                             &s->leechers, 
+                             &s->seeders );
 
     tr_peerMgrTorrentStats( tor->handle->peerMgr,
                             tor->info.hash,
@@ -725,11 +731,6 @@ tr_torrentStat( tr_torrent * tor )
         1.0 - (tr_torrentCountUncheckedPieces( tor ) / (double) tor->info.pieceCount);
 
     tr_torrentGetRates( tor, &s->rateDownload, &s->rateUpload );
-   
-    tr_trackerGetCounts( tc,
-                         &s->completedFromTracker,
-                         &s->leechers, 
-                         &s->seeders );
 
     s->swarmSpeed = tr_rcRate( tor->swarmSpeed );
     
