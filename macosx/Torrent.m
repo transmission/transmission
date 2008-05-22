@@ -728,13 +728,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSDate *) lastAnnounceTime
 {
-    int date = fStat->trackerStat.lastAnnounceTime;
+    int date = fStat->lastAnnounceTime;
     return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
 }
 
 - (int) nextAnnounceTime
 {
-    int date = fStat->trackerStat.nextAnnounceTime;
+    int date = fStat->nextAnnounceTime;
     if (date <= 0)
         return -1;
     
@@ -744,7 +744,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) announceResponse
 {
-    return [NSString stringWithUTF8String: fStat->trackerStat.announceResponse];
+    return [NSString stringWithUTF8String: fStat->announceResponse];
 }
 
 - (NSString *) trackerAddressScrape
@@ -754,13 +754,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSDate *) lastScrapeTime
 {
-    int date = fStat->trackerStat.lastScrapeTime;
+    int date = fStat->lastScrapeTime;
     return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
 }
 
 - (int) nextScrapeTime
 {
-    int date = fStat->trackerStat.nextScrapeTime;
+    int date = fStat->nextScrapeTime;
     if (date <= 0)
         return -1;
     
@@ -770,7 +770,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) scrapeResponse
 {
-    return [NSString stringWithUTF8String: fStat->trackerStat.scrapeResponse];
+    return [NSString stringWithUTF8String: fStat->scrapeResponse];
 }
 
 - (NSArray *) allTrackers: (BOOL) separators

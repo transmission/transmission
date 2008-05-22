@@ -72,7 +72,7 @@ void              tr_trackerUnsubscribe     ( struct tr_tracker * tracker,
 ***/
 
 void tr_trackerStat                         ( const tr_tracker       * tracker,
-                                              struct tr_tracker_stat * setme);
+                                              struct tr_stat         * setme);
 
 void tr_trackerStart                        ( struct tr_tracker * );
 

@@ -986,8 +986,8 @@ tr_trackerChangeMyPort( tr_tracker * t )
 }
 
 void
-tr_trackerStat( const tr_tracker       * t,
-                struct tr_tracker_stat * setme)
+tr_trackerStat( const tr_tracker * t,
+                struct tr_stat   * setme)
 {
     assert( t );
     assert( setme );
@@ -996,7 +996,7 @@ tr_trackerStat( const tr_tracker       * t,
     setme->nextScrapeTime = t->scrapeAt;
     setme->lastAnnounceTime = t->lastAnnounceTime;
     setme->nextAnnounceTime = t->reannounceAt;
-    setme->nextManualAnnounceTime = t->manualAnnounceAllowedAt;
+    setme->manualAnnounceTime = t->manualAnnounceAllowedAt;
 
     if( t->lastScrapeResponse == -1 ) /* never been scraped */
         *setme->scrapeResponse = '\0';

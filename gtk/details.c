@@ -1213,29 +1213,29 @@ refresh_tracker( GtkWidget * w )
     const tr_stat * torStat = tr_torrent_stat( page->gtor );
 
     l = page->last_scrape_time_lb;
-    t = torStat->trackerStat.lastScrapeTime;
+    t = torStat->lastScrapeTime;
     refresh_time_lb( l, t );
 
     l = page->last_scrape_response_lb;
-    gtk_label_set_text( GTK_LABEL( l ), torStat->trackerStat.scrapeResponse );
+    gtk_label_set_text( GTK_LABEL( l ), torStat->scrapeResponse );
 
     l = page->next_scrape_countdown_lb;
-    t = torStat->trackerStat.nextScrapeTime;
+    t = torStat->nextScrapeTime;
     refresh_countdown_lb( l, t );
 
     l = page->last_announce_time_lb;
-    t = torStat->trackerStat.lastAnnounceTime;
+    t = torStat->lastAnnounceTime;
     refresh_time_lb( l, t );
 
     l = page->last_announce_response_lb;
-    gtk_label_set_text( GTK_LABEL( l ), torStat->trackerStat.announceResponse );
+    gtk_label_set_text( GTK_LABEL( l ), torStat->announceResponse );
 
     l = page->next_announce_countdown_lb;
-    t = torStat->trackerStat.nextAnnounceTime;
+    t = torStat->nextAnnounceTime;
     refresh_countdown_lb( l, t );
 
     l = page->manual_announce_countdown_lb;
-    t = torStat->trackerStat.nextManualAnnounceTime;
+    t = torStat->manualAnnounceTime;
     refresh_countdown_lb( l, t );
 }
 

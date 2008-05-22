@@ -706,11 +706,10 @@ tr_torrentStat( tr_torrent * tor )
     ti = tr_trackerGetAddress( tor->tracker );
     s->announceURL = ti ? ti->announce : NULL;
     s->scrapeURL   = ti ? ti->scrape   : NULL;
-    tr_trackerStat( tc, &s->trackerStat );
+    tr_trackerStat( tc, s );
     tr_trackerGetCounts( tc, &s->completedFromTracker,
                              &s->leechers, 
                              &s->seeders );
-
     tr_peerMgrTorrentStats( tor->handle->peerMgr,
                             tor->info.hash,
                             &s->peersKnown,
@@ -718,8 +717,6 @@ tr_torrentStat( tr_torrent * tor )
                             &s->peersSendingToUs,
                             &s->peersGettingFromUs,
                              s->peersFrom );
-
-    s->manualAnnounceTime = tr_trackerGetManualAnnounceTime( tor->tracker );
 
     s->percentComplete = tr_cpPercentComplete ( tor->completion );
 
@@ -911,14 +908,6 @@ tr_torrentSetHasPiece( tr_torrent * tor, tr_piece_index_t pieceIndex, int has )
         tr_cpPieceRem( tor->completion, pieceIndex );
 
     tr_torrentUnlock( tor );
-}
-
-void
-tr_torrentRemoveSaved( tr_torrent * tor )
-{
-    tr_metainfoRemoveSaved( tor->handle, &tor->info );
-
-    tr_torrentRemoveResume( tor );
 }
 
 /***
@@ -1113,8 +1102,10 @@ closeTorrent( void * vtor )
     tr_torrentSaveResume( tor );
     tor->isRunning = 0;
     stopTorrent( tor );
-    if( tor->isDeleting )
-        tr_torrentRemoveSaved( tor );
+    if( tor->isDeleting ) {
+        tr_metainfoRemoveSaved( tor->handle, &tor->info );
+        tr_torrentRemoveResume( tor );
+    }
     freeTorrent( tor );
 }
 

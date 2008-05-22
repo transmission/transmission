@@ -166,11 +166,11 @@ torrentStatus( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
         tr_torrent * tor = torrents[i];
         const tr_stat * st = tr_torrentStat( tor );
         const int * f = st->peersFrom;
-        const struct tr_tracker_stat * s = &st->trackerStat;
-        tr_benc * d = tr_bencListAddDict( list, 35 );
+        tr_benc * d = tr_bencListAddDict( list, 40 );
         tr_benc * t;
 
         tr_bencDictAddInt( d, "activityDate", st->activityDate );
+        tr_bencDictAddStr( d, "announceResponse", st->announceResponse );
         tr_bencDictAddStr( d, "announceURL", st->announceURL );
         tr_bencDictAddInt( d, "completedFromTracker", st->completedFromTracker );
         tr_bencDictAddInt( d, "corruptEver", st->corruptEver );
@@ -182,9 +182,13 @@ torrentStatus( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
         tr_bencDictAddInt( d, "haveUnchecked", st->haveUnchecked );
         tr_bencDictAddInt( d, "haveValid", st->haveValid );
         tr_bencDictAddInt( d, "id", st->id );
+        tr_bencDictAddInt( d, "lastAnnounceTime", st->lastAnnounceTime );
+        tr_bencDictAddInt( d, "lastScrapeTime", st->lastScrapeTime );
         tr_bencDictAddInt( d, "leechers", st->leechers );
         tr_bencDictAddInt( d, "leftUntilDone", st->leftUntilDone );
         tr_bencDictAddInt( d, "manualAnnounceTime", st->manualAnnounceTime );
+        tr_bencDictAddInt( d, "nextAnnounceTime", st->nextAnnounceTime );
+        tr_bencDictAddInt( d, "nextScrapeTime", st->nextScrapeTime );
         tr_bencDictAddInt( d, "peersConnected", st->peersConnected );
         t = tr_bencDictAddDict( d, "peersFrom", 4 );
             tr_bencDictAddInt( t, "cache",    f[TR_PEER_FROM_CACHE] );
@@ -200,20 +204,13 @@ torrentStatus( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
         tr_bencDictAddDouble( d, "rateUpload", st->rateUpload );
         tr_bencDictAddDouble( d, "ratio", st->ratio );
         tr_bencDictAddDouble( d, "recheckProgress", st->recheckProgress );
+        tr_bencDictAddStr( d, "scrapeResponse", st->scrapeResponse );
         tr_bencDictAddStr( d, "scrapeURL", st->scrapeURL );
         tr_bencDictAddInt( d, "seeders", st->seeders );
         tr_bencDictAddInt( d, "sizeWhenDone", st->sizeWhenDone );
         tr_bencDictAddInt( d, "startDate", st->startDate );
         tr_bencDictAddInt( d, "status", st->status );
         tr_bencDictAddDouble( d, "swarmSpeed", st->swarmSpeed );
-        t = tr_bencDictAddDict( d, "trackerStat", 7 );
-            tr_bencDictAddStr( t, "announceResponse", s->announceResponse );
-            tr_bencDictAddInt( t, "lastAnnounceTime", s->lastAnnounceTime );
-            tr_bencDictAddInt( t, "lastScrapeTime", s->lastScrapeTime );
-            tr_bencDictAddInt( t, "nextAnnounceTime", s->nextAnnounceTime );
-            tr_bencDictAddInt( t, "nextScrapeTime", s->nextScrapeTime );
-            tr_bencDictAddInt( t, "nextScrapeTime", s->nextScrapeTime );
-            tr_bencDictAddStr( t, "scrapeResponse", s->scrapeResponse );
         tr_bencDictAddInt( d, "uploadedEver", st->uploadedEver );
     }
 
