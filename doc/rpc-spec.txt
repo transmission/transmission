@@ -152,7 +152,9 @@
    Request arguments: 3.1's optional "ids" argument.
 
    Response arguments: "torrent-status", an array of objects
-   identical to libtransmission's tr_stat struct.
+   based on libtransmission's tr_stat struct but different
+   in the following ways:
+   (1) tr_info's "hashString" field is added.
 
 3.5.  Adding a Torrent
 

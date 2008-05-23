@@ -166,7 +166,7 @@ torrentStatus( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
         tr_torrent * tor = torrents[i];
         const tr_stat * st = tr_torrentStat( tor );
         const int * f = st->peersFrom;
-        tr_benc * d = tr_bencListAddDict( list, 40 );
+        tr_benc * d = tr_bencListAddDict( list, 41 );
         tr_benc * t;
 
         tr_bencDictAddInt( d, "activityDate", st->activityDate );
@@ -179,6 +179,7 @@ torrentStatus( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
         tr_bencDictAddInt( d, "error", st->error );
         tr_bencDictAddStr( d, "errorString", st->errorString );
         tr_bencDictAddInt( d, "eta", st->eta );
+        tr_bencDictAddStr( d, "hashString", tor->info.hashString );
         tr_bencDictAddInt( d, "haveUnchecked", st->haveUnchecked );
         tr_bencDictAddInt( d, "haveValid", st->haveValid );
         tr_bencDictAddInt( d, "id", st->id );
