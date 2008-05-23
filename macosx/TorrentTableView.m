@@ -698,6 +698,72 @@
     }
 }
 
+//alternating rows - first row after group row is white
+- (void) highlightSelectionInClipRect: (NSRect) clipRect
+{
+    NSArray * colors = [NSColor controlAlternatingRowBackgroundColors];
+    
+    NSRect visibleRect = [self visibleRect];
+    NSRange rows = [self rowsInRect: visibleRect];
+    
+    BOOL start = YES;
+    int i;
+    
+    if (rows.length > 0)
+    {
+        //determine what the first row color should be
+        if ([[self itemAtRow: rows.location] isKindOfClass: [Torrent class]])
+        {
+            for (i = rows.location-1; i>=0; i--)
+            {
+                if (![[self itemAtRow: i] isKindOfClass: [Torrent class]])
+                    break;
+                start = !start;
+            }
+        }
+        else
+        {
+            rows.location++;
+            rows.length--;
+        }
+        
+        for (i = rows.location; i < NSMaxRange(rows); i++)
+        {
+            if (![[self itemAtRow: i] isKindOfClass: [Torrent class]])
+            {
+                start = YES;
+                continue;
+            }
+            
+            NSColor * color = start ? [colors objectAtIndex: 0] : [colors objectAtIndex: 1];
+            [color set];
+            NSRectFill([self rectOfRow: i]);
+            
+            start = !start;
+        }
+        
+        float newY = NSMaxY([self rectOfRow: i-1]);
+        visibleRect.size.height -= newY - visibleRect.origin.y;
+        visibleRect.origin.y = newY;
+    }
+    
+    //remaining visible rows continue alternating
+    NSRect rowRect = visibleRect;
+    rowRect.size.height = [self rowHeight] + [self intercellSpacing].height;
+    
+    while (rowRect.origin.y < NSMaxY(visibleRect))
+    {
+        NSColor * color = start ? [colors objectAtIndex: 0] : [colors objectAtIndex: 1];
+        [color set];
+        NSRectFill(rowRect);
+        
+        start = !start;
+        rowRect.origin.y += rowRect.size.height;
+    }
+    
+    [super highlightSelectionInClipRect: clipRect];
+}
+
 - (void) setQuickLimitMode: (id) sender
 {
     int mode;

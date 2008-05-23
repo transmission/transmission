@@ -258,13 +258,8 @@
 		BE75C3660C72A0EF00DBEFE0 /* signal.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3590C72A0EF00DBEFE0 /* signal.c */; };
 		BE75C3670C72A0EF00DBEFE0 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35A0C72A0EF00DBEFE0 /* buffer.c */; };
 		BE75C3680C72A0EF00DBEFE0 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35B0C72A0EF00DBEFE0 /* log.c */; };
-		BE75C3690C72A0EF00DBEFE0 /* strlcpy.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35C0C72A0EF00DBEFE0 /* strlcpy.c */; };
 		BE75C36A0C72A0EF00DBEFE0 /* evbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35D0C72A0EF00DBEFE0 /* evbuffer.c */; };
 		BE75C36B0C72A0EF00DBEFE0 /* event.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35E0C72A0EF00DBEFE0 /* event.c */; };
-		BE75C36C0C72A0EF00DBEFE0 /* http.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35F0C72A0EF00DBEFE0 /* http.c */; };
-		BE75C36D0C72A0EF00DBEFE0 /* event_tagging.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3600C72A0EF00DBEFE0 /* event_tagging.c */; };
-		BE75C36E0C72A0EF00DBEFE0 /* evrpc.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3610C72A0EF00DBEFE0 /* evrpc.c */; };
-		BE75C36F0C72A0EF00DBEFE0 /* evdns.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3620C72A0EF00DBEFE0 /* evdns.c */; };
 		BE75C3700C72A0EF00DBEFE0 /* poll.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3630C72A0EF00DBEFE0 /* poll.c */; };
 		BE75C3710C72A0EF00DBEFE0 /* select.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3640C72A0EF00DBEFE0 /* select.c */; };
 		BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE75C3490C729E9500DBEFE0 /* libevent.a */; };
@@ -738,18 +733,11 @@
 		BE75C3590C72A0EF00DBEFE0 /* signal.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = signal.c; path = "third-party/libevent/signal.c"; sourceTree = "<group>"; };
 		BE75C35A0C72A0EF00DBEFE0 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = buffer.c; path = "third-party/libevent/buffer.c"; sourceTree = "<group>"; };
 		BE75C35B0C72A0EF00DBEFE0 /* log.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = log.c; path = "third-party/libevent/log.c"; sourceTree = "<group>"; };
-		BE75C35C0C72A0EF00DBEFE0 /* strlcpy.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = strlcpy.c; path = "third-party/libevent/strlcpy.c"; sourceTree = "<group>"; };
 		BE75C35D0C72A0EF00DBEFE0 /* evbuffer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = evbuffer.c; path = "third-party/libevent/evbuffer.c"; sourceTree = "<group>"; };
 		BE75C35E0C72A0EF00DBEFE0 /* event.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = event.c; path = "third-party/libevent/event.c"; sourceTree = "<group>"; };
-		BE75C35F0C72A0EF00DBEFE0 /* http.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = http.c; path = "third-party/libevent/http.c"; sourceTree = "<group>"; };
-		BE75C3600C72A0EF00DBEFE0 /* event_tagging.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = event_tagging.c; path = "third-party/libevent/event_tagging.c"; sourceTree = "<group>"; };
-		BE75C3610C72A0EF00DBEFE0 /* evrpc.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = evrpc.c; path = "third-party/libevent/evrpc.c"; sourceTree = "<group>"; };
-		BE75C3620C72A0EF00DBEFE0 /* evdns.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = evdns.c; path = "third-party/libevent/evdns.c"; sourceTree = "<group>"; };
 		BE75C3630C72A0EF00DBEFE0 /* poll.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = poll.c; path = "third-party/libevent/poll.c"; sourceTree = "<group>"; };
 		BE75C3640C72A0EF00DBEFE0 /* select.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = select.c; path = "third-party/libevent/select.c"; sourceTree = "<group>"; };
 		BE75C3810C72A1C100DBEFE0 /* evhttp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = evhttp.h; path = "third-party/libevent/evhttp.h"; sourceTree = "<group>"; };
-		BE75C3820C72A1C100DBEFE0 /* evdns.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = evdns.h; path = "third-party/libevent/evdns.h"; sourceTree = "<group>"; };
-		BE75C3830C72A1C100DBEFE0 /* evrpc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = evrpc.h; path = "third-party/libevent/evrpc.h"; sourceTree = "<group>"; };
 		BE75C3840C72A1C100DBEFE0 /* event.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = event.h; path = "third-party/libevent/event.h"; sourceTree = "<group>"; };
 		BEFC1C000C07750000B0BB3C /* transmission-daemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-daemon"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1C0E0C07756200B0BB3C /* daemon.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = daemon.c; path = daemon/daemon.c; sourceTree = "<group>"; };
@@ -1322,21 +1310,14 @@
 			children = (
 				A2BC19DF0CA9D82300DD302A /* evutil.h */,
 				BE75C3810C72A1C100DBEFE0 /* evhttp.h */,
-				BE75C3820C72A1C100DBEFE0 /* evdns.h */,
-				BE75C3830C72A1C100DBEFE0 /* evrpc.h */,
 				BE75C3840C72A1C100DBEFE0 /* event.h */,
 				4D36BBC80CA309AA00A63CA5 /* evutil.c */,
 				BE75C3580C72A0EF00DBEFE0 /* kqueue.c */,
 				BE75C3590C72A0EF00DBEFE0 /* signal.c */,
 				BE75C35A0C72A0EF00DBEFE0 /* buffer.c */,
 				BE75C35B0C72A0EF00DBEFE0 /* log.c */,
-				BE75C35C0C72A0EF00DBEFE0 /* strlcpy.c */,
 				BE75C35D0C72A0EF00DBEFE0 /* evbuffer.c */,
 				BE75C35E0C72A0EF00DBEFE0 /* event.c */,
-				BE75C35F0C72A0EF00DBEFE0 /* http.c */,
-				BE75C3600C72A0EF00DBEFE0 /* event_tagging.c */,
-				BE75C3610C72A0EF00DBEFE0 /* evrpc.c */,
-				BE75C3620C72A0EF00DBEFE0 /* evdns.c */,
 				BE75C3630C72A0EF00DBEFE0 /* poll.c */,
 				BE75C3640C72A0EF00DBEFE0 /* select.c */,
 			);
@@ -2050,13 +2031,8 @@
 				BE75C3660C72A0EF00DBEFE0 /* signal.c in Sources */,
 				BE75C3670C72A0EF00DBEFE0 /* buffer.c in Sources */,
 				BE75C3680C72A0EF00DBEFE0 /* log.c in Sources */,
-				BE75C3690C72A0EF00DBEFE0 /* strlcpy.c in Sources */,
 				BE75C36A0C72A0EF00DBEFE0 /* evbuffer.c in Sources */,
 				BE75C36B0C72A0EF00DBEFE0 /* event.c in Sources */,
-				BE75C36C0C72A0EF00DBEFE0 /* http.c in Sources */,
-				BE75C36D0C72A0EF00DBEFE0 /* event_tagging.c in Sources */,
-				BE75C36E0C72A0EF00DBEFE0 /* evrpc.c in Sources */,
-				BE75C36F0C72A0EF00DBEFE0 /* evdns.c in Sources */,
 				BE75C3700C72A0EF00DBEFE0 /* poll.c in Sources */,
 				BE75C3710C72A0EF00DBEFE0 /* select.c in Sources */,
 				4D36BBC90CA309AA00A63CA5 /* evutil.c in Sources */,
