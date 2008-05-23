@@ -193,11 +193,18 @@ tr_handle * fLib;
     [fTimeAllField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ total", "stats total"),
                                         [NSString timeString: statsAll.secondsActive showSeconds: NO]]];
     
-    if (statsAll.sessionCount == 1)
-        [fNumOpenedField setStringValue: NSLocalizedString(@"1 time", "stats window -> times opened")];
-    else
-        [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d times", "stats window -> times opened"),
-                                        statsAll.sessionCount]];
+    switch (statsAll.sessionCount)
+    {
+        case 1:
+            [fNumOpenedField setStringValue: NSLocalizedString(@"1 time", "stats window -> times opened")];
+            break;
+        case 0: //for users that have this problem
+            [fNumOpenedField setStringValue: NSLocalizedString(@"n/a", "stats window -> times opened")];
+            break;
+        default:
+            [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d times", "stats window -> times opened"),
+                                                statsAll.sessionCount]];
+    }
 }
 
 - (void) performResetStats
