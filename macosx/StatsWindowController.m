@@ -199,7 +199,7 @@ tr_handle * fLib;
             [fNumOpenedField setStringValue: NSLocalizedString(@"1 time", "stats window -> times opened")];
             break;
         case 0: //for users that have this problem
-            [fNumOpenedField setStringValue: NSLocalizedString(@"n/a", "stats window -> times opened")];
+            [fNumOpenedField setStringValue: NSLocalizedString(@"N/A", "stats window -> times opened")];
             break;
         default:
             [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d times", "stats window -> times opened"),

@@ -687,7 +687,7 @@
         item = [menu itemWithTag: ACTION_MENU_GLOBAL_TAG];
         [item setState: mode == NSMixedState ? NSOnState : NSOffState];
     }
-    else  //assume the menu is part of the file list
+    else //assume the menu is part of the file list
     {
         if ([menu numberOfItems] > 0)
             return;

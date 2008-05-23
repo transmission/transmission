@@ -143,7 +143,7 @@
             && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]])
         specialColor = [NSColor whiteColor];
     else if ([[(FileOutlineView *)[self controlView] torrent] checkForFiles:
-                    [(FileListNode *)[self objectValue] indexes]] == NSOffState)
+                [(FileListNode *)[self objectValue] indexes]] == NSOffState)
         specialColor = [NSColor disabledControlTextColor];
     else;
     
