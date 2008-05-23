@@ -34,7 +34,7 @@
 //alternating rows - first row after group row is white
 - (void) highlightSelectionInClipRect: (NSRect) clipRect
 {
-    NSArray * colors = [NSColor controlAlternatingRowBackgroundColors];
+    NSColor * altColor = [[NSColor controlAlternatingRowBackgroundColors] objectAtIndex: 1];
     
     NSRect visibleRect = clipRect;
     NSRange rows = [self rowsInRect: visibleRect];
@@ -68,9 +68,11 @@
                 continue;
             }
             
-            NSColor * color = start ? [colors objectAtIndex: 0] : [colors objectAtIndex: 1];
-            [color set];
-            NSRectFill([self rectOfRow: i]);
+            if (!start)
+            {
+                [altColor set];
+                NSRectFill([self rectOfRow: i]);
+            }
             
             start = !start;
         }
@@ -86,9 +88,11 @@
     
     while (rowRect.origin.y < NSMaxY(visibleRect))
     {
-        NSColor * color = start ? [colors objectAtIndex: 0] : [colors objectAtIndex: 1];
-        [color set];
-        NSRectFill(rowRect);
+        if (!start)
+        {
+            [altColor set];
+            NSRectFill(rowRect);
+        }
         
         start = !start;
         rowRect.origin.y += rowRect.size.height;
