@@ -56,14 +56,14 @@
 
 - (void) insertChild: (FileListNode *) child
 {
-    NSAssert(fIsFolder, @"method can only be invoked on files");
+    NSAssert(fIsFolder, @"method can only be invoked on folders");
     
     [fChildren addObject: child];
 }
 
 - (void) insertIndex: (NSUInteger) index withSize: (uint64_t) size
 {
-    NSAssert(fIsFolder, @"method can only be invoked on files");
+    NSAssert(fIsFolder, @"method can only be invoked on folders");
     
     [fIndexes addIndex: index];
     fSize += size;
