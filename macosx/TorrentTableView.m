@@ -703,9 +703,8 @@
 {
     NSArray * colors = [NSColor controlAlternatingRowBackgroundColors];
     
-    NSRect visibleRect = [self visibleRect];
+    NSRect visibleRect = clipRect;
     NSRange rows = [self rowsInRect: visibleRect];
-    
     BOOL start = YES;
     int i;
     
