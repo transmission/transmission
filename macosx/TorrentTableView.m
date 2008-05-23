@@ -702,15 +702,15 @@
 - (void) highlightSelectionInClipRect: (NSRect) clipRect
 {
     NSColor * altColor = [[NSColor controlAlternatingRowBackgroundColors] objectAtIndex: 1];
+    [altColor set];
     
     NSRect visibleRect = clipRect;
     NSRange rows = [self rowsInRect: visibleRect];
     BOOL start = YES;
+    int i;
     
     if (rows.length > 0)
     {
-        int i;
-        
         //determine what the first row color should be
         if ([[self itemAtRow: rows.location] isKindOfClass: [Torrent class]])
         {
@@ -736,10 +736,7 @@
             }
             
             if (!start)
-            {
-                [altColor set];
                 NSRectFill([self rectOfRow: i]);
-            }
             
             start = !start;
         }
@@ -750,19 +747,17 @@
     }
     
     //remaining visible rows continue alternating
-    NSRect rowRect = visibleRect;
-    rowRect.size.height = [self rowHeight] + [self intercellSpacing].height;
+    float height = [self rowHeight] + [self intercellSpacing].height;
+    int numberOfRects = ceil(visibleRect.size.height / height);
+    visibleRect.size.height = height;
     
-    while (rowRect.origin.y < NSMaxY(visibleRect))
+    for (i=0; i<numberOfRects; i++)
     {
         if (!start)
-        {
-            [altColor set];
-            NSRectFill(rowRect);
-        }
+            NSRectFill(visibleRect);
         
         start = !start;
-        rowRect.origin.y += rowRect.size.height;
+        visibleRect.origin.y += height;
     }
     
     [super highlightSelectionInClipRect: clipRect];
