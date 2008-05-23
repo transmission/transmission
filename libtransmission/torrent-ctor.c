@@ -30,6 +30,8 @@ struct optional_args
     char downloadDir[MAX_PATH_LENGTH];
 };
 
+/** Opaque class used when instantiating torrents.
+  * @ingroup tr_ctor */
 struct tr_ctor
 {
     const tr_handle * handle;

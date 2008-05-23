@@ -1157,7 +1157,7 @@ clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
 {
     const time_t now = time( NULL );
     tr_torrent * tor = msgs->torrent;
-    tor->activityDate = tr_date( );
+    tor->activityDate = now;
     tor->downloadedCur += byteCount;
     msgs->info->pieceDataActivityDate = now;
     msgs->info->credit += (int)(byteCount * SWIFT_REPAYMENT_RATIO);
@@ -1380,7 +1380,7 @@ peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
 {
     const time_t now = time( NULL );
     tr_torrent * tor = msgs->torrent;
-    tor->activityDate = tr_date( );
+    tor->activityDate = now;
     tor->uploadedCur += byteCount;
     msgs->info->pieceDataActivityDate = now;
     msgs->info->credit -= byteCount;

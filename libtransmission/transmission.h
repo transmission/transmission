@@ -54,9 +54,12 @@ typedef uint64_t tr_block_index_t;
 
 const char* tr_getDefaultConfigDir( void );
 
-typedef struct tr_handle tr_handle;
-typedef struct tr_torrent tr_torrent;
 typedef struct tr_ctor tr_ctor;
+typedef struct tr_handle tr_handle;
+typedef struct tr_info tr_info;
+typedef struct tr_stat tr_stat;
+typedef struct tr_torrent tr_torrent;
+
 
 /**
  * @addtogroup tr_session Session
@@ -423,6 +426,135 @@ int tr_blocklistHasAddress( tr_handle             * handle,
 
 
 
+/** @addtogroup tr_ctor Torrent Instantiation
+    @{ 
+
+    Instantiating a tr_torrent had gotten more complicated as features were
+    added.  At one point there were four functions to check metainfo and five
+    to create tr_torrent.
+  
+    To remedy this, a Torrent Constructor (struct tr_ctor) has been introduced:
+    - Simplifies the API to two functions: tr_torrentParse() and tr_torrentNew()
+    - You can set the fields you want; the system sets defaults for the rest.
+    - You can specify whether or not your fields should supercede resume's.
+    - We can add new features to tr_ctor without breaking tr_torrentNew()'s API.
+  
+    All the tr_ctor{Get,Set}*() functions with a return value return 
+    an error number, or zero if no error occurred.
+  
+    You must call one of the SetMetainfo() functions before creating
+    a torrent with a tr_ctor.  The other functions are optional.
+  
+    You can reuse a single tr_ctor to create a batch of torrents --
+    just call one of the SetMetainfo() functions between each
+    tr_torrentNew() call.
+  
+    Every call to tr_ctorSetMetainfo*() frees the previous metainfo.
+ */
+
+typedef enum
+{
+    TR_FALLBACK, /* indicates the ctor value should be used only
+                    in case of missing resume settings */
+
+    TR_FORCE, /* indicates the ctor value should be used
+                 regardless of what's in the resume settings */
+}
+tr_ctorMode;
+
+struct tr_benc;
+
+tr_ctor* tr_ctorNew                    ( const tr_handle  * handle);
+
+void     tr_ctorFree                   ( tr_ctor        * ctor );
+
+void     tr_ctorSetSave                ( tr_ctor        * ctor,
+                                         int     saveMetadataInOurTorrentsDir );
+
+void     tr_ctorSetDeleteSource       ( tr_ctor        * ctor,
+                                         uint8_t          doDelete );
+
+int      tr_ctorSetMetainfo            ( tr_ctor        * ctor,
+                                         const uint8_t  * metainfo,
+                                         size_t           len );
+
+int      tr_ctorSetMetainfoFromFile    ( tr_ctor        * ctor,
+                                         const char     * filename );
+
+int      tr_ctorSetMetainfoFromHash    ( tr_ctor        * ctor,
+                                         const char     * hashString );
+
+/** Set the maximum number of peers this torrent can connect to.
+    (Default: 50) */
+void     tr_ctorSetPeerLimit           ( tr_ctor        * ctor,
+                                         tr_ctorMode      mode,
+                                         uint16_t         peerLimit  );
+
+/** Set the download folder for the torrent being added with this ctor. 
+    @see tr_ctorSetDownloadDir()
+    @see tr_sessionInitFull() */
+void     tr_ctorSetDownloadDir         ( tr_ctor        * ctor,
+                                         tr_ctorMode      mode,
+                                         const char     * directory );
+
+/** Set whether or not the torrent begins downloading/seeding when created.
+    (Default: not paused) */
+void     tr_ctorSetPaused              ( tr_ctor        * ctor,
+                                         tr_ctorMode      mode,
+                                         uint8_t          isPaused );
+
+int      tr_ctorGetPeerLimit           ( const tr_ctor  * ctor,
+                                         tr_ctorMode      mode,
+                                         uint16_t       * setmeCount );
+
+int      tr_ctorGetPaused              ( const tr_ctor  * ctor,
+                                         tr_ctorMode      mode,
+                                         uint8_t        * setmeIsPaused );
+
+int      tr_ctorGetDownloadDir         ( const tr_ctor  * ctor,
+                                         tr_ctorMode      mode,
+                                         const char    ** setmeDownloadDir );
+
+int      tr_ctorGetMetainfo            ( const tr_ctor  * ctor,
+                                         const struct tr_benc ** setme );
+
+int      tr_ctorGetSave                ( const tr_ctor  * ctor );
+ 
+int      tr_ctorGetDeleteSource        ( const tr_ctor  * ctor,
+                                         uint8_t        * setmeDoDelete );
+
+/* returns NULL if tr_ctorSetMetainfoFromFile() wasn't used */
+const char* tr_ctorGetSourceFile       ( const tr_ctor  * ctor );
+
+#define TR_EINVALID     1
+#define TR_EDUPLICATE   2
+
+/**
+ * Parses the specified metainfo.
+ * Returns TR_OK if it parsed and can be added to Transmission.
+ * Returns TR_EINVALID if it couldn't be parsed.
+ * Returns TR_EDUPLICATE if it parsed but can't be added. 
+ *     "download-dir" must be set to test for TR_EDUPLICATE.
+ *
+ * If setme_info is non-NULL and parsing is successful
+ * (that is, if TR_EINVALID is not returned), then the parsed
+ * metainfo is stored in setme_info and should be freed by the
+ * caller via tr_metainfoFree().
+ */
+int tr_torrentParse( const tr_handle  * handle,
+                     const tr_ctor    * ctor,
+                     tr_info          * setme_info_or_NULL );
+
+/** Instantiate a single torrent. 
+    @return 0 on success,
+            TR_EINVALID if the torrent couldn't be parsed, or
+            TR_EDUPLICATE if there's already a matching torrent object. */
+tr_torrent * tr_torrentNew( tr_handle      * handle,
+                            const tr_ctor  * ctor,
+                            int            * setmeError );
+
+/** @} */
+
 /***********************************************************************
 ***
 ***  TORRENTS
@@ -431,11 +563,15 @@ int tr_blocklistHasAddress( tr_handle             * handle,
 /** @addtogroup tr_torrent Torrents
     @{ */
 
-/**
- * Iterate through the torrents.
- * Pass in in a NULL pointer to get the first torrent.
- */
+/** Iterate through the torrents.
+    Pass in a NULL pointer to get the first torrent.  */
 tr_torrent* tr_torrentNext( tr_handle *, tr_torrent * );
+
+/** Returns this torrent's unique ID.
+    IDs are good as simple lookup keys, but are not persistent
+    between sessions.  If you need that, use tr_info.hash or
+    tr_info.hashString. */
+int tr_torrentId( const tr_torrent * );
 
 /***********************************************************************
 *** Speed Limits
@@ -534,139 +670,6 @@ void tr_torrentRates( tr_handle *, float *, float * );
 
 
 
-/**
- *  Torrent Instantiation
- *
- *  Instantiating a tr_torrent had gotten more complicated as features were
- *  added.  At one point there were four functions to check metainfo and five
- *  to create tr_torrent.
- *
- *  To remedy this, a Torrent Constructor (struct tr_ctor) has been introduced:
- *  + Simplifies the API down to two (non-deprecated) functions.
- *  + You can set the fields you want; the system sets defaults for the rest.
- *  + You can specify whether or not your fields should supercede resume's.
- *  + We can add new features to tr_ctor without breaking tr_torrentNew()'s API.
- *
- *  All the tr_ctor{Get,Set}*() functions with a return value return 
- *  an error number, or zero if no error occurred.
- *
- *  You must call one of the SetMetainfo() functions before creating
- *  a torrent with a tr_ctor.  The other functions are optional.
- *
- *  You can reuse a single tr_ctor to create a batch of torrents --
- *  just call one of the SetMetainfo() functions between each
- *  tr_torrentNew() call.
- *
- *  Every call to tr_ctorSetMetainfo*() frees the previous metainfo.
- */
-
-typedef enum
-{
-    TR_FALLBACK, /* indicates the ctor value should be used only
-                    in case of missing resume settings */
-
-    TR_FORCE, /* indicates the ctor value should be used
-                 regardless of what's in the resume settings */
-}
-tr_ctorMode;
-
-struct tr_benc;
-
-tr_ctor* tr_ctorNew                    ( const tr_handle  * handle);
-
-void     tr_ctorFree                   ( tr_ctor        * ctor );
-
-void     tr_ctorSetSave                ( tr_ctor        * ctor,
-                                         int     saveMetadataInOurTorrentsDir );
-
-void     tr_ctorSetDeleteSource       ( tr_ctor        * ctor,
-                                         uint8_t          doDelete );
-
-int      tr_ctorSetMetainfo            ( tr_ctor        * ctor,
-                                         const uint8_t  * metainfo,
-                                         size_t           len );
-
-int      tr_ctorSetMetainfoFromFile    ( tr_ctor        * ctor,
-                                         const char     * filename );
-
-int      tr_ctorSetMetainfoFromHash    ( tr_ctor        * ctor,
-                                         const char     * hashString );
-
-void     tr_ctorSetPeerLimit           ( tr_ctor        * ctor,
-                                         tr_ctorMode      mode,
-                                         uint16_t         peerLimit  );
-
-/**
- * Set the download folder for the torrent being added with this ctor. 
- * @see tr_ctorSetDownloadDir()
- * @see tr_sessionInitFull()
- */
-void     tr_ctorSetDownloadDir         ( tr_ctor        * ctor,
-                                         tr_ctorMode      mode,
-                                         const char     * directory );
-
-void     tr_ctorSetPaused              ( tr_ctor        * ctor,
-                                         tr_ctorMode      mode,
-                                         uint8_t          isPaused );
-
-int      tr_ctorGetPeerLimit           ( const tr_ctor  * ctor,
-                                         tr_ctorMode      mode,
-                                         uint16_t       * setmeCount );
-
-int      tr_ctorGetPaused              ( const tr_ctor  * ctor,
-                                         tr_ctorMode      mode,
-                                         uint8_t        * setmeIsPaused );
-
-int      tr_ctorGetDownloadDir         ( const tr_ctor  * ctor,
-                                         tr_ctorMode      mode,
-                                         const char    ** setmeDownloadDir );
-
-int      tr_ctorGetMetainfo            ( const tr_ctor  * ctor,
-                                         const struct tr_benc ** setme );
-
-int      tr_ctorGetSave                ( const tr_ctor  * ctor );
- 
-int      tr_ctorGetDeleteSource        ( const tr_ctor  * ctor,
-                                         uint8_t        * setmeDoDelete );
-
-/* returns NULL if tr_ctorSetMetainfoFromFile() wasn't used */
-const char* tr_ctorGetSourceFile       ( const tr_ctor  * ctor );
-
-/**
- * Returns this torrent's unique ID.
- * IDs are allocated when the torrent is constructed and are
- * good until tr_sessionClose() is called.
- */
-int tr_torrentId( const tr_torrent * );
-
-typedef struct tr_info tr_info;
-
-/**
- * Parses the specified metainfo.
- * Returns TR_OK if it parsed and can be added to Transmission.
- * Returns TR_EINVALID if it couldn't be parsed.
- * Returns TR_EDUPLICATE if it parsed but can't be added. 
- *     "download-dir" must be set to test for TR_EDUPLICATE.
- *
- * If setme_info is non-NULL and parsing is successful
- * (that is, if TR_EINVALID is not returned), then the parsed
- * metainfo is stored in setme_info and should be freed by the
- * caller via tr_metainfoFree().
- */
-int tr_torrentParse( const tr_handle  * handle,
-                     const tr_ctor    * ctor,
-                     tr_info          * setme_info_or_NULL );
-
-/**
- * Instantiate a single torrent.
- */
-#define TR_EINVALID     1
-#define TR_EDUPLICATE   2
-tr_torrent * tr_torrentNew( tr_handle      * handle,
-                            const tr_ctor  * ctor,
-                            int            * setmeError );
-
-
 const tr_info * tr_torrentInfo( const tr_torrent * );
 
 void tr_torrentSetDownloadDir( tr_torrent *, const char * );
@@ -750,18 +753,14 @@ void tr_torrentManualUpdate( tr_torrent * );
 
 int tr_torrentCanManualUpdate( const tr_torrent * );
 
-/***********************************************************************
- * tr_torrentStat
- ***********************************************************************
- * Returns a pointer to an tr_stat structure with updated information
- * on the torrent. The structure belongs to libtransmission (do not
- * free it) and is guaranteed to be unchanged until the next call to
- * tr_torrentStat.
- * The interface should call this function every second or so in order
- * to update itself.
- **********************************************************************/
-typedef struct tr_stat tr_stat;
+/** Return a pointer to an tr_stat structure with updated information
+    on the torrent.  This is typically called by the GUI clients every
+    second or so to get a new snapshot of the torrent's status. */
 const tr_stat * tr_torrentStat( tr_torrent * );
+
+/** Like tr_torrentStat(), but only recalculates the statistics if it's
+    been longer than a second since they were last calculated.  This can
+    reduce the CPU load if you're calling tr_torrentStat() frequently. */
 const tr_stat * tr_torrentStatCached( tr_torrent * );
 
 /***********************************************************************
@@ -922,121 +921,171 @@ enum
     TR_PEER_FROM__MAX
 };
 
+/**
+ * The current status of a torrent.
+ * @see tr_torrentStat()
+ */
 struct tr_stat
 {
+    /** The torrent's unique Id. 
+        @see tr_torrentId() */
     int id;
 
+    /** The torrent's current status */
     tr_torrent_status status;
 
+    /** Our current announce URL, or NULL if none.
+        This URL may change during the session if the torrent's
+        metainfo has multiple trackers and the current one
+        becomes unreachable. */
     char * announceURL;
+
+    /** Our current scrape URL, or NULL if none.
+        This URL may change during the session if the torrent's
+        metainfo has multiple trackers and the current one
+        becomes unreachable. */
     char * scrapeURL;
 
+    /** The error status for this torrent.  0 means everything's fine. */
     tr_errno error;
+
+    /** Typically an error string returned from the tracker. */
     char errorString[128];
 
-    /* [0..1] */
+    /** When tr_stat.status is TR_STATUS_CHECK or TR_STATUS_CHECK_WAIT,
+        this is the percentage of how much of the files has been
+        verified.  When it gets to 1, the verify process is done.
+        Range is [0..1]
+        @see tr_stat.status */
     float recheckProgress;
 
-    /* [0..1] */
+    /** How much has been downloaded of the entire torrent.
+        Range is [0..1] */
     float percentComplete;
 
-    /* [0..1] */
+    /** How much has been downloaded of the files the user wants.  This differs
+        from percentComplete if the user wants only some of the torrent's files.
+        Range is [0..1]
+        @see tr_stat.leftUntilDone */
     float percentDone;
 
-    /* KiB/s */
+    /** Download speed in KiB/s */
     float rateDownload;
 
-    /* KiB/s */
+    /** Upload speed in KiB/s */
     float rateUpload;
 
  #define TR_ETA_NOT_AVAIL -1
  #define TR_ETA_UNKNOWN -2
-    /* seconds */
+    /** Estimated number of seconds left until the torrent is done,
+        or TR_ETA_NOT_AVAIL or TR_ETA_UNKNOWN */
     int eta;
 
+    /** Number of peers that the tracker says this torrent has */
     int peersKnown;
+
+    /** Number of peers that we're connected to */
     int peersConnected;
+
+    /** How many peers we found out about from the tracker, or from pex,
+        or from incoming connections, or from our resume file. */
     int peersFrom[TR_PEER_FROM__MAX];
+
+    /** Number of peers that are sending data to us. */
     int peersSendingToUs;
+
+    /** Number of peers that we're sending data to */
     int peersGettingFromUs;
+
+    /** Number of seeders that the tracker says this torrent has */
     int seeders;
+
+    /** Number of leechers that the tracker says this torrent has */
     int leechers;
+
+    /** Number of finished downloads that the tracker says torrent has */
     int completedFromTracker;
 
-    /* Byte count of all the piece data we'll have downloaded when we're done.
-     * whether or not we have it yet. [0...tr_info.totalSize] */
+    /** Byte count of all the piece data we'll have downloaded when we're done,
+        whether or not we have it yet. [0...tr_info.totalSize] */
     uint64_t sizeWhenDone;
 
-    /* Byte count of how much data is left to be downloaded until
-     * we're done -- that is, until we've got all the pieces we wanted.
-     * [0...tr_info.sizeWhenDone] */
+    /** Byte count of how much data is left to be downloaded until
+        we're done -- that is, until we've got all the pieces we wanted.
+        [0...tr_info.sizeWhenDone] */
     uint64_t leftUntilDone;
 
-    /* Byte count of all the piece data we want and don't have yet,
-     * but that a connected peer does have. [0...leftUntilDone] */
+    /** Byte count of all the piece data we want and don't have yet,
+        but that a connected peer does have. [0...leftUntilDone] */
     uint64_t desiredAvailable;
 
-    /* Byte count of all the corrupt data you've ever downloaded for
-     * this torrent.  If you're on a poisoned torrent, this number can
-     * grow very large. */
+    /** Byte count of all the corrupt data you've ever downloaded for
+        this torrent.  If you're on a poisoned torrent, this number can
+        grow very large. */
     uint64_t corruptEver;
 
-    /* Byte count of all data you've ever uploaded for this torrent. */
+    /** Byte count of all data you've ever uploaded for this torrent. */
     uint64_t uploadedEver;
 
-    /* Byte count of all the non-corrupt data you've ever downloaded
-     * for this torrent.  If you deleted the files and downloaded a second time,
-     * this will be 2*totalSize.. */
+    /** Byte count of all the non-corrupt data you've ever downloaded
+        for this torrent.  If you deleted the files and downloaded a second
+        time, this will be 2*totalSize.. */
     uint64_t downloadedEver;
 
-    /* Byte count of all the checksum-verified data we have for this torrent. */
+    /** Byte count of all the checksum-verified data we have for this torrent. */
     uint64_t haveValid;
 
-    /* Byte count of all the partial piece data we have for this torrent.
-     * As pieces become complete, this value may decrease as portions of it are
-     * moved to `corrupt' or `haveValid'. */
+    /** Byte count of all the partial piece data we have for this torrent.
+        As pieces become complete, this value may decrease as portions of it
+        are moved to `corrupt' or `haveValid'. */
     uint64_t haveUnchecked;
 
-    /* This is the unmodified string returned by the tracker in response
-     * to the torrent's most recent scrape request.  If no request was
-     * sent or there was no response, this string is empty. */
+    /** This is the unmodified string returned by the tracker in response
+        to the torrent's most recent scrape request.  If no request was
+        sent or there was no response, this string is empty. */
     char scrapeResponse[256];
 
-    /* The unmodified string returned by the tracker in response
-     * to the torrent's most recent scrape request.  If no request was
-     * sent or there was no response, this string is empty. */
+    /** The unmodified string returned by the tracker in response
+        to the torrent's most recent scrape request.  If no request was
+        sent or there was no response, this string is empty. */
     char announceResponse[256];
 
-    /* Time the most recent scrape request was sent,
-     * or zero if one hasn't been sent yet. */
+    /** Time the most recent scrape request was sent,
+        or zero if one hasn't been sent yet. */
     time_t lastScrapeTime;
 
-    /* Time when the next scrape request will be sent.
-     * This value is always a valid time. */
+    /** Time when the next scrape request will be sent.
+        This value is always a valid time. */
     time_t nextScrapeTime;
 
-    /* Time the most recent announce request was sent,
-     * or zero if one hasn't been sent yet. */
+    /** Time the most recent announce request was sent,
+        or zero if one hasn't been sent yet. */
     time_t lastAnnounceTime;
 
-    /* Time when the next reannounce request will be sent,
-     * or zero if the torrent is stopped. */
+    /** Time when the next reannounce request will be sent,
+        or zero if the torrent is stopped. */
     time_t nextAnnounceTime;
 
-    /* if the torrent is running, this is the time at which
-     * the client can manually ask the torrent's tracker
-     * for more peers.  otherwise, the value is zero. */
+    /** If the torrent is running, this is the time at which
+        the client can manually ask the torrent's tracker
+        for more peers.  otherwise, the value is zero. */
     time_t manualAnnounceTime;
 
+    /** A very rough estimate in KiB/s of how quickly data is being
+        passed around between all the peers we're connected to. 
+        Don't put too much weight in this number. */
     float swarmSpeed;
 
 #define TR_RATIO_NA  -1
 #define TR_RATIO_INF -2
-    /* TR_RATIO_INF, TR_RATIO_NA, or a regular ratio */
+    /** TR_RATIO_INF, TR_RATIO_NA, or a regular ratio */
     float ratio;
-    
-    uint64_t startDate;
-    uint64_t activityDate;
+   
+    /** When the torrent was last started. */ 
+    time_t startDate;
+
+    /** The last time we uploaded or downloaded piece data on this torrent. */
+    time_t activityDate;
 };
 
 struct tr_file_stat

@@ -717,6 +717,19 @@ peer_page_new ( TrTorrent * gtor )
 *****  INFO TAB
 ****/
 
+static void
+refresh_time_lb( GtkWidget * l, time_t t )
+{
+    const char * never = _( "Never" );
+    if( !t )
+        gtk_label_set_text( GTK_LABEL( l ), never );
+    else {
+        char * str = rfc822date( t );
+        gtk_label_set_text( GTK_LABEL( l ), str );
+        g_free( str );
+    }
+}
+
 static GtkWidget*
 info_page_new (tr_torrent * tor)
 {
@@ -771,10 +784,9 @@ info_page_new (tr_torrent * tor)
     l = gtk_label_new (*info->creator ? info->creator : _("Unknown"));
     hig_workarea_add_row (t, &row, _("Creator:"), l, NULL);
 
-    pch = rfc822date ((guint64)info->dateCreated * 1000u);
-    l = gtk_label_new (pch);
+    l = gtk_label_new( NULL );
+    refresh_time_lb( l, info->dateCreated );
     hig_workarea_add_row (t, &row, _("Date:"), l, NULL); 
-    g_free (pch);
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Location"));
@@ -863,15 +875,9 @@ refresh_activity (GtkWidget * top)
   gtk_label_set_text (GTK_LABEL(a->err_lb),
                       *stat->errorString ? stat->errorString : _("None"));
 
-  pch = stat->startDate ? rfc822date( stat->startDate )
-                        : g_strdup_printf( _( "Unknown" ) );
-  gtk_label_set_text (GTK_LABEL(a->date_added_lb), pch);
-  g_free (pch);
+  refresh_time_lb( a->date_added_lb, stat->startDate );
 
-  pch = stat->activityDate ? rfc822date( stat->activityDate )
-                           : g_strdup_printf( _( "Unknown" ) );
-  gtk_label_set_text (GTK_LABEL(a->last_activity_lb), pch);
-  g_free (pch);
+  refresh_time_lb( a->last_activity_lb, stat->activityDate );
 
 #ifdef SHOW_PIECES
   if (GDK_IS_DRAWABLE (a->availability_da->window))
@@ -1188,19 +1194,6 @@ refresh_countdown_lb( GtkWidget * l, time_t t )
         const int seconds = t - now;
         tr_strltime( buf, seconds, sizeof( buf ) );
         gtk_label_set_text( GTK_LABEL( l ), buf );
-    }
-}
-
-static void
-refresh_time_lb( GtkWidget * l, time_t t )
-{
-    const char * never = _( "Never" );
-    if( !t )
-        gtk_label_set_text( GTK_LABEL( l ), never );
-    else {
-        char * str = rfc822date( (guint64)t * 1000 );
-        gtk_label_set_text( GTK_LABEL( l ), str );
-        g_free( str );
     }
 }
 

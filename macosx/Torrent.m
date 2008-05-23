@@ -1477,8 +1477,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSDate *) dateActivity
 {
-    uint64_t date = fStat->activityDate;
-    return date != 0 ? [NSDate dateWithTimeIntervalSince1970: date / 1000] : fDateActivity;
+    time_t date = fStat->activityDate;
+    return date != 0 ? [NSDate dateWithTimeIntervalSince1970: date] : fDateActivity;
 }
 
 - (NSDate *) dateActivityOrAdd
@@ -1489,11 +1489,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (int) stalledMinutes
 {
-    uint64_t start;
+    time_t start;
     if ((start = fStat->startDate) == 0)
         return -1;
     
-    NSDate * started = [NSDate dateWithTimeIntervalSince1970: start / 1000],
+    NSDate * started = [NSDate dateWithTimeIntervalSince1970: start],
             * activity = [self dateActivity];
     
     NSDate * laterDate = activity ? [started laterDate: activity] : started;

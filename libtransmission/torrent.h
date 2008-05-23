@@ -159,9 +159,8 @@ struct tr_torrent
     uint64_t                   corruptCur;
     uint64_t                   corruptPrev;
 
-    uint64_t                   startDate;
-    uint64_t                   stopDate;
-    uint64_t                   activityDate;
+    time_t                     startDate;
+    time_t                     activityDate;
 
     tr_torrent_status_func   * status_func;
     void                     * status_func_user_data;

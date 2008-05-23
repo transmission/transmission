@@ -173,10 +173,9 @@ tr_strltime( char * buf, int seconds, size_t buflen )
 
 
 char *
-rfc822date (guint64 epoch_msec)
+rfc822date( time_t time )
 {
-    const time_t secs = epoch_msec / 1000;
-    const struct tm tm = *localtime (&secs);
+    const struct tm tm = *localtime( &time );
     char buf[128];
     strftime( buf, sizeof(buf), "%a, %d %b %Y %T %Z", &tm );
     return g_locale_to_utf8( buf, -1, NULL, NULL, NULL );

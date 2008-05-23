@@ -1003,7 +1003,7 @@ checkAndStartImpl( void * vtor )
     tr_torrentResetTransferStats( tor );
     tor->cpStatus = tr_cpGetStatus( tor->completion );
     tr_torrentSaveResume( tor );
-    tor->startDate = tr_date( );
+    tor->startDate = time( NULL );
     tr_trackerStart( tor->tracker );
     tr_peerMgrStartTorrent( tor->handle->peerMgr, tor->info.hash );
 
