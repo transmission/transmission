@@ -712,30 +712,6 @@ void tr_torrentSetStatusCallback( tr_torrent             * torrent,
 void tr_torrentClearStatusCallback( tr_torrent * torrent );
 
 
-
-/**
-***
-**/
-
-typedef void (tr_torrent_active_func)(tr_torrent   * torrent,
-                                      int            isRunning,
-                                      void         * user_data );
-
-/**
- * Register to be notified whenever a torrent starts or stops.
- *
- * func is invoked FROM LIBTRANSMISSION'S THREAD!
- * This means func must be fast (to avoid blocking peers),
- * shouldn't call libtransmission functions (to avoid deadlock),
- * and shouldn't modify client-level memory without using a mutex!
- */
-void tr_torrentSetActiveCallback( tr_torrent             * torrent,
-                                  tr_torrent_active_func   func,
-                                  void                   * user_data );
-
-void tr_torrentClearActiveCallback( tr_torrent * torrent );
-
-
 /**
  * MANUAL ANNOUNCE
  *

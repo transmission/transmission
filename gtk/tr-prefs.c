@@ -554,7 +554,7 @@ networkPage( GObject * core, gpointer alive )
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
         
-        s = _("_Forward these port(s) from my router" );
+        s = _("Use port _forwarding from my router" );
         w = new_check_button( s, PREF_KEY_NAT, core );
         hig_workarea_add_wide_control( t, &row, w );
 
