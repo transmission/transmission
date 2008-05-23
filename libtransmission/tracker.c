@@ -21,7 +21,6 @@
 #include "bencode.h"
 #include "completion.h"
 #include "net.h"
-#include "port-forwarding.h"
 #include "publish.h"
 #include "torrent.h"
 #include "tracker.h"
@@ -587,7 +586,7 @@ buildTrackerRequestURI( const tr_tracker  * t,
         strchr(ann, '?') ? '&' : '?',
         t->escaped,
         t->peer_id,
-        tr_sharedGetPublicPort( t->session->shared ),
+        tr_sessionGetPeerPort( t->session ),
         torrent->uploadedCur,
         torrent->downloadedCur,
         torrent->corruptCur,

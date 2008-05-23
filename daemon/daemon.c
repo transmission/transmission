@@ -43,7 +43,7 @@ saveState( tr_handle * h )
     tr_bencDictAddStr( &d, "download-dir", tr_sessionGetDownloadDir( h ) );
     tr_bencDictAddInt( &d, "peer-limit", tr_sessionGetPeerLimit( h ) );
     tr_bencDictAddInt( &d, "pex-allowed", tr_sessionIsPexEnabled( h ) );
-    tr_bencDictAddInt( &d, "port", tr_sessionGetPublicPort( h ) );
+    tr_bencDictAddInt( &d, "port", tr_sessionGetPeerPort( h ) );
     tr_bencDictAddInt( &d, "port-forwarding-enabled",
                            tr_sessionIsPortForwardingEnabled( h ) );
     tr_bencDictAddStr( &d, "rpc-acl", tr_sessionGetRPCACL( h ) );

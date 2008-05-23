@@ -300,7 +300,7 @@ tr_setBindPortImpl( void * vdata )
 }
 
 void
-tr_sessionSetPublicPort( tr_handle * handle, int port )
+tr_sessionSetPeerPort( tr_handle * handle, int port )
 {
     struct bind_port_data * data = tr_new( struct bind_port_data, 1 );
     data->handle = handle;
@@ -309,10 +309,10 @@ tr_sessionSetPublicPort( tr_handle * handle, int port )
 }
 
 int
-tr_sessionGetPublicPort( const tr_handle * h )
+tr_sessionGetPeerPort( const tr_handle * h )
 {
     assert( h != NULL );
-    return tr_sharedGetPublicPort( h->shared );
+    return tr_sharedGetPeerPort( h->shared );
 }
 
 tr_port_forwarding

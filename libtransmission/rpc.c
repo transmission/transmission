@@ -592,7 +592,7 @@ sessionSet( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
     if( tr_bencDictFindInt( args_in, "pex-allowed", &i ) )
         tr_sessionSetPexEnabled( h, i );
     if( tr_bencDictFindInt( args_in, "port", &i ) )
-        tr_sessionSetPublicPort( h, i );
+        tr_sessionSetPeerPort( h, i );
     if( tr_bencDictFindInt( args_in, "port-forwarding-enabled", &i ) )
         tr_sessionSetPortForwardingEnabled( h, i );
     if( tr_bencDictFindInt( args_in, "speed-limit-down", &i ) )
@@ -630,7 +630,7 @@ sessionGet( tr_handle * h, tr_benc * args_in UNUSED, tr_benc * args_out )
     tr_bencDictAddInt( d, "pex-allowed",
                           tr_sessionIsPexEnabled( h ) );
     tr_bencDictAddInt( d, "port",
-                          tr_sessionGetPublicPort( h ) );
+                          tr_sessionGetPeerPort( h ) );
     tr_bencDictAddInt( d, "port-forwarding-enabled",
                           tr_sessionIsPortForwardingEnabled( h ) );
     tr_bencDictAddInt( d, "speed-limit-up",

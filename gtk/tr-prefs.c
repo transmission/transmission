@@ -533,10 +533,6 @@ networkPage( GObject * core, gpointer alive )
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
     hig_workarea_add_section_title (t, &row, _( "Ports" ) );
-        
-        s = _("_Forward port from router" );
-        w = new_check_button( s, PREF_KEY_NAT, core );
-        hig_workarea_add_wide_control( t, &row, w );
 
         h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
         w2 = new_spin_button( PREF_KEY_PORT, core, 1, INT_MAX, 1 );
@@ -544,15 +540,12 @@ networkPage( GObject * core, gpointer alive )
         l = gtk_label_new( NULL );
         gtk_misc_set_alignment( GTK_MISC(l), 0.0f, 0.5f );
         gtk_box_pack_start( GTK_BOX(h), l, FALSE, FALSE, 0 );
-        hig_workarea_add_row( t, &row, _("Incoming _port:"), h, w );
+        hig_workarea_add_row( t, &row, _("Listen for _peers on port:"), h, w );
 
         g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
         g_object_set_data( G_OBJECT(l), "alive", alive );
         g_object_set_data( G_OBJECT(l), "handle", tr_core_handle( TR_CORE( core ) ) );
         testing_port_cb( NULL, l );
-
-        g_signal_connect( w, "toggled", G_CALLBACK(testing_port_cb), l );
-        g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
 
         s = _( "Listen for _RPC requests on port:" );
         w = new_check_button( s, PREF_KEY_RPC_ENABLED, core );
@@ -560,6 +553,13 @@ networkPage( GObject * core, gpointer alive )
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_RPC_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
+        
+        s = _("_Forward these port(s) from my router" );
+        w = new_check_button( s, PREF_KEY_NAT, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+        g_signal_connect( w, "toggled", G_CALLBACK(testing_port_cb), l );
+        g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
 
     hig_workarea_finish( t, &row );
     return t;

@@ -248,9 +248,9 @@
 {
     int port = [sender intValue];
     [fDefaults setInteger: port forKey: @"BindPort"];
-    tr_sessionSetPublicPort(fHandle, port);
+    tr_sessionSetPeerPort(fHandle, port);
     
-    fPublicPort = -1;
+    fPeerPort = -1;
     [self updatePortStatus];
 }
 
@@ -265,12 +265,12 @@
 - (void) updatePortStatus
 {
     const tr_port_forwarding fwd = tr_sessionGetPortForwarding(fHandle);
-    const int port = tr_sessionGetPublicPort(fHandle);
+    const int port = tr_sessionGetPeerPort(fHandle);
 
-    if (fNatStatus != fwd || fPublicPort != port )
+    if (fNatStatus != fwd || fPeerPort != port )
     {
         fNatStatus = fwd;
-        fPublicPort = port;
+        fPeerPort = port;
         
         [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status", "Preferences -> Network -> port status")
             stringByAppendingEllipsis]];
@@ -282,7 +282,7 @@
             [fPortChecker cancelProbe];
             [fPortChecker release];
         }
-        fPortChecker = [[PortChecker alloc] initForPort: fPublicPort withDelegate: self];
+        fPortChecker = [[PortChecker alloc] initForPort: fPeerPort withDelegate: self];
     }
 }
 

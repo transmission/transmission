@@ -55,7 +55,7 @@
     IBOutlet NSImageView * fPortStatusImage;
     IBOutlet NSProgressIndicator * fPortStatusProgress;
     NSTimer * fPortStatusTimer;
-    int fPublicPort, fNatStatus;
+    int fPeerPort, fNatStatus;
 }
 
 - (id) initWithHandle: (tr_handle *) handle;

@@ -464,7 +464,7 @@ torrentRealInit( tr_handle     * h,
     tr_peerMgrAddTorrent( h->peerMgr, tor );
 
     if( !h->isPortSet )
-        tr_sessionSetPublicPort( h, TR_DEFAULT_PORT );
+        tr_sessionSetPeerPort( h, TR_DEFAULT_PORT );
 
     assert( !tor->downloadedCur );
     assert( !tor->uploadedCur );

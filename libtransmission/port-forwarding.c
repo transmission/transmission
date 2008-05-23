@@ -214,7 +214,7 @@ tr_sharedSetPort( tr_shared * s, int port )
 }
 
 int
-tr_sharedGetPublicPort( const tr_shared * s )
+tr_sharedGetPeerPort( const tr_shared * s )
 {
     return s->publicPort;
 }

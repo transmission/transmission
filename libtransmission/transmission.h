@@ -277,9 +277,9 @@ void tr_sessionSetPortForwardingEnabled( tr_handle *, int enable );
 
 int tr_sessionIsPortForwardingEnabled( const tr_handle * );
 
-void tr_sessionSetPublicPort( tr_handle *, int );
+void tr_sessionSetPeerPort( tr_handle *, int );
 
-int tr_sessionGetPublicPort( const tr_handle * );
+int tr_sessionGetPeerPort( const tr_handle * );
 
 typedef enum
 {

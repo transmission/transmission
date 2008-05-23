@@ -893,7 +893,7 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     else if( !strcmp( key, PREF_KEY_PORT ) )
     {
         const int port = pref_int_get( key );
-        tr_sessionSetPublicPort( tr, port );
+        tr_sessionSetPeerPort( tr, port );
     }
     else if( !strcmp( key, PREF_KEY_DL_LIMIT_ENABLED ) )
     {
