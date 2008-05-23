@@ -2134,7 +2134,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 											</object>
 										</object>
 										<double key="NSRowHeight">1.400000e+01</double>
-										<int key="NSTvFlags">314572800</int>
+										<int key="NSTvFlags">306184192</int>
 										<int key="NSColumnAutoresizingStyle">4</int>
 										<int key="NSDraggingSourceMaskForLocal">15</int>
 										<int key="NSDraggingSourceMaskForNonLocal">0</int>
@@ -8921,7 +8921,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 							<string>NSMatrix</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
-							<string>NSTableView</string>
+							<string>TrackerTableView</string>
 							<string>NSView</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
