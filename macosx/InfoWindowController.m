@@ -26,6 +26,7 @@
 #import "InfoTabButtonCell.h"
 #import "FileOutlineView.h"
 #import "FileListNode.h"
+#import "TrackerTableView.h"
 #import "QuickLookController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
@@ -433,6 +434,7 @@ typedef enum
     [self updateInfoStats];
     [self updateOptions];
     
+    [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
     [fPeerTable reloadData];
 }

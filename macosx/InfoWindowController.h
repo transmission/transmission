@@ -28,6 +28,8 @@
 #import "PiecesView.h"
 #import <transmission.h>
 
+@class TrackerTableView;
+
 @interface InfoWindowController : NSWindowController
 {
     NSArray * fTorrents, * fPeers, * fTrackers;
@@ -49,7 +51,7 @@
     IBOutlet NSTextView * fCommentView;
     IBOutlet NSButton * fRevealDataButton, * fRevealTorrentButton;
     
-    IBOutlet NSTableView * fTrackerTable;
+    IBOutlet TrackerTableView * fTrackerTable;
     IBOutlet NSTextField * fAnnounceAddressField, * fAnnounceLastField, * fAnnounceResponseField, * fAnnounceNextField,
                             * fScrapeAddressField, * fScrapeLastField, * fScrapeResponseField, * fScrapeNextField;
 

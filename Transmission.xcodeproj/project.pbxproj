@@ -143,6 +143,7 @@
 		A26E75960CB6AB4800226674 /* InfoGeneral.png in Resources */ = {isa = PBXBuildFile; fileRef = A26E75950CB6AB4800226674 /* InfoGeneral.png */; };
 		A2710E770A86796000CE4F7D /* PrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2710E750A86796000CE4F7D /* PrefsWindow.m */; };
 		A2725B6E0DE5C4F5003445E7 /* FileListNode.m in Sources */ = {isa = PBXBuildFile; fileRef = A2725B6D0DE5C4F5003445E7 /* FileListNode.m */; };
+		A2725D5D0DE7507C003445E7 /* TrackerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2725D5C0DE7507C003445E7 /* TrackerTableView.m */; };
 		A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA090C693D9C00DA2CD4 /* ActionOn.png */; };
 		A29576030D11D63C0093B167 /* Creator.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576010D11D63C0093B167 /* Creator.xib */; };
 		A29576130D11D8DD0093B167 /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576110D11D8DD0093B167 /* InfoWindow.xib */; };
@@ -579,6 +580,8 @@
 		A2710E750A86796000CE4F7D /* PrefsWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrefsWindow.m; path = macosx/PrefsWindow.m; sourceTree = "<group>"; };
 		A2725B6C0DE5C4F5003445E7 /* FileListNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileListNode.h; path = macosx/FileListNode.h; sourceTree = "<group>"; };
 		A2725B6D0DE5C4F5003445E7 /* FileListNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FileListNode.m; path = macosx/FileListNode.m; sourceTree = "<group>"; };
+		A2725D5B0DE7507C003445E7 /* TrackerTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TrackerTableView.h; path = macosx/TrackerTableView.h; sourceTree = "<group>"; };
+		A2725D5C0DE7507C003445E7 /* TrackerTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TrackerTableView.m; path = macosx/TrackerTableView.m; sourceTree = "<group>"; };
 		A27476FF0CC38EE6003CC76D /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = macosx/es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A27477010CC38EE6003CC76D /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = macosx/es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A277DA090C693D9C00DA2CD4 /* ActionOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOn.png; path = macosx/Images/ActionOn.png; sourceTree = "<group>"; };
@@ -1373,6 +1376,8 @@
 				A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */,
 				A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */,
 				A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */,
+				A2725D5B0DE7507C003445E7 /* TrackerTableView.h */,
+				A2725D5C0DE7507C003445E7 /* TrackerTableView.m */,
 			);
 			name = "Info Window";
 			sourceTree = "<group>";
@@ -1984,6 +1989,7 @@
 				A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */,
 				A2DF57740DE46A6A000795D5 /* QuickLookController.m in Sources */,
 				A2725B6E0DE5C4F5003445E7 /* FileListNode.m in Sources */,
+				A2725D5D0DE7507C003445E7 /* TrackerTableView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

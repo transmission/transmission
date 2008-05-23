@@ -706,10 +706,11 @@
     NSRect visibleRect = clipRect;
     NSRange rows = [self rowsInRect: visibleRect];
     BOOL start = YES;
-    int i;
     
     if (rows.length > 0)
     {
+        int i;
+        
         //determine what the first row color should be
         if ([[self itemAtRow: rows.location] isKindOfClass: [Torrent class]])
         {
