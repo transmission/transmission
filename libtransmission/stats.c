@@ -10,6 +10,8 @@
  * $Id$
  */
 
+#include <assert.h>
+
 #include "transmission.h"
 #include "bencode.h"
 #include "platform.h" /* tr_sessionGetConfigDir() */
@@ -46,20 +48,16 @@ loadCumulativeStats( const tr_handle * handle, tr_session_stats * setme )
     {
         int64_t i;
 
-        if( tr_bencDictFindInt( &top, "uploaded-bytes", &i ) )
-            setme->uploadedBytes = (uint64_t) i;
-
         if( tr_bencDictFindInt( &top, "downloaded-bytes", &i ) )
             setme->downloadedBytes = (uint64_t) i;
-
         if( tr_bencDictFindInt( &top, "files-added", &i ) )
             setme->filesAdded = (uint64_t) i;
-
-        if( tr_bencDictFindInt( &top, "session-count", &i ) )
-            setme->sessionCount = (uint64_t) i;
-
         if( tr_bencDictFindInt( &top, "seconds-active", &i ) )
             setme->secondsActive = (uint64_t) i;
+        if( tr_bencDictFindInt( &top, "session-count", &i ) )
+            setme->sessionCount = (uint64_t) i;
+        if( tr_bencDictFindInt( &top, "uploaded-bytes", &i ) )
+            setme->uploadedBytes = (uint64_t) i;
 
         tr_bencFree( &top );
     }
@@ -72,11 +70,11 @@ saveCumulativeStats( const tr_handle * handle, const tr_session_stats * s )
     tr_benc top;
 
     tr_bencInitDict( &top, 5 );
-    tr_bencDictAddInt( &top, "uploaded-bytes",   s->uploadedBytes );
     tr_bencDictAddInt( &top, "downloaded-bytes", s->downloadedBytes );
     tr_bencDictAddInt( &top, "files-added",      s->filesAdded );
-    tr_bencDictAddInt( &top, "session-count",    s->sessionCount );
     tr_bencDictAddInt( &top, "seconds-active",   s->secondsActive );
+    tr_bencDictAddInt( &top, "session-count",    s->sessionCount );
+    tr_bencDictAddInt( &top, "uploaded-bytes",   s->uploadedBytes );
 
     getFilename( handle, filename, sizeof(filename) );
     tr_deepLog( __FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename );
@@ -113,11 +111,7 @@ tr_statsClose( tr_handle * handle )
 static struct tr_stats_handle *
 getStats( const tr_handle * handle )
 {
-    static struct tr_stats_handle nullObject;
-
-    return handle && handle->sessionStats
-        ? handle->sessionStats
-        : &nullObject;
+    return handle->sessionStats;
 }
 
 /***
@@ -149,6 +143,7 @@ tr_sessionGetStats( const tr_handle   * handle,
                     tr_session_stats  * setme )
 {
     const struct tr_stats_handle * stats = getStats( handle );
+    assert( stats != NULL );
     *setme = stats->single;
     setme->secondsActive = time( NULL ) - stats->startTime;
     updateRatio( setme );
@@ -158,9 +153,11 @@ void
 tr_sessionGetCumulativeStats( const tr_handle   * handle,
                               tr_session_stats  * setme )
 {
+    const struct tr_stats_handle * stats = getStats( handle );
+    assert( stats != NULL );
     tr_session_stats current;
     tr_sessionGetStats( handle, &current );
-    addStats( setme, &getStats(handle)->old, &current );
+    addStats( setme, &stats->old, &current );
 }
 
 void
@@ -185,17 +182,23 @@ tr_sessionClearStats( tr_handle * handle )
 void
 tr_statsAddUploaded( tr_handle * handle, uint32_t bytes )
 {
-    getStats(handle)->single.uploadedBytes += bytes;
+    struct tr_stats_handle * s;
+    if(( s = getStats( handle )))
+        s->single.uploadedBytes += bytes;
 }
 
 void
 tr_statsAddDownloaded( tr_handle * handle, uint32_t bytes )
 {
-    getStats(handle)->single.downloadedBytes += bytes;
+    struct tr_stats_handle * s;
+    if(( s = getStats( handle )))
+        s->single.downloadedBytes += bytes;
 }
 
 void
 tr_statsFileCreated( tr_handle * handle )
 {
-    getStats(handle)->single.filesAdded++;
+    struct tr_stats_handle * s;
+    if(( s = getStats( handle )))
+        s->single.filesAdded++;
 }
