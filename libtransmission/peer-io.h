@@ -23,7 +23,6 @@ struct bufferevent;
 struct tr_handle;
 struct tr_crypto;
 typedef struct tr_peerIo tr_peerIo;
-typedef struct tr_extensions tr_extensions;
 
 /**
 ***

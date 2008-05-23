@@ -41,37 +41,33 @@
 ***
 **/
 
-struct tr_extensions
-{
-    unsigned int extendedProtocolSupported : 1;
-    unsigned int fastPeersSupported : 1;
-};
-
 struct tr_peerIo
 {
-    struct tr_handle * handle;
+    unsigned int          isEncrypted : 1;
+    unsigned int          isIncoming : 1;
+    unsigned int          peerIdIsSet : 1;
+    unsigned int          extendedProtocolSupported : 1;
+    unsigned int          fastPeersSupported : 1;
 
-    struct in_addr in_addr;
-    int port;
-    int socket;
-    int encryptionMode;
-    int timeout;
-    struct bufferevent * bufev;
-    uint8_t peerId[20];
-    time_t timeCreated;
+    uint8_t               encryptionMode;
+    uint8_t               timeout;
+    uint16_t              port;
+    int                   socket;
 
-    tr_extensions extensions;
+    uint8_t               peerId[20];
+    time_t                timeCreated;
 
-    unsigned int isEncrypted : 1;
-    unsigned int isIncoming : 1;
-    unsigned int peerIdIsSet : 1;
+    struct tr_handle    * handle;
 
-    tr_can_read_cb     canRead;
-    tr_did_write_cb    didWrite;
-    tr_net_error_cb    gotError;
-    void             * userData;
+    struct in_addr        in_addr;
+    struct bufferevent  * bufev;
 
-    tr_crypto * crypto;
+    tr_can_read_cb        canRead;
+    tr_did_write_cb       didWrite;
+    tr_net_error_cb       gotError;
+    void                * userData;
+
+    tr_crypto           * crypto;
 };
 
 /**
@@ -388,7 +384,7 @@ tr_peerIoEnableLTEP( tr_peerIo * io, int flag )
     assert( io != NULL );
     assert( flag==0 || flag==1 );
     
-    io->extensions.extendedProtocolSupported = flag;
+    io->extendedProtocolSupported = flag;
 }
 
 void
@@ -397,7 +393,7 @@ tr_peerIoEnableFEXT( tr_peerIo * io, int flag )
     assert( io != NULL );
     assert( flag==0 || flag==1 );
     
-    io->extensions.fastPeersSupported = flag;
+    io->fastPeersSupported = flag;
 }
 
 int
@@ -405,7 +401,7 @@ tr_peerIoSupportsLTEP( const tr_peerIo * io )
 {
     assert( io != NULL );
     
-    return io->extensions.extendedProtocolSupported;
+    return io->extendedProtocolSupported;
 }
 
 int
@@ -413,7 +409,7 @@ tr_peerIoSupportsFEXT( const tr_peerIo * io )
 {
     assert( io != NULL );
     
-    return io->extensions.fastPeersSupported;
+    return io->fastPeersSupported;
 }
 /**
 ***
