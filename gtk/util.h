@@ -82,10 +82,6 @@ checkfilenames( int argc, char ** argv );
 
 void gtr_open_file( const char * path );
 
-guint gtr_inhibit_hibernation( void );
-
-void gtr_uninhibit_hibernation( guint );
-
 gboolean gtr_dbus_add_torrent( const char * filename );
 
 char* gtr_get_help_url( void );

@@ -45,6 +45,8 @@
 #include "tr-torrent.h"
 #include "util.h"
 
+static void tr_core_set_hibernation_allowed( TrCore * core, gboolean allowed );
+
 struct TrCorePrivate
 {
 #ifdef HAVE_GIO
@@ -54,6 +56,9 @@ struct TrCorePrivate
     GSList           * monitor_files;
     guint              monitor_idle_tag;
 #endif
+    gboolean           inhibit_allowed;
+    gboolean           have_inhibit_cookie;
+    guint              inhibit_cookie;
     GtkTreeModel     * model;
     tr_handle        * handle;
 };
@@ -473,6 +478,10 @@ prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
         const uint16_t val = pref_int_get( key );
         tr_sessionSetPeerLimit( tr_core_handle( core ), val );
     }
+    else if( !strcmp( key, PREF_KEY_ALLOW_HIBERNATION ) )
+    {
+        tr_core_set_hibernation_allowed( core, pref_flag_get( key ) );
+    }
 #ifdef HAVE_GIO
     else if( !strcmp( key, PREF_KEY_DIR_WATCH ) ||
              !strcmp( key, PREF_KEY_DIR_WATCH_ENABLED ) )
@@ -564,6 +573,7 @@ tr_core_new( tr_handle * h )
     prefsChanged( core, PREF_KEY_SORT_REVERSED, NULL );
     prefsChanged( core, PREF_KEY_DIR_WATCH_ENABLED, NULL );
     prefsChanged( core, PREF_KEY_MAX_PEERS_GLOBAL, NULL );
+    prefsChanged( core, PREF_KEY_ALLOW_HIBERNATION, NULL );
     g_signal_connect( core, "prefs-changed", G_CALLBACK(prefsChanged), NULL );
 
     return core;
@@ -887,6 +897,109 @@ void
 tr_core_quit( TrCore * core )
 {
     g_signal_emit( core, TR_CORE_GET_CLASS(core)->quitsig, 0 );
+}
+
+/**
+***  Hibernate
+**/
+
+#ifdef HAVE_DBUS_GLIB
+
+static DBusGProxy*
+get_hibernation_inhibit_proxy( void )
+{
+    GError * error = NULL;
+    DBusGConnection * conn;
+
+    conn = dbus_g_bus_get( DBUS_BUS_SESSION, &error );
+    if( error )
+    {
+        g_warning ("DBUS cannot connect : %s", error->message);
+        g_error_free (error);
+        return NULL;
+    }
+
+    return dbus_g_proxy_new_for_name (conn,
+               "org.freedesktop.PowerManagement",
+               "/org/freedesktop/PowerManagement/Inhibit",
+               "org.freedesktop.PowerManagement.Inhibit" );
+}
+
+static gboolean
+gtr_inhibit_hibernation( guint * cookie )
+{
+    gboolean success = FALSE;
+    DBusGProxy * proxy = get_hibernation_inhibit_proxy( );
+    if( proxy )
+    {
+        GError * error = NULL;
+        const char * application = _( "Transmission Bittorrent Client" );
+        const char * reason = _( "BitTorrent Activity" );
+        success = dbus_g_proxy_call( proxy, "Inhibit", &error,
+                                     G_TYPE_STRING, application,
+                                     G_TYPE_STRING, reason,
+                                     G_TYPE_INVALID,
+                                     G_TYPE_UINT, cookie,
+                                     G_TYPE_INVALID );
+        if( success )
+            tr_inf( _( "Disallowing desktop hibernation" ) );
+        else {
+            tr_err( _( "Couldn't disable desktop hibernation: %s" ), error->message );
+            g_error_free( error );
+        }
+
+        g_object_unref( G_OBJECT( proxy ) );
+    }
+
+    return success != 0;
+}
+
+static void
+gtr_uninhibit_hibernation( guint inhibit_cookie )
+{
+    DBusGProxy * proxy = get_hibernation_inhibit_proxy( );
+    if( proxy )
+    {
+        GError * error = NULL;
+        gboolean success = dbus_g_proxy_call( proxy, "UnInhibit", &error,
+                                              G_TYPE_UINT, inhibit_cookie,
+                                              G_TYPE_INVALID,
+                                              G_TYPE_INVALID );
+        if( success )
+            tr_inf( _( "Allowing desktop hibernation" ) );
+        else {
+            g_warning( "Couldn't uninhibit the system from suspending: %s.", error->message );
+            g_error_free( error );
+        }
+
+        g_object_unref( G_OBJECT( proxy ) );
+    }
+}
+
+#endif
+
+
+void
+tr_core_set_hibernation_allowed( TrCore * core, gboolean allowed )
+{
+#ifdef HAVE_DBUS_GLIB
+    g_return_if_fail( core );
+    g_return_if_fail( core->priv );
+
+    core->priv->inhibit_allowed = allowed != 0;
+
+    if( allowed && core->priv->have_inhibit_cookie )
+    {
+        gtr_uninhibit_hibernation( core->priv->inhibit_cookie );
+        core->priv->have_inhibit_cookie = FALSE;
+    }
+
+    if( !allowed && !core->priv->have_inhibit_cookie )
+    {
+        core->priv->have_inhibit_cookie = gtr_inhibit_hibernation( &core->priv->inhibit_cookie );
+        core->priv->have_inhibit_cookie = TRUE;
+    }
+#endif
 }
 
 /**

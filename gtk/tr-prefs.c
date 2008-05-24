@@ -44,7 +44,7 @@ tr_prefs_init_global( void )
 #endif
 
     pref_int_set_default    ( PREF_KEY_PEER_SOCKET_TOS, TR_DEFAULT_PEER_SOCKET_TOS );
-    pref_flag_set_default   ( PREF_KEY_INHIBIT_HIBERNATION, TRUE );
+    pref_flag_set_default   ( PREF_KEY_ALLOW_HIBERNATION, TRUE );
     pref_flag_set_default   ( PREF_KEY_BLOCKLIST_ENABLED, TR_DEFAULT_BLOCKLIST_ENABLED );
 
     pref_string_set_default ( PREF_KEY_OPEN_DIALOG_FOLDER, g_get_home_dir( ) );
@@ -55,6 +55,7 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_TOOLBAR, TRUE );
     pref_flag_set_default   ( PREF_KEY_FILTERBAR, TRUE );
     pref_flag_set_default   ( PREF_KEY_STATUSBAR, TRUE );
+    pref_flag_set_default   ( PREF_KEY_TRAY_ICON_ENABLED, TRUE );
     pref_string_set_default ( PREF_KEY_STATUSBAR_STATS, "total-ratio" );
 
     pref_flag_set_default   ( PREF_KEY_DL_LIMIT_ENABLED, FALSE );
@@ -505,6 +506,30 @@ peerPage( GObject * core )
 }
 
 static GtkWidget*
+desktopPage( GObject * core )
+{
+    int row = 0;
+    const char * s;
+    GtkWidget * t;
+    GtkWidget * w;
+
+    t = hig_workarea_create( );
+
+    hig_workarea_add_section_title (t, &row, _("Options"));
+
+        s = _( "Allow desktop _hibernation" );
+        w = new_check_button( s, PREF_KEY_ALLOW_HIBERNATION, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+        s = _( "Show tray _icon" );
+        w = new_check_button( s, PREF_KEY_TRAY_ICON_ENABLED, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+    hig_workarea_finish( t, &row );
+    return t;
+}
+
+static GtkWidget*
 networkPage( GObject * core, gpointer alive )
 {
     int row = 0;
@@ -597,6 +622,9 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               networkPage( core, alive ),
                               gtk_label_new (_("Network")) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              desktopPage( core ),
+                              gtk_label_new (_("Desktop")) );
 
     g_signal_connect( d, "response", G_CALLBACK(response_cb), core );
     gtk_box_pack_start_defaults( GTK_BOX(GTK_DIALOG(d)->vbox), n );

@@ -6,6 +6,8 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.30&order=severi
    + Quick Look integration in the main window and inspector's file tab
    + Transfers can be dragged to different groups
    + Status strings are toggled from the action button (they are no longer clickable)
+- GTK+
+   + Add preferences options to inhibit hibernation and to toggle the tray icon
 
 1.21 (2008/05/21)
 http://trac.transmissionbt.com/query?group=component&milestone=1.21&order=severity

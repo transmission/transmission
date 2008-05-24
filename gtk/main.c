@@ -407,9 +407,6 @@ main( int argc, char ** argv )
 
     if( didlock && ( didinit || cf_init( configDir, &err ) ) )
     {
-        gboolean do_inhibit = FALSE;
-        guint inhibit_cookie = 0;
-
         tr_handle * h = tr_sessionInitFull(
                             configDir,
                             "gtk",
@@ -442,13 +439,7 @@ main( int argc, char ** argv )
         appsetup( win, argfiles, cbdata, startpaused, startminimized );
         tr_sessionSetRPCCallback( h, onRPCChanged, cbdata );
 
-        if(( do_inhibit = pref_flag_get( PREF_KEY_INHIBIT_HIBERNATION )))
-            inhibit_cookie = gtr_inhibit_hibernation( );
-
         gtk_main();
-
-        if( do_inhibit && inhibit_cookie ) 
-            gtr_uninhibit_hibernation( inhibit_cookie );
     }
     else if( err )
     {
@@ -479,6 +470,9 @@ appsetup( TrWindow * wind, GSList * torrentFiles,
     cbdata->errqueue   = NULL;
     cbdata->minimized  = minimized;
 
+    if( minimized )
+        pref_flag_set( PREF_KEY_TRAY_ICON_ENABLED, TRUE );
+
     actions_set_core( cbdata->core );
 
     /* set up core handlers */
@@ -499,8 +493,8 @@ appsetup( TrWindow * wind, GSList * torrentFiles,
     /* set up main window */
     winsetup( cbdata, wind );
 
-    /* set up the system tray */
-    cbdata->icon = tr_icon_new( cbdata->core );
+    /* set up the icon */
+    prefschanged( cbdata->core, PREF_KEY_TRAY_ICON_ENABLED, cbdata );
 
     /* start model update timer */
     cbdata->timer = g_timeout_add( UPDATE_INTERVAL, updatemodel, cbdata );
@@ -895,6 +889,17 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
         const int port = pref_int_get( key );
         tr_sessionSetPeerPort( tr, port );
     }
+    else if( !strcmp( key, PREF_KEY_TRAY_ICON_ENABLED ) )
+    {
+        const int show = pref_flag_get( key );
+        action_sensitize ( "close", show );
+        if( show && !cbdata->icon )
+            cbdata->icon = tr_icon_new( cbdata->core );
+        else if( !show && cbdata->icon ) {
+            g_object_unref( cbdata->icon );
+            cbdata->icon = NULL;
+        }
+    }
     else if( !strcmp( key, PREF_KEY_DL_LIMIT_ENABLED ) )
     {
         const gboolean b = pref_flag_get( key );
@@ -935,7 +940,7 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     }
     else if( !strcmp( key, PREF_KEY_RPC_ENABLED ) )
     {
-        g_message( "preferences option not recognized: %s", key );
+        tr_sessionSetRPCEnabled( tr, pref_flag_get( key ) );
     }
 }
 

@@ -47,12 +47,6 @@ popup ( GtkStatusIcon  * self,
                     self, button, when );
 }
 
-static void
-core_destroyed( gpointer data, GObject * core UNUSED )
-{
-    g_source_remove( GPOINTER_TO_UINT( data ) );
-}
-
 static gboolean
 refresh_tooltip_cb( gpointer data )
 {
@@ -80,6 +74,12 @@ refresh_tooltip_cb( gpointer data )
     return TRUE;
 }
 
+static void
+closeTag( gpointer tag )
+{
+    g_source_remove( GPOINTER_TO_UINT( tag ) );
+}
+
 gpointer
 tr_icon_new( TrCore * core )
 {
@@ -88,8 +88,8 @@ tr_icon_new( TrCore * core )
     g_signal_connect( icon, "activate", G_CALLBACK( activated ), NULL );
     g_signal_connect( icon, "popup-menu", G_CALLBACK( popup ), NULL );
     id = g_timeout_add( UPDATE_INTERVAL, refresh_tooltip_cb, icon );
-    g_object_weak_ref( G_OBJECT( core ), core_destroyed, GUINT_TO_POINTER( id ) );
     g_object_set_data( G_OBJECT( icon ), "tr-core", core );
+    g_object_set_data_full( G_OBJECT( icon ), "update-tag", GUINT_TO_POINTER( id ), closeTag );
     return icon;
 }
 
