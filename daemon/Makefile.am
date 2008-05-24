@@ -9,8 +9,9 @@ bin_PROGRAMS = \
     transmission-daemon \
     transmission-remote
 
-COMMON_LDADD = \
+LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
+    $(top_builddir)/third-party/shttpd/libshttpd.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/libevent/libevent_core.la \
@@ -20,6 +21,4 @@ COMMON_LDADD = \
     $(PTHREAD_LIBS) -lm
 
 transmission_daemon_SOURCES = daemon.c
-transmission_daemon_LDADD = $(COMMON_LDADD) $(top_builddir)/third-party/shttpd/libshttpd.a
 transmission_remote_SOURCES = remote.c
-transmission_remote_LDADD = $(COMMON_LDADD)

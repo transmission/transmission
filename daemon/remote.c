@@ -196,19 +196,19 @@ readargs( int argc, char ** argv )
                       break;
             case 'r': tr_bencDictAddStr( &top, "method", "torrent-remove" );
                       if( strcmp( optarg, "all" ) )
-                          tr_bencDictAddStr( args, "ids", optarg );
+                          tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), optarg, strlen(optarg) );
                       break;
             case 's': tr_bencDictAddStr( &top, "method", "torrent-start" );
                       if( strcmp( optarg, "all" ) )
-                          tr_bencDictAddStr( args, "ids", optarg );
+                          tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), optarg, strlen(optarg) );
                       break;
             case 'S': tr_bencDictAddStr( &top, "method", "torrent-stop" );
                       if( strcmp( optarg, "all" ) )
-                          tr_bencDictAddStr( args, "ids", optarg );
+                          tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), optarg, strlen(optarg) );
                       break;
             case 'v': tr_bencDictAddStr( &top, "method", "torrent-verify" );
                       if( strcmp( optarg, "all" ) )
-                          tr_bencDictAddStr( args, "ids", optarg );
+                          tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), optarg, strlen(optarg) );
                       break;
             default:
                       showUsage( );
@@ -340,6 +340,8 @@ processRequests( const char * host, int port,
     {
         CURLcode res;
         curl_easy_setopt( curl, CURLOPT_POSTFIELDS, reqs[i] );
+        if( debug )
+            tr_ninf( MY_NAME, "posting [%s]\n", reqs[i] );
         if(( res = curl_easy_perform( curl )))
             tr_nerr( MY_NAME, "(%s:%d) %s", host, port, curl_easy_strerror( res ) );
         else

@@ -769,7 +769,7 @@ struct WalkFuncs
  * attack via maliciously-crafted bencoded data. (#667)
  */
 static void
-bencWalk( const tr_benc   * top,
+bencWalk( const tr_benc      * top,
           struct WalkFuncs   * walkFuncs,
           void               * user_data )
 {
@@ -801,7 +801,7 @@ bencWalk( const tr_benc   * top,
             continue;
         }
 
-        switch( val->type )
+        if( val ) switch( val->type )
         {
             case TYPE_INT:
                 walkFuncs->intFunc( val, user_data );
@@ -1095,14 +1095,14 @@ jsonStringFunc( const tr_benc * val, void * vdata )
     for( it=val->val.s.s, end=it+val->val.s.i; it!=end; ++it )
     {
         switch( *it ) {
-            case '"' :
-            case '/' :
-            case '\b':
-            case '\f':
-            case '\n':
-            case '\r':
-            case '\t':
-            case '\\': evbuffer_add_printf( data->out, "\\%c", *it ); break;
+            case '/' : evbuffer_add_printf( data->out, "\\/" ); break;
+            case '\b': evbuffer_add_printf( data->out, "\\b" ); break;
+            case '\f': evbuffer_add_printf( data->out, "\\f" ); break;
+            case '\n': evbuffer_add_printf( data->out, "\\n" ); break;
+            case '\r': evbuffer_add_printf( data->out, "\\r" ); break;
+            case '\t': evbuffer_add_printf( data->out, "\\t" ); break;
+            case '"' : evbuffer_add_printf( data->out, "\\\"" ); break;
+            case '\\': evbuffer_add_printf( data->out, "\\\\" ); break;
             default: {
                 if( isascii( *it ) )
                     evbuffer_add_printf( data->out, "%c", *it );

@@ -741,6 +741,57 @@ tr_rpc_request_exec_json( struct tr_handle  * handle,
     return ret;
 }
 
+/**
+ * Munge the URI into a usable form.
+ *
+ * We have very loose typing on this to make the URIs as simple as possible:
+ * - anything not a 'tag' or 'method' is automatically in 'arguments'
+ * - values that are all-digits are numbers
+ * - values that are all-digits or commas are number lists
+ * - all other values are strings
+ */
+void
+tr_rpc_parse_list_str( tr_benc     * setme,
+                       const char  * str_in,
+                       size_t        len )
+
+{
+    char * str = tr_strndup( str_in, len );
+    int isNum;
+    int isNumList;
+    int commaCount;
+    const char * walk;
+
+    isNum = 1;
+    isNumList = 1;
+    commaCount = 0;
+    walk = str;
+    for( ; *walk && (isNumList || isNum); ++walk ) {
+        if( isNumList ) isNumList = *walk=='-' || isdigit(*walk) || *walk==',';
+        if( isNum     ) isNum     = *walk=='-' || isdigit(*walk);
+        if( *walk == ',' ) ++commaCount;
+    }
+
+    if( isNum )
+        tr_bencInitInt( setme, strtol( str, NULL, 10 ) );
+    else if( !isNumList )
+        tr_bencInitStrDup( setme, str );
+    else {
+        tr_bencInitList( setme, commaCount + 1 );
+        walk = str;
+        while( *walk ) {
+            char * p;
+            tr_bencListAddInt( setme, strtol( walk, &p, 10 ) );
+            if( *p!=',' )
+                break;
+            walk = p + 1;
+        }
+    }
+
+    tr_free( str );
+}
+
+
 char*
 tr_rpc_request_exec_uri( struct tr_handle  * handle,
                          const void        * request_uri,
@@ -771,33 +822,13 @@ tr_rpc_request_exec_uri( struct tr_handle  * handle,
         const char * next = strchr( pch, '&' );
         if( delim )
         {
-            int isNum = 1;
-            int isNumList = 1;
-            const char * walk;
             char * key = tr_strndup( pch, delim-pch );
             int isArg = strcmp( key, "method" ) && strcmp( key, "tag" );
             tr_benc * parent = isArg ? args : &top;
-            char * val = next ? tr_strndup( delim+1, next-(delim+1) )
-                              : tr_strdup( delim+1 );
-            for( walk=val; *walk && ( isNumList || isNum ); ++walk ) {
-                if( isNumList ) isNumList = *walk=='-' || isdigit(*walk) || *walk==',';
-                if( isNum     ) isNum     = *walk=='-' || isdigit(*walk);
-            }
-            if( isNum )
-                tr_bencDictAddInt( parent, key, strtol( val, NULL, 10 ) );
-            else if( !isNumList )
-                tr_bencDictAddStr( parent, key, val );
-            else {
-                tr_benc * numList = tr_bencDictAddList( parent, key, 10 );
-                walk = val;
-                for( ;; ) {
-                    char * end;
-                    tr_bencListAddInt( numList, strtol( walk, &end, 10 ) );
-                    if( *end!=',' )
-                        break;
-                    walk = end + 1;
-                }
-            }
+            tr_rpc_parse_list_str( tr_bencDictAdd( parent, key ),
+                                   delim+1,
+                                   next ? (size_t)(next-(delim+1)) : strlen(delim+1) );
+            tr_free( key );
         }
         pch = next ? next+1 : NULL;
     }
