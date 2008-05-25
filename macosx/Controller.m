@@ -828,7 +828,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (add)
     {
-        [torrent setOrderValue: [fTorrents count]-1]; //ensure that queue order is always sequential
+        [torrent setOrderValue: [fTorrents count]]; //ensure that queue order is always sequential
         
         [torrent update];
         [fTorrents addObject: torrent];
@@ -4147,8 +4147,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) rpcCallback: (tr_rpc_callback_type) type forTorrentStruct: (struct tr_torrent *) torrentStruct
 {
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    
     //get the torrent
-    if (torrentStruct != NULL)
+    if (torrentStruct != NULL && type != TR_RPC_TORRENT_ADDED)
     {
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         Torrent * torrent;
@@ -4178,6 +4180,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         case TR_RPC_SESSION_CHANGED:
             break;
     }
+    
+    [pool release];
 }
 
 /*- (void) ipcQuit
