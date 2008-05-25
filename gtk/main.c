@@ -965,6 +965,14 @@ updatemodel(gpointer gdata) {
 }
 
 static void
+aboutDialogActivateLink( GtkAboutDialog * dialog UNUSED,
+                         const gchar    * link_,
+                         gpointer         user_data UNUSED )
+{
+    gtr_open_file( link_ );
+}
+
+static void
 about ( GtkWindow * parent )
 {
     const char *authors[] =
@@ -976,6 +984,8 @@ about ( GtkWindow * parent )
         "Bryan Varner (BeOS)", 
         NULL
     };
+
+    gtk_about_dialog_set_url_hook( aboutDialogActivateLink, NULL, NULL );
 
     gtk_show_about_dialog( parent,
         "name", g_get_application_name(),
