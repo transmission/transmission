@@ -921,17 +921,17 @@ tr_tracker_info;
 
 struct tr_info
 {
-    /* Path to torrent */
-    char               * torrent;
+    /* Flags */
+    unsigned int isPrivate : 1;
+    unsigned int isMultifile : 1;
 
     /* General info */
     uint8_t              hash[SHA_DIGEST_LENGTH];
     char                 hashString[2*SHA_DIGEST_LENGTH+1];
     char               * name;
 
-    /* Flags */
-    unsigned int isPrivate : 1;
-    unsigned int isMultifile : 1;
+    /* Path to torrent */
+    char               * torrent;
 
     /* these trackers are sorted by tier */
     tr_tracker_info    * trackers;
@@ -1129,12 +1129,12 @@ struct tr_stat
     /** This is the unmodified string returned by the tracker in response
         to the torrent's most recent scrape request.  If no request was
         sent or there was no response, this string is empty. */
-    char scrapeResponse[256];
+    char scrapeResponse[64];
 
     /** The unmodified string returned by the tracker in response
         to the torrent's most recent scrape request.  If no request was
         sent or there was no response, this string is empty. */
-    char announceResponse[256];
+    char announceResponse[64];
 
     /** Time the most recent scrape request was sent,
         or zero if one hasn't been sent yet. */
