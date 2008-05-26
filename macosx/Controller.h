@@ -41,6 +41,7 @@
 typedef enum
 {
     ADD_NORMAL,
+    ADD_AUTO,
     ADD_SHOW_OPTIONS,
     ADD_URL,
     ADD_CREATED

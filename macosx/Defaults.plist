@@ -48,6 +48,8 @@
 	<false/>
 	<key>DownloadAsk</key>
 	<true/>
+	<key>DownloadAskManual</key>
+	<false/>
 	<key>DownloadAskMulti</key>
 	<false/>
 	<key>DownloadFolder</key>

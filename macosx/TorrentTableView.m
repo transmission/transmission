@@ -735,7 +735,7 @@
                 continue;
             }
             
-            if (!start)
+            if (!start && ![self isRowSelected: i])
                 NSRectFill([self rectOfRow: i]);
             
             start = !start;

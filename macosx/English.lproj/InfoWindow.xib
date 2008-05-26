@@ -8,8 +8,8 @@
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="1615"/>
 			<integer value="6"/>
-			<integer value="1731"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2146,7 +2146,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 								<reference key="NSNextKeyView" ref="423972458"/>
 								<reference key="NSDocView" ref="423972458"/>
 								<reference key="NSBGColor" ref="987864771"/>
-								<int key="NScvFlags">4</int>
+								<int key="NScvFlags">2</int>
 							</object>
 							<object class="NSScroller" id="964808471">
 								<reference key="NSNextResponder" ref="754568592"/>

@@ -787,7 +787,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         //determine to show the options window
         BOOL showWindow = type == ADD_SHOW_OPTIONS || ([fDefaults boolForKey: @"DownloadAsk"]
-                            && (info.isMultifile || ![fDefaults boolForKey: @"DownloadAskMulti"]));
+                            && (info.isMultifile || ![fDefaults boolForKey: @"DownloadAskMulti"])
+                            && (type != ADD_AUTO || ![fDefaults boolForKey: @"DownloadAskManual"]));
         tr_metainfoFree(&info);
         
         if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location
@@ -2477,7 +2478,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         switch (tr_torrentParse(fLib, ctor, NULL))
         {
             case TR_OK:
-                [self openFiles: [NSArray arrayWithObject: file] addType: ADD_NORMAL forcePath: nil];
+                [self openFiles: [NSArray arrayWithObject: file] addType: ADD_AUTO forcePath: nil];
                 
                 [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added", "Growl notification title")
                     description: [file lastPathComponent] notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO

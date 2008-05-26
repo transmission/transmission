@@ -5,6 +5,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.30&order=severi
 - Mac
    + Quick Look integration in the main window and inspector's file tab
    + Transfers can be dragged to different groups
+   + Option to only show the add window when manually adding transfers
    + Status strings are toggled from the action button (they are no longer clickable)
 - GTK+
    + Add preferences options to inhibit hibernation and to toggle the tray icon
