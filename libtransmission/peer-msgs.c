@@ -1160,7 +1160,6 @@ clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tor->activityDate = now;
     tor->downloadedCur += byteCount;
     msgs->info->pieceDataActivityDate = now;
-    msgs->info->credit += (int)(byteCount * SWIFT_REPAYMENT_RATIO);
     tr_rcTransferred( msgs->info->rcToClient, byteCount );
     tr_rcTransferred( tor->download, byteCount );
     tr_rcTransferred( tor->handle->download, byteCount );
@@ -1383,7 +1382,6 @@ peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tor->activityDate = now;
     tor->uploadedCur += byteCount;
     msgs->info->pieceDataActivityDate = now;
-    msgs->info->credit -= byteCount;
     tr_rcTransferred( msgs->info->rcToPeer, byteCount );
     tr_rcTransferred( tor->upload, byteCount );
     tr_rcTransferred( tor->handle->upload, byteCount );
@@ -1578,27 +1576,13 @@ sendKeepalive( tr_peermsgs * msgs )
 ***
 **/
 
-static int
-isSwiftEnabled( const tr_peermsgs * msgs )
-{
-    /* rationale: SWIFT is good for getting rid of deadbeats, but most
-     * private trackers have ratios where you _want_ to feed deadbeats
-     * as much as possible.  So we disable SWIFT on private torrents */
-    return SWIFT_ENABLED
-        && !tr_torrentIsSeed( msgs->torrent )
-        && !tr_torrentIsPrivate( msgs->torrent );
-}
-
 static size_t
 getUploadMax( const tr_peermsgs * msgs )
 {
     static const size_t maxval = ~0;
     const tr_torrent * tor = msgs->torrent;
-    const int useSwift = isSwiftEnabled( msgs );
-    const size_t swiftLeft = msgs->info->credit;
     int speedLeft;
     int bufLeft;
-    size_t ret;
 
     if( tor->uploadLimitMode == TR_SPEEDLIMIT_GLOBAL )
         speedLeft = tor->handle->useUploadLimit ? tr_rcBytesLeft( tor->handle->upload ) : maxval;
@@ -1611,10 +1595,7 @@ getUploadMax( const tr_peermsgs * msgs )
      * queued up in it... blocksize, +13 for the size of the BT protocol's
      * block message overhead */
     bufLeft = tor->blockSize + 13 - tr_peerIoWriteBytesWaiting( msgs->io );
-    ret = MIN( speedLeft, bufLeft );
-    if( useSwift)
-        ret = MIN( ret, swiftLeft );
-    return ret;
+    return MIN( speedLeft, bufLeft );
 }
 
 static int

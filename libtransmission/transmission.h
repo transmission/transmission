@@ -52,6 +52,20 @@ typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
 typedef uint64_t tr_block_index_t;
 
+/**
+ * @brief returns Transmission's default configuration file directory.
+ *
+ * The default configuration directory is determined this way:
+ * - If the TRANSMISSION_HOME environmental variable is set,
+ *   its value is returned.
+ * - otherwise, if we're running on Darwin,
+ *   "$HOME/Library/Application Support/Transmission" is returned.
+ * - otherwise, if we're running on WIN32,
+ *   "$CSIDL_APPDATA/Transmission" is returned.
+ * - otherwise, if XDG_CONFIG_HOME is set,
+ *   "$XDG_CONFIG_HOME/transmission" is returned.
+ * - lastly, $HOME/.config/transmission" is used.
+ */
 const char* tr_getDefaultConfigDir( void );
 
 typedef struct tr_ctor tr_ctor;
@@ -72,61 +86,123 @@ typedef struct tr_torrent tr_torrent;
  * @{
  */
 
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_CONFIG_DIR                  tr_getDefaultConfigDir()
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_PEX_ENABLED                 1
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_PORT_FORWARDING_ENABLED     0
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_PORT                        51413
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_GLOBAL_PEER_LIMIT           200
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_PEER_SOCKET_TOS             8
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_BLOCKLIST_ENABLED           0
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_RPC_ENABLED                 0
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_RPC_PORT                    9091
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_RPC_PORT_STR                "9091"
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_RPC_ACL                     "+127.0.0.1"
 
 /**
- * Create and return a Transmission session handle.
+ * @brief Start a libtransmission session.
+ * @return an opaque handle to the new session
  *
- * @param configDir the config directory where libtransmission config
- *                  subdirectories will be found, such as "torrents",
- *                  "resume", and "blocklists".
- *                  TR_DEFAULT_CONFIG_DIR can be used as a default.
- * @param downloadDir The default directory to save added torrents.
- *                    This can be changed per-session with
- *                    tr_sessionSetDownloadDir() and per-torrent with
- *                    tr_ctorSetDownloadDir().
- * @param tag   Obsolete.  Only used now for locating legacy fastresume files.
- *              Valid tags: beos, cli, daemon, gtk, macos, wx
- * @param isPexEnabled whether or not PEX is allowed for non-private torrents.
- *                     This can be changed per-session with
- *                     tr_sessionSetPexEnabled().
- *                     TR_DEFAULT_PEX_ENABLED is the default.
- * @param isPortForwardingEnabled If true, libtransmission will attempt
- *                       to find a local UPnP-enabled or NATPMP-enabled
- *                       router and forward a port from there to the local
- *                       machine.  This is so remote peers can initiate
- *                       connections with us.
- *                       TR_DEFAULT_PORT_FORWARDING_ENABLED is the default.
- * @param publicPort Port number to open for incoming peer connections.
- *                   TR_DEFAULT_PORT is the default.
- * @param encryptionMode must be one of TR_PLAINTEXT_PREFERRED,
- *                       TR_ENCRYPTION_PREFERRED, or TR_ENCRYPTION_REQUIRED.
- * @param isUploadLimitEnabled If true, libtransmission will limit the entire
- *                             session's upload speed from `uploadLimit'.
- * @param uploadLimit The speed limit to use for the entire session when
- *                    isUploadLimitEnabled is true.
- * @param isDownloadLimitEnabled If true, libtransmission will limit the entire
- *                               session's download speed from `downloadLimit'.
- * @param downloadLimit The speed limit to use for the entire session when
- *                      isDownloadLimitEnabled is true.
- * @param peerLimit The maximum number of peer connections allowed in a session.
- *                  TR_DEFAULT_GLOBAL_PEER_LIMIT can be used as a default.
+ * @param configDir
+ *  The config directory where libtransmission config subdirectories
+ *  will be found, such as "torrents", "resume", and "blocklists".
+ *  #TR_DEFAULT_CONFIG_DIR can be used as a default.
+ *
+ * @param downloadDir
+ *  The default directory to save added torrents.
+ *  This can be changed per-session with
+ *  tr_sessionSetDownloadDir() and per-torrent with
+ *  tr_ctorSetDownloadDir().
+ *
+ * @param tag
+ *  Obsolete.  Only used now for locating legacy fastresume files.
+ *  This will be removed at some point in the future.
+ *  Valid tags: beos cli daemon gtk macos wx
+ *
+ * @param isPexEnabled
+ *  whether or not PEX is allowed for non-private torrents.
+ *  This can be changed per-session with
+ *  tr_sessionSetPexEnabled().
+ *  #TR_DEFAULT_PEX_ENABLED is the default.
+ *
+ * @param isPortForwardingEnabled
+ *  If true, libtransmission will attempt
+ *  to find a local UPnP-enabled or NATPMP-enabled
+ *  router and forward a port from there to the local
+ *  machine.  This is so remote peers can initiate
+ *  connections with us.
+ *  #TR_DEFAULT_PORT_FORWARDING_ENABLED is the default.
+ *
+ * @param publicPort
+ *  Port number to open for incoming peer connections.
+ *  #TR_DEFAULT_PORT is the default.
+ *
+ * @param encryptionMode
+ *  Must be one of #TR_PLAINTEXT_PREFERRED,
+ *  #TR_ENCRYPTION_PREFERRED, or #TR_ENCRYPTION_REQUIRED.
+ *
+ * @param isUploadLimitEnabled
+ *  If true, libtransmission will limit the entire
+ *  session's upload speed from "uploadLimit".
+ *
+ * @param uploadLimit
+ *  The speed limit to use for the entire session when
+ *  "isUploadLimitEnabled" is true.
+ *
+ * @param isDownloadLimitEnabled
+ *  If true, libtransmission will limit the entire
+ *  session's download speed from "downloadLimit".
+ *
+ * @param downloadLimit
+ *  The speed limit to use for the entire session when
+ *  "isDownloadLimitEnabled" is true.
+ *
+ * @param peerLimit
+ *  The maximum number of peer connections allowed in a session.
+ *  #TR_DEFAULT_GLOBAL_PEER_LIMIT can be used as a default.
+ *
+ * @param messageLevel
+ *  Verbosity level of libtransmission's logging mechanism.
+ *  Must be one of #TR_MSG_ERR, #TR_MSG_INF, #TR_MSG_DBG.
+ * 
+ * @param isMessageQueueingEnabled
+ *  If true, then messages will build up in a queue until
+ *  processed by the client application.
+ *
+ * @param isBlocklistEnabled
+ *  If true, then Transmission will not allow peer connections
+ *  to the IP addressess specified in the blocklist.
+ * 
+ * @param peerSocketTOS
+ *
+ * @param rpcIsEnabled
+ *  If true, then libtransmission will open an http server port
+ *  to listen for incoming RPC requests.
+ *
+ * @param rpcPort
+ *  The port on which to listen for incoming RPC requests
+ *
+ * @param rpcACL
+ *  The access control list for allowing/denying RPC requests
+ *  from specific IP ranges.
+ *  @see tr_sessionSetRPCACL()
  *
  * @see TR_DEFAULT_PEER_SOCKET_TOS
  * @see TR_DEFAULT_BLOCKLIST_ENABLED
  * @see TR_DEFAULT_RPC_ENABLED
  * @see TR_DEFAULT_RPC_PORT
  * @see TR_DEFAULT_RPC_ACL
+ * @see tr_sessionClose()
  */
 tr_handle * tr_sessionInitFull( const char * configDir,
                                 const char * downloadDir,
@@ -146,17 +222,20 @@ tr_handle * tr_sessionInitFull( const char * configDir,
                                 int          peerSocketTOS,
                                 int          rpcIsEnabled,
                                 int          rpcPort,
-                                const char * rpcACL );
+                                const char * rpcAccessControlList );
 
 /**
- * Like tr_sessionInitFull() but with default values supplied.
+ * @brief shorter form of tr_sessionInitFull()
+ *
+ * @deprecated Use tr_sessionInitFull() instead.
  */ 
 tr_handle * tr_sessionInit( const char * configDir,
                             const char * downloadDir,
                             const char * tag );
 
 /**
- * Shut down a libtransmission instance created by tr_sessionInit*()
+ * @brief end a libtransmission session
+ * @see tr_sessionInitFull()
  */
 void tr_sessionClose( tr_handle * );
 
@@ -170,18 +249,43 @@ const char * tr_sessionGetConfigDir( const tr_handle * );
 /**
  * Set the per-session default download folder for new torrents.
  * @see tr_sessionInitFull()
+ * @see tr_sessionGetDownloadDir()
  * @see tr_ctorSetDownloadDir()
  */
 void tr_sessionSetDownloadDir( tr_handle *, const char * downloadDir );
 
+/**
+ * Get the default download folder for new torrents.
+ *
+ * This is set by tr_sessionInitFull() or tr_sessionSetDownloadDir(),
+ * and can be overridden on a per-torrent basis by tr_ctorSetDownloadDir().
+ */
 const char * tr_sessionGetDownloadDir( const tr_handle * );
 
+/**
+ * @brief Set whether or not RPC calls are allowed in this session.
+ *
+ * @details If true, libtransmission will open a server socket to listen 
+ * for incoming http RPC requests as described in docs/rpc-spec.txt.
+ *
+ * This is intially set by tr_sessionInitFull() and can be
+ * queried by tr_sessionIsRPCEnabled().
+ */
 void tr_sessionSetRPCEnabled( tr_handle *, int isEnabled );
 
+/** @brief Get whether or not RPC calls are allowed in this session.
+    @see tr_sessionInitFull()
+    @see tr_sessionSetRPCEnabled() */
 int tr_sessionIsRPCEnabled( const tr_handle * handle );
 
+/** @brief Specify which port to listen for RPC requests on.
+    @see tr_sessionInitFull()
+    @see tr_sessionGetRPCPort */
 void tr_sessionSetRPCPort( tr_handle *, int port );
 
+/** @brief Get which port to listen for RPC requests on.
+    @see tr_sessionInitFull()
+    @see tr_sessionSetRPCPort */
 int tr_sessionGetRPCPort( const tr_handle * );
 
 /**
@@ -197,9 +301,15 @@ int tr_sessionGetRPCPort( const tr_handle * );
  * Client applications need to validate user input, or better yet
  * generate it from a higher-level interface that doesn't allow user error,
  * before calling this function.
+ *
+ * @see tr_sessionInitFull
+ * @see tr_sessionGetRPCACL
  */
 void tr_sessionSetRPCACL( tr_handle *, const char * acl );
 
+/** Returns the Access Control List for allowing/denying RPC requests.
+    @see tr_sessionInitFull
+    @see tr_sessionSetRPCACL */
 const char* tr_sessionGetRPCACL( const tr_handle * );
 
 typedef enum
@@ -231,9 +341,9 @@ void tr_sessionSetRPCCallback( tr_handle    * handle,
 
 typedef struct tr_session_stats
 {
+    float ratio;              /* TR_RATIO_INF, TR_RATIO_NA, or total up/down */
     uint64_t uploadedBytes;   /* total up */
     uint64_t downloadedBytes; /* total down */
-    double ratio;             /* TR_RATIO_INF, TR_RATIO_NA, or total up/down */
     uint64_t filesAdded;      /* number of files added */
     uint64_t sessionCount;    /* program started N times */
     uint64_t secondsActive;   /* how long Transmisson's been running */

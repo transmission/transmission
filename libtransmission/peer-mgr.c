@@ -35,35 +35,6 @@
 #include "trevent.h"
 #include "utils.h"
 
-/**
-*** The "SWIFT" system is described by Karthik Tamilmani,
-*** Vinay Pai, and Alexander Mohr of Stony Brook University
-*** in their paper "SWIFT: A System With Incentives For Trading"
-*** http://citeseer.ist.psu.edu/tamilmani04swift.html
-***
-*** More SWIFT constants are defined in peer-mgr-private.h
-**/
-
-/**
- * Allow new peers to download this many bytes from
- * us when getting started.  This can prevent gridlock
- * with other peers using tit-for-tat algorithms
- */
-static const int SWIFT_INITIAL_CREDIT = 64 * 1024; /* 64 KiB */
-
-/**
- * We expend a fraction of our torrent's total upload speed
- * on largesse by uniformly distributing free credit to
- * all of our peers.  This too helps prevent gridlock.
- */
-static const double SWIFT_LARGESSE = 0.15; /* 15% of our UL */
-
-/**
- * How frequently to extend largesse-based credit
- */
-static const int SWIFT_PERIOD_MSEC = 5000;
-
-
 enum
 {
     /* how frequently to change which peers are choked */
@@ -135,7 +106,6 @@ typedef struct
     tr_timer * reconnectTimer;
     tr_timer * rechokeTimer;
     tr_timer * refillTimer;
-    tr_timer * swiftTimer;
     tr_torrent * tor;
     tr_peer * optimistic; /* the optimistic peer, or NULL if none */
     tr_bitfield * requested;
@@ -308,7 +278,6 @@ peerConstructor( const struct in_addr * in_addr )
 {
     tr_peer * p;
     p = tr_new0( tr_peer, 1 );
-    p->credit = SWIFT_INITIAL_CREDIT;
     p->rcToClient = tr_rcInit( );
     p->rcToPeer = tr_rcInit( );
     memcpy( &p->in_addr, in_addr, sizeof(struct in_addr) );
@@ -392,7 +361,6 @@ torrentDestructor( Torrent * t )
     tr_timerFree( &t->reconnectTimer );
     tr_timerFree( &t->rechokeTimer );
     tr_timerFree( &t->refillTimer );
-    tr_timerFree( &t->swiftTimer );
 
     tr_bitfieldFree( t->requested );
     tr_ptrArrayFree( t->pool, (PtrArrayForeachFunc)tr_free );
@@ -1235,7 +1203,6 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
 
 static int reconnectPulse( void * vtorrent );
 static int rechokePulse( void * vtorrent );
-static int swiftPulse( void * vtorrent );
 
 void
 tr_peerMgrStartTorrent( tr_peerMgr     * manager,
@@ -1250,7 +1217,6 @@ tr_peerMgrStartTorrent( tr_peerMgr     * manager,
     assert( t != NULL );
     assert( ( t->isRunning != 0 ) == ( t->reconnectTimer != NULL ) );
     assert( ( t->isRunning != 0 ) == ( t->rechokeTimer != NULL ) );
-    assert( ( t->isRunning != 0 ) == ( t->swiftTimer != NULL ) );
 
     if( !t->isRunning )
     {
@@ -1264,15 +1230,9 @@ tr_peerMgrStartTorrent( tr_peerMgr     * manager,
                                        rechokePulse, t,
                                        RECHOKE_PERIOD_MSEC );
 
-        t->swiftTimer = tr_timerNew( t->manager->handle,
-                                     swiftPulse, t,
-                                     SWIFT_PERIOD_MSEC );
-
         reconnectPulse( t );
 
         rechokePulse( t );
-
-        swiftPulse( t );
     }
 
     managerUnlock( manager );
@@ -1286,7 +1246,6 @@ stopTorrent( Torrent * t )
     t->isRunning = 0;
     tr_timerFree( &t->rechokeTimer );
     tr_timerFree( &t->reconnectTimer );
-    tr_timerFree( &t->swiftTimer );
 
     /* disconnect the peers. */
     tr_ptrArrayForeach( t->peers, (PtrArrayForeachFunc)peerDestructor );
@@ -1563,7 +1522,7 @@ isSame( const tr_peer * peer )
 ***
 **/
 
-static double
+static int
 getWeightedRate( const tr_peer * peer, int clientIsSeed )
 {
     return (int)( 10.0 * ( clientIsSeed ? peer->rateToPeer
@@ -1660,55 +1619,6 @@ rechokePulse( void * vtorrent )
 
 /***
 ****
-***/
-
-static int
-swiftPulse( void * vtorrent )
-{
-    Torrent * t = vtorrent;
-    torrentLock( t );
-
-    if( !tr_torrentIsSeed( t->tor ) )
-    {
-        int i;
-        int peerCount = 0;
-        int deadbeatCount = 0;
-        tr_peer ** peers = getConnectedPeers( t, &peerCount );
-        tr_peer ** deadbeats = tr_new( tr_peer*, peerCount );
-
-        const double ul_KiBsec = tr_rcRate( t->tor->upload );
-        const double ul_KiB = ul_KiBsec * (SWIFT_PERIOD_MSEC/1000.0);
-        const double ul_bytes = ul_KiB * 1024;
-        const double freeCreditTotal = ul_bytes * SWIFT_LARGESSE;
-        int freeCreditPerPeer;
-
-        for( i=0; i<peerCount; ++i ) {
-            tr_peer * peer = peers[i];
-            if( peer->credit <= 0 )
-                deadbeats[deadbeatCount++] =  peer;
-        }
-
-        freeCreditPerPeer = (int)( freeCreditTotal / deadbeatCount );
-        for( i=0; i<deadbeatCount; ++i )
-            deadbeats[i]->credit = freeCreditPerPeer;
-
-        tordbg( t, "%d deadbeats, "
-            "who are each being granted %d bytes' credit "
-            "for a total of %.1f KiB, "
-            "%d%% of the torrent's ul speed %.1f\n",
-            deadbeatCount, freeCreditPerPeer,
-            ul_KiBsec*SWIFT_LARGESSE, (int)(SWIFT_LARGESSE*100), ul_KiBsec );
-
-        tr_free( deadbeats );
-        tr_free( peers );
-    }
-
-    torrentUnlock( t );
-    return TRUE;
-}
-
-/***
-****
 ****  Life and Death
 ****
 ***/
@@ -1752,9 +1662,9 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
         const int relaxStrictnessIfFewerThanN = (int)((getMaxPeerCount(tor) * 0.9) + 0.5);
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
-        const double strictness = peerCount >= relaxStrictnessIfFewerThanN
+        const float strictness = peerCount >= relaxStrictnessIfFewerThanN
             ? 1.0
-            : peerCount / (double)relaxStrictnessIfFewerThanN;
+            : peerCount / (float)relaxStrictnessIfFewerThanN;
         const int lo = MIN_UPLOAD_IDLE_SECS;
         const int hi = MAX_UPLOAD_IDLE_SECS;
         const int limit = lo + ((hi-lo) * strictness);

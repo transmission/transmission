@@ -42,8 +42,8 @@ struct tr_transfer
 
 struct tr_ratecontrol
 {
-    int limit;
-    int newest;
+    int8_t limit;
+    int8_t newest;
     struct tr_transfer transfers[HISTORY_SIZE];
 };
 
