@@ -8,6 +8,8 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.30&order=severi
    + Status strings are toggled from the action button (they are no longer clickable)
 - GTK+
    + Add preferences options to inhibit hibernation and to toggle the tray icon
+- Daemon
+   + Redesigned & rewritten to use json over http
 
 1.21 (2008/05/21)
 http://trac.transmissionbt.com/query?group=component&milestone=1.21&order=severity

@@ -185,7 +185,6 @@ enum
     MC_TORRENT,
     MC_TORRENT_RAW,
     MC_STATUS,
-    MC_ID,
     MC_ROW_COUNT
 };
 

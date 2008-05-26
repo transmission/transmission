@@ -506,8 +506,7 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
         G_TYPE_STRING,    /* hash string */
         TR_TORRENT_TYPE,  /* TrTorrent object */
         G_TYPE_POINTER,   /* tr_torrent* */
-        G_TYPE_INT,       /* tr_stat()->status */
-        G_TYPE_INT        /* tr_torrentId() */
+        G_TYPE_INT        /* tr_stat()->status */
     };
 
     p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE( self,
@@ -683,7 +682,6 @@ tr_core_add_torrent( TrCore * self, TrTorrent * gtor )
                                        MC_TORRENT,       gtor,
                                        MC_TORRENT_RAW,   tor,
                                        MC_STATUS,        torStat->status,
-                                       MC_ID,            tr_torrentId( tor ),
                                        -1);
 
     /* cleanup */

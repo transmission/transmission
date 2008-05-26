@@ -35,14 +35,6 @@ enum
     /* seconds between tracker pulses */
     PULSE_INTERVAL_MSEC = 1000,
 
-    /* maximum number of concurrent tracker socket connections */
-    MAX_TRACKER_SOCKETS = 16,
-
-    /* maximum number of concurrent tracker socket connections during shutdown.
-     * all the peer connections should be gone by now, so we can hog more 
-     * connections to send `stop' messages to the trackers */
-    MAX_TRACKER_SOCKETS_DURING_SHUTDOWN = 64,
-
     /* unless the tracker says otherwise, rescrape this frequently */
     DEFAULT_SCRAPE_INTERVAL_SEC = (60 * 15),
 
@@ -69,7 +61,10 @@ struct tr_tracker
 
     uint8_t randOffset;
 
-    tr_session * session;
+    /* sent as the "key" argument in tracker requests
+       to verify us if our IP address changes.
+       This is immutable for the life of the tracker object. */
+    char key_param[KEYLEN+1];
 
     /* these are set from the latest scrape or tracker response */
     int announceIntervalSec;
@@ -80,10 +75,7 @@ struct tr_tracker
     /* index into the torrent's tr_info.trackers array */
     int trackerIndex;
 
-    /* sent as the "key" argument in tracker requests
-       to verify us if our IP address changes.
-       This is immutable for the life of the tracker object. */
-    char key_param[KEYLEN+1];
+    tr_session * session;
 
     tr_publisher_t * publisher;
 
@@ -547,9 +539,9 @@ enum
 
 struct tr_tracker_request
 {
-    char * url;
-    int reqtype; /* TR_REQ_* */
     uint8_t torrent_hash[SHA_DIGEST_LENGTH];
+    int reqtype; /* TR_REQ_* */
+    char * url;
     tr_web_done_func * done_func;
     tr_session * session;
 };
