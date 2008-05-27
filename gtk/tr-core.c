@@ -863,9 +863,6 @@ update_foreach( GtkTreeModel * model,
                             MC_STATUS, newStatus,
                             -1 );
 
-    /* check the seeding cap */
-    tr_torrent_check_seeding_cap ( gtor );
-
     /* cleanup */
     g_object_unref( gtor );
     return FALSE;

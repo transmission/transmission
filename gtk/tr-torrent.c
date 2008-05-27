@@ -40,8 +40,6 @@ struct TrTorrentPrivate
 {
    tr_torrent * handle;
    gboolean do_remove;
-   gboolean seeding_cap_enabled;
-   gdouble seeding_cap; /* ratio to stop seeding at */
 };
 
 
@@ -55,7 +53,6 @@ tr_torrent_init(GTypeInstance *instance, gpointer g_class UNUSED )
                                                   TR_TORRENT_TYPE,
                                                   struct TrTorrentPrivate );
     p->handle = NULL;
-    p->seeding_cap = 2.0;
 
 #ifdef REFDBG
     g_message( "torrent %p init", self );
@@ -145,23 +142,6 @@ tr_torrent_info( TrTorrent * tor )
     return handle ? tr_torrentInfo( handle ) : NULL;
 }
 
-void
-tr_torrent_start( TrTorrent * self )
-{
-    tr_torrent * handle = tr_torrent_handle( self );
-    if( handle )
-        tr_torrentStart( handle );
-}
-
-void
-tr_torrent_stop( TrTorrent * self )
-{
-    tr_torrent * handle = tr_torrent_handle( self );
-    if( handle )
-        tr_torrentStop( handle );
-}
-
-
 static gboolean
 notifyInMainThread( gpointer user_data )
 {
@@ -236,26 +216,6 @@ tr_torrent_new_ctor( tr_handle  * handle,
     }
 
     return maketorrent( tor );
-}
-
-void
-tr_torrent_check_seeding_cap ( TrTorrent *gtor)
-{
-  const tr_stat * st = tr_torrent_stat( gtor );
-  if ((gtor->priv->seeding_cap_enabled) && (st->ratio >= gtor->priv->seeding_cap))
-    tr_torrent_stop (gtor);
-}
-void
-tr_torrent_set_seeding_cap_ratio ( TrTorrent *gtor, gdouble ratio )
-{
-  gtor->priv->seeding_cap = ratio;
-  tr_torrent_check_seeding_cap (gtor);
-}
-void
-tr_torrent_set_seeding_cap_enabled ( TrTorrent *gtor, gboolean b )
-{
-  if ((gtor->priv->seeding_cap_enabled = b))
-    tr_torrent_check_seeding_cap (gtor);
 }
 
 char *

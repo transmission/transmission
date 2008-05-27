@@ -978,15 +978,6 @@ dl_speed_toggled_cb (GtkToggleButton *tb, gpointer gtor)
 }
 
 
-#if 0
-static void
-seeding_cap_toggled_cb (GtkToggleButton *tb, gpointer gtor)
-{
-  tr_torrent_set_seeding_cap_enabled (TR_TORRENT(gtor), 
-                                      gtk_toggle_button_get_active(tb));
-}
-#endif
-
 static void
 sensitize_from_check_cb (GtkToggleButton *toggle, gpointer w)
 {
@@ -1011,15 +1002,6 @@ dl_speed_spun_cb (GtkSpinButton *spin, gpointer gtor)
 {
   setSpeedLimit( spin, gtor, TR_DOWN );
 }
-
-#if 0
-static void
-seeding_ratio_spun_cb (GtkSpinButton *spin, gpointer gtor)
-{
-  tr_torrent_set_seeding_cap_ratio (TR_TORRENT(gtor),
-                                    gtk_spin_button_get_value(spin));
-}
-#endif
 
 static void
 max_peers_spun_cb( GtkSpinButton * spin, gpointer gtor )
@@ -1076,18 +1058,6 @@ options_page_new ( TrTorrent * gtor )
     gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), maxConnectedPeers );
     hig_workarea_add_row( t, &row, _( "_Maximum peers:" ), w, w );
     g_signal_connect( w, "value-changed", G_CALLBACK( max_peers_spun_cb ), gtor );
-
-#if 0
-    tb = gtk_check_button_new_with_mnemonic (_("_Stop seeding at ratio:"));
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(tb), gtor->seeding_cap_enabled);
-    g_signal_connect (tb, "toggled", G_CALLBACK(seeding_cap_toggled_cb), gtor);
-    a = (GtkAdjustment*) gtk_adjustment_new (gtor->seeding_cap, 0.0, G_MAXDOUBLE, 1, 1, 1);
-    w = gtk_spin_button_new (a, 1, 1);
-    g_signal_connect (w, "value-changed", G_CALLBACK(seeding_ratio_spun_cb), gtor);
-    g_signal_connect (tb, "toggled", G_CALLBACK(sensitize_from_check_cb), w);
-    sensitize_from_check_cb (GTK_TOGGLE_BUTTON(tb), w);
-    hig_workarea_add_row_w (t, &row, tb, w, NULL);
-#endif
 
   hig_workarea_finish (t, &row);
   return t;

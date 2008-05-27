@@ -1011,10 +1011,9 @@ startTorrentForeach (GtkTreeModel * model,
                      GtkTreeIter  * iter,
                      gpointer       data UNUSED)
 {
-    TrTorrent * tor = NULL;
-    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
-    tr_torrent_start( tor );
-    g_object_unref( G_OBJECT( tor ) );
+    tr_torrent * tor = NULL;
+    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
+    tr_torrentStart( tor );
 }
 
 static void
@@ -1023,10 +1022,9 @@ stopTorrentForeach (GtkTreeModel * model,
                     GtkTreeIter  * iter,
                     gpointer       data UNUSED)
 {
-    TrTorrent * tor = NULL;
-    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
-    tr_torrent_stop( tor );
-    g_object_unref( G_OBJECT( tor ) );
+    tr_torrent * tor = NULL;
+    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
+    tr_torrentStop( tor );
 }
 
 static void
@@ -1035,10 +1033,9 @@ updateTrackerForeach (GtkTreeModel * model,
                       GtkTreeIter  * iter,
                       gpointer       data UNUSED)
 {
-    TrTorrent * tor = NULL;
-    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
-    tr_torrentManualUpdate( tr_torrent_handle( tor ) );
-    g_object_unref( G_OBJECT( tor ) );
+    tr_torrent * tor = NULL;
+    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
+    tr_torrentManualUpdate( tor );
 }
 
 static void
