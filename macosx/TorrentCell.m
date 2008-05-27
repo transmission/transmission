@@ -534,31 +534,31 @@
         fraction: 1.0];
     
     //reveal button
-    NSString * revealImageSuffix;
+    NSString * revealImageString;
     if (fMouseDownRevealButton)
-        revealImageSuffix = @"On.png";
+        revealImageString = @"RevealOn.png";
     else if (!fTracking && fHoverReveal)
-        revealImageSuffix = @"Hover.png";
+        revealImageString = @"RevealHover.png";
     else
-        revealImageSuffix = @"Off.png";
+        revealImageString = @"RevealOff.png";
     
-    NSImage * revealImage = [NSImage imageNamed: [@"Reveal" stringByAppendingString: revealImageSuffix]];
+    NSImage * revealImage = [NSImage imageNamed: revealImageString];
     [revealImage setFlipped: YES];
     [revealImage drawInRect: [self revealButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
         fraction: 1.0];
     
     //action button
-    NSString * actionImageSuffix;
+    NSString * actionImageString;
     if (fMouseDownActionButton)
-        actionImageSuffix = @"On.png";
+        actionImageString = @"ActionOn.png";
     else if (!fTracking && fHoverAction)
-        actionImageSuffix = @"Hover.png";
+        actionImageString = @"ActionHover.png";
     else
-        actionImageSuffix = nil;
+        actionImageString = nil;
     
-    if (actionImageSuffix)
+    if (actionImageString)
     {
-        NSImage * actionImage = [NSImage imageNamed: [@"Action" stringByAppendingString: actionImageSuffix]];
+        NSImage * actionImage = [NSImage imageNamed: actionImageString];
         [actionImage setFlipped: YES];
         [actionImage drawInRect: [self actionButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
             fraction: 1.0];
@@ -772,7 +772,7 @@
         else
             pieceColor = fBlue4Color;
         
-        //it is faster to just set color instead of checking color
+        //it's faster to just set color instead of checking previous color
         [fBitmap setColor: pieceColor atX: i y: 0];
     }
     
