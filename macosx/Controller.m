@@ -693,7 +693,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) application: (NSApplication *) app openFiles: (NSArray *) filenames
 {
-    [self openFiles: filenames addType: ADD_NORMAL forcePath: nil];
+    [self openFiles: filenames addType: ADD_MANUAL forcePath: nil];
 }
 
 - (void) openFiles: (NSArray *) filenames addType: (addType) type forcePath: (NSString *) path
@@ -884,7 +884,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) open: (NSArray *) files
 {
     NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: files, @"Filenames",
-                                [NSNumber numberWithInt: ADD_NORMAL], @"AddType", nil];
+                                [NSNumber numberWithInt: ADD_MANUAL], @"AddType", nil];
     [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dict waitUntilDone: NO];
 }
 
@@ -906,7 +906,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (code == NSOKButton)
     {
         NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: [panel filenames], @"Filenames",
-            [NSNumber numberWithInt: [useOptions boolValue] ? ADD_SHOW_OPTIONS : ADD_NORMAL], @"AddType", nil];
+            [NSNumber numberWithInt: [useOptions boolValue] ? ADD_SHOW_OPTIONS : ADD_MANUAL], @"AddType", nil];
         [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
     }
 }
@@ -4151,7 +4151,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
     //get the torrent
-    if (torrentStruct != NULL && type != TR_RPC_TORRENT_ADDED)
+    if (torrentStruct != NULL && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED))
     {
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         Torrent * torrent;
@@ -4169,6 +4169,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     switch (type)
     {
         case TR_RPC_TORRENT_ADDED:
+            [self performSelectorOnMainThread: @selector(rpcAddTorrentStruct:) withObject:
+                [[NSValue valueWithPointer: torrentStruct] retain] waitUntilDone: NO];
             break;
         case TR_RPC_TORRENT_STARTED:
             break;
@@ -4183,6 +4185,26 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [pool release];
+}
+
+- (void) rpcAddTorrentStruct: (NSValue *) torrentStructPtr
+{
+    tr_torrent * torrentStruct = (tr_torrent *)[torrentStructPtr pointerValue];
+    [torrentStructPtr release];
+    
+    NSString * location = nil;
+    if (tr_torrentGetDownloadDir(torrentStruct) != NULL)
+        location = [NSString stringWithUTF8String: tr_torrentGetDownloadDir(torrentStruct)];
+    
+    Torrent * torrent = [[Torrent alloc] initWithTorrentStruct: torrentStruct location: location lib: fLib];
+    
+    [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];
+    
+    [torrent update];
+    [fTorrents addObject: torrent];
+    [torrent release];
+    
+    [self updateTorrentsInQueue];
 }
 
 /*- (void) ipcQuit

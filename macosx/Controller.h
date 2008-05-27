@@ -40,7 +40,7 @@
 
 typedef enum
 {
-    ADD_NORMAL,
+    ADD_MANUAL,
     ADD_AUTO,
     ADD_SHOW_OPTIONS,
     ADD_URL,
