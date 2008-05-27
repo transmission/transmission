@@ -144,14 +144,19 @@ readargs( int argc, char ** argv )
     {
         char * tmp;
         char buf[MAX_PATH_LENGTH];
+        int addArg = TRUE;
         tr_benc top, *args;
         tr_bencInitDict( &top, 3 );
         args = tr_bencDictAddDict( &top, "arguments", 0 );
 
         switch( opt )
         {
-            case 'g': debug = 1; break;
-            case 'h': showUsage( ); break;
+            case 'g': debug = 1;
+                      addArg = FALSE;
+                      break;
+            case 'h': showUsage( );
+                      addArg = FALSE;
+                      break;
             case 'a': tr_bencDictAddStr( &top, "method", "torrent-add" );
                       tr_bencDictAddStr( args, "metainfo", ((tmp=getEncodedMetainfo(optarg))) );
                       tr_free( tmp );
@@ -212,10 +217,12 @@ readargs( int argc, char ** argv )
                       break;
             default:
                       showUsage( );
+                      addArg = FALSE;
                       break;
         }
 
-        reqs[reqCount++] = tr_bencSaveAsJSON( &top, NULL );
+        if( addArg )
+            reqs[reqCount++] = tr_bencSaveAsJSON( &top, NULL );
         tr_bencFree( &top );
     }
 }
@@ -274,6 +281,10 @@ processResponse( const char * host, int port,
                  const void * response, size_t len )
 {
     tr_benc top;
+
+    if( debug )
+        fprintf( stderr, "got response: [%*.*s]\n",
+                 (int)len, (int)len, (const char*) response );
 
     if( tr_jsonParse( response, len, &top, NULL ) )
        tr_nerr( MY_NAME, "Unable to parse response" );
