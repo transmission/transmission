@@ -126,7 +126,6 @@
     copy->fDarkGreenGradient = [fDarkGreenGradient retain];
     copy->fYellowGradient = [fYellowGradient retain];
     copy->fRedGradient = [fRedGradient retain];
-    copy->fTransparentGradient = [fTransparentGradient retain];
     
     return copy;
 }
@@ -144,7 +143,6 @@
     [fDarkGreenGradient release];
     [fYellowGradient release];
     [fRedGradient release];
-    [fTransparentGradient release];
     
     [super dealloc];
 }
@@ -782,10 +780,6 @@
     
     //actually draw image
     [fBitmap drawInRect: barRect];
-    
-    if (!fTransparentGradient)
-        fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
-    [fTransparentGradient fillRect: barRect angle: -90];
 }
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
