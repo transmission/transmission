@@ -115,8 +115,6 @@
 {
     TorrentCell * copy = [super copyWithZone: zone];
     
-    copy->fBitmap = nil;
-    
     copy->fGrayGradient = [fGrayGradient retain];
     copy->fLightGrayGradient = [fLightGrayGradient retain];
     copy->fBlueGradient = [fBlueGradient retain];
@@ -132,8 +130,6 @@
 
 - (void) dealloc
 {
-    [fBitmap release];
-    
     [fGrayGradient release];
     [fLightGrayGradient release];
     [fBlueGradient release];
@@ -591,8 +587,6 @@
     }
     else
     {
-        [fBitmap release];
-        fBitmap = nil;
         [[self representedObject] setPreviousAmountFinished: NULL];
         
         [self drawRegularBar: barRect];
@@ -736,10 +730,9 @@
 
 - (void) drawPiecesBar: (NSRect) barRect
 {
-    if (!fBitmap)
-        fBitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
-            pixelsWide: MAX_PIECES pixelsHigh: 1 bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
-            isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
+    NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
+                                    pixelsWide: MAX_PIECES pixelsHigh: 1 bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
+                                    isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
     
     Torrent * torrent = [self representedObject];
     
@@ -773,13 +766,16 @@
             pieceColor = fBlue4Color;
         
         //it's faster to just set color instead of checking previous color
-        [fBitmap setColor: pieceColor atX: i y: 0];
+        [bitmap setColor: pieceColor atX: i y: 0];
     }
     
     [torrent setPreviousAmountFinished: piecePercent];
     
     //actually draw image
-    [fBitmap drawInRect: barRect];
+    [bitmap drawInRect: barRect];
+    
+    [bitmap release];
+    bitmap = nil;
 }
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds

@@ -39,8 +39,6 @@
                 * fGreenGradient, * fLightGreenGradient, * fDarkGreenGradient, * fYellowGradient, * fRedGradient;
     
     NSColor * fGrayColor, * fBlueColor, * fBlue1Color, * fBlue2Color, * fBlue3Color, * fBlue4Color, * fOrangeColor;
-    
-    NSBitmapImageRep * fBitmap;
 }
 
 - (NSRect) iconRectForBounds: (NSRect) bounds;
