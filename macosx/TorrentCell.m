@@ -439,7 +439,7 @@
         //border
         NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: groupRect radius: radius];
         [darkGroupColor set];
-        [bp setLineWidth: 1.5];
+        [bp setLineWidth: 2.0];
         [bp stroke];
         
         //inside

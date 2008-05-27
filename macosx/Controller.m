@@ -1176,7 +1176,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
     }
     
-    [self confirmRemoveTorrents: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
+    [self confirmRemoveTorrents: torrents deleteData: deleteData deleteTorrent: deleteTorrent fromRPC: NO];
 }
 
 - (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (NSDictionary *) dict
@@ -1184,7 +1184,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSArray * torrents = [dict objectForKey: @"Torrents"];
     if (returnCode == NSAlertDefaultReturn)
         [self confirmRemoveTorrents: torrents deleteData: [[dict objectForKey: @"DeleteData"] boolValue]
-                                                deleteTorrent: [[dict objectForKey: @"DeleteTorrent"] boolValue]];
+                deleteTorrent: [[dict objectForKey: @"DeleteTorrent"] boolValue] fromRPC: NO];
     else
         [torrents release];
     
@@ -1192,6 +1192,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 }
 
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
+        fromRPC: (BOOL) rpc
 {
     //don't want any of these starting then stopping
     NSEnumerator * enumerator = [torrents objectEnumerator];
@@ -1215,7 +1216,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         lowestOrderValue = MIN(lowestOrderValue, [torrent orderValue]);
         
-        [torrent closeRemoveTorrent];
+        if (rpc)
+            [torrent closeRemoveTorrentInterface];
+        else
+            [torrent closeRemoveTorrent];
     }
     
     [torrents release];
@@ -4151,10 +4155,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
     //get the torrent
+    Torrent * torrent;
     if (torrentStruct != NULL && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED))
     {
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
             if (torrentStruct == [torrent torrentStruct])
                 break;
@@ -4164,6 +4168,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             NSLog(@"No torrent found matching the given torrent struct from the RPC callback!");
             return;
         }
+        
+        [torrent retain];
     }
     
     switch (type)
@@ -4177,6 +4183,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         case TR_RPC_TORRENT_STOPPED:
             break;
         case TR_RPC_TORRENT_REMOVING:
+            [self performSelectorOnMainThread: @selector(rpcRemoveTorrent:) withObject: torrent waitUntilDone: NO];
             break;
         case TR_RPC_TORRENT_CHANGED:
             break;
@@ -4205,6 +4212,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [torrent release];
     
     [self updateTorrentsInQueue];
+}
+
+- (void) rpcRemoveTorrent: (Torrent *) torrent
+{
+    [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: NO deleteTorrent: NO fromRPC: YES];
+    [torrent release];
 }
 
 @end
