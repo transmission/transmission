@@ -3,7 +3,7 @@ srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 
 ORIGDIR=`pwd`
-cd $srcdir
+cd "$srcdir"
 PROJECT=Transmission
 
 GETTEXTIZE="glib-gettextize"
@@ -13,7 +13,10 @@ if test $? -ne 0; then
 fi
 
 LIBTOOLIZE=libtoolize
-if ! libtoolize --help >/dev/null 2>&1 && glibtoolize --help >/dev/null 2>&1
+if libtoolize --help >/dev/null 2>&1
+then
+  :
+elif glibtoolize --help >/dev/null 2>&1
 then
   LIBTOOLIZE=glibtoolize
 fi
@@ -32,7 +35,7 @@ if test "$GETTEXTIZE"; then
   intltoolize --copy --force --automake
 fi
 
-cd $ORIGDIR || exit $?
+cd "$ORIGDIR" || exit $?
 
 if test -z "$AUTOGEN_SUBDIR_MODE"; then
 	echo Running $srcdir/configure --enable-maintainer-mode "$@"
