@@ -730,10 +730,6 @@
 
 - (void) drawPiecesBar: (NSRect) barRect
 {
-    NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
-                                    pixelsWide: MAX_PIECES pixelsHigh: 1 bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
-                                    isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
-    
     Torrent * torrent = [self representedObject];
     
     int pieceCount = MIN([torrent pieceCount], MAX_PIECES);
@@ -741,26 +737,29 @@
         * previousPiecePercent = [torrent getPreviousAmountFinished];
     [torrent getAmountFinished: piecePercent size: pieceCount];
     
-    int i, index;
-    float increment = (float)pieceCount / MAX_PIECES;
-    NSColor * pieceColor;
-    for (i = 0; i < MAX_PIECES; i++)
+    NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
+                                    pixelsWide: pieceCount pixelsHigh: 1 bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
+                                    isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
+    
+    int i;
+    for (i = 0; i < pieceCount; i++)
     {
-        index = i * increment;
-        if (piecePercent[index] >= 1.0)
+        NSColor * pieceColor;
+        
+        if (piecePercent[i] >= 1.0)
         {
-            if (previousPiecePercent != NULL && previousPiecePercent[index] < 1.0)
+            if (previousPiecePercent != NULL && previousPiecePercent[i] < 1.0)
                 pieceColor = fOrangeColor;
             else
                 pieceColor = fBlueColor;
         }
-        else if (piecePercent[index] <= 0.0)
+        else if (piecePercent[i] <= 0.0)
             pieceColor = fGrayColor;
-        else if (piecePercent[index] <= 0.25)
+        else if (piecePercent[i] <= 0.25)
             pieceColor = fBlue1Color;
-        else if (piecePercent[index] <= 0.5)
+        else if (piecePercent[i] <= 0.5)
             pieceColor = fBlue2Color;
-        else if (piecePercent[index] <= 0.75)
+        else if (piecePercent[i] <= 0.75)
             pieceColor = fBlue3Color;
         else
             pieceColor = fBlue4Color;
@@ -775,7 +774,6 @@
     [bitmap drawInRect: barRect];
     
     [bitmap release];
-    bitmap = nil;
 }
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
