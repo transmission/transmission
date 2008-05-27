@@ -398,36 +398,4 @@
     return [newInstance autorelease];
 }
 
-+ (CTGradient *)progressTransparentGradient
-{
-    CTGradient *newInstance = [[[self class] alloc] init];
-    
-    CTGradientElement color1;
-    color1.red = color1.green = color1.blue = 1.0;
-    color1.alpha = 0.65;
-    color1.position = 0;
-    
-    CTGradientElement color2;
-    color2.red = color2.green = color2.blue = 1.0;
-    color2.alpha = 0.05;
-    color2.position = 0.5;
-    
-    CTGradientElement color3;
-    color3.red = color3.green = color3.blue = 1.0;
-    color3.alpha = 0.4;
-    color3.position = 0.5;
-    
-    CTGradientElement color4;
-    color4.red = color4.green = color4.blue = 1.0;
-    color4.alpha = 0.4;
-    color4.position = 1;
-    
-    [newInstance addElement:&color1];
-    [newInstance addElement:&color2];
-    [newInstance addElement:&color3];
-    [newInstance addElement:&color4];
-    
-    return [newInstance autorelease];
-}
-
 @end
