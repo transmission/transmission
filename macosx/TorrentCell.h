@@ -34,7 +34,7 @@
     BOOL fTracking, fMouseDownControlButton, fMouseDownRevealButton, fMouseDownActionButton,
             fHoverControl, fHoverReveal, fHoverAction;
     
-    NSColor * fBarOverlayColor;
+    NSColor * fBarBorderColor;
     CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fBlueGradient, * fDarkBlueGradient, 
                 * fGreenGradient, * fLightGreenGradient, * fDarkGreenGradient, * fYellowGradient, * fRedGradient;
     

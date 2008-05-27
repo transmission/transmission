@@ -106,7 +106,7 @@
         fBlueColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
         fOrangeColor = [[NSColor orangeColor] retain];
         
-        fBarOverlayColor = [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] retain];
+        fBarBorderColor = [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] retain];
     }
 	return self;
 }
@@ -425,25 +425,27 @@
     int groupValue = [torrent groupValue];
     if (groupValue != -1)
     {
-        NSRect groupRect = NSInsetRect(iconRect, -2.0, -3.0);
+        NSRect groupRect = NSInsetRect(iconRect, -1.0, -2.0);
         if (!minimal)
         {
             groupRect.size.height--;
             groupRect.origin.y--;
         }
+        float radius = minimal ? 3.0 : 6.0;
         
-        NSColor * groupColor = [[GroupsController groups] colorForIndex: groupValue];
+        NSColor * groupColor = [[GroupsController groups] colorForIndex: groupValue],
+                * darkGroupColor = [groupColor blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]];
         
         //border
-        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: groupRect radius: 6.0];
-        CTGradient * gradient = [CTGradient gradientWithBeginningColor: [groupColor blendedColorWithFraction: 0.45 ofColor:
-                                [NSColor whiteColor]] endingColor: groupColor];
-        [gradient fillBezierPath: bp angle: 90.0];
+        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: groupRect radius: radius];
+        [darkGroupColor set];
+        [bp setLineWidth: 1.5];
+        [bp stroke];
         
         //inside
-        bp = [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(groupRect, 1.0, 1.0) radius: 6.0];
-        gradient = [CTGradient gradientWithBeginningColor: [groupColor blendedColorWithFraction: 0.65 ofColor: [NSColor whiteColor]]
-                    endingColor: [groupColor blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]]];
+        bp = [NSBezierPath bezierPathWithRoundedRect: groupRect radius: radius];
+        CTGradient * gradient = [CTGradient gradientWithBeginningColor: [groupColor blendedColorWithFraction: 0.7
+                                    ofColor: [NSColor whiteColor]] endingColor: darkGroupColor];
         [gradient fillBezierPath: bp angle: 90.0];
     }
     
@@ -599,7 +601,7 @@
         [self drawRegularBar: barRect];
     }
     
-    [fBarOverlayColor set];
+    [fBarBorderColor set];
     [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
 }
 
