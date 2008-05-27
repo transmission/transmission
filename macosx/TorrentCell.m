@@ -163,12 +163,18 @@
 
 - (NSRect) minimalStatusRectForBounds: (NSRect) bounds
 {
+    if (![fDefaults boolForKey: @"SmallView"])
+        return NSZeroRect;
+    
     return [self rectForMinimalStatusWithString: [self attributedStatusString: [self minimalStatusString] withColor: nil]
             inBounds: bounds];
 }
 
 - (NSRect) progressRectForBounds: (NSRect) bounds
 {
+    if ([fDefaults boolForKey: @"SmallView"])
+        return NSZeroRect;
+    
     return [self rectForProgressWithString: [self attributedStatusString: [[self representedObject] progressString] withColor: nil]
             inBounds: bounds];
 }
@@ -194,6 +200,9 @@
 
 - (NSRect) statusRectForBounds: (NSRect) bounds
 {
+    if ([fDefaults boolForKey: @"SmallView"])
+        return NSZeroRect;
+    
     return [self rectForStatusWithString: [self attributedStatusString: [self statusString] withColor: nil] inBounds: bounds];
 }
 
@@ -248,9 +257,7 @@
     NSPoint point = [controlView convertPoint: [event locationInWindow] fromView: nil];
     
     if (NSMouseInRect(point, [self controlButtonRectForBounds: cellFrame], [controlView isFlipped])
-        || NSMouseInRect(point, [self revealButtonRectForBounds: cellFrame], [controlView isFlipped])
-        || (NSMouseInRect(point, [self progressRectForBounds: cellFrame], [controlView isFlipped]) && [[self representedObject] folder])
-        || NSMouseInRect(point, [self minimalStatusRectForBounds: cellFrame], [controlView isFlipped]))
+        || NSMouseInRect(point, [self revealButtonRectForBounds: cellFrame], [controlView isFlipped]))
         return NSCellHitContentArea | NSCellHitTrackableArea;
     
     return NSCellHitContentArea;
@@ -778,9 +785,6 @@
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
 {
-    if (![fDefaults boolForKey: @"SmallView"])
-        return NSZeroRect;
-    
     NSRect result = bounds;
     result.size = [string size];
     
@@ -808,9 +812,6 @@
 
 - (NSRect) rectForProgressWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
 {
-    if ([fDefaults boolForKey: @"SmallView"])
-        return NSZeroRect;
-    
     NSRect result = bounds;
     result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS;
     result.origin.x += PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
@@ -823,9 +824,6 @@
 
 - (NSRect) rectForStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
 {
-    if ([fDefaults boolForKey: @"SmallView"])
-        return NSZeroRect;
-    
     NSRect result = bounds;
     result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS
                         + PADDING_BETWEEN_PROGRESS_AND_BAR + BAR_HEIGHT + PADDING_BETWEEN_BAR_AND_STATUS;
