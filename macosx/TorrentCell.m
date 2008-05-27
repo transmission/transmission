@@ -774,8 +774,8 @@
         else
             pieceColor = fBlue4Color;
         
-        if (![pieceColor isEqual: [fBitmap colorAtX: i y: 0]])
-            [fBitmap setColor: pieceColor atX: i y: 0];
+        //it is faster to just set color instead of checking color
+        [fBitmap setColor: pieceColor atX: i y: 0];
     }
     
     [torrent setPreviousAmountFinished: piecePercent];
