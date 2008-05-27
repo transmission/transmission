@@ -181,7 +181,6 @@ enum
 {
     MC_NAME,
     MC_NAME_COLLATED,
-    MC_HASH,
     MC_TORRENT,
     MC_TORRENT_RAW,
     MC_STATUS,

@@ -503,7 +503,6 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
     GType types[] = {
         G_TYPE_STRING,    /* name */
         G_TYPE_STRING,    /* collated name */
-        G_TYPE_STRING,    /* hash string */
         TR_TORRENT_TYPE,  /* TrTorrent object */
         G_TYPE_POINTER,   /* tr_torrent* */
         G_TYPE_INT        /* tr_stat()->status */
@@ -678,7 +677,6 @@ tr_core_add_torrent( TrCore * self, TrTorrent * gtor )
     gtk_list_store_insert_with_values( store, &unused, 0, 
                                        MC_NAME,          inf->name,
                                        MC_NAME_COLLATED, collated,
-                                       MC_HASH,          inf->hashString,
                                        MC_TORRENT,       gtor,
                                        MC_TORRENT_RAW,   tor,
                                        MC_STATUS,        torStat->status,
