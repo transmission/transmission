@@ -152,6 +152,8 @@
 	<false/>
 	<key>WarningDuplicate</key>
 	<true/>
+	<key>WarningCreatorBlankAddress</key>
+	<true/>
 	<key>WarningFolderDataSameName</key>
 	<true/>
 	<key>WarningRemainingSpace</key>

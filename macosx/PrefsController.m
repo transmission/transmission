@@ -506,6 +506,7 @@
     [fDefaults setBool: YES forKey: @"WarningRemainingSpace"];
     [fDefaults setBool: YES forKey: @"WarningFolderDataSameName"];
     [fDefaults setBool: YES forKey: @"WarningResetStats"];
+    [fDefaults setBool: YES forKey: @"WarningCreatorBlankAddress"];
 }
 
 - (void) setCheckForUpdate: (id) sender

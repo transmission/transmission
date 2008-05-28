@@ -31,13 +31,13 @@
     IBOutlet NSImageView * fIconView;
     IBOutlet NSTextField * fNameField, * fStatusField, * fPiecesField, * fTrackerField, * fLocationField;
     IBOutlet NSTextView * fCommentView;
-    IBOutlet NSButton *fCreateButton, * fPrivateCheck, * fOpenCheck;
+    IBOutlet NSButton * fPrivateCheck, * fOpenCheck;
     
     IBOutlet NSView * fProgressView;
     IBOutlet NSProgressIndicator * fProgressIndicator;
     
     tr_metainfo_builder * fInfo;
-    NSString * fPath, * fLocation;
+    NSString * fPath, * fLocation, * fTracker;
     BOOL fOpenTorrent;
     
     NSTimer * fTimer;
@@ -50,6 +50,8 @@
 + (void) createTorrentFile: (tr_handle *) handle forFile: (NSString *) file;
 
 - (id) initWithHandle: (tr_handle *) handle path: (NSString *) path;
+
+- (void) toggleOpenCheck: (id) sender;
 
 - (void) setLocation: (id) sender;
 - (void) create: (id) sender;
