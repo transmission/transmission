@@ -76,7 +76,7 @@ int tr_netResolve( const char * address, struct in_addr * addr )
 
 
 /***********************************************************************
- * TCP/UDP sockets
+ * TCP sockets
  **********************************************************************/
 
 int
