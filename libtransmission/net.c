@@ -204,45 +204,6 @@ tr_netAccept( int b, struct in_addr * addr, tr_port_t * port )
     return makeSocketNonBlocking( tr_fdSocketAccept( b, addr, port ) );
 }
 
-int
-tr_netSend( int s, const void * buf, int size )
-{
-    const int ret = send( s, buf, size, 0 );
-    if( ret >= 0 )
-        return ret;
-
-    if( sockerrno == ENOTCONN || sockerrno == EAGAIN || sockerrno == EWOULDBLOCK )
-        return TR_NET_BLOCK;
-
-    return TR_NET_CLOSE;
-}
-
-int tr_netRecvFrom( int s, uint8_t * buf, int size, struct sockaddr_in * addr )
-{
-    socklen_t len;
-    int       ret;
-
-    len = ( NULL == addr ? 0 : sizeof( *addr ) );
-    ret = recvfrom( s, buf, size, 0, ( struct sockaddr * ) addr, &len );
-    if( ret < 0 )
-    {
-        if( sockerrno == EAGAIN || sockerrno == EWOULDBLOCK )
-        {
-            ret = TR_NET_BLOCK;
-        }
-        else
-        {
-            ret = TR_NET_CLOSE;
-        }
-    }
-    if( !ret )
-    {
-        ret = TR_NET_CLOSE;
-    }
-
-    return ret;
-}
-
 void
 tr_netClose( int s )
 {

@@ -76,17 +76,8 @@ int  tr_netAccept   ( int s, struct in_addr *, tr_port_t * );
 int  tr_netSetTOS   ( int s, int tos );
 void tr_netClose    ( int s );
 
-#define TR_NET_BLOCK 0x80000000
-#define TR_NET_CLOSE 0x40000000
-int  tr_netSend    ( int s, const void * buf, int size );
-#define tr_netRecv( s, buf, size ) tr_netRecvFrom( (s), (buf), (size), NULL )
-int  tr_netRecvFrom( int s, uint8_t * buf, int size, struct sockaddr_in * );
-
 void tr_netNtop( const struct in_addr * addr, char * buf, int len );
 
 void tr_netInit ( void );
-
-
-#define tr_addrcmp( aa, bb )    memcmp( ( void * )(aa), ( void * )(bb), 4)
 
 #endif /* _TR_NET_H_ */
