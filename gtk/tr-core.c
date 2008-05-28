@@ -47,6 +47,8 @@
 
 static void tr_core_set_hibernation_allowed( TrCore * core, gboolean allowed );
 
+static gboolean our_instance_adds_remote_torrents = FALSE;
+
 struct TrCorePrivate
 {
 #ifdef HAVE_GIO
@@ -179,7 +181,7 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
                                G_TYPE_INVALID,
                                G_TYPE_UINT, &result,
                                G_TYPE_INVALID );
-            if( result == 1 )
+            if(( our_instance_adds_remote_torrents = result == 1 ))
                 dbus_g_object_type_install_info( TR_CORE_TYPE,
                                                  &dbus_glib_tr_core_object_info );
         }
@@ -519,6 +521,7 @@ tr_core_init( GTypeInstance * instance, gpointer g_class UNUSED )
     p->model    = GTK_TREE_MODEL( store );
 
 #ifdef HAVE_DBUS_GLIB
+    if( our_instance_adds_remote_torrents )
     {
         DBusGConnection * bus = dbus_g_bus_get( DBUS_BUS_SESSION, NULL );
         if( bus )
