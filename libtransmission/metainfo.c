@@ -260,7 +260,7 @@ getannounce( tr_info * inf, tr_benc * meta )
 
         /* did we use any of the tiers? */
         if( !trackerCount ) {
-            tr_inf( _( "Invalid metadata entry \"%s\"" ), "announce-list" );
+            tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "announce-list" );
             tr_free( trackers );
             trackers = NULL;
         }
@@ -280,6 +280,9 @@ getannounce( tr_info * inf, tr_benc * meta )
 
     inf->trackers = trackers;
     inf->trackerCount = trackerCount;
+
+    if( !inf->trackerCount )
+        tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "announce" );
 
     return inf->trackerCount ? TR_OK : TR_ERROR;
 }
@@ -348,9 +351,9 @@ tr_metainfoParse( const tr_handle  * handle,
     if( !tr_bencIsInt( val ) )
     {
         if( val )
-            tr_err( _( "Invalid metadata entry \"%s\"" ), "piece length" );
+            tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "piece length" );
         else
-            tr_err( _( "Missing metadata entry \"%s\"" ), "piece length" );
+            tr_nerr( inf->name, _( "Missing metadata entry \"%s\"" ), "piece length" );
         goto fail;
     }
     inf->pieceSize = val->val.i;
@@ -360,14 +363,14 @@ tr_metainfoParse( const tr_handle  * handle,
     if( !tr_bencIsString( val ) )
     {
         if( val )
-            tr_err( _( "Invalid metadata entry \"%s\"" ), "pieces" );
+            tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "pieces" );
         else
-            tr_err( _( "Missing metadata entry \"%s\"" ), "pieces" );
+            tr_nerr( inf->name, _( "Missing metadata entry \"%s\"" ), "pieces" );
         goto fail;
     }
     if( val->val.s.i % SHA_DIGEST_LENGTH )
     {
-        tr_err( _( "Invalid metadata entry \"%s\"" ), "pieces" );
+        tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "pieces" );
         goto fail;
     }
     inf->pieceCount = val->val.s.i / SHA_DIGEST_LENGTH;
@@ -391,7 +394,7 @@ tr_metainfoParse( const tr_handle  * handle,
 
     if( !inf->fileCount || !inf->totalSize )
     {
-        tr_err( _( "Torrent is corrupt" ) ); /* the content is missing! */
+        tr_nerr( inf->name, _( "Torrent is corrupt" ) ); /* the content is missing! */
         goto fail;
     }
 
@@ -400,7 +403,7 @@ tr_metainfoParse( const tr_handle  * handle,
     if( (uint64_t) inf->pieceCount !=
         ( inf->totalSize + inf->pieceSize - 1 ) / inf->pieceSize )
     {
-        tr_err( _( "Torrent is corrupt" ) ); /* size of hashes and files don't match */
+        tr_nerr( inf->name, _( "Torrent is corrupt" ) ); /* size of hashes and files don't match */
         goto fail;
     }
 
@@ -558,18 +561,18 @@ parseFiles( tr_info * inf, tr_benc * name,
             if( getfile( &inf->files[ii].name, inf->name, path ) )
             {
                 if( path )
-                    tr_err( _( "Invalid metadata entry \"%s\"" ), "path" );
+                    tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "path" );
                 else
-                    tr_err( _( "Missing metadata entry \"%s\"" ), "path" );
+                    tr_nerr( inf->name, _( "Missing metadata entry \"%s\"" ), "path" );
                 return TR_EINVALID;
             }
             length = tr_bencDictFind( item, "length" );
             if( !tr_bencIsInt( length ) )
             {
                 if( length )
-                    tr_err( _( "Invalid metadata entry \"%s\"" ), "length" );
+                    tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "length" );
                 else
-                    tr_err( _( "Missing metadata entry \"%s\"" ), "length" );
+                    tr_nerr( inf->name, _( "Missing metadata entry \"%s\"" ), "length" );
                 return TR_EINVALID;
             }
             inf->files[ii].length = length->val.i;
@@ -598,7 +601,7 @@ parseFiles( tr_info * inf, tr_benc * name,
     }
     else
     {
-        tr_err( _( "Invalid or missing metadata entries \"length\" and \"files\"" ) );
+        tr_nerr( inf->name, _( "Invalid or missing metadata entries \"length\" and \"files\"" ) );
     }
 
     return TR_OK;
