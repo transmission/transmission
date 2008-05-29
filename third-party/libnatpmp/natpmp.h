@@ -1,4 +1,4 @@
-/* $Id: natpmp.h,v 1.8 2008/04/28 02:58:34 nanard Exp $ */
+/* $Id: natpmp.h,v 1.9 2008/05/29 08:06:01 nanard Exp $ */
 /* libnatpmp
  * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
  * http://miniupnp.free.fr/libnatpmp.html
@@ -52,7 +52,7 @@ typedef struct {
 			uint16_t mappedpublicport;
 			uint32_t lifetime;
 		} newportmapping;
-	};
+	} pnu;
 } natpmpresp_t;
 
 /* possible values for type field of natpmpresp_t */
