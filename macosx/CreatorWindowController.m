@@ -220,7 +220,7 @@
         if ([NSApp isOnLeopardOrBetter])
             [alert setShowsSuppressionButton: YES];
         else
-            [alert addButtonWithTitle: NSLocalizedString(@"Always Download", "Torrent disk space alert -> button")];
+            [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Create torrent -> blank address -> button")];
 
         [alert beginSheetModalForWindow: [self window] modalDelegate: self
             didEndSelector: @selector(createBlankAddressAlertDidEnd:returnCode:contextInfo:) contextInfo: nil];
