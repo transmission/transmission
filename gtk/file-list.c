@@ -47,31 +47,31 @@ enum
 
 enum
 {
-  FC_STOCK,
-  FC_LABEL,
-  FC_PROG,
-  FC_KEY,
-  FC_INDEX,
-  FC_SIZE,
-  FC_HAVE,
-  FC_PRIORITY,
-  FC_ENABLED,
-  FC_IS_FILE,
-  FC_SUB_SIZE,
-  FC_SUB_HAVE,
-  FC_SUB_STATE,
-  N_FILE_COLS
+    FC_STOCK,
+    FC_LABEL,
+    FC_PROG,
+    FC_KEY,
+    FC_INDEX,
+    FC_SIZE,
+    FC_HAVE,
+    FC_PRIORITY,
+    FC_ENABLED,
+    FC_IS_FILE,
+    FC_SUB_SIZE,
+    FC_SUB_HAVE,
+    FC_SUB_STATE,
+    N_FILE_COLS
 };
 
 typedef struct
 {
-  TrTorrent * gtor;
-  GtkWidget * top;
-  GtkWidget * view;
-  GtkTreeModel * model; /* same object as store, but recast */
-  GtkTreeStore * store; /* same object as model, but recast */
-  tr_file_stat * refresh_file_stat;
-  guint timeout_tag;
+    TrTorrent * gtor;
+    GtkWidget * top;
+    GtkWidget * view;
+    GtkTreeModel * model; /* same object as store, but recast */
+    GtkTreeStore * store; /* same object as model, but recast */
+    tr_file_stat * refresh_file_stat;
+    guint timeout_tag;
 }
 FileData;
 
@@ -204,7 +204,7 @@ resetSubForeach( GtkTreeModel  * model,
                  GtkTreeIter   * iter,
                  gpointer        gdata UNUSED )
 {
-    // set the subs to the lowest values...
+    /* set the subs to the lowest values... */
     gtk_tree_store_set( GTK_TREE_STORE( model ), iter,
                         FC_SUB_STATE, 0,
                         FC_SUB_SIZE, (uint64_t)0,
@@ -322,7 +322,7 @@ getActiveFilesForeach( GtkTreeModel  * model,
     if( is_active )
         g_array_append_val( data->array, i );
 
-    return FALSE; /* walk the entire model */
+    return FALSE; /* keep walking */
 }
 
 static GArray*
