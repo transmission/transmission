@@ -134,7 +134,7 @@ typedef enum
 - (NSImage *) icon;
 
 - (NSString *) name;
-- (BOOL) folder;
+- (BOOL) isFolder;
 - (uint64_t) size;
 - (uint64_t) sizeLeft;
 

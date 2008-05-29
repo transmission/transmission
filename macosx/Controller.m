@@ -4060,7 +4060,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     while ((torrent = [enumerator nextObject]))
     {
-        if ([torrent folder] || [torrent isComplete])
+        if ([torrent isFolder] || [torrent isComplete])
             [urlArray addObject: [NSURL fileURLWithPath: [torrent dataLocation]]];
     }
     
@@ -4075,7 +4075,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     while ((torrent = [enumerator nextObject]))
     {
-        if ([torrent folder] || [torrent isComplete])
+        if ([torrent isFolder] || [torrent isComplete])
             return YES;
     }
     

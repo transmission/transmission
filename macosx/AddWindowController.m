@@ -207,7 +207,7 @@
 - (void) updateStatusField: (NSNotification *) notification
 {
     NSString * statusString = [NSString stringForFileSize: [fTorrent size]];
-    if ([fTorrent folder])
+    if ([fTorrent isFolder])
     {
         NSString * fileString;
         int count = [fTorrent fileCount];

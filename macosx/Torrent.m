@@ -699,7 +699,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 {
     if (!fIcon)
     {
-        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: [self folder] ? NSFileTypeForHFSTypeCode('fldr')
+        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: [self isFolder] ? NSFileTypeForHFSTypeCode('fldr')
                                                 : [[self name] pathExtension]] retain];
         [fIcon setFlipped: YES];
     }
@@ -711,7 +711,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fNameString;
 }
 
-- (BOOL) folder
+- (BOOL) isFolder
 {
     return fInfo->isMultifile;
 }
@@ -990,7 +990,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (![self allDownloaded])
     {
         float progress;
-        if ([self folder] && [fDefaults boolForKey: @"DisplayStatusProgressSelected"])
+        if ([self isFolder] && [fDefaults boolForKey: @"DisplayStatusProgressSelected"])
         {
             string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@ selected", "Torrent -> progress string"),
                         [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self totalSizeSelected]]];
@@ -1651,7 +1651,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (void) createFileList
 {
-    if ([self folder])
+    if ([self isFolder])
     {
         int count = [self fileCount], i;
         NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count];

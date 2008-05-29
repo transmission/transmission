@@ -363,7 +363,7 @@ typedef enum
         [fNameField setToolTip: name];
         
         NSString * basicString = [NSString stringForFileSize: [torrent size]];
-        if ([torrent folder])
+        if ([torrent isFolder])
         {
             NSString * fileString;
             int fileCount = [torrent fileCount];
@@ -1176,7 +1176,7 @@ typedef enum
         
         [fStateField setStringValue: [torrent stateString]];
         
-        if ([torrent folder])
+        if ([torrent isFolder])
             [fProgressField setStringValue: [NSString localizedStringWithFormat: NSLocalizedString(@"%.2f%% (%.2f%% selected)",
                 "Inspector -> Activity tab -> progress"), 100.0 * [torrent progress], 100.0 * [torrent progressDone]]];
         else
