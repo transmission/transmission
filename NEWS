@@ -3,7 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.30 (2008/mm/dd)
 http://trac.transmissionbt.com/query?group=component&milestone=1.30&order=severity
 - All Platforms
-   + Creation of torrent files with no tracker (for easier creation for some tracker sites)
+   + Creation of torrent files with no tracker address (for easier creation for upload to some tracker sites)
 - Mac
    + Quick Look integration in the main window and inspector's file tab
    + Transfers can be dragged to different groups
