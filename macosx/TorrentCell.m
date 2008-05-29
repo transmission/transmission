@@ -98,7 +98,7 @@
         [paragraphStyle release];
         
         //store box colors
-        fGrayColor = [[NSColor colorWithCalibratedRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0] retain];
+        fGrayColor = [[NSColor colorWithCalibratedRed: 0.95 green: 0.95 blue: 0.95 alpha: 1.0] retain];
         fBlue1Color = [[NSColor colorWithCalibratedRed: 0.8 green: 1.0 blue: 1.0 alpha: 1.0] retain];
         fBlue2Color = [[NSColor colorWithCalibratedRed: 0.6 green: 1.0 blue: 1.0 alpha: 1.0] retain];
         fBlue3Color = [[NSColor colorWithCalibratedRed: 0.6 green: 0.8 blue: 1.0 alpha: 1.0] retain];
