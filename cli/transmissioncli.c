@@ -52,6 +52,7 @@ const char * USAGE =
 "  -c, --create-from <file>  Create torrent from the specified source file.\n"
 "  -a, --announce <url>      Used in conjunction with -c.\n"
 "  -g, --config-dir <path>   Where to look for configuration files\n"
+"  -o, --output-dir <path>   Where to save downloaded data\n"
 "  -r, --private             Used in conjunction with -c.\n"
 "  -m, --comment <text>      Adds an optional comment when creating a torrent.\n"
 "  -d, --download <int>      Max download rate (-1 = no limit, default = -1)\n"
