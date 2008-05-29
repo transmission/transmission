@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "CreatorWindowController.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #include "utils.h" //tr_httpParseURL
 
@@ -32,6 +33,7 @@
 - (void) updateEnableOpenCheckForTrackerField;
 - (void) locationSheetClosed: (NSSavePanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 
+- (void) createBlankAddressAlertDidEnd: (NSAlert *) alert returnCode: (int) returnCode contextInfo: (void *) contextInfo;
 - (void) createReal;
 - (void) checkProgress;
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info;
@@ -205,10 +207,25 @@
 
 - (void) create: (id) sender
 {
-    /*if ([[fTrackerField stringValue] isEqualToString: @""] && [fDefaults boolForKey: @"WarningCreatorBlankAddress"])
+    if ([[fTrackerField stringValue] isEqualToString: @""] && [fDefaults boolForKey: @"WarningCreatorBlankAddress"])
     {
+        NSAlert * alert = [[NSAlert alloc] init];
+        [alert setMessageText: NSLocalizedString(@"The tracker address is blank.", "Create torrent -> blank address -> title")];
+        [alert setInformativeText: NSLocalizedString(@"The torrent file will not be able to be opened."
+            " A torrent file with no tracker address is only useful when you plan to upload the file to a tracker website"
+            " that will add the address for you.", "Create torrent -> blank address -> message")];
+        [alert addButtonWithTitle: NSLocalizedString(@"Create", "Create torrent -> blank address -> button")];
+        [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Create torrent -> blank address -> button")];
+        
+        if ([NSApp isOnLeopardOrBetter])
+            [alert setShowsSuppressionButton: YES];
+        else
+            [alert addButtonWithTitle: NSLocalizedString(@"Always Download", "Torrent disk space alert -> button")];
+
+        [alert beginSheetModalForWindow: [self window] modalDelegate: self
+            didEndSelector: @selector(createBlankAddressAlertDidEnd:returnCode:contextInfo:) contextInfo: nil];
     }
-    else*/
+    else
         [self createReal];
 }
 
@@ -266,6 +283,17 @@
         [fLocationField setStringValue: [fLocation stringByAbbreviatingWithTildeInPath]];
         [fLocationField setToolTip: fLocation];
     }
+}
+
+- (void) createBlankAddressAlertDidEnd: (NSAlert *) alert returnCode: (int) returnCode contextInfo: (void *) contextInfo
+{
+    if (([NSApp isOnLeopardOrBetter] ? [[alert suppressionButton] state] == NSOnState : returnCode == NSAlertThirdButtonReturn))
+        [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningCreatorBlankAddress"];
+    
+    [alert release];
+    
+    if (returnCode == NSAlertFirstButtonReturn)
+        [self performSelectorOnMainThread: @selector(createReal) withObject: nil waitUntilDone: NO];
 }
 
 - (void) createReal
