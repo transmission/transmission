@@ -230,7 +230,7 @@ typedef enum
                 [NSString stringWithFormat: NSLocalizedString(@"%d files", "Inspector -> selected torrents"), fileCount],
                 [NSString stringWithFormat: NSLocalizedString(@"%@ total", "Inspector -> selected torrents"),
                 [NSString stringForFileSize: size]]]];
-            [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes", "Inspector -> selected torrents"),
+            [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"llu bytes", "Inspector -> selected torrents"),
                                             size]];
         }
         else
@@ -374,7 +374,7 @@ typedef enum
             basicString = [NSString stringWithFormat: @"%@, %@", fileString, basicString];
         }
         [fBasicInfoField setStringValue: basicString];
-        [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes", "Inspector -> selected torrents"),
+        [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%llu bytes", "Inspector -> selected torrents"),
                                         [torrent size]]];
         
         NSString * hashString = [torrent hashString];

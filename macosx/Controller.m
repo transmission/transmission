@@ -3277,7 +3277,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
         
-        [item setLabel: NSLocalizedString(@"QuickLook", "QuickLook toolbar item -> label")];
+        [item setLabel: NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> tooltip")];
         [item setImage: [NSImage imageNamed: NSImageNameQuickLookTemplate]];
