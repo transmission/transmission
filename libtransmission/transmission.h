@@ -856,9 +856,18 @@ typedef struct tr_peer_stat tr_peer_stat;
 tr_peer_stat * tr_torrentPeers( const tr_torrent *, int * peerCount );
 void tr_torrentPeersFree( tr_peer_stat *, int peerCount );
 
-typedef struct tr_file_stat tr_file_stat;
-tr_file_stat * tr_torrentFiles( const tr_torrent *, tr_file_index_t * fileCount );
-void tr_torrentFilesFree( tr_file_stat *, tr_file_index_t fileCount );
+typedef struct tr_file_stat
+{
+    uint64_t bytesCompleted;
+    float progress;
+}
+tr_file_stat;
+
+tr_file_stat * tr_torrentFiles( const tr_torrent * tor,
+                                 tr_file_index_t * fileCount );
+
+void tr_torrentFilesFree( tr_file_stat    * stat,
+                          tr_file_index_t   fileCount );
 
 
 /***********************************************************************
@@ -1172,12 +1181,6 @@ struct tr_stat
 
     /** The last time we uploaded or downloaded piece data on this torrent. */
     time_t activityDate;
-};
-
-struct tr_file_stat
-{
-    uint64_t bytesCompleted;
-    float progress;
 };
 
 struct tr_peer_stat

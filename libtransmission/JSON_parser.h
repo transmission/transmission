@@ -57,10 +57,10 @@ typedef struct JSON_value_struct {
         long double float_value;
         
         struct {
-            const char* string_value;
-            size_t string_length;
-        };
-    };
+            const char* value;
+            size_t length;
+        } str;
+    } vu;
 } JSON_value;
 
 /*! \brief JSON parser callback 
@@ -83,7 +83,7 @@ typedef int (*JSON_parser_callback)(void* ctx, int type, const struct JSON_value
         the depth is the limit
     \param Pointer to a callback. This parameter may be NULL. In this case the input is merely checked for validity.
     \param Callback context. This parameter may be NULL.
-    \param allowComments. To allow C style comments in JSON, set to non-zero.
+    \param depth. Specifies the levels of nested JSON to allow. Negative numbers yield unlimited nesting.
     \param allowComments. To allow C style comments in JSON, set to non-zero.
     \param handleFloatsManually. To decode floating point numbers manually set this parameter to non-zero.
     

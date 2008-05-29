@@ -30,6 +30,17 @@ SOFTWARE.
     Callbacks, comments, Unicode handling by Jean Gressmann (jean@0x42.de), 2007-2008.
     
     For the added features the license above applies also.
+    
+    Changelog:
+    
+        2008/05/28 
+            - Made JSON_value structure ansi C compliant. This bug was report by 
+              trisk@acm.jhu.edu
+        
+        2008/05/20 
+            - Fixed bug reported by Charles.Kerr@noaa.gov where the switching 
+              from static to dynamic parse buffer did not copy the static parse 
+              buffer's content.
 */
 
 
@@ -54,7 +65,7 @@ SOFTWARE.
 #define false 0
 #define __   -1     /* the universal error code */
 
-/* values chosen so that the object approx. fits into a page (4K) */
+/* values chosen so that the object size is approx equal to one page (4K) */
 #ifndef JSON_PARSER_STACK_SIZE
 #   define JSON_PARSER_STACK_SIZE 128
 #endif
@@ -452,20 +463,20 @@ static int parse_parse_buffer(JSON_parser jc)
                 case JSON_T_FLOAT:
                     arg = &value;
                     if (jc->handle_floats_manually) {
-                        value.string_value = jc->parse_buffer;
-                        value.string_length = jc->parse_buffer_count;
+                        value.vu.str.value = jc->parse_buffer;
+                        value.vu.str.length = jc->parse_buffer_count;
                     } else { 
-                        result = sscanf(jc->parse_buffer, "%Lf", &value.float_value);
+                        result = sscanf(jc->parse_buffer, "%Lf", &value.vu.float_value);
                     }
                     break;
                 case JSON_T_INTEGER:
                     arg = &value;
-                    result = sscanf(jc->parse_buffer, JSON_PARSER_INTEGER_SSCANF_TOKEN, &value.integer_value);
+                    result = sscanf(jc->parse_buffer, JSON_PARSER_INTEGER_SSCANF_TOKEN, &value.vu.integer_value);
                     break;
                 case JSON_T_STRING:
                     arg = &value;
-                    value.string_value = jc->parse_buffer;
-                    value.string_length = jc->parse_buffer_count;
+                    value.vu.str.value = jc->parse_buffer;
+                    value.vu.str.length = jc->parse_buffer_count;
                     break;
             }
             
@@ -829,8 +840,8 @@ JSON_parser_char(JSON_parser jc, int next_char)
                 
                 if (jc->callback) {
                     JSON_value value;
-                    value.string_value = jc->parse_buffer;
-                    value.string_length = jc->parse_buffer_count;
+                    value.vu.str.value = jc->parse_buffer;
+                    value.vu.str.length = jc->parse_buffer_count;
                     if (!(*jc->callback)(jc->ctx, JSON_T_KEY, &value)) {
                         return false;
                     }
