@@ -118,12 +118,12 @@ createSocket( int type, int priority )
     return makeSocketNonBlocking( tr_fdSocketCreate( type, priority ) );
 }
 
-static int
-tr_netOpen( const struct in_addr * addr, tr_port_t port,
-            int type, int priority )
+int
+tr_netOpenTCP( const struct in_addr * addr, tr_port_t port, int priority )
 {
     int s;
     struct sockaddr_in sock;
+    const int type = SOCK_STREAM;
 
     if( ( s = createSocket( type, priority ) ) < 0 )
     {
@@ -151,18 +151,13 @@ tr_netOpen( const struct in_addr * addr, tr_port_t port,
 
     return s;
 }
-  
-int
-tr_netOpenTCP( const struct in_addr * addr, tr_port_t port, int priority )
-{
-    return tr_netOpen( addr, port, SOCK_STREAM, priority );
-}
 
-static int
-tr_netBind( int port, int type )
+int
+tr_netBindTCP( int port )
 {
     int s;
     struct sockaddr_in sock;
+    const int type = SOCK_STREAM;
 #if defined( SO_REUSEADDR ) || defined( SO_REUSEPORT )
     int optval;
 #endif
@@ -190,12 +185,6 @@ tr_netBind( int port, int type )
      
     tr_dbg(  "Bound socket %d to port %d", s, port );
     return s;
-}
-
-int
-tr_netBindTCP( int port )
-{
-    return tr_netBind( port, SOCK_STREAM );
 }
 
 int
