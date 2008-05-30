@@ -740,7 +740,7 @@ tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
         return -1;
 
     bitfield->bits[i] |= ands[nth&7u];
-    assert( tr_bitfieldHas( bitfield, nth ) );
+    /*assert( tr_bitfieldHas( bitfield, nth ) );*/
     return 0;
 }
 
@@ -771,7 +771,7 @@ tr_bitfieldRem( tr_bitfield   * bitfield,
         return -1;
 
     bitfield->bits[i] &= rems[nth&7u];
-    assert( !tr_bitfieldHas( bitfield, nth ) );
+    /*assert( !tr_bitfieldHas( bitfield, nth ) );*/
     return 0;
 }
 

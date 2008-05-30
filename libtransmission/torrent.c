@@ -741,7 +741,9 @@ tr_torrentStat( tr_torrent * tor )
     s->haveUnchecked   = tr_cpHaveTotal( tor->completion ) - s->haveValid;
 
 
-    {
+    if( !s->leftUntilDone )
+        s->desiredAvailable = 0;
+    else {
         tr_piece_index_t i;
         tr_bitfield * peerPieces = tr_peerMgrGetAvailable( tor->handle->peerMgr,
                                                            tor->info.hash );
