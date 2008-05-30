@@ -354,6 +354,14 @@ tr_compareUint32( uint32_t a, uint32_t b )
     return 0;
 }
 
+int
+tr_compareUint64( uint64_t a, uint64_t b )
+{
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
 /**
 ***
 **/

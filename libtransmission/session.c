@@ -397,18 +397,40 @@ tr_sessionCountTorrents( const tr_handle * h )
     return h->torrentCount;
 }
 
+/* close the biggest torrents first */
+static int
+compareTorrentByCur( const void * va, const void * vb )
+{
+    const tr_torrent * a = *(const tr_torrent**)va;
+    const tr_torrent * b = *(const tr_torrent**)vb;
+    return -tr_compareUint64( a->downloadedCur + a->uploadedCur,
+                              b->downloadedCur + b->uploadedCur );
+}
+
 static void
 tr_closeAllConnections( void * vh )
 {
     tr_handle * h = vh;
     tr_torrent * tor;
+    int i, n;
+    tr_torrent ** torrents;
 
     tr_sharedShuttingDown( h->shared );
     tr_trackerShuttingDown( h );
     tr_rpcClose( &h->rpcServer );
 
-    while(( tor = tr_torrentNext( h, NULL )))
-        tr_torrentFree( tor );
+    /* close the torrents.  get the most active ones first so that
+     * if we can't get them all closed in a reasonable amount of time,
+     * at least we get the most important ones first. */
+    tor = NULL;
+    n = h->torrentCount;
+    torrents = tr_new( tr_torrent*, h->torrentCount );
+    for( i=0; i<n; ++i )
+        torrents[i] = tr_torrentNext( h, tor );
+    qsort( torrents, n, sizeof(tr_torrent*), compareTorrentByCur );
+    for( i=0; i<n; ++i )
+        tr_torrentFree( torrents[i] );
+    tr_free( torrents );
 
     tr_peerMgrFree( h->peerMgr );
 
