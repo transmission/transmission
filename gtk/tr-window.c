@@ -649,7 +649,7 @@ updateSpeeds( PrivateData * p )
     float u, d;
     tr_handle * handle = tr_core_handle( p->core );
 
-    tr_torrentRates( handle, &d, &u );
+    tr_sessionGetSpeed( handle, &d, &u );
     tr_strlspeed( buf, d, sizeof( buf ) );
     gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
     tr_strlspeed( buf, u, sizeof( buf ) );

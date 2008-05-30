@@ -22,6 +22,13 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+/*
+ * This file defines the public API for the libtransmission library.
+ *
+ * Other headers suitable for public consumption are bencode.h
+ * and utils.h.  Most of the remaining headers in libtransmission
+ * should be considered private to libtransmission.
+ */
 #ifndef TR_TRANSMISSION_H
 #define TR_TRANSMISSION_H 1
 
@@ -41,6 +48,7 @@ extern "C" {
 #include <time.h> /* time_t */
 
 #define SHA_DIGEST_LENGTH 20
+
 #ifdef __BEOS__
 # include <StorageDefs.h>
 # define MAX_PATH_LENGTH  B_FILE_NAME_LENGTH
@@ -71,7 +79,6 @@ const char* tr_getDefaultConfigDir( void );
 typedef struct tr_ctor tr_ctor;
 typedef struct tr_handle tr_handle;
 typedef struct tr_info tr_info;
-typedef struct tr_stat tr_stat;
 typedef struct tr_torrent tr_torrent;
 
 
@@ -87,27 +94,27 @@ typedef struct tr_torrent tr_torrent;
  */
 
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_CONFIG_DIR                  tr_getDefaultConfigDir()
+#define TR_DEFAULT_CONFIG_DIR               tr_getDefaultConfigDir()
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_PEX_ENABLED                 1
+#define TR_DEFAULT_PEX_ENABLED              1
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_PORT_FORWARDING_ENABLED     0
+#define TR_DEFAULT_PORT_FORWARDING_ENABLED  0
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_PORT                        51413
+#define TR_DEFAULT_PORT                     51413
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_GLOBAL_PEER_LIMIT           200
+#define TR_DEFAULT_GLOBAL_PEER_LIMIT        200
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_PEER_SOCKET_TOS             8
+#define TR_DEFAULT_PEER_SOCKET_TOS          8
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_BLOCKLIST_ENABLED           0
+#define TR_DEFAULT_BLOCKLIST_ENABLED        0
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_RPC_ENABLED                 0
+#define TR_DEFAULT_RPC_ENABLED              0
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_RPC_PORT                    9091
+#define TR_DEFAULT_RPC_PORT                 9091
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_RPC_PORT_STR                "9091"
+#define TR_DEFAULT_RPC_PORT_STR             "9091"
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_RPC_ACL                     "+127.0.0.1"
+#define TR_DEFAULT_RPC_ACL                  "+127.0.0.1"
 
 /**
  * @brief Start a libtransmission session.
@@ -224,38 +231,34 @@ tr_handle * tr_sessionInitFull( const char * configDir,
                                 int          rpcPort,
                                 const char * rpcAccessControlList );
 
-/**
- * @brief shorter form of tr_sessionInitFull()
- *
- * @deprecated Use tr_sessionInitFull() instead.
- */ 
+/** @brief Shorter form of tr_sessionInitFull()
+    @deprecated Use tr_sessionInitFull() instead. */ 
 tr_handle * tr_sessionInit( const char * configDir,
                             const char * downloadDir,
                             const char * tag );
 
-/**
- * @brief end a libtransmission session
- * @see tr_sessionInitFull()
- */
+/** @brief End a libtransmission session
+    @see tr_sessionInitFull() */
 void tr_sessionClose( tr_handle * );
 
 /**
- * Returns the configuration directory passed into tr_sessionInitFull().
+ * @brief Return the session's configuration directory
+ *
  * This is where transmission stores its .torrent files, .resume files,
  * blocklists, etc.
  */
 const char * tr_sessionGetConfigDir( const tr_handle * );
 
 /**
- * Set the per-session default download folder for new torrents.
+ * @brief Set the per-session default download folder for new torrents.
  * @see tr_sessionInitFull()
  * @see tr_sessionGetDownloadDir()
  * @see tr_ctorSetDownloadDir()
  */
 void tr_sessionSetDownloadDir( tr_handle *, const char * downloadDir );
 
-/**
- * Get the default download folder for new torrents.
+/** 
+ * @brief Get the default download folder for new torrents.
  *
  * This is set by tr_sessionInitFull() or tr_sessionSetDownloadDir(),
  * and can be overridden on a per-torrent basis by tr_ctorSetDownloadDir().
@@ -322,8 +325,6 @@ typedef enum
     TR_RPC_SESSION_CHANGED
 }
 tr_rpc_callback_type;
-
-struct tr_torrent;
 
 typedef void ( *tr_rpc_func )( tr_handle            * handle,
                                tr_rpc_callback_type   type,
@@ -414,6 +415,10 @@ void tr_sessionSetSpeedLimitEnabled( tr_handle   * session,
 
 enum { TR_UP, TR_DOWN };
 
+void tr_sessionGetSpeed( const tr_handle * session,
+                         float           * overall_down_KiBs,
+                         float           * overall_up_KiBs );
+
 int tr_sessionIsSpeedLimitEnabled( const tr_handle   * session,
                                    int                 up_or_down );
 
@@ -428,6 +433,7 @@ void tr_sessionSetPeerLimit( tr_handle * handle,
                              uint16_t    maxGlobalPeers );
 
 uint16_t tr_sessionGetPeerLimit( const tr_handle * handle );
+
 
 /**
  *  Load all the torrents in tr_getTorrentDir().
@@ -673,19 +679,39 @@ tr_torrent * tr_torrentNew( tr_handle      * handle,
 /** @addtogroup tr_torrent Torrents
     @{ */
 
-/** Iterate through the torrents.
-    Pass in a NULL pointer to get the first torrent.  */
-tr_torrent* tr_torrentNext( tr_handle *, tr_torrent * );
+/** @brief Frees memory allocated by tr_torrentNew().
+           Running torrents are stopped first.  */
+void tr_torrentFree( tr_torrent * );
 
-/** Returns this torrent's unique ID.
-    IDs are good as simple lookup keys, but are not persistent
-    between sessions.  If you need that, use tr_info.hash or
-    tr_info.hashString. */
+/** @brief Removes our .torrent and .resume files for
+           this torrent, then calls tr_torrentFree(). */
+void tr_torrentRemove( tr_torrent * );
+
+/** @brief Start a torrent */
+void tr_torrentStart( tr_torrent * );
+
+/** @brief Stop (pause) a torrent */
+void tr_torrentStop( tr_torrent * );
+
+/**
+ * @brief Iterate through the torrents.
+ *
+ * Pass in a NULL pointer to get the first torrent.
+ */
+tr_torrent* tr_torrentNext( tr_handle * session, tr_torrent * );
+
+/**
+ * @brief Returns this torrent's unique ID.
+ *
+ * IDs are good as simple lookup keys, but are not persistent
+ * between sessions.  If you need that, use tr_info.hash or
+ * tr_info.hashString.
+ */
 int tr_torrentId( const tr_torrent * );
 
-/***********************************************************************
-*** Speed Limits
-**/
+/****
+*****  Speed Limits
+****/
 
 typedef enum
 {
@@ -709,20 +735,18 @@ void tr_torrentSetSpeedLimit( tr_torrent   * tor,
 int tr_torrentGetSpeedLimit( const tr_torrent  * tor,
                              int                 up_or_down );
 
-
-/***********************************************************************
-***  Peer Limits
-**/
+/****
+*****  Peer Limits
+****/
 
 void tr_torrentSetPeerLimit( tr_torrent  * tor,
                              uint16_t      peerLimit );
 
 uint16_t tr_torrentGetPeerLimit( const tr_torrent  * tor );
 
-
-/***********************************************************************
- * Torrent Priorities
- **********************************************************************/
+/****
+*****  File Priorities
+****/
 
 enum
 {
@@ -734,8 +758,9 @@ enum
 typedef int8_t tr_priority_t;
 
 /**
- * Set a batch of files to a particular priority.
- * Priority must be one of TR_PRI_NORMAL, _HIGH, or _LOW
+ * @brief Set a batch of files to a particular priority.
+ *
+ * @param priority must be one of TR_PRI_NORMAL, _HIGH, or _LOW
  */
 void tr_torrentSetFilePriorities( tr_torrent        * tor,
                                   tr_file_index_t   * files,
@@ -743,41 +768,32 @@ void tr_torrentSetFilePriorities( tr_torrent        * tor,
                                   tr_priority_t       priority );
 
 /**
- * Get this torrent's file priorities.
+ * @brief Get this torrent's file priorities.
  *
  * @return A malloc()ed array of tor->info.fileCount items,
- *         each holding a value of TR_PRI_NORMAL, _HIGH, or _LOW.
- *         The caller must free() the array when done.
+ *         each holding a TR_PRI_NORMAL, TR_PRI_HIGH, or TR_PRI_LOW.
+ *         It's the caller's responsibility to free() this.
  */
 tr_priority_t* tr_torrentGetFilePriorities( const tr_torrent * );
 
 /**
- * Single-file form of tr_torrentGetFilePriorities.
- * returns one of TR_PRI_NORMAL, _HIGH, or _LOW.
+ * @brief Single-file form of tr_torrentGetFilePriorities.
+ * @return TR_PRI_NORMAL, TR_PRI_HIGH, or TR_PRI_LOW.
  */
 tr_priority_t tr_torrentGetFilePriority( const tr_torrent *,
                                          tr_file_index_t file );
 
 /**
- * Returns true if the file's `download' flag is set.
+ * @brief See if a file's `download' flag is set.
+ * @return true if the file's `download' flag is set.
  */
 int tr_torrentGetFileDL( const tr_torrent *, tr_file_index_t file );
 
-/**
- * Set a batch of files to be downloaded or not.
- */
+/** @brief Set a batch of files to be downloaded or not. */
 void tr_torrentSetFileDLs ( tr_torrent      * tor,
                             tr_file_index_t * files,
                             tr_file_index_t   fileCount,
                             int               do_download );
-
-/***********************************************************************
- * tr_torrentRates
- ***********************************************************************
- * Gets the total download and upload rates
- **********************************************************************/
-void tr_torrentRates( tr_handle *, float *, float * );
-
 
 
 const tr_info * tr_torrentInfo( const tr_torrent * );
@@ -785,10 +801,6 @@ const tr_info * tr_torrentInfo( const tr_torrent * );
 void tr_torrentSetDownloadDir( tr_torrent *, const char * );
 
 const char * tr_torrentGetDownloadDir( const tr_torrent * );
-
-void tr_torrentStart( tr_torrent * );
-
-void tr_torrentStop( tr_torrent * );
 
 
 /**
@@ -839,22 +851,40 @@ void tr_torrentManualUpdate( tr_torrent * );
 
 int tr_torrentCanManualUpdate( const tr_torrent * );
 
-/** Return a pointer to an tr_stat structure with updated information
-    on the torrent.  This is typically called by the GUI clients every
-    second or so to get a new snapshot of the torrent's status. */
-const tr_stat * tr_torrentStat( tr_torrent * );
-
-/** Like tr_torrentStat(), but only recalculates the statistics if it's
-    been longer than a second since they were last calculated.  This can
-    reduce the CPU load if you're calling tr_torrentStat() frequently. */
-const tr_stat * tr_torrentStatCached( tr_torrent * );
-
 /***********************************************************************
  * tr_torrentPeers
  ***********************************************************************/
-typedef struct tr_peer_stat tr_peer_stat;
-tr_peer_stat * tr_torrentPeers( const tr_torrent *, int * peerCount );
-void tr_torrentPeersFree( tr_peer_stat *, int peerCount );
+
+typedef struct tr_peer_stat
+{
+    unsigned int isEncrypted : 1;
+    unsigned int isDownloadingFrom : 1;
+    unsigned int isUploadingTo : 1;
+
+    unsigned int peerIsChoked : 1;
+    unsigned int peerIsInterested : 1;
+    unsigned int clientIsChoked : 1;
+    unsigned int clientIsInterested : 1;
+    unsigned int isIncoming : 1;
+
+    uint8_t  from;
+    uint16_t port;
+
+    char addr[16];
+    char client[80];
+    char flagStr[32];
+    
+    float progress;
+    float downloadFromRate;
+    float uploadToRate;
+}
+tr_peer_stat;
+
+tr_peer_stat * tr_torrentPeers( const tr_torrent * torrent,
+                                int              * peerCount );
+
+void tr_torrentPeersFree( tr_peer_stat *  peerStats,
+                          int             peerCount );
 
 typedef struct tr_file_stat
 {
@@ -883,18 +913,6 @@ void tr_torrentAvailability( const tr_torrent *, int8_t * tab, int size );
 void tr_torrentAmountFinished( const tr_torrent * tor, float * tab, int size );
 
 void tr_torrentVerify( tr_torrent * );
-
-/**
- * Frees memory allocated by tr_torrentNew().
- * Running torrents are stopped first.
- */
-void tr_torrentFree( tr_torrent * );
-
-/**
- * Removes our .torrent and .resume files for this
- * torrent, then calls tr_torrentFree()
- */
-void tr_torrentRemove( tr_torrent * );
 
 /***********************************************************************
  * tr_info
@@ -1020,7 +1038,7 @@ enum
  * The current status of a torrent.
  * @see tr_torrentStat()
  */
-struct tr_stat
+typedef struct tr_stat
 {
     /** The torrent's unique Id. 
         @see tr_torrentId() */
@@ -1181,32 +1199,18 @@ struct tr_stat
 
     /** The last time we uploaded or downloaded piece data on this torrent. */
     time_t activityDate;
-};
+}
+tr_stat;
 
-struct tr_peer_stat
-{
-    char addr[16];
-    char client[80];
-    
-    unsigned int isEncrypted : 1;
-    unsigned int isDownloadingFrom : 1;
-    unsigned int isUploadingTo : 1;
+/** Return a pointer to an tr_stat structure with updated information
+    on the torrent.  This is typically called by the GUI clients every
+    second or so to get a new snapshot of the torrent's status. */
+const tr_stat * tr_torrentStat( tr_torrent * );
 
-    unsigned int peerIsChoked : 1;
-    unsigned int peerIsInterested : 1;
-    unsigned int clientIsChoked : 1;
-    unsigned int clientIsInterested : 1;
-    unsigned int isIncoming : 1;
-
-    char flagStr[32];
-
-    uint8_t  from;
-    uint16_t port;
-    
-    float progress;
-    float downloadFromRate;
-    float uploadToRate;
-};
+/** Like tr_torrentStat(), but only recalculates the statistics if it's
+    been longer than a second since they were last calculated.  This can
+    reduce the CPU load if you're calling tr_torrentStat() frequently. */
+const tr_stat * tr_torrentStatCached( tr_torrent * );
 
 /** @} */
 

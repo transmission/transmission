@@ -469,7 +469,7 @@ MyFrame :: OnPulse(wxTimerEvent& WXUNUSED(event) )
     mySpeedStats->Pulse( handle );
 
     float down, up;
-    tr_torrentRates( handle, &down, &up );
+    tr_sessionGetSpeed( handle, &down, &up );
     wxString xstr = _("Total DL: ");
     xstr += getReadableSpeed( down );
     SetStatusText( xstr, 1 );

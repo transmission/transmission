@@ -90,7 +90,7 @@
         BOOL badgeDownload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"],
             badgeUpload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"];
         if (badgeDownload || badgeUpload)
-            tr_torrentRates(fLib, badgeDownload ? &downloadRate : NULL, badgeUpload ? &uploadRate : NULL);
+            tr_sessionGetSpeed(fLib, badgeDownload ? &downloadRate : NULL, badgeUpload ? &uploadRate : NULL);
         
         //only update if the badged values change
         if ([(BadgeView *)[[NSApp dockTile] contentView] setRatesWithDownload: downloadRate upload: uploadRate])
@@ -154,7 +154,7 @@
         NSString * downloadRateString = nil, * uploadRateString = nil;
         
         float downloadRate, uploadRate;
-        tr_torrentRates(fLib, &downloadRate, &uploadRate);
+        tr_sessionGetSpeed(fLib, &downloadRate, &uploadRate);
         
         if (checkDownload && downloadRate >= 0.1)
             downloadRateString = [NSString stringForSpeedAbbrev: downloadRate];

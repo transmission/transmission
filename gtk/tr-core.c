@@ -632,9 +632,9 @@ tr_core_get_stats( const TrCore       * core,
 
     if( !isDisposed( core ) )
     {
-        tr_torrentRates( core->priv->handle,
-                         &setme->clientDownloadSpeed,
-                         &setme->clientUploadSpeed );
+        tr_sessionGetSpeed( core->priv->handle,
+                            &setme->clientDownloadSpeed,
+                            &setme->clientUploadSpeed );
 
         gtk_tree_model_foreach( core->priv->model,
                                 statsForeach,

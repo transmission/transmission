@@ -381,19 +381,14 @@ tr_sessionGetPeerLimit( const tr_handle * handle UNUSED )
 ***/
 
 void
-tr_torrentRates( tr_handle * h, float * toClient, float * toPeer )
+tr_sessionGetSpeed( const tr_handle  * session,
+                    float            * toClient,
+                    float            * toPeer )
 {
-    if( h )
-    {
-        tr_globalLock( h );
-
-        if( toClient )
-            *toClient = tr_rcRate( h->download );
-        if( toPeer )
-            *toPeer = tr_rcRate( h->upload );
-
-        tr_globalUnlock( h );
-    }
+    if( session && toClient )
+        *toClient = tr_rcRate( session->download );
+    if( session && toPeer )
+        *toPeer = tr_rcRate( session->upload );
 }
 
 int

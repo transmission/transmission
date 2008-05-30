@@ -214,7 +214,7 @@ SpeedStats :: Pulse( tr_handle * handle )
 {
     // add a new record
     float allUp, allDown;
-    tr_torrentRates( handle, &allDown, &allUp );
+    tr_sessionGetSpeed( handle, &allDown, &allUp );
     Speed s;
     s.time = time( NULL );
     s.allUp = allUp;
