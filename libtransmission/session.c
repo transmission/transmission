@@ -426,7 +426,7 @@ tr_closeAllConnections( void * vh )
     n = h->torrentCount;
     torrents = tr_new( tr_torrent*, h->torrentCount );
     for( i=0; i<n; ++i )
-        torrents[i] = tr_torrentNext( h, tor );
+        torrents[i] = tor = tr_torrentNext( h, tor );
     qsort( torrents, n, sizeof(tr_torrent*), compareTorrentByCur );
     for( i=0; i<n; ++i )
         tr_torrentFree( torrents[i] );
