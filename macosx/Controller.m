@@ -1625,7 +1625,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     return desired;
 }
 
-#warning migrate to Torrent.m
 - (void) torrentFinishedDownloading: (NSNotification *) notification
 {
     Torrent * torrent = [notification object];
@@ -2279,7 +2278,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                         NSLocalizedString(@"No Label", "Groups -> Button")];
             break;
         default:
-            icon = [[GroupsController groups] imageForIndex: groupIndex isSmall: YES];
+            icon = [[GroupsController groups] imageForIndex: groupIndex];
             toolTip = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Group", "Groups -> Button"),
                         [[GroupsController groups] nameForIndex: groupIndex]];
     }
@@ -2548,7 +2547,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         else if ([ident isEqualToString: @"Color"])
         {
             int group = [[item objectForKey: @"Group"] intValue];
-            return group != -1 ? [[GroupsController groups] imageForIndex: group isSmall: YES]
+            return group != -1 ? [[GroupsController groups] imageForIndex: group]
                                 : [NSImage imageNamed: @"GroupsNoneTemplate.png"];
         }
         else if ([ident isEqualToString: @"DL Image"])

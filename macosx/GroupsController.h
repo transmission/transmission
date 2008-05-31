@@ -41,7 +41,7 @@
 - (NSString *) nameForIndex: (int) index;
 - (void) setName: (NSString *) name forIndex: (int) index;
 
-- (NSImage *) imageForIndex: (int) index isSmall: (BOOL) small;
+- (NSImage *) imageForIndex: (int) index;
 
 - (NSColor *) colorForIndex: (int) index;
 - (NSColor *) setColor: (NSColor *) color forIndex: (int) index;

@@ -88,7 +88,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Color"])
-        return [groupsController imageForIndex: groupsIndex isSmall: NO];
+        return [groupsController imageForIndex: groupsIndex];
     else
         return [groupsController nameForIndex: groupsIndex];
 }

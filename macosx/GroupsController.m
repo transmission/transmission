@@ -27,13 +27,12 @@
 #import "NSBezierPathAdditions.h"
 
 #define ICON_WIDTH 16.0
-#define ICON_WIDTH_SMALL 12.0
 
 @interface GroupsController (Private)
 
 - (void) saveGroups;
 
-- (NSImage *) imageForGroup: (NSDictionary *) dict isSmall: (BOOL) small;
+- (NSImage *) imageForGroup: (NSMutableDictionary *) dict;
 
 @end
 
@@ -143,10 +142,10 @@ GroupsController * fGroupsInstance = nil;
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
 }
 
-- (NSImage *) imageForIndex: (int) index isSmall: (BOOL) small
+- (NSImage *) imageForIndex: (int) index
 {
     int orderIndex = [self rowValueForIndex: index];
-    return orderIndex != -1 ? [self imageForGroup: [fGroups objectAtIndex: orderIndex] isSmall: small] : nil;
+    return orderIndex != -1 ? [self imageForGroup: [fGroups objectAtIndex: orderIndex]] : nil;
 }
 
 - (NSColor *) colorForIndex: (int) index
@@ -256,13 +255,14 @@ GroupsController * fGroupsInstance = nil;
     [item release];
     
     NSEnumerator * enumerator = [fGroups objectEnumerator];
-    NSDictionary * dict;
+    NSMutableDictionary * dict;
     while ((dict = [enumerator nextObject]))
     {
         item = [[NSMenuItem alloc] initWithTitle: [dict objectForKey: @"Name"] action: action keyEquivalent: @""];
         [item setTarget: target];
         
-        [item setImage: [self imageForGroup: dict isSmall: small]];
+        #warning factor in size
+        [item setImage: [self imageForGroup: dict]];
         [item setTag: [[dict objectForKey: @"Index"] intValue]];
         
         [menu addItem: item];
@@ -281,10 +281,13 @@ GroupsController * fGroupsInstance = nil;
     [[NSUserDefaults standardUserDefaults] setObject: [NSArchiver archivedDataWithRootObject: fGroups] forKey: @"Groups"];
 }
 
-- (NSImage *) imageForGroup: (NSDictionary *) dict isSmall: (BOOL) small
+- (NSImage *) imageForGroup: (NSMutableDictionary *) dict
 {
-    float width = small ? ICON_WIDTH_SMALL : ICON_WIDTH;
-    NSRect rect = NSMakeRect(0.0, 0.0, width, width);
+    NSImage * image;
+    if ((image = [dict objectForKey: @"Icon"]))
+        return image;
+    
+    NSRect rect = NSMakeRect(0.0, 0.0, ICON_WIDTH, ICON_WIDTH);
     
     NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: rect radius: 3.0];
     NSImage * icon = [[NSImage alloc] initWithSize: rect.size];
@@ -306,7 +309,10 @@ GroupsController * fGroupsInstance = nil;
     
     [icon unlockFocus];
     
-    return [icon autorelease];
+    [dict setObject: icon forKey: @"Icon"];
+    [icon release];
+    
+    return icon;
 }
 
 @end
