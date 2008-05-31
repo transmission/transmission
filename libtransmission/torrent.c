@@ -687,6 +687,7 @@ tr_torrentStat( tr_torrent * tor )
     tr_stat * s;
     struct tr_tracker * tc;
     const tr_tracker_info * ti;
+    int seedsConnected = 0;
 
     if( !tor )
         return NULL;
@@ -714,6 +715,7 @@ tr_torrentStat( tr_torrent * tor )
                             tor->info.hash,
                             &s->peersKnown,
                             &s->peersConnected,
+                               &seedsConnected,
                             &s->peersSendingToUs,
                             &s->peersGettingFromUs,
                              s->peersFrom );
@@ -741,9 +743,16 @@ tr_torrentStat( tr_torrent * tor )
     s->haveUnchecked   = tr_cpHaveTotal( tor->completion ) - s->haveValid;
 
 
-    if( !s->leftUntilDone || !tor->isRunning || !s->peersConnected )
+    if( seedsConnected > 0 )
+    {
+        s->desiredAvailable = s->leftUntilDone;
+    }
+    if( !s->leftUntilDone || !s->peersConnected )
+    {
         s->desiredAvailable = 0;
-    else {
+    }
+    else
+    {
         tr_piece_index_t i;
         tr_bitfield * peerPieces = tr_peerMgrGetAvailable( tor->handle->peerMgr,
                                                            tor->info.hash );

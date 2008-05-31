@@ -1382,6 +1382,7 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                         const uint8_t    * torrentHash,
                         int              * setmePeersKnown,
                         int              * setmePeersConnected,
+                        int              * setmeSeedsConnected,
                         int              * setmePeersSendingToUs,
                         int              * setmePeersGettingFromUs,
                         int              * setmePeersFrom )
@@ -1397,6 +1398,7 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
 
     *setmePeersKnown          = tr_ptrArraySize( t->pool );
     *setmePeersConnected      = 0;
+    *setmeSeedsConnected      = 0;
     *setmePeersSendingToUs    = 0;
     *setmePeersGettingFromUs  = 0;
 
@@ -1420,6 +1422,9 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
 
         if( clientIsUploadingTo( peer ) )
             ++*setmePeersGettingFromUs;
+
+        if( atom->flags & ADDED_F_SEED_FLAG )
+            ++*setmeSeedsConnected;
     }
 
     managerUnlock( (tr_peerMgr*)manager );
