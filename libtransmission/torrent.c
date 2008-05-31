@@ -747,7 +747,7 @@ tr_torrentStat( tr_torrent * tor )
     {
         s->desiredAvailable = s->leftUntilDone;
     }
-    if( !s->leftUntilDone || !s->peersConnected )
+    else if( !s->leftUntilDone || !s->peersConnected )
     {
         s->desiredAvailable = 0;
     }
