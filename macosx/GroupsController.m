@@ -157,7 +157,10 @@ GroupsController * fGroupsInstance = nil;
 
 - (NSColor *) setColor: (NSColor *) color forIndex: (int) index
 {
-    [[fGroups objectAtIndex: [self rowValueForIndex: index]] setObject: color forKey: @"Color"];
+    NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
+    [dict removeObjectForKey: @"Icon"];
+    
+    [dict setObject: color forKey: @"Color"];
     
     [[GroupsController groups] saveGroups];
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
@@ -296,7 +299,19 @@ GroupsController * fGroupsInstance = nil;
 
 - (void) saveGroups
 {
-    [[NSUserDefaults standardUserDefaults] setObject: [NSArchiver archivedDataWithRootObject: fGroups] forKey: @"Groups"];
+    //don't archive the icon
+    NSMutableArray * groups = [NSMutableArray arrayWithCapacity: [fGroups count]];
+    NSEnumerator * enumerator = [fGroups objectEnumerator];
+    NSDictionary * dict;
+    while ((dict = [enumerator nextObject]))
+    {
+        NSMutableDictionary * newDict = [dict mutableCopy];
+        [newDict removeObjectForKey: @"Icon"];
+        [groups addObject: newDict];
+        [newDict release];
+    }
+    
+    [[NSUserDefaults standardUserDefaults] setObject: [NSArchiver archivedDataWithRootObject: groups] forKey: @"Groups"];
 }
 
 - (NSImage *) imageForGroup: (NSMutableDictionary *) dict
