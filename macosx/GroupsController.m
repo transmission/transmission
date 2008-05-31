@@ -27,6 +27,7 @@
 #import "NSBezierPathAdditions.h"
 
 #define ICON_WIDTH 16.0
+#define ICON_WIDTH_SMALL 12.0
 
 @interface GroupsController (Private)
 
@@ -251,6 +252,16 @@ GroupsController * fGroupsInstance = nil;
                             keyEquivalent: @""];
     [item setTarget: target];
     [item setTag: -1];
+    
+    NSImage * icon = [[NSImage imageNamed: @"GroupsNoneTemplate.png"] copy];
+    if (small)
+    {
+        [icon setScalesWhenResized: YES];
+        [icon setSize: NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL)];
+    }
+    [item setImage: icon];
+    [icon release];
+    
     [menu addItem: item];
     [item release];
     
@@ -261,9 +272,16 @@ GroupsController * fGroupsInstance = nil;
         item = [[NSMenuItem alloc] initWithTitle: [dict objectForKey: @"Name"] action: action keyEquivalent: @""];
         [item setTarget: target];
         
-        #warning factor in size
-        [item setImage: [self imageForGroup: dict]];
         [item setTag: [[dict objectForKey: @"Index"] intValue]];
+        
+        NSImage * icon = [[self imageForGroup: dict] copy];
+        if (small)
+        {
+            [icon setScalesWhenResized: YES];
+            [icon setSize: NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL)];
+        }
+        [item setImage: icon];
+        [icon release];
         
         [menu addItem: item];
         [item release];
