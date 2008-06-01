@@ -359,8 +359,14 @@
     [fDefaults setBool: fOpenTorrent forKey: @"CreatorOpen"];
     [fDefaults setObject: [fLocation stringByDeletingLastPathComponent] forKey: @"CreatorLocation"];
     
+    #warning perhaps don't create at all if no trackers
+    //create tracker
+    tr_tracker_info trackerInfo;
+    trackerInfo.tier = 0;
+    trackerInfo.announce = (char *)[fTracker UTF8String];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"BeginCreateTorrentFile" object: fLocation userInfo: nil];
-    tr_makeMetaInfo(fInfo, [fLocation UTF8String], [fTracker UTF8String], [[fCommentView string] UTF8String],
+    tr_makeMetaInfo(fInfo, [fLocation UTF8String], &trackerInfo, 1, [[fCommentView string] UTF8String],
                     [fPrivateCheck state] == NSOnState);
     
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 0.1 target: self selector: @selector(checkProgress)

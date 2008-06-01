@@ -256,14 +256,18 @@ GroupsController * fGroupsInstance = nil;
     [item setTarget: target];
     [item setTag: -1];
     
-    NSImage * icon = [[NSImage imageNamed: @"GroupsNoneTemplate.png"] copy];
+    NSImage * icon = [NSImage imageNamed: @"GroupsNoneTemplate.png"];
     if (small)
     {
+        icon = [icon copy];
         [icon setScalesWhenResized: YES];
         [icon setSize: NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL)];
+        
+        [item setImage: icon];
+        [icon release];
     }
-    [item setImage: icon];
-    [icon release];
+    else
+        [item setImage: icon];
     
     [menu addItem: item];
     [item release];
@@ -277,14 +281,18 @@ GroupsController * fGroupsInstance = nil;
         
         [item setTag: [[dict objectForKey: @"Index"] intValue]];
         
-        NSImage * icon = [[self imageForGroup: dict] copy];
+        NSImage * icon = [self imageForGroup: dict];
         if (small)
         {
+            icon = [icon copy];
             [icon setScalesWhenResized: YES];
             [icon setSize: NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL)];
+            
+            [item setImage: icon];
+            [icon release];
         }
-        [item setImage: icon];
-        [icon release];
+        else
+            [item setImage: icon];
         
         [menu addItem: item];
         [item release];
@@ -305,10 +313,10 @@ GroupsController * fGroupsInstance = nil;
     NSDictionary * dict;
     while ((dict = [enumerator nextObject]))
     {
-        NSMutableDictionary * newDict = [dict mutableCopy];
-        [newDict removeObjectForKey: @"Icon"];
-        [groups addObject: newDict];
-        [newDict release];
+        NSMutableDictionary * tempDict = [dict mutableCopy];
+        [tempDict removeObjectForKey: @"Icon"];
+        [groups addObject: tempDict];
+        [tempDict release];
     }
     
     [[NSUserDefaults standardUserDefaults] setObject: [NSArchiver archivedDataWithRootObject: groups] forKey: @"Groups"];
