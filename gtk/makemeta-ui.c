@@ -25,11 +25,11 @@
 
 #define UPDATE_INTERVAL_MSEC 200
 
-#define BUILDER_KEY "builder"
 #define UI_KEY "ui"
 
 typedef struct
 {
+    GtkWidget * filename_entry;
     GtkWidget * size_lb;
     GtkWidget * pieces_lb;
     GtkWidget * announce_list;
@@ -246,42 +246,66 @@ refreshFromBuilder( MakeMetaUI * ui )
 }
 
 static void
-onSelectionChanged( GtkFileChooser * chooser, gpointer gui )
+onSourceActivated( GtkEditable * editable, gpointer gui )
 {
+    const char * filename = gtk_entry_get_text( GTK_ENTRY( editable ) );
     MakeMetaUI * ui = gui;
-    char * filename = gtk_file_chooser_get_filename( chooser );
-    tr_metainfo_builder * builder = tr_metaInfoBuilderCreate( ui->handle, filename );
 
-    g_object_set_data_full( G_OBJECT( chooser ),
-                            BUILDER_KEY,
-                            builder,
-                            (GDestroyNotify)tr_metaInfoBuilderFree );
-    ui->builder = builder;
-
+    if( ui->builder )
+        tr_metaInfoBuilderFree( ui->builder );
+    ui->builder = tr_metaInfoBuilderCreate( ui->handle, filename );
     refreshFromBuilder( ui );
+}
 
-    g_free( filename );
+static gboolean
+onSourceLostFocus( GtkWidget * w, GdkEventFocus * focus UNUSED, gpointer gui )
+{
+    onSourceActivated( GTK_EDITABLE( w ), gui );
+    return FALSE;
 }
 
 static void
-onFileModeToggled( GtkToggleButton * t, gpointer w )
+onChooseClicked( GtkButton              * button,
+                 gpointer                 gui,
+                 const char             * title,
+                 GtkFileChooserAction     chooserAction )
 {
-    const gboolean active = gtk_toggle_button_get_active( t );
-    gtk_widget_set_sensitive( w, active );
-    if( active )
+    GtkWidget * top = gtk_widget_get_toplevel( GTK_WIDGET( button ) );
+    GtkWidget * d = gtk_file_chooser_dialog_new( title,
+                                                 GTK_WINDOW( top ),
+                                                 chooserAction,
+				                 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+				                 GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
+				                 NULL );
+    if( gtk_dialog_run( GTK_DIALOG( d ) ) == GTK_RESPONSE_ACCEPT )
     {
-        MakeMetaUI * ui = g_object_get_data( G_OBJECT( w ), UI_KEY );
-        ui->builder = g_object_get_data( G_OBJECT( w ), BUILDER_KEY );
-        refreshFromBuilder( ui );
+        MakeMetaUI * ui = gui;
+        char * filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( d ) );
+        gtk_entry_set_text( GTK_ENTRY( ui->filename_entry ), filename );
+        onSourceActivated( GTK_EDITABLE( ui->filename_entry ), gui );
+        g_free( filename );
     }
+
+    gtk_widget_destroy( d );
 }
-    
+
+static void
+onChooseDirectoryClicked( GtkButton * b, gpointer gui )
+{
+    onChooseClicked( b, gui, _( "Choose Directory" ), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
+}
+
+static void
+onChooseFileClicked( GtkButton * b, gpointer gui )
+{
+    onChooseClicked( b, gui, _( "Choose File" ), GTK_FILE_CHOOSER_ACTION_OPEN );
+}
+
 GtkWidget*
 make_meta_ui( GtkWindow * parent, tr_handle * handle )
 {
-    GSList * group;
     int row = 0;
-    GtkWidget *l, *d, *t, *w, *h;
+    GtkWidget *d, *t, *w, *h, *h2, *v, *focusMe;
     GtkBox * main_vbox;
     MakeMetaUI * ui = g_new0 ( MakeMetaUI, 1 );
     ui->handle = handle;
@@ -300,50 +324,52 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
 
     t = hig_workarea_create ();
 
-    hig_workarea_add_section_title (t, &row, _( "Content" ));
+    hig_workarea_add_section_title (t, &row, _( "Source" ));
 
-        l = gtk_radio_button_new_with_mnemonic( NULL, _( "_Single File:" ) );
-        w = gtk_file_chooser_button_new( NULL, GTK_FILE_CHOOSER_ACTION_OPEN );
-        g_object_set_data( G_OBJECT( w ), UI_KEY, ui );
-        hig_workarea_add_row_w( t, &row, l, w, NULL );
-        group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( l ) );
-        g_signal_connect( l, "toggled", G_CALLBACK(onFileModeToggled), w );
-        g_signal_connect( w, "selection-changed", G_CALLBACK(onSelectionChanged), ui );
-
-        l = gtk_radio_button_new_with_mnemonic( group, _( "_Folder:" ) );
-        w = gtk_file_chooser_button_new( NULL, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
-        g_object_set_data( G_OBJECT( w ), UI_KEY, ui );
-        hig_workarea_add_row_w( t, &row, l, w, NULL );
-        g_signal_connect( l, "toggled", G_CALLBACK(onFileModeToggled), w );
-        g_signal_connect( w, "selection-changed", G_CALLBACK(onSelectionChanged), ui );
-        gtk_widget_set_sensitive( w, FALSE );
-
-        h = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
+        h = gtk_hbox_new( FALSE, GUI_PAD );
+        v = gtk_vbox_new( FALSE, GUI_PAD_SMALL );
+        w = ui->filename_entry = gtk_entry_new( );
+        g_signal_connect( w, "activate", G_CALLBACK( onSourceActivated ), ui );
+        g_signal_connect( w, "focus-out-event", G_CALLBACK( onSourceLostFocus ), ui );
+        gtk_box_pack_start( GTK_BOX( v ), w, FALSE, FALSE, 0 );
+        h2 = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
         w = ui->size_lb = gtk_label_new (NULL);
         gtk_label_set_markup ( GTK_LABEL(w), _( "<i>No files selected</i>" ) );
-        gtk_box_pack_start( GTK_BOX(h), w, FALSE, FALSE, 0 );
+        gtk_box_pack_start( GTK_BOX(h2), w, FALSE, FALSE, GUI_PAD_SMALL );
         w = ui->pieces_lb = gtk_label_new (NULL);
-        gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, 0 );
-        w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
+        gtk_box_pack_end( GTK_BOX(h2), w, FALSE, FALSE, GUI_PAD_SMALL );
+        w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
         gtk_widget_set_size_request (w, 2 * GUI_PAD_BIG, 0);
-        gtk_box_pack_start_defaults ( GTK_BOX(h), w );
-        hig_workarea_add_row (t, &row, "", h, NULL);
-        
+        gtk_box_pack_start_defaults ( GTK_BOX(h2), w );
+        gtk_box_pack_start( GTK_BOX( v ), h2, FALSE, FALSE, 0 );
+        gtk_box_pack_start_defaults( GTK_BOX( h ), v );
+        v = gtk_vbox_new( FALSE, GUI_PAD_SMALL );
+        w = tr_button_new_from_stock( GTK_STOCK_DIRECTORY, _( "F_older" ) );
+        focusMe = w;
+        g_signal_connect( w, "clicked", G_CALLBACK( onChooseDirectoryClicked ), ui );
+        gtk_box_pack_start_defaults( GTK_BOX( v ), w );
+        w = tr_button_new_from_stock( GTK_STOCK_FILE, _( "_File" ) );
+        g_signal_connect( w, "clicked", G_CALLBACK( onChooseFileClicked ), ui );
+        gtk_box_pack_start_defaults( GTK_BOX( v ), w );
+        gtk_box_pack_start( GTK_BOX( h ), v, FALSE, FALSE, 0 );
+        hig_workarea_add_wide_control( t, &row, h );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _("Tracker"));
+    hig_workarea_add_section_title( t, &row, _( "Trackers" ) );
 
-        w = ui->private_check = hig_workarea_add_wide_checkbutton( t, &row, _( "_Private to this tracker" ), FALSE );
-
-        w = tracker_list_new( NULL, GTK_POS_LEFT );
+        w = tracker_list_new( NULL, GTK_POS_RIGHT );
         ui->announce_list = w;
-        hig_workarea_add_wide_control (t, &row, w );
+        hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _("Optional Information"));
+    hig_workarea_add_section_title( t, &row, _( "Options" ) );
 
         w = ui->comment_entry = gtk_entry_new( );
         hig_workarea_add_row (t, &row, _( "Commen_t:" ), w, NULL );
+
+        w = hig_workarea_add_wide_checkbutton( t, &row, _( "_Private torrent" ), FALSE );
+        ui->private_check = w;
+ 
 
     hig_workarea_finish( t, &row );
     gtk_box_pack_start_defaults( main_vbox, t );
@@ -358,8 +384,9 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
 
     gtk_box_pack_start( main_vbox, w, FALSE, FALSE, GUI_PAD_BIG );
 
-    gtk_window_set_default_size( GTK_WINDOW(d), 400u, 0u );
+    gtk_window_set_default_size( GTK_WINDOW(d), 500, 0 );
     gtk_widget_show_all( GTK_DIALOG(d)->vbox );
     setIsBuilding( ui, FALSE );
+    gtk_widget_grab_focus( focusMe );
     return d;
 }

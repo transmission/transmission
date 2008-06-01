@@ -43,6 +43,7 @@
 #include <libtransmission/utils.h> /* tr_inf */
 
 #include "conf.h"
+#include "hig.h"
 #include "tr-prefs.h"
 #include "util.h"
 
@@ -476,4 +477,26 @@ gtr_dbus_add_torrent( const char * filename )
        g_message( "err: %s", err->message );
 #endif
     return success;
+}
+
+GtkWidget *
+tr_button_new_from_stock( const char * stock,
+                          const char * mnemonic )
+{
+    GtkWidget * button = gtk_button_new( );
+    GtkWidget * label = gtk_label_new_with_mnemonic( mnemonic );
+    gtk_label_set_mnemonic_widget( GTK_LABEL( label ), GTK_WIDGET( button ) );
+
+    GtkWidget * image = gtk_image_new_from_stock( stock, GTK_ICON_SIZE_BUTTON );
+    GtkWidget * hbox = gtk_hbox_new( FALSE, GUI_PAD );
+    GtkWidget * align = gtk_alignment_new( 0.5, 0.5, 0.0, 0.0 );
+
+    gtk_box_pack_start( GTK_BOX( hbox ), image, FALSE, FALSE, 0 );
+    gtk_box_pack_end( GTK_BOX( hbox ), label, FALSE, FALSE, 0 );
+
+    gtk_container_add( GTK_CONTAINER( align ), hbox );
+    gtk_container_add( GTK_CONTAINER( button ), align );
+    gtk_widget_show_all( align );
+
+    return button;
 }

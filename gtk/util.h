@@ -88,6 +88,9 @@ char* gtr_get_help_url( void );
 
 #ifdef GTK_MAJOR_VERSION
 
+GtkWidget * tr_button_new_from_stock( const char * stock,
+                                      const char * mnemonic );
+
 /* create an error dialog, if wind is NULL or mapped then show dialog now,
    otherwise show it when wind becomes mapped */
 void
