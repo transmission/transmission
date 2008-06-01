@@ -53,6 +53,8 @@ typedef struct tr_benc
     } val;
 } tr_benc;
 
+const tr_benc BENC_INIT;
+
 /* backwards compatability */
 typedef tr_benc benc_val_t;
 
@@ -108,6 +110,7 @@ tr_benc    * tr_bencDictAddStr( tr_benc * dict, const char * key, const char * v
 tr_benc    * tr_bencDictAddList( tr_benc * dict, const char * key, int reserveCount );
 tr_benc    * tr_bencDictAddDict( tr_benc * dict, const char * key, int reserveCount );
 tr_benc    * tr_bencDictAddRaw( tr_benc * dict, const char * key, const void *, size_t len );
+int          tr_bencDictRemove( tr_benc * dict, const char * key );
 
 char*  tr_bencSave( const tr_benc * val, int * len );
 char*  tr_bencSaveAsJSON( const tr_benc * top, int * len );

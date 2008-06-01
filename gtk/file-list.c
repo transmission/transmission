@@ -634,7 +634,7 @@ file_list_new( TrTorrent * gtor )
 
     /* add priority column */
     rend = gtk_cell_renderer_text_new( );
-    col = gtk_tree_view_column_new_with_attributes( _( "Priorities" ), rend, NULL );
+    col = gtk_tree_view_column_new_with_attributes( _( "Priority" ), rend, NULL );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderPriority, NULL, NULL);
     gtk_tree_view_append_column ( GTK_TREE_VIEW( view ), col);
 
@@ -645,7 +645,7 @@ file_list_new( TrTorrent * gtor )
     gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(scroll),
                                          GTK_SHADOW_IN);
     gtk_container_add( GTK_CONTAINER( scroll ), view );
-    gtk_widget_set_size_request (scroll, 0u, 200u);
+    gtk_widget_set_size_request (scroll, -1, 200 );
 
     data = g_new0( FileData, 1 );
 

@@ -802,6 +802,34 @@ void tr_torrentSetDownloadDir( tr_torrent *, const char * );
 
 const char * tr_torrentGetDownloadDir( const tr_torrent * );
 
+/**
+***
+**/
+    
+typedef struct tr_tracker_info
+{
+    int    tier;
+    char * announce;
+    char * scrape;
+}
+tr_tracker_info;
+
+/**
+ * @brief Modify a torrent's tracker list.
+ *
+ * This updates the torrent in-memory and also the metainfo file
+ * stored in the torrent folder in tr_sessionGetConfigDir().
+ *
+ * @param torrent The torrent whose tracker list is to be modified.
+ * @param trackers An array of trackers, sorted by tier from first to last.
+ *                 NOTE: only the `tier' and `announce' fields are used.
+ *                 libtransmission derives `scrape' from `announce'.
+ * @param trackerCount size of the `trackers' array.
+ */
+void tr_torrentSetAnnounceList( tr_torrent             * torrent,
+                                const tr_tracker_info  * trackers,
+                                int                      trackerCount );                   
+
 
 /**
 ***
@@ -937,14 +965,6 @@ typedef struct tr_piece
     int8_t   dnd;                      /* nonzero if the piece shouldn't be downloaded */
 }
 tr_piece;
-    
-typedef struct tr_tracker_info
-{
-    int    tier;
-    char * announce;
-    char * scrape;
-}
-tr_tracker_info;
 
 struct tr_info
 {

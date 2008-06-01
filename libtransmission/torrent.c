@@ -307,17 +307,18 @@ tr_torrentInitFilePieces( tr_torrent * tor )
     tr_file_index_t ff;
     tr_piece_index_t pp;
     uint64_t offset = 0;
+    tr_info * inf = &tor->info;
 
-    assert( tor != NULL );
+    assert( inf != NULL );
 
-    for( ff=0; ff<tor->info.fileCount; ++ff ) {
-      tor->info.files[ff].offset = offset;
-      offset += tor->info.files[ff].length;
-      initFilePieces( &tor->info, ff );
+    for( ff=0; ff<inf->fileCount; ++ff ) {
+      inf->files[ff].offset = offset;
+      offset += inf->files[ff].length;
+      initFilePieces( inf, ff );
     }
 
-    for( pp=0; pp<tor->info.pieceCount; ++pp )
-        tor->info.pieces[pp].priority = calculatePiecePriority( tor, pp, -1 );
+    for( pp=0; pp<inf->pieceCount; ++pp )
+        inf->pieces[pp].priority = calculatePiecePriority( tor, pp, -1 );
 }
 
 int
@@ -1516,4 +1517,55 @@ tr_torrentGetMTimes( const tr_torrent * tor, int * setme_n )
 
     *setme_n = n;
     return m;
+}
+
+/***
+****
+***/
+
+void
+tr_torrentSetAnnounceList( tr_torrent             * tor,
+                           const tr_tracker_info  * trackers,
+                           int                      trackerCount )
+{
+    tr_benc metainfo = BENC_INIT;
+
+    /* save to the .torrent file */
+    if( !tr_bencLoadFile( tor->info.torrent, &metainfo ) )
+    {
+        int i;
+        int prevTier = -1;
+        tr_benc * tier = NULL;
+        tr_benc * announceList;
+        tr_info tmpInfo;
+
+        /* remove the old fields */
+        tr_bencDictRemove( &metainfo, "announce" );
+        tr_bencDictRemove( &metainfo, "announce-list" );
+
+        /* add the new fields */
+        tr_bencDictAddStr( &metainfo, "announce", trackers[0].announce );
+        announceList = tr_bencDictAddList( &metainfo, "announce-list", 0 );
+        for( i=0; i<trackerCount; ++i ) {
+            if( prevTier != trackers[i].tier ) {
+                prevTier = trackers[i].tier;
+                tier = tr_bencListAddList( announceList, 0 );
+            }
+            tr_bencListAddStr( tier, trackers[i].announce );
+        }
+
+        /* try to parse it back again, to make sure it's good */
+        memset( &tmpInfo, 0, sizeof( tr_info ) );
+        if( !tr_metainfoParse( tor->handle, &tmpInfo, &metainfo ) )
+        {
+            /* if it's good, save it and use it */
+            tr_metainfoFree( &tor->info );
+            tor->info = tmpInfo;
+            tr_torrentInitFilePieces( tor );
+            tr_bencSaveFile( tor->info.torrent, &metainfo );
+        }
+
+        /* cleanup */ 
+        tr_bencFree( &metainfo );
+    }
 }

@@ -37,6 +37,8 @@
 #include "ptrarray.h"
 #include "utils.h" /* tr_new(), tr_free() */
 
+const tr_benc BENC_NULL = { 0, { 0 } };
+
 /**
 ***
 **/
@@ -328,13 +330,13 @@ tr_bencLoad( const void  * buf_in,
 ****
 ***/
 
-tr_benc *
-tr_bencDictFind( tr_benc * val, const char * key )
+static int
+dictIndexOf( tr_benc * val, const char * key )
 {
     int len, ii;
 
     if( !tr_bencIsDict( val ) )
-        return NULL;
+        return -1;
 
     len = strlen( key );
     
@@ -346,10 +348,17 @@ tr_bencDictFind( tr_benc * val, const char * key )
         {
             continue;
         }
-        return &val->val.l.vals[ii+1];
+        return ii;
     }
 
-    return NULL;
+    return -1;
+}
+
+tr_benc *
+tr_bencDictFind( tr_benc * val, const char * key )
+{
+    const int i = dictIndexOf( val, key );
+    return i<0 ? NULL : &val->val.l.vals[i+1];
 }
 
 tr_benc*
@@ -646,6 +655,30 @@ tr_bencDictAddRaw( tr_benc * dict, const char * key, const void * src, size_t le
     return child;
 }
 
+int
+tr_bencDictRemove( tr_benc * dict, const char * key )
+{
+    int i = dictIndexOf( dict, key );
+    if( i >= 0 )
+    {
+        const int n = dict->val.l.count;
+fprintf( stderr, "i is %d... count is %d\n", i, dict->val.l.count );
+fprintf( stderr, "moving %d items from pos %d to %d\n", dict->val.l.count-(i+2), i+2, i );
+#if 0
+        tr_bencFree( &dict->val.l.vals[i] );
+        tr_bencFree( &dict->val.l.vals[i+1] );
+#endif
+        if( i + 2 < n )
+        {
+            dict->val.l.vals[i]   = dict->val.l.vals[n-2];
+            dict->val.l.vals[i+1] = dict->val.l.vals[n-1];
+        }
+        dict->val.l.count -= 2;
+    }
+    return i >= 0; /* return true if found */
+}
+
+
 /***
 ****  BENC WALKING
 ***/
@@ -909,7 +942,7 @@ freeContainerBeginFunc( const tr_benc * val, void * freeme )
 void
 tr_bencFree( tr_benc * val )
 {
-    if( val != NULL )
+    if( val && val->type )
     {
         tr_ptrArray * freeme = tr_ptrArrayNew( );
         struct WalkFuncs walkFuncs;
