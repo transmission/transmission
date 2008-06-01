@@ -13,6 +13,7 @@ gtk/notify.c
 gtk/sexy-icon-entry.c
 gtk/stats.c
 gtk/torrent-cell-renderer.c
+gtk/tracker-list.c
 gtk/transmission.desktop.in
 gtk/tr-core.c
 gtk/tr-icon.c
