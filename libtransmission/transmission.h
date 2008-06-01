@@ -817,14 +817,14 @@ tr_tracker_info;
 /**
  * @brief Modify a torrent's tracker list.
  *
- * This updates the torrent in-memory and also the metainfo file
- * stored in the torrent folder in tr_sessionGetConfigDir().
+ * This updates both the `torrent' object's tracker list
+ * and the metainfo file in tr_sessionGetConfigDir()'s torrent subdirectory.
  *
- * @param torrent The torrent whose tracker list is to be modified.
+ * @param torrent The torrent whose tracker list is to be modified
  * @param trackers An array of trackers, sorted by tier from first to last.
  *                 NOTE: only the `tier' and `announce' fields are used.
  *                 libtransmission derives `scrape' from `announce'.
- * @param trackerCount size of the `trackers' array.
+ * @param trackerCount size of the `trackers' array
  */
 void tr_torrentSetAnnounceList( tr_torrent             * torrent,
                                 const tr_tracker_info  * trackers,

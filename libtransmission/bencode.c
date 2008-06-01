@@ -662,12 +662,8 @@ tr_bencDictRemove( tr_benc * dict, const char * key )
     if( i >= 0 )
     {
         const int n = dict->val.l.count;
-fprintf( stderr, "i is %d... count is %d\n", i, dict->val.l.count );
-fprintf( stderr, "moving %d items from pos %d to %d\n", dict->val.l.count-(i+2), i+2, i );
-#if 0
         tr_bencFree( &dict->val.l.vals[i] );
         tr_bencFree( &dict->val.l.vals[i+1] );
-#endif
         if( i + 2 < n )
         {
             dict->val.l.vals[i]   = dict->val.l.vals[n-2];
