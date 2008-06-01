@@ -60,9 +60,9 @@ tr_torrent_init(GTypeInstance *instance, gpointer g_class UNUSED )
 }
 
 static int
-isDisposed( const TrTorrent * self )
+isDisposed( const TrTorrent * tor )
 {
-    return !self || !self->priv;
+    return !tor || !TR_IS_TORRENT( tor ) || !tor->priv;
 }
 
 static void
@@ -123,8 +123,6 @@ tr_torrent_get_type( void )
 tr_torrent *
 tr_torrent_handle(TrTorrent *tor)
 {
-    g_assert( TR_IS_TORRENT(tor) );
-
     return isDisposed( tor ) ? NULL : tor->priv->handle;
 }
 

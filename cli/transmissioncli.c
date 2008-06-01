@@ -176,7 +176,10 @@ main( int argc, char ** argv )
     {
         int err;
         tr_metainfo_builder * builder = tr_metaInfoBuilderCreate( h, sourceFile );
-        tr_makeMetaInfo( builder, torrentPath, announce, comment, isPrivate );
+        tr_tracker_info ti;
+        ti.tier = 0;
+        ti.announce = announce;
+        tr_makeMetaInfo( builder, torrentPath, &ti, 1, comment, isPrivate );
         while( !builder->isDone ) {
             tr_wait( 1000 );
             printf( "." );

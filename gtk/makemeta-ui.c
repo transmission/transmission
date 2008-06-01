@@ -20,6 +20,7 @@
 
 #include "hig.h"
 #include "makemeta-ui.h"
+#include "tracker-list.h"
 #include "util.h"
 
 #define UPDATE_INTERVAL_MSEC 200
@@ -31,7 +32,7 @@ typedef struct
 {
     GtkWidget * size_lb;
     GtkWidget * pieces_lb;
-    GtkWidget * announce_entry;
+    GtkWidget * announce_list;
     GtkWidget * comment_entry;
     GtkWidget * progressbar;
     GtkWidget * private_check;
@@ -145,6 +146,9 @@ response_cb( GtkDialog* d, int response, gpointer user_data )
     char *tmp;
     char buf[1024];
     guint tag;
+    tr_tracker_info * trackers = NULL;
+    int i;
+    int trackerCount = 0;
 
     if( response != GTK_RESPONSE_ACCEPT )
     {
@@ -177,14 +181,21 @@ response_cb( GtkDialog* d, int response, gpointer user_data )
     gtk_progress_bar_set_text( GTK_PROGRESS_BAR(ui->progressbar), buf );
     g_free( tmp );
 
+    trackers = tracker_list_get_trackers( ui->announce_list, &trackerCount );
+
     tr_makeMetaInfo( ui->builder,
                      NULL, 
-                     gtk_entry_get_text( GTK_ENTRY( ui->announce_entry ) ),
+                     trackers, trackerCount,
                      gtk_entry_get_text( GTK_ENTRY( ui->comment_entry ) ),
                      gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ui->private_check ) ) );
 
     tag = g_timeout_add (UPDATE_INTERVAL_MSEC, refresh_cb, ui);
     g_object_set_data_full (G_OBJECT(d), "tag", GUINT_TO_POINTER(tag), remove_tag);
+
+    /* cleanup */
+    for( i=0; i<trackerCount; ++i )
+        g_free( trackers[i].announce );
+    g_free( trackers );
 }
 
 /***
@@ -320,13 +331,16 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
         
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _("Details"));
+    hig_workarea_add_section_title (t, &row, _("Tracker"));
 
         w = ui->private_check = hig_workarea_add_wide_checkbutton( t, &row, _( "_Private to this tracker" ), FALSE );
 
-        w = ui->announce_entry = gtk_entry_new( );
-        gtk_entry_set_text(GTK_ENTRY(w), "http://");
-        hig_workarea_add_row (t, &row, _( "Announce _URL:" ), w, NULL );
+        w = tracker_list_new( NULL, GTK_POS_LEFT );
+        ui->announce_list = w;
+        hig_workarea_add_wide_control (t, &row, w );
+
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title (t, &row, _("Optional Information"));
 
         w = ui->comment_entry = gtk_entry_new( );
         hig_workarea_add_row (t, &row, _( "Commen_t:" ), w, NULL );

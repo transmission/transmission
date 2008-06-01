@@ -168,13 +168,16 @@ tr_metaInfoBuilderFree( tr_metainfo_builder * builder )
 {
     if( builder )
     {
-        uint32_t i;
-        for( i=0; i<builder->fileCount; ++i )
-            tr_free( builder->files[i].filename );
+        tr_file_index_t t;
+        int i;
+        for( t=0; t<builder->fileCount; ++t )
+            tr_free( builder->files[t].filename );
         tr_free( builder->files );
         tr_free( builder->top );
         tr_free( builder->comment );
-        tr_free( builder->announce );
+        for( i=0; i<builder->trackerCount; ++i )
+            tr_free( builder->trackers[i].announce );
+        tr_free( builder->trackers );
         tr_free( builder->outputFile );
         tr_free( builder );
     }
@@ -341,18 +344,33 @@ makeInfoDict ( tr_benc              * dict,
 static void
 tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
 {
-    int n = 5;
+    int i;
     tr_benc top;
-    const char * ann = builder->announce;
 
-    if ( builder->comment && *builder->comment ) ++n;
-    tr_bencInitDict( &top, n );
+    /* allow an empty set, but if URLs *are* listed, verify them. #814, #971 */
+    for( i=0; i<builder->trackerCount && !builder->result; ++i )
+        if( !tr_httpIsValidURL( builder->trackers[i].announce ) )
+            builder->result = TR_MAKEMETA_URL;
 
-    tr_bencDictAddStr( &top, "announce", ann );
+    tr_bencInitDict( &top, 6 );
 
-    /* if a URL was entered but it's invalid, don't allow it. #814, #971 */
-    if( ann && *ann && !tr_httpIsValidURL( ann ) )
-        builder->result = TR_MAKEMETA_URL;
+    if( !builder->result && builder->trackerCount )
+    {
+        int prevTier = -1;
+        tr_benc * tier = NULL;
+        tr_benc * announceList;
+
+        announceList = tr_bencDictAddList( &top, "announce-list", 0 );
+        for( i=0; i<builder->trackerCount; ++i ) {
+            if( prevTier != builder->trackers[i].tier ) {
+                prevTier = builder->trackers[i].tier;
+                tier = tr_bencListAddList( announceList, 0 );
+            }
+            tr_bencListAddStr( tier, builder->trackers[i].announce );
+        }
+
+        tr_bencDictAddStr( &top, "announce", builder->trackers[0].announce );
+    }
     
     if( !builder->result && !builder->abortFlag )
     {
@@ -374,7 +392,7 @@ tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
     }
 
     /* cleanup */
-    tr_bencFree( & top );
+    tr_bencFree( &top );
     if( builder->abortFlag )
         builder->result = TR_MAKEMETA_CANCELLED;
     builder->isDone = 1;
@@ -430,23 +448,32 @@ static void workerFunc( void * user_data )
 }
 
 void
-tr_makeMetaInfo( tr_metainfo_builder  * builder,
-                 const char           * outputFile,
-                 const char           * announce,
-                 const char           * comment,
-                 int                    isPrivate )
+tr_makeMetaInfo( tr_metainfo_builder    * builder,
+                 const char             * outputFile,
+                 const tr_tracker_info  * trackers,
+                 int                      trackerCount,
+                 const char             * comment,
+                 int                      isPrivate )
 {
+    int i;
     tr_lock * lock;
 
     /* free any variables from a previous run */
-    tr_free( builder->announce );
+    for( i=0; i<builder->trackerCount; ++i )
+        tr_free( builder->trackers[i].announce );
+    tr_free( builder->trackers );
     tr_free( builder->comment );
     tr_free( builder->outputFile );
 
     /* initialize the builder variables */
     builder->abortFlag = 0;
     builder->isDone = 0;
-    builder->announce = tr_strdup( announce );
+    builder->trackerCount = trackerCount;
+    builder->trackers = tr_new0( tr_tracker_info, builder->trackerCount );
+    for( i=0; i<builder->trackerCount; ++i ) {
+        builder->trackers[i].tier = trackers[i].tier;
+        builder->trackers[i].announce = tr_strdup( trackers[i].announce );
+    }
     builder->comment = tr_strdup( comment );
     builder->isPrivate = isPrivate;
     if( outputFile && *outputFile )
