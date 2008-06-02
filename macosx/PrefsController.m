@@ -507,6 +507,7 @@
     [fDefaults setBool: YES forKey: @"WarningFolderDataSameName"];
     [fDefaults setBool: YES forKey: @"WarningResetStats"];
     [fDefaults setBool: YES forKey: @"WarningCreatorBlankAddress"];
+    [fDefaults setBool: YES forKey: @"WarningRemoveBuiltInTracker"];
 }
 
 - (void) setCheckForUpdate: (id) sender

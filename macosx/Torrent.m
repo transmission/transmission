@@ -829,19 +829,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     }
     else
     {
-        //remove empty groups
-        int i;
-        for (i = 0; i < [trackers count]; i++)
-            if ([[trackers objectAtIndex: i] isKindOfClass: [NSNumber class]]
-                && (i+1 == [trackers count] || [[trackers objectAtIndex: i+1] isKindOfClass: [NSNumber class]]))
-            {
-                [trackers removeObjectAtIndex: i];
-                i--;
-            }
-        
-        if ([trackers count] == 0)
-            return NO;
-        
         //check if any user-added groups
         if ([[trackers objectAtIndex: 0] intValue] != 0)
             fAddedTrackers = NO;

@@ -1448,11 +1448,12 @@ typedef enum
     [fTrackerTable editColumn: 0 row: i withEvent: nil select: YES];
 }
 
-#warning warning when removing built-in
 - (void) removeTrackers
 {
-    NSMutableIndexSet * indexes = [[fTrackerTable selectedRowIndexes] mutableCopy];
+    NSMutableIndexSet * indexes = [[[fTrackerTable selectedRowIndexes] mutableCopy] autorelease];
     
+    #warning merge?
+    //if a group is selected, remove all trackers in the group
     NSUInteger i;
     for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
@@ -1464,10 +1465,72 @@ typedef enum
         }
     }
     
-    [fTrackers removeObjectsAtIndexes: indexes];
-    [indexes release];
+    //remove empty groups
+    for (i = 0; i < [fTrackers count]; i++)
+        if (![indexes containsIndex: i] && [[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+        {
+            BOOL allSelected = YES;
+            NSUInteger j;
+            for (j = i+1; j < [fTrackers count] && ![[fTrackers objectAtIndex: j] isKindOfClass: [NSNumber class]]; j++)
+                if (![indexes containsIndex: j])
+                {
+                    allSelected = NO;
+                    break;
+                }
+            
+            if (allSelected)
+                [indexes addIndex: i];
+            i = j;
+        }
+    
+    if ([fTrackers count] == [indexes count])
+    {
+        NSBeep();
+        return;
+    }
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];
+    
+    //determine if removing trackers not built-in to the torrent
+    if ([[NSUserDefaults standardUserDefaults] boolForKey: @"WarningRemoveBuiltInTracker"])
+    {
+        BOOL allBuiltIn = ![torrent hasAddedTrackers];
+        if (!allBuiltIn)
+        {
+            for (i=1; i < [fTrackers count]; i++)
+                if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+                    break;
+        }
+        
+        if (allBuiltIn || [indexes indexGreaterThanOrEqualToIndex: i] != NSNotFound)
+        {
+            #warning pluralize?
+            NSAlert * alert = [[NSAlert alloc] init];
+            [alert setMessageText: NSLocalizedString(@"Are you sure you want to remove built-in trackers?",
+                                    "Remove built-in tracker alert -> title")];
+            [alert setInformativeText: NSLocalizedString(@"These tracker addresses are part of the torrent file."
+                " Once removed, Transmission will no longer attempt to contact them.", "Remove built-in tracker alert -> message")];
+            [alert addButtonWithTitle: NSLocalizedString(@"Remove", "Remove built-in tracker alert -> button")];
+            [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Remove built-in tracker alert -> button")];
+            
+            BOOL onLeopard = [NSApp isOnLeopardOrBetter];
+            if (onLeopard)
+                [alert setShowsSuppressionButton: YES];
+            else
+                [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Remove built-in tracker alert -> button")];
+
+            NSInteger result = [alert runModal];
+            if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertThirdButtonReturn))
+                [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningRemoveBuiltInTracker"];
+            [alert release];
+            
+            if (result != NSAlertFirstButtonReturn)
+                return;
+        }
+    }
+    
+    [fTrackers removeObjectsAtIndexes: indexes];
+    
     if (![torrent updateAllTrackers: fTrackers forAdd: NO])
         NSBeep();
     else
