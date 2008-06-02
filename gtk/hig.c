@@ -34,6 +34,15 @@ hig_workarea_add_section_divider( GtkWidget   * t,
 }
 
 void
+hig_workarea_add_section_title_widget( GtkWidget * t,
+                                       int       * row,
+                                       GtkWidget * w )
+{
+    gtk_table_attach( GTK_TABLE( t ), w, 0, 2, *row, *row+1, ~0, 0, 0, 0 );
+    ++*row;
+}
+
+void
 hig_workarea_add_section_title( GtkWidget   * t,
                                 int         * row,
                                 const char  * section_title )
@@ -45,8 +54,7 @@ hig_workarea_add_section_title( GtkWidget   * t,
     l = gtk_label_new( buf );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
     gtk_label_set_use_markup( GTK_LABEL( l ), TRUE );
-    gtk_table_attach( GTK_TABLE( t ), l, 0, 2, *row, *row+1, ~0, 0, 0, 0 );
-    ++*row;
+    hig_workarea_add_section_title_widget( t, row, l );
 }
 
 static GtkWidget*

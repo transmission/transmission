@@ -35,6 +35,7 @@
 #define KEY_PROGRESS     "progress"
 #define KEY_SPEEDLIMIT   "speed-limit"
 #define KEY_UPLOADED     "uploaded"
+#define KEY_ADDED_DATE   "added-date"
 
 #define KEY_SPEEDLIMIT_DOWN_SPEED "down-speed"
 #define KEY_SPEEDLIMIT_DOWN_MODE  "down-mode"
@@ -359,6 +360,8 @@ tr_torrentSaveResume( const tr_torrent * tor )
                              tor->maxConnectedPeers );
     tr_bencDictAddInt( &top, KEY_PAUSED,
                              tor->isRunning ? 0 : 1 );
+    tr_bencDictAddInt( &top, KEY_ADDED_DATE,
+                             tor->addedDate );
     savePeers( &top, tor );
     savePriorities( &top, tor );
     saveDND( &top, tor );
@@ -435,6 +438,12 @@ loadFromFile( tr_torrent    * tor,
             && tr_bencDictFindInt( &top, KEY_PAUSED, &i ) ) {
         tor->isRunning = i ? 0 : 1;
         fieldsLoaded |= TR_FR_RUN;
+    }
+
+    if( ( fieldsToLoad & TR_FR_ADDED_DATE )
+        && tr_bencDictFindInt( &top, KEY_ADDED_DATE, &i ) ) {
+        tor->addedDate = i;
+        fieldsLoaded |= TR_FR_ADDED_DATE;
     }
 
     if( fieldsToLoad & TR_FR_PEERS )

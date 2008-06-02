@@ -1213,6 +1213,9 @@ typedef struct tr_stat
 #define TR_RATIO_INF -2
     /** TR_RATIO_INF, TR_RATIO_NA, or a regular ratio */
     float ratio;
+
+    /** When the torrent was first added. */
+    time_t addedDate;
    
     /** When the torrent was last started. */ 
     time_t startDate;

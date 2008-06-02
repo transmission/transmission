@@ -211,6 +211,14 @@ compareRatio( double a, double b )
 }
 
 static int
+compareTime( time_t a, time_t b )
+{
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
+static int
 compareByRatio( GtkTreeModel * model,
                 GtkTreeIter  * a,
                 GtkTreeIter  * b,
@@ -268,6 +276,19 @@ compareByName( GtkTreeModel   * model,
     g_free( cb );
     g_free( ca );
     return ret;
+}
+
+static int
+compareByAge( GtkTreeModel   * model,
+              GtkTreeIter    * a,
+              GtkTreeIter    * b,
+              gpointer         user_data UNUSED )
+{
+    tr_torrent *ta, *tb;
+    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
+    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
+    return compareTime( tr_torrentStatCached(ta)->addedDate,
+                        tr_torrentStatCached(tb)->addedDate );
 }
 
 static int
@@ -332,6 +353,8 @@ setSort( TrCore * core, const char * mode, gboolean isReversed  )
 
     if( !strcmp( mode, "sort-by-activity" ) )
         sort_func = compareByActivity;
+    else if( !strcmp( mode, "sort-by-age" ) )
+        sort_func = compareByAge;
     else if( !strcmp( mode, "sort-by-progress" ) )
         sort_func = compareByProgress;
     else if( !strcmp( mode, "sort-by-ratio" ) )

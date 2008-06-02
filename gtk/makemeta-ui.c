@@ -211,14 +211,14 @@ refreshFromBuilder( MakeMetaUI * ui )
     const char * filename = builder ? builder->top : NULL;
 
     if( !filename )
-        g_snprintf( buf, sizeof( buf ), _( "No files selected" ) );
+        g_snprintf( buf, sizeof( buf ), _( "No source selected" ) );
     else
         g_snprintf( buf, sizeof(buf), "%s.torrent (%d%%)", filename, 0 );
     gtk_progress_bar_set_text( GTK_PROGRESS_BAR( ui->progressbar ), buf );
     refreshButtons( ui );
 
     if( !filename )
-        g_snprintf( buf, sizeof( buf ), _( "<i>No files selected</i>" ) );
+        g_snprintf( buf, sizeof( buf ), _( "<i>No source selected</i>" ) );
     else {
         tr_strlsize( sizeStr, builder->totalSize, sizeof(sizeStr) );
         g_snprintf( buf, sizeof( buf ),
@@ -305,7 +305,7 @@ GtkWidget*
 make_meta_ui( GtkWindow * parent, tr_handle * handle )
 {
     int row = 0;
-    GtkWidget *d, *t, *w, *h, *h2, *v, *focusMe;
+    GtkWidget *d, *t, *w, *h, *h2, *v, *focusMe, *extras;
     GtkBox * main_vbox;
     MakeMetaUI * ui = g_new0 ( MakeMetaUI, 1 );
     ui->handle = handle;
@@ -313,9 +313,9 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
     d = gtk_dialog_new_with_buttons( _("New Torrent"),
                                      parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
-                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      GTK_STOCK_NEW, GTK_RESPONSE_ACCEPT,
+                                     GTK_STOCK_STOP, GTK_RESPONSE_CANCEL,
                                      NULL );
     g_signal_connect( d, "response", G_CALLBACK(response_cb), ui );
     g_object_set_data_full( G_OBJECT(d), "ui", ui, freeMetaUI );
@@ -334,7 +334,7 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
         gtk_box_pack_start( GTK_BOX( v ), w, FALSE, FALSE, 0 );
         h2 = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
         w = ui->size_lb = gtk_label_new (NULL);
-        gtk_label_set_markup ( GTK_LABEL(w), _( "<i>No files selected</i>" ) );
+        gtk_label_set_markup ( GTK_LABEL(w), _( "<i>No source selected</i>" ) );
         gtk_box_pack_start( GTK_BOX(h2), w, FALSE, FALSE, GUI_PAD_SMALL );
         w = ui->pieces_lb = gtk_label_new (NULL);
         gtk_box_pack_end( GTK_BOX(h2), w, FALSE, FALSE, GUI_PAD_SMALL );
@@ -362,14 +362,20 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
         hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Options" ) );
+    w = extras = gtk_expander_new_with_mnemonic( _( "<b>E_xtras</b>" ) );
+    gtk_expander_set_use_markup( GTK_EXPANDER( w ), TRUE );
+    hig_workarea_add_section_title_widget( t, &row, w );
 
+        {
+        int row2 = 0;
+        GtkWidget * t2 = hig_workarea_create( );
         w = ui->comment_entry = gtk_entry_new( );
-        hig_workarea_add_row (t, &row, _( "Commen_t:" ), w, NULL );
-
-        w = hig_workarea_add_wide_checkbutton( t, &row, _( "_Private torrent" ), FALSE );
+        hig_workarea_add_row( t2, &row2, _( "Commen_t:" ), w, NULL );
+        w = hig_workarea_add_wide_checkbutton( t2, &row2, _( "_Private torrent" ), FALSE );
         ui->private_check = w;
- 
+        hig_workarea_finish( t2, &row2 );
+        gtk_container_add( GTK_CONTAINER( extras ), t2 );
+        }
 
     hig_workarea_finish( t, &row );
     gtk_box_pack_start_defaults( main_vbox, t );
@@ -379,10 +385,10 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
     gtk_container_set_border_width( GTK_CONTAINER( w ), GUI_PAD_BIG );
     
         ui->progressbar = gtk_progress_bar_new( );
-        gtk_progress_bar_set_text( GTK_PROGRESS_BAR( ui->progressbar), _( "No files selected" ) );
+        gtk_progress_bar_set_text( GTK_PROGRESS_BAR( ui->progressbar), _( "No source selected" ) );
         gtk_container_add( GTK_CONTAINER( w ), ui->progressbar );
 
-    gtk_box_pack_start( main_vbox, w, FALSE, FALSE, GUI_PAD_BIG );
+    gtk_box_pack_start( main_vbox, w, FALSE, FALSE, 0 );
 
     gtk_window_set_default_size( GTK_WINDOW(d), 500, 0 );
     gtk_widget_show_all( GTK_DIALOG(d)->vbox );

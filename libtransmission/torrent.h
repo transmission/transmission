@@ -159,6 +159,7 @@ struct tr_torrent
     uint64_t                   corruptCur;
     uint64_t                   corruptPrev;
 
+    time_t                     addedDate;
     time_t                     startDate;
     time_t                     activityDate;
 

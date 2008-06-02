@@ -25,7 +25,8 @@ enum
   TR_FR_SPEEDLIMIT    = (1<<7),
   TR_FR_RUN           = (1<<8),
   TR_FR_DOWNLOAD_DIR  = (1<<9),
-  TR_FR_MAX_PEERS     = (1<<10)
+  TR_FR_MAX_PEERS     = (1<<10),
+  TR_FR_ADDED_DATE    = (1<<11)
 };
 
 /**

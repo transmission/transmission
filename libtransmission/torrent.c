@@ -474,6 +474,9 @@ torrentRealInit( tr_handle     * h,
 
     tor->checkedPieces = tr_bitfieldNew( tor->info.pieceCount );
     tr_torrentUncheck( tor );
+
+    tor->addedDate = time( NULL ); /* this is a default value to be
+                                      overwritten by the resume file */
     loaded = tr_torrentLoadResume( tor, ~0, ctor );
     
     doStart = tor->isRunning;
@@ -736,6 +739,7 @@ tr_torrentStat( tr_torrent * tor )
     
     s->startDate = tor->startDate;
     s->activityDate = tor->activityDate;
+    s->addedDate = tor->addedDate;
 
     s->corruptEver     = tor->corruptCur    + tor->corruptPrev;
     s->downloadedEver  = tor->downloadedCur + tor->downloadedPrev;
