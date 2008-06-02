@@ -25,7 +25,7 @@
 #import "CreatorWindowController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
-#include "utils.h" //tr_httpParseURL
+#include "utils.h" //tr_httpIsValidURL
 
 @interface CreatorWindowController (Private)
 

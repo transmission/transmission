@@ -28,11 +28,8 @@
 
 #define GROUP_TABLE_VIEW_DATA_TYPE @"GroupTableViewDataType"
 
-typedef enum
-{
-    ADD_TAG = 0,
-    REMOVE_TAG = 1
-} controlTag;
+#define ADD_TAG 0
+#define REMOVE_TAG 1
 
 @interface GroupsWindowController (Private)
 

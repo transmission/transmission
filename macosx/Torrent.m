@@ -27,6 +27,7 @@
 #import "FileListNode.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
+#include "utils.h" //tr_httpIsValidURL
 
 @interface Torrent (Private)
 
@@ -38,7 +39,7 @@
         dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         waitToStart: (NSNumber *) waitToStart
-        orderValue: (NSNumber *) orderValue groupValue: (NSNumber *) groupValue;
+        orderValue: (NSNumber *) orderValue groupValue: (NSNumber *) groupValue addedTrackers: (NSNumber *) addedTrackers;
 
 - (BOOL) shouldUseIncompleteFolderForName: (NSString *) name;
 - (void) updateDownloadFolder;
@@ -78,7 +79,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             dateAdded: nil dateCompleted: nil
             dateActivity: nil
             ratioSetting: nil ratioLimit: nil
-            waitToStart: nil orderValue: nil groupValue: nil];
+            waitToStart: nil orderValue: nil groupValue: nil addedTrackers: nil];
     
     if (self)
     {
@@ -97,7 +98,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             dateAdded: nil dateCompleted: nil
             dateActivity: nil
             ratioSetting: nil ratioLimit: nil
-            waitToStart: nil orderValue: nil groupValue: nil];
+            waitToStart: nil orderValue: nil groupValue: nil addedTrackers: nil];
     
     return self;
 }
@@ -117,7 +118,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 ratioLimit: [history objectForKey: @"RatioLimit"]
                 waitToStart: [history objectForKey: @"WaitToStart"]
                 orderValue: [history objectForKey: @"OrderValue"]
-                groupValue: [history objectForKey: @"GroupValue"]];
+                groupValue: [history objectForKey: @"GroupValue"]
+                addedTrackers: [history objectForKey: @"AddedTrackers"]];
     
     if (self)
     {
@@ -145,7 +147,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
                     [NSNumber numberWithInt: fOrderValue], @"OrderValue",
-                    [NSNumber numberWithInt: fGroupValue], @"GroupValue", nil];
+                    [NSNumber numberWithInt: fGroupValue], @"GroupValue",
+                    [NSNumber numberWithBool: fAddedTrackers], @"AddedTrackers", nil];
     
     if (fIncompleteFolder)
         [history setObject: fIncompleteFolder forKey: @"IncompleteFolder"];
@@ -778,7 +781,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return [NSString stringWithUTF8String: fStat->scrapeResponse];
 }
 
-- (NSArray *) allTrackers: (BOOL) separators
+- (NSMutableArray *) allTrackers: (BOOL) separators
 {
     int count = fInfo->trackerCount, capacity = count;
     if (separators)
@@ -791,13 +794,93 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         if (separators && tier != fInfo->trackers[i].tier)
         {
             tier = fInfo->trackers[i].tier;
-            [allTrackers addObject: [NSNumber numberWithInt: tier]];
+            [allTrackers addObject: [NSNumber numberWithInt: fAddedTrackers ? tier : tier + 1]];
         }
         
         [allTrackers addObject: [NSString stringWithUTF8String: fInfo->trackers[i].announce]];
     }
     
     return allTrackers;
+}
+
+- (BOOL) updateAllTrackers: (NSMutableArray *) trackers forAdd: (BOOL) add
+{
+    #warning break up into methods
+    if (add)
+    {
+        //find added tracker at end of first tier
+        int i;
+        for (i = 1; i < [trackers count]; i++)
+            if ([[trackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+                break;
+        i--;
+        
+        NSString * tracker = [trackers objectAtIndex: i];
+        if ([tracker rangeOfString: @"://"].location == NSNotFound)
+        {
+            tracker = [@"http://" stringByAppendingString: tracker];
+            [trackers replaceObjectAtIndex: i withObject: tracker];
+        }
+        
+        if (!tr_httpIsValidURL([tracker UTF8String]))
+            return NO;
+        
+        fAddedTrackers = YES;
+    }
+    else
+    {
+        //remove empty groups
+        int i;
+        for (i = 0; i < [trackers count]; i++)
+            if ([[trackers objectAtIndex: i] isKindOfClass: [NSNumber class]]
+                && (i+1 == [trackers count] || [[trackers objectAtIndex: i+1] isKindOfClass: [NSNumber class]]))
+            {
+                [trackers removeObjectAtIndex: i];
+                i--;
+            }
+        
+        if ([trackers count] == 0)
+            return NO;
+        
+        //check if any user-added groups
+        if ([[trackers objectAtIndex: 0] intValue] != 0)
+            fAddedTrackers = NO;
+    }
+    
+    //get count
+    int count = 0;
+    NSEnumerator * enumerator = [trackers objectEnumerator];
+    id object;
+    while ((object = [enumerator nextObject]))
+        if (![object isKindOfClass: [NSNumber class]])
+            count++;
+    
+    //recreate the tracker structure
+    tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, count);
+    int tier = 0;
+    int i = 0;
+    enumerator = [trackers objectEnumerator];
+    while ((object = [enumerator nextObject]))
+    {
+        if (![object isKindOfClass: [NSNumber class]])
+        {
+            trackerStructs[i].tier = tier;
+            trackerStructs[i].announce = (char *)[object UTF8String];
+            i++;
+        }
+        else
+            tier++;
+    }
+    
+    tr_torrentSetAnnounceList(fHandle, trackerStructs, count);
+    tr_free(trackerStructs);
+    
+    return YES;
+}
+
+- (BOOL) hasAddedTrackers
+{
+    return fAddedTrackers;
 }
 
 - (NSString *) comment
@@ -1538,7 +1621,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         waitToStart: (NSNumber *) waitToStart
-        orderValue: (NSNumber *) orderValue groupValue: (NSNumber *) groupValue;
+        orderValue: (NSNumber *) orderValue groupValue: (NSNumber *) groupValue addedTrackers: (NSNumber *) addedTrackers
 {
     if (!(self = [super init]))
         return nil;
@@ -1635,6 +1718,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     fOrderValue = orderValue ? [orderValue intValue] : tr_sessionCountTorrents(lib) - 1;
     fGroupValue = groupValue ? [groupValue intValue] : -1;
+    
+    fAddedTrackers = addedTrackers ? [addedTrackers boolValue] : NO; 
     
     [self createFileList];
     

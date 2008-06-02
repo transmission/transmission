@@ -67,6 +67,8 @@ typedef enum
     
     int fOrderValue, fGroupValue;
     
+    BOOL fAddedTrackers;
+    
     NSDictionary * fQuickPauseDict;
 }
 
@@ -148,7 +150,9 @@ typedef enum
 - (int) nextScrapeTime;
 - (NSString *) scrapeResponse;
 
-- (NSArray *) allTrackers: (BOOL) separators;
+- (NSMutableArray *) allTrackers: (BOOL) separators;
+- (BOOL) updateAllTrackers: (NSMutableArray *) trackers forAdd: (BOOL) add;
+- (BOOL) hasAddedTrackers;
 
 - (NSString *) comment;
 - (NSString *) creator;

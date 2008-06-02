@@ -26,6 +26,12 @@
 
 @implementation TrackerTableView
 
+- (void) mouseDown: (NSEvent *) event
+{
+    [[self window] makeKeyWindow];
+    [super mouseDown: event];
+}
+
 - (void) setTrackers: (NSArray *) trackers
 {
     fTrackers = trackers;
@@ -68,7 +74,7 @@
                 continue;
             }
             
-            if (!start)
+            if (!start && ![self isRowSelected: i])
                 NSRectFill([self rectOfRow: i]);
             
             start = !start;

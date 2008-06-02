@@ -32,7 +32,8 @@
 
 @interface InfoWindowController : NSWindowController
 {
-    NSArray * fTorrents, * fPeers, * fTrackers;
+    NSArray * fTorrents, * fPeers;
+    NSMutableArray * fTrackers;
     
     IBOutlet NSView * fInfoView, * fActivityView, * fTrackerView, * fPeersView, * fFilesView, * fOptionsView;
     int fCurrentTabTag;
@@ -52,6 +53,7 @@
     IBOutlet NSButton * fRevealDataButton, * fRevealTorrentButton;
     
     IBOutlet TrackerTableView * fTrackerTable;
+    IBOutlet NSSegmentedControl * fTrackerAddRemoveControl;
     IBOutlet NSTextField * fAnnounceAddressField, * fAnnounceLastField, * fAnnounceResponseField, * fAnnounceNextField,
                             * fScrapeAddressField, * fScrapeLastField, * fScrapeResponseField, * fScrapeNextField;
 
@@ -79,6 +81,8 @@
 
 - (void) setNextTab;
 - (void) setPreviousTab;
+
+- (void) addRemoveTracker: (id) sender;
 
 - (BOOL) shouldQuickLookFileView;
 - (NSArray *) quickLookURLs;
