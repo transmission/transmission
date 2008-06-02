@@ -775,10 +775,12 @@ tr_sessionSetRPCCallback( tr_handle    * session,
     session->rpc_func_user_data = user_data;
 }
 
-void
-tr_sessionSetRPCACL( tr_handle * session, const char * acl )
+int
+tr_sessionSetRPCACL( tr_handle    * session,
+                     const char   * acl,
+                     char        ** allocme_errmsg )
 {
-    tr_rpcSetACL( session->rpcServer, acl );
+    return tr_rpcSetACL( session->rpcServer, acl, allocme_errmsg );
 }
 
 const char*

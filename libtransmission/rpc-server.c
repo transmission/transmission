@@ -175,19 +175,72 @@ tr_rpcGetPort( const tr_rpc_server * server )
     return server->port;
 }
 
-void
-tr_rpcSetACL( tr_rpc_server * server, const char * acl )
+/*
+ * DELIM_CHARS, FOR_EACH_WORD_IN_LIST, isbyte, and testACL are from, or modified from,
+ * shttpd, written by Sergey Lyubka under this license:
+ * "THE BEER-WARE LICENSE" (Revision 42):
+ * Sergey Lyubka wrote this file.  As long as you retain this notice you
+ * can do whatever you want with this stuff. If we meet some day, and you think
+ * this stuff is worth it, you can buy me a beer in return.
+ */
+
+#define  DELIM_CHARS " ," /* Separators for lists */
+
+#define FOR_EACH_WORD_IN_LIST(s,len)                                    \
+        for (; s != NULL && (len = strcspn(s, DELIM_CHARS)) != 0;       \
+                        s += len, s+= strspn(s, DELIM_CHARS))
+
+static int isbyte(int n) { return (n >= 0 && n <= 255); }
+
+static char*
+testACL( const char * s )
+{
+    int len;
+
+    FOR_EACH_WORD_IN_LIST(s, len)
+    {
+
+        char flag;
+        int  a, b, c, d, n, mask;
+
+        if( sscanf(s, "%c%d.%d.%d.%d%n",&flag,&a,&b,&c,&d,&n) != 5 )
+            return tr_strdup_printf( _( "[%s]: subnet must be [+|-]x.x.x.x[/x]" ), s );
+        if( flag != '+' && flag != '-')
+            return tr_strdup_printf( _( "[%s]: flag must be + or -" ), s );
+        if( !isbyte(a) || !isbyte(b) || !isbyte(c) || !isbyte(d) )
+            return tr_strdup_printf( _( "[%s]: bad ip address" ), s );
+        if( sscanf(s + n, "/%d", &mask) == 1 && ( mask<0 || mask>32 ) )
+            return tr_strdup_printf( _( "[%s]: bad subnet mask %d" ), s, n );
+    }
+
+    return NULL;
+}
+
+int
+tr_rpcSetACL( tr_rpc_server * server, const char * acl, char ** setme_errmsg )
 {
     const int isRunning = server->ctx != NULL;
+    int ret = 0;
+    char * errmsg = testACL( acl );
 
-    if( isRunning )
-        stopServer( server );
+    if( errmsg )
+    {
+        *setme_errmsg = errmsg;
+        ret = -1;
+    }
+    else
+    {
+        if( isRunning )
+            stopServer( server );
 
-    tr_free( server->acl );
-    server->acl = tr_strdup( acl );
+        tr_free( server->acl );
+        server->acl = tr_strdup( acl );
 
-    if( isRunning )
-        startServer( server );
+        if( isRunning )
+            startServer( server );
+    }
+
+    return ret;
 }
 
 const char*

@@ -300,15 +300,19 @@ int tr_sessionGetRPCPort( const tr_handle * );
  *
  * The default string is "+127.0.0.1"
  *
- * IMPORTANT: a malformed ACL is likely to cause Transmission to crash.
- * Client applications need to validate user input, or better yet
- * generate it from a higher-level interface that doesn't allow user error,
- * before calling this function.
+ * @param acl the new ACL to use.
+ * @param allocme_errmsg If the ACL can't be parsed, this is set to a
+ *                       newly-allocated error string describing the problem.
+ *                       The client should tr_free() this string when done.
+ *
+ * @return 0 on success, -1 on failure due to an unparseable ACL.
  *
  * @see tr_sessionInitFull
  * @see tr_sessionGetRPCACL
  */
-void tr_sessionSetRPCACL( tr_handle *, const char * acl );
+int tr_sessionSetRPCACL( tr_handle   * session,
+                         const char  * acl,
+                         char       ** allocme_errmsg );
 
 /** Returns the Access Control List for allowing/denying RPC requests.
     @see tr_sessionInitFull

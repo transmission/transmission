@@ -3,7 +3,7 @@
 #include "transmission.h"
 #include "utils.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #define NUM_LOOPS 1
 #define SPEED_TEST 0
 
