@@ -31,6 +31,8 @@
 void
 tr_prefs_init_global( void )
 {
+    int i;
+    char pw[12];
     const char * str;
 
     cf_check_older_configs( );
@@ -96,6 +98,13 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_RPC_PORT, TR_DEFAULT_RPC_PORT );
     pref_string_set_default ( PREF_KEY_RPC_ACL, TR_DEFAULT_RPC_ACL );
 
+    for( i=0; i<8; ++i )
+        pw[i] = 'a' + tr_rand(26);
+    pw[8] = '\0';
+    pref_string_set_default( PREF_KEY_RPC_PASSWORD, pw );
+    pref_flag_set_default  ( PREF_KEY_RPC_PASSWORD_ENABLED, FALSE );
+
+
     pref_save( NULL );
 }
 
@@ -158,6 +167,26 @@ new_spin_button( const char * key, gpointer core, int low, int high, int step )
 }
 
 static void
+entry_changed_cb( GtkEntry * w, gpointer core )
+{
+    const char * key = g_object_get_data( G_OBJECT( w ), PREF_KEY );
+    const char * value = gtk_entry_get_text( w );
+    tr_core_set_pref( TR_CORE( core ), key, value );
+}
+
+static GtkWidget*
+new_entry( const char * key, gpointer core )
+{
+    GtkWidget * w = gtk_entry_new( );
+    char * value = pref_string_get( key );
+    gtk_entry_set_text( GTK_ENTRY( w ), value );
+    g_object_set_data_full( G_OBJECT(w), PREF_KEY, g_strdup(key), g_free );
+    g_signal_connect( w, "changed", G_CALLBACK(entry_changed_cb), core );
+    g_free( value );
+    return w;
+}
+
+static void
 chosen_cb( GtkFileChooser * w, gpointer core )
 {
     const char * key = g_object_get_data( G_OBJECT(w), PREF_KEY );
@@ -184,6 +213,13 @@ target_cb( GtkWidget * tb, gpointer target )
 {
     const gboolean b = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( tb ) );
     gtk_widget_set_sensitive( GTK_WIDGET(target), b );
+}
+
+static void
+toggle_sets_sensitivity( GtkWidget * t, GtkWidget * w)
+{
+    target_cb( t, w );
+    g_signal_connect( t, "toggled", G_CALLBACK( target_cb ), w );
 }
 
 struct test_port_data
@@ -530,6 +566,55 @@ desktopPage( GObject * core )
 }
 
 static GtkWidget*
+remotePage( GObject * core )
+{
+    const char  * s;
+    int row = 0;
+    GtkWidget * t;
+    GtkWidget * w;
+    GtkWidget * w2;
+    GtkWidget * enabled_toggle;
+    const gboolean rpc_enabled = pref_flag_get( PREF_KEY_RPC_ENABLED );
+    const gboolean pw_enabled = pref_flag_get( PREF_KEY_RPC_PASSWORD_ENABLED );
+
+    t = hig_workarea_create( );
+
+    hig_workarea_add_section_title( t, &row, _( "Remote Access" ) );
+
+        /* "enabled" checkbutton */
+        s = _( "_Allow requests from transmission-remote, Clutch, etc." );
+        w = new_check_button( s, PREF_KEY_RPC_ENABLED, core );
+        hig_workarea_add_wide_control( t, &row, w );
+        enabled_toggle = w;
+
+        /* port */
+        w = new_spin_button( PREF_KEY_RPC_PORT, core, 0, 65535, 1 );
+        toggle_sets_sensitivity( enabled_toggle, w );
+        w = hig_workarea_add_row( t, &row, _( "Listen for requests on _port:" ), w, NULL );
+        toggle_sets_sensitivity( enabled_toggle, w );
+
+        /* password protection */
+        s = _( "Require _password:" );
+        w = new_check_button( s, PREF_KEY_RPC_PASSWORD_ENABLED, core );
+        toggle_sets_sensitivity( enabled_toggle, w );
+        w2 = new_entry( PREF_KEY_RPC_PASSWORD, core );
+        gtk_widget_set_sensitive( GTK_WIDGET( w2 ), rpc_enabled && pw_enabled );
+        g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
+        g_signal_connect( enabled_toggle, "toggled", G_CALLBACK( target_cb ), w );
+        hig_workarea_add_row_w( t, &row, w, w2, NULL );
+
+        /* access control list */
+        s = _( "Access control list:" );
+        w = new_entry( PREF_KEY_RPC_ACL, core );
+        toggle_sets_sensitivity( enabled_toggle, w );
+        w = hig_workarea_add_row( t, &row, s, w, NULL );
+        toggle_sets_sensitivity( enabled_toggle, w );
+
+    hig_workarea_finish( t, &row );
+    return t;
+}
+
+static GtkWidget*
 networkPage( GObject * core, gpointer alive )
 {
     int row = 0;
@@ -572,13 +657,6 @@ networkPage( GObject * core, gpointer alive )
         g_object_set_data( G_OBJECT(l), "handle", tr_core_handle( TR_CORE( core ) ) );
         testing_port_cb( NULL, l );
 
-        s = _( "Listen for _RPC requests on port:" );
-        w = new_check_button( s, PREF_KEY_RPC_ENABLED, core );
-        w2 = new_spin_button( PREF_KEY_RPC_PORT, core, 0, 65535, 1 );
-        gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_RPC_ENABLED ) );
-        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
-        hig_workarea_add_row_w( t, &row, w, w2, NULL );
-        
         s = _("Use port _forwarding from my router" );
         w = new_check_button( s, PREF_KEY_NAT, core );
         hig_workarea_add_wide_control( t, &row, w );
@@ -625,6 +703,9 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               desktopPage( core ),
                               gtk_label_new (_("Desktop")) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              remotePage( core ),
+                              gtk_label_new (_("Remote")) );
 
     g_signal_connect( d, "response", G_CALLBACK(response_cb), core );
     gtk_box_pack_start_defaults( GTK_BOX(GTK_DIALOG(d)->vbox), n );

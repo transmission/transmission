@@ -98,7 +98,7 @@ refresh_cb ( gpointer user_data )
         switch( ui->builder->result )
         {
             case TR_MAKEMETA_OK:
-                txt = g_strdup( _( "Torrent created" ) );
+                txt = g_strdup( _( "Torrent created!" ) );
                 break;
 
             case TR_MAKEMETA_URL:
