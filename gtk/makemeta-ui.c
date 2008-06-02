@@ -312,7 +312,7 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
 
     d = gtk_dialog_new_with_buttons( _("New Torrent"),
                                      parent,
-                                     GTK_DIALOG_DESTROY_WITH_PARENT,
+                                     GTK_DIALOG_DESTROY_WITH_PARENT|GTK_DIALOG_NO_SEPARATOR,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      GTK_STOCK_NEW, GTK_RESPONSE_ACCEPT,
                                      GTK_STOCK_STOP, GTK_RESPONSE_CANCEL,
@@ -382,12 +382,16 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
 
     w = gtk_frame_new( NULL );
     gtk_frame_set_shadow_type( GTK_FRAME( w ), GTK_SHADOW_NONE );
-    gtk_container_set_border_width( GTK_CONTAINER( w ), GUI_PAD_BIG );
-    
-        ui->progressbar = gtk_progress_bar_new( );
-        gtk_progress_bar_set_text( GTK_PROGRESS_BAR( ui->progressbar), _( "No source selected" ) );
-        gtk_container_add( GTK_CONTAINER( w ), ui->progressbar );
+    gtk_container_set_border_width( GTK_CONTAINER( w ), GUI_PAD );
+    gtk_container_add( GTK_CONTAINER( w ), gtk_hseparator_new( ) );
+    gtk_box_pack_start( main_vbox, w, FALSE, FALSE, 0 );
 
+    w = gtk_frame_new( NULL );
+    gtk_frame_set_shadow_type( GTK_FRAME( w ), GTK_SHADOW_NONE );
+    gtk_container_set_border_width( GTK_CONTAINER( w ), GUI_PAD );
+    ui->progressbar = gtk_progress_bar_new( );
+    gtk_progress_bar_set_text( GTK_PROGRESS_BAR( ui->progressbar), _( "No source selected" ) );
+    gtk_container_add( GTK_CONTAINER( w ), ui->progressbar );
     gtk_box_pack_start( main_vbox, w, FALSE, FALSE, 0 );
 
     gtk_window_set_default_size( GTK_WINDOW(d), 500, 0 );
