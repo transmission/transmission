@@ -101,7 +101,8 @@ onTrackerSelectionChanged( GtkTreeSelection  * sel,
 {
     struct tracker_page * page = gpage;
     gboolean has_selection = gtk_tree_selection_get_selected( sel, NULL, NULL );
-    gtk_widget_set_sensitive( page->remove_button, has_selection );
+    gboolean ok_to_remove = !page->gtor || gtk_tree_model_iter_n_children( GTK_TREE_MODEL( page->store ), NULL ) > 1;
+    gtk_widget_set_sensitive( page->remove_button, has_selection && ok_to_remove );
 }
 
 static void
