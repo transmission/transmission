@@ -933,7 +933,7 @@ typedef enum
     [fTrackers replaceObjectAtIndex: row withObject: object];
     
     Torrent * torrent= [fTorrents objectAtIndex: 0];
-    if (![torrent updateAllTrackers: fTrackers forAdd: YES])
+    if (![torrent updateAllTrackersForAdd: fTrackers])
         NSBeep();
     
     //reset table with either new or old value
@@ -959,7 +959,17 @@ typedef enum
 
 - (BOOL) tableView: (NSTableView *) tableView shouldEditTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
-    return ![[fTrackers objectAtIndex: row] isKindOfClass: [NSNumber class]];
+    if (tableView != fTrackerTable)
+        return NO;
+    
+    //only allow modification of custom-added trackers
+    if ([[fTrackers objectAtIndex: row] isKindOfClass: [NSNumber class]] || ![[fTorrents objectAtIndex: 0] hasAddedTrackers])
+        return NO;
+    
+    NSUInteger i;
+    for (i = row-1; ![[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]]; i--);
+    
+    return [[fTrackers objectAtIndex: i] intValue] == 0;
 }
 
 - (BOOL) shouldQuickLookFileView
@@ -1500,7 +1510,6 @@ typedef enum
     //determine if removing trackers built into the torrent
     if (numberBuiltIn > 0 && [[NSUserDefaults standardUserDefaults] boolForKey: @"WarningRemoveBuiltInTracker"])
     {
-        #warning pluralize?
         NSAlert * alert = [[NSAlert alloc] init];
         
         if (numberBuiltIn > 1)
@@ -1539,7 +1548,7 @@ typedef enum
     
     [fTrackers removeObjectsAtIndexes: indexes];
     
-    if (![torrent updateAllTrackers: fTrackers forAdd: NO])
+    if (![torrent updateAllTrackersForRemove: fTrackers])
         NSBeep();
     else
         [fTrackerTable deselectAll: self];

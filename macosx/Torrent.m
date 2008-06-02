@@ -54,6 +54,8 @@
 
 - (NSString *) etaString: (int) eta;
 
+- (BOOL) updateAllTrackers: (NSMutableArray *) trackers;
+
 - (void) trashFile: (NSString *) path;
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path;
@@ -803,66 +805,37 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return allTrackers;
 }
 
-- (BOOL) updateAllTrackers: (NSMutableArray *) trackers forAdd: (BOOL) add
+- (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers
 {
-    #warning break up into methods
-    if (add)
+    //find added tracker at end of first tier
+    int i;
+    for (i = 1; i < [trackers count]; i++)
+        if ([[trackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+            break;
+    i--;
+    
+    NSString * tracker = [trackers objectAtIndex: i];
+    if ([tracker rangeOfString: @"://"].location == NSNotFound)
     {
-        //find added tracker at end of first tier
-        int i;
-        for (i = 1; i < [trackers count]; i++)
-            if ([[trackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
-                break;
-        i--;
-        
-        NSString * tracker = [trackers objectAtIndex: i];
-        if ([tracker rangeOfString: @"://"].location == NSNotFound)
-        {
-            tracker = [@"http://" stringByAppendingString: tracker];
-            [trackers replaceObjectAtIndex: i withObject: tracker];
-        }
-        
-        if (!tr_httpIsValidURL([tracker UTF8String]))
-            return NO;
-        
-        fAddedTrackers = YES;
-    }
-    else
-    {
-        //check if any user-added groups
-        if ([[trackers objectAtIndex: 0] intValue] != 0)
-            fAddedTrackers = NO;
+        tracker = [@"http://" stringByAppendingString: tracker];
+        [trackers replaceObjectAtIndex: i withObject: tracker];
     }
     
-    //get count
-    int count = 0;
-    NSEnumerator * enumerator = [trackers objectEnumerator];
-    id object;
-    while ((object = [enumerator nextObject]))
-        if (![object isKindOfClass: [NSNumber class]])
-            count++;
+    if (!tr_httpIsValidURL([tracker UTF8String]))
+        return NO;
     
-    //recreate the tracker structure
-    tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, count);
-    int tier = 0;
-    int i = 0;
-    enumerator = [trackers objectEnumerator];
-    while ((object = [enumerator nextObject]))
-    {
-        if (![object isKindOfClass: [NSNumber class]])
-        {
-            trackerStructs[i].tier = tier;
-            trackerStructs[i].announce = (char *)[object UTF8String];
-            i++;
-        }
-        else
-            tier++;
-    }
+    fAddedTrackers = YES;
     
-    tr_torrentSetAnnounceList(fHandle, trackerStructs, count);
-    tr_free(trackerStructs);
+    return [self updateAllTrackers: trackers];
+}
+
+- (BOOL) updateAllTrackersForRemove: (NSMutableArray *) trackers
+{
+    //check if any user-added groups
+    if ([[trackers objectAtIndex: 0] intValue] != 0)
+        fAddedTrackers = NO;
     
-    return YES;
+    return [self updateAllTrackers: trackers];
 }
 
 - (BOOL) hasAddedTrackers
@@ -1927,6 +1900,39 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             return [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> eta string"),
                         [NSString timeString: eta showSeconds: YES maxDigits: 2]];
     }
+}
+
+- (BOOL) updateAllTrackers: (NSMutableArray *) trackers
+{
+    //get count
+    int count = 0;
+    NSEnumerator * enumerator = [trackers objectEnumerator];
+    id object;
+    while ((object = [enumerator nextObject]))
+        if (![object isKindOfClass: [NSNumber class]])
+            count++;
+    
+    //recreate the tracker structure
+    tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, count);
+    int tier = 0;
+    int i = 0;
+    enumerator = [trackers objectEnumerator];
+    while ((object = [enumerator nextObject]))
+    {
+        if (![object isKindOfClass: [NSNumber class]])
+        {
+            trackerStructs[i].tier = tier;
+            trackerStructs[i].announce = (char *)[object UTF8String];
+            i++;
+        }
+        else
+            tier++;
+    }
+    
+    tr_torrentSetAnnounceList(fHandle, trackerStructs, count);
+    tr_free(trackerStructs);
+    
+    return YES;
 }
 
 - (void) trashFile: (NSString *) path
