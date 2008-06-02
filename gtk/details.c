@@ -1116,7 +1116,7 @@ tracker_page_new( TrTorrent * gtor )
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Trackers" ) );
 
-        w = tracker_list_new( gtor, GTK_POS_RIGHT );
+        w = tracker_list_new( gtor );
         hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_add_section_divider( t, &row );

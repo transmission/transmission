@@ -305,10 +305,11 @@ GtkWidget*
 make_meta_ui( GtkWindow * parent, tr_handle * handle )
 {
     int row = 0;
-    GtkWidget *d, *t, *w, *h, *h2, *v, *focusMe, *extras;
+    GtkWidget *b1, *b2, *d, *t, *w, *h, *h2, *v, *focusMe, *extras;
     GtkBox * main_vbox;
     MakeMetaUI * ui = g_new0 ( MakeMetaUI, 1 );
     ui->handle = handle;
+    int width, height;
 
     d = gtk_dialog_new_with_buttons( _("New Torrent"),
                                      parent,
@@ -344,11 +345,11 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
         gtk_box_pack_start( GTK_BOX( v ), h2, FALSE, FALSE, 0 );
         gtk_box_pack_start_defaults( GTK_BOX( h ), v );
         v = gtk_vbox_new( FALSE, GUI_PAD_SMALL );
-        w = tr_button_new_from_stock( GTK_STOCK_DIRECTORY, _( "F_older" ) );
+        w = b1 = tr_button_new_from_stock( GTK_STOCK_DIRECTORY, _( "F_older" ) );
         focusMe = w;
         g_signal_connect( w, "clicked", G_CALLBACK( onChooseDirectoryClicked ), ui );
         gtk_box_pack_start_defaults( GTK_BOX( v ), w );
-        w = tr_button_new_from_stock( GTK_STOCK_FILE, _( "_File" ) );
+        w = b2 = tr_button_new_from_stock( GTK_STOCK_FILE, _( "_File" ) );
         g_signal_connect( w, "clicked", G_CALLBACK( onChooseFileClicked ), ui );
         gtk_box_pack_start_defaults( GTK_BOX( v ), w );
         gtk_box_pack_start( GTK_BOX( h ), v, FALSE, FALSE, 0 );
@@ -357,9 +358,12 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Trackers" ) );
 
-        w = tracker_list_new( NULL, GTK_POS_RIGHT );
+        w = tracker_list_new( NULL );
         ui->announce_list = w;
         hig_workarea_add_wide_control( t, &row, w );
+        tracker_list_get_button_size( w, &width, &height );
+        gtk_widget_set_size_request( b1, width, height );
+        gtk_widget_set_size_request( b2, width, height );
 
     hig_workarea_add_section_divider( t, &row );
     w = extras = gtk_expander_new_with_mnemonic( _( "<b>E_xtras</b>" ) );

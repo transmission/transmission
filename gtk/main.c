@@ -699,8 +699,7 @@ wannaquit( void * vdata )
     gtk_table_attach_defaults( GTK_TABLE( p ), w, 1, 2, 1, 2 );
 
     b = gtk_alignment_new(0.0, 1.0, 0.01, 0.01);
-    w = gtk_button_new_with_label( _( "_Quit Now" ) );
-    gtk_button_set_image( GTK_BUTTON(w), gtk_image_new_from_stock( GTK_STOCK_QUIT, GTK_ICON_SIZE_BUTTON ) );
+    w = tr_button_new_from_stock( GTK_STOCK_QUIT, _( "_Quit Now" ) );
     g_signal_connect(w, "clicked", G_CALLBACK(do_exit_cb), NULL);
     gtk_container_add(GTK_CONTAINER(b), w);
     gtk_table_attach(GTK_TABLE(p), b, 1, 2, 2, 3, GTK_FILL, GTK_FILL, 0, 10 );

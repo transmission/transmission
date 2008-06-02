@@ -250,7 +250,7 @@ onTierEdited( GtkCellRendererText  * renderer UNUSED,
 }
 
 GtkWidget*
-tracker_list_new( TrTorrent * gtor, GtkPositionType buttonPos )
+tracker_list_new( TrTorrent * gtor )
 {
     GtkWidget * w;
     GtkWidget * buttons;
@@ -265,18 +265,9 @@ tracker_list_new( TrTorrent * gtor, GtkPositionType buttonPos )
 
     page->gtor = gtor;
 
-    if( buttonPos == GTK_POS_LEFT || buttonPos == GTK_POS_RIGHT )
-    {
-        top = gtk_hbox_new( FALSE, GUI_PAD );
-        box = gtk_vbox_new( FALSE, GUI_PAD );
-        buttons = gtk_vbox_new( TRUE, GUI_PAD );
-    }
-    else
-    {
-        top = gtk_vbox_new( FALSE, GUI_PAD );
-        box = gtk_hbox_new( FALSE, 0 );
-        buttons = gtk_hbox_new( TRUE, GUI_PAD );
-    }
+    top = gtk_hbox_new( FALSE, GUI_PAD );
+    box = gtk_vbox_new( FALSE, GUI_PAD );
+    buttons = gtk_vbox_new( TRUE, GUI_PAD );
 
     m = tracker_model_new( tr_torrent_handle( gtor ) );
     page->store = GTK_LIST_STORE( m );
@@ -344,20 +335,9 @@ tracker_list_new( TrTorrent * gtor, GtkPositionType buttonPos )
         page->revert_button = w;
     }
 
-    
-    if( buttonPos == GTK_POS_LEFT || buttonPos == GTK_POS_RIGHT ) {
-        gtk_box_pack_start( GTK_BOX( box ), buttons, FALSE, FALSE, 0 );
-    } else {
-        gtk_box_pack_end( GTK_BOX( box ), buttons, FALSE, FALSE, 0 );
-    }
-
-    if( buttonPos == GTK_POS_LEFT || buttonPos == GTK_POS_TOP ) {
-        gtk_box_pack_start( GTK_BOX( top ), box, FALSE, FALSE, 0 );
-        gtk_box_pack_start_defaults( GTK_BOX( top ), fr );
-    } else {
-        gtk_box_pack_start_defaults( GTK_BOX( top ), fr );
-        gtk_box_pack_start( GTK_BOX( top ), box, FALSE, FALSE, 0 );
-    }
+    gtk_box_pack_start( GTK_BOX( box ), buttons, FALSE, FALSE, 0 );
+    gtk_box_pack_start_defaults( GTK_BOX( top ), fr );
+    gtk_box_pack_start( GTK_BOX( top ), box, FALSE, FALSE, 0 );
 
     onTrackerSelectionChanged( sel, page );
 
@@ -391,3 +371,14 @@ tracker_list_get_trackers( GtkWidget * list,
     return trackers;
 }
 
+void
+tracker_list_get_button_size( GtkWidget  * list,
+                              gint       * width,
+                              gint       * height )
+{
+    struct tracker_page * page = g_object_get_data( G_OBJECT( list ), "page" );
+    GtkRequisition req;
+    gtk_widget_size_request( page->remove_button, &req );
+    if( width ) *width = req.width;
+    if( height ) *height = req.height;
+}
