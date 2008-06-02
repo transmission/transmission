@@ -298,12 +298,36 @@
 
 - (void) createReal
 {
+    //check if a file with the same name and location already exists
+    if ([[NSFileManager defaultManager] fileExistsAtPath: fLocation])
+    {
+        NSArray * pathComponents = [fLocation pathComponents];
+        int count = [pathComponents count];
+        
+        NSAlert * alert = [[[NSAlert alloc] init] autorelease];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> file already exists warning -> button")];
+        [alert setMessageText: NSLocalizedString(@"A torrent file with this name and directory cannot be created.",
+                                                "Create torrent -> file already exists warning -> title")];
+        [alert setInformativeText: [NSString stringWithFormat:
+                NSLocalizedString(@"A file with the name \"%@\" already exists in the directory \"%@\". "
+                    "Choose a new name or directory to create the torrent file.",
+                    "Create torrent -> file already exists warning -> warning"),
+                    [pathComponents objectAtIndex: count-1], [pathComponents objectAtIndex: count-2]]];
+        [alert setAlertStyle: NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow: [self window] modalDelegate: self didEndSelector: nil contextInfo: nil];
+        return;
+    }
+    
     [fTracker release]; //incase a previous create was aborted
     fTracker = [[fTrackerField stringValue] retain];
     
     //parse non-empty tracker strings
+    tr_tracker_info trackerInfo;
+    BOOL isTracker = NO;
     if (![fTracker isEqualToString: @""])
     {
+        isTracker = YES;
         if ([fTracker rangeOfString: @"://"].location == NSNotFound)
         {
             NSString * fullTracker = [@"http://" stringByAppendingString: fTracker];
@@ -330,27 +354,9 @@
             [alert beginSheetModalForWindow: [self window] modalDelegate: self didEndSelector: nil contextInfo: nil];
             return;
         }
-    }
-    
-    //check if a file with the same name and location already exists
-    if ([[NSFileManager defaultManager] fileExistsAtPath: fLocation])
-    {
-        NSArray * pathComponents = [fLocation pathComponents];
-        int count = [pathComponents count];
         
-        NSAlert * alert = [[[NSAlert alloc] init] autorelease];
-        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> file already exists warning -> button")];
-        [alert setMessageText: NSLocalizedString(@"A torrent file with this name and directory cannot be created.",
-                                                "Create torrent -> file already exists warning -> title")];
-        [alert setInformativeText: [NSString stringWithFormat:
-                NSLocalizedString(@"A file with the name \"%@\" already exists in the directory \"%@\". "
-                    "Choose a new name or directory to create the torrent file.",
-                    "Create torrent -> file already exists warning -> warning"),
-                    [pathComponents objectAtIndex: count-1], [pathComponents objectAtIndex: count-2]]];
-        [alert setAlertStyle: NSWarningAlertStyle];
-        
-        [alert beginSheetModalForWindow: [self window] modalDelegate: self didEndSelector: nil contextInfo: nil];
-        return;
+        trackerInfo.tier = 0;
+        trackerInfo.announce = (char *)[fTracker UTF8String];
     }
     
     //store values
@@ -359,14 +365,8 @@
     [fDefaults setBool: fOpenTorrent forKey: @"CreatorOpen"];
     [fDefaults setObject: [fLocation stringByDeletingLastPathComponent] forKey: @"CreatorLocation"];
     
-    #warning perhaps don't create at all if no trackers
-    //create tracker
-    tr_tracker_info trackerInfo;
-    trackerInfo.tier = 0;
-    trackerInfo.announce = (char *)[fTracker UTF8String];
-    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"BeginCreateTorrentFile" object: fLocation userInfo: nil];
-    tr_makeMetaInfo(fInfo, [fLocation UTF8String], &trackerInfo, 1, [[fCommentView string] UTF8String],
+    tr_makeMetaInfo(fInfo, [fLocation UTF8String], &trackerInfo, isTracker ? 1 : 0, [[fCommentView string] UTF8String],
                     [fPrivateCheck state] == NSOnState);
     
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 0.1 target: self selector: @selector(checkProgress)
