@@ -1452,22 +1452,18 @@ typedef enum
 {
     NSMutableIndexSet * indexes = [[[fTrackerTable selectedRowIndexes] mutableCopy] autorelease];
     
-    #warning merge?
-    //if a group is selected, remove all trackers in the group
-    NSUInteger i;
-    for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+    
+    NSUInteger i = 0;
+    while (i < [fTrackers count])
     {
-        if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+        //if a group is selected, remove all trackers in the group
+        if ([indexes containsIndex: i])
         {
             for (i = i+1; i < [fTrackers count] && ![[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]]; i++)
                 [indexes addIndex: i];
-            i--;
         }
-    }
-    
-    //remove empty groups
-    for (i = 0; i < [fTrackers count]; i++)
-        if (![indexes containsIndex: i] && [[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+        //remove empty groups
+        else
         {
             BOOL allSelected = YES;
             NSUInteger j;
@@ -1481,7 +1477,12 @@ typedef enum
             if (allSelected)
                 [indexes addIndex: i];
             i = j;
+            
+            //get to next group
+            while (i < [fTrackers count] && ![[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+                i++;
         }
+    }
     
     if ([fTrackers count] == [indexes count])
     {
