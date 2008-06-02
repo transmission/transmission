@@ -21,6 +21,8 @@
 #include "rpc-server.h"
 #include "utils.h"
 
+#define MY_NAME "RPC Server"
+
 #define BUSY_INTERVAL_MSEC 30
 #define IDLE_INTERVAL_MSEC 1000
 
@@ -268,7 +270,18 @@ tr_rpcInit( tr_handle   * session,
             int           port,
             const char  * acl )
 {
-    tr_rpc_server * s = tr_new0( tr_rpc_server, 1 );
+    char * errmsg;
+    tr_rpc_server * s;
+
+    if(( errmsg = testACL ( acl )))
+    {
+        tr_nerr( MY_NAME, errmsg );
+        tr_free( errmsg );
+        acl = TR_DEFAULT_RPC_ACL;
+        tr_nerr( MY_NAME, "using fallback ACL \"%s\"", acl );
+    }
+
+    s = tr_new0( tr_rpc_server, 1 );
     s->session = session;
     s->port = port;
     s->in = evbuffer_new( );
