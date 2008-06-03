@@ -1583,21 +1583,30 @@ rechoke( Torrent * t )
     /* optimistic unchoke */
     if( i < size )
     {
+        int n;
         struct ChokeData * c;
         tr_ptrArray * randPool = tr_ptrArrayNew( );
+
         for( ; i<size; ++i )
         {
-            const tr_peer * peer = choke[i].peer;
-            int x=1, y;
-            if( isNew( peer ) ) x *= 3;
-            if( isSame( peer ) ) x *= 3;
-            for( y=0; y<x; ++y )
-                tr_ptrArrayAppend( randPool, choke );
+            if( choke[i].isInterested )
+            {
+                const tr_peer * peer = choke[i].peer;
+                int x=1, y;
+                if( isNew( peer ) ) x *= 3;
+                if( isSame( peer ) ) x *= 3;
+                for( y=0; y<x; ++y )
+                    tr_ptrArrayAppend( randPool, choke );
+            }
         }
-        i = tr_rand( tr_ptrArraySize( randPool ) );
-        c = tr_ptrArrayNth( randPool, i);
-        c->doUnchoke = 1;
-        t->optimistic = c->peer;
+
+        if(( n = tr_ptrArraySize( randPool )))
+        {
+            c = tr_ptrArrayNth( randPool, tr_rand( n ));
+            c->doUnchoke = 1;
+            t->optimistic = c->peer;
+        }
+
         tr_ptrArrayFree( randPool, NULL );
     }
 
