@@ -1596,3 +1596,10 @@ tr_torrentSetActivityDate( tr_torrent * tor, time_t t )
 {
     tor->activityDate = t;
 }
+
+/** @deprecated this method will be removed in 1.40 */
+void
+tr_torrentSetDoneDate( tr_torrent * tor, time_t t )
+{
+    tor->doneDate = t;
+}

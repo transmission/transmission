@@ -1248,6 +1248,9 @@ void tr_torrentSetAddedDate( tr_torrent *, time_t );
 /** @deprecated this method will be removed in 1.40 */
 void tr_torrentSetActivityDate( tr_torrent *, time_t );
 
+/** @deprecated this method will be removed in 1.40 */
+void tr_torrentSetDoneDate( tr_torrent *, time_t );
+
 /** @} */
 
 #ifdef __TRANSMISSION__
