@@ -1681,6 +1681,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent = [notification object];
     
     [self updateTorrentsInQueue];
+    
+    #warning perhaps check if torrent is selected in inspector
     [fInfoController updateInfoStats];
     [fInfoController updateOptions];
     
@@ -4178,17 +4180,25 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [self performSelectorOnMainThread: @selector(rpcAddTorrentStruct:) withObject:
                 [[NSValue valueWithPointer: torrentStruct] retain] waitUntilDone: NO];
             break;
-        case TR_RPC_TORRENT_STARTED:
-            break;
-        case TR_RPC_TORRENT_STOPPED:
-            break;
+        
         case TR_RPC_TORRENT_REMOVING:
+            [self performSelectorOnMainThread: @selector(rpcStartedStoppedTorrent:) withObject: torrent waitUntilDone: NO];
+            break;
+        
+        case TR_RPC_TORRENT_STARTED:
+        case TR_RPC_TORRENT_STOPPED:
             [self performSelectorOnMainThread: @selector(rpcRemoveTorrent:) withObject: torrent waitUntilDone: NO];
             break;
+        
         case TR_RPC_TORRENT_CHANGED:
+            [self performSelectorOnMainThread: @selector(rpcChangedTorrent:) withObject: torrent waitUntilDone: NO];
             break;
+        
         case TR_RPC_SESSION_CHANGED:
             break;
+        
+        default:
+            NSLog(@"Unknown RPC command received!");
     }
     
     [pool release];
@@ -4218,6 +4228,26 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: NO deleteTorrent: NO fromRPC: YES];
     [torrent release];
+}
+
+- (void) rpcStartedStoppedTorrent: (Torrent *) torrent
+{
+    [torrent update];
+    [torrent release];
+    
+    [self updateUI];
+    [self applyFilter: nil];
+    [self updateTorrentHistory];
+}
+
+- (void) rpcChangedTorrent: (Torrent *) torrent
+{
+    [torrent update];
+    [torrent release];
+    
+    #warning check if torrent is selected?
+    [fInfoController updateInfoStats];
+    [fInfoController updateOptions];
 }
 
 @end
