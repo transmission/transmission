@@ -233,14 +233,17 @@ refreshFromBuilder( MakeMetaUI * ui )
     if( !filename )
         *buf = '\0';
     else {
+        char countStr[512];
+        g_snprintf( countStr, sizeof( countStr ),
+                    ngettext( "%d Piece", "%d Pieces", builder->pieceCount ),
+                    builder->pieceCount );
         tr_strlsize( sizeStr, builder->pieceSize, sizeof(sizeStr) );
         g_snprintf( buf, sizeof( buf ),
-                    /* %1$'s is number of pieces;
+                    /* %1$s is number of pieces;
                        %2$s is how big each piece is */
-                    ngettext( "<i>%1$'d Piece @ %2$s</i>",
-                              "<i>%1$'d Pieces @ %2$s</i>",
-                              builder->pieceCount ),
-                    builder->pieceCount, sizeStr );
+                    _( "%1$s @ %2$s" ), 
+                    countStr,
+                    sizeStr );
     }
     gtk_label_set_markup ( GTK_LABEL(ui->pieces_lb), buf );
 }

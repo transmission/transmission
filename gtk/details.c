@@ -741,20 +741,23 @@ info_page_new (tr_torrent * tor)
   GtkWidget *l, *w, *fr;
   char *pch;
   char sizeStr[128];
+  char countStr[128];
   char buf[256];
   GtkTextBuffer * b;
   const tr_info * info = tr_torrentInfo(tor);
 
   hig_workarea_add_section_title (t, &row, _("Details"));
 
+    g_snprintf( countStr, sizeof( countStr ),
+                ngettext( "%d Piece", "%d Pieces", info->pieceCount ),
+                info->pieceCount );
     tr_strlsize( sizeStr, info->pieceSize, sizeof(sizeStr) );
     g_snprintf( buf, sizeof( buf ),
-                /* %1$'d is number of pieces
+                /* %1$s is number of pieces;
                    %2$s is how big each piece is */
-                ngettext( "%1$'d Piece @ %2$s",
-                          "%1$'d Pieces @ %2$s",
-                          info->pieceCount ),
-                info->pieceCount, sizeStr );
+                _( "%1$s @ %2$s" ),
+              countStr, sizeStr );
+
     l = gtk_label_new (buf);
     hig_workarea_add_row (t, &row, _("Pieces:"), l, NULL);
 
@@ -878,7 +881,7 @@ refresh_activity (GtkWidget * top)
   gtk_label_set_text (GTK_LABEL(a->err_lb),
                       *stat->errorString ? stat->errorString : _("None"));
 
-  refresh_time_lb( a->date_added_lb, stat->startDate );
+  refresh_time_lb( a->date_added_lb, stat->addedDate );
 
   refresh_time_lb( a->last_activity_lb, stat->activityDate );
 
