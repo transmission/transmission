@@ -38,6 +38,7 @@
 #define TOOLBAR_BANDWIDTH   @"TOOLBAR_BANDWIDTH"
 #define TOOLBAR_PEERS       @"TOOLBAR_PEERS"
 #define TOOLBAR_NETWORK     @"TOOLBAR_NETWORK"
+#define TOOLBAR_REMOTE      @"TOOLBAR_REMOTE"
 
 @interface PrefsController (Private)
 
@@ -163,6 +164,9 @@
     
     //set blocklist
     [self updateBlocklistFields];
+    
+    //set rpc port
+    [fRPCPortField setIntValue: [fDefaults integerForKey: @"RPCPort"]];
 }
 
 - (void) setUpdater: (SUUpdater *) updater
@@ -214,6 +218,14 @@
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
     }
+    else if ([ident isEqualToString: TOOLBAR_REMOTE])
+    {
+        [item setLabel: NSLocalizedString(@"Remote", "Preferences -> toolbar item title")];
+        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNameNetwork : @"Network.png"]];
+        [item setTarget: self];
+        [item setAction: @selector(setPrefView:)];
+        [item setAutovalidates: NO];
+    }
     else
     {
         [item release];
@@ -235,7 +247,8 @@
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
-    return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_BANDWIDTH, TOOLBAR_PEERS, TOOLBAR_NETWORK, nil];
+    return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_BANDWIDTH,
+                                        TOOLBAR_PEERS, TOOLBAR_NETWORK, TOOLBAR_REMOTE, nil];
 }
 
 //used by ipc
@@ -612,6 +625,18 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSizeSettingChange" object: self];
 }
 
+- (void) setRPCEnabled: (id) sender
+{
+    tr_sessionSetRPCEnabled(fHandle, [fDefaults boolForKey: @"RPC"]);
+}
+
+- (void) setRPCPort: (id) sender
+{
+    int port = [sender intValue];
+    [fDefaults setInteger: port forKey: @"RPCPort"];
+    tr_sessionSetRPCPort(fHandle, port);
+}
+
 - (void) helpForPeers: (id) sender
 {
     [[NSHelpManager sharedHelpManager] openHelpAnchor: @"PeersPrefs"
@@ -667,7 +692,6 @@
     int upLimit = tr_sessionGetSpeedLimit(fHandle, TR_UP);
     [fDefaults setInteger: upLimit forKey: @"UploadLimit"];
     
-    
     //update gui if loaded
     if (fHasLoaded)
     {
@@ -706,6 +730,8 @@
             view = fPeersView;
         else if ([identifier isEqualToString: TOOLBAR_NETWORK])
             view = fNetworkView;
+        else if ([identifier isEqualToString: TOOLBAR_REMOTE])
+            view = fRemoteView;
         else; //general view already selected
     }
     

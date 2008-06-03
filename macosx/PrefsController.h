@@ -34,7 +34,7 @@
     NSUserDefaults * fDefaults;
     BOOL fHasLoaded;
     
-    IBOutlet NSView * fGeneralView, * fTransfersView, * fBandwidthView, * fPeersView, * fNetworkView;
+    IBOutlet NSView * fGeneralView, * fTransfersView, * fBandwidthView, * fPeersView, * fNetworkView, * fRemoteView;
     
     NSString * fInitialString;
     
@@ -56,6 +56,8 @@
     IBOutlet NSProgressIndicator * fPortStatusProgress;
     NSTimer * fPortStatusTimer;
     int fPeerPort, fNatStatus;
+    
+    IBOutlet NSTextField * fRPCPortField;
 }
 
 - (id) initWithHandle: (tr_handle *) handle;
@@ -115,6 +117,9 @@
 
 - (void) helpForPeers: (id) sender;
 - (void) helpForNetwork: (id) sender;
+
+- (void) setRPCEnabled: (id) sender;
+- (void) setRPCPort: (id) sender;
 
 - (void) rpcUpdatePrefs;
 
