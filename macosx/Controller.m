@@ -275,17 +275,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         [[[fActionButton menu] itemAtIndex: 0] setImage: [NSImage imageNamed: NSImageNameActionTemplate]]; //set in nib if Leopard-only
         
-        [fBottomTigerBar removeFromSuperview];
         [fBottomTigerLine removeFromSuperview];
         [fStatusTigerField removeFromSuperview];
         [fStatusTigerImageView removeFromSuperview];
     }
     else
     {
-        //bottom bar
-        [fBottomTigerBar setHidden: NO];
-        [fBottomTigerLine setHidden: NO];
-        
         [fActionButton setBezelStyle: NSSmallSquareBezelStyle];
         [fSpeedLimitButton setBezelStyle: NSSmallSquareBezelStyle];
         

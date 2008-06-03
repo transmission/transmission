@@ -65,7 +65,6 @@ typedef enum
     
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
     
-    IBOutlet StatusBarView          * fBottomTigerBar;
     IBOutlet NSBox                  * fBottomTigerLine;
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
     NSTimer                         * fSpeedLimitTimer;

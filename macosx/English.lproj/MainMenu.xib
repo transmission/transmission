@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3093"/>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -42,13 +42,6 @@
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSCustomView" id="884073691">
-							<reference key="NSNextResponder" ref="303120456"/>
-							<int key="NSvFlags">-2147483358</int>
-							<string key="NSFrameSize">{468, 23}</string>
-							<reference key="NSSuperview" ref="303120456"/>
-							<string key="NSClassName">StatusBarView</string>
-						</object>
 						<object class="NSPopUpButton" id="327116749">
 							<reference key="NSNextResponder" ref="303120456"/>
 							<int key="NSvFlags">292</int>
@@ -217,7 +210,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						</object>
 						<object class="NSBox" id="382627929">
 							<reference key="NSNextResponder" ref="303120456"/>
-							<int key="NSvFlags">-2147483358</int>
+							<int key="NSvFlags">290</int>
 							<string key="NSFrame">{{0, 20}, {468, 5}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<string key="NSOffsets">{0, 0}</string>
@@ -1837,7 +1830,7 @@ zJLMsszTzPPNFM00zVXNdc2GzabNx83nzgjOKM5JzmnOis6qzrrO2877zxzPPM9dz33Pns++z9/P79AA
 												</object>
 												<object class="NSTableColumn" id="5943702">
 													<string key="NSIdentifier">Group</string>
-													<double key="NSWidth">2.800000e+02</double>
+													<double key="NSWidth">2.830000e+02</double>
 													<double key="NSMinWidth">4.800000e+01</double>
 													<double key="NSMaxWidth">3.402823e+38</double>
 													<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -5859,14 +5852,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">fBottomTigerBar</string>
-						<reference key="source" ref="30116300"/>
-						<reference key="destination" ref="884073691"/>
-					</object>
-					<int key="connectionID">2783</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">fBottomTigerLine</string>
 						<reference key="source" ref="30116300"/>
 						<reference key="destination" ref="382627929"/>
@@ -6354,7 +6339,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<reference ref="673219624"/>
 							<reference ref="403739499"/>
 							<reference ref="87647552"/>
-							<reference ref="884073691"/>
 							<reference ref="382627929"/>
 						</object>
 						<reference key="parent" ref="405103408"/>
@@ -8259,16 +8243,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="parent" ref="675318801"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">2782</int>
-						<reference key="object" ref="884073691"/>
-						<reference key="parent" ref="303120456"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">2785</int>
-						<reference key="object" ref="382627929"/>
-						<reference key="parent" ref="303120456"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">3124</int>
 						<reference key="object" ref="1006202415"/>
 						<object class="NSMutableArray" key="children">
@@ -8377,6 +8351,11 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<int key="objectID">3167</int>
 						<reference key="object" ref="765429693"/>
 						<reference key="parent" ref="455126894"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2785</int>
+						<reference key="object" ref="382627929"/>
+						<reference key="parent" ref="303120456"/>
 					</object>
 				</object>
 			</object>
@@ -8827,8 +8806,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>2731.ImportedFromIB2</string>
 					<string>2743.IBPluginDependency</string>
 					<string>2743.ImportedFromIB2</string>
-					<string>2782.IBPluginDependency</string>
-					<string>2782.ImportedFromIB2</string>
 					<string>2785.IBPluginDependency</string>
 					<string>2785.ImportedFromIB2</string>
 					<string>2839.IBPluginDependency</string>
@@ -9416,8 +9393,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="9"/>
 					<string>{{558, 631}, {183, 33}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
@@ -9718,7 +9693,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>fActionButton</string>
 							<string>fActiveFilterButton</string>
-							<string>fBottomTigerBar</string>
 							<string>fBottomTigerLine</string>
 							<string>fCheckRatioItem</string>
 							<string>fDockMenu</string>
@@ -9765,7 +9739,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSButton</string>
 							<string>FilterButton</string>
-							<string>StatusBarView</string>
 							<string>NSBox</string>
 							<string>NSMenuItem</string>
 							<string>NSMenu</string>
