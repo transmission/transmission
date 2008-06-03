@@ -737,9 +737,10 @@ tr_torrentStat( tr_torrent * tor )
 
     s->swarmSpeed = tr_rcRate( tor->swarmSpeed );
     
-    s->startDate = tor->startDate;
     s->activityDate = tor->activityDate;
-    s->addedDate = tor->addedDate;
+    s->addedDate    = tor->addedDate;
+    s->doneDate     = tor->doneDate;
+    s->startDate    = tor->startDate;
 
     s->corruptEver     = tor->corruptCur    + tor->corruptPrev;
     s->downloadedEver  = tor->downloadedCur + tor->downloadedPrev;
@@ -1190,7 +1191,11 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         fireStatusChange( tor, cpStatus );
 
         if( recentChange && ( cpStatus == TR_CP_COMPLETE ) )
+        {
             tr_trackerCompleted( tor->tracker );
+
+            tor->doneDate = time( NULL );
+        }
 
         tr_torrentSaveResume( tor );
     }

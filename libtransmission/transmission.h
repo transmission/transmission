@@ -1220,6 +1220,9 @@ typedef struct tr_stat
 
     /** When the torrent was first added. */
     time_t addedDate;
+
+    /** When the torrent finished downloading. */
+    time_t doneDate;
    
     /** When the torrent was last started. */ 
     time_t startDate;
