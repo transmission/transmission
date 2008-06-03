@@ -1578,3 +1578,21 @@ tr_torrentSetAnnounceList( tr_torrent             * tor,
         tr_bencFree( &metainfo );
     }
 }
+
+/**
+***
+**/
+
+/** @deprecated this method will be removed in 1.40 */
+void
+tr_torrentSetAddedDate( tr_torrent * tor, time_t t )
+{
+    tor->addedDate = t;
+}
+
+/** @deprecated this method will be removed in 1.40 */
+void
+tr_torrentSetActivityDate( tr_torrent * tor, time_t t )
+{
+    tor->activityDate = t;
+}

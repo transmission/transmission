@@ -1242,6 +1242,12 @@ const tr_stat * tr_torrentStat( tr_torrent * );
     reduce the CPU load if you're calling tr_torrentStat() frequently. */
 const tr_stat * tr_torrentStatCached( tr_torrent * );
 
+/** @deprecated this method will be removed in 1.40 */
+void tr_torrentSetAddedDate( tr_torrent *, time_t );
+
+/** @deprecated this method will be removed in 1.40 */
+void tr_torrentSetActivityDate( tr_torrent *, time_t );
+
 /** @} */
 
 #ifdef __TRANSMISSION__
