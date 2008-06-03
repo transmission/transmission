@@ -4181,12 +4181,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 [[NSValue valueWithPointer: torrentStruct] retain] waitUntilDone: NO];
             break;
         
-        case TR_RPC_TORRENT_REMOVING:
+        case TR_RPC_TORRENT_STARTED:
+        case TR_RPC_TORRENT_STOPPED:
             [self performSelectorOnMainThread: @selector(rpcStartedStoppedTorrent:) withObject: torrent waitUntilDone: NO];
             break;
         
-        case TR_RPC_TORRENT_STARTED:
-        case TR_RPC_TORRENT_STOPPED:
+        case TR_RPC_TORRENT_REMOVING:
             [self performSelectorOnMainThread: @selector(rpcRemoveTorrent:) withObject: torrent waitUntilDone: NO];
             break;
         
