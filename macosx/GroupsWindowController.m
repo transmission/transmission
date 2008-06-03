@@ -58,8 +58,9 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         [[self window] setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
     else
     {
-        [fAddRemoveControl setLabel: @"+" forSegment: 0];
-        [fAddRemoveControl setLabel: @"-" forSegment: 1];
+        [fAddRemoveControl sizeToFit];
+        [fAddRemoveControl setLabel: @"+" forSegment: ADD_TAG];
+        [fAddRemoveControl setLabel: @"-" forSegment: REMOVE_TAG];
     }
     
     [fAddRemoveControl setEnabled: NO forSegment: REMOVE_TAG];

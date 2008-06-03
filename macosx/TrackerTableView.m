@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "TrackerTableView.h"
+#import "NSApplicationAdditions.h"
 
 @implementation TrackerTableView
 
@@ -50,25 +51,30 @@
     
     if (rows.length > 0)
     {
+        BOOL onLeopard = [NSApp isOnLeopardOrBetter];
+        
         //determine what the first row color should be
-        if (![[fTrackers objectAtIndex: rows.location] isKindOfClass: [NSNumber class]])
+        if (onLeopard)
         {
-            for (i = rows.location-1; i>=0; i--)
+            if (![[fTrackers objectAtIndex: rows.location] isKindOfClass: [NSNumber class]])
             {
-                if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
-                    break;
-                start = !start;
+                for (i = rows.location-1; i>=0; i--)
+                {
+                    if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+                        break;
+                    start = !start;
+                }
             }
-        }
-        else
-        {
-            rows.location++;
-            rows.length--;
+            else
+            {
+                rows.location++;
+                rows.length--;
+            }
         }
         
         for (i = rows.location; i < NSMaxRange(rows); i++)
         {
-            if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+            if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]] && onLeopard)
             {
                 start = YES;
                 continue;

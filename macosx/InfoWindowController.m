@@ -163,7 +163,13 @@ typedef enum
         [[fPeerTable tableColumnWithIdentifier: @"UL To"] setHeaderToolTip: NSLocalizedString(@"Uploading To Peer",
                                                                             "inspector -> peer table -> header tool tip")];
         [[fPeerTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Peer",
-                                                                            "inspector -> peer table -> header tool tip")];                                                             
+                                                                            "inspector -> peer table -> header tool tip")];
+    }
+    else
+    {
+        [fTrackerAddRemoveControl sizeToFit];
+        [fTrackerAddRemoveControl setLabel: @"+" forSegment: TRACKER_ADD_TAG];
+        [fTrackerAddRemoveControl setLabel: @"-" forSegment: TRACKER_REMOVE_TAG];
     }
     
     //set blank inspector
