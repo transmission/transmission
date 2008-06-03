@@ -668,7 +668,7 @@
     [fDefaults setInteger: upLimit forKey: @"UploadLimit"];
     
     
-    //update gui if necessary
+    //update gui if loaded
     if (fHasLoaded)
     {
         //encryption handled by bindings

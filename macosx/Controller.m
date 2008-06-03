@@ -4250,9 +4250,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if ([[fTableView selectedTorrents] containsObject: torrent])
     {
-        #warning update the file table as well
-        
-        [fInfoController updateInfoStats];
+        [fInfoController updateInfoStats]; //this will reload the file table
         [fInfoController updateOptions];
     }
     
