@@ -35,8 +35,6 @@
         publicTorrent: (NSNumber *) publicTorrent
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
-        dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
-        dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         waitToStart: (NSNumber *) waitToStart
         orderValue: (NSNumber *) orderValue groupValue: (NSNumber *) groupValue addedTrackers: (NSNumber *) addedTrackers;
@@ -78,8 +76,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                             ? [NSNumber numberWithBool: torrentDelete == TORRENT_FILE_SAVE] : nil
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
-            dateAdded: nil dateCompleted: nil
-            dateActivity: nil
             ratioSetting: nil ratioLimit: nil
             waitToStart: nil orderValue: nil groupValue: nil addedTrackers: nil];
     
@@ -97,8 +93,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             publicTorrent: [NSNumber numberWithBool: NO]
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
-            dateAdded: nil dateCompleted: nil
-            dateActivity: nil
             ratioSetting: nil ratioLimit: nil
             waitToStart: nil orderValue: nil groupValue: nil addedTrackers: nil];
     
@@ -113,9 +107,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 downloadFolder: [history objectForKey: @"DownloadFolder"]
                 useIncompleteFolder: [history objectForKey: @"UseIncompleteFolder"]
                 incompleteFolder: [history objectForKey: @"IncompleteFolder"]
-                dateAdded: [history objectForKey: @"Date"]
-				dateCompleted: [history objectForKey: @"DateCompleted"]
-                dateActivity: [history objectForKey: @"DateActivity"]
                 ratioSetting: [history objectForKey: @"RatioSetting"]
                 ratioLimit: [history objectForKey: @"RatioLimit"]
                 waitToStart: [history objectForKey: @"WaitToStart"]
@@ -132,6 +123,16 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             fStat = tr_torrentStat(fHandle);
             [self startTransfer];
         }
+        
+        #warning remove after 1.3 (from libT as well)
+        //get old added, activity, and done dates
+        NSDate * date;
+        if ((date = [history objectForKey: @"Date"]))
+            tr_torrentSetAddedDate(fHandle, [date timeIntervalSince1970]);
+        if ((date = [history objectForKey: @"DateActivity"]))
+            tr_torrentSetActivityDate(fHandle, [date timeIntervalSince1970]);
+        if ((date = [history objectForKey: @"DateCompleted"]))
+            tr_torrentSetDoneDate(fHandle, [date timeIntervalSince1970]);
     }
     return self;
 }
@@ -144,7 +145,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                     fDownloadFolder, @"DownloadFolder",
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
                     [NSNumber numberWithBool: [self isActive]], @"Active",
-                    fDateAdded, @"Date",
                     [NSNumber numberWithInt: fRatioSetting], @"RatioSetting",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
@@ -157,13 +157,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
     if (fPublicTorrent)
         [history setObject: [self publicTorrentLocation] forKey: @"TorrentPath"];
-	
-    if (fDateCompleted)
-		[history setObject: fDateCompleted forKey: @"DateCompleted"];
-    
-    NSDate * dateActivity = [self dateActivity];
-    if (dateActivity)
-		[history setObject: dateActivity forKey: @"DateActivity"];
 	
     return history;
 }
@@ -186,10 +179,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     [fIncompleteFolder release];
     
     [fPublicTorrentLocation release];
-    
-    [fDateAdded release];
-    [fDateCompleted release];
-    [fDateActivity release];
     
     [fIcon release];
     
@@ -1515,18 +1504,20 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSDate *) dateAdded
 {
-    return fDateAdded;
+    time_t date = fStat->addedDate;
+    return [NSDate dateWithTimeIntervalSince1970: date];
 }
 
 - (NSDate *) dateCompleted
 {
-    return fDateCompleted;
+    time_t date = fStat->doneDate;
+    return date != 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
 }
 
 - (NSDate *) dateActivity
 {
     time_t date = fStat->activityDate;
-    return date != 0 ? [NSDate dateWithTimeIntervalSince1970: date] : fDateActivity;
+    return date != 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
 }
 
 - (NSDate *) dateActivityOrAdd
@@ -1537,8 +1528,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (int) stalledMinutes
 {
-    time_t start;
-    if ((start = fStat->startDate) == 0)
+    time_t start = fStat->startDate;
+    if (start == 0)
         return -1;
     
     NSDate * started = [NSDate dateWithTimeIntervalSince1970: start],
@@ -1577,8 +1568,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         publicTorrent: (NSNumber *) publicTorrent
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
-        dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
-        dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         waitToStart: (NSNumber *) waitToStart
         orderValue: (NSNumber *) orderValue groupValue: (NSNumber *) groupValue addedTrackers: (NSNumber *) addedTrackers
@@ -1662,12 +1651,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     fNameString = [[NSString alloc] initWithUTF8String: fInfo->name];
     fHashString = [[NSString alloc] initWithUTF8String: fInfo->hashString];
-    
-    fDateAdded = dateAdded ? [dateAdded retain] : [[NSDate alloc] init];
-	if (dateCompleted)
-		fDateCompleted = [dateCompleted retain];
-    if (dateActivity)
-		fDateActivity = [dateActivity retain];
 	
     fRatioSetting = ratioSetting ? [ratioSetting intValue] : NSMixedState;
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
@@ -1836,9 +1819,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 fDownloadFolder = fIncompleteFolder;
                 fIncompleteFolder = nil;
             }
-            
-            [fDateCompleted release];
-            fDateCompleted = [[NSDate alloc] init];
             
             //allow to be backed up by Time Machine
             [self setTimeMachineExclude: NO forPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];

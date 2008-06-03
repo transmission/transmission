@@ -41,7 +41,6 @@ typedef enum
     const tr_stat * fStat;
     
     BOOL fResumeOnWake;
-    NSDate * fDateAdded, * fDateCompleted, * fDateActivity;
     
     BOOL fUseIncompleteFolder;
     NSString * fDownloadFolder, * fIncompleteFolder;
