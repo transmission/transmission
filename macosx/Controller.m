@@ -4159,7 +4159,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
     //get the torrent
-    Torrent * torrent;
+    Torrent * torrent = nil;
     if (torrentStruct != NULL && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED))
     {
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
@@ -4197,10 +4197,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             break;
         
         case TR_RPC_SESSION_CHANGED:
+            [fPrefsController performSelectorOnMainThread: @selector(rpcUpdatePrefs) withObject: nil waitUntilDone: NO];
             break;
         
         default:
             NSLog(@"Unknown RPC command received!");
+            [torrent release];
     }
     
     [pool release];
@@ -4248,6 +4250,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if ([[fTableView selectedTorrents] containsObject: torrent])
     {
+        #warning update the file table as well
+        
         [fInfoController updateInfoStats];
         [fInfoController updateOptions];
     }

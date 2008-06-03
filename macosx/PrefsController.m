@@ -624,6 +624,70 @@
         inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
+- (void) rpcUpdatePrefs
+{
+    //encryption
+    tr_encryption_mode encryptionMode = tr_sessionGetEncryption(fHandle);
+    [fDefaults setBool: encryptionMode != TR_PLAINTEXT_PREFERRED forKey: @"EncryptionPrefer"];
+    [fDefaults setBool: encryptionMode == TR_ENCRYPTION_PREFERRED forKey: @"EncryptionPrefer"];
+    
+    //download directory
+    #warning missing!
+    
+    //peers
+    uint16_t peersTotal = tr_sessionGetPeerLimit(fHandle);
+    [fDefaults setInteger: peersTotal forKey: @"PeersTotal"];
+    
+    //pex
+    BOOL pex = tr_sessionIsPexEnabled(fHandle);
+    [fDefaults setBool: pex forKey: @"PEXGlobal"];
+    
+    //port
+    int port = tr_sessionGetPeerPort(fHandle);
+    [fDefaults setInteger: port forKey: @"BindPort"];
+    
+    BOOL nat = tr_sessionIsPortForwardingEnabled(fHandle);
+    [fDefaults setBool: nat forKey: @"NatTraversal"];
+    
+    fPeerPort = -1;
+    fNatStatus = -1;
+    [self updatePortStatus];
+    
+    //speed limit - down
+    BOOL downLimitEnabled = tr_sessionIsSpeedLimitEnabled(fHandle, TR_DOWN);
+    [fDefaults setBool: downLimitEnabled forKey: @"CheckDownload"];
+    
+    int downLimit = tr_sessionGetSpeedLimit(fHandle, TR_DOWN);
+    [fDefaults setInteger: downLimit forKey: @"DownloadLimit"];
+    
+    //speed limit - up
+    BOOL upLimitEnabled = tr_sessionIsSpeedLimitEnabled(fHandle, TR_UP);
+    [fDefaults setBool: upLimitEnabled forKey: @"CheckUpload"];
+    
+    int upLimit = tr_sessionGetSpeedLimit(fHandle, TR_UP);
+    [fDefaults setInteger: upLimit forKey: @"UploadLimit"];
+    
+    
+    //update gui if necessary
+    if (fHasLoaded)
+    {
+        //encryption handled by bindings
+        
+        [fPeersGlobalField setIntValue: peersTotal];
+        
+        //pex handled by bindings
+        
+        [fPortField setIntValue: port];
+        //port forwarding (nat) handled by bindings
+        
+        //limit check handled by bindings
+        [fDownloadField setIntValue: downLimit];
+        
+        //limit check handled by bindings
+        [fUploadField setIntValue: upLimit];
+    }
+}
+
 @end
 
 @implementation PrefsController (Private)
