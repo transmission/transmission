@@ -1682,9 +1682,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [self updateTorrentsInQueue];
     
-    #warning perhaps check if torrent is selected in inspector
-    [fInfoController updateInfoStats];
-    [fInfoController updateOptions];
+    if ([[fTableView selectedTorrents] containsObject: torrent])
+    {
+        [fInfoController updateInfoStats];
+        [fInfoController updateOptions];
+    }
     
     if (!fSoundPlaying && [fDefaults boolForKey: @"PlaySeedingSound"])
     {
@@ -4243,11 +4245,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) rpcChangedTorrent: (Torrent *) torrent
 {
     [torrent update];
-    [torrent release];
     
-    #warning check if torrent is selected?
-    [fInfoController updateInfoStats];
-    [fInfoController updateOptions];
+    if ([[fTableView selectedTorrents] containsObject: torrent])
+    {
+        [fInfoController updateInfoStats];
+        [fInfoController updateOptions];
+    }
+    
+    [torrent release];
 }
 
 @end
