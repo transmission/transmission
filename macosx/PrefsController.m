@@ -743,7 +743,7 @@
         NSArray * components = [object componentsSeparatedByString: @"."];
         NSMutableArray * newComponents = [NSMutableArray arrayWithCapacity: 4];
         
-        //verify ip
+        //create better-formatted ip string
         if ([components count] == 4)
         {
             NSEnumerator * enumerator = [components objectEnumerator];
@@ -759,7 +759,7 @@
         
         NSString * newIP = [newComponents componentsJoinedByString: @"."];
         
-        //revert if ip is not valid
+        //verify ip string
         if (!tr_sessionTestRPCACL(fHandle, [[@"+" stringByAppendingString: newIP] UTF8String], NULL))
         {
             NSDictionary * newDict = [NSDictionary dictionaryWithObjectsAndKeys: newIP, @"IP",
