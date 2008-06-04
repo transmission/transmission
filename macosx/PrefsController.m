@@ -758,29 +758,26 @@
         }
         
         NSString * newIP = [newComponents componentsJoinedByString: @"."];
+        
         //revert if ip is not valid
-        #warning fix
-        if ([newComponents count] != 4)
+        if (!tr_sessionTestRPCACL(fHandle, [[@"+" stringByAppendingString: newIP] UTF8String], NULL))
+        {
+            NSDictionary * newDict = [NSDictionary dictionaryWithObjectsAndKeys: newIP, @"IP",
+                                        [oldDict objectForKey: @"Allow"], @"Allow", nil];
+            [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
+            
+            NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"IP" ascending: YES selector: @selector(compareIP:)]
+                                                autorelease];
+            [fRPCAccessArray sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
+        }
+        else
         {
             NSBeep();
             
             if ([[oldDict objectForKey: @"IP"] isEqualToString: @""])
-            {
                 [fRPCAccessArray removeObjectAtIndex: row];
-                [fRPCAccessTable deselectAll: self];
-                [fRPCAccessTable reloadData];
-            }
-            
-            return;
         }
         
-        NSDictionary * newDict = [NSDictionary dictionaryWithObjectsAndKeys: newIP, @"IP",
-                                    [oldDict objectForKey: @"Allow"], @"Allow", nil];
-        [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
-        
-        NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"IP" ascending: YES selector: @selector(compareIP:)]
-                                            autorelease];
-        [fRPCAccessArray sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
         [fRPCAccessTable deselectAll: self];
         [fRPCAccessTable reloadData];
     }
