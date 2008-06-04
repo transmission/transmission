@@ -227,7 +227,8 @@ tr_rpcSetACL( tr_rpc_server * server, const char * acl, char ** setme_errmsg )
 
     if( errmsg )
     {
-        *setme_errmsg = errmsg;
+        if( setme_errmsg )
+            *setme_errmsg = errmsg;
         ret = -1;
     }
     else
