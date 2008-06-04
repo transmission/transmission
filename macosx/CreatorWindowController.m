@@ -405,43 +405,6 @@
     for (i = 0; i < [fTrackers count]; i++)
         trackerInfo[i].announce = (char *)[[fTrackers objectAtIndex: i] UTF8String];
     
-    /*if ([fTrackers count] > 0)
-    {
-        if ([fTracker rangeOfString: @"://"].location == NSNotFound)
-        {
-            NSString * fullTracker = [@"http://" stringByAppendingString: fTracker];
-            [fTracker release];
-            fTracker = [fullTracker retain];
-        }
-        
-        #warning remove
-        NSString * fTracker = [fTrackers objectAtIndex: 0];
-        
-        #warning move to adding
-        if (!tr_httpIsValidURL([fTracker UTF8String]))
-        {
-            NSAlert * alert = [[[NSAlert alloc] init] autorelease];
-            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> warning -> button")];
-            [alert setInformativeText: NSLocalizedString(@"Change the tracker address to create the torrent file.",
-                                                        "Create torrent -> warning -> info")];
-            [alert setAlertStyle: NSWarningAlertStyle];
-            
-            //check common reasons for failure
-            NSString * prefix = [fTracker substringToIndex: [fTracker rangeOfString: @"://"].location];
-            if ([prefix caseInsensitiveCompare: @"http"] != NSOrderedSame && [prefix caseInsensitiveCompare: @"https"] != NSOrderedSame)
-                [alert setMessageText: NSLocalizedString(@"The tracker address must begin with \"http://\" or \"https://\".",
-                                                        "Create torrent -> warning -> message")];
-            else
-                [alert setMessageText: NSLocalizedString(@"The tracker address is invalid.", "Create torrent -> warning -> message")];
-            
-            [alert beginSheetModalForWindow: [self window] modalDelegate: self didEndSelector: nil contextInfo: nil];
-            return;
-        }
-        
-        trackerInfo.tier = 0;
-        trackerInfo.announce = (char *)[fTracker UTF8String];
-    }*/
-    
     //store values
     [fDefaults setObject: fTrackers forKey: @"CreatorTrackers"];
     [fDefaults setBool: [fPrivateCheck state] == NSOnState forKey: @"CreatorPrivate"];
