@@ -2263,7 +2263,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     int groupIndex = [fDefaults integerForKey: @"FilterGroup"];
     
-    NSImage * icon = nil;
+    NSImage * icon;
     NSString * toolTip;
     switch (groupIndex)
     {
@@ -2280,6 +2280,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             icon = [[GroupsController groups] imageForIndex: groupIndex];
             toolTip = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Group", "Groups -> Button"),
                         [[GroupsController groups] nameForIndex: groupIndex]];
+    }
+    
+    
+    if (![NSApp isOnLeopardOrBetter])
+    {
+        icon = [[icon copy] autorelease];
+        [icon setScalesWhenResized: YES];
+        [icon setSize: NSMakeSize(12.0, 12.0)];
     }
     
     [[fGroupFilterMenu itemAtIndex: 0] setImage: icon];
