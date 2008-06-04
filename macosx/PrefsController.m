@@ -32,7 +32,7 @@
 #define DOWNLOAD_TORRENT    2
 
 #define RPC_ACCESS_ALLOW    0
-#define RPC_ACCESS_BLOCK    1
+#define RPC_ACCESS_DENY    1
 
 #define RPC_IP_ADD_TAG      0
 #define RPC_IP_REMOVE_TAG   1
@@ -669,7 +669,7 @@
         [components addObject: [NSString stringWithFormat: @"%c%@", [[dict objectForKey: @"Allow"] boolValue] ? '+' : '-',
                                 [dict objectForKey: @"IP"]]];
     
-    NSString * string = [components componentsJoinedByString: @","];NSLog(string);
+    NSString * string = [components componentsJoinedByString: @","];
     
     #warning check for an error!
     tr_sessionSetRPCACL(fHandle, [string UTF8String], NULL);
@@ -714,7 +714,7 @@
     NSString * ident = [tableColumn identifier];
     if ([ident isEqualToString: @"Permission"])
     {
-        int allow = [[dict objectForKey: @"Allow"] boolValue] ? RPC_ACCESS_ALLOW : RPC_ACCESS_BLOCK;
+        int allow = [[dict objectForKey: @"Allow"] boolValue] ? RPC_ACCESS_ALLOW : RPC_ACCESS_DENY;
         return [NSNumber numberWithInt: allow];
     }
     else
@@ -724,25 +724,23 @@
 - (void) tableView: (NSTableView *) tableView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn
     row: (NSInteger) row
 {
-    NSDictionary * oldDict = [fRPCAccessArray objectAtIndex: row], * newDict;
+    NSDictionary * oldDict = [fRPCAccessArray objectAtIndex: row];
     
     NSString * ident = [tableColumn identifier];
     if ([ident isEqualToString: @"Permission"])
     {
         NSNumber * allow = [NSNumber numberWithBool: [object intValue] == RPC_ACCESS_ALLOW];
-        newDict = [NSDictionary dictionaryWithObjectsAndKeys: [oldDict objectForKey: @"IP"], @"IP", allow, @"Allow", nil];
+        NSDictionary * newDict = [NSDictionary dictionaryWithObjectsAndKeys: [oldDict objectForKey: @"IP"], @"IP", allow, @"Allow", nil];
+        [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
     }
     else
     {
-        //verify ip
         NSArray * components = [object componentsSeparatedByString: @"."];
-        BOOL valid = [components count] == 4;
+        NSMutableArray * newComponents = [NSMutableArray arrayWithCapacity: 4];
         
-        NSMutableArray * newComponents;
-        if (valid)
+        //verify ip
+        if ([components count] == 4)
         {
-            newComponents = [NSMutableArray arrayWithCapacity: 4];
-            
             NSEnumerator * enumerator = [components objectEnumerator];
             NSString * component;
             while ((component = [enumerator nextObject]))
@@ -750,20 +748,14 @@
                 if ([component isEqualToString: @"*"])
                     [newComponents addObject: component];
                 else
-                {
-                    int value = [component intValue];
-                    if (value >= 0 && value < 256)
-                        [newComponents addObject: [[NSNumber numberWithInt: value] stringValue]];
-                    else
-                    {
-                        valid = NO;
-                        break;
-                    }
-                }
+                    [newComponents addObject: [[NSNumber numberWithInt: [component intValue]] stringValue]];
             }
         }
         
-        if (!valid)
+        NSString * newIP = [newComponents componentsJoinedByString: @"."];
+        //revert if ip is not valid
+        #warning fix
+        if ([newComponents count] != 4)
         {
             NSBeep();
             
@@ -777,11 +769,16 @@
             return;
         }
         
-        newDict = [NSDictionary dictionaryWithObjectsAndKeys: [newComponents componentsJoinedByString: @"."], @"IP",
-                    [oldDict objectForKey: @"Allow"], @"Allow", nil];
+        NSDictionary * newDict = [NSDictionary dictionaryWithObjectsAndKeys: newIP, @"IP",
+                                    [oldDict objectForKey: @"Allow"], @"Allow", nil];
+        [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
+        
+        NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"IP" ascending: YES selector: @selector(compareIP:)]
+                                            autorelease];
+        [fRPCAccessArray sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
+        [fRPCAccessTable deselectAll: self];
+        [fRPCAccessTable reloadData];
     }
-    
-    [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
     
     [fDefaults setObject: fRPCAccessArray forKey: @"RPCAccessList"];
     [self updateRPCAccessList];
