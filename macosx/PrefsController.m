@@ -34,6 +34,9 @@
 #define RPC_ACCESS_ALLOW    0
 #define RPC_ACCESS_BLOCK    1
 
+#define RPC_IP_ADD_TAG      0
+#define RPC_IP_REMOVE_TAG   1
+
 #define UPDATE_SECONDS 86400
 
 #define TOOLBAR_GENERAL     @"TOOLBAR_GENERAL"
@@ -143,6 +146,13 @@
     [toolbar release];
     
     [self setPrefView: nil];
+    
+    if (![NSApp isOnLeopardOrBetter])
+    {
+        [fRPCAddRemoveControl sizeToFit];
+        [fRPCAddRemoveControl setLabel: @"+" forSegment: RPC_IP_ADD_TAG];
+        [fRPCAddRemoveControl setLabel: @"-" forSegment: RPC_IP_REMOVE_TAG];
+    }
     
     //set download folder
     [fFolderPopUp selectItemAtIndex: [fDefaults boolForKey: @"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
@@ -651,22 +661,45 @@
 
 - (void) updateRPCAccessList
 {
-    NSMutableString * string = [NSMutableString stringWithCapacity: 17 * [fRPCAccessArray count]];
+    NSMutableArray * components = [NSMutableArray arrayWithCapacity: [fRPCAccessArray count]];
     
     NSEnumerator * enumerator = [fRPCAccessArray objectEnumerator];
     NSDictionary * dict;
     while ((dict = [enumerator nextObject]))
-    {
-        [string appendFormat: @"%c%@,", [[dict objectForKey: @"Allow"] boolValue] ? '+' : '-', [dict objectForKey: @"IP"]];
-    }
+        [components addObject: [NSString stringWithFormat: @"%c%@", [[dict objectForKey: @"Allow"] boolValue] ? '+' : '-',
+                                [dict objectForKey: @"IP"]]];
     
-    //remove last comma
-    NSUInteger length = [string length];
-    if (length > 0)
-        [string deleteCharactersInRange: NSMakeRange(length-1, 1)];
+    NSString * string = [components componentsJoinedByString: @","];NSLog(string);
     
     #warning check for an error!
     tr_sessionSetRPCACL(fHandle, [string UTF8String], NULL);
+}
+
+- (void) addRemoveRPCIP: (id) sender
+{
+    //don't allow add/remove when currently adding - it leads to weird results
+    if ([fRPCAccessTable editedRow] != -1)
+        return;
+    
+    if ([[sender cell] tagForSegment: [sender selectedSegment]] == RPC_IP_REMOVE_TAG)
+    {
+        [fRPCAccessArray removeObjectsAtIndexes: [fRPCAccessTable selectedRowIndexes]];
+        [fRPCAccessTable deselectAll: self];
+        [fRPCAccessTable reloadData];
+        
+        [fDefaults setObject: fRPCAccessArray forKey: @"RPCAccessList"];
+        [self updateRPCAccessList];
+    }
+    else
+    {
+        [fRPCAccessArray addObject: [NSDictionary dictionaryWithObjectsAndKeys: @"", @"IP",
+                                        [NSNumber numberWithBool: YES], @"Allow", nil]];
+        [fRPCAccessTable reloadData];
+        
+        int row = [fRPCAccessArray count] - 1;
+        [fRPCAccessTable selectRow: row byExtendingSelection: NO];
+        [fRPCAccessTable editColumn: 0 row: row withEvent: nil select: YES];
+    }
 }
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableView
@@ -703,41 +736,60 @@
     {
         //verify ip
         NSArray * components = [object componentsSeparatedByString: @"."];
-        if ([components count] != 4)
-        {
-            NSBeep();
-            return;
-        }
+        BOOL valid = [components count] == 4;
         
-        NSMutableArray * newComponents = [NSMutableArray arrayWithCapacity: 4];
-        
-        NSEnumerator * enumerator = [components objectEnumerator];
-        NSString * component;
-        while ((component = [enumerator nextObject]))
+        NSMutableArray * newComponents;
+        if (valid)
         {
-            if ([component isEqualToString: @"*"])
-                [newComponents addObject: component];
-            else
+            newComponents = [NSMutableArray arrayWithCapacity: 4];
+            
+            NSEnumerator * enumerator = [components objectEnumerator];
+            NSString * component;
+            while ((component = [enumerator nextObject]))
             {
-                int value = [component intValue];
-                if (value >= 0 && value < 256)
-                    [newComponents addObject: [[NSNumber numberWithInt: value] stringValue]];
+                if ([component isEqualToString: @"*"])
+                    [newComponents addObject: component];
                 else
                 {
-                    NSBeep();
-                    return;
+                    int value = [component intValue];
+                    if (value >= 0 && value < 256)
+                        [newComponents addObject: [[NSNumber numberWithInt: value] stringValue]];
+                    else
+                    {
+                        valid = NO;
+                        break;
+                    }
                 }
             }
         }
         
+        if (!valid)
+        {
+            NSBeep();
+            
+            if ([[oldDict objectForKey: @"IP"] isEqualToString: @""])
+            {
+                [fRPCAccessArray removeObjectAtIndex: row];
+                [fRPCAccessTable deselectAll: self];
+                [fRPCAccessTable reloadData];
+            }
+            
+            return;
+        }
+        
         newDict = [NSDictionary dictionaryWithObjectsAndKeys: [newComponents componentsJoinedByString: @"."], @"IP",
-                    [oldDict objectForKey: @"Allow"], @"Allow", nil];NSLog([newDict description]);
+                    [oldDict objectForKey: @"Allow"], @"Allow", nil];
     }
     
     [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
     
     [fDefaults setObject: fRPCAccessArray forKey: @"RPCAccessList"];
     [self updateRPCAccessList];
+}
+
+- (void) tableViewSelectionDidChange: (NSNotification *) notification
+{
+    [fRPCAddRemoveControl setEnabled: [fRPCAccessTable numberOfSelectedRows] > 0 forSegment: RPC_IP_REMOVE_TAG];
 }
 
 - (void) helpForPeers: (id) sender

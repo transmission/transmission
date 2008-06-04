@@ -59,6 +59,7 @@
     
     IBOutlet NSTextField * fRPCPortField;
     IBOutlet NSTableView * fRPCAccessTable;
+    IBOutlet NSSegmentedControl * fRPCAddRemoveControl;
     NSMutableArray * fRPCAccessArray;
 }
 
@@ -117,12 +118,13 @@
 
 - (void) setAutoSize: (id) sender;
 
-- (void) helpForPeers: (id) sender;
-- (void) helpForNetwork: (id) sender;
-
 - (void) setRPCEnabled: (id) sender;
 - (void) setRPCPort: (id) sender;
 - (void) updateRPCAccessList;
+- (void) addRemoveRPCIP: (id) sender;
+
+- (void) helpForPeers: (id) sender;
+- (void) helpForNetwork: (id) sender;
 
 - (void) rpcUpdatePrefs;
 

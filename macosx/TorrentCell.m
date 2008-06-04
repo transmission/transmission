@@ -777,7 +777,7 @@
         [bitmap setColor: pieceColor atX: i y: 0];
     }
     
-    [torrent setPreviousAmountFinished: piecePercent];
+    [torrent setPreviousAmountFinished: piecePercent]; //holds onto piecePercent, so no need to release it here
     
     //actually draw image
     [bitmap drawInRect: barRect];
