@@ -31,6 +31,9 @@
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
 
+#define RPC_ACCESS_ALLOW    0
+#define RPC_ACCESS_BLOCK    1
+
 #define UPDATE_SECONDS 86400
 
 #define TOOLBAR_GENERAL     @"TOOLBAR_GENERAL"
@@ -94,6 +97,13 @@
         
         //actually set bandwidth limits
         [self applySpeedSettings: nil];
+        
+        //update rpc access list
+        fRPCAccessArray = [[fDefaults arrayForKey: @"RPCAccessList"] mutableCopy];
+        if (!fRPCAccessArray)
+            fRPCAccessArray = [[NSMutableArray arrayWithObject: [NSDictionary dictionaryWithObjectsAndKeys: @"127.0.0.1", @"IP",
+                                [NSNumber numberWithBool: YES], @"Allow", nil]] retain];
+        [self updateRPCAccessList];
     }
     
     return self;
@@ -113,6 +123,8 @@
         [fPortChecker cancelProbe];
         [fPortChecker release];
     }
+    
+    [fRPCAccessArray release];
     
     [super dealloc];
 }
@@ -635,6 +647,97 @@
     int port = [sender intValue];
     [fDefaults setInteger: port forKey: @"RPCPort"];
     tr_sessionSetRPCPort(fHandle, port);
+}
+
+- (void) updateRPCAccessList
+{
+    NSMutableString * string = [NSMutableString stringWithCapacity: 17 * [fRPCAccessArray count]];
+    
+    NSEnumerator * enumerator = [fRPCAccessArray objectEnumerator];
+    NSDictionary * dict;
+    while ((dict = [enumerator nextObject]))
+    {
+        [string appendFormat: @"%c%@,", [[dict objectForKey: @"Allow"] boolValue] ? '+' : '-', [dict objectForKey: @"IP"]];
+    }
+    
+    //remove last comma
+    NSUInteger length = [string length];
+    if (length > 0)
+        [string deleteCharactersInRange: NSMakeRange(length-1, 1)];
+    
+    #warning check for an error!
+    tr_sessionSetRPCACL(fHandle, [string UTF8String], NULL);
+}
+
+- (NSInteger) numberOfRowsInTableView: (NSTableView *) tableView
+{
+    return [fRPCAccessArray count];
+}
+
+- (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
+{
+    NSDictionary * dict = [fRPCAccessArray objectAtIndex: row];
+    
+    NSString * ident = [tableColumn identifier];
+    if ([ident isEqualToString: @"Permission"])
+    {
+        int allow = [[dict objectForKey: @"Allow"] boolValue] ? RPC_ACCESS_ALLOW : RPC_ACCESS_BLOCK;
+        return [NSNumber numberWithInt: allow];
+    }
+    else
+        return [dict objectForKey: @"IP"];
+}
+
+- (void) tableView: (NSTableView *) tableView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn
+    row: (NSInteger) row
+{
+    NSDictionary * oldDict = [fRPCAccessArray objectAtIndex: row], * newDict;
+    
+    NSString * ident = [tableColumn identifier];
+    if ([ident isEqualToString: @"Permission"])
+    {
+        NSNumber * allow = [NSNumber numberWithBool: [object intValue] == RPC_ACCESS_ALLOW];
+        newDict = [NSDictionary dictionaryWithObjectsAndKeys: [oldDict objectForKey: @"IP"], @"IP", allow, @"Allow", nil];
+    }
+    else
+    {
+        //verify ip
+        NSArray * components = [object componentsSeparatedByString: @"."];
+        if ([components count] != 4)
+        {
+            NSBeep();
+            return;
+        }
+        
+        NSMutableArray * newComponents = [NSMutableArray arrayWithCapacity: 4];
+        
+        NSEnumerator * enumerator = [components objectEnumerator];
+        NSString * component;
+        while ((component = [enumerator nextObject]))
+        {
+            if ([component isEqualToString: @"*"])
+                [newComponents addObject: component];
+            else
+            {
+                int value = [component intValue];
+                if (value >= 0 && value < 256)
+                    [newComponents addObject: [[NSNumber numberWithInt: value] stringValue]];
+                else
+                {
+                    NSBeep();
+                    return;
+                }
+            }
+        }
+        
+        newDict = [NSDictionary dictionaryWithObjectsAndKeys: [newComponents componentsJoinedByString: @"."], @"IP",
+                    [oldDict objectForKey: @"Allow"], @"Allow", nil];NSLog([newDict description]);
+    }
+    
+    [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
+    
+    [fDefaults setObject: fRPCAccessArray forKey: @"RPCAccessList"];
+    [self updateRPCAccessList];
 }
 
 - (void) helpForPeers: (id) sender

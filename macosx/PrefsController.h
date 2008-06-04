@@ -58,6 +58,8 @@
     int fPeerPort, fNatStatus;
     
     IBOutlet NSTextField * fRPCPortField;
+    IBOutlet NSTableView * fRPCAccessTable;
+    NSMutableArray * fRPCAccessArray;
 }
 
 - (id) initWithHandle: (tr_handle *) handle;
@@ -120,6 +122,7 @@
 
 - (void) setRPCEnabled: (id) sender;
 - (void) setRPCPort: (id) sender;
+- (void) updateRPCAccessList;
 
 - (void) rpcUpdatePrefs;
 

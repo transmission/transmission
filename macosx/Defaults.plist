@@ -84,10 +84,6 @@
 	<string>Constant</string>
 	<key>NatTraversal</key>
 	<true/>
-	<key>RPC</key>
-	<false/>
-	<key>RPCPort</key>
-	<integer>9091</integer>
 	<key>PEXGlobal</key>
 	<true/>
 	<key>PeersTorrent</key>
@@ -114,6 +110,10 @@
 	<false/>
 	<key>RatioLimit</key>
 	<integer>2</integer>
+	<key>RPC</key>
+	<false/>
+	<key>RPCPort</key>
+	<integer>9091</integer>
 	<key>SeedingSound</key>
 	<string>Submarine</string>
 	<key>ShowInspector</key>

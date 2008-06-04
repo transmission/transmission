@@ -219,7 +219,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 TR_DEFAULT_PEER_SOCKET_TOS,
                                 [fDefaults boolForKey: @"RPC"],
                                 [fDefaults integerForKey: @"RPCPort"],
-                                TR_DEFAULT_RPC_ACL);
+                                /*TR_DEFAULT_RPC_ACL*/"");
         
         [NSApp setDelegate: self];
         
