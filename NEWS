@@ -4,6 +4,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 http://trac.transmissionbt.com/query?group=component&milestone=1.30&order=severity
 - All Platforms
    + Ability to add and remove tracker addresses
+   + Ability to create torrent files with multiple tracker addresses
    + Creation of torrent files with no tracker address (for easier creation for upload to some tracker sites)
 - Mac
    + Quick Look integration in the main window and inspector's file tab

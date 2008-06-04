@@ -29,7 +29,9 @@
 @interface CreatorWindowController : NSWindowController
 {
     IBOutlet NSImageView * fIconView;
-    IBOutlet NSTextField * fNameField, * fStatusField, * fPiecesField, * fTrackerField, * fLocationField;
+    IBOutlet NSTextField * fNameField, * fStatusField, * fPiecesField, * fLocationField;
+    IBOutlet NSTableView * fTrackerTable;
+    IBOutlet NSSegmentedControl * fTrackerAddRemoveControl;
     IBOutlet NSTextView * fCommentView;
     IBOutlet NSButton * fPrivateCheck, * fOpenCheck;
     
@@ -37,7 +39,8 @@
     IBOutlet NSProgressIndicator * fProgressIndicator;
     
     tr_metainfo_builder * fInfo;
-    NSString * fPath, * fLocation, * fTracker;
+    NSString * fPath, * fLocation;
+    NSMutableArray * fTrackers;
     BOOL fOpenTorrent;
     
     NSTimer * fTimer;
@@ -57,5 +60,7 @@
 - (void) create: (id) sender;
 - (void) cancelCreateWindow: (id) sender;
 - (void) cancelCreateProgress: (id) sender;
+
+- (void) addRemoveTracker: (id) sender;
 
 @end

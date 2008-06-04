@@ -27,10 +27,13 @@
 #import "NSStringAdditions.h"
 #include "utils.h" //tr_httpIsValidURL
 
+#define TRACKER_ADD_TAG 0
+#define TRACKER_REMOVE_TAG 1
+
 @interface CreatorWindowController (Private)
 
 + (NSString *) chooseFile;
-- (void) updateEnableOpenCheckForTrackerField;
+- (void) updateEnableOpenCheckForTrackers;
 - (void) locationSheetClosed: (NSSavePanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 
 - (void) createBlankAddressAlertDidEnd: (NSAlert *) alert returnCode: (int) returnCode contextInfo: (void *) contextInfo;
@@ -102,6 +105,21 @@
         }
         
         fDefaults = [NSUserDefaults standardUserDefaults];
+        
+        //get list of trackers
+        if (!(fTrackers = [[fDefaults arrayForKey: @"CreatorTrackers"] mutableCopy]))
+        {
+            fTrackers = [[NSMutableArray alloc] initWithCapacity: 1];
+            
+            //check for tracker from versions before 1.3
+            NSString * tracker;
+            if ((tracker = [fDefaults stringForKey: @"CreatorTracker"]))
+            {
+                [fTrackers addObject: tracker];
+                [fDefaults removeObjectForKey: @"CreatorTracker"];
+                [fDefaults setObject: fTrackers forKey: @"CreatorTrackers"];
+            }
+        }NSLog([fTrackers description]);
     }
     return self;
 }
@@ -151,15 +169,18 @@
     [fLocationField setToolTip: fLocation];
     
     //set previously saved values
-    NSString * tracker;
-    if ((tracker = [fDefaults stringForKey: @"CreatorTracker"]))
-        [fTrackerField setStringValue: tracker];
-    
     if ([fDefaults objectForKey: @"CreatorPrivate"])
         [fPrivateCheck setState: [fDefaults boolForKey: @"CreatorPrivate"] ? NSOnState : NSOffState];
     
     fOpenTorrent = [fDefaults boolForKey: @"CreatorOpen"];
-    [self updateEnableOpenCheckForTrackerField];
+    [self updateEnableOpenCheckForTrackers];
+    
+    if (![NSApp isOnLeopardOrBetter])
+    {
+        [fTrackerAddRemoveControl sizeToFit];
+        [fTrackerAddRemoveControl setLabel: @"+" forSegment: TRACKER_ADD_TAG];
+        [fTrackerAddRemoveControl setLabel: @"-" forSegment: TRACKER_REMOVE_TAG];
+    }
 }
 
 - (void) dealloc
@@ -167,7 +188,7 @@
     [fPath release];
     [fLocation release];
     
-    [fTracker release];
+    [fTrackers release];
     
     if (fInfo)
         tr_metaInfoBuilderFree(fInfo);
@@ -181,12 +202,6 @@
 - (void) toggleOpenCheck: (id) sender
 {
     fOpenTorrent = [fOpenCheck state] == NSOnState;
-}
-
-- (void) controlTextDidChange: (NSNotification *) notification
-{
-    if ([notification object] == fTrackerField)
-        [self updateEnableOpenCheckForTrackerField];
 }
 
 - (void) setLocation: (id) sender
@@ -207,7 +222,7 @@
 
 - (void) create: (id) sender
 {
-    if ([[fTrackerField stringValue] isEqualToString: @""] && [fDefaults boolForKey: @"WarningCreatorBlankAddress"])
+    if ([fTrackers count] == 0 && [fDefaults boolForKey: @"WarningCreatorBlankAddress"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: NSLocalizedString(@"The tracker address is blank.", "Create torrent -> blank address -> title")];
@@ -245,6 +260,70 @@
     [fTimer fire];
 }
 
+- (NSInteger) numberOfRowsInTableView: (NSTableView *) tableView
+{
+    return [fTrackers count];
+}
+
+- (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
+{
+    return [fTrackers objectAtIndex: row];
+}
+
+- (void) addRemoveTracker: (id) sender
+{
+    //don't allow add/remove when currently adding - it leads to weird results
+    if ([fTrackerTable editedRow] != -1)
+        return;
+    
+    if ([[sender cell] tagForSegment: [sender selectedSegment]] == TRACKER_REMOVE_TAG)
+    {
+        [fTrackers removeObjectsAtIndexes: [fTrackerTable selectedRowIndexes]];
+        
+        [fTrackerTable deselectAll: self];
+        [fTrackerTable reloadData];
+        
+        [self updateEnableOpenCheckForTrackers];
+    }
+    else
+    {
+        [fTrackers addObject: @""];
+        [fTrackerTable reloadData];
+        
+        int row = [fTrackers count] - 1;
+        [fTrackerTable selectRow: row byExtendingSelection: NO];
+        [fTrackerTable editColumn: 0 row: row withEvent: nil select: YES];
+    }
+}
+
+- (void) tableView: (NSTableView *) tableView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn
+    row: (NSInteger) row
+{
+    NSString * tracker = (NSString *)object;
+    
+    if ([tracker rangeOfString: @"://"].location == NSNotFound)
+        tracker = [@"http://" stringByAppendingString: tracker];
+    
+    if (!tr_httpIsValidURL([tracker UTF8String]))
+    {
+        NSBeep();
+        [fTrackers removeObjectAtIndex: row];
+    }
+    else
+    {
+        [fTrackers replaceObjectAtIndex: row withObject: tracker];
+        [self updateEnableOpenCheckForTrackers];
+    }
+    
+    [fTrackerTable deselectAll: self];
+    [fTrackerTable reloadData];
+}
+
+- (void) tableViewSelectionDidChange: (NSNotification *) notification
+{
+    [fTrackerAddRemoveControl setEnabled: [fTrackerTable numberOfSelectedRows] > 0 forSegment: TRACKER_REMOVE_TAG];
+}
+
 @end
 
 @implementation CreatorWindowController (Private)
@@ -266,9 +345,9 @@
     return success ? [[panel filenames] objectAtIndex: 0] : nil;
 }
 
-- (void) updateEnableOpenCheckForTrackerField
+- (void) updateEnableOpenCheckForTrackers
 {
-    BOOL hasTracker = ![[fTrackerField stringValue] isEqualToString: @""];
+    BOOL hasTracker = [fTrackers count] > 0;
     [fOpenCheck setEnabled: hasTracker];
     [fOpenCheck setState: (fOpenTorrent && hasTracker) ? NSOnState : NSOffState];
 }
@@ -319,15 +398,15 @@
         return;
     }
     
-    [fTracker release]; //incase a previous create was aborted
-    fTracker = [[fTrackerField stringValue] retain];
-    
     //parse non-empty tracker strings
-    tr_tracker_info trackerInfo;
-    BOOL isTracker = NO;
-    if (![fTracker isEqualToString: @""])
+    tr_tracker_info * trackerInfo = tr_new0(tr_tracker_info, [fTrackers count]);
+    
+    NSUInteger i;
+    for (i = 0; i < [fTrackers count]; i++)
+        trackerInfo[i].announce = (char *)[[fTrackers objectAtIndex: i] UTF8String];
+    
+    /*if ([fTrackers count] > 0)
     {
-        isTracker = YES;
         if ([fTracker rangeOfString: @"://"].location == NSNotFound)
         {
             NSString * fullTracker = [@"http://" stringByAppendingString: fTracker];
@@ -335,6 +414,10 @@
             fTracker = [fullTracker retain];
         }
         
+        #warning remove
+        NSString * fTracker = [fTrackers objectAtIndex: 0];
+        
+        #warning move to adding
         if (!tr_httpIsValidURL([fTracker UTF8String]))
         {
             NSAlert * alert = [[[NSAlert alloc] init] autorelease];
@@ -357,17 +440,18 @@
         
         trackerInfo.tier = 0;
         trackerInfo.announce = (char *)[fTracker UTF8String];
-    }
+    }*/
     
     //store values
-    [fDefaults setObject: fTracker forKey: @"CreatorTracker"];
+    [fDefaults setObject: fTrackers forKey: @"CreatorTrackers"];
     [fDefaults setBool: [fPrivateCheck state] == NSOnState forKey: @"CreatorPrivate"];
     [fDefaults setBool: fOpenTorrent forKey: @"CreatorOpen"];
     [fDefaults setObject: [fLocation stringByDeletingLastPathComponent] forKey: @"CreatorLocation"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"BeginCreateTorrentFile" object: fLocation userInfo: nil];
-    tr_makeMetaInfo(fInfo, [fLocation UTF8String], &trackerInfo, isTracker ? 1 : 0, [[fCommentView string] UTF8String],
+    tr_makeMetaInfo(fInfo, [fLocation UTF8String], trackerInfo, [fTrackers count], [[fCommentView string] UTF8String],
                     [fPrivateCheck state] == NSOnState);
+    tr_free(trackerInfo);
     
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 0.1 target: self selector: @selector(checkProgress)
                 userInfo: nil repeats: YES];
@@ -384,7 +468,7 @@
         switch (fInfo->result)
         {
             case TR_MAKEMETA_OK:
-                if (fOpenTorrent && ![fTracker isEqualToString: @""])
+                if (fOpenTorrent && [fTrackers count] > 0)
                 {
                     NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: fLocation, @"File",
                                             [fPath stringByDeletingLastPathComponent], @"Path", nil];
