@@ -671,8 +671,13 @@
     
     NSString * string = [components componentsJoinedByString: @","];
     
-    #warning check for an error!
-    tr_sessionSetRPCACL(fHandle, [string UTF8String], NULL);
+    char ** error = (char **)tr_malloc(sizeof(char **));
+    if (tr_sessionSetRPCACL(fHandle, [string UTF8String], error))
+    {
+        NSLog([NSString stringWithUTF8String: *error]);
+        tr_free(*error);
+    }
+    tr_free(error);
 }
 
 - (void) addRemoveRPCIP: (id) sender
