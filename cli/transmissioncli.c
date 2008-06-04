@@ -59,6 +59,7 @@ const char * USAGE =
 "  -f, --finish <script>     Command you wish to run on completion\n" 
 "  -n  --nat-traversal       Attempt NAT traversal using NAT-PMP or UPnP IGD\n"
 "  -p, --port <int>          Port we should listen on (default = %d)\n"
+"  -t, --tos <int>           Peer socket TOS (0 to 255, default = 32)\n"
 "  -u, --upload <int>        Maximum upload rate (-1 = no limit, default = 20)\n"
 "  -v, --verbose <int>       Verbose level (0 to 2, default = 0)\n"
 "  -y, --recheck             Force a recheck of the torrent data\n";
@@ -70,6 +71,7 @@ static int           showVersion   = 0;
 static int           isPrivate     = 0;
 static int           verboseLevel  = 0;
 static int           peerPort      = TR_DEFAULT_PORT;
+static int           peerSocketTOS = TR_DEFAULT_PEER_SOCKET_TOS;
 static int           uploadLimit   = 20;
 static int           downloadLimit = -1;
 static char        * torrentPath   = NULL;
@@ -142,6 +144,12 @@ main( int argc, char ** argv )
         return EXIT_FAILURE;
     }
 
+    if( peerSocketTOS < 0 || peerSocketTOS > 255 )
+    {
+        printf( "Invalid TOS '%d'\n", peerSocketTOS );
+        return EXIT_FAILURE;
+    }
+
     /* don't bind the port if we're just running the CLI 
      * to get metainfo or to create a torrent */
     if( showInfo || showScrape || ( sourceFile != NULL ) )
@@ -167,7 +175,7 @@ main( int argc, char ** argv )
             verboseLevel + 1,              /* messageLevel */
             0,                             /* is message queueing enabled? */
             TR_DEFAULT_BLOCKLIST_ENABLED,
-            TR_DEFAULT_PEER_SOCKET_TOS,
+            peerSocketTOS,
             TR_DEFAULT_RPC_ENABLED,
             TR_DEFAULT_RPC_PORT,
             TR_DEFAULT_RPC_ACL );
@@ -397,6 +405,7 @@ parseCommandLine( int argc, char ** argv )
             { "port",          required_argument, NULL, 'p' },
             { "private",       no_argument,       NULL, 'r' },
             { "scrape",        no_argument,       NULL, 's' },
+            { "tos",           required_argument, NULL, 't' },
             { "upload",        required_argument, NULL, 'u' },
             { "verbose",       required_argument, NULL, 'v' },
             { "version",       no_argument,       NULL, 'V' },
@@ -404,7 +413,7 @@ parseCommandLine( int argc, char ** argv )
             { 0, 0, 0, 0} };
         int optind = 0;
         int c = getopt_long( argc, argv,
-                             "a:c:d:f:g:him:no:p:rsu:v:Vy",
+                             "a:c:d:f:g:him:no:p:rst:u:v:Vy",
                              long_options, &optind );
         if( c < 0 )
         {
@@ -425,6 +434,7 @@ parseCommandLine( int argc, char ** argv )
             case 'p': peerPort = atoi( optarg ); break;
             case 'r': isPrivate = 1; break;
             case 's': showScrape = 1; break;
+            case 't': peerSocketTOS = atoi( optarg ); break;
             case 'u': uploadLimit = atoi( optarg ); break;
             case 'v': verboseLevel = atoi( optarg ); break;
             case 'V': showVersion = 1; break;
