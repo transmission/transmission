@@ -60,12 +60,12 @@ typedef struct
 }
 tr_tracker_event;
 
-tr_publisher_tag  tr_trackerSubscribe       ( struct tr_tracker * tag,
-                                              tr_delivery_func      func,
-                                              void                * user );
+tr_publisher_tag  tr_trackerSubscribe       ( struct tr_tracker      * tag,
+                                              tr_delivery_func         func,
+                                              void                   * user );
 
-void              tr_trackerUnsubscribe     ( struct tr_tracker * tracker,
-                                              tr_publisher_tag      tag );
+void              tr_trackerUnsubscribe     ( struct tr_tracker      * tracker,
+                                              tr_publisher_tag         tag );
 
 /***
 ****
@@ -84,7 +84,7 @@ void tr_trackerReannounce                   ( struct tr_tracker * );
 
 void tr_trackerChangeMyPort                 ( struct tr_tracker * );
 
-const tr_tracker_info * tr_trackerGetAddress( const struct tr_tracker * );
+const tr_tracker_info * tr_trackerGetAddress( struct tr_tracker * );
 
 int  tr_trackerCanManualAnnounce            ( const struct tr_tracker * );
 

@@ -115,15 +115,20 @@ struct tr_tracker
 ***/
 
 static const tr_tracker_info *
-getCurrentAddressFromTorrent( const tr_tracker * t, const tr_torrent * tor )
+getCurrentAddressFromTorrent( tr_tracker * t, const tr_torrent * tor )
 {
+    /* user might have removed trackers,
+     * so check to make sure our current index is in-bounds */
+    if( t->trackerIndex >= tor->info.trackerCount )
+        t->trackerIndex = 0;
+
     assert( t->trackerIndex >= 0 );
     assert( t->trackerIndex < tor->info.trackerCount );
     return tor->info.trackers + t->trackerIndex;
 }
     
 static const tr_tracker_info *
-getCurrentAddress( const tr_tracker * t )
+getCurrentAddress( tr_tracker * t )
 {
     const tr_torrent * torrent;
     if(( torrent = tr_torrentFindFromHash( t->session, t->hash )))
@@ -132,7 +137,7 @@ getCurrentAddress( const tr_tracker * t )
 }
 
 static int
-trackerSupportsScrape( const tr_tracker * t, const tr_torrent * tor )
+trackerSupportsScrape( tr_tracker * t, const tr_torrent * tor )
 {
     const tr_tracker_info * info = getCurrentAddressFromTorrent( t, tor );
     return info && info->scrape;
@@ -554,7 +559,7 @@ freeRequest( struct tr_tracker_request * req )
 }
 
 static void
-buildTrackerRequestURI( const tr_tracker  * t,
+buildTrackerRequestURI( tr_tracker        * t,
                         const tr_torrent  * torrent,
                         const char        * eventName,
                         struct evbuffer   * buf )
@@ -592,7 +597,7 @@ buildTrackerRequestURI( const tr_tracker  * t,
 }
 
 static struct tr_tracker_request*
-createRequest( tr_session * session, const tr_tracker * tracker, int reqtype )
+createRequest( tr_session * session, tr_tracker * tracker, int reqtype )
 {
     static const char* strings[] = { "started", "completed", "stopped", "", "err" };
     const tr_torrent * torrent = tr_torrentFindFromHash( session, tracker->hash );
@@ -617,7 +622,7 @@ createRequest( tr_session * session, const tr_tracker * tracker, int reqtype )
 }
 
 static struct tr_tracker_request*
-createScrape( tr_session * session, const tr_tracker * tracker )
+createScrape( tr_session * session, tr_tracker * tracker )
 {
     const tr_tracker_info * a = getCurrentAddress( tracker );
     struct tr_tracker_request * req;
@@ -726,7 +731,7 @@ invokeRequest( void * vreq )
 static void ensureGlobalsExist( tr_session * );
 
 static void
-enqueueScrape( tr_session * session, const tr_tracker * tracker )
+enqueueScrape( tr_session * session, tr_tracker * tracker )
 {
     struct tr_tracker_request * req;
     ensureGlobalsExist( session );
@@ -735,7 +740,7 @@ enqueueScrape( tr_session * session, const tr_tracker * tracker )
 }
 
 static void
-enqueueRequest( tr_session * session, const tr_tracker * tracker, int reqtype )
+enqueueRequest( tr_session * session, tr_tracker * tracker, int reqtype )
 {
     struct tr_tracker_request * req;
     ensureGlobalsExist( session );
@@ -899,7 +904,7 @@ tr_trackerUnsubscribe( tr_tracker        * t,
 }
 
 const tr_tracker_info *
-tr_trackerGetAddress( const tr_tracker   * t )
+tr_trackerGetAddress( tr_tracker   * t )
 {
     return getCurrentAddress( t );
 }
