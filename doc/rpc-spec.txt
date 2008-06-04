@@ -83,16 +83,27 @@
 
    Request arguments: none.
 
-   Response arguments: "list", an array of objects that contain seven keys:
+   Response arguments: "list", an array of objects that contain these keys:
 
-   key                 | value type
-   --------------------+-------------------------------------------------
-   "hashString"        | string
-   "id"                | number
-   "name"              | string
-   "rateDownload"      | double
-   "rateUpload"        | double
-   "ratio"             | double
+   key                   | value type
+   ----------------------+-------------------------------------------------
+   "downloadedEver"      | number
+   "eta"                 | number
+   "hashString"          | string
+   "id"                  | number
+   "name"                | string
+   "peersConnected"      | number
+   "peersSendingToUs"    | number
+   "peersGettingFromUs"  | number
+   "percentDone"         | double
+   "rateDownload"        | double
+   "rateUpload"          | double
+   "ratio"               | double
+   "sizeWhenDone"        | number
+   "status"              | number
+   "uploadedEver"        | number
+
+
 
 3.3.  Torrent Info Requests
 

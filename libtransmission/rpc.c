@@ -296,17 +296,26 @@ torrentList( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
     tr_torrent ** torrents = getTorrents( handle, args_in, &torrentCount );
     tr_benc * list = tr_bencDictAddList( args_out, "list", torrentCount );
 
-    for( i=0; i<torrentCount; ++i ) {
+    for( i=0; i<torrentCount; ++i )
+    {
         tr_torrent * tor = torrents[i];
         const tr_stat * st = tr_torrentStat( tor );
-        tr_benc * d = tr_bencListAddDict( list, 7 );
+        tr_benc * d = tr_bencListAddDict( list, 15 );
+        tr_bencDictAddInt( d, "downloadedEver", st->downloadedEver );
+        tr_bencDictAddInt( d, "eta", st->eta );
         tr_bencDictAddStr( d, "hashString", tor->info.hashString );
         tr_bencDictAddInt( d, "id", tr_torrentId( tor ) );
         tr_bencDictAddStr( d, "name", tor->info.name );
+        tr_bencDictAddInt( d, "peersConnected", st->peersConnected );
+        tr_bencDictAddInt( d, "peersGettingFromUs", st->peersGettingFromUs );
+        tr_bencDictAddInt( d, "peersSendingToUs", st->peersSendingToUs );
+        tr_bencDictAddDouble( d, "percentDone", st->percentDone );
         tr_bencDictAddDouble( d, "rateDownload", st->rateDownload );
         tr_bencDictAddDouble( d, "rateUpload", st->rateUpload );
         tr_bencDictAddDouble( d, "ratio", st->ratio );
+        tr_bencDictAddInt( d, "sizeWhenDone", st->sizeWhenDone );
         tr_bencDictAddInt( d, "status", st->status );
+        tr_bencDictAddInt( d, "uploadedEver", st->uploadedEver );
     }
 
     tr_free( torrents );
