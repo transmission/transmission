@@ -10,7 +10,9 @@
  * $Id$
  */
 
+#include <ctype.h> /* isspace */
 #include <errno.h>
+#include <stdarg.h>
 #include <stdlib.h> /* free() */
 #include <unistd.h>
 #include <glib/gi18n.h>
@@ -214,13 +216,6 @@ target_cb( GtkWidget * tb, gpointer target )
 {
     const gboolean b = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( tb ) );
     gtk_widget_set_sensitive( GTK_WIDGET(target), b );
-}
-
-static void
-toggle_sets_sensitivity( GtkWidget * t, GtkWidget * w)
-{
-    target_cb( t, w );
-    g_signal_connect( t, "toggled", G_CALLBACK( target_cb ), w );
 }
 
 struct test_port_data
@@ -580,95 +575,118 @@ allow_deny_model_new( void )
 
 enum
 {
-    COL_ALLOW, COL_IP_1, COL_IP_2, COL_IP_3, COL_IP_4,
-    COL_MASK, COL_DOT, N_COLS
+    COL_ADDRESS,
+    COL_PERMISSION,
+    N_COLS
 };
 
 static GtkTreeModel*
-acl_tree_model_new( const char * str UNUSED )
+acl_tree_model_new( const char * acl )
 {
-    GtkTreeIter iter;
+    int i;
+    char ** rules;
     GtkListStore * store = gtk_list_store_new( N_COLS,
                                                G_TYPE_STRING,
-                                               G_TYPE_INT, G_TYPE_INT,
-                                               G_TYPE_INT, G_TYPE_INT,
-                                               G_TYPE_INT,
                                                G_TYPE_STRING );
-    gtk_list_store_append( store, &iter );
-    gtk_list_store_set( store, &iter, COL_ALLOW, _( "Allow" ),
-                                      COL_IP_1, 127, COL_IP_2, 0, COL_IP_3, 0, COL_IP_4, 1,
-                                      COL_MASK, 32, COL_DOT, ".",
-                                      -1 );
-    gtk_list_store_append( store, &iter );
-    gtk_list_store_set( store, &iter, COL_ALLOW, _( "Deny" ),
-                                      COL_IP_1, 192, COL_IP_2, 168, COL_IP_3, 1, COL_IP_4, 666,
-                                      COL_MASK, 32, COL_DOT, ".",
-                                      -1 );
-    gtk_list_store_append( store, &iter );
-    gtk_list_store_set( store, &iter, COL_ALLOW, _( "Allow" ),
-                                      COL_IP_1, 255, COL_IP_2, 255, COL_IP_3, 255, COL_IP_4, 255,
-                                      COL_MASK, 32, COL_DOT, ".",
-                                      -1 );
+    rules = g_strsplit( acl, ",", 0 );
+
+    for( i=0; rules && rules[i]; ++i )
+    {
+        const char * s = rules[i];
+        while( isspace( *s ) ) ++s;
+        if( *s=='+' || *s=='-' )
+        {
+            GtkTreeIter iter;
+            gtk_list_store_append( store, &iter );
+            gtk_list_store_set( store, &iter,
+                COL_PERMISSION, *s=='+' ? _( "Allow" ) : _( "Deny" ) ,
+                COL_ADDRESS, s+1,
+                -1 );
+        }
+    }
+
+    g_strfreev( rules );
     return GTK_TREE_MODEL( store );
 }
 
 struct remote_page
 {
+    TrCore * core;
     GtkTreeView * view;
     GtkListStore * store;
     GtkWidget * remove_button;
+    GtkWidget * pw_entry;
+    GSList * widgets;
+    GtkToggleButton * rpc_tb;
+    GtkToggleButton * pw_tb;
 };
 
 static void
-onACLSelectionChanged( GtkTreeSelection  * sel,
-                       gpointer            gpage )
+refreshACL( struct remote_page * page )
 {
-    struct remote_page * page = gpage;
-    gboolean has_selection = gtk_tree_selection_get_selected( sel, NULL, NULL );
-    gtk_widget_set_sensitive( page->remove_button, has_selection );
+    GtkTreeIter iter;
+    GtkTreeModel * model = GTK_TREE_MODEL( page->store );
+    GString * gstr = g_string_new( NULL );
+
+    if( gtk_tree_model_get_iter_first( model, &iter ) ) do
+    {
+        char * permission;
+        char * address;
+        gtk_tree_model_get( model, &iter, COL_PERMISSION, &permission,
+                                          COL_ADDRESS, &address,
+                                          -1 );
+        g_string_append_c( gstr, strcmp(permission,_("Allow")) ? '-' : '+' );
+        g_string_append( gstr, address );
+        g_string_append( gstr, ", " );
+        g_free( address );
+        g_free( permission );
+    }
+    while( gtk_tree_model_iter_next( model, &iter ) );
+
+    g_string_truncate( gstr, gstr->len-2 ); /* remove the trailing ", " */
+
+    tr_core_set_pref( page->core, PREF_KEY_RPC_ACL, gstr->str );
+
+    g_string_free( gstr, TRUE );
 }
 
 static void
-onAllowEdited( GtkCellRendererText  * renderer UNUSED,
-               gchar                * path_string,
-               gchar                * new_text,
-               gpointer               gpage )
+onPermissionEdited( GtkCellRendererText  * renderer UNUSED,
+                    gchar                * path_string,
+                    gchar                * new_text,
+                    gpointer               gpage )
 {
     GtkTreeIter iter;
     GtkTreePath * path = gtk_tree_path_new_from_string( path_string );
     struct remote_page * page = gpage;
     GtkTreeModel * model = GTK_TREE_MODEL( page->store );
     if( gtk_tree_model_get_iter( model, &iter, path ) )
-        gtk_list_store_set( page->store, &iter, COL_ALLOW, new_text, -1 );
+        gtk_list_store_set( page->store, &iter, COL_PERMISSION, new_text, -1 );
     gtk_tree_path_free( path );
+    refreshACL( page );
 }
 
-#define IP_OFFSET "ip-offset"
-
 static void
-onNumberEdited( GtkCellRendererText  * r,
-                gchar                * path_string,
-                gchar                * new_text,
-                gpointer               gpage )
+onAddressEdited( GtkCellRendererText  * r UNUSED,
+                 gchar                * path_string,
+                 gchar                * new_text,
+                 gpointer               gpage )
 {
+    char * acl;
     GtkTreeIter iter;
-    GtkTreePath * path = gtk_tree_path_new_from_string( path_string );
     struct remote_page * page = gpage;
     GtkTreeModel * model = GTK_TREE_MODEL( page->store );
-    char * end;
-    int i;
-    int ip_offset = GPOINTER_TO_INT( g_object_get_data( G_OBJECT( r ), IP_OFFSET ) );
+    tr_handle * session = tr_core_handle( page->core );
+    GtkTreePath * path = gtk_tree_path_new_from_string( path_string );
 
-    /* only allow [0...255] */
-    errno = 0;
-    i = strtol( new_text, &end, 10 );
-    if( i<0 || i>255 || *end || errno )
-        return;
+    acl = g_strdup_printf( "+%s", new_text );
+    if( !tr_sessionTestRPCACL( session, acl, NULL ) )
+        if( gtk_tree_model_get_iter( model, &iter, path ) )
+            gtk_list_store_set( page->store, &iter, COL_ADDRESS, new_text, -1 );
 
-    if( gtk_tree_model_get_iter( model, &iter, path ) )
-        gtk_list_store_set( page->store, &iter, COL_IP_1+ip_offset, i, -1 );
-
+    g_free( acl );
     gtk_tree_path_free( path );
+    refreshACL( page );
 }
 
 static void
@@ -679,15 +697,15 @@ onAddACLClicked( GtkButton * b UNUSED, gpointer gpage )
     struct remote_page * page = gpage;
     gtk_list_store_append( page->store, &iter );
     gtk_list_store_set( page->store, &iter,
-                        COL_ALLOW, _( "Allow" ),
-                        COL_IP_1, 0, COL_IP_2, 0,
-                        COL_IP_3, 0, COL_IP_4, 0,
+                        COL_PERMISSION, _( "Allow" ),
+                        COL_ADDRESS, _( "0.0.0.0" ),
                         -1 );
 
     path = gtk_tree_model_get_path( GTK_TREE_MODEL( page->store ), &iter );
-    gtk_tree_view_set_cursor( page->view, path,
-                              gtk_tree_view_get_column( page->view, COL_IP_1 ),
-                              TRUE );
+    gtk_tree_view_set_cursor(
+        page->view, path,
+        gtk_tree_view_get_column( page->view, COL_ADDRESS ),
+        TRUE );
     gtk_tree_path_free( path );
 }
 
@@ -698,7 +716,46 @@ onRemoveACLClicked( GtkButton * b UNUSED, gpointer gpage )
     GtkTreeSelection * sel = gtk_tree_view_get_selection( page->view );
     GtkTreeIter iter;
     if( gtk_tree_selection_get_selected( sel, NULL, &iter ) )
+    {
         gtk_list_store_remove( page->store, &iter );
+        refreshACL( page );
+    }
+}
+
+static void
+refreshRPCSensitivity( struct remote_page * page )
+{
+    GSList * l;
+    const int rpc_active = gtk_toggle_button_get_active( page->rpc_tb );
+    const int pw_active = gtk_toggle_button_get_active( page->pw_tb );
+    GtkTreeSelection * sel = gtk_tree_view_get_selection( page->view );
+    const int have_addr = gtk_tree_selection_get_selected( sel, NULL, NULL );
+    const int n_rules = gtk_tree_model_iter_n_children(
+                                       GTK_TREE_MODEL( page->store ), NULL );
+
+    for( l=page->widgets; l!=NULL; l=l->next )
+        gtk_widget_set_sensitive( GTK_WIDGET( l->data ), rpc_active );
+
+    gtk_widget_set_sensitive( page->pw_entry, rpc_active && pw_active );
+
+    gtk_widget_set_sensitive( page->remove_button,
+                              rpc_active && have_addr && n_rules>1 );
+}
+
+static void
+onRPCToggled( GtkToggleButton * tb UNUSED, gpointer page )
+{
+    refreshRPCSensitivity( page );
+}
+static void
+onRPCPassToggled( GtkToggleButton * tb UNUSED, gpointer page )
+{
+    refreshRPCSensitivity( page );
+}
+static void
+onACLSelectionChanged( GtkTreeSelection * sel UNUSED, gpointer page )
+{
+    refreshRPCSensitivity( page );
 }
 
 static GtkWidget*
@@ -710,9 +767,9 @@ remotePage( GObject * core )
     GtkWidget * w;
     GtkWidget * w2;
     GtkWidget * enabled_toggle;
-    const gboolean rpc_enabled = pref_flag_get( PREF_KEY_RPC_ENABLED );
-    const gboolean pw_enabled = pref_flag_get( PREF_KEY_RPC_PASSWORD_ENABLED );
     struct remote_page * page = g_new0( struct remote_page, 1 );
+
+    page->core = TR_CORE( core );
 
     t = hig_workarea_create( );
     g_object_set_data_full( G_OBJECT( t ), "page", page, g_free );
@@ -724,29 +781,31 @@ remotePage( GObject * core )
         w = new_check_button( s, PREF_KEY_RPC_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
         enabled_toggle = w;
+        page->rpc_tb = GTK_TOGGLE_BUTTON( w );
+        g_signal_connect( w, "clicked", G_CALLBACK(onRPCToggled), page );
 
         /* password protection */
         s = _( "Require _password:" );
         w = new_check_button( s, PREF_KEY_RPC_PASSWORD_ENABLED, core );
-        toggle_sets_sensitivity( enabled_toggle, w );
-        w2 = new_entry( PREF_KEY_RPC_PASSWORD, core );
+        g_signal_connect( w, "clicked", G_CALLBACK(onRPCPassToggled), page );
+        page->pw_tb = GTK_TOGGLE_BUTTON( w );
+        page->widgets = g_slist_append( page->widgets, w );
+        //toggles_set_sensitivity( w, enabled_toggle, NULL );
+        w2 = page->pw_entry = new_entry( PREF_KEY_RPC_PASSWORD, core );
+        //toggles_set_sensitivity( w2, enabled_toggle, w, NULL );
         gtk_entry_set_visibility( GTK_ENTRY( w2 ), FALSE );
-
-        gtk_widget_set_sensitive( GTK_WIDGET( w2 ), rpc_enabled && pw_enabled );
-        g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
-        g_signal_connect( enabled_toggle, "toggled", G_CALLBACK( target_cb ), w );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
         /* port */
         w = new_spin_button( PREF_KEY_RPC_PORT, core, 0, 65535, 1 );
-        toggle_sets_sensitivity( enabled_toggle, w );
-        w = hig_workarea_add_row( t, &row, _( "Listen for requests on _port:" ), w, NULL );
-        toggle_sets_sensitivity( enabled_toggle, w );
+        page->widgets = g_slist_append( page->widgets, w );
+        //toggles_set_sensitivity( w, enabled_toggle, NULL );
+        w = hig_workarea_add_row( t, &row, _( "Listening _port:" ), w, NULL );
+        page->widgets = g_slist_append( page->widgets, w );
+        //toggles_set_sensitivity( w, enabled_toggle, NULL );
 
-#if 1
         /* access control list */
         {
-        int i;
         char * val = pref_string_get( PREF_KEY_RPC_ACL );
         GtkTreeModel * m = acl_tree_model_new( val );
         GtkTreeViewColumn * c;
@@ -755,56 +814,58 @@ remotePage( GObject * core )
         GtkTreeView * v;
         GtkWidget * w;
         GtkWidget * h;
+        GtkTooltips * tips = gtk_tooltips_new( );
 
         s = _( "Access control list:" );
         page->store = GTK_LIST_STORE( m );
         w = gtk_tree_view_new_with_model( m );
+
+        page->widgets = g_slist_append( page->widgets, w );
+        //toggles_set_sensitivity( w, enabled_toggle, NULL );
         v = page->view = GTK_TREE_VIEW( w );
+        gtk_tooltips_set_tip( tips, w,
+            _( "IP addresses may use wildcards, such as 192.168.*.*" ),
+            NULL );
         sel = gtk_tree_view_get_selection( v );
         g_signal_connect( sel, "changed",
                           G_CALLBACK( onACLSelectionChanged ), page );
         g_object_unref( G_OBJECT( m ) );
-        gtk_tree_view_set_headers_visible( v, FALSE );
+        gtk_tree_view_set_headers_visible( v, TRUE );
         w = gtk_frame_new( NULL );
         gtk_frame_set_shadow_type( GTK_FRAME( w ), GTK_SHADOW_IN );
         gtk_container_add( GTK_CONTAINER( w ), GTK_WIDGET( v ) );
 
-        m = allow_deny_model_new( );
-        c = gtk_tree_view_column_new( );
-        r = gtk_cell_renderer_combo_new( );
+        /* ip address column */
+        r = gtk_cell_renderer_text_new( );
         g_signal_connect( r, "edited",
-                          G_CALLBACK( onAllowEdited ), page );
-        gtk_tree_view_column_pack_start( c, r, TRUE );
-        g_object_set (G_OBJECT( r ), "model", m,
+                          G_CALLBACK( onAddressEdited ), page );
+        g_object_set( G_OBJECT( r ), "editable", TRUE, NULL );
+        c = gtk_tree_view_column_new_with_attributes( _( "IP Address" ), r,
+                "text", COL_ADDRESS,
+                NULL );
+        gtk_tree_view_column_set_expand( c, TRUE );
+        gtk_tree_view_append_column( v, c );
+
+        w = hig_workarea_add_row( t, &row, s, w, NULL );
+        gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.1f );
+        page->widgets = g_slist_append( page->widgets, w );
+        //toggles_set_sensitivity( w, enabled_toggle, NULL );
+        g_free( val );
+
+        /* permission column */
+        m = allow_deny_model_new( );
+        r = gtk_cell_renderer_combo_new( );
+        g_object_set( G_OBJECT( r ), "model", m,
                                      "editable", TRUE,
                                      "has-entry", FALSE,
                                      "text-column", 0,
                                      NULL );
-        gtk_tree_view_column_add_attribute( c, r, "text", COL_ALLOW );
+        c = gtk_tree_view_column_new_with_attributes( _( "Permission" ), r,
+                "text", COL_PERMISSION,
+                NULL );
+        g_signal_connect( r, "edited",
+                          G_CALLBACK( onPermissionEdited ), page );
         gtk_tree_view_append_column( v, c );
-
-        for( i=0; i<4; ++i )
-        {
-            r = gtk_cell_renderer_text_new( );
-            g_signal_connect( r, "edited",
-                              G_CALLBACK( onNumberEdited ), page );
-            g_object_set( G_OBJECT( r ), "editable", TRUE, NULL );
-            g_object_set_data( G_OBJECT( r ), IP_OFFSET, GINT_TO_POINTER( i ) );
-            c = gtk_tree_view_column_new_with_attributes( NULL, r, "text", COL_IP_1+i, NULL );
-            gtk_tree_view_append_column( v, c );
-
-            if( i<3 )
-            {
-                r = gtk_cell_renderer_text_new( );
-                c = gtk_tree_view_column_new_with_attributes( NULL, r, "text", COL_DOT, NULL );
-                gtk_tree_view_column_set_clickable( c, FALSE );
-                gtk_tree_view_append_column( v, c );
-            }
-        }
-
-        w = hig_workarea_add_row( t, &row, s, w, NULL );
-        gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.1f );
-        g_free( val );
 
         h = gtk_hbox_new( TRUE, GUI_PAD );
         w = gtk_button_new_from_stock( GTK_STOCK_REMOVE );
@@ -813,6 +874,8 @@ remotePage( GObject * core )
         onACLSelectionChanged( sel, page );
         gtk_box_pack_start_defaults( GTK_BOX( h ), w );
         w = gtk_button_new_from_stock( GTK_STOCK_ADD );
+        page->widgets = g_slist_append( page->widgets, w );
+        //toggles_set_sensitivity( w, enabled_toggle, NULL );
         g_signal_connect( w, "clicked", G_CALLBACK(onAddACLClicked), page );
         gtk_box_pack_start_defaults( GTK_BOX( h ), w );
         w = gtk_hbox_new( FALSE, 0 );
@@ -820,7 +883,6 @@ remotePage( GObject * core )
         gtk_box_pack_start( GTK_BOX( w ), h, FALSE, FALSE, 0 );
         hig_workarea_add_wide_control( t, &row, w );
         }
-#endif
 
     hig_workarea_finish( t, &row );
     return t;
@@ -863,7 +925,7 @@ networkPage( GObject * core, gpointer alive )
         l = gtk_label_new( NULL );
         gtk_misc_set_alignment( GTK_MISC(l), 0.0f, 0.5f );
         gtk_box_pack_start( GTK_BOX(h), l, FALSE, FALSE, 0 );
-        hig_workarea_add_row( t, &row, _("Listen for _peers on port:"), h, w );
+        hig_workarea_add_row( t, &row, _("Listening _port:"), h, w );
 
         g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
         g_object_set_data( G_OBJECT(l), "alive", alive );

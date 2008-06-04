@@ -13,7 +13,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.30&order=severi
 - GTK+
    + Add preferences options to inhibit hibernation and to toggle the tray icon
 - Daemon
-   + Redesigned & rewritten to use json over http
+   + Redesigned & rewritten to use JSON over http
 
 1.21 (2008/05/21)
 http://trac.transmissionbt.com/query?group=component&milestone=1.21&order=severity

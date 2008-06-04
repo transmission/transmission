@@ -941,6 +941,24 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     {
         tr_sessionSetRPCEnabled( tr, pref_flag_get( key ) );
     }
+    else if( !strcmp( key, PREF_KEY_RPC_ACL ) )
+    {
+        char * err = NULL;
+        char * s = pref_string_get( key );
+        tr_sessionSetRPCACL( tr, s, &err );
+        g_free( s );
+    }
+    else if( !strcmp( key, PREF_KEY_RPC_PASSWORD ) )
+    {
+        char * s = pref_string_get( key );
+        /*FIXMEtr_sessionSetRPCACL( tr, s );*/
+        g_free( s );
+    }
+    else if( !strcmp( key, PREF_KEY_RPC_PASSWORD_ENABLED ) )
+    {
+        const gboolean enabled = pref_flag_get( key );
+        /*FIXME tr_sessionSetRPCEnabled( tr, enabled );*/
+    }
 }
 
 gboolean

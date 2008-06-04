@@ -273,7 +273,7 @@ tr_rpcTestACL( const tr_rpc_server  * server UNUSED,
                const char           * acl,
                char                ** setme_errmsg )
 {
-    int ret = 0;
+    int err = 0;
     char * cidr = cidrize( acl );
     char * errmsg = testACL( cidr );
     if( errmsg )
@@ -282,10 +282,10 @@ tr_rpcTestACL( const tr_rpc_server  * server UNUSED,
             *setme_errmsg = errmsg;
         else
             tr_free( errmsg );
-        ret = -1;
+        err = -1;
     }
     tr_free( cidr );
-    return ret;
+    return err;
 }
 
 int
@@ -294,9 +294,9 @@ tr_rpcSetACL( tr_rpc_server   * server,
               char           ** setme_errmsg )
 {
     char * cidr = cidrize( acl );
-    const int ret = tr_rpcTestACL( server, cidr, setme_errmsg );
+    const int err = tr_rpcTestACL( server, cidr, setme_errmsg );
 
-    if( ret )
+    if( err )
     {
         const int isRunning = server->ctx != NULL;
 
@@ -310,7 +310,7 @@ tr_rpcSetACL( tr_rpc_server   * server,
             startServer( server );
     }
 
-    return ret;
+    return err;
 }
 
 const char*
