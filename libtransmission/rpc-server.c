@@ -11,6 +11,9 @@
  */
 
 #include <assert.h>
+#include <ctype.h> /* isdigit */
+#include <errno.h>
+#include <stdlib.h> /* strtol */
 #include <string.h>
 
 #include <libevent/event.h>
@@ -218,13 +221,61 @@ testACL( const char * s )
     return NULL;
 }
 
-int
-tr_rpcSetACL( tr_rpc_server * server, const char * acl, char ** setme_errmsg )
+/* 192.*.*.* --> 192.0.0.0/8
+   192.64.*.* --> 192.64.0.0/16
+   192.64.1.* --> 192.64.1.0/24
+   192.64.1.2 --> 192.64.1.2/32 */
+static void
+cidrizeOne( const char * in, int len, struct evbuffer * out )
 {
-    const int isRunning = server->ctx != NULL;
-    int ret = 0;
-    char * errmsg = testACL( acl );
+    int stars = 0;
+    const char * pch;
+    const char * end;
+    char zero = '0';
+    char huh = '?';
 
+    for( pch=in, end=pch+len; pch!=end; ++pch ) {
+        if( stars && isdigit(*pch) )
+            evbuffer_add( out, &huh, 1 ); 
+        else if( *pch!='*' )
+            evbuffer_add( out, pch, 1 );
+        else {
+            evbuffer_add( out, &zero, 1 );
+            ++stars;
+        }
+    }
+
+    evbuffer_add_printf( out, "/%d", (32-(stars*8)));
+}
+
+char*
+cidrize( const char * acl )
+{
+    int len;
+    const char * walk = acl;
+    char * ret;
+    struct evbuffer * out = evbuffer_new( );
+
+    FOR_EACH_WORD_IN_LIST( walk, len )
+    {
+        cidrizeOne( walk, len, out );
+        evbuffer_add_printf( out, ", " );
+    }
+
+    /* the -2 is to eat the final ", " */
+    ret = tr_strndup( (char*) EVBUFFER_DATA(out), EVBUFFER_LENGTH(out)-2 );
+    evbuffer_free( out );
+    return ret;
+}
+
+int
+tr_rpcTestACL( const tr_rpc_server  * server UNUSED,
+               const char           * acl,
+               char                ** setme_errmsg )
+{
+    int ret = 0;
+    char * cidr = cidrize( acl );
+    char * errmsg = testACL( cidr );
     if( errmsg )
     {
         if( setme_errmsg )
@@ -233,13 +284,27 @@ tr_rpcSetACL( tr_rpc_server * server, const char * acl, char ** setme_errmsg )
             tr_free( errmsg );
         ret = -1;
     }
-    else
+    tr_free( cidr );
+    return ret;
+}
+
+int
+tr_rpcSetACL( tr_rpc_server   * server,
+              const char      * acl,
+              char           ** setme_errmsg )
+{
+    char * cidr = cidrize( acl );
+    const int ret = tr_rpcTestACL( server, cidr, setme_errmsg );
+
+    if( ret )
     {
+        const int isRunning = server->ctx != NULL;
+
         if( isRunning )
             stopServer( server );
 
         tr_free( server->acl );
-        server->acl = tr_strdup( acl );
+        server->acl = tr_strdup( cidr );
 
         if( isRunning )
             startServer( server );

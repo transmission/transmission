@@ -32,6 +32,10 @@ void        tr_rpcSetPort   ( tr_rpc_server          * server,
 
 int         tr_rpcGetPort   ( const tr_rpc_server    * server );
 
+int         tr_rpcSetTest   ( const tr_rpc_server    * server,
+                              const char             * acl,
+                              char                  ** allocme_errmsg );
+
 int         tr_rpcSetACL    ( tr_rpc_server          * server,
                               const char             * acl,
                               char                  ** allocme_errmsg );

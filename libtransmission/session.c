@@ -776,6 +776,14 @@ tr_sessionSetRPCCallback( tr_handle    * session,
 }
 
 int
+tr_sessionTestRPCACL( const tr_handle  * session,
+                      const char       * acl,
+                      char            ** allocme_errmsg )
+{
+    return tr_rpcTestACL( session->rpcServer, acl, allocme_errmsg );
+}
+
+int
 tr_sessionSetRPCACL( tr_handle    * session,
                      const char   * acl,
                      char        ** allocme_errmsg )

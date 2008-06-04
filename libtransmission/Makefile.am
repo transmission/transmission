@@ -91,6 +91,7 @@ TESTS = \
     bencode-test \
     clients-test \
     json-test \
+    rpc-test \
     test-fastset \
     test-peer-id \
     utils-test
@@ -117,6 +118,8 @@ clients_test_SOURCES = clients-test.c
 clients_test_LDADD = $(APPS_LDADD)
 json_test_SOURCES = json-test.c
 json_test_LDADD = $(APPS_LDADD)
+rpc_test_SOURCES = rpc-test.c
+rpc_test_LDADD = $(APPS_LDADD)
 test_fastset_SOURCES = test-fastset.c
 test_fastset_LDADD = $(APPS_LDADD)
 test_peer_id_SOURCES = test-peer-id.c

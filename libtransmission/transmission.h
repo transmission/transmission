@@ -292,21 +292,45 @@ void tr_sessionSetRPCPort( tr_handle *, int port );
 int tr_sessionGetRPCPort( const tr_handle * );
 
 /**
- * Specify access control list (ACL). ACL is a comma separated list
- * of IP subnets, each subnet is prepended by a '-' or '+' sign.
- * Plus means allow, minus means deny. If the subnet mask is omitted,
- * like * "-1.2.3.4", it means a single IP address. The mask may vary
- * from 0 to 32 inclusive.
+ * @brief test an ACL's syntax without modifying the RPC settings.
+ * 
+ * ACL is a comma separated list of IP subnets, each subnet is prepended
+ * by a '+' or '-' sign to denote 'allow' or 'deny'.  If the subnet mask
+ * is omitted, like "-1.2.3.4", it means a single IP address. The mask
+ * may vary from 0 to 32 inclusive.  A simple primer on x.x.x.x/n notation
+ * can be found at <http://25yearsofprogramming.com/blog/20070803.htm>.
  *
- * The default string is "+127.0.0.1"
- *
- * @param acl the new ACL to use.
+ * Since wildcards are more familiar to most users than netmasks,
+ * libtransmission supports a wildcard notation that it
+ * converts into cidr required by the embedded http server.
+ * So, notation like "+192.168.*.*" is accepted by libtransmission and is
+ * converted to "+192.168.0.0/16" before it reaches the server.
+
+ * @param acl the ACL to test
  * @param allocme_errmsg If the ACL can't be parsed, this is set to a
  *                       newly-allocated error string describing the problem.
  *                       The client should tr_free() this string when done.
- *
  * @return 0 on success, -1 on failure due to an unparseable ACL.
+ */
+int tr_sessionTestRPCACL( const tr_handle  * session,
+                          const char       * acl,
+                          char            ** allocme_errmsg );
+
+/**
+ * @brief Specify access control list (ACL).
+ ACL is a comma separated list
+ * of IP subnets, each subnet is prepended by a '-' or '+' sign.
+ * Plus means allow, minus means deny. If the subnet mask is omitted,
+ * like "-1.2.3.4", it means a single IP address. The mask may vary
+ * from 0 to 32 inclusive.
  *
+ * http://25yearsofprogramming.com/blog/20070803.htm has a simple
+ * primer on x.x.x.x/n notation for those interested.
+ *
+ * The parameters and return value follow the same behavior as
+ * tr_sessionTestRPCACL().
+ *
+ * @see tr_sessionTestRPCACL
  * @see tr_sessionInitFull
  * @see tr_sessionGetRPCACL
  */
