@@ -697,7 +697,8 @@ tr_bitfieldDup( const tr_bitfield * in )
     return ret;
 }
 
-void tr_bitfieldFree( tr_bitfield * bitfield )
+void
+tr_bitfieldFree( tr_bitfield * bitfield )
 {
     if( bitfield )
     {
@@ -727,18 +728,13 @@ tr_bitfieldIsEmpty( const tr_bitfield * bitfield )
 int
 tr_bitfieldHas( const tr_bitfield * bitfield, size_t nth )
 {
-    static const uint8_t ands[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
-    const size_t i = nth >> 3u;
-    return ( bitfield != NULL )
-        && ( bitfield->bits != NULL )
-        && ( i < bitfield->len )
-        && ( ( bitfield->bits[i] & ands[nth&7u] ) != 0 );
+    return ( tr_bitfieldTestFast( bitfield, nth ) )
+        && ( tr_bitfieldHasFast( bitfield, nth ) );
 }
 
 int
 tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
 {
-    static const uint8_t ands[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
     const size_t i = nth >> 3u;
 
     assert( bitfield != NULL );
@@ -747,7 +743,7 @@ tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
     if( i >= bitfield->len )
         return -1;
 
-    bitfield->bits[i] |= ands[nth&7u];
+    bitfield->bits[i] |= (0x80 >> (nth&7u));
     /*assert( tr_bitfieldHas( bitfield, nth ) );*/
     return 0;
 }
@@ -769,7 +765,6 @@ int
 tr_bitfieldRem( tr_bitfield   * bitfield,
                 size_t          nth )
 {
-    static const uint8_t rems[8] = { 127, 191, 223, 239, 247, 251, 253, 254 };
     const size_t i = nth >> 3u;
 
     assert( bitfield != NULL );
@@ -778,7 +773,7 @@ tr_bitfieldRem( tr_bitfield   * bitfield,
     if( i >= bitfield->len )
         return -1;
 
-    bitfield->bits[i] &= rems[nth&7u];
+    bitfield->bits[i] &= (0xff7f >> nth&7u);
     /*assert( !tr_bitfieldHas( bitfield, nth ) );*/
     return 0;
 }

@@ -261,6 +261,18 @@ size_t tr_bitfieldCountTrueBits( const tr_bitfield* );
 
 tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
 
+/** A stripped-down version of bitfieldHas to be used
+    for speed when you're looping quickly.  This version
+    has none of tr_bitfieldHas()'s safety checks, so you
+    need to call tr_bitfieldTestFast() first before you
+    start looping. */
+#define tr_bitfieldHasFast(bitfield,nth) \
+    (( bitfield->bits[(nth)>>3u] << ((nth)&7u) & 0x80) != 0 )
+
+/** @param high the highest nth bit you're going to access */
+#define tr_bitfieldTestFast(bitfield,high) \
+    ((bitfield) && ( (bitfield)->bits ) && ( ((high)>>3u) < (bitfield)->len ))
+
 double tr_getRatio( double numerator, double denominator );
 
 #endif
