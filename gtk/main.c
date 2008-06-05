@@ -428,7 +428,10 @@ main( int argc, char ** argv )
                             pref_int_get( PREF_KEY_PEER_SOCKET_TOS ),
                             pref_flag_get( PREF_KEY_RPC_ENABLED ),
                             pref_int_get( PREF_KEY_RPC_PORT ),
-                            pref_string_get( PREF_KEY_RPC_ACL ) );
+                            pref_string_get( PREF_KEY_RPC_ACL ),
+                            pref_flag_get( PREF_KEY_RPC_PASSWORD_ENABLED ),
+                            pref_string_get( PREF_KEY_RPC_USERNAME ),
+                            pref_string_get( PREF_KEY_RPC_PASSWORD ) );
         cbdata->core = tr_core_new( h );
 
         /* create main window now to be a parent to any error dialogs */
@@ -948,16 +951,22 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
         tr_sessionSetRPCACL( tr, s, &err );
         g_free( s );
     }
+    else if( !strcmp( key, PREF_KEY_RPC_USERNAME ) )
+    {
+        char * s = pref_string_get( key );
+        tr_sessionSetRPCUsername( tr, s );
+        g_free( s );
+    }
     else if( !strcmp( key, PREF_KEY_RPC_PASSWORD ) )
     {
         char * s = pref_string_get( key );
-        /*FIXMEtr_sessionSetRPCACL( tr, s );*/
+        tr_sessionSetRPCPassword( tr, s );
         g_free( s );
     }
     else if( !strcmp( key, PREF_KEY_RPC_PASSWORD_ENABLED ) )
     {
         const gboolean enabled = pref_flag_get( key );
-        /*FIXME tr_sessionSetRPCEnabled( tr, enabled );*/
+        tr_sessionSetRPCPasswordEnabled( tr, enabled );
     }
 }
 

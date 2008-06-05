@@ -57,7 +57,7 @@ SOFTWARE.
 #include "ConvertUTF.h"
 
 #if _MSC_VER >= 1400 /* Visual Studio 2005 and up */
-#	pragma warning(disable:4996) // unsecure sscanf
+#	pragma warning(disable:4996) /* unsecure sscanf */
 #endif
 
 

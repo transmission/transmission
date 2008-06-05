@@ -16,7 +16,10 @@
 #include <stdlib.h> /* strtol */
 #include <string.h>
 
+#include <unistd.h> /* unlink */
+
 #include <libevent/event.h>
+#include <shttpd/defs.h> /* edit_passwords */
 #include <shttpd/shttpd.h>
 
 #include "transmission.h"
@@ -25,6 +28,7 @@
 #include "utils.h"
 
 #define MY_NAME "RPC Server"
+#define MY_REALM "Transmission RPC Server"
 
 #define BUSY_INTERVAL_MSEC 30
 #define IDLE_INTERVAL_MSEC 100
@@ -39,6 +43,9 @@ struct tr_rpc_server
     struct evbuffer * in;
     struct evbuffer * out;
     struct event timer;
+    int isPasswordEnabled;
+    char * username;
+    char * password;
     char * acl;
 };
 
@@ -120,6 +127,14 @@ rpcPulse( int socket UNUSED, short action UNUSED, void * vserver )
 }
 
 static void
+getPasswordFile( tr_rpc_server * server, char * buf, int buflen )
+{
+    tr_buildPath( buf, buflen, tr_sessionGetConfigDir( server->session ),
+                               "htpasswd",
+                               NULL );
+}
+
+static void
 startServer( tr_rpc_server * server )
 {
     dbgmsg( "in startServer; current context is %p", server->ctx );
@@ -127,7 +142,14 @@ startServer( tr_rpc_server * server )
     if( !server->ctx )
     {
         char ports[128];
+        char passwd[MAX_PATH_LENGTH];
         struct timeval tv = tr_timevalMsec( UNUSED_INTERVAL_MSEC );
+
+        getPasswordFile( server, passwd, sizeof( passwd ) );
+        if( !server->isPasswordEnabled )
+            unlink( passwd );
+        else
+            edit_passwords( passwd, MY_REALM, "user", "pass" );
 
         server->ctx = shttpd_init( );
         snprintf( ports, sizeof( ports ), "%d", server->port );
@@ -135,9 +157,15 @@ startServer( tr_rpc_server * server )
         shttpd_set_option( server->ctx, "ports", ports );
         shttpd_set_option( server->ctx, "dir_list", "0" );
         shttpd_set_option( server->ctx, "root", "/dev/null" );
+        shttpd_set_option( server->ctx, "auth_realm", MY_REALM );
         if( server->acl ) {
             dbgmsg( "setting acl [%s]", server->acl );
             shttpd_set_option( server->ctx, "acl", server->acl );
+        }
+        if( server->isPasswordEnabled ) {
+            char * buf = tr_strdup_printf( "/transmission=%s", passwd );
+            shttpd_set_option( server->ctx, "protect", buf );
+            tr_free( buf );
         }
 
         evtimer_set( &server->timer, rpcPulse, server );
@@ -150,6 +178,10 @@ stopServer( tr_rpc_server * server )
 {
     if( server->ctx )
     {
+        char passwd[MAX_PATH_LENGTH];
+        getPasswordFile( server, passwd, sizeof( passwd ) );
+        unlink( passwd );
+
         evtimer_del( &server->timer );
         shttpd_fini( server->ctx );
         server->ctx = NULL;
@@ -192,6 +224,10 @@ tr_rpcGetPort( const tr_rpc_server * server )
 {
     return server->port;
 }
+
+/****
+*****  ACL
+****/
 
 /*
  * DELIM_CHARS, FOR_EACH_WORD_IN_LIST, isbyte, and testACL are from, or modified from,
@@ -327,11 +363,87 @@ tr_rpcSetACL( tr_rpc_server   * server,
     return err;
 }
 
-const char*
+char*
 tr_rpcGetACL( const tr_rpc_server * server )
 {
-    return server->acl ? server->acl : "";
+    return tr_strdup( server->acl ? server->acl : "" );
 }
+
+/****
+*****  PASSWORD
+****/
+
+void
+tr_rpcSetUsername( tr_rpc_server        * server,
+                   const char           * username )
+{
+    const int isRunning = server->ctx != NULL;
+
+    if( isRunning )
+        stopServer( server );
+
+    tr_free( server->username );
+    server->username = tr_strdup( username );
+    dbgmsg( "setting our Username to [%s]", server->username );
+
+    if( isRunning )
+        startServer( server );
+}
+
+char*
+tr_rpcGetUsername( const tr_rpc_server  * server )
+{
+    return tr_strdup( server->username ? server->username : "" );
+}
+
+void
+tr_rpcSetPassword( tr_rpc_server        * server,
+                   const char           * password )
+{
+    const int isRunning = server->ctx != NULL;
+
+    if( isRunning )
+        stopServer( server );
+
+    tr_free( server->password );
+    server->password = tr_strdup( password );
+    dbgmsg( "setting our Password to [%s]", server->password );
+
+    if( isRunning )
+        startServer( server );
+}
+
+char*
+tr_rpcGetPassword( const tr_rpc_server  * server )
+{
+    return tr_strdup( server->password ? server->password : "" );
+}
+
+void
+tr_rpcSetPasswordEnabled( tr_rpc_server  * server,
+                          int              isEnabled )
+{
+    const int isRunning = server->ctx != NULL;
+
+    if( isRunning )
+        stopServer( server );
+
+    server->isPasswordEnabled = isEnabled;
+    dbgmsg( "setting 'password enabled' to %d", isEnabled );
+
+    if( isRunning )
+        startServer( server );
+}
+
+int
+tr_rpcIsPasswordEnabled( const tr_rpc_server * server )
+{
+    return server->isPasswordEnabled;
+}
+
+/****
+*****  LIFE CYCLE
+****/
 
 void
 tr_rpcClose( tr_rpc_server ** ps )
@@ -350,7 +462,10 @@ tr_rpc_server *
 tr_rpcInit( tr_handle   * session,
             int           isEnabled,
             int           port,
-            const char  * acl )
+            const char  * acl,
+            int           isPasswordEnabled,
+            const char  * username,
+            const char  * password )
 {
     char * errmsg;
     tr_rpc_server * s;
@@ -369,6 +484,9 @@ tr_rpcInit( tr_handle   * session,
     s->in = evbuffer_new( );
     s->out = evbuffer_new( );
     s->acl = tr_strdup( acl );
+    s->username = tr_strdup( username );
+    s->password = tr_strdup( password );
+    s->isPasswordEnabled = isPasswordEnabled;
    
     if( isEnabled )
         startServer( s );

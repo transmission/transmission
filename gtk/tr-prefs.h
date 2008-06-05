@@ -59,6 +59,7 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_RPC_ACL                "rpc-access-control-list"
 #define PREF_KEY_RPC_PASSWORD_ENABLED   "rpc-password-required"
 #define PREF_KEY_RPC_PASSWORD           "rpc-password"
+#define PREF_KEY_RPC_USERNAME           "rpc-username"
 
 
 void tr_prefs_init_global( void );

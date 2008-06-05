@@ -229,7 +229,10 @@ tr_handle * tr_sessionInitFull( const char * configDir,
                                 int          peerSocketTOS,
                                 int          rpcIsEnabled,
                                 int          rpcPort,
-                                const char * rpcAccessControlList );
+                                const char * rpcAccessControlList,
+                                int          rpcPasswordIsEnabled,
+                                const char * rpcUsername,
+                                const char * rpcPassword );
 
 /** @brief Shorter form of tr_sessionInitFull()
     @deprecated Use tr_sessionInitFull() instead. */ 
@@ -338,10 +341,31 @@ int tr_sessionSetRPCACL( tr_handle   * session,
                          const char  * acl,
                          char       ** allocme_errmsg );
 
-/** Returns the Access Control List for allowing/denying RPC requests.
+/** @brief get the Access Control List for allowing/denying RPC requests.
+    @return a comma-separated string of ACL rules.  tr_free() when done.
     @see tr_sessionInitFull
     @see tr_sessionSetRPCACL */
-const char* tr_sessionGetRPCACL( const tr_handle * );
+char* tr_sessionGetRPCACL( const tr_handle * );
+
+void  tr_sessionSetRPCPassword( tr_handle       * session,
+                                const char      * password );
+
+void  tr_sessionSetRPCUsername( tr_handle       * session,
+                                const char      * username );
+
+/** @brief get the password used to restrict RPC requests.
+    @return the password string. tr_free() when done.
+    @see tr_sessionInitFull()
+    @see tr_sessionSetRPCPassword() */
+char* tr_sessionGetRPCPassword( const tr_handle * session );
+
+char* tr_sessionGetRPCUsername( const tr_handle * session  );
+
+void  tr_sessionSetRPCPasswordEnabled( tr_handle * session,
+                                       int         isEnabled );
+
+int   tr_sessionIsRPCPasswordEnabled( const tr_handle * session );
+
 
 typedef enum
 {

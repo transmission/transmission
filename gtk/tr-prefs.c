@@ -35,8 +35,11 @@ void
 tr_prefs_init_global( void )
 {
     int i;
-    char pw[12];
+    char pw[32];
     const char * str;
+    const char * pool = "abcdefghijklmnopqrstuvwxyz"
+                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                        "1234567890";
 
     cf_check_older_configs( );
 
@@ -101,12 +104,12 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_RPC_PORT, TR_DEFAULT_RPC_PORT );
     pref_string_set_default ( PREF_KEY_RPC_ACL, TR_DEFAULT_RPC_ACL );
 
-    for( i=0; i<8; ++i )
-        pw[i] = 'a' + tr_rand(26);
-    pw[8] = '\0';
+    for( i=0; i<16; ++i )
+        pw[i] = pool[ tr_rand( strlen( pool ) ) ];
+    pw[16] = '\0';
+    pref_string_set_default( PREF_KEY_RPC_USERNAME, "transmission" );
     pref_string_set_default( PREF_KEY_RPC_PASSWORD, pw );
     pref_flag_set_default  ( PREF_KEY_RPC_PASSWORD_ENABLED, FALSE );
-
 
     pref_save( NULL );
 }
@@ -615,10 +618,10 @@ struct remote_page
     GtkTreeView * view;
     GtkListStore * store;
     GtkWidget * remove_button;
-    GtkWidget * pw_entry;
     GSList * widgets;
+    GSList * auth_widgets;
     GtkToggleButton * rpc_tb;
-    GtkToggleButton * pw_tb;
+    GtkToggleButton * auth_tb;
 };
 
 static void
@@ -727,7 +730,7 @@ refreshRPCSensitivity( struct remote_page * page )
 {
     GSList * l;
     const int rpc_active = gtk_toggle_button_get_active( page->rpc_tb );
-    const int pw_active = gtk_toggle_button_get_active( page->pw_tb );
+    const int auth_active = gtk_toggle_button_get_active( page->auth_tb );
     GtkTreeSelection * sel = gtk_tree_view_get_selection( page->view );
     const int have_addr = gtk_tree_selection_get_selected( sel, NULL, NULL );
     const int n_rules = gtk_tree_model_iter_n_children(
@@ -736,7 +739,8 @@ refreshRPCSensitivity( struct remote_page * page )
     for( l=page->widgets; l!=NULL; l=l->next )
         gtk_widget_set_sensitive( GTK_WIDGET( l->data ), rpc_active );
 
-    gtk_widget_set_sensitive( page->pw_entry, rpc_active && pw_active );
+    for( l=page->auth_widgets; l!=NULL; l=l->next )
+        gtk_widget_set_sensitive( GTK_WIDGET( l->data ), rpc_active && auth_active);
 
     gtk_widget_set_sensitive( page->remove_button,
                               rpc_active && have_addr && n_rules>1 );
@@ -744,11 +748,6 @@ refreshRPCSensitivity( struct remote_page * page )
 
 static void
 onRPCToggled( GtkToggleButton * tb UNUSED, gpointer page )
-{
-    refreshRPCSensitivity( page );
-}
-static void
-onRPCPassToggled( GtkToggleButton * tb UNUSED, gpointer page )
 {
     refreshRPCSensitivity( page );
 }
@@ -765,8 +764,6 @@ remotePage( GObject * core )
     int row = 0;
     GtkWidget * t;
     GtkWidget * w;
-    GtkWidget * w2;
-    GtkWidget * enabled_toggle;
     struct remote_page * page = g_new0( struct remote_page, 1 );
 
     page->core = TR_CORE( core );
@@ -780,29 +777,37 @@ remotePage( GObject * core )
         s = _( "A_llow requests from transmission-remote, Clutch, etc." );
         w = new_check_button( s, PREF_KEY_RPC_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
-        enabled_toggle = w;
         page->rpc_tb = GTK_TOGGLE_BUTTON( w );
         g_signal_connect( w, "clicked", G_CALLBACK(onRPCToggled), page );
 
-        /* password protection */
-        s = _( "Require _password:" );
+        /* require authentication */
+        s = _( "Require _authentication" );
         w = new_check_button( s, PREF_KEY_RPC_PASSWORD_ENABLED, core );
-        g_signal_connect( w, "clicked", G_CALLBACK(onRPCPassToggled), page );
-        page->pw_tb = GTK_TOGGLE_BUTTON( w );
+        hig_workarea_add_wide_control( t, &row, w );
+        page->auth_tb = GTK_TOGGLE_BUTTON( w );
         page->widgets = g_slist_append( page->widgets, w );
-        //toggles_set_sensitivity( w, enabled_toggle, NULL );
-        w2 = page->pw_entry = new_entry( PREF_KEY_RPC_PASSWORD, core );
-        //toggles_set_sensitivity( w2, enabled_toggle, w, NULL );
-        gtk_entry_set_visibility( GTK_ENTRY( w2 ), FALSE );
-        hig_workarea_add_row_w( t, &row, w, w2, NULL );
+        g_signal_connect( w, "clicked", G_CALLBACK(onRPCToggled), page );
+
+        /* username */
+        s = _( "_Username:" );
+        w = new_entry( PREF_KEY_RPC_USERNAME, core );
+        page->auth_widgets = g_slist_append( page->auth_widgets, w );
+        w = hig_workarea_add_row( t, &row, s, w, NULL );
+        page->auth_widgets = g_slist_append( page->auth_widgets, w );
+
+        /* password */
+        s = _( "_Password:" );
+        w = new_entry( PREF_KEY_RPC_PASSWORD, core );
+        gtk_entry_set_visibility( GTK_ENTRY( w ), FALSE );
+        page->auth_widgets = g_slist_append( page->auth_widgets, w );
+        w = hig_workarea_add_row( t, &row, s, w, NULL );
+        page->auth_widgets = g_slist_append( page->auth_widgets, w );
 
         /* port */
         w = new_spin_button( PREF_KEY_RPC_PORT, core, 0, 65535, 1 );
         page->widgets = g_slist_append( page->widgets, w );
-        //toggles_set_sensitivity( w, enabled_toggle, NULL );
         w = hig_workarea_add_row( t, &row, _( "Listening _port:" ), w, NULL );
         page->widgets = g_slist_append( page->widgets, w );
-        //toggles_set_sensitivity( w, enabled_toggle, NULL );
 
         /* access control list */
         {
@@ -821,7 +826,6 @@ remotePage( GObject * core )
         w = gtk_tree_view_new_with_model( m );
 
         page->widgets = g_slist_append( page->widgets, w );
-        //toggles_set_sensitivity( w, enabled_toggle, NULL );
         v = page->view = GTK_TREE_VIEW( w );
         gtk_tooltips_set_tip( tips, w,
             _( "IP addresses may use wildcards, such as 192.168.*.*" ),
@@ -849,7 +853,6 @@ remotePage( GObject * core )
         w = hig_workarea_add_row( t, &row, s, w, NULL );
         gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.1f );
         page->widgets = g_slist_append( page->widgets, w );
-        //toggles_set_sensitivity( w, enabled_toggle, NULL );
         g_free( val );
 
         /* permission column */
@@ -875,7 +878,6 @@ remotePage( GObject * core )
         gtk_box_pack_start_defaults( GTK_BOX( h ), w );
         w = gtk_button_new_from_stock( GTK_STOCK_ADD );
         page->widgets = g_slist_append( page->widgets, w );
-        //toggles_set_sensitivity( w, enabled_toggle, NULL );
         g_signal_connect( w, "clicked", G_CALLBACK(onAddACLClicked), page );
         gtk_box_pack_start_defaults( GTK_BOX( h ), w );
         w = gtk_hbox_new( FALSE, 0 );
@@ -884,6 +886,7 @@ remotePage( GObject * core )
         hig_workarea_add_wide_control( t, &row, w );
         }
 
+    refreshRPCSensitivity( page );
     hig_workarea_finish( t, &row );
     return t;
 }

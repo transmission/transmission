@@ -137,7 +137,10 @@ tr_sessionInitFull( const char * configDir,
                     int          peerSocketTOS,
                     int          rpcIsEnabled,
                     int          rpcPort,
-                    const char * rpcACL )
+                    const char * rpcACL,
+                    int          rpcPasswordIsEnabled,
+                    const char * rpcUsername,
+                    const char * rpcPassword )
 {
     tr_handle * h;
     char filename[MAX_PATH_LENGTH];
@@ -199,7 +202,8 @@ tr_sessionInitFull( const char * configDir,
     tr_statsInit( h );
 
     h->web = tr_webInit( h );
-    h->rpcServer = tr_rpcInit( h, rpcIsEnabled, rpcPort, rpcACL );
+    h->rpcServer = tr_rpcInit( h, rpcIsEnabled, rpcPort, rpcACL,
+                                  rpcPasswordIsEnabled, rpcUsername, rpcPassword );
 
     metainfoLookupRescan( h );
 
@@ -229,7 +233,10 @@ tr_sessionInit( const char * configDir,
                                TR_DEFAULT_PEER_SOCKET_TOS,
                                TR_DEFAULT_RPC_ENABLED,
                                TR_DEFAULT_RPC_PORT,
-                               TR_DEFAULT_RPC_ACL );
+                               TR_DEFAULT_RPC_ACL,
+                               FALSE,
+                               "fnord",
+                               "potzrebie" );
 }
 
 /***
@@ -791,8 +798,44 @@ tr_sessionSetRPCACL( tr_handle    * session,
     return tr_rpcSetACL( session->rpcServer, acl, allocme_errmsg );
 }
 
-const char*
+char*
 tr_sessionGetRPCACL( const tr_session * session )
 {
     return tr_rpcGetACL( session->rpcServer );
+}
+
+void
+tr_sessionSetRPCPassword( tr_handle * session, const char * password )
+{
+    tr_rpcSetPassword( session->rpcServer, password );
+}
+
+char*
+tr_sessionGetRPCPassword( const tr_handle * session )
+{
+    return tr_rpcGetPassword( session->rpcServer );
+}
+
+void
+tr_sessionSetRPCUsername( tr_handle * session, const char * username )
+{
+    tr_rpcSetUsername( session->rpcServer, username );
+}
+
+char*
+tr_sessionGetRPCUsername( const tr_handle * session )
+{
+    return tr_rpcGetUsername( session->rpcServer );
+}
+
+void
+tr_sessionSetRPCPasswordEnabled( tr_handle * session, int isEnabled )
+{
+    tr_rpcSetPasswordEnabled( session->rpcServer, isEnabled );
+}
+
+int
+tr_sessionIsRPCPasswordEnabled( const tr_handle * session )
+{
+    return tr_rpcIsPasswordEnabled( session->rpcServer );
 }

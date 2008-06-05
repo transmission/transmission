@@ -327,7 +327,6 @@ onTrackerResponse( tr_session    * session,
             success = TRUE;
 
             if(( tr_bencDictFindStr( &benc, "failure reason", &str ))) {
-               // publishErrorMessageAndStop( t, str );
                 publishMessage( t, str, TR_TRACKER_ERROR );
                 success = FALSE;
             }
