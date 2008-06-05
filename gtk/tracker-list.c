@@ -371,15 +371,3 @@ tracker_list_get_trackers( GtkWidget * list,
 
     return trackers;
 }
-
-void
-tracker_list_get_button_size( GtkWidget  * list,
-                              gint       * width,
-                              gint       * height )
-{
-    struct tracker_page * page = g_object_get_data( G_OBJECT( list ), "page" );
-    GtkRequisition req;
-    gtk_widget_size_request( page->remove_button, &req );
-    if( width ) *width = req.width;
-    if( height ) *height = req.height;
-}

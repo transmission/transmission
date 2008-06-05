@@ -312,7 +312,6 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
     GtkBox * main_vbox;
     MakeMetaUI * ui = g_new0 ( MakeMetaUI, 1 );
     ui->handle = handle;
-    int width, height;
 
     d = gtk_dialog_new_with_buttons( _("New Torrent"),
                                      parent,
@@ -364,9 +363,6 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
         w = tracker_list_new( NULL );
         ui->announce_list = w;
         hig_workarea_add_wide_control( t, &row, w );
-        tracker_list_get_button_size( w, &width, &height );
-        gtk_widget_set_size_request( b1, width, height );
-        gtk_widget_set_size_request( b2, width, height );
 
     hig_workarea_add_section_divider( t, &row );
     w = extras = gtk_expander_new_with_mnemonic( _( "<b>E_xtras</b>" ) );
