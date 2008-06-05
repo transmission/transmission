@@ -810,7 +810,8 @@
     [fDefaults setBool: encryptionMode == TR_ENCRYPTION_PREFERRED forKey: @"EncryptionPrefer"];
     
     //download directory
-    #warning missing!
+    NSString * downloadLocation = [[NSString stringWithUTF8String: tr_sessionGetDownloadDir(fHandle)] stringByStandardizingPath];
+    [fDefaults setObject: downloadLocation forKey: @"DownloadFolder"];
     
     //peers
     uint16_t peersTotal = tr_sessionGetPeerLimit(fHandle);
@@ -849,6 +850,8 @@
     if (fHasLoaded)
     {
         //encryption handled by bindings
+        
+        //download directory handled by bindings
         
         [fPeersGlobalField setIntValue: peersTotal];
         

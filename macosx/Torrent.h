@@ -151,7 +151,7 @@ typedef enum
 
 - (NSMutableArray *) allTrackers: (BOOL) separators;
 - (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers;
-- (BOOL) updateAllTrackersForRemove: (NSMutableArray *) trackers;
+- (void) updateAllTrackersForRemove: (NSMutableArray *) trackers;
 - (BOOL) hasAddedTrackers;
 
 - (NSString *) comment;

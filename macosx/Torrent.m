@@ -819,15 +819,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return YES;
 }
 
-- (BOOL) updateAllTrackersForRemove: (NSMutableArray *) trackers
+- (void) updateAllTrackersForRemove: (NSMutableArray *) trackers
 {
     //check if no user-added groups
     if ([[trackers objectAtIndex: 0] intValue] != 0)
         fAddedTrackers = NO;
     
     [self updateAllTrackers: trackers];
-    
-    return YES;
 }
 
 - (BOOL) hasAddedTrackers

@@ -1553,10 +1553,8 @@ typedef enum
     
     [fTrackers removeObjectsAtIndexes: indexes];
     
-    if (![torrent updateAllTrackersForRemove: fTrackers])
-        NSBeep();
-    else
-        [fTrackerTable deselectAll: self];
+    [torrent updateAllTrackersForRemove: fTrackers];
+    [fTrackerTable deselectAll: self];
     
     //reset table with either new or old value
     [fTrackers release];
