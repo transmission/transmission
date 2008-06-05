@@ -652,6 +652,21 @@
     tr_sessionSetRPCEnabled(fHandle, [fDefaults boolForKey: @"RPC"]);
 }
 
+- (void) setRPCAuthorize: (id) sender
+{
+    tr_sessionSetRPCPasswordEnabled(fHandle, [fDefaults boolForKey: @"RPCAuthorize"]);
+}
+
+- (void) setRPCUsername: (id) sender
+{
+    tr_sessionSetRPCUsername(fHandle, [[fDefaults stringForKey: @"RPCUsername"] UTF8String]);
+}
+
+- (void) setRPCPassword: (id) sender
+{
+    tr_sessionSetRPCPassword(fHandle, [[fDefaults stringForKey: @"RPCPassword"] UTF8String]);
+}
+
 - (void) setRPCPort: (id) sender
 {
     int port = [sender intValue];

@@ -219,10 +219,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 TR_DEFAULT_PEER_SOCKET_TOS,
                                 [fDefaults boolForKey: @"RPC"],
                                 [fDefaults integerForKey: @"RPCPort"],
-                                NULL,
+                                NULL, /*reset in prefs*/
                                 [fDefaults boolForKey: @"RPCAuthorize"],
                                 [[fDefaults stringForKey: @"RPCUsername"] UTF8String],
-                                [[fDefaults stringForKey: @"RPCPassword"] UTF8String]); /*reset in prefs*/
+                                [[fDefaults stringForKey: @"RPCPassword"] UTF8String]);
         
         [NSApp setDelegate: self];
         

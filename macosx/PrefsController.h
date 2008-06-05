@@ -119,6 +119,9 @@
 - (void) setAutoSize: (id) sender;
 
 - (void) setRPCEnabled: (id) sender;
+- (void) setRPCAuthorize: (id) sender;
+- (void) setRPCUsername: (id) sender;
+- (void) setRPCPassword: (id) sender;
 - (void) setRPCPort: (id) sender;
 - (void) updateRPCAccessList;
 - (void) addRemoveRPCIP: (id) sender;
