@@ -52,7 +52,7 @@
 
 - (NSString *) etaString: (int) eta;
 
-- (BOOL) updateAllTrackers: (NSMutableArray *) trackers;
+- (void) updateAllTrackers: (NSMutableArray *) trackers;
 
 - (void) trashFile: (NSString *) path;
 
@@ -813,18 +813,21 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (!tr_httpIsValidURL([tracker UTF8String]))
         return NO;
     
-    fAddedTrackers = YES;
+    [self updateAllTrackers: trackers];
     
-    return [self updateAllTrackers: trackers];
+    fAddedTrackers = YES;
+    return YES;
 }
 
 - (BOOL) updateAllTrackersForRemove: (NSMutableArray *) trackers
 {
-    //check if any user-added groups
+    //check if no user-added groups
     if ([[trackers objectAtIndex: 0] intValue] != 0)
         fAddedTrackers = NO;
     
-    return [self updateAllTrackers: trackers];
+    [self updateAllTrackers: trackers];
+    
+    return YES;
 }
 
 - (BOOL) hasAddedTrackers
@@ -1882,7 +1885,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     }
 }
 
-- (BOOL) updateAllTrackers: (NSMutableArray *) trackers
+- (void) updateAllTrackers: (NSMutableArray *) trackers
 {
     //get count
     int count = 0;
@@ -1911,8 +1914,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     tr_torrentSetAnnounceList(fHandle, trackerStructs, count);
     tr_free(trackerStructs);
-    
-    return YES;
 }
 
 - (void) trashFile: (NSString *) path

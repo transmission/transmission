@@ -842,7 +842,6 @@ typedef enum
 {
     if ([notification object] == fTrackerTable)
     {
-        #warning disable when all selected
         int numSelected = [fTrackerTable numberOfSelectedRows];
         [fTrackerAddRemoveControl setEnabled: numSelected > 0 forSegment: TRACKER_REMOVE_TAG];
     }

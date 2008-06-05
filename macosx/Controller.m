@@ -2275,7 +2275,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         icon = [[GroupsController groups] imageForIndex: groupIndex];
         NSString * groupName = groupIndex != -1 ? [[GroupsController groups] nameForIndex: groupIndex]
                                                 : NSLocalizedString(@"None", "Groups -> Button");
-        toolTip = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Group", "Groups -> Button"), groupName];
+        toolTip = [NSLocalizedString(@"Group", "Groups -> Button") stringByAppendingFormat: @": %@", groupName];
     }
     
     //tiger doesn't have built-in image scaling in buttons
