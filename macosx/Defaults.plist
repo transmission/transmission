@@ -112,8 +112,14 @@
 	<integer>2</integer>
 	<key>RPC</key>
 	<false/>
+	<key>RPCAuthorize</key>
+	<false/>
+	<key>RPCPassword</key>
+	<string>admin</string>
 	<key>RPCPort</key>
 	<integer>9091</integer>
+	<key>RPCUsername</key>
+	<string>admin</string>
 	<key>SeedingSound</key>
 	<string>Submarine</string>
 	<key>ShowInspector</key>
