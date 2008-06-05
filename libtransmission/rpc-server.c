@@ -149,7 +149,7 @@ startServer( tr_rpc_server * server )
         if( !server->isPasswordEnabled )
             unlink( passwd );
         else
-            edit_passwords( passwd, MY_REALM, "user", "pass" );
+            edit_passwords( passwd, MY_REALM, server->username, server->password );
 
         server->ctx = shttpd_init( );
         snprintf( ports, sizeof( ports ), "%d", server->port );
