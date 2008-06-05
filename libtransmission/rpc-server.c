@@ -42,6 +42,8 @@ struct tr_rpc_server
     char * acl;
 };
 
+#define dbgmsg(fmt...) tr_deepLog(__FILE__, __LINE__, MY_NAME, ##fmt )
+
 static void
 handle_rpc( struct shttpd_arg * arg )
 {
@@ -120,6 +122,8 @@ rpcPulse( int socket UNUSED, short action UNUSED, void * vserver )
 static void
 startServer( tr_rpc_server * server )
 {
+    dbgmsg( "in startServer; current context is %p", server->ctx );
+
     if( !server->ctx )
     {
         char ports[128];
@@ -131,8 +135,10 @@ startServer( tr_rpc_server * server )
         shttpd_set_option( server->ctx, "ports", ports );
         shttpd_set_option( server->ctx, "dir_list", "0" );
         shttpd_set_option( server->ctx, "root", "/dev/null" );
-        if( server->acl )
+        if( server->acl ) {
+            dbgmsg( "setting acl [%s]", server->acl );
             shttpd_set_option( server->ctx, "acl", server->acl );
+        }
 
         evtimer_set( &server->timer, rpcPulse, server );
         evtimer_add( &server->timer, &tv );
@@ -303,7 +309,7 @@ tr_rpcSetACL( tr_rpc_server   * server,
     char * cidr = cidrize( acl );
     const int err = tr_rpcTestACL( server, cidr, setme_errmsg );
 
-    if( err )
+    if( !err )
     {
         const int isRunning = server->ctx != NULL;
 
@@ -312,6 +318,7 @@ tr_rpcSetACL( tr_rpc_server   * server,
 
         tr_free( server->acl );
         server->acl = tr_strdup( cidr );
+        dbgmsg( "setting our ACL to [%s]", server->acl );
 
         if( isRunning )
             startServer( server );
