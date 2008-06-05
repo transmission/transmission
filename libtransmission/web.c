@@ -147,6 +147,7 @@ addTask( void * vtask )
         curl_easy_setopt( ch, CURLOPT_WRITEFUNCTION, writeFunc );
         curl_easy_setopt( ch, CURLOPT_WRITEDATA, task );
         curl_easy_setopt( ch, CURLOPT_USERAGENT, TR_NAME "/" LONG_VERSION_STRING );
+        curl_easy_setopt( ch, CURLOPT_SSL_VERIFYHOST, 0 );
         curl_easy_setopt( ch, CURLOPT_SSL_VERIFYPEER, 0 );
         curl_easy_setopt( ch, CURLOPT_FORBID_REUSE, 1 );
         curl_easy_setopt( ch, CURLOPT_NOSIGNAL, 1 );
