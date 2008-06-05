@@ -225,7 +225,7 @@
     if ([fTrackers count] == 0 && [fDefaults boolForKey: @"WarningCreatorBlankAddress"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
-        [alert setMessageText: NSLocalizedString(@"The tracker address is blank.", "Create torrent -> blank address -> title")];
+        [alert setMessageText: NSLocalizedString(@"There is no tracker address.", "Create torrent -> blank address -> title")];
         [alert setInformativeText: NSLocalizedString(@"The torrent file will not be able to be opened."
             " A torrent file with no tracker address is only useful when you plan to upload the file to a tracker website"
             " that will add the address for you.", "Create torrent -> blank address -> message")];

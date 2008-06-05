@@ -307,8 +307,7 @@
         fNatStatus = fwd;
         fPeerPort = port;
         
-        [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status", "Preferences -> Network -> port status")
-            stringByAppendingEllipsis]];
+        [fPortStatusField setStringValue: @""];
         [fPortStatusImage setImage: nil];
         [fPortStatusProgress startAnimation: self];
         
@@ -339,8 +338,7 @@
             [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
             break;
         case PORT_STATUS_ERROR:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Unable to check port status",
-                                                "Preferences -> Network -> port status")];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Unable to check status", "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.png"]];
             break;
     }
