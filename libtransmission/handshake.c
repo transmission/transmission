@@ -228,9 +228,10 @@ parseHandshake( tr_handshake     * handshake,
 
     /* torrent hash */
     tr_peerIoReadBytes( handshake->io, inbuf, hash, sizeof(hash) );
-    assert( tr_torrentExists( handshake->handle, hash ) );
     assert( tr_peerIoHasTorrentHash( handshake->io ) );
-    if( memcmp( hash, tr_peerIoGetTorrentHash(handshake->io), SHA_DIGEST_LENGTH ) ) {
+    if( !tr_torrentExists( handshake->handle, hash )
+        || memcmp( hash, tr_peerIoGetTorrentHash(handshake->io), SHA_DIGEST_LENGTH ) )
+    {
         dbgmsg( handshake, "peer returned the wrong hash. wtf?" );
         return HANDSHAKE_BAD_TORRENT;
     }
