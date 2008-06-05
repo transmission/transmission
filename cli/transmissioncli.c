@@ -178,7 +178,8 @@ main( int argc, char ** argv )
             peerSocketTOS,
             TR_DEFAULT_RPC_ENABLED,
             TR_DEFAULT_RPC_PORT,
-            TR_DEFAULT_RPC_ACL );
+            TR_DEFAULT_RPC_ACL,
+            FALSE, "fnord", "potzrebie" );
 
     if( sourceFile && *sourceFile ) /* creating a torrent */
     {
