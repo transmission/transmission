@@ -65,6 +65,7 @@ showUsage( void )
             "  -s --start all            Start all stopped torrents\n"
             "  -S --stop <int>           Stop the torrent with the given ID\n"
             "  -S --stop all             Stop all running torrents\n"
+            "  -t --auth <user>:<pass>   Username and password for authentication\n"
             "  -u --upload-limit <int>   Max upload rate in KiB/s\n"
             "  -U --upload-unlimited     No upload rate limit\n"
             "  -v --verify <id>          Verify the torrent's local data\n" );
@@ -86,6 +87,7 @@ numarg( const char * arg )
 static char * reqs[256]; /* arbitrary max */
 static int reqCount = 0;
 static int debug = 0;
+static char * auth = NULL;
 
 static char*
 absolutify( char * buf, size_t len, const char * path )
@@ -114,7 +116,7 @@ static void
 readargs( int argc, char ** argv )
 {
     int opt;
-    char optstr[] = "a:c:d:DeEf:ghlmMp:r:s:S:u:Uv:";
+    char optstr[] = "a:c:d:DeEf:ghlmMp:r:s:S:t:u:Uv:";
     
     const struct option longopts[] =
     {
@@ -134,6 +136,7 @@ readargs( int argc, char ** argv )
         { "remove",             required_argument, NULL, 'r' },
         { "start",              required_argument, NULL, 's' },
         { "stop",               required_argument, NULL, 'S' },
+        { "auth",               required_argument, NULL, 't' },
         { "upload-limit",       required_argument, NULL, 'u' },
         { "upload-unlimited",   no_argument,       NULL, 'U' },
         { "verify",             required_argument, NULL, 'v' },
@@ -152,6 +155,9 @@ readargs( int argc, char ** argv )
         switch( opt )
         {
             case 'g': debug = 1;
+                      addArg = FALSE;
+                      break;
+            case 't': auth = tr_strdup( optarg );
                       addArg = FALSE;
                       break;
             case 'h': showUsage( );
@@ -287,7 +293,7 @@ processResponse( const char * host, int port,
                  (int)len, (int)len, (const char*) response );
 
     if( tr_jsonParse( response, len, &top, NULL ) )
-       tr_nerr( MY_NAME, "Unable to parse response" );
+       tr_nerr( MY_NAME, "Unable to parse response \"%*.*s\"", (int)len, (int)len, (char*)response );
     else
     {
         tr_benc *args, *list;
@@ -346,6 +352,10 @@ processRequests( const char * host, int port,
     curl_easy_setopt( curl, CURLOPT_WRITEDATA, buf );
     curl_easy_setopt( curl, CURLOPT_POST, 1 );
     curl_easy_setopt( curl, CURLOPT_URL, url );
+    if( auth ) {
+        curl_easy_setopt( curl, CURLOPT_USERPWD, auth );
+        curl_easy_setopt( curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY );
+    }
 
     for( i=0; i<reqCount; ++i )
     {

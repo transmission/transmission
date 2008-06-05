@@ -13,6 +13,7 @@
 .Op Fl a Ar (+|-)x.x.x.x[/x],...
 .Op Fl g Ar directory
 .Op Fl p Ar port
+.Op Fl t Ar user:pass
 .Ek
 
 .Sh DESCRIPTION
@@ -38,6 +39,12 @@ Run in the foreground and print errors to stderr instead of forking
 and logging errors with syslog.
 .It Fl g Fl -config-dir Ar directory
 Where to look for .torrent and config files on startup.
+.It Fl t Fl -auth Ar user:pass
+Requre
+.Ar username
+and
+.Ar password
+authentication
 .It Fl h Fl -help
 Print command-line option descriptions.
 .It Fl p Fl -port Ar port

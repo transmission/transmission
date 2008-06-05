@@ -24,6 +24,7 @@ and
 .Op Fl m
 .Op Fl M
 .Op Fl p Ar port
+.Op Fl t Ar user:pass
 .Op Fl q
 .Oo
 .Fl r Ar all | Ar id | Ar hash
@@ -83,6 +84,11 @@ Disable automatic port mapping.
 Attempt to bind to
 .Ar port
 for use as a listening port to accept incoming peer connections.
+.It Fl t Fl -auth Ar user:pass
+.Ar Username
+and
+.Ar password
+for authentication
 
 .It Fl r Fl -remove Ar all | id | torrent-hash
 Remove all torrents, or the torrent matching the specified
