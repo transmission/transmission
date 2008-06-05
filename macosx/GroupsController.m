@@ -146,7 +146,8 @@ GroupsController * fGroupsInstance = nil;
 - (NSImage *) imageForIndex: (int) index
 {
     int orderIndex = [self rowValueForIndex: index];
-    return orderIndex != -1 ? [self imageForGroup: [fGroups objectAtIndex: orderIndex]] : nil;
+    return orderIndex != -1 ? [self imageForGroup: [fGroups objectAtIndex: orderIndex]]
+                            : [NSImage imageNamed: @"GroupsNoneTemplate.png"];
 }
 
 - (NSColor *) colorForIndex: (int) index

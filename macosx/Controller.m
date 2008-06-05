@@ -2265,21 +2265,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     NSImage * icon;
     NSString * toolTip;
-    switch (groupIndex)
+    if (groupIndex == GROUP_FILTER_ALL_TAG)
     {
-        case GROUP_FILTER_ALL_TAG:
-            icon = [NSImage imageNamed: @"PinTemplate.png"];
-            toolTip = NSLocalizedString(@"All Groups", "Groups -> Button");
-            break;
-        case -1:
-            icon = [NSImage imageNamed: @"GroupsNoneTemplate.png"];
-            toolTip = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Group", "Groups -> Button"),
-                        NSLocalizedString(@"No Label", "Groups -> Button")];
-            break;
-        default:
-            icon = [[GroupsController groups] imageForIndex: groupIndex];
-            toolTip = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Group", "Groups -> Button"),
-                        [[GroupsController groups] nameForIndex: groupIndex]];
+        icon = [NSImage imageNamed: @"PinTemplate.png"];
+        toolTip = NSLocalizedString(@"All Groups", "Groups -> Button");
+    }
+    else
+    {
+        icon = [[GroupsController groups] imageForIndex: groupIndex];
+        NSString * groupName = groupIndex != -1 ? [[GroupsController groups] nameForIndex: groupIndex]
+                                                : NSLocalizedString(@"None", "Groups -> Button");
+        toolTip = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Group", "Groups -> Button"), groupName];
     }
     
     //tiger doesn't have built-in image scaling in buttons
@@ -2542,7 +2538,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
 {
-    if (![item isKindOfClass: [Torrent class]])
+    if ([item isKindOfClass: [Torrent class]])
+        return [item hashString];
+    else
     {
         NSString * ident = [tableColumn identifier];
         if ([ident isEqualToString: @"Group"])
@@ -2554,8 +2552,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         else if ([ident isEqualToString: @"Color"])
         {
             int group = [[item objectForKey: @"Group"] intValue];
-            return group != -1 ? [[GroupsController groups] imageForIndex: group]
-                                : [NSImage imageNamed: @"GroupsNoneTemplate.png"];
+            return [[GroupsController groups] imageForIndex: group];
         }
         else if ([ident isEqualToString: @"DL Image"])
             return [NSImage imageNamed: @"DownArrowGroupTemplate.png"];
@@ -2591,8 +2588,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             }
         }
     }
-    else
-        return [item hashString];
 }
 
 - (BOOL) outlineView: (NSOutlineView *) outlineView writeItems: (NSArray *) items toPasteboard: (NSPasteboard *) pasteboard
