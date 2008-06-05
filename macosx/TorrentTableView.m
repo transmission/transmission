@@ -188,7 +188,8 @@
     }
     else
     {
-        if ([[tableColumn identifier] isEqualToString: @"UL Image"] || [[tableColumn identifier] isEqualToString: @"DL Image"])
+        NSString * ident = [tableColumn identifier];
+        if ([ident isEqualToString: @"UL Image"] || [ident isEqualToString: @"DL Image"])
         {
             //ensure arrows are white only when selected
             NSImage * image = [cell image];
@@ -454,6 +455,9 @@
             int i;
             for (i = 0; i < [self numberOfRows]; i++)
             {
+                if ([indexSet containsIndex: i])
+                    continue;
+                
                 id tableItem = [self itemAtRow: i];
                 if (![tableItem isKindOfClass: [Torrent class]] && [group isEqualToNumber: [tableItem objectForKey: @"Group"]])
                 {
@@ -482,19 +486,20 @@
 - (NSArray *) selectedTorrents
 {
     NSIndexSet * selectedIndexes = [self selectedRowIndexes];
-    NSMutableArray * torrents = [NSMutableArray array];
+    NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [selectedIndexes count]]; //take a shot at guessing capacity
     
     NSUInteger i;
     for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
     {
         id item = [self itemAtRow: i];
         if ([item isKindOfClass: [Torrent class]])
-        {
-            if (![torrents containsObject: item])
-                [torrents addObject: item];
-        }
+            [torrents addObject: item];
         else
-            [torrents addObjectsFromArray: [item objectForKey: @"Torrents"]];
+        {
+            NSArray * groupTorrents = [item objectForKey: @"Torrents"];
+            [torrents addObjectsFromArray: groupTorrents];
+            i += [groupTorrents count];
+        }
     }
     
     return torrents;
