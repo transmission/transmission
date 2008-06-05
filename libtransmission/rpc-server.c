@@ -27,11 +27,13 @@
 #define MY_NAME "RPC Server"
 
 #define BUSY_INTERVAL_MSEC 30
-#define IDLE_INTERVAL_MSEC 1000
+#define IDLE_INTERVAL_MSEC 100
+#define UNUSED_INTERVAL_MSEC 1000
 
 struct tr_rpc_server
 {
     int port;
+    time_t lastRequestTime;
     struct shttpd_ctx * ctx;
     tr_handle * session;
     struct evbuffer * in;
@@ -96,16 +98,21 @@ rpcPulse( int socket UNUSED, short action UNUSED, void * vserver )
     int interval;
     struct timeval tv;
     tr_rpc_server * server = vserver;
+    const time_t now = time( NULL );
 
     assert( server );
 
     shttpd_poll( server->ctx, 1 );
 
     /* set a timer for the next pulse */
-    if( EVBUFFER_LENGTH( server->in ) || EVBUFFER_LENGTH( server->out ) )
+    if( EVBUFFER_LENGTH( server->in ) || EVBUFFER_LENGTH( server->out ) ) {
         interval = BUSY_INTERVAL_MSEC;
-    else
+        server->lastRequestTime = now;
+    } else if( now - server->lastRequestTime < 300 ) {
         interval = IDLE_INTERVAL_MSEC;
+    } else {
+        interval = UNUSED_INTERVAL_MSEC;
+    }
     tv = tr_timevalMsec( interval );
     evtimer_add( &server->timer, &tv );
 }
@@ -116,7 +123,7 @@ startServer( tr_rpc_server * server )
     if( !server->ctx )
     {
         char ports[128];
-        struct timeval tv = tr_timevalMsec( IDLE_INTERVAL_MSEC );
+        struct timeval tv = tr_timevalMsec( UNUSED_INTERVAL_MSEC );
 
         server->ctx = shttpd_init( );
         snprintf( ports, sizeof( ports ), "%d", server->port );

@@ -36,6 +36,10 @@ int         tr_rpcSetTest   ( const tr_rpc_server    * server,
                               const char             * acl,
                               char                  ** allocme_errmsg );
 
+int         tr_rpcTestACL   ( const tr_rpc_server    * server,
+                              const char             * acl,
+                              char                  ** allocme_errmsg );
+
 int         tr_rpcSetACL    ( tr_rpc_server          * server,
                               const char             * acl,
                               char                  ** allocme_errmsg );
