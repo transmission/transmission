@@ -30,7 +30,7 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_ALLOW_HIBERNATION      "allow-hibernation"
 #define PREF_KEY_DIR_WATCH              "watch-folder"
 #define PREF_KEY_DIR_WATCH_ENABLED      "watch-folder-enabled"
-#define PREF_KEY_TRAY_ICON_ENABLED      "tray-icon-enabled"
+#define PREF_KEY_SHOW_TRAY_ICON         "show-tray-icon"
 #define PREF_KEY_START                  "start-added-torrents"
 #define PREF_KEY_TRASH_ORIGINAL         "trash-original-torrent-files" 
 #define PREF_KEY_PEER_SOCKET_TOS        "peer-socket-tos"
@@ -57,9 +57,14 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_RPC_PORT               "rpc-port"
 #define PREF_KEY_RPC_ENABLED            "rpc-enabled"
 #define PREF_KEY_RPC_ACL                "rpc-access-control-list"
-#define PREF_KEY_RPC_PASSWORD_ENABLED   "rpc-password-required"
+#define PREF_KEY_RPC_AUTH_ENABLED       "rpc-authentication-required"
 #define PREF_KEY_RPC_PASSWORD           "rpc-password"
 #define PREF_KEY_RPC_USERNAME           "rpc-username"
+#define PREF_KEY_PROXY_SERVER           "proxy-server"
+#define PREF_KEY_PROXY_SERVER_ENABLED   "proxy-server-enabled"
+#define PREF_KEY_PROXY_AUTH_ENABLED     "proxy-authentication-required"
+#define PREF_KEY_PROXY_USERNAME         "proxy-username"
+#define PREF_KEY_PROXY_PASSWORD         "proxy-authentication"
 
 
 void tr_prefs_init_global( void );

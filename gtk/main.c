@@ -429,7 +429,7 @@ main( int argc, char ** argv )
                             pref_flag_get( PREF_KEY_RPC_ENABLED ),
                             pref_int_get( PREF_KEY_RPC_PORT ),
                             pref_string_get( PREF_KEY_RPC_ACL ),
-                            pref_flag_get( PREF_KEY_RPC_PASSWORD_ENABLED ),
+                            pref_flag_get( PREF_KEY_RPC_AUTH_ENABLED ),
                             pref_string_get( PREF_KEY_RPC_USERNAME ),
                             pref_string_get( PREF_KEY_RPC_PASSWORD ) );
         cbdata->core = tr_core_new( h );
@@ -474,7 +474,7 @@ appsetup( TrWindow * wind, GSList * torrentFiles,
     cbdata->minimized  = minimized;
 
     if( minimized )
-        pref_flag_set( PREF_KEY_TRAY_ICON_ENABLED, TRUE );
+        pref_flag_set( PREF_KEY_SHOW_TRAY_ICON, TRUE );
 
     actions_set_core( cbdata->core );
 
@@ -497,7 +497,7 @@ appsetup( TrWindow * wind, GSList * torrentFiles,
     winsetup( cbdata, wind );
 
     /* set up the icon */
-    prefschanged( cbdata->core, PREF_KEY_TRAY_ICON_ENABLED, cbdata );
+    prefschanged( cbdata->core, PREF_KEY_SHOW_TRAY_ICON, cbdata );
 
     /* start model update timer */
     cbdata->timer = g_timeout_add( UPDATE_INTERVAL, updatemodel, cbdata );
@@ -891,7 +891,7 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
         const int port = pref_int_get( key );
         tr_sessionSetPeerPort( tr, port );
     }
-    else if( !strcmp( key, PREF_KEY_TRAY_ICON_ENABLED ) )
+    else if( !strcmp( key, PREF_KEY_SHOW_TRAY_ICON ) )
     {
         const int show = pref_flag_get( key );
         action_sensitize ( "close", show );
@@ -963,10 +963,30 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
         tr_sessionSetRPCPassword( tr, s );
         g_free( s );
     }
-    else if( !strcmp( key, PREF_KEY_RPC_PASSWORD_ENABLED ) )
+    else if( !strcmp( key, PREF_KEY_RPC_AUTH_ENABLED ) )
     {
         const gboolean enabled = pref_flag_get( key );
         tr_sessionSetRPCPasswordEnabled( tr, enabled );
+    }
+    else if( !strcmp( key, PREF_KEY_PROXY_SERVER ) )
+    {
+        g_message( "FIXME" );
+    }
+    else if( !strcmp( key, PREF_KEY_PROXY_SERVER_ENABLED ) )
+    {
+        g_message( "FIXME" );
+    }
+    else if( !strcmp( key, PREF_KEY_PROXY_AUTH_ENABLED ) )
+    {
+        g_message( "FIXME" );
+    }
+    else if( !strcmp( key, PREF_KEY_PROXY_USERNAME ) )
+    {
+        g_message( "FIXME" );
+    }
+    else if( !strcmp( key, PREF_KEY_PROXY_PASSWORD ) )
+    {
+        g_message( "FIXME" );
     }
 }
 

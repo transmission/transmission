@@ -91,7 +91,9 @@ static GtkToggleActionEntry pref_toggle_entries[] =
   { "show-statusbar", NULL,
     N_("_Statusbar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
   { "show-toolbar", NULL,
-    N_("_Toolbar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE }
+    N_("_Toolbar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
+  { PREF_KEY_SHOW_TRAY_ICON, NULL,
+    N_("Tray _Icon" ), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE }
 };
 
 static GtkActionEntry entries[] =

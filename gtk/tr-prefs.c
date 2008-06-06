@@ -63,7 +63,7 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_TOOLBAR, TRUE );
     pref_flag_set_default   ( PREF_KEY_FILTERBAR, TRUE );
     pref_flag_set_default   ( PREF_KEY_STATUSBAR, TRUE );
-    pref_flag_set_default   ( PREF_KEY_TRAY_ICON_ENABLED, TRUE );
+    pref_flag_set_default   ( PREF_KEY_SHOW_TRAY_ICON, TRUE );
     pref_string_set_default ( PREF_KEY_STATUSBAR_STATS, "total-ratio" );
 
     pref_flag_set_default   ( PREF_KEY_DL_LIMIT_ENABLED, FALSE );
@@ -76,6 +76,12 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_WIDTH, 300 );
     pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_X, 50 );
     pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_Y, 50 );
+
+    pref_string_set_default ( PREF_KEY_PROXY_SERVER, "" );
+    pref_flag_set_default   ( PREF_KEY_PROXY_SERVER_ENABLED, FALSE );
+    pref_flag_set_default   ( PREF_KEY_PROXY_AUTH_ENABLED, FALSE );
+    pref_string_set_default ( PREF_KEY_PROXY_USERNAME, "" );
+    pref_string_set_default ( PREF_KEY_PROXY_PASSWORD, "" );
 
     str = NULL;
 #if GLIB_CHECK_VERSION(2,14,0)
@@ -109,7 +115,7 @@ tr_prefs_init_global( void )
     pw[16] = '\0';
     pref_string_set_default( PREF_KEY_RPC_USERNAME, "transmission" );
     pref_string_set_default( PREF_KEY_RPC_PASSWORD, pw );
-    pref_flag_set_default  ( PREF_KEY_RPC_PASSWORD_ENABLED, FALSE );
+    pref_flag_set_default  ( PREF_KEY_RPC_AUTH_ENABLED, FALSE );
 
     pref_save( NULL );
 }
@@ -185,7 +191,8 @@ new_entry( const char * key, gpointer core )
 {
     GtkWidget * w = gtk_entry_new( );
     char * value = pref_string_get( key );
-    gtk_entry_set_text( GTK_ENTRY( w ), value );
+    if( value )
+        gtk_entry_set_text( GTK_ENTRY( w ), value );
     g_object_set_data_full( G_OBJECT(w), PREF_KEY, g_strdup(key), g_free );
     g_signal_connect( w, "changed", G_CALLBACK(entry_changed_cb), core );
     g_free( value );
@@ -489,14 +496,16 @@ onUpdateBlocklistCB( GtkButton * w, gpointer gdata )
 }
 
 static GtkWidget*
-peerPage( GObject * core )
+peerPage( GObject * core, gboolean * alive )
 {
     int row = 0;
     const char * s;
     GtkWidget * t;
     GtkWidget * w;
+    GtkWidget * w2;
     GtkWidget * b;
     GtkWidget * h;
+    GtkWidget * l;
     struct blocklist_data * data;
 
     t = hig_workarea_create( );
@@ -526,39 +535,28 @@ peerPage( GObject * core )
         s = _("Use peer e_xchange");
         w = new_check_button( s, PREF_KEY_PEX, core );
         hig_workarea_add_wide_control( t, &row, w );
+
+        h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
+        w2 = new_spin_button( PREF_KEY_PORT, core, 1, INT_MAX, 1 );
+        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
+        l = gtk_label_new( NULL );
+        gtk_misc_set_alignment( GTK_MISC(l), 0.0f, 0.5f );
+        gtk_box_pack_start( GTK_BOX(h), l, FALSE, FALSE, 0 );
+        hig_workarea_add_row( t, &row, _("Listening _port:"), h, w2 );
+
+        g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
+        g_object_set_data( G_OBJECT(l), "alive", alive );
+        g_object_set_data( G_OBJECT(l), "handle", tr_core_handle( TR_CORE( core ) ) );
+        testing_port_cb( NULL, l );
+        g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
         
     hig_workarea_add_section_divider( t, &row );
-    /* section header for the "maximum number of peers" section */
     hig_workarea_add_section_title( t, &row, _( "Limits" ) );
   
         w = new_spin_button( PREF_KEY_MAX_PEERS_GLOBAL, core, 1, 3000, 5 );
         hig_workarea_add_row( t, &row, _( "Maximum peers _overall:" ), w, NULL );
         w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300, 5 );
         hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
-
-    hig_workarea_finish( t, &row );
-    return t;
-}
-
-static GtkWidget*
-desktopPage( GObject * core )
-{
-    int row = 0;
-    const char * s;
-    GtkWidget * t;
-    GtkWidget * w;
-
-    t = hig_workarea_create( );
-
-    hig_workarea_add_section_title (t, &row, _("Options"));
-
-        s = _( "Allow desktop _hibernation" );
-        w = new_check_button( s, PREF_KEY_ALLOW_HIBERNATION, core );
-        hig_workarea_add_wide_control( t, &row, w );
-
-        s = _( "Show tray _icon" );
-        w = new_check_button( s, PREF_KEY_TRAY_ICON_ENABLED, core );
-        hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_finish( t, &row );
     return t;
@@ -782,7 +780,7 @@ remotePage( GObject * core )
 
         /* require authentication */
         s = _( "Require _authentication" );
-        w = new_check_button( s, PREF_KEY_RPC_PASSWORD_ENABLED, core );
+        w = new_check_button( s, PREF_KEY_RPC_AUTH_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
         page->auth_tb = GTK_TOGGLE_BUTTON( w );
         page->widgets = g_slist_append( page->widgets, w );
@@ -892,17 +890,22 @@ remotePage( GObject * core )
 }
 
 static GtkWidget*
-networkPage( GObject * core, gpointer alive )
+networkPage( GObject * core )
 {
     int row = 0;
     const char * s;
     GtkWidget * t;
     GtkWidget * w, * w2;
-    GtkWidget * l;
-    GtkWidget * h;
 
     t = hig_workarea_create( );
 
+    hig_workarea_add_section_title (t, &row, _( "Router" ) );
+
+        s = _("Use port _forwarding from my router" );
+        w = new_check_button( s, PREF_KEY_NAT, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+    hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title (t, &row, _("Bandwidth"));
 
         s = _("Limit _download speed (KB/s):");
@@ -920,27 +923,23 @@ networkPage( GObject * core, gpointer alive )
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _( "Ports" ) );
+    hig_workarea_add_section_title (t, &row, _( "Tracker Proxies" ) );
 
-        h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
-        w2 = new_spin_button( PREF_KEY_PORT, core, 1, INT_MAX, 1 );
-        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
-        l = gtk_label_new( NULL );
-        gtk_misc_set_alignment( GTK_MISC(l), 0.0f, 0.5f );
-        gtk_box_pack_start( GTK_BOX(h), l, FALSE, FALSE, 0 );
-        hig_workarea_add_row( t, &row, _("Listening _port:"), h, w );
+        s = _( "Use a tracker _proxy:" );
+        w = new_check_button( s, PREF_KEY_PROXY_SERVER_ENABLED, core );
+        w2 = new_entry( PREF_KEY_PROXY_SERVER, core );
+        hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
-        g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
-        g_object_set_data( G_OBJECT(l), "alive", alive );
-        g_object_set_data( G_OBJECT(l), "handle", tr_core_handle( TR_CORE( core ) ) );
-        testing_port_cb( NULL, l );
-
-        s = _("Use port _forwarding from my router" );
-        w = new_check_button( s, PREF_KEY_NAT, core );
+        s = _( "My proxy requires _authentication" );
+        w = new_check_button( s, PREF_KEY_PROXY_AUTH_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
 
-        g_signal_connect( w, "toggled", G_CALLBACK(testing_port_cb), l );
-        g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
+        w = new_entry( PREF_KEY_PROXY_USERNAME, core );
+        hig_workarea_add_row( t, &row, _( "_Username:" ), w, NULL );
+
+        w = new_entry( PREF_KEY_PROXY_PASSWORD, core );
+        gtk_entry_set_visibility( GTK_ENTRY( w ), FALSE );
+        hig_workarea_add_row( t, &row, _( "_Password:" ), w, NULL );
 
     hig_workarea_finish( t, &row );
     return t;
@@ -973,14 +972,11 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
                               torrentPage( core ),
                               gtk_label_new (_("Torrents")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              peerPage( core ),
+                              peerPage( core, alive ),
                               gtk_label_new (_("Peers")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              networkPage( core, alive ),
+                              networkPage( core ),
                               gtk_label_new (_("Network")) );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              desktopPage( core ),
-                              gtk_label_new (_("Desktop")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               remotePage( core ),
                               gtk_label_new (_("Remote")) );
