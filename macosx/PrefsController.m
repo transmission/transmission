@@ -820,7 +820,7 @@
     //encryption
     tr_encryption_mode encryptionMode = tr_sessionGetEncryption(fHandle);
     [fDefaults setBool: encryptionMode != TR_PLAINTEXT_PREFERRED forKey: @"EncryptionPrefer"];
-    [fDefaults setBool: encryptionMode == TR_ENCRYPTION_PREFERRED forKey: @"EncryptionPrefer"];
+    [fDefaults setBool: encryptionMode == TR_ENCRYPTION_REQUIRED forKey: @"EncryptionRequire"];
     
     //download directory
     NSString * downloadLocation = [[NSString stringWithUTF8String: tr_sessionGetDownloadDir(fHandle)] stringByStandardizingPath];
