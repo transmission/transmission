@@ -2468,6 +2468,10 @@
 					"third-party/",
 					"third-party/libevent",
 				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DHAVE_DAEMON",
+				);
 				PRODUCT_NAME = "transmission-daemon";
 			};
 			name = "Release - Debug";
@@ -2628,6 +2632,10 @@
 					.,
 					"third-party/",
 					"third-party/libevent",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DHAVE_DAEMON",
 				);
 				PRODUCT_NAME = "transmission-daemon";
 			};
