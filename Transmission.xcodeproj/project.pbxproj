@@ -94,7 +94,6 @@
 		A22E59A70DC11A1D00F4BE15 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.dylib */; };
 		A22E59A80DC11A1F00F4BE15 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.dylib */; };
 		A22E59A90DC11A2000F4BE15 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.dylib */; };
-		A22E59AA0DC11A2000F4BE15 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.dylib */; };
 		A231274C0D11D0B7003F9AFF /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A231274B0D11D0B7003F9AFF /* AboutWindow.xib */; };
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
 		A233BD330D8C6585007EE7B4 /* MessageWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A233BD320D8C6585007EE7B4 /* MessageWindow.xib */; };
@@ -270,8 +269,6 @@
 		BEFC1CF40C07822400B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
 		BEFC1D050C07825A00B0BB3C /* remote.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C140C07756200B0BB3C /* remote.c */; };
 		BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
-		BEFC1D3E0C0783EE00B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
-		BEFC1D3F0C0783EE00B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		BEFC1E290C07861A00B0BB3C /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF00C07861A00B0BB3C /* version.h */; };
 		BEFC1E2A0C07861A00B0BB3C /* utils.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF10C07861A00B0BB3C /* utils.h */; };
 		BEFC1E2B0C07861A00B0BB3C /* utils.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF20C07861A00B0BB3C /* utils.c */; };
@@ -363,13 +360,6 @@
 			remoteInfo = libtransmission;
 		};
 		BEFC1CEC0C07822400B0BB3C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4D18389609DEC0030047D688;
-			remoteInfo = libtransmission;
-		};
-		BEFC1D360C0783EE00B0BB3C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
@@ -746,7 +736,6 @@
 		BEFC1C0E0C07756200B0BB3C /* daemon.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = daemon.c; path = daemon/daemon.c; sourceTree = "<group>"; };
 		BEFC1C140C07756200B0BB3C /* remote.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = remote.c; path = daemon/remote.c; sourceTree = "<group>"; };
 		BEFC1CF90C07822400B0BB3C /* transmission-remote */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-remote"; sourceTree = BUILT_PRODUCTS_DIR; };
-		BEFC1D430C0783EE00B0BB3C /* transmission-proxy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-proxy"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1DF00C07861A00B0BB3C /* version.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = version.h; path = libtransmission/version.h; sourceTree = "<group>"; };
 		BEFC1DF10C07861A00B0BB3C /* utils.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = utils.h; path = libtransmission/utils.h; sourceTree = "<group>"; };
 		BEFC1DF20C07861A00B0BB3C /* utils.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = utils.c; path = libtransmission/utils.c; sourceTree = "<group>"; };
@@ -873,16 +862,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		BEFC1D3D0C0783EE00B0BB3C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				BEFC1D3E0C0783EE00B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */,
-				BEFC1D3F0C0783EE00B0BB3C /* libtransmission.a in Frameworks */,
-				A22E59AA0DC11A2000F4BE15 /* libcurl.dylib in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -963,7 +942,6 @@
 				4D18389709DEC0030047D688 /* libtransmission.a */,
 				BEFC1C000C07750000B0BB3C /* transmission-daemon */,
 				BEFC1CF90C07822400B0BB3C /* transmission-remote */,
-				BEFC1D430C0783EE00B0BB3C /* transmission-proxy */,
 				BE75C3490C729E9500DBEFE0 /* libevent.a */,
 				BE1183480CE160960002D0F3 /* libminiupnp.a */,
 				3C7A118D0D0B2EB800B5701F /* libnatpmp.a */,
@@ -1668,23 +1646,6 @@
 			productReference = BEFC1CF90C07822400B0BB3C /* transmission-remote */;
 			productType = "com.apple.product-type.tool";
 		};
-		BEFC1D340C0783EE00B0BB3C /* transmission-proxy */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = BEFC1D410C0783EE00B0BB3C /* Build configuration list for PBXNativeTarget "transmission-proxy" */;
-			buildPhases = (
-				BEFC1D370C0783EE00B0BB3C /* Sources */,
-				BEFC1D3D0C0783EE00B0BB3C /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				BEFC1D350C0783EE00B0BB3C /* PBXTargetDependency */,
-			);
-			name = "transmission-proxy";
-			productName = "transmission-daemon";
-			productReference = BEFC1D430C0783EE00B0BB3C /* transmission-proxy */;
-			productType = "com.apple.product-type.tool";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1722,7 +1683,6 @@
 				4D18389609DEC0030047D688 /* libtransmission */,
 				BEFC1BFF0C07750000B0BB3C /* transmission-daemon */,
 				BEFC1CEA0C07822400B0BB3C /* transmission-remote */,
-				BEFC1D340C0783EE00B0BB3C /* transmission-proxy */,
 				BE75C3480C729E9500DBEFE0 /* event */,
 				A2DF58240DE4B0EF000795D5 /* shttpd */,
 				BE1183470CE160960002D0F3 /* miniupnp */,
@@ -2061,13 +2021,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		BEFC1D370C0783EE00B0BB3C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -2110,11 +2063,6 @@
 			isa = PBXTargetDependency;
 			target = 4D18389609DEC0030047D688 /* libtransmission */;
 			targetProxy = BEFC1CEC0C07822400B0BB3C /* PBXContainerItemProxy */;
-		};
-		BEFC1D350C0783EE00B0BB3C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4D18389609DEC0030047D688 /* libtransmission */;
-			targetProxy = BEFC1D360C0783EE00B0BB3C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2305,18 +2253,6 @@
 					"third-party/libevent",
 				);
 				PRODUCT_NAME = "transmission-remote";
-			};
-			name = Development;
-		};
-		0053D3D90C86774200545606 /* Development */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				HEADER_SEARCH_PATHS = (
-					.,
-					"third-party/",
-					"third-party/libevent",
-				);
-				PRODUCT_NAME = "transmission-proxy";
 			};
 			name = Development;
 		};
@@ -2548,18 +2484,6 @@
 			};
 			name = "Release - Debug";
 		};
-		A250CFF10CDA19680068B4B6 /* Release - Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				HEADER_SEARCH_PATHS = (
-					.,
-					"third-party/",
-					"third-party/libevent",
-				);
-				PRODUCT_NAME = "transmission-proxy";
-			};
-			name = "Release - Debug";
-		};
 		A250CFF20CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2721,18 +2645,6 @@
 			};
 			name = Release;
 		};
-		BEFC1D420C0783EE00B0BB3C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				HEADER_SEARCH_PATHS = (
-					.,
-					"third-party/",
-					"third-party/libevent",
-				);
-				PRODUCT_NAME = "transmission-proxy";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2832,16 +2744,6 @@
 				BEFC1CF80C07822400B0BB3C /* Release */,
 				A250CFF00CDA19680068B4B6 /* Release - Debug */,
 				0053D3D80C86774200545606 /* Development */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
-		};
-		BEFC1D410C0783EE00B0BB3C /* Build configuration list for PBXNativeTarget "transmission-proxy" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				BEFC1D420C0783EE00B0BB3C /* Release */,
-				A250CFF10CDA19680068B4B6 /* Release - Debug */,
-				0053D3D90C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Development;
