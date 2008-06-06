@@ -588,6 +588,14 @@ tr_errorString( int code )
 *****
 ****/
 
+void*
+tr_memdup( const void * in, int byteCount )
+{
+    void * out = tr_new( uint8_t, byteCount );
+    memcpy( out, in, byteCount );
+    return out;
+}
+    
 char*
 tr_strdup( const char * in )
 {
@@ -692,8 +700,7 @@ tr_bitfieldDup( const tr_bitfield * in )
 {
     tr_bitfield * ret = calloc( 1, sizeof(tr_bitfield) );
     ret->len = in->len;
-    ret->bits = malloc( ret->len );
-    memcpy( ret->bits, in->bits, ret->len );
+    ret->bits = tr_memdup( in->bits, in->len );
     return ret;
 }
 

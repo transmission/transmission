@@ -190,6 +190,7 @@ void  tr_free    ( void* );
 
 char* tr_strdup( const char * str ) TR_GNUC_MALLOC;
 char* tr_strndup( const char * str, int len ) TR_GNUC_MALLOC;
+void* tr_memdup( const void * src, int byteCount ) TR_GNUC_MALLOC;
 char* tr_strdup_printf( const char * fmt, ... )  TR_GNUC_PRINTF( 1, 2 ) TR_GNUC_MALLOC;
 char* tr_base64_encode( const void * input, int inlen, int *outlen ) TR_GNUC_MALLOC;
 char* tr_base64_decode( const void * input, int inlen, int *outlen ) TR_GNUC_MALLOC;
@@ -271,7 +272,7 @@ tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
 
 /** @param high the highest nth bit you're going to access */
 #define tr_bitfieldTestFast(bitfield,high) \
-    ((bitfield) && ( (bitfield)->bits ) && ( ((high)>>3u) < (bitfield)->len ))
+    ((bitfield) && ( (bitfield)->bits ) && ( (high) <= (bitfield)->len*8 ))
 
 double tr_getRatio( double numerator, double denominator );
 
