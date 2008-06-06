@@ -889,6 +889,42 @@ remotePage( GObject * core )
     return t;
 }
 
+struct ProxyPage
+{
+    GSList * proxy_widgets;
+    GSList * proxy_auth_widgets;
+};
+
+static void
+refreshProxySensitivity( struct ProxyPage * p )
+{
+    GSList * l;
+    const gboolean proxy_enabled = pref_flag_get( PREF_KEY_PROXY_SERVER_ENABLED );
+    const gboolean proxy_auth_enabled = pref_flag_get( PREF_KEY_PROXY_AUTH_ENABLED );
+
+    for( l=p->proxy_widgets; l!=NULL; l=l->next )
+        gtk_widget_set_sensitive( GTK_WIDGET( l->data ), proxy_enabled );
+
+    for( l=p->proxy_auth_widgets; l!=NULL; l=l->next )
+        gtk_widget_set_sensitive( GTK_WIDGET( l->data ),
+                                  proxy_enabled && proxy_auth_enabled);
+}
+
+static void
+onProxyToggled( GtkToggleButton * tb UNUSED, gpointer user_data )
+{
+    refreshProxySensitivity( user_data );
+}
+
+static void
+proxyPageFree( gpointer gpage )
+{
+    struct ProxyPage * page = gpage;
+    g_slist_free( page->proxy_widgets );
+    g_slist_free( page->proxy_auth_widgets );
+    g_free( page );
+}
+
 static GtkWidget*
 networkPage( GObject * core )
 {
@@ -896,6 +932,7 @@ networkPage( GObject * core )
     const char * s;
     GtkWidget * t;
     GtkWidget * w, * w2;
+    struct ProxyPage * page = tr_new0( struct ProxyPage, 1 );
 
     t = hig_workarea_create( );
 
@@ -928,20 +965,31 @@ networkPage( GObject * core )
         s = _( "Use a tracker _proxy:" );
         w = new_check_button( s, PREF_KEY_PROXY_SERVER_ENABLED, core );
         w2 = new_entry( PREF_KEY_PROXY_SERVER, core );
+        page->proxy_widgets = g_slist_append( page->proxy_widgets, w2 );
+        g_signal_connect( w, "toggled", G_CALLBACK(onProxyToggled), page );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
         s = _( "My proxy requires _authentication" );
         w = new_check_button( s, PREF_KEY_PROXY_AUTH_ENABLED, core );
+        page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
+        g_signal_connect( w, "toggled", G_CALLBACK(onProxyToggled), page );
         hig_workarea_add_wide_control( t, &row, w );
 
         w = new_entry( PREF_KEY_PROXY_USERNAME, core );
-        hig_workarea_add_row( t, &row, _( "_Username:" ), w, NULL );
+        page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
+        w = hig_workarea_add_row( t, &row, _( "_Username:" ), w, NULL );
+        page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
 
         w = new_entry( PREF_KEY_PROXY_PASSWORD, core );
         gtk_entry_set_visibility( GTK_ENTRY( w ), FALSE );
-        hig_workarea_add_row( t, &row, _( "_Password:" ), w, NULL );
+        page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
+        w = hig_workarea_add_row( t, &row, _( "_Password:" ), w, NULL );
+        page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
 
     hig_workarea_finish( t, &row );
+    g_object_set_data_full( G_OBJECT( t ), "page", page, proxyPageFree );
+
+    refreshProxySensitivity( page );
     return t;
 }
 
