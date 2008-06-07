@@ -1016,6 +1016,18 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return peerDicts;
 }
 
+#warning store?
+- (NSArray *) webSeeders
+{
+    int webSeedCount = fInfo->webseedCount, i;
+    NSMutableArray * webSeeders = [NSMutableArray arrayWithCapacity: webSeedCount];
+    
+    for (i = 0; i < webSeedCount; i++)
+        [webSeeders addObject: [NSString stringWithUTF8String: fInfo->webseeds[i]]];
+    
+    return webSeeders;
+}
+
 - (NSString *) progressString
 {
     NSString * string;

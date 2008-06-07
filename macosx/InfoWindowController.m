@@ -204,6 +204,7 @@ typedef enum
     
     [fTorrents release];
     [fPeers release];
+    [fWebSeeds release];
     [fTrackers release];
     
     [super dealloc];
@@ -356,6 +357,9 @@ typedef enum
         [fPeers release];
         fPeers = nil;
         
+        [fWebSeeds release];
+        fWebSeeds = nil;
+        
         [fTrackers release];
         fTrackers = nil;
         
@@ -440,6 +444,10 @@ typedef enum
         [fPiecesControl setEnabled: YES];
         [fPiecesView setTorrent: torrent];
         
+        //get webseers for table
+        [fWebSeeds release];
+        fWebSeeds = [[torrent webSeeders] retain];
+        
         //get trackers for table
         [fTrackers release];
         fTrackers = [[torrent allTrackers: YES] retain];
@@ -456,6 +464,8 @@ typedef enum
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
     
+    [fWebSeedTable reloadData];
+    #warning check if should just be reloaded when not 1 torrent
     [fPeerTable reloadData];
 }
 
@@ -771,6 +781,8 @@ typedef enum
 {
     if (tableView == fPeerTable)
         return fPeers ? [fPeers count] : 0;
+    else if (tableView == fWebSeedTable)
+        return fWebSeeds ? [fWebSeeds count] : 0;
     else if (tableView == fTrackerTable)
         return fTrackers ? [fTrackers count] : 0;
     return 0;
@@ -801,6 +813,10 @@ typedef enum
         }
         else
             return [peer objectForKey: @"IP"];
+    }
+    else if (tableView == fWebSeedTable)
+    {
+        return [fWebSeeds objectAtIndex: row];
     }
     else if (tableView == fTrackerTable)
     {

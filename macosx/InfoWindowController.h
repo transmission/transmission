@@ -32,7 +32,7 @@
 
 @interface InfoWindowController : NSWindowController
 {
-    NSArray * fTorrents, * fPeers;
+    NSArray * fTorrents;
     NSMutableArray * fTrackers;
     
     IBOutlet NSView * fInfoView, * fActivityView, * fTrackerView, * fPeersView, * fFilesView, * fOptionsView;
@@ -56,8 +56,9 @@
     IBOutlet NSSegmentedControl * fTrackerAddRemoveControl;
     IBOutlet NSTextField * fAnnounceAddressField, * fAnnounceLastField, * fAnnounceResponseField, * fAnnounceNextField,
                             * fScrapeAddressField, * fScrapeLastField, * fScrapeResponseField, * fScrapeNextField;
-
-    IBOutlet NSTableView * fPeerTable;
+    
+    NSArray * fPeers, * fWebSeeds;
+    IBOutlet NSTableView * fPeerTable, * fWebSeedTable;
     IBOutlet NSTextField * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField, * fKnownField,
                             * fSeedersField, * fLeechersField, * fCompletedFromTrackerField;
     IBOutlet NSTextView * fErrorMessageView;
