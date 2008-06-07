@@ -269,7 +269,7 @@ saveProgress( tr_benc * dict, const tr_torrent * tor )
     /* add the bitfield */
     bitfield = tr_cpBlockBitfield( tor->completion );
     tr_bencDictAddRaw( p, KEY_PROGRESS_BITFIELD,
-                       bitfield->bits, bitfield->len );
+                       bitfield->bits, bitfield->byteCount );
 
     /* cleanup */
     tr_free( mtimes );
@@ -319,7 +319,7 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
         if(( b = tr_bencDictFindType( p, KEY_PROGRESS_BITFIELD, TYPE_STR )))
         {
             tr_bitfield tmp;
-            tmp.len = b->val.s.i;
+            tmp.byteCount = b->val.s.i;
             tmp.bits = (uint8_t*) b->val.s.s;
             if( tr_cpBlockBitfieldSet( tor->completion, &tmp ) ) {
                 tr_torrentUncheck( tor );

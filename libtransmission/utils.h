@@ -239,7 +239,8 @@ int tr_httpParseURL( const char * url,
 struct tr_bitfield
 {
     uint8_t * bits;
-    size_t len;
+    size_t bitCount;
+    size_t byteCount;
 };
 
 typedef struct tr_bitfield tr_bitfield;
@@ -272,7 +273,7 @@ tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
 
 /** @param high the highest nth bit you're going to access */
 #define tr_bitfieldTestFast(bitfield,high) \
-    ((bitfield) && ( (bitfield)->bits ) && ( (high) <= (bitfield)->len*8 ))
+    ( (bitfield) && ((bitfield)->bits) && ((high)<(bitfield)->bitCount ) )
 
 double tr_getRatio( double numerator, double denominator );
 

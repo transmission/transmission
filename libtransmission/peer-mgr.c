@@ -662,7 +662,7 @@ getPreferredBlocks( Torrent * t, tr_block_index_t * setmeCount )
         const tr_block_index_t end = begin + tr_torPieceCountBlocks( tor, index );
         tr_block_index_t block;
 
-        assert( tr_bitfieldTestFast( t->requested, end ) );
+        assert( tr_bitfieldTestFast( t->requested, end-1 ) );
 
         for( block=begin; block<end; ++block )
         {

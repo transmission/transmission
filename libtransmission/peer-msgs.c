@@ -502,7 +502,8 @@ isPeerInteresting( const tr_peermsgs * msgs )
     if( !msgs->info->have )
         return TRUE;
 
-    assert( bitfield->len == msgs->info->have->len );
+    assert( bitfield->byteCount == msgs->info->have->byteCount );
+
     for( i=0; i<torrent->info.pieceCount; ++i )
         if( isPieceInteresting( msgs, i ) )
             return TRUE;
@@ -1754,9 +1755,9 @@ sendBitfield( tr_peermsgs * msgs )
     struct evbuffer * out = msgs->outMessages;
 
     dbgmsg( msgs, "sending peer a bitfield message" );
-    tr_peerIoWriteUint32( msgs->io, out, sizeof(uint8_t) + bitfield->len );
+    tr_peerIoWriteUint32( msgs->io, out, sizeof(uint8_t) + bitfield->byteCount );
     tr_peerIoWriteUint8 ( msgs->io, out, BT_BITFIELD );
-    tr_peerIoWriteBytes ( msgs->io, out, bitfield->bits, bitfield->len );
+    tr_peerIoWriteBytes ( msgs->io, out, bitfield->bits, bitfield->byteCount );
     pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
 }
 

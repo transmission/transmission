@@ -677,21 +677,13 @@ tr_strerror( int i )
 *****
 ****/
 
-/* note that the argument is how many bits are needed, not bytes */
 tr_bitfield*
-tr_bitfieldNew( size_t bitcount )
+tr_bitfieldNew( size_t bitCount )
 {
-    tr_bitfield * ret = calloc( 1, sizeof(tr_bitfield) );
-    if( NULL == ret )
-        return NULL;
-
-    ret->len = (bitcount+7u) / 8u;
-    ret->bits = calloc( ret->len, 1 );
-    if( NULL == ret->bits ) {
-        free( ret );
-        return NULL;
-    }
-
+    tr_bitfield * ret = tr_new0( tr_bitfield, 1 );
+    ret->bitCount = bitCount;
+    ret->byteCount = (bitCount+7u) / 8u;
+    ret->bits = tr_new0( uint8_t, ret->byteCount );
     return ret;
 }
 
@@ -699,8 +691,9 @@ tr_bitfield*
 tr_bitfieldDup( const tr_bitfield * in )
 {
     tr_bitfield * ret = calloc( 1, sizeof(tr_bitfield) );
-    ret->len = in->len;
-    ret->bits = tr_memdup( in->bits, in->len );
+    ret->bitCount = in->bitCount;
+    ret->byteCount = in->byteCount;
+    ret->bits = tr_memdup( in->bits, in->byteCount );
     return ret;
 }
 
@@ -709,15 +702,15 @@ tr_bitfieldFree( tr_bitfield * bitfield )
 {
     if( bitfield )
     {
-        free( bitfield->bits );
-        free( bitfield );
+        tr_free( bitfield->bits );
+        tr_free( bitfield );
     }
 }
 
 void
 tr_bitfieldClear( tr_bitfield * bitfield )
 {
-    memset( bitfield->bits, 0, bitfield->len );
+    memset( bitfield->bits, 0, bitfield->byteCount );
 }
 
 int
@@ -725,7 +718,7 @@ tr_bitfieldIsEmpty( const tr_bitfield * bitfield )
 {
     size_t i;
 
-    for( i=0; i<bitfield->len; ++i )
+    for( i=0; i<bitfield->byteCount; ++i )
         if( bitfield->bits[i] )
             return 0;
 
@@ -742,16 +735,13 @@ tr_bitfieldHas( const tr_bitfield * bitfield, size_t nth )
 int
 tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
 {
-    const size_t i = nth >> 3u;
-
     assert( bitfield != NULL );
     assert( bitfield->bits != NULL );
 
-    if( i >= bitfield->len )
+    if( nth >= bitfield->bitCount )
         return -1;
 
-    bitfield->bits[i] |= (0x80 >> (nth&7u));
-    /*assert( tr_bitfieldHas( bitfield, nth ) );*/
+    bitfield->bits[nth>>3u] |= (0x80 >> (nth&7u));
     return 0;
 }
 
@@ -772,16 +762,13 @@ int
 tr_bitfieldRem( tr_bitfield   * bitfield,
                 size_t          nth )
 {
-    const size_t i = nth >> 3u;
-
     assert( bitfield != NULL );
     assert( bitfield->bits != NULL );
 
-    if( i >= bitfield->len )
+    if( nth >= bitfield->bitCount )
         return -1;
 
-    bitfield->bits[i] &= (0xff7f >> (nth&7u));
-    /*assert( !tr_bitfieldHas( bitfield, nth ) );*/
+    bitfield->bits[nth>>3u] &= (0xff7f >> (nth&7u));
     return 0;
 }
 
@@ -804,9 +791,9 @@ tr_bitfieldOr( tr_bitfield * a, const tr_bitfield * b )
     uint8_t *ait;
     const uint8_t *aend, *bit;
 
-    assert( a->len == b->len );
+    assert( a->bitCount == b->bitCount );
 
-    for( ait=a->bits, bit=b->bits, aend=ait+a->len; ait!=aend; )
+    for( ait=a->bits, bit=b->bits, aend=ait+a->byteCount; ait!=aend; )
         *ait++ |= *bit++;
 
     return a;
@@ -819,9 +806,9 @@ tr_bitfieldDifference( tr_bitfield * a, const tr_bitfield * b )
     uint8_t *ait;
     const uint8_t *aend, *bit;
 
-    assert( a->len == b->len );
+    assert( a->bitCount == b->bitCount );
 
-    for( ait=a->bits, bit=b->bits, aend=ait+a->len; ait!=aend; )
+    for( ait=a->bits, bit=b->bits, aend=ait+a->byteCount; ait!=aend; )
         *ait++ &= ~(*bit++);
 }
 
@@ -853,7 +840,7 @@ tr_bitfieldCountTrueBits( const tr_bitfield* b )
     if( !b )
         return 0;
 
-    for( it=b->bits, end=it+b->len; it!=end; ++it )
+    for( it=b->bits, end=it+b->byteCount; it!=end; ++it )
         ret += trueBitCount[*it];
 
     return ret;

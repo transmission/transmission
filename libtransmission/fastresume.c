@@ -429,7 +429,7 @@ parseProgress( tr_torrent     * tor,
 
         /* get the completion bitfield */
         memset( &bitfield, 0, sizeof bitfield );
-        bitfield.len = FR_BLOCK_BITFIELD_LEN( tor );
+        bitfield.byteCount = FR_BLOCK_BITFIELD_LEN( tor );
         bitfield.bits = (uint8_t*) walk;
         if( !tr_cpBlockBitfieldSet( tor->completion, &bitfield ) )
             ret = TR_FR_PROGRESS;
