@@ -779,10 +779,6 @@ refillPulse( void * vtorrent )
     webseedCount = tr_ptrArraySize( t->webseeds );
     webseeds = tr_memdup( tr_ptrArrayBase(t->webseeds), webseedCount*sizeof(tr_webseed*) );
 
-
-#warning do not check in this line
-peerCount = 0;
-
     for( i=0; (webseedCount || peerCount) && i<blockCount; ++i )
     {
         int j;
@@ -792,7 +788,6 @@ peerCount = 0;
         const tr_piece_index_t index = tr_torBlockPiece( tor, block );
         const uint32_t begin = (block * tor->blockSize) - (index * tor->info.pieceSize);
         const uint32_t length = tr_torBlockCountBytes( tor, block );
-fprintf( stderr, "next block in the refill pulse is %d\n", (int)block );
 
         assert( tr_torrentReqIsValid( tor, index, begin, length ) );
         assert( _tr_block( tor, index, begin ) == block );
