@@ -144,6 +144,7 @@
 		A2725B6E0DE5C4F5003445E7 /* FileListNode.m in Sources */ = {isa = PBXBuildFile; fileRef = A2725B6D0DE5C4F5003445E7 /* FileListNode.m */; };
 		A2725D5D0DE7507C003445E7 /* TrackerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2725D5C0DE7507C003445E7 /* TrackerTableView.m */; };
 		A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA090C693D9C00DA2CD4 /* ActionOn.png */; };
+		A292A6E80DFB45FC004B9C0A /* webseed.c in Sources */ = {isa = PBXBuildFile; fileRef = A292A6E50DFB45EC004B9C0A /* webseed.c */; };
 		A29576030D11D63C0093B167 /* Creator.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576010D11D63C0093B167 /* Creator.xib */; };
 		A29576130D11D8DD0093B167 /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576110D11D8DD0093B167 /* InfoWindow.xib */; };
 		A29AF4F70D01BADC00D097EC /* DownArrowTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F60D01BADC00D097EC /* DownArrowTemplate.png */; };
@@ -583,6 +584,9 @@
 		A28AFE0A0DA1C47A00673957 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A28AFE0B0DA1C47A00673957 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A28E1DDF0CFFD8EC00E16385 /* ButtonToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ButtonToolbarItem.h; path = macosx/ButtonToolbarItem.h; sourceTree = "<group>"; };
+		A292A6E40DFB45E5004B9C0A /* peer-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "peer-common.h"; path = "libtransmission/peer-common.h"; sourceTree = "<group>"; };
+		A292A6E50DFB45EC004B9C0A /* webseed.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = webseed.c; path = libtransmission/webseed.c; sourceTree = "<group>"; };
+		A292A6E60DFB45EC004B9C0A /* webseed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = webseed.h; path = libtransmission/webseed.h; sourceTree = "<group>"; };
 		A29576020D11D63C0093B167 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = macosx/English.lproj/Creator.xib; sourceTree = "<group>"; };
 		A29576120D11D8DD0093B167 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = macosx/English.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A29AF4F60D01BADC00D097EC /* DownArrowTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownArrowTemplate.png; path = macosx/Images/DownArrowTemplate.png; sourceTree = "<group>"; };
@@ -953,10 +957,10 @@
 		29B97314FDCFA39411CA2CEA /* Transmission */ = {
 			isa = PBXGroup;
 			children = (
-				BEFC1C0B0C07754700B0BB3C /* daemon */,
+				4DDBB70A09E16B3200284745 /* GUI */,
 				4D1838DC09DEC04A0047D688 /* libtransmission */,
 				4DDBB71F09E16BFE00284745 /* CLI */,
-				4DDBB70A09E16B3200284745 /* GUI */,
+				BEFC1C0B0C07754700B0BB3C /* daemon */,
 				4DDBB71509E16B3F00284745 /* Libraries */,
 				BE75C3570C72A0D600DBEFE0 /* libevent */,
 				A2AAB6C00DE0D57F00E04DDA /* libshttpd */,
@@ -1112,6 +1116,9 @@
 				4D36BA690CA2F00800A63CA5 /* peer-mgr.h */,
 				4D36BA6A0CA2F00800A63CA5 /* peer-msgs.c */,
 				4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */,
+				A292A6E40DFB45E5004B9C0A /* peer-common.h */,
+				A292A6E50DFB45EC004B9C0A /* webseed.c */,
+				A292A6E60DFB45EC004B9C0A /* webseed.h */,
 				4D36BA6C0CA2F00800A63CA5 /* ptrarray.h */,
 				4D36BA6D0CA2F00800A63CA5 /* publish.h */,
 				A24621350C769CF400088E81 /* trevent.h */,
@@ -1679,8 +1686,8 @@
 			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* Transmission */,
-				4DDBB71809E16BAE00284745 /* transmissioncli */,
 				4D18389609DEC0030047D688 /* libtransmission */,
+				4DDBB71809E16BAE00284745 /* transmissioncli */,
 				BEFC1BFF0C07750000B0BB3C /* transmission-daemon */,
 				BEFC1CEA0C07822400B0BB3C /* transmission-remote */,
 				BE75C3480C729E9500DBEFE0 /* event */,
@@ -1881,6 +1888,7 @@
 				A2A4E9880DE1039C000CE197 /* json.c in Sources */,
 				A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */,
 				A2DF58580DE4B2B0000795D5 /* JSON_parser.c in Sources */,
+				A292A6E80DFB45FC004B9C0A /* webseed.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
