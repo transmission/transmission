@@ -780,7 +780,7 @@ tr_bitfieldRem( tr_bitfield   * bitfield,
     if( i >= bitfield->len )
         return -1;
 
-    bitfield->bits[i] &= (0xff7f >> nth&7u);
+    bitfield->bits[i] &= (0xff7f >> (nth&7u));
     /*assert( !tr_bitfieldHas( bitfield, nth ) );*/
     return 0;
 }
