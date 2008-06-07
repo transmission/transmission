@@ -320,6 +320,7 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
         {
             tr_bitfield tmp;
             tmp.byteCount = b->val.s.i;
+            tmp.bitCount = tmp.byteCount * 8;
             tmp.bits = (uint8_t*) b->val.s.s;
             if( tr_cpBlockBitfieldSet( tor->completion, &tmp ) ) {
                 tr_torrentUncheck( tor );

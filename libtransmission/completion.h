@@ -53,9 +53,12 @@ void             tr_cpPieceRem( tr_completion *, tr_piece_index_t piece );
 
 /* Blocks */
 int              tr_cpBlockIsComplete( const tr_completion *, tr_block_index_t block );
+int              tr_cpBlockFindComplete( const tr_completion * cp,
+                                         size_t startPos, size_t* foundPos );
 void             tr_cpBlockAdd( tr_completion *, tr_block_index_t block );
 tr_errno         tr_cpBlockBitfieldSet( tr_completion *, struct tr_bitfield * );
-int              tr_cpMissingBlocksInPiece( const tr_completion * cp, tr_piece_index_t piece );
+int              tr_cpMissingBlocksInPiece( const tr_completion * cp,
+                                            tr_piece_index_t piece );
 
 
 const struct tr_bitfield * tr_cpPieceBitfield( const tr_completion* );

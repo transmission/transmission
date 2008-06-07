@@ -263,6 +263,14 @@ size_t tr_bitfieldCountTrueBits( const tr_bitfield* );
 
 tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
 
+/** @brief finds the first true bit in the bitfield, starting at `startPos'
+    @param setmePos the position of the true bit, if found, is set here.
+    @return nonzero if a true bit was found */
+int tr_bitfieldFindTrue( const tr_bitfield  * bitfield,
+                         size_t               startPos,
+                         size_t             * setmePos );
+
+
 /** A stripped-down version of bitfieldHas to be used
     for speed when you're looping quickly.  This version
     has none of tr_bitfieldHas()'s safety checks, so you

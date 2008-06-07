@@ -180,6 +180,14 @@ tr_cpPieceRem( tr_completion * cp, tr_piece_index_t piece )
 }
 
 int
+tr_cpBlockFindComplete( const tr_completion * cp,
+                        size_t                startPos,
+                        size_t              * foundPos )
+{
+    return tr_bitfieldFindTrue( cp->blockBitfield, startPos, foundPos );
+}
+
+int
 tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index_t block )
 {
     return tr_bitfieldHas( cp->blockBitfield, block );
@@ -232,9 +240,9 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * bitfield )
         return TR_ERROR_ASSERT;
 
     tr_cpReset( cp );
-    for( i=0; i < cp->tor->blockCount; ++i )
-        if( tr_bitfieldHas( bitfield, i ) )
-            tr_cpBlockAdd( cp, i );
+    i = 0;
+    while( tr_bitfieldFindTrue( bitfield, i, &i ) )
+        tr_cpBlockAdd( cp, i++ );
 
     return 0;
 }

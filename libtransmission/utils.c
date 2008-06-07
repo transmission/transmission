@@ -732,6 +732,51 @@ tr_bitfieldHas( const tr_bitfield * bitfield, size_t nth )
         && ( tr_bitfieldHasFast( bitfield, nth ) );
 }
 
+static int
+find_top_bit( uint8_t val )
+{
+    int pos = 0;
+    if ( val & 0xF0U ) pos |= 4, val >>= 4;
+    if ( val & 0xCU )  pos |= 2, val >>= 2;
+    if ( val & 0x2 )   pos |= 1;
+    return 7 - pos;
+}
+
+int
+tr_bitfieldFindTrue( const tr_bitfield  * bitfield,
+                     size_t               startBit,
+                     size_t             * setmePos )
+{
+    if( bitfield && bitfield->bits && startBit < bitfield->bitCount )
+    {
+        const uint8_t * b   = bitfield->bits + startBit/8;
+        const uint8_t * end = bitfield->bits + bitfield->byteCount;
+
+        /* If first byte already contains a set bit after startBit*/
+        if( *b & ( 0xff >> (startBit&7) ) ) {
+            *setmePos  = 8 * ( b - bitfield->bits );
+            *setmePos += find_top_bit( *b & ( 0xff >> (startBit&7) ) );
+            return 1;
+        }
+
+        /* Test bitfield for first non zero byte */
+        ++b;
+        while( (b < end) && !*b )
+            ++b;
+
+        /* If we hit the end of our bitfield, no set bit was found */
+        if( b == end )
+            return 0;
+
+        /* New bitposition is byteoff*8 */
+        *setmePos = 8 * ( b - bitfield->bits ) + find_top_bit( *b );
+
+        return 1;
+    }
+
+    return 0;
+}
+
 int
 tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
 {
