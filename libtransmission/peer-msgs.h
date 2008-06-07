@@ -14,6 +14,7 @@
 #define TR_PEER_MSGS_H
 
 #include <inttypes.h>
+#include "peer-common.h"
 #include "publish.h"
 
 struct tr_torrent;
@@ -42,6 +43,7 @@ void         tr_peerMsgsCancel( tr_peermsgs * msgs,
 void         tr_peerMsgsFree( tr_peermsgs* );
 
 
+#if 0
 enum {
     TR_ADDREQ_OK=0,
     TR_ADDREQ_FULL,
@@ -49,6 +51,7 @@ enum {
     TR_ADDREQ_MISSING,
     TR_ADDREQ_CLIENT_CHOKED
 };
+#endif
 
 int          tr_peerMsgsAddRequest( tr_peermsgs * peer,
                                     uint32_t      index,
@@ -59,6 +62,7 @@ int          tr_peerMsgsAddRequest( tr_peermsgs * peer,
 ***  PeerMsgs Publish / Subscribe
 **/
 
+#if 0
 typedef enum
 {
     TR_PEERMSG_CLIENT_HAVE,
@@ -81,12 +85,9 @@ typedef struct
     tr_errno err;        /* for TR_PEERMSG_GOT_ERROR */
 }
 tr_peermsgs_event;
+#endif
 
-tr_publisher_tag  tr_peerMsgsSubscribe   ( tr_peermsgs       * peer,
-                                           tr_delivery_func    func,
-                                           void              * user );
-
-void              tr_peerMsgsUnsubscribe ( tr_peermsgs       * peer,
-                                           tr_publisher_tag    tag );
+void  tr_peerMsgsUnsubscribe ( tr_peermsgs       * peer,
+                               tr_publisher_tag    tag );
 
 #endif

@@ -46,6 +46,7 @@ struct tr_web_task
     unsigned long tag;
     struct evbuffer * response;
     char * url;
+    char * range;
     tr_session * session;
     tr_web_done_func * done_func;
     void * done_func_user_data;
@@ -86,6 +87,7 @@ processCompletedTasks( tr_web * web )
             curl_multi_remove_handle( web->cm, easy );
             curl_easy_cleanup( easy );
             evbuffer_free( task->response );
+            tr_free( task->range );
             tr_free( task->url );
             tr_free( task );
         }
@@ -154,7 +156,10 @@ addTask( void * vtask )
         curl_easy_setopt( ch, CURLOPT_FOLLOWLOCATION, 1 );
         curl_easy_setopt( ch, CURLOPT_MAXREDIRS, 5 );
         curl_easy_setopt( ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
-        curl_easy_setopt( ch, CURLOPT_ENCODING, "" );
+        if( task->range )
+            curl_easy_setopt( ch, CURLOPT_RANGE, task->range );
+        else /* don't set encoding if range is sent; it messes up binary data */
+            curl_easy_setopt( ch, CURLOPT_ENCODING, "" );
         curl_multi_add_handle( web->cm, ch );
     }
 }
@@ -162,6 +167,7 @@ addTask( void * vtask )
 void
 tr_webRun( tr_session         * session,
            const char         * url,
+           const char         * range,
            tr_web_done_func   * done_func,
            void               * done_func_user_data )
 {
@@ -173,6 +179,7 @@ tr_webRun( tr_session         * session,
         task = tr_new0( struct tr_web_task, 1 );
         task->session = session;
         task->url = tr_strdup( url );
+        task->range = tr_strdup( range );
         task->done_func = done_func;
         task->done_func_user_data = done_func_user_data;
         task->tag = ++tag;

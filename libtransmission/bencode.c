@@ -496,9 +496,8 @@ tr_bencInitRaw( tr_benc * val, const void * src, size_t byteCount )
 {
     tr_bencInit( val, TYPE_STR );
     val->val.s.i = byteCount;
-    val->val.s.s = tr_new( char, byteCount );
+    val->val.s.s = tr_memdup( src, byteCount );
     val->val.s.nofree = 0;
-    memcpy( val->val.s.s, src, byteCount );
 }
 
 int

@@ -696,7 +696,6 @@ static void
 invokeRequest( void * vreq )
 {
     struct tr_tracker_request * req = vreq;
-    uint8_t * hash;
     tr_tracker * t = findTracker( req->session, req->torrent_hash );
 
     if( t )
@@ -720,9 +719,8 @@ invokeRequest( void * vreq )
 
     ++req->session->tracker->runningCount;
 
-    hash = tr_new0( uint8_t, SHA_DIGEST_LENGTH );
-    memcpy( hash, req->torrent_hash, SHA_DIGEST_LENGTH );
-    tr_webRun( req->session, req->url, req->done_func, hash );
+    tr_webRun( req->session, req->url, NULL, req->done_func,
+               tr_memdup( req->torrent_hash, SHA_DIGEST_LENGTH ) );
 
     freeRequest( req );
 }

@@ -99,12 +99,12 @@ compareOffsetToFile( const void * a, const void * b )
     return 0;
 }
 
-static void
-findFileLocation( const tr_torrent * tor,
-                  tr_piece_index_t   pieceIndex,
-                  uint32_t           pieceOffset,
-                  tr_file_index_t  * fileIndex,
-                  uint64_t         * fileOffset )
+void
+tr_ioFindFileLocation( const tr_torrent * tor,
+                       tr_piece_index_t   pieceIndex,
+                       uint32_t           pieceOffset,
+                       tr_file_index_t  * fileIndex,
+                       uint64_t         * fileOffset )
 {
     const uint64_t offset = tr_pieceOffset( tor, pieceIndex, pieceOffset, 0 );
     const tr_file * file;
@@ -172,8 +172,8 @@ readOrWritePiece( const tr_torrent        * tor,
     if( pieceOffset + buflen > tr_torPieceCountBytes( tor, pieceIndex ) )
         return TR_ERROR_ASSERT;
 
-    findFileLocation ( tor, pieceIndex, pieceOffset,
-                            &fileIndex, &fileOffset );
+    tr_ioFindFileLocation( tor, pieceIndex, pieceOffset,
+                           &fileIndex, &fileOffset );
 
     while( buflen && !err )
     {

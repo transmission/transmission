@@ -188,8 +188,8 @@ void* tr_malloc0 ( size_t ) TR_GNUC_MALLOC;
 void* tr_calloc  ( size_t nmemb, size_t size ) TR_GNUC_MALLOC;
 void  tr_free    ( void* );
 
-char* tr_strdup( const char * str ) TR_GNUC_MALLOC;
-char* tr_strndup( const char * str, int len ) TR_GNUC_MALLOC;
+char* tr_strdup( const void * str ) TR_GNUC_MALLOC;
+char* tr_strndup( const void * str, int len ) TR_GNUC_MALLOC;
 void* tr_memdup( const void * src, int byteCount ) TR_GNUC_MALLOC;
 char* tr_strdup_printf( const char * fmt, ... )  TR_GNUC_PRINTF( 1, 2 ) TR_GNUC_MALLOC;
 char* tr_base64_encode( const void * input, int inlen, int *outlen ) TR_GNUC_MALLOC;

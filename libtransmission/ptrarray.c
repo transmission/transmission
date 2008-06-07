@@ -57,10 +57,8 @@ tr_ptrArrayDup( tr_ptrArray* in )
     tr_ptrArray * out;
 
     out = tr_new( tr_ptrArray, 1 );
-    out->n_items = in->n_items;
-    out->n_alloc = in->n_items;
-    out->items = tr_new( void*, out->n_alloc );
-    memcpy( out->items, in->items, out->n_items * sizeof(void*) );
+    out->n_items = out->n_alloc = in->n_items;
+    out->items = tr_memdup( in->items, out->n_items * sizeof(void*) );
 
     return out;
 }
@@ -95,6 +93,12 @@ void**
 tr_ptrArrayPeek( tr_ptrArray * t, int * size )
 {
     *size = t->n_items;
+    return t->items;
+}
+
+void**
+tr_ptrArrayBase( tr_ptrArray * t )
+{
     return t->items;
 }
 

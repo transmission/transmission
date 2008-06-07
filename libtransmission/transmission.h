@@ -1036,6 +1036,9 @@ struct tr_info
     tr_tracker_info    * trackers;
     int                  trackerCount;
 
+    char              ** webseeds;
+    int                  webseedCount;
+
     /* Torrent info */
     char               * comment;
     char               * creator;

@@ -262,7 +262,7 @@ testing_port_begin( gpointer gdata )
         const int port = gtk_spin_button_get_value_as_int( spin );
         char url[256];
         snprintf( url, sizeof(url), "http://portcheck.transmissionbt.com/%d", port );
-        tr_webRun( handle, url, testing_port_done, data );
+        tr_webRun( handle, url, NULL, testing_port_done, data );
     }
     return FALSE;
 }
@@ -492,7 +492,7 @@ onUpdateBlocklistCB( GtkButton * w, gpointer gdata )
     g_signal_connect( d, "response", G_CALLBACK(onUpdateBlocklistResponseCB), data );
     gtk_widget_show( d );
 
-    tr_webRun( handle, url, got_blocklist, data );
+    tr_webRun( handle, url, NULL, got_blocklist, data );
 }
 
 static GtkWidget*

@@ -238,7 +238,7 @@ tr_msg( const char * file, int line, int level,
                 newmsg = tr_new0( tr_msg_list, 1 );
                 newmsg->level = level;
                 newmsg->when = time( NULL );
-                newmsg->message = tr_strdup( (char*)EVBUFFER_DATA( buf ) );
+                newmsg->message = tr_strdup( EVBUFFER_DATA( buf ) );
                 newmsg->file = file;
                 newmsg->line = line;
                 newmsg->name = tr_strdup( name );
@@ -597,13 +597,13 @@ tr_memdup( const void * in, int byteCount )
 }
     
 char*
-tr_strdup( const char * in )
+tr_strdup( const void * in )
 {
-    return tr_strndup( in, in ? strlen(in) : 0 );
+    return tr_strndup( in, in ? strlen((const char*)in) : 0 );
 }
 
 char*
-tr_strndup( const char * in, int len )
+tr_strndup( const void * in, int len )
 {
     char * out = NULL;
 

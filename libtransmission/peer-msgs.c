@@ -155,10 +155,8 @@ reqListClear( struct request_list * list )
 static void
 reqListCopy( struct request_list * dest, const struct request_list * src )
 {
-    dest->count = src->count;
-    dest->max = src->max;
-    dest->requests = tr_new( struct peer_request, dest->max );
-    memcpy( dest->requests, src->requests, sizeof( struct peer_request ) * dest->count );
+    dest->count = dest->max = src->count;
+    dest->requests = tr_memdup( src->requests, dest->count * sizeof( struct peer_request ) );
 }
 
 static void
@@ -396,10 +394,10 @@ protocolSendChoke( tr_peermsgs * msgs, int choke )
 ***  EVENTS
 **/
 
-static const tr_peermsgs_event blankEvent = { 0, 0, 0, 0, 0.0f, 0 };
+static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0 };
 
 static void
-publish( tr_peermsgs * msgs, tr_peermsgs_event * e )
+publish( tr_peermsgs * msgs, tr_peer_event * e )
 {
     tr_publisherPublish( msgs->publisher, msgs->info, e );
 }
@@ -407,8 +405,8 @@ publish( tr_peermsgs * msgs, tr_peermsgs_event * e )
 static void
 fireError( tr_peermsgs * msgs, tr_errno err )
 {
-    tr_peermsgs_event e = blankEvent;
-    e.eventType = TR_PEERMSG_ERROR;
+    tr_peer_event e = blankEvent;
+    e.eventType = TR_PEER_ERROR;
     e.err = err;
     publish( msgs, &e );
 }
@@ -416,34 +414,25 @@ fireError( tr_peermsgs * msgs, tr_errno err )
 static void
 fireNeedReq( tr_peermsgs * msgs )
 {
-    tr_peermsgs_event e = blankEvent;
-    e.eventType = TR_PEERMSG_NEED_REQ;
+    tr_peer_event e = blankEvent;
+    e.eventType = TR_PEER_NEED_REQ;
     publish( msgs, &e );
 }
 
 static void
 firePeerProgress( tr_peermsgs * msgs )
 {
-    tr_peermsgs_event e = blankEvent;
-    e.eventType = TR_PEERMSG_PEER_PROGRESS;
+    tr_peer_event e = blankEvent;
+    e.eventType = TR_PEER_PEER_PROGRESS;
     e.progress = msgs->info->progress;
-    publish( msgs, &e );
-}
-
-static void
-fireClientHave( tr_peermsgs * msgs, uint32_t pieceIndex )
-{
-    tr_peermsgs_event e = blankEvent;
-    e.eventType = TR_PEERMSG_CLIENT_HAVE;
-    e.pieceIndex = pieceIndex;
     publish( msgs, &e );
 }
 
 static void
 fireGotBlock( tr_peermsgs * msgs, const struct peer_request * req )
 {
-    tr_peermsgs_event e = blankEvent;
-    e.eventType = TR_PEERMSG_CLIENT_BLOCK;
+    tr_peer_event e = blankEvent;
+    e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
     e.pieceIndex = req->index;
     e.offset = req->offset;
     e.length = req->length;
@@ -451,18 +440,28 @@ fireGotBlock( tr_peermsgs * msgs, const struct peer_request * req )
 }
 
 static void
-firePieceData( tr_peermsgs * msgs )
+fireClientGotData( tr_peermsgs * msgs, uint32_t length )
 {
-    tr_peermsgs_event e = blankEvent;
-    e.eventType = TR_PEERMSG_PIECE_DATA;
+    tr_peer_event e = blankEvent;
+    e.length = length;
+    e.eventType = TR_PEER_CLIENT_GOT_DATA;
+    publish( msgs, &e );
+}
+
+static void
+firePeerGotData( tr_peermsgs * msgs, uint32_t length )
+{
+    tr_peer_event e = blankEvent;
+    e.length = length;
+    e.eventType = TR_PEER_PEER_GOT_DATA;
     publish( msgs, &e );
 }
 
 static void
 fireCancelledReq( tr_peermsgs * msgs, const struct peer_request * req )
 {
-    tr_peermsgs_event e = blankEvent;
-    e.eventType = TR_PEERMSG_CANCEL;
+    tr_peer_event e = blankEvent;
+    e.eventType = TR_PEER_CANCEL;
     e.pieceIndex = req->index;
     e.offset = req->offset;
     e.length = req->length;
@@ -1186,16 +1185,9 @@ clientGotBlock( tr_peermsgs * msgs, const uint8_t * block, const struct peer_req
 static void
 clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
 {
-    const time_t now = time( NULL );
-    tr_torrent * tor = msgs->torrent;
-    tor->activityDate = now;
-    tor->downloadedCur += byteCount;
-    msgs->info->pieceDataActivityDate = now;
+    msgs->info->pieceDataActivityDate = time( NULL );
     tr_rcTransferred( msgs->info->rcToClient, byteCount );
-    tr_rcTransferred( tor->download, byteCount );
-    tr_rcTransferred( tor->handle->download, byteCount );
-    tr_statsAddDownloaded( msgs->handle, byteCount );
-    firePieceData( msgs );
+    fireClientGotData( msgs, byteCount );
 }
 
 static int
@@ -1408,16 +1400,9 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 static void
 peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
 {
-    const time_t now = time( NULL );
-    tr_torrent * tor = msgs->torrent;
-    tor->activityDate = now;
-    tor->uploadedCur += byteCount;
-    msgs->info->pieceDataActivityDate = now;
+    msgs->info->pieceDataActivityDate = time( NULL );
     tr_rcTransferred( msgs->info->rcToPeer, byteCount );
-    tr_rcTransferred( tor->upload, byteCount );
-    tr_rcTransferred( tor->handle->upload, byteCount );
-    tr_statsAddUploaded( msgs->handle, byteCount );
-    firePieceData( msgs );
+    firePeerGotData( msgs, byteCount );
 }
 
 static size_t
@@ -1441,24 +1426,6 @@ decrementDownloadedCount( tr_peermsgs * msgs, uint32_t byteCount )
 {
     tr_torrent * tor = msgs->torrent;
     tor->downloadedCur -= MIN( tor->downloadedCur, byteCount );
-}
-
-static void
-reassignBytesToCorrupt( tr_peermsgs * msgs, uint32_t byteCount )
-{
-    tr_torrent * tor = msgs->torrent;
-
-    tor->corruptCur += byteCount;
-
-    decrementDownloadedCount( msgs, byteCount );
-}
-
-static void
-gotBadPiece( tr_peermsgs * msgs, tr_piece_index_t pieceIndex )
-{
-    const uint32_t byteCount =
-        tr_torPieceCountBytes( msgs->torrent, pieceIndex );
-    reassignBytesToCorrupt( msgs, byteCount );
 }
 
 static void
@@ -1529,35 +1496,8 @@ clientGotBlock( tr_peermsgs                * msgs,
     if(( err = tr_ioWrite( tor, req->index, req->offset, req->length, data )))
         return err;
 
-    tr_cpBlockAdd( tor->completion, block );
-
     addPeerToBlamefield( msgs, req->index );
-
     fireGotBlock( msgs, req );
-
-    /**
-    ***  Handle if this was the last block in the piece
-    **/
-
-    if( tr_cpPieceIsComplete( tor->completion, req->index ) )
-    {
-        const tr_errno err = tr_ioTestPiece( tor, req->index );
-
-        if( err )
-            tr_torerr( tor, _( "Piece %lu, which was just downloaded, failed its checksum test: %s" ),
-                       (unsigned long)req->index,
-                       tr_errorString( err ) );
-
-        tr_torrentSetHasPiece( tor, req->index, !err );
-        tr_torrentSetPieceChecked( tor, req->index, TRUE );
-        tr_peerMgrSetBlame( tor->handle->peerMgr, tor->info.hash, req->index, !err );
-
-        if( !err )
-            fireClientHave( msgs, req->index );
-        else
-            gotBadPiece( msgs, req->index );
-    }
-
     return 0;
 }
 

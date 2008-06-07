@@ -42,7 +42,8 @@ libtransmission_a_SOURCES = \
     upnp.c \
     utils.c \
     verify.c \
-    web.c
+    web.c \
+    webseed.c
 
 noinst_HEADERS = \
     bencode.h \
@@ -63,6 +64,7 @@ noinst_HEADERS = \
     metainfo.h \
     natpmp.h \
     net.h \
+    peer-common.h \
     peer-io.h \
     peer-mgr.h \
     peer-mgr-private.h \
@@ -84,7 +86,8 @@ noinst_HEADERS = \
     upnp.h \
     utils.h \
     verify.h \
-    web.h
+    web.h \
+    webseed.h
 
 TESTS = \
     blocklist-test \

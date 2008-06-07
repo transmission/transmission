@@ -57,4 +57,15 @@ tr_errno tr_ioWrite( const struct tr_torrent  * tor,
 tr_errno tr_ioTestPiece( const tr_torrent*, int piece );
 
 
+/**
+ * Converts a piece index + offset into a file index + offset.
+ */
+void tr_ioFindFileLocation( const tr_torrent * tor,
+                            tr_piece_index_t   pieceIndex,
+                            uint32_t           pieceOffset,
+                            tr_file_index_t  * fileIndex,
+                            uint64_t         * fileOffset );
+
+
+
 #endif

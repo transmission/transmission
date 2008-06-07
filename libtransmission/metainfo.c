@@ -223,6 +223,26 @@ announceToScrape( const char * announce )
     return scrape;
 }
 
+static void
+geturllist( tr_info * inf, tr_benc * meta )
+{
+    benc_val_t * urls;
+
+    if( tr_bencDictFindList( meta, "url-list", &urls ) )
+    {
+        int i;
+        const char * url;
+        const int n = tr_bencListSize( urls );
+
+        inf->webseedCount = 0;
+        inf->webseeds = tr_new0( char*, n );
+
+        for( i=0; i<n; ++i )
+            if( tr_bencGetStr( tr_bencListChild( urls, i ), &url ) )
+                inf->webseeds[inf->webseedCount++] = tr_strdup( url );
+    }
+}
+
 static int
 getannounce( tr_info * inf, tr_benc * meta )
 {
@@ -411,6 +431,9 @@ tr_metainfoParse( const tr_handle  * handle,
     if( getannounce( inf, meta ) )
         goto fail;
 
+    /* get the url-list */
+    geturllist( inf, meta );
+
     /* filename of Transmission's copy */
     getTorrentFilename( handle, inf, buf, sizeof( buf ) );
     tr_free( inf->torrent );
@@ -428,9 +451,13 @@ void tr_metainfoFree( tr_info * inf )
     tr_file_index_t ff;
     int i;
 
+    for( i=0; i<inf->webseedCount; ++i )
+        tr_free( inf->webseeds[i] );
+
     for( ff=0; ff<inf->fileCount; ++ff )
         tr_free( inf->files[ff].name );
 
+    tr_free( inf->webseeds );
     tr_free( inf->pieces );
     tr_free( inf->files );
     tr_free( inf->comment );
