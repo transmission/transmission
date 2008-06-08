@@ -65,6 +65,7 @@
     IBOutlet PiecesView * fPiecesView;
     IBOutlet NSSegmentedControl * fPiecesControl;
     float fWebSeedTableHeight, fSpaceBetweenWebSeedAndPeer;
+    NSViewAnimation * fWebSeedTableAnimation;
     
     IBOutlet FileOutlineController * fFileController;
     
