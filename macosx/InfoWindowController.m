@@ -72,7 +72,7 @@ typedef enum
 
 - (NSView *) tabViewForTag: (int) tag;
 - (NSArray *) peerSortDescriptors;
-- (void) setWebSeederTableHidden: (BOOL) hide animate: (BOOL) animate;
+- (void) setWebSeedTableHidden: (BOOL) hide animate: (BOOL) animate;
 
 - (void) addTrackers;
 - (void) removeTrackers;
@@ -171,7 +171,7 @@ typedef enum
         [[fPeerTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Peer",
                                                                             "inspector -> peer table -> header tool tip")];
         
-        [[fWebSeedTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Web Seeder",
+        [[fWebSeedTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Web Seed",
                                                                             "inspector -> web seed table -> header tool tip")];
     }
     else
@@ -186,7 +186,7 @@ typedef enum
     fWebSeedTableHeight = webSeedTableFrame.size.height;
     fSpaceBetweenWebSeedAndPeer = webSeedTableFrame.origin.y - NSMaxY([[fPeerTable enclosingScrollView] frame]);
     
-    [self setWebSeederTableHidden: YES animate: NO];
+    [self setWebSeedTableHidden: YES animate: NO];
     
     //set blank inspector
     [self setInfoForTorrents: [NSArray array]];
@@ -379,7 +379,7 @@ typedef enum
         [fWebSeeds release];
         fWebSeeds = nil;
         [fWebSeedTable reloadData];
-        [self setWebSeederTableHidden: YES animate: YES];
+        [self setWebSeedTableHidden: YES animate: YES];
         
         [fTrackers release];
         fTrackers = nil;
@@ -467,7 +467,7 @@ typedef enum
         
         //get webseeds for table - if no webseeds for this torrent, clear the table
         BOOL hasWebSeeds = [torrent webSeedCount] > 0;
-        [self setWebSeederTableHidden: !hasWebSeeds animate: YES];
+        [self setWebSeedTableHidden: !hasWebSeeds animate: YES];
         if (!hasWebSeeds)
         {
             [fWebSeeds release];
@@ -696,7 +696,7 @@ typedef enum
             case TAB_PEERS_TAG:
                 //if in the middle of animating, just stop and resize immediately
                 if (fWebSeedTableAnimation)
-                    [self setWebSeederTableHidden: !fWebSeeds animate: NO];
+                    [self setWebSeedTableHidden: !fWebSeeds animate: NO];
                 
                 [fPeers release];
                 fPeers = nil;
@@ -1507,7 +1507,7 @@ typedef enum
     }
 }
 
-- (void) setWebSeederTableHidden: (BOOL) hide animate: (BOOL) animate
+- (void) setWebSeedTableHidden: (BOOL) hide animate: (BOOL) animate
 {
     if (fCurrentTabTag != TAB_PEERS_TAG || ![[self window] isVisible])
         animate = NO;
