@@ -1016,7 +1016,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return peerDicts;
 }
 
-#warning store?
 - (NSArray *) webSeeders
 {
     int webSeedCount = fInfo->webseedCount, i;

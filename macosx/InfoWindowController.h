@@ -64,6 +64,8 @@
     IBOutlet NSTextView * fErrorMessageView;
     IBOutlet PiecesView * fPiecesView;
     IBOutlet NSSegmentedControl * fPiecesControl;
+    BOOL fWebSeedTableHidden;
+    float fPeerTableHeight, fWebSeedTableOrigin;
     
     IBOutlet FileOutlineController * fFileController;
     
