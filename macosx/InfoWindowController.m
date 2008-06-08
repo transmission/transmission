@@ -635,17 +635,26 @@ typedef enum
     return windowRect;
 }
 
-- (NSSize) windowWillResize: (NSWindow *) window toSize: (NSSize) proposedFrameSize
+- (void) animationDidEnd: (NSAnimation *) animation
 {
-    [fWebSeedTableAnimation stopAnimation];
-    return proposedFrameSize;
+    if (animation == fWebSeedTableAnimation)
+    {
+        [fWebSeedTableAnimation release];
+        fWebSeedTableAnimation = nil;
+    }
 }
 
-- (void) windowDidResize: (NSNotification *) notification
+- (NSSize) windowWillResize: (NSWindow *) window toSize: (NSSize) proposedFrameSize
 {
-    //this is an edge-case - if it's reached, just safely resize the tables without animation
+    //this is an edge-case - just stop the animation (stopAnimation jumps to end frame)
     if (fWebSeedTableAnimation)
-        [self setWebSeederTableHidden: !fWebSeeds || [fWebSeeds count] == 0 animate: NO];
+    {
+        [fWebSeedTableAnimation stopAnimation];
+        [fWebSeedTableAnimation release];
+        fWebSeedTableAnimation = nil;
+    }
+    
+    return proposedFrameSize;
 }
 
 - (void) setTab: (id) sender
@@ -671,6 +680,10 @@ typedef enum
                 oldResizeSaveKey = @"InspectorContentHeightTracker";
                 break;
             case TAB_PEERS_TAG:
+                //if in the middle of animating, just stop and resize immediately
+                if (fWebSeedTableAnimation)
+                    [self setWebSeederTableHidden: !fWebSeeds || [fWebSeeds count] == 0 animate: NO];
+                
                 [fPeers release];
                 fPeers = nil;
                 
@@ -1454,7 +1467,7 @@ typedef enum
 
 - (void) setWebSeederTableHidden: (BOOL) hide animate: (BOOL) animate
 {
-    if (![[self window] isVisible])
+    if (fCurrentTabTag != TAB_PEERS_TAG || ![[self window] isVisible])
         animate = NO;
     
     if (fWebSeedTableAnimation)
@@ -1489,18 +1502,18 @@ typedef enum
     if (animate)
     {
         NSDictionary * webSeedDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                        [fWebSeedTable enclosingScrollView], NSViewAnimationTargetKey,
-                        [NSValue valueWithRect: [[fWebSeedTable enclosingScrollView] frame]], NSViewAnimationStartFrameKey,
-                        [NSValue valueWithRect: webSeedFrame], NSViewAnimationEndFrameKey, nil],
+                                    [fWebSeedTable enclosingScrollView], NSViewAnimationTargetKey,
+                                    [NSValue valueWithRect: [[fWebSeedTable enclosingScrollView] frame]], NSViewAnimationStartFrameKey,
+                                    [NSValue valueWithRect: webSeedFrame], NSViewAnimationEndFrameKey, nil],
                     * peerDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                        [fPeerTable enclosingScrollView], NSViewAnimationTargetKey,
-                        [NSValue valueWithRect: [[fPeerTable enclosingScrollView] frame]], NSViewAnimationStartFrameKey,
-                        [NSValue valueWithRect: peerFrame], NSViewAnimationEndFrameKey, nil];
+                                    [fPeerTable enclosingScrollView], NSViewAnimationTargetKey,
+                                    [NSValue valueWithRect: [[fPeerTable enclosingScrollView] frame]], NSViewAnimationStartFrameKey,
+                                    [NSValue valueWithRect: peerFrame], NSViewAnimationEndFrameKey, nil];
         
         fWebSeedTableAnimation = [[NSViewAnimation alloc] initWithViewAnimations:
                                         [NSArray arrayWithObjects: webSeedDict, peerDict, nil]];
-        [fWebSeedTableAnimation setDuration: 0.2];
-        [fWebSeedTableAnimation setAnimationBlockingMode: NSAnimationNonblockingThreaded];
+        [fWebSeedTableAnimation setDuration: 0.1];
+        [fWebSeedTableAnimation setAnimationBlockingMode: NSAnimationNonblocking];
         [fWebSeedTableAnimation setDelegate: self];
         
         [fWebSeedTableAnimation startAnimation];
@@ -1509,15 +1522,6 @@ typedef enum
     {
         [[fWebSeedTable enclosingScrollView] setFrame: webSeedFrame];
         [[fPeerTable enclosingScrollView] setFrame: peerFrame];
-    }
-}
-
-- (void) animationDidEnd: (NSAnimation *) animation
-{
-    if (animation == fWebSeedTableAnimation)
-    {
-        [fWebSeedTableAnimation release];
-        fWebSeedTableAnimation = nil;
     }
 }
 
