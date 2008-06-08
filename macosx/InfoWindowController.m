@@ -154,6 +154,11 @@ typedef enum
         [fPeerTable setSortDescriptors: [NSArray arrayWithObject: [[fPeerTable tableColumnWithIdentifier: @"IP"]
                                             sortDescriptorPrototype]]];
     
+    //initially sort webseed table by address
+    if ([[fWebSeedTable sortDescriptors] count] == 0)
+        [fWebSeedTable setSortDescriptors: [NSArray arrayWithObject: [[fWebSeedTable tableColumnWithIdentifier: @"Address"]
+                                            sortDescriptorPrototype]]];
+    
     //set table header tool tips
     if ([NSApp isOnLeopardOrBetter])
     {
@@ -164,6 +169,10 @@ typedef enum
         [[fPeerTable tableColumnWithIdentifier: @"UL To"] setHeaderToolTip: NSLocalizedString(@"Uploading To Peer",
                                                                             "inspector -> peer table -> header tool tip")];
         [[fPeerTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Peer",
+                                                                            "inspector -> peer table -> header tool tip")];
+        
+        #warning add tooltip for webseeds?
+        [[fWebSeedTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Web Seeder",
                                                                             "inspector -> peer table -> header tool tip")];
     }
     else
@@ -214,6 +223,8 @@ typedef enum
     [fPeers release];
     [fWebSeeds release];
     [fTrackers release];
+    
+    [fWebSeedTableAnimation release];
     
     [super dealloc];
 }
@@ -364,9 +375,11 @@ typedef enum
         
         [fPeers release];
         fPeers = nil;
+        [fPeerTable reloadData];
         
         [fWebSeeds release];
         fWebSeeds = nil;
+        [fWebSeedTable reloadData];
         [self setWebSeederTableHidden: YES animate: YES];
         
         [fTrackers release];
@@ -471,12 +484,9 @@ typedef enum
     [self updateInfoStats];
     [self updateOptions];
     
+    //reload tables that won't change every update
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
-    
-    [fWebSeedTable reloadData];
-    #warning check if should just be reloaded when not 1 torrent
-    [fPeerTable reloadData];
 }
 
 - (void) updateInfoStats
@@ -852,7 +862,16 @@ typedef enum
     }
     else if (tableView == fWebSeedTable)
     {
-        return [fWebSeeds objectAtIndex: row];
+        NSString * ident = [column identifier];
+        NSDictionary * webSeed = [fWebSeeds objectAtIndex: row];
+        
+        if ([ident isEqualToString: @"DL From"])
+        {
+            NSNumber * rate;
+            return (rate = [webSeed objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate floatValue]] : @"";
+        }
+        else
+            return [webSeed objectForKey: @"Address"];
     }
     else if (tableView == fTrackerTable)
     {
@@ -883,6 +902,17 @@ typedef enum
             [tableView reloadData];
         }
     }
+    else if (tableView == fWebSeedTable)
+    {
+        if (fWebSeeds)
+        {
+            NSArray * oldWebSeeds = fWebSeeds;
+            fWebSeeds = [[fWebSeeds sortedArrayUsingDescriptors: [fWebSeedTable sortDescriptors]] retain];
+            [oldWebSeeds release];
+            [tableView reloadData];
+        }
+    }
+    else;
 }
 
 - (BOOL) tableView: (NSTableView *) tableView shouldSelectRow: (int) row
@@ -1434,8 +1464,11 @@ typedef enum
     
     [fPeers release];
     fPeers = [[[torrent peers] sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];
-    
     [fPeerTable reloadData];
+    
+    [fWebSeeds release];
+    fWebSeeds = [[[torrent webSeeders] sortedArrayUsingDescriptors: [fWebSeedTable sortDescriptors]] retain];
+    [fWebSeedTable reloadData];
 }
 
 - (void) updateInfoFiles
@@ -1512,7 +1545,7 @@ typedef enum
         
         fWebSeedTableAnimation = [[NSViewAnimation alloc] initWithViewAnimations:
                                         [NSArray arrayWithObjects: webSeedDict, peerDict, nil]];
-        [fWebSeedTableAnimation setDuration: 0.1];
+        [fWebSeedTableAnimation setDuration: 0.125];
         [fWebSeedTableAnimation setAnimationBlockingMode: NSAnimationNonblocking];
         [fWebSeedTableAnimation setDelegate: self];
         

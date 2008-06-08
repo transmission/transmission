@@ -1022,7 +1022,16 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     NSMutableArray * webSeeders = [NSMutableArray arrayWithCapacity: webSeedCount];
     
     for (i = 0; i < webSeedCount; i++)
-        [webSeeders addObject: [NSString stringWithUTF8String: fInfo->webseeds[i]]];
+    {
+        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 2];
+        
+        [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
+        
+        /*if (webSeeders->isDownloadingFrom)
+            [dict setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];*/
+        
+        [webSeeders addObject: dict];
+    }
     
     return webSeeders;
 }
