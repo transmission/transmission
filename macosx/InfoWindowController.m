@@ -1441,7 +1441,7 @@ typedef enum
 
 - (void) setWebSeederTableHidden: (BOOL) hide animate: (BOOL) animate
 {
-    if (![NSApp isOnLeopardOrBetter])
+    if (/*![NSApp isOnLeopardOrBetter]*/YES)
         animate = NO;
     
     NSRect webSeedFrame = [[fWebSeedTable enclosingScrollView] frame];
