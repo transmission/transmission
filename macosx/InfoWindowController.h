@@ -65,7 +65,7 @@
     IBOutlet PiecesView * fPiecesView;
     IBOutlet NSSegmentedControl * fPiecesControl;
     BOOL fWebSeedTableHidden;
-    float fPeerTableHeight, fWebSeedTableOrigin;
+    float fPeerTableHeight, fWebSeedTableHeight, fWebSeedTableOrigin;
     
     IBOutlet FileOutlineController * fFileController;
     

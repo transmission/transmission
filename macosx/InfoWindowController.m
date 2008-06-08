@@ -176,6 +176,7 @@ typedef enum
     //prepare for animating peer table and web seed table
     fWebSeedTableHidden = NO;
     fPeerTableHeight = [[fPeerTable enclosingScrollView] frame].size.height;
+    fWebSeedTableHeight = [[fWebSeedTable enclosingScrollView] frame].size.height;
     fWebSeedTableOrigin = [[fWebSeedTable enclosingScrollView] frame].origin.y;
     
     [self setWebSeederTableHidden: YES animate: NO];
@@ -1454,7 +1455,7 @@ typedef enum
     
     if (hidden)
     {
-        float webSeedFrameMaxY = NSMaxY(webSeedFrame);
+        float webSeedFrameMaxY = fWebSeedTableHeight + fWebSeedTableOrigin;
         peerFrame.size.height = webSeedFrameMaxY - peerFrame.origin.y;
         
         webSeedFrame.origin.y = webSeedFrameMaxY;
@@ -1464,9 +1465,9 @@ typedef enum
     {
         peerFrame.size.height = fPeerTableHeight;
         
-        webSeedFrame.size.height = webSeedFrame.origin.y - fWebSeedTableOrigin;
+        webSeedFrame.size.height = fWebSeedTableHeight;
         webSeedFrame.origin.y = fWebSeedTableOrigin;
-    }
+    }NSLog(@"%f", webSeedFrame.size.height);
     
     //actually resize tables
     [NSAnimationContext beginGrouping];
