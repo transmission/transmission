@@ -359,6 +359,7 @@ tr_rpcSetACL( tr_rpc_server   * server,
         if( isRunning )
             startServer( server );
     }
+    tr_free( cidr );
 
     return err;
 }
