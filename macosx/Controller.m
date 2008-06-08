@@ -219,7 +219,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 TR_DEFAULT_PEER_SOCKET_TOS,
                                 [fDefaults boolForKey: @"RPC"],
                                 [fDefaults integerForKey: @"RPCPort"],
-                                NULL, /*reset in prefs*/
+                                NULL, /* reset in prefs */
                                 [fDefaults boolForKey: @"RPCAuthorize"],
                                 [[fDefaults stringForKey: @"RPCUsername"] UTF8String],
                                 [[fDefaults stringForKey: @"RPCPassword"] UTF8String]);

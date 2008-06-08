@@ -98,6 +98,14 @@
 	<true/>
 	<key>PlaySeedingSound</key>
 	<false/>
+	<key>Proxy</key>
+	<false/>
+	<key>ProxyAuthorize</key>
+	<false/>
+	<key>ProxyPassword</key>
+	<string></string>
+	<key>ProxyUsername</key>
+	<string></string>
 	<key>Queue</key>
 	<false/>
 	<key>QueueDownloadNumber</key>
@@ -115,7 +123,7 @@
 	<key>RPCAuthorize</key>
 	<false/>
 	<key>RPCPassword</key>
-	<string>admin</string>
+	<string></string>
 	<key>RPCPort</key>
 	<integer>9091</integer>
 	<key>RPCUsername</key>
