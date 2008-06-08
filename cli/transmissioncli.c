@@ -59,7 +59,7 @@ const char * USAGE =
 "  -f, --finish <script>     Command you wish to run on completion\n" 
 "  -n  --nat-traversal       Attempt NAT traversal using NAT-PMP or UPnP IGD\n"
 "  -p, --port <int>          Port we should listen on (default = %d)\n"
-"  -t, --tos <int>           Peer socket TOS (0 to 255, default = 32)\n"
+"  -t, --tos <int>           Peer socket TOS (0 to 255, default = 8)\n"
 "  -u, --upload <int>        Maximum upload rate (-1 = no limit, default = 20)\n"
 "  -v, --verbose <int>       Verbose level (0 to 2, default = 0)\n"
 "  -y, --recheck             Force a recheck of the torrent data\n";
