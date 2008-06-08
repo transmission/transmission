@@ -72,7 +72,7 @@ typedef enum
 
 - (NSView *) tabViewForTag: (int) tag;
 - (NSArray *) peerSortDescriptors;
-- (void) setWebSeederTableHidden: (BOOL) hidden animate: (BOOL) animate;
+- (void) setWebSeederTableHidden: (BOOL) hide animate: (BOOL) animate;
 
 - (void) addTrackers;
 - (void) removeTrackers;
@@ -174,10 +174,9 @@ typedef enum
     }
     
     //prepare for animating peer table and web seed table
-    fWebSeedTableHidden = NO;
-    fPeerTableHeight = [[fPeerTable enclosingScrollView] frame].size.height;
-    fWebSeedTableHeight = [[fWebSeedTable enclosingScrollView] frame].size.height;
-    fWebSeedTableOrigin = [[fWebSeedTable enclosingScrollView] frame].origin.y;
+    NSRect webSeedTableFrame = [[fWebSeedTable enclosingScrollView] frame];
+    fWebSeedTableHeight = webSeedTableFrame.size.height;
+    fSpaceBetweenWebSeedAndPeer = webSeedTableFrame.origin.y - NSMaxY([[fPeerTable enclosingScrollView] frame]);
     
     [self setWebSeederTableHidden: YES animate: NO];
     
@@ -1440,42 +1439,47 @@ typedef enum
     }
 }
 
-- (void) setWebSeederTableHidden: (BOOL) hidden animate: (BOOL) animate
+- (void) setWebSeederTableHidden: (BOOL) hide animate: (BOOL) animate
 {
-    if (hidden == fWebSeedTableHidden)
-        return;
-    
-    fWebSeedTableHidden = hidden;
-    
     if (![NSApp isOnLeopardOrBetter])
         animate = NO;
     
     NSRect webSeedFrame = [[fWebSeedTable enclosingScrollView] frame];
     NSRect peerFrame = [[fPeerTable enclosingScrollView] frame];
     
-    if (hidden)
+    if (hide)
     {
-        float webSeedFrameMaxY = fWebSeedTableHeight + fWebSeedTableOrigin;
-        peerFrame.size.height = webSeedFrameMaxY - peerFrame.origin.y;
-        
-        webSeedFrame.origin.y = webSeedFrameMaxY;
+        float webSeedFrameMaxY = NSMaxY(webSeedFrame);
         webSeedFrame.size.height = 0;
+        webSeedFrame.origin.y = webSeedFrameMaxY;
+        
+        peerFrame.size.height = webSeedFrameMaxY - peerFrame.origin.y;
     }
     else
     {
-        peerFrame.size.height = fPeerTableHeight;
-        
+        webSeedFrame.origin.y -= fWebSeedTableHeight - webSeedFrame.size.height;
         webSeedFrame.size.height = fWebSeedTableHeight;
-        webSeedFrame.origin.y = fWebSeedTableOrigin;
-    }NSLog(@"%f", webSeedFrame.size.height);
+        
+        peerFrame.size.height = (webSeedFrame.origin.y - fSpaceBetweenWebSeedAndPeer) - peerFrame.origin.y;
+    }
     
     //actually resize tables
-    [NSAnimationContext beginGrouping];
-    
-    [[[fWebSeedTable enclosingScrollView] animator] setFrame: webSeedFrame];
-    [[[fPeerTable enclosingScrollView] animator] setFrame: peerFrame];
-    
-    [NSAnimationContext endGrouping];
+    if (animate)
+    {
+        [NSAnimationContext beginGrouping];
+        
+        [[NSAnimationContext currentContext] setDuration: 0.2];
+        
+        [[[fWebSeedTable enclosingScrollView] animator] setFrame: webSeedFrame];
+        [[[fPeerTable enclosingScrollView] animator] setFrame: peerFrame];
+        
+        [NSAnimationContext endGrouping];
+    }
+    else
+    {
+        [[fWebSeedTable enclosingScrollView] setFrame: webSeedFrame];
+        [[fPeerTable enclosingScrollView] setFrame: peerFrame];
+    }
 }
 
 - (NSArray *) peerSortDescriptors
