@@ -189,6 +189,8 @@ typedef enum
 - (NSString *) errorMessage;
 
 - (NSArray *) peers;
+
+- (NSUInteger) webSeedCount;
 - (NSArray *) webSeeders;
 
 - (NSString *) progressString;

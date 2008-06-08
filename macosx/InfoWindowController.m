@@ -171,9 +171,8 @@ typedef enum
         [[fPeerTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Peer",
                                                                             "inspector -> peer table -> header tool tip")];
         
-        #warning add tooltip for webseeds?
         [[fWebSeedTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Web Seeder",
-                                                                            "inspector -> peer table -> header tool tip")];
+                                                                            "inspector -> web seed table -> header tool tip")];
     }
     else
     {
@@ -466,10 +465,15 @@ typedef enum
         [fPiecesControl setEnabled: YES];
         [fPiecesView setTorrent: torrent];
         
-        //get webseers for table
-        [fWebSeeds release];
-        fWebSeeds = [[torrent webSeeders] retain];
-        [self setWebSeederTableHidden: [fWebSeeds count] == 0 animate: YES];
+        //get webseeders for table - if no webseeds for this torrent, clear the table
+        BOOL hasWebSeeds = [torrent webSeedCount] > 0;
+        [self setWebSeederTableHidden: !hasWebSeeds animate: YES];
+        if (!hasWebSeeds)
+        {
+            [fWebSeeds release];
+            fWebSeeds = nil;
+            [fWebSeedTable reloadData];
+        }
         
         //get trackers for table
         [fTrackers release];
@@ -692,10 +696,12 @@ typedef enum
             case TAB_PEERS_TAG:
                 //if in the middle of animating, just stop and resize immediately
                 if (fWebSeedTableAnimation)
-                    [self setWebSeederTableHidden: !fWebSeeds || [fWebSeeds count] == 0 animate: NO];
+                    [self setWebSeederTableHidden: !fWebSeeds animate: NO];
                 
                 [fPeers release];
                 fPeers = nil;
+                [fWebSeeds release];
+                fWebSeeds = nil;
                 
                 oldResizeSaveKey = @"InspectorContentHeightPeers";
                 break;
@@ -1466,9 +1472,12 @@ typedef enum
     fPeers = [[[torrent peers] sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];
     [fPeerTable reloadData];
     
-    [fWebSeeds release];
-    fWebSeeds = [[[torrent webSeeders] sortedArrayUsingDescriptors: [fWebSeedTable sortDescriptors]] retain];
-    [fWebSeedTable reloadData];
+    if ([torrent webSeedCount] > 0)
+    {
+        [fWebSeeds release];
+        fWebSeeds = [[[torrent webSeeders] sortedArrayUsingDescriptors: [fWebSeedTable sortDescriptors]] retain];
+        [fWebSeedTable reloadData];
+    }
 }
 
 - (void) updateInfoFiles
