@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1766"/>
+			<integer value="1770"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3941,7 +3941,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 										<object class="_NSCornerView" key="NSCornerView" id="336297981">
 											<reference key="NSNextResponder" ref="252354812"/>
 											<int key="NSvFlags">-2147483392</int>
-											<string key="NSFrame">{{328, 0}, {12, 17}}</string>
+											<string key="NSFrame">{{-22, 0}, {12, 17}}</string>
 											<reference key="NSSuperview" ref="252354812"/>
 										</object>
 										<object class="NSMutableArray" key="NSTableColumns">
@@ -3954,7 +3954,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 												<object class="NSTableHeaderCell" key="NSHeaderCell">
 													<int key="NSCellFlags">67239424</int>
 													<int key="NSCellFlags2">0</int>
-													<string key="NSContents">Web Seeders</string>
+													<string key="NSContents">Web Seeds</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSBackgroundColor" ref="665452585"/>
 													<reference key="NSTextColor" ref="390741217"/>

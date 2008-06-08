@@ -1021,10 +1021,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fInfo->webseedCount;
 }
 
-- (NSArray *) webSeeders
+- (NSArray *) webSeeds
 {
     int webSeedCount = fInfo->webseedCount, i;
-    NSMutableArray * webSeeders = [NSMutableArray arrayWithCapacity: webSeedCount];
+    NSMutableArray * webSeeds = [NSMutableArray arrayWithCapacity: webSeedCount];
     
     for (i = 0; i < webSeedCount; i++)
     {
@@ -1032,13 +1032,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         
         [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
         
-        /*if (webSeeders->isDownloadingFrom)
+        /*if (webSeeds->isDownloadingFrom)
             [dict setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];*/
         
-        [webSeeders addObject: dict];
+        [webSeeds addObject: dict];
     }
     
-    return webSeeders;
+    return webSeeds;
 }
 
 - (NSString *) progressString

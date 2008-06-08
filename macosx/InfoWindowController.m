@@ -465,7 +465,7 @@ typedef enum
         [fPiecesControl setEnabled: YES];
         [fPiecesView setTorrent: torrent];
         
-        //get webseeders for table - if no webseeds for this torrent, clear the table
+        //get webseeds for table - if no webseeds for this torrent, clear the table
         BOOL hasWebSeeds = [torrent webSeedCount] > 0;
         [self setWebSeederTableHidden: !hasWebSeeds animate: YES];
         if (!hasWebSeeds)
@@ -1475,7 +1475,7 @@ typedef enum
     if ([torrent webSeedCount] > 0)
     {
         [fWebSeeds release];
-        fWebSeeds = [[[torrent webSeeders] sortedArrayUsingDescriptors: [fWebSeedTable sortDescriptors]] retain];
+        fWebSeeds = [[[torrent webSeeds] sortedArrayUsingDescriptors: [fWebSeedTable sortDescriptors]] retain];
         [fWebSeedTable reloadData];
     }
 }
