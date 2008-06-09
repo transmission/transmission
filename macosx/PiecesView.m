@@ -24,6 +24,7 @@
 
 #import "PiecesView.h"
 #import "InfoWindowController.h"
+#import "CTGradient.h"
 
 #define MAX_ACROSS 18
 #define BETWEEN 1.0
@@ -32,14 +33,13 @@
 
 - (void) awakeFromNib
 {
-        NSBezierPath * bp = [NSBezierPath bezierPathWithRect: [self bounds]];
-        
         //back image
         fBack = [[NSImage alloc] initWithSize: [self bounds].size];
         
         [fBack lockFocus];
-        [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4] set];
-        [bp fill];
+        CTGradient * gradient = [CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4]
+                                    endingColor: [NSColor colorWithCalibratedWhite: 0.25 alpha: 0.4]];
+        [gradient fillRect: [self bounds] angle: 90.0];
         [fBack unlockFocus];
         
         //store box colors
@@ -143,8 +143,7 @@
         [fTorrent getAmountFinished: piecesPercent size: fNumPieces];
     }
     
-    int i, j, piece, index = -1;
-    float piecePercent;
+    int i, j, index = -1;
     NSRect rect = NSMakeRect(0, 0, fWidth, fWidth);
     
     BOOL change = NO;
@@ -162,9 +161,9 @@
             NSColor * pieceColor = nil;
             
             if (showAvailablity)
-            {
-                piece = pieces[index];
-                if (piece < 0)
+            {if (index==0) NSLog(@"%d", pieces[index]);
+                int piece = pieces[index];
+                if (piece == -1)
                 {
                     if (first || fPieces[index] == -2)
                     {
@@ -212,8 +211,8 @@
                 }
             }
             else
-            {
-                piecePercent = piecesPercent[index];
+            {if (index==0) NSLog(@"%f", piecesPercent[index]);
+                float piecePercent = piecesPercent[index];
                 if (piecePercent >= 1.0)
                 {
                     if (first || fPieces[index] == -2)
@@ -228,7 +227,7 @@
                     }
                     else;
                 }
-                else if (piecePercent <= 0.0)
+                else if (piecePercent == 0.0)
                 {
                     if (first || fPieces[index] != 0)
                     {
