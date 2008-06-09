@@ -40,7 +40,7 @@
 
 - (void) setTorrent: (Torrent *) torrent;
 
-- (void) resetView;
+- (void) clearView;
 - (void) updateView;
 
 @end

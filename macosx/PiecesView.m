@@ -80,13 +80,7 @@
 
 - (void) setTorrent: (Torrent *) torrent
 {
-    //reset the view to blank
-    NSImage * newBack = [fBack copy];
-    [self setImage: newBack];
-    [newBack release];
-    
-    tr_free(fPieces);
-    fPieces = NULL;
+    [self clearView];
     
     fTorrent = torrent;
     if (fTorrent)
@@ -98,19 +92,20 @@
         float width = [self bounds].size.width;
         fWidth = (width - (fAcross + 1) * BETWEEN) / fAcross;
         fExtraBorder = (width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
-        
-        [self updateView];
     }
-    else
-        [self setNeedsDisplay];
+    
+    //reset the view to blank
+    NSImage * newBack = [fBack copy];
+    [self setImage: newBack];
+    [newBack release];
+    
+    [self setNeedsDisplay];
 }
 
-- (void) resetView
+- (void) clearView
 {
     tr_free(fPieces);
     fPieces = NULL;
-    
-    [self updateView];
 }
 
 - (void) updateView

@@ -690,9 +690,14 @@ typedef enum
         
         switch (oldTabTag)
         {
+            case TAB_ACTIVITY_TAG:
+                [fPiecesView clearView];
+                break;
+            
             case TAB_TRACKER_TAG:
                 oldResizeSaveKey = @"InspectorContentHeightTracker";
                 break;
+            
             case TAB_PEERS_TAG:
                 //if in the middle of animating, just stop and resize immediately
                 if (fWebSeedTableAnimation)
@@ -705,6 +710,7 @@ typedef enum
                 
                 oldResizeSaveKey = @"InspectorContentHeightPeers";
                 break;
+            
             case TAB_FILES_TAG:
                 [[QuickLookController quickLook] updateQuickLook];
                 
@@ -736,8 +742,6 @@ typedef enum
         case TAB_ACTIVITY_TAG:
             identifier = TAB_ACTIVITY_IDENT;
             title = NSLocalizedString(@"Activity", "Inspector -> title");
-            
-            [fPiecesView resetView];
             break;
         case TAB_TRACKER_TAG:
             identifier = TAB_TRACKER_IDENT;
@@ -1142,7 +1146,8 @@ typedef enum
     [fPiecesControl setSelected: !available forSegment: PIECES_CONTROL_PROGRESS];
     
     [[NSUserDefaults standardUserDefaults] setBool: available forKey: @"PiecesViewShowAvailability"];
-    [fPiecesView resetView];
+    [fPiecesView clearView];
+    [fPiecesView updateView];
 }
 
 - (void) revealTorrentFile: (id) sender
