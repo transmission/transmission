@@ -30,16 +30,6 @@
 
 @implementation PiecesView
 
-- (id) initWithCoder: (NSCoder *) decoder
-{
-    if ((self = [super initWithCoder: decoder]))
-    {
-        fPieces = malloc(MAX_ACROSS * MAX_ACROSS);
-    }
-    
-    return self;
-}
-
 - (void) awakeFromNib
 {
         NSBezierPath * bp = [NSBezierPath bezierPathWithRect: [self bounds]];
@@ -70,7 +60,7 @@
 
 - (void) dealloc
 {
-    free(fPieces);
+    tr_free(fPieces);
     
     [fBack release];
     
@@ -85,82 +75,78 @@
     [fBlue4Color release];
     [fBlueColor release];
     
-    [fTorrent release];
     [super dealloc];
 }
 
 - (void) setTorrent: (Torrent *) torrent
 {
-    [fTorrent release];
+    //reset the view to blank
+    NSImage * newBack = [fBack copy];
+    [self setImage: newBack];
+    [newBack release];
     
-    if (torrent)
+    tr_free(fPieces);
+    fPieces = NULL;
+    
+    fTorrent = torrent;
+    if (fTorrent)
     {
-        fTorrent = [torrent retain];
-        
         //determine relevant values
-        fNumPieces = MAX_ACROSS * MAX_ACROSS;
-        int pieceCount = [fTorrent pieceCount];
-        if (pieceCount < fNumPieces)
-        {
-            fNumPieces = pieceCount;
-            
-            fAcross = sqrt(fNumPieces);
-            if (fAcross * fAcross < fNumPieces)
-                fAcross++;
-        }
-        else
-            fAcross = MAX_ACROSS;
+        fNumPieces = MIN([fTorrent pieceCount], MAX_ACROSS * MAX_ACROSS);
+        fAcross = ceil(sqrt(fNumPieces));
         
         float width = [self bounds].size.width;
         fWidth = (width - (fAcross + 1) * BETWEEN) / fAcross;
         fExtraBorder = (width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
         
-        [self updateView: YES];
+        [self updateView];
     }
     else
-    {
-        fTorrent = nil;
-        
-        NSImage * newBack = [fBack copy];
-        [self setImage: newBack];
-        [newBack release];
-        
         [self setNeedsDisplay];
-    }
 }
 
-- (void) updateView: (BOOL) first
+- (void) resetView
+{
+    tr_free(fPieces);
+    fPieces = NULL;
+    
+    [self updateView];
+}
+
+- (void) updateView
 {
     if (!fTorrent)
         return;
     
-    if (first)
+    //determine if first time
+    BOOL first = NO;
+    if (!fPieces)
     {
-        NSImage * newBack = [fBack copy];
-        [self setImage: newBack];
-        [newBack release];
+        fPieces = (int8_t *)tr_malloc(fNumPieces * sizeof(int8_t));
+        first = YES;
     }
+    
     NSImage * image = [self image];
 
-    int8_t * pieces;
-    float * piecesPercent;
+    int8_t * pieces = NULL;
+    float * piecesPercent = NULL;
     
     BOOL showAvailablity = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
     if (showAvailablity)
     {   
-        pieces = malloc(fNumPieces * sizeof(int8_t));
+        pieces = (int8_t *)tr_malloc(fNumPieces * sizeof(int8_t));
         [fTorrent getAvailability: pieces size: fNumPieces];
     }
     else
     {   
-        piecesPercent = malloc(fNumPieces * sizeof(float));
+        piecesPercent = (float *)tr_malloc(fNumPieces * sizeof(float));
         [fTorrent getAmountFinished: piecesPercent size: fNumPieces];
     }
     
     int i, j, piece, index = -1;
     float piecePercent;
     NSRect rect = NSMakeRect(0, 0, fWidth, fWidth);
-    NSColor * pieceColor;
+    
     BOOL change = NO;
         
     for (i = 0; i < fAcross; i++)
@@ -173,7 +159,7 @@
                 break;
             }
             
-            pieceColor = nil;
+            NSColor * pieceColor = nil;
             
             if (showAvailablity)
             {
@@ -293,10 +279,10 @@
                     change = YES;
                 }
                 
-                [pieceColor set];
-                
                 rect.origin = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
                                     [image size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
+                
+                [pieceColor set];
                 NSRectFill(rect);
             }
         }
@@ -307,10 +293,8 @@
         [self setNeedsDisplay];
     }
     
-    if (showAvailablity)
-        free(pieces);
-    else
-        free(piecesPercent);
+    tr_free(pieces);
+    tr_free(piecesPercent);
 }
 
 - (BOOL) acceptsFirstMouse: (NSEvent *) event

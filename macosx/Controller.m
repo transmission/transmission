@@ -208,15 +208,15 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 [fDefaults boolForKey: @"NatTraversal"],
                                 [fDefaults integerForKey: @"BindPort"],
                                 TR_ENCRYPTION_PREFERRED, /* reset in prefs */
-                                FALSE, /* reset in prefs */
+                                NO, /* reset in prefs */
                                 -1, /* reset in prefs */
-                                FALSE, /* reset in prefs */
+                                NO, /* reset in prefs */
                                 -1, /* reset in prefs */
                                 [fDefaults integerForKey: @"PeersTotal"],
                                 [fDefaults integerForKey: @"MessageLevel"],
                                 YES,
                                 [fDefaults boolForKey: @"Blocklist"],
-                                [fDefaults integerForKey: @"PeerSocketTOS"], /* hidden - default should be TR_DEFAULT_PEER_SOCKET_TOS */
+                                [fDefaults integerForKey: @"PeerSocketTOS"], /* hidden pref - default is TR_DEFAULT_PEER_SOCKET_TOS */
                                 [fDefaults boolForKey: @"RPC"],
                                 [fDefaults integerForKey: @"RPCPort"],
                                 NULL, /* reset in prefs */

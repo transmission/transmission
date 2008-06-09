@@ -54,7 +54,8 @@
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
 
 #define PIECES_TOTAL_PERCENT 0.6
-#define MAX_PIECES 324
+
+#define MAX_PIECES (18*18)
 
 @interface TorrentCell (Private)
 

@@ -737,7 +737,7 @@ typedef enum
             identifier = TAB_ACTIVITY_IDENT;
             title = NSLocalizedString(@"Activity", "Inspector -> title");
             
-            [fPiecesView updateView: YES];
+            [fPiecesView resetView];
             break;
         case TAB_TRACKER_TAG:
             identifier = TAB_TRACKER_IDENT;
@@ -1142,7 +1142,7 @@ typedef enum
     [fPiecesControl setSelected: !available forSegment: PIECES_CONTROL_PROGRESS];
     
     [[NSUserDefaults standardUserDefaults] setBool: available forKey: @"PiecesViewShowAvailability"];
-    [fPiecesView updateView: YES];
+    [fPiecesView resetView];
 }
 
 - (void) revealTorrentFile: (id) sender
@@ -1365,7 +1365,7 @@ typedef enum
         
         [fDateCompletedField setObjectValue: [torrent dateCompleted]];
         
-        [fPiecesView updateView: NO];
+        [fPiecesView updateView];
     }
 }
 

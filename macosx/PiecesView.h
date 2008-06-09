@@ -39,6 +39,8 @@
 }
 
 - (void) setTorrent: (Torrent *) torrent;
-- (void) updateView: (BOOL) first;
+
+- (void) resetView;
+- (void) updateView;
 
 @end
