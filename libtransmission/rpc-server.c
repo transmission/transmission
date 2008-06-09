@@ -238,7 +238,7 @@ tr_rpcGetPort( const tr_rpc_server * server )
  * this stuff is worth it, you can buy me a beer in return.
  */
 
-#define  DELIM_CHARS " ," /* Separators for lists */
+#define  DELIM_CHARS "," /* Separators for lists */
 
 #define FOR_EACH_WORD_IN_LIST(s,len)                                    \
         for (; s != NULL && (len = strcspn(s, DELIM_CHARS)) != 0;       \

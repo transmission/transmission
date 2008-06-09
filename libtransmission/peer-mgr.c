@@ -1300,13 +1300,11 @@ tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
 
     memset( tab, 0, tabCount );
 
-    for( i=0; i<tabCount; ++i )
+    for( i=0; tor && i<tabCount; ++i )
     {
         const int piece = i * interval;
 
-        if( tor == NULL )
-            tab[i] = 0;
-        else if( isComplete || tr_cpPieceIsComplete( tor->completion, piece ) )
+        if( isComplete || tr_cpPieceIsComplete( tor->completion, piece ) )
             tab[i] = -1;
         else if( peerCount ) {
             int j;

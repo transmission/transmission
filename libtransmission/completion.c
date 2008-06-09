@@ -305,18 +305,19 @@ void
 tr_cpGetAmountDone( const tr_completion * cp, float * tab, int tabCount )
 {
     int i;
-    const int isComplete = tr_cpGetStatus ( cp ) == TR_CP_COMPLETE;
-    const int tabSpan = cp->tor->blockCount / tabCount;
-    tr_block_index_t block_i = 0;
-    for( i=0; i<tabCount; ++i ) {
-        if( isComplete )
-            tab[i] = 1.0f;
-        else {
-            int loop, have;
-            for( loop=have=0; loop<tabSpan; ++loop )
-                if( tr_cpBlockIsComplete( cp, block_i++ ) )
-                    ++have;
-            tab[i] = (float)have / tabSpan;
-        }
+    const tr_torrent * tor = cp->tor;
+    const float interval = tor->info.pieceCount / (float)tabCount;
+    const int isComplete = tr_cpGetStatus ( tor->completion ) == TR_CP_COMPLETE;
+
+    for( i=0; i<tabCount; ++i )
+    {
+        const tr_piece_index_t piece = i * interval;
+
+        if( tor == NULL )
+            tab[i] = 0;
+        else if( isComplete || tr_cpPieceIsComplete( cp, piece ) )
+            tab[i] = -1;
+        else 
+            tab[i] = (float)cp->completeBlocks[piece] / tr_torPieceCountBlocks( tor, piece );
     }
 }
