@@ -84,7 +84,7 @@ getProgressString( const tr_info * info, const tr_stat * torStat )
         GString * gstr = g_string_new( str );
         g_string_append( gstr, " - " );
         if( eta == TR_ETA_NOT_AVAIL )
-            g_string_append( gstr, _( "Not available" ) );
+            g_string_append( gstr, _( "Data not fully available" ) );
          else if( eta == TR_ETA_UNKNOWN )
             g_string_append( gstr, _( "Stalled" ) );
         else {
