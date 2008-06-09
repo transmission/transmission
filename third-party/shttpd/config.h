@@ -21,7 +21,7 @@
 #define	CGI_EXT		"cgi,pl,php"	/* Default CGI extensions	*/
 #define	SSI_EXT		"shtml,shtm"	/* Default SSI extensions	*/
 #define	REALM		"mydomain.com"	/* Default authentication realm	*/
-#define	DELIM_CHARS	" ,"		/* Separators for lists		*/
+#define	DELIM_CHARS	","		/* Separators for lists		*/
 #define	EXPIRE_TIME	3600		/* Expiration time, seconds	*/
 #define	ENV_MAX		4096		/* Size of environment block	*/
 #define	CGI_ENV_VARS	64		/* Maximum vars passed to CGI	*/

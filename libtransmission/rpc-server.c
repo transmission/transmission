@@ -308,7 +308,7 @@ cidrize( const char * acl )
     FOR_EACH_WORD_IN_LIST( walk, len )
     {
         cidrizeOne( walk, len, out );
-        evbuffer_add_printf( out, ", " );
+        evbuffer_add_printf( out, "," );
     }
 
     /* the -2 is to eat the final ", " */
