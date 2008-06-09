@@ -105,7 +105,7 @@ absolutify( char * buf, size_t len, const char * path )
 static char*
 getEncodedMetainfo( const char * filename )
 {
-    size_t len;
+    size_t len = 0;
     uint8_t * buf = tr_loadFile( filename, &len );
     char * b64 = tr_base64_encode( buf, len, NULL );
     tr_free( buf );
