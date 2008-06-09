@@ -24,9 +24,7 @@ tr_webseed* tr_webseedNew( struct tr_torrent  * torrent,
 
 void tr_webseedFree( tr_webseed * );
 
-int tr_webseedAddRequest( tr_webseed  * w,
-                          uint32_t      index,
-                          uint32_t      begin,
-                          uint32_t      length );
+int tr_webseedAddRequest( tr_webseed          * w,
+                          tr_piece_index_t      piece );
 
 #endif

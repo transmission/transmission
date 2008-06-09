@@ -112,7 +112,7 @@ typedef struct
     tr_timer * refillTimer;
     tr_torrent * tor;
     tr_peer * optimistic; /* the optimistic peer, or NULL if none */
-    tr_bitfield * requested;
+    tr_bitfield * requestedPieces;
 
     unsigned int isRunning : 1;
 
@@ -366,7 +366,7 @@ torrentDestructor( Torrent * t )
     tr_timerFree( &t->rechokeTimer );
     tr_timerFree( &t->refillTimer );
 
-    tr_bitfieldFree( t->requested );
+    tr_bitfieldFree( t->requestedPieces );
     tr_ptrArrayFree( t->webseeds, (PtrArrayForeachFunc)tr_webseedFree );
     tr_ptrArrayFree( t->pool, (PtrArrayForeachFunc)tr_free );
     tr_ptrArrayFree( t->outgoingHandshakes, NULL );
@@ -390,7 +390,7 @@ torrentConstructor( tr_peerMgr * manager, tr_torrent * tor )
     t->peers = tr_ptrArrayNew( );
     t->webseeds = tr_ptrArrayNew( );
     t->outgoingHandshakes = tr_ptrArrayNew( );
-    t->requested = tr_bitfieldNew( tor->blockCount );
+    t->requestedPieces = tr_bitfieldNew( tor->info.pieceCount );
     memcpy( t->hash, tor->info.hash, SHA_DIGEST_LENGTH );
 
     for( i=0; i<tor->info.webseedCount; ++i ) {
@@ -543,10 +543,6 @@ compareRefillPiece (const void * aIn, const void * bIn)
     const struct tr_refill_piece * a = aIn;
     const struct tr_refill_piece * b = bIn;
 
-    /* fewer missing pieces goes first */
-    if( a->missingBlockCount != b->missingBlockCount )
-        return a->missingBlockCount < b->missingBlockCount ? -1 : 1;
-    
     /* if one piece has a higher priority, it goes first */
     if( a->priority != b->priority )
         return a->priority > b->priority ? -1 : 1;
@@ -555,13 +551,8 @@ compareRefillPiece (const void * aIn, const void * bIn)
     if (a->peerCount != b->peerCount)
         return a->peerCount < b->peerCount ? -1 : 1;
 
-#if 0
-    /* otherwise download them in order */
-    return tr_compareUint16( a->piece, b->piece );
-#else
     /* otherwise go with our random seed */
     return tr_compareUint16( a->random, b->random );
-#endif
 }
 
 static int
@@ -636,94 +627,6 @@ getPreferredPieces( Torrent     * t,
     return pool;
 }
 
-static uint64_t*
-getPreferredBlocks( Torrent * t, tr_block_index_t * setmeCount )
-{
-    int s;
-    uint32_t i;
-    uint32_t pieceCount;
-    uint32_t blockCount;
-    uint32_t unreqCount[3], reqCount[3];
-    uint32_t * pieces;
-    uint64_t * ret, * walk;
-    uint64_t * unreq[3], *req[3];
-    const tr_torrent * tor = t->tor;
-
-    assert( torrentIsLocked( t ) );
-
-    pieces = getPreferredPieces( t, &pieceCount );
-
-    /**
-     * Now we walk through those preferred pieces to find all the blocks
-     * are still missing from them.  We put unrequested blocks first,
-     * of course, but by including requested blocks afterwards, endgame
-     * handling happens naturally.
-     *
-     * By doing this once per priority we also effectively get an endgame
-     * mode for each priority level.  The helps keep high priority files
-     * from getting stuck at 99% due of unresponsive peers.
-     */
-
-    /* make temporary bins for the four tiers of blocks */
-    for( i=0; i<3; ++i ) {
-        req[i] = tr_new( uint64_t, pieceCount *  tor->blockCountInPiece );
-        reqCount[i] = 0;
-        unreq[i] = tr_new( uint64_t, pieceCount *  tor->blockCountInPiece );
-        unreqCount[i] = 0;
-    }
-
-    /* sort the blocks into our temp bins */
-    for( i=blockCount=0; i<pieceCount; ++i )
-    {
-        const tr_piece_index_t index = pieces[i];
-        const int priorityIndex = tor->info.pieces[index].priority + 1;
-        const tr_block_index_t begin = tr_torPieceFirstBlock( tor, index );
-        const tr_block_index_t end = begin + tr_torPieceCountBlocks( tor, index );
-        tr_block_index_t block;
-
-        assert( tr_bitfieldTestFast( t->requested, end-1 ) );
-
-        for( block=begin; block<end; ++block )
-        {
-            if( tr_cpBlockIsComplete( tor->completion, block ) )
-                continue;
-
-            ++blockCount;
-
-            if( tr_bitfieldHasFast( t->requested, block ) )
-            {
-                const uint32_t n = reqCount[priorityIndex]++;
-                req[priorityIndex][n] = block;
-            }
-            else
-            {
-                const uint32_t n = unreqCount[priorityIndex]++;
-                unreq[priorityIndex][n] = block;
-            }
-        }
-    }
-
-    /* join the bins together, going from highest priority to lowest so
-     * the the blocks we want to request first will be first in the list */
-    ret = walk = tr_new( uint64_t, blockCount );
-    for( s=2; s>=0; --s ) {
-        memcpy( walk, unreq[s], sizeof(uint64_t) * unreqCount[s] );
-        walk += unreqCount[s];
-        memcpy( walk, req[s], sizeof(uint64_t) * reqCount[s] );
-        walk += reqCount[s];
-    }
-    assert( ( walk - ret ) == ( int )blockCount );
-    *setmeCount = blockCount;
-
-    /* cleanup */
-    tr_free( pieces );
-    for( i=0; i<3; ++i ) {
-        tr_free( unreq[i] );
-        tr_free( req[i] );
-    }
-    return ret;
-}
-
 static tr_peer**
 getPeersUploadingToClient( Torrent * t, int * setmeCount )
 {
@@ -758,13 +661,13 @@ refillPulse( void * vtorrent )
 {
     Torrent * t = vtorrent;
     tr_torrent * tor = t->tor;
-    tr_block_index_t i;
     int peerCount;
     int webseedCount;
     tr_peer ** peers;
     tr_webseed ** webseeds;
-    tr_block_index_t blockCount;
-    uint64_t * blocks;
+    uint32_t pieceCount;
+    uint32_t * pieces;
+    tr_piece_index_t i;
 
     if( !t->isRunning )
         return TRUE;
@@ -774,30 +677,23 @@ refillPulse( void * vtorrent )
     torrentLock( t );
     tordbg( t, "Refilling Request Buffers..." );
 
-    blocks = getPreferredBlocks( t, &blockCount );
+    pieces = getPreferredPieces( t, &pieceCount );
     peers = getPeersUploadingToClient( t, &peerCount );
     webseedCount = tr_ptrArraySize( t->webseeds );
     webseeds = tr_memdup( tr_ptrArrayBase(t->webseeds), webseedCount*sizeof(tr_webseed*) );
 
-    for( i=0; (webseedCount || peerCount) && i<blockCount; ++i )
+    for( i=0; (webseedCount || peerCount) && i<pieceCount; ++i )
     {
         int j;
         int handled = FALSE;
+        const tr_piece_index_t piece = pieces[i];
 
-        const tr_block_index_t block = blocks[i];
-        const tr_piece_index_t index = tr_torBlockPiece( tor, block );
-        const uint32_t begin = (block * tor->blockSize) - (index * tor->info.pieceSize);
-        const uint32_t length = tr_torBlockCountBytes( tor, block );
+        assert( piece < tor->info.pieceSize );
 
-        assert( tr_torrentReqIsValid( tor, index, begin, length ) );
-        assert( _tr_block( tor, index, begin ) == block );
-        assert( begin < tr_torPieceCountBytes( tor, index ) );
-        assert( (begin + length) <= tr_torPieceCountBytes( tor, index ) );
-
-        /* find a peer who can ask for this block */
+        /* find a peer who can ask for this piece */
         for( j=0; !handled && j<peerCount; )
         {
-            const int val = tr_peerMsgsAddRequest( peers[j]->msgs, index, begin, length );
+            const int val = tr_peerMsgsAddRequest( peers[j]->msgs, piece );
             switch( val )
             {
                 case TR_ADDREQ_FULL: 
@@ -809,7 +705,7 @@ refillPulse( void * vtorrent )
                     ++j;
                     break;
                 case TR_ADDREQ_OK:
-                    tr_bitfieldAdd( t->requested, block );
+                    tr_bitfieldAdd( t->requestedPieces, piece );
                     handled = TRUE;
                     break;
                 default:
@@ -821,14 +717,14 @@ refillPulse( void * vtorrent )
         /* maybe one of the webseeds can do it */
         for( j=0; !handled && j<webseedCount; )
         {
-            const int val = tr_webseedAddRequest( webseeds[j], index, begin, length );
+            const int val = tr_webseedAddRequest( webseeds[j], piece );
             switch( val )
             {
                 case TR_ADDREQ_FULL: 
                     memmove( webseeds+j, webseeds+j+1, sizeof(tr_webseed*)*(--webseedCount-j) );
                     break;
                 case TR_ADDREQ_OK:
-                    tr_bitfieldAdd( t->requested, block );
+                    tr_bitfieldAdd( t->requestedPieces, piece );
                     handled = TRUE;
                     break;
                 default:
@@ -841,25 +737,11 @@ refillPulse( void * vtorrent )
     /* cleanup */
     tr_free( webseeds );
     tr_free( peers );
-    tr_free( blocks );
+    tr_free( pieces );
 
     t->refillTimer = NULL;
     torrentUnlock( t );
     return FALSE;
-}
-
-static void
-broadcastGotBlock( Torrent * t, uint32_t index, uint32_t offset, uint32_t length )
-{
-    int i, size;
-    tr_peer ** peers;
-
-    assert( torrentIsLocked( t ) );
-
-    peers = getConnectedPeers( t, &size );
-    for( i=0; i<size; ++i )
-        tr_peerMsgsCancel( peers[i]->msgs, index, offset, length );
-    tr_free( peers );
 }
 
 static void
@@ -904,7 +786,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
             break;
 
         case TR_PEER_CANCEL:
-            tr_bitfieldRem( t->requested, _tr_block( t->tor, e->pieceIndex, e->offset ) );
+            tr_bitfieldRem( t->requestedPieces, e->pieceIndex );
             break;
 
         case TR_PEER_PEER_GOT_DATA: {
@@ -926,7 +808,14 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
             const time_t now = time( NULL );
             tr_torrent * tor = t->tor;
             tor->activityDate = now;
-            tor->downloadedCur += e->length;
+            /* only add this to downloadedCur if we got it from a peer --
+             * webseeds shouldn't count against our ratio.  As one tracker
+             * admin put it, "Those pieces are downloaded directly from the
+             * content distributor, not the peers, it is the tracker's job
+             * to manage the swarms, not the web server and does not fit
+             * into the jurisdiction of the tracker." */
+            if( peer )
+                tor->downloadedCur += e->length;
             tr_rcTransferred( tor->download, e->length );
             tr_rcTransferred( tor->handle->download, e->length );
             tr_statsAddDownloaded( tor->handle, e->length );
@@ -959,8 +848,6 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
             tr_block_index_t block = _tr_block( tor, e->pieceIndex, e->offset );
 
             tr_cpBlockAdd( tor->completion, block );
-
-            broadcastGotBlock( t, e->pieceIndex, e->offset, e->length );
 
             if( tr_cpPieceIsComplete( tor->completion, e->pieceIndex ) )
             {

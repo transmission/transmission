@@ -732,6 +732,7 @@ tr_bitfieldHas( const tr_bitfield * bitfield, size_t nth )
         && ( tr_bitfieldHasFast( bitfield, nth ) );
 }
 
+#if 0
 static int
 find_top_bit( uint8_t val )
 {
@@ -776,6 +777,7 @@ tr_bitfieldFindTrue( const tr_bitfield  * bitfield,
 
     return 0;
 }
+#endif
 
 int
 tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )

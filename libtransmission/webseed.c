@@ -23,9 +23,10 @@
 #include "web.h"
 #include "webseed.h"
 
+#define MAX_QUEUE_SIZE 4
+
 struct tr_webseed
 {
-    unsigned int        busy : 1;
     unsigned int        dead : 1;
 
     tr_torrent        * torrent;
@@ -34,9 +35,10 @@ struct tr_webseed
     tr_delivery_func  * callback;
     void              * callback_userdata;
 
-    tr_piece_index_t    pieceIndex;
-    uint32_t            pieceOffset;
-    uint32_t            byteCount;
+    uint64_t            bytesSaved;
+
+    tr_piece_index_t    queue[MAX_QUEUE_SIZE];
+    int                 queueSize;
 
     struct evbuffer   * content;
 };
@@ -145,29 +147,55 @@ webResponseFunc( tr_handle   * session UNUSED,
     tr_webseed * w = vw;
     const int success = ( response_code == 206 );
 
-fprintf( stderr, "server responded with code %ld and %lu bytes\n", response_code, (unsigned long)response_byte_count );
+/*fprintf( stderr, "server responded with code %ld and %lu bytes\n", response_code, (unsigned long)response_byte_count );*/
     if( !success )
     {
         /* FIXME */
     }
+    else if( w->dead )
+    {
+        tr_webseedFree( w );
+    }
     else
     {
-        evbuffer_add( w->content, response, response_byte_count );
-        if( !w->dead )
-            fireClientGotData( w, response_byte_count );
+        const tr_piece_index_t piece = w->queue[0];
+        tr_block_index_t block;
+        size_t len;
 
-        if( EVBUFFER_LENGTH( w->content ) < w->byteCount )
+        evbuffer_add( w->content, response, response_byte_count );
+
+        fireClientGotData( w, response_byte_count );
+
+        block = _tr_block( w->torrent, piece, w->bytesSaved );
+        len = tr_torBlockCountBytes( w->torrent, block );
+
+        while( EVBUFFER_LENGTH( w->content ) >= len )
+        {
+/*fprintf( stderr, "saving piece index %lu, offset %lu, len %lu\n", (unsigned long)piece, (unsigned long)w->bytesSaved, (unsigned long)len );*/
+            /* save one block */
+            tr_ioWrite( w->torrent, piece, w->bytesSaved, len, 
+                        EVBUFFER_DATA(w->content) );
+            evbuffer_drain( w->content, len );
+            fireClientGotBlock( w, piece, w->bytesSaved, len );
+            w->bytesSaved += len;
+
+            /* march to the next one */
+            ++block;
+            len = tr_torBlockCountBytes( w->torrent, block );
+        }
+
+        if( w->bytesSaved < tr_torPieceCountBytes( w->torrent, piece ) )
             requestNextChunk( w );
         else {
-            tr_ioWrite( w->torrent, w->pieceIndex, w->pieceOffset, w->byteCount, EVBUFFER_DATA(w->content) );
+            w->bytesSaved = 0;
             evbuffer_drain( w->content, EVBUFFER_LENGTH( w->content ) );
-            w->busy = 0;
-            if( w->dead )
-                tr_webseedFree( w );
-            else  {
-                fireClientGotBlock( w, w->pieceIndex, w->pieceOffset, w->byteCount );
+/*fprintf( stderr, "w->callback_userdata is %p\n", w->callback_userdata );*/
+            memmove( w->queue, w->queue+1, sizeof(tr_piece_index_t)*(MAX_QUEUE_SIZE-1) );
+/*fprintf( stderr, "w->callback_userdata is %p\n", w->callback_userdata );*/
+            if( --w->queueSize )
+                requestNextChunk( w );
+            if( w->queueSize < ( MAX_QUEUE_SIZE / 2 ) )
                 fireNeedReq( w );
-            }
         }
     }
 }
@@ -176,49 +204,44 @@ static void
 requestNextChunk( tr_webseed * w )
 {
     const tr_info * inf = tr_torrentInfo( w->torrent );
-    const uint32_t have = EVBUFFER_LENGTH( w->content );
-    const uint32_t left = w->byteCount - have;
-    const uint32_t pieceOffset = w->pieceOffset + have;
+    const uint32_t have = w->bytesSaved + EVBUFFER_LENGTH( w->content );
+    const tr_piece_index_t piece = w->queue[0];
+    const uint32_t left = tr_torPieceCountBytes( w->torrent, piece ) - have;
+    const uint32_t pieceOffset = have;
     tr_file_index_t fileIndex;
     uint64_t fileOffset;
     uint32_t thisPass;
     char * url;
     char * range;
 
-    tr_ioFindFileLocation( w->torrent, w->pieceIndex, pieceOffset,
+    tr_ioFindFileLocation( w->torrent, piece, pieceOffset,
                            &fileIndex, &fileOffset );
     thisPass = MIN( left, inf->files[fileIndex].length - fileOffset );
 
     url = makeURL( w, &inf->files[fileIndex] );
-//fprintf( stderr, "url is [%s]\n", url );
     range = tr_strdup_printf( "%"PRIu64"-%"PRIu64, fileOffset, fileOffset + thisPass - 1 );
-fprintf( stderr, "range is [%s] ... we want %lu total, we have %lu, so %lu are left, and we're asking for %lu this time\n", range, (unsigned long)w->byteCount, (unsigned long)have, (unsigned long)left, (unsigned long)thisPass );
+/*fprintf( stderr, "range is [%s] ... we want %lu total, we have %lu, so %lu are left, and we're asking for %lu this time\n", range, (unsigned long)tr_torPieceCountBytes(w->torrent,piece), (unsigned long)have, (unsigned long)left, (unsigned long)thisPass );*/
     tr_webRun( w->torrent->handle, url, range, webResponseFunc, w );
     tr_free( range );
     tr_free( url );
 }
 
 int
-tr_webseedAddRequest( tr_webseed  * w,
-                      uint32_t      pieceIndex,
-                      uint32_t      pieceOffset,
-                      uint32_t      byteCount )
+tr_webseedAddRequest( tr_webseed        * w,
+                      tr_piece_index_t    piece )
 {
     int ret;
 
-    if( w->busy || w->dead )
+    if( w->dead || w->queueSize >= MAX_QUEUE_SIZE )
     {
         ret = TR_ADDREQ_FULL;
     }
     else
     {
-fprintf( stderr, "webseed is starting a new piece here -- piece %lu, offset %lu!!!\n", (unsigned long)pieceIndex, (unsigned long)pieceOffset );
-        w->busy = 1;
-        w->pieceIndex = pieceIndex;
-        w->pieceOffset = pieceOffset;
-        w->byteCount = byteCount;
-        evbuffer_drain( w->content, EVBUFFER_LENGTH( w->content ) );
-        requestNextChunk( w );
+        int wasEmpty = w->queueSize == 0;
+        w->queue[ w->queueSize++ ] = piece;
+        if( wasEmpty )
+            requestNextChunk( w );
         ret = TR_ADDREQ_OK;
     }
 
@@ -241,6 +264,7 @@ tr_webseedNew( struct tr_torrent * torrent,
     w->url = tr_strdup( url );
     w->callback = callback;
     w->callback_userdata = callback_userdata;
+/*fprintf( stderr, "w->callback_userdata is %p\n", w->callback_userdata );*/
     return w;
 }
 
@@ -249,7 +273,7 @@ tr_webseedFree( tr_webseed * w )
 {
     if( w )
     {
-        if( w->busy )
+        if( w->queueSize > 0 )
         {
             w->dead = 1;
         }

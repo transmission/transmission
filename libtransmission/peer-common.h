@@ -48,7 +48,7 @@ PeerEventType;
 typedef struct
 {
     PeerEventType eventType;
-    uint32_t pieceIndex; /* for GOT_BLOCK */
+    uint32_t pieceIndex; /* for GOT_BLOCK, CANCEL */
     uint32_t offset;     /* for GOT_BLOCK */
     uint32_t length;     /* for GOT_BLOCK + GOT_DATA */
     float progress;      /* for TR_PEER_PEER_PROGRESS */

@@ -1427,6 +1427,8 @@ tr_torrentReqIsValid( const tr_torrent * tor,
     else if( tr_pieceOffset( tor, index, offset, length ) > tor->info.totalSize )
         err = 4;
 
+if( err ) fprintf( stderr, "index %lu offset %lu length %lu err %d\n", (unsigned long)index, (unsigned long)offset, (unsigned long)length, err );
+
     return !err;
 }
 

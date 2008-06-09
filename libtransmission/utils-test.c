@@ -33,7 +33,6 @@ test_bitfields( void )
 { 
     int i;
     int bitcount = 5000000;
-    size_t pos;
     tr_bitfield * field = tr_bitfieldNew( bitcount );
 
     /* make every seventh one true */
@@ -45,6 +44,7 @@ test_bitfields( void )
     for( i=0; i<bitcount; ++i )
         check( tr_bitfieldHas( field, i ) == (!(i%7)) );
 
+#if 0
     /* testing the "find next" function */
     check( tr_bitfieldFindTrue( field, 0, &pos ) );
     check( pos == 0 );
@@ -64,7 +64,7 @@ test_bitfields( void )
     check( pos == 21 );
     check( tr_bitfieldFindTrue( field, 16, &pos ) );
     check( pos == 21 );
-
+#endif
 
     tr_bitfieldFree( field );
     return 0;

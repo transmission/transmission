@@ -35,59 +35,19 @@ void         tr_peerMsgsSetChoke( tr_peermsgs *, int doChoke );
 void         tr_peerMsgsHave( tr_peermsgs * msgs,
                               uint32_t      pieceIndex );
 
+#if 0
 void         tr_peerMsgsCancel( tr_peermsgs * msgs,
                                 uint32_t      pieceIndex,
                                 uint32_t      offset,
                                 uint32_t      length );
+#endif
 
 void         tr_peerMsgsFree( tr_peermsgs* );
 
+int          tr_peerMsgsAddRequest( tr_peermsgs      * peer,
+                                    tr_piece_index_t   piece );
 
-#if 0
-enum {
-    TR_ADDREQ_OK=0,
-    TR_ADDREQ_FULL,
-    TR_ADDREQ_DUPLICATE,
-    TR_ADDREQ_MISSING,
-    TR_ADDREQ_CLIENT_CHOKED
-};
-#endif
-
-int          tr_peerMsgsAddRequest( tr_peermsgs * peer,
-                                    uint32_t      index,
-                                    uint32_t      begin,
-                                    uint32_t      length );
-
-/**
-***  PeerMsgs Publish / Subscribe
-**/
-
-#if 0
-typedef enum
-{
-    TR_PEERMSG_CLIENT_HAVE,
-    TR_PEERMSG_CLIENT_BLOCK,
-    TR_PEERMSG_PIECE_DATA,
-    TR_PEERMSG_PEER_PROGRESS,
-    TR_PEERMSG_ERROR,
-    TR_PEERMSG_CANCEL,
-    TR_PEERMSG_NEED_REQ
-}
-PeerMsgsEventType;
-
-typedef struct
-{
-    PeerMsgsEventType eventType;
-    uint32_t pieceIndex; /* for TR_PEERMSG_GOT_BLOCK, TR_PEERMSG_GOT_HAVE */
-    uint32_t offset;     /* for TR_PEERMSG_GOT_BLOCK */
-    uint32_t length;     /* for TR_PEERMSG_GOT_BLOCK */
-    float progress;      /* for TR_PEERMSG_PEER_PROGRESS */
-    tr_errno err;        /* for TR_PEERMSG_GOT_ERROR */
-}
-tr_peermsgs_event;
-#endif
-
-void  tr_peerMsgsUnsubscribe ( tr_peermsgs       * peer,
-                               tr_publisher_tag    tag );
+void         tr_peerMsgsUnsubscribe ( tr_peermsgs       * peer,
+                                      tr_publisher_tag    tag );
 
 #endif
