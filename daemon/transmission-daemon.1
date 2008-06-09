@@ -57,8 +57,17 @@ Port to open and listen for RPC requests on.  Default: 9091
 Sets the default config-dir.
 .El
 
+
 .Sh FILES
-.Pa ~/.config/transmission-daemon
+.Bl -tag -width Ds -compact
+.It ~/.config/transmission-daemon
+The config-dir used when neither
+.Op Ev TRANSMISSION_HOME
+nor
+.Op Fl g
+is specified.
+.El
+
 
 .Sh AUTHORS
 .An -nosplit
