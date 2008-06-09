@@ -38,7 +38,7 @@
         
         [fBack lockFocus];
         CTGradient * gradient = [CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4]
-                                    endingColor: [NSColor colorWithCalibratedWhite: 0.25 alpha: 0.4]];
+                                    endingColor: [NSColor colorWithCalibratedWhite: 0.2 alpha: 0.4]];
         [gradient fillRect: [self bounds] angle: 90.0];
         [fBack unlockFocus];
         
@@ -161,7 +161,7 @@
             NSColor * pieceColor = nil;
             
             if (showAvailablity)
-            {if (index==0) NSLog(@"%d", pieces[index]);
+            {
                 int piece = pieces[index];
                 if (piece == -1)
                 {
@@ -211,7 +211,7 @@
                 }
             }
             else
-            {if (index==0) NSLog(@"%f", piecesPercent[index]);
+            {
                 float piecePercent = piecesPercent[index];
                 if (piecePercent >= 1.0)
                 {
