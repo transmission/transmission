@@ -1016,7 +1016,6 @@ tr_core_set_hibernation_allowed( TrCore * core, gboolean allowed )
     if( !allowed && !core->priv->have_inhibit_cookie )
     {
         core->priv->have_inhibit_cookie = gtr_inhibit_hibernation( &core->priv->inhibit_cookie );
-        core->priv->have_inhibit_cookie = TRUE;
     }
 #endif
 }
