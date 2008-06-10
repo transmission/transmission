@@ -314,9 +314,9 @@ tr_cpGetAmountDone( const tr_completion * cp, float * tab, int tabCount )
         const tr_piece_index_t piece = i * interval;
 
         if( tor == NULL )
-            tab[i] = 0;
+            tab[i] = 0f;
         else if( isComplete || tr_cpPieceIsComplete( cp, piece ) )
-            tab[i] = -1;
+            tab[i] = 1f;
         else 
             tab[i] = (float)cp->completeBlocks[piece] / tr_torPieceCountBlocks( tor, piece );
     }
