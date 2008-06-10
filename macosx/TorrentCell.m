@@ -735,9 +735,9 @@
     Torrent * torrent = [self representedObject];
     
     int pieceCount = MIN([torrent pieceCount], MAX_PIECES);
-    float * piecePercent = malloc(pieceCount * sizeof(float)),
+    float * piecesPercent = malloc(pieceCount * sizeof(float)),
         * previousPiecePercent = [torrent getPreviousAmountFinished];
-    [torrent getAmountFinished: piecePercent size: pieceCount];
+    [torrent getAmountFinished: piecesPercent size: pieceCount];
     
     NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
                                     pixelsWide: pieceCount pixelsHigh: 1 bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
@@ -747,16 +747,16 @@
     for (i = 0; i < pieceCount; i++)
     {
         NSColor * pieceColor;
-        if (piecePercent[i] == 1.0 && previousPiecePercent != NULL && previousPiecePercent[i] < 1.0)
+        if (piecesPercent[i] == 1.0 && previousPiecePercent != NULL && previousPiecePercent[i] < 1.0)
             pieceColor = [NSColor orangeColor];
         else
-            pieceColor = [[NSColor whiteColor] blendedColorWithFraction: piecePercent[i] ofColor: fBluePieceColor];
+            pieceColor = [[NSColor whiteColor] blendedColorWithFraction: piecesPercent[i] ofColor: fBluePieceColor];
         
         //it's faster to just set color instead of checking previous color
         [bitmap setColor: pieceColor atX: i y: 0];
     }
     
-    [torrent setPreviousAmountFinished: piecePercent]; //holds onto piecePercent, so no need to release it here
+    [torrent setPreviousAmountFinished: piecesPercent]; //holds onto piecePercent, so no need to release it here
     
     //actually draw image
     [bitmap drawInRect: barRect];

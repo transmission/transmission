@@ -31,7 +31,11 @@
 
 #define HIGH_PEERS 15
 
-#define FINISHED 1
+#define PIECE_NONE 0
+#define PIECE_MIXED 1
+#define PIECE_FINISHED 2
+#define PIECE_HIGH_PEERS 3
+#define PIECE_FLASHING 4
 
 @implementation PiecesView
 
@@ -140,40 +144,95 @@
                 break;
             }
             
-            NSColor * pieceColor;
+            NSColor * pieceColor = nil;
             if (showAvailablity)
             {
                 if (pieces[index] == -1)
                 {
-                    pieceColor = !first && fPieces[index] != FINISHED ? [NSColor orangeColor] : fBluePieceColor;
-                    fPieces[index] = FINISHED;
+                    if (first || fPieces[index] != PIECE_FINISHED)
+                    {
+                        if (!first && fPieces[index] != PIECE_FLASHING)
+                        {
+                            pieceColor = [NSColor orangeColor];
+                            fPieces[index] = PIECE_FLASHING;
+                        }
+                        else
+                        {
+                            pieceColor = fBluePieceColor;
+                            fPieces[index] = PIECE_FINISHED;
+                        }
+                    }
+                }
+                else if (pieces[index] == 0)
+                {
+                    if (first || fPieces[index] != PIECE_NONE)
+                    {
+                        pieceColor = [NSColor whiteColor];
+                        fPieces[index] = PIECE_NONE;
+                    }
+                }
+                else if (pieces[index] >= HIGH_PEERS)
+                {
+                    if (first || fPieces[index] != PIECE_HIGH_PEERS)
+                    {
+                        pieceColor = fGreenAvailabilityColor;
+                        fPieces[index] = PIECE_HIGH_PEERS;
+                    }
                 }
                 else
                 {
-                    float percent = MIN(1.0, (float)pieces[index]/HIGH_PEERS);
-                    pieceColor = [[NSColor whiteColor] blendedColorWithFraction: percent ofColor: fGreenAvailabilityColor];
-                    fPieces[index] = 0;
+                    if (first || fPieces[index] != PIECE_MIXED)
+                    {
+                        float percent = (float)pieces[index]/HIGH_PEERS;
+                        pieceColor = [[NSColor whiteColor] blendedColorWithFraction: percent ofColor: fGreenAvailabilityColor];
+                        fPieces[index] = PIECE_MIXED;
+                    }
                 }
             }
             else
             {
                 if (piecesPercent[index] == 1.0)
                 {
-                    pieceColor = !first && fPieces[index] != FINISHED ? [NSColor orangeColor] : fBluePieceColor;
-                    fPieces[index] = FINISHED;
+                    if (first || fPieces[index] != PIECE_FINISHED)
+                    {
+                        if (!first && fPieces[index] != PIECE_FLASHING)
+                        {
+                            pieceColor = [NSColor orangeColor];
+                            fPieces[index] = PIECE_FLASHING;
+                        }
+                        else
+                        {
+                            pieceColor = fBluePieceColor;
+                            fPieces[index] = PIECE_FINISHED;
+                        }
+                    }
+                }
+                else if (piecesPercent[index] == 0.0)
+                {
+                    if (first || fPieces[index] != PIECE_NONE)
+                    {
+                        pieceColor = [NSColor whiteColor];
+                        fPieces[index] = PIECE_NONE;
+                    }
                 }
                 else
                 {
-                    pieceColor = [[NSColor whiteColor] blendedColorWithFraction: piecesPercent[index] ofColor: fBluePieceColor];
-                    fPieces[index] = 0;
+                    if (first || fPieces[index] != PIECE_MIXED)
+                    {
+                        pieceColor = [[NSColor whiteColor] blendedColorWithFraction: piecesPercent[index] ofColor: fBluePieceColor];
+                        fPieces[index] = PIECE_MIXED;
+                    }
                 }
             }
             
-            rect.origin = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
-                                    [image size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
-            
-            [pieceColor set];
-            NSRectFill(rect);
+            if (pieceColor)
+            {
+                rect.origin = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
+                                        [image size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
+                
+                [pieceColor set];
+                NSRectFill(rect);
+            }
         }
     
     [image unlockFocus];
