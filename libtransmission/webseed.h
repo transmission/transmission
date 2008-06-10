@@ -30,6 +30,9 @@ int tr_webseedAddRequest( tr_webseed          * w,
 /** @return true if a request is being processed, or false if idle */
 int tr_webseedGetSpeed( const tr_webseed * w ,
                         float            * setme_KiBs );
+
+/** @return true if a request is being processed, or false if idle */
+int tr_webseedIsActive( const tr_webseed * w );
               
 
 #endif

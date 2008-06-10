@@ -253,12 +253,18 @@ tr_webseedAddRequest( tr_webseed        * w,
 }
 
 int
+tr_webseedIsActive( const tr_webseed * w )
+{
+    return w->queueSize > 0;
+}
+
+int
 tr_webseedGetSpeed( const tr_webseed * w ,
                     float            * setme_KiBs )
 {
-    const int isBusy = w->queueSize > 0;
-    *setme_KiBs = isBusy ? tr_rcRate( w->rateDown ) : 0.0f;
-    return isBusy;
+    const int isActive = tr_webseedIsActive( w );
+    *setme_KiBs = isActive ? tr_rcRate( w->rateDown ) : 0.0f;
+    return isActive;
 }
 
 /***

@@ -1197,6 +1197,9 @@ typedef struct tr_stat
     /** Number of peers that we're sending data to */
     int peersGettingFromUs;
 
+    /** Number of webseeds that are sending data to us. */
+    int webseedsSendingToUs;
+
     /** Number of seeders that the tracker says this torrent has */
     int seeders;
 

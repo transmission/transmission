@@ -199,8 +199,8 @@ getStatusString( const tr_stat * torStat )
                 ngettext( "Downloading from %1$'d of %2$'d connected peer",
                           "Downloading from %1$'d of %2$'d connected peers",
                           torStat->peersConnected ),
-                torStat->peersSendingToUs,
-                torStat->peersConnected );
+                torStat->peersSendingToUs + torStat->webseedsSendingToUs,
+                torStat->peersConnected + torStat->webseedsSendingToUs );
             break;
 
         case TR_STATUS_SEED:

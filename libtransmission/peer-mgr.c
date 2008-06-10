@@ -1360,6 +1360,7 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                         int              * setmePeersKnown,
                         int              * setmePeersConnected,
                         int              * setmeSeedsConnected,
+                        int              * setmeWebseedsSendingToUs,
                         int              * setmePeersSendingToUs,
                         int              * setmePeersGettingFromUs,
                         int              * setmePeersFrom )
@@ -1367,17 +1368,19 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
     int i, size;
     const Torrent * t;
     const tr_peer ** peers;
+    const tr_webseed ** webseeds;
 
     managerLock( manager );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &size );
 
-    *setmePeersKnown          = tr_ptrArraySize( t->pool );
-    *setmePeersConnected      = 0;
-    *setmeSeedsConnected      = 0;
-    *setmePeersSendingToUs    = 0;
-    *setmePeersGettingFromUs  = 0;
+    *setmePeersKnown           = tr_ptrArraySize( t->pool );
+    *setmePeersConnected       = 0;
+    *setmeSeedsConnected       = 0;
+    *setmePeersGettingFromUs   = 0;
+    *setmePeersSendingToUs     = 0;
+    *setmeWebseedsSendingToUs  = 0;
 
     for( i=0; i<TR_PEER_FROM__MAX; ++i )
         setmePeersFrom[i] = 0;
@@ -1402,6 +1405,13 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
 
         if( atom->flags & ADDED_F_SEED_FLAG )
             ++*setmeSeedsConnected;
+    }
+
+    webseeds = (const tr_webseed **) tr_ptrArrayPeek( t->peers, &size );
+    for( i=0; i<size; ++i )
+    {
+        if( tr_webseedIsActive( webseeds[i] ) )
+            ++setmeWebseedsSendingToUs;
     }
 
     managerUnlock( manager );

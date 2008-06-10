@@ -106,6 +106,7 @@ void tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                              int              * setmePeersKnown,
                              int              * setmePeersConnected,
                              int              * setmeSeedsConnected,
+                             int              * setmeWebseedsSendingToUs,
                              int              * setmePeersSendingToUs,
                              int              * setmePeersGettingFromUs,
                              int              * setmePeersFrom ); /* <-- array of TR_PEER_FROM__MAX */

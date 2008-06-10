@@ -720,6 +720,7 @@ tr_torrentStat( tr_torrent * tor )
                             &s->peersKnown,
                             &s->peersConnected,
                                &usableSeeds,
+                            &s->webseedsSendingToUs,
                             &s->peersSendingToUs,
                             &s->peersGettingFromUs,
                              s->peersFrom );

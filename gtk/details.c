@@ -234,12 +234,48 @@ refresh_pieces( GtkWidget * da, GdkEventExpose * event UNUSED, gpointer gtor )
 
 enum
 {
+  WEBSEED_COL_URL,
+  WEBSEED_COL_DOWNLOAD_RATE,
+  N_WEBSEED_COLS
+};
+
+static const char * webseed_column_names[N_WEBSEED_COLS] =
+{
+    N_( "Web Seeds" ),
+    /* 'download speed' column header. terse to keep the column narrow. */
+    N_( "Down" )
+};
+
+static GtkTreeModel*
+webseed_model_new( const tr_torrent * tor )
+{
+    int i;
+    const tr_info * inf = tr_torrentInfo( tor );
+    float * speeds = tr_torrentWebSpeeds( tor );
+    GtkListStore * store = gtk_list_store_new( N_WEBSEED_COLS,
+                                               G_TYPE_STRING,
+                                               G_TYPE_FLOAT );
+    for( i=0; i<inf->webseedCount; ++i )
+    {
+        GtkTreeIter iter;
+        gtk_list_store_append( store, &iter );
+        gtk_list_store_set( store, &iter, WEBSEED_COL_URL, inf->webseeds[i],
+                                          WEBSEED_COL_DOWNLOAD_RATE, speeds[i],
+                                          -1 );
+    }
+
+    tr_free( speeds );
+    return GTK_TREE_MODEL( store );
+}
+
+enum
+{
   PEER_COL_ADDRESS,
+  PEER_COL_DOWNLOAD_RATE,
+  PEER_COL_UPLOAD_RATE,
   PEER_COL_CLIENT,
   PEER_COL_PROGRESS,
   PEER_COL_IS_ENCRYPTED,
-  PEER_COL_DOWNLOAD_RATE,
-  PEER_COL_UPLOAD_RATE,
   PEER_COL_STATUS,
   N_PEER_COLS
 };
@@ -272,7 +308,7 @@ static int compare_addr_to_peer (const void * a, const void * b)
 }
 
 static void
-peer_row_set (GtkTreeStore        * store,
+peer_row_set (GtkListStore        * store,
               GtkTreeIter         * iter,
               const tr_peer_stat  * peer)
 {
@@ -281,7 +317,7 @@ peer_row_set (GtkTreeStore        * store,
   if (!client || !strcmp(client,"Unknown Client"))
     client = " ";
 
-  gtk_tree_store_set (store, iter,
+  gtk_list_store_set( store, iter,
                       PEER_COL_ADDRESS, peer->addr,
                       PEER_COL_CLIENT, client,
                       PEER_COL_IS_ENCRYPTED, peer->isEncrypted,
@@ -293,14 +329,14 @@ peer_row_set (GtkTreeStore        * store,
 }
 
 static void
-append_peers_to_model (GtkTreeStore        * store,
+append_peers_to_model (GtkListStore        * store,
                        const tr_peer_stat  * peers,
                        int                   n_peers)
 {
   int i;
   for (i=0; i<n_peers; ++i) {
     GtkTreeIter iter;
-    gtk_tree_store_append (store, &iter, NULL);
+    gtk_list_store_append( store, &iter );
     peer_row_set (store, &iter, &peers[i]);
   }
 }
@@ -308,13 +344,13 @@ append_peers_to_model (GtkTreeStore        * store,
 static GtkTreeModel*
 peer_model_new (tr_torrent * tor)
 {
-  GtkTreeStore * m = gtk_tree_store_new (N_PEER_COLS,
+  GtkListStore * m = gtk_list_store_new (N_PEER_COLS,
                                          G_TYPE_STRING,   /* addr */
+                                         G_TYPE_FLOAT,    /* downloadFromRate */
+                                         G_TYPE_FLOAT,    /* uploadToRate */
                                          G_TYPE_STRING,   /* client */
                                          G_TYPE_INT,      /* progress [0..100] */
                                          G_TYPE_BOOLEAN,  /* isEncrypted */
-                                         G_TYPE_FLOAT,    /* downloadFromRate */
-                                         G_TYPE_FLOAT,    /* uploadToRate */
                                          G_TYPE_STRING ); /* flagString */
 
   int n_peers = 0;
@@ -395,7 +431,8 @@ typedef struct
 {
   TrTorrent * gtor;
   GtkTreeModel * model; /* same object as store, but recast */
-  GtkTreeStore * store; /* same object as model, but recast */
+  GtkListStore * store; /* same object as model, but recast */
+  GtkListStore * webseeds;
   GtkWidget * completeness;
   GtkWidget * seeders_lb;
   GtkWidget * leechers_lb;
@@ -424,9 +461,23 @@ refresh_peers (GtkWidget * top)
   PeerData * p = (PeerData*) g_object_get_data (G_OBJECT(top), "peer-data");
   tr_torrent * tor = tr_torrent_handle ( p->gtor );
   GtkTreeModel * model = p->model;
-  GtkTreeStore * store = p->store;
+  GtkListStore * store = p->store;
   tr_peer_stat * peers;
   const tr_stat * stat = tr_torrent_stat( p->gtor );
+  const tr_info * inf = tr_torrent_info( p->gtor );
+
+  if( inf->webseedCount )
+  {
+    float * speeds = tr_torrentWebSpeeds( tor );
+    for( i=0; i<inf->webseedCount; ++i )
+    {
+        GtkTreeIter iter;
+        gtk_tree_model_iter_nth_child( GTK_TREE_MODEL( p->webseeds ), &iter, NULL, i );
+        gtk_list_store_set( p->webseeds, &iter, WEBSEED_COL_DOWNLOAD_RATE, speeds[i],
+                                                -1 );
+    }
+    tr_free( speeds );
+  }
 
   /**
   ***  merge the peer diffs into the tree model.
@@ -462,7 +513,7 @@ refresh_peers (GtkWidget * top)
       g_memmove (peer, peer+1, sizeof(tr_peer_stat)*n_rhs);
       --n_peers;
     }
-    else if (!gtk_tree_store_remove (store, &iter))
+    else if (!gtk_list_store_remove (store, &iter))
       break; /* we removed the model's last item */
   }
   while (gtk_tree_model_iter_next (model, &iter));
@@ -537,9 +588,11 @@ peer_page_new ( TrTorrent * gtor )
 {
   guint i;
   GtkTreeModel *m;
-  GtkWidget *h, *v, *w, *ret, *sw, *l, *vbox, *hbox;
+  GtkWidget *v, *w, *ret, *sw, *l, *vbox, *hbox;
+  GtkWidget *webtree = NULL;
   tr_torrent * tor = tr_torrent_handle (gtor);
   PeerData * p = g_new (PeerData, 1);
+  const tr_info * inf = tr_torrent_info( gtor );
 
   /* TODO: make this configurable? */
   int view_columns[] = { PEER_COL_IS_ENCRYPTED,
@@ -549,6 +602,42 @@ peer_page_new ( TrTorrent * gtor )
                          PEER_COL_STATUS,
                          PEER_COL_ADDRESS,
                          PEER_COL_CLIENT };
+
+ 
+  if( inf->webseedCount )
+  {
+    GtkTreeViewColumn * c;
+    GtkCellRenderer * r;
+    const char * t;
+    GtkWidget * fr;
+
+    m = webseed_model_new( tr_torrent_handle( gtor ) );
+    webtree = gtk_tree_view_new_with_model( m );
+    gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( webtree ), TRUE );
+    p->webseeds = GTK_LIST_STORE( m );
+    g_object_unref( G_OBJECT( m ) );
+
+    t = _( webseed_column_names[WEBSEED_COL_URL] );
+    r = gtk_cell_renderer_text_new ();
+    g_object_set( G_OBJECT( r ), "ellipsize", PANGO_ELLIPSIZE_END, NULL );
+    c = gtk_tree_view_column_new_with_attributes( t, r, "text", WEBSEED_COL_URL, NULL);
+    g_object_set( G_OBJECT( c ), "expand", TRUE, NULL );
+    gtk_tree_view_column_set_sort_column_id( c, WEBSEED_COL_URL );
+    gtk_tree_view_append_column( GTK_TREE_VIEW( webtree ), c );
+
+    t = _( webseed_column_names[WEBSEED_COL_DOWNLOAD_RATE] );
+    r = gtk_cell_renderer_text_new ();
+    c = gtk_tree_view_column_new_with_attributes (t, r, "text", WEBSEED_COL_DOWNLOAD_RATE, NULL);
+    gtk_tree_view_column_set_cell_data_func (c, r, render_dl_rate,
+                                                   NULL, NULL);
+    gtk_tree_view_column_set_sort_column_id( c, WEBSEED_COL_DOWNLOAD_RATE );
+    gtk_tree_view_append_column( GTK_TREE_VIEW( webtree ), c );
+
+    fr = gtk_frame_new( NULL );
+    gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_IN );
+    gtk_container_add( GTK_CONTAINER( fr ), webtree );
+    webtree = fr;
+  } 
 
   m  = peer_model_new (tor);
   v = GTK_WIDGET( g_object_new( GTK_TYPE_TREE_VIEW,
@@ -653,38 +742,12 @@ peer_page_new ( TrTorrent * gtor )
   vbox = gtk_vbox_new (FALSE, GUI_PAD);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), GUI_PAD_BIG);
 
-#ifdef SHOW_PIECES
-    l = gtk_label_new (NULL);
-    gtk_misc_set_alignment (GTK_MISC(l), 0.0f, 0.5f);
-    gtk_label_set_markup (GTK_LABEL(l), _( "<b>Availability</b>" ) );
-    gtk_box_pack_start (GTK_BOX(vbox), l, FALSE, FALSE, 0);
+    if( webtree )
+        gtk_box_pack_start( GTK_BOX( vbox ), webtree, FALSE, FALSE, 0 );
 
-    w = da = p->completeness = gtk_drawing_area_new ();
-    gtk_widget_set_size_request (w, 0u, 100u);
-    g_object_set_data (G_OBJECT(w), "draw-mode", GINT_TO_POINTER(DRAW_AVAIL));
-    g_signal_connect (w, "expose-event", G_CALLBACK(refresh_pieces), gtor);
-
-    h = gtk_hbox_new (FALSE, GUI_PAD);
-    w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request (w, GUI_PAD_BIG, 0);
-    gtk_box_pack_start (GTK_BOX(h), w, FALSE, FALSE, 0);
-    gtk_box_pack_start_defaults (GTK_BOX(h), da);
-    gtk_box_pack_start (GTK_BOX(vbox), h, FALSE, FALSE, 0);
-
-    /* a small vertical spacer */
-    w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request (w, 0u, GUI_PAD);
-    gtk_box_pack_start (GTK_BOX(vbox), w, FALSE, FALSE, 0);
-
-    l = gtk_label_new (NULL);
-    gtk_misc_set_alignment (GTK_MISC(l), 0.0f, 0.5f);
-    gtk_label_set_markup (GTK_LABEL(l), _( "<b>Connected Peers</b>" ) );
-    gtk_box_pack_start (GTK_BOX(vbox), l, FALSE, FALSE, 0);
-#endif
-
-    h = gtk_hbox_new (FALSE, GUI_PAD);
-    gtk_box_pack_start_defaults (GTK_BOX(h), sw);
-    gtk_box_pack_start_defaults (GTK_BOX(vbox), h);
+    //h = gtk_hbox_new (FALSE, GUI_PAD);
+    //gtk_box_pack_start_defaults (GTK_BOX(h), sw);
+    gtk_box_pack_start_defaults( GTK_BOX( vbox ), sw );
 
     hbox = gtk_hbox_new (FALSE, GUI_PAD);
         l = gtk_label_new (NULL);
@@ -711,7 +774,7 @@ peer_page_new ( TrTorrent * gtor )
   ret = vbox;
   p->gtor = gtor;
   p->model = m;
-  p->store = GTK_TREE_STORE(m);
+  p->store = GTK_LIST_STORE(m);
   g_object_set_data_full (G_OBJECT(ret), "peer-data", p, g_free);
   return ret;
 }
