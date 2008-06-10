@@ -128,11 +128,11 @@
         [fTorrent getAmountFinished: piecesPercent size: fNumPieces];
     }
     
+    NSImage * image = [self image];
+    
     int i, j, index = -1;
     NSRect rect = NSMakeRect(0, 0, fWidth, fWidth);
-    
-    NSImage * image = [self image];
-    [image lockFocus];
+    BOOL change = NO;
     
     for (i = 0; i < fAcross; i++)
         for (j = 0; j < fAcross; j++)
@@ -189,6 +189,13 @@
             
             if (pieceColor)
             {
+                //avoid unneeded memory usage by only locking focus if drawing will occur
+                if (!change)
+                {
+                    change = YES;
+                    [image lockFocus];
+                }
+                
                 rect.origin = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
                                         [image size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
                 
@@ -197,8 +204,11 @@
             }
         }
     
-    [image unlockFocus];
-    [self setNeedsDisplay];
+    if (change)
+    {
+        [image unlockFocus];
+        [self setNeedsDisplay];
+    }
     
     tr_free(pieces);
     tr_free(piecesPercent);
