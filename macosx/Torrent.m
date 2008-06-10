@@ -1034,7 +1034,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         
         [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
         
-        if (dlSpeeds[i] != -1)
+        if (dlSpeeds[i] != -1.0)
             [dict setObject: [NSNumber numberWithFloat: dlSpeeds[i]] forKey: @"DL From Rate"];
         
         [webSeeds addObject: dict];
@@ -1149,7 +1149,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                     string = [NSString stringWithFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
                                                     "Torrent -> status string"), [self peersSendingToUs]];
                 
-                /*int webSeedCount = [self webSeedCount];
+                int webSeedCount = fStat->webseedsSendingToUs;
                 if (webSeedCount > 0)
                 {
                     NSString * webSeedString;
@@ -1160,7 +1160,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                                                                     webSeedCount];
                     
                     string = [string stringByAppendingFormat: @" + %@", webSeedString];
-                }*/
+                }
                 
                 break;
 
