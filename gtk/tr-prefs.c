@@ -63,7 +63,7 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_TOOLBAR, TRUE );
     pref_flag_set_default   ( PREF_KEY_FILTERBAR, TRUE );
     pref_flag_set_default   ( PREF_KEY_STATUSBAR, TRUE );
-    pref_flag_set_default   ( PREF_KEY_SHOW_TRAY_ICON, TRUE );
+    pref_flag_set_default   ( PREF_KEY_SHOW_TRAY_ICON, FALSE );
     pref_string_set_default ( PREF_KEY_STATUSBAR_STATS, "total-ratio" );
 
     pref_flag_set_default   ( PREF_KEY_DL_LIMIT_ENABLED, FALSE );

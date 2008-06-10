@@ -15,7 +15,6 @@ const char * fallback_ui_file =
 "      <menuitem action='remove-torrent'/>\n"
 "      <menuitem action='delete-torrent'/>\n"
 "      <separator/>\n"
-"      <menuitem action='close'/>\n"
 "      <menuitem action='quit'/>\n"
 "    </menu>\n"
 "    <menu action='edit-menu'>\n"

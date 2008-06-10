@@ -894,7 +894,6 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     else if( !strcmp( key, PREF_KEY_SHOW_TRAY_ICON ) )
     {
         const int show = pref_flag_get( key );
-        action_sensitize ( "close", show );
         if( show && !cbdata->icon )
             cbdata->icon = tr_icon_new( cbdata->core );
         else if( !show && cbdata->icon ) {
@@ -1239,11 +1238,6 @@ doAction ( const char * action_name, gpointer user_data )
     else if( !strcmp( action_name, "delete-torrent" ) )
     {
         removeSelected( data, TRUE );
-    }
-    else if (!strcmp (action_name, "close"))
-    {
-        if( data->wind != NULL )
-            winclose( NULL, NULL, data );
     }
     else if (!strcmp (action_name, "quit"))
     {
