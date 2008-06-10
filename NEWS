@@ -3,9 +3,11 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.30 (2008/mm/dd)
 http://trac.transmissionbt.com/query?group=component&milestone=1.30&order=severity
 - All Platforms
+   + Added support for HTTP/FTP Seeding (GetRight style)
+   + Added proxy support for communicating with trackers
    + Ability to add and remove tracker addresses
    + Ability to create torrent files with multiple tracker addresses
-   + Creation of torrent files with no tracker address (for easier creation for upload to some tracker sites)
+   + Creation of torrent files with no tracker address (required by some tracker sites) 
 - Mac
    + Quick Look integration in the main window and inspector's file tab
    + Transfers can be dragged to different groups
