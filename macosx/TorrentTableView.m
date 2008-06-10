@@ -305,6 +305,7 @@
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
 }
 
+//when Leopard-only, use these variables instead of pointInActionRect:, etc.
 - (void) mouseEntered: (NSEvent *) event
 {
     NSDictionary * dict = (NSDictionary *)[event userData];
@@ -843,12 +844,9 @@
 {
     //stop previous animation
     if (fPiecesBarAnimation)
-    {
-        [fPiecesBarAnimation stopAnimation];
         [fPiecesBarAnimation release];
-    }
     
-    NSMutableArray * progressMarks = [NSMutableArray arrayWithCapacity: 20];
+    NSMutableArray * progressMarks = [NSMutableArray arrayWithCapacity: 16];
     NSAnimationProgress i;
     for (i = 0.0625; i <= 1.0; i += 0.0625)
         [progressMarks addObject: [NSNumber numberWithFloat: i]];

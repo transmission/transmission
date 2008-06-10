@@ -102,6 +102,8 @@
 	<false/>
 	<key>Proxy</key>
 	<false/>
+	<key>ProxyAddress</key>
+	<string></string>
 	<key>ProxyAuthorize</key>
 	<false/>
 	<key>ProxyPassword</key>

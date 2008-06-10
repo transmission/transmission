@@ -645,9 +645,34 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSizeSettingChange" object: self];
 }
 
+- (void) setProxyEnabled: (id) sender
+{
+    tr_sessionSetProxyEnabled(fHandle, [fDefaults boolForKey: @"Proxy"]);
+}
+
+- (void) setProxyAddress: (id) sender
+{
+    tr_sessionSetProxy(fHandle, [[fDefaults stringForKey: @"ProxyAddress"] UTF8String]);
+}
+
+- (void) setProxyAuthorize: (id) sender
+{
+    tr_sessionSetProxyAuthEnabled(fHandle, [fDefaults boolForKey: @"ProxyAuthorize"]);
+}
+
+- (void) setProxyUsername: (id) sender
+{
+    tr_sessionSetProxyUsername(fHandle, [[fDefaults stringForKey: @"ProxyUsername"] UTF8String]);
+}
+
+- (void) setProxyPassword: (id) sender
+{
+    tr_sessionSetProxyPassword(fHandle, [[fDefaults stringForKey: @"ProxyPassword"] UTF8String]);
+}
+
 - (void) setRPCEnabled: (id) sender
 {
-    tr_sessionSetRPCEnabled(fHandle, [fDefaults boolForKey: @"RPC"]);
+    tr_sessionSetProxyEnabled(fHandle, [fDefaults boolForKey: @"RPC"]);
 }
 
 - (void) setRPCAuthorize: (id) sender

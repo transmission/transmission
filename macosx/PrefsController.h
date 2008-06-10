@@ -118,6 +118,12 @@
 
 - (void) setAutoSize: (id) sender;
 
+- (void) setProxyEnabled: (id) sender;
+- (void) setProxyAddress: (id) sender;
+- (void) setProxyAuthorize: (id) sender;
+- (void) setProxyUsername: (id) sender;
+- (void) setProxyPassword: (id) sender;
+
 - (void) setRPCEnabled: (id) sender;
 - (void) setRPCAuthorize: (id) sender;
 - (void) setRPCUsername: (id) sender;
