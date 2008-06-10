@@ -972,6 +972,8 @@ void tr_torrentPeersFree( tr_peer_stat *  peerStats,
  * @return an array of tor->info.webseedCount floats giving download speeds.
  *         Each speed in the array corresponds to the webseed at the same
  *         array index in tor->info.webseeds.
+ *         To differentiate "idle" and "stalled" status, idle webseeds will
+ *         return -1 instead of 0 KiB/s.
  *         NOTE: always free this array with tr_free() when you're done with it.
  */
 float* tr_torrentWebSpeeds( const tr_torrent * tor );

@@ -1426,7 +1426,8 @@ tr_peerMgrWebSpeeds( const tr_peerMgr * manager,
     ret = tr_new0( float, webseedCount );
 
     for( i=0; i<webseedCount; ++i )
-        tr_webseedGetSpeed( webseeds[i], &ret[i] );
+        if( !tr_webseedGetSpeed( webseeds[i], &ret[i] ) )
+            ret[i] = -1.0;
 
     managerUnlock( manager );
     return ret;
