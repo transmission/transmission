@@ -179,7 +179,12 @@ main( int argc, char ** argv )
             TR_DEFAULT_RPC_ENABLED,
             TR_DEFAULT_RPC_PORT,
             TR_DEFAULT_RPC_ACL,
-            FALSE, "fnord", "potzrebie" );
+            FALSE, "fnord", "potzrebie",
+            TR_DEFAULT_PROXY_ENABLED,
+            TR_DEFAULT_PROXY,
+            TR_DEFAULT_PROXY_AUTH_ENABLED,
+            TR_DEFAULT_PROXY_USERNAME,
+            TR_DEFAULT_PROXY_PASSWORD );
 
     if( sourceFile && *sourceFile ) /* creating a torrent */
     {

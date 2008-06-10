@@ -49,11 +49,13 @@ struct tr_metainfo_lookup
 
 struct tr_handle
 {
-    unsigned int                 isPortSet        : 1;
-    unsigned int                 isPexEnabled     : 1;
-    unsigned int                 isClosed         : 1;
-    unsigned int                 useUploadLimit   : 1;
-    unsigned int                 useDownloadLimit : 1;
+    unsigned int                 isPortSet          : 1;
+    unsigned int                 isPexEnabled       : 1;
+    unsigned int                 isProxyEnabled     : 1;
+    unsigned int                 isProxyAuthEnabled : 1;
+    unsigned int                 isClosed           : 1;
+    unsigned int                 useUploadLimit     : 1;
+    unsigned int                 useDownloadLimit   : 1;
 
     tr_encryption_mode           encryptionMode;
 
@@ -70,6 +72,10 @@ struct tr_handle
     char                       * downloadDir;
     char                       * resumeDir;
     char                       * torrentDir;
+
+    char                       * proxy;
+    char                       * proxyUsername;
+    char                       * proxyPassword;
 
     struct tr_ratecontrol      * upload;
     struct tr_ratecontrol      * download;
@@ -92,8 +98,6 @@ struct tr_handle
     struct tr_metainfo_lookup  * metainfoLookup;
     int                          metainfoLookupCount;
 };
-
-typedef struct tr_handle tr_session;
 
 const char * tr_sessionFindTorrentFile( const tr_session * session,
                                         const char       * hashString );

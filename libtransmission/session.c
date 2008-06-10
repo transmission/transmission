@@ -119,28 +119,33 @@ tr_sessionSetEncryption( tr_session * session, tr_encryption_mode mode )
 static void metainfoLookupRescan( tr_handle * h );
 
 tr_handle *
-tr_sessionInitFull( const char * configDir,
-                    const char * downloadDir,
-                    const char * tag,
-                    int          isPexEnabled,
-                    int          isPortForwardingEnabled,
-                    int          publicPort,
-                    int          encryptionMode,
-                    int          isUploadLimitEnabled,
-                    int          uploadLimit,
-                    int          isDownloadLimitEnabled,
-                    int          downloadLimit,
-                    int          globalPeerLimit,
-                    int          messageLevel,
-                    int          isMessageQueueingEnabled,
-                    int          isBlocklistEnabled,
-                    int          peerSocketTOS,
-                    int          rpcIsEnabled,
-                    int          rpcPort,
-                    const char * rpcACL,
-                    int          rpcPasswordIsEnabled,
-                    const char * rpcUsername,
-                    const char * rpcPassword )
+tr_sessionInitFull( const char  * configDir,
+                    const char  * downloadDir,
+                    const char  * tag,
+                    int           isPexEnabled,
+                    int           isPortForwardingEnabled,
+                    int           publicPort,
+                    int           encryptionMode,
+                    int           isUploadLimitEnabled,
+                    int           uploadLimit,
+                    int           isDownloadLimitEnabled,
+                    int           downloadLimit,
+                    int           globalPeerLimit,
+                    int           messageLevel,
+                    int           isMessageQueueingEnabled,
+                    int           isBlocklistEnabled,
+                    int           peerSocketTOS,
+                    int           rpcIsEnabled,
+                    int           rpcPort,
+                    const char  * rpcACL,
+                    int           rpcAuthIsEnabled,
+                    const char  * rpcUsername,
+                    const char  * rpcPassword,
+                    int           proxyIsEnabled,
+                    const char  * proxy,
+                    int           proxyAuthIsEnabled,
+                    const char  * proxyUsername,
+                    const char  * proxyPassword )
 {
     tr_handle * h;
     char filename[MAX_PATH_LENGTH];
@@ -163,6 +168,11 @@ tr_sessionInitFull( const char * configDir,
     h->encryptionMode = encryptionMode;
     h->peerSocketTOS = peerSocketTOS;
     h->downloadDir = tr_strdup( downloadDir );
+    h->isProxyEnabled = proxyIsEnabled ? 1 : 0;
+    h->proxy = tr_strdup( proxy );
+    h->isProxyAuthEnabled = proxyAuthIsEnabled ? 1 : 0;
+    h->proxyUsername = tr_strdup( proxyUsername );
+    h->proxyPassword = tr_strdup( proxyPassword );
 
     tr_setConfigDir( h, configDir );
 
@@ -203,7 +213,7 @@ tr_sessionInitFull( const char * configDir,
 
     h->web = tr_webInit( h );
     h->rpcServer = tr_rpcInit( h, rpcIsEnabled, rpcPort, rpcACL,
-                                  rpcPasswordIsEnabled, rpcUsername, rpcPassword );
+                                  rpcAuthIsEnabled, rpcUsername, rpcPassword );
 
     metainfoLookupRescan( h );
 
@@ -236,7 +246,13 @@ tr_sessionInit( const char * configDir,
                                TR_DEFAULT_RPC_ACL,
                                FALSE,
                                "fnord",
-                               "potzrebie" );
+                               "potzrebie",
+                               TR_DEFAULT_PROXY_ENABLED,
+                               TR_DEFAULT_PROXY,
+                               TR_DEFAULT_PROXY_AUTH_ENABLED,
+                               TR_DEFAULT_PROXY_USERNAME,
+                               TR_DEFAULT_PROXY_PASSWORD );
+
 }
 
 /***
@@ -487,6 +503,9 @@ tr_sessionClose( tr_handle * h )
     tr_free( h->resumeDir );
     tr_free( h->torrentDir );
     tr_free( h->downloadDir );
+    tr_free( h->proxy );
+    tr_free( h->proxyUsername );
+    tr_free( h->proxyPassword );
     free( h );
 }
 
@@ -754,88 +773,146 @@ tr_torrentNext( tr_handle * session, tr_torrent * tor )
 ***/
 
 void
-tr_sessionSetRPCEnabled( tr_handle * session, int isEnabled )
+tr_sessionSetRPCEnabled( tr_session * session, int isEnabled )
 {
     tr_rpcSetEnabled( session->rpcServer, isEnabled );
 }
 int
-tr_sessionIsRPCEnabled( const tr_handle * session )
+tr_sessionIsRPCEnabled( const tr_session * session )
 {
     return tr_rpcIsEnabled( session->rpcServer );
 }
 void
-tr_sessionSetRPCPort( tr_handle * session, int port )
+tr_sessionSetRPCPort( tr_session * session, int port )
 {
     tr_rpcSetPort( session->rpcServer, port );
 }
 int
-tr_sessionGetRPCPort( const tr_handle * session )
+tr_sessionGetRPCPort( const tr_session * session )
 {
     return tr_rpcGetPort( session->rpcServer );
 }
 void
-tr_sessionSetRPCCallback( tr_handle    * session,
+tr_sessionSetRPCCallback( tr_session    * session,
                           tr_rpc_func    func,
                           void         * user_data )
 {
     session->rpc_func = func;
     session->rpc_func_user_data = user_data;
 }
-
 int
-tr_sessionTestRPCACL( const tr_handle  * session,
+tr_sessionTestRPCACL( const tr_session  * session,
                       const char       * acl,
                       char            ** allocme_errmsg )
 {
     return tr_rpcTestACL( session->rpcServer, acl, allocme_errmsg );
 }
-
 int
-tr_sessionSetRPCACL( tr_handle    * session,
+tr_sessionSetRPCACL( tr_session    * session,
                      const char   * acl,
                      char        ** allocme_errmsg )
 {
     return tr_rpcSetACL( session->rpcServer, acl, allocme_errmsg );
 }
-
 char*
 tr_sessionGetRPCACL( const tr_session * session )
 {
     return tr_rpcGetACL( session->rpcServer );
 }
-
 void
-tr_sessionSetRPCPassword( tr_handle * session, const char * password )
+tr_sessionSetRPCPassword( tr_session * session, const char * password )
 {
     tr_rpcSetPassword( session->rpcServer, password );
 }
-
 char*
-tr_sessionGetRPCPassword( const tr_handle * session )
+tr_sessionGetRPCPassword( const tr_session * session )
 {
     return tr_rpcGetPassword( session->rpcServer );
 }
-
 void
-tr_sessionSetRPCUsername( tr_handle * session, const char * username )
+tr_sessionSetRPCUsername( tr_session * session, const char * username )
 {
     tr_rpcSetUsername( session->rpcServer, username );
 }
-
 char*
-tr_sessionGetRPCUsername( const tr_handle * session )
+tr_sessionGetRPCUsername( const tr_session * session )
 {
     return tr_rpcGetUsername( session->rpcServer );
 }
-
 void
-tr_sessionSetRPCPasswordEnabled( tr_handle * session, int isEnabled )
+tr_sessionSetRPCPasswordEnabled( tr_session * session, int isEnabled )
 {
     tr_rpcSetPasswordEnabled( session->rpcServer, isEnabled );
 }
-
 int
-tr_sessionIsRPCPasswordEnabled( const tr_handle * session )
+tr_sessionIsRPCPasswordEnabled( const tr_session * session )
 {
     return tr_rpcIsPasswordEnabled( session->rpcServer );
+}
+
+/***
+****
+***/
+
+int
+tr_sessionIsProxyEnabled( const tr_session * session )
+{
+    return session->isProxyEnabled;
+}
+void
+tr_sessionSetProxyEnabled( tr_session * session, int isEnabled )
+{
+    session->isProxyEnabled = isEnabled ? 1 : 0;
+}
+const char*
+tr_sessionGetProxy( const tr_session * session )
+{
+    return session->proxy;
+}
+void
+tr_sessionSetProxy( tr_session * session, const char * proxy )
+{
+    if( proxy != session->proxy )
+    {
+        tr_free( session->proxy );
+        session->proxy = tr_strdup( proxy );
+    }
+}
+int
+tr_sessionIsProxyAuthEnabled( const tr_session * session )
+{
+    return session->isProxyAuthEnabled;
+}
+void
+tr_sessionSetProxyAuthEnabled( tr_session * session, int isEnabled )
+{
+    session->isProxyAuthEnabled = isEnabled ? 1 : 0;
+}
+const char*
+tr_sessionGetProxyUsername( const tr_session * session )
+{
+    return session->proxyUsername;
+}
+void
+tr_sessionSetProxyUsername( tr_session * session, const char * username )
+{
+    if( username != session->proxyUsername )
+    {
+        tr_free( session->proxyUsername );
+        session->proxyUsername = tr_strdup( username );
+    }
+}
+const char*
+tr_sessionGetProxyPassword( const tr_session * session )
+{
+    return session->proxyPassword;
+}
+void
+tr_sessionSetProxyPassword( tr_session * session, const char * password )
+{
+    if( password != session->proxyPassword )
+    {
+        tr_free( session->proxyPassword );
+        session->proxyPassword = tr_strdup( password );
+    }
 }

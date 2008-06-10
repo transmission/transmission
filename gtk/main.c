@@ -431,7 +431,13 @@ main( int argc, char ** argv )
                             pref_string_get( PREF_KEY_RPC_ACL ),
                             pref_flag_get( PREF_KEY_RPC_AUTH_ENABLED ),
                             pref_string_get( PREF_KEY_RPC_USERNAME ),
-                            pref_string_get( PREF_KEY_RPC_PASSWORD ) );
+                            pref_string_get( PREF_KEY_RPC_PASSWORD ),
+                            pref_flag_get( PREF_KEY_PROXY_SERVER_ENABLED ),
+                            pref_string_get( PREF_KEY_PROXY_SERVER ),
+                            pref_flag_get( PREF_KEY_PROXY_AUTH_ENABLED ),
+                            pref_string_get( PREF_KEY_PROXY_USERNAME ),
+                            pref_string_get( PREF_KEY_PROXY_PASSWORD ) );
+
         cbdata->core = tr_core_new( h );
 
         /* create main window now to be a parent to any error dialogs */
@@ -969,23 +975,31 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     }
     else if( !strcmp( key, PREF_KEY_PROXY_SERVER ) )
     {
-        g_message( "FIXME" );
+        char * s = pref_string_get( key );
+        tr_sessionSetProxy( tr, s );
+        g_free( s );
     }
     else if( !strcmp( key, PREF_KEY_PROXY_SERVER_ENABLED ) )
     {
-        g_message( "FIXME" );
+        const gboolean enabled = pref_flag_get( key );
+        tr_sessionSetProxyEnabled( tr, enabled );
     }
     else if( !strcmp( key, PREF_KEY_PROXY_AUTH_ENABLED ) )
     {
-        g_message( "FIXME" );
+        const gboolean enabled = pref_flag_get( key );
+        tr_sessionSetProxyAuthEnabled( tr, enabled );
     }
     else if( !strcmp( key, PREF_KEY_PROXY_USERNAME ) )
     {
-        g_message( "FIXME" );
+        char * s = pref_string_get( key );
+        tr_sessionSetProxyUsername( tr, s );
+        g_free( s );
     }
     else if( !strcmp( key, PREF_KEY_PROXY_PASSWORD ) )
     {
-        g_message( "FIXME" );
+        char * s = pref_string_get( key );
+        tr_sessionSetProxyPassword( tr, s );
+        g_free( s );
     }
 }
 

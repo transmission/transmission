@@ -132,10 +132,11 @@ static void
 addTask( void * vtask )
 {
     struct tr_web_task * task = vtask;
+    const tr_handle * session = task->session;
 
-    if( task->session && task->session->web )
+    if( session && session->web )
     {
-        struct tr_web * web = task->session->web;
+        struct tr_web * web = session->web;
         CURL * ch;
 
         ensureTimerIsRunning( web );
@@ -144,6 +145,17 @@ addTask( void * vtask )
         dbgmsg( "adding task #%lu [%s] (%d remain)", task->tag, task->url, web->remain );
 
         ch = curl_easy_init( );
+
+        if( !task->range && session->isProxyEnabled ) {
+            curl_easy_setopt( ch, CURLOPT_PROXY, session->proxy );
+            curl_easy_setopt( ch, CURLOPT_PROXYAUTH, CURLAUTH_ANY );
+        }
+        if( !task->range && session->isProxyAuthEnabled ) {
+            char * str = tr_strdup_printf( "%s:%s", session->proxyUsername, session->proxyPassword );
+            curl_easy_setopt( ch, CURLOPT_PROXYUSERPWD, str );
+            tr_free( str );
+        }
+
         curl_easy_setopt( ch, CURLOPT_PRIVATE, task );
         curl_easy_setopt( ch, CURLOPT_URL, task->url );
         curl_easy_setopt( ch, CURLOPT_WRITEFUNCTION, writeFunc );

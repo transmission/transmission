@@ -80,6 +80,7 @@ typedef struct tr_ctor tr_ctor;
 typedef struct tr_handle tr_handle;
 typedef struct tr_info tr_info;
 typedef struct tr_torrent tr_torrent;
+typedef tr_handle tr_session;
 
 
 /**
@@ -115,6 +116,17 @@ typedef struct tr_torrent tr_torrent;
 #define TR_DEFAULT_RPC_PORT_STR             "9091"
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_RPC_ACL                  "+127.0.0.1"
+/** @see tr_sessionInitFull */
+#define TR_DEFAULT_PROXY_ENABLED            0
+/** @see tr_sessionInitFull */
+#define TR_DEFAULT_PROXY                    NULL
+/** @see tr_sessionInitFull */
+#define TR_DEFAULT_PROXY_AUTH_ENABLED       0
+/** @see tr_sessionInitFull */
+#define TR_DEFAULT_PROXY_USERNAME           NULL
+/** @see tr_sessionInitFull */
+#define TR_DEFAULT_PROXY_PASSWORD           NULL
+
 
 /**
  * @brief Start a libtransmission session.
@@ -211,28 +223,34 @@ typedef struct tr_torrent tr_torrent;
  * @see TR_DEFAULT_RPC_ACL
  * @see tr_sessionClose()
  */
-tr_handle * tr_sessionInitFull( const char * configDir,
-                                const char * downloadDir,
-                                const char * tag,
-                                int          isPexEnabled,
-                                int          isPortForwardingEnabled,
-                                int          publicPort,
-                                int          encryptionMode,
-                                int          isUploadLimitEnabled,
-                                int          uploadLimit,
-                                int          isDownloadLimitEnabled,
-                                int          downloadLimit,
-                                int          peerLimit,
-                                int          messageLevel,
-                                int          isMessageQueueingEnabled,
-                                int          isBlocklistEnabled,
-                                int          peerSocketTOS,
-                                int          rpcIsEnabled,
-                                int          rpcPort,
-                                const char * rpcAccessControlList,
-                                int          rpcPasswordIsEnabled,
-                                const char * rpcUsername,
-                                const char * rpcPassword );
+tr_handle * tr_sessionInitFull( const char  * configDir,
+                                const char  * downloadDir,
+                                const char  * tag,
+                                int           isPexEnabled,
+                                int           isPortForwardingEnabled,
+                                int           publicPort,
+                                int           encryptionMode,
+                                int           isUploadLimitEnabled,
+                                int           uploadLimit,
+                                int           isDownloadLimitEnabled,
+                                int           downloadLimit,
+                                int           peerLimit,
+                                int           messageLevel,
+                                int           isMessageQueueingEnabled,
+                                int           isBlocklistEnabled,
+                                int           peerSocketTOS,
+                                int           rpcIsEnabled,
+                                int           rpcPort,
+                                const char  * rpcAccessControlList,
+                                int           rpcPasswordIsEnabled,
+                                const char  * rpcUsername,
+                                const char  * rpcPassword, 
+                                int           proxyIsEnabled,
+                                const char  * proxy,
+                                int           proxyAuthIsEnabled,
+                                const char  * proxyUsername,
+                                const char  * proxyPassword );
+
 
 /** @brief Shorter form of tr_sessionInitFull()
     @deprecated Use tr_sessionInitFull() instead. */ 
@@ -337,7 +355,7 @@ int tr_sessionTestRPCACL( const tr_handle  * session,
  * @see tr_sessionInitFull
  * @see tr_sessionGetRPCACL
  */
-int tr_sessionSetRPCACL( tr_handle   * session,
+int tr_sessionSetRPCACL( tr_session  * session,
                          const char  * acl,
                          char       ** allocme_errmsg );
 
@@ -345,26 +363,26 @@ int tr_sessionSetRPCACL( tr_handle   * session,
     @return a comma-separated string of ACL rules.  tr_free() when done.
     @see tr_sessionInitFull
     @see tr_sessionSetRPCACL */
-char* tr_sessionGetRPCACL( const tr_handle * );
+char* tr_sessionGetRPCACL( const tr_session * );
 
-void  tr_sessionSetRPCPassword( tr_handle       * session,
-                                const char      * password );
+void  tr_sessionSetRPCPassword( tr_session   * session,
+                                const char   * password );
 
-void  tr_sessionSetRPCUsername( tr_handle       * session,
-                                const char      * username );
+void  tr_sessionSetRPCUsername( tr_session   * session,
+                                const char   * username );
 
 /** @brief get the password used to restrict RPC requests.
     @return the password string. tr_free() when done.
     @see tr_sessionInitFull()
     @see tr_sessionSetRPCPassword() */
-char* tr_sessionGetRPCPassword( const tr_handle * session );
+char* tr_sessionGetRPCPassword( const tr_session * session );
 
-char* tr_sessionGetRPCUsername( const tr_handle * session  );
+char* tr_sessionGetRPCUsername( const tr_session * session  );
 
-void  tr_sessionSetRPCPasswordEnabled( tr_handle * session,
+void  tr_sessionSetRPCPasswordEnabled( tr_session * session,
                                        int         isEnabled );
 
-int   tr_sessionIsRPCPasswordEnabled( const tr_handle * session );
+int   tr_sessionIsRPCPasswordEnabled( const tr_session * session );
 
 
 typedef enum
@@ -378,15 +396,29 @@ typedef enum
 }
 tr_rpc_callback_type;
 
-typedef void ( *tr_rpc_func )( tr_handle            * handle,
+typedef void ( *tr_rpc_func )( tr_session           * handle,
                                tr_rpc_callback_type   type,
                                struct tr_torrent    * tor_or_null,
                                void                 * user_data );
 
-void tr_sessionSetRPCCallback( tr_handle    * handle,
+void tr_sessionSetRPCCallback( tr_session   * handle,
                                tr_rpc_func    func,
                                void         * user_data );
 
+/**
+***
+**/
+
+int         tr_sessionIsProxyEnabled       ( const tr_session * );
+int         tr_sessionIsProxyAuthEnabled   ( const tr_session * );
+const char* tr_sessionGetProxy             ( const tr_session * );
+const char* tr_sessionGetProxyUsername     ( const tr_session * );
+const char* tr_sessionGetProxyPassword     ( const tr_session * );
+void        tr_sessionSetProxyEnabled      ( tr_session *, int isEnabled );
+void        tr_sessionSetProxyAuthEnabled  ( tr_session *, int isEnabled );
+void        tr_sessionSetProxy             ( tr_session *, const char * proxy );
+void        tr_sessionSetProxyUsername     ( tr_session *, const char * username );
+void        tr_sessionSetProxyPassword     ( tr_session *, const char * password );
 
 /**
 ***
@@ -404,23 +436,23 @@ typedef struct tr_session_stats
 tr_session_stats;
 
 /* stats from the current session. */
-void tr_sessionGetStats( const tr_handle   * handle,
+void tr_sessionGetStats( const tr_session  * session,
                          tr_session_stats  * setme );
 
 /* stats from the current and past sessions. */
-void tr_sessionGetCumulativeStats( const tr_handle   * handle,
+void tr_sessionGetCumulativeStats( const tr_session  * session,
                                    tr_session_stats  * setme );
 
-void tr_sessionClearStats( tr_handle * handle );
+void tr_sessionClearStats( tr_session * session );
 
 /**
  * Set whether or not torrents are allowed to do peer exchanges.
  * PEX is always disabled in private torrents regardless of this.
  * In public torrents, PEX is enabled by default.
  */
-void tr_sessionSetPexEnabled( tr_handle *, int isEnabled );
+void tr_sessionSetPexEnabled( tr_session *, int isEnabled );
 
-int tr_sessionIsPexEnabled( const tr_handle * );
+int tr_sessionIsPexEnabled( const tr_session * );
 
 typedef enum
 {
@@ -430,9 +462,9 @@ typedef enum
 }
 tr_encryption_mode;
 
-tr_encryption_mode tr_sessionGetEncryption( tr_handle * handle );
+tr_encryption_mode tr_sessionGetEncryption( tr_session * );
 
-void tr_sessionSetEncryption( tr_handle * handle, tr_encryption_mode mode );
+void tr_sessionSetEncryption( tr_session *, tr_encryption_mode mode );
 
 
 /***********************************************************************

@@ -179,7 +179,13 @@ session_init( const char * configDir, int rpc_port,
                                     FALSE, /* is the blocklist enabled? */
                                     TR_DEFAULT_PEER_SOCKET_TOS,
                                     TRUE, rpc_port, acl,
-                                    auth_required, user, pass );
+                                    auth_required, user, pass,
+                                    TR_DEFAULT_PROXY_ENABLED,
+                                    TR_DEFAULT_PROXY,
+                                    TR_DEFAULT_PROXY_AUTH_ENABLED,
+                                    TR_DEFAULT_PROXY_USERNAME,
+                                    TR_DEFAULT_PROXY_PASSWORD );
+
 
     if( auth_required )
         tr_ninf( MY_NAME, "requiring authentication" );
