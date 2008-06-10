@@ -249,11 +249,11 @@
    "peer-limit"               | int      maximum global number of peers
    "pex-allowed"              | boolean  true means allow pex in public torrents
    "port"                     | int      port number
-   "port-forwarding-enabled"  | boolean  true means enabled.
+   "port-forwarding-enabled"  | boolean  true means enabled
    "speed-limit-down"         | int      max global download speed (in KiB/s)
-   "speed-limit-down-enabled" | int      max global download speed (in KiB/s)
+   "speed-limit-down-enabled" | boolean  true means enabled
    "speed-limit-up"           | int      max global upload speed (in KiB/s)
-   "speed-limit-up-enabled"   | int      max global upload speed (in KiB/s)
+   "speed-limit-up-enabled"   | boolean  true means enabled
 
 4.2.  Mutators
 
