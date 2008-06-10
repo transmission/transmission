@@ -1146,7 +1146,6 @@ typedef enum
     [fPiecesControl setSelected: !available forSegment: PIECES_CONTROL_PROGRESS];
     
     [[NSUserDefaults standardUserDefaults] setBool: available forKey: @"PiecesViewShowAvailability"];
-    [fPiecesView clearView];
     [fPiecesView updateView];
 }
 

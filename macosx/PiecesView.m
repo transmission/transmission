@@ -108,8 +108,6 @@
         fPieces = (int8_t *)tr_malloc(fNumPieces * sizeof(int8_t));
         first = YES;
     }
-    
-    NSImage * image = [self image];
 
     int8_t * pieces = NULL;
     float * piecesPercent = NULL;
@@ -129,7 +127,8 @@
     int i, j, index = -1;
     NSRect rect = NSMakeRect(0, 0, fWidth, fWidth);
     
-    BOOL change = NO;
+    NSImage * image = [self image];
+    [image lockFocus];
     
     for (i = 0; i < fAcross; i++)
         for (j = 0; j < fAcross; j++)
@@ -142,56 +141,43 @@
             }
             
             NSColor * pieceColor;
-            
             if (showAvailablity)
             {
                 if (pieces[index] == -1)
+                {
                     pieceColor = !first && fPieces[index] != FINISHED ? [NSColor orangeColor] : fBluePieceColor;
+                    fPieces[index] = FINISHED;
+                }
                 else
                 {
-                    float percent;
-                    if (pieces[index] < HIGH_PEERS)
-                        percent = (float)pieces[index]/HIGH_PEERS;
-                    else
-                        percent = 1.0;
-                    
+                    float percent = MIN(1.0, (float)pieces[index]/HIGH_PEERS);
                     pieceColor = [[NSColor whiteColor] blendedColorWithFraction: percent ofColor: fGreenAvailabilityColor];
+                    fPieces[index] = 0;
                 }
-                
-                fPieces[index] = pieces[index] == -1 ? FINISHED : 0;
             }
             else
             {
-                if (piecesPercent[index] == 1.0 && !first && fPieces[index] != FINISHED)
-                    pieceColor = [NSColor orangeColor];
+                if (piecesPercent[index] == 1.0)
+                {
+                    pieceColor = !first && fPieces[index] != FINISHED ? [NSColor orangeColor] : fBluePieceColor;
+                    fPieces[index] = FINISHED;
+                }
                 else
+                {
                     pieceColor = [[NSColor whiteColor] blendedColorWithFraction: piecesPercent[index] ofColor: fBluePieceColor];
-                
-                fPieces[index] = piecesPercent[index] == 1.0 ? FINISHED : 0;
+                    fPieces[index] = 0;
+                }
             }
             
-            if (pieceColor)
-            {
-                //drawing actually will occur
-                if (!change)
-                {
-                    [image lockFocus];
-                    change = YES;
-                }
-                
-                rect.origin = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
+            rect.origin = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
                                     [image size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
-                
-                [pieceColor set];
-                NSRectFill(rect);
-            }
+            
+            [pieceColor set];
+            NSRectFill(rect);
         }
     
-    if (change)
-    {
-        [image unlockFocus];
-        [self setNeedsDisplay];
-    }
+    [image unlockFocus];
+    [self setNeedsDisplay];
     
     tr_free(pieces);
     tr_free(piecesPercent);
