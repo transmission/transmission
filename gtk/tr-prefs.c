@@ -960,30 +960,36 @@ networkPage( GObject * core )
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _( "Tracker Proxies" ) );
+    hig_workarea_add_section_title (t, &row, _( "Tracker Proxy" ) );
 
-        s = _( "Use a tracker _proxy:" );
+        s = _( "Connect to tracker with HTTP proxy" );
         w = new_check_button( s, PREF_KEY_PROXY_SERVER_ENABLED, core );
-        w2 = new_entry( PREF_KEY_PROXY_SERVER, core );
-        page->proxy_widgets = g_slist_append( page->proxy_widgets, w2 );
-        g_signal_connect( w, "toggled", G_CALLBACK(onProxyToggled), page );
-        hig_workarea_add_row_w( t, &row, w, w2, NULL );
-
-        s = _( "My proxy requires _authentication" );
-        w = new_check_button( s, PREF_KEY_PROXY_AUTH_ENABLED, core );
-        page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
         g_signal_connect( w, "toggled", G_CALLBACK(onProxyToggled), page );
         hig_workarea_add_wide_control( t, &row, w );
 
+        s = _( "Proxy server:" );
+        w = new_entry( PREF_KEY_PROXY_SERVER, core );
+        page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
+        w = hig_workarea_add_row( t, &row, s, w, NULL );
+        page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
+
+        s = _( "_Authentication is required" );
+        w = new_check_button( s, PREF_KEY_PROXY_AUTH_ENABLED, core );
+        g_signal_connect( w, "toggled", G_CALLBACK(onProxyToggled), page );
+        hig_workarea_add_wide_control( t, &row, w );
+        page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
+
+        s = _( "_Username:" );
         w = new_entry( PREF_KEY_PROXY_USERNAME, core );
         page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
-        w = hig_workarea_add_row( t, &row, _( "_Username:" ), w, NULL );
+        w = hig_workarea_add_row( t, &row, s, w, NULL );
         page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
 
+        s = _( "_Password:" );
         w = new_entry( PREF_KEY_PROXY_PASSWORD, core );
         gtk_entry_set_visibility( GTK_ENTRY( w ), FALSE );
         page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
-        w = hig_workarea_add_row( t, &row, _( "_Password:" ), w, NULL );
+        w = hig_workarea_add_row( t, &row, s, w, NULL );
         page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
 
     hig_workarea_finish( t, &row );
