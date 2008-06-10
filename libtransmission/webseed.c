@@ -18,6 +18,7 @@
 #include "transmission.h"
 #include "inout.h"
 #include "list.h"
+#include "ratecontrol.h"
 #include "torrent.h"
 #include "utils.h"
 #include "web.h"
@@ -39,6 +40,8 @@ struct tr_webseed
 
     tr_piece_index_t    queue[MAX_QUEUE_SIZE];
     int                 queueSize;
+
+    tr_ratecontrol    * rateDown;
 
     struct evbuffer   * content;
 };
@@ -176,6 +179,7 @@ webResponseFunc( tr_handle   * session UNUSED,
             tr_ioWrite( w->torrent, piece, w->bytesSaved, len, 
                         EVBUFFER_DATA(w->content) );
             evbuffer_drain( w->content, len );
+            tr_rcTransferred( w->rateDown, len );
             fireClientGotBlock( w, piece, w->bytesSaved, len );
             w->bytesSaved += len;
 
@@ -248,6 +252,15 @@ tr_webseedAddRequest( tr_webseed        * w,
     return ret;
 }
 
+int
+tr_webseedGetSpeed( const tr_webseed * w ,
+                    float            * setme_KiBs )
+{
+    const int isBusy = w->queueSize > 0;
+    *setme_KiBs = isBusy ? tr_rcRate( w->rateDown ) : 0.0f;
+    return isBusy;
+}
+
 /***
 ****
 ***/
@@ -260,6 +273,7 @@ tr_webseedNew( struct tr_torrent * torrent,
 {
     tr_webseed * w = tr_new0( tr_webseed, 1 );
     w->content = evbuffer_new( );
+    w->rateDown = tr_rcInit( );
     w->torrent = torrent;
     w->url = tr_strdup( url );
     w->callback = callback;
@@ -280,6 +294,7 @@ tr_webseedFree( tr_webseed * w )
         else
         {
             evbuffer_free( w->content );
+            tr_rcClose( w->rateDown );
             tr_free( w->url );
             tr_free( w );
         }

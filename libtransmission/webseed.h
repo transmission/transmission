@@ -27,4 +27,9 @@ void tr_webseedFree( tr_webseed * );
 int tr_webseedAddRequest( tr_webseed          * w,
                           tr_piece_index_t      piece );
 
+/** @return true if a request is being processed, or false if idle */
+int tr_webseedGetSpeed( const tr_webseed * w ,
+                        float            * setme_KiBs );
+              
+
 #endif

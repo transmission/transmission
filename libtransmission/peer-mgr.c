@@ -1290,7 +1290,7 @@ tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
     int peerCount;
     const tr_peer ** peers;
 
-    managerLock( (tr_peerMgr*)manager );
+    managerLock( manager );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     tor = t->tor;
@@ -1314,7 +1314,7 @@ tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
         }
     }
 
-    managerUnlock( (tr_peerMgr*)manager );
+    managerUnlock( manager );
 }
 
 /* Returns the pieces that are available from peers */
@@ -1326,7 +1326,7 @@ tr_peerMgrGetAvailable( const tr_peerMgr * manager,
     Torrent * t;
     tr_peer ** peers;
     tr_bitfield * pieces;
-    managerLock( (tr_peerMgr*)manager );
+    managerLock( manager );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     pieces = tr_bitfieldNew( t->tor->info.pieceCount );
@@ -1334,7 +1334,7 @@ tr_peerMgrGetAvailable( const tr_peerMgr * manager,
     for( i=0; i<size; ++i )
         tr_bitfieldOr( pieces, peers[i]->have );
 
-    managerUnlock( (tr_peerMgr*)manager );
+    managerUnlock( manager );
     tr_free( peers );
     return pieces;
 }
@@ -1345,12 +1345,12 @@ tr_peerMgrHasConnections( const tr_peerMgr * manager,
 {
     int ret;
     const Torrent * t;
-    managerLock( (tr_peerMgr*)manager );
+    managerLock( manager );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     ret = t && tr_ptrArraySize( t->peers );
 
-    managerUnlock( (tr_peerMgr*)manager );
+    managerUnlock( manager );
     return ret;
 }
 
@@ -1368,7 +1368,7 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
     const Torrent * t;
     const tr_peer ** peers;
 
-    managerLock( (tr_peerMgr*)manager );
+    managerLock( manager );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &size );
@@ -1404,7 +1404,32 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
             ++*setmeSeedsConnected;
     }
 
-    managerUnlock( (tr_peerMgr*)manager );
+    managerUnlock( manager );
+}
+
+float*
+tr_peerMgrWebSpeeds( const tr_peerMgr * manager,
+                     const uint8_t    * torrentHash )
+{
+    const Torrent * t;
+    const tr_webseed ** webseeds;
+    int i;
+    int webseedCount;
+    float * ret;
+
+    assert( manager );
+    managerLock( manager );
+
+    t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
+    webseeds = (const tr_webseed**) tr_ptrArrayPeek( t->webseeds, &webseedCount );
+    assert( webseedCount == t->tor->info.webseedCount );
+    ret = tr_new0( float, webseedCount );
+
+    for( i=0; i<webseedCount; ++i )
+        tr_webseedGetSpeed( webseeds[i], &ret[i] );
+
+    managerUnlock( manager );
+    return ret;
 }
 
 struct tr_peer_stat *
@@ -1417,8 +1442,8 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
     tr_peer ** peers;
     tr_peer_stat * ret;
 
-    assert( manager != NULL );
-    managerLock( (tr_peerMgr*)manager );
+    assert( manager );
+    managerLock( manager );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     peers = getConnectedPeers( (Torrent*)t, &size );
@@ -1464,7 +1489,7 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
     *setmeCount = size;
     tr_free( peers );
 
-    managerUnlock( (tr_peerMgr*)manager );
+    managerUnlock( manager );
     return ret;
 }
 

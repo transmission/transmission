@@ -864,6 +864,14 @@ tr_torrentFilesFree( tr_file_stat * files, tr_file_index_t fileCount UNUSED )
 ****
 ***/
 
+float*
+tr_torrentWebSpeeds( const tr_torrent * tor )
+{
+    return tor ? tr_peerMgrWebSpeeds( tor->handle->peerMgr, tor->info.hash )
+               : NULL;
+}
+    
+
 tr_peer_stat *
 tr_torrentPeers( const tr_torrent * tor, int * peerCount )
 {

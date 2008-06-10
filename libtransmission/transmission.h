@@ -966,6 +966,16 @@ tr_peer_stat * tr_torrentPeers( const tr_torrent * torrent,
 void tr_torrentPeersFree( tr_peer_stat *  peerStats,
                           int             peerCount );
 
+/**
+ * @brief get the download speeds for each of this torrent's webseed sources.
+ *
+ * @return an array of tor->info.webseedCount floats giving download speeds.
+ *         Each speed in the array corresponds to the webseed at the same
+ *         array index in tor->info.webseeds.
+ *         NOTE: always free this array with tr_free() when you're done with it.
+ */
+float* tr_torrentWebSpeeds( const tr_torrent * tor );
+
 typedef struct tr_file_stat
 {
     uint64_t bytesCompleted;
