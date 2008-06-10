@@ -35,9 +35,6 @@
 #define ACTION_MENU_UNLIMITED_TAG 102
 #define ACTION_MENU_LIMIT_TAG 103
 
-#define PIECE_CHANGE 0.1
-#define PIECE_TIME 0.005
-
 #define GROUP_SPEED_IMAGE_COLUMN_WIDTH 8.0
 #define GROUP_RATIO_IMAGE_COLUMN_WIDTH 10.0
 
@@ -52,8 +49,6 @@
 - (void) setGroupStatusColumns;
 
 - (void) createFileMenu: (NSMenu *) menu forFiles: (NSArray *) files;
-
-- (void) resizePiecesBarIncrement;
 
 @end
 
@@ -109,7 +104,7 @@
 {
     [fCollapsedGroups release];
     
-    [fPiecesBarTimer invalidate];
+    [fPiecesBarAnimation release];
     [fMenuTorrent release];
     
     [fSelectedValues release];
@@ -846,14 +841,45 @@
 
 - (void) togglePiecesBar
 {
-    [self resizePiecesBarIncrement];
-    
-    if (!fPiecesBarTimer)
+    //stop previous animation
+    if (fPiecesBarAnimation)
     {
-        fPiecesBarTimer = [NSTimer scheduledTimerWithTimeInterval: PIECE_TIME target: self
-                            selector: @selector(resizePiecesBarIncrement) userInfo: nil repeats: YES];
-        [[NSRunLoop currentRunLoop] addTimer: fPiecesBarTimer forMode: NSModalPanelRunLoopMode];
-        [[NSRunLoop currentRunLoop] addTimer: fPiecesBarTimer forMode: NSEventTrackingRunLoopMode];
+        [fPiecesBarAnimation stopAnimation];
+        [fPiecesBarAnimation release];
+    }
+    
+    NSMutableArray * progressMarks = [NSMutableArray arrayWithCapacity: 20];
+    NSAnimationProgress i;
+    for (i = 0.0625; i <= 1.0; i += 0.0625)
+        [progressMarks addObject: [NSNumber numberWithFloat: i]];
+    
+    fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: 0.25 animationCurve: NSAnimationEaseIn];
+    [fPiecesBarAnimation setAnimationBlockingMode: NSAnimationNonblocking];
+    [fPiecesBarAnimation setProgressMarks: progressMarks];
+    [fPiecesBarAnimation setDelegate: self];
+    
+    [fPiecesBarAnimation startAnimation];
+}
+
+- (void) animationDidEnd: (NSAnimation *) animation
+{
+    if (animation == fPiecesBarAnimation)
+    {
+        [fPiecesBarAnimation release];
+        fPiecesBarAnimation = nil;
+    }
+}
+
+- (void) animation: (NSAnimation *) animation didReachProgressMark: (NSAnimationProgress) progress
+{
+    if (animation == fPiecesBarAnimation)
+    {
+        if ([fDefaults boolForKey: @"PiecesBar"])
+            fPiecesBarPercent = progress;
+        else
+            fPiecesBarPercent = 1.0 - progress;
+        
+        [self reloadData];
     }
 }
 
@@ -960,29 +986,6 @@
         [menu addItem: item];
         [item release];
     }
-}
-
-- (void) resizePiecesBarIncrement
-{
-    BOOL done;
-    if ([fDefaults boolForKey: @"PiecesBar"])
-    {
-        fPiecesBarPercent = MIN(fPiecesBarPercent + PIECE_CHANGE, 1.0);
-        done = fPiecesBarPercent == 1.0;
-    }
-    else
-    {
-        fPiecesBarPercent = MAX(fPiecesBarPercent - PIECE_CHANGE, 0.0);
-        done = fPiecesBarPercent == 0.0;
-    }
-    
-    if (done)
-    {
-        [fPiecesBarTimer invalidate];
-        fPiecesBarTimer = nil;
-    }
-    
-    [self reloadData];
 }
 
 @end

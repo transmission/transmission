@@ -49,7 +49,7 @@
     Torrent * fMenuTorrent;
     
     float fPiecesBarPercent;
-    NSTimer * fPiecesBarTimer;
+    NSAnimation * fPiecesBarAnimation;
 }
 
 - (BOOL) isGroupCollapsed: (int) value;
