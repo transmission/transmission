@@ -1037,7 +1037,8 @@ torrentStart( tr_torrent * tor, int reloadProgress )
 void
 tr_torrentStart( tr_torrent * tor )
 {
-    torrentStart( tor, TRUE );
+    if( tor )
+        torrentStart( tor, TRUE );
 }
 
 static void
@@ -1086,14 +1087,17 @@ stopTorrent( void * vtor )
 void
 tr_torrentStop( tr_torrent * tor )
 {
-    tr_globalLock( tor->handle );
+    if( tor )
+    {
+        tr_globalLock( tor->handle );
 
-    tor->isRunning = 0;
-    if( !tor->isDeleting )
-        tr_torrentSaveResume( tor );
-    tr_runInEventThread( tor->handle, stopTorrent, tor );
+        tor->isRunning = 0;
+        if( !tor->isDeleting )
+            tr_torrentSaveResume( tor );
+        tr_runInEventThread( tor->handle, stopTorrent, tor );
 
-    tr_globalUnlock( tor->handle );
+        tr_globalUnlock( tor->handle );
+    }
 }
 
 static void
@@ -1113,7 +1117,7 @@ closeTorrent( void * vtor )
 void
 tr_torrentFree( tr_torrent * tor )
 {
-    if( tor != NULL )
+    if( tor )
     {
         tr_handle * handle = tor->handle;
         tr_globalLock( handle );

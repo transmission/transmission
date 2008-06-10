@@ -115,13 +115,12 @@ rpcPulse( int socket UNUSED, short action UNUSED, void * vserver )
     shttpd_poll( server->ctx, 1 );
 
     /* set a timer for the next pulse */
-    if( EVBUFFER_LENGTH( server->in ) || EVBUFFER_LENGTH( server->out ) ) {
+    if( EVBUFFER_LENGTH( server->in ) || EVBUFFER_LENGTH( server->out ) )
         interval = BUSY_INTERVAL_MSEC;
-    } else if( now - server->lastRequestTime < 300 ) {
+    else if( now - server->lastRequestTime < 300 )
         interval = IDLE_INTERVAL_MSEC;
-    } else {
+    else
         interval = UNUSED_INTERVAL_MSEC;
-    }
     tv = tr_timevalMsec( interval );
     evtimer_add( &server->timer, &tv );
 }
