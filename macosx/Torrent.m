@@ -1026,17 +1026,21 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     int webSeedCount = fInfo->webseedCount, i;
     NSMutableArray * webSeeds = [NSMutableArray arrayWithCapacity: webSeedCount];
     
+    float * dlSpeeds = tr_torrentWebSpeeds(fHandle);
+    
     for (i = 0; i < webSeedCount; i++)
     {
         NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 2];
         
         [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
         
-        /*if (webSeeds->isDownloadingFrom)
-            [dict setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];*/
+        if (dlSpeeds[i] != -1)
+            [dict setObject: [NSNumber numberWithFloat: dlSpeeds[i]] forKey: @"DL From Rate"];
         
         [webSeeds addObject: dict];
     }
+    
+    tr_free(dlSpeeds);
     
     return webSeeds;
 }
@@ -1144,6 +1148,20 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 else
                     string = [NSString stringWithFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
                                                     "Torrent -> status string"), [self peersSendingToUs]];
+                
+                /*int webSeedCount = [self webSeedCount];
+                if (webSeedCount > 0)
+                {
+                    NSString * webSeedString;
+                    if (webSeedCount == 1)
+                        webSeedString = NSLocalizedString(@"web seed", "Torrent -> status string");
+                    else
+                        webSeedString = [NSString stringWithFormat: NSLocalizedString(@"%d web seeds", "Torrent -> status string"),
+                                                                    webSeedCount];
+                    
+                    string = [string stringByAppendingFormat: @" + %@", webSeedString];
+                }*/
+                
                 break;
 
             case TR_STATUS_SEED:
