@@ -672,7 +672,7 @@
 
 - (void) setRPCEnabled: (id) sender
 {
-    tr_sessionSetProxyEnabled(fHandle, [fDefaults boolForKey: @"RPC"]);
+    tr_sessionSetRPCEnabled(fHandle, [fDefaults boolForKey: @"RPC"]);
 }
 
 - (void) setRPCAuthorize: (id) sender
