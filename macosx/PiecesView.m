@@ -29,6 +29,10 @@
 #define MAX_ACROSS 18
 #define BETWEEN 1.0
 
+#define HIGH_PEERS 15
+
+#define FINISHED 1
+
 @implementation PiecesView
 
 - (void) awakeFromNib
@@ -43,17 +47,9 @@
         [fBack unlockFocus];
         
         //store box colors
-        fWhiteColor = [[NSColor whiteColor] retain];
-        fOrangeColor = [[NSColor orangeColor] retain];
-        fGreen1Color = [[NSColor colorWithCalibratedRed: 0.6 green: 1.0 blue: 0.8 alpha: 1.0] retain];
-        fGreen2Color = [[NSColor colorWithCalibratedRed: 0.4 green: 1.0 blue: 0.6 alpha: 1.0] retain];
-        fGreen3Color = [[NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0] retain];
-        fBlue1Color = [[NSColor colorWithCalibratedRed: 0.8 green: 1.0 blue: 1.0 alpha: 1.0] retain];
-        fBlue2Color = [[NSColor colorWithCalibratedRed: 0.6 green: 1.0 blue: 1.0 alpha: 1.0] retain];
-        fBlue3Color = [[NSColor colorWithCalibratedRed: 0.6 green: 0.8 blue: 1.0 alpha: 1.0] retain];
-        fBlue4Color = [[NSColor colorWithCalibratedRed: 0.4 green: 0.6 blue: 1.0 alpha: 1.0] retain];
-        fBlueColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
-        
+        fGreenAvailabilityColor = [[NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0] retain];
+        fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
+                
         //actually draw the box
         [self setTorrent: nil];
 }
@@ -64,16 +60,8 @@
     
     [fBack release];
     
-    [fWhiteColor release];
-    [fOrangeColor release];
-    [fGreen1Color release];
-    [fGreen2Color release];
-    [fGreen3Color release];
-    [fBlue1Color release];
-    [fBlue2Color release];
-    [fBlue3Color release];
-    [fBlue4Color release];
-    [fBlueColor release];
+    [fGreenAvailabilityColor release];
+    [fBluePieceColor release];
     
     [super dealloc];
 }
@@ -142,7 +130,7 @@
     NSRect rect = NSMakeRect(0, 0, fWidth, fWidth);
     
     BOOL change = NO;
-        
+    
     for (i = 0; i < fAcross; i++)
         for (j = 0; j < fAcross; j++)
         {
@@ -153,115 +141,33 @@
                 break;
             }
             
-            NSColor * pieceColor = nil;
+            NSColor * pieceColor;
             
             if (showAvailablity)
             {
-                int piece = pieces[index];
-                if (piece == -1)
-                {
-                    if (first || fPieces[index] == -2)
-                    {
-                        fPieces[index] = -1;
-                        pieceColor = fBlueColor;
-                    }
-                    else if (fPieces[index] != -1)
-                    {
-                        fPieces[index] = -2;
-                        pieceColor = fOrangeColor;
-                    }
-                    else;
-                }
-                else if (piece == 0)
-                {
-                    if (first || fPieces[index] != 0)
-                    {
-                        fPieces[index] = 0;
-                        pieceColor = fWhiteColor;
-                    }
-                }
-                else if (piece <= 4)
-                {
-                    if (first || fPieces[index] != 1)
-                    {
-                        fPieces[index] = 1;
-                        pieceColor = fGreen1Color;
-                    }
-                }
-                else if (piece <= 8)
-                {
-                    if (first || fPieces[index] != 2)
-                    {
-                        fPieces[index] = 2;
-                        pieceColor = fGreen2Color;
-                    }
-                }
+                if (pieces[index] == -1)
+                    pieceColor = !first && fPieces[index] != FINISHED ? [NSColor orangeColor] : fBluePieceColor;
                 else
                 {
-                    if (first || fPieces[index] != 3)
-                    {
-                        fPieces[index] = 3;
-                        pieceColor = fGreen3Color;
-                    }
+                    float percent;
+                    if (pieces[index] < HIGH_PEERS)
+                        percent = (float)pieces[index]/HIGH_PEERS;
+                    else
+                        percent = 1.0;
+                    
+                    pieceColor = [[NSColor whiteColor] blendedColorWithFraction: percent ofColor: fGreenAvailabilityColor];
                 }
+                
+                fPieces[index] = pieces[index] == -1 ? FINISHED : 0;
             }
             else
             {
-                float piecePercent = piecesPercent[index];
-                if (piecePercent >= 1.0)
-                {
-                    if (first || fPieces[index] == -2)
-                    {
-                        fPieces[index] = -1;
-                        pieceColor = fBlueColor;
-                    }
-                    else if (fPieces[index] != -1)
-                    {
-                        fPieces[index] = -2;
-                        pieceColor = fOrangeColor;
-                    }
-                    else;
-                }
-                else if (piecePercent == 0.0)
-                {
-                    if (first || fPieces[index] != 0)
-                    {
-                        fPieces[index] = 0;
-                        pieceColor = fWhiteColor;
-                    }
-                }
-                else if (piecePercent < 0.25)
-                {
-                    if (first || fPieces[index] != 1)
-                    {
-                        fPieces[index] = 1;
-                        pieceColor = fBlue1Color;
-                    }
-                }
-                else if (piecePercent < 0.5)
-                {
-                    if (first || fPieces[index] != 2)
-                    {
-                        fPieces[index] = 2;
-                        pieceColor = fBlue2Color;
-                    }
-                }
-                else if (piecePercent < 0.75)
-                {
-                    if (first || fPieces[index] != 3)
-                    {
-                        fPieces[index] = 3;
-                        pieceColor = fBlue3Color;
-                    }
-                }
+                if (piecesPercent[index] == 1.0 && !first && fPieces[index] != FINISHED)
+                    pieceColor = [NSColor orangeColor];
                 else
-                {
-                    if (first || fPieces[index] != 4)
-                    {
-                        fPieces[index] = 4;
-                        pieceColor = fBlue4Color;
-                    }
-                }
+                    pieceColor = [[NSColor whiteColor] blendedColorWithFraction: piecesPercent[index] ofColor: fBluePieceColor];
+                
+                fPieces[index] = piecesPercent[index] == 1.0 ? FINISHED : 0;
             }
             
             if (pieceColor)

@@ -168,8 +168,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (fFileStat)
         tr_torrentFilesFree(fFileStat, [self fileCount]);
     
-    if (fPreviousFinishedPieces != NULL)
-        free(fPreviousFinishedPieces);
+    tr_free(fPreviousFinishedPieces);
     [fFinishedPiecesDate release];
     
     [fNameString release];
@@ -242,6 +241,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (float *) getPreviousAmountFinished
 {
+    //if the torrent hasn't been seen in a bit, and therefore hasn't been refreshed, return NULL
     if (fFinishedPiecesDate && [fFinishedPiecesDate timeIntervalSinceNow] > -2.0)
         return fPreviousFinishedPieces;
     else
@@ -250,8 +250,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 -(void) setPreviousAmountFinished: (float *) tab
 {
-    if (fPreviousFinishedPieces != NULL)
-        free(fPreviousFinishedPieces);
+    tr_free(fPreviousFinishedPieces);
     fPreviousFinishedPieces = tab;
     
     [fFinishedPiecesDate release];

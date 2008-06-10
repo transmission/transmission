@@ -98,15 +98,7 @@
                                 paragraphStyle, NSParagraphStyleAttributeName, nil];
         [paragraphStyle release];
         
-        //store box colors
-        fGrayColor = [[NSColor colorWithCalibratedRed: 0.95 green: 0.95 blue: 0.95 alpha: 1.0] retain];
-        fBlue1Color = [[NSColor colorWithCalibratedRed: 0.8 green: 1.0 blue: 1.0 alpha: 1.0] retain];
-        fBlue2Color = [[NSColor colorWithCalibratedRed: 0.6 green: 1.0 blue: 1.0 alpha: 1.0] retain];
-        fBlue3Color = [[NSColor colorWithCalibratedRed: 0.6 green: 0.8 blue: 1.0 alpha: 1.0] retain];
-        fBlue4Color = [[NSColor colorWithCalibratedRed: 0.4 green: 0.6 blue: 1.0 alpha: 1.0] retain];
-        fBlueColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
-        fOrangeColor = [[NSColor orangeColor] retain];
-        
+        fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
         fBarBorderColor = [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] retain];
     }
 	return self;
@@ -755,24 +747,10 @@
     for (i = 0; i < pieceCount; i++)
     {
         NSColor * pieceColor;
-        
-        if (piecePercent[i] >= 1.0)
-        {
-            if (previousPiecePercent != NULL && previousPiecePercent[i] < 1.0)
-                pieceColor = fOrangeColor;
-            else
-                pieceColor = fBlueColor;
-        }
-        else if (piecePercent[i] <= 0.0)
-            pieceColor = fGrayColor;
-        else if (piecePercent[i] <= 0.25)
-            pieceColor = fBlue1Color;
-        else if (piecePercent[i] <= 0.5)
-            pieceColor = fBlue2Color;
-        else if (piecePercent[i] <= 0.75)
-            pieceColor = fBlue3Color;
+        if (piecePercent[i] == 1.0 && previousPiecePercent != NULL && previousPiecePercent[i] < 1.0)
+            pieceColor = [NSColor orangeColor];
         else
-            pieceColor = fBlue4Color;
+            pieceColor = [[NSColor whiteColor] blendedColorWithFraction: piecePercent[i] ofColor: fBluePieceColor];
         
         //it's faster to just set color instead of checking previous color
         [bitmap setColor: pieceColor atX: i y: 0];

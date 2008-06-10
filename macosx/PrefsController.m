@@ -32,7 +32,7 @@
 #define DOWNLOAD_TORRENT    2
 
 #define RPC_ACCESS_ALLOW    0
-#define RPC_ACCESS_DENY    1
+#define RPC_ACCESS_DENY     1
 
 #define RPC_IP_ADD_TAG      0
 #define RPC_IP_REMOVE_TAG   1

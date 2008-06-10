@@ -38,7 +38,7 @@
     CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fBlueGradient, * fDarkBlueGradient, 
                 * fGreenGradient, * fLightGreenGradient, * fDarkGreenGradient, * fYellowGradient, * fRedGradient;
     
-    NSColor * fGrayColor, * fBlueColor, * fBlue1Color, * fBlue2Color, * fBlue3Color, * fBlue4Color, * fOrangeColor;
+    NSColor * fBluePieceColor;
 }
 
 - (NSRect) iconRectForBounds: (NSRect) bounds;
