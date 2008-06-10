@@ -184,6 +184,9 @@
     [fQueueSeedField setIntValue: [fDefaults integerForKey: @"QueueSeedNumber"]];
     [fStalledField setIntValue: [fDefaults integerForKey: @"StalledMinutes"]];
     
+    //set proxy address
+    [fProxyAddressField setStringValue: [fDefaults stringForKey: @"ProxyAddress"]];
+    
     //set blocklist
     [self updateBlocklistFields];
     
@@ -652,7 +655,23 @@
 
 - (void) setProxyAddress: (id) sender
 {
-    tr_sessionSetProxy(fHandle, [[fDefaults stringForKey: @"ProxyAddress"] UTF8String]);
+    NSString * address = [sender stringValue];
+    BOOL blank = [address isEqualToString: @""];
+    
+    if (!blank && [address rangeOfString: @"://"].location == NSNotFound)
+        address = [@"http://" stringByAppendingString: address];
+    
+    if (blank || tr_httpIsValidURL([address UTF8String]))
+    {
+        tr_sessionSetProxy(fHandle, [address UTF8String]);
+        [sender setStringValue: address];
+        [fDefaults setObject: address forKey: @"ProxyAddress"];
+    }
+    else
+    {
+        NSBeep();
+        [sender setStringValue: [fDefaults stringForKey: @"ProxyAddress"]];
+    }
 }
 
 - (void) setProxyAuthorize: (id) sender

@@ -29,10 +29,10 @@
 #define MAX_ACROSS 18
 #define BETWEEN 1.0
 
-#define HIGH_PEERS 15
+#define HIGH_PEERS 30
 
 #define PIECE_NONE 0
-#define PIECE_MIXED 1
+#define PIECE_SOME 1
 #define PIECE_HIGH_PEERS 2
 #define PIECE_FINISHED 3
 #define PIECE_FLASHING 4
@@ -184,7 +184,7 @@
                 float percent = showAvailablity ? (float)pieces[index]/HIGH_PEERS : piecesPercent[index];
                 NSColor * fullColor = showAvailablity ? fGreenAvailabilityColor : fBluePieceColor;
                 pieceColor = [[NSColor whiteColor] blendedColorWithFraction: percent ofColor: fullColor];
-                fPieces[index] = PIECE_MIXED;
+                fPieces[index] = PIECE_SOME;
             }
             
             if (pieceColor)

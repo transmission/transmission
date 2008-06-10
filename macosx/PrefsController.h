@@ -56,6 +56,7 @@
     IBOutlet NSProgressIndicator * fPortStatusProgress;
     NSTimer * fPortStatusTimer;
     int fPeerPort, fNatStatus;
+    IBOutlet NSTextField * fProxyAddressField;
     
     IBOutlet NSTextField * fRPCPortField;
     IBOutlet NSTableView * fRPCAccessTable;
