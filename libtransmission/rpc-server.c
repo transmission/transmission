@@ -55,6 +55,7 @@ static void
 handle_rpc( struct shttpd_arg * arg )
 {
     struct tr_rpc_server * s = arg->user_data;
+    s->lastRequestTime = time( NULL );
 
     if( !EVBUFFER_LENGTH( s->out ) )
     {
@@ -116,7 +117,6 @@ rpcPulse( int socket UNUSED, short action UNUSED, void * vserver )
     /* set a timer for the next pulse */
     if( EVBUFFER_LENGTH( server->in ) || EVBUFFER_LENGTH( server->out ) ) {
         interval = BUSY_INTERVAL_MSEC;
-        server->lastRequestTime = now;
     } else if( now - server->lastRequestTime < 300 ) {
         interval = IDLE_INTERVAL_MSEC;
     } else {
