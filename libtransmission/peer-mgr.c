@@ -1420,7 +1420,7 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
     for( i=0; i<size; ++i )
     {
         if( tr_webseedIsActive( webseeds[i] ) )
-            ++setmeWebseedsSendingToUs;
+            ++*setmeWebseedsSendingToUs;
     }
 
     managerUnlock( manager );
