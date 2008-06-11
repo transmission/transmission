@@ -31,6 +31,10 @@
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
 
+#define PROXY_HTTP      0
+#define PROXY_SOCKS4    1
+#define PROXY_SOCKS5    2
+
 #define RPC_ACCESS_ALLOW    0
 #define RPC_ACCESS_DENY     1
 
@@ -100,6 +104,9 @@
         
         //actually set bandwidth limits
         [self applySpeedSettings: nil];
+        
+        //set proxy type
+        [self updateProxyType];
         
         //update rpc access list
         fRPCAccessArray = [[fDefaults arrayForKey: @"RPCAccessList"] mutableCopy];
@@ -184,8 +191,21 @@
     [fQueueSeedField setIntValue: [fDefaults integerForKey: @"QueueSeedNumber"]];
     [fStalledField setIntValue: [fDefaults integerForKey: @"StalledMinutes"]];
     
-    //set proxy address
+    //set proxy fields
     [fProxyAddressField setStringValue: [fDefaults stringForKey: @"ProxyAddress"]];
+    int proxyType;
+    switch(tr_sessionGetProxyType(fHandle))
+    {
+        case TR_PROXY_SOCKS4:
+            proxyType = PROXY_SOCKS4;
+            break;
+        case TR_PROXY_SOCKS5:
+            proxyType = PROXY_SOCKS5;
+            break;
+        case TR_PROXY_HTTP:
+            proxyType = PROXY_HTTP;
+    }
+    [fProxyTypePopUp selectItemAtIndex: proxyType];
     
     //set blocklist
     [self updateBlocklistFields];
@@ -687,6 +707,47 @@
 - (void) setProxyPassword: (id) sender
 {
     tr_sessionSetProxyPassword(fHandle, [[fDefaults stringForKey: @"ProxyPassword"] UTF8String]);
+}
+
+- (void) setProxyType: (id) sender
+{
+    NSString * type;
+    switch ([sender indexOfSelectedItem])
+    {
+        case PROXY_HTTP:
+            type = @"HTTP";
+            break;
+        case PROXY_SOCKS4:
+            type = @"SOCKS4";
+            break;
+        case PROXY_SOCKS5:
+            type = @"SOCKS5";
+    }
+    
+    [fDefaults setObject: type forKey: @"ProxyType"];
+    [self updateProxyType];
+}
+
+- (void) updateProxyType
+{
+    NSString * typeString = [fDefaults stringForKey: @"ProxyType"];
+    tr_proxy_type type;
+    if ([typeString isEqualToString: @"SOCKS4"])
+        type = TR_PROXY_SOCKS4;
+    else if ([typeString isEqualToString: @"SOCKS5"])
+        type = TR_PROXY_SOCKS4;
+    else
+    {
+        //safety
+        if (![typeString isEqualToString: @"HTTP"])
+        {
+            typeString = @"HTTP";
+            [fDefaults setObject: typeString forKey: @"ProxyType"];
+        }
+        type = TR_PROXY_HTTP;
+    }
+    
+    tr_sessionSetProxyType(fHandle, type);
 }
 
 - (void) setRPCEnabled: (id) sender

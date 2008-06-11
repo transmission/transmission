@@ -57,6 +57,7 @@
     NSTimer * fPortStatusTimer;
     int fPeerPort, fNatStatus;
     IBOutlet NSTextField * fProxyAddressField;
+    IBOutlet NSPopUpButton * fProxyTypePopUp;
     
     IBOutlet NSTextField * fRPCPortField;
     IBOutlet NSTableView * fRPCAccessTable;
@@ -124,6 +125,8 @@
 - (void) setProxyAuthorize: (id) sender;
 - (void) setProxyUsername: (id) sender;
 - (void) setProxyPassword: (id) sender;
+- (void) setProxyType: (id) sender;
+- (void) updateProxyType;
 
 - (void) setRPCEnabled: (id) sender;
 - (void) setRPCAuthorize: (id) sender;

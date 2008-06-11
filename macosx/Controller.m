@@ -203,7 +203,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         fLib = tr_sessionInitFull(NULL, /* use default config directory (Application Support) */
                                 "macosx",
-                                NULL, /* download directory set when adding transfers */
+                                "", /* download directory set when adding transfers */
                                 [fDefaults boolForKey: @"PEXGlobal"],
                                 [fDefaults boolForKey: @"NatTraversal"],
                                 [fDefaults integerForKey: @"BindPort"],
@@ -225,6 +225,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 [[fDefaults stringForKey: @"RPCPassword"] UTF8String],
                                 [fDefaults boolForKey: @"Proxy"],
                                 [[fDefaults stringForKey: @"ProxyAddress"] UTF8String],
+                                TR_DEFAULT_PROXY_TYPE, /* reset in prefs */
                                 [fDefaults boolForKey: @"ProxyAuthorize"],
                                 [[fDefaults stringForKey: @"ProxyUsername"] UTF8String],
                                 [[fDefaults stringForKey: @"ProxyPassword"] UTF8String]);
