@@ -1535,7 +1535,7 @@
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSCustomView" id="352903881">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1544,6 +1544,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{295, 184}, {50, 22}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="671472167">
 							<int key="NSCellFlags">-1804468671</int>
@@ -1608,6 +1609,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{171, 159}, {100, 18}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="157187468">
 							<int key="NSCellFlags">67239424</int>
@@ -1630,6 +1632,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{295, 158}, {50, 22}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="213372896">
 							<int key="NSCellFlags">-1804468671</int>
@@ -1694,6 +1697,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{171, 185}, {118, 18}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="651662374">
 							<int key="NSCellFlags">67239424</int>
@@ -1716,6 +1720,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{350, 185}, {34, 17}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="598167921">
 							<int key="NSCellFlags">67239424</int>
@@ -1732,6 +1737,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{350, 159}, {34, 17}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="366797017">
 							<int key="NSCellFlags">67239424</int>
@@ -1748,6 +1754,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{25, 186}, {143, 17}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="916691300">
 							<int key="NSCellFlags">67239424</int>
@@ -1764,6 +1771,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{295, 116}, {50, 22}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="521814699">
 							<int key="NSCellFlags">-1804468671</int>
@@ -1828,6 +1836,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{295, 90}, {50, 22}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="783238913">
 							<int key="NSCellFlags">-1804468671</int>
@@ -1892,6 +1901,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{350, 117}, {34, 17}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="826580374">
 							<int key="NSCellFlags">67239424</int>
@@ -1908,6 +1918,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{350, 91}, {34, 17}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="389698940">
 							<int key="NSCellFlags">67239424</int>
@@ -1924,6 +1935,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{46, 118}, {122, 17}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="162938096">
 							<int key="NSCellFlags">67239424</int>
@@ -1940,6 +1952,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{170, 92}, {82, 17}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="646507129">
 							<int key="NSCellFlags">67239424</int>
@@ -1956,6 +1969,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{170, 118}, {100, 17}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="1023099604">
 							<int key="NSCellFlags">67239424</int>
@@ -1972,6 +1986,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{170, 72}, {339, 14}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="229954658">
 							<int key="NSCellFlags">67239424</int>
@@ -2000,6 +2015,7 @@
 						</object>
 						<string key="NSFrame">{{28, 118}, {20, 14}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSImageCell" key="NSCell" id="916608870">
 							<int key="NSCellFlags">130560</int>
@@ -2020,6 +2036,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{171, 48}, {217, 18}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="881251804">
 							<int key="NSCellFlags">67239424</int>
@@ -2042,6 +2059,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{273, 22}, {28, 17}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="314009658">
 							<int key="NSCellFlags">67239424</int>
@@ -2058,6 +2076,7 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{185, 20}, {86, 27}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSDatePickerCell" key="NSCell" id="1041237499">
 							<int key="NSCellFlags">71433728</int>
@@ -2111,6 +2130,7 @@ AAABAAAAAQ</bytes>
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{306, 20}, {86, 27}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSDatePickerCell" key="NSCell" id="283024896">
 							<int key="NSCellFlags">71433728</int>
@@ -2130,6 +2150,8 @@ AAABAAAAAQ</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{535, 226}</string>
+				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
 			</object>
@@ -2581,7 +2603,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="631967205">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{28, 34}, {90, 17}}</string>
+						<string key="NSFrame">{{32, 34}, {90, 17}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="514153614">
@@ -2597,7 +2619,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSButton" id="109684042">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{121, 33}, {357, 18}}</string>
+						<string key="NSFrame">{{125, 33}, {357, 18}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="127446013">
@@ -2620,7 +2642,7 @@ AAABAAAAAQ</bytes>
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">1280</int>
 						<object class="NSPSMatrix" key="NSDrawMatrix"/>
-						<string key="NSFrame">{{293, 253}, {16, 16}}</string>
+						<string key="NSFrame">{{297, 253}, {16, 16}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<int key="NSpiFlags">28938</int>
 						<double key="NSMaxValue">1.000000e+02</double>
@@ -2640,7 +2662,7 @@ AAABAAAAAQ</bytes>
 								<string>NeXT TIFF v4.0 pasteboard type</string>
 							</object>
 						</object>
-						<string key="NSFrame">{{294, 254}, {14, 14}}</string>
+						<string key="NSFrame">{{298, 254}, {14, 14}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSImageCell" key="NSCell" id="270102740">
@@ -2660,7 +2682,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="585772012">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{108, 253}, {124, 17}}</string>
+						<string key="NSFrame">{{112, 253}, {124, 17}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="941628063">
@@ -2676,7 +2698,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSButton" id="316696878">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{109, 231}, {171, 18}}</string>
+						<string key="NSFrame">{{113, 229}, {171, 18}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="633401664">
@@ -2698,7 +2720,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSButton" id="622323577">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{109, 174}, {248, 18}}</string>
+						<string key="NSFrame">{{113, 172}, {248, 18}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="20752657">
@@ -2720,7 +2742,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="911608268">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{237, 251}, {50, 22}}</string>
+						<string key="NSFrame">{{241, 251}, {50, 22}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="453443006">
@@ -2786,7 +2808,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="646636981">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{108, 215}, {238, 14}}</string>
+						<string key="NSFrame">{{112, 213}, {238, 14}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="67017561">
@@ -2802,7 +2824,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="992746122">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{313, 253}, {154, 17}}</string>
+						<string key="NSFrame">{{317, 253}, {154, 17}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="931894024">
@@ -2818,7 +2840,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="25993221">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{45, 254}, {61, 17}}</string>
+						<string key="NSFrame">{{49, 254}, {61, 17}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="475516915">
@@ -2834,7 +2856,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="90035294">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{62, 175}, {44, 17}}</string>
+						<string key="NSFrame">{{66, 173}, {44, 17}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="582281809">
@@ -2850,7 +2872,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="185775633">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{218, 147}, {184, 22}}</string>
+						<string key="NSFrame">{{222, 145}, {184, 22}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="1051431853">
@@ -2867,7 +2889,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="257109686">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{150, 73}, {68, 17}}</string>
+						<string key="NSFrame">{{154, 73}, {68, 17}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="954130018">
@@ -2883,7 +2905,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="925265526">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{147, 101}, {71, 17}}</string>
+						<string key="NSFrame">{{151, 99}, {71, 17}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="108838744">
@@ -2899,7 +2921,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="995948995">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{127, 149}, {86, 17}}</string>
+						<string key="NSFrame">{{131, 147}, {86, 17}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="677732006">
@@ -2915,7 +2937,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSButton" id="473194484">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{128, 125}, {187, 18}}</string>
+						<string key="NSFrame">{{132, 123}, {187, 18}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="296153825">
@@ -2937,7 +2959,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSSecureTextField" id="1043027599">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{223, 71}, {179, 22}}</string>
+						<string key="NSFrame">{{227, 71}, {164, 22}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSecureTextFieldCell" key="NSCell" id="669471795">
@@ -2958,7 +2980,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="876018656">
 						<reference key="NSNextResponder" ref="204700639"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{223, 99}, {179, 22}}</string>
+						<string key="NSFrame">{{227, 97}, {164, 22}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="731460553">
@@ -2972,25 +2994,25 @@ AAABAAAAAQ</bytes>
 							<reference key="NSTextColor" ref="430340990"/>
 						</object>
 					</object>
-					<object class="NSPopUpButton" id="682100624">
+					<object class="NSPopUpButton" id="325780779">
 						<reference key="NSNextResponder" ref="204700639"/>
-						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{407, 145}, {96, 26}}</string>
+						<int key="NSvFlags">256</int>
+						<string key="NSFrame">{{411, 143}, {91, 26}}</string>
 						<reference key="NSSuperview" ref="204700639"/>
 						<bool key="NSEnabled">YES</bool>
-						<object class="NSPopUpButtonCell" key="NSCell" id="512042046">
+						<object class="NSPopUpButtonCell" key="NSCell" id="11922055">
 							<int key="NSCellFlags">-2076049856</int>
 							<int key="NSCellFlags2">2048</int>
 							<reference key="NSSupport" ref="86725571"/>
-							<reference key="NSControlView" ref="682100624"/>
+							<reference key="NSControlView" ref="325780779"/>
 							<int key="NSButtonFlags">109199615</int>
 							<int key="NSButtonFlags2">129</int>
 							<string key="NSAlternateContents"/>
 							<string key="NSKeyEquivalent"/>
 							<int key="NSPeriodicDelay">400</int>
 							<int key="NSPeriodicInterval">75</int>
-							<object class="NSMenuItem" key="NSMenuItem" id="121411742">
-								<reference key="NSMenu" ref="847827596"/>
+							<object class="NSMenuItem" key="NSMenuItem" id="40677514">
+								<reference key="NSMenu" ref="726754500"/>
 								<string key="NSTitle">HTTP</string>
 								<string key="NSKeyEquiv"/>
 								<int key="NSKeyEquivModMask">1048576</int>
@@ -2999,16 +3021,16 @@ AAABAAAAAQ</bytes>
 								<reference key="NSOnImage" ref="550412468"/>
 								<reference key="NSMixedImage" ref="32510707"/>
 								<string key="NSAction">_popUpItemAction:</string>
-								<reference key="NSTarget" ref="512042046"/>
+								<reference key="NSTarget" ref="11922055"/>
 							</object>
 							<bool key="NSMenuItemRespectAlignment">YES</bool>
-							<object class="NSMenu" key="NSMenu" id="847827596">
+							<object class="NSMenu" key="NSMenu" id="726754500">
 								<string key="NSTitle">OtherViews</string>
 								<object class="NSMutableArray" key="NSMenuItems">
 									<bool key="EncodedWithXMLCoder">YES</bool>
-									<reference ref="121411742"/>
-									<object class="NSMenuItem" id="37580132">
-										<reference key="NSMenu" ref="847827596"/>
+									<reference ref="40677514"/>
+									<object class="NSMenuItem" id="73788575">
+										<reference key="NSMenu" ref="726754500"/>
 										<string key="NSTitle">SOCKS4</string>
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
@@ -3016,10 +3038,10 @@ AAABAAAAAQ</bytes>
 										<reference key="NSOnImage" ref="550412468"/>
 										<reference key="NSMixedImage" ref="32510707"/>
 										<string key="NSAction">_popUpItemAction:</string>
-										<reference key="NSTarget" ref="512042046"/>
+										<reference key="NSTarget" ref="11922055"/>
 									</object>
-									<object class="NSMenuItem" id="935614302">
-										<reference key="NSMenu" ref="847827596"/>
+									<object class="NSMenuItem" id="267615296">
+										<reference key="NSMenu" ref="726754500"/>
 										<string key="NSTitle">SOCKS5</string>
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
@@ -3027,7 +3049,7 @@ AAABAAAAAQ</bytes>
 										<reference key="NSOnImage" ref="550412468"/>
 										<reference key="NSMixedImage" ref="32510707"/>
 										<string key="NSAction">_popUpItemAction:</string>
-										<reference key="NSTarget" ref="512042046"/>
+										<reference key="NSTarget" ref="11922055"/>
 									</object>
 								</object>
 							</object>
@@ -5926,7 +5948,7 @@ AAABAAAAAQ</bytes>
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">fProxyTypePopUp</string>
 						<reference key="source" ref="511492310"/>
-						<reference key="destination" ref="682100624"/>
+						<reference key="destination" ref="325780779"/>
 					</object>
 					<int key="connectionID">1669</int>
 				</object>
@@ -5934,17 +5956,17 @@ AAABAAAAAQ</bytes>
 					<object class="IBActionConnection" key="connection">
 						<string key="label">setProxyType:</string>
 						<reference key="source" ref="511492310"/>
-						<reference key="destination" ref="682100624"/>
+						<reference key="destination" ref="325780779"/>
 					</object>
 					<int key="connectionID">1670</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">enabled: values.Proxy</string>
-						<reference key="source" ref="682100624"/>
+						<reference key="source" ref="325780779"/>
 						<reference key="destination" ref="356871564"/>
 						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="682100624"/>
+							<reference key="NSSource" ref="325780779"/>
 							<reference key="NSDestination" ref="356871564"/>
 							<string key="NSLabel">enabled: values.Proxy</string>
 							<string key="NSBinding">enabled</string>
@@ -6458,7 +6480,7 @@ AAABAAAAAQ</bytes>
 							<reference ref="1043027599"/>
 							<reference ref="876018656"/>
 							<reference ref="995948995"/>
-							<reference ref="682100624"/>
+							<reference ref="325780779"/>
 						</object>
 						<reference key="parent" ref="37013934"/>
 						<string key="objectName">Network</string>
@@ -8189,47 +8211,47 @@ AAABAAAAAQ</bytes>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1663</int>
-						<reference key="object" ref="682100624"/>
+						<reference key="object" ref="325780779"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="512042046"/>
+							<reference ref="11922055"/>
 						</object>
 						<reference key="parent" ref="204700639"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1664</int>
-						<reference key="object" ref="512042046"/>
+						<reference key="object" ref="11922055"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="847827596"/>
+							<reference ref="726754500"/>
 						</object>
-						<reference key="parent" ref="682100624"/>
+						<reference key="parent" ref="325780779"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1665</int>
-						<reference key="object" ref="847827596"/>
+						<reference key="object" ref="726754500"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="121411742"/>
-							<reference ref="37580132"/>
-							<reference ref="935614302"/>
+							<reference ref="40677514"/>
+							<reference ref="73788575"/>
+							<reference ref="267615296"/>
 						</object>
-						<reference key="parent" ref="512042046"/>
+						<reference key="parent" ref="11922055"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1666</int>
-						<reference key="object" ref="121411742"/>
-						<reference key="parent" ref="847827596"/>
+						<reference key="object" ref="40677514"/>
+						<reference key="parent" ref="726754500"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1667</int>
-						<reference key="object" ref="37580132"/>
-						<reference key="parent" ref="847827596"/>
+						<reference key="object" ref="73788575"/>
+						<reference key="parent" ref="726754500"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1668</int>
-						<reference key="object" ref="935614302"/>
-						<reference key="parent" ref="847827596"/>
+						<reference key="object" ref="267615296"/>
+						<reference key="parent" ref="726754500"/>
 					</object>
 				</object>
 			</object>
