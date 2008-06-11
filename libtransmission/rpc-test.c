@@ -30,7 +30,7 @@ testWildcard( const char * in, const char * expected )
 {
     int ok;
     char * str = cidrize( in );
-/*fprintf( stderr, "in [%s] out [%s] should be [%s]\n", in, str, expected );*/
+fprintf( stderr, "in [%s] out [%s] should be [%s]\n", in, str, expected );
     ok = expected ? !strcmp( expected, str ) : !str;
     tr_free( str );
     return ok;
@@ -46,7 +46,7 @@ test_acl( void )
     check( testWildcard( "192.64.*.*", "192.64.0.0/16" ) );
     check( testWildcard( "192.64.0.*", "192.64.0.0/24" ) );
     check( testWildcard( "192.64.0.1", "192.64.0.1/32" ) );
-    check( testWildcard( "+192.*.*.*, -192.64.*.*", "+192.0.0.0/8, -192.64.0.0/16" ) );
+    check( testWildcard( "+192.*.*.*,-192.64.*.*", "+192.0.0.0/8,-192.64.0.0/16" ) );
 
     err = tr_rpcTestACL( NULL, "+192.*.*.*", &errmsg );
     check( !err );
@@ -56,7 +56,7 @@ test_acl( void )
     check( errmsg );
     tr_free( errmsg );
     errmsg = NULL;
-    err = tr_rpcTestACL( NULL, "+192.*.*.*, -192.168.*.*", &errmsg );
+    err = tr_rpcTestACL( NULL, "+192.*.*.*,-192.168.*.*", &errmsg );
     check( !err );
     check( !errmsg );
 

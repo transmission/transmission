@@ -310,8 +310,8 @@ cidrize( const char * acl )
         evbuffer_add_printf( out, "," );
     }
 
-    /* the -2 is to eat the final ", " */
-    ret = tr_strndup( (char*) EVBUFFER_DATA(out), EVBUFFER_LENGTH(out)-2 );
+    /* the -1 is to eat the final ", " */
+    ret = tr_strndup( (char*) EVBUFFER_DATA(out), EVBUFFER_LENGTH(out)-1 );
     evbuffer_free( out );
     return ret;
 }
