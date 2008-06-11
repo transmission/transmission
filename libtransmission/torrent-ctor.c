@@ -207,8 +207,13 @@ tr_ctorSetDownloadDir( tr_ctor        * ctor,
                        const char     * directory )
 {
     struct optional_args * args = &ctor->optionalArgs[mode];
-    args->isSet_downloadDir = 1;
-    tr_strlcpy( args->downloadDir, directory, sizeof( args->downloadDir ) );
+    if( directory ) {
+        args->isSet_downloadDir = 1;
+        tr_strlcpy( args->downloadDir, directory, sizeof( args->downloadDir ) );
+    } else {
+        args->isSet_downloadDir = 0;
+        *args->downloadDir = '\0';
+    }
 }
 
 int
