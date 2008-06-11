@@ -892,6 +892,7 @@ remotePage( GObject * core )
 
 struct ProxyPage
 {
+    TrCore * core;
     GSList * proxy_widgets;
     GSList * proxy_auth_widgets;
 };
@@ -926,6 +927,33 @@ proxyPageFree( gpointer gpage )
     g_free( page );
 }
 
+static GtkTreeModel*
+proxyTypeModelNew( void )
+{
+    GtkTreeIter iter;
+    GtkListStore * store = gtk_list_store_new( 2, G_TYPE_STRING, G_TYPE_INT );
+    gtk_list_store_append( store, &iter );
+    gtk_list_store_set( store, &iter, 0, _( "HTTP" ), 1, TR_PROXY_HTTP, -1 );
+    gtk_list_store_append( store, &iter );
+    gtk_list_store_set( store, &iter, 0, _( "SOCKS4" ), 1, TR_PROXY_SOCKS4, -1 );
+    gtk_list_store_append( store, &iter );
+    gtk_list_store_set( store, &iter, 0, _( "SOCKS5" ), 1, TR_PROXY_SOCKS5, -1 );
+    return GTK_TREE_MODEL( store );
+}
+
+static void
+onProxyTypeChanged( GtkComboBox * w, gpointer gpage )
+{
+    GtkTreeIter iter;
+    if( gtk_combo_box_get_active_iter( w, &iter ) )
+    {
+        struct ProxyPage * page = gpage;
+        int type = TR_PROXY_HTTP;
+        gtk_tree_model_get( gtk_combo_box_get_model( w ), &iter, 1, &type, -1 );
+        tr_core_set_pref_int( TR_CORE( page->core ), PREF_KEY_PROXY_TYPE, type );
+    }
+}
+
 static GtkWidget*
 networkPage( GObject * core )
 {
@@ -933,10 +961,13 @@ networkPage( GObject * core )
     const char * s;
     GtkWidget * t;
     GtkWidget * w, * w2;
+    GtkTreeModel * m;
+    GtkCellRenderer * r;
     struct ProxyPage * page = tr_new0( struct ProxyPage, 1 );
 
-    t = hig_workarea_create( );
+    page->core = TR_CORE( core );
 
+    t = hig_workarea_create( );
     hig_workarea_add_section_title (t, &row, _( "Router" ) );
 
         s = _("Use port _forwarding from my router" );
@@ -970,6 +1001,19 @@ networkPage( GObject * core )
 
         s = _( "Proxy server:" );
         w = new_entry( PREF_KEY_PROXY_SERVER, core );
+        page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
+        w = hig_workarea_add_row( t, &row, s, w, NULL );
+        page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
+
+        s = _( "Proxy type:" );
+        m = proxyTypeModelNew( );
+        w = gtk_combo_box_new_with_model( m );
+        r = gtk_cell_renderer_text_new( );
+        gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
+        gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 0, NULL );
+        gtk_combo_box_set_active( GTK_COMBO_BOX( w ), pref_int_get( PREF_KEY_PROXY_TYPE ) );
+        g_signal_connect( w, "changed", G_CALLBACK(onProxyTypeChanged), NULL );
+        g_object_unref( G_OBJECT( m ) );
         page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
         w = hig_workarea_add_row( t, &row, s, w, NULL );
         page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
