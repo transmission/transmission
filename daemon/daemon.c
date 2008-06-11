@@ -58,7 +58,6 @@ static void
 saveState( tr_session * s )
 {
     tr_benc d;
-fprintf( stderr, "tr_sessionGetDownloadDir(s) returned [%s]\n", tr_sessionGetDownloadDir(s));
     tr_bencInitDict( &d, 16 );
     tr_bencDictAddInt( &d, KEY_BLOCKLIST,        tr_blocklistIsEnabled( s ) );
     tr_bencDictAddStr( &d, KEY_DOWNLOAD_DIR,     tr_sessionGetDownloadDir( s ) );
@@ -77,7 +76,6 @@ fprintf( stderr, "tr_sessionGetDownloadDir(s) returned [%s]\n", tr_sessionGetDow
     tr_bencDictAddInt( &d, KEY_USPEED_ENABLED,   tr_sessionIsSpeedLimitEnabled( s, TR_UP ) );
     tr_bencDictAddStr( &d, KEY_ENCRYPTION,       encryption_str[tr_sessionGetEncryption( s )] );
     tr_bencSaveJSONFile( myConfigFilename, &d );
-fprintf( stderr, "saved:\n%s\n", tr_bencSaveAsJSON(&d,NULL) );
     tr_bencFree( &d );
     tr_ninf( MY_NAME, "saved \"%s\"", myConfigFilename );
 }
@@ -184,7 +182,6 @@ session_init( const char * configDir, const char * downloadDir,
             tr_bencDictFindStr( &state, KEY_DOWNLOAD_DIR, &downloadDir );
         if( !downloadDir ) {
             getcwd( mycwd, sizeof( mycwd ) );
-            fprintf( stderr, "cwd is [%s]\n", mycwd );
             downloadDir = mycwd;
         }
     }
