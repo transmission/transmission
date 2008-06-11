@@ -168,8 +168,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (fFileStat)
         tr_torrentFilesFree(fFileStat, [self fileCount]);
     
-    tr_free(fPreviousFinishedPieces);
-    [fFinishedPiecesDate release];
+    [fPreviousFinishedIndexes release];
+    [fPreviousFinishedIndexesDate release];
     
     [fNameString release];
     [fHashString release];
@@ -239,22 +239,22 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     tr_torrentAmountFinished(fHandle, tab, size);
 }
 
-- (float *) getPreviousAmountFinished
+- (NSIndexSet *) previousFinishedPieces
 {
-    //if the torrent hasn't been seen in a bit, and therefore hasn't been refreshed, return NULL
-    if (fFinishedPiecesDate && [fFinishedPiecesDate timeIntervalSinceNow] > -2.0)
-        return fPreviousFinishedPieces;
+    //if the torrent hasn't been seen in a bit, and therefore hasn't been refreshed, return nil
+    if (fPreviousFinishedIndexesDate && [fPreviousFinishedIndexesDate timeIntervalSinceNow] > -2.0)
+        return fPreviousFinishedIndexes;
     else
-        return NULL;
+        return nil;
 }
 
--(void) setPreviousAmountFinished: (float *) tab
+-(void) setPreviousFinishedPieces: (NSIndexSet *) indexes
 {
-    tr_free(fPreviousFinishedPieces);
-    fPreviousFinishedPieces = tab;
+    [fPreviousFinishedIndexes release];
+    fPreviousFinishedIndexes = [indexes retain];
     
-    [fFinishedPiecesDate release];
-    fFinishedPiecesDate = tab != NULL ? [[NSDate alloc] init] : nil;
+    [fPreviousFinishedIndexesDate release];
+    fPreviousFinishedIndexesDate = indexes != nil ? [[NSDate alloc] init] : nil;
 }
 
 #warning when queue and seeding options are folded into libt, no need to call this on all torrents - use tr_torrentGetStatus

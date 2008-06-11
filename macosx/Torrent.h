@@ -57,8 +57,8 @@ typedef enum
     tr_file_stat * fFileStat;
     NSArray * fFileList;
     
-    float * fPreviousFinishedPieces;
-    NSDate * fFinishedPiecesDate;
+    NSIndexSet * fPreviousFinishedIndexes;
+    NSDate * fPreviousFinishedIndexesDate;
     
     float fRatioLimit;
     int fRatioSetting;
@@ -87,8 +87,8 @@ typedef enum
 
 - (void) getAvailability: (int8_t *) tab size: (int) size;
 - (void) getAmountFinished: (float *) tab size: (int) size;
-- (float *) getPreviousAmountFinished;
--(void) setPreviousAmountFinished: (float *) tab;
+- (NSIndexSet *) previousFinishedPieces;
+-(void) setPreviousFinishedPieces: (NSIndexSet *) indexes;
 
 - (void) update;
 

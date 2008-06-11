@@ -589,7 +589,7 @@
     }
     else
     {
-        [[self representedObject] setPreviousAmountFinished: NULL];
+        [[self representedObject] setPreviousFinishedPieces: nil];
         
         [self drawRegularBar: barRect];
     }
@@ -735,20 +735,28 @@
     Torrent * torrent = [self representedObject];
     
     int pieceCount = MIN([torrent pieceCount], MAX_PIECES);
-    float * piecesPercent = malloc(pieceCount * sizeof(float)),
-        * previousPiecePercent = [torrent getPreviousAmountFinished];
+    float * piecesPercent = malloc(pieceCount * sizeof(float));
     [torrent getAmountFinished: piecesPercent size: pieceCount];
     
     NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
                                     pixelsWide: pieceCount pixelsHigh: 1 bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
                                     isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
     
+    NSIndexSet * previousFinishedIndexes = [torrent previousFinishedPieces];
+    NSMutableIndexSet * finishedIndexes = [NSMutableIndexSet indexSet];
+    
     int i;
     for (i = 0; i < pieceCount; i++)
     {
         NSColor * pieceColor;
-        if (piecesPercent[i] == 1.0 && previousPiecePercent != NULL && previousPiecePercent[i] < 1.0)
-            pieceColor = [NSColor orangeColor];
+        if (piecesPercent[i] == 1.0)
+        {
+            if (previousFinishedIndexes && ![previousFinishedIndexes containsIndex: i])
+                pieceColor = [NSColor orangeColor];
+            else
+                pieceColor = fBluePieceColor;
+            [finishedIndexes addIndex: i];
+        }
         else
             pieceColor = [[NSColor whiteColor] blendedColorWithFraction: piecesPercent[i] ofColor: fBluePieceColor];
         
@@ -756,11 +764,12 @@
         [bitmap setColor: pieceColor atX: i y: 0];
     }
     
-    [torrent setPreviousAmountFinished: piecesPercent]; //holds onto piecePercent, so no need to release it here
+    free(piecesPercent);
+    
+    [torrent setPreviousFinishedPieces: [finishedIndexes count] > 0 ? finishedIndexes : nil]; //don't bother saving if none are complete
     
     //actually draw image
     [bitmap drawInRect: barRect];
-    
     [bitmap release];
 }
 

@@ -2003,7 +2003,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [previousTorrents removeObjectsInArray: allTorrents];
     enumerator = [previousTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
-        [torrent setPreviousAmountFinished: NULL];
+        [torrent setPreviousFinishedPieces: nil];
     
     //place torrents into groups
     BOOL groupRows = [fDefaults boolForKey: @"SortByGroup"] && [NSApp isOnLeopardOrBetter];
