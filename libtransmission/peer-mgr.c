@@ -768,6 +768,15 @@ gotBadPiece( Torrent * t, tr_piece_index_t pieceIndex )
 }
 
 static void
+refillSoon( Torrent * t )
+{
+    if( t->refillTimer == NULL )
+        t->refillTimer = tr_timerNew( t->manager->handle,
+                                      refillPulse, t,
+                                      REFILL_PERIOD_MSEC );
+}
+
+static void
 peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 {
     tr_peer * peer = vpeer; /* may be NULL if peer is a webseed */
@@ -779,10 +788,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
     switch( e->eventType )
     {
         case TR_PEER_NEED_REQ:
-            if( t->refillTimer == NULL )
-                t->refillTimer = tr_timerNew( t->manager->handle,
-                                              refillPulse, t,
-                                              REFILL_PERIOD_MSEC );
+            refillSoon( t );
             break;
 
         case TR_PEER_CANCEL:
@@ -1208,6 +1214,9 @@ tr_peerMgrStartTorrent( tr_peerMgr     * manager,
         reconnectPulse( t );
 
         rechokePulse( t );
+
+        if( !tr_ptrArrayEmpty( t->webseeds ) )
+            refillSoon( t );
     }
 
     managerUnlock( manager );
@@ -1407,7 +1416,7 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
             ++*setmeSeedsConnected;
     }
 
-    webseeds = (const tr_webseed **) tr_ptrArrayPeek( t->peers, &size );
+    webseeds = (const tr_webseed **) tr_ptrArrayPeek( t->webseeds, &size );
     for( i=0; i<size; ++i )
     {
         if( tr_webseedIsActive( webseeds[i] ) )
