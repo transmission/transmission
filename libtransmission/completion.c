@@ -228,7 +228,7 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * bitfield )
     assert( bitfield );
     assert( cp->blockBitfield );
 
-    if( !cp || !tr_bitfieldTestFast( bitfield, cp->tor->blockCount ) )
+    if( !tr_bitfieldTestFast( bitfield, cp->tor->blockCount-1 ) )
         return TR_ERROR_ASSERT;
 
     tr_cpReset( cp );
