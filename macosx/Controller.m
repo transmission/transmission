@@ -1209,8 +1209,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     enumerator = [torrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
-        #warning redo, since now can be removed through rpc
-        //expand the group, since either the whole group is being removed, it is already expanded, or not showing groups
+        //let's expand all groups that have removed items - they either don't exist anymore, are already expanded, or are collapsed (rpc)
         [fTableView removeCollapsedGroup: [torrent groupValue]];
         
         if (deleteData)
