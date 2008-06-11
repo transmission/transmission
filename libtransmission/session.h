@@ -74,6 +74,7 @@ struct tr_handle
     char                       * resumeDir;
     char                       * torrentDir;
 
+    tr_proxy_type                proxyType;
     char                       * proxy;
     char                       * proxyUsername;
     char                       * proxyPassword;

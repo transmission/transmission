@@ -94,6 +94,14 @@ typedef tr_handle tr_session;
  * @{
  */
 
+typedef enum
+{
+  TR_PROXY_HTTP,
+  TR_PROXY_SOCKS4,
+  TR_PROXY_SOCKS5
+}
+tr_proxy_type;
+
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_CONFIG_DIR               tr_getDefaultConfigDir()
 /** @see tr_sessionInitFull */
@@ -120,6 +128,8 @@ typedef tr_handle tr_session;
 #define TR_DEFAULT_PROXY_ENABLED            0
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PROXY                    NULL
+/** @see tr_sessionInitFull */
+#define TR_DEFAULT_PROXY_TYPE               TR_PROXY_HTTP
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PROXY_AUTH_ENABLED       0
 /** @see tr_sessionInitFull */
@@ -223,33 +233,34 @@ typedef tr_handle tr_session;
  * @see TR_DEFAULT_RPC_ACL
  * @see tr_sessionClose()
  */
-tr_handle * tr_sessionInitFull( const char  * configDir,
-                                const char  * tag,
-                                const char  * downloadDir,
-                                int           isPexEnabled,
-                                int           isPortForwardingEnabled,
-                                int           publicPort,
-                                int           encryptionMode,
-                                int           isUploadLimitEnabled,
-                                int           uploadLimit,
-                                int           isDownloadLimitEnabled,
-                                int           downloadLimit,
-                                int           peerLimit,
-                                int           messageLevel,
-                                int           isMessageQueueingEnabled,
-                                int           isBlocklistEnabled,
-                                int           peerSocketTOS,
-                                int           rpcIsEnabled,
-                                int           rpcPort,
-                                const char  * rpcAccessControlList,
-                                int           rpcPasswordIsEnabled,
-                                const char  * rpcUsername,
-                                const char  * rpcPassword, 
-                                int           proxyIsEnabled,
-                                const char  * proxy,
-                                int           proxyAuthIsEnabled,
-                                const char  * proxyUsername,
-                                const char  * proxyPassword );
+tr_handle * tr_sessionInitFull( const char    * configDir,
+                                const char    * tag,
+                                const char    * downloadDir,
+                                int             isPexEnabled,
+                                int             isPortForwardingEnabled,
+                                int             publicPort,
+                                int             encryptionMode,
+                                int             isUploadLimitEnabled,
+                                int             uploadLimit,
+                                int             isDownloadLimitEnabled,
+                                int             downloadLimit,
+                                int             peerLimit,
+                                int             messageLevel,
+                                int             isMessageQueueingEnabled,
+                                int             isBlocklistEnabled,
+                                int             peerSocketTOS,
+                                int             rpcIsEnabled,
+                                int             rpcPort,
+                                const char    * rpcAccessControlList,
+                                int             rpcPasswordIsEnabled,
+                                const char    * rpcUsername,
+                                const char    * rpcPassword, 
+                                int             proxyIsEnabled,
+                                const char    * proxy,
+                                tr_proxy_type   proxyType,
+                                int             proxyAuthIsEnabled,
+                                const char    * proxyUsername,
+                                const char    * proxyPassword );
 
 
 /** @brief Shorter form of tr_sessionInitFull()
@@ -409,16 +420,17 @@ void tr_sessionSetRPCCallback( tr_session   * handle,
 ***
 **/
 
-int         tr_sessionIsProxyEnabled       ( const tr_session * );
-int         tr_sessionIsProxyAuthEnabled   ( const tr_session * );
-const char* tr_sessionGetProxy             ( const tr_session * );
-const char* tr_sessionGetProxyUsername     ( const tr_session * );
-const char* tr_sessionGetProxyPassword     ( const tr_session * );
-void        tr_sessionSetProxyEnabled      ( tr_session *, int isEnabled );
-void        tr_sessionSetProxyAuthEnabled  ( tr_session *, int isEnabled );
-void        tr_sessionSetProxy             ( tr_session *, const char * proxy );
-void        tr_sessionSetProxyUsername     ( tr_session *, const char * username );
-void        tr_sessionSetProxyPassword     ( tr_session *, const char * password );
+int           tr_sessionIsProxyEnabled       ( const tr_session * );
+int           tr_sessionIsProxyAuthEnabled   ( const tr_session * );
+const char*   tr_sessionGetProxy             ( const tr_session * );
+tr_proxy_type tr_sessionGetProxyType         ( const tr_session * );
+const char*   tr_sessionGetProxyPassword     ( const tr_session * );
+void          tr_sessionSetProxyEnabled      ( tr_session *, int isEnabled );
+void          tr_sessionSetProxyAuthEnabled  ( tr_session *, int isEnabled );
+void          tr_sessionSetProxy             ( tr_session *, const char * proxy );
+void          tr_sessionSetProxyType         ( tr_session *, tr_proxy_type );
+void          tr_sessionSetProxyUsername     ( tr_session *, const char * username );
+void          tr_sessionSetProxyPassword     ( tr_session *, const char * password );
 
 /**
 ***

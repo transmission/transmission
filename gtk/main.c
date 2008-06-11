@@ -434,6 +434,7 @@ main( int argc, char ** argv )
                             pref_string_get( PREF_KEY_RPC_PASSWORD ),
                             pref_flag_get( PREF_KEY_PROXY_SERVER_ENABLED ),
                             pref_string_get( PREF_KEY_PROXY_SERVER ),
+                            pref_int_get( PREF_KEY_PROXY_TYPE ),
                             pref_flag_get( PREF_KEY_PROXY_AUTH_ENABLED ),
                             pref_string_get( PREF_KEY_PROXY_USERNAME ),
                             pref_string_get( PREF_KEY_PROXY_PASSWORD ) );
@@ -978,6 +979,11 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
         char * s = pref_string_get( key );
         tr_sessionSetProxy( tr, s );
         g_free( s );
+    }
+    else if( !strcmp( key, PREF_KEY_PROXY_TYPE ) )
+    {
+        int i = pref_int_get( key );
+        tr_sessionSetProxyType( tr, i );
     }
     else if( !strcmp( key, PREF_KEY_PROXY_SERVER_ENABLED ) )
     {

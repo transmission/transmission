@@ -62,6 +62,7 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_RPC_USERNAME           "rpc-username"
 #define PREF_KEY_PROXY_SERVER           "proxy-server"
 #define PREF_KEY_PROXY_SERVER_ENABLED   "proxy-server-enabled"
+#define PREF_KEY_PROXY_TYPE             "proxy-type"
 #define PREF_KEY_PROXY_AUTH_ENABLED     "proxy-authentication-required"
 #define PREF_KEY_PROXY_USERNAME         "proxy-username"
 #define PREF_KEY_PROXY_PASSWORD         "proxy-authentication"

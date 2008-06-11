@@ -78,6 +78,7 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_Y, 50 );
 
     pref_string_set_default ( PREF_KEY_PROXY_SERVER, "" );
+    pref_int_set_default    ( PREF_KEY_PROXY_TYPE, TR_PROXY_HTTP );
     pref_flag_set_default   ( PREF_KEY_PROXY_SERVER_ENABLED, FALSE );
     pref_flag_set_default   ( PREF_KEY_PROXY_AUTH_ENABLED, FALSE );
     pref_string_set_default ( PREF_KEY_PROXY_USERNAME, "" );

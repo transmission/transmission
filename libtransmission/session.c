@@ -184,33 +184,34 @@ loadBlocklists( tr_session * session )
 static void metainfoLookupRescan( tr_handle * h );
 
 tr_handle *
-tr_sessionInitFull( const char  * configDir,
-                    const char  * tag,
-                    const char  * downloadDir,
-                    int           isPexEnabled,
-                    int           isPortForwardingEnabled,
-                    int           publicPort,
-                    int           encryptionMode,
-                    int           isUploadLimitEnabled,
-                    int           uploadLimit,
-                    int           isDownloadLimitEnabled,
-                    int           downloadLimit,
-                    int           globalPeerLimit,
-                    int           messageLevel,
-                    int           isMessageQueueingEnabled,
-                    int           isBlocklistEnabled,
-                    int           peerSocketTOS,
-                    int           rpcIsEnabled,
-                    int           rpcPort,
-                    const char  * rpcACL,
-                    int           rpcAuthIsEnabled,
-                    const char  * rpcUsername,
-                    const char  * rpcPassword,
-                    int           proxyIsEnabled,
-                    const char  * proxy,
-                    int           proxyAuthIsEnabled,
-                    const char  * proxyUsername,
-                    const char  * proxyPassword )
+tr_sessionInitFull( const char    * configDir,
+                    const char    * tag,
+                    const char    * downloadDir,
+                    int             isPexEnabled,
+                    int             isPortForwardingEnabled,
+                    int               publicPort,
+                    int             encryptionMode,
+                    int             isUploadLimitEnabled,
+                    int             uploadLimit,
+                    int             isDownloadLimitEnabled,
+                    int             downloadLimit,
+                    int             globalPeerLimit,
+                    int             messageLevel,
+                    int             isMessageQueueingEnabled,
+                    int             isBlocklistEnabled,
+                    int             peerSocketTOS,
+                    int             rpcIsEnabled,
+                    int             rpcPort,
+                    const char    * rpcACL,
+                    int             rpcAuthIsEnabled,
+                    const char    * rpcUsername,
+                    const char    * rpcPassword,
+                    int             proxyIsEnabled,
+                    const char    * proxy,
+                    tr_proxy_type   proxyType,
+                    int             proxyAuthIsEnabled,
+                    const char    * proxyUsername,
+                    const char    * proxyPassword )
 {
     tr_handle * h;
     char filename[MAX_PATH_LENGTH];
@@ -235,6 +236,7 @@ tr_sessionInitFull( const char  * configDir,
     h->downloadDir = tr_strdup( downloadDir );
     h->isProxyEnabled = proxyIsEnabled ? 1 : 0;
     h->proxy = tr_strdup( proxy );
+    h->proxyType = proxyType;
     h->isProxyAuthEnabled = proxyAuthIsEnabled ? 1 : 0;
     h->proxyUsername = tr_strdup( proxyUsername );
     h->proxyPassword = tr_strdup( proxyPassword );
@@ -314,6 +316,7 @@ tr_sessionInit( const char * configDir,
                                "potzrebie",
                                TR_DEFAULT_PROXY_ENABLED,
                                TR_DEFAULT_PROXY,
+                               TR_DEFAULT_PROXY_TYPE,
                                TR_DEFAULT_PROXY_AUTH_ENABLED,
                                TR_DEFAULT_PROXY_USERNAME,
                                TR_DEFAULT_PROXY_PASSWORD );
@@ -957,6 +960,16 @@ void
 tr_sessionSetProxyEnabled( tr_session * session, int isEnabled )
 {
     session->isProxyEnabled = isEnabled ? 1 : 0;
+}
+tr_proxy_type
+tr_sessionGetProxyType( const tr_session * session )
+{
+    return session->proxyType;
+}
+void
+tr_sessionSetProxyType( tr_session * session, tr_proxy_type type )
+{
+    session->proxyType = type;
 }
 const char*
 tr_sessionGetProxy( const tr_session * session )

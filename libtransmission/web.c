@@ -128,6 +128,19 @@ ensureTimerIsRunning( tr_web * web )
     }
 }
 
+static int
+getCurlProxyType( tr_proxy_type t )
+{
+    switch( t )
+    {
+        case TR_PROXY_SOCKS4: return CURLPROXY_SOCKS4;
+        case TR_PROXY_SOCKS5: return CURLPROXY_SOCKS5;
+        default:              return CURLPROXY_HTTP;
+    }
+}
+
+
+
 static void
 addTask( void * vtask )
 {
@@ -148,6 +161,7 @@ addTask( void * vtask )
 
         if( !task->range && session->isProxyEnabled ) {
             curl_easy_setopt( ch, CURLOPT_PROXY, session->proxy );
+            curl_easy_setopt( ch, CURLOPT_PROXYTYPE, getCurlProxyType( session->proxyType ) );
             curl_easy_setopt( ch, CURLOPT_PROXYAUTH, CURLAUTH_ANY );
         }
         if( !task->range && session->isProxyAuthEnabled ) {

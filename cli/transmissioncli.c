@@ -182,6 +182,7 @@ main( int argc, char ** argv )
             FALSE, "fnord", "potzrebie",
             TR_DEFAULT_PROXY_ENABLED,
             TR_DEFAULT_PROXY,
+            TR_DEFAULT_PROXY_TYPE,
             TR_DEFAULT_PROXY_AUTH_ENABLED,
             TR_DEFAULT_PROXY_USERNAME,
             TR_DEFAULT_PROXY_PASSWORD );
