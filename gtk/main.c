@@ -982,8 +982,7 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     }
     else if( !strcmp( key, PREF_KEY_PROXY_TYPE ) )
     {
-        int i = pref_int_get( key );
-g_message( "new type is %d", i );
+        const int i = pref_int_get( key );
         tr_sessionSetProxyType( tr, i );
     }
     else if( !strcmp( key, PREF_KEY_PROXY_SERVER_ENABLED ) )

@@ -1012,7 +1012,7 @@ networkPage( GObject * core )
         gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
         gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 0, NULL );
         gtk_combo_box_set_active( GTK_COMBO_BOX( w ), pref_int_get( PREF_KEY_PROXY_TYPE ) );
-        g_signal_connect( w, "changed", G_CALLBACK(onProxyTypeChanged), NULL );
+        g_signal_connect( w, "changed", G_CALLBACK(onProxyTypeChanged), page );
         g_object_unref( G_OBJECT( m ) );
         page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
         w = hig_workarea_add_row( t, &row, s, w, NULL );
