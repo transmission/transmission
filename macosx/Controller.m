@@ -3694,8 +3694,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return NO;
     }
     
-    #warning hide queue options if all queues are disabled?
-    
     //enable resume all waiting item
     if (action == @selector(resumeWaitingTorrents:))
     {

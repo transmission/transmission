@@ -1153,7 +1153,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 {
                     NSString * webSeedString;
                     if (webSeedCount == 1)
-                        webSeedString = NSLocalizedString(@"web seed", "Torrent -> status string");
+                        webSeedString = NSLocalizedString(@"1 web seed", "Torrent -> status string");
                     else
                         webSeedString = [NSString stringWithFormat: NSLocalizedString(@"%d web seeds", "Torrent -> status string"),
                                                                     webSeedCount];
