@@ -33,6 +33,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "json.h"
 #include "list.h"
 #include "ptrarray.h"
 #include "utils.h" /* tr_new(), tr_free() */
@@ -1221,12 +1222,10 @@ tr_bencSaveAsJSON( const tr_benc * top, int * len )
 ****
 ***/
 
-int
-tr_bencSaveFile( const char * filename,  const tr_benc * b )
+static int
+saveFile( const char * filename, const char * content, size_t len )
 {
     int err = TR_OK;
-    int len;
-    char * content = tr_bencSave( b, &len );
     FILE * out = NULL;
 
     out = fopen( filename, "wb+" );
@@ -1245,9 +1244,18 @@ tr_bencSaveFile( const char * filename,  const tr_benc * b )
 
     if( !err )
         tr_dbg( "tr_bencSaveFile saved \"%s\"", filename );
-    tr_free( content );
     if( out )
         fclose( out );
+    return err;
+}
+
+int
+tr_bencSaveFile( const char * filename,  const tr_benc * b )
+{
+    int len;
+    char * content = tr_bencSave( b, &len );
+    const int err = saveFile( filename, content, len );
+    tr_free( content );
     return err;
 }
 
@@ -1258,6 +1266,28 @@ tr_bencLoadFile( const char * filename, tr_benc * b )
     size_t contentLen;
     uint8_t * content = tr_loadFile( filename, &contentLen );
     ret = content ? tr_bencLoad( content, contentLen, b, NULL )
+                  : TR_ERROR_IO_OTHER;
+    tr_free( content );
+    return ret;
+}
+
+int
+tr_bencSaveJSONFile( const char * filename, const tr_benc * b )
+{
+    int len;
+    char * content = tr_bencSaveAsJSON( b, &len );
+    const int err = saveFile( filename, content, len );
+    tr_free( content );
+    return err;
+}
+
+int
+tr_bencLoadJSONFile( const char * filename, tr_benc * b )
+{
+    int ret;
+    size_t contentLen;
+    uint8_t * content = tr_loadFile( filename, &contentLen );
+    ret = content ? tr_jsonParse( content, contentLen, b, NULL )
                   : TR_ERROR_IO_OTHER;
     tr_free( content );
     return ret;

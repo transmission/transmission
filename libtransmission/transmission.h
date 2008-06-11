@@ -224,8 +224,8 @@ typedef tr_handle tr_session;
  * @see tr_sessionClose()
  */
 tr_handle * tr_sessionInitFull( const char  * configDir,
-                                const char  * downloadDir,
                                 const char  * tag,
+                                const char  * downloadDir,
                                 int           isPexEnabled,
                                 int           isPortForwardingEnabled,
                                 int           publicPort,

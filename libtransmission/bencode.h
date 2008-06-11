@@ -112,10 +112,12 @@ tr_benc    * tr_bencDictAddDict( tr_benc * dict, const char * key, int reserveCo
 tr_benc    * tr_bencDictAddRaw( tr_benc * dict, const char * key, const void *, size_t len );
 int          tr_bencDictRemove( tr_benc * dict, const char * key );
 
-char*  tr_bencSave( const tr_benc * val, int * len );
-char*  tr_bencSaveAsJSON( const tr_benc * top, int * len );
-int    tr_bencSaveFile( const char * filename, const tr_benc * );
-int    tr_bencLoadFile( const char * filename, tr_benc * );
+char*  tr_bencSave         ( const tr_benc * val, int * len );
+char*  tr_bencSaveAsJSON   ( const tr_benc * top, int * len );
+int    tr_bencSaveFile     ( const char * filename, const tr_benc * );
+int    tr_bencSaveJSONFile ( const char * filename, const tr_benc * );
+int    tr_bencLoadFile     ( const char * filename, tr_benc * );
+int    tr_bencLoadJSONFile ( const char * filename, tr_benc * );
 
 int tr_bencGetInt( const tr_benc * val, int64_t * setme );
 int tr_bencGetStr( const tr_benc * val, const char ** setme );

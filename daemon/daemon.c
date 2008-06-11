@@ -33,71 +33,70 @@ static int closing = FALSE;
 static tr_handle * mySession;
 static char myConfigFilename[MAX_PATH_LENGTH];
 
+#define KEY_BLOCKLIST        "blocklist-enabled"
+#define KEY_DOWNLOAD_DIR     "download-dir"
+#define KEY_ENCRYPTION       "encryption"
+#define KEY_PEER_LIMIT       "peer-limit"
+#define KEY_PEER_PORT        "peer-port"
+#define KEY_PORT_FORWARDING  "port-forwarding-enabled"
+#define KEY_PEX_ENABLED      "pex-enabled"
+#define KEY_AUTH_REQUIRED    "rpc-auth-required"
+#define KEY_USERNAME         "rpc-username"
+#define KEY_PASSWORD         "rpc-password"
+#define KEY_ACL              "rpc-acl"
+#define KEY_RPC_PORT         "rpc-port"
+#define KEY_DSPEED           "speed-limit-down"
+#define KEY_DSPEED_ENABLED   "speed-limit-down-enabled"
+#define KEY_USPEED           "speed-limit-up"
+#define KEY_USPEED_ENABLED   "speed-limit-up-enabled"
+
+#define CONFIG_FILE          "session.json"
+
+const char * encryption_str[3] = { "tolerated", "preferred", "required" };
+
 static void
-saveState( tr_handle * h )
+saveState( tr_session * s )
 {
     tr_benc d;
-    const char * str;
-    char * username = tr_sessionGetRPCUsername( h );
-    char * password = tr_sessionGetRPCPassword( h );
-    char * auth = tr_strdup_printf( "%s:%s", username, password );
-
-    tr_bencInitDict( &d, 14 );
-    tr_bencDictAddStr( &d, "download-dir", tr_sessionGetDownloadDir( h ) );
-    tr_bencDictAddInt( &d, "peer-limit", tr_sessionGetPeerLimit( h ) );
-    tr_bencDictAddInt( &d, "pex-allowed", tr_sessionIsPexEnabled( h ) );
-    tr_bencDictAddInt( &d, "port", tr_sessionGetPeerPort( h ) );
-    tr_bencDictAddStr( &d, "auth", auth );
-    tr_bencDictAddInt( &d, "auth-required",
-                           tr_sessionIsRPCPasswordEnabled( h ) );
-    tr_bencDictAddInt( &d, "port-forwarding-enabled",
-                           tr_sessionIsPortForwardingEnabled( h ) );
-    tr_bencDictAddStr( &d, "rpc-acl", tr_sessionGetRPCACL( h ) );
-    tr_bencDictAddInt( &d, "rpc-port", tr_sessionGetRPCPort( h ) );
-    tr_bencDictAddInt( &d, "speed-limit-down",
-                           tr_sessionGetSpeedLimit( h, TR_DOWN ) );
-    tr_bencDictAddInt( &d, "speed-limit-down-enabled",
-                           tr_sessionIsSpeedLimitEnabled( h, TR_DOWN ) );
-    tr_bencDictAddInt( &d, "speed-limit-up",
-                           tr_sessionGetSpeedLimit( h, TR_UP ) );
-    tr_bencDictAddInt( &d, "speed-limit-up-enabled",
-                           tr_sessionIsSpeedLimitEnabled( h, TR_UP ) );
-    switch( tr_sessionGetEncryption( h ) ) {
-        case TR_PLAINTEXT_PREFERRED: str = "tolerated"; break;
-        case TR_ENCRYPTION_REQUIRED: str = "required"; break;
-        default: str = "preferred"; break;
-    }
-    tr_bencDictAddStr( &d, "encryption", str );
-
-    tr_ninf( MY_NAME, "saving \"%s\"", myConfigFilename );
-    tr_bencSaveFile( myConfigFilename, &d );
-
+fprintf( stderr, "tr_sessionGetDownloadDir(s) returned [%s]\n", tr_sessionGetDownloadDir(s));
+    tr_bencInitDict( &d, 16 );
+    tr_bencDictAddInt( &d, KEY_BLOCKLIST,        tr_blocklistIsEnabled( s ) );
+    tr_bencDictAddStr( &d, KEY_DOWNLOAD_DIR,     tr_sessionGetDownloadDir( s ) );
+    tr_bencDictAddInt( &d, KEY_PEER_LIMIT,       tr_sessionGetPeerLimit( s ) );
+    tr_bencDictAddInt( &d, KEY_PEER_PORT,        tr_sessionGetPeerPort( s ) );
+    tr_bencDictAddInt( &d, KEY_PORT_FORWARDING,  tr_sessionIsPortForwardingEnabled( s ) );
+    tr_bencDictAddInt( &d, KEY_PEX_ENABLED,      tr_sessionIsPexEnabled( s ) );
+    tr_bencDictAddStr( &d, KEY_USERNAME,         tr_sessionGetRPCUsername( s ) );
+    tr_bencDictAddStr( &d, KEY_PASSWORD,         tr_sessionGetRPCPassword( s ) );
+    tr_bencDictAddStr( &d, KEY_ACL,              tr_sessionGetRPCACL( s ) );
+    tr_bencDictAddInt( &d, KEY_RPC_PORT,         tr_sessionGetRPCPort( s ) );
+    tr_bencDictAddInt( &d, KEY_AUTH_REQUIRED,    tr_sessionIsRPCPasswordEnabled( s ) );
+    tr_bencDictAddInt( &d, KEY_DSPEED,           tr_sessionGetSpeedLimit( s, TR_DOWN ) );
+    tr_bencDictAddInt( &d, KEY_DSPEED_ENABLED,   tr_sessionIsSpeedLimitEnabled( s, TR_DOWN ) );
+    tr_bencDictAddInt( &d, KEY_USPEED,           tr_sessionGetSpeedLimit( s, TR_UP ) );
+    tr_bencDictAddInt( &d, KEY_USPEED_ENABLED,   tr_sessionIsSpeedLimitEnabled( s, TR_UP ) );
+    tr_bencDictAddStr( &d, KEY_ENCRYPTION,       encryption_str[tr_sessionGetEncryption( s )] );
+    tr_bencSaveJSONFile( myConfigFilename, &d );
+fprintf( stderr, "saved:\n%s\n", tr_bencSaveAsJSON(&d,NULL) );
     tr_bencFree( &d );
-    tr_free( auth );
-    tr_free( password );
-    tr_free( username );
+    tr_ninf( MY_NAME, "saved \"%s\"", myConfigFilename );
 }
 
-static int
-parseAuth( const char * auth, char ** username, char ** password )
-{
-    int err = 0;
-    const char * pch = strchr( auth, ':' );
-    if( !pch )
-        err = -1;
-    else {
-        *username = tr_strndup( auth, pch-auth );
-        *password = tr_strdup( pch+1 );
-    }
-    return err;
-}
-
+/**
+ * @param port      port number, or -1 if not set in the command line
+ * @param auth      TRUE, FALSE, or -1 if not set on the command line
+ * @param blocklist TRUE, FALSE, or -1 if not set on the command line
+ */
 static void
-session_init( const char * configDir, int rpc_port,
-              const char * acl, const char * auth, int noauth )
+session_init( const char * configDir, const char * downloadDir,
+              int rpcPort, const char * acl,
+              int authRequired, const char * username, const char * password,
+              int blocklistEnabled )
 {
+    char mycwd[MAX_PATH_LENGTH];
     tr_benc state;
     int have_state;
+    int64_t i;
     int64_t peer_port = TR_DEFAULT_PORT;
     int64_t peers = TR_DEFAULT_GLOBAL_PEER_LIMIT;
     int64_t pex_enabled = TR_DEFAULT_PEX_ENABLED;
@@ -107,37 +106,23 @@ session_init( const char * configDir, int rpc_port,
     int64_t down_limit = 100;
     int64_t down_limited = FALSE;
     int encryption = TR_ENCRYPTION_PREFERRED;
-    char downloadDir[MAX_PATH_LENGTH] = { '\0' };
-    const char * acl_fallback = TR_DEFAULT_RPC_ACL;
-    int64_t rpc_port_fallback = TR_DEFAULT_RPC_PORT;
-    int64_t auth_required_fallback = 0;
-    const char * auth_fallback = NULL;
     tr_ctor * ctor;
     tr_torrent ** torrents;
-    int auth_required;
-    char * user = NULL;
-    char * pass = NULL;
 
-    if(( have_state = !tr_bencLoadFile( myConfigFilename, &state )))
+    if(( have_state = !tr_bencLoadJSONFile( myConfigFilename, &state )))
     {
         const char * str;
         tr_ninf( MY_NAME, "loading settings from \"%s\"", myConfigFilename );
 
-        if( tr_bencDictFindStr( &state, "download-dir", &str ) )
-            tr_strlcpy( downloadDir, str, sizeof( downloadDir ) );
-        tr_bencDictFindInt( &state, "peer-limit", &peers );
-        tr_bencDictFindInt( &state, "pex-allowed", &pex_enabled );
-        tr_bencDictFindInt( &state, "port", &peer_port );
-        tr_bencDictFindInt( &state, "port-forwarding-enabled", &fwd_enabled );
-        tr_bencDictFindStr( &state, "rpc-acl", &acl_fallback );
-        tr_bencDictFindStr( &state, "auth", &auth_fallback );
-        tr_bencDictFindInt( &state, "auth-required", &auth_required_fallback );
-        tr_bencDictFindInt( &state, "rpc-port", &rpc_port_fallback );
-        tr_bencDictFindInt( &state, "speed-limit-down", &down_limit );
-        tr_bencDictFindInt( &state, "speed-limit-down-enabled", &down_limited );
-        tr_bencDictFindInt( &state, "speed-limit-up", &up_limit );
-        tr_bencDictFindInt( &state, "speed-limit-up-enabled", &up_limited );
-        if( tr_bencDictFindStr( &state, "encryption", &str ) ) {
+        tr_bencDictFindInt( &state, KEY_PEER_LIMIT, &peers );
+        tr_bencDictFindInt( &state, KEY_PEX_ENABLED, &pex_enabled );
+        tr_bencDictFindInt( &state, KEY_PEER_PORT, &peer_port );
+        tr_bencDictFindInt( &state, KEY_PORT_FORWARDING, &fwd_enabled );
+        tr_bencDictFindInt( &state, KEY_DSPEED, &down_limit );
+        tr_bencDictFindInt( &state, KEY_DSPEED_ENABLED, &down_limited );
+        tr_bencDictFindInt( &state, KEY_USPEED, &up_limit );
+        tr_bencDictFindInt( &state, KEY_USPEED_ENABLED, &up_limited );
+        if( tr_bencDictFindStr( &state, KEY_ENCRYPTION, &str ) ) {
             if( !strcmp( str, "required" ) )
                 encryption = TR_ENCRYPTION_REQUIRED;
             else if( !strcmp( str, "tolerated" ) )
@@ -145,28 +130,68 @@ session_init( const char * configDir, int rpc_port,
         }
     }
 
-    /* fallbacks */
-    if( !*downloadDir )
-        getcwd( downloadDir, sizeof( downloadDir ) );
-    if( rpc_port < 1 )
-        rpc_port = rpc_port_fallback;
-    if( !acl || !*acl )
-        acl = acl_fallback;
-    if( !auth || !*auth )
-        auth = auth_fallback;
+    /***
+    ****  Decide on which values to pass into tr_sessionInitFull().
+    ****  The command-line arguments are given precedence and
+    ****  the state file from the previous session is used as a fallback.
+    ****  If neither of those can be found, the TR_DEFAULT fields are used .
+    ***/
 
-    if( auth && parseAuth( auth, &user, &pass ) ) {
-        tr_nerr( MY_NAME, "Unable to parse authentication string \"%s\"", auth );
-        abort( );
+    /* authorization */
+    if( authRequired < 0 ) {
+        if( have_state && tr_bencDictFindInt( &state, KEY_AUTH_REQUIRED, &i ) )
+            authRequired = i;
+        if( authRequired < 0 )
+            authRequired = FALSE;
     }
 
-    if( noauth ) {
-        /* user has explicitly turned off authentication */
-        user = NULL;
-        pass = NULL;
+    /* username */
+    if( !username )
+        tr_bencDictFindStr( &state, KEY_USERNAME, &username );
+
+    /* password */
+    if( !password )
+        tr_bencDictFindStr( &state, KEY_PASSWORD, &password );
+
+    /* acl */
+    if( !acl ) {
+        if( have_state )
+            tr_bencDictFindStr( &state, KEY_ACL, &acl );
+        if( !acl )
+            acl = TR_DEFAULT_RPC_ACL;
     }
 
-    auth_required = user || pass;
+    /* rpc port */
+    if( rpcPort < 0 ) {
+        if( have_state && tr_bencDictFindInt( &state, KEY_RPC_PORT, &i ) )
+            rpcPort = i;
+        if( rpcPort < 0 )
+            rpcPort = TR_DEFAULT_RPC_PORT;
+    }
+
+
+    /* blocklist */
+    if( blocklistEnabled < 0 ) {
+        if( have_state && tr_bencDictFindInt( &state, KEY_BLOCKLIST, &i ) )
+            blocklistEnabled = i;
+        if( blocklistEnabled < 0 )
+            blocklistEnabled = TR_DEFAULT_BLOCKLIST_ENABLED;
+    }
+
+    /* download dir */
+    if( !downloadDir ) {
+        if( have_state )
+            tr_bencDictFindStr( &state, KEY_DOWNLOAD_DIR, &downloadDir );
+        if( !downloadDir ) {
+            getcwd( mycwd, sizeof( mycwd ) );
+            fprintf( stderr, "cwd is [%s]\n", mycwd );
+            downloadDir = mycwd;
+        }
+    }
+
+    /***
+    ****
+    ***/
 
     /* start the session */
     mySession = tr_sessionInitFull( configDir, "daemon", downloadDir,
@@ -176,10 +201,9 @@ session_init( const char * configDir, int rpc_port,
                                     down_limit, down_limited,
                                     peers,
                                     TR_MSG_INF, 0,
-                                    FALSE, /* is the blocklist enabled? */
+                                    blocklistEnabled,
                                     TR_DEFAULT_PEER_SOCKET_TOS,
-                                    TRUE, rpc_port, acl,
-                                    auth_required, user, pass,
+                                    TRUE, rpcPort, acl, authRequired, username, password,
                                     TR_DEFAULT_PROXY_ENABLED,
                                     TR_DEFAULT_PROXY,
                                     TR_DEFAULT_PROXY_AUTH_ENABLED,
@@ -187,7 +211,7 @@ session_init( const char * configDir, int rpc_port,
                                     TR_DEFAULT_PROXY_PASSWORD );
 
 
-    if( auth_required )
+    if( authRequired )
         tr_ninf( MY_NAME, "requiring authentication" );
 
     /* load the torrents */
@@ -205,15 +229,21 @@ daemonUsage( void )
 {
     puts( "usage: " MY_NAME " [-dfh] [-p file] [-s file]\n"
           "\n"
-          "Transmission " LONG_VERSION_STRING " http://www.transmissionbt.com/\n"
+          "Transmission "LONG_VERSION_STRING" http://www.transmissionbt.com/\n"
           "A fast and easy BitTorrent client\n"
           "\n"
-          "  -a --acl <list>         Access Control List.  (Default: "TR_DEFAULT_RPC_ACL")\n"
-          "  -f --foreground         Run in the foreground and log to stderr\n"
-          "  -g --config-dir <dir>   Where to look for torrents and daemon-config.benc\n"
-          "  -h --help               Display this message and exit\n"
-          "  -t --auth <user>:<pass> Username and password for authentication\n"
-          "  -p --port n             Port to listen to for requests  (Default: "TR_DEFAULT_RPC_PORT_STR")\n"
+          "  -a  --acl <list>         Access Control List.  (Default: "TR_DEFAULT_RPC_ACL")\n"
+          "  -b  --blocklist          Enable peer blocklists\n"
+          "  -b0 --blocklist=0        Disable peer blocklists\n"
+          "  -d  --download-dir <dir> Where store downloaded data\n"
+          "  -f  --foreground         Run in the foreground and log to stderr\n"
+          "  -g  --config-dir <dir>   Where to look for torrents and "CONFIG_FILE"\n"
+          "  -h  --help               Display this message and exit\n"
+          "  -p  --port=n             Port to listen to for requests  (Default: "TR_DEFAULT_RPC_PORT_STR")\n"
+          "  -t  --auth               Require authentication\n"
+          "  -t0 --auth=0             Don't require authentication\n"
+          "  -u  --username <user>    Set username for authentication\n"
+          "  -w  --password <pass>    Set password for authentication\n"
           "\n"
           MY_NAME" is a headless Transmission session\n"
           "that can be controlled via transmission-remote or Clutch.\n" );
@@ -222,32 +252,37 @@ daemonUsage( void )
 
 static void
 readargs( int argc, char ** argv,
-          int * nofork, int * port,
-          char ** configDir,
-          char ** acl,
-          char ** auth,
-          int * noauth )
+          int * nofork, char ** configDir, char ** downloadDir,
+          int * rpcPort, char ** acl, int * authRequired, char ** username, char ** password,
+          int * blocklistEnabled )
 {
     int opt;
-    char optstr[] = "a:fg:hnp:t:u:w:";
+    char shortopts[] = "a:b::d:fg:hp:t::u:w:";
     struct option longopts[] = {
-        { "acl",         required_argument,  NULL, 'a'  },
-        { "foreground",  no_argument,        NULL, 'f'  },
-        { "config-dir",  required_argument,  NULL, 'g'  },
-        { "help",        no_argument,        NULL, 'h'  },
-        { "noauth",      no_argument,        NULL, 'n'  },
-        { "port",        required_argument,  NULL, 'p'  },
-        { "auth",        required_argument,  NULL, 't'  },
-        { NULL,          0,                  NULL, '\0' }
+        { "acl",           required_argument,  NULL, 'a'  },
+        { "blocklist",     optional_argument,  NULL, 'b'  },
+        { "download-dir",  required_argument,  NULL, 'd'  },
+        { "foreground",    no_argument,        NULL, 'f'  },
+        { "config-dir",    required_argument,  NULL, 'g'  },
+        { "help",          no_argument,        NULL, 'h'  },
+        { "port",          required_argument,  NULL, 'p'  },
+        { "auth",          optional_argument,  NULL, 't'  },
+        { "username",      required_argument,  NULL, 'u'  },
+        { "password",      required_argument,  NULL, 'w'  },
+        { NULL,            0,                  NULL, '\0' }
     };
-    while((( opt = getopt_long( argc, argv, optstr, longopts, NULL ))) != -1 ) {
+    while((( opt = getopt_long( argc, argv, shortopts, longopts, NULL ))) != -1 ) {
         switch( opt ) {
             case 'a': *acl = tr_strdup( optarg ); break;
+            case 'b': *blocklistEnabled = optarg ? atoi(optarg)!=0 : TRUE; break;
+            case 'd': *downloadDir = tr_strdup( optarg ); break;
             case 'f': *nofork = 1; break;
-            case 'n': *noauth = 1; break;
+            case 'n': *authRequired = FALSE; break;
             case 'g': *configDir = tr_strdup( optarg ); break;
-            case 't': *auth = tr_strdup( optarg ); break;
-            case 'p': *port = atoi( optarg ); break;
+            case 't': *authRequired = optarg ? atoi(optarg)!=0 : TRUE; break;
+            case 'u': *username = tr_strdup( optarg ); break; 
+            case 'w': *password = tr_strdup( optarg ); break; 
+            case 'p': *rpcPort = atoi( optarg ); break;
             default: daemonUsage( ); break;
         }
     }
@@ -317,11 +352,14 @@ int
 main( int argc, char ** argv )
 {
     int nofork = 0;
-    int noauth = 0;
-    int port = TR_DEFAULT_RPC_PORT;
+    int rpcPort = -1;
+    int authRequired = -1;
+    int blocklistEnabled = -1;
     char * configDir = NULL;
+    char * downloadDir = NULL;
     char * acl = NULL;
-    char * auth = NULL;
+    char * username = NULL;
+    char * password = NULL;
 
     signal( SIGINT, gotsig );
     signal( SIGQUIT, gotsig );
@@ -329,11 +367,13 @@ main( int argc, char ** argv )
     signal( SIGPIPE, SIG_IGN );
     signal( SIGHUP, SIG_IGN );
 
-    readargs( argc, argv, &nofork, &port, &configDir, &acl, &auth, &noauth );
+    readargs( argc, argv, &nofork, &configDir, &downloadDir,
+              &rpcPort, &acl, &authRequired, &username, &password,
+              &blocklistEnabled );
     if( configDir == NULL )
         configDir = tr_strdup_printf( "%s-daemon", tr_getDefaultConfigDir() );
     tr_buildPath( myConfigFilename, sizeof( myConfigFilename ),
-                  configDir, "daemon-config.benc", NULL );
+                  configDir, CONFIG_FILE, NULL );
 
     if( !nofork ) {
         if( 0 > daemon( 1, 0 ) ) {
@@ -342,7 +382,9 @@ main( int argc, char ** argv )
         }
     }
 
-    session_init( configDir, port, acl, auth, noauth );
+    session_init( configDir, downloadDir,
+                  rpcPort, acl, authRequired, username, password,
+                  blocklistEnabled );
 
     while( !closing )
         sleep( 1 );
@@ -353,5 +395,9 @@ main( int argc, char ** argv )
     printf( " done.\n" );
 
     tr_free( configDir );
+    tr_free( downloadDir );
+    tr_free( username );
+    tr_free( password );
+    tr_free( acl );
     return 0;
 }
