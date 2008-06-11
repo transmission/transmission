@@ -135,6 +135,7 @@
 
 - (void) helpForPeers: (id) sender;
 - (void) helpForNetwork: (id) sender;
+- (void) helpForRemote: (id) sender;
 
 - (void) rpcUpdatePrefs;
 

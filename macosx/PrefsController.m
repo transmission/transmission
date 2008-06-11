@@ -859,6 +859,12 @@
         inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
+- (void) helpForRemote: (id) sender
+{
+    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"RemotePrefs"
+        inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
+}
+
 - (void) rpcUpdatePrefs
 {
     //encryption

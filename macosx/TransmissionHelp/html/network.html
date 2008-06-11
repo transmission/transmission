@@ -1,7 +1,5 @@
 <html>
 
-	<a name="NetworkPrefs"></a>
-	
 	<head>
 		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
@@ -24,6 +22,12 @@
 				<p>You haven't port forwarded correctly. Port forwarding opens a port in your firewall or router so that incoming connections from the outside world can be made with Transmission. If the port is forwarded, other people in the torrent can see you, thus increasing your potential number of connections, which more importantly, may increase the speed of your download.
 				<p>You need to port forward if you share your internet connection with a router, or if your broadband modem is a router itself. In most cases Transmission can do this automatically, see <a href="portforward.html">this page</a> for instructions on port forwarding.
 
+				<div id="pagetitle">
+					<h1>What is a 'Tracker Proxy'? </h1>
+				</div>
+				<p>Using a proxy for connections to the tracker means that instead of connecting directly to the tracker, you connect to some other <i>proxy server</i>, which in turn connects to the tracker itself. Thus the tracker will see the proxy IP address as the source address rather than your own.
+				<p>Using a proxy may increase your privacy somewhat, making it harder for third parties to monitor your activity. However, using a proxy slows down tracker communication as notifications are no longer sent directly.
+				<p>If you want to use a proxy, enter its address and authenticate as necessary.
 				<p>
 
 		</div>

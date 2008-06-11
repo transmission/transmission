@@ -122,7 +122,7 @@
 
 - (BOOL) isGroupCollapsed: (int) value
 {
-    if (value < 0)
+    if (value == -1)
         value = MAX_GROUP;
     
     return [fCollapsedGroups containsIndex: value];
@@ -130,7 +130,7 @@
 
 - (void) removeCollapsedGroup: (int) value
 {
-    if (value < 0)
+    if (value == -1)
         value = MAX_GROUP;
     
     [fCollapsedGroups removeIndex: value];

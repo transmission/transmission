@@ -55,7 +55,7 @@
 - (BOOL) isGroupCollapsed: (int) value;
 - (void) removeCollapsedGroup: (int) value;
 - (void) removeAllCollapsedGroups;
-- (void) saveCollapsedGroups;
+- (void) refreshCollapsedGroups;
 
 - (void) removeButtonTrackingAreas;
 - (void) setControlButtonHover: (int) row;
