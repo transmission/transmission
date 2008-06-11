@@ -30,7 +30,7 @@ testWildcard( const char * in, const char * expected )
 {
     int ok;
     char * str = cidrize( in );
-fprintf( stderr, "in [%s] out [%s] should be [%s]\n", in, str, expected );
+/* fprintf( stderr, "in [%s] out [%s] should be [%s]\n", in, str, expected ); */
     ok = expected ? !strcmp( expected, str ) : !str;
     tr_free( str );
     return ok;

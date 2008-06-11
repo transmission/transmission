@@ -51,6 +51,7 @@ struct tr_handle
 {
     unsigned int                 isPortSet          : 1;
     unsigned int                 isPexEnabled       : 1;
+    unsigned int                 isBlocklistEnabled : 1;
     unsigned int                 isProxyEnabled     : 1;
     unsigned int                 isProxyAuthEnabled : 1;
     unsigned int                 isClosed           : 1;
@@ -80,7 +81,7 @@ struct tr_handle
     struct tr_ratecontrol      * upload;
     struct tr_ratecontrol      * download;
 
-    struct tr_blocklist        * blocklist;
+    struct tr_list             * blocklists;
     struct tr_peerMgr          * peerMgr;
     struct tr_shared           * shared;
 
@@ -105,6 +106,12 @@ const char * tr_sessionFindTorrentFile( const tr_session * session,
 void tr_sessionSetTorrentFile( tr_session   * session,
                                const char   * hashString,
                                const char   * filename );
+
+struct in_addr;
+
+int tr_sessionIsAddressBlocked( const tr_session     * session,
+                                const struct in_addr * addr );
+
 
 void tr_globalLock       ( tr_session * );
 void tr_globalUnlock     ( tr_session * );

@@ -17,12 +17,13 @@ struct in_addr;
 typedef struct tr_blocklist tr_blocklist;
 
 tr_blocklist* _tr_blocklistNew         ( const char * filename, int isEnabled );
-void          _tr_blocklistFree        ( tr_blocklist * b );
-int           _tr_blocklistGetRuleCount( tr_blocklist * b );
-int           _tr_blocklistIsEnabled   ( tr_blocklist * b );
-void          _tr_blocklistSetEnabled  ( tr_blocklist * b, int isEnabled );
-int           _tr_blocklistHasAddress  ( tr_blocklist * b, const struct in_addr * addr );
-int           _tr_blocklistExists      ( const tr_blocklist * b );
-int           _tr_blocklistSetContent  ( tr_blocklist * b, const char * filename );
+int           _tr_blocklistExists      ( const tr_blocklist * );
+const char*   _tr_blocklistGetFilename ( const tr_blocklist * );
+int           _tr_blocklistGetRuleCount( const tr_blocklist * );
+void          _tr_blocklistFree        ( tr_blocklist * );
+int           _tr_blocklistIsEnabled   ( tr_blocklist * );
+void          _tr_blocklistSetEnabled  ( tr_blocklist *, int isEnabled );
+int           _tr_blocklistHasAddress  ( tr_blocklist *, const struct in_addr * addr );
+int           _tr_blocklistSetContent  ( tr_blocklist *, const char * filename );
 
 #endif

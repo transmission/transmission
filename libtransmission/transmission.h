@@ -605,22 +605,18 @@ void tr_freeMessageList( tr_msg_list * freeme );
  *
  * Passing NULL for a filename will clear the blocklist.
  */
-int tr_blocklistSetContent( tr_handle  * handle,
-                            const char * filename );
+int tr_blocklistSetContent   ( tr_session       * session,
+                               const char       * filename );
 
-int tr_blocklistGetRuleCount( tr_handle * handle );
+int tr_blocklistGetRuleCount ( const tr_session * session );
 
-int tr_blocklistExists( const tr_handle * handle );
+int tr_blocklistExists       ( const tr_session * session );
 
-int tr_blocklistIsEnabled( const tr_handle * handle );
+int tr_blocklistIsEnabled    ( const tr_session * session );
 
-void tr_blocklistSetEnabled( tr_handle * handle,
-                             int         isEnabled );
+void tr_blocklistSetEnabled  ( tr_session       * session,
+                               int                isEnabled );
 
-struct in_addr;
-
-int tr_blocklistHasAddress( tr_handle             * handle,
-                            const struct in_addr  * addr);
 
 /** @} */
 

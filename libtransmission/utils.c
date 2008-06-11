@@ -921,6 +921,14 @@ tr_wait( uint64_t delay_milliseconds )
 ****
 ***/
 
+int
+tr_stringEndsWith( const char * str, const char * end )
+{
+    const size_t slen = strlen( str );
+    const size_t elen = strlen( end );
+    return slen>=elen && !memcmp( &str[slen-elen], end, elen );
+}
+
 /*
  * Copy src to string dst of size siz.  At most siz-1 characters
  * will be copied.  Always NUL terminates (unless siz == 0).

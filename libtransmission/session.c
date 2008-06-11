@@ -116,6 +116,71 @@ tr_sessionSetEncryption( tr_session * session, tr_encryption_mode mode )
 ****
 ***/
 
+static void
+loadBlocklists( tr_session * session )
+{
+    int binCount = 0;
+    int newCount = 0;
+    struct stat sb;
+    char dirname[MAX_PATH_LENGTH];
+    DIR * odir = NULL;
+    tr_list * list = NULL;
+    const int isEnabled = session->isBlocklistEnabled;
+
+    /* walk through the directory and find blocklists */
+    tr_buildPath( dirname, sizeof( dirname ), session->configDir, "blocklists", NULL );
+    if( !stat( dirname, &sb ) && S_ISDIR( sb.st_mode ) && (( odir = opendir( dirname ))))
+    {
+        struct dirent *d;
+        for( d=readdir( odir ); d; d=readdir( odir ) )
+        {
+            char filename[MAX_PATH_LENGTH];
+
+            if( !d->d_name || d->d_name[0]=='.' ) /* skip dotfiles, ., and .. */
+                continue;
+
+            tr_buildPath( filename, sizeof(filename), dirname, d->d_name, NULL );
+
+            if( tr_stringEndsWith( filename, ".bin" ) )
+            {
+                /* if we don't already have this blocklist, add it */
+                if( !tr_list_find( list, filename, (TrListCompareFunc)strcmp ) )
+                {
+                    tr_list_append( &list, _tr_blocklistNew( filename, isEnabled ) );
+                    ++binCount;
+                }
+            }
+            else
+            {
+                /* strip out the file suffix, if there is one, and add ".bin" instead */
+                tr_blocklist * b;
+                const char * dot = strrchr( d->d_name, '.' );
+                const int len = dot ? dot - d->d_name : (int)strlen( d->d_name );
+                char tmp[MAX_PATH_LENGTH];
+                snprintf( tmp, sizeof( tmp ),
+                          "%s%c%*.*s.bin", dirname, TR_PATH_DELIMITER, len, len, d->d_name );
+                b = _tr_blocklistNew( tmp, isEnabled );
+                _tr_blocklistSetContent( b, filename );
+                tr_list_append( &list, b );
+                ++newCount;
+            }
+        }
+
+        closedir( odir );
+    }
+
+    session->blocklists = list;
+
+    if( binCount )
+        tr_dbg( "Found %d blocklists in \"%s\"", binCount, dirname );
+    if( newCount )
+        tr_dbg( "Found %d new blocklists in \"%s\"", newCount, dirname );
+}
+
+/***
+****
+***/
+
 static void metainfoLookupRescan( tr_handle * h );
 
 tr_handle *
@@ -206,8 +271,8 @@ tr_sessionInitFull( const char  * configDir,
     /* initialize the blocklist */
     tr_buildPath( filename, sizeof( filename ), h->configDir, "blocklists", NULL );
     tr_mkdirp( filename, 0777 );
-    tr_buildPath( filename, sizeof( filename ), h->configDir, "blocklists", "level1.bin", NULL );
-    h->blocklist = _tr_blocklistNew( filename, isBlocklistEnabled );
+    h->isBlocklistEnabled = isBlocklistEnabled;
+    loadBlocklists( h );
 
     tr_statsInit( h );
 
@@ -485,8 +550,7 @@ tr_sessionClose( tr_handle * h )
     while( !h->isClosed && !deadlineReached( deadline ) )
         tr_wait( 100 );
 
-    _tr_blocklistFree( h->blocklist );
-    h->blocklist = NULL;
+    tr_list_free( &h->blocklists, (TrListForeachFunc)_tr_blocklistFree );
     tr_webClose( &h->web );
 
     tr_eventClose( h );
@@ -535,11 +599,14 @@ tr_sessionLoadTorrents ( tr_handle   * h,
                 tr_torrent * tor;
                 char filename[MAX_PATH_LENGTH];
                 tr_buildPath( filename, sizeof(filename), dirname, d->d_name, NULL );
-                tr_ctorSetMetainfoFromFile( ctor, filename );
-                tor = tr_torrentNew( h, ctor, NULL );
-                if( tor ) {
-                    tr_list_append( &list, tor );
-                    n++;
+                if( tr_stringEndsWith( filename, ".torrent" ) )
+                {
+                    tr_ctorSetMetainfoFromFile( ctor, filename );
+                    tor = tr_torrentNew( h, ctor, NULL );
+                    if( tor ) {
+                        tr_list_append( &list, tor );
+                        ++n;
+                    }
                 }
             }
         }
@@ -600,39 +667,66 @@ tr_sessionIsPortForwardingEnabled( const tr_handle * h )
 ***/
 
 int
-tr_blocklistGetRuleCount( tr_handle * handle )
+tr_blocklistGetRuleCount( const tr_session * session )
 {
-    return _tr_blocklistGetRuleCount( handle->blocklist );
+    int n = 0;
+    tr_list * l;
+    for( l=session->blocklists; l; l=l->next )
+        n += _tr_blocklistGetRuleCount( l->data );
+    return n;
 }
 
 int
-tr_blocklistIsEnabled( const tr_handle * handle )
+tr_blocklistIsEnabled( const tr_session * session )
 {
-    return _tr_blocklistIsEnabled( handle->blocklist );
+    return session->isBlocklistEnabled;
 }
 
 void
-tr_blocklistSetEnabled( tr_handle * handle, int isEnabled )
+tr_blocklistSetEnabled( tr_session * session, int isEnabled )
 {
-    _tr_blocklistSetEnabled( handle->blocklist, isEnabled );
+    tr_list * l;
+    session->isBlocklistEnabled = isEnabled ? 1 : 0;
+    for( l=session->blocklists; l; l=l->next )
+        _tr_blocklistSetEnabled( l->data, isEnabled );
 }
 
 int
-tr_blocklistExists( const tr_handle * handle )
+tr_blocklistExists( const tr_session * session )
 {
-    return _tr_blocklistExists( handle->blocklist );
+    return session->blocklists != NULL;
 }
 
 int
-tr_blocklistSetContent( tr_handle  * handle, const char * filename )
+tr_blocklistSetContent( tr_session  * session, const char * contentFilename )
 {
-    return _tr_blocklistSetContent( handle->blocklist, filename );
+    tr_list * l;
+    tr_blocklist * b;
+    const char * defaultName = "level1.bin";
+
+    for( b=NULL, l=session->blocklists; !b && l; l=l->next )
+        if( tr_stringEndsWith( _tr_blocklistGetFilename( l->data ), defaultName ) )
+            b = l->data;
+
+    if( !b ) {
+        char filename[MAX_PATH_LENGTH];
+        tr_buildPath( filename, sizeof( filename ), session->configDir, "blocklists", defaultName, NULL );
+        b = _tr_blocklistNew( filename, session->isBlocklistEnabled );
+        tr_list_append( &session->blocklists, b );
+    }
+
+    return _tr_blocklistSetContent( b, contentFilename );
 }
 
 int
-tr_blocklistHasAddress( tr_handle * handle, const struct in_addr * addr )
+tr_sessionIsAddressBlocked( const tr_session      * session,
+                            const struct in_addr  * addr )
 {
-    return _tr_blocklistHasAddress( handle->blocklist, addr );
+    tr_list * l;
+    for( l=session->blocklists; l; l=l->next )
+        if( _tr_blocklistHasAddress( l->data, addr ) )
+            return TRUE;
+    return FALSE;
 }
 
 /***

@@ -1015,7 +1015,7 @@ tr_peerMgrAddIncoming( tr_peerMgr      * manager,
 {
     managerLock( manager );
 
-    if( tr_blocklistHasAddress( manager->handle, addr ) )
+    if( tr_sessionIsAddressBlocked( manager->handle, addr ) )
     {
         tr_dbg( "Banned IP address \"%s\" tried to connect to us",
                 inet_ntoa( *addr ) );
@@ -1053,7 +1053,7 @@ tr_peerMgrAddPex( tr_peerMgr     * manager,
     managerLock( manager );
 
     t = getExistingTorrent( manager, torrentHash );
-    if( !tr_blocklistHasAddress( t->manager->handle, &pex->in_addr ) )
+    if( !tr_sessionIsAddressBlocked( t->manager->handle, &pex->in_addr ) )
         ensureAtomExists( t, &pex->in_addr, pex->port, pex->flags, from );
 
     managerUnlock( manager );
@@ -1799,7 +1799,7 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         }
 
         /* Don't connect to peers in our blocklist */
-        if( tr_blocklistHasAddress( t->manager->handle, &atom->addr ) )
+        if( tr_sessionIsAddressBlocked( t->manager->handle, &atom->addr ) )
             continue;
 
         ret[retCount++] = atom;

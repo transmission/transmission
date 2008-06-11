@@ -197,7 +197,7 @@ char* tr_base64_decode( const void * input, int inlen, int *outlen ) TR_GNUC_MAL
 
 size_t tr_strlcpy( char * dst, const char * src, size_t siz );
 
-
+int   tr_stringEndsWith( const char * string, const char * end );
 
 const char* tr_strerror( int );
 
