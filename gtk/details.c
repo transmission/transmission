@@ -283,14 +283,14 @@ enum
 static const char* peer_column_names[N_PEER_COLS] =
 {
   N_("Address"),
-  N_("Client"),
-  /* 'percent done' column header. terse to keep the column narrow. */
-  N_("%"),
-  " ",
   /* 'download speed' column header. terse to keep the column narrow. */
   N_("Down"),
   /* 'upload speed' column header.  terse to keep the column narrow. */
   N_("Up"),
+  N_("Client"),
+  /* 'percent done' column header. terse to keep the column narrow. */
+  N_("%"),
+  " ",
   N_("Status")
 };
 
