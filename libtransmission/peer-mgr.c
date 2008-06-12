@@ -1357,7 +1357,7 @@ tr_peerMgrHasConnections( const tr_peerMgr * manager,
     managerLock( manager );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
-    ret = t && tr_ptrArraySize( t->peers );
+    ret = t && ( !tr_ptrArrayEmpty( t->peers ) || !tr_ptrArrayEmpty( t->webseeds ) );
 
     managerUnlock( manager );
     return ret;
