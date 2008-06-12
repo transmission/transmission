@@ -30,9 +30,11 @@
 #include <signal.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/bencode.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/metainfo.h> /* tr_metainfoFree */
 #include <libtransmission/utils.h> /* tr_wait */
+#include <libtransmission/web.h> /* tr_webRun */
 
 
 /* macro to shut up "unused parameter" warnings */
@@ -101,6 +103,27 @@ getStringRatio( float ratio )
     return string;
 }
 
+static int
+is_rfc2396_alnum( char ch )
+{
+    return     ( '0' <= ch && ch <= '9' )
+            || ( 'A' <= ch && ch <= 'Z' )
+            || ( 'a' <= ch && ch <= 'z' );
+}
+
+static void
+escape( char * out, const uint8_t * in, int in_len ) /* rfc2396 */
+{
+    const uint8_t *end = in + in_len;
+    while( in != end )
+        if( is_rfc2396_alnum(*in) )
+            *out++ = (char) *in++;
+        else
+            out += snprintf( out, 4, "%%%02X", (unsigned int)*in++ );
+    *out = '\0';
+}
+
+
 #define LINEWIDTH 80
 
 static void
@@ -109,6 +132,36 @@ torrentStateChanged( tr_torrent   * torrent UNUSED,
                      void         * user_data UNUSED )
 {
     system( finishCall );
+}
+
+static int leftToScrape = 0;
+
+static void
+scrapeDoneFunc( struct tr_handle    * session UNUSED,
+                long                  response_code,
+                const void          * response,
+                size_t                response_byte_count,
+                void                * host )
+{
+    tr_benc top, *files;
+
+    if( !tr_bencLoad( response, response_byte_count, &top, NULL ) 
+        && tr_bencDictFindDict( &top, "files", &files )
+        && files->val.l.count >= 2 )
+    {
+        int64_t complete=-1, incomplete=-1, downloaded=-1;
+        tr_benc * hash = &files->val.l.vals[1];
+        tr_bencDictFindInt( hash, "complete", &complete );
+        tr_bencDictFindInt( hash, "incomplete", &incomplete );
+        tr_bencDictFindInt( hash, "downloaded", &downloaded );
+        printf( "%4d seeders, %4d leechers, %5d downloads at %s\n",
+                (int)complete, (int)incomplete, (int)downloaded, (char*)host );
+        tr_bencFree( &top );
+    }
+    else
+        printf( "unable to parse response (http code %lu) at %s", response_code, (char*)host );
+
+    --leftToScrape;
 }
 
 int
@@ -206,8 +259,43 @@ main( int argc, char ** argv )
 
     ctor = tr_ctorNew( h );
     tr_ctorSetMetainfoFromFile( ctor, torrentPath );
-    tr_ctorSetPaused( ctor, TR_FORCE, 0 );
+    tr_ctorSetPaused( ctor, TR_FORCE, showScrape );
     tr_ctorSetDownloadDir( ctor, TR_FORCE, downloadDir );
+
+    if( showScrape )
+    {
+        tr_info info;
+
+        if( !tr_torrentParse( h, ctor, &info ) )
+        {
+            int i;
+            const time_t start = time( NULL );
+            for( i=0; i<info.trackerCount; ++i )
+            {
+                if( info.trackers[i].scrape )
+                {
+                    const char * scrape = info.trackers[i].scrape;
+                    char escaped[SHA_DIGEST_LENGTH*3 + 1];
+                    char *url, *host;
+                    escape( escaped, info.hash, SHA_DIGEST_LENGTH );
+                    url = tr_strdup_printf( "%s%cinfo_hash=%s",
+                                            scrape,
+                                            strchr(scrape,'?')?'&':'?',
+                                            escaped );
+                    tr_httpParseURL( scrape, -1, &host, NULL, NULL );
+                    ++leftToScrape;
+                    tr_webRun( h, url, NULL, scrapeDoneFunc, host );
+                    tr_free( url );
+                }
+            }
+
+            fprintf( stderr, "scraping %d trackers:\n", leftToScrape );
+
+            while( leftToScrape>0 && ((time(NULL)-start)<20) )
+                tr_wait( 250 );
+        }
+        goto cleanup;
+    }
 
     if( showInfo )
     {
@@ -255,7 +343,6 @@ main( int argc, char ** argv )
         goto cleanup;
     }
 
-
     tor = tr_torrentNew( h, ctor, &error );
     tr_ctorFree( ctor );
     if( tor == NULL )
@@ -263,30 +350,6 @@ main( int argc, char ** argv )
         printf( "Failed opening torrent file `%s'\n", torrentPath );
         tr_sessionClose( h );
         return EXIT_FAILURE;
-    }
-
-    if( showScrape )
-    {
-        const struct tr_stat * stats;
-        const uint64_t start = tr_date( );
-        printf( "Scraping, Please wait...\n" );
-        
-        do
-        {
-            stats = tr_torrentStat( tor );
-            if( !stats || tr_date() - start > 20000 )
-            {
-                printf( "Scrape failed.\n" );
-                goto cleanup;
-            }
-            tr_wait( 2000 );
-        }
-        while( stats->completedFromTracker == -1 || stats->leechers == -1 || stats->seeders == -1 );
-        
-        printf( "%d seeder(s), %d leecher(s), %d download(s).\n",
-            stats->seeders, stats->leechers, stats->completedFromTracker );
-
-        goto cleanup;
     }
 
     signal( SIGINT, sigHandler );
