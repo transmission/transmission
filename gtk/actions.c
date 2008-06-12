@@ -207,7 +207,7 @@ actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
 {
   int i, n;
   int active;
-  char * match;
+  const char * match;
   const int n_entries = G_N_ELEMENTS( entries );
   GtkActionGroup * action_group;
 
@@ -254,7 +254,6 @@ actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
 
   gtk_ui_manager_insert_action_group( ui_manager, action_group, 0 );
   g_object_unref (G_OBJECT(action_group));
-  g_free( match );
 }
 
 /****

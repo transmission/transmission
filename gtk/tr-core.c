@@ -125,7 +125,7 @@ tr_core_dispose( GObject * obj )
     {
         GObjectClass * parent;
 
-        pref_save( NULL );
+        pref_save( );
         core->priv = NULL;
 
         parent = g_type_class_peek( g_type_parent( TR_CORE_TYPE ) );
@@ -386,9 +386,8 @@ tr_core_apply_defaults( tr_ctor * ctor )
                              pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
 
     if( tr_ctorGetDownloadDir( ctor, TR_FORCE, NULL ) ) {
-        char * path = pref_string_get( PREF_KEY_DOWNLOAD_DIR );
+        const char * path = pref_string_get( PREF_KEY_DOWNLOAD_DIR );
         tr_ctorSetDownloadDir( ctor, TR_FORCE, path );
-        g_free( path );
     }
 }
 
@@ -493,10 +492,9 @@ prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
     if( !strcmp( key, PREF_KEY_SORT_MODE ) ||
         !strcmp( key, PREF_KEY_SORT_REVERSED ) )
     {
-        char * mode = pref_string_get( PREF_KEY_SORT_MODE );
+        const char * mode = pref_string_get( PREF_KEY_SORT_MODE );
         gboolean isReversed = pref_flag_get( PREF_KEY_SORT_REVERSED );
         setSort( core, mode, isReversed );
-        g_free( mode );
     }
     else if( !strcmp( key, PREF_KEY_MAX_PEERS_GLOBAL ) )
     {
@@ -1027,20 +1025,19 @@ tr_core_set_hibernation_allowed( TrCore * core, gboolean allowed )
 static void
 commitPrefsChange( TrCore * core, const char * key )
 {
-    pref_save( NULL );
+    pref_save( );
     g_signal_emit( core, TR_CORE_GET_CLASS(core)->prefsig, 0, key );
 }
 
 void
 tr_core_set_pref( TrCore * self, const char * key, const char * newval )
 {
-    char * oldval = pref_string_get( key );
+    const char * oldval = pref_string_get( key );
     if( tr_strcmp( oldval, newval ) )
     {
         pref_string_set( key, newval );
         commitPrefsChange( self, key );
     }
-    g_free( oldval );
 }
 
 void

@@ -36,48 +36,96 @@ static char myConfigFilename[MAX_PATH_LENGTH];
 #define KEY_BLOCKLIST        "blocklist-enabled"
 #define KEY_DOWNLOAD_DIR     "download-dir"
 #define KEY_ENCRYPTION       "encryption"
-#define KEY_PEER_LIMIT       "peer-limit"
+#define KEY_PEER_LIMIT       "max-peers-global"
 #define KEY_PEER_PORT        "peer-port"
 #define KEY_PORT_FORWARDING  "port-forwarding-enabled"
 #define KEY_PEX_ENABLED      "pex-enabled"
-#define KEY_AUTH_REQUIRED    "rpc-auth-required"
+#define KEY_AUTH_REQUIRED    "rpc-authentication-required"
 #define KEY_USERNAME         "rpc-username"
 #define KEY_PASSWORD         "rpc-password"
-#define KEY_ACL              "rpc-acl"
+#define KEY_ACL              "rpc-access-control-list"
 #define KEY_RPC_PORT         "rpc-port"
-#define KEY_DSPEED           "speed-limit-down"
-#define KEY_DSPEED_ENABLED   "speed-limit-down-enabled"
-#define KEY_USPEED           "speed-limit-up"
-#define KEY_USPEED_ENABLED   "speed-limit-up-enabled"
+#define KEY_DSPEED           "download-limit"
+#define KEY_DSPEED_ENABLED   "download-limit-enabled"
+#define KEY_USPEED           "upload-limit"
+#define KEY_USPEED_ENABLED   "upload-limit-enabled"
 
-#define CONFIG_FILE          "session.json"
+#define CONFIG_FILE          "settings.json"
 
-const char * encryption_str[3] = { "tolerated", "preferred", "required" };
+/***
+****  Config File
+***/
 
+static void
+replaceInt( tr_benc * dict, const char * key, int64_t value )
+{
+    tr_bencDictRemove( dict, key );
+    tr_bencDictAddInt( dict, key, value );
+}
+static void
+replaceStr( tr_benc * dict, const char * key, const char* value )
+{
+    tr_bencDictRemove( dict, key );
+    tr_bencDictAddStr( dict, key, value );
+}
 static void
 saveState( tr_session * s )
 {
     tr_benc d;
-    tr_bencInitDict( &d, 16 );
-    tr_bencDictAddInt( &d, KEY_BLOCKLIST,        tr_blocklistIsEnabled( s ) );
-    tr_bencDictAddStr( &d, KEY_DOWNLOAD_DIR,     tr_sessionGetDownloadDir( s ) );
-    tr_bencDictAddInt( &d, KEY_PEER_LIMIT,       tr_sessionGetPeerLimit( s ) );
-    tr_bencDictAddInt( &d, KEY_PEER_PORT,        tr_sessionGetPeerPort( s ) );
-    tr_bencDictAddInt( &d, KEY_PORT_FORWARDING,  tr_sessionIsPortForwardingEnabled( s ) );
-    tr_bencDictAddInt( &d, KEY_PEX_ENABLED,      tr_sessionIsPexEnabled( s ) );
-    tr_bencDictAddStr( &d, KEY_USERNAME,         tr_sessionGetRPCUsername( s ) );
-    tr_bencDictAddStr( &d, KEY_PASSWORD,         tr_sessionGetRPCPassword( s ) );
-    tr_bencDictAddStr( &d, KEY_ACL,              tr_sessionGetRPCACL( s ) );
-    tr_bencDictAddInt( &d, KEY_RPC_PORT,         tr_sessionGetRPCPort( s ) );
-    tr_bencDictAddInt( &d, KEY_AUTH_REQUIRED,    tr_sessionIsRPCPasswordEnabled( s ) );
-    tr_bencDictAddInt( &d, KEY_DSPEED,           tr_sessionGetSpeedLimit( s, TR_DOWN ) );
-    tr_bencDictAddInt( &d, KEY_DSPEED_ENABLED,   tr_sessionIsSpeedLimitEnabled( s, TR_DOWN ) );
-    tr_bencDictAddInt( &d, KEY_USPEED,           tr_sessionGetSpeedLimit( s, TR_UP ) );
-    tr_bencDictAddInt( &d, KEY_USPEED_ENABLED,   tr_sessionIsSpeedLimitEnabled( s, TR_UP ) );
-    tr_bencDictAddStr( &d, KEY_ENCRYPTION,       encryption_str[tr_sessionGetEncryption( s )] );
+    if( tr_bencLoadJSONFile( myConfigFilename, &d ) )
+        tr_bencInitDict( &d, 16 );
+    
+    replaceInt( &d, KEY_BLOCKLIST,       tr_blocklistIsEnabled( s ) );
+    replaceStr( &d, KEY_DOWNLOAD_DIR,    tr_sessionGetDownloadDir( s ) );
+    replaceInt( &d, KEY_PEER_LIMIT,      tr_sessionGetPeerLimit( s ) );
+    replaceInt( &d, KEY_PEER_PORT,       tr_sessionGetPeerPort( s ) );
+    replaceInt( &d, KEY_PORT_FORWARDING, tr_sessionIsPortForwardingEnabled( s ) );
+    replaceInt( &d, KEY_PEX_ENABLED,     tr_sessionIsPexEnabled( s ) );
+    replaceStr( &d, KEY_USERNAME,        tr_sessionGetRPCUsername( s ) );
+    replaceStr( &d, KEY_PASSWORD,        tr_sessionGetRPCPassword( s ) );
+    replaceStr( &d, KEY_ACL,             tr_sessionGetRPCACL( s ) );
+    replaceInt( &d, KEY_RPC_PORT,        tr_sessionGetRPCPort( s ) );
+    replaceInt( &d, KEY_AUTH_REQUIRED,   tr_sessionIsRPCPasswordEnabled( s ) );
+    replaceInt( &d, KEY_DSPEED,          tr_sessionGetSpeedLimit( s, TR_DOWN ) );
+    replaceInt( &d, KEY_DSPEED_ENABLED,  tr_sessionIsSpeedLimitEnabled( s, TR_DOWN ) );
+    replaceInt( &d, KEY_USPEED,          tr_sessionGetSpeedLimit( s, TR_UP ) );
+fprintf( stderr, "session says its speed upload speed limit is %d\n", tr_sessionGetSpeedLimit( s, TR_UP ) );
+    replaceInt( &d, KEY_USPEED_ENABLED,  tr_sessionIsSpeedLimitEnabled( s, TR_UP ) );
+    replaceInt( &d, KEY_ENCRYPTION,      tr_sessionGetEncryption( s ) );
+
     tr_bencSaveJSONFile( myConfigFilename, &d );
     tr_bencFree( &d );
     tr_ninf( MY_NAME, "saved \"%s\"", myConfigFilename );
+}
+
+static void
+getConfigInt( tr_benc     * dict,
+              const char  * key,
+              int         * setme,
+              int           defaultVal )
+{
+    if( *setme < 0 ) {
+        int64_t i;
+        if( tr_bencDictFindInt( dict, key, &i ) )
+            *setme = i;
+        else
+            *setme = defaultVal;
+    }
+}
+
+static void
+getConfigStr( tr_benc      * dict,
+              const char   * key,
+              const char  ** setme,
+              const char   * defaultVal )
+{
+    if( !*setme ) {
+        const char * s;
+        if( tr_bencDictFindStr( dict, key, &s ) )
+            *setme = s;
+        else
+            *setme = defaultVal;
+    }
 }
 
 /**
@@ -92,41 +140,17 @@ session_init( const char * configDir, const char * downloadDir,
               int blocklistEnabled )
 {
     char mycwd[MAX_PATH_LENGTH];
-    tr_benc state;
-    int have_state;
-    int64_t i;
-    int64_t peer_port = TR_DEFAULT_PORT;
-    int64_t peers = TR_DEFAULT_GLOBAL_PEER_LIMIT;
-    int64_t pex_enabled = TR_DEFAULT_PEX_ENABLED;
-    int64_t fwd_enabled = TR_DEFAULT_PORT_FORWARDING_ENABLED;
-    int64_t up_limit = 100;
-    int64_t up_limited = FALSE;
-    int64_t down_limit = 100;
-    int64_t down_limited = FALSE;
-    int encryption = TR_ENCRYPTION_PREFERRED;
+    tr_benc state, *dict = NULL;
+    int peerPort=-1, peers=-1;
+    int pexEnabled = -1;
+    int fwdEnabled = -1;
+    int upLimit=-1, upLimited=-1, downLimit=-1, downLimited=-1;
+    int encryption = -1;
     tr_ctor * ctor;
     tr_torrent ** torrents;
 
-    if(( have_state = !tr_bencLoadJSONFile( myConfigFilename, &state )))
-    {
-        const char * str;
-        tr_ninf( MY_NAME, "loading settings from \"%s\"", myConfigFilename );
-
-        tr_bencDictFindInt( &state, KEY_PEER_LIMIT, &peers );
-        tr_bencDictFindInt( &state, KEY_PEX_ENABLED, &pex_enabled );
-        tr_bencDictFindInt( &state, KEY_PEER_PORT, &peer_port );
-        tr_bencDictFindInt( &state, KEY_PORT_FORWARDING, &fwd_enabled );
-        tr_bencDictFindInt( &state, KEY_DSPEED, &down_limit );
-        tr_bencDictFindInt( &state, KEY_DSPEED_ENABLED, &down_limited );
-        tr_bencDictFindInt( &state, KEY_USPEED, &up_limit );
-        tr_bencDictFindInt( &state, KEY_USPEED_ENABLED, &up_limited );
-        if( tr_bencDictFindStr( &state, KEY_ENCRYPTION, &str ) ) {
-            if( !strcmp( str, "required" ) )
-                encryption = TR_ENCRYPTION_REQUIRED;
-            else if( !strcmp( str, "tolerated" ) )
-                encryption = TR_PLAINTEXT_PREFERRED;
-        }
-    }
+    if( !tr_bencLoadJSONFile( myConfigFilename, &state ) )
+        dict = &state;
 
     /***
     ****  Decide on which values to pass into tr_sessionInitFull().
@@ -135,56 +159,23 @@ session_init( const char * configDir, const char * downloadDir,
     ****  If neither of those can be found, the TR_DEFAULT fields are used .
     ***/
 
-    /* authorization */
-    if( authRequired < 0 ) {
-        if( have_state && tr_bencDictFindInt( &state, KEY_AUTH_REQUIRED, &i ) )
-            authRequired = i;
-        if( authRequired < 0 )
-            authRequired = FALSE;
-    }
-
-    /* username */
-    if( !username )
-        tr_bencDictFindStr( &state, KEY_USERNAME, &username );
-
-    /* password */
-    if( !password )
-        tr_bencDictFindStr( &state, KEY_PASSWORD, &password );
-
-    /* acl */
-    if( !acl ) {
-        if( have_state )
-            tr_bencDictFindStr( &state, KEY_ACL, &acl );
-        if( !acl )
-            acl = TR_DEFAULT_RPC_ACL;
-    }
-
-    /* rpc port */
-    if( rpcPort < 0 ) {
-        if( have_state && tr_bencDictFindInt( &state, KEY_RPC_PORT, &i ) )
-            rpcPort = i;
-        if( rpcPort < 0 )
-            rpcPort = TR_DEFAULT_RPC_PORT;
-    }
-
-
-    /* blocklist */
-    if( blocklistEnabled < 0 ) {
-        if( have_state && tr_bencDictFindInt( &state, KEY_BLOCKLIST, &i ) )
-            blocklistEnabled = i;
-        if( blocklistEnabled < 0 )
-            blocklistEnabled = TR_DEFAULT_BLOCKLIST_ENABLED;
-    }
-
-    /* download dir */
-    if( !downloadDir ) {
-        if( have_state )
-            tr_bencDictFindStr( &state, KEY_DOWNLOAD_DIR, &downloadDir );
-        if( !downloadDir ) {
-            getcwd( mycwd, sizeof( mycwd ) );
-            downloadDir = mycwd;
-        }
-    }
+    getcwd( mycwd, sizeof( mycwd ) );
+    getConfigStr( dict, KEY_DOWNLOAD_DIR,    &downloadDir,       mycwd );
+    getConfigInt( dict, KEY_PEX_ENABLED,     &pexEnabled,        TR_DEFAULT_PEX_ENABLED );
+    getConfigInt( dict, KEY_PORT_FORWARDING, &fwdEnabled,        TR_DEFAULT_PORT_FORWARDING_ENABLED );
+    getConfigInt( dict, KEY_PEER_PORT,       &peerPort,          TR_DEFAULT_PORT );
+    getConfigInt( dict, KEY_DSPEED,          &downLimit,         100 );
+    getConfigInt( dict, KEY_DSPEED_ENABLED,  &downLimited,       FALSE );
+    getConfigInt( dict, KEY_USPEED,          &upLimit,           100 );
+    getConfigInt( dict, KEY_USPEED_ENABLED,  &upLimited,         FALSE );
+    getConfigInt( dict, KEY_PEER_LIMIT,      &peers,             TR_DEFAULT_GLOBAL_PEER_LIMIT );
+    getConfigInt( dict, KEY_BLOCKLIST,       &blocklistEnabled,  TR_DEFAULT_BLOCKLIST_ENABLED );
+    getConfigInt( dict, KEY_RPC_PORT,        &rpcPort,           TR_DEFAULT_RPC_PORT );
+    getConfigStr( dict, KEY_ACL,             &acl,               TR_DEFAULT_RPC_ACL );
+    getConfigInt( dict, KEY_AUTH_REQUIRED,   &authRequired,      FALSE );
+    getConfigStr( dict, KEY_USERNAME,        &username,          NULL );
+    getConfigStr( dict, KEY_PASSWORD,        &password,          NULL );
+    getConfigInt( dict, KEY_ENCRYPTION,      &encryption,        TR_ENCRYPTION_PREFERRED );
 
     /***
     ****
@@ -192,10 +183,10 @@ session_init( const char * configDir, const char * downloadDir,
 
     /* start the session */
     mySession = tr_sessionInitFull( configDir, "daemon", downloadDir,
-                                    pex_enabled, fwd_enabled, peer_port,
+                                    pexEnabled, fwdEnabled, peerPort,
                                     encryption,
-                                    up_limit, up_limited,
-                                    down_limit, down_limited,
+                                    upLimited, upLimit,
+                                    downLimited, downLimit,
                                     peers,
                                     TR_MSG_INF, 0,
                                     blocklistEnabled,
@@ -218,7 +209,7 @@ session_init( const char * configDir, const char * downloadDir,
     tr_free( torrents );
     tr_ctorFree( ctor );
 
-    if( have_state )
+    if( dict )
         tr_bencFree( &state );
 }
 

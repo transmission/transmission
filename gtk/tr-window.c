@@ -413,7 +413,7 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
 {
     int i, n;
     int status_stats_mode;
-    char * pch;
+    const char * pch;
     PrivateData * p;
     GtkWidget *vbox, *w, *self, *h, *c, *s, *image, *menu;
     GtkWindow *win;
@@ -510,7 +510,6 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
         gtk_menu_shell_append( GTK_MENU_SHELL(menu), w );
         gtk_widget_show( w );
     }
-    g_free( pch );
 
     /* status */
     h = p->status = gtk_hbox_new( FALSE, GUI_PAD );
@@ -606,7 +605,7 @@ updateTorrentCount( PrivateData * p )
 static void
 updateStats( PrivateData * p )
 {
-    char * pch;
+    const char * pch;
     char up[32], down[32], ratio[32], buf[128];
     struct tr_session_stats stats;
     tr_handle * handle = tr_core_handle( p->core );
@@ -638,7 +637,6 @@ updateStats( PrivateData * p )
         tr_strlratio( ratio, stats.ratio, sizeof( ratio ) );
         g_snprintf( buf, sizeof(buf), _("Ratio: %s"), ratio );
     }
-    g_free( pch );
     gtk_label_set_text( GTK_LABEL( p->stats_lb ), buf );
 }
 

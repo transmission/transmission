@@ -29,7 +29,7 @@ struct tr_stats_handle
 };
 
 static char*
-getFilename( const tr_handle * handle, char * buf, size_t buflen )
+getOldFilename( const tr_handle * handle, char * buf, size_t buflen )
 {
     tr_buildPath( buf, buflen, tr_sessionGetConfigDir(handle),
                                "stats.benc",
@@ -37,14 +37,29 @@ getFilename( const tr_handle * handle, char * buf, size_t buflen )
     return buf;
 }
 
+static char*
+getFilename( const tr_handle * handle, char * buf, size_t buflen )
+{
+    tr_buildPath( buf, buflen, tr_sessionGetConfigDir(handle),
+                               "stats.json",
+                               NULL );
+    return buf;
+}
+
 static void
 loadCumulativeStats( const tr_handle * handle, tr_session_stats * setme )
 {
+    int loaded = FALSE;
     char filename[MAX_PATH_LENGTH];
     tr_benc top;
 
     getFilename( handle, filename, sizeof(filename) );
-    if( !tr_bencLoadFile( filename, &top ) )
+    loaded = !tr_bencLoadJSONFile( filename, &top );
+    if( !loaded ) {
+        getOldFilename( handle, filename, sizeof(filename) );
+        loaded = !tr_bencLoadFile( filename, &top );
+    }
+    if( loaded )
     {
         int64_t i;
 
@@ -78,7 +93,7 @@ saveCumulativeStats( const tr_handle * handle, const tr_session_stats * s )
 
     getFilename( handle, filename, sizeof(filename) );
     tr_deepLog( __FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename );
-    tr_bencSaveFile( filename, &top );
+    tr_bencSaveJSONFile( filename, &top );
 
     tr_bencFree( &top );
 }

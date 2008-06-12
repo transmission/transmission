@@ -93,10 +93,10 @@ tr_prefs_init_global( void )
 
     pref_int_set_default    ( PREF_KEY_PORT, TR_DEFAULT_PORT );
 
-    pref_flag_set_default   ( PREF_KEY_NAT, TRUE );
+    pref_flag_set_default   ( PREF_KEY_PORT_FORWARDING, TRUE );
     pref_flag_set_default   ( PREF_KEY_PEX, TR_DEFAULT_PEX_ENABLED );
     pref_flag_set_default   ( PREF_KEY_ASKQUIT, TRUE );
-    pref_flag_set_default   ( PREF_KEY_ENCRYPTED_ONLY, FALSE );
+    pref_flag_set_default   ( PREF_KEY_ENCRYPTION, TR_ENCRYPTION_PREFERRED );
 
     pref_int_set_default    ( PREF_KEY_MSGLEVEL, TR_MSG_INF );
 
@@ -118,7 +118,7 @@ tr_prefs_init_global( void )
     pref_string_set_default( PREF_KEY_RPC_PASSWORD, pw );
     pref_flag_set_default  ( PREF_KEY_RPC_AUTH_ENABLED, FALSE );
 
-    pref_save( NULL );
+    pref_save( );
 }
 
 /**
@@ -191,12 +191,11 @@ static GtkWidget*
 new_entry( const char * key, gpointer core )
 {
     GtkWidget * w = gtk_entry_new( );
-    char * value = pref_string_get( key );
+    const char * value = pref_string_get( key );
     if( value )
         gtk_entry_set_text( GTK_ENTRY( w ), value );
     g_object_set_data_full( G_OBJECT(w), PREF_KEY, g_strdup(key), g_free );
     g_signal_connect( w, "changed", G_CALLBACK(entry_changed_cb), core );
-    g_free( value );
     return w;
 }
 
@@ -214,11 +213,10 @@ new_path_chooser_button( const char * key, gpointer core )
 {
     GtkWidget * w = gtk_file_chooser_button_new( NULL,
                                     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
-    char * path = pref_string_get( key );
+    const char * path = pref_string_get( key );
     g_object_set_data_full( G_OBJECT(w), PREF_KEY, g_strdup(key), g_free );
     g_signal_connect( w, "selection-changed", G_CALLBACK(chosen_cb), core );
     gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER(w), path );
-    g_free( path );
     return w;
 }
 
@@ -496,6 +494,15 @@ onUpdateBlocklistCB( GtkButton * w, gpointer gdata )
     tr_webRun( handle, url, NULL, got_blocklist, data );
 }
 
+static void
+onEncryptionToggled( GtkToggleButton * w, gpointer core )
+{
+    const int val = gtk_toggle_button_get_active( w )
+                  ? TR_ENCRYPTION_REQUIRED
+                  : TR_ENCRYPTION_PREFERRED;
+    tr_core_set_pref_int( TR_CORE( core ), PREF_KEY_ENCRYPTION, val );
+}
+
 static GtkWidget*
 peerPage( GObject * core, gboolean * alive )
 {
@@ -530,7 +537,10 @@ peerPage( GObject * core, gboolean * alive )
         hig_workarea_add_wide_control( t, &row, h );
         
         s = _("_Ignore unencrypted peers");
-        w = new_check_button( s, PREF_KEY_ENCRYPTED_ONLY, core );
+        w = gtk_check_button_new_with_mnemonic( s );
+        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(w),
+                                      pref_int_get(PREF_KEY_ENCRYPTION)==TR_ENCRYPTION_REQUIRED );
+        g_signal_connect( w, "toggled", G_CALLBACK(onEncryptionToggled), core );
         hig_workarea_add_wide_control( t, &row, w );
 
         s = _("Use peer e_xchange");
@@ -810,7 +820,7 @@ remotePage( GObject * core )
 
         /* access control list */
         {
-        char * val = pref_string_get( PREF_KEY_RPC_ACL );
+        const char * val = pref_string_get( PREF_KEY_RPC_ACL );
         GtkTreeModel * m = acl_tree_model_new( val );
         GtkTreeViewColumn * c;
         GtkCellRenderer * r;
@@ -852,7 +862,6 @@ remotePage( GObject * core )
         w = hig_workarea_add_row( t, &row, s, w, NULL );
         gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.1f );
         page->widgets = g_slist_append( page->widgets, w );
-        g_free( val );
 
         /* permission column */
         m = allow_deny_model_new( );
@@ -971,7 +980,7 @@ networkPage( GObject * core )
     hig_workarea_add_section_title (t, &row, _( "Router" ) );
 
         s = _("Use port _forwarding from my router" );
-        w = new_check_button( s, PREF_KEY_NAT, core );
+        w = new_check_button( s, PREF_KEY_PORT_FORWARDING, core );
         hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_add_section_divider( t, &row );

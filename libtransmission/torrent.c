@@ -1554,7 +1554,7 @@ tr_torrentSetAnnounceList( tr_torrent             * tor,
                            const tr_tracker_info  * trackers,
                            int                      trackerCount )
 {
-    tr_benc metainfo = BENC_INIT;
+    tr_benc metainfo;
 
     /* save to the .torrent file */
     if( !tr_bencLoadFile( tor->info.torrent, &metainfo ) )

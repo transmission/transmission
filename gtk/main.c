@@ -412,11 +412,9 @@ main( int argc, char ** argv )
                             "gtk",
                             pref_string_get( PREF_KEY_DOWNLOAD_DIR ),
                             pref_flag_get( PREF_KEY_PEX ),
-                            pref_flag_get( PREF_KEY_NAT ),
+                            pref_flag_get( PREF_KEY_PORT_FORWARDING ),
                             pref_int_get( PREF_KEY_PORT ),
-                            pref_flag_get( PREF_KEY_ENCRYPTED_ONLY )
-                                ? TR_ENCRYPTION_REQUIRED
-                                : TR_ENCRYPTION_PREFERRED,
+                            pref_int_get( PREF_KEY_ENCRYPTION ),
                             pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ),
                             pref_int_get( PREF_KEY_UL_LIMIT ),
                             pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ),
@@ -887,11 +885,11 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     struct cbdata * cbdata = data;
     tr_handle     * tr     = tr_core_handle( cbdata->core );
 
-    if( !strcmp( key, PREF_KEY_ENCRYPTED_ONLY ) )
+    if( !strcmp( key, PREF_KEY_ENCRYPTION ) )
     {
-        const gboolean crypto_only = pref_flag_get( key );
-        tr_sessionSetEncryption( tr, crypto_only ? TR_ENCRYPTION_REQUIRED
-                                                 : TR_ENCRYPTION_PREFERRED );
+        const int encryption = pref_int_get( key );
+g_message( "setting encryption to %d", encryption );
+        tr_sessionSetEncryption( tr, encryption );
     }
     else if( !strcmp( key, PREF_KEY_PORT ) )
     {
@@ -928,7 +926,7 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
         const int limit = pref_int_get( key );
         tr_sessionSetSpeedLimit( tr, TR_UP, limit );
     }
-    else if( !strcmp( key, PREF_KEY_NAT ) )
+    else if( !strcmp( key, PREF_KEY_PORT_FORWARDING ) )
     {
         const gboolean enabled = pref_flag_get( key );
         tr_sessionSetPortForwardingEnabled( tr, enabled );
@@ -953,21 +951,18 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     else if( !strcmp( key, PREF_KEY_RPC_ACL ) )
     {
         char * err = NULL;
-        char * s = pref_string_get( key );
+        const char * s = pref_string_get( key );
         tr_sessionSetRPCACL( tr, s, &err );
-        g_free( s );
     }
     else if( !strcmp( key, PREF_KEY_RPC_USERNAME ) )
     {
-        char * s = pref_string_get( key );
+        const char * s = pref_string_get( key );
         tr_sessionSetRPCUsername( tr, s );
-        g_free( s );
     }
     else if( !strcmp( key, PREF_KEY_RPC_PASSWORD ) )
     {
-        char * s = pref_string_get( key );
+        const char * s = pref_string_get( key );
         tr_sessionSetRPCPassword( tr, s );
-        g_free( s );
     }
     else if( !strcmp( key, PREF_KEY_RPC_AUTH_ENABLED ) )
     {
@@ -976,9 +971,8 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     }
     else if( !strcmp( key, PREF_KEY_PROXY_SERVER ) )
     {
-        char * s = pref_string_get( key );
+        const char * s = pref_string_get( key );
         tr_sessionSetProxy( tr, s );
-        g_free( s );
     }
     else if( !strcmp( key, PREF_KEY_PROXY_TYPE ) )
     {
@@ -997,15 +991,13 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     }
     else if( !strcmp( key, PREF_KEY_PROXY_USERNAME ) )
     {
-        char * s = pref_string_get( key );
+        const char * s = pref_string_get( key );
         tr_sessionSetProxyUsername( tr, s );
-        g_free( s );
     }
     else if( !strcmp( key, PREF_KEY_PROXY_PASSWORD ) )
     {
-        char * s = pref_string_get( key );
+        const char * s = pref_string_get( key );
         tr_sessionSetProxyPassword( tr, s );
-        g_free( s );
     }
 }
 

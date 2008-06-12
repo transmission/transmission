@@ -53,8 +53,6 @@ typedef struct tr_benc
     } val;
 } tr_benc;
 
-const tr_benc BENC_INIT;
-
 /* backwards compatability */
 typedef tr_benc benc_val_t;
 

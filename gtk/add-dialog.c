@@ -290,7 +290,7 @@ addDialog( GtkWindow * parent,
 {
     GtkWidget * w;
     GtkWidget * c;
-    char * folder;
+    const char * folder;
 
     w = gtk_file_chooser_dialog_new( _( "Add a Torrent" ), parent,
                                      GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -305,10 +305,8 @@ addDialog( GtkWindow * parent,
     addTorrentFilters( GTK_FILE_CHOOSER( w ) );
     g_signal_connect( w, "response", G_CALLBACK(onAddDialogResponse), core );
 
-    if(( folder = pref_string_get( PREF_KEY_OPEN_DIALOG_FOLDER ))) {
+    if(( folder = pref_string_get( PREF_KEY_OPEN_DIALOG_FOLDER )))
         gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ), folder );
-        g_free( folder );
-    }
 
     c = gtk_check_button_new_with_mnemonic( _( "Display _options dialog" ) );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( c ), pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) );
