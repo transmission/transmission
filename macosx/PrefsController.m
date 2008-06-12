@@ -760,20 +760,22 @@
     //don't allow passwords to be set if no user name
     if ([username isEqualToString: @""])
     {
-        NSBeep();
-        [fProxyPasswordField setStringValue: @""];
+        [sender setStringValue: @""];
+        
+        [fProxyPassword release];
+        fProxyPassword = [@"" retain];
         return;
     }
     
     [fProxyPassword release];
     fProxyPassword = [[sender stringValue] retain];
     
-    EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission Proxy"
+    EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission:Proxy"
                                             withUsername: username];
     if (keychainItem)
         [keychainItem setPassword: fProxyPassword];
     else
-        [[EMKeychainProxy sharedProxy] addGenericKeychainItemForService: @"Transmission Proxy" withUsername: username
+        [[EMKeychainProxy sharedProxy] addGenericKeychainItemForService: @"Transmission:Proxy" withUsername: username
             password: fProxyPassword];
     
     tr_sessionSetProxyPassword(fHandle, [fProxyPassword UTF8String]);
@@ -787,7 +789,7 @@
     
     if (![username isEqualToString: @""])
     {
-        EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission Proxy"
+        EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission:Proxy"
                                                 withUsername: [fDefaults stringForKey: @"ProxyUsername"]];
         if (!(fProxyPassword = [keychainItem password]))
             fProxyPassword = @"";
