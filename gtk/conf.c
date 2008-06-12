@@ -287,8 +287,7 @@ getCompat090PrefsFilename( void )
 static char*
 getCompat121PrefsFilename( void )
 {
-    assert( gl_confdir != NULL );
-    return g_build_filename( gl_confdir, "prefs.ini", NULL );
+    return g_build_filename( g_get_user_config_dir(), "transmission", "gtk", "prefs.ini", NULL );
 }
 
 static void
@@ -378,7 +377,7 @@ translate_keyfile_to_json( const char * old_file, const char * new_file )
                 key = renamed[j].newkey;
 
         if( !strcmp(val,"true") || !strcmp(val,"false") )
-            tr_bencDictAddInt( &dict, key, !strcmp(val,"true") );
+            tr_bencDictAddInt( &dict, key, !strcmp( val, "true" ) );
         else {
             char * end;
             long l;
