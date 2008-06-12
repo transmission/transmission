@@ -27,6 +27,7 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
+#import "EMKeychainProxy.h"
 
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
@@ -107,6 +108,7 @@
         
         //set proxy type
         [self updateProxyType];
+        [self updateProxyPassword];
         
         //update rpc access list
         fRPCAccessArray = [[fDefaults arrayForKey: @"RPCAccessList"] mutableCopy];
@@ -126,13 +128,14 @@
 
 - (void) dealloc
 {
-    if (fPortStatusTimer)
-        [fPortStatusTimer invalidate];
+    [fPortStatusTimer invalidate];
     if (fPortChecker)
     {
         [fPortChecker cancelProbe];
         [fPortChecker release];
     }
+    
+    [fProxyPassword release];
     
     [fRPCAccessArray release];
     
@@ -206,6 +209,7 @@
             proxyType = PROXY_HTTP;
     }
     [fProxyTypePopUp selectItemAtIndex: proxyType];
+    [fProxyPasswordField setStringValue: fProxyPassword];
     
     //set blocklist
     [self updateBlocklistFields];
@@ -694,21 +698,6 @@
     }
 }
 
-- (void) setProxyAuthorize: (id) sender
-{
-    tr_sessionSetProxyAuthEnabled(fHandle, [fDefaults boolForKey: @"ProxyAuthorize"]);
-}
-
-- (void) setProxyUsername: (id) sender
-{
-    tr_sessionSetProxyUsername(fHandle, [[fDefaults stringForKey: @"ProxyUsername"] UTF8String]);
-}
-
-- (void) setProxyPassword: (id) sender
-{
-    tr_sessionSetProxyPassword(fHandle, [[fDefaults stringForKey: @"ProxyPassword"] UTF8String]);
-}
-
 - (void) setProxyType: (id) sender
 {
     NSString * type;
@@ -748,6 +737,67 @@
     }
     
     tr_sessionSetProxyType(fHandle, type);
+}
+
+- (void) setProxyAuthorize: (id) sender
+{
+    tr_sessionSetProxyAuthEnabled(fHandle, [fDefaults boolForKey: @"ProxyAuthorize"]);
+}
+
+- (void) setProxyUsername: (id) sender
+{
+    tr_sessionSetProxyUsername(fHandle, [[fDefaults stringForKey: @"ProxyUsername"] UTF8String]);
+    
+    //new username means new password
+    [self updateProxyPassword];
+    [fProxyPasswordField setStringValue: fProxyPassword];
+}
+
+- (void) setProxyPassword: (id) sender
+{
+    NSString * username = [fDefaults stringForKey: @"ProxyUsername"];
+    
+    //don't allow passwords to be set if no user name
+    if ([username isEqualToString: @""])
+    {
+        NSBeep();
+        [fProxyPasswordField setStringValue: @""];
+        return;
+    }
+    
+    [fProxyPassword release];
+    fProxyPassword = [[sender stringValue] retain];
+    
+    EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission Proxy"
+                                            withUsername: username];
+    if (keychainItem)
+        [keychainItem setPassword: fProxyPassword];
+    else
+        [[EMKeychainProxy sharedProxy] addGenericKeychainItemForService: @"Transmission Proxy" withUsername: username
+            password: fProxyPassword];
+    
+    tr_sessionSetProxyPassword(fHandle, [fProxyPassword UTF8String]);
+}
+
+- (void) updateProxyPassword
+{
+    [fProxyPassword release];
+    
+    NSString * username = [fDefaults stringForKey: @"ProxyUsername"];
+    
+    if (![username isEqualToString: @""])
+    {
+        EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission Proxy"
+                                                withUsername: [fDefaults stringForKey: @"ProxyUsername"]];
+        if (!(fProxyPassword = [keychainItem password]))
+            fProxyPassword = @"";
+    }
+    else
+        fProxyPassword = @"";
+    
+    [fProxyPassword retain];
+    
+    tr_sessionSetProxyPassword(fHandle, [fProxyPassword UTF8String]);
 }
 
 - (void) setRPCEnabled: (id) sender

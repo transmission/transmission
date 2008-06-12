@@ -106,8 +106,6 @@
 	<string></string>
 	<key>ProxyAuthorize</key>
 	<false/>
-	<key>ProxyPassword</key>
-	<string></string>
 	<key>ProxyType</key>
 	<string>HTTP</string>
 	<key>ProxyUsername</key>

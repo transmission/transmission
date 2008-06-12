@@ -24,8 +24,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class CTGradient;
-
 @interface GroupsController : NSObject
 {
     NSMutableArray * fGroups;
