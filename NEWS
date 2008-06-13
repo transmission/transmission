@@ -1,11 +1,20 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.22 (2008/06/xx)
+http://trac.transmissionbt.com/query?group=component&milestone=1.22&order=severity
+- All Platforms
+  + Fix two separate BitTorrent unchoke bugs that could affect performance.
+  + Allow torrent creation with no tracker address (required by some trackers)
+  + Transmission now builds correctly on Sun Studio
+  + Minor fixes to the man pages
 - GTK+
+  + Fix crash when quitting while the stats window is still up
   + Added Latvian, Malayalam, Serbian, and Telugu translations
   + Updated Czech, Español, Romanian, Russian, Dutch, Polish, Italian,
     Portuguese, Catalan, Danish, German, Swedish, Traditional Chinese,
     Finnish, and Chinese (simplified) translations
+- CLI:
+  + Fix scraping torrents with the -s command-line argument
 
 1.21 (2008/05/21)
 http://trac.transmissionbt.com/query?group=component&milestone=1.21&order=severity
