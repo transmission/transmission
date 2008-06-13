@@ -453,9 +453,7 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         my_cell.height = p->bar_height;
         if( 1 )
         {
-            const double havePercent = ( torStat->haveValid + torStat->haveUnchecked )
-                                                              / (double)info->totalSize;
-            g_object_set( p->progress_renderer, "value", (int)(havePercent*100.0), 
+            g_object_set( p->progress_renderer, "value", (int)(torStat->percentDone*100.0), 
                                                 "text", "",
                                                 NULL );
             gtk_cell_renderer_render( p->progress_renderer,
