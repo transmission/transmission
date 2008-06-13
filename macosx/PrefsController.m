@@ -109,9 +109,7 @@
         //set proxy type
         [self updateProxyType];
         
-        fProxyPasswordSet = NO;
-        if ([fDefaults boolForKey: @"Proxy"] && [fDefaults boolForKey: @"ProxyAuthorize"])
-            [self updateProxyPassword];
+        [self updateProxyPassword];
         
         //update rpc access list
         fRPCAccessArray = [[fDefaults arrayForKey: @"RPCAccessList"] mutableCopy];
@@ -677,10 +675,6 @@
 {
     BOOL enable = [fDefaults boolForKey: @"Proxy"];
     tr_sessionSetProxyEnabled(fHandle, [fDefaults boolForKey: @"Proxy"]);
-    
-    //if proxy password hasn't be retrieved, get it now
-    if (!fProxyPasswordSet && enable && [fDefaults boolForKey: @"ProxyAuthorize"])
-        [self updateProxyPassword];
 }
 
 - (void) setProxyAddress: (id) sender
@@ -749,10 +743,6 @@
 {
     BOOL enable = [fDefaults boolForKey: @"ProxyAuthorize"];
     tr_sessionSetProxyAuthEnabled(fHandle, enable);
-    
-    //if proxy password hasn't be retrieved, get it now
-    if (!fProxyPasswordSet && enable)
-        [self updateProxyPassword];
 }
 
 - (void) setProxyUsername: (id) sender
@@ -775,10 +765,9 @@
     tr_sessionSetProxyPassword(fHandle, [password UTF8String]);
 }
 
+//user will only be prompted if Keychain is locked and Transmission has changed since last launched
 - (void) updateProxyPassword
 {
-    fProxyPasswordSet = YES;
-    
     NSString * password;
     EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission:Proxy"
                                             withUsername: @"Proxy"];
