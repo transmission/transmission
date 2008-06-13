@@ -1,13 +1,13 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.30 (2008/mm/dd)
-http://trac.transmissionbt.com/query?group=component&milestone=1.30&order=severity
+http://trac.transmissionbt.com/query?group=component&milestone=1.30
 - All Platforms
    + Added support for HTTP/FTP Seeding (GetRight style)
    + Added proxy support for communicating with trackers
    + Ability to add and remove tracker addresses
    + Ability to create torrent files with multiple tracker addresses
-   + Creation of torrent files with no tracker address (required by some tracker sites) 
+   + Allow torrent creation with no tracker address (required by some trackers)
 - Mac
    + Quick Look integration in the main window and inspector's file tab
    + Transfers can be dragged to different groups
@@ -15,12 +15,27 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.30&order=severi
    + Status strings are toggled from the action button (they are no longer clickable)
    + Colors in pieces bar and pieces box more accurately reflect their corresponding values
 - GTK+
-   + Add preferences options to inhibit hibernation and to toggle the tray icon
+   + Add options to inhibit hibernation and to toggle the tray icon
 - Daemon
    + Redesigned & rewritten to use JSON over http
 
+1.22 (2008/06/13)
+http://trac.transmissionbt.com/query?group=component&milestone=1.22
+- All Platforms
+  + Fix two separate BitTorrent unchoke bugs that could affect performance.
+  + Transmission now builds correctly on Sun Studio
+  + Minor man page fixes
+- GTK+
+  + Fix crash when quitting while the stats window is still up
+  + Added Latvian, Malayalam, Serbian, and Telugu translations
+  + Updated Czech, Español, Romanian, Russian, Dutch, Polish, Italian,
+    Portuguese, Catalan, Danish, German, Swedish, Traditional Chinese,
+    Finnish, and Chinese (simplified) translations
+- CLI:
+  + Fix scraping torrents with the -s command-line argument
+
 1.21 (2008/05/21)
-http://trac.transmissionbt.com/query?group=component&milestone=1.21&order=severity
+http://trac.transmissionbt.com/query?group=component&milestone=1.21
 - All Platforms
    + Fix rare crash-on-startup bug
    + Handle corrupt announce URLs in torrent files more gracefully
@@ -33,7 +48,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.21&order=severi
      Polish, Romanian, Thai, Turkish, and Traditional Chinese translations
 
 1.20 (2008/05/09)
-http://trac.transmissionbt.com/query?group=component&milestone=1.20&order=severity
+http://trac.transmissionbt.com/query?group=component&milestone=1.20
 - All Platforms
    + Support https tracker connections
    + IP blocking using the Bluetack Level1 blocklist
