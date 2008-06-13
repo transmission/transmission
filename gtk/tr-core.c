@@ -441,7 +441,7 @@ scanWatchDir( TrCore * core )
     const gboolean isEnabled = pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED );
     if( isEnabled )
     {
-        char * dirname = pref_string_get( PREF_KEY_DIR_WATCH );
+        const char * dirname = pref_string_get( PREF_KEY_DIR_WATCH );
         GDir * dir = g_dir_open( dirname, 0, NULL );
         const char * basename;
         while(( basename = g_dir_read_name( dir ))) {
@@ -449,14 +449,13 @@ scanWatchDir( TrCore * core )
             maybeAddTorrent( core, filename );
             g_free( filename );
         }
-        g_free( dirname );
     }
 }
 
 static void
 updateWatchDir( TrCore * core )
 {
-    char * filename = pref_string_get( PREF_KEY_DIR_WATCH );
+    const char * filename = pref_string_get( PREF_KEY_DIR_WATCH );
     const gboolean isEnabled = pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED );
     struct TrCorePrivate * p = TR_CORE( core )->priv;
 
@@ -482,7 +481,6 @@ updateWatchDir( TrCore * core )
                                            G_CALLBACK( watchFolderChanged ), core );
     }
 
-    g_free( filename );
 }
 #endif
 
