@@ -618,6 +618,7 @@ quitThreadFunc( gpointer gdata )
     return NULL;
 }
 
+#if 0
 /* since there are no buttons in the dialog, gtk tries to
  * select one of the labels, which looks ugly... so force
  * the dialog's primary and secondary labels to be unselectable */
@@ -629,6 +630,7 @@ deselectLabels( GtkWidget * w, gpointer unused UNUSED )
     else if( GTK_IS_CONTAINER( w ) )
         gtk_container_foreach( GTK_CONTAINER(w), deselectLabels, NULL );
 }
+#endif
 
 static void
 do_exit_cb( GtkWidget *w UNUSED, gpointer data UNUSED )

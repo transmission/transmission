@@ -1,4 +1,4 @@
-/* $Id: natpmp.c,v 1.6 2008/04/28 02:58:34 nanard Exp $ */
+/* $Id: natpmp.c,v 1.7 2008/05/29 08:06:01 nanard Exp $ */
 /* libnatpmp
  * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
  * http://miniupnp.free.fr/libnatpmp.html
@@ -203,11 +203,11 @@ int readnatpmpresponse(natpmp_t * p, natpmpresp_t * response)
 			response->type = buf[1] & 0x7f;
 			if(buf[1] == 128)
 				//response->publicaddress.addr = *((uint32_t *)(buf + 8));
-				response->publicaddress.addr.s_addr = *((uint32_t *)(buf + 8));
+				response->pnu.publicaddress.addr.s_addr = *((uint32_t *)(buf + 8));
 			else {
-				response->newportmapping.privateport = ntohs(*((uint16_t *)(buf + 8)));
-				response->newportmapping.mappedpublicport = ntohs(*((uint16_t *)(buf + 10)));
-				response->newportmapping.lifetime = ntohl(*((uint32_t *)(buf + 12)));
+				response->pnu.newportmapping.privateport = ntohs(*((uint16_t *)(buf + 8)));
+				response->pnu.newportmapping.mappedpublicport = ntohs(*((uint16_t *)(buf + 10)));
+				response->pnu.newportmapping.lifetime = ntohl(*((uint32_t *)(buf + 12)));
 			}
 			n = 0;
 		}

@@ -126,7 +126,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
         const int val = readnatpmpresponseorretry( &nat->natpmp, &response );
         logVal( "readnatpmpresponseorretry", val );
         if( val >= 0 ) {
-            tr_ninf( getKey(), _( "Found public address \"%s\"" ), inet_ntoa( response.publicaddress.addr ) );
+            tr_ninf( getKey(), _( "Found public address \"%s\"" ), inet_ntoa( response.pnu.publicaddress.addr ) );
             nat->state = TR_NATPMP_IDLE;
         } else if( val != NATPMP_TRYAGAIN ) {
             nat->state = TR_NATPMP_ERR;
@@ -188,7 +188,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
             nat->state = TR_NATPMP_IDLE;
             nat->isMapped = 1;
             nat->renewTime = time( NULL ) + LIFETIME_SECS;
-            nat->port = resp.newportmapping.privateport;
+            nat->port = resp.pnu.newportmapping.privateport;
             tr_ninf( getKey(), _( "Port %d forwarded successfully" ), nat->port );
         } else if( val != NATPMP_TRYAGAIN ) {
             nat->state = TR_NATPMP_ERR;

@@ -842,9 +842,9 @@ tr_torrentPeersFree( tr_peer_stat * peers, int peerCount UNUSED )
 
 void tr_torrentAvailability( const tr_torrent * tor, int8_t * tab, int size )
 {
-    return tr_peerMgrTorrentAvailability( tor->handle->peerMgr,
-                                          tor->info.hash,
-                                          tab, size );
+    tr_peerMgrTorrentAvailability( tor->handle->peerMgr,
+                                   tor->info.hash,
+                                   tab, size );
 }
 
 void
