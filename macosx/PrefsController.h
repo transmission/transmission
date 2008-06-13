@@ -60,6 +60,7 @@
     IBOutlet NSTextField * fProxyAddressField, * fProxyPasswordField;
     IBOutlet NSPopUpButton * fProxyTypePopUp;
     NSString * fProxyPassword;
+    BOOL fProxyPasswordSet;
     
     IBOutlet NSTextField * fRPCPortField;
     IBOutlet NSTableView * fRPCAccessTable;

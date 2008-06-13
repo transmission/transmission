@@ -108,7 +108,10 @@
         
         //set proxy type
         [self updateProxyType];
-        [self updateProxyPassword];
+        
+        fProxyPasswordSet = NO;
+        if ([fProxyPasswordField isEnabled])
+            [self updateProxyPassword];
         
         //update rpc access list
         fRPCAccessArray = [[fDefaults arrayForKey: @"RPCAccessList"] mutableCopy];
@@ -209,7 +212,7 @@
             proxyType = PROXY_HTTP;
     }
     [fProxyTypePopUp selectItemAtIndex: proxyType];
-    [fProxyPasswordField setStringValue: fProxyPassword];
+    [fProxyPasswordField setStringValue: fProxyPassword ? fProxyPassword : @""];
     
     //set blocklist
     [self updateBlocklistFields];
@@ -675,6 +678,13 @@
 - (void) setProxyEnabled: (id) sender
 {
     tr_sessionSetProxyEnabled(fHandle, [fDefaults boolForKey: @"Proxy"]);
+    
+    //if proxy password hasn't be retrieved, get it now
+    if (!fProxyPasswordSet && [fProxyPasswordField isEnabled])
+    {
+        [self updateProxyPassword];
+        [fProxyPasswordField setStringValue: fProxyPassword];
+    }
 }
 
 - (void) setProxyAddress: (id) sender
@@ -742,40 +752,31 @@
 - (void) setProxyAuthorize: (id) sender
 {
     tr_sessionSetProxyAuthEnabled(fHandle, [fDefaults boolForKey: @"ProxyAuthorize"]);
+    
+    //if proxy password hasn't be retrieved, get it now
+    if (!fProxyPasswordSet && [fProxyPasswordField isEnabled])
+    {
+        [self updateProxyPassword];
+        [fProxyPasswordField setStringValue: fProxyPassword];
+    }
 }
 
 - (void) setProxyUsername: (id) sender
 {
     tr_sessionSetProxyUsername(fHandle, [[fDefaults stringForKey: @"ProxyUsername"] UTF8String]);
-    
-    //new username means new password
-    [self updateProxyPassword];
-    [fProxyPasswordField setStringValue: fProxyPassword];
 }
 
 - (void) setProxyPassword: (id) sender
 {
-    NSString * username = [fDefaults stringForKey: @"ProxyUsername"];
-    
-    //don't allow passwords to be set if no user name
-    if ([username isEqualToString: @""])
-    {
-        [sender setStringValue: @""];
-        
-        [fProxyPassword release];
-        fProxyPassword = [@"" retain];
-        return;
-    }
-    
     [fProxyPassword release];
     fProxyPassword = [[sender stringValue] retain];
     
     EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission:Proxy"
-                                            withUsername: username];
+                                            withUsername: @"Proxy"];
     if (keychainItem)
         [keychainItem setPassword: fProxyPassword];
     else
-        [[EMKeychainProxy sharedProxy] addGenericKeychainItemForService: @"Transmission:Proxy" withUsername: username
+        [[EMKeychainProxy sharedProxy] addGenericKeychainItemForService: @"Transmission:Proxy" withUsername: @"Proxy"
             password: fProxyPassword];
     
     tr_sessionSetProxyPassword(fHandle, [fProxyPassword UTF8String]);
@@ -783,20 +784,14 @@
 
 - (void) updateProxyPassword
 {
+    fProxyPasswordSet = YES;
+    
     [fProxyPassword release];
     
-    NSString * username = [fDefaults stringForKey: @"ProxyUsername"];
-    
-    if (![username isEqualToString: @""])
-    {
-        EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission:Proxy"
-                                                withUsername: [fDefaults stringForKey: @"ProxyUsername"]];
-        if (!(fProxyPassword = [keychainItem password]))
-            fProxyPassword = @"";
-    }
-    else
+    EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission:Proxy"
+                                            withUsername: @"Proxy"];
+    if (!(fProxyPassword = [keychainItem password]))
         fProxyPassword = @"";
-    
     [fProxyPassword retain];
     
     tr_sessionSetProxyPassword(fHandle, [fProxyPassword UTF8String]);
