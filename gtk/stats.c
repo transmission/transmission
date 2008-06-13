@@ -77,6 +77,12 @@ updateStats( gpointer gdata )
 }
 
 static void
+dialogDestroyed( gpointer p, GObject * dialog UNUSED )
+{
+    g_source_remove( GPOINTER_TO_UINT( p ) );
+}
+
+static void
 dialogResponse( GtkDialog * dialog, gint response, gpointer gdata )
 {
     struct stat_ui * ui = gdata;
@@ -90,7 +96,6 @@ dialogResponse( GtkDialog * dialog, gint response, gpointer gdata )
 
     if( response == GTK_RESPONSE_CLOSE )
     {
-        g_source_remove( GPOINTER_TO_UINT( g_object_get_data( G_OBJECT(dialog), "TrTimer" ) ) );
         gtk_widget_destroy( GTK_WIDGET( dialog ) );
     }
 }
@@ -143,6 +148,6 @@ stats_dialog_create( GtkWindow * parent, TrCore * core )
     g_object_set_data_full( G_OBJECT(d), "data", ui, g_free );
     g_signal_connect( d, "response", G_CALLBACK(dialogResponse), ui );
     i = g_timeout_add( 1000, updateStats, ui );
-    g_object_set_data( G_OBJECT(d), "TrTimer", GUINT_TO_POINTER(i) );
+    g_object_weak_ref( G_OBJECT( d ), dialogDestroyed, GUINT_TO_POINTER( i ) );
     return d;
 }
