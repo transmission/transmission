@@ -19,7 +19,7 @@
 </ul>
 <h4>Mac-specific Changes:</h4>
 <ul>
- <li>Fix bug where "Program Started" in the Statistics window would always display as 0</li>
+ <li>Fix bug where "Program Started" in the Statistics window would sometimes display as 0</li>
 </ul>
 
 
