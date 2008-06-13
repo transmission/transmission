@@ -355,9 +355,12 @@ translate_keyfile_to_json( const char * old_file, const char * new_file )
 	const char* newkey;
     } renamed[] = {
 	{ "default-download-directory", "download-dir" },
+        { "encrypted-connections-only", "encryption" },
 	{ "listening-port", "peer-port" },
         { "nat-traversal-enabled", "port-forwarding-enabled" },
-        { "encrypted-connections-only", "encryption" }
+        { "open-dialog-folder", "open-dialog-dir" },
+        { "watch-folder", "watch-dir" },
+        { "watch-folder-enabled", "watch-dir-enabled" }
     };
 
     keyfile = g_key_file_new( );
