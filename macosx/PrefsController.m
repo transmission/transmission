@@ -54,6 +54,9 @@
 #define PROXY_KEYCHAIN_SERVICE  @"Transmission:Proxy"
 #define PROXY_KEYCHAIN_NAME     @"Proxy"
 
+#define RPC_KEYCHAIN_SERVICE    @"Transmission:Remote"
+#define RPC_KEYCHAIN_NAME       @"Remote"
+
 @interface PrefsController (Private)
 
 - (void) setPrefView: (id) sender;
@@ -113,10 +116,11 @@
         
         //set proxy type
         [self updateProxyType];
-        
         [self updateProxyPassword];
         
         //update rpc access list
+        [self updateRPCPassword];
+        
         fRPCAccessArray = [[fDefaults arrayForKey: @"RPCAccessList"] mutableCopy];
         if (!fRPCAccessArray)
             fRPCAccessArray = [[NSMutableArray arrayWithObject: [NSDictionary dictionaryWithObjectsAndKeys: @"127.0.0.1", @"IP",
@@ -220,6 +224,7 @@
     
     //set rpc port
     [fRPCPortField setIntValue: [fDefaults integerForKey: @"RPCPort"]];
+    [fRPCPasswordField setStringValue: [NSString stringWithUTF8String: tr_sessionGetRPCPassword(fHandle)]];
 }
 
 - (void) setUpdater: (SUUpdater *) updater
@@ -763,12 +768,12 @@
     tr_sessionSetProxyPassword(fHandle, [password UTF8String]);
 }
 
-//user will only be prompted if Keychain is locked and Transmission has changed since last launched
 - (void) updateProxyPassword
 {
-    NSString * password;
     EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: PROXY_KEYCHAIN_SERVICE
                                             withUsername: PROXY_KEYCHAIN_NAME];
+    
+    NSString * password;
     if (!(password = [keychainItem password]))
         password = @"";
     
@@ -794,7 +799,24 @@
 
 - (void) setRPCPassword: (id) sender
 {
-    tr_sessionSetRPCPassword(fHandle, [[fDefaults stringForKey: @"RPCPassword"] UTF8String]);
+    NSString * password = [[sender stringValue] retain];
+    [self setKeychainPassword: password forService: RPC_KEYCHAIN_SERVICE username: RPC_KEYCHAIN_NAME];
+    
+    tr_sessionSetRPCPassword(fHandle, [password UTF8String]);
+}
+
+- (void) updateRPCPassword
+{
+    EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: RPC_KEYCHAIN_SERVICE
+                                            withUsername: RPC_KEYCHAIN_NAME];
+    
+    NSString * password;
+    if (!(password = [keychainItem password]))
+        password = @"";
+    
+    tr_sessionSetRPCPassword(fHandle, [password UTF8String]);
+    
+    [fRPCPasswordField setStringValue: password];
 }
 
 - (void) setRPCPort: (id) sender
@@ -1123,7 +1145,7 @@
 
 - (void) setKeychainPassword: (NSString *) password forService: (NSString *) service username: (NSString *) username
 {
-    BOOL shouldAdd = ![password isEqualToString: @""];
+    BOOL shouldAdd = password && ![password isEqualToString: @""];
     
     EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: service withUsername: username];
     if (keychainItem)

@@ -126,8 +126,6 @@
 	<false/>
 	<key>RPCAuthorize</key>
 	<false/>
-	<key>RPCPassword</key>
-	<string></string>
 	<key>RPCPort</key>
 	<integer>9091</integer>
 	<key>RPCUsername</key>

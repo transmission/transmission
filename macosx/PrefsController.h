@@ -60,7 +60,7 @@
     IBOutlet NSTextField * fProxyAddressField, * fProxyPasswordField;
     IBOutlet NSPopUpButton * fProxyTypePopUp;
     
-    IBOutlet NSTextField * fRPCPortField;
+    IBOutlet NSTextField * fRPCPortField, * fRPCPasswordField;
     IBOutlet NSTableView * fRPCAccessTable;
     IBOutlet NSSegmentedControl * fRPCAddRemoveControl;
     NSMutableArray * fRPCAccessArray;
@@ -134,6 +134,7 @@
 - (void) setRPCAuthorize: (id) sender;
 - (void) setRPCUsername: (id) sender;
 - (void) setRPCPassword: (id) sender;
+- (void) updateRPCPassword;
 - (void) setRPCPort: (id) sender;
 - (void) updateRPCAccessList;
 - (void) addRemoveRPCIP: (id) sender;

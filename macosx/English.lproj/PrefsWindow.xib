@@ -9,6 +9,7 @@
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="66"/>
+			<integer value="1481"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3026,7 +3027,7 @@ AAABAAAAAQ</bytes>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSCustomView" id="810116101">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3538,6 +3539,7 @@ AAABAAAAAQ</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{535, 403}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
 			</object>
@@ -5417,22 +5419,6 @@ AAABAAAAAQ</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.RPCPassword</string>
-						<reference key="source" ref="894846458"/>
-						<reference key="destination" ref="356871564"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="894846458"/>
-							<reference key="NSDestination" ref="356871564"/>
-							<string key="NSLabel">value: values.RPCPassword</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.RPCPassword</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">1566</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: values.RPCAuthorize</string>
 						<reference key="source" ref="151618662"/>
 						<reference key="destination" ref="356871564"/>
@@ -5926,6 +5912,14 @@ AAABAAAAAQ</bytes>
 						<reference key="destination" ref="1043027599"/>
 					</object>
 					<int key="connectionID">1673</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fRPCPasswordField</string>
+						<reference key="source" ref="511492310"/>
+						<reference key="destination" ref="894846458"/>
+					</object>
+					<int key="connectionID">1674</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -8980,7 +8974,7 @@ AAABAAAAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1673</int>
+			<int key="maxID">1674</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -9185,6 +9179,7 @@ AAABAAAAAQ</bytes>
 							<string>fQueueSeedField</string>
 							<string>fRPCAccessTable</string>
 							<string>fRPCAddRemoveControl</string>
+							<string>fRPCPasswordField</string>
 							<string>fRPCPortField</string>
 							<string>fRatioStopField</string>
 							<string>fRemoteView</string>
@@ -9220,6 +9215,7 @@ AAABAAAAAQ</bytes>
 							<string>NSTextField</string>
 							<string>NSTableView</string>
 							<string>NSSegmentedControl</string>
+							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSView</string>

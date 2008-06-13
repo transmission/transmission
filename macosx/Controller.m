@@ -222,7 +222,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 NULL, /* reset in prefs */
                                 [fDefaults boolForKey: @"RPCAuthorize"],
                                 [[fDefaults stringForKey: @"RPCUsername"] UTF8String],
-                                [[fDefaults stringForKey: @"RPCPassword"] UTF8String],
+                                "", /* reset in prefs - from Keychain */
                                 [fDefaults boolForKey: @"Proxy"],
                                 [[fDefaults stringForKey: @"ProxyAddress"] UTF8String],
                                 TR_DEFAULT_PROXY_TYPE, /* reset in prefs */
