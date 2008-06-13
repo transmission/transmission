@@ -19,102 +19,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-05-03 14:47+0000\n"
-"Last-Translator: Alessandro Ranaldi <ranaldialessandro@gmail.com>\n"
+"PO-Revision-Date: 2008-06-10 20:18+0000\n"
+"Last-Translator: Luca Ferretti <elle.uca@libero.it>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-05-08 18:40+0000\n"
+"X-Launchpad-Export-Date: 2008-06-13 16:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
-
-# (ndt) suggerimento
-#~ msgid "Open a torrent"
-#~ msgstr "Apre un torrent"
-
-#~ msgid "_Open..."
-#~ msgstr "_Apri..."
-
-#, c-format
-#~ msgid "Couldn't create \"%s\": %s"
-#~ msgstr "Impossibile creare «%s»: %s"
-
-#, c-format
-#~ msgid "Couldn't open \"%s\": %s"
-#~ msgstr "Impossibile aprire «%s»: %s"
-
-#~ msgid "<b>Really Quit?</b>"
-#~ msgstr "<b>Uscire veramente?</b>"
-
-#, c-format
-#~ msgid "Couldn't connect to \"%s\": %s"
-#~ msgstr "Impossibile connettersi a «%s»: %s"
-
-#, c-format
-#~ msgid "Couldn't set up socket: %s"
-#~ msgstr "Impossibile impostare il socket: %s"
-
-#, c-format
-#~ msgid "Couldn't save file \"%s\": %s"
-#~ msgstr "Impossibile salvare il file «%s»: %s"
-
-#~ msgid "_Start when opened"
-#~ msgstr "_Avviare quando viene aperto"
-
-# (ndt) titolo finestra
-#~ msgid "Open a Torrent"
-#~ msgstr "Apri un torrent"
-
-#~ msgid "Opening Torrents"
-#~ msgstr "Apertura torrent"
-
-#~ msgid "Notification"
-#~ msgstr "Notifica"
-
-#~ msgid "_Display a message when torrents finish"
-#~ msgstr "_Visualizzare un messaggio al termine di un torrent"
-
-#~ msgid "Preferences"
-#~ msgstr "Preferenze"
-
-#~ msgid "Torrent needs to be verified"
-#~ msgstr "Il torrent deve essere verificato"
-
-#, c-format
-#~ msgid "Couldn't read resume file for \"%s\""
-#~ msgstr "Impossibile leggere il file di ripristino di «%s»"
-
-#, c-format
-#~ msgid "%s responded \"try again\""
-#~ msgstr "%s ha risposto \"try again\""
-
-#~ msgid "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!"
-#~ msgstr ""
-#~ "Se il proprio router supporta NAT-PMP, assicurarsi che sia abilitato."
-
-#, c-format
-#~ msgid "Bound socket %d to port %d"
-#~ msgstr "Socket %d vincolato alla porta %d"
-
-#, c-format
-#~ msgid "Got %d peers from peer exchange"
-#~ msgstr "Ottenuti %d peer dallo scambio dei peer"
-
-#~ msgid "If your router supports UPnP, please make sure UPnP is enabled!"
-#~ msgstr "Se il proprio router supporta UPnP, assicurarsi che sia abilitato."
-
-#, c-format
-#~ msgid "Couldn't read file \"%s\": %s"
-#~ msgstr "Impossibile leggere il file «%s»: %s"
-
-#, c-format
-#~ msgid "Couldn't read \"%s\": %s"
-#~ msgstr "Impossibile leggere «%s»: %s"
-
-#, c-format
-#~ msgid "Couldn't write \"%s\": %s"
-#~ msgstr "Impossibile scrivere «%s»: %s"
 
 #: ../gtk/actions.c:47
 msgid "Sort by _Activity"
@@ -272,7 +185,7 @@ msgstr "_Apri cartella"
 
 #: ../gtk/actions.c:132
 msgid "Ask Tracker for _More Peers"
-msgstr "C_hiedi più peer al server traccia"
+msgstr "C_hiedi più nodi al server traccia"
 
 #: ../gtk/add-dialog.c:135
 msgid "Torrent files"
@@ -297,7 +210,7 @@ msgstr "_Avviare quando aggiunto"
 
 #: ../gtk/add-dialog.c:199
 msgid "_Source file:"
-msgstr "File _sorgente:"
+msgstr "_File sorgente:"
 
 # (ndt) sembra sia un pulsante...
 #: ../gtk/add-dialog.c:203
@@ -322,7 +235,7 @@ msgstr "Aggiungi un torrent"
 
 #: ../gtk/add-dialog.c:313 ../gtk/tr-prefs.c:251
 msgid "Display _options dialog"
-msgstr "Visualizza dialogo _opzioni"
+msgstr "Visualizzare dialogo _opzioni"
 
 #: ../gtk/conf.c:60 ../gtk/makemeta-ui.c:117 ../libtransmission/utils.c:458
 #: ../libtransmission/utils.c:469
@@ -334,7 +247,7 @@ msgstr "Impossibile creare «%1$s»: %2$s"
 #: ../libtransmission/fastresume.c:195 ../libtransmission/fdlimit.c:166
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr "Impossibile aprire \"%1$s\": %2$s"
+msgstr "Impossibile aprire «%1$s»: %2$s"
 
 #: ../gtk/conf.c:85
 #, c-format
@@ -370,31 +283,31 @@ msgstr "Stato"
 
 #: ../gtk/details.c:505
 msgid "Optimistic unchoke"
-msgstr "Diffusione ottimistica"
+msgstr "Unchoke ottimistico"
 
 #: ../gtk/details.c:506
 msgid "Downloading from peer"
-msgstr "Ricezione dal peer"
+msgstr "Ricezione dal nodo"
 
 #: ../gtk/details.c:507
 msgid "We'd download from peer if they'd let us"
-msgstr "Ricezione dal nodo se possibile"
+msgstr "Scaricheremmo dal nodo se fosse consentito"
 
 #: ../gtk/details.c:508
 msgid "Uploading to peer"
-msgstr "Invio al peer"
+msgstr "Invio al nodo"
 
 #: ../gtk/details.c:509
 msgid "We'd upload to peer if they'd ask us"
-msgstr "Invio al nodo su richiesta"
+msgstr "Invieremmo al nodo se ci fosse richiesto"
 
 #: ../gtk/details.c:510
 msgid "Peer has unchoked us, but we're not interested"
-msgstr "Rifiuto al nodo di diffondere"
+msgstr "Il nodo ci ha offerto l'unchoke, ma non siamo interessati"
 
 #: ../gtk/details.c:511
 msgid "We unchoked the peer, but they're not interested"
-msgstr "Rifiuto del nodo della diffusione"
+msgstr "Abbiamo offerto l'unchoke al nodo, ma non è interessato"
 
 #: ../gtk/details.c:512
 msgid "Encrypted connection"
@@ -832,7 +745,8 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  Alessandro Ranaldi https://launchpad.net/~ciaolo\n"
 "  Damiano Di Carlo https://launchpad.net/~dldc\n"
-"  Luca Ferretti https://launchpad.net/~elle-uca\n"
+"  Luca Ferretti https://launchpad.net/~elle.uca\n"
+"  Matteo Settenvini https://launchpad.net/~tchernobog\n"
 "  Milo Casagrande https://launchpad.net/~milo\n"
 "  ftaurino https://launchpad.net/~francesco-taurino"
 
@@ -1303,7 +1217,7 @@ msgstr "_Attivi"
 #. show only torrents that are trying to download
 #: ../gtk/tr-window.c:428
 msgid "_Downloading"
-msgstr "_RIcezione"
+msgstr "_Ricezione"
 
 #. show only torrents that are trying to upload
 #: ../gtk/tr-window.c:430
@@ -1432,7 +1346,7 @@ msgstr ""
 #: ../gtk/util.c:479
 #, c-format
 msgid "Couldn't disable desktop hibernation: %s"
-msgstr "Non posso disabilitare l'ibernazione del computer: %s"
+msgstr "Impossibile disabilitare l'ibernazione del computer: %s"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:806
@@ -1447,7 +1361,7 @@ msgstr "La blocklist contiene %'d voci"
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:644 ../libtransmission/fastresume.c:655
 msgid "Couldn't read resume file"
-msgstr "Non posso leggere il file di ripresa"
+msgstr "Impossibile leggere il file di ripristino"
 
 #: ../libtransmission/makemeta.c:58
 #, c-format
@@ -1506,7 +1420,7 @@ msgstr "forwarding della porta %d non più applicato"
 #: ../libtransmission/natpmp.c:192
 #, c-format
 msgid "Port %d forwarded successfully"
-msgstr "Porta %d inoltrata correttamente"
+msgstr "Forwarding della porta %d riuscito"
 
 #: ../libtransmission/net.c:145
 #, c-format
@@ -1591,7 +1505,7 @@ msgstr "Caricati %d torrent"
 #: ../libtransmission/torrent.c:163
 #, c-format
 msgid "Got %d peers from tracker"
-msgstr "Ricevuti %d peer dal tracker"
+msgstr "Ricevuti %d nodi dal server traccia"
 
 #: ../libtransmission/torrent.c:177
 #, c-format
@@ -1627,7 +1541,7 @@ msgstr "Incompleto"
 #: ../libtransmission/torrent.c:1110
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
-msgstr "Stato cambiato da \"%1$s\" a \"%2$s\""
+msgstr "Stato cambiato da «%1$s» a «%2$s»"
 
 #: ../libtransmission/upnp.c:27
 msgid "Port Forwarding (UPnP)"

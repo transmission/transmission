@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: fi\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-04-30 05:24+0000\n"
-"Last-Translator: Elias Julkunen <elias.julkunen@gmail.com>\n"
+"PO-Revision-Date: 2008-05-28 18:00+0000\n"
+"Last-Translator: Timo Jyrinki <timo.jyrinki@iki.fi>\n"
 "Language-Team: -\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-05-08 18:40+0000\n"
+"X-Launchpad-Export-Date: 2008-06-13 16:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -275,18 +275,16 @@ msgid "Downloading from peer"
 msgstr "Ladataan, %i yhdistetty ( %i kaikkiaan )"
 
 #: ../gtk/details.c:507
-#, fuzzy
 msgid "We'd download from peer if they'd let us"
-msgstr "Me lataamme vertaisesti, jos he antavat"
+msgstr "Vertaiselta ladataan sallittaessa"
 
 #: ../gtk/details.c:508
 msgid "Uploading to peer"
 msgstr "Lähetetään, %d yhdistetty ( %d kaikkiaan )"
 
 #: ../gtk/details.c:509
-#, fuzzy
 msgid "We'd upload to peer if they'd ask us"
-msgstr "Me jaamme vertaisille, jos he pyytävät"
+msgstr "Vertaiselle lähetetään pyydettäessä"
 
 #: ../gtk/details.c:510
 msgid "Peer has unchoked us, but we're not interested"
@@ -302,7 +300,7 @@ msgstr "Salattu yhteys"
 
 #: ../gtk/details.c:513
 msgid "Peer was discovered through Peer Exchange (PEX)"
-msgstr ""
+msgstr "Lähde löydettiin vertaisvaihdon (PEX) avulla"
 
 #: ../gtk/details.c:514
 msgid "Peer is an incoming connection"
@@ -633,9 +631,8 @@ msgstr "Edistyminen"
 #. Don't include the prefix "filedetails|" in the translation.
 #. Please note the items for this column are checkboxes (yes/no)
 #: ../gtk/file-list.c:512
-#, fuzzy
 msgid "filedetails|Download"
-msgstr "Lataa"
+msgstr "Ladataanko"
 
 #. Translators: this is a column header in Files tab, Details dialog;
 #. Don't include the prefix "filedetails|" in the translation.
@@ -659,16 +656,14 @@ msgid "Couldn't create socket: %s"
 msgstr "Socketin luominen epäonnistui: %s"
 
 #: ../gtk/ipc.c:273
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't connect to \"%1$s\": %2$s"
-msgstr "Ei voitu yhdistää \"%1$s\":een: %2$s"
+msgstr "Ei voi yhdistää kohteeseen \"%1$s\": %2$s"
 
 #: ../gtk/ipc.c:313 ../gtk/ipc.c:1133
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't set up IPC: %s"
-msgstr ""
-"Socketin alustaminen epäonnistui:\n"
-"%s"
+msgstr "IPC:n alustaminen epäonnistui: %s"
 
 #: ../gtk/main.c:302
 msgid "Start with all torrents paused"
@@ -727,7 +722,7 @@ msgstr "Tekijänoikeudet 2005-2008 Transmission-projekti"
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Elias Julkunen https://launchpad.net/~vililikku\n"
+"  Elias Julkunen https://launchpad.net/~eliasj\n"
 "  Jaakko Huhtala https://launchpad.net/~jaakko-huhtala\n"
 "  Timo Jyrinki https://launchpad.net/~timo-jyrinki\n"
 "  papukaija https://launchpad.net/~papukaija"
@@ -746,15 +741,15 @@ msgid "Invalid URL"
 msgstr "Epäkelpo URL"
 
 #: ../gtk/makemeta-ui.c:106
-#, fuzzy, c-format
+#, c-format
 msgid "Torrent creation cancelled"
-msgstr "Torrentin luonti epäonnistui"
+msgstr "Torrentin luonti peruutettiin"
 
 #: ../gtk/makemeta-ui.c:110 ../libtransmission/blocklist.c:69
 #: ../libtransmission/blocklist.c:203 ../libtransmission/utils.c:370
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
-msgstr "Ei voitu lukea \"%1$s\": %2$s"
+msgstr "Ei voi lukea \"%1$s\": %2$s"
 
 #: ../gtk/makemeta-ui.c:209 ../gtk/makemeta-ui.c:331
 #, c-format
@@ -866,10 +861,10 @@ msgid "Open Folder"
 msgstr "Avaa kansio"
 
 #: ../gtk/stats.c:63 ../gtk/stats.c:111
-#, fuzzy, c-format
+#, c-format
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
-msgstr[0] "Käynnistetty %'d kertaa"
+msgstr[0] "Käynnistetty %'d kerran"
 msgstr[1] "Käynnistetty %'d kertaa"
 
 #: ../gtk/stats.c:91
@@ -1030,9 +1025,8 @@ msgid "Adding Torrents"
 msgstr "Lisätään torrentteja"
 
 #: ../gtk/tr-prefs.c:243
-#, fuzzy
 msgid "Automatically add torrents from:"
-msgstr "Käynnistä torrentin lataus automaattisesti"
+msgstr "Lisää torrentit automaattisesti hakemistosta:"
 
 #: ../gtk/tr-prefs.c:259
 msgid "Mo_ve source files to Trash"
@@ -1113,9 +1107,8 @@ msgid "_Forward port from router"
 msgstr ""
 
 #: ../gtk/tr-prefs.c:532
-#, fuzzy
 msgid "Incoming _port:"
-msgstr "Käytetty portti:"
+msgstr "Sissäntuleva portti:"
 
 #: ../gtk/tr-prefs.c:555
 msgid "Transmission Preferences"
@@ -1130,14 +1123,14 @@ msgid "Network"
 msgstr "Verkko"
 
 #: ../gtk/tr-torrent.c:225
-#, fuzzy, c-format
+#, c-format
 msgid "File \"%s\" isn't a valid torrent"
-msgstr "Tiedosto \"%s\" ei ole torrent-tiedosto"
+msgstr "Tiedosto \"%s\" ei ole kelvollinen torrent-tiedosto"
 
 #: ../gtk/tr-torrent.c:228
-#, fuzzy, c-format
+#, c-format
 msgid "File \"%s\" is already open"
-msgstr "Tiedosto \"%s\" on jo avoinna"
+msgstr "Tiedosto \"%s\" on jo auki"
 
 #. [0...100]
 #: ../gtk/tr-torrent.c:277
@@ -1213,11 +1206,11 @@ msgid "_Paused"
 msgstr "_Pysäytetyt"
 
 #: ../gtk/tr-window.c:593
-#, fuzzy, c-format
+#, c-format
 msgid "%1$'d of %2$'d Torrent"
 msgid_plural "%1$'d of %2$'d Torrents"
-msgstr[0] "Lisää torrent-tiedosto"
-msgstr[1] "Lisää torrent-tiedosto"
+msgstr[0] "%1$'d/%2$'d torrentti"
+msgstr[1] "%1$'d/%2$'d torrenttia"
 
 #: ../gtk/tr-window.c:598
 #, c-format
@@ -1235,9 +1228,9 @@ msgid "size|Down: %1$s, Up: %2$s"
 msgstr "Latausmäärä: %1$s, lähetysmäärä: %2$s"
 
 #: ../gtk/tr-window.c:691
-#, fuzzy, c-format
+#, c-format
 msgid "Tracker will allow requests in %s"
-msgstr "Seurantapalvelin sallii pyynnöt %s minuutissa."
+msgstr "Seurantapalvelin sallii pyynnöt: %s"
 
 #: ../gtk/util.c:90
 #, c-format
@@ -1307,20 +1300,19 @@ msgstr[0] "%'d tunti"
 msgstr[1] "%'d tuntia"
 
 #: ../gtk/util.c:169
-#, fuzzy, c-format
+#, c-format
 msgid "%'d day"
 msgid_plural "%'d days"
-msgstr[0] "päivä"
-msgstr[1] "päivää"
+msgstr[0] "%'d päivä"
+msgstr[1] "%'d päivää"
 
 #: ../gtk/util.c:468
 msgid "Transmission Bittorrent Client"
 msgstr "Transmission-bittorrent-asiakasohjelma"
 
 #: ../gtk/util.c:469
-#, fuzzy
 msgid "BitTorrent Activity"
-msgstr "BitTorrent aktiivisuus"
+msgstr "BitTorrent-aktiivisuus"
 
 #: ../gtk/util.c:477
 msgid "Desktop hibernation disabled while Transmission is running"
@@ -1381,7 +1373,6 @@ msgid "Invalid or missing metadata entries \"length\" and \"files\""
 msgstr "Virheellinen tai puuttuva metatieto kohdissa pituus ja tiedostot"
 
 #: ../libtransmission/natpmp.c:34
-#, fuzzy
 msgid "Port Forwarding (NAT-PMP)"
 msgstr "Portin välitys (NAT-PMP)"
 
@@ -1421,7 +1412,6 @@ msgid "Piece %lu, which was just downloaded, failed its checksum test: %s"
 msgstr "Äsken ladattu osa %lu ei suoriutunut tarkistussummatestistä: %s"
 
 #: ../libtransmission/port-forwarding.c:41
-#, fuzzy
 msgid "Port Forwarding"
 msgstr "Portin välitys"
 
@@ -1526,7 +1516,6 @@ msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Tila muuttui tilasta %1$s tilaan %2$s"
 
 #: ../libtransmission/upnp.c:27
-#, fuzzy
 msgid "Port Forwarding (UPnP)"
 msgstr "Portin välitys (UPnP)"
 
@@ -1552,7 +1541,6 @@ msgid ""
 msgstr ""
 
 #: ../libtransmission/upnp.c:152
-#, fuzzy
 msgid "Port forwarding successful!"
 msgstr "Portin välitys onnistui."
 
@@ -1561,9 +1549,8 @@ msgid "Not a regular file"
 msgstr "Ei ole tavallinen tiedosto"
 
 #: ../libtransmission/utils.c:396
-#, fuzzy
 msgid "Memory allocation failed"
-msgstr "Torrent-tiedostot"
+msgstr "Muistin varaus epäonnistui"
 
 #: ../libtransmission/utils.c:468
 #, fuzzy, c-format
@@ -1595,7 +1582,6 @@ msgid "Checksum failed"
 msgstr "Tarkistussummat eivät vastaa toisiaan"
 
 #: ../libtransmission/utils.c:557
-#, fuzzy
 msgid "Unspecified I/O error"
 msgstr "Tuntematon I/O-virhe"
 

@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-04-14 14:29+0000\n"
+"PO-Revision-Date: 2008-06-01 16:18+0000\n"
 "Last-Translator: Adrian Guniš <andygun@seznam.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2008-05-08 18:41+0000\n"
+"X-Launchpad-Export-Date: 2008-06-13 16:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -683,7 +683,7 @@ msgstr "Spustit minimalizovaně v oznamovací oblasti"
 
 #: ../gtk/main.c:310
 msgid "Where to look for configuration files"
-msgstr ""
+msgstr "Kde hledat konfigurační soubory"
 
 #: ../gtk/main.c:322
 msgid "Transmission"
@@ -1322,20 +1322,21 @@ msgstr[2] "%'d dnů"
 
 #: ../gtk/util.c:468
 msgid "Transmission Bittorrent Client"
-msgstr ""
+msgstr "Bittorrent klient Transmission"
 
 #: ../gtk/util.c:469
 msgid "BitTorrent Activity"
-msgstr ""
+msgstr "Aktivita BitTorrentu"
 
 #: ../gtk/util.c:477
 msgid "Desktop hibernation disabled while Transmission is running"
 msgstr ""
+"Uspání počítače na disk je zakázáno, dokud bude Transmission spuštěno"
 
 #: ../gtk/util.c:479
 #, c-format
 msgid "Couldn't disable desktop hibernation: %s"
-msgstr ""
+msgstr "Nelze zakázat uspání počítače na disk: %s"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:806
@@ -1350,7 +1351,7 @@ msgstr "Seznam blokovaných obsahuje %'d údajů"
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:644 ../libtransmission/fastresume.c:655
 msgid "Couldn't read resume file"
-msgstr ""
+msgstr "Nelze číst soubor obnovení"
 
 #: ../libtransmission/makemeta.c:58
 #, c-format
@@ -1408,7 +1409,7 @@ msgstr "dále nepoužívám přesměrování portu %d"
 #: ../libtransmission/natpmp.c:192
 #, c-format
 msgid "Port %d forwarded successfully"
-msgstr ""
+msgstr "Port %d úspěšně přesměrován"
 
 #: ../libtransmission/net.c:145
 #, c-format
@@ -1492,7 +1493,7 @@ msgstr "Načteno %d torrentů"
 #: ../libtransmission/torrent.c:163
 #, c-format
 msgid "Got %d peers from tracker"
-msgstr ""
+msgstr "Od trackeru získáno %d protějšků"
 
 #: ../libtransmission/torrent.c:177
 #, c-format
@@ -1528,7 +1529,7 @@ msgstr "Neúplné"
 #: ../libtransmission/torrent.c:1110
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
-msgstr ""
+msgstr "Stav změněn z \"%1$s\" na \"%2$s\""
 
 #: ../libtransmission/upnp.c:27
 msgid "Port Forwarding (UPnP)"

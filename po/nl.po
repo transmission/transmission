@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: Transmission-1.1x 5399\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-04-24 12:06+0000\n"
-"Last-Translator: Jan Klopper <janklopper@innerheight.com>\n"
+"PO-Revision-Date: 2008-05-25 15:09+0000\n"
+"Last-Translator: Arnout Lok <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-05-08 18:40+0000\n"
+"X-Launchpad-Export-Date: 2008-06-13 16:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: NETHERLANDS\n"
 "X-Poedit-Language: Dutch\n"
@@ -24,121 +24,6 @@ msgstr ""
 #, c-format
 #~ msgid "Couldn't create \"%s\": %s"
 #~ msgstr "Aanmaken van \"%s\" mislukt: %s"
-
-# Of "Fout bij het openen van ..."
-#, c-format
-#~ msgid "Couldn't open \"%s\": %s"
-#~ msgstr "Kon \"%s\" niet openen: %s"
-
-#~ msgid "<b>Really Quit?</b>"
-#~ msgstr "<b>Weet u zeker dat u wilt afsluiten?</b>"
-
-#, c-format
-#~ msgid "Couldn't connect to \"%s\": %s"
-#~ msgstr "Verbinding maken met  \"%s\" mislukt: %s"
-
-#, c-format
-#~ msgid "Couldn't set up socket: %s"
-#~ msgstr "Opzetten van socket mislukt: %s"
-
-#~ msgid "Torrent creation failed"
-#~ msgstr "Aanmaken van torrent mislukt"
-
-#, c-format
-#~ msgid "Couldn't save file \"%s\": %s"
-#~ msgstr "Kon bestand \"%s\" niet opslaan: %s"
-
-#~ msgid "_Start when opened"
-#~ msgstr "_Starten na het openen"
-
-#~ msgid "Open a Torrent"
-#~ msgstr "Torrent openen"
-
-#~ msgid "Opening Torrents"
-#~ msgstr "Torrents openen"
-
-#~ msgid "Notification"
-#~ msgstr "Mededelingen"
-
-#~ msgid "_Display a message when torrents finish"
-#~ msgstr "Een _bericht tonen wanneer torrents klaar zijn"
-
-#~ msgid "Preferences"
-#~ msgstr "Voorkeuren"
-
-#, c-format
-#~ msgid "Uploading to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Uploading to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "Uploaden naar %1$'d van de %2$'d verbonden peer"
-#~ msgstr[1] "Uploaden naar %1$'d van de %2$'d verbonden peers"
-
-#~ msgid "Torrent needs to be verified"
-#~ msgstr "Torrent moet geverifieerd worden"
-
-# Klinkt nog een beetje raar misschien iets als "10 peers geladen uit lokaal bestand"
-#, c-format
-#~ msgid "Loaded %i peers from resume file"
-#~ msgstr "%i peers geladen vanuit hervattingsbestand"
-
-#, c-format
-#~ msgid "Skipping unknown resume code %d"
-#~ msgstr "Onbekende hervattingscode %d overslaan"
-
-#, c-format
-#~ msgid "Couldn't read resume file for \"%s\""
-#~ msgstr "Kon hervattingsbestand niet lezen voor \"%s\""
-
-#, c-format
-#~ msgid "%s responded \"try again\""
-#~ msgstr "%s antwoordde \"try again\""
-
-#, c-format
-#~ msgid "%s failed (%d): %s (%d)"
-#~ msgstr "%s mislukt (%d): %s (%d)"
-
-#~ msgid "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!"
-#~ msgstr ""
-#~ "Als uw router NAT-PMP ondersteund, verzeker u er dan van dat NAT-PMP is "
-#~ "ingeschakeld!"
-
-#~ msgid "NAT-PMP port forwarding unsuccessful, trying UPnP next"
-#~ msgstr "NAT-PMP port forwarding niet succesvol, als volgende UPnP proberen"
-
-#, c-format
-#~ msgid "port %d forwarded successfully"
-#~ msgstr "poort %d succesvol geforward"
-
-#, c-format
-#~ msgid "Bound socket %d to port %d"
-#~ msgstr "Socket %d gekoppeld aan poort %d"
-
-#, c-format
-#~ msgid "Got %d peers from peer exchange"
-#~ msgstr "%d peers verkregen via peeruitwisseling"
-
-#~ msgid "Port forwarding failed."
-#~ msgstr "Port forwarding is mislukt"
-
-#, c-format
-#~ msgid "upnpDiscover failed (errno %d - %s)"
-#~ msgstr "upnpDiscover mislukt (errno %d - %s)"
-
-#, c-format
-#~ msgid "UPNP_GetValidIGD failed (errno %d - %s)"
-#~ msgstr "UPNP_GetValidIGD mislukt (errno %d - %s)"
-
-#~ msgid "If your router supports UPnP, please make sure UPnP is enabled!"
-#~ msgstr ""
-#~ "Als uw router UPnP ondersteund, verzeker u er dan van dat dit is "
-#~ "ingeschakeld!"
-
-#, c-format
-#~ msgid "Port forwarding failed with error %d (errno %d - %s)"
-#~ msgstr "Port forwarding mislukt met fout %d (errno %d - %s)"
-
-#, c-format
-#~ msgid "Couldn't read file \"%s\": %s"
-#~ msgstr "Kon bestand \"%s\" niet lezen: %s"
 
 #: ../gtk/actions.c:47
 msgid "Sort by _Activity"
@@ -154,7 +39,7 @@ msgstr "Sorteren op _voortgang"
 
 #: ../gtk/actions.c:50
 msgid "Sort by _Ratio"
-msgstr "Sorteren op _Ratio"
+msgstr "Sorteren op _ratio"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _State"
@@ -178,7 +63,7 @@ msgstr "_Minimaal overzicht"
 
 #: ../gtk/actions.c:87
 msgid "_Reverse Sort Order"
-msgstr "Omgekeerde sortee_rvolgorde"
+msgstr "_Omgekeerde sorteervolgorde"
 
 #: ../gtk/actions.c:89
 msgid "_Filterbar"
@@ -246,7 +131,7 @@ msgstr "Torrent pauzeren"
 
 #: ../gtk/actions.c:112
 msgid "Remove torrent"
-msgstr "Verwijder torrent"
+msgstr "Torrent verwijderen"
 
 #: ../gtk/actions.c:113
 msgid "_Delete Files and Remove"
@@ -311,7 +196,7 @@ msgstr "Torrentopties"
 
 #: ../gtk/add-dialog.c:187
 msgid "Mo_ve source file to Trash"
-msgstr "Bronbestand naar de prullenbak verplaatsen"
+msgstr "Bronbestand naar de prullenbak _verplaatsen"
 
 #: ../gtk/add-dialog.c:188 ../gtk/tr-prefs.c:255
 msgid "_Start when added"
@@ -339,7 +224,7 @@ msgstr "Lokale data _verifiëren"
 
 #: ../gtk/add-dialog.c:295
 msgid "Add a Torrent"
-msgstr "Voeg een torrent toe"
+msgstr "Torrent toevoegen"
 
 # Evt. iets van "vragen om opties" of
 # "Opties aanpassen bij het openen" i.p.v. Opties-dialoog tonen
@@ -351,13 +236,13 @@ msgstr "_Opties aanpassen bij het openen"
 #: ../libtransmission/utils.c:469
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr "Kan \"%1$s\" niet aanmaken: %2$s"
+msgstr "Kon \"%1$s\" niet aanmaken: %2$s"
 
 #: ../gtk/conf.c:81 ../libtransmission/bencode.c:1105
 #: ../libtransmission/fastresume.c:195 ../libtransmission/fdlimit.c:166
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr "Kan \"%1$s\" niet openen: %2$s"
+msgstr "Kon \"%1$s\" niet openen: %2$s"
 
 #: ../gtk/conf.c:85
 #, c-format
@@ -616,7 +501,7 @@ msgstr "_Downloadsnelheid limiteren (KiB/s):"
 
 #: ../gtk/details.c:1052 ../gtk/tr-prefs.c:513
 msgid "Limit _upload speed (KB/s):"
-msgstr "_Uploadsnelheid limiteren (KiB/s):"
+msgstr "Upl_oadsnelheid limiteren (KiB/s):"
 
 #: ../gtk/details.c:1066
 msgid "Peer Connections"
@@ -710,7 +595,7 @@ msgstr "<big><b>Transmission afsluiten?</b></big>"
 
 #: ../gtk/dialogs.c:126
 msgid "_Don't ask me again"
-msgstr "_Vraag dit niet opnieuw"
+msgstr "Niet opnieuw _vragen"
 
 #: ../gtk/dialogs.c:215
 msgid "Remove torrent?"
@@ -814,7 +699,7 @@ msgstr "Geminimaliseerd in het systeemvak starten"
 
 #: ../gtk/main.c:310
 msgid "Where to look for configuration files"
-msgstr "Zoeklocaties voor configuratie bestanden"
+msgstr "Zoeklocaties voor configuratiebestanden"
 
 #: ../gtk/main.c:322
 msgid "Transmission"
@@ -874,7 +759,7 @@ msgstr "Torrent aangemaakt"
 #: ../gtk/makemeta-ui.c:102 ../gtk/makemeta-ui.c:111 ../gtk/makemeta-ui.c:118
 #, c-format
 msgid "Torrent creation failed: %s"
-msgstr "Torrent creatie mislukt: %s"
+msgstr "Aanmaken van torrent mislukt: %s"
 
 #: ../gtk/makemeta-ui.c:102
 msgid "Invalid URL"
@@ -957,7 +842,7 @@ msgstr "Kan bestand \"%1$s\" niet opslaan: %2$s"
 
 #: ../gtk/msgwin.c:132
 msgid "Save Log"
-msgstr "Log opslaan"
+msgstr "Logbestand opslaan"
 
 #: ../gtk/msgwin.c:167
 msgid "Error"
@@ -1163,7 +1048,7 @@ msgstr "<i>Poort aan het testen...</i>"
 
 #: ../gtk/tr-prefs.c:240
 msgid "Adding Torrents"
-msgstr "Torrents aan het toevoegen"
+msgstr "Torrents toevoegen"
 
 #: ../gtk/tr-prefs.c:243
 msgid "Automatically add torrents from:"
@@ -1177,50 +1062,50 @@ msgstr "Bronbestanden naar de prullenbak verplaatsen"
 #, c-format
 msgid "Ignore the %'d _blocklisted peer"
 msgid_plural "Ignore the %'d _blocklisted peers"
-msgstr[0] "Negeer de %'d _geweigerde peer"
-msgstr[1] "Negeer de %'d _geweigerde peers"
+msgstr[0] "%'d ge_blokkeerde peer negeren"
+msgstr[1] "%'d ge_blokkeerde peers negeren"
 
 #: ../gtk/tr-prefs.c:337
 #, c-format
 msgid "Retrieving blocklist..."
-msgstr "Ban- lijst aan het ophalen..."
+msgstr "Bezig met het ophalen van de blokkadelijst..."
 
 #: ../gtk/tr-prefs.c:343
 #, c-format
 msgid "Unable to get blocklist."
-msgstr "Kan ban- lijst niet ophalen."
+msgstr "Kan blokkadelijst niet ophalen."
 
 #: ../gtk/tr-prefs.c:355
 #, c-format
 msgid "Unable to get blocklist: %s"
-msgstr "Kan ban- lijst niet ophalen: %s"
+msgstr "Kan blokkadelijst niet ophalen: %s"
 
 #: ../gtk/tr-prefs.c:369
 #, c-format
 msgid "Uncompressing blocklist..."
-msgstr "Ban- lijst aan het uitpakken..."
+msgstr "Bezig met het uitpakken van de blokkadelijst..."
 
 #: ../gtk/tr-prefs.c:379
 #, c-format
 msgid "Parsing blocklist..."
-msgstr "Ban- lijst samenvoegen"
+msgstr "Bezig met het samenvoegen van de blokkadelijst..."
 
 #: ../gtk/tr-prefs.c:386 ../libtransmission/blocklist.c:258
 #, c-format
 msgid "Blocklist updated with %'d entries"
-msgstr "Ban- lijst bijgewerkt met %'d items"
+msgstr "Blokkadelijst bijgewerkt met %'d items"
 
 #: ../gtk/tr-prefs.c:427
 msgid "Updating Blocklist"
-msgstr "Ban- lijst aan het bijwerken"
+msgstr "Blokkadelijst bijwerken"
 
 #: ../gtk/tr-prefs.c:459
 msgid "_Update Blocklist"
-msgstr "_Update Ban- lijst"
+msgstr "Blokkadelijst bij_werken"
 
 #: ../gtk/tr-prefs.c:471
 msgid "_Ignore unencrypted peers"
-msgstr "_Onversleutelde peers negeren"
+msgstr "O_nversleutelde peers negeren"
 
 #: ../gtk/tr-prefs.c:475
 msgid "Use peer e_xchange"
@@ -1237,7 +1122,7 @@ msgstr "Gl_obaal maximum aantal peers:"
 
 #: ../gtk/tr-prefs.c:486
 msgid "Maximum peers per _torrent:"
-msgstr "Maximum aantal peers per torrents:"
+msgstr "Maximum aantal peers per _torrent:"
 
 #: ../gtk/tr-prefs.c:520
 msgid "Ports"
@@ -1245,7 +1130,7 @@ msgstr "Poorten"
 
 #: ../gtk/tr-prefs.c:522
 msgid "_Forward port from router"
-msgstr "Poort van router forwarden"
+msgstr "Poort van router _forwarden"
 
 #: ../gtk/tr-prefs.c:532
 msgid "Incoming _port:"
@@ -1472,12 +1357,12 @@ msgstr "Ongeldige metadata"
 #: ../libtransmission/blocklist.c:92
 #, c-format
 msgid "Blocklist contains %'d entries"
-msgstr "Ban- lijst bevat %' d items"
+msgstr "Blokkadelijst bevat %' d items"
 
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:644 ../libtransmission/fastresume.c:655
 msgid "Couldn't read resume file"
-msgstr "Kan niet verder gaan vanaf vorige punt"
+msgstr "Kon hervattingsbestand niet lezen"
 
 #: ../libtransmission/makemeta.c:58
 #, c-format
@@ -1535,7 +1420,7 @@ msgstr "poort %d wordt niet langer geforward"
 #: ../libtransmission/natpmp.c:192
 #, c-format
 msgid "Port %d forwarded successfully"
-msgstr "Port %d succesvol doorgestuurd"
+msgstr "Poort %d succesvol doorgestuurd"
 
 #: ../libtransmission/net.c:145
 #, c-format
@@ -1635,7 +1520,7 @@ msgstr "Trackerfout: \"%s\""
 #: ../libtransmission/torrent.c:880
 #, c-format
 msgid "Closing torrent; %d left"
-msgstr "Torrent aan het sluiten; %d over"
+msgstr "Torrent aan het sluiten; %d resterend"
 
 #. Translators: this is a minor point that's safe to skip over, but FYI:
 #. "Complete" and "Done" are specific, different terms in Transmission:
@@ -1656,7 +1541,7 @@ msgstr "Incompleet"
 #: ../libtransmission/torrent.c:1110
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
-msgstr "Status aangepast van \"%1$s\" naar \"%2$s\""
+msgstr "Status gewijzigd van \"%1$s\" naar \"%2$s\""
 
 #: ../libtransmission/upnp.c:27
 msgid "Port Forwarding (UPnP)"
@@ -1689,7 +1574,7 @@ msgstr "Port forwarding succesvol!"
 
 #: ../libtransmission/utils.c:382
 msgid "Not a regular file"
-msgstr "Niet een standaardbestand"
+msgstr "Geen regulier bestand"
 
 #: ../libtransmission/utils.c:396
 msgid "Memory allocation failed"
@@ -1698,7 +1583,7 @@ msgstr "Geheugen toewijzing mislukt"
 #: ../libtransmission/utils.c:468
 #, c-format
 msgid "File \"%s\" is in the way"
-msgstr "Bestaand \"%s\" staat in de weg"
+msgstr "Bestand \"%s\" staat in de weg"
 
 #: ../libtransmission/utils.c:535
 msgid "No error"
@@ -1718,7 +1603,7 @@ msgstr "Doelmap bestaat niet"
 
 #: ../libtransmission/utils.c:553
 msgid "A torrent with this name and destination folder already exists."
-msgstr "Een torrent met deze name en doelmap bestaat reeds."
+msgstr "Een torrent met deze naam en doelmap bestaat reeds."
 
 #: ../libtransmission/utils.c:555
 msgid "Checksum failed"
