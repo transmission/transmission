@@ -19,14 +19,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-05-09 10:18+0000\n"
-"Last-Translator: Alessandro Ranaldi <ranaldialessandro@gmail.com>\n"
+"PO-Revision-Date: 2008-06-10 20:18+0000\n"
+"Last-Translator: Luca Ferretti <elle.uca@libero.it>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-05-21 17:32+0000\n"
+"X-Launchpad-Export-Date: 2008-06-13 16:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -185,7 +185,7 @@ msgstr "_Apri cartella"
 
 #: ../gtk/actions.c:132
 msgid "Ask Tracker for _More Peers"
-msgstr "C_hiedi più peer al server traccia"
+msgstr "C_hiedi più nodi al server traccia"
 
 #: ../gtk/add-dialog.c:135
 msgid "Torrent files"
@@ -235,7 +235,7 @@ msgstr "Aggiungi un torrent"
 
 #: ../gtk/add-dialog.c:313 ../gtk/tr-prefs.c:251
 msgid "Display _options dialog"
-msgstr "Visualizzare il dialogo delle _opzioni"
+msgstr "Visualizzare dialogo _opzioni"
 
 #: ../gtk/conf.c:60 ../gtk/makemeta-ui.c:117 ../libtransmission/utils.c:458
 #: ../libtransmission/utils.c:469
@@ -287,7 +287,7 @@ msgstr "Unchoke ottimistico"
 
 #: ../gtk/details.c:506
 msgid "Downloading from peer"
-msgstr "Ricezione dal peer"
+msgstr "Ricezione dal nodo"
 
 #: ../gtk/details.c:507
 msgid "We'd download from peer if they'd let us"
@@ -295,7 +295,7 @@ msgstr "Scaricheremmo dal nodo se fosse consentito"
 
 #: ../gtk/details.c:508
 msgid "Uploading to peer"
-msgstr "Invio al peer"
+msgstr "Invio al nodo"
 
 #: ../gtk/details.c:509
 msgid "We'd upload to peer if they'd ask us"
@@ -746,6 +746,7 @@ msgstr ""
 "  Alessandro Ranaldi https://launchpad.net/~ciaolo\n"
 "  Damiano Di Carlo https://launchpad.net/~dldc\n"
 "  Luca Ferretti https://launchpad.net/~elle.uca\n"
+"  Matteo Settenvini https://launchpad.net/~tchernobog\n"
 "  Milo Casagrande https://launchpad.net/~milo\n"
 "  ftaurino https://launchpad.net/~francesco-taurino"
 
@@ -1504,7 +1505,7 @@ msgstr "Caricati %d torrent"
 #: ../libtransmission/torrent.c:163
 #, c-format
 msgid "Got %d peers from tracker"
-msgstr "Ricevuti %d peer dal tracker"
+msgstr "Ricevuti %d nodi dal server traccia"
 
 #: ../libtransmission/torrent.c:177
 #, c-format
@@ -1540,7 +1541,7 @@ msgstr "Incompleto"
 #: ../libtransmission/torrent.c:1110
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
-msgstr "Stato cambiato da \"%1$s\" a \"%2$s\""
+msgstr "Stato cambiato da «%1$s» a «%2$s»"
 
 #: ../libtransmission/upnp.c:27
 msgid "Port Forwarding (UPnP)"

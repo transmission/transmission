@@ -1,5 +1,12 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.22 (2008/06/xx)
+- GTK+
+  + Added Latvian, Malayalam, Serbian, and Telugu translations
+  + Updated Czech, Español, Romanian, Russian, Dutch, Polish, Italian,
+    Portuguese, Catalan, Danish, German, Swedish, Traditional Chinese,
+    Finnish, and Chinese (simplified) translations
+
 1.21 (2008/05/21)
 http://trac.transmissionbt.com/query?group=component&milestone=1.21&order=severity
 - All Platforms

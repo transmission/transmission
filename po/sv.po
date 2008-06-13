@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-04-30 18:43+0000\n"
-"Last-Translator: Mikael Olofsson <michlos@1vb.us>\n"
+"PO-Revision-Date: 2008-05-27 09:39+0000\n"
+"Last-Translator: Per Söderkvist <per.soderkvist@gmail.com>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-05-21 17:32+0000\n"
+"X-Launchpad-Export-Date: 2008-06-13 16:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #, fuzzy
@@ -784,7 +784,7 @@ msgstr "Sortera efter _förlopp"
 
 #: ../gtk/actions.c:50
 msgid "Sort by _Ratio"
-msgstr ""
+msgstr "Sortera efter _Ratio"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _State"
@@ -952,7 +952,7 @@ msgstr "Torrentdetaljer"
 
 #: ../gtk/add-dialog.c:187
 msgid "Mo_ve source file to Trash"
-msgstr ""
+msgstr "Fl_ytta fil till papperskorgen"
 
 #: ../gtk/add-dialog.c:188 ../gtk/tr-prefs.c:255
 msgid "_Start when added"
@@ -988,8 +988,9 @@ msgid "Add a Torrent"
 msgstr "Lägg till en torrent"
 
 #: ../gtk/add-dialog.c:313 ../gtk/tr-prefs.c:251
+#, fuzzy
 msgid "Display _options dialog"
-msgstr ""
+msgstr "Visa _inställningsfönstret"
 
 #: ../gtk/conf.c:60 ../gtk/makemeta-ui.c:117 ../libtransmission/utils.c:458
 #: ../libtransmission/utils.c:469
@@ -1001,7 +1002,7 @@ msgstr "Kunde inte skapa \"%1$s\": %2$s"
 #: ../libtransmission/fastresume.c:195 ../libtransmission/fdlimit.c:166
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr ""
+msgstr "Kunde inte öppna \"%1$s\": %2$s"
 
 #: ../gtk/conf.c:85
 #, fuzzy, c-format
@@ -1044,16 +1045,18 @@ msgid "Downloading from peer"
 msgstr "Hämtar från klient"
 
 #: ../gtk/details.c:507
+#, fuzzy
 msgid "We'd download from peer if they'd let us"
-msgstr ""
+msgstr "Vi skulle ladda ner från användare om de lät oss"
 
 #: ../gtk/details.c:508
 msgid "Uploading to peer"
 msgstr "Skickar till klient"
 
 #: ../gtk/details.c:509
+#, fuzzy
 msgid "We'd upload to peer if they'd ask us"
-msgstr ""
+msgstr "Vi skulle ladda upp till användare om de frågade oss"
 
 #: ../gtk/details.c:510
 msgid "Peer has unchoked us, but we're not interested"
@@ -1072,8 +1075,9 @@ msgid "Peer was discovered through Peer Exchange (PEX)"
 msgstr ""
 
 #: ../gtk/details.c:514
+#, fuzzy
 msgid "Peer is an incoming connection"
-msgstr ""
+msgstr "Användaren är en inkommande anslutning"
 
 #: ../gtk/details.c:656
 #, fuzzy
@@ -1533,8 +1537,10 @@ msgstr ""
 "\n"
 "Launchpad Contributions:\n"
 "  Daniel Nylander https://launchpad.net/~yeager\n"
+"  Gustaf Johansson https://launchpad.net/~gustaf-joh\n"
 "  Michael Dundee https://launchpad.net/~dundee-michael\n"
-"  Mikael Olofsson https://launchpad.net/~michlos"
+"  Mikael Olofsson https://launchpad.net/~michlos\n"
+"  Per Söderkvist https://launchpad.net/~sodper"
 
 #: ../gtk/makemeta-ui.c:98
 #, fuzzy

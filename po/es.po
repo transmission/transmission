@@ -12,14 +12,14 @@ msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-05-18 09:43+0000\n"
-"Last-Translator: Festor Wailon Dacoba <festor90@gmail.com>\n"
+"PO-Revision-Date: 2008-05-23 16:41+0000\n"
+"Last-Translator: Roberto C. R. M. <Unknown>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-05-21 17:32+0000\n"
+"X-Launchpad-Export-Date: 2008-06-13 16:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SPAIN\n"
 "X-Poedit-Language: Spanish\n"
@@ -165,8 +165,9 @@ msgid "Sort by _State"
 msgstr "Ordenar por _estado"
 
 #: ../gtk/actions.c:52
+#, fuzzy
 msgid "Sort by _Tracker"
-msgstr "Ordenar por _tracker"
+msgstr "Ordenar por _rastreador"
 
 #: ../gtk/actions.c:69
 msgid "_Main Window"
@@ -178,7 +179,7 @@ msgstr "_Registro de mensajes"
 
 #: ../gtk/actions.c:85
 msgid "_Minimal View"
-msgstr "_Modo reducido"
+msgstr "Vista _Mínima"
 
 #: ../gtk/actions.c:87
 msgid "_Reverse Sort Order"
@@ -872,6 +873,7 @@ msgstr ""
 "  Marcos Escalier https://launchpad.net/~mescalier\n"
 "  Miguel Alvarado https://launchpad.net/~alvaradoma\n"
 "  Raúl Pedroche https://launchpad.net/~pedroche\n"
+"  Roberto C. R. M. https://launchpad.net/~roberrm\n"
 "  Xoan Sampaiño https://launchpad.net/~xoan"
 
 #: ../gtk/makemeta-ui.c:98

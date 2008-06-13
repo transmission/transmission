@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-04-21 21:44-0500\n"
-"PO-Revision-Date: 2008-05-17 16:00+0000\n"
-"Last-Translator: Kamil Páral <ripper42@gmail.com>\n"
+"PO-Revision-Date: 2008-06-01 16:18+0000\n"
+"Last-Translator: Adrian Guniš <andygun@seznam.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2008-05-21 17:32+0000\n"
+"X-Launchpad-Export-Date: 2008-06-13 16:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -1331,11 +1331,12 @@ msgstr "Aktivita BitTorrentu"
 #: ../gtk/util.c:477
 msgid "Desktop hibernation disabled while Transmission is running"
 msgstr ""
+"Uspání počítače na disk je zakázáno, dokud bude Transmission spuštěno"
 
 #: ../gtk/util.c:479
 #, c-format
 msgid "Couldn't disable desktop hibernation: %s"
-msgstr ""
+msgstr "Nelze zakázat uspání počítače na disk: %s"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:806
@@ -1350,7 +1351,7 @@ msgstr "Seznam blokovaných obsahuje %'d údajů"
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:644 ../libtransmission/fastresume.c:655
 msgid "Couldn't read resume file"
-msgstr ""
+msgstr "Nelze číst soubor obnovení"
 
 #: ../libtransmission/makemeta.c:58
 #, c-format
