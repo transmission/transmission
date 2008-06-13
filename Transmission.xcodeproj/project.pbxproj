@@ -186,6 +186,7 @@
 		A2BE9C530C1E4AF7002D16E6 /* makemeta.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */; };
 		A2BF07910B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */; };
 		A2C0C2E00E00CCE400D95339 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2C0C2DF0E00CCE400D95339 /* Security.framework */; };
+		A2C0C5030E02CB6100D95339 /* Remote.png in Resources */ = {isa = PBXBuildFile; fileRef = A2C0C5020E02CB6100D95339 /* Remote.png */; };
 		A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */; };
 		A2D0E0490A54A97C003C72CF /* Bandwidth.png in Resources */ = {isa = PBXBuildFile; fileRef = A2D0E0480A54A97C003C72CF /* Bandwidth.png */; };
 		A2D22A130D65EEE700007D5F /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D22A100D65EED100007D5F /* verify.c */; };
@@ -661,6 +662,7 @@
 		A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SpeedLimitToTurtleIconTransformer.m; path = macosx/SpeedLimitToTurtleIconTransformer.m; sourceTree = "<group>"; };
 		A2C0C2A90E00CC9300D95339 /* Security.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Security.framework; path = /Users/mitchell/Desktop/Transmission/build/Development/Security.framework; sourceTree = "<absolute>"; };
 		A2C0C2DF0E00CCE400D95339 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
+		A2C0C5020E02CB6100D95339 /* Remote.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Remote.png; path = macosx/Images/Remote.png; sourceTree = "<group>"; };
 		A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ButtonToolbarItem.m; path = macosx/ButtonToolbarItem.m; sourceTree = "<group>"; };
 		A2CBDED80D993E4500BB22BC /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2CBDF9E0D9AD08100BB22BC /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/AddWindow.xib; sourceTree = "<group>"; };
@@ -1037,6 +1039,7 @@
 				A2D0E0480A54A97C003C72CF /* Bandwidth.png */,
 				A224D2630DAAC55F000954EA /* Peers.png */,
 				A29E04B40DA8764100705643 /* Network.png */,
+				A2C0C5020E02CB6100D95339 /* Remote.png */,
 				4D2784360905709500687951 /* Transmission.icns */,
 				4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */,
 				A26146E00DD4A0160060F033 /* GroupsNoneTemplate.png */,
@@ -1850,6 +1853,7 @@
 				A29E04B50DA8764100705643 /* Network.png in Resources */,
 				A224D2640DAAC55F000954EA /* Peers.png in Resources */,
 				A26146E10DD4A0160060F033 /* GroupsNoneTemplate.png in Resources */,
+				A2C0C5030E02CB6100D95339 /* Remote.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
