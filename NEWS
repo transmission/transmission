@@ -7,7 +7,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.22&order=severi
   + Transmission now builds correctly on Sun Studio
   + Minor man page fixes
 - Mac
-  + Fix bug where "Program Started" in the Statistics window would always display as 0
+  + Fix bug where "Program Started" in the Statistics window would sometimes display as 0
 - GTK+
   + Fix crash when quitting while the stats window is still up
   + Added Latvian, Malayalam, Serbian, and Telugu translations
