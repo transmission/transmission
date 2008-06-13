@@ -6,31 +6,28 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Fri, 9 May 2008 14:50:00 -0400</pubDate>
-    <lastBuildDate>Wed, 21 May 2008 17:01:00 -0400</lastBuildDate>
+    <lastBuildDate>Fri, 13 May 2008 18:00:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 1.21 Released</title>
+      <title>Transmission 1.22 Released</title>
       <description><![CDATA[
 <h4>Transmission now requires Mac OS X 10.4.11 with Security Update 2008-002. Mac OS X 10.5 or greater is recommended.</h4>
 
 <h4>Core Changes:</h4>
 <ul>
- <li>Fix rare crash-on-startup bug</li>
- <li>Handle corrupt announce URLs in torrent files more gracefully</li>
- <li>Fix minor memory leak when closing torrents</li>
+ <li>Fix two separate BitTorrent unchoke bugs that could affect performance</li>
 </ul>
 <h4>Mac-specific Changes:</h4>
 <ul>
- <li>Fix visual glitch with the pieces bar</li>
- <li>Italian localization included</li>
+ <li>Fix bug where "Program Started" in the Statistics window would always display as 0</li>
 </ul>
 
 
-<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?group=component&milestone=1.21&order=severity">click here</a>.</p>
+<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?group=component&milestone=1.22&order=severity">click here</a>.</p>
 
 Transmission 0.72 and earlier: Complete your downloads before upgrading or you will lose data!]]></description>
-      <pubDate>Wed, 21 May 2008 17:01:00 -0400</pubDate>
-      <enclosure sparkle:version="5890" sparkle:shortVersionString="1.21" url="http://mirrors.m0k.org/transmission/files/Transmission-1.21.dmg" length="2983745" type="application/octet-stream"/>
+      <pubDate>Fri, 13 May 2008 18:00:00 -0400</pubDate>
+      <enclosure sparkle:version="6189" sparkle:shortVersionString="1.22" sparkle:minimumSystemVersion="10.4.11" url="http://mirrors.m0k.org/transmission/files/Transmission-1.22.dmg" length="2848269" type="application/octet-stream"/>
     </item>
     
   </channel>

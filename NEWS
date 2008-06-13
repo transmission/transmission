@@ -3,7 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.22 (2008/06/13)
 http://trac.transmissionbt.com/query?group=component&milestone=1.22&order=severity
 - All Platforms
-  + Fix two separate BitTorrent unchoke bugs that could affect performance.
+  + Fix two separate BitTorrent unchoke bugs that could affect performance
   + Transmission now builds correctly on Sun Studio
   + Minor man page fixes
 - Mac
