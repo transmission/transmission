@@ -82,6 +82,12 @@
 	
 	return [self modifyAttributeWithTag:kSecLabelItemAttr toBeString:newLabel];
 }
+
+- (void)removeFromKeychain
+{
+    SecKeychainItemDelete(coreKeychainItem);
+}
+
 @end
 
 @implementation EMKeychainItem (Private)

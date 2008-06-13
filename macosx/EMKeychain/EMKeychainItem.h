@@ -40,6 +40,9 @@
 - (BOOL)setPassword:(NSString *)newPassword;
 - (BOOL)setUsername:(NSString *)newUsername;
 - (BOOL)setLabel:(NSString *)newLabel;
+
+//added by ML
+- (void)removeFromKeychain;
 @end 
 
 @interface EMKeychainItem (Private)

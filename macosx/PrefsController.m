@@ -757,10 +757,18 @@
     EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission:Proxy"
                                             withUsername: @"Proxy"];
     if (keychainItem)
-        [keychainItem setPassword: password];
+    {
+        if (![password isEqualToString: @""])
+            [keychainItem setPassword: password];
+        else
+            [keychainItem removeFromKeychain];
+    }
     else
-        [[EMKeychainProxy sharedProxy] addGenericKeychainItemForService: @"Transmission:Proxy" withUsername: @"Proxy"
-            password: password];
+    {
+        if (![password isEqualToString: @""])
+            [[EMKeychainProxy sharedProxy] addGenericKeychainItemForService: @"Transmission:Proxy" withUsername: @"Proxy"
+                password: password];
+    }
     
     tr_sessionSetProxyPassword(fHandle, [password UTF8String]);
 }
