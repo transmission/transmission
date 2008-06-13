@@ -1574,7 +1574,7 @@ getWeightedRate( const tr_peer * peer, int clientIsSeed )
 static void
 rechoke( Torrent * t )
 {
-    int i, n, peerCount, size, unchokedInterested;
+    int i, peerCount, size, unchokedInterested;
     tr_peer ** peers = getConnectedPeers( t, &peerCount );
     struct ChokeData * choke = tr_new0( struct ChokeData, peerCount );
     const int clientIsSeed = tr_torrentIsSeed( t->tor );
@@ -1616,28 +1616,34 @@ rechoke( Torrent * t )
         if( choke[i].isInterested )
             ++unchokedInterested;
     }
-    n = i;
-    while( i<size )
-        choke[i++].doUnchoke = 0;
 
     /* optimistic unchoke */
     if( i < size )
     {
+        int n;
         struct ChokeData * c;
         tr_ptrArray * randPool = tr_ptrArrayNew( );
+
         for( ; i<size; ++i )
         {
-            const tr_peer * peer = choke[i].peer;
-            int x=1, y;
-            if( isNew( peer ) ) x *= 3;
-            if( isSame( peer ) ) x *= 3;
-            for( y=0; y<x; ++y )
-                tr_ptrArrayAppend( randPool, choke );
+            if( choke[i].isInterested )
+            {
+                const tr_peer * peer = choke[i].peer;
+                int x=1, y;
+                if( isNew( peer ) ) x *= 3;
+                if( isSame( peer ) ) x *= 3;
+                for( y=0; y<x; ++y )
+                    tr_ptrArrayAppend( randPool, choke );
+            }
         }
-        i = tr_rand( tr_ptrArraySize( randPool ) );
-        c = ( struct ChokeData* )tr_ptrArrayNth( randPool, i);
-        c->doUnchoke = 1;
-        t->optimistic = c->peer;
+
+        if(( n = tr_ptrArraySize( randPool )))
+        {
+            c = tr_ptrArrayNth( randPool, tr_rand( n ));
+            c->doUnchoke = 1;
+            t->optimistic = c->peer;
+        }
+
         tr_ptrArrayFree( randPool, NULL );
     }
 
