@@ -51,6 +51,9 @@
 #define TOOLBAR_NETWORK     @"TOOLBAR_NETWORK"
 #define TOOLBAR_REMOTE      @"TOOLBAR_REMOTE"
 
+#define PROXY_KEYCHAIN_SERVICE  @"Transmission:Proxy"
+#define PROXY_KEYCHAIN_NAME     @"Proxy"
+
 @interface PrefsController (Private)
 
 - (void) setPrefView: (id) sender;
@@ -58,6 +61,8 @@
 - (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 - (void) incompleteFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 - (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
+
+- (void) setKeychainPassword: (NSString *) password forService: (NSString *) service username: (NSString *) username;
 
 @end
 
@@ -753,22 +758,7 @@
 - (void) setProxyPassword: (id) sender
 {
     NSString * password = [[sender stringValue] retain];
-    
-    EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission:Proxy"
-                                            withUsername: @"Proxy"];
-    if (keychainItem)
-    {
-        if (![password isEqualToString: @""])
-            [keychainItem setPassword: password];
-        else
-            [keychainItem removeFromKeychain];
-    }
-    else
-    {
-        if (![password isEqualToString: @""])
-            [[EMKeychainProxy sharedProxy] addGenericKeychainItemForService: @"Transmission:Proxy" withUsername: @"Proxy"
-                password: password];
-    }
+    [self setKeychainPassword: password forService: PROXY_KEYCHAIN_SERVICE username: PROXY_KEYCHAIN_NAME];
     
     tr_sessionSetProxyPassword(fHandle, [password UTF8String]);
 }
@@ -777,8 +767,8 @@
 - (void) updateProxyPassword
 {
     NSString * password;
-    EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission:Proxy"
-                                            withUsername: @"Proxy"];
+    EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: PROXY_KEYCHAIN_SERVICE
+                                            withUsername: PROXY_KEYCHAIN_NAME];
     if (!(password = [keychainItem password]))
         password = @"";
     
@@ -1129,6 +1119,25 @@
         [fDefaults setBool: NO forKey: @"AutoImport"];
     
     [fImportFolderPopUp selectItemAtIndex: 0];
+}
+
+- (void) setKeychainPassword: (NSString *) password forService: (NSString *) service username: (NSString *) username
+{
+    BOOL shouldAdd = ![password isEqualToString: @""];
+    
+    EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: service withUsername: username];
+    if (keychainItem)
+    {
+        if (shouldAdd)
+            [keychainItem setPassword: password];
+        else
+            [keychainItem removeFromKeychain];
+    }
+    else
+    {
+        if (shouldAdd)
+            [[EMKeychainProxy sharedProxy] addGenericKeychainItemForService: service withUsername: username password: password];
+    }
 }
 
 @end
