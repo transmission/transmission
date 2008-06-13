@@ -110,7 +110,7 @@
         [self updateProxyType];
         
         fProxyPasswordSet = NO;
-        if ([fProxyPasswordField isEnabled])
+        if ([fDefaults boolForKey: @"Proxy"] && [fDefaults boolForKey: @"ProxyAuthorize"])
             [self updateProxyPassword];
         
         //update rpc access list
@@ -137,8 +137,6 @@
         [fPortChecker cancelProbe];
         [fPortChecker release];
     }
-    
-    [fProxyPassword release];
     
     [fRPCAccessArray release];
     
@@ -212,7 +210,7 @@
             proxyType = PROXY_HTTP;
     }
     [fProxyTypePopUp selectItemAtIndex: proxyType];
-    [fProxyPasswordField setStringValue: fProxyPassword ? fProxyPassword : @""];
+    [fProxyPasswordField setStringValue: [NSString stringWithUTF8String: tr_sessionGetProxyPassword(fHandle)]];
     
     //set blocklist
     [self updateBlocklistFields];
@@ -677,14 +675,12 @@
 
 - (void) setProxyEnabled: (id) sender
 {
+    BOOL enable = [fDefaults boolForKey: @"Proxy"];
     tr_sessionSetProxyEnabled(fHandle, [fDefaults boolForKey: @"Proxy"]);
     
     //if proxy password hasn't be retrieved, get it now
-    if (!fProxyPasswordSet && [fProxyPasswordField isEnabled])
-    {
+    if (!fProxyPasswordSet && enable && [fDefaults boolForKey: @"ProxyAuthorize"])
         [self updateProxyPassword];
-        [fProxyPasswordField setStringValue: fProxyPassword];
-    }
 }
 
 - (void) setProxyAddress: (id) sender
@@ -751,14 +747,12 @@
 
 - (void) setProxyAuthorize: (id) sender
 {
-    tr_sessionSetProxyAuthEnabled(fHandle, [fDefaults boolForKey: @"ProxyAuthorize"]);
+    BOOL enable = [fDefaults boolForKey: @"ProxyAuthorize"];
+    tr_sessionSetProxyAuthEnabled(fHandle, enable);
     
     //if proxy password hasn't be retrieved, get it now
-    if (!fProxyPasswordSet && [fProxyPasswordField isEnabled])
-    {
+    if (!fProxyPasswordSet && enable)
         [self updateProxyPassword];
-        [fProxyPasswordField setStringValue: fProxyPassword];
-    }
 }
 
 - (void) setProxyUsername: (id) sender
@@ -768,33 +762,32 @@
 
 - (void) setProxyPassword: (id) sender
 {
-    [fProxyPassword release];
-    fProxyPassword = [[sender stringValue] retain];
+    NSString * password = [[sender stringValue] retain];
     
     EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission:Proxy"
                                             withUsername: @"Proxy"];
     if (keychainItem)
-        [keychainItem setPassword: fProxyPassword];
+        [keychainItem setPassword: password];
     else
         [[EMKeychainProxy sharedProxy] addGenericKeychainItemForService: @"Transmission:Proxy" withUsername: @"Proxy"
-            password: fProxyPassword];
+            password: password];
     
-    tr_sessionSetProxyPassword(fHandle, [fProxyPassword UTF8String]);
+    tr_sessionSetProxyPassword(fHandle, [password UTF8String]);
 }
 
 - (void) updateProxyPassword
 {
     fProxyPasswordSet = YES;
     
-    [fProxyPassword release];
-    
+    NSString * password;
     EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: @"Transmission:Proxy"
                                             withUsername: @"Proxy"];
-    if (!(fProxyPassword = [keychainItem password]))
-        fProxyPassword = @"";
-    [fProxyPassword retain];
+    if (!(password = [keychainItem password]))
+        password = @"";
     
-    tr_sessionSetProxyPassword(fHandle, [fProxyPassword UTF8String]);
+    tr_sessionSetProxyPassword(fHandle, [password UTF8String]);
+    
+    [fProxyPasswordField setStringValue: password];
 }
 
 - (void) setRPCEnabled: (id) sender
