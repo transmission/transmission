@@ -344,15 +344,13 @@ tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
 {
     int n = 5;
     tr_benc top;
-    const char * ann = builder->announce;
 
     if ( builder->comment && *builder->comment ) ++n;
     tr_bencInitDict( &top, n );
 
-    tr_bencDictAddStr( &top, "announce", ann );
+    tr_bencDictAddStr( &top, "announce", builder->announce );
 
-    /* if a URL was entered but it's invalid, don't allow it. #814, #971 */
-    if( ann && *ann && !tr_httpIsValidURL( ann ) )
+    if( tr_httpParseURL( builder->announce, -1, NULL, NULL, NULL ) )
         builder->result = TR_MAKEMETA_URL;
     
     if( !builder->result && !builder->abortFlag )
