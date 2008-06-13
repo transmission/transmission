@@ -6,6 +6,8 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.22&order=severi
   + Fix two separate BitTorrent unchoke bugs that could affect performance.
   + Transmission now builds correctly on Sun Studio
   + Minor man page fixes
+- Mac
+  + Fix bug where "Program Started" in the Statistics window would always display as 0
 - GTK+
   + Fix crash when quitting while the stats window is still up
   + Added Latvian, Malayalam, Serbian, and Telugu translations

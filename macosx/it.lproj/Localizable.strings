@@ -71,7 +71,7 @@
 "%d Seeding" = "%d in seed";
 
 /* stats window -> times opened */
-"%d times" = "%d volte";
+"%llu times" = "%llu volte";
 
 /* Drag overlay -> torrents */
 "%d Torrent Files" = "%d file torrent";

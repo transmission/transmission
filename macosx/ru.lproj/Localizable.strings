@@ -71,7 +71,7 @@
 "%d Seeding" = "%d раздается";
 
 /* stats window -> times opened */
-"%d times" = "%d раз";
+"%llu times" = "%llu раз";
 
 /* Drag overlay -> torrents */
 "%d Torrent Files" = "%d файлов";
