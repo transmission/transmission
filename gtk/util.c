@@ -428,6 +428,15 @@ tr_file_trash_or_unlink( const char * filename )
     }
 }
 
+char*
+gtr_get_help_url( void )
+{
+    const char * fmt = "http://www.transmissionbt.com/help/gtk/%d.%dx";
+    int major, minor;
+    sscanf( SHORT_VERSION_STRING, "%d.%d", &major, &minor );
+    return g_strdup_printf( fmt, major, minor/10 );
+}
+
 void
 gtr_open_file( const char * path )
 {

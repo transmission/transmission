@@ -89,6 +89,7 @@ guint gtr_inhibit_hibernation( void );
 
 void gtr_uninhibit_hibernation( guint );
 
+char* gtr_get_help_url( void );
 #ifdef GTK_MAJOR_VERSION
 
 /* create an error dialog, if wind is NULL or mapped then show dialog now,
