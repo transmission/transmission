@@ -30,7 +30,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.22
 - GTK+
   + Fix crash when quitting while the stats window is still up
   + Added Latvian, Malayalam, Serbian, and Telugu translations
-  + Updated Czech, Español, Romanian, Russian, Dutch, Polish, Italian,
+  + Updated Czech, Spanish, Romanian, Russian, Dutch, Polish, Italian,
     Portuguese, Catalan, Danish, German, Swedish, Traditional Chinese,
     Finnish, and Chinese (simplified) translations
 - CLI:
