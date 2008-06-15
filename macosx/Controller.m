@@ -228,7 +228,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 TR_DEFAULT_PROXY_TYPE, /* reset in prefs */
                                 [fDefaults boolForKey: @"ProxyAuthorize"],
                                 [[fDefaults stringForKey: @"ProxyUsername"] UTF8String],
-                                NULL); /* reset in prefs - from Keychain */
+                                ""); /* reset in prefs - from Keychain */
         
         [NSApp setDelegate: self];
         

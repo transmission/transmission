@@ -51,11 +51,11 @@
 #define TOOLBAR_NETWORK     @"TOOLBAR_NETWORK"
 #define TOOLBAR_REMOTE      @"TOOLBAR_REMOTE"
 
-#define PROXY_KEYCHAIN_SERVICE  @"Transmission:Proxy"
-#define PROXY_KEYCHAIN_NAME     @"Proxy"
+#define PROXY_KEYCHAIN_SERVICE  "Transmission:Proxy"
+#define PROXY_KEYCHAIN_NAME     "Proxy"
 
-#define RPC_KEYCHAIN_SERVICE    @"Transmission:Remote"
-#define RPC_KEYCHAIN_NAME       @"Remote"
+#define RPC_KEYCHAIN_SERVICE    "Transmission:Remote"
+#define RPC_KEYCHAIN_NAME       "Remote"
 
 @interface PrefsController (Private)
 
@@ -65,7 +65,7 @@
 - (void) incompleteFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 - (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 
-- (void) setKeychainPassword: (NSString *) password forService: (NSString *) service username: (NSString *) username;
+- (void) setKeychainPassword: (NSString *) password forService: (const char *) service username: (const char *) username;
 
 @end
 
@@ -768,7 +768,7 @@
 
 - (void) setProxyPassword: (id) sender
 {
-    NSString * password = [[sender stringValue] retain];
+    NSString * password = [sender stringValue];
     [self setKeychainPassword: password forService: PROXY_KEYCHAIN_SERVICE username: PROXY_KEYCHAIN_NAME];
     
     tr_sessionSetProxyPassword(fHandle, [password UTF8String]);
@@ -776,16 +776,21 @@
 
 - (void) updateProxyPassword
 {
-    EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: PROXY_KEYCHAIN_SERVICE
-                                            withUsername: PROXY_KEYCHAIN_NAME];
+    UInt32 passwordLength;
+	const char * password = nil;
+    SecKeychainFindGenericPassword(NULL, strlen(PROXY_KEYCHAIN_SERVICE), PROXY_KEYCHAIN_SERVICE,
+        strlen(PROXY_KEYCHAIN_NAME), PROXY_KEYCHAIN_NAME, &passwordLength, (void **)&password, NULL);
     
-    NSString * password;
-    if (!(password = [keychainItem password]))
-        password = @"";
-    
-    tr_sessionSetProxyPassword(fHandle, [password UTF8String]);
-    
-    [fProxyPasswordField setStringValue: password];
+    if (password != NULL)
+    {
+        char fullPassword[passwordLength+1];
+        strncpy(fullPassword, password, passwordLength);
+        fullPassword[passwordLength] = '\0';
+        SecKeychainItemFreeContent(NULL, (void *)password);
+        
+        tr_sessionSetProxyPassword(fHandle, fullPassword);
+        [fProxyPasswordField setStringValue: [NSString stringWithUTF8String: fullPassword]];
+    }
 }
 
 - (void) setRPCEnabled: (id) sender
@@ -805,7 +810,7 @@
 
 - (void) setRPCPassword: (id) sender
 {
-    NSString * password = [[sender stringValue] retain];
+    NSString * password = [sender stringValue];
     [self setKeychainPassword: password forService: RPC_KEYCHAIN_SERVICE username: RPC_KEYCHAIN_NAME];
     
     tr_sessionSetRPCPassword(fHandle, [password UTF8String]);
@@ -813,16 +818,21 @@
 
 - (void) updateRPCPassword
 {
-    EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: RPC_KEYCHAIN_SERVICE
-                                            withUsername: RPC_KEYCHAIN_NAME];
+    UInt32 passwordLength;
+	const char * password = nil;
+    SecKeychainFindGenericPassword(NULL, strlen(RPC_KEYCHAIN_SERVICE), RPC_KEYCHAIN_SERVICE,
+        strlen(RPC_KEYCHAIN_NAME), RPC_KEYCHAIN_NAME, &passwordLength, (void **)&password, NULL);
     
-    NSString * password;
-    if (!(password = [keychainItem password]))
-        password = @"";
-    
-    tr_sessionSetRPCPassword(fHandle, [password UTF8String]);
-    
-    [fRPCPasswordField setStringValue: password];
+    if (password != NULL)
+    {
+        char fullPassword[passwordLength+1];
+        strncpy(fullPassword, password, passwordLength);
+        fullPassword[passwordLength] = '\0';
+        SecKeychainItemFreeContent(NULL, (void *)password);
+        
+        tr_sessionSetRPCPassword(fHandle, fullPassword);
+        [fRPCPasswordField setStringValue: [NSString stringWithUTF8String: fullPassword]];
+    }
 }
 
 - (void) setRPCPort: (id) sender
@@ -1149,23 +1159,39 @@
     [fImportFolderPopUp selectItemAtIndex: 0];
 }
 
-- (void) setKeychainPassword: (NSString *) password forService: (NSString *) service username: (NSString *) username
+- (void) setKeychainPassword: (NSString *) password forService: (const char *) service username: (const char *) username
 {
+    SecKeychainItemRef item = NULL;
     BOOL shouldAdd = password && ![password isEqualToString: @""];
     
-    EMGenericKeychainItem * keychainItem = [[EMKeychainProxy sharedProxy] genericKeychainItemForService: service withUsername: username];
-    if (keychainItem)
+    OSStatus result = SecKeychainFindGenericPassword(NULL, strlen(service), service, strlen(username), username, NULL, NULL, &item);
+    if (result == noErr && item)
+    {
+        if (shouldAdd) //found, so update
+        {
+            result = SecKeychainItemModifyAttributesAndData(item, NULL, [password length], (const void *)[password UTF8String]);
+            if (result != noErr)
+                NSLog(@"Problem updating Keychain item: %s", GetMacOSStatusErrorString(result));
+        }
+        else //remove the item
+        {
+            result = SecKeychainItemDelete(item);
+            if (result != noErr)
+                NSLog(@"Problem removing Keychain item: %s", GetMacOSStatusErrorString(result));
+        }
+    }
+    else if (result == errSecItemNotFound) //not found, so add
     {
         if (shouldAdd)
-            [keychainItem setPassword: password];
-        else
-            [keychainItem removeFromKeychain];
+        {
+            result = SecKeychainAddGenericPassword(NULL, strlen(service), service, strlen(username), username,
+                        [password length], (const void *)[password UTF8String], NULL);
+            if (result != noErr)
+                NSLog(@"Problem adding Keychain item: %s", GetMacOSStatusErrorString(result));
+        }
     }
     else
-    {
-        if (shouldAdd)
-            [[EMKeychainProxy sharedProxy] addGenericKeychainItemForService: service withUsername: username password: password];
-    }
+        NSLog(@"Problem accessing Keychain: %s", GetMacOSStatusErrorString(result));
 }
 
 @end
