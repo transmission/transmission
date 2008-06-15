@@ -27,7 +27,6 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
-#import "EMKeychainProxy.h"
 
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
@@ -777,7 +776,7 @@
 - (void) updateProxyPassword
 {
     UInt32 passwordLength;
-	const char * password = nil;
+    const char * password = nil;
     SecKeychainFindGenericPassword(NULL, strlen(PROXY_KEYCHAIN_SERVICE), PROXY_KEYCHAIN_SERVICE,
         strlen(PROXY_KEYCHAIN_NAME), PROXY_KEYCHAIN_NAME, &passwordLength, (void **)&password, NULL);
     
@@ -819,7 +818,7 @@
 - (void) updateRPCPassword
 {
     UInt32 passwordLength;
-	const char * password = nil;
+    const char * password = nil;
     SecKeychainFindGenericPassword(NULL, strlen(RPC_KEYCHAIN_SERVICE), RPC_KEYCHAIN_SERVICE,
         strlen(RPC_KEYCHAIN_NAME), RPC_KEYCHAIN_NAME, &passwordLength, (void **)&password, NULL);
     
