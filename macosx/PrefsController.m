@@ -202,7 +202,7 @@
     [fQueueSeedField setIntValue: [fDefaults integerForKey: @"QueueSeedNumber"]];
     [fStalledField setIntValue: [fDefaults integerForKey: @"StalledMinutes"]];
     
-    //set proxy fields
+    //set proxy type
     [fProxyAddressField setStringValue: [fDefaults stringForKey: @"ProxyAddress"]];
     int proxyType;
     switch(tr_sessionGetProxyType(fHandle))
@@ -217,6 +217,8 @@
             proxyType = PROXY_HTTP;
     }
     [fProxyTypePopUp selectItemAtIndex: proxyType];
+    
+    //set proxy password - does NOT need to be released
     [fProxyPasswordField setStringValue: [NSString stringWithUTF8String: tr_sessionGetProxyPassword(fHandle)]];
     
     //set blocklist
@@ -224,7 +226,11 @@
     
     //set rpc port
     [fRPCPortField setIntValue: [fDefaults integerForKey: @"RPCPort"]];
-    [fRPCPasswordField setStringValue: [NSString stringWithUTF8String: tr_sessionGetRPCPassword(fHandle)]];
+    
+    //set rpc password - has to be released
+    const char * rpcPassword = tr_sessionGetRPCPassword(fHandle);
+    [fRPCPasswordField setStringValue: [NSString stringWithUTF8String: rpcPassword]];
+    tr_free(rpcPassword);
 }
 
 - (void) setUpdater: (SUUpdater *) updater
