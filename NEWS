@@ -8,6 +8,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.30
    + Ability to add and remove tracker addresses
    + Ability to create torrent files with multiple tracker addresses
    + Allow torrent creation with no tracker address (required by some trackers)
+   + Restructuring of remote access
 - Mac
    + Quick Look integration in the main window and inspector's file tab
    + Transfers can be dragged to different groups

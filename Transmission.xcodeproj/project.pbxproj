@@ -660,9 +660,9 @@
 		A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = makemeta.h; path = libtransmission/makemeta.h; sourceTree = "<group>"; };
 		A2BF078E0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SpeedLimitToTurtleIconTransformer.h; path = macosx/SpeedLimitToTurtleIconTransformer.h; sourceTree = "<group>"; };
 		A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SpeedLimitToTurtleIconTransformer.m; path = macosx/SpeedLimitToTurtleIconTransformer.m; sourceTree = "<group>"; };
-		A2C0C2A90E00CC9300D95339 /* Security.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Security.framework; path = /Users/mitchell/Desktop/Transmission/build/Development/Security.framework; sourceTree = "<absolute>"; };
 		A2C0C2DF0E00CCE400D95339 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		A2C0C5020E02CB6100D95339 /* Remote.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Remote.png; path = macosx/Images/Remote.png; sourceTree = "<group>"; };
+		A2C0C5370E0326E700D95339 /* Security.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Security.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ButtonToolbarItem.m; path = macosx/ButtonToolbarItem.m; sourceTree = "<group>"; };
 		A2CBDED80D993E4500BB22BC /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2CBDF9E0D9AD08100BB22BC /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/AddWindow.xib; sourceTree = "<group>"; };
@@ -970,6 +970,7 @@
 				BE1183480CE160960002D0F3 /* libminiupnp.a */,
 				3C7A118D0D0B2EB800B5701F /* libnatpmp.a */,
 				A2DF58250DE4B0EF000795D5 /* libshttpd.a */,
+				A2C0C5370E0326E700D95339 /* Security.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1622,7 +1623,7 @@
 			);
 			name = Security;
 			productName = Security;
-			productReference = A2C0C2A90E00CC9300D95339 /* Security.framework */;
+			productReference = A2C0C5370E0326E700D95339 /* Security.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		A2DF58240DE4B0EF000795D5 /* shttpd */ = {
