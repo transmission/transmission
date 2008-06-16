@@ -2272,6 +2272,7 @@
 					"-DHAVE_STRLCAT",
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
+					"-DHAVE_STRCASECMP",
 				);
 				PRODUCT_NAME = transmission;
 			};
