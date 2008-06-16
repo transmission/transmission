@@ -398,7 +398,7 @@ tr_strcasecmp( const char * a, const char * b )
 #else
     while( *a && ( tolower( *(uint8_t*)a ) == tolower( *(uint8_t*)b ) ) )
         ++a, ++b;
-    return tolower( *(uint8_t*)s1) - tolower(*(uint8_t*)s2 );
+    return tolower( *(uint8_t*)a) - tolower(*(uint8_t*)b );
 #endif
 }
 
