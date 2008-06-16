@@ -1830,7 +1830,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 //status has been retained
 - (void) completenessChange: (NSNumber *) status
 {
-    [self update];
+    fStat = tr_torrentStat(fHandle); //don't call update yet to avoid auto-stop
     
     BOOL canMove;
     switch ([status intValue])
@@ -1866,7 +1866,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             //allow to be backed up by Time Machine
             [self setTimeMachineExclude: NO forPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
             
-            fStat = tr_torrentStat(fHandle);
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
             break;
         
@@ -1878,6 +1877,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             break;
     }
     [status release];
+    
+    [self update];
 } 
 
 - (void) quickPause
