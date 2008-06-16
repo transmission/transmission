@@ -219,6 +219,8 @@
 		A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF576B0DE468C6000795D5 /* JSON_parser.h */; };
 		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */; };
 		A2E9AA760C249AF400085DCF /* Create.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* Create.png */; };
+		A2EC3E910E071DCE0072505E /* rpc-utils.c in Sources */ = {isa = PBXBuildFile; fileRef = A2EC3E8E0E071DC40072505E /* rpc-utils.c */; };
+		A2EC3E920E071DD20072505E /* rpc-utils.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EC3E8F0E071DC40072505E /* rpc-utils.h */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
 		A2EF7DEC0C96297400FA9811 /* PurpleDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2EF7DEB0C96297400FA9811 /* PurpleDot.png */; };
 		A2F011990C27418800576FC0 /* CreateLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F011980C27418800576FC0 /* CreateLarge.png */; };
@@ -688,6 +690,8 @@
 		A2E9AA750C249AF400085DCF /* Create.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Create.png; path = macosx/Images/Create.png; sourceTree = "<group>"; };
 		A2EA8E3C0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2EA8E3E0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A2EC3E8E0E071DC40072505E /* rpc-utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "rpc-utils.c"; path = "libtransmission/rpc-utils.c"; sourceTree = "<group>"; };
+		A2EC3E8F0E071DC40072505E /* rpc-utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "rpc-utils.h"; path = "libtransmission/rpc-utils.h"; sourceTree = "<group>"; };
 		A2ED7D8D0CEF431B00970975 /* FilterButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterButton.h; path = macosx/FilterButton.h; sourceTree = "<group>"; };
 		A2ED7D8E0CEF431B00970975 /* FilterButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterButton.m; path = macosx/FilterButton.m; sourceTree = "<group>"; };
 		A2EF7DEB0C96297400FA9811 /* PurpleDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PurpleDot.png; path = macosx/Images/PurpleDot.png; sourceTree = "<group>"; };
@@ -1118,6 +1122,8 @@
 				A2AAB6590DE0CF6200E04DDA /* rpc.h */,
 				A2AAB6580DE0CF6200E04DDA /* rpc-server.c */,
 				A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */,
+				A2EC3E8E0E071DC40072505E /* rpc-utils.c */,
+				A2EC3E8F0E071DC40072505E /* rpc-utils.h */,
 				A29DF8B60DB2544C00D04E5A /* resume.c */,
 				A29DF8B70DB2544C00D04E5A /* resume.h */,
 				A29DF8B80DB2544C00D04E5A /* torrent.h */,
@@ -1464,6 +1470,7 @@
 				A2A4E9870DE10399000CE197 /* json.h in Headers */,
 				A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */,
 				A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */,
+				A2EC3E920E071DD20072505E /* rpc-utils.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1939,6 +1946,7 @@
 				A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */,
 				A2DF58580DE4B2B0000795D5 /* JSON_parser.c in Sources */,
 				A292A6E80DFB45FC004B9C0A /* webseed.c in Sources */,
+				A2EC3E910E071DCE0072505E /* rpc-utils.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
