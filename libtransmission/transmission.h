@@ -1247,7 +1247,7 @@ typedef struct tr_stat
     int leechers;
 
     /** Number of finished downloads that the tracker says torrent has */
-    int completedFromTracker;
+    int timesCompleted;
 
     /** Byte count of all the piece data we'll have downloaded when we're done,
         whether or not we have it yet. [0...tr_info.totalSize] */

@@ -712,7 +712,7 @@ tr_torrentStat( tr_torrent * tor )
     s->announceURL = ti ? ti->announce : NULL;
     s->scrapeURL   = ti ? ti->scrape   : NULL;
     tr_trackerStat( tc, s );
-    tr_trackerGetCounts( tc, &s->completedFromTracker,
+    tr_trackerGetCounts( tc, &s->timesCompleted,
                              &s->leechers, 
                              &s->seeders );
     tr_peerMgrTorrentStats( tor->handle->peerMgr,

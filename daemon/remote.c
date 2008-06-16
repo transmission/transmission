@@ -148,6 +148,7 @@ readargs( int argc, char ** argv )
         char * tmp;
         char buf[MAX_PATH_LENGTH];
         int addArg = TRUE;
+        int64_t fields = 0;
         tr_benc top, *args;
         tr_bencInitDict( &top, 3 );
         args = tr_bencDictAddDict( &top, "arguments", 0 );
@@ -193,8 +194,12 @@ readargs( int argc, char ** argv )
             case 'f': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddStr( args, "download-dir", absolutify(buf,sizeof(buf),optarg) );
                       break;
-            case 'l': tr_bencDictAddStr( &top, "method", "torrent-list" );
+            case 'l': tr_bencDictAddStr( &top, "method", "torrent-info" );
                       tr_bencDictAddInt( &top, "tag", TAG_LIST );
+                      fields = TR_RPC_TORRENT_FIELD_ID
+                             | TR_RPC_TORRENT_FIELD_ACTIVITY
+                             | TR_RPC_TORRENT_FIELD_SIZE;
+                      tr_bencDictAddInt( args, "fields", fields );
                       break;
             case 'm': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddInt( args, "port-forwarding-enabled", 1 );
@@ -306,7 +311,7 @@ processResponse( const char * host, int port,
 
         if( ( tag == TAG_LIST ) &&
             ( tr_bencDictFindDict( &top, "arguments", &args ) ) &&
-            ( tr_bencDictFindList( args, "list", &list ) ) )
+            ( tr_bencDictFindList( args, "torrent-info", &list ) ) )
         {
             int i, n;
             for( i=0, n=tr_bencListSize( list ); i<n; ++i )
@@ -315,11 +320,11 @@ processResponse( const char * host, int port,
                 const char *name, *ratiostr, *upstr, *dnstr;
                 tr_benc * d = tr_bencListChild( list, i );
                 if(    tr_bencDictFindInt( d, "id", &id )
-                    && tr_bencDictFindInt( d, "status", &status )
                     && tr_bencDictFindStr( d, "name", &name )
-                    && tr_bencDictFindStr( d, "ratio", &ratiostr )
+                    && tr_bencDictFindStr( d, "rateDownload", &dnstr )
                     && tr_bencDictFindStr( d, "rateUpload", &upstr )
-                    && tr_bencDictFindStr( d, "rateDownload", &dnstr ) )
+                    && tr_bencDictFindStr( d, "ratio", &ratiostr )
+                    && tr_bencDictFindInt( d, "status", &status ) )
                 {
                     printf( "%4d.  Up: %5.1f  Down: %5.1f  Ratio: %4.1f  %-15s  %s\n",
                             (int)id,

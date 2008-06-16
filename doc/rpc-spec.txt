@@ -75,105 +75,178 @@
 
    Response arguments: none
 
-3.2.  Torrent List
-
-   An overview list of torrents.
-
-   Method name: "torrent-list".
-
-   Request arguments: none.
-
-   Response arguments: "list", an array of objects that contain these keys:
-
-   key                   | value type
-   ----------------------+-------------------------------------------------
-   "downloadedEver"      | number
-   "eta"                 | number
-   "hashString"          | string
-   "id"                  | number
-   "name"                | string
-   "peersConnected"      | number
-   "peersSendingToUs"    | number
-   "peersGettingFromUs"  | number
-   "percentDone"         | double
-   "rateDownload"        | double
-   "rateUpload"          | double
-   "ratio"               | double
-   "sizeWhenDone"        | number
-   "status"              | number
-   "uploadedEver"        | number
-
-
-
-3.3.  Torrent Info Requests
+3.2.  Torrent Information Requests
 
    Method name: "torrent-info".
 
-   Request arguments: 3.1's optional "ids" argument.
+   The request takes two arguments: "ids", as described in section 3.1, and
+   "fields", a bitwise-or'ed number which specifies which torrent information
+   is being requested.  (See libtransmission/rpc.h's enumeration)
+   The response arguments are "fields" (identical to the request argument)
+   and "torrent-info", a list of objects that each contain the pairs
+   shown here:
 
-   Response arguments: "torrent-info", an array of objects based on
-   libtransmission's tr_info struct but different in the following ways:
-   (1) the torrent's "id" field is added.
-   (2) tr_info's "hash" field is omitted.
-   (3) tr_info's "pieces" field is omitted.
-   (4) tr_file's only included pieces are "name" and "length".
+   field and          | response | response               | source
+   numeric value      | type     | name                   | 
+   -------------------+----------+------------------------+-------------
+   activity, 1        | number   | desiredAvailable       | tr_stat
+                      | number   | eta                    | tr_stat
+                      | number   | peersConnected         | tr_stat
+                      | number   | peersGettingFromUs     | tr_stat
+                      | number   | peersSendingToUs       | tr_stat
+                      | number   | rateDownload           | tr_stat
+                      | number   | rateUpload             | tr_stat
+                      | number   | recheckProgress        | tr_stat
+                      | number   | status                 | tr_stat
+                      | number   | swarmSpeed             | tr_stat
+                      | number   | webseedsSendingToUs    | tr_stat
+   -------------------+----------+------------------------+-------------
+   announce, 2        | string   | announceResponse       | tr_stat
+                      | string   | announceURL            | tr_stat
+                      | string   | lastAnnounceTime       | tr_stat
+                      | string   | manualAnnounceTime     | tr_stat
+                      | string   | nextAnnounceTime       | tr_stat
+   -------------------+----------+------------------------+-------------
+   error, 4           | number   | error                  | tr_stat
+                      | number   | errorString            | tr_Stat
+   -------------------+----------+------------------------+-------------
+   files, 8           | array    | files
+                      +----------+-------------------------------------- 
+                      | files is an array of objects that contain:
+                      +----------+------------------------+------------- 
+                      | number   | length                 | tr_info
+                      | string   | name                   | tr_info
+   -------------------+----------+------------------------+-------------
+   history, 16        | number   | activityDate           | tr_stat
+                      | number   | addedDate              | tr_stat
+                      | number   | corruptEver            | tr_stat
+                      | number   | doneDate               | tr_stat
+                      | number   | downloadedEver         | tr_stat
+                      | number   | startDate              | tr_stat
+                      | number   | uploadedEver           | tr_stat
+   -------------------+----------+------------------------+-------------
+   id, 32             | number   | uniqueId               | tr_torrent
+                      | string   | hashString             | tr_info
+                      | string   | name                   | tr_info
+   -------------------+----------+------------------------+-------------
+   info, 64           | string   | comment                | tr_info
+                      | string   | creator                | tr_info
+                      | number   | dateCreated            | tr_info
+                      | number   | pieceCount             | tr_info
+                      | number   | pieceSize              | tr_info
+   -------------------+----------+------------------------+-------------
+   limits, 128        | number   | downloadLimit          | tr_torrent
+                      | number   | downloadLimitMode      | tr_torrent
+                      | number   | maxConnectedPeers      | tr_torrent
+                      | number   | uploadLimit            | tr_torrent
+                      | number   | uploadLimitMode        | tr_torrent
+   -------------------+----------+------------------------+-------------
+   peers, 256         | object   | peersFrom              | tr_stat
+                      +----------+------------------------+------------- 
+                      | peersFrom contains:
+                      +----------+------------------------+------------- 
+                      | number   | cache                  | tr_stat
+                      | number   | incoming               | tr_stat
+                      | number   | pex                    | tr_stat
+                      | number   | tracker                | tr_stat
+   -------------------+----------+------------------------+-------------
+   scrape, 512        | number   | lastScrapeTime         | tr_stat
+                      | number   | nextScrapeTime         | tr_stat
+                      | string   | scrapeResponse         | tr_stat
+                      | string   | scrapeURL              | tr_stat
+   -------------------+----------+------------------------+-------------
+   size, 1024         | number   | haveUnchecked          | tr_stat
+                      | number   | haveValid              | tr_stat
+                      | number   | leftUntilDone          | tr_stat
+                      | 'double' | percentComplete        | tr_stat
+                      | 'double' | percentDone            | tr_stat
+                      | 'double' | ratio                  | tr_stat
+                      | number   | sizeWhenDone           | tr_stat
+                      | number   | totalSize              | tr_stat
+   -------------------+----------+------------------------+-------------
+   tracker stats,     | number   | leechers               | tr_stat
+   2048               | number   | peersKnown             | tr_stat
+                      | number   | seeders                | tr_stat
+                      | number   | timesCompleted         | tr_stat
+   -------------------+----------+--------------------------------------
+   trackers, 4096     | array    | trackers
+                      +----------+-------------------------------------- 
+                      | trackers is an array of objects that contain:
+                      +----------+------------------------+------------- 
+                      | string   | announce               | tr_info
+                      | string   | scrape                 | tr_info
+                      | number   | tier                   | tr_info
+   -------------------+----------+------------------------+-------------
+   webseeds, 8192     | object   | webseeds
+                      +----------+-------------------------------------- 
+                      | webseeds contains:
+                      | an array of weseed url strings
+   -------------------+----------+------------------------+-------------
 
-   Note that this is a fairly high-bandwidth request and that its results
-   don't change.  You should try to cache its results instead of re-calling it.
 
-   Example Request: 
+   Example:
+
+   Say we want to get the ratio and name of torrents 7 and 10.
+   name is in the "id" section (32) and ratio is in "size" (1024),
+   so the "fields" argument will be 32 + 1024 == 1056.
+
+   Request: 
 
       {
-         "arguments": { "ids": [ 7, 10 ] }
+         "arguments": {
+             "fields": 1056,
+             "ids": [ 7, 10 ],
+         }
          "method": "torrent-info",
          "tag": 39693
       }
 
-   Example Response:
+
+   Response:
 
       {
          "tag": 39693
          "result": "success",
          "arguments": {
+            "fields": 1056,
             "torrent-info": [ 
-               { 
-                  "id": 7, 
-                  "name": "Ubuntu x86_64 DVD", 
-                  "pieceCount": 1209233, 
-                  "pieceSize": 4096, 
-                  "totalSize": 9803930483, 
-                  ... 
+               {
+                   "hashString": "asdasiofjosejfoasjfiosj",
+                   "haveUnchecked", 0,
+                   "haveValid", 9923890123,
+                   "leftUntilDone", 0,
+                   "name": "Ubundu x86_64 DVD",
+                   "percentComplete", "1.0000",
+                   "percentDone", "1.0000",
+                   "ratio", "2.23222",
+                   "sizeWhenDone", 9923890123,
+                   "totalSize", 9923890123,
+                   "uniqueId": 7,
                }, 
                { 
-                  "id": 10, 
-                  "name": "Ubuntu i386 DVD", 
-                  "pieceCount": 83943, 
-                  "pieceSize": 12345, 
-                  "totalSize": 2398480394, 
-                  ... 
+                   "hashString": "sijioejisoefjiosejfioi",
+                   "haveUnchecked", 23023,
+                   "haveValid", 27986795145,
+                   "leftUntilDone", 0,
+                   "name": "Fedora x86_64 DVD",
+                   "percentComplete", "1.0000",
+                   "percentDone", "0.8010",
+                   "ratio", "0.604034",
+                   "sizeWhenDone", 34983493932,
+                   "totalSize", 34983493932,
+                   "uniqueId": 10,
                } 
             ]
          }
       }
 
-3.4.  Torrent Status Requests
-
-   Method name: "torrent-status"
-
-   Request arguments: 3.1's optional "ids" argument.
-
-   Response arguments: "torrent-status", an array of objects
-   based on libtransmission's tr_stat struct but different
-   in the following ways:
-   (1) tr_info's "hashString" field is added.
-
-3.5.  Adding a Torrent
+3.3.  Adding a Torrent
 
    Method name: "torrent-add"
 
    Request arguments:
 
-   string             | value type & description
+   key                | value type & description
    -------------------+-------------------------------------------------
    "download-dir"     | string    path to download the torrent to
    "filename"         | string    location of the .torrent file
@@ -185,9 +258,10 @@
    All other arguments are optional.
 
    Response arguments: on success, a "torrent-added" object in the
-                       form of one of 3.3's tr_info objects.
+                       form of one of 3.3's tr_info objects with the
+                       fields for id, name, and hashString.
 
-3.6.  Other Torrent Settings
+3.4.  Other Torrent Settings
 
    Common arguments:
 
@@ -199,21 +273,14 @@
    "speed-limit-up"           | int       maximum upload speed (in KiB/s)
    "speed-limit-up-enabled"   | boolean   true if the upload speed is limited
 
-3.6.1.  Mutators
+3.4.1.  Mutators
 
    Method name: "torrent-set"
    Request arguments: 3.1's "ids", plus one or more of 3.6's arguments
    Response arguments: none
-
-3.6.2.  Accessors
-
-   Method name: "torrent-get"
-   Request arguments: none
-   Response arguments: A "torrents" list of objects containing all
-                       of 3.6's arguments plus the torrent's "id" field.
                       
 
-3.7  File Priorities
+3.5  File Priorities
 
    Common arguments:
 
@@ -225,13 +292,13 @@
    "priority-low"     | array     indices of one or more low-priority files
    "priority-normal"  | array     indices of one or more normal-priority files
 
-3.7.1.  Mutators
+3.5.1.  Mutators
 
     Method name: "torrent-set-priorities"
     Request arguments: 3.1's "ids", plus one or more of 3.7's arguments
     Response arguments: none
 
-3.7.2.  Accessors
+3.5.2.  Accessors
 
     Method name: "torrent-get-priorities"
     Request arguments: none

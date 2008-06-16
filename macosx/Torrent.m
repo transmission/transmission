@@ -1277,7 +1277,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (int) completedFromTracker
 {
-    return fStat->completedFromTracker;
+    return fStat->timesCompleted;
 }
 
 - (int) totalPeersConnected

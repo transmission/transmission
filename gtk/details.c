@@ -527,7 +527,7 @@ refresh_peers (GtkWidget * top)
 
   fmtpeercount (p->seeders_lb, stat->seeders);
   fmtpeercount (p->leechers_lb, stat->leechers);
-  fmtpeercount (p->completed_lb, stat->completedFromTracker );
+  fmtpeercount (p->completed_lb, stat->timesCompleted );
 
   free( peers );
 }
@@ -765,7 +765,7 @@ peer_page_new ( TrTorrent * gtor )
     gtk_box_pack_start_defaults (GTK_BOX(hbox),
                                  gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f));
         l = gtk_label_new (NULL);
-        gtk_label_set_markup (GTK_LABEL(l), _( "<b>Completed:</b>" ) );
+        gtk_label_set_markup (GTK_LABEL(l), _( "<b>Times Completed:</b>" ) );
         gtk_box_pack_start (GTK_BOX(hbox), l, FALSE, FALSE, 0);
         l = p->completed_lb = gtk_label_new (NULL);
         gtk_box_pack_start (GTK_BOX(hbox), l, FALSE, FALSE, 0);
