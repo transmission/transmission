@@ -1161,7 +1161,7 @@
 - (void) setKeychainPassword: (const char *) password forService: (const char *) service username: (const char *) username
 {
     SecKeychainItemRef item = NULL;
-    NSUInteger passwordLength = strlen(password) > 0;
+    NSUInteger passwordLength = strlen(password);
     
     OSStatus result = SecKeychainFindGenericPassword(NULL, strlen(service), service, strlen(username), username, NULL, NULL, &item);
     if (result == noErr && item)
