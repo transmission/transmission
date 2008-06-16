@@ -114,6 +114,36 @@ isMainlineStyle( const uint8_t * peer_id )
         && ( peer_id[4]=='-' || peer_id[5]=='-' );
 }
 
+static int
+decodeBitCometClient( char * buf, size_t buflen, const uint8_t * id )
+{
+    int is_bitlord;
+    int major, minor;
+    const char * name;
+    const char * mod = NULL;
+
+    if( !memcmp( id, "exbc", 4 ) ) mod = "";
+    else if( !memcmp( id, "FUTB", 4 )) mod = "(Solidox Mod) ";
+    else if( !memcmp( id, "xUTB", 4 )) mod = "(Mod 2) ";
+    else return FALSE;
+
+    is_bitlord = !memcmp( id+6, "LORD", 4 );
+    name = (is_bitlord) ? "BitLord " : "BitComet ";
+    major = id[4];
+    minor = id[5];
+
+    /**
+     * Bitcomet, and older versions of BitLord, are of the form x.yy.
+     * Bitcoment 1.0 and onwards are of the form x.y.
+     */
+    if( is_bitlord && major>0 )
+        snprintf( buf, buflen, "%s%s%d.%d", name, mod, major, minor );
+    else
+        snprintf( buf, buflen, "%s%s%d.%02d", name, mod, major, minor );
+
+    return TRUE;
+}
+
 void
 tr_clientForId( char * buf, size_t buflen, const void * id_in )
 {
@@ -261,6 +291,9 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         if( *id=='Q' ) mainline_style( buf, buflen, "Queen Bee", id );
         if( *buf ) return;
     }
+
+    if( decodeBitCometClient( buf, buflen, id ) )
+        return;
 
     /* Clients with no version */
          if( !memcmp( id, "AZ2500BT", 8 ) )  no_version( buf, buflen, "BitTyrant (Azureus Mod)" );
