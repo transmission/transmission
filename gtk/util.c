@@ -47,15 +47,6 @@
 #include "tr-prefs.h"
 #include "util.h"
 
-int
-tr_strcmp( const char * a, const char * b )
-{
-    if( a && b ) return strcmp( a, b );
-    if( a ) return 1;
-    if( b ) return -1;
-    return 0;
-}
-
 char*
 tr_strlratio( char * buf, double ratio, size_t buflen )
 {

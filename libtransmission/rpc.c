@@ -19,6 +19,7 @@
 #include "bencode.h"
 #include "ratecontrol.h"
 #include "rpc.h"
+#include "rpc-utils.h"
 #include "json.h"
 #include "session.h"
 #include "torrent.h"
@@ -44,10 +45,17 @@ notify( tr_handle * session, int type, tr_torrent * tor )
 static tr_torrent **
 getTorrents( tr_handle * handle, tr_benc * args, int * setmeCount )
 {
-    int64_t id;
-    tr_torrent ** torrents = NULL;
+    int method;
     int torrentCount = 0;
+    int64_t id;
+    int64_t sortAscending;
+    tr_torrent ** torrents = NULL;
+    const char * str;
     tr_benc * ids;
+
+    /***
+    ****  Build the array of torrents
+    ***/
 
     if( tr_bencDictFindList( args, "ids", &ids ) )
     {
@@ -86,6 +94,42 @@ getTorrents( tr_handle * handle, tr_benc * args, int * setmeCount )
         while(( tor = tr_torrentNext( handle, tor )))
             torrents[torrentCount++] = tor;
     }
+
+    /***
+    ****  filter the torrents
+    ***/
+
+    method = TR_FILTER_ALL;
+    if( tr_bencDictFindStr( args, "filter", &str ) ) {
+             if( !strcmp( str, "active"      ) ) method = TR_FILTER_ACTIVE;
+        else if( !strcmp( str, "downloading" ) ) method = TR_FILTER_DOWNLOADING;
+        else if( !strcmp( str, "paused"      ) ) method = TR_FILTER_PAUSED;
+        else if( !strcmp( str, "seeding"     ) ) method = TR_FILTER_SEEDING;
+    }
+    if( method != TR_FILTER_ALL )
+        tr_torrentFilter( torrents, &torrentCount, method );
+
+    /***
+    ****  sort the torrents
+    ***/
+
+    method = TR_SORT_ID;
+    sortAscending = 1;
+    tr_bencDictFindInt( args, "sort-ascending", &sortAscending );
+    if( tr_bencDictFindStr( args, "sort", &str ) ) {
+             if( !strcmp( str, "activity" ) ) method = TR_SORT_ACTIVITY;
+        else if( !strcmp( str, "age" ) )      method = TR_SORT_AGE;
+        else if( !strcmp( str, "name" ) )     method = TR_SORT_NAME;
+        else if( !strcmp( str, "progress" ) ) method = TR_SORT_PROGRESS;
+        else if( !strcmp( str, "ratio" ) )    method = TR_SORT_RATIO;
+        else if( !strcmp( str, "state" ) )    method = TR_SORT_STATE;
+        else if( !strcmp( str, "tracker" ) )  method = TR_SORT_TRACKER;
+    }
+    tr_torrentSort( torrents, torrentCount, method, sortAscending!=0 );
+
+    /***
+    ****  return the results
+    ***/
 
     *setmeCount = torrentCount;
     return torrents;

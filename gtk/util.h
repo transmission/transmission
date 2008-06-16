@@ -33,9 +33,6 @@
 #define UNUSED G_GNUC_UNUSED
 #endif
 
-/* NULL-safe version of strcmp */
-int tr_strcmp( const char*, const char * );
-
 /* return number of items in array */
 #define ALEN(a) ((signed)G_N_ELEMENTS(a))
 

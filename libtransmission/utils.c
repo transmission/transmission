@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #include <assert.h>
-#include <ctype.h> /* isalpha */
+#include <ctype.h> /* isalpha, tolower */
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -361,6 +361,47 @@ tr_compareUint64( uint64_t a, uint64_t b )
     if( a > b ) return 1;
     return 0;
 }
+
+int
+tr_compareDouble( double a, double b )
+{
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
+int
+tr_compareTime( time_t a, time_t b )
+{
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
+int
+tr_strcmp( const void * a, const void * b )
+{
+    if( a && b ) return strcmp( a, b );
+    if( a ) return 1;
+    if( b ) return -1;
+    return 0;
+}
+
+int
+tr_strcasecmp( const char * a, const char * b )
+{
+    if( !a && !b ) return 0;
+    if( !a ) return -1;
+    if( !b ) return 1;
+#ifdef HAVE_STRCASECMP
+    return strcasecmp( a, b );
+#else
+    while( *a && ( tolower( *(uint8_t*)a ) == tolower( *(uint8_t*)b ) ) )
+        ++a, ++b;
+    return tolower( *(uint8_t*)s1) - tolower(*(uint8_t*)s2 );
+#endif
+}
+
 
 /**
 ***

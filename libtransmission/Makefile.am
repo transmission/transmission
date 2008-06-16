@@ -33,6 +33,7 @@ libtransmission_a_SOURCES = \
     resume.c \
     rpc.c \
     rpc-server.c \
+    rpc-utils.c \
     session.c \
     stats.c \
     torrent.c \
@@ -77,6 +78,7 @@ noinst_HEADERS = \
     resume.h \
     rpc.h \
     rpc-server.h \
+    rpc-utils.h \
     session.h \
     stats.h \
     torrent.h \

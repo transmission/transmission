@@ -79,12 +79,23 @@
 
    Method name: "torrent-info".
 
-   The request takes two arguments: "ids", as described in section 3.1, and
-   "fields", a bitwise-or'ed number which specifies which torrent information
-   is being requested.  (See libtransmission/rpc.h's enumeration)
-   The response arguments are "fields" (identical to the request argument)
-   and "torrent-info", a list of objects that each contain the pairs
-   shown here:
+   The request supports four arguments:
+
+   (1) "ids", as described in section 3.1.
+   (2) A required "fields" number as described in the table below
+   (3) An optional "sort" string whose value should be one of:
+       "activity", "age", "id", "name", "progress", "ratio", "state", "tracker".
+   (4) An optional "sort-ascending" 'boolean'.
+       This is only used if "sort-method" is supplied.
+       Its default value is 'true'.
+   (5) An optional "filter" string whose value may be one of:
+       "active", "all", "downloading", "paused", "seeding"
+
+   The respons supports two arguments:
+
+   (1) A required "fields" number identical to the request's
+   (2) A "torrent-info" list of objects, each of which contains the
+       response names described in the table below.
 
    field and          | response | response               | source
    numeric value      | type     | name                   | 
@@ -196,6 +207,7 @@
          "arguments": {
              "fields": 1056,
              "ids": [ 7, 10 ],
+             "sort-method": "name"
          }
          "method": "torrent-info",
          "tag": 39693
@@ -205,17 +217,28 @@
    Response:
 
       {
-         "tag": 39693
-         "result": "success",
          "arguments": {
             "fields": 1056,
             "torrent-info": [ 
+               { 
+                   "hashString": "sijioejisoefjiosejfioi",
+                   "haveUnchecked", 23023,
+                   "haveValid", 27986795145,
+                   "leftUntilDone", 0,
+                   "name": "Fedora x86_64 DVD",
+                   "percentComplete", "0.8010",
+                   "percentDone", "0.8010",
+                   "ratio", "0.604034",
+                   "sizeWhenDone", 34983493932,
+                   "totalSize", 34983493932,
+                   "uniqueId": 10,
+               } 
                {
                    "hashString": "asdasiofjosejfoasjfiosj",
                    "haveUnchecked", 0,
                    "haveValid", 9923890123,
                    "leftUntilDone", 0,
-                   "name": "Ubundu x86_64 DVD",
+                   "name": "Ubuntu x86_64 DVD",
                    "percentComplete", "1.0000",
                    "percentDone", "1.0000",
                    "ratio", "2.23222",
@@ -223,21 +246,10 @@
                    "totalSize", 9923890123,
                    "uniqueId": 7,
                }, 
-               { 
-                   "hashString": "sijioejisoefjiosejfioi",
-                   "haveUnchecked", 23023,
-                   "haveValid", 27986795145,
-                   "leftUntilDone", 0,
-                   "name": "Fedora x86_64 DVD",
-                   "percentComplete", "1.0000",
-                   "percentDone", "0.8010",
-                   "ratio", "0.604034",
-                   "sizeWhenDone", 34983493932,
-                   "totalSize", 34983493932,
-                   "uniqueId": 10,
-               } 
             ]
-         }
+         },
+         "result": "success",
+         "tag": 39693
       }
 
 3.3.  Adding a Torrent
