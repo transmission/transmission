@@ -64,7 +64,7 @@
 - (void) incompleteFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 - (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 
-- (void) setKeychainPassword: (NSString *) password forService: (const char *) service username: (const char *) username;
+- (void) setKeychainPassword: (const char *) password forService: (const char *) service username: (const char *) username;
 
 @end
 
@@ -767,10 +767,10 @@
 
 - (void) setProxyPassword: (id) sender
 {
-    NSString * password = [sender stringValue];
+    const char * password = [[sender stringValue] UTF8String];
     [self setKeychainPassword: password forService: PROXY_KEYCHAIN_SERVICE username: PROXY_KEYCHAIN_NAME];
     
-    tr_sessionSetProxyPassword(fHandle, [password UTF8String]);
+    tr_sessionSetProxyPassword(fHandle, password);
 }
 
 - (void) updateProxyPassword
@@ -809,10 +809,10 @@
 
 - (void) setRPCPassword: (id) sender
 {
-    NSString * password = [sender stringValue];
+    const char * password = [[sender stringValue] UTF8String];
     [self setKeychainPassword: password forService: RPC_KEYCHAIN_SERVICE username: RPC_KEYCHAIN_NAME];
     
-    tr_sessionSetRPCPassword(fHandle, [password UTF8String]);
+    tr_sessionSetRPCPassword(fHandle, password);
 }
 
 - (void) updateRPCPassword
@@ -1158,17 +1158,17 @@
     [fImportFolderPopUp selectItemAtIndex: 0];
 }
 
-- (void) setKeychainPassword: (NSString *) password forService: (const char *) service username: (const char *) username
+- (void) setKeychainPassword: (const char *) password forService: (const char *) service username: (const char *) username
 {
     SecKeychainItemRef item = NULL;
-    BOOL shouldAdd = password && ![password isEqualToString: @""];
+    NSUInteger passwordLength = strlen(password) > 0;
     
     OSStatus result = SecKeychainFindGenericPassword(NULL, strlen(service), service, strlen(username), username, NULL, NULL, &item);
     if (result == noErr && item)
     {
-        if (shouldAdd) //found, so update
+        if (passwordLength > 0) //found, so update
         {
-            result = SecKeychainItemModifyAttributesAndData(item, NULL, [password length], (const void *)[password UTF8String]);
+            result = SecKeychainItemModifyAttributesAndData(item, NULL, passwordLength, (const void *)password);
             if (result != noErr)
                 NSLog(@"Problem updating Keychain item: %s", GetMacOSStatusErrorString(result));
         }
@@ -1181,10 +1181,10 @@
     }
     else if (result == errSecItemNotFound) //not found, so add
     {
-        if (shouldAdd)
+        if (passwordLength > 0)
         {
             result = SecKeychainAddGenericPassword(NULL, strlen(service), service, strlen(username), username,
-                        [password length], (const void *)[password UTF8String], NULL);
+                        passwordLength, (const void *)password, NULL);
             if (result != noErr)
                 NSLog(@"Problem adding Keychain item: %s", GetMacOSStatusErrorString(result));
         }
