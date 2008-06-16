@@ -221,6 +221,7 @@
 		A2E9AA760C249AF400085DCF /* Create.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* Create.png */; };
 		A2EC3E910E071DCE0072505E /* rpc-utils.c in Sources */ = {isa = PBXBuildFile; fileRef = A2EC3E8E0E071DC40072505E /* rpc-utils.c */; };
 		A2EC3E920E071DD20072505E /* rpc-utils.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EC3E8F0E071DC40072505E /* rpc-utils.h */; };
+		A2EC3EBB0E071EDF0072505E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC3EBA0E071EDF0072505E /* Security.framework */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
 		A2EF7DEC0C96297400FA9811 /* PurpleDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2EF7DEB0C96297400FA9811 /* PurpleDot.png */; };
 		A2F011990C27418800576FC0 /* CreateLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F011980C27418800576FC0 /* CreateLarge.png */; };
@@ -658,7 +659,6 @@
 		A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SpeedLimitToTurtleIconTransformer.m; path = macosx/SpeedLimitToTurtleIconTransformer.m; sourceTree = "<group>"; };
 		A2C0C2DF0E00CCE400D95339 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		A2C0C5020E02CB6100D95339 /* Remote.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Remote.png; path = macosx/Images/Remote.png; sourceTree = "<group>"; };
-		A2C0C5370E0326E700D95339 /* Security.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Security.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ButtonToolbarItem.m; path = macosx/ButtonToolbarItem.m; sourceTree = "<group>"; };
 		A2CBDED80D993E4500BB22BC /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2CBDF9E0D9AD08100BB22BC /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/AddWindow.xib; sourceTree = "<group>"; };
@@ -692,6 +692,7 @@
 		A2EA8E3E0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2EC3E8E0E071DC40072505E /* rpc-utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "rpc-utils.c"; path = "libtransmission/rpc-utils.c"; sourceTree = "<group>"; };
 		A2EC3E8F0E071DC40072505E /* rpc-utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "rpc-utils.h"; path = "libtransmission/rpc-utils.h"; sourceTree = "<group>"; };
+		A2EC3EBA0E071EDF0072505E /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		A2ED7D8D0CEF431B00970975 /* FilterButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterButton.h; path = macosx/FilterButton.h; sourceTree = "<group>"; };
 		A2ED7D8E0CEF431B00970975 /* FilterButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterButton.m; path = macosx/FilterButton.m; sourceTree = "<group>"; };
 		A2EF7DEB0C96297400FA9811 /* PurpleDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PurpleDot.png; path = macosx/Images/PurpleDot.png; sourceTree = "<group>"; };
@@ -821,13 +822,7 @@
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
 				A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */,
 				A29EBE710DC06068006CEE80 /* libcurl.dylib in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A2C0C2A70E00CC9300D95339 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				A2EC3EBB0E071EDF0072505E /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -967,7 +962,6 @@
 				BE1183480CE160960002D0F3 /* libminiupnp.a */,
 				3C7A118D0D0B2EB800B5701F /* libnatpmp.a */,
 				A2DF58250DE4B0EF000795D5 /* libshttpd.a */,
-				A2C0C5370E0326E700D95339 /* Security.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1093,9 +1087,10 @@
 			isa = PBXGroup;
 			children = (
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
-				4D3EA0A908AE13C600EA10C2 /* IOKit.framework */,
-				A2C0C2DF0E00CCE400D95339 /* Security.framework */,
 				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
+				4D3EA0A908AE13C600EA10C2 /* IOKit.framework */,
+				A2EC3EBA0E071EDF0072505E /* Security.framework */,
+				A2C0C2DF0E00CCE400D95339 /* Security.framework */,
 				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
 				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
 				A261F1DB0A69A1610002815A /* Growl.framework */,
@@ -1474,13 +1469,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A2C0C2A40E00CC9300D95339 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		A2DF58210DE4B0EF000795D5 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1596,24 +1584,6 @@
 			productName = Transmission;
 			productReference = 8D1107320486CEB800E47090 /* Transmission.app */;
 			productType = "com.apple.product-type.application";
-		};
-		A2C0C2A80E00CC9300D95339 /* Security */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A2C0C2BF0E00CC9300D95339 /* Build configuration list for PBXNativeTarget "Security" */;
-			buildPhases = (
-				A2C0C2A40E00CC9300D95339 /* Headers */,
-				A2C0C2A50E00CC9300D95339 /* Resources */,
-				A2C0C2A60E00CC9300D95339 /* Sources */,
-				A2C0C2A70E00CC9300D95339 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Security;
-			productName = Security;
-			productReference = A2C0C5370E0326E700D95339 /* Security.framework */;
-			productType = "com.apple.product-type.framework";
 		};
 		A2DF58240DE4B0EF000795D5 /* shttpd */ = {
 			isa = PBXNativeTarget;
@@ -1742,7 +1712,6 @@
 				A2DF58240DE4B0EF000795D5 /* shttpd */,
 				BE1183470CE160960002D0F3 /* miniupnp */,
 				3C7A118C0D0B2EB800B5701F /* natpmp */,
-				A2C0C2A80E00CC9300D95339 /* Security */,
 			);
 		};
 /* End PBXProject section */
@@ -1844,13 +1813,6 @@
 				A224D2640DAAC55F000954EA /* Peers.png in Resources */,
 				A26146E10DD4A0160060F033 /* GroupsNoneTemplate.png in Resources */,
 				A2C0C5030E02CB6100D95339 /* Remote.png in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A2C0C2A50E00CC9300D95339 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2016,13 +1978,6 @@
 				A2DF57740DE46A6A000795D5 /* QuickLookController.m in Sources */,
 				A2725B6E0DE5C4F5003445E7 /* FileListNode.m in Sources */,
 				A2725D5D0DE7507C003445E7 /* TrackerTableView.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A2C0C2A60E00CC9300D95339 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2571,84 +2526,6 @@
 			};
 			name = "Release - Debug";
 		};
-		A2C0C2BC0E00CC9300D95339 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_VERSION = A;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INFOPLIST_FILE = "Security-Info.plist";
-				INSTALL_PATH = "$(HOME)/Library/Frameworks";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = Security;
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
-		A2C0C2BD0E00CC9300D95339 /* Release - Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_VERSION = A;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INFOPLIST_FILE = "Security-Info.plist";
-				INSTALL_PATH = "$(HOME)/Library/Frameworks";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = Security;
-			};
-			name = "Release - Debug";
-		};
-		A2C0C2BE0E00CC9300D95339 /* Development */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_VERSION = A;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INFOPLIST_FILE = "Security-Info.plist";
-				INSTALL_PATH = "$(HOME)/Library/Frameworks";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = Security;
-			};
-			name = Development;
-		};
 		A2DF58260DE4B0EF000795D5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2854,16 +2731,6 @@
 				4DF0C59D089918A300DD8943 /* Release */,
 				A250CFEB0CDA19680068B4B6 /* Release - Debug */,
 				0053D3DA0C86774200545606 /* Development */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
-		};
-		A2C0C2BF0E00CC9300D95339 /* Build configuration list for PBXNativeTarget "Security" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A2C0C2BC0E00CC9300D95339 /* Release */,
-				A2C0C2BD0E00CC9300D95339 /* Release - Debug */,
-				A2C0C2BE0E00CC9300D95339 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Development;
