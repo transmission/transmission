@@ -733,8 +733,9 @@ tr_torrentStat( tr_torrent * tor )
     s->leftUntilDone = tr_cpLeftUntilDone( tor->completion );
     s->sizeWhenDone = tr_cpSizeWhenDone( tor->completion );
 
-    s->recheckProgress =
-        1.0 - (tr_torrentCountUncheckedPieces( tor ) / (double) tor->info.pieceCount);
+    s->recheckProgress = s->status == TR_STATUS_CHECK
+        ? 1.0 - (tr_torrentCountUncheckedPieces( tor ) / (double) tor->info.pieceCount)
+        : 0.0;
 
     tr_torrentGetRates( tor, &s->rateDownload, &s->rateUpload );
 
