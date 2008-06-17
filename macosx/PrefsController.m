@@ -688,7 +688,6 @@
 
 - (void) setProxyEnabled: (id) sender
 {
-    BOOL enable = [fDefaults boolForKey: @"Proxy"];
     tr_sessionSetProxyEnabled(fHandle, [fDefaults boolForKey: @"Proxy"]);
 }
 

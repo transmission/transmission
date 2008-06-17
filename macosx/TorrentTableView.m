@@ -529,8 +529,7 @@
 {
     unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
     
-    if (firstChar == 'f' && [event modifierFlags] & NSAlternateKeyMask
-        && [event modifierFlags] & NSCommandKeyMask)
+    if (firstChar == 'f' && [event modifierFlags] & NSAlternateKeyMask && [event modifierFlags] & NSCommandKeyMask)
         [fController focusFilterField];
     else
     {

@@ -41,21 +41,21 @@
 
 - (void) awakeFromNib
 {
-        //back image
-        fBack = [[NSImage alloc] initWithSize: [self bounds].size];
-        
-        [fBack lockFocus];
-        CTGradient * gradient = [CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4]
-                                    endingColor: [NSColor colorWithCalibratedWhite: 0.2 alpha: 0.4]];
-        [gradient fillRect: [self bounds] angle: 90.0];
-        [fBack unlockFocus];
-        
-        //store box colors
-        fGreenAvailabilityColor = [[NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0] retain];
-        fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
-                
-        //actually draw the box
-        [self setTorrent: nil];
+    //back image
+    fBack = [[NSImage alloc] initWithSize: [self bounds].size];
+    
+    [fBack lockFocus];
+    CTGradient * gradient = [CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4]
+                                endingColor: [NSColor colorWithCalibratedWhite: 0.2 alpha: 0.4]];
+    [gradient fillRect: [self bounds] angle: 90.0];
+    [fBack unlockFocus];
+    
+    //store box colors
+    fGreenAvailabilityColor = [[NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0] retain];
+    fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
+            
+    //actually draw the box
+    [self setTorrent: nil];
 }
 
 - (void) dealloc

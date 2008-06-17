@@ -415,8 +415,9 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (void) setMaxPeerConnect: (uint16_t) count
 {
-    if (count > 0)
-        tr_torrentSetPeerLimit(fHandle, count);
+    NSAssert(count > 0, @"max peer count must be greater than 0");
+    
+    tr_torrentSetPeerLimit(fHandle, count);
 }
 
 - (uint16_t) maxPeerConnect
