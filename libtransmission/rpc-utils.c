@@ -25,8 +25,8 @@
 static int
 compareTorrentsByActivity( const void * a, const void * b )
 {
-    const tr_stat * sa = tr_torrentStatCached( (tr_torrent*) a );
-    const tr_stat * sb = tr_torrentStatCached( (tr_torrent*) b );
+    const tr_stat * sa = tr_torrentStatCached( *(tr_torrent**) a );
+    const tr_stat * sb = tr_torrentStatCached( *(tr_torrent**) b );
     int i;
     if(( i = tr_compareDouble( sa->rateUpload + sa->rateDownload,
                                sb->rateUpload + sb->rateDownload ) ))
@@ -39,21 +39,25 @@ compareTorrentsByActivity( const void * a, const void * b )
 static int
 compareTorrentsByAge( const void * a, const void * b )
 {
-    return tr_compareTime( tr_torrentStatCached( (tr_torrent*)a )->addedDate,
-                           tr_torrentStatCached( (tr_torrent*)b )->addedDate );
+    const tr_torrent * ta = * (tr_torrent **) a;
+    const tr_torrent * tb = * (tr_torrent **) b;
+    return tr_compareTime( tr_torrentStatCached( ta )->addedDate,
+                           tr_torrentStatCached( tb )->addedDate );
 }
 
 static int
 compareTorrentsByID( const void * a, const void * b )
 {
-    return ((tr_torrent*)a)->uniqueId - ((tr_torrent*)b)->uniqueId;
+    const tr_torrent * ta = * (tr_torrent **) a;
+    const tr_torrent * tb = * (tr_torrent **) b;
+    return ta->uniqueId - tb->uniqueId;
 }
 
 static int
 compareTorrentsByName( const void * a, const void * b )
 {
-    const tr_torrent * ta = a;
-    const tr_torrent * tb = b;
+    const tr_torrent * ta = * (tr_torrent **) a;
+    const tr_torrent * tb = * (tr_torrent **) b;
     return tr_strcasecmp( ta->info.name, tb->info.name );
 }
 
@@ -69,8 +73,8 @@ compareRatio( double a, double b )
 static int
 compareTorrentsByProgress( const void * a, const void * b )
 {
-    const tr_stat * sa = tr_torrentStatCached( (tr_torrent*) a );
-    const tr_stat * sb = tr_torrentStatCached( (tr_torrent*) b );
+    const tr_stat * sa = tr_torrentStatCached( *(tr_torrent**) a );
+    const tr_stat * sb = tr_torrentStatCached( *(tr_torrent**) b );
     int ret = tr_compareDouble( sa->percentDone, sb->percentDone );
     if( !ret )
         ret = compareRatio( sa->ratio, sb->ratio );
@@ -80,16 +84,16 @@ compareTorrentsByProgress( const void * a, const void * b )
 static int
 compareTorrentsByRatio( const void * a, const void * b )
 {
-    const tr_stat * sa = tr_torrentStatCached( (tr_torrent*) a );
-    const tr_stat * sb = tr_torrentStatCached( (tr_torrent*) b );
+    const tr_stat * sa = tr_torrentStatCached( *(tr_torrent**) a );
+    const tr_stat * sb = tr_torrentStatCached( *(tr_torrent**) b );
     return compareRatio( sa->ratio, sb->ratio );
 }
 
 static int
 compareTorrentsByState( const void * a, const void * b )
 {
-    const tr_stat * sa = tr_torrentStatCached( (tr_torrent*) a );
-    const tr_stat * sb = tr_torrentStatCached( (tr_torrent*) b );
+    const tr_stat * sa = tr_torrentStatCached( *(tr_torrent**) a );
+    const tr_stat * sb = tr_torrentStatCached( *(tr_torrent**) b );
     int ret = sa->status - sb->status;
     if( !ret )
         ret = compareTorrentsByRatio( a, b );
@@ -99,8 +103,8 @@ compareTorrentsByState( const void * a, const void * b )
 static int
 compareTorrentsByTracker( const void * a, const void * b )
 {
-    const tr_stat * sa = tr_torrentStatCached( (tr_torrent*) a );
-    const tr_stat * sb = tr_torrentStatCached( (tr_torrent*) b );
+    const tr_stat * sa = tr_torrentStatCached( *(tr_torrent**) a );
+    const tr_stat * sb = tr_torrentStatCached( *(tr_torrent**) b );
     return tr_strcmp( sa->announceURL, sb->announceURL );
 }
 

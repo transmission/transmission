@@ -115,7 +115,7 @@ getTorrents( tr_handle * handle, tr_benc * args, int * setmeCount )
 
     method = TR_SORT_ID;
     sortAscending = 1;
-    tr_bencDictFindInt( args, "sort-ascending", &sortAscending );
+    tr_bencDictFindInt( args, "ascending", &sortAscending );
     if( tr_bencDictFindStr( args, "sort", &str ) ) {
              if( !strcmp( str, "activity" ) ) method = TR_SORT_ACTIVITY;
         else if( !strcmp( str, "age" ) )      method = TR_SORT_AGE;
@@ -313,6 +313,16 @@ addInfo( const tr_torrent * tor, tr_benc * d, uint64_t fields )
         tr_bencDictAddInt( d, "fromTracker",  f[TR_PEER_FROM_TRACKER] );
     }
 
+    if( fields & TR_RPC_TORRENT_FIELD_PRIORITIES ) {
+        tr_file_index_t i;
+        tr_benc * p = tr_bencDictAddList( d, "priorities", inf->fileCount );
+        tr_benc * w = tr_bencDictAddList( d, "wanted", inf->fileCount );
+        for( i=0; i<inf->fileCount; ++i ) {
+            tr_bencListAddInt( p, inf->files[i].priority );
+            tr_bencListAddInt( w, inf->files[i].dnd ? 0 : 1 );
+        }
+    }
+
     if( fields & TR_RPC_TORRENT_FIELD_SCRAPE ) {
         tr_bencDictAddInt( d, "lastScrapeTime", st->lastScrapeTime );
         tr_bencDictAddInt( d, "nextScrapeTime", st->nextScrapeTime );
@@ -343,11 +353,11 @@ addInfo( const tr_torrent * tor, tr_benc * d, uint64_t fields )
 }
 
 static const char*
-torrentInfo( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
+torrentGet( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
 {
     int i, torrentCount;
     tr_torrent ** torrents = getTorrents( handle, args_in, &torrentCount );
-    tr_benc * list = tr_bencDictAddList( args_out, "torrent-info", torrentCount );
+    tr_benc * list = tr_bencDictAddList( args_out, "torrents", torrentCount );
     int64_t fields = 0;
 
     if( !tr_bencDictFindInt( args_in, "fields", &fields ) )
@@ -364,109 +374,6 @@ torrentInfo( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
 /***
 ****
 ***/
-
-static const char*
-torrentSet( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
-{
-    int i, torrentCount;
-    tr_torrent ** torrents = getTorrents( h, args_in, &torrentCount );
-
-    for( i=0; i<torrentCount; ++i )
-    {
-        int64_t tmp;
-        tr_torrent * tor = torrents[i];
-        if( tr_bencDictFindInt( args_in, "peer-limit", &tmp ) )
-            tr_torrentSetPeerLimit( tor, tmp );
-        if( tr_bencDictFindInt( args_in, "speed-limit-down", &tmp ) )
-            tr_torrentSetSpeedLimit( tor, TR_DOWN, tmp );
-        if( tr_bencDictFindInt( args_in, "speed-limit-down-enabled", &tmp ) )
-            tr_torrentSetSpeedMode( tor, TR_DOWN, tmp ? TR_SPEEDLIMIT_SINGLE
-                                                      : TR_SPEEDLIMIT_GLOBAL );
-        if( tr_bencDictFindInt( args_in, "speed-limit-up", &tmp ) )
-            tr_torrentSetSpeedLimit( tor, TR_UP, tmp );
-        if( tr_bencDictFindInt( args_in, "speed-limit-up-enabled", &tmp ) )
-            tr_torrentSetSpeedMode( tor, TR_UP, tmp ? TR_SPEEDLIMIT_SINGLE
-                                                    : TR_SPEEDLIMIT_GLOBAL );
-        notify( h, TR_RPC_TORRENT_CHANGED, tor );
-    }
-
-    tr_free( torrents );
-    return NULL;
-}
-
-typedef int( *fileTestFunc )( const tr_torrent * tor, int i );
-
-static int
-testFileHigh( const tr_torrent * tor, int i )
-{
-    return tor->info.files[i].priority == TR_PRI_HIGH;
-}
-static int
-testFileLow( const tr_torrent * tor, int i )
-{
-    return tor->info.files[i].priority == TR_PRI_LOW;
-}
-static int
-testFileNormal( const tr_torrent * tor, int i )
-{
-    return tor->info.files[i].priority == TR_PRI_NORMAL;
-}
-static int
-testFileDND( const tr_torrent * tor, int i )
-{
-    return tor->info.files[i].dnd != 0;
-}
-static int
-testFileDownload( const tr_torrent * tor, int i )
-{
-    return tor->info.files[i].dnd == 0;
-}
-
-static void
-buildFileList( const tr_torrent * tor, tr_benc * dict,
-               const char * key, fileTestFunc func )
-{
-    int i;
-    const int n = tor->info.fileCount;
-    tr_benc * list;
-    int * files = tr_new0( int, n );
-    int fileCount = 0;
-    
-    for( i=0; i<n; ++i )
-        if( func( tor, i ) )
-            files[fileCount++] = i;
-
-    list = tr_bencDictAddList( dict, key, fileCount );
-
-    for( i=0; i<fileCount; ++i )
-        tr_bencListAddInt( list, files[i] );
-
-    tr_free( files );
-}
-
-static const char*
-torrentGetPriorities( tr_handle * handle,
-                      tr_benc * args_in, tr_benc * args_out )
-{
-    int i, torrentCount;
-    tr_torrent ** torrents = getTorrents( handle, args_in, &torrentCount );
-    tr_benc * list = tr_bencDictAddList( args_out, "torrents", torrentCount );
-
-    for( i=0; i<torrentCount; ++i )
-    {
-        const tr_torrent * tor = torrents[i];
-        tr_benc * d = tr_bencListAddDict( list, 6 );
-        tr_bencDictAddInt( d, "id", tr_torrentId( tor ) );
-        buildFileList( tor, d, "files-unwanted", testFileDND );
-        buildFileList( tor, d, "files-wanted", testFileDownload );
-        buildFileList( tor, d, "priority-low", testFileLow );
-        buildFileList( tor, d, "priority-normal", testFileNormal );
-        buildFileList( tor, d, "priority-high", testFileHigh );
-    }
-
-    tr_free( torrents );
-    return NULL;
-}
 
 static void
 setFilePriorities( tr_torrent * tor, int priority, tr_benc * list )
@@ -507,14 +414,14 @@ setFileDLs( tr_torrent * tor, int do_download, tr_benc * list )
 }
 
 static const char*
-torrentSetPriorities( tr_handle * h,
-                      tr_benc * args_in, tr_benc * args_out UNUSED )
+torrentSet( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
 {
     int i, torrentCount;
     tr_torrent ** torrents = getTorrents( h, args_in, &torrentCount );
 
     for( i=0; i<torrentCount; ++i )
     {
+        int64_t tmp;
         tr_benc * files;
         tr_torrent * tor = torrents[i];
 
@@ -522,12 +429,24 @@ torrentSetPriorities( tr_handle * h,
             setFileDLs( tor, FALSE, files );
         if( tr_bencDictFindList( args_in, "files-wanted", &files ) )
             setFileDLs( tor, TRUE, files );
+        if( tr_bencDictFindInt( args_in, "peer-limit", &tmp ) )
+            tr_torrentSetPeerLimit( tor, tmp );
         if( tr_bencDictFindList( args_in, "priority-high", &files ) )
             setFilePriorities( tor, TR_PRI_HIGH, files );
         if( tr_bencDictFindList( args_in, "priority-low", &files ) )
             setFilePriorities( tor, TR_PRI_LOW, files );
         if( tr_bencDictFindList( args_in, "priority-normal", &files ) )
             setFilePriorities( tor, TR_PRI_NORMAL, files );
+        if( tr_bencDictFindInt( args_in, "speed-limit-down", &tmp ) )
+            tr_torrentSetSpeedLimit( tor, TR_DOWN, tmp );
+        if( tr_bencDictFindInt( args_in, "speed-limit-down-enabled", &tmp ) )
+            tr_torrentSetSpeedMode( tor, TR_DOWN, tmp ? TR_SPEEDLIMIT_SINGLE
+                                                      : TR_SPEEDLIMIT_GLOBAL );
+        if( tr_bencDictFindInt( args_in, "speed-limit-up", &tmp ) )
+            tr_torrentSetSpeedLimit( tor, TR_UP, tmp );
+        if( tr_bencDictFindInt( args_in, "speed-limit-up-enabled", &tmp ) )
+            tr_torrentSetSpeedMode( tor, TR_UP, tmp ? TR_SPEEDLIMIT_SINGLE
+                                                    : TR_SPEEDLIMIT_GLOBAL );
 
         notify( h, TR_RPC_TORRENT_CHANGED, tor );
     }
@@ -684,10 +603,8 @@ struct method {
     { "session-get", sessionGet },
     { "session-set", sessionSet },
     { "torrent-add", torrentAdd },
-    { "torrent-get-priorities", torrentGetPriorities },
-    { "torrent-info", torrentInfo },
+    { "torrent-get", torrentGet },
     { "torrent-remove", torrentRemove },
-    { "torrent-set-priorities", torrentSetPriorities },
     { "torrent-set", torrentSet },
     { "torrent-start", torrentStart },
     { "torrent-stop", torrentStop },

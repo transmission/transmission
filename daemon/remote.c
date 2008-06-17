@@ -194,13 +194,12 @@ readargs( int argc, char ** argv )
             case 'f': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddStr( args, "download-dir", absolutify(buf,sizeof(buf),optarg) );
                       break;
-            case 'l': tr_bencDictAddStr( &top, "method", "torrent-info" );
+            case 'l': tr_bencDictAddStr( &top, "method", "torrent-get" );
                       tr_bencDictAddInt( &top, "tag", TAG_LIST );
                       fields = TR_RPC_TORRENT_FIELD_ID
-                             | TR_RPC_TORRENT_FIELD_ACTIVITY
-                             | TR_RPC_TORRENT_FIELD_SIZE;
+                             | TR_RPC_TORRENT_FIELD_ACTIVITY;
                       tr_bencDictAddInt( args, "fields", fields );
-                      tr_bencDictAddStr( args, "sort", "name" );
+                      /*tr_bencDictAddStr( args, "sort", "name" );*/
                       break;
             case 'm': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddInt( args, "port-forwarding-enabled", 1 );
@@ -312,7 +311,7 @@ processResponse( const char * host, int port,
 
         if( ( tag == TAG_LIST ) &&
             ( tr_bencDictFindDict( &top, "arguments", &args ) ) &&
-            ( tr_bencDictFindList( args, "torrent-info", &list ) ) )
+            ( tr_bencDictFindList( args, "torrents", &list ) ) )
         {
             int i, n;
             for( i=0, n=tr_bencListSize( list ); i<n; ++i )

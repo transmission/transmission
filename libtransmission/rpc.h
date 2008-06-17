@@ -28,11 +28,12 @@ enum
     TR_RPC_TORRENT_FIELD_INFO            = (1<<6),
     TR_RPC_TORRENT_FIELD_LIMITS          = (1<<7),
     TR_RPC_TORRENT_FIELD_PEERS           = (1<<8),
-    TR_RPC_TORRENT_FIELD_SCRAPE          = (1<<9),
-    TR_RPC_TORRENT_FIELD_SIZE            = (1<<10),
-    TR_RPC_TORRENT_FIELD_TRACKER_STATS   = (1<<11),
-    TR_RPC_TORRENT_FIELD_TRACKERS        = (1<<12),
-    TR_RPC_TORRENT_FIELD_WEBSEEDS        = (1<<13)
+    TR_RPC_TORRENT_FIELD_PRIORITIES      = (1<<9),
+    TR_RPC_TORRENT_FIELD_SCRAPE          = (1<<10),
+    TR_RPC_TORRENT_FIELD_SIZE            = (1<<11),
+    TR_RPC_TORRENT_FIELD_TRACKER_STATS   = (1<<12),
+    TR_RPC_TORRENT_FIELD_TRACKERS        = (1<<13),
+    TR_RPC_TORRENT_FIELD_WEBSEEDS        = (1<<14)
 };
 
 struct tr_benc;

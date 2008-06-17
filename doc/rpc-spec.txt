@@ -12,8 +12,9 @@
 2.  Message Format
 
    Messages are formatted in a subset of JSON easily represented
-   as bencoded data -- arrays, objects, strings, and numbers.
+   as bencoded data -- arrays, objects, strings, and whole numbers.
    Booleans are represented as numbers where 0 is false and 1 is true.
+   Floating-point numbers are represented as strings.
 
    Messages are formatted as objects.  There are two types:
    requests (described in 2.1) and responses (described in 2.2).
@@ -24,7 +25,7 @@
 
    (1) A required "method" string telling the name of the method to invoke
    (2) An optional "arguments" object of key/value pairs
-   (3) An optional "tag" integer used by clients to track responses.
+   (3) An optional "tag" number used by clients to track responses.
        If provided by a request, the response MUST include the same tag.
 
 2.2.  Responses
@@ -34,12 +35,12 @@
    (1) A required "result" string whose value must be "success" on success,
        or an error string on failure.
    (2) An optional "arguments" object of key/value pairs
-   (3) An optional "tag" integer as described in 2.1.
+   (3) An optional "tag" number as described in 2.1.
 
 2.3.  Transport Mechanism
 
-   POSTing a JSON-encoded request is the preferred way of communicating
-   with the Transmission server; however, a simple notation also exists
+   HTTP POSTing a JSON-encoded request is the preferred way of communicating
+   with a Transmission RPC server; however, a simple notation also exists
    for sending requests in the query portion of a URL.
 
    The URL notation works as follows:
@@ -64,39 +65,62 @@
    "torrent-stop"      | tr_torrentStop
    "torrent-verify"    | tr_torrentVerify
 
-   Request arguments: "ids", a list of torrent id integers, sha1 hash strings,
+   Request arguments: "ids", a list of torrent id numbers, sha1 hash strings,
                       or both.  These are the torrents that the request will
                       be applied to.  If "ids" is ommitted, the request is
                       applied to all torrents.
 
    Response arguments: none
 
-3.2.  Torrent Information Requests
+3.2.  Torrent Mutator
 
-   Method name: "torrent-info".
+   Method name: "torrent-set"
 
-   The request supports four arguments:
+   Request arguments:
 
-   (1) An optional "ids" array as described in section 3.1.
-   (2) A required "fields" number as described in the table below.
-   (3) An optional "sort" string whose value should be one of
-       "activity", "age", "id", "name", "progress", "ratio", "state", "tracker".
-       The default value is "id".
-   (4) An optional "sort-ascending" 'boolean'.
-       This is only used if "sort-method" is supplied.
-       Its default value is 'true'.
-   (5) An optional "filter" string whose value may be one of
-       "active", "all", "downloading", "paused", "seeding".
-       The default value is "all".
+   string                     | value type & description
+   ---------------------------+-------------------------------------------------
+   "files-wanted"             | array      indices of one or more file to download
+   "files-unwanted"           | array      indices of one or more file to not download
+   "ids"                      | array      which torrent(s) to set, described in 3.1
+   "peer-limit"               | number     maximum number of peers
+   "priority-high"            | array      indices of one or more high-priority files
+   "priority-low"             | array      indices of one or more low-priority files
+   "priority-normal"          | array      indices of one or more normal-priority files
+   "speed-limit-down"         | number     maximum download speed (in KiB/s)
+   "speed-limit-down-enabled" | 'boolean'  true if the download speed is limited
+   "speed-limit-up"           | number     maximum upload speed (in KiB/s)
+   "speed-limit-up-enabled"   | 'boolean'  true if the upload speed is limited
 
-   The respons supports two arguments:
+   Response arguments: none
 
-   (1) A required "fields" number identical to the request's
-   (2) A "torrent-info" list of objects, each of which contains the
-       response names described in the table below.
+3.3.  Torrent Accessors
 
-   field and          | response | response               | source
-   numeric value      | type     | name                   | 
+   Method name: "torrent-get".
+
+   Request arguments:
+
+   string       | required? | default | value type & description
+   -------------+-----------+---------+---------------------------------------
+   "ids"        | no        | all     | array     described in 3.1
+   "fields"     | yes       | n/a     | number    bitwise-or'ed field
+                |           |         |           values from the table below
+   "sort"       | no        | "id"    | string    "activity", "age", "id",
+                |           |         |           "name", "progress", "ratio",
+                |           |         |           "state", or "tracker".
+   "ascending"  | no        | 'true'  | 'boolean' true if sorting ascending
+   "filter"     | no        | "all"   | string    "active", "all", "paused",
+                |           |         |           "downloading", or "seeding".
+
+   The response contains two arguments:
+
+   (1) A "fields" number identical to the request's
+   (2) A "torrents" array of objects, each of which contains the
+       key/value fields that match the "fields" argument.
+       See the table below for a complete list.
+
+   "fields" value     | response | response               | source
+                      | value    | key                    | 
    -------------------+----------+------------------------+-------------
    activity, 1        | number   | desiredAvailable       | tr_stat
                       | number   | eta                    | tr_stat
@@ -113,12 +137,12 @@
    -------------------+----------+------------------------+-------------
    announce, 2        | string   | announceResponse       | tr_stat
                       | string   | announceURL            | tr_stat
-                      | string   | lastAnnounceTime       | tr_stat
-                      | string   | manualAnnounceTime     | tr_stat
-                      | string   | nextAnnounceTime       | tr_stat
+                      | number   | lastAnnounceTime       | tr_stat
+                      | number   | manualAnnounceTime     | tr_stat
+                      | number   | nextAnnounceTime       | tr_stat
    -------------------+----------+------------------------+-------------
    error, 4           | number   | error                  | tr_stat
-                      | number   | errorString            | tr_Stat
+                      | number   | errorString            | tr_stat
    -------------------+----------+------------------------+-------------
    files, 8           | array    | files
                       +----------+-------------------------------------- 
@@ -156,23 +180,34 @@
                       | number   | fromPex                | tr_stat
                       | number   | fromTracker            | tr_stat
    -------------------+----------+------------------------+-------------
-   scrape, 512        | number   | lastScrapeTime         | tr_stat
+   priorities, 512    | array    | priorities             | tr_info
+                      | array    | wanted                 | tr_info
+                      +----------+-------------------------------------- 
+                      | priorities is an array of tr_info.fileCount
+                      | numbers.  Each is the tr_priority_t mode for
+                      | the corresponding file.
+                      +------------------------------------------------- 
+                      | wanted is an array of tr_info.fileCount
+                      | 'booleans' true if the corresponding file
+                      | is to be downloaded.
+   -------------------+----------+------------------------+-------------
+   scrape, 1024       | number   | lastScrapeTime         | tr_stat
                       | number   | nextScrapeTime         | tr_stat
                       | string   | scrapeResponse         | tr_stat
                       | string   | scrapeURL              | tr_stat
    -------------------+----------+------------------------+-------------
-   size, 1024         | number   | haveUnchecked          | tr_stat
+   size, 2048         | number   | haveUnchecked          | tr_stat
                       | number   | haveValid              | tr_stat
                       | number   | leftUntilDone          | tr_stat
                       | number   | sizeWhenDone           | tr_stat
                       | number   | totalSize              | tr_info
    -------------------+----------+------------------------+-------------
    tracker stats,     | number   | leechers               | tr_stat
-   2048               | number   | peersKnown             | tr_stat
+   4096               | number   | peersKnown             | tr_stat
                       | number   | seeders                | tr_stat
                       | number   | timesCompleted         | tr_stat
    -------------------+----------+--------------------------------------
-   trackers, 4096     | array    | trackers
+   trackers, 8192     | array    | trackers
                       +----------+-------------------------------------- 
                       | trackers is an array of objects that contain:
                       +----------+------------------------+------------- 
@@ -180,29 +215,28 @@
                       | string   | scrape                 | tr_info
                       | number   | tier                   | tr_info
    -------------------+----------+------------------------+-------------
-   webseeds, 8192     | object   | webseeds
+   webseeds, 16384    | array    | webseeds
                       +----------+-------------------------------------- 
-                      | webseeds contains:
+                      | webseeds is an array of strings:
                       +----------+------------------------+------------- 
-                      | an array of weseed URL strings    | tr_info
+                      | string   | webseed URL            | tr_info
    -------------------+----------+------------------------+-------------
-
 
    Example:
 
-   Say we want to get the name and total size torrents 7 and 10.
-   name is in the "id" section (32) and total size is in "size" (1024),
-   so the "fields" argument will be 32 + 1024 == 1056.
+   Say we want to get the name and total size of torrents #7 and #10.
+   name is in the "id" section (32) and total size is in "size" (2048),
+   so the "fields" argument will be 32 + 2048 == 2080.
 
    Request: 
 
       {
          "arguments": {
-             "fields": 1056,
+             "fields": 2080,
              "ids": [ 7, 10 ],
              "sort-method": "name"
          }
-         "method": "torrent-info",
+         "method": "torrent-get",
          "tag": 39693
       }
 
@@ -211,8 +245,8 @@
 
       {
          "arguments": {
-            "fields": 1056,
-            "torrent-info": [ 
+            "fields": 2080,
+            "torrents": [ 
                { 
                    "hashString": "sijioejisoefjiosejfioi",
                    "haveUnchecked", 23023,
@@ -239,7 +273,7 @@
          "tag": 39693
       }
 
-3.3.  Adding a Torrent
+3.2.  Adding a Torrent
 
    Method name: "torrent-add"
 
@@ -247,11 +281,11 @@
 
    key                | value type & description
    -------------------+-------------------------------------------------
-   "download-dir"     | string    path to download the torrent to
-   "filename"         | string    location of the .torrent file
-   "metainfo"         | string    base64-encoded .torrent content
-   "paused"           | boolean   if true, don't start the torrent
-   "peer-limit"       | int       maximum number of peers
+   "download-dir"     | string      path to download the torrent to
+   "filename"         | string      location of the .torrent file
+   "metainfo"         | string      base64-encoded .torrent content
+   "paused"           | 'boolean'   if true, don't start the torrent
+   "peer-limit"       | number      maximum number of peers
 
    Either "filename" OR "metainfo" must be included.
    All other arguments are optional.
@@ -260,66 +294,22 @@
                        form of one of 3.3's tr_info objects with the
                        fields for id, name, and hashString.
 
-3.4.  Other Torrent Settings
-
-   Common arguments:
-
-   string                     | value type & description
-   ---------------------------+-------------------------------------------------
-   "peer-limit"               | int       maximum number of peers
-   "speed-limit-down"         | int       maximum download speed (in KiB/s)
-   "speed-limit-down-enabled" | boolean   true if the download speed is limited
-   "speed-limit-up"           | int       maximum upload speed (in KiB/s)
-   "speed-limit-up-enabled"   | boolean   true if the upload speed is limited
-
-3.4.1.  Mutators
-
-   Method name: "torrent-set"
-   Request arguments: 3.1's "ids", plus one or more of 3.6's arguments
-   Response arguments: none
-                      
-
-3.5  File Priorities
-
-   Common arguments:
-
-   string             | value type & description
-   -------------------+-------------------------------------------------
-   "files-wanted"     | array     indices of one or more file to download
-   "files-unwanted"   | array     indices of one or more file to not download
-   "priority-high"    | array     indices of one or more high-priority files
-   "priority-low"     | array     indices of one or more low-priority files
-   "priority-normal"  | array     indices of one or more normal-priority files
-
-3.5.1.  Mutators
-
-    Method name: "torrent-set-priorities"
-    Request arguments: 3.1's "ids", plus one or more of 3.7's arguments
-    Response arguments: none
-
-3.5.2.  Accessors
-
-    Method name: "torrent-get-priorities"
-    Request arguments: none
-    Response arguments: A "torrents" list of objects containing all
-                        of 3.7's arguments plus the torrent's "id" int.
-   
 4.   Session Status Requests
 
 4.1.  Session Arguments
 
    string                     | value type & description
    ---------------------------+-------------------------------------------------
-   "encryption"               | string   "required", "preferred", "tolerated"
-   "download-dir"             | string   default path to download torrents
-   "peer-limit"               | int      maximum global number of peers
-   "pex-allowed"              | boolean  true means allow pex in public torrents
-   "port"                     | int      port number
-   "port-forwarding-enabled"  | boolean  true means enabled
-   "speed-limit-down"         | int      max global download speed (in KiB/s)
-   "speed-limit-down-enabled" | boolean  true means enabled
-   "speed-limit-up"           | int      max global upload speed (in KiB/s)
-   "speed-limit-up-enabled"   | boolean  true means enabled
+   "encryption"               | string     "required", "preferred", "tolerated"
+   "download-dir"             | string     default path to download torrents
+   "peer-limit"               | number     maximum global number of peers
+   "pex-allowed"              | 'boolean'  true means allow pex in public torrents
+   "port"                     | number     port number
+   "port-forwarding-enabled"  | 'boolean'  true means enabled
+   "speed-limit-down"         | number     max global download speed (in KiB/s)
+   "speed-limit-down-enabled" | 'boolean'  true means enabled
+   "speed-limit-up"           | number     max global upload speed (in KiB/s)
+   "speed-limit-up-enabled"   | 'boolean'  true means enabled
 
 4.2.  Mutators
 
