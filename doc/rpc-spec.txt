@@ -112,7 +112,7 @@
    "filter"     | no        | "all"   | string    "active", "all", "paused",
                 |           |         |           "downloading", or "seeding".
 
-   The response contains two arguments:
+   Response arguments:
 
    (1) A "fields" number identical to the request's
    (2) A "torrents" array of objects, each of which contains the
@@ -273,7 +273,7 @@
          "tag": 39693
       }
 
-3.2.  Adding a Torrent
+3.4.  Adding a Torrent
 
    Method name: "torrent-add"
 
