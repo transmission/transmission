@@ -298,6 +298,7 @@ typedef enum
             
             [fPeersConnectField setEnabled: NO];
             [fPeersConnectField setStringValue: @""];
+            [fPeersConnectLabel setEnabled: NO];
         }
         
         [fFileController setTorrent: nil];
@@ -636,6 +637,7 @@ typedef enum
     
     //set peer view
     [fPeersConnectField setEnabled: YES];
+    [fPeersConnectLabel setEnabled: YES];
     if (maxPeers != INVALID)
         [fPeersConnectField setIntValue: maxPeers];
     else

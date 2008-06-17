@@ -71,7 +71,7 @@
     
     IBOutlet NSPopUpButton * fRatioPopUp, * fUploadLimitPopUp, * fDownloadLimitPopUp;
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField, * fPeersConnectField,
-                        * fUploadLimitLabel, * fDownloadLimitLabel;
+                        * fUploadLimitLabel, * fDownloadLimitLabel, * fPeersConnectLabel;
     
     NSString * fInitialString;
 }
