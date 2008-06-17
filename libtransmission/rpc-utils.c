@@ -39,8 +39,8 @@ compareTorrentsByActivity( const void * a, const void * b )
 static int
 compareTorrentsByAge( const void * a, const void * b )
 {
-    const tr_torrent * ta = * (tr_torrent **) a;
-    const tr_torrent * tb = * (tr_torrent **) b;
+    tr_torrent * ta = * (tr_torrent **) a;
+    tr_torrent * tb = * (tr_torrent **) b;
     return tr_compareTime( tr_torrentStatCached( ta )->addedDate,
                            tr_torrentStatCached( tb )->addedDate );
 }
