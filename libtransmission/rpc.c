@@ -253,6 +253,7 @@ addInfo( const tr_torrent * tor, tr_benc * d, uint64_t fields )
         tr_bencDictAddDouble( d, "recheckProgress", st->recheckProgress );
         tr_bencDictAddInt( d, "status", st->status );
         tr_bencDictAddDouble( d, "swarmSpeed", st->swarmSpeed );
+        tr_bencDictAddDouble( d, "ratio", st->ratio );
         tr_bencDictAddInt( d, "webseedsSendingToUs", st->webseedsSendingToUs );
     }
 
@@ -305,13 +306,11 @@ addInfo( const tr_torrent * tor, tr_benc * d, uint64_t fields )
     }
 
     if( fields & TR_RPC_TORRENT_FIELD_PEERS ) {
-        const int * from = st->peersFrom;
-        tr_benc * f;
-        f = tr_bencDictAddDict( d, "peersFrom", 4 );
-            tr_bencDictAddInt( f, "cache",    from[TR_PEER_FROM_CACHE] );
-            tr_bencDictAddInt( f, "incoming", from[TR_PEER_FROM_INCOMING] );
-            tr_bencDictAddInt( f, "pex",      from[TR_PEER_FROM_PEX] );
-            tr_bencDictAddInt( f, "tracker",  from[TR_PEER_FROM_TRACKER] );
+        const int * f = st->peersFrom;
+        tr_bencDictAddInt( d, "fromCache",    f[TR_PEER_FROM_CACHE] );
+        tr_bencDictAddInt( d, "fromIncoming", f[TR_PEER_FROM_INCOMING] );
+        tr_bencDictAddInt( d, "fromPex",      f[TR_PEER_FROM_PEX] );
+        tr_bencDictAddInt( d, "fromTracker",  f[TR_PEER_FROM_TRACKER] );
     }
 
     if( fields & TR_RPC_TORRENT_FIELD_SCRAPE ) {
@@ -325,9 +324,6 @@ addInfo( const tr_torrent * tor, tr_benc * d, uint64_t fields )
         tr_bencDictAddInt( d, "haveUnchecked", st->haveUnchecked );
         tr_bencDictAddInt( d, "haveValid", st->haveValid );
         tr_bencDictAddInt( d, "leftUntilDone", st->leftUntilDone );
-        tr_bencDictAddDouble( d, "percentComplete", st->percentComplete );
-        tr_bencDictAddDouble( d, "percentDone", st->percentDone );
-        tr_bencDictAddDouble( d, "ratio", st->ratio );
         tr_bencDictAddInt( d, "sizeWhenDone", st->sizeWhenDone );
         tr_bencDictAddInt( d, "totalSize", inf->totalSize );
     }

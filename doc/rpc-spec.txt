@@ -11,13 +11,11 @@
 
 2.  Message Format
 
-   Messages are formatted in a subset of JSON that understands
-   arrays, maps, strings, and whole numbers with no exponentials --
-   in short, the subset of JSON easily represented as bencoded data.
-   Floating-point numbers are represented as strings.
-   Booleans are represented as integers where 0 is false and 1 is true.
+   Messages are formatted in a subset of JSON easily represented
+   as bencoded data -- arrays, objects, strings, and numbers.
+   Booleans are represented as numbers where 0 is false and 1 is true.
 
-   Messages are represented as JSON objects.  There are two types:
+   Messages are formatted as objects.  There are two types:
    requests (described in 2.1) and responses (described in 2.2).
 
 2.1.  Requests
@@ -45,13 +43,11 @@
    for sending requests in the query portion of a URL.
 
    The URL notation works as follows:
-   (1) Any key not "tag" or "method" is assumed to be in "arguments".
+   (1) Any key not "tag" or "method" is treated as an argument.
    (2) The "arguments" key isn't needed, since data isn't nested.
-   (3) If the entire value in a key/value pair can be parsed as an integer,
-       it's parsed into a JSON number.
-       Otherwise, if the value can be parsed as comma-delimited integers,
-       it's parsed into a JSON array of integers.
-       Otherwise, the value is treated as a string.
+   (3) If the value in a key/value pair can be parsed as a number, then it is.
+       Otherwise if it can be parsed as an array of numbers, then it is.
+       Otherwise, it's parsed as a string.
 
    Examples:
    ?method=torrent-start&ids=1,2
@@ -81,15 +77,17 @@
 
    The request supports four arguments:
 
-   (1) "ids", as described in section 3.1.
-   (2) A required "fields" number as described in the table below
-   (3) An optional "sort" string whose value should be one of:
+   (1) An optional "ids" array as described in section 3.1.
+   (2) A required "fields" number as described in the table below.
+   (3) An optional "sort" string whose value should be one of
        "activity", "age", "id", "name", "progress", "ratio", "state", "tracker".
+       The default value is "id".
    (4) An optional "sort-ascending" 'boolean'.
        This is only used if "sort-method" is supplied.
        Its default value is 'true'.
-   (5) An optional "filter" string whose value may be one of:
-       "active", "all", "downloading", "paused", "seeding"
+   (5) An optional "filter" string whose value may be one of
+       "active", "all", "downloading", "paused", "seeding".
+       The default value is "all".
 
    The respons supports two arguments:
 
@@ -110,6 +108,7 @@
                       | number   | recheckProgress        | tr_stat
                       | number   | status                 | tr_stat
                       | number   | swarmSpeed             | tr_stat
+                      | 'double' | uploadRatio            | tr_stat
                       | number   | webseedsSendingToUs    | tr_stat
    -------------------+----------+------------------------+-------------
    announce, 2        | string   | announceResponse       | tr_stat
@@ -152,14 +151,10 @@
                       | number   | uploadLimit            | tr_torrent
                       | number   | uploadLimitMode        | tr_torrent
    -------------------+----------+------------------------+-------------
-   peers, 256         | object   | peersFrom              | tr_stat
-                      +----------+------------------------+------------- 
-                      | peersFrom contains:
-                      +----------+------------------------+------------- 
-                      | number   | cache                  | tr_stat
-                      | number   | incoming               | tr_stat
-                      | number   | pex                    | tr_stat
-                      | number   | tracker                | tr_stat
+   peers, 256         | number   | fromCache              | tr_stat
+                      | number   | fromIncoming           | tr_stat
+                      | number   | fromPex                | tr_stat
+                      | number   | fromTracker            | tr_stat
    -------------------+----------+------------------------+-------------
    scrape, 512        | number   | lastScrapeTime         | tr_stat
                       | number   | nextScrapeTime         | tr_stat
@@ -169,11 +164,8 @@
    size, 1024         | number   | haveUnchecked          | tr_stat
                       | number   | haveValid              | tr_stat
                       | number   | leftUntilDone          | tr_stat
-                      | 'double' | percentComplete        | tr_stat
-                      | 'double' | percentDone            | tr_stat
-                      | 'double' | ratio                  | tr_stat
                       | number   | sizeWhenDone           | tr_stat
-                      | number   | totalSize              | tr_stat
+                      | number   | totalSize              | tr_info
    -------------------+----------+------------------------+-------------
    tracker stats,     | number   | leechers               | tr_stat
    2048               | number   | peersKnown             | tr_stat
@@ -191,14 +183,15 @@
    webseeds, 8192     | object   | webseeds
                       +----------+-------------------------------------- 
                       | webseeds contains:
-                      | an array of weseed url strings
+                      +----------+------------------------+------------- 
+                      | an array of weseed URL strings    | tr_info
    -------------------+----------+------------------------+-------------
 
 
    Example:
 
-   Say we want to get the ratio and name of torrents 7 and 10.
-   name is in the "id" section (32) and ratio is in "size" (1024),
+   Say we want to get the name and total size torrents 7 and 10.
+   name is in the "id" section (32) and total size is in "size" (1024),
    so the "fields" argument will be 32 + 1024 == 1056.
 
    Request: 
@@ -226,9 +219,6 @@
                    "haveValid", 27986795145,
                    "leftUntilDone", 0,
                    "name": "Fedora x86_64 DVD",
-                   "percentComplete", "0.8010",
-                   "percentDone", "0.8010",
-                   "ratio", "0.604034",
                    "sizeWhenDone", 34983493932,
                    "totalSize", 34983493932,
                    "uniqueId": 10,
@@ -239,9 +229,6 @@
                    "haveValid", 9923890123,
                    "leftUntilDone", 0,
                    "name": "Ubuntu x86_64 DVD",
-                   "percentComplete", "1.0000",
-                   "percentDone", "1.0000",
-                   "ratio", "2.23222",
                    "sizeWhenDone", 9923890123,
                    "totalSize", 9923890123,
                    "uniqueId": 7,
