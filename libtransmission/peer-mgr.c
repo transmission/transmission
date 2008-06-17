@@ -1618,7 +1618,7 @@ rechoke( Torrent * t )
                 if( isNew( peer ) ) x *= 3;
                 if( isSame( peer ) ) x *= 3;
                 for( y=0; y<x; ++y )
-                    tr_ptrArrayAppend( randPool, choke );
+                    tr_ptrArrayAppend( randPool, &choke[i] );
             }
         }
 
