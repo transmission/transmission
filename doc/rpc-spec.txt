@@ -21,7 +21,7 @@
 
 2.1.  Requests
 
-   Requests supports three keys:
+   Requests support three keys:
 
    (1) A required "method" string telling the name of the method to invoke
    (2) An optional "arguments" object of key/value pairs
@@ -80,13 +80,13 @@
 
    string                     | value type & description
    ---------------------------+-------------------------------------------------
-   "files-wanted"             | array      indices of one or more file to download
-   "files-unwanted"           | array      indices of one or more file to not download
-   "ids"                      | array      which torrent(s) to set, described in 3.1
+   "files-wanted"             | array      indices of file(s) to download
+   "files-unwanted"           | array      indices of file(s) to not download
+   "ids"                      | array      torrent list, as described in 3.1
    "peer-limit"               | number     maximum number of peers
-   "priority-high"            | array      indices of one or more high-priority files
-   "priority-low"             | array      indices of one or more low-priority files
-   "priority-normal"          | array      indices of one or more normal-priority files
+   "priority-high"            | array      indices of high-priority file(s)
+   "priority-low"             | array      indices of low-priority file(s)
+   "priority-normal"          | array      indices of normal-priority file(s)
    "speed-limit-down"         | number     maximum download speed (in KiB/s)
    "speed-limit-down-enabled" | 'boolean'  true if the download speed is limited
    "speed-limit-up"           | number     maximum upload speed (in KiB/s)
@@ -294,7 +294,8 @@
                        form of one of 3.3's tr_info objects with the
                        fields for id, name, and hashString.
 
-4.   Session Status Requests
+
+4.   Session Requests
 
 4.1.  Session Arguments
 
@@ -311,15 +312,32 @@
    "speed-limit-up"           | number     max global upload speed (in KiB/s)
    "speed-limit-up-enabled"   | 'boolean'  true means enabled
 
-4.2.  Mutators
+4.1.1.  Mutators
 
    Method name: "session-set"
    Request arguments: one or more of 4.1's arguments
    Response arguments: none
 
-4.2.  Accessors
+4.1.2.  Accessors
 
    Method name: "session-get"
    Request arguments: none
    Response arguments: all of 4.1's arguments
+
+4.2.  Session Statistics
+
+   Method name: "session-stats"
+
+   Request arguments: none
+
+   Response arguments:
+
+   string                     | value type
+   ---------------------------+-------------------------------------------------
+   "activeTorrentCount"       | number
+   "downloadSpeed"            | number
+   "pausedTorrentCount"       | number
+   "torrentCount"             | number
+   "uploadSpeed"              | number
+   
 

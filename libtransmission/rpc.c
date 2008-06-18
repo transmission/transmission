@@ -248,8 +248,8 @@ addInfo( const tr_torrent * tor, tr_benc * d, uint64_t fields )
         tr_bencDictAddInt( d, "peersConnected", st->peersConnected );
         tr_bencDictAddInt( d, "peersGettingFromUs", st->peersGettingFromUs );
         tr_bencDictAddInt( d, "peersSendingToUs", st->peersSendingToUs );
-        tr_bencDictAddDouble( d, "rateDownload", st->rateDownload );
-        tr_bencDictAddDouble( d, "rateUpload", st->rateUpload );
+        tr_bencDictAddInt( d, "rateDownload", (int)(st->rateDownload*1024) );
+        tr_bencDictAddInt( d, "rateUpload", (int)(st->rateUpload*1024) );
         tr_bencDictAddDouble( d, "recheckProgress", st->recheckProgress );
         tr_bencDictAddInt( d, "status", st->status );
         tr_bencDictAddDouble( d, "swarmSpeed", st->swarmSpeed );
@@ -555,6 +555,30 @@ sessionSet( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
 }
 
 static const char*
+sessionStats( tr_handle * h, tr_benc * args_in UNUSED, tr_benc * args_out )
+{
+    tr_benc * d = tr_bencDictAddDict( args_out, "session-stats", 10 );
+    tr_torrent * tor = NULL;
+    float up, down;
+    int running = 0;
+    int total = 0;
+
+    tr_sessionGetSpeed( h, &down, &up );
+    while(( tor = tr_torrentNext( h, tor ))) {
+        ++total;
+        if( tor->isRunning )
+            ++running;
+    }
+        
+    tr_bencDictAddInt( d, "activeTorrentCount", running );
+    tr_bencDictAddInt( d, "downloadSpeed", (int)(down*1024) );
+    tr_bencDictAddInt( d, "pausedTorrentCount", total-running );
+    tr_bencDictAddInt( d, "torrentCount", total );
+    tr_bencDictAddInt( d, "uploadSpeed", (int)(up*1024) );
+    return NULL;
+}
+
+static const char*
 sessionGet( tr_handle * h, tr_benc * args_in UNUSED, tr_benc * args_out )
 {
     const char * str;
@@ -602,6 +626,7 @@ struct method {
 } methods[] = { 
     { "session-get", sessionGet },
     { "session-set", sessionSet },
+    { "session-stats", sessionStats },
     { "torrent-add", torrentAdd },
     { "torrent-get", torrentGet },
     { "torrent-remove", torrentRemove },

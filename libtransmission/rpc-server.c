@@ -152,7 +152,7 @@ startServer( tr_rpc_server * server )
 
         server->ctx = shttpd_init( );
         snprintf( ports, sizeof( ports ), "%d", server->port );
-        shttpd_register_uri( server->ctx, "/transmission", handle_rpc, server );
+        shttpd_register_uri( server->ctx, "/transmission/rpc", handle_rpc, server );
         shttpd_set_option( server->ctx, "ports", ports );
         shttpd_set_option( server->ctx, "dir_list", "0" );
         shttpd_set_option( server->ctx, "root", "/dev/null" );
@@ -162,7 +162,7 @@ startServer( tr_rpc_server * server )
             shttpd_set_option( server->ctx, "acl", server->acl );
         }
         if( server->isPasswordEnabled ) {
-            char * buf = tr_strdup_printf( "/transmission=%s", passwd );
+            char * buf = tr_strdup_printf( "/transmission/rpc=%s", passwd );
             shttpd_set_option( server->ctx, "protect", buf );
             tr_free( buf );
         }

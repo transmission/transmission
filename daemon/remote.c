@@ -348,7 +348,7 @@ processRequests( const char * host, int port,
     int i;
     CURL * curl;
     struct evbuffer * buf = evbuffer_new( );
-    char * url = tr_strdup_printf( "http://%s:%d/transmission", host, port );
+    char * url = tr_strdup_printf( "http://%s:%d/transmission/rpc", host, port );
 
     curl = curl_easy_init( );
     curl_easy_setopt( curl, CURLOPT_VERBOSE, debug );
