@@ -769,13 +769,24 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //ensure torrent doesn't already exist
         tr_ctor * ctor = tr_ctorNew(fLib);
         tr_ctorSetMetainfoFromFile(ctor, [torrentPath UTF8String]);
-        if (tr_torrentParse(fLib, ctor, &info) == TR_EDUPLICATE)
+        int result = tr_torrentParse(fLib, ctor, &info);
+        if (result != TR_OK)
         {
-            [self duplicateOpenAlert: [NSString stringWithUTF8String: info.name]];
+            if (result == TR_EDUPLICATE)
+                [self duplicateOpenAlert: [NSString stringWithUTF8String: info.name]];
+            else if (result == TR_EINVALID)
+            {
+                if (type != ADD_AUTO)
+                    [self invalidOpenAlert: [torrentPath lastPathComponent]];
+            }
+            else //this shouldn't happen
+                NSLog(@"Unknown error when attempting to open \"%@\"", torrentPath);
+            
             tr_ctorFree(ctor);
             tr_metainfoFree(&info);
             continue;
         }
+        
         tr_ctorFree(ctor);
         
         //determine download location
@@ -913,6 +924,32 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [NSNumber numberWithInt: [useOptions boolValue] ? ADD_SHOW_OPTIONS : ADD_MANUAL], @"AddType", nil];
         [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
     }
+}
+
+- (void) invalidOpenAlert: (NSString *) filename
+{
+    if (![fDefaults boolForKey: @"WarningInvalidOpen"])
+        return;
+    
+    NSAlert * alert = [[NSAlert alloc] init];
+    [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"\"%@\" is not a valid torrent file.",
+                            "Open invalid alert -> title"), filename]];
+    [alert setInformativeText:
+            NSLocalizedString(@"The torrent file cannot be opened because it contains invalid data.",
+                            "Open invalid alert -> message")];
+    [alert setAlertStyle: NSWarningAlertStyle];
+    [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open invalid alert -> button")];
+    
+    BOOL onLeopard = [NSApp isOnLeopardOrBetter];
+    if (onLeopard)
+        [alert setShowsSuppressionButton: YES];
+    else
+        [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Open duplicate alert -> button")];
+    
+    NSInteger result = [alert runModal];
+    if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertSecondButtonReturn))
+        [fDefaults setBool: NO forKey: @"WarningInvalidOpen"];
+    [alert release];
 }
 
 - (void) duplicateOpenAlert: (NSString *) name
@@ -1450,7 +1487,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             {
                 //set rates
                 float downloadRate, uploadRate;
-                tr_sessionGetSpeed(fLib, & downloadRate, & uploadRate);
+                tr_sessionGetSpeed(fLib, &downloadRate, &uploadRate);
                 
                 [fTotalDLField setStringValue: [NSString stringForSpeed: downloadRate]];
                 [fTotalULField setStringValue: [NSString stringForSpeed: uploadRate]];
@@ -1466,7 +1503,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     else
                         tr_sessionGetStats(fLib, &stats);
                     
-                    statusString = [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Ratio", "status bar -> status label"),
+                    statusString = [NSLocalizedString(@"Ratio", "status bar -> status label") stringByAppendingFormat: @": %@",
                                     [NSString stringForRatio: stats.ratio]];
                 }
                 else //STATUS_TRANSFER_TOTAL or STATUS_TRANSFER_SESSION

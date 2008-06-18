@@ -38,6 +38,8 @@
 #define GROUP_SPEED_IMAGE_COLUMN_WIDTH 8.0
 #define GROUP_RATIO_IMAGE_COLUMN_WIDTH 10.0
 
+#define TOGGLE_PROGRESS_SECONDS 0.175
+
 @interface TorrentTableView (Private)
 
 - (BOOL) pointInControlRect: (NSPoint) point;
@@ -850,7 +852,7 @@
     for (i = 0.0625; i <= 1.0; i += 0.0625)
         [progressMarks addObject: [NSNumber numberWithFloat: i]];
     
-    fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: 0.25 animationCurve: NSAnimationEaseIn];
+    fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: TOGGLE_PROGRESS_SECONDS animationCurve: NSAnimationEaseIn];
     [fPiecesBarAnimation setAnimationBlockingMode: NSAnimationNonblocking];
     [fPiecesBarAnimation setProgressMarks: progressMarks];
     [fPiecesBarAnimation setDelegate: self];

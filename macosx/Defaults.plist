@@ -172,6 +172,8 @@
 	<true/>
 	<key>WarningFolderDataSameName</key>
 	<true/>
+	<key>WarningInvalidOpen</key>
+	<true/>
 	<key>WarningRemainingSpace</key>
 	<true/>
 	<key>WarningRemoveBuiltInTracker</key>

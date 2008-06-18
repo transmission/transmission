@@ -123,6 +123,7 @@ typedef enum
 - (void) openFilesWithDict:     (NSDictionary *) dictionary;
 - (void) openShowSheet:         (id) sender;
 
+- (void) invalidOpenAlert: (NSString *) filename;
 - (void) duplicateOpenAlert: (NSString *) name;
 
 - (void) openURL:               (NSURL *) torrentURL;

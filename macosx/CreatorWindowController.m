@@ -193,8 +193,7 @@
     if (fInfo)
         tr_metaInfoBuilderFree(fInfo);
     
-    if (fTimer)
-        [fTimer invalidate];
+    [fTimer invalidate];
     
     [super dealloc];
 }

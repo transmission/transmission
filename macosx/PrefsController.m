@@ -582,6 +582,7 @@
     [fDefaults setBool: YES forKey: @"WarningResetStats"];
     [fDefaults setBool: YES forKey: @"WarningCreatorBlankAddress"];
     [fDefaults setBool: YES forKey: @"WarningRemoveBuiltInTracker"];
+    [fDefaults setBool: YES forKey: @"WarningInvalidOpen"];
 }
 
 - (void) setCheckForUpdate: (id) sender
