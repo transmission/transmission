@@ -220,7 +220,7 @@ typedef enum
 - (void) toggleSpeedLimit: (id) sender;
 - (void) autoSpeedLimitChange: (NSNotification *) notification;
 - (void) autoSpeedLimit: (NSTimer *) timer;
-- (void) setAutoSpeedLimitTimer: (BOOL) nextIsOn;
+- (void) setAutoSpeedLimitTimer: (BOOL) nextIsLimit;
 
 - (void) setLimitGlobalEnabled: (id) sender;
 - (void) setQuickLimitGlobal: (id) sender;
