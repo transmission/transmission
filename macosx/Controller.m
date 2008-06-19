@@ -2380,6 +2380,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self setAutoSpeedLimitTimer: !shouldBeOn];
 }
 
+//only called from fSpeedLimitTimer
 - (void) autoSpeedLimit: (NSTimer *) timer
 {
     //check if should toggle (for cases where users might have manually
@@ -2413,27 +2414,27 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) setAutoSpeedLimitTimer: (BOOL) nextIsOn
 {
-    NSCalendarDate * timerDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate: [[fDefaults objectForKey:
-                                    nextIsOn ? @"SpeedLimitAutoOnDate" : @"SpeedLimitAutoOffDate"] timeIntervalSinceReferenceDate]],
-                    * nowDate = [NSCalendarDate calendarDate];
+    NSDate * timerDate = [fDefaults objectForKey: nextIsOn ? @"SpeedLimitAutoOnDate" : @"SpeedLimitAutoOffDate"],
+            * nowDate = [NSDate date];
     
     //create date with combination of the current date and the date to go off
-    NSDateComponents * components = [[NSDateComponents alloc] init];
-    [components setDay: [nowDate dayOfMonth]];
-    [components setMonth: [nowDate monthOfYear]];
-    [components setYear: [nowDate yearOfCommonEra]];
-    [components setHour: [timerDate hourOfDay]];
-    [components setMinute: [timerDate minuteOfHour]];
-    [components setSecond: 0];
-    
     NSCalendar * calendar = [[NSCalendar alloc] initWithCalendarIdentifier: NSGregorianCalendar];
-    NSDate * dateToUse = [calendar dateFromComponents: components];
+    
+    NSDateComponents * nowComponents = [calendar components: NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit
+                                        | NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: nowDate];
+    NSDateComponents * timerComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: timerDate];
+    
+    int nowTime = [nowComponents hour] * 60 + [nowComponents minute],
+        timerTime = [timerComponents hour] * 60 + [timerComponents minute];
+    
+    [nowComponents setHour: [timerComponents hour]];
+    [nowComponents setMinute: [timerComponents minute]];
+    [nowComponents setSecond: 0];
+    
+    NSDate * dateToUse = [calendar dateFromComponents: nowComponents];
     [calendar release];
-    [components release];
     
     //check if should be the next day
-    int timerTime = [timerDate hourOfDay] * 60 + [timerDate minuteOfHour],
-        nowTime = [nowDate hourOfDay] * 60 + [nowDate minuteOfHour];
     if (timerTime < nowTime)
         dateToUse = [dateToUse addTimeInterval: 60 * 60 * 24]; //60 sec * 60 min * 24 hr
     
