@@ -236,7 +236,6 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "AX", 2 ) ) two_major_two_minor( buf, buflen, "BitPump", id+3 );
         else if( !memcmp( id+1, "BC", 2 ) ) two_major_two_minor( buf, buflen, "BitComet", id+3 );
         else if( !memcmp( id+1, "CD", 2 ) ) two_major_two_minor( buf, buflen, "Enhanced CTorrent", id+3 );
-        else if( !memcmp( id+1, "FG", 2 ) ) two_major_two_minor( buf, buflen, "FlashGet", id+3 );
         else if( !memcmp( id+1, "LP", 2 ) ) two_major_two_minor( buf, buflen, "Lphant", id+3 );
 
         else if( !memcmp( id+1, "BF", 2 ) ) no_version( buf, buflen, "BitFlu" );
@@ -306,6 +305,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     else if( !memcmp( id, "10-------", 9 ) ) no_version( buf, buflen, "JVtorrent" );
     else if( !memcmp( id, "346-", 4 ) )      no_version( buf, buflen, "TorrentTopia" );
     else if( !memcmp( id, "eX", 2 ) )        no_version( buf, buflen, "eXeem" );
+    else if( !memcmp( id, "-FG", 3 ) )       two_major_two_minor( buf, buflen, "FlashGet", id+3 );
    
     /* Everything else */ 
     else if( !memcmp( id, "S3", 2 ) && id[2] == '-' && id[4] == '-' && id[6] == '-' )
