@@ -2351,17 +2351,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (![fDefaults boolForKey: @"SpeedLimitAuto"])
         return;
- 
-    NSCalendarDate * onDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
-                                [[fDefaults objectForKey: @"SpeedLimitAutoOnDate"] timeIntervalSinceReferenceDate]],
-                    * offDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
-                                [[fDefaults objectForKey: @"SpeedLimitAutoOffDate"] timeIntervalSinceReferenceDate]],
-                    * nowDate = [NSCalendarDate calendarDate];
+    
+    NSCalendar * calendar = [[NSCalendar alloc] initWithCalendarIdentifier: NSGregorianCalendar];
+    NSDateComponents * nowComponents = [calendar components: NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit
+                                        | NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: [NSDate date]],
+                    * onComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit
+                                        fromDate: [fDefaults objectForKey: @"SpeedLimitAutoOnDate"]],
+                    * offComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit
+                                        fromDate: [fDefaults objectForKey: @"SpeedLimitAutoOffDate"]];
+    [calendar release];
     
     //check if should be on if within range
-    int onTime = [onDate hourOfDay] * 60 + [onDate minuteOfHour],
-        offTime = [offDate hourOfDay] * 60 + [offDate minuteOfHour],
-        nowTime = [nowDate hourOfDay] * 60 + [nowDate minuteOfHour];
+    int onTime = [onComponents hour] * 60 + [onComponents minute],
+        offTime = [offComponents hour] * 60 + [offComponents minute],
+        nowTime = [nowComponents hour] * 60 + [nowComponents minute];
     
     BOOL shouldBeOn = NO;
     if (onTime < offTime)
@@ -2373,14 +2376,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([fDefaults boolForKey: @"SpeedLimit"] != shouldBeOn)
         [self toggleSpeedLimit: nil];
     
-    //no need to check if both times are equal
+    //no need to set the timer if both times are equal
     if (onTime == offTime)
         return;
     
     [self setAutoSpeedLimitTimer: !shouldBeOn];
 }
 
-//only called from fSpeedLimitTimer
+//only called by fSpeedLimitTimer
 - (void) autoSpeedLimit: (NSTimer *) timer
 {
     BOOL shouldLimit = [[timer userInfo] boolValue];
@@ -2401,18 +2404,19 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) setAutoSpeedLimitTimer: (BOOL) nextIsLimit
 {
-    NSDate * timerDate = [fDefaults objectForKey: nextIsLimit ? @"SpeedLimitAutoOnDate" : @"SpeedLimitAutoOffDate"],
-            * nowDate = [NSDate date];
+    NSDate * timerDate = [fDefaults objectForKey: nextIsLimit ? @"SpeedLimitAutoOnDate" : @"SpeedLimitAutoOffDate"];
     
     //create date with combination of the current date and the date to go off
     NSCalendar * calendar = [[NSCalendar alloc] initWithCalendarIdentifier: NSGregorianCalendar];
-    
     NSDateComponents * nowComponents = [calendar components: NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit
-                                        | NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: nowDate];
-    NSDateComponents * timerComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: timerDate];
+                                        | NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: [NSDate date]],
+                    * timerComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: timerDate];
     
+    //check if should be the next day
     int nowTime = [nowComponents hour] * 60 + [nowComponents minute],
         timerTime = [timerComponents hour] * 60 + [timerComponents minute];
+    if (timerTime < nowTime)
+        [nowComponents setDay: [nowComponents day] + 1]; //properly goes to next month when appropriate
     
     [nowComponents setHour: [timerComponents hour]];
     [nowComponents setMinute: [timerComponents minute]];
@@ -2420,10 +2424,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     NSDate * dateToUse = [calendar dateFromComponents: nowComponents];
     [calendar release];
-    
-    //check if should be the next day
-    if (timerTime < nowTime)
-        dateToUse = [dateToUse addTimeInterval: 60 * 60 * 24]; //60 sec * 60 min * 24 hr
     
     fSpeedLimitTimer = [[NSTimer alloc] initWithFireDate: dateToUse interval: 0 target: self selector: @selector(autoSpeedLimit:)
                         userInfo: [NSNumber numberWithBool: nextIsLimit] repeats: NO];
