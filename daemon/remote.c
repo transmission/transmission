@@ -316,20 +316,20 @@ processResponse( const char * host, int port,
             int i, n;
             for( i=0, n=tr_bencListSize( list ); i<n; ++i )
             {
-                int64_t id, status;
-                const char *name, *ratiostr, *upstr, *dnstr;
+                int64_t id, status, up, down;
+                const char *name, *ratiostr;
                 tr_benc * d = tr_bencListChild( list, i );
                 if(    tr_bencDictFindInt( d, "id", &id )
                     && tr_bencDictFindStr( d, "name", &name )
-                    && tr_bencDictFindStr( d, "rateDownload", &dnstr )
-                    && tr_bencDictFindStr( d, "rateUpload", &upstr )
+                    && tr_bencDictFindInt( d, "rateDownload", &down )
+                    && tr_bencDictFindInt( d, "rateUpload", &up )
                     && tr_bencDictFindStr( d, "ratio", &ratiostr )
                     && tr_bencDictFindInt( d, "status", &status ) )
                 {
                     printf( "%4d.  Up: %5.1f  Down: %5.1f  Ratio: %4.1f  %-15s  %s\n",
                             (int)id,
-                            strtod( upstr, NULL ),
-                            strtod( dnstr, NULL ),
+                            up / 1024.0,
+                            down / 1024.0,
                             strtod( ratiostr, NULL ),
                             torrentStatusToString( status ),
                             name );
