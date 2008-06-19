@@ -480,7 +480,7 @@ parseCommandLine( int argc, char ** argv )
             case 'i': showInfo = 1; break;
             case 'm': comment = optarg; break;
             case 'n': natTraversal = 1; break;
-            case 'o': savePath = optarg;
+            case 'o': savePath = optarg; break;
             case 'p': bindPort = atoi( optarg ); break;
             case 'r': isPrivate = 1; break;
             case 's': showScrape = 1; break;
