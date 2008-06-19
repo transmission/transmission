@@ -38,8 +38,6 @@
 #include "ptrarray.h"
 #include "utils.h" /* tr_new(), tr_free() */
 
-const tr_benc BENC_NULL = { 0, { 0 } };
-
 /**
 ***
 **/
@@ -60,6 +58,14 @@ isSomething( const tr_benc * val )
 {
     return isContainer(val) || tr_bencIsInt(val) || tr_bencIsString(val);
 }
+
+static void
+tr_bencInit( tr_benc * val, int type )
+{
+    memset( val, 0, sizeof( *val ) );
+    val->type = type;
+}
+
 
 /***
 ****  tr_bencParse()

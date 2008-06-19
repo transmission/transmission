@@ -79,12 +79,6 @@ tr_benc * tr_bencDictFindFirst( tr_benc * dict, ... );
 
 /* convenience functions for building tr_benc    structures */
 
-static inline void tr_bencInit( tr_benc    * val, int type )
-{
-    memset( val, 0, sizeof( *val ) );
-    val->type = type;
-}
-
 #define tr_bencInitStr( a, b, c, d ) \
     _tr_bencInitStr( (a), ( char * )(b), (c), (d) )
 void   _tr_bencInitStr( tr_benc * val, char * str, int len, int nofree );
