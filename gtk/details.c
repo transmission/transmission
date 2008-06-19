@@ -1238,12 +1238,13 @@ tracker_page_new( TrTorrent * gtor )
 }
 
 static void
-refresh_countdown_lb( GtkWidget * l, time_t t )
+refresh_countdown_lb( GtkWidget * l, time_t t,
+                      const char * countdown_done )
 {
     const time_t now = time( NULL );
 
     if( !t || ( t < now ) )
-        gtk_label_set_text( GTK_LABEL( l ), _( "Never" ) );
+        gtk_label_set_text( GTK_LABEL( l ), countdown_done );
     else {
         char buf[1024];
         const int seconds = t - now;
@@ -1269,7 +1270,7 @@ refresh_tracker( GtkWidget * w )
 
     l = page->next_scrape_countdown_lb;
     t = torStat->nextScrapeTime;
-    refresh_countdown_lb( l, t );
+    refresh_countdown_lb( l, t, _( "Never" ) );
 
     l = page->last_announce_time_lb;
     t = torStat->lastAnnounceTime;
@@ -1280,11 +1281,11 @@ refresh_tracker( GtkWidget * w )
 
     l = page->next_announce_countdown_lb;
     t = torStat->nextAnnounceTime;
-    refresh_countdown_lb( l, t );
+    refresh_countdown_lb( l, t, _( "Never" ) );
 
     l = page->manual_announce_countdown_lb;
     t = torStat->manualAnnounceTime;
-    refresh_countdown_lb( l, t );
+    refresh_countdown_lb( l, t, _( "Now" ) );
 }
 
 /****
