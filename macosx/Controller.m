@@ -1562,16 +1562,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (filtering)
     {
-        int count = 0, rows = [fTableView numberOfRows];
-        if (rows > 0 && ![[fTableView itemAtRow: 0] isKindOfClass: [Torrent class]])
-        {
-            int i;
-            for (i = 1; i < rows; i++)
-                if ([[fTableView itemAtRow: i] isKindOfClass: [Torrent class]])
-                    count++;
-        }
-        else
-            count = rows;
+        int count = [fTableView numberOfRows]; //have to factor in collapsed rows
+        if (count > 0 && ![[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [Torrent class]])
+            count -= [fDisplayedTorrents count];
         
         totalTorrentsString = [NSString stringWithFormat: NSLocalizedString(@"%d of %@", "Status bar transfer count"),
                                 count, totalTorrentsString];
@@ -2353,8 +2346,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return;
     
     NSCalendar * calendar = [[NSCalendar alloc] initWithCalendarIdentifier: NSGregorianCalendar];
-    NSDateComponents * nowComponents = [calendar components: NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit
-                                        | NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: [NSDate date]],
+    NSDateComponents * nowComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: [NSDate date]],
                     * onComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit
                                         fromDate: [fDefaults objectForKey: @"SpeedLimitAutoOnDate"]],
                     * offComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit
