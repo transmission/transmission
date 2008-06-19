@@ -2345,13 +2345,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (![fDefaults boolForKey: @"SpeedLimitAuto"])
         return;
     
-    NSCalendar * calendar = [[NSCalendar alloc] initWithCalendarIdentifier: NSGregorianCalendar];
+    NSCalendar * calendar = [NSCalendar currentCalendar];
     NSDateComponents * nowComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: [NSDate date]],
                     * onComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit
                                         fromDate: [fDefaults objectForKey: @"SpeedLimitAutoOnDate"]],
                     * offComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit
                                         fromDate: [fDefaults objectForKey: @"SpeedLimitAutoOffDate"]];
-    [calendar release];
     
     //check if should be on if within range
     int onTime = [onComponents hour] * 60 + [onComponents minute],
@@ -2399,7 +2398,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSDate * timerDate = [fDefaults objectForKey: nextIsLimit ? @"SpeedLimitAutoOnDate" : @"SpeedLimitAutoOffDate"];
     
     //create date with combination of the current date and the date to go off
-    NSCalendar * calendar = [[NSCalendar alloc] initWithCalendarIdentifier: NSGregorianCalendar];
+    NSCalendar * calendar = [NSCalendar currentCalendar];
     NSDateComponents * nowComponents = [calendar components: NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit
                                         | NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: [NSDate date]],
                     * timerComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: timerDate];
@@ -2415,7 +2414,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [nowComponents setSecond: 0];
     
     NSDate * dateToUse = [calendar dateFromComponents: nowComponents];
-    [calendar release];
     
     fSpeedLimitTimer = [[NSTimer alloc] initWithFireDate: dateToUse interval: 0 target: self selector: @selector(autoSpeedLimit:)
                         userInfo: [NSNumber numberWithBool: nextIsLimit] repeats: NO];
