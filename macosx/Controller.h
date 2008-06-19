@@ -62,12 +62,14 @@ typedef enum
     IBOutlet NSWindow               * fWindow;
     DragOverlayWindow               * fOverlayWindow;
     IBOutlet TorrentTableView       * fTableView;
+
+    io_connect_t                    fRootPort;
+    NSTimer                         * fTimer;
     
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
     
     IBOutlet NSBox                  * fBottomTigerLine;
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
-    NSTimer                         * fSpeedLimitTimer;
     IBOutlet NSTextField            * fTotalTorrentsField;
     
     IBOutlet StatusBarView          * fStatusBar;
@@ -98,15 +100,14 @@ typedef enum
     IBOutlet NSWindow               * fURLSheetWindow;
     IBOutlet NSTextField            * fURLSheetTextField;
     IBOutlet NSButton               * fURLSheetOpenButton;
-
-    io_connect_t                    fRootPort;
-    NSTimer                         * fTimer;
     
     IBOutlet SUUpdater              * fUpdater;
     BOOL                            fUpdateInProgress;
     
     Badger                          * fBadger;
     IBOutlet NSMenu                 * fDockMenu;
+    
+    NSTimer                         * fSpeedLimitTimer;
     
     NSMutableArray                  * fAutoImportedNames;
     NSTimer                         * fAutoImportTimer;
@@ -218,7 +219,8 @@ typedef enum
 
 - (void) toggleSpeedLimit: (id) sender;
 - (void) autoSpeedLimitChange: (NSNotification *) notification;
-- (void) autoSpeedLimit;
+- (void) autoSpeedLimit: (NSTimer *) timer;
+- (void) setAutoSpeedLimitTimer: (BOOL) nextIsOn;
 
 - (void) setLimitGlobalEnabled: (id) sender;
 - (void) setQuickLimitGlobal: (id) sender;

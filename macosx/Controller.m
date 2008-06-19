@@ -128,8 +128,7 @@ typedef enum
 #define SEARCH_FILTER_MIN_WIDTH 48.0
 #define SEARCH_FILTER_MAX_WIDTH 95.0
 
-#define UPDATE_UI_SECONDS           1.0
-#define AUTO_SPEED_LIMIT_SECONDS    5.0
+#define UPDATE_UI_SECONDS   1.0
 
 #define DOCK_SEEDING_TAG        101
 #define DOCK_DOWNLOADING_TAG    102
@@ -485,12 +484,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
     
-    //timer to auto toggle speed limit
+    //set up the speed limit
     [self autoSpeedLimitChange: nil];
-    fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self
-                        selector: @selector(autoSpeedLimit) userInfo: nil repeats: YES];
-    [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSModalPanelRunLoopMode];
-    [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSEventTrackingRunLoopMode];
 }
 
 - (void) applicationDidFinishLaunching: (NSNotification *) notification
@@ -558,6 +553,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fTimer invalidate];
     [fSpeedLimitTimer invalidate];
+    
     if (fAutoImportTimer)
     {   
         if ([fAutoImportTimer isValid])
@@ -780,7 +776,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     [self invalidOpenAlert: [torrentPath lastPathComponent]];
             }
             else //this shouldn't happen
-                NSLog(@"Unknown error when attempting to open \"%@\"", torrentPath);
+                NSLog(@"Unknown error code (%d) when attempting to open \"%@\"", result, torrentPath);
             
             tr_ctorFree(ctor);
             tr_metainfoFree(&info);
@@ -2349,14 +2345,18 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) autoSpeedLimitChange: (NSNotification *) notification
 {
+    //clear timer here in case its not being reset
+    [fSpeedLimitTimer invalidate];
+    fSpeedLimitTimer = nil;
+    
     if (![fDefaults boolForKey: @"SpeedLimitAuto"])
         return;
  
     NSCalendarDate * onDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
-                        [[fDefaults objectForKey: @"SpeedLimitAutoOnDate"] timeIntervalSinceReferenceDate]],
-        * offDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
-                        [[fDefaults objectForKey: @"SpeedLimitAutoOffDate"] timeIntervalSinceReferenceDate]],
-        * nowDate = [NSCalendarDate calendarDate];
+                                [[fDefaults objectForKey: @"SpeedLimitAutoOnDate"] timeIntervalSinceReferenceDate]],
+                    * offDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
+                                [[fDefaults objectForKey: @"SpeedLimitAutoOffDate"] timeIntervalSinceReferenceDate]],
+                    * nowDate = [NSCalendarDate calendarDate];
     
     //check if should be on if within range
     int onTime = [onDate hourOfDay] * 60 + [onDate minuteOfHour],
@@ -2372,31 +2372,28 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if ([fDefaults boolForKey: @"SpeedLimit"] != shouldBeOn)
         [self toggleSpeedLimit: nil];
+    
+    //no need to check if both times are equal
+    if (onTime == offTime)
+        return;
+    
+    [self setAutoSpeedLimitTimer: !shouldBeOn];
 }
 
-- (void) autoSpeedLimit
+- (void) autoSpeedLimit: (NSTimer *) timer
 {
-    if (![fDefaults boolForKey: @"SpeedLimitAuto"])
-        return;
+    //check if should toggle (for cases where users might have manually
+    NSCalendarDate * onDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
+                                [[fDefaults objectForKey: @"SpeedLimitAutoOnDate"] timeIntervalSinceReferenceDate]],
+                    * offDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
+                                [[fDefaults objectForKey: @"SpeedLimitAutoOffDate"] timeIntervalSinceReferenceDate]],
+                    * nowDate = [NSCalendarDate calendarDate];
     
-    //only toggle if within first few seconds of minutes
-    NSCalendarDate * nowDate = [NSCalendarDate calendarDate];
-    if ([nowDate secondOfMinute] > AUTO_SPEED_LIMIT_SECONDS)
-        return;
-    
-    NSCalendarDate * offDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
-                        [[fDefaults objectForKey: @"SpeedLimitAutoOffDate"] timeIntervalSinceReferenceDate]];
-    
-    BOOL toggle;
-    if ([fDefaults boolForKey: @"SpeedLimit"])
+    BOOL currentlyLimiting = [fDefaults boolForKey: @"SpeedLimit"], toggle;
+    if (currentlyLimiting)
         toggle = [nowDate hourOfDay] == [offDate hourOfDay] && [nowDate minuteOfHour] == [offDate minuteOfHour];
     else
-    {
-        NSCalendarDate * onDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
-                        [[fDefaults objectForKey: @"SpeedLimitAutoOnDate"] timeIntervalSinceReferenceDate]];
-        toggle = ([nowDate hourOfDay] == [onDate hourOfDay] && [nowDate minuteOfHour] == [onDate minuteOfHour])
-                    && !([onDate hourOfDay] == [offDate hourOfDay] && [onDate minuteOfHour] == [offDate minuteOfHour]);
-    }
+        toggle = [nowDate hourOfDay] == [onDate hourOfDay] && [nowDate minuteOfHour] == [onDate minuteOfHour];
     
     if (toggle)
     {
@@ -2407,7 +2404,46 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 : NSLocalizedString(@"Speed Limit Auto Disabled", "Growl notification title")
             description: NSLocalizedString(@"Bandwidth settings changed", "Growl notification description")
             notificationName: GROWL_AUTO_SPEED_LIMIT iconData: nil priority: 0 isSticky: NO clickContext: nil];
+            
+            currentlyLimiting != currentlyLimiting;
     }
+    
+    [self setAutoSpeedLimitTimer: !currentlyLimiting];
+}
+
+- (void) setAutoSpeedLimitTimer: (BOOL) nextIsOn
+{
+    NSCalendarDate * timerDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate: [[fDefaults objectForKey:
+                                    nextIsOn ? @"SpeedLimitAutoOnDate" : @"SpeedLimitAutoOffDate"] timeIntervalSinceReferenceDate]],
+                    * nowDate = [NSCalendarDate calendarDate];
+    
+    //create date with combination of the current date and the date to go off
+    NSDateComponents * components = [[NSDateComponents alloc] init];
+    [components setDay: [nowDate dayOfMonth]];
+    [components setMonth: [nowDate monthOfYear]];
+    [components setYear: [nowDate yearOfCommonEra]];
+    [components setHour: [timerDate hourOfDay]];
+    [components setMinute: [timerDate minuteOfHour]];
+    [components setSecond: 0];
+    
+    NSCalendar * calendar = [[NSCalendar alloc] initWithCalendarIdentifier: NSGregorianCalendar];
+    NSDate * dateToUse = [calendar dateFromComponents: components];
+    [calendar release];
+    [components release];
+    
+    //check if should be the next day
+    int timerTime = [timerDate hourOfDay] * 60 + [timerDate minuteOfHour],
+        nowTime = [nowDate hourOfDay] * 60 + [nowDate minuteOfHour];
+    if (timerTime < nowTime)
+        dateToUse = [dateToUse addTimeInterval: 60 * 60 * 24]; //60 sec * 60 min * 24 hr
+    
+    fSpeedLimitTimer = [[NSTimer alloc] initWithFireDate: dateToUse interval: 0 target: self selector: @selector(autoSpeedLimit:)
+                        userInfo: nil repeats: NO];
+    
+    [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSDefaultRunLoopMode];
+    [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSModalPanelRunLoopMode];
+    [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSEventTrackingRunLoopMode];
+    [fSpeedLimitTimer release];
 }
 
 - (void) setLimitGlobalEnabled: (id) sender
