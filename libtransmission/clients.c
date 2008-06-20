@@ -173,7 +173,15 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
                 snprintf( buf, buflen, "Transmission %d.%02d%s", strint(id+3,1), strint(id+4,2),
                           id[6]=='Z' || id[6]=='X' ? "+" : "" );
         }
-
+        
+        else if( !memcmp( id+1, "AZ", 2 ) )
+        {
+            if( id[3] > '3' || ( id[3] == '3' && id[4] >= '1' ) ) /* Vuze starts at version 3.1.0.0 */
+                four_digits( buf, buflen, "Vuze", id+3 );
+            else
+                four_digits( buf, buflen, "Azureus", id+3 );
+        }
+        
         else if( !memcmp( id+1, "KT", 2 ) )
         {
             if( id[5] == 'D' )
@@ -187,7 +195,6 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "AR", 2 ) ) four_digits( buf, buflen, "Ares", id+3 );
         else if( !memcmp( id+1, "AT", 2 ) ) four_digits( buf, buflen, "Artemis", id+3 );
         else if( !memcmp( id+1, "AV", 2 ) ) four_digits( buf, buflen, "Avicora", id+3 );
-        else if( !memcmp( id+1, "AZ", 2 ) ) four_digits( buf, buflen, "Azureus", id+3 );
         else if( !memcmp( id+1, "BG", 2 ) ) four_digits( buf, buflen, "BTGetit", id+3 );
         else if( !memcmp( id+1, "BM", 2 ) ) four_digits( buf, buflen, "BitMagnet", id+3 );
         else if( !memcmp( id+1, "BX", 2 ) ) four_digits( buf, buflen, "BittorrentX", id+3 );
