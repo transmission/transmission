@@ -168,6 +168,7 @@
                       | number   | dateCreated            | tr_info
                       | number   | pieceCount             | tr_info
                       | number   | pieceSize              | tr_info
+                      | 'boolean'| isPrivate              | tr_torrent
    -------------------+----------+------------------------+-------------
    limits, 128        | number   | downloadLimit          | tr_torrent
                       | number   | downloadLimitMode      | tr_torrent

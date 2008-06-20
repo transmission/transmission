@@ -293,6 +293,7 @@ addInfo( const tr_torrent * tor, tr_benc * d, uint64_t fields )
         tr_bencDictAddStr( d, "comment", inf->comment ? inf->comment : "" );
         tr_bencDictAddStr( d, "creator", inf->creator ? inf->creator : "" );
         tr_bencDictAddInt( d, "dateCreated", inf->dateCreated );
+        tr_bencDictAddInt( d, "isPrivate", tr_torrentIsPrivate( tor ) );
         tr_bencDictAddInt( d, "pieceCount", inf->pieceCount );
         tr_bencDictAddInt( d, "pieceSize", inf->pieceSize );
     }
