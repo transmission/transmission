@@ -1582,14 +1582,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         desiredSeedActive = [self numToStartFromQueue: NO];
     
     //sort torrents by order value
+    NSArray * sortedTorrents; //can't just resort fTorrents because it might be rearranged while enumerating because of recursion
     if ([fTorrents count] > 1 && (desiredDownloadActive > 0 || desiredSeedActive > 0))
     {
         NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: YES] autorelease];
-        [fTorrents sortUsingDescriptors: [NSArray arrayWithObject: orderDescriptor]];
+        sortedTorrents = [fTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: orderDescriptor]];
     }
+    else
+        sortedTorrents = fTorrents;
     
     Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    NSEnumerator * enumerator = [sortedTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
         if (![torrent isActive] && ![torrent isChecking] && [torrent waitingToStart])
