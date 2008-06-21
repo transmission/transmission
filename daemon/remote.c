@@ -199,7 +199,6 @@ readargs( int argc, char ** argv )
                       fields = TR_RPC_TORRENT_FIELD_ID
                              | TR_RPC_TORRENT_FIELD_ACTIVITY;
                       tr_bencDictAddInt( args, "fields", fields );
-                      /*tr_bencDictAddStr( args, "sort", "name" );*/
                       break;
             case 'm': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddInt( args, "port-forwarding-enabled", 1 );

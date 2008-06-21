@@ -216,7 +216,7 @@ session_init( const char * configDir, const char * downloadDir,
 static void
 daemonUsage( void )
 {
-    puts( "usage: " MY_NAME " [-dfh] [-p file] [-s file]\n"
+    puts( "Usage: " MY_NAME " [options]\n"
           "\n"
           "Transmission "LONG_VERSION_STRING" http://www.transmissionbt.com/\n"
           "A fast and easy BitTorrent client\n"
