@@ -871,6 +871,13 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 
                 if( err )
                     gotBadPiece( t, p );
+                else {
+                    int i, peerCount;
+                    tr_peer ** peers = getConnectedPeers( t, &peerCount );
+                    for( i=0; i<peerCount; ++i )
+                        tr_peerMsgsHave( peers[i]->msgs, p );
+                    tr_free( peers );
+                }
 
                 tr_torrentRecheckCompleteness( tor );
             }
