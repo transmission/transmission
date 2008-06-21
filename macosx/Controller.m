@@ -1264,12 +1264,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //reset the order values if necessary
     if (lowestOrderValue < [fTorrents count])
     {
-        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: YES] autorelease];
-        NSArray * tempTorrents = [fTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: orderDescriptor]];
-
         int i;
-        for (i = lowestOrderValue; i < [tempTorrents count]; i++)
-            [[tempTorrents objectAtIndex: i] setOrderValue: i];
+        for (i = lowestOrderValue; i < [fTorrents count]; i++)
+            [[fTorrents objectAtIndex: i] setOrderValue: i];
     }
     
     [fTableView deselectAll: nil];
@@ -1581,18 +1578,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     int desiredDownloadActive = [self numToStartFromQueue: YES],
         desiredSeedActive = [self numToStartFromQueue: NO];
     
-    //sort torrents by order value
-    NSArray * sortedTorrents; //can't just resort fTorrents because it might be rearranged while enumerating because of recursion
-    if ([fTorrents count] > 1 && (desiredDownloadActive > 0 || desiredSeedActive > 0))
-    {
-        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: YES] autorelease];
-        sortedTorrents = [fTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: orderDescriptor]];
-    }
-    else
-        sortedTorrents = fTorrents;
-    
     Torrent * torrent;
-    NSEnumerator * enumerator = [sortedTorrents objectEnumerator];
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
         if (![torrent isActive] && ![torrent isChecking] && [torrent waitingToStart])
@@ -2773,10 +2760,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             //remove objects to reinsert
             [fTorrents removeObjectsInArray: movingTorrents];
-            
-            //get all torrents to reorder
-            NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: YES] autorelease];
-            [fTorrents sortUsingDescriptors: [NSArray arrayWithObject: orderDescriptor]];
             
             //insert objects at new location
             int insertIndex = topTorrent ? [fTorrents indexOfObject: topTorrent] + 1 : 0;
