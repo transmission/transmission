@@ -197,7 +197,8 @@ readargs( int argc, char ** argv )
             case 'l': tr_bencDictAddStr( &top, "method", "torrent-get" );
                       tr_bencDictAddInt( &top, "tag", TAG_LIST );
                       fields = TR_RPC_TORRENT_FIELD_ID
-                             | TR_RPC_TORRENT_FIELD_ACTIVITY;
+                             | TR_RPC_TORRENT_FIELD_ACTIVITY
+                             | TR_RPC_TORRENT_FIELD_SIZE;
                       tr_bencDictAddInt( args, "fields", fields );
                       break;
             case 'm': tr_bencDictAddStr( &top, "method", "session-set" );
@@ -272,6 +273,16 @@ writeFunc( void * ptr, size_t size, size_t nmemb, void * buf )
     return byteCount;
 }
 
+static void
+etaToString( char * buf, size_t buflen, int64_t eta )
+{
+         if( eta < 0 )           snprintf( buf, buflen, "Unknown" );
+    else if( eta < 60 )          snprintf( buf, buflen, "%"PRId64"sec", eta );
+    else if( eta < (60*60) )     snprintf( buf, buflen, "%"PRId64" min", eta/60 );
+    else if( eta < (60*60*24) )  snprintf( buf, buflen, "%"PRId64" hrs", eta/(60*60) );
+    else                         snprintf( buf, buflen, "%"PRId64" days", eta/(60*60*24) );
+}
+
 static const char*
 torrentStatusToString( int i )
 {
@@ -313,20 +324,33 @@ processResponse( const char * host, int port,
             ( tr_bencDictFindList( args, "torrents", &list ) ) )
         {
             int i, n;
+            printf( "%-3s  %-4s  %-8s  %-5s  %-5s  %-5s  %-11s  %s\n",
+                    "ID", "Done", "ETA", "Up", "Down", "Ratio", "Status", "Name" );
             for( i=0, n=tr_bencListSize( list ); i<n; ++i )
             {
-                int64_t id, status, up, down;
+                int64_t id, eta, status, up, down, sizeWhenDone, leftUntilDone;
                 const char *name, *ratiostr;
                 tr_benc * d = tr_bencListChild( list, i );
                 if(    tr_bencDictFindInt( d, "id", &id )
                     && tr_bencDictFindStr( d, "name", &name )
+                    && tr_bencDictFindInt( d, "eta", &eta )
+                    && tr_bencDictFindInt( d, "eta", &eta )
+                    && tr_bencDictFindInt( d, "leftUntilDone", &leftUntilDone )
+                    && tr_bencDictFindInt( d, "sizeWhenDone", &sizeWhenDone )
                     && tr_bencDictFindInt( d, "rateDownload", &down )
                     && tr_bencDictFindInt( d, "rateUpload", &up )
                     && tr_bencDictFindStr( d, "ratio", &ratiostr )
                     && tr_bencDictFindInt( d, "status", &status ) )
                 {
-                    printf( "%4d.  Up: %5.1f  Down: %5.1f  Ratio: %4.1f  %-15s  %s\n",
+                    char etaStr[16];
+                    if( leftUntilDone )
+                        etaToString( etaStr, sizeof( etaStr ), eta );
+                    else
+                        snprintf( etaStr, sizeof( etaStr ), "Done" );
+                    printf( "%3d  %3d%%  %-8s  %5.1f  %5.1f  %5.1f  %-11s  %s\n",
                             (int)id,
+                            (int)(100.0*(sizeWhenDone-leftUntilDone)/sizeWhenDone),
+                            etaStr,
                             up / 1024.0,
                             down / 1024.0,
                             strtod( ratiostr, NULL ),
