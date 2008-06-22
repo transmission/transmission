@@ -71,8 +71,10 @@ typedef enum
 - (void) updateInfoFiles;
 
 - (NSView *) tabViewForTag: (int) tag;
-- (NSArray *) peerSortDescriptors;
 - (void) setWebSeedTableHidden: (BOOL) hide animate: (BOOL) animate;
+- (NSArray *) peerSortDescriptors;
+
+- (BOOL) canQuickLookFile: (FileListNode *) item;
 
 - (void) addTrackers;
 - (void) removeTrackers;
@@ -1088,7 +1090,7 @@ typedef enum
     for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
         FileListNode * item = [fileOutlineView itemAtRow: i];
-        if ([item isFolder] || [torrent fileProgress: [[item indexes] firstIndex]] == 1.0)
+        if ([self canQuickLookFile: item])
             [urlArray addObject: [NSURL fileURLWithPath: [folder stringByAppendingPathComponent: [item fullPath]]]];
     }
     
@@ -1103,11 +1105,8 @@ typedef enum
 
     int i;
     for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
-    {
-        FileListNode * item = [fileOutlineView itemAtRow: i];
-        if ([item isFolder] || [torrent fileProgress: [[item indexes] firstIndex]] == 1.0)
+        if ([self canQuickLookFile: [fileOutlineView itemAtRow: i]])
             return YES;
-    }
     
     return NO;
 }
@@ -1598,6 +1597,16 @@ typedef enum
     }
     
     return descriptors;
+}
+
+- (BOOL) canQuickLookFile: (FileListNode *) item
+{
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath: [[torrent downloadFolder] stringByAppendingPathComponent: [item fullPath]]])
+        return NO;
+    
+    return [item isFolder] || [torrent fileProgress: [[item indexes] firstIndex]] == 1.0;
 }
 
 - (void) addTrackers

@@ -473,7 +473,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //timer to update the interface every second
     [self updateUI];
     fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_UI_SECONDS target: self
-        selector: @selector(updateUI) userInfo: nil repeats: YES];
+                selector: @selector(updateUI) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
@@ -4103,10 +4103,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent;
     
     while ((torrent = [enumerator nextObject]))
-    {
-        if ([torrent isFolder] || [torrent isComplete])
+        if ([self canQuickLookTorrent: torrent])
             [urlArray addObject: [NSURL fileURLWithPath: [torrent dataLocation]]];
-    }
     
     return urlArray;
 }
@@ -4118,12 +4116,18 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent;
     
     while ((torrent = [enumerator nextObject]))
-    {
-        if ([torrent isFolder] || [torrent isComplete])
+        if ([self canQuickLookTorrent: torrent])
             return YES;
-    }
     
     return NO;
+}
+
+- (BOOL) canQuickLookTorrent: (Torrent *) torrent
+{
+    if (![[NSFileManager defaultManager] fileExistsAtPath: [torrent dataLocation]])
+        return NO;
+    
+    return [torrent isFolder] || [torrent isComplete];
 }
 
 - (NSRect) quickLookFrameWithURL: (NSURL *) url

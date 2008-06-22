@@ -257,7 +257,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fPreviousFinishedIndexesDate = indexes != nil ? [[NSDate alloc] init] : nil;
 }
 
-#warning when queue and seeding options are folded into libt, no need to call this on all torrents - use tr_torrentGetStatus
 - (void) update
 {
     //get previous status values before update
