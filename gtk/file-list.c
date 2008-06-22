@@ -151,6 +151,7 @@ parsepath( const tr_torrent  * tor,
         size  = 0;
     }
 
+#if 0
     gtk_tree_store_set( store, &iter, FC_INDEX, index,
                                       FC_LABEL, file,
                                       FC_KEY, mykey,
@@ -161,6 +162,18 @@ parsepath( const tr_torrent  * tor,
                                       FC_SIZE, size,
                                       FC_HAVE, 0,
                                       -1 );
+#else
+    gtk_tree_store_set( store, &iter, FC_INDEX, index, -1 );
+    gtk_tree_store_set( store, &iter, FC_LABEL, file, -1 );
+    gtk_tree_store_set( store, &iter, FC_KEY, mykey, -1 );
+    gtk_tree_store_set( store, &iter, FC_STOCK, stock, -1 );
+    gtk_tree_store_set( store, &iter, FC_PRIORITY, priority, -1 );
+    gtk_tree_store_set( store, &iter, FC_ENABLED, enabled, -1 );
+    gtk_tree_store_set( store, &iter, FC_IS_FILE, is_file, -1 );
+    gtk_tree_store_set( store, &iter, FC_SIZE, size, -1 );
+    gtk_tree_store_set( store, &iter, FC_HAVE, 0, -1 );
+#endif
+
   done:
     g_free( mykey );
     g_free( lower );
