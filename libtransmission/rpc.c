@@ -216,8 +216,7 @@ addInfo( const tr_torrent * tor, tr_benc * d, uint64_t fields )
         tr_bencDictAddInt( d, "rateUpload", (int)(st->rateUpload*1024) );
         tr_bencDictAddDouble( d, "recheckProgress", st->recheckProgress );
         tr_bencDictAddInt( d, "status", st->status );
-        tr_bencDictAddDouble( d, "swarmSpeed", st->swarmSpeed );
-        tr_bencDictAddDouble( d, "ratio", st->ratio );
+        tr_bencDictAddInt( d, "swarmSpeed", (int)(st->swarmSpeed*1024) );
         tr_bencDictAddInt( d, "webseedsSendingToUs", st->webseedsSendingToUs );
     }
 
@@ -560,11 +559,11 @@ sessionGet( tr_handle * h, tr_benc * args_in UNUSED, tr_benc * args_out )
     tr_bencDictAddInt( d, "port-forwarding-enabled",
                           tr_sessionIsPortForwardingEnabled( h ) );
     tr_bencDictAddInt( d, "speed-limit-up",
-                          tr_sessionGetSpeedLimit( h, TR_UP ) );
+                          tr_sessionGetSpeedLimit( h, TR_UP ) * 1024 );
     tr_bencDictAddInt( d, "speed-limit-up-enabled",
                           tr_sessionIsSpeedLimitEnabled( h, TR_UP ) );
     tr_bencDictAddInt( d, "speed-limit-down",
-                          tr_sessionGetSpeedLimit( h, TR_DOWN ) );
+                          tr_sessionGetSpeedLimit( h, TR_DOWN ) * 1024 );
     tr_bencDictAddInt( d, "speed-limit-down-enabled",
                           tr_sessionIsSpeedLimitEnabled( h, TR_DOWN ) );
     switch( tr_sessionGetEncryption( h ) ) {

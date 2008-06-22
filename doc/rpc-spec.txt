@@ -87,9 +87,9 @@
    "priority-high"            | array      indices of high-priority file(s)
    "priority-low"             | array      indices of low-priority file(s)
    "priority-normal"          | array      indices of normal-priority file(s)
-   "speed-limit-down"         | number     maximum download speed (in KiB/s)
+   "speed-limit-down"         | number     maximum download speed (in K/s)
    "speed-limit-down-enabled" | 'boolean'  true if the download speed is limited
-   "speed-limit-up"           | number     maximum upload speed (in KiB/s)
+   "speed-limit-up"           | number     maximum upload speed (in K/s)
    "speed-limit-up-enabled"   | 'boolean'  true if the upload speed is limited
 
    Response arguments: none
@@ -125,7 +125,7 @@
                       | number   | rateUpload             | tr_stat
                       | number   | recheckProgress        | tr_stat
                       | number   | status                 | tr_stat
-                      | number   | swarmSpeed             | tr_stat
+                      | number   | swarmSpeed (K/s)       | tr_stat
                       | 'double' | uploadRatio            | tr_stat
                       | number   | webseedsSendingToUs    | tr_stat
    -------------------+----------+------------------------+-------------
@@ -302,9 +302,9 @@
    "pex-allowed"              | 'boolean'  true means allow pex in public torrents
    "port"                     | number     port number
    "port-forwarding-enabled"  | 'boolean'  true means enabled
-   "speed-limit-down"         | number     max global download speed (in KiB/s)
+   "speed-limit-down"         | number     max global download speed (in K/s)
    "speed-limit-down-enabled" | 'boolean'  true means enabled
-   "speed-limit-up"           | number     max global upload speed (in KiB/s)
+   "speed-limit-up"           | number     max global upload speed (in K/s)
    "speed-limit-up-enabled"   | 'boolean'  true means enabled
 
 4.1.1.  Mutators
