@@ -329,17 +329,15 @@ processResponse( const char * host, int port,
             for( i=0, n=tr_bencListSize( list ); i<n; ++i )
             {
                 int64_t id, eta, status, up, down, sizeWhenDone, leftUntilDone;
-                const char *name, *ratiostr;
+                const char *name;
                 tr_benc * d = tr_bencListChild( list, i );
-                if(    tr_bencDictFindInt( d, "id", &id )
-                    && tr_bencDictFindStr( d, "name", &name )
-                    && tr_bencDictFindInt( d, "eta", &eta )
-                    && tr_bencDictFindInt( d, "eta", &eta )
+                if(    tr_bencDictFindInt( d, "eta", &eta )
+                    && tr_bencDictFindInt( d, "id", &id )
                     && tr_bencDictFindInt( d, "leftUntilDone", &leftUntilDone )
-                    && tr_bencDictFindInt( d, "sizeWhenDone", &sizeWhenDone )
+                    && tr_bencDictFindStr( d, "name", &name )
                     && tr_bencDictFindInt( d, "rateDownload", &down )
                     && tr_bencDictFindInt( d, "rateUpload", &up )
-                    && tr_bencDictFindStr( d, "ratio", &ratiostr )
+                    && tr_bencDictFindInt( d, "sizeWhenDone", &sizeWhenDone )
                     && tr_bencDictFindInt( d, "status", &status ) )
                 {
                     char etaStr[16];
@@ -353,7 +351,7 @@ processResponse( const char * host, int port,
                             etaStr,
                             up / 1024.0,
                             down / 1024.0,
-                            strtod( ratiostr, NULL ),
+                            (double)(sizeWhenDone-leftUntilDone)/sizeWhenDone,
                             torrentStatusToString( status ),
                             name );
                 }
