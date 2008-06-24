@@ -25,6 +25,9 @@
 #import "CTGradient.h"
 
 @interface CTGradient (ProgressBar)
+
++ (CTGradient *) progressGradientForColor: (NSColor *) color;
+
 + (CTGradient *)progressWhiteGradient;
 + (CTGradient *)progressGrayGradient;
 + (CTGradient *)progressLightGrayGradient;
@@ -35,4 +38,5 @@
 + (CTGradient *)progressDarkGreenGradient;
 + (CTGradient *)progressRedGradient;
 + (CTGradient *)progressYellowGradient;
+
 @end

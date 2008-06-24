@@ -436,15 +436,17 @@ typedef enum
         [fCreatorField setStringValue: creatorString];
         [fDateCreatedField setObjectValue: [torrent dateCreated]];
         
-        BOOL publicTorrent = [torrent publicTorrent];
-        [fTorrentLocationField setStringValue: publicTorrent
-                    ? [[torrent publicTorrentLocation] stringByAbbreviatingWithTildeInPath]
-                    : NSLocalizedString(@"Transmission Support Folder", "Torrent -> location when deleting original")];
-        if (publicTorrent)
-            [fTorrentLocationField setToolTip: [[torrent publicTorrentLocation] stringByAppendingFormat: @"\n\n%@",
-                                                [torrent torrentLocation]]];
+        if ([torrent publicTorrent])
+        {
+            NSString * location = [torrent publicTorrentLocation];
+            [fTorrentLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
+            [fTorrentLocationField setToolTip: [location stringByAppendingFormat: @"\n\n%@", [torrent torrentLocation]]];
+        }
         else
+        {
+            [fTorrentLocationField setStringValue: NSLocalizedString(@"Transmission Support Folder", "Inspector -> torrent location")];
             [fTorrentLocationField setToolTip: [torrent torrentLocation]];
+        }
         
         [fDateAddedField setObjectValue: [torrent dateAdded]];
         

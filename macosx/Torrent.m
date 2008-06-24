@@ -382,7 +382,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 }
 
 - (float) progressStopRatio
-{
+{return 0.5;
     float stopRatio, ratio;
     if ((stopRatio = [self actualStopRatio]) == INVALID || (ratio = [self ratio]) >= stopRatio)
         return 1.0;

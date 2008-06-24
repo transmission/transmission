@@ -3,13 +3,14 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">9D34</string>
-		<string key="IBDocument.InterfaceBuilderVersion">667</string>
+		<string key="IBDocument.InterfaceBuilderVersion">670</string>
 		<string key="IBDocument.AppKitVersion">949.33</string>
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="2"/>
-			<integer value="81"/>
+			<integer value="1603"/>
+			<integer value="1480"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -91,7 +92,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 								<object class="NSMenuItem" key="NSMenuItem" id="824838798">
 									<reference key="NSMenu" ref="97165992"/>
 									<bool key="NSIsHidden">YES</bool>
-									<string key="NSTitle">Action Menu</string>
+									<string key="NSTitle"/>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -3406,7 +3407,7 @@ zJLMsszTzPPNFM00zVXNdc2GzabNx83nzgjOKM5JzmnOis6qzrrO2877zxzPPM9dz33Pns++z9/P79AA
 				<string key="NSName"/>
 			</object>
 			<object class="NSCustomView" id="492482618">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">266</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3641,11 +3642,12 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{400, 21}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">StatusBarView</string>
 				<string key="NSExtension">NSView</string>
 			</object>
 			<object class="NSCustomView" id="793806362">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">266</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3930,6 +3932,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{457, 23}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">StatusBarView</string>
 				<string key="NSExtension">NSView</string>
 			</object>
