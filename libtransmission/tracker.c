@@ -44,6 +44,12 @@ enum
     /* unless the tracker says otherwise, this is the announce min_interval */
     DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC = (60 * 2),
 
+    /* how long to wait before a rescrape the first time we get an error */
+    FIRST_SCRAPE_RETRY_INTERVAL_SEC = 30,
+
+    /* how long to wait before a reannounce the first time we get an error */
+    FIRST_ANNOUNCE_RETRY_INTERVAL_SEC = 30,
+
     /* the value of the 'numwant' argument passed in tracker requests. */
     NUMWANT = 80,
 
@@ -71,6 +77,7 @@ struct tr_tracker
     int announceMinIntervalSec;
     int scrapeIntervalSec;
     int retryScrapeIntervalSec;
+    int retryAnnounceIntervalSec;
 
     /* index into the torrent's tr_info.trackers array */
     int trackerIndex;
@@ -325,6 +332,7 @@ onTrackerResponse( tr_session    * session,
             const char * str;
 
             success = TRUE;
+            t->retryAnnounceIntervalSec = FIRST_SCRAPE_RETRY_INTERVAL_SEC;
 
             if(( tr_bencDictFindStr( &benc, "failure reason", &str ))) {
                 publishMessage( t, str, TR_TRACKER_ERROR );
@@ -418,7 +426,8 @@ onTrackerResponse( tr_session    * session,
          * incapable of performing the request.  So we pause a bit and
          * try again. */
         t->manualAnnounceAllowedAt = ~(time_t)0;
-        t->reannounceAt = time( NULL ) + 60;
+        t->reannounceAt = time( NULL ) + t->retryAnnounceIntervalSec;
+        t->retryAnnounceIntervalSec *= 2;
     }
     else
     {
@@ -482,12 +491,11 @@ onScrapeResponse( tr_session   * session,
                     if(( tr_bencDictFindInt( flags, "min_request_interval", &itmp )))
                         t->scrapeIntervalSec = i;
 
-                success = TRUE;
-
                 tr_ndbg( t->name, "Scrape successful.  Rescraping in %d seconds.",
                          t->scrapeIntervalSec );
 
-                t->retryScrapeIntervalSec = 30;
+                success = TRUE;
+                t->retryScrapeIntervalSec = FIRST_SCRAPE_RETRY_INTERVAL_SEC;
             }
         }
 
@@ -837,7 +845,8 @@ tr_trackerNew( const tr_torrent * torrent )
     t->publisher = tr_publisherNew( );
     t->session                  = torrent->handle;
     t->scrapeIntervalSec        = DEFAULT_SCRAPE_INTERVAL_SEC;
-    t->retryScrapeIntervalSec   = 60;
+    t->retryScrapeIntervalSec   = FIRST_SCRAPE_RETRY_INTERVAL_SEC;
+    t->retryAnnounceIntervalSec = FIRST_ANNOUNCE_RETRY_INTERVAL_SEC;
     t->announceIntervalSec      = DEFAULT_ANNOUNCE_INTERVAL_SEC;
     t->announceMinIntervalSec   = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
     t->timesDownloaded          = -1;

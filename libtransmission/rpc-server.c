@@ -31,8 +31,8 @@
 #define MY_REALM "Transmission RPC Server"
 
 #define BUSY_INTERVAL_MSEC 30
-#define IDLE_INTERVAL_MSEC 100
-#define UNUSED_INTERVAL_MSEC 1000
+#define IDLE_INTERVAL_MSEC 66
+#define UNUSED_INTERVAL_MSEC 100
 
 struct tr_rpc_server
 {
@@ -142,7 +142,12 @@ startServer( tr_rpc_server * server )
     {
         char ports[128];
         char passwd[MAX_PATH_LENGTH];
+        char clutchDir[MAX_PATH_LENGTH];
+        char * clutchAlias;
         struct timeval tv = tr_timevalMsec( UNUSED_INTERVAL_MSEC );
+
+        tr_buildPath( clutchDir, sizeof( clutchDir ), tr_sessionGetConfigDir( server->session ), "clutch", NULL );
+        clutchAlias = tr_strdup_printf( "%s=%s", "/transmission/clutch", clutchDir );
 
         getPasswordFile( server, passwd, sizeof( passwd ) );
         if( !server->isPasswordEnabled )
@@ -153,9 +158,10 @@ startServer( tr_rpc_server * server )
         server->ctx = shttpd_init( );
         snprintf( ports, sizeof( ports ), "%d", server->port );
         shttpd_register_uri( server->ctx, "/transmission/rpc", handle_rpc, server );
+        shttpd_set_option(server->ctx, "aliases", clutchAlias );
         shttpd_set_option( server->ctx, "ports", ports );
         shttpd_set_option( server->ctx, "dir_list", "0" );
-        shttpd_set_option( server->ctx, "root", "/dev/null" );
+        //shttpd_set_option( server->ctx, "root", "/dev/null" );
         shttpd_set_option( server->ctx, "auth_realm", MY_REALM );
         if( server->acl ) {
             dbgmsg( "setting acl [%s]", server->acl );
@@ -169,6 +175,8 @@ startServer( tr_rpc_server * server )
 
         evtimer_set( &server->timer, rpcPulse, server );
         evtimer_add( &server->timer, &tv );
+
+        tr_free( clutchAlias );
     }
 }
 
