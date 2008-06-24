@@ -622,7 +622,7 @@
             
             if (!fLightGrayGradient)
                 fLightGrayGradient = [[CTGradient progressLightGrayGradient] retain];
-            [fLightGrayGradient fillRect: noIncludeRect angle: -90];
+            [fLightGrayGradient fillRect: noIncludeRect angle: 90];
         }
         
         if (rightWidth > 0)
@@ -641,7 +641,7 @@
                     
                     if (!fRedGradient)
                         fRedGradient = [[CTGradient progressRedGradient] retain];
-                    [fRedGradient fillRect: notAvailableRect angle: -90];
+                    [fRedGradient fillRect: notAvailableRect angle: 90];
                 }
             }
             
@@ -653,7 +653,7 @@
                 
                 if (!fWhiteGradient)
                     fWhiteGradient = [[CTGradient progressWhiteGradient] retain];
-                [fWhiteGradient fillRect: includeRect angle: -90];
+                [fWhiteGradient fillRect: includeRect angle: 90];
             }
         }
     }
@@ -669,7 +669,7 @@
             {
                 if (!fYellowGradient)
                     fYellowGradient = [[CTGradient progressYellowGradient] retain];
-                [fYellowGradient fillRect: completeRect angle: -90];
+                [fYellowGradient fillRect: completeRect angle: 90];
             }
             else if ([torrent isSeeding])
             {
@@ -684,7 +684,7 @@
                     
                     if (!fLightGreenGradient)
                         fLightGreenGradient = [[CTGradient progressLightGreenGradient] retain];
-                    [fLightGreenGradient fillRect: ratioLeftRect angle: -90];
+                    [fLightGreenGradient fillRect: ratioLeftRect angle: 90];
                 }
                 
                 if (leftWidth > 0)
@@ -693,14 +693,14 @@
                     
                     if (!fGreenGradient)
                         fGreenGradient = [[CTGradient progressGreenGradient] retain];
-                    [fGreenGradient fillRect: completeRect angle: -90];
+                    [fGreenGradient fillRect: completeRect angle: 90];
                 }
             }
             else
             {
                 if (!fBlueGradient)
                     fBlueGradient = [[CTGradient progressBlueGradient] retain];
-                [fBlueGradient fillRect: completeRect angle: -90];
+                [fBlueGradient fillRect: completeRect angle: 90];
             }
         }
         else
@@ -711,20 +711,20 @@
                 {
                     if (!fDarkGreenGradient)
                         fDarkGreenGradient = [[CTGradient progressDarkGreenGradient] retain];
-                    [fDarkGreenGradient fillRect: completeRect angle: -90];
+                    [fDarkGreenGradient fillRect: completeRect angle: 90];
                 }
                 else
                 {
                     if (!fDarkBlueGradient)
                         fDarkBlueGradient = [[CTGradient progressDarkBlueGradient] retain];
-                    [fDarkBlueGradient fillRect: completeRect angle: -90];
+                    [fDarkBlueGradient fillRect: completeRect angle: 90];
                 }
             }
             else
             {
                 if (!fGrayGradient)
                     fGrayGradient = [[CTGradient progressGrayGradient] retain];
-                [fGrayGradient fillRect: completeRect angle: -90];
+                [fGrayGradient fillRect: completeRect angle: 90];
             }
         }
     }

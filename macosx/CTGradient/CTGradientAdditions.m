@@ -28,35 +28,33 @@
 
 + (CTGradient *) progressGradientForColor: (NSColor *) color
 {
-    float redComponent = [color redComponent],
-        greenComponent = [color greenComponent],
-        blueComponent = [color blueComponent];
+    float redComponent = [color redComponent], greenComponent = [color greenComponent], blueComponent = [color blueComponent];
     
     CTGradientElement color1;
-    color1.red = redComponent;
-    color1.green = greenComponent;
-    color1.blue = blueComponent;
+    color1.red = redComponent * 0.9684;
+    color1.green = greenComponent * 0.9684;
+    color1.blue = blueComponent * 0.9684;
     color1.alpha = 1.0;
     color1.position = 0.0;
     
     CTGradientElement color2;
-    color2.red = redComponent * 0.8736;
-    color2.green = greenComponent * 0.8736;
-    color2.blue = blueComponent * 0.8736;
+    color2.red = redComponent;
+    color2.green = greenComponent;
+    color2.blue = blueComponent;
     color2.alpha = 1.0;
     color2.position = 0.5;
     
     CTGradientElement color3;
-    color3.red = redComponent;
-    color3.green = greenComponent;
-    color3.blue = blueComponent;
+    color3.red = redComponent * 0.8736;
+    color3.green = greenComponent * 0.8736;
+    color3.blue = blueComponent * 0.8736;
     color3.alpha = 1.0;
     color3.position = 0.5;
     
     CTGradientElement color4;
-    color4.red = redComponent * 0.9684;
-    color4.green = greenComponent * 0.9684;
-    color4.blue = blueComponent * 0.9684;
+    color4.red = redComponent;
+    color4.green = greenComponent;
+    color4.blue = blueComponent;
     color4.alpha = 1.0;
     color4.position = 1.0;
     
