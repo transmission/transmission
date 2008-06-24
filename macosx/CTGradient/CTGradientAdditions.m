@@ -26,14 +26,12 @@
 
 @implementation CTGradient (ProgressBar)
 
-+ (CTGradient *) progressGradientForColor: (NSColor *) color
++ (CTGradient *) progressGradientForRed: (float) redComponent green: (float) greenComponent blue: (float) blueComponent
 {
-    float redComponent = [color redComponent], greenComponent = [color greenComponent], blueComponent = [color blueComponent];
-    
     CTGradientElement color1;
-    color1.red = redComponent * 0.9684;
-    color1.green = greenComponent * 0.9684;
-    color1.blue = blueComponent * 0.9684;
+    color1.red = redComponent * 0.95;
+    color1.green = greenComponent * 0.95;
+    color1.blue = blueComponent * 0.95;
     color1.alpha = 1.0;
     color1.position = 0.0;
     
@@ -45,9 +43,9 @@
     color2.position = 0.5;
     
     CTGradientElement color3;
-    color3.red = redComponent * 0.8736;
-    color3.green = greenComponent * 0.8736;
-    color3.blue = blueComponent * 0.8736;
+    color3.red = redComponent * 0.8;
+    color3.green = greenComponent * 0.8;
+    color3.blue = blueComponent * 0.8;
     color3.alpha = 1.0;
     color3.position = 0.5;
     
@@ -59,62 +57,62 @@
     color4.position = 1.0;
     
     CTGradient * newInstance = [[[self class] alloc] init];
-    [newInstance addElement:&color1];
-    [newInstance addElement:&color2];
-    [newInstance addElement:&color3];
-    [newInstance addElement:&color4];
+    [newInstance addElement: &color1];
+    [newInstance addElement: &color2];
+    [newInstance addElement: &color3];
+    [newInstance addElement: &color4];
     
     return [newInstance autorelease];
 }
 
 + (CTGradient *)progressWhiteGradient
 {
-    return [[self class] progressGradientForColor: [NSColor colorWithCalibratedRed: 0.95 green: 0.95 blue: 0.95 alpha: 1.0]];
+    return [[self class] progressGradientForRed: 0.95 green: 0.95 blue: 0.95];
 }
 
 + (CTGradient *)progressGrayGradient
 {
-    return [[self class] progressGradientForColor: [NSColor colorWithCalibratedRed: 0.7 green: 0.7 blue: 0.7 alpha: 1.0]];
+    return [[self class] progressGradientForRed: 0.7 green: 0.7 blue: 0.7];
 }
 
 + (CTGradient *)progressLightGrayGradient
 {
-    return [[self class] progressGradientForColor: [NSColor colorWithCalibratedRed: 0.87 green: 0.87 blue: 0.87 alpha: 1.0]];
+    return [[self class] progressGradientForRed: 0.87 green: 0.87 blue: 0.87];
 }
 
 + (CTGradient *)progressBlueGradient
 {
-    return [[self class] progressGradientForColor: [NSColor colorWithCalibratedRed: 0.373 green: 0.698 blue: 0.972 alpha: 1.0]];
+    return [[self class] progressGradientForRed: 0.373 green: 0.698 blue: 0.972];
 }
 
 + (CTGradient *)progressDarkBlueGradient
 {
-    return [[self class] progressGradientForColor: [NSColor colorWithCalibratedRed: 0.616 green: 0.722 blue: 0.776 alpha: 1.0]];
+    return [[self class] progressGradientForRed: 0.616 green: 0.722 blue: 0.776];
 }
 
 + (CTGradient *)progressGreenGradient
 {
-    return [[self class] progressGradientForColor: [NSColor colorWithCalibratedRed: 0.384 green: 0.847 blue: 0.310 alpha: 1.0]];
+    return [[self class] progressGradientForRed: 0.384 green: 0.847 blue: 0.310];
 }
 
 + (CTGradient *)progressLightGreenGradient
 {
-    return [[self class] progressGradientForColor: [NSColor colorWithCalibratedRed: 0.780 green: 0.894 blue: 0.729 alpha: 1.0]];
+    return [[self class] progressGradientForRed: 0.780 green: 0.894 blue: 0.729];
 }
 
 + (CTGradient *)progressDarkGreenGradient
 {
-    return [[self class] progressGradientForColor: [NSColor colorWithCalibratedRed: 0.627 green: 0.714 blue: 0.639 alpha: 1.0]];
+    return [[self class] progressGradientForRed: 0.627 green: 0.714 blue: 0.639];
 }
 
 + (CTGradient *)progressRedGradient
 {
-    return [[self class] progressGradientForColor: [NSColor colorWithCalibratedRed: 0.902 green: 0.439 blue: 0.451 alpha: 1.0]];
+    return [[self class] progressGradientForRed: 0.902 green: 0.439 blue: 0.451];
 }
 
 + (CTGradient *)progressYellowGradient
 {
-    return [[self class] progressGradientForColor: [NSColor colorWithCalibratedRed: 0.933 green: 0.890 blue: 0.243 alpha: 1.0]];
+    return [[self class] progressGradientForRed: 0.933 green: 0.890 blue: 0.243];
 }
 
 @end
