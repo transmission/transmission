@@ -112,7 +112,8 @@ rpcPulse( int socket UNUSED, short action UNUSED, void * vserver )
 
     assert( server );
 
-    shttpd_poll( server->ctx, 1 );
+    if( server->ctx )
+        shttpd_poll( server->ctx, 1 );
 
     /* set a timer for the next pulse */
     if( EVBUFFER_LENGTH( server->in ) || EVBUFFER_LENGTH( server->out ) )

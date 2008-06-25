@@ -117,7 +117,7 @@ readFromPipe( int fd, short eventType, void * veh )
         {
             assert( 0 && "unhandled command type!" );
             break;
-	}
+        }
     }
 }
 
