@@ -1102,9 +1102,8 @@ typedef enum
 - (BOOL) canQuickLook
 {
     FileOutlineView * fileOutlineView = [fFileController outlineView];
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
     NSIndexSet * indexes = [fileOutlineView selectedRowIndexes];
-
+    
     int i;
     for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
         if ([self canQuickLookFile: [fileOutlineView itemAtRow: i]])

@@ -40,7 +40,7 @@
         fStatus = PORT_STATUS_CHECKING;
         
         fTimer = [NSTimer scheduledTimerWithTimeInterval: CHECK_FIRE target: self selector: @selector(startProbe)
-                        userInfo: nil repeats: NO];
+                    userInfo: nil repeats: NO];
     }
     
     return self;
@@ -124,7 +124,7 @@
         if ([nodes count] == 1)
         {
             NSString * portStatus = [[[[nodes objectAtIndex: 0] stringValue] stringByTrimmingCharactersInSet:
-                                                [[NSCharacterSet letterCharacterSet] invertedSet]] lowercaseString];
+                                        [[NSCharacterSet letterCharacterSet] invertedSet]] lowercaseString];
             
             if ([portStatus isEqualToString: @"open"])
                 [self callBackWithStatus: PORT_STATUS_OPEN];
@@ -140,8 +140,8 @@
         }
         else
         {
-                NSLog(@"Unable to get port status: invalid response");
-                [self callBackWithStatus: PORT_STATUS_ERROR];
+            NSLog(@"Unable to get port status: invalid response");
+            [self callBackWithStatus: PORT_STATUS_ERROR];
         }
         [shieldsUpProbe release];
     }
