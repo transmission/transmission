@@ -568,23 +568,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         NSEnumerator * downloadEnumerator = [[fPendingTorrentDownloads allValues] objectEnumerator];
         NSDictionary * downloadDict;
-        NSURLDownload * download;
         while ((downloadDict = [downloadEnumerator nextObject]))
         {
-            download = [downloadDict objectForKey: @"Download"];
+            NSURLDownload * download = [downloadDict objectForKey: @"Download"];
             [download cancel];
             [download release];
         }
         [fPendingTorrentDownloads removeAllObjects];
-    }
-    
-    //remove all remaining torrent files in the temporary directory
-    if (fTempTorrentFiles)
-    {
-        NSEnumerator * torrentEnumerator = [fTempTorrentFiles objectEnumerator];
-        NSString * path;
-        while ((path = [torrentEnumerator nextObject]))
-            [[NSFileManager defaultManager] removeFileAtPath: path handler: nil];
     }
     
     //remember window states and close all windows
@@ -609,7 +599,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fAutoImportedNames release];
     [fPendingTorrentDownloads release];
-    [fTempTorrentFiles release];
     
     //complete cleanup
     tr_sessionClose(fLib);
@@ -673,6 +662,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [error localizedDescription]], NSLocalizedString(@"OK", "Torrent download failed -> button"), nil, nil);
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
+    if ([fPendingTorrentDownloads count] == 0)
+    {
+        [fPendingTorrentDownloads release];
+        fPendingTorrentDownloads = nil;
+    }
+    
     [download release];
 }
 
@@ -682,13 +677,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [self openFiles: [NSArray arrayWithObject: path] addType: ADD_URL forcePath: nil];
     
-    [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
-    [download release];
+    [[NSFileManager defaultManager] removeFileAtPath: path handler: nil]; //delete the torrent file after opening
     
-    //delete temp torrent file on quit
-    if (!fTempTorrentFiles)
-        fTempTorrentFiles = [[NSMutableArray alloc] init];
-    [fTempTorrentFiles addObject: path];
+    [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
+    if ([fPendingTorrentDownloads count] == 0)
+    {
+        [fPendingTorrentDownloads release];
+        fPendingTorrentDownloads = nil;
+    }
+    
+    [download release];
 }
 
 - (void) application: (NSApplication *) app openFiles: (NSArray *) filenames

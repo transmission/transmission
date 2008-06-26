@@ -113,7 +113,6 @@ typedef enum
     NSTimer                         * fAutoImportTimer;
     
     NSMutableDictionary             * fPendingTorrentDownloads;
-    NSMutableArray                  * fTempTorrentFiles;
     
     BOOL                            fSoundPlaying;
 }
