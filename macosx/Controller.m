@@ -566,7 +566,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //remove all torrent downloads
     if (fPendingTorrentDownloads)
     {
-        NSEnumerator * downloadEnumerator = [[fPendingTorrentDownloads allValues] objectEnumerator];
+        NSEnumerator * downloadEnumerator = [fPendingTorrentDownloads objectEnumerator];
         NSDictionary * downloadDict;
         while ((downloadDict = [downloadEnumerator nextObject]))
         {
