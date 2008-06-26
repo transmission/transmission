@@ -1447,6 +1447,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
 }
 
+- (void) resetInfo
+{
+    [fInfoController setInfoForTorrents: [fTableView selectedTorrents]];
+    [[QuickLookController quickLook] updateQuickLook];
+}
+
 - (void) setInfoTab: (id) sender
 {
     if (sender == fNextInfoTabItem)
@@ -2056,6 +2062,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //actually sort
     [self sortTorrentsIgnoreSelected];
     [fTableView selectValues: selectedValues];
+    [self resetInfo]; //if group is already selected, but the torrents in it change
     
     //reset expanded/collapsed rows
     if (groupRows)
@@ -2775,6 +2782,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         //set selected rows
         [fTableView selectValues: selectedValues];
+        [self resetInfo]; //if group is already selected, but the torrents in it change
     }
     
     return YES;
@@ -2782,8 +2790,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) torrentTableViewSelectionDidChange: (NSNotification *) notification
 {
-    [fInfoController setInfoForTorrents: [fTableView selectedTorrents]];
-    [[QuickLookController quickLook] updateQuickLook];
+    [self resetInfo];
 }
 
 - (NSDragOperation) draggingEntered: (id <NSDraggingInfo>) info

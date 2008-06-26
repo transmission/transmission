@@ -178,6 +178,7 @@ typedef enum
 - (void) showAboutWindow: (id) sender;
 
 - (void) showInfo: (id) sender;
+- (void) resetInfo;
 - (void) setInfoTab: (id) sender;
 
 - (void) showMessageWindow: (id) sender;
