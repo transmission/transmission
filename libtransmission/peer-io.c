@@ -316,6 +316,7 @@ tr_peerIoSetTimeoutSecs( tr_peerIo * io, int secs )
 {
     io->timeout = secs;
     bufferevent_settimeout( io->bufev, io->timeout, io->timeout );
+    bufferevent_enable( io->bufev, EV_READ|EV_WRITE );
 }
 
 /**

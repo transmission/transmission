@@ -30,7 +30,7 @@
 #include "utils.h"
 
 #define GRANULARITY_MSEC 500
-#define SHORT_INTERVAL_MSEC 4000
+#define SHORT_INTERVAL_MSEC 1000
 #define LONG_INTERVAL_MSEC 8000
 #define HISTORY_SIZE (LONG_INTERVAL_MSEC / GRANULARITY_MSEC)
 
@@ -56,7 +56,7 @@ rateForInterval( const tr_ratecontrol * r, int interval_msec )
     int i = r->newest;
     for( ;; )
     {
-        if( r->transfers[i].date < cutoff )
+        if( r->transfers[i].date <= cutoff )
             break;
 
         bytes += r->transfers[i].size;

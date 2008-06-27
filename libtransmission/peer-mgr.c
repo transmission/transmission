@@ -60,7 +60,7 @@ enum
     RECONNECT_PERIOD_MSEC = (2 * 1000),
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
-    MAX_RECONNECTIONS_PER_PULSE = 1,
+    MAX_RECONNECTIONS_PER_PULSE = 4,
 
     /* max number of peers to ask for per second overall.
      * this throttle is to avoid overloading the router */
@@ -1537,7 +1537,16 @@ compareChoke( const void * va, const void * vb )
 {
     const struct ChokeData * a = va;
     const struct ChokeData * b = vb;
-    return -tr_compareUint32( a->rate, b->rate );
+    int diff = 0;
+
+    if( diff == 0 ) /* prefer higher dl speeds */
+        diff = -tr_compareDouble( a->peer->rateToClient, b->peer->rateToClient );
+    if( diff == 0 ) /* prefer higher ul speeds */
+        diff = -tr_compareDouble( a->peer->rateToPeer, b->peer->rateToPeer );
+    if( diff == 0 ) /* prefer unchoked */
+        diff = (int)a->peer->peerIsChoked - (int)b->peer->peerIsChoked;
+
+    return diff;
 }
 
 static int

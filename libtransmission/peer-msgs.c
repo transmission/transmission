@@ -1325,7 +1325,6 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_INTERESTED:
             dbgmsg( msgs, "got Interested" );
             msgs->info->peerIsInterested = 1;
-            tr_peerMsgsSetChoke( msgs, 0 );
             break;
 
         case BT_NOT_INTERESTED:
@@ -1734,7 +1733,7 @@ static void
 gotError( struct bufferevent * evbuf UNUSED, short what, void * vmsgs )
 {
     if( what & EVBUFFER_TIMEOUT )
-        dbgmsg( vmsgs, "libevent got a timeout, what=%hd", what );
+        dbgmsg( vmsgs, "libevent got a timeout, what=%hd, secs=%d", what, evbuf->timeout_read );
     if( what & ( EVBUFFER_EOF | EVBUFFER_ERROR ) )
         dbgmsg( vmsgs, "libevent got an error! what=%hd, errno=%d (%s)",
                 what, errno, tr_strerror(errno) );
