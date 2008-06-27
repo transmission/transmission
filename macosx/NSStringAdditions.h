@@ -39,6 +39,6 @@
 + (NSString *) timeString: (NSUInteger) seconds showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max;
 
 - (NSComparisonResult) compareFinder: (NSString *) string; //how the Finder compares strings
-- (NSComparisonResult) compareIP: (NSString *) string;
+- (NSComparisonResult) compareNumeric: (NSString *) string; //simple compare method for strings with numbers (works for IP addresses)
 
 @end

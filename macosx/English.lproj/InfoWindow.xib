@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1039"/>
+			<integer value="1042"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2287,10 +2287,10 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 												<int key="NSResizingMask">2</int>
 												<bool key="NSIsResizeable">YES</bool>
 												<reference key="NSTableView" ref="221969066"/>
-												<object class="NSSortDescriptor" key="NSSortDescriptorPrototype" id="631031026">
+												<object class="NSSortDescriptor" key="NSSortDescriptorPrototype">
 													<string key="NSKey">IP</string>
 													<bool key="NSAscending">YES</bool>
-													<string key="NSSelector">compareIP:</string>
+													<string key="NSSelector">compareNumeric:</string>
 												</object>
 											</object>
 											<object class="NSTableColumn" id="510868589">
@@ -3851,7 +3851,6 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 										<string key="NSAutosaveName">InspectorTable</string>
 										<object class="NSArray" key="NSSortDescriptors">
 											<bool key="EncodedWithXMLCoder">YES</bool>
-											<reference ref="631031026"/>
 											<reference ref="116573225"/>
 										</object>
 										<int key="NSColumnAutoresizingStyle">1</int>

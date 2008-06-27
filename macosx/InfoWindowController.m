@@ -1592,7 +1592,7 @@ typedef enum
     if (useSecond)
     {
         NSSortDescriptor * secondDescriptor = [[NSSortDescriptor alloc] initWithKey: @"IP" ascending: asc
-                                                                        selector: @selector(compareIP:)];
+                                                                        selector: @selector(compareFinder:)];
         [descriptors addObject: secondDescriptor];
         [secondDescriptor release];
     }
