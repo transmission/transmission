@@ -947,8 +947,8 @@
                                         [oldDict objectForKey: @"Allow"], @"Allow", nil];
             [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
             
-            NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"IP" ascending: YES selector: @selector(compareIP:)]
-                                                autorelease];
+            NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"IP" ascending: YES
+                                                selector: @selector(compareNumeric:)] autorelease];
             [fRPCAccessArray sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
         }
         else
