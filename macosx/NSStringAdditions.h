@@ -38,6 +38,7 @@
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds;
 + (NSString *) timeString: (NSUInteger) seconds showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max;
 
+- (NSComparisonResult) compareFinder: (NSString *) string; //how the Finder compares strings
 - (NSComparisonResult) compareIP: (NSString *) string;
 
 @end

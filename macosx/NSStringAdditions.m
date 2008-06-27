@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "NSStringAdditions.h"
+#import "NSApplicationAdditions.h"
 #import <transmission.h>
 
 @implementation NSString (NSStringAdditions)
@@ -144,8 +145,16 @@
     return [timeArray componentsJoinedByString: @" "];
 }
 
-- (NSComparisonResult) compareIP: (NSString *) string
+- (NSComparisonResult) compareFinder: (NSString *) string
 {
+    int comparisonOptions = ![NSApp isOnLeopardOrBetter] ? (NSCaseInsensitiveSearch | NSNumericSearch)
+        : (NSCaseInsensitiveSearch | NSNumericSearch| NSWidthInsensitiveSearch | NSForcedOrderingSearch);
+    
+    return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
+}
+
+- (NSComparisonResult) compareIP: (NSString *) string
+{    
     NSArray * selfSections = [self componentsSeparatedByString: @"."],
             * newSections = [string componentsSeparatedByString: @"."];
     
@@ -154,9 +163,11 @@
 
     NSEnumerator * selfSectionsEnum = [selfSections objectEnumerator], * newSectionsEnum = [newSections objectEnumerator];
     NSString * selfString, * newString;
+    int comparisonOptions = [NSApp isOnLeopardOrBetter] ? (NSNumericSearch | NSForcedOrderingSearch) : NSNumericSearch;
     NSComparisonResult result;
     while ((selfString = [selfSectionsEnum nextObject]) && (newString = [newSectionsEnum nextObject]))
-        if ((result = [selfString compare: newString options: NSNumericSearch]) != NSOrderedSame)
+        if ((result = [selfString compare: newString options: comparisonOptions
+                        range: NSMakeRange(0, [selfString length]) locale: [NSLocale currentLocale]]) != NSOrderedSame)
             return result;
     
     return NSOrderedSame;
