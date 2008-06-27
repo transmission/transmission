@@ -603,7 +603,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //complete cleanup
     tr_sessionClose(fLib);
     
-    [fBadger release]; //clears dock icon on 10.4
+    [fBadger release]; //clears dock icon on Tiger
 }
 
 - (void) handleOpenContentsEvent: (NSAppleEventDescriptor *) event replyEvent: (NSAppleEventDescriptor *) replyEvent
@@ -677,7 +677,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [self openFiles: [NSArray arrayWithObject: path] addType: ADD_URL forcePath: nil];
     
-    [[NSFileManager defaultManager] removeFileAtPath: path handler: nil]; //delete the torrent file after opening
+    //delete the torrent file after opening
+    if ([NSApp isOnLeopardOrBetter])
+        [[NSFileManager defaultManager] removeItemAtPath: path error: NULL];
+    else
+        [[NSFileManager defaultManager] removeFileAtPath: path handler: nil];
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
     if ([fPendingTorrentDownloads count] == 0)
@@ -1816,14 +1820,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else if ([sortType isEqualToString: SORT_NAME])
     {
         NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
-                                                selector: @selector(caseInsensitiveCompare:)] autorelease];
+                                                selector: @selector(localizedCaseInsensitiveCompare:)] autorelease];
         
         descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, orderDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_STATE])
     {
         NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
-                                                selector: @selector(caseInsensitiveCompare:)] autorelease],
+                                                selector: @selector(localizedCaseInsensitiveCompare:)] autorelease],
                         * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"stateSortKey" ascending: !asc] autorelease],
                         * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"progress" ascending: !asc] autorelease],
                         * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"ratio" ascending: !asc] autorelease];
@@ -1834,7 +1838,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else if ([sortType isEqualToString: SORT_PROGRESS])
     {
         NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
-                                                selector: @selector(caseInsensitiveCompare:)] autorelease],
+                                                selector: @selector(localizedCaseInsensitiveCompare:)] autorelease],
                         * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"progress" ascending: asc] autorelease],
                         * ratioProgressDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"progressStopRatio"
                                                         ascending: asc] autorelease],
@@ -1846,9 +1850,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else if ([sortType isEqualToString: SORT_TRACKER])
     {
         NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
-                                                selector: @selector(caseInsensitiveCompare:)] autorelease],
+                                                selector: @selector(localizedCaseInsensitiveCompare:)] autorelease],
                         * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddressAnnounce" ascending: asc
-                                                selector: @selector(caseInsensitiveCompare:)] autorelease];
+                                                selector: @selector(localizedCaseInsensitiveCompare:)] autorelease];
         
         descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, orderDescriptor, nil];
     }
@@ -2780,7 +2784,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         //set selected rows
         [fTableView selectValues: selectedValues];
-        [self resetInfo]; //if group is already selected, but the torrents in it change
     }
     
     return YES;
