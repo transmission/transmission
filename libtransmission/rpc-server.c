@@ -23,6 +23,7 @@
 #include <shttpd/shttpd.h>
 
 #include "transmission.h"
+#include "bencode.h"
 #include "rpc.h"
 #include "rpc-server.h"
 #include "utils.h"
@@ -50,6 +51,132 @@ struct tr_rpc_server
 };
 
 #define dbgmsg(fmt...) tr_deepLog(__FILE__, __LINE__, MY_NAME, ##fmt )
+
+static const char*
+tr_memmem( const char * s1, size_t l1,
+           const char * s2, size_t l2 )
+{
+        if (!l2) return s1;
+        while (l1 >= l2) {
+                l1--;
+                if (!memcmp(s1,s2,l2))
+                        return s1;
+                s1++;
+        }
+        return NULL;
+}
+
+static void
+handle_upload( struct shttpd_arg * arg )
+{
+    struct tr_rpc_server * s = arg->user_data;
+    s->lastRequestTime = time( NULL );
+
+    /* if we haven't parsed the POST, do that now */
+    if( !EVBUFFER_LENGTH( s->out ) )
+    {
+        /* if we haven't finished reading the POST, read more now */
+        if( arg->in.len ) {
+            evbuffer_add( s->in, arg->in.buf, arg->in.len );
+            arg->in.num_bytes = arg->in.len;
+        }
+        if( arg->flags & SHTTPD_MORE_POST_DATA )
+            return;
+
+        const char * query_string = shttpd_get_env( arg, "QUERY_STRING" );
+        const char * content_type = shttpd_get_header( arg, "Content-Type" );
+        const char * delim;
+        const char * in = (const char *) EVBUFFER_DATA( s->in );
+        size_t inlen = EVBUFFER_LENGTH( s->in );
+        char * boundary = tr_strdup_printf( "--%s", strstr( content_type, "boundary=" ) + strlen( "boundary=" ) );
+        const size_t boundary_len = strlen( boundary );
+        char buf[64];
+        int paused = TRUE;
+#if 0
+        int paused = ( query_string != NULL )
+                  && ( shttpd_get_var( "paused", query_string, strlen( query_string ), buf, sizeof( buf ) ) == 4 )
+                  && ( !strcmp( buf, "true" ) );
+#endif
+
+        delim = tr_memmem( in, inlen, boundary, boundary_len );
+        if( delim ) do
+        {
+            size_t part_len;
+            const char * part = delim + boundary_len;
+            inlen -= ( part - in );
+            in = part;
+            delim = tr_memmem( in, inlen, boundary, boundary_len );
+            part_len = delim ? (size_t)(delim-part) : inlen;
+#if 0
+            fprintf( stderr, "part_len is %d\n", (int)part_len );
+            fprintf( stderr, "part is [%*.*s]\n", (int)part_len, (int)part_len, part );
+#endif
+
+            if( part_len )
+            {
+                char * text = tr_strndup( part, part_len );
+                if( strstr( text, "filename=\"" ) )
+                {
+                    const char * body = strstr( text, "\r\n\r\n" );
+                    if( body )
+                    {
+                        int err;
+                        tr_ctor * ctor;
+                        size_t body_len;
+                        body += 4;
+                        body_len = part_len - ( body - text );
+                        if( body_len >= 2 && !memcmp(&body[body_len-2],"\r\n",2) )
+                            body_len -= 2;
+                        
+#if 0
+                        fprintf( stderr, "body_len is %d\n", (int)body_len );
+                        fprintf( stderr, "body is [%*.*s]\n", (int)body_len, (int)body_len, body );
+#endif
+
+                        ctor = tr_ctorNew( s->session );
+                        tr_ctorSetMetainfo( ctor, (void*)body, body_len );
+                        tr_ctorSetPaused( ctor, TR_FORCE, paused );
+                        tr_torrentNew( s->session, ctor, &err );
+                        tr_ctorFree( ctor );
+                    }
+                }
+                tr_free( text );
+            }
+        }
+        while( delim );
+
+        evbuffer_drain( s->in, EVBUFFER_LENGTH( s->in ) );
+        tr_free( boundary );
+
+        {
+            int len;
+            char * response;
+            tr_benc top;
+            tr_bencInitDict( &top, 2 );
+            tr_bencDictAddStr( &top, "result", "success" );
+            tr_bencDictAddDict( &top, "arguments", 0 );
+            response = tr_bencSaveAsJSON( &top, &len );
+            evbuffer_add_printf( s->out, "HTTP/1.1 200 OK\r\n"
+                                         "Content-Type: application/json\r\n"
+                                         "Content-Length: %d\r\n"
+                                         "\r\n"
+                                         "%*.*s", len, len, len, response );
+            tr_free( response );
+            tr_bencFree( &top );
+        }
+    }
+
+    if( EVBUFFER_LENGTH( s->out ) )
+    {
+        const int n = MIN( ( int )EVBUFFER_LENGTH( s->out ), arg->out.len );
+        memcpy( arg->out.buf, EVBUFFER_DATA( s->out ), n );
+        evbuffer_drain( s->out, n );
+        arg->out.num_bytes = n;
+    }
+
+    if( !EVBUFFER_LENGTH( s->out ) )
+        arg->flags |= SHTTPD_END_OF_OUTPUT;
+}
 
 static void
 handle_rpc( struct shttpd_arg * arg )
@@ -86,7 +213,7 @@ handle_rpc( struct shttpd_arg * arg )
                                      "Content-Type: application/json\r\n"
                                      "Content-Length: %d\r\n"
                                      "\r\n"
-                                     "%*.*s\r\n", len, len, len, response );
+                                     "%*.*s", len, len, len, response );
         tr_free( response );
     }
 
@@ -159,6 +286,7 @@ startServer( tr_rpc_server * server )
         server->ctx = shttpd_init( );
         snprintf( ports, sizeof( ports ), "%d", server->port );
         shttpd_register_uri( server->ctx, "/transmission/rpc", handle_rpc, server );
+        shttpd_register_uri( server->ctx, "/transmission/upload", handle_upload, server );
         shttpd_set_option(server->ctx, "aliases", clutchAlias );
         shttpd_set_option( server->ctx, "ports", ports );
         shttpd_set_option( server->ctx, "dir_list", "0" );
@@ -169,7 +297,8 @@ startServer( tr_rpc_server * server )
             shttpd_set_option( server->ctx, "acl", server->acl );
         }
         if( server->isPasswordEnabled ) {
-            char * buf = tr_strdup_printf( "/transmission/rpc=%s", passwd );
+            char * buf = tr_strdup_printf( "/transmission/rpc=%s,"
+                                           "/transmission/upload=%s", passwd, passwd );
             shttpd_set_option( server->ctx, "protect", buf );
             tr_free( buf );
         }
