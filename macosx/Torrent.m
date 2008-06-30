@@ -1587,14 +1587,14 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fStalled;
 }
 
-- (NSNumber *) stateSortKey
+- (NSInteger) stateSortKey
 {
-    if (![self isActive])
-        return [NSNumber numberWithInt: 0];
-    else if ([self isSeeding])
-        return [NSNumber numberWithInt: 1];
-    else
-        return [NSNumber numberWithInt: 2];
+    if (![self isActive]) //paused
+        return 0;
+    else if ([self isSeeding]) //seeding
+        return 1;
+    else //downloading
+        return 2;
 }
 
 - (tr_torrent *) torrentStruct

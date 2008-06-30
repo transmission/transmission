@@ -1787,7 +1787,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 													<object class="NSSortDescriptor" key="NSSortDescriptorPrototype">
 														<string key="NSKey">Message</string>
 														<bool key="NSAscending">YES</bool>
-														<string key="NSSelector">localizedCaseInsensitiveCompare:</string>
+														<string key="NSSelector">compareFinder:</string>
 													</object>
 												</object>
 											</object>

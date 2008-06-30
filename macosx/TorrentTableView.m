@@ -263,8 +263,7 @@
         
         NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: row] forKey: @"Row"];
         TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: -1 row: row];
-        [cell addTrackingAreasForView: self inRect: [self rectOfRow: row] withUserInfo: userInfo
-                mouseLocation: mouseLocation];
+        [cell addTrackingAreasForView: self inRect: [self rectOfRow: row] withUserInfo: userInfo mouseLocation: mouseLocation];
     }
 }
 

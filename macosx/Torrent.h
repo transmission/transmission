@@ -255,7 +255,7 @@ typedef enum
 - (int) stalledMinutes;
 - (BOOL) isStalled;
 
-- (NSNumber *) stateSortKey;
+- (NSInteger) stateSortKey;
 
 - (tr_torrent *) torrentStruct;
 
