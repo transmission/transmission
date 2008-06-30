@@ -29,23 +29,23 @@
 + (CTGradient *) progressGradientForRed: (float) redComponent green: (float) greenComponent blue: (float) blueComponent
 {
     CTGradientElement color1;
-    color1.red = redComponent * 0.95;
-    color1.green = greenComponent * 0.95;
-    color1.blue = blueComponent * 0.95;
+    color1.red = redComponent;
+    color1.green = greenComponent;
+    color1.blue = blueComponent;
     color1.alpha = 1.0;
     color1.position = 0.0;
     
     CTGradientElement color2;
-    color2.red = redComponent;
-    color2.green = greenComponent;
-    color2.blue = blueComponent;
+    color2.red = redComponent * 0.95;
+    color2.green = greenComponent * 0.95;
+    color2.blue = blueComponent * 0.95;
     color2.alpha = 1.0;
     color2.position = 0.5;
     
     CTGradientElement color3;
-    color3.red = redComponent * 0.8;
-    color3.green = greenComponent * 0.8;
-    color3.blue = blueComponent * 0.8;
+    color3.red = redComponent * 0.85;
+    color3.green = greenComponent * 0.85;
+    color3.blue = blueComponent * 0.85;
     color3.alpha = 1.0;
     color3.position = 0.5;
     
@@ -93,7 +93,7 @@ CTGradient * fProgressBlueGradient = nil;
 + (CTGradient *)progressBlueGradient
 {
     if (!fProgressBlueGradient)
-        fProgressBlueGradient = [[[self class] progressGradientForRed: 0.373 green: 0.698 blue: 0.972] retain];
+        fProgressBlueGradient = [[[self class] progressGradientForRed: 0.35 green: 0.67 blue: 0.98] retain];
     return fProgressBlueGradient;
 }
 
@@ -109,7 +109,7 @@ CTGradient * fProgressGreenGradient = nil;
 + (CTGradient *)progressGreenGradient
 {
     if (!fProgressGreenGradient)
-        fProgressGreenGradient = [[[self class] progressGradientForRed: 0.384 green: 0.847 blue: 0.310] retain];
+        fProgressGreenGradient = [[[self class] progressGradientForRed: 0.44 green: 0.89 blue: 0.40] retain];
     return fProgressGreenGradient;
 }
 
@@ -117,7 +117,7 @@ CTGradient * fProgressLightGreenGradient = nil;
 + (CTGradient *)progressLightGreenGradient
 {
     if (!fProgressLightGreenGradient)
-        fProgressLightGreenGradient = [[[self class] progressGradientForRed: 0.780 green: 0.894 blue: 0.729] retain];
+        fProgressLightGreenGradient = [[[self class] progressGradientForRed: 0.62 green: 0.99 blue: 0.58] retain];
     return fProgressLightGreenGradient;
 }
 
