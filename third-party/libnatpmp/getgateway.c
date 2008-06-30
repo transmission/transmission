@@ -24,20 +24,14 @@
  * Many systems should provide route information through raw PF_ROUTE
  * sockets. */
 #ifdef __linux__
-#define USE_PROC_NET_ROUTE
-#endif
-
-#ifdef BSD
-/*#define USE_SYSCTL_NET_ROUTE*/
-#define USE_SOCKET_ROUTE
-#endif
-
-#ifdef __APPLE__
-#define USE_SYSCTL_NET_ROUTE
-#endif
-
-#if (defined(sun) && defined(__SVR4))
-#define USE_SOCKET_ROUTE
+  #define USE_PROC_NET_ROUTE
+#elif defined(__APPLE__)
+  #define USE_SYSCTL_NET_ROUTE
+#elif defined(BSD)
+  /*#define USE_SYSCTL_NET_ROUTE*/
+  #define USE_SOCKET_ROUTE
+#elif (defined(sun) && defined(__SVR4))
+  #define USE_SOCKET_ROUTE
 #endif
 
 #ifdef USE_SYSCTL_NET_ROUTE
