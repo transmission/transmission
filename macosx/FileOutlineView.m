@@ -116,8 +116,12 @@
 
 - (NSRect) iconRectForRow: (int) row
 {
-    FileNameCell * cell = (FileNameCell *)[[self tableColumnWithIdentifier: @"Name"] dataCell];
-    return [cell imageRectForBounds: [self rectOfRow: row]];
+    FileNameCell * cell = (FileNameCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Name"] row: row];
+    NSRect iconRect = [cell imageRectForBounds: [self rectOfRow: row]];
+    
+    iconRect.origin.x += [self frameOfOutlineCellAtRow: row].size.width;
+    iconRect.origin.x += [self indentationPerLevel] * (float)([self levelForRow: row] + ([[self itemAtRow: row] isFolder] ? 0 : 1));
+    return iconRect;
 }
 
 - (void) updateTrackingAreas
