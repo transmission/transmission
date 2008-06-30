@@ -42,7 +42,7 @@
     long long fExpectedSize;
 }
 
-+ (id) downloadWithPrefsController: (PrefsController *) prefsController;
++ (void) downloadWithPrefsController: (PrefsController *) prefsController; //only use when no other blocklist downloads
 
 - (void) cancelDownload: (id) sender;
 

@@ -42,7 +42,7 @@
 
 @implementation BlocklistDownloader
 
-+ (id) downloadWithPrefsController: (PrefsController *) prefsController
++ (void) downloadWithPrefsController: (PrefsController *) prefsController
 {
     BlocklistDownloader * downloader = [[BlocklistDownloader alloc] initWithPrefsController: prefsController];
     [downloader startDownload];

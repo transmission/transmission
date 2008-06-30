@@ -156,7 +156,7 @@ GroupsController * fGroupsInstance = nil;
     return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"Color"] : nil;
 }
 
-- (NSColor *) setColor: (NSColor *) color forIndex: (int) index
+- (void) setColor: (NSColor *) color forIndex: (int) index
 {
     NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
     [dict removeObjectForKey: @"Icon"];
