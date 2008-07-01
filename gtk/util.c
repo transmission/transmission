@@ -118,48 +118,44 @@ tr_strlspeed( char * buf, double kb_sec, size_t buflen )
 char*
 tr_strltime( char * buf, int seconds, size_t buflen )
 {
-    int hours;
-    int days;
+    int days, hours, minutes;
+    char d[128], h[128], m[128], s[128];
 
     if( seconds < 0 )
         seconds = 0;
 
-    if( seconds < 60 )
-    {
-        g_snprintf( buf, buflen, ngettext( "%'d second", "%'d seconds", (int)seconds ), (int) seconds );
-        return buf;
+    days = seconds / 86400;
+    hours = (seconds % 86400) / 3600;
+    minutes = (seconds % 3600) / 60;
+    seconds = (seconds % 3600) % 60;
+
+    g_snprintf( d, sizeof( d ), ngettext( "%'d day", "%'d days", days ), days );
+    g_snprintf( h, sizeof( h ), ngettext( "%'d hour", "%'d hours", hours ), hours );
+    g_snprintf( m, sizeof( m ), ngettext( "%'d minute", "%'d minutes", minutes ), minutes );
+    g_snprintf( s, sizeof( s ), ngettext( "%'d second", "%'d seconds", seconds ), seconds );
+
+    if( days ) {
+        if( days >= 4 || !hours ) {
+            g_strlcpy( buf, d, buflen );
+        } else {
+            g_snprintf( buf, buflen, "%s, %s", d, h );
+        }
+    } else if( hours ) {
+        if( hours >= 4 || !minutes ) {
+            g_strlcpy( buf, h, buflen );
+        } else {
+            g_snprintf( buf, buflen, "%s, %s", h, m );
+        }
+    } else if( minutes ) {
+        if( minutes >= 4 || !seconds ) {
+            g_strlcpy( buf, m, buflen );
+        } else {
+            g_snprintf( buf, buflen, "%s, %s", m, s );
+        }
+    } else {
+        g_strlcpy( buf, s, buflen );
     }
 
-    if( seconds < ( 60 * 60 ) )
-    {
-        const int minutes = ( seconds + 30 ) / 60;
-        g_snprintf( buf, buflen, ngettext( "%'d minute", "%'d minutes", minutes ), minutes );
-        return buf;
-    }
-
-    hours = seconds / ( 60 * 60 );
-
-    if( seconds < ( 60 * 60 * 4 ) )
-    {
-        char h[64];
-        char m[64];
-
-        const int minutes = ( seconds - hours * 60 * 60 + 30 ) / 60;
-
-        g_snprintf( h, sizeof(h), ngettext( "%'d hour", "%'d hours", hours ), hours );
-        g_snprintf( m, sizeof(m), ngettext( "%'d minute", "%'d minutes", minutes ), minutes );
-        g_snprintf( buf, buflen, "%s, %s", h, m );
-        return buf;
-    }
-
-    if( hours < 24 )
-    {
-        g_snprintf( buf, buflen, ngettext( "%'d hour", "%'d hours", hours ), hours );
-        return buf;
-    }
-
-    days = seconds / ( 60 * 60 * 24 );
-    g_snprintf( buf, buflen, ngettext( "%'d day", "%'d days", days ), days );
     return buf;
 }
 
