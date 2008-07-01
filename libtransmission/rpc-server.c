@@ -76,10 +76,8 @@ handle_upload( struct shttpd_arg * arg )
     if( !EVBUFFER_LENGTH( s->out ) )
     {
         /* if we haven't finished reading the POST, read more now */
-        if( arg->in.len ) {
-            evbuffer_add( s->in, arg->in.buf, arg->in.len );
-            arg->in.num_bytes = arg->in.len;
-        }
+        evbuffer_add( s->in, arg->in.buf, arg->in.len );
+        arg->in.num_bytes = arg->in.len;
         if( arg->flags & SHTTPD_MORE_POST_DATA )
             return;
 
@@ -91,12 +89,9 @@ handle_upload( struct shttpd_arg * arg )
         char * boundary = tr_strdup_printf( "--%s", strstr( content_type, "boundary=" ) + strlen( "boundary=" ) );
         const size_t boundary_len = strlen( boundary );
         char buf[64];
-        int paused = TRUE;
-#if 0
         int paused = ( query_string != NULL )
                   && ( shttpd_get_var( "paused", query_string, strlen( query_string ), buf, sizeof( buf ) ) == 4 )
                   && ( !strcmp( buf, "true" ) );
-#endif
 
         delim = tr_memmem( in, inlen, boundary, boundary_len );
         if( delim ) do
@@ -107,10 +102,6 @@ handle_upload( struct shttpd_arg * arg )
             in = part;
             delim = tr_memmem( in, inlen, boundary, boundary_len );
             part_len = delim ? (size_t)(delim-part) : inlen;
-#if 0
-            fprintf( stderr, "part_len is %d\n", (int)part_len );
-            fprintf( stderr, "part is [%*.*s]\n", (int)part_len, (int)part_len, part );
-#endif
 
             if( part_len )
             {
@@ -128,11 +119,6 @@ handle_upload( struct shttpd_arg * arg )
                         if( body_len >= 2 && !memcmp(&body[body_len-2],"\r\n",2) )
                             body_len -= 2;
                         
-#if 0
-                        fprintf( stderr, "body_len is %d\n", (int)body_len );
-                        fprintf( stderr, "body is [%*.*s]\n", (int)body_len, (int)body_len, body );
-#endif
-
                         ctor = tr_ctorNew( s->session );
                         tr_ctorSetMetainfo( ctor, (void*)body, body_len );
                         tr_ctorSetPaused( ctor, TR_FORCE, paused );
@@ -149,20 +135,15 @@ handle_upload( struct shttpd_arg * arg )
         tr_free( boundary );
 
         {
-            int len;
-            char * response;
-            tr_benc top;
-            tr_bencInitDict( &top, 2 );
-            tr_bencDictAddStr( &top, "result", "success" );
-            tr_bencDictAddDict( &top, "arguments", 0 );
-            response = tr_bencSaveAsJSON( &top, &len );
+            /* use xml here because json responses to file uploads is trouble.
+             * see http://www.malsup.com/jquery/form/#sample7 for details */
+            const char * response = "<result>success</result>";
+            const int len = strlen( response );
             evbuffer_add_printf( s->out, "HTTP/1.1 200 OK\r\n"
-                                         "Content-Type: application/json\r\n"
+                                         "Content-Type: text/xml\r\n"
                                          "Content-Length: %d\r\n"
                                          "\r\n"
-                                         "%*.*s", len, len, len, response );
-            tr_free( response );
-            tr_bencFree( &top );
+                                         "%s\r\n", len, response );
         }
     }
 
