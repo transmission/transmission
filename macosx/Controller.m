@@ -26,6 +26,7 @@
 
 #import "Controller.h"
 #import "Torrent.h"
+#import "TorrentGroup.h"
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
 #import "CreatorWindowController.h"
@@ -1888,9 +1889,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([fDefaults boolForKey: @"SortByGroup"] && [NSApp isOnLeopardOrBetter])
     {
         NSEnumerator * enumerator = [fDisplayedTorrents objectEnumerator];
-        NSDictionary * dict;
-        while ((dict = [enumerator nextObject]))
-            [[dict objectForKey: @"Torrents"] sortUsingDescriptors: descriptors];
+        TorrentGroup * group;
+        while ((group = [enumerator nextObject]))
+            [[group torrents] sortUsingDescriptors: descriptors];
     }
     else
         [fDisplayedTorrents sortUsingDescriptors: descriptors];
@@ -1909,9 +1910,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         previousTorrents = [NSMutableArray array];
         
         NSEnumerator * enumerator = [fDisplayedTorrents objectEnumerator];
-        NSDictionary * dict;
-        while ((dict = [enumerator nextObject]))
-            [previousTorrents addObjectsFromArray: [dict objectForKey: @"Torrents"]];
+        TorrentGroup * group;
+        while ((group = [enumerator nextObject]))
+            [previousTorrents addObjectsFromArray: [group torrents]];
     }
     else
         previousTorrents = fDisplayedTorrents;
@@ -2047,10 +2048,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             int groupValue = [torrent groupValue];
             if (groupValue != oldGroupValue)
             {
-                groupTorrents = [NSMutableArray array];
-                NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt: groupValue], @"Group",
-                                        groupTorrents, @"Torrents", nil];
-                [fDisplayedTorrents addObject: dict];
+                TorrentGroup * group = [TorrentGroup groupForIndex: groupValue];
+                [fDisplayedTorrents addObject: group];
+                groupTorrents = [group torrents];
                 
                 oldGroupValue = groupValue;
             }
@@ -2070,13 +2070,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (groupRows)
     {
         enumerator = [fDisplayedTorrents objectEnumerator];
-        NSDictionary * dict;
-        while ((dict = [enumerator nextObject]))
+        TorrentGroup * group;
+        while ((group = [enumerator nextObject]))
         {
-            if ([fTableView isGroupCollapsed: [[dict objectForKey: @"Group"] intValue]])
-                [fTableView collapseItem: dict];
+            if ([fTableView isGroupCollapsed: [group groupIndex]])
+                [fTableView collapseItem: group];
             else
-                [fTableView expandItem: dict];
+                [fTableView expandItem: group];
         }
     }
     
@@ -2576,7 +2576,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (NSInteger) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
 {
     if (item)
-        return [[item objectForKey: @"Torrents"] count];
+        return [[item torrents] count];
     else
         return [fDisplayedTorrents count];
 }
@@ -2584,7 +2584,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (id) outlineView: (NSOutlineView *) outlineView child: (NSInteger) index ofItem: (id) item
 {
     if (item)
-        return [[item objectForKey: @"Torrents"] objectAtIndex: index];
+        return [[item torrents] objectAtIndex: index];
     else
         return [fDisplayedTorrents objectAtIndex: index];
 }
@@ -2603,13 +2603,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSString * ident = [tableColumn identifier];
         if ([ident isEqualToString: @"Group"])
         {
-            int group = [[item objectForKey: @"Group"] intValue];
+            int group = [item groupIndex];
             return group != -1 ? [[GroupsController groups] nameForIndex: group]
                                 : NSLocalizedString(@"No Group", "Group table row");
         }
         else if ([ident isEqualToString: @"Color"])
         {
-            int group = [[item objectForKey: @"Group"] intValue];
+            int group = [item groupIndex];
             return [[GroupsController groups] imageForIndex: group];
         }
         else if ([ident isEqualToString: @"DL Image"])
@@ -2622,7 +2622,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             if ([fDefaults boolForKey: @"DisplayGroupRowRatio"])
             {
                 uint64_t uploaded = 0, downloaded = 0;
-                NSEnumerator * enumerator = [[item objectForKey: @"Torrents"] objectEnumerator];
+                NSEnumerator * enumerator = [[item torrents] objectEnumerator];
                 Torrent * torrent;
                 while ((torrent = [enumerator nextObject]))
                 {
@@ -2637,7 +2637,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 BOOL upload = [ident isEqualToString: @"UL"];
                 
                 float rate = 0.0;
-                NSEnumerator * enumerator = [[item objectForKey: @"Torrents"] objectEnumerator];
+                NSEnumerator * enumerator = [[item torrents] objectEnumerator];
                 Torrent * torrent;
                 while ((torrent = [enumerator nextObject]))
                     rate += upload ? [torrent uploadRate] : [torrent downloadRate];
@@ -2687,8 +2687,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             {
                 if ([item isKindOfClass: [Torrent class]])
                 {
-                    NSDictionary * group = [fTableView parentForItem: item];
-                    index = [[group objectForKey: @"Torrents"] indexOfObject: item] + 1;
+                    TorrentGroup * group = [fTableView parentForItem: item];
+                    index = [[group torrents] indexOfObject: item] + 1;
                     item = group;
                 }
             }
@@ -2736,14 +2736,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (item)
         {
             //change groups
-            int groupValue = [[item objectForKey: @"Group"] intValue];
+            int groupValue = [item groupIndex];
             NSEnumerator * enumerator = [movingTorrents objectEnumerator];
             Torrent * torrent;
             while ((torrent = [enumerator nextObject]))
             {
                 //have to reset objects here to avoid weird crash
-                [[[fTableView parentForItem: torrent] objectForKey: @"Torrent"] removeObject: torrent];
-                [[item objectForKey: @"Torrent"] addObject: torrent];
+                [[[fTableView parentForItem: torrent] torrents] removeObject: torrent];
+                [[item torrents] addObject: torrent];
                 
                 [torrent setGroupValue: groupValue];
             }
@@ -2755,7 +2755,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (newRow != NSOutlineViewDropOnItemIndex)
         {
             //find torrent to place under
-            NSArray * groupTorrents = item ? [item objectForKey: @"Torrents"] : fDisplayedTorrents;
+            NSArray * groupTorrents = item ? [item torrents] : fDisplayedTorrents;
             Torrent * topTorrent = nil;
             for (i = newRow-1; i >= 0; i--)
             {

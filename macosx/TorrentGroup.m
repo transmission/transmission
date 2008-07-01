@@ -1,6 +1,6 @@
 /******************************************************************************
  * $Id$
- *
+ * 
  * Copyright (c) 2008 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -22,28 +22,49 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
-#import <transmission.h>
+#import "TorrentGroup.h"
 
-@class PrefsController;
+@interface TorrentGroup (Private)
 
-@interface BlocklistDownloader : NSObject
-{    
-    PrefsController * fPrefsController;
-    
-    IBOutlet NSWindow * fStatusWindow;
-    IBOutlet NSProgressIndicator * fProgressBar;
-    IBOutlet NSTextField * fTextField;
-    IBOutlet NSButton * fButton;
-    
-    NSURLDownload * fDownload;
-    
-    NSUInteger fCurrentSize;
-    long long fExpectedSize;
+- (id) initWithGroup: (int) group;
+
+@end
+
+@implementation TorrentGroup
+
++ (id) groupForIndex: (int) group
+{
+    return [[[self alloc] initWithGroup: group] autorelease];
 }
 
-+ (void) downloadWithPrefsController: (PrefsController *) prefsController; //only use when no other blocklist is downloading
+- (void) dealloc
+{
+    [fTorrents release];
+    [super dealloc];
+}
 
-- (void) cancelDownload: (id) sender;
+- (NSInteger) groupIndex
+{
+    return fGroup;
+}
+
+- (NSMutableArray *) torrents
+{
+    return fTorrents;
+}
+
+@end
+
+@implementation TorrentGroup (Private)
+
+- (id) initWithGroup: (int) group
+{
+    if ((self = [super init]))
+    {
+        fGroup = group;
+        fTorrents = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
 
 @end

@@ -1,6 +1,6 @@
 /******************************************************************************
  * $Id$
- *
+ * 
  * Copyright (c) 2008 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -23,27 +23,16 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <transmission.h>
 
-@class PrefsController;
-
-@interface BlocklistDownloader : NSObject
-{    
-    PrefsController * fPrefsController;
-    
-    IBOutlet NSWindow * fStatusWindow;
-    IBOutlet NSProgressIndicator * fProgressBar;
-    IBOutlet NSTextField * fTextField;
-    IBOutlet NSButton * fButton;
-    
-    NSURLDownload * fDownload;
-    
-    NSUInteger fCurrentSize;
-    long long fExpectedSize;
+@interface TorrentGroup : NSObject
+{
+    NSInteger fGroup;
+    NSMutableArray * fTorrents;
 }
 
-+ (void) downloadWithPrefsController: (PrefsController *) prefsController; //only use when no other blocklist is downloading
++ (id) groupForIndex: (int) group;
 
-- (void) cancelDownload: (id) sender;
+- (NSInteger) groupIndex;
+- (NSMutableArray *) torrents;
 
 @end

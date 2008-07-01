@@ -144,6 +144,7 @@
 		A2725B6E0DE5C4F5003445E7 /* FileListNode.m in Sources */ = {isa = PBXBuildFile; fileRef = A2725B6D0DE5C4F5003445E7 /* FileListNode.m */; };
 		A2725D5D0DE7507C003445E7 /* TrackerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2725D5C0DE7507C003445E7 /* TrackerTableView.m */; };
 		A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA090C693D9C00DA2CD4 /* ActionOn.png */; };
+		A27F0F330E19AD9800B2DB97 /* TorrentGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = A27F0F320E19AD9800B2DB97 /* TorrentGroup.m */; };
 		A28F4F770E085BDC003A3882 /* ColorTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A28F4F760E085BDC003A3882 /* ColorTextField.m */; };
 		A292A6E80DFB45FC004B9C0A /* webseed.c in Sources */ = {isa = PBXBuildFile; fileRef = A292A6E50DFB45EC004B9C0A /* webseed.c */; };
 		A29576030D11D63C0093B167 /* Creator.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576010D11D63C0093B167 /* Creator.xib */; };
@@ -577,6 +578,8 @@
 		A27476FF0CC38EE6003CC76D /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = macosx/es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A27477010CC38EE6003CC76D /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = macosx/es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A277DA090C693D9C00DA2CD4 /* ActionOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOn.png; path = macosx/Images/ActionOn.png; sourceTree = "<group>"; };
+		A27F0F310E19AD9800B2DB97 /* TorrentGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TorrentGroup.h; path = macosx/TorrentGroup.h; sourceTree = "<group>"; };
+		A27F0F320E19AD9800B2DB97 /* TorrentGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TorrentGroup.m; path = macosx/TorrentGroup.m; sourceTree = "<group>"; };
 		A28AFE050DA1C47A00673957 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A28AFE060DA1C47A00673957 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/Creator.xib; sourceTree = "<group>"; };
 		A28AFE070DA1C47A00673957 /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = macosx/zh_TW.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -889,6 +892,8 @@
 				4DF0C5A90899190500DD8943 /* Controller.m */,
 				4DFBC2DD09C0970D00D5C571 /* Torrent.h */,
 				4DFBC2DE09C0970D00D5C571 /* Torrent.m */,
+				A27F0F310E19AD9800B2DB97 /* TorrentGroup.h */,
+				A27F0F320E19AD9800B2DB97 /* TorrentGroup.m */,
 				4D364D9E091FBB2C00377D12 /* TorrentTableView.h */,
 				4D364D9F091FBB2C00377D12 /* TorrentTableView.m */,
 				4DCCBB3D09C3D71100D3CABF /* TorrentCell.h */,
@@ -1976,6 +1981,7 @@
 				A2725B6E0DE5C4F5003445E7 /* FileListNode.m in Sources */,
 				A2725D5D0DE7507C003445E7 /* TrackerTableView.m in Sources */,
 				A28F4F770E085BDC003A3882 /* ColorTextField.m in Sources */,
+				A27F0F330E19AD9800B2DB97 /* TorrentGroup.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

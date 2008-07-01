@@ -25,6 +25,7 @@
 #import "TorrentTableView.h"
 #import "TorrentCell.h"
 #import "Torrent.h"
+#import "TorrentGroup.h"
 #import "FileListNode.h"
 #import "QuickLookController.h"
 #import "NSApplicationAdditions.h"
@@ -234,7 +235,7 @@
                 : NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
     else if (ident)
     {
-        int count = [[item objectForKey: @"Torrents"] count];
+        int count = [[item torrents] count];
         if (count == 1)
             return NSLocalizedString(@"1 transfer", "Torrent table -> group row -> tooltip");
         else
@@ -354,7 +355,7 @@
 
 - (void) outlineViewItemDidExpand: (NSNotification *) notification
 {
-    int value = [[[[notification userInfo] objectForKey: @"NSObject"] objectForKey: @"Group"] intValue];
+    int value = [[[notification userInfo] objectForKey: @"NSObject"] groupIndex];
     if (value < 0)
         value = MAX_GROUP;
     
@@ -367,7 +368,7 @@
 
 - (void) outlineViewItemDidCollapse: (NSNotification *) notification
 {
-    int value = [[[[notification userInfo] objectForKey: @"NSObject"] objectForKey: @"Group"] intValue];
+    int value = [[[notification userInfo] objectForKey: @"NSObject"] groupIndex];
     if (value < 0)
         value = MAX_GROUP;
     
@@ -448,15 +449,14 @@
         }
         else
         {
-            NSNumber * group = [item objectForKey: @"Group"];
-            int i;
+            int i, group = [item groupIndex];
             for (i = 0; i < [self numberOfRows]; i++)
             {
                 if ([indexSet containsIndex: i])
                     continue;
                 
                 id tableItem = [self itemAtRow: i];
-                if (![tableItem isKindOfClass: [Torrent class]] && [group isEqualToNumber: [tableItem objectForKey: @"Group"]])
+                if (![tableItem isKindOfClass: [Torrent class]] && group == [tableItem groupIndex])
                 {
                     [indexSet addIndex: i];
                     break;
@@ -493,7 +493,7 @@
             [torrents addObject: item];
         else
         {
-            NSArray * groupTorrents = [item objectForKey: @"Torrents"];
+            NSArray * groupTorrents = [item torrents];
             [torrents addObjectsFromArray: groupTorrents];
             i += [groupTorrents count];
         }
