@@ -2048,9 +2048,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             int groupValue = [torrent groupValue];
             if (groupValue != oldGroupValue)
             {
-                TorrentGroup * group = [TorrentGroup groupForIndex: groupValue];
-                [fDisplayedTorrents addObject: group];
+                TorrentGroup * group = [[TorrentGroup alloc] initWithGroup: groupValue];
                 groupTorrents = [group torrents];
+                
+                [fDisplayedTorrents addObject: group];
+                [group release];
                 
                 oldGroupValue = groupValue;
             }
@@ -2064,7 +2066,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //actually sort
     [self sortTorrentsIgnoreSelected];
     [fTableView selectValues: selectedValues];
-    [self resetInfo]; //if group is already selected, but the torrents in it change
+    //[self resetInfo]; //if group is already selected, but the torrents in it change
     
     //reset expanded/collapsed rows
     if (groupRows)

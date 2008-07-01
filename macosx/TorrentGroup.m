@@ -24,17 +24,16 @@
 
 #import "TorrentGroup.h"
 
-@interface TorrentGroup (Private)
-
-- (id) initWithGroup: (int) group;
-
-@end
-
 @implementation TorrentGroup
 
-+ (id) groupForIndex: (int) group
+- (id) initWithGroup: (int) group
 {
-    return [[[self alloc] initWithGroup: group] autorelease];
+    if ((self = [super init]))
+    {
+        fGroup = group;
+        fTorrents = [[NSMutableArray alloc] init];
+    }
+    return self;
 }
 
 - (void) dealloc
@@ -51,20 +50,6 @@
 - (NSMutableArray *) torrents
 {
     return fTorrents;
-}
-
-@end
-
-@implementation TorrentGroup (Private)
-
-- (id) initWithGroup: (int) group
-{
-    if ((self = [super init]))
-    {
-        fGroup = group;
-        fTorrents = [[NSMutableArray alloc] init];
-    }
-    return self;
 }
 
 @end

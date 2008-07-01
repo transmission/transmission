@@ -30,7 +30,7 @@
     NSMutableArray * fTorrents;
 }
 
-+ (id) groupForIndex: (int) group;
+- (id) initWithGroup: (int) group;
 
 - (NSInteger) groupIndex;
 - (NSMutableArray *) torrents;
