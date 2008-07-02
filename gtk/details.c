@@ -456,6 +456,8 @@ static void
 refresh_peers (GtkWidget * top)
 {
   int i;
+  int seedCount = 0;
+  int leechCount = 0;
   int n_peers;
   GtkTreeIter iter;
   PeerData * p = (PeerData*) g_object_get_data (G_OBJECT(top), "peer-data");
@@ -490,6 +492,12 @@ refresh_peers (GtkWidget * top)
   n_peers = 0;
   peers = tr_torrentPeers (tor, &n_peers);
   qsort (peers, n_peers, sizeof(tr_peer_stat), compare_peers);
+  for( i=0; i<n_peers; ++i ) {
+    if( peers[i].progress >= 1.0 )
+      ++seedCount;
+    else
+      ++leechCount;
+  }
 
   i = 0;
   if (gtk_tree_model_get_iter_first (model, &iter)) do
@@ -525,8 +533,10 @@ refresh_peers (GtkWidget * top)
     refresh_pieces (p->completeness, NULL, p->gtor);
 #endif
 
-  fmtpeercount (p->seeders_lb, stat->seeders);
-  fmtpeercount (p->leechers_lb, stat->leechers);
+  /* use the tracker-supplied information if it's available;
+   * otherwise, use the counts of connected peers as a fallback */
+  fmtpeercount (p->seeders_lb, stat->seeders >= 0 ? stat->seeders : seedCount );
+  fmtpeercount (p->leechers_lb, stat->leechers >= 0 ? stat->leechers : leechCount );
   fmtpeercount (p->completed_lb, stat->timesCompleted );
 
   free( peers );
