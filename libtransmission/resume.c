@@ -350,6 +350,9 @@ tr_torrentSaveResume( const tr_torrent * tor )
     tr_benc top;
     char filename[MAX_PATH_LENGTH];
 
+    if( !tor )
+        return;
+
     tr_bencInitDict( &top, 14 );
     tr_bencDictAddInt( &top, KEY_ACTIVITY_DATE,
                              tor->activityDate );
