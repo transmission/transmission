@@ -52,7 +52,7 @@ tr_prefs_init_global( void )
 #endif
 
     pref_int_set_default    ( PREF_KEY_PEER_SOCKET_TOS, TR_DEFAULT_PEER_SOCKET_TOS );
-    pref_flag_set_default   ( PREF_KEY_ALLOW_HIBERNATION, TRUE );
+    pref_flag_set_default   ( PREF_KEY_ALLOW_HIBERNATION, FALSE );
     pref_flag_set_default   ( PREF_KEY_BLOCKLIST_ENABLED, TR_DEFAULT_BLOCKLIST_ENABLED );
 
     pref_string_set_default ( PREF_KEY_OPEN_DIALOG_FOLDER, g_get_home_dir( ) );

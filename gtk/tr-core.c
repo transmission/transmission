@@ -45,7 +45,7 @@
 #include "tr-torrent.h"
 #include "util.h"
 
-static void tr_core_set_hibernation_allowed( TrCore * core, gboolean allowed );
+static void maybeInhibitHibernation( TrCore * core );
 
 static gboolean our_instance_adds_remote_torrents = FALSE;
 
@@ -501,7 +501,7 @@ prefsChanged( TrCore * core, const char * key, gpointer data UNUSED )
     }
     else if( !strcmp( key, PREF_KEY_ALLOW_HIBERNATION ) )
     {
-        tr_core_set_hibernation_allowed( core, pref_flag_get( key ) );
+        maybeInhibitHibernation( core );
     }
 #ifdef HAVE_GIO
     else if( !strcmp( key, PREF_KEY_DIR_WATCH ) ||
@@ -906,6 +906,9 @@ tr_core_update( TrCore * self )
 
     /* resume sorting */
     gtk_tree_sortable_set_sort_column_id( sortable, column, order );
+
+    /* maybe inhibit hibernation */
+    maybeInhibitHibernation( self );
 }
 
 void
@@ -993,8 +996,7 @@ gtr_uninhibit_hibernation( guint inhibit_cookie )
 
 #endif
 
-
-void
+static void
 tr_core_set_hibernation_allowed( TrCore * core, gboolean allowed )
 {
 #ifdef HAVE_DBUS_GLIB
@@ -1014,6 +1016,30 @@ tr_core_set_hibernation_allowed( TrCore * core, gboolean allowed )
         core->priv->have_inhibit_cookie = gtr_inhibit_hibernation( &core->priv->inhibit_cookie );
     }
 #endif
+}
+
+static void
+maybeInhibitHibernation( TrCore * core )
+{
+    gboolean allowHibernation;
+    tr_handle * session = tr_core_handle( core );
+
+    /* allow hibernation unless we have active torrents */
+    allowHibernation = TRUE;
+    tr_torrent * tor = NULL;
+    while(( tor = tr_torrentNext( session, tor ))) {
+        if( tr_torrentGetStatus( tor ) != TR_STATUS_STOPPED ) {
+            allowHibernation = FALSE;
+            break;
+        }
+    }
+
+    /* even if we do have active torrents,
+     * maybe allow hibernation anyway... */
+    if( !allowHibernation )
+        allowHibernation = pref_flag_get( PREF_KEY_ALLOW_HIBERNATION );
+
+    tr_core_set_hibernation_allowed( core, allowHibernation );
 }
 
 /**

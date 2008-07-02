@@ -27,7 +27,7 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_OPTIONS_PROMPT         "show-options-window"
 #define PREF_KEY_DOWNLOAD_DIR           "download-dir"
 #define PREF_KEY_OPEN_DIALOG_FOLDER     "open-dialog-dir"
-#define PREF_KEY_ALLOW_HIBERNATION      "allow-hibernation"
+#define PREF_KEY_ALLOW_HIBERNATION      "allow-hibernation-even-when-torrents-are-active"
 #define PREF_KEY_DIR_WATCH              "watch-dir"
 #define PREF_KEY_DIR_WATCH_ENABLED      "watch-dir-enabled"
 #define PREF_KEY_SHOW_TRAY_ICON         "show-tray-icon"
