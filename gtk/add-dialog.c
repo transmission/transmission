@@ -18,6 +18,67 @@
 #include "hig.h"
 #include "tr-prefs.h"
 
+/****
+*****
+****/
+
+#define N_RECENT 4
+
+static GSList*
+get_recent_destinations( void )
+{
+    int i;
+    GSList * list = NULL;
+    for( i=0; i<N_RECENT; ++i )
+    {
+        char key[64];
+        const char * val;
+        g_snprintf( key, sizeof(key), "recent-download-dir-%d", i+1 );
+        if(( val = pref_string_get( key )))
+            list = g_slist_append( list, (void*)val );
+    }
+    return list;
+}
+
+static void
+save_recent_destination( const char * dir  )
+{
+    int i;
+    GSList * list = get_recent_destinations( );
+    GSList * l;
+
+    if( !dir )
+        return;
+
+    /* if it was already in the list, remove it */
+    if(( l = g_slist_find_custom( list, dir, (GCompareFunc)strcmp )))
+        list = g_slist_delete_link( list, l );
+
+    /* add it to the front of the list */
+    list = g_slist_prepend( list, (void*)dir );
+
+    /* make local copies of the strings that aren't
+     * invalidated by pref_string_set() */
+    for( l=list; l; l=l->next )
+         l->data = g_strdup( l->data );
+
+    /* save the first N_RECENT directories */
+    for( l=list, i=0; l && (i<N_RECENT); ++i, l=l->next ) {
+        char key[64];
+        g_snprintf( key, sizeof(key), "recent-download-dir-%d", i+1 );
+        pref_string_set( key, l->data );
+    }
+    pref_save( );
+
+    /* cleanup */
+    g_slist_foreach( list, (GFunc)g_free, NULL );
+    g_slist_free( list );
+}
+
+/****
+*****
+****/
+
 struct AddData
 {
     TrCore * core;
@@ -58,6 +119,7 @@ addResponseCB( GtkDialog * dialog, gint response, gpointer gdata )
             tr_core_add_torrent( data->core, data->gtor );
             if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->trash_check ) ) )
                 tr_file_trash_or_unlink( data->filename );
+            save_recent_destination( data->downloadDir );
         }
     }
 
@@ -160,6 +222,8 @@ addSingleTorrentDialog( GtkWindow  * parent,
     GtkWidget * l;
     struct AddData * data;
     uint8_t flag;
+    GSList * list;
+    GSList * walk;
 
     /* make the dialog */
     d = gtk_dialog_new_with_buttons( _( "Torrent Options" ), parent,
@@ -220,6 +284,10 @@ addSingleTorrentDialog( GtkWindow  * parent,
     w = gtk_file_chooser_button_new( _( "Select Destination Folder" ), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
     if( !gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ), data->downloadDir ) )
         g_warning( "couldn't select '%s'", data->downloadDir );
+    list = get_recent_destinations( );
+    for( walk=list; walk; walk=walk->next )
+        gtk_file_chooser_add_shortcut_folder( GTK_FILE_CHOOSER( w ), walk->data, NULL );
+    g_slist_free( list );
     gtk_table_attach( GTK_TABLE( t ), w, col, col+1, row, row+1, ~0, 0, 0, 0 );
     gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
     g_signal_connect( w, "selection-changed", G_CALLBACK( downloadDirChanged ), data );
