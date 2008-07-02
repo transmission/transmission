@@ -491,6 +491,11 @@ onScrapeResponse( tr_session   * session,
                     if(( tr_bencDictFindInt( flags, "min_request_interval", &itmp )))
                         t->scrapeIntervalSec = i;
 
+                /* as per ticket #1045, safeguard against trackers returning
+                 * a very low min_request_interval... */
+                if( t->scrapeIntervalSec < DEFAULT_SCRAPE_INTERVAL_SEC )
+                    t->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
+
                 tr_ndbg( t->name, "Scrape successful.  Rescraping in %d seconds.",
                          t->scrapeIntervalSec );
 
