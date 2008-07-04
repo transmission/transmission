@@ -72,7 +72,6 @@
 		A20152640D1C1BE70081714F /* PinTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A20152630D1C1BE70081714F /* PinTemplate.png */; };
 		A201527E0D1C270F0081714F /* torrent-ctor.c in Sources */ = {isa = PBXBuildFile; fileRef = A20152790D1C26EB0081714F /* torrent-ctor.c */; };
 		A2085DDC0C53BC74000BC3B7 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */; };
-		A2085E3F0C53C949000BC3B7 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = A2085E2F0C53C833000BC3B7 /* LICENSE */; };
 		A20B6F6B0C4D842B0034AB1D /* PriorityLow.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */; };
 		A20B6F830C4D8A610034AB1D /* PriorityHigh.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F820C4D8A610034AB1D /* PriorityHigh.png */; };
 		A20B6F8C0C4D90980034AB1D /* PriorityMixed.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */; };
@@ -188,6 +187,7 @@
 		A2C0C2E00E00CCE400D95339 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2C0C2DF0E00CCE400D95339 /* Security.framework */; };
 		A2C0C5030E02CB6100D95339 /* Remote.png in Resources */ = {isa = PBXBuildFile; fileRef = A2C0C5020E02CB6100D95339 /* Remote.png */; };
 		A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */; };
+		A2CB38AF0E1E6896002B514C /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = A2CB38AE0E1E6896002B514C /* COPYING */; };
 		A2D0E0490A54A97C003C72CF /* Bandwidth.png in Resources */ = {isa = PBXBuildFile; fileRef = A2D0E0480A54A97C003C72CF /* Bandwidth.png */; };
 		A2D22A130D65EEE700007D5F /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D22A100D65EED100007D5F /* verify.c */; };
 		A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D307A30D9EC6870051FD27 /* BlocklistDownloader.m */; };
@@ -474,7 +474,6 @@
 		A202FF610DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = macosx/AboutWindowController.h; sourceTree = "<group>"; };
 		A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = macosx/AboutWindowController.m; sourceTree = "<group>"; };
-		A2085E2F0C53C833000BC3B7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityLow.png; path = macosx/Images/PriorityLow.png; sourceTree = "<group>"; };
 		A20B6F820C4D8A610034AB1D /* PriorityHigh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityHigh.png; path = macosx/Images/PriorityHigh.png; sourceTree = "<group>"; };
 		A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityMixed.png; path = macosx/Images/PriorityMixed.png; sourceTree = "<group>"; };
@@ -666,6 +665,7 @@
 		A2C0C2DF0E00CCE400D95339 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		A2C0C5020E02CB6100D95339 /* Remote.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Remote.png; path = macosx/Images/Remote.png; sourceTree = "<group>"; };
 		A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ButtonToolbarItem.m; path = macosx/ButtonToolbarItem.m; sourceTree = "<group>"; };
+		A2CB38AE0E1E6896002B514C /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
 		A2CBDED80D993E4500BB22BC /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2CBDF9E0D9AD08100BB22BC /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2D0E0480A54A97C003C72CF /* Bandwidth.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Bandwidth.png; path = macosx/Images/Bandwidth.png; sourceTree = "<group>"; };
@@ -995,7 +995,7 @@
 				A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */,
 				A259316A0A73B2CC002F4FE7 /* TransmissionHelp */,
 				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
-				A2085E2F0C53C833000BC3B7 /* LICENSE */,
+				A2CB38AE0E1E6896002B514C /* COPYING */,
 				4DE5CCCA0981D9BE00BE280E /* Defaults.plist */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
@@ -1761,7 +1761,6 @@
 				A20B6F8C0C4D90980034AB1D /* PriorityMixed.png in Resources */,
 				A20B6FA50C4D97840034AB1D /* PriorityNone.png in Resources */,
 				A20B6FAE0C4D9B040034AB1D /* PriorityNormal.png in Resources */,
-				A2085E3F0C53C949000BC3B7 /* LICENSE in Resources */,
 				A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */,
 				A261A8260C6A0D68003BAFDA /* Error.png in Resources */,
 				A2EF7DEC0C96297400FA9811 /* PurpleDot.png in Resources */,
@@ -1816,6 +1815,7 @@
 				A224D2640DAAC55F000954EA /* Peers.png in Resources */,
 				A26146E10DD4A0160060F033 /* GroupsNoneTemplate.png in Resources */,
 				A2C0C5030E02CB6100D95339 /* Remote.png in Resources */,
+				A2CB38AF0E1E6896002B514C /* COPYING in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
