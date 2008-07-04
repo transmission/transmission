@@ -33,7 +33,7 @@ SUBDIRS = \
 EXTRA_DIST = \
   NEWS \
   AUTHORS \
-  LICENSE \
+  COPYING \
   README \
   Transmission.xcodeproj/project.pbxproj \
   intltool-extract.in \
