@@ -60,6 +60,7 @@ struct TrCorePrivate
 #endif
     gboolean           inhibit_allowed;
     gboolean           have_inhibit_cookie;
+    gboolean           dbus_error;
     guint              inhibit_cookie;
     GtkTreeModel     * model;
     tr_handle        * handle;
@@ -1011,9 +1012,14 @@ tr_core_set_hibernation_allowed( TrCore * core, gboolean allowed )
         core->priv->have_inhibit_cookie = FALSE;
     }
 
-    if( !allowed && !core->priv->have_inhibit_cookie )
+    if( !allowed &&
+        !core->priv->have_inhibit_cookie &&
+        !core->priv->dbus_error )
     {
-        core->priv->have_inhibit_cookie = gtr_inhibit_hibernation( &core->priv->inhibit_cookie );
+        if( gtr_inhibit_hibernation( &core->priv->inhibit_cookie ) )
+            core->priv->have_inhibit_cookie = TRUE;
+        else
+            core->priv->dbus_error = TRUE;
     }
 #endif
 }
