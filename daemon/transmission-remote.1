@@ -20,6 +20,9 @@ and
 .Oo
 .Fl f Ar id | Ar hash
 .Oc
+.Oo
+.Fl i Ar id | Ar hash
+.Oc
 .Op Fl l
 .Op Fl m
 .Op Fl M
@@ -79,8 +82,13 @@ or
 .Ar hash .
 .It Fl h Fl -help
 Print command-line option descriptions.
+.It Fl i Fl -info Ar id | torrent-hash
+Print detailed information for the torrent matching the specified
+.Ar id
+or
+.Ar hash .
 .It Fl l Fl -list
-Print a listing of all torrents, their Id numbers, and current status.
+List all torrents, their Id numbers, and current status.
 .It Fl m Fl -port-mapping
 Enable automatic port mapping via NAT-PMP or UPnP IGD.
 .It Fl M Fl -no-port-mapping
@@ -89,11 +97,6 @@ Disable automatic port mapping.
 Attempt to bind to
 .Ar port
 for use as a listening port to accept incoming peer connections.
-.It Fl t Fl -auth Ar user:pass
-.Ar Username
-and
-.Ar password
-for authentication
 
 .It Fl r Fl -remove Ar all | id | torrent-hash
 Remove all torrents, or the torrent matching the specified
@@ -102,17 +105,23 @@ or
 .Ar hash .
 This does not delete the downloaded data.
 
+.It Fl s Fl -start Ar all | id | torrent-hash
+Start all torrents downloading or seeding, or the torrent matching the specified
+.Ar id
+or
+.Ar hash .
+
 .It Fl S Fl -stop Ar all | id | torrent-hash
 Stop all torrents from downloading or seeding, or the torrent matching the specified
 .Ar id
 or
 .Ar hash .
 
-.It Fl s Fl -start Ar all | id | torrent-hash
-Start all torrents downloading or seeding, or the torrent matching the specified
-.Ar id
-or
-.Ar hash .
+.It Fl t Fl -auth Ar user:pass
+.Ar Username
+and
+.Ar password
+for authentication
 
 .It Fl u Fl -upload-limit Ar upload-rate
 Set maximum upload rate to

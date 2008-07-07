@@ -53,7 +53,8 @@ showUsage( void )
             "  -f --files <id>           Get a file list for the specified torrent\n"
             "  -g --debug                Print debugging information\n"
             "  -h --help                 Display this message and exit\n"
-            "  -l --list                 Long list of all torrent and status\n"
+            "  -i --info                 Detailed information for the specified torrent\n"
+            "  -l --list                 List all torrents\n"
             "  -m --port-mapping         Automatic port mapping via NAT-PMP or UPnP\n"
             "  -M --no-port-mapping      Disable automatic port mapping\n"
             "  -p --port <id>            Port to listen for incoming peers\n"
@@ -117,7 +118,7 @@ static void
 readargs( int argc, char ** argv )
 {
     int opt;
-    char optstr[] = "a:d:De:f:ghlmMp:r:s:S:t:u:Uv:w:xX";
+    char optstr[] = "a:d:De:f:ghi:lmMp:r:s:S:t:u:Uv:w:xX";
     
     const struct option longopts[] =
     {
@@ -128,6 +129,7 @@ readargs( int argc, char ** argv )
         { "files",              required_argument, NULL, 'f' },
         { "debug",              no_argument,       NULL, 'g' },
         { "help",               no_argument,       NULL, 'h' },
+        { "info",               required_argument, NULL, 'i' },
         { "list",               no_argument,       NULL, 'l' },
         { "port-mapping",       no_argument,       NULL, 'm' },
         { "no-port-mapping",    no_argument,       NULL, 'M' },
@@ -179,6 +181,20 @@ readargs( int argc, char ** argv )
                       fields = TR_RPC_TORRENT_FIELD_ID
                              | TR_RPC_TORRENT_FIELD_FILES
                              | TR_RPC_TORRENT_FIELD_PRIORITIES;
+                      tr_bencDictAddInt( args, "fields", fields );
+                      break;
+            case 'i': tr_bencDictAddStr( &top, "method", "torrent-get" );
+                      tr_bencDictAddInt( &top, "tag", TAG_DETAILS );
+                      tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), optarg, strlen(optarg) );
+                      fields = TR_RPC_TORRENT_FIELD_ACTIVITY
+                             | TR_RPC_TORRENT_FIELD_ANNOUNCE
+                             | TR_RPC_TORRENT_FIELD_ERROR
+                             | TR_RPC_TORRENT_FIELD_HISTORY
+                             | TR_RPC_TORRENT_FIELD_ID
+                             | TR_RPC_TORRENT_FIELD_INFO
+                             | TR_RPC_TORRENT_FIELD_SCRAPE
+                             | TR_RPC_TORRENT_FIELD_SIZE
+                             | TR_RPC_TORRENT_FIELD_TRACKER_STATS;
                       tr_bencDictAddInt( args, "fields", fields );
                       break;
             case 'd': tr_bencDictAddStr( &top, "method", "session-set" );
@@ -298,6 +314,26 @@ etaToString( char * buf, size_t buflen, int64_t eta )
 #define GIGABYTE_FACTOR (1024.0 * 1024.0 * 1024.0)
 
 static char*
+strlratio( char * buf, double numerator, double denominator, size_t buflen )
+{
+    if( denominator )
+    {
+        const double ratio = numerator / denominator;
+        if( ratio < 10.0 )
+            snprintf( buf, buflen, "%'.2f", ratio );
+        else if( ratio < 100.0 )
+            snprintf( buf, buflen, "%'.1f", ratio );
+        else
+            snprintf( buf, buflen, "%'.0f", ratio );
+    }
+    else if( numerator )
+        tr_strlcpy( buf, "Infinity", buflen );
+    else
+        tr_strlcpy( buf, "None", buflen );
+    return buf;
+}
+
+static char*
 strlsize( char * buf, int64_t size, size_t buflen )
 {
     if( !size )
@@ -331,6 +367,159 @@ torrentStatusToString( int i )
         case TR_STATUS_SEED:       return "Seeding";
         case TR_STATUS_STOPPED:    return "Stopped";
         default:                   return "Error";
+    }
+}
+
+static void
+printDetails( tr_benc * top )
+{
+    tr_benc *args, *torrents;
+
+    if( ( tr_bencDictFindDict( top, "arguments", &args ) ) &&
+        ( tr_bencDictFindList( args, "torrents", &torrents ) ) )
+    {
+        int ti, tCount;
+        for( ti=0, tCount=tr_bencListSize( torrents ); ti<tCount; ++ti )
+        {
+            tr_benc * t = tr_bencListChild( torrents, ti );
+            const char * str;
+            char buf[512];
+            char buf2[512];
+            int64_t i, j;
+
+            printf( "NAME\n" );
+            if( tr_bencDictFindInt( t, "id", &i ) )
+                printf( "  Id: %"PRId64"\n", i );
+            if( tr_bencDictFindStr( t, "name", &str ) )
+                printf( "  Name: %s\n", str );
+            if( tr_bencDictFindStr( t, "hashString", &str ) )
+                printf( "  Hash: %s\n", str );
+            printf( "\n" );
+
+            printf( "TRANSFER\n" );
+            if( tr_bencDictFindInt( t, "status", &i ) ) {
+                switch( i ) {
+                    case TR_STATUS_SEED:        str = "Seeding"; break;
+                    case TR_STATUS_DOWNLOAD:    str = "Downloading"; break;
+                    case TR_STATUS_STOPPED:     str = "Paused"; break;
+                    case TR_STATUS_CHECK:       str = "Verifying local data"; break;
+                    case TR_STATUS_CHECK_WAIT:  str = "Waiting to verify"; break;
+                    default:                    str = "error"; break;
+                }
+                printf( "  State: %s\n", str );
+            }
+            if( tr_bencDictFindInt( t, "eta", &i ) ) {
+                etaToString( buf, sizeof( buf ), i );
+                printf( "  ETA: %s\n", buf );
+            }
+            if( tr_bencDictFindInt( t, "rateDownload", &i ) )
+                printf( "  Download Speed: %.1f KB/s\n", i/1024.0 );
+            if( tr_bencDictFindInt( t, "rateUpload", &i ) )
+            {
+                printf( "  Upload Speed: %.1f KB/s\n", i/1024.0 );
+            }
+            if( tr_bencDictFindInt( t, "haveUnchecked", &i ) &&
+                tr_bencDictFindInt( t, "haveValid", &j ) )
+            {
+                strlsize( buf, i+j, sizeof( buf ) );
+                strlsize( buf2, j, sizeof( buf2 ) );
+                printf( "  Have: %s (%s verified)\n", buf, buf2 );
+            }
+            if( tr_bencDictFindInt( t, "sizeWhenDone", &i ) &&
+                tr_bencDictFindInt( t, "leftUntilDone", &j ) )
+            {
+                strlratio( buf, (i-j), i, sizeof( buf ) );
+                printf( "  Progress: %s%%\n", buf );
+            }
+            if( tr_bencDictFindInt( t, "sizeWhenDone", &i ) &&
+                tr_bencDictFindInt( t, "totalSize", &j ) )
+            {
+                strlsize( buf, j, sizeof( buf ) );
+                strlsize( buf2, i, sizeof( buf2 ) );
+                printf( "  Total size: %s (%s wanted)\n", buf, buf2 );
+            }
+            if( tr_bencDictFindInt( t, "downloadedEver", &i ) &&
+                tr_bencDictFindInt( t, "uploadedEver", &j ) ) {
+                strlsize( buf, i, sizeof( buf ) );
+                printf( "  Downloaded: %s\n", buf );
+                strlsize( buf, j, sizeof( buf ) );
+                printf( "  Uploaded: %s\n", buf );
+                strlratio( buf, i, j, sizeof( buf ) );
+                printf( "  Ratio: %s\n", buf );
+            }
+            if( tr_bencDictFindInt( t, "corruptEver", &i ) ) {
+                strlsize( buf, i, sizeof( buf ) );
+                printf( "  Corrupt DL: %s\n", buf );
+            }
+            if( tr_bencDictFindStr( t, "errorString", &str ) && str && *str )
+                printf( "  Error: %s\n", str );
+            printf( "\n" );
+            
+            printf( "HISTORY\n" );
+            if( tr_bencDictFindInt( t, "addedDate", &i ) && i ) {
+                const time_t tt = i;
+                printf( "  Date added:      %s", ctime( &tt ) );
+            }
+            if( tr_bencDictFindInt( t, "doneDate", &i ) && i ) {
+                const time_t tt = i;
+                printf( "  Date finished:   %s", ctime( &tt ) );
+            }
+            if( tr_bencDictFindInt( t, "startDate", &i ) && i ) {
+                const time_t tt = i;
+                printf( "  Date started:    %s", ctime( &tt ) );
+            }
+            if( tr_bencDictFindInt( t, "activityDate", &i ) && i ) {
+                const time_t tt = i;
+                printf( "  Latest activity: %s", ctime( &tt ) );
+            }
+            printf( "\n" );
+            
+            printf( "TRACKER\n" );
+            if( tr_bencDictFindInt( t, "lastAnnounceTime", &i ) && i ) {
+                const time_t tt = i;
+                printf( "  Latest announce: %s", ctime( &tt ) );
+            }
+            if( tr_bencDictFindStr( t, "announceURL", &str ) )
+                printf( "  Announce URL: %s\n", str );
+            if( tr_bencDictFindStr( t, "announceResponse", &str ) && str && *str )
+                printf( "  Announce response: %s\n", str );
+            if( tr_bencDictFindInt( t, "nextAnnounceTime", &i ) && i ) {
+                const time_t tt = i;
+                printf( "  Next announce:   %s", ctime( &tt ) );
+            }
+            if( tr_bencDictFindInt( t, "lastScrapeTime", &i ) && i ) {
+                const time_t tt = i;
+                printf( "  Latest scrape:   %s", ctime( &tt ) );
+            }
+            if( tr_bencDictFindStr( t, "scrapeResponse", &str ) )
+                printf( "  Scrape response: %s\n", str );
+            if( tr_bencDictFindInt( t, "nextScrapeTime", &i ) && i ) {
+                const time_t tt = i;
+                printf( "  Next scrape:     %s", ctime( &tt ) );
+            }
+            if( tr_bencDictFindInt( t, "seeders", &i ) &&
+                tr_bencDictFindInt( t, "leechers", &j ) )
+                printf( "  Tracker knows of %"PRId64" seeders and %"PRId64" leechers\n", i, j );
+            if( tr_bencDictFindInt( t, "timesCompleted", &i ) )
+                printf( "  Tracker has seen %"PRId64" clients complete this torrent\n", i );
+            printf( "\n" );
+
+            printf( "ORIGINS\n" );
+            if( tr_bencDictFindInt( t, "dateCreated", &i ) && i ) {
+                const time_t tt = i;
+                printf( "  Date created: %s", ctime( &tt ) );
+            }
+            if( tr_bencDictFindInt( t, "isPrivate", &i ) )
+                printf( "  Public torrent: %s\n", ( i ? "No" : "Yes" ) );
+            if( tr_bencDictFindStr( t, "comment", &str ) && str && *str )
+                printf( "  Comment: %s\n", str );
+            if( tr_bencDictFindStr( t, "creator", &str ) && str && *str )
+                printf( "  Creator: %s\n", str );
+            if( tr_bencDictFindInt( t, "pieceCount", &i ) )
+                printf( "  Piece Count: %"PRId64"\n", i );
+            if( tr_bencDictFindInt( t, "pieceSize", &i ) )
+                printf( "  Piece Size: %"PRId64"\n", i );
+        }
     }
 }
 
@@ -448,10 +637,12 @@ processResponse( const char * host, int port,
 
         if( tr_bencDictFindStr( &top, "result", &str ) )
             printf( "%s:%d responded: \"%s\"\n", host, port, str );
-        if( tag == TAG_FILES )
-            printFileList( &top );
-        if( tag == TAG_LIST )
-            printTorrentList( &top );
+        switch( tag ) {
+            case TAG_FILES: printFileList( &top ); break;
+            case TAG_DETAILS: printDetails( &top ); break;
+            case TAG_LIST: printTorrentList( &top ); break;
+            default: break;
+        }
 
         tr_bencFree( &top );
     }
