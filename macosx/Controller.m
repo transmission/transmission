@@ -2081,7 +2081,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [fTableView selectValues: selectedValues];
-    //removed because it made the inspector reset
+    #warning still happens anyway?
+    //removed because it made the inspector reset (noticeable when a transfer with web seeds is selected)
     //[self resetInfo]; //if group is already selected, but the torrents in it change
     
     [self setBottomCountText: groupRows || filterStatus || filterGroup || filterText];
@@ -2775,9 +2776,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [fTorrents removeObjectsInArray: movingTorrents];
             
             //insert objects at new location
-            int insertIndex = topTorrent ? [fTorrents indexOfObject: topTorrent] + 1 : 0;
-            for (i = 0; i < [movingTorrents count]; i++)
-                [fTorrents insertObject: [movingTorrents objectAtIndex: i] atIndex: insertIndex + i];
+            NSUInteger insertIndex = topTorrent ? [fTorrents indexOfObject: topTorrent] + 1 : 0;
+            NSIndexSet * insertIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(insertIndex, [movingTorrents count])];
+            [fTorrents insertObjects: movingTorrents atIndexes: insertIndexes];
             
             //redo order values
             for (i = 0; i < [fTorrents count]; i++)
@@ -2785,8 +2786,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
         
         [self applyFilter: nil];
-        
-        //set selected rows
         [fTableView selectValues: selectedValues];
     }
     
