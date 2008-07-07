@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include <string.h> /* strcmp */
 
-#include <getopt.h>
 #include <unistd.h> /* getcwd */
 
 #include <libevent/event.h>
@@ -27,50 +26,58 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
+#include "getopts.h"
+
 #define MY_NAME "transmission-remote"
 #define DEFAULT_HOST "localhost"
 #define DEFAULT_PORT TR_DEFAULT_RPC_PORT
 
 enum { TAG_LIST, TAG_DETAILS, TAG_FILES, TAG_PEERS };
 
+static const char*
+getUsage( void )
+{
+    return "Transmission "LONG_VERSION_STRING"  http://www.transmissionbt.com/\n"
+           "A fast and easy BitTorrent client\n"
+           "\n"
+           "Usage: "MY_NAME" [host] [options]\n"
+           "       "MY_NAME" [port] [options]\n"
+           "       "MY_NAME" [host:port] [options]";
+}
+
+static struct options opts[] =
+{
+    { 'a', "add",          "Add torrent files", "a", 0, NULL },
+    { 'd', "downlimit",    "Set the maximum download speed in KB/s", "d", 1, "<number>" },
+    { 'D', "no-downlimit", "Don't limit the download speed", "D", 0, NULL },
+    { 'e', "encryption",   "Set encryption mode [required, preferred, tolerated]", "e", 1, "<mode>" },
+    { 'f', "files",        "Get a file list for the current torrent(s)", "f", 0, NULL },
+    { 'g', "debug",        "Print debugging information", "g", 0, NULL },
+    { 'h', "help",         "Show this help page and exit", "h", 0, NULL },
+    { 'i', "info",         "Show details of the current torrent(s)", "i", 0, NULL },
+    { 'l', "list",         "List all torrents", "l", 0, NULL },
+    { 'm', "portmap",      "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
+    { 'M', "no-portmap",   "Disable portmapping", "M", 0, NULL },
+    { 'n', "auth",         "Set username for authentication", "n", 1, "<user>:<pass>" },
+    { 'p', "port",         "Port to listen for incoming peers", "p", 1, "<port>" },
+    { 'r', "remove",       "Remove the current torrent(s)", "r", 0, NULL },
+    { 's', "start",        "Start the current torrent(s)", "s", 0, NULL },
+    { 'S', "stop",         "Stop the current torrent(s)", "S", 0, NULL },
+    { 't', "torrent",      "Set the current torrent(s)", "t", 1, "<id|hash|all>" },
+    { 'u', "uplimit",      "Set the maximum upload speed in KB/s", "u", 1, "<number>" },
+    { 'U', "no-uplimit",   "Don't limit the upload speed", "U", 0, NULL },
+    { 'v', "verify",       "Verify the current torrent(s)", "v", 0, NULL },
+    { 'w', "download-dir", "Set the download folder for new torrents", "w", 1, "<path>" },
+    { 'x', "pex",          "Enable peer exchange (PEX)", "x", 0, NULL },
+    { 'X', "no-pex",       "Disable peer exchange (PEX)", "X", 0, NULL },
+    { 0, NULL, NULL, NULL, 0, NULL }
+};
+
 static void
 showUsage( void )
 {
-    puts( "Transmission "LONG_VERSION_STRING"  http://www.transmissionbt.com/\n"
-            "A fast and easy BitTorrent client\n"
-            "\n"
-            "Usage: "MY_NAME" [host] [options]\n"
-            "       "MY_NAME" [port] [options]\n"
-            "       "MY_NAME" [host:port] [options]\n"
-            "\n"
-            "Options:\n"
-            "  -a --add <torrent>        Add a torrent\n"
-            "  -d --download-limit <int> Max download rate in KiB/s\n"
-            "  -D --download-unlimited   No download rate limit\n"
-            "  -e --encryption required  Require encryption for all peers\n"
-            "  -e --encryption preferred Prefer peers to use encryption\n"
-            "  -e --encryption tolerated Prefer peers to use plaintext\n"
-            "  -f --files <id>           Get a file list for the specified torrent\n"
-            "  -g --debug                Print debugging information\n"
-            "  -h --help                 Display this message and exit\n"
-            "  -i --info                 Detailed information for the specified torrent\n"
-            "  -l --list                 List all torrents\n"
-            "  -m --port-mapping         Automatic port mapping via NAT-PMP or UPnP\n"
-            "  -M --no-port-mapping      Disable automatic port mapping\n"
-            "  -p --port <id>            Port to listen for incoming peers\n"
-            "  -r --remove <id>          Remove the torrent with the given ID\n"
-            "  -r --remove all           Remove all torrents\n"
-            "  -s --start <id>           Start the torrent with the given ID\n"
-            "  -s --start all            Start all stopped torrents\n"
-            "  -S --stop <id>            Stop the torrent with the given ID\n"
-            "  -S --stop all             Stop all running torrents\n"
-            "  -t --auth <user>:<pass>   Username and password for authentication\n"
-            "  -u --upload-limit <int>   Max upload rate in KiB/s\n"
-            "  -U --upload-unlimited     No upload rate limit\n"
-            "  -v --verify <id>          Verify the torrent's local data\n"
-            "  -w --download-dir <path>  Folder to set for new torrents\n"
-            "  -x --enable-pex           Enable peer exchange\n"
-            "  -X --disable-pex          Disable peer exchange\n" );
+fprintf( stderr, "asdfasdfasdfasdfasdfasdf\n");
+    getopts_usage( MY_NAME, getUsage(), opts );
     exit( 0 );
 }
 
@@ -115,62 +122,60 @@ getEncodedMetainfo( const char * filename )
 }
 
 static void
+addIdArg( tr_benc * args, const char * id )
+{
+    if( !*id ) {
+        fprintf( stderr, "No torrent specified!  Please use the -t option first.\n" );
+        id = "-1"; /* no torrent will have this ID, so should be a no-op */
+    } else if( strcmp( id, "all" ) ) {
+        tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), id, strlen(id) );
+    }
+}
+
+static void
 readargs( int argc, char ** argv )
 {
-    int opt;
-    char optstr[] = "a:d:De:f:ghi:lmMp:r:s:S:t:u:Uv:w:xX";
-    
-    const struct option longopts[] =
-    {
-        { "add",                required_argument, NULL, 'a' },
-        { "download-limit",     required_argument, NULL, 'd' },
-        { "download-unlimited", no_argument,       NULL, 'D' },
-        { "encryption",         required_argument, NULL, 'e' },
-        { "files",              required_argument, NULL, 'f' },
-        { "debug",              no_argument,       NULL, 'g' },
-        { "help",               no_argument,       NULL, 'h' },
-        { "info",               required_argument, NULL, 'i' },
-        { "list",               no_argument,       NULL, 'l' },
-        { "port-mapping",       no_argument,       NULL, 'm' },
-        { "no-port-mapping",    no_argument,       NULL, 'M' },
-        { "port",               required_argument, NULL, 'p' },
-        { "remove",             required_argument, NULL, 'r' },
-        { "start",              required_argument, NULL, 's' },
-        { "stop",               required_argument, NULL, 'S' },
-        { "auth",               required_argument, NULL, 't' },
-        { "upload-limit",       required_argument, NULL, 'u' },
-        { "upload-unlimited",   no_argument,       NULL, 'U' },
-        { "verify",             required_argument, NULL, 'v' },
-        { "download-dir",       required_argument, NULL, 'w' },
-        { "enable-pex",         no_argument,       NULL, 'x' },
-        { "disable-pex",        no_argument,       NULL, 'X' },
-        { NULL, 0, NULL, 0 }
-    };
+    int c;
+    int addingTorrents = 0;
+    char * optarg;
+    char id[4096];
 
-    while((( opt = getopt_long( argc, argv, optstr, longopts, NULL ))) != -1 )
+    *id = '\0';
+
+    while(( c = getopts( getUsage(), argc, argv, opts, &optarg )))
     {
-        char * tmp;
         char buf[MAX_PATH_LENGTH];
         int addArg = TRUE;
-        int64_t fields = 0;
         tr_benc top, *args;
         tr_bencInitDict( &top, 3 );
+        int64_t fields = 0;
         args = tr_bencDictAddDict( &top, "arguments", 0 );
 
-        switch( opt )
+fprintf( stderr, "got opt [%c][%s]\n", (char)c, (optarg?optarg:"(null)") );
+        switch( c )
         {
-            case 'g': debug = 1;
+            case -2:  /* special case: recognize options we didn't set above */
+fprintf( stderr, "hello world\n" );
+                      if( addingTorrents ) {
+                          char * tmp;
+fprintf( stderr, "adding filename [%s]\n", optarg );
+                          tr_bencDictAddStr( &top, "method", "torrent-add" );
+                          tr_bencDictAddStr( args, "metainfo", ((tmp=getEncodedMetainfo(optarg))) );
+                          tr_free( tmp );
+                      } else {
+                          fprintf( stderr, "Unknown option: %s\n", optarg );
+                          addArg = FALSE;
+                      }
+                      break;
+            case 'a': addingTorrents = 1;
                       addArg = FALSE;
                       break;
-            case 't': auth = tr_strdup( optarg );
-                      addArg = FALSE;
+            case 'd': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "speed-limit-down", numarg( optarg ) );
+                      tr_bencDictAddInt( args, "speed-limit-down-enabled", 1 );
                       break;
-            case 'h': showUsage( );
-                      addArg = FALSE;
-                      break;
-            case 'a': tr_bencDictAddStr( &top, "method", "torrent-add" );
-                      tr_bencDictAddStr( args, "metainfo", ((tmp=getEncodedMetainfo(optarg))) );
-                      tr_free( tmp );
+            case 'D': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "speed-limit-down-enabled", 0 );
                       break;
             case 'e': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddStr( args, "encryption", optarg );
@@ -183,33 +188,22 @@ readargs( int argc, char ** argv )
                              | TR_RPC_TORRENT_FIELD_PRIORITIES;
                       tr_bencDictAddInt( args, "fields", fields );
                       break;
+            case 'g': debug = 1;
+                      addArg = FALSE;
+                      break;
             case 'i': tr_bencDictAddStr( &top, "method", "torrent-get" );
                       tr_bencDictAddInt( &top, "tag", TAG_DETAILS );
-                      tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), optarg, strlen(optarg) );
+                      addIdArg( args, id );
                       fields = TR_RPC_TORRENT_FIELD_ACTIVITY
-                             | TR_RPC_TORRENT_FIELD_ANNOUNCE
-                             | TR_RPC_TORRENT_FIELD_ERROR
-                             | TR_RPC_TORRENT_FIELD_HISTORY
-                             | TR_RPC_TORRENT_FIELD_ID
-                             | TR_RPC_TORRENT_FIELD_INFO
-                             | TR_RPC_TORRENT_FIELD_SCRAPE
-                             | TR_RPC_TORRENT_FIELD_SIZE
-                             | TR_RPC_TORRENT_FIELD_TRACKER_STATS;
+                          | TR_RPC_TORRENT_FIELD_ANNOUNCE
+                          | TR_RPC_TORRENT_FIELD_ERROR
+                          | TR_RPC_TORRENT_FIELD_HISTORY
+                          | TR_RPC_TORRENT_FIELD_ID
+                          | TR_RPC_TORRENT_FIELD_INFO
+                          | TR_RPC_TORRENT_FIELD_SCRAPE
+                          | TR_RPC_TORRENT_FIELD_SIZE
+                          | TR_RPC_TORRENT_FIELD_TRACKER_STATS;
                       tr_bencDictAddInt( args, "fields", fields );
-                      break;
-            case 'd': tr_bencDictAddStr( &top, "method", "session-set" );
-                      tr_bencDictAddInt( args, "speed-limit-down", numarg( optarg ) );
-                      tr_bencDictAddInt( args, "speed-limit-down-enabled", 1 );
-                      break;
-            case 'D': tr_bencDictAddStr( &top, "method", "session-set" );
-                      tr_bencDictAddInt( args, "speed-limit-down-enabled", 0 );
-                      break;
-            case 'u': tr_bencDictAddStr( &top, "method", "session-set" );
-                      tr_bencDictAddInt( args, "speed-limit-up", numarg( optarg ) );
-                      tr_bencDictAddInt( args, "speed-limit-up-enabled", 1 );
-                      break;
-            case 'U': tr_bencDictAddStr( &top, "method", "session-set" );
-                      tr_bencDictAddInt( args, "speed-limit-up-enabled", 0 );
                       break;
             case 'l': tr_bencDictAddStr( &top, "method", "torrent-get" );
                       tr_bencDictAddInt( &top, "tag", TAG_LIST );
@@ -224,24 +218,33 @@ readargs( int argc, char ** argv )
             case 'M': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddInt( args, "port-forwarding-enabled", 0 );
                       break;
+            case 'n': auth = tr_strdup( optarg );
+                      addArg = FALSE;
+                      break;
             case 'p': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddInt( args, "port", numarg( optarg ) );
                       break;
             case 'r': tr_bencDictAddStr( &top, "method", "torrent-remove" );
-                      if( strcmp( optarg, "all" ) )
-                          tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), optarg, strlen(optarg) );
+                      addIdArg( args, id );
                       break;
             case 's': tr_bencDictAddStr( &top, "method", "torrent-start" );
-                      if( strcmp( optarg, "all" ) )
-                          tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), optarg, strlen(optarg) );
+                      addIdArg( args, id );
                       break;
             case 'S': tr_bencDictAddStr( &top, "method", "torrent-stop" );
-                      if( strcmp( optarg, "all" ) )
-                          tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), optarg, strlen(optarg) );
+                      addIdArg( args, id );
+                      break;
+            case 't': tr_strlcpy( id, optarg, sizeof( id ) );
+                      addArg = FALSE;
+                      break;
+            case 'u': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "speed-limit-up", numarg( optarg ) );
+                      tr_bencDictAddInt( args, "speed-limit-up-enabled", 1 );
+                      break;
+            case 'U': tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddInt( args, "speed-limit-up-enabled", 0 );
                       break;
             case 'v': tr_bencDictAddStr( &top, "method", "torrent-verify" );
-                      if( strcmp( optarg, "all" ) )
-                          tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), optarg, strlen(optarg) );
+                      addIdArg( args, id );
                       break;
             case 'w': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddStr( args, "download-dir", absolutify(buf,sizeof(buf),optarg) );
@@ -252,9 +255,8 @@ readargs( int argc, char ** argv )
             case 'X': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddInt( args, "pex-allowed", 0 );
                       break;
-            default:
+            default:  fprintf( stderr, "got opt [%d]\n", (int)c );
                       showUsage( );
-                      addArg = FALSE;
                       break;
         }
 

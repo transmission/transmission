@@ -20,5 +20,7 @@ LDADD = \
     $(LIBCURL_LIBS) \
     $(PTHREAD_LIBS) -lm
 
+noinst_HEADERS = getopts.h
+
 transmission_daemon_SOURCES = daemon.c
-transmission_remote_SOURCES = remote.c
+transmission_remote_SOURCES = remote.c getopts.c
