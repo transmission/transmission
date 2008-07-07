@@ -306,7 +306,7 @@ addInfo( const tr_torrent * tor, tr_benc * d, uint64_t fields )
         tr_bencDictAddInt( d, "leechers", st->leechers );
         tr_bencDictAddInt( d, "peersKnown", st->peersKnown );
         tr_bencDictAddInt( d, "seeders", st->seeders );
-        tr_bencDictAddDouble( d, "timesCompleted", st->timesCompleted );
+        tr_bencDictAddInt( d, "timesCompleted", st->timesCompleted );
     }
 
     if( fields & TR_RPC_TORRENT_FIELD_TRACKERS )
