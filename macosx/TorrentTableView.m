@@ -443,7 +443,7 @@
     {
         if ([item isKindOfClass: [Torrent class]])
         {
-            NSUInteger index = [self rowForItem: item];
+            NSInteger index = [self rowForItem: item];
             if (index != -1)
                 [indexSet addIndex: index];
         }

@@ -2065,8 +2065,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //actually sort
     [self sortTorrentsIgnoreSelected];
-    [fTableView selectValues: selectedValues];
-    //[self resetInfo]; //if group is already selected, but the torrents in it change
     
     //reset expanded/collapsed rows
     if (groupRows)
@@ -2081,6 +2079,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 [fTableView expandItem: group];
         }
     }
+    
+    [fTableView selectValues: selectedValues];
+    //removed because it made the inspector reset
+    //[self resetInfo]; //if group is already selected, but the torrents in it change
     
     [self setBottomCountText: groupRows || filterStatus || filterGroup || filterText];
     
