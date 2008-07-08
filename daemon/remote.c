@@ -76,7 +76,6 @@ static struct options opts[] =
 static void
 showUsage( void )
 {
-fprintf( stderr, "asdfasdfasdfasdfasdfasdf\n");
     getopts_usage( MY_NAME, getUsage(), opts );
     exit( 0 );
 }
@@ -133,11 +132,11 @@ addIdArg( tr_benc * args, const char * id )
 }
 
 static void
-readargs( int argc, char ** argv )
+readargs( int argc, const char ** argv )
 {
     int c;
     int addingTorrents = 0;
-    char * optarg;
+    const char * optarg;
     char id[4096];
 
     *id = '\0';
@@ -705,7 +704,7 @@ main( int argc, char ** argv )
     if( host == NULL )
         host = tr_strdup( DEFAULT_HOST );
 
-    readargs( argc, argv );
+    readargs( argc, (const char**)argv );
     if( reqCount )
         processRequests( host, port, (const char**)reqs, reqCount );
     else

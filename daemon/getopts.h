@@ -49,8 +49,15 @@ struct options
   char *argName;	/* Argument name, for the `help' option */
 };
 
-int getopts(const char * summary, int argc, char **argv, struct options opts[], char **args);
-int getopts_usage(const char *progName, const char * summary, struct options opts[]);
+int getopts( const char              * summary,
+             int                       argc,
+             const char             ** argv,
+             const struct options    * opts,
+             const char             ** setme_optarg );
+
+void getopts_usage( const char            * appName,
+                    const char            * description,
+                    const struct options  * opts );
 
 #ifdef __cplusplus
 }

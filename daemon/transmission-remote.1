@@ -9,40 +9,29 @@ and
 .Xr transmission 1
 .Sh SYNOPSIS
 .Bk -words
-.Nm transmission-remote
-.Fl h
 .Nm
 .Op Ar host:port | host | port
-.Op Fl a Ar torrent-file
-.Op Fl d Ar download-rate
+.Op Fl a Ar torrent-files
+.Op Fl d Ar number
 .Op Fl D
-.Op Fl e Ar encryption-mode
-.Oo
-.Fl f Ar id | Ar hash
-.Oc
-.Oo
-.Fl i Ar id | Ar hash
-.Oc
+.Op Fl e Ar mode
+.Op Fl f
+.Op Fl g
+.Op Fl h
+.Op Fl i
 .Op Fl l
 .Op Fl m
 .Op Fl M
+.Op Fl n Ar user:pass
 .Op Fl p Ar port
-.Op Fl t Ar user:pass
-.Oo
-.Fl r Ar all | Ar id | Ar hash
-.Oc
-.Oo
-.Fl s Ar all | Ar id | Ar hash
-.Oc
-.Oo
-.Fl S Ar all | Ar id | Ar hash
-.Oc
-.Op Fl u Ar upload-rate
+.Op Fl r
+.Op Fl s
+.Op Fl S
+.Op Fl t Ar all | Ar id | Ar hash
+.Op Fl u Ar number
 .Op Fl U
-.Oo
-.Fl v Ar all | Ar id | Ar hash
-.Oc
-.Op Fl w Ar directory
+.Op Fl v
+.Op Fl w Ar download-dir
 .Op Fl x
 .Op Fl X
 .Ek
@@ -61,81 +50,78 @@ Other sessions can be controlled by specifying a different host and/or port.
 The options are as follows:
 .Bl -tag -width Ds
 .It Fl a Fl -add Ar torrent-file
-Add the torrent metainfo file
-.Ar torrent-file .
-.It Fl d Fl -download-limit Ar download-rate
-Set maximum download rate to
-.Ar download-rate
-in kilobytes per second.
-.It Fl D Fl -download-unlimited
+Add metainfo
+.Ar torrent-file(s) .
+
+.It Fl d Fl -downlimit Ar limit
+Limit the download speed to
+.Ar limit
+kilobytes per second.
+
+.It Fl D Fl -no-downlimit
 Remove the download limit.
+
 .It Fl e Fl -encryption Ar required
 Require all peer connections to be encrypted.
 .It Fl e Fl -encryption Ar preferred
 Prefer encrypted peer connections.
 .It Fl e Fl -encryption Ar tolerated
 Prefer unencrypted peer connections.
-.It Fl f Fl -files Ar id | torrent-hash
-Get file information for the torrent matching the specified
-.Ar id
-or
-.Ar hash .
+
+.It Fl f Fl -files
+Get a file list for the current torrent(s)
+
 .It Fl h Fl -help
 Print command-line option descriptions.
+
 .It Fl i Fl -info Ar id | torrent-hash
-Print detailed information for the torrent matching the specified
-.Ar id
-or
-.Ar hash .
+Show details of the current torrent(s)
+
 .It Fl l Fl -list
-List all torrents, their Id numbers, and current status.
-.It Fl m Fl -port-mapping
-Enable automatic port mapping via NAT-PMP or UPnP IGD.
-.It Fl M Fl -no-port-mapping
-Disable automatic port mapping.
-.It Fl p Fl -port Ar port
-Attempt to bind to
-.Ar port
-for use as a listening port to accept incoming peer connections.
+List all torrents
 
-.It Fl r Fl -remove Ar all | id | torrent-hash
-Remove all torrents, or the torrent matching the specified
-.Ar id
-or
-.Ar hash .
-This does not delete the downloaded data.
+.It Fl m Fl -portmap
+Enable portmapping via NAT-PMP or UPnP
+.It Fl M Fl -no-portmap
+Disable portmapping
 
-.It Fl s Fl -start Ar all | id | torrent-hash
-Start all torrents downloading or seeding, or the torrent matching the specified
-.Ar id
-or
-.Ar hash .
-
-.It Fl S Fl -stop Ar all | id | torrent-hash
-Stop all torrents from downloading or seeding, or the torrent matching the specified
-.Ar id
-or
-.Ar hash .
-
-.It Fl t Fl -auth Ar user:pass
+.It Fl n Fl -auth Ar user:pass
 .Ar Username
 and
 .Ar password
 for authentication
 
-.It Fl u Fl -upload-limit Ar upload-rate
-Set maximum upload rate to
-.Ar upload-rate
-in kilobytes per second.
+.It Fl p Fl -port Ar port
+Set the
+.Ar port
+for use when listening for incoming peer connections
 
-.It Fl U Fl -upload-unlimited
-Remove the upload limit.
+.It Fl r Fl -remove
+Remove the current torrent(s).  This does not delete the downloaded data.
 
-.It Fl v Fl -verify Ar all | id | torrent-hash
-Queue all the torrents for verification, or the torrent matching the specified
+.It Fl s Fl -start
+Start the current torrent(s)
+
+.It Fl S Fl -stop
+Stop the current torrent(s) from downloading or seeding
+
+.It Fl t Fl -torrent Ar all | id | torrent-hash
+Set the current torrent(s) for use by subsequent options.
+.Ar all
+will apply following requests to all torrents, while specific torrents can be chosen by
 .Ar id
 or
 .Ar hash .
+
+.It Fl u Fl -uplimit Ar limit
+Limit the upload speed to
+.Ar limit
+kilobytes per second.
+.It Fl U Fl -no-uplimit
+Remove the upload limit.
+
+.It Fl v Fl -verify
+Verify the current torrent(s)
 
 .It Fl w Fl -download-dir Ar directory
 Use
@@ -155,15 +141,22 @@ Show all torrents, their ID numbers, and their status:
 .Pp
 Pause torrent #12:
 .Pp
-.Dl transmission-remote -S 12
+.Dl transmission-remote -t 12 -S
+.Dl transmission-remote --torrent=12 --stop
+.Pp
+Start all torrents:
+.Pp
+.Dl transmission-remote -t all -s
+.Dl transmission-remote --torrent=all --start
 .Pp
 Set download and upload limits to 100 KiB/sec and 20 KiB/sec:
 .Pp
 .Dl transmission-remote -d 100 -u 20
+.Dl transmission-remote -d=100 -u=20
 .Pp
 Add two torrents:
 .Pp
-.Dl transmission-remote -a foo.torrent -a bar.torrent
+.Dl transmission-remote -a one.torrent two.torrent
 
 .Sh AUTHORS
 .An -nosplit

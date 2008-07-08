@@ -37,7 +37,7 @@
  *
 */
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> /* exit() */
 #include <string.h>
 
 #include "getopts.h"
@@ -65,11 +65,10 @@ getopts_usage_line( const struct options * opt, int nameWidth, int shortWidth, i
     printf( "  -%*s, --%-*s %-*s  %s\n", shortWidth, shortName, nameWidth, name, argWidth, arg, opt->description );
 }
 
-/* int getopts_usage()
- *
- *  Returns: 1 - Successful
- */
-int getopts_usage(const char *progName, const char *usage, struct options opts[])
+void
+getopts_usage( const char           * progName,
+               const char           * description,
+               const struct options   opts[] )
 {
   int count;
   int nameWidth = 0;
@@ -91,9 +90,9 @@ int getopts_usage(const char *progName, const char *usage, struct options opts[]
       argWidth = MAX( argWidth, (int)strlen( arg ) );
   }
 
-  if( !usage )
-    usage = "Usage: %s [options]";
-  printf( usage, progName );
+  if( !description )
+    description = "Usage: %s [options]";
+  printf( description, progName );
   printf( "\n\n" );
   printf( "Usage:\n" );
 
@@ -106,103 +105,115 @@ int getopts_usage(const char *progName, const char *usage, struct options opts[]
   
   for( count=0; opts[count].description; ++count )
       getopts_usage_line( &opts[count], nameWidth, shortWidth, argWidth );
-
-  return 1;
 }
 
-/* int getopts()
- *
- * Returns: -1 - Couldn't allocate memory.  Please handle me. 
- *          0  - No arguements to parse
- *          #  - The number in the struct for the matched arg.
- *
-*/
-int
-getopts( const char      * usage,
-         int               argc,
-         char           ** argv,
-         struct options  * opts,
-         char           ** args )
+static const struct options *
+findOption( const struct options  * opts,
+            const char            * str,
+            const char           ** nested )
 {
-  int argCounter, sizeOfArgs;
-  if (argc == 1 || option_index == argc)
-    return 0;
-  
-/* Search for '-h' or '--help' first.  Then we can just exit */
-  for (argCounter = 1; argCounter < argc; argCounter++)
+    size_t len;
+    const struct options * o;
+
+    for( o=opts; o->number; ++o )
     {
-      if (!strcmp(argv[argCounter], "-h") || !strcmp(argv[argCounter], "--help"))
-        {
-useage:
-fprintf( stderr, "dkdkdkdkdkd\n" );
-          getopts_usage(argv[0], usage, opts);
-          exit(0);
-        }
-    }
-/* End of -h --help section */
-  
-  *args = NULL;
-  if (option_index <= argc)
-    {
-      for (argCounter = 0; opts[argCounter].number!=0; argCounter++)
-        {
-          if ((opts[argCounter].name && !strcmp(opts[argCounter].name, (argv[option_index]+2))) || 
-              (opts[argCounter].shortName && !strcmp(opts[argCounter].shortName, (argv[option_index]+1))))
-            {
-              if (opts[argCounter].args)
-                {
-                  option_index++;
-                  if (option_index >= argc)
-                    goto useage;
-/* This grossness that follows is to support having a '-' in the argument.  */
-                  if (*argv[option_index] == '-')
-                    {
-                      int optionSeeker;
-                      for (optionSeeker = 0; opts[optionSeeker].description; optionSeeker++)
-                        {
-                          if ((opts[optionSeeker].name && 
-                               !strcmp(opts[optionSeeker].name, (argv[option_index]+2))) ||
-                               (opts[optionSeeker].shortName && 
-                               !strcmp(opts[optionSeeker].shortName, (argv[option_index]+1))))
-                            {
-                              goto useage;
-                            }
-                        }
-/* End of gross hack for supporting '-' in arguments. */
-                    }
-                  sizeOfArgs = strlen(argv[option_index]);
-#ifdef __cplusplus
-                  if ((*args = (char *)calloc(1, sizeOfArgs+1)) == NULL)
-#else
-                  if ((*args = calloc(1, sizeOfArgs+1)) == NULL)
-#endif
-                    return -1;
-                  strncpy(*args, argv[option_index], sizeOfArgs);
-                }
-              option_index++;
-              return opts[argCounter].number;
+        if( o->name && (str[0]=='-') && (str[1]=='-') ) {
+            if( !strcmp( o->name, str+2 ) ) {
+                if( nested ) *nested = NULL;
+                return o;
+            }
+            len = strlen( o->name );
+            if( !memcmp( o->name, str+2, len ) && str[len+2]=='=' ) {
+                if( nested ) *nested = str+len+3;
+                return o;
             }
         }
-/** The Option doesn't exist.  We should warn them. */
-      //if (*argv[option_index] == '-')
-        {
-          sizeOfArgs = strlen(argv[option_index]);
-#ifdef __cplusplus
-          if ((*args = (char *)calloc(1, sizeOfArgs+1)) == NULL)
-#else
-          if ((*args = calloc(1, sizeOfArgs+1)) == NULL)
-#endif
-            return -1;
-          strncpy(*args, argv[option_index], sizeOfArgs);
-          option_index++;
-          return -2;
+        
+        if( o->shortName && (str[0]=='-') ) {
+            if( !strcmp( o->shortName, str+1 ) ) {
+                if( nested ) *nested = NULL;
+                return o;
+            }
+            len = strlen( o->shortName );
+            if( !memcmp( o->shortName, str+1, len ) && str[len+1]=='=' ) {
+                if( nested ) *nested = str+len+2;
+                return o;
+            }
         }
     }
-  return 0;
+
+    return NULL;
+}
+
+static void
+showUsageAndExit( const char           * appName,
+                  const char           * description,
+                  const struct options * opts )
+{
+    getopts_usage( appName, description, opts );
+    exit( 0 );
 }
 
 
+/*
+ * Returns: 0  - No arguments to parse
+ *          #  - The number in the struct for the matched arg.
+ *         -2  - Unrecognized option
+ */
+int
+getopts( const char             * usage,
+         int                      argc,
+         const char            ** argv,
+         const struct options   * opts,
+         const char            ** setme_optarg )
+{
+    int i;
+    const char * nest = NULL;
+    const struct options * o = NULL;
 
+    *setme_optarg = NULL;  
 
+    if( argc==1 || argc==option_index )
+        return 0;
+  
+    /* handle the builtin 'help' option */
+    for( i=1; i<argc; ++i )
+        if( !strcmp(argv[i], "-h") || !strcmp(argv[i], "--help" ) )
+            showUsageAndExit( argv[0], usage, opts );
 
+    /* out of options */
+    if( option_index >= argc )
+        return 0;
 
+    o = findOption( opts, argv[option_index], &nest );
+    if( !o ) {
+        /* let the user know we got an unknown option... */
+        *setme_optarg = argv[option_index++];
+        return -2;
+    }
+
+    if( !o->args ) {
+        /* no argument needed for this option, so we're done */
+        if( nest )
+            showUsageAndExit( argv[0], usage, opts );
+        *setme_optarg = NULL;
+        option_index++;
+        return o->number;
+    }
+
+    /* option needed an argument, and it was nested in this string */
+    if( nest ) {
+        *setme_optarg = nest;
+        option_index++;
+        return o->number;
+    }
+
+    /* throw an error if the option needed an argument but didn't get one */
+    if( ++option_index >= argc )
+        showUsageAndExit( argv[0], usage, opts );
+    if( findOption( opts, argv[option_index], NULL ))
+        showUsageAndExit( argv[0], usage, opts );
+
+    *setme_optarg = argv[option_index++];
+    return o->number;
+}
