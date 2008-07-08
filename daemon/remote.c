@@ -23,10 +23,9 @@
 #include <libtransmission/bencode.h>
 #include <libtransmission/rpc.h>
 #include <libtransmission/json.h>
+#include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
-
-#include "getopts.h"
 
 #define MY_NAME "transmission-remote"
 #define DEFAULT_HOST "localhost"
@@ -45,7 +44,7 @@ getUsage( void )
            "       "MY_NAME" [host:port] [options]";
 }
 
-static struct options opts[] =
+static tr_option opts[] =
 {
     { 'a', "add",          "Add torrent files", "a", 0, NULL },
     { 'd', "downlimit",    "Set the maximum download speed in KB/s", "d", 1, "<number>" },
@@ -76,7 +75,7 @@ static struct options opts[] =
 static void
 showUsage( void )
 {
-    getopts_usage( MY_NAME, getUsage(), opts );
+    tr_getopt_usage( MY_NAME, getUsage(), opts );
     exit( 0 );
 }
 
@@ -141,7 +140,7 @@ readargs( int argc, const char ** argv )
 
     *id = '\0';
 
-    while(( c = getopts( getUsage(), argc, argv, opts, &optarg )))
+    while(( c = tr_getopt( getUsage(), argc, argv, opts, &optarg )))
     {
         char buf[MAX_PATH_LENGTH];
         int addArg = TRUE;
@@ -152,7 +151,7 @@ readargs( int argc, const char ** argv )
 
         switch( c )
         {
-            case -2:  /* special case: recognize options we didn't set above */
+            case TR_OPT_UNK:
                       if( addingTorrents ) {
                           char * tmp;
                           tr_bencDictAddStr( &top, "method", "torrent-add" );
