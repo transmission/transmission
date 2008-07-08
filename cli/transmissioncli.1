@@ -24,28 +24,20 @@
 .Bk -words
 .Fl h
 .Nm
-.Op Fl v Ar level
 .Fl i
 .Ar torrent-file
 .Nm
-.Op Fl v Ar level
 .Fl s
 .Ar torrent-file
 .Nm
-.Op Fl v Ar level
-.Op Fl p Ar port
-.Op Fl d Ar number
-.Op Fl u Ar number
-.Op Fl f Ar script
-.Op Fl n
-.Ar torrent-file
-.Op Ar output-dir
-.Nm
-.Fl n Ar path
+.Fl n Ar sourcefile
 .Op Fl a Ar url
 .Op Fl c Ar comment
 .Op Fl r
-.Ar output-file
+.Ar new-torrent-file
+.Nm
+.Op options
+.Ar torrent-file
 .Ek
 .Sh DESCRIPTION
 The
@@ -59,6 +51,13 @@ The options are as follows:
 .It Fl a, Fl -announce Ar announce-url
 When creating a new torrent, set its announce URL
 
+.It Fl b Fl -blocklist
+Enable peer blocklists.  Transmission understands the bluetack blocklist file format.
+New blocklists can be added by copying them into the config-dir's "blocklists" subdirectory.
+
+.It Fl B Fl -no-blocklist
+Disble blocklists.
+
 .It Fl c, Fl -comment Ar comment-text
 When creating a new torrent, set its comment field
 
@@ -67,6 +66,13 @@ Set the maximum download speed in KB/s
 
 .It Fl D, -no-downlimit
 Don't limit the download speed
+
+.It Fl e Fl -encryption Ar required
+Require all peer connections to be encrypted.
+.It Fl e Fl -encryption Ar preferred
+Prefer encrypted peer connections.
+.It Fl e Fl -encryption Ar tolerated
+Prefer unencrypted peer connections.
 
 .It Fl f, -finish Ar script
 Set a script to run when the torrent finishes
@@ -86,7 +92,7 @@ Enable portmapping via NAT-PMP or UPnP
 .It Fl M, Fl -no-portmap
 Disable portmapping
 
-.It Fl n, Fl -new Ar path
+.It Fl n, Fl -new Ar sourcefile
 Create torrent from the specified file or directory
 
 .It Fl p, -port Ar port
@@ -112,8 +118,6 @@ Verify the torrent's downloaded data.
 
 .It Fl w, Fl -download-dir Ar directory
 Where to save downloaded data.
-
-ccc
 
 .Sh SIGNALS
 In addition to these options, sending

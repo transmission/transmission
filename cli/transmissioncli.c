@@ -38,18 +38,20 @@
 
 #define MY_NAME "transmission-cli"
 
-static int           showInfo      = 0;
-static int           showScrape    = 0;
-static int           isPrivate     = 0;
-static int           verboseLevel  = 0;
-static int           peerPort      = TR_DEFAULT_PORT;
-static int           peerSocketTOS = TR_DEFAULT_PEER_SOCKET_TOS;
-static int           uploadLimit   = 20;
-static int           downloadLimit = -1;
-static int           natTraversal  = 0;
-static int           verify        = 0;
-static sig_atomic_t  gotsig        = 0;
-static sig_atomic_t  manualUpdate  = 0;
+static int           showInfo         = 0;
+static int           showScrape       = 0;
+static int           isPrivate        = 0;
+static int           verboseLevel     = 0;
+static int           encryptionMode   = TR_ENCRYPTION_PREFERRED;
+static int           peerPort         = TR_DEFAULT_PORT;
+static int           peerSocketTOS    = TR_DEFAULT_PEER_SOCKET_TOS;
+static int           blocklistEnabled = TR_DEFAULT_BLOCKLIST_ENABLED;
+static int           uploadLimit      = 20;
+static int           downloadLimit    = -1;
+static int           natTraversal     = TR_DEFAULT_PORT_FORWARDING_ENABLED;
+static int           verify           = 0;
+static sig_atomic_t  gotsig           = 0;
+static sig_atomic_t  manualUpdate     = 0;
 
 static const char   * torrentPath   = NULL;
 static const char   * downloadDir   = NULL;
@@ -187,7 +189,7 @@ main( int argc, char ** argv )
             TR_DEFAULT_PEX_ENABLED,
             natTraversal,                  /* nat enabled */
             peerPort,
-            TR_ENCRYPTION_PREFERRED,
+            encryptionMode,
             uploadLimit >= 0,
             uploadLimit,
             downloadLimit >= 0,
@@ -195,7 +197,7 @@ main( int argc, char ** argv )
             TR_DEFAULT_GLOBAL_PEER_LIMIT,
             verboseLevel + 1,              /* messageLevel */
             0,                             /* is message queueing enabled? */
-            TR_DEFAULT_BLOCKLIST_ENABLED,
+            blocklistEnabled,
             peerSocketTOS,
             TR_DEFAULT_RPC_ENABLED,
             TR_DEFAULT_RPC_PORT,
@@ -439,24 +441,27 @@ getUsage( void )
 }
 
 const struct tr_option options[] = {
-    { 'a', "announce",     "When creating a new torrent, set its announce URL",   "a", 1, "<url>" },
-    { 'c', "comment",      "When creating a new torrent, set its comment field",  "c", 1, "<comment>" },
-    { 'd', "downlimit",    "Set the maxiumum download speed in KB/s",             "d", 1, "<number>" },
-    { 'D', "no-downlimit", "Don't limit the download speed",                      "D", 0, NULL },
-    { 'f', "finish",       "Set a script to run when the torrent finishes",       "f", 1, "<script>" },
-    { 'g', "config-dir",   "Where to look for configuration files",               "g", 1, "<path>" },
-    { 'i', "info",         "Show torrent details and exit",                       "i", 0, NULL },
-    { 'm', "portmap",      "Enable portmapping via NAT-PMP or UPnP",              "m", 0, NULL },
-    { 'M', "no-portmap",   "Disable portmapping",                                 "M", 0, NULL },
-    { 'n', "new",          "Create a new torrent from a file or directory",       "n", 1, "<path>" },
+    { 'a', "announce",     "When creating a new torrent, set its announce URL",    "a", 1, "<url>" },
+    { 'b', "blocklist",    "Enable peer blocklists",                               "b", 0, NULL },
+    { 'B', "no-blocklist", "Disable peer blocklists",                              "B", 0, NULL },
+    { 'c', "comment",      "When creating a new torrent, set its comment field",   "c", 1, "<comment>" },
+    { 'd', "downlimit",    "Set the maxiumum download speed in KB/s",              "d", 1, "<number>" },
+    { 'D', "no-downlimit", "Don't limit the download speed",                       "D", 0, NULL },
+    { 'e', "encryption",   "Set encryption mode [required, preferred, tolerated]", "e", 1, "<mode>" },
+    { 'f', "finish",       "Set a script to run when the torrent finishes",        "f", 1, "<script>" },
+    { 'g', "config-dir",   "Where to look for configuration files",                "g", 1, "<path>" },
+    { 'i', "info",         "Show torrent details and exit",                        "i", 0, NULL },
+    { 'm', "portmap",      "Enable portmapping via NAT-PMP or UPnP",               "m", 0, NULL },
+    { 'M', "no-portmap",   "Disable portmapping",                                  "M", 0, NULL },
+    { 'n', "new",          "Create a new torrent from a file or directory",        "n", 1, "<path>" },
     { 'p', "port",         "Port to listen for incoming peers (Default: "TR_DEFAULT_PORT_STR")", "p", 1, "<port>" },
-    { 'r', "private",      "When creating a new torrent, set its 'private' flag", "r", 0, NULL },
-    { 's', "scrape",       "Scrape the torrent and exit",                         "s", 0, NULL },
+    { 'r', "private",      "When creating a new torrent, set its 'private' flag",  "r", 0, NULL },
+    { 's', "scrape",       "Scrape the torrent and exit",                          "s", 0, NULL },
     { 't', "tos",          "Peer socket TOS (0 to 255, default="TR_DEFAULT_PEER_SOCKET_TOS_STR")", "t", 1, "<number>"},
-    { 'u', "uplimit",      "Set the maxiumum upload speed in KB/s",               "u", 1, "<number>" },
-    { 'U', "no-uplimit",   "Don't limit the upload speed",                        "U", 0, NULL },
-    { 'v', "verify",       "Verify the specified torrent",                        "v", 0, NULL },
-    { 'w', "download-dir", "Where to save downloaded data",                       "w", 1, "<path>" },
+    { 'u', "uplimit",      "Set the maxiumum upload speed in KB/s",                "u", 1, "<number>" },
+    { 'U', "no-uplimit",   "Don't limit the upload speed",                         "U", 0, NULL },
+    { 'v', "verify",       "Verify the specified torrent",                         "v", 0, NULL },
+    { 'w', "download-dir", "Where to save downloaded data",                        "w", 1, "<path>" },
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
@@ -490,9 +495,18 @@ parseCommandLine( int argc, const char ** argv )
         switch( c )
         {
             case 'a': announce = optarg; break;
+            case 'b': blocklistEnabled = 1; break;
+            case 'B': blocklistEnabled = 0; break;
             case 'c': comment = optarg; break;
             case 'd': downloadLimit = numarg( optarg ); break;
             case 'D': downloadLimit = -1; break;
+            case 'e': if( !strcmp( optarg, "required" ) )
+                          encryptionMode = TR_ENCRYPTION_REQUIRED;
+                      else if( !strcmp( optarg, "tolerated" ) )
+                          encryptionMode = TR_PLAINTEXT_PREFERRED;
+                      else
+                          encryptionMode = TR_ENCRYPTION_PREFERRED;
+                      break;
             case 'f': finishCall = optarg; break;
             case 'g': configdir = optarg; break;
             case 'i': showInfo = 1; break;
