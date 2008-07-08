@@ -26,70 +26,40 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <getopt.h>
 #include <signal.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/metainfo.h> /* tr_metainfoFree */
+#include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h> /* tr_wait */
 #include <libtransmission/web.h> /* tr_webRun */
 
+#define MY_NAME "transmission-cli"
 
-/* macro to shut up "unused parameter" warnings */
-#ifdef __GNUC__
-#define UNUSED                  __attribute__((unused))
-#else
-#define UNUSED
-#endif
-
-const char * USAGE =
-"Usage: %s [-car[-m]] [-dfginpsuv] [-h] file.torrent [output-dir]\n\n"
-"Options:\n"
-"  -h, --help                Print this help and exit\n" 
-"  -i, --info                Print metainfo and exit\n"
-"  -s, --scrape              Print counts of seeders/leechers and exit\n"
-"  -V, --version             Print the version number and exit\n"
-"  -c, --create-from <file>  Create torrent from the specified source file.\n"
-"  -a, --announce <url>      Used in conjunction with -c.\n"
-"  -g, --config-dir <path>   Where to look for configuration files\n"
-"  -o, --output-dir <path>   Where to save downloaded data\n"
-"  -r, --private             Used in conjunction with -c.\n"
-"  -m, --comment <text>      Adds an optional comment when creating a torrent.\n"
-"  -d, --download <int>      Max download rate (-1 = no limit, default = -1)\n"
-"  -f, --finish <script>     Command you wish to run on completion\n" 
-"  -n  --nat-traversal       Attempt NAT traversal using NAT-PMP or UPnP IGD\n"
-"  -p, --port <int>          Port we should listen on (default = %d)\n"
-"  -t, --tos <int>           Peer socket TOS (0 to 255, default = 8)\n"
-"  -u, --upload <int>        Maximum upload rate (-1 = no limit, default = 20)\n"
-"  -v, --verbose <int>       Verbose level (0 to 2, default = 0)\n"
-"  -y, --recheck             Force a recheck of the torrent data\n";
-
-static int           showHelp      = 0;
 static int           showInfo      = 0;
 static int           showScrape    = 0;
-static int           showVersion   = 0;
 static int           isPrivate     = 0;
 static int           verboseLevel  = 0;
 static int           peerPort      = TR_DEFAULT_PORT;
 static int           peerSocketTOS = TR_DEFAULT_PEER_SOCKET_TOS;
 static int           uploadLimit   = 20;
 static int           downloadLimit = -1;
-static char        * torrentPath   = NULL;
 static int           natTraversal  = 0;
-static int           recheckData   = 0;
+static int           verify        = 0;
 static sig_atomic_t  gotsig        = 0;
 static sig_atomic_t  manualUpdate  = 0;
-static char          downloadDir[MAX_PATH_LENGTH] = { '\0' };
 
-static char          * finishCall   = NULL;
-static char          * announce     = NULL;
-static char          * configdir    = NULL;
-static char          * sourceFile   = NULL;
-static char          * comment      = NULL;
+static const char   * torrentPath   = NULL;
+static const char   * downloadDir   = NULL;
+static const char   * finishCall   = NULL;
+static const char   * announce     = NULL;
+static const char   * configdir    = NULL;
+static const char   * sourceFile   = NULL;
+static const char   * comment      = NULL;
 
-static int  parseCommandLine ( int argc, char ** argv );
+static int  parseCommandLine ( int argc, const char ** argv );
 static void sigHandler       ( int signal );
 
 static char *
@@ -171,34 +141,25 @@ main( int argc, char ** argv )
     tr_handle  * h;
     tr_ctor * ctor;
     tr_torrent * tor = NULL;
+    char cwd[MAX_PATH_LENGTH];
 
     printf( "Transmission %s - http://www.transmissionbt.com/\n",
             LONG_VERSION_STRING );
 
     /* Get options */
-    if( parseCommandLine( argc, argv ) )
-    {
-        printf( USAGE, argv[0], TR_DEFAULT_PORT );
+    if( parseCommandLine( argc, (const char**)argv ) )
+        return EXIT_FAILURE;
+
+    /* Check the options for validity */
+    if( !torrentPath ) {
+        printf( "No torrent specified!\n" );
         return EXIT_FAILURE;
     }
-
-    if( showVersion )
-        return EXIT_SUCCESS;
-
-    if( showHelp )
-    {
-        printf( USAGE, argv[0], TR_DEFAULT_PORT );
-        return EXIT_SUCCESS;
-    }
-
-    if( peerPort < 1 || peerPort > 65535 )
-    {
+    if( peerPort < 1 || peerPort > 65535 ) {
         printf( "Invalid port '%d'\n", peerPort );
         return EXIT_FAILURE;
     }
-
-    if( peerSocketTOS < 0 || peerSocketTOS > 255 )
-    {
+    if( peerSocketTOS < 0 || peerSocketTOS > 255 ) {
         printf( "Invalid TOS '%d'\n", peerSocketTOS );
         return EXIT_FAILURE;
     }
@@ -209,7 +170,14 @@ main( int argc, char ** argv )
         peerPort = -1;
 
     if( configdir == NULL )
-        configdir = strdup( tr_getDefaultConfigDir( ) );
+        configdir = tr_getDefaultConfigDir( );
+
+    /* if no download directory specified, use cwd instead */
+    if( !downloadDir ) {
+        getcwd( cwd, sizeof( cwd ) );
+        downloadDir = cwd;
+    }
+
 
     /* Initialize libtransmission */
     h = tr_sessionInitFull(
@@ -246,7 +214,7 @@ main( int argc, char ** argv )
         tr_metainfo_builder * builder = tr_metaInfoBuilderCreate( h, sourceFile );
         tr_tracker_info ti;
         ti.tier = 0;
-        ti.announce = announce;
+        ti.announce = (char*) announce;
         tr_makeMetaInfo( builder, torrentPath, &ti, 1, comment, isPrivate );
         while( !builder->isDone ) {
             tr_wait( 1000 );
@@ -384,9 +352,9 @@ main( int argc, char ** argv )
             }
         }
         
-        if( recheckData )
+        if( verify )
         {
-            recheckData = 0;
+            verify = 0;
             tr_torrentVerify( tor );
         }
 
@@ -456,89 +424,104 @@ cleanup:
     return EXIT_SUCCESS;
 }
 
-static int
-parseCommandLine( int argc, char ** argv )
+/***
+****
+****
+****
+***/
+
+static const char *
+getUsage( void )
 {
-    for( ;; )
+    return "A fast and easy BitTorrent client\n"
+           "\n"
+           "Usage: "MY_NAME" [options] <torrent-filename>";
+}
+
+const struct tr_option options[] = {
+    { 'a', "announce",     "When creating a new torrent, set its announce URL",   "a", 1, "<url>" },
+    { 'c', "comment",      "When creating a new torrent, set its comment field",  "c", 1, "<comment>" },
+    { 'd', "downlimit",    "Set the maxiumum download speed in KB/s",             "d", 1, "<number>" },
+    { 'D', "no-downlimit", "Don't limit the download speed",                      "D", 0, NULL },
+    { 'f', "finish",       "Set a script to run when the torrent finishes",       "f", 1, "<script>" },
+    { 'g', "config-dir",   "Where to look for configuration files",               "g", 1, "<path>" },
+    { 'i', "info",         "Show torrent details and exit",                       "i", 0, NULL },
+    { 'm', "portmap",      "Enable portmapping via NAT-PMP or UPnP",              "m", 0, NULL },
+    { 'M', "no-portmap",   "Disable portmapping",                                 "M", 0, NULL },
+    { 'n', "new",          "Create a new torrent from a file or directory",       "n", 1, "<path>" },
+    { 'p', "port",         "Port to listen for incoming peers (Default: "TR_DEFAULT_RPC_PORT_STR")", "p", 1, "<port>" },
+    { 'r', "private",      "When creating a new torrent, set its 'private' flag", "r", 0, NULL },
+    { 's', "scrape",       "Scrape the torrent and exit",                         "s", 0, NULL },
+    { 't', "tos",          "Peer socket TOS (0 to 255, default="TR_DEFAULT_PEER_SOCKET_TOS_STR")", "t", 1, "<number>"},
+    { 'u', "uplimit",      "Set the maxiumum upload speed in KB/s",               "u", 1, "<number>" },
+    { 'U', "no-uplimit",   "Don't limit the upload speed",                        "U", 0, NULL },
+    { 'v', "verify",       "Verify the specified torrent",                        "v", 0, NULL },
+    { 'w', "download-dir", "Where to save downloaded data",                       "w", 1, "<path>" },
+    { 0, NULL, NULL, NULL, 0, NULL }
+};
+
+static void
+showUsage( void )
+{
+    tr_getopt_usage( MY_NAME, getUsage(), options );
+    exit( 0 );
+}
+
+static int
+numarg( const char * arg )
+{
+    char * end = NULL;
+    const long num = strtol( arg, &end, 10 );
+    if( *end ) {
+        fprintf( stderr, "Not a number: \"%s\"\n", arg );
+        showUsage( );
+    }
+    return num;
+}
+
+static int
+parseCommandLine( int argc, const char ** argv )
+{
+    int c;
+    const char * optarg;
+
+    while(( c = tr_getopt( getUsage(), argc, argv, options, &optarg )))
     {
-        static const struct option long_options[] = {
-            { "announce",      required_argument, NULL, 'a' },
-            { "create-from",   required_argument, NULL, 'c' },
-            { "download",      required_argument, NULL, 'd' },
-            { "finish",        required_argument, NULL, 'f' },
-            { "config-dir",    required_argument, NULL, 'g' },
-            { "help",          no_argument,       NULL, 'h' },
-            { "info",          no_argument,       NULL, 'i' },
-            { "comment",       required_argument, NULL, 'm' },
-            { "nat-traversal", no_argument,       NULL, 'n' },
-            { "output-dir",    required_argument, NULL, 'o' },
-            { "port",          required_argument, NULL, 'p' },
-            { "private",       no_argument,       NULL, 'r' },
-            { "scrape",        no_argument,       NULL, 's' },
-            { "tos",           required_argument, NULL, 't' },
-            { "upload",        required_argument, NULL, 'u' },
-            { "verbose",       required_argument, NULL, 'v' },
-            { "version",       no_argument,       NULL, 'V' },
-            { "recheck",       no_argument,       NULL, 'y' },
-            { 0, 0, 0, 0} };
-        int optind = 0;
-        int c = getopt_long( argc, argv,
-                             "a:c:d:f:g:him:no:p:rst:u:v:Vy",
-                             long_options, &optind );
-        if( c < 0 )
-        {
-            break;
-        }
         switch( c )
         {
             case 'a': announce = optarg; break;
-            case 'c': sourceFile = optarg; break;
-            case 'd': downloadLimit = atoi( optarg ); break;
+            case 'c': comment = optarg; break;
+            case 'd': downloadLimit = numarg( optarg ); break;
+            case 'D': downloadLimit = -1; break;
             case 'f': finishCall = optarg; break;
-            case 'g': configdir = strdup( optarg ); break;
-            case 'h': showHelp = 1; break;
+            case 'g': configdir = optarg; break;
             case 'i': showInfo = 1; break;
-            case 'm': comment = optarg; break;
-            case 'n': natTraversal = 1; break;
-            case 'o': tr_strlcpy( downloadDir, optarg, sizeof( downloadDir ) ); break;
-            case 'p': peerPort = atoi( optarg ); break;
+            case 'm': natTraversal = 1; break;
+            case 'M': natTraversal = 0; break;
+            case 'n': sourceFile = optarg; break;
+            case 'p': peerPort = numarg( optarg ); break;
             case 'r': isPrivate = 1; break;
             case 's': showScrape = 1; break;
-            case 't': peerSocketTOS = atoi( optarg ); break;
-            case 'u': uploadLimit = atoi( optarg ); break;
-            case 'v': verboseLevel = atoi( optarg ); break;
-            case 'V': showVersion = 1; break;
-            case 'y': recheckData = 1; break;
+            case 't': peerSocketTOS = numarg( optarg ); break;
+            case 'u': uploadLimit = numarg( optarg ); break;
+            case 'U': uploadLimit = -1; break;
+            case 'v': verify = 1; break;
+            case 'w': downloadDir = optarg; break;
+            case TR_OPT_UNK: torrentPath = optarg; break;
             default: return 1;
         }
     }
 
-    if( !*downloadDir )
-        getcwd( downloadDir, sizeof( downloadDir ) );
-
-    if( showHelp || showVersion )
-        return 0;
-
-    if( optind >= argc )
-        return 1;
-
-    torrentPath = argv[optind];
     return 0;
 }
 
-static void sigHandler( int signal )
+static void
+sigHandler( int signal )
 {
     switch( signal )
     {
-        case SIGINT:
-            gotsig = 1;
-            break;
-            
-        case SIGHUP:
-            manualUpdate = 1;
-            break;
-
-        default:
-            break;
+        case SIGINT: gotsig = 1; break;
+        case SIGHUP: manualUpdate = 1; break;
+        default: break;
     }
 }

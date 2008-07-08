@@ -72,7 +72,7 @@ tr_getopt_usage( const char             * progName,
     description = "Usage: %s [options]";
   printf( description, progName );
   printf( "\n\n" );
-  printf( "Usage:\n" );
+  printf( "Options:\n" );
 
   help.val = -1;
   help.longName = "help";

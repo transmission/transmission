@@ -115,6 +115,8 @@ tr_proxy_type;
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PEER_SOCKET_TOS          8
 /** @see tr_sessionInitFull */
+#define TR_DEFAULT_PEER_SOCKET_TOS_STR      "8"
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_BLOCKLIST_ENABLED        0
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_RPC_ENABLED              0
