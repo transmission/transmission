@@ -150,14 +150,11 @@ readargs( int argc, const char ** argv )
         int64_t fields = 0;
         args = tr_bencDictAddDict( &top, "arguments", 0 );
 
-fprintf( stderr, "got opt [%c][%s]\n", (char)c, (optarg?optarg:"(null)") );
         switch( c )
         {
             case -2:  /* special case: recognize options we didn't set above */
-fprintf( stderr, "hello world\n" );
                       if( addingTorrents ) {
                           char * tmp;
-fprintf( stderr, "adding filename [%s]\n", optarg );
                           tr_bencDictAddStr( &top, "method", "torrent-add" );
                           tr_bencDictAddStr( args, "metainfo", ((tmp=getEncodedMetainfo(optarg))) );
                           tr_free( tmp );
