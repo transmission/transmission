@@ -34,18 +34,17 @@
 .Nm
 .Op Fl v Ar level
 .Op Fl p Ar port
-.Op Fl d Ar download-rate
-.Op Fl u Ar upload-rate
+.Op Fl d Ar number
+.Op Fl u Ar number
 .Op Fl f Ar script
 .Op Fl n
 .Ar torrent-file
 .Op Ar output-dir
 .Nm
-.Op Fl v Ar level
-.Fl c Ar source-file
-.Fl a Ar announce-url
-.Op Fl p Ar port
-.Op Fl m Ar comment
+.Fl n Ar path
+.Op Fl a Ar url
+.Op Fl c Ar comment
+.Op Fl r
 .Ar output-file
 .Ek
 .Sh DESCRIPTION
@@ -56,49 +55,66 @@ scripting capabilities.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
-.It Fl g, Fl -config-dir Ar directory
-Where to look for configuration files.
-.It Fl o, Fl -output-dir Ar directory
-Where to save downloaded data.
-.It Fl c, Fl -create-from Ar source-file
-Create torrent from the specified source file.
+
 .It Fl a, Fl -announce Ar announce-url
-Specifies the announce-url the new torrent will use. Can only be
-used in conjunction with -c or --create-from.
-.It Fl r, Fl -private
-Sets the private flag for the new torrent. Can only be used in
-conjunction with -c or --create-from.
-.It Fl m, Fl -comment Ar comment-text
-This optional parameter adds a comment to the new torrent. Can only
-be used in conjunction with -c or --create-from.
+When creating a new torrent, set its announce URL
+
+.It Fl c, Fl -comment Ar comment-text
+When creating a new torrent, set its comment field
+
+.It Fl d, -downlimit Ar number
+Set the maximum download speed in KB/s
+
+.It Fl D, -no-downlimit
+Don't limit the download speed
+
+.It Fl f, -finish Ar script
+Set a script to run when the torrent finishes
+
+.It Fl g, Fl -config-dir Ar directory
+Where to look for configuration files
+
 .It Fl h, Fl -help
 Prints a short usage summary.
+
 .It Fl i, Fl -info
-Shows information from the specified torrent file, such as the
-cryptographic hash, the tracker, announcement, file size and file
-name.
-.It Fl s, -scrape
-Prints the number of seeders and leechers for the specified torrent
-file, and exits.
-.It Fl v, -verbose Ar level
-Sets debugging options. You can use both many -v flags, or a -v level. The current available levels are 0-2, with the highest
-level producing the most output.  The default is 0.
-.It Fl n, Fl -nat-traversal
-Attempt to use the NAT-PMP and UPnP IGD protocols to establish a port
-mapping for allowing incoming peer connections.
+Shows torrent details and exit
+
+.It Fl m, Fl -portmap
+Enable portmapping via NAT-PMP or UPnP
+
+.It Fl M, Fl -no-portmap
+Disable portmapping
+
+.It Fl n, Fl -new Ar path
+Create torrent from the specified file or directory
+
 .It Fl p, -port Ar port
-Specifies an alternate port for the client to listen on.  The default is
-51413.
-.It Fl u, -upload Ar upload-rate
-Specifies the maximum upload rate in kB/s, which defaults to 20.  The
-level -1 may be used for unlimited uploads.
-.It Fl d, -download Ar download-rate
-Specifies the maximum download rate in kB/s, which defaults to -1 for
-no download limit.
-.It Fl f, -finish Ar script
-Specifies a shell script to be executed upon successful download.
-.It Fl y, Fl -recheck
-Force a recheck of the torrent data.
+Set the port to listen for incoming peers. (Default: 51413)
+
+.It Fl r, Fl -private
+When creating a new torrent, set its 'private' flag
+
+.It Fl s, -scrape
+Print the current number of seeders and leechers for the specified torrent
+
+.It Fl t, -tos
+Set the peer socket TOS for local router-based traffic shaping.
+
+.It Fl u, -uplimit Ar number
+Set the maximum upload speed in KB/s
+
+.It Fl U, -no-uplimit
+Don't limit the upload speed
+
+.It Fl v, Fl -verify
+Verify the torrent's downloaded data.
+
+.It Fl w, Fl -download-dir Ar directory
+Where to save downloaded data.
+
+ccc
+
 .Sh SIGNALS
 In addition to these options, sending
 .Nm

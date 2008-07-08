@@ -449,7 +449,7 @@ const struct tr_option options[] = {
     { 'm', "portmap",      "Enable portmapping via NAT-PMP or UPnP",              "m", 0, NULL },
     { 'M', "no-portmap",   "Disable portmapping",                                 "M", 0, NULL },
     { 'n', "new",          "Create a new torrent from a file or directory",       "n", 1, "<path>" },
-    { 'p', "port",         "Port to listen for incoming peers (Default: "TR_DEFAULT_RPC_PORT_STR")", "p", 1, "<port>" },
+    { 'p', "port",         "Port to listen for incoming peers (Default: "TR_DEFAULT_PORT_STR")", "p", 1, "<port>" },
     { 'r', "private",      "When creating a new torrent, set its 'private' flag", "r", 0, NULL },
     { 's', "scrape",       "Scrape the torrent and exit",                         "s", 0, NULL },
     { 't', "tos",          "Peer socket TOS (0 to 255, default="TR_DEFAULT_PEER_SOCKET_TOS_STR")", "t", 1, "<number>"},

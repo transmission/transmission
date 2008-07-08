@@ -111,6 +111,8 @@ tr_proxy_type;
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PORT                     51413
 /** @see tr_sessionInitFull */
+#define TR_DEFAULT_PORT_STR                 "51413"
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_GLOBAL_PEER_LIMIT        200
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PEER_SOCKET_TOS          8

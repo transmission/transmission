@@ -11,16 +11,16 @@
 .Nm
 .Op Fl a Ar (+|-)x.x.x.x[/x],...
 .Op Fl b
-.Op Fl b0
-.Op Fl d
+.Op Fl B
 .Op Fl f
 .Op Fl g Ar directory
 .Op Fl h
 .Op Fl p Ar port
 .Op Fl t
-.Op Fl t0
+.Op Fl T
 .Op Fl u Ar username
-.Op Fl w Ar password
+.Op Fl v Ar password
+.Op Fl w Ar download-dir
 .Ek
 
 .Sh DESCRIPTION
@@ -47,11 +47,8 @@ Default: +127.0.0.1
 Enable peer blocklists.  Transmission understands the bluetack blocklist file format.
 New blocklists can be added by copying them into the config-dir's "blocklists" subdirectory.
 
-.It Fl b0 Fl -blocklist=0
+.It Fl B Fl -no-blocklist
 Disble blocklists.
-
-.It Fl d Fl -download-dir
-Where to store downloaded data.
 
 .It Fl f Fl -foreground
 Run in the foreground and print errors to stderr.
@@ -68,17 +65,22 @@ Port to open and listen for RPC requests on.  Default: 9091
 .It Fl t Fl -auth
 Require clients to authenticate themselves.
 This doesn't do much good unless
-.Ar username and
-.Ar password are also set.
+.Ar username
+and
+.Ar password
+are also set.
 
-.It Fl t0 Fl -auth=0
+.It Fl T Fl -no-auth
 Don't require authentication from clients.
 
-.It Fl u Fl -username ar username
+.It Fl u Fl -username Ar username
 Used for client authentication.
 
-.It Fl w Fl -password ar password
+.It Fl v Fl -password Ar password
 Used for client authentication.
+
+.It Fl w Fl -download-dir
+Where to store downloaded data.
 
 .El
 

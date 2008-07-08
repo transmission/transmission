@@ -230,11 +230,11 @@ const struct tr_option options[] = {
     { 'B', "no-blocklist", "Disable peer blocklists",         "B", 0, NULL },
     { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", 0, NULL },
     { 'g', "config-dir",   "Where to look for configuration files", "g", 1, "<path>" },
-    { 'p', "port",         "Port to listen for incoming peers (Default: "TR_DEFAULT_RPC_PORT_STR")", "p", 1, "<port>" },
+    { 'p', "port",         "Port to listen for incoming peers (Default: "TR_DEFAULT_PORT_STR")", "p", 1, "<port>" },
     { 't', "auth",         "Requre authentication",           "t", 0, NULL },
     { 'T', "no-auth",      "Don't require authentication",    "T", 0, NULL },
     { 'u', "username",     "Set username for authentication", "u", 1, "<username>" },
-    { 's', "password",     "Set password for authentication", "s", 1, "<password>" },
+    { 'v', "password",     "Set password for authentication", "v", 1, "<password>" },
     { 'w', "download-dir", "Where to save downloaded data",   "w", 1, "<path>" },
     { 0, NULL, NULL, NULL, 0, NULL }
 };
@@ -249,7 +249,8 @@ showUsage( void )
 static void
 readargs( int argc, const char ** argv,
           int * nofork, const char ** configDir, const char ** downloadDir,
-          int * rpcPort, const char ** acl, int * authRequired, const char ** username, const char ** password,
+          int * rpcPort, const char ** acl,
+          int * authRequired, const char ** username, const char ** password,
           int * blocklistEnabled )
 {
     int c;
@@ -267,7 +268,7 @@ readargs( int argc, const char ** argv,
             case 't': *authRequired = TRUE; break;
             case 'T': *authRequired = FALSE; break;
             case 'u': *username = optarg; break; 
-            case 's': *password = optarg; break; 
+            case 'v': *password = optarg; break; 
             case 'w': *downloadDir = optarg; break;
             default: showUsage( ); break;
         }
@@ -353,7 +354,7 @@ main( int argc, char ** argv )
     signal( SIGPIPE, SIG_IGN );
     signal( SIGHUP, SIG_IGN );
 
-    readargs( argc, (const char*)argv, &nofork, &configDir, &downloadDir,
+    readargs( argc, (const char**)argv, &nofork, &configDir, &downloadDir,
               &rpcPort, &acl, &authRequired, &username, &password,
               &blocklistEnabled );
     if( configDir == NULL )
