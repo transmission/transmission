@@ -302,6 +302,34 @@ verrmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
 }
 
 void
+addTorrentErrorDialog( GtkWidget * child, int err, const char * filename )
+{
+    GtkWidget * w;
+    GtkWidget * win;
+    const char * fmt;
+    char * secondary;
+    switch( err ) {
+        case TR_EINVALID: fmt = _( "The torrent file \"%s\" contains invalid data." ); break;
+        case TR_EDUPLICATE: fmt = _( "The torrent file \"%s\" is already in use." ); break;
+        default: fmt = _( "The torrent file \"%s\" encountered an unknown error." ); break;
+    }
+    secondary = g_strdup_printf( fmt, filename );
+    win = ( !child || GTK_IS_WINDOW( child ) )
+        ? child
+        : gtk_widget_get_ancestor( child ? GTK_WIDGET( child ) : NULL, GTK_TYPE_WINDOW );
+    w = gtk_message_dialog_new( GTK_WINDOW( win ),
+                                GTK_DIALOG_DESTROY_WITH_PARENT,
+                                GTK_MESSAGE_ERROR,
+                                GTK_BUTTONS_CLOSE,
+                                _( "Error opening torrent" ) );
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ), secondary );
+    g_signal_connect_swapped( w, "response",
+                              G_CALLBACK( gtk_widget_destroy ), w );
+    gtk_widget_show_all( w );
+    g_free( secondary );
+}
+
+void
 errmsg( GtkWindow * wind, const char * format, ... )
 {
     GtkWidget * dialog;

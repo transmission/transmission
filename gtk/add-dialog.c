@@ -160,6 +160,8 @@ sourceChanged( GtkFileChooserButton * b, gpointer gdata )
         tr_ctorSetDeleteSource( data->ctor, FALSE );
         if(( torrent = tr_torrentNew( handle, data->ctor, &err )))
             data->gtor = tr_torrent_new_preexisting( torrent );
+        else
+            addTorrentErrorDialog( GTK_WIDGET(b), err, data->filename );
     }
 
     updateTorrent( data );

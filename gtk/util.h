@@ -88,6 +88,10 @@ char* gtr_get_help_url( void );
 GtkWidget * tr_button_new_from_stock( const char * stock,
                                       const char * mnemonic );
 
+void addTorrentErrorDialog( GtkWidget  * window_or_child,
+                            int          err,
+                            const char * filename );
+
 /* create an error dialog, if wind is NULL or mapped then show dialog now,
    otherwise show it when wind becomes mapped */
 void

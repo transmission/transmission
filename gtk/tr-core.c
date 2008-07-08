@@ -769,14 +769,17 @@ add_filename( TrCore       * core,
 
     if( filename && handle )
     {
+        int err;
         tr_ctor * ctor = tr_ctorNew( handle );
         tr_core_apply_defaults( ctor );
         tr_ctorSetPaused( ctor, TR_FORCE, !doStart );
-        if( tr_ctorSetMetainfoFromFile( ctor, filename ) )
+        if( tr_ctorSetMetainfoFromFile( ctor, filename ) ) {
+            addTorrentErrorDialog( NULL, TR_EINVALID, filename );
             tr_ctorFree( ctor );
-        else if( tr_torrentParse( handle, ctor, NULL ) )
+        } else if(( err = tr_torrentParse( handle, ctor, NULL ))) {
+            addTorrentErrorDialog( NULL, err, filename );
             tr_ctorFree( ctor );
-        else if( doPrompt )
+        } else if( doPrompt )
             g_signal_emit( core, TR_CORE_GET_CLASS(core)->promptsig, 0, ctor );
         else
             tr_core_add_ctor( core, ctor );
