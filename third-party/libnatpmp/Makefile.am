@@ -5,6 +5,7 @@ libnatpmp_a_SOURCES = \
     natpmp.c
 
 noinst_HEADERS = \
+    declspec.h \
     getgateway.h \
     natpmp.h
 
