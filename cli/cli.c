@@ -243,7 +243,7 @@ main( int argc, char ** argv )
         return EXIT_FAILURE;
     }
     if( peerSocketTOS < 0 || peerSocketTOS > 255 ) {
-        printf( "Error: Port must between 0 and 255; got %d\n", peerSocketTOS );
+        printf( "Error: value must between 0 and 255; got %d\n", peerSocketTOS );
         return EXIT_FAILURE;
     }
 
