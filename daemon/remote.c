@@ -31,7 +31,7 @@
 #define DEFAULT_HOST "localhost"
 #define DEFAULT_PORT TR_DEFAULT_RPC_PORT
 
-enum { TAG_LIST, TAG_DETAILS, TAG_FILES, TAG_PEERS };
+enum { TAG_LIST, TAG_DETAILS, TAG_FILES };
 
 static const char*
 getUsage( void )
@@ -153,9 +153,9 @@ readargs( int argc, const char ** argv )
         {
             case TR_OPT_UNK:
                       if( addingTorrents ) {
-                          char * tmp;
+                          char * tmp = getEncodedMetainfo( optarg );
                           tr_bencDictAddStr( &top, "method", "torrent-add" );
-                          tr_bencDictAddStr( args, "metainfo", ((tmp=getEncodedMetainfo(optarg))) );
+                          tr_bencDictAddStr( args, "metainfo", tmp );
                           tr_free( tmp );
                       } else {
                           fprintf( stderr, "Unknown option: %s\n", optarg );
@@ -204,6 +204,7 @@ readargs( int argc, const char ** argv )
                       tr_bencDictAddInt( &top, "tag", TAG_LIST );
                       fields = TR_RPC_TORRENT_FIELD_ID
                              | TR_RPC_TORRENT_FIELD_ACTIVITY
+                             | TR_RPC_TORRENT_FIELD_HISTORY
                              | TR_RPC_TORRENT_FIELD_SIZE;
                       tr_bencDictAddInt( args, "fields", fields );
                       break;
@@ -412,9 +413,7 @@ printDetails( tr_benc * top )
             if( tr_bencDictFindInt( t, "rateDownload", &i ) )
                 printf( "  Download Speed: %.1f KB/s\n", i/1024.0 );
             if( tr_bencDictFindInt( t, "rateUpload", &i ) )
-            {
                 printf( "  Upload Speed: %.1f KB/s\n", i/1024.0 );
-            }
             if( tr_bencDictFindInt( t, "haveUnchecked", &i ) &&
                 tr_bencDictFindInt( t, "haveValid", &j ) )
             {
@@ -583,17 +582,21 @@ printTorrentList( tr_benc * top )
                 "ID", "Done", "ETA", "Up", "Down", "Ratio", "Status", "Name" );
         for( i=0, n=tr_bencListSize( list ); i<n; ++i )
         {
-            int64_t id, eta, status, up, down, sizeWhenDone, leftUntilDone;
+            int64_t id, eta, status, up, down;
+            int64_t sizeWhenDone, leftUntilDone;
+            int64_t upEver, downEver;
             const char *name;
             tr_benc * d = tr_bencListChild( list, i );
-            if(    tr_bencDictFindInt( d, "eta", &eta )
+            if(    tr_bencDictFindInt( d, "downloadedEver", &downEver )
+                && tr_bencDictFindInt( d, "eta", &eta )
                 && tr_bencDictFindInt( d, "id", &id )
                 && tr_bencDictFindInt( d, "leftUntilDone", &leftUntilDone )
                 && tr_bencDictFindStr( d, "name", &name )
                 && tr_bencDictFindInt( d, "rateDownload", &down )
                 && tr_bencDictFindInt( d, "rateUpload", &up )
                 && tr_bencDictFindInt( d, "sizeWhenDone", &sizeWhenDone )
-                && tr_bencDictFindInt( d, "status", &status ) )
+                && tr_bencDictFindInt( d, "status", &status )
+                && tr_bencDictFindInt( d, "uploadedEver", &upEver ) )
             {
                 char etaStr[16];
                 if( leftUntilDone )
@@ -606,7 +609,7 @@ printTorrentList( tr_benc * top )
                         etaStr,
                         up / 1024.0,
                         down / 1024.0,
-                        (double)(sizeWhenDone-leftUntilDone)/sizeWhenDone,
+                        (double)(downEver ? ((double)upEver/downEver) : 0.0),
                         torrentStatusToString( status ),
                         name );
             }
