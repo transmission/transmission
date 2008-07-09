@@ -1,4 +1,4 @@
-/* $Id: getgateway.h,v 1.2 2007/11/22 18:01:37 nanard Exp $ */
+/* $Id: getgateway.h,v 1.3 2008/07/02 22:33:06 nanard Exp $ */
 /* libnatpmp
  * Copyright (c) 2007, Thomas BERNARD <miniupnp@free.fr>
  *
@@ -16,10 +16,16 @@
 #ifndef __GETGATEWAY_H__
 #define __GETGATEWAY_H__
 
+#ifdef WIN32
+#include <stdint.h>
+#define in_addr_t uint32_t
+#endif
+#include "declspec.h"
+
 /* getdefaultgateway() :
  * return value :
  *    0 : success
  *   -1 : failure    */
-int getdefaultgateway(in_addr_t * addr);
+LIBSPEC int getdefaultgateway(in_addr_t * addr);
 
 #endif

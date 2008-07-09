@@ -1,4 +1,4 @@
-/* $Id: natpmp.h,v 1.9 2008/05/29 08:06:01 nanard Exp $ */
+/* $Id: natpmp.h,v 1.10 2008/07/02 22:33:06 nanard Exp $ */
 /* libnatpmp
  * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
  * http://miniupnp.free.fr/libnatpmp.html
@@ -24,9 +24,12 @@
 #include <sys/time.h>
 #ifdef WIN32
 #include <winsock2.h>
+#include <stdint.h>
+#define in_addr_t uint32_t
 #else
 #include <netinet/in.h>
 #endif
+#include "declspec.h"
 
 typedef struct {
 	int s;	/* socket */
@@ -113,7 +116,7 @@ typedef struct {
  * NATPMP_ERR_FCNTLERROR
  * NATPMP_ERR_CANNOTGETGATEWAY
  * NATPMP_ERR_CONNECTERR */
-int initnatpmp(natpmp_t * p);
+LIBSPEC int initnatpmp(natpmp_t * p);
 
 /* closenatpmp()
  * close resources associated with a natpmp_t object
@@ -121,7 +124,7 @@ int initnatpmp(natpmp_t * p);
  * 0 = OK
  * NATPMP_ERR_INVALIDARGS
  * NATPMP_ERR_CLOSEERR */
-int closenatpmp(natpmp_t * p);
+LIBSPEC int closenatpmp(natpmp_t * p);
 
 /* sendpublicaddressrequest()
  * send a public address NAT-PMP request to the network gateway
@@ -129,7 +132,7 @@ int closenatpmp(natpmp_t * p);
  * 2 = OK (size of the request)
  * NATPMP_ERR_INVALIDARGS
  * NATPMP_ERR_SENDERR */
-int sendpublicaddressrequest(natpmp_t * p);
+LIBSPEC int sendpublicaddressrequest(natpmp_t * p);
 
 /* sendnewportmappingrequest()
  * send a new port mapping NAT-PMP request to the network gateway
@@ -143,7 +146,7 @@ int sendpublicaddressrequest(natpmp_t * p);
  * 12 = OK (size of the request)
  * NATPMP_ERR_INVALIDARGS
  * NATPMP_ERR_SENDERR */
-int sendnewportmappingrequest(natpmp_t * p, int protocol,
+LIBSPEC int sendnewportmappingrequest(natpmp_t * p, int protocol,
                               uint16_t privateport, uint16_t publicport,
 							  uint32_t lifetime);
 
@@ -155,7 +158,7 @@ int sendnewportmappingrequest(natpmp_t * p, int protocol,
  * NATPMP_ERR_INVALIDARGS
  * NATPMP_ERR_GETTIMEOFDAYERR
  * NATPMP_ERR_NOPENDINGREQ */
-int getnatpmprequesttimeout(natpmp_t * p, struct timeval * timeout);
+LIBSPEC int getnatpmprequesttimeout(natpmp_t * p, struct timeval * timeout);
 
 /* readnatpmpresponseorretry()
  * fills the natpmpresp_t structure if possible
@@ -174,10 +177,10 @@ int getnatpmprequesttimeout(natpmp_t * p, struct timeval * timeout);
  * NATPMP_ERR_OUTOFRESOURCES
  * NATPMP_ERR_UNSUPPORTEDOPCODE
  * NATPMP_ERR_UNDEFINEDERROR */
-int readnatpmpresponseorretry(natpmp_t * p, natpmpresp_t * response);
+LIBSPEC int readnatpmpresponseorretry(natpmp_t * p, natpmpresp_t * response);
 
 #ifdef ENABLE_STRNATPMPERR
-const char * strnatpmperr(int t);
+LIBSPEC const char * strnatpmperr(int t);
 #endif
 
 #endif
