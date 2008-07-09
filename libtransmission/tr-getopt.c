@@ -136,8 +136,9 @@ findOption( const tr_option   * opts,
                 return o;
             }
             len = strlen( o->shortName );
-            if( !memcmp( o->shortName, str+1, len ) && str[len+1]=='=' ) {
-                if( nested ) *nested = str+len+2;
+            if( !memcmp( o->shortName, str+1, len ) ) {
+                if( nested )
+                    *nested = str[len+1]=='=' ? str+len+2 : str+len+1;
                 return o;
             }
         }

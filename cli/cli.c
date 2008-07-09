@@ -239,11 +239,11 @@ main( int argc, char ** argv )
         return EXIT_FAILURE;
     }
     if( peerPort < 1 || peerPort > 65535 ) {
-        printf( "Invalid port '%d'\n", peerPort );
+        printf( "Error: Port must between 1 and 65535; got %d\n", peerPort );
         return EXIT_FAILURE;
     }
     if( peerSocketTOS < 0 || peerSocketTOS > 255 ) {
-        printf( "Invalid TOS '%d'\n", peerSocketTOS );
+        printf( "Error: Port must between 0 and 255; got %d\n", peerSocketTOS );
         return EXIT_FAILURE;
     }
 
@@ -392,7 +392,7 @@ main( int argc, char ** argv )
 
         if( gotsig ) {
             gotsig = 0;
-            printf( "stopping torrent...\n" );
+            printf( "\nStopping torrent...\n" );
             tr_torrentStop( tor );
         }
         
