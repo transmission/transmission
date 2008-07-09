@@ -1,11 +1,23 @@
 /*
  * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
  *
- * This file is licensed by the GPL version 2.  Works owned by the
- * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license. 
- * This exemption does not extend to derived works not owned by
- * the Transmission project.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  *
  * $Id:$
  */
@@ -20,14 +32,21 @@
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
 #endif
 
-int option_index = 1;
+int tr_optind = 1;
 
 static const char*
 getArgName( const tr_option * opt )
 {
-    if( !opt->has_arg )   return "";
-    if( opt->argName ) return opt->argName;
-    return "<args>";
+    char * arg;
+
+    if( !opt->has_arg )
+        arg = "";
+    else if( opt->argName )
+        arg = opt->argName;
+    else
+        arg = "<args>";
+
+    return arg;
 }
 
 static void
@@ -43,46 +62,50 @@ getopts_usage_line( const tr_option * opt,
                                          opt->description );
 }
 
-void
-tr_getopt_usage( const char             * progName,
-                 const char             * description,
-                 const struct tr_option    opts[] )
+static void
+maxWidth( const struct tr_option * o,
+          int * longWidth, int * shortWidth, int * argWidth )
 {
-  int count;
-  int longWidth = 0;
-  int shortWidth = 0;
-  int argWidth = 0;
-  struct tr_option help;
-
-  for( count=0; opts[count].description; ++count )
-  {
     const char * arg;
 
-    if( opts[count].longName ) 
-      longWidth = MAX( longWidth, (int)strlen( opts[count].longName ) );
+    if( o->longName ) 
+        *longWidth = MAX( *longWidth, (int)strlen( o->longName ) );
 
-    if( opts[count].shortName )
-      shortWidth = MAX( shortWidth, (int)strlen( opts[count].shortName ) );
+    if( o->shortName )
+        *shortWidth = MAX( *shortWidth, (int)strlen( o->shortName ) );
 
-    if(( arg = getArgName( &opts[count] )))
-      argWidth = MAX( argWidth, (int)strlen( arg ) );
-  }
+    if(( arg = getArgName( o )))
+        *argWidth = MAX( *argWidth, (int)strlen( arg ) );
+}
 
-  if( !description )
-    description = "Usage: %s [options]";
-  printf( description, progName );
-  printf( "\n\n" );
-  printf( "Options:\n" );
+void
+tr_getopt_usage( const char              * progName,
+                 const char              * description,
+                 const struct tr_option    opts[] )
+{
+    int longWidth = 0;
+    int shortWidth = 0;
+    int argWidth = 0;
+    struct tr_option help;
+    const struct tr_option * o;
 
-  help.val = -1;
-  help.longName = "help";
-  help.description = "Display this help page and exit";
-  help.shortName = "h";
-  help.has_arg = 0;
-  getopts_usage_line( &help, longWidth, shortWidth, argWidth );
-  
-  for( count=0; opts[count].description; ++count )
-      getopts_usage_line( &opts[count], longWidth, shortWidth, argWidth );
+    for( o=opts; o->val; ++o )
+        maxWidth( o, &longWidth, &shortWidth, &argWidth );
+
+    help.val = -1;
+    help.longName = "help";
+    help.description = "Display this help page and exit";
+    help.shortName = "h";
+    help.has_arg = 0;
+    maxWidth( &help, &longWidth, &shortWidth, &argWidth );
+
+    if( description == NULL )
+        description = "Usage: %s [options]";
+    printf( description, progName );
+    printf( "\n\nOptions:\n" );
+    getopts_usage_line( &help, longWidth, shortWidth, argWidth );
+    for( o=opts; o->val; ++o )
+        getopts_usage_line( o, longWidth, shortWidth, argWidth );
 }
 
 static const tr_option *
@@ -123,16 +146,6 @@ findOption( const tr_option   * opts,
     return NULL;
 }
 
-static void
-showUsageAndExit( const char        * appName,
-                  const char        * description,
-                  const tr_option   * opts )
-{
-    tr_getopt_usage( appName, description, opts );
-    exit( 0 );
-}
-
-
 int
 tr_getopt( const char        * usage,
            int                 argc,
@@ -145,23 +158,23 @@ tr_getopt( const char        * usage,
     const tr_option * o = NULL;
 
     *setme_optarg = NULL;  
-
-    if( argc==1 || argc==option_index )
-        return TR_OPT_DONE;
   
     /* handle the builtin 'help' option */
-    for( i=1; i<argc; ++i )
-        if( !strcmp(argv[i], "-h") || !strcmp(argv[i], "--help" ) )
-            showUsageAndExit( argv[0], usage, opts );
+    for( i=1; i<argc; ++i ) {
+        if( !strcmp(argv[i], "-h") || !strcmp(argv[i], "--help" ) ) {
+            tr_getopt_usage( argv[0], usage, opts );
+            exit( 0 );
+        }
+    }
 
-    /* out of options */
-    if( option_index >= argc )
+    /* out of options? */
+    if( argc==1 || tr_optind>=argc )
         return TR_OPT_DONE;
 
-    o = findOption( opts, argv[option_index], &nest );
+    o = findOption( opts, argv[tr_optind], &nest );
     if( !o ) {
         /* let the user know we got an unknown option... */
-        *setme_optarg = argv[option_index++];
+        *setme_optarg = argv[tr_optind++];
         return TR_OPT_UNK;
     }
 
@@ -170,23 +183,23 @@ tr_getopt( const char        * usage,
         if( nest )
             return TR_OPT_ERR;
         *setme_optarg = NULL;
-        option_index++;
+        tr_optind++;
         return o->val;
     }
 
     /* option needed an argument, and it was nested in this string */
     if( nest ) {
         *setme_optarg = nest;
-        option_index++;
+        tr_optind++;
         return o->val;
     }
 
     /* throw an error if the option needed an argument but didn't get one */
-    if( ++option_index >= argc )
+    if( ++tr_optind >= argc )
         return TR_OPT_ERR;
-    if( findOption( opts, argv[option_index], NULL ))
+    if( findOption( opts, argv[tr_optind], NULL ))
         return TR_OPT_ERR;
 
-    *setme_optarg = argv[option_index++];
+    *setme_optarg = argv[tr_optind++];
     return o->val;
 }

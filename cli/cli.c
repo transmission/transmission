@@ -54,8 +54,8 @@ static int           verify           = 0;
 static sig_atomic_t  gotsig           = 0;
 static sig_atomic_t  manualUpdate     = 0;
 
-static const char   * torrentPath   = NULL;
-static const char   * downloadDir   = NULL;
+static const char   * torrentPath  = NULL;
+static const char   * downloadDir  = NULL;
 static const char   * finishCall   = NULL;
 static const char   * announce     = NULL;
 static const char   * configdir    = NULL;
@@ -165,16 +165,17 @@ dumpInfo( FILE * out, const tr_info * inf )
                   inf->totalSize, inf->totalSize / inf->pieceSize,
                   inf->pieceSize, inf->totalSize % inf->pieceSize );
 
-    if( inf->comment[0] )
+    if( inf->comment && *inf->comment )
         fprintf( out, "comment:\t%s\n", inf->comment );
-    if( inf->creator[0] )
+    if( inf->creator && *inf->creator )
         fprintf( out, "creator:\t%s\n", inf->creator );
     if( inf->isPrivate )
         fprintf( out, "private flag set\n" );
 
     fprintf( out, "file(s):\n" );
     for( ff=0; ff<inf->fileCount; ++ff )
-        fprintf( out, "\t%s (%"PRIu64")\n", inf->files[ff].name, inf->files[ff].length );
+        fprintf( out, "\t%s (%"PRIu64")\n", inf->files[ff].name,
+                                            inf->files[ff].length );
 }
 
 static void
@@ -213,10 +214,7 @@ getStatusStr( const tr_stat * st, char * buf, size_t buflen )
                   st->peersGettingFromUs, st->peersConnected,
                   st->rateUpload, ratioStr );
     }
-    else if( st->status & TR_STATUS_STOPPED )
-    {
-        *buf = '\0';
-    }
+    else *buf = '\0';
 }
 
 int
@@ -296,17 +294,17 @@ main( int argc, char ** argv )
     if( sourceFile && *sourceFile ) /* creating a torrent */
     {
         int err;
-        tr_metainfo_builder * builder = tr_metaInfoBuilderCreate( h, sourceFile );
+        tr_metainfo_builder * b = tr_metaInfoBuilderCreate( h, sourceFile );
         tr_tracker_info ti;
         ti.tier = 0;
         ti.announce = (char*) announce;
-        tr_makeMetaInfo( builder, torrentPath, &ti, 1, comment, isPrivate );
-        while( !builder->isDone ) {
+        tr_makeMetaInfo( b, torrentPath, &ti, 1, comment, isPrivate );
+        while( !b->isDone ) {
             tr_wait( 1000 );
             printf( "." );
         }
-        err = builder->result;
-        tr_metaInfoBuilderFree( builder );
+        err = b->result;
+        tr_metaInfoBuilderFree( b );
         return err;
     }
 
@@ -338,6 +336,7 @@ main( int argc, char ** argv )
                     tr_httpParseURL( scrape, -1, &host, NULL, NULL );
                     ++leftToScrape;
                     tr_webRun( h, url, NULL, scrapeDoneFunc, host );
+                    tr_free( host );
                     tr_free( url );
                 }
             }
@@ -393,16 +392,16 @@ main( int argc, char ** argv )
 
         if( gotsig ) {
             gotsig = 0;
-fprintf( stderr, "stopping torrent...\n" );
+            printf( "stopping torrent...\n" );
             tr_torrentStop( tor );
         }
         
         if( manualUpdate ) {
             manualUpdate = 0;
             if ( !tr_torrentCanManualUpdate( tor ) )
-                fprintf( stderr, "\rReceived SIGHUP, but can't send a manual update now\n" );
+                fprintf( stderr, "\nReceived SIGHUP, but can't send a manual update now\n" );
             else {
-                fprintf( stderr, "\rReceived SIGHUP: manual update scheduled\n" );
+                fprintf( stderr, "\nReceived SIGHUP: manual update scheduled\n" );
                 tr_torrentManualUpdate( tor );
             }
         }
@@ -412,9 +411,9 @@ fprintf( stderr, "stopping torrent...\n" );
             break;
 
         getStatusStr( st, line, sizeof( line ) );
-        printf( "%-*s\n", LINEWIDTH, line );
+        printf( "\r%-*s", LINEWIDTH, line );
         if( st->error )
-            printf( "%s\n", st->errorString );
+            printf( "\n%s\n", st->errorString );
     }
 
 cleanup:
