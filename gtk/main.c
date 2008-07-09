@@ -114,6 +114,7 @@ struct cbdata
     GtkWidget    * msgwin;
     GtkWidget    * prefs;
     GSList       * errqueue;
+    GSList       * dupqueue;
     GHashTable   * tor2details;
     GHashTable   * details2tor;
 };
@@ -476,6 +477,7 @@ appsetup( TrWindow * wind, GSList * torrentFiles,
     cbdata->timer      = 0;
     cbdata->closing    = FALSE;
     cbdata->errqueue   = NULL;
+    cbdata->dupqueue   = NULL;
     cbdata->minimized  = minimized;
 
     if( minimized )
@@ -656,6 +658,10 @@ quitThreadFunc( gpointer gdata )
         g_slist_foreach( cbdata->errqueue, (GFunc)g_free, NULL );
         g_slist_free( cbdata->errqueue );
     }
+    if( cbdata->dupqueue ) {
+        g_slist_foreach( cbdata->dupqueue, (GFunc)g_free, NULL );
+        g_slist_free( cbdata->dupqueue );
+    }
 
     g_hash_table_destroy( cbdata->details2tor );
     g_hash_table_destroy( cbdata->tor2details );
@@ -822,39 +828,76 @@ setupdrag(GtkWidget *widget, struct cbdata *data) {
 }
 
 static void
+flushAddTorrentErrors( GtkWindow * window, const char * primary, GSList ** files )
+{
+    GString * s = g_string_new( NULL );
+    GSList * l;
+    GtkWidget * w;
+    for( l=*files; l; l=l->next )
+        g_string_append_printf( s, "%s\n", (const char*)l->data );
+    w = gtk_message_dialog_new( window,
+                                GTK_DIALOG_DESTROY_WITH_PARENT,
+                                GTK_MESSAGE_ERROR,
+                                GTK_BUTTONS_CLOSE,
+                                primary );
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ), s->str );
+    g_signal_connect_swapped( w, "response",
+                              G_CALLBACK( gtk_widget_destroy ), w );
+    gtk_widget_show_all( w );
+    g_string_free( s, TRUE );
+
+    g_slist_foreach( *files, (GFunc)g_free, NULL );
+    g_slist_free( *files );
+    *files = NULL;
+}
+
+static void
+showTorrentErrors( struct cbdata * cbdata )
+{
+    if( cbdata->errqueue )
+        flushAddTorrentErrors( GTK_WINDOW( cbdata->wind ),
+                               ngettext( "Couldn't add corrupt torrent",
+                                         "Couldn't add corrupt torrents",
+                                         g_slist_length( cbdata->errqueue ) ),
+                               &cbdata->errqueue );
+
+    if( cbdata->dupqueue )
+        flushAddTorrentErrors( GTK_WINDOW( cbdata->wind ),
+                               ngettext( "Couldn't add duplicate torrent",
+                                         "Couldn't add duplicate torrents",
+                                         g_slist_length( cbdata->dupqueue ) ),
+                               &cbdata->dupqueue );
+}
+
+static void
 coreerr( TrCore * core UNUSED, enum tr_core_err code, const char * msg,
          gpointer gdata )
 {
-    struct cbdata * cbdata = gdata;
-    char          * joined;
+    struct cbdata * c = gdata;
 
     switch( code )
     {
-        case TR_CORE_ERR_ADD_TORRENT:
-            cbdata->errqueue = g_slist_append( cbdata->errqueue,
-                                               g_strdup( msg ) );
-            return;
+        case TR_EINVALID:
+            c->errqueue = g_slist_append( c->errqueue, g_path_get_basename( msg ) );
+            break;
+
+        case TR_EDUPLICATE:
+            c->dupqueue = g_slist_append( c->dupqueue, g_path_get_basename( msg ) );
+            break;
+
         case TR_CORE_ERR_NO_MORE_TORRENTS:
-            if( cbdata->errqueue )
-            {
-                joined = joinstrlist( cbdata->errqueue, "\n" );
-                errmsg( cbdata->wind,
-                        ngettext( "Failed to load torrent file: %s",
-                                  "Failed to load torrent files: %s",
-                                  g_slist_length( cbdata->errqueue ) ),
-                        joined );
-                g_slist_foreach( cbdata->errqueue, (GFunc) g_free, NULL );
-                g_slist_free( cbdata->errqueue );
-                cbdata->errqueue = NULL;
-                g_free( joined );
-            }
-            return;
+            showTorrentErrors( c );
+            break;
+
         case TR_CORE_ERR_SAVE_STATE:
-            errmsg( cbdata->wind, "%s", msg );
-            return;
+            errmsg( c->wind, "%s", msg );
+            break;
+
+        default:
+            g_assert_not_reached();
+            break;
     }
 
-    g_assert_not_reached();
 }
 
 #if GTK_CHECK_VERSION(2,8,0)

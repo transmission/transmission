@@ -740,25 +740,6 @@ tr_core_errsig( TrCore * core, enum tr_core_err type, const char * msg )
     g_signal_emit( core, TR_CORE_GET_CLASS(core)->errsig, 0, type, msg );
 }
 
-void
-tr_core_add_ctor( TrCore * self, tr_ctor * ctor )
-{
-    TrTorrent * tor;
-    char      * errstr = NULL;
-
-    tr_core_apply_defaults( ctor );
-
-    if(( tor = tr_torrent_new_ctor( tr_core_handle( self ), ctor, &errstr )))
-        tr_core_add_torrent( self, tor );
-    else{ 
-        tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );
-        g_free( errstr );
-    }
-
-    /* cleanup */
-    tr_ctorFree( ctor );
-}
-
 static void
 add_filename( TrCore       * core,
               const char   * filename,
@@ -774,15 +755,20 @@ add_filename( TrCore       * core,
         tr_core_apply_defaults( ctor );
         tr_ctorSetPaused( ctor, TR_FORCE, !doStart );
         if( tr_ctorSetMetainfoFromFile( ctor, filename ) ) {
-            addTorrentErrorDialog( NULL, TR_EINVALID, filename );
+            tr_core_errsig( core, TR_EINVALID, filename );
             tr_ctorFree( ctor );
         } else if(( err = tr_torrentParse( handle, ctor, NULL ))) {
-            addTorrentErrorDialog( NULL, err, filename );
+            tr_core_errsig( core, err, filename );
             tr_ctorFree( ctor );
         } else if( doPrompt )
             g_signal_emit( core, TR_CORE_GET_CLASS(core)->promptsig, 0, ctor );
-        else
-            tr_core_add_ctor( core, ctor );
+        else {
+            tr_torrent * tor = tr_torrentNew( handle, ctor, &err );
+            if( err )
+                tr_core_errsig( core, err, filename );
+            else
+                tr_core_add_torrent( core, tr_torrent_new_preexisting( tor ) );
+        }
     }
 }
 

@@ -81,10 +81,10 @@ TrCoreClass;
 
 enum tr_core_err
 {
-    TR_CORE_ERR_ADD_TORRENT,    /* adding a torrent failed */
-    /* no more torrents to be added, used for grouping torrent add errors */
-    TR_CORE_ERR_NO_MORE_TORRENTS,
-    TR_CORE_ERR_SAVE_STATE      /* error saving state */
+    TR_CORE_ERR_ADD_TORRENT_ERR  = TR_EINVALID,
+    TR_CORE_ERR_ADD_TORRENT_DUP  = TR_EDUPLICATE,
+    TR_CORE_ERR_NO_MORE_TORRENTS,  /* finished adding a batch */
+    TR_CORE_ERR_SAVE_STATE         /* error saving state */
 };
 
 GType tr_core_get_type( void );
@@ -110,14 +110,6 @@ void tr_core_get_stats( const TrCore      * core,
  * May trigger one or more "error" signals with TR_CORE_ERR_ADD_TORRENT
  */
 int tr_core_load( TrCore * self, gboolean forcepaused );
-
-/**
- * Add a torrent.
- * This function assumes ownership of ctor
- *
- * May trigger an "error" signal with TR_CORE_ERR_ADD_TORRENT
- */
-void tr_core_add_ctor( TrCore * self, tr_ctor * ctor );
 
 /**
  * Add a list of torrents.
