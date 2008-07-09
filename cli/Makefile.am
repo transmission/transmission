@@ -5,7 +5,7 @@ bin_PROGRAMS = transmissioncli
 
 dist_man_MANS = transmissioncli.1
 
-transmissioncli_SOURCES = transmissioncli.c
+transmissioncli_SOURCES = cli.c
 
 transmissioncli_LDADD = \
   $(top_builddir)/libtransmission/libtransmission.a \

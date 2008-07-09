@@ -36,6 +36,7 @@
 #include <libtransmission/utils.h> /* tr_wait */
 #include <libtransmission/web.h> /* tr_webRun */
 
+#define LINEWIDTH 80
 #define MY_NAME "transmission-cli"
 
 static int           showInfo         = 0;
@@ -64,15 +65,20 @@ static const char   * comment      = NULL;
 static int  parseCommandLine ( int argc, const char ** argv );
 static void sigHandler       ( int signal );
 
-static char *
-getStringRatio( float ratio )
+char*
+tr_strlratio( char * buf, double ratio, size_t buflen )
 {
-    static char string[20];
-
-    if( ratio == TR_RATIO_NA )
-        return "n/a";
-    snprintf( string, sizeof string, "%.3f", ratio );
-    return string;
+    if( (int)ratio == TR_RATIO_NA )
+        tr_strlcpy( buf, _( "None" ), buflen );
+    else if( (int)ratio == TR_RATIO_INF )
+        tr_strlcpy( buf, "Inf", buflen );
+    else if( ratio < 10.0 )
+        snprintf( buf, buflen, "%'.2f", ratio );
+    else if( ratio < 100.0 )
+        snprintf( buf, buflen, "%'.1f", ratio );
+    else
+        snprintf( buf, buflen, "%'.0f", ratio );
+    return buf;
 }
 
 static int
@@ -94,9 +100,6 @@ escape( char * out, const uint8_t * in, int in_len ) /* rfc2396 */
             out += snprintf( out, 4, "%%%02X", (unsigned int)*in++ );
     *out = '\0';
 }
-
-
-#define LINEWIDTH 80
 
 static void
 torrentStateChanged( tr_torrent   * torrent UNUSED,
@@ -136,10 +139,90 @@ scrapeDoneFunc( struct tr_handle    * session UNUSED,
     --leftToScrape;
 }
 
+static void
+dumpInfo( FILE * out, const tr_info * inf )
+{
+    int i;
+    int prevTier = -1;
+    tr_file_index_t ff;
+
+    fprintf( out, "hash:\t" );
+    for( i=0; i<SHA_DIGEST_LENGTH; ++i )
+        fprintf( out, "%02x", inf->hash[i] );
+    fprintf( out, "\n" );
+
+    fprintf( out, "name:\t%s\n", inf->name );
+
+    for( i=0; i<inf->trackerCount; ++i ) {
+        if( prevTier != inf->trackers[i].tier ) {
+            prevTier = inf->trackers[i].tier;
+            fprintf( out, "\ntracker tier #%d:\n", (prevTier+1) );
+        }
+        fprintf( out, "\tannounce:\t%s\n", inf->trackers[i].announce );
+    }
+
+    fprintf( out, "size:\t%"PRIu64" (%"PRIu64" * %d + %"PRIu64")\n",
+                  inf->totalSize, inf->totalSize / inf->pieceSize,
+                  inf->pieceSize, inf->totalSize % inf->pieceSize );
+
+    if( inf->comment[0] )
+        fprintf( out, "comment:\t%s\n", inf->comment );
+    if( inf->creator[0] )
+        fprintf( out, "creator:\t%s\n", inf->creator );
+    if( inf->isPrivate )
+        fprintf( out, "private flag set\n" );
+
+    fprintf( out, "file(s):\n" );
+    for( ff=0; ff<inf->fileCount; ++ff )
+        fprintf( out, "\t%s (%"PRIu64")\n", inf->files[ff].name, inf->files[ff].length );
+}
+
+static void
+getStatusStr( const tr_stat * st, char * buf, size_t buflen )
+{
+    if( st->status & TR_STATUS_CHECK_WAIT )
+    {
+        snprintf( buf, buflen, "Waiting to verify local files" );
+    }
+    else if( st->status & TR_STATUS_CHECK )
+    {
+        snprintf( buf, buflen, "Verifying local files (%.2f%%, %.2f%% valid)",
+                  100 * st->recheckProgress, 100.0 * st->percentDone );
+    }
+    else if( st->status & TR_STATUS_DOWNLOAD )
+    {
+        char ratioStr[80];
+        tr_strlratio( ratioStr, st->ratio, sizeof( ratioStr ) );
+        snprintf( buf, buflen,
+                  "Progress: %.1f%%, dl from %d of %d peers (%.0f KB/s), "
+                  "ul to %d (%.0f KB/s) [%s]",
+                  st->percentDone * 100.0,
+                  st->peersSendingToUs,
+                  st->peersConnected,
+                  st->rateDownload,
+                  st->peersGettingFromUs,
+                  st->rateUpload,
+                  ratioStr );
+    }
+    else if( st->status & TR_STATUS_SEED )
+    {
+        char ratioStr[80];
+        tr_strlratio( ratioStr, st->ratio, sizeof( ratioStr ) );
+        snprintf( buf, buflen,
+                  "Seeding, uploading to %d of %d peer(s), %.0f KB/s [%s]",
+                  st->peersGettingFromUs, st->peersConnected,
+                  st->rateUpload, ratioStr );
+    }
+    else if( st->status & TR_STATUS_STOPPED )
+    {
+        *buf = '\0';
+    }
+}
+
 int
 main( int argc, char ** argv )
 {
-    int i, error;
+    int error;
     tr_handle  * h;
     tr_ctor * ctor;
     tr_torrent * tor = NULL;
@@ -273,39 +356,7 @@ main( int argc, char ** argv )
 
         if( !tr_torrentParse( h, ctor, &info ) )
         {
-            int prevTier = -1;
-            tr_file_index_t ff;
-
-            printf( "hash:\t" );
-            for( i=0; i<SHA_DIGEST_LENGTH; ++i )
-                printf( "%02x", info.hash[i] );
-            printf( "\n" );
-
-            printf( "name:\t%s\n", info.name );
-
-            for( i=0; i<info.trackerCount; ++i ) {
-                if( prevTier != info.trackers[i].tier ) {
-                    prevTier = info.trackers[i].tier;
-                    printf( "\ntracker tier #%d:\n", (prevTier+1) );
-                }
-                printf( "\tannounce:\t%s\n", info.trackers[i].announce );
-            }
-
-            printf( "size:\t%"PRIu64" (%"PRIu64" * %d + %"PRIu64")\n",
-                    info.totalSize, info.totalSize / info.pieceSize,
-                    info.pieceSize, info.totalSize % info.pieceSize );
-
-            if( info.comment[0] )
-                printf( "comment:\t%s\n", info.comment );
-            if( info.creator[0] )
-                printf( "creator:\t%s\n", info.creator );
-            if( info.isPrivate )
-                printf( "private flag set\n" );
-
-            printf( "file(s):\n" );
-            for( ff=0; ff<info.fileCount; ++ff )
-                printf( "\t%s (%"PRIu64")\n", info.files[ff].name, info.files[ff].length );
-
+            dumpInfo( stdout, &info );
             tr_metainfoFree( &info );
         }
 
@@ -315,7 +366,7 @@ main( int argc, char ** argv )
 
     tor = tr_torrentNew( h, ctor, &error );
     tr_ctorFree( ctor );
-    if( tor == NULL )
+    if( !tor )
     {
         printf( "Failed opening torrent file `%s'\n", torrentPath );
         tr_sessionClose( h );
@@ -328,23 +379,25 @@ main( int argc, char ** argv )
     tr_torrentSetStatusCallback( tor, torrentStateChanged, NULL );
     tr_torrentStart( tor );
 
+    if( verify ) {
+        verify = 0;
+        tr_torrentVerify( tor );
+    }
+
     for( ;; )
     {
-        char string[LINEWIDTH];
-        int  chars = 0;
-        const struct tr_stat * s;
+        char line[LINEWIDTH];
+        const tr_stat * st;
 
         tr_wait( 1000 );
 
-        if( gotsig )
-        {
+        if( gotsig ) {
             gotsig = 0;
+fprintf( stderr, "stopping torrent...\n" );
             tr_torrentStop( tor );
-            tr_sessionSetPortForwardingEnabled( h, 0 );
         }
         
-        if( manualUpdate )
-        {
+        if( manualUpdate ) {
             manualUpdate = 0;
             if ( !tr_torrentCanManualUpdate( tor ) )
                 fprintf( stderr, "\rReceived SIGHUP, but can't send a manual update now\n" );
@@ -353,76 +406,20 @@ main( int argc, char ** argv )
                 tr_torrentManualUpdate( tor );
             }
         }
-        
-        if( verify )
-        {
-            verify = 0;
-            tr_torrentVerify( tor );
-        }
 
-        s = tr_torrentStat( tor );
-
-        if( s->status & TR_STATUS_CHECK_WAIT )
-        {
-            chars = snprintf( string, sizeof string,
-                "Waiting to verify local files..." );
-        }
-        else if( s->status & TR_STATUS_CHECK )
-        {
-            chars = snprintf( string, sizeof string,
-                "Verifying local files... %.2f%%, found %.2f%% valid", 100 * s->recheckProgress, 100.0 * s->percentDone );
-        }
-        else if( s->status & TR_STATUS_DOWNLOAD )
-        {
-            chars = snprintf( string, sizeof string,
-                "Progress: %.2f %%, %d peer%s, dl from %d (%.2f KB/s), "
-                "ul to %d (%.2f KB/s) [%s]", 100.0 * s->percentDone,
-                s->peersConnected, ( s->peersConnected == 1 ) ? "" : "s",
-                s->peersSendingToUs, s->rateDownload,
-                s->peersGettingFromUs, s->rateUpload,
-                getStringRatio(s->ratio) );
-        }
-        else if( s->status & TR_STATUS_SEED )
-        {
-            chars = snprintf( string, sizeof string,
-                "Seeding, uploading to %d of %d peer(s), %.2f KB/s [%s]",
-                s->peersGettingFromUs, s->peersConnected,
-                s->rateUpload, getStringRatio(s->ratio) );
-        }
-        else if( s->status & TR_STATUS_STOPPED )
-        {
+        st = tr_torrentStat( tor );
+        if( st->status & TR_STATUS_STOPPED )
             break;
-        }
-        if( ( signed )sizeof string > chars )
-        {
-            memset( &string[chars], ' ', sizeof string - 1 - chars );
-        }
-        string[sizeof string - 1] = '\0';
-        fprintf( stderr, "\r%s", string );
 
-        if( s->error )
-        {
-            fprintf( stderr, "\n%s\n", s->errorString );
-        }
-        else if( verboseLevel > 0 )
-        {
-            fprintf( stderr, "\n" );
-        }
+        getStatusStr( st, line, sizeof( line ) );
+        printf( "%-*s\n", LINEWIDTH, line );
+        if( st->error )
+            printf( "%s\n", st->errorString );
     }
-    fprintf( stderr, "\n" );
 
-    /* try for 5 seconds to delete any port mappings for nat traversal */
-    tr_sessionSetPortForwardingEnabled( h, 0 );
-    for( i=0; i<10; ++i ) {
-        const tr_port_forwarding f = tr_sessionGetPortForwarding( h );
-        if( f == TR_PORT_UNMAPPED )
-            break;
-        tr_wait( 500 );
-    }
-    
 cleanup:
+    printf( "\n" );
     tr_sessionClose( h );
-
     return EXIT_SUCCESS;
 }
 
@@ -441,27 +438,35 @@ getUsage( void )
 }
 
 const struct tr_option options[] = {
-    { 'a', "announce",     "When creating a new torrent, set its announce URL",    "a", 1, "<url>" },
-    { 'b', "blocklist",    "Enable peer blocklists",                               "b", 0, NULL },
-    { 'B', "no-blocklist", "Disable peer blocklists",                              "B", 0, NULL },
-    { 'c', "comment",      "When creating a new torrent, set its comment field",   "c", 1, "<comment>" },
-    { 'd', "downlimit",    "Set the maxiumum download speed in KB/s",              "d", 1, "<number>" },
-    { 'D', "no-downlimit", "Don't limit the download speed",                       "D", 0, NULL },
-    { 'e', "encryption",   "Set encryption mode [required, preferred, tolerated]", "e", 1, "<mode>" },
-    { 'f', "finish",       "Set a script to run when the torrent finishes",        "f", 1, "<script>" },
-    { 'g', "config-dir",   "Where to look for configuration files",                "g", 1, "<path>" },
-    { 'i', "info",         "Show torrent details and exit",                        "i", 0, NULL },
-    { 'm', "portmap",      "Enable portmapping via NAT-PMP or UPnP",               "m", 0, NULL },
-    { 'M', "no-portmap",   "Disable portmapping",                                  "M", 0, NULL },
-    { 'n', "new",          "Create a new torrent from a file or directory",        "n", 1, "<path>" },
-    { 'p', "port",         "Port to listen for incoming peers (Default: "TR_DEFAULT_PORT_STR")", "p", 1, "<port>" },
-    { 'r', "private",      "When creating a new torrent, set its 'private' flag",  "r", 0, NULL },
-    { 's', "scrape",       "Scrape the torrent and exit",                          "s", 0, NULL },
-    { 't', "tos",          "Peer socket TOS (0 to 255, default="TR_DEFAULT_PEER_SOCKET_TOS_STR")", "t", 1, "<number>"},
-    { 'u', "uplimit",      "Set the maxiumum upload speed in KB/s",                "u", 1, "<number>" },
-    { 'U', "no-uplimit",   "Don't limit the upload speed",                         "U", 0, NULL },
-    { 'v', "verify",       "Verify the specified torrent",                         "v", 0, NULL },
-    { 'w', "download-dir", "Where to save downloaded data",                        "w", 1, "<path>" },
+    { 'a', "announce", "Set the new torrent's announce URL", "a", 1, "<url>" },
+    { 'b', "blocklist", "Enable peer blocklists", "b", 0, NULL },
+    { 'B', "no-blocklist", "Disable peer blocklists", "B", 0, NULL },
+    { 'c', "comment", "Set the new torrent's comment", "c", 1, "<comment>" },
+    { 'd', "downlimit", "Set max download speed in KB/s", "d", 1, "<number>" },
+    { 'D', "no-downlimit", "Don't limit the download speed", "D", 0, NULL },
+    { 'e', "encryption", "Set encryption mode (required, preferred, tolerated)",
+      "e", 1, "<mode>" },
+    { 'f', "finish", "Set a script to run when the torrent finishes",
+      "f", 1, "<script>" },
+    { 'g', "config-dir", "Where to find configuration files",
+      "g", 1, "<path>" },
+    { 'i', "info", "Show torrent details and exit", "i", 0, NULL },
+    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
+    { 'M', "no-portmap", "Disable portmapping", "M", 0, NULL },
+    { 'n', "new", "Create a new torrent from a file or directory",
+      "n", 1, "<path>" },
+    { 'p', "port",
+      "Port to listen for incoming peers (Default: "TR_DEFAULT_PORT_STR")",
+      "p", 1, "<port>" },
+    { 'r', "private", "Set the new torrent's 'private' flag", "r", 0, NULL },
+    { 's', "scrape", "Scrape the torrent and exit", "s", 0, NULL },
+    { 't', "tos",
+      "Peer socket TOS (0 to 255, default="TR_DEFAULT_PEER_SOCKET_TOS_STR")",
+      "t", 1, "<number>" },
+    { 'u', "uplimit", "Set max upload speed in KB/s", "u", 1, "<number>" },
+    { 'U', "no-uplimit", "Don't limit the upload speed", "U", 0, NULL },
+    { 'v', "verify", "Verify the specified torrent", "v", 0, NULL },
+    { 'w', "download-dir", "Where to save downloaded data", "w", 1, "<path>" },
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
