@@ -116,8 +116,9 @@ findOption( const tr_option   * opts,
     size_t len;
     const tr_option * o;
 
-    for( o=opts; o->val; ++o )
-    {
+    /* try all the longopts first to avoid collisions between
+       long options, and short options with args appended to them  */
+    for( o=opts; o->val; ++o ) {
         if( o->longName && (str[0]=='-') && (str[1]=='-') ) {
             if( !strcmp( o->longName, str+2 ) ) {
                 if( nested ) *nested = NULL;
@@ -129,7 +130,11 @@ findOption( const tr_option   * opts,
                 return o;
             }
         }
-        
+    }
+
+    /* look for a matching shortopt */ 
+    for( o=opts; o->val; ++o )
+    {
         if( o->shortName && (str[0]=='-') ) {
             if( !strcmp( o->shortName, str+1 ) ) {
                 if( nested ) *nested = NULL;
