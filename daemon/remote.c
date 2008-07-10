@@ -177,10 +177,10 @@ readargs( int argc, const char ** argv )
                       break;
             case 'f': tr_bencDictAddStr( &top, "method", "torrent-get" );
                       tr_bencDictAddInt( &top, "tag", TAG_FILES );
-                      tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), optarg, strlen(optarg) );
-                      fields = TR_RPC_TORRENT_FIELD_ID
-                             | TR_RPC_TORRENT_FIELD_FILES
-                             | TR_RPC_TORRENT_FIELD_PRIORITIES;
+                      addIdArg( args, id );
+                      fields = TR_RPC_TORRENT_ID
+                             | TR_RPC_TORRENT_FILES
+                             | TR_RPC_TORRENT_PRIORITIES;
                       tr_bencDictAddInt( args, "fields", fields );
                       break;
             case 'g': debug = 1;
@@ -189,23 +189,23 @@ readargs( int argc, const char ** argv )
             case 'i': tr_bencDictAddStr( &top, "method", "torrent-get" );
                       tr_bencDictAddInt( &top, "tag", TAG_DETAILS );
                       addIdArg( args, id );
-                      fields = TR_RPC_TORRENT_FIELD_ACTIVITY
-                          | TR_RPC_TORRENT_FIELD_ANNOUNCE
-                          | TR_RPC_TORRENT_FIELD_ERROR
-                          | TR_RPC_TORRENT_FIELD_HISTORY
-                          | TR_RPC_TORRENT_FIELD_ID
-                          | TR_RPC_TORRENT_FIELD_INFO
-                          | TR_RPC_TORRENT_FIELD_SCRAPE
-                          | TR_RPC_TORRENT_FIELD_SIZE
-                          | TR_RPC_TORRENT_FIELD_TRACKER_STATS;
+                      fields = TR_RPC_TORRENT_ACTIVITY
+                          | TR_RPC_TORRENT_ANNOUNCE
+                          | TR_RPC_TORRENT_ERROR
+                          | TR_RPC_TORRENT_HISTORY
+                          | TR_RPC_TORRENT_ID
+                          | TR_RPC_TORRENT_INFO
+                          | TR_RPC_TORRENT_SCRAPE
+                          | TR_RPC_TORRENT_SIZE
+                          | TR_RPC_TORRENT_TRACKER_STATS;
                       tr_bencDictAddInt( args, "fields", fields );
                       break;
             case 'l': tr_bencDictAddStr( &top, "method", "torrent-get" );
                       tr_bencDictAddInt( &top, "tag", TAG_LIST );
-                      fields = TR_RPC_TORRENT_FIELD_ID
-                             | TR_RPC_TORRENT_FIELD_ACTIVITY
-                             | TR_RPC_TORRENT_FIELD_HISTORY
-                             | TR_RPC_TORRENT_FIELD_SIZE;
+                      fields = TR_RPC_TORRENT_ID
+                             | TR_RPC_TORRENT_ACTIVITY
+                             | TR_RPC_TORRENT_HISTORY
+                             | TR_RPC_TORRENT_SIZE;
                       tr_bencDictAddInt( args, "fields", fields );
                       break;
             case 'm': tr_bencDictAddStr( &top, "method", "session-set" );
@@ -243,7 +243,8 @@ readargs( int argc, const char ** argv )
                       addIdArg( args, id );
                       break;
             case 'w': tr_bencDictAddStr( &top, "method", "session-set" );
-                      tr_bencDictAddStr( args, "download-dir", absolutify(buf,sizeof(buf),optarg) );
+                      tr_bencDictAddStr( args, "download-dir",
+                                         absolutify(buf,sizeof(buf),optarg) );
                       break;
             case 'x': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddInt( args, "pex-allowed", 1 );
