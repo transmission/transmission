@@ -12,11 +12,13 @@ and
 .Nm
 .Op Ar host:port | host | port
 .Op Fl a Ar torrent-files
+.Op Fl b
 .Op Fl d Ar number
 .Op Fl D
 .Op Fl e Ar mode
 .Op Fl f
-.Op Fl g
+.Op Fl g Ar files
+.Op Fl G Ar files
 .Op Fl h
 .Op Fl i
 .Op Fl l
@@ -24,6 +26,9 @@ and
 .Op Fl M
 .Op Fl n Ar user:pass
 .Op Fl p Ar port
+.Op Fl ph Ar files
+.Op Fl pl Ar files
+.Op Fl pn Ar files
 .Op Fl r
 .Op Fl s
 .Op Fl S
@@ -53,6 +58,9 @@ The options are as follows:
 Add metainfo
 .Ar torrent-file(s) .
 
+.It Fl b Fl -debug
+Enable debugging mode.
+
 .It Fl d Fl -downlimit Ar limit
 Limit the download speed to
 .Ar limit
@@ -70,6 +78,16 @@ Prefer unencrypted peer connections.
 
 .It Fl f Fl -files
 Get a file list for the current torrent(s)
+
+.It Fl g Fl -get Ar files
+Mark file(s) for download.
+.Ar files
+can be a file index, or a comma-separated list of file indices, or the literal
+.Ar all
+for all files in the torrent.
+
+.It Fl g Fl -no-get Ar files
+Mark file(s) for not downloading
 
 .It Fl h Fl -help
 Print command-line option descriptions.
@@ -95,6 +113,25 @@ for authentication
 Set the
 .Ar port
 for use when listening for incoming peer connections
+
+.It Fl ph Fl -priority-high Ar files
+Mark 
+.Ar files
+as high priority.
+.Ar files
+can be a file index, or a comma-separated list of file indices, or the literal
+.Ar all
+for all files in the torrent.
+
+.It Fl pl Fl -priority-low Ar files
+Mark 
+.Ar files
+as low priority
+
+.It Fl pn Fl -priority-normal Ar files
+Mark 
+.Ar files
+as normal priority
 
 .It Fl r Fl -remove
 Remove the current torrent(s).  This does not delete the downloaded data.
@@ -135,28 +172,47 @@ Disable peer exchange (PEX).
 
 .El
 .Sh EXAMPLES
-Show all torrents, their ID numbers, and their status:
+
+List all torrents:
 .Pp
-.Dl transmission-remote -l
+.Dl $ transmission-remote -l
 .Pp
-Pause torrent #12:
-.Pp
-.Dl transmission-remote -t 12 -S
-.Dl transmission-remote --torrent=12 --stop
-.Pp
+
 Start all torrents:
 .Pp
-.Dl transmission-remote -t all -s
-.Dl transmission-remote --torrent=all --start
+.Dl $ transmission-remote -tall --start
 .Pp
+
+Get detailed information on the torrent whose ID is '1':
+.Pp
+.Dl $ transmission-remote -t1 -i
+.Pp
+
+Only download the second, fourth, and sixth files of the torrent whose ID is '1':
+.Pp
+.Dl $ transmission-remote -t1 -Gall -g2,4,6
+.Pp
+
+Set all torrents' first two files' priorities to high:
+.Pp
+.Dl $ transmission-remote -t1 -ph1,2
+.Pp
+
+Set all torrents' files' priorities to normal:
+.Pp
+.Dl $ transmission-remote -tall -pnall
+.Pp
+
 Set download and upload limits to 100 KiB/sec and 20 KiB/sec:
 .Pp
-.Dl transmission-remote -d 100 -u 20
-.Dl transmission-remote -d=100 -u=20
+.Dl $ transmission-remote -d 100 -u 20
+.Dl $ transmission-remote -d=100 -u=20
 .Pp
+
 Add two torrents:
 .Pp
-.Dl transmission-remote -a one.torrent two.torrent
+.Dl $ transmission-remote -a one.torrent two.torrent
+.Pp
 
 .Sh AUTHORS
 .An -nosplit

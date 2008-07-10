@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> /* strcmp */
@@ -36,22 +37,38 @@ enum { TAG_LIST, TAG_DETAILS, TAG_FILES };
 static const char*
 getUsage( void )
 {
-    return "Transmission "LONG_VERSION_STRING"  http://www.transmissionbt.com/\n"
-           "A fast and easy BitTorrent client\n"
-           "\n"
-           "Usage: "MY_NAME" [host] [options]\n"
-           "       "MY_NAME" [port] [options]\n"
-           "       "MY_NAME" [host:port] [options]";
+    return
+"Transmission "LONG_VERSION_STRING"  http://www.transmissionbt.com/\n"
+"A fast and easy BitTorrent client\n"
+"\n"
+"Usage: "MY_NAME" [host] [options]\n"
+"       "MY_NAME" [port] [options]\n"
+"       "MY_NAME" [host:port] [options]\n"
+"\n"
+"Notes:\n"
+"  <files> can be 'all', a single index, or a comma-separated list.\n"
+"  <torrents> can be 'all', a torrent id or hash string, or a comma-separated list of ids and hash strings.\n"
+"\n"
+"Examples:\n"
+"  \""MY_NAME" -l\" (list all torrents)\n"
+"  \""MY_NAME" -tall --start\" (start all torrents)\n"
+"  \""MY_NAME" --add ~/Desktop/*torrent\" (add all the torrent files in $HOME/Desktop)\n"
+"  \""MY_NAME" -t1 -i\" (get detailed information on the torrent whose id is '1')\n"
+"  \""MY_NAME" -t1 -Gall -g2,4,6\" (same torrent; only download the second, fourth, and sixth files)\n"
+"  \""MY_NAME" -tall -ph1,2\" (set all torrent's first two files' priorities to high)\n"
+"  \""MY_NAME" -tall -pnall\" (set all torrent's files' priorities to normal)";
 }
 
 static tr_option opts[] =
 {
     { 'a', "add",          "Add torrent files", "a", 0, NULL },
+    { 'b', "debug",        "Print debugging information", "b", 0, NULL },
     { 'd', "downlimit",    "Set the maximum download speed in KB/s", "d", 1, "<number>" },
     { 'D', "no-downlimit", "Don't limit the download speed", "D", 0, NULL },
     { 'e', "encryption",   "Set encryption mode [required, preferred, tolerated]", "e", 1, "<mode>" },
     { 'f', "files",        "Get a file list for the current torrent(s)", "f", 0, NULL },
-    { 'g', "debug",        "Print debugging information", "g", 0, NULL },
+    { 'g', "get",          "Mark files for download", "g", 1, "<files>" },
+    { 'G', "no-get",       "Mark files for not downloading", "G", 1, "<files>" },
     { 'h', "help",         "Show this help page and exit", "h", 0, NULL },
     { 'i', "info",         "Show details of the current torrent(s)", "i", 0, NULL },
     { 'l', "list",         "List all torrents", "l", 0, NULL },
@@ -59,10 +76,13 @@ static tr_option opts[] =
     { 'M', "no-portmap",   "Disable portmapping", "M", 0, NULL },
     { 'n', "auth",         "Set username for authentication", "n", 1, "<user>:<pass>" },
     { 'p', "port",         "Port to listen for incoming peers", "p", 1, "<port>" },
+    { 900, "priority-high", "Set one or more files' priority as high", "ph", 1, "<files>" },
+    { 901, "priority-normal", "Set one or more files' priority as normal", "pn", 1, "<files>" },
+    { 902, "priority-normal", "Set one or more files' priority as low", "pl", 1, "<files>" },
     { 'r', "remove",       "Remove the current torrent(s)", "r", 0, NULL },
     { 's', "start",        "Start the current torrent(s)", "s", 0, NULL },
     { 'S', "stop",         "Stop the current torrent(s)", "S", 0, NULL },
-    { 't', "torrent",      "Set the current torrent(s)", "t", 1, "<id|hash|all>" },
+    { 't', "torrent",      "Set the current torrent(s)", "t", 1, "<torrents>" },
     { 'u', "uplimit",      "Set the maximum upload speed in KB/s", "u", 1, "<number>" },
     { 'U', "no-uplimit",   "Don't limit the upload speed", "U", 0, NULL },
     { 'v', "verify",       "Verify the current torrent(s)", "v", 0, NULL },
@@ -125,8 +145,37 @@ addIdArg( tr_benc * args, const char * id )
     if( !*id ) {
         fprintf( stderr, "No torrent specified!  Please use the -t option first.\n" );
         id = "-1"; /* no torrent will have this ID, so should be a no-op */
-    } else if( strcmp( id, "all" ) ) {
+    }
+    if( strcmp( id, "all" ) ) {
         tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), id, strlen(id) );
+    }
+}
+
+static void
+addFiles( tr_benc * args, const char * key, const char * arg )
+{
+    tr_benc * files = tr_bencDictAddList( args, key, 100 );
+
+    if( !*arg )
+    {
+        fprintf( stderr, "No files specified!\n" );
+        arg = "-1"; /* no file will have this index, so should be a no-op */
+    }
+    if( strcmp( arg, "all" ) )
+    {
+        const char * walk = arg;
+        while( *walk ) {
+            char * p;
+            unsigned long l;
+            errno = 0;
+            l = strtol( walk, &p, 10 );
+            if( errno )
+                break; 
+            tr_bencListAddInt( files, l - 1 );
+            if( *p != ',' )
+                break;
+            walk = p + 1;
+        }
     }
 }
 
@@ -165,6 +214,9 @@ readargs( int argc, const char ** argv )
             case 'a': addingTorrents = 1;
                       addArg = FALSE;
                       break;
+            case 'b': debug = 1;
+                      addArg = FALSE;
+                      break;
             case 'd': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddInt( args, "speed-limit-down", numarg( optarg ) );
                       tr_bencDictAddInt( args, "speed-limit-down-enabled", 1 );
@@ -183,8 +235,13 @@ readargs( int argc, const char ** argv )
                              | TR_RPC_TORRENT_PRIORITIES;
                       tr_bencDictAddInt( args, "fields", fields );
                       break;
-            case 'g': debug = 1;
-                      addArg = FALSE;
+            case 'g': tr_bencDictAddStr( &top, "method", "torrent-set" );
+                      addIdArg( args, id );
+                      addFiles( args, "files-wanted", optarg );
+                      break;
+            case 'G': tr_bencDictAddStr( &top, "method", "torrent-set" );
+                      addIdArg( args, id );
+                      addFiles( args, "files-unwanted", optarg );
                       break;
             case 'i': tr_bencDictAddStr( &top, "method", "torrent-get" );
                       tr_bencDictAddInt( &top, "tag", TAG_DETAILS );
@@ -251,6 +308,18 @@ readargs( int argc, const char ** argv )
                       break;
             case 'X': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddInt( args, "pex-allowed", 0 );
+                      break;
+            case 900: tr_bencDictAddStr( &top, "method", "torrent-set" );
+                      addIdArg( args, id );
+                      addFiles( args, "priority-high", optarg );
+                      break;
+            case 901: tr_bencDictAddStr( &top, "method", "torrent-set" );
+                      addIdArg( args, id );
+                      addFiles( args, "priority-normal", optarg );
+                      break;
+            case 902: tr_bencDictAddStr( &top, "method", "torrent-set" );
+                      addIdArg( args, id );
+                      addFiles( args, "priority-low", optarg );
                       break;
             default:  fprintf( stderr, "got opt [%d]\n", (int)c );
                       showUsage( );

@@ -338,11 +338,21 @@ setFilePriorities( tr_torrent * tor, int priority, tr_benc * list )
     int64_t tmp;
     int fileCount = 0;
     const int n = tr_bencListSize( list );
-    tr_file_index_t * files = tr_new0( tr_file_index_t, n );
+    tr_file_index_t * files = tr_new0( tr_file_index_t, tor->info.fileCount );
 
-    for( i=0; i<n; ++i )
-        if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) )
-            files[fileCount++] = tmp;
+    if( n )
+    {
+        for( i=0; i<n; ++i )
+            if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) )
+                if( 0<=tmp && tmp<tor->info.fileCount )
+                    files[fileCount++] = tmp;
+    }
+    else // if empty set, apply to all
+    {
+        tr_file_index_t t;
+        for( t=0; t<tor->info.fileCount; ++t )
+            files[fileCount++] = t;
+    }
 
     if( fileCount )
         tr_torrentSetFilePriorities( tor, files, fileCount, priority );
@@ -357,11 +367,21 @@ setFileDLs( tr_torrent * tor, int do_download, tr_benc * list )
     int64_t tmp;
     int fileCount = 0;
     const int n = tr_bencListSize( list );
-    tr_file_index_t * files = tr_new0( tr_file_index_t, n );
+    tr_file_index_t * files = tr_new0( tr_file_index_t, tor->info.fileCount );
 
-    for( i=0; i<n; ++i )
-        if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) )
-            files[fileCount++] = tmp;
+    if( n ) // if argument list, process them
+    {
+        for( i=0; i<n; ++i )
+            if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) )
+                if( 0<=tmp && tmp<tor->info.fileCount )
+                    files[fileCount++] = tmp;
+    }
+    else // if empty set, apply to all
+    {
+        tr_file_index_t t;
+        for( t=0; t<tor->info.fileCount; ++t )
+            files[fileCount++] = t;
+    }
 
     if( fileCount )
         tr_torrentSetFileDLs( tor, files, fileCount, do_download );

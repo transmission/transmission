@@ -979,7 +979,7 @@ networkPage( GObject * core )
     t = hig_workarea_create( );
     hig_workarea_add_section_title (t, &row, _( "Router" ) );
 
-        s = _("Use port _forwarding from my router" );
+        s = _("Use UPnP or NAT-PMP port _forwarding from my router" );
         w = new_check_button( s, PREF_KEY_PORT_FORWARDING, core );
         hig_workarea_add_wide_control( t, &row, w );
 
