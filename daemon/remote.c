@@ -409,13 +409,13 @@ printDetails( tr_benc * top )
 
                 if( isVerifying( i ) &&
                     tr_bencDictFindStr( t, "recheckProgress", &str ) )
-                        printf( "  Verified Progress: %.2f%%\n", atof(str) );
+                        printf( "  Verified Progress: %.2f%%\n", 100.0*atof(str) );
             }
 
             if( tr_bencDictFindInt( t, "sizeWhenDone", &i ) &&
                 tr_bencDictFindInt( t, "leftUntilDone", &j ) )
             {
-                strlratio( buf, (i-j), i, sizeof( buf ) );
+                strlratio( buf, 100.0*(i-j), i, sizeof( buf ) );
                 printf( "  Download Progress: %s%%\n", buf );
             }
 
