@@ -405,18 +405,19 @@ printDetails( tr_benc * top )
             printf( "TRANSFER\n" );
             if( tr_bencDictFindInt( t, "status", &i ) )
             {
-                printf( "  State: %s\n", torrentStatusToString( i ) );
+                if( isVerifying( i ) && tr_bencDictFindStr( t, "recheckProgress", &str ) )
+                    snprintf( buf, sizeof( buf ), " (%.0f%% Done)", 100.0*atof(str) );
+                else
+                    *buf = '\0';
+                printf( "  State: %s%s\n", torrentStatusToString( i ), buf );
 
-                if( isVerifying( i ) &&
-                    tr_bencDictFindStr( t, "recheckProgress", &str ) )
-                        printf( "  Verified Progress: %.2f%%\n", 100.0*atof(str) );
             }
 
             if( tr_bencDictFindInt( t, "sizeWhenDone", &i ) &&
                 tr_bencDictFindInt( t, "leftUntilDone", &j ) )
             {
                 strlratio( buf, 100.0*(i-j), i, sizeof( buf ) );
-                printf( "  Download Progress: %s%%\n", buf );
+                printf( "  Percent Done: %s%%\n", buf );
             }
 
             if( tr_bencDictFindInt( t, "eta", &i ) ) {
