@@ -396,17 +396,8 @@ printDetails( tr_benc * top )
             printf( "\n" );
 
             printf( "TRANSFER\n" );
-            if( tr_bencDictFindInt( t, "status", &i ) ) {
-                switch( i ) {
-                    case TR_STATUS_SEED:        str = "Seeding"; break;
-                    case TR_STATUS_DOWNLOAD:    str = "Downloading"; break;
-                    case TR_STATUS_STOPPED:     str = "Paused"; break;
-                    case TR_STATUS_CHECK:       str = "Verifying local data"; break;
-                    case TR_STATUS_CHECK_WAIT:  str = "Waiting to verify"; break;
-                    default:                    str = "error"; break;
-                }
-                printf( "  State: %s\n", str );
-            }
+            if( tr_bencDictFindInt( t, "status", &i ) )
+                printf( "  State: %s\n", torrentStatusToString( i ) );
             if( tr_bencDictFindInt( t, "eta", &i ) ) {
                 etaToString( buf, sizeof( buf ), i );
                 printf( "  ETA: %s\n", buf );
