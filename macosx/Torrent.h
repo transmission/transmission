@@ -34,6 +34,9 @@ typedef enum
     TORRENT_FILE_DEFAULT
 } torrentFileState;
 
+#define STAT_TIME_NONE -1
+#define STAT_TIME_NOW -2
+
 @interface Torrent : NSObject
 {
     tr_torrent * fHandle;

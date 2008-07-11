@@ -1395,7 +1395,19 @@ typedef enum
     [fAnnounceResponseField setSelectable: ![announceResponse isEqualToString: @""]];
     
     int announceNext = [torrent nextAnnounceTime];
-    [fAnnounceNextField setStringValue: announceNext > 0 ? [NSString timeString: announceNext showSeconds: YES] : @""];
+    NSString * announceNextString;
+    switch (announceNext)
+    {
+        case STAT_TIME_NOW:
+            announceNextString = [NSLocalizedString(@"In progress", "Inspector -> tracker tab") stringByAppendingEllipsis];
+            break;
+        case STAT_TIME_NONE:
+            announceNextString = @"";
+            break;
+        default:
+            announceNextString = [NSString timeString: announceNext showSeconds: YES];
+    }
+    [fAnnounceNextField setStringValue: announceNextString];
     
     //scrape fields
     NSString * scrapeAddress;
@@ -1418,7 +1430,19 @@ typedef enum
     [fScrapeResponseField setSelectable: ![scrapeResponse isEqualToString: @""]];
     
     int scrapeNext = [torrent nextScrapeTime];
-    [fScrapeNextField setStringValue: scrapeNext > 0 ? [NSString timeString: scrapeNext showSeconds: YES] : @""];
+    NSString * scrapeNextString;
+    switch (scrapeNext)
+    {
+        case STAT_TIME_NOW:
+            scrapeNextString = [NSLocalizedString(@"In progress", "Inspector -> tracker tab") stringByAppendingEllipsis];
+            break;
+        case STAT_TIME_NONE:
+            scrapeNextString = @"";
+            break;
+        default:
+            scrapeNextString = [NSString timeString: scrapeNext showSeconds: YES];
+    }
+    [fScrapeNextField setStringValue: scrapeNextString];
 }
 
 - (void) updateInfoPeers

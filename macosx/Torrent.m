@@ -733,11 +733,17 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (int) nextAnnounceTime
 {
     int date = fStat->nextAnnounceTime;
-    if (date <= 0)
-        return -1;
-    
-    NSTimeInterval difference = [[NSDate dateWithTimeIntervalSince1970: date] timeIntervalSinceNow];
-    return difference > 0 ? (int)difference : -1;
+    NSTimeInterval difference;
+    switch (date)
+    {
+        case 0:
+            return STAT_TIME_NONE;
+        case 1:
+            return STAT_TIME_NOW;
+        default:
+            difference = [[NSDate dateWithTimeIntervalSince1970: date] timeIntervalSinceNow];
+            return difference > 0 ? (int)difference : STAT_TIME_NONE;
+    }
 }
 
 - (NSString *) announceResponse
@@ -759,11 +765,17 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (int) nextScrapeTime
 {
     int date = fStat->nextScrapeTime;
-    if (date <= 0)
-        return -1;
-    
-    NSTimeInterval difference = [[NSDate dateWithTimeIntervalSince1970: date] timeIntervalSinceNow];
-    return difference > 0 ? (int)difference : -1;
+    NSTimeInterval difference;
+    switch (date)
+    {
+        case 0:
+            return STAT_TIME_NONE;
+        case 1:
+            return STAT_TIME_NOW;
+        default:
+            difference = [[NSDate dateWithTimeIntervalSince1970: date] timeIntervalSinceNow];
+            return difference > 0 ? (int)difference : STAT_TIME_NONE;
+    }
 }
 
 - (NSString *) scrapeResponse
