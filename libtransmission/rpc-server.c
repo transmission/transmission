@@ -253,10 +253,8 @@ startServer( tr_rpc_server * server )
         char ports[128];
         char passwd[MAX_PATH_LENGTH];
         const char * clutchDir = tr_getClutchDir( server->session );
-        char * clutchAlias = tr_strdup_printf( "%s=%s", "/transmission/clutch", clutchDir );
         struct timeval tv = tr_timevalMsec( UNUSED_INTERVAL_MSEC );
 
-fprintf( stderr, "clutchAlias is [%s]\n", clutchAlias );
         getPasswordFile( server, passwd, sizeof( passwd ) );
         if( !server->isPasswordEnabled )
             unlink( passwd );
@@ -267,7 +265,14 @@ fprintf( stderr, "clutchAlias is [%s]\n", clutchAlias );
         snprintf( ports, sizeof( ports ), "%d", server->port );
         shttpd_register_uri( server->ctx, "/transmission/rpc", handle_rpc, server );
         shttpd_register_uri( server->ctx, "/transmission/upload", handle_upload, server );
-        shttpd_set_option(server->ctx, "aliases", clutchAlias );
+
+        if( clutchDir && *clutchDir ) {
+            char * clutchAlias = tr_strdup_printf( "%s=%s", "/transmission/clutch", clutchDir );
+            tr_inf( _( "Serving the web interface files from \"%s\"" ), clutchDir );
+            shttpd_set_option( server->ctx, "aliases", clutchAlias );
+            tr_free( clutchAlias );
+        }
+
         shttpd_set_option( server->ctx, "ports", ports );
         shttpd_set_option( server->ctx, "dir_list", "0" );
         //shttpd_set_option( server->ctx, "root", "/dev/null" );
@@ -285,8 +290,6 @@ fprintf( stderr, "clutchAlias is [%s]\n", clutchAlias );
 
         evtimer_set( &server->timer, rpcPulse, server );
         evtimer_add( &server->timer, &tv );
-
-        tr_free( clutchAlias );
     }
 }
 

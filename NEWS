@@ -3,12 +3,16 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.30 (2008/mm/dd)
 http://trac.transmissionbt.com/query?group=component&milestone=1.30
 - All Platforms
-   + Added support for HTTP/FTP Seeding (GetRight style)
-   + Added proxy support for communicating with trackers
+   + The "Clutch" web interface is now bundled with Transmission
    + Ability to add and remove tracker addresses
    + Ability to create torrent files with multiple tracker addresses
+   + Added support for HTTP/FTP Seeding (GetRight style)
+   + Added proxy support for communicating with trackers
    + Allow torrent creation with no tracker address (required by some trackers)
-   + Restructuring of remote access
+   + Redesigned remote access via JSON
+- Daemon
+   + transmission-daemon and transmission-remote were rewritten from scratch
+   + remote and daemon now support per-file priority & download flag settings
 - Mac
    + Quick Look integration in the main window and inspector's file tab
    + Transfers can be dragged to different groups
@@ -17,8 +21,6 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.30
    + Colors in pieces bar and pieces box more accurately reflect their corresponding values
 - GTK+
    + Add options to inhibit hibernation and to toggle the tray icon
-- Daemon
-   + Redesigned & rewritten to use JSON over http
 
 1.22 (2008/06/13)
 http://trac.transmissionbt.com/query?group=component&milestone=1.22

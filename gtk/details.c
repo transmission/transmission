@@ -557,12 +557,12 @@ onPeerViewQueryTooltip( GtkWidget  * widget,
             const char * txt = NULL;
             switch( *pch ) {
                 case 'O': txt = _( "Optimistic unchoke" ); break;
-                case 'D': txt = _( "Downloading from peer" ); break;
-                case 'd': txt = _( "We'd download from peer if they'd let us" ); break;
+                case 'D': txt = _( "Downloading from this peer" ); break;
+                case 'd': txt = _( "We would download from this peer if they would let us" ); break;
                 case 'U': txt = _( "Uploading to peer" ); break;
-                case 'u': txt = _( "We'd upload to peer if they'd ask us" ); break;
+                case 'u': txt = _( "We would upload to this peer if they asked" ); break;
                 case 'K': txt = _( "Peer has unchoked us, but we're not interested" ); break;
-                case '?': txt = _( "We unchoked the peer, but they're not interested" ); break;
+                case '?': txt = _( "We unchoked this peer, but they're not interested" ); break;
                 case 'E': txt = _( "Encrypted connection" ); break;
                 case 'X': txt = _( "Peer was discovered through Peer Exchange (PEX)" ); break;
                 case 'I': txt = _( "Peer is an incoming connection" ); break;
@@ -812,7 +812,7 @@ info_page_new (tr_torrent * tor)
   hig_workarea_add_section_title (t, &row, _("Details"));
 
     g_snprintf( countStr, sizeof( countStr ),
-                ngettext( "%d Piece", "%d Pieces", info->pieceCount ),
+                ngettext( "%'d Piece", "%'d Pieces", info->pieceCount ),
                 info->pieceCount );
     tr_strlsize( sizeStr, info->pieceSize, sizeof(sizeStr) );
     g_snprintf( buf, sizeof( buf ),

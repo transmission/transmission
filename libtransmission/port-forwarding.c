@@ -96,7 +96,7 @@ natPulse( tr_shared * s )
     newStatus = tr_sharedTraversalStatus( s );
 
     if( newStatus != oldStatus )
-        tr_ninf( getKey(), _( "State changed from \"%s\" to \"%s\"" ),
+        tr_ninf( getKey(), _( "State changed from \"%1$s\" to \"%2$s\"" ),
                  getNatStateStr(oldStatus),
                  getNatStateStr(newStatus) );
 }

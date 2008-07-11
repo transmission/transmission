@@ -710,7 +710,7 @@ onAddACLClicked( GtkButton * b UNUSED, gpointer gpage )
     gtk_list_store_append( page->store, &iter );
     gtk_list_store_set( page->store, &iter,
                         COL_PERMISSION, _( "Allow" ),
-                        COL_ADDRESS, _( "0.0.0.0" ),
+                        COL_ADDRESS,  "0.0.0.0",
                         -1 );
 
     path = gtk_tree_model_get_path( GTK_TREE_MODEL( page->store ), &iter );
@@ -767,7 +767,7 @@ onACLSelectionChanged( GtkTreeSelection * sel UNUSED, gpointer page )
 }
 
 static GtkWidget*
-remotePage( GObject * core )
+webPage( GObject * core )
 {
     const char  * s;
     int row = 0;
@@ -780,10 +780,10 @@ remotePage( GObject * core )
     t = hig_workarea_create( );
     g_object_set_data_full( G_OBJECT( t ), "page", page, g_free );
 
-    hig_workarea_add_section_title( t, &row, _( "Remote Access" ) );
+    hig_workarea_add_section_title( t, &row, _( "Web Interface" ) );
 
         /* "enabled" checkbutton */
-        s = _( "A_llow requests from transmission-remote, Clutch, etc." );
+        s = _( "Allow remote access" );
         w = new_check_button( s, PREF_KEY_RPC_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
         page->rpc_tb = GTK_TOGGLE_BUTTON( w );
@@ -1086,8 +1086,8 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
                               networkPage( core ),
                               gtk_label_new (_("Network")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              remotePage( core ),
-                              gtk_label_new (_("Remote")) );
+                              webPage( core ),
+                              gtk_label_new (_("Web")) );
 
     g_signal_connect( d, "response", G_CALLBACK(response_cb), core );
     gtk_box_pack_start_defaults( GTK_BOX(GTK_DIALOG(d)->vbox), n );

@@ -2,11 +2,11 @@ The Transmission Project
 http://www.transmissionbt.com/
 
 Lead Developers <dev@transmissionbt.com>
-        Mitchell Livingston <livings124@transmissionbt.com>  (Mac OS X interface)
-        Charles Kerr <charles@transmissionbt.com>  (Backend, GTK+ client)
+        Charles Kerr <charles@transmissionbt.com>  (Daemon, Backend, GTK+ client)
+        Mitchell Livingston <livings124@transmissionbt.com>  (Mac OS X client)
         Eric Petit <titer@m0k.org>  (Creator)
-        Josh Elsasser <josh@elsasser.org>  (Daemon, Backend, GTK+ interface)
-        Bryan Varner <bryan@varnernet.com>  (BeOS interface)
+        Josh Elsasser <josh@elsasser.org>  (Daemon, Backend, GTK+ client)
+        Bryan Varner <bryan@varnernet.com>  (BeOS client)
 
 Project Contributors
 	Hugo van Heuven, madebysofa  (Main icon design)

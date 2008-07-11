@@ -235,7 +235,7 @@ refreshFromBuilder( MakeMetaUI * ui )
     else {
         char countStr[512];
         g_snprintf( countStr, sizeof( countStr ),
-                    ngettext( "%d Piece", "%d Pieces", builder->pieceCount ),
+                    ngettext( "%'d Piece", "%'d Pieces", builder->pieceCount ),
                     builder->pieceCount );
         tr_strlsize( sizeStr, builder->pieceSize, sizeof(sizeStr) );
         g_snprintf( buf, sizeof( buf ),

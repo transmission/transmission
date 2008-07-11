@@ -274,7 +274,7 @@ _tr_blocklistSetContent( tr_blocklist * b,
         char buf[MAX_PATH_LENGTH];
         tr_strlcpy( buf, b->filename, sizeof( buf ) );
         name = basename( buf );
-        tr_inf( _( "Blocklist \"%s\" updated with %'d entries" ), name, lineCount );
+        tr_inf( _( "Blocklist \"%1$s\" updated with %2$'d entries" ), name, lineCount );
     }
 
 
