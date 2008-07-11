@@ -536,10 +536,12 @@ tr_getClutchDir( const tr_session * session UNUSED )
         else
         {
 #ifdef SYS_DARWIN
-#warning FIXME BentMyWookie
-#error darwin version not implemented
+
+            #warning hey BentMyWookie can this be implemented here without passing anything into initFull()
+
 #elif defined(WIN32)
-#warning hey win32 people is this good or is there a better implementation of the next four lines
+
+            #warning hey win32 people is this good or is there a better implementation of the next four lines
             char appdata[MAX_PATH_LENGTH];
             SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
             tr_buildPath( path, sizeof( path ),
