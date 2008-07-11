@@ -24,6 +24,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "platform.h"
 #include "rpc.h"
 #include "rpc-server.h"
 #include "utils.h"
@@ -251,13 +252,11 @@ startServer( tr_rpc_server * server )
     {
         char ports[128];
         char passwd[MAX_PATH_LENGTH];
-        char clutchDir[MAX_PATH_LENGTH];
-        char * clutchAlias;
+        const char * clutchDir = tr_getClutchDir( server->session );
+        char * clutchAlias = tr_strdup_printf( "%s=%s", "/transmission/clutch", clutchDir );
         struct timeval tv = tr_timevalMsec( UNUSED_INTERVAL_MSEC );
 
-        tr_buildPath( clutchDir, sizeof( clutchDir ), tr_sessionGetConfigDir( server->session ), "clutch", NULL );
-        clutchAlias = tr_strdup_printf( "%s=%s", "/transmission/clutch", clutchDir );
-
+fprintf( stderr, "clutchAlias is [%s]\n", clutchAlias );
         getPasswordFile( server, passwd, sizeof( passwd ) );
         if( !server->isPasswordEnabled )
             unlink( passwd );

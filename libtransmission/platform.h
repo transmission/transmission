@@ -44,6 +44,9 @@ const char * tr_getResumeDir  ( const struct tr_handle * );
 
 const char * tr_getTorrentDir ( const struct tr_handle * );
 
+const char * tr_getClutchDir  ( const struct tr_handle * );
+
+
 tr_thread*   tr_threadNew  ( void (*func)(void *), void * arg, const char * name );
 int          tr_amInThread ( const tr_thread * );
 

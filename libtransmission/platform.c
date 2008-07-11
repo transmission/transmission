@@ -50,6 +50,7 @@
 #include <unistd.h> /* getuid getpid close */
 
 #include "transmission.h"
+#include "list.h"
 #include "platform.h"
 #include "utils.h"
 
@@ -503,6 +504,95 @@ tr_getDefaultConfigDir( void )
 
     return s;
 }
+
+/***
+****
+***/
+
+static int
+isClutchDir( const char * path )
+{
+    struct stat sb;
+    char tmp[MAX_PATH_LENGTH];
+    tr_buildPath( tmp, sizeof( tmp ), path, "javascript", "transmission.js", NULL );
+fprintf( stderr, "path is [%s]; testing [%s] for clutch\n", path, tmp );
+    return !stat( tmp, &sb );
+}
+
+const char *
+tr_getClutchDir( const tr_session * session UNUSED )
+{
+    static char * s = NULL;
+
+    if( !s )
+    {
+        char path[MAX_PATH_LENGTH];
+
+        if(( s = getenv( "CLUTCH_HOME" )))
+        {
+            snprintf( path, sizeof( path ), s );
+        }
+        else
+        {
+#ifdef SYS_DARWIN
+#error not implemented
+#elif defined(WIN32)
+#warning hey win32 people is this good or is there a better implementation of the next four lines
+            char appdata[MAX_PATH_LENGTH];
+            SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
+            tr_buildPath( path, sizeof( path ),
+                          appdata, "Transmission", NULL );
+#else
+            tr_list *candidates=NULL, *l;
+
+            /* XDG_DATA_HOME should be the first in the list of candidates */
+            s = getenv( "XDG_DATA_HOME" );
+            if( s && *s )
+                tr_list_append( &candidates, tr_strdup( s ) );
+            else {
+                char tmp[MAX_PATH_LENGTH];
+                tr_buildPath( tmp, sizeof( tmp ), getHomeDir(), ".local", "share", NULL );
+                tr_list_append( &candidates, tr_strdup( tmp ) );
+            }
+
+            /* XDG_DATA_DIRS are the backup directories */
+            s = getenv( "XDG_DATA_DIRS" );
+            if( !s || !*s )
+                s = "/usr/local/share/:/usr/share/";
+            while( s && *s ) {
+                char * end = strchr( s, ':' );
+                if( end ) {
+                    tr_list_append( &candidates, tr_strndup( s, end-s ) );
+                    s = end + 1;
+                } else {
+                    tr_list_append( &candidates, tr_strdup( s ) );
+                    break;
+                }
+            }
+
+            for( l=candidates; l; l=l->next ) {
+                tr_buildPath( path, sizeof( path ), l->data, "transmission", "clutch", NULL );
+                if( isClutchDir( path ) )
+                    break;
+                *path = '\0';
+            }
+
+            tr_list_free( &candidates, tr_free );
+#endif
+        }
+
+        if( !*path )
+        {
+            tr_err( _( "Unable to find web interface files" ) );
+            tr_strlcpy( path, "/dev/null", sizeof( path ) );
+        }
+
+        s = tr_strdup( path );
+    }
+
+    return s;
+}
+
 
 /***
 ****
