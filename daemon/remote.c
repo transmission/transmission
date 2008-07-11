@@ -45,18 +45,7 @@ getUsage( void )
 "       "MY_NAME" [port] [options]\n"
 "       "MY_NAME" [host:port] [options]\n"
 "\n"
-"Notes:\n"
-"  <files> can be 'all', a single index, or a comma-separated list.\n"
-"  <torrents> can be 'all', a torrent id or hash string, or a comma-separated list of ids and hash strings.\n"
-"\n"
-"Examples:\n"
-"  \""MY_NAME" -l\" (list all torrents)\n"
-"  \""MY_NAME" -tall --start\" (start all torrents)\n"
-"  \""MY_NAME" --add ~/Desktop/*torrent\" (add all the torrent files in $HOME/Desktop)\n"
-"  \""MY_NAME" -t1 -i\" (get detailed information on the torrent whose id is '1')\n"
-"  \""MY_NAME" -t1 -Gall -g2,4,6\" (same torrent; only download the second, fourth, and sixth files)\n"
-"  \""MY_NAME" -tall -ph1,2\" (set all torrent's first two files' priorities to high)\n"
-"  \""MY_NAME" -tall -pnall\" (set all torrent's files' priorities to normal)";
+"See the man page for detailed explanations and many examples.";
 }
 
 static tr_option opts[] =
@@ -65,8 +54,10 @@ static tr_option opts[] =
     { 'b', "debug",        "Print debugging information", "b", 0, NULL },
     { 'd', "downlimit",    "Set the maximum download speed in KB/s", "d", 1, "<number>" },
     { 'D', "no-downlimit", "Don't limit the download speed", "D", 0, NULL },
-    { 'e', "encryption",   "Set encryption mode [required, preferred, tolerated]", "e", 1, "<mode>" },
-    { 'f', "files",        "Get a file list for the current torrent(s)", "f", 0, NULL },
+    { 910, "encryption-required", "Encrypt all peer connections", "er", 0, NULL },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL },
+    { 'f', "files",        "List the current torrent's files", "f", 0, NULL },
     { 'g', "get",          "Mark files for download", "g", 1, "<files>" },
     { 'G', "no-get",       "Mark files for not downloading", "G", 1, "<files>" },
     { 'h', "help",         "Show this help page and exit", "h", 0, NULL },
@@ -74,11 +65,11 @@ static tr_option opts[] =
     { 'l', "list",         "List all torrents", "l", 0, NULL },
     { 'm', "portmap",      "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
     { 'M', "no-portmap",   "Disable portmapping", "M", 0, NULL },
-    { 'n', "auth",         "Set username for authentication", "n", 1, "<user>:<pass>" },
+    { 'n', "auth",         "Set username for authentication", "n", 1, "<auth>" },
     { 'p', "port",         "Port to listen for incoming peers", "p", 1, "<port>" },
-    { 900, "priority-high", "Set one or more files' priority as high", "ph", 1, "<files>" },
-    { 901, "priority-normal", "Set one or more files' priority as normal", "pn", 1, "<files>" },
-    { 902, "priority-normal", "Set one or more files' priority as low", "pl", 1, "<files>" },
+    { 900, "priority-high", "Set the files' priorities as high", "ph", 1, "<files>" },
+    { 901, "priority-normal", "Set the files' priorities as normal", "pn", 1, "<files>" },
+    { 902, "priority-normal", "Set the files' priorities as low", "pl", 1, "<files>" },
     { 'r', "remove",       "Remove the current torrent(s)", "r", 0, NULL },
     { 's', "start",        "Start the current torrent(s)", "s", 0, NULL },
     { 'S', "stop",         "Stop the current torrent(s)", "S", 0, NULL },
@@ -86,7 +77,7 @@ static tr_option opts[] =
     { 'u', "uplimit",      "Set the maximum upload speed in KB/s", "u", 1, "<number>" },
     { 'U', "no-uplimit",   "Don't limit the upload speed", "U", 0, NULL },
     { 'v', "verify",       "Verify the current torrent(s)", "v", 0, NULL },
-    { 'w', "download-dir", "Set the download folder for new torrents", "w", 1, "<path>" },
+    { 'w', "download-dir", "Set the default download folder", "w", 1, "<path>" },
     { 'x', "pex",          "Enable peer exchange (PEX)", "x", 0, NULL },
     { 'X', "no-pex",       "Disable peer exchange (PEX)", "X", 0, NULL },
     { 0, NULL, NULL, NULL, 0, NULL }
@@ -224,9 +215,6 @@ readargs( int argc, const char ** argv )
             case 'D': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddInt( args, "speed-limit-down-enabled", 0 );
                       break;
-            case 'e': tr_bencDictAddStr( &top, "method", "session-set" );
-                      tr_bencDictAddStr( args, "encryption", optarg );
-                      break;
             case 'f': tr_bencDictAddStr( &top, "method", "torrent-get" );
                       tr_bencDictAddInt( &top, "tag", TAG_FILES );
                       addIdArg( args, id );
@@ -320,6 +308,15 @@ readargs( int argc, const char ** argv )
             case 902: tr_bencDictAddStr( &top, "method", "torrent-set" );
                       addIdArg( args, id );
                       addFiles( args, "priority-low", optarg );
+                      break;
+            case 910: tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddStr( args, "encryption", "required" );
+                      break;
+            case 911: tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddStr( args, "encryption", "preferred" );
+                      break;
+            case 912: tr_bencDictAddStr( &top, "method", "session-set" );
+                      tr_bencDictAddStr( args, "encryption", "tolerated" );
                       break;
             default:  fprintf( stderr, "got opt [%d]\n", (int)c );
                       showUsage( );

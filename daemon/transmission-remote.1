@@ -15,7 +15,9 @@ and
 .Op Fl b
 .Op Fl d Ar number
 .Op Fl D
-.Op Fl e Ar mode
+.Op Fl er
+.Op Fl ep
+.Op Fl et
 .Op Fl f
 .Op Fl g Ar files
 .Op Fl G Ar files
@@ -69,11 +71,11 @@ kilobytes per second.
 .It Fl D Fl -no-downlimit
 Remove the download limit.
 
-.It Fl e Fl -encryption Ar required
-Require all peer connections to be encrypted.
-.It Fl e Fl -encryption Ar preferred
+.It Fl er Fl -encryption-required
+Encrypt all peer connections.
+.It Fl ep Fl -encryption-preferred
 Prefer encrypted peer connections.
-.It Fl e Fl -encryption Ar tolerated
+.It Fl et Fl -encryption-tolerated
 Prefer unencrypted peer connections.
 
 .It Fl f Fl -files
@@ -103,8 +105,9 @@ Enable portmapping via NAT-PMP or UPnP
 .It Fl M Fl -no-portmap
 Disable portmapping
 
-.It Fl n Fl -auth Ar user:pass
-.Ar Username
+.It Fl n Fl -auth Ar username:password
+Set the
+.Ar username
 and
 .Ar password
 for authentication
@@ -149,6 +152,8 @@ will apply following requests to all torrents, while specific torrents can be ch
 .Ar id
 or
 .Ar hash .
+To set more than one current torrent, joined their ids or hashes together in a comma-delimited list,
+such as "-t1,2,3"
 
 .It Fl u Fl -uplimit Ar limit
 Limit the upload speed to
@@ -165,54 +170,64 @@ Use
 .Ar directory
 as the default location for newly added torrents to download files to.
 
-.It Fl x
+.It Fl x Fl -pex
 Enable peer exchange (PEX).
-.It Fl X
+.It Fl X Fl -no-pex
 Disable peer exchange (PEX).
 
 .El
 .Sh EXAMPLES
 
-List all torrents:
-.Pp
-.Dl $ transmission-remote -l
-.Pp
+List all torrents' IDs and states:
+.Bd -literal -offset indent
+$ transmission-remote -l
+.Ed
+
+List all torrents from a remote session that requires authentication:
+.Bd -literal -offset indent
+$ transmission-remote host:9091 --auth=username:password -l
+.Ed
 
 Start all torrents:
-.Pp
-.Dl $ transmission-remote -tall --start
-.Pp
-
-Get detailed information on the torrent whose ID is '1':
-.Pp
-.Dl $ transmission-remote -t1 -i
-.Pp
-
-Only download the second, fourth, and sixth files of the torrent whose ID is '1':
-.Pp
-.Dl $ transmission-remote -t1 -Gall -g2,4,6
-.Pp
-
-Set all torrents' first two files' priorities to high:
-.Pp
-.Dl $ transmission-remote -t1 -ph1,2
-.Pp
-
-Set all torrents' files' priorities to normal:
-.Pp
-.Dl $ transmission-remote -tall -pnall
-.Pp
-
-Set download and upload limits to 100 KiB/sec and 20 KiB/sec:
-.Pp
-.Dl $ transmission-remote -d 100 -u 20
-.Dl $ transmission-remote -d=100 -u=20
-.Pp
+.Bd -literal -offset indent
+$ transmission-remote -tall --start
+.Ed
 
 Add two torrents:
-.Pp
-.Dl $ transmission-remote -a one.torrent two.torrent
-.Pp
+.Bd -literal -offset indent
+$ transmission-remote -a one.torrent two.torrent
+.Ed
+
+Add all torrents in ~/Desktop:
+.Bd -literal -offset indent
+$ transmission-remote -a ~/Desktop/*torrent
+.Ed
+
+Get detailed information on the torrent whose ID is '1':
+.Bd -literal -offset indent
+$ transmission-remote -t1 -i"
+.Ed
+
+Download only its second and fourth files:
+.Bd -literal -offset indent
+$ transmission-remote -t1 -Gall -g2,4"
+.Ed
+
+Set all torrents' first two files' priorities to high:
+.Bd -literal -offset indent
+$ transmission-remote -tall -ph1,2"
+.Ed
+
+Set all torrents' files' priorities to normal:
+.Bd -literal -offset indent
+$ transmission-remote -tall -pnall"
+.Ed
+
+Set download and upload limits to 100 KiB/sec and 20 KiB/sec:
+.Bd -literal -offset indent
+$ transmission-remote -d100 -u20
+$ transmission-remote --downlimit=100 --uplimit=20
+.Bd -literal -offset indent
 
 .Sh AUTHORS
 .An -nosplit
