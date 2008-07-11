@@ -1238,18 +1238,21 @@ tracker_page_new( TrTorrent * gtor )
 }
 
 static void
-refresh_countdown_lb( GtkWidget * l, time_t t,
+refresh_countdown_lb( GtkWidget * w, time_t t,
                       const char * countdown_done )
 {
     const time_t now = time( NULL );
+    GtkLabel * l = GTK_LABEL( w );
 
-    if( !t || ( t < now ) )
-        gtk_label_set_text( GTK_LABEL( l ), countdown_done );
+    if( t == 1 )
+        gtk_label_set_text( l, _( "In progress" ) );
+    else if( t < now )
+        gtk_label_set_text( l, countdown_done );
     else {
         char buf[1024];
         const int seconds = t - now;
         tr_strltime( buf, seconds, sizeof( buf ) );
-        gtk_label_set_text( GTK_LABEL( l ), buf );
+        gtk_label_set_text( l, buf );
     }
 }
 

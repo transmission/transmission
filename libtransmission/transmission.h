@@ -1301,8 +1301,10 @@ typedef struct tr_stat
         or zero if one hasn't been sent yet. */
     time_t lastScrapeTime;
 
-    /** Time when the next scrape request will be sent.
-        This value is always a valid time. */
+    /** Time when the next scrape request will be sent,
+        or 0 if an error has occured that stops scraping,
+        or 1 if a scrape is currently in progress s.t.
+        we haven't set a timer for the next one yet. */
     time_t nextScrapeTime;
 
     /** Time the most recent announce request was sent,
@@ -1310,12 +1312,17 @@ typedef struct tr_stat
     time_t lastAnnounceTime;
 
     /** Time when the next reannounce request will be sent,
-        or zero if the torrent is stopped. */
+        or 0 if the torrent is stopped,
+        or 1 if an announce is currently in progress s.t.
+        we haven't set a timer for the next one yet */
     time_t nextAnnounceTime;
 
     /** If the torrent is running, this is the time at which
         the client can manually ask the torrent's tracker
-        for more peers.  otherwise, the value is zero. */
+        for more peers,
+        or 0 if the torrent is stopped or doesn't allow manual,
+        or 1 if an announce is currently in progress s.t.
+        we haven't set a timer for the next one yet */
     time_t manualAnnounceTime;
 
     /** A very rough estimate in KiB/s of how quickly data is being

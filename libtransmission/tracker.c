@@ -723,12 +723,13 @@ invokeRequest( void * vreq )
         if( req->reqtype == TR_REQ_SCRAPE )
         {
             t->lastScrapeTime = now;
-            t->scrapeAt = 0;
+            t->scrapeAt = 1;
         }
         else
         {
             t->lastAnnounceTime = now;
-            t->reannounceAt = 0;
+            t->reannounceAt = 1;
+            t->manualAnnounceAllowedAt = 1;
             t->scrapeAt = req->reqtype == TR_REQ_STOPPED
                         ? now + t->scrapeIntervalSec + t->randOffset
                         : 0;
@@ -782,13 +783,20 @@ pulse( void * vsession )
     {
         tr_tracker * t = tor->tracker;
 
-        if( t->scrapeAt && trackerSupportsScrape( t, tor ) && ( now >= t->scrapeAt ) ) {
-            t->scrapeAt = 0;
+        if( ( t->scrapeAt > 1 ) &&
+            ( t->scrapeAt <= now ) &&
+            ( trackerSupportsScrape( t, tor ) ) )
+        {
+            t->scrapeAt = 1;
             enqueueScrape( session, t );
         }
 
-        if( t->reannounceAt && t->isRunning && ( now >= t->reannounceAt ) ) {
-            t->reannounceAt = 0;
+        if( ( t->reannounceAt > 1 ) && 
+            ( t->reannounceAt <= now ) &&
+            ( t->isRunning ) )
+        {
+            t->reannounceAt = 1;
+            t->manualAnnounceAllowedAt = 1;
             enqueueRequest( session, t, TR_REQ_REANNOUNCE );
         }
     }
