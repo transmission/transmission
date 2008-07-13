@@ -1045,23 +1045,25 @@ g_message( "setting encryption to %d", encryption );
 }
 
 gboolean
-updatemodel(gpointer gdata) {
-  struct cbdata *data = gdata;
+updatemodel( gpointer gdata )
+{
+    struct cbdata *data = gdata;
+    const gboolean done = data->closing || global_sigcount;
 
-  if( !data->closing && 0 < global_sigcount )
-  {
-      wannaquit( data );
-      return FALSE;
-  }
+    if( !done )
+    {
+        /* update the torrent data in the model */
+        tr_core_update( data->core );
 
-  /* update the torrent data in the model */
-  tr_core_update( data->core );
+        /* update the main window's statusbar and toolbar buttons */
+        if( data->wind )
+            tr_window_update( data->wind );
 
-  /* update the main window's statusbar and toolbar buttons */
-  if( data->wind )
-      tr_window_update( data->wind );
+        /* update the actions */
+        refreshTorrentActions( tr_window_get_selection( data->wind ) );
+    }
 
-  return TRUE;
+    return !done;
 }
 
 static void
