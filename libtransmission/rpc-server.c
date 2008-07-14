@@ -267,7 +267,9 @@ startServer( tr_rpc_server * server )
         shttpd_register_uri( server->ctx, "/transmission/upload", handle_upload, server );
 
         if( clutchDir && *clutchDir ) {
-            char * clutchAlias = tr_strdup_printf( "%s=%s", "/transmission/clutch", clutchDir );
+            char * clutchAlias = tr_strdup_printf( "%s=%s,%s=%s",
+                "/transmission/clutch", clutchDir,
+                "/transmission/web", clutchDir );
             tr_inf( _( "Serving the web interface files from \"%s\"" ), clutchDir );
             shttpd_set_option( server->ctx, "aliases", clutchAlias );
             tr_free( clutchAlias );

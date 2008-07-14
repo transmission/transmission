@@ -527,9 +527,13 @@ tr_getClutchDir( const tr_session * session UNUSED )
 
     if( !s )
     {
-        char path[MAX_PATH_LENGTH];
+        char path[MAX_PATH_LENGTH] = { '\0' };
 
         if(( s = getenv( "CLUTCH_HOME" )))
+        {
+            snprintf( path, sizeof( path ), s );
+        }
+        else if(( s = getenv( "TRANSMISSION_WEB_HOME" )))
         {
             snprintf( path, sizeof( path ), s );
         }
@@ -575,7 +579,7 @@ tr_getClutchDir( const tr_session * session UNUSED )
             }
 
             for( l=candidates; l; l=l->next ) {
-                tr_buildPath( path, sizeof( path ), l->data, "transmission", "clutch", NULL );
+                tr_buildPath( path, sizeof( path ), l->data, "transmission", "web", NULL );
                 if( isClutchDir( path ) )
                     break;
                 *path = '\0';
