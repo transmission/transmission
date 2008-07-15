@@ -112,19 +112,29 @@ handle_upload( struct shttpd_arg * arg )
                     const char * body = strstr( text, "\r\n\r\n" );
                     if( body )
                     {
-                        int err;
-                        tr_ctor * ctor;
+                        char * b64, *json, *freeme;
+                        int json_len;
                         size_t body_len;
+                        tr_benc top, *args;
+
                         body += 4;
                         body_len = part_len - ( body - text );
                         if( body_len >= 2 && !memcmp(&body[body_len-2],"\r\n",2) )
                             body_len -= 2;
-                        
-                        ctor = tr_ctorNew( s->session );
-                        tr_ctorSetMetainfo( ctor, (void*)body, body_len );
-                        tr_ctorSetPaused( ctor, TR_FORCE, paused );
-                        tr_torrentNew( s->session, ctor, &err );
-                        tr_ctorFree( ctor );
+
+                        tr_bencInitDict( &top, 2 );
+                        args = tr_bencDictAddDict( &top, "arguments", 2 );
+                        tr_bencDictAddStr( &top, "method", "torrent-add" );
+                        b64 = tr_base64_encode( body, body_len, NULL );
+                        tr_bencDictAddStr( args, "metainfo", b64 );
+                        tr_bencDictAddInt( args, "paused", paused );
+                        json = tr_bencSaveAsJSON( &top, &json_len );
+                        freeme = tr_rpc_request_exec_json( s->session, json, json_len, NULL );
+
+                        tr_free( freeme );
+                        tr_free( json );
+                        tr_free( b64 );
+                        tr_bencFree( &top );
                     }
                 }
                 tr_free( text );
