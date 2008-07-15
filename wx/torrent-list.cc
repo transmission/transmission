@@ -144,7 +144,7 @@ namespace
         for ( i=0; size>>10; ++i )
             size = size >> 10;
         char buf[512];
-        snprintf( buf, sizeof(buf), "%.*f %s", bestDecimal(size), (double)size, sizestrs[i] );
+        tr_snprintf( buf, sizeof(buf), "%.*f %s", bestDecimal(size), (double)size, sizestrs[i] );
         return toWxStr( buf );
     }
 
@@ -236,12 +236,12 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent   * tor,
         switch( *it )
         {
             case COL_POSITION:
-                snprintf( buf, sizeof(buf), "%d", 666 );
+                tr_snprintf( buf, sizeof(buf), "%d", 666 );
                 xstr = toWxStr( buf );
                 break;
 
             case COL_PERCENT_DONE:
-                snprintf( buf, sizeof(buf), "%d%%", (int)(s->percentDone*100.0) );
+                tr_snprintf( buf, sizeof(buf), "%d%%", (int)(s->percentDone*100.0) );
                 xstr = toWxStr( buf );
                 break;
 
@@ -440,7 +440,7 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
 
         case COL_PEERS:
             /* FIXME: this is all peers, not just leechers 
-            snprintf( buf, sizeof(buf), "%d (%d)", s->peersTotal, s->peersConnected );
+            tr_snprintf( buf, sizeof(buf), "%d (%d)", s->peersTotal, s->peersConnected );
             xstr = toWxStr( buf );*/
             break;
 
@@ -475,7 +475,7 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
             break;
 
         case COL_SEEDS:
-            /*snprintf( buf, sizeof(buf), "%d", s->seeders );
+            /*tr_snprintf( buf, sizeof(buf), "%d", s->seeders );
             xstr = toWxStr( buf );*/
             break;
 
