@@ -294,8 +294,7 @@ startServer( tr_rpc_server * server )
             shttpd_set_option( server->ctx, "acl", server->acl );
         }
         if( server->isPasswordEnabled ) {
-            char * buf = tr_strdup_printf( "/transmission/rpc=%s,"
-                                           "/transmission/upload=%s", passwd, passwd );
+            char * buf = tr_strdup_printf( "/transmission=%s", passwd );
             shttpd_set_option( server->ctx, "protect", buf );
             tr_free( buf );
         }
