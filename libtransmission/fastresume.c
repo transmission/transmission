@@ -135,7 +135,7 @@ fastResumeFileName( char * buf, size_t buflen, const tr_torrent * tor, int tag )
     else
     {
         char base[1024];
-        snprintf( base, sizeof(base), "%s-%s", hash, tor->handle->tag );
+        tr_snprintf( base, sizeof(base), "%s-%s", hash, tor->handle->tag );
         tr_buildPath( buf, buflen, cacheDir, base, NULL );
     }
 }
@@ -622,7 +622,7 @@ loadResumeFile( const tr_torrent * tor, size_t * len )
     if( !ret && tor->handle->tag )
     {
         char base[1024];
-        snprintf( base, sizeof(base), "%s-%s", hash, tor->handle->tag );
+        tr_snprintf( base, sizeof(base), "%s-%s", hash, tor->handle->tag );
         tr_buildPath( path, sizeof(path), cacheDir, base, NULL );
         ret = tr_loadFile( path, len );
     }
@@ -683,7 +683,7 @@ tr_fastResumeRemove( const tr_torrent * tor )
     if( tor->handle->tag )
     {
         char base[1024];
-        snprintf( base, sizeof(base), "%s-%s", hash, tor->handle->tag );
+        tr_snprintf( base, sizeof(base), "%s-%s", hash, tor->handle->tag );
         tr_buildPath( path, sizeof(path), cacheDir, base, NULL );
         unlink( path );
     }

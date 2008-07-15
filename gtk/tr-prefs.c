@@ -261,7 +261,7 @@ testing_port_begin( gpointer gdata )
         tr_handle * handle = g_object_get_data( G_OBJECT( data->label ), "handle" );
         const int port = gtk_spin_button_get_value_as_int( spin );
         char url[256];
-        snprintf( url, sizeof(url), "http://portcheck.transmissionbt.com/%d", port );
+        g_snprintf( url, sizeof(url), "http://portcheck.transmissionbt.com/%d", port );
         tr_webRun( handle, url, NULL, testing_port_done, data );
     }
     return FALSE;

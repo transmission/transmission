@@ -65,26 +65,26 @@ getMnemonicEnd( char ch )
 static void
 three_digits( char * buf, size_t buflen, const char * name, const uint8_t * digits )
 {
-    snprintf( buf, buflen, "%s %d.%d.%d", name,
-              charint( digits[0] ),
-              charint( digits[1] ),
-              charint( digits[2] ) );
+    tr_snprintf( buf, buflen, "%s %d.%d.%d", name,
+                 charint( digits[0] ),
+                 charint( digits[1] ),
+                 charint( digits[2] ) );
 }
 static void
 four_digits( char * buf, size_t buflen, const char * name, const uint8_t * digits )
 {
-    snprintf( buf, buflen, "%s %d.%d.%d.%d", name,
-              charint( digits[0] ),
-              charint( digits[1] ),
-              charint( digits[2] ),
-              charint( digits[3] ) );
+    tr_snprintf( buf, buflen, "%s %d.%d.%d.%d", name,
+                 charint( digits[0] ),
+                 charint( digits[1] ),
+                 charint( digits[2] ),
+                 charint( digits[3] ) );
 }
 static void
 two_major_two_minor( char * buf, size_t buflen, const char * name, const uint8_t * digits )
 {
-    snprintf( buf, buflen, "%s %d.%02d", name,
-              strint( digits, 2 ),
-              strint( digits+2, 2 ) );
+    tr_snprintf( buf, buflen, "%s %d.%02d", name,
+                 strint( digits, 2 ),
+                 strint( digits+2, 2 ) );
 }
 static void
 no_version( char * buf, size_t buflen, const char * name )
@@ -96,9 +96,9 @@ static void
 mainline_style( char * buf, size_t buflen, const char * name, const uint8_t * id )
 {
     if( id[4] == '-' && id[6] == '-' )
-        snprintf( buf, buflen, "%s %c.%c.%c", name, id[1], id[3], id[5] );
+        tr_snprintf( buf, buflen, "%s %c.%c.%c", name, id[1], id[3], id[5] );
     else if( id[5] == '-' )
-        snprintf( buf, buflen, "%s %c.%c%c.%c", name, id[1], id[3], id[4], id[6] );
+        tr_snprintf( buf, buflen, "%s %c.%c%c.%c", name, id[1], id[3], id[4], id[6] );
 }
 
 static int
@@ -137,9 +137,9 @@ decodeBitCometClient( char * buf, size_t buflen, const uint8_t * id )
      * Bitcoment 1.0 and onwards are of the form x.y.
      */
     if( is_bitlord && major>0 )
-        snprintf( buf, buflen, "%s%s%d.%d", name, mod, major, minor );
+        tr_snprintf( buf, buflen, "%s%s%d.%d", name, mod, major, minor );
     else
-        snprintf( buf, buflen, "%s%s%d.%02d", name, mod, major, minor );
+        tr_snprintf( buf, buflen, "%s%s%d.%02d", name, mod, major, minor );
 
     return TRUE;
 }
@@ -159,18 +159,18 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     {
         if( !memcmp( id+1, "UT", 2 ) )
         {
-            snprintf( buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s",
-                      strint(id+3,1), strint(id+4,1), strint(id+5,1), getMnemonicEnd(id[6]) );
+            tr_snprintf( buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s",
+                         strint(id+3,1), strint(id+4,1), strint(id+5,1), getMnemonicEnd(id[6]) );
         }
 
         else if( !memcmp( id+1, "TR", 2 ) )
         {
             if( !memcmp( id+3, "000", 3 ) ) /* very old client style: -TR0006- is 0.6 */
-                snprintf( buf, buflen, "Transmission 0.%c", id[6] );
+                tr_snprintf( buf, buflen, "Transmission 0.%c", id[6] );
             else if( !memcmp( id+3, "00", 2) ) /* previous client style: -TR0072- is 0.72 */
-                snprintf( buf, buflen, "Transmission 0.%02d", strint(id+5,2) );
+                tr_snprintf( buf, buflen, "Transmission 0.%02d", strint(id+5,2) );
             else /* current client style: -TR111Z- is 1.11+ */
-                snprintf( buf, buflen, "Transmission %d.%02d%s", strint(id+3,1), strint(id+4,2),
+                tr_snprintf( buf, buflen, "Transmission %d.%02d%s", strint(id+3,1), strint(id+4,2),
                           id[6]=='Z' || id[6]=='X' ? "+" : "" );
         }
         
@@ -185,9 +185,9 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "KT", 2 ) )
         {
             if( id[5] == 'D' )
-                snprintf( buf, buflen, "KTorrent %d.%d Dev %d", charint(id[3]), charint(id[4]), charint(id[6]) );
+                tr_snprintf( buf, buflen, "KTorrent %d.%d Dev %d", charint(id[3]), charint(id[4]), charint(id[6]) );
             else if( id[5] == 'R' )
-                snprintf( buf, buflen, "KTorrent %d.%d RC %d", charint(id[3]), charint(id[4]), charint(id[6]) );
+                tr_snprintf( buf, buflen, "KTorrent %d.%d RC %d", charint(id[3]), charint(id[4]), charint(id[6]) );
             else
                 three_digits( buf, buflen, "KTorrent", id+3 );
         }
@@ -250,25 +250,25 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
 
         else if( !memcmp( id+1, "BB", 2 ) )
         {
-            snprintf( buf, buflen, "BitBuddy %c.%c%c%c", id[3], id[4], id[5], id[6] );
+            tr_snprintf( buf, buflen, "BitBuddy %c.%c%c%c", id[3], id[4], id[5], id[6] );
         }
         else if( !memcmp( id+1, "BR", 2 ) )
         {
-            snprintf( buf, buflen, "BitRocket %c.%c (%c%c)", id[3], id[4], id[5], id[6] );
+            tr_snprintf( buf, buflen, "BitRocket %c.%c (%c%c)", id[3], id[4], id[5], id[6] );
         }
         else if( !memcmp( id+1, "CT", 2 ) )
         {
-            snprintf( buf, buflen, "CTorrent %d.%d.%02d", charint(id[3]), charint(id[4]), strint(id+5,2) );
+            tr_snprintf( buf, buflen, "CTorrent %d.%d.%02d", charint(id[3]), charint(id[4]), strint(id+5,2) );
         }
         else if( !memcmp( id+1, "XX", 2 ) )
         {
-            snprintf( buf, buflen, "Xtorrent %d.%d (%d)", charint(id[3]), charint(id[4]), strint(id+5,2) );
+            tr_snprintf( buf, buflen, "Xtorrent %d.%d (%d)", charint(id[3]), charint(id[4]), strint(id+5,2) );
         }
         else if( !memcmp( id+1, "BOW", 3 ) )
         {
-                 if( !memcmp( &id[4], "A0B", 3 ) ) snprintf( buf, buflen, "Bits on Wheels 1.0.5" );
-            else if( !memcmp( &id[4], "A0C", 3 ) ) snprintf( buf, buflen, "Bits on Wheels 1.0.6" );
-            else                                   snprintf( buf, buflen, "Bits on Wheels %c.%c.%c", id[4], id[5], id[5] );
+                 if( !memcmp( &id[4], "A0B", 3 ) ) tr_snprintf( buf, buflen, "Bits on Wheels 1.0.5" );
+            else if( !memcmp( &id[4], "A0C", 3 ) ) tr_snprintf( buf, buflen, "Bits on Wheels 1.0.6" );
+            else                                   tr_snprintf( buf, buflen, "Bits on Wheels %c.%c.%c", id[4], id[5], id[5] );
         }
 
         if( *buf )
@@ -317,45 +317,45 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     /* Everything else */ 
     else if( !memcmp( id, "S3", 2 ) && id[2] == '-' && id[4] == '-' && id[6] == '-' )
     {
-        snprintf( buf, buflen, "Amazon S3 %c.%c.%c", id[3], id[5], id[7] );
+        tr_snprintf( buf, buflen, "Amazon S3 %c.%c.%c", id[3], id[5], id[7] );
     }
     else if( !memcmp( id, "OP", 2 ) )
     {
-        snprintf( buf, buflen, "Opera (Build %c%c%c%c)", id[2], id[3], id[4], id[5] );
+        tr_snprintf( buf, buflen, "Opera (Build %c%c%c%c)", id[2], id[3], id[4], id[5] );
     }
     else if( !memcmp( id, "-ML", 3 ) )
     {
-        snprintf( buf, buflen, "MLDonkey %c%c%c%c%c", id[3], id[4], id[5], id[6], id[7] );
+        tr_snprintf( buf, buflen, "MLDonkey %c%c%c%c%c", id[3], id[4], id[5], id[6], id[7] );
     }
     else if( !memcmp( id, "DNA", 3 ) )
     {
-        snprintf( buf, buflen, "BitTorrent DNA %d.%d.%d", strint(id+3,2),
-                                                          strint(id+5,2),
-                                                          strint(id+7,2) );
+        tr_snprintf( buf, buflen, "BitTorrent DNA %d.%d.%d", strint(id+3,2),
+                                                             strint(id+5,2),
+                                                             strint(id+7,2) );
     }
     else if( !memcmp( id, "Plus", 4 ) )
     {
-        snprintf( buf, buflen, "Plus! v2 %c.%c%c", id[4], id[5], id[6] );
+        tr_snprintf( buf, buflen, "Plus! v2 %c.%c%c", id[4], id[5], id[6] );
     }
     else if( !memcmp( id, "XBT", 3 ) )
     {
-        snprintf( buf, buflen, "XBT Client %c.%c.%c%s", id[3], id[4], id[5], getMnemonicEnd(id[6]) );
+        tr_snprintf( buf, buflen, "XBT Client %c.%c.%c%s", id[3], id[4], id[5], getMnemonicEnd(id[6]) );
     }
     else if( !memcmp( id, "Mbrst", 5 ) )
     {
-        snprintf( buf, buflen, "burst! %c.%c.%c", id[5], id[7], id[9] );
+        tr_snprintf( buf, buflen, "burst! %c.%c.%c", id[5], id[7], id[9] );
     }
     else if( !memcmp( id, "btpd", 4 ) )
     {
-        snprintf( buf, buflen, "BT Protocol Daemon %c%c%c", id[5], id[6], id[7] );
+        tr_snprintf( buf, buflen, "BT Protocol Daemon %c%c%c", id[5], id[6], id[7] );
     }
     else if( !memcmp( id, "BLZ", 3 ) )
     {
-        snprintf( buf, buflen, "Blizzard Downloader %d.%d", id[3]+1, id[4] );
+        tr_snprintf( buf, buflen, "Blizzard Downloader %d.%d", id[3]+1, id[4] );
     }
     else if( '\0' == id[0] && !memcmp( &id[1], "BS", 2 ) )
     {
-        snprintf( buf, buflen, "BitSpirit %u", ( id[1] == 0 ? 1 : id[1] ) );
+        tr_snprintf( buf, buflen, "BitSpirit %u", ( id[1] == 0 ? 1 : id[1] ) );
     }
 
     /* No match */
@@ -364,10 +364,10 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         if( isprint( id[0] ) && isprint( id[1] ) && isprint( id[2] ) &&
             isprint( id[3] ) && isprint( id[4] ) && isprint( id[5] ) &&
             isprint( id[6] ) && isprint( id[7] ) )
-                snprintf( buf, buflen, "%c%c%c%c%c%c%c%c",
-                          id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7] );
+                tr_snprintf( buf, buflen, "%c%c%c%c%c%c%c%c",
+                             id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7] );
         else
-                snprintf( buf, buflen, "0x%02x%02x%02x%02x%02x%02x%02x%02x",
-                          id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7] );
+                tr_snprintf( buf, buflen, "0x%02x%02x%02x%02x%02x%02x%02x%02x",
+                             id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7] );
     }
 }

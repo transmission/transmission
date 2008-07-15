@@ -367,11 +367,11 @@ writeFunc( void * ptr, size_t size, size_t nmemb, void * buf )
 static void
 etaToString( char * buf, size_t buflen, int64_t eta )
 {
-         if( eta < 0 )           snprintf( buf, buflen, "Unknown" );
-    else if( eta < 60 )          snprintf( buf, buflen, "%"PRId64"sec", eta );
-    else if( eta < (60*60) )     snprintf( buf, buflen, "%"PRId64" min", eta/60 );
-    else if( eta < (60*60*24) )  snprintf( buf, buflen, "%"PRId64" hrs", eta/(60*60) );
-    else                         snprintf( buf, buflen, "%"PRId64" days", eta/(60*60*24) );
+         if( eta < 0 )           tr_snprintf( buf, buflen, "Unknown" );
+    else if( eta < 60 )          tr_snprintf( buf, buflen, "%"PRId64"sec", eta );
+    else if( eta < (60*60) )     tr_snprintf( buf, buflen, "%"PRId64" min", eta/60 );
+    else if( eta < (60*60*24) )  tr_snprintf( buf, buflen, "%"PRId64" hrs", eta/(60*60) );
+    else                         tr_snprintf( buf, buflen, "%"PRId64" days", eta/(60*60*24) );
 }
 
 #define KILOBYTE_FACTOR 1024.0
@@ -385,11 +385,11 @@ strlratio( char * buf, double numerator, double denominator, size_t buflen )
     {
         const double ratio = numerator / denominator;
         if( ratio < 10.0 )
-            snprintf( buf, buflen, "%'.2f", ratio );
+            tr_snprintf( buf, buflen, "%'.2f", ratio );
         else if( ratio < 100.0 )
-            snprintf( buf, buflen, "%'.1f", ratio );
+            tr_snprintf( buf, buflen, "%'.1f", ratio );
         else
-            snprintf( buf, buflen, "%'.0f", ratio );
+            tr_snprintf( buf, buflen, "%'.0f", ratio );
     }
     else if( numerator )
         tr_strlcpy( buf, "Infinity", buflen );
@@ -404,18 +404,18 @@ strlsize( char * buf, int64_t size, size_t buflen )
     if( !size )
         tr_strlcpy( buf, "None", buflen );
     else if( size < (int64_t)KILOBYTE_FACTOR )
-        snprintf( buf, buflen, "%'"PRId64" bytes", (int64_t)size );
+        tr_snprintf( buf, buflen, "%'"PRId64" bytes", (int64_t)size );
     else {
         double displayed_size;
         if (size < (int64_t)MEGABYTE_FACTOR) {
             displayed_size = (double) size / KILOBYTE_FACTOR;
-            snprintf( buf, buflen, "%'.1f KB", displayed_size );
+            tr_snprintf( buf, buflen, "%'.1f KB", displayed_size );
         } else if (size < (int64_t)GIGABYTE_FACTOR) {
             displayed_size = (double) size / MEGABYTE_FACTOR;
-            snprintf( buf, buflen, "%'.1f MB", displayed_size );
+            tr_snprintf( buf, buflen, "%'.1f MB", displayed_size );
         } else {
             displayed_size = (double) size / GIGABYTE_FACTOR;
-            snprintf( buf, buflen, "%'.1f GB", displayed_size );
+            tr_snprintf( buf, buflen, "%'.1f GB", displayed_size );
         }
     }
     return buf;
@@ -472,7 +472,7 @@ printDetails( tr_benc * top )
             if( tr_bencDictFindInt( t, "status", &i ) )
             {
                 if( isVerifying( i ) && tr_bencDictFindStr( t, "recheckProgress", &str ) )
-                    snprintf( buf, sizeof( buf ), " (%.0f%% Done)", 100.0*atof(str) );
+                    tr_snprintf( buf, sizeof( buf ), " (%.0f%% Done)", 100.0*atof(str) );
                 else
                     *buf = '\0';
                 printf( "  State: %s%s\n", torrentStatusToString( i ), buf );
@@ -677,7 +677,7 @@ printTorrentList( tr_benc * top )
                 if( leftUntilDone )
                     etaToString( etaStr, sizeof( etaStr ), eta );
                 else
-                    snprintf( etaStr, sizeof( etaStr ), "Done" );
+                    tr_snprintf( etaStr, sizeof( etaStr ), "Done" );
                 printf( "%3d  %3d%%  %-8s  %5.1f  %5.1f  %5.1f  %-11s  %s\n",
                         (int)id,
                         (int)(100.0*(sizeWhenDone-leftUntilDone)/sizeWhenDone),

@@ -131,7 +131,7 @@ getTorrentFilename( const tr_handle  * handle,
 {
     const char * dir = tr_getTorrentDir( handle );
     char base[MAX_PATH_LENGTH];
-    snprintf( base, sizeof( base ), "%s.%16.16s.torrent", inf->name, inf->hashString );
+    tr_snprintf( base, sizeof( base ), "%s.%16.16s.torrent", inf->name, inf->hashString );
     tr_buildPath( buf, buflen, dir, base, NULL );
 }
 
@@ -150,7 +150,7 @@ getTorrentOldFilename( const tr_handle * handle,
     else
     {
         char base[1024];
-        snprintf( base, sizeof(base), "%s-%s", info->hashString, handle->tag );
+        tr_snprintf( base, sizeof(base), "%s-%s", info->hashString, handle->tag );
         tr_buildPath( name, len, torDir, base, NULL );
     }
 }

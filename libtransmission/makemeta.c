@@ -12,7 +12,7 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdio.h> /* FILE, snprintf, stderr */
+#include <stdio.h> /* FILE, stderr */
 #include <stdlib.h> /* qsort */
 
 #include <sys/types.h>
@@ -207,7 +207,7 @@ getHashInfo ( tr_metainfo_builder * b )
     fp = fopen( b->files[fileIndex].filename, "rb" );
     if( !fp ) {
         b->my_errno = errno;
-        snprintf( b->errfile, sizeof( b->errfile ), b->files[fileIndex].filename );
+        tr_snprintf( b->errfile, sizeof( b->errfile ), b->files[fileIndex].filename );
         b->result = TR_MAKEMETA_IO_READ;
         tr_free( ret );
         return NULL;
@@ -237,7 +237,7 @@ getHashInfo ( tr_metainfo_builder * b )
                     fp = fopen( b->files[fileIndex].filename, "rb" );
                     if( !fp ) {
                         b->my_errno = errno;
-                        snprintf( b->errfile, sizeof( b->errfile ), b->files[fileIndex].filename );
+                        tr_snprintf( b->errfile, sizeof( b->errfile ), b->files[fileIndex].filename );
                         b->result = TR_MAKEMETA_IO_READ;
                         tr_free( ret );
                         return NULL;
@@ -480,7 +480,7 @@ tr_makeMetaInfo( tr_metainfo_builder    * builder,
         builder->outputFile = tr_strdup( outputFile );
     else {
         char out[MAX_PATH_LENGTH];
-        snprintf( out, sizeof(out), "%s.torrent", builder->top);
+        tr_snprintf( out, sizeof(out), "%s.torrent", builder->top);
         builder->outputFile = tr_strdup( out );
     }
 

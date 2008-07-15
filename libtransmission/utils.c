@@ -167,7 +167,7 @@ tr_getLogTimeStr( char * buf, int buflen )
 #endif
     strftime( tmp, sizeof(tmp), "%H:%M:%S", &now_tm );
     milliseconds = (int)(tv.tv_usec / 1000);
-    snprintf( buf, buflen, "%s.%03d", tmp, milliseconds );
+    tr_snprintf( buf, buflen, "%s.%03d", tmp, milliseconds );
 
     return buf;
 }
@@ -521,7 +521,7 @@ tr_mkdirp( const char * path_in, int permissions )
         {
             /* Node exists but isn't a folder */
             char buf[MAX_PATH_LENGTH];
-            snprintf( buf, sizeof( buf ), _( "File \"%s\" is in the way" ), path );
+            tr_snprintf( buf, sizeof( buf ), _( "File \"%s\" is in the way" ), path );
             tr_err( _( "Couldn't create \"%1$s\": %2$s" ), path_in, buf );
             tr_free( path );
             errno = ENOTDIR;
@@ -969,6 +969,19 @@ tr_stringEndsWith( const char * str, const char * end )
     const size_t elen = strlen( end );
     return slen>=elen && !memcmp( &str[slen-elen], end, elen );
 }
+
+int
+tr_snprintf( char * buf, size_t buflen, const char * fmt, ... )
+{
+    int len;
+    va_list args;
+    va_start( args, fmt );
+    len = evutil_vsnprintf( buf, buflen, fmt, args );
+    va_end( args );
+    return len;
+
+}
+
 
 /*
  * Copy src to string dst of size siz.  At most siz-1 characters

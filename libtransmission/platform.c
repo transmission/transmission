@@ -477,7 +477,7 @@ tr_getDefaultConfigDir( void )
 
         if(( s = getenv( "TRANSMISSION_HOME" )))
         {
-            snprintf( path, sizeof( path ), s );
+            tr_snprintf( path, sizeof( path ), s );
         }
         else
         {
@@ -531,11 +531,11 @@ tr_getClutchDir( const tr_session * session UNUSED )
 
         if(( s = getenv( "CLUTCH_HOME" )))
         {
-            snprintf( path, sizeof( path ), s );
+            tr_snprintf( path, sizeof( path ), s );
         }
         else if(( s = getenv( "TRANSMISSION_WEB_HOME" )))
         {
-            snprintf( path, sizeof( path ), s );
+            tr_snprintf( path, sizeof( path ), s );
         }
         else
         {

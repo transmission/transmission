@@ -52,9 +52,9 @@ getResumeFilename( char * buf, size_t buflen, const tr_torrent * tor )
 {
     const char * dir = tr_getResumeDir( tor->handle );
     char base[MAX_PATH_LENGTH];
-    snprintf( base, sizeof( base ), "%s.%16.16s.resume",
-              tor->info.name,
-              tor->info.hashString );
+    tr_snprintf( base, sizeof( base ), "%s.%16.16s.resume",
+                 tor->info.name,
+                 tor->info.hashString );
     tr_buildPath( buf, buflen, dir, base, NULL );
 }
 

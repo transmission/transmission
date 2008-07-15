@@ -636,7 +636,7 @@ tr_benc*
 tr_bencDictAddDouble( tr_benc * dict, const char * key, double d )
 {
     char buf[128];
-    snprintf( buf, sizeof( buf ), "%f", d );
+    tr_snprintf( buf, sizeof( buf ), "%f", d );
     return tr_bencDictAddStr( dict, key, buf );
 }
 tr_benc*

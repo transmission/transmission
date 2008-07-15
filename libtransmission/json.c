@@ -85,7 +85,7 @@ callback( void * vdata, int type, const JSON_value * value )
 
         case JSON_T_FLOAT: {
             char buf[128];
-            snprintf( buf, sizeof( buf ), "%f", (double)value->vu.float_value );
+            tr_snprintf( buf, sizeof( buf ), "%f", (double)value->vu.float_value );
             tr_bencInitStrDup( getNode( data ), buf );
             break;
         }

@@ -73,11 +73,11 @@ tr_strlratio( char * buf, double ratio, size_t buflen )
     else if( (int)ratio == TR_RATIO_INF )
         tr_strlcpy( buf, "Inf", buflen );
     else if( ratio < 10.0 )
-        snprintf( buf, buflen, "%'.2f", ratio );
+        tr_snprintf( buf, buflen, "%'.2f", ratio );
     else if( ratio < 100.0 )
-        snprintf( buf, buflen, "%'.1f", ratio );
+        tr_snprintf( buf, buflen, "%'.1f", ratio );
     else
-        snprintf( buf, buflen, "%'.0f", ratio );
+        tr_snprintf( buf, buflen, "%'.0f", ratio );
     return buf;
 }
 
@@ -97,7 +97,7 @@ escape( char * out, const uint8_t * in, int in_len ) /* rfc2396 */
         if( is_rfc2396_alnum(*in) )
             *out++ = (char) *in++;
         else
-            out += snprintf( out, 4, "%%%02X", (unsigned int)*in++ );
+            out += tr_snprintf( out, 4, "%%%02X", (unsigned int)*in++ );
     *out = '\0';
 }
 
@@ -183,20 +183,20 @@ getStatusStr( const tr_stat * st, char * buf, size_t buflen )
 {
     if( st->status & TR_STATUS_CHECK_WAIT )
     {
-        snprintf( buf, buflen, "Waiting to verify local files" );
+        tr_snprintf( buf, buflen, "Waiting to verify local files" );
     }
     else if( st->status & TR_STATUS_CHECK )
     {
-        snprintf( buf, buflen, "Verifying local files (%.2f%%, %.2f%% valid)",
-                  100 * st->recheckProgress, 100.0 * st->percentDone );
+        tr_snprintf( buf, buflen, "Verifying local files (%.2f%%, %.2f%% valid)",
+                     100 * st->recheckProgress, 100.0 * st->percentDone );
     }
     else if( st->status & TR_STATUS_DOWNLOAD )
     {
         char ratioStr[80];
         tr_strlratio( ratioStr, st->ratio, sizeof( ratioStr ) );
-        snprintf( buf, buflen,
-                  "Progress: %.1f%%, dl from %d of %d peers (%.0f KB/s), "
-                  "ul to %d (%.0f KB/s) [%s]",
+        tr_snprintf( buf, buflen,
+                     "Progress: %.1f%%, dl from %d of %d peers (%.0f KB/s), "
+                     "ul to %d (%.0f KB/s) [%s]",
                   st->percentDone * 100.0,
                   st->peersSendingToUs,
                   st->peersConnected,
@@ -209,10 +209,10 @@ getStatusStr( const tr_stat * st, char * buf, size_t buflen )
     {
         char ratioStr[80];
         tr_strlratio( ratioStr, st->ratio, sizeof( ratioStr ) );
-        snprintf( buf, buflen,
-                  "Seeding, uploading to %d of %d peer(s), %.0f KB/s [%s]",
-                  st->peersGettingFromUs, st->peersConnected,
-                  st->rateUpload, ratioStr );
+        tr_snprintf( buf, buflen,
+                     "Seeding, uploading to %d of %d peer(s), %.0f KB/s [%s]",
+                     st->peersGettingFromUs, st->peersConnected,
+                     st->rateUpload, ratioStr );
     }
     else *buf = '\0';
 }

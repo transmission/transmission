@@ -262,7 +262,7 @@ startServer( tr_rpc_server * server )
             edit_passwords( passwd, MY_REALM, server->username, server->password );
 
         server->ctx = shttpd_init( );
-        snprintf( ports, sizeof( ports ), "%d", server->port );
+        tr_snprintf( ports, sizeof( ports ), "%d", server->port );
         shttpd_register_uri( server->ctx, "/transmission/rpc", handle_rpc, server );
         shttpd_register_uri( server->ctx, "/transmission/upload", handle_upload, server );
 

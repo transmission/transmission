@@ -157,8 +157,8 @@ loadBlocklists( tr_session * session )
                 const char * dot = strrchr( d->d_name, '.' );
                 const int len = dot ? dot - d->d_name : (int)strlen( d->d_name );
                 char tmp[MAX_PATH_LENGTH];
-                snprintf( tmp, sizeof( tmp ),
-                          "%s%c%*.*s.bin", dirname, TR_PATH_DELIMITER, len, len, d->d_name );
+                tr_snprintf( tmp, sizeof( tmp ),
+                             "%s%c%*.*s.bin", dirname, TR_PATH_DELIMITER, len, len, d->d_name );
                 b = _tr_blocklistNew( tmp, isEnabled );
                 _tr_blocklistSetContent( b, filename );
                 tr_list_append( &list, b );

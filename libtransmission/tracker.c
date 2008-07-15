@@ -11,7 +11,6 @@
  */
 
 #include <assert.h>
-#include <stdio.h> /* snprintf */
 #include <stdlib.h>
 #include <string.h> /* strcmp, strchr */
 
@@ -849,7 +848,7 @@ escape( char * out, const uint8_t * in, int in_len ) /* rfc2396 */
         if( is_rfc2396_alnum(*in) )
             *out++ = (char) *in++;
         else 
-            out += snprintf( out, 4, "%%%02X", (unsigned int)*in++ );
+            out += tr_snprintf( out, 4, "%%%02X", (unsigned int)*in++ );
     *out = '\0';
 }
 
@@ -1021,18 +1020,18 @@ tr_trackerStat( const tr_tracker * t,
     if( t->lastScrapeResponse == -1 ) /* never been scraped */
         *setme->scrapeResponse = '\0';
     else
-        snprintf( setme->scrapeResponse,
-                  sizeof( setme->scrapeResponse ),
-                  "%s (%ld)",
-                  tr_webGetResponseStr( t->lastScrapeResponse ),
-                  t->lastScrapeResponse );
+        tr_snprintf( setme->scrapeResponse,
+                     sizeof( setme->scrapeResponse ),
+                     "%s (%ld)",
+                     tr_webGetResponseStr( t->lastScrapeResponse ),
+                     t->lastScrapeResponse );
 
     if( t->lastAnnounceResponse == -1 ) /* never been announced */
         *setme->announceResponse = '\0';
     else
-        snprintf( setme->announceResponse,
-                  sizeof( setme->announceResponse ),
-                  "%s (%ld)",
-                  tr_webGetResponseStr( t->lastAnnounceResponse ),
-                  t->lastAnnounceResponse );
+        tr_snprintf( setme->announceResponse,
+                     sizeof( setme->announceResponse ),
+                     "%s (%ld)",
+                     tr_webGetResponseStr( t->lastAnnounceResponse ),
+                     t->lastAnnounceResponse );
 }
