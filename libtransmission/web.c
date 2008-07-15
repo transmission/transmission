@@ -161,6 +161,7 @@ addTask( void * vtask )
 
         if( !task->range && session->isProxyEnabled ) {
             curl_easy_setopt( ch, CURLOPT_PROXY, session->proxy );
+            curl_easy_setopt( ch, CURLOPT_PROXYPORT, session->proxyPort );
             curl_easy_setopt( ch, CURLOPT_PROXYTYPE, getCurlProxyType( session->proxyType ) );
             curl_easy_setopt( ch, CURLOPT_PROXYAUTH, CURLAUTH_ANY );
         }

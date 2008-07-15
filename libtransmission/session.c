@@ -189,7 +189,7 @@ tr_sessionInitFull( const char    * configDir,
                     const char    * downloadDir,
                     int             isPexEnabled,
                     int             isPortForwardingEnabled,
-                    int               publicPort,
+                    int             publicPort,
                     int             encryptionMode,
                     int             isUploadLimitEnabled,
                     int             uploadLimit,
@@ -208,6 +208,7 @@ tr_sessionInitFull( const char    * configDir,
                     const char    * rpcPassword,
                     int             proxyIsEnabled,
                     const char    * proxy,
+                    int             proxyPort,
                     tr_proxy_type   proxyType,
                     int             proxyAuthIsEnabled,
                     const char    * proxyUsername,
@@ -236,6 +237,7 @@ tr_sessionInitFull( const char    * configDir,
     h->downloadDir = tr_strdup( downloadDir );
     h->isProxyEnabled = proxyIsEnabled ? 1 : 0;
     h->proxy = tr_strdup( proxy );
+    h->proxyPort = proxyPort;
     h->proxyType = proxyType;
     h->isProxyAuthEnabled = proxyAuthIsEnabled ? 1 : 0;
     h->proxyUsername = tr_strdup( proxyUsername );
@@ -316,6 +318,7 @@ tr_sessionInit( const char * configDir,
                                "potzrebie",
                                TR_DEFAULT_PROXY_ENABLED,
                                TR_DEFAULT_PROXY,
+                               TR_DEFAULT_PROXY_PORT,
                                TR_DEFAULT_PROXY_TYPE,
                                TR_DEFAULT_PROXY_AUTH_ENABLED,
                                TR_DEFAULT_PROXY_USERNAME,
@@ -976,6 +979,11 @@ tr_sessionGetProxy( const tr_session * session )
 {
     return session->proxy;
 }
+int
+tr_sessionGetProxyPort( const tr_session * session )
+{
+    return session->proxyPort;
+}
 void
 tr_sessionSetProxy( tr_session * session, const char * proxy )
 {
@@ -984,6 +992,11 @@ tr_sessionSetProxy( tr_session * session, const char * proxy )
         tr_free( session->proxy );
         session->proxy = tr_strdup( proxy );
     }
+}
+void
+tr_sessionSetProxyPort( tr_session * session, int port )
+{
+    session->proxyPort = port;
 }
 int
 tr_sessionIsProxyAuthEnabled( const tr_session * session )

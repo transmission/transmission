@@ -133,6 +133,8 @@ tr_proxy_type;
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PROXY                    NULL
 /** @see tr_sessionInitFull */
+#define TR_DEFAULT_PROXY_PORT               80
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_PROXY_TYPE               TR_PROXY_HTTP
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PROXY_AUTH_ENABLED       0
@@ -261,6 +263,7 @@ tr_handle * tr_sessionInitFull( const char    * configDir,
                                 const char    * rpcPassword, 
                                 int             proxyIsEnabled,
                                 const char    * proxy,
+                                int             proxyPort,
                                 tr_proxy_type   proxyType,
                                 int             proxyAuthIsEnabled,
                                 const char    * proxyUsername,
@@ -427,11 +430,13 @@ void tr_sessionSetRPCCallback( tr_session   * handle,
 int           tr_sessionIsProxyEnabled       ( const tr_session * );
 int           tr_sessionIsProxyAuthEnabled   ( const tr_session * );
 const char*   tr_sessionGetProxy             ( const tr_session * );
+int           tr_sessionGetProxyPort         ( const tr_session * );
 tr_proxy_type tr_sessionGetProxyType         ( const tr_session * );
 const char*   tr_sessionGetProxyPassword     ( const tr_session * );
 void          tr_sessionSetProxyEnabled      ( tr_session *, int isEnabled );
 void          tr_sessionSetProxyAuthEnabled  ( tr_session *, int isEnabled );
 void          tr_sessionSetProxy             ( tr_session *, const char * proxy );
+void          tr_sessionSetProxyPort         ( tr_session *, int port );
 void          tr_sessionSetProxyType         ( tr_session *, tr_proxy_type );
 void          tr_sessionSetProxyUsername     ( tr_session *, const char * username );
 void          tr_sessionSetProxyPassword     ( tr_session *, const char * password );

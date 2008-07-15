@@ -62,6 +62,7 @@ struct tr_handle
 
     struct tr_event_handle     * events;
 
+    int                          proxyPort;
     int                          peerSocketTOS;
 
     int                          torrentCount;

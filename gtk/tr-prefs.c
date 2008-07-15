@@ -78,9 +78,10 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_Y, 50 );
 
     pref_string_set_default ( PREF_KEY_PROXY_SERVER, "" );
-    pref_int_set_default    ( PREF_KEY_PROXY_TYPE, TR_PROXY_HTTP );
-    pref_flag_set_default   ( PREF_KEY_PROXY_SERVER_ENABLED, FALSE );
-    pref_flag_set_default   ( PREF_KEY_PROXY_AUTH_ENABLED, FALSE );
+    pref_int_set_default    ( PREF_KEY_PROXY_PORT, TR_DEFAULT_PROXY_PORT );
+    pref_int_set_default    ( PREF_KEY_PROXY_TYPE, TR_DEFAULT_PROXY_TYPE );
+    pref_flag_set_default   ( PREF_KEY_PROXY_SERVER_ENABLED, TR_DEFAULT_PROXY_ENABLED );
+    pref_flag_set_default   ( PREF_KEY_PROXY_AUTH_ENABLED, TR_DEFAULT_PROXY_AUTH_ENABLED );
     pref_string_set_default ( PREF_KEY_PROXY_USERNAME, "" );
     pref_string_set_default ( PREF_KEY_PROXY_PASSWORD, "" );
 
@@ -964,12 +965,12 @@ onProxyTypeChanged( GtkComboBox * w, gpointer gpage )
 }
 
 static GtkWidget*
-networkPage( GObject * core )
+trackerPage( GObject * core )
 {
     int row = 0;
     const char * s;
     GtkWidget * t;
-    GtkWidget * w, * w2;
+    GtkWidget * w;
     GtkTreeModel * m;
     GtkCellRenderer * r;
     struct ProxyPage * page = tr_new0( struct ProxyPage, 1 );
@@ -977,30 +978,6 @@ networkPage( GObject * core )
     page->core = TR_CORE( core );
 
     t = hig_workarea_create( );
-    hig_workarea_add_section_title (t, &row, _( "Router" ) );
-
-        s = _("Use UPnP or NAT-PMP port _forwarding from my router" );
-        w = new_check_button( s, PREF_KEY_PORT_FORWARDING, core );
-        hig_workarea_add_wide_control( t, &row, w );
-
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _("Bandwidth"));
-
-        s = _("Limit _download speed (KB/s):");
-        w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
-        w2 = new_spin_button( PREF_KEY_DL_LIMIT, core, 0, INT_MAX, 5 );
-        gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ) );
-        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
-        hig_workarea_add_row_w( t, &row, w, w2, NULL );
-
-        s = _("Limit _upload speed (KB/s):");
-        w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
-        w2 = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX, 5 );
-        gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ) );
-        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
-        hig_workarea_add_row_w( t, &row, w, w2, NULL );
-
-    hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title (t, &row, _( "Tracker Proxy" ) );
 
         s = _( "Connect to tracker with HTTP proxy" );
@@ -1012,6 +989,11 @@ networkPage( GObject * core )
         w = new_entry( PREF_KEY_PROXY_SERVER, core );
         page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
         w = hig_workarea_add_row( t, &row, s, w, NULL );
+        page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
+
+        w = new_spin_button( PREF_KEY_PROXY_PORT, core, 0, 65536, 1 );
+        page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
+        w = hig_workarea_add_row( t, &row, _( "Proxy port:" ), w, NULL );
         page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
 
         s = _( "Proxy type:" );
@@ -1053,6 +1035,42 @@ networkPage( GObject * core )
     return t;
 }
 
+static GtkWidget*
+networkPage( GObject * core )
+{
+    int row = 0;
+    const char * s;
+    GtkWidget * t;
+    GtkWidget * w, * w2;
+
+    t = hig_workarea_create( );
+    hig_workarea_add_section_title (t, &row, _( "Router" ) );
+
+        s = _("Use UPnP or NAT-PMP port _forwarding from my router" );
+        w = new_check_button( s, PREF_KEY_PORT_FORWARDING, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title (t, &row, _("Bandwidth"));
+
+        s = _("Limit _download speed (KB/s):");
+        w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
+        w2 = new_spin_button( PREF_KEY_DL_LIMIT, core, 0, INT_MAX, 5 );
+        gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ) );
+        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
+        hig_workarea_add_row_w( t, &row, w, w2, NULL );
+
+        s = _("Limit _upload speed (KB/s):");
+        w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
+        w2 = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX, 5 );
+        gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ) );
+        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
+        hig_workarea_add_row_w( t, &row, w, w2, NULL );
+
+    hig_workarea_finish( t, &row );
+    return t;
+}
+
 GtkWidget *
 tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 {
@@ -1082,6 +1100,9 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               peerPage( core, alive ),
                               gtk_label_new (_("Peers")) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              trackerPage( core ),
+                              gtk_label_new (_("Trackers")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               networkPage( core ),
                               gtk_label_new (_("Network")) );

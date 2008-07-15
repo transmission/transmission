@@ -433,6 +433,7 @@ main( int argc, char ** argv )
                             pref_string_get( PREF_KEY_RPC_PASSWORD ),
                             pref_flag_get( PREF_KEY_PROXY_SERVER_ENABLED ),
                             pref_string_get( PREF_KEY_PROXY_SERVER ),
+                            pref_int_get( PREF_KEY_PROXY_PORT ),
                             pref_int_get( PREF_KEY_PROXY_TYPE ),
                             pref_flag_get( PREF_KEY_PROXY_AUTH_ENABLED ),
                             pref_string_get( PREF_KEY_PROXY_USERNAME ),
