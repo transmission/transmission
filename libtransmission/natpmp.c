@@ -21,6 +21,7 @@
 #include <arpa/inet.h> /* inet_ntoa */
 #endif
 
+#define ENABLE_STRNATPMPERR
 #include <libnatpmp/natpmp.h>
 
 #include "transmission.h"
@@ -69,7 +70,9 @@ logVal( const char * func, int ret )
     if( ret >= 0 )
         tr_ninf( getKey(), _( "%s succeeded (%d)" ), func, ret );
     else
-        tr_ndbg( getKey(), "%s failed (%d): %s (%d)", func, ret, tr_strerror(errno), errno );
+        tr_ndbg( getKey(), "%s failed.  natpmp returned %d (%s); errno is %d (%s)",
+                 func, ret, strnatpmperr(ret), errno, tr_strerror(errno) );
+
 }
 
 struct tr_natpmp*
