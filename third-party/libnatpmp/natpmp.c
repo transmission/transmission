@@ -267,7 +267,6 @@ int readnatpmpresponseorretry(natpmp_t * p, natpmpresp_t * response)
 	return n;
 }
 
-#ifdef ENABLE_STRNATPMPERR
 const char * strnatpmperr(int r)
 {
 	const char * s;
@@ -335,5 +334,4 @@ const char * strnatpmperr(int r)
 	}
 	return s;
 }
-#endif
 
