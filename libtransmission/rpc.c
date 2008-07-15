@@ -210,6 +210,7 @@ addInfo( const tr_torrent * tor, tr_benc * d, uint64_t fields )
         tr_bencDictAddInt( d, "status", st->status );
         tr_bencDictAddInt( d, "swarmSpeed", (int)(st->swarmSpeed*1024) );
         tr_bencDictAddInt( d, "webseedsSendingToUs", st->webseedsSendingToUs );
+        tr_bencDictAddDouble( d, "uploadRatio", tr_getRatio( st->uploadedEver, st->downloadedEver ) );
     }
 
     if( fields & TR_RPC_TORRENT_ANNOUNCE ) {
