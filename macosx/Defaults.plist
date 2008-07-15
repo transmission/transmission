@@ -104,6 +104,8 @@
 	<false/>
 	<key>ProxyAddress</key>
 	<string></string>
+	<key>ProxyPort</key>
+	<integer>80</integer>
 	<key>ProxyAuthorize</key>
 	<false/>
 	<key>ProxyType</key>

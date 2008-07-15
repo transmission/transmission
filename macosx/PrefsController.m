@@ -220,6 +220,9 @@
     //set proxy password - does NOT need to be released
     [fProxyPasswordField setStringValue: [NSString stringWithUTF8String: tr_sessionGetProxyPassword(fHandle)]];
     
+    //set proxy port
+    [fProxyPortField setIntValue: [fDefaults integerForKey: @"ProxyPort"]];
+    
     //set blocklist
     [self updateBlocklistFields];
     
@@ -711,6 +714,13 @@
         NSBeep();
         [sender setStringValue: [fDefaults stringForKey: @"ProxyAddress"]];
     }
+}
+
+- (void) setProxyPort: (id) sender
+{
+    int port = [sender intValue];
+    [fDefaults setInteger: port forKey: @"ProxyPort"];
+    tr_sessionSetProxyPort(fHandle, port);
 }
 
 - (void) setProxyType: (id) sender

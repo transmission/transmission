@@ -225,6 +225,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 "", /* reset in prefs - from Keychain */
                                 [fDefaults boolForKey: @"Proxy"],
                                 [[fDefaults stringForKey: @"ProxyAddress"] UTF8String],
+                                [fDefaults integerForKey: @"ProxyPort"],
                                 TR_DEFAULT_PROXY_TYPE, /* reset in prefs */
                                 [fDefaults boolForKey: @"ProxyAuthorize"],
                                 [[fDefaults stringForKey: @"ProxyUsername"] UTF8String],
