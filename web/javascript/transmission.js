@@ -816,6 +816,8 @@ Transmission.prototype =
 		var have_public = false;
 		var have_private = false;
 		var name;
+		var sizeWhenDone = 0;
+		var sizeDone = 0;
 		var total_completed = 0;
 		var total_download = 0;
 		var total_download_peers = 0;
@@ -850,6 +852,8 @@ Transmission.prototype =
 
 		for( i=0; i<torrents.length; ++i ) {
 			var t = torrents[i];
+			sizeWhenDone         += t._sizeWhenDone;
+			sizeDone             += t._sizeWhenDone - t._leftUntilDone;
 			total_completed      += t.completed();
 			total_verified       += t._verified;
 			total_size           += t.size();
@@ -899,8 +903,7 @@ Transmission.prototype =
 		$(ti+'download_from')[0].innerHTML   = total_download_peers;
 		$(ti+'secure')[0].innerHTML          = private_string;
 		$(ti+'creator_date')[0].innerHTML    = date_created;
-		$(ti+'progress')[0].innerHTML        = Math.ratio( total_completed * 100, total_size ) + '% (' +
-		                                       Math.ratio( total_completed * 100, total_size ) + '% Selected)';
+		$(ti+'progress')[0].innerHTML        = Math.ratio( sizeDone*100, sizeWhenDone ) + '%';
 	},
     
 	/*

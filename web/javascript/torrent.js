@@ -17,7 +17,6 @@ Torrent._StatusDownloading     = 4;
 Torrent._StatusSeeding         = 8;
 Torrent._StatusPaused          = 16;
 Torrent._InfiniteTimeRemaining = 215784000; // 999 Hours - may as well be infinite
-Torrent._MaxProgressBarWidth   = 100; // reduce this to make the progress bar shorter (%)
 
 Torrent.prototype =
 {
@@ -129,6 +128,15 @@ Torrent.prototype =
 	name: function() { return this._name; },
 	peersDownloading: function() { return this._peers_downloading; },
 	peersUploading: function() { return this._peers_uploading; },
+	getPercentDone: function() {
+		if( !this._sizeWhenDone ) return 1.0;
+		return ( this._sizeWhenDone - this._leftUntilDone )
+		       / this._sizeWhenDone;
+	},
+	getPercentDoneStr: function() {
+		return Math.ratio( 100 * ( this._sizeWhenDone - this._leftUntilDone ),
+		                           this._sizeWhenDone );
+	},
 	size: function() { return this._size; },
 	state: function() { return this._state; },
 	stateStr: function() {
@@ -246,15 +254,17 @@ Torrent.prototype =
 	refreshData: function(data)
 	{
 		// These variables never change after the inital load
-		if (data.isPrivate)    this._is_private   = data.isPrivate;
-		if (data.hashString)   this._hashString   = data.hashString;
-		if (data.addedDate)    this._date         = data.addedDate;
-		if (data.totalSize)    this._size         = data.totalSize;
-		if (data.announceURL)  this._tracker      = data.announceURL;
-		if (data.comment)      this._comment      = data.comment;
-		if (data.creator)      this._creator      = data.creator;
-		if (data.dateCreated)  this._creator_date = data.dateCreated;
-		if (data.path)         this._torrent_file = data.path;//FIXME
+		if (data.isPrivate)     this._is_private    = data.isPrivate;
+		if (data.hashString)    this._hashString    = data.hashString;
+		if (data.addedDate)     this._date          = data.addedDate;
+		if (data.totalSize)     this._size          = data.totalSize;
+		if (data.announceURL)   this._tracker       = data.announceURL;
+		if (data.comment)       this._comment       = data.comment;
+		if (data.creator)       this._creator       = data.creator;
+		if (data.dateCreated)   this._creator_date  = data.dateCreated;
+                if (data.leftUntilDone) this._leftUntilDone = data.leftUntilDone;
+                if (data.sizeWhenDone)  this._sizeWhenDone  = data.sizeWhenDone;
+		if (data.path)          this._torrent_file  = data.path;//FIXME
 		if (data.name) {
 			this._name = data.name;
 			this._name_lc = this._name.toLowerCase( );
@@ -275,15 +285,9 @@ Torrent.prototype =
 		this._error_message     = data.errorString;
 		this._eta               = data.eta;
 		this._swarm_speed       = data.swarmSpeed;
-		this._total_leechers    = data.leechers;
-		this._total_seeders     = data.seeders;
+		this._total_leechers    = Math.max( 0, data.leechers );
+		this._total_seeders     = Math.max( 0, data.seeders );
 		this._state             = data.status;
-		
-		// Get -1 returned sometimes (maybe torrents with errors?)
-		if( this._total_leechers < 0 )
-		    this._total_leechers = 0;
-		if( this._total_seeders < 0 )
-		    this._total_seeders = 0;
 	},
 
 	refreshHTML: function()
@@ -291,15 +295,12 @@ Torrent.prototype =
 		var progress_details;
 		var peer_details;
 		var root = this._element;
+		var MaxBarWidth = 100; // reduce this to make the progress bar shorter (%)
 		
 		setInnerHTML( root._name_container[0], this._name );
 		
-		// Figure out the percent completed
-		var percent = Math.min( 1.0, ( this._completed / this._size ) );
-		var css_completed_width = Math.floor( percent * Torrent._MaxProgressBarWidth );
-		
 		// Add the progress bar
-		var notDone = this._completed < this._size;
+                var notDone = this._leftUntilDone > 0;
 		if( notDone )
 		{
 			var eta = '';
@@ -315,21 +316,24 @@ Torrent.prototype =
 			
 			// Create the 'progress details' label
 			// Eg: '101 MB of 631 MB (16.02%) - 2 hr remaining'
-			progress_details = Math.formatBytes( this._completed )
+			progress_details = Math.formatBytes( this._sizeWhenDone - this._leftUntilDone )
 			                 + ' of '
-			                 + Math.formatBytes( this._size )
+			                 + Math.formatBytes( this._sizeWhenDone )
 			                 + ' ('
-			                 + Math.ratio( this._completed, this._size )
+			                 + this.getPercentDoneStr()
 			                 + '%)'
 			                 + eta;
+		
+			// Figure out the percent completed
+			var css_completed_width = Math.floor( this.getPercentDone() * MaxBarWidth );
 			
 			// Update the 'in progress' bar
-			var class_name = (this.isActive()) ? 'in_progress' : 'incomplete_stopped';
+			var class_name = this.isActive() ? 'in_progress' : 'incomplete_stopped';
 			var e = root._progress_complete_container;
-			e.removeClass();
-			e.addClass('torrent_progress_bar');
-			e.addClass(class_name);
-			e.css('width', css_completed_width + '%');
+			e.removeClass( );
+			e.addClass( 'torrent_progress_bar' );
+			e.addClass( class_name );
+			e.css( 'width', css_completed_width + '%' );
 			
 			// Update the 'incomplete' bar
 			e = root._progress_incomplete_container;
@@ -337,7 +341,7 @@ Torrent.prototype =
 				e.removeClass();
 				e.addClass('torrent_progress_bar in_progress');
 			}
-			e.css('width', (Torrent._MaxProgressBarWidth - css_completed_width) + '%');
+			e.css('width', (MaxBarWidth - css_completed_width) + '%');
 			e.show();
 			
 			// Create the 'peer details' label
@@ -378,7 +382,7 @@ Torrent.prototype =
 			root._progress_incomplete_container.hide();
 			
 			// Set progress to maximum
-			root._progress_complete_container.css('width', Torrent._MaxProgressBarWidth + '%');
+			root._progress_complete_container.css('width', MaxBarWidth + '%');
 			
 			// Create the 'peer details' label
 			// Eg: 'Seeding to 13 of 22 peers - UL: 36.2 KB/s'
@@ -493,10 +497,8 @@ Torrent.compareByActivity = function( a, b ) {
 
 /** Helper function for sortTorrents(). */
 Torrent.compareByProgress = function( a, b ) {
-	var a_prog = Math.ratio( a._completed, a._size );
-	var b_prog = Math.ratio( b._completed, b._size );
-	if( a_prog !== b_prog )
-		return a_prog - b_prog;
+	if( a._leftUntilDone !== b._leftUntilDone )
+		return a._leftUntilDone - b._leftUntilDone;
 	var a_ratio = Math.ratio( a._upload_total, a._download_total );
 	var b_ratio = Math.ratio( b._upload_total, b._download_total );
 	return a_ratio - b_ratio;
