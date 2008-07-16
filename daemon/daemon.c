@@ -71,6 +71,9 @@ replaceStr( tr_benc * dict, const char * key, const char* value )
 static void
 saveState( tr_session * s )
 {
+    int i, n = 0;
+    char * strs[4];
+
     tr_benc d;
     if( tr_bencLoadJSONFile( myConfigFilename, &d ) )
         tr_bencInitDict( &d, 16 );
@@ -81,9 +84,9 @@ saveState( tr_session * s )
     replaceInt( &d, KEY_PEER_PORT,       tr_sessionGetPeerPort( s ) );
     replaceInt( &d, KEY_PORT_FORWARDING, tr_sessionIsPortForwardingEnabled( s ) );
     replaceInt( &d, KEY_PEX_ENABLED,     tr_sessionIsPexEnabled( s ) );
-    replaceStr( &d, KEY_USERNAME,        tr_sessionGetRPCUsername( s ) );
-    replaceStr( &d, KEY_PASSWORD,        tr_sessionGetRPCPassword( s ) );
-    replaceStr( &d, KEY_ACL,             tr_sessionGetRPCACL( s ) );
+    replaceStr( &d, KEY_USERNAME,        strs[n++] = tr_sessionGetRPCUsername( s ) );
+    replaceStr( &d, KEY_PASSWORD,        strs[n++] = tr_sessionGetRPCPassword( s ) );
+    replaceStr( &d, KEY_ACL,             strs[n++] = tr_sessionGetRPCACL( s ) );
     replaceInt( &d, KEY_RPC_PORT,        tr_sessionGetRPCPort( s ) );
     replaceInt( &d, KEY_AUTH_REQUIRED,   tr_sessionIsRPCPasswordEnabled( s ) );
     replaceInt( &d, KEY_DSPEED,          tr_sessionGetSpeedLimit( s, TR_DOWN ) );
@@ -95,6 +98,9 @@ saveState( tr_session * s )
     tr_bencSaveJSONFile( myConfigFilename, &d );
     tr_bencFree( &d );
     tr_ninf( MY_NAME, "saved \"%s\"", myConfigFilename );
+
+    for( i=0; i<n; ++i )
+        tr_free( strs[i] );
 }
 
 static void
@@ -343,6 +349,7 @@ main( int argc, char ** argv )
     int rpcPort = -1;
     int authRequired = -1;
     int blocklistEnabled = -1;
+    char * freeme = NULL;
     const char * configDir = NULL;
     const char * downloadDir = NULL;
     const char * acl = NULL;
@@ -359,7 +366,7 @@ main( int argc, char ** argv )
               &rpcPort, &acl, &authRequired, &username, &password,
               &blocklistEnabled );
     if( configDir == NULL )
-        configDir = tr_strdup_printf( "%s-daemon", tr_getDefaultConfigDir() );
+        configDir = freeme = tr_strdup_printf( "%s-daemon", tr_getDefaultConfigDir() );
     tr_buildPath( myConfigFilename, sizeof( myConfigFilename ),
                   configDir, CONFIG_FILE, NULL );
 
@@ -382,5 +389,6 @@ main( int argc, char ** argv )
     tr_sessionClose( mySession );
     printf( " done.\n" );
 
+    tr_free( freeme );
     return 0;
 }
