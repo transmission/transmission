@@ -304,7 +304,7 @@ onRPCIdle( void * vdata )
             /* this should be automatic */
             break;
         case TR_RPC_TORRENT_REMOVING:
-            /* FIXME */
+            tr_core_torrent_destroyed( data->cbdata->core, data->torrentId );
             break;
         case TR_RPC_TORRENT_CHANGED:
         case TR_RPC_SESSION_CHANGED:

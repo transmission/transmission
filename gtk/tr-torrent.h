@@ -58,6 +58,9 @@ TrTorrentClass;
 GType
 tr_torrent_get_type(void);
 
+void
+tr_torrent_clear( TrTorrent * tor );
+
 tr_torrent *
 tr_torrent_handle(TrTorrent *tor);
 

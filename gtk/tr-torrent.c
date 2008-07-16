@@ -88,6 +88,15 @@ tr_torrent_dispose( GObject * o )
     parent->dispose( o );
 }
 
+void
+tr_torrent_clear( TrTorrent * tor )
+{
+    g_return_if_fail( tor );
+    g_return_if_fail( tor->priv );
+
+    tor->priv->handle = NULL;
+}
+
 static void
 tr_torrent_class_init( gpointer g_class, gpointer g_class_data UNUSED )
 {

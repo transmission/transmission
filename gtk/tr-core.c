@@ -807,7 +807,7 @@ tr_core_torrents_added( TrCore * self )
 }
 
 static gboolean
-findTorrentInModel( TrCore * core, const TrTorrent * gtor, GtkTreeIter * setme )
+findTorrentInModel( TrCore * core, int id, GtkTreeIter * setme )
 {
     int match = 0;
     GtkTreeIter iter;
@@ -815,10 +815,9 @@ findTorrentInModel( TrCore * core, const TrTorrent * gtor, GtkTreeIter * setme )
 
     if( gtk_tree_model_iter_children( model, &iter, NULL ) ) do
     {
-        TrTorrent * tmp;
-        gtk_tree_model_get( model, &iter, MC_TORRENT, &tmp, -1 );
-        match = tmp == gtor;
-        g_object_unref( G_OBJECT( tmp ) );
+        tr_torrent * tor;
+        gtk_tree_model_get( model, &iter, MC_TORRENT_RAW, &tor, -1 );
+        match = tr_torrentId(tor) == id;
     }
     while( !match && gtk_tree_model_iter_next( model, &iter ) );
 
@@ -829,24 +828,46 @@ findTorrentInModel( TrCore * core, const TrTorrent * gtor, GtkTreeIter * setme )
 }
 
 void
-tr_core_remove_torrent( TrCore * self, TrTorrent * gtor, int deleteFiles )
+tr_core_torrent_destroyed( TrCore   * core,
+                           int        id )
 {
     GtkTreeIter iter;
-    GtkTreeModel * model = tr_core_model( self );
-
-    /* remove from the gui */
-    if( findTorrentInModel( self, gtor, &iter ) )
+    if( findTorrentInModel( core, id, &iter ) )
+    {
+        TrTorrent * gtor;
+        GtkTreeModel * model = tr_core_model( core );
+        gtk_tree_model_get( model, &iter, MC_TORRENT, &gtor, -1 );
+        tr_torrent_clear( gtor );
         gtk_list_store_remove( GTK_LIST_STORE( model ), &iter );
-
-    /* maybe delete the downloaded files */
-    if( deleteFiles )
-        tr_torrent_delete_files( gtor );
-
-    /* remove the torrent */
-    tr_torrent_set_remove_flag( gtor, TRUE );
-    g_object_unref( G_OBJECT( gtor ) );
+        g_object_unref( G_OBJECT( gtor ) );
+    }
 }
 
+void
+tr_core_remove_torrent( TrCore * core, TrTorrent * gtor, int deleteFiles )
+{
+    const tr_torrent * tor = tr_torrent_handle( gtor );
+    if( tor )
+    {
+        int id = tr_torrentId( tor );
+        GtkTreeIter iter;
+        if( findTorrentInModel( core, id, &iter ) )
+        {
+            GtkTreeModel * model = tr_core_model( core );
+
+            /* remove from the gui */
+            gtk_list_store_remove( GTK_LIST_STORE( model ), &iter );
+
+            /* maybe delete the downloaded files */
+            if( deleteFiles )
+                tr_torrent_delete_files( gtor );
+
+            /* remove the torrent */
+            tr_torrent_set_remove_flag( gtor, TRUE );
+            g_object_unref( G_OBJECT( gtor ) );
+        }
+    }
+}
 
 /***
 ****
