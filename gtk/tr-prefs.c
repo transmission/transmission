@@ -299,7 +299,7 @@ torrentPage( GObject * core )
     hig_workarea_add_section_title( t, &row, _( "Adding Torrents" ) );
 
 #ifdef HAVE_GIO
-        s = _( "Automatically add torrents from:" );
+        s = _( "Automatically _add torrents from:" );
         l = new_check_button( s, PREF_KEY_DIR_WATCH_ENABLED, core );
         w = new_path_chooser_button( PREF_KEY_DIR_WATCH, core );
         gtk_widget_set_sensitive( GTK_WIDGET(w), pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED ) );
@@ -767,6 +767,15 @@ onACLSelectionChanged( GtkTreeSelection * sel UNUSED, gpointer page )
     refreshRPCSensitivity( page );
 }
 
+static void
+onLaunchClutchCB( GtkButton * w UNUSED, gpointer data UNUSED )
+{
+    int port = pref_int_get( PREF_KEY_RPC_PORT );
+    char * url = g_strdup_printf( "http://localhost:%d/transmission/web", port );
+    gtr_open_file( url );
+    g_free( url );
+}
+
 static GtkWidget*
 webPage( GObject * core )
 {
@@ -774,6 +783,7 @@ webPage( GObject * core )
     int row = 0;
     GtkWidget * t;
     GtkWidget * w;
+    GtkWidget * h;
     struct remote_page * page = g_new0( struct remote_page, 1 );
 
     page->core = TR_CORE( core );
@@ -784,14 +794,20 @@ webPage( GObject * core )
     hig_workarea_add_section_title( t, &row, _( "Web Interface" ) );
 
         /* "enabled" checkbutton */
-        s = _( "Allow remote access" );
+        s = _( "_Allow remote access" );
         w = new_check_button( s, PREF_KEY_RPC_ENABLED, core );
-        hig_workarea_add_wide_control( t, &row, w );
         page->rpc_tb = GTK_TOGGLE_BUTTON( w );
         g_signal_connect( w, "clicked", G_CALLBACK(onRPCToggled), page );
+        h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
+        gtk_box_pack_start_defaults( GTK_BOX(h), w );
+        w = gtk_button_new_with_mnemonic( _( "_Launch Web GUI" ) );
+        page->widgets = g_slist_append( page->widgets, w );
+        g_signal_connect( w, "clicked", G_CALLBACK(onLaunchClutchCB), NULL );
+        gtk_box_pack_start( GTK_BOX(h), w, FALSE, FALSE, 0 );
+        hig_workarea_add_wide_control( t, &row, h );
 
         /* require authentication */
-        s = _( "Require _authentication" );
+        s = _( "Require _username" );
         w = new_check_button( s, PREF_KEY_RPC_AUTH_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
         page->auth_tb = GTK_TOGGLE_BUTTON( w );

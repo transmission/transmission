@@ -590,7 +590,10 @@ tr_getClutchDir( const tr_session * session UNUSED )
         }
 
         if( !*path )
+        {
+            tr_strlcpy( path, "/dev/null", sizeof( path ) );
             tr_err( _( "Couldn't find the web interface's files!  To customize this, set the CLUTCH_HOME environmental variable to the folder where index.html is located." ) );
+        }
 
         s = tr_strdup( path );
     }
