@@ -262,7 +262,7 @@ addInfo( const tr_torrent * tor, tr_benc * d, uint64_t fields )
         tr_bencDictAddInt( d, "uploadLimitMode",   tr_torrentGetSpeedMode( tor, TR_UP ) );
     }
 
-    if( fields & TR_RPC_TORRENT_PEERS ) {
+    if( fields & TR_RPC_TORRENT_PEER_STATS ) {
         const int * f = st->peersFrom;
         tr_bencDictAddInt( d, "fromCache",    f[TR_PEER_FROM_CACHE] );
         tr_bencDictAddInt( d, "fromIncoming", f[TR_PEER_FROM_INCOMING] );

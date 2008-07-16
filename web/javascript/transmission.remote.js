@@ -30,12 +30,13 @@ RPC._TorrentId              = (1<<5);
 RPC._TorrentInfo            = (1<<6);
 RPC._TorrentLimits          = (1<<7);
 RPC._TorrentPeers           = (1<<8);
-RPC._TorrentPriorities      = (1<<9);
-RPC._TorrentScrape          = (1<<10);
-RPC._TorrentSize            = (1<<11);
-RPC._TorrentTrackerStats    = (1<<12);
-RPC._TorrentTrackers        = (1<<13);
-RPC._TorrentWebseeds        = (1<<14);
+RPC._TorrentPeerStats       = (1<<9);
+RPC._TorrentPriorities      = (1<<10);
+RPC._TorrentScrape          = (1<<11);
+RPC._TorrentSize            = (1<<12);
+RPC._TorrentTrackerStats    = (1<<13);
+RPC._TorrentTrackers        = (1<<14);
+RPC._TorrentWebseeds        = (1<<15);
 
 function TransmissionRemote( controller )
 {

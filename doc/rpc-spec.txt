@@ -170,12 +170,14 @@
                       | number   | uploadLimit            | tr_torrent
                       | number   | uploadLimitMode        | tr_torrent
    -------------------+----------+------------------------+-------------
-   peers, 256         | number   | fromCache              | tr_stat
+   peers, 256         | not defined yet
+   -------------------+----------+------------------------+-------------
+   peer stats, 512    | number   | fromCache              | tr_stat
                       | number   | fromIncoming           | tr_stat
                       | number   | fromPex                | tr_stat
                       | number   | fromTracker            | tr_stat
    -------------------+----------+------------------------+-------------
-   priorities, 512    | array    | priorities             | tr_info
+   priorities, 1024   | array    | priorities             | tr_info
                       | array    | wanted                 | tr_info
                       +----------+-------------------------------------- 
                       | priorities is an array of tr_info.fileCount
@@ -186,23 +188,23 @@
                       | 'booleans' true if the corresponding file
                       | is to be downloaded.
    -------------------+----------+------------------------+-------------
-   scrape, 1024       | number   | lastScrapeTime         | tr_stat
+   scrape, 2048       | number   | lastScrapeTime         | tr_stat
                       | number   | nextScrapeTime         | tr_stat
                       | string   | scrapeResponse         | tr_stat
                       | string   | scrapeURL              | tr_stat
    -------------------+----------+------------------------+-------------
-   size, 2048         | number   | haveUnchecked          | tr_stat
+   size, 4096         | number   | haveUnchecked          | tr_stat
                       | number   | haveValid              | tr_stat
                       | number   | leftUntilDone          | tr_stat
                       | number   | sizeWhenDone           | tr_stat
                       | number   | totalSize              | tr_info
    -------------------+----------+------------------------+-------------
    tracker stats,     | number   | leechers               | tr_stat
-   4096               | number   | peersKnown             | tr_stat
+   8192               | number   | peersKnown             | tr_stat
                       | number   | seeders                | tr_stat
                       | number   | timesCompleted         | tr_stat
    -------------------+----------+--------------------------------------
-   trackers, 8192     | array    | trackers
+   trackers, 16384    | array    | trackers
                       +----------+-------------------------------------- 
                       | trackers is an array of objects that contain:
                       +----------+------------------------+------------- 
@@ -210,7 +212,7 @@
                       | string   | scrape                 | tr_info
                       | number   | tier                   | tr_info
    -------------------+----------+------------------------+-------------
-   webseeds, 16384    | array    | webseeds
+   webseeds, 32768    | array    | webseeds
                       +----------+-------------------------------------- 
                       | webseeds is an array of strings:
                       +----------+------------------------+------------- 
