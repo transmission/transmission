@@ -14,9 +14,9 @@
 #include "std_includes.h"
 #include "llist.h"
 #include "io.h"
-#include "shttpd.h"
 #include "md5.h"
 #include "config.h"
+#include "shttpd.h"
 
 #define	NELEMS(ar)	(sizeof(ar) / sizeof(ar[0]))
 
@@ -25,10 +25,6 @@
 #else
 #define	DBG(x)
 #endif /* DEBUG */
-
-#ifdef EMBEDDED
-#include "shttpd.h"
-#endif /* EMBEDDED */
 
 /*
  * Darwin prior to 7.0 and Win32 do not have socklen_t
@@ -45,9 +41,10 @@ struct vec {
 	int		len;
 };
 
-#if !defined(_WIN32)
+#if !defined(FALSE)
 enum {FALSE, TRUE};
-#endif /* _WIN32 */
+#endif /* !FALSE */
+
 enum {METHOD_GET, METHOD_POST, METHOD_PUT, METHOD_DELETE, METHOD_HEAD};
 enum {HDR_DATE, HDR_INT, HDR_STRING};	/* HTTP header types		*/
 enum {E_FATAL = 1, E_LOG = 2};		/* Flags for elog() function	*/
@@ -175,7 +172,6 @@ struct stream {
 	union channel		chan;		/* Descriptor		*/
 	struct io		io;		/* IO buffer		*/
 	const struct io_class	*io_class;	/* IO class		*/
-	int			nread_last;	/* Bytes last read	*/
 	int			headers_len;
 	big_int_t		content_len;
 	unsigned int		flags;
@@ -186,10 +182,21 @@ struct stream {
 #define	FLAG_CLOSED		16
 #define	FLAG_DONT_CLOSE		32
 #define	FLAG_ALWAYS_READY	64		/* File, dir, user_func	*/
+#define	FLAG_SUSPEND		128
+};
+
+struct worker {
+	struct llhead	link;
+	int		num_conns;	/* Num of active connections 	*/
+	int		exit_flag;	/* Ditto - exit flag		*/
+	int		ctl[2];		/* Control socket pair		*/
+	struct shttpd_ctx *ctx;		/* Context reference		*/
+	struct llhead	connections;	/* List of connections		*/
 };
 
 struct conn {
 	struct llhead	link;		/* Connections chain		*/
+	struct worker	*worker;	/* Worker this conn belongs to	*/
 	struct shttpd_ctx *ctx;		/* Context this conn belongs to */
 	struct usa	sa;		/* Remote socket address	*/
 	time_t		birth_time;	/* Creation time		*/
@@ -223,7 +230,7 @@ enum {
 	OPT_SSI_EXTENSIONS, OPT_AUTH_REALM, OPT_AUTH_GPASSWD,
 	OPT_AUTH_PUT, OPT_ACCESS_LOG, OPT_ERROR_LOG, OPT_MIME_TYPES,
 	OPT_SSL_CERTIFICATE, OPT_ALIASES, OPT_ACL, OPT_INETD, OPT_UID,
-	OPT_CFG_URI, OPT_PROTECT,
+	OPT_CFG_URI, OPT_PROTECT, OPT_SERVICE, OPT_HIDE, OPT_THREADS,
 	NUM_OPTIONS
 };
 
@@ -231,35 +238,33 @@ enum {
  * SHTTPD context
  */
 struct shttpd_ctx {
-	time_t		start_time;	/* Start time			*/
-	int		nactive;	/* # of connections now		*/
-	unsigned long	nrequests;	/* Requests made		*/
-	uint64_t	in, out;	/* IN/OUT traffic counters	*/
 	SSL_CTX		*ssl_ctx;	/* SSL context			*/
-	struct llhead	connections;	/* List of connections		*/
 
 	struct llhead	registered_uris;/* User urls			*/
 	struct llhead	error_handlers;	/* Embedded error handlers	*/
 	struct llhead	acl;		/* Access control list		*/
-#if !defined(NO_SSI)
 	struct llhead	ssi_funcs;	/* SSI callback functions	*/
-#endif
 	struct llhead	listeners;	/* Listening sockets		*/
+	struct llhead	workers;	/* Worker workers		*/
 
-	FILE	*access_log;		/* Access log stream		*/
-	FILE	*error_log;		/* Error log stream		*/
+	FILE		*access_log;	/* Access log stream		*/
+	FILE		*error_log;	/* Error log stream		*/
 
 	char	*options[NUM_OPTIONS];	/* Configurable options		*/
-
-#if defined(_WIN32)
-	CRITICAL_SECTION mutex;		/* For MT case			*/
-	HANDLE		ev[2];		/* For thread synchronization */
-#elif defined(__rtems__)
+#if defined(__rtems__)
 	rtems_id         mutex;
 #endif /* _WIN32 */
 };
 
-#define IS_TRUE(ctx, opt) ((ctx)->options[opt] && (ctx)->options[opt][0] =='1')
+struct listener {
+	struct llhead		link;
+	struct shttpd_ctx	*ctx;	/* Context that socket belongs	*/
+	int			sock;	/* Listening socket		*/
+	int			is_ssl;	/* Should be SSL-ed		*/
+};
+
+/* Types of messages that could be sent over the control socket */
+enum {CTL_PASS_SOCKET, CTL_WAKEUP};
 
 /*
  * In SHTTPD, list of values are represented as comma or space separated
@@ -300,11 +305,11 @@ extern int	url_decode(const char *, int, char *dst, int);
 extern void	send_server_error(struct conn *, int code, const char *reason);
 extern int	get_headers_len(const char *buf, size_t buflen);
 extern void	parse_headers(const char *s, int len, struct headers *parsed);
-extern void	open_listening_ports(struct shttpd_ctx *ctx);
+extern int	is_true(const char *str);
+extern int	shttpd_socketpair(int pair[2]);
 extern void get_mime_type(struct shttpd_ctx *, const char *, int, struct vec *);
-extern void	free_list(struct llhead *head, void (*)(struct llhead *));
-extern void	registered_uri_destructor(struct llhead *);
-extern void	listener_destructor(struct llhead *);
+
+#define	IS_TRUE(ctx, opt)	is_true((ctx)->options[opt])
 
 /*
  * config.c
@@ -342,6 +347,10 @@ extern char *	my_getcwd(char *, int);
 extern int	spawn_process(struct conn *c, const char *prog,
 		char *envblk, char *envp[], int sock, const char *dir);
 
+extern void	set_nt_service(struct shttpd_ctx *, const char *);
+extern void	set_systray(struct shttpd_ctx *, const char *);
+extern void	try_to_run_as_nt_service(void);
+
 /*
  * io_*.c
  */
@@ -360,10 +369,8 @@ extern void	ssl_handshake(struct stream *stream);
 extern void	setup_embedded_stream(struct conn *, union variant, void *);
 extern struct registered_uri *is_registered_uri(struct shttpd_ctx *,
 		const char *uri);
-#if !defined(NO_SSI)
 extern void	do_ssi(struct conn *);
 extern void	ssi_func_destructor(struct llhead *lp);
-#endif
 
 /*
  * auth.c

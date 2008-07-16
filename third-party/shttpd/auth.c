@@ -281,12 +281,12 @@ check_authorization(struct conn *c, const char *path)
 
 		if (!memcmp(c->uri, s, p - s)) {
 			
-			n = s + len - p + 1;
+			n = s + len - p;
 			if (n > (int) sizeof(protected_path) - 1)
 				n = sizeof(protected_path) - 1;
-			
+
 			my_strlcpy(protected_path, p + 1, n);
-			
+
 			if ((fp = fopen(protected_path, "r")) == NULL)
 				elog(E_LOG, c, "check_auth: cannot open %s: %s",
 				    protected_path, strerror(errno));

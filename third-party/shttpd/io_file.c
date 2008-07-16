@@ -20,7 +20,7 @@ write_file(struct stream *stream, const void *buf, size_t len)
 	assert(fd != -1);
 	n = write(fd, buf, len);
 
-	DBG(("put_file(%p, %d): %d bytes", (void *) stream, len, n));
+	DBG(("put_file(%p, %d): %d bytes", (void *) stream, (int) len, n));
 
 	if (n <= 0 || (rem->io.total >= (big_int_t) rem->headers_len)) {
 		(void) fstat(fd, &st);

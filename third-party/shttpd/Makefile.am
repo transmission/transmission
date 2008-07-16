@@ -4,7 +4,7 @@ noinst_LIBRARIES = libshttpd.a
 AM_CPPFLAGS = -DEMBEDDED -DNDEBUG -DNO_CGI -DNO_SSI
 
 libshttpd_a_SOURCES = \
-    string.c shttpd.c log.c auth.c md5.c cgi.c config.c \
+    string.c shttpd.c log.c auth.c md5.c \
     io_file.c io_socket.c io_ssl.c io_emb.c io_dir.c io_cgi.c \
     compat_unix.c
 

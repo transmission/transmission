@@ -52,6 +52,9 @@ call_user(struct conn *c, struct shttpd_arg *arg, shttpd_callback_t func)
 		c->loc.flags &= ~FLAG_DONT_CLOSE;
 	else
 		c->loc.flags |= FLAG_DONT_CLOSE;
+
+	if (arg->flags & SHTTPD_SUSPEND)
+		c->loc.flags |= FLAG_SUSPEND;
 }
 
 static int
@@ -90,13 +93,9 @@ close_embedded(struct stream *stream)
 size_t
 shttpd_printf(struct shttpd_arg *arg, const char *fmt, ...)
 {
-	struct conn	*c = arg->priv;
-	struct io	*io = &c->loc.io;
 	char		*buf = arg->out.buf + arg->out.num_bytes;
 	int		buflen = arg->out.len - arg->out.num_bytes, len = 0;
 	va_list		ap;
-
-	assert(buf <= io->buf + io->size);
 
 	if (buflen > 0) {
 		va_start(ap, fmt);
@@ -265,6 +264,22 @@ shttpd_handle_error(struct shttpd_ctx *ctx, int code,
 		e->callback_data = data;
 		LL_TAIL(&ctx->error_handlers, &e->link);
 	}
+}
+
+void
+shttpd_wakeup(const void *priv)
+{
+	const struct conn	*conn = priv;
+	char			buf[sizeof(int) + sizeof(void *)];
+	int			cmd = CTL_WAKEUP;
+
+#if 0
+	conn->flags &= ~SHTTPD_SUSPEND;
+#endif
+	(void) memcpy(buf, &cmd, sizeof(cmd));
+	(void) memcpy(buf + sizeof(cmd), conn, sizeof(conn));
+
+	(void) send(conn->worker->ctl[1], buf, sizeof(buf), 0);
 }
 
 const struct io_class	io_embedded =  {

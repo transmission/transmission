@@ -20,14 +20,16 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <dlfcn.h>
+
+#if !defined(NO_THREADS)
+#include "pthread.h"
+#define	_beginthread(a, b, c) do { pthread_t tid; \
+	pthread_create(&tid, NULL, (void *(*)(void *))a, c); } while (0)
+#endif /* !NO_THREADS */
+
 #define	SSL_LIB				"libssl.so"
 #define	DIRSEP				'/'
 #define	IS_DIRSEP_CHAR(c)		((c) == '/')
 #define	O_BINARY			0
 #define	closesocket(a)			close(a)
 #define	ERRNO				errno
-#define	NO_GUI
-
-#define	InitializeCriticalSection(x)	/* FIXME UNIX version is not MT safe */
-#define	EnterCriticalSection(x)
-#define	LeaveCriticalSection(x)

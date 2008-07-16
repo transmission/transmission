@@ -18,58 +18,6 @@ struct env_block {
 	int	nvars;			/* Number of variables		*/
 };
 
-/*
- * UNIX socketpair() implementation. Why? Because Windows does not have it.
- * Return 0 on success, -1 on error.
- */
-static int
-my_socketpair(struct conn *c, int sp[2])
-{
-	struct sockaddr_in	sa;
-	int			sock, ret = -1;
-	socklen_t		len = sizeof(sa);
-
-	(void) memset(&sa, 0, sizeof(sa));
-	sa.sin_family 		= AF_INET;
-	sa.sin_port		= htons(0);
-	sa.sin_addr.s_addr	= htonl(INADDR_LOOPBACK);
-
-	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		elog(E_LOG, c, "mysocketpair: socket(): %d", ERRNO);
-	} else if (bind(sock, (struct sockaddr *) &sa, len) != 0) {
-		elog(E_LOG, c, "mysocketpair: bind(): %d", ERRNO);
-		(void) closesocket(sock);
-	} else if (listen(sock, 1) != 0) {
-		elog(E_LOG, c, "mysocketpair: listen(): %d", ERRNO);
-		(void) closesocket(sock);
-	} else if (getsockname(sock, (struct sockaddr *) &sa, &len) != 0) {
-		elog(E_LOG, c, "mysocketpair: getsockname(): %d", ERRNO);
-		(void) closesocket(sock);
-	} else if ((sp[0] = socket(AF_INET, SOCK_STREAM, 6)) == -1) {
-		elog(E_LOG, c, "mysocketpair: socket(): %d", ERRNO);
-		(void) closesocket(sock);
-	} else if (connect(sp[0], (struct sockaddr *) &sa, len) != 0) {
-		elog(E_LOG, c, "mysocketpair: connect(): %d", ERRNO);
-		(void) closesocket(sock);
-		(void) closesocket(sp[0]);
-	} else if ((sp[1] = accept(sock,(struct sockaddr *) &sa, &len)) == -1) {
-		elog(E_LOG, c, "mysocketpair: accept(): %d", ERRNO);
-		(void) closesocket(sock);
-		(void) closesocket(sp[0]);
-	} else {
-		/* Success */
-		ret = 0;
-		(void) closesocket(sock);
-	}
-
-#ifndef _WIN32
-	(void) fcntl(sp[0], F_SETFD, FD_CLOEXEC);
-	(void) fcntl(sp[1], F_SETFD, FD_CLOEXEC);
-#endif /* _WIN32*/
-
-	return (ret);
-}
-
 static void
 addenv(struct env_block *block, const char *fmt, ...)
 {
@@ -145,10 +93,15 @@ prepare_environment(const struct conn *c, const char *prog,
 		struct env_block *blk)
 {
 	const struct headers	*h = &c->ch;
-	const char		*s, *root = c->ctx->options[OPT_ROOT];
+	const char		*s, *fname, *root = c->ctx->options[OPT_ROOT];
 	size_t			len;
 
 	blk->len = blk->nvars = 0;
+
+	/* SCRIPT_FILENAME */
+	fname = prog;
+	if ((s = strrchr(prog, '/')))
+		fname = s + 1;
 
 	/* Prepare the environment block */
 	addenv(blk, "%s", "GATEWAY_INTERFACE=CGI/1.1");
@@ -163,7 +116,7 @@ prepare_environment(const struct conn *c, const char *prog,
 	addenv(blk, "REMOTE_PORT=%hu", ntohs(c->sa.u.sin.sin_port));
 	addenv(blk, "REQUEST_URI=%s", c->uri);
 	addenv(blk, "SCRIPT_NAME=%s", prog + strlen(root));
-	addenv(blk, "SCRIPT_FILENAME=%s", prog);	/* PHP */
+	addenv(blk, "SCRIPT_FILENAME=%s", fname);	/* PHP */
 	addenv(blk, "PATH_TRANSLATED=%s", prog);
 
 	if (h->ct.v_vec.len > 0)
@@ -244,7 +197,7 @@ run_cgi(struct conn *c, const char *prog)
 			break;
 		}
 	
-	if (my_socketpair(c, pair) != 0) {
+	if (shttpd_socketpair(pair) != 0) {
 		ret = -1;
 	} else if (spawn_process(c, prog, blk.buf, blk.vars, pair[1], dir)) {
 		ret = -1;

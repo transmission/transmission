@@ -1,25 +1,13 @@
 /*
- * Copyright (c) 2004-2005 Sergey Lyubka <valenok@gmail.com>
+ * Copyright (c) 2004-2008 Sergey Lyubka <valenok@gmail.com>
+ * All rights reserved
  *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * "THE BEER-WARE LICENSE" (Revision 42):
+ * Sergey Lyubka wrote this file.  As long as you retain this notice you
+ * can do whatever you want with this stuff. If we meet some day, and you think
+ * this stuff is worth it, you can buy me a beer in return.
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *
- * $Id: shttpd.h,v 1.9 2008/02/13 20:44:32 drozd Exp $
+ * $Id: shttpd.h,v 1.16 2008/05/31 09:02:02 drozd Exp $
  */
 
 #ifndef SHTTPD_HEADER_INCLUDED
@@ -41,54 +29,62 @@ struct ubuf {
 struct shttpd_arg {
 	void		*priv;		/* Private! Do not touch!	*/
 	void		*state;		/* User state			*/
-	void		*user_data;	/* User-defined data		*/
+	void		*user_data;	/* Data from register_uri()	*/
 	struct ubuf	in;		/* Input is here, POST data	*/
 	struct ubuf	out;		/* Output goes here		*/
+
 	unsigned int	flags;
-#define	SHTTPD_END_OF_OUTPUT	1
-#define	SHTTPD_CONNECTION_ERROR	2
-#define	SHTTPD_MORE_POST_DATA	4
-#define	SHTTPD_POST_BUFFER_FULL	8
-#define	SHTTPD_SSI_EVAL_TRUE	16
+#define	SHTTPD_END_OF_OUTPUT	1	/* No more data do send		*/
+#define	SHTTPD_CONNECTION_ERROR	2	/* Server closed the connection	*/
+#define	SHTTPD_MORE_POST_DATA	4	/* arg->in has incomplete data	*/
+#define	SHTTPD_POST_BUFFER_FULL	8	/* arg->in has max data		*/
+#define	SHTTPD_SSI_EVAL_TRUE	16	/* SSI eval callback must set it*/
+#define	SHTTPD_SUSPEND		32	/* User wants to suspend output	*/
 };
 
 /*
  * User callback function. Called when certain registered URLs have been
  * requested. These are the requirements to the callback function:
  *
- * 1. it must copy data into 'out.buf' buffer, not more than 'out.len' bytes,
+ * 1. It must copy data into 'out.buf' buffer, not more than 'out.len' bytes,
  *	and record how many bytes are copied, into 'out.num_bytes'
- * 2. it must not block the execution
- * 3. it must set SHTTPD_END_OF_OUTPUT flag when finished
- * 4. for POST requests, it must process the incoming data (in.buf) of length
+ * 2. It must not call any blocking functions
+ * 3. It must set SHTTPD_END_OF_OUTPUT flag when there is no more data to send
+ * 4. For POST requests, it must process the incoming data (in.buf) of length
  *	'in.len', and set 'in.num_bytes', which is how many bytes of POST
- *	data is read and can be discarded by SHTTPD.
+ *	data was processed and can be discarded by SHTTPD.
  * 5. If callback allocates arg->state, to keep state, it must deallocate it
  *    at the end of coonection SHTTPD_CONNECTION_ERROR or SHTTPD_END_OF_OUTPUT
+ * 6. If callback function wants to suspend until some event, it must store
+ *	arg->priv pointer elsewhere, set SHTTPD_SUSPEND flag and return. When
+ *	the event happens, user code should call shttpd_wakeup(priv).
+ *	It is safe to call shttpd_wakeup() from any thread. User code must
+ *	not call shttpd_wakeup once the connection is closed.
  */
 typedef void (*shttpd_callback_t)(struct shttpd_arg *);
 
 /*
- * shttpd_init		Initialize shttpd context.
- * shttpd_set_option	Set new value for option.
- * shttpd_fini		Dealocate the context
- * shttpd_register_uri	Setup the callback function for specified URL.
- * shtppd_listen	Setup a listening socket in the SHTTPD context
+ * shttpd_init		Initialize shttpd context
+ * shttpd_fini		Dealocate the context, close all connections
+ * shttpd_set_option	Set new value for option
+ * shttpd_register_uri	Setup the callback function for specified URL
  * shttpd_poll		Do connections processing
  * shttpd_version	return string with SHTTPD version
  * shttpd_get_var	Fetch POST/GET variable value by name. Return value len
  * shttpd_get_header	return value of the specified HTTP header
- * shttpd_get_env	return string values for the following
- *			pseudo-variables: "REQUEST_METHOD", "REQUEST_URI",
- *			"REMOTE_USER" and "REMOTE_ADDR".
+ * shttpd_get_env	return values for the following	pseudo-variables:
+ 			"REQUEST_METHOD", "REQUEST_URI",
+ *			"REMOTE_USER" and "REMOTE_ADDR"
+ * shttpd_printf	helper function to output data
+ * shttpd_handle_error	register custom HTTP error handler
+ * shttpd_wakeup	clear SHTTPD_SUSPEND state for the connection
  */
 
 struct shttpd_ctx;
 
-struct shttpd_ctx *shttpd_init(void);
+struct shttpd_ctx *shttpd_init(int argc, char *argv[]);
 void shttpd_set_option(struct shttpd_ctx *, const char *opt, const char *val);
 void shttpd_fini(struct shttpd_ctx *);
-int shttpd_listen(struct shttpd_ctx *ctx, int port, int is_ssl);
 void shttpd_register_uri(struct shttpd_ctx *ctx, const char *uri,
 		shttpd_callback_t callback, void *const user_data);
 void shttpd_poll(struct shttpd_ctx *, int milliseconds);
@@ -104,19 +100,7 @@ void shttpd_handle_error(struct shttpd_ctx *ctx, int status,
 		shttpd_callback_t func, void *const data);
 void shttpd_register_ssi_func(struct shttpd_ctx *ctx, const char *name,
 		shttpd_callback_t func, void *const user_data);
-
-/*
- * The following three functions are for applications that need to
- * load-balance the connections on their own. Many threads may be spawned
- * with one SHTTPD context per thread. Boss thread may only wait for
- * new connections by means of shttpd_accept(). Then it may scan thread
- * pool for the idle thread by means of shttpd_active(), and add new
- * connection to the context by means of shttpd_add().
- */
-void shttpd_add_socket(struct shttpd_ctx *, int sock, int is_ssl);
-int shttpd_accept(int lsn_sock, int milliseconds);
-int shttpd_active(struct shttpd_ctx *);
-
+void shttpd_wakeup(const void *priv);
 
 #ifdef __cplusplus
 }

@@ -328,7 +328,9 @@ startServer( tr_rpc_server * server )
 
     if( !server->ctx )
     {
-        char ports[128];
+        int i;
+        int argc = 0;
+        char * argv[100];
         char passwd[MAX_PATH_LENGTH];
         const char * clutchDir = tr_getClutchDir( server->session );
         struct timeval tv = tr_timevalMsec( INACTIVE_INTERVAL_MSEC );
@@ -339,36 +341,41 @@ startServer( tr_rpc_server * server )
         else
             edit_passwords( passwd, MY_REALM, server->username, server->password );
 
-        server->ctx = shttpd_init( );
-        tr_snprintf( ports, sizeof( ports ), "%d", server->port );
+        argv[argc++] = tr_strdup( "appname-unused" );
+        argv[argc++] = tr_strdup( "-ports" );
+        argv[argc++] = tr_strdup_printf( "%d", server->port );
+        argv[argc++] = tr_strdup( "-dir_list" );
+        argv[argc++] = tr_strdup( "0" );
+        argv[argc++] = tr_strdup( "-auth_realm" );
+        argv[argc++] = tr_strdup( MY_REALM );
+        if( server->acl )
+        {
+            argv[argc++] = tr_strdup( "-acl" );
+            argv[argc++] = tr_strdup( server->acl );
+        }
+        if( server->isPasswordEnabled )
+        {
+            argv[argc++] = tr_strdup( "-protect" );
+            argv[argc++] = tr_strdup_printf( "/transmission=%s", passwd );
+        }
+        if( clutchDir && *clutchDir )
+        {
+            tr_inf( _( "Serving the web interface files from \"%s\"" ), clutchDir );
+            argv[argc++] = tr_strdup( "-aliases" );
+            argv[argc++] = tr_strdup_printf( "%s=%s,%s=%s",
+                                             "/transmission/clutch", clutchDir,
+                                             "/transmission/web", clutchDir );
+        }
+
+        server->ctx = shttpd_init( argc, argv );
         shttpd_register_uri( server->ctx, "/transmission/rpc", handle_rpc, server );
         shttpd_register_uri( server->ctx, "/transmission/upload", handle_upload, server );
 
-        if( clutchDir && *clutchDir ) {
-            char * clutchAlias = tr_strdup_printf( "%s=%s,%s=%s",
-                "/transmission/clutch", clutchDir,
-                "/transmission/web", clutchDir );
-            tr_inf( _( "Serving the web interface files from \"%s\"" ), clutchDir );
-            shttpd_set_option( server->ctx, "aliases", clutchAlias );
-            tr_free( clutchAlias );
-        }
-
-        shttpd_set_option( server->ctx, "ports", ports );
-        shttpd_set_option( server->ctx, "dir_list", "0" );
-        //shttpd_set_option( server->ctx, "root", "/dev/null" );
-        shttpd_set_option( server->ctx, "auth_realm", MY_REALM );
-        if( server->acl ) {
-            dbgmsg( "setting acl [%s]", server->acl );
-            shttpd_set_option( server->ctx, "acl", server->acl );
-        }
-        if( server->isPasswordEnabled ) {
-            char * buf = tr_strdup_printf( "/transmission=%s", passwd );
-            shttpd_set_option( server->ctx, "protect", buf );
-            tr_free( buf );
-        }
-
         evtimer_set( &server->timer, rpcPulse, server );
         evtimer_add( &server->timer, &tv );
+
+        for( i=0; i<argc; ++i )
+            tr_free( argv[i] );
     }
 }
 
@@ -429,15 +436,13 @@ tr_rpcGetPort( const tr_rpc_server * server )
 ****/
 
 /*
- * DELIM_CHARS, FOR_EACH_WORD_IN_LIST, isbyte, and testACL are from, or modified from,
+ * FOR_EACH_WORD_IN_LIST, isbyte, and testACL are from, or modified from,
  * shttpd, written by Sergey Lyubka under this license:
  * "THE BEER-WARE LICENSE" (Revision 42):
  * Sergey Lyubka wrote this file.  As long as you retain this notice you
  * can do whatever you want with this stuff. If we meet some day, and you think
  * this stuff is worth it, you can buy me a beer in return.
  */
-
-#define  DELIM_CHARS "," /* Separators for lists */
 
 #define FOR_EACH_WORD_IN_LIST(s,len)                                    \
         for (; s != NULL && (len = strcspn(s, DELIM_CHARS)) != 0;       \
