@@ -652,6 +652,8 @@ tr_rpcClose( tr_rpc_server ** ps )
     *ps = NULL;
 
     stopServer( s );
+    tr_free( s->username );
+    tr_free( s->password );
     tr_free( s->acl );
     tr_free( s );
 }
