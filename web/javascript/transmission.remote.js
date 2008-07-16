@@ -91,7 +91,7 @@ TransmissionRemote.prototype =
 		var o = { };
 		o.method = 'session-get';
 		this.sendRequest( RPC._Root, $.toJSON(o), function(data) {
-			var o = data.arguments.session;
+			var o = data.arguments;
 			Prefs.getClutchPrefs( o );
 			tr.updatePrefs( o );
 		}, "json" );

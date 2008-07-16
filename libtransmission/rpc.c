@@ -559,7 +559,7 @@ static const char*
 sessionGet( tr_handle * h, tr_benc * args_in UNUSED, tr_benc * args_out )
 {
     const char * str;
-    tr_benc * d = tr_bencDictAddDict( args_out, "session", 10 );
+    tr_benc * d = args_out;
 
     tr_bencDictAddStr( d, "download-dir",
                           tr_sessionGetDownloadDir( h ) );
@@ -586,8 +586,6 @@ sessionGet( tr_handle * h, tr_benc * args_in UNUSED, tr_benc * args_out )
     }
     tr_bencDictAddStr( d, "encryption", str );
 
-
-    
     return NULL;
 }
 

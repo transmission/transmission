@@ -524,10 +524,10 @@ Transmission.prototype =
 		
 		// pass the new prefs upstream to the RPC server
 		var o = { };
+		o[RPC._PeerPort]         = parseInt( $('#prefs_form #port')[0].value );
 		o[RPC._UpSpeedLimit]     = parseInt( $('#prefs_form #upload_rate')[0].value );
 		o[RPC._DownSpeedLimit]   = parseInt( $('#prefs_form #download_rate')[0].value );
 		o[RPC._DownloadDir]      = $('#prefs_form #download_location')[0].value;
-		o[RPC._PeerPort]         = $('#prefs_form #port')[0].value;
 		o[RPC._UpSpeedLimited]   = $('#prefs_form #limit_upload')[0].checked;
 		o[RPC._DownSpeedLimited] = $('#prefs_form #limit_download')[0].checked;
 		o[RPC._Encryption]       = $('#prefs_form #encryption')[0].checked
