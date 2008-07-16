@@ -794,20 +794,20 @@ webPage( GObject * core )
     hig_workarea_add_section_title( t, &row, _( "Web Interface" ) );
 
         /* "enabled" checkbutton */
-        s = _( "Enable _web access" );
+        s = _( "_Enable web access" );
         w = new_check_button( s, PREF_KEY_RPC_ENABLED, core );
         page->rpc_tb = GTK_TOGGLE_BUTTON( w );
         g_signal_connect( w, "clicked", G_CALLBACK(onRPCToggled), page );
         h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
         gtk_box_pack_start_defaults( GTK_BOX(h), w );
-        w = gtk_button_new_with_mnemonic( _( "_Launch Web GUI" ) );
+        w = gtk_button_new_with_mnemonic( _( "Launch Web _GUI" ) );
         page->widgets = g_slist_append( page->widgets, w );
         g_signal_connect( w, "clicked", G_CALLBACK(onLaunchClutchCB), NULL );
         gtk_box_pack_start( GTK_BOX(h), w, FALSE, FALSE, 0 );
         hig_workarea_add_wide_control( t, &row, h );
 
         /* require authentication */
-        s = _( "Require _username" );
+        s = _( "_Require username" );
         w = new_check_button( s, PREF_KEY_RPC_AUTH_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
         page->auth_tb = GTK_TOGGLE_BUTTON( w );
@@ -822,7 +822,7 @@ webPage( GObject * core )
         page->auth_widgets = g_slist_append( page->auth_widgets, w );
 
         /* password */
-        s = _( "_Password:" );
+        s = _( "Pass_word:" );
         w = new_entry( PREF_KEY_RPC_PASSWORD, core );
         gtk_entry_set_visibility( GTK_ENTRY( w ), FALSE );
         page->auth_widgets = g_slist_append( page->auth_widgets, w );
@@ -847,7 +847,7 @@ webPage( GObject * core )
         GtkWidget * h;
         GtkTooltips * tips = gtk_tooltips_new( );
 
-        s = _( "Access control list:" );
+        s = _( "Access control _list:" );
         page->store = GTK_LIST_STORE( m );
         w = gtk_tree_view_new_with_model( m );
 
