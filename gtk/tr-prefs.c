@@ -794,7 +794,7 @@ webPage( GObject * core )
     hig_workarea_add_section_title( t, &row, _( "Web Interface" ) );
 
         /* "enabled" checkbutton */
-        s = _( "_Allow remote access" );
+        s = _( "Enable _web access" );
         w = new_check_button( s, PREF_KEY_RPC_ENABLED, core );
         page->rpc_tb = GTK_TOGGLE_BUTTON( w );
         g_signal_connect( w, "clicked", G_CALLBACK(onRPCToggled), page );
