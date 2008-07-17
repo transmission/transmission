@@ -205,7 +205,6 @@
 		A2DF58320DE4B13D000795D5 /* auth.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB6C10DE0D5A400E04DDA /* auth.c */; };
 		A2DF58330DE4B13D000795D5 /* cgi.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB6C20DE0D5A400E04DDA /* cgi.c */; };
 		A2DF58340DE4B13D000795D5 /* compat_unix.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB6C50DE0D5A400E04DDA /* compat_unix.c */; };
-		A2DF58350DE4B13D000795D5 /* config.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB6C70DE0D5A400E04DDA /* config.c */; };
 		A2DF58360DE4B13D000795D5 /* io_cgi.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB6CA0DE0D5A400E04DDA /* io_cgi.c */; };
 		A2DF58370DE4B13D000795D5 /* io_dir.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB6CB0DE0D5A400E04DDA /* io_dir.c */; };
 		A2DF58380DE4B13D000795D5 /* io_emb.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB6CC0DE0D5A400E04DDA /* io_emb.c */; };
@@ -637,7 +636,6 @@
 		A2AAB6C20DE0D5A400E04DDA /* cgi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgi.c; path = "third-party/shttpd/cgi.c"; sourceTree = "<group>"; };
 		A2AAB6C50DE0D5A400E04DDA /* compat_unix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = compat_unix.c; path = "third-party/shttpd/compat_unix.c"; sourceTree = "<group>"; };
 		A2AAB6C60DE0D5A400E04DDA /* compat_unix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compat_unix.h; path = "third-party/shttpd/compat_unix.h"; sourceTree = "<group>"; };
-		A2AAB6C70DE0D5A400E04DDA /* config.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = config.c; path = "third-party/shttpd/config.c"; sourceTree = "<group>"; };
 		A2AAB6C80DE0D5A400E04DDA /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = "third-party/shttpd/config.h"; sourceTree = "<group>"; };
 		A2AAB6CA0DE0D5A400E04DDA /* io_cgi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = io_cgi.c; path = "third-party/shttpd/io_cgi.c"; sourceTree = "<group>"; };
 		A2AAB6CB0DE0D5A400E04DDA /* io_dir.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = io_dir.c; path = "third-party/shttpd/io_dir.c"; sourceTree = "<group>"; };
@@ -1270,7 +1268,6 @@
 				A2AAB6C20DE0D5A400E04DDA /* cgi.c */,
 				A2AAB6C50DE0D5A400E04DDA /* compat_unix.c */,
 				A2AAB6C60DE0D5A400E04DDA /* compat_unix.h */,
-				A2AAB6C70DE0D5A400E04DDA /* config.c */,
 				A2AAB6C80DE0D5A400E04DDA /* config.h */,
 				A2A4E9FC0DE10643000CE197 /* defs.h */,
 				A2AAB6CA0DE0D5A400E04DDA /* io_cgi.c */,
@@ -1992,7 +1989,6 @@
 				A2DF58320DE4B13D000795D5 /* auth.c in Sources */,
 				A2DF58330DE4B13D000795D5 /* cgi.c in Sources */,
 				A2DF58340DE4B13D000795D5 /* compat_unix.c in Sources */,
-				A2DF58350DE4B13D000795D5 /* config.c in Sources */,
 				A2DF58360DE4B13D000795D5 /* io_cgi.c in Sources */,
 				A2DF58370DE4B13D000795D5 /* io_dir.c in Sources */,
 				A2DF58380DE4B13D000795D5 /* io_emb.c in Sources */,
