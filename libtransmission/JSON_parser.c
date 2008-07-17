@@ -446,7 +446,6 @@ static void grow_parse_buffer(JSON_parser jc)
 static int parse_parse_buffer(JSON_parser jc)
 {
     if (jc->callback) {
-        int result = 1;
         JSON_value value, *arg = NULL;
         
         if (jc->type != JSON_T_NONE) {
@@ -466,12 +465,12 @@ static int parse_parse_buffer(JSON_parser jc)
                         value.vu.str.value = jc->parse_buffer;
                         value.vu.str.length = jc->parse_buffer_count;
                     } else { 
-                        result = sscanf(jc->parse_buffer, "%Lf", &value.vu.float_value);
+                        sscanf(jc->parse_buffer, "%Lf", &value.vu.float_value);
                     }
                     break;
                 case JSON_T_INTEGER:
                     arg = &value;
-                    result = sscanf(jc->parse_buffer, JSON_PARSER_INTEGER_SSCANF_TOKEN, &value.vu.integer_value);
+                    sscanf(jc->parse_buffer, JSON_PARSER_INTEGER_SSCANF_TOKEN, &value.vu.integer_value);
                     break;
                 case JSON_T_STRING:
                     arg = &value;

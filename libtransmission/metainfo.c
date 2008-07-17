@@ -404,8 +404,7 @@ tr_metainfoParse( const tr_handle  * handle,
 
     /* get file or top directory name */
     val = tr_bencDictFindFirst( beInfo, "name.utf-8", "name", NULL );
-    if( parseFiles( inf, tr_bencDictFindFirst( beInfo,
-                                               "name.utf-8", "name", NULL ),
+    if( parseFiles( inf, val,
                     tr_bencDictFind( beInfo, "files" ),
                     tr_bencDictFind( beInfo, "length" ) ) )
     {

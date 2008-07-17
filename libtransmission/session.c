@@ -73,7 +73,6 @@ tr_peerIdNew( void )
     }
 
     val = total % base ? base - (total % base) : 0;
-    total += val;
     buf[19] = pool[val];
     buf[20] = '\0';
 

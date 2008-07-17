@@ -241,7 +241,7 @@ getBytePiece( const tr_info * info, uint64_t byteOffset )
 static void
 initFilePieces ( tr_info * info, tr_file_index_t fileIndex )
 {
-    tr_file * file = &info->files[fileIndex];
+    tr_file * file;
     uint64_t firstByte, lastByte;
 
     assert( info != NULL );

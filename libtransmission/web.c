@@ -57,7 +57,6 @@ processCompletedTasks( tr_web * web )
 {
     CURL * easy;
     CURLMsg * msg;
-    CURLcode res;
 
     do {
         /* this convoluted loop is from the "hiperinfo.c" sample which
@@ -68,7 +67,6 @@ processCompletedTasks( tr_web * web )
         while(( msg = curl_multi_info_read( web->cm, &more ))) {
             if( msg->msg == CURLMSG_DONE ) {
                 easy = msg->easy_handle;
-                res = msg->data.result;
                 break;
             }
         }
