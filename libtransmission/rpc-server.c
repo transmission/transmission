@@ -367,6 +367,8 @@ startServer( tr_rpc_server * server )
                                              "/transmission/web", clutchDir );
         }
 
+        argv[argc++] = NULL; /* shttpd_init() wants it null-terminated */
+
         server->ctx = shttpd_init( argc, argv );
         shttpd_register_uri( server->ctx, "/transmission/rpc", handle_rpc, server );
         shttpd_register_uri( server->ctx, "/transmission/upload", handle_upload, server );
