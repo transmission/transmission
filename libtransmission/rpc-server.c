@@ -34,7 +34,7 @@
 #define MY_REALM "Transmission RPC Server"
 
 #define ACTIVE_INTERVAL_MSEC 40
-#define INACTIVE_INTERVAL_MSEC 500
+#define INACTIVE_INTERVAL_MSEC 200
 
 struct tr_rpc_server
 {
@@ -342,12 +342,16 @@ startServer( tr_rpc_server * server )
             edit_passwords( passwd, MY_REALM, server->username, server->password );
 
         argv[argc++] = tr_strdup( "appname-unused" );
+
         argv[argc++] = tr_strdup( "-ports" );
         argv[argc++] = tr_strdup_printf( "%d", server->port );
+
         argv[argc++] = tr_strdup( "-dir_list" );
         argv[argc++] = tr_strdup( "0" );
+
         argv[argc++] = tr_strdup( "-auth_realm" );
         argv[argc++] = tr_strdup( MY_REALM );
+
         if( server->acl )
         {
             argv[argc++] = tr_strdup( "-acl" );
@@ -367,7 +371,7 @@ startServer( tr_rpc_server * server )
                                              "/transmission/web", clutchDir );
         }
 
-        argv[argc++] = NULL; /* shttpd_init() wants it null-terminated */
+        argv[argc] = NULL; /* shttpd_init() wants it null-terminated */
 
         server->ctx = shttpd_init( argc, argv );
         shttpd_register_uri( server->ctx, "/transmission/rpc", handle_rpc, server );
