@@ -382,7 +382,7 @@
             [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
             break;
         case PORT_STATUS_ERROR:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Unable to check status", "Preferences -> Network -> port status")];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Port check website is down", "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.png"]];
             break;
     }
