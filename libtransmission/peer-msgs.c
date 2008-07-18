@@ -1856,6 +1856,7 @@ sendPex( tr_peermsgs * msgs )
             *walk++ = diffs.added[i].flags;
         assert( ( walk - tmp ) == diffs.addedCount );
         tr_bencDictAddRaw( &val, "added.f", tmp, walk-tmp );
+        tr_free( tmp );
 
         /* "dropped" */
         dropped = tr_bencDictAdd( &val, "dropped" );
