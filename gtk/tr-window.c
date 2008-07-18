@@ -412,7 +412,6 @@ GtkWidget *
 tr_window_new( GtkUIManager * ui_manager, TrCore * core )
 {
     int i, n;
-    int status_stats_mode;
     const char * pch;
     PrivateData * p;
     GtkWidget *vbox, *w, *self, *h, *c, *s, *image, *menu;
@@ -496,7 +495,6 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
 
     /* status menu */
     menu = p->status_menu = gtk_menu_new( );
-    status_stats_mode = 0;
     l = NULL;
     pch = pref_string_get( PREF_KEY_STATUSBAR_STATS );
     for( i=0, n=G_N_ELEMENTS(stats_modes); i<n; ++i )

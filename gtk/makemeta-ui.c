@@ -308,7 +308,7 @@ GtkWidget*
 make_meta_ui( GtkWindow * parent, tr_handle * handle )
 {
     int row = 0;
-    GtkWidget *b1, *b2, *d, *t, *w, *h, *h2, *v, *focusMe, *extras;
+    GtkWidget *d, *t, *w, *h, *h2, *v, *focusMe, *extras;
     GtkBox * main_vbox;
     MakeMetaUI * ui = g_new0 ( MakeMetaUI, 1 );
     ui->handle = handle;
@@ -347,11 +347,11 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
         gtk_box_pack_start( GTK_BOX( v ), h2, FALSE, FALSE, 0 );
         gtk_box_pack_start_defaults( GTK_BOX( h ), v );
         v = gtk_vbox_new( FALSE, GUI_PAD_SMALL );
-        w = b1 = tr_button_new_from_stock( GTK_STOCK_DIRECTORY, _( "F_older" ) );
+        w = tr_button_new_from_stock( GTK_STOCK_DIRECTORY, _( "F_older" ) );
         focusMe = w;
         g_signal_connect( w, "clicked", G_CALLBACK( onChooseDirectoryClicked ), ui );
         gtk_box_pack_start_defaults( GTK_BOX( v ), w );
-        w = b2 = tr_button_new_from_stock( GTK_STOCK_FILE, _( "_File" ) );
+        w = tr_button_new_from_stock( GTK_STOCK_FILE, _( "_File" ) );
         g_signal_connect( w, "clicked", G_CALLBACK( onChooseFileClicked ), ui );
         gtk_box_pack_start_defaults( GTK_BOX( v ), w );
         gtk_box_pack_start( GTK_BOX( h ), v, FALSE, FALSE, 0 );

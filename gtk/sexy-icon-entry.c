@@ -89,14 +89,12 @@ sexy_icon_entry_class_init(SexyIconEntryClass *klass)
 	GObjectClass *gobject_class;
 	GtkObjectClass *object_class;
 	GtkWidgetClass *widget_class;
-	GtkEntryClass *entry_class;
 
 	parent_class = g_type_class_peek_parent(klass);
 
 	gobject_class = G_OBJECT_CLASS(klass);
 	object_class  = GTK_OBJECT_CLASS(klass);
 	widget_class  = GTK_WIDGET_CLASS(klass);
-	entry_class   = GTK_ENTRY_CLASS(klass);
 
 	gobject_class->finalize = sexy_icon_entry_finalize;
 
@@ -389,12 +387,10 @@ sexy_icon_entry_unrealize(GtkWidget *widget)
 static void
 sexy_icon_entry_size_request(GtkWidget *widget, GtkRequisition *requisition)
 {
-	GtkEntry *gtkentry;
 	SexyIconEntry *entry;
 	gint icon_widths = 0;
 	int i;
 
-	gtkentry = GTK_ENTRY(widget);
 	entry    = SEXY_ICON_ENTRY(widget);
 
 	for (i = 0; i < MAX_ICONS; i++)

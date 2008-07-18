@@ -491,7 +491,6 @@ refresh_peers (GtkWidget * top)
   peers = tr_torrentPeers (tor, &n_peers);
   qsort (peers, n_peers, sizeof(tr_peer_stat), compare_peers);
 
-  i = 0;
   if (gtk_tree_model_get_iter_first (model, &iter)) do
   {
     char * addr = NULL;
