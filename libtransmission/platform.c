@@ -32,6 +32,10 @@
   #include <windows.h>
   #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_PROFILE */
 #else
+  #ifdef SYS_DARWIN
+    #include <CoreFoundation/CoreFoundation.h>
+  #endif
+    
   #define _XOPEN_SOURCE 500 /* needed for recursive locks. */
   #ifndef __USE_UNIX98
   #define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
@@ -540,8 +544,16 @@ tr_getClutchDir( const tr_session * session UNUSED )
         else
         {
 #ifdef SYS_DARWIN
-
-            #warning hey BentMyWookie can this be implemented here without passing anything into initFull()
+            
+            CFURLRef appURL = CFBundleCopyBundleURL( CFBundleGetMainBundle() );
+            CFStringRef appRef = CFURLCopyPath( appURL );
+            const char * appString = CFStringGetCStringPtr( appRef, CFStringGetFastestEncoding( appRef ) );
+            
+            /*CFURLRef resourcesDirURL = CFBundleCopyResourcesDirectoryURL( CFBundleGetMainBundle() );
+            CFStringRef resourcesDirRef = CFURLCopyPath( resourcesDirURL );
+            const char * resourcesDirString = CFStringGetCStringPtr( resourcesDirRef, CFStringGetFastestEncoding( resourcesDirRef ) );*/
+            
+            sprintf( path, "%s%s", appString, "Contents/Resources/web" );
 
 #elif defined(WIN32)
 

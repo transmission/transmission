@@ -110,6 +110,7 @@
 		A24B65600D3F30870079EA4D /* QuitBadge.png in Resources */ = {isa = PBXBuildFile; fileRef = A24B655F0D3F30870079EA4D /* QuitBadge.png */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
+		A250EEB60E2ED87B00A688E6 /* web in Resources */ = {isa = PBXBuildFile; fileRef = A250EE800E2ED87B00A688E6 /* web */; };
 		A256588D0A9A695400E8A03B /* MessageWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A256588B0A9A695400E8A03B /* MessageWindowController.m */; };
 		A257C1820CAD3003004E121C /* PeerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A257C1800CAD3003004E121C /* PeerTableView.m */; };
 		A25892640CF1F7E800CCCDDF /* StatsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A25892630CF1F7E800CCCDDF /* StatsWindowController.m */; };
@@ -517,6 +518,7 @@
 		A24621360C769CF400088E81 /* trevent.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = trevent.c; path = libtransmission/trevent.c; sourceTree = "<group>"; };
 		A24B655F0D3F30870079EA4D /* QuitBadge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = QuitBadge.png; path = macosx/Images/QuitBadge.png; sourceTree = "<group>"; };
 		A24F19070A3A790800C9C145 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = macosx/Sparkle.framework; sourceTree = "<group>"; };
+		A250EE800E2ED87B00A688E6 /* web */ = {isa = PBXFileReference; lastKnownFileType = folder; path = web; sourceTree = "<group>"; };
 		A256588A0A9A695400E8A03B /* MessageWindowController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MessageWindowController.h; path = macosx/MessageWindowController.h; sourceTree = "<group>"; };
 		A256588B0A9A695400E8A03B /* MessageWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MessageWindowController.m; path = macosx/MessageWindowController.m; sourceTree = "<group>"; };
 		A257C17F0CAD3003004E121C /* PeerTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PeerTableView.h; path = macosx/PeerTableView.h; sourceTree = "<group>"; };
@@ -994,6 +996,7 @@
 				A259316A0A73B2CC002F4FE7 /* TransmissionHelp */,
 				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
 				A2CB38AE0E1E6896002B514C /* COPYING */,
+				A250EE800E2ED87B00A688E6 /* web */,
 				4DE5CCCA0981D9BE00BE280E /* Defaults.plist */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
@@ -1813,6 +1816,7 @@
 				A26146E10DD4A0160060F033 /* GroupsNoneTemplate.png in Resources */,
 				A2C0C5030E02CB6100D95339 /* Remote.png in Resources */,
 				A2CB38AF0E1E6896002B514C /* COPYING in Resources */,
+				A250EEB60E2ED87B00A688E6 /* web in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
