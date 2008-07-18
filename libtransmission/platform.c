@@ -548,10 +548,14 @@ tr_getClutchDir( const tr_session * session UNUSED )
             CFURLRef appURL = CFBundleCopyBundleURL( CFBundleGetMainBundle() );
             CFStringRef appRef = CFURLCopyPath( appURL );
             const char * appString = CFStringGetCStringPtr( appRef, CFStringGetFastestEncoding( appRef ) );
+            CFRelease(appURL);
+            CFRelease(appRef);
             
             /*CFURLRef resourcesDirURL = CFBundleCopyResourcesDirectoryURL( CFBundleGetMainBundle() );
             CFStringRef resourcesDirRef = CFURLCopyPath( resourcesDirURL );
-            const char * resourcesDirString = CFStringGetCStringPtr( resourcesDirRef, CFStringGetFastestEncoding( resourcesDirRef ) );*/
+            const char * resourcesDirString = CFStringGetCStringPtr( resourcesDirRef, CFStringGetFastestEncoding( resourcesDirRef ) );
+            CFRelease(resourcesDirURL);
+            CFRelease(resourcesDirRef);*/
             
             sprintf( path, "%s%s", appString, "Contents/Resources/web" );
 
