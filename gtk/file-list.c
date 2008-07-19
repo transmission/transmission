@@ -672,10 +672,10 @@ file_list_new( TrTorrent * gtor )
         w = gtk_button_new_with_mnemonic( _( "_Low" ) );
         g_signal_connect( w, "clicked", G_CALLBACK(onLowClicked), data );
         gtk_box_pack_start( GTK_BOX( vbox ), w, FALSE, FALSE, 0 );
-        w = gtk_button_new_with_mnemonic( "_Ignore" );
+        w = gtk_button_new_with_mnemonic( _( "_Ignore" ) );
         g_signal_connect( w, "clicked", G_CALLBACK(onIgnoreClicked), data );
         gtk_box_pack_end( GTK_BOX( vbox ), w, FALSE, FALSE, 0 );
-        w = gtk_button_new_with_mnemonic( "_Download" );
+        w = gtk_button_new_with_mnemonic( _( "_Download" ) );
         g_signal_connect( w, "clicked", G_CALLBACK(onDownloadClicked), data );
         gtk_box_pack_end( GTK_BOX( vbox ), w, FALSE, FALSE, 0 );
     hbox = gtk_hbox_new( FALSE, GUI_PAD );

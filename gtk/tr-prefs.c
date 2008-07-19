@@ -996,12 +996,12 @@ trackerPage( GObject * core )
     t = hig_workarea_create( );
     hig_workarea_add_section_title (t, &row, _( "Tracker Proxy" ) );
 
-        s = _( "Connect to tracker with HTTP proxy" );
+        s = _( "Connect to tracker via a pro_xy" );
         w = new_check_button( s, PREF_KEY_PROXY_SERVER_ENABLED, core );
         g_signal_connect( w, "toggled", G_CALLBACK(onProxyToggled), page );
         hig_workarea_add_wide_control( t, &row, w );
 
-        s = _( "Proxy server:" );
+        s = _( "Proxy _server:" );
         w = new_entry( PREF_KEY_PROXY_SERVER, core );
         page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
         w = hig_workarea_add_row( t, &row, s, w, NULL );
@@ -1009,10 +1009,10 @@ trackerPage( GObject * core )
 
         w = new_spin_button( PREF_KEY_PROXY_PORT, core, 0, 65536, 1 );
         page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
-        w = hig_workarea_add_row( t, &row, _( "Proxy port:" ), w, NULL );
+        w = hig_workarea_add_row( t, &row, _( "Proxy _port:" ), w, NULL );
         page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
 
-        s = _( "Proxy type:" );
+        s = _( "Proxy _type:" );
         m = proxyTypeModelNew( );
         w = gtk_combo_box_new_with_model( m );
         r = gtk_cell_renderer_text_new( );
@@ -1037,7 +1037,7 @@ trackerPage( GObject * core )
         w = hig_workarea_add_row( t, &row, s, w, NULL );
         page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
 
-        s = _( "_Password:" );
+        s = _( "Pass_word:" );
         w = new_entry( PREF_KEY_PROXY_PASSWORD, core );
         gtk_entry_set_visibility( GTK_ENTRY( w ), FALSE );
         page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
