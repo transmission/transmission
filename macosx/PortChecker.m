@@ -25,7 +25,7 @@
 #import "PortChecker.h"
 #import "NSApplicationAdditions.h"
 
-#define CHECKER_URL @"https://www.grc.com/x/portprobe=%d"
+#define CHECKER_URL @"http://portcheck.transmissionbt.com/%d"
 #define CHECK_FIRE  3.0
 
 @implementation PortChecker
@@ -114,40 +114,26 @@
 
 - (void) connectionDidFinishLoading: (NSURLConnection *) connection
 {
-    NSXMLDocument * shieldsUpProbe = [[NSXMLDocument alloc] initWithData: fPortProbeData options: NSXMLDocumentTidyHTML error: nil];
+    NSString * probeString = [[NSString alloc] initWithData: fPortProbeData encoding: NSUTF8StringEncoding];
     [fPortProbeData release];
     fPortProbeData = nil;
     
-    if (shieldsUpProbe)
+    if (probeString)
     {
-        NSArray * nodes = [shieldsUpProbe nodesForXPath: @"/html/body/center/table[3]/tr/td[2]" error: nil];
-        if ([nodes count] == 1)
-        {
-            NSString * portStatus = [[[[nodes objectAtIndex: 0] stringValue] stringByTrimmingCharactersInSet:
-                                        [[NSCharacterSet letterCharacterSet] invertedSet]] lowercaseString];
-            
-            if ([portStatus isEqualToString: @"open"])
-                [self callBackWithStatus: PORT_STATUS_OPEN];
-            else if ([portStatus isEqualToString: @"stealth"])
-                [self callBackWithStatus: PORT_STATUS_STEALTH];
-            else if ([portStatus isEqualToString: @"closed"])
-                [self callBackWithStatus: PORT_STATUS_CLOSED];
-            else
-            {
-                NSLog(@"Unable to get port status: unknown port state");
-                [self callBackWithStatus: PORT_STATUS_ERROR];
-            }
-        }
+        if ([probeString isEqualToString: @"1"])
+            [self callBackWithStatus: PORT_STATUS_OPEN];
+        else if ([probeString isEqualToString: @"0"])
+            [self callBackWithStatus: PORT_STATUS_CLOSED];
         else
         {
             NSLog(@"Unable to get port status: invalid response");
             [self callBackWithStatus: PORT_STATUS_ERROR];
         }
-        [shieldsUpProbe release];
+        [probeString release];
     }
     else
     {
-        NSLog(@"Unable to get port status: failed to create xml document");
+        NSLog(@"Unable to get port status: invalid data received");
         [self callBackWithStatus: PORT_STATUS_ERROR];
     }
 }
