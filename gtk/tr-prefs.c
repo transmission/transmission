@@ -791,16 +791,16 @@ webPage( GObject * core )
     t = hig_workarea_create( );
     g_object_set_data_full( G_OBJECT( t ), "page", page, g_free );
 
-    hig_workarea_add_section_title( t, &row, _( "Web Access" ) );
+    hig_workarea_add_section_title( t, &row, _( "Web Interface" ) );
 
         /* "enabled" checkbutton */
-        s = _( "_Enable web access" );
+        s = _( "_Enable web interface" );
         w = new_check_button( s, PREF_KEY_RPC_ENABLED, core );
         page->rpc_tb = GTK_TOGGLE_BUTTON( w );
         g_signal_connect( w, "clicked", G_CALLBACK(onRPCToggled), page );
         h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
         gtk_box_pack_start_defaults( GTK_BOX(h), w );
-        w = gtk_button_new_with_mnemonic( _( "_Launch Web Browser" ) );
+        w = gtk_button_new_from_stock( GTK_STOCK_OPEN );
         page->widgets = g_slist_append( page->widgets, w );
         g_signal_connect( w, "clicked", G_CALLBACK(onLaunchClutchCB), NULL );
         gtk_box_pack_start( GTK_BOX(h), w, FALSE, FALSE, 0 );
