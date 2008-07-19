@@ -3,7 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.30 (2008/mm/dd)
 http://trac.transmissionbt.com/query?group=component&milestone=1.30
 - All Platforms
-   + The "Clutch" web interface is now bundled with Transmission
+   + The "Clutch" web interface is now bundled with Transmission (as a beta)
    + Ability to add and remove tracker addresses
    + Ability to create torrent files with multiple tracker addresses
    + Added support for HTTP/FTP Seeding (GetRight style)
