@@ -250,7 +250,7 @@ addSingleTorrentDialog( GtkWindow  * parent,
     data->filename = g_strdup( tr_ctorGetSourceFile( ctor ) );
     data->downloadDir = g_strdup( str );
     data->list = file_list_new( NULL );
-    data->trash_check = gtk_check_button_new_with_mnemonic( _( "Mo_ve source file to Trash" ) );
+    data->trash_check = gtk_check_button_new_with_mnemonic( _( "_Move source file to Trash" ) );
     data->run_check = gtk_check_button_new_with_mnemonic( _( "_Start when added" ) );
 
     g_signal_connect( G_OBJECT( d ), "response",
@@ -262,7 +262,7 @@ addSingleTorrentDialog( GtkWindow  * parent,
     gtk_table_set_col_spacings( GTK_TABLE( t ), GUI_PAD_BIG );
 
     row = col = 0;
-    l = gtk_label_new_with_mnemonic( _( "_Source file:" ) );
+    l = gtk_label_new_with_mnemonic( _( "_Torrent file:" ) );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
     gtk_table_attach( GTK_TABLE( t ), l, col, col+1, row, row+1, GTK_FILL, 0, 0, 0 );
     ++col;
@@ -302,7 +302,7 @@ addSingleTorrentDialog( GtkWindow  * parent,
 
     ++row;
     col = 0;
-    w = gtk_button_new_with_mnemonic( _( "Verify Local Data" ) );
+    w = gtk_button_new_with_mnemonic( _( "_Verify Local Data" ) );
     gtk_table_attach( GTK_TABLE( t ), w, col, col+1, row, row+1, GTK_FILL, 0, 0, 0 );
     g_signal_connect( w, "clicked", G_CALLBACK( verifyRequested ), data );
 
