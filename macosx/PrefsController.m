@@ -56,6 +56,8 @@
 #define RPC_KEYCHAIN_SERVICE    "Transmission:Remote"
 #define RPC_KEYCHAIN_NAME       "Remote"
 
+#define WEBUI_URL   @"http://localhost:%d/transmission/clutch/"
+
 @interface PrefsController (Private)
 
 - (void) setPrefView: (id) sender;
@@ -805,6 +807,12 @@
 - (void) setRPCEnabled: (id) sender
 {
     tr_sessionSetRPCEnabled(fHandle, [fDefaults boolForKey: @"RPC"]);
+}
+
+- (void) linkWebUI: (id) sender
+{
+    NSString * urlString = [NSString stringWithFormat: WEBUI_URL, [fDefaults integerForKey: @"RPCPort"]];
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: urlString]];
 }
 
 - (void) setRPCAuthorize: (id) sender

@@ -132,6 +132,7 @@
 - (void) updateProxyPassword;
 
 - (void) setRPCEnabled: (id) sender;
+- (void) linkWebUI: (id) sender;
 - (void) setRPCAuthorize: (id) sender;
 - (void) setRPCUsername: (id) sender;
 - (void) setRPCPassword: (id) sender;
