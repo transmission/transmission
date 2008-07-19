@@ -8,8 +8,8 @@
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1481"/>
 			<integer value="66"/>
+			<integer value="1481"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3640,6 +3640,22 @@ AAABAAAAAQ</bytes>
 							<int key="NSPeriodicInterval">75</int>
 						</object>
 					</object>
+					<object class="NSTextField" id="500968779">
+						<reference key="NSNextResponder" ref="810116101"/>
+						<int key="NSvFlags">268</int>
+						<string key="NSFrame">{{257, 351}, {38, 14}}</string>
+						<reference key="NSSuperview" ref="810116101"/>
+						<bool key="NSEnabled">YES</bool>
+						<object class="NSTextFieldCell" key="NSCell" id="274347909">
+							<int key="NSCellFlags">68288064</int>
+							<int key="NSCellFlags2">272761856</int>
+							<string key="NSContents">beta</string>
+							<reference key="NSSupport" ref="26"/>
+							<reference key="NSControlView" ref="500968779"/>
+							<reference key="NSBackgroundColor" ref="977951849"/>
+							<reference key="NSTextColor" ref="400627124"/>
+						</object>
+					</object>
 				</object>
 				<string key="NSFrameSize">{535, 446}</string>
 				<reference key="NSSuperview"/>
@@ -3647,10 +3663,6 @@ AAABAAAAAQ</bytes>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSUserDefaultsController" id="356871564">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>RPC</string>
-				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 		</object>
@@ -8130,6 +8142,7 @@ AAABAAAAAQ</bytes>
 							<reference ref="535988411"/>
 							<reference ref="749999527"/>
 							<reference ref="52925771"/>
+							<reference ref="500968779"/>
 						</object>
 						<reference key="parent" ref="37013934"/>
 						<string key="objectName">Remote</string>
@@ -8775,6 +8788,20 @@ AAABAAAAAQ</bytes>
 						<reference key="object" ref="853520292"/>
 						<reference key="parent" ref="52925771"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1731</int>
+						<reference key="object" ref="500968779"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="274347909"/>
+						</object>
+						<reference key="parent" ref="810116101"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1732</int>
+						<reference key="object" ref="274347909"/>
+						<reference key="parent" ref="500968779"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -8972,6 +8999,8 @@ AAABAAAAAQ</bytes>
 					<string>1706.ImportedFromIB2</string>
 					<string>1717.IBPluginDependency</string>
 					<string>1718.IBPluginDependency</string>
+					<string>1731.IBPluginDependency</string>
+					<string>1732.IBPluginDependency</string>
 					<string>190.IBPluginDependency</string>
 					<string>190.ImportedFromIB2</string>
 					<string>192.IBPluginDependency</string>
@@ -9367,6 +9396,8 @@ AAABAAAAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
@@ -9595,7 +9626,7 @@ AAABAAAAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1720</int>
+			<int key="maxID">1732</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
