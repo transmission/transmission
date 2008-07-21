@@ -673,6 +673,24 @@ tr_rpc_request_exec_json( struct tr_handle  * handle,
     return ret;
 }
 
+static void
+addToken( tr_benc * list, const char * token, size_t len )
+{
+    char * p;
+    const char * end = token + len;
+    const long a = strtol( token, &p, 10 );
+    if( p == end )
+        tr_bencListAddInt( list, a );
+    else if( *p == '-' && isdigit(p[1]) ) {
+        const long b = strtol( p+1, &p, 10 );
+        if( ( p == end ) && ( b > a ) ) {
+            long i;
+            for( i=a; i<=b; ++i )
+                tr_bencListAddInt( list, i );
+        }
+    }
+}
+
 /**
  * Munge the URI into a usable form.
  *
@@ -712,8 +730,10 @@ tr_rpc_parse_list_str( tr_benc     * setme,
         tr_bencInitList( setme, commaCount + 1 );
         walk = str;
         while( *walk ) {
-            char * p;
-            tr_bencListAddInt( setme, strtol( walk, &p, 10 ) );
+            const char * p = strchr( walk, ',' );
+            if( !p )
+                p = walk + strlen( walk );
+            addToken( setme, walk, p-walk );
             if( *p!=',' )
                 break;
             walk = p + 1;

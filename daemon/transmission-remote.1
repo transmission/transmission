@@ -1,4 +1,4 @@
-.Dd May 20, 2008
+.Dd July 21, 2008
 .Dt TRANSMISSION-REMOTE 1
 .Os
 .Sh NAME
@@ -13,34 +13,27 @@ and
 .Op Ar host:port | host | port
 .Op Fl a Ar torrent-files
 .Op Fl b
-.Op Fl d Ar number
-.Op Fl D
-.Op Fl er
-.Op Fl ep
-.Op Fl et
+.Op Fl d Ar number | Fl D
+.Op Fl er | ep | et
 .Op Fl f
 .Op Fl g Ar files
 .Op Fl G Ar files
 .Op Fl h
 .Op Fl i
 .Op Fl l
-.Op Fl m
-.Op Fl M
+.Op Fl m | M
 .Op Fl n Ar user:pass
 .Op Fl p Ar port
 .Op Fl ph Ar files
 .Op Fl pl Ar files
 .Op Fl pn Ar files
 .Op Fl r
-.Op Fl s
-.Op Fl S
+.Op Fl s | S
 .Op Fl t Ar all | Ar id | Ar hash
-.Op Fl u Ar number
-.Op Fl U
+.Op Fl u Ar number | Fl U
 .Op Fl v
 .Op Fl w Ar download-dir
-.Op Fl x
-.Op Fl X
+.Op Fl x | X
 .Ek
 .Sh DESCRIPTION
 .Nm
@@ -53,12 +46,13 @@ By default,
 .Nm
 connects to the transmission session at localhost:9091.
 Other sessions can be controlled by specifying a different host and/or port.
-.Pp
-The options are as follows:
+
+.Sh OPTIONS
 .Bl -tag -width Ds
-.It Fl a Fl -add Ar torrent-file
-Add metainfo
-.Ar torrent-file(s) .
+.It Fl a Fl -add Ar torrent-file(s)
+Add
+.Ar torrent-file(s)
+into transmission.
 
 .It Fl b Fl -debug
 Enable debugging mode.
@@ -81,15 +75,18 @@ Prefer unencrypted peer connections.
 .It Fl f Fl -files
 Get a file list for the current torrent(s)
 
-.It Fl g Fl -get Ar files
+.It Fl g Fl -get Ar all | file-index | files
 Mark file(s) for download.
-.Ar files
-can be a file index, or a comma-separated list of file indices, or the literal
 .Ar all
-for all files in the torrent.
+marks all all of the torrent's files for downloading,
+.Ar file-index
+adds a single file to the download list, and
+.Ar files
+adds multiple files to the download list,
+such as "-g1,3-5" to add files #1, #3, #4, and #5 to the download list.
 
-.It Fl g Fl -no-get Ar files
-Mark file(s) for not downloading
+.It Fl G Fl -no-get Ar all | file-index | files
+Mark file(s) for not downloading.
 
 .It Fl h Fl -help
 Print command-line option descriptions.
@@ -117,24 +114,21 @@ Set the
 .Ar port
 for use when listening for incoming peer connections
 
-.It Fl ph Fl -priority-high Ar files
-Mark 
-.Ar files
-as high priority.
-.Ar files
-can be a file index, or a comma-separated list of file indices, or the literal
+.It Fl pn Fl -priority-normal Ar all | file-index | files
+Mark file(s) as normal priority.
 .Ar all
-for all files in the torrent.
-
-.It Fl pl Fl -priority-low Ar files
-Mark 
+marks all of the torrent's files as normal priority,
+.Ar file-index
+sets a single file's priority as normal, and
 .Ar files
-as low priority
+sets multiple files' priorities as normal,
+such as "-pn1,3-5" to normalize files #1, #3, #4, and #5.
 
-.It Fl pn Fl -priority-normal Ar files
-Mark 
-.Ar files
-as normal priority
+.It Fl ph Fl -priority-high Ar all | file-index | files
+Mark file(s) as high priority.
+
+.It Fl pl Fl -priority-low Ar all | file-index | files
+Mark file(s) as low priority.
 
 .It Fl r Fl -remove
 Remove the current torrent(s).  This does not delete the downloaded data.
@@ -152,8 +146,8 @@ will apply following requests to all torrents, while specific torrents can be ch
 .Ar id
 or
 .Ar hash .
-To set more than one current torrent, joined their ids or hashes together in a comma-delimited list,
-such as "-t1,2,3"
+To set more than one current torrent, join their ids or hashes together in a list,
+such as "-t2,4,6-8" to operate on the torrents whose IDs are 2, 4, 6, 7, and 8.
 
 .It Fl u Fl -uplimit Ar limit
 Limit the upload speed to
@@ -177,6 +171,12 @@ Disable peer exchange (PEX).
 
 .El
 .Sh EXAMPLES
+
+Set download and upload limits to 100 KiB/sec and 20 KiB/sec:
+.Bd -literal -offset indent
+$ transmission-remote -d100 -u20
+$ transmission-remote --downlimit=100 --uplimit=20
+.Ed
 
 List all torrents' IDs and states:
 .Bd -literal -offset indent
@@ -208,6 +208,11 @@ Get detailed information on the torrent whose ID is '1':
 $ transmission-remote -t1 -i"
 .Ed
 
+Get a list of a torrent's files:
+.Bd -literal -offset indent
+$ transmission-remote -t1 -l"
+.Ed
+
 Download only its second and fourth files:
 .Bd -literal -offset indent
 $ transmission-remote -t1 -Gall -g2,4"
@@ -222,12 +227,6 @@ Set all torrents' files' priorities to normal:
 .Bd -literal -offset indent
 $ transmission-remote -tall -pnall"
 .Ed
-
-Set download and upload limits to 100 KiB/sec and 20 KiB/sec:
-.Bd -literal -offset indent
-$ transmission-remote -d100 -u20
-$ transmission-remote --downlimit=100 --uplimit=20
-.Bd -literal -offset indent
 
 .Sh AUTHORS
 .An -nosplit
