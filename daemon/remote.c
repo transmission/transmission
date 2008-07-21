@@ -515,7 +515,7 @@ printDetails( tr_benc * top )
                 printf( "  Downloaded: %s\n", buf );
                 strlsize( buf, j, sizeof( buf ) );
                 printf( "  Uploaded: %s\n", buf );
-                strlratio( buf, i, j, sizeof( buf ) );
+                strlratio( buf, j, i, sizeof( buf ) );
                 printf( "  Ratio: %s\n", buf );
             }
             if( tr_bencDictFindInt( t, "corruptEver", &i ) ) {
