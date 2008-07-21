@@ -615,9 +615,10 @@ printFileList( tr_benc * top )
             {
                 int j=0, jn=tr_bencListSize(files);
                 printf( "%s (%d files):\n", name, jn );
-                printf("%3s  %8s %3s %9s  %s\n", "#", "Priority", "Get", "Size", "Name" );
+                printf("%3s  %4s %8s %3s %9s  %s\n", "#", "Done", "Priority", "Get", "Size", "Name" );
                 for( j=0, jn=tr_bencListSize( files ); j<jn; ++j )
                 {
+                    int64_t have;
                     int64_t length;
                     int64_t priority;
                     int64_t wanted;
@@ -625,10 +626,12 @@ printFileList( tr_benc * top )
                     tr_benc * file = tr_bencListChild( files, j );
                     if( tr_bencDictFindInt( file, "length", &length ) &&
                         tr_bencDictFindStr( file, "name", &filename ) &&
+                        tr_bencDictFindInt( file, "bytesCompleted", &have ) &&
                         tr_bencGetInt( tr_bencListChild( priorities, j ), &priority ) &&
                         tr_bencGetInt( tr_bencListChild( wanteds, j ), &wanted ) )
                     {
                         char sizestr[64];
+                        double percent = (double)have / length;
                         strlsize( sizestr, length, sizeof( sizestr ) );
                         const char * pristr;
                         switch( priority ) {
@@ -636,7 +639,7 @@ printFileList( tr_benc * top )
                             case TR_PRI_HIGH:   pristr = "High"; break;
                             default:            pristr = "Normal"; break;
                         }
-                        printf( "%3d: %-8s %-3s %9s  %s\n", (j+1), pristr, (wanted?"Yes":"No"), sizestr, filename );
+                        printf( "%3d: %3.0f%% %-8s %-3s %9s  %s\n", (j+1), percent, pristr, (wanted?"Yes":"No"), sizestr, filename );
                     }
                 }
             }

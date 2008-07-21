@@ -142,6 +142,7 @@
                       +----------+-------------------------------------- 
                       | files is an array of objects that contain:
                       +----------+------------------------+------------- 
+                      | number   | bytesCompleted         | tr_torrent
                       | number   | length                 | tr_info
                       | string   | name                   | tr_info
    -------------------+----------+------------------------+-------------

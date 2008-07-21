@@ -156,16 +156,23 @@ torrentVerify( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
 ***/
 
 static void
-addFiles( const tr_info * info, tr_benc * files )
+addFiles( const tr_torrent * tor, tr_benc * list )
 {
     tr_file_index_t i;
+    tr_file_index_t n;
+    const tr_info * info = tr_torrentInfo( tor );
+    tr_file_stat * files = tr_torrentFiles( tor, &n );
+
     for( i=0; i<info->fileCount; ++i )
     {
         const tr_file * file = &info->files[i];
-        tr_benc * d = tr_bencListAddDict( files, 2 );
+        tr_benc * d = tr_bencListAddDict( list, 3 );
+        tr_bencDictAddInt( d, "bytesCompleted", files[i].bytesCompleted );
         tr_bencDictAddInt( d, "length", file->length );
         tr_bencDictAddStr( d, "name", file->name );
     }
+
+    tr_torrentFilesFree( files, n );
 }
 
 static void
@@ -227,7 +234,7 @@ addInfo( const tr_torrent * tor, tr_benc * d, uint64_t fields )
     }
 
     if( fields & TR_RPC_TORRENT_FILES )
-        addFiles( inf, tr_bencDictAddList( d, "files", inf->fileCount ) );
+        addFiles( tor, tr_bencDictAddList( d, "files", inf->fileCount ) );
 
     if( fields & TR_RPC_TORRENT_HISTORY ) {
         tr_bencDictAddInt( d, "activityDate", st->activityDate );
