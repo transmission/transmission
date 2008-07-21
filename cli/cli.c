@@ -444,8 +444,9 @@ const struct tr_option options[] = {
     { 'c', "comment", "Set the new torrent's comment", "c", 1, "<comment>" },
     { 'd', "downlimit", "Set max download speed in KB/s", "d", 1, "<number>" },
     { 'D', "no-downlimit", "Don't limit the download speed", "D", 0, NULL },
-    { 'e', "encryption", "Set encryption mode (required, preferred, tolerated)",
-      "e", 1, "<mode>" },
+    { 910, "encryption-required", "Encrypt all peer connections", "er", 0, NULL },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL },
     { 'f', "finish", "Set a script to run when the torrent finishes",
       "f", 1, "<script>" },
     { 'g', "config-dir", "Where to find configuration files",
@@ -505,13 +506,6 @@ parseCommandLine( int argc, const char ** argv )
             case 'c': comment = optarg; break;
             case 'd': downloadLimit = numarg( optarg ); break;
             case 'D': downloadLimit = -1; break;
-            case 'e': if( !strcmp( optarg, "required" ) )
-                          encryptionMode = TR_ENCRYPTION_REQUIRED;
-                      else if( !strcmp( optarg, "tolerated" ) )
-                          encryptionMode = TR_PLAINTEXT_PREFERRED;
-                      else
-                          encryptionMode = TR_ENCRYPTION_PREFERRED;
-                      break;
             case 'f': finishCall = optarg; break;
             case 'g': configdir = optarg; break;
             case 'i': showInfo = 1; break;
@@ -526,6 +520,9 @@ parseCommandLine( int argc, const char ** argv )
             case 'U': uploadLimit = -1; break;
             case 'v': verify = 1; break;
             case 'w': downloadDir = optarg; break;
+            case 910: encryptionMode = TR_ENCRYPTION_REQUIRED; break;
+            case 911: encryptionMode = TR_PLAINTEXT_PREFERRED; break;
+            case 912: encryptionMode = TR_ENCRYPTION_PREFERRED; break;
             case TR_OPT_UNK: torrentPath = optarg; break;
             default: return 1;
         }

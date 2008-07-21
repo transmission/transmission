@@ -13,7 +13,7 @@
 .\"  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\"  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd April 18, 2007
+.Dd July 21, 2008
 .Dt TRANSMISSIONCLI 1
 .Os
 .Sh NAME
@@ -36,7 +36,18 @@
 .Op Fl r
 .Ar new-torrent-file
 .Nm
-.Op options
+.Op Fl b | B
+.Op Fl d Ar number | Fl D
+.Op Fl er | ep | et
+.Op Fl f Ar script
+.Op Fl g Ar directory
+.Op Fl h
+.Op Fl m | M
+.Op Fl p
+.Op Fl t
+.Op Fl u Ar number | Fl U
+.Op Fl v
+.Op Fl w Ar directory
 .Ar torrent-file
 .Ek
 .Sh DESCRIPTION
@@ -67,11 +78,11 @@ Set the maximum download speed in KB/s
 .It Fl D, -no-downlimit
 Don't limit the download speed
 
-.It Fl e Fl -encryption Ar required
-Require all peer connections to be encrypted.
-.It Fl e Fl -encryption Ar preferred
+.It Fl er Fl -encryption-required
+Encrypt all peer connections.
+.It Fl ep Fl -encryption-preferred 
 Prefer encrypted peer connections.
-.It Fl e Fl -encryption Ar tolerated
+.It Fl et Fl -encryption-tolerated
 Prefer unencrypted peer connections.
 
 .It Fl f, -finish Ar script
