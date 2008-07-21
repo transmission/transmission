@@ -111,45 +111,47 @@ tr_getopt_usage( const char              * progName,
 static const tr_option *
 findOption( const tr_option   * opts,
             const char        * str,
-            const char       ** nested )
+            const char       ** setme_arg )
 {
-    size_t len;
+    size_t matchlen = 0;
+    const char * arg = NULL;
     const tr_option * o;
+    const tr_option * match = NULL;
 
-    /* try all the longopts first to avoid collisions between
-       long options, and short options with args appended to them  */
-    for( o=opts; o->val; ++o ) {
-        if( o->longName && (str[0]=='-') && (str[1]=='-') ) {
-            if( !strcmp( o->longName, str+2 ) ) {
-                if( nested ) *nested = NULL;
-                return o;
-            }
-            len = strlen( o->longName );
-            if( !memcmp( o->longName, str+2, len ) && str[len+2]=='=' ) {
-                if( nested ) *nested = str+len+3;
-                return o;
-            }
-        }
-    }
-
-    /* look for a matching shortopt */ 
+    /* find the longest matching option */
     for( o=opts; o->val; ++o )
     {
-        if( o->shortName && (str[0]=='-') ) {
-            if( !strcmp( o->shortName, str+1 ) ) {
-                if( nested ) *nested = NULL;
-                return o;
-            }
-            len = strlen( o->shortName );
-            if( !memcmp( o->shortName, str+1, len ) ) {
-                if( nested )
-                    *nested = str[len+1]=='=' ? str+len+2 : str+len+1;
-                return o;
+        size_t len = o->longName ? strlen( o->longName ) : 0;
+
+        if( ( matchlen < len ) && !memcmp( str, "--", 2 )
+                               && !memcmp( str+2, o->longName, len ) 
+                               && ( str[len+2]=='\0' || ( o->has_arg && str[len+2]=='=' ) ) )
+        {
+            matchlen = len;
+            match = o;
+            arg = str[len+2]=='=' ? str+len+3 : NULL;
+        }
+
+        len = o->shortName ? strlen( o->shortName ) : 0;
+
+        if( ( matchlen < len ) && !memcmp( str, "-", 1 )
+                               && !memcmp( str+1, o->shortName, len ) 
+                               && ( str[len+1]=='\0' || o->has_arg ) )
+        {
+            matchlen = len;
+            match = o;
+            switch( str[len+1] ) {
+                case '\0': arg = NULL;          break;
+                case '=':  arg = str + len + 2; break;
+                default:   arg = str + len + 1; break;
             }
         }
     }
 
-    return NULL;
+    if( setme_arg )
+        *setme_arg = arg;
+
+    return match;
 }
 
 int
@@ -160,7 +162,7 @@ tr_getopt( const char        * usage,
            const char       ** setme_optarg )
 {
     int i;
-    const char * nest = NULL;
+    const char * arg = NULL;
     const tr_option * o = NULL;
 
     *setme_optarg = NULL;  
@@ -177,7 +179,7 @@ tr_getopt( const char        * usage,
     if( argc==1 || tr_optind>=argc )
         return TR_OPT_DONE;
 
-    o = findOption( opts, argv[tr_optind], &nest );
+    o = findOption( opts, argv[tr_optind], &arg );
     if( !o ) {
         /* let the user know we got an unknown option... */
         *setme_optarg = argv[tr_optind++];
@@ -186,17 +188,17 @@ tr_getopt( const char        * usage,
 
     if( !o->has_arg ) {
         /* no argument needed for this option, so we're done */
-        if( nest )
+        if( arg )
             return TR_OPT_ERR;
         *setme_optarg = NULL;
-        tr_optind++;
+        ++tr_optind;
         return o->val;
     }
 
-    /* option needed an argument, and it was nested in this string */
-    if( nest ) {
-        *setme_optarg = nest;
-        tr_optind++;
+    /* option needed an argument, and it was embedded in this string */
+    if( arg ) {
+        *setme_optarg = arg;
+        ++tr_optind;
         return o->val;
     }
 

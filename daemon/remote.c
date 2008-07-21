@@ -318,6 +318,10 @@ readargs( int argc, const char ** argv )
             case 912: tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddStr( args, "encryption", "tolerated" );
                       break;
+            case TR_OPT_ERR:
+                      fprintf( stderr, "invalid option\n" );
+                      showUsage( );
+                      break;
             default:  fprintf( stderr, "got opt [%d]\n", (int)c );
                       showUsage( );
                       break;
