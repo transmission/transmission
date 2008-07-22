@@ -71,7 +71,7 @@ static tr_option opts[] =
       "p", 1, "<port>" },
     { 900, "priority-high", "Set the files' priorities as high", "ph", 1, "<files>" },
     { 901, "priority-normal", "Set the files' priorities as normal", "pn", 1, "<files>" },
-    { 902, "priority-normal", "Set the files' priorities as low", "pl", 1, "<files>" },
+    { 902, "priority-low", "Set the files' priorities as low", "pl", 1, "<files>" },
     { 'r', "remove",       "Remove the current torrent(s)", "r", 0, NULL },
     { 's', "start",        "Start the current torrent(s)", "s", 0, NULL },
     { 'S', "stop",         "Stop the current torrent(s)", "S", 0, NULL },
