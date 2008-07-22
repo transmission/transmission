@@ -645,7 +645,13 @@ printFileList( tr_benc * top )
                             case TR_PRI_HIGH:   pristr = "High"; break;
                             default:            pristr = "Normal"; break;
                         }
-                        printf( "%3d: %3.0f%% %-8s %-3s %9s  %s\n", (j+1), percent, pristr, (wanted?"Yes":"No"), sizestr, filename );
+                        printf( "%3d: %3.0f%% %-8s %-3s %9s  %s\n",
+                                (j+1),
+                                (100.0*percent),
+                                pristr,
+                                (wanted?"Yes":"No"),
+                                sizestr,
+                                filename );
                     }
                 }
             }
