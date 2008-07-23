@@ -898,7 +898,10 @@ read_stream(struct stream *stream)
 		len = stream->content_len - stream->io.total;
 
 	/* Read from underlying channel */
-	n = stream->io_class->read(stream, io_space(&stream->io), len);
+        if( stream->io_class )
+	    n = stream->io_class->read(stream, io_space(&stream->io), len);
+        else
+            n = 0;
 
 	if (n > 0)
 		io_inc_head(&stream->io, n);
@@ -936,7 +939,11 @@ write_stream(struct stream *from, struct stream *to)
 	assert(len > 0);
 
 	/* TODO: should be assert on CAN_WRITE flag */
-	n = to->io_class->write(to, io_data(&from->io), len);
+        if( to->io_class )
+	    n = to->io_class->write(to, io_data(&from->io), len);
+        else
+            n = 0;
+
 	to->conn->expire_time = current_time + EXPIRE_TIME;
 	DBG(("write_stream (%d %s): written %d/%d bytes (errno %d)",
 	    to->conn->rem.chan.sock,
