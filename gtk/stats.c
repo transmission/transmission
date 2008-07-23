@@ -112,9 +112,9 @@ stats_dialog_create( GtkWindow * parent, TrCore * core )
 
     d = gtk_dialog_new_with_buttons( _("Statistics"),
                                      parent,
-                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                     GTK_STOCK_CLEAR, TR_RESPONSE_CLEAR,
-                                     GTK_STOCK_OK, GTK_RESPONSE_CLOSE,
+                                     GTK_DIALOG_DESTROY_WITH_PARENT|GTK_DIALOG_NO_SEPARATOR,
+                                     GTK_STOCK_DELETE, TR_RESPONSE_CLEAR,
+                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      NULL );
     gtk_dialog_set_default_response( GTK_DIALOG( d ),
                                      GTK_RESPONSE_CLOSE );
