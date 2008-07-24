@@ -17,6 +17,8 @@
 #include <stdlib.h> /* strtol */
 #include <string.h>
 
+#include <libevent/event.h> /* evbuffer */
+
 #include "transmission.h"
 #include "utils.h"
 
@@ -141,7 +143,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
 
     if( !id )
         return;
-    
+
     /* Azureus-style */
     if( id[0] == '-' && id[7] == '-' )
     {
@@ -349,13 +351,16 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     /* No match */
     if( !*buf )
     {
-        if( isprint( id[0] ) && isprint( id[1] ) && isprint( id[2] ) &&
-            isprint( id[3] ) && isprint( id[4] ) && isprint( id[5] ) &&
-            isprint( id[6] ) && isprint( id[7] ) )
-                tr_snprintf( buf, buflen, "%c%c%c%c%c%c%c%c",
-                             id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7] );
-        else
-                tr_snprintf( buf, buflen, "0x%02x%02x%02x%02x%02x%02x%02x%02x",
-                             id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7] );
+        struct evbuffer * out = evbuffer_new( );
+        const char *in, *in_end;
+        for( in=(const char*)id, in_end=in+8; in!=in_end; ++in ) {
+            if( isprint( *in ) )
+                evbuffer_add_printf( out, "%c", *in );
+            else
+                evbuffer_add_printf( out, "%%%02X", (unsigned int)*in );
+        }
+
+        tr_strlcpy( buf, (const char*)EVBUFFER_DATA(out), buflen );
+        evbuffer_free( out );
     }
 }

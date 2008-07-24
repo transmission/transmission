@@ -979,7 +979,6 @@ tr_snprintf( char * buf, size_t buflen, const char * fmt, ... )
     len = evutil_vsnprintf( buf, buflen, fmt, args );
     va_end( args );
     return len;
-
 }
 
 
