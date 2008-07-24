@@ -115,7 +115,19 @@ makeSocketNonBlocking( int fd )
 static int
 createSocket( int type, int priority )
 {
-    return makeSocketNonBlocking( tr_fdSocketCreate( type, priority ) );
+    int fd;
+
+    fd = tr_fdSocketCreate( type, priority );
+
+    if( fd >= 0 )
+        fd = makeSocketNonBlocking( fd );
+
+    if( fd >= 0 ) {
+        const int buffsize = 1500*2; /* 2x MTU for most ethernet/wireless */
+        setsockopt( fd, SOL_SOCKET, SO_SNDBUF, &buffsize, sizeof( buffsize ) );
+    }
+
+    return fd;
 }
 
 int
