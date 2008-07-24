@@ -70,9 +70,6 @@
 /* Dock item - Seeding */
 "%d Seeding" = "%d in seed";
 
-/* stats window -> times opened */
-"%d times" = "%d volte";
-
 /* Drag overlay -> torrents */
 "%d Torrent Files" = "%d file torrent";
 
@@ -89,10 +86,16 @@
 
 "%d transfers" = "%d trasferimenti";
 
+/* Torrent -> status string */
+"%d web seeds" = "%d seed web";
+
 /* stats -> bytes
    Inspector -> selected torrents */
 
-"%u bytes" = "%u byte";
+"%llu bytes" = "%llu byte";
+
+/* stats window -> times opened */
+"%llu times" = "%llu volte";
 
 /* time string */
 "%u days" = "%u giorni";
@@ -137,6 +140,9 @@
 /* Folder cannot be used alert -> message */
 "\"%@\" cannot be used. The transfer will be paused." = "\"%@\" non può essere usato. Il trasferimento sarà messo in pausa.";
 
+/* Open invalid alert -> title */
+"\"%@\" is not a valid torrent file." = "\"%@\" non è un file torrent valido.";
+
 /* Prefs -> blocklist -> message */
 "A blocklist must first be downloaded" = "Occorre prima scaricare una blocklist";
 
@@ -174,7 +180,10 @@
 "Apply Selected" = "Applica selezionati";
 
 /* Confirm Quit panel -> title */
-"Are you sure you want to quit?" = "Desideri veramente uscire?";
+"Are you sure you want to quit?" = "Vuoi veramente uscire?";
+
+/* Remove built-in tracker alert -> title */
+"Are you sure you want to remove %d built-in trackers?" = "Vuoi veramente rimuovere %d tracker incorporati?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove %d transfers from the transfer list and trash both the data and torrent files?" = "Vuoi veramente rimuovere %d trasferimenti dalla lista e cestinare i dati ed il file torrent?";
@@ -200,6 +209,9 @@
 /* Removal confirm panel -> title */
 "Are you sure you want to remove \"%@\" from the transfer list?" = "Vuoi veramente rimuovere \"%@\" dalla lista?";
 
+/* Remove built-in tracker alert -> title */
+"Are you sure you want to remove a built-in tracker?" = "Vuoi veramente rimuovere un tracker incorporato?";
+
 /* Stats reset -> title */
 "Are you sure you want to reset usage statistics?" = "Vuoi veramente resettare le statistiche d'utilizzo?";
 
@@ -222,18 +234,19 @@
 "bytes" = "byte";
 
 /* Confirm Quit panel -> button
+   Create torrent -> blank address -> button
+   Add torrent -> same name -> button
    Removal confirm panel -> button
    Blocklist -> cancel button
-   Add torrent -> same name -> button
+   Remove built-in tracker alert -> button
    Stats reset -> button */
 
 
 
 
-"Cancel" = "Annulla";
 
-/* Create torrent -> warning -> info */
-"Change the tracker address to create the torrent file." = "Cambia l'indirizzo del tracker per creare il file torrent.";
+
+"Cancel" = "Annulla";
 
 /* Torrent Table -> tooltip */
 "Change transfer settings" = "Cambia le impostazioni per il trasferimento";
@@ -243,9 +256,6 @@
 
 /* Torrent -> status string */
 "Checking existing data (%.2f%%)" = "Verifico dati esistenti (%.2f%%)";
-
-/* Preferences -> Network -> port status */
-"Checking port status" = "Verifica porta...";
 
 /* Folder cannot be used alert -> location button */
 "Choose New Location" = "Scegli una nuova posizione";
@@ -268,19 +278,21 @@
 /* Create torrent -> failed -> warning */
 "Could not write \"%s\": %s." = "Impossibile scrivere \"%1$s\": %2$s.";
 
-/* Create toolbar item -> label */
+/* Create torrent -> blank address -> button
+   Create toolbar item -> label */
+
 "Create" = "Crea";
 
 /* Drag overlay -> file */
 "Create a Torrent File" = "Crea un file torrent";
 
-/* Create toolbar item -> tooltip */
-"Create torrent file" = "Crea file torrent";
-
 /* Create torrent -> select file
    Create toolbar item -> palette label */
 
 "Create Torrent File" = "Crea file torrent";
+
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "Crea file torrent";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Creazione di \"%@\" fallita.";
@@ -290,6 +302,9 @@
 
 /* Inspector -> peer -> status */
 "Currently uploading (interested and not choked)" = "Invio in corso (interessato e non bloccato)";
+
+/* Torrent -> eta string */
+"data not fully available" = "dati non completamente disponibili";
 
 /* Message window -> table column */
 "Date" = "Data";
@@ -308,8 +323,12 @@
 "Do not check disk space again" = "Non controllare nuovamente lo spazio su disco";
 
 /* Open duplicate alert -> button
+   Create torrent -> blank address -> button
+   Remove built-in tracker alert -> button
    Add torrent -> same name -> button
    Stats reset -> button */
+
+
 
 
 "Don't Alert Again" = "Non avvisare nuovamente";
@@ -354,6 +373,9 @@
 
 /* inspector -> peer table -> header tool tip */
 "Downloading From Peer" = "In download dal peer";
+
+/* inspector -> web seed table -> header tool tip */
+"Downloading From Web Seed" = "Download da seed web";
 
 /* inspector -> peer table -> header tool tip
    Inspector -> Peers tab -> table row tooltip */
@@ -426,6 +448,9 @@
 /* Add torrent -> same name -> message */
 "If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "Se stai cercando di utilizzare dati già esistenti, la cartella di origine dei dati dovrebbe essere dentro la cartella di destinazione.";
 
+/* Inspector -> tracker tab */
+"In progress" = "In corso";
+
 /* Message window -> level string
    Message window -> level */
 
@@ -480,13 +505,12 @@
 /* Group table row */
 "No Group" = "Nessun gruppo";
 
-/* Groups -> Button */
-"No Label" = "Nessuna etichetta";
-
 /* Inspector -> selected torrents */
 "No Torrents Selected" = "Nessun torrent selezionato";
 
-/* Groups -> Menu */
+/* Groups -> Menu
+   Groups -> Button */
+
 "None" = "Nessuno";
 
 /* File Outline -> Priority Menu */
@@ -500,7 +524,6 @@
 
 /* Torrent file copy alert -> button
    Move error alert -> button
-   Create torrent -> warning -> button
    Create torrent -> file already exists warning -> button
    Save log alert panel -> button
    Folder cannot be used alert -> button
@@ -509,6 +532,7 @@
    Create torrent -> failed -> button
    Create torrent -> no files -> button
    Download not a torrent -> button
+   Open invalid alert -> button
    About window -> license close button
    Blocklist -> button
    Open duplicate alert -> button
@@ -548,11 +572,11 @@
 /* Open address toolbar item -> palette label */
 "Open Torrent Address" = "Apri indirizzo torrent";
 
-/* Open toolbar item -> tooltip */
-"Open torrent files" = "Apri file torrent";
-
 /* Open toolbar item -> palette label */
 "Open Torrent Files" = "Apri file torrent";
+
+/* Open toolbar item -> tooltip */
+"Open torrent files" = "Apri file torrent";
 
 /* Open address toolbar item -> tooltip */
 "Open torrent web address" = "Apri indirizzo web torrent";
@@ -602,13 +626,13 @@
 "Port" = "Porta";
 
 /* Preferences -> Network -> port status */
+"Port check website is down" = "Il sito per la verifica della porta non è raggiungibile";
+
+/* Preferences -> Network -> port status */
 "Port is closed" = "Porta chiusa";
 
 /* Preferences -> Network -> port status */
 "Port is open" = "Porta aperta";
-
-/* Preferences -> Network -> port status */
-"Port is stealth" = "Porta occultata";
 
 /* file table -> header tool tip
    File Outline -> Menu */
@@ -639,6 +663,13 @@
 /* Groups -> Name */
 "Purple" = "Viola";
 
+/* QuickLook toolbar item -> label
+   QuickLook toolbar item -> palette label
+   QuickLook toolbar item -> tooltip */
+
+
+"Quick Look" = "Visualizzazione rapida";
+
 /* Transmission already running alert -> button
    Confirm Quit panel -> button */
 
@@ -661,11 +692,19 @@
 /* Groups -> Name */
 "Red" = "Rosso";
 
+/* Action menu -> status string toggle */
+"Remaining Time" = "Tempo rimanente";
+
 /* Torrent -> eta string */
 "remaining time unknown" = "tempo rimanente sconosciuto";
 
-/* Removal confirm panel -> button
+/* Preferences -> toolbar item title */
+"Remote" = "Remoto";
+
+/* Remove built-in tracker alert -> button
+   Removal confirm panel -> button
    Remove toolbar item -> label */
+
 
 "Remove" = "Rimuovi";
 
@@ -713,11 +752,11 @@
 /* Torrent -> status string */
 "Seeding" = "In seed";
 
-/* Growl notification title */
-"Seeding Complete" = "Seeding completato";
-
 /* Torrent -> status string */
 "Seeding complete" = "Seeding completato";
+
+/* Growl notification title */
+"Seeding Complete" = "Seeding completato";
 
 /* Torrent -> status string */
 "Seeding to %d of %d peers" = "In seed verso %1$d su %2$d peer";
@@ -786,6 +825,9 @@
 /* Stats window -> title */
 "Statistics" = "Statistiche";
 
+/* Action menu -> status string toggle */
+"Status of Selected Files" = "Stato dei file selezionati";
+
 /* torrent action menu -> ratio stop
    Action menu -> ratio stop */
 
@@ -823,17 +865,20 @@
 /* Torrent file copy alert -> message */
 "The torrent file (%@) cannot be found." = "Impossibile trovare il file torrent (%@).";
 
+/* Open invalid alert -> message */
+"The torrent file cannot be opened because it contains invalid data." = "Non è possibile aprire il file torrent poiché contiene dati non validi.";
+
 /* Open duplicate alert -> message */
 "The torrent file cannot be opened because it is a duplicate of an already added transfer." = "Il file torrent non può essere aperto perché è una copia di un trasferimento che è già stato aggiunto.";
+
+/* Create torrent -> blank address -> message */
+"The torrent file will not be able to be opened. A torrent file with no tracker address is only useful when you plan to upload the file to a tracker website that will add the address for you." = "Il file torrent non potrà essere aperto. Un file torrent senza indirizzo del tracker è utile unicamente qualora si desideri inviare tale file ad un sito web che aggiungerà l'indirizzo del tracker.";
 
 /* Create torrent -> zero size -> title */
 "The total file size is zero bytes." = "La dimensione complessiva del file è pari a zero byte.";
 
-/* Create torrent -> warning -> message */
-"The tracker address is invalid." = "L'indirizzo del tracker non è valido.";
-
-/* Create torrent -> warning -> message */
-"The tracker address must begin with \"http://\" or \"https://\"." = "L'indirizzo del tracker deve cominciare con \"http://\" o \"https://\".";
+/* Remove built-in tracker alert -> message */
+"The tracker address is part of the torrent file. Once removed, Transmission will no longer attempt to contact it." = "L'indirizzo del tracker è parte del file torrent. Dopo averlo rimosso, Transmission non tenterà più di contattarlo.";
 
 /* Torrent disk space alert -> message */
 "The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Il trasferimento sarà messo in pausa. Liberare spazio in %@ o deselezionare alcuni file nel visualizzatore del torrent per continuare.";
@@ -853,6 +898,9 @@
 /* Confirm Quit panel -> message */
 "There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "C'è un trasferimento in corso che sarà messo in pausa all'uscita. Il trasferimento riprenderà automaticamente al prossimo avvio.";
 
+/* Create torrent -> blank address -> title */
+"There is no tracker address." = "Non c'è alcun indirizzo del tracker.";
+
 /* Create torrent -> no files -> warning */
 "There must be at least one file in a folder to create a torrent file." = "Per creare un file torrent occorre che nella cartella sia presente almeno un file.";
 
@@ -861,6 +909,9 @@
 
 /* Move error alert -> title */
 "There was an error moving the data file." = "Si è verificato un errore spostando il file dati.";
+
+/* Remove built-in tracker alert -> message */
+"These tracker addresses are part of the torrent file. Once removed, Transmission will no longer attempt to contact them." = "Questi indirizzi dei tracker sono parte del file torrent. Dopo averli rimossi, Transmission non tenterà più di contattarli.";
 
 /* Create torrent -> no files -> title */
 "This folder contains no files." = "Questa cartella non contiene alcun file.";
@@ -915,16 +966,13 @@
 /* Transmission already running alert -> title */
 "Transmission is already running." = "Transmission è già in esecuzione.";
 
-/* Torrent -> location when deleting original */
+/* Inspector -> torrent location */
 "Transmission Support Folder" = "Cartella di supporto di Transmission";
 
 /* Torrent -> status string
    status bar -> status label */
 
 "UL" = "UL";
-
-/* Preferences -> Network -> port status */
-"Unable to check port status" = "Controllo fallito";
 
 /* File Outline -> Menu */
 "Uncheck Selected" = "Non spuntare selezionati";
@@ -947,6 +995,9 @@
 /* inspector -> peer table -> header tool tip */
 "Uploading To Peer" = "Invio al peer";
 
+/* Inspector -> tracker table */
+"User-Added" = "Aggiunto dall'utente";
+
 /* Torrent -> status string */
 "Waiting to check existing data" = "In attesa di verificare i dati esistenti";
 
@@ -958,6 +1009,9 @@
 
 /* Drag overlay -> url */
 "Web Address" = "Sito web";
+
+/* Torrent -> status string */
+"web seed" = "seed web";
 
 /* Groups -> Name */
 "Yellow" = "Giallo";
