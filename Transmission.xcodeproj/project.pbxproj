@@ -651,6 +651,13 @@
 		A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileOutlineView.h; path = macosx/FileOutlineView.h; sourceTree = "<group>"; };
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileOutlineView.m; path = macosx/FileOutlineView.m; sourceTree = "<group>"; };
 		A2B5BB7A0D9C7C2300FCB650 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/AddWindow.xib; sourceTree = "<group>"; };
+		A2B5DF860E39880000394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/AddWindow.xib; sourceTree = "<group>"; };
+		A2B5DF890E39881000394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/Creator.xib; sourceTree = "<group>"; };
+		A2B5DF8B0E39881900394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/InfoWindow.xib; sourceTree = "<group>"; };
+		A2B5DF8D0E39882200394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		A2B5DF8F0E39882900394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
+		A2B5DF910E39883100394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = macosx/tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2B5DF930E39884200394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = macosx/tr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2BB67780D5BA74600AB0618 /* OpenWeb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = OpenWeb.png; path = macosx/Images/OpenWeb.png; sourceTree = "<group>"; };
 		A2BC19840CA9AF5A00DD302A /* CompleteCheck.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CompleteCheck.png; path = macosx/Images/CompleteCheck.png; sourceTree = "<group>"; };
 		A2BC19DF0CA9D82300DD302A /* evutil.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = evutil.h; path = "third-party/libevent/evutil.h"; sourceTree = "<group>"; };
@@ -1695,6 +1702,7 @@
 				nl,
 				ru,
 				zh_TW,
+				tr,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -2101,6 +2109,7 @@
 				A26AF1050D2855FC00FF7140 /* ru */,
 				A28AFE070DA1C47A00673957 /* zh_TW */,
 				A202FF5D0DDA9275009938FF /* it */,
+				A2B5DF910E39883100394E9A /* tr */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -2115,6 +2124,7 @@
 				A28AFE090DA1C47A00673957 /* zh_TW */,
 				A202FF5F0DDA9275009938FF /* it */,
 				A291477F0E195A0C00F60CB2 /* en */,
+				A2B5DF930E39884200394E9A /* tr */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2129,6 +2139,7 @@
 				A26AF10A0D2855FC00FF7140 /* ru */,
 				A28AFE0B0DA1C47A00673957 /* zh_TW */,
 				A202FF610DDA9275009938FF /* it */,
+				A2B5DF8F0E39882900394E9A /* tr */,
 			);
 			name = PrefsWindow.xib;
 			sourceTree = "<group>";
@@ -2143,6 +2154,7 @@
 				A26AF1080D2855FC00FF7140 /* ru */,
 				A28AFE0A0DA1C47A00673957 /* zh_TW */,
 				A202FF600DDA9275009938FF /* it */,
+				A2B5DF8D0E39882200394E9A /* tr */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -2157,6 +2169,7 @@
 				A2B5BB7A0D9C7C2300FCB650 /* es */,
 				A28AFE050DA1C47A00673957 /* zh_TW */,
 				A202FF5B0DDA9275009938FF /* it */,
+				A2B5DF860E39880000394E9A /* tr */,
 			);
 			name = AddWindow.xib;
 			sourceTree = "<group>";
@@ -2171,6 +2184,7 @@
 				A26AF1040D2855FC00FF7140 /* ru */,
 				A28AFE060DA1C47A00673957 /* zh_TW */,
 				A202FF5C0DDA9275009938FF /* it */,
+				A2B5DF890E39881000394E9A /* tr */,
 			);
 			name = Creator.xib;
 			sourceTree = "<group>";
@@ -2185,6 +2199,7 @@
 				A26AF1060D2855FC00FF7140 /* ru */,
 				A28AFE080DA1C47A00673957 /* zh_TW */,
 				A202FF5E0DDA9275009938FF /* it */,
+				A2B5DF8B0E39881900394E9A /* tr */,
 			);
 			name = InfoWindow.xib;
 			sourceTree = "<group>";
