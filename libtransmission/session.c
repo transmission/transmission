@@ -592,14 +592,12 @@ tr_sessionLoadTorrents ( tr_handle   * h,
                 tr_torrent * tor;
                 char filename[MAX_PATH_LENGTH];
                 tr_buildPath( filename, sizeof(filename), dirname, d->d_name, NULL );
-                if( tr_stringEndsWith( filename, ".torrent" ) )
-                {
-                    tr_ctorSetMetainfoFromFile( ctor, filename );
-                    tor = tr_torrentNew( h, ctor, NULL );
-                    if( tor ) {
-                        tr_list_append( &list, tor );
-                        ++n;
-                    }
+
+                tr_ctorSetMetainfoFromFile( ctor, filename );
+                tor = tr_torrentNew( h, ctor, NULL );
+                if( tor ) {
+                    tr_list_append( &list, tor );
+                    ++n;
                 }
             }
         }
