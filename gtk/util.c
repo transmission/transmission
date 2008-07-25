@@ -159,13 +159,16 @@ tr_strltime( char * buf, int seconds, size_t buflen )
     return buf;
 }
 
-
 char *
-rfc822date( time_t time )
+gtr_localtime( time_t time )
 {
     const struct tm tm = *localtime( &time );
-    char buf[128];
-    strftime( buf, sizeof(buf), "%a, %d %b %Y %T %Z", &tm );
+    char buf[256], *eoln;
+
+    g_strlcpy( buf, asctime( &tm ), sizeof( buf ) );
+    if(( eoln = strchr( buf, '\n' )))
+        *eoln = '\0';
+
     return g_locale_to_utf8( buf, -1, NULL, NULL, NULL );
 }
 

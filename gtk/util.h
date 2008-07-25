@@ -51,7 +51,7 @@ char* tr_strlratio( char * buf, double ratio, size_t buflen );
 /* return a human-readable string for the time given in seconds. */
 char* tr_strltime( char * buf, int secs, size_t buflen );
 
-char* rfc822date( time_t epoch_sec );
+char* gtr_localtime( time_t time );
 
 /* create a directory and any missing parent directories */
 gboolean

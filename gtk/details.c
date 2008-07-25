@@ -789,7 +789,7 @@ refresh_time_lb( GtkWidget * l, time_t t )
     if( !t )
         gtk_label_set_text( GTK_LABEL( l ), never );
     else {
-        char * str = rfc822date( t );
+        char * str = gtr_localtime( t );
         gtk_label_set_text( GTK_LABEL( l ), str );
         g_free( str );
     }

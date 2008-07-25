@@ -97,13 +97,15 @@ doSave( GtkWindow      * parent,
             gtk_tree_model_get( model, &iter,
                                 COL_TR_MSG, &node,
                                 -1 );
-            date = rfc822date( node->when );
+            date = gtr_localtime( node->when );
             switch( node->level ) {
                 case TR_MSG_DBG: levelStr = "debug"; break;
                 case TR_MSG_ERR: levelStr = "error"; break;
                 default:         levelStr = "     "; break;
             }
-            fprintf( fp, "%s\t%s\t%s\t%s\n", date, levelStr, node->name, node->message );
+            fprintf( fp, "%s\t%s\t%s\t%s\n", date, levelStr,
+                     ( node->name ? node->name : "" ),
+                     ( node->message ? node->message : "" ) );
 
             g_free( date );
         }
