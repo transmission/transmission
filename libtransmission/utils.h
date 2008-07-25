@@ -83,7 +83,7 @@
 #if !defined(_)
 #if defined(SYS_DARWIN)
   #define _(a) (a)
-#elif HAVE_LIBINTL
+#elif defined(HAVE_LIBINTL_H)
   #include <libintl.h>
   #define _(a) gettext (a)
 #else

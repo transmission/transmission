@@ -363,6 +363,7 @@ main( int argc, char ** argv )
     cbdata->details2tor = g_hash_table_new( g_direct_hash, g_direct_equal );
 
     /* bind the gettext domain */
+    setlocale( LC_ALL, "" );
     bindtextdomain( domain, TRANSMISSIONLOCALEDIR );
     bind_textdomain_codeset( domain, "UTF-8" );
     textdomain( domain );
