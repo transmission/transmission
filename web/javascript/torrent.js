@@ -126,8 +126,8 @@ Torrent.prototype =
 	isDownloading: function() { return this.state() == Torrent._StatusDownloading; },
 	isSeeding: function() { return this.state() == Torrent._StatusSeeding; },
 	name: function() { return this._name; },
-	peersDownloading: function() { return this._peers_downloading; },
-	peersUploading: function() { return this._peers_uploading; },
+	peersSendingToUs: function() { return this._peers_sending_to_us; },
+	peersGettingFromUs: function() { return this._peers_getting_from_us; },
 	getPercentDone: function() {
 		if( !this._sizeWhenDone ) return 1.0;
 		return ( this._sizeWhenDone - this._leftUntilDone )
@@ -271,23 +271,23 @@ Torrent.prototype =
 		}
 		
 		// Set the regularly-changing torrent variables
-		this._id                = data.id;
-		this._completed         = data.haveUnchecked + data.haveValid;
-		this._verified          = data.haveValid;
-		this._download_total    = data.downloadedEver;
-		this._upload_total      = data.uploadedEver;
-		this._download_speed    = data.rateDownload;
-		this._upload_speed      = data.rateUpload;
-		this._peers_downloading = data.peersGettingFromUs;
-		this._peers_uploading   = data.peersSendingToUs;
-		this._peers_total       = data.peersKnown;
-		this._error             = data.error;
-		this._error_message     = data.errorString;
-		this._eta               = data.eta;
-		this._swarm_speed       = data.swarmSpeed;
-		this._total_leechers    = Math.max( 0, data.leechers );
-		this._total_seeders     = Math.max( 0, data.seeders );
-		this._state             = data.status;
+		this._id                    = data.id;
+		this._completed             = data.haveUnchecked + data.haveValid;
+		this._verified              = data.haveValid;
+		this._download_total        = data.downloadedEver;
+		this._upload_total          = data.uploadedEver;
+		this._download_speed        = data.rateDownload;
+		this._upload_speed          = data.rateUpload;
+		this._peers_getting_from_us = data.peersGettingFromUs;
+		this._peers_sending_to_us   = data.peersSendingToUs;
+		this._peers_total           = data.peersKnown;
+		this._error                 = data.error;
+		this._error_message         = data.errorString;
+		this._eta                   = data.eta;
+		this._swarm_speed           = data.swarmSpeed;
+		this._total_leechers        = Math.max( 0, data.leechers );
+		this._total_seeders         = Math.max( 0, data.seeders );
+		this._state                 = data.status;
 	},
 
 	refreshHTML: function()
@@ -350,7 +350,7 @@ Torrent.prototype =
 				peer_details = this.stateStr( );
 			else {
 				peer_details = 'Downloading from '
-				             + this._peers_downloading
+				             + this.peersSendingToUs()
 				             + ' of '
 				             + this._peers_total
 				             + ' peers - DL: '
@@ -390,7 +390,7 @@ Torrent.prototype =
 				peer_details = this.stateStr( );
 			else
 				peer_details = 'Seeding to '
-				             + this._peers_uploading
+				             + this.peersGettingFromUs()
 				             + ' of '
 				             + this._peers_total
 				             + ' peers - UL: '

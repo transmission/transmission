@@ -863,8 +863,8 @@ Transmission.prototype =
 			total_download_speed += t.downloadSpeed();
 			total_seeders        += t.totalSeeders();
 			total_leechers       += t.totalLeechers();
-			total_upload_peers   += t.peersUploading();
-			total_download_peers += t.peersDownloading();
+			total_upload_peers   += t.peersGettingFromUs();
+			total_download_peers += t.peersSendingToUs();
 			total_swarm_speed    += t.swarmSpeed();
 			if( total_state == null )
 				total_state = t.stateStr();
