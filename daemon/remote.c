@@ -172,6 +172,28 @@ addFiles( tr_benc * args, const char * key, const char * arg )
     }
 }
 
+#define TR_N_ELEMENTS( ary ) ( sizeof( ary ) / sizeof( *ary ) )
+
+static const char * files_keys[] = {
+    "files", "name", "priorities", "wanted"
+};
+
+static const char * details_keys[] = {
+    "activityDate", "addedDate", "announceResponse", "announceURL",
+    "comment", "corruptEver", "creator", "dateCreated", "doneDate",
+    "downloadedEver", "errorString", "eta", "hashString", "haveUnchecked",
+    "haveValid", "id", "isPrivate", "lastAnnounceTime", "lastScrapeTime",
+    "leechers", "leftUntilDone", "name", "nextAnnounceTime", "nextScrapeTime",
+    "pieceCount", "pieceSize", "rateDownload", "rateUpload", "recheckProgress",
+    "scrapeResponse", "seeders", "sizeWhenDone", "sizeWhenDone", "startDate",
+    "status", "timesCompleted", "totalSize", "uploadedEver" 
+};
+
+static const char * list_keys[] = {
+    "downloadedEver", "eta", "id", "leftUntilDone", "name", "rateDownload",
+    "rateUpload", "sizeWhenDone", "status", "uploadedEver"
+};
+
 static void
 readargs( int argc, const char ** argv )
 {
@@ -184,11 +206,11 @@ readargs( int argc, const char ** argv )
 
     while(( c = tr_getopt( getUsage(), argc, argv, opts, &optarg )))
     {
+        int i, n;
         char buf[MAX_PATH_LENGTH];
         int addArg = TRUE;
-        tr_benc top, *args;
+        tr_benc top, *args, *fields;
         tr_bencInitDict( &top, 3 );
-        int64_t fields = 0;
         args = tr_bencDictAddDict( &top, "arguments", 0 );
 
         switch( c )
@@ -220,10 +242,10 @@ readargs( int argc, const char ** argv )
             case 'f': tr_bencDictAddStr( &top, "method", "torrent-get" );
                       tr_bencDictAddInt( &top, "tag", TAG_FILES );
                       addIdArg( args, id );
-                      fields = TR_RPC_TORRENT_ID
-                             | TR_RPC_TORRENT_FILES
-                             | TR_RPC_TORRENT_PRIORITIES;
-                      tr_bencDictAddInt( args, "fields", fields );
+                      n = TR_N_ELEMENTS( files_keys );
+                      fields = tr_bencDictAddList( args, "fields", n );
+                      for( i=0; i<n; ++i )
+                          tr_bencListAddStr( fields, files_keys[i] );
                       break;
             case 'g': tr_bencDictAddStr( &top, "method", "torrent-set" );
                       addIdArg( args, id );
@@ -236,24 +258,17 @@ readargs( int argc, const char ** argv )
             case 'i': tr_bencDictAddStr( &top, "method", "torrent-get" );
                       tr_bencDictAddInt( &top, "tag", TAG_DETAILS );
                       addIdArg( args, id );
-                      fields = TR_RPC_TORRENT_ACTIVITY
-                          | TR_RPC_TORRENT_ANNOUNCE
-                          | TR_RPC_TORRENT_ERROR
-                          | TR_RPC_TORRENT_HISTORY
-                          | TR_RPC_TORRENT_ID
-                          | TR_RPC_TORRENT_INFO
-                          | TR_RPC_TORRENT_SCRAPE
-                          | TR_RPC_TORRENT_SIZE
-                          | TR_RPC_TORRENT_TRACKER_STATS;
-                      tr_bencDictAddInt( args, "fields", fields );
+                      n = TR_N_ELEMENTS( details_keys );
+                      fields = tr_bencDictAddList( args, "fields", n );
+                      for( i=0; i<n; ++i )
+                          tr_bencListAddStr( fields, details_keys[i] );
                       break;
             case 'l': tr_bencDictAddStr( &top, "method", "torrent-get" );
                       tr_bencDictAddInt( &top, "tag", TAG_LIST );
-                      fields = TR_RPC_TORRENT_ID
-                             | TR_RPC_TORRENT_ACTIVITY
-                             | TR_RPC_TORRENT_HISTORY
-                             | TR_RPC_TORRENT_SIZE;
-                      tr_bencDictAddInt( args, "fields", fields );
+                      n = TR_N_ELEMENTS( list_keys );
+                      fields = tr_bencDictAddList( args, "fields", n );
+                      for( i=0; i<n; ++i )
+                          tr_bencListAddStr( fields, list_keys[i] );
                       break;
             case 'm': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddInt( args, "port-forwarding-enabled", 1 );
@@ -725,13 +740,12 @@ processResponse( const char * host, int port,
         const char * str;
         tr_bencDictFindInt( &top, "tag", &tag );
 
-        if( tr_bencDictFindStr( &top, "result", &str ) )
-            printf( "%s:%d responded: \"%s\"\n", host, port, str );
         switch( tag ) {
             case TAG_FILES: printFileList( &top ); break;
             case TAG_DETAILS: printDetails( &top ); break;
             case TAG_LIST: printTorrentList( &top ); break;
-            default: break;
+            default: if( tr_bencDictFindStr( &top, "result", &str ) ) 
+                         printf( "%s:%d responded: \"%s\"\n", host, port, str );
         }
 
         tr_bencFree( &top );

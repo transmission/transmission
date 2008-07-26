@@ -21,23 +21,6 @@ RPC._PeerPort               = 'port';
 RPC._UpSpeedLimited         = 'speed-limit-up-enabled';
 RPC._DownSpeedLimited       = 'speed-limit-down-enabled';
 
-RPC._TorrentActivity        = (1<<0);
-RPC._TorrentAnnounce        = (1<<1);
-RPC._TorrentError           = (1<<2);
-RPC._TorrentFiles           = (1<<3);
-RPC._TorrentHistory         = (1<<4);
-RPC._TorrentId              = (1<<5);
-RPC._TorrentInfo            = (1<<6);
-RPC._TorrentLimits          = (1<<7);
-RPC._TorrentPeers           = (1<<8);
-RPC._TorrentPeerStats       = (1<<9);
-RPC._TorrentPriorities      = (1<<10);
-RPC._TorrentScrape          = (1<<11);
-RPC._TorrentSize            = (1<<12);
-RPC._TorrentTrackerStats    = (1<<13);
-RPC._TorrentTrackers        = (1<<14);
-RPC._TorrentWebseeds        = (1<<15);
-
 function TransmissionRemote( controller )
 {
 	this.initialize( controller );
@@ -103,16 +86,14 @@ TransmissionRemote.prototype =
 		var o = { };
 		o.method = 'torrent-get'
 		o.arguments = { };
-		o.arguments.fields = RPC._TorrentActivity
-                                   + RPC._TorrentAnnounce
-                                   + RPC._TorrentError
-                                   + RPC._TorrentHistory
-                                   + RPC._TorrentId
-                                   + RPC._TorrentInfo
-                                   + RPC._TorrentLimits
-                                   + RPC._TorrentScrape
-                                   + RPC._TorrentSize
-                                   + RPC._TorrentTrackerStats;
+		o.arguments.fields = [
+			'addedDate', 'announceURL', 'comment', 'creator',
+			'dateCreated', 'downloadedEver', 'error', 'errorString',
+			'eta', 'hashString', 'haveUnchecked', 'haveValid', 'id',
+			'isPrivate', 'leechers', 'leftUntilDone', 'name',
+			'peersGettingFromUs', 'peersKnown', 'peersSendingToUs',
+			'rateDownload', 'rateUpload', 'seeders', 'sizeWhenDone',
+			'status', 'swarmSpeed', 'totalSize', 'uploadedEver' ];
 		this.sendRequest( RPC._Root, $.toJSON(o), function(data) {
 			tr.updateTorrents( data.arguments.torrents );
 		}, "json" );
