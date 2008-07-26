@@ -60,7 +60,6 @@ static tr_option opts[] =
     { 'f', "files",        "List the current torrent's files", "f", 0, NULL },
     { 'g', "get",          "Mark files for download", "g", 1, "<files>" },
     { 'G', "no-get",       "Mark files for not downloading", "G", 1, "<files>" },
-    { 'h', "help",         "Show this help page and exit", "h", 0, NULL },
     { 'i', "info",         "Show details of the current torrent(s)", "i", 0, NULL },
     { 'l', "list",         "List all torrents", "l", 0, NULL },
     { 'm', "portmap",      "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
