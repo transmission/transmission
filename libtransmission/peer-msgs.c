@@ -88,8 +88,8 @@ enum
 
     /* used in lowering the outMessages queue period */
     IMMEDIATE_PRIORITY_INTERVAL_SECS = 0,
-    HIGH_PRIORITY_INTERVAL_SECS = 5,
-    LOW_PRIORITY_INTERVAL_SECS = 30
+    HIGH_PRIORITY_INTERVAL_SECS = 2,
+    LOW_PRIORITY_INTERVAL_SECS = 20
 };
 
 /**
@@ -288,6 +288,11 @@ struct tr_peermsgs
     uint16_t minActiveRequests;
     uint16_t maxActiveRequests;
 
+    /* how long the outMessages batch should be allowed to grow before
+     * it's flushed -- some messages (like requests >:) should be sent
+     * very quickly; others aren't as urgent. */
+    int outMessagesBatchPeriod;
+
     tr_peer * info;
 
     tr_handle * handle;
@@ -313,11 +318,6 @@ struct tr_peermsgs
 
     /* when we started batching the outMessages */
     time_t outMessagesBatchedAt;
-
-    /* how long the outMessages batch should be allowed to grow before
-     * it's flushed -- some messages (like requests >:) should be sent
-     * very quickly; others aren't as urgent. */
-    int outMessagesBatchPeriod;
     
     tr_bitfield * peerAllowedPieces;
 
@@ -1670,7 +1670,7 @@ pulse( void * vmsgs )
 
             len -= outlen;
             msgs->clientSentAnythingAt = now;
-            msgs->sendingBlock = len!=0;
+            msgs->sendingBlock = len != 0;
 
             dbgmsg( msgs, "wrote %d bytes; %d left in block", (int)outlen, (int)len );
         }

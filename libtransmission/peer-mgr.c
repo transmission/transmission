@@ -43,12 +43,8 @@ enum
     /* how frequently to change which peers are choked */
     RECHOKE_PERIOD_MSEC = (10 * 1000),
 
-    /* how frequently to refill peers' request lists */
-    REFILL_PERIOD_MSEC = 666,
-
-    /* following the BT spec, we consider ourselves `snubbed' if 
-     * we're we don't get piece data from a peer in this long */
-    SNUBBED_SEC = 60,
+    /* minimum interval for refilling peers' request lists */
+    REFILL_PERIOD_MSEC = 333,
 
     /* when many peers are available, keep idle ones this long */
     MIN_UPLOAD_IDLE_SECS = (60 * 3),
@@ -66,7 +62,8 @@ enum
      * this throttle is to avoid overloading the router */
     MAX_CONNECTIONS_PER_SECOND = 8,
 
-    /* number of unchoked peers per torrent */
+    /* number of unchoked peers per torrent.
+     * FIXME: this probably ought to be configurable */
     MAX_UNCHOKED_PEERS = 12,
 
     /* number of bad pieces a peer is allowed to send before we ban them */
@@ -1526,8 +1523,8 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
 
 struct ChokeData
 {
-    uint8_t doUnchoke;
-    uint8_t isInterested;
+    unsigned int  doUnchoke     : 1;
+    unsigned int  isInterested  : 1;
     uint32_t rate;
     tr_peer * peer;
 };
@@ -1811,8 +1808,8 @@ getPeerCandidates( Torrent * t, int * setmeSize )
          * hold off on this peer to give another one a try instead */
         if( ( now - atom->piece_data_time ) > 30 )
         {
-            int minWait = (60 * 10); /* ten minutes */
-            int maxWait = (60 * 30); /* thirty minutes */
+            int minWait = (60 * 5); /* five minutes */
+            int maxWait = minWait * 3;
             int wait = atom->numFails * minWait;
             if( wait < minWait ) wait = minWait;
             if( wait > maxWait ) wait = maxWait;
