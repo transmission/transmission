@@ -238,7 +238,7 @@ const struct tr_option options[] = {
     { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", 0, NULL },
     { 'g', "config-dir",   "Where to look for configuration files", "g", 1, "<path>" },
     { 'p', "port", "RPC port (Default: "TR_DEFAULT_RPC_PORT_STR")", "p", 1, "<port>" },
-    { 't', "auth",         "Requre authentication",           "t", 0, NULL },
+    { 't', "auth",         "Require authentication",          "t", 0, NULL },
     { 'T', "no-auth",      "Don't require authentication",    "T", 0, NULL },
     { 'u', "username",     "Set username for authentication", "u", 1, "<username>" },
     { 'v', "password",     "Set password for authentication", "v", 1, "<password>" },
