@@ -20,6 +20,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.30
    + Status strings are toggled from the action button (they are no longer clickable)
    + Colors in pieces bar and pieces box more accurately reflect their corresponding values
    + The port checker now uses our own portcheck.transmissionbt.com
+   + Turkish localization
 - GTK+
    + Add options to inhibit hibernation and to toggle the tray icon
    + Various bug fixes and usability improvements
