@@ -214,7 +214,7 @@
       {
          "arguments": {
              "fields": 2080,
-             "fields": [ "name", "totalSize" ],
+             "fields": [ "id", "name", "totalSize" ],
              "sort-method": "name"
          }
          "method": "torrent-get",

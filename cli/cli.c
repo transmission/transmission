@@ -389,7 +389,7 @@ main( int argc, char ** argv )
         char line[LINEWIDTH];
         const tr_stat * st;
 
-        tr_wait( 1000 );
+        tr_wait( 200 );
 
         if( gotsig ) {
             gotsig = 0;
