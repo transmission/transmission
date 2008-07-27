@@ -183,9 +183,11 @@ static const char * details_keys[] = {
     "downloadedEver", "errorString", "eta", "hashString", "haveUnchecked",
     "haveValid", "id", "isPrivate", "lastAnnounceTime", "lastScrapeTime",
     "leechers", "leftUntilDone", "name", "nextAnnounceTime", "nextScrapeTime",
+    "peersConnected", "peersGettingFromUs", "peersSendingToUs",
     "pieceCount", "pieceSize", "rateDownload", "rateUpload", "recheckProgress",
     "scrapeResponse", "seeders", "sizeWhenDone", "sizeWhenDone", "startDate",
-    "status", "timesCompleted", "totalSize", "uploadedEver" 
+    "status", "timesCompleted", "totalSize", "uploadedEver",
+    "webseeds", "webseedsSendingToUs"
 };
 
 static const char * list_keys[] = {
@@ -474,10 +476,11 @@ printDetails( tr_benc * top )
         for( ti=0, tCount=tr_bencListSize( torrents ); ti<tCount; ++ti )
         {
             tr_benc * t = tr_bencListChild( torrents, ti );
+            tr_benc * l;
             const char * str;
             char buf[512];
             char buf2[512];
-            int64_t i, j;
+            int64_t i, j, k;
 
             printf( "NAME\n" );
             if( tr_bencDictFindInt( t, "id", &i ) )
@@ -496,7 +499,6 @@ printDetails( tr_benc * top )
                 else
                     *buf = '\0';
                 printf( "  State: %s%s\n", torrentStatusToString( i ), buf );
-
             }
 
             if( tr_bencDictFindInt( t, "sizeWhenDone", &i ) &&
@@ -544,6 +546,25 @@ printDetails( tr_benc * top )
             }
             if( tr_bencDictFindStr( t, "errorString", &str ) && str && *str )
                 printf( "  Error: %s\n", str );
+
+            if( tr_bencDictFindInt( t, "peersConnected", &i ) &&
+                tr_bencDictFindInt( t, "peersGettingFromUs", &j ) &&
+                tr_bencDictFindInt( t, "peersSendingToUs", &k ) )
+            {
+                printf( "  Peers: "
+                        "connected to %"PRId64", "
+                        "uploading to %"PRId64", "
+                        "downloading from %"PRId64"\n",
+                        i, j, k );
+            }
+                
+            if( tr_bencDictFindList( t, "webseeds", &l ) &&
+                tr_bencDictFindInt( t, "webseedsSendingToUs", &i ) )
+            {
+                const int64_t n = tr_bencListSize( l );
+                if( n > 0 )
+                        printf( "  Web Seeds: downloading from %"PRId64" of %"PRId64" web seeds\n", i, n );
+            }
             printf( "\n" );
             
             printf( "HISTORY\n" );
