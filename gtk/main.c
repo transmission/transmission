@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <locale.h>
 #include <sys/param.h>
 #include <signal.h>
 #include <string.h>
