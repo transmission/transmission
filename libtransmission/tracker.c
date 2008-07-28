@@ -666,7 +666,7 @@ struct tr_tracker_handle
     tr_timer * pulseTimer;
 };
 
-static int pulse( void * vsession );
+static int trackerPulse( void * vsession );
 
 static void
 ensureGlobalsExist( tr_session * session )
@@ -674,7 +674,7 @@ ensureGlobalsExist( tr_session * session )
     if( session->tracker == NULL )
     {
         session->tracker = tr_new0( struct tr_tracker_handle, 1 );
-        session->tracker->pulseTimer = tr_timerNew( session, pulse, session, PULSE_INTERVAL_MSEC );
+        session->tracker->pulseTimer = tr_timerNew( session, trackerPulse, session, PULSE_INTERVAL_MSEC );
         dbgmsg( NULL, "creating tracker timer" );
     }
 }
@@ -764,7 +764,7 @@ enqueueRequest( tr_session * session, tr_tracker * tracker, int reqtype )
 }
 
 static int
-pulse( void * vsession )
+trackerPulse( void * vsession )
 {
     tr_session * session = vsession;
     struct tr_tracker_handle * th = session->tracker;
@@ -813,7 +813,7 @@ onReqDone( tr_session * session )
     {
         --session->tracker->runningCount;
         dbgmsg( NULL, "decrementing runningCount to %d", session->tracker->runningCount );
-        pulse( session );
+        trackerPulse( session );
     }
 }
 

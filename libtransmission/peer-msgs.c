@@ -67,7 +67,7 @@ enum
     KEEPALIVE_INTERVAL_SECS = 100,
 
     PEX_INTERVAL            = (90 * 1000), /* msec between sendPex() calls */
-    PEER_PULSE_INTERVAL     = (50),        /* msec between pulse() calls */
+    PEER_PULSE_INTERVAL     = (50),        /* msec between peerPulse() calls */
     RATE_PULSE_INTERVAL     = (250),       /* msec between ratePulse() calls */
 
     MAX_QUEUE_SIZE          = (100),
@@ -835,7 +835,7 @@ pumpRequestQueue( tr_peermsgs * msgs )
 }
 
 static int
-pulse( void * vmsgs );
+peerPulse( void * vmsgs );
 
 static int
 requestQueueIsFull( const tr_peermsgs * msgs )
@@ -1545,7 +1545,7 @@ clientGotBlock( tr_peermsgs                * msgs,
 static void
 didWrite( struct bufferevent * evin UNUSED, void * vmsgs )
 {
-    pulse( vmsgs );
+    peerPulse( vmsgs );
 }
 
 static ReadState
@@ -1645,7 +1645,7 @@ popNextRequest( tr_peermsgs * msgs, struct peer_request * setme )
 }
 
 static int
-pulse( void * vmsgs )
+peerPulse( void * vmsgs )
 {
     const time_t now = time( NULL );
     tr_peermsgs * msgs = vmsgs;
@@ -1922,7 +1922,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->info->peerIsInterested = 0;
     m->info->have = tr_bitfieldNew( torrent->info.pieceCount );
     m->state = AWAITING_BT_LENGTH;
-    m->pulseTimer = tr_timerNew( m->handle, pulse, m, PEER_PULSE_INTERVAL );
+    m->pulseTimer = tr_timerNew( m->handle, peerPulse, m, PEER_PULSE_INTERVAL );
     m->rateTimer = tr_timerNew( m->handle, ratePulse, m, RATE_PULSE_INTERVAL );
     m->pexTimer = tr_timerNew( m->handle, pexPulse, m, PEX_INTERVAL );
     m->outMessages = evbuffer_new( );
