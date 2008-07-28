@@ -51,6 +51,13 @@
 - (void) awakeFromNib
 {
     [fButton setTitle: NSLocalizedString(@"Cancel", "Blocklist -> cancel button")];
+    
+    float oldWidth = [fButton frame].size.width;
+    [fButton sizeToFit];
+    NSRect buttonFrame = [fButton frame];
+    buttonFrame.origin.x -= buttonFrame.size.width - oldWidth;
+    [fButton setFrame: buttonFrame];
+    
     [fTextField setStringValue: [NSLocalizedString(@"Connecting to site", "Blocklist -> message") stringByAppendingEllipsis]];
     
     [fProgressBar setUsesThreadedAnimation: YES];
