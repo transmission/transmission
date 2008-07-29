@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-06-15 06:58+0000\n"
+"PO-Revision-Date: 2008-07-26 12:20+0000\n"
 "Last-Translator: Mark Krapivner <mark125@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-07-24 20:56+0000\n"
+"X-Launchpad-Export-Date: 2008-07-29 01:01+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Language: Hebrew\n"
 
@@ -271,7 +271,7 @@ msgstr "_פתח תיקייה"
 
 #: ../gtk/actions.c:131
 msgid "_Contents"
-msgstr ""
+msgstr "_תכנים"
 
 #: ../gtk/actions.c:133
 msgid "Ask Tracker for _More Peers"
@@ -292,7 +292,7 @@ msgstr "אפשרויות טורנט"
 
 #: ../gtk/add-dialog.c:253
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "_העבר את קובץ המקור לאשפה"
 
 #: ../gtk/add-dialog.c:254 ../gtk/tr-prefs.c:314
 msgid "_Start when added"
@@ -300,7 +300,7 @@ msgstr "_התחל בהוספה"
 
 #: ../gtk/add-dialog.c:265
 msgid "_Torrent file:"
-msgstr ""
+msgstr "קובץ _טורנט"
 
 #: ../gtk/add-dialog.c:269
 msgid "Select Source File"
@@ -320,7 +320,7 @@ msgstr "הוסף טורנט"
 
 #: ../gtk/add-dialog.c:381 ../gtk/tr-prefs.c:310
 msgid "Display _options dialog"
-msgstr ""
+msgstr "הצג חלון _אפשרויות"
 
 #: ../gtk/conf.c:60 ../gtk/makemeta-ui.c:120 ../libtransmission/metainfo.c:182
 #: ../libtransmission/utils.c:514 ../libtransmission/utils.c:525
@@ -376,7 +376,7 @@ msgstr ""
 
 #: ../gtk/details.c:559
 msgid "Downloading from this peer"
-msgstr ""
+msgstr "מוריד מהמקור הזה"
 
 #: ../gtk/details.c:560
 msgid "We would download from this peer if they would let us"
@@ -640,11 +640,11 @@ msgstr "קריאה ידנית תתאפשר בעוד:"
 
 #: ../gtk/details.c:1247
 msgid "In progress"
-msgstr ""
+msgstr "התהליך"
 
 #: ../gtk/details.c:1290
 msgid "Now"
-msgstr ""
+msgstr "עכשיו"
 
 #. %1$s is torrent name
 #. %2$s its file size
@@ -768,11 +768,11 @@ msgstr "_נמוכה"
 
 #: ../gtk/file-list.c:675
 msgid "_Ignore"
-msgstr ""
+msgstr "_התעלם"
 
 #: ../gtk/file-list.c:678
 msgid "_Download"
-msgstr ""
+msgstr "_הורדה"
 
 #: ../gtk/main.c:351
 msgid "Start with all torrents paused"
@@ -882,7 +882,7 @@ msgstr[1] "<i>%1$s; %2$'d קבצים</i>"
 
 #: ../gtk/makemeta-ui.c:298
 msgid "Choose Directory"
-msgstr ""
+msgstr "בחר תיקייה"
 
 #: ../gtk/makemeta-ui.c:304
 msgid "Choose File"
@@ -920,7 +920,7 @@ msgstr "טורנט _פרטי"
 #: ../libtransmission/blocklist.c:265
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
-msgstr ""
+msgstr "לא ניתן לשמור קובץ \"%1$s\": %2$s"
 
 #: ../gtk/msgwin.c:132
 msgid "Save Log"
@@ -1166,7 +1166,7 @@ msgstr "מוסיף טורנטים"
 
 #: ../gtk/tr-prefs.c:302
 msgid "Automatically _add torrents from:"
-msgstr ""
+msgstr "אוטומטית _הוסף טורנטים מ:"
 
 #: ../gtk/tr-prefs.c:318
 msgid "Mo_ve source files to Trash"
@@ -1182,7 +1182,7 @@ msgstr[1] ""
 #: ../gtk/tr-prefs.c:398
 #, c-format
 msgid "Unable to get blocklist."
-msgstr ""
+msgstr "לא ניתן להשיג רשימת חסומים."
 
 #: ../gtk/tr-prefs.c:409
 #, c-format
@@ -1197,24 +1197,24 @@ msgstr ""
 #: ../gtk/tr-prefs.c:433
 #, c-format
 msgid "Parsing blocklist..."
-msgstr ""
+msgstr "עובר על רשימת חסומים..."
 
 #: ../gtk/tr-prefs.c:440
 #, c-format
 msgid "Blocklist updated with %'d entries"
-msgstr ""
+msgstr "רשימת חסומים התעדכנה עם %'d רשומות"
 
 #: ../gtk/tr-prefs.c:481
 msgid "Updating Blocklist"
-msgstr ""
+msgstr "מעדכן רשימת חסומים"
 
 #: ../gtk/tr-prefs.c:483
 msgid "Retrieving blocklist..."
-msgstr ""
+msgstr "מוריד רשימת חסומים"
 
 #: ../gtk/tr-prefs.c:527
 msgid "_Update Blocklist"
-msgstr ""
+msgstr "_עדכן רשימת חסומים"
 
 #: ../gtk/tr-prefs.c:540
 msgid "_Ignore unencrypted peers"
@@ -1251,17 +1251,17 @@ msgstr "דחה"
 
 #: ../gtk/tr-prefs.c:794
 msgid "Web Interface"
-msgstr ""
+msgstr "מנשק דפדפן"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:797
 msgid "_Enable web interface"
-msgstr ""
+msgstr "_הפעל מנשק דפדפן"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:810
 msgid "_Require username"
-msgstr ""
+msgstr "_נדרש שם משתמש"
 
 #. username
 #: ../gtk/tr-prefs.c:818 ../gtk/tr-prefs.c:1034
@@ -1271,7 +1271,7 @@ msgstr "שם _משתמש:"
 #. password
 #: ../gtk/tr-prefs.c:825 ../gtk/tr-prefs.c:1040
 msgid "Pass_word:"
-msgstr ""
+msgstr "סיס_מה:"
 
 #: ../gtk/tr-prefs.c:850
 msgid "Access control list:"
@@ -1307,19 +1307,19 @@ msgstr "פרוקסי לטראקר"
 
 #: ../gtk/tr-prefs.c:999
 msgid "Connect to tracker via a pro_xy"
-msgstr ""
+msgstr "התחבר לטראקר דרך שרת פרוק_סי"
 
 #: ../gtk/tr-prefs.c:1004
 msgid "Proxy _server:"
-msgstr ""
+msgstr "_שרת לפרוקסי:"
 
 #: ../gtk/tr-prefs.c:1012
 msgid "Proxy _port:"
-msgstr ""
+msgstr "_פורט לפרוקסי:"
 
 #: ../gtk/tr-prefs.c:1015
 msgid "Proxy _type:"
-msgstr ""
+msgstr "_סוג הפרוקסי:"
 
 #: ../gtk/tr-prefs.c:1028
 msgid "_Authentication is required"
@@ -1347,7 +1347,7 @@ msgstr "רשת"
 
 #: ../gtk/tr-prefs.c:1127
 msgid "Web"
-msgstr ""
+msgstr "רשת"
 
 #: ../gtk/tr-torrent.c:211
 #, c-format
@@ -1368,7 +1368,7 @@ msgstr "ממתין לבדיקת הנתונים המקומיים (%.1f%% נבדק
 #: ../gtk/tr-torrent.c:254
 #, c-format
 msgid "Data not fully available (%.1f%%)"
-msgstr ""
+msgstr "לא כל הנתונים זמינים (%.1f%%)"
 
 #: ../gtk/tr-torrent.c:256
 #, c-format
@@ -1457,7 +1457,7 @@ msgstr "ירד: %1$s, הועלה: %2$s"
 #: ../gtk/tr-window.c:687
 #, c-format
 msgid "Tracker will allow requests in %s"
-msgstr ""
+msgstr "הטראקר יאפשר בקשות בעוד %s"
 
 #: ../gtk/util.c:83
 #, c-format
@@ -1536,21 +1536,21 @@ msgstr[1] "%'d שניות"
 #: ../gtk/util.c:312
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
-msgstr ""
+msgstr "קובץ הטורנט \"%s\" מכיל נתונים לא תקינים."
 
 #: ../gtk/util.c:313
 #, c-format
 msgid "The torrent file \"%s\" is already in use."
-msgstr ""
+msgstr "קובץ הטורנט \"%s\" כבר בשימוש."
 
 #: ../gtk/util.c:314
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
-msgstr ""
+msgstr "קובץ הטורנט \"%s\" ניתקע בשגיאה לא ידועה."
 
 #: ../gtk/util.c:324
 msgid "Error opening torrent"
-msgstr ""
+msgstr "שגיאה בפתיחת טורנט"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:865
@@ -1613,22 +1613,22 @@ msgstr "העברת פורטים (NAT-PMP)"
 #: ../libtransmission/natpmp.c:71
 #, c-format
 msgid "%s succeeded (%d)"
-msgstr ""
+msgstr "%s עבר (%d)"
 
 #: ../libtransmission/natpmp.c:132
 #, c-format
 msgid "Found public address \"%s\""
-msgstr ""
+msgstr "נמצא כתובת ציבורית \"%s\""
 
 #: ../libtransmission/natpmp.c:159
 #, c-format
 msgid "no longer forwarding port %d"
-msgstr ""
+msgstr "לא מעביר יותר את הפורט %d"
 
 #: ../libtransmission/natpmp.c:195
 #, c-format
 msgid "Port %d forwarded successfully"
-msgstr ""
+msgstr "הפורט %d הועבר בהצלחה"
 
 #: ../libtransmission/net.c:145
 #, c-format
@@ -1694,7 +1694,7 @@ msgstr "נעצר"
 #: ../libtransmission/session.c:272
 #, c-format
 msgid "%s %s started"
-msgstr ""
+msgstr "%s %s התחיל"
 
 #: ../libtransmission/session.c:629
 #, c-format
@@ -1730,7 +1730,7 @@ msgstr "הסתיים"
 
 #: ../libtransmission/torrent.c:1156
 msgid "Incomplete"
-msgstr ""
+msgstr "לא שלם"
 
 #: ../libtransmission/upnp.c:25
 msgid "Port Forwarding (UPnP)"
@@ -1744,7 +1744,7 @@ msgstr ""
 #: ../libtransmission/upnp.c:94
 #, c-format
 msgid "Local Address is \"%s\""
-msgstr ""
+msgstr "הכתובת המקומית היא \"%s\""
 
 #: ../libtransmission/upnp.c:118
 #, c-format

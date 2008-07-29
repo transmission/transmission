@@ -5,14 +5,14 @@ msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-06-29 06:45+0000\n"
+"PO-Revision-Date: 2008-07-28 23:35+0000\n"
 "Last-Translator: Aron Xu <Unknown>\n"
 "Language-Team: weiyh <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2008-07-24 20:56+0000\n"
+"X-Launchpad-Export-Date: 2008-07-29 01:01+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #, fuzzy
@@ -439,7 +439,6 @@ msgid "Sort by _Tracker"
 msgstr "按 Tracker 排序"
 
 #: ../gtk/actions.c:53
-#, fuzzy
 msgid "Sort by A_ge"
 msgstr "按时间排序"
 
@@ -569,7 +568,7 @@ msgstr "打开文件夹"
 
 #: ../gtk/actions.c:131
 msgid "_Contents"
-msgstr ""
+msgstr "内容(_C)"
 
 #: ../gtk/actions.c:133
 msgid "Ask Tracker for _More Peers"
@@ -590,7 +589,7 @@ msgstr "Torrent 选项"
 
 #: ../gtk/add-dialog.c:253
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "移动源文件到回收站(_M)"
 
 #: ../gtk/add-dialog.c:254 ../gtk/tr-prefs.c:314
 msgid "_Start when added"
@@ -598,7 +597,7 @@ msgstr "添加后立即开始"
 
 #: ../gtk/add-dialog.c:265
 msgid "_Torrent file:"
-msgstr ""
+msgstr "种子文件(_T):"
 
 #: ../gtk/add-dialog.c:269
 msgid "Select Source File"
@@ -676,11 +675,11 @@ msgstr ""
 
 #: ../gtk/details.c:559
 msgid "Downloading from this peer"
-msgstr ""
+msgstr "从该peer下载"
 
 #: ../gtk/details.c:560
 msgid "We would download from this peer if they would let us"
-msgstr ""
+msgstr "若对方允许，将从该peer下载"
 
 #: ../gtk/details.c:561
 msgid "Uploading to peer"
@@ -688,7 +687,7 @@ msgstr "上传 peer"
 
 #: ../gtk/details.c:562
 msgid "We would upload to this peer if they asked"
-msgstr ""
+msgstr "若对方询问，将上传至该peer"
 
 #: ../gtk/details.c:563
 msgid "Peer has unchoked us, but we're not interested"
@@ -720,7 +719,7 @@ msgstr "<b>吸血客户端</b>"
 
 #: ../gtk/details.c:767
 msgid "<b>Times Completed:</b>"
-msgstr ""
+msgstr "<b>完成次数:</b>"
 
 #: ../gtk/details.c:788 ../gtk/details.c:1275 ../gtk/details.c:1286
 msgid "Never"
@@ -735,8 +734,7 @@ msgstr "详细信息"
 #, c-format
 msgid "%'d Piece"
 msgid_plural "%'d Pieces"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d 块"
 
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
@@ -946,11 +944,11 @@ msgstr ""
 
 #: ../gtk/details.c:1247
 msgid "In progress"
-msgstr ""
+msgstr "进行中"
 
 #: ../gtk/details.c:1290
 msgid "Now"
-msgstr ""
+msgstr "立即"
 
 #. %1$s is torrent name
 #. %2$s its file size
@@ -1071,11 +1069,11 @@ msgstr "低"
 
 #: ../gtk/file-list.c:675
 msgid "_Ignore"
-msgstr ""
+msgstr "忽略(_I)"
 
 #: ../gtk/file-list.c:678
 msgid "_Download"
-msgstr ""
+msgstr "下载(_D)"
 
 #: ../gtk/main.c:351
 msgid "Start with all torrents paused"
@@ -1112,14 +1110,12 @@ msgstr "立即退出"
 #: ../gtk/main.c:860
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "无法添加已损坏的 Torrent"
 
 #: ../gtk/main.c:867
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "无法重复添加 Torrent"
 
 #: ../gtk/main.c:1095
 msgid "A fast and easy BitTorrent client"
@@ -1469,7 +1465,7 @@ msgstr "正在添加 Torrent"
 
 #: ../gtk/tr-prefs.c:302
 msgid "Automatically _add torrents from:"
-msgstr ""
+msgstr "从此处自动添加 torrent:"
 
 #: ../gtk/tr-prefs.c:318
 msgid "Mo_ve source files to Trash"
@@ -1536,11 +1532,11 @@ msgstr "限速"
 
 #: ../gtk/tr-prefs.c:569
 msgid "Maximum peers _overall:"
-msgstr ""
+msgstr "全局最大peer数 (_O):"
 
 #: ../gtk/tr-prefs.c:571
 msgid "Maximum peers per _torrent:"
-msgstr "新任务最大连接 Peer数："
+msgstr "新任务最大连接 Peers"
 
 #: ../gtk/tr-prefs.c:583 ../gtk/tr-prefs.c:615 ../gtk/tr-prefs.c:651
 #: ../gtk/tr-prefs.c:713
@@ -1553,27 +1549,27 @@ msgstr "禁止"
 
 #: ../gtk/tr-prefs.c:794
 msgid "Web Interface"
-msgstr ""
+msgstr "Web 界面"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:797
 msgid "_Enable web interface"
-msgstr ""
+msgstr "开启 Web 界面 (_E)"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:810
 msgid "_Require username"
-msgstr ""
+msgstr "需要用户名(_R)"
 
 #. username
 #: ../gtk/tr-prefs.c:818 ../gtk/tr-prefs.c:1034
 msgid "_Username:"
-msgstr "用户名："
+msgstr "用户名(_U)："
 
 #. password
 #: ../gtk/tr-prefs.c:825 ../gtk/tr-prefs.c:1040
 msgid "Pass_word:"
-msgstr ""
+msgstr "密码(_W):"
 
 #: ../gtk/tr-prefs.c:850
 msgid "Access control list:"
@@ -1581,7 +1577,7 @@ msgstr "访问控制列表"
 
 #: ../gtk/tr-prefs.c:857
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
-msgstr ""
+msgstr "可用通配符表示IP 地址，例如 192.168.*.*"
 
 #: ../gtk/tr-prefs.c:873
 msgid "IP Address"
@@ -1609,19 +1605,19 @@ msgstr "使用代理服务器连接 Tracker"
 
 #: ../gtk/tr-prefs.c:999
 msgid "Connect to tracker via a pro_xy"
-msgstr ""
+msgstr "通过代理连接至 tracker (_X)"
 
 #: ../gtk/tr-prefs.c:1004
 msgid "Proxy _server:"
-msgstr ""
+msgstr "代理服务器(_S)："
 
 #: ../gtk/tr-prefs.c:1012
 msgid "Proxy _port:"
-msgstr ""
+msgstr "代理服务器端口 (_P)"
 
 #: ../gtk/tr-prefs.c:1015
 msgid "Proxy _type:"
-msgstr ""
+msgstr "代理服务器类型(_T)："
 
 #: ../gtk/tr-prefs.c:1028
 msgid "_Authentication is required"
@@ -1633,7 +1629,7 @@ msgstr "路由器"
 
 #: ../gtk/tr-prefs.c:1065
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr ""
+msgstr "启用路由器的 UPnP 或 NAT-PMP 端口转发功能 (_F)"
 
 #: ../gtk/tr-prefs.c:1100
 msgid "Transmission Preferences"
@@ -1649,7 +1645,7 @@ msgstr "网络"
 
 #: ../gtk/tr-prefs.c:1127
 msgid "Web"
-msgstr ""
+msgstr "Web"
 
 #: ../gtk/tr-torrent.c:211
 #, c-format
@@ -1831,21 +1827,21 @@ msgstr[0] "%'d 秒"
 #: ../gtk/util.c:312
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
-msgstr ""
+msgstr "种子文件 \"%s\" 包含无效数据。"
 
 #: ../gtk/util.c:313
 #, c-format
 msgid "The torrent file \"%s\" is already in use."
-msgstr ""
+msgstr "种子文件 \"%s\" 已在使用中。"
 
 #: ../gtk/util.c:314
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
-msgstr ""
+msgstr "种子文件 \"%s\" 出现未知错误。"
 
 #: ../gtk/util.c:324
 msgid "Error opening torrent"
-msgstr ""
+msgstr "打开种子文件时出错。"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:865
@@ -1855,12 +1851,12 @@ msgstr "无效元数据"
 #: ../libtransmission/blocklist.c:99
 #, c-format
 msgid "Blocklist \"%s\" contains %'u entries"
-msgstr ""
+msgstr "阻止列表 \"%s\" 包含 %'u 条记录"
 
 #: ../libtransmission/blocklist.c:277
 #, c-format
 msgid "Blocklist \"%1$s\" updated with %2$'d entries"
-msgstr ""
+msgstr "阻止列表 \"%1$s\" 已更新，本次更新 %2$'d 条记录"
 
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:649 ../libtransmission/fastresume.c:660
@@ -1895,7 +1891,7 @@ msgstr "缺少元数据项 \"%s\""
 
 #: ../libtransmission/metainfo.c:416 ../libtransmission/metainfo.c:425
 msgid "Torrent is corrupt"
-msgstr ""
+msgstr "种子文件已损坏"
 
 #: ../libtransmission/metainfo.c:630
 msgid "Invalid or missing metadata entries \"length\" and \"files\""
@@ -2063,7 +2059,7 @@ msgstr "非常规文件"
 
 #: ../libtransmission/utils.c:452
 msgid "Memory allocation failed"
-msgstr ""
+msgstr "内存分配失败"
 
 #: ../libtransmission/utils.c:524
 #, c-format
@@ -2120,4 +2116,4 @@ msgstr "打开 Torrent"
 
 #: ../libtransmission/verify.c:170
 msgid "Queued for verification"
-msgstr ""
+msgstr "加入队列以验证"

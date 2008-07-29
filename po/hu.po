@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-07-24 20:56+0000\n"
+"X-Launchpad-Export-Date: 2008-07-29 01:01+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #~ msgid "Open a torrent"
@@ -1301,8 +1301,8 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  Dr. Gráf https://launchpad.net/~dr-graf-nxt\n"
 "  Gabor Kelemen https://launchpad.net/~kelemeng\n"
+"  Gergely Ujlaki https://launchpad.net/~gergo86\n"
 "  Pittmann Tamás https://launchpad.net/~zaivaldi\n"
-"  gergo86 https://launchpad.net/~gergo86\n"
 "  Γριφεγ https://launchpad.net/~grfgguvf"
 
 #: ../gtk/makemeta-ui.c:101

@@ -19,14 +19,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-07-22 16:46+0000\n"
+"PO-Revision-Date: 2008-07-26 13:04+0000\n"
 "Last-Translator: Luca Ferretti <elle.uca@libero.it>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-07-24 20:56+0000\n"
+"X-Launchpad-Export-Date: 2008-07-29 01:01+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #~ msgid "Close main window"
@@ -368,7 +368,6 @@ msgid "Status"
 msgstr "Stato"
 
 #: ../gtk/details.c:558
-#, fuzzy
 msgid "Optimistic unchoke"
 msgstr "Collaborazione ottimistica"
 
@@ -378,7 +377,6 @@ msgid "Downloading from this peer"
 msgstr "In ricezione da questo nodo"
 
 #: ../gtk/details.c:560
-#, fuzzy
 msgid "We would download from this peer if they would let us"
 msgstr "Riceveremmo da questo nodo se fosse consentito"
 
@@ -387,17 +385,14 @@ msgid "Uploading to peer"
 msgstr "Invio al nodo"
 
 #: ../gtk/details.c:562
-#, fuzzy
 msgid "We would upload to this peer if they asked"
 msgstr "Invieremmo al nodo se ci fosse richiesto"
 
 #: ../gtk/details.c:563
-#, fuzzy
 msgid "Peer has unchoked us, but we're not interested"
 msgstr "Il nodo ha offerto collaborazione, ma non siamo interessati"
 
 #: ../gtk/details.c:564
-#, fuzzy
 msgid "We unchoked this peer, but they're not interested"
 msgstr "Abbiamo offerto l'unchoke al nodo, ma non è interessato"
 
@@ -444,9 +439,9 @@ msgstr[1] "%'d pezzi"
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
 #: ../gtk/details.c:820 ../gtk/makemeta-ui.c:244
-#, fuzzy, c-format
+#, c-format
 msgid "%1$s @ %2$s"
-msgstr "%1$s di %2$s"
+msgstr "%1$s da %2$s"
 
 #: ../gtk/details.c:824
 msgid "Pieces:"
@@ -778,7 +773,6 @@ msgid "_Ignore"
 msgstr "Ign_ora"
 
 #: ../gtk/file-list.c:678
-#, fuzzy
 msgid "_Download"
 msgstr "_Scarica"
 
