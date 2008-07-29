@@ -17,6 +17,7 @@
 #include <curl/curl.h>
 
 #include "transmission.h"
+#include "list.h"
 #include "trevent.h"
 #include "utils.h"
 #include "web.h"
@@ -25,11 +26,10 @@
 
 struct tr_web
 {
-    unsigned int dying     : 1;
-    unsigned int running   : 1;
     int remain;
     CURLM * cm;
     tr_session * session;
+    tr_list * socket_events;
     struct event timer;
 };
 
@@ -181,16 +181,6 @@ tr_webRun( tr_session         * session,
     }
 }
 
-static void
-webDestroy( tr_web * web )
-{
-    dbgmsg( "deleting web timer" );
-    assert( !web->running );
-    evtimer_del( &web->timer );
-    curl_multi_cleanup( web->cm );
-    tr_free( web );
-}
-
 /* libevent says that sock is ready to be processed, so wake up libcurl */
 static void
 event_callback( int sock, short action, void * vweb )
@@ -238,6 +228,7 @@ socket_callback( CURL            * easy UNUSED,
         event_del( ev );
     else {
         ev = tr_new0( struct event, 1 );
+        tr_list_prepend( &web->socket_events, ev );
         curl_multi_assign( web->cm, sock, ev );
     }
 
@@ -254,7 +245,9 @@ socket_callback( CURL            * easy UNUSED,
         case CURL_POLL_IN: events |= EV_READ; break;
         case CURL_POLL_OUT: events |= EV_WRITE; break;
         case CURL_POLL_INOUT: events |= EV_READ|EV_WRITE; break;
-        case CURL_POLL_REMOVE: tr_free( ev ); /* fallthrough */
+        case CURL_POLL_REMOVE: tr_list_remove_data( &web->socket_events, ev );
+                               tr_free( ev );
+                               /* fallthrough */
         case CURL_POLL_NONE: return 0;
         default: tr_err( "Unknown socket action %d", action ); return -1;
     }
@@ -287,7 +280,7 @@ timer_callback( CURLM *multi UNUSED, long timeout_ms, void * vweb )
 {
     tr_web * web = vweb;
     struct timeval timeout = tr_timevalMsec( timeout_ms );
-    evtimer_add( &web->timer, &timeout );
+    timeout_add( &web->timer, &timeout );
 }
 
 tr_web*
@@ -309,7 +302,7 @@ tr_webInit( tr_session * session )
     web->cm = curl_multi_init( );
     web->session = session;
 
-    evtimer_set( &web->timer, timeout_callback, web );
+    timeout_set( &web->timer, timeout_callback, web );
     curl_multi_setopt( web->cm, CURLMOPT_SOCKETDATA, web );
     curl_multi_setopt( web->cm, CURLMOPT_SOCKETFUNCTION, socket_callback );
     curl_multi_setopt( web->cm, CURLMOPT_TIMERDATA, web );
@@ -318,16 +311,23 @@ tr_webInit( tr_session * session )
     return web;
 }
 
+static void
+event_del_and_free( void * e )
+{
+    event_del( e );
+    tr_free( e );
+}
+
 void
 tr_webClose( tr_web ** web_in )
 {
     tr_web * web = *web_in;
     *web_in = NULL;
 
-    if( !web->running )
-        webDestroy( web );
-    else
-        web->dying = 1;
+    timeout_del( &web->timer );
+    tr_list_free( &web->socket_events, event_del_and_free );
+    curl_multi_cleanup( web->cm );
+    tr_free( web );
 }
 
 /***
