@@ -68,6 +68,8 @@ struct tr_peerIo
     void                * userData;
 
     tr_crypto           * crypto;
+
+    uint64_t              fromPeer;
 };
 
 /**
@@ -537,11 +539,11 @@ tr_peerIoReadBytes( tr_peerIo        * io,
     switch( io->encryptionMode )
     {
         case PEER_ENCRYPTION_NONE:
-            evbuffer_remove( inbuf, bytes, byteCount );
+            io->fromPeer += evbuffer_remove( inbuf, bytes, byteCount );
             break;
 
         case PEER_ENCRYPTION_RC4:
-            evbuffer_remove( inbuf, bytes, byteCount );
+            io->fromPeer += evbuffer_remove( inbuf, bytes, byteCount );
             tr_cryptoDecrypt( io->crypto, byteCount, bytes, bytes );
             break;
 
@@ -593,3 +595,10 @@ tr_peerIoGetAge( const tr_peerIo * io )
 {
     return time( NULL ) - io->timeCreated;
 }
+
+int64_t
+tr_peerIoCountBytesFromPeer( const tr_peerIo * io )
+{
+    return io->fromPeer;
+}
+

@@ -44,7 +44,7 @@ enum
     RECHOKE_PERIOD_MSEC = (10 * 1000),
 
     /* minimum interval for refilling peers' request lists */
-    REFILL_PERIOD_MSEC = 333,
+    REFILL_PERIOD_MSEC = 500,
 
     /* when many peers are available, keep idle ones this long */
     MIN_UPLOAD_IDLE_SECS = (60 * 3),
@@ -965,7 +965,18 @@ myHandshakeDoneCB( tr_handshake    * handshake,
         if( t ) {
             struct peer_atom * atom = getExistingAtom( t, addr );
             if( atom )
-                ++atom->numFails;
+            {
+                /* if we talked but the connection failed, mark a failure
+                 * in the peer's permanent record.  if they didn't send
+                 * us anything at all, mark the peer as unreachable. */
+                if( tr_peerIoCountBytesFromPeer( io ) ) {
+                    ++atom->numFails;
+                    tordbg( t, "handshake failed; incremented fail count to %d", (int)atom->numFails );
+                } else {
+                    tordbg( t, "no data received at all during handshake; marking as unreachable" );
+                    atom->myflags |= MYFLAG_UNREACHABLE;
+                }
+            }
         }
 
         tr_peerIoFree( io );
@@ -1814,8 +1825,8 @@ getPeerCandidates( Torrent * t, int * setmeSize )
             if( wait < minWait ) wait = minWait;
             if( wait > maxWait ) wait = maxWait;
             if( ( now - atom->time ) < wait ) {
-                tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
-                        i, tr_peerIoAddrStr(&atom->addr,atom->port), wait );
+                /*tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
+                          i, tr_peerIoAddrStr(&atom->addr,atom->port), wait );*/
                 continue;
             }
         }
@@ -1895,7 +1906,7 @@ reconnectPulse( void * vtorrent )
             io = tr_peerIoNewOutgoing( mgr->handle, &atom->addr, atom->port, t->hash );
             if( io == NULL )
             {
-                atom->myflags |= MYFLAG_UNREACHABLE;
+                /* we've temporarily exceeded our max connection limit... */
             }
             else
             {
