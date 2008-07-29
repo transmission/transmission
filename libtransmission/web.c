@@ -21,14 +21,6 @@
 #include "utils.h"
 #include "web.h"
 
-#define CURL_CHECK_VERSION(major,minor,micro)    \
-    (LIBCURL_VERSION_MAJOR > (major) || \
-     (LIBCURL_VERSION_MAJOR == (major) && LIBCURL_VERSION_MINOR > (minor)) || \
-     (LIBCURL_VERSION_MAJOR == (major) && LIBCURL_VERSION_MINOR == (minor) && \
-      LIBCURL_VERSION_PATCH >= (micro)))
-
-#define PULSE_MSEC 500
-
 #define dbgmsg(fmt...) tr_deepLog( __FILE__, __LINE__, "web", ##fmt )
 
 struct tr_web
@@ -92,38 +84,12 @@ processCompletedTasks( tr_web * web )
     } while( easy );
 }
 
-static void
-pump( tr_web * web )
-{
-    int unused;
-    CURLMcode rc;
-    do {
-        rc = curl_multi_perform( web->cm, &unused );
-    } while( rc == CURLM_CALL_MULTI_PERFORM );
-    if ( rc == CURLM_OK  )
-        processCompletedTasks( web );
-    else
-        tr_err( "%s", curl_multi_strerror(rc) );
-}
-
 static size_t
 writeFunc( void * ptr, size_t size, size_t nmemb, void * task )
 {
     const size_t byteCount = size * nmemb;
     evbuffer_add( ((struct tr_web_task*)task)->response, ptr, byteCount );
     return byteCount;
-}
-
-static void
-ensureTimerIsRunning( tr_web * web )
-{
-    if( !web->running )
-    {
-        struct timeval tv = tr_timevalMsec( PULSE_MSEC );
-        dbgmsg( "starting web timer" );
-        web->running = 1;
-        evtimer_add( &web->timer, &tv );
-    }
 }
 
 static int
@@ -150,12 +116,13 @@ addTask( void * vtask )
         struct tr_web * web = session->web;
         CURL * ch;
 
-        ensureTimerIsRunning( web );
-
         ++web->remain;
         dbgmsg( "adding task #%lu [%s] (%d remain)", task->tag, task->url, web->remain );
 
         ch = curl_easy_init( );
+
+        if( getenv( "TRANSMISSION_LIBCURL_VERBOSE" ) != 0 )
+            curl_easy_setopt( ch, CURLOPT_VERBOSE, 1 );
 
         if( !task->range && session->isProxyEnabled ) {
             curl_easy_setopt( ch, CURLOPT_PROXY, session->proxy );
@@ -224,26 +191,103 @@ webDestroy( tr_web * web )
     tr_free( web );
 }
 
+/* libevent says that sock is ready to be processed, so wake up libcurl */
 static void
-pulse( int socket UNUSED, short action UNUSED, void * vweb )
+event_callback( int sock, short action, void * vweb )
 {
     tr_web * web = vweb;
-    assert( web->running );
+    CURLMcode rc;
+    int mask;
 
-    pump( web );
+#if 0
+    static const char *strings[] = {
+        "NONE","TIMEOUT","READ","TIMEOUT|READ","WRITE","TIMEOUT|WRITE",
+        "READ|WRITE","TIMEOUT|READ|WRITE","SIGNAL" };
+     fprintf( stderr, "%s:%d (%s) event on socket %d (%s)\n",
+              __FILE__, __LINE__, __FUNCTION__,
+              sock, strings[action] );
+#endif
 
-    evtimer_del( &web->timer );
+    mask = 0;
+    if( action & EV_READ  ) mask |= CURL_CSELECT_IN;
+    if( action & EV_WRITE ) mask |= CURL_CSELECT_OUT;
 
-    web->running = web->remain > 0;
+    do
+        rc = curl_multi_socket_action( web->cm, sock, mask, &web->remain );
+    while( rc == CURLM_CALL_MULTI_PERFORM );
 
-    if( web->running ) {
-        struct timeval tv = tr_timevalMsec( PULSE_MSEC );
-        evtimer_add( &web->timer, &tv );
-    } else if( web->dying ) {
-        webDestroy( web );
-    } else {
-        dbgmsg( "stopping web timer" );
+    if ( rc != CURLM_OK  )
+        tr_err( "%s (%d)", curl_multi_strerror(rc), (int)sock );
+
+    processCompletedTasks( web );
+}
+
+/* libcurl wants us to tell it when sock is ready to be processed */
+static int
+socket_callback( CURL            * easy UNUSED,
+                 curl_socket_t     sock,
+                 int               action,
+                 void            * vweb,
+                 void            * assigndata )
+{
+    tr_web * web = vweb;
+    int events = EV_PERSIST;
+    struct event * ev = assigndata;
+
+    if( ev )
+        event_del( ev );
+    else {
+        ev = tr_new0( struct event, 1 );
+        curl_multi_assign( web->cm, sock, ev );
     }
+
+#if 0
+    {
+        static const char *actions[] = {"NONE", "IN", "OUT", "INOUT", "REMOVE"};
+        fprintf( stderr, "%s:%d (%s) callback on socket %d (%s)\n",
+                 __FILE__, __LINE__, __FUNCTION__,
+                 (int)sock, actions[action]);
+    }
+#endif
+
+    switch (action) {
+        case CURL_POLL_IN: events |= EV_READ; break;
+        case CURL_POLL_OUT: events |= EV_WRITE; break;
+        case CURL_POLL_INOUT: events |= EV_READ|EV_WRITE; break;
+        case CURL_POLL_REMOVE: tr_free( ev ); /* fallthrough */
+        case CURL_POLL_NONE: return 0;
+        default: tr_err( "Unknown socket action %d", action ); return -1;
+    }
+
+    event_set( ev, sock, events, event_callback, web );
+    event_add( ev, NULL );
+    return 0;
+}
+
+/* libevent says that timeout_ms have passed, so wake up libcurl */
+static void
+timeout_callback( int socket UNUSED, short action UNUSED, void * vweb )
+{
+    CURLMcode rc;
+    tr_web * web = vweb;
+
+    do
+        rc = curl_multi_socket( web->cm, CURL_SOCKET_TIMEOUT, &web->remain );
+    while( rc == CURLM_CALL_MULTI_PERFORM );
+
+    if( rc != CURLM_OK )
+        tr_err( "%s", curl_multi_strerror( rc ) );
+
+    processCompletedTasks( web );
+}
+
+/* libcurl wants us to tell it when timeout_ms have passed */
+static void
+timer_callback( CURLM *multi UNUSED, long timeout_ms, void * vweb )
+{
+    tr_web * web = vweb;
+    struct timeval timeout = tr_timevalMsec( timeout_ms );
+    evtimer_add( &web->timer, &timeout );
 }
 
 tr_web*
@@ -265,11 +309,11 @@ tr_webInit( tr_session * session )
     web->cm = curl_multi_init( );
     web->session = session;
 
-    evtimer_set( &web->timer, pulse, web );
-#if CURL_CHECK_VERSION(7,16,3)
-    curl_multi_setopt( web->cm, CURLMOPT_MAXCONNECTS, 10 );
-#endif
-    pump( web );
+    evtimer_set( &web->timer, timeout_callback, web );
+    curl_multi_setopt( web->cm, CURLMOPT_SOCKETDATA, web );
+    curl_multi_setopt( web->cm, CURLMOPT_SOCKETFUNCTION, socket_callback );
+    curl_multi_setopt( web->cm, CURLMOPT_TIMERDATA, web );
+    curl_multi_setopt( web->cm, CURLMOPT_TIMERFUNCTION, timer_callback );
 
     return web;
 }
