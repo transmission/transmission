@@ -118,6 +118,9 @@
 		A25AFDE90D1038AD0092A1BA /* MenuLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = A25AFDE80D1038AD0092A1BA /* MenuLabel.m */; };
 		A25D2CBD0CF4C73E0096A262 /* stats.c in Sources */ = {isa = PBXBuildFile; fileRef = A25D2CBB0CF4C7190096A262 /* stats.c */; };
 		A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */ = {isa = PBXBuildFile; fileRef = A25D2CBA0CF4C7190096A262 /* stats.h */; };
+		A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		A25E03E20E4015380086C225 /* tr-getopt.h in Headers */ = {isa = PBXBuildFile; fileRef = A25E03E00E4015380086C225 /* tr-getopt.h */; };
+		A25E03E30E4015380086C225 /* tr-getopt.c in Sources */ = {isa = PBXBuildFile; fileRef = A25E03E10E4015380086C225 /* tr-getopt.c */; };
 		A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */; };
 		A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */; };
 		A25FCDEF0A3769A6002BCBBE /* PauseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDD0A37695F002BCBBE /* PauseSelected.png */; };
@@ -528,6 +531,8 @@
 		A25AFDE80D1038AD0092A1BA /* MenuLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MenuLabel.m; path = macosx/MenuLabel.m; sourceTree = "<group>"; };
 		A25D2CBA0CF4C7190096A262 /* stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stats.h; path = libtransmission/stats.h; sourceTree = "<group>"; };
 		A25D2CBB0CF4C7190096A262 /* stats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stats.c; path = libtransmission/stats.c; sourceTree = "<group>"; };
+		A25E03E00E4015380086C225 /* tr-getopt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-getopt.h"; path = "libtransmission/tr-getopt.h"; sourceTree = "<group>"; };
+		A25E03E10E4015380086C225 /* tr-getopt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-getopt.c"; path = "libtransmission/tr-getopt.c"; sourceTree = "<group>"; };
 		A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ExpandedPathToPathTransformer.m; path = macosx/ExpandedPathToPathTransformer.m; sourceTree = "<group>"; };
 		A25E74450AF5089E006F11AE /* ExpandedPathToPathTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ExpandedPathToPathTransformer.h; path = macosx/ExpandedPathToPathTransformer.h; sourceTree = "<group>"; };
 		A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ExpandedPathToIconTransformer.m; path = macosx/ExpandedPathToIconTransformer.m; sourceTree = "<group>"; };
@@ -880,6 +885,7 @@
 				BEFC1CF40C07822400B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */,
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
 				A22E59A90DC11A2000F4BE15 /* libcurl.dylib in Frameworks */,
+				A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1200,6 +1206,8 @@
 				A2D307900D9EC46B0051FD27 /* ggets.c */,
 				A29EBE530DC01FC9006CEE80 /* web.h */,
 				A29EBE520DC01FC9006CEE80 /* web.c */,
+				A25E03E00E4015380086C225 /* tr-getopt.h */,
+				A25E03E10E4015380086C225 /* tr-getopt.c */,
 				A2A4E9840DE1038C000CE197 /* json.h */,
 				A2A4E9830DE1038C000CE197 /* json.c */,
 				A2DF576A0DE468C6000795D5 /* JSON_parser.c */,
@@ -1470,6 +1478,7 @@
 				A2A4E9870DE10399000CE197 /* json.h in Headers */,
 				A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */,
 				A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */,
+				A25E03E20E4015380086C225 /* tr-getopt.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1914,6 +1923,7 @@
 				A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */,
 				A2DF58580DE4B2B0000795D5 /* JSON_parser.c in Sources */,
 				A292A6E80DFB45FC004B9C0A /* webseed.c in Sources */,
+				A25E03E30E4015380086C225 /* tr-getopt.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
