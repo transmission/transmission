@@ -577,7 +577,7 @@ tr_ioErrorFromErrno( int err )
         case EFBIG:
             return TR_ERROR_IO_FILE_TOO_BIG;
         default:
-            tr_dbg( "generic i/o errno from errno: %s", tr_strerror( errno ) );
+            tr_err( "generic i/o errno from errno: %s", tr_strerror( errno ) );
             return TR_ERROR_IO_OTHER;
     }
 }
