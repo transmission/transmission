@@ -1,4 +1,3 @@
-<?php $iPhone = (ereg("(iPhone|iPod)",$_SERVER['HTTP_USER_AGENT']))?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 	<head>
@@ -9,7 +8,8 @@
 		<link rel="apple-touch-icon" href="./images/webclip-icon.png"/>
 		<link href="./images/favicon.ico" rel="SHORTCUT ICON" />
 		<script type="text/javascript" src="./javascript/jquery/jquery.min.js"></script>
-		<link media="screen" rel="stylesheet" type="text/css" href="./stylesheets/common.css" />
+		<link media="only screen and (max-device-width: 480px)" href="./stylesheets/iphone.css" type= "text/css" rel="stylesheet">
+		<link media="screen and (min-device-width: 481px)" href="./stylesheets/common.css" type="text/css" rel="stylesheet">
 		<script type="text/javascript" src="./javascript/jquery/jquery.transmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery.contextmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/menu.js"></script>
@@ -22,7 +22,7 @@
 		<script type="text/javascript" src="./javascript/torrent.js"></script>
 		<script type="text/javascript" src="./javascript/dialog.js"></script>
 	</head>
-	<body id="transmission_body"<?php if ($iPhone) { ?> onorientationchange="updateLayout();" onload="updateLayout();"<?php } ?>>
+	<body id="transmission_body">
 
 		<div class="torrent_global_menu">
 			 <ul>    

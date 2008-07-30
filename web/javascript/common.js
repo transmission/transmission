@@ -15,26 +15,6 @@ var Safari3 = testSafari3();
 var iPhone = RegExp("(iPhone|iPod)").test(navigator.userAgent);
 if (iPhone) var scroll_timeout;
 
-/* (is this used?)
-function updateLayout()
-{
-	if (iPhone) {
-		switch(window.orientation) {
-			case -90:
-				$('body').addClass('landscape');
-				break;
-			case 90:
-				$('body').addClass('landscape');
-				break;
-			default:
-				$('body.landscape').removeClass('landscape');
-				break;
-		} 
-		transmission.hideiPhoneAddressbar(0.4);
-	}
-};
-*/
-
 function testSafari3()
 {
     var minimum = new Array(521,0);
