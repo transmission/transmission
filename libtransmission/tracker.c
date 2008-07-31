@@ -661,7 +661,6 @@ createScrape( tr_session * session, tr_tracker * tracker )
 
 struct tr_tracker_handle
 {
-    unsigned int isShuttingDown : 1;
     int runningCount;
     tr_timer * pulseTimer;
 };
@@ -680,29 +679,15 @@ ensureGlobalsExist( tr_session * session )
 }
 
 void
-tr_trackerShuttingDown( tr_session * session )
+tr_trackerSessionClose( tr_session * session )
 {
-    if( session->tracker )
-        session->tracker->isShuttingDown = 1;
-}
-
-static int
-maybeFreeGlobals( tr_session * session )
-{
-    int globalsExist = session->tracker != NULL;
-
-    if( globalsExist
-        && ( session->tracker->runningCount < 1 )
-        && ( session->torrentList== NULL ) )
+    if( session && session->tracker )
     {
         dbgmsg( NULL, "freeing tracker timer" );
         tr_timerFree( &session->tracker->pulseTimer );
         tr_free( session->tracker );
         session->tracker = NULL;
-        globalsExist = FALSE;
     }
-
-    return globalsExist;
 }
 
 /***
@@ -803,7 +788,18 @@ trackerPulse( void * vsession )
     if( th->runningCount )
         dbgmsg( NULL, "tracker pulse after upkeep... %d running", th->runningCount );
 
-    return maybeFreeGlobals( session );
+    /* free the tracker manager if no torrents are left */
+    if(    ( session->tracker )
+        && ( session->tracker->runningCount < 1 )
+        && ( session->torrentList == NULL ) )
+    {
+        tr_trackerSessionClose( session );
+    }
+
+    /* if there are still running torrents (as indicated by
+     * the existence of the tracker manager) then keep the
+     * trackerPulse() timer alive */
+    return session->tracker != NULL;
 }
 
 static void

@@ -497,7 +497,6 @@ tr_closeAllConnections( void * vh )
     tr_torrent ** torrents;
 
     tr_sharedShuttingDown( h->shared );
-    tr_trackerShuttingDown( h );
     tr_rpcClose( &h->rpcServer );
 
     /* close the torrents.  get the most active ones first so that
@@ -543,6 +542,7 @@ tr_sessionClose( tr_handle * h )
     while( !h->isClosed && !deadlineReached( deadline ) )
         tr_wait( 100 );
 
+    tr_trackerSessionClose( h );
     tr_list_free( &h->blocklists, (TrListForeachFunc)_tr_blocklistFree );
     tr_webClose( &h->web );
 
