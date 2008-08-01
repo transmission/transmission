@@ -1,7 +1,7 @@
 <html>
-	
+
 	<a name="RemotePrefs"></a>
-	
+
 	<head>
 		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
@@ -20,12 +20,21 @@
 			</div>
 
 			<div id="pagetitle">
-				<h1>What does allowing Transmission to be operated remotely mean? </h1>
+				<h1>What is remote access? </h1>
 			</div>
-				<p>Using an application such as <i><a href="http://www.clutchbt.com">Clutch</a></i> or <i>transmission-remote</i>, you can monitor and manage your transfers from any location on the internet. Leave this option unchecked if you are only going to be managing your transfers on your local machine.
-				<p>See your remote manager's documentation for operating instructions. 
+				<p>Transmission has a web interface which can be used to monitor and manage your transfers over the internet. Other applications, such as <i>transmission-remote</i>, can also control Transmission. If you want to use the web interface, or other remote control application, check 'Enable remote access'. Leave this option unchecked if you are only going to be managing your transfers on your local machine.
 				<p>For security purposes, you can password protect access to Transmission, as well as restrict access to a trusted list of external IP addresses. To add an address to the list, click the + button.
-				<p>
+				<p>You can view the web interface on your local computer by clicking the 'Launch web interface' button. To view it on a remote location:
+					<div summary="To do this" id="taskbox">
+						<ol>
+							<li>Open your web browser</li>
+							<li>In the address bar, enter "http://localip:port/transmission/web/", where: </li>
+								<ul>
+									<li><i>localip</i> is the IP address of the computer Transmission is running on.</li>
+									<li><i>port</i>	is the port specified in Preferences >> Remote.</li>
+								</ul>
+						</ol>
+					</div>
 
 		</div>
 	</body>
