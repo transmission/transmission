@@ -489,35 +489,40 @@ compareTorrentByCur( const void * va, const void * vb )
 }
 
 static void
-tr_closeAllConnections( void * vh )
+tr_closeAllConnections( void * vsession )
 {
-    tr_handle * h = vh;
+    tr_handle * session = vsession;
     tr_torrent * tor;
     int i, n;
     tr_torrent ** torrents;
 
-    tr_sharedShuttingDown( h->shared );
-    tr_rpcClose( &h->rpcServer );
+    tr_statsClose( session );
+    tr_sharedShuttingDown( session->shared );
+    tr_rpcClose( &session->rpcServer );
 
     /* close the torrents.  get the most active ones first so that
      * if we can't get them all closed in a reasonable amount of time,
      * at least we get the most important ones first. */
     tor = NULL;
-    n = h->torrentCount;
-    torrents = tr_new( tr_torrent*, h->torrentCount );
+    n = session->torrentCount;
+    torrents = tr_new( tr_torrent*, session->torrentCount );
     for( i=0; i<n; ++i )
-        torrents[i] = tor = tr_torrentNext( h, tor );
+        torrents[i] = tor = tr_torrentNext( session, tor );
     qsort( torrents, n, sizeof(tr_torrent*), compareTorrentByCur );
     for( i=0; i<n; ++i )
         tr_torrentFree( torrents[i] );
     tr_free( torrents );
 
-    tr_peerMgrFree( h->peerMgr );
+    tr_peerMgrFree( session->peerMgr );
 
-    tr_rcClose( h->upload );
-    tr_rcClose( h->download );
+    tr_rcClose( session->upload );
+    tr_rcClose( session->download );
+
+    tr_trackerSessionClose( session );
+    tr_list_free( &session->blocklists, (TrListForeachFunc)_tr_blocklistFree );
+    tr_webClose( &session->web );
     
-    h->isClosed = TRUE;
+    session->isClosed = TRUE;
 }
 
 static int
@@ -528,42 +533,56 @@ deadlineReached( const uint64_t deadline )
 
 #define SHUTDOWN_MAX_SECONDS 30
 
+#define dbgmsg(fmt...) tr_deepLog( __FILE__, __LINE__, NULL, ##fmt )
+
 void
-tr_sessionClose( tr_handle * h )
+tr_sessionClose( tr_handle * session )
 {
     int i;
     const int maxwait_msec = SHUTDOWN_MAX_SECONDS * 1000;
     const uint64_t deadline = tr_date( ) + maxwait_msec;
 
-    tr_deepLog( __FILE__, __LINE__, NULL, "shutting down transmission session %p", h );
-    tr_statsClose( h );
+    dbgmsg( "shutting down transmission session %p", session );
 
-    tr_runInEventThread( h, tr_closeAllConnections, h );
-    while( !h->isClosed && !deadlineReached( deadline ) )
+    /* close the session */
+    tr_runInEventThread( session, tr_closeAllConnections, session );
+    while( !session->isClosed && !deadlineReached( deadline ) ) {
+        dbgmsg( "waiting for the shutdown commands to run in the main thread" );
         tr_wait( 100 );
+    }
 
-    tr_trackerSessionClose( h );
-    tr_list_free( &h->blocklists, (TrListForeachFunc)_tr_blocklistFree );
-    tr_webClose( &h->web );
-
-    tr_eventClose( h );
-    while( h->events && !deadlineReached( deadline ) )
+    /* "shared" and "tracker" have live sockets,
+     * so we need to keep the transmission thread alive
+     * for a bit while they tell the router & tracker
+     * that we're closing now */
+    while( ( session->shared || session->tracker ) && !deadlineReached( deadline ) ) {
+        dbgmsg( "waiting on port unmap (%p) or tracker (%p)",
+                session->shared, session->tracker );
         tr_wait( 100 );
-
+    }
     tr_fdClose( );
-    tr_lockFree( h->lock );
-    for( i=0; i<h->metainfoLookupCount; ++i )
-        tr_free( h->metainfoLookup[i].filename );
-    tr_free( h->metainfoLookup );
-    tr_free( h->tag );
-    tr_free( h->configDir );
-    tr_free( h->resumeDir );
-    tr_free( h->torrentDir );
-    tr_free( h->downloadDir );
-    tr_free( h->proxy );
-    tr_free( h->proxyUsername );
-    tr_free( h->proxyPassword );
-    free( h );
+
+    /* close the libtransmission thread */
+    tr_eventClose( session );
+    while( session->events && !deadlineReached( deadline ) ) {
+        dbgmsg( "waiting for the libevent thread to shutdown cleanly" );
+        tr_wait( 100 );
+    }
+
+    /* free the session memory */
+    tr_lockFree( session->lock );
+    for( i=0; i<session->metainfoLookupCount; ++i )
+        tr_free( session->metainfoLookup[i].filename );
+    tr_free( session->metainfoLookup );
+    tr_free( session->tag );
+    tr_free( session->configDir );
+    tr_free( session->resumeDir );
+    tr_free( session->torrentDir );
+    tr_free( session->downloadDir );
+    tr_free( session->proxy );
+    tr_free( session->proxyUsername );
+    tr_free( session->proxyPassword );
+    tr_free( session );
 }
 
 tr_torrent **
