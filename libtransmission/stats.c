@@ -158,7 +158,7 @@ tr_sessionGetStats( const tr_handle   * handle,
                     tr_session_stats  * setme )
 {
     const struct tr_stats_handle * stats = getStats( handle );
-    assert( stats != NULL );
+    assert( stats );
     *setme = stats->single;
     setme->secondsActive = time( NULL ) - stats->startTime;
     updateRatio( setme );
@@ -169,7 +169,7 @@ tr_sessionGetCumulativeStats( const tr_handle   * handle,
                               tr_session_stats  * setme )
 {
     const struct tr_stats_handle * stats = getStats( handle );
-    assert( stats != NULL );
+    assert( stats );
     tr_session_stats current;
     tr_sessionGetStats( handle, &current );
     addStats( setme, &stats->old, &current );

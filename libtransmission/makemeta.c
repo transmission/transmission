@@ -262,7 +262,7 @@ getHashInfo ( tr_metainfo_builder * b )
     assert( b->abortFlag || (walk-ret == (int)(SHA_DIGEST_LENGTH*b->pieceCount)) );
     assert( b->abortFlag || !totalRemain );
 
-    if( fp != NULL )
+    if( fp )
         fclose( fp );
 
     tr_free( buf );
@@ -431,7 +431,7 @@ static void workerFunc( void * user_data )
         /* find the next builder to process */
         tr_lock * lock = getQueueLock ( handle );
         tr_lockLock( lock );
-        if( queue != NULL ) {
+        if( queue ) {
             builder = queue;
             queue = queue->nextBuilder;
         }

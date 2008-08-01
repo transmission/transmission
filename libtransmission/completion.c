@@ -163,7 +163,7 @@ tr_cpPieceRem( tr_completion * cp, tr_piece_index_t piece )
     const tr_block_index_t end = start + tr_torPieceCountBlocks( tor, piece );
     tr_block_index_t block;
 
-    assert( cp != NULL );
+    assert( cp );
     assert( piece < tor->info.pieceCount );
     assert( start < tor->blockCount );
     assert( start <= end );

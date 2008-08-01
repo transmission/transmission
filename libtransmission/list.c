@@ -37,7 +37,7 @@ tr_list_free( tr_list** list, TrListForeachFunc data_free_func )
     {
         tr_list *node = *list;
         *list = (*list)->next;
-        if( data_free_func != NULL )
+        if( data_free_func )
             data_free_func( node->data );
         node_free( node );
     }
@@ -125,7 +125,7 @@ void*
 tr_list_pop_front( tr_list ** list )
 {
     void * ret = NULL;
-    if( *list != NULL )
+    if( *list )
     {
         ret = (*list)->data;
         tr_list_remove_node( list, *list );
@@ -161,7 +161,7 @@ tr_list_find ( tr_list * list , const void * b, TrListCompareFunc func )
 void
 tr_list_foreach( tr_list * list, TrListForeachFunc func )
 {
-    while( list != NULL ) {
+    while( list ) {
         func( list->data );
         list = list->next;
     }
@@ -171,7 +171,7 @@ int
 tr_list_size( const tr_list * list )
 {
     int size = 0;
-    while( list != NULL ) {
+    while( list ) {
         ++size;
         list = list->next;
     }

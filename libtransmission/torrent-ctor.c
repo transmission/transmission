@@ -107,7 +107,7 @@ tr_ctorSetMetainfoFromFile( tr_ctor        * ctor,
     /* if no `name' field was set, then set it from the filename */
     if( ctor->isSet_metainfo ) {
         tr_benc * info = tr_bencDictFindType( &ctor->metainfo, "info", TYPE_DICT );
-        if( info != NULL ) {
+        if( info ) {
             tr_benc * name = tr_bencDictFindFirst( info, "name.utf-8", "name", NULL );
             if( name == NULL )
                 name = tr_bencDictAdd( info, "name" );

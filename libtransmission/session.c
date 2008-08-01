@@ -83,7 +83,7 @@ tr_getPeerId( void )
 tr_encryption_mode
 tr_sessionGetEncryption( tr_session * session )
 {
-    assert( session != NULL );
+    assert( session );
 
     return session->encryptionMode;
 }
@@ -91,7 +91,7 @@ tr_sessionGetEncryption( tr_session * session )
 void
 tr_sessionSetEncryption( tr_session * session, tr_encryption_mode mode )
 {
-    assert( session != NULL );
+    assert( session );
     assert( mode==TR_ENCRYPTION_PREFERRED
          || mode==TR_ENCRYPTION_REQUIRED
          || mode==TR_PLAINTEXT_PREFERRED );
@@ -392,7 +392,7 @@ tr_sessionSetPeerPort( tr_handle * handle, int port )
 int
 tr_sessionGetPeerPort( const tr_handle * h )
 {
-    assert( h != NULL );
+    assert( h );
     return tr_sharedGetPeerPort( h->shared );
 }
 
@@ -844,7 +844,7 @@ tr_sessionSetTorrentFile( tr_handle    * h,
                                              h->metainfoLookupCount,
                                              sizeof( struct tr_metainfo_lookup ),
                                              compareHashStringToLookupEntry );
-    if( l != NULL )
+    if( l )
     {
         if( l->filename != filename )
         {

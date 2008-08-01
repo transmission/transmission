@@ -240,8 +240,8 @@ recalculateHash( const tr_torrent  * tor,
 
     tr_lockLock( lock );
 
-    assert( tor != NULL );
-    assert( setme != NULL );
+    assert( tor );
+    assert( setme );
     assert( pieceIndex < tor->info.pieceCount );
 
     n = tr_torPieceCountBytes( tor, pieceIndex );

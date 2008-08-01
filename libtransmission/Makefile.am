@@ -1,5 +1,5 @@
 AM_CPPFLAGS = -I. -I$(top_srcdir) -I$(top_srcdir)/third-party/ -D__TRANSMISSION__ $(LIBEVENT_CPPFLAGS)
-AM_CFLAGS = $(OPENSSL_CFLAGS) $(LIBCURL_CFLAGS) $(PTHREAD_CFLAGS)
+AM_CFLAGS = $(LIBCURL_CFLAGS) $(OPENSSL_CFLAGS) $(PTHREAD_CFLAGS)
 
 noinst_LIBRARIES = libtransmission.a
 
@@ -110,8 +110,8 @@ APPS_LDADD = \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/libevent/libevent.la \
     $(INTLLIBS) \
-    $(OPENSSL_LIBS) \
     $(LIBCURL_LIBS) \
+    $(OPENSSL_LIBS) \
     $(PTHREAD_LIBS) \
     -lm
 

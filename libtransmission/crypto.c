@@ -241,7 +241,7 @@ tr_cryptoSetTorrentHash( tr_crypto     * crypto,
 {
     crypto->torrentHashIsSet = hash ? 1 : 0;
 
-    if( hash != NULL )
+    if( hash )
         memcpy( crypto->torrentHash, hash, SHA_DIGEST_LENGTH );
     else
         memset( crypto->torrentHash, 0, SHA_DIGEST_LENGTH );
@@ -250,7 +250,7 @@ tr_cryptoSetTorrentHash( tr_crypto     * crypto,
 const uint8_t*
 tr_cryptoGetTorrentHash( const tr_crypto * crypto )
 {
-    assert( crypto != NULL );
+    assert( crypto );
     assert( crypto->torrentHashIsSet );
 
     return crypto->torrentHash;
@@ -259,7 +259,7 @@ tr_cryptoGetTorrentHash( const tr_crypto * crypto )
 int
 tr_cryptoHasTorrentHash( const tr_crypto * crypto )
 {
-    assert( crypto != NULL );
+    assert( crypto );
 
     return crypto->torrentHashIsSet ? 1 : 0;
 }

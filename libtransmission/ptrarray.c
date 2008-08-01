@@ -56,9 +56,9 @@ tr_ptrArrayForeach( tr_ptrArray * t, PtrArrayForeachFunc func )
 {
     int i;
 
-    assert( t != NULL );
-    assert( t->items != NULL );
-    assert( func != NULL );
+    assert( t );
+    assert( t->items );
+    assert( func );
 
     for( i=0; i<t->n_items; ++i )
         func( t->items[i] );
@@ -67,10 +67,10 @@ tr_ptrArrayForeach( tr_ptrArray * t, PtrArrayForeachFunc func )
 void
 tr_ptrArrayFree( tr_ptrArray * t, PtrArrayForeachFunc func )
 {
-    assert( t != NULL );
-    assert( t->items != NULL );
+    assert( t );
+    assert( t->items );
 
-    if( func != NULL )
+    if( func )
         tr_ptrArrayForeach( t, func );
 
     tr_free( t->items );
@@ -93,7 +93,7 @@ tr_ptrArrayBase( tr_ptrArray * t )
 void*
 tr_ptrArrayNth( tr_ptrArray* t, int i )
 {
-    assert( t != NULL  );
+    assert( t );
     assert( i >= 0 );
     assert( i < t->n_items );
 

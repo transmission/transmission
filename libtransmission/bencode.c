@@ -33,7 +33,7 @@
 int
 tr_bencIsType( const tr_benc * val, int type )
 {
-    return ( ( val != NULL ) && ( val->type == type ) );
+    return ( ( val ) && ( val->type == type ) );
 }
 
 static int
@@ -176,14 +176,14 @@ getNode( tr_benc * top, tr_ptrArray * parentStack, int type )
 {
     tr_benc * parent;
 
-    assert( top != NULL );
-    assert( parentStack != NULL );
+    assert( top );
+    assert( parentStack );
 
     if( tr_ptrArrayEmpty( parentStack ) )
         return top;
 
     parent = tr_ptrArrayBack( parentStack );
-    assert( parent != NULL );
+    assert( parent );
 
     /* dictionary keys must be strings */
     if( ( parent->type == TYPE_DICT )
@@ -300,7 +300,7 @@ tr_bencParse( const void     * buf_in,
 
     err = !isSomething( top ) || !tr_ptrArrayEmpty( parentStack );
 
-    if( !err && ( setme_end != NULL ) )
+    if( !err && setme_end )
         *setme_end = buf;
 
     tr_ptrArrayFree( parentStack, NULL );
@@ -903,7 +903,7 @@ tr_bencSave( const tr_benc * top, int * len )
     walkFuncs.containerEndFunc = saveContainerEndFunc;
     bencWalk( top, &walkFuncs, out );
     
-    if( len != NULL )
+    if( len )
         *len = EVBUFFER_LENGTH( out );
     ret = tr_strndup( (char*) EVBUFFER_DATA( out ), EVBUFFER_LENGTH( out ) );
     evbuffer_free( out );
@@ -1205,7 +1205,7 @@ tr_bencSaveAsJSON( const tr_benc * top, int * len )
     
     if( EVBUFFER_LENGTH( data.out ) )
         evbuffer_add_printf( data.out, "\n" );
-    if( len != NULL )
+    if( len )
         *len = EVBUFFER_LENGTH( data.out );
     ret = tr_strndup( (char*) EVBUFFER_DATA( data.out ), EVBUFFER_LENGTH( data.out ) );
     evbuffer_free( data.out );

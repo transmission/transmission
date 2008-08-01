@@ -176,7 +176,7 @@ void
 tr_deepLog( const char * file, int line, const char * name, const char * fmt, ... )
 {
     FILE * fp = tr_getLog( );
-    if( fp != NULL )
+    if( fp )
     {
         va_list args;
         char timestr[64];
@@ -652,7 +652,7 @@ tr_strndup( const void * in, int len )
     {
         out = tr_strdup( in );
     }
-    else if( in != NULL )
+    else if( in )
     {
         out = tr_malloc( len+1 );
         memcpy( out, in, len );
@@ -823,8 +823,8 @@ tr_bitfieldFindTrue( const tr_bitfield  * bitfield,
 int
 tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
 {
-    assert( bitfield != NULL );
-    assert( bitfield->bits != NULL );
+    assert( bitfield );
+    assert( bitfield->bits );
 
     if( nth >= bitfield->bitCount )
         return -1;
@@ -850,8 +850,8 @@ int
 tr_bitfieldRem( tr_bitfield   * bitfield,
                 size_t          nth )
 {
-    assert( bitfield != NULL );
-    assert( bitfield->bits != NULL );
+    assert( bitfield );
+    assert( bitfield->bits );
 
     if( nth >= bitfield->bitCount )
         return -1;
@@ -997,8 +997,8 @@ tr_strlcpy(char *dst, const char *src, size_t siz)
     const char *s = src;
     size_t n = siz;
 
-    assert( s != NULL );
-    assert( d != NULL );
+    assert( s );
+    assert( d );
 
     /* Copy as many bytes as will fit */
     if (n != 0) {

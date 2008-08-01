@@ -336,7 +336,7 @@ myDebug( const char * file, int line,
          const char * fmt, ... )
 {
     FILE * fp = tr_getLog( );
-    if( fp != NULL )
+    if( fp )
     {
         va_list args;
         char timestr[64];
@@ -551,7 +551,7 @@ isPeerInteresting( const tr_peermsgs * msgs )
 static void
 sendInterest( tr_peermsgs * msgs, int weAreInterested )
 {
-    assert( msgs != NULL );
+    assert( msgs );
     assert( weAreInterested==0 || weAreInterested==1 );
 
     msgs->info->clientIsInterested = weAreInterested;
@@ -585,8 +585,8 @@ tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
 {
     const time_t fibrillationTime = time(NULL) - MIN_CHOKE_PERIOD_SEC;
 
-    assert( msgs != NULL );
-    assert( msgs->info != NULL );
+    assert( msgs );
+    assert( msgs->info );
     assert( choke==0 || choke==1 );
 
     if( msgs->info->chokeChangedAt > fibrillationTime )
@@ -621,7 +621,7 @@ static void
 sendFastSuggest( tr_peermsgs * msgs,
                  uint32_t      pieceIndex )
 {
-    assert( msgs != NULL );
+    assert( msgs );
     
     if( tr_peerIoSupportsFEXT( msgs->io ) )
     {
@@ -633,7 +633,7 @@ sendFastSuggest( tr_peermsgs * msgs,
 static void
 sendFastHave( tr_peermsgs * msgs, int all )
 {
-    assert( msgs != NULL );
+    assert( msgs );
     
     if( tr_peerIoSupportsFEXT( msgs->io ) )
     {
@@ -651,7 +651,7 @@ sendFastReject( tr_peermsgs * msgs,
                 uint32_t      offset,
                 uint32_t      length )
 {
-    assert( msgs != NULL );
+    assert( msgs );
 
     if( tr_peerIoSupportsFEXT( msgs->io ) )
     {
@@ -684,7 +684,7 @@ static void
 sendFastAllowed( tr_peermsgs * msgs,
                  uint32_t      pieceIndex)
 {
-    assert( msgs != NULL );
+    assert( msgs );
     
     if( tr_peerIoSupportsFEXT( msgs->io ) )
     {
@@ -850,8 +850,8 @@ tr_peerMsgsAddRequest( tr_peermsgs       * msgs,
 {
     struct peer_request req;
 
-    assert( msgs != NULL );
-    assert( msgs->torrent != NULL );
+    assert( msgs );
+    assert( msgs->torrent );
     assert( piece < msgs->torrent->info.pieceCount );
 
     /**
@@ -1492,8 +1492,8 @@ clientGotBlock( tr_peermsgs                * msgs,
     tr_torrent * tor = msgs->torrent;
     const tr_block_index_t block = _tr_block( tor, req->index, req->offset );
 
-    assert( msgs != NULL );
-    assert( req != NULL );
+    assert( msgs );
+    assert( req );
 
     if( req->length != tr_torBlockCountBytes( msgs->torrent, block ) )
     {
@@ -1907,8 +1907,8 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
 {
     tr_peermsgs * m;
 
-    assert( info != NULL );
-    assert( info->io != NULL );
+    assert( info );
+    assert( info->io );
 
     m = tr_new0( tr_peermsgs, 1 );
     m->publisher = tr_publisherNew( );
@@ -1952,7 +1952,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
 void
 tr_peerMsgsFree( tr_peermsgs* msgs )
 {
-    if( msgs != NULL )
+    if( msgs )
     {
         tr_timerFree( &msgs->pulseTimer );
         tr_timerFree( &msgs->rateTimer );

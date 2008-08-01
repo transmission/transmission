@@ -36,8 +36,8 @@ static void
 fireCheckDone( tr_torrent          * torrent,
                tr_verify_done_cb     verify_done_cb )
 {
-    if( verify_done_cb != NULL )
-        (*verify_done_cb)( torrent );
+    if( verify_done_cb )
+        verify_done_cb( torrent );
 }
 
 static struct verify_node currentNode;

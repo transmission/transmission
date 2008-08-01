@@ -80,8 +80,8 @@ static void
 didWriteWrapper( struct bufferevent * e, void * userData )
 {
     tr_peerIo * c = (tr_peerIo *) userData;
-    if( c->didWrite != NULL )
-        (*c->didWrite)( e, c->userData );
+    if( c->didWrite )
+        c->didWrite( e, c->userData );
 }
 
 static void
@@ -98,7 +98,7 @@ canReadWrapper( struct bufferevent * e, void * userData )
 
     while( !done )
     {
-        const int ret = (*c->canRead)( e, c->userData );
+        const int ret = c->canRead( e, c->userData );
 
         switch( ret )
         {
@@ -118,8 +118,8 @@ static void
 gotErrorWrapper( struct bufferevent * e, short what, void * userData )
 {
     tr_peerIo * c = userData;
-    if( c->gotError != NULL )
-        (*c->gotError)( e, what, c->userData );
+    if( c->gotError )
+        c->gotError( e, what, c->userData );
 }
 
 /**
@@ -168,8 +168,8 @@ tr_peerIoNewIncoming( struct tr_handle      * handle,
                       uint16_t                port,
                       int                     socket )
 {
-    assert( handle != NULL );
-    assert( in_addr != NULL );
+    assert( handle );
+    assert( in_addr );
     assert( socket >= 0 );
 
     return tr_peerIoNew( handle, in_addr, port,
@@ -185,10 +185,10 @@ tr_peerIoNewOutgoing( struct tr_handle      * handle,
 {
     int socket;
 
-    assert( handle != NULL );
-    assert( in_addr != NULL );
+    assert( handle );
+    assert( in_addr );
     assert( port >= 0 );
-    assert( torrentHash != NULL );
+    assert( torrentHash );
 
     socket = tr_netOpenTCP( in_addr, port, 0 );
 
@@ -211,7 +211,7 @@ io_dtor( void * vio )
 void
 tr_peerIoFree( tr_peerIo * io )
 {
-    if( io != NULL )
+    if( io )
     {
         io->canRead = NULL;
         io->didWrite = NULL;
@@ -223,8 +223,8 @@ tr_peerIoFree( tr_peerIo * io )
 tr_handle*
 tr_peerIoGetHandle( tr_peerIo * io )
 {
-    assert( io != NULL );
-    assert( io->handle != NULL );
+    assert( io );
+    assert( io->handle );
 
     return io->handle;
 }
@@ -232,9 +232,9 @@ tr_peerIoGetHandle( tr_peerIo * io )
 const struct in_addr*
 tr_peerIoGetAddress( const tr_peerIo * io, uint16_t * port )
 {
-    assert( io != NULL );
+    assert( io );
 
-    if( port != NULL )
+    if( port )
        *port = io->port;
 
     return &io->in_addr;
@@ -329,7 +329,7 @@ void
 tr_peerIoSetTorrentHash( tr_peerIo     * io,
                          const uint8_t * hash )
 {
-    assert( io != NULL );
+    assert( io );
 
     tr_cryptoSetTorrentHash( io->crypto, hash );
 }
@@ -337,8 +337,8 @@ tr_peerIoSetTorrentHash( tr_peerIo     * io,
 const uint8_t*
 tr_peerIoGetTorrentHash( tr_peerIo * io )
 {
-    assert( io != NULL );
-    assert( io->crypto != NULL );
+    assert( io );
+    assert( io->crypto );
 
     return tr_cryptoGetTorrentHash( io->crypto );
 }
@@ -346,8 +346,8 @@ tr_peerIoGetTorrentHash( tr_peerIo * io )
 int
 tr_peerIoHasTorrentHash( const tr_peerIo * io )
 {
-    assert( io != NULL );
-    assert( io->crypto != NULL );
+    assert( io );
+    assert( io->crypto );
 
     return tr_cryptoHasTorrentHash( io->crypto );
 }
@@ -360,7 +360,7 @@ void
 tr_peerIoSetPeersId( tr_peerIo     * io,
                      const uint8_t * peer_id )
 {
-    assert( io != NULL );
+    assert( io );
 
     if(( io->peerIdIsSet = peer_id != NULL ))
         memcpy( io->peerId, peer_id, 20 );
@@ -371,7 +371,7 @@ tr_peerIoSetPeersId( tr_peerIo     * io,
 const uint8_t* 
 tr_peerIoGetPeersId( const tr_peerIo * io )
 {
-    assert( io != NULL );
+    assert( io );
     assert( io->peerIdIsSet );
 
     return io->peerId;
@@ -384,7 +384,7 @@ tr_peerIoGetPeersId( const tr_peerIo * io )
 void
 tr_peerIoEnableLTEP( tr_peerIo * io, int flag )
 {
-    assert( io != NULL );
+    assert( io );
     assert( flag==0 || flag==1 );
     
     io->extendedProtocolSupported = flag;
@@ -393,7 +393,7 @@ tr_peerIoEnableLTEP( tr_peerIo * io, int flag )
 void
 tr_peerIoEnableFEXT( tr_peerIo * io, int flag )
 {
-    assert( io != NULL );
+    assert( io );
     assert( flag==0 || flag==1 );
     
     io->fastPeersSupported = flag;
@@ -402,7 +402,7 @@ tr_peerIoEnableFEXT( tr_peerIo * io, int flag )
 int
 tr_peerIoSupportsLTEP( const tr_peerIo * io )
 {
-    assert( io != NULL );
+    assert( io );
     
     return io->extendedProtocolSupported;
 }
@@ -410,7 +410,7 @@ tr_peerIoSupportsLTEP( const tr_peerIo * io )
 int
 tr_peerIoSupportsFEXT( const tr_peerIo * io )
 {
-    assert( io != NULL );
+    assert( io );
     
     return io->fastPeersSupported;
 }
@@ -456,7 +456,7 @@ void
 tr_peerIoSetEncryption( tr_peerIo * io,
                         int         encryptionMode )
 {
-    assert( io != NULL );
+    assert( io );
     assert( encryptionMode==PEER_ENCRYPTION_NONE || encryptionMode==PEER_ENCRYPTION_RC4 );
 
     io->encryptionMode = encryptionMode;

@@ -96,7 +96,7 @@ tr_rcBytesLeft( const tr_ratecontrol * r )
 {
     size_t bytes = 0;
 
-    if( r != NULL )
+    if( r )
     {
         const float cur = rateForInterval( r, SHORT_INTERVAL_MSEC );
         const float max = r->limit;

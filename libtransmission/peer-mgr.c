@@ -248,11 +248,11 @@ static tr_peer*
 getExistingPeer( Torrent * torrent, const struct in_addr * in_addr )
 {
     assert( torrentIsLocked( torrent ) );
-    assert( in_addr != NULL );
+    assert( in_addr );
 
-    return (tr_peer*) tr_ptrArrayFindSorted( torrent->peers,
-                                             in_addr,
-                                             peerCompareToAddr );
+    return tr_ptrArrayFindSorted( torrent->peers,
+                                  in_addr,
+                                  peerCompareToAddr );
 }
 
 static struct peer_atom*
@@ -305,8 +305,8 @@ getPeer( Torrent * torrent, const struct in_addr * in_addr )
 static void
 peerDestructor( tr_peer * peer )
 {
-    assert( peer != NULL );
-    assert( peer->msgs != NULL );
+    assert( peer );
+    assert( peer->msgs );
 
     tr_peerMsgsUnsubscribe( peer->msgs, peer->msgsTag );
     tr_peerMsgsFree( peer->msgs );
@@ -330,7 +330,7 @@ removePeer( Torrent * t, tr_peer * peer )
     assert( torrentIsLocked( t ) );
 
     atom = getExistingAtom( t, &peer->in_addr );
-    assert( atom != NULL );
+    assert( atom );
     atom->time = time( NULL );
 
     removed = tr_ptrArrayRemoveSorted( t->peers, peer, peerCompare );
@@ -350,9 +350,9 @@ torrentDestructor( Torrent * t )
 {
     uint8_t hash[SHA_DIGEST_LENGTH];
 
-    assert( t != NULL );
+    assert( t );
     assert( !t->isRunning );
-    assert( t->peers != NULL );
+    assert( t->peers );
     assert( torrentIsLocked( t ) );
     assert( tr_ptrArrayEmpty( t->outgoingHandshakes ) );
     assert( tr_ptrArrayEmpty( t->peers ) );
@@ -480,7 +480,7 @@ getConnectedPeers( Torrent * t, int * setmeCount )
     ret = tr_new( tr_peer*, peerCount );
 
     for( i=connectionCount=0; i<peerCount; ++i )
-        if( peers[i]->msgs != NULL )
+        if( peers[i]->msgs )
             ret[connectionCount++] = peers[i];
 
     *setmeCount = connectionCount;
@@ -936,7 +936,7 @@ myHandshakeDoneCB( tr_handshake    * handshake,
     Torrent * t;
     tr_handshake * ours;
 
-    assert( io != NULL );
+    assert( io );
     assert( isConnected==0 || isConnected==1 );
 
     t = tr_peerIoHasTorrentHash( io )
@@ -946,16 +946,16 @@ myHandshakeDoneCB( tr_handshake    * handshake,
     if( tr_peerIoIsIncoming ( io ) )
         ours = tr_ptrArrayRemoveSorted( manager->incomingHandshakes,
                                         handshake, handshakeCompare );
-    else if( t != NULL )
+    else if( t )
         ours = tr_ptrArrayRemoveSorted( t->outgoingHandshakes,
                                         handshake, handshakeCompare );
     else
         ours = handshake;
 
-    assert( ours != NULL );
+    assert( ours );
     assert( ours == handshake );
 
-    if( t != NULL )
+    if( t )
         torrentLock( t );
 
     addr = tr_peerIoGetAddress( io, &port );
@@ -1000,7 +1000,7 @@ myHandshakeDoneCB( tr_handshake    * handshake,
         {
             tr_peer * peer = getExistingPeer( t, addr );
 
-            if( peer != NULL ) /* we already have this peer */
+            if( peer ) /* we already have this peer */
             {
                 tr_peerIoFree( io );
             }
@@ -1024,7 +1024,7 @@ myHandshakeDoneCB( tr_handshake    * handshake,
         }
     }
 
-    if( t != NULL )
+    if( t )
         torrentUnlock( t );
 }
 
@@ -1136,8 +1136,8 @@ tr_peerMgrSetBlame( tr_peerMgr     * manager,
 int
 tr_pexCompare( const void * va, const void * vb )
 {
-    const tr_pex * a = (const tr_pex *) va;
-    const tr_pex * b = (const tr_pex *) vb;
+    const tr_pex * a = va;
+    const tr_pex * b = vb;
     int i = memcmp( &a->in_addr, &b->in_addr, sizeof(struct in_addr) );
     if( i ) return i;
     if( a->port < b->port ) return -1;
@@ -1210,7 +1210,7 @@ tr_peerMgrStartTorrent( tr_peerMgr     * manager,
 
     t = getExistingTorrent( manager, torrentHash );
 
-    assert( t != NULL );
+    assert( t );
     assert( ( t->isRunning != 0 ) == ( t->reconnectTimer != NULL ) );
     assert( ( t->isRunning != 0 ) == ( t->rechokeTimer != NULL ) );
 
@@ -1274,7 +1274,7 @@ tr_peerMgrAddTorrent( tr_peerMgr * manager,
 
     managerLock( manager );
 
-    assert( tor != NULL );
+    assert( tor );
     assert( getExistingTorrent( manager, tor->info.hash ) == NULL );
 
     t = torrentConstructor( manager, tor );
@@ -1292,7 +1292,7 @@ tr_peerMgrRemoveTorrent( tr_peerMgr     * manager,
     managerLock( manager );
 
     t = getExistingTorrent( manager, torrentHash );
-    assert( t != NULL );
+    assert( t );
     stopTorrent( t );
     tr_ptrArrayRemoveSorted( manager->torrents, t, torrentCompare );
     torrentDestructor( t );
@@ -1905,7 +1905,7 @@ reconnectPulse( void * vtorrent )
                                                             myHandshakeDoneCB,
                                                             mgr );
 
-                assert( tr_peerIoGetTorrentHash( io ) != NULL );
+                assert( tr_peerIoGetTorrentHash( io ) );
 
                 ++newConnectionsThisSecond;
 

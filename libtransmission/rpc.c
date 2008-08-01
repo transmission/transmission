@@ -33,7 +33,7 @@
 static void
 notify( tr_handle * session, int type, tr_torrent * tor )
 {
-    if( session->rpc_func != NULL )
+    if( session->rpc_func )
         session->rpc_func( session, type, tor, session->rpc_func_user_data );
 }
 

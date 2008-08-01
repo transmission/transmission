@@ -286,7 +286,7 @@ sendYa( tr_handshake * handshake )
     /* add our public key (Ya) */
     public_key = tr_cryptoGetMyPublicKey( handshake->crypto, &len );
     assert( len == KEY_LEN );
-    assert( public_key != NULL );
+    assert( public_key );
     evbuffer_add( outbuf, public_key, len );
 
     /* add some bullshit padding */
@@ -1057,8 +1057,8 @@ tr_handshakeNew( tr_peerIo           * io,
 const struct in_addr *
 tr_handshakeGetAddr( const struct tr_handshake * handshake, uint16_t * port )
 {
-    assert( handshake != NULL );
-    assert( handshake->io != NULL );
+    assert( handshake );
+    assert( handshake->io );
 
     return tr_peerIoGetAddress( handshake->io, port );
 }
