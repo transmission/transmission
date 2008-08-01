@@ -1536,7 +1536,6 @@ struct ChokeData
 {
     unsigned int  doUnchoke     : 1;
     unsigned int  isInterested  : 1;
-    uint32_t rate;
     tr_peer * peer;
 };
 
@@ -1573,20 +1572,12 @@ isSame( const tr_peer * peer )
 ***
 **/
 
-static int
-getWeightedRate( const tr_peer * peer, int clientIsSeed )
-{
-    return (int)( 10.0 * ( clientIsSeed ? peer->rateToPeer
-                                        : peer->rateToClient ) );
-}
-
 static void
 rechoke( Torrent * t )
 {
     int i, peerCount, size, unchokedInterested;
     tr_peer ** peers = getConnectedPeers( t, &peerCount );
     struct ChokeData * choke = tr_new0( struct ChokeData, peerCount );
-    const int clientIsSeed = tr_torrentIsSeed( t->tor );
 
     assert( torrentIsLocked( t ) );
     
@@ -1600,7 +1591,6 @@ rechoke( Torrent * t )
             struct ChokeData * node = &choke[size++];
             node->peer = peer;
             node->isInterested = peer->peerIsInterested;
-            node->rate = getWeightedRate( peer, clientIsSeed );
         }
     }
 
