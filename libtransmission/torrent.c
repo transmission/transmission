@@ -389,6 +389,22 @@ randomizeTiers( tr_info * info )
 
 static void torrentStart( tr_torrent * tor, int reloadProgress );
 
+/**
+ * Decide on a block size.  constraints:
+ * (1) most clients decline requests over 16 KiB
+ * (2) pieceSize must be a multiple of block size
+ */
+static uint32_t
+getBlockSize( uint32_t pieceSize )
+{
+    uint32_t b = pieceSize;
+    while( b > MAX_BLOCK_SIZE )
+        b /= 2u;
+    if( pieceSize % b ) /* not cleanly divisible */
+        return 0;
+    return b;
+}
+
 static void
 torrentRealInit( tr_handle     * h,
                  tr_torrent    * tor,
@@ -407,14 +423,7 @@ torrentRealInit( tr_handle     * h,
 
     randomizeTiers( info );
 
-    /**
-     * Decide on a block size.  constraints:
-     * (1) most clients decline requests over 16 KiB
-     * (2) pieceSize must be a multiple of block size
-     */
-    tor->blockSize = info->pieceSize;
-    while( tor->blockSize > MAX_BLOCK_SIZE )
-        tor->blockSize /= 2;
+    tor->blockSize = getBlockSize( info->pieceSize );
 
     tor->lastPieceSize = info->totalSize % info->pieceSize;
 
@@ -543,6 +552,9 @@ tr_torrentParse( const tr_handle  * handle,
 
     err = tr_metainfoParse( handle, setmeInfo, metainfo );
     doFree = !err && ( setmeInfo == &tmp );
+
+    if( !getBlockSize( setmeInfo->pieceSize ) )
+        err = TR_EINVALID;
 
     if( !err && tr_torrentExists( handle, setmeInfo->hash ) )
         err = TR_EDUPLICATE;
