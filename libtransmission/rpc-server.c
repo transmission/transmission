@@ -365,10 +365,8 @@ startServer( tr_rpc_server * server )
         if( clutchDir && *clutchDir )
         {
             tr_inf( _( "Serving the web interface files from \"%s\"" ), clutchDir );
-            argv[argc++] = tr_strdup( "-aliases" );
-            argv[argc++] = tr_strdup_printf( "%s=%s,%s=%s",
-                                             "/transmission/clutch", clutchDir,
-                                             "/transmission/web", clutchDir );
+            argv[argc++] = tr_strdup( "-root" );
+            argv[argc++] = tr_strdup( clutchDir );
         }
 
         argv[argc] = NULL; /* shttpd_init() wants it null-terminated */
