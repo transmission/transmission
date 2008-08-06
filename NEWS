@@ -1,5 +1,10 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.31 (2008/08/06)
+http://trac.transmissionbt.com/query?group=component&milestone=1.31
+- All Platforms
+   + Fix a crash caused by certain torrent files
+
 1.30 (2008/08/05)
 http://trac.transmissionbt.com/query?group=component&milestone=1.30
 - All Platforms
@@ -23,8 +28,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.30
    + Turkish localization
 - GTK+
    + Add options to inhibit hibernation and to toggle the tray icon
-   + Lots of small bug fixes and usability improvements
-   + Dozens of updated translations
+   + Various bug fixes and usability improvements
 
 1.22 (2008/06/13)
 http://trac.transmissionbt.com/query?group=component&milestone=1.22
