@@ -237,6 +237,24 @@ handle_upload( struct shttpd_arg * arg )
 }
 
 static void
+handle_root( struct shttpd_arg * arg )
+{
+    const char * redirect = "HTTP/1.1 200 OK""\r\n"
+                            "Content-Type: text/html" "\r\n"
+                            "\r\n"
+                            "<html><head>" "\r\n"
+                            "  <meta http-equiv=\"Refresh\" content=\"2; url=/transmission/web\">" "\r\n"
+                            "</head><body>" "\r\n"
+                            "  <p>redirecting to <a href=\"/transmission/web\">/transmission/web</a></p>" "\r\n"
+                            "</body></html>" "\r\n";
+    const size_t n = strlen( redirect );
+    memcpy( arg->out.buf, redirect, n );
+    arg->in.num_bytes = arg->in.len;
+    arg->out.num_bytes = n;
+    arg->flags |= SHTTPD_END_OF_OUTPUT;
+}
+
+static void
 handle_rpc( struct shttpd_arg * arg )
 {
     struct tr_rpc_server * s = arg->user_data;
@@ -365,8 +383,10 @@ startServer( tr_rpc_server * server )
         if( clutchDir && *clutchDir )
         {
             tr_inf( _( "Serving the web interface files from \"%s\"" ), clutchDir );
-            argv[argc++] = tr_strdup( "-root" );
-            argv[argc++] = tr_strdup( clutchDir );
+            argv[argc++] = tr_strdup( "-aliases" );
+            argv[argc++] = tr_strdup_printf( "%s=%s,%s=%s",
+                                             "/transmission/clutch", clutchDir,
+                                             "/transmission/web", clutchDir );
         }
 
         argv[argc] = NULL; /* shttpd_init() wants it null-terminated */
@@ -374,6 +394,7 @@ startServer( tr_rpc_server * server )
         server->ctx = shttpd_init( argc, argv );
         shttpd_register_uri( server->ctx, "/transmission/rpc", handle_rpc, server );
         shttpd_register_uri( server->ctx, "/transmission/upload", handle_upload, server );
+        shttpd_register_uri( server->ctx, "/", handle_root, server );
 
         evtimer_set( &server->timer, rpcPulse, server );
         evtimer_add( &server->timer, &tv );
