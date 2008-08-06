@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-07-28 15:13+0000\n"
+"PO-Revision-Date: 2008-07-29 16:45+0000\n"
 "Last-Translator: Masatoshi Haraoka <f99aq8ove@gmail.com>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2008-07-29 01:01+0000\n"
+"X-Launchpad-Export-Date: 2008-08-06 01:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -195,8 +195,9 @@ msgid "Torrent Options"
 msgstr "Torrent オプション"
 
 #: ../gtk/add-dialog.c:253
+#, fuzzy
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "追加後にソースファイルをごみ箱へ"
 
 #: ../gtk/add-dialog.c:254 ../gtk/tr-prefs.c:314
 msgid "_Start when added"
@@ -517,20 +518,21 @@ msgid "Trackers"
 msgstr "トラッカー"
 
 #: ../gtk/details.c:1188
+#, fuzzy
 msgid "Scrape"
-msgstr ""
+msgstr "共有情報の収集"
 
 #: ../gtk/details.c:1190
 msgid "Last scrape at:"
-msgstr ""
+msgstr "最終収集日時:"
 
 #: ../gtk/details.c:1195 ../gtk/details.c:1217
 msgid "Tracker responded:"
-msgstr ""
+msgstr "トラッカーの応答:"
 
 #: ../gtk/details.c:1200
 msgid "Next scrape in:"
-msgstr ""
+msgstr "次回収集まで:"
 
 #: ../gtk/details.c:1206
 #, fuzzy
@@ -561,8 +563,9 @@ msgid "In progress"
 msgstr "実行中"
 
 #: ../gtk/details.c:1290
+#, fuzzy
 msgid "Now"
-msgstr ""
+msgstr "今"
 
 #. %1$s is torrent name
 #. %2$s its file size
@@ -757,7 +760,7 @@ msgstr ""
 
 #: ../gtk/makemeta-ui.c:101
 msgid "Torrent created!"
-msgstr ""
+msgstr "Torrent 作成完了"
 
 #: ../gtk/makemeta-ui.c:105 ../gtk/makemeta-ui.c:114 ../gtk/makemeta-ui.c:121
 #, c-format
@@ -782,12 +785,12 @@ msgstr "\"%1$s\" 読み込み失敗: %2$s"
 #: ../gtk/makemeta-ui.c:214 ../gtk/makemeta-ui.c:396
 #, c-format
 msgid "No source selected"
-msgstr ""
+msgstr "ソースファイル未選択"
 
 #: ../gtk/makemeta-ui.c:221 ../gtk/makemeta-ui.c:340
 #, c-format
 msgid "<i>No source selected</i>"
-msgstr ""
+msgstr "<i>ソースファイルが選択されていません</i>"
 
 #. %1$s is the torrent size
 #. %2$'d is its number of files

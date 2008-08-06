@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-07-08 13:54+0000\n"
+"PO-Revision-Date: 2008-08-05 11:27+0000\n"
 "Last-Translator: vestel <Unknown>\n"
 "Language-Team: Latvian <lv@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2008-07-29 01:01+0000\n"
+"X-Launchpad-Export-Date: 2008-08-06 01:01+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -44,9 +44,8 @@ msgid "Sort by _Tracker"
 msgstr "Šķirot pēc _trakera"
 
 #: ../gtk/actions.c:53
-#, fuzzy
 msgid "Sort by A_ge"
-msgstr "Sortēt pēc vecuma"
+msgstr "Šķirot pēc _vecuma"
 
 #: ../gtk/actions.c:70
 #, fuzzy
@@ -80,8 +79,9 @@ msgid "_Toolbar"
 msgstr "_Rīkjosla"
 
 #: ../gtk/actions.c:96
+#, fuzzy
 msgid "Tray _Icon"
-msgstr ""
+msgstr "Treja _ikoniņa"
 
 #: ../gtk/actions.c:101
 msgid "_Torrent"
@@ -106,7 +106,7 @@ msgstr "_Palīdzība"
 #: ../gtk/actions.c:106 ../gtk/actions.c:107
 #, fuzzy
 msgid "Add a torrent"
-msgstr "Privienot torrentu"
+msgstr "Pievienot torrentu"
 
 #: ../gtk/actions.c:107
 msgid "_Add..."
@@ -130,7 +130,7 @@ msgstr "_Pārbaudīt lokālos datus"
 
 #: ../gtk/actions.c:114
 msgid "_Pause"
-msgstr "_Pauze"
+msgstr "A_pturēt"
 
 #: ../gtk/actions.c:114
 #, fuzzy
@@ -143,8 +143,9 @@ msgid "Remove torrent"
 msgstr "Noņemt torrentu"
 
 #: ../gtk/actions.c:116
+#, fuzzy
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "Iz_dzēst failus un noņemt"
 
 #: ../gtk/actions.c:117
 #, fuzzy
@@ -176,7 +177,7 @@ msgstr "_Detaļas"
 #: ../gtk/actions.c:127
 #, fuzzy
 msgid "Torrent details"
-msgstr "Torrenta detalas"
+msgstr "Torrenta detaļas"
 
 #: ../gtk/actions.c:129
 msgid "_Open Folder"
@@ -184,7 +185,7 @@ msgstr "_Atvērt mapi"
 
 #: ../gtk/actions.c:131
 msgid "_Contents"
-msgstr ""
+msgstr "_Saturs"
 
 #: ../gtk/actions.c:133
 #, fuzzy
@@ -214,8 +215,9 @@ msgid "_Start when added"
 msgstr "_Sakt pēc pievienojuma"
 
 #: ../gtk/add-dialog.c:265
+#, fuzzy
 msgid "_Torrent file:"
-msgstr ""
+msgstr "_Torrenta fails:"
 
 #: ../gtk/add-dialog.c:269
 msgid "Select Source File"

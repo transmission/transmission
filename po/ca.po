@@ -15,14 +15,14 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-07-17 12:07+0000\n"
-"Last-Translator: DPini <Unknown>\n"
+"PO-Revision-Date: 2008-08-03 18:45+0000\n"
+"Last-Translator: David Planella <Unknown>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-07-29 01:01+0000\n"
+"X-Launchpad-Export-Date: 2008-08-06 01:01+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #~ msgid "Open a torrent"
@@ -434,7 +434,7 @@ msgstr "Opcions torrent"
 
 #: ../gtk/add-dialog.c:253
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "_Mou el fitxer font a la paperera"
 
 #: ../gtk/add-dialog.c:254 ../gtk/tr-prefs.c:314
 msgid "_Start when added"
@@ -442,7 +442,7 @@ msgstr "_Inicia quan s'afegeixi"
 
 #: ../gtk/add-dialog.c:265
 msgid "_Torrent file:"
-msgstr ""
+msgstr "Fitxer _torrent:"
 
 #: ../gtk/add-dialog.c:269
 msgid "Select Source File"
@@ -518,11 +518,11 @@ msgstr "Desobstrucció optimista"
 
 #: ../gtk/details.c:559
 msgid "Downloading from this peer"
-msgstr ""
+msgstr "S'està baixant des d'aquest client"
 
 #: ../gtk/details.c:560
 msgid "We would download from this peer if they would let us"
-msgstr ""
+msgstr "Es baixaria d'aquest client si ho permetés"
 
 #: ../gtk/details.c:561
 msgid "Uploading to peer"
@@ -530,7 +530,7 @@ msgstr "S'està pujant al client"
 
 #: ../gtk/details.c:562
 msgid "We would upload to this peer if they asked"
-msgstr ""
+msgstr "Es pujaria a aquest client si ho demanés"
 
 #: ../gtk/details.c:563
 msgid "Peer has unchoked us, but we're not interested"
@@ -538,7 +538,7 @@ msgstr "Un client ha permès l'entrada, però no hi estem interessats"
 
 #: ../gtk/details.c:564
 msgid "We unchoked this peer, but they're not interested"
-msgstr ""
+msgstr "S'ha permès l'entrada a aquest client, però no hi està interessat"
 
 #: ../gtk/details.c:565
 msgid "Encrypted connection"
@@ -563,7 +563,7 @@ msgstr "<b>Clients que només baixen:</b>"
 
 #: ../gtk/details.c:767
 msgid "<b>Times Completed:</b>"
-msgstr ""
+msgstr "<b>S'ha completat aquest nombre de vegades:</b>"
 
 #: ../gtk/details.c:788 ../gtk/details.c:1275 ../gtk/details.c:1286
 msgid "Never"
@@ -577,8 +577,8 @@ msgstr "Detalls"
 #, c-format
 msgid "%'d Piece"
 msgid_plural "%'d Pieces"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d Peça"
+msgstr[1] "%'d Peces"
 
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
@@ -589,7 +589,7 @@ msgstr "%1$s de %2$s"
 
 #: ../gtk/details.c:824
 msgid "Pieces:"
-msgstr "Trossos:"
+msgstr "Peces:"
 
 #: ../gtk/details.c:828
 msgid "Hash:"
@@ -782,9 +782,8 @@ msgid "Manual announce allowed in:"
 msgstr "Anunci manual permès en:"
 
 #: ../gtk/details.c:1247
-#, fuzzy
 msgid "In progress"
-msgstr "En progres"
+msgstr "En progrés"
 
 #: ../gtk/details.c:1290
 msgid "Now"
@@ -912,11 +911,11 @@ msgstr "_Baixa"
 
 #: ../gtk/file-list.c:675
 msgid "_Ignore"
-msgstr ""
+msgstr "_Ignora"
 
 #: ../gtk/file-list.c:678
 msgid "_Download"
-msgstr ""
+msgstr "_Baixada"
 
 #: ../gtk/main.c:351
 msgid "Start with all torrents paused"
@@ -953,14 +952,14 @@ msgstr "_Surt ara"
 #: ../gtk/main.c:860
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] "No puc afegir un torrent corrupte"
-msgstr[1] "No puc afegir torrents corruptes"
+msgstr[0] "No s'ha pogut afegir un torrent malmès"
+msgstr[1] "No s'han pogut afegir torrents malmesos"
 
 #: ../gtk/main.c:867
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] "No puc afegir un torrent duplicat"
-msgstr[1] "No puc afegir torrents duplicats"
+msgstr[0] "No s'ha pogut afegir un torrent duplicat"
+msgstr[1] "No s'han pogut afegir torrents duplicats"
 
 #: ../gtk/main.c:1095
 msgid "A fast and easy BitTorrent client"
@@ -979,6 +978,7 @@ msgstr ""
 "\n"
 "Launchpad Contributions:\n"
 "  DPini https://launchpad.net/~davidpini\n"
+"  David Planella https://launchpad.net/~dpm\n"
 "  Javi Rodríguez https://launchpad.net/~menut\n"
 "  Joan Duran https://launchpad.net/~jodufi"
 
@@ -1311,7 +1311,7 @@ msgstr "S'estan afegint torrents"
 
 #: ../gtk/tr-prefs.c:302
 msgid "Automatically _add torrents from:"
-msgstr ""
+msgstr "_Afegeix torrents automàticament des de:"
 
 #: ../gtk/tr-prefs.c:318
 msgid "Mo_ve source files to Trash"
@@ -1396,17 +1396,17 @@ msgstr "Denega"
 
 #: ../gtk/tr-prefs.c:794
 msgid "Web Interface"
-msgstr ""
+msgstr "Interfície web"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:797
 msgid "_Enable web interface"
-msgstr ""
+msgstr "_Habilita la interfície web"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:810
 msgid "_Require username"
-msgstr ""
+msgstr "Requereix un _nom d'usuari"
 
 #. username
 #: ../gtk/tr-prefs.c:818 ../gtk/tr-prefs.c:1034
@@ -1416,7 +1416,7 @@ msgstr "Nom d'_usuari:"
 #. password
 #: ../gtk/tr-prefs.c:825 ../gtk/tr-prefs.c:1040
 msgid "Pass_word:"
-msgstr ""
+msgstr "Contrasen_ya:"
 
 #: ../gtk/tr-prefs.c:850
 msgid "Access control list:"
@@ -1452,19 +1452,19 @@ msgstr "Servidor intermediari del rastrejador"
 
 #: ../gtk/tr-prefs.c:999
 msgid "Connect to tracker via a pro_xy"
-msgstr ""
+msgstr "Connecta al _rastrejador a través d'un servidor intermediari"
 
 #: ../gtk/tr-prefs.c:1004
 msgid "Proxy _server:"
-msgstr ""
+msgstr "_Servidor intermediari:"
 
 #: ../gtk/tr-prefs.c:1012
 msgid "Proxy _port:"
-msgstr ""
+msgstr "_Port del servidor intermediari:"
 
 #: ../gtk/tr-prefs.c:1015
 msgid "Proxy _type:"
-msgstr ""
+msgstr "_Tipus de servidor intermediari:"
 
 #: ../gtk/tr-prefs.c:1028
 msgid "_Authentication is required"
@@ -1477,7 +1477,7 @@ msgstr "Encaminador"
 #: ../gtk/tr-prefs.c:1065
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr ""
-"Fes servir UPNP o NAT-PMP per redireccionar els ports desde el meu router"
+"Utilitza el redireccionament de ports UPnP o NAT-PMP de l'encaminador"
 
 #: ../gtk/tr-prefs.c:1100
 msgid "Transmission Preferences"
@@ -1493,7 +1493,7 @@ msgstr "Xarxa"
 
 #: ../gtk/tr-prefs.c:1127
 msgid "Web"
-msgstr ""
+msgstr "Web"
 
 #: ../gtk/tr-torrent.c:211
 #, c-format
@@ -1682,21 +1682,21 @@ msgstr[1] "%'d segons"
 #: ../gtk/util.c:312
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
-msgstr "El fitxer torrent \"%s\" conté dades incorrectes,"
+msgstr "El fitxer torrent «%s» conté dades invàlides."
 
 #: ../gtk/util.c:313
 #, c-format
 msgid "The torrent file \"%s\" is already in use."
-msgstr "El fitxer torrent \"%s\" ja està en ús."
+msgstr "El fitxer torrent «%s» ja s'està utilitzant."
 
 #: ../gtk/util.c:314
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
-msgstr "S'ha trobat un error desconegut amb el fitxer torrent \"%s\""
+msgstr "S'ha produït un error desconegut en el fitxer torrent «%s»."
 
 #: ../gtk/util.c:324
 msgid "Error opening torrent"
-msgstr "Ha hagut un error obrint el fitxer torrent"
+msgstr "S'ha produït un error en obrir el fitxer torrent"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:865
@@ -1711,7 +1711,7 @@ msgstr "La llista de bloquejats «%s» conté %'u entrades"
 #: ../libtransmission/blocklist.c:277
 #, c-format
 msgid "Blocklist \"%1$s\" updated with %2$'d entries"
-msgstr ""
+msgstr "La llista de bloquejats «%1$s» s'ha actualitzat amb %2$'d entrades"
 
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:649 ../libtransmission/fastresume.c:660

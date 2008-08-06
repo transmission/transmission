@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-05-30 06:17+0000\n"
-"Last-Translator: Rick Chen <stuffcorpse@gmail.com>\n"
+"PO-Revision-Date: 2008-07-31 13:08+0000\n"
+"Last-Translator: 蔡查理 <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2008-07-29 01:00+0000\n"
+"X-Launchpad-Export-Date: 2008-08-06 01:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -44,7 +44,7 @@ msgstr "依追蹤者排列(_T)"
 
 #: ../gtk/actions.c:53
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "按時間排序"
 
 #: ../gtk/actions.c:70
 msgid "_Main Window"
@@ -76,7 +76,7 @@ msgstr "工具列(_T)"
 
 #: ../gtk/actions.c:96
 msgid "Tray _Icon"
-msgstr ""
+msgstr "系統列圖示"
 
 #: ../gtk/actions.c:101
 msgid "_Torrent"
@@ -172,7 +172,7 @@ msgstr "開啟資料夾(_O)"
 
 #: ../gtk/actions.c:131
 msgid "_Contents"
-msgstr ""
+msgstr "內容(_C)"
 
 #: ../gtk/actions.c:133
 #, fuzzy
@@ -194,7 +194,7 @@ msgstr "種子選項"
 
 #: ../gtk/add-dialog.c:253
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "移動源文件到垃圾桶(_M)"
 
 #: ../gtk/add-dialog.c:254 ../gtk/tr-prefs.c:314
 msgid "_Start when added"
@@ -202,7 +202,7 @@ msgstr "加了之後啟動(_S)"
 
 #: ../gtk/add-dialog.c:265
 msgid "_Torrent file:"
-msgstr ""
+msgstr "Torrent檔: (_T)"
 
 #: ../gtk/add-dialog.c:269
 msgid "Select Source File"
@@ -243,7 +243,7 @@ msgstr "另一份 copy %s 已經在運行。"
 
 #: ../gtk/details.c:244
 msgid "Web Seeds"
-msgstr ""
+msgstr "網路種子"
 
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:246 ../gtk/details.c:287
@@ -278,12 +278,14 @@ msgid "Optimistic unchoke"
 msgstr "樂觀的停止組塞"
 
 #: ../gtk/details.c:559
+#, fuzzy
 msgid "Downloading from this peer"
-msgstr ""
+msgstr "從該peer下載"
 
 #: ../gtk/details.c:560
+#, fuzzy
 msgid "We would download from this peer if they would let us"
-msgstr ""
+msgstr "若對方允許, 將從該peer下載"
 
 #: ../gtk/details.c:561
 msgid "Uploading to peer"
@@ -324,7 +326,7 @@ msgstr "<b>下載者：</b>"
 
 #: ../gtk/details.c:767
 msgid "<b>Times Completed:</b>"
-msgstr ""
+msgstr "<b>完成次數:</b>"
 
 #: ../gtk/details.c:788 ../gtk/details.c:1275 ../gtk/details.c:1286
 msgid "Never"
@@ -335,18 +337,17 @@ msgid "Details"
 msgstr "詳細資訊"
 
 #: ../gtk/details.c:814 ../gtk/makemeta-ui.c:238
-#, c-format
+#, fuzzy, c-format
 msgid "%'d Piece"
 msgid_plural "%'d Pieces"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d 區塊"
 
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
 #: ../gtk/details.c:820 ../gtk/makemeta-ui.c:244
 #, c-format
 msgid "%1$s @ %2$s"
-msgstr ""
+msgstr "%1$s @ %2$s"
 
 #: ../gtk/details.c:824
 msgid "Pieces:"
@@ -502,8 +503,9 @@ msgid "_Maximum peers:"
 msgstr "最多節點(_M)"
 
 #: ../gtk/details.c:1182 ../gtk/makemeta-ui.c:361 ../gtk/tr-prefs.c:1121
+#, fuzzy
 msgid "Trackers"
-msgstr ""
+msgstr "Trackers"
 
 #: ../gtk/details.c:1188
 msgid "Scrape"
@@ -544,12 +546,13 @@ msgid "Manual announce allowed in:"
 msgstr "允許手動宣佈："
 
 #: ../gtk/details.c:1247
+#, fuzzy
 msgid "In progress"
-msgstr ""
+msgstr "進行中"
 
 #: ../gtk/details.c:1290
 msgid "Now"
-msgstr ""
+msgstr "立即"
 
 #. %1$s is torrent name
 #. %2$s its file size
@@ -612,15 +615,15 @@ msgstr[0] "這torrent不完全或有用戶連接"
 
 #: ../gtk/file-list.c:530 ../gtk/file-list.c:534
 msgid "Yes"
-msgstr ""
+msgstr "是"
 
 #: ../gtk/file-list.c:532 ../gtk/file-list.c:535
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #: ../gtk/file-list.c:536 ../gtk/file-list.c:579
 msgid "Mixed"
-msgstr ""
+msgstr "混合"
 
 #: ../gtk/file-list.c:573
 msgid "High"
@@ -655,27 +658,27 @@ msgstr "下載"
 
 #: ../gtk/file-list.c:650
 msgid "Priority"
-msgstr ""
+msgstr "優先順序"
 
 #: ../gtk/file-list.c:666
 msgid "_High"
-msgstr ""
+msgstr "高(_H)"
 
 #: ../gtk/file-list.c:669
 msgid "_Normal"
-msgstr ""
+msgstr "一般(_N)"
 
 #: ../gtk/file-list.c:672
 msgid "_Low"
-msgstr ""
+msgstr "低(_L)"
 
 #: ../gtk/file-list.c:675
 msgid "_Ignore"
-msgstr ""
+msgstr "略過(_I)"
 
 #: ../gtk/file-list.c:678
 msgid "_Download"
-msgstr ""
+msgstr "下載(_D)"
 
 #: ../gtk/main.c:351
 msgid "Start with all torrents paused"
@@ -706,20 +709,20 @@ msgid "Sending upload/download totals to tracker..."
 msgstr "傳送上傳/下載總數到追蹤者..."
 
 #: ../gtk/main.c:717
+#, fuzzy
 msgid "_Quit Now"
-msgstr ""
+msgstr "現在離開(_Q)"
 
 #: ../gtk/main.c:860
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "無法新增已損壞的Torrent"
 
 #: ../gtk/main.c:867
+#, fuzzy
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "無法重複新增同樣的Torrent"
 
 #: ../gtk/main.c:1095
 msgid "A fast and easy BitTorrent client"
@@ -737,11 +740,13 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  Eason Lai https://launchpad.net/~eason-freezone\n"
 "  Medical-Wei https://launchpad.net/~medicalwei\n"
-"  Rick Chen https://launchpad.net/~stuffcorpse"
+"  Rick Chen https://launchpad.net/~stuffcorpse\n"
+"  蔡查理 https://launchpad.net/~charlie-tsai"
 
 #: ../gtk/makemeta-ui.c:101
+#, fuzzy
 msgid "Torrent created!"
-msgstr ""
+msgstr "Torrent已建立"
 
 #: ../gtk/makemeta-ui.c:105 ../gtk/makemeta-ui.c:114 ../gtk/makemeta-ui.c:121
 #, c-format
@@ -764,14 +769,14 @@ msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "沒辦法讀取「%1$s」：%2$s"
 
 #: ../gtk/makemeta-ui.c:214 ../gtk/makemeta-ui.c:396
-#, c-format
+#, fuzzy, c-format
 msgid "No source selected"
-msgstr ""
+msgstr "未選擇來源"
 
 #: ../gtk/makemeta-ui.c:221 ../gtk/makemeta-ui.c:340
-#, c-format
+#, fuzzy, c-format
 msgid "<i>No source selected</i>"
-msgstr ""
+msgstr "<i>未選擇來源</i>"
 
 #. %1$s is the torrent size
 #. %2$'d is its number of files
@@ -783,11 +788,11 @@ msgstr[0] "<i>%1$s：%2$'d 檔案</i>"
 
 #: ../gtk/makemeta-ui.c:298
 msgid "Choose Directory"
-msgstr ""
+msgstr "選擇目錄"
 
 #: ../gtk/makemeta-ui.c:304
 msgid "Choose File"
-msgstr ""
+msgstr "選擇檔案"
 
 #: ../gtk/makemeta-ui.c:316
 msgid "New Torrent"
@@ -795,19 +800,21 @@ msgstr "新種子"
 
 #: ../gtk/makemeta-ui.c:330
 msgid "Source"
-msgstr ""
+msgstr "來源"
 
 #: ../gtk/makemeta-ui.c:350
+#, fuzzy
 msgid "F_older"
-msgstr ""
+msgstr "資料夾(_O)"
 
 #: ../gtk/makemeta-ui.c:354
+#, fuzzy
 msgid "_File"
-msgstr ""
+msgstr "檔案(_F)"
 
 #: ../gtk/makemeta-ui.c:368
 msgid "<b>E_xtras</b>"
-msgstr ""
+msgstr "<b>附加 (_E)</b>"
 
 #: ../gtk/makemeta-ui.c:376
 msgid "Commen_t:"
@@ -815,7 +822,7 @@ msgstr "注釋（_T）："
 
 #: ../gtk/makemeta-ui.c:377
 msgid "_Private torrent"
-msgstr ""
+msgstr "私人的Torrent"
 
 #: ../gtk/msgwin.c:84 ../libtransmission/bencode.c:1246
 #: ../libtransmission/blocklist.c:265
@@ -918,8 +925,9 @@ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
 msgstr "%1$s，上傳%2$s（比率：%3$s）"
 
 #: ../gtk/torrent-cell-renderer.c:87
+#, fuzzy
 msgid "Data not fully available"
-msgstr ""
+msgstr "資料不完整"
 
 #: ../gtk/torrent-cell-renderer.c:89
 msgid "Stalled"
@@ -990,7 +998,7 @@ msgstr[0] "上傳到 %2$'d 之 %1$'d 連上的用戶"
 
 #: ../gtk/tracker-list.c:128
 msgid "http://"
-msgstr ""
+msgstr "http://"
 
 #: ../gtk/tracker-list.c:284
 msgid "Tier"
@@ -998,7 +1006,7 @@ msgstr ""
 
 #: ../gtk/tracker-list.c:296
 msgid "Announce URL"
-msgstr ""
+msgstr "發佈URL"
 
 #: ../gtk/transmission.desktop.in.h:1
 msgid "BitTorrent Client"
@@ -1022,8 +1030,9 @@ msgid "BitTorrent Activity"
 msgstr "BitTorrent 活動"
 
 #: ../gtk/tr-core.c:974
+#, fuzzy
 msgid "Disallowing desktop hibernation"
-msgstr ""
+msgstr "禁止桌面休眠"
 
 #: ../gtk/tr-core.c:976
 #, c-format
@@ -1031,8 +1040,9 @@ msgid "Couldn't disable desktop hibernation: %s"
 msgstr "停止桌面冬眠失敗：%s"
 
 #: ../gtk/tr-core.c:998
+#, fuzzy
 msgid "Allowing desktop hibernation"
-msgstr ""
+msgstr "允許桌面休眠"
 
 #. %1$'d is the number of torrents we're seeding,
 #. %2$'d is the number of torrents we're downloading,
@@ -1064,8 +1074,9 @@ msgid "Adding Torrents"
 msgstr "加種子"
 
 #: ../gtk/tr-prefs.c:302
+#, fuzzy
 msgid "Automatically _add torrents from:"
-msgstr ""
+msgstr "從此處自動新增Torrent:"
 
 #: ../gtk/tr-prefs.c:318
 msgid "Mo_ve source files to Trash"
@@ -1124,7 +1135,7 @@ msgstr "儘可能使用用戶交換(_X)"
 
 #: ../gtk/tr-prefs.c:557 ../gtk/tr-prefs.c:835
 msgid "Listening _port:"
-msgstr ""
+msgstr "監聽通訊埠: (_p)"
 
 #: ../gtk/tr-prefs.c:566
 msgid "Limits"
@@ -1141,35 +1152,36 @@ msgstr "新任務最大連接 Peers"
 #: ../gtk/tr-prefs.c:583 ../gtk/tr-prefs.c:615 ../gtk/tr-prefs.c:651
 #: ../gtk/tr-prefs.c:713
 msgid "Allow"
-msgstr ""
+msgstr "允許"
 
 #: ../gtk/tr-prefs.c:585 ../gtk/tr-prefs.c:615
 msgid "Deny"
-msgstr ""
+msgstr "拒絕"
 
 #: ../gtk/tr-prefs.c:794
 msgid "Web Interface"
-msgstr ""
+msgstr "網頁介面"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:797
 msgid "_Enable web interface"
-msgstr ""
+msgstr "啟用網頁介面 (_E)"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:810
+#, fuzzy
 msgid "_Require username"
-msgstr ""
+msgstr "需要用戶名(_R)"
 
 #. username
 #: ../gtk/tr-prefs.c:818 ../gtk/tr-prefs.c:1034
 msgid "_Username:"
-msgstr ""
+msgstr "使用者名稱(_U)："
 
 #. password
 #: ../gtk/tr-prefs.c:825 ../gtk/tr-prefs.c:1040
 msgid "Pass_word:"
-msgstr ""
+msgstr "密碼(_W):"
 
 #: ../gtk/tr-prefs.c:850
 msgid "Access control list:"
@@ -1177,59 +1189,61 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:857
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
-msgstr ""
+msgstr "可用通配符表示IP地址，例如192.168.*.*"
 
 #: ../gtk/tr-prefs.c:873
 msgid "IP Address"
-msgstr ""
+msgstr "IP 位址"
 
 #: ../gtk/tr-prefs.c:891
 msgid "Permission"
-msgstr ""
+msgstr "權限"
 
 #: ../gtk/tr-prefs.c:962
 msgid "HTTP"
-msgstr ""
+msgstr "HTTP"
 
 #: ../gtk/tr-prefs.c:964
 msgid "SOCKS4"
-msgstr ""
+msgstr "SOCKS4"
 
 #: ../gtk/tr-prefs.c:966
 msgid "SOCKS5"
-msgstr ""
+msgstr "SOCKS5"
 
 #: ../gtk/tr-prefs.c:997
 msgid "Tracker Proxy"
-msgstr ""
+msgstr "使用代理伺服器連接Tracker"
 
 #: ../gtk/tr-prefs.c:999
 msgid "Connect to tracker via a pro_xy"
-msgstr ""
+msgstr "通過代理連接至Tracker (_X)"
 
 #: ../gtk/tr-prefs.c:1004
 msgid "Proxy _server:"
-msgstr ""
+msgstr "代理伺服器: (_s)"
 
 #: ../gtk/tr-prefs.c:1012
+#, fuzzy
 msgid "Proxy _port:"
-msgstr ""
+msgstr "代理通訊埠: (_p)"
 
 #: ../gtk/tr-prefs.c:1015
 msgid "Proxy _type:"
-msgstr ""
+msgstr "代理伺服器型態(_T)："
 
 #: ../gtk/tr-prefs.c:1028
 msgid "_Authentication is required"
-msgstr ""
+msgstr "需認證"
 
 #: ../gtk/tr-prefs.c:1063
 msgid "Router"
-msgstr ""
+msgstr "路由器"
 
 #: ../gtk/tr-prefs.c:1065
+#, fuzzy
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr ""
+msgstr "啟用路由器的 UPnP 或 NAT-PMP 端口轉發功能 (_F)"
 
 #: ../gtk/tr-prefs.c:1100
 msgid "Transmission Preferences"
@@ -1245,7 +1259,7 @@ msgstr "網路"
 
 #: ../gtk/tr-prefs.c:1127
 msgid "Web"
-msgstr ""
+msgstr "Web"
 
 #: ../gtk/tr-torrent.c:211
 #, fuzzy, c-format
@@ -1266,7 +1280,7 @@ msgstr "等待本地數據校驗 (%.1f%% 完成)"
 #: ../gtk/tr-torrent.c:254
 #, c-format
 msgid "Data not fully available (%.1f%%)"
-msgstr ""
+msgstr "數據不完整（%.1f%%）"
 
 #: ../gtk/tr-torrent.c:256
 #, c-format
@@ -1356,11 +1370,10 @@ msgid "Tracker will allow requests in %s"
 msgstr "伺服器會允許要求在 %s"
 
 #: ../gtk/util.c:83
-#, c-format
+#, fuzzy, c-format
 msgid "%'u byte"
 msgid_plural "%'u bytes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'u 位元組"
 
 #: ../gtk/util.c:88
 #, c-format
@@ -1428,21 +1441,21 @@ msgstr[0] "%'d 秒"
 #: ../gtk/util.c:312
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
-msgstr ""
+msgstr "Torrent檔 \"%s\" 含有無效資料."
 
 #: ../gtk/util.c:313
 #, c-format
 msgid "The torrent file \"%s\" is already in use."
-msgstr ""
+msgstr "種子檔 \"%s\" 已在使用中。"
 
 #: ../gtk/util.c:314
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
-msgstr ""
+msgstr "種子檔\"%s\"出現未知錯誤。"
 
 #: ../gtk/util.c:324
 msgid "Error opening torrent"
-msgstr ""
+msgstr "打開種子檔時出錯。"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:865
@@ -1494,7 +1507,7 @@ msgstr "紀錄缺少元數據「%s」"
 
 #: ../libtransmission/metainfo.c:416 ../libtransmission/metainfo.c:425
 msgid "Torrent is corrupt"
-msgstr ""
+msgstr "種子檔已損壞"
 
 #: ../libtransmission/metainfo.c:630
 msgid "Invalid or missing metadata entries \"length\" and \"files\""
@@ -1561,7 +1574,7 @@ msgstr "沒有轉寄"
 #: ../libtransmission/port-forwarding.c:99 ../libtransmission/torrent.c:1201
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
-msgstr ""
+msgstr "狀態從\"%1$s\"轉換到\"%2$s\""
 
 #: ../libtransmission/port-forwarding.c:109
 #, c-format
@@ -1569,15 +1582,15 @@ msgid "Closing port %d"
 msgstr "關閉連接埠%d"
 
 #: ../libtransmission/port-forwarding.c:120
-#, c-format
+#, fuzzy, c-format
 msgid "Opened port %d to listen for incoming peer connections"
-msgstr ""
+msgstr "已打開%d監聽連入的peer連接"
 
 #: ../libtransmission/port-forwarding.c:125
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "Couldn't open port %d to listen for incoming peer connections (errno %d - %s)"
-msgstr ""
+msgstr "無法打開端口%d監聽入向連接(錯誤號%d - %s)"
 
 #: ../libtransmission/port-forwarding.c:163
 msgid "Stopped"
