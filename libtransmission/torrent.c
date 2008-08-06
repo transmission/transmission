@@ -400,7 +400,7 @@ getBlockSize( uint32_t pieceSize )
     uint32_t b = pieceSize;
     while( b > MAX_BLOCK_SIZE )
         b /= 2u;
-    if( pieceSize % b ) /* not cleanly divisible */
+    if( !b || ( pieceSize % b ) ) /* not cleanly divisible */
         return 0;
     return b;
 }
@@ -553,7 +553,7 @@ tr_torrentParse( const tr_handle  * handle,
     err = tr_metainfoParse( handle, setmeInfo, metainfo );
     doFree = !err && ( setmeInfo == &tmp );
 
-    if( !getBlockSize( setmeInfo->pieceSize ) )
+    if( !err && !getBlockSize( setmeInfo->pieceSize ) )
         err = TR_EINVALID;
 
     if( !err && tr_torrentExists( handle, setmeInfo->hash ) )
