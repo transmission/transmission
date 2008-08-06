@@ -39,7 +39,7 @@
 
 Transmission 0.72 and earlier: Complete your downloads before upgrading or you will lose data!]]></description>
       <pubDate>Tues, 5 Aug 2008 20:43:00 -0400</pubDate>
-      <enclosure sparkle:version="6189" sparkle:shortVersionString="1.30" sparkle:minimumSystemVersion="10.4.11" url="http://mirrors.m0k.org/transmission/files/Transmission-1.30.dmg" length="2848269" type="application/octet-stream"/>
+      <enclosure sparkle:version="6430" sparkle:shortVersionString="1.30" sparkle:minimumSystemVersion="10.4.11" url="http://mirrors.m0k.org/transmission/files/Transmission-1.30.dmg" length="3657897" type="application/octet-stream"/>
     </item>
     
   </channel>
