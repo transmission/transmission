@@ -28,7 +28,8 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.30
    + Turkish localization
 - GTK+
    + Add options to inhibit hibernation and to toggle the tray icon
-   + Various bug fixes and usability improvements
+   + Lots of small bug fixes and usability improvements 
+   + Dozens of updated translations
 
 1.22 (2008/06/13)
 http://trac.transmissionbt.com/query?group=component&milestone=1.22
