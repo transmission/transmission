@@ -88,7 +88,8 @@ bestPieceSize( uint64_t totalSize )
     static const uint64_t MiB = 1048576;
     static const uint64_t KiB = 1024;
 
-    if( totalSize >=   (1*GiB) ) return MiB;
+    if( totalSize >=   (2*GiB) ) return (2*MiB);
+    if( totalSize >=   (1*GiB) ) return (1*MiB);
     if( totalSize >= (512*MiB) ) return (512*KiB);
     if( totalSize >= (350*MiB) ) return (256*KiB);
     if( totalSize >= (150*MiB) ) return (128*KiB);
