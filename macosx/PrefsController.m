@@ -747,7 +747,7 @@
     if ([typeString isEqualToString: @"SOCKS4"])
         type = TR_PROXY_SOCKS4;
     else if ([typeString isEqualToString: @"SOCKS5"])
-        type = TR_PROXY_SOCKS4;
+        type = TR_PROXY_SOCKS5;
     else
     {
         //safety
