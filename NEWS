@@ -1,5 +1,10 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.31 (2008/MM/DD)
+http://trac.transmissionbt.com/query?group=component&milestone=1.32
+- Mac
+   + Fix bug where the proxy type was changed from SOCKS5 to SOCKS4 on launch
+
 1.31 (2008/08/06)
 http://trac.transmissionbt.com/query?group=component&milestone=1.31
 - All Platforms
