@@ -685,7 +685,7 @@ refillPulse( void * vtorrent )
         int handled = FALSE;
         const tr_piece_index_t piece = pieces[i];
 
-        assert( piece < tor->info.pieceSize );
+        assert( piece < tor->info.pieceCount );
 
         /* find a peer who can ask for this piece */
         for( j=0; !handled && j<peerCount; )
