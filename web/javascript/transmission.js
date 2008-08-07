@@ -498,11 +498,7 @@ Transmission.prototype =
 	},
 
 	confirmUploadClicked: function(event) {
-		var url_data = jQuery.fieldValue($("#torrent_upload_url")[0]);
-		if( url_data.length )
-			transmission.remote.addTorrentByURL();
-		else
-			transmission.uploadTorrentFile(true);
+		transmission.uploadTorrentFile( true );
 		transmission.hideUploadDialog( );
 	},
 

@@ -130,13 +130,5 @@ TransmissionRemote.prototype =
 		this.sendRequest( RPC._Root, $.toJSON(o), function(){
 			remote.loadDaemonPrefs();
 		}, "json" );
-	},
-
-	/*
-	 * Upload Torrent by URL
-	addTorrentByURL: function() {
-		$('#torrent_upload_form')[0].action = 'remote/index.php?action=addTorrentByURL&param=[]';
-		$('#torrent_upload_form').ajaxSubmit({dataType: 'script', type: 'POST'});
-	},
-	 */
+	}
 };
