@@ -44,7 +44,7 @@ enum
     RECHOKE_PERIOD_MSEC = (10 * 1000),
 
     /* minimum interval for refilling peers' request lists */
-    REFILL_PERIOD_MSEC = 500,
+    REFILL_PERIOD_MSEC = 333,
 
     /* when many peers are available, keep idle ones this long */
     MIN_UPLOAD_IDLE_SECS = (60 * 3),
@@ -965,18 +965,7 @@ myHandshakeDoneCB( tr_handshake    * handshake,
         if( t ) {
             struct peer_atom * atom = getExistingAtom( t, addr );
             if( atom )
-            {
-                /* if we talked but the connection failed, mark a failure
-                 * in the peer's permanent record.  if they didn't send
-                 * us anything at all, mark the peer as unreachable. */
-                if( tr_peerIoCountBytesFromPeer( io ) ) {
-                    ++atom->numFails;
-                    tordbg( t, "handshake failed; incremented fail count to %d", (int)atom->numFails );
-                } else {
-                    tordbg( t, "no data received at all during handshake; marking as unreachable" );
-                    atom->myflags |= MYFLAG_UNREACHABLE;
-                }
-            }
+                ++atom->numFails;
         }
 
         tr_peerIoFree( io );
@@ -1090,6 +1079,14 @@ tr_peerMgrCompactToPex( const void  * compact,
     size_t n = compactLen / 6;
     const uint8_t * walk = compact;
     tr_pex * pex = tr_new0( tr_pex, n );
+if( added_f && strlen(added_f)!=n )
+{
+    int i;
+    const int len = strlen( added_f );
+    fprintf( stderr, "compactLen is %d, n is %d, and strlen(added_f) is %d!!!\n", (int)compactLen, (int)n, len );
+    for( i=0; i<len; ++i )
+        fprintf( stderr, "added.f[%d] is %d\n", i, (int)added_f[i] );
+}
     for( i=0; i<n; ++i ) {
         memcpy( &pex[i].in_addr, walk, 4 ); walk += 4;
         memcpy( &pex[i].port, walk, 2 ); walk += 2;
@@ -1815,8 +1812,8 @@ getPeerCandidates( Torrent * t, int * setmeSize )
             if( wait < minWait ) wait = minWait;
             if( wait > maxWait ) wait = maxWait;
             if( ( now - atom->time ) < wait ) {
-                /*tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
-                          i, tr_peerIoAddrStr(&atom->addr,atom->port), wait );*/
+                tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
+                        i, tr_peerIoAddrStr(&atom->addr,atom->port), wait );
                 continue;
             }
         }
@@ -1896,7 +1893,7 @@ reconnectPulse( void * vtorrent )
             io = tr_peerIoNewOutgoing( mgr->handle, &atom->addr, atom->port, t->hash );
             if( io == NULL )
             {
-                /* we've temporarily exceeded our max connection limit... */
+                atom->myflags |= MYFLAG_UNREACHABLE;
             }
             else
             {
