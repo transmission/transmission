@@ -6,41 +6,29 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Tues, 5 Aug 2008 20:43:00 -0400</pubDate>
-    <lastBuildDate>Wed, 6 Aug 2008 17:55:00 -0400</lastBuildDate>
+    <lastBuildDate>Fri, 8 Aug 2008 21:27:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 1.31 Released</title>
+      <title>Transmission 1.32 Released</title>
       <description><![CDATA[
 <h4>Transmission now requires Mac OS X 10.4.11 with Security Update 2008-002. Mac OS X 10.5 or greater is recommended.</h4>
 
 <h4>Core Changes:</h4>
 <ul>
- <li><b>1.31:</b> Fix a crash caused by certain torrent files</li>
- <li>The "Clutch" web interface is now bundled with Transmission (as a beta)</li>
- <li>Ability to add and remove tracker addresses</li>
- <li>Added support for HTTP/FTP Seeding (GetRight style)</li>
- <li>Added proxy support for communicating with trackers</li>
- <li>Allow torrent creation with no tracker address (required by some trackers)</li>
- <li>New JSON-RPC protocol for clients to interact with the backend
-- Daemon</li>
+ <li>Fix a bug introduced in 1.30 that caused problems establishing tracker communication</li>
+ <li>Creating torrent files for files >= 2 GB will result in 2 MB pieces</li>
 </ul>
 <h4>Mac-specific Changes:</h4>
 <ul>
- <li>Quick Look integration in the main window and inspector's file tab</li>
- <li>Transfers can be dragged to different groups</li>
- <li>Option to only show the add window when manually adding transfers</li>
- <li>Status strings are toggled from the action button (they are no longer clickable)</li>
- <li>Colors in pieces bar and pieces box more accurately reflect their corresponding values</li>
- <li>The port checker now uses our own portcheck.transmissionbt.com</li>
- <li>Turkish localization</li>
+ <li>Fix bug where the proxy type was changed from SOCKS5 to SOCKS4 on launch</li>
 </ul>
 
 
 <p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?group=component&milestone=1.30&order=severity">click here</a>.</p>
 
 Transmission 0.72 and earlier: Complete your downloads before upgrading or you will lose data!]]></description>
-      <pubDate>Wed, 6 Aug 2008 17:55:00 -0400</pubDate>
-      <enclosure sparkle:version="6435" sparkle:shortVersionString="1.31" sparkle:minimumSystemVersion="10.4.11" url="http://mirrors.m0k.org/transmission/files/Transmission-1.31.dmg" length="3666906" type="application/octet-stream"/>
+      <pubDate>Fri, 8 Aug 2008 21:27:00 -0400</pubDate>
+      <enclosure sparkle:version="6435" sparkle:shortVersionString="1.32" sparkle:minimumSystemVersion="10.4.11" url="http://mirrors.m0k.org/transmission/files/Transmission-1.32.dmg" length="3666906" type="application/octet-stream"/>
     </item>
     
   </channel>
