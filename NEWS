@@ -3,7 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.32 (2008/08/08)
 http://trac.transmissionbt.com/query?group=component&milestone=1.32
 - All Platforms
-   + Fix a bug introduced in 1.30 that caused problems establishing tracker communication
+   + Fix bug introduced in 1.30 that caused problems establishing tracker communication
    + Creating torrent files for files >= 2 GB will result in 2 MB pieces
 - Mac
    + Fix bug where the proxy type was changed from SOCKS5 to SOCKS4 on launch
