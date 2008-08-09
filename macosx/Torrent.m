@@ -123,8 +123,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             [self startTransfer];
         }
         
-        #warning remove after 1.3 (from libT as well)
-        //get old added, activity, and done dates
+        //upgrading from versions < 1.30: get old added, activity, and done dates
         NSDate * date;
         if ((date = [history objectForKey: @"Date"]))
             tr_torrentSetAddedDate(fHandle, [date timeIntervalSince1970]);
