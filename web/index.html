@@ -8,8 +8,8 @@
 		<link rel="apple-touch-icon" href="./images/webclip-icon.png"/>
 		<link href="./images/favicon.ico" rel="SHORTCUT ICON" />
 		<script type="text/javascript" src="./javascript/jquery/jquery.min.js"></script>
-		<link media="only screen and (max-device-width: 480px)" href="./stylesheets/iphone.css" type= "text/css" rel="stylesheet">
-		<link media="screen and (min-device-width: 481px)" href="./stylesheets/common.css" type="text/css" rel="stylesheet">
+		<link media="only screen and (max-device-width: 480px)" href="./stylesheets/iphone.css" type= "text/css" rel="stylesheet" />
+		<link media="screen and (min-device-width: 481px)" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />
 		<script type="text/javascript" src="./javascript/jquery/jquery.transmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery.contextmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/menu.js"></script>
@@ -47,12 +47,12 @@
 		
 		<div id="torrent_filter_bar">
 			<ul>    
-				 <li><a href='#all' id='filter_all_link' class='active'>All</a></li>
-				 <li><a href='#downloading' id='filter_downloading_link'>Downloading</a></li>
-				 <li><a href='#seeding' id='filter_seeding_link'>Seeding</a></li>
-				 <li><a href='#paused' id='filter_paused_link'>Paused</a></li>
+				 <li><a href="#all" id="filter_all_link" class="active">All</a></li>
+				 <li><a href="#downloading" id="filter_downloading_link">Downloading</a></li>
+				 <li><a href="#seeding" id="filter_seeding_link">Seeding</a></li>
+				 <li><a href="#paused" id="filter_paused_link">Paused</a></li>
 			</ul>
-			<input type='text' id='torrent_search' class='blur' />		
+			<input type="search" id="torrent_search" class="blur" autosave="Clutch" results="0" />		
 		</div>
 		<div id="torrent_inspector" style="display:none;">
 			
@@ -193,7 +193,7 @@
 				<form action='#' method='post' id='torrent_upload_form' 
 					enctype='multipart/form-data' target='torrent_upload_frame'>  
 					<div class="dialog_message">
-						Please select a .torrent file to upload:
+						Please select a torrent file to upload:
 							<input type='file' name='torrent_file' id='torrent_upload_file'/>
 					</div>
 					<a href="#upload" id="upload_confirm_button">Upload</a>

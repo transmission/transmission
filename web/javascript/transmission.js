@@ -166,21 +166,25 @@ Transmission.prototype =
 	{
 		var tr = this;
 		var search_box = $('#torrent_search');
-		search_box[0].value = 'filter';
-		search_box.bind('keyup', {transmission: this}, function(event) {
+		search_box.bind('keyup click', {transmission: this}, function(event) {
 			tr.setSearch(this.value);
-		}).bind('blur', {transmission: this}, function(event) {
-			if (this.value == '') {
-				$(this).addClass('blur');
-				this.value = 'filter';
-				tr.setSearch(null);
-			}
-		}).bind('focus', {}, function(event) {
-			if ($(this).is('.blur')) {
-				this.value = '';
-				$(this).removeClass('blur');
-			}
 		});
+		if (!$.browser.safari)
+		{
+			search_box[0].value = 'Filter';
+			search_box.bind('blur', {transmission: this}, function(event) {
+				if (this.value == '') {
+					$(this).addClass('blur');
+					this.value = 'Filter';
+					tr.setSearch(null);
+				}
+			}).bind('focus', {}, function(event) {
+				if ($(this).is('.blur')) {
+					this.value = '';
+					$(this).removeClass('blur');
+				}
+			});
+		}
 	},
 
 	contextStopSelected: function( ) {
