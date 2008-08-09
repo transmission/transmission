@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.32 (2008/08/DD)
+1.32 (2008/08/08)
 http://trac.transmissionbt.com/query?group=component&milestone=1.32
 - All Platforms
    + Fix a bug introduced in 1.30 that caused problems establishing tracker communication
