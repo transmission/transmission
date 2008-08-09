@@ -72,8 +72,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         lib: (tr_handle *) lib
 {
     self = [self initWithHash: nil path: path torrentStruct: NULL lib: lib
-            publicTorrent: torrentDelete != TORRENT_FILE_DEFAULT
-                            ? [NSNumber numberWithBool: torrentDelete == TORRENT_FILE_SAVE] : nil
+            publicTorrent: torrentDelete != TORRENT_FILE_DEFAULT ? [NSNumber numberWithBool: torrentDelete == TORRENT_FILE_SAVE] : nil
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
             ratioSetting: nil ratioLimit: nil
