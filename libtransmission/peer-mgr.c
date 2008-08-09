@@ -1078,7 +1078,7 @@ tr_peerMgrCompactToPex( const void  * compact,
     size_t i;
     size_t n = compactLen / 6;
     const uint8_t * walk = compact;
-    const size_t flen = strlen( added_f );
+    const size_t flen = added_f ? strlen( added_f ) : 0;
     tr_pex * pex = tr_new0( tr_pex, n );
 
 #if 0
