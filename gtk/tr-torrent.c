@@ -250,10 +250,8 @@ tr_torrent_status_str ( TrTorrent * gtor )
 
         case TR_STATUS_DOWNLOAD:
 
-            if( eta == TR_ETA_NOT_AVAIL )
-                top = g_strdup_printf( _("Data not fully available (%.1f%%)" ), prog );
-            else if( eta == TR_ETA_UNKNOWN )
-                top = g_strdup_printf( _( "Stalled (%.1f%%)" ), prog );
+            if( eta < 0 )
+                top = g_strdup_printf( _("Remaining time unknown (%.1f%%)" ), prog );
             else {
                 char timestr[128];
                 tr_strltime( timestr, eta, sizeof( timestr ) );
