@@ -171,7 +171,7 @@ Transmission.prototype =
 		});
 		if (!$.browser.safari)
 		{
-			(this).addClass('blur');
+			$(this).addClass('blur');
 			search_box[0].value = 'Filter';
 			search_box.bind('blur', {transmission: this}, function(event) {
 				if (this.value == '') {
