@@ -576,26 +576,34 @@ Transmission.prototype =
 		if (transmission.isButtonEnabled(event))
 			transmission.toggleFilter();
 	},
-	setFilter: function( mode ) {
+	setFilter: function( mode )
+	{
+		// update the radiobuttons
+		var c;
+		switch( mode ) {
+			case Prefs._FilterAll:         c = '#filter_all_link'; break;
+			case Prefs._FilterSeeding:     c = '#filter_seeding_link'; break;
+			case Prefs._FilterDownloading: c = '#filter_downloading_link'; break;
+			case Prefs._FilterPaused:      c = '#filter_paused_link'; break;
+		}
+		$(c).parent().siblings().removeClass('selected');
+		$(c).parent().addClass('selected');
+
+		// do the filtering
 		this.setPref( Prefs._FilterMode, mode );
 		this.refilter( );
 	},
-	setFilterFromButton: function( element, mode ) {
-		$(element).siblings().removeClass('selected');
-		$(element).addClass('selected');
-		this.setFilter( mode );
-	},
 	showAllClicked: function( event ) {	
-		transmission.setFilterFromButton( this, Prefs._FilterAll );
+		transmission.setFilter( Prefs._FilterAll );
 	},
 	showDownloadingClicked: function( event ) {
-		transmission.setFilterFromButton( this, Prefs._FilterDownloading );
+		transmission.setFilter( Prefs._FilterDownloading );
 	},
 	showSeedingClicked: function(event) {	
-		transmission.setFilterFromButton( this, Prefs._FilterSeeding );
+		transmission.setFilter( Prefs._FilterSeeding );
 	},
 	showPausedClicked: function(event) {
-		transmission.setFilterFromButton( this, Prefs._FilterPaused );
+		transmission.setFilter( Prefs._FilterPaused );
 	},
 
 	/*
@@ -971,11 +979,13 @@ Transmission.prototype =
 		this.setPref( Prefs._ShowFilter, true );
 	},
 	
-	hideFilter: function() {
+	hideFilter: function()
+	{
 		var container_top = parseInt($('#torrent_container').css('top')) - $('#torrent_filter_bar').height() - 1;
 		$('#torrent_container').css('top', container_top + 'px');
 		$('#torrent_filter_bar').hide();
 		this.setPref( Prefs._ShowFilter, false );
+		this.setFilter( Prefs._FilterAll );
 	},
 
 	/*
