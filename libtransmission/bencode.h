@@ -71,6 +71,8 @@ void      tr_bencFree( tr_benc * );
 int       tr_bencDictFindInt( tr_benc * dict, const char * key, int64_t * setme );
 int       tr_bencDictFindDouble( tr_benc * dict, const char * key, double * setme );
 int       tr_bencDictFindStr( tr_benc * dict, const char * key, const char ** setme );
+int       tr_bencDictFindRaw( tr_benc * dict, const char * key, const uint8_t ** setme_raw,
+                                                                size_t * setme_len );
 int       tr_bencDictFindList( tr_benc * dict, const char * key, tr_benc ** setme );
 int       tr_bencDictFindDict( tr_benc * dict, const char * key, tr_benc ** setme );
 tr_benc * tr_bencDictFind( tr_benc * dict, const char * key );

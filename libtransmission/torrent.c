@@ -187,7 +187,7 @@ onTrackerResponse( void * tracker UNUSED, void * vevent, void * user_data )
             size_t i, n;
             tr_pex * pex = tr_peerMgrCompactToPex( event->compact,
                                                    event->compactLen,
-                                                   NULL, &n );
+                                                   NULL, 0, &n );
             if( event->allAreSeeds )
                 tr_tordbg( tor, "Got %d seeds from tracker", (int)n );
             else
