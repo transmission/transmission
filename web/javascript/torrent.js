@@ -301,6 +301,12 @@ Torrent.prototype =
 		
 		// Add the progress bar
                 var notDone = this._leftUntilDone > 0;
+
+		// Fix for situation
+		// when a verifying/downloading torrent gets state seeding
+		if( this.state == Torrent._StatusSeeding )
+			notDone = false ;
+		
 		if( notDone )
 		{
 			var eta = '';

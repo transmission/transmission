@@ -913,6 +913,9 @@ Transmission.prototype =
 		$(ti+'secure')[0].innerHTML          = private_string;
 		$(ti+'creator_date')[0].innerHTML    = date_created;
 		$(ti+'progress')[0].innerHTML        = Math.ratio( sizeDone*100, sizeWhenDone ) + '%';
+		$(ti+'comment')[0].innerHTML	  = comment ;
+		$(ti+'creator')[0].innerHTML	  = creator ;
+		$(ti+'error')[0].innerHTML		  = error ;
 	},
     
 	/*
