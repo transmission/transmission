@@ -1070,34 +1070,24 @@ tr_peerMgrAddPex( tr_peerMgr     * manager,
 }
 
 tr_pex *
-tr_peerMgrCompactToPex( const void  * compact,
-                        size_t        compactLen,
-                        const char  * added_f,
-                        size_t      * pexCount )
+tr_peerMgrCompactToPex( const void     * compact,
+                        size_t           compactLen,
+                        const uint8_t  * added_f,
+                        size_t           added_f_len,
+                        size_t         * pexCount )
 {
     size_t i;
     size_t n = compactLen / 6;
     const uint8_t * walk = compact;
-    const size_t flen = added_f ? strlen( added_f ) : 0;
     tr_pex * pex = tr_new0( tr_pex, n );
-
-#if 0
-if( added_f && strlen(added_f)!=n )
-{
-    int i;
-    const int len = strlen( added_f );
-    fprintf( stderr, "compactLen is %d, n is %d, and strlen(added_f) is %d!!!\n", (int)compactLen, (int)n, len );
-    for( i=0; i<len; ++i )
-        fprintf( stderr, "added.f[%d] is %d\n", i, (int)added_f[i] );
-}
-#endif
 
     for( i=0; i<n; ++i ) {
         memcpy( &pex[i].in_addr, walk, 4 ); walk += 4;
         memcpy( &pex[i].port, walk, 2 ); walk += 2;
-        if( added_f && ( n == flen ) )
+        if( added_f && ( n == added_f_len ) )
             pex[i].flags = added_f[i];
     }
+
     *pexCount = n;
     return pex;
 }

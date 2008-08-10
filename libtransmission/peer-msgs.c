@@ -1021,11 +1021,12 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
         && (( loaded = !tr_bencLoad( tmp, msglen, &val, NULL )))
         && (( added = tr_bencDictFindType( &val, "added", TYPE_STR ))))
     {
-        const char * added_f = NULL;
+        const uint8_t * added_f = NULL;
         tr_pex * pex;
         size_t i, n;
-        tr_bencDictFindStr( &val, "added.f", &added_f );
-        pex = tr_peerMgrCompactToPex( added->val.s.s, added->val.s.i, added_f, &n );
+        size_t added_f_len = 0;
+        tr_bencDictFindRaw( &val, "added.f", &added_f, &added_f_len );
+        pex = tr_peerMgrCompactToPex( added->val.s.s, added->val.s.i, added_f, added_f_len, &n );
         for( i=0; i<n; ++i )
             tr_peerMgrAddPex( msgs->handle->peerMgr, tor->info.hash,
                               TR_PEER_FROM_PEX, pex+i );

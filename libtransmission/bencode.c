@@ -469,6 +469,23 @@ tr_bencDictFindStr( tr_benc * dict, const char * key, const char ** setme )
     return found;
 }
 
+int
+tr_bencDictFindRaw( tr_benc         * dict,
+                    const char      * key,
+                    const uint8_t  ** setme_raw, 
+                    size_t          * setme_len )
+{
+    int found = FALSE;
+    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_STR );
+    if( child ) {
+        *setme_raw = (uint8_t*) child->val.s.s;
+        *setme_len = child->val.s.i;
+        found = TRUE;
+    }
+    return found;
+}
+
+
 /***
 ****
 ***/

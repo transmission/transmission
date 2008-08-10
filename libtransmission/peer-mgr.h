@@ -59,10 +59,11 @@ void tr_peerMgrAddIncoming( tr_peerMgr      * manager,
                             uint16_t          port,
                             int               socket );
 
-tr_pex * tr_peerMgrCompactToPex( const void  * compact,
-                                 size_t        compactLen,
-                                 const char  * added_f,
-                                 size_t      * pexCount );
+tr_pex * tr_peerMgrCompactToPex( const void     * compact,
+                                 size_t           compactLen,
+                                 const uint8_t  * added_f,
+                                 size_t           added_f_len,
+                                 size_t         * setme_pex_count );
                              
 void tr_peerMgrAddPex( tr_peerMgr     * manager,
                        const uint8_t  * torrentHash,
