@@ -543,10 +543,13 @@ tr_mkdirp( const char * path_in, int permissions )
 void
 tr_buildPath ( char *buf, size_t buflen, const char *first_element, ... )
 {
-    struct evbuffer * evbuf = evbuffer_new( );
+    struct evbuffer * evbuf;
     const char * element = first_element;
     va_list vl;
+
+    evbuf = evbuffer_new( );
     va_start( vl, first_element );
+
     while( element ) {
         if( EVBUFFER_LENGTH(evbuf) )
             evbuffer_add_printf( evbuf, "%c", TR_PATH_DELIMITER );
@@ -557,6 +560,8 @@ tr_buildPath ( char *buf, size_t buflen, const char *first_element, ... )
         tr_strlcpy( buf, (char*)EVBUFFER_DATA(evbuf), buflen );
     else
         *buf = '\0';
+
+    va_end( vl );
     evbuffer_free( evbuf );
 }
 
@@ -671,10 +676,12 @@ tr_strdup_printf( const char * fmt, ... )
 
     buf = evbuffer_new( );
     va_start( ap, fmt );
+
     if( evbuffer_add_vprintf( buf, fmt, ap ) != -1 )
         ret = tr_strdup( (char*)EVBUFFER_DATA( buf ) );
-    evbuffer_free( buf );
 
+    va_end( ap );
+    evbuffer_free( buf );
     return ret;
 }
 

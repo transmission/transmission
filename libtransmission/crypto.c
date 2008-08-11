@@ -50,6 +50,7 @@ tr_sha1( uint8_t    * setme,
             break;
         SHA1_Update( &sha, content, content_len );
     }
+    va_end( vl );
     SHA1_Final( setme, &sha );
 }
 
