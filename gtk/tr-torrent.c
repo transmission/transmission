@@ -227,7 +227,7 @@ tr_torrent_new_ctor( tr_handle  * handle,
 char *
 tr_torrent_status_str ( TrTorrent * gtor )
 {
-    char * top = 0;
+    char * top = NULL;
 
     const tr_stat * st = tr_torrent_stat( gtor );
 

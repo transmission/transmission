@@ -28,4 +28,6 @@ void action_toggle ( const char * name, gboolean b );
 
 GtkWidget* action_get_widget ( const char * path );
 
+void doAction( const char * action_name, gpointer user_data );
+
 #endif

@@ -21,6 +21,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "json.h"
 #include "ptrarray.h"
 #include "utils.h"
 

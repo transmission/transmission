@@ -1165,7 +1165,7 @@ struct tracker_page
     GtkWidget * manual_announce_countdown_lb;
 };
 
-GtkWidget*
+static GtkWidget*
 tracker_page_new( TrTorrent * gtor )
 {
     GtkWidget * t;

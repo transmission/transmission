@@ -182,7 +182,7 @@ tr_ptrArrayErase( tr_ptrArray * t, int begin, int end )
 ***
 **/
 
-int
+static int
 tr_ptrArrayLowerBound( const tr_ptrArray * t,
                        const void        * ptr,
                        int                 compare( const void *,const void * ),

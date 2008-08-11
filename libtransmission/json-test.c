@@ -6,7 +6,7 @@
 
 #define VERBOSE 0
 
-int test = 0;
+static int test = 0;
 
 #define check(A) { \
     ++test; \

@@ -1039,10 +1039,10 @@ maybeInhibitHibernation( TrCore * core )
 {
     gboolean allowHibernation;
     tr_handle * session = tr_core_handle( core );
+    tr_torrent * tor = NULL;
 
     /* allow hibernation unless we have active torrents */
     allowHibernation = TRUE;
-    tr_torrent * tor = NULL;
     while(( tor = tr_torrentNext( session, tor ))) {
         if( tr_torrentGetStatus( tor ) != TR_STATUS_STOPPED ) {
             allowHibernation = FALSE;

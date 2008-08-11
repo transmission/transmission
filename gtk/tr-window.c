@@ -101,7 +101,7 @@ PrivateData;
 #define FILTER_TEXT_MODE_KEY "tr-filter-text-mode"
 #define FILTER_TOGGLES_KEY "tr-filter-toggles"
 
-PrivateData*
+static PrivateData*
 get_private_data( TrWindow * w )
 {
     return g_object_get_data (G_OBJECT(w), PRIVATE_DATA_KEY);
@@ -224,7 +224,7 @@ static void
 onYinYangReleased( GtkWidget * w UNUSED, GdkEventButton * button UNUSED, gpointer vprivate )
 {
     PrivateData * p = vprivate;
-    gtk_menu_popup( GTK_MENU( p->status_menu ), 0, 0, 0, 0, 0, gtk_get_current_event_time( ) );
+    gtk_menu_popup( GTK_MENU( p->status_menu ), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time( ) );
 }
 
 #define STATS_MODE "stats-mode"
@@ -401,7 +401,7 @@ entry_icon_released( SexyIconEntry         * entry UNUSED,
                      gpointer                menu )
 {
     if ( icon_pos == SEXY_ICON_ENTRY_PRIMARY )
-        gtk_menu_popup ( GTK_MENU( menu ), 0, 0, 0, 0, 0, gtk_get_current_event_time( ) );
+        gtk_menu_popup ( GTK_MENU( menu ), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time( ) );
 }
 
 /***

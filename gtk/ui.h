@@ -1,4 +1,4 @@
-const char * fallback_ui_file =
+static const char * fallback_ui_file =
 "<ui>\n"
 "  <menubar name='main-window-menu'>\n"
 "    <menu action='torrent-menu'>\n"

@@ -14,6 +14,7 @@
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 #include <libtransmission/transmission.h>
+#include "actions.h"
 #include "conf.h"
 #include "tr-core.h"
 #include "tr-prefs.h"
@@ -22,11 +23,9 @@
 
 #define UNUSED G_GNUC_UNUSED
 
-extern void doAction (const char * action_name, gpointer user_data );
+static TrCore * myCore = NULL;
 
-static TrCore * myCore = 0;
-
-static GtkActionGroup * myGroup = 0;
+static GtkActionGroup * myGroup = NULL;
 
 static void
 action_cb ( GtkAction * a, gpointer user_data )
@@ -140,7 +139,7 @@ typedef struct
 }
 BuiltinIconInfo;
 
-const BuiltinIconInfo my_fallback_icons [] =
+static const BuiltinIconInfo my_fallback_icons [] =
 {
     { tr_icon_logo, "transmission" },
     { tr_icon_lock, "transmission-lock" }
@@ -165,7 +164,7 @@ register_my_icons ( void )
             GdkPixbuf * p;
             GtkIconSet * icon_set;
 
-            p = gdk_pixbuf_new_from_inline( -1, my_fallback_icons[i].raw, FALSE, 0 );
+            p = gdk_pixbuf_new_from_inline( -1, my_fallback_icons[i].raw, FALSE, NULL );
             width = gdk_pixbuf_get_width( p );
             icon_set = gtk_icon_set_new_from_pixbuf( p );
             gtk_icon_theme_add_builtin_icon( name, width, p );

@@ -80,7 +80,7 @@ blocklistLoad( tr_blocklist * b )
         return;
     }
 
-    b->rules = mmap( 0, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0 );
+    b->rules = mmap( NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0 );
     if( !b->rules ) {
         tr_err( err_fmt, b->filename, tr_strerror(errno) );
         close( fd );

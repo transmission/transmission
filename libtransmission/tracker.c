@@ -154,7 +154,7 @@ trackerSupportsScrape( tr_tracker * t, const tr_torrent * tor )
 ****
 ***/
 
-tr_tracker *
+static tr_tracker *
 findTracker( tr_session * session, const uint8_t * hash )
 {
     tr_torrent * torrent = tr_torrentFindFromHash( session, hash );
@@ -322,7 +322,8 @@ onTrackerResponse( tr_session    * session,
     if( responseCode == HTTP_OK )
     {
         tr_benc benc;
-        const int bencLoaded = !tr_bencLoad( response, responseLen, &benc, 0 );
+        const int bencLoaded = !tr_bencLoad( response, responseLen,
+                                             &benc, NULL );
         publishErrorClear( t );
         if( bencLoaded && tr_bencIsDict( &benc ) )
         {
@@ -466,7 +467,8 @@ onScrapeResponse( tr_session   * session,
     if( responseCode == HTTP_OK )
     {
         tr_benc benc, *files;
-        const int bencLoaded = !tr_bencLoad( response, responseLen, &benc, 0 );
+        const int bencLoaded = !tr_bencLoad( response, responseLen,
+                                             &benc, NULL );
         if( bencLoaded && tr_bencDictFindDict( &benc, "files", &files ) )
         {
             int i;

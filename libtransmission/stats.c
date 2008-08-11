@@ -15,6 +15,7 @@
 #include "transmission.h"
 #include "bencode.h"
 #include "platform.h" /* tr_sessionGetConfigDir() */
+#include "stats.h"
 #include "utils.h" /* tr_buildPath */
 
 /***
@@ -169,8 +170,8 @@ tr_sessionGetCumulativeStats( const tr_handle   * handle,
                               tr_session_stats  * setme )
 {
     const struct tr_stats_handle * stats = getStats( handle );
-    assert( stats );
     tr_session_stats current;
+    assert( stats );
     tr_sessionGetStats( handle, &current );
     addStats( setme, &stats->old, &current );
 }
