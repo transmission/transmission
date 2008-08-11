@@ -361,20 +361,22 @@ tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
     {
         int prevTier = -1;
         tr_benc * tier = NULL;
-        tr_benc * announceList;
 
-        announceList = tr_bencDictAddList( &top, "announce-list", 0 );
-        for( i=0; i<builder->trackerCount; ++i ) {
-            if( prevTier != builder->trackers[i].tier ) {
-                prevTier = builder->trackers[i].tier;
-                tier = tr_bencListAddList( announceList, 0 );
+        if( builder->trackerCount > 1 )
+        {
+            tr_benc * annList = tr_bencDictAddList( &top, "announce-list", 0 );
+            for( i=0; i<builder->trackerCount; ++i ) {
+                if( prevTier != builder->trackers[i].tier ) {
+                    prevTier = builder->trackers[i].tier;
+                    tier = tr_bencListAddList( annList, 0 );
+                }
+                tr_bencListAddStr( tier, builder->trackers[i].announce );
             }
-            tr_bencListAddStr( tier, builder->trackers[i].announce );
         }
 
         tr_bencDictAddStr( &top, "announce", builder->trackers[0].announce );
     }
-    
+
     if( !builder->result && !builder->abortFlag )
     {
         if( builder->comment && *builder->comment )
