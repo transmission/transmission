@@ -317,11 +317,14 @@ tr_bencParse( const void     * buf,
               tr_benc        * top,
               const uint8_t ** setme_end )
 {
+    int err;
     tr_ptrArray * parentStack = tr_ptrArrayNew( );
+
     top->type = 0; /* not initialized yet */
-    const int err = tr_bencParseImpl( buf, end, top, parentStack, setme_end );
+    err = tr_bencParseImpl( buf, end, top, parentStack, setme_end );
     if( err )
         tr_bencFree( top ); 
+
     tr_ptrArrayFree( parentStack, NULL );
     return err;
 }

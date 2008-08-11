@@ -14,7 +14,7 @@
 #define NUM_LOOPS 200
 #endif
 
-int test = 0;
+static int test = 0;
 
 #define check(A) { \
     ++test; \

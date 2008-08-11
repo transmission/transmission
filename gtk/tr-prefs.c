@@ -270,9 +270,12 @@ testing_port_begin( gpointer gdata )
 static void
 testing_port_cb( GtkWidget * unused UNUSED, gpointer l )
 {
+    struct test_port_data * data;
+
     gtk_label_set_markup( GTK_LABEL( l ), _( "<i>Testing port...</i>" ) );
+
     /* wait three seconds to give the port forwarding time to kick in */
-    struct test_port_data * data = g_new0( struct test_port_data, 1 );
+    data = g_new0( struct test_port_data, 1 );
     data->label = l;
     data->alive = g_object_get_data( G_OBJECT( l ), "alive" );
     g_timeout_add( 3000, testing_port_begin, data );
@@ -418,11 +421,12 @@ got_blocklist( tr_handle   * handle         UNUSED,
     }
     if( ok && !data->abortFlag )
     {
+        char * cmd;
         filename2 = g_strdup_printf( "%s.txt", filename );
         g_snprintf( data->secondary, sizeof( data->secondary ),
                     _( "Uncompressing blocklist..." ) );
         g_idle_add( blocklistDialogSetSecondary, data );
-        char * cmd = g_strdup_printf( "zcat %s > %s ", filename, filename2 );
+        cmd = g_strdup_printf( "zcat %s > %s ", filename, filename2 );
         tr_dbg( "%s", cmd );
         system( cmd );
         g_free( cmd );

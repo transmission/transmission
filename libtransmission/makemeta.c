@@ -382,7 +382,7 @@ tr_realMakeMetaInfo ( tr_metainfo_builder * builder )
         if( builder->comment && *builder->comment )
             tr_bencDictAddStr( &top, "comment", builder->comment );
         tr_bencDictAddStr( &top, "created by", TR_NAME "/" LONG_VERSION_STRING );
-        tr_bencDictAddInt( &top, "creation date", time(0) );
+        tr_bencDictAddInt( &top, "creation date", time(NULL) );
         tr_bencDictAddStr( &top, "encoding", "UTF-8" );
         makeInfoDict( tr_bencDictAddDict( &top, "info", 666 ), builder );
     }

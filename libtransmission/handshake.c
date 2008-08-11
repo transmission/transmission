@@ -969,7 +969,7 @@ fireDoneFunc( tr_handshake * handshake, int isConnected )
                           handshake->doneUserData );
 }
 
-void
+static void
 tr_handshakeDone( tr_handshake * handshake, int isOK )
 {
     dbgmsg( handshake, "handshakeDone: %s", isOK ? "connected" : "aborting" );

@@ -1974,14 +1974,6 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
     }
 }
 
-tr_publisher_tag
-tr_peerMsgsSubscribe( tr_peermsgs       * peer,
-                      tr_delivery_func    func,
-                      void              * userData )
-{
-    return tr_publisherSubscribe( peer->publisher, func, userData );
-}
-
 void
 tr_peerMsgsUnsubscribe( tr_peermsgs       * peer,
                         tr_publisher_tag    tag )

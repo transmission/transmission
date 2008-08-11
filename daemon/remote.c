@@ -682,8 +682,8 @@ printFileList( tr_benc * top )
                     {
                         char sizestr[64];
                         double percent = (double)have / length;
-                        strlsize( sizestr, length, sizeof( sizestr ) );
                         const char * pristr;
+                        strlsize( sizestr, length, sizeof( sizestr ) );
                         switch( priority ) {
                             case TR_PRI_LOW:    pristr = "Low"; break;
                             case TR_PRI_HIGH:   pristr = "High"; break;

@@ -642,7 +642,7 @@ sessionGet( tr_handle * h, tr_benc * args_in UNUSED, tr_benc * args_out )
 
 typedef const char* (handler)( tr_handle*, tr_benc*, tr_benc* );
 
-struct method {
+static struct method {
     const char * name;
     handler * func;
 } methods[] = { 

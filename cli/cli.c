@@ -65,7 +65,7 @@ static const char   * comment      = NULL;
 static int  parseCommandLine ( int argc, const char ** argv );
 static void sigHandler       ( int signal );
 
-char*
+static char*
 tr_strlratio( char * buf, double ratio, size_t buflen )
 {
     if( (int)ratio == TR_RATIO_NA )
@@ -437,7 +437,7 @@ getUsage( void )
            "Usage: "MY_NAME" [options] <torrent-filename>";
 }
 
-const struct tr_option options[] = {
+static const struct tr_option options[] = {
     { 'a', "announce", "Set the new torrent's announce URL", "a", 1, "<url>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", 0, NULL },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", 0, NULL },

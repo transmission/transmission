@@ -20,6 +20,7 @@
 #include <libevent/event.h> /* evbuffer */
 
 #include "transmission.h"
+#include "clients.h"
 #include "utils.h"
 
 static int

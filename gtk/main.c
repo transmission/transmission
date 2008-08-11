@@ -410,6 +410,8 @@ main( int argc, char ** argv )
 
     if( didlock && ( didinit || cf_init( configDir, &err ) ) )
     {
+        GtkWindow * win;
+
         tr_handle * h = tr_sessionInitFull(
                             configDir,
                             "gtk",
@@ -444,7 +446,7 @@ main( int argc, char ** argv )
         cbdata->core = tr_core_new( h );
 
         /* create main window now to be a parent to any error dialogs */
-        GtkWindow * win = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
+        win = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
         g_signal_connect( win, "window-state-event", G_CALLBACK(windowStateChanged), cbdata );
         g_signal_connect( win, "size-allocate", G_CALLBACK(onMainWindowSizeAllocated), cbdata );
 
@@ -1047,7 +1049,7 @@ g_message( "setting encryption to %d", encryption );
     }
 }
 
-gboolean
+static gboolean
 updatemodel( gpointer gdata )
 {
     struct cbdata *data = gdata;

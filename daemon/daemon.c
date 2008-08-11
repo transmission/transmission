@@ -231,7 +231,7 @@ getUsage( void )
            "Usage: "MY_NAME" [options]";
 }
 
-const struct tr_option options[] = {
+static const struct tr_option options[] = {
     { 'a', "acl",       "Access Control List.  (Default: "TR_DEFAULT_RPC_ACL")", "a", 1, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists",             "b", 0, NULL },
     { 'B', "no-blocklist", "Disable peer blocklists",         "B", 0, NULL },

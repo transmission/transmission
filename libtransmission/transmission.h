@@ -432,6 +432,7 @@ int           tr_sessionIsProxyAuthEnabled   ( const tr_session * );
 const char*   tr_sessionGetProxy             ( const tr_session * );
 int           tr_sessionGetProxyPort         ( const tr_session * );
 tr_proxy_type tr_sessionGetProxyType         ( const tr_session * );
+const char*   tr_sessionGetProxyUsername     ( const tr_session * );
 const char*   tr_sessionGetProxyPassword     ( const tr_session * );
 void          tr_sessionSetProxyEnabled      ( tr_session *, int isEnabled );
 void          tr_sessionSetProxyAuthEnabled  ( tr_session *, int isEnabled );
