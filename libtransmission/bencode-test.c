@@ -324,12 +324,12 @@ testJSON( void )
     if(( val = testJSONSnippet( benc_str, expected )))
         return val;
 
-    benc_str = "d5:helloi1e5:worldi2e3:fooli1ei2ei3ee";
+    benc_str = "d5:helloi1e5:worldi2e3:fooli1ei2ei3eee";
     expected = "{\"foo\":[1,2,3],\"hello\":1,\"world\":2}";
     if(( val = testJSONSnippet( benc_str, expected )))
         return val;
 
-    benc_str = "d5:helloi1e5:worldi2e3:fooli1ei2ei3ed1:ai0eee";
+    benc_str = "d5:helloi1e5:worldi2e3:fooli1ei2ei3ed1:ai0eeee";
     expected = "{\"foo\":[1,2,3,{\"a\":0}],\"hello\":1,\"world\":2}";
     if(( val = testJSONSnippet( benc_str, expected )))
         return val;

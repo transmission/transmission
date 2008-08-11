@@ -200,16 +200,16 @@ getNode( tr_benc * top, tr_ptrArray * parentStack, int type )
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted bencoded data. (#667)
  */
-int
-tr_bencParse( const void     * buf_in,
-              const void     * bufend_in,
-              tr_benc        * top,
-              const uint8_t ** setme_end )
+static int
+tr_bencParseImpl( const void     * buf_in,
+                  const void     * bufend_in,
+                  tr_benc        * top,
+                  tr_ptrArray    * parentStack,
+                  const uint8_t ** setme_end )
 {
     int err;
     const uint8_t * buf = buf_in;
     const uint8_t * bufend = bufend_in;
-    tr_ptrArray * parentStack = tr_ptrArrayNew( );
 
     tr_bencInit( top, 0 );
 
@@ -264,8 +264,11 @@ tr_bencParse( const void     * buf_in,
                 return TR_ERROR;
 
             node = tr_ptrArrayBack( parentStack );
-            if( tr_bencIsDict( node ) && ( node->val.l.count % 2 ) )
-                return TR_ERROR; /* odd # of children in dict */
+            if( tr_bencIsDict( node ) && ( node->val.l.count % 2 ) ) {
+                /* odd # of children in dict */
+                tr_bencFree( &node->val.l.vals [ --node->val.l.count ] );
+                return TR_ERROR;
+            }
 
             tr_ptrArrayPop( parentStack );
             if( tr_ptrArrayEmpty( parentStack ) )
@@ -283,8 +286,10 @@ tr_bencParse( const void     * buf_in,
                 return err;
 
             node = getNode( top, parentStack, TYPE_STR );
-            if( !node )
+            if( !node ) {
+                tr_free( str );
                 return TR_ERROR;
+            }
 
             tr_bencInitStr( node, str, str_len, 0 );
             buf = end;
@@ -303,6 +308,20 @@ tr_bencParse( const void     * buf_in,
     if( !err && setme_end )
         *setme_end = buf;
 
+    return err;
+}
+
+int
+tr_bencParse( const void     * buf,
+              const void     * end,
+              tr_benc        * top,
+              const uint8_t ** setme_end )
+{
+    tr_ptrArray * parentStack = tr_ptrArrayNew( );
+    top->type = 0; /* not initialized yet */
+    const int err = tr_bencParseImpl( buf, end, top, parentStack, setme_end );
+    if( err )
+        tr_bencFree( top ); 
     tr_ptrArrayFree( parentStack, NULL );
     return err;
 }

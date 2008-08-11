@@ -210,6 +210,7 @@ getHashInfo ( tr_metainfo_builder * b )
         b->my_errno = errno;
         tr_snprintf( b->errfile, sizeof( b->errfile ), b->files[fileIndex].filename );
         b->result = TR_MAKEMETA_IO_READ;
+        tr_free( buf );
         tr_free( ret );
         return NULL;
     }
@@ -240,6 +241,7 @@ getHashInfo ( tr_metainfo_builder * b )
                         b->my_errno = errno;
                         tr_snprintf( b->errfile, sizeof( b->errfile ), b->files[fileIndex].filename );
                         b->result = TR_MAKEMETA_IO_READ;
+                        tr_free( buf );
                         tr_free( ret );
                         return NULL;
                     }
