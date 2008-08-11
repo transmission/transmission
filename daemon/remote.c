@@ -125,9 +125,13 @@ static char*
 getEncodedMetainfo( const char * filename )
 {
     size_t len = 0;
+    char * b64 = NULL;
     uint8_t * buf = tr_loadFile( filename, &len );
-    char * b64 = tr_base64_encode( buf, len, NULL );
-    tr_free( buf );
+    if( buf )
+    {
+        b64 = tr_base64_encode( buf, len, NULL );
+        tr_free( buf );
+    }
     return b64;
 }
 
@@ -219,9 +223,14 @@ readargs( int argc, const char ** argv )
             case TR_OPT_UNK:
                       if( addingTorrents ) {
                           char * tmp = getEncodedMetainfo( optarg );
-                          tr_bencDictAddStr( &top, "method", "torrent-add" );
-                          tr_bencDictAddStr( args, "metainfo", tmp );
-                          tr_free( tmp );
+                          if( tmp ) {
+                              tr_bencDictAddStr( &top, "method", "torrent-add" );
+                              tr_bencDictAddStr( args, "metainfo", tmp );
+                              tr_free( tmp );
+                          } else {
+                              fprintf( stderr, "Couldn't add file: %s\n", optarg );
+                              addArg = FALSE;
+                          }
                       } else {
                           fprintf( stderr, "Unknown option: %s\n", optarg );
                           addArg = FALSE;
