@@ -125,7 +125,7 @@ onTrackerAddClicked( GtkButton * w UNUSED, gpointer gpage )
     gtk_list_store_append( page->store, &iter );
     setTrackerChangeState( page, TRUE );
     gtk_list_store_set( page->store, &iter, TR_COL_TIER, 1,
-                                      TR_COL_ANNOUNCE, _( "http://" ),
+                                      TR_COL_ANNOUNCE, "http://",
                                       -1 );
     path = gtk_tree_model_get_path( GTK_TREE_MODEL( page->store ), &iter );
     gtk_tree_view_set_cursor( page->view,
