@@ -425,7 +425,7 @@ static tr_lock* getQueueLock( tr_handle * h )
     return lock;
 }
 
-static void workerFunc( void * user_data )
+static void makeMetaWorkerFunc( void * user_data )
 {
     tr_handle * handle = (tr_handle *) user_data;
 
@@ -495,7 +495,7 @@ tr_makeMetaInfo( tr_metainfo_builder    * builder,
     builder->nextBuilder = queue;
     queue = builder;
     if( !workerThread )
-         workerThread = tr_threadNew( workerFunc, builder->handle, "makeMeta" );
+         workerThread = tr_threadNew( makeMetaWorkerFunc, builder->handle );
     tr_lockUnlock( lock );
 }
 

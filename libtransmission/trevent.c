@@ -167,7 +167,7 @@ tr_eventInit( tr_handle * handle )
     eh->lock = tr_lockNew( );
     pipe( eh->fds );
     eh->h = handle;
-    eh->thread = tr_threadNew( libeventThreadFunc, eh, "libeventThreadFunc" );
+    eh->thread = tr_threadNew( libeventThreadFunc, eh );
 }
 
 void
