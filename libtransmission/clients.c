@@ -135,6 +135,18 @@ decodeBitCometClient( char * buf, size_t buflen, const uint8_t * id )
     return TRUE;
 }
 
+static int
+decodeBitSpiritClient( char * buf, size_t buflen, const uint8_t * id )
+{
+    const int isBS = !memcmp( id+2, "BS", 2 );
+    if( isBS )
+    {
+        const int version = id[1] ? id[1] : 1;
+        tr_snprintf( buf, buflen, "BitSpirit v%d", version );
+    }
+    return isBS;
+}
+
 void
 tr_clientForId( char * buf, size_t buflen, const void * id_in )
 {
@@ -290,6 +302,8 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     }
 
     if( decodeBitCometClient( buf, buflen, id ) )
+        return;
+    if( decodeBitSpiritClient( buf, buflen, id ) )
         return;
 
     /* Clients with no version */
