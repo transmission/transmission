@@ -94,7 +94,7 @@ tr_sessionSetEncryption( tr_session * session, tr_encryption_mode mode )
     assert( session );
     assert( mode==TR_ENCRYPTION_PREFERRED
          || mode==TR_ENCRYPTION_REQUIRED
-         || mode==TR_PLAINTEXT_PREFERRED );
+         || mode==TR_CLEAR_PREFERRED );
 
     session->encryptionMode = mode;
 }
@@ -171,35 +171,35 @@ loadBlocklists( tr_session * session )
 static void metainfoLookupRescan( tr_handle * h );
 
 tr_handle *
-tr_sessionInitFull( const char    * configDir,
-                    const char    * tag,
-                    const char    * downloadDir,
-                    int             isPexEnabled,
-                    int             isPortForwardingEnabled,
-                    int             publicPort,
-                    int             encryptionMode,
-                    int             isUploadLimitEnabled,
-                    int             uploadLimit,
-                    int             isDownloadLimitEnabled,
-                    int             downloadLimit,
-                    int             globalPeerLimit,
-                    int             messageLevel,
-                    int             isMessageQueueingEnabled,
-                    int             isBlocklistEnabled,
-                    int             peerSocketTOS,
-                    int             rpcIsEnabled,
-                    int             rpcPort,
-                    const char    * rpcACL,
-                    int             rpcAuthIsEnabled,
-                    const char    * rpcUsername,
-                    const char    * rpcPassword,
-                    int             proxyIsEnabled,
-                    const char    * proxy,
-                    int             proxyPort,
-                    tr_proxy_type   proxyType,
-                    int             proxyAuthIsEnabled,
-                    const char    * proxyUsername,
-                    const char    * proxyPassword )
+tr_sessionInitFull( const char        * configDir,
+                    const char        * tag,
+                    const char        * downloadDir,
+                    int                 isPexEnabled,
+                    int                 isPortForwardingEnabled,
+                    int                 publicPort,
+                    tr_encryption_mode  encryptionMode,
+                    int                 isUploadLimitEnabled,
+                    int                 uploadLimit,
+                    int                 isDownloadLimitEnabled,
+                    int                 downloadLimit,
+                    int                 globalPeerLimit,
+                    int                 messageLevel,
+                    int                 isMessageQueueingEnabled,
+                    int                 isBlocklistEnabled,
+                    int                 peerSocketTOS,
+                    int                 rpcIsEnabled,
+                    int                 rpcPort,
+                    const char        * rpcACL,
+                    int                 rpcAuthIsEnabled,
+                    const char        * rpcUsername,
+                    const char        * rpcPassword,
+                    int                 proxyIsEnabled,
+                    const char        * proxy,
+                    int                 proxyPort,
+                    tr_proxy_type       proxyType,
+                    int                 proxyAuthIsEnabled,
+                    const char        * proxyUsername,
+                    const char        * proxyPassword )
 {
     tr_handle * h;
     char filename[MAX_PATH_LENGTH];
@@ -208,9 +208,6 @@ tr_sessionInitFull( const char    * configDir,
     /* Don't exit when writing on a broken socket */
     signal( SIGPIPE, SIG_IGN );
 #endif
-
-    if( configDir == NULL )
-        configDir = tr_getDefaultConfigDir( );
 
     tr_msgInit( );
     tr_setMessageLevel( messageLevel );
@@ -230,6 +227,8 @@ tr_sessionInitFull( const char    * configDir,
     h->proxyUsername = tr_strdup( proxyUsername );
     h->proxyPassword = tr_strdup( proxyPassword );
 
+    if( configDir == NULL )
+        configDir = tr_getDefaultConfigDir( );
     tr_setConfigDir( h, configDir );
 
     tr_netInit(); /* must go before tr_eventInit */

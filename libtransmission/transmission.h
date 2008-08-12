@@ -143,6 +143,13 @@ tr_proxy_type;
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PROXY_PASSWORD           NULL
 
+typedef enum
+{
+    TR_CLEAR_PREFERRED,
+    TR_ENCRYPTION_PREFERRED,
+    TR_ENCRYPTION_REQUIRED
+}
+tr_encryption_mode;
 
 /**
  * @brief Start a libtransmission session.
@@ -183,7 +190,7 @@ tr_proxy_type;
  *  #TR_DEFAULT_PORT is the default.
  *
  * @param encryptionMode
- *  Must be one of #TR_PLAINTEXT_PREFERRED,
+ *  Must be one of #TR_CLEAR_PREFERRED,
  *  #TR_ENCRYPTION_PREFERRED, or #TR_ENCRYPTION_REQUIRED.
  *
  * @param isUploadLimitEnabled
@@ -192,7 +199,7 @@ tr_proxy_type;
  *
  * @param uploadLimit
  *  The speed limit to use for the entire session when
- *  "isUploadLimitEnabled" is true.
+ *  "isUploadLimitEnabled" is true.  Units are KiB/s.
  *
  * @param isDownloadLimitEnabled
  *  If true, libtransmission will limit the entire
@@ -200,7 +207,7 @@ tr_proxy_type;
  *
  * @param downloadLimit
  *  The speed limit to use for the entire session when
- *  "isDownloadLimitEnabled" is true.
+ *  "isDownloadLimitEnabled" is true.  Units are KiB/s.
  *
  * @param peerLimit
  *  The maximum number of peer connections allowed in a session.
@@ -239,35 +246,35 @@ tr_proxy_type;
  * @see TR_DEFAULT_RPC_ACL
  * @see tr_sessionClose()
  */
-tr_handle * tr_sessionInitFull( const char    * configDir,
-                                const char    * tag,
-                                const char    * downloadDir,
-                                int             isPexEnabled,
-                                int             isPortForwardingEnabled,
-                                int             publicPort,
-                                int             encryptionMode,
-                                int             isUploadLimitEnabled,
-                                int             uploadLimit,
-                                int             isDownloadLimitEnabled,
-                                int             downloadLimit,
-                                int             peerLimit,
-                                int             messageLevel,
-                                int             isMessageQueueingEnabled,
-                                int             isBlocklistEnabled,
-                                int             peerSocketTOS,
-                                int             rpcIsEnabled,
-                                int             rpcPort,
-                                const char    * rpcAccessControlList,
-                                int             rpcPasswordIsEnabled,
-                                const char    * rpcUsername,
-                                const char    * rpcPassword, 
-                                int             proxyIsEnabled,
-                                const char    * proxy,
-                                int             proxyPort,
-                                tr_proxy_type   proxyType,
-                                int             proxyAuthIsEnabled,
-                                const char    * proxyUsername,
-                                const char    * proxyPassword );
+tr_handle * tr_sessionInitFull( const char         * configDir,
+                                const char         * tag,
+                                const char         * downloadDir,
+                                int                  isPexEnabled,
+                                int                  isPortForwardingEnabled,
+                                int                  publicPort,
+                                tr_encryption_mode   encryptionMode,
+                                int                  isUploadLimitEnabled,
+                                int                  uploadLimit,
+                                int                  isDownloadLimitEnabled,
+                                int                  downloadLimit,
+                                int                  peerLimit,
+                                int                  messageLevel,
+                                int                  isMessageQueueingEnabled,
+                                int                  isBlocklistEnabled,
+                                int                  peerSocketTOS,
+                                int                  rpcIsEnabled,
+                                int                  rpcPort,
+                                const char         * rpcAccessControlList,
+                                int                  rpcPasswordIsEnabled,
+                                const char         * rpcUsername,
+                                const char         * rpcPassword, 
+                                int                  proxyIsEnabled,
+                                const char         * proxy,
+                                int                  proxyPort,
+                                tr_proxy_type        proxyType,
+                                int                  proxyAuthIsEnabled,
+                                const char         * proxyUsername,
+                                const char         * proxyPassword );
 
 
 /** @brief Shorter form of tr_sessionInitFull()
@@ -475,14 +482,6 @@ void tr_sessionClearStats( tr_session * session );
 void tr_sessionSetPexEnabled( tr_session *, int isEnabled );
 
 int tr_sessionIsPexEnabled( const tr_session * );
-
-typedef enum
-{
-    TR_PLAINTEXT_PREFERRED,
-    TR_ENCRYPTION_PREFERRED,
-    TR_ENCRYPTION_REQUIRED
-}
-tr_encryption_mode;
 
 tr_encryption_mode tr_sessionGetEncryption( tr_session * );
 

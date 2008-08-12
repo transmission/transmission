@@ -568,7 +568,7 @@ sessionSet( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
         if( !strcmp( str, "required" ) )
             tr_sessionSetEncryption( h, TR_ENCRYPTION_REQUIRED );
         else if( !strcmp( str, "tolerated" ) )
-            tr_sessionSetEncryption( h, TR_PLAINTEXT_PREFERRED );
+            tr_sessionSetEncryption( h, TR_CLEAR_PREFERRED );
         else
             tr_sessionSetEncryption( h, TR_ENCRYPTION_PREFERRED );
     }
@@ -627,7 +627,7 @@ sessionGet( tr_handle * h, tr_benc * args_in UNUSED, tr_benc * args_out )
     tr_bencDictAddInt( d, "speed-limit-down-enabled",
                           tr_sessionIsSpeedLimitEnabled( h, TR_DOWN ) );
     switch( tr_sessionGetEncryption( h ) ) {
-        case TR_PLAINTEXT_PREFERRED: str = "tolerated"; break;
+        case TR_CLEAR_PREFERRED: str = "tolerated"; break;
         case TR_ENCRYPTION_REQUIRED: str = "required"; break;
         default: str = "preferred"; break;
     }

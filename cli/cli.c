@@ -521,7 +521,7 @@ parseCommandLine( int argc, const char ** argv )
             case 'v': verify = 1; break;
             case 'w': downloadDir = optarg; break;
             case 910: encryptionMode = TR_ENCRYPTION_REQUIRED; break;
-            case 911: encryptionMode = TR_PLAINTEXT_PREFERRED; break;
+            case 911: encryptionMode = TR_CLEAR_PREFERRED; break;
             case 912: encryptionMode = TR_ENCRYPTION_PREFERRED; break;
             case TR_OPT_UNK: torrentPath = optarg; break;
             default: return 1;

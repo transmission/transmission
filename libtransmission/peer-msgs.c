@@ -942,7 +942,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
         pex = 1;
 
     tr_bencInitDict( &val, 4 );
-    tr_bencDictAddInt( &val, "e", msgs->handle->encryptionMode != TR_PLAINTEXT_PREFERRED );
+    tr_bencDictAddInt( &val, "e", msgs->handle->encryptionMode != TR_CLEAR_PREFERRED );
     tr_bencDictAddInt( &val, "p", tr_sessionGetPeerPort( msgs->handle ) );
     tr_bencDictAddStr( &val, "v", TR_NAME " " USERAGENT_PREFIX );
     m  = tr_bencDictAddDict( &val, "m", 1 );

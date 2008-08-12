@@ -315,7 +315,7 @@ getCryptoProvide( const tr_handshake * handshake )
             provide |= CRYPTO_PROVIDE_CRYPTO;
             break;
 
-        case TR_PLAINTEXT_PREFERRED:
+        case TR_CLEAR_PREFERRED:
             provide |= CRYPTO_PROVIDE_CRYPTO | CRYPTO_PROVIDE_PLAINTEXT;
             break;
     }
@@ -340,7 +340,7 @@ getCryptoSelect( const tr_handshake * handshake, uint32_t crypto_provide )
             choices[nChoices++] = CRYPTO_PROVIDE_PLAINTEXT;
             break;
 
-        case TR_PLAINTEXT_PREFERRED:
+        case TR_CLEAR_PREFERRED:
             choices[nChoices++] = CRYPTO_PROVIDE_PLAINTEXT;
             choices[nChoices++] = CRYPTO_PROVIDE_CRYPTO;
             break;
@@ -1040,7 +1040,7 @@ tr_handshakeNew( tr_peerIo           * io,
 
     if( tr_peerIoIsIncoming( handshake->io ) )
         setReadState( handshake, AWAITING_HANDSHAKE );
-    else if( encryptionMode != TR_PLAINTEXT_PREFERRED )
+    else if( encryptionMode != TR_CLEAR_PREFERRED )
         sendYa( handshake );
     else {
         int msgSize; 
