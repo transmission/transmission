@@ -963,11 +963,11 @@ proxyTypeModelNew( void )
     GtkTreeIter iter;
     GtkListStore * store = gtk_list_store_new( 2, G_TYPE_STRING, G_TYPE_INT );
     gtk_list_store_append( store, &iter );
-    gtk_list_store_set( store, &iter, 0, _( "HTTP" ), 1, TR_PROXY_HTTP, -1 );
+    gtk_list_store_set( store, &iter, 0, "HTTP", 1, TR_PROXY_HTTP, -1 );
     gtk_list_store_append( store, &iter );
-    gtk_list_store_set( store, &iter, 0, _( "SOCKS4" ), 1, TR_PROXY_SOCKS4, -1 );
+    gtk_list_store_set( store, &iter, 0, "SOCKS4", 1, TR_PROXY_SOCKS4, -1 );
     gtk_list_store_append( store, &iter );
-    gtk_list_store_set( store, &iter, 0, _( "SOCKS5" ), 1, TR_PROXY_SOCKS5, -1 );
+    gtk_list_store_set( store, &iter, 0, "SOCKS5", 1, TR_PROXY_SOCKS5, -1 );
     return GTK_TREE_MODEL( store );
 }
 
