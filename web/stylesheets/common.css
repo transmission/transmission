@@ -758,6 +758,7 @@ iframe#torrent_upload_frame {
 }
 
 div#prefs_container label {
+	line-height: 25px;
 	vertical-align: middle;
 	display: block;
 }
