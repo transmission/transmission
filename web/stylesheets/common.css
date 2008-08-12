@@ -667,6 +667,7 @@ div#prefs_container div.dialog_window {
 	width: 410px;
 	height: 420px;
 	padding: 0 15px;
+	line-height: 14pt;
 }
 
 div.dialog_container div.dialog_window img {
