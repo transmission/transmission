@@ -844,9 +844,9 @@ Transmission.prototype =
 		var total_verified = 0;
 
 		switch( torrents.length ) {
-			case 0: name = 'No Torrent Selected'; break;
+			case 0: name = 'No Selection'; break;
 			case 1: name = torrents[0].name(); break;
-			default: name = torrents.length+' Torrents Selected'; break;
+			default: name = torrents.length+' Transfers Selected'; break;
 		}
 
 		if( torrents.length == 1 )
