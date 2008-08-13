@@ -850,6 +850,7 @@ info_page_new (tr_torrent * tor)
   hig_workarea_add_section_title (t, &row, _("Origins"));
   
     l = gtk_label_new (*info->creator ? info->creator : _("Unknown"));
+    gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
     hig_workarea_add_row (t, &row, _("Creator:"), l, NULL);
 
     l = gtk_label_new( NULL );
