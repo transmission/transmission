@@ -32,7 +32,7 @@
 
    Reponses support three keys:
 
-   (1) A required "result" string whose value must be "success" on success,
+   (1) A required "result" string whose value MUST be "success" on success,
        or an error string on failure.
    (2) An optional "arguments" object of key/value pairs
    (3) An optional "tag" number as described in 2.1.
@@ -214,8 +214,7 @@
       {
          "arguments": {
              "fields": 2080,
-             "fields": [ "id", "name", "totalSize" ],
-             "sort-method": "name"
+             "fields": [ "id", "name", "totalSize" ]
          }
          "method": "torrent-get",
          "tag": 39693
@@ -258,7 +257,7 @@
    "paused"           | 'boolean'   if true, don't start the torrent
    "peer-limit"       | number      maximum number of peers
 
-   Either "filename" OR "metainfo" must be included.
+   Either "filename" OR "metainfo" MUST be included.
    All other arguments are optional.
 
    Response arguments: on success, a "torrent-added" object in the
