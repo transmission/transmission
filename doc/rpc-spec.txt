@@ -72,7 +72,7 @@
 
    Response arguments: none
 
-3.2.  Torrent Mutator
+3.2.  Torrent Mutators
 
    Method name: "torrent-set"
 
@@ -213,7 +213,6 @@
 
       {
          "arguments": {
-             "fields": 2080,
              "fields": [ "id", "name", "totalSize" ]
          }
          "method": "torrent-get",
@@ -225,7 +224,6 @@
 
       {
          "arguments": {
-            "fields": 2080,
             "torrents": [ 
                { 
                    "id": 10,
