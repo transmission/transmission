@@ -780,53 +780,6 @@ tr_bitfieldHas( const tr_bitfield * bitfield, size_t nth )
         && ( tr_bitfieldHasFast( bitfield, nth ) );
 }
 
-#if 0
-static int
-find_top_bit( uint8_t val )
-{
-    int pos = 0;
-    if ( val & 0xF0U ) pos |= 4, val >>= 4;
-    if ( val & 0xCU )  pos |= 2, val >>= 2;
-    if ( val & 0x2 )   pos |= 1;
-    return 7 - pos;
-}
-
-int
-tr_bitfieldFindTrue( const tr_bitfield  * bitfield,
-                     size_t               startBit,
-                     size_t             * setmePos )
-{
-    if( bitfield && bitfield->bits && startBit < bitfield->bitCount )
-    {
-        const uint8_t * b   = bitfield->bits + startBit/8;
-        const uint8_t * end = bitfield->bits + bitfield->byteCount;
-
-        /* If first byte already contains a set bit after startBit*/
-        if( *b & ( 0xff >> (startBit&7) ) ) {
-            *setmePos  = 8 * ( b - bitfield->bits );
-            *setmePos += find_top_bit( *b & ( 0xff >> (startBit&7) ) );
-            return 1;
-        }
-
-        /* Test bitfield for first non zero byte */
-        ++b;
-        while( (b < end) && !*b )
-            ++b;
-
-        /* If we hit the end of our bitfield, no set bit was found */
-        if( b == end )
-            return 0;
-
-        /* New bitposition is byteoff*8 */
-        *setmePos = 8 * ( b - bitfield->bits ) + find_top_bit( *b );
-
-        return 1;
-    }
-
-    return 0;
-}
-#endif
-
 int
 tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
 {
@@ -872,12 +825,28 @@ tr_bitfieldRemRange ( tr_bitfield  * b,
                       size_t         begin,
                       size_t         end )
 {
-    int err = 0;
-    size_t i;
-    for( i=begin; i<end; ++i )
-        if(( err = tr_bitfieldRem( b, i )))
-            break;
-    return err;
+    size_t sb, eb;
+    unsigned char sm, em;
+
+    if( ( end >= b->bitCount ) || ( begin > end ) )
+        return -1;
+
+    sb = begin >> 3;
+    sm = 0xff << ( 8 - ( begin & 7 ) );
+    eb = end >> 3;
+    em = ~( 0xff << ( 8 - ( end & 7 ) ) );
+
+    if ( sb == eb ) {
+        b->bits[sb] &= ( sm | em );
+    } else {
+        b->bits[sb] &= sm;
+        b->bits[eb] &= em;
+        if( ++sb < eb )
+            memset (b->bits + sb, 0, eb - sb);
+    }
+
+    return 0;
+
 }
 
 tr_bitfield*
