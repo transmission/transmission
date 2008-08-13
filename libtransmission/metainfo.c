@@ -411,7 +411,7 @@ tr_metainfoParse( const tr_handle  * handle,
         goto fail;
     }
 
-    if( !inf->fileCount || !inf->totalSize )
+    if( !inf->fileCount || !inf->totalSize || !inf->pieceSize )
     {
         tr_nerr( inf->name, _( "Torrent is corrupt" ) ); /* the content is missing! */
         goto fail;
