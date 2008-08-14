@@ -439,6 +439,10 @@ ul.torrent_list li.torrent div.torrent_progress_bar.complete_stopped {
 	border: 1px solid #939393;
 }
 
+ul.torrent_list li.torrent div.torrent_progress_bar.empty {
+	border-color: #c8cacd;
+}
+
 li.torrent a div {
 	float: right;
 	position: relative;

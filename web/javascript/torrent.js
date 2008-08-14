@@ -340,6 +340,7 @@ Torrent.prototype =
 			e.addClass( 'torrent_progress_bar' );
 			e.addClass( class_name );
 			e.css( 'width', css_completed_width + '%' );
+			if(css_completed_width == 0) { e.addClass( 'empty' ); }
 			
 			// Update the 'incomplete' bar
 			e = root._progress_incomplete_container;
