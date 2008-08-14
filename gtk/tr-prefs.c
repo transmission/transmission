@@ -40,6 +40,7 @@ tr_prefs_init_global( void )
     const char * pool = "abcdefghijklmnopqrstuvwxyz"
                         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                         "1234567890";
+    GRand *rand;
 
     cf_check_older_configs( );
 
@@ -112,8 +113,11 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_RPC_PORT, TR_DEFAULT_RPC_PORT );
     pref_string_set_default ( PREF_KEY_RPC_ACL, TR_DEFAULT_RPC_ACL );
 
+    rand = g_rand_new ();
     for( i=0; i<16; ++i )
-        pw[i] = pool[ tr_rand( strlen( pool ) ) ];
+        pw[i] = pool[ g_rand_int_range (rand, 0, strlen(pool))];
+    g_rand_free (rand);
+
     pw[16] = '\0';
     pref_string_set_default( PREF_KEY_RPC_USERNAME, "transmission" );
     pref_string_set_default( PREF_KEY_RPC_PASSWORD, pw );

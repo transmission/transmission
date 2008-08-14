@@ -37,6 +37,7 @@
 #include "trevent.h"
 #include "utils.h"
 #include "web.h"
+#include "crypto.h"
 
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
    characters, where x is the major version number, y is the
@@ -55,7 +56,7 @@ tr_peerIdNew( void )
     memcpy( buf, PEERID_PREFIX, 8 );
 
     for( i=8; i<19; ++i ) {
-        val = tr_rand( base );
+        val = tr_cryptoRandInt( base );
         total += val;
         buf[i] = pool[val];
     }

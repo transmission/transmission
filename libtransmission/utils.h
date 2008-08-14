@@ -117,9 +117,6 @@ void tr_deepLog( const char * file, int line,
 
 char* tr_getLogTimeStr( char * buf, int buflen );
 
-/** Returns a random number in the range of [0...n) */
-int tr_rand ( int n );
-
 /**
  * a portability wrapper around mkdir().
  * On WIN32, the `permissions' argument is unused.

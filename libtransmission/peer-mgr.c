@@ -600,7 +600,7 @@ getPreferredPieces( Torrent     * t,
             setme->piece = piece;
             setme->priority = inf->pieces[piece].priority;
             setme->peerCount = 0;
-            setme->random = tr_rand( UINT16_MAX );
+            setme->random = tr_cryptoRandInt( UINT16_MAX );
             setme->missingBlockCount = tr_cpMissingBlocksInPiece( tor->completion, piece );
 
             for( k=0; k<peerCount; ++k ) {
@@ -642,7 +642,7 @@ getPeersUploadingToClient( Torrent * t, int * setmeCount )
      * get a chance at the first blocks in the queue */
     if( retCount ) {
         tr_peer ** tmp = tr_new( tr_peer*, retCount );
-        i = tr_rand( retCount );
+        i = tr_cryptoRandInt( retCount );
         memcpy( tmp, ret, sizeof(tr_peer*) * retCount );
         memcpy( ret, tmp+i, sizeof(tr_peer*) * (retCount-i) );
         memcpy( ret+(retCount-i), tmp, sizeof(tr_peer*) * i );
@@ -1630,7 +1630,7 @@ rechoke( Torrent * t )
 
         if(( n = tr_ptrArraySize( randPool )))
         {
-            c = tr_ptrArrayNth( randPool, tr_rand( n ));
+            c = tr_ptrArrayNth( randPool, tr_cryptoRandInt( n ));
             c->doUnchoke = 1;
             t->optimistic = c->peer;
         }

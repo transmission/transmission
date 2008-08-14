@@ -379,7 +379,7 @@ randomizeTiers( tr_info * info )
     struct RandomTracker * r = tr_new0( struct RandomTracker, n );
     for( i=0; i<n; ++i ) {
         r[i].tracker = info->trackers[i];
-        r[i].random_value = tr_rand( INT_MAX );
+        r[i].random_value = tr_cryptoRandInt( INT_MAX );
     }
     qsort( r, n, sizeof( struct RandomTracker ), compareRandomTracker );
     for( i=0; i<n; ++i )

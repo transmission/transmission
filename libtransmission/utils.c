@@ -265,20 +265,6 @@ tr_msg( const char * file, int line, int level,
         tr_lockUnlock( messageLock );
 }
 
-int tr_rand( int sup )
-{
-    static int init = 0;
-
-    assert( sup > 0 );
-
-    if( !init )
-    {
-        srand( tr_date() );
-        init = 1;
-    }
-    return rand() % sup;
-}
-
 /***
 ****
 ***/

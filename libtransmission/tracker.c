@@ -18,6 +18,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "crypto.h"
 #include "completion.h"
 #include "net.h"
 #include "publish.h"
@@ -826,7 +827,7 @@ generateKeyParam( char * msg, int len )
     const char * pool = "abcdefghijklmnopqrstuvwxyz0123456789";
     const int poolSize = strlen( pool );
     for( i=0; i<len; ++i )
-        *msg++ = pool[tr_rand(poolSize)];
+        *msg++ = pool[tr_cryptoRandInt(poolSize)];
     *msg = '\0';
 }
 
@@ -871,7 +872,7 @@ tr_trackerNew( const tr_torrent * torrent )
     t->lastScrapeResponse       = -1;
     t->manualAnnounceAllowedAt  = ~(time_t)0;
     t->name = tr_strdup( info->name );
-    t->randOffset = tr_rand( 30 );
+    t->randOffset = tr_cryptoRandInt( 30 );
     memcpy( t->hash, info->hash, SHA_DIGEST_LENGTH );
     escape( t->escaped, info->hash, SHA_DIGEST_LENGTH );
     generateKeyParam( t->key_param, KEYLEN );

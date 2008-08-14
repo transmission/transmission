@@ -75,4 +75,11 @@ void  tr_sha1              ( uint8_t     * setme,
                              int           content1_len,
                              ... );
 
+
+/** Returns a random number in the range of [0...n) */
+int tr_cryptoRandInt ( int n );
+
+/** Fills a buffer with random bytes */
+void tr_cryptoRandBuf ( unsigned char *buf, size_t len );
+
 #endif

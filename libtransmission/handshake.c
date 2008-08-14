@@ -277,7 +277,6 @@ parseHandshake( tr_handshake     * handshake,
 static void
 sendYa( tr_handshake * handshake )
 {
-    int i;
     int len;
     const uint8_t * public_key;
     struct evbuffer * outbuf = evbuffer_new( );
@@ -290,9 +289,8 @@ sendYa( tr_handshake * handshake )
     evbuffer_add( outbuf, public_key, len );
 
     /* add some bullshit padding */
-    len = tr_rand( PadA_MAXLEN );
-    for( i=0; i<len; ++i )
-        pad_a[i] = tr_rand( UCHAR_MAX );
+    len = tr_cryptoRandInt( PadA_MAXLEN );
+    tr_cryptoRandBuf(pad_a, len);
     evbuffer_add( outbuf, pad_a, len );
 
     /* send it */
@@ -704,15 +702,15 @@ dbgmsg( handshake, "in readYa... need %d, have %d", (int)KEY_LEN, (int)EVBUFFER_
     memcpy( handshake->mySecret, secret, KEY_LEN );
     tr_sha1( handshake->myReq1, "req1", 4, secret, KEY_LEN, NULL );
 
-dbgmsg( handshake, "sending B->A: Diffie Hellman Yb, PadB" );
+    dbgmsg( handshake, "sending B->A: Diffie Hellman Yb, PadB" );
     /* send our public key to the peer */
     walk = outbuf;
     myKey = tr_cryptoGetMyPublicKey( handshake->crypto, &len );
     memcpy( walk, myKey, len );
     walk += len;
-    len = tr_rand( PadB_MAXLEN );
-    while( len-- )
-        *walk++ = tr_rand( UCHAR_MAX );
+    len = tr_cryptoRandInt( PadB_MAXLEN );
+    tr_cryptoRandBuf( walk, len );
+    walk += len;
 
     setReadState( handshake, AWAITING_PAD_A );
     tr_peerIoWrite( handshake->io, outbuf, walk-outbuf );
