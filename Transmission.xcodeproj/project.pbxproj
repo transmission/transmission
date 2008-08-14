@@ -50,7 +50,6 @@
 		4DA6FDC5091141AD00450CB1 /* ResumeOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDC3091141AD00450CB1 /* ResumeOff.png */; };
 		4DA6FDC6091141AD00450CB1 /* ResumeOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDC4091141AD00450CB1 /* ResumeOn.png */; };
 		4DCCBB3E09C3D71100D3CABF /* TorrentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCCBB3C09C3D71100D3CABF /* TorrentCell.m */; };
-		4DDBB71C09E16BF100284745 /* transmissioncli.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBB71B09E16BF100284745 /* transmissioncli.c */; };
 		4DDFDD22099A5D8E00189D81 /* DownloadBadge.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DDFDD20099A5D8E00189D81 /* DownloadBadge.png */; };
 		4DDFDD23099A5D8E00189D81 /* UploadBadge.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DDFDD21099A5D8E00189D81 /* UploadBadge.png */; };
 		4DE5CC9D0980656F00BE280E /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.m */; };
@@ -441,7 +440,6 @@
 		4DCCBB3C09C3D71100D3CABF /* TorrentCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = TorrentCell.m; path = macosx/TorrentCell.m; sourceTree = "<group>"; };
 		4DCCBB3D09C3D71100D3CABF /* TorrentCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TorrentCell.h; path = macosx/TorrentCell.h; sourceTree = "<group>"; };
 		4DDBB71909E16BAE00284745 /* transmissioncli */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = transmissioncli; sourceTree = BUILT_PRODUCTS_DIR; };
-		4DDBB71B09E16BF100284745 /* transmissioncli.c */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.c; name = transmissioncli.c; path = cli/transmissioncli.c; sourceTree = "<group>"; };
 		4DDFDD20099A5D8E00189D81 /* DownloadBadge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownloadBadge.png; path = macosx/Images/DownloadBadge.png; sourceTree = "<group>"; };
 		4DDFDD21099A5D8E00189D81 /* UploadBadge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UploadBadge.png; path = macosx/Images/UploadBadge.png; sourceTree = "<group>"; };
 		4DE5CC9B0980656F00BE280E /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSStringAdditions.h; path = macosx/NSStringAdditions.h; sourceTree = "<group>"; };
@@ -1240,7 +1238,6 @@
 		4DDBB71F09E16BFE00284745 /* CLI */ = {
 			isa = PBXGroup;
 			children = (
-				4DDBB71B09E16BF100284745 /* transmissioncli.c */,
 			);
 			name = CLI;
 			sourceTree = "<group>";
@@ -1931,7 +1928,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DDBB71C09E16BF100284745 /* transmissioncli.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
