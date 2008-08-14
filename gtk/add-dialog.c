@@ -139,32 +139,50 @@ updateTorrent( struct AddData * o )
     file_list_set_torrent( o->list, o->gtor );
 }
 
+/**
+ * When the source .torrent file is deleted
+ * (such as, if it was a temp file that a web browser passed to us),
+ * gtk invokes this callback and `filename' will be NULL.
+ * The `filename' tests here are to prevent us from losing the current
+ * metadata when that happens.
+ */
 static void
 sourceChanged( GtkFileChooserButton * b, gpointer gdata )
 {
     struct AddData * data = gdata;
-
-    removeOldTorrent( data );
-
-    g_free( data->filename );
-    data->filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( b ) );
+    char * filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( b ) );
 
     /* maybe instantiate a torrent */
-    if( data->filename ) {
+    if( data->filename || !data->gtor )
+    {
         int err = 0;
+        int new_file = 0;
         tr_torrent * torrent;
         tr_handle * handle = tr_core_handle( data->core );
-        tr_ctorSetMetainfoFromFile( data->ctor, data->filename );
+
+        if( filename && ( !data->filename || strcmp( filename, data->filename ) ) )
+        {
+            g_free( data->filename );
+            data->filename = g_strdup( filename );
+            tr_ctorSetMetainfoFromFile( data->ctor, data->filename );
+            new_file = 1;
+        }
+
         tr_ctorSetDownloadDir( data->ctor, TR_FORCE, data->downloadDir );
         tr_ctorSetPaused( data->ctor, TR_FORCE, TRUE );
         tr_ctorSetDeleteSource( data->ctor, FALSE );
-        if(( torrent = tr_torrentNew( handle, data->ctor, &err )))
+
+        if(( torrent = tr_torrentNew( handle, data->ctor, &err ))) {
+            removeOldTorrent( data );
             data->gtor = tr_torrent_new_preexisting( torrent );
-        else
+        } else if( new_file ) {
             addTorrentErrorDialog( GTK_WIDGET(b), err, data->filename );
+        }
+
+        updateTorrent( data );
     }
 
-    updateTorrent( data );
+    g_free( filename );
 }
 
 static void
@@ -179,15 +197,18 @@ static void
 downloadDirChanged( GtkFileChooserButton * b, gpointer gdata )
 {
     char * fname = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( b ) );
-    if( fname )
+    struct AddData * data = gdata;
+
+    if( fname && ( !data->downloadDir || strcmp( fname, data->downloadDir ) ) )
     {
-        struct AddData * data = gdata;
         g_free( data->downloadDir );
-        data->downloadDir = fname;
+        data->downloadDir = g_strdup( fname );
 
         updateTorrent( data );
         verifyRequested( NULL, data );
     }
+
+    g_free( fname );
 }
 
 static void
