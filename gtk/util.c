@@ -493,6 +493,9 @@ gtr_dbus_add_torrent( const char * filename )
                            G_TYPE_INVALID );
     if( err )
        g_message( "err: %s", err->message );
+
+    g_object_unref( proxy );
+    dbus_g_connection_unref( conn );
 #endif
     return success;
 }
