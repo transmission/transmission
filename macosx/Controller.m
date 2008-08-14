@@ -140,9 +140,10 @@ typedef enum
 #define FORUM_URL   @"http://forum.transmissionbt.com/"
 #define DONATE_URL  @"http://www.transmissionbt.com/donate.php"
 
-static void rpcCallback(tr_handle * handle UNUSED, tr_rpc_callback_type type, struct tr_torrent * torrentStruct, void * controller)
+static tr_rpc_callback_status rpcCallback(tr_handle * handle UNUSED, tr_rpc_callback_type type, struct tr_torrent * torrentStruct, void * controller)
 {
     [(Controller *)controller rpcCallback: type forTorrentStruct: torrentStruct];
+    return TR_RPC_NOREMOVE; //we'll do the remove manually
 }
 
 static void sleepCallback(void * controller, io_service_t y, natural_t messageType, void * messageArgument)
@@ -1217,7 +1218,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
     }
     
-    [self confirmRemoveTorrents: torrents deleteData: deleteData deleteTorrent: deleteTorrent fromRPC: NO];
+    [self confirmRemoveTorrents: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
 }
 
 - (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (NSDictionary *) dict
@@ -1225,7 +1226,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSArray * torrents = [dict objectForKey: @"Torrents"];
     if (returnCode == NSAlertDefaultReturn)
         [self confirmRemoveTorrents: torrents deleteData: [[dict objectForKey: @"DeleteData"] boolValue]
-                deleteTorrent: [[dict objectForKey: @"DeleteTorrent"] boolValue] fromRPC: NO];
+                deleteTorrent: [[dict objectForKey: @"DeleteTorrent"] boolValue]];
     else
         [torrents release];
     
@@ -1233,7 +1234,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 }
 
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
-        fromRPC: (BOOL) rpc
 {
     //don't want any of these starting then stopping
     NSEnumerator * enumerator = [torrents objectEnumerator];
@@ -1257,10 +1257,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         lowestOrderValue = MIN(lowestOrderValue, [torrent orderValue]);
         
-        if (rpc)
-            [torrent closeRemoveTorrentInterface];
-        else
-            [torrent closeRemoveTorrent];
+        [torrent closeRemoveTorrent];
     }
     
     [torrents release];
@@ -4287,7 +4284,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) rpcRemoveTorrent: (Torrent *) torrent
 {
-    [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: NO deleteTorrent: NO fromRPC: YES];
+    [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: NO deleteTorrent: NO];
     [torrent release];
 }
 

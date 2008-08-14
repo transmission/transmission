@@ -81,7 +81,6 @@ typedef enum
 
 - (NSDictionary *) history;
 
-- (void) closeRemoveTorrentInterface;
 - (void) closeRemoveTorrent;
 
 - (void) changeIncompleteDownloadFolder: (NSString *) folder;

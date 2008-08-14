@@ -151,8 +151,7 @@ typedef enum
         deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteData;
 - (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode
                         contextInfo: (NSDictionary *) dict;
-- (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
-        fromRPC: (BOOL) rpc;
+- (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent;
 - (void) removeNoDelete:                (id) sender;
 - (void) removeDeleteData:              (id) sender;
 - (void) removeDeleteTorrent:           (id) sender;

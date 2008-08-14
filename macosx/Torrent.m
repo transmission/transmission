@@ -191,15 +191,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return [@"Torrent: " stringByAppendingString: [self name]];
 }
 
-- (void) closeRemoveTorrentInterface
+- (void) closeRemoveTorrent
 {
     //allow the file to be index by Time Machine
     [self setTimeMachineExclude: NO forPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
-}
-
-- (void) closeRemoveTorrent
-{
-    [self closeRemoveTorrentInterface];
     
     tr_torrentRemove(fHandle);
 }
