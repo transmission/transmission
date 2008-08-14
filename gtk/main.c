@@ -316,7 +316,7 @@ onRPCIdle( void * vdata )
     return FALSE;
 }
 
-static void
+static tr_rpc_callback_status
 onRPCChanged( tr_handle            * handle UNUSED,
               tr_rpc_callback_type   type,
               struct tr_torrent    * tor,
@@ -331,6 +331,7 @@ onRPCChanged( tr_handle            * handle UNUSED,
     data->tor = type == TR_RPC_TORRENT_REMOVING ? NULL : tor;
     data->cbdata = cbdata;
     g_idle_add( onRPCIdle, data );
+    return TR_RPC_OK;
 }
 
 int

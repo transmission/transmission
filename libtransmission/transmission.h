@@ -421,10 +421,23 @@ typedef enum
 }
 tr_rpc_callback_type;
 
-typedef void ( *tr_rpc_func )( tr_session           * handle,
-                               tr_rpc_callback_type   type,
-                               struct tr_torrent    * tor_or_null,
-                               void                 * user_data );
+typedef enum
+{
+    /* no special handling is needed by the caller */
+    TR_RPC_OK            = 0,
+
+    /* indicates to the caller that the client will take care of
+     * removing the torrent itself.  For example the client may
+     * need to keep the torrent alive long enough to cleanly close
+     * some resources in another thread. */
+    TR_RPC_NOREMOVE   = (1<<1)
+}
+tr_rpc_callback_status;
+
+typedef tr_rpc_callback_status ( *tr_rpc_func )( tr_session           * handle,
+                                                 tr_rpc_callback_type   type,
+                                                 struct tr_torrent    * tor_or_null,
+                                                 void                 * user_data );
 
 void tr_sessionSetRPCCallback( tr_session   * handle,
                                tr_rpc_func    func,

@@ -30,11 +30,15 @@
 ****
 ***/
 
-static void
+static tr_rpc_callback_status
 notify( tr_handle * session, int type, tr_torrent * tor )
 {
+    tr_rpc_callback_status status = 0;
+
     if( session->rpc_func )
-        session->rpc_func( session, type, tor, session->rpc_func_user_data );
+        status = session->rpc_func( session, type, tor, session->rpc_func_user_data );
+
+    return status;
 }
 
 /***
@@ -129,8 +133,9 @@ torrentRemove( tr_handle * h, tr_benc * args_in, tr_benc * args_out UNUSED )
     for( i=0; i<torrentCount; ++i )
     {
         tr_torrent * tor = torrents[i];
-        notify( h, TR_RPC_TORRENT_REMOVING, tor );
-        tr_torrentRemove( tor );
+        const tr_rpc_callback_status status = notify( h, TR_RPC_TORRENT_REMOVING, tor );
+        if( ! ( status & TR_RPC_NOREMOVE ) )
+            tr_torrentRemove( tor );
     }
     tr_free( torrents );
     return NULL;
