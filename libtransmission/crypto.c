@@ -11,7 +11,7 @@
  */
 
 #include <stdlib.h> /* for abs() */
-#include <values.h> /* for INT_MAX */
+#include <limits.h> /* for INT_MAX */
 #include <sys/types.h> /* for event.h, as well as netinet/in.h on some platforms */
 #include <assert.h>
 #include <inttypes.h> /* uint8_t */
