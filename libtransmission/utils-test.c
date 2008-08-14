@@ -63,6 +63,24 @@ test_bitfields( void )
     for( i=0; i<64; ++i )
         check( tr_bitfieldHas( field, i ) == ( ( i < 4 ) || ( i >= 5 ) ) );
 
+    /* test tr_bitfieldAddRange */
+    tr_bitfieldRemRange( field, 0, 64 );
+    tr_bitfieldAddRange( field, 4, 21 );
+    for( i=0; i<64; ++i )
+        check( tr_bitfieldHas( field, i ) == ( ( 4 <= i ) && ( i < 21 ) ) );
+
+    /* test tr_bitfieldAddRange on the boundaries */
+    tr_bitfieldRemRange( field, 0, 64 );
+    tr_bitfieldAddRange( field, 8, 24 );
+    for( i=0; i<64; ++i )
+        check( tr_bitfieldHas( field, i ) == ( ( 8 <= i ) && ( i < 24 ) ) );
+
+    /* test tr_bitfieldAddRange when begin & end is on the same word */
+    tr_bitfieldRemRange( field, 0, 64 );
+    tr_bitfieldAddRange( field, 4, 5 );
+    for( i=0; i<64; ++i )
+        check( tr_bitfieldHas( field, i ) == ( ( 4 <= i ) && ( i < 5 ) ) );
+
     tr_bitfieldFree( field );
     return 0;
 }
