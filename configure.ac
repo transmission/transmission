@@ -39,7 +39,6 @@ AC_CHECK_FUNCS([lrintf strlcpy daemon dirname basename daemon strcasecmp])
 AC_CHECK_SIZEOF([void*])
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 ACX_PTHREAD
 
 AC_SEARCH_LIBS([socket], [socket net])
