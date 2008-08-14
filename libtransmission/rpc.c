@@ -363,15 +363,19 @@ torrentGet( tr_handle * handle, tr_benc * args_in, tr_benc * args_out )
     tr_torrent ** torrents = getTorrents( handle, args_in, &torrentCount );
     tr_benc * list = tr_bencDictAddList( args_out, "torrents", torrentCount );
     tr_benc * fields;
+    char *msg = NULL;
 
-    if( !tr_bencDictFindList( args_in, "fields", &fields ) )
-        return "no fields specified";
+    if( !tr_bencDictFindList( args_in, "fields", &fields ) ) {
+        msg = "no fields specified";
+        goto out;
+    }
 
     for( i=0; i<torrentCount; ++i )
         addInfo( torrents[i], tr_bencListAdd( list ), fields );
 
+out:
     tr_free( torrents );
-    return NULL;
+    return msg;
 }
 
 /***
