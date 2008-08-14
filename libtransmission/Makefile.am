@@ -1,4 +1,8 @@
-AM_CPPFLAGS = -I. -I$(top_srcdir) -I$(top_srcdir)/third-party/ -D__TRANSMISSION__ $(LIBEVENT_CPPFLAGS)
+AM_CPPFLAGS = \
+	-I. -I$(top_srcdir) -I$(top_srcdir)/third-party/ \
+	-D__TRANSMISSION__ $(LIBEVENT_CPPFLAGS) \
+	-DPACKAGE_DATA_DIR=\""$(datadir)"\"
+
 AM_CFLAGS = $(LIBCURL_CFLAGS) $(OPENSSL_CFLAGS) $(PTHREAD_CFLAGS)
 
 noinst_LIBRARIES = libtransmission.a

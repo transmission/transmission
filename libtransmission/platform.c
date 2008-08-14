@@ -563,7 +563,7 @@ tr_getClutchDir( const tr_session * session UNUSED )
             /* XDG_DATA_DIRS are the backup directories */
             s = getenv( "XDG_DATA_DIRS" );
             if( !s || !*s )
-                s = "/usr/local/share/:/usr/share/";
+                s =  PACKAGE_DATA_DIR ":/usr/local/share/:/usr/share/";
             while( s && *s ) {
                 char * end = strchr( s, ':' );
                 if( end ) {
