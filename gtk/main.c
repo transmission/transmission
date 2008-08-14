@@ -998,9 +998,8 @@ g_message( "setting encryption to %d", encryption );
     }
     else if( !strcmp( key, PREF_KEY_RPC_ACL ) )
     {
-        char * err = NULL;
         const char * s = pref_string_get( key );
-        tr_sessionSetRPCACL( tr, s, &err );
+        tr_sessionSetRPCACL( tr, s, NULL );
     }
     else if( !strcmp( key, PREF_KEY_RPC_USERNAME ) )
     {
