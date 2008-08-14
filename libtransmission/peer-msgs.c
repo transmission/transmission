@@ -84,7 +84,7 @@ enum
 
     /* how long a sent request can stay queued before it's returned
        back to the peer-mgr's pool of requests */
-    SENT_REQUEST_TTL_SECS = 120,
+    SENT_REQUEST_TTL_SECS = 240,
 
     /* used in lowering the outMessages queue period */
     IMMEDIATE_PRIORITY_INTERVAL_SECS = 0,
