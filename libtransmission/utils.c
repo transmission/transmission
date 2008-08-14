@@ -779,17 +779,35 @@ tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
     return 0;
 }
 
+/* Sets bit range [begin, end) to 1 */
 int
-tr_bitfieldAddRange( tr_bitfield  * bitfield,
+tr_bitfieldAddRange( tr_bitfield  * b,
                      size_t         begin,
                      size_t         end )
 {
-    int err = 0;
-    size_t i;
-    for( i=begin; i<end; ++i )
-        if(( err = tr_bitfieldAdd( bitfield, i )))
-            break;
-    return err;
+    size_t sb, eb;
+    unsigned char sm, em;
+
+    end--;
+
+    if( ( end >= b->bitCount ) || ( begin > end ) )
+        return -1;
+
+    sb = begin >> 3;
+    sm = ~( 0xff << ( 8 - ( begin & 7 ) ) );
+    eb = end >> 3;
+    em = 0xff << ( 7 - ( end & 7 ) );
+
+    if ( sb == eb ) {
+        b->bits[sb] |= ( sm & em );
+    } else {
+        b->bits[sb] |= sm;
+        b->bits[eb] |= em;
+        if( ++sb < eb )
+            memset (b->bits + sb, 0xff, eb - sb);
+    }
+
+    return 0;
 }
 
 int
@@ -806,6 +824,7 @@ tr_bitfieldRem( tr_bitfield   * bitfield,
     return 0;
 }
 
+/* Clears bit range [begin, end) to 0 */
 int
 tr_bitfieldRemRange ( tr_bitfield  * b,
                       size_t         begin,
@@ -814,13 +833,15 @@ tr_bitfieldRemRange ( tr_bitfield  * b,
     size_t sb, eb;
     unsigned char sm, em;
 
+    end--;
+
     if( ( end >= b->bitCount ) || ( begin > end ) )
         return -1;
 
     sb = begin >> 3;
     sm = 0xff << ( 8 - ( begin & 7 ) );
     eb = end >> 3;
-    em = ~( 0xff << ( 8 - ( end & 7 ) ) );
+    em = ~( 0xff << ( 7 - ( end & 7 ) ) );
 
     if ( sb == eb ) {
         b->bits[sb] &= ( sm | em );
@@ -832,7 +853,6 @@ tr_bitfieldRemRange ( tr_bitfield  * b,
     }
 
     return 0;
-
 }
 
 tr_bitfield*
