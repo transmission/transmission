@@ -132,30 +132,41 @@ pruneBuf( tr_rpc_server * server, struct ConnBuf * buf )
 static void
 handle_upload( struct shttpd_arg * arg )
 {
-    struct tr_rpc_server * s = arg->user_data;
+    struct tr_rpc_server * s;
+    struct ConnBuf * cbuf;
+
+    s = arg->user_data;
     s->lastRequestTime = time( NULL );
-    struct ConnBuf * cbuf = getBuffer( s, arg );
+    cbuf = getBuffer( s, arg );
 
     /* if we haven't parsed the POST, do that now */
     if( !EVBUFFER_LENGTH( cbuf->out ) )
     {
+        const char * query_string;
+        const char * content_type;
+        const char * delim;
+        const char * in;
+        size_t inlen;
+        char * boundary;
+        size_t boundary_len;
+        char buf[64];
+        int paused;
+
         /* if we haven't finished reading the POST, read more now */
         evbuffer_add( cbuf->in, arg->in.buf, arg->in.len );
         arg->in.num_bytes = arg->in.len;
         if( arg->flags & SHTTPD_MORE_POST_DATA )
             return;
 
-        const char * query_string = shttpd_get_env( arg, "QUERY_STRING" );
-        const char * content_type = shttpd_get_header( arg, "Content-Type" );
-        const char * delim;
-        const char * in = (const char *) EVBUFFER_DATA( cbuf->in );
-        size_t inlen = EVBUFFER_LENGTH( cbuf->in );
-        char * boundary = tr_strdup_printf( "--%s", strstr( content_type, "boundary=" ) + strlen( "boundary=" ) );
-        const size_t boundary_len = strlen( boundary );
-        char buf[64];
-        int paused = ( query_string != NULL )
-                  && ( shttpd_get_var( "paused", query_string, strlen( query_string ), buf, sizeof( buf ) ) == 4 )
-                  && ( !strcmp( buf, "true" ) );
+        query_string = shttpd_get_env( arg, "QUERY_STRING" );
+        content_type = shttpd_get_header( arg, "Content-Type" );
+        in = (const char *) EVBUFFER_DATA( cbuf->in );
+        inlen = EVBUFFER_LENGTH( cbuf->in );
+        boundary = tr_strdup_printf( "--%s", strstr( content_type, "boundary=" ) + strlen( "boundary=" ) );
+        boundary_len = strlen( boundary );
+        paused = ( query_string != NULL )
+              && ( shttpd_get_var( "paused", query_string, strlen( query_string ), buf, sizeof( buf ) ) == 4 )
+              && ( !strcmp( buf, "true" ) );
 
         delim = tr_memmem( in, inlen, boundary, boundary_len );
         if( delim ) do
@@ -257,9 +268,12 @@ handle_root( struct shttpd_arg * arg )
 static void
 handle_rpc( struct shttpd_arg * arg )
 {
-    struct tr_rpc_server * s = arg->user_data;
+    struct tr_rpc_server * s;
+    struct ConnBuf * cbuf;
+
+    s = arg->user_data;
     s->lastRequestTime = time( NULL );
-    struct ConnBuf * cbuf = getBuffer( s, arg );
+    cbuf = getBuffer( s, arg );
 
     if( !EVBUFFER_LENGTH( cbuf->out ) )
     {

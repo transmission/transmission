@@ -64,4 +64,8 @@ void    tr_rpcSetPasswordEnabled ( tr_rpc_server        * server,
 
 int     tr_rpcIsPasswordEnabled  ( const tr_rpc_server  * session );
 
+/** (public for the unit tests) */
+char* cidrize( const char * acl );
+
+
 #endif
