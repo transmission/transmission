@@ -284,11 +284,11 @@ AC_ARG_ENABLE([cli],
               [build_cli="yes"])
 AM_CONDITIONAL([BUILD_CLI],[test "x$build_cli" = "xyes"])
 
-AC_ARG_ENABLE([darwin],
-              [AC_HELP_STRING([--enable-darwin],[build OS X client])],
-              [build_darwin=${enableval}],
-              [build_darwin=${have_darwin}])
-AM_CONDITIONAL([BUILD_DARWIN],[test "x$build_darwin" = "xyes"])
+AC_ARG_ENABLE([mac],
+              [AC_HELP_STRING([--enable-mac],[build OS X client])],
+              [build_mac=${enableval}],
+              [build_mac=${have_darwin}])
+AM_CONDITIONAL([BUILD_MAC],[test "x$build_mac" = "xyes"])
 
 AC_ARG_ENABLE([daemon],
               [AC_HELP_STRING([--enable-daemon],[build daemon])],
@@ -346,7 +346,7 @@ Configuration:
           ... gio support:          ${use_gio}
           ... dbus-glib support:    ${use_dbus_glib}
           ... libnotify support:    ${use_libnotify}
-        Build OS X client:          ${build_darwin}
+        Build OS X client:          ${build_mac}
         Build wxWidgets client:     ${build_wx}
 
 "

@@ -9,11 +9,11 @@ endif
 if BUILD_DAEMON
   DAEMON_DIR = daemon
 endif
-if BUILD_DARWIN
-  MAC_DIR = macosx
-endif
 if BUILD_GTK
   GTK_DIR = gtk po
+endif
+if BUILD_MAC
+  MAC_DIR = macosx
 endif
 if BUILD_WX
   WX_DIR = wx
