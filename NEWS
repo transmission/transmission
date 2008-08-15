@@ -8,6 +8,8 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.33
      "Multi tracker torrents are not allowed" warning on one tracker
    + Fix memory error when reading KTorrent's pex messages
    + Fix small memory leaks
+- Mac
+   + Rephrase "data not fully available" to "remaining time unknown"
 - Daemon
    + Fix crash when adding nonexistent torrents via transmission-remote
 - GTK+
