@@ -3,7 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.33 (2008/08/xx)
 http://trac.transmissionbt.com/query?group=component&milestone=1.33
 - All Platforms
-   + Fix crash from malicious .torrent files with a pieceSize of zero
+   + Fix crash from malicious torrent files with a piece size of zero
    + When creating new torrents, change behavior that caused 
      "Multi tracker torrents are not allowed" warning on one tracker
    + Fix memory error when reading KTorrent's pex messages
@@ -11,7 +11,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.33
 - Daemon
    + Fix crash when adding nonexistent torrents via transmission-remote
 - GTK+
-   + Fix crash from malicious .torrent files with large creator fields
+   + Fix crash from malicious torrent files with large creator fields
    + Fix error where some torrents opened via a web browser didn't appear
 
 1.32 (2008/08/08)
