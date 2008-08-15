@@ -1092,13 +1092,16 @@ about ( GtkWindow * parent )
         NULL
     };
 
+    const char *website_url = "http://www.transmissionbt.com/";
+
     gtk_about_dialog_set_url_hook( aboutDialogActivateLink, NULL, NULL );
 
     gtk_show_about_dialog( parent,
         "name", g_get_application_name(),
         "comments", _("A fast and easy BitTorrent client"),
         "version", LONG_VERSION_STRING,
-        "website", "http://www.transmissionbt.com/",
+        "website", website_url,
+        "website-label", website_url,
         "copyright",_("Copyright 2005-2008 The Transmission Project"),
         "logo-icon-name", "transmission",
 #ifdef SHOW_LICENSE
