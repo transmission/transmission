@@ -4,71 +4,44 @@ http://www.transmissionbt.com/
 Lead Developers <dev@transmissionbt.com>
         Charles Kerr <charles@transmissionbt.com>  (Daemon, Backend, GTK+ client)
         Mitchell Livingston <livings124@transmissionbt.com>  (Mac OS X client)
+
+Web Client Developers
+	Malcom Jarvis
+	Dave Perrett
+	Kendall Hopkins <SoftwareElves@gmail.com>
+	Charles Kerr
+
+Previous Developers
         Eric Petit <titer@m0k.org>  (Creator)
         Josh Elsasser <josh@elsasser.org>  (Daemon, Backend, GTK+ client)
         Bryan Varner <bryan@varnernet.com>  (BeOS client)
 
 Project Contributors
+	John Clay (Website maintenance and troubleshooting)
 	Hugo van Heuven, madebysofa  (Main icon design)
-	Kendall Hopkins (IPC patches)
-        Nick Pucius  (Mac OS X Help documentation)
-	John Clay
+        Nick Pucius  (Help documentation)
+	Rick Patrick  (Mac OS X images)
+	Jonas Rask  (Mac OS X Globe icon)
+	Rashid Eissing  (Mac OS X Transfers preferences icon)
 
-Translators
-Mac OS X, current release:
-        Jorge Carrasco  (Spanish)
-        Etienne Samson  (French)
-        Marco Cavazzuti  (Italian)
-        Anton Sotkov  (Russian)
-        Alexander Bykov  (Russian)
+Mac OS X Translators, current release:
+	Jorge Carrasco  (Spanish)
+	Etienne Samson  (French)
+	Marco Cavazzuti  (Italian)
+	Anton Sotkov  (Russian)
+	Alexander Bykov  (Russian)
 	Maarten Van Coile  (Dutch)
 	Jack Lin  (Traditional Chinese)
 	Can Duruk  (Turkish)
 
-GTK+:
-        Calorì Alessandro  (Italian)
-        Daniel Nylander  (Swedish)
-        Filipe Gomes (Portuguese)
-        Jaakko Huhtala  (Finnish)
-        Jan Geboers (Dutch)
-        Lubomir Marinov  (Bulgarian)
-        Mircea Suciu  (Romanian)
-        Mirek (Slovakian)
-        Nickolay V. Shmyrev  (Russian)
-        Pavel Shevchuk  (Russian)
-        Pierre-Henri Quelen  (French)
-        Raphael Higino (Brazilian Portuguese)
-        Jean-François Fortin Tam  (French)
-        Tomasz Dominikowski  (Polish)
-        Vicente Carro Fernandez  (Spanish)
+GTK+ Translators:
+	Hundreds of people in an ever-changing list.
+	See the po files for a full list.
 
-Special Thanks
-
-Image Contributors
-	Rick Patrick  (Toolbar icons)
-	Martin Stadtmueller  (Icon tweaking)
-	Jonas Rask  (Globe icon)
-	George Tsotsos
-	Rashid Eissing  (Transfers preferences icon)
-	Anthony Ryan  (Previous inspector icons)
-	Mike Matas <http://www.mikematas.com/>  (Previous toolbar icons)
-
-Other Contributors
-        Omar and Adrien  (Beta testing)
-        BitTorrent Protocol Specification <http://wiki.theory.org/BitTorrentSpecification>
-        Ahmad M. Afuni  (NetBSD patch)
-        Jeremy Messenger  (FreeBSD patch)
-        John Blitch  (Mac OS X patch)
-        Michael Demars <keul@m0k.org>  (Mac OS X patches)
-        Fredrik Modéen (BeOS patches)
-        Deanna Phillips  (transmissioncli manpage)
-        Nicholas Shanks  (Mac OS X patches)
-
-Third-Party Resources
-Thanks to:
-        Niels Provos for use of libevent <http://monkey.org/~provos/libevent/>
-	Thomas Bernard for use of MiniUPnP and libnatpmp. <http://miniupnp.tuxfamily.org/>
-        The Growl Development Team for use of Growl. <http://growl.info/>
-        Andy Matuschak for use of Sparkle. <http://sparkle.andymatuschak.org/>
-        M. Uli Kusterer for use of UKKQueue.
-        Christian Hammond for use of icon entry. <http://www.chipx86.com/wiki/Libsexy> 
+Third-Party Resources:
+        Niels Provos for libevent <http://monkey.org/~provos/libevent/>
+	Thomas Bernard for MiniUPnP and libnatpmp. <http://miniupnp.tuxfamily.org/>
+        The Growl Development Team for Growl. <http://growl.info/>
+        Andy Matuschak for Sparkle. <http://sparkle.andymatuschak.org/>
+        Christian Hammond for SexyIconEntry. <http://www.chipx86.com/wiki/Libsexy> 
+        M. Uli Kusterer for UKKQueue.
