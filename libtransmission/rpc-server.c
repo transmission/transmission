@@ -243,9 +243,9 @@ handle_root( struct shttpd_arg * arg )
                             "Content-Type: text/html" "\r\n"
                             "\r\n"
                             "<html><head>" "\r\n"
-                            "  <meta http-equiv=\"Refresh\" content=\"2; url=/transmission/web\">" "\r\n"
+                            "  <meta http-equiv=\"Refresh\" content=\"2; url=/transmission/web/\">" "\r\n"
                             "</head><body>" "\r\n"
-                            "  <p>redirecting to <a href=\"/transmission/web\">/transmission/web</a></p>" "\r\n"
+                            "  <p>redirecting to <a href=\"/transmission/web\">/transmission/web/</a></p>" "\r\n"
                             "</body></html>" "\r\n";
     const size_t n = strlen( redirect );
     memcpy( arg->out.buf, redirect, n );
@@ -369,6 +369,9 @@ startServer( tr_rpc_server * server )
 
         argv[argc++] = tr_strdup( "-auth_realm" );
         argv[argc++] = tr_strdup( MY_REALM );
+
+        argv[argc++] = tr_strdup( "-root" );
+        argv[argc++] = tr_strdup( "/dev/null" );
 
         if( server->acl )
         {
