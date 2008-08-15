@@ -18,8 +18,6 @@
 	<false/>
 	<key>CheckDownload</key>
 	<false/>
-	<key>CheckForUpdates</key>
-	<true/>
 	<key>CheckQuit</key>
 	<true/>
 	<key>CheckQuitDownloading</key>
@@ -164,6 +162,8 @@
 	<true/>
 	<key>StatusLabel</key>
 	<string>RatioTotal</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
 	<key>UploadLimit</key>
 	<integer>20</integer>
 	<key>UseIncompleteDownloadFolder</key>

@@ -41,8 +41,6 @@
 #define RPC_IP_ADD_TAG      0
 #define RPC_IP_REMOVE_TAG   1
 
-#define UPDATE_SECONDS 86400
-
 #define TOOLBAR_GENERAL     @"TOOLBAR_GENERAL"
 #define TOOLBAR_TRANSFERS   @"TOOLBAR_TRANSFERS"
 #define TOOLBAR_BANDWIDTH   @"TOOLBAR_BANDWIDTH"
@@ -100,9 +98,6 @@
             
             [fDefaults removeObjectForKey: @"DownloadChoice"];
         }
-        
-        //set check for update to right value
-        [self setCheckForUpdate: nil];
         
         //set auto import
         NSString * autoPath;
@@ -235,11 +230,6 @@
     const char * rpcPassword = tr_sessionGetRPCPassword(fHandle);
     [fRPCPasswordField setStringValue: [NSString stringWithUTF8String: rpcPassword]];
     tr_free(rpcPassword);
-}
-
-- (void) setUpdater: (SUUpdater *) updater
-{
-    fUpdater = updater;
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) toolbar itemForItemIdentifier: (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
@@ -577,21 +567,13 @@
 
 - (void) resetWarnings: (id) sender
 {
-    [fDefaults setBool: YES forKey: @"WarningDuplicate"];
-    [fDefaults setBool: YES forKey: @"WarningRemainingSpace"];
-    [fDefaults setBool: YES forKey: @"WarningFolderDataSameName"];
-    [fDefaults setBool: YES forKey: @"WarningResetStats"];
-    [fDefaults setBool: YES forKey: @"WarningCreatorBlankAddress"];
-    [fDefaults setBool: YES forKey: @"WarningRemoveBuiltInTracker"];
-    [fDefaults setBool: YES forKey: @"WarningInvalidOpen"];
-}
-
-- (void) setCheckForUpdate: (id) sender
-{
-    NSTimeInterval seconds = [fDefaults boolForKey: @"CheckForUpdates"] ? UPDATE_SECONDS : 0;
-    [fDefaults setInteger: seconds forKey: @"SUScheduledCheckInterval"];
-    if (fUpdater)
-        [fUpdater scheduleCheckWithInterval: seconds];
+    [fDefaults removeObjectForKey: @"WarningDuplicate"];
+    [fDefaults removeObjectForKey: @"WarningRemainingSpace"];
+    [fDefaults removeObjectForKey: @"WarningFolderDataSameName"];
+    [fDefaults removeObjectForKey: @"WarningResetStats"];
+    [fDefaults removeObjectForKey: @"WarningCreatorBlankAddress"];
+    [fDefaults removeObjectForKey: @"WarningRemoveBuiltInTracker"];
+    [fDefaults removeObjectForKey: @"WarningInvalidOpen"];
 }
 
 - (void) setQueue: (id) sender

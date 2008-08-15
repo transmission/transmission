@@ -24,7 +24,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
-#import <Sparkle/Sparkle.h>
 #import "PortChecker.h"
 
 @interface PrefsController : NSWindowController
@@ -40,8 +39,6 @@
     
     IBOutlet NSPopUpButton * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp;
     IBOutlet NSTextField * fRatioStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
-    
-    SUUpdater * fUpdater;
 
     IBOutlet NSTextField * fUploadField, * fDownloadField,
                         * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
@@ -68,7 +65,6 @@
 
 - (id) initWithHandle: (tr_handle *) handle;
 - (tr_handle *) handle;
-- (void) setUpdater: (SUUpdater *) updater;
 
 - (void) updatePortField;
 - (void) setPort: (id) sender;
@@ -92,7 +88,6 @@
 
 - (void) setBadge: (id) sender;
 - (void) resetWarnings: (id) sender;
-- (void) setCheckForUpdate: (id) sender;
 
 - (void) setQueue: (id) sender;
 - (void) setQueueNumber: (id) sender;

@@ -249,7 +249,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_sessionSetRPCCallback(fLib, rpcCallback, self);
         
         [GrowlApplicationBridge setGrowlDelegate: self];
+        
         [[UKKQueue sharedFileWatcher] setDelegate: self];
+        
+        SUUpdater * updater = [SUUpdater sharedUpdater];
+        [updater setDelegate: self];
+        fUpdateInProgress = NO;
+        
+        //reset old Sparkle settings from previous versions
+        [fDefaults removeObjectForKey: @"SUScheduledCheckInterval"];
+        if ([fDefaults objectForKey: @"CheckForUpdates"])
+        {
+            [updater setAutomaticallyChecksForUpdates: [fDefaults boolForKey: @"CheckForUpdates"]];
+            [fDefaults removeObjectForKey: @"CheckForUpdates"];
+        }
     }
     return self;
 }
@@ -343,8 +356,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fSpeedLimitButton setToolTip: NSLocalizedString(@"Speed Limit overrides the total bandwidth limits with its own limits.",
                                 "Main window -> 2nd bottom left button (turtle) tooltip")];
     
-    [fPrefsController setUpdater: fUpdater];
-    
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
 
@@ -434,10 +445,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //avoids need of setting delegate
     [nc addObserver: self selector: @selector(torrentTableViewSelectionDidChange:)
                     name: NSOutlineViewSelectionDidChangeNotification object: fTableView];
-    
-    [nc addObserver: self selector: @selector(prepareForUpdate:)
-                    name: SUUpdaterWillRestartNotification object: nil];
-    fUpdateInProgress = NO;
     
     [nc addObserver: self selector: @selector(autoSpeedLimitChange:)
                     name: @"AutoSpeedLimitChange" object: nil];
@@ -4184,7 +4191,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: DONATE_URL]];
 }
 
-- (void) prepareForUpdate: (NSNotification *) notification
+- (void) updaterWillRelaunchApplication: (SUUpdater *) updater
 {
     fUpdateInProgress = YES;
 }

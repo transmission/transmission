@@ -101,7 +101,6 @@ typedef enum
     IBOutlet NSTextField            * fURLSheetTextField;
     IBOutlet NSButton               * fURLSheetOpenButton;
     
-    IBOutlet SUUpdater              * fUpdater;
     BOOL                            fUpdateInProgress;
     
     Badger                          * fBadger;
@@ -266,8 +265,6 @@ typedef enum
 - (void) linkHomepage: (id) sender;
 - (void) linkForums: (id) sender;
 - (void) linkDonate: (id) sender;
-
-- (void) prepareForUpdate:  (NSNotification *) notification;
 
 - (void) rpcCallback: (tr_rpc_callback_type) type forTorrentStruct: (struct tr_torrent *) torrentStruct;
 - (void) rpcAddTorrentStruct: (NSValue *) torrentStructPtr;
