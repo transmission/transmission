@@ -36,6 +36,7 @@ EXTRA_DIST = \
   AUTHORS \
   COPYING \
   README \
+  autogen.sh \
   Transmission.xcodeproj/project.pbxproj \
   intltool-extract.in \
   intltool-merge.in \
