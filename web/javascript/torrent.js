@@ -301,6 +301,12 @@ Torrent.prototype =
 		
 		// Add the progress bar
                 var notDone = this._leftUntilDone > 0;
+
+		// Fix for situation
+		// when a verifying/downloading torrent gets state seeding
+		if( this.state == Torrent._StatusSeeding )
+			notDone = false ;
+		
 		if( notDone )
 		{
 			var eta = '';
@@ -334,6 +340,7 @@ Torrent.prototype =
 			e.addClass( 'torrent_progress_bar' );
 			e.addClass( class_name );
 			e.css( 'width', css_completed_width + '%' );
+			if(css_completed_width == 0) { e.addClass( 'empty' ); }
 			
 			// Update the 'incomplete' bar
 			e = root._progress_incomplete_container;

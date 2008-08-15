@@ -439,6 +439,10 @@ ul.torrent_list li.torrent div.torrent_progress_bar.complete_stopped {
 	border: 1px solid #939393;
 }
 
+ul.torrent_list li.torrent div.torrent_progress_bar.empty {
+	border-color: #c8cacd;
+}
+
 li.torrent a div {
 	float: right;
 	position: relative;
@@ -667,6 +671,7 @@ div#prefs_container div.dialog_window {
 	width: 410px;
 	height: 420px;
 	padding: 0 15px;
+	line-height: 14pt;
 }
 
 div.dialog_container div.dialog_window img {

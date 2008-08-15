@@ -47,9 +47,7 @@ $(document).ready( function() {
 		// firefox so have to be safari-specific
 		$('#torrent_inspector').css('height', '100%');
 		
-		// Set Filter input to type search (nicely styled input field)
-		$('#torrent_search')[0].type = 'search';
-		$('#torrent_search')[0].placeholder = 'Filter';
+		// Move search field's margin down for the styled input
 		$('#torrent_search').css('margin-top', 3);		
 	}
 	if (!Safari3 && !iPhone) {
