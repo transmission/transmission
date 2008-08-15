@@ -111,7 +111,7 @@
         {
             fTrackers = [[NSMutableArray alloc] initWithCapacity: 1];
             
-            //check for tracker from versions before 1.3
+            //check for single tracker from versions before 1.3
             NSString * tracker;
             if ((tracker = [fDefaults stringForKey: @"CreatorTracker"]))
             {
@@ -119,6 +119,14 @@
                 [fDefaults removeObjectForKey: @"CreatorTracker"];
                 [fDefaults setObject: fTrackers forKey: @"CreatorTrackers"];
             }
+        }
+        
+        //remove potentially invalid addresses
+        NSInteger i;
+        for (i = [fTrackers count]-1; i >= 0; i--)
+        {
+            if (!tr_httpIsValidURL([[fTrackers objectAtIndex: i] UTF8String]))
+                [fTrackers removeObjectAtIndex: i];
         }
     }
     return self;
