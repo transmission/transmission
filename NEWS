@@ -1,9 +1,30 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.0 (2008/mm/dd)
+http://trac.transmissionbt.com/query?group=component&milestone=1.40
+- Mac
+   + Sparkled updated to 1.5
+
+1.33 (2008/08/xx)
+http://trac.transmissionbt.com/query?group=component&milestone=1.33
+- All Platforms
+   + Fix crash from malicious torrent files with a piece size of zero
+   + When creating new torrent files, change behavior that caused 
+     "Multi tracker torrents are not allowed" warning on one tracker
+   + Fix memory error when reading KTorrent's PEX messages
+   + Fix small memory leaks
+- Mac
+   + Rephrase "data not fully available" to "remaining time unknown"
+- Daemon
+   + Fix crash when adding nonexistent torrents via transmission-remote
+- GTK+
+   + Fix crash from malicious torrent files with large creator fields
+   + Fix error where some torrents opened via a web browser didn't appear
+
 1.32 (2008/08/08)
 http://trac.transmissionbt.com/query?group=component&milestone=1.32
 - All Platforms
-   + Fix bug introduced in 1.30 that caused problems establishing tracker communication
+   + Fix bug introduced in 1.30 that caused poor tracker communication
    + Creating torrent files for files >= 2 GB will result in 2 MB pieces
 - Mac
    + Fix bug where the proxy type was changed from SOCKS5 to SOCKS4 on launch
