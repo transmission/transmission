@@ -1,14 +1,36 @@
-AC_INIT([transmission],[1.32+],[http://trac.transmissionbt.com/newticket])
+AC_PREREQ(2.54)
+
+m4_define([tr_version_major], [1])
+m4_define([tr_version_minor], [32])
+m4_define([tr_version_suffix], [+])
+m4_define([tr_version], [tr_version_major.tr_version_minor])
+
+AC_INIT([Transmission], [tr_version], [http://trac.transmissionbt.com/newticket], [transmission])
+
+TR_VERSION_MAJOR=tr_version_major
+TR_VERSION_MINOR=tr_version_minor
+TR_VERSION_SUFFIX=tr_version_suffix
+TR_VERSION=tr_version
+
+dnl Someone still needs to hook this up to the system above
 PEERID_PREFIX="-TR132Z-"
-USERAGENT_PREFIX="1.32+"
+
+USERAGENT_PREFIX=$TR_VERSION$TR_VERSION_SUFFIX
+
 AC_SUBST(PEERID_PREFIX,[$PEERID_PREFIX])
 AC_SUBST(USERAGENT_PREFIX,[$USERAGENT_PREFIX])
 
-AC_PREREQ(2.54)
 dnl AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SRCDIR(libtransmission/transmission.h)
 AM_INIT_AUTOMAKE([1.9 tar-ustar])
 AC_PROG_LIBTOOL
+
+if test "x$TR_VERSION_SUFFIX" = "x+"; then
+  AC_DEFINE(TR_UNSTABLE, 1,
+            [Define to 1 if this is an unstable version of Transmission])
+  TR_UNSTABLE=yes
+fi
+AM_CONDITIONAL(TR_UNSTABLE, test "x$TR_UNSTABLE" = "xyes")
 
 OPENSSL_MINIMUM=0.9.4
 CURL_MINIMUM=7.15.0
@@ -30,9 +52,10 @@ AC_SUBST(DBUS_GLIB_MINIMUM)
 AC_PROG_CC
 AC_PROG_CXX
 if test "x$GCC" = "xyes" ; then
-    CFLAGS="-g -Wall -W -O3 -funroll-loops"
+    CFLAGS="-g -Wall -W -Wmissing-prototypes -Wdeclaration-after-statement -O3 -funroll-loops"
     CXXFLAGS="-g -Wall -W -O3 -funroll-loops"
 fi
+
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_CHECK_FUNCS([lrintf strlcpy daemon dirname basename daemon strcasecmp])
