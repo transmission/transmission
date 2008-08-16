@@ -1009,6 +1009,7 @@ myHandshakeDoneCB( tr_handshake    * handshake,
                 peer->io = io;
                 peer->msgs = tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
                 atom->time = time( NULL );
+                atom->numFails = 0;
             }
         }
     }
@@ -1758,19 +1759,19 @@ compareCandidates( const void * va, const void * vb )
 static int
 getReconnectIntervalSecs( const struct peer_atom * atom )
 {
-    int min;
+    int sec;
 
     switch( atom->numFails )
     {
-        case 0:
-        case 1: min = 7; break;
-        case 2: min = 15; break;
-        case 3: min = 30; break;
-        case 4: min = 60; break;
-        default: min = 120; break;
+        case 0: sec = 0; break;
+        case 1: sec = 30; break;
+        case 2: sec = 15*60; break;
+        case 3: sec = 30*60; break;
+        case 4: sec = 60*60; break;
+        default: sec = 120*60; break;
     }
 
-    return min * 60;
+    return sec;
 }
 
 static struct peer_atom **
@@ -1880,6 +1881,7 @@ reconnectPulse( void * vtorrent )
                 atom->numFails = 0;
             else
                 ++atom->numFails;
+            tordbg( t, "removing bad peer %s", tr_peerIoGetAddrStr( peer->io ) );
             removePeer( t, peer );
         }
 
