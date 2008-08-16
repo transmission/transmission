@@ -1009,7 +1009,6 @@ myHandshakeDoneCB( tr_handshake    * handshake,
                 peer->io = io;
                 peer->msgs = tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
                 atom->time = time( NULL );
-                atom->numFails = 0;
             }
         }
     }
@@ -1764,10 +1763,11 @@ getReconnectIntervalSecs( const struct peer_atom * atom )
     switch( atom->numFails )
     {
         case 0: sec = 0; break;
-        case 1: sec = 30; break;
-        case 2: sec = 15*60; break;
-        case 3: sec = 30*60; break;
-        case 4: sec = 60*60; break;
+        case 1: sec = 5; break;
+        case 2: sec = 2*60; break;
+        case 3: sec = 15*60; break;
+        case 4: sec = 30*60; break;
+        case 5: sec = 60*60; break;
         default: sec = 120*60; break;
     }
 
@@ -1871,7 +1871,7 @@ reconnectPulse( void * vtorrent )
                        (int)MAX_RECONNECTIONS_PER_PULSE );
 
         /* disconnect some peers.
-           if we got transferred piece data, then they might be good peers,
+           if we transferred piece data, then they might be good peers,
            so reset their `numFails' weight to zero.  otherwise we connected
            to them fruitlessly, so mark it as another fail */
         for( i=0; i<nBad; ++i ) {

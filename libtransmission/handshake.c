@@ -785,7 +785,7 @@ readCryptoProvide( tr_handshake * handshake, struct evbuffer * inbuf )
         obfuscatedTorrentHash[i] = req2[i] ^ req3[i];
     if(( tor = tr_torrentFindFromObfuscatedHash( handshake->handle, obfuscatedTorrentHash )))
     {
-        dbgmsg( handshake, "found the torrent; it's [%s]", tor->info.name );
+        dbgmsg( handshake, "got INCOMING connection's encrypted handshake for torrent [%s]", tor->info.name );
         tr_peerIoSetTorrentHash( handshake->io, tor->info.hash );
         if( !tr_torrentAllowsPex( tor ) &&
             tr_peerMgrPeerIsSeed( handshake->handle->peerMgr,
