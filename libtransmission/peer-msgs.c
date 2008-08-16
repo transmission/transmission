@@ -388,6 +388,7 @@ protocolSendRequest( tr_peermsgs * msgs, const struct peer_request * req )
     tr_peerIoWriteUint32( io, out, req->offset );
     tr_peerIoWriteUint32( io, out, req->length );
     pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
+    dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 }
 
 static void
@@ -403,6 +404,7 @@ protocolSendCancel( tr_peermsgs * msgs, const struct peer_request * req )
     tr_peerIoWriteUint32( io, out, req->offset );
     tr_peerIoWriteUint32( io, out, req->length );
     pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
+    dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 }
 
 static void
@@ -416,6 +418,7 @@ protocolSendHave( tr_peermsgs * msgs, uint32_t index )
     tr_peerIoWriteUint8 ( io, out, BT_HAVE );
     tr_peerIoWriteUint32( io, out, index );
     pokeBatchPeriod( msgs, LOW_PRIORITY_INTERVAL_SECS );
+    dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 }
 
 static void
@@ -428,6 +431,7 @@ protocolSendChoke( tr_peermsgs * msgs, int choke )
     tr_peerIoWriteUint32( io, out, sizeof(uint8_t) );
     tr_peerIoWriteUint8 ( io, out, choke ? BT_CHOKE : BT_UNCHOKE );
     pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
+    dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 }
 
 /**
@@ -551,17 +555,17 @@ isPeerInteresting( const tr_peermsgs * msgs )
 static void
 sendInterest( tr_peermsgs * msgs, int weAreInterested )
 {
+    struct evbuffer * out = msgs->outMessages;
+
     assert( msgs );
     assert( weAreInterested==0 || weAreInterested==1 );
 
     msgs->info->clientIsInterested = weAreInterested;
-    dbgmsg( msgs, "Sending %s",
-            weAreInterested ? "Interested" : "Not Interested");
-
-    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) );
-    tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages,
-                   weAreInterested ? BT_INTERESTED : BT_NOT_INTERESTED );
+    dbgmsg( msgs, "Sending %s", weAreInterested ? "Interested" : "Not Interested");
+    tr_peerIoWriteUint32( msgs->io, out, sizeof(uint8_t) );
+    tr_peerIoWriteUint8 ( msgs->io, out, weAreInterested ? BT_INTERESTED : BT_NOT_INTERESTED );
     pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
+    dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 }
 
 static void
@@ -655,13 +659,16 @@ sendFastReject( tr_peermsgs * msgs,
 
     if( tr_peerIoSupportsFEXT( msgs->io ) )
     {
+        struct evbuffer * out = msgs->outMessages;
         const uint32_t len = sizeof(uint8_t) + 3 * sizeof(uint32_t);
-        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, len );
-        tr_peerIoWriteUint8( msgs->io, msgs->outMessages, BT_REJECT );
-        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, pieceIndex );
-        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, offset );
-        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, length );
+        dbgmsg( msgs, "sending fast reject %u:%u->%u", pieceIndex, offset, length );
+        tr_peerIoWriteUint32( msgs->io, out, len );
+        tr_peerIoWriteUint8( msgs->io, out, BT_REJECT );
+        tr_peerIoWriteUint32( msgs->io, out, pieceIndex );
+        tr_peerIoWriteUint32( msgs->io, out, offset );
+        tr_peerIoWriteUint32( msgs->io, out, length );
         pokeBatchPeriod( msgs, LOW_PRIORITY_INTERVAL_SECS );
+        dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
     }
 }
 
@@ -688,10 +695,13 @@ sendFastAllowed( tr_peermsgs * msgs,
     
     if( tr_peerIoSupportsFEXT( msgs->io ) )
     {
-        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + sizeof(uint32_t) );
-        tr_peerIoWriteUint8( msgs->io, msgs->outMessages, BT_ALLOWED_FAST );
-        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, pieceIndex );
+        struct evbuffer * out = msgs->outMessages;
+        dbgmsg( msgs, "sending fast allowed" );
+        tr_peerIoWriteUint32( msgs->io, out,  sizeof(uint8_t) + sizeof(uint32_t) );
+        tr_peerIoWriteUint8( msgs->io, out, BT_ALLOWED_FAST );
+        tr_peerIoWriteUint32( msgs->io, out, pieceIndex );
         pokeBatchPeriod( msgs, LOW_PRIORITY_INTERVAL_SECS );
+        dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
     }
 }
 
@@ -924,12 +934,11 @@ sendLtepHandshake( tr_peermsgs * msgs )
     char * buf;
     int len;
     int pex;
-    struct evbuffer * outbuf;
+    struct evbuffer * out = msgs->outMessages;
 
     if( msgs->clientSentLtepHandshake )
         return;
 
-    outbuf = evbuffer_new( );
     dbgmsg( msgs, "sending an ltep handshake" );
     msgs->clientSentLtepHandshake = 1;
 
@@ -950,19 +959,16 @@ sendLtepHandshake( tr_peermsgs * msgs )
         tr_bencDictAddInt( m, "ut_pex", TR_LTEP_PEX );
     buf = tr_bencSave( &val, &len );
 
-    tr_peerIoWriteUint32( msgs->io, outbuf, 2*sizeof(uint8_t) + len );
-    tr_peerIoWriteUint8 ( msgs->io, outbuf, BT_LTEP );
-    tr_peerIoWriteUint8 ( msgs->io, outbuf, LTEP_HANDSHAKE );
-    tr_peerIoWriteBytes ( msgs->io, outbuf, buf, len );
-
-    tr_peerIoWriteBuf( msgs->io, outbuf );
-
-    dbgmsg( msgs, "here is the ltep handshake we sent [%*.*s]", len, len, buf );
+    tr_peerIoWriteUint32( msgs->io, out, 2*sizeof(uint8_t) + len );
+    tr_peerIoWriteUint8 ( msgs->io, out, BT_LTEP );
+    tr_peerIoWriteUint8 ( msgs->io, out, LTEP_HANDSHAKE );
+    tr_peerIoWriteBytes ( msgs->io, out, buf, len );
+    pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
+    dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 
     /* cleanup */
     tr_bencFree( &val );
     tr_free( buf );
-    evbuffer_free( outbuf );
 }
 
 static void
@@ -1752,6 +1758,7 @@ sendBitfield( tr_peermsgs * msgs )
     tr_peerIoWriteUint8 ( msgs->io, out, BT_BITFIELD );
     tr_peerIoWriteBytes ( msgs->io, out, bitfield->bits, bitfield->byteCount );
     pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
+    dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 }
 
 /**
@@ -1819,6 +1826,7 @@ sendPex( tr_peermsgs * msgs )
         uint8_t *tmp, *walk;
         char * benc;
         int bencLen;
+        struct evbuffer * out = msgs->outMessages;
 
         /* build the diffs */
         diffs.added = tr_new( tr_pex, newCount );
@@ -1871,11 +1879,12 @@ sendPex( tr_peermsgs * msgs )
 
         /* write the pex message */
         benc = tr_bencSave( &val, &bencLen );
-        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, 2*sizeof(uint8_t) + bencLen );
-        tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, BT_LTEP );
-        tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, msgs->ut_pex_id );
-        tr_peerIoWriteBytes ( msgs->io, msgs->outMessages, benc, bencLen );
+        tr_peerIoWriteUint32( msgs->io, out, 2*sizeof(uint8_t) + bencLen );
+        tr_peerIoWriteUint8 ( msgs->io, out, BT_LTEP );
+        tr_peerIoWriteUint8 ( msgs->io, out, msgs->ut_pex_id );
+        tr_peerIoWriteBytes ( msgs->io, out, benc, bencLen );
         pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
+        dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 
         /* cleanup */
         tr_free( benc );
