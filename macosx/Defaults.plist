@@ -29,7 +29,7 @@
 	<key>CheckStalled</key>
 	<false/>
 	<key>CheckUpload</key>
-	<true/>
+	<false/>
 	<key>CreatorLocation</key>
 	<string>~/Desktop</string>
 	<key>DeleteOriginalTorrent</key>
@@ -102,10 +102,10 @@
 	<false/>
 	<key>ProxyAddress</key>
 	<string></string>
-	<key>ProxyPort</key>
-	<integer>80</integer>
 	<key>ProxyAuthorize</key>
 	<false/>
+	<key>ProxyPort</key>
+	<integer>80</integer>
 	<key>ProxyType</key>
 	<string>HTTP</string>
 	<key>ProxyUsername</key>
@@ -118,10 +118,6 @@
 	<false/>
 	<key>QueueSeedNumber</key>
 	<integer>3</integer>
-	<key>RatioCheck</key>
-	<false/>
-	<key>RatioLimit</key>
-	<integer>2</integer>
 	<key>RPC</key>
 	<false/>
 	<key>RPCAuthorize</key>
@@ -130,6 +126,12 @@
 	<integer>9091</integer>
 	<key>RPCUsername</key>
 	<string>admin</string>
+	<key>RatioCheck</key>
+	<false/>
+	<key>RatioLimit</key>
+	<integer>2</integer>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
 	<key>SeedingSound</key>
 	<string>Submarine</string>
 	<key>ShowInspector</key>
@@ -162,15 +164,13 @@
 	<true/>
 	<key>StatusLabel</key>
 	<string>RatioTotal</string>
-	<key>SUEnableAutomaticChecks</key>
-	<true/>
 	<key>UploadLimit</key>
-	<integer>20</integer>
+	<integer>50</integer>
 	<key>UseIncompleteDownloadFolder</key>
 	<false/>
-	<key>WarningDuplicate</key>
-	<true/>
 	<key>WarningCreatorBlankAddress</key>
+	<true/>
+	<key>WarningDuplicate</key>
 	<true/>
 	<key>WarningFolderDataSameName</key>
 	<true/>
