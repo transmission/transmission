@@ -57,6 +57,7 @@ struct tr_handle
     unsigned int                 isClosed           : 1;
     unsigned int                 useUploadLimit     : 1;
     unsigned int                 useDownloadLimit   : 1;
+    unsigned int                 useLazyBitfield    : 1;
 
     tr_encryption_mode           encryptionMode;
 

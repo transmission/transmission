@@ -23,6 +23,7 @@
 #include "transmission.h"
 #include "bencode.h"
 #include "completion.h"
+#include "crypto.h"
 #include "inout.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
@@ -89,7 +90,11 @@ enum
     /* used in lowering the outMessages queue period */
     IMMEDIATE_PRIORITY_INTERVAL_SECS = 0,
     HIGH_PRIORITY_INTERVAL_SECS = 2,
-    LOW_PRIORITY_INTERVAL_SECS = 20
+    LOW_PRIORITY_INTERVAL_SECS = 20,
+
+    /* number of pieces to remove from the bitfield when
+     * lazy bitfields are turned on */
+    LAZY_PIECE_COUNT = 26
 };
 
 /**
@@ -295,7 +300,7 @@ struct tr_peermsgs
 
     tr_peer * info;
 
-    tr_handle * handle;
+    tr_session * session;
     tr_torrent * torrent;
     tr_peerIo * io;
 
@@ -381,14 +386,14 @@ protocolSendRequest( tr_peermsgs * msgs, const struct peer_request * req )
     tr_peerIo * io = msgs->io;
     struct evbuffer * out = msgs->outMessages;
 
-    dbgmsg( msgs, "requesting %u:%u->%u", req->index, req->offset, req->length );
     tr_peerIoWriteUint32( io, out, sizeof(uint8_t) + 3*sizeof(uint32_t) );
     tr_peerIoWriteUint8 ( io, out, BT_REQUEST );
     tr_peerIoWriteUint32( io, out, req->index );
     tr_peerIoWriteUint32( io, out, req->offset );
     tr_peerIoWriteUint32( io, out, req->length );
+    dbgmsg( msgs, "requesting %u:%u->%u... outMessage size is now %d",
+            req->index, req->offset, req->length, (int)EVBUFFER_LENGTH(out) );
     pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
-    dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 }
 
 static void
@@ -397,14 +402,14 @@ protocolSendCancel( tr_peermsgs * msgs, const struct peer_request * req )
     tr_peerIo * io = msgs->io;
     struct evbuffer * out = msgs->outMessages;
 
-    dbgmsg( msgs, "cancelling %u:%u->%u", req->index, req->offset, req->length );
     tr_peerIoWriteUint32( io, out, sizeof(uint8_t) + 3*sizeof(uint32_t) );
     tr_peerIoWriteUint8 ( io, out, BT_CANCEL );
     tr_peerIoWriteUint32( io, out, req->index );
     tr_peerIoWriteUint32( io, out, req->offset );
     tr_peerIoWriteUint32( io, out, req->length );
+    dbgmsg( msgs, "cancelling %u:%u->%u... outMessage size is now %d",
+            req->index, req->offset, req->length, (int)EVBUFFER_LENGTH(out) );
     pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
-    dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 }
 
 static void
@@ -413,12 +418,12 @@ protocolSendHave( tr_peermsgs * msgs, uint32_t index )
     tr_peerIo * io = msgs->io;
     struct evbuffer * out = msgs->outMessages;
 
-    dbgmsg( msgs, "sending Have %u", index );
     tr_peerIoWriteUint32( io, out, sizeof(uint8_t) + sizeof(uint32_t) );
     tr_peerIoWriteUint8 ( io, out, BT_HAVE );
     tr_peerIoWriteUint32( io, out, index );
+    dbgmsg( msgs, "sending Have %u.. outMessage size is now %d",
+            index, (int)EVBUFFER_LENGTH(out) );
     pokeBatchPeriod( msgs, LOW_PRIORITY_INTERVAL_SECS );
-    dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 }
 
 static void
@@ -427,11 +432,12 @@ protocolSendChoke( tr_peermsgs * msgs, int choke )
     tr_peerIo * io = msgs->io;
     struct evbuffer * out = msgs->outMessages;
 
-    dbgmsg( msgs, "sending %s", (choke ? "Choke" : "Unchoke") );
     tr_peerIoWriteUint32( io, out, sizeof(uint8_t) );
     tr_peerIoWriteUint8 ( io, out, choke ? BT_CHOKE : BT_UNCHOKE );
+    dbgmsg( msgs, "sending %s... outMessage size is now %d",
+                  (choke ? "Choke" : "Unchoke"),
+                  (int)EVBUFFER_LENGTH(out) );
     pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
-    dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 }
 
 /**
@@ -951,8 +957,8 @@ sendLtepHandshake( tr_peermsgs * msgs )
         pex = 1;
 
     tr_bencInitDict( &val, 4 );
-    tr_bencDictAddInt( &val, "e", msgs->handle->encryptionMode != TR_CLEAR_PREFERRED );
-    tr_bencDictAddInt( &val, "p", tr_sessionGetPeerPort( msgs->handle ) );
+    tr_bencDictAddInt( &val, "e", msgs->session->encryptionMode != TR_CLEAR_PREFERRED );
+    tr_bencDictAddInt( &val, "p", tr_sessionGetPeerPort( msgs->session ) );
     tr_bencDictAddStr( &val, "v", TR_NAME " " USERAGENT_PREFIX );
     m  = tr_bencDictAddDict( &val, "m", 1 );
     if( pex )
@@ -1034,7 +1040,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
         tr_bencDictFindRaw( &val, "added.f", &added_f, &added_f_len );
         pex = tr_peerMgrCompactToPex( added->val.s.s, added->val.s.i, added_f, added_f_len, &n );
         for( i=0; i<n; ++i )
-            tr_peerMgrAddPex( msgs->handle->peerMgr, tor->info.hash,
+            tr_peerMgrAddPex( msgs->session->peerMgr, tor->info.hash,
                               TR_PEER_FROM_PEX, pex+i );
         tr_free( pex );
     }
@@ -1750,15 +1756,42 @@ gotError( struct bufferevent * evbuf UNUSED, short what, void * vmsgs )
 static void
 sendBitfield( tr_peermsgs * msgs )
 {
-    const tr_bitfield * bitfield = tr_cpPieceBitfield( msgs->torrent->completion );
     struct evbuffer * out = msgs->outMessages;
+    const tr_piece_index_t pieceCount = msgs->torrent->info.pieceCount;
+    tr_bitfield * field;
+    tr_piece_index_t lazyPieces[LAZY_PIECE_COUNT];
+    int i;
+    int lazyCount = 0;
 
-    dbgmsg( msgs, "sending peer a bitfield message" );
-    tr_peerIoWriteUint32( msgs->io, out, sizeof(uint8_t) + bitfield->byteCount );
+    field = tr_bitfieldDup( tr_cpPieceBitfield( msgs->torrent->completion ) );
+
+    if( tr_sessionIsLazyBitfieldEnabled( msgs->session ) )
+    {
+        const int maxLazyCount = MIN( LAZY_PIECE_COUNT, pieceCount );
+
+        while( lazyCount < maxLazyCount )
+        {
+            const size_t pos = tr_cryptoRandInt ( pieceCount );
+            if( !tr_bitfieldHas( field, pos ) ) /* already removed it */
+                continue;
+            dbgmsg( msgs, "lazy bitfield #%d: piece %d of %d",
+                    (int)(lazyCount+1), (int)pos, (int)pieceCount );
+            tr_bitfieldRem( field, pos );
+            lazyPieces[lazyCount++] = pos;
+        }
+    }
+
+    tr_peerIoWriteUint32( msgs->io, out, sizeof(uint8_t) + field->byteCount );
     tr_peerIoWriteUint8 ( msgs->io, out, BT_BITFIELD );
-    tr_peerIoWriteBytes ( msgs->io, out, bitfield->bits, bitfield->byteCount );
+    tr_peerIoWriteBytes ( msgs->io, out, field->bits, field->byteCount );
+    dbgmsg( msgs, "sending bitfield... outMessage size is now %d",
+                  (int)EVBUFFER_LENGTH(out) );
     pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
-    dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
+
+    for( i=0; i<lazyCount; ++i )
+        protocolSendHave( msgs, lazyPieces[i] );
+
+    tr_bitfieldFree( field );
 }
 
 /**
@@ -1820,7 +1853,7 @@ sendPex( tr_peermsgs * msgs )
     {
         int i;
         tr_pex * newPex = NULL;
-        const int newCount = tr_peerMgrGetPeers( msgs->handle->peerMgr, msgs->torrent->info.hash, &newPex );
+        const int newCount = tr_peerMgrGetPeers( msgs->session->peerMgr, msgs->torrent->info.hash, &newPex );
         PexDiffs diffs;
         tr_benc val, *added, *dropped;
         uint8_t *tmp, *walk;
@@ -1923,7 +1956,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m = tr_new0( tr_peermsgs, 1 );
     m->publisher = tr_publisherNew( );
     m->info = info;
-    m->handle = torrent->handle;
+    m->session = torrent->handle;
     m->torrent = torrent;
     m->io = info->io;
     m->info->clientIsChoked = 1;
@@ -1932,9 +1965,9 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->info->peerIsInterested = 0;
     m->info->have = tr_bitfieldNew( torrent->info.pieceCount );
     m->state = AWAITING_BT_LENGTH;
-    m->pulseTimer = tr_timerNew( m->handle, peerPulse, m, PEER_PULSE_INTERVAL );
-    m->rateTimer = tr_timerNew( m->handle, ratePulse, m, RATE_PULSE_INTERVAL );
-    m->pexTimer = tr_timerNew( m->handle, pexPulse, m, PEX_INTERVAL );
+    m->pulseTimer = tr_timerNew( m->session, peerPulse, m, PEER_PULSE_INTERVAL );
+    m->rateTimer = tr_timerNew( m->session, ratePulse, m, RATE_PULSE_INTERVAL );
+    m->pexTimer = tr_timerNew( m->session, pexPulse, m, PEX_INTERVAL );
     m->outMessages = evbuffer_new( );
     m->outMessagesBatchedAt = 0;
     m->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;

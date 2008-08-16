@@ -43,6 +43,7 @@
 #include "fdlimit.h"
 #include "natpmp.h"
 #include "net.h"
+#include "peer-io.h"
 #include "platform.h"
 #include "utils.h"
 
@@ -122,10 +123,12 @@ createSocket( int type, int priority )
     if( fd >= 0 )
         fd = makeSocketNonBlocking( fd );
 
+#if 0
     if( fd >= 0 ) {
         const int buffsize = 1500*3; /* 3x MTU for most ethernet/wireless */
         setsockopt( fd, SOL_SOCKET, SO_SNDBUF, &buffsize, sizeof( buffsize ) );
     }
+#endif
 
     return fd;
 }
@@ -138,9 +141,7 @@ tr_netOpenTCP( const struct in_addr * addr, tr_port_t port, int priority )
     const int type = SOCK_STREAM;
 
     if( ( s = createSocket( type, priority ) ) < 0 )
-    {
         return -1;
-    }
 
     memset( &sock, 0, sizeof( sock ) );
     sock.sin_family      = AF_INET;
@@ -160,6 +161,9 @@ tr_netOpenTCP( const struct in_addr * addr, tr_port_t port, int priority )
         tr_netClose( s );
         s = -1;
     }
+
+    tr_deepLog( __FILE__, __LINE__, NULL, "New OUTGOING connection %d (%s)",
+                s, tr_peerIoAddrStr( addr, port ) );
 
     return s;
 }

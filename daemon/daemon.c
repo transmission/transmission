@@ -36,6 +36,7 @@ static char myConfigFilename[MAX_PATH_LENGTH];
 #define KEY_BLOCKLIST        "blocklist-enabled"
 #define KEY_DOWNLOAD_DIR     "download-dir"
 #define KEY_ENCRYPTION       "encryption"
+#define KEY_LAZY_BITFIELD    "lazy-bitfield-enabled"
 #define KEY_PEER_LIMIT       "max-peers-global"
 #define KEY_PEER_PORT        "peer-port"
 #define KEY_PORT_FORWARDING  "port-forwarding-enabled"
@@ -151,6 +152,7 @@ session_init( const char * configDir, const char * downloadDir,
     int fwdEnabled = -1;
     int upLimit=-1, upLimited=-1, downLimit=-1, downLimited=-1;
     int encryption = -1;
+    int useLazyBitfield = -1;
     tr_ctor * ctor;
     tr_torrent ** torrents;
 
@@ -173,6 +175,7 @@ session_init( const char * configDir, const char * downloadDir,
     getConfigInt( dict, KEY_DSPEED_ENABLED,  &downLimited,       FALSE );
     getConfigInt( dict, KEY_USPEED,          &upLimit,           100 );
     getConfigInt( dict, KEY_USPEED_ENABLED,  &upLimited,         FALSE );
+    getConfigInt( dict, KEY_LAZY_BITFIELD,   &useLazyBitfield,   TR_DEFAULT_LAZY_BITFIELD_ENABLED );
     getConfigInt( dict, KEY_PEER_LIMIT,      &peers,             TR_DEFAULT_GLOBAL_PEER_LIMIT );
     getConfigInt( dict, KEY_BLOCKLIST,       &blocklistEnabled,  TR_DEFAULT_BLOCKLIST_ENABLED );
     getConfigInt( dict, KEY_RPC_PORT,        &rpcPort,           TR_DEFAULT_RPC_PORT );
@@ -190,6 +193,7 @@ session_init( const char * configDir, const char * downloadDir,
     mySession = tr_sessionInitFull( configDir, "daemon", downloadDir,
                                     pexEnabled, fwdEnabled, peerPort,
                                     encryption,
+                                    useLazyBitfield,
                                     upLimited, upLimit,
                                     downLimited, downLimit,
                                     peers,

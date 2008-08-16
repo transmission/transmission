@@ -179,9 +179,10 @@ tr_sessionInitFull( const char        * configDir,
                     int                 isPortForwardingEnabled,
                     int                 publicPort,
                     tr_encryption_mode  encryptionMode,
-                    int                 isUploadLimitEnabled,
+                    int                 useLazyBitfield,
+                    int                 useUploadLimit,
                     int                 uploadLimit,
-                    int                 isDownloadLimitEnabled,
+                    int                 useDownloadLimit,
                     int                 downloadLimit,
                     int                 globalPeerLimit,
                     int                 messageLevel,
@@ -224,7 +225,7 @@ tr_sessionInitFull( const char        * configDir,
     h->proxy = tr_strdup( proxy );
     h->proxyPort = proxyPort;
     h->proxyType = proxyType;
-    h->isProxyAuthEnabled = proxyAuthIsEnabled ? 1 : 0;
+    h->isProxyAuthEnabled = proxyAuthIsEnabled != 0;
     h->proxyUsername = tr_strdup( proxyUsername );
     h->proxyPassword = tr_strdup( proxyPassword );
 
@@ -241,15 +242,17 @@ tr_sessionInitFull( const char        * configDir,
     h->tag = tr_strdup( tag );
     h->peerMgr = tr_peerMgrNew( h );
 
+    h->useLazyBitfield = useLazyBitfield != 0;
+
     /* Initialize rate and file descripts controls */
 
     h->upload = tr_rcInit();
     tr_rcSetLimit( h->upload, uploadLimit );
-    h->useUploadLimit = isUploadLimitEnabled;
+    h->useUploadLimit = useUploadLimit;
 
     h->download = tr_rcInit();
     tr_rcSetLimit( h->download, downloadLimit );
-    h->useDownloadLimit = isDownloadLimitEnabled;
+    h->useDownloadLimit = useDownloadLimit;
 
     tr_fdInit( globalPeerLimit );
     h->shared = tr_sharedInit( h, isPortForwardingEnabled, publicPort );
@@ -288,6 +291,7 @@ tr_sessionInit( const char * configDir,
                                TR_DEFAULT_PORT_FORWARDING_ENABLED,
                                -1, /* public port */
                                TR_ENCRYPTION_PREFERRED, /* encryption mode */
+                               TR_DEFAULT_LAZY_BITFIELD_ENABLED,
                                FALSE, /* use upload speed limit? */ 
                                -1, /* upload speed limit */
                                FALSE, /* use download speed limit? */
@@ -643,15 +647,31 @@ tr_sessionLoadTorrents ( tr_handle   * h,
 ***/
 
 void
-tr_sessionSetPexEnabled( tr_handle * handle, int isPexEnabled )
+tr_sessionSetPexEnabled( tr_handle * handle, int enabled )
 {
-    handle->isPexEnabled = isPexEnabled ? 1 : 0;
+    handle->isPexEnabled = enabled ? 1 : 0;
 }
 
 int
 tr_sessionIsPexEnabled( const tr_handle * handle )
 {
     return handle->isPexEnabled;
+}
+
+/***
+****
+***/
+
+void
+tr_sessionSetLazyBitfieldEnabled( tr_handle * handle, int enabled )
+{
+    handle->useLazyBitfield = enabled ? 1 : 0;
+}
+
+int
+tr_sessionIsLazyBitfieldEnabled( const tr_handle * handle )
+{
+    return handle->useLazyBitfield;
 }
 
 /***

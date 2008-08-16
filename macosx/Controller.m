@@ -209,6 +209,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 [fDefaults boolForKey: @"NatTraversal"],
                                 [fDefaults integerForKey: @"BindPort"],
                                 TR_ENCRYPTION_PREFERRED, /* reset in prefs */
+                                TR_DEFAULT_LAZY_BITFIELD_ENABLED,
                                 NO, /* reset in prefs */
                                 -1, /* reset in prefs */
                                 NO, /* reset in prefs */

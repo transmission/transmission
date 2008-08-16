@@ -421,6 +421,7 @@ main( int argc, char ** argv )
                             pref_flag_get( PREF_KEY_PORT_FORWARDING ),
                             pref_int_get( PREF_KEY_PORT ),
                             pref_int_get( PREF_KEY_ENCRYPTION ),
+                            pref_flag_get( PREF_KEY_LAZY_BITFIELD ),
                             pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ),
                             pref_int_get( PREF_KEY_UL_LIMIT ),
                             pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ),

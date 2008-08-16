@@ -113,6 +113,8 @@ tr_proxy_type;
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PORT_STR                 "51413"
 /** @see tr_sessionInitFull */
+#define TR_DEFAULT_LAZY_BITFIELD_ENABLED    0
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_GLOBAL_PEER_LIMIT        200
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PEER_SOCKET_TOS          8
@@ -253,9 +255,10 @@ tr_handle * tr_sessionInitFull( const char         * configDir,
                                 int                  isPortForwardingEnabled,
                                 int                  publicPort,
                                 tr_encryption_mode   encryptionMode,
-                                int                  isUploadLimitEnabled,
+                                int                  useLazyBitfield,
+                                int                  useUploadLimit,
                                 int                  uploadLimit,
-                                int                  isDownloadLimitEnabled,
+                                int                  useDownloadLimit,
                                 int                  downloadLimit,
                                 int                  peerLimit,
                                 int                  messageLevel,
@@ -495,6 +498,10 @@ void tr_sessionClearStats( tr_session * session );
 void tr_sessionSetPexEnabled( tr_session *, int isEnabled );
 
 int tr_sessionIsPexEnabled( const tr_session * );
+
+void tr_sessionSetLazyBitfieldEnabled( tr_handle * handle, int enabled );
+
+int tr_sessionIsLazyBitfieldEnabled( const tr_handle * handle );
 
 tr_encryption_mode tr_sessionGetEncryption( tr_session * );
 

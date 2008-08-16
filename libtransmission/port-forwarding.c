@@ -19,6 +19,7 @@
 #include "transmission.h"
 #include "natpmp.h"
 #include "net.h"
+#include "peer-io.h"
 #include "peer-mgr.h"
 #include "port-forwarding.h"
 #include "torrent.h"
@@ -129,6 +130,9 @@ incomingPeersPulse( tr_shared * s )
         socket = tr_netAccept( s->bindSocket, &addr, &port );
         if( socket < 0 )
             break;
+
+        tr_deepLog( __FILE__, __LINE__, NULL, "New INCOMING connection %d (%s)",
+                    socket, tr_peerIoAddrStr( &addr, port ) );
 
         tr_peerMgrAddIncoming( s->h->peerMgr, &addr, port, socket );
     }

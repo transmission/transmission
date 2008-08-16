@@ -99,6 +99,7 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_PEX, TR_DEFAULT_PEX_ENABLED );
     pref_flag_set_default   ( PREF_KEY_ASKQUIT, TRUE );
     pref_flag_set_default   ( PREF_KEY_ENCRYPTION, TR_ENCRYPTION_PREFERRED );
+    pref_flag_set_default   ( PREF_KEY_LAZY_BITFIELD, TR_DEFAULT_LAZY_BITFIELD_ENABLED );
 
     pref_int_set_default    ( PREF_KEY_MSGLEVEL, TR_MSG_INF );
 

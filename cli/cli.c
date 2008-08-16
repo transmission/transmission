@@ -271,6 +271,7 @@ main( int argc, char ** argv )
             natTraversal,                  /* nat enabled */
             peerPort,
             encryptionMode,
+            TR_DEFAULT_LAZY_BITFIELD_ENABLED,
             uploadLimit >= 0,
             uploadLimit,
             downloadLimit >= 0,
