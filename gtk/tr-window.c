@@ -556,6 +556,7 @@ tr_window_new( GtkUIManager * ui_manager, TrCore * core )
     p->view = makeview( p, core );
     w = p->scroll = gtk_scrolled_window_new( NULL, NULL );
     gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(w), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC );
+    gtk_scrolled_window_set_shadow_type( GTK_SCROLLED_WINDOW(w), GTK_SHADOW_IN );
     gtk_container_add( GTK_CONTAINER(w), p->view );
     gtk_box_pack_start_defaults( GTK_BOX(vbox), w );
     gtk_container_set_focus_child( GTK_CONTAINER( vbox ), w );
