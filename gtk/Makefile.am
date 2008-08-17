@@ -104,6 +104,7 @@ icondir = $(datadir)/pixmaps
 
 EXTRA_DIST = \
     $(DESKTOP_IN_FILES) \
+    tr-core-dbus.xml \
     transmission.png
 
 DISTCLEANFILES = \
