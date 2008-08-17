@@ -15,6 +15,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.33
    + Fix small memory leaks
 - Mac
    + Rephrase "data not fully available" to "remaining time unknown"
+   + Fix bug where torrent file creation would fail because an extra blank tracker addresses was inserted
 - Daemon
    + Fix crash when adding nonexistent torrents via transmission-remote
 - GTK+
