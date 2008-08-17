@@ -500,6 +500,34 @@ gtr_dbus_add_torrent( const char * filename )
     return success;
 }
 
+gboolean
+gtr_dbus_present_window()
+{
+    static gboolean success = FALSE;
+#ifdef HAVE_DBUS_GLIB
+    DBusGProxy * proxy = NULL;
+    GError * err = NULL;
+    DBusGConnection * conn;
+    if(( conn = dbus_g_bus_get( DBUS_BUS_SESSION, &err )))
+        proxy = dbus_g_proxy_new_for_name (conn, VALUE_SERVICE_NAME,
+                                                 VALUE_SERVICE_OBJECT_PATH,
+                                                 VALUE_SERVICE_INTERFACE );
+    else if( err )
+       g_message( "err: %s", err->message );
+    if( proxy )
+        dbus_g_proxy_call( proxy, "PresentWindow", &err,
+                           G_TYPE_INVALID,
+                           G_TYPE_BOOLEAN, &success,
+                           G_TYPE_INVALID );
+    if( err )
+       g_message( "err: %s", err->message );
+
+    g_object_unref( proxy );
+    dbus_g_connection_unref( conn );
+#endif
+    return success;
+}
+
 GtkWidget *
 tr_button_new_from_stock( const char * stock,
                           const char * mnemonic )

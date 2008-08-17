@@ -603,10 +603,10 @@ tr_getClutchDir( const tr_session * session UNUSED )
 ****
 ***/
 
-int
+tr_lockfile_state_t
 tr_lockfile( const char * filename )
 {
-    int ret;
+    tr_lockfile_state_t ret;
 
 #ifdef WIN32
 

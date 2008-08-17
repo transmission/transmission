@@ -56,14 +56,6 @@ void         tr_lockLock       ( tr_lock * );
 void         tr_lockUnlock     ( tr_lock * );
 int          tr_lockHave       ( const tr_lock * );
 
-
-enum
-{
-  TR_LOCKFILE_SUCCESS,
-  TR_LOCKFILE_EOPEN,
-  TR_LOCKFILE_ELOCK
-};
-
-int          tr_lockfile       ( const char * filename );
+tr_lockfile_state_t tr_lockfile       ( const char * filename );
 
 #endif

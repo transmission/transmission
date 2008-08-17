@@ -66,7 +66,7 @@ gboolean pref_flag_eval( pref_flag_t val, const char * key );
 gboolean
 cf_init(const char *confdir, char **errstr);
 gboolean
-cf_lock(char **errstr);
+cf_lock(tr_lockfile_state_t *tr_state, char **errstr);
 void
 cf_check_older_configs(void);
 

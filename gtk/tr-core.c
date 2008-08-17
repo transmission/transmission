@@ -44,6 +44,7 @@
 #include "tr-prefs.h"
 #include "tr-torrent.h"
 #include "util.h"
+#include "actions.h"
 
 static void maybeInhibitHibernation( TrCore * core );
 
@@ -781,6 +782,16 @@ tr_core_add_file( TrCore      * core,
     add_filename( core, filename,
                   pref_flag_get( PREF_KEY_START ),
                   pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) );
+    *success = TRUE;
+    return TRUE;
+}
+
+gboolean
+tr_core_present_window( TrCore      * core UNUSED,
+                        gboolean    * success,
+                        GError     ** err UNUSED )
+{
+    action_activate( "present-main-window" );
     *success = TRUE;
     return TRUE;
 }

@@ -49,6 +49,8 @@ noinst_HEADERS = \
 
 bin_PROGRAMS = transmission
 
+dbus_generated_sources = tr-core-dbus.h
+
 transmission_SOURCES = \
     actions.c \
     add-dialog.c \
@@ -71,7 +73,8 @@ transmission_SOURCES = \
     tr-prefs.c \
     tr-torrent.c \
     tr-window.c \
-    util.c
+    util.c \
+    $(dbus_generated_sources)
 
 dist_man_MANS = transmission.1
 
@@ -106,3 +109,9 @@ EXTRA_DIST = \
 DISTCLEANFILES = \
     transmission.desktop
 
+CLEANFILES = $(dbus_generated_sources)
+
+$(srcdir)/tr-core-dbus.c: tr-core-dbus.h
+
+tr-core-dbus.h: $(srcdir)/tr-core-dbus.xml
+	$(DBUS_BINDING_TOOL) --mode=glib-server --prefix=tr_core $< > $(@F)

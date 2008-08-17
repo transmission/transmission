@@ -347,6 +347,7 @@ main( int argc, char ** argv )
     gboolean startminimized = FALSE;
     char * domain = "transmission";
     char * configDir = NULL;
+    tr_lockfile_state_t tr_state;
 
     GOptionEntry entries[] = {
         { "paused", 'p', 0, G_OPTION_ARG_NONE, &startpaused,
@@ -397,7 +398,7 @@ main( int argc, char ** argv )
     /* either get a lockfile s.t. this is the one instance of
      * transmission that's running, OR if there are files to
      * be added, delegate that to the running instance via dbus */
-    didlock = cf_lock( &err );
+    didlock = cf_lock( &tr_state, &err );
     argfiles = checkfilenames( argc-1, argv+1 );
     if( !didlock && argfiles )
     {
@@ -407,6 +408,11 @@ main( int argc, char ** argv )
             delegated |= gtr_dbus_add_torrent( l->data );
         if( delegated )
             err = NULL;
+    }
+    else if( (!didlock) && (tr_state == TR_LOCKFILE_ELOCK) )
+    {
+        gtr_dbus_present_window();
+        err = NULL;
     }
 
     if( didlock && ( didinit || cf_init( configDir, &err ) ) )
@@ -576,13 +582,13 @@ clearTag( guint * tag )
 }
 
 static void
-toggleMainWindow( struct cbdata * cbdata )
+toggleMainWindow( struct cbdata * cbdata, gboolean present )
 {
     GtkWindow * window = GTK_WINDOW( cbdata->wind );
     const int hide = !cbdata->minimized;
     static int x=0, y=0;
 
-    if( hide )
+    if( (!present) && hide )
     {
         gtk_window_get_position( window, &x, &y );
         clearTag( &cbdata->idle_hide_mainwindow_tag );
@@ -592,7 +598,8 @@ toggleMainWindow( struct cbdata * cbdata )
     else
     {
         gtk_window_set_skip_taskbar_hint( window, FALSE );
-        gtk_window_move( window, x, y );
+        if ( x != 0 && y != 0 )
+            gtk_window_move( window, x, y );
         gtk_widget_show( GTK_WIDGET( window ) );
         gtk_window_deiconify( window );
 #if GTK_CHECK_VERSION(2,8,0)
@@ -1357,7 +1364,11 @@ doAction ( const char * action_name, gpointer user_data )
     }
     else if (!strcmp (action_name, "toggle-main-window"))
     {
-        toggleMainWindow( data );
+        toggleMainWindow( data, FALSE );
+    }
+    else if (!strcmp (action_name, "present-main-window"))
+    {
+        toggleMainWindow( data, TRUE );
     }
     else g_error ("Unhandled action: %s", action_name );
 

@@ -130,6 +130,9 @@ void tr_core_add_list( TrCore      * self,
 /** Add a torrent. */
 gboolean tr_core_add_file( TrCore*, const char * filename, gboolean * setme_success, GError ** err );
 
+/** Present the main window */
+gboolean tr_core_present_window( TrCore*, gboolean * setme_success, GError ** err );
+
 /** Add a torrent. */
 void tr_core_add_torrent( TrCore*, TrTorrent* );
 

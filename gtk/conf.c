@@ -71,9 +71,9 @@ cf_init(const char *dir, char **errstr)
 
 /* errstr may be NULL, this might be called before GTK is initialized */
 static gboolean
-lockfile(const char * filename, char **errstr)
+lockfile(const char * filename, tr_lockfile_state_t *tr_state, char **errstr)
 {
-    const int state = tr_lockfile( filename );
+    const tr_lockfile_state_t state = tr_lockfile( filename );
     const gboolean success = state == TR_LOCKFILE_SUCCESS;
 
     if( errstr ) switch( state ) {
@@ -89,6 +89,9 @@ lockfile(const char * filename, char **errstr)
             *errstr = NULL;
             break;
     }
+
+    if( tr_state != NULL)
+        *tr_state = state;
 
     return success;
 }
@@ -111,10 +114,10 @@ cf_removelocks( void )
 
 /* errstr may be NULL, this might be called before GTK is initialized */
 gboolean
-cf_lock( char ** errstr )
+cf_lock( tr_lockfile_state_t *tr_state, char ** errstr )
 {
     char * path = getLockFilename( );
-    const gboolean didLock = lockfile( path, errstr );
+    const gboolean didLock = lockfile( path, tr_state, errstr );
     if( didLock )
         gl_lockpath = g_strdup( path );
     g_atexit( cf_removelocks );

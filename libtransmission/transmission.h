@@ -1179,6 +1179,13 @@ typedef enum tr_errno
 }
 tr_errno;
 
+typedef enum
+{
+  TR_LOCKFILE_SUCCESS = 0,
+  TR_LOCKFILE_EOPEN,
+  TR_LOCKFILE_ELOCK
+} tr_lockfile_state_t;
+
 tr_torrent_status tr_torrentGetStatus( tr_torrent * );
 
 enum

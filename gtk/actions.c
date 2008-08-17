@@ -129,7 +129,8 @@ static GtkActionEntry entries[] =
   { "show-about-dialog", GTK_STOCK_ABOUT, NULL, NULL, NULL, G_CALLBACK(action_cb) },
   { "help", GTK_STOCK_HELP, N_("_Contents"), "F1", NULL, G_CALLBACK(action_cb) },
   { "update-tracker", GTK_STOCK_NETWORK,
-    N_("Ask Tracker for _More Peers"), NULL, NULL, G_CALLBACK(action_cb) }
+    N_("Ask Tracker for _More Peers"), NULL, NULL, G_CALLBACK(action_cb) },
+  { "present-main-window", NULL, NULL, NULL, NULL, G_CALLBACK(action_cb) },
 };
 
 typedef struct
