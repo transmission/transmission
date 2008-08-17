@@ -112,7 +112,7 @@ DISTCLEANFILES = \
 
 CLEANFILES = $(dbus_generated_sources)
 
-$(srcdir)/tr-core-dbus.c: tr-core-dbus.h
+$(srcdir)/tr-core.c: tr-core-dbus.h
 
 tr-core-dbus.h: $(srcdir)/tr-core-dbus.xml
 	$(DBUS_BINDING_TOOL) --mode=glib-server --prefix=tr_core $< > $(@F)
