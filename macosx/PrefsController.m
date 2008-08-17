@@ -80,12 +80,12 @@
         //checks for old version speeds of -1
         if ([fDefaults integerForKey: @"UploadLimit"] < 0)
         {
-            [fDefaults setInteger: 20 forKey: @"UploadLimit"];
+            [fDefaults removeObjectForKey: @"UploadLimit"];
             [fDefaults setBool: NO forKey: @"CheckUpload"];
         }
         if ([fDefaults integerForKey: @"DownloadLimit"] < 0)
         {
-            [fDefaults setInteger: 20 forKey: @"DownloadLimit"];
+            [fDefaults removeObjectForKey: @"DownloadLimit"];
             [fDefaults setBool: NO forKey: @"CheckDownload"];
         }
         
