@@ -225,7 +225,7 @@ handle_upload( struct shttpd_arg * arg )
             const char * response = "<result>success</result>";
             const int len = strlen( response );
             evbuffer_add_printf( cbuf->out, "HTTP/1.1 200 OK\r\n"
-                                            "Content-Type: text/xml\r\n"
+                                            "Content-Type: text/xml; charset=UTF-8\r\n"
                                             "Content-Length: %d\r\n"
                                             "\r\n"
                                            "%s\r\n", len, response );
@@ -251,7 +251,7 @@ static void
 handle_root( struct shttpd_arg * arg )
 {
     const char * redirect = "HTTP/1.1 200 OK""\r\n"
-                            "Content-Type: text/html" "\r\n"
+                            "Content-Type: text/html; charset=UTF-8" "\r\n"
                             "\r\n"
                             "<html><head>" "\r\n"
                             "  <meta http-equiv=\"Refresh\" content=\"2; url=/transmission/web/\">" "\r\n"
@@ -301,7 +301,7 @@ handle_rpc( struct shttpd_arg * arg )
         }
 
         evbuffer_add_printf( cbuf->out, "HTTP/1.1 200 OK\r\n"
-                                        "Content-Type: application/json\r\n"
+                                        "Content-Type: application/json; charset=UTF-8\r\n"
                                         "Content-Length: %d\r\n"
                                         "\r\n"
                                         "%*.*s", len, len, len, response );
