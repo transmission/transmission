@@ -10,7 +10,7 @@
 
 	<item>
 		<title>Transmission 1.32</title>
-		<sparkle:releaseNotesLink>http://www.transmissionbt.com/releasenotes.html</sparkle:releaseNotesLink>
+		<sparkle:releaseNotesLink>http://www.transmissionbt.com/appcast/releasenotes.html</sparkle:releaseNotesLink>
       	<pubDate>Fri, 8 Aug 2008 22:26:00 -0400</pubDate>
       	<enclosure sparkle:version="6453" sparkle:shortVersionString="1.32" sparkle:minimumSystemVersion="10.4.11" url="http://mirrors.m0k.org/transmission/files/Transmission-1.32.dmg" length="3405197" type="application/octet-stream"/>
     </item>
