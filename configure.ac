@@ -164,14 +164,14 @@ if test "x$build_gtk" = "xyes"; then
     AC_SUBST(DBUS_GLIB_LIBS)
     AC_SUBST(DBUS_GLIB_CFLAGS)
     if test "x$use_dbus_glib" = "xyes"; then
+        AC_DEFINE([HAVE_DBUS_GLIB], 1)
+    fi
+    if test "x$use_dbus_glib" = "xyes"; then
         AC_PATH_PROG(DBUS_BINDING_TOOL, dbus-binding-tool, no)
         if test "x$DBUS_BINDING_TOOL" = xno; then
           AC_MSG_WARN([Cannot find dbus-binding-tool])
           use_dbus_glib="no (dbus-binding-tool not found)"
         fi
-    fi
-    if test "x$use_dbus_glib" = "xyes"; then
-        AC_DEFINE([HAVE_DBUS_GLIB], 1)
     fi
 fi
 
