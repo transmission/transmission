@@ -56,11 +56,11 @@ enum
     RECONNECT_PERIOD_MSEC = (2 * 1000),
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
-    MAX_RECONNECTIONS_PER_PULSE = 4,
+    MAX_RECONNECTIONS_PER_PULSE = 2,
 
     /* max number of peers to ask for per second overall.
      * this throttle is to avoid overloading the router */
-    MAX_CONNECTIONS_PER_SECOND = 8,
+    MAX_CONNECTIONS_PER_SECOND = 4,
 
     /* number of unchoked peers per torrent.
      * FIXME: this probably ought to be configurable */
@@ -1755,6 +1755,25 @@ compareCandidates( const void * va, const void * vb )
     return 0;
 }
 
+static int
+getReconnectIntervalSecs( const struct peer_atom * atom )
+{
+    int sec;
+
+    switch( atom->numFails )
+    {
+        case 0: sec = 0; break;
+        case 1: sec = 5; break;
+        case 2: sec = 2*60; break;
+        case 3: sec = 15*60; break;
+        case 4: sec = 30*60; break;
+        case 5: sec = 60*60; break;
+        default: sec = 120*60; break;
+    }
+
+    return sec;
+}
+
 static struct peer_atom **
 getPeerCandidates( Torrent * t, int * setmeSize )
 {
@@ -1791,21 +1810,13 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         if( seed && (atom->flags & ADDED_F_SEED_FLAG) )
             continue;
 
-        /* we're wasting our time trying to connect to this bozo. */
-        if( atom->numFails > 3 )
-            continue;
-
         /* If we were connected to this peer recently and transferring
          * piece data, try to reconnect -- network troubles may have
          * disconnected us.  but if we weren't sharing piece data,
          * hold off on this peer to give another one a try instead */
-        if( ( now - atom->piece_data_time ) > 30 )
+        if( ( now - atom->piece_data_time ) > 10 )
         {
-            int minWait = (60 * 5); /* five minutes */
-            int maxWait = minWait * 3;
-            int wait = atom->numFails * minWait;
-            if( wait < minWait ) wait = minWait;
-            if( wait > maxWait ) wait = maxWait;
+            const int wait = getReconnectIntervalSecs( atom );
             if( ( now - atom->time ) < wait ) {
                 tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
                         i, tr_peerIoAddrStr(&atom->addr,atom->port), wait );
@@ -1860,7 +1871,7 @@ reconnectPulse( void * vtorrent )
                        (int)MAX_RECONNECTIONS_PER_PULSE );
 
         /* disconnect some peers.
-           if we got transferred piece data, then they might be good peers,
+           if we transferred piece data, then they might be good peers,
            so reset their `numFails' weight to zero.  otherwise we connected
            to them fruitlessly, so mark it as another fail */
         for( i=0; i<nBad; ++i ) {
