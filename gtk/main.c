@@ -373,7 +373,9 @@ main( int argc, char ** argv )
     g_set_application_name( _( "Transmission" ) );
 
     /* initialize gtk */
-    g_thread_init( NULL );
+    if( !g_thread_supported() )
+        g_thread_init( NULL );
+
     gerr = NULL;
     if( !gtk_init_with_args( &argc, &argv, _("[torrent files]"), entries, domain, &gerr ) ) {
         g_message( "%s", gerr->message );
