@@ -1314,7 +1314,7 @@ tr_bencLoadJSONFile( const char * filename, tr_benc * b )
     int ret;
     size_t contentLen;
     uint8_t * content = tr_loadFile( filename, &contentLen );
-    ret = content ? tr_jsonParse( content, contentLen, b )
+    ret = content ? tr_jsonParse( content, contentLen, b, NULL )
                   : TR_ERROR_IO_OTHER;
     tr_free( content );
     return ret;
