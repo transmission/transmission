@@ -1146,9 +1146,9 @@ Transmission.prototype =
 		{
 			var torrent = torrents[0];
 			var header = 'Remove ' + torrent.name() + '?';
-			var message = 'The torrent \"' + torrent.name() + '\" is ' + torrent.stateStr();
+			var message = 'The transfer is active';
 			if( torrent._error_message && torrent._error_message != '' ) message += ', but reporting an error';
-			message += '. Remove this torrent? ';
+			message += '. Are you sure you want to remove it?';
 			dialog.confirm( header, message, 'Remove', 'transmission.removeTorrents', torrents );
 		}
 		else 
