@@ -14,10 +14,28 @@ static int test = 0;
         if( VERBOSE ) \
             fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
     } else { \
-        if( VERBOSE ) \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
+        fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
         return test; \
     } \
+}
+
+static int
+test_utf8( void )
+{
+    const char * in = "{ \"key\": \"Letöltések\" }";
+    tr_benc top;
+    const char * str;
+    const int err = tr_jsonParse( in, strlen(in), &top, NULL );
+
+    check( !err );
+    check( tr_bencIsDict( &top ) );
+    check( tr_bencDictFindStr( &top, "key", &str ) );
+    check( !strcmp( str, "Letöltések" ) );
+
+    if( !err )
+        tr_bencFree( &top );
+
+    return 0;
 }
 
 static int
@@ -39,8 +57,7 @@ test1( void )
     tr_benc top, *headers, *body, *args, *ids;
     const char * str;
     int64_t i;
-    const uint8_t * end = NULL;
-    const int err = tr_jsonParse( in, strlen(in), &top, &end );
+    const int err = tr_jsonParse( in, strlen(in), &top, NULL );
 
     check( !err );
     check( tr_bencIsDict( &top ) );
@@ -71,6 +88,9 @@ int
 main( void )
 {
     int i;
+
+    if(( i = test_utf8( )))
+        return i;
 
     if(( i = test1( )))
         return i;

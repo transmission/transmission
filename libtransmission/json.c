@@ -126,7 +126,7 @@ tr_jsonParse( const void      * vbuf,
               const uint8_t  ** setme_end )
 {
     int err = 0;
-    const char * buf = vbuf;
+    const unsigned char * buf = vbuf;
     const void * bufend = buf + len;
     struct JSON_config_struct config;
     struct JSON_parser_struct * checker;
