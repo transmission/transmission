@@ -761,7 +761,7 @@ processResponse( const char * host, int port,
         fprintf( stderr, "got response: [%*.*s]\n",
                  (int)len, (int)len, (const char*) response );
 
-    if( tr_jsonParse( response, len, &top, NULL ) )
+    if( tr_jsonParse( response, len, &top ) )
        tr_nerr( MY_NAME, "Unable to parse response \"%*.*s\"", (int)len, (int)len, (char*)response );
     else
     {
