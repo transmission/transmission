@@ -1146,15 +1146,13 @@ Transmission.prototype =
 		{
 			var torrent = torrents[0];
 			var header = 'Remove ' + torrent.name() + '?';
-			var message = 'The transfer is active';
-			if( torrent._error_message && torrent._error_message != '' ) message += ', but reporting an error';
-			message += '. Are you sure you want to remove it?';
+			var message += 'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
 			dialog.confirm( header, message, 'Remove', 'transmission.removeTorrents', torrents );
 		}
 		else 
 		{
-			var header = 'Remove ' + torrents.length + ' Torrents?';
-			var message = 'Really remove these '+torrents.length+' torrents?';
+			var header = 'Remove ' + torrents.length + ' transfers?';
+			var message = 'Once removed, continuing the transfers will require the torrent files. Are you sure you want to remove them?';
 			dialog.confirm( header, message, 'Remove', 'transmission.removeTorrents', torrents );
 		}
 	},
