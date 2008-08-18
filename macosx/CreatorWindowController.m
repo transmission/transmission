@@ -115,9 +115,12 @@
             NSString * tracker;
             if ((tracker = [fDefaults stringForKey: @"CreatorTracker"]))
             {
-                [fTrackers addObject: tracker];
                 [fDefaults removeObjectForKey: @"CreatorTracker"];
-                [fDefaults setObject: fTrackers forKey: @"CreatorTrackers"];
+                if (![tracker isEqualToString: @""])
+                {
+                    [fTrackers addObject: tracker];
+                    [fDefaults setObject: fTrackers forKey: @"CreatorTrackers"];
+                }
             }
         }
         
