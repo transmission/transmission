@@ -21,6 +21,22 @@ static int test = 0;
 }
 
 static int
+test_utf8( void )
+{
+    const char * in = "{ \"key\": \"Letöltések\" }";
+    tr_benc top;
+    const int err = tr_jsonParse( in, strlen(in), &top );
+
+    check( !err );
+    check( tr_bencIsDict( &top ) );
+
+    if( !err )
+        tr_bencFree( &top );
+
+    return 0;
+}
+
+static int
 test1( void )
 {
     const char * in =
@@ -39,8 +55,7 @@ test1( void )
     tr_benc top, *headers, *body, *args, *ids;
     const char * str;
     int64_t i;
-    const uint8_t * end = NULL;
-    const int err = tr_jsonParse( in, strlen(in), &top, &end );
+    const int err = tr_jsonParse( in, strlen(in), &top );
 
     check( !err );
     check( tr_bencIsDict( &top ) );
@@ -71,6 +86,9 @@ int
 main( void )
 {
     int i;
+
+    if(( i = test_utf8( )))
+        return i;
 
     if(( i = test1( )))
         return i;

@@ -717,7 +717,7 @@ tr_rpc_request_exec_json( struct tr_handle  * handle,
     if( request_len < 0 )
         request_len = strlen( request_json );
 
-    have_content = !tr_jsonParse( request_json, request_len, &top, NULL );
+    have_content = !tr_jsonParse( request_json, request_len, &top );
     ret = request_exec( handle, have_content ? &top : NULL, response_len );
 
     if( have_content )

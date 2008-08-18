@@ -17,6 +17,7 @@
 
 #include <event.h> /* evbuffer */
 
+#include "ConvertUTF.h"
 #include "JSON_parser.h"
 
 #include "transmission.h"
@@ -107,12 +108,12 @@ callback( void * vdata, int type, const JSON_value * value )
             break;
 
         case JSON_T_STRING:
-            tr_bencInitStrDup( getNode( data ), value->vu.str.value );
+            tr_bencInitRaw( getNode( data ), value->vu.str.value, value->vu.str.length );
             break;
 
         case JSON_T_KEY:
             assert( !data->key );
-            data->key = tr_strdup( value->vu.str.value );
+            data->key = tr_strndup( value->vu.str.value, value->vu.str.length );
             break;
     }
 
@@ -122,15 +123,17 @@ callback( void * vdata, int type, const JSON_value * value )
 int
 tr_jsonParse( const void      * vbuf,
               size_t            len,
-              tr_benc         * setme_benc,
-              const uint8_t  ** setme_end )
+              tr_benc         * setme_benc )
 {
-    int err = 0;
-    const char * buf = vbuf;
-    const void * bufend = buf + len;
     struct JSON_config_struct config;
     struct JSON_parser_struct * checker;
     struct json_benc_data data;
+    const UTF8 * utf8_begin;
+    const UTF8 * utf8_end;
+    UTF32 * utf32_begin;
+    UTF32 * utf32_end;
+    UTF32 * utf32_walk;
+    int err = 0;
 
     init_JSON_config( &config );
     config.callback = callback;
@@ -141,16 +144,25 @@ tr_jsonParse( const void      * vbuf,
     data.top = setme_benc;
     data.stack = tr_ptrArrayNew( );
 
-    checker = new_JSON_parser( &config );
-    while( ( buf != bufend ) && JSON_parser_char( checker, *buf ) )
-        ++buf;
-    if( buf != bufend )
-        err = TR_ERROR;
+    /* convert the utf8 that was passed in, into utf32 so that
+     * we can be certain that each call to JSON_parser_char()
+     * passes through a complete character */
+    utf8_begin = vbuf;
+    utf8_end = utf8_begin; /* inout argument */
+    utf32_begin = tr_new0( UTF32, len );    
+    utf32_end = utf32_begin; /* inout argument */
+    ConvertUTF8toUTF32( &utf8_end, utf8_begin+len,
+                        &utf32_end, utf32_begin+len, 0 );
 
-    if( setme_end )
-        *setme_end = (const uint8_t*) buf;
+    checker = new_JSON_parser( &config );
+    utf32_walk = utf32_begin;
+    while( ( utf32_walk != utf32_end ) && JSON_parser_char( checker, *utf32_walk ) )
+        ++utf32_walk;
+    if( utf32_walk != utf32_end )
+        err = TR_ERROR;
 
     delete_JSON_parser( checker );
     tr_ptrArrayFree( data.stack, NULL );
+    tr_free( utf32_begin );
     return err;
 }
