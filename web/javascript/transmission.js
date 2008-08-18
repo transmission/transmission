@@ -1146,7 +1146,7 @@ Transmission.prototype =
 		{
 			var torrent = torrents[0];
 			var header = 'Remove ' + torrent.name() + '?';
-			var message += 'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
+			var message = 'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
 			dialog.confirm( header, message, 'Remove', 'transmission.removeTorrents', torrents );
 		}
 		else 
