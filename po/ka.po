@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-04-16 14:42+0000\n"
+"PO-Revision-Date: 2008-08-17 11:50+0000\n"
 "Last-Translator: David Machakhelidze <david.machakhelidze@gmail.com>\n"
 "Language-Team: Georgian <ka@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2008-08-06 01:00+0000\n"
+"X-Launchpad-Export-Date: 2008-08-19 00:21+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -44,7 +44,7 @@ msgstr "დალაგება მეთვალყურის მიხე�
 
 #: ../gtk/actions.c:53
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "დალაგება ასაკის მიხედვით"
 
 #: ../gtk/actions.c:70
 msgid "_Main Window"
@@ -60,7 +60,7 @@ msgstr "მინიმალური ხედი"
 
 #: ../gtk/actions.c:88
 msgid "_Reverse Sort Order"
-msgstr ""
+msgstr "დალაგების შებრუნებული რიგი"
 
 #: ../gtk/actions.c:90
 msgid "_Filterbar"
@@ -76,7 +76,7 @@ msgstr "ხელსაწყოთა _პანელი"
 
 #: ../gtk/actions.c:96
 msgid "Tray _Icon"
-msgstr ""
+msgstr "სისტემური პანელის ხატულა"
 
 #: ../gtk/actions.c:101
 msgid "_Torrent"
@@ -88,7 +88,7 @@ msgstr "_ხედი"
 
 #: ../gtk/actions.c:103
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "ტორენტების სორტირება"
 
 #: ../gtk/actions.c:104
 msgid "_Edit"
@@ -100,7 +100,7 @@ msgstr "_დახმარება"
 
 #: ../gtk/actions.c:106 ../gtk/actions.c:107
 msgid "Add a torrent"
-msgstr ""
+msgstr "ტორენტის დამატება"
 
 #: ../gtk/actions.c:107
 msgid "_Add..."
@@ -172,11 +172,11 @@ msgstr "_გახსენი საქაღალდე"
 
 #: ../gtk/actions.c:131
 msgid "_Contents"
-msgstr ""
+msgstr "შინაარსი"
 
 #: ../gtk/actions.c:133
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "გამოითხოვე მეთვალყურისგან დამატებითი პირები"
 
 #: ../gtk/add-dialog.c:199
 msgid "Torrent files"
@@ -193,7 +193,7 @@ msgstr "ტორენტის პარამეტრები"
 
 #: ../gtk/add-dialog.c:253
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "წყარო ფაილის სანაგვეში გადატანა"
 
 #: ../gtk/add-dialog.c:254 ../gtk/tr-prefs.c:314
 msgid "_Start when added"
@@ -201,7 +201,7 @@ msgstr "დაწყება დამატებისას"
 
 #: ../gtk/add-dialog.c:265
 msgid "_Torrent file:"
-msgstr ""
+msgstr "ტორენტ ფაილი"
 
 #: ../gtk/add-dialog.c:269
 msgid "Select Source File"
@@ -242,7 +242,7 @@ msgstr "%s უკვე მუშაობს."
 
 #: ../gtk/details.c:244
 msgid "Web Seeds"
-msgstr ""
+msgstr "ვებ სიდი"
 
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:246 ../gtk/details.c:287
@@ -272,44 +272,47 @@ msgid "Status"
 msgstr "სტატუსი"
 
 #: ../gtk/details.c:558
+#, fuzzy
 msgid "Optimistic unchoke"
-msgstr ""
+msgstr "ოპტიმისტური ანჩოკი"
 
 #: ../gtk/details.c:559
 msgid "Downloading from this peer"
-msgstr ""
+msgstr "ჩამოტვირთვა ამ პირისგან"
 
 #: ../gtk/details.c:560
+#, fuzzy
 msgid "We would download from this peer if they would let us"
-msgstr ""
+msgstr "უნდა ჩამოვტვირთოთ ამ პირისგან თუ მივიღეთ ნებართვა"
 
 #: ../gtk/details.c:561
 msgid "Uploading to peer"
-msgstr ""
+msgstr "ატვირთვა პირისთვის"
 
 #: ../gtk/details.c:562
 msgid "We would upload to this peer if they asked"
-msgstr ""
+msgstr "ჩვენ ავტვირთავთ პირისკენ თუ გვთხოვეს"
 
 #: ../gtk/details.c:563
+#, fuzzy
 msgid "Peer has unchoked us, but we're not interested"
-msgstr ""
+msgstr "პირმა გაგვიკეთა ანჩოკი, მაგრამ ჩვენ დაინტერესებულნი არა ვართ"
 
 #: ../gtk/details.c:564
 msgid "We unchoked this peer, but they're not interested"
-msgstr ""
+msgstr "ჩვენ ანჩოკი გავუკეთეთ პირს, მაგრამ ისინი დაინტერესებულნი არ არიან"
 
 #: ../gtk/details.c:565
 msgid "Encrypted connection"
-msgstr ""
+msgstr "დაშიფრული შეერთება"
 
 #: ../gtk/details.c:566
 msgid "Peer was discovered through Peer Exchange (PEX)"
-msgstr ""
+msgstr "პირი აღმოჩენილია პირთა გაცვლის სისტემის (PEX) საშუალებით"
 
 #: ../gtk/details.c:567
 msgid "Peer is an incoming connection"
-msgstr ""
+msgstr "პირი არის შემომავალი შეერთება"
 
 #: ../gtk/details.c:753
 msgid "<b>Seeders:</b>"
@@ -321,11 +324,11 @@ msgstr "<b>ლიჩერები:</b>"
 
 #: ../gtk/details.c:767
 msgid "<b>Times Completed:</b>"
-msgstr ""
+msgstr "<b>დასრულების დროები:</b>"
 
 #: ../gtk/details.c:788 ../gtk/details.c:1275 ../gtk/details.c:1286
 msgid "Never"
-msgstr ""
+msgstr "არასოდეს"
 
 #: ../gtk/details.c:811
 msgid "Details"
@@ -335,15 +338,14 @@ msgstr "დაწვრილებით"
 #, c-format
 msgid "%'d Piece"
 msgid_plural "%'d Pieces"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d ნაჭერი"
 
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
 #: ../gtk/details.c:820 ../gtk/makemeta-ui.c:244
 #, c-format
 msgid "%1$s @ %2$s"
-msgstr ""
+msgstr "%1$s @ %2$s"
 
 #: ../gtk/details.c:824
 msgid "Pieces:"
@@ -354,12 +356,13 @@ msgid "Hash:"
 msgstr "ჰეში:"
 
 #: ../gtk/details.c:831
+#, fuzzy
 msgid "Private to this tracker -- PEX disabled"
-msgstr ""
+msgstr "პრივატულად ამ მეთვალყურესთან -- PEX გამორთულია"
 
 #: ../gtk/details.c:832
 msgid "Public torrent"
-msgstr ""
+msgstr "საჯარო ტორენტი"
 
 #: ../gtk/details.c:834
 msgid "Privacy:"
@@ -370,8 +373,9 @@ msgid "Comment:"
 msgstr "კომენტარი:"
 
 #: ../gtk/details.c:850
+#, fuzzy
 msgid "Origins"
-msgstr ""
+msgstr "წარმომავლობა"
 
 #: ../gtk/details.c:852
 msgid "Unknown"
@@ -391,7 +395,7 @@ msgstr "მისამართი"
 
 #: ../gtk/details.c:864
 msgid "Destination folder:"
-msgstr ""
+msgstr "შესანახლი დირექტორია"
 
 #: ../gtk/details.c:868
 msgid "Torrent file:"
@@ -414,7 +418,7 @@ msgstr ""
 #: ../gtk/details.c:925
 #, c-format
 msgid "%1$s (%2$s verified)"
-msgstr ""
+msgstr "%1$s (%2$s უკვე შემოწმდა)"
 
 #: ../gtk/details.c:944 ../gtk/util.c:54 ../gtk/util.c:74
 msgid "None"
@@ -435,7 +439,7 @@ msgstr "პროგრესი:"
 #. "Have" refers to how much of the torrent we have
 #: ../gtk/details.c:977
 msgid "Have:"
-msgstr ""
+msgstr "გვაქვს:"
 
 #: ../gtk/details.c:980 ../gtk/stats.c:127 ../gtk/stats.c:139
 msgid "Downloaded:"
@@ -455,7 +459,7 @@ msgstr "შეფარდება:"
 
 #: ../gtk/details.c:993
 msgid "Swarm rate:"
-msgstr ""
+msgstr "ქსელის რეიტინგი:"
 
 #: ../gtk/details.c:996
 msgid "Error:"
@@ -471,11 +475,11 @@ msgstr "თარიღები"
 
 #: ../gtk/details.c:1013
 msgid "Started at:"
-msgstr ""
+msgstr "დაიწყო:"
 
 #: ../gtk/details.c:1016
 msgid "Last activity at:"
-msgstr ""
+msgstr "ბოლო აქტივობა:"
 
 #: ../gtk/details.c:1093 ../gtk/tr-prefs.c:1070
 msgid "Bandwidth"
@@ -483,69 +487,70 @@ msgstr "გამტარუნარიანობა"
 
 #: ../gtk/details.c:1095 ../gtk/tr-prefs.c:1072
 msgid "Limit _download speed (KB/s):"
-msgstr ""
+msgstr "ჩამოტვირთვის სიჩქარის ლიმიტი (კბ/წმ):"
 
 #: ../gtk/details.c:1108 ../gtk/tr-prefs.c:1079
 msgid "Limit _upload speed (KB/s):"
-msgstr ""
+msgstr "ატვირთვის სიჩქარის ლიმიტი (კბ/წმ):"
 
 #: ../gtk/details.c:1122
 msgid "Peer Connections"
-msgstr ""
+msgstr "პირთა შეერთებები"
 
 #: ../gtk/details.c:1127
 msgid "_Maximum peers:"
-msgstr ""
+msgstr "მაქსიმუმი პირები:"
 
 #: ../gtk/details.c:1182 ../gtk/makemeta-ui.c:361 ../gtk/tr-prefs.c:1121
 msgid "Trackers"
-msgstr ""
+msgstr "მეთვალყურეები:"
 
 #: ../gtk/details.c:1188
 msgid "Scrape"
-msgstr ""
+msgstr "გაკაწრვა"
 
 #: ../gtk/details.c:1190
 msgid "Last scrape at:"
-msgstr ""
+msgstr "ბოლო სქრეიპი:"
 
 #: ../gtk/details.c:1195 ../gtk/details.c:1217
 msgid "Tracker responded:"
-msgstr ""
+msgstr "მეთვალყურის პასუხი:"
 
 #: ../gtk/details.c:1200
 msgid "Next scrape in:"
-msgstr ""
+msgstr "შემდეგი გაკაწრვა:"
 
 #: ../gtk/details.c:1206
 msgid "Announce"
-msgstr ""
+msgstr "ანონსი"
 
 #: ../gtk/details.c:1210
 msgid "Tracker:"
-msgstr ""
+msgstr "მეთვალყურე:"
 
 #: ../gtk/details.c:1212
 msgid "Last announce at:"
-msgstr ""
+msgstr "ბოლო ანონსი:"
 
 #: ../gtk/details.c:1222
 msgid "Next announce in:"
-msgstr ""
+msgstr "შემდეგი ანონსი:"
 
 #. how long until the tracker will honor user
 #. * pressing the "ask for more peers" button
 #: ../gtk/details.c:1229
 msgid "Manual announce allowed in:"
-msgstr ""
+msgstr "ხელოვნური ანონსი ნებადართულია:"
 
 #: ../gtk/details.c:1247
+#, fuzzy
 msgid "In progress"
-msgstr ""
+msgstr "მიმდინარეობს"
 
 #: ../gtk/details.c:1290
 msgid "Now"
-msgstr ""
+msgstr "ახლა"
 
 #. %1$s is torrent name
 #. %2$s its file size
@@ -556,81 +561,79 @@ msgstr ""
 
 #: ../gtk/details.c:1358
 msgid "Activity"
-msgstr ""
+msgstr "აქტივობა"
 
 #: ../gtk/details.c:1363 ../gtk/tr-prefs.c:1118
 msgid "Peers"
-msgstr ""
+msgstr "პირები"
 
 #: ../gtk/details.c:1368 ../gtk/tr-window.c:434
 msgid "Tracker"
-msgstr ""
+msgstr "მეთვალყურე"
 
 #: ../gtk/details.c:1372 ../gtk/msgwin.c:168
 msgid "Information"
-msgstr ""
+msgstr "ინფორმაცია"
 
 #: ../gtk/details.c:1378 ../gtk/tr-window.c:434
 msgid "Files"
-msgstr ""
+msgstr "ფაილები"
 
 #: ../gtk/details.c:1383 ../gtk/tr-prefs.c:521
 msgid "Options"
-msgstr ""
+msgstr "პარამეტრები"
 
 #: ../gtk/dialogs.c:114
+#, fuzzy
 msgid "<big><b>Quit Transmission?</b></big>"
-msgstr ""
+msgstr "<big><b>ტრანსმიშენის დახურვა?</b></big>"
 
 #: ../gtk/dialogs.c:127
 msgid "_Don't ask me again"
-msgstr ""
+msgstr "ხელმეორედ არ მკითხო"
 
 #: ../gtk/dialogs.c:216
 msgid "Remove torrent?"
 msgid_plural "Remove torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ტორენტის ამოღება"
 
 #: ../gtk/dialogs.c:218
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "წავშალო ამ ტორენტით ჩამოტვირთული ფაილები?"
 
 #: ../gtk/dialogs.c:223
 msgid "Some of these torrents are incomplete or connected to peers."
-msgstr ""
+msgstr "ზოგერთი ამ ტორენტებიდან არის დაუსრულებელი ან შეერთებულია პირებთან."
 
 #: ../gtk/dialogs.c:227
 msgid "This torrent is incomplete or connected to peers."
 msgid_plural "One of these torrents is incomplete or connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ეს ტორენტი არის დაუსრულებელი ან შეერთებული პირებთან."
 
 #: ../gtk/file-list.c:530 ../gtk/file-list.c:534
 msgid "Yes"
-msgstr ""
+msgstr "დიახ"
 
 #: ../gtk/file-list.c:532 ../gtk/file-list.c:535
 msgid "No"
-msgstr ""
+msgstr "არა"
 
 #: ../gtk/file-list.c:536 ../gtk/file-list.c:579
 msgid "Mixed"
-msgstr ""
+msgstr "შერეული"
 
 #: ../gtk/file-list.c:573
 msgid "High"
-msgstr ""
+msgstr "მაღალი"
 
 #: ../gtk/file-list.c:575
 msgid "Normal"
-msgstr ""
+msgstr "ჩვეულებრივი"
 
 #: ../gtk/file-list.c:577
 msgid "Low"
-msgstr ""
+msgstr "დაბალი"
 
 #. Translators: this is a column header in Files tab, Details dialog;
 #. Don't include the prefix "filedetails|" in the translation.
@@ -653,31 +656,31 @@ msgstr ""
 
 #: ../gtk/file-list.c:650
 msgid "Priority"
-msgstr ""
+msgstr "პრიორიტეტი"
 
 #: ../gtk/file-list.c:666
 msgid "_High"
-msgstr ""
+msgstr "მაღალი"
 
 #: ../gtk/file-list.c:669
 msgid "_Normal"
-msgstr ""
+msgstr "ჩვეულებრივი"
 
 #: ../gtk/file-list.c:672
 msgid "_Low"
-msgstr ""
+msgstr "დაბალი"
 
 #: ../gtk/file-list.c:675
 msgid "_Ignore"
-msgstr ""
+msgstr "იგნორირება"
 
 #: ../gtk/file-list.c:678
 msgid "_Download"
-msgstr ""
+msgstr "ჩამოტვირთვა"
 
 #: ../gtk/main.c:351
 msgid "Start with all torrents paused"
-msgstr ""
+msgstr "ყველა ტორენტის შეჩერება დაწყებისას"
 
 #: ../gtk/main.c:354
 msgid "Start minimized in system tray"

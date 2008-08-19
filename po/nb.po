@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: transmission 1.06\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-05-16 21:46+0000\n"
-"Last-Translator: Mikal Krogstad <mikal.krogstad@gmail.com>\n"
+"PO-Revision-Date: 2008-08-13 21:52+0000\n"
+"Last-Translator: Geir Hauge <Unknown>\n"
 "Language-Team: Norwegian <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-08-06 01:01+0000\n"
+"X-Launchpad-Export-Date: 2008-08-19 00:21+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #~ msgid "Close main window"
@@ -482,11 +482,11 @@ msgstr "Sorter etter _tilstand"
 
 #: ../gtk/actions.c:52
 msgid "Sort by _Tracker"
-msgstr "Sorter etter st_ifinder"
+msgstr "Sorter etter st_ifinner"
 
 #: ../gtk/actions.c:53
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "Sorter etter a_lder"
 
 #: ../gtk/actions.c:70
 msgid "_Main Window"
@@ -518,7 +518,7 @@ msgstr "_Verktøylinje"
 
 #: ../gtk/actions.c:96
 msgid "Tray _Icon"
-msgstr ""
+msgstr "Varslings_områdeikon"
 
 #: ../gtk/actions.c:101
 msgid "_Torrent"
@@ -614,7 +614,7 @@ msgstr "_Åpne mappe"
 
 #: ../gtk/actions.c:131
 msgid "_Contents"
-msgstr ""
+msgstr "_Innhold"
 
 #: ../gtk/actions.c:133
 msgid "Ask Tracker for _More Peers"
@@ -635,7 +635,7 @@ msgstr "Torrentvalg"
 
 #: ../gtk/add-dialog.c:253
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "_Flytt kildefila til papirkurven"
 
 #: ../gtk/add-dialog.c:254 ../gtk/tr-prefs.c:314
 msgid "_Start when added"
@@ -643,7 +643,7 @@ msgstr "_Start når den er lagt til"
 
 #: ../gtk/add-dialog.c:265
 msgid "_Torrent file:"
-msgstr ""
+msgstr "_Torrentfil:"
 
 #: ../gtk/add-dialog.c:269
 msgid "Select Source File"
@@ -684,7 +684,7 @@ msgstr "Det kjører allerede en annen instans av «%s»."
 
 #: ../gtk/details.c:244
 msgid "Web Seeds"
-msgstr ""
+msgstr "Vevkilder"
 
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:246 ../gtk/details.c:287
@@ -719,11 +719,11 @@ msgstr "Optimistisk fjerning av struping"
 
 #: ../gtk/details.c:559
 msgid "Downloading from this peer"
-msgstr ""
+msgstr "Laster ned fra denne nedlasteren"
 
 #: ../gtk/details.c:560
 msgid "We would download from this peer if they would let us"
-msgstr ""
+msgstr "Ville ha lastet ned fra denne nedlasteren om den tillatte det"
 
 #: ../gtk/details.c:561
 msgid "Uploading to peer"
@@ -731,7 +731,7 @@ msgstr "Laster opp til nedlaster"
 
 #: ../gtk/details.c:562
 msgid "We would upload to this peer if they asked"
-msgstr ""
+msgstr "Ville lastet opp til denne nedlasteren om den hadde spurt"
 
 #: ../gtk/details.c:563
 msgid "Peer has unchoked us, but we're not interested"
@@ -740,6 +740,7 @@ msgstr "Nedlaster har fjernet strupingen mot oss, men vi er ikke interessert"
 #: ../gtk/details.c:564
 msgid "We unchoked this peer, but they're not interested"
 msgstr ""
+"Fjernet strupingen av denne nedlasteren, men nedlasteren er ikke interessert"
 
 #: ../gtk/details.c:565
 msgid "Encrypted connection"
@@ -763,7 +764,7 @@ msgstr "<b>Snyltere:</b>"
 
 #: ../gtk/details.c:767
 msgid "<b>Times Completed:</b>"
-msgstr ""
+msgstr "<b>Antall fullførte nedlastinger:</b>"
 
 #: ../gtk/details.c:788 ../gtk/details.c:1275 ../gtk/details.c:1286
 msgid "Never"
@@ -777,15 +778,15 @@ msgstr "Detaljer"
 #, c-format
 msgid "%'d Piece"
 msgid_plural "%'d Pieces"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d brudstykke"
+msgstr[1] "%'d bruddstykker"
 
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
 #: ../gtk/details.c:820 ../gtk/makemeta-ui.c:244
 #, c-format
 msgid "%1$s @ %2$s"
-msgstr ""
+msgstr "%1$s à %2$s"
 
 #: ../gtk/details.c:824
 msgid "Pieces:"
@@ -941,7 +942,7 @@ msgstr "_Maksimalt tilkoblede nedlastere:"
 
 #: ../gtk/details.c:1182 ../gtk/makemeta-ui.c:361 ../gtk/tr-prefs.c:1121
 msgid "Trackers"
-msgstr ""
+msgstr "Stifinnere"
 
 #: ../gtk/details.c:1188
 msgid "Scrape"
@@ -983,11 +984,11 @@ msgstr "Manuell annonsering tillat om:"
 
 #: ../gtk/details.c:1247
 msgid "In progress"
-msgstr ""
+msgstr "Holder på"
 
 #: ../gtk/details.c:1290
 msgid "Now"
-msgstr ""
+msgstr "Nå"
 
 #. %1$s is torrent name
 #. %2$s its file size
@@ -1053,15 +1054,15 @@ msgstr[1] ""
 
 #: ../gtk/file-list.c:530 ../gtk/file-list.c:534
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: ../gtk/file-list.c:532 ../gtk/file-list.c:535
 msgid "No"
-msgstr ""
+msgstr "Nei"
 
 #: ../gtk/file-list.c:536 ../gtk/file-list.c:579
 msgid "Mixed"
-msgstr ""
+msgstr "Delvis"
 
 #: ../gtk/file-list.c:573
 msgid "High"
@@ -1104,7 +1105,7 @@ msgstr "_Høy"
 
 #: ../gtk/file-list.c:669
 msgid "_Normal"
-msgstr "_Normal"
+msgstr "_Middels"
 
 #: ../gtk/file-list.c:672
 msgid "_Low"
@@ -1112,11 +1113,11 @@ msgstr "_Lav"
 
 #: ../gtk/file-list.c:675
 msgid "_Ignore"
-msgstr ""
+msgstr "_Ignorer"
 
 #: ../gtk/file-list.c:678
 msgid "_Download"
-msgstr ""
+msgstr "_Last ned"
 
 #: ../gtk/main.c:351
 msgid "Start with all torrents paused"
@@ -1148,19 +1149,19 @@ msgstr "Sender opplasting- og nedlastingsmengde til stifinner ..."
 
 #: ../gtk/main.c:717
 msgid "_Quit Now"
-msgstr ""
+msgstr "_Avslutt nå"
 
 #: ../gtk/main.c:860
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kunne ikke legge til korrupt torrent"
+msgstr[1] "Kunne ikke legge til korrupte torrenter"
 
 #: ../gtk/main.c:867
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kunne ikke legge til torrent som var lagt til fra før"
+msgstr[1] "Kunne ikke legge til torrenter som var lagt til fra før"
 
 #: ../gtk/main.c:1095
 msgid "A fast and easy BitTorrent client"
@@ -1180,11 +1181,12 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  Anders Oftedal https://launchpad.net/~anders-oftedal-gmail\n"
 "  Geir Hauge https://launchpad.net/~geir-hauge\n"
-"  Mikal Krogstad https://launchpad.net/~mikal-krogstad"
+"  Mikal Krogstad https://launchpad.net/~mikal-krogstad\n"
+"  Tommy Mikkelsen https://launchpad.net/~tamikkelsen"
 
 #: ../gtk/makemeta-ui.c:101
 msgid "Torrent created!"
-msgstr ""
+msgstr "Torrent opprettet!"
 
 #: ../gtk/makemeta-ui.c:105 ../gtk/makemeta-ui.c:114 ../gtk/makemeta-ui.c:121
 #, c-format
@@ -1209,12 +1211,12 @@ msgstr "Klarte ikke å lese «%1$s»: %2$s"
 #: ../gtk/makemeta-ui.c:214 ../gtk/makemeta-ui.c:396
 #, c-format
 msgid "No source selected"
-msgstr ""
+msgstr "Ingen kilde valgt"
 
 #: ../gtk/makemeta-ui.c:221 ../gtk/makemeta-ui.c:340
 #, c-format
 msgid "<i>No source selected</i>"
-msgstr ""
+msgstr "<i>Ingen kilde valgt</i>"
 
 #. %1$s is the torrent size
 #. %2$'d is its number of files
@@ -1227,11 +1229,11 @@ msgstr[1] "<i>%1$s i %2$'d filer</i>"
 
 #: ../gtk/makemeta-ui.c:298
 msgid "Choose Directory"
-msgstr ""
+msgstr "Velg katalog"
 
 #: ../gtk/makemeta-ui.c:304
 msgid "Choose File"
-msgstr ""
+msgstr "Velg fil"
 
 #: ../gtk/makemeta-ui.c:316
 msgid "New Torrent"
@@ -1239,19 +1241,19 @@ msgstr "Ny torrent"
 
 #: ../gtk/makemeta-ui.c:330
 msgid "Source"
-msgstr ""
+msgstr "Kilde"
 
 #: ../gtk/makemeta-ui.c:350
 msgid "F_older"
-msgstr ""
+msgstr "_Mappe"
 
 #: ../gtk/makemeta-ui.c:354
 msgid "_File"
-msgstr ""
+msgstr "_Fil"
 
 #: ../gtk/makemeta-ui.c:368
 msgid "<b>E_xtras</b>"
-msgstr ""
+msgstr "<b>_Ekstra</b>"
 
 #: ../gtk/makemeta-ui.c:376
 msgid "Commen_t:"
@@ -1259,7 +1261,7 @@ msgstr "Kommen_tar:"
 
 #: ../gtk/makemeta-ui.c:377
 msgid "_Private torrent"
-msgstr ""
+msgstr "_Privat torrent"
 
 #: ../gtk/msgwin.c:84 ../libtransmission/bencode.c:1246
 #: ../libtransmission/blocklist.c:265
@@ -1437,15 +1439,15 @@ msgstr[1] "Deler med %1$'d av %2$'d tilkoblede nedlastere"
 
 #: ../gtk/tracker-list.c:128
 msgid "http://"
-msgstr ""
+msgstr "http://"
 
 #: ../gtk/tracker-list.c:284
 msgid "Tier"
-msgstr ""
+msgstr "Gruppering"
 
 #: ../gtk/tracker-list.c:296
 msgid "Announce URL"
-msgstr ""
+msgstr "Annonserings-URL"
 
 #: ../gtk/transmission.desktop.in.h:1
 msgid "BitTorrent Client"
@@ -1469,7 +1471,7 @@ msgstr "BitTorrent-aktivitet"
 
 #: ../gtk/tr-core.c:974
 msgid "Disallowing desktop hibernation"
-msgstr ""
+msgstr "Tillater ikke maskinen å gå i dvalemodus"
 
 #: ../gtk/tr-core.c:976
 #, c-format
@@ -1478,7 +1480,7 @@ msgstr "Klarte ikke å koble fra dvalemodus: %s"
 
 #: ../gtk/tr-core.c:998
 msgid "Allowing desktop hibernation"
-msgstr ""
+msgstr "Tillater maskinen å gå i dvalemodus"
 
 #. %1$'d is the number of torrents we're seeding,
 #. %2$'d is the number of torrents we're downloading,
@@ -1511,7 +1513,7 @@ msgstr "Legger til torrenter"
 
 #: ../gtk/tr-prefs.c:302
 msgid "Automatically _add torrents from:"
-msgstr ""
+msgstr "Legg _automatisk til torrenter fra:"
 
 #: ../gtk/tr-prefs.c:318
 msgid "Mo_ve source files to Trash"
@@ -1521,8 +1523,8 @@ msgstr "_Flytt kildefilene til papirkurven"
 #, c-format
 msgid "Ignore the %'d _blocklisted peer"
 msgid_plural "Ignore the %'d _blocklisted peers"
-msgstr[0] "Ignorer %'d blokkeringslistet nedlaster"
-msgstr[1] "Ignorer de %'d blokkeringslistede nedlasterene"
+msgstr[0] "Ignorer %'d _blokkeringslistet nedlaster"
+msgstr[1] "Ignorer de %'d _blokkeringslistede nedlasterene"
 
 #: ../gtk/tr-prefs.c:398
 #, c-format
@@ -1563,15 +1565,15 @@ msgstr "_Oppdater blokkeringsliste"
 
 #: ../gtk/tr-prefs.c:540
 msgid "_Ignore unencrypted peers"
-msgstr "_Ignorer ukrypterte nedlastere"
+msgstr "Ignorer _ukrypterte nedlastere"
 
 #: ../gtk/tr-prefs.c:547
 msgid "Use peer e_xchange"
-msgstr "Bruk nedlaster_utveksling"
+msgstr "Bruk _nedlasterutveksling"
 
 #: ../gtk/tr-prefs.c:557 ../gtk/tr-prefs.c:835
 msgid "Listening _port:"
-msgstr ""
+msgstr "Lytte_port"
 
 #: ../gtk/tr-prefs.c:566
 msgid "Limits"
@@ -1579,7 +1581,7 @@ msgstr "Begrensninger"
 
 #: ../gtk/tr-prefs.c:569
 msgid "Maximum peers _overall:"
-msgstr "Maksimalt antall nedlastere t_otalt:"
+msgstr "Maksimalt _antall nedlastere totalt:"
 
 #: ../gtk/tr-prefs.c:571
 msgid "Maximum peers per _torrent:"
@@ -1588,51 +1590,51 @@ msgstr "Maksimalt antall tilkoblede nedlastere per _torrent:"
 #: ../gtk/tr-prefs.c:583 ../gtk/tr-prefs.c:615 ../gtk/tr-prefs.c:651
 #: ../gtk/tr-prefs.c:713
 msgid "Allow"
-msgstr ""
+msgstr "Tillat"
 
 #: ../gtk/tr-prefs.c:585 ../gtk/tr-prefs.c:615
 msgid "Deny"
-msgstr ""
+msgstr "Nekt"
 
 #: ../gtk/tr-prefs.c:794
 msgid "Web Interface"
-msgstr ""
+msgstr "Vevgrensesnitt"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:797
 msgid "_Enable web interface"
-msgstr ""
+msgstr "_Aktiver vevgrensesnitt"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:810
 msgid "_Require username"
-msgstr ""
+msgstr "_Krev brukernavn"
 
 #. username
 #: ../gtk/tr-prefs.c:818 ../gtk/tr-prefs.c:1034
 msgid "_Username:"
-msgstr ""
+msgstr "_Brukernavn:"
 
 #. password
 #: ../gtk/tr-prefs.c:825 ../gtk/tr-prefs.c:1040
 msgid "Pass_word:"
-msgstr ""
+msgstr "Pass_ord:"
 
 #: ../gtk/tr-prefs.c:850
 msgid "Access control list:"
-msgstr ""
+msgstr "Tilgangskontrolliste:"
 
 #: ../gtk/tr-prefs.c:857
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
-msgstr ""
+msgstr "IP-adresser kan inneholde jokertegn. F.eks. 192.168.*.*"
 
 #: ../gtk/tr-prefs.c:873
 msgid "IP Address"
-msgstr ""
+msgstr "IP-adresse"
 
 #: ../gtk/tr-prefs.c:891
 msgid "Permission"
-msgstr ""
+msgstr "Tillatelse"
 
 #: ../gtk/tr-prefs.c:962
 msgid "HTTP"
@@ -1640,43 +1642,43 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:964
 msgid "SOCKS4"
-msgstr ""
+msgstr "SOCKS4"
 
 #: ../gtk/tr-prefs.c:966
 msgid "SOCKS5"
-msgstr ""
+msgstr "SOCKS5"
 
 #: ../gtk/tr-prefs.c:997
 msgid "Tracker Proxy"
-msgstr ""
+msgstr "Mellomtjener for stifinner"
 
 #: ../gtk/tr-prefs.c:999
 msgid "Connect to tracker via a pro_xy"
-msgstr ""
+msgstr "_Koble til stifinner via mellomtjener"
 
 #: ../gtk/tr-prefs.c:1004
 msgid "Proxy _server:"
-msgstr ""
+msgstr "_Mellomtjener"
 
 #: ../gtk/tr-prefs.c:1012
 msgid "Proxy _port:"
-msgstr ""
+msgstr "Mellomtjener_port:"
 
 #: ../gtk/tr-prefs.c:1015
 msgid "Proxy _type:"
-msgstr ""
+msgstr "Mellomtjener_type"
 
 #: ../gtk/tr-prefs.c:1028
 msgid "_Authentication is required"
-msgstr ""
+msgstr "_Autentisering er påkrevd"
 
 #: ../gtk/tr-prefs.c:1063
 msgid "Router"
-msgstr ""
+msgstr "Ruter"
 
 #: ../gtk/tr-prefs.c:1065
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr ""
+msgstr "Bruk UPnP- eller NAT-PMP-_videreføring av porter fra min ruter"
 
 #: ../gtk/tr-prefs.c:1100
 msgid "Transmission Preferences"
@@ -1692,7 +1694,7 @@ msgstr "Nettverk"
 
 #: ../gtk/tr-prefs.c:1127
 msgid "Web"
-msgstr ""
+msgstr "Vev"
 
 #: ../gtk/tr-torrent.c:211
 #, c-format
@@ -1881,21 +1883,21 @@ msgstr[1] "%'d sekund"
 #: ../gtk/util.c:312
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
-msgstr ""
+msgstr "Torrentfila «%s» inneholder ugyldig data."
 
 #: ../gtk/util.c:313
 #, c-format
 msgid "The torrent file \"%s\" is already in use."
-msgstr ""
+msgstr "Torrentfila «%s» er allerede i bruk."
 
 #: ../gtk/util.c:314
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
-msgstr ""
+msgstr "Støtte på en ukjent feil med torrentfila «%s»"
 
 #: ../gtk/util.c:324
 msgid "Error opening torrent"
-msgstr ""
+msgstr "Feil under åpning av torrent"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:865
@@ -1905,12 +1907,12 @@ msgstr "Ugyldig metadata"
 #: ../libtransmission/blocklist.c:99
 #, c-format
 msgid "Blocklist \"%s\" contains %'u entries"
-msgstr ""
+msgstr "Blokkeringsliste «%s» inneholder %'u oppføringer"
 
 #: ../libtransmission/blocklist.c:277
 #, c-format
 msgid "Blocklist \"%1$s\" updated with %2$'d entries"
-msgstr ""
+msgstr "Blokkeringsliste «%1$s» oppdatert med %2$'d oppføringer"
 
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:649 ../libtransmission/fastresume.c:660

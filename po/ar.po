@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n % 100 >= "
 "3 && n % 100 <= 10 ? 3 : n % 100 >= 11 && n % 100 <= 99 ? 4 : 5;\n"
-"X-Launchpad-Export-Date: 2008-08-06 01:01+0000\n"
+"X-Launchpad-Export-Date: 2008-08-19 00:21+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -751,6 +751,7 @@ msgstr ""
 "  Benjamin Geer https://launchpad.net/~benjamin-geer\n"
 "  Khaled Hosny https://launchpad.net/~khaledhosny\n"
 "  Mohammed Adnène Trojette https://launchpad.net/~adn+ubuntu\n"
+"  r00t020 https://launchpad.net/~r00t020\n"
 "  صقر بن عبدالله https://launchpad.net/~agari"
 
 #: ../gtk/makemeta-ui.c:101

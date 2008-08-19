@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-08-06 01:01+0000\n"
+"X-Launchpad-Export-Date: 2008-08-19 00:21+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #, fuzzy
@@ -1494,7 +1494,8 @@ msgstr ""
 "  Filipe Gomes https://launchpad.net/~filipefgomes\n"
 "  Filipe Roque https://launchpad.net/~flip-roque\n"
 "  Fábio Domingos https://launchpad.net/~fabioandre-domingos\n"
-"  Tiago Silva https://launchpad.net/~tiagosilva"
+"  Tiago Silva https://launchpad.net/~tiagosilva\n"
+"  Tony Manco https://launchpad.net/~trmanco"
 
 #: ../gtk/makemeta-ui.c:101
 msgid "Torrent created!"
