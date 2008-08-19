@@ -19,6 +19,8 @@
    Messages are formatted as objects.  There are two types:
    requests (described in 2.1) and responses (described in 2.2).
 
+   All text MUST be UTF-8 encoded.
+
 2.1.  Requests
 
    Requests support three keys:
@@ -214,7 +216,7 @@
       {
          "arguments": {
              "fields": [ "id", "name", "totalSize" ]
-         }
+         },
          "method": "torrent-get",
          "tag": 39693
       }
@@ -229,12 +231,12 @@
                    "id": 10,
                    "name": "Fedora x86_64 DVD",
                    "totalSize", 34983493932,
-               } 
+               },
                {
                    "id": 7,
                    "name": "Ubuntu x86_64 DVD",
                    "totalSize", 9923890123,
-               }, 
+               } 
             ]
          },
          "result": "success",
