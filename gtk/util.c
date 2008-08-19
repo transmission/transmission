@@ -501,7 +501,7 @@ gtr_dbus_add_torrent( const char * filename )
 }
 
 gboolean
-gtr_dbus_present_window()
+gtr_dbus_present_window( void )
 {
     static gboolean success = FALSE;
 #ifdef HAVE_DBUS_GLIB
