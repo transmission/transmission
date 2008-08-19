@@ -214,7 +214,7 @@
       {
          "arguments": {
              "fields": [ "id", "name", "totalSize" ]
-         }
+         },
          "method": "torrent-get",
          "tag": 39693
       }
@@ -229,12 +229,12 @@
                    "id": 10,
                    "name": "Fedora x86_64 DVD",
                    "totalSize", 34983493932,
-               } 
+               },
                {
                    "id": 7,
                    "name": "Ubuntu x86_64 DVD",
                    "totalSize", 9923890123,
-               }, 
+               } 
             ]
          },
          "result": "success",
