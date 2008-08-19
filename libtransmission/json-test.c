@@ -19,21 +19,63 @@ static int test = 0;
     } \
 }
 
+#include "ConvertUTF.h"
+
 static int
 test_utf8( void )
 {
     const char * in = "{ \"key\": \"Letöltések\" }";
     tr_benc top;
     const char * str;
-    const int err = tr_jsonParse( in, strlen(in), &top, NULL );
+    char * json;
+    int json_len;
+    int err;
 
+    err = tr_jsonParse( in, strlen(in), &top, NULL );
     check( !err );
     check( tr_bencIsDict( &top ) );
     check( tr_bencDictFindStr( &top, "key", &str ) );
     check( !strcmp( str, "Letöltések" ) );
-
     if( !err )
         tr_bencFree( &top );
+
+    in = "{ \"key\": \"\\u005C\" }";
+    err = tr_jsonParse( in, strlen( in ), &top, NULL );
+    check( !err );
+    check( tr_bencIsDict( &top ) );
+    check( tr_bencDictFindStr( &top, "key", &str ) );
+    check( !strcmp( str, "\\" ) );
+    if( !err )
+        tr_bencFree( &top );
+
+    /**
+     * 1. Feed it JSON-escaped nonascii to the JSON decoder.
+     * 2. Confirm that the result is UTF-8.
+     * 3. Feed the same UTF-8 back into the JSON encoder.
+     * 4. Confirm that the result is JSON-escaped.
+     * 5. Dogfood that result back into the parser.
+     * 6. Confirm that the result is UTF-8.
+     */ 
+    in = "{ \"key\": \"Let\\u00f6lt\\u00e9sek\" }";
+    err = tr_jsonParse( in, strlen(in), &top, NULL );
+    check( !err );
+    check( tr_bencIsDict( &top ) );
+    check( tr_bencDictFindStr( &top, "key", &str ) );
+    check( !strcmp( str, "Letöltések" ) );
+    json = tr_bencSaveAsJSON( &top, &json_len );
+    if( !err )
+        tr_bencFree( &top );
+    check( json );
+    check( strstr( json, "\\u00f6" ) != NULL );
+    check( strstr( json, "\\u00e9" ) != NULL );
+    err = tr_jsonParse( json, json_len, &top, NULL );
+    check( !err );
+    check( tr_bencIsDict( &top ) );
+    check( tr_bencDictFindStr( &top, "key", &str ) );
+    check( !strcmp( str, "Letöltések" ) );
+    if( !err )
+        tr_bencFree( &top );
+    tr_free( json );
 
     return 0;
 }
@@ -88,9 +130,6 @@ int
 main( void )
 {
     int i;
-
-    if(( i = test_utf8( )))
-        return i;
 
     if(( i = test_utf8( )))
         return i;

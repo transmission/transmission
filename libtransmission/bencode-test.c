@@ -15,8 +15,7 @@ static int test = 0;
         if( VERBOSE ) \
             fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
     } else { \
-        if( VERBOSE ) \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
+        fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
         return test; \
     } \
 }

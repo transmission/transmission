@@ -19,6 +19,8 @@
 
 #include <event.h> /* evbuffer */
 
+#include "ConvertUTF.h"
+
 #include "transmission.h"
 #include "bencode.h"
 #include "json.h"
@@ -1152,9 +1154,9 @@ static void
 jsonStringFunc( const tr_benc * val, void * vdata )
 {
     struct jsonWalk * data = vdata;
-    const char *it, *end;
+    const unsigned char *it, *end;
     evbuffer_add_printf( data->out, "\"" );
-    for( it=val->val.s.s, end=it+val->val.s.i; it!=end; ++it )
+    for( it=(const unsigned char*)val->val.s.s, end=it+val->val.s.i; it!=end; ++it )
     {
         switch( *it ) {
             case '/' : evbuffer_add_printf( data->out, "\\/" ); break;
@@ -1165,7 +1167,19 @@ jsonStringFunc( const tr_benc * val, void * vdata )
             case '\t': evbuffer_add_printf( data->out, "\\t" ); break;
             case '"' : evbuffer_add_printf( data->out, "\\\"" ); break;
             case '\\': evbuffer_add_printf( data->out, "\\\\" ); break;
-            default:   evbuffer_add_printf( data->out, "%c", *it );
+            default:
+                if( isascii( *it ) ) {
+                    /*fprintf( stderr, "[%c]\n", *it );*/
+                    evbuffer_add_printf( data->out, "%c", *it );
+                } else {
+                    const UTF8 * tmp = it;
+                    UTF32 buf = 0;
+                    UTF32 * u32 = &buf;
+                    ConvertUTF8toUTF32( &tmp, end, &u32, &buf+1, 0 );
+                    evbuffer_add_printf( data->out, "\\u%04x", buf );
+                    it = tmp - 1;
+                    /*fprintf( stderr, "[\\u%04x]\n", buf );*/
+                }
         }
     }
     evbuffer_add_printf( data->out, "\"" );
