@@ -980,6 +980,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
 static void
 parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
 {
+    int64_t i;
     tr_benc val, * sub;
     uint8_t * tmp = tr_new( uint8_t, len );
 
@@ -995,24 +996,23 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
     dbgmsg( msgs, "here is the ltep handshake we got [%*.*s]", len, len, tmp );
 
     /* does the peer prefer encrypted connections? */
-    if(( sub = tr_bencDictFindType( &val, "e", TYPE_INT )))
-        msgs->info->encryption_preference = sub->val.i
-                                      ? ENCRYPTION_PREFERENCE_YES
-                                      : ENCRYPTION_PREFERENCE_NO;
+    if( tr_bencDictFindInt( &val, "e", &i ) )
+        msgs->info->encryption_preference = i ? ENCRYPTION_PREFERENCE_YES
+                                              : ENCRYPTION_PREFERENCE_NO;
 
     /* check supported messages for utorrent pex */
     msgs->peerSupportsPex = 0;
-    if(( sub = tr_bencDictFindType( &val, "m", TYPE_DICT ))) {
-        if(( sub = tr_bencDictFindType( sub, "ut_pex", TYPE_INT ))) {
-            msgs->ut_pex_id = (uint8_t) sub->val.i;
+    if( tr_bencDictFindDict( &val, "m", &sub ) ) {
+        if( tr_bencDictFindInt( sub, "ut_pex", &i ) ) {
+            msgs->ut_pex_id = (uint8_t) i;
             msgs->peerSupportsPex = msgs->ut_pex_id == 0 ? 0 : 1;
             dbgmsg( msgs, "msgs->ut_pex is %d", (int)msgs->ut_pex_id );
         }
     }
 
     /* get peer's listening port */
-    if(( sub = tr_bencDictFindType( &val, "p", TYPE_INT ))) {
-        msgs->info->port = htons( (uint16_t)sub->val.i );
+    if( tr_bencDictFindInt( &val, "p", &i ) ) {
+        msgs->info->port = htons( (uint16_t)i );
         dbgmsg( msgs, "msgs->port is now %hu", msgs->info->port );
     }
 
@@ -1025,20 +1025,23 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
 {
     int loaded = 0;
     uint8_t * tmp = tr_new( uint8_t, msglen );
-    tr_benc val, *added;
+    tr_benc val;
     const tr_torrent * tor = msgs->torrent;
+    const uint8_t * added;
+    size_t added_len;
+
     tr_peerIoReadBytes( msgs->io, inbuf, tmp, msglen );
 
     if( tr_torrentAllowsPex( tor )
         && (( loaded = !tr_bencLoad( tmp, msglen, &val, NULL )))
-        && (( added = tr_bencDictFindType( &val, "added", TYPE_STR ))))
+        && tr_bencDictFindRaw( &val, "added", &added, &added_len ) )
     {
         const uint8_t * added_f = NULL;
         tr_pex * pex;
         size_t i, n;
         size_t added_f_len = 0;
         tr_bencDictFindRaw( &val, "added.f", &added_f, &added_f_len );
-        pex = tr_peerMgrCompactToPex( added->val.s.s, added->val.s.i, added_f, added_f_len, &n );
+        pex = tr_peerMgrCompactToPex( added, added_len, added_f, added_f_len, &n );
         for( i=0; i<n; ++i )
             tr_peerMgrAddPex( msgs->session->peerMgr, tor->info.hash,
                               TR_PEER_FROM_PEX, pex+i );

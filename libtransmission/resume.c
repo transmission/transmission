@@ -77,13 +77,12 @@ static uint64_t
 loadPeers( tr_benc * dict, tr_torrent * tor )
 {
     uint64_t ret = 0;
-    tr_benc * p;
+    const uint8_t * str;
+    size_t len;
 
-    if(( p = tr_bencDictFindType( dict, KEY_PEERS, TYPE_STR )))
+    if( tr_bencDictFindRaw( dict, KEY_PEERS, &str, &len ) )
     {
         int i;
-        const char * str = p->val.s.s;
-        const size_t len = p->val.s.i;
         const int count = len / sizeof( tr_pex );
         for( i=0; i<count; ++i ) {
             tr_pex pex;
@@ -283,8 +282,9 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
 
     if( tr_bencDictFindDict( dict, KEY_PROGRESS, &p ) )
     {
+        const uint8_t * raw; 
+        size_t rawlen;
         tr_benc * m;
-        tr_benc * b;
         int n;
         time_t * curMTimes = tr_torrentGetMTimes( tor, &n );
 
@@ -316,12 +316,12 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
             tr_tordbg( tor, "Torrent needs to be verified - unable to find mtimes" );
         }
 
-        if(( b = tr_bencDictFindType( p, KEY_PROGRESS_BITFIELD, TYPE_STR )))
+        if( tr_bencDictFindRaw( p, KEY_PROGRESS_BITFIELD, &raw, &rawlen ) )
         {
             tr_bitfield tmp;
-            tmp.byteCount = b->val.s.i;
+            tmp.byteCount = rawlen;
             tmp.bitCount = tmp.byteCount * 8;
-            tmp.bits = (uint8_t*) b->val.s.s;
+            tmp.bits = (uint8_t*) raw;
             if( tr_cpBlockBitfieldSet( tor->completion, &tmp ) ) {
                 tr_torrentUncheck( tor );
                 tr_tordbg( tor, "Torrent needs to be verified - error loading bitfield" );

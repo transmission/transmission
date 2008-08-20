@@ -320,7 +320,7 @@ tr_metainfoParse( const tr_handle  * handle,
     /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
      * from the Metainfo file. Note that the value will be a bencoded 
      * dictionary, given the definition of the info key above. */
-    if(( beInfo = tr_bencDictFindType( meta, "info", TYPE_DICT )))
+    if( tr_bencDictFindDict( meta, "info", &beInfo ) )
     {
         int len;
         char * str = tr_bencSave( beInfo, &len );

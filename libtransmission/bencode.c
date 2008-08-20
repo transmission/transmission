@@ -380,7 +380,7 @@ tr_bencDictFind( tr_benc * val, const char * key )
     return i<0 ? NULL : &val->val.l.vals[i+1];
 }
 
-tr_benc*
+static tr_benc*
 tr_bencDictFindType( tr_benc * val, const char * key, int type )
 {
     tr_benc * ret = tr_bencDictFind( val, key );

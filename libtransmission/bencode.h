@@ -76,7 +76,6 @@ int       tr_bencDictFindRaw( tr_benc * dict, const char * key, const uint8_t **
 int       tr_bencDictFindList( tr_benc * dict, const char * key, tr_benc ** setme );
 int       tr_bencDictFindDict( tr_benc * dict, const char * key, tr_benc ** setme );
 tr_benc * tr_bencDictFind( tr_benc * dict, const char * key );
-tr_benc * tr_bencDictFindType( tr_benc * dict, const char * key, int type );
 tr_benc * tr_bencDictFindFirst( tr_benc * dict, ... );
 
 /* convenience functions for building tr_benc    structures */
