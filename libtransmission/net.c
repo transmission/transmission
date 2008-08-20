@@ -122,10 +122,12 @@ createSocket( int type, int priority )
     if( fd >= 0 )
         fd = makeSocketNonBlocking( fd );
 
+#if 0
     if( fd >= 0 ) {
         const int buffsize = 1500*3; /* 3x MTU for most ethernet/wireless */
         setsockopt( fd, SOL_SOCKET, SO_SNDBUF, &buffsize, sizeof( buffsize ) );
     }
+#endif
 
     return fd;
 }
