@@ -550,7 +550,7 @@ struct tr_refill_piece
 {
     tr_priority_t priority;
     int missingBlockCount;
-    uint16_t random;
+    int random;
     uint32_t piece;
     uint32_t peerCount;
 };
@@ -621,7 +621,7 @@ getPreferredPieces( Torrent     * t,
             setme->piece = piece;
             setme->priority = inf->pieces[piece].priority;
             setme->peerCount = 0;
-            setme->random = tr_stupidRandInt( UINT16_MAX );
+            setme->random = tr_stupidRandInt( INT_MAX );
             setme->missingBlockCount = tr_cpMissingBlocksInPiece( tor->completion, piece );
 
             for( k=0; k<peerCount; ++k ) {
