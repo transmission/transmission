@@ -549,7 +549,7 @@ compareRefillPiece (const void * aIn, const void * bIn)
         return a->peerCount < b->peerCount ? -1 : 1;
 
     /* otherwise go with our random seed */
-    return tr_compareUint16( a->random, b->random );
+    return a->random - b->random;
 }
 
 static int
