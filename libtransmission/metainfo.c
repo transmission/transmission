@@ -123,36 +123,32 @@ strlcat_utf8( void * dest, const void * src, size_t len, char skip )
     }
 }
 
-static void
+static char*
 getTorrentFilename( const tr_handle  * handle,
-                    const tr_info    * inf,
-                    char             * buf,
-                    size_t             buflen )
+                    const tr_info    * inf )
 {
-    const char * dir = tr_getTorrentDir( handle );
-    char base[MAX_PATH_LENGTH];
-    tr_snprintf( base, sizeof( base ), "%s.%16.16s.torrent", inf->name, inf->hashString );
-    tr_buildPath( buf, buflen, dir, base, NULL );
+    return tr_strdup_printf( "%s%c%s.%16.16s.torrent",
+                             tr_getTorrentDir( handle ),
+                             TR_PATH_DELIMITER,
+                             inf->name,
+                             inf->hashString );
 }
 
-static void
+static char*
 getTorrentOldFilename( const tr_handle * handle,
-                       const tr_info   * info,
-                       char            * name,
-                       size_t            len )
+                       const tr_info   * inf )
 {
-    const char * torDir = tr_getTorrentDir( handle );
-
-    if( !handle->tag )
-    {
-        tr_buildPath( name, len, torDir, info->hashString, NULL );
-    }
-    else
-    {
-        char base[1024];
-        tr_snprintf( base, sizeof(base), "%s-%s", info->hashString, handle->tag );
-        tr_buildPath( name, len, torDir, base, NULL );
-    }
+    char * ret;
+    struct evbuffer * buf = evbuffer_new( );
+    evbuffer_add_printf( buf, "%s%c%s", 
+                         tr_getTorrentDir( handle ),
+                         TR_PATH_DELIMITER,
+                         inf->hashString );
+    if( handle->tag )
+        evbuffer_add_printf( buf, "-%s", handle->tag );
+    ret = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+    evbuffer_free( buf );
+    return ret;
 }
 
 void
@@ -160,18 +156,15 @@ tr_metainfoMigrate( tr_handle * handle,
                     tr_info   * inf )
 {
     struct stat new_sb;
-    char new_name[MAX_PATH_LENGTH];
-
-    getTorrentFilename( handle, inf, new_name, sizeof( new_name ) );
+    char * new_name = getTorrentFilename( handle, inf );
 
     if( stat( new_name, &new_sb ) || ( ( new_sb.st_mode & S_IFMT ) != S_IFREG ) )
     {
-        char old_name[MAX_PATH_LENGTH];
+        char * old_name = getTorrentOldFilename( handle, inf );
         size_t contentLen;
         uint8_t * content;
 
         tr_mkdirp( tr_getTorrentDir( handle ), 0777 );
-        getTorrentOldFilename( handle, inf, old_name, sizeof( old_name ) );
         if(( content = tr_loadFile( old_name, &contentLen )))
         {
             FILE * out;
@@ -195,7 +188,10 @@ tr_metainfoMigrate( tr_handle * handle,
         }
 
         tr_free( content );
+        tr_free( old_name );
     }
+
+    tr_free( new_name );
 }
 
 static char *
@@ -434,9 +430,8 @@ tr_metainfoParse( const tr_handle  * handle,
     geturllist( inf, meta );
 
     /* filename of Transmission's copy */
-    getTorrentFilename( handle, inf, buf, sizeof( buf ) );
     tr_free( inf->torrent );
-    inf->torrent = tr_strdup( buf );
+    inf->torrent = getTorrentFilename( handle, inf );
 
     return TR_OK;
 
@@ -533,13 +528,15 @@ void
 tr_metainfoRemoveSaved( const tr_handle * handle,
                         const tr_info   * inf )
 {
-    char filename[MAX_PATH_LENGTH];
+    char * filename;
 
-    getTorrentFilename( handle, inf, filename, sizeof( filename ) );
+    filename = getTorrentFilename( handle, inf );
     unlink( filename );
+    tr_free( filename );
 
-    getTorrentOldFilename( handle, inf, filename, sizeof( filename ) );
+    filename = getTorrentOldFilename( handle, inf );
     unlink( filename );
+    tr_free( filename );
 }
 
 static int

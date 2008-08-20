@@ -47,15 +47,14 @@
 #define KEY_PROGRESS_MTIMES   "mtimes"
 #define KEY_PROGRESS_BITFIELD "bitfield"
 
-static void
-getResumeFilename( char * buf, size_t buflen, const tr_torrent * tor )
+static char*
+getResumeFilename( const tr_torrent * tor )
 {
-    const char * dir = tr_getResumeDir( tor->handle );
-    char base[MAX_PATH_LENGTH];
-    tr_snprintf( base, sizeof( base ), "%s.%16.16s.resume",
-                 tor->info.name,
-                 tor->info.hashString );
-    tr_buildPath( buf, buflen, dir, base, NULL );
+    return tr_strdup_printf( "%s%c%s.%16.16s.resume",
+                             tr_getResumeDir( tor->handle ),
+                             TR_PATH_DELIMITER,
+                             tor->info.name,
+                             tor->info.hashString );
 }
 
 /***
@@ -348,7 +347,7 @@ void
 tr_torrentSaveResume( const tr_torrent * tor )
 {
     tr_benc top;
-    char filename[MAX_PATH_LENGTH];
+    char * filename;
 
     if( !tor )
         return;
@@ -378,8 +377,9 @@ tr_torrentSaveResume( const tr_torrent * tor )
     saveProgress( &top, tor );
     saveSpeedLimits( &top, tor );
 
-    getResumeFilename( filename, sizeof( filename ), tor );
+    filename = getResumeFilename( tor );
     tr_bencSaveFile( filename, &top );
+    tr_free( filename );
 
     tr_bencFree( &top );
 }
@@ -391,10 +391,10 @@ loadFromFile( tr_torrent    * tor,
     int64_t i;
     const char * str;
     uint64_t fieldsLoaded = 0;
-    char filename[MAX_PATH_LENGTH];
+    char * filename;
     tr_benc top;
 
-    getResumeFilename( filename, sizeof( filename ), tor );
+    filename = getResumeFilename( tor );
 
     if( tr_bencLoadFile( filename, &top ) )
     {
@@ -408,6 +408,7 @@ loadFromFile( tr_torrent    * tor,
             tr_tordbg( tor, "Migrated resume file to \"%s\"", filename );
         }
 
+        tr_free( filename );
         return fieldsLoaded;
     }
 
@@ -484,6 +485,7 @@ loadFromFile( tr_torrent    * tor,
         fieldsLoaded |= loadSpeedLimits( &top, tor );
 
     tr_bencFree( &top );
+    tr_free( filename );
     return fieldsLoaded;
 }
 
@@ -547,8 +549,8 @@ tr_torrentLoadResume( tr_torrent    * tor,
 void
 tr_torrentRemoveResume( const tr_torrent * tor )
 {
-    char filename[MAX_PATH_LENGTH];
-    getResumeFilename( filename, sizeof( filename ), tor );
+    char * filename = getResumeFilename( tor );
     unlink( filename );
     tr_fastResumeRemove( tor );
+    tr_free( filename );
 }
