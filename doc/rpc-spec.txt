@@ -19,6 +19,8 @@
    Messages are formatted as objects.  There are two types:
    requests (described in 2.1) and responses (described in 2.2).
 
+   All text MUST be UTF-8 encoded.
+
 2.1.  Requests
 
    Requests support three keys:
