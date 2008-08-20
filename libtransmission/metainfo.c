@@ -44,84 +44,11 @@
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
-static int parseFiles( tr_info * inf, tr_benc * name,
-                       tr_benc * files, tr_benc * length );
+static int parseFiles( tr_info * inf, tr_benc * files, tr_benc * length );
 
 /***
 ****
 ***/
-
-#define WANTBYTES( want, got ) \
-    if( (want) > (got) ) { return; } else { (got) -= (want); }
-static void
-strlcat_utf8( void * dest, const void * src, size_t len, char skip )
-{
-    char       * s      = dest;
-    const char * append = src;
-    const char * p;
-
-    /* don't overwrite the nul at the end */
-    len--;
-
-    /* Go to the end of the destination string */
-    while( s[0] )
-    {
-        s++;
-        len--;
-    }
-
-    /* Now start appending, converting on the fly if necessary */
-    for( p = append; p[0]; )
-    {
-        /* skip over the requested character */
-        if( skip == p[0] )
-        {
-            p++;
-            continue;
-        }
-
-        if( !( p[0] & 0x80 ) )
-        {
-            /* ASCII character */
-            WANTBYTES( 1, len );
-            *(s++) = *(p++);
-            continue;
-        }
-
-        if( ( p[0] & 0xE0 ) == 0xC0 && ( p[1] & 0xC0 ) == 0x80 )
-        {
-            /* 2-bytes UTF-8 character */
-            WANTBYTES( 2, len );
-            *(s++) = *(p++); *(s++) = *(p++);
-            continue;
-        }
-
-        if( ( p[0] & 0xF0 ) == 0xE0 && ( p[1] & 0xC0 ) == 0x80 &&
-            ( p[2] & 0xC0 ) == 0x80 )
-        {
-            /* 3-bytes UTF-8 character */
-            WANTBYTES( 3, len );
-            *(s++) = *(p++); *(s++) = *(p++);
-            *(s++) = *(p++);
-            continue;
-        }
-
-        if( ( p[0] & 0xF8 ) == 0xF0 && ( p[1] & 0xC0 ) == 0x80 &&
-            ( p[2] & 0xC0 ) == 0x80 && ( p[3] & 0xC0 ) == 0x80 )
-        {
-            /* 4-bytes UTF-8 character */
-            WANTBYTES( 4, len );
-            *(s++) = *(p++); *(s++) = *(p++);
-            *(s++) = *(p++); *(s++) = *(p++);
-            continue;
-        }
-
-        /* ISO 8859-1 -> UTF-8 conversion */
-        WANTBYTES( 2, len );
-        *(s++) = 0xC0 | ( ( *p & 0xFF ) >> 6 );
-        *(s++) = 0x80 | ( *(p++) & 0x3F );
-    }
-}
 
 static char*
 getTorrentFilename( const tr_handle  * handle,
@@ -308,10 +235,13 @@ tr_metainfoParse( const tr_handle  * handle,
                   tr_info          * inf,
                   const tr_benc    * meta_in )
 {
-    tr_piece_index_t i;
-    tr_benc * beInfo, * val, * val2;
+    int64_t i;
+    const char * str;
+    const uint8_t * raw;
+    size_t rawlen;
+    tr_piece_index_t pi;
+    tr_benc * beInfo;
     tr_benc * meta = (tr_benc *) meta_in;
-    char buf[4096];
 
     /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
      * from the Metainfo file. Note that the value will be a bencoded 
@@ -321,6 +251,7 @@ tr_metainfoParse( const tr_handle  * handle,
         int len;
         char * str = tr_bencSave( beInfo, &len );
         tr_sha1( inf->hash, str, len, NULL );
+        tr_sha1_to_hex( inf->hashString, inf->hash );
         tr_free( str );
     }
     else
@@ -329,85 +260,68 @@ tr_metainfoParse( const tr_handle  * handle,
         return TR_EINVALID;
     }
 
-    tr_sha1_to_hex( inf->hashString, inf->hash );
+    /* name */
+    if( !tr_bencDictFindStr( beInfo, "name.utf-8", &str ) )
+        if( !tr_bencDictFindStr( beInfo, "name", &str ) )
+            str = NULL;
+    tr_free( inf->name );
+    inf->name = tr_strdup( str );
+    if( !str || !*str ) {
+        tr_err( _( "Invalid metadata entry \"%s\"" ), "name" );
+        return TR_EINVALID;
+    }
 
     /* comment */
-    memset( buf, '\0', sizeof( buf ) );
-    val = tr_bencDictFindFirst( meta, "comment.utf-8", "comment", NULL );
-    if( tr_bencIsString( val ) )
-        strlcat_utf8( buf, val->val.s.s, sizeof( buf ), 0 );
+    if( !tr_bencDictFindStr( meta, "comment.utf-8", &str ) )
+        if( !tr_bencDictFindStr( meta, "comment", &str ) )
+            str = "";
     tr_free( inf->comment );
-    inf->comment = tr_strdup( buf );
+    inf->comment = tr_strdup( str );
     
     /* creator */
-    memset( buf, '\0', sizeof( buf ) );
-    val = tr_bencDictFindFirst( meta, "created by.utf-8", "created by", NULL );
-    if( tr_bencIsString( val ) )
-        strlcat_utf8( buf, val->val.s.s, sizeof( buf ), 0 );
+    if( !tr_bencDictFindStr( meta, "created by.utf-8", &str ) )
+        if( !tr_bencDictFindStr( meta, "created by", &str ) )
+            str = "";
     tr_free( inf->creator );
-    inf->creator = tr_strdup( buf );
+    inf->creator = tr_strdup( str );
     
     /* Date created */
-    inf->dateCreated = 0;
-    val = tr_bencDictFind( meta, "creation date" );
-    if( tr_bencIsInt( val ) )
-        inf->dateCreated = val->val.i;
+    if( !tr_bencDictFindInt( meta, "creation date", &i ) )
+        i = 0;
+    inf->dateCreated = i;
     
     /* Private torrent */
-    val  = tr_bencDictFind( beInfo, "private" );
-    val2 = tr_bencDictFind( meta,  "private" );
-    if( ( tr_bencIsInt(val) && val->val.i ) ||
-        ( tr_bencIsInt(val2) && val2->val.i ) )
-    {
-        inf->isPrivate = 1;
-    }
+    if( !tr_bencDictFindInt( beInfo, "private", &i ) )
+        if( !tr_bencDictFindInt( meta, "private", &i ) )
+            i = 0;
+    inf->isPrivate = i != 0;
     
     /* Piece length */
-    val = tr_bencDictFind( beInfo, "piece length" );
-    if( !tr_bencIsInt( val ) )
-    {
-        if( val )
-            tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "piece length" );
-        else
-            tr_nerr( inf->name, _( "Missing metadata entry \"%s\"" ), "piece length" );
+    if( tr_bencDictFindInt( beInfo, "piece length", &i ) && ( i > 0 ) )
+        inf->pieceSize = i;
+    else {
+        tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "piece length" );
         goto fail;
     }
-    inf->pieceSize = val->val.i;
 
     /* Hashes */
-    val = tr_bencDictFind( beInfo, "pieces" );
-    if( !tr_bencIsString( val ) )
-    {
-        if( val )
-            tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "pieces" );
-        else
-            tr_nerr( inf->name, _( "Missing metadata entry \"%s\"" ), "pieces" );
-        goto fail;
-    }
-    if( val->val.s.i % SHA_DIGEST_LENGTH )
-    {
+    if( !tr_bencDictFindRaw( beInfo, "pieces", &raw, &rawlen ) || ( rawlen % SHA_DIGEST_LENGTH ) ) {
         tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "pieces" );
         goto fail;
     }
-    inf->pieceCount = val->val.s.i / SHA_DIGEST_LENGTH;
+    inf->pieceCount = rawlen / SHA_DIGEST_LENGTH;
+    inf->pieces = tr_new0( tr_piece, inf->pieceCount );
+    for ( pi=0; pi<inf->pieceCount; ++pi )
+        memcpy( inf->pieces[pi].hash, &raw[pi*SHA_DIGEST_LENGTH], SHA_DIGEST_LENGTH );
 
-    inf->pieces = calloc ( inf->pieceCount, sizeof(tr_piece) );
-
-    for ( i=0; i<inf->pieceCount; ++i )
-    {
-        memcpy (inf->pieces[i].hash, &val->val.s.s[i*SHA_DIGEST_LENGTH], SHA_DIGEST_LENGTH);
-    }
-
-    /* get file or top directory name */
-    val = tr_bencDictFindFirst( beInfo, "name.utf-8", "name", NULL );
-    if( parseFiles( inf, val,
-                    tr_bencDictFind( beInfo, "files" ),
-                    tr_bencDictFind( beInfo, "length" ) ) )
+    /* files */
+    if( parseFiles( inf, tr_bencDictFind( beInfo, "files" ),
+                         tr_bencDictFind( beInfo, "length" ) ) )
     {
         goto fail;
     }
 
-    if( !inf->fileCount || !inf->totalSize || !inf->pieceSize )
+    if( !inf->fileCount || !inf->totalSize )
     {
         tr_nerr( inf->name, _( "Torrent is corrupt" ) ); /* the content is missing! */
         goto fail;
@@ -469,59 +383,36 @@ void tr_metainfoFree( tr_info * inf )
 }
 
 static int
-getfile( char ** setme, const char * prefix, tr_benc * name )
+getfile( char ** setme, const char * root, tr_benc * path )
 {
-    const char ** list;
-    int           ii, jj;
-    char          buf[4096];
+    int err;
 
-    if( !tr_bencIsList( name ) )
-        return TR_EINVALID;
-
-    list = calloc( name->val.l.count, sizeof( list[0] ) );
-    if( !list )
-        return TR_EINVALID;
-
-    for( ii = jj = 0; name->val.l.count > ii; ii++ )
+    if( !tr_bencIsList( path ) )
     {
-        tr_benc * dir = &name->val.l.vals[ii];
+        err = TR_EINVALID;
+    }
+    else
+    {
+        struct evbuffer * buf = evbuffer_new( );
+        int n = tr_bencListSize( path );
+        int i;
 
-        if( !tr_bencIsString( dir ) )
-            continue;
-
-        if( 0 == strcmp( "..", dir->val.s.s ) )
-        {
-            if( 0 < jj )
-            {
-                jj--;
+        evbuffer_add( buf, root, strlen( root ) );
+        for( i=0; i<n; ++i ) {
+            const char * str;
+            if( tr_bencGetStr( tr_bencListChild( path, i ), &str ) && strcmp( str, ".." ) ) {
+                evbuffer_add( buf, TR_PATH_DELIMITER_STR, 1 );
+                evbuffer_add( buf, str, strlen( str ) );
             }
         }
-        else if( 0 != strcmp( ".", dir->val.s.s ) )
-        {
-            list[jj] = dir->val.s.s;
-            jj++;
-        }
+
+        *setme = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+        /* fprintf( stderr, "[%s]\n", *setme ); */
+        evbuffer_free( buf );
+        err = TR_OK;
     }
 
-    if( 0 == jj )
-    {
-        free( list );
-        return TR_EINVALID;
-    }
-
-    memset( buf, 0, sizeof( buf ) );
-    strlcat_utf8( buf, prefix, sizeof(buf), 0 );
-    for( ii = 0; jj > ii; ii++ )
-    {
-        strlcat_utf8( buf, TR_PATH_DELIMITER_STR, sizeof(buf), 0 );
-        strlcat_utf8( buf, list[ii], sizeof(buf), TR_PATH_DELIMITER );
-    }
-    free( list );
-
-    tr_free( *setme );
-    *setme = tr_strdup( buf );
-
-    return TR_OK;
+    return err;
 }
 
 void
@@ -540,39 +431,18 @@ tr_metainfoRemoveSaved( const tr_handle * handle,
 }
 
 static int
-parseFiles( tr_info * inf, tr_benc * name,
-            tr_benc * files, tr_benc * length )
+parseFiles( tr_info * inf, tr_benc * files, tr_benc * length )
 {
     tr_benc * item, * path;
     int ii;
-    char buf[4096];
-
-    if( !tr_bencIsString( name ) )
-    {
-        if( name )
-            tr_err( _( "Invalid metadata entry \"%s\"" ), "name" );
-        else
-            tr_err( _( "Missing metadata entry \"%s\"" ), "name" );
-        return TR_EINVALID;
-    }
-
-    memset( buf, 0, sizeof( buf ) );
-    strlcat_utf8( buf, name->val.s.s, sizeof( buf ), 0 );
-    tr_free( inf->name );
-    inf->name = tr_strdup( buf );
-    if( !inf->name || !*inf->name )
-    {
-        tr_err( _( "Invalid metadata entry \"%s\"" ), "name" );
-        return TR_EINVALID;
-    }
     inf->totalSize = 0;
 
     if( tr_bencIsList( files ) )
     {
         /* Multi-file mode */
         inf->isMultifile = 1;
-        inf->fileCount = files->val.l.count;
-        inf->files     = calloc( inf->fileCount, sizeof( inf->files[0] ) );
+        inf->fileCount   = files->val.l.count;
+        inf->files       = tr_new0( tr_file, inf->fileCount );
 
         if( !inf->files )
             return TR_EINVALID;
@@ -604,21 +474,16 @@ parseFiles( tr_info * inf, tr_benc * name,
     }
     else if( tr_bencIsInt( length ) )
     {
-        char buf[4096];
-
         /* Single-file mode */
         inf->isMultifile = 0;
         inf->fileCount = 1;
-        inf->files     = calloc( 1, sizeof( inf->files[0] ) );
+        inf->files = tr_new0( tr_file, 1 );
 
         if( !inf->files )
             return TR_EINVALID;
 
-        memset( buf, 0, sizeof( buf ) );
-        strlcat_utf8( buf, name->val.s.s, sizeof(buf), TR_PATH_DELIMITER );
         tr_free( inf->files[0].name );
-        inf->files[0].name = tr_strdup( buf );
-
+        inf->files[0].name   = tr_strdup( inf->name );
         inf->files[0].length = length->val.i;
         inf->totalSize      += length->val.i;
     }
