@@ -6,6 +6,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.33
    + Fix crash from malicious torrent files with a piece size of zero
    + When creating new torrent files, change behavior that caused 
      "Multi tracker torrents are not allowed" warning on one tracker
+   + Fix Unicode handling in the JSON parser/generator
    + Fix memory error when reading KTorrent's PEX messages
    + Fix small memory leaks
 - Mac
