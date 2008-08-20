@@ -23,10 +23,8 @@
  *****************************************************************************/
 
 #include <assert.h>
-#include <ctype.h> /* isspace */
 #include <errno.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -40,11 +38,6 @@
 #include "metainfo.h"
 #include "platform.h"
 #include "utils.h"
-
-/***********************************************************************
- * Local prototypes
- **********************************************************************/
-static int parseFiles( tr_info * inf, tr_benc * files, tr_benc * length );
 
 /***
 ****
@@ -62,17 +55,18 @@ getTorrentFilename( const tr_handle  * handle,
 }
 
 static char*
-getTorrentOldFilename( const tr_handle * handle,
+getOldTorrentFilename( const tr_handle * handle,
                        const tr_info   * inf )
 {
     char * ret;
     struct evbuffer * buf = evbuffer_new( );
-    evbuffer_add_printf( buf, "%s%c%s", 
-                         tr_getTorrentDir( handle ),
-                         TR_PATH_DELIMITER,
-                         inf->hashString );
+
+    evbuffer_add_printf( buf, "%s%c%s", tr_getTorrentDir( handle ),
+                                        TR_PATH_DELIMITER,
+                                        inf->hashString );
     if( handle->tag )
         evbuffer_add_printf( buf, "-%s", handle->tag );
+
     ret = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
     evbuffer_free( buf );
     return ret;
@@ -87,7 +81,7 @@ tr_metainfoMigrate( tr_handle * handle,
 
     if( stat( new_name, &new_sb ) || ( ( new_sb.st_mode & S_IFMT ) != S_IFREG ) )
     {
-        char * old_name = getTorrentOldFilename( handle, inf );
+        char * old_name = getOldTorrentFilename( handle, inf );
         size_t contentLen;
         uint8_t * content;
 
@@ -121,6 +115,97 @@ tr_metainfoMigrate( tr_handle * handle,
     tr_free( new_name );
 }
 
+/***
+****
+***/
+
+static int
+getfile( char ** setme, const char * root, tr_benc * path )
+{
+    int err;
+
+    if( !tr_bencIsList( path ) )
+    {
+        err = TR_EINVALID;
+    }
+    else
+    {
+        struct evbuffer * buf = evbuffer_new( );
+        int n = tr_bencListSize( path );
+        int i;
+
+        evbuffer_add( buf, root, strlen( root ) );
+        for( i=0; i<n; ++i ) {
+            const char * str;
+            if( tr_bencGetStr( tr_bencListChild( path, i ), &str ) && strcmp( str, ".." ) ) {
+                evbuffer_add( buf, TR_PATH_DELIMITER_STR, 1 );
+                evbuffer_add( buf, str, strlen( str ) );
+            }
+        }
+
+        *setme = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+        /* fprintf( stderr, "[%s]\n", *setme ); */
+        evbuffer_free( buf );
+        err = TR_OK;
+    }
+
+    return err;
+}
+
+static const char*
+parseFiles( tr_info * inf, tr_benc * files, tr_benc * length )
+{
+    tr_file_index_t i;
+
+    inf->totalSize = 0;
+
+    if( tr_bencIsList( files ) ) /* multi-file mode */
+    {
+        inf->isMultifile = 1;
+        inf->fileCount   = tr_bencListSize( files );
+        inf->files       = tr_new0( tr_file, inf->fileCount );
+
+        for( i=0; i<inf->fileCount; ++i )
+        {
+            tr_benc * file;
+            tr_benc * path;
+            int64_t length;
+
+            file = tr_bencListChild( files, i );
+            if( !tr_bencIsDict( file ) )
+                return "files";
+
+            if( !tr_bencDictFindList( file, "path.utf-8", &path ) )
+                if( !tr_bencDictFindList( file, "path", &path ) )
+                    return "path";
+
+            if( getfile( &inf->files[i].name, inf->name, path ) )
+                return "path";
+
+            if( !tr_bencDictFindInt( file, "length", &length ) )
+                return "length";
+
+            inf->files[i].length = length;
+            inf->totalSize      += length;
+        }
+    }
+    else if( tr_bencIsInt( length ) ) /* single-file mode */
+    {
+        inf->isMultifile      = 0;
+        inf->fileCount        = 1;
+        inf->files            = tr_new0( tr_file, 1 );
+        inf->files[0].name    = tr_strdup( inf->name );
+        inf->files[0].length  = length->val.i;
+        inf->totalSize       += length->val.i;
+    }
+    else
+    {
+        return "length";
+    }
+
+    return NULL;
+}
+
 static char *
 announceToScrape( const char * announce )
 {
@@ -146,27 +231,7 @@ announceToScrape( const char * announce )
     return scrape;
 }
 
-static void
-geturllist( tr_info * inf, tr_benc * meta )
-{
-    benc_val_t * urls;
-
-    if( tr_bencDictFindList( meta, "url-list", &urls ) )
-    {
-        int i;
-        const char * url;
-        const int n = tr_bencListSize( urls );
-
-        inf->webseedCount = 0;
-        inf->webseeds = tr_new0( char*, n );
-
-        for( i=0; i<n; ++i )
-            if( tr_bencGetStr( tr_bencListChild( urls, i ), &url ) )
-                inf->webseeds[inf->webseedCount++] = tr_strdup( url );
-    }
-}
-
-static int
+static const char*
 getannounce( tr_info * inf, tr_benc * meta )
 {
     const char * str;
@@ -203,7 +268,6 @@ getannounce( tr_info * inf, tr_benc * meta )
 
         /* did we use any of the tiers? */
         if( !trackerCount ) {
-            tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "announce-list" );
             tr_free( trackers );
             trackers = NULL;
         }
@@ -224,52 +288,62 @@ getannounce( tr_info * inf, tr_benc * meta )
     inf->trackers = trackers;
     inf->trackerCount = trackerCount;
 
-    if( !inf->trackerCount )
-        tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "announce" );
-
-    return inf->trackerCount ? TR_OK : TR_ERROR;
+    return inf->trackerCount ? NULL : "announce";
 }
 
-int
-tr_metainfoParse( const tr_handle  * handle,
-                  tr_info          * inf,
-                  const tr_benc    * meta_in )
+static void
+geturllist( tr_info * inf, tr_benc * meta )
+{
+    benc_val_t * urls;
+
+    if( tr_bencDictFindList( meta, "url-list", &urls ) )
+    {
+        int i;
+        const char * url;
+        const int n = tr_bencListSize( urls );
+
+        inf->webseedCount = 0;
+        inf->webseeds = tr_new0( char*, n );
+
+        for( i=0; i<n; ++i )
+            if( tr_bencGetStr( tr_bencListChild( urls, i ), &url ) )
+                inf->webseeds[inf->webseedCount++] = tr_strdup( url );
+    }
+}
+
+static const char*
+tr_metainfoParseImpl( const tr_handle  * handle,
+                      tr_info          * inf,
+                      const tr_benc    * meta_in )
 {
     int64_t i;
+    size_t raw_len;
     const char * str;
     const uint8_t * raw;
-    size_t rawlen;
-    tr_piece_index_t pi;
     tr_benc * beInfo;
     tr_benc * meta = (tr_benc *) meta_in;
 
     /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
      * from the Metainfo file. Note that the value will be a bencoded 
      * dictionary, given the definition of the info key above. */
-    if( tr_bencDictFindDict( meta, "info", &beInfo ) )
-    {
+    if( !tr_bencDictFindDict( meta, "info", &beInfo ) )
+        return "info";
+    else {
         int len;
         char * str = tr_bencSave( beInfo, &len );
         tr_sha1( inf->hash, str, len, NULL );
         tr_sha1_to_hex( inf->hashString, inf->hash );
         tr_free( str );
     }
-    else
-    {
-        tr_err( _( "Missing metadata entry \"%s\"" ), "info" );
-        return TR_EINVALID;
-    }
 
     /* name */
     if( !tr_bencDictFindStr( beInfo, "name.utf-8", &str ) )
         if( !tr_bencDictFindStr( beInfo, "name", &str ) )
-            str = NULL;
+            str = "";
+    if( !str || !*str )
+        return "name";
     tr_free( inf->name );
     inf->name = tr_strdup( str );
-    if( !str || !*str ) {
-        tr_err( _( "Invalid metadata entry \"%s\"" ), "name" );
-        return TR_EINVALID;
-    }
 
     /* comment */
     if( !tr_bencDictFindStr( meta, "comment.utf-8", &str ) )
@@ -278,67 +352,48 @@ tr_metainfoParse( const tr_handle  * handle,
     tr_free( inf->comment );
     inf->comment = tr_strdup( str );
     
-    /* creator */
+    /* created by */
     if( !tr_bencDictFindStr( meta, "created by.utf-8", &str ) )
         if( !tr_bencDictFindStr( meta, "created by", &str ) )
             str = "";
     tr_free( inf->creator );
     inf->creator = tr_strdup( str );
     
-    /* Date created */
+    /* creation date */
     if( !tr_bencDictFindInt( meta, "creation date", &i ) )
         i = 0;
     inf->dateCreated = i;
     
-    /* Private torrent */
+    /* private */
     if( !tr_bencDictFindInt( beInfo, "private", &i ) )
         if( !tr_bencDictFindInt( meta, "private", &i ) )
             i = 0;
     inf->isPrivate = i != 0;
     
-    /* Piece length */
-    if( tr_bencDictFindInt( beInfo, "piece length", &i ) && ( i > 0 ) )
-        inf->pieceSize = i;
-    else {
-        tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "piece length" );
-        goto fail;
-    }
+    /* piece length */
+    if( !tr_bencDictFindInt( beInfo, "piece length", &i ) || ( i < 1 ) )
+        return "piece length";
+    inf->pieceSize = i;
 
-    /* Hashes */
-    if( !tr_bencDictFindRaw( beInfo, "pieces", &raw, &rawlen ) || ( rawlen % SHA_DIGEST_LENGTH ) ) {
-        tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "pieces" );
-        goto fail;
-    }
-    inf->pieceCount = rawlen / SHA_DIGEST_LENGTH;
+    /* pieces */
+    if( !tr_bencDictFindRaw( beInfo, "pieces", &raw, &raw_len ) || ( raw_len % SHA_DIGEST_LENGTH ) )
+        return "pieces";
+    inf->pieceCount = raw_len / SHA_DIGEST_LENGTH;
     inf->pieces = tr_new0( tr_piece, inf->pieceCount );
-    for ( pi=0; pi<inf->pieceCount; ++pi )
-        memcpy( inf->pieces[pi].hash, &raw[pi*SHA_DIGEST_LENGTH], SHA_DIGEST_LENGTH );
+    for ( i=0; i<inf->pieceCount; ++i )
+        memcpy( inf->pieces[i].hash, &raw[i*SHA_DIGEST_LENGTH], SHA_DIGEST_LENGTH );
 
     /* files */
-    if( parseFiles( inf, tr_bencDictFind( beInfo, "files" ),
-                         tr_bencDictFind( beInfo, "length" ) ) )
-    {
-        goto fail;
-    }
-
+    if(( str = parseFiles( inf, tr_bencDictFind( beInfo, "files" ), tr_bencDictFind( beInfo, "length" ))))
+        return str;
     if( !inf->fileCount || !inf->totalSize )
-    {
-        tr_nerr( inf->name, _( "Torrent is corrupt" ) ); /* the content is missing! */
-        goto fail;
-    }
-
-    /* TODO add more tests so we don't crash on weird files */
-
-    if( (uint64_t) inf->pieceCount !=
-        ( inf->totalSize + inf->pieceSize - 1 ) / inf->pieceSize )
-    {
-        tr_nerr( inf->name, _( "Torrent is corrupt" ) ); /* size of hashes and files don't match */
-        goto fail;
-    }
+        return "files";
+    if( (uint64_t) inf->pieceCount != ( inf->totalSize + inf->pieceSize - 1 ) / inf->pieceSize )
+        return "files";
 
     /* get announce or announce-list */
-    if( getannounce( inf, meta ) )
-        goto fail;
+    if(( str = getannounce( inf, meta ) ))
+        return str;
 
     /* get the url-list */
     geturllist( inf, meta );
@@ -347,14 +402,26 @@ tr_metainfoParse( const tr_handle  * handle,
     tr_free( inf->torrent );
     inf->torrent = getTorrentFilename( handle, inf );
 
-    return TR_OK;
-
-  fail:
-    tr_metainfoFree( inf );
-    return TR_EINVALID;
+    return NULL;
 }
 
-void tr_metainfoFree( tr_info * inf )
+int
+tr_metainfoParse( const tr_handle  * handle,
+                  tr_info          * inf,
+                  const tr_benc    * meta_in )
+{
+    const char * badTag = tr_metainfoParseImpl( handle, inf, meta_in );
+    if( badTag )
+    {
+        tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), badTag );
+        tr_metainfoFree( inf );
+        return TR_EINVALID;
+    }
+    return TR_OK;
+}
+
+void
+tr_metainfoFree( tr_info * inf )
 {
     tr_file_index_t ff;
     int i;
@@ -382,39 +449,6 @@ void tr_metainfoFree( tr_info * inf )
     memset( inf, '\0', sizeof(tr_info) );
 }
 
-static int
-getfile( char ** setme, const char * root, tr_benc * path )
-{
-    int err;
-
-    if( !tr_bencIsList( path ) )
-    {
-        err = TR_EINVALID;
-    }
-    else
-    {
-        struct evbuffer * buf = evbuffer_new( );
-        int n = tr_bencListSize( path );
-        int i;
-
-        evbuffer_add( buf, root, strlen( root ) );
-        for( i=0; i<n; ++i ) {
-            const char * str;
-            if( tr_bencGetStr( tr_bencListChild( path, i ), &str ) && strcmp( str, ".." ) ) {
-                evbuffer_add( buf, TR_PATH_DELIMITER_STR, 1 );
-                evbuffer_add( buf, str, strlen( str ) );
-            }
-        }
-
-        *setme = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
-        /* fprintf( stderr, "[%s]\n", *setme ); */
-        evbuffer_free( buf );
-        err = TR_OK;
-    }
-
-    return err;
-}
-
 void
 tr_metainfoRemoveSaved( const tr_handle * handle,
                         const tr_info   * inf )
@@ -425,72 +459,7 @@ tr_metainfoRemoveSaved( const tr_handle * handle,
     unlink( filename );
     tr_free( filename );
 
-    filename = getTorrentOldFilename( handle, inf );
+    filename = getOldTorrentFilename( handle, inf );
     unlink( filename );
     tr_free( filename );
-}
-
-static int
-parseFiles( tr_info * inf, tr_benc * files, tr_benc * length )
-{
-    tr_benc * item, * path;
-    int ii;
-    inf->totalSize = 0;
-
-    if( tr_bencIsList( files ) )
-    {
-        /* Multi-file mode */
-        inf->isMultifile = 1;
-        inf->fileCount   = files->val.l.count;
-        inf->files       = tr_new0( tr_file, inf->fileCount );
-
-        if( !inf->files )
-            return TR_EINVALID;
-
-        for( ii = 0; files->val.l.count > ii; ii++ )
-        {
-            item = &files->val.l.vals[ii];
-            path = tr_bencDictFindFirst( item, "path.utf-8", "path", NULL );
-            if( getfile( &inf->files[ii].name, inf->name, path ) )
-            {
-                if( path )
-                    tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "path" );
-                else
-                    tr_nerr( inf->name, _( "Missing metadata entry \"%s\"" ), "path" );
-                return TR_EINVALID;
-            }
-            length = tr_bencDictFind( item, "length" );
-            if( !tr_bencIsInt( length ) )
-            {
-                if( length )
-                    tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), "length" );
-                else
-                    tr_nerr( inf->name, _( "Missing metadata entry \"%s\"" ), "length" );
-                return TR_EINVALID;
-            }
-            inf->files[ii].length = length->val.i;
-            inf->totalSize         += length->val.i;
-        }
-    }
-    else if( tr_bencIsInt( length ) )
-    {
-        /* Single-file mode */
-        inf->isMultifile = 0;
-        inf->fileCount = 1;
-        inf->files = tr_new0( tr_file, 1 );
-
-        if( !inf->files )
-            return TR_EINVALID;
-
-        tr_free( inf->files[0].name );
-        inf->files[0].name   = tr_strdup( inf->name );
-        inf->files[0].length = length->val.i;
-        inf->totalSize      += length->val.i;
-    }
-    else
-    {
-        tr_nerr( inf->name, _( "Invalid or missing metadata entries \"length\" and \"files\"" ) );
-    }
-
-    return TR_OK;
 }
