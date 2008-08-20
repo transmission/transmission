@@ -760,13 +760,6 @@ tr_bitfieldIsEmpty( const tr_bitfield * bitfield )
 }
 
 int
-tr_bitfieldHas( const tr_bitfield * bitfield, size_t nth )
-{
-    return ( tr_bitfieldTestFast( bitfield, nth ) )
-        && ( tr_bitfieldHasFast( bitfield, nth ) );
-}
-
-int
 tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
 {
     assert( bitfield );

@@ -30,8 +30,8 @@ static int test = 0;
 static int
 test_bitfields( void )
 { 
-    int i;
-    int bitcount = 5000000;
+    unsigned int i;
+    unsigned int bitcount = 5000000;
     tr_bitfield * field = tr_bitfieldNew( bitcount );
 
     /* test tr_bitfieldAdd */

@@ -28,7 +28,7 @@ main( void )
     struct in_addr addr;
     uint32_t sz;
     uint32_t k;
-    int pieces[] = { 1059,431,808,1217,287,376,1188,353,508 };
+    tr_piece_index_t pieces[] = { 1059,431,808,1217,287,376,1188,353,508 };
 
     for( i=0; i<SHA_DIGEST_LENGTH; ++i )
         infohash[i] = 0xaa;

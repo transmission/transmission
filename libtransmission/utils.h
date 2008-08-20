@@ -261,7 +261,6 @@ int  tr_bitfieldAddRange( tr_bitfield *, size_t begin, size_t end );
 int  tr_bitfieldRemRange ( tr_bitfield*, size_t begin, size_t end );
 void tr_bitfieldDifference( tr_bitfield *, const tr_bitfield * );
 
-int    tr_bitfieldHas( const tr_bitfield*, size_t bit );
 int    tr_bitfieldIsEmpty( const tr_bitfield* );
 size_t tr_bitfieldCountTrueBits( const tr_bitfield* );
 
@@ -288,6 +287,10 @@ int tr_bitfieldFindTrue( const tr_bitfield  * bitfield,
 /** @param high the highest nth bit you're going to access */
 #define tr_bitfieldTestFast(bitfield,high) \
     ( (bitfield) && ((bitfield)->bits) && ((high)<(bitfield)->bitCount ) )
+
+#define tr_bitfieldHas(bitfield,nth) \
+    ( tr_bitfieldTestFast( bitfield, nth ) && \
+      tr_bitfieldHasFast( bitfield, nth ) )
 
 double tr_getRatio( double numerator, double denominator );
 

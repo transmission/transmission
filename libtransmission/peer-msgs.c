@@ -522,7 +522,7 @@ fireCancelledReq( tr_peermsgs * msgs, const tr_piece_index_t pieceIndex )
 
 static int
 isPieceInteresting( const tr_peermsgs   * peer,
-                    int                   piece )
+                    tr_piece_index_t      piece )
 {
     const tr_torrent * torrent = peer->torrent;
 

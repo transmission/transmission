@@ -594,7 +594,7 @@ getPreferredPieces( Torrent     * t,
         for( j=0; j<poolSize; ++j )
         {
             int k;
-            const int piece = pool[j];
+            const tr_piece_index_t piece = pool[j];
             struct tr_refill_piece * setme = p + j;
 
             setme->piece = piece;
@@ -1099,7 +1099,7 @@ tr_peerMgrCompactToPex( const void     * compact,
 void
 tr_peerMgrSetBlame( tr_peerMgr     * manager,
                     const uint8_t  * torrentHash,
-                    int              pieceIndex,
+                    tr_piece_index_t pieceIndex,
                     int              success )
 {
     if( !success )
@@ -1296,9 +1296,9 @@ void
 tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
                                const uint8_t    * torrentHash,
                                int8_t           * tab,
-                               int                tabCount )
+                               unsigned int       tabCount )
 {
-    int i;
+    tr_piece_index_t i;
     const Torrent * t;
     const tr_torrent * tor;
     float interval;
