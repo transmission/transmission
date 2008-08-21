@@ -140,7 +140,7 @@ int  tr_bencParseInt( const uint8_t  * buf,
 int  tr_bencParseStr( const uint8_t  * buf,
                       const uint8_t  * bufend,
                       const uint8_t ** setme_end, 
-                      uint8_t       ** setme_str,
+                      const uint8_t ** setme_str,
                       size_t         * setme_strlen );
 
 #endif

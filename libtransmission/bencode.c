@@ -118,7 +118,7 @@ int
 tr_bencParseStr( const uint8_t  * buf,
                  const uint8_t  * bufend,
                  const uint8_t ** setme_end,
-                 uint8_t       ** setme_str,
+                 const uint8_t ** setme_str,
                  size_t         * setme_strlen )
 {
     size_t len;
@@ -144,7 +144,7 @@ tr_bencParseStr( const uint8_t  * buf,
         return TR_ERROR;
 
     *setme_end = end + 1 + len;
-    *setme_str = tr_memdup( end+1, len );
+    *setme_str = end + 1;
     *setme_strlen = len;
     return TR_OK;
 }
@@ -279,7 +279,7 @@ tr_bencParseImpl( const void     * buf_in,
         else if( isdigit(*buf) ) /* string? */
         {
             const uint8_t * end;
-            uint8_t * str;
+            const uint8_t * str;
             size_t str_len;
             int err;
             tr_benc * node;
@@ -288,10 +288,8 @@ tr_bencParseImpl( const void     * buf_in,
                 return err;
 
             node = getNode( top, parentStack, TYPE_STR );
-            if( !node ) {
-                tr_free( str );
+            if( !node )
                 return TR_ERROR;
-            }
 
             tr_bencInitStr( node, str, str_len );
             buf = end;

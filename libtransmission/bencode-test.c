@@ -89,17 +89,16 @@ testStr( void )
     uint8_t buf[128];
     int err;
     const uint8_t * end;
-    uint8_t * str;
+    const uint8_t * str;
     size_t len;
 
     /* good string */
     tr_snprintf( (char*)buf, sizeof( buf ), "4:boat" );
     err = tr_bencParseStr( buf, buf+6, &end, &str, &len );
     check( err == TR_OK );
-    check( !strcmp( (char*)str, "boat" ) );
+    check( !strncmp( (char*)str, "boat", len ) );
     check( len == 4 );
     check( end == buf + 6 );
-    tr_free( str );
     str = NULL;
     end = NULL;
     len = 0;
@@ -118,7 +117,6 @@ testStr( void )
     check( !*str );
     check( !len );
     check( end == buf + 2 );
-    tr_free( str );
     str = NULL;
     end = NULL;
     len = 0;
@@ -127,10 +125,9 @@ testStr( void )
     tr_snprintf( (char*)buf, sizeof( buf ), "3:boat" );
     err = tr_bencParseStr( buf, buf+6, &end, &str, &len );
     check( err == TR_OK );
-    check( !strcmp( (char*)str, "boa" ) );
+    check( !strncmp( (char*)str, "boa", len ) );
     check( len == 3 );
     check( end == buf + 5 );
-    tr_free( str );
     str = NULL;
     end = NULL;
     len = 0;
