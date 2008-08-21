@@ -777,7 +777,7 @@ tr_rpc_parse_list_str( tr_benc     * setme,
     if( isNum )
         tr_bencInitInt( setme, strtol( str, NULL, 10 ) );
     else if( !isNumList )
-        tr_bencInitStrDup( setme, str );
+        tr_bencInitStr( setme, str, len );
     else {
         tr_bencInitList( setme, commaCount + 1 );
         walk = str;

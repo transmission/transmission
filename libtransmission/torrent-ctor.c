@@ -108,12 +108,13 @@ tr_ctorSetMetainfoFromFile( tr_ctor        * ctor,
     if( ctor->isSet_metainfo ) {
         tr_benc * info;
         if( tr_bencDictFindDict( &ctor->metainfo, "info", &info ) ) {
-            tr_benc * name = tr_bencDictFindFirst( info, "name.utf-8", "name", NULL );
-            if( name == NULL )
-                name = tr_bencDictAdd( info, "name" );
-            if( name->type!=TYPE_STR || !name->val.s.s || !*name->val.s.s ) {
+            const char * name;
+            if( !tr_bencDictFindStr( info, "name.utf-8", &name ) )
+                if( !tr_bencDictFindStr( info, "name", &name ) )
+                    name = NULL;
+            if( !name || !*name ) {
                 char * tmp = tr_strdup( filename );
-                tr_bencInitStrDup( name, basename( tmp ) );
+                tr_bencDictAddStr( info, "name", basename( tmp ) );
                 tr_free( tmp );
             }
         }

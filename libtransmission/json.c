@@ -87,7 +87,7 @@ callback( void * vdata, int type, const JSON_value * value )
         case JSON_T_FLOAT: {
             char buf[128];
             tr_snprintf( buf, sizeof( buf ), "%f", (double)value->vu.float_value );
-            tr_bencInitStrDup( getNode( data ), buf );
+            tr_bencInitStr( getNode( data ), buf, -1 );
             break;
         }
 
@@ -107,7 +107,7 @@ callback( void * vdata, int type, const JSON_value * value )
             break;
 
         case JSON_T_STRING:
-            tr_bencInitStrDup( getNode( data ), value->vu.str.value );
+            tr_bencInitStr( getNode( data ), value->vu.str.value, value->vu.str.length );
             break;
 
         case JSON_T_KEY:

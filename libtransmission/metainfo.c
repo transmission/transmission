@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -294,7 +295,7 @@ getannounce( tr_info * inf, tr_benc * meta )
 static void
 geturllist( tr_info * inf, tr_benc * meta )
 {
-    benc_val_t * urls;
+    tr_benc * urls;
 
     if( tr_bencDictFindList( meta, "url-list", &urls ) )
     {

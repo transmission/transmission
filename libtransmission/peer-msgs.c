@@ -1858,7 +1858,7 @@ sendPex( tr_peermsgs * msgs )
         tr_pex * newPex = NULL;
         const int newCount = tr_peerMgrGetPeers( msgs->session->peerMgr, msgs->torrent->info.hash, &newPex );
         PexDiffs diffs;
-        tr_benc val, *added, *dropped;
+        tr_benc val;
         uint8_t *tmp, *walk;
         char * benc;
         int bencLen;
@@ -1886,14 +1886,14 @@ sendPex( tr_peermsgs * msgs )
         tr_bencInitDict( &val, 3 );
 
         /* "added" */
-        added = tr_bencDictAdd( &val, "added" );
         tmp = walk = tr_new( uint8_t, diffs.addedCount * 6 );
         for( i=0; i<diffs.addedCount; ++i ) {
             memcpy( walk, &diffs.added[i].in_addr, 4 ); walk += 4;
             memcpy( walk, &diffs.added[i].port, 2 ); walk += 2;
         }
         assert( ( walk - tmp ) == diffs.addedCount * 6 );
-        tr_bencInitStr( added, tmp, walk-tmp, FALSE );
+        tr_bencDictAddRaw( &val, "added", tmp, walk-tmp );
+        tr_free( tmp );
 
         /* "added.f" */
         tmp = walk = tr_new( uint8_t, diffs.addedCount );
@@ -1904,14 +1904,14 @@ sendPex( tr_peermsgs * msgs )
         tr_free( tmp );
 
         /* "dropped" */
-        dropped = tr_bencDictAdd( &val, "dropped" );
         tmp = walk = tr_new( uint8_t, diffs.droppedCount * 6 );
         for( i=0; i<diffs.droppedCount; ++i ) {
             memcpy( walk, &diffs.dropped[i].in_addr, 4 ); walk += 4;
             memcpy( walk, &diffs.dropped[i].port, 2 ); walk += 2;
         }
         assert( ( walk - tmp ) == diffs.droppedCount * 6 );
-        tr_bencInitStr( dropped, tmp, walk-tmp, FALSE );
+        tr_bencDictAddRaw( &val, "dropped", tmp, walk-tmp );
+        tr_free( tmp );
 
         /* write the pex message */
         benc = tr_bencSave( &val, &bencLen );

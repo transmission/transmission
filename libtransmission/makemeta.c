@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <stdio.h> /* FILE, stderr */
 #include <stdlib.h> /* qsort */
+#include <string.h> /* strcmp, strlen */
 
 #include <sys/types.h>
 #include <sys/stat.h>

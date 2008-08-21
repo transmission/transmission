@@ -13,9 +13,9 @@
 #include <assert.h>
 #include <ctype.h> /* isdigit, isprint, isspace */
 #include <errno.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <event.h> /* evbuffer */
 
@@ -293,7 +293,7 @@ tr_bencParseImpl( const void     * buf_in,
                 return TR_ERROR;
             }
 
-            tr_bencInitStr( node, str, str_len, 0 );
+            tr_bencInitStr( node, str, str_len );
             buf = end;
 
             if( tr_ptrArrayEmpty( parentStack ) )
@@ -385,23 +385,6 @@ tr_bencDictFindType( tr_benc * val, const char * key, int type )
 {
     tr_benc * ret = tr_bencDictFind( val, key );
     return ret && ret->type == type ? ret : NULL;
-}
-
-tr_benc *
-tr_bencDictFindFirst( tr_benc * val, ... )
-{
-    const char * key;
-    tr_benc * ret;
-    va_list      ap;
-
-    ret = NULL;
-    va_start( ap, val );
-    while(( key = va_arg( ap, const char * )))
-        if(( ret = tr_bencDictFind( val, key )))
-            break;
-    va_end( ap );
-
-    return ret;
 }
 
 int
@@ -515,36 +498,19 @@ tr_bencDictFindRaw( tr_benc         * dict,
 ***/
 
 void
-_tr_bencInitStr( tr_benc * val, char * str, int len, int nofree )
-{
-    tr_bencInit( val, TYPE_STR );
-    val->val.s.s      = str;
-    val->val.s.nofree = nofree;
-    if( 0 >= len )
-    {
-        len = ( NULL == str ? 0 : strlen( str ) );
-    }
-    val->val.s.i = len;
-}
-
-void
 tr_bencInitRaw( tr_benc * val, const void * src, size_t byteCount )
 {
     tr_bencInit( val, TYPE_STR );
     val->val.s.i = byteCount;
     val->val.s.s = tr_memdup( src, byteCount );
-    val->val.s.nofree = 0;
 }
 
-int
-tr_bencInitStrDup( tr_benc * val, const char * str )
+void
+tr_bencInitStr( tr_benc * val, const void * str, int len )
 {
-    char * newStr = tr_strdup( str );
-    if( newStr == NULL )
-        return 1;
-
-    _tr_bencInitStr( val, newStr, 0, 0 );
-    return 0;
+    tr_bencInit( val, TYPE_STR );
+    val->val.s.s = tr_strndup( str, len );
+    val->val.s.i = val->val.s.s ? strlen( val->val.s.s ) : 0;
 }
 
 void
@@ -611,7 +577,7 @@ tr_benc *
 tr_bencListAddStr( tr_benc * list, const char * val )
 {
     tr_benc * node = tr_bencListAdd( list );
-    tr_bencInitStrDup( node, val );
+    tr_bencInitStr( node, val, -1 );
     return node;
 }
 tr_benc*
@@ -640,7 +606,7 @@ tr_bencDictAdd( tr_benc * dict, const char * key )
     assert( dict->val.l.count + 2 <= dict->val.l.alloc );
 
     keyval = dict->val.l.vals + dict->val.l.count++;
-    tr_bencInitStrDup( keyval, key );
+    tr_bencInitStr( keyval, key, -1 );
 
     itemval = dict->val.l.vals + dict->val.l.count++;
     tr_bencInit( itemval, TYPE_INT );
@@ -658,7 +624,7 @@ tr_benc*
 tr_bencDictAddStr( tr_benc * dict, const char * key, const char * val )
 {
     tr_benc * child = tr_bencDictAdd( dict, key );
-    tr_bencInitStrDup( child, val );
+    tr_bencInitStr( child, val, -1 );
     return child;
 }
 tr_benc*
@@ -962,8 +928,7 @@ freeDummyFunc( const tr_benc * val UNUSED, void * buf UNUSED  )
 static void
 freeStringFunc( const tr_benc * val, void * freeme )
 {
-    if( !val->val.s.nofree )
-        tr_ptrArrayAppend( freeme, val->val.s.s );
+    tr_ptrArrayAppend( freeme, val->val.s.s );
 }
 static void
 freeContainerBeginFunc( const tr_benc * val, void * freeme )
@@ -993,6 +958,7 @@ tr_bencFree( tr_benc * val )
 ****
 ***/
 
+#if 0
 struct WalkPrint
 {
     int depth;
@@ -1069,6 +1035,7 @@ tr_bencPrint( const tr_benc * val )
     walkPrint.depth = 0;
     bencWalk( val, &walkFuncs, &walkPrint );
 }
+#endif
 
 /***
 ****
@@ -1301,6 +1268,20 @@ tr_bencSaveFile( const char * filename,  const tr_benc * b )
 }
 
 int
+tr_bencSaveJSONFile( const char * filename, const tr_benc * b )
+{
+    int len;
+    char * content = tr_bencSaveAsJSON( b, &len );
+    const int err = saveFile( filename, content, len );
+    tr_free( content );
+    return err;
+}
+
+/***
+****
+***/
+
+int
 tr_bencLoadFile( const char * filename, tr_benc * b )
 {
     int ret;
@@ -1310,16 +1291,6 @@ tr_bencLoadFile( const char * filename, tr_benc * b )
                   : TR_ERROR_IO_OTHER;
     tr_free( content );
     return ret;
-}
-
-int
-tr_bencSaveJSONFile( const char * filename, const tr_benc * b )
-{
-    int len;
-    char * content = tr_bencSaveAsJSON( b, &len );
-    const int err = saveFile( filename, content, len );
-    tr_free( content );
-    return err;
 }
 
 int
