@@ -144,7 +144,7 @@ tr_bencParseStr( const uint8_t  * buf,
         return TR_ERROR;
 
     *setme_end = end + 1 + len;
-    *setme_str = (uint8_t*) tr_strndup( end + 1, len );
+    *setme_str = tr_memdup( end+1, len );
     *setme_strlen = len;
     return TR_OK;
 }
@@ -509,8 +509,15 @@ void
 tr_bencInitStr( tr_benc * val, const void * str, int len )
 {
     tr_bencInit( val, TYPE_STR );
+
     val->val.s.s = tr_strndup( str, len );
-    val->val.s.i = val->val.s.s ? strlen( val->val.s.s ) : 0;
+
+    if( val->val.s.s == NULL )
+        val->val.s.i = 0;
+    else if( len < 0 )
+        val->val.s.i = strlen( val->val.s.s );
+    else
+        val->val.s.i = len;
 }
 
 void
