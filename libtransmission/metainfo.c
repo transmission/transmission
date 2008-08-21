@@ -78,9 +78,9 @@ tr_metainfoMigrate( tr_handle * handle,
                     tr_info   * inf )
 {
     struct stat new_sb;
-    char * new_name = getTorrentFilename( handle, inf );
+    char * name = getTorrentFilename( handle, inf );
 
-    if( stat( new_name, &new_sb ) || ( ( new_sb.st_mode & S_IFMT ) != S_IFREG ) )
+    if( stat( name, &new_sb ) || ( ( new_sb.st_mode & S_IFMT ) != S_IFREG ) )
     {
         char * old_name = getOldTorrentFilename( handle, inf );
         size_t contentLen;
@@ -91,18 +91,20 @@ tr_metainfoMigrate( tr_handle * handle,
         {
             FILE * out;
             errno = 0;
-            out = fopen( new_name, "wb+" );
+            out = fopen( name, "wb+" );
             if( !out )
             {
-                tr_nerr( inf->name, _( "Couldn't create \"%1$s\": %2$s" ), new_name, tr_strerror( errno ) );
+                tr_nerr( inf->name, _( "Couldn't create \"%1$s\": %2$s" ),
+                         name, tr_strerror( errno ) );
             }
             else
             {
-                if( fwrite( content, sizeof( uint8_t ), contentLen, out ) == contentLen )
+                if( fwrite( content, sizeof( uint8_t ), contentLen, out )
+                        == contentLen )
                 {
                     tr_free( inf->torrent );
-                    inf->torrent = tr_strdup( new_name );
-                    tr_sessionSetTorrentFile( handle, inf->hashString, new_name );
+                    inf->torrent = tr_strdup( name );
+                    tr_sessionSetTorrentFile( handle, inf->hashString, name );
                     unlink( old_name );
                 }
                 fclose( out );
@@ -113,7 +115,7 @@ tr_metainfoMigrate( tr_handle * handle,
         tr_free( old_name );
     }
 
-    tr_free( new_name );
+    tr_free( name );
 }
 
 /***
@@ -138,7 +140,8 @@ getfile( char ** setme, const char * root, tr_benc * path )
         evbuffer_add( buf, root, strlen( root ) );
         for( i=0; i<n; ++i ) {
             const char * str;
-            if( tr_bencGetStr( tr_bencListChild( path, i ), &str ) && strcmp( str, ".." ) ) {
+            if( tr_bencGetStr( tr_bencListChild( path, i ), &str )
+                    && strcmp( str, ".." ) ) {
                 evbuffer_add( buf, TR_PATH_DELIMITER_STR, 1 );
                 evbuffer_add( buf, str, strlen( str ) );
             }
@@ -154,14 +157,16 @@ getfile( char ** setme, const char * root, tr_benc * path )
 }
 
 static const char*
-parseFiles( tr_info * inf, tr_benc * files, tr_benc * length )
+parseFiles( tr_info * inf, tr_benc * files, const tr_benc * length )
 {
-    tr_file_index_t i;
+    int64_t len;
 
     inf->totalSize = 0;
 
     if( tr_bencIsList( files ) ) /* multi-file mode */
     {
+        tr_file_index_t i;
+
         inf->isMultifile = 1;
         inf->fileCount   = tr_bencListSize( files );
         inf->files       = tr_new0( tr_file, inf->fileCount );
@@ -190,14 +195,14 @@ parseFiles( tr_info * inf, tr_benc * files, tr_benc * length )
             inf->totalSize      += length;
         }
     }
-    else if( tr_bencIsInt( length ) ) /* single-file mode */
+    else if( tr_bencGetInt( length, &len ) ) /* single-file mode */
     {
         inf->isMultifile      = 0;
         inf->fileCount        = 1;
         inf->files            = tr_new0( tr_file, 1 );
         inf->files[0].name    = tr_strdup( inf->name );
-        inf->files[0].length  = length->val.i;
-        inf->totalSize       += length->val.i;
+        inf->files[0].length  = len;
+        inf->totalSize       += len;
     }
     else
     {
@@ -225,7 +230,7 @@ announceToScrape( const char * announce )
         evbuffer_add( buf, announce, s-announce );
         evbuffer_add( buf, "scrape", 6 );
         evbuffer_add_printf( buf, "%s", s+8 );
-        scrape = tr_strdup( ( char * ) EVBUFFER_DATA( buf ) );
+        scrape = tr_strdup( EVBUFFER_DATA( buf ) );
         evbuffer_free( buf );
     }
 
@@ -245,24 +250,27 @@ getannounce( tr_info * inf, tr_benc * meta )
     {
         int n;
         int i, j;
+        const int numTiers = tr_bencListSize( tiers );
 
         n = 0;
-        for( i=0; i<tiers->val.l.count; ++i )
-            n += tiers->val.l.vals[i].val.l.count;
+        for( i=0; i<numTiers; ++i )
+            n += tr_bencListSize( tr_bencListChild( tiers, i ) );
 
         trackers = tr_new0( tr_tracker_info, n );
         trackerCount = 0;
 
-        for( i=0; i<tiers->val.l.count; ++i ) {
-            const tr_benc * tier = &tiers->val.l.vals[i];
-            for( j=0; tr_bencIsList(tier) && j<tier->val.l.count; ++j ) {
-                const tr_benc * a = &tier->val.l.vals[j];
-                if( tr_bencIsString( a ) && tr_httpIsValidURL( a->val.s.s ) ) {
+        for( i=0; i<numTiers; ++i ) {
+            tr_benc * tier = tr_bencListChild( tiers, i );
+            const int tierSize = tr_bencListSize( tier );
+            for( j=0; j<tierSize; ++j ) {
+                const char * str;
+                if( tr_bencGetStr( tr_bencListChild( tier, j ), &str ) 
+                        && tr_httpIsValidURL( str ) )  {
                     tr_tracker_info * t = trackers + trackerCount++;
                     t->tier = i;
-                    t->announce = tr_strndup( a->val.s.s, a->val.s.i );
-                    t->scrape = announceToScrape( a->val.s.s );
-                    /*fprintf( stderr, "tier %d: %s\n", i, a->val.s.s );*/
+                    t->announce = tr_strdup( str );
+                    t->scrape = announceToScrape( str );
+                    /*fprintf( stderr, "tier %d: %s\n", i, str );*/
                 }
             }
         }

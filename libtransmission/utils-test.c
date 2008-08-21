@@ -106,13 +106,6 @@ main( void )
     tr_free( in );
     tr_free( out );
 
-    /* tr_stringEndsWith */
-    check( tr_stringEndsWith( "the", "the" ) );
-    check( tr_stringEndsWith( "dress", "dress" ) );
-    check( tr_stringEndsWith( "address", "dress" ) );
-    check( !tr_stringEndsWith( "foo.bin", "gfoo.bin" ) );
-    check( !tr_stringEndsWith( "xyz", "xyw" ) );
-
     /* simple bitfield tests */
     for( l=0; l<NUM_LOOPS; ++l )
         if(( i = test_bitfields( )))

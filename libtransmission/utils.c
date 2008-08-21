@@ -190,7 +190,7 @@ tr_deepLog( const char * file, int line, const char * name, const char * fmt, ..
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
         evbuffer_add_printf( buf, " (%s:%d)\n", basename(myfile), line );
-        fwrite( EVBUFFER_DATA(buf), 1, EVBUFFER_LENGTH(buf), fp );
+        fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
 
         tr_free( myfile );
         evbuffer_free( buf );
@@ -543,7 +543,7 @@ tr_buildPath ( char *buf, size_t buflen, const char *first_element, ... )
         element = (const char*) va_arg( vl, const char* );
     }
     if( EVBUFFER_LENGTH(evbuf) )
-        tr_strlcpy( buf, (char*)EVBUFFER_DATA(evbuf), buflen );
+        tr_strlcpy( buf, EVBUFFER_DATA( evbuf ), buflen );
     else
         *buf = '\0';
 
@@ -664,7 +664,7 @@ tr_strdup_printf( const char * fmt, ... )
     va_start( ap, fmt );
 
     if( evbuffer_add_vprintf( buf, fmt, ap ) != -1 )
-        ret = tr_strdup( (char*)EVBUFFER_DATA( buf ) );
+        ret = tr_strdup( EVBUFFER_DATA( buf ) );
 
     va_end( ap );
     evbuffer_free( buf );
@@ -938,14 +938,6 @@ tr_wait( uint64_t delay_milliseconds )
 ***/
 
 int
-tr_stringEndsWith( const char * str, const char * end )
-{
-    const size_t slen = strlen( str );
-    const size_t elen = strlen( end );
-    return slen>=elen && !memcmp( &str[slen-elen], end, elen );
-}
-
-int
 tr_snprintf( char * buf, size_t buflen, const char * fmt, ... )
 {
     int len;
@@ -963,7 +955,7 @@ tr_snprintf( char * buf, size_t buflen, const char * fmt, ... )
  * Returns strlen(src); if retval >= siz, truncation occurred.
  */
 size_t
-tr_strlcpy(char *dst, const char *src, size_t siz)
+tr_strlcpy(char *dst, const void * src, size_t siz)
 {
 #ifdef HAVE_STRLCPY
     return strlcpy( dst, src, siz );
@@ -991,7 +983,7 @@ tr_strlcpy(char *dst, const char *src, size_t siz)
             ;
     }
 
-    return(s - src - 1); /* count does not include NUL */
+    return(s - (char*)src - 1); /* count does not include NUL */
 #endif
 }
 

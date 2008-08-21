@@ -558,7 +558,7 @@ cidrize( const char * acl )
     }
 
     /* the -1 is to eat the final ", " */
-    ret = tr_strndup( (char*) EVBUFFER_DATA(out), EVBUFFER_LENGTH(out)-1 );
+    ret = tr_strndup( EVBUFFER_DATA( out ), EVBUFFER_LENGTH( out ) - 1 );
     evbuffer_free( out );
     return ret;
 }

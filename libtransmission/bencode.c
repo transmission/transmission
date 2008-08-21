@@ -912,7 +912,7 @@ tr_bencSave( const tr_benc * top, int * len )
     
     if( len )
         *len = EVBUFFER_LENGTH( out );
-    ret = tr_strndup( (char*) EVBUFFER_DATA( out ), EVBUFFER_LENGTH( out ) );
+    ret = tr_strndup( EVBUFFER_DATA( out ), EVBUFFER_LENGTH( out ) );
     evbuffer_free( out );
     return ret;
 }
@@ -1221,7 +1221,7 @@ tr_bencSaveAsJSON( const tr_benc * top, int * len )
         evbuffer_add_printf( data.out, "\n" );
     if( len )
         *len = EVBUFFER_LENGTH( data.out );
-    ret = tr_strndup( (char*) EVBUFFER_DATA( data.out ), EVBUFFER_LENGTH( data.out ) );
+    ret = tr_strndup( EVBUFFER_DATA( data.out ), EVBUFFER_LENGTH( data.out ) );
     evbuffer_free( data.out );
     return ret;
 }

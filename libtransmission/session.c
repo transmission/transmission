@@ -104,6 +104,14 @@ tr_sessionSetEncryption( tr_session * session, tr_encryption_mode mode )
 ****
 ***/
 
+static int
+tr_stringEndsWith( const char * str, const char * end )
+{
+    const size_t slen = strlen( str );
+    const size_t elen = strlen( end );
+    return slen>=elen && !memcmp( &str[slen-elen], end, elen );
+}
+
 static void
 loadBlocklists( tr_session * session )
 {

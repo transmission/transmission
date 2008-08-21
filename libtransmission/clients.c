@@ -375,7 +375,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
                 evbuffer_add_printf( out, "%%%02X", (unsigned int)*in );
         }
 
-        tr_strlcpy( buf, (const char*)EVBUFFER_DATA(out), buflen );
+        tr_strlcpy( buf, EVBUFFER_DATA( out ), buflen );
         evbuffer_free( out );
     }
 }

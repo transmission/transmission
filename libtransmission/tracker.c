@@ -633,7 +633,7 @@ createRequest( tr_session * session, tr_tracker * tracker, int reqtype )
     req->session = session;
     req->reqtype = reqtype;
     req->done_func =  isStopping ? onStoppedResponse : onTrackerResponse;
-    req->url = tr_strdup( ( char * ) EVBUFFER_DATA( url ) );
+    req->url = tr_strdup( EVBUFFER_DATA( url ) );
     memcpy( req->torrent_hash, tracker->hash, SHA_DIGEST_LENGTH );
 
     evbuffer_free( url );
@@ -654,7 +654,7 @@ createScrape( tr_session * session, tr_tracker * tracker )
     req = tr_new0( struct tr_tracker_request, 1 );
     req->session = session;
     req->reqtype = TR_REQ_SCRAPE;
-    req->url = tr_strdup( ( char * ) EVBUFFER_DATA( url ) );
+    req->url = tr_strdup( EVBUFFER_DATA( url ) );
     req->done_func = onScrapeResponse;
     memcpy( req->torrent_hash, tracker->hash, SHA_DIGEST_LENGTH );
 

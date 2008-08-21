@@ -193,10 +193,8 @@ char* tr_strdup_printf( const char * fmt, ... )  TR_GNUC_PRINTF( 1, 2 ) TR_GNUC_
 char* tr_base64_encode( const void * input, int inlen, int *outlen ) TR_GNUC_MALLOC;
 char* tr_base64_decode( const void * input, int inlen, int *outlen ) TR_GNUC_MALLOC;
 
-size_t tr_strlcpy( char * dst, const char * src, size_t siz );
+size_t tr_strlcpy( char * dst, const void * src, size_t siz );
 int tr_snprintf( char * buf, size_t buflen, const char * fmt, ... );
-
-int   tr_stringEndsWith( const char * string, const char * end );
 
 const char* tr_strerror( int );
 
