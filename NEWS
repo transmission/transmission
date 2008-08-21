@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.33 (2008/08/xx)
+1.33 (2008/08/20)
 http://trac.transmissionbt.com/query?group=component&milestone=1.33
 - All Platforms
    + Fix crash from malicious torrent files with a piece size of zero
