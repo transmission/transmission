@@ -18,8 +18,11 @@
 				<tr>
 					<td>
 						<ul>
-						<li>Fix a bug introduced in 1.30 that caused poor tracker communication</li>
-						<li>Creating torrent files for files >= 2 GB will result in 2 MB pieces</li>
+						<li>Fix crash from malicious torrent files with a piece size of zero</li>
+						<li>When creating new torrent files, change behavior that caused "Multi tracker torrents are not allowed" warning on one tracker</li>
+						<li>Fix Unicode handling in the JSON parser/generator</li>
+						<li>Fix memory error when reading KTorrent's PEX messages</li>
+						<li>Fix small memory leaks</li>
 						</ul>
 					</td>
 				</tr>
@@ -34,12 +37,13 @@
 				<tr>
 					<td>
 						<ul>
-						<li>Fix bug where the proxy type was changed from SOCKS5 to SOCKS4 on launch</li>
+						<li>Rephrase "data not fully available" to "remaining time unknown"</li>
+						<li>Fix bug where torrent file creation would fail because an extra blank tracker address was inserted</li>
 						</ul>
 					</td>
 				</tr>
 			</table>
-			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?group=component&milestone=1.32&order=severity">click here</a>.</p>
+			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?group=component&milestone=1.33&order=severity">click here</a>.</p>
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
 					<td class="red">
