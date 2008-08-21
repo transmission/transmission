@@ -107,6 +107,8 @@ struct tr_tracker
 
     time_t manualAnnounceAllowedAt;
     time_t reannounceAt;
+
+    /* 0==never, 1==in progress, other values==when to scrape */
     time_t scrapeAt;
 
     time_t lastScrapeTime;
@@ -717,9 +719,6 @@ invokeRequest( void * vreq )
             t->lastAnnounceTime = now;
             t->reannounceAt = 1;
             t->manualAnnounceAllowedAt = 1;
-            t->scrapeAt = req->reqtype == TR_REQ_STOPPED
-                        ? now + t->scrapeIntervalSec + t->randOffset
-                        : 0;
         }
     }
 
@@ -731,13 +730,10 @@ invokeRequest( void * vreq )
     freeRequest( req );
 }
 
-static void ensureGlobalsExist( tr_session * );
-
 static void
 enqueueScrape( tr_session * session, tr_tracker * tracker )
 {
     struct tr_tracker_request * req;
-    ensureGlobalsExist( session );
     req = createScrape( session, tracker );
     tr_runInEventThread( session, invokeRequest, req );
 }
@@ -746,7 +742,6 @@ static void
 enqueueRequest( tr_session * session, tr_tracker * tracker, int reqtype )
 {
     struct tr_tracker_request * req;
-    ensureGlobalsExist( session );
     req = createRequest( session, tracker, reqtype );
     tr_runInEventThread( session, invokeRequest, req );
 }
@@ -856,6 +851,8 @@ tr_trackerNew( const tr_torrent * torrent )
 {
     const tr_info * info = &torrent->info;
     tr_tracker * t;
+
+    ensureGlobalsExist( torrent->handle );
 
     t = tr_new0( tr_tracker, 1 );
     t->publisher = tr_publisherNew( );
