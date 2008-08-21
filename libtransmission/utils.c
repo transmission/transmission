@@ -54,7 +54,8 @@ static int            messageQueuing = FALSE;
 static tr_msg_list *  messageQueue = NULL;
 static tr_msg_list ** messageQueueTail = &messageQueue;
 
-void tr_msgInit( void )
+void
+tr_msgInit( void )
 {
     if( !messageLock )
          messageLock = tr_lockNew( );
@@ -326,22 +327,6 @@ tr_set_compare( const void * va, size_t aCount,
 
 int
 tr_compareUint64( uint64_t a, uint64_t b )
-{
-    if( a < b ) return -1;
-    if( a > b ) return 1;
-    return 0;
-}
-
-int
-tr_compareDouble( double a, double b )
-{
-    if( a < b ) return -1;
-    if( a > b ) return 1;
-    return 0;
-}
-
-int
-tr_compareTime( time_t a, time_t b )
 {
     if( a < b ) return -1;
     if( a > b ) return 1;

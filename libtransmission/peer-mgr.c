@@ -1553,6 +1553,14 @@ struct ChokeData
 };
 
 static int
+tr_compareDouble( double a, double b )
+{
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
+static int
 compareChoke( const void * va, const void * vb )
 {
     const struct ChokeData * a = va;

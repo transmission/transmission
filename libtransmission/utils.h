@@ -213,8 +213,6 @@ void tr_set_compare( const void * a, size_t aCount,
                      void * userData );
                     
 int tr_compareUint64( uint64_t a, uint64_t b );
-int tr_compareDouble( double a, double b );
-int tr_compareTime( time_t a, time_t b );
 
 int tr_strcmp( const void * a, const void * b );
 int tr_strcasecmp( const char * a, const char * b );
