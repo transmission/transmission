@@ -118,6 +118,14 @@ struct peer_request
 };
 
 static int
+tr_compareUint32( uint32_t a, uint32_t b )
+{
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
+static int
 compareRequest( const void * va, const void * vb )
 {
     int i;

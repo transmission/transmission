@@ -184,7 +184,7 @@ torrentIsLocked( const Torrent * t )
 static int
 compareAddresses( const struct in_addr * a, const struct in_addr * b )
 {
-    return tr_compareUint32( a->s_addr, b->s_addr );
+    return a->s_addr - b->s_addr;
 }
 
 static int
@@ -1767,7 +1767,7 @@ compareCandidates( const void * va, const void * vb )
     if( a->piece_data_time > b->piece_data_time ) return -1;
     if( a->piece_data_time < b->piece_data_time ) return  1;
 
-    if(( i = tr_compareUint16( a->numFails, b->numFails )))
+    if(( i = a->numFails - b->numFails ))
         return i;
 
     if( a->time != b->time )

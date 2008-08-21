@@ -183,7 +183,6 @@ void tr_wait( uint64_t delay_milliseconds );
 
 void* tr_malloc  ( size_t ) TR_GNUC_MALLOC;
 void* tr_malloc0 ( size_t ) TR_GNUC_MALLOC;
-void* tr_calloc  ( size_t nmemb, size_t size ) TR_GNUC_MALLOC;
 void  tr_free    ( void* );
 
 char* tr_strdup( const void * str ) TR_GNUC_MALLOC;
@@ -213,8 +212,6 @@ void tr_set_compare( const void * a, size_t aCount,
                      tr_set_func in_both_cb,
                      void * userData );
                     
-int tr_compareUint16( uint16_t a, uint16_t b );
-int tr_compareUint32( uint32_t a, uint32_t b );
 int tr_compareUint64( uint64_t a, uint64_t b );
 int tr_compareDouble( double a, double b );
 int tr_compareTime( time_t a, time_t b );

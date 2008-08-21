@@ -325,22 +325,6 @@ tr_set_compare( const void * va, size_t aCount,
 ***/
 
 int
-tr_compareUint16( uint16_t a, uint16_t b )
-{
-    if( a < b ) return -1;
-    if( a > b ) return 1;
-    return 0;
-}
-
-int
-tr_compareUint32( uint32_t a, uint32_t b )
-{
-    if( a < b ) return -1;
-    if( a > b ) return 1;
-    return 0;
-}
-
-int
 tr_compareUint64( uint64_t a, uint64_t b )
 {
     if( a < b ) return -1;
@@ -672,12 +656,6 @@ tr_strdup_printf( const char * fmt, ... )
 }
 
 void*
-tr_calloc( size_t nmemb, size_t size )
-{
-    return nmemb && size ? calloc( nmemb, size ) : NULL;
-}
-
-void*
 tr_malloc( size_t size )
 {
     return size ? malloc( size ) : NULL;
@@ -724,7 +702,7 @@ tr_bitfieldNew( size_t bitCount )
 tr_bitfield*
 tr_bitfieldDup( const tr_bitfield * in )
 {
-    tr_bitfield * ret = calloc( 1, sizeof(tr_bitfield) );
+    tr_bitfield * ret = tr_new0( tr_bitfield, 1 );
     ret->bitCount = in->bitCount;
     ret->byteCount = in->byteCount;
     ret->bits = tr_memdup( in->bits, in->byteCount );
