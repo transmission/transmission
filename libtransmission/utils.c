@@ -357,6 +357,41 @@ tr_strcasecmp( const char * a, const char * b )
 #endif
 }
 
+/**
+***
+**/
+
+#ifdef DISABLE_GETTEXT
+
+const char*
+tr_strip_positional_args( const char* str )
+{
+    static size_t bufsize = 0;
+    static char * buf = NULL;
+    const size_t len = strlen( str );
+    char * out;
+
+    if( bufsize < len ) {
+        bufsize = len * 2;
+        buf = tr_renew( char, buf, bufsize );
+    }
+
+    for( out=buf; *str; ++str ) {
+        *out++ = *str;
+        if( ( *str == '%' ) && isdigit( str[1] ) ) {
+            const char * tmp = str + 1;
+            while( isdigit( *tmp ) )
+                ++tmp;
+            if( *tmp == '$' )
+                str = tmp;
+        }
+    }
+    *out = '\0';
+
+    return buf;
+}
+
+#endif
 
 /**
 ***

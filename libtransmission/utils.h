@@ -91,6 +91,13 @@
 #endif
 #endif
 
+/* #define DISABLE_GETTEXT */
+#ifdef DISABLE_GETTEXT
+const char* tr_strip_positional_args( const char* fmt );
+#undef _
+#define _(a) tr_strip_positional_args(a)
+#endif
+
 #define tr_nerr( n, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, n, ## a )
 #define tr_ninf( n, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, n, ## a )
 #define tr_ndbg( n, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, n, ## a )
