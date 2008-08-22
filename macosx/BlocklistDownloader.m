@@ -151,6 +151,8 @@
 
 - (void) finishDownloadSuccess
 {
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    
     //change to indeterminate while processing
     [fProgressBar setIndeterminate: YES];
     [fProgressBar startAnimation: self];
@@ -172,6 +174,8 @@
     
     [NSApp endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
+    
+    [pool release];
     [self release];
 }
 
