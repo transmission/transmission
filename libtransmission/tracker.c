@@ -398,7 +398,8 @@ onTrackerResponse( tr_session    * session,
         const int interval = t->announceIntervalSec + t->randOffset;
         const time_t now = time ( NULL );
         dbgmsg( t->name, "request succeeded. reannouncing in %d seconds", interval );
-        t->scrapeAt = now + t->scrapeIntervalSec + t->randOffset;
+        if( t->scrapeAt <= now )
+            t->scrapeAt = now + t->scrapeIntervalSec + t->randOffset;
         t->reannounceAt = now + interval;
         t->manualAnnounceAllowedAt = now + t->announceMinIntervalSec;
 
@@ -730,13 +731,10 @@ invokeRequest( void * vreq )
     freeRequest( req );
 }
 
-static void ensureGlobalsExist( tr_session * );
-
 static void
 enqueueScrape( tr_session * session, tr_tracker * tracker )
 {
     struct tr_tracker_request * req;
-    ensureGlobalsExist( session );
     req = createScrape( session, tracker );
     tr_runInEventThread( session, invokeRequest, req );
 }
@@ -745,7 +743,6 @@ static void
 enqueueRequest( tr_session * session, tr_tracker * tracker, int reqtype )
 {
     struct tr_tracker_request * req;
-    ensureGlobalsExist( session );
     req = createRequest( session, tracker, reqtype );
     tr_runInEventThread( session, invokeRequest, req );
 }
@@ -855,6 +852,8 @@ tr_trackerNew( const tr_torrent * torrent )
 {
     const tr_info * info = &torrent->info;
     tr_tracker * t;
+
+    ensureGlobalsExist( torrent->handle );
 
     t = tr_new0( tr_tracker, 1 );
     t->publisher = tr_publisherNew( );
