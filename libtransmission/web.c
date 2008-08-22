@@ -181,6 +181,7 @@ addTask( void * vtask )
         curl_easy_setopt( ch, CURLOPT_FOLLOWLOCATION, 1 );
         curl_easy_setopt( ch, CURLOPT_MAXREDIRS, 5 );
         curl_easy_setopt( ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+        curl_easy_setopt( ch, CURLOPT_VERBOSE, getenv( "TR_CURL_VERBOSE" ) != NULL );
         if( task->range )
             curl_easy_setopt( ch, CURLOPT_RANGE, task->range );
         else /* don't set encoding if range is sent; it messes up binary data */
