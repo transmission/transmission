@@ -739,7 +739,7 @@ refillPulse( void * vtorrent )
         /* maybe one of the webseeds can do it */
         for( j=0; !handled && j<webseedCount; )
         {
-            const int val = tr_webseedAddRequest( webseeds[j], piece );
+            const tr_addreq_t val = tr_webseedAddRequest( webseeds[j], piece );
             switch( val )
             {
                 case TR_ADDREQ_FULL:

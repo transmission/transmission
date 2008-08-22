@@ -230,7 +230,7 @@ requestNextChunk( tr_webseed * w )
     tr_free( url );
 }
 
-int
+tr_addreq_t
 tr_webseedAddRequest( tr_webseed        * w,
                       tr_piece_index_t    piece )
 {
