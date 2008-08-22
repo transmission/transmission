@@ -142,7 +142,7 @@ tr_stupidRandInt( int sup )
     static int init = 0;
     assert( sup > 0 );
 
-    if ( !init )
+    if( !init )
     {
         srand( tr_date() );
         init = 1;
@@ -184,7 +184,7 @@ torrentIsLocked( const Torrent * t )
 static int
 compareAddresses( const struct in_addr * a, const struct in_addr * b )
 {
-    if (a->s_addr != b->s_addr)
+    if( a->s_addr != b->s_addr )
         return a->s_addr < b->s_addr ? -1 : 1;
 
     return 0;
@@ -452,7 +452,7 @@ tr_peerMgrGenerateAllowedSet( const uint32_t         k,         /* number of pie
             uint32_t j = i * 4;                                /* (5) */
             uint32_t y = ntohl(*(uint32_t*)(x+j));             /* (6) */
             uint32_t index = y % sz;                           /* (7) */
-            if ( !tr_bitfieldHas( a, index ) ) {               /* (8) */
+            if( !tr_bitfieldHas( a, index ) ) {                /* (8) */
                 tr_bitfieldAdd( a, index );                    /* (9) */
                 ++a_size;
             }
@@ -569,11 +569,11 @@ compareRefillPiece (const void * aIn, const void * bIn)
         return a->priority > b->priority ? -1 : 1;
 
     /* otherwise if one has fewer peers, it goes first */
-    if (a->peerCount != b->peerCount)
+    if( a->peerCount != b->peerCount )
         return a->peerCount < b->peerCount ? -1 : 1;
 
     /* otherwise go with our random seed */
-    if (a->random != b->random)
+    if( a->random != b->random )
         return a->random < b->random ? -1 : 1;
 
     return 0;
@@ -1777,8 +1777,15 @@ compareCandidates( const void * va, const void * vb )
     const struct peer_atom * a = * (const struct peer_atom**) va;
     const struct peer_atom * b = * (const struct peer_atom**) vb;
 
+    /* <Charles> Here we would probably want to try reconnecting to
+     * peers that had most recently given us data. Lots of users have
+     * trouble with resets due to their routers and/or ISPs. This way we
+     * can quickly recover from an unwanted reset. So we sort
+     * piece_data_time in descending order.
+     */
+
     if( a->piece_data_time != b->piece_data_time )
-        return a->piece_data_time < b->piece_data_time ? -1 : 1;
+        return a->piece_data_time < b->piece_data_time ? 1 : -1;
 
     if( a->numFails != b->numFails )
         return a->numFails < b->numFails ? -1 : 1;
