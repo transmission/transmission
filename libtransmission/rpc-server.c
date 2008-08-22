@@ -31,7 +31,7 @@
 #include "utils.h"
 
 #define MY_NAME "RPC Server"
-#define MY_REALM "Transmission RPC Server"
+#define MY_REALM "Transmission"
 
 #define ACTIVE_INTERVAL_MSEC 40
 #define INACTIVE_INTERVAL_MSEC 200
