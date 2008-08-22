@@ -44,7 +44,7 @@ void         tr_peerMsgsCancel( tr_peermsgs * msgs,
 
 void         tr_peerMsgsFree( tr_peermsgs* );
 
-int          tr_peerMsgsAddRequest( tr_peermsgs      * peer,
+tr_addreq_t  tr_peerMsgsAddRequest( tr_peermsgs      * peer,
                                     tr_piece_index_t   piece );
 
 void         tr_peerMsgsUnsubscribe ( tr_peermsgs       * peer,

@@ -866,7 +866,7 @@ requestQueueIsFull( const tr_peermsgs * msgs )
     return msgs->clientWillAskFor.count >= req_max;
 }
 
-int
+tr_addreq_t
 tr_peerMsgsAddRequest( tr_peermsgs       * msgs,
                        tr_piece_index_t    piece )
 {

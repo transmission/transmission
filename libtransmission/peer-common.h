@@ -20,14 +20,14 @@
 #include "transmission.h"
 #include "publish.h"
 
-enum
+typedef enum
 {
     TR_ADDREQ_OK=0,
     TR_ADDREQ_FULL,
     TR_ADDREQ_DUPLICATE,
     TR_ADDREQ_MISSING,
     TR_ADDREQ_CLIENT_CHOKED
-};
+} tr_addreq_t;
 
 /**
 ***  Peer Publish / Subscribe

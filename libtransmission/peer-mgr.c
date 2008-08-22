@@ -715,7 +715,7 @@ refillPulse( void * vtorrent )
         /* find a peer who can ask for this piece */
         for( j=0; !handled && j<peerCount; )
         {
-            const int val = tr_peerMsgsAddRequest( peers[j]->msgs, piece );
+            const tr_addreq_t val = tr_peerMsgsAddRequest( peers[j]->msgs, piece );
             switch( val )
             {
                 case TR_ADDREQ_FULL: 
