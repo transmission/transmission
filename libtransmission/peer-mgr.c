@@ -184,7 +184,10 @@ torrentIsLocked( const Torrent * t )
 static int
 compareAddresses( const struct in_addr * a, const struct in_addr * b )
 {
-    return tr_compareUint32( a->s_addr, b->s_addr );
+    if (a->s_addr != b->s_addr)
+        return a->s_addr < b->s_addr ? -1 : 1;
+
+    return 0;
 }
 
 static int
@@ -564,13 +567,16 @@ compareRefillPiece (const void * aIn, const void * bIn)
     /* if one piece has a higher priority, it goes first */
     if( a->priority != b->priority )
         return a->priority > b->priority ? -1 : 1;
-   
+
     /* otherwise if one has fewer peers, it goes first */
     if (a->peerCount != b->peerCount)
         return a->peerCount < b->peerCount ? -1 : 1;
 
     /* otherwise go with our random seed */
-    return a->random - b->random;
+    if (a->random != b->random)
+        return a->random < b->random ? -1 : 1;
+
+    return 0;
 }
 
 static int
@@ -1771,8 +1777,8 @@ compareCandidates( const void * va, const void * vb )
     const struct peer_atom * a = * (const struct peer_atom**) va;
     const struct peer_atom * b = * (const struct peer_atom**) vb;
 
-    if( a->piece_data_time > b->piece_data_time ) return -1;
-    if( a->piece_data_time < b->piece_data_time ) return  1;
+    if( a->piece_data_time != b->piece_data_time )
+        return a->piece_data_time < b->piece_data_time ? -1 : 1;
 
     if( a->numFails != b->numFails )
         return a->numFails < b->numFails ? -1 : 1;
