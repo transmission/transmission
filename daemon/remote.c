@@ -32,7 +32,7 @@
 #define DEFAULT_HOST "localhost"
 #define DEFAULT_PORT TR_DEFAULT_RPC_PORT
 
-enum { TAG_LIST, TAG_DETAILS, TAG_FILES };
+enum { TAG_LIST, TAG_DETAILS, TAG_FILES, TAG_PEERS };
 
 static const char*
 getUsage( void )
@@ -81,6 +81,7 @@ static tr_option opts[] =
     { 'w', "download-dir", "Set the default download folder", "w", 1, "<path>" },
     { 'x', "pex",          "Enable peer exchange (PEX)", "x", 0, NULL },
     { 'X', "no-pex",       "Disable peer exchange (PEX)", "X", 0, NULL },
+    { 'z', "peers",        "List the current torrent's peers", "z", 0, NULL },
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
@@ -323,6 +324,11 @@ readargs( int argc, const char ** argv )
                       break;
             case 'X': tr_bencDictAddStr( &top, "method", "session-set" );
                       tr_bencDictAddInt( args, "pex-allowed", 0 );
+                      break;
+            case 'z': tr_bencDictAddStr( &top, "method", "torrent-get" );
+                      tr_bencDictAddInt( &top, "tag", TAG_PEERS );
+                      fields = tr_bencDictAddList( args, "fields", 1 );
+                      tr_bencListAddStr( fields, "peers" );
                       break;
             case 900: tr_bencDictAddStr( &top, "method", "torrent-set" );
                       addIdArg( args, id );
@@ -704,6 +710,38 @@ printFileList( tr_benc * top )
 }
 
 static void
+printPeerList( tr_benc * top )
+{
+    tr_benc *args, *list;
+
+    if( ( tr_bencDictFindDict( top, "arguments", &args ) ) &&
+        ( tr_bencDictFindList( args, "peers", &list ) ) )
+    {
+        int i, n;
+        printf( "%-20s  %-12s  %-5s  %5s  %s\n",
+                "Address", "Flags", "Down", "Up", "Client" );
+        for( i=0, n=tr_bencListSize( list ); i<n; ++i )
+        {
+            const char * address, * client, * flagstr;
+            int64_t rateToClient, rateToPeer;
+            tr_benc * d = tr_bencListChild( list, i );
+            if(    tr_bencDictFindStr( d, "address", &address )
+                && tr_bencDictFindStr( d, "client", &client )
+                && tr_bencDictFindStr( d, "flagstr", &flagstr )
+                && tr_bencDictFindInt( d, "rateToClient", &rateToClient )
+                && tr_bencDictFindInt( d, "rateToPeer", &rateToPeer ) )
+            {
+                printf( "%-20s  %-12s  %5.1f  %5.1f  %s\n",
+                        address, flagstr,
+                        rateToClient * 1024.0,
+                        rateToPeer * 1024.0,
+                        client );
+            }
+        }
+    }
+}
+
+static void
 printTorrentList( tr_benc * top )
 {
     tr_benc *args, *list;
@@ -773,6 +811,7 @@ processResponse( const char * host, int port,
             case TAG_FILES: printFileList( &top ); break;
             case TAG_DETAILS: printDetails( &top ); break;
             case TAG_LIST: printTorrentList( &top ); break;
+            case TAG_PEERS: printPeerList( &top ); break;
             default: if( tr_bencDictFindStr( &top, "result", &str ) ) 
                          printf( "%s:%d responded: \"%s\"\n", host, port, str );
         }

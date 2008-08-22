@@ -1514,8 +1514,8 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
         stat->from               = atom->from;
         stat->progress           = peer->progress;
         stat->isEncrypted        = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
-        stat->uploadToRate       = peer->rateToPeer;
-        stat->downloadFromRate   = peer->rateToClient;
+        stat->rateToPeer         = peer->rateToPeer;
+        stat->rateToClient       = peer->rateToClient;
         stat->peerIsChoked       = peer->peerIsChoked;
         stat->peerIsInterested   = peer->peerIsInterested;
         stat->clientIsChoked     = peer->clientIsChoked;

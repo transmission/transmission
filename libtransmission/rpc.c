@@ -203,6 +203,38 @@ addTrackers( const tr_info * info, tr_benc * trackers )
 }
 
 static void
+addPeers( const tr_torrent * tor, tr_benc * list )
+{
+    int i;
+    int peerCount;
+    tr_peer_stat * peers = tr_torrentPeers( tor, &peerCount );
+
+    tr_bencInitList( list, peerCount );
+
+    for( i=0; i<peerCount; ++i )
+    {
+        tr_benc * d = tr_bencListAddDict( list, 14 );
+        const tr_peer_stat * peer = peers + i;
+        tr_bencDictAddStr( d, "address", peer->addr );
+        tr_bencDictAddStr( d, "clientName", peer->client );
+        tr_bencDictAddInt( d, "clientIsChoked", peer->clientIsChoked );
+        tr_bencDictAddInt( d, "clientIsInterested", peer->clientIsInterested );
+        tr_bencDictAddStr( d, "flagStr", peer->flagStr );
+        tr_bencDictAddInt( d, "isDownloadingFrom", peer->isDownloadingFrom );
+        tr_bencDictAddInt( d, "isEncrypted", peer->isEncrypted );
+        tr_bencDictAddInt( d, "isIncoming", peer->isIncoming );
+        tr_bencDictAddInt( d, "isUploadingTo", peer->isUploadingTo );
+        tr_bencDictAddInt( d, "peerIsChoked", peer->peerIsChoked );
+        tr_bencDictAddInt( d, "peerIsInterested", peer->peerIsInterested );
+        tr_bencDictAddDouble( d, "progress", peer->progress );
+        tr_bencDictAddInt( d, "rateToClient", (int)(peer->rateToClient*1024.0) );
+        tr_bencDictAddInt( d, "rateToPeer", (int)(peer->rateToPeer*1024.0) );
+    }
+
+    tr_torrentPeersFree( peers, peerCount );
+}
+
+static void
 addField( const tr_torrent * tor, tr_benc * d, const char * key )
 {
     const tr_info * inf = tr_torrentInfo( tor );
@@ -270,6 +302,8 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddInt( d, key, st->nextAnnounceTime );
     else if( !strcmp( key, "nextScrapeTime" ) )
         tr_bencDictAddInt( d, key, st->nextScrapeTime );
+    else if( !strcmp( key, "peers" ) )
+        addPeers( tor, tr_bencDictAdd( d, key ) );
     else if( !strcmp( key, "peersConnected" ) )
         tr_bencDictAddInt( d, key, st->peersConnected );
     else if( !strcmp( key, "peersFrom" ) ) {

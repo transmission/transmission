@@ -143,6 +143,7 @@
    name                   | string                               | tr_info
    nextAnnounceTime       | number                               | tr_stat
    nextScrapeTime         | number                               | tr_stat
+   peers                  | array (see below)                    | n/a
    peersConnected         | number                               | tr_stat
    peersFrom              | object (see below)                   | n/a
    peersGettingFromUs     | number                               | tr_stat
@@ -151,8 +152,8 @@
    pieceCount             | tnumber                              | tr_info
    pieceSize              | tnumber                              | tr_info
    priorities             | array (see below)                    | n/a
-   rateDownload           | number                               | tr_stat
-   rateUpload             | number                               | tr_stat
+   rateDownload (B/s)     | number                               | tr_stat
+   rateUpload (B/s)       | number                               | tr_stat
    recheckProgress        | number                               | tr_stat
    scrapeResponse         | string                               | tr_stat
    scrapeURL              | string                               | tr_stat
@@ -175,37 +176,53 @@
                           |                                      |
    -----------------------+--------------------------------------+
    files                  | array of objects, each containing:   |
-                          +------------------+-------------------+
-                          | key              | type              |
-		          | bytesCompleted   | number            | tr_torrent
-		          | length           | number            | tr_info
-		          | name             | string            | tr_info
+                          +-------------------------+------------+
+                          | key                     | type       |
+                          | bytesCompleted          | number     | tr_torrent
+                          | length                  | number     | tr_info
+                          | name                    | string     | tr_info
+   -----------------------+--------------------------------------+
+   peers                  | array of objects, each containing:   |
+                          +-------------------------+------------+
+                          | address                 | string     | tr_peer_stat
+                          | clientName              | string     | tr_peer_stat
+                          | clientIsChoked          | 'boolean'  | tr_peer_stat
+                          | clientIsInterested      | 'boolean'  | tr_peer_stat
+                          | isDownloadingFrom       | 'boolean'  | tr_peer_stat
+                          | isEncrypted             | 'boolean'  | tr_peer_stat
+                          | isIncoming              | 'boolean'  | tr_peer_stat
+                          | isUploadingTo           | 'boolean'  | tr_peer_stat
+                          | peerIsChoked            | 'boolean'  | tr_peer_stat
+                          | peerIsInterested        | 'boolean'  | tr_peer_stat
+                          | progress                | 'double'   | tr_peer_stat
+                          | rateToClient (B/s)      | number     | tr_peer_stat
+                          | rateToPeer (B/s)        | number     | tr_peer_stat
    -----------------------+--------------------------------------+
    peersFrom              | an object containing:                |
-                          +------------------+-------------------+
-                          | fromCache        | number            | tr_stat
-                          | fromIncoming     | number            | tr_stat
-                          | fromPex          | number            | tr_stat
-                          | fromTracker      | number            | tr_stat
+                          +-------------------------+------------+
+                          | fromCache               | number     | tr_stat
+                          | fromIncoming            | number     | tr_stat
+                          | fromPex                 | number     | tr_stat
+                          | fromTracker             | number     | tr_stat
    -----------------------+--------------------------------------+
    priorities             | an array of tr_info.filecount        | tr_info
                           | numbers. each is the tr_priority_t   |
                           | mode for the corresponding file.     |
    -----------------------+--------------------------------------+
    trackers               | array of objects, each containing:   |
-                          +------------------+-------------------+
-                          | announce         | string            | tr_info
-                          | scrape           | string            | tr_info
-                          | tier             | number            | tr_info
+                          +-------------------------+------------+
+                          | announce                | string     | tr_info
+                          | scrape                  | string     | tr_info
+                          | tier                    | number     | tr_info
    -----------------------+--------------------------------------+
    wanted                 | an array of tr_info.fileCount        | tr_info
                           | 'booleans' true if the corresponding |
                           | file is to be downloaded.            |
    -----------------------+--------------------------------------+
    webseeds               | an array of strings:                 |
-                          +------------------+-------------------+
-                          | webseed          | string            | tr_info
-                          +------------------+-------------------+
+                          +-------------------------+------------+
+                          | webseed                 | string     | tr_info
+                          +-------------------------+------------+
 
    Example:
 

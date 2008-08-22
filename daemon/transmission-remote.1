@@ -34,6 +34,7 @@ and
 .Op Fl v
 .Op Fl w Ar download-dir
 .Op Fl x | X
+.Op Fl z | peers
 .Ek
 .Sh DESCRIPTION
 .Nm
@@ -168,6 +169,20 @@ as the default location for newly added torrents to download files to.
 Enable peer exchange (PEX).
 .It Fl X Fl -no-pex
 Disable peer exchange (PEX).
+
+.It Fl x Fl -peers
+List the current torrent's connected peers.
+In the `status' section of the list, the following shorthand is used:
+.D1 D: Downloading from this peer
+.D1 d: We would download from this peer if they would let us
+.D1 E: Encrypted connection
+.D1 I: Peer is an incoming connection
+.D1 K: Peer has unchoked us, but we're not interested
+.D1 O: Optimistic unchoked
+.D1 U: Uploading to peer
+.D1 u: We would upload to this peer if they asked
+.D1 X: Peer was discovered through Peer Exchange (PEX)
+.D1 ?: We unchoked this peer, but they're not interested
 
 .El
 .Sh EXAMPLES

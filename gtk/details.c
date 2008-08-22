@@ -322,8 +322,8 @@ peer_row_set (GtkListStore        * store,
                       PEER_COL_CLIENT, client,
                       PEER_COL_IS_ENCRYPTED, peer->isEncrypted,
                       PEER_COL_PROGRESS, (int)(100.0*peer->progress),
-                      PEER_COL_DOWNLOAD_RATE, peer->downloadFromRate,
-                      PEER_COL_UPLOAD_RATE, peer->uploadToRate,
+                      PEER_COL_DOWNLOAD_RATE, peer->rateToClient,
+                      PEER_COL_UPLOAD_RATE, peer->rateToPeer,
                       PEER_COL_STATUS, peer->flagStr,
                       -1);
 }

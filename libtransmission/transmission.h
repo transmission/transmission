@@ -1024,8 +1024,8 @@ typedef struct tr_peer_stat
     char flagStr[32];
     
     float progress;
-    float downloadFromRate;
-    float uploadToRate;
+    float rateToPeer;
+    float rateToClient;
 }
 tr_peer_stat;
 
