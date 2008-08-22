@@ -552,7 +552,6 @@ tr_peerMgrPeerIsSeed( const tr_peerMgr       * mgr,
 struct tr_refill_piece
 {
     tr_priority_t priority;
-    int missingBlockCount;
     int random;
     uint32_t piece;
     uint32_t peerCount;
@@ -628,7 +627,6 @@ getPreferredPieces( Torrent     * t,
             setme->priority = inf->pieces[piece].priority;
             setme->peerCount = 0;
             setme->random = tr_stupidRandInt( INT_MAX );
-            setme->missingBlockCount = tr_cpMissingBlocksInPiece( tor->completion, piece );
 
             for( k=0; k<peerCount; ++k ) {
                 const tr_peer * peer = peers[k];
