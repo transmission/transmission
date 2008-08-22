@@ -68,7 +68,7 @@ enum
     KEEPALIVE_INTERVAL_SECS = 100,
 
     PEX_INTERVAL            = (90 * 1000), /* msec between sendPex() calls */
-    PEER_PULSE_INTERVAL     = (50),        /* msec between peerPulse() calls */
+    PEER_PULSE_INTERVAL     = (250),       /* msec between peerPulse() calls */
     RATE_PULSE_INTERVAL     = (250),       /* msec between ratePulse() calls */
 
     MAX_QUEUE_SIZE          = (100),
