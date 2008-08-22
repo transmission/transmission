@@ -434,7 +434,7 @@ tr_peerMgrGenerateAllowedSet( const uint32_t         k,         /* number of pie
 {
     uint8_t w[SHA_DIGEST_LENGTH + 4];
     uint8_t x[SHA_DIGEST_LENGTH];
-    tr_bitfield_t * a;
+    tr_bitfield * a;
     uint32_t a_size;
 
     *(uint32_t*)w = ntohl( htonl(ip->s_addr) & 0xffffff00 );   /* (1) */
