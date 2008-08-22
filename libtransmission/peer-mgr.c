@@ -718,12 +718,12 @@ refillPulse( void * vtorrent )
             const tr_addreq_t val = tr_peerMsgsAddRequest( peers[j]->msgs, piece );
             switch( val )
             {
-                case TR_ADDREQ_FULL: 
+                case TR_ADDREQ_FULL:
                 case TR_ADDREQ_CLIENT_CHOKED:
-                    memmove( peers+j, peers+j+1, sizeof(tr_peer*)*(--peerCount-j) );
+                    memmove( peers+j, peers + --peerCount, sizeof *peers );
                     break;
-                case TR_ADDREQ_MISSING: 
-                case TR_ADDREQ_DUPLICATE: 
+                case TR_ADDREQ_MISSING:
+                case TR_ADDREQ_DUPLICATE:
                     ++j;
                     break;
                 case TR_ADDREQ_OK:
@@ -742,8 +742,8 @@ refillPulse( void * vtorrent )
             const int val = tr_webseedAddRequest( webseeds[j], piece );
             switch( val )
             {
-                case TR_ADDREQ_FULL: 
-                    memmove( webseeds+j, webseeds+j+1, sizeof(tr_webseed*)*(--webseedCount-j) );
+                case TR_ADDREQ_FULL:
+                    memmove( webseeds+j, webseeds + --webseedCount, sizeof *webseeds );
                     break;
                 case TR_ADDREQ_OK:
                     tr_bitfieldAdd( t->requestedPieces, piece );
