@@ -358,6 +358,9 @@ tr_fdSocketCreate( int type, int isReserved )
     int s = -1;
     tr_lockLock( gFd->lock );
 
+/* FIXME */
+abort();
+
     if( isReserved || ( gFd->normal < getSocketMax( gFd ) ) )
         if( ( s = socket( AF_INET, type, 0 ) ) < 0 )
             tr_err( _( "Couldn't create socket: %s" ), tr_strerror( sockerrno ) );
