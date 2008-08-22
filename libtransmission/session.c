@@ -219,6 +219,8 @@ tr_sessionInitFull( const char        * configDir,
     signal( SIGPIPE, SIG_IGN );
 #endif
 
+abort();
+
     tr_msgInit( );
     tr_setMessageLevel( messageLevel );
     tr_setMessageQueuing( isMessageQueueingEnabled );
