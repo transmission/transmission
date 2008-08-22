@@ -149,7 +149,7 @@ tr_bencParseStr( const uint8_t  * buf,
     return TR_OK;
 }
 
-/* setting to 1 to help expose bugs with tr_bencListAdd and tr_bencDictAdd */
+/* set to 1 to help expose bugs with tr_bencListAdd and tr_bencDictAdd */
 #define LIST_SIZE 8 /* number of items to increment list/dict buffer by */
 
 static int
@@ -320,7 +320,7 @@ tr_bencParse( const void     * buf,
     int err;
     tr_ptrArray * parentStack = tr_ptrArrayNew( );
 
-    top->type = 0; /* not initialized yet */
+    top->type = 0; /* set to `uninitialized' */
     err = tr_bencParseImpl( buf, end, top, parentStack, setme_end );
     if( err )
         tr_bencFree( top ); 
@@ -348,24 +348,22 @@ tr_bencLoad( const void  * buf_in,
 ***/
 
 static int
-dictIndexOf( tr_benc * val, const char * key )
+dictIndexOf( const tr_benc * val, const char * key )
 {
-    int len, ii;
-
-    if( !tr_bencIsDict( val ) )
-        return -1;
-
-    len = strlen( key );
-    
-    for( ii = 0; ii + 1 < val->val.l.count; ii += 2 )
+    if( tr_bencIsDict( val ) )
     {
-        if( TYPE_STR  != val->val.l.vals[ii].type ||
-            len       != val->val.l.vals[ii].val.s.i ||
-            0 != memcmp( val->val.l.vals[ii].val.s.s, key, len ) )
+        int i;
+        const int len = strlen( key );
+
+        for( i=0; (i+1)<val->val.l.count; i+=2 )
         {
-            continue;
+            const tr_benc * child = val->val.l.vals + i;
+
+            if( ( child->type == TYPE_STR )
+                    && ( child->val.s.i == len )
+                    && !memcmp( child->val.s.s, key, len ) )
+                return i;
         }
-        return ii;
     }
 
     return -1;
@@ -382,7 +380,7 @@ static tr_benc*
 tr_bencDictFindType( tr_benc * val, const char * key, int type )
 {
     tr_benc * ret = tr_bencDictFind( val, key );
-    return ret && ret->type == type ? ret : NULL;
+    return ( ret && ( ret->type == type ) ) ? ret : NULL;
 }
 
 int
@@ -985,19 +983,19 @@ printIntFunc( const tr_benc * val, void * vdata )
 static void
 printStringFunc( const tr_benc * val, void * vdata )
 {
-    int ii;
+    int i;
     struct WalkPrint * data = vdata;
     printLeadingSpaces( data );
     fprintf( data->out, "string:  " );
-    for( ii = 0; val->val.s.i > ii; ii++ )
+    for( i=0; i<val->val.s.i; ++i )
     {
-        if( '\\' == val->val.s.s[ii] ) {
+        if( '\\' == val->val.s.s[i] ) {
             putc( '\\', data->out );
             putc( '\\', data->out );
-        } else if( isprint( val->val.s.s[ii] ) ) {
-            putc( val->val.s.s[ii], data->out );
+        } else if( isprint( val->val.s.s[i] ) ) {
+            putc( val->val.s.s[i], data->out );
         } else {
-            fprintf( data->out, "\\x%02x", val->val.s.s[ii] );
+            fprintf( data->out, "\\x%02x", val->val.s.s[i] );
         }
     }
     fprintf( data->out, "\n" );
