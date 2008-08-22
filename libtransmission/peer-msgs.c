@@ -120,12 +120,18 @@ struct peer_request
 static int
 compareRequest( const void * va, const void * vb )
 {
-    int i;
     const struct peer_request * a = va;
     const struct peer_request * b = vb;
-    if(( i = tr_compareUint32( a->index, b->index ))) return i;
-    if(( i = tr_compareUint32( a->offset, b->offset ))) return i;
-    if(( i = tr_compareUint32( a->length, b->length ))) return i;
+
+    if( a->index != b->index )
+        return a->index < b->index ? -1 : 1;
+
+    if( a->offset != b->offset )
+        return a->offset < b->offset ? -1 : 1;
+
+    if( a->length != b->length )
+        return a->length < b->length ? -1 : 1;
+
     return 0;
 }
 

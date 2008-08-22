@@ -219,12 +219,6 @@ void tr_set_compare( const void * a, size_t aCount,
                      tr_set_func in_both_cb,
                      void * userData );
 
-int tr_compareUint32( uint32_t a, uint32_t b );
-int tr_compareUint64( uint64_t a, uint64_t b );
-
-int tr_strcmp( const void * a, const void * b );
-int tr_strcasecmp( const char * a, const char * b );
-
 void tr_sha1_to_hex( char * out, const uint8_t * sha1 );
 
 

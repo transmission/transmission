@@ -490,14 +490,18 @@ tr_sessionCountTorrents( const tr_handle * h )
     return h->torrentCount;
 }
 
-/* close the biggest torrents first */
 static int
 compareTorrentByCur( const void * va, const void * vb )
 {
     const tr_torrent * a = *(const tr_torrent**)va;
     const tr_torrent * b = *(const tr_torrent**)vb;
-    return -tr_compareUint64( a->downloadedCur + a->uploadedCur,
-                              b->downloadedCur + b->uploadedCur );
+    const uint64_t aCur = a->downloadedCur + a->uploadedCur;
+    const uint64_t bCur = b->downloadedCur + b->uploadedCur;
+
+    if( aCur != bCur )
+        return aCur > bCur ? -1 : 1; /* close the biggest torrents first */
+
+    return 0;
 }
 
 static void
