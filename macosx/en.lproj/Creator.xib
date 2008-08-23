@@ -2,8 +2,8 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.02">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9D34</string>
-		<string key="IBDocument.InterfaceBuilderVersion">667</string>
+		<string key="IBDocument.SystemVersion">9E17</string>
+		<string key="IBDocument.InterfaceBuilderVersion">670</string>
 		<string key="IBDocument.AppKitVersion">949.33</string>
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
@@ -28,7 +28,7 @@
 			<object class="NSWindowTemplate" id="742202125">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{432, 524}, {488, 392}}</string>
+				<string key="NSWindowRect">{{581, 334}, {488, 392}}</string>
 				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle">Torrent Creator</string>
 				<string key="NSWindowClass">NSWindow</string>

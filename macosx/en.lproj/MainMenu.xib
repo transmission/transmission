@@ -8,9 +8,9 @@
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="1603"/>
 			<integer value="1480"/>
 			<integer value="2"/>
-			<integer value="1603"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -30,7 +30,7 @@
 			<object class="NSWindowTemplate" id="405103408">
 				<int key="NSWindowStyleMask">4111</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{52, 684}, {468, 196}}</string>
+				<string key="NSWindowRect">{{178, 675}, {468, 196}}</string>
 				<int key="NSWTFlags">1881669632</int>
 				<string key="NSWindowTitle">Transmission</string>
 				<string key="NSWindowClass">NSWindow</string>
