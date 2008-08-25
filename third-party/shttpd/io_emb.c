@@ -124,7 +124,7 @@ shttpd_get_header(struct shttpd_arg *arg, const char *header_name)
 	while (p < e) {
 		if ((s = strchr(p, '\n')) != NULL)
 			s[s[-1] == '\r' ? -1 : 0] = '\0';
-		if (my_strncasecmp(header_name, p, len) == 0)
+		if (_shttpd_strncasecmp(header_name, p, len) == 0)
 			return (p + len + 2);
 
 		p += strlen(p) + 1;
@@ -140,7 +140,7 @@ shttpd_get_env(struct shttpd_arg *arg, const char *env_name)
 	struct vec	*vec;
 
 	if (strcmp(env_name, "REQUEST_METHOD") == 0) {
-		return (known_http_methods[c->method].ptr);
+		return (_shttpd_known_http_methods[c->method].ptr);
 	} else if (strcmp(env_name, "REQUEST_URI") == 0) {
 		return (c->uri);
 	} else if (strcmp(env_name, "QUERY_STRING") == 0) {
@@ -159,7 +159,8 @@ shttpd_get_env(struct shttpd_arg *arg, const char *env_name)
 }
 
 void
-shttpd_get_http_version(struct shttpd_arg *arg, unsigned long *major, unsigned long *minor)
+shttpd_get_http_version(struct shttpd_arg *arg,
+		unsigned long *major, unsigned long *minor)
 {
 	struct conn *c = arg->priv;
 	
@@ -174,7 +175,7 @@ shttpd_register_uri(struct shttpd_ctx *ctx,
 	struct registered_uri	*e;
 
 	if ((e = malloc(sizeof(*e))) != NULL) {
-		e->uri			= my_strdup(uri);
+		e->uri			= _shttpd_strdup(uri);
 		e->callback.v_func	= (void (*)(void)) callback;
 		e->callback_data	= data;
 		LL_TAIL(&ctx->registered_uris, &e->link);
@@ -195,7 +196,7 @@ shttpd_get_var(const char *var, const char *buf, int buf_len,
 	for (p = buf; p + var_len < e; p++)
 		if ((p == buf || p[-1] == '&') &&
 		    p[var_len] == '=' &&
-		    !my_strncasecmp(var, p, var_len)) {
+		    !_shttpd_strncasecmp(var, p, var_len)) {
 
 			/* Point 'p' to var value, 's' to the end of value */
 			p += var_len + 1;	
@@ -203,7 +204,7 @@ shttpd_get_var(const char *var, const char *buf, int buf_len,
 				s = e;
 
 			/* URL-decode value. Return result length */
-			return (url_decode(p, s - p, value, value_len));
+			return (_shttpd_url_decode(p, s - p, value, value_len));
 		}
 
 	return (-1);
@@ -228,7 +229,7 @@ match_regexp(const char *regexp, const char *text)
 }
 
 struct registered_uri *
-is_registered_uri(struct shttpd_ctx *ctx, const char *uri)
+_shttpd_is_registered_uri(struct shttpd_ctx *ctx, const char *uri)
 {
 	struct llhead		*lp;
 	struct registered_uri	*reg_uri;
@@ -243,12 +244,12 @@ is_registered_uri(struct shttpd_ctx *ctx, const char *uri)
 }
 
 void
-setup_embedded_stream(struct conn *c, union variant func, void *data)
+_shttpd_setup_embedded_stream(struct conn *c, union variant func, void *data)
 {
 	c->loc.chan.emb.state = NULL;
 	c->loc.chan.emb.func = func;
 	c->loc.chan.emb.data = data;
-	c->loc.io_class = &io_embedded;
+	c->loc.io_class = &_shttpd_io_embedded;
 	c->loc.flags |= FLAG_R | FLAG_W |FLAG_ALWAYS_READY;
 }
 
@@ -282,7 +283,7 @@ shttpd_wakeup(const void *priv)
 	(void) send(conn->worker->ctl[1], buf, sizeof(buf), 0);
 }
 
-const struct io_class	io_embedded =  {
+const struct io_class	_shttpd_io_embedded =  {
 	"embedded",
 	do_embedded,
 	(int (*)(struct stream *, const void *, size_t)) do_embedded,

@@ -16,7 +16,7 @@
  * or -1 on error, 1 if OK.
  */
 int
-put_dir(const char *path)
+_shttpd_put_dir(const char *path)
 {
 	char		buf[FILENAME_MAX];
 	const char	*s, *p;
@@ -30,7 +30,8 @@ put_dir(const char *path)
 		buf[len] = '\0';
 
 		/* Try to create intermediate directory */
-		if (my_stat(buf, &st) == -1 && my_mkdir(buf, 0755) != 0)
+		if (_shttpd_stat(buf, &st) == -1 &&
+		    _shttpd_mkdir(buf, 0755) != 0)
 			return (-1);
 
 		/* Is path itself a directory ? */
@@ -44,6 +45,8 @@ put_dir(const char *path)
 static int
 read_dir(struct stream *stream, void *buf, size_t len)
 {
+	static const char footer[] = "</table></body></html>\n";
+
 	struct dirent	*dp = NULL;
 	char		file[FILENAME_MAX], line[FILENAME_MAX + 512],
 				size[64], mod[64];
@@ -59,10 +62,8 @@ read_dir(struct stream *stream, void *buf, size_t len)
 		if (len < sizeof(line))
 			break;
 
-		if ((dp = readdir(stream->chan.dir.dirp)) == NULL) {
-			stream->flags |= FLAG_CLOSED;
+		if ((dp = readdir(stream->chan.dir.dirp)) == NULL)
 			break;
-		}
 		DBG(("read_dir: %s", dp->d_name));
 
 		/* Do not show current dir and passwords file */
@@ -70,26 +71,27 @@ read_dir(struct stream *stream, void *buf, size_t len)
 		   strcmp(dp->d_name, HTPASSWD) == 0)
 			continue;
 
-		(void) my_snprintf(file, sizeof(file),
+		(void) _shttpd_snprintf(file, sizeof(file),
 		    "%s%s%s", stream->chan.dir.path, slash, dp->d_name);
-		(void) my_stat(file, &st);
+		(void) _shttpd_stat(file, &st);
 		if (S_ISDIR(st.st_mode)) {
-			my_snprintf(size,sizeof(size),"%s","&lt;DIR&gt;");
+			_shttpd_snprintf(size,sizeof(size),"%s","&lt;DIR&gt;");
 		} else {
 			if (st.st_size < 1024)
-				(void) my_snprintf(size, sizeof(size),
+				(void) _shttpd_snprintf(size, sizeof(size),
 				    "%lu", (unsigned long) st.st_size);
 			else if (st.st_size < 1024 * 1024)
-				(void) my_snprintf(size, sizeof(size), "%luk",
+				(void) _shttpd_snprintf(size,
+				    sizeof(size), "%luk",
 				    (unsigned long) (st.st_size >> 10)  + 1);
 			else
-				(void) my_snprintf(size, sizeof(size),
+				(void) _shttpd_snprintf(size, sizeof(size),
 				    "%.1fM", (float) st.st_size / 1048576);
 		}
 		(void) strftime(mod, sizeof(mod), "%d-%b-%Y %H:%M",
 			localtime(&st.st_mtime));
 
-		n = my_snprintf(line, sizeof(line),
+		n = _shttpd_snprintf(line, sizeof(line),
 		    "<tr><td><a href=\"%s%s%s\">%s%s</a></td>"
 		    "<td>&nbsp;%s</td><td>&nbsp;&nbsp;%s</td></tr>\n",
 		    c->uri, slash, dp->d_name, dp->d_name,
@@ -99,6 +101,13 @@ read_dir(struct stream *stream, void *buf, size_t len)
 		nwritten += n;
 		len -= n;
 	} while (dp != NULL);
+
+	/* Append proper HTML footer for the page */
+	if (dp == NULL && len >= sizeof(footer)) {
+		(void) memcpy(buf, footer, sizeof(footer));
+		nwritten += sizeof(footer);
+		stream->flags |= FLAG_CLOSED;
+	}
 
 	return (nwritten);
 }
@@ -113,13 +122,13 @@ close_dir(struct stream *stream)
 }
 
 void
-get_dir(struct conn *c)
+_shttpd_get_dir(struct conn *c)
 {
 	if ((c->loc.chan.dir.dirp = opendir(c->loc.chan.dir.path)) == NULL) {
 		(void) free(c->loc.chan.dir.path);
-		send_server_error(c, 500, "Cannot open directory");
+		_shttpd_send_server_error(c, 500, "Cannot open directory");
 	} else {
-		c->loc.io.head = my_snprintf(c->loc.io.buf, c->loc.io.size,
+		c->loc.io.head = _shttpd_snprintf(c->loc.io.buf, c->loc.io.size,
 		    "HTTP/1.1 200 OK\r\n"
 		    "Connection: close\r\n"
 		    "Content-Type: text/html; charset=utf-8\r\n\r\n"
@@ -131,12 +140,12 @@ get_dir(struct conn *c)
 		    c->uri, c->uri);
 		io_clear(&c->rem.io);
 		c->status = 200;
-		c->loc.io_class = &io_dir;
+		c->loc.io_class = &_shttpd_io_dir;
 		c->loc.flags |= FLAG_R | FLAG_ALWAYS_READY;
 	}
 }
 
-const struct io_class	io_dir =  {
+const struct io_class	_shttpd_io_dir =  {
 	"dir",
 	read_dir,
 	NULL,

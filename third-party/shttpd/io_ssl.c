@@ -29,7 +29,7 @@ struct ssl_func	ssl_sw[] = {
 };
 
 void
-ssl_handshake(struct stream *stream)
+_shttpd_ssl_handshake(struct stream *stream)
 {
 	int	n;
 
@@ -52,7 +52,7 @@ read_ssl(struct stream *stream, void *buf, size_t len)
 	assert(stream->chan.ssl.ssl != NULL);
 
 	if (!(stream->flags & FLAG_SSL_ACCEPTED))
-		ssl_handshake(stream);
+		_shttpd_ssl_handshake(stream);
 
 	if (stream->flags & FLAG_SSL_ACCEPTED)
 		nread = SSL_read(stream->chan.ssl.ssl, buf, len);
@@ -76,7 +76,7 @@ close_ssl(struct stream *stream)
 	SSL_free(stream->chan.ssl.ssl);
 }
 
-const struct io_class	io_ssl =  {
+const struct io_class	_shttpd_io_ssl =  {
 	"ssl",
 	read_ssl,
 	write_ssl,

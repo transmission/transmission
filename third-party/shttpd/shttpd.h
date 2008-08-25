@@ -7,7 +7,7 @@
  * can do whatever you want with this stuff. If we meet some day, and you think
  * this stuff is worth it, you can buy me a beer in return.
  *
- * $Id: shttpd.h,v 1.16 2008/05/31 09:02:02 drozd Exp $
+ * $Id: shttpd.h,v 1.18 2008/08/23 08:34:50 drozd Exp $
  */
 
 #ifndef SHTTPD_HEADER_INCLUDED
@@ -83,7 +83,7 @@ typedef void (*shttpd_callback_t)(struct shttpd_arg *);
 struct shttpd_ctx;
 
 struct shttpd_ctx *shttpd_init(int argc, char *argv[]);
-void shttpd_set_option(struct shttpd_ctx *, const char *opt, const char *val);
+int shttpd_set_option(struct shttpd_ctx *, const char *opt, const char *val);
 void shttpd_fini(struct shttpd_ctx *);
 void shttpd_register_uri(struct shttpd_ctx *ctx, const char *uri,
 		shttpd_callback_t callback, void *const user_data);
@@ -101,6 +101,8 @@ void shttpd_handle_error(struct shttpd_ctx *ctx, int status,
 void shttpd_register_ssi_func(struct shttpd_ctx *ctx, const char *name,
 		shttpd_callback_t func, void *const user_data);
 void shttpd_wakeup(const void *priv);
+int shttpd_join(struct shttpd_ctx *, fd_set *, fd_set *, int *max_fd);
+int  shttpd_socketpair(int sp[2]);
 
 #ifdef __cplusplus
 }

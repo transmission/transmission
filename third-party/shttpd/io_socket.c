@@ -31,7 +31,7 @@ close_socket(struct stream *stream)
 	(void) closesocket(stream->chan.sock);
 }
 
-const struct io_class	io_socket =  {
+const struct io_class	_shttpd_io_socket =  {
 	"socket",
 	read_socket,
 	write_socket,

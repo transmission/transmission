@@ -158,11 +158,14 @@ check_password(int method, const struct vec *ha1, const struct digest *digest)
 	    now - strtoul(dig->nonce, NULL, 10) > 3600 */)
 		return (0);
 
-	md5(a2, &known_http_methods[method], &digest->uri, NULL);
+	md5(a2, &_shttpd_known_http_methods[method], &digest->uri, NULL);
 	vec_a2.ptr = a2;
 	vec_a2.len = sizeof(a2);
 	md5(resp, ha1, &digest->nonce, &digest->nc,
 	    &digest->cnonce, &digest->qop, &vec_a2, NULL);
+	DBG(("%s: uri [%.*s] expected_resp [%.*s] resp [%.*s]",
+	    "check_password", digest->uri.len, digest->uri.ptr,
+	    32, resp, digest->resp.len, digest->resp.ptr));
 
 	return (!memcmp(resp, digest->resp.ptr, 32));
 }
@@ -177,20 +180,30 @@ open_auth_file(struct shttpd_ctx *ctx, const char *path)
 
 	if (ctx->options[OPT_AUTH_GPASSWD] != NULL) {
 		/* Use global passwords file */
-		my_snprintf(name, sizeof(name), "%s",
+		_shttpd_snprintf(name, sizeof(name), "%s",
 		    ctx->options[OPT_AUTH_GPASSWD]);
 	} else {
-		/* Try to find .htpasswd in requested directory */
+		/*
+		 * Try to find .htpasswd in requested directory.
+		 * Given the path, create the path to .htpasswd file
+		 * in the same directory. Find the right-most
+		 * directory separator character first. That would be the
+		 * directory name. If directory separator character is not
+		 * found, 'e' will point to 'p'.
+		 */
 		for (p = path, e = p + strlen(p) - 1; e > p; e--)
 			if (IS_DIRSEP_CHAR(*e))
 				break;
 
-		assert(IS_DIRSEP_CHAR(*e));
-		(void) my_snprintf(name, sizeof(name), "%.*s/%s",
+		/*
+		 * Make up the path by concatenating directory name and
+		 * .htpasswd file name.
+		 */
+		(void) _shttpd_snprintf(name, sizeof(name), "%.*s/%s",
 		    (int) (e - p), p, HTPASSWD);
 	}
 
-	if ((fd = my_open(name, O_RDONLY, 0)) == -1) {
+	if ((fd = _shttpd_open(name, O_RDONLY, 0)) == -1) {
 		DBG(("open_auth_file: open(%s)", name));
 	} else if ((fp = fdopen(fd, "r")) == NULL) {
 		DBG(("open_auth_file: fdopen(%s)", name));
@@ -241,7 +254,7 @@ authorize(struct conn *c, FILE *fp)
 	char		line[256];
 
 	if (auth_vec->len > 20 &&
-	    !my_strncasecmp(auth_vec->ptr, "Digest ", 7)) {
+	    !_shttpd_strncasecmp(auth_vec->ptr, "Digest ", 7)) {
 
 		parse_authorization_header(auth_vec, &digest);
 		*user_vec = digest.user;
@@ -267,7 +280,7 @@ authorize(struct conn *c, FILE *fp)
 }
 
 int
-check_authorization(struct conn *c, const char *path)
+_shttpd_check_authorization(struct conn *c, const char *path)
 {
 	FILE		*fp = NULL;
 	int		len, n, authorized = 1;
@@ -285,10 +298,11 @@ check_authorization(struct conn *c, const char *path)
 			if (n > (int) sizeof(protected_path) - 1)
 				n = sizeof(protected_path) - 1;
 
-			my_strlcpy(protected_path, p + 1, n);
+			_shttpd_strlcpy(protected_path, p + 1, n);
 
 			if ((fp = fopen(protected_path, "r")) == NULL)
-				elog(E_LOG, c, "check_auth: cannot open %s: %s",
+				_shttpd_elog(E_LOG, c,
+				    "check_auth: cannot open %s: %s",
 				    protected_path, strerror(errno));
 			break;
 		}
@@ -306,7 +320,7 @@ check_authorization(struct conn *c, const char *path)
 }
 
 int
-is_authorized_for_put(struct conn *c)
+_shttpd_is_authorized_for_put(struct conn *c)
 {
 	FILE	*fp;
 	int	ret = 0;
@@ -320,23 +334,23 @@ is_authorized_for_put(struct conn *c)
 }
 
 void
-send_authorization_request(struct conn *c)
+_shttpd_send_authorization_request(struct conn *c)
 {
 	char	buf[512];
 
-	(void) my_snprintf(buf, sizeof(buf), "Unauthorized\r\n"
+	(void) _shttpd_snprintf(buf, sizeof(buf), "Unauthorized\r\n"
 	    "WWW-Authenticate: Digest qop=\"auth\", realm=\"%s\", "
 	    "nonce=\"%lu\"", c->ctx->options[OPT_AUTH_REALM],
-	    (unsigned long) current_time);
+	    (unsigned long) _shttpd_current_time);
 
-	send_server_error(c, 401, buf);
+	_shttpd_send_server_error(c, 401, buf);
 }
 
 /*
  * Edit the passwords file.
  */
 int
-edit_passwords(const char *fname, const char *domain,
+_shttpd_edit_passwords(const char *fname, const char *domain,
 		const char *user, const char *pass)
 {
 	int		ret = EXIT_SUCCESS, found = 0;
@@ -344,7 +358,7 @@ edit_passwords(const char *fname, const char *domain,
 	char		line[512], tmp[FILENAME_MAX], ha1[32];
 	FILE		*fp = NULL, *fp2 = NULL;
 
-	(void) my_snprintf(tmp, sizeof(tmp), "%s.tmp", fname);
+	(void) _shttpd_snprintf(tmp, sizeof(tmp), "%s.tmp", fname);
 
 	/* Create the file if does not exist */
 	if ((fp = fopen(fname, "a+")))
@@ -352,9 +366,11 @@ edit_passwords(const char *fname, const char *domain,
 
 	/* Open the given file and temporary file */
 	if ((fp = fopen(fname, "r")) == NULL)
-		elog(E_FATAL, 0, "Cannot open %s: %s", fname, strerror(errno));
+		_shttpd_elog(E_FATAL, NULL,
+		    "Cannot open %s: %s", fname, strerror(errno));
 	else if ((fp2 = fopen(tmp, "w+")) == NULL)
-		elog(E_FATAL, 0, "Cannot open %s: %s", tmp, strerror(errno));
+		_shttpd_elog(E_FATAL, NULL,
+		    "Cannot open %s: %s", tmp, strerror(errno));
 
 	p.ptr = pass;
 	p.len = strlen(pass);
@@ -395,8 +411,8 @@ edit_passwords(const char *fname, const char *domain,
 	(void) fclose(fp2);
 
 	/* Put the temp file in place of real file */
-	(void) my_remove(fname);
-	(void) my_rename(tmp, fname);
+	(void) _shttpd_remove(fname);
+	(void) _shttpd_rename(tmp, fname);
 
 	return (ret);
 }

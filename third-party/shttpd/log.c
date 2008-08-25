@@ -14,7 +14,7 @@
  * Log function
  */
 void
-elog(int flags, struct conn *c, const char *fmt, ...)
+_shttpd_elog(int flags, struct conn *c, const char *fmt, ...)
 {
 	char	date[64], buf[URI_MAX];
 	int	len;
@@ -30,9 +30,9 @@ elog(int flags, struct conn *c, const char *fmt, ...)
 	}
 
 	strftime(date, sizeof(date), "%a %b %d %H:%M:%S %Y",
-	    localtime(&current_time));
+	    localtime(&_shttpd_current_time));
 
-	len = my_snprintf(buf, sizeof(buf),
+	len = _shttpd_snprintf(buf, sizeof(buf),
 	    "[%s] [error] [client %s] \"%s\" ",
 	    date, c ? inet_ntoa(c->sa.u.sin.sin_addr) : "-",
 	    c && c->request ? c->request : "-");
@@ -53,7 +53,7 @@ elog(int flags, struct conn *c, const char *fmt, ...)
 }
 
 void
-log_access(FILE *fp, const struct conn *c)
+_shttpd_log_access(FILE *fp, const struct conn *c)
 {
 	static const struct vec	dash = {"-", 1};
 
@@ -78,10 +78,10 @@ log_access(FILE *fp, const struct conn *c)
 	(void) strftime(date, sizeof(date), "%d/%b/%Y:%H:%M:%S",
 			localtime(&c->birth_time));
 
-	(void) my_snprintf(buf, sizeof(buf),
+	(void) _shttpd_snprintf(buf, sizeof(buf),
 	    "%s - %.*s [%s %+05d] \"%s\" %d %lu %s%.*s%s %s%.*s%s",
 	    inet_ntoa(c->sa.u.sin.sin_addr), user->len, user->ptr,
-	    date, tz_offset, c->request ? c->request : "-",
+	    date, _shttpd_tz_offset, c->request ? c->request : "-",
 	    c->status, (unsigned long) c->loc.io.total,
 	    q1, referer->len, referer->ptr, q1,
 	    q2, user_agent->len, user_agent->ptr, q2);

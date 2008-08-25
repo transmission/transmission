@@ -10,16 +10,16 @@
 
 /*
  * Small and portable HTTP server, http://shttpd.sourceforge.net
- * $Id: shttpd.c,v 1.44 2008/05/31 18:20:02 drozd Exp $
+ * $Id: shttpd.c,v 1.57 2008/08/23 21:00:38 drozd Exp $
  */
 
 #include "defs.h"
 
-time_t	current_time;	/* Current UTC time		*/
-int	tz_offset;	/* Time zone offset from UTC	*/
-int	exit_flag;	/* Program exit flag		*/
+time_t	_shttpd_current_time;	/* Current UTC time		*/
+int	_shttpd_tz_offset;	/* Time zone offset from UTC	*/
+int	_shttpd_exit_flag;	/* Program exit flag		*/
 
-const struct vec known_http_methods[] = {
+const struct vec _shttpd_known_http_methods[] = {
 	{"GET",		3},
 	{"POST",	4},
 	{"PUT",		3},
@@ -53,7 +53,7 @@ struct shttpd_ctx *init_ctx(const char *config_file, int argc, char *argv[]);
 static void process_connection(struct conn *, int, int);
 
 int
-is_true(const char *str)
+_shttpd_is_true(const char *str)
 {
 	static const char	*trues[] = {"1", "yes", "true", "jawohl", NULL};
 	const char		**p;
@@ -102,7 +102,7 @@ acl_destructor(struct llhead *lp)
 }
 
 int
-url_decode(const char *src, int src_len, char *dst, int dst_len)
+_shttpd_url_decode(const char *src, int src_len, char *dst, int dst_len)
 {
 	int	i, j, a, b;
 #define	HEXTOI(x)  (isdigit(x) ? x - '0' : x - 'W')
@@ -157,7 +157,7 @@ is_alias(struct shttpd_ctx *ctx, const char *uri,
 }
 
 void
-stop_stream(struct stream *stream)
+_shttpd_stop_stream(struct stream *stream)
 {
 	if (stream->io_class != NULL && stream->io_class->close != NULL)
 		stream->io_class->close(stream);
@@ -192,7 +192,7 @@ shttpd_open_listening_port(int port)
 
 	if ((sock = socket(PF_INET, SOCK_STREAM, 6)) == -1)
 		goto fail;
-	if (set_non_blocking_mode(sock) != 0)
+	if (_shttpd_set_non_blocking_mode(sock) != 0)
 		goto fail;
 	if (setsockopt(sock, SOL_SOCKET,
 	    SO_REUSEADDR,(char *) &on, sizeof(on)) != 0)
@@ -210,7 +210,7 @@ shttpd_open_listening_port(int port)
 fail:
 	if (sock != -1)
 		(void) closesocket(sock);
-	elog(E_LOG, NULL, "open_listening_port(%d): %s", port, strerror(errno));
+	_shttpd_elog(E_LOG, NULL, "open_listening_port(%d): %s", port, strerror(errno));
 	return (-1);
 }
 
@@ -218,7 +218,7 @@ fail:
  * Check whether full request is buffered Return headers length, or 0
  */
 int
-get_headers_len(const char *buf, size_t buflen)
+_shttpd_get_headers_len(const char *buf, size_t buflen)
 {
 	const char	*s, *e;
 	int		len = 0;
@@ -241,7 +241,7 @@ get_headers_len(const char *buf, size_t buflen)
  * Send error message back to a client.
  */
 void
-send_server_error(struct conn *c, int status, const char *reason)
+_shttpd_send_server_error(struct conn *c, int status, const char *reason)
 {
 	struct llhead		*lp;
 	struct error_handler	*e;
@@ -254,13 +254,14 @@ send_server_error(struct conn *c, int status, const char *reason)
 			    c->loc.io_class->close != NULL)
 				c->loc.io_class->close(&c->loc);
 			io_clear(&c->loc.io);
-			setup_embedded_stream(c, e->callback, e->callback_data);
+			_shttpd_setup_embedded_stream(c,
+			    e->callback, e->callback_data);
 			return;
 		}
 	}
 
 	io_clear(&c->loc.io);
-	c->loc.io.head = my_snprintf(c->loc.io.buf, c->loc.io.size,
+	c->loc.io.head = _shttpd_snprintf(c->loc.io.buf, c->loc.io.size,
 	    "HTTP/1.1 %d %s\r\n"
 	    "Content-Type: text/plain\r\n"
 	    "Content-Length: 12\r\n"
@@ -269,7 +270,7 @@ send_server_error(struct conn *c, int status, const char *reason)
 	    status, reason, status);
 	c->loc.content_len = 10;
 	c->status = status;
-	stop_stream(&c->loc);
+	_shttpd_stop_stream(&c->loc);
 }
 
 /*
@@ -327,7 +328,7 @@ date_to_epoch(const char *s)
 		tm.tm_year += 100;
 
 	/* Set Daylight Saving Time field */
-	tmp = localtime(&current_time);
+	tmp = localtime(&_shttpd_current_time);
 	tm.tm_isdst = tmp->tm_isdst;
 
 	return (mktime(&tm));
@@ -348,7 +349,7 @@ remove_double_dots(char *s)
 }
 
 void
-parse_headers(const char *s, int len, struct headers *parsed)
+_shttpd_parse_headers(const char *s, int len, struct headers *parsed)
 {
 	const struct http_header	*h;
 	union variant			*v;
@@ -365,7 +366,7 @@ parse_headers(const char *s, int len, struct headers *parsed)
 		/* Is this header known to us ? */
 		for (h = http_headers; h->len != 0; h++)
 			if (e - s > h->len &&
-			    !my_strncasecmp(s, h->name, h->len))
+			    !_shttpd_strncasecmp(s, h->name, h->len))
 				break;
 
 		/* If the header is known to us, store its value */
@@ -438,7 +439,8 @@ static const struct {
 };
 
 void
-get_mime_type(struct shttpd_ctx *ctx, const char *uri, int len, struct vec *vec)
+_shttpd_get_mime_type(struct shttpd_ctx *ctx,
+		const char *uri, int len, struct vec *vec)
 {
 	const char	*eq, *p = ctx->options[OPT_MIME_TYPES];
 	int		i, n, ext_len;
@@ -449,7 +451,7 @@ get_mime_type(struct shttpd_ctx *ctx, const char *uri, int len, struct vec *vec)
 			continue;
 		ext_len = eq - p;
 		if (len > ext_len && uri[len - ext_len - 1] == '.' &&
-		    !my_strncasecmp(p, &uri[len - ext_len], ext_len)) {
+		    !_shttpd_strncasecmp(p, &uri[len - ext_len], ext_len)) {
 			vec->ptr = eq + 1;
 			vec->len = p + n - vec->ptr;
 			return;
@@ -460,7 +462,7 @@ get_mime_type(struct shttpd_ctx *ctx, const char *uri, int len, struct vec *vec)
 	for (i = 0; builtin_mime_types[i].extension != NULL; i++) {
 		ext_len = builtin_mime_types[i].ext_len;
 		if (len > ext_len && uri[len - ext_len - 1] == '.' &&
-		    !my_strncasecmp(builtin_mime_types[i].extension,
+		    !_shttpd_strncasecmp(builtin_mime_types[i].extension,
 			    &uri[len - ext_len], ext_len)) {
 			vec->ptr = builtin_mime_types[i].mime_type;
 			vec->len = strlen(vec->ptr);
@@ -485,10 +487,11 @@ find_index_file(struct conn *c, char *path, size_t maxpath, struct stat *stp)
 	size_t		len;
 
 	FOR_EACH_WORD_IN_LIST(s, len) {
-		my_snprintf(buf, sizeof(buf), "%s%c%.*s",path, DIRSEP, len, s);
-		if (my_stat(buf, stp) == 0) {
-			my_strlcpy(path, buf, maxpath);
-			get_mime_type(c->ctx, s, len, &c->mime_type);
+		/* path must end with '/' character */
+		_shttpd_snprintf(buf, sizeof(buf), "%s%.*s", path, len, s);
+		if (_shttpd_stat(buf, stp) == 0) {
+			_shttpd_strlcpy(path, buf, maxpath);
+			_shttpd_get_mime_type(c->ctx, s, len, &c->mime_type);
 			return (0);
 		}
 	}
@@ -506,7 +509,7 @@ get_path_info(struct conn *c, char *path, struct stat *stp)
 {
 	char	*p, *e;
 
-	if (my_stat(path, stp) == 0)
+	if (_shttpd_stat(path, stp) == 0)
 		return (0);
 
 	p = path + strlen(path);
@@ -516,7 +519,7 @@ get_path_info(struct conn *c, char *path, struct stat *stp)
 	for (; p > e; p--)
 		if (*p == '/') {
 			*p = '\0';
-			if (!my_stat(path, stp) && !S_ISDIR(stp->st_mode)) {
+			if (!_shttpd_stat(path, stp) && !S_ISDIR(stp->st_mode)) {
 				c->path_info = p + 1;
 				return (0);
 			} else {
@@ -541,112 +544,116 @@ decide_what_to_do(struct conn *c)
 	if ((c->query = strchr(c->uri, '?')) != NULL)
 		*c->query++ = '\0';
 
-	url_decode(c->uri, strlen(c->uri), c->uri, strlen(c->uri) + 1);
+	_shttpd_url_decode(c->uri, strlen(c->uri), c->uri, strlen(c->uri) + 1);
 	remove_double_dots(c->uri);
 	
 	root = c->ctx->options[OPT_ROOT];
 	if (strlen(c->uri) + strlen(root) >= sizeof(path)) {
-		send_server_error(c, 400, "URI is too long");
+		_shttpd_send_server_error(c, 400, "URI is too long");
 		return;
 	}
 
-	(void) my_snprintf(path, sizeof(path), "%s%s", root, c->uri);
+	(void) _shttpd_snprintf(path, sizeof(path), "%s%s", root, c->uri);
 
 	/* User may use the aliases - check URI for mount point */
 	if (is_alias(c->ctx, c->uri, &alias_uri, &alias_path) != NULL) {
-		(void) my_snprintf(path, sizeof(path), "%.*s%s",
+		(void) _shttpd_snprintf(path, sizeof(path), "%.*s%s",
 		    alias_path.len, alias_path.ptr, c->uri + alias_uri.len);
 		DBG(("using alias %.*s -> %.*s", alias_uri.len, alias_uri.ptr,
 		    alias_path.len, alias_path.ptr));
 	}
 
 #if !defined(NO_AUTH)
-	if (check_authorization(c, path) != 1) {
-		send_authorization_request(c);
+	if (_shttpd_check_authorization(c, path) != 1) {
+		_shttpd_send_authorization_request(c);
 	} else
 #endif /* NO_AUTH */
-	if ((ruri = is_registered_uri(c->ctx, c->uri)) != NULL) {
-		setup_embedded_stream(c, ruri->callback, ruri->callback_data);
+	if ((ruri = _shttpd_is_registered_uri(c->ctx, c->uri)) != NULL) {
+		_shttpd_setup_embedded_stream(c,
+		    ruri->callback, ruri->callback_data);
 	} else
 	if (strstr(path, HTPASSWD)) {
 		/* Do not allow to view passwords files */
-		send_server_error(c, 403, "Forbidden");
+		_shttpd_send_server_error(c, 403, "Forbidden");
 	} else
 #if !defined(NO_AUTH)
 	if ((c->method == METHOD_PUT || c->method == METHOD_DELETE) &&
 	    (c->ctx->options[OPT_AUTH_PUT] == NULL ||
-	     !is_authorized_for_put(c))) {
-		send_authorization_request(c);
+	     !_shttpd_is_authorized_for_put(c))) {
+		_shttpd_send_authorization_request(c);
 	} else
 #endif /* NO_AUTH */
 	if (c->method == METHOD_PUT) {
-		c->status = my_stat(path, &st) == 0 ? 200 : 201;
+		c->status = _shttpd_stat(path, &st) == 0 ? 200 : 201;
 
 		if (c->ch.range.v_vec.len > 0) {
-			send_server_error(c, 501, "PUT Range Not Implemented");
-		} else if ((rc = put_dir(path)) == 0) {
-			send_server_error(c, 200, "OK");
+			_shttpd_send_server_error(c, 501,
+			    "PUT Range Not Implemented");
+		} else if ((rc = _shttpd_put_dir(path)) == 0) {
+			_shttpd_send_server_error(c, 200, "OK");
 		} else if (rc == -1) {
-			send_server_error(c, 500, "PUT Directory Error");
+			_shttpd_send_server_error(c, 500, "PUT Directory Error");
 		} else if (c->rem.content_len == 0) {
-			send_server_error(c, 411, "Length Required");
-		} else if ((c->loc.chan.fd = my_open(path, O_WRONLY | O_BINARY |
+			_shttpd_send_server_error(c, 411, "Length Required");
+		} else if ((c->loc.chan.fd = _shttpd_open(path, O_WRONLY | O_BINARY |
 		    O_CREAT | O_NONBLOCK | O_TRUNC, 0644)) == -1) {
-			send_server_error(c, 500, "PUT Error");
+			_shttpd_send_server_error(c, 500, "PUT Error");
 		} else {
 			DBG(("PUT file [%s]", c->uri));
-			c->loc.io_class = &io_file;
+			c->loc.io_class = &_shttpd_io_file;
 			c->loc.flags |= FLAG_W | FLAG_ALWAYS_READY ;
 		}
 	} else if (c->method == METHOD_DELETE) {
 		DBG(("DELETE [%s]", c->uri));
-		if (my_remove(path) == 0)
-			send_server_error(c, 200, "OK");
+		if (_shttpd_remove(path) == 0)
+			_shttpd_send_server_error(c, 200, "OK");
 		else
-			send_server_error(c, 500, "DELETE Error");
+			_shttpd_send_server_error(c, 500, "DELETE Error");
 	} else if (get_path_info(c, path, &st) != 0) {
-		send_server_error(c, 404, "Not Found");
+		_shttpd_send_server_error(c, 404, "Not Found");
 	} else if (S_ISDIR(st.st_mode) && path[strlen(path) - 1] != '/') {
-		(void) my_snprintf(buf, sizeof(buf),
+		(void) _shttpd_snprintf(buf, sizeof(buf),
 			"Moved Permanently\r\nLocation: %s/", c->uri);
-		send_server_error(c, 301, buf);
+		_shttpd_send_server_error(c, 301, buf);
 	} else if (S_ISDIR(st.st_mode) &&
 	    find_index_file(c, path, sizeof(path) - 1, &st) == -1 &&
 	    !IS_TRUE(c->ctx, OPT_DIR_LIST)) {
-		send_server_error(c, 403, "Directory Listing Denied");
+		_shttpd_send_server_error(c, 403, "Directory Listing Denied");
 	} else if (S_ISDIR(st.st_mode) && IS_TRUE(c->ctx, OPT_DIR_LIST)) {
-		if ((c->loc.chan.dir.path = my_strdup(path)) != NULL)
-			get_dir(c);
+		if ((c->loc.chan.dir.path = _shttpd_strdup(path)) != NULL)
+			_shttpd_get_dir(c);
 		else
-			send_server_error(c, 500, "GET Directory Error");
+			_shttpd_send_server_error(c, 500, "GET Directory Error");
 	} else if (S_ISDIR(st.st_mode) && !IS_TRUE(c->ctx, OPT_DIR_LIST)) {
-		send_server_error(c, 403, "Directory listing denied");
+		_shttpd_send_server_error(c, 403, "Directory listing denied");
 #if !defined(NO_CGI)
-	} else if (match_extension(path, c->ctx->options[OPT_CGI_EXTENSIONS])) {
+	} else if (_shttpd_match_extension(path,
+	    c->ctx->options[OPT_CGI_EXTENSIONS])) {
 		if (c->method != METHOD_POST && c->method != METHOD_GET) {
-			send_server_error(c, 501, "Bad method ");
-		} else if ((run_cgi(c, path)) == -1) {
-			send_server_error(c, 500, "Cannot exec CGI");
+			_shttpd_send_server_error(c, 501, "Bad method ");
+		} else if ((_shttpd_run_cgi(c, path)) == -1) {
+			_shttpd_send_server_error(c, 500, "Cannot exec CGI");
 		} else {
-			do_cgi(c);
+			_shttpd_do_cgi(c);
 		}
 #endif /* NO_CGI */
 #if !defined(NO_SSI)
-	} else if (match_extension(path, c->ctx->options[OPT_SSI_EXTENSIONS])) {
-		if ((c->loc.chan.fd = my_open(path,
+	} else if (_shttpd_match_extension(path,
+	    c->ctx->options[OPT_SSI_EXTENSIONS])) {
+		if ((c->loc.chan.fd = _shttpd_open(path,
 		    O_RDONLY | O_BINARY, 0644)) == -1) {
-			send_server_error(c, 500, "SSI open error");
+			_shttpd_send_server_error(c, 500, "SSI open error");
 		} else {
-			do_ssi(c);
+			_shttpd_do_ssi(c);
 		}
 #endif /* NO_CGI */
 	} else if (c->ch.ims.v_time && st.st_mtime <= c->ch.ims.v_time) {
-		send_server_error(c, 304, "Not Modified");
-	} else if ((c->loc.chan.fd = my_open(path,
+		_shttpd_send_server_error(c, 304, "Not Modified");
+	} else if ((c->loc.chan.fd = _shttpd_open(path,
 	    O_RDONLY | O_BINARY, 0644)) != -1) {
-		get_file(c, &st);
+		_shttpd_get_file(c, &st);
 	} else {
-		send_server_error(c, 500, "Internal Error");
+		_shttpd_send_server_error(c, 500, "Internal Error");
 	}
 }
 
@@ -656,9 +663,9 @@ set_request_method(struct conn *c)
 	const struct vec	*v;
 
 	/* Set the request method */
-	for (v = known_http_methods; v->ptr != NULL; v++)
+	for (v = _shttpd_known_http_methods; v->ptr != NULL; v++)
 		if (!memcmp(c->rem.io.buf, v->ptr, v->len)) {
-			c->method = v - known_http_methods;
+			c->method = v - _shttpd_known_http_methods;
 			break;
 		}
 
@@ -673,21 +680,21 @@ parse_http_request(struct conn *c)
 
 	s = io_data(&c->rem.io);;
 	req_len = c->rem.headers_len =
-	    get_headers_len(s, io_data_len(&c->rem.io));
+	    _shttpd_get_headers_len(s, io_data_len(&c->rem.io));
 
 	if (req_len == 0 && io_space_len(&c->rem.io) == 0) {
 		io_clear(&c->rem.io);
-		send_server_error(c, 400, "Request is too big");
+		_shttpd_send_server_error(c, 400, "Request is too big");
 	}
 
 	if (req_len == 0) {
 		return;
 	} else if (req_len < 16) {	/* Minimal: "GET / HTTP/1.0\n\n" */
-		send_server_error(c, 400, "Bad request");
+		_shttpd_send_server_error(c, 400, "Bad request");
 	} else if (set_request_method(c)) {
-		send_server_error(c, 501, "Method Not Implemented");
-	} else if ((c->request = my_strndup(s, req_len)) == NULL) {
-		send_server_error(c, 500, "Cannot allocate request");
+		_shttpd_send_server_error(c, 501, "Method Not Implemented");
+	} else if ((c->request = _shttpd_strndup(s, req_len)) == NULL) {
+		_shttpd_send_server_error(c, 500, "Cannot allocate request");
 	}
 
 	if (c->loc.flags & FLAG_CLOSED)
@@ -726,17 +733,17 @@ parse_http_request(struct conn *c)
 	/* Now comes the HTTP-Version in the form HTTP/<major>.<minor> */
 	if (sscanf(p, "HTTP/%lu.%lu%n",
 	    &c->major_version, &c->minor_version, &n) != 2 || p[n] != '\0') {
-		send_server_error(c, 400, "Bad HTTP version");
+		_shttpd_send_server_error(c, 400, "Bad HTTP version");
 	} else if (c->major_version > 1 ||
 	    (c->major_version == 1 && c->minor_version > 1)) {
-		send_server_error(c, 505, "HTTP version not supported");
+		_shttpd_send_server_error(c, 505, "HTTP version not supported");
 	} else if (uri_len <= 0) {
-		send_server_error(c, 400, "Bad URI");
+		_shttpd_send_server_error(c, 400, "Bad URI");
 	} else if ((c->uri = malloc(uri_len + 1)) == NULL) {
-		send_server_error(c, 500, "Cannot allocate URI");
+		_shttpd_send_server_error(c, 500, "Cannot allocate URI");
 	} else {
-		my_strlcpy(c->uri, (char *) start, uri_len + 1);
-		parse_headers(c->headers,
+		_shttpd_strlcpy(c->uri, (char *) start, uri_len + 1);
+		_shttpd_parse_headers(c->headers,
 		    (c->request + req_len) - c->headers, &c->ch);
 
 		/* Remove the length of request from total, count only data */
@@ -761,16 +768,16 @@ add_socket(struct worker *worker, int sock, int is_ssl)
 #endif /* NO_SSL */
 
 	sa.len = sizeof(sa.u.sin);
-	(void) set_non_blocking_mode(sock);
+	(void) _shttpd_set_non_blocking_mode(sock);
 
 	if (getpeername(sock, &sa.u.sa, &sa.len)) {
-		elog(l, NULL, "add_socket: %s", strerror(errno));
+		_shttpd_elog(l, NULL, "add_socket: %s", strerror(errno));
 #if !defined(NO_SSL)
 	} else if (is_ssl && (ssl = SSL_new(ctx->ssl_ctx)) == NULL) {
-		elog(l, NULL, "add_socket: SSL_new: %s", strerror(ERRNO));
+		_shttpd_elog(l, NULL, "add_socket: SSL_new: %s", strerror(ERRNO));
 		(void) closesocket(sock);
 	} else if (is_ssl && SSL_set_fd(ssl, sock) == 0) {
-		elog(l, NULL, "add_socket: SSL_set_fd: %s", strerror(ERRNO));
+		_shttpd_elog(l, NULL, "add_socket: SSL_set_fd: %s", strerror(ERRNO));
 		(void) closesocket(sock);
 		SSL_free(ssl);
 #endif /* NO_SSL */
@@ -780,23 +787,23 @@ add_socket(struct worker *worker, int sock, int is_ssl)
 			SSL_free(ssl);
 #endif /* NO_SSL */
 		(void) closesocket(sock);
-		elog(l, NULL, "add_socket: calloc: %s", strerror(ERRNO));
+		_shttpd_elog(l, NULL, "add_socket: calloc: %s", strerror(ERRNO));
 	} else {
 		c->rem.conn	= c->loc.conn = c;
 		c->ctx		= ctx;
 		c->worker	= worker;
 		c->sa		= sa;
-		c->birth_time	= current_time;
-		c->expire_time	= current_time + EXPIRE_TIME;
+		c->birth_time	= _shttpd_current_time;
+		c->expire_time	= _shttpd_current_time + EXPIRE_TIME;
 
 		(void) getsockname(sock, &sa.u.sa, &sa.len);
 		c->loc_port = sa.u.sin.sin_port;
 
-		set_close_on_exec(sock);
+		_shttpd_set_close_on_exec(sock);
 
 		c->loc.io_class	= NULL;
 	
-		c->rem.io_class	= &io_socket;
+		c->rem.io_class	= &_shttpd_io_socket;
 		c->rem.chan.sock = sock;
 
 		/* Set IO buffers */
@@ -806,10 +813,10 @@ add_socket(struct worker *worker, int sock, int is_ssl)
 
 #if !defined(NO_SSL)
 		if (is_ssl) {
-			c->rem.io_class	= &io_ssl;
+			c->rem.io_class	= &_shttpd_io_ssl;
 			c->rem.chan.ssl.sock = sock;
 			c->rem.chan.ssl.ssl = ssl;
-			ssl_handshake(&c->rem);
+			_shttpd_ssl_handshake(&c->rem);
 		}
 #endif /* NO_SSL */
 
@@ -851,7 +858,7 @@ pass_socket(struct shttpd_ctx *ctx, int sock, int is_ssl)
 	(void) send(lazy->ctl[1], (void *) buf, sizeof(buf), 0);
 }
 
-static void
+static int
 set_ports(struct shttpd_ctx *ctx, const char *p)
 {
 	int		sock, len, is_ssl, port;
@@ -866,14 +873,17 @@ set_ports(struct shttpd_ctx *ctx, const char *p)
 		port	= atoi(p);
 
 		if ((sock = shttpd_open_listening_port(port)) == -1) {
-			elog(E_FATAL, NULL, "cannot open port %d", port);
-		} else if ((l = calloc(1, sizeof(*l))) == NULL) {
-			(void) closesocket(sock);
-			elog(E_FATAL, NULL, "cannot allocate listener");
+			_shttpd_elog(E_LOG, NULL, "cannot open port %d", port);
+			goto fail;
 		} else if (is_ssl && ctx->ssl_ctx == NULL) {
 			(void) closesocket(sock);
-			elog(E_FATAL, NULL, "cannot add SSL socket, "
+			_shttpd_elog(E_LOG, NULL, "cannot add SSL socket, "
 			    "please specify certificate file");
+			goto fail;
+		} else if ((l = calloc(1, sizeof(*l))) == NULL) {
+			(void) closesocket(sock);
+			_shttpd_elog(E_LOG, NULL, "cannot allocate listener");
+			goto fail;
 		} else {
 			l->is_ssl = is_ssl;
 			l->sock	= sock;
@@ -882,6 +892,11 @@ set_ports(struct shttpd_ctx *ctx, const char *p)
 			DBG(("shttpd_listen: added socket %d", sock));
 		}
 	}
+
+	return (TRUE);
+fail:
+	free_list(&ctx->listeners, &listener_destructor);
+	return (FALSE);
 }
 
 static void
@@ -898,17 +913,15 @@ read_stream(struct stream *stream)
 		len = stream->content_len - stream->io.total;
 
 	/* Read from underlying channel */
-        if( stream->io_class )
-	    n = stream->io_class->read(stream, io_space(&stream->io), len);
-        else
-            n = 0;
+	assert(stream->io_class != NULL);
+	n = stream->io_class->read(stream, io_space(&stream->io), len);
 
 	if (n > 0)
 		io_inc_head(&stream->io, n);
 	else if (n == -1 && (ERRNO == EINTR || ERRNO == EWOULDBLOCK))
 		n = n;	/* Ignore EINTR and EAGAIN */
 	else if (!(stream->flags & FLAG_DONT_CLOSE))
-		stop_stream(stream);
+		_shttpd_stop_stream(stream);
 
 	DBG(("read_stream (%d %s): read %d/%d/%lu bytes (errno %d)",
 	    stream->conn->rem.chan.sock,
@@ -924,10 +937,10 @@ read_stream(struct stream *stream)
 	if (stream->content_len > 0 && stream == &stream->conn->loc) {
 		assert(stream->io.total <= stream->content_len);
 		if (stream->io.total == stream->content_len)
-			stop_stream(stream);
+			_shttpd_stop_stream(stream);
 	}
 
-	stream->conn->expire_time = current_time + EXPIRE_TIME;
+	stream->conn->expire_time = _shttpd_current_time + EXPIRE_TIME;
 }
 
 static void
@@ -939,12 +952,8 @@ write_stream(struct stream *from, struct stream *to)
 	assert(len > 0);
 
 	/* TODO: should be assert on CAN_WRITE flag */
-        if( to->io_class )
-	    n = to->io_class->write(to, io_data(&from->io), len);
-        else
-            n = 0;
-
-	to->conn->expire_time = current_time + EXPIRE_TIME;
+	n = to->io_class->write(to, io_data(&from->io), len);
+	to->conn->expire_time = _shttpd_current_time + EXPIRE_TIME;
 	DBG(("write_stream (%d %s): written %d/%d bytes (errno %d)",
 	    to->conn->rem.chan.sock,
 	    to->io_class ? to->io_class->name : "(null)", n, len, ERRNO));
@@ -954,7 +963,7 @@ write_stream(struct stream *from, struct stream *to)
 	else if (n == -1 && (ERRNO == EINTR || ERRNO == EWOULDBLOCK))
 		n = n;	/* Ignore EINTR and EAGAIN */
 	else if (!(to->flags & FLAG_DONT_CLOSE))
-		stop_stream(to);
+		_shttpd_stop_stream(to);
 }
 
 
@@ -969,7 +978,7 @@ connection_desctructor(struct llhead *lp)
 	    c->ch.connection.v_vec.len, c->ch.connection.v_vec.ptr));
 
 	if (c->request != NULL && c->ctx->access_log != NULL)
-		log_access(c->ctx->access_log, c);
+		_shttpd_log_access(c->ctx->access_log, c);
 
 	/* In inetd mode, exit if request is finished. */
 	if (IS_TRUE(c->ctx, OPT_INETD))
@@ -983,7 +992,7 @@ connection_desctructor(struct llhead *lp)
 	 * If it its 'keep-alive', then do not close the connection
 	 */
 	do_close = (c->ch.connection.v_vec.len >= vec.len &&
-	    !my_strncasecmp(vec.ptr, c->ch.connection.v_vec.ptr, vec.len)) ||
+	    !_shttpd_strncasecmp(vec.ptr,c->ch.connection.v_vec.ptr,vec.len)) ||
 	    (c->major_version < 1 ||
 	    (c->major_version >= 1 && c->minor_version < 1));
 
@@ -1002,7 +1011,7 @@ connection_desctructor(struct llhead *lp)
 		c->mime_type.len = 0;
 		(void) memset(&c->ch, 0, sizeof(c->ch));
 		io_clear(&c->loc.io);
-		c->birth_time = current_time;
+		c->birth_time = _shttpd_current_time;
 		if (io_data_len(&c->rem.io) > 0)
 			process_connection(c, 0, 0);
 	} else {
@@ -1080,7 +1089,7 @@ process_connection(struct conn *c, int remote_ready, int local_ready)
 		write_stream(&c->loc, &c->rem); 
 
 	/* Check whether we should close this connection */
-	if ((current_time > c->expire_time) ||
+	if ((_shttpd_current_time > c->expire_time) ||
 	    (c->rem.flags & FLAG_CLOSED) ||
 	    ((c->loc.flags & FLAG_CLOSED) && !io_data_len(&c->loc.io)))
 		connection_desctructor(&c->link);
@@ -1099,13 +1108,13 @@ handle_connected_socket(struct shttpd_ctx *ctx,
 {
 #if !defined(_WIN32)
 	if (sock >= (int) FD_SETSIZE) {
-		elog(E_LOG, NULL, "ctx %p: discarding "
+		_shttpd_elog(E_LOG, NULL, "ctx %p: discarding "
 		    "socket %d, too busy", ctx, sock);
 		(void) closesocket(sock);
 	} else
 #endif /* !_WIN32 */
 		if (!is_allowed(ctx, sap)) {
-		elog(E_LOG, NULL, "%s is not allowed to connect",
+		_shttpd_elog(E_LOG, NULL, "%s is not allowed to connect",
 		    inet_ntoa(sap->u.sin.sin_addr));
 		(void) closesocket(sock);
 	} else if (num_workers(ctx) > 1) {
@@ -1141,12 +1150,13 @@ do_select(int max_fd, fd_set *read_set, fd_set *write_set, int milliseconds)
 	return (n);
 }
 
-static void
+static int
 multiplex_worker_sockets(const struct worker *worker, int *max_fd,
-		fd_set *read_set, fd_set *write_set, int *milliseconds)
+		fd_set *read_set, fd_set *write_set)
 {
 	struct llhead	*lp;
 	struct conn	*c;
+	int		nowait = FALSE;
 
 	/* Add control socket */
 	add_to_set(worker->ctl[0], read_set, max_fd);
@@ -1165,7 +1175,7 @@ multiplex_worker_sockets(const struct worker *worker, int *max_fd,
 		 * CGI, check local socket for read availability
 		 */
 		if (io_space_len(&c->loc.io) && (c->loc.flags & FLAG_R) &&
-		    c->loc.io_class == &io_cgi)
+		    c->loc.io_class == &_shttpd_io_cgi)
 			add_to_set(c->loc.chan.fd, read_set, max_fd);
 
 		/*
@@ -1173,7 +1183,7 @@ multiplex_worker_sockets(const struct worker *worker, int *max_fd,
 		 * local endpoint is CGI, check local for write availability
 		 */
 		if (io_data_len(&c->rem.io) && (c->loc.flags & FLAG_W) &&
-		    c->loc.io_class == &io_cgi)
+		    c->loc.io_class == &_shttpd_io_cgi)
 			add_to_set(c->loc.chan.fd, write_set, max_fd);
 #endif /* NO_CGI */
 
@@ -1189,13 +1199,38 @@ multiplex_worker_sockets(const struct worker *worker, int *max_fd,
 		 */
 		if (io_space_len(&c->loc.io) && (c->loc.flags & FLAG_R) &&
 		    (c->loc.flags & FLAG_ALWAYS_READY))
-			*milliseconds = 0;
+			nowait = TRUE;
 		
 		if (io_data_len(&c->rem.io) && (c->loc.flags & FLAG_W) &&
 		    (c->loc.flags & FLAG_ALWAYS_READY))
-			*milliseconds = 0;
+			nowait = TRUE;
 	}
+
+	return (nowait);
 }
+
+int
+shttpd_join(struct shttpd_ctx *ctx,
+		fd_set *read_set, fd_set *write_set, int *max_fd)
+{
+	struct llhead	*lp;
+	struct listener	*l;
+	int		nowait = FALSE;
+
+	/* Add listening sockets to the read set */
+	LL_FOREACH(&ctx->listeners, lp) {
+		l = LL_ENTRY(lp, struct listener, link);
+		add_to_set(l->sock, read_set, max_fd);
+		DBG(("FD_SET(%d) (listening)", l->sock));
+	}
+
+	if (num_workers(ctx) == 1)
+		nowait = multiplex_worker_sockets(first_worker(ctx), max_fd,
+		    read_set, write_set);
+
+	return (nowait);
+}
+
 
 static void
 process_worker_sockets(struct worker *worker, fd_set *read_set)
@@ -1217,7 +1252,7 @@ process_worker_sockets(struct worker *worker, fd_set *read_set)
 				c->loc.flags &= FLAG_SUSPEND;
 				break;
 			default:
-				elog(E_FATAL, NULL, "ctx %p: ctl cmd %d",
+				_shttpd_elog(E_FATAL, NULL, "ctx %p: ctl cmd %d",
 				    worker->ctx, cmd);
 				break;
 			}
@@ -1225,10 +1260,11 @@ process_worker_sockets(struct worker *worker, fd_set *read_set)
 	/* Process all connections */
 	LL_FOREACH_SAFE(&worker->connections, lp, tmp) {
 		c = LL_ENTRY(lp, struct conn, link);
-		process_connection(c, FD_ISSET(c->rem.chan.fd, read_set),
+		process_connection(c, FD_ISSET(c->rem.chan.sock, read_set),
+		    c->loc.io_class != NULL &&
 		    ((c->loc.flags & FLAG_ALWAYS_READY)
 #if !defined(NO_CGI)
-		    || (c->loc.io_class == &io_cgi &&
+		    || (c->loc.io_class == &_shttpd_io_cgi &&
 		     FD_ISSET(c->loc.chan.fd, read_set))
 #endif /* NO_CGI */
 		    ));
@@ -1247,20 +1283,12 @@ shttpd_poll(struct shttpd_ctx *ctx, int milliseconds)
 	int		sock, max_fd = -1;
 	struct usa	sa;
 
-	current_time = time(0);
+	_shttpd_current_time = time(0);
 	FD_ZERO(&read_set);
 	FD_ZERO(&write_set);
 
-	/* Add listening sockets to the read set */
-	LL_FOREACH(&ctx->listeners, lp) {
-		l = LL_ENTRY(lp, struct listener, link);
-		add_to_set(l->sock, &read_set, &max_fd);
-		DBG(("FD_SET(%d) (listening)", l->sock));
-	}
-
-	if (num_workers(ctx) == 1)
-		multiplex_worker_sockets(first_worker(ctx), &max_fd,
-				&read_set, &write_set, &milliseconds);
+	if (shttpd_join(ctx, &read_set, &write_set, &max_fd))
+		milliseconds = 0;
 
 	if (do_select(max_fd, &read_set, &write_set, milliseconds) < 0)
 		return;;
@@ -1294,7 +1322,7 @@ shttpd_fini(struct shttpd_ctx *ctx)
 	free_list(&ctx->acl, acl_destructor);
 	free_list(&ctx->listeners, listener_destructor);
 #if !defined(NO_SSI)
-	free_list(&ctx->ssi_funcs, ssi_func_destructor);
+	free_list(&ctx->ssi_funcs, _shttpd_ssi_func_destructor);
 #endif /* !NO_SSI */
 
 	for (i = 0; i < NELEMS(ctx->options); i++)
@@ -1347,8 +1375,8 @@ shttpd_socketpair(int sp[2])
 	}
 
 	(void) closesocket(sock);
-	(void) set_non_blocking_mode(sp[0]);
-	(void) set_non_blocking_mode(sp[1]);
+	(void) _shttpd_set_non_blocking_mode(sp[0]);
+	(void) _shttpd_set_non_blocking_mode(sp[1]);
 
 #ifndef _WIN32
 	(void) fcntl(sp[0], F_SETFD, FD_CLOEXEC);
@@ -1360,19 +1388,21 @@ shttpd_socketpair(int sp[2])
 
 static int isbyte(int n) { return (n >= 0 && n <= 255); }
 
-static void
+static int
 set_inetd(struct shttpd_ctx *ctx, const char *flag)
 {
 	ctx = NULL; /* Unused */
 
-	if (is_true(flag)) {
+	if (_shttpd_is_true(flag)) {
 		shttpd_set_option(ctx, "ports", NULL);
 		(void) freopen("/dev/null", "a", stderr);
 		add_socket(first_worker(ctx), 0, 0);
 	}
+
+	return (TRUE);
 }
 
-static void
+static int
 set_uid(struct shttpd_ctx *ctx, const char *uid)
 {
 	struct passwd	*pw;
@@ -1381,45 +1411,44 @@ set_uid(struct shttpd_ctx *ctx, const char *uid)
 
 #if !defined(_WIN32)
 	if ((pw = getpwnam(uid)) == NULL)
-		elog(E_FATAL, 0, "%s: unknown user [%s]", __func__, uid);
+		_shttpd_elog(E_FATAL, 0, "%s: unknown user [%s]", __func__, uid);
 	else if (setgid(pw->pw_gid) == -1)
-		elog(E_FATAL, NULL, "%s: setgid(%s): %s",
+		_shttpd_elog(E_FATAL, NULL, "%s: setgid(%s): %s",
 		    __func__, uid, strerror(errno));
 	else if (setuid(pw->pw_uid) == -1)
-		elog(E_FATAL, NULL, "%s: setuid(%s): %s",
+		_shttpd_elog(E_FATAL, NULL, "%s: setuid(%s): %s",
 		    __func__, uid, strerror(errno));
 #endif /* !_WIN32 */
+	return (TRUE);
 }
 
-static void
+static int
 set_acl(struct shttpd_ctx *ctx, const char *s)
 {
 	struct acl	*acl = NULL;
 	char		flag;
 	int		len, a, b, c, d, n, mask;
-	struct llhead	*lp, *tmp;
 
 	/* Delete the old ACLs if any */
-	LL_FOREACH_SAFE(&ctx->acl, lp, tmp)
-		free(LL_ENTRY(lp, struct acl, link));
+	free_list(&ctx->acl, acl_destructor);
 
 	FOR_EACH_WORD_IN_LIST(s, len) {
 
 		mask = 32;
 
 		if (sscanf(s, "%c%d.%d.%d.%d%n",&flag,&a,&b,&c,&d,&n) != 5) {
-			elog(E_FATAL, NULL, "[%s]: subnet must be "
+			_shttpd_elog(E_FATAL, NULL, "[%s]: subnet must be "
 			    "[+|-]x.x.x.x[/x]", s);
 		} else if (flag != '+' && flag != '-') {
-			elog(E_FATAL, NULL, "flag must be + or -: [%s]", s);
+			_shttpd_elog(E_FATAL, NULL, "flag must be + or -: [%s]", s);
 		} else if (!isbyte(a)||!isbyte(b)||!isbyte(c)||!isbyte(d)) {
-			elog(E_FATAL, NULL, "bad ip address: [%s]", s);
+			_shttpd_elog(E_FATAL, NULL, "bad ip address: [%s]", s);
 		} else	if ((acl = malloc(sizeof(*acl))) == NULL) {
-			elog(E_FATAL, NULL, "%s", "cannot malloc subnet");
+			_shttpd_elog(E_FATAL, NULL, "%s", "cannot malloc subnet");
 		} else if (sscanf(s + n, "/%d", &mask) == 0) { 
 			/* Do nothing, no mask specified */
 		} else if (mask < 0 || mask > 32) {
-			elog(E_FATAL, NULL, "bad subnet mask: %d [%s]", n, s);
+			_shttpd_elog(E_FATAL, NULL, "bad subnet mask: %d [%s]", n, s);
 		}
 
 		acl->ip = (a << 24) | (b << 16) | (c << 8) | d;
@@ -1427,71 +1456,90 @@ set_acl(struct shttpd_ctx *ctx, const char *s)
 		acl->flag = flag;
 		LL_TAIL(&ctx->acl, &acl->link);
 	}
+
+	return (TRUE);
 }
 
 #ifndef NO_SSL
 /*
  * Dynamically load SSL library. Set up ctx->ssl_ctx pointer.
  */
-static void
+static int
 set_ssl(struct shttpd_ctx *ctx, const char *pem)
 {
 	SSL_CTX		*CTX;
 	void		*lib;
 	struct ssl_func	*fp;
+	int		retval = FALSE;
 
 	/* Load SSL library dynamically */
-	if ((lib = dlopen(SSL_LIB, RTLD_LAZY)) == NULL)
-		elog(E_FATAL, NULL, "set_ssl: cannot load %s", SSL_LIB);
+	if ((lib = dlopen(SSL_LIB, RTLD_LAZY)) == NULL) {
+		_shttpd_elog(E_LOG, NULL, "set_ssl: cannot load %s", SSL_LIB);
+		return (FALSE);
+	}
 
 	for (fp = ssl_sw; fp->name != NULL; fp++)
-		if ((fp->ptr.v_void = dlsym(lib, fp->name)) == NULL)
-			elog(E_FATAL, NULL,"set_ssl: cannot find %s", fp->name);
+		if ((fp->ptr.v_void = dlsym(lib, fp->name)) == NULL) {
+			_shttpd_elog(E_LOG, NULL,"set_ssl: cannot find %s", fp->name);
+			return (FALSE);
+		}
 
 	/* Initialize SSL crap */
 	SSL_library_init();
 
 	if ((CTX = SSL_CTX_new(SSLv23_server_method())) == NULL)
-		elog(E_FATAL, NULL, "SSL_CTX_new error");
+		_shttpd_elog(E_LOG, NULL, "SSL_CTX_new error");
 	else if (SSL_CTX_use_certificate_file(CTX, pem, SSL_FILETYPE_PEM) == 0)
-		elog(E_FATAL, NULL, "cannot open %s", pem);
+		_shttpd_elog(E_LOG, NULL, "cannot open %s", pem);
 	else if (SSL_CTX_use_PrivateKey_file(CTX, pem, SSL_FILETYPE_PEM) == 0)
-		elog(E_FATAL, NULL, "cannot open %s", pem);
+		_shttpd_elog(E_LOG, NULL, "cannot open %s", pem);
+	else
+		retval = TRUE;
+
 	ctx->ssl_ctx = CTX;
+
+	return (retval);
 }
 #endif /* NO_SSL */
 
-static void
+static int
 open_log_file(FILE **fpp, const char *path)
 {
+	int	retval = TRUE;
+
 	if (*fpp != NULL)
 		(void) fclose(*fpp);
 
 	if (path == NULL) {
 		*fpp = NULL;
 	} else if ((*fpp = fopen(path, "a")) == NULL) {
-		elog(E_FATAL, NULL, "cannot open log file %s: %s",
+		_shttpd_elog(E_LOG, NULL, "cannot open log file %s: %s",
 		    path, strerror(errno));
+		retval = FALSE;
 	}
+
+	return (retval);
 }
 
-static void set_alog(struct shttpd_ctx *ctx, const char *path) {
-	open_log_file(&ctx->access_log, path);
+static int set_alog(struct shttpd_ctx *ctx, const char *path) {
+	return (open_log_file(&ctx->access_log, path));
 }
 
-static void set_elog(struct shttpd_ctx *ctx, const char *path) {
-	open_log_file(&ctx->error_log, path);
+static int set_elog(struct shttpd_ctx *ctx, const char *path) {
+	return (open_log_file(&ctx->error_log, path));
 }
 
 static void show_cfg_page(struct shttpd_arg *arg);
 
-static void
+static int
 set_cfg_uri(struct shttpd_ctx *ctx, const char *uri)
 {
 	free_list(&ctx->registered_uris, &registered_uri_destructor);
 
 	if (uri != NULL)
 		shttpd_register_uri(ctx, uri, &show_cfg_page, ctx);
+
+	return (TRUE);
 }
 
 static struct worker *
@@ -1500,7 +1548,7 @@ add_worker(struct shttpd_ctx *ctx)
 	struct worker	*worker;
 
 	if ((worker = calloc(1, sizeof(*worker))) == NULL)
-		elog(E_FATAL, NULL, "Cannot allocate worker");
+		_shttpd_elog(E_FATAL, NULL, "Cannot allocate worker");
 	LL_INIT(&worker->connections);
 	worker->ctx = ctx;
 	(void) shttpd_socketpair(worker->ctl);
@@ -1519,8 +1567,8 @@ poll_worker(struct worker *worker, int milliseconds)
 	FD_ZERO(&read_set);
 	FD_ZERO(&write_set);
 
-	multiplex_worker_sockets(worker, &max_fd,
-			&read_set, &write_set, &milliseconds);
+	if (multiplex_worker_sockets(worker, &max_fd, &read_set, &write_set))
+		milliseconds = 0;
 
 	if (do_select(max_fd, &read_set, &write_set, milliseconds) < 0)
 		return;;
@@ -1540,7 +1588,7 @@ worker_function(void *param)
 	free(worker);
 }
 
-static void
+static int
 set_workers(struct shttpd_ctx *ctx, const char *value)
 {
 	int		new_num, old_num;
@@ -1570,6 +1618,8 @@ set_workers(struct shttpd_ctx *ctx, const char *value)
 			old_num++;
 		}
 	}
+
+	return (TRUE);
 }
 #endif /* NO_THREADS */
 
@@ -1578,7 +1628,7 @@ static const struct opt {
 	const char	*name;		/* Option name in config file	*/
 	const char	*description;	/* Description			*/
 	const char	*default_value;	/* Default option value		*/
-	void (*setter)(struct shttpd_ctx *, const char *);
+	int (*setter)(struct shttpd_ctx *, const char *);
 } known_options[] = {
 	{OPT_ROOT, "root", "\tWeb root directory", ".", NULL},
 	{OPT_INDEX_FILES, "index_files", "Index files", INDEX_FILES, NULL},
@@ -1602,9 +1652,9 @@ static const struct opt {
 #endif /* !NO_AUTH */
 #ifdef _WIN32
 	{OPT_SERVICE, "service", "Manage WinNNT service (install"
-	    "|uninstall)", NULL, set_nt_service},
+	    "|uninstall)", NULL, _shttpd_set_nt_service},
 	{OPT_HIDE, "systray", "Hide console, show icon on systray",
-		"no", set_systray},
+		"no", _shttpd_set_systray},
 #else
 	{OPT_INETD, "inetd", "Inetd mode", "no", set_inetd},
 	{OPT_UID, "uid", "\tRun as user", NULL, set_uid},
@@ -1629,27 +1679,30 @@ find_opt(const char *opt_name)
 		if (!strcmp(opt_name, known_options[i].name))
 			return (known_options + i);
 
-	elog(E_FATAL, NULL, "no such option: [%s]", opt_name);
+	_shttpd_elog(E_FATAL, NULL, "no such option: [%s]", opt_name);
 
 	/* UNREACHABLE */
 	return (NULL);
 }
 
-void
+int
 shttpd_set_option(struct shttpd_ctx *ctx, const char *opt, const char *val)
 {
 	const struct opt	*o = find_opt(opt);
+	int			retval = TRUE;
 
 	/* Call option setter first, so it can use both new and old values */
 	if (o->setter != NULL)
-		o->setter(ctx, val);
+		retval = o->setter(ctx, val);
 
 	/* Free old value if any */
 	if (ctx->options[o->index] != NULL)
 		free(ctx->options[o->index]);
 	
 	/* Set new option value */
-	ctx->options[o->index] = val ? my_strdup(val) : NULL;
+	ctx->options[o->index] = val ? _shttpd_strdup(val) : NULL;
+
+	return (retval);
 }
 
 static void
@@ -1701,7 +1754,7 @@ show_cfg_page(struct shttpd_arg *arg)
  * Show usage string and exit.
  */
 void
-usage(const char *prog)
+_shttpd_usage(const char *prog)
 {
 	const struct opt	*o;
 
@@ -1731,7 +1784,7 @@ set_opt(struct shttpd_ctx *ctx, const char *opt, const char *value)
 	o = find_opt(opt);
 	if (ctx->options[o->index] != NULL)
 		free(ctx->options[o->index]);
-	ctx->options[o->index] = my_strdup(value);
+	ctx->options[o->index] = _shttpd_strdup(value);
 }
 
 static void
@@ -1746,18 +1799,18 @@ process_command_line_arguments(struct shttpd_ctx *ctx, char *argv[])
 	/* First find out, which config file to open */
 	for (i = 1; argv[i] != NULL && argv[i][0] == '-'; i += 2)
 		if (argv[i + 1] == NULL)
-			usage(argv[0]);
+			_shttpd_usage(argv[0]);
 
 	if (argv[i] != NULL && argv[i + 1] != NULL) {
 		/* More than one non-option arguments are given w*/
-		usage(argv[0]);
+		_shttpd_usage(argv[0]);
 	} else if (argv[i] != NULL) {
 		/* Just one non-option argument is given, this is config file */
 		config_file = argv[i];
 	} else {
 		/* No config file specified. Look for one where shttpd lives */
 		if ((p = strrchr(argv[0], DIRSEP)) != 0) {
-			my_snprintf(path, sizeof(path), "%.*s%s",
+			_shttpd_snprintf(path, sizeof(path), "%.*s%s",
 			    p - argv[0] + 1, argv[0], config_file);
 			config_file = path;
 		}
@@ -1767,12 +1820,12 @@ process_command_line_arguments(struct shttpd_ctx *ctx, char *argv[])
 
 	/* If config file was set in command line and open failed, exit */
 	if (fp == NULL && argv[i] != NULL)
-		elog(E_FATAL, NULL, "cannot open config file %s: %s",
+		_shttpd_elog(E_FATAL, NULL, "cannot open config file %s: %s",
 		    config_file, strerror(errno));
 
 	if (fp != NULL) {
 
-		elog(E_LOG, NULL, "Loading config file %s", config_file);
+		_shttpd_elog(E_LOG, NULL, "Loading config file %s", config_file);
 
 		/* Loop over the lines in config file */
 		while (fgets(line, sizeof(line), fp) != NULL) {
@@ -1784,7 +1837,7 @@ process_command_line_arguments(struct shttpd_ctx *ctx, char *argv[])
 				continue;
 
 			if (sscanf(line, "%s %[^\n#]", opt, val) != 2)
-				elog(E_FATAL, NULL, "line %d in %s is invalid",
+				_shttpd_elog(E_FATAL, NULL, "line %d in %s is invalid",
 				    line_no, config_file);
 
 			set_opt(ctx, opt, val);
@@ -1806,7 +1859,7 @@ shttpd_init(int argc, char *argv[])
 	const struct opt	*o;
 
 	if ((ctx = calloc(1, sizeof(*ctx))) == NULL)
-		elog(E_FATAL, NULL, "cannot allocate shttpd context");
+		_shttpd_elog(E_FATAL, NULL, "cannot allocate shttpd context");
 
 	LL_INIT(&ctx->registered_uris);
 	LL_INIT(&ctx->error_handlers);
@@ -1818,7 +1871,7 @@ shttpd_init(int argc, char *argv[])
 	/* Initialize options. First pass: set default option values */
 	for (o = known_options; o->name != NULL; o++)
 		ctx->options[o->index] = o->default_value ?
-			my_strdup(o->default_value) : NULL;
+			_shttpd_strdup(o->default_value) : NULL;
 
 	/* Second and third passes: config file and argv */
 	if (argc > 0 && argv != NULL)
@@ -1827,11 +1880,14 @@ shttpd_init(int argc, char *argv[])
 	/* Call setter functions */
 	for (o = known_options; o->name != NULL; o++)
 		if (o->setter && ctx->options[o->index] != NULL)
-			o->setter(ctx, ctx->options[o->index]);
+			if (o->setter(ctx, ctx->options[o->index]) == FALSE) {
+				shttpd_fini(ctx);
+				return (NULL);
+			}
 
-	current_time = time(NULL);
-	tm = localtime(&current_time);
-	tz_offset = 0;
+	_shttpd_current_time = time(NULL);
+	tm = localtime(&_shttpd_current_time);
+	_shttpd_tz_offset = 0;
 
 	if (num_workers(ctx) == 1)
 		(void) add_worker(ctx);

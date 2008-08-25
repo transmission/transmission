@@ -296,96 +296,98 @@ struct acl {
 /*
  * shttpd.c
  */
-extern time_t		current_time;	/* Current UTC time		*/
-extern int		tz_offset;	/* Offset from GMT time zone	*/
-extern const struct vec known_http_methods[];
+extern time_t	_shttpd_current_time;	/* Current UTC time		*/
+extern int	_shttpd_tz_offset;	/* Offset from GMT time zone	*/
+extern const struct vec _shttpd_known_http_methods[];
 
-extern void	stop_stream(struct stream *stream);
-extern int	url_decode(const char *, int, char *dst, int);
-extern void	send_server_error(struct conn *, int code, const char *reason);
-extern int	get_headers_len(const char *buf, size_t buflen);
-extern void	parse_headers(const char *s, int len, struct headers *parsed);
-extern int	is_true(const char *str);
-extern int	shttpd_socketpair(int pair[2]);
-extern void get_mime_type(struct shttpd_ctx *, const char *, int, struct vec *);
+extern void	_shttpd_stop_stream(struct stream *stream);
+extern int	_shttpd_url_decode(const char *, int, char *dst, int);
+extern void	_shttpd_send_server_error(struct conn *, int, const char *);
+extern int	_shttpd_get_headers_len(const char *buf, size_t buflen);
+extern void	_shttpd_parse_headers(const char *s, int, struct headers *);
+extern int	_shttpd_is_true(const char *str);
+extern int	_shttpd_socketpair(int pair[2]);
+extern void	_shttpd_get_mime_type(struct shttpd_ctx *,
+			const char *, int, struct vec *);
 
-#define	IS_TRUE(ctx, opt)	is_true((ctx)->options[opt])
+#define	IS_TRUE(ctx, opt)	_shttpd_is_true((ctx)->options[opt])
 
 /*
  * config.c
  */
-extern void	usage(const char *prog);
+extern void	_shttpd_usage(const char *prog);
 
 /*
  * log.c
  */
-extern void	elog(int flags, struct conn *c, const char *fmt, ...);
-extern void	log_access(FILE *fp, const struct conn *c);
+extern void	_shttpd_elog(int flags, struct conn *c, const char *fmt, ...);
+extern void	_shttpd_log_access(FILE *fp, const struct conn *c);
 
 /*
  * string.c
  */
-extern void	my_strlcpy(register char *, register const char *, size_t);
-extern int	my_strncasecmp(register const char *,
-		register const char *, size_t);
-extern char	*my_strndup(const char *ptr, size_t len);
-extern char	*my_strdup(const char *str);
-extern int	my_snprintf(char *buf, size_t buflen, const char *fmt, ...);
-extern int	match_extension(const char *path, const char *ext_list);
+extern void	_shttpd_strlcpy(register char *, register const char *, size_t);
+extern int	_shttpd_strncasecmp(register const char *,
+			register const char *, size_t);
+extern char	*_shttpd_strndup(const char *ptr, size_t len);
+extern char	*_shttpd_strdup(const char *str);
+extern int	_shttpd_snprintf(char *buf, size_t len, const char *fmt, ...);
+extern int	_shttpd_match_extension(const char *path, const char *ext_list);
 
 /*
  * compat_*.c
  */
-extern void	set_close_on_exec(int fd);
-extern int	set_non_blocking_mode(int fd);
-extern int	my_stat(const char *, struct stat *stp);
-extern int	my_open(const char *, int flags, int mode);
-extern int	my_remove(const char *);
-extern int	my_rename(const char *, const char *);
-extern int	my_mkdir(const char *, int);
-extern char *	my_getcwd(char *, int);
-extern int	spawn_process(struct conn *c, const char *prog,
-		char *envblk, char *envp[], int sock, const char *dir);
+extern void	_shttpd_set_close_on_exec(int fd);
+extern int	_shttpd_set_non_blocking_mode(int fd);
+extern int	_shttpd_stat(const char *, struct stat *stp);
+extern int	_shttpd_open(const char *, int flags, int mode);
+extern int	_shttpd_remove(const char *);
+extern int	_shttpd_rename(const char *, const char *);
+extern int	_shttpd_mkdir(const char *, int);
+extern char *	_shttpd_getcwd(char *, int);
+extern int	_shttpd_spawn_process(struct conn *c, const char *prog,
+			char *envblk, char *envp[], int sock, const char *dir);
 
-extern void	set_nt_service(struct shttpd_ctx *, const char *);
-extern void	set_systray(struct shttpd_ctx *, const char *);
-extern void	try_to_run_as_nt_service(void);
+extern int	_shttpd_set_nt_service(struct shttpd_ctx *, const char *);
+extern int	_shttpd_set_systray(struct shttpd_ctx *, const char *);
+extern void	_shttpd_try_to_run_as_nt_service(void);
 
 /*
  * io_*.c
  */
-extern const struct io_class	io_file;
-extern const struct io_class	io_socket;
-extern const struct io_class	io_ssl;
-extern const struct io_class	io_cgi;
-extern const struct io_class	io_dir;
-extern const struct io_class	io_embedded;
-extern const struct io_class	io_ssi;
+extern const struct io_class	_shttpd_io_file;
+extern const struct io_class	_shttpd_io_socket;
+extern const struct io_class	_shttpd_io_ssl;
+extern const struct io_class	_shttpd_io_cgi;
+extern const struct io_class	_shttpd_io_dir;
+extern const struct io_class	_shttpd_io_embedded;
+extern const struct io_class	_shttpd_io_ssi;
 
-extern int	put_dir(const char *path);
-extern void	get_dir(struct conn *c);
-extern void	get_file(struct conn *c, struct stat *stp);
-extern void	ssl_handshake(struct stream *stream);
-extern void	setup_embedded_stream(struct conn *, union variant, void *);
-extern struct registered_uri *is_registered_uri(struct shttpd_ctx *,
-		const char *uri);
-extern void	do_ssi(struct conn *);
-extern void	ssi_func_destructor(struct llhead *lp);
+extern int	_shttpd_put_dir(const char *path);
+extern void	_shttpd_get_dir(struct conn *c);
+extern void	_shttpd_get_file(struct conn *c, struct stat *stp);
+extern void	_shttpd_ssl_handshake(struct stream *stream);
+extern void	_shttpd_setup_embedded_stream(struct conn *,
+			union variant, void *);
+extern struct registered_uri *_shttpd_is_registered_uri(struct shttpd_ctx *,
+			const char *uri);
+extern void	_shttpd_do_ssi(struct conn *);
+extern void	_shttpd_ssi_func_destructor(struct llhead *lp);
 
 /*
  * auth.c
  */
-extern int	check_authorization(struct conn *c, const char *path);
-extern int	is_authorized_for_put(struct conn *c);
-extern void	send_authorization_request(struct conn *c);
-extern int	edit_passwords(const char *fname, const char *domain,
-		const char *user, const char *pass);
+extern int	_shttpd_check_authorization(struct conn *c, const char *path);
+extern int	_shttpd_is_authorized_for_put(struct conn *c);
+extern void	_shttpd_send_authorization_request(struct conn *c);
+extern int	_shttpd_edit_passwords(const char *fname, const char *domain,
+			const char *user, const char *pass);
 
 /*
  * cgi.c
  */
-extern int	run_cgi(struct conn *c, const char *prog);
-extern void	do_cgi(struct conn *c);
+extern int	_shttpd_run_cgi(struct conn *c, const char *prog);
+extern void	_shttpd_do_cgi(struct conn *c);
 
 #define CGI_REPLY	"HTTP/1.1     OK\r\n"
 #define	CGI_REPLY_LEN	(sizeof(CGI_REPLY) - 1)
