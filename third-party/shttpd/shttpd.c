@@ -1760,7 +1760,7 @@ _shttpd_usage(const char *prog)
 
 	(void) fprintf(stderr,
 	    "SHTTPD version %s (c) Sergey Lyubka\n"
-	    "usage: %s [options] [config_file]\n", VERSION, prog);
+	    "usage: %s [options] [config_file]\n", SHTTPD_VERSION, prog);
 
 #if !defined(NO_AUTH)
 	fprintf(stderr, "  -A <htpasswd_file> <realm> <user> <passwd>\n");

@@ -11,7 +11,7 @@
 #ifndef CONFIG_HEADER_DEFINED
 #define	CONFIG_HEADER_DEFINED
 
-#define	VERSION		"1.42"		/* Version			*/
+#define	SHTTPD_VERSION	"1.42"		/* Version			*/
 #define	CONFIG_FILE	"shttpd.conf"	/* Configuration file		*/
 #define	HTPASSWD	".htpasswd"	/* Passwords file name		*/
 #define	URI_MAX		16384		/* Default max request size	*/
@@ -24,6 +24,6 @@
 #define	EXPIRE_TIME	3600		/* Expiration time, seconds	*/
 #define	ENV_MAX		4096		/* Size of environment block	*/
 #define	CGI_ENV_VARS	64		/* Maximum vars passed to CGI	*/
-#define	SERVICE_NAME	"SHTTPD " VERSION	/* NT service name	*/
+#define	SERVICE_NAME	"SHTTPD " SHTTPD_VERSION	/* NT service name	*/
 
 #endif /* CONFIG_HEADER_DEFINED */

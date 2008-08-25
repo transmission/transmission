@@ -533,7 +533,7 @@ systray(void *arg)
 
 	cls.lpfnWndProc = (WNDPROC) WindowProc; 
 	cls.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	cls.lpszClassName = "shttpd v." VERSION; 
+	cls.lpszClassName = "shttpd v." SHTTPD_VERSION; 
 
 	if (!RegisterClass(&cls)) 
 		_shttpd_elog(E_FATAL, NULL, "RegisterClass: %d", ERRNO);

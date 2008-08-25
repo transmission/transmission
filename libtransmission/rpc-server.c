@@ -371,7 +371,7 @@ startServer( tr_rpc_server * server )
         if( !server->isPasswordEnabled )
             unlink( passwd );
         else
-            edit_passwords( passwd, MY_REALM, server->username, server->password );
+            shttpd_edit_passwords( passwd, MY_REALM, server->username, server->password );
 
         argv[argc++] = tr_strdup( "appname-unused" );
 

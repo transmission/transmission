@@ -13,7 +13,7 @@
 const char *
 shttpd_version(void)
 {
-	return (VERSION);
+	return (SHTTPD_VERSION);
 }
 
 static void

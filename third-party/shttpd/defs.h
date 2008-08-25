@@ -380,7 +380,7 @@ extern void	_shttpd_ssi_func_destructor(struct llhead *lp);
 extern int	_shttpd_check_authorization(struct conn *c, const char *path);
 extern int	_shttpd_is_authorized_for_put(struct conn *c);
 extern void	_shttpd_send_authorization_request(struct conn *c);
-extern int	_shttpd_edit_passwords(const char *fname, const char *domain,
+extern int	shttpd_edit_passwords(const char *fname, const char *domain,
 			const char *user, const char *pass);
 
 /*

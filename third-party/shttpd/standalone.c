@@ -36,7 +36,7 @@ main(int argc, char *argv[])
 	if (argc > 1 && argv[1][0] == '-' && argv[1][1] == 'A') {
 		if (argc != 6)
 			_shttpd_usage(argv[0]);
-		exit(_shttpd_edit_passwords(argv[2],argv[3],argv[4],argv[5]));
+		exit(shttpd_edit_passwords(argv[2],argv[3],argv[4],argv[5]));
 	}
 #endif /* NO_AUTH */
 
@@ -60,7 +60,7 @@ main(int argc, char *argv[])
 		    "Cannot initialize SHTTPD context");
 
 	_shttpd_elog(E_LOG, NULL, "shttpd %s started on port(s) %s, serving %s",
-	    VERSION, ctx->options[OPT_PORTS], ctx->options[OPT_ROOT]);
+	    SHTTPD_VERSION, ctx->options[OPT_PORTS], ctx->options[OPT_ROOT]);
 
 	while (exit_flag == 0)
 		shttpd_poll(ctx, 10 * 1000);

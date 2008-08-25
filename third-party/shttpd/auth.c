@@ -350,7 +350,7 @@ _shttpd_send_authorization_request(struct conn *c)
  * Edit the passwords file.
  */
 int
-_shttpd_edit_passwords(const char *fname, const char *domain,
+shttpd_edit_passwords(const char *fname, const char *domain,
 		const char *user, const char *pass)
 {
 	int		ret = EXIT_SUCCESS, found = 0;
