@@ -94,6 +94,10 @@
    "speed-limit-up"           | number     maximum upload speed (in K/s)
    "speed-limit-up-enabled"   | 'boolean'  true if the upload speed is limited
 
+   Just as an empty "ids" value is shorthand for "all ids", using an empty array
+   for "files-wanted", "files-unwanted", "priority-high", "priority-low", or
+   "priority-normal" is shorthand for saying "all files".
+
    Response arguments: none
 
 3.3.  Torrent Accessors
