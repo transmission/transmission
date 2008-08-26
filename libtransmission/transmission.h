@@ -113,7 +113,7 @@ tr_proxy_type;
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PORT_STR                 "51413"
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_LAZY_BITFIELD_ENABLED    0
+#define TR_DEFAULT_LAZY_BITFIELD_ENABLED    1
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_GLOBAL_PEER_LIMIT        200
 /** @see tr_sessionInitFull */
