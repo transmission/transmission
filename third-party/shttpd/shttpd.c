@@ -533,7 +533,8 @@ get_path_info(struct conn *c, char *path, struct stat *stp)
 static void
 decide_what_to_do(struct conn *c)
 {
-	char		path[URI_MAX], buf[1024], *root;
+	char		*path;
+	const char	*root;
 	struct vec	alias_uri, alias_path;
 	struct stat	st;
 	int		rc;
@@ -548,16 +549,17 @@ decide_what_to_do(struct conn *c)
 	remove_double_dots(c->uri);
 	
 	root = c->ctx->options[OPT_ROOT];
-	if (strlen(c->uri) + strlen(root) >= sizeof(path)) {
+	if (strlen(c->uri) + strlen(root) >= URI_MAX) {
 		_shttpd_send_server_error(c, 400, "URI is too long");
 		return;
 	}
 
-	(void) _shttpd_snprintf(path, sizeof(path), "%s%s", root, c->uri);
+	path = malloc( URI_MAX );
+	(void) _shttpd_snprintf(path, URI_MAX, "%s%s", root, c->uri);
 
 	/* User may use the aliases - check URI for mount point */
 	if (is_alias(c->ctx, c->uri, &alias_uri, &alias_path) != NULL) {
-		(void) _shttpd_snprintf(path, sizeof(path), "%.*s%s",
+		(void) _shttpd_snprintf(path, URI_MAX, "%.*s%s",
 		    alias_path.len, alias_path.ptr, c->uri + alias_uri.len);
 		DBG(("using alias %.*s -> %.*s", alias_uri.len, alias_uri.ptr,
 		    alias_path.len, alias_path.ptr));
@@ -612,11 +614,12 @@ decide_what_to_do(struct conn *c)
 	} else if (get_path_info(c, path, &st) != 0) {
 		_shttpd_send_server_error(c, 404, "Not Found");
 	} else if (S_ISDIR(st.st_mode) && path[strlen(path) - 1] != '/') {
+		char buf[1024];
 		(void) _shttpd_snprintf(buf, sizeof(buf),
 			"Moved Permanently\r\nLocation: %s/", c->uri);
 		_shttpd_send_server_error(c, 301, buf);
 	} else if (S_ISDIR(st.st_mode) &&
-	    find_index_file(c, path, sizeof(path) - 1, &st) == -1 &&
+	    find_index_file(c, path, URI_MAX - 1, &st) == -1 &&
 	    !IS_TRUE(c->ctx, OPT_DIR_LIST)) {
 		_shttpd_send_server_error(c, 403, "Directory Listing Denied");
 	} else if (S_ISDIR(st.st_mode) && IS_TRUE(c->ctx, OPT_DIR_LIST)) {
@@ -655,6 +658,8 @@ decide_what_to_do(struct conn *c)
 	} else {
 		_shttpd_send_server_error(c, 500, "Internal Error");
 	}
+
+	free(path);
 }
 
 static int
@@ -781,7 +786,7 @@ add_socket(struct worker *worker, int sock, int is_ssl)
 		(void) closesocket(sock);
 		SSL_free(ssl);
 #endif /* NO_SSL */
-	} else if ((c = calloc(1, sizeof(*c) + 2 * URI_MAX)) == NULL) {
+	} else if ((c = calloc(1, sizeof(*c) + 2 * IO_BUFSIZE)) == NULL) {
 #if !defined(NO_SSL)
 		if (ssl)
 			SSL_free(ssl);
@@ -808,8 +813,8 @@ add_socket(struct worker *worker, int sock, int is_ssl)
 
 		/* Set IO buffers */
 		c->loc.io.buf	= (char *) (c + 1);
-		c->rem.io.buf	= c->loc.io.buf + URI_MAX;
-		c->loc.io.size	= c->rem.io.size = URI_MAX;
+		c->rem.io.buf	= c->loc.io.buf + IO_BUFSIZE;
+		c->loc.io.size	= c->rem.io.size = IO_BUFSIZE;
 
 #if !defined(NO_SSL)
 		if (is_ssl) {
