@@ -134,7 +134,7 @@ scrapeDoneFunc( struct tr_handle    * session UNUSED,
         tr_bencFree( &top );
     }
     else
-        printf( "unable to parse response (http code %lu) at %s", response_code, (char*)host );
+        fprintf( stderr, "Unable to parse response (http code %lu) at %s", response_code, (char*)host );
 
     --leftToScrape;
 }
@@ -235,15 +235,15 @@ main( int argc, char ** argv )
 
     /* Check the options for validity */
     if( !torrentPath ) {
-        printf( "No torrent specified!\n" );
+        fprintf( stderr, "No torrent specified!\n" );
         return EXIT_FAILURE;
     }
     if( peerPort < 1 || peerPort > 65535 ) {
-        printf( "Error: Port must between 1 and 65535; got %d\n", peerPort );
+        fprintf( stderr, "Error: Port must between 1 and 65535; got %d\n", peerPort );
         return EXIT_FAILURE;
     }
     if( peerSocketTOS < 0 || peerSocketTOS > 255 ) {
-        printf( "Error: value must between 0 and 255; got %d\n", peerSocketTOS );
+        fprintf( stderr, "Error: value must between 0 and 255; got %d\n", peerSocketTOS );
         return EXIT_FAILURE;
     }
 
@@ -369,7 +369,7 @@ main( int argc, char ** argv )
     tr_ctorFree( ctor );
     if( !tor )
     {
-        printf( "Failed opening torrent file `%s'\n", torrentPath );
+        fprintf( stderr, "Failed opening torrent file `%s'\n", torrentPath );
         tr_sessionClose( h );
         return EXIT_FAILURE;
     }
@@ -415,7 +415,7 @@ main( int argc, char ** argv )
         getStatusStr( st, line, sizeof( line ) );
         printf( "\r%-*s", LINEWIDTH, line );
         if( st->error )
-            printf( "\n%s\n", st->errorString );
+            fprintf( stderr, "\n%s\n", st->errorString );
     }
 
 cleanup:
