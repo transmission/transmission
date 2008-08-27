@@ -1784,7 +1784,6 @@ sendBitfield( tr_peermsgs * msgs )
         /* build the pool */
         for( i=0; i<poolSize; ++i )
             pool[i] = i;
-        poolSize = i;
 
         /* pull random piece indices from the pool */
         while( ( poolSize > 0 ) && ( lazyCount < LAZY_PIECE_COUNT ) )
