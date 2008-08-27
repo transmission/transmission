@@ -64,7 +64,7 @@ static tr_option opts[] =
     { 'l', "list",         "List all torrents", "l", 0, NULL },
     { 'm', "portmap",      "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
     { 'M', "no-portmap",   "Disable portmapping", "M", 0, NULL },
-    { 'n', "auth",         "Set username for authentication", "n", 1, "<auth>" },
+    { 'n', "auth",         "Set authentication info", "n", 1, "<username:password>" },
     { 'p', "port",
       "Port for incoming peers (Default: "TR_DEFAULT_PORT_STR")",
       "p", 1, "<port>" },
