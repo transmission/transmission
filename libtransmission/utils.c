@@ -998,7 +998,7 @@ tr_httpIsValidURL( const char * url )
         "<>#%<\""                    /* delims */
         "{}|\\^[]`";                 /* unwise */
 
-    if (url == NULL)
+    if( url == NULL )
         return FALSE;
 
     for( c=url; c && *c; ++c )
