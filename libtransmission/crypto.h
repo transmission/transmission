@@ -79,6 +79,12 @@ void  tr_sha1              ( uint8_t     * setme,
 /** Returns a random number in the range of [0...n) */
 int tr_cryptoRandInt ( int n );
 
+/** Returns a vaguely random number in the range of [0...n).
+    This is faster -- BUT WEAKER -- than tr_cryptoRandInt()
+    and should only be used when tr_cryptoRandInt() is too
+    slow, and NEVER in sensitive cases */
+int tr_cryptoWeakRandInt( int n );
+
 /** Fills a buffer with random bytes */
 void tr_cryptoRandBuf ( unsigned char *buf, size_t len );
 

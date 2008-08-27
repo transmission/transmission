@@ -268,13 +268,29 @@ tr_cryptoHasTorrentHash( const tr_crypto * crypto )
     return crypto->torrentHashIsSet ? 1 : 0;
 }
 
-int tr_cryptoRandInt( int sup )
+int
+tr_cryptoRandInt( int sup )
 {
     int r;
 
     RAND_pseudo_bytes ((unsigned char *) &r, sizeof r);
 
     return ((int) (sup * (abs(r) / (INT_MAX + 1.0))));
+}
+
+int
+tr_cryptoWeakRandInt( int sup )
+{
+    static int init = 0;
+    assert( sup > 0 );
+
+    if( !init )
+    {
+        srand( tr_date( ) );
+        init = 1;
+    }
+
+    return rand() % sup;
 }
 
 void tr_cryptoRandBuf ( unsigned char *buf, size_t len )

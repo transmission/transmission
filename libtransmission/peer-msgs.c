@@ -1766,28 +1766,38 @@ static void
 sendBitfield( tr_peermsgs * msgs )
 {
     struct evbuffer * out = msgs->outMessages;
-    const tr_piece_index_t pieceCount = msgs->torrent->info.pieceCount;
     tr_bitfield * field;
     tr_piece_index_t lazyPieces[LAZY_PIECE_COUNT];
-    int i;
-    int lazyCount = 0;
+    size_t i;
+    size_t lazyCount = 0;
 
     field = tr_bitfieldDup( tr_cpPieceBitfield( msgs->torrent->completion ) );
 
     if( tr_sessionIsLazyBitfieldEnabled( msgs->session ) )
     {
-        const int maxLazyCount = MIN( LAZY_PIECE_COUNT, pieceCount );
+        /** Lazy bitfields aren't a high priority or secure, so I'm opting for
+            speed over a truly random sample -- let's limit the pool size to
+            the first 1000 pieces so large torrents don't bog things down */
+        size_t poolSize = MIN( msgs->torrent->info.pieceCount, 1000 );
+        tr_piece_index_t * pool = tr_new( tr_piece_index_t, poolSize );
 
-        while( lazyCount < maxLazyCount )
+        /* build the pool */
+        for( i=0; i<poolSize; ++i )
+            pool[i] = i;
+        poolSize = i;
+
+        /* pull random piece indices from the pool */
+        while( ( poolSize > 0 ) && ( lazyCount < LAZY_PIECE_COUNT ) )
         {
-            const size_t pos = tr_cryptoRandInt ( pieceCount );
-            if( !tr_bitfieldHas( field, pos ) ) /* already removed it */
-                continue;
-            dbgmsg( msgs, "lazy bitfield #%d: piece %d of %d",
-                    (int)(lazyCount+1), (int)pos, (int)pieceCount );
-            tr_bitfieldRem( field, pos );
-            lazyPieces[lazyCount++] = pos;
+            const int pos = tr_cryptoWeakRandInt( poolSize );
+            const tr_piece_index_t piece = pool[pos];
+            tr_bitfieldRem( field, piece );
+            lazyPieces[lazyCount++] = piece;
+            pool[pos] = pool[--poolSize];
         }
+
+        /* cleanup */
+        tr_free( pool );
     }
 
     tr_peerIoWriteUint32( msgs->io, out, sizeof(uint8_t) + field->byteCount );

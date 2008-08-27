@@ -130,27 +130,6 @@ struct tr_peerMgr
 ***
 **/
 
-/* The following is not a very high quality random number generator.  It
- * is mainly used as a simple stupid random number generator inside some
- * functions below. Please don't use it for anything else unless you
- * know what you're doing. Use tr_cryptoRandInt() instead.
- */
-
-static int
-tr_stupidRandInt( int sup )
-{
-    static int init = 0;
-    assert( sup > 0 );
-
-    if( !init )
-    {
-        srand( tr_date() );
-        init = 1;
-    }
-
-    return rand() % sup;
-}
-
 static void
 managerLock( const struct tr_peerMgr * manager )
 {
@@ -626,7 +605,7 @@ getPreferredPieces( Torrent     * t,
             setme->piece = piece;
             setme->priority = inf->pieces[piece].priority;
             setme->peerCount = 0;
-            setme->random = tr_stupidRandInt( INT_MAX );
+            setme->random = tr_cryptoWeakRandInt( INT_MAX );
 
             for( k=0; k<peerCount; ++k ) {
                 const tr_peer * peer = peers[k];
@@ -667,7 +646,7 @@ getPeersUploadingToClient( Torrent * t, int * setmeCount )
      * get a chance at the first blocks in the queue */
     if( retCount ) {
         tr_peer ** tmp = tr_new( tr_peer*, retCount );
-        i = tr_stupidRandInt( retCount );
+        i = tr_cryptoWeakRandInt( retCount );
         memcpy( tmp, ret, sizeof(tr_peer*) * retCount );
         memcpy( ret, tmp+i, sizeof(tr_peer*) * (retCount-i) );
         memcpy( ret+(retCount-i), tmp, sizeof(tr_peer*) * i );
@@ -1663,7 +1642,7 @@ rechoke( Torrent * t )
 
         if(( n = tr_ptrArraySize( randPool )))
         {
-            c = tr_ptrArrayNth( randPool, tr_stupidRandInt( n ));
+            c = tr_ptrArrayNth( randPool, tr_cryptoWeakRandInt( n ));
             c->doUnchoke = 1;
             t->optimistic = c->peer;
         }
