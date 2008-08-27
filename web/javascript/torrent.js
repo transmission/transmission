@@ -304,7 +304,7 @@ Torrent.prototype =
 
 		// Fix for situation
 		// when a verifying/downloading torrent gets state seeding
-		if( this.state == Torrent._StatusSeeding )
+		if( this._state == Torrent._StatusSeeding )
 			notDone = false ;
 		
 		if( notDone )
