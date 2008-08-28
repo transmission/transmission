@@ -2,6 +2,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.40 (2008/mm/dd)
 http://trac.transmissionbt.com/query?group=component&milestone=1.40
+- All Platforms
+   + Lazy bitfields
 - Mac
    + Sparkle updated to 1.5
 
