@@ -113,10 +113,10 @@ QuickLookController * fQuickLookInstance = nil;
 
 - (void) updateQuickLook
 {
-    if (!fQuickLookAvailable)
+    //only update when window is open or in the middle of opening (visible)
+    if (!fQuickLookAvailable || !([[QLPreviewPanel sharedPreviewPanel] isOpen] || [[QLPreviewPanel sharedPreviewPanel] isVisible]))
         return;
     
-    //if the user changes the selection while the panel is open then update the current items
     if (![self quickLookSelectItems])
         [[QLPreviewPanel sharedPreviewPanel] closeWithEffect: 1];
 }
