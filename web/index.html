@@ -56,67 +56,116 @@
 		</div>
 		<div id="torrent_inspector" style="display:none;">
 			
-			<ul class="torrent_inspector_tabs">
-				<li><a href="#info" id="inspector_tab_info" class="inspector_tab selected"><img src="images/buttons/info_general.png" alt="Information"/></a></li>
-				<li><a href="#activity" id="inspector_tab_activity" class="inspector_tab"><img src="images/buttons/info_activity.png" alt="Activity"/></a></li>
-			</ul>
-			
-			<div class="torrent_inspector_header">
-				<h1 id="torrent_inspector_name">No Selection</h1>
-				<span id="torrent_inspector_size">0 B</span>
+			<div id="inspector_tabs">
+				<div class="inspector_tab selected" id="inspector_tab_info"><a href="#info"><img src="images/buttons/info_general.png" alt="Information"/></a></div>
+				<div class="inspector_tab" id="inspector_tab_activity"><a href="#activity"><img src="images/buttons/info_activity.png" alt="Activity"/></a></div>
 			</div>
 			
-			<div class="torrent_inspector_section" id="inspector_tab_info_container">
-				<h2>Transfer Information</h2>
-				<label>Tracker:</label>
-				<div id="torrent_inspector_tracker">N/A</div>
-				<label>Hash:</label>
-				<div id="torrent_inspector_hash">N/A</div>
-				<label>Secure:</label>
-				<div id="torrent_inspector_secure">N/A</div>
-				<label>Comment:</label>
-				<div id="torrent_inspector_comment">N/A</div>
+			<div id="inspector_header">
+				<h1 id="torrent_inspector_name"></h1>
+				<span id="torrent_inspector_size"></span>
+			</div>
+			
+			<div class="inspector_container" id="inspector_tab_info_container">
+				<div class="inspector_group">
+					<strong>Transfer Information</strong>
+					<div class="inspector_row">
+						<div class="inspector_label">Tracker:</div>
+						<div id="torrent_inspector_tracker"></div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Hash:</div>
+						<div id="torrent_inspector_hash"></div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Secure:</div>
+						<div id="torrent_inspector_secure"></div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Comment:</div>
+						<div id="torrent_inspector_comment"></div>
+					</div>
+				</div><!-- class="inspector_group"-->
 				
-				<h2>Created By</h2>
-				<label>Creator:</label>
-				<div id="torrent_inspector_creator">N/A</div>
-				<label>Date:</label>
-				<div id="torrent_inspector_creator_date">N/A</div>
-			</div>
+				<div class="inspector_group">
+					<strong>Created By</strong>
+					<div class="inspector_row">
+						<div class="inspector_label">Creator:</div>
+						<div id="torrent_inspector_creator">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Date:</div>
+						<div id="torrent_inspector_creator_date">N/A</div>
+					</div>
+				</div><!-- class="inspector_group"-->
+			</div><!-- id="inspector_tab_info_container" -->
 			
-			<div class="torrent_inspector_section" style="display:none;" id="inspector_tab_activity_container">
-				<h2>Activity</h2>
-				<label>State:</label>
-				<div id="torrent_inspector_state">N/A</div>
-				<label>Progress:</label>
-				<div id="torrent_inspector_progress">N/A</div>
-				<label>Have:</label>
-				<div id="torrent_inspector_have">N/A</div>
-				<label>Downloaded:</label>
-				<div id="torrent_inspector_downloaded">N/A</div>
-				<label>Uploaded:</label>
-				<div id="torrent_inspector_uploaded">N/A</div>
-				<label>Ratio:</label>
-				<div id="torrent_inspector_ratio">N/A</div>
-				<label>Swarm Rate:</label>
-				<div id="torrent_inspector_swarm_speed">N/A</div>
-				<label>Error:</label>
-				<div id="torrent_inspector_error">N/A</div>
-				<label>DL Speed:</label>
-				<div id="torrent_inspector_download_speed">N/A</div>
-				<label>UL Speed:</label>
-				<div id="torrent_inspector_upload_speed">N/A</div>
+			<div style="display:none;" class="inspector_container" id="inspector_tab_activity_container">
+
+				<div class="inspector_group">
+					<strong>Activity</strong>
+					<div class="inspector_row">
+						<div class="inspector_label">State:</div>
+						<div id="torrent_inspector_state">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Progress:</div>
+						<div id="torrent_inspector_progress">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Have:</div>
+						<div id="torrent_inspector_have">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Downloaded:</div>
+						<div id="torrent_inspector_downloaded">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Uploaded:</div>
+						<div id="torrent_inspector_uploaded">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Ratio:</div>
+						<div id="torrent_inspector_ratio">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Swarm Rate:</div>
+						<div id="torrent_inspector_swarm_speed">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Error:</div>
+						<div id="torrent_inspector_error">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">DL Speed:</div>
+						<div id="torrent_inspector_download_speed">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">UL Speed:</div>
+						<div id="torrent_inspector_upload_speed">N/A</div>
+					</div>
+				</div><!-- class="inspector_group"-->
 				
-				<h2>Peers</h2>
-				<label>UL To:</label>
-				<div id="torrent_inspector_upload_to">N/A</div>
-				<label>DL From:</label>
-				<div id="torrent_inspector_download_from">N/A</div>
-				<label>Total Seeders:</label>
-				<div id="torrent_inspector_total_seeders">N/A</div>
-				<label>Total Leechers:</label>
-				<div id="torrent_inspector_total_leechers">N/A</div>
-			</div>
+				<div class="inspector_group">
+					<strong>Peers</strong>
+					<div class="inspector_row">
+						<div class="inspector_label">UL To:</div>
+						<div id="torrent_inspector_upload_to">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">DL From:</div>
+						<div id="torrent_inspector_download_from">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Total Seeders:</div>
+						<div id="torrent_inspector_total_seeders">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Total Leechers:</div>
+						<div id="torrent_inspector_total_leechers">N/A</div>
+					</div>
+				</div><!-- class="inspector_group"-->
+			</div><!-- id="inspector_tab_activity_container" -->
 		</div>
 		
 		<div id="torrent_container">
