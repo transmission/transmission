@@ -494,34 +494,27 @@ div#torrent_inspector {
 	z-index: 2;
 	text-align: left;
 }
-
 div#torrent_inspector #torrent_inspector_name {
-	font-size: 1.3em;
 	margin: 0;
-	word-wrap: break-word;
 	overflow: hidden;
 }
-
 div#torrent_inspector #torrent_inspector_size {
 	font-size: 1.2em;
 	margin: 3;
 	display: block;
 	padding-top: 2px;
 }
-
 div#inspector_header {
 	clear: both;
 	padding-top: 10px;
 	padding-left: 10px;
 	padding-right: 10px;
 }
-
 div#inspector_tabs {
 	margin: 0 auto;
 	padding-top: 10px;
 	width: 140px;
 }
-
 .inspector_tab {
 	float: left;
 	background: transparent url('../images/buttons/tab_backgrounds.png') left -1px repeat-x;
@@ -530,24 +523,22 @@ div#inspector_tabs {
 	padding: 3px 15px; /* 3px == ((bg image height - fg image height) / 2) */
 	cursor: pointer;
 }
-
 #inspector_tabs > .selected {
-	background-position: left -26px;
+	background-position: left -26px; /* the highlighted part of the image */
 }
-
 .inspector_container {
-	padding-top: 10px;
-	padding-bottom: 5px;
-	margin: 5px 10px;
+	margin: 10px;
+	width: 330px; /* inspector_width==350 - ((margin==10)*2) */
 }
-
 .inspector_group {
+	display: table;
+	width: 100%;
 	border-top: 1px solid #888;
-	margin: 8px 0px;
-	padding: 8px 0px;
+	margin: 10px 0px;
+	padding: 10px 0px;
 }
-
 .inspector_group_label {
+	display: table-header-group;
 	font-weight: bold;
 }
 .inspector_row {
@@ -555,12 +546,12 @@ div#inspector_tabs {
 }
 .inspector_row > .inspector_label {
 	display: table-cell;
-	padding-left: 10px;
+	width: 100px; /* this + the next 230 == inspector_container_with */
 }
 .inspector_row > div {
+	display: table-cell;
 	padding-top: 10px;
-	padding-left: 10px;
-	word-wrap: break-word;
+	width: 230px; /* inspector_container_width==330 - inspector_label_width==100 */
 }
 
 /*--------------------------------------
