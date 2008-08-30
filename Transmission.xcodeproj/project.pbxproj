@@ -2221,7 +2221,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		0053D3D30C86774200545606 /* Development */ = {
+		0053D3D30C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_ENABLE_SYMBOL_SEPARATION = NO;
@@ -2230,9 +2230,9 @@
 				PRODUCT_NAME = event;
 				USER_HEADER_SEARCH_PATHS = "third-party/libevent";
 			};
-			name = Development;
+			name = Debug;
 		};
-		0053D3D40C86774200545606 /* Development */ = {
+		0053D3D40C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
@@ -2256,9 +2256,9 @@
 				);
 				PRODUCT_NAME = transmission;
 			};
-			name = Development;
+			name = Debug;
 		};
-		0053D3D50C86774200545606 /* Development */ = {
+		0053D3D50C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = macosx;
@@ -2272,17 +2272,17 @@
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
-			name = Development;
+			name = Debug;
 		};
-		0053D3D60C86774200545606 /* Development */ = {
+		0053D3D60C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = .;
 				PRODUCT_NAME = transmissioncli;
 			};
-			name = Development;
+			name = Debug;
 		};
-		0053D3D70C86774200545606 /* Development */ = {
+		0053D3D70C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
@@ -2296,9 +2296,9 @@
 				);
 				PRODUCT_NAME = "transmission-daemon";
 			};
-			name = Development;
+			name = Debug;
 		};
-		0053D3D80C86774200545606 /* Development */ = {
+		0053D3D80C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
@@ -2308,9 +2308,9 @@
 				);
 				PRODUCT_NAME = "transmission-remote";
 			};
-			name = Development;
+			name = Debug;
 		};
-		0053D3DA0C86774200545606 /* Development */ = {
+		0053D3DA0C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
@@ -2342,7 +2342,7 @@
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
-			name = Development;
+			name = Debug;
 		};
 		3C7A118E0D0B2EB800B5701F /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -2370,7 +2370,7 @@
 			};
 			name = "Release - Debug";
 		};
-		3C7A11900D0B2EB800B5701F /* Development */ = {
+		3C7A11900D0B2EB800B5701F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
@@ -2383,7 +2383,7 @@
 				PRODUCT_NAME = natpmp;
 				ZERO_LINK = YES;
 			};
-			name = Development;
+			name = Debug;
 		};
 		4D18389C09DEC01E0047D688 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -2620,7 +2620,7 @@
 			};
 			name = "Release - Debug";
 		};
-		A2DF58280DE4B0EF000795D5 /* Development */ = {
+		A2DF58280DE4B0EF000795D5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -2640,7 +2640,7 @@
 				PRODUCT_NAME = shttpd;
 				USER_HEADER_SEARCH_PATHS = "third-party/shttpd";
 			};
-			name = Development;
+			name = Debug;
 		};
 		BE1183490CE160960002D0F3 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -2678,7 +2678,7 @@
 			};
 			name = "Release - Debug";
 		};
-		BE11834B0CE160960002D0F3 /* Development */ = {
+		BE11834B0CE160960002D0F3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
@@ -2696,7 +2696,7 @@
 				PRODUCT_NAME = miniupnp;
 				ZERO_LINK = YES;
 			};
-			name = Development;
+			name = Debug;
 		};
 		BE75C34B0C729EB600DBEFE0 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -2743,100 +2743,100 @@
 			buildConfigurations = (
 				3C7A118E0D0B2EB800B5701F /* Release */,
 				3C7A118F0D0B2EB800B5701F /* Release - Debug */,
-				3C7A11900D0B2EB800B5701F /* Development */,
+				3C7A11900D0B2EB800B5701F /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 		4D18389B09DEC01E0047D688 /* Build configuration list for PBXNativeTarget "libtransmission" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4D18389C09DEC01E0047D688 /* Release */,
 				A250CFEE0CDA19680068B4B6 /* Release - Debug */,
-				0053D3D40C86774200545606 /* Development */,
+				0053D3D40C86774200545606 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 		4DDBB71D09E16BF100284745 /* Build configuration list for PBXNativeTarget "transmissioncli" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DDBB71E09E16BF100284745 /* Release */,
 				A250CFED0CDA19680068B4B6 /* Release - Debug */,
-				0053D3D60C86774200545606 /* Development */,
+				0053D3D60C86774200545606 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 		4DF0C596089918A300DD8943 /* Build configuration list for PBXNativeTarget "Transmission" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DF0C599089918A300DD8943 /* Release */,
 				A250CFEC0CDA19680068B4B6 /* Release - Debug */,
-				0053D3D50C86774200545606 /* Development */,
+				0053D3D50C86774200545606 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 		4DF0C59A089918A300DD8943 /* Build configuration list for PBXProject "Transmission" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DF0C59D089918A300DD8943 /* Release */,
 				A250CFEB0CDA19680068B4B6 /* Release - Debug */,
-				0053D3DA0C86774200545606 /* Development */,
+				0053D3DA0C86774200545606 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 		A2DF584A0DE4B15A000795D5 /* Build configuration list for PBXNativeTarget "shttpd" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A2DF58260DE4B0EF000795D5 /* Release */,
 				A2DF58270DE4B0EF000795D5 /* Release - Debug */,
-				A2DF58280DE4B0EF000795D5 /* Development */,
+				A2DF58280DE4B0EF000795D5 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 		BE11834C0CE160A80002D0F3 /* Build configuration list for PBXNativeTarget "miniupnp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BE1183490CE160960002D0F3 /* Release */,
 				BE11834A0CE160960002D0F3 /* Release - Debug */,
-				BE11834B0CE160960002D0F3 /* Development */,
+				BE11834B0CE160960002D0F3 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 		BE75C34A0C729EB600DBEFE0 /* Build configuration list for PBXNativeTarget "event" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BE75C34B0C729EB600DBEFE0 /* Release */,
 				A250CFF20CDA19680068B4B6 /* Release - Debug */,
-				0053D3D30C86774200545606 /* Development */,
+				0053D3D30C86774200545606 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 		BEFC1C090C07753800B0BB3C /* Build configuration list for PBXNativeTarget "transmission-daemon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BEFC1C0A0C07753800B0BB3C /* Release */,
 				A250CFEF0CDA19680068B4B6 /* Release - Debug */,
-				0053D3D70C86774200545606 /* Development */,
+				0053D3D70C86774200545606 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 		BEFC1CF70C07822400B0BB3C /* Build configuration list for PBXNativeTarget "transmission-remote" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BEFC1CF80C07822400B0BB3C /* Release */,
 				A250CFF00CDA19680068B4B6 /* Release - Debug */,
-				0053D3D80C86774200545606 /* Development */,
+				0053D3D80C86774200545606 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
