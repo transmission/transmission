@@ -34,6 +34,8 @@ EXTRA_DIST = \
     BadgeView.m \
     BlocklistDownloader.h \
     BlocklistDownloader.m \
+    BlocklistDownloaderViewController.h \
+    BlocklistDownloaderViewController.m \
     ButtonToolbarItem.h \
     ButtonToolbarItem.m \
     ColorTextField.h \
