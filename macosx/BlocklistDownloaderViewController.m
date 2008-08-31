@@ -26,7 +26,6 @@
 #import "BlocklistDownloader.h"
 #import "PrefsController.h"
 #import "NSStringAdditions.h"
-#import "NSApplicationAdditions.h"
 
 @interface BlocklistDownloaderViewController (Private)
 
@@ -82,7 +81,7 @@
         [fProgressBar setDoubleValue: (double)currentSize / expectedSize];
     }
     else
-        string = [string stringByAppendingFormat: @" (%@)",  [NSString stringForFileSize: expectedSize]];
+        string = [string stringByAppendingFormat: @" (%@)",  [NSString stringForFileSize: currentSize]];
     
     [fTextField setStringValue: string];
 }
@@ -108,9 +107,6 @@
 
 - (void) setFailed: (NSString *) error
 {
-    #warning remove?
-    //[fProgressBar setHidden: YES];
-    
     [NSApp endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
     

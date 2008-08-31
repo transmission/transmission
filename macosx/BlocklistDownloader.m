@@ -91,7 +91,6 @@ BlocklistDownloader * fDownloader = nil;
     [fViewController setStatusProgressForCurrentSize: fCurrentSize expectedSize: fExpectedSize];
 }
 
-#warning release?
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
 {
     [fViewController setFailed: [error localizedDescription]];
@@ -147,7 +146,8 @@ BlocklistDownloader * fDownloader = nil;
     
     [fViewController setFinished];
     
-    #warning update date
+    [[NSUserDefaults standardUserDefaults] setObject: [NSDate date] forKey: @"BlocklistLastUpdate"];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"BlocklistUpdated" object: nil];
     
     [pool release];
