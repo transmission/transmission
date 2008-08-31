@@ -73,9 +73,6 @@ BlocklistDownloader * fDownloader = nil;
                 [fViewController setStatusProcessing];
                 break;
         }
-        
-        #warning set actual status
-        [fViewController setStatusStarting];
     }
 }
 
