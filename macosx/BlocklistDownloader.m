@@ -61,6 +61,19 @@ BlocklistDownloader * fDownloader = nil;
     fViewController = viewController;
     if (fViewController)
     {
+        switch (fState)
+        {
+            case BLOCKLIST_DL_START:
+                [fViewController setStatusStarting];
+                break;
+            case BLOCKLIST_DL_DOWNLOADING:
+                [fViewController setStatusProgressForCurrentSize: fCurrentSize expectedSize: fExpectedSize];
+                break;
+            case BLOCKLIST_DL_PROCESSING:
+                [fViewController setStatusProcessing];
+                break;
+        }
+        
         #warning set actual status
         [fViewController setStatusStarting];
     }
@@ -84,6 +97,8 @@ BlocklistDownloader * fDownloader = nil;
 
 - (void) download: (NSURLDownload *) download didReceiveResponse: (NSURLResponse *) response
 {
+    fState = BLOCKLIST_DL_DOWNLOADING;
+    
     fCurrentSize = 0;
     fExpectedSize = [response expectedContentLength];
     
@@ -106,6 +121,8 @@ BlocklistDownloader * fDownloader = nil;
 
 - (void) downloadDidFinish: (NSURLDownload *) download
 {
+    fState = BLOCKLIST_DL_PROCESSING;
+    
     if ([NSApp isOnLeopardOrBetter])
         [self performSelectorInBackground: @selector(finishDownloadSuccess) withObject: nil];
     else
@@ -118,6 +135,8 @@ BlocklistDownloader * fDownloader = nil;
 
 - (void) startDownload
 {
+    fState = BLOCKLIST_DL_START;
+    
     NSURLRequest * request = [NSURLRequest requestWithURL: [NSURL URLWithString: LIST_URL]];
     
     fDownload = [[NSURLDownload alloc] initWithRequest: request delegate: self];
