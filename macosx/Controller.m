@@ -559,6 +559,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
+    #warning stop blocklist download
+    
     //stop timers and notification checking
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     

@@ -23,8 +23,7 @@
  *****************************************************************************/
 
 #import "BlocklistDownloader.h"
-#import "PrefsController.h"
-#import "NSStringAdditions.h"
+#import "BlocklistDownloaderViewController.h"
 #import "NSApplicationAdditions.h"
 
 #define LIST_URL @"http://download.m0k.org/transmission/files/level1.gz"
@@ -32,36 +31,34 @@
 
 @interface BlocklistDownloader (Private)
 
-- (id) initWithPrefsController: (PrefsController *) prefsController;
+- (id) initWithHandle: (tr_handle *) handle;
 - (void) startDownload;
 - (void) finishDownloadSuccess;
-- (void) updateProcessString;
-- (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info;
 
 @end
 
 @implementation BlocklistDownloader
 
-+ (void) downloadWithPrefsController: (PrefsController *) prefsController
+BlocklistDownloader * fDownloader = nil;
++ (BlocklistDownloader *) downloader: (tr_handle *) handle
 {
-    BlocklistDownloader * downloader = [[BlocklistDownloader alloc] initWithPrefsController: prefsController];
-    [downloader startDownload];
+    if (!fDownloader)
+    {
+        fDownloader = [[BlocklistDownloader alloc] initWithHandle: handle];
+        [fDownloader startDownload];
+    }
+    
+    return fDownloader;
 }
 
-- (void) awakeFromNib
+- (void) setViewController: (BlocklistDownloaderViewController *) viewController
 {
-    [fButton setTitle: NSLocalizedString(@"Cancel", "Blocklist -> cancel button")];
-    
-    float oldWidth = [fButton frame].size.width;
-    [fButton sizeToFit];
-    NSRect buttonFrame = [fButton frame];
-    buttonFrame.origin.x -= buttonFrame.size.width - oldWidth;
-    [fButton setFrame: buttonFrame];
-    
-    [fTextField setStringValue: [NSLocalizedString(@"Connecting to site", "Blocklist -> message") stringByAppendingEllipsis]];
-    
-    [fProgressBar setUsesThreadedAnimation: YES];
-    [fProgressBar startAnimation: self];
+    fViewController = viewController;
+    if (fViewController)
+    {
+        #warning set actual status
+        [fViewController setStatusStarting];
+    }
 }
 
 - (void) dealloc
@@ -70,12 +67,13 @@
     [super dealloc];
 }
 
-- (void) cancelDownload: (id) sender
+- (void) cancelDownload
 {
+    [fViewController setFinished];
+    
     [fDownload cancel];
     
-    [NSApp endSheet: fStatusWindow];
-    [fStatusWindow orderOut: self];
+    fDownloader = nil;
     [self release];
 }
 
@@ -84,34 +82,22 @@
     fCurrentSize = 0;
     fExpectedSize = [response expectedContentLength];
     
-    //change from indeterminate to progress
-    [fProgressBar setIndeterminate: fExpectedSize == NSURLResponseUnknownLength];
-    [self updateProcessString];
+    [fViewController setStatusProgressForCurrentSize: fCurrentSize expectedSize: fExpectedSize];
 }
 
 - (void) download: (NSURLDownload *) download didReceiveDataOfLength: (NSUInteger) length
 {
     fCurrentSize += length;
-    [self updateProcessString];
+    [fViewController setStatusProgressForCurrentSize: fCurrentSize expectedSize: fExpectedSize];
 }
 
+#warning release?
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
 {
-    [fProgressBar setHidden: YES];
+    [fViewController setFailed: [error localizedDescription]];
     
-    [NSApp endSheet: fStatusWindow];
-    [fStatusWindow orderOut: self];
-    
-    NSAlert * alert = [[[NSAlert alloc] init] autorelease];
-    [alert addButtonWithTitle: NSLocalizedString(@"OK", "Blocklist -> button")];
-    [alert setMessageText: NSLocalizedString(@"Download of the blocklist failed.", "Blocklist -> message")];
-    [alert setAlertStyle: NSWarningAlertStyle];
-    
-    [alert setInformativeText: [NSString stringWithFormat: @"%@ - %@", NSLocalizedString(@"Error", "Blocklist -> message"),
-        [error localizedDescription]]];
-    
-    [alert beginSheetModalForWindow: [fPrefsController window] modalDelegate: self
-        didEndSelector: @selector(failureSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+    fDownloader = nil;
+    [self release];
 }
 
 - (void) downloadDidFinish: (NSURLDownload *) download
@@ -126,11 +112,11 @@
 
 @implementation BlocklistDownloader (Private)
 
-- (id) initWithPrefsController: (PrefsController *) prefsController
+- (id) initWithHandle: (tr_handle *) handle
 {
     if ((self = [super init]))
     {
-        fPrefsController = prefsController;
+        fHandle = handle;
     }
     
     return self;
@@ -138,11 +124,6 @@
 
 - (void) startDownload
 {
-    //load window and show as sheet
-    [NSBundle loadNibNamed: @"BlocklistStatusWindow" owner: self];
-    [NSApp beginSheet: fStatusWindow modalForWindow: [fPrefsController window] modalDelegate: nil didEndSelector: nil contextInfo: nil];
-    
-    //start the download
     NSURLRequest * request = [NSURLRequest requestWithURL: [NSURL URLWithString: LIST_URL]];
     
     fDownload = [[NSURLDownload alloc] initWithRequest: request delegate: self];
@@ -153,16 +134,10 @@
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
-    //change to indeterminate while processing
-    [fProgressBar setIndeterminate: YES];
-    [fProgressBar startAnimation: self];
-    
-    [fTextField setStringValue: [NSLocalizedString(@"Processing blocklist", "Blocklist -> message") stringByAppendingEllipsis]];
-    [fButton setEnabled: NO];
-    [fStatusWindow display]; //force window to be updated
+    [fViewController setStatusProcessing];
     
     //process data
-    tr_blocklistSetContent([fPrefsController handle], [DESTINATION UTF8String]);
+    tr_blocklistSetContent(fHandle, [DESTINATION UTF8String]);
     
     //delete downloaded file
     if ([NSApp isOnLeopardOrBetter])
@@ -170,32 +145,14 @@
     else
         [[NSFileManager defaultManager] removeFileAtPath: DESTINATION handler: nil];
     
-    [fPrefsController updateBlocklistFields];
+    [fViewController setFinished];
     
-    [NSApp endSheet: fStatusWindow];
-    [fStatusWindow orderOut: self];
+    #warning update date
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"BlocklistUpdated" object: nil];
     
     [pool release];
-    [self release];
-}
-
-- (void) updateProcessString
-{
-    NSString * string = NSLocalizedString(@"Downloading blocklist", "Blocklist -> message");
-    if (fExpectedSize != NSURLResponseUnknownLength)
-    {
-        NSString * substring = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Blocklist -> message"),
-                                [NSString stringForFileSize: fCurrentSize], [NSString stringForFileSize: fExpectedSize]];
-        string = [string stringByAppendingFormat: @" (%@)",  substring];
-        [fProgressBar setDoubleValue: (double)fCurrentSize / fExpectedSize];
-    }
     
-    [fTextField setStringValue: string];
-}
-
-- (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info
-{
-    [[alert window] orderOut: nil];
+    fDownloader = nil;
     [self release];
 }
 

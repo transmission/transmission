@@ -25,24 +25,29 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
-@class BlocklistDownloaderViewController;
+@class PrefsController;
+@class BlocklistDownloader;
 
-@interface BlocklistDownloader : NSObject
-{
-    NSURLDownload * fDownload;
+@interface BlocklistDownloaderViewController : NSObject
+{    
+    PrefsController * fPrefsController;
+    BlocklistDownloader * fDownloader;
     
-    #warning have to store???
-    tr_handle * fHandle;
-    
-    BlocklistDownloaderViewController * fViewController;
-    
-    NSUInteger fCurrentSize;
-    long long fExpectedSize;
+    IBOutlet NSWindow * fStatusWindow;
+    IBOutlet NSProgressIndicator * fProgressBar;
+    IBOutlet NSTextField * fTextField;
+    IBOutlet NSButton * fButton;
 }
 
-+ (BlocklistDownloader *) downloader: (tr_handle *) handle;
-- (void) setViewController: (BlocklistDownloaderViewController *) viewController;
++ (void) downloadWithPrefsController: (PrefsController *) prefsController;
 
-- (void) cancelDownload;
+- (void) cancelDownload: (id) sender;
+
+- (void) setStatusStarting;
+- (void) setStatusProgressForCurrentSize: (NSUInteger) currentSize expectedSize: (long long) expectedSize;
+- (void) setStatusProcessing;
+
+- (void) setFinished;
+- (void) setFailed: (NSString *) error;
 
 @end

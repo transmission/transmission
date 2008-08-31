@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "PrefsController.h"
-#import "BlocklistDownloader.h"
+#import "BlocklistDownloaderViewController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
@@ -127,6 +127,7 @@
     return self;
 }
 
+#warning still needed? make class method?
 - (tr_handle *) handle
 {
     return fHandle;
@@ -134,6 +135,8 @@
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
     [fPortStatusTimer invalidate];
     if (fPortChecker)
     {
@@ -222,6 +225,8 @@
     
     //set blocklist
     [self updateBlocklistFields];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBlocklistFields)
+        name: @"BlocklistUpdated" object: nil];
     
     //set rpc port
     [fRPCPortField setIntValue: [fDefaults integerForKey: @"RPCPort"]];
@@ -446,7 +451,7 @@
 
 - (void) updateBlocklist: (id) sender
 {
-    [BlocklistDownloader downloadWithPrefsController: self];
+    [BlocklistDownloaderViewController downloadWithPrefsController: self];
 }
 
 - (void) updateBlocklistFields
