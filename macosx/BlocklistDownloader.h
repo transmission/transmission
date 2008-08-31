@@ -40,7 +40,9 @@
     long long fExpectedSize;
 }
 
-+ (BlocklistDownloader *) downloader: (tr_handle *) handle;
++ (BlocklistDownloader *) downloader: (tr_handle *) handle; //starts download if not already occuring
++ (BOOL) isRunning;
+
 - (void) setViewController: (BlocklistDownloaderViewController *) viewController;
 
 - (void) cancelDownload;

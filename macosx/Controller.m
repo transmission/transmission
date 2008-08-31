@@ -38,6 +38,7 @@
 #import "ButtonToolbarItem.h"
 #import "GroupToolbarItem.h"
 #import "ToolbarSegmentedCell.h"
+#import "BlocklistDownloader.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSMenuAdditions.h"
@@ -559,7 +560,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
-    #warning stop blocklist download
+    //stop blocklist download
+    if ([BlocklistDownloader isRunning])
+        [[BlocklistDownloader downloader: fLib] cancelDownload];
     
     //stop timers and notification checking
     [[NSNotificationCenter defaultCenter] removeObserver: self];

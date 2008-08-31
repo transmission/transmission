@@ -51,6 +51,11 @@ BlocklistDownloader * fDownloader = nil;
     return fDownloader;
 }
 
++ (BOOL) isRunning
+{
+    return fDownloader != nil;
+}
+
 - (void) setViewController: (BlocklistDownloaderViewController *) viewController
 {
     fViewController = viewController;
