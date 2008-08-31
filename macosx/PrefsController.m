@@ -70,12 +70,22 @@
 
 @implementation PrefsController
 
-- (id) initWithHandle: (tr_handle *) handle
+tr_handle * fHandle;
++ (void) setHandle: (tr_handle *) handle
+{
+    fHandle = handle;
+}
+
++ (tr_handle *) handle
+{
+    return fHandle;
+}
+
+- (id) init
 {
     if ((self = [super initWithWindowNibName: @"PrefsWindow"]))
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
-        fHandle = handle;
         
         //checks for old version speeds of -1
         if ([fDefaults integerForKey: @"UploadLimit"] < 0)
@@ -125,12 +135,6 @@
     }
     
     return self;
-}
-
-#warning still needed? make class method?
-- (tr_handle *) handle
-{
-    return fHandle;
 }
 
 - (void) dealloc

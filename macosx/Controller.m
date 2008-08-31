@@ -241,7 +241,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         fMessageController = [[MessageWindowController alloc] init];
         fInfoController = [[InfoWindowController alloc] init];
-        fPrefsController = [[PrefsController alloc] initWithHandle: fLib];
+        
+        [PrefsController setHandle: fLib];
+        fPrefsController = [[PrefsController alloc] init];
         
         fBadger = [[Badger alloc] initWithLib: fLib];
         [QuickLookController quickLookControllerInitializeWithController: self infoController: fInfoController];
@@ -562,7 +564,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     //stop blocklist download
     if ([BlocklistDownloader isRunning])
-        [[BlocklistDownloader downloader: fLib] cancelDownload];
+        [[BlocklistDownloader downloader] cancelDownload];
     
     //stop timers and notification checking
     [[NSNotificationCenter defaultCenter] removeObserver: self];

@@ -59,7 +59,7 @@
 
 - (void) cancelDownload: (id) sender
 {
-    [fDownloader cancelDownload];
+    [[BlocklistDownloader downloader] cancelDownload];
 }
 
 - (void) setStatusStarting
@@ -142,8 +142,8 @@
     [NSBundle loadNibNamed: @"BlocklistStatusWindow" owner: self];
     [NSApp beginSheet: fStatusWindow modalForWindow: [fPrefsController window] modalDelegate: nil didEndSelector: nil contextInfo: nil];
     
-    fDownloader = [BlocklistDownloader downloader: [fPrefsController handle]];
-    [fDownloader setViewController: self];
+    BlocklistDownloader * downloader = [BlocklistDownloader downloader];
+    [downloader setViewController: self];
 }
 
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info

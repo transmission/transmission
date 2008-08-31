@@ -28,8 +28,6 @@
 
 @interface PrefsController : NSWindowController
 {
-    tr_handle * fHandle;
-    
     NSUserDefaults * fDefaults;
     BOOL fHasLoaded;
     
@@ -63,8 +61,8 @@
     NSMutableArray * fRPCAccessArray;
 }
 
-- (id) initWithHandle: (tr_handle *) handle;
-- (tr_handle *) handle;
++ (void) setHandle: (tr_handle *) handle;
++ (tr_handle *) handle;
 
 - (void) updatePortField;
 - (void) setPort: (id) sender;

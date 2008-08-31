@@ -24,6 +24,7 @@
 
 #import "BlocklistDownloader.h"
 #import "BlocklistDownloaderViewController.h"
+#import "PrefsController.h"
 #import "NSApplicationAdditions.h"
 
 #define LIST_URL @"http://download.m0k.org/transmission/files/level1.gz"
@@ -31,7 +32,6 @@
 
 @interface BlocklistDownloader (Private)
 
-- (id) initWithHandle: (tr_handle *) handle;
 - (void) startDownload;
 - (void) finishDownloadSuccess;
 
@@ -40,11 +40,11 @@
 @implementation BlocklistDownloader
 
 BlocklistDownloader * fDownloader = nil;
-+ (BlocklistDownloader *) downloader: (tr_handle *) handle
++ (BlocklistDownloader *) downloader
 {
     if (!fDownloader)
     {
-        fDownloader = [[BlocklistDownloader alloc] initWithHandle: handle];
+        fDownloader = [[BlocklistDownloader alloc] init];
         [fDownloader startDownload];
     }
     
@@ -116,16 +116,6 @@ BlocklistDownloader * fDownloader = nil;
 
 @implementation BlocklistDownloader (Private)
 
-- (id) initWithHandle: (tr_handle *) handle
-{
-    if ((self = [super init]))
-    {
-        fHandle = handle;
-    }
-    
-    return self;
-}
-
 - (void) startDownload
 {
     NSURLRequest * request = [NSURLRequest requestWithURL: [NSURL URLWithString: LIST_URL]];
@@ -141,7 +131,7 @@ BlocklistDownloader * fDownloader = nil;
     [fViewController setStatusProcessing];
     
     //process data
-    tr_blocklistSetContent(fHandle, [DESTINATION UTF8String]);
+    tr_blocklistSetContent([PrefsController handle], [DESTINATION UTF8String]);
     
     //delete downloaded file
     if ([NSApp isOnLeopardOrBetter])

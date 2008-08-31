@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <transmission.h>
 
 @class BlocklistDownloaderViewController;
 
@@ -31,16 +30,13 @@
 {
     NSURLDownload * fDownload;
     
-    #warning have to store???
-    tr_handle * fHandle;
-    
     BlocklistDownloaderViewController * fViewController;
     
     NSUInteger fCurrentSize;
     long long fExpectedSize;
 }
 
-+ (BlocklistDownloader *) downloader: (tr_handle *) handle; //starts download if not already occuring
++ (BlocklistDownloader *) downloader; //starts download if not already occuring
 + (BOOL) isRunning;
 
 - (void) setViewController: (BlocklistDownloaderViewController *) viewController;

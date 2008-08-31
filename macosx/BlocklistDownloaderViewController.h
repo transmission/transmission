@@ -26,12 +26,10 @@
 #import <transmission.h>
 
 @class PrefsController;
-@class BlocklistDownloader;
 
 @interface BlocklistDownloaderViewController : NSObject
 {    
     PrefsController * fPrefsController;
-    BlocklistDownloader * fDownloader;
     
     IBOutlet NSWindow * fStatusWindow;
     IBOutlet NSProgressIndicator * fProgressBar;
