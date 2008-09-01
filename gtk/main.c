@@ -41,6 +41,8 @@
 #include <gdk/gdkx.h>
 #endif
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
 #include "actions.h"
@@ -476,6 +478,85 @@ main( int argc, char ** argv )
     return 0;
 }
 
+static gboolean
+updateScheduledLimits(gpointer data)
+{
+    tr_handle *tr = (tr_handle *) data;
+    static gboolean last_state = FALSE;
+    gboolean in_sched_state = FALSE;
+
+    if( !pref_flag_get( PREF_KEY_SCHED_LIMIT_ENABLED ) )
+    {
+        in_sched_state = FALSE;
+    }
+    else
+    {
+        time_t t;
+        struct tm *tm;
+        int begin_hour, begin_minute, end_hour, end_minute;
+        int begin_time, end_time, cur_time;
+
+        begin_hour = pref_int_get( PREF_KEY_SCHED_BEGIN_HOUR );
+        begin_minute = pref_int_get( PREF_KEY_SCHED_BEGIN_MINUTE );
+        end_hour = pref_int_get( PREF_KEY_SCHED_END_HOUR );
+        end_minute = pref_int_get( PREF_KEY_SCHED_END_MINUTE );
+
+        time( &t );
+        tm = localtime (&t);
+        cur_time = (tm->tm_hour * 60) + tm->tm_min;
+        begin_time = (begin_hour * 60) + begin_minute;
+        end_time = (end_hour * 60) + end_minute;
+
+        if( (end_time - begin_time) >= 0 )
+        {
+            if( (cur_time >= begin_time) && (cur_time <= end_time) )
+                in_sched_state = TRUE;
+	}
+        else
+        {
+            if ( (cur_time >= begin_time) || (cur_time <= end_time) )
+                in_sched_state = TRUE;
+        }
+    }
+
+    if( last_state != in_sched_state )
+    {
+        if( in_sched_state )
+        {
+            int limit;
+
+            tr_inf ( _( "Enabling scheduled bandwidth limits" ) );
+
+            tr_sessionSetSpeedLimitEnabled( tr, TR_DOWN, TRUE );
+            limit = pref_int_get( PREF_KEY_SCHED_DL_LIMIT );
+            tr_sessionSetSpeedLimit( tr, TR_DOWN, limit );
+            tr_sessionSetSpeedLimitEnabled( tr, TR_UP, TRUE );
+            limit = pref_int_get( PREF_KEY_SCHED_UL_LIMIT );
+            tr_sessionSetSpeedLimit( tr, TR_UP, limit );
+        }
+        else
+        {
+            gboolean b;
+            int limit;
+
+            tr_inf ( _( "Disabling scheduled bandwidth limits" ) );
+
+            b = pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED );
+            tr_sessionSetSpeedLimitEnabled( tr, TR_DOWN, b );
+            limit = pref_int_get( PREF_KEY_DL_LIMIT );
+            tr_sessionSetSpeedLimit( tr, TR_DOWN, limit );
+            b = pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED );
+            tr_sessionSetSpeedLimitEnabled( tr, TR_UP, b );
+            limit = pref_int_get( PREF_KEY_UL_LIMIT );
+            tr_sessionSetSpeedLimit( tr, TR_UP, limit );
+        }
+
+        last_state = in_sched_state;
+    }
+
+    return TRUE;
+}
+
 static void
 appsetup( TrWindow * wind, GSList * torrentFiles,
           struct cbdata * cbdata,
@@ -524,6 +605,10 @@ appsetup( TrWindow * wind, GSList * torrentFiles,
     /* start model update timer */
     cbdata->timer = g_timeout_add( UPDATE_INTERVAL, updatemodel, cbdata );
     updatemodel( cbdata );
+
+    /* start scheduled rate timer */
+    updateScheduledLimits (tr_core_handle( cbdata->core ));
+    g_timeout_add_seconds( 60, updateScheduledLimits, tr_core_handle( cbdata->core ) );
 
     /* either show the window or iconify it */
     if( !minimized )

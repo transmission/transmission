@@ -71,6 +71,14 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_DL_LIMIT, 100 );
     pref_flag_set_default   ( PREF_KEY_UL_LIMIT_ENABLED, FALSE );
     pref_int_set_default    ( PREF_KEY_UL_LIMIT, 50 );
+    pref_flag_set_default   ( PREF_KEY_SCHED_LIMIT_ENABLED, FALSE );
+    pref_int_set_default    ( PREF_KEY_SCHED_BEGIN_HOUR, 0 );
+    pref_int_set_default    ( PREF_KEY_SCHED_BEGIN_MINUTE, 0 );
+    pref_int_set_default    ( PREF_KEY_SCHED_END_HOUR, 0 );
+    pref_int_set_default    ( PREF_KEY_SCHED_END_MINUTE, 0 );
+    pref_int_set_default    ( PREF_KEY_SCHED_DL_LIMIT, 100 );
+    pref_int_set_default    ( PREF_KEY_SCHED_UL_LIMIT, 50 );
+
     pref_flag_set_default   ( PREF_KEY_OPTIONS_PROMPT, TRUE );
 
     pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_HEIGHT, 500 );
@@ -1060,13 +1068,46 @@ trackerPage( GObject * core )
     return t;
 }
 
+struct NetworkPage
+{
+    TrCore * core;
+    GSList * sched_widgets;
+};
+
+static void
+refreshNetworkSensitivity( struct NetworkPage * p )
+{
+    GSList * l;
+    const gboolean sched_enabled = pref_flag_get( PREF_KEY_SCHED_LIMIT_ENABLED );
+
+    for( l=p->sched_widgets; l!=NULL; l=l->next )
+        gtk_widget_set_sensitive( GTK_WIDGET( l->data ), sched_enabled );
+}
+
+static void
+onNetworkToggled( GtkToggleButton * tb UNUSED, gpointer user_data )
+{
+    refreshNetworkSensitivity( user_data );
+}
+
+static void
+networkPageFree( gpointer gpage )
+{
+    struct NetworkPage * page = gpage;
+    g_slist_free( page->sched_widgets );
+    g_free( page );
+}
+
 static GtkWidget*
 networkPage( GObject * core )
 {
     int row = 0;
     const char * s;
     GtkWidget * t;
-    GtkWidget * w, * w2;
+    GtkWidget * w, * w2, * h;
+    struct NetworkPage * page = tr_new0( struct NetworkPage, 1 );
+
+    page->core = TR_CORE( core );
 
     t = hig_workarea_create( );
     hig_workarea_add_section_title (t, &row, _( "Router" ) );
@@ -1092,7 +1133,50 @@ networkPage( GObject * core )
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title (t, &row, _("Scheduled Bandwidth Limit"));
+
+        h = gtk_hbox_new( FALSE, 0 );
+        w2 = new_spin_button( PREF_KEY_SCHED_BEGIN_HOUR, core, 0, 23, 1 );
+        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
+	w2 = gtk_label_new (":");
+        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
+        w2 = new_spin_button( PREF_KEY_SCHED_BEGIN_MINUTE, core, 0, 59, 1 );
+        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
+	w2 = gtk_label_new (_(" and "));
+        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
+        w2 = new_spin_button( PREF_KEY_SCHED_END_HOUR, core, 0, 23, 1 );
+        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
+	w2 = gtk_label_new (":");
+        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
+        w2 = new_spin_button( PREF_KEY_SCHED_END_MINUTE, core, 0, 59, 1 );
+        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
+
+        s = _( "Limit bandwidth between" );
+        w = new_check_button( s, PREF_KEY_SCHED_LIMIT_ENABLED, core );
+        g_signal_connect( w, "toggled", G_CALLBACK(onNetworkToggled), page );
+        hig_workarea_add_row_w( t, &row, w, h, NULL );
+
+        w = new_spin_button( PREF_KEY_SCHED_DL_LIMIT, core, 0, INT_MAX, 5 );
+        gtk_widget_set_sensitive( GTK_WIDGET(w), pref_flag_get( PREF_KEY_SCHED_LIMIT_ENABLED ) );
+        page->sched_widgets = g_slist_append( page->sched_widgets, w );
+        hig_workarea_add_row( t, &row, _( "Scheduled download speed (KB/s):" ), w, NULL );
+        w = new_spin_button( PREF_KEY_SCHED_DL_LIMIT, core, 0, INT_MAX, 5 );
+        gtk_widget_set_sensitive( GTK_WIDGET(w), pref_flag_get( PREF_KEY_SCHED_LIMIT_ENABLED ) );
+        page->sched_widgets = g_slist_append( page->sched_widgets, w );
+        hig_workarea_add_row( t, &row, _( "Scheduled upload speed (KB/s):" ), w, NULL );
+
     hig_workarea_finish( t, &row );
+    g_object_set_data_full( G_OBJECT( t ), "page", page, networkPageFree );
+
+    refreshNetworkSensitivity( page );
     return t;
 }
 
