@@ -553,6 +553,23 @@ updateScheduledLimits(gpointer data)
 
         last_state = in_sched_state;
     }
+    else if( in_sched_state )
+    {
+        static int old_dl_limit = 0, old_ul_limit = 0;
+        int dl_limit = pref_int_get( PREF_KEY_SCHED_DL_LIMIT );
+        int ul_limit = pref_int_get( PREF_KEY_SCHED_UL_LIMIT );
+
+        if( ( dl_limit != old_dl_limit ) || ( ul_limit != old_ul_limit ) )
+        {
+            tr_sessionSetSpeedLimitEnabled( tr, TR_DOWN, TRUE );
+            tr_sessionSetSpeedLimit( tr, TR_DOWN, dl_limit );
+            tr_sessionSetSpeedLimitEnabled( tr, TR_UP, TRUE );
+            tr_sessionSetSpeedLimit( tr, TR_UP, ul_limit );
+
+            old_dl_limit = dl_limit;
+            old_ul_limit = ul_limit;
+        }
+    }
 
     return TRUE;
 }
@@ -1069,6 +1086,10 @@ g_message( "setting encryption to %d", encryption );
     {
         const int limit = pref_int_get( key );
         tr_sessionSetSpeedLimit( tr, TR_UP, limit );
+    }
+    else if ( !strncmp( key, "sched-", 6 ) )
+    {
+        updateScheduledLimits( tr );
     }
     else if( !strcmp( key, PREF_KEY_PORT_FORWARDING ) )
     {
