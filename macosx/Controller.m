@@ -488,8 +488,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self updateUI];
     fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_UI_SECONDS target: self
                 selector: @selector(updateUI) userInfo: nil repeats: YES];
-    [[NSRunLoop mainRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
-    [[NSRunLoop mainRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
+    [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
+    [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
     [self applyFilter: nil];
     
