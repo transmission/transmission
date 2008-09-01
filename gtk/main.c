@@ -525,7 +525,7 @@ updateScheduledLimits(gpointer data)
         {
             int limit;
 
-            tr_inf ( _( "Enabling scheduled bandwidth limits" ) );
+            tr_inf ( _( "Beginning to use scheduled bandwidth limits" ) );
 
             tr_sessionSetSpeedLimitEnabled( tr, TR_DOWN, TRUE );
             limit = pref_int_get( PREF_KEY_SCHED_DL_LIMIT );
@@ -539,7 +539,7 @@ updateScheduledLimits(gpointer data)
             gboolean b;
             int limit;
 
-            tr_inf ( _( "Disabling scheduled bandwidth limits" ) );
+            tr_inf ( _( "Ending use of scheduled bandwidth limits" ) );
 
             b = pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED );
             tr_sessionSetSpeedLimitEnabled( tr, TR_DOWN, b );
