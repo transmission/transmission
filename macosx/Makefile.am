@@ -36,6 +36,8 @@ EXTRA_DIST = \
     BlocklistDownloader.m \
     BlocklistDownloaderViewController.h \
     BlocklistDownloaderViewController.m \
+    BlocklistScheduler.h \
+    BlocklistScheduler.m \
     ButtonToolbarItem.h \
     ButtonToolbarItem.m \
     ColorTextField.h \

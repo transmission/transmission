@@ -82,6 +82,7 @@
 
 - (void) setBlocklistEnabled: (id) sender;
 - (void) updateBlocklist: (id) sender;
+- (void) setBlocklistAutoUpdate: (id) sender;
 - (void) updateBlocklistFields;
 
 - (void) setBadge: (id) sender;

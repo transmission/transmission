@@ -24,6 +24,7 @@
 
 #import "PrefsController.h"
 #import "BlocklistDownloaderViewController.h"
+#import "BlocklistScheduler.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
@@ -113,6 +114,9 @@ tr_handle * fHandle;
         NSString * autoPath;
         if ([fDefaults boolForKey: @"AutoImport"] && (autoPath = [fDefaults stringForKey: @"AutoImportDirectory"]))
             [[UKKQueue sharedFileWatcher] addPath: [autoPath stringByExpandingTildeInPath]];
+        
+        //set blocklist scheduler
+        [[BlocklistScheduler scheduler] updateSchedule];
         
         //set encryption
         [self setEncryptionMode: nil];
@@ -451,11 +455,18 @@ tr_handle * fHandle;
     BOOL enable = [sender state] == NSOnState;
     [fDefaults setBool: enable forKey: @"Blocklist"];
     tr_blocklistSetEnabled(fHandle, enable);
+    
+    [[BlocklistScheduler scheduler] updateSchedule];
 }
 
 - (void) updateBlocklist: (id) sender
 {
     [BlocklistDownloaderViewController downloadWithPrefsController: self];
+}
+
+- (void) setBlocklistAutoUpdate: (id) sender
+{
+    [[BlocklistScheduler scheduler] updateSchedule];
 }
 
 - (void) updateBlocklistFields

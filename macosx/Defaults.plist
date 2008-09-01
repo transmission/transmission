@@ -16,6 +16,8 @@
 	<integer>51413</integer>
 	<key>Blocklist</key>
 	<false/>
+	<key>BlocklistAutoUpdate</key>
+	<false/>
 	<key>CheckDownload</key>
 	<false/>
 	<key>CheckQuit</key>

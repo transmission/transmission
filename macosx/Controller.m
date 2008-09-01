@@ -488,8 +488,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self updateUI];
     fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_UI_SECONDS target: self
                 selector: @selector(updateUI) userInfo: nil repeats: YES];
-    [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
-    [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
+    [[NSRunLoop mainRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
+    [[NSRunLoop mainRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
     [self applyFilter: nil];
     
@@ -2435,9 +2435,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     fSpeedLimitTimer = [[NSTimer alloc] initWithFireDate: dateToUse interval: 0 target: self selector: @selector(autoSpeedLimit:)
                         userInfo: [NSNumber numberWithBool: nextIsLimit] repeats: NO];
     
-    [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSDefaultRunLoopMode];
-    [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSModalPanelRunLoopMode];
-    [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSEventTrackingRunLoopMode];
+    [[NSRunLoop mainRunLoop] addTimer: fSpeedLimitTimer forMode: NSDefaultRunLoopMode];
+    [[NSRunLoop mainRunLoop] addTimer: fSpeedLimitTimer forMode: NSModalPanelRunLoopMode];
+    [[NSRunLoop mainRunLoop] addTimer: fSpeedLimitTimer forMode: NSEventTrackingRunLoopMode];
     [fSpeedLimitTimer release];
 }
 

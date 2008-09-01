@@ -24,6 +24,7 @@
 
 #import "BlocklistDownloader.h"
 #import "BlocklistDownloaderViewController.h"
+#import "BlocklistScheduler.h"
 #import "PrefsController.h"
 #import "NSApplicationAdditions.h"
 
@@ -88,6 +89,8 @@ BlocklistDownloader * fDownloader = nil;
     
     [fDownload cancel];
     
+    [[BlocklistScheduler scheduler] updateSchedule];
+    
     fDownloader = nil;
     [self release];
 }
@@ -112,6 +115,8 @@ BlocklistDownloader * fDownloader = nil;
 {
     [fViewController setFailed: [error localizedDescription]];
     
+    [[BlocklistScheduler scheduler] updateSchedule];
+    
     fDownloader = nil;
     [self release];
 }
@@ -133,6 +138,8 @@ BlocklistDownloader * fDownloader = nil;
 - (void) startDownload
 {
     fState = BLOCKLIST_DL_START;
+    
+    [[BlocklistScheduler scheduler] cancelSchedule];
     
     NSURLRequest * request = [NSURLRequest requestWithURL: [NSURL URLWithString: LIST_URL]];
     
@@ -157,7 +164,9 @@ BlocklistDownloader * fDownloader = nil;
     
     [fViewController setFinished];
     
+    //update last updated date for schedule
     [[NSUserDefaults standardUserDefaults] setObject: [NSDate date] forKey: @"BlocklistLastUpdate"];
+    [[BlocklistScheduler scheduler] updateSchedule];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"BlocklistUpdated" object: nil];
     
