@@ -480,19 +480,24 @@ tr_handle * fHandle;
     [fBlocklistEnableCheck setEnabled: exists];
     [fBlocklistEnableCheck setState: exists && [fDefaults boolForKey: @"Blocklist"]];
     
-    NSDate * updatedDate = [fDefaults objectForKey: @"BlocklistLastUpdate"];
     NSString * updatedDateString;
-    if (updatedDate)
+    if (exists)
     {
-        NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateStyle: NSDateFormatterFullStyle];
-        [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
-        
-        updatedDateString = [dateFormatter stringFromDate: updatedDate];
-        [dateFormatter release];
+        NSDate * updatedDate = [fDefaults objectForKey: @"BlocklistLastUpdate"];
+        if (updatedDate)
+        {
+            NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateStyle: NSDateFormatterFullStyle];
+            [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
+            
+            updatedDateString = [dateFormatter stringFromDate: updatedDate];
+            [dateFormatter release];
+        }
+        else
+            updatedDateString = NSLocalizedString(@"N/A", "Prefs -> blocklist -> message");
     }
     else
-        updatedDateString = NSLocalizedString(@"N/A", "Prefs -> blocklist -> message");
+        updatedDateString = NSLocalizedString(@"Never", "Prefs -> blocklist -> message");
     
     [fBlocklistDateField setStringValue: [NSString stringWithFormat: @"%@: %@",
         NSLocalizedString(@"Last updated", "Prefs -> blocklist -> message"), updatedDateString]];
