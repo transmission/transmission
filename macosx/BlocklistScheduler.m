@@ -24,6 +24,7 @@
 
 #import "BlocklistScheduler.h"
 #import "BlocklistDownloader.h"
+#import "NSApplicationAdditions.h"
 
 //one minute delay before running after option is changed
 #define SMALL_DELAY 60
@@ -69,9 +70,11 @@ BlocklistScheduler * fScheduler = nil;
     fTimer = [[NSTimer alloc] initWithFireDate: useDate interval: 0 target: self selector: @selector(runUpdater)
                 userInfo: nil repeats: NO];
     
-    [[NSRunLoop mainRunLoop] addTimer: fTimer forMode: NSDefaultRunLoopMode];
-    [[NSRunLoop mainRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
-    [[NSRunLoop mainRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
+    //current run loop usually means a second update won't work
+    NSRunLoop * loop = [NSApp isOnLeopardOrBetter] ? [NSRunLoop mainRunLoop] : [NSRunLoop currentRunLoop];
+    [loop addTimer: fTimer forMode: NSDefaultRunLoopMode];
+    [loop addTimer: fTimer forMode: NSModalPanelRunLoopMode];
+    [loop addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
 }
 
 - (void) cancelSchedule

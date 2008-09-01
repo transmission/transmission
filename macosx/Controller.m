@@ -2435,9 +2435,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     fSpeedLimitTimer = [[NSTimer alloc] initWithFireDate: dateToUse interval: 0 target: self selector: @selector(autoSpeedLimit:)
                         userInfo: [NSNumber numberWithBool: nextIsLimit] repeats: NO];
     
-    [[NSRunLoop mainRunLoop] addTimer: fSpeedLimitTimer forMode: NSDefaultRunLoopMode];
-    [[NSRunLoop mainRunLoop] addTimer: fSpeedLimitTimer forMode: NSModalPanelRunLoopMode];
-    [[NSRunLoop mainRunLoop] addTimer: fSpeedLimitTimer forMode: NSEventTrackingRunLoopMode];
+    NSRunLoop * loop = [NSApp isOnLeopardOrBetter] ? [NSRunLoop mainRunLoop] : [NSRunLoop currentRunLoop];
+    [loop addTimer: fSpeedLimitTimer forMode: NSDefaultRunLoopMode];
+    [loop addTimer: fSpeedLimitTimer forMode: NSModalPanelRunLoopMode];
+    [loop addTimer: fSpeedLimitTimer forMode: NSEventTrackingRunLoopMode];
     [fSpeedLimitTimer release];
 }
 
