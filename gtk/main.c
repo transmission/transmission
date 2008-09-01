@@ -608,7 +608,7 @@ appsetup( TrWindow * wind, GSList * torrentFiles,
 
     /* start scheduled rate timer */
     updateScheduledLimits (tr_core_handle( cbdata->core ));
-    g_timeout_add_seconds( 60, updateScheduledLimits, tr_core_handle( cbdata->core ) );
+    g_timeout_add( 60 * 1000, updateScheduledLimits, tr_core_handle( cbdata->core ) );
 
     /* either show the window or iconify it */
     if( !minimized )
