@@ -41,7 +41,7 @@
     IBOutlet NSTextField * fUploadField, * fDownloadField,
                         * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
     
-    IBOutlet NSTextField * fPeersGlobalField, * fPeersTorrentField, * fBlocklistMessageField;
+    IBOutlet NSTextField * fPeersGlobalField, * fPeersTorrentField, * fBlocklistMessageField, * fBlocklistDateField;
     IBOutlet NSButton * fBlocklistEnableCheck;
     
     PortChecker * fPortChecker;

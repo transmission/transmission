@@ -50,6 +50,7 @@
     float oldWidth = [fButton frame].size.width;
     [fButton sizeToFit];
     NSRect buttonFrame = [fButton frame];
+    buttonFrame.size.width += 12.0; //sizeToFit sizes a bit too small
     buttonFrame.origin.x -= buttonFrame.size.width - oldWidth;
     [fButton setFrame: buttonFrame];
     
@@ -94,7 +95,6 @@
     
     [fTextField setStringValue: [NSLocalizedString(@"Processing blocklist", "Blocklist -> message") stringByAppendingEllipsis]];
     [fButton setEnabled: NO];
-    [fStatusWindow display]; //force window to be updated
 }
 
 - (void) setFinished

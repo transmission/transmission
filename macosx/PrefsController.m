@@ -379,7 +379,7 @@ tr_handle * fHandle;
             [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
             break;
         case PORT_STATUS_ERROR:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Port check website is down", "Preferences -> Network -> port status")];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.png"]];
             break;
     }
@@ -479,6 +479,23 @@ tr_handle * fHandle;
     
     [fBlocklistEnableCheck setEnabled: exists];
     [fBlocklistEnableCheck setState: exists && [fDefaults boolForKey: @"Blocklist"]];
+    
+    NSDate * updatedDate = [fDefaults objectForKey: @"BlocklistLastUpdate"];
+    NSString * updatedDateString;
+    if (updatedDate)
+    {
+        NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateStyle: NSDateFormatterFullStyle];
+        [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
+        
+        updatedDateString = [dateFormatter stringFromDate: updatedDate];
+        [dateFormatter release];
+    }
+    else
+        updatedDateString = NSLocalizedString(@"N/A", "Prefs -> blocklist -> message");
+    
+    [fBlocklistDateField setStringValue: [NSString stringWithFormat: @"%@: %@",
+        NSLocalizedString(@"Last updated", "Prefs -> blocklist -> message"), updatedDateString]];
 }
 
 - (void) applySpeedSettings: (id) sender
