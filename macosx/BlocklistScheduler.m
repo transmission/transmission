@@ -50,6 +50,9 @@ BlocklistScheduler * fScheduler = nil;
 
 - (void) updateSchedule
 {
+    if ([BlocklistDownloader isRunning])
+        return;
+    
     [self cancelSchedule];
     
     if (![[NSUserDefaults standardUserDefaults] boolForKey: @"Blocklist"]
