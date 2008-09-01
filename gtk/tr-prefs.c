@@ -1165,11 +1165,9 @@ networkPage( GObject * core )
         hig_workarea_add_row_w( t, &row, w, h, NULL );
 
         w = new_spin_button( PREF_KEY_SCHED_DL_LIMIT, core, 0, INT_MAX, 5 );
-        gtk_widget_set_sensitive( GTK_WIDGET(w), pref_flag_get( PREF_KEY_SCHED_LIMIT_ENABLED ) );
         page->sched_widgets = g_slist_append( page->sched_widgets, w );
         hig_workarea_add_row( t, &row, _( "Scheduled download speed (KB/s):" ), w, NULL );
-        w = new_spin_button( PREF_KEY_SCHED_DL_LIMIT, core, 0, INT_MAX, 5 );
-        gtk_widget_set_sensitive( GTK_WIDGET(w), pref_flag_get( PREF_KEY_SCHED_LIMIT_ENABLED ) );
+        w = new_spin_button( PREF_KEY_SCHED_UL_LIMIT, core, 0, INT_MAX, 5 );
         page->sched_widgets = g_slist_append( page->sched_widgets, w );
         hig_workarea_add_row( t, &row, _( "Scheduled upload speed (KB/s):" ), w, NULL );
 
