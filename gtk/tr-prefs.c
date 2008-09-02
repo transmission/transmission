@@ -72,12 +72,10 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_UL_LIMIT_ENABLED, FALSE );
     pref_int_set_default    ( PREF_KEY_UL_LIMIT, 50 );
     pref_flag_set_default   ( PREF_KEY_SCHED_LIMIT_ENABLED, FALSE );
-    pref_int_set_default    ( PREF_KEY_SCHED_BEGIN_HOUR, 0 );
-    pref_int_set_default    ( PREF_KEY_SCHED_BEGIN_MINUTE, 0 );
-    pref_int_set_default    ( PREF_KEY_SCHED_END_HOUR, 0 );
-    pref_int_set_default    ( PREF_KEY_SCHED_END_MINUTE, 0 );
-    pref_int_set_default    ( PREF_KEY_SCHED_DL_LIMIT, 100 );
-    pref_int_set_default    ( PREF_KEY_SCHED_UL_LIMIT, 50 );
+    pref_int_set_default    ( PREF_KEY_SCHED_BEGIN,    60*23 ); /* 11pm */
+    pref_int_set_default    ( PREF_KEY_SCHED_END,      60*7 );  /* 7am */
+    pref_int_set_default    ( PREF_KEY_SCHED_DL_LIMIT, 200 );   /* 2x the other limit */
+    pref_int_set_default    ( PREF_KEY_SCHED_UL_LIMIT, 100 );   /* 2x the other limit */
 
     pref_flag_set_default   ( PREF_KEY_OPTIONS_PROMPT, TRUE );
 
@@ -1091,6 +1089,57 @@ onNetworkToggled( GtkToggleButton * tb UNUSED, gpointer user_data )
 }
 
 static void
+onTimeComboChanged( GtkComboBox * w, gpointer core )
+{
+    GtkTreeIter iter;
+    if( gtk_combo_box_get_active_iter( w, &iter ) )
+    {
+        const char * key = g_object_get_data( G_OBJECT( w ), PREF_KEY );
+        int val = 0;
+        gtk_tree_model_get( gtk_combo_box_get_model( w ), &iter, 0, &val, -1 );
+        tr_core_set_pref_int( TR_CORE( core ), key, val );
+    }
+}
+
+static GtkWidget*
+new_time_combo( GObject * core, const char * key )
+{
+    int val;
+    int i;
+    GtkWidget * w;
+    GtkCellRenderer * r;
+    GtkListStore * store;
+
+    /* build a store at 15 minute intervals */
+    store = gtk_list_store_new( 2, G_TYPE_INT, G_TYPE_STRING );
+    for( i=0; i<60*24; i+=15 ) {
+        char buf[128];
+        GtkTreeIter iter;
+        struct tm tm;
+        tm.tm_hour = i/60;
+        tm.tm_min = i%60;
+        strftime( buf, sizeof( buf ), "%I:%M %p", &tm );
+        gtk_list_store_append( store, &iter );
+        gtk_list_store_set( store, &iter, 0, i, 1, buf, -1 );
+    }
+
+    /* build the widget */
+    w = gtk_combo_box_new_with_model( GTK_TREE_MODEL( store ) );
+    gtk_combo_box_set_wrap_width( GTK_COMBO_BOX( w ), 4 );
+    r = gtk_cell_renderer_text_new( );
+    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
+    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 1, NULL );
+    g_object_set_data_full( G_OBJECT( w ), PREF_KEY, tr_strdup( key ), g_free );
+    val = pref_int_get( key );
+    gtk_combo_box_set_active( GTK_COMBO_BOX( w ), val/(15) );
+    g_signal_connect( w, "changed", G_CALLBACK( onTimeComboChanged ), core );
+
+    /* cleanup */
+    g_object_unref( G_OBJECT( store ) );
+    return w;
+}
+
+static void
 networkPageFree( gpointer gpage )
 {
     struct NetworkPage * page = gpage;
@@ -1117,7 +1166,7 @@ networkPage( GObject * core )
         hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _("Bandwidth"));
+    hig_workarea_add_section_title (t, &row, _("Bandwidth Limits"));
 
         s = _("Limit _download speed (KB/s):");
         w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
@@ -1134,42 +1183,30 @@ networkPage( GObject * core )
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _("Scheduled Bandwidth Limit"));
+    hig_workarea_add_section_title( t, &row, _( "Scheduled Bandwidth Limits" ) );
 
         h = gtk_hbox_new( FALSE, 0 );
-        w2 = new_spin_button( PREF_KEY_SCHED_BEGIN_HOUR, core, 0, 23, 1 );
-        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
-        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
-	w2 = gtk_label_new (":");
-        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
-        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
-        w2 = new_spin_button( PREF_KEY_SCHED_BEGIN_MINUTE, core, 0, 59, 1 );
+        w2 = new_time_combo( core, PREF_KEY_SCHED_BEGIN );
         page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
         gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
 	w2 = gtk_label_new (_(" and "));
         page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
         gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
-        w2 = new_spin_button( PREF_KEY_SCHED_END_HOUR, core, 0, 23, 1 );
-        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
-        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
-	w2 = gtk_label_new (":");
-        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
-        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
-        w2 = new_spin_button( PREF_KEY_SCHED_END_MINUTE, core, 0, 59, 1 );
+        w2 = new_time_combo( core, PREF_KEY_SCHED_END );
         page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
         gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
 
-        s = _( "Limit bandwidth between" );
+        s = _( "_Limit bandwidth between" );
         w = new_check_button( s, PREF_KEY_SCHED_LIMIT_ENABLED, core );
         g_signal_connect( w, "toggled", G_CALLBACK(onNetworkToggled), page );
         hig_workarea_add_row_w( t, &row, w, h, NULL );
 
         w = new_spin_button( PREF_KEY_SCHED_DL_LIMIT, core, 0, INT_MAX, 5 );
         page->sched_widgets = g_slist_append( page->sched_widgets, w );
-        hig_workarea_add_row( t, &row, _( "Scheduled download speed (KB/s):" ), w, NULL );
+        hig_workarea_add_row( t, &row, _( "Limit d_ownload speed (KB/s):" ), w, NULL );
         w = new_spin_button( PREF_KEY_SCHED_UL_LIMIT, core, 0, INT_MAX, 5 );
         page->sched_widgets = g_slist_append( page->sched_widgets, w );
-        hig_workarea_add_row( t, &row, _( "Scheduled upload speed (KB/s):" ), w, NULL );
+        hig_workarea_add_row( t, &row, _( "Limit u_pload speed (KB/s):" ), w, NULL );
 
     hig_workarea_finish( t, &row );
     g_object_set_data_full( G_OBJECT( t ), "page", page, networkPageFree );

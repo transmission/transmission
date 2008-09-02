@@ -491,23 +491,17 @@ updateScheduledLimits(gpointer data)
     }
     else
     {
+        const int begin_time = pref_int_get( PREF_KEY_SCHED_BEGIN );
+        const int end_time = pref_int_get( PREF_KEY_SCHED_BEGIN );
         time_t t;
         struct tm *tm;
-        int begin_hour, begin_minute, end_hour, end_minute;
-        int begin_time, end_time, cur_time;
-
-        begin_hour = pref_int_get( PREF_KEY_SCHED_BEGIN_HOUR );
-        begin_minute = pref_int_get( PREF_KEY_SCHED_BEGIN_MINUTE );
-        end_hour = pref_int_get( PREF_KEY_SCHED_END_HOUR );
-        end_minute = pref_int_get( PREF_KEY_SCHED_END_MINUTE );
+        int cur_time;
 
         time( &t );
         tm = localtime (&t);
         cur_time = (tm->tm_hour * 60) + tm->tm_min;
-        begin_time = (begin_hour * 60) + begin_minute;
-        end_time = (end_hour * 60) + end_minute;
 
-        if( (end_time - begin_time) >= 0 )
+        if( end_time >= begin_time )
         {
             if( (cur_time >= begin_time) && (cur_time <= end_time) )
                 in_sched_state = TRUE;
