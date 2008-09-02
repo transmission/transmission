@@ -160,22 +160,22 @@ getPrefs( void )
 ****
 ***/
 
-int
+int64_t
 pref_int_get( const char * key )
 {
-    int64_t i;
+    int64_t i = 0;
     tr_bencDictFindInt( getPrefs( ), key, &i );
     return i;
 }
 void
-pref_int_set( const char * key, int value )
+pref_int_set( const char * key, int64_t value )
 {
     tr_benc * d = getPrefs( );
     tr_bencDictRemove( d, key );
     tr_bencDictAddInt( d, key, value );
 }
 void
-pref_int_set_default( const char * key, int value )
+pref_int_set_default( const char * key, int64_t value )
 {
     if( !tr_bencDictFind( getPrefs( ), key ) )
         pref_int_set( key, value );

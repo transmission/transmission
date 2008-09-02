@@ -1,6 +1,7 @@
 [encoding: UTF-8]
 gtk/actions.c
 gtk/add-dialog.c
+gtk/blocklist.c
 gtk/conf.c
 gtk/details.c
 gtk/dialogs.c

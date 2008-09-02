@@ -21,6 +21,7 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web.h>
+#include "blocklist.h"
 #include "conf.h"
 #include "hig.h"
 #include "tr-core.h"
@@ -54,7 +55,8 @@ tr_prefs_init_global( void )
 
     pref_int_set_default    ( PREF_KEY_PEER_SOCKET_TOS, TR_DEFAULT_PEER_SOCKET_TOS );
     pref_flag_set_default   ( PREF_KEY_ALLOW_HIBERNATION, FALSE );
-    pref_flag_set_default   ( PREF_KEY_BLOCKLIST_ENABLED, TR_DEFAULT_BLOCKLIST_ENABLED );
+    pref_flag_set_default   ( PREF_KEY_BLOCKLIST_ENABLED, TRUE );
+    pref_flag_set_default   ( PREF_KEY_BLOCKLIST_UPDATES_ENABLED, TRUE );
 
     pref_string_set_default ( PREF_KEY_OPEN_DIALOG_FOLDER, g_get_home_dir( ) );
 
@@ -349,6 +351,7 @@ struct blocklist_data
     GtkWidget * check;
     GtkWidget * dialog;
     TrCore * core;
+    gulong id;
     int abortFlag;
     char secondary[256];
 };
@@ -363,122 +366,27 @@ updateBlocklistText( GtkWidget * w, TrCore * core )
                           "Ignore the %'d _blocklisted peers", n ), n );
     gtk_button_set_label( GTK_BUTTON( w ), buf );
 }
-static gboolean
-updateBlocklistTextFromData( gpointer gdata )
+
+static void
+onBlocklistDialogResponse( GtkDialog * d, int response UNUSED, gpointer gdata )
 {
     struct blocklist_data * data = gdata;
-    updateBlocklistText( data->check, data->core );
-    return FALSE;
-}
-
-static gboolean
-blocklistDialogSetSecondary( gpointer gdata )
-{
-    struct blocklist_data * data = gdata;
-    GtkMessageDialog * md = GTK_MESSAGE_DIALOG( data->dialog );
-    gtk_message_dialog_format_secondary_text( md, data->secondary );
-    return FALSE;
-}
-
-static gboolean
-blocklistDialogAllowClose( gpointer dialog )
-{
-    GtkDialog * d = GTK_DIALOG( dialog );
-    gtk_dialog_set_response_sensitive( GTK_DIALOG( d ), GTK_RESPONSE_CANCEL, FALSE );
-    gtk_dialog_set_response_sensitive( GTK_DIALOG( d ), GTK_RESPONSE_CLOSE, TRUE );
-    return FALSE;
+    g_signal_handler_disconnect( data->core, data->id );
+    gtk_widget_destroy( GTK_WIDGET( d ) );
 }
 
 static void
-got_blocklist( tr_handle   * handle         UNUSED,
-               long          response_code  UNUSED,
-               const void  * response,
-               size_t        response_len,
-               void        * gdata )
+onBlocklistStatus( TrCore * core UNUSED, gboolean isDone, const char * status, gpointer gdata )
 {
     struct blocklist_data * data = gdata;
-    const char * text = response;
-    int size = response_len;
-    int rules = 0;
-    gchar * filename = NULL;
-    gchar * filename2 = NULL;
-    int fd = -1;
-    int ok = 1;
 
-    if( !data->abortFlag && ( !text || !size ) )
-    {
-        ok = FALSE;
-        g_snprintf( data->secondary, sizeof( data->secondary ),
-                    _( "Unable to get blocklist." ) );
-        g_message( data->secondary );
-        g_idle_add( blocklistDialogSetSecondary, data );
-    }      
-
-    if( ok && !data->abortFlag )
-    {
-        GError * err = NULL;
-        fd = g_file_open_tmp( "transmission-blockfile-XXXXXX", &filename, &err );
-        if( err ) {
-            g_snprintf( data->secondary, sizeof( data->secondary ),
-                        _( "Unable to get blocklist: %s" ), err->message );
-            g_warning( data->secondary );
-            g_idle_add( blocklistDialogSetSecondary, data );
-            g_clear_error( &err );
-            ok = FALSE;
-        } else {
-            write( fd, text, size );
-            close( fd );
-        }
-    }
-    if( ok && !data->abortFlag )
-    {
-        char * cmd;
-        filename2 = g_strdup_printf( "%s.txt", filename );
-        g_snprintf( data->secondary, sizeof( data->secondary ),
-                    _( "Uncompressing blocklist..." ) );
-        g_idle_add( blocklistDialogSetSecondary, data );
-        cmd = g_strdup_printf( "zcat %s > %s ", filename, filename2 );
-        tr_dbg( "%s", cmd );
-        system( cmd );
-        g_free( cmd );
-    }
-    if( ok && !data->abortFlag )
-    {
-        g_snprintf( data->secondary, sizeof( data->secondary ),
-                    _( "Parsing blocklist..." ) );
-        g_idle_add( blocklistDialogSetSecondary, data );
-        rules = tr_blocklistSetContent( tr_core_handle( data->core ), filename2 );
-    }
-    if( ok && !data->abortFlag )
-    {
-        g_snprintf( data->secondary, sizeof( data->secondary ),
-                    _( "Blocklist updated with %'d entries" ), rules );
-        g_idle_add( blocklistDialogSetSecondary, data );
-        g_idle_add( blocklistDialogAllowClose, data->dialog );
-        g_idle_add( updateBlocklistTextFromData, data );
-    }
-
-    /* g_free( data ); */
-    if( filename2 ) {
-        unlink( filename2 );
-        g_free( filename2 );
-    }
-    if( filename ) {
-        unlink( filename );
-        g_free( filename );
-    }
-}
-
-static void
-onUpdateBlocklistResponseCB( GtkDialog * dialog, int response, gpointer vdata )
-{
-    struct blocklist_data * data = vdata;
-
-    if( response == GTK_RESPONSE_CANCEL )
-        data->abortFlag = 1;
-
-    data->dialog = NULL;
-    gtk_widget_destroy( GTK_WIDGET( dialog ) );
+    gdk_threads_enter( );
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( data->dialog ), status );
+    gtk_dialog_set_response_sensitive( GTK_DIALOG( data->dialog ), GTK_RESPONSE_CANCEL, !isDone );
+    gtk_dialog_set_response_sensitive( GTK_DIALOG( data->dialog ), GTK_RESPONSE_CLOSE, isDone );
+    if( isDone )
+        updateBlocklistText( data->check, core );
+    gdk_threads_leave( );
 }
 
 static void
@@ -486,28 +394,26 @@ onUpdateBlocklistCB( GtkButton * w, gpointer gdata )
 {
     GtkWidget * d;
     struct blocklist_data * data = gdata;
-    tr_handle * handle = g_object_get_data( G_OBJECT( w ), "handle" );
-    const char * url = "http://download.m0k.org/transmission/files/level1.gz";
     
     d = gtk_message_dialog_new( GTK_WINDOW( gtk_widget_get_toplevel( GTK_WIDGET( w ) ) ),
                                 GTK_DIALOG_DESTROY_WITH_PARENT,
                                 GTK_MESSAGE_INFO,
                                 GTK_BUTTONS_NONE,
                                 _( "Updating Blocklist" ) );
-    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ),
-                                              _( "Retrieving blocklist..." ) );
+
+    data->dialog = d;
+    data->id = g_signal_connect( data->core, "blocklist-status", G_CALLBACK( onBlocklistStatus ), data );
+
     gtk_dialog_add_buttons( GTK_DIALOG( d ),
                             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                             GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                             NULL );
     gtk_dialog_set_response_sensitive( GTK_DIALOG( d ), GTK_RESPONSE_CLOSE, FALSE );
 
-    data->dialog = d;
-
-    g_signal_connect( d, "response", G_CALLBACK(onUpdateBlocklistResponseCB), data );
+    g_signal_connect( d, "response", G_CALLBACK(onBlocklistDialogResponse), data );
     gtk_widget_show( d );
 
-    tr_webRun( handle, url, NULL, got_blocklist, data );
+    gtr_blocklist_update( data->core );
 }
 
 static void
@@ -532,26 +438,12 @@ peerPage( GObject * core, gboolean * alive )
     GtkWidget * l;
     struct blocklist_data * data;
 
+    data = g_new0( struct blocklist_data, 1 );
+    data->core = TR_CORE( core );
+
     t = hig_workarea_create( );
     hig_workarea_add_section_title (t, &row, _("Options"));
 
-        w = new_check_button( "", PREF_KEY_BLOCKLIST_ENABLED, core );
-        updateBlocklistText( w, TR_CORE( core ) );
-        h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
-        gtk_box_pack_start_defaults( GTK_BOX(h), w );
-        b = gtk_button_new_with_mnemonic( _( "_Update Blocklist" ) );
-
-        data = g_new0( struct blocklist_data, 1 );
-        data->core = TR_CORE( core );
-        data->check = w;
-
-        g_object_set_data( G_OBJECT( b ), "handle", tr_core_handle( TR_CORE( core ) ) );
-        g_signal_connect( b, "clicked", G_CALLBACK(onUpdateBlocklistCB), data );
-        gtk_box_pack_start( GTK_BOX(h), b, FALSE, FALSE, 0 );
-        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), b );
-        target_cb( w, b );
-        hig_workarea_add_wide_control( t, &row, h );
-        
         s = _("_Ignore unencrypted peers");
         w = gtk_check_button_new_with_mnemonic( s );
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(w),
@@ -576,6 +468,28 @@ peerPage( GObject * core, gboolean * alive )
         g_object_set_data( G_OBJECT(l), "handle", tr_core_handle( TR_CORE( core ) ) );
         testing_port_cb( NULL, l );
         g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
+        
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Blocklist" ) );
+
+        w = new_check_button( "", PREF_KEY_BLOCKLIST_ENABLED, core );
+        updateBlocklistText( w, TR_CORE( core ) );
+        h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
+        gtk_box_pack_start_defaults( GTK_BOX(h), w );
+        b = gtk_button_new_with_mnemonic( _( "_Update Blocklist" ) );
+        data->check = w;
+        g_object_set_data( G_OBJECT( b ), "handle", tr_core_handle( TR_CORE( core ) ) );
+        g_signal_connect( b, "clicked", G_CALLBACK(onUpdateBlocklistCB), data );
+        gtk_box_pack_start( GTK_BOX(h), b, FALSE, FALSE, 0 );
+        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), b );
+        target_cb( w, b );
+        hig_workarea_add_wide_control( t, &row, h );
+        
+        s = _( "_Enable automatic updates" );
+        w = new_check_button( s, PREF_KEY_BLOCKLIST_UPDATES_ENABLED, core );
+        hig_workarea_add_wide_control( t, &row, w );
+        g_signal_connect( data->check, "toggled", G_CALLBACK(target_cb), w );
+        target_cb( data->check, w );
         
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Limits" ) );

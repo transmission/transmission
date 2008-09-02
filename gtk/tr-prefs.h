@@ -56,6 +56,7 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_MAX_PEERS_GLOBAL       "max-peers-global"
 #define PREF_KEY_MAX_PEERS_PER_TORRENT  "max-peers-per-torrent"
 #define PREF_KEY_BLOCKLIST_ENABLED      "blocklist-enabled"
+#define PREF_KEY_BLOCKLIST_UPDATES_ENABLED  "blocklist-updates-enabled"
 #define PREF_KEY_MAIN_WINDOW_HEIGHT     "main-window-height"
 #define PREF_KEY_MAIN_WINDOW_WIDTH      "main-window-width"
 #define PREF_KEY_MAIN_WINDOW_X          "main-window-x"

@@ -47,6 +47,7 @@
 
 #include "actions.h"
 #include "add-dialog.h"
+#include "blocklist.h"
 #include "conf.h"
 #include "details.h"
 #include "dialogs.h"
@@ -464,6 +465,7 @@ main( int argc, char ** argv )
 
         appsetup( win, argfiles, cbdata, startpaused, startminimized );
         tr_sessionSetRPCCallback( h, onRPCChanged, cbdata );
+        gtr_blocklist_maybe_autoupdate( cbdata->core );
 
         gtk_main();
     }

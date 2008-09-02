@@ -40,7 +40,7 @@
 typedef void (*callbackfunc_t)(void*);
 
 /* return a human-readable string for the size given in bytes. */
-char* tr_strlsize( char * buf, guint64 size, size_t buflen );
+char* tr_strlsize( char * buf, uint64_t size, size_t buflen );
 
 /* return a human-readable string for the transfer rate given in bytes. */
 char* tr_strlspeed (char * buf, double KiBps, size_t buflen );
@@ -54,8 +54,7 @@ char* tr_strltime( char * buf, int secs, size_t buflen );
 char* gtr_localtime( time_t time );
 
 /* create a directory and any missing parent directories */
-gboolean
-mkdir_p(const char *name, mode_t mode);
+int mkdir_p(const char *name, mode_t mode);
 
 /* create a copy of a GSList of strings, this dups the actual strings too */
 GSList *

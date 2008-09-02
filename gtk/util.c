@@ -172,7 +172,7 @@ gtr_localtime( time_t time )
     return g_locale_to_utf8( buf, -1, NULL, NULL, NULL );
 }
 
-gboolean
+int
 mkdir_p( const char * path, mode_t mode )
 {
 #if GLIB_CHECK_VERSION( 2, 8, 0)

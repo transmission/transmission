@@ -29,9 +29,9 @@
 #ifndef TG_CONF_H
 #define TG_CONF_H
 
-int          pref_int_get            ( const char * key );
-void         pref_int_set            ( const char * key, int value );
-void         pref_int_set_default    ( const char * key, int value );
+int64_t      pref_int_get            ( const char * key );
+void         pref_int_set            ( const char * key, int64_t value );
+void         pref_int_set_default    ( const char * key, int64_t value );
 
 gboolean     pref_flag_get           ( const char * key );
 void         pref_flag_set           ( const char * key, gboolean value );

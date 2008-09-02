@@ -92,6 +92,30 @@ tr_core_marshal_err( GClosure * closure, GValue * ret UNUSED,
 }
 
 static void
+tr_core_marshal_blocklist( GClosure * closure, GValue * ret UNUSED,
+                           guint count, const GValue * vals,
+                           gpointer hint UNUSED, gpointer marshal )
+{
+    typedef void (*TRMarshalErr)
+        ( gpointer, enum tr_core_err, const char *, gpointer );
+    TRMarshalErr     callback;
+    GCClosure      * cclosure = (GCClosure*) closure;
+    gboolean         flag;
+    const char     * str;
+    gpointer         inst, gdata;
+
+    g_return_if_fail( count == 3 );
+
+    inst    = g_value_peek_pointer( vals );
+    flag    = g_value_get_boolean( vals + 1 );
+    str     = g_value_get_string( vals + 2 );
+    gdata   = closure->data;
+
+    callback = (TRMarshalErr)( marshal ? marshal : cclosure->callback );
+    callback( inst, flag, str, gdata );
+}
+
+static void
 tr_core_marshal_prompt( GClosure * closure, GValue * ret UNUSED,
                         guint count, const GValue * vals,
                         gpointer hint UNUSED, gpointer marshal )
@@ -148,6 +172,11 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
 
 
     core_class = TR_CORE_CLASS( g_class );
+    core_class->blocksig = g_signal_new( "blocklist-status",
+                                         G_TYPE_FROM_CLASS( g_class ),
+                                         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                                         tr_core_marshal_blocklist, G_TYPE_NONE,
+                                         2, G_TYPE_BOOLEAN, G_TYPE_STRING );
     core_class->errsig = g_signal_new( "error", G_TYPE_FROM_CLASS( g_class ),
                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                        tr_core_marshal_err, G_TYPE_NONE,
@@ -742,6 +771,12 @@ tr_core_load( TrCore * self, gboolean forcePaused )
     tr_ctorFree( ctor );
 
     return count;
+}
+
+void
+tr_core_blocksig( TrCore * core, gboolean isDone, const char * status )
+{
+    g_signal_emit( core, TR_CORE_GET_CLASS(core)->blocksig, 0, isDone, status );
 }
 
 static void

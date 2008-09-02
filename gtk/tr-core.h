@@ -60,6 +60,10 @@ typedef struct TrCoreClass
 {
     GObjectClass parent;
 
+    /* "blocklist" signal:
+       void  handler( TrCore *, const char *, gpointer userData ); */
+    int blocksig;
+
     /* "error" signal:
        void handler( TrCore *, enum tr_core_err, const char *, gpointer ) */
     int errsig;
@@ -159,6 +163,9 @@ void tr_core_update( TrCore * self );
 /* emit the "quit" signal */
 void tr_core_quit( TrCore * self );
 
+/* emit the "blocklist changed" signal */
+void tr_core_blocksig( TrCore * core, gboolean isDone, const char * status );
+
 /* Set a preference value, save the prefs file, and emit the
    "prefs-changed" signal */
 void tr_core_set_pref( TrCore * self, const char * key, const char * val );
@@ -170,6 +177,7 @@ void tr_core_set_pref_bool( TrCore * self, const char * key, gboolean val );
 /* Set an integer preference value, save the prefs file, and emit the
    "prefs-changed" signal */
 void tr_core_set_pref_int( TrCore * self, const char * key, int val );
+
 
 /**
 ***
