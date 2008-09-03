@@ -494,7 +494,7 @@ updateScheduledLimits(gpointer data)
     else
     {
         const int begin_time = pref_int_get( PREF_KEY_SCHED_BEGIN );
-        const int end_time = pref_int_get( PREF_KEY_SCHED_BEGIN );
+        const int end_time = pref_int_get( PREF_KEY_SCHED_END );
         time_t t;
         struct tm *tm;
         int cur_time;
@@ -510,7 +510,7 @@ updateScheduledLimits(gpointer data)
 	}
         else
         {
-            if ( (cur_time >= begin_time) || (cur_time <= end_time) )
+            if( (cur_time >= begin_time) || (cur_time <= end_time) )
                 in_sched_state = TRUE;
         }
     }
