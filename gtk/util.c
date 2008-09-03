@@ -529,8 +529,8 @@ gtr_dbus_present_window( void )
 }
 
 GtkWidget *
-tr_button_new_from_stock( const char * stock,
-                          const char * mnemonic )
+gtr_button_new_from_stock( const char * stock,
+                           const char * mnemonic )
 {
     GtkWidget * image = gtk_image_new_from_stock( stock, GTK_ICON_SIZE_BUTTON );
     GtkWidget * button = gtk_button_new_with_mnemonic( mnemonic );

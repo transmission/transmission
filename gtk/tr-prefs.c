@@ -174,12 +174,62 @@ new_check_button( const char * mnemonic, const char * key, gpointer core )
     return w;
 }
 
+
+#define IDLE_DATA "idle-data"
+
+struct spin_idle_data
+{
+    gpointer core;
+    GTimer * last_change;
+};
+
+static void
+spin_idle_data_free( gpointer gdata )
+{
+    struct spin_idle_data * data = gdata;
+    g_timer_destroy( data->last_change );
+    g_free( data );
+}
+
+static gboolean
+spun_cb_idle( gpointer spin )
+{
+    gboolean keep_waiting = TRUE;
+    GObject * o = G_OBJECT( spin );
+    struct spin_idle_data * data = g_object_get_data( o, IDLE_DATA );
+
+    /* has it been at least a half-second since the user stopped making changes? */
+    if( g_timer_elapsed( data->last_change, NULL ) > 0.5f )
+    {
+        /* update the core */
+        const char * key = g_object_get_data( o, PREF_KEY );
+        const int value = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( spin ) );
+        tr_core_set_pref_int( TR_CORE( data->core ), key, value );
+
+        /* cleanup */
+        g_object_set_data( o, IDLE_DATA, NULL );
+        keep_waiting = FALSE;
+    }
+
+    return keep_waiting;
+}
+
 static void
 spun_cb( GtkSpinButton * w, gpointer core )
 {
-    const char * key = g_object_get_data( G_OBJECT(w), PREF_KEY );
-    const int value = gtk_spin_button_get_value_as_int( w );
-    tr_core_set_pref_int( TR_CORE(core), key, value );
+    /* user may be spinning through many values, so let's hold off
+       for a moment to keep from flooding the core with changes */
+    GObject * o = G_OBJECT( w );
+    struct spin_idle_data * data = g_object_get_data( o, IDLE_DATA );
+    if( data == NULL )
+    {
+        data = g_new( struct spin_idle_data, 1 );
+        data->core = core;
+        data->last_change = g_timer_new( );
+        g_object_set_data_full( o, IDLE_DATA, data, spin_idle_data_free );
+        g_timeout_add( 500, spun_cb_idle, w );
+    }
+    g_timer_start( data->last_change );
 }
 
 static GtkWidget*
@@ -241,64 +291,9 @@ target_cb( GtkWidget * tb, gpointer target )
     gtk_widget_set_sensitive( GTK_WIDGET(target), b );
 }
 
-struct test_port_data
-{
-    GtkWidget * label;
-    gboolean * alive;
-};
-
-static void
-testing_port_done( tr_handle   * handle         UNUSED,
-                   long          response_code  UNUSED,
-                   const void  * response,
-                   size_t        response_len,
-                   void        * gdata )
-{
-    struct test_port_data * data = gdata;
-    if( *data->alive )
-    {
-        const int isOpen = response_len && *(char*)response=='1';
-        gtk_label_set_markup( GTK_LABEL( data->label ), isOpen
-                              ? _("Port is <b>open</b>")
-                              : _("Port is <b>closed</b>") );
-    }
-}
-
-static gboolean
-testing_port_begin( gpointer gdata )
-{
-    struct test_port_data * data = gdata;
-    if( *data->alive )
-    {
-        GtkSpinButton * spin = g_object_get_data( G_OBJECT( data->label ), "tr-port-spin" );
-        tr_handle * handle = g_object_get_data( G_OBJECT( data->label ), "handle" );
-        const int port = gtk_spin_button_get_value_as_int( spin );
-        char url[256];
-        g_snprintf( url, sizeof(url), "http://portcheck.transmissionbt.com/%d", port );
-        tr_webRun( handle, url, NULL, testing_port_done, data );
-    }
-    return FALSE;
-}
-
-static void
-testing_port_cb( GtkWidget * unused UNUSED, gpointer l )
-{
-    struct test_port_data * data;
-
-    gtk_label_set_markup( GTK_LABEL( l ), _( "<i>Testing port...</i>" ) );
-
-    /* wait three seconds to give the port forwarding time to kick in */
-    data = g_new0( struct test_port_data, 1 );
-    data->label = l;
-    data->alive = g_object_get_data( G_OBJECT( l ), "alive" );
-    g_timeout_add( 3000, testing_port_begin, data );
-}
-
-static void
-dialogDestroyed( gpointer alive, GObject * dialog UNUSED )
-{
-    *(gboolean*)alive = FALSE;
-}
+/****
+*****  Torrent Tab
+****/
 
 static GtkWidget*
 torrentPage( GObject * core )
@@ -342,9 +337,9 @@ torrentPage( GObject * core )
     return t;
 }
 
-/***
-****
-***/
+/****
+*****  Peer Tab
+****/
 
 struct blocklist_data
 {
@@ -362,8 +357,8 @@ updateBlocklistText( GtkWidget * w, TrCore * core )
     const int n = tr_blocklistGetRuleCount( tr_core_handle( core ) );
     char buf[512];
     g_snprintf( buf, sizeof( buf ),
-                ngettext( "Ignore the %'d _blocklisted peer",
-                          "Ignore the %'d _blocklisted peers", n ), n );
+                ngettext( "Enable _blocklist (contains %'d rule)",
+                          "Enable _blocklist (contains %'d rules)", n ), n );
     gtk_button_set_label( GTK_BUTTON( w ), buf );
 }
 
@@ -426,57 +421,27 @@ onEncryptionToggled( GtkToggleButton * w, gpointer core )
 }
 
 static GtkWidget*
-peerPage( GObject * core, gboolean * alive )
+peerPage( GObject * core )
 {
     int row = 0;
     const char * s;
     GtkWidget * t;
     GtkWidget * w;
-    GtkWidget * w2;
     GtkWidget * b;
     GtkWidget * h;
-    GtkWidget * l;
     struct blocklist_data * data;
 
     data = g_new0( struct blocklist_data, 1 );
     data->core = TR_CORE( core );
 
     t = hig_workarea_create( );
-    hig_workarea_add_section_title (t, &row, _("Options"));
-
-        s = _("_Ignore unencrypted peers");
-        w = gtk_check_button_new_with_mnemonic( s );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(w),
-                                      pref_int_get(PREF_KEY_ENCRYPTION)==TR_ENCRYPTION_REQUIRED );
-        g_signal_connect( w, "toggled", G_CALLBACK(onEncryptionToggled), core );
-        hig_workarea_add_wide_control( t, &row, w );
-
-        s = _("Use peer e_xchange");
-        w = new_check_button( s, PREF_KEY_PEX, core );
-        hig_workarea_add_wide_control( t, &row, w );
-
-        h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
-        w2 = new_spin_button( PREF_KEY_PORT, core, 1, INT_MAX, 1 );
-        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
-        l = gtk_label_new( NULL );
-        gtk_misc_set_alignment( GTK_MISC(l), 0.0f, 0.5f );
-        gtk_box_pack_start( GTK_BOX(h), l, FALSE, FALSE, 0 );
-        hig_workarea_add_row( t, &row, _("Listening _port:"), h, w2 );
-
-        g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
-        g_object_set_data( G_OBJECT(l), "alive", alive );
-        g_object_set_data( G_OBJECT(l), "handle", tr_core_handle( TR_CORE( core ) ) );
-        testing_port_cb( NULL, l );
-        g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
-        
-    hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Blocklist" ) );
 
         w = new_check_button( "", PREF_KEY_BLOCKLIST_ENABLED, core );
         updateBlocklistText( w, TR_CORE( core ) );
         h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
         gtk_box_pack_start_defaults( GTK_BOX(h), w );
-        b = gtk_button_new_with_mnemonic( _( "_Update Blocklist" ) );
+        b = gtr_button_new_from_stock( GTK_STOCK_REFRESH, _( "_Update" ) );
         data->check = w;
         g_object_set_data( G_OBJECT( b ), "handle", tr_core_handle( TR_CORE( core ) ) );
         g_signal_connect( b, "clicked", G_CALLBACK(onUpdateBlocklistCB), data );
@@ -485,7 +450,7 @@ peerPage( GObject * core, gboolean * alive )
         target_cb( w, b );
         hig_workarea_add_wide_control( t, &row, h );
         
-        s = _( "_Enable automatic updates" );
+        s = _( "Enable _automatic updates" );
         w = new_check_button( s, PREF_KEY_BLOCKLIST_UPDATES_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
         g_signal_connect( data->check, "toggled", G_CALLBACK(target_cb), w );
@@ -499,9 +464,27 @@ peerPage( GObject * core, gboolean * alive )
         w = new_spin_button( PREF_KEY_MAX_PEERS_PER_TORRENT, core, 1, 300, 5 );
         hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
 
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title (t, &row, _("Options"));
+
+        s = _("_Ignore unencrypted peers");
+        w = gtk_check_button_new_with_mnemonic( s );
+        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(w),
+                                      pref_int_get(PREF_KEY_ENCRYPTION)==TR_ENCRYPTION_REQUIRED );
+        g_signal_connect( w, "toggled", G_CALLBACK(onEncryptionToggled), core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+        s = _("Use peer e_xchange");
+        w = new_check_button( s, PREF_KEY_PEX, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
     hig_workarea_finish( t, &row );
     return t;
 }
+
+/****
+*****  Web Tab
+****/
 
 static GtkTreeModel*
 allow_deny_model_new( void )
@@ -845,6 +828,10 @@ webPage( GObject * core )
     return t;
 }
 
+/****
+*****  Proxy Tab
+****/
+
 struct ProxyPage
 {
     TrCore * core;
@@ -980,14 +967,18 @@ trackerPage( GObject * core )
     return t;
 }
 
-struct NetworkPage
+/****
+*****  Bandwidth Tab
+****/
+
+struct BandwidthPage
 {
     TrCore * core;
     GSList * sched_widgets;
 };
 
 static void
-refreshNetworkSensitivity( struct NetworkPage * p )
+refreshSchedSensitivity( struct BandwidthPage * p )
 {
     GSList * l;
     const gboolean sched_enabled = pref_flag_get( PREF_KEY_SCHED_LIMIT_ENABLED );
@@ -997,9 +988,9 @@ refreshNetworkSensitivity( struct NetworkPage * p )
 }
 
 static void
-onNetworkToggled( GtkToggleButton * tb UNUSED, gpointer user_data )
+onSchedToggled( GtkToggleButton * tb UNUSED, gpointer user_data )
 {
-    refreshNetworkSensitivity( user_data );
+    refreshSchedSensitivity( user_data );
 }
 
 static void
@@ -1054,42 +1045,35 @@ new_time_combo( GObject * core, const char * key )
 }
 
 static void
-networkPageFree( gpointer gpage )
+bandwidthPageFree( gpointer gpage )
 {
-    struct NetworkPage * page = gpage;
+    struct BandwidthPage * page = gpage;
     g_slist_free( page->sched_widgets );
     g_free( page );
 }
 
 static GtkWidget*
-networkPage( GObject * core )
+bandwidthPage( GObject * core )
 {
     int row = 0;
     const char * s;
     GtkWidget * t;
-    GtkWidget * w, * w2, * h;
-    struct NetworkPage * page = tr_new0( struct NetworkPage, 1 );
+    GtkWidget * w, * w2, * h, * l;
+    struct BandwidthPage * page = tr_new0( struct BandwidthPage, 1 );
 
     page->core = TR_CORE( core );
 
     t = hig_workarea_create( );
-    hig_workarea_add_section_title (t, &row, _( "Router" ) );
+    hig_workarea_add_section_title( t, &row, _( "Limits" ) );
 
-        s = _("Use UPnP or NAT-PMP port _forwarding from my router" );
-        w = new_check_button( s, PREF_KEY_PORT_FORWARDING, core );
-        hig_workarea_add_wide_control( t, &row, w );
-
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title (t, &row, _("Bandwidth Limits"));
-
-        s = _("Limit _download speed (KB/s):");
+        s = _( "Limit _download speed (KB/s):" );
         w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_DL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
-        s = _("Limit _upload speed (KB/s):");
+        s = _( "Limit _upload speed (KB/s):" );
         w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ) );
@@ -1097,7 +1081,7 @@ networkPage( GObject * core )
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Scheduled Bandwidth Limits" ) );
+    hig_workarea_add_section_title( t, &row, _( "Scheduled Limits" ) );
 
         h = gtk_hbox_new( FALSE, 0 );
         w2 = new_time_combo( core, PREF_KEY_SCHED_BEGIN );
@@ -1112,22 +1096,134 @@ networkPage( GObject * core )
 
         s = _( "_Limit bandwidth between" );
         w = new_check_button( s, PREF_KEY_SCHED_LIMIT_ENABLED, core );
-        g_signal_connect( w, "toggled", G_CALLBACK(onNetworkToggled), page );
+        g_signal_connect( w, "toggled", G_CALLBACK(onSchedToggled), page );
         hig_workarea_add_row_w( t, &row, w, h, NULL );
 
         w = new_spin_button( PREF_KEY_SCHED_DL_LIMIT, core, 0, INT_MAX, 5 );
         page->sched_widgets = g_slist_append( page->sched_widgets, w );
-        hig_workarea_add_row( t, &row, _( "Limit d_ownload speed (KB/s):" ), w, NULL );
+        l = hig_workarea_add_row( t, &row, _( "Limit d_ownload speed (KB/s):" ), w, NULL );
+        page->sched_widgets = g_slist_append( page->sched_widgets, l );
+
         w = new_spin_button( PREF_KEY_SCHED_UL_LIMIT, core, 0, INT_MAX, 5 );
         page->sched_widgets = g_slist_append( page->sched_widgets, w );
-        hig_workarea_add_row( t, &row, _( "Limit u_pload speed (KB/s):" ), w, NULL );
+        l = hig_workarea_add_row( t, &row, _( "Limit u_pload speed (KB/s):" ), w, NULL );
+        page->sched_widgets = g_slist_append( page->sched_widgets, l );
 
     hig_workarea_finish( t, &row );
-    g_object_set_data_full( G_OBJECT( t ), "page", page, networkPageFree );
+    g_object_set_data_full( G_OBJECT( t ), "page", page, bandwidthPageFree );
 
-    refreshNetworkSensitivity( page );
+    refreshSchedSensitivity( page );
     return t;
 }
+
+/****
+*****  Network Tab
+****/
+
+struct test_port_data
+{
+    GtkWidget * label;
+    gboolean * alive;
+};
+
+static void
+testing_port_done( tr_handle   * handle         UNUSED,
+                   long          response_code  UNUSED,
+                   const void  * response,
+                   size_t        response_len,
+                   void        * gdata )
+{
+    struct test_port_data * data = gdata;
+    if( *data->alive )
+    {
+        const int isOpen = response_len && *(char*)response=='1';
+        gdk_threads_enter( );
+        gtk_label_set_markup( GTK_LABEL( data->label ), isOpen
+                              ? _("Port is <b>open</b>")
+                              : _("Port is <b>closed</b>") );
+        gdk_threads_leave( );
+    }
+}
+
+static gboolean
+testing_port_begin( gpointer gdata )
+{
+    struct test_port_data * data = gdata;
+    if( *data->alive )
+    {
+        GtkSpinButton * spin = g_object_get_data( G_OBJECT( data->label ), "tr-port-spin" );
+        tr_handle * handle = g_object_get_data( G_OBJECT( data->label ), "handle" );
+        const int port = gtk_spin_button_get_value_as_int( spin );
+        char url[256];
+        g_snprintf( url, sizeof(url), "http://portcheck.transmissionbt.com/%d", port );
+        tr_webRun( handle, url, NULL, testing_port_done, data );
+    }
+    return FALSE;
+}
+
+static void
+testing_port_cb( GtkWidget * unused UNUSED, gpointer l )
+{
+    struct test_port_data * data;
+
+    gtk_label_set_markup( GTK_LABEL( l ), _( "<i>Testing port...</i>" ) );
+
+    /* wait three seconds to give the port forwarding time to kick in */
+    data = g_new0( struct test_port_data, 1 );
+    data->label = l;
+    data->alive = g_object_get_data( G_OBJECT( l ), "alive" );
+    g_timeout_add( 3000, testing_port_begin, data );
+}
+
+static void
+dialogDestroyed( gpointer alive, GObject * dialog UNUSED )
+{
+    *(gboolean*)alive = FALSE;
+}
+
+static GtkWidget*
+networkPage( GObject * core, gboolean * alive )
+{
+    int row = 0;
+    const char * s;
+    GtkWidget * t;
+    GtkWidget * w;
+    GtkWidget * w2;
+    GtkWidget * h;
+    GtkWidget * l;
+    struct blocklist_data * data;
+
+    data = g_new0( struct blocklist_data, 1 );
+    data->core = TR_CORE( core );
+
+    t = hig_workarea_create( );
+    hig_workarea_add_section_title( t, &row, _( "Incoming Peers" ) );
+
+        h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
+        w2 = new_spin_button( PREF_KEY_PORT, core, 1, 65535, 1 );
+        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
+        l = gtk_label_new( NULL );
+        gtk_misc_set_alignment( GTK_MISC(l), 0.0f, 0.5f );
+        gtk_box_pack_start( GTK_BOX(h), l, FALSE, FALSE, 0 );
+        hig_workarea_add_row( t, &row, _("Listening _port:"), h, w2 );
+
+        g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
+        g_object_set_data( G_OBJECT(l), "alive", alive );
+        g_object_set_data( G_OBJECT(l), "handle", tr_core_handle( TR_CORE( core ) ) );
+        testing_port_cb( NULL, l );
+        g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
+
+        s = _("Use UPnP or NAT-PMP port _forwarding from my router" );
+        w = new_check_button( s, PREF_KEY_PORT_FORWARDING, core );
+        hig_workarea_add_wide_control( t, &row, w );
+
+    hig_workarea_finish( t, &row );
+    return t;
+}
+
+/****
+*****
+****/
 
 GtkWidget *
 tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
@@ -1156,13 +1252,16 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
                               torrentPage( core ),
                               gtk_label_new (_("Torrents")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              peerPage( core, alive ),
+                              peerPage( core ),
                               gtk_label_new (_("Peers")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               trackerPage( core ),
                               gtk_label_new (_("Trackers")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              networkPage( core ),
+                              bandwidthPage( core ),
+                              gtk_label_new (_("Bandwidth")) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              networkPage( core, alive ),
                               gtk_label_new (_("Network")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               webPage( core ),

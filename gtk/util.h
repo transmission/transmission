@@ -85,8 +85,8 @@ char* gtr_get_help_url( void );
 
 #ifdef GTK_MAJOR_VERSION
 
-GtkWidget * tr_button_new_from_stock( const char * stock,
-                                      const char * mnemonic );
+GtkWidget * gtr_button_new_from_stock( const char * stock,
+                                       const char * mnemonic );
 
 void addTorrentErrorDialog( GtkWidget  * window_or_child,
                             int          err,
