@@ -198,8 +198,8 @@ spun_cb_idle( gpointer spin )
     GObject * o = G_OBJECT( spin );
     struct spin_idle_data * data = g_object_get_data( o, IDLE_DATA );
 
-    /* has it been at least a half-second since the user stopped making changes? */
-    if( g_timer_elapsed( data->last_change, NULL ) > 0.5f )
+    /* has the user stopped making changes? */
+    if( g_timer_elapsed( data->last_change, NULL ) > 0.33f )
     {
         /* update the core */
         const char * key = g_object_get_data( o, PREF_KEY );
@@ -227,7 +227,7 @@ spun_cb( GtkSpinButton * w, gpointer core )
         data->core = core;
         data->last_change = g_timer_new( );
         g_object_set_data_full( o, IDLE_DATA, data, spin_idle_data_free );
-        g_timeout_add( 500, spun_cb_idle, w );
+        g_timeout_add( 100, spun_cb_idle, w );
     }
     g_timer_start( data->last_change );
 }
