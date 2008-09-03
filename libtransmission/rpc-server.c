@@ -38,12 +38,13 @@
 
 struct tr_rpc_server
 {
+    unsigned int isEnabled          : 1;
+    unsigned int isPasswordEnabled  : 1;
     int port;
     time_t lastRequestTime;
     struct shttpd_ctx * ctx;
     tr_handle * session;
     struct event timer;
-    int isPasswordEnabled;
     char * username;
     char * password;
     char * acl;
@@ -408,13 +409,15 @@ startServer( tr_rpc_server * server )
 
         argv[argc] = NULL; /* shttpd_init() wants it null-terminated */
 
-        server->ctx = shttpd_init( argc, argv );
-        shttpd_register_uri( server->ctx, "/transmission/rpc", handle_rpc, server );
-        shttpd_register_uri( server->ctx, "/transmission/upload", handle_upload, server );
-        shttpd_register_uri( server->ctx, "/", handle_root, server );
+        if(( server->ctx = shttpd_init( argc, argv )))
+        {
+            shttpd_register_uri( server->ctx, "/transmission/rpc", handle_rpc, server );
+            shttpd_register_uri( server->ctx, "/transmission/upload", handle_upload, server );
+            shttpd_register_uri( server->ctx, "/", handle_root, server );
 
-        evtimer_set( &server->timer, rpcPulse, server );
-        evtimer_add( &server->timer, &tv );
+            evtimer_set( &server->timer, rpcPulse, server );
+            evtimer_add( &server->timer, &tv );
+        }
 
         for( i=0; i<argc; ++i )
             tr_free( argv[i] );
@@ -439,10 +442,11 @@ stopServer( tr_rpc_server * server )
 void
 tr_rpcSetEnabled( tr_rpc_server * server, int isEnabled )
 {
-    if( !isEnabled && server->ctx )
-        stopServer( server );
+    server->isEnabled = isEnabled != 0;
 
-    if( isEnabled && !server->ctx )
+    if( !isEnabled )
+        stopServer( server );
+    else
         startServer( server );
 }
 
@@ -459,7 +463,7 @@ tr_rpcSetPort( tr_rpc_server * server, int port )
     {
         server->port = port;
 
-        if( server->ctx )
+        if( server->isEnabled )
         {
             stopServer( server );
             startServer( server );
@@ -593,16 +597,16 @@ tr_rpcSetACL( tr_rpc_server   * server,
 
     if( !err )
     {
-        const int isRunning = server->ctx != NULL;
+        const int isEnabled = server->isEnabled;
 
-        if( isRunning )
+        if( isEnabled )
             stopServer( server );
 
         tr_free( server->acl );
         server->acl = tr_strdup( cidr );
         dbgmsg( "setting our ACL to [%s]", server->acl );
 
-        if( isRunning )
+        if( isEnabled )
             startServer( server );
     }
     tr_free( cidr );
@@ -624,16 +628,16 @@ void
 tr_rpcSetUsername( tr_rpc_server        * server,
                    const char           * username )
 {
-    const int isRunning = server->ctx != NULL;
+    const int isEnabled = server->isEnabled;
 
-    if( isRunning )
+    if( isEnabled )
         stopServer( server );
 
     tr_free( server->username );
     server->username = tr_strdup( username );
     dbgmsg( "setting our Username to [%s]", server->username );
 
-    if( isRunning )
+    if( isEnabled )
         startServer( server );
 }
 
@@ -647,16 +651,16 @@ void
 tr_rpcSetPassword( tr_rpc_server        * server,
                    const char           * password )
 {
-    const int isRunning = server->ctx != NULL;
+    const int isEnabled = server->isEnabled;
 
-    if( isRunning )
+    if( isEnabled )
         stopServer( server );
 
     tr_free( server->password );
     server->password = tr_strdup( password );
     dbgmsg( "setting our Password to [%s]", server->password );
 
-    if( isRunning )
+    if( isEnabled )
         startServer( server );
 }
 
@@ -670,15 +674,15 @@ void
 tr_rpcSetPasswordEnabled( tr_rpc_server  * server,
                           int              isEnabled )
 {
-    const int isRunning = server->ctx != NULL;
+    const int wasEnabled = server->isEnabled;
 
-    if( isRunning )
+    if( wasEnabled )
         stopServer( server );
 
     server->isPasswordEnabled = isEnabled;
     dbgmsg( "setting 'password enabled' to %d", isEnabled );
 
-    if( isRunning )
+    if( isEnabled )
         startServer( server );
 }
 
@@ -731,7 +735,8 @@ tr_rpcInit( tr_handle   * session,
     s->acl = tr_strdup( acl );
     s->username = tr_strdup( username );
     s->password = tr_strdup( password );
-    s->isPasswordEnabled = isPasswordEnabled;
+    s->isPasswordEnabled = isPasswordEnabled != 0;
+    s->isEnabled = isEnabled != 0;
    
     if( isEnabled )
         startServer( s );
