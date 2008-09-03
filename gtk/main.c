@@ -503,7 +503,7 @@ updateScheduledLimits(gpointer data)
         tm = localtime (&t);
         cur_time = (tm->tm_hour * 60) + tm->tm_min;
 
-        if( end_time >= begin_time )
+        if( end_time <= begin_time )
         {
             if( (cur_time >= begin_time) && (cur_time <= end_time) )
                 in_sched_state = TRUE;
