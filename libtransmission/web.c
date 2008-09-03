@@ -27,7 +27,7 @@
      (LIBCURL_VERSION_MAJOR == (major) && LIBCURL_VERSION_MINOR == (minor) && \
       LIBCURL_VERSION_PATCH >= (micro)))
 
-#define PULSE_MSEC 500
+#define PULSE_MSEC 100
 
 #define dbgmsg(fmt...) tr_deepLog( __FILE__, __LINE__, "web", ##fmt )
 
