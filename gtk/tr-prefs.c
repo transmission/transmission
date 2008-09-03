@@ -1161,28 +1161,43 @@ testing_port_begin( gpointer gdata )
     return FALSE;
 }
 
-static void
-testing_port_cb( GtkWidget * unused UNUSED, gpointer l )
+struct network_page_data
 {
-    struct test_port_data * data;
+    gboolean * alive;
+    GtkWidget * label;
+    guint id;
+    TrCore * core;
+};
 
-    gtk_label_set_markup( GTK_LABEL( l ), _( "<i>Testing port...</i>" ) );
+static void
+onCorePrefsChanged( TrCore * core UNUSED, const char * key, gpointer gdata )
+{
+    if( !strcmp( key, PREF_KEY_PORT ) )
+    {
+        struct network_page_data * ndata = gdata;
+        struct test_port_data * data;
 
-    /* wait three seconds to give the port forwarding time to kick in */
-    data = g_new0( struct test_port_data, 1 );
-    data->label = l;
-    data->alive = g_object_get_data( G_OBJECT( l ), "alive" );
-    g_timeout_add( 3000, testing_port_begin, data );
+        gtk_label_set_markup( GTK_LABEL( ndata->label ), _( "<i>Testing port...</i>" ) );
+
+        /* wait three seconds to give the port forwarding time to kick in */
+        data = g_new0( struct test_port_data, 1 );
+        data->label = ndata->label;
+        data->alive = ndata->alive;
+        g_timeout_add( 3000, testing_port_begin, data );
+    }
 }
 
 static void
-dialogDestroyed( gpointer alive, GObject * dialog UNUSED )
+networkPageDestroyed( gpointer gdata, GObject * dead UNUSED )
 {
-    *(gboolean*)alive = FALSE;
+    struct network_page_data * data = gdata;
+    *data->alive = FALSE;
+    g_signal_handler_disconnect( data->core, data->id );
+    g_free( data );
 }
 
 static GtkWidget*
-networkPage( GObject * core, gboolean * alive )
+networkPage( GObject * core )
 {
     int row = 0;
     const char * s;
@@ -1191,33 +1206,41 @@ networkPage( GObject * core, gboolean * alive )
     GtkWidget * w2;
     GtkWidget * h;
     GtkWidget * l;
-    struct blocklist_data * data;
+    struct network_page_data * data;
 
-    data = g_new0( struct blocklist_data, 1 );
+    /* register to stop listening to core prefs changes when the page is destroyed */
+    data = g_new0( struct network_page_data, 1 );
     data->core = TR_CORE( core );
 
+    /* we leak this gboolean* s.t. we know it will still be alive when the port
+       check is done, whether the dialog was destroyed or not.  kind of clumsy... */
+    data->alive = g_new( gboolean, 1 );
+    *data->alive = TRUE;
+
+    /* build the page */
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Incoming Peers" ) );
 
         h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
         w2 = new_spin_button( PREF_KEY_PORT, core, 1, 65535, 1 );
         gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
-        l = gtk_label_new( NULL );
+        data->label = l = gtk_label_new( NULL );
         gtk_misc_set_alignment( GTK_MISC(l), 0.0f, 0.5f );
         gtk_box_pack_start( GTK_BOX(h), l, FALSE, FALSE, 0 );
         hig_workarea_add_row( t, &row, _("Listening _port:"), h, w2 );
 
         g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
-        g_object_set_data( G_OBJECT(l), "alive", alive );
         g_object_set_data( G_OBJECT(l), "handle", tr_core_handle( TR_CORE( core ) ) );
-        testing_port_cb( NULL, l );
-        g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
+        data->id = g_signal_connect( TR_CORE( core ), "prefs-changed", G_CALLBACK( onCorePrefsChanged ), data );
+        onCorePrefsChanged( NULL, PREF_KEY_PORT, data );
 
         s = _("Use UPnP or NAT-PMP port _forwarding from my router" );
         w = new_check_button( s, PREF_KEY_PORT_FORWARDING, core );
         hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_finish( t, &row );
+    g_object_weak_ref( G_OBJECT( t ), networkPageDestroyed, data );
+
     return t;
 }
 
@@ -1230,10 +1253,6 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 {
     GtkWidget * d;
     GtkWidget * n;
-    gboolean * alive;
-
-    alive = g_new( gboolean, 1 );
-    *alive = TRUE;
 
     d = gtk_dialog_new_with_buttons( _( "Transmission Preferences" ), parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -1243,7 +1262,6 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     gtk_window_set_role( GTK_WINDOW(d), "transmission-preferences-dialog" );
     gtk_dialog_set_has_separator( GTK_DIALOG( d ), FALSE );
     gtk_container_set_border_width( GTK_CONTAINER( d ), GUI_PAD );
-    g_object_weak_ref( G_OBJECT( d ), dialogDestroyed, alive );
 
     n = gtk_notebook_new( );
     gtk_container_set_border_width ( GTK_CONTAINER ( n ), GUI_PAD );
@@ -1261,7 +1279,7 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
                               bandwidthPage( core ),
                               gtk_label_new (_("Bandwidth")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              networkPage( core, alive ),
+                              networkPage( core ),
                               gtk_label_new (_("Network")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               webPage( core ),
