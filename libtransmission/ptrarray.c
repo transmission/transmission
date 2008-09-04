@@ -168,7 +168,7 @@ tr_ptrArrayErase( tr_ptrArray * t, int begin, int end )
 {
     assert( begin >= 0 );
     if( end < 0 ) end = t->n_items;
-    assert( end > begin );
+    assert( end - begin > 0 );
     assert( end <= t->n_items );
 
     memmove( t->items + begin,

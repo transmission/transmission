@@ -1534,10 +1534,10 @@ tr_torrentCountUncheckedPieces( const tr_torrent * tor )
 }
 
 time_t*
-tr_torrentGetMTimes( const tr_torrent * tor, int * setme_n )
+tr_torrentGetMTimes( const tr_torrent * tor, size_t * setme_n )
 {
-    int i;
-    const int n = tor->info.fileCount;
+    size_t i;
+    const size_t n = tor->info.fileCount;
     time_t * m = tr_new0( time_t, n );
 
     for( i=0; i<n; ++i ) {

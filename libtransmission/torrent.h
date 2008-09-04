@@ -105,7 +105,7 @@ void tr_torrentUncheck             ( tr_torrent * );
 
 int tr_torrentPromoteTracker       ( tr_torrent *, int trackerIndex );
 
-time_t* tr_torrentGetMTimes        ( const tr_torrent *, int * setmeCount );
+time_t* tr_torrentGetMTimes        ( const tr_torrent *, size_t * setmeCount );
 
 typedef enum
 {

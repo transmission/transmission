@@ -31,13 +31,13 @@ typedef struct tr_benc
         int64_t i;
         struct
         {
-            int    i;
+            size_t i;
             char * s;
         } s;
         struct
         {
-            int alloc;
-            int count;
+            size_t alloc;
+            size_t count;
             struct tr_benc * vals;
         } l;
     } val;
@@ -53,7 +53,7 @@ int tr_bencParse( const void      * buf,
                   const uint8_t  ** setme_end );
 
 int tr_bencLoad( const void  * buf,
-                 int           buflen,
+                 size_t        buflen,
                  tr_benc     * setme_benc,
                  char       ** setme_end );
 
@@ -74,35 +74,35 @@ int    tr_bencSaveJSONFile ( const char * filename, const tr_benc * );
 void  tr_bencInitStr( tr_benc *, const void * str, int str_len );
 void  tr_bencInitRaw( tr_benc *, const void * raw, size_t raw_len );
 void  tr_bencInitInt( tr_benc *, int64_t num );
-int   tr_bencInitDict( tr_benc *, int reserveCount );
-int   tr_bencInitList( tr_benc *, int reserveCount );
+int   tr_bencInitDict( tr_benc *, size_t reserveCount );
+int   tr_bencInitList( tr_benc *, size_t reserveCount );
 
 /***
 ****
 ***/
 
-int tr_bencListReserve( tr_benc *, int count );
+int tr_bencListReserve( tr_benc *, size_t reserveCount );
 tr_benc * tr_bencListAdd( tr_benc * );
 tr_benc * tr_bencListAddInt( tr_benc *, int64_t val );
 tr_benc * tr_bencListAddStr( tr_benc *, const char * val );
-tr_benc * tr_bencListAddList( tr_benc *, int reserveCount );
-tr_benc * tr_bencListAddDict( tr_benc *, int reserveCount );
+tr_benc * tr_bencListAddList( tr_benc *, size_t reserveCount );
+tr_benc * tr_bencListAddDict( tr_benc *, size_t reserveCount );
 
-int tr_bencListSize( const tr_benc * list );
-tr_benc * tr_bencListChild( tr_benc * list, int n );
+size_t tr_bencListSize( const tr_benc * list );
+tr_benc * tr_bencListChild( tr_benc * list, size_t n );
 
 /***
 ****
 ***/
 
-int tr_bencDictReserve( tr_benc *, int count );
+int tr_bencDictReserve( tr_benc *, size_t reserveCount );
 int tr_bencDictRemove( tr_benc *, const char * key );
 tr_benc * tr_bencDictAdd( tr_benc *, const char * key );
 tr_benc * tr_bencDictAddDouble( tr_benc *, const char * key, double d );
 tr_benc * tr_bencDictAddInt( tr_benc *, const char * key, int64_t val );
 tr_benc * tr_bencDictAddStr( tr_benc *, const char * key, const char * val );
-tr_benc * tr_bencDictAddList( tr_benc *, const char * key, int reserveCount );
-tr_benc * tr_bencDictAddDict( tr_benc *, const char * key, int reserveCount );
+tr_benc * tr_bencDictAddList( tr_benc *, const char * key, size_t reserve );
+tr_benc * tr_bencDictAddDict( tr_benc *, const char * key, size_t reserve );
 tr_benc * tr_bencDictAddRaw( tr_benc *, const char * key,
                              const void *, size_t len );
 

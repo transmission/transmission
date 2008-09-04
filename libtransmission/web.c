@@ -73,7 +73,7 @@ processCompletedTasks( tr_web * web )
         if( easy ) {
             struct tr_web_task * task;
             long response_code;
-            curl_easy_getinfo( easy, CURLINFO_PRIVATE, &task );
+            curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
             curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &response_code );
             --web->remain;
             dbgmsg( "task #%lu done (%d remain)", task->tag, web->remain );

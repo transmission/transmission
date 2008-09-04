@@ -153,7 +153,7 @@ tr_bencParseStr( const uint8_t  * buf,
 #define LIST_SIZE 8 /* number of items to increment list/dict buffer by */
 
 static int
-makeroom( tr_benc * val, int count )
+makeroom( tr_benc * val, size_t count )
 {
     assert( TYPE_LIST == val->type || TYPE_DICT == val->type );
 
@@ -331,7 +331,7 @@ tr_bencParse( const void     * buf,
 
 int
 tr_bencLoad( const void  * buf_in,
-             int           buflen,
+             size_t        buflen,
              tr_benc     * setme_benc,
              char       ** setme_end )
 {
@@ -352,8 +352,8 @@ dictIndexOf( const tr_benc * val, const char * key )
 {
     if( tr_bencIsDict( val ) )
     {
-        int i;
-        const int len = strlen( key );
+        size_t i;
+        const size_t len = strlen( key );
 
         for( i=0; (i+1)<val->val.l.count; i+=2 )
         {
@@ -383,17 +383,17 @@ tr_bencDictFindType( tr_benc * val, const char * key, int type )
     return ( ret && ( ret->type == type ) ) ? ret : NULL;
 }
 
-int
+size_t
 tr_bencListSize( const tr_benc * list )
 {
     return tr_bencIsList( list ) ? list->val.l.count : 0;
 }
 
 tr_benc*
-tr_bencListChild( tr_benc * val, int i )
+tr_bencListChild( tr_benc * val, size_t i )
 {
     tr_benc * ret = NULL;
-    if( tr_bencIsList( val ) && ( i >= 0 ) && ( i < val->val.l.count ) )
+    if( tr_bencIsList( val ) && ( i < val->val.l.count ) )
         ret = val->val.l.vals + i;
     return ret;
 }
@@ -524,31 +524,31 @@ tr_bencInitInt( tr_benc * val, int64_t num )
 }
 
 int
-tr_bencInitList( tr_benc * val, int reserveCount )
+tr_bencInitList( tr_benc * val, size_t reserveCount )
 {
     tr_bencInit( val, TYPE_LIST );
     return tr_bencListReserve( val, reserveCount );
 }
 
 int
-tr_bencListReserve( tr_benc * val, int count )
+tr_bencListReserve( tr_benc * val, size_t count )
 {
     assert( tr_bencIsList( val ) );
     return makeroom( val, count );
 }
 
 int
-tr_bencInitDict( tr_benc * val, int reserveCount )
+tr_bencInitDict( tr_benc * val, size_t reserveCount )
 {
     tr_bencInit( val, TYPE_DICT );
     return tr_bencDictReserve( val, reserveCount );
 }
 
 int
-tr_bencDictReserve( tr_benc * val, int count )
+tr_bencDictReserve( tr_benc * val, size_t reserveCount )
 {
     assert( tr_bencIsDict( val ) );
-    return makeroom( val, count * 2 );
+    return makeroom( val, reserveCount * 2 );
 }
 
 tr_benc *
@@ -584,14 +584,14 @@ tr_bencListAddStr( tr_benc * list, const char * val )
     return node;
 }
 tr_benc*
-tr_bencListAddList( tr_benc * list, int reserveCount )
+tr_bencListAddList( tr_benc * list, size_t reserveCount )
 {
     tr_benc * child = tr_bencListAdd( list );
     tr_bencInitList( child, reserveCount );
     return child;
 }
 tr_benc*
-tr_bencListAddDict( tr_benc * list, int reserveCount )
+tr_bencListAddDict( tr_benc * list, size_t reserveCount )
 {
     tr_benc * child = tr_bencListAdd( list );
     tr_bencInitDict( child, reserveCount );
@@ -638,14 +638,14 @@ tr_bencDictAddDouble( tr_benc * dict, const char * key, double d )
     return tr_bencDictAddStr( dict, key, buf );
 }
 tr_benc*
-tr_bencDictAddList( tr_benc * dict, const char * key, int reserveCount )
+tr_bencDictAddList( tr_benc * dict, const char * key, size_t reserveCount )
 {
     tr_benc * child = tr_bencDictAdd( dict, key );
     tr_bencInitList( child, reserveCount );
     return child;
 }
 tr_benc*
-tr_bencDictAddDict( tr_benc * dict, const char * key, int reserveCount )
+tr_bencDictAddDict( tr_benc * dict, const char * key, size_t reserveCount )
 {
     tr_benc * child = tr_bencDictAdd( dict, key );
     tr_bencInitDict( child, reserveCount );
@@ -881,7 +881,7 @@ static void
 saveStringFunc( const tr_benc * val, void * vevbuf )
 {
     struct evbuffer * evbuf = vevbuf;
-    evbuffer_add_printf( evbuf, "%d:", val->val.s.i );
+    evbuffer_add_printf( evbuf, "%lu:", (unsigned long)val->val.s.i );
     evbuffer_add( evbuf, val->val.s.s, val->val.s.i );
 }
 static void
@@ -1167,7 +1167,7 @@ jsonDictBeginFunc( const tr_benc * val, void * vdata )
 static void
 jsonListBeginFunc( const tr_benc * val, void * vdata )
 {
-    const int nChildren = tr_bencListSize( val );
+    const size_t nChildren = tr_bencListSize( val );
     struct jsonWalk * data = vdata;
     jsonPushParent( data, val );
     evbuffer_add_printf( data->out, "[" );

@@ -474,7 +474,7 @@ onScrapeResponse( tr_session   * session,
                                              &benc, NULL );
         if( bencLoaded && tr_bencDictFindDict( &benc, "files", &files ) )
         {
-            int i;
+            size_t i;
             for( i=0; i<files->val.l.count; i+=2 )
             {
                 int64_t itmp;

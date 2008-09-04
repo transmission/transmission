@@ -1273,14 +1273,14 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
                               peerPage( core ),
                               gtk_label_new (_("Peers")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              networkPage( core ),
+                              gtk_label_new (_("Network")) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               trackerPage( core ),
                               gtk_label_new (_("Trackers")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               bandwidthPage( core ),
                               gtk_label_new (_("Bandwidth")) );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              networkPage( core ),
-                              gtk_label_new (_("Network")) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               webPage( core ),
                               gtk_label_new (_("Web")) );

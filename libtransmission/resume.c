@@ -122,7 +122,7 @@ loadDND( tr_benc * dict, tr_torrent * tor )
     tr_benc * list = NULL;
 
     if( tr_bencDictFindList( dict, KEY_DND, &list )
-        && ( list->val.l.count == (int)n ) )
+        && ( tr_bencListSize( list ) == n ) )
     {
         int64_t tmp;
         tr_file_index_t * dl = tr_new( tr_file_index_t, n );
@@ -130,7 +130,7 @@ loadDND( tr_benc * dict, tr_torrent * tor )
         tr_file_index_t i, dlCount=0, dndCount=0;
 
         for( i=0; i<n; ++i ) {
-            if( tr_bencGetInt( &list->val.l.vals[i], &tmp ) && tmp )
+            if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) && tmp )
                 dnd[dndCount++] = i;
             else
                 dl[dlCount++] = i;
@@ -151,8 +151,8 @@ loadDND( tr_benc * dict, tr_torrent * tor )
     }
     else
     {
-        tr_tordbg( tor, "Couldn't load DND flags.  dnd list (%p) has %d children; torrent has %d files",
-                   list, ( list ? list->val.l.count : -1 ), (int)n );
+        tr_tordbg( tor, "Couldn't load DND flags.  dnd list (%p) has %zu children; torrent has %d files",
+                   list, tr_bencListSize( list ), (int)n );
     }
 
     return ret;
@@ -184,12 +184,12 @@ loadPriorities( tr_benc * dict, tr_torrent * tor )
     tr_benc * list;
 
     if( tr_bencDictFindList( dict, KEY_PRIORITY, &list )
-        && ( list->val.l.count == (int)n ) )
+        && ( tr_bencListSize( list ) == n ) )
     {
         int64_t tmp;
         tr_file_index_t i;
         for( i=0; i<n; ++i )
-            if( tr_bencGetInt( &list->val.l.vals[i], &tmp ) )
+            if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) )
                 inf->files[i].priority = tmp;
         ret = TR_FR_PRIORITY;
     }
@@ -245,8 +245,7 @@ loadSpeedLimits( tr_benc * dict, tr_torrent * tor )
 static void
 saveProgress( tr_benc * dict, const tr_torrent * tor )
 {
-    int i;
-    int n;
+    size_t i, n;
     time_t * mtimes;
     tr_benc * p;
     tr_benc * m;
@@ -284,26 +283,26 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
         const uint8_t * raw; 
         size_t rawlen;
         tr_benc * m;
-        int n;
+        size_t n;
         time_t * curMTimes = tr_torrentGetMTimes( tor, &n );
 
         if( tr_bencDictFindList( p, KEY_PROGRESS_MTIMES, &m )
-            && ( m->val.l.count == (int64_t)tor->info.fileCount )
-            && ( m->val.l.count == n ) )
+            && ( n == tor->info.fileCount )
+            && ( n == tr_bencListSize( m ) ) )
         {
-            int i;
+            size_t i;
             for( i=0; i<n; ++i )
             {
                 int64_t tmp;
-                if( !tr_bencGetInt( &m->val.l.vals[i], &tmp ) ) {
-                    tr_tordbg( tor, "File #%d needs to be verified - couldn't find benc entry", i );
+                if( !tr_bencGetInt( tr_bencListChild( m, i ), &tmp ) ) {
+                    tr_tordbg( tor, "File #%zu needs to be verified - couldn't find benc entry", i );
                     tr_torrentSetFileChecked( tor, i, FALSE );
                 } else {
                     const time_t t = (time_t) tmp;
                     if( t == curMTimes[i] )
                         tr_torrentSetFileChecked( tor, i, TRUE );
                     else {
-                        tr_tordbg( tor, "File #%d needs to be verified - times %lu and %lu don't match", i, t, curMTimes[i] );
+                        tr_tordbg( tor, "File #%zu needs to be verified - times %lu and %lu don't match", i, t, curMTimes[i] );
                         tr_torrentSetFileChecked( tor, i, FALSE );
                     }
                 }
