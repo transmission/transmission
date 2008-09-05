@@ -17,6 +17,9 @@
 #include <ctype.h>
 #ifndef WIN32
 #include <netinet/in.h>
+#else
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #endif
 #include <sys/param.h>
 /* There is no portable method to get the default route gateway.
