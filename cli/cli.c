@@ -375,8 +375,9 @@ main( int argc, char ** argv )
     }
 
     signal( SIGINT, sigHandler );
+#ifndef WIN32
     signal( SIGHUP, sigHandler );
-
+#endif
     tr_torrentSetStatusCallback( tor, torrentStateChanged, NULL );
     tr_torrentStart( tor );
 
@@ -538,7 +539,9 @@ sigHandler( int signal )
     switch( signal )
     {
         case SIGINT: gotsig = 1; break;
+#ifndef WIN32
         case SIGHUP: manualUpdate = 1; break;
+#endif
         default: break;
     }
 }
