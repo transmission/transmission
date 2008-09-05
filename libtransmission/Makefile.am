@@ -35,7 +35,7 @@ libtransmission_a_SOURCES = \
     publish.c \
     ratecontrol.c \
     resume.c \
-    rpc.c \
+    rpcimpl.c \
     rpc-server.c \
     session.c \
     stats.c \
@@ -80,7 +80,7 @@ noinst_HEADERS = \
     publish.h \
     ratecontrol.h \
     resume.h \
-    rpc.h \
+    rpcimpl.h \
     rpc-server.h \
     session.h \
     stats.h \

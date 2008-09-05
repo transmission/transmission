@@ -18,7 +18,7 @@
 #include "transmission.h"
 #include "bencode.h"
 #include "ratecontrol.h"
-#include "rpc.h"
+#include "rpcimpl.h"
 #include "json.h"
 #include "session.h"
 #include "torrent.h"

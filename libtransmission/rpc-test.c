@@ -2,7 +2,7 @@
 #include <string.h> /* strcmp */
 #include "transmission.h"
 #include "bencode.h"
-#include "rpc.h"
+#include "rpcimpl.h"
 #include "utils.h"
 
 #define VERBOSE 0

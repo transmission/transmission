@@ -22,7 +22,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
-#include <libtransmission/rpc.h>
+#include <libtransmission/rpcimpl.h>
 #include <libtransmission/json.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>

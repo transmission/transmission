@@ -26,7 +26,7 @@
 #include "bencode.h"
 #include "list.h"
 #include "platform.h"
-#include "rpc.h"
+#include "rpcimpl.h"
 #include "rpc-server.h"
 #include "utils.h"
 
