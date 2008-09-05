@@ -8,6 +8,8 @@
  * this stuff is worth it, you can buy me a beer in return.
  */
 
+#ifndef _WIN32
+
 #include "defs.h"
 
 void 
@@ -126,3 +128,6 @@ _shttpd_spawn_process(struct conn *c, const char *prog, char *envblk,
 	return (ret);
 }
 #endif /* !NO_CGI */
+
+#endif /* !_WIN32 */
+

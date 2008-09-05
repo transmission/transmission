@@ -8,6 +8,8 @@
  * this stuff is worth it, you can buy me a beer in return.
  */
 
+#ifdef _WIN32
+
 #include "defs.h"
 
 static SERVICE_STATUS		ss; 
@@ -685,3 +687,6 @@ try_to_run_as_nt_service(void)
 	if (StartServiceCtrlDispatcher(service_table))
 		exit(EXIT_SUCCESS);
 }
+
+#endif /* _WIN32 */
+
