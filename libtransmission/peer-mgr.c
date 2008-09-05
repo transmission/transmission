@@ -73,7 +73,10 @@ enum
     MYFLAG_BANNED = 1,
 
     /* unreachable for now... but not banned.  if they try to connect to us it's okay */
-    MYFLAG_UNREACHABLE = 2
+    MYFLAG_UNREACHABLE = 2,
+
+    /* the absolute minimum we'll wait before attempting to reconnect to a peer */
+    MINIMUM_RECONNECT_INTERVAL_SECS = 5
 };
 
 
@@ -93,7 +96,7 @@ struct peer_atom
     uint16_t port;
     uint16_t numFails;
     struct in_addr addr;
-    time_t time;
+    time_t time; /* the last time the peer's connection status changed */
     time_t piece_data_time;
 };
 
@@ -920,9 +923,15 @@ ensureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8
 }
 
 static int
-getMaxPeerCount( const tr_torrent * tor UNUSED )
+getMaxPeerCount( const tr_torrent * tor )
 {
     return tor->maxConnectedPeers;
+}
+
+static int
+getPeerCount( const Torrent * t )
+{
+    return tr_ptrArraySize( t->peers ) + tr_ptrArraySize( t->outgoingHandshakes );
 }
 
 /* FIXME: this is kind of a mess. */
@@ -979,13 +988,16 @@ myHandshakeDoneCB( tr_handshake    * handshake,
         struct peer_atom * atom;
         ensureAtomExists( t, addr, port, 0, TR_PEER_FROM_INCOMING );
         atom = getExistingAtom( t, addr );
+        atom->time = time( NULL );
 
         if( atom->myflags & MYFLAG_BANNED )
         {
             tordbg( t, "banned peer %s tried to reconnect", tr_peerIoAddrStr(&atom->addr,atom->port) );
             tr_peerIoFree( io );
         }
-        else if( tr_ptrArraySize( t->peers ) >= getMaxPeerCount( t->tor ) )
+        else if( tr_peerIoIsIncoming( io )
+                 && ( getPeerCount( t ) >= getMaxPeerCount( t->tor ) ) )
+
         {
             tr_peerIoFree( io );
         }
@@ -1012,7 +1024,6 @@ myHandshakeDoneCB( tr_handshake    * handshake,
                 peer->port = port;
                 peer->io = io;
                 peer->msgs = tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
-                atom->time = time( NULL );
             }
         }
     }
@@ -1777,9 +1788,21 @@ static int
 getReconnectIntervalSecs( const struct peer_atom * atom )
 {
     int sec;
+    const time_t now = time( NULL );
 
-    switch( atom->numFails )
-    {
+    /* if we were recently connected to this peer and transferring piece
+     * data, try to reconnect to them sooner rather that later -- we don't
+     * want network troubles to get in the way of a good peer. */
+    if( ( now - atom->piece_data_time ) <= ( MINIMUM_RECONNECT_INTERVAL_SECS * 2 ) )
+        sec = MINIMUM_RECONNECT_INTERVAL_SECS;
+
+    /* don't allow reconnects more often than our minimum */
+    else if( ( now - atom->time ) < MINIMUM_RECONNECT_INTERVAL_SECS )
+        sec = MINIMUM_RECONNECT_INTERVAL_SECS;
+
+    /* otherwise, the interval depends on how many times we've tried
+     * and failed to connect to the peer */
+    else switch( atom->numFails ) {
         case 0: sec = 0; break;
         case 1: sec = 5; break;
         case 2: sec = 2*60; break;
@@ -1807,6 +1830,7 @@ getPeerCandidates( Torrent * t, int * setmeSize )
     ret = tr_new( struct peer_atom*, atomCount );
     for( i=retCount=0; i<atomCount; ++i )
     {
+        int interval;
         struct peer_atom * atom = atoms[i];
 
         /* peer fed us too much bad data ... we only keep it around
@@ -1828,18 +1852,12 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         if( seed && (atom->flags & ADDED_F_SEED_FLAG) )
             continue;
 
-        /* If we were connected to this peer recently and transferring
-         * piece data, try to reconnect -- network troubles may have
-         * disconnected us.  but if we weren't sharing piece data,
-         * hold off on this peer to give another one a try instead */
-        if( ( now - atom->piece_data_time ) > 10 )
-        {
-            const int wait = getReconnectIntervalSecs( atom );
-            if( ( now - atom->time ) < wait ) {
-                tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
-                        i, tr_peerIoAddrStr(&atom->addr,atom->port), wait );
-                continue;
-            }
+        /* don't reconnect too often */
+        interval = getReconnectIntervalSecs( atom );
+        if( ( now - atom->time ) < interval ) {
+            tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
+                    i, tr_peerIoAddrStr(&atom->addr,atom->port), interval );
+            continue;
         }
 
         /* Don't connect to peers in our blocklist */
@@ -1904,9 +1922,10 @@ reconnectPulse( void * vtorrent )
         }
 
         /* add some new ones */
-        for( i=0;    i < nCandidates
-                  && i < MAX_RECONNECTIONS_PER_PULSE
-                  && newConnectionsThisSecond < MAX_CONNECTIONS_PER_SECOND; ++i )
+        for( i=0;    ( i < nCandidates )
+                  && ( i < MAX_RECONNECTIONS_PER_PULSE )
+                  && ( getPeerCount( t ) < getMaxPeerCount( t->tor ) )
+                  && ( newConnectionsThisSecond < MAX_CONNECTIONS_PER_SECOND ); ++i )
         {
             tr_peerMgr * mgr = t->manager;
             struct peer_atom * atom = candidates[i];
