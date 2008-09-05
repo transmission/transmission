@@ -7,6 +7,7 @@
 #include <stddef.h>
 
 /* Windows DLL stuff */
+/*
 #ifdef _WIN32
 #	ifdef JSON_PARSER_DLL_EXPORTS
 #		define JSON_PARSER_DLL_API __declspec(dllexport)
@@ -14,8 +15,11 @@
 #		define JSON_PARSER_DLL_API __declspec(dllimport)
 #   endif
 #else
+*/
 #	define JSON_PARSER_DLL_API 
+/*
 #endif
+*/
 
 #include <inttypes.h>
 typedef int64_t JSON_int_t;
