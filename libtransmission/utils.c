@@ -673,6 +673,34 @@ tr_strerror( int i )
 *****
 ****/
 
+char*
+tr_strstrip( char * str )
+{
+    if( str != NULL )
+    {
+        size_t pos;
+        size_t len = strlen( str );
+
+        while( len && isspace( str[len-1] ) )
+            --len;
+        str[len] = '\0';
+
+        for( pos=0; pos<len && isspace( str[pos] ); )
+            ++pos;
+
+        len -= pos;
+        memmove( str, str+pos, len );
+        str[len] = '\0';
+    }
+
+    return str;
+}
+
+
+/****
+*****
+****/
+
 tr_bitfield*
 tr_bitfieldNew( size_t bitCount )
 {

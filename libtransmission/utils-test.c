@@ -85,6 +85,35 @@ test_bitfields( void )
     return 0;
 }
 
+static int
+test_strstrip( void )
+{
+    char *in, *out;
+
+    /* strstrip */
+    in = tr_strdup( "   test    " );
+    out = tr_strstrip( in );
+    check( in == out );
+    check( !strcmp( in, "test" ) );
+    tr_free( in );
+
+    /* strstrip */
+    in = tr_strdup( " test test " );
+    out = tr_strstrip( in );
+    check( in == out );
+    check( !strcmp( in, "test test" ) );
+    tr_free( in );
+
+    /* strstrip */
+    in = tr_strdup( "test" );
+    out = tr_strstrip( in );
+    check( in == out );
+    check( !strcmp( in, "test" ) );
+    tr_free( in );
+
+    return 0;
+}
+
 int
 main( void )
 {
@@ -105,6 +134,9 @@ main( void )
     check( len == 5 );
     tr_free( in );
     tr_free( out );
+
+    if(( i = test_strstrip( )))
+        return i;
 
     /* simple bitfield tests */
     for( l=0; l<NUM_LOOPS; ++l )

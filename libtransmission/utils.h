@@ -204,6 +204,8 @@ int tr_snprintf( char * buf, size_t buflen, const char * fmt, ... );
 
 const char* tr_strerror( int );
 
+char* tr_strstrip( char * str );
+
 /***
 ****
 ***/

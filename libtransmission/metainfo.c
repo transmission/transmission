@@ -263,14 +263,15 @@ getannounce( tr_info * inf, tr_benc * meta )
             tr_benc * tier = tr_bencListChild( tiers, i );
             const int tierSize = tr_bencListSize( tier );
             for( j=0; j<tierSize; ++j ) {
-                const char * str;
-                if( tr_bencGetStr( tr_bencListChild( tier, j ), &str ) 
-                        && tr_httpIsValidURL( str ) )  {
-                    tr_tracker_info * t = trackers + trackerCount++;
-                    t->tier = i;
-                    t->announce = tr_strdup( str );
-                    t->scrape = announceToScrape( str );
-                    /*fprintf( stderr, "tier %d: %s\n", i, str );*/
+                if( tr_bencGetStr( tr_bencListChild( tier, j ), &str ) ) {
+                    char * url = tr_strstrip( tr_strdup( str ) );
+                    if( tr_httpIsValidURL( url ) )  {
+                        tr_tracker_info * t = trackers + trackerCount++;
+                        t->tier = i;
+                        t->announce = tr_strdup( url );
+                        t->scrape = announceToScrape( url );
+                    }
+                    tr_free( url );
                 }
             }
         }
@@ -284,14 +285,18 @@ getannounce( tr_info * inf, tr_benc * meta )
 
     /* Regular announce value */
     if( !trackerCount
-        && tr_bencDictFindStr( meta, "announce", &str )
-        && tr_httpIsValidURL( str ) )
+        && tr_bencDictFindStr( meta, "announce", &str ) )
     {
-        trackers = tr_new0( tr_tracker_info, 1 );
-        trackers[trackerCount].tier = 0;
-        trackers[trackerCount].announce = tr_strdup( str );
-        trackers[trackerCount++].scrape = announceToScrape( str );
-        /*fprintf( stderr, "single announce: [%s]\n", str );*/
+        char * url = tr_strstrip( tr_strdup( str ) );
+        if( tr_httpIsValidURL( url ) )
+        {
+            trackers = tr_new0( tr_tracker_info, 1 );
+            trackers[trackerCount].tier = 0;
+            trackers[trackerCount].announce = tr_strdup( url );
+            trackers[trackerCount++].scrape = announceToScrape( url );
+            /*fprintf( stderr, "single announce: [%s]\n", url );*/
+        }
+        tr_free( url );
     }
 
     inf->trackers = trackers;
