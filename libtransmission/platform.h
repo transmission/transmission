@@ -58,4 +58,9 @@ int          tr_lockHave       ( const tr_lock * );
 
 tr_lockfile_state_t tr_lockfile       ( const char * filename );
 
+#ifdef WIN32
+void *mmap (void *ptr, long size, long prot, long type, long handle, long arg);
+long munmap (void *ptr, long size);
+#endif
+
 #endif

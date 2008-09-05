@@ -638,3 +638,73 @@ tr_lockfile( const char * filename )
 
     return ret;
 }
+
+
+#ifdef WIN32
+
+/* The following mmap functions are by Joerg Walter, and were taken from
+ * his paper at: http://www.genesys-e.de/jwalter/mix4win.htm
+ */
+
+/* Wait for spin lock */
+static int slwait (int *sl) {
+    while (InterlockedCompareExchange ((void **) sl, (void *) 1, (void *) 0) != 0) 
+	Sleep (0);
+    return 0;
+}
+
+/* Release spin lock */
+static int slrelease (int *sl) {
+    InterlockedExchange (sl, 0);
+    return 0;
+}
+
+static int g_sl;
+
+void *mmap (void *ptr, long size, long prot, long type, long handle, long arg) {
+    static long g_pagesize;
+    static long g_regionsize;
+    /* Wait for spin lock */
+    slwait (&g_sl);
+    /* First time initialization */
+    if (! g_pagesize) 
+        g_pagesize = getpagesize ();
+    if (! g_regionsize) 
+        g_regionsize = getregionsize ();
+    /* Allocate this */
+    ptr = VirtualAlloc (ptr, size,
+			MEM_RESERVE | MEM_COMMIT | MEM_TOP_DOWN, PAGE_READWRITE);
+    if (! ptr) {
+        ptr = MMAP_FAILURE;
+        goto mmap_exit;
+    }
+mmap_exit:
+    /* Release spin lock */
+    slrelease (&g_sl);
+    return ptr;
+}
+
+long munmap (void *ptr, long size) {
+    static long g_pagesize;
+    static long g_regionsize;
+    int rc = MUNMAP_FAILURE;
+    /* Wait for spin lock */
+    slwait (&g_sl);
+    /* First time initialization */
+    if (! g_pagesize) 
+        g_pagesize = getpagesize ();
+    if (! g_regionsize) 
+        g_regionsize = getregionsize ();
+    /* Free this */
+    if (! VirtualFree (ptr, 0, 
+                       MEM_RELEASE))
+        goto munmap_exit;
+    rc = 0;
+munmap_exit:
+    /* Release spin lock */
+    slrelease (&g_sl);
+    return rc;
+}
+
+#endif
+
