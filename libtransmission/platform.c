@@ -696,7 +696,7 @@ void *mmap (void *ptr, long size, long prot, long type, long handle, long arg) {
     ptr = VirtualAlloc (ptr, size,
 			MEM_RESERVE | MEM_COMMIT | MEM_TOP_DOWN, PAGE_READWRITE);
     if (! ptr) {
-        ptr = MMAP_FAILURE;
+      ptr = (void *) -1;
         goto mmap_exit;
     }
 mmap_exit:
@@ -708,7 +708,7 @@ mmap_exit:
 long munmap (void *ptr, long size) {
     static long g_pagesize;
     static long g_regionsize;
-    int rc = MUNMAP_FAILURE;
+    int rc = -1;
     /* Wait for spin lock */
     slwait (&g_sl);
     /* First time initialization */
