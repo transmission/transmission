@@ -179,9 +179,9 @@
 		A2A6321B0CD9751700E3DA60 /* BadgeView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A6321A0CD9751700E3DA60 /* BadgeView.m */; };
 		A2AA579D0ADFCAB400CA59F6 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */; };
 		A2AAB65C0DE0CF6200E04DDA /* rpc-server.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB6580DE0CF6200E04DDA /* rpc-server.c */; };
-		A2AAB65D0DE0CF6200E04DDA /* rpc.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB6590DE0CF6200E04DDA /* rpc.h */; };
+		A2AAB65D0DE0CF6200E04DDA /* rpcimpl.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */; };
 		A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */; };
-		A2AAB65F0DE0CF6200E04DDA /* rpc.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB65B0DE0CF6200E04DDA /* rpc.c */; };
+		A2AAB65F0DE0CF6200E04DDA /* rpcimpl.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */; };
 		A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D307930D9EC4860051FD27 /* blocklist.h */; };
 		A2AF1C390A3D0F6200F1575D /* FileOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */; };
 		A2B3FB460E5901E700FF78FB /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = A2B3FB450E5901E700FF78FB /* cli.c */; };
@@ -641,9 +641,9 @@
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
 		A2AAB6580DE0CF6200E04DDA /* rpc-server.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "rpc-server.c"; path = "libtransmission/rpc-server.c"; sourceTree = "<group>"; };
-		A2AAB6590DE0CF6200E04DDA /* rpc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rpc.h; path = libtransmission/rpc.h; sourceTree = "<group>"; };
+		A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rpcimpl.h; path = libtransmission/rpcimpl.h; sourceTree = "<group>"; };
 		A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "rpc-server.h"; path = "libtransmission/rpc-server.h"; sourceTree = "<group>"; };
-		A2AAB65B0DE0CF6200E04DDA /* rpc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rpc.c; path = libtransmission/rpc.c; sourceTree = "<group>"; };
+		A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rpcimpl.c; path = libtransmission/rpcimpl.c; sourceTree = "<group>"; };
 		A2AAB6C10DE0D5A400E04DDA /* auth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = auth.c; path = "third-party/shttpd/auth.c"; sourceTree = "<group>"; };
 		A2AAB6C50DE0D5A400E04DDA /* compat_unix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = compat_unix.c; path = "third-party/shttpd/compat_unix.c"; sourceTree = "<group>"; };
 		A2AAB6C60DE0D5A400E04DDA /* compat_unix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compat_unix.h; path = "third-party/shttpd/compat_unix.h"; sourceTree = "<group>"; };
@@ -1143,8 +1143,8 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
-				A2AAB65B0DE0CF6200E04DDA /* rpc.c */,
-				A2AAB6590DE0CF6200E04DDA /* rpc.h */,
+				A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */,
+				A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */,
 				A2AAB6580DE0CF6200E04DDA /* rpc-server.c */,
 				A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */,
 				A29DF8B60DB2544C00D04E5A /* resume.c */,
@@ -1454,7 +1454,7 @@
 				BEFC1E290C07861A00B0BB3C /* version.h in Headers */,
 				BEFC1E2A0C07861A00B0BB3C /* utils.h in Headers */,
 				BEFC1E2C0C07861A00B0BB3C /* upnp.h in Headers */,
-				A2AAB65D0DE0CF6200E04DDA /* rpc.h in Headers */,
+				A2AAB65D0DE0CF6200E04DDA /* rpcimpl.h in Headers */,
 				A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */,
 				BEFC1E2E0C07861A00B0BB3C /* transmission.h in Headers */,
 				BEFC1E300C07861A00B0BB3C /* tracker.h in Headers */,
@@ -1901,7 +1901,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BEFC1E2B0C07861A00B0BB3C /* utils.c in Sources */,
-				A2AAB65F0DE0CF6200E04DDA /* rpc.c in Sources */,
+				A2AAB65F0DE0CF6200E04DDA /* rpcimpl.c in Sources */,
 				BEFC1E2D0C07861A00B0BB3C /* upnp.c in Sources */,
 				A2AAB65C0DE0CF6200E04DDA /* rpc-server.c in Sources */,
 				BEFC1E2F0C07861A00B0BB3C /* session.c in Sources */,
