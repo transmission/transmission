@@ -646,20 +646,20 @@ tr_lockfile( const char * filename )
  * his paper at: http://www.genesys-e.de/jwalter/mix4win.htm
  */
 
+static LONG volatile g_sl __attribute__ ((aligned (4)));
+
 /* Wait for spin lock */
-static int slwait (int *sl) {
-    while (InterlockedCompareExchange ((void **) sl, (void *) 1, (void *) 0) != 0) 
+static int slwait (LONG volatile *sl) {
+    while (InterlockedCompareExchange (sl, 1, 0) != 0)
 	Sleep (0);
     return 0;
 }
 
 /* Release spin lock */
-static int slrelease (int *sl) {
+static int slrelease (LONG *sl) {
     InterlockedExchange (sl, 0);
     return 0;
 }
-
-static int g_sl;
 
 void *mmap (void *ptr, long size, long prot, long type, long handle, long arg) {
     static long g_pagesize;
