@@ -23,7 +23,16 @@
  *****************************************************************************/
 
 #include <sys/types.h>
+#ifdef WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <io.h>
+#define EWOULDBLOCK WSAEWOULDBLOCK
+#define ECONNREFUSED WSAECONNREFUSED
+#define ECONNABORTED WSAECONNABORTED
+#else
 #include <sys/socket.h>
+#endif
 #include <errno.h>
 #include <string.h> /* memset, memmove */
 #include <unistd.h> /* read, write */
