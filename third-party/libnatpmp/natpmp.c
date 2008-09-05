@@ -19,7 +19,7 @@
 #include <sys/time.h>
 #ifdef WIN32
 #include <winsock2.h>
-#include <Ws2tcpip.h>
+#include <ws2tcpip.h>
 #include <io.h>
 #define EWOULDBLOCK WSAEWOULDBLOCK
 #define ECONNREFUSED WSAECONNREFUSED

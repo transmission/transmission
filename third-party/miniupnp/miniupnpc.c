@@ -9,7 +9,7 @@
 #include <string.h>
 #ifdef WIN32
 #include <winsock2.h>
-#include <Ws2tcpip.h>
+#include <ws2tcpip.h>
 #include <io.h>
 #define snprintf _snprintf
 #define strncasecmp memicmp
