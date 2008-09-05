@@ -661,6 +661,27 @@ static int slrelease (LONG *sl) {
     return 0;
 }
 
+/* getpagesize for windows */
+static long getpagesize (void) {
+    static long g_pagesize = 0;
+    if (! g_pagesize) {
+        SYSTEM_INFO system_info;
+        GetSystemInfo (&system_info);
+        g_pagesize = system_info.dwPageSize;
+    }
+    return g_pagesize;
+}
+
+static long getregionsize (void) {
+    static long g_regionsize = 0;
+    if (! g_regionsize) {
+        SYSTEM_INFO system_info;
+        GetSystemInfo (&system_info);
+        g_regionsize = system_info.dwAllocationGranularity;
+    }
+    return g_regionsize;
+}
+
 void *mmap (void *ptr, long size, long prot, long type, long handle, long arg) {
     static long g_pagesize;
     static long g_regionsize;
