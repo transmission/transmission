@@ -7,7 +7,9 @@ if BUILD_CLI
   CLI_DIR = cli
 endif
 if BUILD_DAEMON
+if !WIN32
   DAEMON_DIR = daemon
+endif
 endif
 if BUILD_GTK
   GTK_DIR = gtk po

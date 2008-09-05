@@ -313,7 +313,7 @@ fi
 if test "x$have_msw" = "xyes"; then
     AC_DEFINE([HAVE_MSW], 1)
 fi
-
+AM_CONDITIONAL(WIN32, test "x$have_msw" = "xyes")
 
 dnl ----------------------------------------------------------------------------
 dnl
