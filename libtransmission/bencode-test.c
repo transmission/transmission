@@ -340,18 +340,16 @@ testJSON( void )
 }
 
 static int
-testStackSmash( void )
+testStackSmash( int depth )
 {
     int i;
     int len;
-    int depth;
     int err;
     uint8_t * in;
     const uint8_t * end;
     tr_benc val;
     char * saved;
 
-    depth = 1000000;
     in = tr_new( uint8_t, depth*2 + 1 );
     for( i=0; i<depth; ++i ) {
         in[i] = 'l';
@@ -388,7 +386,12 @@ main( void )
     if(( i = testJSON( )))
         return i;
 
-    if(( i = testStackSmash( )))
+#ifndef WIN32
+    i = testStackSmash( 1000000 );
+#else
+    i = testStackSmash( 100000 );
+#endif
+    if( i )
         return i;
 
     return 0;
