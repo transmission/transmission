@@ -138,6 +138,13 @@ main( void )
     if(( i = test_strstrip( )))
         return i;
 
+    /* test that tr_cryptoRandInt() stays in-bounds */
+    for( i=0; i<100000; ++i ) {
+        const int val = tr_cryptoRandInt( 100 );
+        check( i >= 0 );
+        check( i < 100 );
+    }
+
     /* simple bitfield tests */
     for( l=0; l<NUM_LOOPS; ++l )
         if(( i = test_bitfields( )))
