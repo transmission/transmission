@@ -19,6 +19,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <openssl/sha.h>
+
 #include "transmission.h"
 #include "crypto.h"
 #include "fdlimit.h"
@@ -226,36 +228,33 @@ recalculateHash( const tr_torrent  * tor,
                  tr_piece_index_t    pieceIndex,
                  uint8_t           * setme )
 {
-    static uint8_t * buf = NULL;
-    static int buflen = 0;
-    static tr_lock * lock = NULL;
-
-    int n;
-    tr_errno err;
-
-    /* only check one block at a time to prevent disk thrashing.
-     * this also lets us reuse the same buffer each time. */
-    if( lock == NULL )
-        lock = tr_lockNew( );
-
-    tr_lockLock( lock );
+    size_t bytesLeft;
+    size_t n;
+    uint32_t offset = 0;
+    tr_errno err =  0;
+    SHA_CTX sha;
 
     assert( tor );
     assert( setme );
     assert( pieceIndex < tor->info.pieceCount );
 
-    n = tr_torPieceCountBytes( tor, pieceIndex );
+    SHA1_Init( &sha );
+    n = bytesLeft = tr_torPieceCountBytes( tor, pieceIndex );
 
-    if( buflen < n ) {
-        buflen = n;
-        buf = tr_renew( uint8_t, buf, buflen );
+    while( bytesLeft )
+    {
+        uint8_t buf[2048];
+        const int len = MIN( bytesLeft, sizeof( buf ) );
+        if(( err = tr_ioRead( tor, pieceIndex, offset, len, buf )))
+            break;
+        SHA1_Update( &sha, buf, len );
+        offset += len;
+        bytesLeft -= len;
     }
-        
-    err = tr_ioRead( tor, pieceIndex, 0, n, buf );
-    if( !err )
-        tr_sha1( setme, buf, n, NULL );
 
-    tr_lockUnlock( lock );
+    if( !err )
+        SHA1_Final( setme, &sha );
+
     return err;
 }
 
