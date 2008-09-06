@@ -808,6 +808,9 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     i--;
     
     NSString * tracker = [trackers objectAtIndex: i];
+    
+    tracker = [tracker stringByTrimmingWhitespace];
+    
     if ([tracker rangeOfString: @"://"].location == NSNotFound)
     {
         tracker = [@"http://" stringByAppendingString: tracker];

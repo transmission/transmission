@@ -311,6 +311,8 @@
 {
     NSString * tracker = (NSString *)object;
     
+    tracker = [tracker stringByTrimmingWhitespace];
+    
     if ([tracker rangeOfString: @"://"].location == NSNotFound)
         tracker = [@"http://" stringByAppendingString: tracker];
     
