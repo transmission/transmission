@@ -407,12 +407,11 @@ tr_loadFile( const char * path, size_t * size )
         fclose( file );
         return NULL;
     }
-    fseek( file, 0, SEEK_SET );
     if( fread( buf, sb.st_size, 1, file ) != 1 )
     {
         tr_err( err_fmt, path, tr_strerror(errno) );
-        free( buf );
         fclose( file );
+        free( buf );
         return NULL;
     }
     fclose( file );
