@@ -451,7 +451,8 @@ torrent_cell_renderer_render( GtkCellRenderer      * cell,
         my_cell.height = p->bar_height;
         if( 1 )
         {
-            g_object_set( p->progress_renderer, "value", (int)(torStat->percentDone*100.0), 
+            const double percent = MAX( 0.0, torStat->percentDone );
+            g_object_set( p->progress_renderer, "value", (int)(percent*100.0), 
                                                 "text", "",
                                                 NULL );
             gtk_cell_renderer_render( p->progress_renderer,
