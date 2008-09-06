@@ -141,8 +141,8 @@ main( void )
     /* test that tr_cryptoRandInt() stays in-bounds */
     for( i=0; i<100000; ++i ) {
         const int val = tr_cryptoRandInt( 100 );
-        check( i >= 0 );
-        check( i < 100 );
+        check( val >= 0 );
+        check( val < 100 );
     }
 
     /* simple bitfield tests */
