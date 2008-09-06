@@ -120,6 +120,18 @@ tr-core-dbus.h: $(srcdir)/tr-core-dbus.xml
 	$(DBUS_BINDING_TOOL) --mode=glib-server --prefix=tr_core $< > $(@F)
 
 if WIN32
+transmission.res: transmission.rc
+        $(WINDRES) -J rc -i transmission.rc -O coff -o transmission.res
+
+BUILT_SOURCES = \
+        transmission.res
+
+CLEANFILES += \
+        transmission.res
+
+transmission_LDADD += \
+        transmission.res
+
 transmission_LDFLAGS = \
 	-mwindows
 endif

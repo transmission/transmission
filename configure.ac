@@ -228,11 +228,7 @@ case $host_os in
      else
        hostaliaswindres="$host_alias-windres";
      fi
-     AC_PATH_PROGS([WINDRES], [windres $hostaliaswindres $host_os-windres])
-     if test "x$WINDRES" = "x"; then
-       AC_MSG_ERROR([windres could not be found within your path.])
-     fi
-     AC_SUBST(WINDRES)
+     AC_CHECK_TOOL(WINDRES, windres)
      ;;
 
   *beos*)
