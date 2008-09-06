@@ -2,6 +2,7 @@
 #include <string.h> /* strcmp */
 #include "transmission.h"
 #include "utils.h"
+#include "crypto.h"
 
 #define VERBOSE 0
 #define NUM_LOOPS 1
