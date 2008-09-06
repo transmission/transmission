@@ -44,7 +44,7 @@ typedef enum
     NSTimer * fTimer;
 }
 
-- (id) initForPort: (int) portNumber withDelegate: (id) delegate;
+- (id) initForPort: (int) portNumber delay: (BOOL) delay withDelegate: (id) delegate;
 - (void) cancelProbe;
 
 - (void) callBackWithStatus: (port_status_t) status;

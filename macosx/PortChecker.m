@@ -30,7 +30,7 @@
 
 @implementation PortChecker
 
-- (id) initForPort: (int) portNumber withDelegate: (id) delegate
+- (id) initForPort: (int) portNumber delay: (BOOL) delay withDelegate: (id) delegate
 {
     if ((self = [super init]))
     {
@@ -39,8 +39,8 @@
         fPortNumber = portNumber;
         fStatus = PORT_STATUS_CHECKING;
         
-        fTimer = [NSTimer scheduledTimerWithTimeInterval: CHECK_FIRE target: self selector: @selector(startProbe)
-                    userInfo: nil repeats: NO];
+        fTimer = [NSTimer scheduledTimerWithTimeInterval: (delay ? CHECK_FIRE : 0.1) target: self
+                    selector: @selector(startProbe) userInfo: nil repeats: NO];
     }
     
     return self;
