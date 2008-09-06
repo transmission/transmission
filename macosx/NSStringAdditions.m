@@ -38,19 +38,6 @@
 	return [self stringByAppendingString: [NSString ellipsis]];
 }
 
-- (NSString *) stringByTrimmingWhitespace
-{
-    NSString * newString = self;
-    while ([newString length] > 0 && [[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:
-                                        [newString characterAtIndex: [newString length] - 1]])
-        newString = [newString substringToIndex: [newString length] - 1];
-    while ([newString length] > 0 && [[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:
-                                        [newString characterAtIndex: 0]])
-        newString = [newString substringFromIndex: 1];
-    
-    return newString;
-}
-
 + (NSString *) stringForFileSize: (uint64_t) size
 {
     if (size < 1024)

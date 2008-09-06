@@ -809,7 +809,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     NSString * tracker = [trackers objectAtIndex: i];
     
-    tracker = [tracker stringByTrimmingWhitespace];
+    tracker = [tracker stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
     if ([tracker rangeOfString: @"://"].location == NSNotFound)
     {
