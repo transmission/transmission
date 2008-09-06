@@ -121,16 +121,16 @@ tr-core-dbus.h: $(srcdir)/tr-core-dbus.xml
 
 if WIN32
 transmission.res: transmission.rc
-        $(WINDRES) -J rc -i transmission.rc -O coff -o transmission.res
+	$(WINDRES) -J rc -i transmission.rc -O coff -o transmission.res
 
 BUILT_SOURCES = \
-        transmission.res
+	transmission.res
 
 CLEANFILES += \
-        transmission.res
+	transmission.res
 
 transmission_LDADD += \
-        transmission.res
+	transmission.res
 
 transmission_LDFLAGS = \
 	-mwindows
