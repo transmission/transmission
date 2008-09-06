@@ -365,8 +365,7 @@ tr_handle * fHandle;
             [fPortChecker cancelProbe];
             [fPortChecker release];
         }
-        fPortChecker = [[PortChecker alloc] initForPort: fPeerPort
-            delay: tr_sessionIsPortForwardingEnabled(fHandle) withDelegate: self];
+        fPortChecker = [[PortChecker alloc] initForPort: fPeerPort delay: tr_sessionIsPortForwardingEnabled(fHandle) withDelegate: self];
     }
 }
 
