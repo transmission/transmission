@@ -64,7 +64,6 @@
 + (void) setHandle: (tr_handle *) handle;
 + (tr_handle *) handle;
 
-- (void) updatePortField;
 - (void) setPort: (id) sender;
 - (void) setNat: (id) sender;
 - (void) updatePortStatus;

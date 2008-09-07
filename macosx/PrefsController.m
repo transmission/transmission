@@ -322,12 +322,6 @@ tr_handle * fHandle;
                                         TOOLBAR_PEERS, TOOLBAR_NETWORK, TOOLBAR_REMOTE, nil];
 }
 
-//used by ipc
-- (void) updatePortField
-{
-    [fPortField setIntValue: [fDefaults integerForKey: @"BindPort"]];
-}
-
 - (void) setPort: (id) sender
 {
     int port = [sender intValue];

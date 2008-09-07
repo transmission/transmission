@@ -155,7 +155,7 @@
     if (multifile)
     {
         NSString * fileString;
-        int count = fInfo->fileCount;
+        NSInteger count = fInfo->fileCount;
         if (count != 1)
             fileString = [NSString stringWithFormat: NSLocalizedString(@"%d files", "Create torrent -> info"), count];
         else
@@ -487,12 +487,12 @@
             NSWindow * window = [self window];
             
             NSRect windowRect = [window frame];
-            float difference = [fProgressView frame].size.height - [[window contentView] frame].size.height;
+            CGFloat difference = [fProgressView frame].size.height - [[window contentView] frame].size.height;
             windowRect.origin.y -= difference;
             windowRect.size.height += difference;
             
             //don't allow vertical resizing
-            float height = windowRect.size.height;
+            CGFloat height = windowRect.size.height;
             [window setMinSize: NSMakeSize([window minSize].width, height)];
             [window setMaxSize: NSMakeSize([window maxSize].width, height)];
             
