@@ -36,7 +36,7 @@ typedef enum
 {    
     id fDelegate;
     port_status_t fStatus;
-    int fPortNumber;
+    NSInteger fPortNumber;
     
     NSURLConnection * fConnection;
     NSMutableData * fPortProbeData;
@@ -44,10 +44,9 @@ typedef enum
     NSTimer * fTimer;
 }
 
-- (id) initForPort: (int) portNumber delay: (BOOL) delay withDelegate: (id) delegate;
+- (id) initForPort: (NSInteger) portNumber delay: (BOOL) delay withDelegate: (id) delegate;
 - (void) cancelProbe;
 
-- (void) callBackWithStatus: (port_status_t) status;
 - (port_status_t) status;
 
 @end

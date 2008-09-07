@@ -29,12 +29,12 @@
 {
     tr_handle * fLib;
     
-    int fCompleted;
+    NSInteger fCompleted;
     
     //tiger-only fields
     NSImage * fDockIcon, * fBadge;
     NSDictionary * fAttributes;
-    int fCompletedBadged;
+    NSInteger fCompletedBadged;
     BOOL fSpeedBadge, fQuittingTiger;
 }
 

@@ -32,11 +32,13 @@
 
 - (void) startProbe;
 
+- (void) callBackWithStatus: (port_status_t) status;
+
 @end
 
 @implementation PortChecker
 
-- (id) initForPort: (int) portNumber delay: (BOOL) delay withDelegate: (id) delegate
+- (id) initForPort: (NSInteger) portNumber delay: (BOOL) delay withDelegate: (id) delegate
 {
     if ((self = [super init]))
     {
@@ -75,14 +77,6 @@
     fTimer = nil;
     
     [fConnection cancel];
-}
-
-- (void) callBackWithStatus: (port_status_t) status
-{
-    fStatus = status;
-    
-    if (fDelegate && [fDelegate respondsToSelector: @selector(portCheckerDidFinishProbing:)])
-        [fDelegate performSelectorOnMainThread: @selector(portCheckerDidFinishProbing:) withObject: self waitUntilDone: NO];
 }
 
 - (void) connection: (NSURLConnection *) connection didReceiveResponse: (NSURLResponse *) response
@@ -147,6 +141,14 @@
         NSLog(@"Unable to get port status: failed to initiate connection");
         [self callBackWithStatus: PORT_STATUS_ERROR];
     }
+}
+
+- (void) callBackWithStatus: (port_status_t) status
+{
+    fStatus = status;
+    
+    if (fDelegate && [fDelegate respondsToSelector: @selector(portCheckerDidFinishProbing:)])
+        [fDelegate performSelectorOnMainThread: @selector(portCheckerDidFinishProbing:) withObject: self waitUntilDone: NO];
 }
 
 @end

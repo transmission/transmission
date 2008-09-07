@@ -47,7 +47,7 @@
 {
     [fButton setTitle: NSLocalizedString(@"Cancel", "Blocklist -> cancel button")];
     
-    float oldWidth = [fButton frame].size.width;
+    CGFloat oldWidth = [fButton frame].size.width;
     [fButton sizeToFit];
     NSRect buttonFrame = [fButton frame];
     buttonFrame.size.width += 12.0; //sizeToFit sizes a bit too small

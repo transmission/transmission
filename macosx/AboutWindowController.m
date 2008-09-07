@@ -47,7 +47,7 @@ AboutWindowController * fAboutBoxInstance = nil;
             [[NSBundle mainBundle] pathForResource: @"Credits" ofType: @"rtf"] documentAttributes: nil] autorelease]];
     
     //size license button
-    float oldButtonWidth = [fLicenseButton frame].size.width;
+    CGFloat oldButtonWidth = [fLicenseButton frame].size.width;
     
     [fLicenseButton setTitle: NSLocalizedString(@"License", "About window -> license button")];
     [fLicenseButton sizeToFit];
