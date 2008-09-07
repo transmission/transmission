@@ -139,6 +139,7 @@ typedef enum
 
 #define WEBSITE_URL @"http://www.transmissionbt.com/"
 #define FORUM_URL   @"http://forum.transmissionbt.com/"
+#define TRAC_URL   @"http://trac.transmissionbt.com/"
 #define DONATE_URL  @"http://www.transmissionbt.com/donate.php"
 
 static tr_rpc_callback_status rpcCallback(tr_handle * handle UNUSED, tr_rpc_callback_type type, struct tr_torrent * torrentStruct, void * controller)
@@ -4193,6 +4194,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) linkForums: (id) sender
 {
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: FORUM_URL]];
+}
+
+- (void) linkTrac: (id) sender
+{
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: TRAC_URL]];
 }
 
 - (void) linkDonate: (id) sender
