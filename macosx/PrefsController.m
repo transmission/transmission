@@ -344,8 +344,10 @@ tr_handle * fHandle;
 {
     const tr_port_forwarding fwd = tr_sessionGetPortForwarding(fHandle);
     const int port = tr_sessionGetPeerPort(fHandle);
+    BOOL natStatusChanged = (fNatStatus != fwd);
+    BOOL peerPortChanged = (fPeerPort != port);
 
-    if (fNatStatus != fwd || fPeerPort != port )
+    if (natStatusChanged || peerPortChanged)
     {
         fNatStatus = fwd;
         fPeerPort = port;
@@ -359,7 +361,8 @@ tr_handle * fHandle;
             [fPortChecker cancelProbe];
             [fPortChecker release];
         }
-        fPortChecker = [[PortChecker alloc] initForPort: fPeerPort delay: tr_sessionIsPortForwardingEnabled(fHandle) withDelegate: self];
+        BOOL delay = natStatusChanged || tr_sessionIsPortForwardingEnabled(fHandle);
+        fPortChecker = [[PortChecker alloc] initForPort: fPeerPort delay: delay withDelegate: self];
     }
 }
 
