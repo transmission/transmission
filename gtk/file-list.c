@@ -630,7 +630,7 @@ onViewButtonPressed( GtkWidget      * w,
                     int sub_state;
                     gboolean enabled;
 
-                    /* get the `enabled' state of the row that was clicked on */
+                    /* get the `enabled' state of the clicked row */
                     gtk_tree_model_get( model, &iter, FC_IS_FILE, &is_file,
                                                       FC_ENABLED, &enabled,
                                                       FC_SUB_STATE, &sub_state, -1 );
@@ -642,13 +642,17 @@ onViewButtonPressed( GtkWidget      * w,
                         enabled = ( sub_state & SUB_STATE_IGNORE ) ? 1 : 0;
 
                     /* apply that new state to the active files */
-                    tr_torrentSetFileDLs ( tr_torrent_handle( data->gtor ),
-                                           (tr_file_index_t*)a->data,
-                                           (tr_file_index_t)a->len,
-                                           enabled );
+                    tr_torrentSetFileDLs( tr_torrent_handle( data->gtor ),
+                                          (tr_file_index_t*)a->data,
+                                          (tr_file_index_t)a->len,
+                                          enabled );
                 }
 
                 refresh( data );
+
+                /* the click was meant to change the priority or enabled state,
+                   not to alter which rows were selected, so don't pass this
+                   event on to the other handlers. */
                 handled = isSelected;
 
                 /* cleanup */
