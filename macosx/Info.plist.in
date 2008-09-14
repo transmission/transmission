@@ -63,6 +63,8 @@
 			</array>
 		</dict>
 	</array>
+	<key>SUAllowsAutomaticUpdates</key>
+	<false/>
 	<key>SUFeedURL</key>
 	<string>http://www.transmissionbt.com/appcast.xml</string>
 	<key>SUScheduledCheckInterval</key>
