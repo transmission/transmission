@@ -9,10 +9,16 @@
     <lastBuildDate>Wed, 20 Aug 2008 23:44:00 -0400</lastBuildDate>
 
 	<item>
-		<title>Transmission 1.32</title>
+		<title>Transmission 1.33</title>
 		<sparkle:releaseNotesLink>http://www.transmissionbt.com/appcast/releasenotes.html</sparkle:releaseNotesLink>
       	<pubDate>Wed, 20 Aug 2008 23:44:00 -0400</pubDate>
-      	<enclosure sparkle:version="6594" sparkle:shortVersionString="1.33" sparkle:minimumSystemVersion="10.4.11" url="http://mirrors.m0k.org/transmission/files/Transmission-1.33.dmg" length="3406796" type="application/octet-stream"/>
+      	<enclosure 			url="http://mirrors.m0k.org/transmission/files/Transmission-1.33.dmg" 
+      	sparkle:version="6594"
+      	sparkle:shortVersionString="1.33"
+      	sparkle:dsaSignature="MCwCFGWRExReQLVi4LOhEPZu+9yhCNWjAhRJD6Y+9M3R2h68ZoOzwZNxaZi6Ww=="
+      	length="3406796"
+      	sparkle:minimumSystemVersion="10.4.11"
+      	type="application/octet-stream"/>
     </item>
     
   </channel>
