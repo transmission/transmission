@@ -1091,7 +1091,7 @@ options_page_new ( TrTorrent * gtor )
 
   row = 0;
   t = hig_workarea_create ();
-  hig_workarea_add_section_title (t, &row, _("Bandwidth") );
+  hig_workarea_add_section_title (t, &row, _("Limits") );
 
     tb = gtk_check_button_new_with_mnemonic (_("Limit _download speed (KB/s):"));
     b = tr_torrentGetSpeedMode(tor,TR_DOWN) == TR_SPEEDLIMIT_SINGLE;
@@ -1099,8 +1099,9 @@ options_page_new ( TrTorrent * gtor )
     g_signal_connect (tb, "toggled", G_CALLBACK(dl_speed_toggled_cb), gtor);
 
     i = tr_torrentGetSpeedLimit( tor, TR_DOWN );
-    a = (GtkAdjustment*) gtk_adjustment_new (i, 0.0, G_MAXDOUBLE, 1, 1, 1);
-    w = gtk_spin_button_new (a, 1, 0);
+    w = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
+    gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), i );
+
     g_signal_connect (w, "value-changed", G_CALLBACK(dl_speed_spun_cb), gtor);
     g_signal_connect (tb, "toggled", G_CALLBACK(sensitize_from_check_cb), w);
     sensitize_from_check_cb (GTK_TOGGLE_BUTTON(tb), w);
@@ -1112,8 +1113,9 @@ options_page_new ( TrTorrent * gtor )
     g_signal_connect (tb, "toggled", G_CALLBACK(ul_speed_toggled_cb), gtor);
 
     i = tr_torrentGetSpeedLimit( tor, TR_UP );
-    a = (GtkAdjustment*) gtk_adjustment_new (i, 0.0, G_MAXDOUBLE, 1, 1, 1);
-    w = gtk_spin_button_new (a, 1, 0);
+    w = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
+    gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), i );
+
     g_signal_connect (w, "value-changed", G_CALLBACK(ul_speed_spun_cb), gtor);
     g_signal_connect (tb, "toggled", G_CALLBACK(sensitize_from_check_cb), w);
     sensitize_from_check_cb (GTK_TOGGLE_BUTTON(tb), w);
