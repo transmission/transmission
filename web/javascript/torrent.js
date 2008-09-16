@@ -379,7 +379,7 @@ Torrent.prototype =
 			// Create the 'progress details' label
 			// Eg: '698.05 MB, uploaded 8.59 GB (Ratio: 12.3)'
 			progress_details = Math.formatBytes( this._size )
-			                 + ', uploaded ';
+			                 + ', uploaded '
 			                 + Math.formatBytes( this._upload_total )
 			                 + ' (Ratio '
 			                 + Math.ratio( this._upload_total, this._download_total )
