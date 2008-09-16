@@ -45,7 +45,7 @@ div.torrent_global_menu {
 	left: 0;
 	right: 0;
 	top: 0;
-	border-bottom: 1px solid #444;
+	border-bottom: 1px solid #888;
 	z-index: 3;
 	overflow: hidden;
 	-moz-user-select: none;
@@ -192,7 +192,7 @@ div.torrent_global_details {
 	background: #ddd url('../images/graphics/filter_bar.png') repeat-x left -51px;
 	font-size: 1.1em;
 	font-weight: normal;
-	border-bottom: 1px solid #777;
+	border-bottom: 1px solid #888;
 	position: fixed;
 	left: 0;
 	right: 0;
@@ -236,7 +236,7 @@ div#torrent_filter_bar {
 	margin: 0;
 	height: 24px;
 	background: #ddd url('../images/graphics/filter_bar.png') repeat-x bottom left;
-	border-bottom: 1px solid #777;
+	border-bottom: 1px solid #888;
 	position: fixed;
 	left: 0;
 	right: 0px;
@@ -486,101 +486,72 @@ li.torrent a:active div.torrent_resume {
 div#torrent_inspector {
 	position: fixed;
 	top: 97px;
-	right: 0px;
 	bottom: 22px;
+	right: 0px;
 	width: 350px;
 	background-color: #ddd;
-	border-left: #888 1px solid;
+	border-left: 1px solid #888;
 	z-index: 2;
 	text-align: left;
-	font-size: 1.1em;
 }
-
-div#torrent_inspector h1#torrent_inspector_name {
-	font-size: 1.3em;
+div#torrent_inspector #torrent_inspector_name {
 	margin: 0;
-	word-wrap: break-word;
 	overflow: hidden;
 }
-
-div#torrent_inspector span#torrent_inspector_size {
+div#torrent_inspector #torrent_inspector_size {
 	font-size: 1.2em;
 	margin: 3;
 	display: block;
 	padding-top: 2px;
 }
-
-div.torrent_inspector_header {
-	padding: 5px 10px 0;
-}
-
-div#torrent_inspector ul.torrent_inspector_tabs {
-	margin: 0 0 0 113px; /* Center tabs */
-	padding: 0;
-	display: block;
-	width: 100%;
-}
-
-/* Force anything after the menu to display on a new line -
-   looks like overkill, maybe an easier way to do this */
-div#torrent_inspector ul.torrent_inspector_tabs:after {
-	content: ".";
-	display: block;
-	height: 0;
-	font-size: 0;
+div#inspector_header {
 	clear: both;
-	visibility: hidden;
+	padding-top: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
 }
-
-div#torrent_inspector ul.torrent_inspector_tabs li {
+div#inspector_tabs {
+	margin: 0 auto;
+	padding-top: 10px;
+	width: 140px;
+}
+.inspector_tab {
 	float: left;
-	list-style-type: none;
-}
-
-div#torrent_inspector ul.torrent_inspector_tabs li a {
-	display: block;
-	margin: 10px -1px 3px 0; /* Collapse horizontal borders */
-	padding: 4px;
-	background: transparent url('../images/buttons/tab_backgrounds.png') left top repeat-x;
-	border-left: 1px solid #787878;
-	border-right: 1px solid #787878;
-	width: 50px;
-	text-align: center;
-	font-weight: bold;
-	text-decoration: none;
-	color: #323232;
+	background: transparent url('../images/buttons/tab_backgrounds.png') left -1px repeat-x;
+	border: 1px solid #888;
+	margin: 0px 1px;
+	padding: 3px 15px; /* 3px == ((bg image height - fg image height) / 2) */
 	cursor: pointer;
 }
-
-div#torrent_inspector ul.torrent_inspector_tabs li a.selected {
-	background-position: left bottom;
+#inspector_tabs > .selected {
+	background-position: left -26px; /* the highlighted part of the image */
 }
-
-div#torrent_inspector div.torrent_inspector_section h2 {
-	border-top: 1px solid #aaa;
-	font-size: 1.1em;
-	margin: 5px 0 0;
-	padding: 5px 5px 5px;
+.inspector_container {
+	margin: 10px;
+	width: 330px; /* inspector_width==350 - ((margin==10)*2) */
 }
-
-div.torrent_inspector_section {
-	padding: 5px;
+.inspector_group {
+	display: table;
+	width: 100%;
+	border-top: 1px solid #888;
+	margin: 10px 0px;
+	padding: 10px 0px;
 }
-
-div#torrent_inspector div.torrent_inspector_section label {
-	margin-left: 15px;
-	width: 90px;
-	display: block;
-	float: left;
+.inspector_group_label {
+	display: table-header-group;
+	font-weight: bold;
 }
-
-div#torrent_inspector div.torrent_inspector_section div {
-	height: 17px;
-	width: 215px;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	-o-text-overflow: ellipsis;
+.inspector_row {
+	display: table-row;
+}
+.inspector_row > .inspector_label {
+	display: table-cell;
+	width: 100px; /* this + the next 230 == inspector_container_with */
+}
+.inspector_row > div {
+	display: table-cell;
+	padding-top: 10px;
+	width: 230px; /* inspector_container_width==330 - inspector_label_width==100 */
 }
 
 /*--------------------------------------

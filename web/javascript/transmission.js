@@ -842,19 +842,55 @@ Transmission.prototype =
 		var total_upload_peers = 0;
 		var total_upload_speed = 0;
 		var total_verified = 0;
+		var na = 'N/A';
 
-		switch( torrents.length ) {
-			case 0: name = 'No Selection'; break;
-			case 1: name = torrents[0].name(); break;
-			default: name = torrents.length+' Transfers Selected'; break;
+		if( torrents.length == 0 )
+		{
+			var ti = '#torrent_inspector_';
+			setInnerHTML( $(ti+'name')[0], 'No Selection' );
+			setInnerHTML( $(ti+'size')[0], na );
+			setInnerHTML( $(ti+'tracker')[0], na );
+			setInnerHTML( $(ti+'hash')[0], na );
+			setInnerHTML( $(ti+'state')[0], na );
+			setInnerHTML( $(ti+'download_speed')[0], na );
+			setInnerHTML( $(ti+'upload_speed')[0], na );
+			setInnerHTML( $(ti+'uploaded')[0], na );
+			setInnerHTML( $(ti+'downloaded')[0], na );
+			setInnerHTML( $(ti+'ratio')[0], na );
+			setInnerHTML( $(ti+'total_seeders')[0], na );
+			setInnerHTML( $(ti+'total_leechers')[0], na );
+			setInnerHTML( $(ti+'swarm_speed')[0], na );
+			setInnerHTML( $(ti+'have')[0], na );
+			setInnerHTML( $(ti+'upload_to')[0], na );
+			setInnerHTML( $(ti+'download_from')[0], na );
+			setInnerHTML( $(ti+'secure')[0], na );
+			setInnerHTML( $(ti+'creator_date')[0], na );
+			setInnerHTML( $(ti+'progress')[0], na );
+			setInnerHTML( $(ti+'comment')[0], na );
+			setInnerHTML( $(ti+'creator')[0], na );
+			setInnerHTML( $(ti+'error')[0], na );
+			return;
 		}
+
+		name = torrents.length == 1
+			? torrents[0].name()
+			: torrents.length+' Transfers Selected';
 
 		if( torrents.length == 1 )
 		{
 			var t = torrents[0];
-			error = t._error_message ? t._error_message : '';
-			comment = t._comment ? t._comment : '';
-			creator = t._creator ? t._creator : '';
+			if( t._error_message )
+			{
+				error = t._error_message ;
+			}
+			if( t._comment)
+			{
+				comment = t._comment ;
+			}
+			if( t._creator )
+			{
+				creator = t._creator ;
+			}
 			hash = t.hash();
 			date_created = Math.formatTimestamp( t._creator_date );
 		}
@@ -895,27 +931,27 @@ Transmission.prototype =
 
 		var ti = '#torrent_inspector_';
 		$(ti+'name')[0].innerHTML            = name;
-		$(ti+'size')[0].innerHTML            = Math.formatBytes( total_size );
+		$(ti+'size')[0].innerHTML            = torrents.length ? Math.formatBytes( total_size ) : 'N/A';
 		$(ti+'tracker')[0].innerHTML         = total_tracker;
 		$(ti+'hash')[0].innerHTML            = hash;
 		$(ti+'state')[0].innerHTML           = total_state;
-		$(ti+'download_speed')[0].innerHTML  = Math.formatBytes( total_download_speed ) + '/s';
-		$(ti+'upload_speed')[0].innerHTML    = Math.formatBytes( total_upload_speed ) + '/s';
-		$(ti+'uploaded')[0].innerHTML        = Math.formatBytes( total_upload );
-		$(ti+'downloaded')[0].innerHTML      = Math.formatBytes( total_download );
-		$(ti+'ratio')[0].innerHTML           = Math.ratio( total_upload, total_download );
-		$(ti+'total_seeders')[0].innerHTML   = total_seeders;
-		$(ti+'total_leechers')[0].innerHTML  = total_leechers;
-		$(ti+'swarm_speed')[0].innerHTML     = Math.formatBytes(total_swarm_speed) + '/s';
-		$(ti+'have')[0].innerHTML            = Math.formatBytes(total_completed) + ' (' + Math.formatBytes(total_verified) + ' verified)';
-		$(ti+'upload_to')[0].innerHTML       = total_upload_peers;
-		$(ti+'download_from')[0].innerHTML   = total_download_peers;
+		$(ti+'download_speed')[0].innerHTML  = torrents.length ? Math.formatBytes( total_download_speed ) + '/s' : 'N/A';
+		$(ti+'upload_speed')[0].innerHTML    = torrents.length ? Math.formatBytes( total_upload_speed ) + '/s' : 'N/A';
+		$(ti+'uploaded')[0].innerHTML        = torrents.length ? Math.formatBytes( total_upload ) : 'N/A';
+		$(ti+'downloaded')[0].innerHTML      = torrents.length ? Math.formatBytes( total_download ) : 'N/A';
+		$(ti+'ratio')[0].innerHTML           = torrents.length ? Math.ratio( total_upload, total_download ) : 'N/A';
+		$(ti+'total_seeders')[0].innerHTML   = torrents.length ? total_seeders : 'N/A';
+		$(ti+'total_leechers')[0].innerHTML  = torrents.length ? total_leechers : 'N/A';
+		$(ti+'swarm_speed')[0].innerHTML     = torrents.length ? Math.formatBytes(total_swarm_speed) + '/s' : 'N/A';
+		$(ti+'have')[0].innerHTML            = torrents.length ? Math.formatBytes(total_completed) + ' (' + Math.formatBytes(total_verified) + ' verified)' : 'N/A';
+		$(ti+'upload_to')[0].innerHTML       = torrents.length ? total_upload_peers : 'N/A';
+		$(ti+'download_from')[0].innerHTML   = torrents.length ? total_download_peers : 'N/A';
 		$(ti+'secure')[0].innerHTML          = private_string;
 		$(ti+'creator_date')[0].innerHTML    = date_created;
-		$(ti+'progress')[0].innerHTML        = Math.ratio( sizeDone*100, sizeWhenDone ) + '%';
-		$(ti+'comment')[0].innerHTML	  = comment ;
-		$(ti+'creator')[0].innerHTML	  = creator ;
-		$(ti+'error')[0].innerHTML		  = error ;
+		$(ti+'progress')[0].innerHTML        = torrents.length ? Math.ratio( sizeDone*100, sizeWhenDone ) + '%' : 'N/A';
+		$(ti+'comment')[0].innerHTML         = comment;
+		$(ti+'creator')[0].innerHTML         = creator;
+		$(ti+'error')[0].innerHTML           = error;
 	},
     
 	/*
