@@ -130,6 +130,7 @@ makeURL( tr_webseed * w, const tr_file * file )
                     evbuffer_add_printf( out, "%%%02X", *str );
                     break;
             }
+            str++;
         }
     }
 
