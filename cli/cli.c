@@ -73,11 +73,11 @@ tr_strlratio( char * buf, double ratio, size_t buflen )
     else if( (int)ratio == TR_RATIO_INF )
         tr_strlcpy( buf, "Inf", buflen );
     else if( ratio < 10.0 )
-        tr_snprintf( buf, buflen, "%'.2f", ratio );
+        tr_snprintf( buf, buflen, "%.2f", ratio );
     else if( ratio < 100.0 )
-        tr_snprintf( buf, buflen, "%'.1f", ratio );
+        tr_snprintf( buf, buflen, "%.1f", ratio );
     else
-        tr_snprintf( buf, buflen, "%'.0f", ratio );
+        tr_snprintf( buf, buflen, "%.0f", ratio );
     return buf;
 }
 
