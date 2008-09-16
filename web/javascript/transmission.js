@@ -837,7 +837,7 @@ Transmission.prototype =
 		var total_seeders = 0;
 		var total_state = null;
 		var total_swarm_speed = 0;
-		var total_tracker = '';
+		var total_tracker = null;
 		var total_upload = 0;
 		var total_upload_peers = 0;
 		var total_upload_speed = 0;
@@ -916,7 +916,9 @@ Transmission.prototype =
 			else if ( total_state.search ( t.stateStr() ) == -1 )
 				total_state += '/' + t.stateStr();
 			var tracker = t._tracker;
-			if ( total_tracker.search ( tracker ) == -1 )  
+			if( total_tracker == null )
+				total_tracker = tracker;
+			else if ( total_tracker.search ( tracker ) == -1 )  
 				total_tracker += '/' + tracker;
 			if( t._is_private )
 				have_private = true;
