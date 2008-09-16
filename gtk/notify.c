@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <string.h>
 #ifdef HAVE_GIO
 #include <gio/gio.h>
 #endif

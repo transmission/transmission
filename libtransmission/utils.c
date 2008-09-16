@@ -371,14 +371,6 @@ tr_compareDouble( double a, double b )
 }
 
 int
-tr_compareTime( time_t a, time_t b )
-{
-    if( a < b ) return -1;
-    if( a > b ) return 1;
-    return 0;
-}
-
-int
 tr_strcmp( const void * a, const void * b )
 {
     if( a && b ) return strcmp( a, b );

@@ -413,7 +413,7 @@ tr_peerMgrGenerateAllowedSet( const uint32_t         k,         /* number of pie
 {
     uint8_t w[SHA_DIGEST_LENGTH + 4];
     uint8_t x[SHA_DIGEST_LENGTH];
-    tr_bitfield_t * a;
+    tr_bitfield * a;
     uint32_t a_size;
 
     *(uint32_t*)w = ntohl( htonl(ip->s_addr) & 0xffffff00 );   /* (1) */
@@ -531,7 +531,6 @@ tr_peerMgrPeerIsSeed( const tr_peerMgr       * mgr,
 struct tr_refill_piece
 {
     tr_priority_t priority;
-    int missingBlockCount;
     uint16_t random;
     uint32_t piece;
     uint32_t peerCount;
@@ -604,7 +603,6 @@ getPreferredPieces( Torrent     * t,
             setme->priority = inf->pieces[piece].priority;
             setme->peerCount = 0;
             setme->random = tr_rand( UINT16_MAX );
-            setme->missingBlockCount = tr_cpMissingBlocksInPiece( tor->completion, piece );
 
             for( k=0; k<peerCount; ++k ) {
                 const tr_peer * peer = peers[k];

@@ -222,7 +222,6 @@ int tr_compareUint16( uint16_t a, uint16_t b );
 int tr_compareUint32( uint32_t a, uint32_t b );
 int tr_compareUint64( uint64_t a, uint64_t b );
 int tr_compareDouble( double a, double b );
-int tr_compareTime( time_t a, time_t b );
 
 int tr_strcmp( const void * a, const void * b );
 int tr_strcasecmp( const char * a, const char * b );
@@ -251,7 +250,6 @@ struct tr_bitfield
 };
 
 typedef struct tr_bitfield tr_bitfield;
-typedef struct tr_bitfield tr_bitfield_t;
 
 tr_bitfield* tr_bitfieldNew( size_t bitcount ) TR_GNUC_MALLOC;
 tr_bitfield* tr_bitfieldDup( const tr_bitfield* ) TR_GNUC_MALLOC;
@@ -269,16 +267,6 @@ int    tr_bitfieldIsEmpty( const tr_bitfield* );
 size_t tr_bitfieldCountTrueBits( const tr_bitfield* );
 
 tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
-
-#if 0
-/** @brief finds the first true bit in the bitfield, starting at `startPos'
-    @param setmePos the position of the true bit, if found, is set here.
-    @return nonzero if a true bit was found */
-int tr_bitfieldFindTrue( const tr_bitfield  * bitfield,
-                         size_t               startPos,
-                         size_t             * setmePos );
-#endif
-
 
 /** A stripped-down version of bitfieldHas to be used
     for speed when you're looping quickly.  This version
