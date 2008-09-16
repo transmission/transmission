@@ -362,6 +362,9 @@ onTrackerResponse( tr_session    * session,
             if(( tr_bencDictFindInt( &benc, "incomplete", &i )))
                 t->leecherCount = incomplete = i;
 
+            if(( tr_bencDictFindInt( &benc, "downloaded", &i )))
+                t->timesDownloaded = i;
+
             if(( tmp = tr_bencDictFind( &benc, "peers" )))
             {
                 const int allAreSeeds = incomplete == 0;
