@@ -62,7 +62,6 @@ clutch_js_DATA = \
 
 clutch_jquerydir = $(clutch_jsdir)/jquery
 clutch_jquery_DATA = \
-  web/javascript/jquery \
   web/javascript/jquery/json.min.js \
   web/javascript/jquery/jquery.contextmenu.min.js \
   web/javascript/jquery/jquery.min.js \
