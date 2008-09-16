@@ -532,21 +532,13 @@ tr_getClutchDir( const tr_session * session UNUSED )
         else
         {
 #ifdef SYS_DARWIN
-            
             CFURLRef appURL = CFBundleCopyBundleURL( CFBundleGetMainBundle() );
-            CFStringRef appRef = CFURLCopyPath( appURL );
+            CFStringRef appRef = CFURLCopyFileSystemPath( appURL, kCFURLPOSIXPathStyle );
             const char * appString = CFStringGetCStringPtr( appRef, CFStringGetFastestEncoding( appRef ) );
-            CFRelease(appURL);
-            CFRelease(appRef);
+            CFRelease( appURL );
+            CFRelease( appRef );
             
-            /*CFURLRef resourcesDirURL = CFBundleCopyResourcesDirectoryURL( CFBundleGetMainBundle() );
-            CFStringRef resourcesDirRef = CFURLCopyPath( resourcesDirURL );
-            const char * resourcesDirString = CFStringGetCStringPtr( resourcesDirRef, CFStringGetFastestEncoding( resourcesDirRef ) );
-            CFRelease(resourcesDirURL);
-            CFRelease(resourcesDirRef);*/
-            
-            sprintf( path, "%s%s", appString, "Contents/Resources/web" );
-
+            tr_buildPath( path, sizeof( path ), appString, "Contents", "Resources", "web", NULL );
 #elif defined(WIN32)
 
             #warning hey win32 people is this good or is there a better implementation of the next four lines
