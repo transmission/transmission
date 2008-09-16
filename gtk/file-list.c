@@ -626,6 +626,7 @@ file_list_new( TrTorrent * gtor )
     g_object_set( rend, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
     gtk_tree_view_column_pack_start( col, rend, TRUE );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderFilename, NULL, NULL);
+    gtk_tree_view_column_set_resizable( col, TRUE );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
 
 
@@ -634,6 +635,7 @@ file_list_new( TrTorrent * gtor )
        Don't include the prefix "filedetails|" in the translation. */ 
     col = gtk_tree_view_column_new_with_attributes( Q_("filedetails|Progress"), rend, NULL );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderProgress, NULL, NULL);
+    gtk_tree_view_column_set_resizable( col, TRUE );
     gtk_tree_view_append_column ( GTK_TREE_VIEW( view ), col);
 
     /* add "enabled" column */
@@ -643,12 +645,14 @@ file_list_new( TrTorrent * gtor )
        The items for this column are checkboxes (yes/no) */ 
     col = gtk_tree_view_column_new_with_attributes( Q_( "filedetails|Download" ), rend, NULL );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderDownload, NULL, NULL);
+    gtk_tree_view_column_set_resizable( col, TRUE );
     gtk_tree_view_append_column ( GTK_TREE_VIEW( view ), col);
 
     /* add priority column */
     rend = gtk_cell_renderer_text_new( );
     col = gtk_tree_view_column_new_with_attributes( _( "Priority" ), rend, NULL );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderPriority, NULL, NULL);
+    gtk_tree_view_column_set_resizable( col, TRUE );
     gtk_tree_view_append_column ( GTK_TREE_VIEW( view ), col);
 
     /* create the scrolled window and stick the view in it */
