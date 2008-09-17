@@ -1,7 +1,7 @@
 AC_PREREQ(2.54)
 
 m4_define([tr_version_major], [1])
-m4_define([tr_version_minor], [33])
+m4_define([tr_version_minor], [34])
 m4_define([tr_version_suffix], [+])
 m4_define([tr_version], [tr_version_major.tr_version_minor])
 
@@ -13,7 +13,7 @@ TR_VERSION_SUFFIX=tr_version_suffix
 TR_VERSION=tr_version
 
 dnl Someone still needs to hook this up to the system above
-PEERID_PREFIX="-TR133Z-"
+PEERID_PREFIX="-TR134Z-"
 
 USERAGENT_PREFIX=$TR_VERSION$TR_VERSION_SUFFIX
 

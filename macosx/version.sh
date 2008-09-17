@@ -7,8 +7,8 @@
 #         "Z" for unsupported trunk builds,
 #         "0" for stable, supported releases
 # these should be the only two lines you need to change
-PEERID_PREFIX="-TR133Z-"
-USERAGENT_PREFIX="1.33+"
+PEERID_PREFIX="-TR134Z-"
+USERAGENT_PREFIX="1.34+"
 
 
 SVN_REVISION=`find ./ -name "*\.[chmp]" -o -name "*\.cpp" -o -name "*\.po" -o -name "*\.sh" | \

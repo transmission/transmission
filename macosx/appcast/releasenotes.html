@@ -18,11 +18,10 @@
 				<tr>
 					<td>
 						<ul>
-						<li>Fix crash from malicious torrent files with a piece size of zero</li>
-						<li>When creating new torrent files, change behavior that caused "Multi tracker torrents are not allowed" warning on one tracker</li>
-						<li>Fix Unicode handling in the JSON parser/generator</li>
-						<li>Fix memory error when reading KTorrent's PEX messages</li>
-						<li>Fix small memory leaks</li>
+						<li>Don't reconnect too frequently to the same peer</li>
+						<li>Webseed bugfix</li>
+						<li>Fix bug that caused some transfers to not be scraped</li>
+						<li>Handle OpenTracker's `downloaded' key in announce responses</li>
 						</ul>
 					</td>
 				</tr>
@@ -37,13 +36,13 @@
 				<tr>
 					<td>
 						<ul>
-						<li>Rephrase "data not fully available" to "remaining time unknown"</li>
-						<li>Fix bug where torrent file creation would fail because an extra blank tracker address was inserted</li>
+						<li>Fix memory leak when updating blocklist</li>
+						<li>Connect to the web interface when the application's path contains a space</li>
 						</ul>
 					</td>
 				</tr>
 			</table>
-			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?group=component&milestone=1.33&order=severity">click here</a>.</p>
+			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?group=component&milestone=1.34&order=severity">click here</a>.</p>
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
 					<td class="red">
