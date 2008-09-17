@@ -923,7 +923,7 @@ trackerPage( GObject * core )
         w = hig_workarea_add_row( t, &row, s, w, NULL );
         page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
 
-        w = new_spin_button( PREF_KEY_PROXY_PORT, core, 0, 65536, 1 );
+        w = new_spin_button( PREF_KEY_PROXY_PORT, core, 0, 65535, 1 );
         page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
         w = hig_workarea_add_row( t, &row, _( "Proxy _port:" ), w, NULL );
         page->proxy_widgets = g_slist_append( page->proxy_widgets, w );

@@ -1085,7 +1085,6 @@ options_page_new ( TrTorrent * gtor )
   uint16_t maxConnectedPeers;
   int i, row;
   gboolean b;
-  GtkAdjustment *a;
   GtkWidget *t, *w, *tb;
   tr_torrent * tor = tr_torrent_handle (gtor);
 
