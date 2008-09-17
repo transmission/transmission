@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-07-22 14:36+0000\n"
-"Last-Translator: Adrian Guniš <andygun@seznam.cz>\n"
+"PO-Revision-Date: 2008-09-13 00:43+0000\n"
+"Last-Translator: Kamil Páral <ripper42@gmail.com>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2008-08-21 03:17+0000\n"
+"X-Launchpad-Export-Date: 2008-09-16 21:17+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -160,7 +160,7 @@ msgstr "Z_rušit vše"
 
 #: ../gtk/actions.c:127
 msgid "_Details"
-msgstr "Po_drobnosti"
+msgstr "P_odrobnosti"
 
 #: ../gtk/actions.c:127
 msgid "Torrent details"
@@ -242,7 +242,7 @@ msgstr "%s je už spuštěn."
 
 #: ../gtk/details.c:244
 msgid "Web Seeds"
-msgstr ""
+msgstr "Weboví poskytující"
 
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:246 ../gtk/details.c:287
@@ -321,7 +321,7 @@ msgstr "<b>Stahující:</b>"
 
 #: ../gtk/details.c:767
 msgid "<b>Times Completed:</b>"
-msgstr ""
+msgstr "<b>Počet stažení:</b>"
 
 #: ../gtk/details.c:788 ../gtk/details.c:1275 ../gtk/details.c:1286
 msgid "Never"
@@ -468,7 +468,7 @@ msgstr "Dokončení"
 
 #: ../gtk/details.c:1010
 msgid "Dates"
-msgstr "Data"
+msgstr "Datumy"
 
 #: ../gtk/details.c:1013
 msgid "Started at:"
@@ -538,7 +538,7 @@ msgstr "Další oznámení:"
 #. * pressing the "ask for more peers" button
 #: ../gtk/details.c:1229
 msgid "Manual announce allowed in:"
-msgstr "Ruční oznámení povoleno v:"
+msgstr "Ruční oznámení povoleno za:"
 
 #: ../gtk/details.c:1247
 msgid "In progress"
@@ -1120,7 +1120,7 @@ msgstr "Aktualizace seznamu blokovaných"
 
 #: ../gtk/tr-prefs.c:483
 msgid "Retrieving blocklist..."
-msgstr "Získávání seznamu blokovaných..."
+msgstr "Získává se seznam blokovaných..."
 
 #: ../gtk/tr-prefs.c:527
 msgid "_Update Blocklist"

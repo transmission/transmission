@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n == 1 ? 0: (((n % 100 > 19) || ((n % 100 "
 "== 0) && (n != 0))) ? 2: 1));\n"
-"X-Launchpad-Export-Date: 2008-08-21 03:17+0000\n"
+"X-Launchpad-Export-Date: 2008-09-16 21:17+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #, fuzzy
@@ -1338,10 +1338,11 @@ msgstr "Copyright 2005-2008 Proiectul Transmission"
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  Bogdan Bădic-Spătariu https://launchpad.net/~thelad33\n"
 "  Cris G https://launchpad.net/~krig-tiscali\n"
+"  Harabulă Adrian https://launchpad.net/~opensoft\n"
 "  Ionuț Jula https://launchpad.net/~ionutjula\n"
-"  Mircea Suciu https://launchpad.net/~mirceasuciu\n"
-"  rEbyTer https://launchpad.net/~opensoft"
+"  Mircea Suciu https://launchpad.net/~mirceasuciu"
 
 #: ../gtk/makemeta-ui.c:101
 msgid "Torrent created!"

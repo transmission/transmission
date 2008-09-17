@@ -5,14 +5,14 @@ msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-08-17 16:22+0000\n"
+"PO-Revision-Date: 2008-09-13 14:04+0000\n"
 "Last-Translator: Aron Xu <Unknown>\n"
 "Language-Team: Chinese (China) <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2008-08-21 03:16+0000\n"
+"X-Launchpad-Export-Date: 2008-09-16 21:17+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #, fuzzy
@@ -552,7 +552,7 @@ msgstr "选中全部(_A)"
 
 #: ../gtk/actions.c:124
 msgid "Dese_lect All"
-msgstr "全部不选(_L)"
+msgstr "反选(_l)"
 
 #: ../gtk/actions.c:127
 msgid "_Details"

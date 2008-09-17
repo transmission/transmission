@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-07-31 13:08+0000\n"
-"Last-Translator: 蔡查理 <Unknown>\n"
+"PO-Revision-Date: 2008-09-03 23:56+0000\n"
+"Last-Translator: Tse-Hsien Chiang <jackblackevo@ubuntu.org.tw>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2008-08-21 03:16+0000\n"
+"X-Launchpad-Export-Date: 2008-09-16 21:16+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -76,7 +76,7 @@ msgstr "工具列(_T)"
 
 #: ../gtk/actions.c:96
 msgid "Tray _Icon"
-msgstr "系統列圖示"
+msgstr "系統夾圖示"
 
 #: ../gtk/actions.c:101
 msgid "_Torrent"
@@ -88,7 +88,7 @@ msgstr "檢視(_V)"
 
 #: ../gtk/actions.c:103
 msgid "_Sort Torrents By"
-msgstr "Torrent 排序"
+msgstr "種子排序"
 
 #: ../gtk/actions.c:104
 msgid "_Edit"
@@ -100,7 +100,7 @@ msgstr "幫助(_H)"
 
 #: ../gtk/actions.c:106 ../gtk/actions.c:107
 msgid "Add a torrent"
-msgstr "新增 torrent"
+msgstr "新增種子"
 
 #: ../gtk/actions.c:107
 msgid "_Add..."
@@ -112,7 +112,7 @@ msgstr "開始(_S)"
 
 #: ../gtk/actions.c:109
 msgid "Start torrent"
-msgstr "啟動 torrent"
+msgstr "啟動種子"
 
 #: ../gtk/actions.c:110
 msgid "_Statistics"
@@ -198,11 +198,11 @@ msgstr "移動源文件到垃圾桶(_M)"
 
 #: ../gtk/add-dialog.c:254 ../gtk/tr-prefs.c:314
 msgid "_Start when added"
-msgstr "加了之後啟動(_S)"
+msgstr "加入之後啟動(_S)"
 
 #: ../gtk/add-dialog.c:265
 msgid "_Torrent file:"
-msgstr "Torrent檔: (_T)"
+msgstr "種子檔案(_T):"
 
 #: ../gtk/add-dialog.c:269
 msgid "Select Source File"
@@ -280,20 +280,21 @@ msgstr "樂觀的停止組塞"
 #: ../gtk/details.c:559
 #, fuzzy
 msgid "Downloading from this peer"
-msgstr "從該peer下載"
+msgstr "從該 Peer 下載"
 
 #: ../gtk/details.c:560
 #, fuzzy
 msgid "We would download from this peer if they would let us"
-msgstr "若對方允許, 將從該peer下載"
+msgstr "若對方允許，將從該 Peer 下載"
 
 #: ../gtk/details.c:561
 msgid "Uploading to peer"
 msgstr "上傳到節點"
 
 #: ../gtk/details.c:562
+#, fuzzy
 msgid "We would upload to this peer if they asked"
-msgstr ""
+msgstr "將會上傳至要求的 Peer"
 
 #: ../gtk/details.c:563
 #, fuzzy
@@ -318,11 +319,11 @@ msgstr "用戶是進來的連線"
 
 #: ../gtk/details.c:753
 msgid "<b>Seeders:</b>"
-msgstr "<b>種子數: </b>"
+msgstr "<b>種子數:</b>"
 
 #: ../gtk/details.c:760
 msgid "<b>Leechers:</b>"
-msgstr "<b>下載者：</b>"
+msgstr "<b>下載者:</b>"
 
 #: ../gtk/details.c:767
 msgid "<b>Times Completed:</b>"
@@ -351,11 +352,11 @@ msgstr "%1$s @ %2$s"
 
 #: ../gtk/details.c:824
 msgid "Pieces:"
-msgstr "格數："
+msgstr "格數:"
 
 #: ../gtk/details.c:828
 msgid "Hash:"
-msgstr "雜湊函數："
+msgstr "切細值:"
 
 #: ../gtk/details.c:831
 #, fuzzy
@@ -364,11 +365,11 @@ msgstr "伺服器不公開，PEX 無效"
 
 #: ../gtk/details.c:832
 msgid "Public torrent"
-msgstr "公眾 torrent"
+msgstr "公眾種子"
 
 #: ../gtk/details.c:834
 msgid "Privacy:"
-msgstr "隱私："
+msgstr "隱私:"
 
 #: ../gtk/details.c:846
 msgid "Comment:"
@@ -384,7 +385,7 @@ msgstr "未知"
 
 #: ../gtk/details.c:853
 msgid "Creator:"
-msgstr "建立者："
+msgstr "建立者:"
 
 #: ../gtk/details.c:857
 msgid "Date:"
@@ -396,11 +397,11 @@ msgstr "位置"
 
 #: ../gtk/details.c:864
 msgid "Destination folder:"
-msgstr "目的地資料夾："
+msgstr "目的資料夾:"
 
 #: ../gtk/details.c:868
 msgid "Torrent file:"
-msgstr "種子檔"
+msgstr "種子檔案:"
 
 #: ../gtk/details.c:913
 #, c-format
@@ -412,14 +413,14 @@ msgstr "%.1f%%"
 #: ../gtk/details.c:917
 #, c-format
 msgid "%1$.1f%% (%2$.1f%% selected)"
-msgstr "%1$.1f%%(%2$.1f%% 挑選的)"
+msgstr "%1$.1f%% (%2$.1f%% 選取的)"
 
 #. %1$s is total size of what we've saved to disk
 #. %2$s is how much of it's passed the checksum test
 #: ../gtk/details.c:925
 #, c-format
 msgid "%1$s (%2$s verified)"
-msgstr "%1$s (%2$s 以驗證)"
+msgstr "%1$s (%2$s 已驗證)"
 
 #: ../gtk/details.c:944 ../gtk/util.c:54 ../gtk/util.c:74
 msgid "None"
@@ -431,20 +432,20 @@ msgstr "傳輸"
 
 #: ../gtk/details.c:970
 msgid "State:"
-msgstr "狀態："
+msgstr "狀態:"
 
 #: ../gtk/details.c:973
 msgid "Progress:"
-msgstr "進度："
+msgstr "進度:"
 
 #. "Have" refers to how much of the torrent we have
 #: ../gtk/details.c:977
 msgid "Have:"
-msgstr "擁有"
+msgstr "擁有:"
 
 #: ../gtk/details.c:980 ../gtk/stats.c:127 ../gtk/stats.c:139
 msgid "Downloaded:"
-msgstr "已下載："
+msgstr "已下載:"
 
 #: ../gtk/details.c:983 ../gtk/stats.c:125 ../gtk/stats.c:137
 msgid "Uploaded:"
@@ -452,19 +453,19 @@ msgstr "已上傳："
 
 #: ../gtk/details.c:987
 msgid "Failed DL:"
-msgstr "下載失敗："
+msgstr "下載失敗:"
 
 #: ../gtk/details.c:990 ../gtk/stats.c:129 ../gtk/stats.c:141
 msgid "Ratio:"
-msgstr "比例："
+msgstr "比例:"
 
 #: ../gtk/details.c:993
 msgid "Swarm rate:"
-msgstr "分群比例："
+msgstr "分群比例:"
 
 #: ../gtk/details.c:996
 msgid "Error:"
-msgstr "錯誤："
+msgstr "錯誤:"
 
 #: ../gtk/details.c:1000
 msgid "Completion"
@@ -476,11 +477,11 @@ msgstr "日期"
 
 #: ../gtk/details.c:1013
 msgid "Started at:"
-msgstr "開始於："
+msgstr "開始於:"
 
 #: ../gtk/details.c:1016
 msgid "Last activity at:"
-msgstr "最後活動於："
+msgstr "最後活動於:"
 
 #: ../gtk/details.c:1093 ../gtk/tr-prefs.c:1070
 msgid "Bandwidth"
@@ -517,11 +518,11 @@ msgstr "上次刮頁:"
 
 #: ../gtk/details.c:1195 ../gtk/details.c:1217
 msgid "Tracker responded:"
-msgstr "伺服器回答："
+msgstr "伺服器回答:"
 
 #: ../gtk/details.c:1200
 msgid "Next scrape in:"
-msgstr "下次刮頁："
+msgstr "下次刮頁:"
 
 #: ../gtk/details.c:1206
 msgid "Announce"
@@ -529,21 +530,21 @@ msgstr "宣佈"
 
 #: ../gtk/details.c:1210
 msgid "Tracker:"
-msgstr "追蹤器："
+msgstr "追蹤器:"
 
 #: ../gtk/details.c:1212
 msgid "Last announce at:"
-msgstr "上次宣佈："
+msgstr "上次宣佈:"
 
 #: ../gtk/details.c:1222
 msgid "Next announce in:"
-msgstr "下次宣佈："
+msgstr "下次宣佈:"
 
 #. how long until the tracker will honor user
 #. * pressing the "ask for more peers" button
 #: ../gtk/details.c:1229
 msgid "Manual announce allowed in:"
-msgstr "允許手動宣佈："
+msgstr "允許手動宣佈:"
 
 #: ../gtk/details.c:1247
 #, fuzzy
@@ -741,6 +742,7 @@ msgstr ""
 "  Eason Lai https://launchpad.net/~eason-freezone\n"
 "  Medical-Wei https://launchpad.net/~medicalwei\n"
 "  Rick Chen https://launchpad.net/~stuffcorpse\n"
+"  Tse-Hsien Chiang https://launchpad.net/~jackblackevo\n"
 "  蔡查理 https://launchpad.net/~charlie-tsai"
 
 #: ../gtk/makemeta-ui.c:101

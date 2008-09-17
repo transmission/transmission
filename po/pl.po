@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-07-25 08:32+0000\n"
+"PO-Revision-Date: 2008-09-08 09:27+0000\n"
 "Last-Translator: Piotr Zaryk (Aviary.pl) <Unknown>\n"
 "Language-Team: Piotr Zaryk (Aviary.pl) <pzaryk@aviary.pl>\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2008-08-21 03:17+0000\n"
+"X-Launchpad-Export-Date: 2008-09-16 21:17+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: Poland\n"
 "X-Poedit-Language: POLISH\n"
@@ -266,7 +266,7 @@ msgstr "Sortowanie według _trackera"
 
 #: ../gtk/actions.c:53
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "Sortowanie według _wieku"
 
 #: ../gtk/actions.c:70
 msgid "_Main Window"
@@ -415,7 +415,7 @@ msgstr "Opcje torrenta"
 
 #: ../gtk/add-dialog.c:253
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "Przenieś plik źródłowy do _kosza"
 
 #: ../gtk/add-dialog.c:254 ../gtk/tr-prefs.c:314
 msgid "_Start when added"
@@ -423,7 +423,7 @@ msgstr "_Rozpocznij po dodaniu"
 
 #: ../gtk/add-dialog.c:265
 msgid "_Torrent file:"
-msgstr ""
+msgstr "Plik _torrent:"
 
 #: ../gtk/add-dialog.c:269
 msgid "Select Source File"
@@ -464,7 +464,7 @@ msgstr "%s jest już uruchomiony."
 
 #: ../gtk/details.c:244
 msgid "Web Seeds"
-msgstr ""
+msgstr "Serwery rozsiewające"
 
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:246 ../gtk/details.c:287
@@ -499,11 +499,11 @@ msgstr "Optymistyczne odblokowanie"
 
 #: ../gtk/details.c:559
 msgid "Downloading from this peer"
-msgstr ""
+msgstr "Pobieranie od tego partnera"
 
 #: ../gtk/details.c:560
 msgid "We would download from this peer if they would let us"
-msgstr ""
+msgstr "Pobieranie od tego partnera zostanie rozpoczęte po otrzymaniu zgody"
 
 #: ../gtk/details.c:561
 msgid "Uploading to peer"
@@ -512,15 +512,16 @@ msgstr "Wysyłanie do partnera"
 #: ../gtk/details.c:562
 msgid "We would upload to this peer if they asked"
 msgstr ""
+"Wysyłanie do tego partnera zostanie rozpoczęte po otrzymaniu zapytania"
 
 #: ../gtk/details.c:563
 #, fuzzy
 msgid "Peer has unchoked us, but we're not interested"
-msgstr "Partner nas odblokował, ale nie jesteśmy zainteresowani"
+msgstr "Partner odblokował użytkownika, ale nie jest on zainteresowany"
 
 #: ../gtk/details.c:564
 msgid "We unchoked this peer, but they're not interested"
-msgstr ""
+msgstr "Odblokowano tego parnera, ale nie jest on zainteresowany"
 
 #: ../gtk/details.c:565
 msgid "Encrypted connection"
@@ -558,8 +559,9 @@ msgstr "Szczegóły"
 #, c-format
 msgid "%'d Piece"
 msgid_plural "%'d Pieces"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d część"
+msgstr[1] "%'d części"
+msgstr[2] "%'d części"
 
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
@@ -787,7 +789,7 @@ msgstr "Aktywność"
 
 #: ../gtk/details.c:1363 ../gtk/tr-prefs.c:1118
 msgid "Peers"
-msgstr "Partnerów"
+msgstr "Partnerzy"
 
 #: ../gtk/details.c:1368 ../gtk/tr-window.c:434
 msgid "Tracker"
@@ -851,7 +853,7 @@ msgstr "Nie"
 
 #: ../gtk/file-list.c:536 ../gtk/file-list.c:579
 msgid "Mixed"
-msgstr ""
+msgstr "mieszane"
 
 #: ../gtk/file-list.c:573
 msgid "High"
@@ -902,11 +904,11 @@ msgstr "_Niski"
 
 #: ../gtk/file-list.c:675
 msgid "_Ignore"
-msgstr ""
+msgstr "_Ignoruj"
 
 #: ../gtk/file-list.c:678
 msgid "_Download"
-msgstr ""
+msgstr "_Pobierz"
 
 #: ../gtk/main.c:351
 msgid "Start with all torrents paused"
@@ -938,13 +940,14 @@ msgstr "Wysyłanie informacji o pobranych/wysłanych do trakera..."
 
 #: ../gtk/main.c:717
 msgid "_Quit Now"
-msgstr ""
+msgstr "_Zakończ teraz"
 
 #: ../gtk/main.c:860
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Nie udało się dodać uszkodzonego pliku torrent"
+msgstr[1] "Nie udało się dodać uszkodzonych plików torrent"
+msgstr[2] "Nie udało się dodać uszkodzonych plików torrent"
 
 #: ../gtk/main.c:867
 msgid "Couldn't add duplicate torrent"
@@ -1044,7 +1047,7 @@ msgstr "_Plik"
 
 #: ../gtk/makemeta-ui.c:368
 msgid "<b>E_xtras</b>"
-msgstr ""
+msgstr "<b>_Dodatkowe</b>"
 
 #: ../gtk/makemeta-ui.c:376
 msgid "Commen_t:"
@@ -1253,11 +1256,11 @@ msgstr "Pobieraj i udostępniaj pliki poprzez BitTorrent"
 
 #: ../gtk/transmission.desktop.in.h:3
 msgid "Transmission BitTorrent Client"
-msgstr "Klient Bittorrent Transmission"
+msgstr "Klient BitTorrent Transmission"
 
 #: ../gtk/tr-core.c:965
 msgid "Transmission Bittorrent Client"
-msgstr "Klient Bittorrent Transmission"
+msgstr "Klient BitTorrent Transmission"
 
 #: ../gtk/tr-core.c:966
 msgid "BitTorrent Activity"
@@ -1265,7 +1268,7 @@ msgstr "Aktywność BitTorrent"
 
 #: ../gtk/tr-core.c:974
 msgid "Disallowing desktop hibernation"
-msgstr ""
+msgstr "Brak zezwolenia na hibernację pulpitu"
 
 #: ../gtk/tr-core.c:976
 #, c-format
@@ -1274,7 +1277,7 @@ msgstr "Nie można wyłączyć hibernacji: %s"
 
 #: ../gtk/tr-core.c:998
 msgid "Allowing desktop hibernation"
-msgstr ""
+msgstr "Zezwolenie na hibernację pulpitu"
 
 #. %1$'d is the number of torrents we're seeding,
 #. %2$'d is the number of torrents we're downloading,
@@ -1307,7 +1310,7 @@ msgstr "Dodawanie torrentów"
 
 #: ../gtk/tr-prefs.c:302
 msgid "Automatically _add torrents from:"
-msgstr ""
+msgstr "Automatyczne dod_awanie plików torrent z:"
 
 #: ../gtk/tr-prefs.c:318
 msgid "Mo_ve source files to Trash"
@@ -1393,17 +1396,17 @@ msgstr "Odmów"
 
 #: ../gtk/tr-prefs.c:794
 msgid "Web Interface"
-msgstr ""
+msgstr "Interfejs sieciowy"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:797
 msgid "_Enable web interface"
-msgstr ""
+msgstr "Int_erfejs sieciowy"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:810
 msgid "_Require username"
-msgstr ""
+msgstr "W_ymaganie nazwy użytkownika"
 
 #. username
 #: ../gtk/tr-prefs.c:818 ../gtk/tr-prefs.c:1034
@@ -1413,7 +1416,7 @@ msgstr "Nazwa _użytkownika:"
 #. password
 #: ../gtk/tr-prefs.c:825 ../gtk/tr-prefs.c:1040
 msgid "Pass_word:"
-msgstr ""
+msgstr "_Hasło:"
 
 #: ../gtk/tr-prefs.c:850
 msgid "Access control list:"
@@ -1429,7 +1432,7 @@ msgstr "Adres IP"
 
 #: ../gtk/tr-prefs.c:891
 msgid "Permission"
-msgstr ""
+msgstr "Uprawnienia"
 
 #: ../gtk/tr-prefs.c:962
 msgid "HTTP"
@@ -1445,15 +1448,15 @@ msgstr "SOCKS5"
 
 #: ../gtk/tr-prefs.c:997
 msgid "Tracker Proxy"
-msgstr ""
+msgstr "Serwer pośredniczący trackera"
 
 #: ../gtk/tr-prefs.c:999
 msgid "Connect to tracker via a pro_xy"
-msgstr ""
+msgstr "Łączenie z trackerem poprzez pro_xy"
 
 #: ../gtk/tr-prefs.c:1004
 msgid "Proxy _server:"
-msgstr ""
+msgstr "_Serwer proxy:"
 
 #: ../gtk/tr-prefs.c:1012
 msgid "Proxy _port:"
@@ -1695,7 +1698,7 @@ msgstr "Plik torrent \"%s\" jest już w użyciu."
 #: ../gtk/util.c:314
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
-msgstr ""
+msgstr "Plik torrent \\\"%s\\” napotkał na nieznany błąd."
 
 #: ../gtk/util.c:324
 msgid "Error opening torrent"

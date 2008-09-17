@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;\n"
-"X-Launchpad-Export-Date: 2008-08-21 03:16+0000\n"
+"X-Launchpad-Export-Date: 2008-09-16 21:16+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -734,6 +734,7 @@ msgstr "Copyright 2005-2008 The Transmission Project"
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  simonkoco https://launchpad.net/~simonkoco-gmail\n"
 "  Арангел Ангов https://launchpad.net/~ufo"
 
 #: ../gtk/makemeta-ui.c:101

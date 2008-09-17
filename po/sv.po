@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-07-27 13:58+0000\n"
+"PO-Revision-Date: 2008-08-22 07:30+0000\n"
 "Last-Translator: Daniel Nylander <yeager@ubuntu.com>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-08-21 03:17+0000\n"
+"X-Launchpad-Export-Date: 2008-09-16 21:17+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #~ msgid "Bad IPC protocol version"
@@ -739,7 +739,7 @@ msgstr "_Visa"
 
 #: ../gtk/actions.c:103
 msgid "_Sort Torrents By"
-msgstr "_Sortera torrentfiler efter"
+msgstr "_Sortera torrent-filer efter"
 
 #: ../gtk/actions.c:104
 msgid "_Edit"
@@ -831,7 +831,7 @@ msgstr "Fråga bevakare efter f_ler klienter"
 
 #: ../gtk/add-dialog.c:199
 msgid "Torrent files"
-msgstr "Torrentfiler"
+msgstr "Torrent-filer"
 
 #: ../gtk/add-dialog.c:204
 msgid "All files"

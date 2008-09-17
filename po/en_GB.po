@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-08-21 03:16+0000\n"
+"X-Launchpad-Export-Date: 2008-09-16 21:17+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -733,7 +733,8 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Edward Chidgey https://launchpad.net/~chidge"
+"  Edward Chidgey https://launchpad.net/~chidge\n"
+"  Gabriel Ruiz https://launchpad.net/~anakron"
 
 #: ../gtk/makemeta-ui.c:101
 msgid "Torrent created!"

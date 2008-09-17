@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: fi\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-08-10 13:44+0000\n"
+"PO-Revision-Date: 2008-09-15 17:00+0000\n"
 "Last-Translator: Timo Jyrinki <timo.jyrinki@iki.fi>\n"
 "Language-Team: -\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-08-21 03:17+0000\n"
+"X-Launchpad-Export-Date: 2008-09-16 21:17+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #~ msgid "Close main window"
@@ -265,7 +265,7 @@ msgstr "Ylös"
 
 #: ../gtk/details.c:290
 msgid "Client"
-msgstr "Asiakasohjelma"
+msgstr "Asiakas"
 
 #. 'percent done' column header. terse to keep the column narrow.
 #: ../gtk/details.c:292
@@ -727,7 +727,7 @@ msgstr[1] "Samoja torrenteja ei voi lisätä toista kertaa"
 
 #: ../gtk/main.c:1095
 msgid "A fast and easy BitTorrent client"
-msgstr "Nopea ja helppokäyttöinen BitTorrent-asiakasohjelma"
+msgstr "Nopea ja helppokäyttöinen BitTorrent-asiakas"
 
 #: ../gtk/main.c:1098
 msgid "Copyright 2005-2008 The Transmission Project"
@@ -983,20 +983,19 @@ msgstr "Tarkistetaan paikallista dataa ((%.1f%% testattu)"
 msgid "Ratio: %s"
 msgstr "Jakosuhde: %s"
 
-#fuzzy, c-format
 #: ../gtk/torrent-cell-renderer.c:199
 #, c-format
 msgid "Downloading from %1$'d of %2$'d connected peer"
 msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] "Ladataan, %i yhdistetty ( %i kaikkiaan )"
-msgstr[1] "Ladataan, %i yhdistetty ( %i kaikkiaan )"
+msgstr[0] "Ladataan %1$'d / %2$'d yhdistetyltä vertaiselta"
+msgstr[1] "Ladataan %1$'d / %2$'d yhdistetyltä vertaiselta"
 
 #: ../gtk/torrent-cell-renderer.c:208 ../gtk/tr-torrent.c:268
-#, fuzzy, c-format
+#, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-msgstr[0] "Lähetetään, %d yhdistetty ( %d kaikkiaan )"
-msgstr[1] "Lähetetään, %d yhdistetty ( %d kaikkiaan )"
+msgstr[0] "Lähetetään %1$'d / %2$'d yhdistetylle vertaiselle"
+msgstr[1] "Lähetetään %1$'d / %2$'d yhdistetylle vertaiselle"
 
 #: ../gtk/tracker-list.c:128
 msgid "http://"
@@ -1012,19 +1011,19 @@ msgstr "Julkistus-URL"
 
 #: ../gtk/transmission.desktop.in.h:1
 msgid "BitTorrent Client"
-msgstr "BitTorrent-asiakasohjelma"
+msgstr "BitTorrent-asiakas"
 
 #: ../gtk/transmission.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
-msgstr "Lataa ja jaa tiedostoja BitTorrentin kautta"
+msgstr "Lataa ja jaa tiedostoja BitTorrentin avulla"
 
 #: ../gtk/transmission.desktop.in.h:3
 msgid "Transmission BitTorrent Client"
-msgstr "Transmission - BitTorrent-asiakasohjelma"
+msgstr "Transmission - BitTorrent-asiakas"
 
 #: ../gtk/tr-core.c:965
 msgid "Transmission Bittorrent Client"
-msgstr "Transmission-bittorrent-asiakasohjelma"
+msgstr "Transmission - BitTorrent-asiakas"
 
 #: ../gtk/tr-core.c:966
 msgid "BitTorrent Activity"
@@ -1530,12 +1529,12 @@ msgid "Found public address \"%s\""
 msgstr "Löydettiin julkinen osoite \"%s\""
 
 #: ../libtransmission/natpmp.c:159
-#, fuzzy, c-format
+#, c-format
 msgid "no longer forwarding port %d"
-msgstr "enää ei välitetä porttia %d"
+msgstr "ei enää välitetä porttia %d"
 
 #: ../libtransmission/natpmp.c:195
-#, fuzzy, c-format
+#, c-format
 msgid "Port %d forwarded successfully"
 msgstr "Portti %d välitettiin onnistuneesti"
 
@@ -1584,17 +1583,17 @@ msgid "Closing port %d"
 msgstr "Suljetaan porttia %d"
 
 #: ../libtransmission/port-forwarding.c:120
-#, fuzzy, c-format
+#, c-format
 msgid "Opened port %d to listen for incoming peer connections"
-msgstr "Avattiin portti %d kuuntelemaan sisääntulevia yhteyksiä"
+msgstr "Avattiin portti %d kuuntelemaan sisääntulevia vertaisyhteyksiä"
 
 #: ../libtransmission/port-forwarding.c:125
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Couldn't open port %d to listen for incoming peer connections (errno %d - %s)"
 msgstr ""
-"Ei voitu avata porttia %d kuuntelemaat sisääntulevia yhteyksiä (virhenumero "
-"%d - %s)"
+"Ei voitu avata porttia %d kuuntelemaan sisääntulevia vertaisyhteyksiä "
+"(virhenumero %d - %s)"
 
 #: ../libtransmission/port-forwarding.c:163
 msgid "Stopped"
@@ -1681,9 +1680,9 @@ msgid "Memory allocation failed"
 msgstr "Muistin varaus epäonnistui"
 
 #: ../libtransmission/utils.c:524
-#, fuzzy, c-format
+#, c-format
 msgid "File \"%s\" is in the way"
-msgstr "Tiedosto %s on tien päällä"
+msgstr "Tiedosto %s on tiellä"
 
 #: ../libtransmission/utils.c:591
 msgid "No error"

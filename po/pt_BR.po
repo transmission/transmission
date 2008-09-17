@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-07-19 14:55-0500\n"
-"PO-Revision-Date: 2008-07-16 22:28+0000\n"
-"Last-Translator: Guilherme Gonçalves <punpre6@hotmail.com>\n"
+"PO-Revision-Date: 2008-09-08 19:23+0000\n"
+"Last-Translator: Djavan Fagundes <dnoway@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2008-08-21 03:16+0000\n"
+"X-Launchpad-Export-Date: 2008-09-16 21:17+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #, fuzzy
@@ -627,7 +627,7 @@ msgstr "_Abrir pasta"
 
 #: ../gtk/actions.c:131
 msgid "_Contents"
-msgstr ""
+msgstr "S_umário"
 
 #: ../gtk/actions.c:133
 msgid "Ask Tracker for _More Peers"
@@ -648,7 +648,7 @@ msgstr "Opções do torrent"
 
 #: ../gtk/add-dialog.c:253
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "_Mover arquivo fonte para a lixeira"
 
 #: ../gtk/add-dialog.c:254 ../gtk/tr-prefs.c:314
 msgid "_Start when added"
@@ -656,7 +656,7 @@ msgstr "_Iniciar ao adicionar"
 
 #: ../gtk/add-dialog.c:265
 msgid "_Torrent file:"
-msgstr ""
+msgstr "Arquivo _torrent"
 
 #: ../gtk/add-dialog.c:269
 msgid "Select Source File"
@@ -732,11 +732,11 @@ msgstr "Disponibilidade otimista"
 
 #: ../gtk/details.c:559
 msgid "Downloading from this peer"
-msgstr ""
+msgstr "Baixando deste par"
 
 #: ../gtk/details.c:560
 msgid "We would download from this peer if they would let us"
-msgstr ""
+msgstr "Poderíamos baixar deste par se ele nos permitisse"
 
 #: ../gtk/details.c:561
 msgid "Uploading to peer"
@@ -744,7 +744,7 @@ msgstr "Enviando para o peer"
 
 #: ../gtk/details.c:562
 msgid "We would upload to this peer if they asked"
-msgstr ""
+msgstr "Poderíamos enviar para este par se ele nos solicitar"
 
 #: ../gtk/details.c:563
 msgid "Peer has unchoked us, but we're not interested"
@@ -752,7 +752,7 @@ msgstr "O peer possui disponibilidade para nós, mas não estamos interessados"
 
 #: ../gtk/details.c:564
 msgid "We unchoked this peer, but they're not interested"
-msgstr ""
+msgstr "Nós permitimos este par, mas ele não está interessado"
 
 #: ../gtk/details.c:565
 msgid "Encrypted connection"
@@ -790,8 +790,8 @@ msgstr "Detalhes"
 #, c-format
 msgid "%'d Piece"
 msgid_plural "%'d Pieces"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d parte"
+msgstr[1] "%'d partes"
 
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
@@ -1000,7 +1000,7 @@ msgstr "Em progresso"
 
 #: ../gtk/details.c:1290
 msgid "Now"
-msgstr ""
+msgstr "Agora"
 
 #. %1$s is torrent name
 #. %2$s its file size
@@ -1124,11 +1124,11 @@ msgstr "_Baixa"
 
 #: ../gtk/file-list.c:675
 msgid "_Ignore"
-msgstr ""
+msgstr "_Ignorar"
 
 #: ../gtk/file-list.c:678
 msgid "_Download"
-msgstr ""
+msgstr "_Baixar"
 
 #: ../gtk/main.c:351
 msgid "Start with all torrents paused"
@@ -1191,6 +1191,7 @@ msgstr ""
 "Djavan Fagundes <dnoway@gmail.com>\n"
 "\n"
 "Launchpad Contributions:\n"
+"  Allan Lopes https://launchpad.net/~mendigodase\n"
 "  Augusta Carla Klug https://launchpad.net/~augusta-klug\n"
 "  Diogo Lima https://launchpad.net/~diogooo\n"
 "  Djavan Fagundes https://launchpad.net/~dnoway\n"
@@ -1527,7 +1528,7 @@ msgstr "Adicionando Torrents"
 
 #: ../gtk/tr-prefs.c:302
 msgid "Automatically _add torrents from:"
-msgstr ""
+msgstr "Adicion_ar torrents automaticamente de:"
 
 #: ../gtk/tr-prefs.c:318
 msgid "Mo_ve source files to Trash"
@@ -1612,17 +1613,17 @@ msgstr "Negar"
 
 #: ../gtk/tr-prefs.c:794
 msgid "Web Interface"
-msgstr ""
+msgstr "Interface web"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:797
 msgid "_Enable web interface"
-msgstr ""
+msgstr "Hab_ilitar a interface web"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:810
 msgid "_Require username"
-msgstr ""
+msgstr "_Requer nome de usuário"
 
 #. username
 #: ../gtk/tr-prefs.c:818 ../gtk/tr-prefs.c:1034
@@ -1632,7 +1633,7 @@ msgstr "Nome do _usuário:"
 #. password
 #: ../gtk/tr-prefs.c:825 ../gtk/tr-prefs.c:1040
 msgid "Pass_word:"
-msgstr ""
+msgstr "Se_nha:"
 
 #: ../gtk/tr-prefs.c:850
 msgid "Access control list:"
@@ -1668,19 +1669,19 @@ msgstr "Proxy do tracker"
 
 #: ../gtk/tr-prefs.c:999
 msgid "Connect to tracker via a pro_xy"
-msgstr ""
+msgstr "Conectar ao tracker através de um pro_xy"
 
 #: ../gtk/tr-prefs.c:1004
 msgid "Proxy _server:"
-msgstr ""
+msgstr "_Servidor proxy:"
 
 #: ../gtk/tr-prefs.c:1012
 msgid "Proxy _port:"
-msgstr ""
+msgstr "_Porta do proxy:"
 
 #: ../gtk/tr-prefs.c:1015
 msgid "Proxy _type:"
-msgstr ""
+msgstr "_Tipo de proxy:"
 
 #: ../gtk/tr-prefs.c:1028
 msgid "_Authentication is required"
@@ -1692,7 +1693,7 @@ msgstr "Roteador"
 
 #: ../gtk/tr-prefs.c:1065
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr ""
+msgstr "Usar _encaminhamento da porta UPnP ou NAT-PMP do meu roteador"
 
 #: ../gtk/tr-prefs.c:1100
 msgid "Transmission Preferences"
@@ -1708,7 +1709,7 @@ msgstr "Rede"
 
 #: ../gtk/tr-prefs.c:1127
 msgid "Web"
-msgstr ""
+msgstr "Web"
 
 #: ../gtk/tr-torrent.c:211
 #, c-format
@@ -1926,7 +1927,7 @@ msgstr "A lista de bloqueados \"%s\" contém %'u entradas"
 #: ../libtransmission/blocklist.c:277
 #, c-format
 msgid "Blocklist \"%1$s\" updated with %2$'d entries"
-msgstr ""
+msgstr "Lista de bloqueados \"%1$s\" atualizada com %2$'d entradas"
 
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:649 ../libtransmission/fastresume.c:660
