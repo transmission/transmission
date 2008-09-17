@@ -18,7 +18,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.34
 - Web Client
    + Minor display fixes
 - CLI:
-   + Fix crash when creating a .torrent
+   + Fix crash when creating a torrent file
 
 1.33 (2008/08/20)
 http://trac.transmissionbt.com/query?group=component&milestone=1.33
