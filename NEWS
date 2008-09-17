@@ -3,14 +3,14 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.34 (2008/09/16)
 http://trac.transmissionbt.com/query?group=component&milestone=1.34
 - All Clients
-   + Don't reconnect too frequently to the same peer.
+   + Don't reconnect too frequently to the same peer
    + Webseed bugfix
-   + Fix bug that caused some torrents to not be scraped
+   + Fix bug that caused some transfers to not be scraped
    + Fix BSD build issues
-   + Handle OpenTracker's `downloaded' key in announce responses.
+   + Handle OpenTracker's `downloaded' key in announce responses
 - Mac
    + Fix memory leak when updating blocklist
-   + Handle Web UI paths which include spaces
+   + Connect to the web interface when the application's path contains a space
 + GTK+
    + Minor display fixes
 + Daemon+
