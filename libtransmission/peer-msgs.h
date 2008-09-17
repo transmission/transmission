@@ -35,6 +35,8 @@ void         tr_peerMsgsSetChoke( tr_peermsgs *, int doChoke );
 void         tr_peerMsgsHave( tr_peermsgs * msgs,
                               uint32_t      pieceIndex );
 
+void         tr_peerMsgsPulse( tr_peermsgs * msgs );
+
 #if 0
 void         tr_peerMsgsCancel( tr_peermsgs * msgs,
                                 uint32_t      pieceIndex,

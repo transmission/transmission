@@ -254,12 +254,9 @@ tr_sessionInitFull( const char        * configDir,
 
     /* Initialize rate and file descripts controls */
 
-    h->upload = tr_rcInit();
-    tr_rcSetLimit( h->upload, uploadLimit );
+    h->uploadLimit = uploadLimit;
     h->useUploadLimit = useUploadLimit;
-
-    h->download = tr_rcInit();
-    tr_rcSetLimit( h->download, downloadLimit );
+    h->downloadLimit = downloadLimit;
     h->useDownloadLimit = useDownloadLimit;
 
     tr_fdInit( globalPeerLimit );
@@ -419,37 +416,40 @@ tr_sessionGetPortForwarding( const tr_handle * h )
 ***/
 
 void
-tr_sessionSetSpeedLimitEnabled( tr_handle  * h,
-                                int          up_or_down,
-                                int          use_flag )
+tr_sessionSetSpeedLimitEnabled( tr_handle      * h,
+                                tr_direction     direction,
+                                int              use_flag )
 {
-    if( up_or_down == TR_UP )
+    assert( h );
+    assert( direction==TR_UP || direction==TR_DOWN );
+
+    if( direction == TR_UP )
         h->useUploadLimit = use_flag ? 1 : 0;
     else
         h->useDownloadLimit = use_flag ? 1 : 0;
 }
 
 int
-tr_sessionIsSpeedLimitEnabled( const tr_handle * h, int up_or_down )
+tr_sessionIsSpeedLimitEnabled( const tr_handle * h, tr_direction direction )
 {
-       return up_or_down==TR_UP ? h->useUploadLimit : h->useDownloadLimit;
+       return direction==TR_UP ? h->useUploadLimit : h->useDownloadLimit;
 }
 
 void
 tr_sessionSetSpeedLimit( tr_handle  * h,
-                         int          up_or_down,
+                         tr_direction direction,
                          int          KiB_sec )
 {
-    if( up_or_down == TR_DOWN )
-        tr_rcSetLimit( h->download, KiB_sec );
+    if( direction == TR_DOWN )
+        h->downloadLimit = KiB_sec;
     else
-        tr_rcSetLimit( h->upload, KiB_sec );
+        h->uploadLimit = KiB_sec;
 }
 
 int
-tr_sessionGetSpeedLimit( const tr_handle * h, int up_or_down )
+tr_sessionGetSpeedLimit( const tr_handle * h, tr_direction direction )
 {
-    return tr_rcGetLimit( up_or_down==TR_UP ? h->upload : h->download );
+    return direction==TR_UP ? h->uploadLimit : h->downloadLimit;
 }
 
 /***
@@ -479,9 +479,10 @@ tr_sessionGetSpeed( const tr_handle  * session,
                     float            * toPeer )
 {
     if( session && toClient )
-        *toClient = tr_rcRate( session->download );
+        *toClient = tr_peerMgrGetRate( session->peerMgr, TR_DOWN );
+
     if( session && toPeer )
-        *toPeer = tr_rcRate( session->upload );
+        *toPeer = tr_peerMgrGetRate( session->peerMgr, TR_UP );
 }
 
 int
@@ -530,9 +531,6 @@ tr_closeAllConnections( void * vsession )
     tr_free( torrents );
 
     tr_peerMgrFree( session->peerMgr );
-
-    tr_rcClose( session->upload );
-    tr_rcClose( session->download );
 
     tr_trackerSessionClose( session );
     tr_list_free( &session->blocklists, (TrListForeachFunc)_tr_blocklistFree );

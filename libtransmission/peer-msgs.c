@@ -69,7 +69,6 @@ enum
 
     PEX_INTERVAL            = (90 * 1000), /* msec between sendPex() calls */
     PEER_PULSE_INTERVAL     = (250),       /* msec between peerPulse() calls */
-    RATE_PULSE_INTERVAL     = (250),       /* msec between ratePulse() calls */
 
     MAX_QUEUE_SIZE          = (100),
      
@@ -320,8 +319,6 @@ struct tr_peermsgs
     struct request_list clientAskedFor;
     struct request_list clientWillAskFor;
 
-    tr_timer * rateTimer;
-    tr_timer * pulseTimer;
     tr_timer * pexTimer;
 
     time_t clientSentPexAt;
@@ -857,9 +854,6 @@ pumpRequestQueue( tr_peermsgs * msgs )
 }
 
 static int
-peerPulse( void * vmsgs );
-
-static int
 requestQueueIsFull( const tr_peermsgs * msgs )
 {
     const int req_max = msgs->maxActiveRequests;
@@ -1250,7 +1244,6 @@ static void
 clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
 {
     msgs->info->pieceDataActivityDate = time( NULL );
-    tr_rcTransferred( msgs->info->rcToClient, byteCount );
     fireClientGotData( msgs, byteCount );
 }
 
@@ -1464,24 +1457,7 @@ static void
 peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
 {
     msgs->info->pieceDataActivityDate = time( NULL );
-    tr_rcTransferred( msgs->info->rcToPeer, byteCount );
     firePeerGotData( msgs, byteCount );
-}
-
-static size_t
-getDownloadMax( const tr_peermsgs * msgs )
-{
-    static const size_t maxval = ~0;
-    const tr_torrent * tor = msgs->torrent;
-
-    if( tor->downloadLimitMode == TR_SPEEDLIMIT_GLOBAL )
-        return tor->handle->useDownloadLimit
-            ? tr_rcBytesLeft( tor->handle->download ) : maxval;
-
-    if( tor->downloadLimitMode == TR_SPEEDLIMIT_SINGLE )
-        return tr_rcBytesLeft( tor->download );
-
-    return maxval;
 }
 
 static void
@@ -1564,12 +1540,6 @@ clientGotBlock( tr_peermsgs                * msgs,
     return 0;
 }
 
-static void
-didWrite( struct bufferevent * evin UNUSED, void * vmsgs )
-{
-    peerPulse( vmsgs );
-}
-
 static ReadState
 canRead( struct bufferevent * evin, void * vmsgs )
 {
@@ -1584,9 +1554,7 @@ canRead( struct bufferevent * evin, void * vmsgs )
     }
     else if( msgs->state == AWAITING_BT_PIECE )
     {
-        const size_t downloadMax = getDownloadMax( msgs );
-        const size_t n = MIN( inlen, downloadMax );
-        ret = n ? readBtPiece( msgs, in, n ) : READ_DONE;
+        ret = inlen ? readBtPiece( msgs, in, inlen ) : READ_DONE;
     }
     else switch( msgs->state )
     {
@@ -1611,47 +1579,14 @@ sendKeepalive( tr_peermsgs * msgs )
 ***
 **/
 
-static size_t
-getUploadMax( const tr_peermsgs * msgs )
-{
-    static const size_t maxval = ~0;
-    const tr_torrent * tor = msgs->torrent;
-    int speedLeft;
-    int bufLeft;
-
-    if( tor->uploadLimitMode == TR_SPEEDLIMIT_GLOBAL )
-        speedLeft = tor->handle->useUploadLimit ? tr_rcBytesLeft( tor->handle->upload ) : maxval;
-    else if( tor->uploadLimitMode == TR_SPEEDLIMIT_SINGLE )
-        speedLeft = tr_rcBytesLeft( tor->upload );
-    else
-        speedLeft = INT_MAX;
-
-    /* this basically says the outbuf shouldn't have more than one block
-     * queued up in it... blocksize, +13 for the size of the BT protocol's
-     * block message overhead */
-    bufLeft = tor->blockSize + 13 - tr_peerIoWriteBytesWaiting( msgs->io );
-    return MIN( speedLeft, bufLeft );
-}
-
-static int
-getMaxBlocksFromPeerSoon( const tr_peermsgs * peer )
-{
-    const double seconds = 30;
-    const double bytesPerSecond = peer->info->rateToClient * 1024;
-    const double totalBytes = bytesPerSecond * seconds;
-    const int blockCount = totalBytes / peer->torrent->blockSize;
-    /*fprintf( stderr, "rate %f -- blockCount %d\n", peer->info->rateToClient, blockCount );*/
-    return blockCount;
-}
-
 static int
 ratePulse( void * vpeer )
 {
     tr_peermsgs * peer = vpeer;
-    peer->info->rateToClient = tr_rcRate( peer->info->rcToClient );
-    peer->info->rateToPeer = tr_rcRate( peer->info->rcToPeer );
+    const double rateToClient = tr_peerIoGetRateToClient( peer->io );
+    const int estimatedBlocksInNext30Seconds = ( rateToClient * 30 * 1024 ) / peer->torrent->blockSize;
     peer->minActiveRequests = 4;
-    peer->maxActiveRequests = peer->minActiveRequests + getMaxBlocksFromPeerSoon( peer );
+    peer->maxActiveRequests = peer->minActiveRequests + estimatedBlocksInNext30Seconds;
     return TRUE;
 }
 
@@ -1669,16 +1604,18 @@ popNextRequest( tr_peermsgs * msgs, struct peer_request * setme )
 static int
 peerPulse( void * vmsgs )
 {
-    const time_t now = time( NULL );
     tr_peermsgs * msgs = vmsgs;
+    const time_t now = time( NULL );
 
-    tr_peerIoTryRead( msgs->io );
+    ratePulse( msgs );
+
+    /*tr_peerIoTryRead( msgs->io );*/
     pumpRequestQueue( msgs );
     expireOldRequests( msgs );
 
     if( msgs->sendingBlock )
     {
-        const size_t uploadMax = getUploadMax( msgs );
+        const size_t uploadMax = tr_peerIoGetWriteBufferSpace( msgs->io );
         size_t len = EVBUFFER_LENGTH( msgs->outBlock );
         const size_t outlen = MIN( len, uploadMax );
 
@@ -1749,6 +1686,13 @@ peerPulse( void * vmsgs )
     }
 
     return TRUE; /* loop forever */
+}
+
+void
+tr_peerMsgsPulse( tr_peermsgs * msgs )
+{
+    if( msgs != NULL )
+        peerPulse( msgs );
 }
 
 static void
@@ -1983,8 +1927,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->info->peerIsInterested = 0;
     m->info->have = tr_bitfieldNew( torrent->info.pieceCount );
     m->state = AWAITING_BT_LENGTH;
-    m->pulseTimer = tr_timerNew( m->session, peerPulse, m, PEER_PULSE_INTERVAL );
-    m->rateTimer = tr_timerNew( m->session, ratePulse, m, RATE_PULSE_INTERVAL );
     m->pexTimer = tr_timerNew( m->session, pexPulse, m, PEX_INTERVAL );
     m->outMessages = evbuffer_new( );
     m->outMessagesBatchedAt = 0;
@@ -2004,7 +1946,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     sendBitfield( m );
     
     tr_peerIoSetTimeoutSecs( m->io, 150 ); /* timeout after N seconds of inactivity */
-    tr_peerIoSetIOFuncs( m->io, canRead, didWrite, gotError, m );
+    tr_peerIoSetIOFuncs( m->io, canRead, NULL, gotError, m );
     ratePulse( m );
 
     return m;
@@ -2015,8 +1957,6 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
 {
     if( msgs )
     {
-        tr_timerFree( &msgs->pulseTimer );
-        tr_timerFree( &msgs->rateTimer );
         tr_timerFree( &msgs->pexTimer );
         tr_publisherFree( &msgs->publisher );
         reqListClear( &msgs->clientWillAskFor );

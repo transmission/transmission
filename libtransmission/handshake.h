@@ -35,4 +35,6 @@ const struct in_addr * tr_handshakeGetAddr( const struct tr_handshake * handshak
 
 void tr_handshakeAbort( tr_handshake  * handshake );
 
+struct tr_peerIo* tr_handshakeGetIO( tr_handshake * handshake );
+
 #endif

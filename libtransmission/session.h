@@ -35,6 +35,11 @@
 #endif
 #endif
 
+/**
+ * How frequently to reallocate peer bandwidth.
+ */
+#define BANDWIDTH_PULSES_PER_SECOND 5
+
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
 uint8_t* tr_peerIdNew( void );
@@ -81,8 +86,8 @@ struct tr_handle
     char                       * proxyUsername;
     char                       * proxyPassword;
 
-    struct tr_ratecontrol      * upload;
-    struct tr_ratecontrol      * download;
+    int                          uploadLimit;
+    int                          downloadLimit;
 
     struct tr_list             * blocklists;
     struct tr_peerMgr          * peerMgr;

@@ -1025,13 +1025,16 @@ tr_handshakeNew( tr_peerIo           * io,
 {
     tr_handshake * handshake;
 
+    tr_peerIoSetBandwidthUnlimited( io, TR_UP );
+    tr_peerIoSetBandwidthUnlimited( io, TR_DOWN );
+
     handshake = tr_new0( tr_handshake, 1 );
     handshake->io = io;
     handshake->crypto = tr_peerIoGetCrypto( io );
     handshake->encryptionMode = encryptionMode;
     handshake->doneCB = doneCB;
     handshake->doneUserData = doneUserData;
-    handshake->handle = tr_peerIoGetHandle( io );
+    handshake->handle = tr_peerIoGetSession( io );
     tr_peerIoSetTimeoutSecs( io, 15 );
     
     tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );
@@ -1050,6 +1053,15 @@ tr_handshakeNew( tr_peerIo           * io,
     }
 
     return handshake;
+}
+
+struct tr_peerIo*
+tr_handshakeGetIO( tr_handshake * handshake )
+{
+    assert( handshake );
+    assert( handshake->io );
+
+    return handshake->io;
 }
 
 const struct in_addr *

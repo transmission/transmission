@@ -534,25 +534,30 @@ tr_port_forwarding tr_sessionGetPortForwarding( const tr_handle * );
 
 int tr_sessionCountTorrents( const tr_handle * h );
 
-void tr_sessionSetSpeedLimitEnabled( tr_handle   * session,
-                                     int           up_or_down,
-                                     int           isEnabled );
+typedef enum
+{
+    TR_CLIENT_TO_PEER = 0, TR_UP = 0,
+    TR_PEER_TO_CLIENT = 1, TR_DOWN = 1
+}
+tr_direction;
 
-enum { TR_UP, TR_DOWN };
+void tr_sessionSetSpeedLimitEnabled( tr_handle   * session,
+                                     tr_direction  direction,
+                                     int           isEnabled );
 
 void tr_sessionGetSpeed( const tr_handle * session,
                          float           * overall_down_KiBs,
                          float           * overall_up_KiBs );
 
 int tr_sessionIsSpeedLimitEnabled( const tr_handle   * session,
-                                   int                 up_or_down );
+                                   tr_direction        direction );
 
 void tr_sessionSetSpeedLimit( tr_handle   * session,
-                              int           up_or_down,
+                              tr_direction  direction,
                               int           KiB_sec );
 
-int tr_sessionGetSpeedLimit( const tr_handle   * session,
-                             int                 up_or_down );
+int tr_sessionGetSpeedLimit( const tr_handle  * session,
+                             tr_direction       direction );
 
 void tr_sessionSetPeerLimit( tr_handle * handle,
                              uint16_t    maxGlobalPeers );
@@ -843,18 +848,18 @@ typedef enum
 tr_speedlimit;
 
 void tr_torrentSetSpeedMode( tr_torrent   * tor,
-                             int            up_or_down,
+                             tr_direction   up_or_down,
                              tr_speedlimit  mode );
 
 tr_speedlimit tr_torrentGetSpeedMode( const tr_torrent  * tor,
-                                      int                 up_or_down);
+                                      tr_direction        direction );
 
 void tr_torrentSetSpeedLimit( tr_torrent   * tor,
-                              int            up_or_down,
+                              tr_direction   up_or_down,
                               int            KiB_sec );
 
 int tr_torrentGetSpeedLimit( const tr_torrent  * tor,
-                             int                 up_or_down );
+                             tr_direction        direction );
 
 /****
 *****  Peer Limits
@@ -1246,10 +1251,10 @@ typedef struct tr_stat
     float percentDone;
 
     /** Download speed in KiB/s */
-    float rateDownload;
+    double rateDownload;
 
     /** Upload speed in KiB/s */
-    float rateUpload;
+    double rateUpload;
 
  #define TR_ETA_NOT_AVAIL -1
  #define TR_ETA_UNKNOWN -2

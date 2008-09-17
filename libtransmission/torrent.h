@@ -54,8 +54,6 @@ tr_torrent* tr_torrentFindFromHash( tr_handle *, const uint8_t * );
 tr_torrent* tr_torrentFindFromHashString( tr_handle *, const char * );
 tr_torrent* tr_torrentFindFromObfuscatedHash( tr_handle *, const uint8_t* );
 
-void tr_torrentGetRates( const tr_torrent *, float * toClient, float * toPeer );
-
 int tr_torrentAllowsPex( const tr_torrent * );
 
 /* get the index of this piece's first block */
@@ -120,10 +118,11 @@ struct tr_torrent
     tr_handle                * handle;
     tr_info                    info;
 
+    int                        uploadLimit;
     tr_speedlimit              uploadLimitMode;
+    int                        downloadLimit;
     tr_speedlimit              downloadLimitMode;
-    struct tr_ratecontrol    * upload;
-    struct tr_ratecontrol    * download;
+
     struct tr_ratecontrol    * swarmSpeed;
 
     int                        error;
@@ -180,6 +179,9 @@ struct tr_torrent
     tr_torrent               * next;
 
     int                        uniqueId;
+
+    double                     rateHistory[2][BANDWIDTH_PULSES_PER_SECOND];
+
 };
 
 #endif

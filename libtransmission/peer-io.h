@@ -29,20 +29,20 @@ typedef struct tr_peerIo tr_peerIo;
 **/
 
 tr_peerIo*
-      tr_peerIoNewOutgoing( struct tr_handle     * handle,
+      tr_peerIoNewOutgoing( struct tr_handle     * session,
                             const struct in_addr * addr,
                             int                    port,
                             const  uint8_t       * torrentHash );
 
 tr_peerIo*
-      tr_peerIoNewIncoming( struct tr_handle     * handle,
+      tr_peerIoNewIncoming( struct tr_handle     * session,
                             const struct in_addr * addr,
                             uint16_t               port,
                             int                    socket );
 
 void  tr_peerIoFree      ( tr_peerIo  * io );
 
-tr_handle* tr_peerIoGetHandle( tr_peerIo * io );
+tr_session* tr_peerIoGetSession( tr_peerIo * io );
 
 /**
 ***
@@ -109,13 +109,15 @@ void  tr_peerIoSetIOFuncs( tr_peerIo        * io,
                            tr_net_error_cb    errcb,
                            void             * user_data );
 
-size_t tr_peerIoWriteBytesWaiting( const tr_peerIo * io );
+int tr_peerIoWantsBandwidth( const tr_peerIo * io, tr_direction );
 
+#if 0
 void tr_peerIoTryRead( tr_peerIo * io );
+#endif
 
 void tr_peerIoWrite( tr_peerIo   * io,
                      const void  * writeme,
-                     int           writeme_len );
+                     size_t        writemeLen );
 
 void tr_peerIoWriteBuf( tr_peerIo       * io,
                         struct evbuffer * buf );
@@ -177,6 +179,29 @@ void tr_peerIoReadUint32  ( tr_peerIo        * io,
 void tr_peerIoDrain       ( tr_peerIo        * io,
                             struct evbuffer  * inbuf,
                             size_t             byteCount );
+
+/**
+***
+**/
+
+size_t tr_peerIoGetBandwidthUsed( const tr_peerIo * io,
+                                  tr_direction      direction );
+
+size_t tr_peerIoGetBandwidthLeft( const tr_peerIo * io,
+                                  tr_direction      direction );
+
+size_t tr_peerIoGetWriteBufferSpace( const tr_peerIo * io );
+
+void tr_peerIoSetBandwidth  ( tr_peerIo     * io,
+                              tr_direction    direction,
+                              size_t          bytesLeft );
+
+void tr_peerIoSetBandwidthUnlimited( tr_peerIo    * io,
+                                     tr_direction   direction );
+
+double tr_peerIoGetRateToClient( const tr_peerIo * io );
+
+double tr_peerIoGetRateToPeer( const tr_peerIo * io );
 
 
 #endif

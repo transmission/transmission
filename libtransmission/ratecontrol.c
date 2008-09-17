@@ -29,10 +29,9 @@
 #include "ratecontrol.h"
 #include "utils.h"
 
-#define GRANULARITY_MSEC 500
-#define SHORT_INTERVAL_MSEC 1000
-#define LONG_INTERVAL_MSEC 8000
-#define HISTORY_SIZE (LONG_INTERVAL_MSEC / GRANULARITY_MSEC)
+#define INTERVAL_MSEC 1000
+#define GRANULARITY_MSEC 200
+#define HISTORY_SIZE (INTERVAL_MSEC / GRANULARITY_MSEC)
 
 struct tr_transfer
 {
@@ -83,7 +82,7 @@ tr_rcInit( void )
 void
 tr_rcClose( tr_ratecontrol * r )
 {
-    tr_rcReset( r );
+    memset( r, 0, sizeof( tr_ratecontrol ) );
     tr_free( r );
 }
 
@@ -91,29 +90,13 @@ tr_rcClose( tr_ratecontrol * r )
 ****
 ***/
 
-size_t
-tr_rcBytesLeft( const tr_ratecontrol * r )
-{
-    size_t bytes = 0;
-
-    if( r )
-    {
-        const float cur = rateForInterval( r, SHORT_INTERVAL_MSEC );
-        const float max = r->limit;
-        const float kb = max>cur ? max-cur : 0;
-        bytes = (size_t)(kb * 1024);
-    }
-
-    return bytes;
-}
-
 float
 tr_rcRate( const tr_ratecontrol * r )
 {
     float ret = 0.0f;
 
     if( r )
-        ret = rateForInterval( r, LONG_INTERVAL_MSEC );
+        ret = rateForInterval( r, INTERVAL_MSEC );
 
     return ret;
 }
@@ -134,13 +117,6 @@ tr_rcTransferred( tr_ratecontrol * r, size_t size )
         r->transfers[r->newest].date = now;
         r->transfers[r->newest].size = size;
     }
-}
-
-void
-tr_rcReset( tr_ratecontrol * r )
-{
-    r->newest = 0;
-    memset( r->transfers, 0, sizeof(struct tr_transfer) * HISTORY_SIZE );
 }
 
 void
