@@ -15,7 +15,6 @@ EXTRA_DIST = \
     UKKQueue \
     TransmissionHelp \
     Images \
-    appcast \
     en.lproj \
     es.lproj \
     fr.lproj \
