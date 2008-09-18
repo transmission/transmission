@@ -404,7 +404,8 @@ onTrackerResponse( tr_session    * session,
         const int interval = t->announceIntervalSec + t->randOffset;
         const time_t now = time ( NULL );
         dbgmsg( t->name, "request succeeded. reannouncing in %d seconds", interval );
-        t->scrapeAt = now + t->scrapeIntervalSec + t->randOffset;
+        if( t->scrapeAt <= now )
+            t->scrapeAt = now + t->scrapeIntervalSec + t->randOffset;
         t->reannounceAt = now + interval;
         t->manualAnnounceAllowedAt = now + t->announceMinIntervalSec;
 
