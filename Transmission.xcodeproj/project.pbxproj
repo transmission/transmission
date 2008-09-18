@@ -1562,7 +1562,6 @@
 				4DC4AA3D0B05673D0005DB76 /* ShellScript */,
 				4D18389309DEC0030047D688 /* Headers */,
 				4D18389409DEC0030047D688 /* Sources */,
-				BEFC1CA00C077F1200B0BB3C /* Resources */,
 				BE75C3860C72A1D300DBEFE0 /* Frameworks */,
 			);
 			buildRules = (
@@ -1849,13 +1848,6 @@
 				A2CB38AF0E1E6896002B514C /* COPYING in Resources */,
 				A250EEB60E2ED87B00A688E6 /* web in Resources */,
 				A22F1E550E7DA8030065DB9D /* sparkle_dsa_pub.pem in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		BEFC1CA00C077F1200B0BB3C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

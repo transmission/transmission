@@ -11,7 +11,7 @@ PEERID_PREFIX="-TR134Z-"
 USERAGENT_PREFIX="1.34+"
 
 
-SVN_REVISION=`find ./ -name "*\.[chmp]" -o -name "*\.cpp" -o -name "*\.po" -o -name "*\.sh" | \
+SVN_REVISION=`find ./macosx ./libtransmission -name "*\.[chmp]" -o -name "*\.cpp" -o -name "*\.po" -o -name "*\.sh" | \
               xargs grep "\$Id:" | \
               grep -v third-party | \
               cut -d"$Id:" -f3 | cut -d" " -f3 | sort -n | tail -n 1`
