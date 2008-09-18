@@ -85,6 +85,7 @@ clutch_graphics_DATA = \
   web/images/graphics/iphone_chrome.png \
   web/images/graphics/browser_opera.gif \
   web/images/graphics/filter_bar.png \
+  web/images/graphics/filter_icon.png \
   web/images/graphics/transfer_arrows.png \
   web/images/graphics/browser_safari.gif
 
