@@ -35,10 +35,15 @@
 #endif
 #endif
 
-/**
- * How frequently to reallocate peer bandwidth.
- */
-#define BANDWIDTH_PULSES_PER_SECOND 5
+enum
+{
+    /* How frequently to reallocate peer bandwidth. */
+    BANDWIDTH_PULSES_PER_SECOND = 8,
+
+    /* HOw many pulses to remember for averaging the current speed */
+    BANDWIDTH_PULSE_HISTORY = ( BANDWIDTH_PULSES_PER_SECOND * 2 )
+};
+
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 

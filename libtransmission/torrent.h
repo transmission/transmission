@@ -180,7 +180,7 @@ struct tr_torrent
 
     int                        uniqueId;
 
-    double                     rateHistory[2][BANDWIDTH_PULSES_PER_SECOND];
+    double                     rateHistory[2][BANDWIDTH_PULSE_HISTORY];
 
 };
 

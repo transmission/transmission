@@ -128,8 +128,8 @@ struct tr_peerMgr
     tr_ptrArray * torrents; /* Torrent */
     tr_ptrArray * incomingHandshakes; /* tr_handshake */
     tr_timer * bandwidthTimer;
-    double rateHistory[2][BANDWIDTH_PULSES_PER_SECOND];
-    double globalPoolHistory[2][BANDWIDTH_PULSES_PER_SECOND];
+    double rateHistory[2][BANDWIDTH_PULSE_HISTORY];
+    double globalPoolHistory[2][BANDWIDTH_PULSE_HISTORY];
 };
 
 #define tordbg(t, fmt...) \
@@ -1476,15 +1476,16 @@ tr_peerMgrGetRate( const tr_peerMgr  * manager,
                    tr_direction        direction )
 {
     int i;
-    double rate = 0;
+    double bytes = 0;
 
     assert( manager != NULL );
     assert( direction==TR_UP || direction==TR_DOWN );
 
-    for( i=0; i<BANDWIDTH_PULSES_PER_SECOND; ++i )
-        rate += manager->rateHistory[direction][i];
+    for( i=0; i<BANDWIDTH_PULSE_HISTORY; ++i )
+        bytes += manager->rateHistory[direction][i];
 
-    return rate / 1024.0;
+    return ( BANDWIDTH_PULSES_PER_SECOND * bytes )
+         / ( BANDWIDTH_PULSE_HISTORY * 1024 );
 }
 
 float*
@@ -2016,49 +2017,49 @@ reconnectPulse( void * vtorrent )
 
 static double
 allocateHowMuch( double           desiredAvgKB,
-                 const double   * history,
-                 int              pulseNumber )
+                 const double   * history )
 {
-    int i;
-    int oldest = ( pulseNumber + 1 ) % BANDWIDTH_PULSES_PER_SECOND;
     const double baseline = desiredAvgKB * 1024.0 / BANDWIDTH_PULSES_PER_SECOND;
     const double min = baseline * 0.66;
     const double max = baseline * 1.33;
-    double bytes;
+    int i;
+    double usedBytes;
+    double n;
+    double clamped;
 
-    bytes = desiredAvgKB * 1024.0;
-    for( i=0; i<BANDWIDTH_PULSES_PER_SECOND; ++i )
-        if( i != oldest )
-            bytes -= history[i];
+    for( usedBytes=i=0; i<BANDWIDTH_PULSE_HISTORY; ++i )
+        usedBytes += history[i];
 
-    /* clamp the return value to lessen any oscillation */
-    bytes = MAX( bytes, min );
-    bytes = MIN( bytes, max );
-    return bytes;
+    n = ( desiredAvgKB * 1024.0 ) * ( BANDWIDTH_PULSE_HISTORY + 1.0 ) / BANDWIDTH_PULSES_PER_SECOND - usedBytes;
+
+    /* clamp the return value to lessen oscillation */
+    clamped = n;
+    clamped = MAX( clamped, min );
+    clamped = MIN( clamped, max );
+/*fprintf( stderr, "desiredAvgKB is %.2f, rate is %.2f, allocating %.2f (%.2f)\n", desiredAvgKB, ((usedBytes*BANDWIDTH_PULSES_PER_SECOND)/BANDWIDTH_PULSE_HISTORY)/1024.0, clamped/1024.0, n/1024.0 );*/
+    return clamped;
 }
 
 /**
- * Distirbutes a fixed amount of bandwidth among a set of peers.
+ * Distributes a fixed amount of bandwidth among a set of peers.
  *
- * @param peerArray peers whose client-to-peer bandwidth will be adjusted
+ * @param peerArray peers whose client-to-peer bandwidth will be set
  * @param direction whether to allocate upload or download bandwidth
  * @param history recent bandwidth history for these peers
- * @param pulseNumber index of the current pulse in the history array
  * @param desiredAvgKB overall bandwidth goal for this set of peers
  */
 static void
 setPeerBandwidth( tr_ptrArray         * peerArray,
                   const tr_direction    direction,
                   const double        * history,
-                  int                   pulseNumber,
                   double                desiredAvgKB )
 {
     const int peerCount = tr_ptrArraySize( peerArray );
-    tr_peer ** peers = (tr_peer**) tr_ptrArrayBase( peerArray );
-    tr_peer ** candidates = tr_new( tr_peer*, peerCount );
-    const double bytes = allocateHowMuch( desiredAvgKB, history, pulseNumber );
+    const double bytes = allocateHowMuch( desiredAvgKB, history );
     const double welfareBytes = MIN( 2048, bytes * 0.2 );
     const double meritBytes = MAX( 0, bytes - welfareBytes );
+    tr_peer ** peers = (tr_peer**) tr_ptrArrayBase( peerArray );
+    tr_peer ** candidates = tr_new( tr_peer*, peerCount );
     int i;
     int candidateCount;
     double welfare;
@@ -2095,10 +2096,10 @@ setPeerBandwidth( tr_ptrArray         * peerArray,
 static size_t
 countHandshakeBandwidth( tr_ptrArray * handshakes, tr_direction direction )
 {
-    int i;
-    size_t total = 0;
     const int n = tr_ptrArraySize( handshakes );
-    for( i=0; i<n; ++i ) {
+    int i;
+    size_t total;
+    for( i=total=0; i<n; ++i ) {
          tr_peerIo * io = tr_handshakeGetIO( tr_ptrArrayNth( handshakes, i ) );
          total += tr_peerIoGetBandwidthUsed( io, direction );
     }
@@ -2108,10 +2109,10 @@ countHandshakeBandwidth( tr_ptrArray * handshakes, tr_direction direction )
 static size_t
 countPeerBandwidth( tr_ptrArray * peers, tr_direction direction )
 {
-    int i;
-    size_t total = 0;
     const int n = tr_ptrArraySize( peers );
-    for( i=0; i<n; ++i )
+    int i;
+    size_t total;
+    for( i=total=0; i<n; ++i )
     {
          tr_peer * peer = tr_ptrArrayNth( peers, i );
          total += tr_peerIoGetBandwidthUsed( peer->io, direction );
@@ -2122,8 +2123,8 @@ countPeerBandwidth( tr_ptrArray * peers, tr_direction direction )
 static void
 givePeersUnlimitedBandwidth( tr_ptrArray * peers, tr_direction direction )
 {
-    int i;
     const int n = tr_ptrArraySize( peers );
+    int i;
     for( i=0; i<n; ++i )
     {
         tr_peer * peer = tr_ptrArrayNth( peers, i );
@@ -2134,8 +2135,8 @@ givePeersUnlimitedBandwidth( tr_ptrArray * peers, tr_direction direction )
 static void
 pumpAllPeers( tr_peerMgr * mgr )
 {
-    int i, j;
     const int torrentCount = tr_ptrArraySize( mgr->torrents );
+    int i, j;
     for( i=0; i<torrentCount; ++i )
     {
         Torrent * t = tr_ptrArrayNth( mgr->torrents, i );
@@ -2196,7 +2197,6 @@ allocateBandwidth( tr_peerMgr   * mgr,
 
                 setPeerBandwidth( t->peers, direction,
                                   t->tor->rateHistory[direction],
-                                  pulseNumber,
                                   tr_torrentGetSpeedLimit( t->tor,
                                                            direction ) );
                 break;
@@ -2226,7 +2226,6 @@ allocateBandwidth( tr_peerMgr   * mgr,
     else 
         setPeerBandwidth( globalPool, direction,
                           mgr->globalPoolHistory[direction],
-                          pulseNumber,
                           tr_sessionGetSpeedLimit( session, direction ) );
 
     /* now that we've allocated bandwidth, pump all the connected peers */
@@ -2245,7 +2244,7 @@ bandwidthPulse( void * vmgr )
     managerLock( mgr );
 
     /* keep track of how far we are into the cycle */
-    if( ++mgr->bandwidthPulseNumber == BANDWIDTH_PULSES_PER_SECOND )
+    if( ++mgr->bandwidthPulseNumber == BANDWIDTH_PULSE_HISTORY )
         mgr->bandwidthPulseNumber = 0;
 
     /* allocate the upload and download bandwidth */
