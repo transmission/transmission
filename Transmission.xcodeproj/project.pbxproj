@@ -2235,6 +2235,7 @@
 		0053D3D30C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
@@ -2246,6 +2247,7 @@
 		0053D3D40C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
 				HEADER_SEARCH_PATHS = (
 					"third-party/shttpd",
 					"third-party/libevent",
@@ -2273,6 +2275,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = macosx;
+				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				INFOPLIST_FILE = macosx/Info.plist;
@@ -2288,6 +2291,7 @@
 		0053D3D60C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
 				HEADER_SEARCH_PATHS = .;
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -2296,6 +2300,7 @@
 		0053D3D70C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
 				HEADER_SEARCH_PATHS = (
 					.,
 					"third-party/",
@@ -2312,6 +2317,7 @@
 		0053D3D80C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
 				HEADER_SEARCH_PATHS = (
 					.,
 					"third-party/",
@@ -2372,6 +2378,7 @@
 		3C7A118F0D0B2EB800B5701F /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/lib;
@@ -2385,6 +2392,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -2508,6 +2516,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = macosx;
+				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				INFOPLIST_FILE = macosx/Info.plist;
@@ -2523,6 +2532,7 @@
 		A250CFED0CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
 				HEADER_SEARCH_PATHS = .;
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -2531,6 +2541,7 @@
 		A250CFEE0CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
 				HEADER_SEARCH_PATHS = (
 					"third-party/shttpd",
 					"third-party/libevent",
@@ -2556,6 +2567,7 @@
 		A250CFEF0CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
 				HEADER_SEARCH_PATHS = (
 					.,
 					"third-party/",
@@ -2572,6 +2584,7 @@
 		A250CFF00CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
 				HEADER_SEARCH_PATHS = (
 					.,
 					"third-party/",
@@ -2584,6 +2597,7 @@
 		A250CFF20CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
 				USER_HEADER_SEARCH_PATHS = "third-party/libevent";
@@ -2616,6 +2630,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/lib;
@@ -2636,6 +2651,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
+				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -2675,6 +2691,7 @@
 		BE11834A0CE160960002D0F3 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/lib;
@@ -2693,6 +2710,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
