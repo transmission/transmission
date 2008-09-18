@@ -223,7 +223,7 @@ div.torrent_global_details div#torrent_global_upload {
 }
 
 div.torrent_global_details div#torrent_global_download {
-	background: url('../images/graphics/transfer_arrows.png') left 1px no-repeat;
+	background: url('../images/graphics/transfer_arrows.png') left 2px no-repeat;
 }
 
 /*--------------------------------------
@@ -313,10 +313,23 @@ div#torrent_filter_bar input#torrent_search {
 	height: 15px;
 	width: 100px;
 	border: solid 0 #fff;
-	padding-left: 2px;
-	padding-right: 2px;
+	padding: 0 2px;
 	margin: 4px 5px 0 0;
 }
+/* Safari-look filter input for Firefox */
+@-moz-document url-prefix() {
+	div#torrent_filter_bar input#torrent_search {
+		background: #FFF url('../images/graphics/filter_icon.png') top left no-repeat;
+		border: 1px solid #5D80A1;
+		margin-top: 3px;
+		padding: 1px 10px 1px 18px;
+		width: 76px;
+		-moz-border-radius: 10px;
+	}
+	div#torrent_filter_bar input#torrent_search.blur {
+		border-color: #CCC;
+	}
+} 
 
 div#torrent_filter_bar input#torrent_search.blur {
 	color: #999;
@@ -754,16 +767,7 @@ div#prefs_container label.suffix {
 	float: left;
 }
 
-div#prefs_container div.download_location label.item,
-div#prefs_container div.port label.item,
-div#prefs_container div.web_gui label.item {
-	width: 112px;
-	clear: left;
-}
-
-div#prefs_container div.auto_start label.item,
-div#prefs_container div.encryption label.item,
-div#prefs_container div.limit_total label.item {
+div#prefs_container div.formdiv.checkbox label.item {
 	margin: 0 5px 0 41px;
 	clear: left;
 }
@@ -779,6 +783,11 @@ div#prefs_container div.preference input[type=checkbox] {
 	z-index: 99;
 	left: 14px;
 }
+@-moz-document url-prefix() {
+	div#prefs_container div.preference input[type=checkbox] {
+		margin-top: 5px;
+	}
+}
 
 div#prefs_container div.preference input[type=text] {
 	width: 50px;
@@ -791,12 +800,12 @@ div#prefs_container div.preference input {
 	float: left;
 }
 
-div#prefs_container div.preference input#limit_upload {
-	margin-top: 33px !important;
-}
-
 div#prefs_container div.download_location input {
 	width: 256px !important;
+}
+
+div#prefs_container div.formdiv {
+	clear: both;
 }
 
 div#prefs_container a {

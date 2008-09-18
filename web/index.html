@@ -193,40 +193,51 @@
 				<form id="prefs_form">
 					<div class="preference download_location">
 						<label class="category">Add transfers:</label>
-						<label class="item">Download to:</label>
-						<input type="text" name="download_location" id="download_location"/>
+						<div class="formdiv">
+							<label for="download_location" class="item">Download to:</label>
+							<input type="text" name="download_location" id="download_location"/>
+						</div>
+						<div class="formdiv checkbox auto_start">
+							<input type="checkbox" name="auto_start" id="auto_start"/>
+							<label for="auto_start" class="item">Start transfers when added</label>
+						</div>
 					</div>
 					<div class="preference port">
 						<label class="category">Network:</label>
-						<label class="item">Incoming TCP Port:</label>
-						<input type="text" id="port" name="port"/>
-					</div>
-					<div class="preference auto_start">
-						<label class="category">Transfers:</label>
-						<input type="checkbox" name="auto_start" id="auto_start"/>
-						<label class="item">Start transfers when added</label>
+						<div class="formdiv">
+							<label for="post" class="item">Incoming TCP Port:</label>
+							<input type="text" id="port" name="port"/>
+						</div>
 					</div>
 					<div class="preference encryption">
 						<label class="category">Encryption:</label>
-						<input type="checkbox" name="encryption" id="encryption"/>
-						<label class="item">Ignore unencrypted peers</label>
+						<div class="formdiv checkbox">
+							<input type="checkbox" name="encryption" id="encryption"/>
+							<label for="encryption" class="item">Ignore unencrypted peers</label>
+						</div>
 					</div>
 					<div class="preference limit_total">
 						<label class="category">Limit total bandwidth:</label>
-						<input type="checkbox" name="limit_download" id="limit_download"/>
-						<label class="item">Download Rate:</label>
-						<input type="text" name="download_rate" id="download_rate"/>
-						<label class="suffix">KB/s</label>
-						<input type="checkbox" name="limit_upload" id="limit_upload"/>
-						<label class="item">Upload Rate:</label>
-						<input type="text" name="upload_rate" id="upload_rate"/>
-						<label class="suffix">KB/s</label>
+						<div class="formdiv checkbox">
+							<input type="checkbox" name="limit_download" id="limit_download"/>
+							<label for="limit_download" class="item">Download Rate:</label>
+							<input type="text" name="download_rate" id="download_rate"/>
+							<label class="suffix">KB/s</label>
+						</div>
+						<div class="formdiv checkbox">
+							<input type="checkbox" name="limit_upload" id="limit_upload"/>
+							<label for="limit_upload" class="item">Upload Rate:</label>
+							<input type="text" name="upload_rate" id="upload_rate"/>
+							<label class="suffix">KB/s</label>
+						</div>
 					</div>
 					<div class="preference web_gui">
 						<label class="category">Web Client:</label>
-						<label class="item">Refresh Rate:</label>
-						<input type="text" name="refresh_rate" id="refresh_rate"/>
-						<label class="suffix">seconds</label>
+						<div class="formdiv">
+							<label for="refresh_rate" class="item">Refresh Rate:</label>
+							<input type="text" name="refresh_rate" id="refresh_rate"/>
+							<label class="suffix">seconds</label>
+						</div>
 					</div>
 					<a href="#save" id="prefs_save_button">Save</a>
 					<a href="#cancel" id="prefs_cancel_button">Cancel</a>

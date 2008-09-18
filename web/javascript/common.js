@@ -69,11 +69,6 @@ $(document).ready( function() {
 		// different padding.
 		$('div.dialog_container div.dialog_window a').css('padding', '2px 10px 3px');
 	}
-	if ($.browser.mozilla) {
-		$('div#prefs_container div.preference input').css('height', 'auto');
-		$('div#prefs_container div.preference input').css('padding', '1px');
-		$('div#prefs_container div.preference input').css('margin-top', '2px');
-	}
 });
 
 /*
