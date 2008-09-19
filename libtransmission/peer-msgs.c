@@ -1093,7 +1093,7 @@ readBtLength( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     uint32_t len;
 
     if( inlen < sizeof(len) )
-        return READ_MORE;
+        return READ_LATER;
 
     tr_peerIoReadUint32( msgs->io, inbuf, &len );
 
@@ -1104,7 +1104,7 @@ readBtLength( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         msgs->state = AWAITING_BT_ID;
     }
 
-    return READ_AGAIN;
+    return READ_NOW;
 }
 
 static int
@@ -1116,7 +1116,7 @@ readBtId( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     uint8_t id;
 
     if( inlen < sizeof(uint8_t) )
-        return READ_MORE;
+        return READ_LATER;
 
     tr_peerIoReadUint8( msgs->io, inbuf, &id );
     msgs->incoming.id = id;
@@ -1124,12 +1124,12 @@ readBtId( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     if( id==BT_PIECE )
     {
         msgs->state = AWAITING_BT_PIECE;
-        return READ_AGAIN;
+        return READ_NOW;
     }
     else if( msgs->incoming.length != 1 )
     {
         msgs->state = AWAITING_BT_MESSAGE;
-        return READ_AGAIN;
+        return READ_NOW;
     }
     else return readBtMessage( msgs, inbuf, inlen-1 );
 }
@@ -1257,13 +1257,13 @@ readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     if( !req->length )
     {
         if( inlen < 8 )
-            return READ_MORE;
+            return READ_LATER;
 
         tr_peerIoReadUint32( msgs->io, inbuf, &req->index );
         tr_peerIoReadUint32( msgs->io, inbuf, &req->offset );
         req->length = msgs->incoming.length - 9;
         dbgmsg( msgs, "got incoming block header %u:%u->%u", req->index, req->offset, req->length );
-        return READ_AGAIN;
+        return READ_NOW;
     }
     else
     {
@@ -1282,7 +1282,7 @@ readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
                (int)n, req->index, req->offset, req->length,
                (int)( req->length - EVBUFFER_LENGTH(msgs->incoming.block) ) );
         if( EVBUFFER_LENGTH(msgs->incoming.block) < req->length )
-            return READ_MORE;
+            return READ_LATER;
 
         /* we've got the whole block ... process it */
         err = clientGotBlock( msgs, EVBUFFER_DATA(msgs->incoming.block), req );
@@ -1292,10 +1292,10 @@ readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         req->length = 0;
         msgs->state = AWAITING_BT_LENGTH;
         if( !err )
-            return READ_AGAIN;
+            return READ_NOW;
         else {
             fireError( msgs, err );
-            return READ_DONE;
+            return READ_ERR;
         }
     }
 }
@@ -1311,7 +1311,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     --msglen; /* id length */
 
     if( inlen < msglen )
-        return READ_MORE;
+        return READ_LATER;
 
     dbgmsg( msgs, "got BT id %d, len %d, buffer size is %d", (int)id, (int)msglen, (int)inlen );
 
@@ -1319,7 +1319,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     {
         dbgmsg( msgs, "bad packet - BT message #%d with a length of %d", (int)id, (int)msglen );
         fireError( msgs, TR_ERROR );
-        return READ_DONE;
+        return READ_ERR;
     }
 
     switch( id )
@@ -1450,7 +1450,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     assert( EVBUFFER_LENGTH(inbuf) == startBufLen - msglen );
 
     msgs->state = AWAITING_BT_LENGTH;
-    return READ_AGAIN;
+    return READ_NOW;
 }
 
 static void
@@ -1550,11 +1550,11 @@ canRead( struct bufferevent * evin, void * vmsgs )
 
     if( !inlen )
     {
-        ret = READ_DONE;
+        ret = READ_LATER;
     }
     else if( msgs->state == AWAITING_BT_PIECE )
     {
-        ret = inlen ? readBtPiece( msgs, in, inlen ) : READ_DONE;
+        ret = inlen ? readBtPiece( msgs, in, inlen ) : READ_LATER;
     }
     else switch( msgs->state )
     {

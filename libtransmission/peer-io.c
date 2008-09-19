@@ -191,6 +191,7 @@ static void
 canReadWrapper( struct bufferevent * e, void * vio )
 {
     int done = 0;
+    int err = 0;
     tr_peerIo * io = vio;
     tr_session * session = io->session;
     const size_t len = EVBUFFER_LENGTH( EVBUFFER_INPUT( e ) );
@@ -216,25 +217,31 @@ canReadWrapper( struct bufferevent * e, void * vio )
     {
         tr_globalLock( session );
 
-        while( !done )
+        while( !done && !err )
         {
             const int ret = io->canRead( e, io->userData );
 
             switch( ret )
             {
-                case READ_AGAIN:
+                case READ_NOW:
                     if( EVBUFFER_LENGTH( e->input ) )
                         continue;
-                case READ_MORE:
-                case READ_DONE:
                     done = 1;
+                    break;
+                case READ_LATER:
+                    done = 1;
+                    break;
+                case READ_ERR:
+                    err = 1;
+                    break;
             }
         }
 
         tr_globalUnlock( session );
     }
 
-    io->bufferSize[TR_DOWN] = EVBUFFER_LENGTH( EVBUFFER_INPUT( e ) );
+    if( !err )
+        io->bufferSize[TR_DOWN] = EVBUFFER_LENGTH( EVBUFFER_INPUT( e ) );
 }
 
 static void

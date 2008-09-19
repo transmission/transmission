@@ -19,11 +19,12 @@ struct in_addr;
 struct tr_peerIo;
 typedef struct tr_handshake tr_handshake;
 
-typedef void (*handshakeDoneCB)(struct tr_handshake * handshake,
-                                struct tr_peerIo    * io,
-                                int                   isConnected,
-                                const uint8_t       * peerId,
-                                void                * userData );
+/* returns true on success, false on error */
+typedef int (*handshakeDoneCB)(struct tr_handshake * handshake,
+                               struct tr_peerIo    * io,
+                               int                   isConnected,
+                               const uint8_t       * peerId,
+                               void                * userData );
 
 tr_handshake *  tr_handshakeNew( struct tr_peerIo   * io,
                                  tr_encryption_mode   encryptionMode,

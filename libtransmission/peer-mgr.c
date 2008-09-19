@@ -949,7 +949,7 @@ getPeerCount( const Torrent * t )
 }
 
 /* FIXME: this is kind of a mess. */
-static void
+static int
 myHandshakeDoneCB( tr_handshake    * handshake,
                    tr_peerIo       * io,
                    int               isConnected,
@@ -957,6 +957,7 @@ myHandshakeDoneCB( tr_handshake    * handshake,
                    void            * vmanager )
 {
     int ok = isConnected;
+    int success = FALSE;
     uint16_t port;
     const struct in_addr * addr;
     tr_peerMgr * manager = (tr_peerMgr*) vmanager;
@@ -1038,12 +1039,16 @@ myHandshakeDoneCB( tr_handshake    * handshake,
                 peer->port = port;
                 peer->io = io;
                 peer->msgs = tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
+
+                success = TRUE;
             }
         }
     }
 
     if( t )
         torrentUnlock( t );
+
+    return success;
 }
 
 void

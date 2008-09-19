@@ -98,7 +98,14 @@ const uint8_t*
 ***
 **/
 
-typedef enum { READ_MORE, READ_AGAIN, READ_DONE } ReadState;
+typedef enum
+{
+    READ_NOW,
+    READ_LATER,
+    READ_ERR
+}
+ReadState;
+
 typedef ReadState (*tr_can_read_cb)(struct bufferevent*, void* user_data);
 typedef void (*tr_did_write_cb)(struct bufferevent *, void *);
 typedef void (*tr_net_error_cb)(struct bufferevent *, short what, void *);
