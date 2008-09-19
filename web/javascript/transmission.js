@@ -843,6 +843,8 @@ Transmission.prototype =
 		var total_upload_speed = 0;
 		var total_verified = 0;
 		var na = 'N/A';
+		
+		$("#torrent_inspector_size, .inspector_row div").css('color', '#222');
 
 		if( torrents.length == 0 )
 		{
@@ -868,7 +870,8 @@ Transmission.prototype =
 			setInnerHTML( $(ti+'progress')[0], na );
 			setInnerHTML( $(ti+'comment')[0], na );
 			setInnerHTML( $(ti+'creator')[0], na );
-			setInnerHTML( $(ti+'error')[0], na );
+			setInnerHTML( $(ti+'error')[0], na );		
+			$("#torrent_inspector_size, .inspector_row > div:contains('N/A')").css('color', '#666');
 			return;
 		}
 
@@ -929,7 +932,7 @@ Transmission.prototype =
 		var private_string = '';
 		if( have_private && have_public ) private_string = 'Mixed';
 		else if( have_private ) private_string = 'Private Torrent';
-		else if( have_public ) private_string = 'Public Torrent';
+		else if( have_public ) private_string = 'Public Torrent';	
 
 		var ti = '#torrent_inspector_';
 		$(ti+'name')[0].innerHTML            = name;
@@ -954,6 +957,8 @@ Transmission.prototype =
 		$(ti+'comment')[0].innerHTML         = comment;
 		$(ti+'creator')[0].innerHTML         = creator;
 		$(ti+'error')[0].innerHTML           = error;
+		
+		$(".inspector_row > div:contains('N/A')").css('color', '#666');
 	},
     
 	/*

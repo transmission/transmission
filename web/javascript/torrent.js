@@ -130,6 +130,7 @@ Torrent.prototype =
 	peersGettingFromUs: function() { return this._peers_getting_from_us; },
 	getPercentDone: function() {
 		if( !this._sizeWhenDone ) return 1.0;
+		if( !this._leftUntilDone ) return 1.0;
 		return ( this._sizeWhenDone - this._leftUntilDone )
 		       / this._sizeWhenDone;
 	},
@@ -504,8 +505,8 @@ Torrent.compareByActivity = function( a, b ) {
 
 /** Helper function for sortTorrents(). */
 Torrent.compareByProgress = function( a, b ) {
-	if( a._leftUntilDone !== b._leftUntilDone )
-		return a._leftUntilDone - b._leftUntilDone;
+	if( a.getPercentDone() !== b.getPercentDone() )
+		return a.getPercentDone() - b.getPercentDone();
 	var a_ratio = Math.ratio( a._upload_total, a._download_total );
 	var b_ratio = Math.ratio( b._upload_total, b._download_total );
 	return a_ratio - b_ratio;

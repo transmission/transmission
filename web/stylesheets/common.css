@@ -631,7 +631,7 @@ div.dialog_container {
 	margin: 0px;
 	width: 100%;
 	height: 100%;
-	z-index: 2;
+	z-index: 4;
 	text-align: center;
 	color: black;
 	font-size: 1.1em;
@@ -639,7 +639,7 @@ div.dialog_container {
 
 div.dialog_container div.dialog_window {
 	background-color: #eee;
-	margin: 71px auto 0;
+	margin: -210px auto 0;
 	filter: alpha(opacity=95);
 	-moz-opacity: .95;
 	opacity: .95;
@@ -649,7 +649,14 @@ div.dialog_container div.dialog_window {
 	height: 145px;
 	position: relative;
 	-webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.7);
+	top: 50%;
 }
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+	div.dialog_container div.dialog_window {
+		top: 0;
+		margin-top: 71px;
+	}
+} 
 
 div#prefs_container div.dialog_window {
 	width: 410px;
@@ -746,8 +753,6 @@ iframe#torrent_upload_frame {
 }
 
 div#prefs_container label {
-	line-height: 25px;
-	vertical-align: middle;
 	display: block;
 }
 
@@ -758,6 +763,7 @@ div#prefs_container label.category {
 }
 
 div#prefs_container label.item {
+	font-size: 11px !important;
 	margin: 0 5px 0 20px;
 	float: left;
 }
@@ -768,8 +774,7 @@ div#prefs_container label.suffix {
 }
 
 div#prefs_container div.formdiv.checkbox label.item {
-	margin: 0 5px 0 41px;
-	clear: left;
+	margin: 0 5px 0 2px;
 }
 
 div#prefs_container div.limit_total label.item {
@@ -777,15 +782,13 @@ div#prefs_container div.limit_total label.item {
 }
 
 div#prefs_container div.preference input[type=checkbox] {
-	margin: 7px 7px 0 22px;
-	clear: left;
-	position: absolute; /* this plus z-index makes Opera show the checkboxes above the dialog */
-	z-index: 99;
-	left: 14px;
+	float: left;
+	margin-left: 20px;
+	margin-top: 9px;
 }
 @-moz-document url-prefix() {
 	div#prefs_container div.preference input[type=checkbox] {
-		margin-top: 5px;
+		margin-top: 8px;
 	}
 }
 
@@ -803,9 +806,13 @@ div#prefs_container div.preference input {
 div#prefs_container div.download_location input {
 	width: 256px !important;
 }
+div#prefs_container div.download_location .checkbox input {
+	width: auto !important;
+}
 
 div#prefs_container div.formdiv {
 	clear: both;
+	line-height: 30px;
 }
 
 div#prefs_container a {
@@ -1009,4 +1016,11 @@ div#jqContextMenu ul {
 	opacity: .98;
 	-webkit-box-shadow: 0 10px 25px rgba(0,0,0,0.4);
 	-webkit-border-radius: 5px;
+}
+
+div#jqContextMenu li.separator, div#jqContextMenu li.separator:hover {
+	background: inherit !important;
+	border-top: 1px solid #ddd !important;
+	margin: 5px 0 !important;
+	padding: 0px;
 }

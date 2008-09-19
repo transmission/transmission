@@ -75,6 +75,7 @@ clutch_jquery_DATA = \
 clutch_imagesdir = $(clutchdir)/images
 clutch_images_DATA = \
   web/images/favicon.ico \
+  web/images/favicon.png \
   web/images/webclip-icon.png
 
 clutch_graphicsdir = $(clutch_imagesdir)/graphics
