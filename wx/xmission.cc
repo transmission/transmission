@@ -40,6 +40,7 @@
 #include <wx/snglinst.h>
 #include <wx/splitter.h>
 #include <wx/statline.h>
+#include <wx/stdpaths.h>
 #include <wx/taskbar.h>
 #include <wx/tglbtn.h>
 #include <wx/toolbar.h>
@@ -343,7 +344,7 @@ void
 MyFrame :: OnRecheck( wxCommandEvent& WXUNUSED(unused) )
 {
     foreach( torrents_v, mySelectedTorrents, it )
-        tr_torrentRecheck( *it );
+        tr_torrentVerify( *it );
 }
 
 /**
@@ -370,7 +371,7 @@ void MyFrame :: OnOpen( wxCommandEvent& WXUNUSED(event) )
             const std::string filename = toStr( paths[i] );
             tr_ctor * ctor = tr_ctorNew( handle );
             tr_ctorSetMetainfoFromFile( ctor, filename.c_str() );
-            tr_ctorSetDestination( ctor, TR_FALLBACK, mySavePath.c_str() );
+            tr_ctorSetDownloadDir( ctor, TR_FALLBACK, mySavePath.c_str() );
             tr_torrent * tor = tr_torrentNew( handle, ctor, NULL );
             tr_ctorFree( ctor );
 
@@ -389,7 +390,11 @@ void MyFrame :: OnOpen( wxCommandEvent& WXUNUSED(event) )
 bool
 MyApp :: OnInit( )
 {
-    handle = tr_sessionInit( "wx" );
+    const wxString downloadDir = wxStandardPaths::Get().GetDocumentsDir( );
+
+    handle = tr_sessionInit( tr_getDefaultConfigDir(),
+                             toStr(downloadDir).c_str(),
+                             "wx" );
 
     wxCmdLineParser cmdParser( cmdLineDesc, argc, argv );
     if( cmdParser.Parse ( ) )
@@ -516,7 +521,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     wxString key = _T("port");
     if( !myConfig->Read( key, &port, TR_DEFAULT_PORT ) )
         myConfig->Write( key, port );
-    tr_setBindPort( handle, port );
+    tr_sessionSetPeerPort( handle, port );
 
     key = _T("save-path");
     wxString wxstr;
@@ -679,8 +684,8 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     int count = 0;
     tr_ctor * ctor = tr_ctorNew( handle );
     tr_ctorSetPaused( ctor, TR_FORCE, paused );
-    tr_ctorSetDestination( ctor, TR_FALLBACK, mySavePath.c_str() );
-    tr_torrent ** torrents = tr_loadTorrents ( handle, ctor, &count );
+    tr_ctorSetDownloadDir( ctor, TR_FALLBACK, mySavePath.c_str() );
+    tr_torrent ** torrents = tr_sessionLoadTorrents( handle, ctor, &count );
     myTorrents.insert( myTorrents.end(), torrents, torrents+count );
     tr_free( torrents );
     tr_ctorFree( ctor );

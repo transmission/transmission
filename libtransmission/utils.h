@@ -31,6 +31,10 @@
 #include <stdio.h> /* FILE* */
 #include <time.h> /* time_t* */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /***
 ****
 ***/
@@ -279,5 +283,9 @@ tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
       tr_bitfieldHasFast( bitfield, nth ) )
 
 double tr_getRatio( double numerator, double denominator );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

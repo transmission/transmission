@@ -18,8 +18,10 @@
  * $Id$
  */
 
+#include <algorithm>
 #include <wx/intl.h>
 #include <torrent-list.h>
+#include <libtransmission/utils.h>
 
 namespace
 {
