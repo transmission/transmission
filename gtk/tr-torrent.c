@@ -249,41 +249,33 @@ tr_torrent_status_str( TrTorrent * gtor )
     const int       tpeers = MAX ( st->peersConnected, 0 );
     const int       upeers = MAX ( st->peersGettingFromUs, 0 );
     const int       eta = st->eta;
-    double          prog = st->percentDone * 100.0; /* [0...100] */
 
     switch( st->status )
     {
         case TR_STATUS_CHECK_WAIT:
-            prog = st->recheckProgress * 100.0; /* [0...100] */
             top =
                 g_strdup_printf( _(
                                      "Waiting to verify local data (%.1f%% tested)" ),
-                                 prog );
+                                 st->recheckProgress * 100.0 );
             break;
 
         case TR_STATUS_CHECK:
-            prog = st->recheckProgress * 100.0; /* [0...100] */
             top =
                 g_strdup_printf( _(
                                      "Verifying local data (%.1f%% tested)" ),
-                                 prog );
+                                 st->recheckProgress * 100.0 );
             break;
 
         case TR_STATUS_DOWNLOAD:
 
             if( eta < 0 )
-                top = g_strdup_printf( _(
-                                           "Remaining time unknown (%.1f%%)" ),
-                                       prog );
+                top = g_strdup_printf( _( "Remaining time unknown" ) );
             else
             {
                 char timestr[128];
                 tr_strltime( timestr, eta, sizeof( timestr ) );
-                /* %1$s is # of minutes
-                   %2$.1f is a percentage of how much of the torrent is done */
-                top = g_strdup_printf( _(
-                                           "%1$s remaining (%2$.1f%%)" ),
-                                       timestr, prog );
+                /* %s is # of minutes */
+                top = g_strdup_printf( _( "%1$s remaining" ), timestr );
             }
             break;
 
@@ -296,11 +288,11 @@ tr_torrent_status_str( TrTorrent * gtor )
             break;
 
         case TR_STATUS_STOPPED:
-            top = g_strdup_printf( _( "Stopped (%.1f%%)" ), prog );
+            top = g_strdup( _( "Stopped" ) );
             break;
 
         default:
-            top = g_strdup_printf( "???" );
+            top = g_strdup( "???" );
             break;
     }
 
