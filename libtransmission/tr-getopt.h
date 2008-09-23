@@ -30,11 +30,11 @@ extern int tr_optind;
 typedef struct tr_option
 {
     int     val;          /* the value to return from tr_getopt() */
-    char  * longName;     /* --long-form */
-    char  * description;  /* option's description for tr_getopt_usage() */
-    char  * shortName;	  /* short form */
+    char *  longName;     /* --long-form */
+    char *  description;  /* option's description for tr_getopt_usage() */
+    char *  shortName;    /* short form */
     int     has_arg;      /* 0 for no argument, 1 for argument */
-    char  * argName;	  /* argument's description for tr_getopt_usage() */
+    char *  argName;      /* argument's description for tr_getopt_usage() */
 }
 tr_option;
 
@@ -55,14 +55,14 @@ enum
  * @return TR_GETOPT_DONE, TR_GETOPT_ERR, TR_GETOPT_UNK,
  *         or the matching tr_option's `val' field
  */
-int tr_getopt( const char        * summary,
-               int                 argc,
-               const char       ** argv,
-               const tr_option   * opts,
-               const char       ** setme_optarg );
+int  tr_getopt( const char *      summary,
+                int               argc,
+                const char **     argv,
+                const tr_option * opts,
+                const char **     setme_optarg );
 
-void tr_getopt_usage( const char       * appName,
-                      const char       * description,
-                      const tr_option  * opts );
+void tr_getopt_usage( const char *      appName,
+                      const char *      description,
+                      const tr_option * opts );
 
 #endif /* TR_GETOPT_H */

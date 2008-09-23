@@ -3,10 +3,10 @@
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license. 
+ * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
- * 
+ *
  * $Id$
  */
 
@@ -15,7 +15,8 @@
 
 #include <gtk/gtk.h>
 
-GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
+GtkWidget * tr_prefs_dialog_new( GObject *   core,
+                                 GtkWindow * parent );
 
 /* if you add a key here,  you /must/ add its
  * default in tr_prefs_init_global( void ) */
@@ -32,12 +33,13 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_OPTIONS_PROMPT         "show-options-window"
 #define PREF_KEY_DOWNLOAD_DIR           "download-dir"
 #define PREF_KEY_OPEN_DIALOG_FOLDER     "open-dialog-dir"
-#define PREF_KEY_ALLOW_HIBERNATION      "allow-hibernation-even-when-torrents-are-active"
+#define PREF_KEY_ALLOW_HIBERNATION\
+    "allow-hibernation-even-when-torrents-are-active"
 #define PREF_KEY_DIR_WATCH              "watch-dir"
 #define PREF_KEY_DIR_WATCH_ENABLED      "watch-dir-enabled"
 #define PREF_KEY_SHOW_TRAY_ICON         "show-tray-icon"
 #define PREF_KEY_START                  "start-added-torrents"
-#define PREF_KEY_TRASH_ORIGINAL         "trash-original-torrent-files" 
+#define PREF_KEY_TRASH_ORIGINAL         "trash-original-torrent-files"
 #define PREF_KEY_PEER_SOCKET_TOS        "peer-socket-tos"
 #define PREF_KEY_PORT                   "peer-port"
 #define PREF_KEY_PORT_FORWARDING        "port-forwarding-enabled"

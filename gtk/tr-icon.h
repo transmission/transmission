@@ -28,8 +28,8 @@
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
-#if GTK_CHECK_VERSION(2,10,0)
-#define STATUS_ICON_SUPPORTED
+#if GTK_CHECK_VERSION( 2, 10, 0 )
+ #define STATUS_ICON_SUPPORTED
 #endif
 
 gpointer tr_icon_new( TrCore * core );

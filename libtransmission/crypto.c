@@ -3,7 +3,7 @@
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license. 
+ * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
@@ -12,7 +12,8 @@
 
 #include <stdlib.h> /* for abs() */
 #include <limits.h> /* for INT_MAX */
-#include <sys/types.h> /* for event.h, as well as netinet/in.h on some platforms */
+#include <sys/types.h> /* for event.h, as well as netinet/in.h on some platforms
+                         */
 #include <assert.h>
 #include <inttypes.h> /* uint8_t */
 #include <string.h> /* memcpy */
@@ -34,7 +35,7 @@
 **/
 
 void
-tr_sha1( uint8_t    * setme,
+tr_sha1( uint8_t *    setme,
          const void * content1,
          int          content1_len,
          ... )
@@ -46,10 +47,11 @@ tr_sha1( uint8_t    * setme,
     SHA1_Update( &sha, content1, content1_len );
 
     va_start( vl, content1_len );
-    for( ;; ) {
+    for( ; ; )
+    {
         const void * content = (const void*) va_arg( vl, const void* );
-        const int content_len = content ? (int) va_arg( vl, int ) : -1;
-        if( content==NULL || content_len<1 )
+        const int    content_len = content ? (int) va_arg( vl, int ) : -1;
+        if( content == NULL || content_len < 1 )
             break;
         SHA1_Update( &sha, content, content_len );
     }
@@ -81,14 +83,14 @@ static const uint8_t dh_G[] = { 2 };
 
 struct tr_crypto
 {
-    RC4_KEY dec_key;
-    RC4_KEY enc_key;
-    uint8_t torrentHash[SHA_DIGEST_LENGTH];
-    unsigned int isIncoming       : 1;
-    unsigned int torrentHashIsSet : 1;
-    unsigned int mySecretIsSet    : 1;
-    uint8_t myPublicKey[KEY_LEN];
-    uint8_t mySecret[KEY_LEN];
+    RC4_KEY         dec_key;
+    RC4_KEY         enc_key;
+    uint8_t         torrentHash[SHA_DIGEST_LENGTH];
+    unsigned int    isIncoming       : 1;
+    unsigned int    torrentHashIsSet : 1;
+    unsigned int    mySecretIsSet    : 1;
+    uint8_t         myPublicKey[KEY_LEN];
+    uint8_t         mySecret[KEY_LEN];
 };
 
 /**
@@ -103,21 +105,21 @@ getSharedDH( void )
     if( dh == NULL )
     {
         dh = DH_new( );
-        dh->p = BN_bin2bn( dh_P, sizeof(dh_P), NULL );
-        dh->g = BN_bin2bn( dh_G, sizeof(dh_G), NULL );
+        dh->p = BN_bin2bn( dh_P, sizeof( dh_P ), NULL );
+        dh->g = BN_bin2bn( dh_G, sizeof( dh_G ), NULL );
         DH_generate_key( dh );
     }
 
     return dh;
 }
 
-tr_crypto * 
+tr_crypto *
 tr_cryptoNew( const uint8_t * torrentHash,
               int             isIncoming )
 {
-    int len, offset;
+    int         len, offset;
     tr_crypto * crypto;
-    DH * dh = getSharedDH( );
+    DH *        dh = getSharedDH( );
 
     crypto = tr_new0( tr_crypto, 1 );
     crypto->isIncoming = isIncoming ? 1 : 0;
@@ -146,14 +148,15 @@ tr_cryptoFree( tr_crypto * crypto )
 **/
 
 const uint8_t*
-tr_cryptoComputeSecret( tr_crypto      * crypto,
-                        const uint8_t  * peerPublicKey )
+tr_cryptoComputeSecret( tr_crypto *     crypto,
+                        const uint8_t * peerPublicKey )
 {
-    int len, offset;
-    uint8_t secret[KEY_LEN];
+    int      len, offset;
+    uint8_t  secret[KEY_LEN];
     BIGNUM * bn = BN_bin2bn( peerPublicKey, KEY_LEN, NULL );
-    DH * dh = getSharedDH( );
-    assert( DH_size(dh) == KEY_LEN );
+    DH *     dh = getSharedDH( );
+
+    assert( DH_size( dh ) == KEY_LEN );
 
     len = DH_compute_key( secret, bn, dh );
     assert( len <= KEY_LEN );
@@ -161,14 +164,15 @@ tr_cryptoComputeSecret( tr_crypto      * crypto,
     memset( crypto->mySecret, 0, offset );
     memcpy( crypto->mySecret + offset, secret, len );
     crypto->mySecretIsSet = 1;
-    
+
     BN_free( bn );
 
     return crypto->mySecret;
 }
 
 const uint8_t*
-tr_cryptoGetMyPublicKey( const tr_crypto * crypto, int * setme_len )
+tr_cryptoGetMyPublicKey( const tr_crypto * crypto,
+                         int *             setme_len )
 {
     *setme_len = KEY_LEN;
     return crypto->myPublicKey;
@@ -179,7 +183,9 @@ tr_cryptoGetMyPublicKey( const tr_crypto * crypto, int * setme_len )
 **/
 
 static void
-initRC4( tr_crypto * crypto, RC4_KEY * setme, const char * key )
+initRC4( tr_crypto *  crypto,
+         RC4_KEY *    setme,
+         const char * key )
 {
     SHA_CTX sha;
     uint8_t buf[SHA_DIGEST_LENGTH];
@@ -199,16 +205,17 @@ void
 tr_cryptoDecryptInit( tr_crypto * crypto )
 {
     unsigned char discard[1024];
-    const char * txt = crypto->isIncoming ? "keyA" : "keyB";
+    const char *  txt = crypto->isIncoming ? "keyA" : "keyB";
+
     initRC4( crypto, &crypto->dec_key, txt );
-    RC4( &crypto->dec_key, sizeof(discard), discard, discard );
+    RC4( &crypto->dec_key, sizeof( discard ), discard, discard );
 }
 
 void
-tr_cryptoDecrypt( tr_crypto  * crypto,
+tr_cryptoDecrypt( tr_crypto *  crypto,
                   size_t       buf_len,
                   const void * buf_in,
-                  void       * buf_out )
+                  void *       buf_out )
 {
     RC4( &crypto->dec_key, buf_len,
          (const unsigned char*)buf_in,
@@ -219,16 +226,17 @@ void
 tr_cryptoEncryptInit( tr_crypto * crypto )
 {
     unsigned char discard[1024];
-    const char * txt = crypto->isIncoming ? "keyB" : "keyA";
+    const char *  txt = crypto->isIncoming ? "keyB" : "keyA";
+
     initRC4( crypto, &crypto->enc_key, txt );
-    RC4( &crypto->enc_key, sizeof(discard), discard, discard );
+    RC4( &crypto->enc_key, sizeof( discard ), discard, discard );
 }
 
 void
-tr_cryptoEncrypt( tr_crypto  * crypto,
+tr_cryptoEncrypt( tr_crypto *  crypto,
                   size_t       buf_len,
                   const void * buf_in,
-                  void       * buf_out )
+                  void *       buf_out )
 {
     RC4( &crypto->enc_key, buf_len,
          (const unsigned char*)buf_in,
@@ -240,7 +248,7 @@ tr_cryptoEncrypt( tr_crypto  * crypto,
 **/
 
 void
-tr_cryptoSetTorrentHash( tr_crypto     * crypto,
+tr_cryptoSetTorrentHash( tr_crypto *     crypto,
                          const uint8_t * hash )
 {
     crypto->torrentHashIsSet = hash ? 1 : 0;
@@ -273,15 +281,16 @@ tr_cryptoRandInt( int sup )
 {
     int r;
 
-    RAND_pseudo_bytes ((unsigned char *) &r, sizeof r);
+    RAND_pseudo_bytes ( (unsigned char *) &r, sizeof r );
 
-    return ((int) (sup * (abs(r) / (INT_MAX + 1.0))));
+    return (int) ( sup * ( abs( r ) / ( INT_MAX + 1.0 ) ) );
 }
 
 int
 tr_cryptoWeakRandInt( int sup )
 {
     static int init = 0;
+
     assert( sup > 0 );
 
     if( !init )
@@ -290,10 +299,12 @@ tr_cryptoWeakRandInt( int sup )
         init = 1;
     }
 
-    return rand() % sup;
+    return rand( ) % sup;
 }
 
-void tr_cryptoRandBuf ( unsigned char *buf, size_t len )
+void
+tr_cryptoRandBuf( unsigned char *buf,
+                  size_t         len )
 {
     RAND_pseudo_bytes ( buf, len );
 }

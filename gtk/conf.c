@@ -46,7 +46,8 @@ static char * gl_lockpath = NULL;
 
 /* errstr may be NULL, this might be called before GTK is initialized */
 gboolean
-cf_init(const char *dir, char **errstr)
+cf_init( const char *dir,
+         char **     errstr )
 {
     if( errstr != NULL )
         *errstr = NULL;
@@ -58,7 +59,7 @@ cf_init(const char *dir, char **errstr)
 
     if( errstr != NULL )
         *errstr = g_strdup_printf( _( "Couldn't create \"%1$s\": %2$s" ),
-                                   gl_confdir, g_strerror(errno) );
+                                  gl_confdir, g_strerror( errno ) );
 
     return FALSE;
 }
@@ -71,26 +72,32 @@ cf_init(const char *dir, char **errstr)
 
 /* errstr may be NULL, this might be called before GTK is initialized */
 static gboolean
-lockfile(const char * filename, tr_lockfile_state_t *tr_state, char **errstr)
+lockfile( const char *         filename,
+          tr_lockfile_state_t *tr_state,
+          char **              errstr )
 {
     const tr_lockfile_state_t state = tr_lockfile( filename );
-    const gboolean success = state == TR_LOCKFILE_SUCCESS;
+    const gboolean            success = state == TR_LOCKFILE_SUCCESS;
 
-    if( errstr ) switch( state ) {
-        case TR_LOCKFILE_EOPEN:
-        *errstr = g_strdup_printf( _( "Couldn't open \"%1$s\": %2$s" ),
-                                   filename, g_strerror( errno ) );
-            break;
-        case TR_LOCKFILE_ELOCK:
-            *errstr = g_strdup_printf( _( "%s is already running." ),
-                                       g_get_application_name( ) );
-            break;
-        case TR_LOCKFILE_SUCCESS:
-            *errstr = NULL;
-            break;
-    }
+    if( errstr ) switch( state )
+        {
+            case TR_LOCKFILE_EOPEN:
+                *errstr =
+                    g_strdup_printf( _( "Couldn't open \"%1$s\": %2$s" ),
+                                    filename, g_strerror( errno ) );
+                break;
 
-    if( tr_state != NULL)
+            case TR_LOCKFILE_ELOCK:
+                *errstr = g_strdup_printf( _( "%s is already running." ),
+                                          g_get_application_name( ) );
+                break;
+
+            case TR_LOCKFILE_SUCCESS:
+                *errstr = NULL;
+                break;
+        }
+
+    if( tr_state != NULL )
         *tr_state = state;
 
     return success;
@@ -106,18 +113,21 @@ getLockFilename( void )
 static void
 cf_removelocks( void )
 {
-    if( gl_lockpath ) {
-      g_unlink( gl_lockpath );
-      g_free( gl_lockpath );
+    if( gl_lockpath )
+    {
+        g_unlink( gl_lockpath );
+        g_free( gl_lockpath );
     }
 }
 
 /* errstr may be NULL, this might be called before GTK is initialized */
 gboolean
-cf_lock( tr_lockfile_state_t *tr_state, char ** errstr )
+cf_lock( tr_lockfile_state_t *tr_state,
+         char **              errstr )
 {
-    char * path = getLockFilename( );
+    char *         path = getLockFilename( );
     const gboolean didLock = lockfile( path, tr_state, errstr );
+
     if( didLock )
         gl_lockpath = g_strdup( path );
     g_atexit( cf_removelocks );
@@ -141,7 +151,7 @@ getPrefsFilename( void )
 static tr_benc*
 getPrefs( void )
 {
-    static tr_benc dict;
+    static tr_benc  dict;
     static gboolean loaded = FALSE;
 
     if( !loaded )
@@ -164,18 +174,24 @@ int64_t
 pref_int_get( const char * key )
 {
     int64_t i = 0;
+
     tr_bencDictFindInt( getPrefs( ), key, &i );
     return i;
 }
+
 void
-pref_int_set( const char * key, int64_t value )
+pref_int_set( const char * key,
+              int64_t      value )
 {
     tr_benc * d = getPrefs( );
+
     tr_bencDictRemove( d, key );
     tr_bencDictAddInt( d, key, value );
 }
+
 void
-pref_int_set_default( const char * key, int64_t value )
+pref_int_set_default( const char * key,
+                      int64_t      value )
 {
     if( !tr_bencDictFind( getPrefs( ), key ) )
         pref_int_set( key, value );
@@ -186,30 +202,43 @@ pref_int_set_default( const char * key, int64_t value )
 ***/
 
 gboolean
-pref_flag_get ( const char * key )
+pref_flag_get( const char * key )
 {
     int64_t i;
+
     tr_bencDictFindInt( getPrefs( ), key, &i );
     return i != 0;
 }
+
 gboolean
-pref_flag_eval( pref_flag_t val, const char * key )
+pref_flag_eval( pref_flag_t  val,
+                const char * key )
 {
-    switch( val ) {
-        case PREF_FLAG_TRUE: return TRUE;
-        case PREF_FLAG_FALSE: return FALSE;
-        default: return pref_flag_get( key );
+    switch( val )
+    {
+        case PREF_FLAG_TRUE:
+            return TRUE;
+
+        case PREF_FLAG_FALSE:
+            return FALSE;
+
+        default:
+            return pref_flag_get( key );
     }
 }
+
 void
-pref_flag_set( const char * key, gboolean value )
+pref_flag_set( const char * key,
+               gboolean     value )
 {
-    pref_int_set( key, value!=0 );
+    pref_int_set( key, value != 0 );
 }
+
 void
-pref_flag_set_default( const char * key, gboolean value )
+pref_flag_set_default( const char * key,
+                       gboolean     value )
 {
-    pref_int_set_default( key, value!=0 );
+    pref_int_set_default( key, value != 0 );
 }
 
 /***
@@ -220,20 +249,24 @@ const char*
 pref_string_get( const char * key )
 {
     const char * str = NULL;
+
     tr_bencDictFindStr( getPrefs( ), key, &str );
     return str;
 }
 
 void
-pref_string_set( const char * key, const char * value )
+pref_string_set( const char * key,
+                 const char * value )
 {
     tr_benc * d = getPrefs( );
+
     tr_bencDictRemove( d, key );
     tr_bencDictAddStr( d, key, value );
 }
 
 void
-pref_string_set_default( const char * key, const char * value )
+pref_string_set_default( const char * key,
+                         const char * value )
 {
     if( !tr_bencDictFind( getPrefs( ), key ) )
         pref_string_set( key, value );
@@ -260,81 +293,98 @@ pref_save( void )
 ****
 ***/
 
-#if !GLIB_CHECK_VERSION(2,8,0)
+#if !GLIB_CHECK_VERSION( 2, 8, 0 )
 static void
-tr_file_set_contents( const char * filename, const void * out, size_t len, GError* unused UNUSED )
+tr_file_set_contents( const char *   filename,
+                      const void *   out,
+                      size_t         len,
+                      GError* unused UNUSED )
 {
     FILE * fp = fopen( filename, "wb+" );
-    if( fp != NULL ) {
+
+    if( fp != NULL )
+    {
         fwrite( out, 1, len, fp );
         fclose( fp );
     }
 }
-#define g_file_set_contents tr_file_set_contents
+
+ #define g_file_set_contents tr_file_set_contents
 #endif
 
 static char*
 getCompat080PrefsFilename( void )
 {
     assert( gl_confdir != NULL );
-    return g_build_filename( g_get_home_dir(), ".transmission", "gtk", "prefs", NULL );
+    return g_build_filename(
+               g_get_home_dir( ), ".transmission", "gtk", "prefs", NULL );
 }
 
 static char*
 getCompat090PrefsFilename( void )
 {
     assert( gl_confdir != NULL );
-    return g_build_filename( g_get_home_dir(), ".transmission", "gtk", "prefs.ini", NULL );
+    return g_build_filename(
+               g_get_home_dir( ), ".transmission", "gtk", "prefs.ini", NULL );
 }
 
 static char*
 getCompat121PrefsFilename( void )
 {
-    return g_build_filename( g_get_user_config_dir(), "transmission", "gtk", "prefs.ini", NULL );
+    return g_build_filename(
+               g_get_user_config_dir( ), "transmission", "gtk", "prefs.ini",
+               NULL );
 }
 
 static void
-translate_08_to_09( const char* oldfile, const char* newfile )
+translate_08_to_09( const char* oldfile,
+                    const char* newfile )
 {
-    static struct pref_entry {
-	const char* oldkey;
-	const char* newkey;
+    static struct pref_entry
+    {
+        const char*   oldkey;
+        const char*   newkey;
     } pref_table[] = {
-	{ "add-behavior-ipc",       "add-behavior-ipc"},
-	{ "add-behavior-standard",  "add-behavior-standard"},
-	{ "download-directory",     "default-download-directory"},
-	{ "download-limit",         "download-limit"},
-	{ "use-download-limit",     "download-limit-enabled" },
-	{ "listening-port",         "listening-port"},
-	{ "use-nat-traversal",      "nat-traversal-enabled"},
-	{ "use-peer-exchange",      "pex-enabled"},
-	{ "ask-quit",               "prompt-before-exit"},
-	{ "ask-download-directory", "prompt-for-download-directory"},
-	{ "use-tray-icon",          "system-tray-icon-enabled"},
-	{ "upload-limit",           "upload-limit"},
-	{ "use-upload-limit",       "upload-limit-enabled"}
+        { "add-behavior-ipc",       "add-behavior-ipc"                                             },
+        { "add-behavior-standard",  "add-behavior-standard"                                        },
+        { "download-directory",     "default-download-directory"                                   },
+        { "download-limit",         "download-limit"                                               },
+        { "use-download-limit",     "download-limit-enabled"                                       },
+        { "listening-port",         "listening-port"                                               },
+        { "use-nat-traversal",      "nat-traversal-enabled"                                        },
+        { "use-peer-exchange",      "pex-enabled"                                                  },
+        { "ask-quit",               "prompt-before-exit"                                           },
+        { "ask-download-directory", "prompt-for-download-directory"                                },
+        { "use-tray-icon",          "system-tray-icon-enabled"                                     },
+        { "upload-limit",           "upload-limit"                                                 },
+        { "use-upload-limit",       "upload-limit-enabled"                                         }
     };
 
     GString * out = g_string_new( NULL );
-    gchar * contents = NULL;
-    gsize contents_len = 0;
-    tr_benc top;
+    gchar *   contents = NULL;
+    gsize     contents_len = 0;
+    tr_benc   top;
 
-    memset( &top, 0, sizeof(tr_benc) );
+    memset( &top, 0, sizeof( tr_benc ) );
 
     if( g_file_get_contents( oldfile, &contents, &contents_len, NULL )
-        && !tr_bencLoad( contents, contents_len, &top, NULL )
-        && top.type==TYPE_DICT )
+      && !tr_bencLoad( contents, contents_len, &top, NULL )
+      && top.type == TYPE_DICT )
     {
         unsigned int i;
         g_string_append( out, "\n[general]\n" );
-        for ( i=0; i<G_N_ELEMENTS(pref_table); ++i ) {
-            const tr_benc * val = tr_bencDictFind( &top, pref_table[i].oldkey );
-            if( val != NULL ) {
+        for( i = 0; i < G_N_ELEMENTS( pref_table ); ++i )
+        {
+            const tr_benc * val = tr_bencDictFind( &top,
+                                                   pref_table[i].oldkey );
+            if( val != NULL )
+            {
                 const char * valstr = val->val.s.s;
                 if( !strcmp( valstr, "yes" ) ) valstr = "true";
                 if( !strcmp( valstr, "no" ) ) valstr = "false";
-                g_string_append_printf( out, "%s=%s\n", pref_table[i].newkey, valstr );
+                g_string_append_printf( out, "%s=%s\n",
+                                        pref_table[i].newkey,
+                                        valstr );
             }
         }
     }
@@ -345,25 +395,27 @@ translate_08_to_09( const char* oldfile, const char* newfile )
 }
 
 static void
-translate_keyfile_to_json( const char * old_file, const char * new_file )
+translate_keyfile_to_json( const char * old_file,
+                           const char * new_file )
 {
-    tr_benc dict;
+    tr_benc    dict;
     GKeyFile * keyfile;
-    gchar ** keys;
-    gsize i;
-    gsize length;
+    gchar **   keys;
+    gsize      i;
+    gsize      length;
 
-    static struct pref_entry {
-	const char* oldkey;
-	const char* newkey;
+    static struct pref_entry
+    {
+        const char*   oldkey;
+        const char*   newkey;
     } renamed[] = {
-	{ "default-download-directory", "download-dir" },
-        { "encrypted-connections-only", "encryption" },
-	{ "listening-port", "peer-port" },
-        { "nat-traversal-enabled", "port-forwarding-enabled" },
-        { "open-dialog-folder", "open-dialog-dir" },
-        { "watch-folder", "watch-dir" },
-        { "watch-folder-enabled", "watch-dir-enabled" }
+        { "default-download-directory", "download-dir"                                        },
+        { "encrypted-connections-only", "encryption"                                          },
+        { "listening-port",             "peer-port"                                           },
+        { "nat-traversal-enabled",      "port-forwarding-enabled"                             },
+        { "open-dialog-folder",         "open-dialog-dir"                                     },
+        { "watch-folder",               "watch-dir"                                           },
+        { "watch-folder-enabled",       "watch-dir-enabled"                                   }
     };
 
     keyfile = g_key_file_new( );
@@ -372,21 +424,23 @@ translate_keyfile_to_json( const char * old_file, const char * new_file )
     keys = g_key_file_get_keys( keyfile, "general", &length, NULL );
 
     tr_bencInitDict( &dict, length );
-    for( i=0; i<length; ++i )
+    for( i = 0; i < length; ++i )
     {
-        guint j;
+        guint        j;
         const char * key = keys[i];
-        gchar * val = g_key_file_get_value( keyfile, "general", key, NULL );
+        gchar *      val = g_key_file_get_value( keyfile, "general", key,
+                                                 NULL );
 
-        for( j=0; j<G_N_ELEMENTS(renamed); ++j )
+        for( j = 0; j < G_N_ELEMENTS( renamed ); ++j )
             if( !strcmp( renamed[j].oldkey, key ) )
                 key = renamed[j].newkey;
 
-        if( !strcmp(val,"true") || !strcmp(val,"false") )
+        if( !strcmp( val, "true" ) || !strcmp( val, "false" ) )
             tr_bencDictAddInt( &dict, key, !strcmp( val, "true" ) );
-        else {
+        else
+        {
             char * end;
-            long l;
+            long   l;
             errno = 0;
             l = strtol( val, &end, 10 );
             if( !errno && end && !*end )
@@ -425,7 +479,9 @@ cf_check_older_configs( void )
         else if( g_file_test( benc, G_FILE_TEST_IS_REGULAR ) )
         {
             char * tmpfile;
-            int fd = g_file_open_tmp( "transmission-prefs-XXXXXX", &tmpfile, NULL );
+            int    fd =
+                g_file_open_tmp( "transmission-prefs-XXXXXX", &tmpfile,
+                                 NULL );
             if( fd != -1 ) close( fd );
             translate_08_to_09( benc, tmpfile );
             translate_keyfile_to_json( tmpfile, filename );
@@ -439,3 +495,4 @@ cf_check_older_configs( void )
 
     g_free( filename );
 }
+

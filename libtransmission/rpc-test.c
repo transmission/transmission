@@ -9,29 +9,34 @@
 
 static int test = 0;
 
-#define check(A) { \
-    ++test; \
-    if (A) { \
-        if( VERBOSE ) \
-            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-    } else { \
-        if( VERBOSE ) \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-        return test; \
-    } \
-}
+#define check( A ) \
+    { \
+        ++test; \
+        if( A ){ \
+            if( VERBOSE ) \
+                fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__,\
+                         __LINE__ );\
+        } else { \
+            if( VERBOSE ) \
+                fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__,\
+                         __LINE__ );\
+            return test; \
+        } \
+    }
 
 extern char* cidrize( const char * in );
 
-extern int tr_rpcTestACL( const void           * unused,
-                          const char           * acl,
-                          char                ** setme_errmsg );
+extern int   tr_rpcTestACL( const void * unused,
+                            const char * acl,
+                            char **      setme_errmsg );
 
 static int
-testWildcard( const char * in, const char * expected )
+testWildcard( const char * in,
+              const char * expected )
 {
-    int ok;
+    int    ok;
     char * str = cidrize( in );
+
 /* fprintf( stderr, "in [%s] out [%s] expected [%s]\n", in, str, expected ); */
     ok = expected ? !strcmp( expected, str ) : !str;
     tr_free( str );
@@ -41,7 +46,7 @@ testWildcard( const char * in, const char * expected )
 static int
 test_acl( void )
 {
-    int err;
+    int    err;
     char * errmsg = NULL;
 
     check( testWildcard( "192.*.*.*", "192.0.0.0/8" ) );
@@ -69,9 +74,9 @@ test_acl( void )
 static int
 test_list( void )
 {
-    int64_t i;
+    int64_t      i;
     const char * str;
-    tr_benc top;
+    tr_benc      top;
 
     tr_rpc_parse_list_str( &top, "12", -1 );
     check( tr_bencIsInt( &top ) );
@@ -121,10 +126,11 @@ main( void )
 {
     int i;
 
-    if(( i = test_acl( )))
+    if( ( i = test_acl( ) ) )
         return i;
-    if(( i = test_list( )))
+    if( ( i = test_list( ) ) )
         return i;
 
     return 0;
 }
+

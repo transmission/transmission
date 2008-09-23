@@ -39,21 +39,23 @@
 
 struct quitdata
 {
-    TrCore          * core;
+    TrCore *          core;
     callbackfunc_t    func;
-    void            * cbdata;
-    GtkWidget       * dontask;
+    void *            cbdata;
+    GtkWidget *       dontask;
 };
 
 static void
-quitresp( GtkWidget * widget, int response, gpointer data )
+quitresp( GtkWidget * widget,
+          int         response,
+          gpointer    data )
 {
     struct quitdata * stuff = data;
     GtkToggleButton * tb = GTK_TOGGLE_BUTTON( stuff->dontask );
 
     tr_core_set_pref_bool( stuff->core,
-                           PREF_KEY_ASKQUIT,
-                           !gtk_toggle_button_get_active( tb ) );
+                          PREF_KEY_ASKQUIT,
+                          !gtk_toggle_button_get_active( tb ) );
 
     if( response == GTK_RESPONSE_ACCEPT )
         stuff->func( stuff->cbdata );
@@ -63,12 +65,13 @@ quitresp( GtkWidget * widget, int response, gpointer data )
 }
 
 static gboolean
-countActiveTorrents( GtkTreeModel  * model,
+countActiveTorrents( GtkTreeModel *       model,
                      GtkTreePath   * path UNUSED,
-                     GtkTreeIter   * iter,
-                     gpointer        activeTorrentCount )
+                     GtkTreeIter *        iter,
+                     gpointer             activeTorrentCount )
 {
     int status = -1;
+
     gtk_tree_model_get( model, iter, MC_STATUS, &status, -1 );
     if( status != TR_STATUS_STOPPED )
         *(int*)activeTorrentCount += 1;
@@ -76,19 +79,20 @@ countActiveTorrents( GtkTreeModel  * model,
 }
 
 void
-askquit( TrCore          * core,
-         GtkWindow       * parent,
-         callbackfunc_t    func,
-         void            * cbdata )
+askquit( TrCore *       core,
+         GtkWindow *    parent,
+         callbackfunc_t func,
+         void *         cbdata )
 {
     struct quitdata * stuff;
-    GtkWidget * wind;
-    GtkWidget * dontask;
-    GtkTreeModel * model;
-    int activeTorrentCount;
+    GtkWidget *       wind;
+    GtkWidget *       dontask;
+    GtkTreeModel *    model;
+    int               activeTorrentCount;
 
     /* if the user doesn't want to be asked, don't ask */
-    if( !pref_flag_get( PREF_KEY_ASKQUIT ) ) {
+    if( !pref_flag_get( PREF_KEY_ASKQUIT ) )
+    {
         func( cbdata );
         return;
     }
@@ -97,7 +101,8 @@ askquit( TrCore          * core,
     model = tr_core_model( core );
     activeTorrentCount = 0;
     gtk_tree_model_foreach( model, countActiveTorrents, &activeTorrentCount );
-    if( !activeTorrentCount ) {
+    if( !activeTorrentCount )
+    {
         func( cbdata );
         return;
     }
@@ -107,13 +112,15 @@ askquit( TrCore          * core,
     stuff->cbdata  = cbdata;
     stuff->core    = core;
 
-    wind = gtk_message_dialog_new_with_markup( parent,
-                                               GTK_DIALOG_DESTROY_WITH_PARENT,
-                                               GTK_MESSAGE_WARNING,
-                                               GTK_BUTTONS_NONE,
-                                               _("<big><b>Quit Transmission?</b></big>") );
+    wind = gtk_message_dialog_new_with_markup(
+         parent,
+        GTK_DIALOG_DESTROY_WITH_PARENT,
+        GTK_MESSAGE_WARNING,
+        GTK_BUTTONS_NONE,
+        _(
+            "<big><b>Quit Transmission?</b></big>" ) );
 
-    gtk_dialog_add_buttons( GTK_DIALOG(wind),
+    gtk_dialog_add_buttons( GTK_DIALOG( wind ),
                             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                             GTK_STOCK_QUIT, GTK_RESPONSE_ACCEPT,
                             NULL );
@@ -124,10 +131,12 @@ askquit( TrCore          * core,
                                              GTK_RESPONSE_CANCEL,
                                              -1 );
 
-    dontask = gtk_check_button_new_with_mnemonic( _("_Don't ask me again") );
+    dontask = gtk_check_button_new_with_mnemonic( _( "_Don't ask me again" ) );
     stuff->dontask = dontask;
 
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(wind)->vbox), dontask, FALSE, FALSE, GUI_PAD );
+    gtk_box_pack_start( GTK_BOX( GTK_DIALOG(
+                                     wind )->vbox ), dontask, FALSE, FALSE,
+                        GUI_PAD );
 
     g_signal_connect( G_OBJECT( wind ), "response",
                       G_CALLBACK( quitresp ), stuff );
@@ -141,24 +150,26 @@ askquit( TrCore          * core,
 
 struct DeleteData
 {
-    gboolean delete_files;
-    GSList * torrents;
-    TrCore * core;
+    gboolean    delete_files;
+    GSList *    torrents;
+    TrCore *    core;
 };
 
 static void
 removeTorrents( struct DeleteData * data )
 {
     GSList * l;
-    for( l=data->torrents; l!=NULL; l=l->next )
+
+    for( l = data->torrents; l != NULL; l = l->next )
         tr_core_remove_torrent( data->core, l->data, data->delete_files );
     g_slist_free( data->torrents );
     data->torrents = NULL;
 }
 
-
 static void
-removeResponse( GtkDialog * dialog, gint response, gpointer gdata )
+removeResponse( GtkDialog * dialog,
+                gint        response,
+                gpointer    gdata )
 {
     struct DeleteData * data = gdata;
 
@@ -173,26 +184,27 @@ removeResponse( GtkDialog * dialog, gint response, gpointer gdata )
 }
 
 static void
-countBusyTorrents( gpointer gtor, gpointer busyCount )
+countBusyTorrents( gpointer gtor,
+                   gpointer busyCount )
 {
     const tr_stat * stat = tr_torrent_stat( gtor );
 
     if( stat->leftUntilDone || stat->peersConnected )
-        ++(*(int*)busyCount);
+        ++( *(int*)busyCount );
 }
 
 void
 confirmRemove( GtkWindow * parent,
-               TrCore    * core,
-               GSList    * torrents,
+               TrCore *    core,
+               GSList *    torrents,
                gboolean    delete_files )
 {
-    GtkWidget * d;
+    GtkWidget *         d;
     struct DeleteData * dd;
-    int busyCount;
-    const int count = g_slist_length( torrents );
-    const char * primary_text;
-    const char * secondary_text;
+    int                 busyCount;
+    const int           count = g_slist_length( torrents );
+    const char *        primary_text;
+    const char *        secondary_text;
 
     if( !count )
         return;
@@ -213,31 +225,37 @@ confirmRemove( GtkWindow * parent,
     }
 
     if( !delete_files )
-        primary_text = ngettext( "Remove torrent?", "Remove torrents?", count );
+        primary_text = ngettext( "Remove torrent?", "Remove torrents?",
+                                 count );
     else
         primary_text = ngettext( "Delete this torrent's downloaded files?",
                                  "Delete these torrents' downloaded files?",
                                  count );
 
     if( busyCount > 1 )
-        secondary_text = _( "Some of these torrents are incomplete or connected to peers." );
+        secondary_text = _(
+            "Some of these torrents are incomplete or connected to peers." );
     else if( busyCount == 0 )
         secondary_text = NULL;
     else
-        secondary_text = ngettext( "This torrent is incomplete or connected to peers.",
-                                   "One of these torrents is incomplete or connected to peers.",
-                                   count );
+        secondary_text = ngettext(
+            "This torrent is incomplete or connected to peers.",
+            "One of these torrents is incomplete or connected to peers.",
+            count );
 
     d = gtk_message_dialog_new_with_markup( parent,
                                             GTK_DIALOG_DESTROY_WITH_PARENT,
                                             GTK_MESSAGE_WARNING,
                                             GTK_BUTTONS_NONE,
-                                            "<big><b>%s</b></big>", primary_text );
+                                            "<big><b>%s</b></big>",
+                                            primary_text );
     if( secondary_text )
-        gtk_message_dialog_format_secondary_markup( GTK_MESSAGE_DIALOG( d ), secondary_text );
+        gtk_message_dialog_format_secondary_markup( GTK_MESSAGE_DIALOG(
+                                                        d ), secondary_text );
     gtk_dialog_add_buttons( GTK_DIALOG( d ),
                             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                            (delete_files ? GTK_STOCK_DELETE : GTK_STOCK_REMOVE), GTK_RESPONSE_ACCEPT,
+                            ( delete_files ? GTK_STOCK_DELETE :
+                              GTK_STOCK_REMOVE ), GTK_RESPONSE_ACCEPT,
                             NULL );
     gtk_dialog_set_default_response( GTK_DIALOG ( d ),
                                      GTK_RESPONSE_CANCEL );
@@ -248,3 +266,4 @@ confirmRemove( GtkWindow * parent,
     g_signal_connect( d, "response", G_CALLBACK( removeResponse ), dd );
     gtk_widget_show_all( d );
 }
+

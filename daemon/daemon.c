@@ -3,7 +3,7 @@
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license. 
+ * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
@@ -12,7 +12,7 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdio.h> /* printf */ 
+#include <stdio.h> /* printf */
 #include <stdlib.h> /* exit, atoi */
 #include <string.h> /* strcmp */
 
@@ -29,9 +29,9 @@
 
 #define MY_NAME "transmission-daemon"
 
-static int closing = FALSE;
+static int         closing = FALSE;
 static tr_handle * mySession;
-static char myConfigFilename[MAX_PATH_LENGTH];
+static char        myConfigFilename[MAX_PATH_LENGTH];
 
 #define KEY_BLOCKLIST        "blocklist-enabled"
 #define KEY_DOWNLOAD_DIR     "download-dir"
@@ -58,59 +58,75 @@ static char myConfigFilename[MAX_PATH_LENGTH];
 ***/
 
 static void
-replaceInt( tr_benc * dict, const char * key, int64_t value )
+replaceInt( tr_benc *    dict,
+            const char * key,
+            int64_t      value )
 {
     tr_bencDictRemove( dict, key );
     tr_bencDictAddInt( dict, key, value );
 }
+
 static void
-replaceStr( tr_benc * dict, const char * key, const char* value )
+replaceStr( tr_benc *    dict,
+            const char * key,
+            const char*  value )
 {
     tr_bencDictRemove( dict, key );
     tr_bencDictAddStr( dict, key, value );
 }
+
 static void
 saveState( tr_session * s )
 {
-    int i, n = 0;
-    char * strs[4];
+    int     i, n = 0;
+    char *  strs[4];
 
     tr_benc d;
+
     if( tr_bencLoadJSONFile( myConfigFilename, &d ) )
         tr_bencInitDict( &d, 16 );
-    
+
     replaceInt( &d, KEY_BLOCKLIST,       tr_blocklistIsEnabled( s ) );
     replaceStr( &d, KEY_DOWNLOAD_DIR,    tr_sessionGetDownloadDir( s ) );
     replaceInt( &d, KEY_PEER_LIMIT,      tr_sessionGetPeerLimit( s ) );
     replaceInt( &d, KEY_PEER_PORT,       tr_sessionGetPeerPort( s ) );
-    replaceInt( &d, KEY_PORT_FORWARDING, tr_sessionIsPortForwardingEnabled( s ) );
+    replaceInt( &d, KEY_PORT_FORWARDING,
+               tr_sessionIsPortForwardingEnabled( s ) );
     replaceInt( &d, KEY_PEX_ENABLED,     tr_sessionIsPexEnabled( s ) );
-    replaceStr( &d, KEY_USERNAME,        strs[n++] = tr_sessionGetRPCUsername( s ) );
-    replaceStr( &d, KEY_PASSWORD,        strs[n++] = tr_sessionGetRPCPassword( s ) );
+    replaceStr( &d, KEY_USERNAME,        strs[n++] =
+                   tr_sessionGetRPCUsername(
+                       s ) );
+    replaceStr( &d, KEY_PASSWORD,        strs[n++] =
+                   tr_sessionGetRPCPassword(
+                       s ) );
     replaceStr( &d, KEY_ACL,             strs[n++] = tr_sessionGetRPCACL( s ) );
     replaceInt( &d, KEY_RPC_PORT,        tr_sessionGetRPCPort( s ) );
     replaceInt( &d, KEY_AUTH_REQUIRED,   tr_sessionIsRPCPasswordEnabled( s ) );
-    replaceInt( &d, KEY_DSPEED,          tr_sessionGetSpeedLimit( s, TR_DOWN ) );
-    replaceInt( &d, KEY_DSPEED_ENABLED,  tr_sessionIsSpeedLimitEnabled( s, TR_DOWN ) );
+    replaceInt( &d, KEY_DSPEED,
+               tr_sessionGetSpeedLimit( s, TR_DOWN ) );
+    replaceInt( &d, KEY_DSPEED_ENABLED,
+               tr_sessionIsSpeedLimitEnabled( s, TR_DOWN ) );
     replaceInt( &d, KEY_USPEED,          tr_sessionGetSpeedLimit( s, TR_UP ) );
-    replaceInt( &d, KEY_USPEED_ENABLED,  tr_sessionIsSpeedLimitEnabled( s, TR_UP ) );
+    replaceInt( &d, KEY_USPEED_ENABLED,
+               tr_sessionIsSpeedLimitEnabled( s, TR_UP ) );
     replaceInt( &d, KEY_ENCRYPTION,      tr_sessionGetEncryption( s ) );
 
     tr_bencSaveJSONFile( myConfigFilename, &d );
     tr_bencFree( &d );
     tr_ninf( MY_NAME, "saved \"%s\"", myConfigFilename );
 
-    for( i=0; i<n; ++i )
+    for( i = 0; i < n; ++i )
         tr_free( strs[i] );
 }
 
 static void
-getConfigInt( tr_benc     * dict,
-              const char  * key,
-              int         * setme,
-              int           defaultVal )
+getConfigInt( tr_benc *    dict,
+              const char * key,
+              int *        setme,
+              int          defaultVal )
 {
-    if( *setme < 0 ) {
+    if( *setme < 0 )
+    {
         int64_t i;
         if( tr_bencDictFindInt( dict, key, &i ) )
             *setme = i;
@@ -120,12 +136,13 @@ getConfigInt( tr_benc     * dict,
 }
 
 static void
-getConfigStr( tr_benc      * dict,
-              const char   * key,
-              const char  ** setme,
-              const char   * defaultVal )
+getConfigStr( tr_benc *     dict,
+              const char *  key,
+              const char ** setme,
+              const char *  defaultVal )
 {
-    if( !*setme ) {
+    if( !*setme )
+    {
         const char * s;
         if( tr_bencDictFindStr( dict, key, &s ) )
             *setme = s;
@@ -140,20 +157,25 @@ getConfigStr( tr_benc      * dict,
  * @param blocklist TRUE, FALSE, or -1 if not set on the command line
  */
 static void
-session_init( const char * configDir, const char * downloadDir,
-              int rpcPort, const char * acl,
-              int authRequired, const char * username, const char * password,
-              int blocklistEnabled )
+session_init( const char * configDir,
+              const char * downloadDir,
+              int          rpcPort,
+              const char * acl,
+              int          authRequired,
+              const char * username,
+              const char * password,
+              int          blocklistEnabled )
 {
-    char mycwd[MAX_PATH_LENGTH];
-    tr_benc state, *dict = NULL;
-    int peerPort=-1, peers=-1;
-    int pexEnabled = -1;
-    int fwdEnabled = -1;
-    int upLimit=-1, upLimited=-1, downLimit=-1, downLimited=-1;
-    int encryption = -1;
-    int useLazyBitfield = -1;
-    tr_ctor * ctor;
+    char          mycwd[MAX_PATH_LENGTH];
+    tr_benc       state, *dict = NULL;
+    int           peerPort = -1, peers = -1;
+    int           pexEnabled = -1;
+    int           fwdEnabled = -1;
+    int           upLimit = -1, upLimited = -1, downLimit = -1,
+                  downLimited = -1;
+    int           encryption = -1;
+    int           useLazyBitfield = -1;
+    tr_ctor *     ctor;
     tr_torrent ** torrents;
 
     if( !tr_bencLoadJSONFile( myConfigFilename, &state ) )
@@ -168,22 +190,31 @@ session_init( const char * configDir, const char * downloadDir,
 
     getcwd( mycwd, sizeof( mycwd ) );
     getConfigStr( dict, KEY_DOWNLOAD_DIR,    &downloadDir,       mycwd );
-    getConfigInt( dict, KEY_PEX_ENABLED,     &pexEnabled,        TR_DEFAULT_PEX_ENABLED );
-    getConfigInt( dict, KEY_PORT_FORWARDING, &fwdEnabled,        TR_DEFAULT_PORT_FORWARDING_ENABLED );
-    getConfigInt( dict, KEY_PEER_PORT,       &peerPort,          TR_DEFAULT_PORT );
+    getConfigInt( dict, KEY_PEX_ENABLED,     &pexEnabled,
+                  TR_DEFAULT_PEX_ENABLED );
+    getConfigInt( dict, KEY_PORT_FORWARDING, &fwdEnabled,
+                  TR_DEFAULT_PORT_FORWARDING_ENABLED );
+    getConfigInt( dict, KEY_PEER_PORT,       &peerPort,
+                  TR_DEFAULT_PORT );
     getConfigInt( dict, KEY_DSPEED,          &downLimit,         100 );
     getConfigInt( dict, KEY_DSPEED_ENABLED,  &downLimited,       FALSE );
     getConfigInt( dict, KEY_USPEED,          &upLimit,           100 );
     getConfigInt( dict, KEY_USPEED_ENABLED,  &upLimited,         FALSE );
-    getConfigInt( dict, KEY_LAZY_BITFIELD,   &useLazyBitfield,   TR_DEFAULT_LAZY_BITFIELD_ENABLED );
-    getConfigInt( dict, KEY_PEER_LIMIT,      &peers,             TR_DEFAULT_GLOBAL_PEER_LIMIT );
-    getConfigInt( dict, KEY_BLOCKLIST,       &blocklistEnabled,  TR_DEFAULT_BLOCKLIST_ENABLED );
-    getConfigInt( dict, KEY_RPC_PORT,        &rpcPort,           TR_DEFAULT_RPC_PORT );
-    getConfigStr( dict, KEY_ACL,             &acl,               TR_DEFAULT_RPC_ACL );
+    getConfigInt( dict, KEY_LAZY_BITFIELD,   &useLazyBitfield,
+                  TR_DEFAULT_LAZY_BITFIELD_ENABLED );
+    getConfigInt( dict, KEY_PEER_LIMIT,      &peers,
+                  TR_DEFAULT_GLOBAL_PEER_LIMIT );
+    getConfigInt( dict, KEY_BLOCKLIST,       &blocklistEnabled,
+                  TR_DEFAULT_BLOCKLIST_ENABLED );
+    getConfigInt( dict, KEY_RPC_PORT,        &rpcPort,
+                  TR_DEFAULT_RPC_PORT );
+    getConfigStr( dict, KEY_ACL,             &acl,
+                  TR_DEFAULT_RPC_ACL );
     getConfigInt( dict, KEY_AUTH_REQUIRED,   &authRequired,      FALSE );
     getConfigStr( dict, KEY_USERNAME,        &username,          NULL );
     getConfigStr( dict, KEY_PASSWORD,        &password,          NULL );
-    getConfigInt( dict, KEY_ENCRYPTION,      &encryption,        TR_ENCRYPTION_PREFERRED );
+    getConfigInt( dict, KEY_ENCRYPTION,      &encryption,
+                  TR_ENCRYPTION_PREFERRED );
 
     /***
     ****
@@ -200,7 +231,8 @@ session_init( const char * configDir, const char * downloadDir,
                                     TR_MSG_INF, 0,
                                     blocklistEnabled,
                                     TR_DEFAULT_PEER_SOCKET_TOS,
-                                    TRUE, rpcPort, acl, authRequired, username, password,
+                                    TRUE, rpcPort, acl, authRequired,
+                                    username, password,
                                     TR_DEFAULT_PROXY_ENABLED,
                                     TR_DEFAULT_PROXY,
                                     TR_DEFAULT_PROXY_PORT,
@@ -226,62 +258,108 @@ session_init( const char * configDir, const char * downloadDir,
 static const char *
 getUsage( void )
 {
-    return "Transmission "LONG_VERSION_STRING"  http://www.transmissionbt.com/\n"
+    return "Transmission " LONG_VERSION_STRING
+           "  http://www.transmissionbt.com/\n"
            "A fast and easy BitTorrent client\n"
            "\n"
-           MY_NAME" is a headless Transmission session\n"
-           "that can be controlled via transmission-remote or Clutch.\n"
-           "\n"
-           "Usage: "MY_NAME" [options]";
+           MY_NAME " is a headless Transmission session\n"
+                   "that can be controlled via transmission-remote or Clutch.\n"
+                   "\n"
+                   "Usage: " MY_NAME " [options]";
 }
 
-static const struct tr_option options[] = {
-    { 'a', "acl",       "Access Control List.  (Default: "TR_DEFAULT_RPC_ACL")", "a", 1, "<list>" },
-    { 'b', "blocklist", "Enable peer blocklists",             "b", 0, NULL },
-    { 'B', "no-blocklist", "Disable peer blocklists",         "B", 0, NULL },
-    { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", 0, NULL },
-    { 'g', "config-dir",   "Where to look for configuration files", "g", 1, "<path>" },
-    { 'p', "port", "RPC port (Default: "TR_DEFAULT_RPC_PORT_STR")", "p", 1, "<port>" },
-    { 't', "auth",         "Require authentication",          "t", 0, NULL },
-    { 'T', "no-auth",      "Don't require authentication",    "T", 0, NULL },
-    { 'u', "username",     "Set username for authentication", "u", 1, "<username>" },
-    { 'v', "password",     "Set password for authentication", "v", 1, "<password>" },
-    { 'w', "download-dir", "Where to save downloaded data",   "w", 1, "<path>" },
-    { 0, NULL, NULL, NULL, 0, NULL }
+static const struct tr_option options[] =
+{
+    { 'a', "acl",
+      "Access Control List.  (Default: " TR_DEFAULT_RPC_ACL ")",       "a",
+      1, "<list>"     },
+    { 'b', "blocklist",    "Enable peer blocklists",
+      "b",             0, NULL         },
+    { 'B', "no-blocklist", "Disable peer blocklists",
+      "B",             0, NULL         },
+    { 'f', "foreground",   "Run in the foreground instead of daemonizing",
+      "f",             0, NULL         },
+    { 'g', "config-dir",   "Where to look for configuration files",
+      "g",             1, "<path>"     },
+    { 'p', "port",
+      "RPC port (Default: " TR_DEFAULT_RPC_PORT_STR ")",               "p",
+      1, "<port>"     },
+    { 't', "auth",         "Require authentication",
+      "t",             0, NULL         },
+    { 'T', "no-auth",      "Don't require authentication",
+      "T",             0, NULL         },
+    { 'u', "username",     "Set username for authentication",
+      "u",             1, "<username>" },
+    { 'v', "password",     "Set password for authentication",
+      "v",             1, "<password>" },
+    { 'w', "download-dir", "Where to save downloaded data",
+      "w",             1, "<path>"     },
+    {   0, NULL,           NULL,
+        NULL,            0, NULL         }
 };
 
 static void
 showUsage( void )
 {
-    tr_getopt_usage( MY_NAME, getUsage(), options );
+    tr_getopt_usage( MY_NAME, getUsage( ), options );
     exit( 0 );
 }
 
 static void
-readargs( int argc, const char ** argv,
-          int * nofork, const char ** configDir, const char ** downloadDir,
-          int * rpcPort, const char ** acl,
-          int * authRequired, const char ** username, const char ** password,
-          int * blocklistEnabled )
+readargs( int           argc,
+          const char ** argv,
+          int *         nofork,
+          const char ** configDir,
+          const char ** downloadDir,
+          int *         rpcPort,
+          const char ** acl,
+          int *         authRequired,
+          const char ** username,
+          const char ** password,
+          int *         blocklistEnabled )
 {
-    int c;
+    int          c;
     const char * optarg;
-    while(( c = tr_getopt( getUsage(), argc, argv, options, &optarg )))
+
+    while( ( c = tr_getopt( getUsage( ), argc, argv, options, &optarg ) ) )
     {
         switch( c )
         {
-            case 'a': *acl = optarg; break;
-            case 'b': *blocklistEnabled = 1; break;
-            case 'B': *blocklistEnabled = 0; break;
-            case 'f': *nofork = 1; break;
-            case 'g': *configDir = optarg; break;
-            case 'p': *rpcPort = atoi( optarg ); break;
-            case 't': *authRequired = TRUE; break;
-            case 'T': *authRequired = FALSE; break;
-            case 'u': *username = optarg; break; 
-            case 'v': *password = optarg; break; 
-            case 'w': *downloadDir = optarg; break;
-            default: showUsage( ); break;
+            case 'a':
+                *acl = optarg; break;
+
+            case 'b':
+                *blocklistEnabled = 1; break;
+
+            case 'B':
+                *blocklistEnabled = 0; break;
+
+            case 'f':
+                *nofork = 1; break;
+
+            case 'g':
+                *configDir = optarg; break;
+
+            case 'p':
+                *rpcPort = atoi( optarg ); break;
+
+            case 't':
+                *authRequired = TRUE; break;
+
+            case 'T':
+                *authRequired = FALSE; break;
+
+            case 'u':
+                *username = optarg; break;
+
+            case 'v':
+                *password = optarg; break;
+
+            case 'w':
+                *downloadDir = optarg; break;
+
+            default:
+                showUsage( ); break;
         }
     }
 }
@@ -292,51 +370,72 @@ gotsig( int sig UNUSED )
     closing = TRUE;
 }
 
-#if !defined(HAVE_DAEMON)
+#if !defined( HAVE_DAEMON )
 static int
-daemon( int nochdir, int noclose )
+daemon( int nochdir,
+        int noclose )
 {
-    switch( fork( ) ) {
+    switch( fork( ) )
+    {
         case 0:
             break;
-        case -1:
-            tr_nerr( MY_NAME, "Error daemonizing (fork)! %d - %s", errno, strerror(errno) );
+
+        case - 1:
+            tr_nerr( MY_NAME, "Error daemonizing (fork)! %d - %s", errno,
+                    strerror(
+                        errno ) );
             return -1;
+
         default:
-            _exit(0);
+            _exit( 0 );
     }
 
-    if( setsid() < 0 ) {
-        tr_nerr( MY_NAME, "Error daemonizing (setsid)! %d - %s", errno, strerror(errno) );
+    if( setsid( ) < 0 )
+    {
+        tr_nerr( MY_NAME, "Error daemonizing (setsid)! %d - %s", errno,
+                strerror(
+                    errno ) );
         return -1;
     }
 
-    switch( fork( ) ) {
+    switch( fork( ) )
+    {
         case 0:
             break;
-        case -1:
-            tr_nerr( MY_NAME, "Error daemonizing (fork2)! %d - %s", errno, strerror(errno) );
+
+        case - 1:
+            tr_nerr( MY_NAME, "Error daemonizing (fork2)! %d - %s", errno,
+                    strerror(
+                        errno ) );
             return -1;
+
         default:
-            _exit(0);
+            _exit( 0 );
     }
 
-    if( !nochdir && 0 > chdir( "/" ) ) {
-        tr_nerr( MY_NAME, "Error daemonizing (chdir)! %d - %s", errno, strerror(errno) );
+    if( !nochdir && 0 > chdir( "/" ) )
+    {
+        tr_nerr( MY_NAME, "Error daemonizing (chdir)! %d - %s", errno,
+                strerror(
+                    errno ) );
         return -1;
     }
 
-    if( !noclose ) {
+    if( !noclose )
+    {
         int fd;
-        if((( fd = open("/dev/null", O_RDONLY))) != 0 ) {
+        if( ( ( fd = open( "/dev/null", O_RDONLY ) ) ) != 0 )
+        {
             dup2( fd,  0 );
             close( fd );
         }
-        if((( fd = open("/dev/null", O_WRONLY))) != 1 ) {
+        if( ( ( fd = open( "/dev/null", O_WRONLY ) ) ) != 1 )
+        {
             dup2( fd, 1 );
             close( fd );
         }
-        if((( fd = open("/dev/null", O_WRONLY))) != 2 ) {
+        if( ( ( fd = open( "/dev/null", O_WRONLY ) ) ) != 2 )
+        {
             dup2( fd, 2 );
             close( fd );
         }
@@ -344,16 +443,18 @@ daemon( int nochdir, int noclose )
 
     return 0;
 }
+
 #endif
 
 int
-main( int argc, char ** argv )
+main( int     argc,
+      char ** argv )
 {
-    int nofork = 0;
-    int rpcPort = -1;
-    int authRequired = -1;
-    int blocklistEnabled = -1;
-    char * freeme = NULL;
+    int          nofork = 0;
+    int          rpcPort = -1;
+    int          authRequired = -1;
+    int          blocklistEnabled = -1;
+    char *       freeme = NULL;
     const char * configDir = NULL;
     const char * downloadDir = NULL;
     const char * acl = NULL;
@@ -370,12 +471,15 @@ main( int argc, char ** argv )
               &rpcPort, &acl, &authRequired, &username, &password,
               &blocklistEnabled );
     if( configDir == NULL )
-        configDir = freeme = tr_strdup_printf( "%s-daemon", tr_getDefaultConfigDir() );
+        configDir = freeme = tr_strdup_printf( "%s-daemon",
+                                              tr_getDefaultConfigDir( ) );
     tr_buildPath( myConfigFilename, sizeof( myConfigFilename ),
                   configDir, CONFIG_FILE, NULL );
 
-    if( !nofork ) {
-        if( 0 > daemon( 1, 0 ) ) {
+    if( !nofork )
+    {
+        if( 0 > daemon( 1, 0 ) )
+        {
             fprintf( stderr, "failed to daemonize: %s\n", strerror( errno ) );
             exit( 1 );
         }
@@ -396,3 +500,4 @@ main( int argc, char ** argv )
     tr_free( freeme );
     return 0;
 }
+

@@ -6,17 +6,20 @@
 
 #define VERBOSE 0
 
-#define check(A) { \
-    ++test; \
-    if (A) { \
-        if( VERBOSE ) \
-            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-    } else { \
-        if( VERBOSE ) \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-        return test; \
-    } \
-}
+#define check( A ) \
+    { \
+        ++test; \
+        if( A ){ \
+            if( VERBOSE ) \
+                fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__,\
+                         __LINE__ );\
+        } else { \
+            if( VERBOSE ) \
+                fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__,\
+                         __LINE__ );\
+            return test; \
+        } \
+    }
 
 int
 main( void )
@@ -24,16 +27,17 @@ main( void )
     int i;
     int test = 0;
 
-    for( i=0; i<100000; ++i )
+    for( i = 0; i < 100000; ++i )
     {
-        int j;
-        int val = 0;
+        int       j;
+        int       val = 0;
         uint8_t * pch = tr_peerIdNew( );
 
         check( strlen( (char*)pch ) == 20 );
         check( !memcmp( pch, PEERID_PREFIX, 8 ) );
 
-        for( j=8; j<20; ++j ) {
+        for( j = 8; j < 20; ++j )
+        {
             char tmp[2] = { pch[j], '\0' };
             val += strtoul( tmp, NULL, 36 );
         }
@@ -45,3 +49,4 @@ main( void )
 
     return 0;
 }
+

@@ -37,8 +37,8 @@
 
 #include <gdk/gdk.h>
 #ifdef GDK_WINDOWING_X11
-#include <X11/Xatom.h>
-#include <gdk/gdkx.h>
+ #include <X11/Xatom.h>
+ #include <gdk/gdkx.h>
 #endif
 
 #include <libtransmission/transmission.h>
@@ -73,98 +73,112 @@
 /* interval in milliseconds to check for stopped torrents and update display */
 #define EXIT_CHECK_INTERVAL     500
 
-#if GTK_CHECK_VERSION(2,8,0)
-#define SHOW_LICENSE
-static const char * LICENSE = 
-"The Transmission binaries and most of its source code is distributed "
-"license. "
-"\n\n"
-"Some files are copyrighted by Charles Kerr and are covered by "
-"the GPL version 2.  Works owned by the Transmission project "
-"are granted a special exemption to clause 2(b) so that the bulk "
-"of its code can remain under the MIT license.  This exemption does "
-"not extend to original or derived works not owned by the "
-"Transmission project. "
-"\n\n"
-"Permission is hereby granted, free of charge, to any person obtaining "
-"a copy of this software and associated documentation files (the "
-"'Software'), to deal in the Software without restriction, including "
-"without limitation the rights to use, copy, modify, merge, publish, "
-"distribute, sublicense, and/or sell copies of the Software, and to "
-"permit persons to whom the Software is furnished to do so, subject to "
-"the following conditions: "
-"\n\n"
-"The above copyright notice and this permission notice shall be included "
-"in all copies or substantial portions of the Software. "
-"\n\n"
-"THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, "
-"EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF "
-"MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. "
-"IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY "
-"CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, "
-"TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE "
-"SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.";
+#if GTK_CHECK_VERSION( 2, 8, 0 )
+ #define SHOW_LICENSE
+static const char * LICENSE =
+    "The Transmission binaries and most of its source code is distributed "
+    "license. "
+    "\n\n"
+    "Some files are copyrighted by Charles Kerr and are covered by "
+    "the GPL version 2.  Works owned by the Transmission project "
+    "are granted a special exemption to clause 2(b) so that the bulk "
+    "of its code can remain under the MIT license.  This exemption does "
+    "not extend to original or derived works not owned by the "
+    "Transmission project. "
+    "\n\n"
+    "Permission is hereby granted, free of charge, to any person obtaining "
+    "a copy of this software and associated documentation files (the "
+    "'Software'), to deal in the Software without restriction, including "
+    "without limitation the rights to use, copy, modify, merge, publish, "
+    "distribute, sublicense, and/or sell copies of the Software, and to "
+    "permit persons to whom the Software is furnished to do so, subject to "
+    "the following conditions: "
+    "\n\n"
+    "The above copyright notice and this permission notice shall be included "
+    "in all copies or substantial portions of the Software. "
+    "\n\n"
+    "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, "
+    "EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF "
+    "MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. "
+    "IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY "
+    "CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, "
+    "TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE "
+    "SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.";
 #endif
 
 struct cbdata
 {
-    gboolean       minimized;
-    gboolean       closing;
-    guint          timer;
-    guint          idle_hide_mainwindow_tag;
-    gpointer       icon;
-    GtkWindow    * wind;
-    TrCore       * core;
-    GtkWidget    * msgwin;
-    GtkWidget    * prefs;
-    GSList       * errqueue;
-    GSList       * dupqueue;
-    GHashTable   * tor2details;
-    GHashTable   * details2tor;
+    gboolean      minimized;
+    gboolean      closing;
+    guint         timer;
+    guint         idle_hide_mainwindow_tag;
+    gpointer      icon;
+    GtkWindow *   wind;
+    TrCore *      core;
+    GtkWidget *   msgwin;
+    GtkWidget *   prefs;
+    GSList *      errqueue;
+    GSList *      dupqueue;
+    GHashTable *  tor2details;
+    GHashTable *  details2tor;
 };
 
 #define CBDATA_PTR "callback-data-pointer"
 
 static GtkUIManager * myUIManager = NULL;
 
-static void
-appsetup( TrWindow * wind, GSList * args,
-          struct cbdata *,
-          gboolean paused, gboolean minimized );
-static void
-winsetup( struct cbdata * cbdata, TrWindow * wind );
-static void
-wannaquit( void * vdata );
-static void
-setupdrag(GtkWidget *widget, struct cbdata *data);
-static void
-gotdrag(GtkWidget *widget, GdkDragContext *dc, gint x, gint y,
-        GtkSelectionData *sel, guint info, guint time, gpointer gdata);
+static void           appsetup( TrWindow * wind,
+                                GSList *   args,
+                                struct     cbdata *,
+                                gboolean   paused,
+                                gboolean   minimized );
 
-static void
-coreerr( TrCore * core, enum tr_core_err code, const char * msg,
-         gpointer gdata );
-static void
-onAddTorrent( TrCore *, tr_ctor *, gpointer );
-static void
-prefschanged( TrCore * core, const char * key, gpointer data );
-static gboolean
-updatemodel(gpointer gdata);
+static void           winsetup( struct cbdata * cbdata,
+                                TrWindow *      wind );
+
+static void           wannaquit( void * vdata );
+
+static void           setupdrag( GtkWidget *    widget,
+                                 struct cbdata *data );
+
+static void           gotdrag( GtkWidget *       widget,
+                               GdkDragContext *  dc,
+                               gint              x,
+                               gint              y,
+                               GtkSelectionData *sel,
+                               guint             info,
+                               guint             time,
+                               gpointer          gdata );
+
+static void           coreerr( TrCore *         core,
+                               enum tr_core_err code,
+                               const char *     msg,
+                               gpointer         gdata );
+
+static void           onAddTorrent( TrCore *,
+                                    tr_ctor *,
+                                    gpointer );
+
+static void           prefschanged( TrCore *     core,
+                                    const char * key,
+                                    gpointer     data );
+
+static gboolean       updatemodel( gpointer gdata );
 
 struct counts_data
 {
-    int totalCount;
-    int activeCount;
-    int inactiveCount;
+    int    totalCount;
+    int    activeCount;
+    int    inactiveCount;
 };
 
 static void
-accumulateStatusForeach( GtkTreeModel * model,
+accumulateStatusForeach( GtkTreeModel *      model,
                          GtkTreePath  * path UNUSED,
-                         GtkTreeIter  * iter,
-                         gpointer       user_data )
+                         GtkTreeIter *       iter,
+                         gpointer            user_data )
 {
-    int status = 0;
+    int                  status = 0;
     struct counts_data * counts = user_data;
 
     ++counts->totalCount;
@@ -178,12 +192,13 @@ accumulateStatusForeach( GtkTreeModel * model,
 }
 
 static void
-accumulateCanUpdateForeach (GtkTreeModel * model,
+accumulateCanUpdateForeach( GtkTreeModel *      model,
                             GtkTreePath  * path UNUSED,
-                            GtkTreeIter  * iter,
-                            gpointer       accumulated_status)
+                            GtkTreeIter *       iter,
+                            gpointer            accumulated_status )
 {
     tr_torrent * tor;
+
     gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
     *(int*)accumulated_status |= tr_torrentCanManualUpdate( tor );
 }
@@ -191,47 +206,53 @@ accumulateCanUpdateForeach (GtkTreeModel * model,
 static void
 refreshTorrentActions( GtkTreeSelection * s )
 {
-    int canUpdate;
+    int                canUpdate;
     struct counts_data counts;
 
     counts.activeCount = 0;
     counts.inactiveCount = 0;
     counts.totalCount = 0;
-    gtk_tree_selection_selected_foreach( s, accumulateStatusForeach, &counts );
-    action_sensitize( "pause-torrent", counts.activeCount!=0 );
-    action_sensitize( "start-torrent", counts.inactiveCount!=0 );
-    action_sensitize( "remove-torrent", counts.totalCount!=0 );
-    action_sensitize( "delete-torrent", counts.totalCount!=0 );
-    action_sensitize( "verify-torrent", counts.totalCount!=0 );
-    action_sensitize( "open-torrent-folder", counts.totalCount==1 );
-    action_sensitize( "show-torrent-details", counts.totalCount==1 );
+    gtk_tree_selection_selected_foreach( s, accumulateStatusForeach,
+                                         &counts );
+    action_sensitize( "pause-torrent", counts.activeCount != 0 );
+    action_sensitize( "start-torrent", counts.inactiveCount != 0 );
+    action_sensitize( "remove-torrent", counts.totalCount != 0 );
+    action_sensitize( "delete-torrent", counts.totalCount != 0 );
+    action_sensitize( "verify-torrent", counts.totalCount != 0 );
+    action_sensitize( "open-torrent-folder", counts.totalCount == 1 );
+    action_sensitize( "show-torrent-details", counts.totalCount == 1 );
 
     canUpdate = 0;
-    gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach, &canUpdate );
-    action_sensitize( "update-tracker", canUpdate!=0 );
+    gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach,
+                                         &canUpdate );
+    action_sensitize( "update-tracker", canUpdate != 0 );
 
     {
-        GtkTreeView * view = gtk_tree_selection_get_tree_view( s );
+        GtkTreeView *  view = gtk_tree_selection_get_tree_view( s );
         GtkTreeModel * model = gtk_tree_view_get_model( view );
-        const int torrentCount = gtk_tree_model_iter_n_children( model, NULL ) != 0;
-        action_sensitize( "select-all", torrentCount!=0 );
-        action_sensitize( "deselect-all", torrentCount!=0 );
+        const int      torrentCount = gtk_tree_model_iter_n_children( model,
+                                                                      NULL )
+                                      != 0;
+        action_sensitize( "select-all", torrentCount != 0 );
+        action_sensitize( "deselect-all", torrentCount != 0 );
     }
 }
 
 static void
-selectionChangedCB( GtkTreeSelection * s, gpointer unused UNUSED )
+selectionChangedCB( GtkTreeSelection * s,
+                    gpointer unused    UNUSED )
 {
     refreshTorrentActions( s );
 }
 
 static void
-onMainWindowSizeAllocated( GtkWidget      * window,
+onMainWindowSizeAllocated( GtkWidget *            window,
                            GtkAllocation  * alloc UNUSED,
                            gpointer         gdata UNUSED )
 {
     const gboolean isMaximized = window->window
-        && ( gdk_window_get_state( window->window ) & GDK_WINDOW_STATE_MAXIMIZED );
+                                 && ( gdk_window_get_state( window->window )
+                                      & GDK_WINDOW_STATE_MAXIMIZED );
 
     if( !isMaximized )
     {
@@ -246,12 +267,16 @@ onMainWindowSizeAllocated( GtkWidget      * window,
 }
 
 static void
-windowStateChanged( GtkWidget * widget UNUSED, GdkEventWindowState * event, gpointer gdata )
+windowStateChanged( GtkWidget * widget    UNUSED,
+                    GdkEventWindowState * event,
+                    gpointer              gdata )
 {
     if( event->changed_mask & GDK_WINDOW_STATE_ICONIFIED )
     {
         struct cbdata * cbdata = gdata;
-        cbdata->minimized = ( event->new_window_state & GDK_WINDOW_STATE_ICONIFIED ) ? 1 : 0;
+        cbdata->minimized =
+            ( event->new_window_state &
+              GDK_WINDOW_STATE_ICONIFIED ) ? 1 : 0;
     }
 }
 
@@ -260,7 +285,8 @@ static sig_atomic_t global_sigcount = 0;
 static void
 fatalsig( int sig )
 {
-    static const int SIGCOUNT_MAX = 3; /* revert to default handler after this many */
+    static const int SIGCOUNT_MAX = 3; /* revert to default handler after this
+                                         many */
 
     if( ++global_sigcount >= SIGCOUNT_MAX )
     {
@@ -269,47 +295,53 @@ fatalsig( int sig )
     }
 }
 
-
 static void
 setupsighandlers( void )
 {
 #ifdef G_OS_WIN32
-  const int sigs[] = { SIGINT, SIGTERM };
+    const int sigs[] = { SIGINT, SIGTERM };
 #else
-  const int sigs[] = { SIGHUP, SIGINT, SIGQUIT, SIGTERM };
+    const int sigs[] = { SIGHUP, SIGINT, SIGQUIT, SIGTERM };
 #endif
-  guint i;
+    guint     i;
 
-  for( i=0; i<G_N_ELEMENTS(sigs); ++i )
-      signal( sigs[i], fatalsig );
+    for( i = 0; i < G_N_ELEMENTS( sigs ); ++i )
+        signal( sigs[i], fatalsig );
 }
 
 struct rpc_data
 {
-    int type;
-    int torrentId;
-    tr_torrent * tor;
-    struct cbdata * cbdata;
+    int              type;
+    int              torrentId;
+    tr_torrent *     tor;
+    struct cbdata *  cbdata;
 };
 
 static int
 onRPCIdle( void * vdata )
 {
     struct rpc_data * data = vdata;
+
     switch( data->type )
     {
         case TR_RPC_TORRENT_ADDED:
-            tr_core_add_torrent( data->cbdata->core, tr_torrent_new_preexisting( data->tor ) );
+            tr_core_add_torrent( data->cbdata->core,
+                                tr_torrent_new_preexisting(
+                                    data->tor ) );
             break;
+
         case TR_RPC_TORRENT_STARTED:
             /* this should be automatic */
             break;
+
         case TR_RPC_TORRENT_STOPPED:
             /* this should be automatic */
             break;
+
         case TR_RPC_TORRENT_REMOVING:
             tr_core_torrent_destroyed( data->cbdata->core, data->torrentId );
             break;
+
         case TR_RPC_TORRENT_CHANGED:
         case TR_RPC_SESSION_CHANGED:
             /* nothing interesting to do here */
@@ -321,14 +353,15 @@ onRPCIdle( void * vdata )
 
 static tr_rpc_callback_status
 onRPCChanged( tr_handle            * handle UNUSED,
-              tr_rpc_callback_type   type,
-              struct tr_torrent    * tor,
-              void                 * cbdata )
+              tr_rpc_callback_type          type,
+              struct tr_torrent *           tor,
+              void *                        cbdata )
 {
     /* this callback is being invoked from the libtransmission thread,
      * so let's push the information over to the gtk+ thread where
      * it's safe to update the gui */
     struct rpc_data * data = g_new0( struct rpc_data, 1 );
+
     data->type = type;
     data->torrentId = tor ? tr_torrentId( tor ) : -1;
     data->tor = type == TR_RPC_TORRENT_REMOVING ? NULL : tor;
@@ -338,30 +371,34 @@ onRPCChanged( tr_handle            * handle UNUSED,
 }
 
 int
-main( int argc, char ** argv )
+main( int     argc,
+      char ** argv )
 {
-    char * err = NULL;
-    struct cbdata * cbdata;
-    GSList * argfiles;
-    GError * gerr;
-    gboolean didinit = FALSE;
-    gboolean didlock = FALSE;
-    gboolean startpaused = FALSE;
-    gboolean startminimized = FALSE;
-    char * domain = "transmission";
-    char * configDir = NULL;
+    char *              err = NULL;
+    struct cbdata *     cbdata;
+    GSList *            argfiles;
+    GError *            gerr;
+    gboolean            didinit = FALSE;
+    gboolean            didlock = FALSE;
+    gboolean            startpaused = FALSE;
+    gboolean            startminimized = FALSE;
+    char *              domain = "transmission";
+    char *              configDir = NULL;
     tr_lockfile_state_t tr_state;
 
-    GOptionEntry entries[] = {
-        { "paused", 'p', 0, G_OPTION_ARG_NONE, &startpaused,
-          _("Start with all torrents paused"), NULL },
+    GOptionEntry        entries[] = {
+        { "paused",     'p',                                         0, G_OPTION_ARG_NONE,
+          &startpaused,
+          _( "Start with all torrents paused" ), NULL },
 #ifdef STATUS_ICON_SUPPORTED
-        { "minimized", 'm', 0, G_OPTION_ARG_NONE, &startminimized,
-          _( "Start minimized in system tray"), NULL },
+        { "minimized",  'm',                         0, G_OPTION_ARG_NONE,
+          &startminimized,
+          _( "Start minimized in system tray" ), NULL },
 #endif
-        { "config-dir", 'g', 0, G_OPTION_ARG_FILENAME, &configDir,
+        { "config-dir", 'g',         0, G_OPTION_ARG_FILENAME, &configDir,
           _( "Where to look for configuration files" ), NULL },
-        { NULL, 0, 0, 0, NULL, NULL, NULL }
+        { NULL,                   0, 0,                     0, NULL,
+          NULL, NULL }
     };
 
     cbdata = g_new0( struct cbdata, 1 );
@@ -376,11 +413,13 @@ main( int argc, char ** argv )
     g_set_application_name( _( "Transmission" ) );
 
     /* initialize gtk */
-    if( !g_thread_supported() )
+    if( !g_thread_supported( ) )
         g_thread_init( NULL );
 
     gerr = NULL;
-    if( !gtk_init_with_args( &argc, &argv, _("[torrent files]"), entries, domain, &gerr ) ) {
+    if( !gtk_init_with_args( &argc, &argv, _( "[torrent files]" ), entries,
+                             domain, &gerr ) )
+    {
         g_message( "%s", gerr->message );
         g_clear_error( &gerr );
         return 0;
@@ -392,10 +431,11 @@ main( int argc, char ** argv )
 
     didinit = cf_init( configDir, NULL ); /* must come before actions_init */
     tr_prefs_init_global( );
-    myUIManager = gtk_ui_manager_new ();
+    myUIManager = gtk_ui_manager_new ( );
     actions_init ( myUIManager, cbdata );
-    gtk_ui_manager_add_ui_from_string (myUIManager, fallback_ui_file, -1, NULL);
-    gtk_ui_manager_ensure_update (myUIManager);
+    gtk_ui_manager_add_ui_from_string ( myUIManager, fallback_ui_file, -1,
+                                        NULL );
+    gtk_ui_manager_ensure_update ( myUIManager );
     gtk_window_set_default_icon_name ( "transmission" );
 
     setupsighandlers( ); /* set up handlers for fatal signals */
@@ -404,19 +444,19 @@ main( int argc, char ** argv )
      * transmission that's running, OR if there are files to
      * be added, delegate that to the running instance via dbus */
     didlock = cf_lock( &tr_state, &err );
-    argfiles = checkfilenames( argc-1, argv+1 );
+    argfiles = checkfilenames( argc - 1, argv + 1 );
     if( !didlock && argfiles )
     {
         GSList * l;
         gboolean delegated = FALSE;
-        for( l=argfiles; l; l=l->next )
+        for( l = argfiles; l; l = l->next )
             delegated |= gtr_dbus_add_torrent( l->data );
         if( delegated )
             err = NULL;
     }
-    else if( (!didlock) && (tr_state == TR_LOCKFILE_ELOCK) )
+    else if( ( !didlock ) && ( tr_state == TR_LOCKFILE_ELOCK ) )
     {
-        gtr_dbus_present_window();
+        gtr_dbus_present_window( );
         err = NULL;
     }
 
@@ -425,67 +465,69 @@ main( int argc, char ** argv )
         GtkWindow * win;
 
         tr_handle * h = tr_sessionInitFull(
-                            configDir,
-                            "gtk",
-                            pref_string_get( PREF_KEY_DOWNLOAD_DIR ),
-                            pref_flag_get( PREF_KEY_PEX ),
-                            pref_flag_get( PREF_KEY_PORT_FORWARDING ),
-                            pref_int_get( PREF_KEY_PORT ),
-                            pref_int_get( PREF_KEY_ENCRYPTION ),
-                            pref_flag_get( PREF_KEY_LAZY_BITFIELD ),
-                            pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ),
-                            pref_int_get( PREF_KEY_UL_LIMIT ),
-                            pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ),
-                            pref_int_get( PREF_KEY_DL_LIMIT ),
-                            pref_int_get( PREF_KEY_MAX_PEERS_GLOBAL ),
-                            pref_int_get( PREF_KEY_MSGLEVEL ),
-                            TRUE, /* message queueing */
-                            pref_flag_get( PREF_KEY_BLOCKLIST_ENABLED ),
-                            pref_int_get( PREF_KEY_PEER_SOCKET_TOS ),
-                            pref_flag_get( PREF_KEY_RPC_ENABLED ),
-                            pref_int_get( PREF_KEY_RPC_PORT ),
-                            pref_string_get( PREF_KEY_RPC_ACL ),
-                            pref_flag_get( PREF_KEY_RPC_AUTH_ENABLED ),
-                            pref_string_get( PREF_KEY_RPC_USERNAME ),
-                            pref_string_get( PREF_KEY_RPC_PASSWORD ),
-                            pref_flag_get( PREF_KEY_PROXY_SERVER_ENABLED ),
-                            pref_string_get( PREF_KEY_PROXY_SERVER ),
-                            pref_int_get( PREF_KEY_PROXY_PORT ),
-                            pref_int_get( PREF_KEY_PROXY_TYPE ),
-                            pref_flag_get( PREF_KEY_PROXY_AUTH_ENABLED ),
-                            pref_string_get( PREF_KEY_PROXY_USERNAME ),
-                            pref_string_get( PREF_KEY_PROXY_PASSWORD ) );
+            configDir,
+            "gtk",
+            pref_string_get( PREF_KEY_DOWNLOAD_DIR ),
+            pref_flag_get( PREF_KEY_PEX ),
+            pref_flag_get( PREF_KEY_PORT_FORWARDING ),
+            pref_int_get( PREF_KEY_PORT ),
+            pref_int_get( PREF_KEY_ENCRYPTION ),
+            pref_flag_get( PREF_KEY_LAZY_BITFIELD ),
+            pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ),
+            pref_int_get( PREF_KEY_UL_LIMIT ),
+            pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ),
+            pref_int_get( PREF_KEY_DL_LIMIT ),
+            pref_int_get( PREF_KEY_MAX_PEERS_GLOBAL ),
+            pref_int_get( PREF_KEY_MSGLEVEL ),
+            TRUE,                 /* message queueing */
+            pref_flag_get( PREF_KEY_BLOCKLIST_ENABLED ),
+            pref_int_get( PREF_KEY_PEER_SOCKET_TOS ),
+            pref_flag_get( PREF_KEY_RPC_ENABLED ),
+            pref_int_get( PREF_KEY_RPC_PORT ),
+            pref_string_get( PREF_KEY_RPC_ACL ),
+            pref_flag_get( PREF_KEY_RPC_AUTH_ENABLED ),
+            pref_string_get( PREF_KEY_RPC_USERNAME ),
+            pref_string_get( PREF_KEY_RPC_PASSWORD ),
+            pref_flag_get( PREF_KEY_PROXY_SERVER_ENABLED ),
+            pref_string_get( PREF_KEY_PROXY_SERVER ),
+            pref_int_get( PREF_KEY_PROXY_PORT ),
+            pref_int_get( PREF_KEY_PROXY_TYPE ),
+            pref_flag_get( PREF_KEY_PROXY_AUTH_ENABLED ),
+            pref_string_get( PREF_KEY_PROXY_USERNAME ),
+            pref_string_get( PREF_KEY_PROXY_PASSWORD ) );
 
         cbdata->core = tr_core_new( h );
 
         /* create main window now to be a parent to any error dialogs */
         win = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
-        g_signal_connect( win, "window-state-event", G_CALLBACK(windowStateChanged), cbdata );
-        g_signal_connect( win, "size-allocate", G_CALLBACK(onMainWindowSizeAllocated), cbdata );
+        g_signal_connect( win, "window-state-event",
+                          G_CALLBACK( windowStateChanged ), cbdata );
+        g_signal_connect( win, "size-allocate",
+                          G_CALLBACK( onMainWindowSizeAllocated ), cbdata );
 
         appsetup( win, argfiles, cbdata, startpaused, startminimized );
         tr_sessionSetRPCCallback( h, onRPCChanged, cbdata );
         gtr_blocklist_maybe_autoupdate( cbdata->core );
 
-        gtk_main();
+        gtk_main( );
     }
     else if( err )
     {
         gtk_widget_show( errmsg_full( NULL, (callbackfunc_t)gtk_main_quit,
                                       NULL, "%s", err ) );
         g_free( err );
-        gtk_main();
+        gtk_main( );
     }
 
     return 0;
 }
 
 static gboolean
-updateScheduledLimits(gpointer data)
+updateScheduledLimits( gpointer data )
 {
-    tr_handle *tr = (tr_handle *) data;
+    tr_handle *     tr = (tr_handle *) data;
     static gboolean last_state = FALSE;
-    gboolean in_sched_state = FALSE;
+    gboolean        in_sched_state = FALSE;
 
     if( !pref_flag_get( PREF_KEY_SCHED_LIMIT_ENABLED ) )
     {
@@ -493,24 +535,24 @@ updateScheduledLimits(gpointer data)
     }
     else
     {
-        const int begin_time = pref_int_get( PREF_KEY_SCHED_BEGIN );
-        const int end_time = pref_int_get( PREF_KEY_SCHED_END );
-        time_t t;
+        const int  begin_time = pref_int_get( PREF_KEY_SCHED_BEGIN );
+        const int  end_time = pref_int_get( PREF_KEY_SCHED_END );
+        time_t     t;
         struct tm *tm;
-        int cur_time;
+        int        cur_time;
 
         time( &t );
-        tm = localtime (&t);
-        cur_time = (tm->tm_hour * 60) + tm->tm_min;
+        tm = localtime ( &t );
+        cur_time = ( tm->tm_hour * 60 ) + tm->tm_min;
 
         if( end_time >= begin_time )
         {
-            if( (cur_time >= begin_time) && (cur_time <= end_time) )
+            if( ( cur_time >= begin_time ) && ( cur_time <= end_time ) )
                 in_sched_state = TRUE;
-	}
+        }
         else
         {
-            if( (cur_time >= begin_time) || (cur_time <= end_time) )
+            if( ( cur_time >= begin_time ) || ( cur_time <= end_time ) )
                 in_sched_state = TRUE;
         }
     }
@@ -533,7 +575,7 @@ updateScheduledLimits(gpointer data)
         else
         {
             gboolean b;
-            int limit;
+            int      limit;
 
             tr_inf ( _( "Ending use of scheduled bandwidth limits" ) );
 
@@ -552,8 +594,8 @@ updateScheduledLimits(gpointer data)
     else if( in_sched_state )
     {
         static int old_dl_limit = 0, old_ul_limit = 0;
-        int dl_limit = pref_int_get( PREF_KEY_SCHED_DL_LIMIT );
-        int ul_limit = pref_int_get( PREF_KEY_SCHED_UL_LIMIT );
+        int        dl_limit = pref_int_get( PREF_KEY_SCHED_DL_LIMIT );
+        int        ul_limit = pref_int_get( PREF_KEY_SCHED_UL_LIMIT );
 
         if( ( dl_limit != old_dl_limit ) || ( ul_limit != old_ul_limit ) )
         {
@@ -571,11 +613,14 @@ updateScheduledLimits(gpointer data)
 }
 
 static void
-appsetup( TrWindow * wind, GSList * torrentFiles,
+appsetup( TrWindow *      wind,
+          GSList *        torrentFiles,
           struct cbdata * cbdata,
-          gboolean forcepause, gboolean minimized )
+          gboolean        forcepause,
+          gboolean        minimized )
 {
-    const pref_flag_t start = forcepause ? PREF_FLAG_FALSE : PREF_FLAG_DEFAULT;
+    const pref_flag_t start =
+        forcepause ? PREF_FLAG_FALSE : PREF_FLAG_DEFAULT;
     const pref_flag_t prompt = PREF_FLAG_DEFAULT;
 
     /* fill out cbdata */
@@ -620,18 +665,20 @@ appsetup( TrWindow * wind, GSList * torrentFiles,
     updatemodel( cbdata );
 
     /* start scheduled rate timer */
-    updateScheduledLimits (tr_core_handle( cbdata->core ));
-    g_timeout_add( 60 * 1000, updateScheduledLimits, tr_core_handle( cbdata->core ) );
+    updateScheduledLimits ( tr_core_handle( cbdata->core ) );
+    g_timeout_add( 60 * 1000, updateScheduledLimits,
+                  tr_core_handle( cbdata->core ) );
 
     /* either show the window or iconify it */
     if( !minimized )
         gtk_widget_show( GTK_WIDGET( wind ) );
-    else {
+    else
+    {
         gtk_window_iconify( wind );
-        gtk_window_set_skip_taskbar_hint( cbdata->wind, cbdata->icon != NULL );
+        gtk_window_set_skip_taskbar_hint( cbdata->wind,
+                                          cbdata->icon != NULL );
     }
 }
-
 
 /**
  * hideMainWindow, and the timeout hack in toggleMainWindow,
@@ -643,30 +690,33 @@ idle_hide_mainwindow( gpointer window )
     gtk_widget_hide( window );
     return FALSE;
 }
+
 static void
 hideMainWindow( struct cbdata * cbdata )
 {
-#if defined(STATUS_ICON_SUPPORTED) && defined(GDK_WINDOWING_X11)
-    GdkRectangle  bounds;
-    gulong        data[4];
-    Display      *dpy;
-    GdkWindow    *gdk_window;
+#if defined( STATUS_ICON_SUPPORTED ) && defined( GDK_WINDOWING_X11 )
+    GdkRectangle bounds;
+    gulong       data[4];
+    Display *    dpy;
+    GdkWindow *  gdk_window;
 
-    gtk_status_icon_get_geometry( GTK_STATUS_ICON( cbdata->icon ), NULL, &bounds, NULL );
-    gdk_window = GTK_WIDGET (cbdata->wind)->window;
-    dpy = gdk_x11_drawable_get_xdisplay (gdk_window);
+    gtk_status_icon_get_geometry( GTK_STATUS_ICON(
+                                      cbdata->icon ), NULL, &bounds, NULL );
+    gdk_window = GTK_WIDGET ( cbdata->wind )->window;
+    dpy = gdk_x11_drawable_get_xdisplay ( gdk_window );
 
     data[0] = bounds.x;
     data[1] = bounds.y;
     data[2] = bounds.width;
     data[3] = bounds.height;
 
-    XChangeProperty (dpy,
-                     GDK_WINDOW_XID (gdk_window),
-                     gdk_x11_get_xatom_by_name_for_display (gdk_drawable_get_display (gdk_window),
-                     "_NET_WM_ICON_GEOMETRY"),
-                     XA_CARDINAL, 32, PropModeReplace,
-                     (guchar*)&data, 4);
+    XChangeProperty ( dpy,
+                      GDK_WINDOW_XID ( gdk_window ),
+                      gdk_x11_get_xatom_by_name_for_display (
+                          gdk_drawable_get_display ( gdk_window ),
+                          "_NET_WM_ICON_GEOMETRY" ),
+                      XA_CARDINAL, 32, PropModeReplace,
+                      (guchar*)&data, 4 );
 
     gtk_window_set_skip_taskbar_hint( cbdata->wind, TRUE );
 #endif
@@ -682,27 +732,29 @@ clearTag( guint * tag )
 }
 
 static void
-toggleMainWindow( struct cbdata * cbdata, gboolean present )
+toggleMainWindow( struct cbdata * cbdata,
+                  gboolean        present )
 {
     GtkWindow * window = GTK_WINDOW( cbdata->wind );
-    const int hide = !cbdata->minimized;
-    static int x=0, y=0;
+    const int   hide = !cbdata->minimized;
+    static int  x = 0, y = 0;
 
-    if( (!present) && hide )
+    if( ( !present ) && hide )
     {
         gtk_window_get_position( window, &x, &y );
         clearTag( &cbdata->idle_hide_mainwindow_tag );
         hideMainWindow( cbdata );
-        cbdata->idle_hide_mainwindow_tag = g_timeout_add( 250, idle_hide_mainwindow, window );
+        cbdata->idle_hide_mainwindow_tag = g_timeout_add(
+            250, idle_hide_mainwindow, window );
     }
     else
     {
         gtk_window_set_skip_taskbar_hint( window, FALSE );
-        if ( x != 0 && y != 0 )
+        if( x != 0 && y != 0 )
             gtk_window_move( window, x, y );
         gtk_widget_show( GTK_WIDGET( window ) );
         gtk_window_deiconify( window );
-#if GTK_CHECK_VERSION(2,8,0)
+#if GTK_CHECK_VERSION( 2, 8, 0 )
         gtk_window_present_with_time( window, gtk_get_current_event_time( ) );
 #else
         gtk_window_present( window );
@@ -711,12 +763,14 @@ toggleMainWindow( struct cbdata * cbdata, gboolean present )
 }
 
 static gboolean
-winclose( GtkWidget * w UNUSED, GdkEvent * event UNUSED, gpointer gdata )
+winclose( GtkWidget * w    UNUSED,
+          GdkEvent * event UNUSED,
+          gpointer         gdata )
 {
     struct cbdata * cbdata = gdata;
 
     if( cbdata->icon != NULL )
-        action_activate ("toggle-main-window");
+        action_activate ( "toggle-main-window" );
     else
         askquit( cbdata->core, cbdata->wind, wannaquit, cbdata );
 
@@ -725,32 +779,34 @@ winclose( GtkWidget * w UNUSED, GdkEvent * event UNUSED, gpointer gdata )
 
 static void
 rowChangedCB( GtkTreeModel  * model UNUSED,
-              GtkTreePath   * path,
-              GtkTreeIter   * iter UNUSED,
-              gpointer        sel)
+              GtkTreePath *         path,
+              GtkTreeIter   * iter  UNUSED,
+              gpointer              sel )
 {
     if( gtk_tree_selection_path_is_selected ( sel, path ) )
-        refreshTorrentActions( GTK_TREE_SELECTION(sel) );
+        refreshTorrentActions( GTK_TREE_SELECTION( sel ) );
 }
 
 static void
-winsetup( struct cbdata * cbdata, TrWindow * wind )
+winsetup( struct cbdata * cbdata,
+          TrWindow *      wind )
 {
-    GtkTreeModel * model;
+    GtkTreeModel *     model;
     GtkTreeSelection * sel;
 
     g_assert( NULL == cbdata->wind );
     cbdata->wind = GTK_WINDOW( wind );
 
     sel = tr_window_get_selection( cbdata->wind );
-    g_signal_connect( sel, "changed", G_CALLBACK(selectionChangedCB), NULL );
+    g_signal_connect( sel, "changed", G_CALLBACK(
+                          selectionChangedCB ), NULL );
     selectionChangedCB( sel, NULL );
     model = tr_core_model( cbdata->core );
-    g_signal_connect( model, "row-changed", G_CALLBACK(rowChangedCB), sel );
+    g_signal_connect( model, "row-changed", G_CALLBACK( rowChangedCB ), sel );
     g_signal_connect( wind, "delete-event", G_CALLBACK( winclose ), cbdata );
     refreshTorrentActions( sel );
-    
-    setupdrag( GTK_WIDGET(wind), cbdata );
+
+    setupdrag( GTK_WIDGET( wind ), cbdata );
 }
 
 static gpointer
@@ -768,11 +824,13 @@ quitThreadFunc( gpointer gdata )
     g_object_unref( cbdata->core );
     if( cbdata->icon )
         g_object_unref( cbdata->icon );
-    if( cbdata->errqueue ) {
+    if( cbdata->errqueue )
+    {
         g_slist_foreach( cbdata->errqueue, (GFunc)g_free, NULL );
         g_slist_free( cbdata->errqueue );
     }
-    if( cbdata->dupqueue ) {
+    if( cbdata->dupqueue )
+    {
         g_slist_foreach( cbdata->dupqueue, (GFunc)g_free, NULL );
         g_slist_free( cbdata->dupqueue );
     }
@@ -787,7 +845,8 @@ quitThreadFunc( gpointer gdata )
 }
 
 static void
-do_exit_cb( GtkWidget *w UNUSED, gpointer data UNUSED )
+do_exit_cb( GtkWidget *w  UNUSED,
+            gpointer data UNUSED )
 {
     exit( 0 );
 }
@@ -795,11 +854,12 @@ do_exit_cb( GtkWidget *w UNUSED, gpointer data UNUSED )
 static void
 wannaquit( void * vdata )
 {
-    GtkWidget * r, * p, * b, * w, *c;
+    GtkWidget *     r, * p, * b, * w, *c;
     struct cbdata * cbdata = vdata;
 
     /* stop the update timer */
-    if( cbdata->timer ) {
+    if( cbdata->timer )
+    {
         g_source_remove( cbdata->timer );
         cbdata->timer = 0;
     }
@@ -807,15 +867,15 @@ wannaquit( void * vdata )
     c = GTK_WIDGET( cbdata->wind );
     gtk_container_remove( GTK_CONTAINER( c ), gtk_bin_get_child( GTK_BIN( c ) ) );
 
-    r = gtk_alignment_new(0.5, 0.5, 0.01, 0.01);
-    gtk_container_add(GTK_CONTAINER(c), r);
+    r = gtk_alignment_new( 0.5, 0.5, 0.01, 0.01 );
+    gtk_container_add( GTK_CONTAINER( c ), r );
 
-    p = gtk_table_new(3, 2, FALSE);
+    p = gtk_table_new( 3, 2, FALSE );
     gtk_table_set_col_spacings( GTK_TABLE( p ), GUI_PAD_BIG );
     gtk_container_add( GTK_CONTAINER( r ), p );
 
     w = gtk_image_new_from_stock( GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG );
-    gtk_table_attach_defaults(GTK_TABLE(p), w, 0, 1, 0, 2 );
+    gtk_table_attach_defaults( GTK_TABLE( p ), w, 0, 1, 0, 2 );
 
     w = gtk_label_new( NULL );
     gtk_label_set_markup( GTK_LABEL( w ), _( "<b>Closing Connections</b>" ) );
@@ -826,13 +886,14 @@ wannaquit( void * vdata )
     gtk_misc_set_alignment( GTK_MISC( w ), 0.0, 0.5 );
     gtk_table_attach_defaults( GTK_TABLE( p ), w, 1, 2, 1, 2 );
 
-    b = gtk_alignment_new(0.0, 1.0, 0.01, 0.01);
+    b = gtk_alignment_new( 0.0, 1.0, 0.01, 0.01 );
     w = gtr_button_new_from_stock( GTK_STOCK_QUIT, _( "_Quit Now" ) );
-    g_signal_connect(w, "clicked", G_CALLBACK(do_exit_cb), NULL);
-    gtk_container_add(GTK_CONTAINER(b), w);
-    gtk_table_attach(GTK_TABLE(p), b, 1, 2, 2, 3, GTK_FILL, GTK_FILL, 0, 10 );
+    g_signal_connect( w, "clicked", G_CALLBACK( do_exit_cb ), NULL );
+    gtk_container_add( GTK_CONTAINER( b ), w );
+    gtk_table_attach( GTK_TABLE(
+                          p ), b, 1, 2, 2, 3, GTK_FILL, GTK_FILL, 0, 10 );
 
-    gtk_widget_show_all(r);
+    gtk_widget_show_all( r );
 
     /* clear the UI */
     gtk_list_store_clear( GTK_LIST_STORE( tr_core_model( cbdata->core ) ) );
@@ -843,43 +904,44 @@ wannaquit( void * vdata )
 
 static void
 gotdrag( GtkWidget         * widget UNUSED,
-         GdkDragContext    * dc,
-         gint                x UNUSED,
-         gint                y UNUSED,
-         GtkSelectionData  * sel,
-         guint               info UNUSED,
-         guint               time,
-         gpointer            gdata )
+         GdkDragContext *           dc,
+         gint                x      UNUSED,
+         gint                y      UNUSED,
+         GtkSelectionData *         sel,
+         guint               info   UNUSED,
+         guint                      time,
+         gpointer                   gdata )
 {
     struct cbdata * data = gdata;
-    GSList * paths = NULL;
-    GSList * freeme = NULL;
+    GSList *        paths = NULL;
+    GSList *        freeme = NULL;
 
 #if 0
-    int i;
-    char *sele = gdk_atom_name(sel->selection);
-    char *targ = gdk_atom_name(sel->target);
-    char *type = gdk_atom_name(sel->type);
+    int             i;
+    char *          sele = gdk_atom_name( sel->selection );
+    char *          targ = gdk_atom_name( sel->target );
+    char *          type = gdk_atom_name( sel->type );
 
     g_message( "dropped file: sel=%s targ=%s type=%s fmt=%i len=%i",
                sele, targ, type, sel->format, sel->length );
-    g_free(sele);
-    g_free(targ);
-    g_free(type);
-    if( sel->format == 8 ) {
-        for( i=0; i<sel->length; ++i )
-            fprintf(stderr, "%02X ", sel->data[i]);
-        fprintf(stderr, "\n");
+    g_free( sele );
+    g_free( targ );
+    g_free( type );
+    if( sel->format == 8 )
+    {
+        for( i = 0; i < sel->length; ++i )
+            fprintf( stderr, "%02X ", sel->data[i] );
+        fprintf( stderr, "\n" );
     }
 #endif
 
-    if( ( sel->format == 8 ) &&
-        ( sel->selection == gdk_atom_intern( "XdndSelection", FALSE ) ) )
+    if( ( sel->format == 8 )
+      && ( sel->selection == gdk_atom_intern( "XdndSelection", FALSE ) ) )
     {
-        int i;
-        char * str = g_strndup( (char*)sel->data, sel->length );
+        int      i;
+        char *   str = g_strndup( (char*)sel->data, sel->length );
         gchar ** files = g_strsplit_set( str, "\r\n", -1 );
-        for( i=0; files && files[i]; ++i )
+        for( i = 0; files && files[i]; ++i )
         {
             char * filename;
             if( !*files[i] ) /* empty filename... */
@@ -892,7 +954,8 @@ gotdrag( GtkWidget         * widget UNUSED,
                 continue;
 
             /* walk past "file://", if present */
-            if( g_str_has_prefix( filename, "file:" ) ) {
+            if( g_str_has_prefix( filename, "file:" ) )
+            {
                 filename += 5;
                 while( g_str_has_prefix( filename, "//" ) )
                     ++filename;
@@ -900,7 +963,8 @@ gotdrag( GtkWidget         * widget UNUSED,
 
             /* if the file doesn't exist, the first part
                might be a hostname ... walk past it. */
-            if( !g_file_test( filename, G_FILE_TEST_EXISTS ) ) {
+            if( !g_file_test( filename, G_FILE_TEST_EXISTS ) )
+            {
                 char * pch = strchr( filename + 1, '/' );
                 if( pch != NULL )
                     filename = pch;
@@ -924,37 +988,44 @@ gotdrag( GtkWidget         * widget UNUSED,
         g_free( str );
     }
 
-    gtk_drag_finish(dc, (NULL != paths), FALSE, time);
+    gtk_drag_finish( dc, ( NULL != paths ), FALSE, time );
 }
 
 static void
-setupdrag(GtkWidget *widget, struct cbdata *data) {
-  GtkTargetEntry targets[] = {
-    { "STRING",     0, 0 },
-    { "text/plain", 0, 0 },
-    { "text/uri-list", 0, 0 },
-  };
-
-  g_signal_connect(widget, "drag_data_received", G_CALLBACK(gotdrag), data);
-
-  gtk_drag_dest_set(widget, GTK_DEST_DEFAULT_ALL, targets,
-                    ALEN(targets), GDK_ACTION_COPY | GDK_ACTION_MOVE);
-}
-
-static void
-flushAddTorrentErrors( GtkWindow * window, const char * primary, GSList ** files )
+setupdrag( GtkWidget *    widget,
+           struct cbdata *data )
 {
-    GString * s = g_string_new( NULL );
-    GSList * l;
+    GtkTargetEntry targets[] = {
+        { "STRING",                                 0, 0 },
+        { "text/plain",                             0, 0 },
+        { "text/uri-list",                          0, 0 },
+    };
+
+    g_signal_connect( widget, "drag_data_received", G_CALLBACK(
+                          gotdrag ), data );
+
+    gtk_drag_dest_set( widget, GTK_DEST_DEFAULT_ALL, targets,
+                       ALEN( targets ), GDK_ACTION_COPY | GDK_ACTION_MOVE );
+}
+
+static void
+flushAddTorrentErrors( GtkWindow *  window,
+                       const char * primary,
+                       GSList **    files )
+{
+    GString *   s = g_string_new( NULL );
+    GSList *    l;
     GtkWidget * w;
-    for( l=*files; l; l=l->next )
+
+    for( l = *files; l; l = l->next )
         g_string_append_printf( s, "%s\n", (const char*)l->data );
     w = gtk_message_dialog_new( window,
                                 GTK_DIALOG_DESTROY_WITH_PARENT,
                                 GTK_MESSAGE_ERROR,
                                 GTK_BUTTONS_CLOSE,
                                 primary );
-    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ), s->str );
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG(
+                                                  w ), s->str );
     g_signal_connect_swapped( w, "response",
                               G_CALLBACK( gtk_widget_destroy ), w );
     gtk_widget_show_all( w );
@@ -971,32 +1042,36 @@ showTorrentErrors( struct cbdata * cbdata )
     if( cbdata->errqueue )
         flushAddTorrentErrors( GTK_WINDOW( cbdata->wind ),
                                ngettext( "Couldn't add corrupt torrent",
-                                         "Couldn't add corrupt torrents",
-                                         g_slist_length( cbdata->errqueue ) ),
+                                        "Couldn't add corrupt torrents",
+                                        g_slist_length( cbdata->errqueue ) ),
                                &cbdata->errqueue );
 
     if( cbdata->dupqueue )
         flushAddTorrentErrors( GTK_WINDOW( cbdata->wind ),
                                ngettext( "Couldn't add duplicate torrent",
-                                         "Couldn't add duplicate torrents",
-                                         g_slist_length( cbdata->dupqueue ) ),
+                                        "Couldn't add duplicate torrents",
+                                        g_slist_length( cbdata->dupqueue ) ),
                                &cbdata->dupqueue );
 }
 
 static void
-coreerr( TrCore * core UNUSED, enum tr_core_err code, const char * msg,
-         gpointer gdata )
+coreerr( TrCore * core    UNUSED,
+         enum tr_core_err code,
+         const char *     msg,
+         gpointer         gdata )
 {
     struct cbdata * c = gdata;
 
     switch( code )
     {
         case TR_EINVALID:
-            c->errqueue = g_slist_append( c->errqueue, g_path_get_basename( msg ) );
+            c->errqueue =
+                g_slist_append( c->errqueue, g_path_get_basename( msg ) );
             break;
 
         case TR_EDUPLICATE:
-            c->dupqueue = g_slist_append( c->dupqueue, g_path_get_basename( msg ) );
+            c->dupqueue =
+                g_slist_append( c->dupqueue, g_path_get_basename( msg ) );
             break;
 
         case TR_CORE_ERR_NO_MORE_TORRENTS:
@@ -1008,44 +1083,51 @@ coreerr( TrCore * core UNUSED, enum tr_core_err code, const char * msg,
             break;
 
         default:
-            g_assert_not_reached();
+            g_assert_not_reached( );
             break;
     }
-
 }
 
-#if GTK_CHECK_VERSION(2,8,0)
+#if GTK_CHECK_VERSION( 2, 8, 0 )
 static void
 on_main_window_focus_in( GtkWidget      * widget UNUSED,
-                         GdkEventFocus  * event UNUSED,
-                         gpointer         gdata )
+                         GdkEventFocus  * event  UNUSED,
+                         gpointer                gdata )
 {
     struct cbdata * cbdata = gdata;
+
     gtk_window_set_urgency_hint( GTK_WINDOW( cbdata->wind ), FALSE );
 }
+
 #endif
 
 static void
-onAddTorrent( TrCore * core, tr_ctor * ctor, gpointer gdata )
+onAddTorrent( TrCore *  core,
+              tr_ctor * ctor,
+              gpointer  gdata )
 {
     struct cbdata * cbdata = gdata;
-    GtkWidget * w = addSingleTorrentDialog( cbdata->wind, core, ctor );
-#if GTK_CHECK_VERSION(2,8,0)
-    g_signal_connect( w, "focus-in-event", G_CALLBACK(on_main_window_focus_in),  cbdata );
+    GtkWidget *     w = addSingleTorrentDialog( cbdata->wind, core, ctor );
+
+#if GTK_CHECK_VERSION( 2, 8, 0 )
+    g_signal_connect( w, "focus-in-event",
+                      G_CALLBACK( on_main_window_focus_in ),  cbdata );
     gtk_window_set_urgency_hint( cbdata->wind, TRUE );
 #endif
 }
 
 static void
-prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
+prefschanged( TrCore * core UNUSED,
+              const char *  key,
+              gpointer      data )
 {
     struct cbdata * cbdata = data;
-    tr_handle     * tr     = tr_core_handle( cbdata->core );
+    tr_handle *     tr     = tr_core_handle( cbdata->core );
 
     if( !strcmp( key, PREF_KEY_ENCRYPTION ) )
     {
         const int encryption = pref_int_get( key );
-g_message( "setting encryption to %d", encryption );
+        g_message( "setting encryption to %d", encryption );
         tr_sessionSetEncryption( tr, encryption );
     }
     else if( !strcmp( key, PREF_KEY_PORT ) )
@@ -1058,7 +1140,8 @@ g_message( "setting encryption to %d", encryption );
         const int show = pref_flag_get( key );
         if( show && !cbdata->icon )
             cbdata->icon = tr_icon_new( cbdata->core );
-        else if( !show && cbdata->icon ) {
+        else if( !show && cbdata->icon )
+        {
             g_object_unref( cbdata->icon );
             cbdata->icon = NULL;
         }
@@ -1083,7 +1166,7 @@ g_message( "setting encryption to %d", encryption );
         const int limit = pref_int_get( key );
         tr_sessionSetSpeedLimit( tr, TR_UP, limit );
     }
-    else if ( !strncmp( key, "sched-", 6 ) )
+    else if( !strncmp( key, "sched-", 6 ) )
     {
         updateScheduledLimits( tr );
     }
@@ -1184,15 +1267,15 @@ updatemodel( gpointer gdata )
 }
 
 static void
-aboutDialogActivateLink( GtkAboutDialog * dialog UNUSED,
-                         const gchar    * link_,
+aboutDialogActivateLink( GtkAboutDialog * dialog    UNUSED,
+                         const gchar *              link_,
                          gpointer         user_data UNUSED )
 {
     gtr_open_file( link_ );
 }
 
 static void
-about ( GtkWindow * parent )
+about( GtkWindow * parent )
 {
     const char *authors[] =
     {
@@ -1200,7 +1283,7 @@ about ( GtkWindow * parent )
         "Mitchell Livingston (Backend; OS X)",
         "Eric Petit (Backend; OS X)",
         "Josh Elsasser (Daemon; Backend; GTK+)",
-        "Bryan Varner (BeOS)", 
+        "Bryan Varner (BeOS)",
         NULL
     };
 
@@ -1209,95 +1292,108 @@ about ( GtkWindow * parent )
     gtk_about_dialog_set_url_hook( aboutDialogActivateLink, NULL, NULL );
 
     gtk_show_about_dialog( parent,
-        "name", g_get_application_name(),
-        "comments", _("A fast and easy BitTorrent client"),
-        "version", LONG_VERSION_STRING,
-        "website", website_url,
-        "website-label", website_url,
-        "copyright",_("Copyright 2005-2008 The Transmission Project"),
-        "logo-icon-name", "transmission",
+                           "name", g_get_application_name( ),
+                           "comments",
+                           _( "A fast and easy BitTorrent client" ),
+                           "version", LONG_VERSION_STRING,
+                           "website", website_url,
+                           "website-label", website_url,
+                           "copyright",
+                           _(
+                               "Copyright 2005-2008 The Transmission Project" ),
+                           "logo-icon-name", "transmission",
 #ifdef SHOW_LICENSE
-        "license", LICENSE,
-        "wrap-license", TRUE,
+                           "license", LICENSE,
+                           "wrap-license", TRUE,
 #endif
-        "authors", authors,
-        /* Translators: translate "translator-credits" as your name
-           to have it appear in the credits in the "About" dialog */
-        "translator-credits", _("translator-credits"),
-        NULL );
+                           "authors", authors,
+                           /* Translators: translate "translator-credits" as
+                              your name
+                              to have it appear in the credits in the "About"
+                              dialog */
+                           "translator-credits", _( "translator-credits" ),
+                           NULL );
 }
 
 static void
-startTorrentForeach (GtkTreeModel * model,
+startTorrentForeach( GtkTreeModel *      model,
                      GtkTreePath  * path UNUSED,
-                     GtkTreeIter  * iter,
-                     gpointer       data UNUSED)
+                     GtkTreeIter *       iter,
+                     gpointer       data UNUSED )
 {
     tr_torrent * tor = NULL;
+
     gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
     tr_torrentStart( tor );
 }
 
 static void
-stopTorrentForeach (GtkTreeModel * model,
+stopTorrentForeach( GtkTreeModel *      model,
                     GtkTreePath  * path UNUSED,
-                    GtkTreeIter  * iter,
-                    gpointer       data UNUSED)
+                    GtkTreeIter *       iter,
+                    gpointer       data UNUSED )
 {
     tr_torrent * tor = NULL;
+
     gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
     tr_torrentStop( tor );
 }
 
 static void
-updateTrackerForeach (GtkTreeModel * model,
+updateTrackerForeach( GtkTreeModel *      model,
                       GtkTreePath  * path UNUSED,
-                      GtkTreeIter  * iter,
-                      gpointer       data UNUSED)
+                      GtkTreeIter *       iter,
+                      gpointer       data UNUSED )
 {
     tr_torrent * tor = NULL;
+
     gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
     tr_torrentManualUpdate( tor );
 }
 
 static void
-detailsClosed( gpointer user_data, GObject * details )
+detailsClosed( gpointer  user_data,
+               GObject * details )
 {
     struct cbdata * data = user_data;
-    gpointer hashString = g_hash_table_lookup( data->details2tor, details );
+    gpointer        hashString = g_hash_table_lookup( data->details2tor,
+                                                      details );
+
     g_hash_table_remove( data->details2tor, details );
     g_hash_table_remove( data->tor2details, hashString );
 }
 
 static void
-openFolderForeach( GtkTreeModel * model,
-                   GtkTreePath  * path UNUSED,
-                   GtkTreeIter  * iter,
+openFolderForeach( GtkTreeModel *           model,
+                   GtkTreePath  * path      UNUSED,
+                   GtkTreeIter *            iter,
                    gpointer       user_data UNUSED )
 {
     TrTorrent * gtor = NULL;
+
     gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, -1 );
     tr_torrent_open_folder( gtor );
     g_object_unref( G_OBJECT( gtor ) );
 }
 
 static void
-showInfoForeach (GtkTreeModel * model,
+showInfoForeach( GtkTreeModel *      model,
                  GtkTreePath  * path UNUSED,
-                 GtkTreeIter  * iter,
-                 gpointer       user_data )
+                 GtkTreeIter *       iter,
+                 gpointer            user_data )
 {
-    const char * hashString;
+    const char *    hashString;
     struct cbdata * data = user_data;
-    TrTorrent * tor = NULL;
-    GtkWidget * w;
+    TrTorrent *     tor = NULL;
+    GtkWidget *     w;
 
     gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
-    hashString = tr_torrent_info(tor)->hashString;
+    hashString = tr_torrent_info( tor )->hashString;
     w = g_hash_table_lookup( data->tor2details, hashString );
     if( w != NULL )
         gtk_window_present( GTK_WINDOW( w ) );
-    else {
+    else
+    {
         w = torrent_inspector_new( GTK_WINDOW( data->wind ), tor );
         gtk_widget_show( w );
         g_hash_table_insert( data->tor2details, (gpointer)hashString, w );
@@ -1309,103 +1405,110 @@ showInfoForeach (GtkTreeModel * model,
 }
 
 static void
-recheckTorrentForeach (GtkTreeModel * model,
+recheckTorrentForeach( GtkTreeModel *      model,
                        GtkTreePath  * path UNUSED,
-                       GtkTreeIter  * iter,
-                       gpointer       data UNUSED)
+                       GtkTreeIter *       iter,
+                       gpointer       data UNUSED )
 {
     TrTorrent * gtor = NULL;
+
     gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, -1 );
     tr_torrentVerify( tr_torrent_handle( gtor ) );
     g_object_unref( G_OBJECT( gtor ) );
 }
 
-static gboolean 
+static gboolean
 msgwinclosed( void )
 {
-  action_toggle( "toggle-message-log", FALSE );
-  return FALSE;
+    action_toggle( "toggle-message-log", FALSE );
+    return FALSE;
 }
 
 static void
-accumulateSelectedTorrents( GtkTreeModel * model,
+accumulateSelectedTorrents( GtkTreeModel *      model,
                             GtkTreePath  * path UNUSED,
-                            GtkTreeIter  * iter,
-                            gpointer       gdata )
+                            GtkTreeIter *       iter,
+                            gpointer            gdata )
 {
-    GSList ** data = ( GSList** ) gdata;
+    GSList **   data = ( GSList** ) gdata;
     TrTorrent * tor = NULL;
+
     gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
     *data = g_slist_prepend( *data, tor );
 }
 
 static void
-removeSelected( struct cbdata * data, gboolean delete_files )
+removeSelected( struct cbdata * data,
+                gboolean        delete_files )
 {
-    GSList * l = NULL;
+    GSList *           l = NULL;
     GtkTreeSelection * s = tr_window_get_selection( data->wind );
+
     gtk_tree_selection_selected_foreach( s, accumulateSelectedTorrents, &l );
     gtk_tree_selection_unselect_all( s );
-    if( l ) {
+    if( l )
+    {
         l = g_slist_reverse( l );
         confirmRemove( data->wind, data->core, l, delete_files );
     }
 }
 
 void
-doAction ( const char * action_name, gpointer user_data )
+doAction( const char * action_name,
+          gpointer     user_data )
 {
     struct cbdata * data = user_data;
-    gboolean changed = FALSE;
+    gboolean        changed = FALSE;
 
-    if ( !strcmp (action_name, "add-torrent-menu") ||
-         !strcmp( action_name, "add-torrent-toolbar" ))
+    if( !strcmp ( action_name, "add-torrent-menu" )
+      || !strcmp( action_name, "add-torrent-toolbar" ) )
     {
         addDialog( data->wind, data->core );
     }
-    else if (!strcmp (action_name, "show-stats"))
+    else if( !strcmp ( action_name, "show-stats" ) )
     {
         GtkWidget * dialog = stats_dialog_create( data->wind,
                                                   data->core );
         gtk_widget_show( dialog );
     }
-    else if (!strcmp (action_name, "start-torrent"))
+    else if( !strcmp ( action_name, "start-torrent" ) )
     {
-        GtkTreeSelection * s = tr_window_get_selection(data->wind);
+        GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_selected_foreach( s, startTorrentForeach, NULL );
         changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
     }
-    else if (!strcmp (action_name, "pause-torrent"))
+    else if( !strcmp ( action_name, "pause-torrent" ) )
     {
-        GtkTreeSelection * s = tr_window_get_selection(data->wind);
+        GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_selected_foreach( s, stopTorrentForeach, NULL );
         changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
     }
-    else if (!strcmp (action_name, "verify-torrent"))
+    else if( !strcmp ( action_name, "verify-torrent" ) )
     {
-        GtkTreeSelection * s = tr_window_get_selection(data->wind);
+        GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_selected_foreach( s, recheckTorrentForeach, NULL );
         changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
     }
-    else if (!strcmp (action_name, "open-torrent-folder"))
+    else if( !strcmp ( action_name, "open-torrent-folder" ) )
     {
-        GtkTreeSelection * s = tr_window_get_selection(data->wind);
+        GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_selected_foreach( s, openFolderForeach, data );
     }
-    else if (!strcmp (action_name, "show-torrent-details"))
+    else if( !strcmp ( action_name, "show-torrent-details" ) )
     {
-        GtkTreeSelection * s = tr_window_get_selection(data->wind);
+        GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_selected_foreach( s, showInfoForeach, data );
     }
-    else if (!strcmp( action_name, "update-tracker"))
+    else if( !strcmp( action_name, "update-tracker" ) )
     {
-        GtkTreeSelection * s = tr_window_get_selection(data->wind);
-        gtk_tree_selection_selected_foreach( s, updateTrackerForeach, data->wind );
+        GtkTreeSelection * s = tr_window_get_selection( data->wind );
+        gtk_tree_selection_selected_foreach( s, updateTrackerForeach,
+                                             data->wind );
     }
-    else if (!strcmp (action_name, "new-torrent"))
+    else if( !strcmp ( action_name, "new-torrent" ) )
     {
         GtkWidget * w = make_meta_ui( GTK_WINDOW( data->wind ),
-                                      tr_core_handle( data->core ) );
+                                     tr_core_handle( data->core ) );
         gtk_widget_show_all( w );
     }
     else if( !strcmp( action_name, "remove-torrent" ) )
@@ -1416,66 +1519,69 @@ doAction ( const char * action_name, gpointer user_data )
     {
         removeSelected( data, TRUE );
     }
-    else if (!strcmp (action_name, "quit"))
+    else if( !strcmp ( action_name, "quit" ) )
     {
         askquit( data->core, data->wind, wannaquit, data );
     }
-    else if (!strcmp (action_name, "select-all"))
+    else if( !strcmp ( action_name, "select-all" ) )
     {
-        GtkTreeSelection * s = tr_window_get_selection(data->wind);
+        GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_select_all( s );
     }
-    else if (!strcmp (action_name, "deselect-all"))
+    else if( !strcmp ( action_name, "deselect-all" ) )
     {
-        GtkTreeSelection * s = tr_window_get_selection(data->wind);
+        GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_unselect_all( s );
     }
-    else if (!strcmp (action_name, "edit-preferences"))
+    else if( !strcmp ( action_name, "edit-preferences" ) )
     {
         if( NULL == data->prefs )
         {
-            data->prefs = tr_prefs_dialog_new( G_OBJECT(data->core), data->wind );
+            data->prefs = tr_prefs_dialog_new( G_OBJECT(
+                                                   data->core ), data->wind );
             g_signal_connect( data->prefs, "destroy",
-                             G_CALLBACK( gtk_widget_destroyed ), &data->prefs );
+                              G_CALLBACK(
+                                  gtk_widget_destroyed ), &data->prefs );
             gtk_widget_show( GTK_WIDGET( data->prefs ) );
         }
     }
-    else if (!strcmp (action_name, "toggle-message-log"))
+    else if( !strcmp ( action_name, "toggle-message-log" ) )
     {
         if( !data->msgwin )
         {
             GtkWidget * win = msgwin_new( data->core );
-            g_signal_connect( win, "destroy", G_CALLBACK( msgwinclosed ), 
-                             NULL );
+            g_signal_connect( win, "destroy", G_CALLBACK( msgwinclosed ),
+                              NULL );
             data->msgwin = win;
         }
         else
         {
-            action_toggle("toggle-message-log", FALSE);
+            action_toggle( "toggle-message-log", FALSE );
             gtk_widget_destroy( data->msgwin );
             data->msgwin = NULL;
         }
     }
-    else if (!strcmp (action_name, "show-about-dialog"))
+    else if( !strcmp ( action_name, "show-about-dialog" ) )
     {
         about( data->wind );
     }
-    else if (!strcmp (action_name, "help"))
+    else if( !strcmp ( action_name, "help" ) )
     {
         char * url = gtr_get_help_url( );
         gtr_open_file( url );
         g_free( url );
     }
-    else if (!strcmp (action_name, "toggle-main-window"))
+    else if( !strcmp ( action_name, "toggle-main-window" ) )
     {
         toggleMainWindow( data, FALSE );
     }
-    else if (!strcmp (action_name, "present-main-window"))
+    else if( !strcmp ( action_name, "present-main-window" ) )
     {
         toggleMainWindow( data, TRUE );
     }
-    else g_error ("Unhandled action: %s", action_name );
+    else g_error ( "Unhandled action: %s", action_name );
 
     if( changed )
         updatemodel( data );
 }
+

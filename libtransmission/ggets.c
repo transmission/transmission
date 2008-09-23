@@ -33,43 +33,52 @@
 #include "ggets.h"
 
 #define INITSIZE   112  /* power of 2 minus 16, helps malloc */
-#define DELTASIZE (INITSIZE + 16)
+#define DELTASIZE ( INITSIZE + 16 )
 
 enum {OK = 0, NOMEM};
 
-int fggets(char* *ln, FILE *f)
+int
+fggets( char* *ln,
+        FILE * f )
 {
-   int     cursize, ch, ix;
-   char   *buffer, *temp;
+    int   cursize, ch, ix;
+    char *buffer, *temp;
 
-   *ln = NULL; /* default */
-   if (NULL == (buffer = malloc(INITSIZE))) return NOMEM;
-   cursize = INITSIZE;
+    *ln = NULL; /* default */
+    if( NULL == ( buffer = malloc( INITSIZE ) ) ) return NOMEM;
+    cursize = INITSIZE;
 
-   ix = 0;
-   while ((EOF != (ch = getc(f))) && ('\n' != ch)) {
-      if (ix >= (cursize - 1)) { /* extend buffer */
-         cursize += DELTASIZE;
-         if (NULL == (temp = realloc(buffer, (size_t)cursize))) {
-            /* ran out of memory, return partial line */
-            buffer[ix] = '\0';
-            *ln = buffer;
-            return NOMEM;
-         }
-         buffer = temp;
-      }
-      buffer[ix++] = ch;
-   }
-   if ((EOF == ch) && (0 == ix)) {
-      free(buffer);
-      return EOF;
-   }
+    ix = 0;
+    while( ( EOF != ( ch = getc( f ) ) ) && ( '\n' != ch ) )
+    {
+        if( ix >= ( cursize - 1 ) ) /* extend buffer */
+        {
+            cursize += DELTASIZE;
+            if( NULL == ( temp = realloc( buffer, (size_t)cursize ) ) )
+            {
+                /* ran out of memory, return partial line */
+                buffer[ix] = '\0';
+                *ln = buffer;
+                return NOMEM;
+            }
+            buffer = temp;
+        }
+        buffer[ix++] = ch;
+    }
 
-   buffer[ix] = '\0';
-   if (NULL == (temp = realloc(buffer, (size_t)ix + 1))) {
-      *ln = buffer;  /* without reducing it */
-   }
-   else *ln = temp;
-   return OK;
+    if( ( EOF == ch ) && ( 0 == ix ) )
+    {
+        free( buffer );
+        return EOF;
+    }
+
+    buffer[ix] = '\0';
+    if( NULL == ( temp = realloc( buffer, (size_t)ix + 1 ) ) )
+    {
+        *ln = buffer; /* without reducing it */
+    }
+    else *ln = temp;
+    return OK;
 } /* fggets */
+
 /* End of ggets.c */

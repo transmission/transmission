@@ -28,10 +28,17 @@
 typedef struct tr_ratecontrol tr_ratecontrol;
 
 tr_ratecontrol * tr_rcInit( void );
-void             tr_rcSetLimit( tr_ratecontrol *, int );
+
+void             tr_rcSetLimit( tr_ratecontrol *,
+                                int );
+
 int              tr_rcGetLimit( const tr_ratecontrol * );
-void             tr_rcTransferred( tr_ratecontrol *, size_t byteCount );
+
+void             tr_rcTransferred(               tr_ratecontrol *,
+                                          size_t byteCount );
+
 float            tr_rcRate( const tr_ratecontrol * );
+
 void             tr_rcClose( tr_ratecontrol * );
 
 #endif

@@ -28,11 +28,11 @@
 #define TR_NAME "Transmission"
 
 #ifndef UNUSED
-#ifdef __GNUC__
-#define UNUSED __attribute__((unused))
-#else
-#define UNUSED
-#endif
+ #ifdef __GNUC__
+  #define UNUSED __attribute__ ( ( unused ) )
+ #else
+  #define UNUSED
+ #endif
 #endif
 
 enum
@@ -47,14 +47,14 @@ enum
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
-uint8_t* tr_peerIdNew( void );
+uint8_t*       tr_peerIdNew( void );
 
 const uint8_t* tr_getPeerId( void );
 
 struct tr_metainfo_lookup
 {
-    char hashString[2*SHA_DIGEST_LENGTH+1];
-    char * filename;
+    char    hashString[2 * SHA_DIGEST_LENGTH + 1];
+    char *  filename;
 };
 
 struct tr_handle
@@ -71,68 +71,72 @@ struct tr_handle
 
     tr_encryption_mode           encryptionMode;
 
-    struct tr_event_handle     * events;
+    struct tr_event_handle *     events;
 
     int                          proxyPort;
     int                          peerSocketTOS;
 
     int                          torrentCount;
-    tr_torrent                 * torrentList;
+    tr_torrent *                 torrentList;
 
-    char                       * tag;
+    char *                       tag;
 
-    char                       * configDir;
-    char                       * downloadDir;
-    char                       * resumeDir;
-    char                       * torrentDir;
+    char *                       configDir;
+    char *                       downloadDir;
+    char *                       resumeDir;
+    char *                       torrentDir;
 
     tr_proxy_type                proxyType;
-    char                       * proxy;
-    char                       * proxyUsername;
-    char                       * proxyPassword;
+    char *                       proxy;
+    char *                       proxyUsername;
+    char *                       proxyPassword;
 
     int                          uploadLimit;
     int                          downloadLimit;
 
-    struct tr_list             * blocklists;
-    struct tr_peerMgr          * peerMgr;
-    struct tr_shared           * shared;
+    struct tr_list *             blocklists;
+    struct tr_peerMgr *          peerMgr;
+    struct tr_shared *           shared;
 
-    struct tr_lock             * lock;
+    struct tr_lock *             lock;
 
-    struct tr_web              * web;
+    struct tr_web *              web;
 
-    struct tr_rpc_server       * rpcServer;
+    struct tr_rpc_server *       rpcServer;
     tr_rpc_func                  rpc_func;
-    void                       * rpc_func_user_data;
+    void *                       rpc_func_user_data;
 
-    struct tr_stats_handle     * sessionStats;
-    struct tr_tracker_handle   * tracker;
+    struct tr_stats_handle *     sessionStats;
+    struct tr_tracker_handle *   tracker;
 
-    struct tr_metainfo_lookup  * metainfoLookup;
+    struct tr_metainfo_lookup *  metainfoLookup;
     int                          metainfoLookupCount;
 };
 
 const char * tr_sessionFindTorrentFile( const tr_session * session,
-                                        const char       * hashString );
+                                        const char *       hashString );
 
-void tr_sessionSetTorrentFile( tr_session   * session,
-                               const char   * hashString,
-                               const char   * filename );
+void         tr_sessionSetTorrentFile( tr_session * session,
+                                       const char * hashString,
+                                       const char * filename );
 
 struct in_addr;
 
-int tr_sessionIsAddressBlocked( const tr_session     * session,
-                                const struct in_addr * addr );
+int          tr_sessionIsAddressBlocked( const tr_session *     session,
+                                         const struct in_addr * addr );
 
 
-void tr_globalLock       ( tr_session * );
-void tr_globalUnlock     ( tr_session * );
-int  tr_globalIsLocked   ( const tr_session * );
+void         tr_globalLock( tr_session * );
+
+void         tr_globalUnlock( tr_session * );
+
+int          tr_globalIsLocked( const tr_session * );
 
 
-#define TR_ERROR_IS_IO(e) (TR_ERROR_IO_PARENT<=(e) && (e)<=TR_ERROR_IO_OTHER)
-#define TR_ERROR_IS_TC(e) (TR_ERROR_TC_ERROR<=(e) && (e)<=TR_ERROR_TC_WARNING)
+#define TR_ERROR_IS_IO( e ) ( TR_ERROR_IO_PARENT <= ( e ) && ( e ) <=\
+                              TR_ERROR_IO_OTHER )
+#define TR_ERROR_IS_TC( e ) ( TR_ERROR_TC_ERROR <= ( e ) && ( e ) <=\
+                              TR_ERROR_TC_WARNING )
 
 
 #endif

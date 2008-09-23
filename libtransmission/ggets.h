@@ -28,18 +28,19 @@
  */
 
 #ifndef ggets_h_
-#  define ggets_h_
+#define ggets_h_
 
-#  ifdef __cplusplus
-      extern "C" {
-#  endif
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-int fggets(char* *ln, FILE *f);
+int fggets( char* *ln,
+            FILE * f );
 
-#define ggets(ln) fggets(ln, stdin)
+#define ggets( ln ) fggets( ln, stdin )
 
-#  ifdef __cplusplus
-      }
-#  endif
+#ifdef __cplusplus
+}
+#endif
 #endif
 /* END ggets.h */

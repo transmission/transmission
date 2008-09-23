@@ -3,10 +3,10 @@
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license. 
+ * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
- * 
+ *
  * $Id: details.c 5987 2008-06-01 01:40:32Z charles $
  */
 
@@ -33,25 +33,25 @@
 
 struct tracker_page
 {
-    TrTorrent * gtor;
+    TrTorrent *         gtor;
 
-    GtkTreeView * view;
-    GtkListStore * store;
-    GtkTreeSelection * sel;
+    GtkTreeView *       view;
+    GtkListStore *      store;
+    GtkTreeSelection *  sel;
 
-    GtkWidget * add_button;
-    GtkWidget * remove_button;
-    GtkWidget * save_button;
-    GtkWidget * revert_button;
+    GtkWidget *         add_button;
+    GtkWidget *         remove_button;
+    GtkWidget *         save_button;
+    GtkWidget *         revert_button;
 
-    GtkWidget * last_scrape_time_lb;
-    GtkWidget * last_scrape_response_lb;
-    GtkWidget * next_scrape_countdown_lb;
+    GtkWidget *         last_scrape_time_lb;
+    GtkWidget *         last_scrape_response_lb;
+    GtkWidget *         next_scrape_countdown_lb;
 
-    GtkWidget * last_announce_time_lb;
-    GtkWidget * last_announce_response_lb;
-    GtkWidget * next_announce_countdown_lb;
-    GtkWidget * manual_announce_countdown_lb;
+    GtkWidget *         last_announce_time_lb;
+    GtkWidget *         last_announce_response_lb;
+    GtkWidget *         next_announce_countdown_lb;
+    GtkWidget *         manual_announce_countdown_lb;
 };
 
 enum
@@ -62,7 +62,8 @@ enum
 };
 
 static void
-setTrackerChangeState( struct tracker_page * page, gboolean changed )
+setTrackerChangeState( struct tracker_page * page,
+                       gboolean              changed )
 {
     if( page->save_button )
         gtk_widget_set_sensitive( page->save_button, changed );
@@ -74,18 +75,19 @@ setTrackerChangeState( struct tracker_page * page, gboolean changed )
 static GtkTreeModel*
 tracker_model_new( tr_torrent * tor )
 {
-    int i;
+    int             i;
     const tr_info * inf = tr_torrentInfo( tor );
-    GtkListStore * store = gtk_list_store_new( TR_N_COLS, G_TYPE_INT, G_TYPE_STRING );
+    GtkListStore *  store = gtk_list_store_new( TR_N_COLS, G_TYPE_INT,
+                                                G_TYPE_STRING );
 
-    for( i=0; inf && i<inf->trackerCount; ++i )
+    for( i = 0; inf && i < inf->trackerCount; ++i )
     {
-        GtkTreeIter iter;
+        GtkTreeIter             iter;
         const tr_tracker_info * tinf = inf->trackers + i;
         gtk_list_store_append( store, &iter );
         gtk_list_store_set( store, &iter, TR_COL_TIER, tinf->tier + 1,
-                                          TR_COL_ANNOUNCE, tinf->announce,
-                                          -1 );
+                            TR_COL_ANNOUNCE, tinf->announce,
+                            -1 );
     }
 
     gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( store ),
@@ -96,66 +98,85 @@ tracker_model_new( tr_torrent * tor )
 }
 
 static void
-onTrackerSelectionChanged( GtkTreeSelection  * sel,
-                           gpointer            gpage )
+onTrackerSelectionChanged( GtkTreeSelection * sel,
+                           gpointer           gpage )
 {
     struct tracker_page * page = gpage;
-    gboolean has_selection = gtk_tree_selection_get_selected( sel, NULL, NULL );
-    gboolean ok_to_remove = !page->gtor || gtk_tree_model_iter_n_children( GTK_TREE_MODEL( page->store ), NULL ) > 1;
-    gtk_widget_set_sensitive( page->remove_button, has_selection && ok_to_remove );
+    gboolean              has_selection = gtk_tree_selection_get_selected(
+        sel, NULL, NULL );
+    gboolean              ok_to_remove = !page->gtor
+                                         || gtk_tree_model_iter_n_children(
+        GTK_TREE_MODEL(
+            page->store ),
+        NULL )
+                                         > 1;
+
+    gtk_widget_set_sensitive( page->remove_button,
+                              has_selection && ok_to_remove );
 }
 
 static void
-onTrackerRemoveClicked( GtkButton * w UNUSED, gpointer gpage )
+onTrackerRemoveClicked( GtkButton * w UNUSED,
+                        gpointer      gpage )
 {
     struct tracker_page * page = gpage;
-    GtkTreeIter iter;
-    if( gtk_tree_selection_get_selected( page->sel, NULL, &iter ) ) {
+    GtkTreeIter           iter;
+
+    if( gtk_tree_selection_get_selected( page->sel, NULL, &iter ) )
+    {
         gtk_list_store_remove( page->store, &iter );
         setTrackerChangeState( page, TRUE );
     }
 }
 
 static void
-onTrackerAddClicked( GtkButton * w UNUSED, gpointer gpage )
+onTrackerAddClicked( GtkButton * w UNUSED,
+                     gpointer      gpage )
 {
-    GtkTreeIter iter;
+    GtkTreeIter           iter;
     struct tracker_page * page = gpage;
-    GtkTreePath * path;
+    GtkTreePath *         path;
+
     gtk_list_store_append( page->store, &iter );
     setTrackerChangeState( page, TRUE );
     gtk_list_store_set( page->store, &iter, TR_COL_TIER, 1,
-                                      TR_COL_ANNOUNCE, "http://",
-                                      -1 );
+                        TR_COL_ANNOUNCE, "http://",
+                        -1 );
     path = gtk_tree_model_get_path( GTK_TREE_MODEL( page->store ), &iter );
     gtk_tree_view_set_cursor( page->view,
                               path,
-                              gtk_tree_view_get_column( page->view, TR_COL_ANNOUNCE ),
+                              gtk_tree_view_get_column( page->view,
+                                                        TR_COL_ANNOUNCE ),
                               TRUE );
     gtk_tree_path_free( path );
 }
 
 static void
-onTrackerSaveClicked( GtkButton * w UNUSED, gpointer gpage )
+onTrackerSaveClicked( GtkButton * w UNUSED,
+                      gpointer      gpage )
 {
     struct tracker_page * page = gpage;
-    GtkTreeModel * model = GTK_TREE_MODEL( page->store );
-    const int n = gtk_tree_model_iter_n_children( model, NULL );
+    GtkTreeModel *        model = GTK_TREE_MODEL( page->store );
+    const int             n = gtk_tree_model_iter_n_children( model, NULL );
 
     if( n > 0 ) /* must have at least one tracker */
     {
-        int i = 0;
-        GtkTreeIter iter;
+        int               i = 0;
+        GtkTreeIter       iter;
         tr_tracker_info * trackers;
 
         /* build the tracker list */
         trackers = g_new0( tr_tracker_info, n );
-        if( gtk_tree_model_get_iter_first( model, &iter ) ) do {
-            gtk_tree_model_get( model, &iter, TR_COL_TIER, &trackers[i].tier,
-                                              TR_COL_ANNOUNCE, &trackers[i].announce,
-                                              -1 );
-            ++i;
-        } while( gtk_tree_model_iter_next( model, &iter ) );
+        if( gtk_tree_model_get_iter_first( model, &iter ) ) do
+            {
+                gtk_tree_model_get( model, &iter, TR_COL_TIER,
+                                    &trackers[i].tier,
+                                    TR_COL_ANNOUNCE, &trackers[i].announce,
+                                    -1 );
+                ++i;
+            }
+            while( gtk_tree_model_iter_next( model, &iter ) );
+
         g_assert( i == n );
 
         /* set the tracker list */
@@ -166,17 +187,20 @@ onTrackerSaveClicked( GtkButton * w UNUSED, gpointer gpage )
         setTrackerChangeState( page, FALSE );
 
         /* cleanup */
-        for( i=0; i<n; ++i )
+        for( i = 0; i < n; ++i )
             g_free( trackers[i].announce );
         g_free( trackers );
     }
 }
 
 static void
-onTrackerRevertClicked( GtkButton * w UNUSED, gpointer gpage )
+onTrackerRevertClicked( GtkButton * w UNUSED,
+                        gpointer      gpage )
 {
     struct tracker_page * page = gpage;
-    GtkTreeModel * model = tracker_model_new( tr_torrent_handle( page->gtor ) );
+    GtkTreeModel *        model =
+        tracker_model_new( tr_torrent_handle( page->gtor ) );
+
     gtk_tree_view_set_model( page->view, model );
     page->store = GTK_LIST_STORE( model );
     g_object_unref( G_OBJECT( model ) );
@@ -185,14 +209,15 @@ onTrackerRevertClicked( GtkButton * w UNUSED, gpointer gpage )
 
 static void
 onAnnounceEdited( GtkCellRendererText * renderer UNUSED,
-                  gchar               * path_string,
-                  gchar               * new_text,
-                  gpointer              gpage )
+                  gchar *                        path_string,
+                  gchar *                        new_text,
+                  gpointer                       gpage )
 {
     struct tracker_page * page = gpage;
-    GtkTreeModel * model = GTK_TREE_MODEL( page->store );
-    GtkTreeIter iter;
-    GtkTreePath * path = gtk_tree_path_new_from_string( path_string ) ;
+    GtkTreeModel *        model = GTK_TREE_MODEL( page->store );
+    GtkTreeIter           iter;
+    GtkTreePath *         path = gtk_tree_path_new_from_string( path_string );
+
     if( gtk_tree_model_get_iter( model, &iter, path ) )
     {
         char * old_text;
@@ -201,7 +226,9 @@ onAnnounceEdited( GtkCellRendererText * renderer UNUSED,
         {
             if( strcmp( old_text, new_text ) )
             {
-                gtk_list_store_set( page->store, &iter, TR_COL_ANNOUNCE, new_text, -1 );
+                gtk_list_store_set( page->store, &iter, TR_COL_ANNOUNCE,
+                                    new_text,
+                                    -1 );
                 setTrackerChangeState( page, TRUE );
             }
         }
@@ -220,30 +247,31 @@ onAnnounceEdited( GtkCellRendererText * renderer UNUSED,
 
 static void
 onTierEdited( GtkCellRendererText  * renderer UNUSED,
-              gchar                * path_string,
-              gchar                * new_text,
-              gpointer               gpage )
+              gchar *                         path_string,
+              gchar *                         new_text,
+              gpointer                        gpage )
 {
     struct tracker_page * page = gpage;
-    GtkTreeModel * model = GTK_TREE_MODEL( page->store );
-    GtkTreeIter iter;
-    GtkTreePath * path;
-    char * end;
-    int new_tier;
+    GtkTreeModel *        model = GTK_TREE_MODEL( page->store );
+    GtkTreeIter           iter;
+    GtkTreePath *         path;
+    char *                end;
+    int                   new_tier;
 
     errno = 0;
     new_tier = strtol( new_text, &end, 10 );
-    if( new_tier<1 || *end || errno )
+    if( new_tier < 1 || *end || errno )
         return;
- 
-    path = gtk_tree_path_new_from_string( path_string ) ;
+
+    path = gtk_tree_path_new_from_string( path_string );
     if( gtk_tree_model_get_iter( model, &iter, path ) )
     {
         int old_tier;
         gtk_tree_model_get( model, &iter, TR_COL_TIER, &old_tier, -1 );
         if( old_tier != new_tier )
         {
-            gtk_list_store_set( page->store, &iter, TR_COL_TIER, new_tier, -1 );
+            gtk_list_store_set( page->store, &iter, TR_COL_TIER, new_tier,
+                                -1 );
             setTrackerChangeState( page, TRUE );
         }
     }
@@ -253,15 +281,15 @@ onTierEdited( GtkCellRendererText  * renderer UNUSED,
 GtkWidget*
 tracker_list_new( TrTorrent * gtor )
 {
-    GtkWidget * w;
-    GtkWidget * buttons;
-    GtkWidget * box;
-    GtkWidget * top;
-    GtkWidget * fr;
-    GtkTreeModel * m;
-    GtkCellRenderer * r;
-    GtkTreeViewColumn * c;
-    GtkTreeSelection * sel;
+    GtkWidget *           w;
+    GtkWidget *           buttons;
+    GtkWidget *           box;
+    GtkWidget *           top;
+    GtkWidget *           fr;
+    GtkTreeModel *        m;
+    GtkCellRenderer *     r;
+    GtkTreeViewColumn *   c;
+    GtkTreeSelection *    sel;
     struct tracker_page * page = g_new0( struct tracker_page, 1 );
 
     page->gtor = gtor;
@@ -277,25 +305,25 @@ tracker_list_new( TrTorrent * gtor )
     gtk_tree_view_set_enable_search( page->view, FALSE );
     r = gtk_cell_renderer_text_new( );
     g_object_set( G_OBJECT( r ),
-            "editable", TRUE,
-            NULL );
+                  "editable", TRUE,
+                  NULL );
     g_signal_connect( r, "edited",
                       G_CALLBACK( onTierEdited ), page );
     c = gtk_tree_view_column_new_with_attributes( _( "Tier" ), r,
-            "text", TR_COL_TIER,
-            NULL );
+                                                  "text", TR_COL_TIER,
+                                                  NULL );
     gtk_tree_view_column_set_sort_column_id( c, TR_COL_TIER );
     gtk_tree_view_append_column( page->view, c );
     r = gtk_cell_renderer_text_new( );
     g_object_set( G_OBJECT( r ),
-            "editable", TRUE,
-            "ellipsize", PANGO_ELLIPSIZE_END,
-            NULL );
+                  "editable", TRUE,
+                  "ellipsize", PANGO_ELLIPSIZE_END,
+                  NULL );
     g_signal_connect( r, "edited",
                       G_CALLBACK( onAnnounceEdited ), page );
     c = gtk_tree_view_column_new_with_attributes( _( "Announce URL" ), r,
-            "text", TR_COL_ANNOUNCE,
-            NULL );
+                                                  "text", TR_COL_ANNOUNCE,
+                                                  NULL );
     gtk_tree_view_column_set_sort_column_id( c, TR_COL_ANNOUNCE );
     gtk_tree_view_append_column( page->view, c );
     w = gtk_scrolled_window_new( NULL, NULL );
@@ -312,25 +340,28 @@ tracker_list_new( TrTorrent * gtor )
     gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_IN );
     gtk_container_add( GTK_CONTAINER( fr ), w );
     g_object_unref( G_OBJECT( m ) );
-                  
+
     w = gtk_button_new_from_stock( GTK_STOCK_ADD );
     g_signal_connect( w, "clicked", G_CALLBACK( onTrackerAddClicked ), page );
     gtk_box_pack_start_defaults( GTK_BOX( buttons ), w );
     page->add_button = w;
     w = gtk_button_new_from_stock( GTK_STOCK_REMOVE );
-    g_signal_connect( w, "clicked", G_CALLBACK( onTrackerRemoveClicked ), page );
+    g_signal_connect( w, "clicked", G_CALLBACK(
+                          onTrackerRemoveClicked ), page );
     gtk_box_pack_start_defaults( GTK_BOX( buttons ), w );
     page->remove_button = w;
     if( gtor )
     {
         w = gtk_button_new_from_stock( GTK_STOCK_SAVE );
-        g_signal_connect( w, "clicked", G_CALLBACK( onTrackerSaveClicked ), page );
+        g_signal_connect( w, "clicked", G_CALLBACK(
+                              onTrackerSaveClicked ), page );
         gtk_widget_set_sensitive( w, FALSE );
         gtk_box_pack_start_defaults( GTK_BOX( buttons ), w );
         page->save_button = w;
 
         w = gtk_button_new_from_stock( GTK_STOCK_REVERT_TO_SAVED );
-        g_signal_connect( w, "clicked", G_CALLBACK( onTrackerRevertClicked ), page );
+        g_signal_connect( w, "clicked", G_CALLBACK(
+                              onTrackerRevertClicked ), page );
         gtk_widget_set_sensitive( w, FALSE );
         gtk_box_pack_start_defaults( GTK_BOX( buttons ), w );
         page->revert_button = w;
@@ -348,26 +379,32 @@ tracker_list_new( TrTorrent * gtor )
 
 tr_tracker_info*
 tracker_list_get_trackers( GtkWidget * list,
-                           int       * trackerCount )
+                           int *       trackerCount )
 {
-    struct tracker_page * page = g_object_get_data( G_OBJECT( list ), "page" );
-    GtkTreeModel * model = GTK_TREE_MODEL( page->store );
-    const int n = gtk_tree_model_iter_n_children( model, NULL );
-    tr_tracker_info * trackers;
-    int i = 0;
-    GtkTreeIter iter;
+    struct tracker_page * page = g_object_get_data( G_OBJECT(
+                                                        list ), "page" );
+    GtkTreeModel *        model = GTK_TREE_MODEL( page->store );
+    const int             n = gtk_tree_model_iter_n_children( model, NULL );
+    tr_tracker_info *     trackers;
+    int                   i = 0;
+    GtkTreeIter           iter;
 
     /* build the tracker list */
     trackers = g_new0( tr_tracker_info, n );
-    if( gtk_tree_model_get_iter_first( model, &iter ) ) do {
-        gtk_tree_model_get( model, &iter, TR_COL_TIER, &trackers[i].tier,
-                                          TR_COL_ANNOUNCE, &trackers[i].announce,
-                                          -1 );
-        ++i;
-    } while( gtk_tree_model_iter_next( model, &iter ) );
+    if( gtk_tree_model_get_iter_first( model, &iter ) ) do
+        {
+            gtk_tree_model_get( model, &iter, TR_COL_TIER,
+                                &trackers[i].tier,
+                                TR_COL_ANNOUNCE, &trackers[i].announce,
+                                -1 );
+            ++i;
+        }
+        while( gtk_tree_model_iter_next( model, &iter ) );
+
     g_assert( i == n );
 
     *trackerCount = n;
 
     return trackers;
 }
+

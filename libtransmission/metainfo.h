@@ -29,16 +29,16 @@
 
 struct tr_benc;
 
-int tr_metainfoParse( const tr_handle       * handle,
-                      tr_info               * info,
-                      const struct tr_benc  * benc );
+int  tr_metainfoParse( const tr_handle *      handle,
+                       tr_info *              info,
+                       const struct tr_benc * benc );
 
 void tr_metainfoFree( tr_info * inf );
 
-void tr_metainfoRemoveSaved( const tr_handle  * handle,
-                             const tr_info    * info );
+void tr_metainfoRemoveSaved( const tr_handle * handle,
+                             const tr_info *   info );
 
 void tr_metainfoMigrate( tr_handle * handle,
-                         tr_info   * inf );
+                         tr_info *   inf );
 
 #endif

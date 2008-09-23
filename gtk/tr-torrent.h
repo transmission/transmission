@@ -30,62 +30,54 @@
 #include <libtransmission/bencode.h>
 #include "util.h"
 
-#define TR_TORRENT_TYPE		  (tr_torrent_get_type ())
-#define TR_TORRENT(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST ((obj), TR_TORRENT_TYPE, TrTorrent))
-#define TR_TORRENT_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST ((klass), TR_TORRENT_TYPE, TrTorrentClass))
-#define TR_IS_TORRENT(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TR_TORRENT_TYPE))
-#define TR_IS_TORRENT_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE ((klass), TR_TORRENT_TYPE))
-#define TR_TORRENT_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS ((obj), TR_TORRENT_TYPE, TrTorrentClass))
+#define TR_TORRENT_TYPE       ( tr_torrent_get_type ( ) )
+#define TR_TORRENT( obj ) \
+    ( G_TYPE_CHECK_INSTANCE_CAST ( ( obj ), TR_TORRENT_TYPE, TrTorrent ) )
+#define TR_TORRENT_CLASS( klass ) \
+    ( G_TYPE_CHECK_CLASS_CAST ( ( klass ), TR_TORRENT_TYPE, TrTorrentClass ) )
+#define TR_IS_TORRENT( obj ) \
+    ( G_TYPE_CHECK_INSTANCE_TYPE ( ( obj ), TR_TORRENT_TYPE ) )
+#define TR_IS_TORRENT_CLASS( klass ) \
+    ( G_TYPE_CHECK_CLASS_TYPE ( ( klass ), TR_TORRENT_TYPE ) )
+#define TR_TORRENT_GET_CLASS( obj ) \
+    ( G_TYPE_INSTANCE_GET_CLASS ( ( obj ), TR_TORRENT_TYPE, TrTorrentClass ) )
 
 typedef struct _TrTorrent
 {
-    GObject                    parent;
+    GObject    parent;
     struct TrTorrentPrivate  * priv;
 }
 TrTorrent;
 
 typedef struct TrTorrentClass
 {
-    GObjectClass parent;
+    GObjectClass    parent;
 }
 TrTorrentClass;
 
-GType
-tr_torrent_get_type(void);
+GType          tr_torrent_get_type( void );
 
-void
-tr_torrent_clear( TrTorrent * tor );
+void           tr_torrent_clear( TrTorrent * tor );
 
-tr_torrent *
-tr_torrent_handle(TrTorrent *tor);
+tr_torrent *   tr_torrent_handle( TrTorrent *tor );
 
-const tr_stat *
-tr_torrent_stat(TrTorrent *tor);
+const tr_stat *tr_torrent_stat( TrTorrent *tor );
 
-const tr_info *
-tr_torrent_info(TrTorrent *tor);
+const tr_info *tr_torrent_info( TrTorrent *tor );
 
-char*
-tr_torrent_status_str ( TrTorrent * tor );
+char*          tr_torrent_status_str( TrTorrent * tor );
 
-void
-tr_torrent_delete_files( TrTorrent * tor );
+void           tr_torrent_delete_files( TrTorrent * tor );
 
-void
-tr_torrent_open_folder( TrTorrent * tor );
+void           tr_torrent_open_folder( TrTorrent * tor );
 
-TrTorrent *
-tr_torrent_new_preexisting( tr_torrent * tor );
+TrTorrent *    tr_torrent_new_preexisting( tr_torrent * tor );
 
-TrTorrent *
-tr_torrent_new_ctor( tr_handle * handle, tr_ctor * ctor, char ** err );
+TrTorrent *    tr_torrent_new_ctor( tr_handle * handle,
+                                    tr_ctor *   ctor,
+                                    char **     err );
 
-void
-tr_torrent_set_remove_flag( TrTorrent *, gboolean );
+void           tr_torrent_set_remove_flag( TrTorrent *,
+                                           gboolean );
 
 #endif

@@ -3,7 +3,7 @@
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license. 
+ * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
@@ -11,24 +11,24 @@
  */
 
 #ifdef __BEOS__
-  #include <signal.h> 
-  #include <fs_info.h>
-  #include <FindDirectory.h>
-  #include <kernel/OS.h>
-  #define BEOS_MAX_THREADS 256
-#elif defined(WIN32)
-  #include <windows.h>
-  #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_PROFILE */
+ #include <signal.h>
+ #include <fs_info.h>
+ #include <FindDirectory.h>
+ #include <kernel/OS.h>
+ #define BEOS_MAX_THREADS 256
+#elif defined( WIN32 )
+ #include <windows.h>
+ #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_PROFILE */
 #else
-  #ifdef SYS_DARWIN
-    #include <CoreFoundation/CoreFoundation.h>
-  #endif
-    
-  #define _XOPEN_SOURCE 500 /* needed for recursive locks. */
-  #ifndef __USE_UNIX98
+ #ifdef SYS_DARWIN
+  #include <CoreFoundation/CoreFoundation.h>
+ #endif
+
+ #define _XOPEN_SOURCE 500  /* needed for recursive locks. */
+ #ifndef __USE_UNIX98
   #define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
-  #endif
-  #include <pthread.h>
+ #endif
+ #include <pthread.h>
 #endif
 
 #include <assert.h>
@@ -53,7 +53,7 @@
 
 #ifdef __BEOS__
 typedef thread_id tr_thread_id;
-#elif defined(WIN32)
+#elif defined( WIN32 )
 typedef DWORD tr_thread_id;
 #else
 typedef pthread_t tr_thread_id;
@@ -64,19 +64,20 @@ tr_getCurrentThread( void )
 {
 #ifdef __BEOS__
     return find_thread( NULL );
-#elif defined(WIN32)
-    return GetCurrentThreadId();
+#elif defined( WIN32 )
+    return GetCurrentThreadId( );
 #else
     return pthread_self( );
 #endif
 }
 
 static int
-tr_areThreadsEqual( tr_thread_id a, tr_thread_id b )
+tr_areThreadsEqual( tr_thread_id a,
+                    tr_thread_id b )
 {
 #ifdef __BEOS__
     return a == b;
-#elif defined(WIN32)
+#elif defined( WIN32 )
     return a == b;
 #else
     return pthread_equal( a, b );
@@ -85,24 +86,24 @@ tr_areThreadsEqual( tr_thread_id a, tr_thread_id b )
 
 struct tr_thread
 {
-    void          (* func ) ( void * );
-    void           * arg;
-    tr_thread_id     thread;
+    void            ( * func )( void * );
+    void *          arg;
+    tr_thread_id    thread;
 #ifdef WIN32
-    HANDLE           thread_handle;
+    HANDLE          thread_handle;
 #endif
 };
 
 int
-tr_amInThread ( const tr_thread * t )
+tr_amInThread( const tr_thread * t )
 {
-    return tr_areThreadsEqual( tr_getCurrentThread(), t->thread );
+    return tr_areThreadsEqual( tr_getCurrentThread( ), t->thread );
 }
 
 #ifdef WIN32
-#define ThreadFuncReturnType unsigned WINAPI
+ #define ThreadFuncReturnType unsigned WINAPI
 #else
-#define ThreadFuncReturnType void
+ #define ThreadFuncReturnType void
 #endif
 
 static ThreadFuncReturnType
@@ -125,55 +126,62 @@ ThreadFunc( void * _t )
 }
 
 tr_thread *
-tr_threadNew( void (*func)(void *), void * arg )
+tr_threadNew( void   ( *func )(void *),
+              void * arg )
 {
     tr_thread * t = tr_new0( tr_thread, 1 );
+
     t->func = func;
     t->arg  = arg;
 
 #ifdef __BEOS__
-    t->thread = spawn_thread( (void*)ThreadFunc, "beos thread", B_NORMAL_PRIORITY, t );
+    t->thread =
+        spawn_thread( (void*)ThreadFunc, "beos thread", B_NORMAL_PRIORITY,
+                     t );
     resume_thread( t->thread );
-#elif defined(WIN32)
+#elif defined( WIN32 )
     {
         unsigned int id;
-        t->thread_handle = (HANDLE) _beginthreadex( NULL, 0, &ThreadFunc, t, 0, &id );
+        t->thread_handle =
+            (HANDLE) _beginthreadex( NULL, 0, &ThreadFunc, t, 0,
+                                     &id );
         t->thread = (DWORD) id;
     }
 #else
-    pthread_create( &t->thread, NULL, (void * (*) (void *)) ThreadFunc, t );
+    pthread_create( &t->thread, NULL, ( void * ( * )(
+                                           void * ) )ThreadFunc, t );
 #endif
 
     return t;
 }
-    
+
 /***
 ****  LOCKS
 ***/
 
 struct tr_lock
 {
-    int depth;
+    int                 depth;
 #ifdef __BEOS__
-    sem_id lock;
-    thread_id lockThread;
-#elif defined(WIN32)
-    CRITICAL_SECTION lock;
-    DWORD lockThread;
+    sem_id              lock;
+    thread_id           lockThread;
+#elif defined( WIN32 )
+    CRITICAL_SECTION    lock;
+    DWORD               lockThread;
 #else
-    pthread_mutex_t lock;
-    pthread_t lockThread;
+    pthread_mutex_t     lock;
+    pthread_t           lockThread;
 #endif
 };
 
 tr_lock*
 tr_lockNew( void )
 {
-    tr_lock * l = tr_new0( tr_lock, 1 );
+    tr_lock *           l = tr_new0( tr_lock, 1 );
 
 #ifdef __BEOS__
     l->lock = create_sem( 1, "" );
-#elif defined(WIN32)
+#elif defined( WIN32 )
     InitializeCriticalSection( &l->lock ); /* supports recursion */
 #else
     pthread_mutexattr_t attr;
@@ -190,7 +198,7 @@ tr_lockFree( tr_lock * l )
 {
 #ifdef __BEOS__
     delete_sem( l->lock );
-#elif defined(WIN32)
+#elif defined( WIN32 )
     DeleteCriticalSection( &l->lock );
 #else
     pthread_mutex_destroy( &l->lock );
@@ -203,14 +211,14 @@ tr_lockLock( tr_lock * l )
 {
 #ifdef __BEOS__
     acquire_sem( l->lock );
-#elif defined(WIN32)
+#elif defined( WIN32 )
     EnterCriticalSection( &l->lock );
 #else
     pthread_mutex_lock( &l->lock );
 #endif
     assert( l->depth >= 0 );
     if( l->depth )
-        assert( tr_areThreadsEqual( l->lockThread, tr_getCurrentThread() ) );
+        assert( tr_areThreadsEqual( l->lockThread, tr_getCurrentThread( ) ) );
     l->lockThread = tr_getCurrentThread( );
     ++l->depth;
 }
@@ -219,20 +227,20 @@ int
 tr_lockHave( const tr_lock * l )
 {
     return ( l->depth > 0 )
-        && ( tr_areThreadsEqual( l->lockThread, tr_getCurrentThread() ) );
+           && ( tr_areThreadsEqual( l->lockThread, tr_getCurrentThread( ) ) );
 }
 
 void
 tr_lockUnlock( tr_lock * l )
 {
     assert( l->depth > 0 );
-    assert( tr_areThreadsEqual( l->lockThread, tr_getCurrentThread() ));
+    assert( tr_areThreadsEqual( l->lockThread, tr_getCurrentThread( ) ) );
 
     --l->depth;
     assert( l->depth >= 0 );
 #ifdef __BEOS__
     release_sem( l->lock );
-#elif defined(WIN32)
+#elif defined( WIN32 )
     LeaveCriticalSection( &l->lock );
 #else
     pthread_mutex_unlock( &l->lock );
@@ -243,8 +251,8 @@ tr_lockUnlock( tr_lock * l )
 ****  PATHS
 ***/
 
-#if !defined(WIN32) && !defined(__BEOS__) && !defined(__AMIGAOS4__)
-#include <pwd.h>
+#if !defined( WIN32 ) && !defined( __BEOS__ ) && !defined( __AMIGAOS4__ )
+ #include <pwd.h>
 #endif
 
 static const char *
@@ -260,10 +268,10 @@ getHomeDir( void )
         {
 #ifdef WIN32
             SHGetFolderPath( NULL, CSIDL_PROFILE, NULL, 0, home );
-#elif defined(__BEOS__) || defined(__AMIGAOS4__)
+#elif defined( __BEOS__ ) || defined( __AMIGAOS4__ )
             home = tr_strdup( "" );
 #else
-            struct passwd * pw = getpwuid( getuid() );
+            struct passwd * pw = getpwuid( getuid( ) );
             if( pw )
                 home = tr_strdup( pw->pw_dir );
             endpwent( );
@@ -287,22 +295,22 @@ getOldConfigDir( void )
         char buf[MAX_PATH_LENGTH];
 #ifdef __BEOS__
         find_directory( B_USER_SETTINGS_DIRECTORY,
-                        dev_for_path("/boot"), true,
-                        buf, sizeof( buf ) );
+                       dev_for_path( "/boot" ), true,
+                       buf, sizeof( buf ) );
         strcat( buf, "/Transmission" );
 #elif defined( SYS_DARWIN )
         tr_buildPath ( buf, sizeof( buf ), getHomeDir( ),
                        "Library", "Application Support",
                        "Transmission", NULL );
-#elif defined(__AMIGAOS4__)
+#elif defined( __AMIGAOS4__ )
         tr_strlcpy( buf, "PROGDIR:.transmission", sizeof( buf ) );
-#elif defined(WIN32)
+#elif defined( WIN32 )
         char appdata[MAX_PATH_LENGTH];
         SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
-        tr_buildPath( buf, sizeof(buf),
+        tr_buildPath( buf, sizeof( buf ),
                       appdata, "Transmission", NULL );
 #else
-        tr_buildPath ( buf, sizeof(buf),
+        tr_buildPath ( buf, sizeof( buf ),
                        getHomeDir( ), ".transmission", NULL );
 #endif
         path = tr_strdup( buf );
@@ -318,9 +326,9 @@ getOldTorrentsDir( void )
 
     if( !path )
     {
-        char buf[MAX_PATH_LENGTH];
-        const char * p = getOldConfigDir();
-#if defined(__BEOS__) || defined(WIN32) || defined(SYS_DARWIN)
+        char         buf[MAX_PATH_LENGTH];
+        const char * p = getOldConfigDir( );
+#if defined( __BEOS__ ) || defined( WIN32 ) || defined( SYS_DARWIN )
         tr_buildPath( buf, sizeof( buf ), p, "Torrents", NULL );
 #else
         tr_buildPath( buf, sizeof( buf ), p, "torrents", NULL );
@@ -331,6 +339,7 @@ getOldTorrentsDir( void )
 
     return path;
 }
+
 static const char *
 getOldCacheDir( void )
 {
@@ -338,12 +347,12 @@ getOldCacheDir( void )
 
     if( !path )
     {
-        char buf[MAX_PATH_LENGTH];
-#if defined(__BEOS__) || defined(WIN32)
+        char         buf[MAX_PATH_LENGTH];
+#if defined( __BEOS__ ) || defined( WIN32 )
         const char * p = getOldConfigDir( );
         tr_buildPath( buf, sizeof( buf ), p, "Cache", NULL );
 #elif defined( SYS_DARWIN )
-        tr_buildPath( buf, sizeof( buf ), getHomeDir(),
+        tr_buildPath( buf, sizeof( buf ), getHomeDir( ),
                       "Library", "Caches", "Transmission", NULL );
 #else
         const char * p = getOldConfigDir( );
@@ -356,23 +365,27 @@ getOldCacheDir( void )
 }
 
 static void
-moveFiles( const char * oldDir, const char * newDir )
+moveFiles( const char * oldDir,
+           const char * newDir )
 {
     if( oldDir && newDir && strcmp( oldDir, newDir ) )
     {
         DIR * dirh = opendir( oldDir );
         if( dirh )
         {
-            int count = 0;
+            int             count = 0;
             struct dirent * dirp;
-            while(( dirp = readdir( dirh )))
+            while( ( dirp = readdir( dirh ) ) )
             {
-                if( strcmp( dirp->d_name, "." ) && strcmp( dirp->d_name, ".." ) )
+                if( strcmp( dirp->d_name,
+                            "." ) && strcmp( dirp->d_name, ".." ) )
                 {
                     char o[MAX_PATH_LENGTH];
                     char n[MAX_PATH_LENGTH];
-                    tr_buildPath( o, sizeof(o), oldDir, dirp->d_name, NULL );
-                    tr_buildPath( n, sizeof(n), newDir, dirp->d_name, NULL );
+                    tr_buildPath( o, sizeof( o ), oldDir, dirp->d_name,
+                                  NULL );
+                    tr_buildPath( n, sizeof( n ), newDir, dirp->d_name,
+                                  NULL );
                     rename( o, n );
                     ++count;
                 }
@@ -408,15 +421,16 @@ migrateFiles( const tr_handle * handle )
 }
 
 #ifdef SYS_DARWIN
-#define RESUME_SUBDIR  "Resume"
-#define TORRENT_SUBDIR "Torrents"
+ #define RESUME_SUBDIR  "Resume"
+ #define TORRENT_SUBDIR "Torrents"
 #else
-#define RESUME_SUBDIR  "resume"
-#define TORRENT_SUBDIR "torrents"
+ #define RESUME_SUBDIR  "resume"
+ #define TORRENT_SUBDIR "torrents"
 #endif
 
 void
-tr_setConfigDir( tr_handle * handle, const char * configDir )
+tr_setConfigDir( tr_handle *  handle,
+                 const char * configDir )
 {
     char buf[MAX_PATH_LENGTH];
 
@@ -460,7 +474,7 @@ tr_getDefaultConfigDir( void )
     {
         char path[MAX_PATH_LENGTH];
 
-        if(( s = getenv( "TRANSMISSION_HOME" )))
+        if( ( s = getenv( "TRANSMISSION_HOME" ) ) )
         {
             tr_strlcpy( path, s, sizeof( path ) );
         }
@@ -470,18 +484,19 @@ tr_getDefaultConfigDir( void )
             tr_buildPath( path, sizeof( path ),
                           getHomeDir( ), "Library", "Application Support",
                           "Transmission", NULL );
-#elif defined(WIN32)
+#elif defined( WIN32 )
             char appdata[MAX_PATH_LENGTH];
             SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
             tr_buildPath( path, sizeof( path ),
                           appdata, "Transmission", NULL );
 #else
-            if(( s = getenv( "XDG_CONFIG_HOME" )))
+            if( ( s = getenv( "XDG_CONFIG_HOME" ) ) )
                 tr_buildPath( path, sizeof( path ),
                               s, "transmission", NULL );
             else
                 tr_buildPath( path, sizeof( path ),
-                              getHomeDir(), ".config", "transmission", NULL );
+                              getHomeDir( ), ".config", "transmission",
+                              NULL );
 #endif
         }
 
@@ -499,8 +514,10 @@ static int
 isClutchDir( const char * path )
 {
     struct stat sb;
-    char tmp[MAX_PATH_LENGTH];
-    tr_buildPath( tmp, sizeof( tmp ), path, "javascript", "transmission.js", NULL );
+    char        tmp[MAX_PATH_LENGTH];
+
+    tr_buildPath( tmp, sizeof( tmp ), path, "javascript", "transmission.js",
+                  NULL );
     tr_inf( _( "Searching for web interface file \"%s\"" ), tmp );
     return !stat( tmp, &sb );
 }
@@ -514,41 +531,49 @@ tr_getClutchDir( const tr_session * session UNUSED )
     {
         char path[MAX_PATH_LENGTH] = { '\0' };
 
-        if(( s = getenv( "CLUTCH_HOME" )))
+        if( ( s = getenv( "CLUTCH_HOME" ) ) )
         {
             tr_strlcpy( path, s, sizeof( path ) );
         }
-        else if(( s = getenv( "TRANSMISSION_WEB_HOME" )))
+        else if( ( s = getenv( "TRANSMISSION_WEB_HOME" ) ) )
         {
             tr_strlcpy( path, s, sizeof( path ) );
         }
         else
         {
 #ifdef SYS_DARWIN
-            CFURLRef appURL = CFBundleCopyBundleURL( CFBundleGetMainBundle() );
-            CFStringRef appRef = CFURLCopyFileSystemPath( appURL, kCFURLPOSIXPathStyle );
-            const char * appString = CFStringGetCStringPtr( appRef, CFStringGetFastestEncoding( appRef ) );
+            CFURLRef     appURL = CFBundleCopyBundleURL(
+                 CFBundleGetMainBundle( ) );
+            CFStringRef  appRef = CFURLCopyFileSystemPath(
+                appURL, kCFURLPOSIXPathStyle );
+            const char * appString = CFStringGetCStringPtr(
+                 appRef, CFStringGetFastestEncoding( appRef ) );
             CFRelease( appURL );
             CFRelease( appRef );
-            
-            tr_buildPath( path, sizeof( path ), appString, "Contents", "Resources", "web", NULL );
-#elif defined(WIN32)
 
-            #warning hey win32 people is this good or is there a better implementation of the next four lines
-            char appdata[MAX_PATH_LENGTH];
+            tr_buildPath( path, sizeof( path ), appString, "Contents",
+                          "Resources", "web",
+                          NULL );
+#elif defined( WIN32 )
+
+ #warning\
+            hey win32 people is this good or is there a better implementation of the next four lines
+            char     appdata[MAX_PATH_LENGTH];
             SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
             tr_buildPath( path, sizeof( path ),
                           appdata, "Transmission", NULL );
 #else
-            tr_list *candidates=NULL, *l;
+            tr_list *candidates = NULL, *l;
 
             /* XDG_DATA_HOME should be the first in the list of candidates */
             s = getenv( "XDG_DATA_HOME" );
             if( s && *s )
                 tr_list_append( &candidates, tr_strdup( s ) );
-            else {
+            else
+            {
                 char tmp[MAX_PATH_LENGTH];
-                tr_buildPath( tmp, sizeof( tmp ), getHomeDir(), ".local", "share", NULL );
+                tr_buildPath( tmp, sizeof( tmp ),
+                              getHomeDir( ), ".local", "share", NULL );
                 tr_list_append( &candidates, tr_strdup( tmp ) );
             }
 
@@ -556,19 +581,26 @@ tr_getClutchDir( const tr_session * session UNUSED )
             s = getenv( "XDG_DATA_DIRS" );
             if( !s || !*s )
                 s =  PACKAGE_DATA_DIR ":/usr/local/share/:/usr/share/";
-            while( s && *s ) {
+            while( s && *s )
+            {
                 char * end = strchr( s, ':' );
-                if( end ) {
-                    tr_list_append( &candidates, tr_strndup( s, end-s ) );
+                if( end )
+                {
+                    tr_list_append( &candidates, tr_strndup( s, end - s ) );
                     s = end + 1;
-                } else {
+                }
+                else
+                {
                     tr_list_append( &candidates, tr_strdup( s ) );
                     break;
                 }
             }
 
-            for( l=candidates; l; l=l->next ) {
-                tr_buildPath( path, sizeof( path ), l->data, "transmission", "web", NULL );
+            for( l = candidates; l; l = l->next )
+            {
+                tr_buildPath( path, sizeof( path ), l->data, "transmission",
+                              "web",
+                              NULL );
                 if( isClutchDir( path ) )
                     break;
                 *path = '\0';
@@ -581,7 +613,8 @@ tr_getClutchDir( const tr_session * session UNUSED )
         if( !*path )
         {
             tr_strlcpy( path, "/dev/null", sizeof( path ) );
-            tr_err( _( "Couldn't find the web interface's files!  To customize this, set the CLUTCH_HOME environmental variable to the folder where index.html is located." ) );
+            tr_err( _(
+                       "Couldn't find the web interface's files!  To customize this, set the CLUTCH_HOME environmental variable to the folder where index.html is located." ) );
         }
 
         s = tr_strdup( path );
@@ -589,7 +622,6 @@ tr_getClutchDir( const tr_session * session UNUSED )
 
     return s;
 }
-
 
 /***
 ****
@@ -602,13 +634,15 @@ tr_lockfile( const char * filename )
 
 #ifdef WIN32
 
-    HANDLE file = CreateFile( filename,
-                              GENERIC_READ|GENERIC_WRITE,
-                              FILE_SHARE_READ|FILE_SHARE_WRITE,
-                              NULL,
-                              OPEN_ALWAYS,
-                              FILE_ATTRIBUTE_NORMAL,
-                              NULL );
+    HANDLE              file = CreateFile(
+        filename,
+        GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ |
+        FILE_SHARE_WRITE,
+        NULL,
+        OPEN_ALWAYS,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL );
     if( file == INVALID_HANDLE_VALUE )
         ret = TR_LOCKFILE_EOPEN;
     else if( !LockFile( file, 0, 0, 1, 1 ) )
@@ -621,7 +655,8 @@ tr_lockfile( const char * filename )
     int fd = open( filename, O_RDWR | O_CREAT, 0666 );
     if( fd < 0 )
         ret = TR_LOCKFILE_EOPEN;
-    else {
+    else
+    {
         struct flock lk;
         memset( &lk, 0,  sizeof( lk ) );
         lk.l_start = 0;
@@ -639,91 +674,117 @@ tr_lockfile( const char * filename )
     return ret;
 }
 
-
 #ifdef WIN32
 
 /* The following mmap functions are by Joerg Walter, and were taken from
  * his paper at: http://www.genesys-e.de/jwalter/mix4win.htm
  */
 
-static LONG volatile g_sl __attribute__ ((aligned (4)));
+static LONG volatile g_sl __attribute__ ( ( aligned ( 4 ) ) );
 
 /* Wait for spin lock */
-static int slwait (LONG volatile *sl) {
-    while (InterlockedCompareExchange (sl, 1, 0) != 0)
-	Sleep (0);
+static int
+slwait( LONG volatile *sl )
+{
+    while( InterlockedCompareExchange ( sl, 1, 0 ) != 0 )
+        Sleep ( 0 );
+
     return 0;
 }
 
 /* Release spin lock */
-static int slrelease (LONG *sl) {
-    InterlockedExchange (sl, 0);
+static int
+slrelease( LONG *sl )
+{
+    InterlockedExchange ( sl, 0 );
     return 0;
 }
 
 /* getpagesize for windows */
-static long getpagesize (void) {
+static long
+getpagesize( void )
+{
     static long g_pagesize = 0;
-    if (! g_pagesize) {
+
+    if( !g_pagesize )
+    {
         SYSTEM_INFO system_info;
-        GetSystemInfo (&system_info);
+        GetSystemInfo ( &system_info );
         g_pagesize = system_info.dwPageSize;
     }
     return g_pagesize;
 }
 
-static long getregionsize (void) {
+static long
+getregionsize( void )
+{
     static long g_regionsize = 0;
-    if (! g_regionsize) {
+
+    if( !g_regionsize )
+    {
         SYSTEM_INFO system_info;
-        GetSystemInfo (&system_info);
+        GetSystemInfo ( &system_info );
         g_regionsize = system_info.dwAllocationGranularity;
     }
     return g_regionsize;
 }
 
-void *mmap (void *ptr, long size, long prot, long type, long handle, long arg) {
+void *
+mmap( void *ptr,
+      long  size,
+      long  prot,
+      long  type,
+      long  handle,
+      long  arg )
+{
     static long g_pagesize;
     static long g_regionsize;
+
     /* Wait for spin lock */
-    slwait (&g_sl);
+    slwait ( &g_sl );
     /* First time initialization */
-    if (! g_pagesize) 
-        g_pagesize = getpagesize ();
-    if (! g_regionsize) 
-        g_regionsize = getregionsize ();
+    if( !g_pagesize )
+        g_pagesize = getpagesize ( );
+    if( !g_regionsize )
+        g_regionsize = getregionsize ( );
     /* Allocate this */
-    ptr = VirtualAlloc (ptr, size,
-			MEM_RESERVE | MEM_COMMIT | MEM_TOP_DOWN, PAGE_READWRITE);
-    if (! ptr) {
-      ptr = (void *) -1;
+    ptr = VirtualAlloc ( ptr, size,
+                         MEM_RESERVE | MEM_COMMIT | MEM_TOP_DOWN,
+                         PAGE_READWRITE );
+    if( !ptr )
+    {
+        ptr = (void *) -1;
         goto mmap_exit;
     }
 mmap_exit:
     /* Release spin lock */
-    slrelease (&g_sl);
+    slrelease ( &g_sl );
     return ptr;
 }
 
-long munmap (void *ptr, long size) {
+long
+munmap( void *ptr,
+        long  size )
+{
     static long g_pagesize;
     static long g_regionsize;
-    int rc = -1;
+    int         rc = -1;
+
     /* Wait for spin lock */
-    slwait (&g_sl);
+    slwait ( &g_sl );
     /* First time initialization */
-    if (! g_pagesize) 
-        g_pagesize = getpagesize ();
-    if (! g_regionsize) 
-        g_regionsize = getregionsize ();
+    if( !g_pagesize )
+        g_pagesize = getpagesize ( );
+    if( !g_regionsize )
+        g_regionsize = getregionsize ( );
     /* Free this */
-    if (! VirtualFree (ptr, 0, 
-                       MEM_RELEASE))
+    if( !VirtualFree ( ptr, 0,
+                       MEM_RELEASE ) )
         goto munmap_exit;
     rc = 0;
 munmap_exit:
     /* Release spin lock */
-    slrelease (&g_sl);
+    slrelease ( &g_sl );
     return rc;
 }
 

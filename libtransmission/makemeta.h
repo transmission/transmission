@@ -3,7 +3,7 @@
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license. 
+ * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
@@ -15,8 +15,8 @@
 
 typedef struct tr_metainfo_builder_file
 {
-    char * filename;
-    uint64_t size;
+    char *      filename;
+    uint64_t    size;
 }
 tr_metainfo_builder_file;
 
@@ -30,7 +30,6 @@ typedef enum
 }
 tr_metainfo_builder_err;
 
-    
 
 typedef struct tr_metainfo_builder
 {
@@ -39,14 +38,14 @@ typedef struct tr_metainfo_builder
     ***  and cleaned up by tr_metaInfoBuilderFree()
     **/
 
-    char * top;
-    tr_metainfo_builder_file * files;
-    uint64_t totalSize;
-    uint32_t fileCount;
-    uint32_t pieceSize;
-    uint32_t pieceCount;
-    int isSingleFile;
-    tr_handle * handle;
+    char *                      top;
+    tr_metainfo_builder_file *  files;
+    uint64_t                    totalSize;
+    uint32_t                    fileCount;
+    uint32_t                    pieceSize;
+    uint32_t                    pieceCount;
+    int                         isSingleFile;
+    tr_handle *                 handle;
 
     /**
     ***  These are set inside tr_makeMetaInfo()
@@ -54,11 +53,11 @@ typedef struct tr_metainfo_builder
     ***  and cleaned up by tr_metaInfoBuilderFree()
     **/
 
-    tr_tracker_info  * trackers;
-    int trackerCount;
-    char * comment;
-    char * outputFile;
-    int isPrivate;
+    tr_tracker_info *  trackers;
+    int                trackerCount;
+    char *             comment;
+    char *             outputFile;
+    int                isPrivate;
 
     /**
     ***  These are set inside tr_makeMetaInfo() so the client
@@ -67,16 +66,16 @@ typedef struct tr_metainfo_builder
     ***  tell tr_makeMetaInfo() to abort and clean up after itself.
     **/
 
-    uint32_t pieceIndex;
-    int abortFlag;
-    int isDone;
-    tr_metainfo_builder_err result;
+    uint32_t                   pieceIndex;
+    int                        abortFlag;
+    int                        isDone;
+    tr_metainfo_builder_err    result;
 
     /* file in use when result was set to _IO_READ or _IO_WRITE */
-    char errfile[2048];
+    char    errfile[2048];
 
     /* errno encountered when result was set to _IO_READ or _IO_WRITE */
-    int my_errno;
+    int    my_errno;
 
     /**
     ***  This is an implementation detail.
@@ -88,12 +87,10 @@ typedef struct tr_metainfo_builder
 tr_metainfo_builder;
 
 
-tr_metainfo_builder*
-tr_metaInfoBuilderCreate( tr_handle   * handle,
-                          const char  * topFile );
+tr_metainfo_builder*tr_metaInfoBuilderCreate( tr_handle *  handle,
+                                              const char * topFile );
 
-void
-tr_metaInfoBuilderFree( tr_metainfo_builder* );
+void                tr_metaInfoBuilderFree( tr_metainfo_builder* );
 
 /**
  * @brief create a new .torrent file
@@ -112,13 +109,12 @@ tr_metaInfoBuilderFree( tr_metainfo_builder* );
  *
  * @param trackerCount size of the `trackers' array
  */
-void
-tr_makeMetaInfo( tr_metainfo_builder     * builder,
-                 const char              * outputFile,
-                 const tr_tracker_info   * trackers,
-                 int                       trackerCount,
-                 const char              * comment,
-                 int                       isPrivate );
+void tr_makeMetaInfo( tr_metainfo_builder *   builder,
+                      const char *            outputFile,
+                      const tr_tracker_info * trackers,
+                      int                     trackerCount,
+                      const char *            comment,
+                      int                     isPrivate );
 
 
 #endif

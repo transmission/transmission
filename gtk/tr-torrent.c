@@ -38,15 +38,16 @@
 
 struct TrTorrentPrivate
 {
-   tr_torrent * handle;
-   gboolean do_remove;
+    tr_torrent *  handle;
+    gboolean      do_remove;
 };
 
 
 static void
-tr_torrent_init(GTypeInstance *instance, gpointer g_class UNUSED )
+tr_torrent_init( GTypeInstance *  instance,
+                 gpointer g_class UNUSED )
 {
-    TrTorrent * self = TR_TORRENT( instance );
+    TrTorrent *               self = TR_TORRENT( instance );
     struct TrTorrentPrivate * p;
 
     p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE( self,
@@ -69,7 +70,7 @@ static void
 tr_torrent_dispose( GObject * o )
 {
     GObjectClass * parent;
-    TrTorrent * self = TR_TORRENT( o );
+    TrTorrent *    self = TR_TORRENT( o );
 
     if( !isDisposed( self ) )
     {
@@ -84,7 +85,7 @@ tr_torrent_dispose( GObject * o )
         self->priv = NULL;
     }
 
-    parent = g_type_class_peek(g_type_parent(TR_TORRENT_TYPE));
+    parent = g_type_class_peek( g_type_parent( TR_TORRENT_TYPE ) );
     parent->dispose( o );
 }
 
@@ -98,9 +99,11 @@ tr_torrent_clear( TrTorrent * tor )
 }
 
 static void
-tr_torrent_class_init( gpointer g_class, gpointer g_class_data UNUSED )
+tr_torrent_class_init( gpointer              g_class,
+                       gpointer g_class_data UNUSED )
 {
-    GObjectClass *gobject_class = G_OBJECT_CLASS(g_class);
+    GObjectClass *gobject_class = G_OBJECT_CLASS( g_class );
+
     gobject_class->dispose = tr_torrent_dispose;
     g_type_class_add_private( g_class, sizeof( struct TrTorrentPrivate ) );
 }
@@ -108,37 +111,38 @@ tr_torrent_class_init( gpointer g_class, gpointer g_class_data UNUSED )
 GType
 tr_torrent_get_type( void )
 {
-  static GType type = 0;
+    static GType type = 0;
 
-  if( !type )
-  {
-    static const GTypeInfo info = {
-      sizeof (TrTorrentClass),
-      NULL,   /* base_init */
-      NULL,   /* base_finalize */
-      tr_torrent_class_init,   /* class_init */
-      NULL,   /* class_finalize */
-      NULL,   /* class_data */
-      sizeof (TrTorrent),
-      0,      /* n_preallocs */
-      tr_torrent_init, /* instance_init */
-      NULL,
-    };
-    type = g_type_register_static(G_TYPE_OBJECT, "TrTorrent", &info, 0);
-  }
-  return type;
+    if( !type )
+    {
+        static const GTypeInfo info = {
+            sizeof ( TrTorrentClass ),
+            NULL,                     /* base_init */
+            NULL,                     /* base_finalize */
+            tr_torrent_class_init,    /* class_init */
+            NULL,                     /* class_finalize */
+            NULL,                     /* class_data */
+            sizeof ( TrTorrent ),
+            0,                        /* n_preallocs */
+            tr_torrent_init,          /* instance_init */
+            NULL,
+        };
+        type = g_type_register_static( G_TYPE_OBJECT, "TrTorrent", &info, 0 );
+    }
+    return type;
 }
 
 tr_torrent *
-tr_torrent_handle(TrTorrent *tor)
+tr_torrent_handle( TrTorrent *tor )
 {
     return isDisposed( tor ) ? NULL : tor->priv->handle;
 }
 
 const tr_stat *
-tr_torrent_stat(TrTorrent *tor)
+tr_torrent_stat( TrTorrent *tor )
 {
     tr_torrent * handle = tr_torrent_handle( tor );
+
     return handle ? tr_torrentStatCached( handle ) : NULL;
 }
 
@@ -146,6 +150,7 @@ const tr_info *
 tr_torrent_info( TrTorrent * tor )
 {
     tr_torrent * handle = tr_torrent_handle( tor );
+
     return handle ? tr_torrentInfo( handle ) : NULL;
 }
 
@@ -155,18 +160,21 @@ notifyInMainThread( gpointer user_data )
     tr_notify_send( TR_TORRENT( user_data ) );
     return FALSE;
 }
+
 static void
 statusChangedCallback( tr_torrent   * tor UNUSED,
-                       cp_status_t    status,
-                       void         * user_data )
+                       cp_status_t        status,
+                       void *             user_data )
 {
     if( status == TR_CP_COMPLETE )
         g_idle_add( notifyInMainThread, user_data );
 }
+
 static TrTorrent *
 maketorrent( tr_torrent * handle )
 {
     TrTorrent * tor = g_object_new( TR_TORRENT_TYPE, NULL );
+
     tor->priv->handle = handle;
     tr_torrentSetStatusCallback( handle, statusChangedCallback, tor );
     return tor;
@@ -179,13 +187,13 @@ tr_torrent_new_preexisting( tr_torrent * tor )
 }
 
 TrTorrent *
-tr_torrent_new_ctor( tr_handle  * handle,
-                     tr_ctor    * ctor,
-                     char      ** err )
+tr_torrent_new_ctor( tr_handle * handle,
+                     tr_ctor *   ctor,
+                     char **     err )
 {
     tr_torrent * tor;
-    int errcode;
-    uint8_t doTrash = FALSE;
+    int          errcode;
+    uint8_t      doTrash = FALSE;
 
     errcode = -1;
     *err = NULL;
@@ -198,7 +206,7 @@ tr_torrent_new_ctor( tr_handle  * handle,
 
     if( tor && doTrash )
         tr_file_trash_or_unlink( tr_ctorGetSourceFile( ctor ) );
-  
+
     if( !tor )
     {
         const char * filename = tr_ctorGetSourceFile( ctor );
@@ -208,11 +216,18 @@ tr_torrent_new_ctor( tr_handle  * handle,
         switch( errcode )
         {
             case TR_EINVALID:
-                *err = g_strdup_printf( _( "File \"%s\" isn't a valid torrent" ), filename );
-                 break;
-            case TR_EDUPLICATE:
-                *err = g_strdup_printf( _( "File \"%s\" is already open" ), filename );
+                *err =
+                    g_strdup_printf( _(
+                                         "File \"%s\" isn't a valid torrent" ),
+                                     filename );
                 break;
+
+            case TR_EDUPLICATE:
+                *err = g_strdup_printf( _(
+                                            "File \"%s\" is already open" ),
+                                        filename );
+                break;
+
             default:
                 *err = g_strdup( filename );
                 break;
@@ -225,64 +240,76 @@ tr_torrent_new_ctor( tr_handle  * handle,
 }
 
 char *
-tr_torrent_status_str ( TrTorrent * gtor )
+tr_torrent_status_str( TrTorrent * gtor )
 {
-    char * top = NULL;
+    char *          top = NULL;
 
     const tr_stat * st = tr_torrent_stat( gtor );
 
-    const int tpeers = MAX (st->peersConnected, 0);
-    const int upeers = MAX (st->peersGettingFromUs, 0);
-    const int eta = st->eta;
-    double prog = st->percentDone * 100.0; /* [0...100] */
+    const int       tpeers = MAX ( st->peersConnected, 0 );
+    const int       upeers = MAX ( st->peersGettingFromUs, 0 );
+    const int       eta = st->eta;
+    double          prog = st->percentDone * 100.0; /* [0...100] */
 
     switch( st->status )
     {
         case TR_STATUS_CHECK_WAIT:
             prog = st->recheckProgress * 100.0; /* [0...100] */
-            top = g_strdup_printf( _("Waiting to verify local data (%.1f%% tested)"), prog );
+            top =
+                g_strdup_printf( _(
+                                     "Waiting to verify local data (%.1f%% tested)" ),
+                                 prog );
             break;
 
         case TR_STATUS_CHECK:
             prog = st->recheckProgress * 100.0; /* [0...100] */
-            top = g_strdup_printf( _("Verifying local data (%.1f%% tested)"), prog );
+            top =
+                g_strdup_printf( _(
+                                     "Verifying local data (%.1f%% tested)" ),
+                                 prog );
             break;
 
         case TR_STATUS_DOWNLOAD:
 
             if( eta < 0 )
-                top = g_strdup_printf( _("Remaining time unknown (%.1f%%)" ), prog );
-            else {
+                top = g_strdup_printf( _(
+                                           "Remaining time unknown (%.1f%%)" ),
+                                       prog );
+            else
+            {
                 char timestr[128];
                 tr_strltime( timestr, eta, sizeof( timestr ) );
                 /* %1$s is # of minutes
                    %2$.1f is a percentage of how much of the torrent is done */
-                top = g_strdup_printf( _("%1$s remaining (%2$.1f%%)"), timestr, prog );
+                top = g_strdup_printf( _(
+                                           "%1$s remaining (%2$.1f%%)" ),
+                                       timestr, prog );
             }
             break;
 
         case TR_STATUS_SEED:
             top = g_strdup_printf(
                 ngettext( "Seeding to %1$'d of %2$'d connected peer",
-                          "Seeding to %1$'d of %2$'d connected peers", tpeers ),
-                          upeers, tpeers );
+                          "Seeding to %1$'d of %2$'d connected peers",
+                          tpeers ),
+                upeers, tpeers );
             break;
 
         case TR_STATUS_STOPPED:
-            top = g_strdup_printf( _("Stopped (%.1f%%)"), prog );
+            top = g_strdup_printf( _( "Stopped (%.1f%%)" ), prog );
             break;
 
         default:
             top = g_strdup_printf( "???" );
             break;
-
     }
 
     return top;
 }
 
 void
-tr_torrent_set_remove_flag( TrTorrent * gtor, gboolean do_remove )
+tr_torrent_set_remove_flag( TrTorrent * gtor,
+                            gboolean    do_remove )
 {
     if( !isDisposed( gtor ) )
         gtor->priv->do_remove = do_remove;
@@ -293,18 +320,20 @@ tr_torrent_delete_files( TrTorrent * gtor )
 {
     tr_file_index_t i;
     const tr_info * info = tr_torrent_info( gtor );
-    const char * stop = tr_torrentGetDownloadDir( tr_torrent_handle( gtor ) );
+    const char *    stop =
+        tr_torrentGetDownloadDir( tr_torrent_handle( gtor ) );
 
-    for( i=0; info && i<info->fileCount; ++i )
+    for( i = 0; info && i < info->fileCount; ++i )
     {
         char * file = g_build_filename( stop, info->files[i].name, NULL );
-        while( strcmp( stop, file ) && strlen(stop) < strlen(file) )
+        while( strcmp( stop, file ) && strlen( stop ) < strlen( file ) )
         {
             char * swap = g_path_get_dirname( file );
             tr_file_trash_or_unlink( file );
             g_free( file );
             file = swap;
         }
+
         g_free( file );
     }
 }
@@ -312,11 +341,15 @@ tr_torrent_delete_files( TrTorrent * gtor )
 void
 tr_torrent_open_folder( TrTorrent * gtor )
 {
-    tr_torrent * tor = tr_torrent_handle( gtor );
+    tr_torrent *    tor = tr_torrent_handle( gtor );
     const tr_info * info = tr_torrent_info( gtor );
-    char * path = info->fileCount == 1
-        ? g_build_filename( tr_torrentGetDownloadDir(tor), NULL )
-        : g_build_filename( tr_torrentGetDownloadDir(tor), info->name, NULL );
+    char *          path = info->fileCount == 1
+                           ? g_build_filename( tr_torrentGetDownloadDir(
+                                                   tor ), NULL )
+                           : g_build_filename( tr_torrentGetDownloadDir(
+                                                   tor ), info->name, NULL );
+
     gtr_open_file( path );
     g_free( path );
 }
+

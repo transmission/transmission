@@ -29,19 +29,31 @@
 #ifndef TG_CONF_H
 #define TG_CONF_H
 
-int64_t      pref_int_get            ( const char * key );
-void         pref_int_set            ( const char * key, int64_t value );
-void         pref_int_set_default    ( const char * key, int64_t value );
+int64_t     pref_int_get( const char * key );
 
-gboolean     pref_flag_get           ( const char * key );
-void         pref_flag_set           ( const char * key, gboolean value );
-void         pref_flag_set_default   ( const char * key, gboolean value );
+void        pref_int_set( const char * key,
+                          int64_t      value );
 
-const char*  pref_string_get         ( const char * key );
-void         pref_string_set         ( const char * key, const char * value );
-void         pref_string_set_default ( const char * key, const char * value );
+void        pref_int_set_default( const char * key,
+                                  int64_t      value );
 
-void         pref_save               ( void );
+gboolean    pref_flag_get( const char * key );
+
+void        pref_flag_set( const char * key,
+                           gboolean     value );
+
+void        pref_flag_set_default( const char * key,
+                                   gboolean     value );
+
+const char* pref_string_get( const char * key );
+
+void        pref_string_set( const char * key,
+                             const char * value );
+
+void        pref_string_set_default( const char * key,
+                                     const char * value );
+
+void        pref_save( void );
 
 /**
 ***
@@ -56,18 +68,20 @@ enum
 
 typedef int pref_flag_t;
 
-gboolean pref_flag_eval( pref_flag_t val, const char * key );
+gboolean pref_flag_eval( pref_flag_t  val,
+                         const char * key );
 
 
 /**
 ***
 **/
 
-gboolean
-cf_init(const char *confdir, char **errstr);
-gboolean
-cf_lock(tr_lockfile_state_t *tr_state, char **errstr);
-void
-cf_check_older_configs(void);
+gboolean cf_init( const char *confdir,
+                  char **     errstr );
+
+gboolean cf_lock( tr_lockfile_state_t *tr_state,
+                  char **              errstr );
+
+void     cf_check_older_configs( void );
 
 #endif /* TG_CONF_H */

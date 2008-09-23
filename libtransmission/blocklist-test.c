@@ -8,17 +8,20 @@
 
 #define VERBOSE 0
 
-#define check(A) { \
-    ++test; \
-    if (A) { \
-        if( VERBOSE ) \
-            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-    } else { \
-        if( VERBOSE ) \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-        return test; \
-    } \
-}
+#define check( A ) \
+    { \
+        ++test; \
+        if( A ){ \
+            if( VERBOSE ) \
+                fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__,\
+                         __LINE__ );\
+        } else { \
+            if( VERBOSE ) \
+                fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__,\
+                         __LINE__ );\
+            return test; \
+        } \
+    }
 
 static void
 createTestBlocklist( const char * tmpfile )
@@ -27,13 +30,13 @@ createTestBlocklist( const char * tmpfile )
                              "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255",
                              "Corel Corporation:216.21.157.192-216.21.157.223",
                              "Fox Speed Channel:216.79.131.192-216.79.131.223" };
-    FILE * out;
-    int i;
-    const int lineCount = sizeof(lines) / sizeof(lines[0]);
+    FILE *       out;
+    int          i;
+    const int    lineCount = sizeof( lines ) / sizeof( lines[0] );
 
     /* create the ascii file to feed to libtransmission */
     out = fopen( tmpfile, "w+" );
-    for( i=0; i<lineCount; ++i )
+    for( i = 0; i < lineCount; ++i )
         fprintf( out, "%s\n", lines[i] );
     fclose( out );
 }
@@ -42,14 +45,14 @@ int
 main( void )
 {
 #ifndef WIN32
-    char * tmpfile_txt = "/tmp/transmission-blocklist-test.txt";
-    char * tmpfile_bin = "/tmp/transmission-blocklist-test.bin";
+    char *         tmpfile_txt = "/tmp/transmission-blocklist-test.txt";
+    char *         tmpfile_bin = "/tmp/transmission-blocklist-test.bin";
 #else
-    char * tmpfile_txt = "transmission-blocklist-test.txt";
-    char * tmpfile_bin = "transmission-blocklist-test.bin";
+    char *         tmpfile_txt = "transmission-blocklist-test.txt";
+    char *         tmpfile_bin = "transmission-blocklist-test.bin";
 #endif
     struct in_addr addr;
-    int test = 0;
+    int            test = 0;
     tr_blocklist * b;
 
     remove( tmpfile_txt );
@@ -63,21 +66,21 @@ main( void )
     check( !tr_netResolve( "216.16.1.143", &addr ) );
     check( !_tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.144", &addr ) );
-    check(  _tr_blocklistHasAddress( b, &addr ) );
+    check( _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.145", &addr ) );
-    check(  _tr_blocklistHasAddress( b, &addr ) );
+    check( _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.146", &addr ) );
-    check(  _tr_blocklistHasAddress( b, &addr ) );
+    check( _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.147", &addr ) );
-    check(  _tr_blocklistHasAddress( b, &addr ) );
+    check( _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.148", &addr ) );
-    check(  _tr_blocklistHasAddress( b, &addr ) );
+    check( _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.149", &addr ) );
-    check(  _tr_blocklistHasAddress( b, &addr ) );
+    check( _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.150", &addr ) );
-    check(  _tr_blocklistHasAddress( b, &addr ) );
+    check( _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.151", &addr ) );
-    check(  _tr_blocklistHasAddress( b, &addr ) );
+    check( _tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.152", &addr ) );
     check( !_tr_blocklistHasAddress( b, &addr ) );
     check( !tr_netResolve( "216.16.1.153", &addr ) );
@@ -92,3 +95,4 @@ main( void )
     remove( tmpfile_bin );
     return 0;
 }
+

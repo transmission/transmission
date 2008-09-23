@@ -30,11 +30,14 @@
 #include "util.h"
 
 /* prompt if the user wants to quit, calls func with cbdata if they do */
-void askquit( TrCore*, GtkWindow* parent, callbackfunc_t func, void* cbdata );
+void askquit(                               TrCore*,
+                             GtkWindow*     parent,
+                             callbackfunc_t func,
+                             void*          cbdata );
 
 void confirmRemove( GtkWindow * parent,
-                    TrCore    * core,
-                    GSList    * gtorrents,
+                    TrCore *    core,
+                    GSList *    gtorrents,
                     gboolean    doDelete );
 
 #endif /* TG_PREFS_H */

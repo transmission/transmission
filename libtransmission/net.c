@@ -30,11 +30,11 @@
 #include <sys/types.h>
 
 #ifdef WIN32
-#include <winsock2.h> /* inet_addr */
+ #include <winsock2.h> /* inet_addr */
 #else
-#include <arpa/inet.h> /* inet_addr */
-#include <netdb.h>
-#include <fcntl.h>
+ #include <arpa/inet.h> /* inet_addr */
+ #include <netdb.h>
+ #include <fcntl.h>
 #endif
 
 #include <evutil.h>
@@ -52,11 +52,12 @@ void
 tr_netInit( void )
 {
     static int initialized = FALSE;
+
     if( !initialized )
     {
 #ifdef WIN32
         WSADATA wsaData;
-        WSAStartup(MAKEWORD(2,2), &wsaData);
+        WSAStartup( MAKEWORD( 2, 2 ), &wsaData );
 #endif
         initialized = TRUE;
     }
@@ -64,24 +65,26 @@ tr_netInit( void )
 
 /***********************************************************************
  * DNS resolution
- * 
+ *
  * Synchronous "resolution": only works with character strings
  * representing numbers expressed in the Internet standard `.' notation.
  * Returns a non-zero value if an error occurs.
  **********************************************************************/
-int tr_netResolve( const char * address, struct in_addr * addr )
+int
+tr_netResolve( const char *     address,
+               struct in_addr * addr )
 {
     addr->s_addr = inet_addr( address );
-    return ( addr->s_addr == 0xFFFFFFFF );
+    return addr->s_addr == 0xFFFFFFFF;
 }
-
 
 /***********************************************************************
  * TCP sockets
  **********************************************************************/
 
 int
-tr_netSetTOS( int s, int tos )
+tr_netSetTOS( int s,
+              int tos )
 {
 #ifdef IP_TOS
     return setsockopt( s, IPPROTO_IP, IP_TOS, (char*)&tos, sizeof( tos ) );
@@ -95,16 +98,16 @@ makeSocketNonBlocking( int fd )
 {
     if( fd >= 0 )
     {
-#if defined(__BEOS__)
+#if defined( __BEOS__ )
         int flags = 1;
         if( setsockopt( fd, SOL_SOCKET, SO_NONBLOCK,
-                        &flags, sizeof( int ) ) < 0 )
+                       &flags, sizeof( int ) ) < 0 )
 #else
         if( evutil_make_socket_nonblocking( fd ) )
 #endif
         {
             tr_err( _( "Couldn't create socket: %s" ),
-                    tr_strerror( sockerrno ) );
+                   tr_strerror( sockerrno ) );
             tr_netClose( fd );
             fd = -1;
         }
@@ -114,7 +117,8 @@ makeSocketNonBlocking( int fd )
 }
 
 static int
-createSocket( int type, int priority )
+createSocket( int type,
+              int priority )
 {
     int fd;
 
@@ -124,8 +128,9 @@ createSocket( int type, int priority )
         fd = makeSocketNonBlocking( fd );
 
 #if 0
-    if( fd >= 0 ) {
-        const int buffsize = 1500*3; /* 3x MTU for most ethernet/wireless */
+    if( fd >= 0 )
+    {
+        const int buffsize = 1500 * 3; /* 3x MTU for most ethernet/wireless */
         setsockopt( fd, SOL_SOCKET, SO_SNDBUF, &buffsize, sizeof( buffsize ) );
     }
 #endif
@@ -134,11 +139,13 @@ createSocket( int type, int priority )
 }
 
 int
-tr_netOpenTCP( const struct in_addr * addr, tr_port_t port, int priority )
+tr_netOpenTCP( const struct in_addr * addr,
+               tr_port_t              port,
+               int                    priority )
 {
-    int s;
+    int                s;
     struct sockaddr_in sock;
-    const int type = SOCK_STREAM;
+    const int          type = SOCK_STREAM;
 
     if( ( s = createSocket( type, priority ) ) < 0 )
         return -1;
@@ -149,21 +156,22 @@ tr_netOpenTCP( const struct in_addr * addr, tr_port_t port, int priority )
     sock.sin_port        = port;
 
     if( ( connect( s, (struct sockaddr *) &sock,
-                   sizeof( struct sockaddr_in ) ) < 0 )
+                  sizeof( struct sockaddr_in ) ) < 0 )
 #ifdef WIN32
-        && ( sockerrno != WSAEWOULDBLOCK )
+      && ( sockerrno != WSAEWOULDBLOCK )
 #endif
-        && ( sockerrno != EINPROGRESS ) )
+      && ( sockerrno != EINPROGRESS ) )
     {
-        tr_err( _( "Couldn't connect socket %d to %s, port %d (errno %d - %s)" ),
-                s, inet_ntoa(*addr), port,
-                sockerrno, tr_strerror(sockerrno) );
+        tr_err( _(
+                   "Couldn't connect socket %d to %s, port %d (errno %d - %s)" ),
+               s, inet_ntoa( *addr ), port,
+               sockerrno, tr_strerror( sockerrno ) );
         tr_netClose( s );
         s = -1;
     }
 
     tr_deepLog( __FILE__, __LINE__, NULL, "New OUTGOING connection %d (%s)",
-                s, tr_peerIoAddrStr( addr, port ) );
+               s, tr_peerIoAddrStr( addr, port ) );
 
     return s;
 }
@@ -171,11 +179,12 @@ tr_netOpenTCP( const struct in_addr * addr, tr_port_t port, int priority )
 int
 tr_netBindTCP( int port )
 {
-    int s;
+    int                s;
     struct sockaddr_in sock;
-    const int type = SOCK_STREAM;
+    const int          type = SOCK_STREAM;
+
 #if defined( SO_REUSEADDR ) || defined( SO_REUSEPORT )
-    int optval;
+    int                optval;
 #endif
 
     if( ( s = createSocket( type, 1 ) ) < 0 )
@@ -192,19 +201,22 @@ tr_netBindTCP( int port )
     sock.sin_port        = htons( port );
 
     if( bind( s, (struct sockaddr *) &sock,
-               sizeof( struct sockaddr_in ) ) )
+             sizeof( struct sockaddr_in ) ) )
     {
-        tr_err( _( "Couldn't bind port %d: %s" ), port, tr_strerror(sockerrno) );
+        tr_err( _( "Couldn't bind port %d: %s" ), port,
+               tr_strerror( sockerrno ) );
         tr_netClose( s );
         return -1;
     }
-     
+
     tr_dbg(  "Bound socket %d to port %d", s, port );
     return s;
 }
 
 int
-tr_netAccept( int b, struct in_addr * addr, tr_port_t * port )
+tr_netAccept( int              b,
+              struct in_addr * addr,
+              tr_port_t *      port )
 {
     return makeSocketNonBlocking( tr_fdSocketAccept( b, addr, port ) );
 }
@@ -216,11 +228,14 @@ tr_netClose( int s )
 }
 
 void
-tr_netNtop( const struct in_addr * addr, char * buf, int len )
+tr_netNtop( const struct in_addr * addr,
+            char *                 buf,
+            int                    len )
 {
     const uint8_t * cast;
 
     cast = (const uint8_t *)addr;
     tr_snprintf( buf, len, "%hhu.%hhu.%hhu.%hhu",
-                cast[0], cast[1], cast[2], cast[3] );
+                 cast[0], cast[1], cast[2], cast[3] );
 }
+

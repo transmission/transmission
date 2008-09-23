@@ -31,29 +31,31 @@
 
 #define INTERVAL_MSEC 1000
 #define GRANULARITY_MSEC 200
-#define HISTORY_SIZE (INTERVAL_MSEC / GRANULARITY_MSEC)
+#define HISTORY_SIZE ( INTERVAL_MSEC / GRANULARITY_MSEC )
 
 struct tr_transfer
 {
-    uint64_t date;
-    uint64_t size;
+    uint64_t    date;
+    uint64_t    size;
 };
 
 struct tr_ratecontrol
 {
-    int limit;
-    int newest;
-    struct tr_transfer transfers[HISTORY_SIZE];
+    int                   limit;
+    int                   newest;
+    struct tr_transfer    transfers[HISTORY_SIZE];
 };
 
 /* return the xfer rate over the last `interval' seconds in KiB/sec */
 static float
-rateForInterval( const tr_ratecontrol * r, int interval_msec )
+rateForInterval( const tr_ratecontrol * r,
+                 int                    interval_msec )
 {
-    uint64_t bytes = 0;
-    const uint64_t cutoff = tr_date () - interval_msec;
-    int i = r->newest;
-    for( ;; )
+    uint64_t       bytes = 0;
+    const uint64_t cutoff = tr_date ( ) - interval_msec;
+    int            i = r->newest;
+
+    for( ; ; )
     {
         if( r->transfers[i].date <= cutoff )
             break;
@@ -64,7 +66,7 @@ rateForInterval( const tr_ratecontrol * r, int interval_msec )
         if( i == r->newest ) break; /* we've come all the way around */
     }
 
-    return (bytes/1024.0) * (1000.0/interval_msec);
+    return ( bytes / 1024.0 ) * ( 1000.0 / interval_msec );
 }
 
 /***
@@ -75,6 +77,7 @@ tr_ratecontrol*
 tr_rcInit( void )
 {
     tr_ratecontrol * r = tr_new0( tr_ratecontrol, 1 );
+
     r->limit = 0;
     return r;
 }
@@ -106,13 +109,15 @@ tr_rcRate( const tr_ratecontrol * r )
 ***/
 
 void
-tr_rcTransferred( tr_ratecontrol * r, size_t size )
+tr_rcTransferred( tr_ratecontrol * r,
+                  size_t           size )
 {
-    const uint64_t now = tr_date ();
+    const uint64_t now = tr_date ( );
 
     if( r->transfers[r->newest].date + GRANULARITY_MSEC >= now )
         r->transfers[r->newest].size += size;
-    else {
+    else
+    {
         if( ++r->newest == HISTORY_SIZE ) r->newest = 0;
         r->transfers[r->newest].date = now;
         r->transfers[r->newest].size = size;
@@ -120,7 +125,8 @@ tr_rcTransferred( tr_ratecontrol * r, size_t size )
 }
 
 void
-tr_rcSetLimit( tr_ratecontrol * r, int limit )
+tr_rcSetLimit( tr_ratecontrol * r,
+               int              limit )
 {
     r->limit = limit;
 }
@@ -130,3 +136,4 @@ tr_rcGetLimit( const tr_ratecontrol * r )
 {
     return r->limit;
 }
+

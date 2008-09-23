@@ -39,16 +39,16 @@
 #include "event.h"
 
 #ifdef WIN32
-    #include <windows.h> /* for Sleep */
-#elif defined(__BEOS__)
-    #include <kernel/OS.h>
+ #include <windows.h>   /* for Sleep */
+#elif defined( __BEOS__ )
+ #include <kernel/OS.h>
 #endif
 
 #include "transmission.h"
 #include "utils.h"
 #include "platform.h"
 
-static tr_lock      * messageLock = NULL;
+static tr_lock *      messageLock = NULL;
 static int            messageLevel = 0;
 static int            messageQueuing = FALSE;
 static tr_msg_list *  messageQueue = NULL;
@@ -58,25 +58,31 @@ void
 tr_msgInit( void )
 {
     if( !messageLock )
-         messageLock = tr_lockNew( );
+        messageLock = tr_lockNew( );
 }
 
 FILE*
 tr_getLog( void )
 {
-    static int initialized = FALSE;
-    static FILE * file= NULL;
+    static int    initialized = FALSE;
+    static FILE * file = NULL;
 
     if( !initialized )
     {
         const char * str = getenv( "TR_DEBUG_FD" );
-        int fd = 0;
+        int          fd = 0;
         if( str && *str )
             fd = atoi( str );
-        switch( fd ) {
-            case 1: file = stdout; break;
-            case 2: file = stderr; break;
-            default: file = NULL; break;
+        switch( fd )
+        {
+            case 1:
+                file = stdout; break;
+
+            case 2:
+                file = stderr; break;
+
+            default:
+                file = NULL; break;
         }
         initialized = TRUE;
     }
@@ -87,7 +93,7 @@ tr_getLog( void )
 void
 tr_setMessageLevel( int level )
 {
-    tr_msgInit();
+    tr_msgInit( );
     tr_lockLock( messageLock );
     messageLevel = MAX( 0, level );
     tr_lockUnlock( messageLock );
@@ -98,7 +104,7 @@ tr_getMessageLevel( void )
 {
     int ret;
 
-    tr_msgInit();
+    tr_msgInit( );
     tr_lockLock( messageLock );
     ret = messageLevel;
     tr_lockUnlock( messageLock );
@@ -109,7 +115,7 @@ tr_getMessageLevel( void )
 void
 tr_setMessageQueuing( int enabled )
 {
-    tr_msgInit();
+    tr_msgInit( );
     tr_lockLock( messageLock );
     messageQueuing = enabled;
     tr_lockUnlock( messageLock );
@@ -150,13 +156,14 @@ tr_freeMessageList( tr_msg_list * list )
 **/
 
 char*
-tr_getLogTimeStr( char * buf, int buflen )
+tr_getLogTimeStr( char * buf,
+                  int    buflen )
 {
-    char tmp[64];
-    time_t now;
-    struct tm now_tm;
+    char           tmp[64];
+    time_t         now;
+    struct tm      now_tm;
     struct timeval tv;
-    int milliseconds;
+    int            milliseconds;
 
     now = time( NULL );
     gettimeofday( &tv, NULL );
@@ -166,31 +173,37 @@ tr_getLogTimeStr( char * buf, int buflen )
 #else
     localtime_r( &now, &now_tm );
 #endif
-    strftime( tmp, sizeof(tmp), "%H:%M:%S", &now_tm );
-    milliseconds = (int)(tv.tv_usec / 1000);
+    strftime( tmp, sizeof( tmp ), "%H:%M:%S", &now_tm );
+    milliseconds = (int)( tv.tv_usec / 1000 );
     tr_snprintf( buf, buflen, "%s.%03d", tmp, milliseconds );
 
     return buf;
 }
 
 void
-tr_deepLog( const char * file, int line, const char * name, const char * fmt, ... )
+tr_deepLog( const char * file,
+            int          line,
+            const char * name,
+            const char * fmt,
+            ... )
 {
     FILE * fp = tr_getLog( );
+
     if( fp )
     {
-        va_list args;
-        char timestr[64];
+        va_list           args;
+        char              timestr[64];
         struct evbuffer * buf = evbuffer_new( );
-        char * myfile = tr_strdup( file );
+        char *            myfile = tr_strdup( file );
 
-        evbuffer_add_printf( buf, "[%s] ", tr_getLogTimeStr( timestr, sizeof(timestr) ) );
+        evbuffer_add_printf( buf, "[%s] ",
+                            tr_getLogTimeStr( timestr, sizeof( timestr ) ) );
         if( name )
             evbuffer_add_printf( buf, "%s ", name );
         va_start( args, fmt );
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
-        evbuffer_add_printf( buf, " (%s:%d)\n", basename(myfile), line );
+        evbuffer_add_printf( buf, " (%s:%d)\n", basename( myfile ), line );
         fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
 
         tr_free( myfile );
@@ -203,9 +216,12 @@ tr_deepLog( const char * file, int line, const char * name, const char * fmt, ..
 ***/
 
 void
-tr_msg( const char * file, int line, int level,
+tr_msg( const char * file,
+        int          line,
+        int          level,
         const char * name,
-        const char * fmt, ... )
+        const char * fmt,
+        ... )
 {
     FILE * fp;
 
@@ -223,7 +239,7 @@ tr_msg( const char * file, int line, int level,
 
     if( messageLevel >= level )
     {
-        va_list ap;
+        va_list           ap;
         struct evbuffer * buf = evbuffer_new( );
 
         /* build the text message */
@@ -252,9 +268,10 @@ tr_msg( const char * file, int line, int level,
                 if( fp == NULL )
                     fp = stderr;
                 if( name )
-                    fprintf( fp, "%s: %s\n", name, (char*)EVBUFFER_DATA(buf) );
+                    fprintf( fp, "%s: %s\n", name,
+                            (char*)EVBUFFER_DATA( buf ) );
                 else
-                    fprintf( fp, "%s\n", (char*)EVBUFFER_DATA(buf) );
+                    fprintf( fp, "%s\n", (char*)EVBUFFER_DATA( buf ) );
                 fflush( fp );
             }
 
@@ -271,8 +288,10 @@ tr_msg( const char * file, int line, int level,
 ***/
 
 void
-tr_set_compare( const void * va, size_t aCount,
-                const void * vb, size_t bCount,
+tr_set_compare( const void * va,
+                size_t aCount,
+                const void * vb,
+                size_t bCount,
                 int compare( const void * a, const void * b ),
                 size_t elementSize,
                 tr_set_func in_a_cb,
@@ -282,39 +301,39 @@ tr_set_compare( const void * va, size_t aCount,
 {
     const uint8_t * a = (const uint8_t *) va;
     const uint8_t * b = (const uint8_t *) vb;
-    const uint8_t * aend = a + elementSize*aCount;
-    const uint8_t * bend = b + elementSize*bCount;
+    const uint8_t * aend = a + elementSize * aCount;
+    const uint8_t * bend = b + elementSize * bCount;
 
-    while( a!=aend || b!=bend )
+    while( a != aend || b != bend )
     {
-        if( a==aend )
+        if( a == aend )
         {
-            (*in_b_cb)( (void*)b, userData );
+            ( *in_b_cb )( (void*)b, userData );
             b += elementSize;
         }
-        else if ( b==bend )
+        else if( b == bend )
         {
-            (*in_a_cb)( (void*)a, userData );
+            ( *in_a_cb )( (void*)a, userData );
             a += elementSize;
         }
         else
         {
-            const int val = (*compare)( a, b );
+            const int val = ( *compare )( a, b );
 
             if( !val )
             {
-                (*in_both_cb)( (void*)a, userData );
+                ( *in_both_cb )( (void*)a, userData );
                 a += elementSize;
                 b += elementSize;
             }
             else if( val < 0 )
             {
-                (*in_a_cb)( (void*)a, userData );
+                ( *in_a_cb )( (void*)a, userData );
                 a += elementSize;
             }
             else if( val > 0 )
             {
-                (*in_b_cb)( (void*)b, userData );
+                ( *in_b_cb )( (void*)b, userData );
                 b += elementSize;
             }
         }
@@ -332,20 +351,24 @@ tr_strip_positional_args( const char* str )
 {
     static size_t bufsize = 0;
     static char * buf = NULL;
-    const size_t len = strlen( str );
-    char * out;
+    const size_t  len = strlen( str );
+    char *        out;
 
-    if( bufsize < len ) {
+    if( bufsize < len )
+    {
         bufsize = len * 2;
         buf = tr_renew( char, buf, bufsize );
     }
 
-    for( out=buf; *str; ++str ) {
+    for( out = buf; *str; ++str )
+    {
         *out++ = *str;
-        if( ( *str == '%' ) && isdigit( str[1] ) ) {
+        if( ( *str == '%' ) && isdigit( str[1] ) )
+        {
             const char * tmp = str + 1;
             while( isdigit( *tmp ) )
                 ++tmp;
+
             if( *tmp == '$' )
                 str = tmp;
         }
@@ -366,24 +389,26 @@ tr_timevalMsec( uint64_t milliseconds )
 {
     struct timeval ret;
     const uint64_t microseconds = milliseconds * 1000;
+
     ret.tv_sec  = microseconds / 1000000;
     ret.tv_usec = microseconds % 1000000;
     return ret;
 }
 
 uint8_t *
-tr_loadFile( const char * path, size_t * size )
+tr_loadFile( const char * path,
+             size_t *     size )
 {
-    uint8_t    * buf;
+    uint8_t *    buf;
     struct stat  sb;
-    FILE       * file;
+    FILE *       file;
     const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
 
     /* try to stat the file */
     errno = 0;
     if( stat( path, &sb ) )
     {
-        tr_dbg( err_fmt, path, tr_strerror(errno) );
+        tr_dbg( err_fmt, path, tr_strerror( errno ) );
         return NULL;
     }
 
@@ -397,7 +422,7 @@ tr_loadFile( const char * path, size_t * size )
     file = fopen( path, "rb" );
     if( !file )
     {
-        tr_err( err_fmt, path, tr_strerror(errno) );
+        tr_err( err_fmt, path, tr_strerror( errno ) );
         return NULL;
     }
     buf = malloc( sb.st_size );
@@ -409,7 +434,7 @@ tr_loadFile( const char * path, size_t * size )
     }
     if( fread( buf, sb.st_size, 1, file ) != 1 )
     {
-        tr_err( err_fmt, path, tr_strerror(errno) );
+        tr_err( err_fmt, path, tr_strerror( errno ) );
         fclose( file );
         free( buf );
         return NULL;
@@ -422,14 +447,15 @@ tr_loadFile( const char * path, size_t * size )
 }
 
 int
-tr_mkdir( const char * path, int permissions 
+tr_mkdir( const char * path,
+          int permissions
 #ifdef WIN32
-                                             UNUSED
+                       UNUSED
 #endif
-                                                    )
+        )
 {
 #ifdef WIN32
-    if( path && isalpha(path[0]) && path[1]==':' && !path[2] )
+    if( path && isalpha( path[0] ) && path[1] == ':' && !path[2] )
         return 0;
     return mkdir( path );
 #else
@@ -438,12 +464,13 @@ tr_mkdir( const char * path, int permissions
 }
 
 int
-tr_mkdirp( const char * path_in, int permissions )
+tr_mkdirp( const char * path_in,
+           int          permissions )
 {
-    char * path = tr_strdup( path_in );
-    char * p, * pp;
+    char *      path = tr_strdup( path_in );
+    char *      p, * pp;
     struct stat sb;
-    int done;
+    int         done;
 
     /* walk past the root */
     p = path;
@@ -452,7 +479,8 @@ tr_mkdirp( const char * path_in, int permissions )
 
     pp = p;
     done = 0;
-    while( ( p = strchr( pp, TR_PATH_DELIMITER ) ) || ( p = strchr( pp, '\0' ) ) )
+    while( ( p =
+                strchr( pp, TR_PATH_DELIMITER ) ) || ( p = strchr( pp, '\0' ) ) )
     {
         if( !*p )
             done = 1;
@@ -462,9 +490,12 @@ tr_mkdirp( const char * path_in, int permissions )
         if( stat( path, &sb ) )
         {
             /* Folder doesn't exist yet */
-            if( tr_mkdir( path, permissions ) ) {
+            if( tr_mkdir( path, permissions ) )
+            {
                 const int err = errno;
-                tr_err( _( "Couldn't create \"%1$s\": %2$s" ), path, tr_strerror( err ) );
+                tr_err( _(
+                           "Couldn't create \"%1$s\": %2$s" ), path,
+                       tr_strerror( err ) );
                 tr_free( path );
                 errno = err;
                 return -1;
@@ -474,7 +505,8 @@ tr_mkdirp( const char * path_in, int permissions )
         {
             /* Node exists but isn't a folder */
             char buf[MAX_PATH_LENGTH];
-            tr_snprintf( buf, sizeof( buf ), _( "File \"%s\" is in the way" ), path );
+            tr_snprintf( buf, sizeof( buf ), _(
+                             "File \"%s\" is in the way" ), path );
             tr_err( _( "Couldn't create \"%1$s\": %2$s" ), path_in, buf );
             tr_free( path );
             errno = ENOTDIR;
@@ -494,22 +526,27 @@ tr_mkdirp( const char * path_in, int permissions )
 }
 
 void
-tr_buildPath ( char *buf, size_t buflen, const char *first_element, ... )
+tr_buildPath( char *      buf,
+              size_t      buflen,
+              const char *first_element,
+              ... )
 {
     struct evbuffer * evbuf;
-    const char * element = first_element;
-    va_list vl;
+    const char *      element = first_element;
+    va_list           vl;
 
     evbuf = evbuffer_new( );
     va_start( vl, first_element );
 
-    while( element ) {
-        if( EVBUFFER_LENGTH(evbuf) )
+    while( element )
+    {
+        if( EVBUFFER_LENGTH( evbuf ) )
             evbuffer_add_printf( evbuf, "%c", TR_PATH_DELIMITER );
         evbuffer_add_printf( evbuf, "%s", element );
         element = (const char*) va_arg( vl, const char* );
     }
-    if( EVBUFFER_LENGTH(evbuf) )
+
+    if( EVBUFFER_LENGTH( evbuf ) )
         tr_strlcpy( buf, EVBUFFER_DATA( evbuf ), buflen );
     else
         *buf = '\0';
@@ -525,15 +562,20 @@ tr_ioErrorFromErrno( int err )
     {
         case 0:
             return TR_OK;
+
         case EACCES:
         case EROFS:
             return TR_ERROR_IO_PERMISSIONS;
+
         case ENOSPC:
             return TR_ERROR_IO_SPACE;
+
         case EMFILE:
             return TR_ERROR_IO_OPEN_FILES;
+
         case EFBIG:
             return TR_ERROR_IO_FILE_TOO_BIG;
+
         default:
             tr_err( "generic i/o errno from errno: %s", tr_strerror( errno ) );
             return TR_ERROR_IO_OTHER;
@@ -550,28 +592,38 @@ tr_errorString( int code )
 
         case TR_ERROR:
             return _( "Unspecified error" );
+
         case TR_ERROR_ASSERT:
             return _( "Assert error" );
 
         case TR_ERROR_IO_PARENT:
             return _( "Destination folder doesn't exist" );
+
         case TR_ERROR_IO_PERMISSIONS:
             return tr_strerror( EACCES );
+
         case TR_ERROR_IO_SPACE:
             return tr_strerror( ENOSPC );
+
         case TR_ERROR_IO_FILE_TOO_BIG:
             return tr_strerror( EFBIG );
+
         case TR_ERROR_IO_OPEN_FILES:
             return tr_strerror( EMFILE );
+
         case TR_ERROR_IO_DUP_DOWNLOAD:
-            return _( "A torrent with this name and destination folder already exists." );
+            return _(
+                       "A torrent with this name and destination folder already exists." );
+
         case TR_ERROR_IO_CHECKSUM:
             return _( "Checksum failed" );
+
         case TR_ERROR_IO_OTHER:
             return _( "Unspecified I/O error" );
 
         case TR_ERROR_TC_ERROR:
             return _( "Tracker error" );
+
         case TR_ERROR_TC_WARNING:
             return _( "Tracker warning" );
 
@@ -588,21 +640,24 @@ tr_errorString( int code )
 ****/
 
 void*
-tr_memdup( const void * in, int byteCount )
+tr_memdup( const void * in,
+           int          byteCount )
 {
     void * out = tr_new( uint8_t, byteCount );
+
     memcpy( out, in, byteCount );
     return out;
 }
-    
+
 char*
 tr_strdup( const void * in )
 {
-    return tr_strndup( in, in ? strlen((const char*)in) : 0 );
+    return tr_strndup( in, in ? strlen( (const char*)in ) : 0 );
 }
 
 char*
-tr_strndup( const void * in, int len )
+tr_strndup( const void * in,
+            int          len )
 {
     char * out = NULL;
 
@@ -612,7 +667,7 @@ tr_strndup( const void * in, int len )
     }
     else if( in )
     {
-        out = tr_malloc( len+1 );
+        out = tr_malloc( len + 1 );
         memcpy( out, in, len );
         out[len] = '\0';
     }
@@ -621,11 +676,12 @@ tr_strndup( const void * in, int len )
 }
 
 char*
-tr_strdup_printf( const char * fmt, ... )
+tr_strdup_printf( const char * fmt,
+                  ... )
 {
-    char * ret = NULL;
+    char *            ret = NULL;
     struct evbuffer * buf;
-    va_list ap;
+    va_list           ap;
 
     buf = evbuffer_new( );
     va_start( ap, fmt );
@@ -648,6 +704,7 @@ void*
 tr_malloc0( size_t size )
 {
     void * ret = tr_malloc( size );
+
     memset( ret, 0, size );
     return ret;
 }
@@ -663,6 +720,7 @@ const char*
 tr_strerror( int i )
 {
     const char * ret = strerror( i );
+
     if( ret == NULL )
         ret = "Unknown Error";
     return ret;
@@ -680,21 +738,21 @@ tr_strstrip( char * str )
         size_t pos;
         size_t len = strlen( str );
 
-        while( len && isspace( str[len-1] ) )
+        while( len && isspace( str[len - 1] ) )
             --len;
+
         str[len] = '\0';
 
-        for( pos=0; pos<len && isspace( str[pos] ); )
+        for( pos = 0; pos < len && isspace( str[pos] ); )
             ++pos;
 
         len -= pos;
-        memmove( str, str+pos, len );
+        memmove( str, str + pos, len );
         str[len] = '\0';
     }
 
     return str;
 }
-
 
 /****
 *****
@@ -704,8 +762,9 @@ tr_bitfield*
 tr_bitfieldNew( size_t bitCount )
 {
     tr_bitfield * ret = tr_new0( tr_bitfield, 1 );
+
     ret->bitCount = bitCount;
-    ret->byteCount = (bitCount+7u) / 8u;
+    ret->byteCount = ( bitCount + 7u ) / 8u;
     ret->bits = tr_new0( uint8_t, ret->byteCount );
     return ret;
 }
@@ -714,6 +773,7 @@ tr_bitfield*
 tr_bitfieldDup( const tr_bitfield * in )
 {
     tr_bitfield * ret = tr_new0( tr_bitfield, 1 );
+
     ret->bitCount = in->bitCount;
     ret->byteCount = in->byteCount;
     ret->bits = tr_memdup( in->bits, in->byteCount );
@@ -741,7 +801,7 @@ tr_bitfieldIsEmpty( const tr_bitfield * bitfield )
 {
     size_t i;
 
-    for( i=0; i<bitfield->byteCount; ++i )
+    for( i = 0; i < bitfield->byteCount; ++i )
         if( bitfield->bits[i] )
             return 0;
 
@@ -749,7 +809,8 @@ tr_bitfieldIsEmpty( const tr_bitfield * bitfield )
 }
 
 int
-tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
+tr_bitfieldAdd( tr_bitfield * bitfield,
+                size_t        nth )
 {
     assert( bitfield );
     assert( bitfield->bits );
@@ -757,17 +818,17 @@ tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
     if( nth >= bitfield->bitCount )
         return -1;
 
-    bitfield->bits[nth>>3u] |= (0x80 >> (nth&7u));
+    bitfield->bits[nth >> 3u] |= ( 0x80 >> ( nth & 7u ) );
     return 0;
 }
 
 /* Sets bit range [begin, end) to 1 */
 int
-tr_bitfieldAddRange( tr_bitfield  * b,
-                     size_t         begin,
-                     size_t         end )
+tr_bitfieldAddRange( tr_bitfield * b,
+                     size_t        begin,
+                     size_t        end )
 {
-    size_t sb, eb;
+    size_t        sb, eb;
     unsigned char sm, em;
 
     end--;
@@ -780,21 +841,24 @@ tr_bitfieldAddRange( tr_bitfield  * b,
     eb = end >> 3;
     em = 0xff << ( 7 - ( end & 7 ) );
 
-    if ( sb == eb ) {
+    if( sb == eb )
+    {
         b->bits[sb] |= ( sm & em );
-    } else {
+    }
+    else
+    {
         b->bits[sb] |= sm;
         b->bits[eb] |= em;
         if( ++sb < eb )
-            memset (b->bits + sb, 0xff, eb - sb);
+            memset ( b->bits + sb, 0xff, eb - sb );
     }
 
     return 0;
 }
 
 int
-tr_bitfieldRem( tr_bitfield   * bitfield,
-                size_t          nth )
+tr_bitfieldRem( tr_bitfield * bitfield,
+                size_t        nth )
 {
     assert( bitfield );
     assert( bitfield->bits );
@@ -802,17 +866,17 @@ tr_bitfieldRem( tr_bitfield   * bitfield,
     if( nth >= bitfield->bitCount )
         return -1;
 
-    bitfield->bits[nth>>3u] &= (0xff7f >> (nth&7u));
+    bitfield->bits[nth >> 3u] &= ( 0xff7f >> ( nth & 7u ) );
     return 0;
 }
 
 /* Clears bit range [begin, end) to 0 */
 int
-tr_bitfieldRemRange ( tr_bitfield  * b,
-                      size_t         begin,
-                      size_t         end )
+tr_bitfieldRemRange( tr_bitfield * b,
+                     size_t        begin,
+                     size_t        end )
 {
-    size_t sb, eb;
+    size_t        sb, eb;
     unsigned char sm, em;
 
     end--;
@@ -825,27 +889,32 @@ tr_bitfieldRemRange ( tr_bitfield  * b,
     eb = end >> 3;
     em = ~( 0xff << ( 7 - ( end & 7 ) ) );
 
-    if ( sb == eb ) {
+    if( sb == eb )
+    {
         b->bits[sb] &= ( sm | em );
-    } else {
+    }
+    else
+    {
         b->bits[sb] &= sm;
         b->bits[eb] &= em;
         if( ++sb < eb )
-            memset (b->bits + sb, 0, eb - sb);
+            memset ( b->bits + sb, 0, eb - sb );
     }
 
     return 0;
 }
 
 tr_bitfield*
-tr_bitfieldOr( tr_bitfield * a, const tr_bitfield * b )
+tr_bitfieldOr( tr_bitfield *       a,
+               const tr_bitfield * b )
 {
-    uint8_t *ait;
+    uint8_t *      ait;
     const uint8_t *aend, *bit;
 
     assert( a->bitCount == b->bitCount );
 
-    for( ait=a->bits, bit=b->bits, aend=ait+a->byteCount; ait!=aend; )
+    for( ait = a->bits, bit = b->bits, aend = ait + a->byteCount;
+         ait != aend; )
         *ait++ |= *bit++;
 
     return a;
@@ -853,46 +922,63 @@ tr_bitfieldOr( tr_bitfield * a, const tr_bitfield * b )
 
 /* set 'a' to all the flags that were in 'a' but not 'b' */
 void
-tr_bitfieldDifference( tr_bitfield * a, const tr_bitfield * b )
+tr_bitfieldDifference( tr_bitfield *       a,
+                       const tr_bitfield * b )
 {
-    uint8_t *ait;
+    uint8_t *      ait;
     const uint8_t *aend, *bit;
 
     assert( a->bitCount == b->bitCount );
 
-    for( ait=a->bits, bit=b->bits, aend=ait+a->byteCount; ait!=aend; )
-        *ait++ &= ~(*bit++);
+    for( ait = a->bits, bit = b->bits, aend = ait + a->byteCount;
+         ait != aend; )
+        *ait++ &= ~( *bit++ );
 }
-
 
 size_t
 tr_bitfieldCountTrueBits( const tr_bitfield* b )
 {
-    size_t ret = 0;
-    const uint8_t *it, *end;
+    size_t           ret = 0;
+    const uint8_t *  it, *end;
     static const int trueBitCount[512] = {
-        0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,
-        1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
-        1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
-        2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
-        1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
-        2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
-        2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
-        3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8,
-        1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
-        2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
-        2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
-        3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8,
-        2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
-        3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8,
-        3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8,
-        4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8,5,6,6,7,6,7,7,8,6,7,7,8,7,8,8,9
+        0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3,
+        4, 2, 3, 3, 4, 3, 4, 4, 5,
+        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4,
+        5, 3, 4, 4, 5, 4, 5, 5, 6,
+        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4,
+        5, 3, 4, 4, 5, 4, 5, 5, 6,
+        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5,
+        6, 4, 5, 5, 6, 5, 6, 6, 7,
+        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4,
+        5, 3, 4, 4, 5, 4, 5, 5, 6,
+        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5,
+        6, 4, 5, 5, 6, 5, 6, 6, 7,
+        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5,
+        6, 4, 5, 5, 6, 5, 6, 6, 7,
+        3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6,
+        7, 5, 6, 6, 7, 6, 7, 7, 8,
+        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4,
+        5, 3, 4, 4, 5, 4, 5, 5, 6,
+        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5,
+        6, 4, 5, 5, 6, 5, 6, 6, 7,
+        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5,
+        6, 4, 5, 5, 6, 5, 6, 6, 7,
+        3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6,
+        7, 5, 6, 6, 7, 6, 7, 7, 8,
+        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5,
+        6, 4, 5, 5, 6, 5, 6, 6, 7,
+        3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6,
+        7, 5, 6, 6, 7, 6, 7, 7, 8,
+        3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6,
+        7, 5, 6, 6, 7, 6, 7, 7, 8,
+        4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8, 5, 6, 6, 7, 6, 7, 7,
+        8, 6, 7, 7, 8, 7, 8, 8, 9
     };
 
     if( !b )
         return 0;
 
-    for( it=b->bits, end=it+b->byteCount; it!=end; ++it )
+    for( it = b->bits, end = it + b->byteCount; it != end; ++it )
         ret += trueBitCount[*it];
 
     return ret;
@@ -906,6 +992,7 @@ uint64_t
 tr_date( void )
 {
     struct timeval tv;
+
     gettimeofday( &tv, NULL );
     return (uint64_t) tv.tv_sec * 1000 + ( tv.tv_usec / 1000 );
 }
@@ -915,7 +1002,7 @@ tr_wait( uint64_t delay_milliseconds )
 {
 #ifdef __BEOS__
     snooze( 1000 * delay_milliseconds );
-#elif defined(WIN32)
+#elif defined( WIN32 )
     Sleep( (DWORD)delay_milliseconds );
 #else
     usleep( 1000 * delay_milliseconds );
@@ -927,16 +1014,19 @@ tr_wait( uint64_t delay_milliseconds )
 ***/
 
 int
-tr_snprintf( char * buf, size_t buflen, const char * fmt, ... )
+tr_snprintf( char *       buf,
+             size_t       buflen,
+             const char * fmt,
+             ... )
 {
-    int len;
+    int     len;
     va_list args;
+
     va_start( args, fmt );
     len = evutil_vsnprintf( buf, buflen, fmt, args );
     va_end( args );
     return len;
 }
-
 
 /*
  * Copy src to string dst of size siz.  At most siz-1 characters
@@ -944,35 +1034,40 @@ tr_snprintf( char * buf, size_t buflen, const char * fmt, ... )
  * Returns strlen(src); if retval >= siz, truncation occurred.
  */
 size_t
-tr_strlcpy(char *dst, const void * src, size_t siz)
+tr_strlcpy( char *       dst,
+            const void * src,
+            size_t       siz )
 {
 #ifdef HAVE_STRLCPY
     return strlcpy( dst, src, siz );
 #else
-    char *d = dst;
+    char *      d = dst;
     const char *s = src;
-    size_t n = siz;
+    size_t      n = siz;
 
     assert( s );
     assert( d );
 
     /* Copy as many bytes as will fit */
-    if (n != 0) {
-        while (--n != 0) {
-            if ((*d++ = *s++) == '\0')
+    if( n != 0 )
+    {
+        while( --n != 0 )
+        {
+            if( ( *d++ = *s++ ) == '\0' )
                 break;
         }
     }
 
     /* Not enough room in dst, add NUL and traverse rest of src */
-    if (n == 0) {
-        if (siz != 0)
+    if( n == 0 )
+    {
+        if( siz != 0 )
             *d = '\0'; /* NUL-terminate dst */
-        while (*s++)
+        while( *s++ )
             ;
     }
 
-    return(s - (char*)src - 1); /* count does not include NUL */
+    return s - (char*)src - 1;  /* count does not include NUL */
 #endif
 }
 
@@ -981,7 +1076,8 @@ tr_strlcpy(char *dst, const void * src, size_t siz)
 ***/
 
 double
-tr_getRatio( double numerator, double denominator )
+tr_getRatio( double numerator,
+             double denominator )
 {
     double ratio;
 
@@ -996,11 +1092,14 @@ tr_getRatio( double numerator, double denominator )
 }
 
 void
-tr_sha1_to_hex( char * out, const uint8_t * sha1 )
+tr_sha1_to_hex( char *          out,
+                const uint8_t * sha1 )
 {
     static const char hex[] = "0123456789abcdef";
-    int i;
-    for (i = 0; i < 20; i++) {
+    int               i;
+
+    for( i = 0; i < 20; i++ )
+    {
         unsigned int val = *sha1++;
         *out++ = hex[val >> 4];
         *out++ = hex[val & 0xf];
@@ -1015,7 +1114,7 @@ tr_sha1_to_hex( char * out, const uint8_t * sha1 )
 int
 tr_httpIsValidURL( const char * url )
 {
-    const char * c;
+    const char *        c;
     static const char * rfc2396_valid_chars =
         "abcdefghijklmnopqrstuvwxyz" /* lowalpha */
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" /* upalpha */
@@ -1028,7 +1127,7 @@ tr_httpIsValidURL( const char * url )
     if( url == NULL )
         return FALSE;
 
-    for( c=url; c && *c; ++c )
+    for( c = url; c && *c; ++c )
         if( !strchr( rfc2396_valid_chars, *c ) )
             return FALSE;
 
@@ -1036,57 +1135,64 @@ tr_httpIsValidURL( const char * url )
 }
 
 int
-tr_httpParseURL( const char * url_in, int len,
-                 char ** setme_host,
-                 int * setme_port,
-                 char ** setme_path )
+tr_httpParseURL( const char * url_in,
+                 int          len,
+                 char **      setme_host,
+                 int *        setme_port,
+                 char **      setme_path )
 {
-    int err;
-    int port = 0;
-    int n;
-    char * tmp;
-    char * pch;
+    int          err;
+    int          port = 0;
+    int          n;
+    char *       tmp;
+    char *       pch;
     const char * protocol = NULL;
     const char * host = NULL;
     const char * path = NULL;
 
     tmp = tr_strndup( url_in, len );
-    if(( pch = strstr( tmp, "://" )))
+    if( ( pch = strstr( tmp, "://" ) ) )
     {
-       *pch = '\0';
-       protocol = tmp;
-       pch += 3;
-/*fprintf( stderr, "protocol is [%s]... what's left is [%s]\n", protocol, pch );*/
-       if(( n = strcspn( pch, ":/" )))
-       {
-           const int havePort = pch[n] == ':';
-           host = pch;
-           pch += n;
-           *pch++ = '\0';
+        *pch = '\0';
+        protocol = tmp;
+        pch += 3;
+/*fprintf( stderr, "protocol is [%s]... what's left is [%s]\n", protocol, pch
+  );*/
+        if( ( n = strcspn( pch, ":/" ) ) )
+        {
+            const int havePort = pch[n] == ':';
+            host = pch;
+            pch += n;
+            *pch++ = '\0';
 /*fprintf( stderr, "host is [%s]... what's left is [%s]\n", host, pch );*/
-           if( havePort )
-           {
-               char * end;
-               port = strtol( pch, &end, 10 );
-               pch = end;
+            if( havePort )
+            {
+                char * end;
+                port = strtol( pch, &end, 10 );
+                pch = end;
 /*fprintf( stderr, "port is [%d]... what's left is [%s]\n", port, pch );*/
-           }
-           path = pch;
+            }
+            path = pch;
 /*fprintf( stderr, "path is [%s]\n", path );*/
-       }
+        }
     }
 
-    err = !host || !path || !protocol || ( strcmp(protocol,"http") && strcmp(protocol,"https") );
+    err = !host || !path || !protocol
+          || ( strcmp( protocol, "http" ) && strcmp( protocol, "https" ) );
 
-    if( !err && !port ) {
-        if( !strcmp(protocol,"http") ) port = 80;
-        if( !strcmp(protocol,"https") ) port = 443;
+    if( !err && !port )
+    {
+        if( !strcmp( protocol, "http" ) ) port = 80;
+        if( !strcmp( protocol, "https" ) ) port = 443;
     }
 
-    if( !err ) {
-        if( setme_host) { ((char*)host)[-3]=':'; *setme_host = tr_strdup( protocol ); }
-        if( setme_path) { ((char*)path)[-1]='/'; *setme_path = tr_strdup( path-1 ); }
-        if( setme_port) *setme_port = port;
+    if( !err )
+    {
+        if( setme_host ){ ( (char*)host )[-3] = ':'; *setme_host =
+                              tr_strdup( protocol ); }
+        if( setme_path ){ ( (char*)path )[-1] = '/'; *setme_path =
+                              tr_strdup( path - 1 ); }
+        if( setme_port ) *setme_port = port;
     }
 
 
@@ -1102,15 +1208,17 @@ tr_httpParseURL( const char * url_in, int len,
 #include <openssl/buffer.h>
 
 char *
-tr_base64_encode( const void * input, int length, int * setme_len )
+tr_base64_encode( const void * input,
+                  int          length,
+                  int *        setme_len )
 {
-    char * ret;
-    BIO * b64;
-    BIO * bmem;
+    char *    ret;
+    BIO *     b64;
+    BIO *     bmem;
     BUF_MEM * bptr;
 
     if( length < 1 )
-       length = strlen( input );
+        length = strlen( input );
 
     bmem = BIO_new( BIO_s_mem( ) );
     b64 = BIO_new( BIO_f_base64( ) );
@@ -1127,15 +1235,17 @@ tr_base64_encode( const void * input, int length, int * setme_len )
 }
 
 char *
-tr_base64_decode( const void * input, int length, int * setme_len )
+tr_base64_decode( const void * input,
+                  int          length,
+                  int *        setme_len )
 {
     char * ret;
-    BIO * b64;
-    BIO * bmem;
-    int retlen;
+    BIO *  b64;
+    BIO *  bmem;
+    int    retlen;
 
     if( length < 1 )
-       length = strlen( input );
+        length = strlen( input );
 
     ret = tr_new0( char, length );
     b64 = BIO_new( BIO_f_base64( ) );
@@ -1159,3 +1269,4 @@ tr_base64_decode( const void * input, int length, int * setme_len )
     BIO_free_all( bmem );
     return ret;
 }
+

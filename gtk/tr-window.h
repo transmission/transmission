@@ -32,8 +32,9 @@ typedef GtkWindow TrWindow;
 
 GtkTreeSelection * tr_window_get_selection( TrWindow* wind );
 
-GtkWidget * tr_window_new( GtkUIManager*, TrCore * core );
+GtkWidget *        tr_window_new(            GtkUIManager*,
+                                    TrCore * core );
 
-void tr_window_update( TrWindow * wind );
+void               tr_window_update( TrWindow * wind );
 
 #endif

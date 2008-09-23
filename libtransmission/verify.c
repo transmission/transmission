@@ -3,7 +3,7 @@
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license. 
+ * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
@@ -28,13 +28,13 @@
 
 struct verify_node
 {
-    tr_torrent * torrent;
-    tr_verify_done_cb verify_done_cb;
+    tr_torrent *         torrent;
+    tr_verify_done_cb    verify_done_cb;
 };
 
 static void
-fireCheckDone( tr_torrent          * torrent,
-               tr_verify_done_cb     verify_done_cb )
+fireCheckDone( tr_torrent *      torrent,
+               tr_verify_done_cb verify_done_cb )
 {
     if( verify_done_cb )
         verify_done_cb( torrent );
@@ -42,36 +42,40 @@ fireCheckDone( tr_torrent          * torrent,
 
 static struct verify_node currentNode;
 
-static tr_list * verifyList = NULL;
+static tr_list *          verifyList = NULL;
 
-static tr_thread * verifyThread = NULL;
+static tr_thread *        verifyThread = NULL;
 
-static int stopCurrent = FALSE;
+static int                stopCurrent = FALSE;
 
-static tr_lock* getVerifyLock( void )
+static tr_lock*
+getVerifyLock( void )
 {
     static tr_lock * lock = NULL;
+
     if( lock == NULL )
         lock = tr_lockNew( );
     return lock;
 }
 
 static int
-checkFile( tr_torrent       * tor,
-           tr_file_index_t    fileIndex,
-           int              * abortFlag )
+checkFile( tr_torrent *    tor,
+           tr_file_index_t fileIndex,
+           int *           abortFlag )
 {
     tr_piece_index_t i;
-    int changed = FALSE;
-    int nofile;
-    struct stat sb;
-    char path[MAX_PATH_LENGTH];
-    const tr_file * file = &tor->info.files[fileIndex];
+    int              changed = FALSE;
+    int              nofile;
+    struct stat      sb;
+    char             path[MAX_PATH_LENGTH];
+    const tr_file *  file = &tor->info.files[fileIndex];
 
-    tr_buildPath ( path, sizeof(path), tor->downloadDir, file->name, NULL );
+    tr_buildPath ( path, sizeof( path ), tor->downloadDir, file->name, NULL );
     nofile = stat( path, &sb ) || !S_ISREG( sb.st_mode );
 
-    for( i=file->firstPiece; i<=file->lastPiece && i<tor->info.pieceCount && (!*abortFlag); ++i )
+    for( i = file->firstPiece;
+         i <= file->lastPiece && i < tor->info.pieceCount && ( !*abortFlag );
+         ++i )
     {
         if( nofile )
         {
@@ -79,7 +83,8 @@ checkFile( tr_torrent       * tor,
         }
         else if( !tr_torrentIsPieceChecked( tor, i ) )
         {
-            const int wasComplete = tr_cpPieceIsComplete( tor->completion, i );
+            const int      wasComplete = tr_cpPieceIsComplete(
+                tor->completion, i );
             const tr_errno err = tr_ioTestPiece( tor, i );
 
             if( !err ) /* yay */
@@ -95,7 +100,8 @@ checkFile( tr_torrent       * tor,
                  * it being incomplete, do nothing -- we don't
                  * want to lose blocks in those incomplete pieces */
 
-                if( wasComplete ) {
+                if( wasComplete )
+                {
                     tr_torrentSetHasPiece( tor, i, FALSE );
                     changed = TRUE;
                 }
@@ -111,17 +117,18 @@ checkFile( tr_torrent       * tor,
 static void
 verifyThreadFunc( void * unused UNUSED )
 {
-    for( ;; )
+    for( ; ; )
     {
-        int changed = 0;
-        tr_file_index_t i;
-        tr_torrent * tor;
+        int                  changed = 0;
+        tr_file_index_t      i;
+        tr_torrent *         tor;
         struct verify_node * node;
 
         tr_lockLock( getVerifyLock( ) );
         stopCurrent = FALSE;
         node = (struct verify_node*) verifyList ? verifyList->data : NULL;
-        if( node == NULL ) {
+        if( node == NULL )
+        {
             currentNode.torrent = NULL;
             break;
         }
@@ -135,7 +142,7 @@ verifyThreadFunc( void * unused UNUSED )
         tor->verifyState = TR_VERIFY_NOW;
 
         tr_torinf( tor, _( "Verifying torrent" ) );
-        for( i=0; i<tor->info.fileCount && !stopCurrent; ++i )
+        for( i = 0; i < tor->info.fileCount && !stopCurrent; ++i )
             changed |= checkFile( tor, i, &stopCurrent );
 
         tor->verifyState = TR_VERIFY_NONE;
@@ -153,8 +160,8 @@ verifyThreadFunc( void * unused UNUSED )
 }
 
 void
-tr_verifyAdd( tr_torrent          * tor,
-              tr_verify_done_cb    verify_done_cb )
+tr_verifyAdd( tr_torrent *      tor,
+              tr_verify_done_cb verify_done_cb )
 {
     const int uncheckedCount = tr_torrentCountUncheckedPieces( tor );
 
@@ -183,10 +190,12 @@ tr_verifyAdd( tr_torrent          * tor,
 }
 
 static int
-compareVerifyByTorrent( const void * va, const void * vb )
+compareVerifyByTorrent( const void * va,
+                        const void * vb )
 {
     const struct verify_node * a = va;
-    const tr_torrent * b = vb;
+    const tr_torrent *         b = vb;
+
     return a->torrent - b;
 }
 
@@ -194,6 +203,7 @@ void
 tr_verifyRemove( tr_torrent * tor )
 {
     tr_lock * lock = getVerifyLock( );
+
     tr_lockLock( lock );
 
     if( tor == currentNode.torrent )
@@ -214,3 +224,4 @@ tr_verifyRemove( tr_torrent * tor )
 
     tr_lockUnlock( lock );
 }
+

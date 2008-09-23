@@ -53,9 +53,9 @@ void tr_fdClose( void );
  * @see tr_fdFileClose
  * @see tr_errno
  */
-int tr_fdFileCheckout( const char * folder,
-                       const char * torrentFile,
-                       int          doWrite );
+int  tr_fdFileCheckout( const char * folder,
+                        const char * torrentFile,
+                        int          doWrite );
 
 /**
  * Returns an fd from tr_fdFileCheckout() so that other clients may borrow it.
@@ -74,26 +74,30 @@ void tr_fdFileReturn( int file );
  * @see tr_fdFileCheckout
  * @see tr_fdFileReturn
  */
-void tr_fdFileClose( const char * filename );
-
+void     tr_fdFileClose( const char * filename );
 
 
 /***********************************************************************
  * Sockets
  **********************************************************************/
-int  tr_fdSocketCreate( int type, int priority );
-int  tr_fdSocketAccept( int b, struct in_addr * addr, tr_port_t * port );
-void tr_fdSocketClose( int s );
+int      tr_fdSocketCreate( int type,
+                            int priority );
+
+int      tr_fdSocketAccept( int              b,
+                            struct in_addr * addr,
+                            tr_port_t *      port );
+
+void     tr_fdSocketClose( int s );
 
 /***********************************************************************
  * tr_fdClose
  ***********************************************************************
  * Frees resources allocated by tr_fdInit.
  **********************************************************************/
-void tr_fdClose( void );
+void     tr_fdClose( void );
 
 
-void tr_fdSetPeerLimit( uint16_t n );
+void     tr_fdSetPeerLimit( uint16_t n );
 
 uint16_t tr_fdGetPeerLimit( void );
 

@@ -31,6 +31,7 @@
 /* create a new file list */
 GtkWidget * file_list_new( TrTorrent * );
 
-void file_list_set_torrent( GtkWidget *, TrTorrent * );
+void        file_list_set_torrent( GtkWidget *,
+                                   TrTorrent * );
 
 #endif

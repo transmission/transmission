@@ -24,12 +24,12 @@
 #ifndef TR_PLATFORM_H
 #define TR_PLATFORM_H
 
-#if defined(WIN32)
-#define TR_PATH_DELIMITER '\\'
-#define TR_PATH_DELIMITER_STR "\\"
+#if defined( WIN32 )
+ #define TR_PATH_DELIMITER '\\'
+ #define TR_PATH_DELIMITER_STR "\\"
 #else
-#define TR_PATH_DELIMITER '/'
-#define TR_PATH_DELIMITER_STR "/"
+ #define TR_PATH_DELIMITER '/'
+ #define TR_PATH_DELIMITER_STR "/"
 #endif
 
 typedef struct tr_lock   tr_lock;
@@ -37,30 +37,44 @@ typedef struct tr_thread tr_thread;
 
 struct tr_handle;
 
-void tr_setConfigDir  ( struct tr_handle * handle,
-                        const char       * configDir );
+void                tr_setConfigDir( struct tr_handle * handle,
+                                     const char *       configDir );
 
-const char * tr_getResumeDir  ( const struct tr_handle * );
+const char *        tr_getResumeDir( const struct tr_handle * );
 
-const char * tr_getTorrentDir ( const struct tr_handle * );
+const char *        tr_getTorrentDir( const struct tr_handle * );
 
-const char * tr_getClutchDir  ( const struct tr_handle * );
+const char *        tr_getClutchDir( const struct tr_handle * );
 
 
-tr_thread*   tr_threadNew  ( void (*func)(void *), void * arg );
-int          tr_amInThread ( const tr_thread * );
+tr_thread*          tr_threadNew( void   ( *func )(void *),
+                                  void * arg );
 
-tr_lock *    tr_lockNew        ( void );
-void         tr_lockFree       ( tr_lock * );
-void         tr_lockLock       ( tr_lock * );
-void         tr_lockUnlock     ( tr_lock * );
-int          tr_lockHave       ( const tr_lock * );
+int                 tr_amInThread( const tr_thread * );
 
-tr_lockfile_state_t tr_lockfile       ( const char * filename );
+tr_lock *           tr_lockNew( void );
+
+void                tr_lockFree( tr_lock * );
+
+void                tr_lockLock( tr_lock * );
+
+void                tr_lockUnlock( tr_lock * );
+
+int                 tr_lockHave( const tr_lock * );
+
+tr_lockfile_state_t tr_lockfile( const char * filename );
 
 #ifdef WIN32
-void *mmap (void *ptr, long size, long prot, long type, long handle, long arg);
-long munmap (void *ptr, long size);
+void *              mmap( void *ptr,
+                          long  size,
+                          long  prot,
+                          long  type,
+                          long  handle,
+                          long  arg );
+
+long                munmap( void *ptr,
+                            long  size );
+
 #endif
 
 #endif

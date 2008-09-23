@@ -32,26 +32,26 @@
 
 struct tr_completion
 {
-    unsigned int sizeWhenDoneIsDirty : 1;
+    unsigned int    sizeWhenDoneIsDirty : 1;
 
-    tr_torrent * tor;
+    tr_torrent *    tor;
 
     /* do we have this block? */
-    tr_bitfield * blockBitfield;
+    tr_bitfield *  blockBitfield;
 
     /* do we have this piece? */
-    tr_bitfield * pieceBitfield;
+    tr_bitfield *  pieceBitfield;
 
     /* a block is complete if and only if we have it */
-    uint16_t * completeBlocks;
+    uint16_t *  completeBlocks;
 
     /* number of bytes we'll have when done downloading. [0..info.totalSize]
        DON'T access this directly; it's a lazy field.
        use tr_cpSizeWhenDone() instead! */
-    uint64_t sizeWhenDoneLazy;
+    uint64_t    sizeWhenDoneLazy;
 
     /* number of bytes we want or have now. [0..sizeWhenDone] */
-    uint64_t sizeNow;
+    uint64_t    sizeNow;
 };
 
 static void
@@ -59,7 +59,8 @@ tr_cpReset( tr_completion * cp )
 {
     tr_bitfieldClear( cp->pieceBitfield );
     tr_bitfieldClear( cp->blockBitfield );
-    memset( cp->completeBlocks, 0, sizeof(uint16_t) * cp->tor->info.pieceCount );
+    memset( cp->completeBlocks, 0,
+            sizeof( uint16_t ) * cp->tor->info.pieceCount );
     cp->sizeNow = 0;
     cp->sizeWhenDoneIsDirty = 1;
 }
@@ -68,6 +69,7 @@ tr_completion *
 tr_cpInit( tr_torrent * tor )
 {
     tr_completion * cp  = tr_new( tr_completion, 1 );
+
     cp->tor             = tor;
     cp->blockBitfield   = tr_bitfieldNew( tor->blockCount );
     cp->pieceBitfield   = tr_bitfieldNew( tor->info.pieceCount );
@@ -86,7 +88,7 @@ tr_cpClose( tr_completion * cp )
 }
 
 void
-tr_cpInvalidateDND ( tr_completion * cp )
+tr_cpInvalidateDND( tr_completion * cp )
 {
     cp->sizeWhenDoneIsDirty = 1;
 }
@@ -96,26 +98,32 @@ tr_cpSizeWhenDone( const tr_completion * ccp )
 {
     if( ccp->sizeWhenDoneIsDirty )
     {
-        tr_completion * cp = (tr_completion *) ccp; /* mutable */
+        tr_completion *    cp = (tr_completion *) ccp; /* mutable */
         const tr_torrent * tor = cp->tor;
-        const tr_info * info = &tor->info;
-        tr_piece_index_t i;
-        uint64_t size = 0;
+        const tr_info *    info = &tor->info;
+        tr_piece_index_t   i;
+        uint64_t           size = 0;
 
-        for( i=0; i<info->pieceCount; ++i )
+        for( i = 0; i < info->pieceCount; ++i )
         {
-            if( !info->pieces[i].dnd ) {
+            if( !info->pieces[i].dnd )
+            {
                 /* we want the piece... */
                 size += tr_torPieceCountBytes( tor, i );
-            } else if( tr_cpPieceIsComplete( cp, i ) ) {
+            }
+            else if( tr_cpPieceIsComplete( cp, i ) )
+            {
                 /* we have the piece... */
                 size += tr_torPieceCountBytes( tor, i );
-            } else if( cp->completeBlocks[i] ) {
+            }
+            else if( cp->completeBlocks[i] )
+            {
                 /* we have part of the piece... */
                 const tr_block_index_t b = tr_torPieceFirstBlock( tor, i );
-                const tr_block_index_t e = b + tr_torPieceCountBlocks( tor, i );
-                tr_block_index_t j;
-                for( j=b; j<e; ++j )
+                const tr_block_index_t e = b + tr_torPieceCountBlocks( tor,
+                                                                       i );
+                tr_block_index_t       j;
+                for( j = b; j < e; ++j )
                     if( tr_cpBlockIsComplete( cp, j ) )
                         size += tr_torBlockCountBytes( tor, j );
             }
@@ -131,10 +139,11 @@ tr_cpSizeWhenDone( const tr_completion * ccp )
 }
 
 int
-tr_cpPieceIsComplete( const tr_completion  * cp,
-                      tr_piece_index_t       piece )
+tr_cpPieceIsComplete( const tr_completion * cp,
+                      tr_piece_index_t      piece )
 {
-    return cp->completeBlocks[piece] == tr_torPieceCountBlocks(cp->tor,piece);
+    return cp->completeBlocks[piece] == tr_torPieceCountBlocks( cp->tor,
+                                                                piece );
 }
 
 const tr_bitfield *
@@ -144,24 +153,26 @@ tr_cpPieceBitfield( const tr_completion * cp )
 }
 
 void
-tr_cpPieceAdd( tr_completion * cp, tr_piece_index_t piece )
+tr_cpPieceAdd( tr_completion *  cp,
+               tr_piece_index_t piece )
 {
-    const tr_torrent * tor = cp->tor;
-    const tr_block_index_t start = tr_torPieceFirstBlock(tor,piece);
-    const tr_block_index_t end = start + tr_torPieceCountBlocks(tor, piece);
-    tr_block_index_t i;
+    const tr_torrent *     tor = cp->tor;
+    const tr_block_index_t start = tr_torPieceFirstBlock( tor, piece );
+    const tr_block_index_t end = start + tr_torPieceCountBlocks( tor, piece );
+    tr_block_index_t       i;
 
-    for( i=start; i<end; ++i )
+    for( i = start; i < end; ++i )
         tr_cpBlockAdd( cp, i );
 }
 
 void
-tr_cpPieceRem( tr_completion * cp, tr_piece_index_t piece )
+tr_cpPieceRem( tr_completion *  cp,
+               tr_piece_index_t piece )
 {
-    const tr_torrent * tor = cp->tor;
+    const tr_torrent *     tor = cp->tor;
     const tr_block_index_t start = tr_torPieceFirstBlock( tor, piece );
     const tr_block_index_t end = start + tr_torPieceCountBlocks( tor, piece );
-    tr_block_index_t block;
+    tr_block_index_t       block;
 
     assert( cp );
     assert( piece < tor->info.pieceCount );
@@ -169,7 +180,7 @@ tr_cpPieceRem( tr_completion * cp, tr_piece_index_t piece )
     assert( start <= end );
     assert( end <= tor->blockCount );
 
-    for( block=start; block<end; ++block )
+    for( block = start; block < end; ++block )
         if( tr_cpBlockIsComplete( cp, block ) )
             cp->sizeNow -= tr_torBlockCountBytes( tor, block );
 
@@ -180,20 +191,23 @@ tr_cpPieceRem( tr_completion * cp, tr_piece_index_t piece )
 }
 
 int
-tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index_t block )
+tr_cpBlockIsComplete( const tr_completion * cp,
+                      tr_block_index_t      block )
 {
     return tr_bitfieldHas( cp->blockBitfield, block );
 }
 
 void
-tr_cpBlockAdd( tr_completion * cp, tr_block_index_t block )
+tr_cpBlockAdd( tr_completion *  cp,
+               tr_block_index_t block )
 {
     const tr_torrent * tor = cp->tor;
 
     if( !tr_cpBlockIsComplete( cp, block ) )
     {
         const tr_piece_index_t piece = tr_torBlockPiece( tor, block );
-        const int blockSize = tr_torBlockCountBytes( tor, block );
+        const int              blockSize = tr_torBlockCountBytes( tor,
+                                                                  block );
 
         ++cp->completeBlocks[piece];
 
@@ -220,7 +234,8 @@ tr_cpBlockBitfield( const tr_completion * cp )
 }
 
 tr_errno
-tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * bitfield )
+tr_cpBlockBitfieldSet( tr_completion * cp,
+                       tr_bitfield *   bitfield )
 {
     tr_block_index_t i;
 
@@ -228,11 +243,11 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * bitfield )
     assert( bitfield );
     assert( cp->blockBitfield );
 
-    if( !tr_bitfieldTestFast( bitfield, cp->tor->blockCount-1 ) )
+    if( !tr_bitfieldTestFast( bitfield, cp->tor->blockCount - 1 ) )
         return TR_ERROR_ASSERT;
 
     tr_cpReset( cp );
-    for( i=0; i<cp->tor->blockCount; ++i )
+    for( i = 0; i < cp->tor->blockCount; ++i )
         if( tr_bitfieldHasFast( bitfield, i ) )
             tr_cpBlockAdd( cp, i );
 
@@ -240,9 +255,11 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * bitfield )
 }
 
 int
-tr_cpMissingBlocksInPiece( const tr_completion * cp, tr_piece_index_t piece )
+tr_cpMissingBlocksInPiece( const tr_completion * cp,
+                           tr_piece_index_t      piece )
 {
-    return tr_torPieceCountBlocks( cp->tor, piece ) - cp->completeBlocks[piece];
+    return tr_torPieceCountBlocks( cp->tor,
+                                   piece ) - cp->completeBlocks[piece];
 }
 
 /***
@@ -252,43 +269,43 @@ tr_cpMissingBlocksInPiece( const tr_completion * cp, tr_piece_index_t piece )
 float
 tr_cpPercentDone( const tr_completion * cp )
 {
-    return tr_getRatio( cp->sizeNow, tr_cpSizeWhenDone(cp) );
+    return tr_getRatio( cp->sizeNow, tr_cpSizeWhenDone( cp ) );
 }
 
 float
-tr_cpPercentComplete ( const tr_completion * cp )
+tr_cpPercentComplete( const tr_completion * cp )
 {
     return tr_getRatio( cp->sizeNow, cp->tor->info.totalSize );
 }
 
 uint64_t
-tr_cpLeftUntilDone ( const tr_completion * cp )
+tr_cpLeftUntilDone( const tr_completion * cp )
 {
-    return tr_cpSizeWhenDone(cp) - cp->sizeNow;
+    return tr_cpSizeWhenDone( cp ) - cp->sizeNow;
 }
 
 uint64_t
-tr_cpLeftUntilComplete ( const tr_completion * cp )
+tr_cpLeftUntilComplete( const tr_completion * cp )
 {
     return cp->tor->info.totalSize - cp->sizeNow;
 }
 
 cp_status_t
-tr_cpGetStatus ( const tr_completion * cp )
+tr_cpGetStatus( const tr_completion * cp )
 {
     if( cp->sizeNow == cp->tor->info.totalSize ) return TR_CP_COMPLETE;
-    if( cp->sizeNow == tr_cpSizeWhenDone(cp) ) return TR_CP_DONE;
+    if( cp->sizeNow == tr_cpSizeWhenDone( cp ) ) return TR_CP_DONE;
     return TR_CP_INCOMPLETE;
 }
 
 uint64_t
 tr_cpHaveValid( const tr_completion * cp )
 {
-    uint64_t b = 0;
-    tr_piece_index_t i;
+    uint64_t           b = 0;
+    tr_piece_index_t   i;
     const tr_torrent * tor = cp->tor;
 
-    for( i=0; i<tor->info.pieceCount; ++i )
+    for( i = 0; i < tor->info.pieceCount; ++i )
         if( tr_cpPieceIsComplete( cp, i ) )
             b += tr_torPieceCountBytes( tor, i );
 
@@ -302,14 +319,17 @@ tr_cpHaveTotal( const tr_completion * cp )
 }
 
 void
-tr_cpGetAmountDone( const tr_completion * cp, float * tab, int tabCount )
+tr_cpGetAmountDone( const tr_completion * cp,
+                    float *               tab,
+                    int                   tabCount )
 {
-    int i;
+    int                i;
     const tr_torrent * tor = cp->tor;
-    const float interval = tor->info.pieceCount / (float)tabCount;
-    const int isComplete = tr_cpGetStatus ( tor->completion ) == TR_CP_COMPLETE;
+    const float        interval = tor->info.pieceCount / (float)tabCount;
+    const int          isComplete = tr_cpGetStatus ( tor->completion ) ==
+                                    TR_CP_COMPLETE;
 
-    for( i=0; i<tabCount; ++i )
+    for( i = 0; i < tabCount; ++i )
     {
         const tr_piece_index_t piece = i * interval;
 
@@ -317,7 +337,9 @@ tr_cpGetAmountDone( const tr_completion * cp, float * tab, int tabCount )
             tab[i] = 0.0f;
         else if( isComplete || tr_cpPieceIsComplete( cp, piece ) )
             tab[i] = 1.0f;
-        else 
-            tab[i] = (float)cp->completeBlocks[piece] / tr_torPieceCountBlocks( tor, piece );
+        else
+            tab[i] = (float)cp->completeBlocks[piece] /
+                     tr_torPieceCountBlocks( tor, piece );
     }
 }
+

@@ -26,34 +26,34 @@
 #define _TR_NET_H_
 
 #ifdef WIN32
-    #include <inttypes.h>
-    #include <winsock2.h>
-    typedef int socklen_t;
-    typedef uint16_t tr_port_t;
-#elif defined(__BEOS__)
-    #include <sys/socket.h>
-    #include <netinet/in.h>
-    typedef unsigned short tr_port_t;
-    typedef int socklen_t;
+ #include <inttypes.h>
+ #include <winsock2.h>
+typedef int socklen_t;
+typedef uint16_t tr_port_t;
+#elif defined( __BEOS__ )
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+typedef unsigned short tr_port_t;
+typedef int socklen_t;
 #else
-    #include <sys/types.h>
-    #include <sys/socket.h>
-    #include <netinet/in.h>
-    #include <arpa/inet.h>
-    typedef in_port_t tr_port_t;
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+typedef in_port_t tr_port_t;
 #endif
 
 #ifdef WIN32
-    #define ECONNREFUSED WSAECONNREFUSED
-    #define ECONNRESET   WSAECONNRESET
-    #define EHOSTUNREACH WSAEHOSTUNREACH
-    #define EINPROGRESS  WSAEINPROGRESS
-    #define ENOTCONN     WSAENOTCONN
-    #define EWOULDBLOCK  WSAEWOULDBLOCK
-    #define sockerrno WSAGetLastError( )
+ #define ECONNREFUSED WSAECONNREFUSED
+ #define ECONNRESET   WSAECONNRESET
+ #define EHOSTUNREACH WSAEHOSTUNREACH
+ #define EINPROGRESS  WSAEINPROGRESS
+ #define ENOTCONN     WSAENOTCONN
+ #define EWOULDBLOCK  WSAEWOULDBLOCK
+ #define sockerrno WSAGetLastError( )
 #else
-    #include <errno.h>
-    #define sockerrno errno
+ #include <errno.h>
+ #define sockerrno errno
 #endif
 
 struct in_addr;
@@ -62,20 +62,32 @@ struct sockaddr_in;
 /***********************************************************************
  * DNS resolution
  **********************************************************************/
-int tr_netResolve( const char *, struct in_addr * );
+int  tr_netResolve( const  char *,
+                    struct in_addr * );
 
 
 /***********************************************************************
  * Sockets
  **********************************************************************/
-int  tr_netOpenTCP  ( const struct in_addr * addr, tr_port_t port, int priority );
-int  tr_netBindTCP  ( int port );
-int  tr_netAccept   ( int s, struct in_addr *, tr_port_t * );
-int  tr_netSetTOS   ( int s, int tos );
-void tr_netClose    ( int s );
+int  tr_netOpenTCP( const struct in_addr * addr,
+                    tr_port_t              port,
+                    int                    priority );
 
-void tr_netNtop( const struct in_addr * addr, char * buf, int len );
+int  tr_netBindTCP( int port );
 
-void tr_netInit ( void );
+int  tr_netAccept( int    s,
+                   struct in_addr *,
+                          tr_port_t * );
+
+int  tr_netSetTOS( int s,
+                   int tos );
+
+void tr_netClose( int s );
+
+void tr_netNtop( const struct in_addr * addr,
+                 char *                 buf,
+                 int                    len );
+
+void tr_netInit( void );
 
 #endif /* _TR_NET_H_ */

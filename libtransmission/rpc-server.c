@@ -3,7 +3,7 @@
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license. 
+ * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
@@ -38,32 +38,36 @@
 
 struct tr_rpc_server
 {
-    unsigned int isEnabled          : 1;
-    unsigned int isPasswordEnabled  : 1;
-    int port;
-    time_t lastRequestTime;
-    struct shttpd_ctx * ctx;
-    tr_handle * session;
-    struct event timer;
-    char * username;
-    char * password;
-    char * acl;
-    tr_list * connections;
+    unsigned int         isEnabled         : 1;
+    unsigned int         isPasswordEnabled : 1;
+    int                  port;
+    time_t               lastRequestTime;
+    struct shttpd_ctx *  ctx;
+    tr_handle *          session;
+    struct event         timer;
+    char *               username;
+    char *               password;
+    char *               acl;
+    tr_list *            connections;
 };
 
-#define dbgmsg(fmt...) tr_deepLog(__FILE__, __LINE__, MY_NAME, ##fmt )
+#define dbgmsg( fmt... ) tr_deepLog( __FILE__, __LINE__, MY_NAME, ## fmt )
 
 static const char*
-tr_memmem( const char * s1, size_t l1,
-           const char * s2, size_t l2 )
+tr_memmem( const char * s1,
+           size_t       l1,
+           const char * s2,
+           size_t       l2 )
 {
-    if (!l2) return s1;
-    while (l1 >= l2) {
+    if( !l2 ) return s1;
+    while( l1 >= l2 )
+    {
         l1--;
-        if (!memcmp(s1,s2,l2))
+        if( !memcmp( s1, s2, l2 ) )
             return s1;
         s1++;
     }
+
     return NULL;
 }
 
@@ -73,28 +77,30 @@ tr_memmem( const char * s1, size_t l1,
 
 struct ConnBuf
 {
-    char * key;
-    time_t lastActivity;
-    struct evbuffer * in;
-    struct evbuffer * out;
+    char *             key;
+    time_t             lastActivity;
+    struct evbuffer *  in;
+    struct evbuffer *  out;
 };
 
 static char*
 buildKey( struct shttpd_arg * arg )
 {
     return tr_strdup_printf( "%s %s",
-                             shttpd_get_env( arg, "REMOTE_ADDR" ),
-                             shttpd_get_env( arg, "REQUEST_URI" ) );
+                            shttpd_get_env( arg, "REMOTE_ADDR" ),
+                            shttpd_get_env( arg, "REQUEST_URI" ) );
 }
 
 static struct ConnBuf*
-getBuffer( tr_rpc_server * server, struct shttpd_arg * arg )
+getBuffer(
+                        tr_rpc_server * server,
+    struct shttpd_arg * arg )
 {
-    tr_list * l;
-    char * key = buildKey( arg );
+    tr_list *        l;
+    char *           key = buildKey( arg );
     struct ConnBuf * found = NULL;
 
-    for( l=server->connections; l && !found; l=l->next )
+    for( l = server->connections; l && !found; l = l->next )
     {
         struct ConnBuf * buf = l->data;
         if( !strcmp( key, buf->key ) )
@@ -116,7 +122,8 @@ getBuffer( tr_rpc_server * server, struct shttpd_arg * arg )
 }
 
 static void
-pruneBuf( tr_rpc_server * server, struct ConnBuf * buf )
+pruneBuf( tr_rpc_server *  server,
+          struct ConnBuf * buf )
 {
     tr_list_remove_data( &server->connections, buf );
 
@@ -134,7 +141,7 @@ static void
 handle_upload( struct shttpd_arg * arg )
 {
     struct tr_rpc_server * s;
-    struct ConnBuf * cbuf;
+    struct ConnBuf *       cbuf;
 
     s = arg->user_data;
     s->lastRequestTime = time( NULL );
@@ -147,11 +154,11 @@ handle_upload( struct shttpd_arg * arg )
         const char * content_type;
         const char * delim;
         const char * in;
-        size_t inlen;
-        char * boundary;
-        size_t boundary_len;
-        char buf[64];
-        int paused;
+        size_t       inlen;
+        char *       boundary;
+        size_t       boundary_len;
+        char         buf[64];
+        int          paused;
 
         /* if we haven't finished reading the POST, read more now */
         evbuffer_add( cbuf->in, arg->in.buf, arg->in.len );
@@ -163,59 +170,69 @@ handle_upload( struct shttpd_arg * arg )
         content_type = shttpd_get_header( arg, "Content-Type" );
         in = (const char *) EVBUFFER_DATA( cbuf->in );
         inlen = EVBUFFER_LENGTH( cbuf->in );
-        boundary = tr_strdup_printf( "--%s", strstr( content_type, "boundary=" ) + strlen( "boundary=" ) );
+        boundary =
+            tr_strdup_printf( "--%s", strstr( content_type,
+                                              "boundary=" ) +
+                             strlen( "boundary=" ) );
         boundary_len = strlen( boundary );
         paused = ( query_string != NULL )
-              && ( shttpd_get_var( "paused", query_string, strlen( query_string ), buf, sizeof( buf ) ) == 4 )
-              && ( !strcmp( buf, "true" ) );
+                 && ( shttpd_get_var( "paused", query_string,
+                                     strlen( query_string ), buf,
+                                     sizeof( buf ) ) == 4 )
+                 && ( !strcmp( buf, "true" ) );
 
         delim = tr_memmem( in, inlen, boundary, boundary_len );
         if( delim ) do
-        {
-            size_t part_len;
-            const char * part = delim + boundary_len;
-            inlen -= ( part - in );
-            in = part;
-            delim = tr_memmem( in, inlen, boundary, boundary_len );
-            part_len = delim ? (size_t)(delim-part) : inlen;
-
-            if( part_len )
             {
-                char * text = tr_strndup( part, part_len );
-                if( strstr( text, "filename=\"" ) )
+                size_t       part_len;
+                const char * part = delim + boundary_len;
+                inlen -= ( part - in );
+                in = part;
+                delim = tr_memmem( in, inlen, boundary, boundary_len );
+                part_len = delim ? (size_t)( delim - part ) : inlen;
+
+                if( part_len )
                 {
-                    const char * body = strstr( text, "\r\n\r\n" );
-                    if( body )
+                    char * text = tr_strndup( part, part_len );
+                    if( strstr( text, "filename=\"" ) )
                     {
-                        char * b64, *json, *freeme;
-                        int json_len;
-                        size_t body_len;
-                        tr_benc top, *args;
+                        const char * body = strstr( text, "\r\n\r\n" );
+                        if( body )
+                        {
+                            char *  b64, *json, *freeme;
+                            int     json_len;
+                            size_t  body_len;
+                            tr_benc top, *args;
 
-                        body += 4;
-                        body_len = part_len - ( body - text );
-                        if( body_len >= 2 && !memcmp(&body[body_len-2],"\r\n",2) )
-                            body_len -= 2;
+                            body += 4;
+                            body_len = part_len - ( body - text );
+                            if( body_len >= 2
+                              && !memcmp( &body[body_len - 2], "\r\n", 2 ) )
+                                body_len -= 2;
 
-                        tr_bencInitDict( &top, 2 );
-                        args = tr_bencDictAddDict( &top, "arguments", 2 );
-                        tr_bencDictAddStr( &top, "method", "torrent-add" );
-                        b64 = tr_base64_encode( body, body_len, NULL );
-                        tr_bencDictAddStr( args, "metainfo", b64 );
-                        tr_bencDictAddInt( args, "paused", paused );
-                        json = tr_bencSaveAsJSON( &top, &json_len );
-                        freeme = tr_rpc_request_exec_json( s->session, json, json_len, NULL );
+                            tr_bencInitDict( &top, 2 );
+                            args = tr_bencDictAddDict( &top, "arguments", 2 );
+                            tr_bencDictAddStr( &top, "method",
+                                               "torrent-add" );
+                            b64 = tr_base64_encode( body, body_len, NULL );
+                            tr_bencDictAddStr( args, "metainfo", b64 );
+                            tr_bencDictAddInt( args, "paused", paused );
+                            json = tr_bencSaveAsJSON( &top, &json_len );
+                            freeme =
+                                tr_rpc_request_exec_json( s->session, json,
+                                                          json_len,
+                                                          NULL );
 
-                        tr_free( freeme );
-                        tr_free( json );
-                        tr_free( b64 );
-                        tr_bencFree( &top );
+                            tr_free( freeme );
+                            tr_free( json );
+                            tr_free( b64 );
+                            tr_bencFree( &top );
+                        }
                     }
+                    tr_free( text );
                 }
-                tr_free( text );
             }
-        }
-        while( delim );
+            while( delim );
 
         evbuffer_drain( cbuf->in, EVBUFFER_LENGTH( cbuf->in ) );
         tr_free( boundary );
@@ -224,18 +241,20 @@ handle_upload( struct shttpd_arg * arg )
             /* use xml here because json responses to file uploads is trouble.
              * see http://www.malsup.com/jquery/form/#sample7 for details */
             const char * response = "<result>success</result>";
-            const int len = strlen( response );
-            evbuffer_add_printf( cbuf->out, "HTTP/1.1 200 OK\r\n"
-                                            "Content-Type: text/xml; charset=UTF-8\r\n"
-                                            "Content-Length: %d\r\n"
-                                            "\r\n"
-                                           "%s\r\n", len, response );
+            const int    len = strlen( response );
+            evbuffer_add_printf(
+                cbuf->out, "HTTP/1.1 200 OK\r\n"
+                           "Content-Type: text/xml; charset=UTF-8\r\n"
+                           "Content-Length: %d\r\n"
+                           "\r\n"
+                           "%s\r\n", len, response );
         }
     }
 
     if( EVBUFFER_LENGTH( cbuf->out ) )
     {
-        const int n = MIN( ( int )EVBUFFER_LENGTH( cbuf->out ), arg->out.len );
+        const int n = MIN( ( int )EVBUFFER_LENGTH(
+                              cbuf->out ), arg->out.len );
         memcpy( arg->out.buf, EVBUFFER_DATA( cbuf->out ), n );
         evbuffer_drain( cbuf->out, n );
         arg->out.num_bytes = n;
@@ -251,15 +270,22 @@ handle_upload( struct shttpd_arg * arg )
 static void
 handle_root( struct shttpd_arg * arg )
 {
-    const char * redirect = "HTTP/1.1 200 OK""\r\n"
-                            "Content-Type: text/html; charset=UTF-8" "\r\n"
-                            "\r\n"
-                            "<html><head>" "\r\n"
-                            "  <meta http-equiv=\"Refresh\" content=\"2; url=/transmission/web/\">" "\r\n"
-                            "</head><body>" "\r\n"
-                            "  <p>redirecting to <a href=\"/transmission/web\">/transmission/web/</a></p>" "\r\n"
-                            "</body></html>" "\r\n";
+    const char * redirect = "HTTP/1.1 200 OK" "\r\n"
+                                              "Content-Type: text/html; charset=UTF-8"
+                                              "\r\n"
+                                              "\r\n"
+                                              "<html><head>"
+                                              "\r\n"
+                                              "  <meta http-equiv=\"Refresh\" content=\"2; url=/transmission/web/\">"
+                                              "\r\n"
+                                              "</head><body>"
+                                              "\r\n"
+                                              "  <p>redirecting to <a href=\"/transmission/web\">/transmission/web/</a></p>"
+                                              "\r\n"
+                                              "</body></html>"
+                                              "\r\n";
     const size_t n = strlen( redirect );
+
     memcpy( arg->out.buf, redirect, n );
     arg->in.num_bytes = arg->in.len;
     arg->out.num_bytes = n;
@@ -270,7 +296,7 @@ static void
 handle_rpc( struct shttpd_arg * arg )
 {
     struct tr_rpc_server * s;
-    struct ConnBuf * cbuf;
+    struct ConnBuf *       cbuf;
 
     s = arg->user_data;
     s->lastRequestTime = time( NULL );
@@ -278,8 +304,8 @@ handle_rpc( struct shttpd_arg * arg )
 
     if( !EVBUFFER_LENGTH( cbuf->out ) )
     {
-        int len = 0;
-        char * response = NULL;
+        int          len = 0;
+        char *       response = NULL;
         const char * request_method = shttpd_get_env( arg, "REQUEST_METHOD" );
         const char * query_string = shttpd_get_env( arg, "QUERY_STRING" );
 
@@ -301,17 +327,19 @@ handle_rpc( struct shttpd_arg * arg )
             evbuffer_drain( cbuf->in, EVBUFFER_LENGTH( cbuf->in ) );
         }
 
-        evbuffer_add_printf( cbuf->out, "HTTP/1.1 200 OK\r\n"
-                                        "Content-Type: application/json; charset=UTF-8\r\n"
-                                        "Content-Length: %d\r\n"
-                                        "\r\n"
-                                        "%*.*s", len, len, len, response );
+        evbuffer_add_printf(
+            cbuf->out, "HTTP/1.1 200 OK\r\n"
+                       "Content-Type: application/json; charset=UTF-8\r\n"
+                       "Content-Length: %d\r\n"
+                       "\r\n"
+                       "%*.*s", len, len, len, response );
         tr_free( response );
     }
 
     if( EVBUFFER_LENGTH( cbuf->out ) )
     {
-        const int n = MIN( ( int )EVBUFFER_LENGTH( cbuf->out ), arg->out.len );
+        const int n = MIN( ( int )EVBUFFER_LENGTH(
+                              cbuf->out ), arg->out.len );
         memcpy( arg->out.buf, EVBUFFER_DATA( cbuf->out ), n );
         evbuffer_drain( cbuf->out, n );
         arg->out.num_bytes = n;
@@ -325,12 +353,14 @@ handle_rpc( struct shttpd_arg * arg )
 }
 
 static void
-rpcPulse( int socket UNUSED, short action UNUSED, void * vserver )
+rpcPulse( int socket   UNUSED,
+          short action UNUSED,
+          void *       vserver )
 {
-    int interval;
-    struct timeval tv;
+    int             interval;
+    struct timeval  tv;
     tr_rpc_server * server = vserver;
-    const time_t now = time( NULL );
+    const time_t    now = time( NULL );
 
     assert( server );
 
@@ -347,11 +377,13 @@ rpcPulse( int socket UNUSED, short action UNUSED, void * vserver )
 }
 
 static void
-getPasswordFile( tr_rpc_server * server, char * buf, int buflen )
+getPasswordFile( tr_rpc_server * server,
+                 char *          buf,
+                 int             buflen )
 {
     tr_buildPath( buf, buflen, tr_sessionGetConfigDir( server->session ),
-                               "htpasswd",
-                               NULL );
+                  "htpasswd",
+                  NULL );
 }
 
 static void
@@ -361,18 +393,19 @@ startServer( tr_rpc_server * server )
 
     if( !server->ctx )
     {
-        int i;
-        int argc = 0;
-        char * argv[100];
-        char passwd[MAX_PATH_LENGTH];
-        const char * clutchDir = tr_getClutchDir( server->session );
+        int            i;
+        int            argc = 0;
+        char *         argv[100];
+        char           passwd[MAX_PATH_LENGTH];
+        const char *   clutchDir = tr_getClutchDir( server->session );
         struct timeval tv = tr_timevalMsec( INACTIVE_INTERVAL_MSEC );
 
         getPasswordFile( server, passwd, sizeof( passwd ) );
         if( !server->isPasswordEnabled )
             unlink( passwd );
         else
-            shttpd_edit_passwords( passwd, MY_REALM, server->username, server->password );
+            shttpd_edit_passwords( passwd, MY_REALM, server->username,
+                                   server->password );
 
         argv[argc++] = tr_strdup( "appname-unused" );
 
@@ -400,26 +433,34 @@ startServer( tr_rpc_server * server )
         }
         if( clutchDir && *clutchDir )
         {
-            tr_inf( _( "Serving the web interface files from \"%s\"" ), clutchDir );
+            tr_inf( _(
+                        "Serving the web interface files from \"%s\"" ),
+                    clutchDir );
             argv[argc++] = tr_strdup( "-aliases" );
             argv[argc++] = tr_strdup_printf( "%s=%s,%s=%s",
-                                             "/transmission/clutch", clutchDir,
-                                             "/transmission/web", clutchDir );
+                                             "/transmission/clutch",
+                                             clutchDir,
+                                             "/transmission/web",
+                                             clutchDir );
         }
 
         argv[argc] = NULL; /* shttpd_init() wants it null-terminated */
 
-        if(( server->ctx = shttpd_init( argc, argv )))
+        if( ( server->ctx = shttpd_init( argc, argv ) ) )
         {
-            shttpd_register_uri( server->ctx, "/transmission/rpc", handle_rpc, server );
-            shttpd_register_uri( server->ctx, "/transmission/upload", handle_upload, server );
+            shttpd_register_uri( server->ctx, "/transmission/rpc",
+                                 handle_rpc,
+                                 server );
+            shttpd_register_uri( server->ctx, "/transmission/upload",
+                                 handle_upload,
+                                 server );
             shttpd_register_uri( server->ctx, "/", handle_root, server );
 
             evtimer_set( &server->timer, rpcPulse, server );
             evtimer_add( &server->timer, &tv );
         }
 
-        for( i=0; i<argc; ++i )
+        for( i = 0; i < argc; ++i )
             tr_free( argv[i] );
     }
 }
@@ -440,7 +481,8 @@ stopServer( tr_rpc_server * server )
 }
 
 void
-tr_rpcSetEnabled( tr_rpc_server * server, int isEnabled )
+tr_rpcSetEnabled( tr_rpc_server * server,
+                  int             isEnabled )
 {
     server->isEnabled = isEnabled != 0;
 
@@ -457,7 +499,8 @@ tr_rpcIsEnabled( const tr_rpc_server * server )
 }
 
 void
-tr_rpcSetPort( tr_rpc_server * server, int port )
+tr_rpcSetPort( tr_rpc_server * server,
+               int             port )
 {
     if( server->port != port )
     {
@@ -490,30 +533,32 @@ tr_rpcGetPort( const tr_rpc_server * server )
  * this stuff is worth it, you can buy me a beer in return.
  */
 
-#define FOR_EACH_WORD_IN_LIST(s,len)                                    \
-        for (; s != NULL && (len = strcspn(s, DELIM_CHARS)) != 0;       \
-                        s += len, s+= strspn(s, DELIM_CHARS))
+#define FOR_EACH_WORD_IN_LIST( s, len )                                    \
+    for( ; s != NULL && ( len = strcspn( s, DELIM_CHARS ) ) != 0;       \
+                         s += len, s += strspn( s, DELIM_CHARS ) )
 
-static int isbyte(int n) { return (n >= 0 && n <= 255); }
+static int
+isbyte( int n ) { return n >= 0 && n <= 255;  }
 
 static char*
 testACL( const char * s )
 {
     int len;
 
-    FOR_EACH_WORD_IN_LIST(s, len)
+    FOR_EACH_WORD_IN_LIST( s, len )
     {
-
         char flag;
         int  a, b, c, d, n, mask;
 
-        if( sscanf(s, "%c%d.%d.%d.%d%n",&flag,&a,&b,&c,&d,&n) != 5 )
-            return tr_strdup_printf( _( "[%s]: subnet must be [+|-]x.x.x.x[/x]" ), s );
-        if( flag != '+' && flag != '-')
+        if( sscanf( s, "%c%d.%d.%d.%d%n", &flag, &a, &b, &c, &d, &n ) != 5 )
+            return tr_strdup_printf( _(
+                                         "[%s]: subnet must be [+|-]x.x.x.x[/x]" ),
+                                     s );
+        if( flag != '+' && flag != '-' )
             return tr_strdup_printf( _( "[%s]: flag must be + or -" ), s );
-        if( !isbyte(a) || !isbyte(b) || !isbyte(c) || !isbyte(d) )
+        if( !isbyte( a ) || !isbyte( b ) || !isbyte( c ) || !isbyte( d ) )
             return tr_strdup_printf( _( "[%s]: bad ip address" ), s );
-        if( sscanf(s + n, "/%d", &mask) == 1 && ( mask<0 || mask>32 ) )
+        if( sscanf( s + n, "/%d", &mask ) == 1 && ( mask < 0 || mask > 32 ) )
             return tr_strdup_printf( _( "[%s]: bad subnet mask %d" ), s, n );
     }
 
@@ -525,34 +570,38 @@ testACL( const char * s )
    192.64.1.* --> 192.64.1.0/24
    192.64.1.2 --> 192.64.1.2/32 */
 static void
-cidrizeOne( const char * in, int len, struct evbuffer * out )
+cidrizeOne( const char *      in,
+            int               len,
+            struct evbuffer * out )
 {
-    int stars = 0;
+    int          stars = 0;
     const char * pch;
     const char * end;
-    char zero = '0';
-    char huh = '?';
+    char         zero = '0';
+    char         huh = '?';
 
-    for( pch=in, end=pch+len; pch!=end; ++pch ) {
-        if( stars && isdigit(*pch) )
-            evbuffer_add( out, &huh, 1 ); 
-        else if( *pch!='*' )
+    for( pch = in, end = pch + len; pch != end; ++pch )
+    {
+        if( stars && isdigit( *pch ) )
+            evbuffer_add( out, &huh, 1 );
+        else if( *pch != '*' )
             evbuffer_add( out, pch, 1 );
-        else {
+        else
+        {
             evbuffer_add( out, &zero, 1 );
             ++stars;
         }
     }
 
-    evbuffer_add_printf( out, "/%d", (32-(stars*8)));
+    evbuffer_add_printf( out, "/%d", ( 32 - ( stars * 8 ) ) );
 }
 
 char*
 cidrize( const char * acl )
 {
-    int len;
-    const char * walk = acl;
-    char * ret;
+    int               len;
+    const char *      walk = acl;
+    char *            ret;
     struct evbuffer * out = evbuffer_new( );
 
     FOR_EACH_WORD_IN_LIST( walk, len )
@@ -569,12 +618,13 @@ cidrize( const char * acl )
 
 int
 tr_rpcTestACL( const tr_rpc_server  * server UNUSED,
-               const char           * acl,
-               char                ** setme_errmsg )
+               const char *                  acl,
+               char **                       setme_errmsg )
 {
-    int err = 0;
+    int    err = 0;
     char * cidr = cidrize( acl );
     char * errmsg = testACL( cidr );
+
     if( errmsg )
     {
         if( setme_errmsg )
@@ -588,11 +638,11 @@ tr_rpcTestACL( const tr_rpc_server  * server UNUSED,
 }
 
 int
-tr_rpcSetACL( tr_rpc_server   * server,
-              const char      * acl,
-              char           ** setme_errmsg )
+tr_rpcSetACL( tr_rpc_server * server,
+              const char *    acl,
+              char **         setme_errmsg )
 {
-    char * cidr = cidrize( acl );
+    char *    cidr = cidrize( acl );
     const int err = tr_rpcTestACL( server, cidr, setme_errmsg );
 
     if( !err )
@@ -625,8 +675,8 @@ tr_rpcGetACL( const tr_rpc_server * server )
 ****/
 
 void
-tr_rpcSetUsername( tr_rpc_server        * server,
-                   const char           * username )
+tr_rpcSetUsername( tr_rpc_server * server,
+                   const char *    username )
 {
     const int isEnabled = server->isEnabled;
 
@@ -642,14 +692,14 @@ tr_rpcSetUsername( tr_rpc_server        * server,
 }
 
 char*
-tr_rpcGetUsername( const tr_rpc_server  * server )
+tr_rpcGetUsername( const tr_rpc_server * server )
 {
     return tr_strdup( server->username ? server->username : "" );
 }
 
 void
-tr_rpcSetPassword( tr_rpc_server        * server,
-                   const char           * password )
+tr_rpcSetPassword( tr_rpc_server * server,
+                   const char *    password )
 {
     const int isEnabled = server->isEnabled;
 
@@ -665,14 +715,14 @@ tr_rpcSetPassword( tr_rpc_server        * server,
 }
 
 char*
-tr_rpcGetPassword( const tr_rpc_server  * server )
+tr_rpcGetPassword( const tr_rpc_server * server )
 {
     return tr_strdup( server->password ? server->password : "" );
 }
 
 void
-tr_rpcSetPasswordEnabled( tr_rpc_server  * server,
-                          int              isEnabled )
+tr_rpcSetPasswordEnabled( tr_rpc_server * server,
+                          int             isEnabled )
 {
     const int wasEnabled = server->isEnabled;
 
@@ -700,6 +750,7 @@ void
 tr_rpcClose( tr_rpc_server ** ps )
 {
     tr_rpc_server * s = *ps;
+
     *ps = NULL;
 
     stopServer( s );
@@ -710,18 +761,18 @@ tr_rpcClose( tr_rpc_server ** ps )
 }
 
 tr_rpc_server *
-tr_rpcInit( tr_handle   * session,
-            int           isEnabled,
-            int           port,
-            const char  * acl,
-            int           isPasswordEnabled,
-            const char  * username,
-            const char  * password )
+tr_rpcInit( tr_handle *  session,
+            int          isEnabled,
+            int          port,
+            const char * acl,
+            int          isPasswordEnabled,
+            const char * username,
+            const char * password )
 {
-    char * errmsg;
+    char *          errmsg;
     tr_rpc_server * s;
 
-    if(( errmsg = testACL ( acl )))
+    if( ( errmsg = testACL ( acl ) ) )
     {
         tr_nerr( MY_NAME, errmsg );
         tr_free( errmsg );
@@ -737,8 +788,9 @@ tr_rpcInit( tr_handle   * session,
     s->password = tr_strdup( password );
     s->isPasswordEnabled = isPasswordEnabled != 0;
     s->isEnabled = isEnabled != 0;
-   
+
     if( isEnabled )
         startServer( s );
-    return s;   
+    return s;
 }
+
