@@ -346,51 +346,15 @@ void tr_sessionSetRPCPort(                     tr_handle *,
 int  tr_sessionGetRPCPort( const tr_handle * );
 
 /**
- * @brief test an ACL's syntax without modifying the RPC settings.
- *
- * ACL is a comma separated list of IP subnets, each subnet is prepended
- * by a '+' or '-' sign to denote 'allow' or 'deny'.  If the subnet mask
- * is omitted, like "-1.2.3.4", it means a single IP address. The mask
- * may vary from 0 to 32 inclusive.  A simple primer on x.x.x.x/n notation
- * can be found at <http://25yearsofprogramming.com/blog/20070803.htm>.
- *
- * Since wildcards are more familiar to most users than netmasks,
- * libtransmission supports a wildcard notation that it
- * converts into cidr required by the embedded http server.
- * So, notation like "+192.168.*.*" is accepted by libtransmission and is
- * converted to "+192.168.0.0/16" before it reaches the server.
-
- * @param acl the ACL to test
- * @param allocme_errmsg If the ACL can't be parsed, this is set to a
- *                       newly-allocated error string describing the problem.
- *                       The client should tr_free() this string when done.
- * @return 0 on success, -1 on failure due to an unparseable ACL.
- */
-int tr_sessionTestRPCACL( const tr_handle * session,
-                          const char *      acl,
-                          char **           allocme_errmsg );
-
-/**
  * @brief Specify access control list (ACL).
-   ACL is a comma separated list
- * of IP subnets, each subnet is prepended by a '-' or '+' sign.
- * Plus means allow, minus means deny. If the subnet mask is omitted,
- * like "-1.2.3.4", it means a single IP address. The mask may vary
- * from 0 to 32 inclusive.
  *
- * http://25yearsofprogramming.com/blog/20070803.htm has a simple
- * primer on x.x.x.x/n notation for those interested.
- *
- * The parameters and return value follow the same behavior as
- * tr_sessionTestRPCACL().
- *
- * @see tr_sessionTestRPCACL
- * @see tr_sessionInitFull
- * @see tr_sessionGetRPCACL
+ * ACL is a comma-delimited list of dotted-quad IP addresses, each preceded
+ * by a '+' or '-' sign to denote 'allow' or 'deny'.  Wildmat notation is
+ * supported, meaning that '?' is interpreted as a single-character wildcard
+ * and '*' is interprted as a multi-character wildcard.
  */
-int   tr_sessionSetRPCACL( tr_session * session,
-                           const char * acl,
-                           char **      allocme_errmsg );
+void   tr_sessionSetRPCACL( tr_session * session,
+                            const char * acl );
 
 /** @brief get the Access Control List for allowing/denying RPC requests.
     @return a comma-separated string of ACL rules.  tr_free() when done.

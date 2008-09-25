@@ -123,6 +123,9 @@ const char* tr_strip_positional_args( const char* fmt );
 #define tr_inf( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, NULL, ## a )
 #define tr_dbg( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, NULL, ## a )
 
+int            tr_wildmat( const char * text,
+                           const char * pattern );
+
 void           tr_msgInit( void );
 
 void           tr_msg( const char * file,

@@ -48,7 +48,8 @@ libtransmission_a_SOURCES = \
     utils.c \
     verify.c \
     web.c \
-    webseed.c
+    webseed.c \
+    wildmat.c
 
 noinst_HEADERS = \
     bencode.h \

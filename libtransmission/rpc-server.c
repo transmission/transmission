@@ -11,17 +11,13 @@
  */
 
 #include <assert.h>
-#include <ctype.h> /* isdigit */
-#include <errno.h>
-#include <stdlib.h> /* strtol */
-#include <string.h>
+#include <string.h> /* memcpy */
 #include <limits.h> /* INT_MAX */
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h> /* open */
-
-#include <unistd.h> /* unlink */
+#include <unistd.h> /* close */
 
 #include <libevent/event.h>
 #include <libevent/evhttp.h>
@@ -33,19 +29,17 @@
 #include "rpcimpl.h"
 #include "rpc-server.h"
 #include "utils.h"
+#include "web.h"
 
 #define MY_NAME "RPC Server"
 #define MY_REALM "Transmission"
-
-#define ACTIVE_INTERVAL_MSEC 40
-#define INACTIVE_INTERVAL_MSEC 200
-
+#define MAX_TOKEN_LEN 16
 #define TR_N_ELEMENTS( ary ) ( sizeof( ary ) / sizeof( *ary ) )
 
 struct acl_addr
 {
-    char flag;
-    char parts[4][20];
+    char flag; /* '+' to allow, '-' to deny */
+    char quads[4][MAX_TOKEN_LEN];
 };
 
 struct tr_rpc_server
@@ -58,8 +52,7 @@ struct tr_rpc_server
     tr_handle *          session;
     char *               username;
     char *               password;
-    char *               acl_str;
-    tr_list *            acl_list; /* struct acl_addr */
+    char *               acl;
 };
 
 #define dbgmsg( fmt... ) tr_deepLog( __FILE__, __LINE__, MY_NAME, ## fmt )
@@ -97,41 +90,25 @@ parseAddress( const char * addr, struct acl_addr * setme, const char ** end )
     if( !addr ) return 0;
 
     if(!((pch = strchr( addr, '.' )))) return 0;
-    if( pch-addr > 20 ) return 0;
-    memcpy( setme->parts[0], addr, pch-addr );
+    if( pch-addr > MAX_TOKEN_LEN ) return 0;
+    memcpy( setme->quads[0], addr, pch-addr );
     addr = pch + 1;
 
     if(!((pch = strchr( addr, '.' )))) return 0;
-    if( pch-addr > 20 ) return 0;
-    memcpy( setme->parts[1], addr, pch-addr );
+    if( pch-addr > MAX_TOKEN_LEN ) return 0;
+    memcpy( setme->quads[1], addr, pch-addr );
     addr = pch + 1;
 
     if(!((pch = strchr( addr, '.' )))) return 0;
-    if( pch-addr > 20 ) return 0;
-    memcpy( setme->parts[2], addr, pch-addr );
+    if( pch-addr > MAX_TOKEN_LEN ) return 0;
+    memcpy( setme->quads[2], addr, pch-addr );
     addr = pch + 1;
 
     while( *pch && *pch!=',' ) ++pch;
-    if( pch-addr > 20 ) return 0;
-    memcpy( setme->parts[3], addr, pch-addr );
+    if( pch-addr > MAX_TOKEN_LEN ) return 0;
+    memcpy( setme->quads[3], addr, pch-addr );
 
     *end = pch;
-    return 1;
-}
-
-static int
-testAddress( const struct acl_addr * ref,
-             const struct acl_addr * testme )
-{
-    int i;
-
-    for( i=0; i<4; ++i )
-    {
-        const char * a = ref->parts[i];
-        const char * b = testme->parts[i];
-        if( strcmp( a, "*" ) && strcmp( a, b ) ) return 0;
-    }
-
     return 1;
 }
 
@@ -139,49 +116,29 @@ static int
 isAddressAllowed( const tr_rpc_server * server,
                   const char * address )
 {
+    const char * acl;
     struct acl_addr tmp;
     const char * end;
     const int parsed = parseAddress( address, &tmp, &end );
-    tr_list * l;
 
     if( !parsed )
         return 0;
 
-    for( l=server->acl_list; l; l=l->next ) {
-        const struct acl_addr * a = l->data;
-        if( testAddress( a, &tmp ) ) {
-            return a->flag == '+';
-        }
+    for( acl=server->acl; acl && *acl; )
+    {
+        const char * delimiter = strchr( acl, ',' );
+        const int len = delimiter ? delimiter-acl : (int)strlen( acl );
+        char * token = tr_strndup( acl, len );
+        const int match = tr_wildmat( address, token+1 );
+        tr_free( token );
+        if( match )
+            return *acl == '+';
+        if( !delimiter )
+            break;
+        acl = delimiter + 1;
     }
 
     return 0;
-}
-
-static tr_list*
-parseACL( const char * acl, int * err )
-{
-    tr_list * list = NULL;
-
-    *err = 0;
-
-    for( ;; )
-    {
-        const char flag = *acl++;
-        struct acl_addr tmp;
-
-        if( ( flag!='+' && flag!='-' ) || !parseAddress( acl, &tmp, &acl ) )
-        {
-            *err = 1;
-            tr_list_free( &list, tr_free );
-            return NULL;
-        }
-
-        tmp.flag = flag;
-        tr_list_append( &list, tr_memdup( &tmp, sizeof( struct acl_addr ) ) );
-        if( !*acl )
-            return list;
-        ++acl;
-    }
 }
 
 /**
@@ -189,11 +146,21 @@ parseACL( const char * acl, int * err )
 **/
 
 static void
+send_simple_response( struct evhttp_request * req, int code, const char * text )
+{
+    const char * code_text = tr_webGetResponseStr( code );
+    struct evbuffer * body = evbuffer_new( );
+    evbuffer_add_printf( body, "<h1>%s</h1>", text ? text : code_text );
+    evhttp_send_reply( req, code, code_text, body );
+    evbuffer_free( body );
+}
+
+static void
 handle_upload( struct evhttp_request * req, struct tr_rpc_server * server )
 {
     if( req->type != EVHTTP_REQ_POST )
     {
-        evhttp_send_reply( req, HTTP_BADREQUEST, "Bad Request", NULL );
+        send_simple_response( req, HTTP_BADREQUEST, NULL );
     }
     else
     {
@@ -213,7 +180,7 @@ handle_upload( struct evhttp_request * req, struct tr_rpc_server * server )
         const size_t boundary_len = strlen( boundary );
 
         const char * delim = tr_memmem( in, inlen, boundary, boundary_len );
-        if( delim ) do
+        while( delim )
             {
                 size_t       part_len;
                 const char * part = delim + boundary_len;
@@ -263,14 +230,13 @@ handle_upload( struct evhttp_request * req, struct tr_rpc_server * server )
                     tr_free( text );
                 }
             }
-            while( delim );
 
         tr_free( boundary );
 
         /* use xml here because json responses to file uploads is trouble.
            * see http://www.malsup.com/jquery/form/#sample7 for details */
         evhttp_add_header(req->output_headers, "Content-Type", "text/xml; charset=UTF-8" );
-        evhttp_send_reply( req, HTTP_OK, "Success", NULL );
+        send_simple_response( req, HTTP_OK, NULL );
     }
 }
 
@@ -305,12 +271,16 @@ serve_file( struct evhttp_request * req, const char * path )
     if( req->type != EVHTTP_REQ_GET )
     {
         evhttp_add_header(req->output_headers, "Allow", "GET");
-        evhttp_send_reply(req, 405, "Method Not Allowed", NULL);
+        send_simple_response( req, 405, NULL );
     }
     else
     {
         const int fd = open( path, O_RDONLY, 0 );
-        if( fd != -1 )
+        if( fd == -1 )
+        {
+            send_simple_response( req, HTTP_NOTFOUND, NULL );
+        }
+        else
         {
             char size[12];
             struct evbuffer * buf = evbuffer_new();
@@ -319,17 +289,10 @@ serve_file( struct evhttp_request * req, const char * path )
             evhttp_add_header(req->output_headers, "Content-Type", mimetype_guess( path ) );
             snprintf(size, sizeof(size), "%zu", EVBUFFER_LENGTH( buf ) );
             evhttp_add_header(req->output_headers, "Content-Length", size );
-            evhttp_send_reply(req, HTTP_OK, "OK", buf);
+            evhttp_send_reply( req, HTTP_OK, "OK", buf );
 
             evbuffer_free(buf);
             close( fd );
-        }
-        else
-        {
-            struct evbuffer * buf = evbuffer_new();
-            evbuffer_add_printf(buf, "<h1>Not Found</h1>");
-            evhttp_send_reply(req, HTTP_NOTFOUND, "Not Found", buf);
-            evbuffer_free(buf);
         }
     }
 }
@@ -344,7 +307,7 @@ handle_clutch( struct evhttp_request * req, struct tr_rpc_server * server )
 
     evbuffer_add_printf( buf, "%s%s", tr_getClutchDir( server->session ), TR_PATH_DELIMITER_STR );
     uri = req->uri + 18;
-    if( !*uri || (*uri=='?') )
+    if( (*uri=='?') || (*uri=='\0') )
         evbuffer_add_printf( buf, "index.html" );
     else {
         const char * pch;
@@ -404,7 +367,7 @@ handle_request( struct evhttp_request * req, void * arg )
         char * user = NULL;
         char * pass = NULL;
 
-        evhttp_add_header( req->output_headers, "Server", "Transmission" );
+        evhttp_add_header( req->output_headers, "Server", MY_REALM );
        
         auth = evhttp_find_header( req->input_headers, "Authorization" );
 
@@ -418,29 +381,25 @@ handle_request( struct evhttp_request * req, void * arg )
             }
         }
 
-        if( server->acl_list && !isAddressAllowed( server, req->remote_host ) )
+        if( server->acl && !isAddressAllowed( server, req->remote_host ) )
         {
-            struct evbuffer * buf = evbuffer_new();
-            evbuffer_add_printf(buf, "<h1>Unauthorized IP Address</h1>");
-            evhttp_send_reply(req, 401, "Unauthorized", buf );
+            send_simple_response( req, 401, "Unauthorized IP Address" );
         }
         else if( server->isPasswordEnabled && (    !pass
                                                 || !user
                                                 || strcmp( server->username, user )
                                                 || strcmp( server->password, pass ) ) )
         {
-            struct evbuffer * buf = evbuffer_new();
             evhttp_add_header( req->output_headers,
-                "WWW-Authenticate", "Basic realm=\"Transmission\"");
-            evbuffer_add_printf(buf, "<h1>Unauthorized User</h1>");
-            evhttp_send_reply(req, 401, "Unauthorized", buf);
+                "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"" );
+            send_simple_response( req, 401, "Unauthorized User" );
         }
         else if( !strcmp( req->uri, "/transmission/web" ) ||
                  !strcmp( req->uri, "/transmission/clutch" ) ||
                  !strcmp( req->uri, "/" ) )
         {
             evhttp_add_header( req->output_headers, "Location", "/transmission/web/" );
-            evhttp_send_reply(req, HTTP_MOVEPERM, "Moved Permanently", NULL );
+            send_simple_response( req, HTTP_MOVEPERM, NULL );
         }
         else if( !strncmp( req->uri, "/transmission/web/", 18 ) )
         {
@@ -456,9 +415,7 @@ handle_request( struct evhttp_request * req, void * arg )
         }
         else
         {
-            struct evbuffer *buf = evbuffer_new( );
-            evbuffer_add_printf(buf, "<h1>Not Found</h1>");
-            evhttp_send_reply(req, HTTP_NOTFOUND, "Not Found", buf);
+            send_simple_response( req, HTTP_NOTFOUND, NULL );
         }
 
         tr_free( user );
@@ -500,7 +457,7 @@ tr_rpcSetEnabled( tr_rpc_server * server,
 int
 tr_rpcIsEnabled( const tr_rpc_server * server )
 {
-    return server->httpd != NULL;
+    return server->isEnabled;
 }
 
 void
@@ -525,46 +482,18 @@ tr_rpcGetPort( const tr_rpc_server * server )
     return server->port;
 }
 
-int
-tr_rpcTestACL( const tr_rpc_server  * server UNUSED,
-               const char *                  acl,
-               char **                       setme_errmsg )
-{
-    int err = 0;
-    tr_list * list = parseACL( acl, &err );
-    if( err )
-        *setme_errmsg = tr_strdup( "invalid ACL" );
-    tr_list_free( &list, tr_free );
-    return err;
-}
-
-int
+void
 tr_rpcSetACL( tr_rpc_server * server,
-              const char *    acl_str,
-              char **         setme_errmsg )
+              const char *    acl )
 {
-    int err = 0;
-    tr_list * list = parseACL( acl_str, &err );
-
-    if( err )
-    {
-        *setme_errmsg = tr_strdup( "invalid ACL" );
-    }
-    else
-    {
-        tr_free( server->acl_str );
-        tr_list_free( &server->acl_list, tr_free );
-        server->acl_str = tr_strdup( acl_str );
-        server->acl_list = list;
-    }
-
-    return err;
+    tr_free( server->acl );
+    server->acl = tr_strdup( acl );
 }
 
 char*
 tr_rpcGetACL( const tr_rpc_server * server )
 {
-    return tr_strdup( server->acl_str ? server->acl_str : "" );
+    return tr_strdup( server->acl ? server->acl : "" );
 }
 
 /****
@@ -605,7 +534,7 @@ void
 tr_rpcSetPasswordEnabled( tr_rpc_server * server,
                           int             isEnabled )
 {
-    server->isPasswordEnabled = isEnabled;
+    server->isPasswordEnabled = isEnabled != 0;
     dbgmsg( "setting 'password enabled' to %d", isEnabled );
 }
 
@@ -627,8 +556,7 @@ tr_rpcClose( tr_rpc_server ** ps )
     *ps = NULL;
 
     stopServer( s );
-    tr_list_free( &s->acl_list, tr_free );
-    tr_free( s->acl_str );
+    tr_free( s->acl );
     tr_free( s->username );
     tr_free( s->password );
     tr_free( s );
@@ -638,26 +566,17 @@ tr_rpc_server *
 tr_rpcInit( tr_handle *  session,
             int          isEnabled,
             int          port,
-            const char * acl_str,
+            const char * acl,
             int          isPasswordEnabled,
             const char * username,
             const char * password )
 {
     tr_rpc_server * s;
-    int err = 0;
-    tr_list * list = parseACL( acl_str, &err );
-
-    if( err ) {
-        acl_str = TR_DEFAULT_RPC_ACL;
-        tr_nerr( MY_NAME, "using fallback ACL \"%s\"", acl_str );
-        list = parseACL( acl_str, &err );
-    }
 
     s = tr_new0( tr_rpc_server, 1 );
     s->session = session;
     s->port = port;
-    s->acl_str = tr_strdup( acl_str );
-    s->acl_list = list;
+    s->acl = tr_strdup( acl && *acl ? acl : TR_DEFAULT_RPC_ACL );
     s->username = tr_strdup( username );
     s->password = tr_strdup( password );
     s->isPasswordEnabled = isPasswordEnabled != 0;

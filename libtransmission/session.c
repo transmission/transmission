@@ -1002,20 +1002,11 @@ tr_sessionSetRPCCallback( tr_session * session,
     session->rpc_func_user_data = user_data;
 }
 
-int
-tr_sessionTestRPCACL( const tr_session * session,
-                      const char *       acl,
-                      char **            allocme_errmsg )
-{
-    return tr_rpcTestACL( session->rpcServer, acl, allocme_errmsg );
-}
-
-int
+void
 tr_sessionSetRPCACL( tr_session * session,
-                     const char * acl,
-                     char **      allocme_errmsg )
+                     const char * acl )
 {
-    return tr_rpcSetACL( session->rpcServer, acl, allocme_errmsg );
+    return tr_rpcSetACL( session->rpcServer, acl );
 }
 
 char*

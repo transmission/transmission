@@ -683,10 +683,8 @@ onAddressEdited( GtkCellRendererText  * r UNUSED,
     GtkTreePath *        path = gtk_tree_path_new_from_string( path_string );
 
     acl = g_strdup_printf( "+%s", new_text );
-    if( !tr_sessionTestRPCACL( session, acl, NULL ) )
-        if( gtk_tree_model_get_iter( model, &iter, path ) )
-            gtk_list_store_set( page->store, &iter, COL_ADDRESS, new_text,
-                                -1 );
+    if( gtk_tree_model_get_iter( model, &iter, path ) )
+        gtk_list_store_set( page->store, &iter, COL_ADDRESS, new_text, -1 );
 
     g_free( acl );
     gtk_tree_path_free( path );

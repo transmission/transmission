@@ -1195,7 +1195,7 @@ prefschanged( TrCore * core UNUSED,
     else if( !strcmp( key, PREF_KEY_RPC_ACL ) )
     {
         const char * s = pref_string_get( key );
-        tr_sessionSetRPCACL( tr, s, NULL );
+        tr_sessionSetRPCACL( tr, s );
     }
     else if( !strcmp( key, PREF_KEY_RPC_USERNAME ) )
     {
