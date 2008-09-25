@@ -24,6 +24,7 @@ static int test = 0;
         } \
     }
 
+#if 0
 extern char* cidrize( const char * in );
 
 extern int   tr_rpcTestACL( const void * unused,
@@ -42,10 +43,12 @@ testWildcard( const char * in,
     tr_free( str );
     return ok;
 }
+#endif
 
 static int
 test_acl( void )
 {
+#if 0
     int    err;
     char * errmsg = NULL;
 
@@ -67,6 +70,7 @@ test_acl( void )
     err = tr_rpcTestACL( NULL, "+192.*.*.*,-192.168.*.*", &errmsg );
     check( !err );
     check( !errmsg );
+#endif
 
     return 0;
 }

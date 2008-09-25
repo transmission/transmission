@@ -109,7 +109,6 @@ noinst_PROGRAMS = $(TESTS)
 
 APPS_LDADD = \
     ./libtransmission.a  \
-    $(top_builddir)/third-party/shttpd/libshttpd.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/libevent/libevent.la \

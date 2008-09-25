@@ -11,10 +11,9 @@ bin_PROGRAMS = \
 
 LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
-    $(top_builddir)/third-party/shttpd/libshttpd.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
-    $(top_builddir)/third-party/libevent/libevent_core.la \
+    $(top_builddir)/third-party/libevent/libevent.la \
     $(INTLLIBS) \
     $(OPENSSL_LIBS) \
     $(LIBCURL_LIBS) \

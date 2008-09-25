@@ -325,7 +325,6 @@ AC_CONFIG_FILES([Makefile
                  third-party/Makefile
                  third-party/miniupnp/Makefile
                  third-party/libnatpmp/Makefile
-                 third-party/shttpd/Makefile
                  macosx/Makefile
                  wx/Makefile
                  wx/images/Makefile

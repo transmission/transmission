@@ -9,10 +9,9 @@ transmissioncli_SOURCES = cli.c
 
 transmissioncli_LDADD = \
   $(top_builddir)/libtransmission/libtransmission.a \
-  $(top_builddir)/third-party/libevent/libevent_core.la \
+  $(top_builddir)/third-party/libevent/libevent.la \
   $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
   $(top_builddir)/third-party/miniupnp/libminiupnp.a \
-  $(top_builddir)/third-party/shttpd/libshttpd.a \
   $(INTLLIBS) \
   $(OPENSSL_LIBS) \
   $(LIBCURL_LIBS) \
