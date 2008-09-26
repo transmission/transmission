@@ -14,10 +14,10 @@
 #include <string.h> /* memcpy */
 #include <limits.h> /* INT_MAX */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h> /* open */
-#include <unistd.h> /* close */
+#include <sys/types.h> /* open */
+#include <sys/stat.h>  /* open */
+#include <fcntl.h>     /* open */
+#include <unistd.h>    /* close */
 
 #include <libevent/event.h>
 #include <libevent/evhttp.h>
@@ -33,14 +33,7 @@
 
 #define MY_NAME "RPC Server"
 #define MY_REALM "Transmission"
-#define MAX_TOKEN_LEN 16
 #define TR_N_ELEMENTS( ary ) ( sizeof( ary ) / sizeof( *ary ) )
-
-struct acl_addr
-{
-    char flag; /* '+' to allow, '-' to deny */
-    char quads[4][MAX_TOKEN_LEN];
-};
 
 struct tr_rpc_server
 {
@@ -81,48 +74,10 @@ tr_memmem( const char * s1,
 ****/
 
 static int
-parseAddress( const char * addr, struct acl_addr * setme, const char ** end )
-{
-    const char * pch;
-
-    memset( setme, 0, sizeof( struct acl_addr ) );
-
-    if( !addr ) return 0;
-
-    if(!((pch = strchr( addr, '.' )))) return 0;
-    if( pch-addr > MAX_TOKEN_LEN ) return 0;
-    memcpy( setme->quads[0], addr, pch-addr );
-    addr = pch + 1;
-
-    if(!((pch = strchr( addr, '.' )))) return 0;
-    if( pch-addr > MAX_TOKEN_LEN ) return 0;
-    memcpy( setme->quads[1], addr, pch-addr );
-    addr = pch + 1;
-
-    if(!((pch = strchr( addr, '.' )))) return 0;
-    if( pch-addr > MAX_TOKEN_LEN ) return 0;
-    memcpy( setme->quads[2], addr, pch-addr );
-    addr = pch + 1;
-
-    while( *pch && *pch!=',' ) ++pch;
-    if( pch-addr > MAX_TOKEN_LEN ) return 0;
-    memcpy( setme->quads[3], addr, pch-addr );
-
-    *end = pch;
-    return 1;
-}
-
-static int
 isAddressAllowed( const tr_rpc_server * server,
                   const char * address )
 {
     const char * acl;
-    struct acl_addr tmp;
-    const char * end;
-    const int parsed = parseAddress( address, &tmp, &end );
-
-    if( !parsed )
-        return 0;
 
     for( acl=server->acl; acl && *acl; )
     {
@@ -160,7 +115,7 @@ handle_upload( struct evhttp_request * req, struct tr_rpc_server * server )
 {
     if( req->type != EVHTTP_REQ_POST )
     {
-        send_simple_response( req, HTTP_BADREQUEST, NULL );
+        send_simple_response( req, 405, NULL );
     }
     else
     {
@@ -282,15 +237,10 @@ serve_file( struct evhttp_request * req, const char * path )
         }
         else
         {
-            char size[12];
-            struct evbuffer * buf = evbuffer_new();
-
+            struct evbuffer * buf = evbuffer_new( );
             evbuffer_read(buf, fd, INT_MAX );
             evhttp_add_header(req->output_headers, "Content-Type", mimetype_guess( path ) );
-            snprintf(size, sizeof(size), "%zu", EVBUFFER_LENGTH( buf ) );
-            evhttp_add_header(req->output_headers, "Content-Length", size );
             evhttp_send_reply( req, HTTP_OK, "OK", buf );
-
             evbuffer_free(buf);
             close( fd );
         }
@@ -310,15 +260,15 @@ handle_clutch( struct evhttp_request * req, struct tr_rpc_server * server )
     if( (*uri=='?') || (*uri=='\0') )
         evbuffer_add_printf( buf, "index.html" );
     else {
-        const char * pch;
-        if(( pch = strchr( uri, '?' )))
+        const char * pch = strchr( uri, '?' );
+        if( pch )
             evbuffer_add_printf( buf, "%*.*s", (int)(pch-uri), (int)(pch-uri), uri );
         else
             evbuffer_add_printf( buf, "%s", uri );
     }
                               
     if( strstr( (const char *)EVBUFFER_DATA( buf ), ".." ) )
-        serve_file( req, "/dev/null" );
+        send_simple_response( req, 401, NULL );
     else
         serve_file( req, (const char *)EVBUFFER_DATA( buf ) );
 
