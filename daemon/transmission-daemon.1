@@ -30,13 +30,11 @@ via RPC commands from transmission's web interface or
 .Sh OPTIONS
 .Bl -tag -width Ds
 
-.It Fl a Fl -acl Ar (+|-)x.x.x.x[/x],...
+.It Fl a Fl -acl Ar (+|-)x.x.x.x,...
 Specify access control list (ACL) to control which hosts may submit RPC requests.
-ACL is a comma separated list of IP subnets,
-each subnet is prepended by '-' or '+' sign.
-Plus means allow, minus means deny.
-If subnet mask is omitted, like "-1.2.3.4", then it means that single IP address.
-Masks may vary from 0 to 32 inclusive.
+This is a comma-separated list of IP addresses, each prepended by a '-' or '+'
+to denote that access should be denied or allowed to that address.
+Wildcards can be specified in an address by using '*'.
 Default: +127.0.0.1
 
 .It Fl b Fl -blocklist
