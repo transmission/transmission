@@ -246,7 +246,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [PrefsController setHandle: fLib];
         fPrefsController = [[PrefsController alloc] init];
         
-        fBadger = [[Badger alloc] initWithLib: fLib];
         [QuickLookController quickLookControllerInitializeWithController: self infoController: fInfoController];
         
         fSoundPlaying = NO;
@@ -274,6 +273,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) awakeFromNib
 {
+    fBadger = [[Badger alloc] initWithLib: fLib];
+
     NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"TRMainToolbar"];
     [toolbar setDelegate: self];
     [toolbar setAllowsUserCustomization: YES];
