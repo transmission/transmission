@@ -888,12 +888,7 @@ tr_handle * fHandle;
     
     NSString * string = [components componentsJoinedByString: @","];
     
-    char * error = NULL;
-    if (tr_sessionSetRPCACL(fHandle, [string UTF8String], &error))
-    {
-        NSLog([NSString stringWithUTF8String: error]);
-        tr_free(error);
-    }
+    tr_sessionSetRPCACL(fHandle, [string UTF8String]);
 }
 
 - (void) addRemoveRPCIP: (id) sender
@@ -975,24 +970,13 @@ tr_handle * fHandle;
         
         NSString * newIP = [newComponents componentsJoinedByString: @"."];
         
-        //verify ip string
-        if (!tr_sessionTestRPCACL(fHandle, [[@"+" stringByAppendingString: newIP] UTF8String], NULL))
-        {
-            NSDictionary * newDict = [NSDictionary dictionaryWithObjectsAndKeys: newIP, @"IP",
-                                        [oldDict objectForKey: @"Allow"], @"Allow", nil];
-            [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
-            
-            NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"IP" ascending: YES
-                                                selector: @selector(compareNumeric:)] autorelease];
-            [fRPCAccessArray sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
-        }
-        else
-        {
-            NSBeep();
-            
-            if ([[oldDict objectForKey: @"IP"] isEqualToString: @""])
-                [fRPCAccessArray removeObjectAtIndex: row];
-        }
+        NSDictionary * newDict = [NSDictionary dictionaryWithObjectsAndKeys: newIP, @"IP",
+                                    [oldDict objectForKey: @"Allow"], @"Allow", nil];
+        [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
+        
+        NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"IP" ascending: YES
+                                            selector: @selector(compareNumeric:)] autorelease];
+        [fRPCAccessArray sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
         
         [fRPCAccessTable deselectAll: self];
         [fRPCAccessTable reloadData];
