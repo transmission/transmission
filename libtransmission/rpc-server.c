@@ -37,17 +37,36 @@
 
 struct tr_rpc_server
 {
-    unsigned int         isEnabled         : 1;
-    unsigned int         isPasswordEnabled : 1;
-    uint16_t             port;
-    struct evhttp *      httpd;
-    tr_handle *          session;
-    char *               username;
-    char *               password;
-    char *               acl;
+    unsigned int     isEnabled         : 1;
+    unsigned int     isPasswordEnabled : 1;
+    uint16_t         port;
+    struct evhttp *  httpd;
+    tr_handle *      session;
+    char *           username;
+    char *           password;
+    char *           acl;
 };
 
 #define dbgmsg( fmt... ) tr_deepLog( __FILE__, __LINE__, MY_NAME, ## fmt )
+
+/**
+***
+**/
+
+static void
+send_simple_response( struct evhttp_request * req,
+                      int                     code,
+                      const char *            text )
+{
+    const char *      code_text = tr_webGetResponseStr( code );
+    struct evbuffer * body = evbuffer_new( );
+
+    evbuffer_add_printf( body, "<h1>%s</h1>", code_text );
+    if( text )
+        evbuffer_add_printf( body, "<h2>%s</h2>", text );
+    evhttp_send_reply( req, code, code_text, body );
+    evbuffer_free( body );
+}
 
 static const char*
 tr_memmem( const char * s1,
@@ -67,52 +86,9 @@ tr_memmem( const char * s1,
     return NULL;
 }
 
-
-/****
-*****  ACL UTILITIES
-****/
-
-static int
-isAddressAllowed( const tr_rpc_server * server,
-                  const char * address )
-{
-    const char * acl;
-
-    for( acl=server->acl; acl && *acl; )
-    {
-        const char * delimiter = strchr( acl, ',' );
-        const int len = delimiter ? delimiter-acl : (int)strlen( acl );
-        char * token = tr_strndup( acl, len );
-        const int match = tr_wildmat( address, token+1 );
-        tr_free( token );
-        if( match )
-            return *acl == '+';
-        if( !delimiter )
-            break;
-        acl = delimiter + 1;
-    }
-
-    return 0;
-}
-
-/**
-***
-**/
-
 static void
-send_simple_response( struct evhttp_request * req, int code, const char * text )
-{
-    const char * code_text = tr_webGetResponseStr( code );
-    struct evbuffer * body = evbuffer_new( );
-    evbuffer_add_printf( body, "<h1>%s</h1>", code_text );
-    if( text )
-        evbuffer_add_printf( body, "<h2>%s</h2>", text );
-    evhttp_send_reply( req, code, code_text, body );
-    evbuffer_free( body );
-}
-
-static void
-handle_upload( struct evhttp_request * req, struct tr_rpc_server * server )
+handle_upload( struct evhttp_request * req,
+               struct tr_rpc_server *  server )
 {
     if( req->type != EVHTTP_REQ_POST )
     {
@@ -120,20 +96,23 @@ handle_upload( struct evhttp_request * req, struct tr_rpc_server * server )
     }
     else
     {
-
-        const char * content_type = evhttp_find_header( req->input_headers, "Content-Type" );
+        const char * content_type = evhttp_find_header( req->input_headers,
+                                                        "Content-Type" );
 
         const char * query = strchr( req->uri, '?' );
-        const int paused = query && strstr( query+1, "paused=true" );
+        const int    paused = query && strstr( query + 1, "paused=true" );
 
         const char * in = (const char *) EVBUFFER_DATA( req->input_buffer );
-        size_t inlen = EVBUFFER_LENGTH( req->input_buffer );
+        size_t       inlen = EVBUFFER_LENGTH( req->input_buffer );
 
         const char * boundary_key = "boundary=";
-        const char * boundary_key_begin = strstr( content_type, boundary_key );
-        const char * boundary_val = boundary_key_begin ? boundary_key_begin + strlen( boundary_key ) : "arglebargle";
+        const char * boundary_key_begin = strstr( content_type,
+                                                  boundary_key );
+        const char * boundary_val =
+            boundary_key_begin ? boundary_key_begin +
+            strlen( boundary_key ) : "arglebargle";
 
-        char * boundary = tr_strdup_printf( "--%s", boundary_val );
+        char *       boundary = tr_strdup_printf( "--%s", boundary_val );
         const size_t boundary_len = strlen( boundary );
 
         const char * delim = tr_memmem( in, inlen, boundary, boundary_len );
@@ -162,8 +141,8 @@ handle_upload( struct evhttp_request * req, struct tr_rpc_server * server )
                         body += 4;
                         body_len = part_len - ( body - text );
                         if( body_len >= 2
-                              && !memcmp( &body[body_len - 2], "\r\n", 2 ) )
-                                body_len -= 2;
+                          && !memcmp( &body[body_len - 2], "\r\n", 2 ) )
+                            body_len -= 2;
 
                         tr_bencInitDict( &top, 2 );
                         args = tr_bencDictAddDict( &top, "arguments", 2 );
@@ -189,8 +168,9 @@ handle_upload( struct evhttp_request * req, struct tr_rpc_server * server )
         tr_free( boundary );
 
         /* use xml here because json responses to file uploads is trouble.
-           * see http://www.malsup.com/jquery/form/#sample7 for details */
-        evhttp_add_header(req->output_headers, "Content-Type", "text/xml; charset=UTF-8" );
+         * see http://www.malsup.com/jquery/form/#sample7 for details */
+        evhttp_add_header( req->output_headers, "Content-Type",
+                           "text/xml; charset=UTF-8" );
         send_simple_response( req, HTTP_OK, NULL );
     }
 }
@@ -199,33 +179,36 @@ static const char*
 mimetype_guess( const char * path )
 {
     unsigned int i;
-    const struct {
-        const char * suffix;
-        const char * mime_type;
+
+    const struct
+    {
+        const char *  suffix;
+        const char *  mime_type;
     } types[] = {
         /* these are just the ones we need for serving clutch... */
-        { "css", "text/css" },
-        { "gif", "image/gif" },
-        { "html", "text/html" },
-        { "ico", "image/vnd.microsoft.icon" },
-        { "js", "application/javascript" },
-        { "png", "image/png" }
+        { "css",  "text/css"                   },
+        { "gif",  "image/gif"                  },
+        { "html", "text/html"                  },
+        { "ico",  "image/vnd.microsoft.icon"   },
+        { "js",   "application/javascript"     },
+        { "png",  "image/png"                  }
     };
     const char * dot = strrchr( path, '.' );
 
-    for( i=0; dot && i<TR_N_ELEMENTS(types); ++i )
-        if( !strcmp( dot+1, types[i].suffix ) )
+    for( i = 0; dot && i < TR_N_ELEMENTS( types ); ++i )
+        if( !strcmp( dot + 1, types[i].suffix ) )
             return types[i].mime_type;
 
     return "application/octet-stream";
 }
 
 static void
-serve_file( struct evhttp_request * req, const char * path )
+serve_file( struct evhttp_request * req,
+            const char *            path )
 {
     if( req->type != EVHTTP_REQ_GET )
     {
-        evhttp_add_header(req->output_headers, "Allow", "GET");
+        evhttp_add_header( req->output_headers, "Allow", "GET" );
         send_simple_response( req, 405, NULL );
     }
     else
@@ -238,35 +221,41 @@ serve_file( struct evhttp_request * req, const char * path )
         else
         {
             struct evbuffer * buf = evbuffer_new( );
-            evbuffer_read(buf, fd, INT_MAX );
-            evhttp_add_header(req->output_headers, "Content-Type", mimetype_guess( path ) );
+            evbuffer_read( buf, fd, INT_MAX );
+            evhttp_add_header( req->output_headers, "Content-Type",
+                              mimetype_guess(
+                                  path ) );
             evhttp_send_reply( req, HTTP_OK, "OK", buf );
-            evbuffer_free(buf);
+            evbuffer_free( buf );
             close( fd );
         }
     }
 }
 
 static void
-handle_clutch( struct evhttp_request * req, struct tr_rpc_server * server )
+handle_clutch( struct evhttp_request * req,
+               struct tr_rpc_server *  server )
 {
-    const char * uri;
+    const char *      uri;
     struct evbuffer * buf = evbuffer_new( );
 
     assert( !strncmp( req->uri, "/transmission/web/", 18 ) );
 
-    evbuffer_add_printf( buf, "%s%s", tr_getClutchDir( server->session ), TR_PATH_DELIMITER_STR );
+    evbuffer_add_printf( buf, "%s%s", tr_getClutchDir(
+                             server->session ), TR_PATH_DELIMITER_STR );
     uri = req->uri + 18;
-    if( (*uri=='?') || (*uri=='\0') )
+    if( ( *uri == '?' ) || ( *uri == '\0' ) )
         evbuffer_add_printf( buf, "index.html" );
-    else {
+    else
+    {
         const char * pch = strchr( uri, '?' );
         if( pch )
-            evbuffer_add_printf( buf, "%*.*s", (int)(pch-uri), (int)(pch-uri), uri );
+            evbuffer_add_printf( buf, "%*.*s", (int)( pch - uri ),
+                                 (int)( pch - uri ), uri );
         else
             evbuffer_add_printf( buf, "%s", uri );
     }
-                              
+
     if( strstr( (const char *)EVBUFFER_DATA( buf ), ".." ) )
         send_simple_response( req, 401, NULL );
     else
@@ -276,16 +265,17 @@ handle_clutch( struct evhttp_request * req, struct tr_rpc_server * server )
 }
 
 static void
-handle_rpc( struct evhttp_request * req, struct tr_rpc_server * server )
+handle_rpc( struct evhttp_request * req,
+            struct tr_rpc_server *  server )
 {
-    int len = 0;
-    char * response;
+    int               len = 0;
+    char *            response = NULL;
     struct evbuffer * buf;
 
     if( req->type == EVHTTP_REQ_GET )
     {
         const char * q;
-        if(( q = strchr( req->uri, '?' )))
+        if( ( q = strchr( req->uri, '?' ) ) )
             response = tr_rpc_request_exec_uri( server->session,
                                                 q + 1,
                                                 strlen( q + 1 ),
@@ -294,38 +284,66 @@ handle_rpc( struct evhttp_request * req, struct tr_rpc_server * server )
     else if( req->type == EVHTTP_REQ_POST )
     {
         response = tr_rpc_request_exec_json( server->session,
-                                             EVBUFFER_DATA( req->input_buffer ),
-                                             EVBUFFER_LENGTH( req->input_buffer ),
+                                             EVBUFFER_DATA( req->
+                                                            input_buffer ),
+                                             EVBUFFER_LENGTH( req->
+                                                              input_buffer ),
                                              &len );
     }
 
     buf = evbuffer_new( );
     evbuffer_add( buf, response, len );
-    evhttp_add_header( req->output_headers, "Content-Type", "application/json; charset=UTF-8" );
+    evhttp_add_header( req->output_headers, "Content-Type",
+                       "application/json; charset=UTF-8" );
     evhttp_send_reply( req, HTTP_OK, "OK", buf );
     evbuffer_free( buf );
 }
 
+static int
+isAddressAllowed( const tr_rpc_server * server,
+                  const char *          address )
+{
+    const char * acl;
+
+    for( acl = server->acl; acl && *acl; )
+    {
+        const char * delimiter = strchr( acl, ',' );
+        const int    len = delimiter ? delimiter - acl : (int)strlen( acl );
+        char *       token = tr_strndup( acl, len );
+        const int    match = tr_wildmat( address, token + 1 );
+        tr_free( token );
+        if( match )
+            return *acl == '+';
+        if( !delimiter )
+            break;
+        acl = delimiter + 1;
+    }
+
+    return 0;
+}
+
 static void
-handle_request( struct evhttp_request * req, void * arg )
+handle_request( struct evhttp_request * req,
+                void *                  arg )
 {
     struct tr_rpc_server * server = arg;
 
-    if (req && req->evcon )
+    if( req && req->evcon )
     {
         const char * auth;
-        char * user = NULL;
-        char * pass = NULL;
+        char *       user = NULL;
+        char *       pass = NULL;
 
         evhttp_add_header( req->output_headers, "Server", MY_REALM );
-       
+
         auth = evhttp_find_header( req->input_headers, "Authorization" );
 
         if( auth && !strncasecmp( auth, "basic ", 6 ) )
         {
-            int plen;
+            int    plen;
             char * p = tr_base64_decode( auth + 6, 0, &plen );
-            if( p && plen && (( pass = strchr( p, ':' )))) {
+            if( p && plen && ( ( pass = strchr( p, ':' ) ) ) )
+            {
                 user = p;
                 *pass++ = '\0';
             }
@@ -335,20 +353,24 @@ handle_request( struct evhttp_request * req, void * arg )
         {
             send_simple_response( req, 401, "Unauthorized IP Address" );
         }
-        else if( server->isPasswordEnabled && (    !pass
-                                                || !user
-                                                || strcmp( server->username, user )
-                                                || strcmp( server->password, pass ) ) )
+        else if( server->isPasswordEnabled && ( !pass
+                                              || !user
+                                              || strcmp( server->username,
+                                                         user )
+                                              || strcmp( server->password,
+                                                         pass ) ) )
         {
             evhttp_add_header( req->output_headers,
-                "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"" );
+                               "WWW-Authenticate",
+                               "Basic realm=\"" MY_REALM "\"" );
             send_simple_response( req, 401, "Unauthorized User" );
         }
-        else if( !strcmp( req->uri, "/transmission/web" ) ||
-                 !strcmp( req->uri, "/transmission/clutch" ) ||
-                 !strcmp( req->uri, "/" ) )
+        else if( !strcmp( req->uri, "/transmission/web" )
+               || !strcmp( req->uri, "/transmission/clutch" )
+               || !strcmp( req->uri, "/" ) )
         {
-            evhttp_add_header( req->output_headers, "Location", "/transmission/web/" );
+            evhttp_add_header( req->output_headers, "Location",
+                               "/transmission/web/" );
             send_simple_response( req, HTTP_MOVEPERM, NULL );
         }
         else if( !strncmp( req->uri, "/transmission/web/", 18 ) )
@@ -536,3 +558,4 @@ tr_rpcInit( tr_handle *  session,
         startServer( s );
     return s;
 }
+
