@@ -17,7 +17,7 @@ typedef struct tr_rpc_server tr_rpc_server;
 
 tr_rpc_server * tr_rpcInit( struct tr_handle * session,
                             int                isEnabled,
-                            int                port,
+                            uint16_t           port,
                             const char *       acl,
                             int                isPasswordEnabled,
                             const char *       username,
@@ -31,9 +31,9 @@ void            tr_rpcSetEnabled( tr_rpc_server * server,
 int             tr_rpcIsEnabled( const tr_rpc_server * server );
 
 void            tr_rpcSetPort( tr_rpc_server * server,
-                               int             port );
+                               uint16_t        port );
 
-int             tr_rpcGetPort( const tr_rpc_server * server );
+uint16_t        tr_rpcGetPort( const tr_rpc_server * server );
 
 int             tr_rpcSetTest( const tr_rpc_server * server,
                                const char *          acl,

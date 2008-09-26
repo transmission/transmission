@@ -679,7 +679,6 @@ onAddressEdited( GtkCellRendererText  * r UNUSED,
     GtkTreeIter          iter;
     struct remote_page * page = gpage;
     GtkTreeModel *       model = GTK_TREE_MODEL( page->store );
-    tr_handle *          session = tr_core_handle( page->core );
     GtkTreePath *        path = gtk_tree_path_new_from_string( path_string );
 
     acl = g_strdup_printf( "+%s", new_text );

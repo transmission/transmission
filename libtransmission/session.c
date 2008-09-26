@@ -215,7 +215,7 @@ tr_sessionInitFull( const char *       configDir,
                     int                isBlocklistEnabled,
                     int                peerSocketTOS,
                     int                rpcIsEnabled,
-                    int                rpcPort,
+                    uint16_t           rpcPort,
                     const char *       rpcACL,
                     int                rpcAuthIsEnabled,
                     const char *       rpcUsername,
@@ -982,12 +982,12 @@ tr_sessionIsRPCEnabled( const tr_session * session )
 
 void
 tr_sessionSetRPCPort( tr_session * session,
-                      int          port )
+                      uint16_t     port )
 {
     tr_rpcSetPort( session->rpcServer, port );
 }
 
-int
+uint16_t
 tr_sessionGetRPCPort( const tr_session * session )
 {
     return tr_rpcGetPort( session->rpcServer );

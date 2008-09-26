@@ -39,8 +39,7 @@ struct tr_rpc_server
 {
     unsigned int         isEnabled         : 1;
     unsigned int         isPasswordEnabled : 1;
-    int                  port;
-    time_t               lastRequestTime;
+    uint16_t             port;
     struct evhttp *      httpd;
     tr_handle *          session;
     char *               username;
@@ -105,7 +104,9 @@ send_simple_response( struct evhttp_request * req, int code, const char * text )
 {
     const char * code_text = tr_webGetResponseStr( code );
     struct evbuffer * body = evbuffer_new( );
-    evbuffer_add_printf( body, "<h1>%s</h1>", text ? text : code_text );
+    evbuffer_add_printf( body, "<h1>%s</h1>", code_text );
+    if( text )
+        evbuffer_add_printf( body, "<h2>%s</h2>", text );
     evhttp_send_reply( req, code, code_text, body );
     evbuffer_free( body );
 }
@@ -128,63 +129,62 @@ handle_upload( struct evhttp_request * req, struct tr_rpc_server * server )
         const char * in = (const char *) EVBUFFER_DATA( req->input_buffer );
         size_t inlen = EVBUFFER_LENGTH( req->input_buffer );
 
-        char * boundary =
-            tr_strdup_printf( "--%s", strstr( content_type,
-                                              "boundary=" ) +
-                             strlen( "boundary=" ) );
+        const char * boundary_key = "boundary=";
+        const char * boundary_key_begin = strstr( content_type, boundary_key );
+        const char * boundary_val = boundary_key_begin ? boundary_key_begin + strlen( boundary_key ) : "arglebargle";
+
+        char * boundary = tr_strdup_printf( "--%s", boundary_val );
         const size_t boundary_len = strlen( boundary );
 
         const char * delim = tr_memmem( in, inlen, boundary, boundary_len );
         while( delim )
+        {
+            size_t       part_len;
+            const char * part = delim + boundary_len;
+            inlen -= ( part - in );
+            in = part;
+            delim = tr_memmem( in, inlen, boundary, boundary_len );
+            part_len = delim ? (size_t)( delim - part ) : inlen;
+
+            if( part_len )
             {
-                size_t       part_len;
-                const char * part = delim + boundary_len;
-                inlen -= ( part - in );
-                in = part;
-                delim = tr_memmem( in, inlen, boundary, boundary_len );
-                part_len = delim ? (size_t)( delim - part ) : inlen;
-
-                if( part_len )
+                char * text = tr_strndup( part, part_len );
+                if( strstr( text, "filename=\"" ) )
                 {
-                    char * text = tr_strndup( part, part_len );
-                    if( strstr( text, "filename=\"" ) )
+                    const char * body = strstr( text, "\r\n\r\n" );
+                    if( body )
                     {
-                        const char * body = strstr( text, "\r\n\r\n" );
-                        if( body )
-                        {
-                            char *  b64, *json, *freeme;
-                            int     json_len;
-                            size_t  body_len;
-                            tr_benc top, *args;
+                        char *  b64, *json, *freeme;
+                        int     json_len;
+                        size_t  body_len;
+                        tr_benc top, *args;
 
-                            body += 4;
-                            body_len = part_len - ( body - text );
-                            if( body_len >= 2
+                        body += 4;
+                        body_len = part_len - ( body - text );
+                        if( body_len >= 2
                               && !memcmp( &body[body_len - 2], "\r\n", 2 ) )
                                 body_len -= 2;
 
-                            tr_bencInitDict( &top, 2 );
-                            args = tr_bencDictAddDict( &top, "arguments", 2 );
-                            tr_bencDictAddStr( &top, "method",
-                                               "torrent-add" );
-                            b64 = tr_base64_encode( body, body_len, NULL );
-                            tr_bencDictAddStr( args, "metainfo", b64 );
-                            tr_bencDictAddInt( args, "paused", paused );
-                            json = tr_bencSaveAsJSON( &top, &json_len );
-                            freeme =
-                                tr_rpc_request_exec_json( server->session,
-                                                          json, json_len,
-                                                          NULL );
+                        tr_bencInitDict( &top, 2 );
+                        args = tr_bencDictAddDict( &top, "arguments", 2 );
+                        tr_bencDictAddStr( &top, "method", "torrent-add" );
+                        b64 = tr_base64_encode( body, body_len, NULL );
+                        tr_bencDictAddStr( args, "metainfo", b64 );
+                        tr_bencDictAddInt( args, "paused", paused );
+                        json = tr_bencSaveAsJSON( &top, &json_len );
+                        freeme = tr_rpc_request_exec_json( server->session,
+                                                           json, json_len,
+                                                           NULL );
 
-                            tr_free( freeme );
-                            tr_free( json );
-                            tr_free( b64 );
-                            tr_bencFree( &top );
-                        }
+                        tr_free( freeme );
+                        tr_free( json );
+                        tr_free( b64 );
+                        tr_bencFree( &top );
                     }
-                    tr_free( text );
                 }
+                tr_free( text );
             }
+        }
 
         tr_free( boundary );
 
@@ -378,7 +378,7 @@ startServer( tr_rpc_server * server )
     dbgmsg( "in startServer; current context is %p", server->httpd );
 
     if( !server->httpd )
-        if( ( server->httpd = evhttp_start( "0.0.0.0", server->port ) ) )
+        if( ( server->httpd = evhttp_start( NULL, server->port ) ) )
             evhttp_set_gencb( server->httpd, handle_request, server );
 }
 
@@ -412,7 +412,7 @@ tr_rpcIsEnabled( const tr_rpc_server * server )
 
 void
 tr_rpcSetPort( tr_rpc_server * server,
-               int             port )
+               uint16_t        port )
 {
     if( server->port != port )
     {
@@ -426,7 +426,7 @@ tr_rpcSetPort( tr_rpc_server * server,
     }
 }
 
-int
+uint16_t
 tr_rpcGetPort( const tr_rpc_server * server )
 {
     return server->port;
@@ -515,7 +515,7 @@ tr_rpcClose( tr_rpc_server ** ps )
 tr_rpc_server *
 tr_rpcInit( tr_handle *  session,
             int          isEnabled,
-            int          port,
+            uint16_t     port,
             const char * acl,
             int          isPasswordEnabled,
             const char * username,

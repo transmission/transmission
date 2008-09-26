@@ -266,7 +266,7 @@ tr_handle * tr_sessionInitFull( const char *       configDir,
                                 int                isBlocklistEnabled,
                                 int                peerSocketTOS,
                                 int                rpcIsEnabled,
-                                int                rpcPort,
+                                uint16_t           rpcPort,
                                 const char *       rpcAccessControlList,
                                 int                rpcPasswordIsEnabled,
                                 const char *       rpcUsername,
@@ -337,13 +337,13 @@ int  tr_sessionIsRPCEnabled( const tr_handle * handle );
 /** @brief Specify which port to listen for RPC requests on.
     @see tr_sessionInitFull()
     @see tr_sessionGetRPCPort */
-void tr_sessionSetRPCPort(                     tr_handle *,
-                                           int port );
+void tr_sessionSetRPCPort( tr_handle * session,
+                           uint16_t port );
 
 /** @brief Get which port to listen for RPC requests on.
     @see tr_sessionInitFull()
     @see tr_sessionSetRPCPort */
-int  tr_sessionGetRPCPort( const tr_handle * );
+uint16_t  tr_sessionGetRPCPort( const tr_handle * );
 
 /**
  * @brief Specify access control list (ACL).
