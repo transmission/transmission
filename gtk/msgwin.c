@@ -526,6 +526,8 @@ msgwin_new( TrCore * core )
 
 
     view = gtk_tree_view_new_with_model( data->sort );
+    g_signal_connect( view, "button-release-event",
+                      G_CALLBACK( on_tree_view_button_released ), NULL );
     data->view = GTK_TREE_VIEW( view );
     gtk_tree_view_set_rules_hint( data->view, TRUE );
     appendColumn( data->view, COL_SEQUENCE );

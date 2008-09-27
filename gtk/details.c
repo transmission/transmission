@@ -700,6 +700,8 @@ peer_page_new( TrTorrent * gtor )
 
         m = webseed_model_new( tr_torrent_handle( gtor ) );
         webtree = gtk_tree_view_new_with_model( m );
+        g_signal_connect( webtree, "button-release-event",
+                          G_CALLBACK( on_tree_view_button_released ), NULL );
         gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( webtree ), TRUE );
         p->webseeds = GTK_LIST_STORE( m );
         g_object_unref( G_OBJECT( m ) );
@@ -745,6 +747,8 @@ peer_page_new( TrTorrent * gtor )
 #endif
     gtk_widget_set_size_request( v, 550, 0 );
     g_object_unref ( G_OBJECT( m ) );
+    g_signal_connect( v, "button-release-event",
+                      G_CALLBACK( on_tree_view_button_released ), NULL );
 
     for( i = 0; i < G_N_ELEMENTS( view_columns ); ++i )
     {

@@ -853,6 +853,8 @@ webPage( GObject * core )
         s = _( "Access control list:" );
         page->store = GTK_LIST_STORE( m );
         w = gtk_tree_view_new_with_model( m );
+        g_signal_connect( w, "button-release-event",
+                          G_CALLBACK( on_tree_view_button_released ), NULL );
 
         page->widgets = g_slist_append( page->widgets, w );
         v = page->view = GTK_TREE_VIEW( w );

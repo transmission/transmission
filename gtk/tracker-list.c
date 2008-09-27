@@ -301,6 +301,8 @@ tracker_list_new( TrTorrent * gtor )
     m = tracker_model_new( tr_torrent_handle( gtor ) );
     page->store = GTK_LIST_STORE( m );
     w = gtk_tree_view_new_with_model( m );
+    g_signal_connect( w, "button-release-event",
+                      G_CALLBACK( on_tree_view_button_released ), NULL );
     page->view = GTK_TREE_VIEW( w );
     gtk_tree_view_set_enable_search( page->view, FALSE );
     r = gtk_cell_renderer_text_new( );

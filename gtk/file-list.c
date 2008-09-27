@@ -754,6 +754,9 @@ file_list_new( TrTorrent * gtor )
     gtk_container_set_border_width( GTK_CONTAINER( view ), GUI_PAD_BIG );
     g_signal_connect( view, "button-press-event",
                       G_CALLBACK( onViewButtonPressed ), data );
+    g_signal_connect( view, "button-release-event",
+                      G_CALLBACK( on_tree_view_button_released ), NULL );
+
 
     /* set up view */
     sel = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );

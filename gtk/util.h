@@ -119,6 +119,13 @@ gboolean    on_tree_view_button_pressed( GtkWidget *      view,
                                          GdkEventButton * event,
                                          gpointer         unused );
 
+/* if the click didn't specify a row, clear the selection */
+gboolean    on_tree_view_button_released( GtkWidget *      view,
+                                          GdkEventButton * event,
+                                          gpointer         unused );
+
+
+
 gpointer    tr_object_ref_sink( gpointer object );
 
 void        tr_file_trash_or_unlink( const char * filename );

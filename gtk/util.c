@@ -480,6 +480,28 @@ on_tree_view_button_pressed( GtkWidget *      view,
     return FALSE;
 }
 
+/* if the user clicked in an empty area of the list,
+ * clear all the selections. */
+gboolean
+on_tree_view_button_released( GtkWidget *      view,
+                              GdkEventButton * event,
+                              gpointer         unused UNUSED )
+{
+    GtkTreeView * tv = GTK_TREE_VIEW( view );
+
+    if( !gtk_tree_view_get_path_at_pos ( tv,
+                                         (gint) event->x,
+                                         (gint) event->y,
+                                         NULL, NULL, NULL, NULL ) )
+    {
+        GtkTreeSelection * selection = gtk_tree_view_get_selection( tv );
+        gtk_tree_selection_unselect_all ( selection );
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 gpointer
 tr_object_ref_sink( gpointer object )
 {
