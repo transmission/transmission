@@ -91,7 +91,7 @@ TransmissionRemote.prototype =
 			'dateCreated', 'downloadedEver', 'error', 'errorString',
 			'eta', 'hashString', 'haveUnchecked', 'haveValid', 'id',
 			'isPrivate', 'leechers', 'leftUntilDone', 'name',
-			'peersGettingFromUs', 'peersKnown', 'peersSendingToUs',
+			'peersConnected', 'peersGettingFromUs', 'peersSendingToUs',
 			'rateDownload', 'rateUpload', 'seeders', 'sizeWhenDone',
 			'status', 'swarmSpeed', 'totalSize', 'uploadedEver' ];
 		this.sendRequest( RPC._Root, $.toJSON(o), function(data) {
