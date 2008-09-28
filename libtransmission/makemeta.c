@@ -67,12 +67,11 @@ getFiles( const char *      dir,
     {
         struct dirent *d;
         for( d = readdir( odir ); d != NULL; d = readdir( odir ) )
-            if( d->d_name && d->d_name[0] != '.' ) /* skip dotfiles, ., and ..
-                                                     */
+            if( d->d_name && d->d_name[0] != '.' ) /* skip dotfiles */
                 list = getFiles( buf, d->d_name, list );
         closedir( odir );
     }
-    else if( S_ISREG( sb.st_mode ) )
+    else if( S_ISREG( sb.st_mode ) && ( sb.st_size > 0 ) )
     {
         struct FileList * node = tr_new( struct FileList, 1 );
         node->size = sb.st_size;
