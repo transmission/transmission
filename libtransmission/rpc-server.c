@@ -327,6 +327,7 @@ handle_request( struct evhttp_request * req,
                 void *                  arg )
 {
     struct tr_rpc_server * server = arg;
+    tr_ndbg( MY_NAME, _( "Got request: \"%s\"" ), req->uri );
 
     if( req && req->evcon )
     {
@@ -400,8 +401,12 @@ startServer( tr_rpc_server * server )
     dbgmsg( "in startServer; current context is %p", server->httpd );
 
     if( !server->httpd )
-        if( ( server->httpd = evhttp_start( NULL, server->port ) ) )
+    {
+        if( ( server->httpd = evhttp_start( "0.0.0.0", server->port ) ) )
             evhttp_set_gencb( server->httpd, handle_request, server );
+        else
+            tr_nerr( MY_NAME, _( "Failed to start RPC server" ) );
+    }
 }
 
 static void
