@@ -28,6 +28,7 @@
 #include "platform.h"
 #include "rpcimpl.h"
 #include "rpc-server.h"
+#include "trevent.h"
 #include "utils.h"
 #include "web.h"
 
@@ -327,7 +328,7 @@ handle_request( struct evhttp_request * req,
                 void *                  arg )
 {
     struct tr_rpc_server * server = arg;
-    tr_ndbg( MY_NAME, _( "Got request: \"%s\"" ), req->uri );
+    fprintf( stderr, "%s:%d Got request: \"%s\"\n", __FILE__, __LINE__, req->uri );
 
     if( req && req->evcon )
     {
@@ -393,19 +394,21 @@ handle_request( struct evhttp_request * req,
 
         tr_free( user );
     }
+    fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
 }
 
 static void
 startServer( tr_rpc_server * server )
 {
-    dbgmsg( "in startServer; current context is %p", server->httpd );
+    fprintf( stderr, "%s:%d in startServer; current context is %p\n", __FILE__, __LINE__, server->httpd );
 
     if( !server->httpd )
     {
-        if( ( server->httpd = evhttp_start( "0.0.0.0", server->port ) ) )
-            evhttp_set_gencb( server->httpd, handle_request, server );
-        else
-            tr_nerr( MY_NAME, _( "Failed to start RPC server" ) );
+        int i;
+        server->httpd = evhttp_new( tr_eventGetBase( server->session ) );
+        fprintf( stderr, "%s:%d in startServer; new context is %p\n", __FILE__, __LINE__, server->httpd );
+        i = evhttp_bind_socket( server->httpd, "0.0.0.0", server->port );
+        fprintf( stderr, "evhttp_bind_socket returned %d\n", i );
     }
 }
 

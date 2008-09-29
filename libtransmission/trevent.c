@@ -302,3 +302,8 @@ tr_runInEventThread( struct tr_handle *       handle,
     }
 }
 
+struct event_base *
+tr_eventGetBase( tr_session * session )
+{
+    return session->events->base;
+}

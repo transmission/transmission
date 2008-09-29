@@ -22,6 +22,8 @@ void      tr_eventInit( struct tr_handle * tr_handle );
 
 void      tr_eventClose( struct tr_handle * tr_handle );
 
+struct event_base * tr_eventGetBase( struct tr_handle * tr_handle );
+
 
 typedef struct tr_timer  tr_timer;
 
