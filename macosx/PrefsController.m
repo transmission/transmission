@@ -955,8 +955,10 @@ tr_handle * fHandle;
         NSMutableArray * newComponents = [NSMutableArray arrayWithCapacity: 4];
         
         //create better-formatted ip string
+        BOOL valid = false;
         if ([components count] == 4)
         {
+            valid = true;
             NSEnumerator * enumerator = [components objectEnumerator];
             NSString * component;
             while ((component = [enumerator nextObject]))
@@ -964,19 +966,37 @@ tr_handle * fHandle;
                 if ([component isEqualToString: @"*"])
                     [newComponents addObject: component];
                 else
-                    [newComponents addObject: [[NSNumber numberWithInt: [component intValue]] stringValue]];
+                {
+                    int num = [component intValue];
+                    if (num >= 0 && num < 256)
+                        [newComponents addObject: [[NSNumber numberWithInt: num] stringValue]];
+                    else
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
             }
         }
         
-        NSString * newIP = [newComponents componentsJoinedByString: @"."];
-        
-        NSDictionary * newDict = [NSDictionary dictionaryWithObjectsAndKeys: newIP, @"IP",
-                                    [oldDict objectForKey: @"Allow"], @"Allow", nil];
-        [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
-        
-        NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"IP" ascending: YES
-                                            selector: @selector(compareNumeric:)] autorelease];
-        [fRPCAccessArray sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
+        if (valid)
+        {
+            NSString * newIP = [newComponents componentsJoinedByString: @"."];
+            
+            NSDictionary * newDict = [NSDictionary dictionaryWithObjectsAndKeys: newIP, @"IP",
+                                        [oldDict objectForKey: @"Allow"], @"Allow", nil];
+            [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
+            
+            NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"IP" ascending: YES
+                                                selector: @selector(compareNumeric:)] autorelease];
+            [fRPCAccessArray sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
+        }
+        else
+        {
+            NSBeep();
+            if ([[oldDict objectForKey: @"IP"] isEqualToString: @""])
+                [fRPCAccessArray removeObjectAtIndex: row];
+        }
         
         [fRPCAccessTable deselectAll: self];
         [fRPCAccessTable reloadData];
