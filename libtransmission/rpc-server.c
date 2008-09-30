@@ -409,6 +409,7 @@ startServer( tr_rpc_server * server )
         fprintf( stderr, "%s:%d in startServer; new context is %p\n", __FILE__, __LINE__, server->httpd );
         i = evhttp_bind_socket( server->httpd, "0.0.0.0", server->port );
         fprintf( stderr, "evhttp_bind_socket returned %d\n", i );
+        evhttp_set_gencb( server->httpd, handle_request, server );
     }
 }
 
