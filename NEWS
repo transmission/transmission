@@ -4,6 +4,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 http://trac.transmissionbt.com/query?group=component&milestone=1.40
 - All Platforms
    + Lazy bitfields
+   + Rewritten bandwidth management code
 - Mac
    + Option to automatically update the blocklist weekly
    + Sparkle updated to 1.5
