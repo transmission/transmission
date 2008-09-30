@@ -407,7 +407,7 @@ startServer( tr_rpc_server * server )
         int i;
         server->httpd = evhttp_new( tr_eventGetBase( server->session ) );
         fprintf( stderr, "%s:%d in startServer; new context is %p\n", __FILE__, __LINE__, server->httpd );
-        i = evhttp_bind_socket( server->httpd, "0.0.0.0", server->port );
+        i = evhttp_bind_socket( server->httpd, NULL, server->port );
         fprintf( stderr, "evhttp_bind_socket returned %d\n", i );
         evhttp_set_gencb( server->httpd, handle_request, server );
     }
