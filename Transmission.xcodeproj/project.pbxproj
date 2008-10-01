@@ -40,6 +40,10 @@
 		4D3EA0AA08AE13C600EA10C2 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D3EA0A908AE13C600EA10C2 /* IOKit.framework */; };
 		4D4ADFC70DA1631500A68297 /* blocklist.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D3078E0D9EC45F0051FD27 /* blocklist.c */; };
 		4D4B7F6109E055660053C1EB /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
+		4D4C8BD00E93DB720004ACB8 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D4C8BCF0E93DB720004ACB8 /* libz.dylib */; };
+		4D4C8BD10E93DB720004ACB8 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D4C8BCF0E93DB720004ACB8 /* libz.dylib */; };
+		4D4C8BD20E93DB720004ACB8 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D4C8BCF0E93DB720004ACB8 /* libz.dylib */; };
+		4D4C8BD30E93DB720004ACB8 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D4C8BCF0E93DB720004ACB8 /* libz.dylib */; };
 		4D6DAAC6090CE00500F43C22 /* RevealOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D6DAAC4090CE00500F43C22 /* RevealOff.png */; };
 		4D6DAAC7090CE00500F43C22 /* RevealOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D6DAAC5090CE00500F43C22 /* RevealOn.png */; };
 		4D752E930913C949008EAAD4 /* Preferences.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D752E920913C949008EAAD4 /* Preferences.png */; };
@@ -413,6 +417,7 @@
 		4D36BA6D0CA2F00800A63CA5 /* publish.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = publish.h; path = libtransmission/publish.h; sourceTree = "<group>"; };
 		4D36BBC80CA309AA00A63CA5 /* evutil.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = evutil.c; path = "third-party/libevent/evutil.c"; sourceTree = "<group>"; };
 		4D3EA0A908AE13C600EA10C2 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		4D4C8BCF0E93DB720004ACB8 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
 		4D6DAAC4090CE00500F43C22 /* RevealOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RevealOff.png; path = macosx/Images/RevealOff.png; sourceTree = "<group>"; };
 		4D6DAAC5090CE00500F43C22 /* RevealOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RevealOn.png; path = macosx/Images/RevealOn.png; sourceTree = "<group>"; };
 		4D752E920913C949008EAAD4 /* Preferences.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Preferences.png; path = macosx/Images/Preferences.png; sourceTree = "<group>"; };
@@ -790,6 +795,7 @@
 				4D9A2BF909E16D4F002D0FF9 /* libcrypto.0.9.7.dylib in Frameworks */,
 				A22E59A70DC11A1D00F4BE15 /* libcurl.dylib in Frameworks */,
 				A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */,
+				4D4C8BD10E93DB720004ACB8 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -805,6 +811,7 @@
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
 				A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */,
 				A29EBE710DC06068006CEE80 /* libcurl.dylib in Frameworks */,
+				4D4C8BD00E93DB720004ACB8 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -840,6 +847,7 @@
 				BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */,
 				A22E59A80DC11A1F00F4BE15 /* libcurl.dylib in Frameworks */,
 				A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */,
+				4D4C8BD20E93DB720004ACB8 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -851,6 +859,7 @@
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
 				A22E59A90DC11A2000F4BE15 /* libcurl.dylib in Frameworks */,
 				A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */,
+				4D4C8BD30E93DB720004ACB8 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1202,6 +1211,7 @@
 			children = (
 				4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */,
 				A29EBE700DC06068006CEE80 /* libcurl.dylib */,
+				4D4C8BCF0E93DB720004ACB8 /* libz.dylib */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -2144,6 +2154,7 @@
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
 					"-DHAVE_STRCASECMP",
+					"-DHAVE_LIBZ",
 				);
 				PRODUCT_NAME = transmission;
 			};
@@ -2201,6 +2212,7 @@
 					"third-party/",
 					"third-party/libevent",
 				);
+				OTHER_CFLAGS = "-DHAVE_LIBZ";
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Debug;
@@ -2302,6 +2314,8 @@
 					"-DHAVE_STRLCAT",
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
+					"-DHAVE_STRCASECMP",
+					"-DHAVE_LIBZ",
 				);
 				PRODUCT_NAME = transmission;
 			};
@@ -2437,6 +2451,8 @@
 					"-DHAVE_STRLCAT",
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
+					"-DHAVE_STRCASECMP",
+					"-DHAVE_LIBZ",
 				);
 				PRODUCT_NAME = transmission;
 			};
@@ -2468,6 +2484,7 @@
 					"third-party/",
 					"third-party/libevent",
 				);
+				OTHER_CFLAGS = "-DHAVE_LIBZ";
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = "Release - Debug";
@@ -2573,6 +2590,7 @@
 					"third-party/",
 					"third-party/libevent",
 				);
+				OTHER_CFLAGS = "-DHAVE_LIBZ";
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Release;
