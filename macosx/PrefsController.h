@@ -56,9 +56,9 @@
     IBOutlet NSPopUpButton * fProxyTypePopUp;
     
     IBOutlet NSTextField * fRPCPortField, * fRPCPasswordField;
-    IBOutlet NSTableView * fRPCAccessTable;
+    IBOutlet NSTableView * fRPCWhitelistTable;
+    NSMutableArray * fRPCWhitelistArray;
     IBOutlet NSSegmentedControl * fRPCAddRemoveControl;
-    NSMutableArray * fRPCAccessArray;
 }
 
 + (void) setHandle: (tr_handle *) handle;
@@ -131,7 +131,7 @@
 - (void) setRPCPassword: (id) sender;
 - (void) updateRPCPassword;
 - (void) setRPCPort: (id) sender;
-- (void) updateRPCAccessList;
+- (void) updateRPCWhitelist;
 - (void) addRemoveRPCIP: (id) sender;
 
 - (void) helpForPeers: (id) sender;

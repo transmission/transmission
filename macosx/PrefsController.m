@@ -36,9 +36,6 @@
 #define PROXY_SOCKS4    1
 #define PROXY_SOCKS5    2
 
-#define RPC_ACCESS_ALLOW    0
-#define RPC_ACCESS_DENY     1
-
 #define RPC_IP_ADD_TAG      0
 #define RPC_IP_REMOVE_TAG   1
 
@@ -128,14 +125,13 @@ tr_handle * fHandle;
         [self updateProxyType];
         [self updateProxyPassword];
         
-        //update rpc access list
+        //update rpc whitelist
         [self updateRPCPassword];
         
-        fRPCAccessArray = [[fDefaults arrayForKey: @"RPCAccessList"] mutableCopy];
-        if (!fRPCAccessArray)
-            fRPCAccessArray = [[NSMutableArray arrayWithObject: [NSDictionary dictionaryWithObjectsAndKeys: @"127.0.0.1", @"IP",
-                                [NSNumber numberWithBool: YES], @"Allow", nil]] retain];
-        [self updateRPCAccessList];
+        fRPCWhitelistArray = [[fDefaults arrayForKey: @"RPCWhitelist"] mutableCopy];
+        if (!fRPCWhitelistArray)
+            fRPCWhitelistArray = [[NSMutableArray arrayWithObject: @"127.0.0.1"] retain];
+        [self updateRPCWhitelist];
     }
     
     return self;
@@ -152,7 +148,7 @@ tr_handle * fHandle;
         [fPortChecker release];
     }
     
-    [fRPCAccessArray release];
+    [fRPCWhitelistArray release];
     
     [super dealloc];
 }
@@ -876,138 +872,111 @@ tr_handle * fHandle;
     tr_sessionSetRPCPort(fHandle, port);
 }
 
-- (void) updateRPCAccessList
+- (void) updateRPCWhitelist
 {
-    NSMutableArray * components = [NSMutableArray arrayWithCapacity: [fRPCAccessArray count]];
-    
-    NSEnumerator * enumerator = [fRPCAccessArray objectEnumerator];
-    NSDictionary * dict;
-    while ((dict = [enumerator nextObject]))
-        [components addObject: [NSString stringWithFormat: @"%c%@", [[dict objectForKey: @"Allow"] boolValue] ? '+' : '-',
-                                [dict objectForKey: @"IP"]]];
-    
-    NSString * string = [components componentsJoinedByString: @","];
-    tr_sessionSetRPCACL(fHandle, [string UTF8String]);
+    NSString * string = [fRPCWhitelistArray componentsJoinedByString: @","];
+    tr_sessionSetRPCWhitelist(fHandle, [string UTF8String]);
 }
 
 - (void) addRemoveRPCIP: (id) sender
 {
     //don't allow add/remove when currently adding - it leads to weird results
-    if ([fRPCAccessTable editedRow] != -1)
+    if ([fRPCWhitelistTable editedRow] != -1)
         return;
     
     if ([[sender cell] tagForSegment: [sender selectedSegment]] == RPC_IP_REMOVE_TAG)
     {
-        [fRPCAccessArray removeObjectsAtIndexes: [fRPCAccessTable selectedRowIndexes]];
-        [fRPCAccessTable deselectAll: self];
-        [fRPCAccessTable reloadData];
+        [fRPCWhitelistArray removeObjectsAtIndexes: [fRPCWhitelistTable selectedRowIndexes]];
+        [fRPCWhitelistTable deselectAll: self];
+        [fRPCWhitelistTable reloadData];
         
-        [fDefaults setObject: fRPCAccessArray forKey: @"RPCAccessList"];
-        [self updateRPCAccessList];
+        [fDefaults setObject: fRPCWhitelistArray forKey: @"RPCWhitelist"];
+        [self updateRPCWhitelist];
     }
     else
     {
-        [fRPCAccessArray addObject: [NSDictionary dictionaryWithObjectsAndKeys: @"", @"IP",
-                                        [NSNumber numberWithBool: YES], @"Allow", nil]];
-        [fRPCAccessTable reloadData];
+        [fRPCWhitelistArray addObject: @""];
+        [fRPCWhitelistTable reloadData];
         
-        int row = [fRPCAccessArray count] - 1;
-        [fRPCAccessTable selectRow: row byExtendingSelection: NO];
-        [fRPCAccessTable editColumn: 0 row: row withEvent: nil select: YES];
+        int row = [fRPCWhitelistArray count] - 1;
+        [fRPCWhitelistTable selectRow: row byExtendingSelection: NO];
+        [fRPCWhitelistTable editColumn: 0 row: row withEvent: nil select: YES];
     }
 }
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableView
 {
-    return [fRPCAccessArray count];
+    return [fRPCWhitelistArray count];
 }
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
-    NSDictionary * dict = [fRPCAccessArray objectAtIndex: row];
-    
-    NSString * ident = [tableColumn identifier];
-    if ([ident isEqualToString: @"Permission"])
-    {
-        int allow = [[dict objectForKey: @"Allow"] boolValue] ? RPC_ACCESS_ALLOW : RPC_ACCESS_DENY;
-        return [NSNumber numberWithInt: allow];
-    }
-    else
-        return [dict objectForKey: @"IP"];
+    return [fRPCWhitelistArray objectAtIndex: row];
 }
 
 - (void) tableView: (NSTableView *) tableView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn
     row: (NSInteger) row
 {
-    NSDictionary * oldDict = [fRPCAccessArray objectAtIndex: row];
-    
-    NSString * ident = [tableColumn identifier];
-    if ([ident isEqualToString: @"Permission"])
-    {
-        NSNumber * allow = [NSNumber numberWithBool: [object intValue] == RPC_ACCESS_ALLOW];
-        NSDictionary * newDict = [NSDictionary dictionaryWithObjectsAndKeys: [oldDict objectForKey: @"IP"], @"IP", allow, @"Allow", nil];
-        [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
-    }
-    else
-    {
-        NSArray * components = [object componentsSeparatedByString: @"."];
-        NSMutableArray * newComponents = [NSMutableArray arrayWithCapacity: 4];
+    NSArray * components = [object componentsSeparatedByString: @"."];
+    NSMutableArray * newComponents = [NSMutableArray arrayWithCapacity: 4];
         
-        //create better-formatted ip string
-        BOOL valid = false;
-        if ([components count] == 4)
+    //create better-formatted ip string
+    BOOL valid = false;
+    if ([components count] == 4)
+    {
+        valid = true;
+        NSEnumerator * enumerator = [components objectEnumerator];
+        NSString * component;
+        while ((component = [enumerator nextObject]))
         {
-            valid = true;
-            NSEnumerator * enumerator = [components objectEnumerator];
-            NSString * component;
-            while ((component = [enumerator nextObject]))
+            if ([component isEqualToString: @"*"])
+                [newComponents addObject: component];
+            else
             {
-                if ([component isEqualToString: @"*"])
-                    [newComponents addObject: component];
+                int num = [component intValue];
+                if (num >= 0 && num < 256)
+                    [newComponents addObject: [[NSNumber numberWithInt: num] stringValue]];
                 else
                 {
-                    int num = [component intValue];
-                    if (num >= 0 && num < 256)
-                        [newComponents addObject: [[NSNumber numberWithInt: num] stringValue]];
-                    else
-                    {
-                        valid = false;
-                        break;
-                    }
+                    valid = false;
+                    break;
                 }
             }
         }
-        
-        if (valid)
-        {
-            NSString * newIP = [newComponents componentsJoinedByString: @"."];
-            
-            NSDictionary * newDict = [NSDictionary dictionaryWithObjectsAndKeys: newIP, @"IP",
-                                        [oldDict objectForKey: @"Allow"], @"Allow", nil];
-            [fRPCAccessArray replaceObjectAtIndex: row withObject: newDict];
-            
-            NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"IP" ascending: YES
-                                                selector: @selector(compareNumeric:)] autorelease];
-            [fRPCAccessArray sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
-        }
-        else
-        {
-            NSBeep();
-            if ([[oldDict objectForKey: @"IP"] isEqualToString: @""])
-                [fRPCAccessArray removeObjectAtIndex: row];
-        }
-        
-        [fRPCAccessTable deselectAll: self];
-        [fRPCAccessTable reloadData];
     }
     
-    [fDefaults setObject: fRPCAccessArray forKey: @"RPCAccessList"];
-    [self updateRPCAccessList];
+    NSString * newIP;
+    if (valid)
+    {
+        newIP = [newComponents componentsJoinedByString: @"."];
+        
+        //don't allow the same ip address
+        if ([fRPCWhitelistArray containsObject: newIP] && ![[fRPCWhitelistArray objectAtIndex: row] isEqualToString: newIP])
+            valid = false;
+    }
+    
+    if (valid)
+    {
+        [fRPCWhitelistArray replaceObjectAtIndex: row withObject: newIP];
+        [fRPCWhitelistArray sortUsingSelector: @selector(compareNumeric:)];
+    }
+    else
+    {
+        NSBeep();
+        if ([[fRPCWhitelistArray objectAtIndex: row] isEqualToString: @""])
+            [fRPCWhitelistArray removeObjectAtIndex: row];
+    }
+        
+    [fRPCWhitelistTable deselectAll: self];
+    [fRPCWhitelistTable reloadData];
+    
+    [fDefaults setObject: fRPCWhitelistArray forKey: @"RPCWhitelist"];
+    [self updateRPCWhitelist];
 }
 
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
-    [fRPCAddRemoveControl setEnabled: [fRPCAccessTable numberOfSelectedRows] > 0 forSegment: RPC_IP_REMOVE_TAG];
+    [fRPCAddRemoveControl setEnabled: [fRPCWhitelistTable numberOfSelectedRows] > 0 forSegment: RPC_IP_REMOVE_TAG];
 }
 
 - (void) helpForPeers: (id) sender
