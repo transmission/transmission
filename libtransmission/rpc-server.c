@@ -20,7 +20,7 @@
 #include <unistd.h>    /* close */
 
 #ifdef HAVE_LIBZ
-#include <zlib.h>
+ #include <zlib.h>
 #endif
 
 #include <libevent/event.h>
@@ -42,17 +42,17 @@
 
 struct tr_rpc_server
 {
-    unsigned int     isEnabled         : 1;
-    unsigned int     isPasswordEnabled : 1;
-    uint16_t         port;
-    struct evhttp *  httpd;
-    tr_handle *      session;
-    char *           username;
-    char *           password;
-    char *           acl;
+    unsigned int       isEnabled         : 1;
+    unsigned int       isPasswordEnabled : 1;
+    uint16_t           port;
+    struct evhttp *    httpd;
+    tr_handle *        session;
+    char *             username;
+    char *             password;
+    char *             whitelist;
 };
 
-#define dbgmsg( fmt... ) tr_deepLog( __FILE__, __LINE__, MY_NAME, ## fmt )
+#define dbgmsg( fmt ... ) tr_deepLog( __FILE__, __LINE__, MY_NAME, ## fmt )
 
 /**
 ***
@@ -187,16 +187,16 @@ mimetype_guess( const char * path )
 
     const struct
     {
-        const char *  suffix;
-        const char *  mime_type;
+        const char *    suffix;
+        const char *    mime_type;
     } types[] = {
         /* these are just the ones we need for serving clutch... */
-        { "css",  "text/css"                   },
-        { "gif",  "image/gif"                  },
-        { "html", "text/html"                  },
-        { "ico",  "image/vnd.microsoft.icon"   },
-        { "js",   "application/javascript"     },
-        { "png",  "image/png"                  }
+        { "css",  "text/css"                       },
+        { "gif",  "image/gif"                      },
+        { "html", "text/html"                      },
+        { "ico",  "image/vnd.microsoft.icon"       },
+        { "js",   "application/javascript"         },
+        { "png",  "image/png"                      }
     };
     const char * dot = strrchr( path, '.' );
 
@@ -211,42 +211,52 @@ mimetype_guess( const char * path )
 static void
 compress_evbuf( struct evbuffer * evbuf )
 {
-    static struct evbuffer *tmp;
-    static z_stream stream;
-    static unsigned char buffer[2048];
-    
-    if( !tmp ) {
+    static struct evbuffer * tmp;
+    static z_stream          stream;
+    static unsigned char     buffer[2048];
+
+    if( !tmp )
+    {
         tmp = evbuffer_new( );
         deflateInit( &stream, Z_BEST_COMPRESSION );
     }
 
     deflateReset( &stream );
-    stream.next_in = EVBUFFER_DATA(evbuf);
-    stream.avail_in = EVBUFFER_LENGTH(evbuf);
+    stream.next_in = EVBUFFER_DATA( evbuf );
+    stream.avail_in = EVBUFFER_LENGTH( evbuf );
 
-    do {
+    do
+    {
         stream.next_out = buffer;
         stream.avail_out = sizeof( buffer );
         if( deflate( &stream, Z_FULL_FLUSH ) == Z_OK )
             evbuffer_add( tmp, buffer, sizeof( buffer ) - stream.avail_out );
         else
             break;
-    } while (stream.avail_out == 0);
+    }
+    while( stream.avail_out == 0 );
 
-/*fprintf( stderr, "deflated response from %zu to %zu bytes\n", EVBUFFER_LENGTH( evbuf ), EVBUFFER_LENGTH( tmp ) );*/
-    evbuffer_drain(evbuf, EVBUFFER_LENGTH(evbuf));
-    evbuffer_add_buffer(evbuf, tmp);
+/*fprintf( stderr, "deflated response from %zu to %zu bytes\n", EVBUFFER_LENGTH(
+  evbuf ), EVBUFFER_LENGTH( tmp ) );*/
+    evbuffer_drain( evbuf, EVBUFFER_LENGTH( evbuf ) );
+    evbuffer_add_buffer( evbuf, tmp );
 }
+
 #endif
 
 static void
-maybe_deflate_response( struct evhttp_request * req, struct evbuffer * response )
+maybe_deflate_response( struct evhttp_request * req,
+                        struct evbuffer *       response )
 {
 #ifdef HAVE_LIBZ
-    const char * accept_encoding = evhttp_find_header( req->input_headers, "Accept-Encoding" );
-    const int do_deflate = accept_encoding && strstr( accept_encoding, "deflate" );
-    if( do_deflate ) {
-        evhttp_add_header( req->output_headers, "Content-Encoding", "deflate" );
+    const char * accept_encoding = evhttp_find_header( req->input_headers,
+                                                       "Accept-Encoding" );
+    const int    do_deflate = accept_encoding && strstr( accept_encoding,
+                                                         "deflate" );
+    if( do_deflate )
+    {
+        evhttp_add_header( req->output_headers, "Content-Encoding",
+                           "deflate" );
         compress_evbuf( response );
     }
 #endif
@@ -315,7 +325,6 @@ handle_clutch( struct evhttp_request * req,
     evbuffer_free( buf );
 }
 
-
 static void
 handle_rpc( struct evhttp_request * req,
             struct tr_rpc_server *  server )
@@ -356,20 +365,20 @@ static int
 isAddressAllowed( const tr_rpc_server * server,
                   const char *          address )
 {
-    const char * acl;
+    const char * str;
 
-    for( acl = server->acl; acl && *acl; )
+    for( str = server->whitelist; str && *str; )
     {
-        const char * delimiter = strchr( acl, ',' );
-        const int    len = delimiter ? delimiter - acl : (int)strlen( acl );
-        char *       token = tr_strndup( acl, len );
-        const int    match = tr_wildmat( address, token + 1 );
+        const char * delimiter = strchr( str, ',' );
+        const int    len = delimiter ? delimiter - str : (int)strlen( str );
+        char *       token = tr_strndup( str, len );
+        const int    match = tr_wildmat( address, token );
         tr_free( token );
         if( match )
-            return *acl == '+';
+            return 1;
         if( !delimiter )
             break;
-        acl = delimiter + 1;
+        str = delimiter + 1;
     }
 
     return 0;
@@ -402,7 +411,7 @@ handle_request( struct evhttp_request * req,
             }
         }
 
-        if( server->acl && !isAddressAllowed( server, req->remote_host ) )
+        if( server->whitelist && !isAddressAllowed( server, req->remote_host ) )
         {
             send_simple_response( req, 401, "Unauthorized IP Address" );
         }
@@ -480,7 +489,6 @@ onEnabledChanged( void * vserver )
     else
         startServer( server );
 }
-    
 
 void
 tr_rpcSetEnabled( tr_rpc_server * server,
@@ -529,17 +537,17 @@ tr_rpcGetPort( const tr_rpc_server * server )
 }
 
 void
-tr_rpcSetACL( tr_rpc_server * server,
-              const char *    acl )
+tr_rpcSetWhitelist( tr_rpc_server * server,
+                    const char *    whitelist )
 {
-    tr_free( server->acl );
-    server->acl = tr_strdup( acl );
+    tr_free( server->whitelist );
+    server->whitelist = tr_strdup( whitelist );
 }
 
 char*
-tr_rpcGetACL( const tr_rpc_server * server )
+tr_rpcGetWhitelist( const tr_rpc_server * server )
 {
-    return tr_strdup( server->acl ? server->acl : "" );
+    return tr_strdup( server->whitelist ? server->whitelist : "" );
 }
 
 /****
@@ -598,8 +606,9 @@ static void
 closeServer( void * vserver )
 {
     tr_rpc_server * s = vserver;
+
     stopServer( s );
-    tr_free( s->acl );
+    tr_free( s->whitelist );
     tr_free( s->username );
     tr_free( s->password );
     tr_free( s );
@@ -608,7 +617,7 @@ closeServer( void * vserver )
 void
 tr_rpcClose( tr_rpc_server ** ps )
 {
-    tr_runInEventThread( (*ps)->session, closeServer, *ps );
+    tr_runInEventThread( ( *ps )->session, closeServer, *ps );
     *ps = NULL;
 }
 
@@ -616,7 +625,7 @@ tr_rpc_server *
 tr_rpcInit( tr_handle *  session,
             int          isEnabled,
             uint16_t     port,
-            const char * acl,
+            const char * whitelist,
             int          isPasswordEnabled,
             const char * username,
             const char * password )
@@ -626,7 +635,7 @@ tr_rpcInit( tr_handle *  session,
     s = tr_new0( tr_rpc_server, 1 );
     s->session = session;
     s->port = port;
-    s->acl = tr_strdup( acl && *acl ? acl : TR_DEFAULT_RPC_ACL );
+    s->whitelist = tr_strdup( whitelist && *whitelist ? whitelist : TR_DEFAULT_RPC_WHITELIST );
     s->username = tr_strdup( username );
     s->password = tr_strdup( password );
     s->isPasswordEnabled = isPasswordEnabled != 0;

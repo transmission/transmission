@@ -65,7 +65,7 @@ GtkWidget * tr_prefs_dialog_new( GObject *   core,
 #define PREF_KEY_MAIN_WINDOW_Y          "main-window-y"
 #define PREF_KEY_RPC_PORT               "rpc-port"
 #define PREF_KEY_RPC_ENABLED            "rpc-enabled"
-#define PREF_KEY_RPC_ACL                "rpc-access-control-list"
+#define PREF_KEY_RPC_WHITELIST          "rpc-whitelist"
 #define PREF_KEY_RPC_AUTH_ENABLED       "rpc-authentication-required"
 #define PREF_KEY_RPC_PASSWORD           "rpc-password"
 #define PREF_KEY_RPC_USERNAME           "rpc-username"

@@ -18,7 +18,7 @@ typedef struct tr_rpc_server tr_rpc_server;
 tr_rpc_server * tr_rpcInit( struct tr_handle * session,
                             int                isEnabled,
                             uint16_t           port,
-                            const char *       acl,
+                            const char *       whitelist,
                             int                isPasswordEnabled,
                             const char *       username,
                             const char *       password );
@@ -36,13 +36,13 @@ void            tr_rpcSetPort( tr_rpc_server * server,
 uint16_t        tr_rpcGetPort( const tr_rpc_server * server );
 
 int             tr_rpcSetTest( const tr_rpc_server * server,
-                               const char *          acl,
+                               const char *          whitelist,
                                char **               allocme_errmsg );
 
-void            tr_rpcSetACL( tr_rpc_server * server,
-                              const char *    acl );
+void            tr_rpcSetWhitelist( tr_rpc_server * server,
+                                    const char *    whitelist );
 
-char*           tr_rpcGetACL( const tr_rpc_server * server );
+char*           tr_rpcGetWhitelist( const tr_rpc_server * server );
 
 void            tr_rpcSetPassword( tr_rpc_server * server,
                                    const char *    password );
@@ -58,9 +58,6 @@ void            tr_rpcSetPasswordEnabled( tr_rpc_server * server,
                                           int             isEnabled );
 
 int             tr_rpcIsPasswordEnabled( const tr_rpc_server * session );
-
-/** (public for the unit tests) */
-char*           cidrize( const char * acl );
 
 
 #endif

@@ -127,7 +127,7 @@ tr_prefs_init_global( void )
 
     pref_flag_set_default   ( PREF_KEY_RPC_ENABLED, TR_DEFAULT_RPC_ENABLED );
     pref_int_set_default    ( PREF_KEY_RPC_PORT, TR_DEFAULT_RPC_PORT );
-    pref_string_set_default ( PREF_KEY_RPC_ACL, TR_DEFAULT_RPC_ACL );
+    pref_string_set_default ( PREF_KEY_RPC_WHITELIST, TR_DEFAULT_RPC_WHITELIST );
 
     rand = g_rand_new ( );
     for( i = 0; i < 16; ++i )
@@ -556,29 +556,14 @@ peerPage( GObject * core )
 *****  Web Tab
 ****/
 
-static GtkTreeModel*
-allow_deny_model_new( void )
-{
-    GtkTreeIter    iter;
-    GtkListStore * store = gtk_list_store_new( 2, G_TYPE_STRING,
-                                               G_TYPE_CHAR );
-
-    gtk_list_store_append( store, &iter );
-    gtk_list_store_set( store, &iter, 0, _( "Allow" ), 1, '+', -1 );
-    gtk_list_store_append( store, &iter );
-    gtk_list_store_set( store, &iter, 0, _( "Deny" ), 1, '-', -1 );
-    return GTK_TREE_MODEL( store );
-}
-
 enum
 {
     COL_ADDRESS,
-    COL_PERMISSION,
     N_COLS
 };
 
 static GtkTreeModel*
-acl_tree_model_new( const char * acl )
+whitelist_tree_model_new( const char * whitelist )
 {
     int            i;
     char **        rules;
@@ -586,23 +571,15 @@ acl_tree_model_new( const char * acl )
                                                G_TYPE_STRING,
                                                G_TYPE_STRING );
 
-    rules = g_strsplit( acl, ",", 0 );
+    rules = g_strsplit( whitelist, ",", 0 );
 
     for( i = 0; rules && rules[i]; ++i )
     {
+        GtkTreeIter iter;
         const char * s = rules[i];
         while( isspace( *s ) ) ++s;
-
-        if( *s == '+' || *s == '-' )
-        {
-            GtkTreeIter iter;
-            gtk_list_store_append( store, &iter );
-            gtk_list_store_set( store, &iter,
-                                COL_PERMISSION, *s == '+' ? _(
-                                    "Allow" ) : _( "Deny" ),
-                                COL_ADDRESS, s + 1,
-                                -1 );
-        }
+        gtk_list_store_append( store, &iter );
+        gtk_list_store_set( store, &iter, COL_ADDRESS, s, -1 );
     }
 
     g_strfreev( rules );
@@ -622,7 +599,7 @@ struct remote_page
 };
 
 static void
-refreshACL( struct remote_page * page )
+refreshWhitelist( struct remote_page * page )
 {
     GtkTreeIter    iter;
     GtkTreeModel * model = GTK_TREE_MODEL( page->store );
@@ -630,68 +607,43 @@ refreshACL( struct remote_page * page )
 
     if( gtk_tree_model_get_iter_first( model, &iter ) ) do
         {
-            char * permission;
             char * address;
-            gtk_tree_model_get( model, &iter, COL_PERMISSION, &permission,
+            gtk_tree_model_get( model, &iter,
                                 COL_ADDRESS, &address,
                                 -1 );
-            g_string_append_c( gstr, strcmp( permission, _(
-                                                "Allow" ) ) ? '-' : '+' );
             g_string_append( gstr, address );
-            g_string_append( gstr, ", " );
+            g_string_append( gstr, "," );
             g_free( address );
-            g_free( permission );
         }
         while( gtk_tree_model_iter_next( model, &iter ) );
 
-    g_string_truncate( gstr, gstr->len - 2 ); /* remove the trailing ", " */
+    g_string_truncate( gstr, gstr->len - 1 ); /* remove the trailing comma */
 
-    tr_core_set_pref( page->core, PREF_KEY_RPC_ACL, gstr->str );
+    tr_core_set_pref( page->core, PREF_KEY_RPC_WHITELIST, gstr->str );
 
     g_string_free( gstr, TRUE );
 }
 
 static void
-onPermissionEdited( GtkCellRendererText  * renderer UNUSED,
-                    gchar *                         path_string,
-                    gchar *                         new_text,
-                    gpointer                        gpage )
-{
-    GtkTreeIter          iter;
-    GtkTreePath *        path = gtk_tree_path_new_from_string( path_string );
-    struct remote_page * page = gpage;
-    GtkTreeModel *       model = GTK_TREE_MODEL( page->store );
-
-    if( gtk_tree_model_get_iter( model, &iter, path ) )
-        gtk_list_store_set( page->store, &iter, COL_PERMISSION, new_text,
-                            -1 );
-    gtk_tree_path_free( path );
-    refreshACL( page );
-}
-
-static void
 onAddressEdited( GtkCellRendererText  * r UNUSED,
                  gchar *                  path_string,
-                 gchar *                  new_text,
+                 gchar *                  address,
                  gpointer                 gpage )
 {
-    char *               acl;
     GtkTreeIter          iter;
     struct remote_page * page = gpage;
     GtkTreeModel *       model = GTK_TREE_MODEL( page->store );
     GtkTreePath *        path = gtk_tree_path_new_from_string( path_string );
 
-    acl = g_strdup_printf( "+%s", new_text );
     if( gtk_tree_model_get_iter( model, &iter, path ) )
-        gtk_list_store_set( page->store, &iter, COL_ADDRESS, new_text, -1 );
+        gtk_list_store_set( page->store, &iter, COL_ADDRESS, address, -1 );
 
-    g_free( acl );
     gtk_tree_path_free( path );
-    refreshACL( page );
+    refreshWhitelist( page );
 }
 
 static void
-onAddACLClicked( GtkButton * b UNUSED,
+onAddWhitelistClicked( GtkButton * b UNUSED,
                  gpointer      gpage )
 {
     GtkTreeIter          iter;
@@ -700,7 +652,6 @@ onAddACLClicked( GtkButton * b UNUSED,
 
     gtk_list_store_append( page->store, &iter );
     gtk_list_store_set( page->store, &iter,
-                        COL_PERMISSION, _( "Allow" ),
                         COL_ADDRESS,  "0.0.0.0",
                         -1 );
 
@@ -713,7 +664,7 @@ onAddACLClicked( GtkButton * b UNUSED,
 }
 
 static void
-onRemoveACLClicked( GtkButton * b UNUSED,
+onRemoveWhitelistClicked( GtkButton * b UNUSED,
                     gpointer      gpage )
 {
     struct remote_page * page = gpage;
@@ -723,7 +674,7 @@ onRemoveACLClicked( GtkButton * b UNUSED,
     if( gtk_tree_selection_get_selected( sel, NULL, &iter ) )
     {
         gtk_list_store_remove( page->store, &iter );
-        refreshACL( page );
+        refreshWhitelist( page );
     }
 }
 
@@ -761,7 +712,7 @@ onRPCToggled( GtkToggleButton * tb UNUSED,
 }
 
 static void
-onACLSelectionChanged( GtkTreeSelection * sel UNUSED,
+onWhitelistSelectionChanged( GtkTreeSelection * sel UNUSED,
                        gpointer               page )
 {
     refreshRPCSensitivity( page );
@@ -840,8 +791,8 @@ webPage( GObject * core )
 
     /* access control list */
     {
-        const char *        val = pref_string_get( PREF_KEY_RPC_ACL );
-        GtkTreeModel *      m = acl_tree_model_new( val );
+        const char *        val = pref_string_get( PREF_KEY_RPC_WHITELIST );
+        GtkTreeModel *      m = whitelist_tree_model_new( val );
         GtkTreeViewColumn * c;
         GtkCellRenderer *   r;
         GtkTreeSelection *  sel;
@@ -850,7 +801,6 @@ webPage( GObject * core )
         GtkWidget *         h;
         GtkTooltips *       tips = gtk_tooltips_new( );
 
-        s = _( "Access control list:" );
         page->store = GTK_LIST_STORE( m );
         w = gtk_tree_view_new_with_model( m );
         g_signal_connect( w, "button-release-event",
@@ -864,7 +814,7 @@ webPage( GObject * core )
                               NULL );
         sel = gtk_tree_view_get_selection( v );
         g_signal_connect( sel, "changed",
-                          G_CALLBACK( onACLSelectionChanged ), page );
+                          G_CALLBACK( onWhitelistSelectionChanged ), page );
         g_object_unref( G_OBJECT( m ) );
         gtk_tree_view_set_headers_visible( v, TRUE );
         w = gtk_frame_new( NULL );
@@ -876,43 +826,29 @@ webPage( GObject * core )
         g_signal_connect( r, "edited",
                           G_CALLBACK( onAddressEdited ), page );
         g_object_set( G_OBJECT( r ), "editable", TRUE, NULL );
-        c = gtk_tree_view_column_new_with_attributes( _( "IP Address" ), r,
+        c = gtk_tree_view_column_new_with_attributes( NULL, r,
                                                       "text", COL_ADDRESS,
                                                       NULL );
         gtk_tree_view_column_set_expand( c, TRUE );
         gtk_tree_view_append_column( v, c );
+        gtk_tree_view_set_headers_visible( v, FALSE );
 
+        s = _( "Allowed _IP Addresses:" );
         w = hig_workarea_add_row( t, &row, s, w, NULL );
-        gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.1f );
+        gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.0f );
+        gtk_misc_set_padding( GTK_MISC( w ), 0, GUI_PAD );
         page->widgets = g_slist_append( page->widgets, w );
-
-        /* permission column */
-        m = allow_deny_model_new( );
-        r = gtk_cell_renderer_combo_new( );
-        g_object_set( G_OBJECT( r ), "model", m,
-                      "editable", TRUE,
-                      "has-entry", FALSE,
-                      "text-column", 0,
-                      NULL );
-        c = gtk_tree_view_column_new_with_attributes( _(
-                                                          "Permission" ), r,
-                                                      "text",
-                                                      COL_PERMISSION,
-                                                      NULL );
-        g_signal_connect( r, "edited",
-                          G_CALLBACK( onPermissionEdited ), page );
-        gtk_tree_view_append_column( v, c );
 
         h = gtk_hbox_new( TRUE, GUI_PAD );
         w = gtk_button_new_from_stock( GTK_STOCK_REMOVE );
         g_signal_connect( w, "clicked", G_CALLBACK(
-                              onRemoveACLClicked ), page );
+                              onRemoveWhitelistClicked ), page );
         page->remove_button = w;
-        onACLSelectionChanged( sel, page );
+        onWhitelistSelectionChanged( sel, page );
         gtk_box_pack_start_defaults( GTK_BOX( h ), w );
         w = gtk_button_new_from_stock( GTK_STOCK_ADD );
         page->widgets = g_slist_append( page->widgets, w );
-        g_signal_connect( w, "clicked", G_CALLBACK( onAddACLClicked ), page );
+        g_signal_connect( w, "clicked", G_CALLBACK( onAddWhitelistClicked ), page );
         gtk_box_pack_start_defaults( GTK_BOX( h ), w );
         w = gtk_hbox_new( FALSE, 0 );
         gtk_box_pack_start_defaults( GTK_BOX( w ),

@@ -129,7 +129,7 @@ tr_proxy_type;
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_RPC_PORT_STR             "9091"
 /** @see tr_sessionInitFull */
-#define TR_DEFAULT_RPC_ACL                  "+127.0.0.1"
+#define TR_DEFAULT_RPC_WHITELIST            "127.0.0.1"
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PROXY_ENABLED            0
 /** @see tr_sessionInitFull */
@@ -236,16 +236,15 @@ tr_encryption_mode;
  * @param rpcPort
  *  The port on which to listen for incoming RPC requests
  *
- * @param rpcACL
- *  The access control list for allowing/denying RPC requests
- *  from specific IP ranges.
- *  @see tr_sessionSetRPCACL()
+ * @param rpcWhitelist
+ *  The list of IP addresses allowed to make RPC connections.
+ *  @see tr_sessionSetRPCWhitelist()
  *
  * @see TR_DEFAULT_PEER_SOCKET_TOS
  * @see TR_DEFAULT_BLOCKLIST_ENABLED
  * @see TR_DEFAULT_RPC_ENABLED
  * @see TR_DEFAULT_RPC_PORT
- * @see TR_DEFAULT_RPC_ACL
+ * @see TR_DEFAULT_RPC_WHITELIST
  * @see tr_sessionClose()
  */
 tr_handle * tr_sessionInitFull( const char *       configDir,
@@ -267,7 +266,7 @@ tr_handle * tr_sessionInitFull( const char *       configDir,
                                 int                peerSocketTOS,
                                 int                rpcIsEnabled,
                                 uint16_t           rpcPort,
-                                const char *       rpcAccessControlList,
+                                const char *       rpcWhitelist,
                                 int                rpcPasswordIsEnabled,
                                 const char *       rpcUsername,
                                 const char *       rpcPassword,
@@ -346,21 +345,21 @@ void tr_sessionSetRPCPort( tr_handle * session,
 uint16_t  tr_sessionGetRPCPort( const tr_handle * );
 
 /**
- * @brief Specify access control list (ACL).
+ * @brief Specify a whitelist for remote RPC access
  *
- * ACL is a comma-delimited list of dotted-quad IP addresses, each preceded
- * by a '+' or '-' sign to denote 'allow' or 'deny'.  Wildmat notation is
- * supported, meaning that '?' is interpreted as a single-character wildcard
- * and '*' is interprted as a multi-character wildcard.
+ * The whitelist is a comma-separated list of dotted-quad IP addresses
+ * to be allowed.  Wildmat notation is supported, meaning that
+ * '?' is interpreted as a single-character wildcard and
+ * '*' is interprted as a multi-character wildcard.
  */
-void   tr_sessionSetRPCACL( tr_session * session,
-                            const char * acl );
+void   tr_sessionSetRPCWhitelist( tr_session * session,
+                                  const char * whitelist );
 
 /** @brief get the Access Control List for allowing/denying RPC requests.
-    @return a comma-separated string of ACL rules.  tr_free() when done.
+    @return a comma-separated string of whitelist domains.  tr_free() when done.
     @see tr_sessionInitFull
-    @see tr_sessionSetRPCACL */
-char* tr_sessionGetRPCACL( const tr_session * );
+    @see tr_sessionSetRPCWhitelist */
+char* tr_sessionGetRPCWhitelist( const tr_session * );
 
 void  tr_sessionSetRPCPassword( tr_session * session,
                                 const char * password );

@@ -44,7 +44,7 @@ static char        myConfigFilename[MAX_PATH_LENGTH];
 #define KEY_AUTH_REQUIRED    "rpc-authentication-required"
 #define KEY_USERNAME         "rpc-username"
 #define KEY_PASSWORD         "rpc-password"
-#define KEY_ACL              "rpc-access-control-list"
+#define KEY_WHITELIST        "rpc-whitelist"
 #define KEY_RPC_PORT         "rpc-port"
 #define KEY_DSPEED           "download-limit"
 #define KEY_DSPEED_ENABLED   "download-limit-enabled"
@@ -99,7 +99,7 @@ saveState( tr_session * s )
     replaceStr( &d, KEY_PASSWORD,        strs[n++] =
                    tr_sessionGetRPCPassword(
                        s ) );
-    replaceStr( &d, KEY_ACL,             strs[n++] = tr_sessionGetRPCACL( s ) );
+    replaceStr( &d, KEY_WHITELIST,       strs[n++] = tr_sessionGetRPCWhitelist( s ) );
     replaceInt( &d, KEY_RPC_PORT,        tr_sessionGetRPCPort( s ) );
     replaceInt( &d, KEY_AUTH_REQUIRED,   tr_sessionIsRPCPasswordEnabled( s ) );
     replaceInt( &d, KEY_DSPEED,
@@ -160,7 +160,7 @@ static void
 session_init( const char * configDir,
               const char * downloadDir,
               int          rpcPort,
-              const char * acl,
+              const char * whitelist,
               int          authRequired,
               const char * username,
               const char * password,
@@ -208,8 +208,8 @@ session_init( const char * configDir,
                   TR_DEFAULT_BLOCKLIST_ENABLED );
     getConfigInt( dict, KEY_RPC_PORT,        &rpcPort,
                   TR_DEFAULT_RPC_PORT );
-    getConfigStr( dict, KEY_ACL,             &acl,
-                  TR_DEFAULT_RPC_ACL );
+    getConfigStr( dict, KEY_WHITELIST,       &whitelist,
+                  TR_DEFAULT_RPC_WHITELIST );
     getConfigInt( dict, KEY_AUTH_REQUIRED,   &authRequired,      FALSE );
     getConfigStr( dict, KEY_USERNAME,        &username,          NULL );
     getConfigStr( dict, KEY_PASSWORD,        &password,          NULL );
@@ -231,7 +231,7 @@ session_init( const char * configDir,
                                     TR_MSG_INF, 0,
                                     blocklistEnabled,
                                     TR_DEFAULT_PEER_SOCKET_TOS,
-                                    TRUE, rpcPort, acl, authRequired,
+                                    TRUE, rpcPort, whitelist, authRequired,
                                     username, password,
                                     TR_DEFAULT_PROXY_ENABLED,
                                     TR_DEFAULT_PROXY,
@@ -270,8 +270,8 @@ getUsage( void )
 
 static const struct tr_option options[] =
 {
-    { 'a', "acl",
-      "Access Control List.  (Default: " TR_DEFAULT_RPC_ACL ")",       "a",
+    { 'a', "allowed",
+      "Allowed IP addresses.  (Default: " TR_DEFAULT_RPC_WHITELIST ")",       "a",
       1, "<list>"     },
     { 'b', "blocklist",    "Enable peer blocklists",
       "b",             0, NULL         },
@@ -312,7 +312,7 @@ readargs( int           argc,
           const char ** configDir,
           const char ** downloadDir,
           int *         rpcPort,
-          const char ** acl,
+          const char ** whitelist,
           int *         authRequired,
           const char ** username,
           const char ** password,
@@ -326,7 +326,7 @@ readargs( int           argc,
         switch( c )
         {
             case 'a':
-                *acl = optarg; break;
+                *whitelist = optarg; break;
 
             case 'b':
                 *blocklistEnabled = 1; break;
@@ -457,7 +457,7 @@ main( int     argc,
     char *       freeme = NULL;
     const char * configDir = NULL;
     const char * downloadDir = NULL;
-    const char * acl = NULL;
+    const char * whitelist = NULL;
     const char * username = NULL;
     const char * password = NULL;
 
@@ -468,7 +468,7 @@ main( int     argc,
     signal( SIGHUP, SIG_IGN );
 
     readargs( argc, (const char**)argv, &nofork, &configDir, &downloadDir,
-              &rpcPort, &acl, &authRequired, &username, &password,
+              &rpcPort, &whitelist, &authRequired, &username, &password,
               &blocklistEnabled );
     if( configDir == NULL )
         configDir = freeme = tr_strdup_printf( "%s-daemon",
@@ -486,7 +486,7 @@ main( int     argc,
     }
 
     session_init( configDir, downloadDir,
-                  rpcPort, acl, authRequired, username, password,
+                  rpcPort, whitelist, authRequired, username, password,
                   blocklistEnabled );
 
     while( !closing )

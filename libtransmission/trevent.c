@@ -161,7 +161,7 @@ libeventThreadFunc( void * veh )
                readFromPipe,
                veh );
     event_add( &eh->pipeEvent, NULL );
-
+    event_set_log_callback( logFunc );
     event_dispatch( );
 
     tr_lockFree( eh->lock );

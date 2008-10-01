@@ -30,12 +30,11 @@ via RPC commands from transmission's web interface or
 .Sh OPTIONS
 .Bl -tag -width Ds
 
-.It Fl a Fl -acl Ar (+|-)x.x.x.x,...
-Specify access control list (ACL) to control which hosts may submit RPC requests.
-This is a comma-separated list of IP addresses, each prepended by a '-' or '+'
-to denote that access should be denied or allowed to that address.
+.It Fl a Fl -allowed Ar x.x.x.x,...
+Allow RPC accecss to a comma-delimited whitelist of IP addresses.
 Wildcards can be specified in an address by using '*'.
-Default: +127.0.0.1
+Default: "127.0.0.1"
+Example: "127.0.0.*,192.168.1.*"
 
 .It Fl b Fl -blocklist
 Enable peer blocklists.  Transmission understands the bluetack blocklist file format.

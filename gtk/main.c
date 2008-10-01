@@ -484,7 +484,7 @@ main( int     argc,
             pref_int_get( PREF_KEY_PEER_SOCKET_TOS ),
             pref_flag_get( PREF_KEY_RPC_ENABLED ),
             pref_int_get( PREF_KEY_RPC_PORT ),
-            pref_string_get( PREF_KEY_RPC_ACL ),
+            pref_string_get( PREF_KEY_RPC_WHITELIST ),
             pref_flag_get( PREF_KEY_RPC_AUTH_ENABLED ),
             pref_string_get( PREF_KEY_RPC_USERNAME ),
             pref_string_get( PREF_KEY_RPC_PASSWORD ),
@@ -1192,10 +1192,10 @@ prefschanged( TrCore * core UNUSED,
     {
         tr_sessionSetRPCEnabled( tr, pref_flag_get( key ) );
     }
-    else if( !strcmp( key, PREF_KEY_RPC_ACL ) )
+    else if( !strcmp( key, PREF_KEY_RPC_WHITELIST ) )
     {
         const char * s = pref_string_get( key );
-        tr_sessionSetRPCACL( tr, s );
+        tr_sessionSetRPCWhitelist( tr, s );
     }
     else if( !strcmp( key, PREF_KEY_RPC_USERNAME ) )
     {
