@@ -3398,27 +3398,27 @@ AAABAAAAAQ</bytes>
 									<object class="NSTableView" id="173651346">
 										<reference key="NSNextResponder" ref="206862330"/>
 										<int key="NSvFlags">256</int>
-										<string key="NSFrameSize">{248, 95}</string>
+										<string key="NSFrameSize">{291, 95}</string>
 										<reference key="NSSuperview" ref="206862330"/>
 										<bool key="NSEnabled">YES</bool>
 										<object class="NSTableHeaderView" key="NSHeaderView" id="520862816">
 											<reference key="NSNextResponder" ref="612952923"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrameSize">{248, 17}</string>
+											<string key="NSFrameSize">{291, 17}</string>
 											<reference key="NSSuperview" ref="612952923"/>
 											<reference key="NSTableView" ref="173651346"/>
 										</object>
 										<object class="_NSCornerView" key="NSCornerView" id="1018053122">
 											<reference key="NSNextResponder" ref="122119447"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{249, 0}, {16, 17}}</string>
+											<string key="NSFrame">{{292, 0}, {16, 17}}</string>
 											<reference key="NSSuperview" ref="122119447"/>
 										</object>
 										<object class="NSMutableArray" key="NSTableColumns">
 											<bool key="EncodedWithXMLCoder">YES</bool>
 											<object class="NSTableColumn" id="419711322">
 												<string key="NSIdentifier">IP</string>
-												<double key="NSWidth">2.450000e+02</double>
+												<double key="NSWidth">2.880000e+02</double>
 												<double key="NSMinWidth">4.000000e+01</double>
 												<double key="NSMaxWidth">1.000000e+03</double>
 												<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -3472,7 +3472,7 @@ AAABAAAAAQ</bytes>
 										<bool key="NSAllowsTypeSelect">NO</bool>
 									</object>
 								</object>
-								<string key="NSFrame">{{1, 17}, {248, 95}}</string>
+								<string key="NSFrame">{{1, 17}, {291, 95}}</string>
 								<reference key="NSSuperview" ref="122119447"/>
 								<reference key="NSNextKeyView" ref="173651346"/>
 								<reference key="NSDocView" ref="173651346"/>
@@ -3482,7 +3482,7 @@ AAABAAAAAQ</bytes>
 							<object class="NSScroller" id="220703981">
 								<reference key="NSNextResponder" ref="122119447"/>
 								<int key="NSvFlags">256</int>
-								<string key="NSFrame">{{249, 17}, {15, 95}}</string>
+								<string key="NSFrame">{{292, 17}, {15, 95}}</string>
 								<reference key="NSSuperview" ref="122119447"/>
 								<reference key="NSTarget" ref="122119447"/>
 								<string key="NSAction">_doScroller:</string>
@@ -3505,7 +3505,7 @@ AAABAAAAAQ</bytes>
 									<bool key="EncodedWithXMLCoder">YES</bool>
 									<reference ref="520862816"/>
 								</object>
-								<string key="NSFrame">{{1, 0}, {248, 17}}</string>
+								<string key="NSFrame">{{1, 0}, {291, 17}}</string>
 								<reference key="NSSuperview" ref="122119447"/>
 								<reference key="NSNextKeyView" ref="520862816"/>
 								<reference key="NSDocView" ref="520862816"/>
@@ -3514,7 +3514,7 @@ AAABAAAAAQ</bytes>
 							</object>
 							<reference ref="1018053122"/>
 						</object>
-						<string key="NSFrame">{{123, 63}, {265, 113}}</string>
+						<string key="NSFrame">{{123, 63}, {308, 113}}</string>
 						<reference key="NSSuperview" ref="810116101"/>
 						<reference key="NSNextKeyView" ref="206862330"/>
 						<int key="NSsFlags">18</int>
@@ -3644,11 +3644,6 @@ AAABAAAAAQ</bytes>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSUserDefaultsController" id="356871564">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>RPC</string>
-					<string>RPCUseWhitelist</string>
-				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 		</object>
@@ -6597,6 +6592,14 @@ AAABAAAAAQ</bytes>
 						</object>
 					</object>
 					<int key="connectionID">1757</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setRPCUseWhitelist:</string>
+						<reference key="source" ref="511492310"/>
+						<reference key="destination" ref="264419599"/>
+					</object>
+					<int key="connectionID">1758</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -9755,7 +9758,7 @@ AAABAAAAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1757</int>
+			<int key="maxID">1758</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
