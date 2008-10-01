@@ -128,6 +128,8 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_RPC_ENABLED, TR_DEFAULT_RPC_ENABLED );
     pref_int_set_default    ( PREF_KEY_RPC_PORT, TR_DEFAULT_RPC_PORT );
     pref_string_set_default ( PREF_KEY_RPC_WHITELIST, TR_DEFAULT_RPC_WHITELIST );
+    pref_flag_set_default   ( PREF_KEY_RPC_WHITELIST_ENABLED, TR_DEFAULT_RPC_WHITELIST_ENABLED  );
+
 
     rand = g_rand_new ( );
     for( i = 0; i < 16; ++i )
@@ -594,8 +596,10 @@ struct remote_page
     GtkWidget *        remove_button;
     GSList *           widgets;
     GSList *           auth_widgets;
+    GSList *           whitelist_widgets;
     GtkToggleButton *  rpc_tb;
     GtkToggleButton *  auth_tb;
+    GtkToggleButton *  whitelist_tb;
 };
 
 static void
@@ -686,6 +690,8 @@ refreshRPCSensitivity( struct remote_page * page )
         page->rpc_tb );
     const int          auth_active = gtk_toggle_button_get_active(
         page->auth_tb );
+    const int          whitelist_active = gtk_toggle_button_get_active(
+        page->whitelist_tb );
     GtkTreeSelection * sel = gtk_tree_view_get_selection( page->view );
     const int          have_addr =
         gtk_tree_selection_get_selected( sel, NULL,
@@ -699,6 +705,10 @@ refreshRPCSensitivity( struct remote_page * page )
     for( l = page->auth_widgets; l != NULL; l = l->next )
         gtk_widget_set_sensitive( GTK_WIDGET(
                                       l->data ), rpc_active && auth_active );
+
+    for( l = page->whitelist_widgets; l != NULL; l = l->next )
+        gtk_widget_set_sensitive( GTK_WIDGET( l->data ),
+                                  rpc_active && whitelist_active );
 
     gtk_widget_set_sensitive( page->remove_button,
                               rpc_active && have_addr && n_rules > 1 );
@@ -760,6 +770,12 @@ webPage( GObject * core )
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     hig_workarea_add_wide_control( t, &row, h );
 
+    /* port */
+    w = new_spin_button( PREF_KEY_RPC_PORT, core, 0, 65535, 1 );
+    page->widgets = g_slist_append( page->widgets, w );
+    w = hig_workarea_add_row( t, &row, _( "Listening _port:" ), w, NULL );
+    page->widgets = g_slist_append( page->widgets, w );
+
     /* require authentication */
     s = _( "_Require username" );
     w = new_check_button( s, PREF_KEY_RPC_AUTH_ENABLED, core );
@@ -783,11 +799,13 @@ webPage( GObject * core )
     w = hig_workarea_add_row( t, &row, s, w, NULL );
     page->auth_widgets = g_slist_append( page->auth_widgets, w );
 
-    /* port */
-    w = new_spin_button( PREF_KEY_RPC_PORT, core, 0, 65535, 1 );
+    /* require authentication */
+    s = _( "Only allow the following IP _addresses to connect:" );
+    w = new_check_button( s, PREF_KEY_RPC_WHITELIST_ENABLED, core );
+    hig_workarea_add_wide_control( t, &row, w );
+    page->whitelist_tb = GTK_TOGGLE_BUTTON( w );
     page->widgets = g_slist_append( page->widgets, w );
-    w = hig_workarea_add_row( t, &row, _( "Listening _port:" ), w, NULL );
-    page->widgets = g_slist_append( page->widgets, w );
+    g_signal_connect( w, "clicked", G_CALLBACK( onRPCToggled ), page );
 
     /* access control list */
     {
@@ -806,7 +824,7 @@ webPage( GObject * core )
         g_signal_connect( w, "button-release-event",
                           G_CALLBACK( on_tree_view_button_released ), NULL );
 
-        page->widgets = g_slist_append( page->widgets, w );
+        page->whitelist_widgets = g_slist_append( page->whitelist_widgets, w );
         v = page->view = GTK_TREE_VIEW( w );
         gtk_tooltips_set_tip( tips, w,
                               _(
@@ -833,11 +851,11 @@ webPage( GObject * core )
         gtk_tree_view_append_column( v, c );
         gtk_tree_view_set_headers_visible( v, FALSE );
 
-        s = _( "Allowed _IP Addresses:" );
+        s = _( "Addresses:" );
         w = hig_workarea_add_row( t, &row, s, w, NULL );
         gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.0f );
         gtk_misc_set_padding( GTK_MISC( w ), 0, GUI_PAD );
-        page->widgets = g_slist_append( page->widgets, w );
+        page->whitelist_widgets = g_slist_append( page->whitelist_widgets, w );
 
         h = gtk_hbox_new( TRUE, GUI_PAD );
         w = gtk_button_new_from_stock( GTK_STOCK_REMOVE );
@@ -847,7 +865,7 @@ webPage( GObject * core )
         onWhitelistSelectionChanged( sel, page );
         gtk_box_pack_start_defaults( GTK_BOX( h ), w );
         w = gtk_button_new_from_stock( GTK_STOCK_ADD );
-        page->widgets = g_slist_append( page->widgets, w );
+        page->whitelist_widgets = g_slist_append( page->whitelist_widgets, w );
         g_signal_connect( w, "clicked", G_CALLBACK( onAddWhitelistClicked ), page );
         gtk_box_pack_start_defaults( GTK_BOX( h ), w );
         w = gtk_hbox_new( FALSE, 0 );

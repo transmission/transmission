@@ -131,6 +131,8 @@ tr_proxy_type;
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_RPC_WHITELIST            "127.0.0.1"
 /** @see tr_sessionInitFull */
+#define TR_DEFAULT_RPC_WHITELIST_ENABLED    0
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_PROXY_ENABLED            0
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PROXY                    NULL
@@ -245,6 +247,7 @@ tr_encryption_mode;
  * @see TR_DEFAULT_RPC_ENABLED
  * @see TR_DEFAULT_RPC_PORT
  * @see TR_DEFAULT_RPC_WHITELIST
+ * @see TR_DEFAULT_RPC_WHITELIST_ENABLED
  * @see tr_sessionClose()
  */
 tr_handle * tr_sessionInitFull( const char *       configDir,
@@ -266,6 +269,7 @@ tr_handle * tr_sessionInitFull( const char *       configDir,
                                 int                peerSocketTOS,
                                 int                rpcIsEnabled,
                                 uint16_t           rpcPort,
+                                int                rpcWhitelistIsEnabled,
                                 const char *       rpcWhitelist,
                                 int                rpcPasswordIsEnabled,
                                 const char *       rpcUsername,
@@ -360,6 +364,11 @@ void   tr_sessionSetRPCWhitelist( tr_session * session,
     @see tr_sessionInitFull
     @see tr_sessionSetRPCWhitelist */
 char* tr_sessionGetRPCWhitelist( const tr_session * );
+
+void  tr_sessionSetRPCWhitelistEnabled( tr_session * session,
+                                        int          isEnabled );
+
+int   tr_sessionGetRPCWhitelistEnabled( const tr_session * session );
 
 void  tr_sessionSetRPCPassword( tr_session * session,
                                 const char * password );

@@ -42,8 +42,9 @@
 
 struct tr_rpc_server
 {
-    unsigned int       isEnabled         : 1;
-    unsigned int       isPasswordEnabled : 1;
+    unsigned int       isEnabled          : 1;
+    unsigned int       isPasswordEnabled  : 1;
+    unsigned int       isWhitelistEnabled : 1;
     uint16_t           port;
     struct evhttp *    httpd;
     tr_handle *        session;
@@ -367,6 +368,9 @@ isAddressAllowed( const tr_rpc_server * server,
 {
     const char * str;
 
+    if( !server->isWhitelistEnabled )
+        return 1;
+
     for( str = server->whitelist; str && *str; )
     {
         const char * delimiter = strchr( str, ',' );
@@ -411,7 +415,7 @@ handle_request( struct evhttp_request * req,
             }
         }
 
-        if( server->whitelist && !isAddressAllowed( server, req->remote_host ) )
+        if( !isAddressAllowed( server, req->remote_host ) )
         {
             send_simple_response( req, 401, "Unauthorized IP Address" );
         }
@@ -550,6 +554,19 @@ tr_rpcGetWhitelist( const tr_rpc_server * server )
     return tr_strdup( server->whitelist ? server->whitelist : "" );
 }
 
+void
+tr_rpcSetWhitelistEnabled( tr_rpc_server  * server,
+                           int              isEnabled )
+{
+    server->isWhitelistEnabled = isEnabled != 0;
+}
+
+int
+tr_rpcGetWhitelistEnabled( const tr_rpc_server * server )
+{
+    return server->isWhitelistEnabled;
+}
+
 /****
 *****  PASSWORD
 ****/
@@ -625,6 +642,7 @@ tr_rpc_server *
 tr_rpcInit( tr_handle *  session,
             int          isEnabled,
             uint16_t     port,
+            int          isWhitelistEnabled,
             const char * whitelist,
             int          isPasswordEnabled,
             const char * username,
@@ -638,6 +656,7 @@ tr_rpcInit( tr_handle *  session,
     s->whitelist = tr_strdup( whitelist && *whitelist ? whitelist : TR_DEFAULT_RPC_WHITELIST );
     s->username = tr_strdup( username );
     s->password = tr_strdup( password );
+    s->isWhitelistEnabled = isWhitelistEnabled != 0;
     s->isPasswordEnabled = isPasswordEnabled != 0;
     s->isEnabled = isEnabled != 0;
     if( isEnabled )

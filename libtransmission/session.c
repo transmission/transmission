@@ -216,6 +216,7 @@ tr_sessionInitFull( const char *       configDir,
                     int                peerSocketTOS,
                     int                rpcIsEnabled,
                     uint16_t           rpcPort,
+                    int                rpcWhitelistIsEnabled,
                     const char *       rpcWhitelist,
                     int                rpcAuthIsEnabled,
                     const char *       rpcUsername,
@@ -294,7 +295,8 @@ tr_sessionInitFull( const char *       configDir,
     tr_statsInit( h );
 
     h->web = tr_webInit( h );
-    h->rpcServer = tr_rpcInit( h, rpcIsEnabled, rpcPort, rpcWhitelist,
+    h->rpcServer = tr_rpcInit( h, rpcIsEnabled, rpcPort,
+                               rpcWhitelistIsEnabled, rpcWhitelist,
                                rpcAuthIsEnabled, rpcUsername, rpcPassword );
 
     metainfoLookupRescan( h );
@@ -326,6 +328,7 @@ tr_sessionInit( const char * configDir,
                                TR_DEFAULT_PEER_SOCKET_TOS,
                                TR_DEFAULT_RPC_ENABLED,
                                TR_DEFAULT_RPC_PORT,
+                               TR_DEFAULT_RPC_WHITELIST_ENABLED,
                                TR_DEFAULT_RPC_WHITELIST,
                                FALSE,
                                "fnord",
@@ -1014,6 +1017,21 @@ tr_sessionGetRPCWhitelist( const tr_session * session )
 {
     return tr_rpcGetWhitelist( session->rpcServer );
 }
+
+void
+tr_sessionSetRPCWhitelistEnabled( tr_session * session,
+                                  int          isEnabled )
+{
+    return tr_rpcSetWhitelistEnabled( session->rpcServer,
+                                      isEnabled );
+}
+
+int
+tr_sessionGetRPCWhitelistEnabled( const tr_session * session )
+{
+    return tr_rpcGetWhitelistEnabled( session->rpcServer );
+}
+
 
 void
 tr_sessionSetRPCPassword( tr_session * session,

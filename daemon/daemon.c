@@ -33,25 +33,26 @@ static int         closing = FALSE;
 static tr_handle * mySession;
 static char        myConfigFilename[MAX_PATH_LENGTH];
 
-#define KEY_BLOCKLIST        "blocklist-enabled"
-#define KEY_DOWNLOAD_DIR     "download-dir"
-#define KEY_ENCRYPTION       "encryption"
-#define KEY_LAZY_BITFIELD    "lazy-bitfield-enabled"
-#define KEY_PEER_LIMIT       "max-peers-global"
-#define KEY_PEER_PORT        "peer-port"
-#define KEY_PORT_FORWARDING  "port-forwarding-enabled"
-#define KEY_PEX_ENABLED      "pex-enabled"
-#define KEY_AUTH_REQUIRED    "rpc-authentication-required"
-#define KEY_USERNAME         "rpc-username"
-#define KEY_PASSWORD         "rpc-password"
-#define KEY_WHITELIST        "rpc-whitelist"
-#define KEY_RPC_PORT         "rpc-port"
-#define KEY_DSPEED           "download-limit"
-#define KEY_DSPEED_ENABLED   "download-limit-enabled"
-#define KEY_USPEED           "upload-limit"
-#define KEY_USPEED_ENABLED   "upload-limit-enabled"
+#define KEY_BLOCKLIST         "blocklist-enabled"
+#define KEY_DOWNLOAD_DIR      "download-dir"
+#define KEY_ENCRYPTION        "encryption"
+#define KEY_LAZY_BITFIELD     "lazy-bitfield-enabled"
+#define KEY_PEER_LIMIT        "max-peers-global"
+#define KEY_PEER_PORT         "peer-port"
+#define KEY_PORT_FORWARDING   "port-forwarding-enabled"
+#define KEY_PEX_ENABLED       "pex-enabled"
+#define KEY_AUTH_REQUIRED     "rpc-authentication-required"
+#define KEY_USERNAME          "rpc-username"
+#define KEY_PASSWORD          "rpc-password"
+#define KEY_WHITELIST         "rpc-whitelist"
+#define KEY_WHITELIST_ENABLED "rpc-whitelist-enabled"
+#define KEY_RPC_PORT          "rpc-port"
+#define KEY_DSPEED            "download-limit"
+#define KEY_DSPEED_ENABLED    "download-limit-enabled"
+#define KEY_USPEED            "upload-limit"
+#define KEY_USPEED_ENABLED    "upload-limit-enabled"
 
-#define CONFIG_FILE          "settings.json"
+#define CONFIG_FILE           "settings.json"
 
 /***
 ****  Config File
@@ -169,6 +170,7 @@ session_init( const char * configDir,
     char          mycwd[MAX_PATH_LENGTH];
     tr_benc       state, *dict = NULL;
     int           peerPort = -1, peers = -1;
+    int           whitelistEnabled = -1;
     int           pexEnabled = -1;
     int           fwdEnabled = -1;
     int           upLimit = -1, upLimited = -1, downLimit = -1,
@@ -208,6 +210,8 @@ session_init( const char * configDir,
                   TR_DEFAULT_BLOCKLIST_ENABLED );
     getConfigInt( dict, KEY_RPC_PORT,        &rpcPort,
                   TR_DEFAULT_RPC_PORT );
+    getConfigInt( dict, KEY_WHITELIST_ENABLED, &whitelistEnabled,
+                  TR_DEFAULT_RPC_WHITELIST_ENABLED );
     getConfigStr( dict, KEY_WHITELIST,       &whitelist,
                   TR_DEFAULT_RPC_WHITELIST );
     getConfigInt( dict, KEY_AUTH_REQUIRED,   &authRequired,      FALSE );
@@ -231,8 +235,9 @@ session_init( const char * configDir,
                                     TR_MSG_INF, 0,
                                     blocklistEnabled,
                                     TR_DEFAULT_PEER_SOCKET_TOS,
-                                    TRUE, rpcPort, whitelist, authRequired,
-                                    username, password,
+                                    TRUE, rpcPort,
+                                    whitelistEnabled, whitelist,
+                                    authRequired, username, password,
                                     TR_DEFAULT_PROXY_ENABLED,
                                     TR_DEFAULT_PROXY,
                                     TR_DEFAULT_PROXY_PORT,

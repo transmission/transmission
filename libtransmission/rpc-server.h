@@ -18,6 +18,7 @@ typedef struct tr_rpc_server tr_rpc_server;
 tr_rpc_server * tr_rpcInit( struct tr_handle * session,
                             int                isEnabled,
                             uint16_t           port,
+                            int                isWhitelistEnabled,
                             const char *       whitelist,
                             int                isPasswordEnabled,
                             const char *       username,
@@ -38,6 +39,11 @@ uint16_t        tr_rpcGetPort( const tr_rpc_server * server );
 int             tr_rpcSetTest( const tr_rpc_server * server,
                                const char *          whitelist,
                                char **               allocme_errmsg );
+
+void            tr_rpcSetWhitelistEnabled( tr_rpc_server  * server,
+                                           int              isEnabled );
+
+int             tr_rpcGetWhitelistEnabled( const tr_rpc_server * server );
 
 void            tr_rpcSetWhitelist( tr_rpc_server * server,
                                     const char *    whitelist );
