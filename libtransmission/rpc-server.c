@@ -398,8 +398,10 @@ handle_request( struct evhttp_request * req,
 }
 
 static void
-startServer( tr_rpc_server * server )
+startServer( void * vserver )
 {
+    tr_rpc_server * server  = vserver;
+
     fprintf( stderr, "%s:%d in startServer; current context is %p\n", __FILE__, __LINE__, server->httpd );
 
     if( !server->httpd )
@@ -423,22 +425,43 @@ stopServer( tr_rpc_server * server )
     }
 }
 
+static void
+onEnabledChanged( void * vserver )
+{
+    tr_rpc_server * server = vserver;
+
+    if( !server->isEnabled )
+        stopServer( server );
+    else
+        startServer( server );
+}
+    
+
 void
 tr_rpcSetEnabled( tr_rpc_server * server,
                   int             isEnabled )
 {
     server->isEnabled = isEnabled != 0;
 
-    if( !isEnabled )
-        stopServer( server );
-    else
-        startServer( server );
+    tr_runInEventThread( server->session, onEnabledChanged, server );
 }
 
 int
 tr_rpcIsEnabled( const tr_rpc_server * server )
 {
     return server->isEnabled;
+}
+
+static void
+restartServer( void * vserver )
+{
+    tr_rpc_server * server = vserver;
+
+    if( server->isEnabled )
+    {
+        stopServer( server );
+        startServer( server );
+    }
 }
 
 void
@@ -450,10 +473,7 @@ tr_rpcSetPort( tr_rpc_server * server,
         server->port = port;
 
         if( server->isEnabled )
-        {
-            stopServer( server );
-            startServer( server );
-        }
+            tr_runInEventThread( server->session, restartServer, server );
     }
 }
 
@@ -529,18 +549,22 @@ tr_rpcIsPasswordEnabled( const tr_rpc_server * server )
 *****  LIFE CYCLE
 ****/
 
-void
-tr_rpcClose( tr_rpc_server ** ps )
+static void
+closeServer( void * vserver )
 {
-    tr_rpc_server * s = *ps;
-
-    *ps = NULL;
-
+    tr_rpc_server * s = vserver;
     stopServer( s );
     tr_free( s->acl );
     tr_free( s->username );
     tr_free( s->password );
     tr_free( s );
+}
+
+void
+tr_rpcClose( tr_rpc_server ** ps )
+{
+    tr_runInEventThread( (*ps)->session, closeServer, *ps );
+    *ps = NULL;
 }
 
 tr_rpc_server *
@@ -562,9 +586,8 @@ tr_rpcInit( tr_handle *  session,
     s->password = tr_strdup( password );
     s->isPasswordEnabled = isPasswordEnabled != 0;
     s->isEnabled = isEnabled != 0;
-
     if( isEnabled )
-        startServer( s );
+        tr_runInEventThread( session, startServer, s );
     return s;
 }
 

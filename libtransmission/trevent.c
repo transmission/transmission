@@ -145,7 +145,7 @@ logFunc( int          severity,
 static void
 libeventThreadFunc( void * veh )
 {
-    tr_event_handle * eh = (tr_event_handle *) veh;
+    tr_event_handle * eh = veh;
 
     tr_dbg( "Starting libevent thread" );
 
@@ -154,9 +154,7 @@ libeventThreadFunc( void * veh )
     signal( SIGPIPE, SIG_IGN );
 #endif
 
-    eh->base = event_init( );
     eh->h->events = eh;
-    event_set_log_callback( logFunc );
 
     /* listen to the pipe's read fd */
     event_set( &eh->pipeEvent, eh->fds[0], EV_READ | EV_PERSIST,
@@ -182,6 +180,7 @@ tr_eventInit( tr_handle * handle )
     eh->lock = tr_lockNew( );
     pipe( eh->fds );
     eh->h = handle;
+    eh->base = event_init( );
     eh->thread = tr_threadNew( libeventThreadFunc, eh );
 }
 
