@@ -131,6 +131,7 @@
 - (void) setRPCPassword: (id) sender;
 - (void) updateRPCPassword;
 - (void) setRPCPort: (id) sender;
+- (void) setRPCUseWhitelist: (id) sender;
 - (void) updateRPCWhitelist;
 - (void) addRemoveRPCIP: (id) sender;
 

@@ -223,6 +223,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 [fDefaults integerForKey: @"PeerSocketTOS"], /* hidden pref - default is TR_DEFAULT_PEER_SOCKET_TOS */
                                 [fDefaults boolForKey: @"RPC"],
                                 [fDefaults integerForKey: @"RPCPort"],
+                                [fDefaults boolForKey: @"RPCUseWhitelist"],
                                 NULL, /* reset in prefs */
                                 [fDefaults boolForKey: @"RPCAuthorize"],
                                 [[fDefaults stringForKey: @"RPCUsername"] UTF8String],

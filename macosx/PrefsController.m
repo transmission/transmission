@@ -872,6 +872,11 @@ tr_handle * fHandle;
     tr_sessionSetRPCPort(fHandle, port);
 }
 
+- (void) setRPCUseWhitelist: (id) sender
+{
+    tr_sessionSetRPCWhitelistEnabled(fHandle, [fDefaults boolForKey: @"RPCUseWhitelist"]);
+}
+
 - (void) updateRPCWhitelist
 {
     NSString * string = [fRPCWhitelistArray componentsJoinedByString: @","];

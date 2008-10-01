@@ -124,6 +124,8 @@
 	<false/>
 	<key>RPCAuthorize</key>
 	<false/>
+	<key>RPCUseWhitelist</key>
+	<false/>
 	<key>RPCPort</key>
 	<integer>9091</integer>
 	<key>RPCUsername</key>
