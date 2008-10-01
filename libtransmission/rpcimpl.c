@@ -722,11 +722,11 @@ sessionGet( tr_handle *       h,
     tr_bencDictAddInt( d, "port-forwarding-enabled",
                       tr_sessionIsPortForwardingEnabled( h ) );
     tr_bencDictAddInt( d, "speed-limit-up",
-                       tr_sessionGetSpeedLimit( h, TR_UP ) * 1024 );
+                       tr_sessionGetSpeedLimit( h, TR_UP ) );
     tr_bencDictAddInt( d, "speed-limit-up-enabled",
                       tr_sessionIsSpeedLimitEnabled( h, TR_UP ) );
     tr_bencDictAddInt( d, "speed-limit-down",
-                       tr_sessionGetSpeedLimit( h, TR_DOWN ) * 1024 );
+                       tr_sessionGetSpeedLimit( h, TR_DOWN ) );
     tr_bencDictAddInt( d, "speed-limit-down-enabled",
                       tr_sessionIsSpeedLimitEnabled( h, TR_DOWN ) );
     switch( tr_sessionGetEncryption( h ) )
