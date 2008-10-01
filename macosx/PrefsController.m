@@ -887,7 +887,6 @@ tr_handle * fHandle;
                                 [dict objectForKey: @"IP"]]];
     
     NSString * string = [components componentsJoinedByString: @","];
-    
     tr_sessionSetRPCACL(fHandle, [string UTF8String]);
 }
 

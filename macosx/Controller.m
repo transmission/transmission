@@ -273,8 +273,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) awakeFromNib
 {
-    fBadger = [[Badger alloc] initWithLib: fLib];
-
     NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"TRMainToolbar"];
     [toolbar setDelegate: self];
     [toolbar setAllowsUserCustomization: YES];
@@ -435,6 +433,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         filterSearchTypeTitle = [[filterSearchMenu itemWithTag: FILTER_TYPE_TAG_NAME] title];
     }
     [[fSearchFilterField cell] setPlaceholderString: filterSearchTypeTitle];
+    
+    fBadger = [[Badger alloc] initWithLib: fLib];
     
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];

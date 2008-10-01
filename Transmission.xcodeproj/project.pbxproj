@@ -212,7 +212,6 @@
 		A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF576B0DE468C6000795D5 /* JSON_parser.h */; };
 		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */; };
 		A2E9AA760C249AF400085DCF /* Create.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* Create.png */; };
-		A2EC3EBB0E071EDF0072505E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC3EBA0E071EDF0072505E /* Security.framework */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
 		A2EF7DEC0C96297400FA9811 /* PurpleDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2EF7DEB0C96297400FA9811 /* PurpleDot.png */; };
 		A2F011990C27418800576FC0 /* CreateLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F011980C27418800576FC0 /* CreateLarge.png */; };
@@ -806,7 +805,6 @@
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
 				A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */,
 				A29EBE710DC06068006CEE80 /* libcurl.dylib in Frameworks */,
-				A2EC3EBB0E071EDF0072505E /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2585,9 +2583,9 @@
 		3C7A119B0D0B2EE300B5701F /* Build configuration list for PBXNativeTarget "natpmp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3C7A118E0D0B2EB800B5701F /* Release */,
-				3C7A118F0D0B2EB800B5701F /* Release - Debug */,
 				3C7A11900D0B2EB800B5701F /* Debug */,
+				3C7A118F0D0B2EB800B5701F /* Release - Debug */,
+				3C7A118E0D0B2EB800B5701F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -2595,9 +2593,9 @@
 		4D18389B09DEC01E0047D688 /* Build configuration list for PBXNativeTarget "libtransmission" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4D18389C09DEC01E0047D688 /* Release */,
-				A250CFEE0CDA19680068B4B6 /* Release - Debug */,
 				0053D3D40C86774200545606 /* Debug */,
+				A250CFEE0CDA19680068B4B6 /* Release - Debug */,
+				4D18389C09DEC01E0047D688 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -2605,9 +2603,9 @@
 		4DDBB71D09E16BF100284745 /* Build configuration list for PBXNativeTarget "transmissioncli" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4DDBB71E09E16BF100284745 /* Release */,
-				A250CFED0CDA19680068B4B6 /* Release - Debug */,
 				0053D3D60C86774200545606 /* Debug */,
+				A250CFED0CDA19680068B4B6 /* Release - Debug */,
+				4DDBB71E09E16BF100284745 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -2615,9 +2613,9 @@
 		4DF0C596089918A300DD8943 /* Build configuration list for PBXNativeTarget "Transmission" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4DF0C599089918A300DD8943 /* Release */,
-				A250CFEC0CDA19680068B4B6 /* Release - Debug */,
 				0053D3D50C86774200545606 /* Debug */,
+				A250CFEC0CDA19680068B4B6 /* Release - Debug */,
+				4DF0C599089918A300DD8943 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -2625,9 +2623,9 @@
 		4DF0C59A089918A300DD8943 /* Build configuration list for PBXProject "Transmission" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4DF0C59D089918A300DD8943 /* Release */,
-				A250CFEB0CDA19680068B4B6 /* Release - Debug */,
 				0053D3DA0C86774200545606 /* Debug */,
+				A250CFEB0CDA19680068B4B6 /* Release - Debug */,
+				4DF0C59D089918A300DD8943 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -2635,9 +2633,9 @@
 		BE11834C0CE160A80002D0F3 /* Build configuration list for PBXNativeTarget "miniupnp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BE1183490CE160960002D0F3 /* Release */,
-				BE11834A0CE160960002D0F3 /* Release - Debug */,
 				BE11834B0CE160960002D0F3 /* Debug */,
+				BE11834A0CE160960002D0F3 /* Release - Debug */,
+				BE1183490CE160960002D0F3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -2645,9 +2643,9 @@
 		BE75C34A0C729EB600DBEFE0 /* Build configuration list for PBXNativeTarget "event" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BE75C34B0C729EB600DBEFE0 /* Release */,
-				A250CFF20CDA19680068B4B6 /* Release - Debug */,
 				0053D3D30C86774200545606 /* Debug */,
+				A250CFF20CDA19680068B4B6 /* Release - Debug */,
+				BE75C34B0C729EB600DBEFE0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -2655,9 +2653,9 @@
 		BEFC1C090C07753800B0BB3C /* Build configuration list for PBXNativeTarget "transmission-daemon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BEFC1C0A0C07753800B0BB3C /* Release */,
-				A250CFEF0CDA19680068B4B6 /* Release - Debug */,
 				0053D3D70C86774200545606 /* Debug */,
+				A250CFEF0CDA19680068B4B6 /* Release - Debug */,
+				BEFC1C0A0C07753800B0BB3C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -2665,9 +2663,9 @@
 		BEFC1CF70C07822400B0BB3C /* Build configuration list for PBXNativeTarget "transmission-remote" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BEFC1CF80C07822400B0BB3C /* Release */,
-				A250CFF00CDA19680068B4B6 /* Release - Debug */,
 				0053D3D80C86774200545606 /* Debug */,
+				A250CFF00CDA19680068B4B6 /* Release - Debug */,
+				BEFC1CF80C07822400B0BB3C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

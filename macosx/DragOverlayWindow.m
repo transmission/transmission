@@ -30,8 +30,8 @@
 
 - (id) initWithLib: (tr_handle *) lib forWindow: (NSWindow *) window
 {
-    if (self = ([super initWithContentRect: NSMakeRect(0, 0, 1.0, 1.0) styleMask: NSBorderlessWindowMask
-                    backing: NSBackingStoreBuffered defer: NO]))
+    if ((self = ([super initWithContentRect: NSMakeRect(0, 0, 1.0, 1.0) styleMask: NSBorderlessWindowMask
+                    backing: NSBackingStoreBuffered defer: NO])))
     {
         fLib = lib;
         
