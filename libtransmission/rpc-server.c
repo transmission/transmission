@@ -19,6 +19,10 @@
 #include <fcntl.h>     /* open */
 #include <unistd.h>    /* close */
 
+#ifdef HAVE_LIBZ
+#include <zlib.h>
+#endif
+
 #include <libevent/event.h>
 #include <libevent/evhttp.h>
 
@@ -203,6 +207,51 @@ mimetype_guess( const char * path )
     return "application/octet-stream";
 }
 
+#ifdef HAVE_LIBZ
+static void
+compress_evbuf( struct evbuffer * evbuf )
+{
+    static struct evbuffer *tmp;
+    static z_stream stream;
+    static unsigned char buffer[2048];
+    
+    if( !tmp ) {
+        tmp = evbuffer_new( );
+        deflateInit( &stream, Z_BEST_COMPRESSION );
+    }
+
+    deflateReset( &stream );
+    stream.next_in = EVBUFFER_DATA(evbuf);
+    stream.avail_in = EVBUFFER_LENGTH(evbuf);
+
+    do {
+        stream.next_out = buffer;
+        stream.avail_out = sizeof( buffer );
+        if( deflate( &stream, Z_FULL_FLUSH ) == Z_OK )
+            evbuffer_add( tmp, buffer, sizeof( buffer ) - stream.avail_out );
+        else
+            break;
+    } while (stream.avail_out == 0);
+
+/*fprintf( stderr, "deflated response from %zu to %zu bytes\n", EVBUFFER_LENGTH( evbuf ), EVBUFFER_LENGTH( tmp ) );*/
+    evbuffer_drain(evbuf, EVBUFFER_LENGTH(evbuf));
+    evbuffer_add_buffer(evbuf, tmp);
+}
+#endif
+
+static void
+maybe_deflate_response( struct evhttp_request * req, struct evbuffer * response )
+{
+#ifdef HAVE_LIBZ
+    const char * accept_encoding = evhttp_find_header( req->input_headers, "Accept-Encoding" );
+    const int do_deflate = accept_encoding && strstr( accept_encoding, "deflate" );
+    if( do_deflate ) {
+        evhttp_add_header( req->output_headers, "Content-Encoding", "deflate" );
+        compress_evbuf( response );
+    }
+#endif
+}
+
 static void
 serve_file( struct evhttp_request * req,
             const char *            path )
@@ -226,6 +275,7 @@ serve_file( struct evhttp_request * req,
             evhttp_add_header( req->output_headers, "Content-Type",
                               mimetype_guess(
                                   path ) );
+            maybe_deflate_response( req, buf );
             evhttp_send_reply( req, HTTP_OK, "OK", buf );
             evbuffer_free( buf );
             close( fd );
@@ -265,6 +315,7 @@ handle_clutch( struct evhttp_request * req,
     evbuffer_free( buf );
 }
 
+
 static void
 handle_rpc( struct evhttp_request * req,
             struct tr_rpc_server *  server )
@@ -294,6 +345,7 @@ handle_rpc( struct evhttp_request * req,
 
     buf = evbuffer_new( );
     evbuffer_add( buf, response, len );
+    maybe_deflate_response( req, buf );
     evhttp_add_header( req->output_headers, "Content-Type",
                        "application/json; charset=UTF-8" );
     evhttp_send_reply( req, HTTP_OK, "OK", buf );
@@ -328,7 +380,6 @@ handle_request( struct evhttp_request * req,
                 void *                  arg )
 {
     struct tr_rpc_server * server = arg;
-    fprintf( stderr, "%s:%d Got request: \"%s\"\n", __FILE__, __LINE__, req->uri );
 
     if( req && req->evcon )
     {
@@ -394,7 +445,6 @@ handle_request( struct evhttp_request * req,
 
         tr_free( user );
     }
-    fprintf( stderr, "%s:%d\n", __FILE__, __LINE__ );
 }
 
 static void
@@ -402,15 +452,10 @@ startServer( void * vserver )
 {
     tr_rpc_server * server  = vserver;
 
-    fprintf( stderr, "%s:%d in startServer; current context is %p\n", __FILE__, __LINE__, server->httpd );
-
     if( !server->httpd )
     {
-        int i;
         server->httpd = evhttp_new( tr_eventGetBase( server->session ) );
-        fprintf( stderr, "%s:%d in startServer; new context is %p\n", __FILE__, __LINE__, server->httpd );
-        i = evhttp_bind_socket( server->httpd, "0.0.0.0", server->port );
-        fprintf( stderr, "evhttp_bind_socket returned %d\n", i );
+        evhttp_bind_socket( server->httpd, "0.0.0.0", server->port );
         evhttp_set_gencb( server->httpd, handle_request, server );
     }
 }

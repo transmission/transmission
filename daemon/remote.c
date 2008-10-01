@@ -1056,6 +1056,9 @@ processRequests( const char *  host,
 
     curl = curl_easy_init( );
     curl_easy_setopt( curl, CURLOPT_VERBOSE, debug );
+#ifdef HAVE_LIBZ
+    curl_easy_setopt( curl, CURLOPT_ENCODING, "deflate" );
+#endif
     curl_easy_setopt( curl, CURLOPT_USERAGENT,
                       MY_NAME "/" LONG_VERSION_STRING );
     curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, writeFunc );

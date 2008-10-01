@@ -230,7 +230,7 @@
 #define TIME_WITH_SYS_TIME 1
 
 /* Version number of package */
-#define VERSION "1.4.1-beta"
+#define VERSION "1.4.8-stable"
 
 /* Define to appropriate substitue if compiler doesnt have __func__ */
 /* #undef __func__ */
