@@ -33,6 +33,17 @@ charint( char ch )
 }
 
 static int
+getShadowInt( char ch, int * setme )
+{
+    const char * str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-";
+    const char * pch = strchr( str, ch );
+    if( !pch )
+        return 0;
+    *setme = pch - str;
+    return 1;
+}
+
+static int
 strint( const void * pch,
         int          span )
 {
@@ -430,35 +441,6 @@ tr_clientForId( char *       buf,
             return;
     }
 
-    /* Shad0w-style */
-    if( !memcmp( &id[4], "----", 4 ) || !memcmp( &id[4], "--0", 3 ) )
-    {
-        switch( *id )
-        {
-            case 'A':
-                three_digits( buf, buflen, "ABC", id + 1 ); break;
-
-            case 'O':
-                three_digits( buf, buflen, "Osprey", id + 1 ); break;
-
-            case 'Q':
-                three_digits( buf, buflen, "BTQueue", id + 1 ); break;
-
-            case 'R':
-                three_digits( buf, buflen, "Tribler", id + 1 ); break;
-
-            case 'S':
-                three_digits( buf, buflen, "Shad0w", id + 1 ); break;
-
-            case 'T':
-                three_digits( buf, buflen, "BitTornado", id + 1 ); break;
-
-            default:
-                break;
-        }
-        if( *buf ) return;
-    }
-
     /* Mainline */
     if( isMainlineStyle( id ) )
     {
@@ -548,6 +530,35 @@ tr_clientForId( char *       buf,
         tr_snprintf( buf, buflen, "BitSpirit %u", ( id[1] == 0 ? 1 : id[1] ) );
     }
 
+    /* Shad0w-style */
+    {
+        int a, b, c;
+        if( strchr( "AOQRSTU", id[0] )
+            && getShadowInt( id[1], &a )
+            && getShadowInt( id[2], &b )
+            && getShadowInt( id[3], &c ) )
+        {
+            const char * name = NULL;
+
+            switch( id[0] )
+            {
+                case 'A': name = "ABC"; break;
+                case 'O': name = "Osprey"; break;
+                case 'Q': name = "BTQueue"; break;
+                case 'R': name = "Tribler"; break;
+                case 'S': name = "Shad0w"; break;
+                case 'T': name = "BitTornado"; break;
+                case 'U': name = "UPnP NAT Bit Torrent"; break;
+            }
+
+            if( name )
+            {
+                tr_snprintf( buf, buflen, "%s %d.%d.%d", name, a, b, c );
+                return;
+            }
+        }
+    }
+
     /* No match */
     if( !*buf )
     {
@@ -565,4 +576,3 @@ tr_clientForId( char *       buf,
         evbuffer_free( out );
     }
 }
-

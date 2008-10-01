@@ -36,6 +36,7 @@ main( void )
     TEST_CLIENT( "-TR0006-", "Transmission 0.6" );
     TEST_CLIENT( "-TR0072-", "Transmission 0.72" );
     TEST_CLIENT( "-TR111Z-", "Transmission 1.11+" );
+    TEST_CLIENT( "O1008132", "Osprey 1.0.0" );
 
     TEST_CLIENT(
         "\x65\x78\x62\x63\x00\x38\x7A\x44\x63\x10\x2D\x6E\x9A\xD6\x72\x3B\x33\x9F\x35\xA9",
