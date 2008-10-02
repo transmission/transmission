@@ -352,7 +352,10 @@ handle_rpc( struct evhttp_request * req,
     evhttp_add_header( req->output_headers, "Content-Type",
                        "application/json; charset=UTF-8" );
     evhttp_send_reply( req, HTTP_OK, "OK", buf );
+
+    /* cleanup */
     evbuffer_free( buf );
+    tr_free( response );
 }
 
 static int
