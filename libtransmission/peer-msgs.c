@@ -225,22 +225,21 @@ reqListAppendPiece( const tr_torrent *    tor,
     }
 }
 
-static tr_errno
+static int
 reqListPop( struct request_list * list,
             struct peer_request * setme )
 {
-    tr_errno err;
+    int success;
 
     if( !list->count )
-        err = TR_ERROR;
-    else
-    {
+        success = FALSE;
+    else {
         *setme = list->requests[0];
         reqListRemoveOne( list, 0 );
-        err = TR_OK;
+        success = TRUE;
     }
 
-    return err;
+    return success;
 }
 
 static int
@@ -269,22 +268,21 @@ reqListFind( struct request_list *       list,
     return -1;
 }
 
-static tr_errno
+static int
 reqListRemove( struct request_list *       list,
                const struct peer_request * key )
 {
-    tr_errno  err;
+    int success;
     const int i = reqListFind( list, key );
 
     if( i < 0 )
-        err = TR_ERROR;
-    else
-    {
-        err = TR_OK;
+        success = FALSE;
+    else {
         reqListRemoveOne( list, i );
+        success = TRUE;
     }
 
-    return err;
+    return success;
 }
 
 /**
@@ -889,7 +887,7 @@ pumpRequestQueue( tr_peermsgs * msgs )
     if( msgs->info->clientIsChoked )
         return;
 
-    while( ( count < max ) && !reqListPop( &msgs->clientWillAskFor, &req ) )
+    while( ( count < max ) && reqListPop( &msgs->clientWillAskFor, &req ) )
     {
         assert( requestIsValid( msgs, &req ) );
         assert( tr_bitfieldHas( msgs->info->have, req.index ) );
@@ -1632,7 +1630,7 @@ clientGotBlock( tr_peermsgs *               msgs,
     *** Remove the block from our `we asked for this' list
     **/
 
-    if( reqListRemove( &msgs->clientAskedFor, req ) )
+    if( !reqListRemove( &msgs->clientAskedFor, req ) )
     {
         clientGotUnwantedBlock( msgs, req );
         dbgmsg( msgs, "we didn't ask for this message..." );
@@ -1727,16 +1725,12 @@ ratePulse( void * vpeer )
     return TRUE;
 }
 
-static tr_errno
+static int
 popNextRequest( tr_peermsgs *         msgs,
                 struct peer_request * setme )
 {
-    if( !reqListPop( &msgs->peerAskedForFast, setme ) )
-        return 0;
-    if( !reqListPop( &msgs->peerAskedFor, setme ) )
-        return 0;
-
-    return TR_ERROR;
+    return reqListPop( &msgs->peerAskedForFast, setme )
+        || reqListPop( &msgs->peerAskedFor, setme );
 }
 
 static int
@@ -1804,7 +1798,7 @@ peerPulse( void * vmsgs )
             msgs->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;
         }
         else if( !EVBUFFER_LENGTH( msgs->outBlock )
-               && !popNextRequest( msgs, &req )
+               && popNextRequest( msgs, &req )
                && requestIsValid( msgs, &req )
                && tr_cpPieceIsComplete( msgs->torrent->completion,
                                         req.index ) )
