@@ -45,7 +45,7 @@ AC_DEFUN([CHECK_SSL],
 [
     AC_MSG_CHECKING([for OpenSSL])
 
-    for dir in $withval /usr/local/ssl /usr/lib/ssl /usr/ssl /usr/pkg /usr/local /usr; do
+    for dir in $with_ssl /usr/local/ssl /usr/lib/ssl /usr/ssl /usr/pkg /usr/local /usr; do
         ssldir="$dir"
         if test -f "$dir/include/openssl/ssl.h"; then
             found_ssl="yes";
