@@ -233,25 +233,27 @@ tr_cpBlockBitfield( const tr_completion * cp )
     return cp->blockBitfield;
 }
 
-tr_errno
+int
 tr_cpBlockBitfieldSet( tr_completion * cp,
                        tr_bitfield *   bitfield )
 {
-    tr_block_index_t i;
+    int success = FALSE;
 
     assert( cp );
     assert( bitfield );
     assert( cp->blockBitfield );
 
-    if( !tr_bitfieldTestFast( bitfield, cp->tor->blockCount - 1 ) )
-        return TR_ERROR_ASSERT;
+    if( tr_bitfieldTestFast( bitfield, cp->tor->blockCount - 1 ) )
+    {
+        tr_block_index_t i;
+        tr_cpReset( cp );
+        for( i = 0; i < cp->tor->blockCount; ++i )
+            if( tr_bitfieldHasFast( bitfield, i ) )
+                tr_cpBlockAdd( cp, i );
+        success = TRUE;
+    }
 
-    tr_cpReset( cp );
-    for( i = 0; i < cp->tor->blockCount; ++i )
-        if( tr_bitfieldHasFast( bitfield, i ) )
-            tr_cpBlockAdd( cp, i );
-
-    return 0;
+    return success;
 }
 
 int

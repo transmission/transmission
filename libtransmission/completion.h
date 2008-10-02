@@ -54,41 +54,32 @@ float                      tr_cpPercentDone( const tr_completion * );
 
 void                       tr_cpInvalidateDND( tr_completion * );
 
-void                       tr_cpGetAmountDone( const   tr_completion *,
-                                               float * tab,
-                                               int     tabCount );
+void                       tr_cpGetAmountDone( const   tr_completion * completion,
+                                               float                 * tab,
+                                               int                     tabCount );
 
 /* Pieces */
-int                        tr_cpPieceIsComplete(
-    const            tr_completion *,
-    tr_piece_index_t piece );
+int                        tr_cpPieceIsComplete( const tr_completion * completion,
+                                                 tr_piece_index_t      piece );
 
-void                       tr_cpPieceAdd(
-                     tr_completion *,
-    tr_piece_index_t piece );
+void                       tr_cpPieceAdd( tr_completion    * completion,
+                                          tr_piece_index_t   piece );
 
-void                       tr_cpPieceRem(
-                     tr_completion *,
-    tr_piece_index_t piece );
+void                       tr_cpPieceRem( tr_completion     * completion,
+                                           tr_piece_index_t   piece );
 
 /* Blocks */
-int                        tr_cpBlockIsComplete(
-    const            tr_completion *,
-    tr_block_index_t block );
+int                        tr_cpBlockIsComplete( const tr_completion * completion,
+                                                 tr_block_index_t block );
 
-void                       tr_cpBlockAdd(
-                     tr_completion *,
-    tr_block_index_t block );
+void                       tr_cpBlockAdd( tr_completion * completion,
+                                          tr_block_index_t block );
 
-tr_errno                   tr_cpBlockBitfieldSet(
-           tr_completion *,
-    struct tr_bitfield
-    * );
+int                        tr_cpBlockBitfieldSet( tr_completion      * completion,
+                                                  struct tr_bitfield * blocks );
 
-int                        tr_cpMissingBlocksInPiece(
-    const tr_completion * cp,
-    tr_piece_index_t
-                          piece );
+int                        tr_cpMissingBlocksInPiece( const tr_completion  * completion,
+                                                      tr_piece_index_t       piece );
 
 
 const struct tr_bitfield * tr_cpPieceBitfield( const tr_completion* );

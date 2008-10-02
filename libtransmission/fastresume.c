@@ -482,10 +482,9 @@ parseProgress( tr_torrent *    tor,
         bitfield.byteCount = FR_BLOCK_BITFIELD_LEN( tor );
         bitfield.bitCount = bitfield.byteCount * 8;
         bitfield.bits = (uint8_t*) walk;
-        if( !tr_cpBlockBitfieldSet( tor->completion, &bitfield ) )
+        if( tr_cpBlockBitfieldSet( tor->completion, &bitfield ) )
             ret = TR_FR_PROGRESS;
-        else
-        {
+        else {
             tr_torrentUncheck( tor );
             tr_tordbg( tor, "Torrent needs to be verified" );
         }

@@ -353,7 +353,7 @@ loadProgress( tr_benc *    dict,
             tmp.byteCount = rawlen;
             tmp.bitCount = tmp.byteCount * 8;
             tmp.bits = (uint8_t*) raw;
-            if( tr_cpBlockBitfieldSet( tor->completion, &tmp ) )
+            if( !tr_cpBlockBitfieldSet( tor->completion, &tmp ) )
             {
                 tr_torrentUncheck( tor );
                 tr_tordbg(
