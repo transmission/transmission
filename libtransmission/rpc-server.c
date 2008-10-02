@@ -298,32 +298,25 @@ static void
 handle_clutch( struct evhttp_request * req,
                struct tr_rpc_server *  server )
 {
-    const char *      uri;
-    struct evbuffer * buf = evbuffer_new( );
+    char * pch;
+    char * subpath;
+    char * filename;
+    const char * clutchDir = tr_getClutchDir( server->session );
 
     assert( !strncmp( req->uri, "/transmission/web/", 18 ) );
 
-    evbuffer_add_printf( buf, "%s%s", tr_getClutchDir(
-                             server->session ), TR_PATH_DELIMITER_STR );
-    uri = req->uri + 18;
-    if( ( *uri == '?' ) || ( *uri == '\0' ) )
-        evbuffer_add_printf( buf, "index.html" );
-    else
-    {
-        const char * pch = strchr( uri, '?' );
-        if( pch )
-            evbuffer_add_printf( buf, "%*.*s", (int)( pch - uri ),
-                                 (int)( pch - uri ), uri );
-        else
-            evbuffer_add_printf( buf, "%s", uri );
-    }
+    subpath = tr_strdup( req->uri + 18 );
+    if(( pch = strchr( subpath, '?' )))
+        *pch = '\0';
 
-    if( strstr( (const char *)EVBUFFER_DATA( buf ), ".." ) )
-        send_simple_response( req, 401, NULL );
-    else
-        serve_file( req, (const char *)EVBUFFER_DATA( buf ) );
+    filename = *subpath
+        ? tr_strdup_printf( "%s%s%s", clutchDir, TR_PATH_DELIMITER_STR, subpath )
+        : tr_strdup_printf( "%s%s%s", clutchDir, TR_PATH_DELIMITER_STR, "index.html" );
 
-    evbuffer_free( buf );
+    serve_file( req, filename );
+
+    tr_free( filename );
+    tr_free( subpath );
 }
 
 static void
