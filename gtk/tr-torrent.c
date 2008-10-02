@@ -205,7 +205,15 @@ tr_torrent_new_ctor( tr_handle * handle,
     tor = tr_torrentNew( handle, ctor, &errcode );
 
     if( tor && doTrash )
-        tr_file_trash_or_unlink( tr_ctorGetSourceFile( ctor ) );
+    {
+        const char * config = tr_sessionGetConfigDir( handle );
+        const char * source = tr_ctorGetSourceFile( ctor );
+        const int is_internal = source && ( strstr( source, config ) == source );
+
+        /* #1294: don't delete the source .torrent file if it's our internal copy */
+        if( !is_internal )
+            tr_file_trash_or_unlink( source );
+    }
 
     if( !tor )
     {
