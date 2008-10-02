@@ -266,22 +266,12 @@ recalculateHash( const tr_torrent * tor,
     return err;
 }
 
-tr_errno
+int
 tr_ioTestPiece( const tr_torrent * tor,
                 int                pieceIndex )
 {
-    int     err;
     uint8_t hash[SHA_DIGEST_LENGTH];
-
-    err  = recalculateHash( tor, pieceIndex, hash );
-
-    if( !err && memcmp( hash, tor->info.pieces[pieceIndex].hash,
-                        SHA_DIGEST_LENGTH ) )
-        err = TR_ERROR_IO_CHECKSUM;
-
-    tr_tordbg ( tor, "piece %d hash check: %s",
-               pieceIndex, ( err ? "FAILED" : "OK" ) );
-
-    return err;
+    const tr_errno err = recalculateHash( tor, pieceIndex, hash );
+    return !err && !memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH );
 }
 

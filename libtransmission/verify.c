@@ -85,9 +85,8 @@ checkFile( tr_torrent *    tor,
         {
             const int      wasComplete = tr_cpPieceIsComplete(
                 tor->completion, i );
-            const tr_errno err = tr_ioTestPiece( tor, i );
 
-            if( !err ) /* yay */
+            if( tr_ioTestPiece( tor, i ) ) /* yay */
             {
                 tr_torrentSetHasPiece( tor, i, TRUE );
                 if( !wasComplete )

@@ -959,22 +959,20 @@ peerCallbackFunc( void * vpeer,
             if( tr_cpPieceIsComplete( tor->completion, e->pieceIndex ) )
             {
                 const tr_piece_index_t p = e->pieceIndex;
-                const tr_errno         err = tr_ioTestPiece( tor, p );
+                const int              ok = tr_ioTestPiece( tor, p );
 
-                if( err )
+                if( !ok )
                 {
                     tr_torerr( tor,
-                              _(
-                                  "Piece %lu, which was just downloaded, failed its checksum test: %s" ),
-                              (unsigned long)p, tr_errorString( err ) );
+                              _( "Piece %lu, which was just downloaded, failed its checksum test" ),
+                              (unsigned long)p );
                 }
 
-                tr_torrentSetHasPiece( tor, p, !err );
+                tr_torrentSetHasPiece( tor, p, ok );
                 tr_torrentSetPieceChecked( tor, p, TRUE );
-                tr_peerMgrSetBlame( tor->session->peerMgr, tor->info.hash, p,
-                                    !err );
+                tr_peerMgrSetBlame( tor->session->peerMgr, tor->info.hash, p, ok );
 
-                if( err )
+                if( !ok )
                     gotBadPiece( t, p );
                 else
                 {
