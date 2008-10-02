@@ -103,17 +103,10 @@ onTrackerSelectionChanged( GtkTreeSelection * sel,
                            gpointer           gpage )
 {
     struct tracker_page * page = gpage;
-    gboolean              has_selection = gtk_tree_selection_get_selected(
-        sel, NULL, NULL );
-    gboolean              ok_to_remove = !page->gtor
-                                         || gtk_tree_model_iter_n_children(
-        GTK_TREE_MODEL(
-            page->store ),
-        NULL )
-                                         > 1;
-
-    gtk_widget_set_sensitive( page->remove_button,
-                              has_selection && ok_to_remove );
+    const gboolean        has_selection = gtk_tree_selection_count_selected_rows( sel ) > 0;
+    const int             trackerCount = gtk_tree_model_iter_n_children( GTK_TREE_MODEL( page->store ), NULL );
+    const gboolean        ok_to_remove = !page->gtor || ( trackerCount > 1 );
+    gtk_widget_set_sensitive( page->remove_button, has_selection && ok_to_remove );
 }
 
 static void
@@ -121,13 +114,31 @@ onTrackerRemoveClicked( GtkButton * w UNUSED,
                         gpointer      gpage )
 {
     struct tracker_page * page = gpage;
-    GtkTreeIter           iter;
+    GtkTreeModel * model;
+    GList * l;
+    GList * list = gtk_tree_selection_get_selected_rows( page->sel, &model );
 
-    if( gtk_tree_selection_get_selected( page->sel, NULL, &iter ) )
-    {
-        gtk_list_store_remove( page->store, &iter );
-        setTrackerChangeState( page, TRUE );
+    /* convert the list to references */
+    for( l=list; l; l=l->next ) {
+        GtkTreePath * path = l->data;
+        l->data = gtk_tree_row_reference_new( model, path );
+        gtk_tree_path_free( path );
     }
+
+    /* remove the selected rows */
+    for( l=list; l; l=l->next ) {
+        GtkTreePath * path = gtk_tree_row_reference_get_path( l->data );
+        GtkTreeIter iter;
+        gtk_tree_model_get_iter( model, &iter, path );
+        gtk_list_store_remove( page->store, &iter );
+        gtk_tree_path_free( path );
+        gtk_tree_row_reference_free( l->data );
+    }
+
+    setTrackerChangeState( page, TRUE );
+
+    /* cleanup */
+    g_list_free( list );
 }
 
 static void
@@ -338,6 +349,7 @@ tracker_list_new( TrTorrent * gtor )
     page->sel = sel;
     g_signal_connect( sel, "changed",
                       G_CALLBACK( onTrackerSelectionChanged ), page );
+    gtk_tree_selection_set_mode( sel, GTK_SELECTION_MULTIPLE );
     gtk_container_add( GTK_CONTAINER( w ), GTK_WIDGET( page->view ) );
     gtk_widget_set_size_request( w, -1, 133 );
     fr = gtk_frame_new( NULL );
