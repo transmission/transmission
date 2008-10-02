@@ -29,7 +29,7 @@
 #include "util.h"
 
 #define UPDATE_INTERVAL_MSEC 2000
-
+#define PAGE_KEY "page"
 
 struct tracker_page
 {
@@ -85,7 +85,8 @@ tracker_model_new( tr_torrent * tor )
         GtkTreeIter             iter;
         const tr_tracker_info * tinf = inf->trackers + i;
         gtk_list_store_append( store, &iter );
-        gtk_list_store_set( store, &iter, TR_COL_TIER, tinf->tier + 1,
+        gtk_list_store_set( store, &iter,
+                            TR_COL_TIER, tinf->tier + 1,
                             TR_COL_ANNOUNCE, tinf->announce,
                             -1 );
     }
@@ -139,7 +140,8 @@ onTrackerAddClicked( GtkButton * w UNUSED,
 
     gtk_list_store_append( page->store, &iter );
     setTrackerChangeState( page, TRUE );
-    gtk_list_store_set( page->store, &iter, TR_COL_TIER, 1,
+    gtk_list_store_set( page->store, &iter,
+                        TR_COL_TIER, 1,
                         TR_COL_ANNOUNCE, "http://",
                         -1 );
     path = gtk_tree_model_get_path( GTK_TREE_MODEL( page->store ), &iter );
@@ -375,7 +377,7 @@ tracker_list_new( TrTorrent * gtor )
 
     onTrackerSelectionChanged( sel, page );
 
-    g_object_set_data_full( G_OBJECT( top ), "page", page, g_free );
+    g_object_set_data_full( G_OBJECT( top ), PAGE_KEY, page, g_free );
     return top;
 }
 
@@ -384,7 +386,7 @@ tracker_list_get_trackers( GtkWidget * list,
                            int *       trackerCount )
 {
     struct tracker_page * page = g_object_get_data( G_OBJECT(
-                                                        list ), "page" );
+                                                        list ), PAGE_KEY );
     GtkTreeModel *        model = GTK_TREE_MODEL( page->store );
     const int             n = gtk_tree_model_iter_n_children( model, NULL );
     tr_tracker_info *     trackers;
@@ -395,10 +397,13 @@ tracker_list_get_trackers( GtkWidget * list,
     trackers = g_new0( tr_tracker_info, n );
     if( gtk_tree_model_get_iter_first( model, &iter ) ) do
         {
-            gtk_tree_model_get( model, &iter, TR_COL_TIER,
-                                &trackers[i].tier,
+            int tier;
+            gtk_tree_model_get( model, &iter,
+                                TR_COL_TIER, &tier,
                                 TR_COL_ANNOUNCE, &trackers[i].announce,
                                 -1 );
+            /* tracker_info.tier is zero-based, but the display is 1-based */
+            trackers[i].tier = tier - 1;
             ++i;
         }
         while( gtk_tree_model_iter_next( model, &iter ) );
@@ -410,3 +415,22 @@ tracker_list_get_trackers( GtkWidget * list,
     return trackers;
 }
 
+void
+tracker_list_add_trackers( GtkWidget             * list,
+                           const tr_tracker_info * trackers,
+                           int                     trackerCount )
+{
+    int i;
+    struct tracker_page * page = g_object_get_data( G_OBJECT( list ), PAGE_KEY );
+    GtkListStore * store = page->store;
+
+    for( i=0; i<trackerCount; ++i )
+    {
+        GtkTreeIter             iter;
+        gtk_list_store_append( store, &iter );
+        gtk_list_store_set( store, &iter,
+                            TR_COL_TIER, trackers[i].tier + 1,
+                            TR_COL_ANNOUNCE, trackers[i].announce,
+                            -1 );
+    }
+}

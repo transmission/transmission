@@ -18,6 +18,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
 
+#include "conf.h"
 #include "hig.h"
 #include "makemeta-ui.h"
 #include "tracker-list.h"
@@ -26,6 +27,7 @@
 #define UPDATE_INTERVAL_MSEC 200
 
 #define UI_KEY "ui"
+#define ANNOUNCE_KEY "recent-announce-url"
 
 typedef struct
 {
@@ -211,6 +213,16 @@ response_cb( GtkDialog* d,
 
     trackers = tracker_list_get_trackers( ui->announce_list, &trackerCount );
 
+    pref_int_set( ANNOUNCE_KEY"-count", trackerCount );
+    for( i=0; i<trackerCount; ++i )
+    {
+        char key[512];
+        g_snprintf( key, sizeof( key ), ANNOUNCE_KEY"-%d-tier", i );
+        pref_int_set( key, trackers[i].tier );
+        g_snprintf( key, sizeof( key ), ANNOUNCE_KEY"-%d-announce", i );
+        pref_string_set( key, trackers[i].announce );
+    }
+
     tr_makeMetaInfo( ui->builder,
                     NULL,
                     trackers, trackerCount,
@@ -355,6 +367,7 @@ GtkWidget*
 make_meta_ui( GtkWindow * parent,
               tr_handle * handle )
 {
+    int          n;
     int          row = 0;
     GtkWidget *  d, *t, *w, *h, *h2, *v, *focusMe, *extras;
     GtkBox *     main_vbox;
@@ -414,6 +427,35 @@ make_meta_ui( GtkWindow * parent,
     hig_workarea_add_section_title( t, &row, _( "Trackers" ) );
 
     w = tracker_list_new( NULL );
+
+    n = pref_int_get( ANNOUNCE_KEY"-count" );
+    if( n > 0 )
+    {
+        int i;
+        int trackerCount = 0;
+        tr_tracker_info * trackers = g_new0( tr_tracker_info, n );
+         
+        for( i=0; i<n; ++i )
+        {
+            char key[512];
+            int tier;
+            const char * announce;
+            g_snprintf( key, sizeof( key ), ANNOUNCE_KEY"-%d-tier", i );
+            tier = pref_int_get( key );
+            g_snprintf( key, sizeof( key ), ANNOUNCE_KEY"-%d-announce", i );
+            announce = pref_string_get( key );
+            if( tier >= 0 && announce && *announce ) {
+                trackers[trackerCount].tier = tier;
+                trackers[trackerCount++].announce = (char*) announce;
+            }
+        }
+
+        if( trackerCount > 0 )
+            tracker_list_add_trackers( w, trackers, trackerCount );
+
+        g_free( trackers );
+    }
+
     ui->announce_list = w;
     hig_workarea_add_wide_control( t, &row, w );
 
