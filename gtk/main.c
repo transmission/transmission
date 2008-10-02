@@ -309,25 +309,20 @@ setupsighandlers( void )
         signal( sigs[i], fatalsig );
 }
 
-struct rpc_data
+static tr_rpc_callback_status
+onRPCChanged( tr_handle             * handle UNUSED,
+              tr_rpc_callback_type    type,
+              struct tr_torrent     * tor,
+              void                  * gdata )
 {
-    int              type;
-    int              torrentId;
-    tr_torrent *     tor;
-    struct cbdata *  cbdata;
-};
+    struct cbdata * cbdata = gdata;
+    gdk_threads_enter( );
 
-static int
-onRPCIdle( void * vdata )
-{
-    struct rpc_data * data = vdata;
-
-    switch( data->type )
+    switch( type )
     {
         case TR_RPC_TORRENT_ADDED:
-            tr_core_add_torrent( data->cbdata->core,
-                                tr_torrent_new_preexisting(
-                                    data->tor ) );
+            tr_core_add_torrent( cbdata->core,
+                                 tr_torrent_new_preexisting( tor ) );
             break;
 
         case TR_RPC_TORRENT_STARTED:
@@ -339,7 +334,7 @@ onRPCIdle( void * vdata )
             break;
 
         case TR_RPC_TORRENT_REMOVING:
-            tr_core_torrent_destroyed( data->cbdata->core, data->torrentId );
+            tr_core_torrent_destroyed( cbdata->core, tr_torrentId( tor ) );
             break;
 
         case TR_RPC_TORRENT_CHANGED:
@@ -347,26 +342,8 @@ onRPCIdle( void * vdata )
             /* nothing interesting to do here */
             break;
     }
-    g_free( data );
-    return FALSE;
-}
 
-static tr_rpc_callback_status
-onRPCChanged( tr_handle            * handle UNUSED,
-              tr_rpc_callback_type          type,
-              struct tr_torrent *           tor,
-              void *                        cbdata )
-{
-    /* this callback is being invoked from the libtransmission thread,
-     * so let's push the information over to the gtk+ thread where
-     * it's safe to update the gui */
-    struct rpc_data * data = g_new0( struct rpc_data, 1 );
-
-    data->type = type;
-    data->torrentId = tor ? tr_torrentId( tor ) : -1;
-    data->tor = type == TR_RPC_TORRENT_REMOVING ? NULL : tor;
-    data->cbdata = cbdata;
-    g_idle_add( onRPCIdle, data );
+    gdk_threads_leave( );
     return TR_RPC_OK;
 }
 
