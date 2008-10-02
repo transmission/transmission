@@ -2092,7 +2092,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m = tr_new0( tr_peermsgs, 1 );
     m->publisher = tr_publisherNew( );
     m->info = info;
-    m->session = torrent->handle;
+    m->session = torrent->session;
     m->torrent = torrent;
     m->io = info->io;
     m->info->clientIsChoked = 1;

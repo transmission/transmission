@@ -300,7 +300,7 @@ requestNextChunk( tr_webseed * w )
   left, and we're asking for %lu this time\n", range, (unsigned
   long)tr_torPieceCountBytes(w->torrent,piece), (unsigned long)have, (unsigned
   long)left, (unsigned long)thisPass );*/
-    tr_webRun( w->torrent->handle, url, range, webResponseFunc, w );
+    tr_webRun( w->torrent->session, url, range, webResponseFunc, w );
     tr_free( range );
     tr_free( url );
 }

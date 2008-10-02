@@ -41,31 +41,28 @@ void        tr_torrentSetHasPiece( tr_torrent *     tor,
                                    tr_piece_index_t pieceIndex,
                                    int              has );
 
-void        tr_torrentLock( const tr_torrent * );
+void        tr_torrentLock( const tr_torrent * session );
 
-void        tr_torrentUnlock( const tr_torrent * );
+void        tr_torrentUnlock( const tr_torrent * session );
 
-int         tr_torrentIsSeed( const tr_torrent * );
+int         tr_torrentIsSeed( const tr_torrent * session );
 
-void        tr_torrentChangeMyPort( tr_torrent * );
+void        tr_torrentChangeMyPort( tr_torrent * session );
 
-int         tr_torrentExists( const tr_handle *,
-                              const uint8_t * );
+int         tr_torrentExists( const tr_session * session,
+                              const uint8_t    * hash );
 
-tr_torrent* tr_torrentFindFromId(                     tr_handle *,
-                                                  int id );
+tr_torrent* tr_torrentFindFromId( tr_session * session,
+                                  int          id );
 
-tr_torrent* tr_torrentFindFromHash(                               tr_handle *,
-                                                            const uint8_t * );
+tr_torrent* tr_torrentFindFromHash( tr_session *    session,
+                                    const uint8_t * hash );
 
-tr_torrent* tr_torrentFindFromHashString(
-          tr_handle *,
-    const char * );
+tr_torrent* tr_torrentFindFromHashString( tr_session * session,
+                                          const char * hashString );
 
-tr_torrent* tr_torrentFindFromObfuscatedHash(
-    tr_handle *,
-    const
-    uint8_t* );
+tr_torrent* tr_torrentFindFromObfuscatedHash( tr_session    * session,
+                                              const uint8_t * hash );
 
 int         tr_torrentAllowsPex( const tr_torrent * );
 
@@ -153,7 +150,7 @@ tr_verify_state;
 
 struct tr_torrent
 {
-    tr_handle *              handle;
+    tr_session *             session;
     tr_info                  info;
 
     int                      uploadLimit;

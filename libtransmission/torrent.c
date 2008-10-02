@@ -126,13 +126,13 @@ tr_torrentFindFromObfuscatedHash( tr_handle *     handle,
 void
 tr_torrentLock( const tr_torrent * tor )
 {
-    tr_globalLock( tor->handle );
+    tr_globalLock( tor->session );
 }
 
 void
 tr_torrentUnlock( const tr_torrent * tor )
 {
-    tr_globalUnlock( tor->handle );
+    tr_globalUnlock( tor->session );
 }
 
 /***
@@ -222,7 +222,7 @@ onTrackerResponse( void * tracker UNUSED,
             {
                 if( event->allAreSeeds )
                     pex[i].flags |= ADDED_F_SEED_FLAG;
-                tr_peerMgrAddPex( tor->handle->peerMgr, tor->info.hash,
+                tr_peerMgrAddPex( tor->session->peerMgr, tor->info.hash,
                                   TR_PEER_FROM_TRACKER, pex + i );
             }
 
@@ -461,7 +461,7 @@ torrentRealInit( tr_handle *     h,
 
     tr_globalLock( h );
 
-    tor->handle   = h;
+    tor->session   = h;
     tor->uniqueId = nextUniqueId++;
 
     randomizeTiers( info );
@@ -537,9 +537,9 @@ torrentRealInit( tr_handle *     h,
     if( !( loaded & TR_FR_SPEEDLIMIT ) )
     {
         tr_torrentSetSpeedLimit( tor, TR_UP,
-                                tr_sessionGetSpeedLimit( tor->handle, TR_UP ) );
+                                tr_sessionGetSpeedLimit( tor->session, TR_UP ) );
         tr_torrentSetSpeedLimit( tor, TR_DOWN,
-                                tr_sessionGetSpeedLimit( tor->handle,
+                                tr_sessionGetSpeedLimit( tor->session,
                                                          TR_DOWN ) );
     }
 
@@ -573,7 +573,7 @@ torrentRealInit( tr_handle *     h,
         {
             const char * filename = tor->info.torrent;
             tr_bencSaveFile( filename, val );
-            tr_sessionSetTorrentFile( tor->handle, tor->info.hashString,
+            tr_sessionSetTorrentFile( tor->session, tor->info.hashString,
                                       filename );
         }
     }
@@ -680,7 +680,7 @@ int
 tr_torrentAllowsPex( const tr_torrent * tor )
 {
     return tor
-           && tor->handle->isPexEnabled
+           && tor->session->isPexEnabled
            && !tr_torrentIsPrivate( tor );
 }
 
@@ -696,7 +696,7 @@ tr_torrentManualUpdateImpl( void * vtor )
 void
 tr_torrentManualUpdate( tr_torrent * tor )
 {
-    tr_runInEventThread( tor->handle, tr_torrentManualUpdateImpl, tor );
+    tr_runInEventThread( tor->session, tr_torrentManualUpdateImpl, tor );
 }
 
 int
@@ -769,7 +769,7 @@ tr_torrentStat( tr_torrent * tor )
     tr_trackerGetCounts( tc, &s->timesCompleted,
                          &s->leechers,
                          &s->seeders );
-    tr_peerMgrTorrentStats( tor->handle->peerMgr,
+    tr_peerMgrTorrentStats( tor->session->peerMgr,
                             tor->info.hash,
                             &s->peersKnown,
                             &s->peersConnected,
@@ -821,7 +821,7 @@ tr_torrentStat( tr_torrent * tor )
     {
         tr_piece_index_t i;
         tr_bitfield *    peerPieces = tr_peerMgrGetAvailable(
-            tor->handle->peerMgr,
+            tor->session->peerMgr,
             tor->info.
             hash );
         s->desiredAvailable = 0;
@@ -941,7 +941,7 @@ tr_torrentFilesFree( tr_file_stat *            files,
 float*
 tr_torrentWebSpeeds( const tr_torrent * tor )
 {
-    return tor ? tr_peerMgrWebSpeeds( tor->handle->peerMgr, tor->info.hash )
+    return tor ? tr_peerMgrWebSpeeds( tor->session->peerMgr, tor->info.hash )
            : NULL;
 }
 
@@ -952,7 +952,7 @@ tr_torrentPeers( const tr_torrent * tor,
     tr_peer_stat * ret = NULL;
 
     if( tor )
-        ret = tr_peerMgrPeerStats( tor->handle->peerMgr,
+        ret = tr_peerMgrPeerStats( tor->session->peerMgr,
                                    tor->info.hash, peerCount );
 
     return ret;
@@ -970,7 +970,7 @@ tr_torrentAvailability( const tr_torrent * tor,
                         int8_t *           tab,
                         int                size )
 {
-    tr_peerMgrTorrentAvailability( tor->handle->peerMgr,
+    tr_peerMgrTorrentAvailability( tor->session->peerMgr,
                                    tor->info.hash,
                                    tab, size );
 }
@@ -1026,7 +1026,7 @@ static void
 freeTorrent( tr_torrent * tor )
 {
     tr_torrent * t;
-    tr_handle *  h = tor->handle;
+    tr_handle *  h = tor->session;
     tr_info *    inf = &tor->info;
 
     assert( tor );
@@ -1077,7 +1077,7 @@ checkAndStartImpl( void * vtor )
 {
     tr_torrent * tor = vtor;
 
-    tr_globalLock( tor->handle );
+    tr_globalLock( tor->session );
 
     tor->isRunning  = 1;
     *tor->errorString = '\0';
@@ -1086,22 +1086,22 @@ checkAndStartImpl( void * vtor )
     tr_torrentSaveResume( tor );
     tor->startDate = time( NULL );
     tr_trackerStart( tor->tracker );
-    tr_peerMgrStartTorrent( tor->handle->peerMgr, tor->info.hash );
+    tr_peerMgrStartTorrent( tor->session->peerMgr, tor->info.hash );
 
-    tr_globalUnlock( tor->handle );
+    tr_globalUnlock( tor->session );
 }
 
 static void
 checkAndStartCB( tr_torrent * tor )
 {
-    tr_runInEventThread( tor->handle, checkAndStartImpl, tor );
+    tr_runInEventThread( tor->session, checkAndStartImpl, tor );
 }
 
 static void
 torrentStart( tr_torrent * tor,
               int          reloadProgress )
 {
-    tr_globalLock( tor->handle );
+    tr_globalLock( tor->session );
 
     if( !tor->isRunning )
     {
@@ -1111,7 +1111,7 @@ torrentStart( tr_torrent * tor,
         tr_verifyAdd( tor, checkAndStartCB );
     }
 
-    tr_globalUnlock( tor->handle );
+    tr_globalUnlock( tor->session );
 }
 
 void
@@ -1130,7 +1130,7 @@ torrentRecheckDoneImpl( void * vtor )
 static void
 torrentRecheckDoneCB( tr_torrent * tor )
 {
-    tr_runInEventThread( tor->handle, torrentRecheckDoneImpl, tor );
+    tr_runInEventThread( tor->session, torrentRecheckDoneImpl, tor );
 }
 
 void
@@ -1138,12 +1138,12 @@ tr_torrentVerify( tr_torrent * tor )
 {
     tr_verifyRemove( tor );
 
-    tr_globalLock( tor->handle );
+    tr_globalLock( tor->session );
 
     tr_torrentUncheck( tor );
     tr_verifyAdd( tor, torrentRecheckDoneCB );
 
-    tr_globalUnlock( tor->handle );
+    tr_globalUnlock( tor->session );
 }
 
 static void
@@ -1154,7 +1154,7 @@ stopTorrent( void * vtor )
     tr_torrent *    tor = vtor;
 
     tr_verifyRemove( tor );
-    tr_peerMgrStopTorrent( tor->handle->peerMgr, tor->info.hash );
+    tr_peerMgrStopTorrent( tor->session->peerMgr, tor->info.hash );
     tr_trackerStop( tor->tracker );
 
     for( i = 0; i < tor->info.fileCount; ++i )
@@ -1172,14 +1172,14 @@ tr_torrentStop( tr_torrent * tor )
 {
     if( tor )
     {
-        tr_globalLock( tor->handle );
+        tr_globalLock( tor->session );
 
         tor->isRunning = 0;
         if( !tor->isDeleting )
             tr_torrentSaveResume( tor );
-        tr_runInEventThread( tor->handle, stopTorrent, tor );
+        tr_runInEventThread( tor->session, stopTorrent, tor );
 
-        tr_globalUnlock( tor->handle );
+        tr_globalUnlock( tor->session );
     }
 }
 
@@ -1193,7 +1193,7 @@ closeTorrent( void * vtor )
     stopTorrent( tor );
     if( tor->isDeleting )
     {
-        tr_metainfoRemoveSaved( tor->handle, &tor->info );
+        tr_metainfoRemoveSaved( tor->session, &tor->info );
         tr_torrentRemoveResume( tor );
     }
     freeTorrent( tor );
@@ -1204,7 +1204,7 @@ tr_torrentFree( tr_torrent * tor )
 {
     if( tor )
     {
-        tr_handle * handle = tor->handle;
+        tr_handle * handle = tor->session;
         tr_globalLock( handle );
 
         tr_torrentClearStatusCallback( tor );
@@ -1702,7 +1702,7 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
 
         /* try to parse it back again, to make sure it's good */
         memset( &tmpInfo, 0, sizeof( tr_info ) );
-        if( !tr_metainfoParse( tor->handle, &tmpInfo, &metainfo ) )
+        if( !tr_metainfoParse( tor->session, &tmpInfo, &metainfo ) )
         {
             /* if it's good, save it and use it */
             tr_metainfoFree( &tor->info );

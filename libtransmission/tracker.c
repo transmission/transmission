@@ -913,11 +913,11 @@ tr_trackerNew( const tr_torrent * torrent )
     const tr_info * info = &torrent->info;
     tr_tracker *    t;
 
-    ensureGlobalsExist( torrent->handle );
+    ensureGlobalsExist( torrent->session );
 
     t = tr_new0( tr_tracker, 1 );
     t->publisher = tr_publisherNew( );
-    t->session                  = torrent->handle;
+    t->session                  = torrent->session;
     t->scrapeIntervalSec        = DEFAULT_SCRAPE_INTERVAL_SEC;
     t->retryScrapeIntervalSec   = FIRST_SCRAPE_RETRY_INTERVAL_SEC;
     t->retryAnnounceIntervalSec = FIRST_ANNOUNCE_RETRY_INTERVAL_SEC;

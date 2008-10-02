@@ -615,7 +615,7 @@ parsePeers( tr_torrent *    tor,
         {
             tr_pex pex;
             readBytes( &pex, &buf, sizeof( tr_pex ) );
-            tr_peerMgrAddPex( tor->handle->peerMgr, tor->info.hash,
+            tr_peerMgrAddPex( tor->session->peerMgr, tor->info.hash,
                               TR_PEER_FROM_CACHE,
                               &pex );
         }
@@ -713,13 +713,13 @@ loadResumeFile( const tr_torrent * tor,
 {
     uint8_t *    ret = NULL;
     char         path[MAX_PATH_LENGTH];
-    const char * cacheDir = tr_getResumeDir( tor->handle );
+    const char * cacheDir = tr_getResumeDir( tor->session );
     const char * hash = tor->info.hashString;
 
-    if( !ret && tor->handle->tag )
+    if( !ret && tor->session->tag )
     {
         char base[1024];
-        tr_snprintf( base, sizeof( base ), "%s-%s", hash, tor->handle->tag );
+        tr_snprintf( base, sizeof( base ), "%s-%s", hash, tor->session->tag );
         tr_buildPath( path, sizeof( path ), cacheDir, base, NULL );
         ret = tr_loadFile( path, len );
     }
@@ -776,13 +776,13 @@ void
 tr_fastResumeRemove( const tr_torrent * tor )
 {
     char         path[MAX_PATH_LENGTH];
-    const char * cacheDir = tr_getResumeDir( tor->handle );
+    const char * cacheDir = tr_getResumeDir( tor->session );
     const char * hash = tor->info.hashString;
 
-    if( tor->handle->tag )
+    if( tor->session->tag )
     {
         char base[1024];
-        tr_snprintf( base, sizeof( base ), "%s-%s", hash, tor->handle->tag );
+        tr_snprintf( base, sizeof( base ), "%s-%s", hash, tor->session->tag );
         tr_buildPath( path, sizeof( path ), cacheDir, base, NULL );
         unlink( path );
     }

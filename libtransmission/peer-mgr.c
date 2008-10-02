@@ -889,7 +889,7 @@ peerCallbackFunc( void * vpeer,
             tr_torrent * tor = t->tor;
             tor->activityDate = now;
             tor->uploadedCur += e->length;
-            tr_statsAddUploaded( tor->handle, e->length );
+            tr_statsAddUploaded( tor->session, e->length );
             if( peer )
             {
                 struct peer_atom * atom = getExistingAtom( t,
@@ -912,7 +912,7 @@ peerCallbackFunc( void * vpeer,
              * into the jurisdiction of the tracker." */
             if( peer )
                 tor->downloadedCur += e->length;
-            tr_statsAddDownloaded( tor->handle, e->length );
+            tr_statsAddDownloaded( tor->session, e->length );
             if( peer )
             {
                 struct peer_atom * atom = getExistingAtom( t,
@@ -971,7 +971,7 @@ peerCallbackFunc( void * vpeer,
 
                 tr_torrentSetHasPiece( tor, p, !err );
                 tr_torrentSetPieceChecked( tor, p, TRUE );
-                tr_peerMgrSetBlame( tor->handle->peerMgr, tor->info.hash, p,
+                tr_peerMgrSetBlame( tor->session->peerMgr, tor->info.hash, p,
                                     !err );
 
                 if( err )

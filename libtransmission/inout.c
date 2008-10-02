@@ -84,7 +84,7 @@ readOrWriteBytes( const tr_torrent * tor,
         err = TR_OK;
 
     if( ( err == TR_OK ) && ( !fileExists ) && ( ioMode == TR_IO_WRITE ) )
-        tr_statsFileCreated( tor->handle );
+        tr_statsFileCreated( tor->session );
 
     if( fd >= 0 )
         tr_fdFileReturn( fd );

@@ -51,7 +51,7 @@ static char*
 getResumeFilename( const tr_torrent * tor )
 {
     return tr_strdup_printf( "%s%c%s.%16.16s.resume",
-                             tr_getResumeDir( tor->handle ),
+                             tr_getResumeDir( tor->session ),
                              TR_PATH_DELIMITER,
                              tor->info.name,
                              tor->info.hashString );
@@ -66,7 +66,7 @@ savePeers( tr_benc *          dict,
            const tr_torrent * tor )
 {
     tr_pex *  pex = NULL;
-    const int count = tr_peerMgrGetPeers( tor->handle->peerMgr,
+    const int count = tr_peerMgrGetPeers( tor->session->peerMgr,
                                           tor->info.hash, &pex );
 
     if( count > 0 )
@@ -90,7 +90,7 @@ loadPeers( tr_benc *    dict,
         {
             tr_pex pex;
             memcpy( &pex, str + ( i * sizeof( tr_pex ) ), sizeof( tr_pex ) );
-            tr_peerMgrAddPex( tor->handle->peerMgr,
+            tr_peerMgrAddPex( tor->session->peerMgr,
                               tor->info.hash, TR_PEER_FROM_CACHE, &pex );
         }
         tr_tordbg( tor, "Loaded %d peers from resume file", count );
