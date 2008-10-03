@@ -241,10 +241,14 @@ compress_evbuf( struct evbuffer * evbuf )
             break;
     }
 
+    /* if the deflated form is larger, then just use the original */
+    if( !err && ( EVBUFFER_LENGTH( out ) >= EVBUFFER_LENGTH( evbuf ) ) )
+        err = -1;
+
     if( !err ) {
-        fprintf( stderr, "deflated response from %zu bytes to %zu\n",
-                 EVBUFFER_LENGTH( evbuf ),
-                 EVBUFFER_LENGTH( out ) );
+        tr_ninf( MY_NAME, "deflated response from %zu bytes to %zu\n",
+                          EVBUFFER_LENGTH( evbuf ),
+                          EVBUFFER_LENGTH( out ) );
         evbuffer_drain( evbuf, EVBUFFER_LENGTH( evbuf ) );
         evbuffer_add_buffer( evbuf, out );
     }
