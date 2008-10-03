@@ -246,7 +246,7 @@ compress_evbuf( struct evbuffer * evbuf )
         err = -1;
 
     if( !err ) {
-        tr_ninf( MY_NAME, "deflated response from %zu bytes to %zu\n",
+        tr_ninf( MY_NAME, "deflated response from %zu bytes to %zu",
                           EVBUFFER_LENGTH( evbuf ),
                           EVBUFFER_LENGTH( out ) );
         evbuffer_drain( evbuf, EVBUFFER_LENGTH( evbuf ) );
@@ -292,7 +292,9 @@ serve_file( struct evhttp_request * req,
         else
         {
             struct evbuffer * buf = evbuffer_new( );
-            evbuffer_read( buf, fd, INT_MAX );
+            for( ;; )
+                if( evbuffer_read( buf, fd, INT_MAX ) < 1 )
+                    break;
             evhttp_add_header( req->output_headers, "Content-Type",
                               mimetype_guess(
                                   path ) );
