@@ -4297,8 +4297,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     Torrent * torrent = [[Torrent alloc] initWithTorrentStruct: torrentStruct location: location lib: fLib];
     
-    [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];
-    
     [torrent update];
     [fTorrents addObject: torrent];
     [torrent release];
