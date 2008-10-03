@@ -231,7 +231,7 @@ tr_ioWrite( const tr_torrent * tor,
 *****
 ****/
 
-static tr_errno
+static int
 recalculateHash( const tr_torrent * tor,
                  tr_piece_index_t   pieceIndex,
                  uint8_t *          setme )
@@ -239,7 +239,7 @@ recalculateHash( const tr_torrent * tor,
     size_t   bytesLeft;
     size_t   n;
     uint32_t offset = 0;
-    tr_errno err =  0;
+    int      success = TRUE;
     SHA_CTX  sha;
 
     assert( tor );
@@ -253,17 +253,18 @@ recalculateHash( const tr_torrent * tor,
     {
         uint8_t   buf[2048];
         const int len = MIN( bytesLeft, sizeof( buf ) );
-        if( ( err = tr_ioRead( tor, pieceIndex, offset, len, buf ) ) )
+        success = !tr_ioRead( tor, pieceIndex, offset, len, buf );
+        if( !success )
             break;
         SHA1_Update( &sha, buf, len );
         offset += len;
         bytesLeft -= len;
     }
 
-    if( !err )
+    if( success )
         SHA1_Final( setme, &sha );
 
-    return err;
+    return success;
 }
 
 int
@@ -271,7 +272,7 @@ tr_ioTestPiece( const tr_torrent * tor,
                 int                pieceIndex )
 {
     uint8_t hash[SHA_DIGEST_LENGTH];
-    const tr_errno err = recalculateHash( tor, pieceIndex, hash );
-    return !err && !memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH );
+    const int recalculated = recalculateHash( tor, pieceIndex, hash );
+    return recalculated && !memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH );
 }
 
