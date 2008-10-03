@@ -1195,6 +1195,9 @@ enum
     TR_PEER_FROM__MAX
 };
 
+/** Can be used as a mnemonic for "no error" errno */
+#define TR_OK 0
+
 /**
  * The current status of a torrent.
  * @see tr_torrentStat()
