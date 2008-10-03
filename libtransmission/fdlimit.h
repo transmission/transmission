@@ -42,16 +42,15 @@ void tr_fdClose( void );
  * write to the file at a time.  Callers check out a file, use it,
  * and then check it back in via tr_fdFileReturn() when done.
  *
- * - if `folder' doesn't exist, TR_ERROR_IO_PARENT is returned.
+ * - if `folder' doesn't exist, errno is set to ENOENT.
  * - if doWrite is true, subfolders in torrentFile are created if necessary.
  * - if doWrite is true, the target file is created if necessary.
  *
  * on success, a file descriptor >= 0 is returned.
- * on failure, a negative number corresponding to tr_errno is returned.
+ * on failure, a -1 is returned and errno is set.
  *
  * @see tr_fdFileReturn
  * @see tr_fdFileClose
- * @see tr_errno
  */
 int  tr_fdFileCheckout( const char * folder,
                         const char * torrentFile,

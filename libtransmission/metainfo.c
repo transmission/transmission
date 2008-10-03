@@ -154,7 +154,7 @@ getfile( char **      setme,
         *setme = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
         /* fprintf( stderr, "[%s]\n", *setme ); */
         evbuffer_free( buf );
-        err = TR_OK;
+        err = 0;
     }
 
     return err;
@@ -454,7 +454,7 @@ tr_metainfoParse( const tr_handle * handle,
         tr_metainfoFree( inf );
         return TR_EINVALID;
     }
-    return TR_OK;
+    return 0;
 }
 
 void

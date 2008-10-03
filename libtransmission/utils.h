@@ -166,6 +166,10 @@ int            tr_mkdirp( const char * path,
                           int          permissions );
 
 
+/**
+ * Loads a file and returns its contents.
+ * On failure, NULL is returned and errno is set.
+ */
 uint8_t*       tr_loadFile( const char * filename,
                             size_t *     size ) TR_GNUC_MALLOC;
 
@@ -180,10 +184,6 @@ TR_GNUC_NULL_TERMINATED;
 
 struct timeval tr_timevalMsec( uint64_t milliseconds );
 
-
-int            tr_ioErrorFromErrno( int err );
-
-const char *   tr_errorString( int code );
 
 /* return the current date in milliseconds */
 uint64_t       tr_date( void );

@@ -232,14 +232,14 @@ onTrackerResponse( void * tracker UNUSED,
 
         case TR_TRACKER_WARNING:
             tr_torerr( tor, _( "Tracker warning: \"%s\"" ), event->text );
-            tor->error = TR_ERROR_TC_WARNING;
+            tor->error = -1;
             tr_strlcpy( tor->errorString, event->text,
                        sizeof( tor->errorString ) );
             break;
 
         case TR_TRACKER_ERROR:
             tr_torerr( tor, _( "Tracker error: \"%s\"" ), event->text );
-            tor->error = TR_ERROR_TC_ERROR;
+            tor->error = -2;
             tr_strlcpy( tor->errorString, event->text,
                        sizeof( tor->errorString ) );
             break;
@@ -522,7 +522,7 @@ torrentRealInit( tr_handle *     h,
     assert( !tor->downloadedCur );
     assert( !tor->uploadedCur );
 
-    tor->error   = TR_OK;
+    tor->error   = 0;
 
     tor->checkedPieces = tr_bitfieldNew( tor->info.pieceCount );
     tr_torrentUncheck( tor );

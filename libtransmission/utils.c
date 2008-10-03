@@ -408,13 +408,16 @@ tr_loadFile( const char * path,
     errno = 0;
     if( stat( path, &sb ) )
     {
+        const int err = errno;
         tr_dbg( err_fmt, path, tr_strerror( errno ) );
+        errno = err;
         return NULL;
     }
 
     if( ( sb.st_mode & S_IFMT ) != S_IFREG )
     {
         tr_err( err_fmt, path, _( "Not a regular file" ) );
+        errno = EISDIR;
         return NULL;
     }
 
@@ -422,27 +425,32 @@ tr_loadFile( const char * path,
     file = fopen( path, "rb" );
     if( !file )
     {
+        const int err = errno;
         tr_err( err_fmt, path, tr_strerror( errno ) );
+        errno = err;
         return NULL;
     }
     buf = malloc( sb.st_size );
-    if( NULL == buf )
+    if( !buf )
     {
+        const int err = errno;
         tr_err( err_fmt, path, _( "Memory allocation failed" ) );
         fclose( file );
+        errno = err;
         return NULL;
     }
     if( fread( buf, sb.st_size, 1, file ) != 1 )
     {
+        const int err = errno;
         tr_err( err_fmt, path, tr_strerror( errno ) );
         fclose( file );
         free( buf );
+        errno = err;
         return NULL;
     }
+
     fclose( file );
-
     *size = sb.st_size;
-
     return buf;
 }
 
@@ -553,86 +561,6 @@ tr_buildPath( char *      buf,
 
     va_end( vl );
     evbuffer_free( evbuf );
-}
-
-int
-tr_ioErrorFromErrno( int err )
-{
-    switch( err )
-    {
-        case 0:
-            return TR_OK;
-
-        case EACCES:
-        case EROFS:
-            return TR_ERROR_IO_PERMISSIONS;
-
-        case ENOSPC:
-            return TR_ERROR_IO_SPACE;
-
-        case EMFILE:
-            return TR_ERROR_IO_OPEN_FILES;
-
-        case EFBIG:
-            return TR_ERROR_IO_FILE_TOO_BIG;
-
-        default:
-            tr_err( "generic i/o errno from errno: %s", tr_strerror( errno ) );
-            return TR_ERROR_IO_OTHER;
-    }
-}
-
-const char *
-tr_errorString( int code )
-{
-    switch( code )
-    {
-        case TR_OK:
-            return _( "No error" );
-
-        case TR_ERROR:
-            return _( "Unspecified error" );
-
-        case TR_ERROR_ASSERT:
-            return _( "Assert error" );
-
-        case TR_ERROR_IO_PARENT:
-            return _( "Destination folder doesn't exist" );
-
-        case TR_ERROR_IO_PERMISSIONS:
-            return tr_strerror( EACCES );
-
-        case TR_ERROR_IO_SPACE:
-            return tr_strerror( ENOSPC );
-
-        case TR_ERROR_IO_FILE_TOO_BIG:
-            return tr_strerror( EFBIG );
-
-        case TR_ERROR_IO_OPEN_FILES:
-            return tr_strerror( EMFILE );
-
-        case TR_ERROR_IO_DUP_DOWNLOAD:
-            return _(
-                       "A torrent with this name and destination folder already exists." );
-
-        case TR_ERROR_IO_CHECKSUM:
-            return _( "Checksum failed" );
-
-        case TR_ERROR_IO_OTHER:
-            return _( "Unspecified I/O error" );
-
-        case TR_ERROR_TC_ERROR:
-            return _( "Tracker error" );
-
-        case TR_ERROR_TC_WARNING:
-            return _( "Tracker warning" );
-
-        case TR_ERROR_PEER_MESSAGE:
-            return _( "Peer sent a bad message" );
-
-        default:
-            return _( "Unknown error" );
-    }
 }
 
 /****

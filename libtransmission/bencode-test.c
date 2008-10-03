@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include "transmission.h"
@@ -43,34 +44,34 @@ testInt( void )
     end = NULL;
     val = 888;
     err = tr_bencParseInt( buf, buf + 3, &end, &val );
-    check( err == TR_ERROR );
+    check( err == EILSEQ );
     check( val == 888 );
     check( end == NULL );
 
     /* empty buffer */
     err = tr_bencParseInt( buf, buf + 0, &end, &val );
-    check( err == TR_ERROR );
+    check( err == EILSEQ );
     check( val == 888 );
     check( end == NULL );
 
     /* bad number */
     tr_snprintf( (char*)buf, sizeof( buf ), "i6z4e" );
     err = tr_bencParseInt( buf, buf + 5, &end, &val );
-    check( err == TR_ERROR );
+    check( err == EILSEQ );
     check( val == 888 );
     check( end == NULL );
 
     /* negative number */
     tr_snprintf( (char*)buf, sizeof( buf ), "i-3e" );
     err = tr_bencParseInt( buf, buf + 4, &end, &val );
-    check( err == TR_OK );
+    check( err == 0 );
     check( val == -3 );
     check( end == buf + 4 );
 
     /* zero */
     tr_snprintf( (char*)buf, sizeof( buf ), "i0e" );
     err = tr_bencParseInt( buf, buf + 4, &end, &val );
-    check( err == TR_OK );
+    check( err == 0 );
     check( val == 0 );
     check( end == buf + 3 );
 
@@ -79,7 +80,7 @@ testInt( void )
     end = NULL;
     tr_snprintf( (char*)buf, sizeof( buf ), "i04e" );
     err = tr_bencParseInt( buf, buf + 4, &end, &val );
-    check( err == TR_ERROR );
+    check( err == EILSEQ );
     check( val == 0 );
     check( end == NULL );
 
@@ -98,7 +99,7 @@ testStr( void )
     /* good string */
     tr_snprintf( (char*)buf, sizeof( buf ), "4:boat" );
     err = tr_bencParseStr( buf, buf + 6, &end, &str, &len );
-    check( err == TR_OK );
+    check( err == 0 );
     check( !strncmp( (char*)str, "boat", len ) );
     check( len == 4 );
     check( end == buf + 6 );
@@ -108,7 +109,7 @@ testStr( void )
 
     /* string goes past end of buffer */
     err = tr_bencParseStr( buf, buf + 5, &end, &str, &len );
-    check( err == TR_ERROR );
+    check( err == EILSEQ );
     check( str == NULL );
     check( end == NULL );
     check( !len );
@@ -116,7 +117,7 @@ testStr( void )
     /* empty string */
     tr_snprintf( (char*)buf, sizeof( buf ), "0:" );
     err = tr_bencParseStr( buf, buf + 2, &end, &str, &len );
-    check( err == TR_OK );
+    check( err == 0 );
     check( !*str );
     check( !len );
     check( end == buf + 2 );
@@ -127,7 +128,7 @@ testStr( void )
     /* short string */
     tr_snprintf( (char*)buf, sizeof( buf ), "3:boat" );
     err = tr_bencParseStr( buf, buf + 6, &end, &str, &len );
-    check( err == TR_OK );
+    check( err == 0 );
     check( !strncmp( (char*)str, "boa", len ) );
     check( len == 3 );
     check( end == buf + 5 );

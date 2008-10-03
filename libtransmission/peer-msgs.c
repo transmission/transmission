@@ -482,7 +482,7 @@ publish( tr_peermsgs *   msgs,
 
 static void
 fireError( tr_peermsgs * msgs,
-           tr_errno      err )
+           int           err )
 {
     tr_peer_event e = blankEvent;
 
@@ -1424,7 +1424,7 @@ readBtMessage( tr_peermsgs *     msgs,
     {
         dbgmsg( msgs, "bad packet - BT message #%d with a length of %d",
                 (int)id, (int)msglen );
-        fireError( msgs, TR_ERROR );
+        fireError( msgs, EPROTO );
         return READ_ERR;
     }
 
@@ -1457,7 +1457,7 @@ readBtMessage( tr_peermsgs *     msgs,
             tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
             dbgmsg( msgs, "got Have: %u", ui32 );
             if( tr_bitfieldAdd( msgs->info->have, ui32 ) )
-                fireError( msgs, TR_ERROR_PEER_MESSAGE );
+                fireError( msgs, ERANGE );
             updatePeerProgress( msgs );
             tr_rcTransferred( msgs->torrent->swarmSpeed,
                               msgs->torrent->info.pieceSize );
@@ -1603,7 +1603,8 @@ addPeerToBlamefield( tr_peermsgs * msgs,
     tr_bitfieldAdd( msgs->info->blame, index );
 }
 
-static tr_errno
+/* returns 0 on success, or an errno on failure */
+static int
 clientGotBlock( tr_peermsgs *               msgs,
                 const uint8_t *             data,
                 const struct peer_request * req )
@@ -1619,7 +1620,7 @@ clientGotBlock( tr_peermsgs *               msgs,
     {
         dbgmsg( msgs, "wrong block size -- expected %u, got %d",
                 tr_torBlockCountBytes( msgs->torrent, block ), req->length );
-        return TR_ERROR;
+        return EMSGSIZE;
     }
 
     /* save the block */
@@ -1656,7 +1657,7 @@ clientGotBlock( tr_peermsgs *               msgs,
     **/
 
     msgs->info->peerSentPieceDataAt = time( NULL );
-    if( ( err = tr_ioWrite( tor, req->index, req->offset, req->length, data ) ) )
+    if(( err = tr_ioWrite( tor, req->index, req->offset, req->length, data )))
         return err;
 
     addPeerToBlamefield( msgs, req->index );
@@ -1855,7 +1856,7 @@ gotError( struct bufferevent * evbuf UNUSED,
     if( what & ( EVBUFFER_EOF | EVBUFFER_ERROR ) )
         dbgmsg( vmsgs, "libevent got an error! what=%hd, errno=%d (%s)",
                what, errno, tr_strerror( errno ) );
-    fireError( vmsgs, TR_ERROR );
+    fireError( vmsgs, ENOTCONN );
 }
 
 static void

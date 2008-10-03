@@ -787,7 +787,7 @@ const char* tr_ctorGetSourceFile( const tr_ctor * ctor );
 
 /**
  * Parses the specified metainfo.
- * Returns TR_OK if it parsed and can be added to Transmission.
+ * Returns 0 if it parsed successfully and can be added to Transmission.
  * Returns TR_EINVALID if it couldn't be parsed.
  * Returns TR_EDUPLICATE if it parsed but can't be added.
  *     "download-dir" must be set to test for TR_EDUPLICATE.
@@ -1176,43 +1176,13 @@ tr_torrent_status;
 
 #define TR_STATUS_IS_ACTIVE( s ) ( ( s ) != TR_STATUS_STOPPED )
 
-/**
- * Transmission error codes
- * errors are always negative, and 0 refers to no error.
- */
-typedef enum tr_errno
-{
-    TR_OK = 0,
-
-    /* general errors */
-    TR_ERROR = -100,
-    TR_ERROR_ASSERT,
-
-    /* io errors */
-    TR_ERROR_IO_PARENT = -200,
-    TR_ERROR_IO_PERMISSIONS,
-    TR_ERROR_IO_SPACE,
-    TR_ERROR_IO_FILE_TOO_BIG,
-    TR_ERROR_IO_OPEN_FILES,
-    TR_ERROR_IO_DUP_DOWNLOAD,
-    TR_ERROR_IO_CHECKSUM,
-    TR_ERROR_IO_OTHER,
-
-    /* tracker errors */
-    TR_ERROR_TC_ERROR = -300,
-    TR_ERROR_TC_WARNING,
-
-    /* peer errors */
-    TR_ERROR_PEER_MESSAGE = -400
-}
-tr_errno;
-
 typedef enum
 {
     TR_LOCKFILE_SUCCESS = 0,
     TR_LOCKFILE_EOPEN,
     TR_LOCKFILE_ELOCK
-} tr_lockfile_state_t;
+}
+tr_lockfile_state_t;
 
 tr_torrent_status tr_torrentGetStatus( tr_torrent * );
 
@@ -1250,8 +1220,8 @@ typedef struct tr_stat
         becomes unreachable. */
     char *  scrapeURL;
 
-    /** The error status for this torrent.  0 means everything's fine. */
-    tr_errno    error;
+    /** The errno status for this torrent.  0 means everything's fine. */
+    int     error;
 
     /** Typically an error string returned from the tracker. */
     char    errorString[128];

@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <errno.h>
 #include <libgen.h> /* basename */
 #include "transmission.h"
 #include "bencode.h"
@@ -138,10 +139,11 @@ tr_ctorSetMetainfoFromHash( tr_ctor *    ctor,
     int          err;
     const char * filename;
 
-    if( ( filename = tr_sessionFindTorrentFile( ctor->handle, hashString ) ) )
-        err = tr_ctorSetMetainfoFromFile( ctor, filename );
+    filename = tr_sessionFindTorrentFile( ctor->handle, hashString );
+    if( !filename )
+        err = EINVAL;
     else
-        err = TR_ERROR;
+        err = tr_ctorSetMetainfoFromFile( ctor, filename );
 
     return err;
 }

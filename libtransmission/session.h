@@ -132,11 +132,4 @@ void         tr_globalUnlock( tr_session * );
 
 int          tr_globalIsLocked( const tr_session * );
 
-
-#define TR_ERROR_IS_IO( e ) ( TR_ERROR_IO_PARENT <= ( e ) && ( e ) <=\
-                              TR_ERROR_IO_OTHER )
-#define TR_ERROR_IS_TC( e ) ( TR_ERROR_TC_ERROR <= ( e ) && ( e ) <=\
-                              TR_ERROR_TC_WARNING )
-
-
 #endif

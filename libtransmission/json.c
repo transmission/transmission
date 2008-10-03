@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <errno.h>
 #include <string.h>
 #include <stdio.h> /* printf */
 
@@ -153,7 +154,7 @@ tr_jsonParse( const void *     vbuf,
         ++buf;
 
     if( buf != bufend )
-        err = TR_ERROR;
+        err = EILSEQ;
 
     if( setme_end )
         *setme_end = (const uint8_t*) buf;

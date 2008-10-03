@@ -53,7 +53,7 @@ typedef struct
     uint32_t         offset; /* for GOT_BLOCK */
     uint32_t         length; /* for GOT_BLOCK + GOT_DATA */
     float            progress; /* for TR_PEER_PEER_PROGRESS */
-    tr_errno         err; /* for TR_PEER_GOT_ERROR */
+    int              err; /* errno for TR_PEER_GOT_ERROR */
 }
 tr_peer_event;
 

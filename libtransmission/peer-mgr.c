@@ -989,18 +989,27 @@ peerCallbackFunc( void * vpeer,
         }
 
         case TR_PEER_ERROR:
-            if( TR_ERROR_IS_IO( e->err ) )
-            {
-                t->tor->error = e->err;
-                tr_strlcpy( t->tor->errorString, tr_errorString(
-                               e->err ), sizeof( t->tor->errorString ) );
-                tr_torrentStop( t->tor );
-            }
-            else if( e->err == TR_ERROR_ASSERT )
+            if( e->err == EINVAL )
             {
                 addStrike( t, peer );
+                peer->doPurge = 1;
             }
-            peer->doPurge = 1;
+            else if( ( e->err == EPROTO )
+                  || ( e->err == ERANGE )
+                  || ( e->err == EMSGSIZE )
+                  || ( e->err == ENOTCONN ) )
+            {
+                /* some protocol error from the peer */
+                peer->doPurge = 1;
+            }
+            else /* a local error, such as an IO error */
+            {
+                t->tor->error = e->err;
+                tr_strlcpy( t->tor->errorString,
+                            tr_strerror( t->tor->error ),
+                            sizeof( t->tor->errorString ) );
+                tr_torrentStop( t->tor );
+            }
             break;
 
         default:

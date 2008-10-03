@@ -100,7 +100,12 @@ static struct tr_fd_s * gFd = NULL;
 ****
 ***/
 
-static tr_errno
+/**
+ * returns 0 on success, or an errno value on failure.
+ * errno values include ENOENT if the parent folder doesn't exist,
+ * plus the errno values set by tr_mkdirp() and open().
+ */
+static int
 TrOpenFile( int          i,
             const char * folder,
             const char * torrentFile,
@@ -113,7 +118,7 @@ TrOpenFile( int          i,
 
     /* confirm the parent folder exists */
     if( stat( folder, &sb ) || !S_ISDIR( sb.st_mode ) )
-        return TR_ERROR_IO_PARENT;
+        return ENOENT;
 
     /* create subfolders, if any */
     tr_buildPath ( filename, sizeof( filename ), folder, torrentFile, NULL );
@@ -123,7 +128,7 @@ TrOpenFile( int          i,
         const int err = tr_mkdirp( dirname( tmp ), 0777 ) ? errno : 0;
         tr_free( tmp );
         if( err )
-            return tr_ioErrorFromErrno( err );
+            return err;
     }
 
     /* open the file */
@@ -140,10 +145,10 @@ TrOpenFile( int          i,
         const int err = errno;
         tr_err( _( "Couldn't open \"%1$s\": %2$s" ), filename,
                tr_strerror( err ) );
-        return tr_ioErrorFromErrno( err );
+        return err;
     }
 
-    return TR_OK;
+    return 0;
 }
 
 static int
@@ -172,6 +177,7 @@ fileIsCheckedOut( const struct tr_openfile * o )
     return fileIsOpen( o ) && o->isCheckedOut;
 }
 
+/* returns an fd on success, or a -1 on failure and sets errno */
 int
 tr_fdFileCheckout( const char * folder,
                    const char * torrentFile,
@@ -274,11 +280,11 @@ tr_fdFileCheckout( const char * folder,
     o = &gFd->open[winner];
     if( !fileIsOpen( o ) )
     {
-        const tr_errno err = TrOpenFile( winner, folder, torrentFile, write );
-        if( err )
-        {
+        const int err = TrOpenFile( winner, folder, torrentFile, write );
+        if( err ) {
             tr_lockUnlock( gFd->lock );
-            return err;
+            errno = err;
+            return -1;
         }
 
         dbgmsg( "opened '%s' in slot %d, write %c", filename, winner,

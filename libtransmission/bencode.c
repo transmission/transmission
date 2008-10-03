@@ -80,28 +80,28 @@ tr_bencParseInt( const uint8_t *  buf,
                  const uint8_t ** setme_end,
                  int64_t *        setme_val )
 {
-    int          err = TR_OK;
+    int          err = 0;
     char *       endptr;
     const void * begin;
     const void * end;
     int64_t      val;
 
     if( buf >= bufend )
-        return TR_ERROR;
+        return EILSEQ;
     if( *buf != 'i' )
-        return TR_ERROR;
+        return EILSEQ;
 
     begin = buf + 1;
     end = memchr( begin, 'e', ( bufend - buf ) - 1 );
     if( end == NULL )
-        return TR_ERROR;
+        return EILSEQ;
 
     errno = 0;
     val = strtoll( begin, &endptr, 10 );
     if( errno || ( endptr != end ) ) /* incomplete parse */
-        err = TR_ERROR;
+        err = EILSEQ;
     else if( val && *(const char*)begin == '0' ) /* no leading zeroes! */
-        err = TR_ERROR;
+        err = EILSEQ;
     else
     {
         *setme_end = end + 1;
@@ -129,27 +129,27 @@ tr_bencParseStr( const uint8_t *  buf,
     char *       endptr;
 
     if( buf >= bufend )
-        return TR_ERROR;
+        return EILSEQ;
 
     if( !isdigit( *buf  ) )
-        return TR_ERROR;
+        return EILSEQ;
 
     end = memchr( buf, ':', bufend - buf );
     if( end == NULL )
-        return TR_ERROR;
+        return EILSEQ;
 
     errno = 0;
     len = strtoul( (const char*)buf, &endptr, 10 );
     if( errno || endptr != end )
-        return TR_ERROR;
+        return EILSEQ;
 
     if( (const uint8_t*)end + 1 + len > bufend )
-        return TR_ERROR;
+        return EILSEQ;
 
     *setme_end = end + 1 + len;
     *setme_str = end + 1;
     *setme_strlen = len;
-    return TR_OK;
+    return 0;
 }
 
 /* set to 1 to help expose bugs with tr_bencListAdd and tr_bencDictAdd */
@@ -239,7 +239,7 @@ tr_bencParseImpl( const void *     buf_in,
 
             node = getNode( top, parentStack, TYPE_INT );
             if( !node )
-                return TR_ERROR;
+                return EILSEQ;
 
             tr_bencInitInt( node, val );
             buf = end;
@@ -251,7 +251,7 @@ tr_bencParseImpl( const void *     buf_in,
         {
             tr_benc * node = getNode( top, parentStack, TYPE_LIST );
             if( !node )
-                return TR_ERROR;
+                return EILSEQ;
             tr_bencInit( node, TYPE_LIST );
             tr_ptrArrayAppend( parentStack, node );
             ++buf;
@@ -260,7 +260,7 @@ tr_bencParseImpl( const void *     buf_in,
         {
             tr_benc * node = getNode( top, parentStack, TYPE_DICT );
             if( !node )
-                return TR_ERROR;
+                return EILSEQ;
             tr_bencInit( node, TYPE_DICT );
             tr_ptrArrayAppend( parentStack, node );
             ++buf;
@@ -270,14 +270,14 @@ tr_bencParseImpl( const void *     buf_in,
             tr_benc * node;
             ++buf;
             if( tr_ptrArrayEmpty( parentStack ) )
-                return TR_ERROR;
+                return EILSEQ;
 
             node = tr_ptrArrayBack( parentStack );
             if( tr_bencIsDict( node ) && ( node->val.l.count % 2 ) )
             {
                 /* odd # of children in dict */
                 tr_bencFree( &node->val.l.vals[--node->val.l.count] );
-                return TR_ERROR;
+                return EILSEQ;
             }
 
             tr_ptrArrayPop( parentStack );
@@ -297,7 +297,7 @@ tr_bencParseImpl( const void *     buf_in,
 
             node = getNode( top, parentStack, TYPE_STR );
             if( !node )
-                return TR_ERROR;
+                return EILSEQ;
 
             tr_bencInitStr( node, str, str_len );
             buf = end;
@@ -1414,21 +1414,22 @@ saveFile( const char * filename,
           const char * content,
           size_t       len )
 {
-    int    err = TR_OK;
+    int    err = 0;
     FILE * out = NULL;
 
     out = fopen( filename, "wb+" );
+
     if( !out )
     {
+        err = errno;
         tr_err( _( "Couldn't open \"%1$s\": %2$s" ),
-               filename, tr_strerror( errno ) );
-        err = TR_EINVALID;
+                filename, tr_strerror( errno ) );
     }
     else if( fwrite( content, sizeof( char ), len, out ) != (size_t)len )
     {
+        err = errno;
         tr_err( _( "Couldn't save file \"%1$s\": %2$s" ),
                filename, tr_strerror( errno ) );
-        err = TR_EINVALID;
     }
 
     if( !err )
@@ -1470,27 +1471,35 @@ int
 tr_bencLoadFile( const char * filename,
                  tr_benc *    b )
 {
-    int       ret;
+    int       err;
     size_t    contentLen;
-    uint8_t * content = tr_loadFile( filename, &contentLen );
+    uint8_t * content;
 
-    ret = content ? tr_bencLoad( content, contentLen, b, NULL )
-          : TR_ERROR_IO_OTHER;
+    content = tr_loadFile( filename, &contentLen );
+    if( !content )
+        err = errno;
+    else
+        err = tr_bencLoad( content, contentLen, b, NULL );
+
     tr_free( content );
-    return ret;
+    return err;
 }
 
 int
 tr_bencLoadJSONFile( const char * filename,
                      tr_benc *    b )
 {
-    int       ret;
-    size_t    contentLen;
-    uint8_t * content = tr_loadFile( filename, &contentLen );
+    int        err;
+    size_t     contentLen;
+    uint8_t  * content;
 
-    ret = content ? tr_jsonParse( content, contentLen, b, NULL )
-          : TR_ERROR_IO_OTHER;
+    content = tr_loadFile( filename, &contentLen );
+    if( !content )
+        err = errno;
+    else
+        err = tr_jsonParse( content, contentLen, b, NULL );
+
     tr_free( content );
-    return ret;
+    return err;
 }
 
