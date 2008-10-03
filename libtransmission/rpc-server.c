@@ -209,40 +209,50 @@ mimetype_guess( const char * path )
 }
 
 #ifdef HAVE_LIBZ
-static void
+static int
 compress_evbuf( struct evbuffer * evbuf )
 {
-    static struct evbuffer * tmp;
-    static z_stream          stream;
-    static unsigned char     buffer[2048];
+    int err = 0;
+    struct evbuffer  * out;
+    static z_stream    stream;
 
-    if( !tmp )
-    {
-        tmp = evbuffer_new( );
-        deflateInit( &stream, Z_BEST_COMPRESSION );
-    }
+    stream.zalloc = Z_NULL;
+    stream.zfree = Z_NULL;
+    stream.opaque = Z_NULL;
+    deflateInit( &stream, Z_DEFAULT_COMPRESSION );
 
-    deflateReset( &stream );
     stream.next_in = EVBUFFER_DATA( evbuf );
     stream.avail_in = EVBUFFER_LENGTH( evbuf );
+    out = evbuffer_new( );
 
-    do
-    {
-        stream.next_out = buffer;
-        stream.avail_out = sizeof( buffer );
-        if( deflate( &stream, Z_FULL_FLUSH ) == Z_OK )
-            evbuffer_add( tmp, buffer, sizeof( buffer ) - stream.avail_out );
-        else
+    while( !err ) {
+        unsigned char buf[1024];
+        int state;
+        stream.next_out = buf;
+        stream.avail_out = sizeof( buf );
+        state = deflate( &stream, Z_FINISH );
+        if( ( state != Z_OK ) && ( state != Z_STREAM_END ) ) {
+            tr_nerr( MY_NAME, _( "Error deflating file: %s" ), zError( err ) );
+            err = state;
+            break;
+        }
+        evbuffer_add( out, buf, sizeof(buf) - stream.avail_out );
+        if( state == Z_STREAM_END )
             break;
     }
-    while( stream.avail_out == 0 );
 
-/*fprintf( stderr, "deflated response from %zu to %zu bytes\n", EVBUFFER_LENGTH(
-  evbuf ), EVBUFFER_LENGTH( tmp ) );*/
-    evbuffer_drain( evbuf, EVBUFFER_LENGTH( evbuf ) );
-    evbuffer_add_buffer( evbuf, tmp );
+    if( !err ) {
+        fprintf( stderr, "deflated response from %zu bytes to %zu\n",
+                 EVBUFFER_LENGTH( evbuf ),
+                 EVBUFFER_LENGTH( out ) );
+        evbuffer_drain( evbuf, EVBUFFER_LENGTH( evbuf ) );
+        evbuffer_add_buffer( evbuf, out );
+    }
+
+    deflateEnd( &stream );
+    evbuffer_free( out );
+    return err;
 }
-
 #endif
 
 static void
@@ -254,12 +264,8 @@ maybe_deflate_response( struct evhttp_request * req,
                                                        "Accept-Encoding" );
     const int    do_deflate = accept_encoding && strstr( accept_encoding,
                                                          "deflate" );
-    if( do_deflate )
-    {
-        evhttp_add_header( req->output_headers, "Content-Encoding",
-                           "deflate" );
-        compress_evbuf( response );
-    }
+    if( do_deflate && !compress_evbuf( response ) )
+        evhttp_add_header( req->output_headers, "Content-Encoding", "deflate" );
 #endif
 }
 
