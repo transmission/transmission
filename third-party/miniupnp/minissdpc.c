@@ -4,9 +4,6 @@
  * copyright (c) 2005-2007 Thomas Bernard
  * This software is subjet to the conditions detailed in the
  * provided LICENCE file. */
-
-#ifndef WIN32
-
 /*#include <syslog.h>*/
 #include <stdio.h>
 #include <string.h>
@@ -107,6 +104,4 @@ getDevicesFromMiniSSDPD(const char * devtype, const char * socketpath)
 	close(s);
 	return devlist;
 }
-
-#endif
 

@@ -1,7 +1,7 @@
-/* $Id: upnpcommands.h,v 1.13 2008/02/18 13:27:24 nanard Exp $ */
+/* $Id: upnpcommands.h,v 1.14 2008/09/25 18:02:50 nanard Exp $ */
 /* Miniupnp project : http://miniupnp.free.fr/
  * Author : Thomas Bernard
- * Copyright (c) 2005-2006 Thomas Bernard
+ * Copyright (c) 2005-2008 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided within this distribution */
 #ifndef __UPNPCOMMANDS_H__
