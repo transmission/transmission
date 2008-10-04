@@ -88,7 +88,7 @@ tr_upnpPulse( tr_upnp * handle,
     {
         struct UPNPDev * devlist;
         errno = 0;
-        devlist = upnpDiscover( 2000, NULL, NULL );
+        devlist = upnpDiscover( 2000, NULL, NULL, 0 );
         if( devlist == NULL )
         {
             tr_ndbg(
