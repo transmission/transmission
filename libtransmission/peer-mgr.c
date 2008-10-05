@@ -1310,38 +1310,39 @@ tr_peerMgrGetPeers( tr_peerMgr *    manager,
                     const uint8_t * torrentHash,
                     tr_pex **       setme_pex )
 {
-    const Torrent *  t = getExistingTorrent( (tr_peerMgr*)manager,
-                                            torrentHash );
-    int              i, peerCount;
-    const tr_peer ** peers;
-    tr_pex *         pex;
-    tr_pex *         walk;
+    int peerCount = 0;
+    const Torrent *  t;
 
     managerLock( manager );
 
-    peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
-    pex = walk = tr_new( tr_pex, peerCount );
-
-    for( i = 0; i < peerCount; ++i, ++walk )
+    t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
+    if( !t )
     {
-        const tr_peer * peer = peers[i];
+        *setme_pex = NULL;
+    }
+    else
+    {
+        int i;
+        const tr_peer ** peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
+        tr_pex * pex = tr_new( tr_pex, peerCount );
+        tr_pex * walk = pex;
 
-        walk->in_addr = peer->in_addr;
+        for( i = 0; i < peerCount; ++i, ++walk )
+        {
+            const tr_peer * peer = peers[i];
+            walk->in_addr = peer->in_addr;
+            walk->port = peer->port;
+            walk->flags = 0;
+            if( peerPrefersCrypto( peer ) ) walk->flags |= ADDED_F_ENCRYPTION_FLAG;
+            if( peer->progress >= 1.0 ) walk->flags |= ADDED_F_SEED_FLAG;
+        }
 
-        walk->port = peer->port;
-
-        walk->flags = 0;
-        if( peerPrefersCrypto( peer ) ) walk->flags |=
-                ADDED_F_ENCRYPTION_FLAG;
-        if( peer->progress >= 1.0 ) walk->flags |= ADDED_F_SEED_FLAG;
+        assert( ( walk - pex ) == peerCount );
+        qsort( pex, peerCount, sizeof( tr_pex ), tr_pexCompare );
+        *setme_pex = pex;
     }
 
-    assert( ( walk - pex ) == peerCount );
-    qsort( pex, peerCount, sizeof( tr_pex ), tr_pexCompare );
-    *setme_pex = pex;
-
     managerUnlock( manager );
-
     return peerCount;
 }
 
