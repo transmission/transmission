@@ -301,14 +301,15 @@ serve_file( struct evhttp_request * req,
         }
         else
         {
-            struct evbuffer * out = evbuffer_new( );
+            struct evbuffer * out;
 
+            errno = error;
+            out = evbuffer_new( );
             evhttp_add_header( req->output_headers, "Content-Type",
                                mimetype_guess( filename ) );
             add_response( req, out, content, content_len );
             evhttp_send_reply( req, HTTP_OK, "OK", out );
 
-            errno = error;
             evbuffer_free( out );
             tr_free( content );
         }
