@@ -197,6 +197,7 @@ new_check_button( const char * mnemonic,
 
 struct spin_idle_data
 {
+    guint       tag;
     gpointer    core;
     GTimer *    last_change;
 };
@@ -210,11 +211,18 @@ spin_idle_data_free( gpointer gdata )
     g_free( data );
 }
 
+static void
+onSpinDestroyed( gpointer     tag,
+                 GObject    * details UNUSED )
+{
+    g_source_remove( GPOINTER_TO_UINT( tag ) );
+}
+
 static gboolean
 spun_cb_idle( gpointer spin )
 {
-    gboolean                keep_waiting = TRUE;
-    GObject *               o = G_OBJECT( spin );
+    gboolean keep_waiting = TRUE;
+    GObject * o = G_OBJECT( spin );
     struct spin_idle_data * data = g_object_get_data( o, IDLE_DATA );
 
     /* has the user stopped making changes? */
@@ -227,6 +235,7 @@ spun_cb_idle( gpointer spin )
         tr_core_set_pref_int( TR_CORE( data->core ), key, value );
 
         /* cleanup */
+        g_object_weak_unref( o, onSpinDestroyed, GUINT_TO_POINTER( data->tag ) );
         g_object_set_data( o, IDLE_DATA, NULL );
         keep_waiting = FALSE;
     }
@@ -248,8 +257,9 @@ spun_cb( GtkSpinButton * w,
         data = g_new( struct spin_idle_data, 1 );
         data->core = core;
         data->last_change = g_timer_new( );
+        data->tag = g_timeout_add( 100, spun_cb_idle, w );
         g_object_set_data_full( o, IDLE_DATA, data, spin_idle_data_free );
-        g_timeout_add( 100, spun_cb_idle, w );
+        g_object_weak_ref( o, onSpinDestroyed, GUINT_TO_POINTER( data->tag ) );
     }
     g_timer_start( data->last_change );
 }
