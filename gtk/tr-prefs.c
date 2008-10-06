@@ -197,9 +197,11 @@ new_check_button( const char * mnemonic,
 
 struct spin_idle_data
 {
-    guint       tag;
-    gpointer    core;
-    GTimer *    last_change;
+    gpointer          core;
+    char            * key;
+    int               value;
+    GTimer          * last_change;
+    GtkSpinButton   * spin;
 };
 
 static void
@@ -208,35 +210,37 @@ spin_idle_data_free( gpointer gdata )
     struct spin_idle_data * data = gdata;
 
     g_timer_destroy( data->last_change );
+    g_free( data->key );
     g_free( data );
 }
 
 static void
-onSpinDestroyed( gpointer     tag,
+onSpinDestroyed( gpointer     gdata,
                  GObject    * details UNUSED )
 {
-    g_source_remove( GPOINTER_TO_UINT( tag ) );
+    struct spin_idle_data * data = gdata;
+    data->spin = NULL;
 }
 
 static gboolean
-spun_cb_idle( gpointer spin )
+spun_cb_idle( gpointer gdata )
 {
     gboolean keep_waiting = TRUE;
-    GObject * o = G_OBJECT( spin );
-    struct spin_idle_data * data = g_object_get_data( o, IDLE_DATA );
+    struct spin_idle_data * data = gdata;
 
     /* has the user stopped making changes? */
     if( g_timer_elapsed( data->last_change, NULL ) > 0.33f )
     {
         /* update the core */
-        const char * key = g_object_get_data( o, PREF_KEY );
-        const int    value = gtk_spin_button_get_value_as_int(
-             GTK_SPIN_BUTTON( spin ) );
-        tr_core_set_pref_int( TR_CORE( data->core ), key, value );
+        tr_core_set_pref_int( TR_CORE( data->core ), data->key, data->value );
 
         /* cleanup */
-        g_object_weak_unref( o, onSpinDestroyed, GUINT_TO_POINTER( data->tag ) );
-        g_object_set_data( o, IDLE_DATA, NULL );
+        if( data->spin ) {
+            GObject * o = G_OBJECT( data->spin );
+            g_object_weak_unref( o, onSpinDestroyed, data );
+            g_object_set_data( o, IDLE_DATA, NULL );
+        }
+        spin_idle_data_free( data );
         keep_waiting = FALSE;
     }
 
@@ -249,7 +253,7 @@ spun_cb( GtkSpinButton * w,
 {
     /* user may be spinning through many values, so let's hold off
        for a moment to keep from flooding the core with changes */
-    GObject *               o = G_OBJECT( w );
+    GObject * o = G_OBJECT( w );
     struct spin_idle_data * data = g_object_get_data( o, IDLE_DATA );
 
     if( data == NULL )
@@ -257,9 +261,11 @@ spun_cb( GtkSpinButton * w,
         data = g_new( struct spin_idle_data, 1 );
         data->core = core;
         data->last_change = g_timer_new( );
-        data->tag = g_timeout_add( 100, spun_cb_idle, w );
-        g_object_set_data_full( o, IDLE_DATA, data, spin_idle_data_free );
-        g_object_weak_ref( o, onSpinDestroyed, GUINT_TO_POINTER( data->tag ) );
+        data->key = g_strdup( g_object_get_data( o, PREF_KEY ) );
+        data->value = gtk_spin_button_get_value_as_int( w );
+        g_timeout_add( 100, spun_cb_idle, data );
+        g_object_set_data( o, IDLE_DATA, data );
+        g_object_weak_ref( o, onSpinDestroyed, data );
     }
     g_timer_start( data->last_change );
 }
