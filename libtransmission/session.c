@@ -29,7 +29,6 @@
 #include "peer-mgr.h"
 #include "platform.h" /* tr_lock */
 #include "port-forwarding.h"
-#include "ratecontrol.h"
 #include "rpc-server.h"
 #include "stats.h"
 #include "torrent.h"

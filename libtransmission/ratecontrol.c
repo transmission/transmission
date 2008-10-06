@@ -41,7 +41,6 @@ struct tr_transfer
 
 struct tr_ratecontrol
 {
-    int                   limit;
     int                   newest;
     struct tr_transfer    transfers[HISTORY_SIZE];
 };
@@ -76,10 +75,7 @@ rateForInterval( const tr_ratecontrol * r,
 tr_ratecontrol*
 tr_rcInit( void )
 {
-    tr_ratecontrol * r = tr_new0( tr_ratecontrol, 1 );
-
-    r->limit = 0;
-    return r;
+    return tr_new0( tr_ratecontrol, 1 );
 }
 
 void
@@ -123,17 +119,3 @@ tr_rcTransferred( tr_ratecontrol * r,
         r->transfers[r->newest].size = size;
     }
 }
-
-void
-tr_rcSetLimit( tr_ratecontrol * r,
-               int              limit )
-{
-    r->limit = limit;
-}
-
-int
-tr_rcGetLimit( const tr_ratecontrol * r )
-{
-    return r->limit;
-}
-

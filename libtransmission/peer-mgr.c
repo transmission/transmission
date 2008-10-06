@@ -31,7 +31,6 @@
 #include "peer-mgr-private.h"
 #include "peer-msgs.h"
 #include "ptrarray.h"
-#include "ratecontrol.h"
 #include "stats.h" /* tr_statsAddDownloaded */
 #include "torrent.h"
 #include "trevent.h"
