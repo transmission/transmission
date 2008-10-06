@@ -1310,9 +1310,13 @@ jsonStringFunc( const tr_benc * val,
                     const UTF8 * tmp = it;
                     UTF32        buf = 0;
                     UTF32 *      u32 = &buf;
-                    ConvertUTF8toUTF32( &tmp, end, &u32, &buf + 1, 0 );
-                    evbuffer_add_printf( data->out, "\\u%04x", buf );
-                    it = tmp - 1;
+                    ConversionResult result = ConvertUTF8toUTF32( &tmp, end, &u32, &buf + 1, 0 );
+                    if( ( result != conversionOK ) && ( tmp == it ) )
+                        ++it; /* it's beyond help; skip it */
+                    else {
+                        evbuffer_add_printf( data->out, "\\u%04x", buf );
+                        it = tmp - 1;
+                    }
                     /*fprintf( stderr, "[\\u%04x]\n", buf );*/
                 }
         }
