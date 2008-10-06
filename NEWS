@@ -13,6 +13,10 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.40
 - GTK+
    + Option to automatically update the blocklist weekly
    + Added off-hour bandwidth scheduling
+- Web Client
+   + The Web Client is now out of beta
+   + Minor display fixes
+   + On iPhone/iPod touch, launching from the home screen will hide the address bar
 
 1.34 (2008/09/16)
 http://trac.transmissionbt.com/query?group=component&milestone=1.34
