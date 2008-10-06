@@ -11,6 +11,7 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 #include <string.h> /* memcpy */
 #include <limits.h> /* INT_MAX */
 
@@ -67,7 +68,7 @@ send_simple_response( struct evhttp_request * req,
     const char *      code_text = tr_webGetResponseStr( code );
     struct evbuffer * body = evbuffer_new( );
 
-    evbuffer_add_printf( body, "<h1>%s</h1>", code_text );
+    evbuffer_add_printf( body, "<h1>%d: %s</h1>", code, code_text );
     if( text )
         evbuffer_add_printf( body, "<h2>%s</h2>", text );
     evhttp_send_reply( req, code, code_text, body );
@@ -144,7 +145,7 @@ handle_upload( struct evhttp_request * req,
                         size_t  body_len;
                         tr_benc top, *args;
 
-                        body += 4;
+                        body += 4; /* walk past the \r\n\r\n */
                         body_len = part_len - ( body - text );
                         if( body_len >= 2
                           && !memcmp( &body[body_len - 2], "\r\n", 2 ) )
@@ -192,12 +193,12 @@ mimetype_guess( const char * path )
         const char *    mime_type;
     } types[] = {
         /* these are just the ones we need for serving clutch... */
-        { "css",  "text/css"                       },
-        { "gif",  "image/gif"                      },
-        { "html", "text/html"                      },
-        { "ico",  "image/vnd.microsoft.icon"       },
-        { "js",   "application/javascript"         },
-        { "png",  "image/png"                      }
+        { "css",  "text/css"                  },
+        { "gif",  "image/gif"                 },
+        { "html", "text/html"                 },
+        { "ico",  "image/vnd.microsoft.icon"  },
+        { "js",   "application/javascript"    },
+        { "png",  "image/png"                 }
     };
     const char * dot = strrchr( path, '.' );
 
@@ -210,20 +211,20 @@ mimetype_guess( const char * path )
 
 #ifdef HAVE_LIBZ
 static int
-compress_evbuf( struct evbuffer * evbuf )
+compress_response( struct evbuffer  * out,
+                   const void       * content,
+                   size_t             content_len )
 {
     int err = 0;
-    struct evbuffer  * out;
-    static z_stream    stream;
+    z_stream stream;
 
     stream.zalloc = Z_NULL;
     stream.zfree = Z_NULL;
     stream.opaque = Z_NULL;
-    deflateInit( &stream, Z_DEFAULT_COMPRESSION );
+    deflateInit( &stream, Z_BEST_COMPRESSION );
 
-    stream.next_in = EVBUFFER_DATA( evbuf );
-    stream.avail_in = EVBUFFER_LENGTH( evbuf );
-    out = evbuffer_new( );
+    stream.next_in = (Bytef*) content;
+    stream.avail_in = content_len;
 
     while( !err ) {
         unsigned char buf[1024];
@@ -242,40 +243,42 @@ compress_evbuf( struct evbuffer * evbuf )
     }
 
     /* if the deflated form is larger, then just use the original */
-    if( !err && ( EVBUFFER_LENGTH( out ) >= EVBUFFER_LENGTH( evbuf ) ) )
+    if( !err && ( EVBUFFER_LENGTH( out ) >= content_len ) )
         err = -1;
 
-    if( !err ) {
+    if( err )
+        evbuffer_add( out, content, content_len );
+    else
         tr_ninf( MY_NAME, "deflated response from %zu bytes to %zu",
-                          EVBUFFER_LENGTH( evbuf ),
+                          content_len,
                           EVBUFFER_LENGTH( out ) );
-        evbuffer_drain( evbuf, EVBUFFER_LENGTH( evbuf ) );
-        evbuffer_add_buffer( evbuf, out );
-    }
 
     deflateEnd( &stream );
-    evbuffer_free( out );
     return err;
 }
 #endif
 
 static void
-maybe_deflate_response( struct evhttp_request * req,
-                        struct evbuffer *       response )
+add_response( struct evhttp_request * req,
+              struct evbuffer *       response,
+              const void *            content,
+              size_t                  content_len )
 {
 #ifdef HAVE_LIBZ
     const char * accept_encoding = evhttp_find_header( req->input_headers,
                                                        "Accept-Encoding" );
     const int    do_deflate = accept_encoding && strstr( accept_encoding,
                                                          "deflate" );
-    if( do_deflate && !compress_evbuf( response ) )
+    if( do_deflate && !compress_response( response, content, content_len ) )
         evhttp_add_header( req->output_headers, "Content-Encoding", "deflate" );
+#else
+    evbuffer_add( response, content, content_len );
 #endif
 }
 
 static void
 serve_file( struct evhttp_request * req,
-            const char *            path )
+            const char *            filename )
 {
     if( req->type != EVHTTP_REQ_GET )
     {
@@ -284,24 +287,30 @@ serve_file( struct evhttp_request * req,
     }
     else
     {
-        const int fd = open( path, O_RDONLY, 0 );
-        if( fd == -1 )
+        size_t content_len;
+        uint8_t * content;
+        const int error = errno;
+
+        errno = 0;
+        content_len = 0;
+        content = tr_loadFile( filename, &content_len );
+
+        if( errno )
         {
             send_simple_response( req, HTTP_NOTFOUND, NULL );
         }
         else
         {
-            struct evbuffer * buf = evbuffer_new( );
-            for( ;; )
-                if( evbuffer_read( buf, fd, INT_MAX ) < 1 )
-                    break;
+            struct evbuffer * out = evbuffer_new( );
+
             evhttp_add_header( req->output_headers, "Content-Type",
-                              mimetype_guess(
-                                  path ) );
-            maybe_deflate_response( req, buf );
-            evhttp_send_reply( req, HTTP_OK, "OK", buf );
-            evbuffer_free( buf );
-            close( fd );
+                               mimetype_guess( filename ) );
+            add_response( req, out, content, content_len );
+            evhttp_send_reply( req, HTTP_OK, "OK", out );
+
+            errno = error;
+            evbuffer_free( out );
+            tr_free( content );
         }
     }
 }
@@ -336,38 +345,35 @@ handle_rpc( struct evhttp_request * req,
             struct tr_rpc_server *  server )
 {
     int               len = 0;
-    char *            response = NULL;
+    char *            out = NULL;
     struct evbuffer * buf;
 
     if( req->type == EVHTTP_REQ_GET )
     {
         const char * q;
         if( ( q = strchr( req->uri, '?' ) ) )
-            response = tr_rpc_request_exec_uri( server->session,
-                                                q + 1,
-                                                strlen( q + 1 ),
-                                                &len );
+            out = tr_rpc_request_exec_uri( server->session,
+                                           q + 1,
+                                           strlen( q + 1 ),
+                                           &len );
     }
     else if( req->type == EVHTTP_REQ_POST )
     {
-        response = tr_rpc_request_exec_json( server->session,
-                                             EVBUFFER_DATA( req->
-                                                            input_buffer ),
-                                             EVBUFFER_LENGTH( req->
-                                                              input_buffer ),
-                                             &len );
+        out = tr_rpc_request_exec_json( server->session,
+                                        EVBUFFER_DATA( req->input_buffer ),
+                                        EVBUFFER_LENGTH( req->input_buffer ),
+                                        &len );
     }
 
     buf = evbuffer_new( );
-    evbuffer_add( buf, response, len );
-    maybe_deflate_response( req, buf );
+    add_response( req, buf, out, len );
     evhttp_add_header( req->output_headers, "Content-Type",
                        "application/json; charset=UTF-8" );
     evhttp_send_reply( req, HTTP_OK, "OK", buf );
 
     /* cleanup */
     evbuffer_free( buf );
-    tr_free( response );
+    tr_free( out );
 }
 
 static int
@@ -427,12 +433,9 @@ handle_request( struct evhttp_request * req,
         {
             send_simple_response( req, 401, "Unauthorized IP Address" );
         }
-        else if( server->isPasswordEnabled && ( !pass
-                                              || !user
-                                              || strcmp( server->username,
-                                                         user )
-                                              || strcmp( server->password,
-                                                         pass ) ) )
+        else if( server->isPasswordEnabled
+                 && ( !pass || !user || strcmp( server->username, user )
+                                     || strcmp( server->password, pass ) ) )
         {
             evhttp_add_header( req->output_headers,
                                "WWW-Authenticate",
@@ -661,7 +664,9 @@ tr_rpcInit( tr_handle *  session,
     s = tr_new0( tr_rpc_server, 1 );
     s->session = session;
     s->port = port;
-    s->whitelist = tr_strdup( whitelist && *whitelist ? whitelist : TR_DEFAULT_RPC_WHITELIST );
+    s->whitelist = tr_strdup( whitelist && *whitelist
+                              ? whitelist
+                              : TR_DEFAULT_RPC_WHITELIST );
     s->username = tr_strdup( username );
     s->password = tr_strdup( password );
     s->isWhitelistEnabled = isWhitelistEnabled != 0;
@@ -671,4 +676,3 @@ tr_rpcInit( tr_handle *  session,
         tr_runInEventThread( session, startServer, s );
     return s;
 }
-
