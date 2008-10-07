@@ -345,19 +345,19 @@ translate_08_to_09( const char* oldfile,
         const char*   oldkey;
         const char*   newkey;
     } pref_table[] = {
-        { "add-behavior-ipc",       "add-behavior-ipc"                                             },
-        { "add-behavior-standard",  "add-behavior-standard"                                        },
-        { "download-directory",     "default-download-directory"                                   },
-        { "download-limit",         "download-limit"                                               },
-        { "use-download-limit",     "download-limit-enabled"                                       },
-        { "listening-port",         "listening-port"                                               },
-        { "use-nat-traversal",      "nat-traversal-enabled"                                        },
-        { "use-peer-exchange",      "pex-enabled"                                                  },
-        { "ask-quit",               "prompt-before-exit"                                           },
-        { "ask-download-directory", "prompt-for-download-directory"                                },
-        { "use-tray-icon",          "system-tray-icon-enabled"                                     },
-        { "upload-limit",           "upload-limit"                                                 },
-        { "use-upload-limit",       "upload-limit-enabled"                                         }
+        { "add-behavior-ipc",       "add-behavior-ipc"               },
+        { "add-behavior-standard",  "add-behavior-standard"          },
+        { "download-directory",     "default-download-directory"     },
+        { "download-limit",         "download-limit"                 },
+        { "use-download-limit",     "download-limit-enabled"         },
+        { "listening-port",         "listening-port"                 },
+        { "use-nat-traversal",      "nat-traversal-enabled"          },
+        { "use-peer-exchange",      "pex-enabled"                    },
+        { "ask-quit",               "prompt-before-exit"             },
+        { "ask-download-directory", "prompt-for-download-directory"  },
+        { "use-tray-icon",          "system-tray-icon-enabled"       },
+        { "upload-limit",           "upload-limit"                   },
+        { "use-upload-limit",       "upload-limit-enabled"           }
     };
 
     GString * out = g_string_new( NULL );
@@ -404,18 +404,17 @@ translate_keyfile_to_json( const char * old_file,
     gsize      i;
     gsize      length;
 
-    static struct pref_entry
-    {
+    static struct pref_entry {
         const char*   oldkey;
         const char*   newkey;
     } renamed[] = {
-        { "default-download-directory", "download-dir"                                        },
-        { "encrypted-connections-only", "encryption"                                          },
-        { "listening-port",             "peer-port"                                           },
-        { "nat-traversal-enabled",      "port-forwarding-enabled"                             },
-        { "open-dialog-folder",         "open-dialog-dir"                                     },
-        { "watch-folder",               "watch-dir"                                           },
-        { "watch-folder-enabled",       "watch-dir-enabled"                                   }
+        { "default-download-directory", "download-dir"             },
+        { "encrypted-connections-only", "encryption"               },
+        { "listening-port",             "peer-port"                },
+        { "nat-traversal-enabled",      "port-forwarding-enabled"  },
+        { "open-dialog-folder",         "open-dialog-dir"          },
+        { "watch-folder",               "watch-dir"                },
+        { "watch-folder-enabled",       "watch-dir-enabled"        }
     };
 
     keyfile = g_key_file_new( );

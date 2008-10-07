@@ -204,24 +204,22 @@ getStatusString( const tr_stat * torStat )
 
             case TR_STATUS_DOWNLOAD:
                 g_string_append_printf( gstr,
-                                        ngettext(
-                                            "Downloading from %1$'d of %2$'d connected peer",
-                                            "Downloading from %1$'d of %2$'d connected peers",
-                                            torStat->peersConnected ),
-                                        torStat->peersSendingToUs +
-                                        torStat->webseedsSendingToUs,
-                                        torStat->peersConnected +
-                                        torStat->webseedsSendingToUs );
+                    ngettext( "Downloading from %1$'d of %2$'d connected peer",
+                              "Downloading from %1$'d of %2$'d connected peers",
+                              torStat->peersConnected ),
+                    torStat->peersSendingToUs +
+                    torStat->webseedsSendingToUs,
+                    torStat->peersConnected +
+                    torStat->webseedsSendingToUs );
                 break;
 
             case TR_STATUS_SEED:
                 g_string_append_printf( gstr,
-                                        ngettext(
-                                            "Seeding to %1$'d of %2$'d connected peer",
-                                            "Seeding to %1$'d of %2$'d connected peers",
-                                            torStat->peersConnected ),
-                                        torStat->peersGettingFromUs,
-                                        torStat->peersConnected );
+                    ngettext( "Seeding to %1$'d of %2$'d connected peer",
+                              "Seeding to %1$'d of %2$'d connected peers",
+                              torStat->peersConnected ),
+                    torStat->peersGettingFromUs,
+                    torStat->peersConnected );
                 break;
         }
 

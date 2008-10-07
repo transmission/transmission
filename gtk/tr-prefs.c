@@ -128,8 +128,8 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_RPC_ENABLED, TR_DEFAULT_RPC_ENABLED );
     pref_int_set_default    ( PREF_KEY_RPC_PORT, TR_DEFAULT_RPC_PORT );
     pref_string_set_default ( PREF_KEY_RPC_WHITELIST, TR_DEFAULT_RPC_WHITELIST );
-    pref_flag_set_default   ( PREF_KEY_RPC_WHITELIST_ENABLED, TR_DEFAULT_RPC_WHITELIST_ENABLED  );
-
+    pref_flag_set_default   ( PREF_KEY_RPC_WHITELIST_ENABLED,
+                              TR_DEFAULT_RPC_WHITELIST_ENABLED  );
 
     rand = g_rand_new ( );
     for( i = 0; i < 16; ++i )
@@ -829,9 +829,7 @@ webPage( GObject * core )
         page->whitelist_widgets = g_slist_append( page->whitelist_widgets, w );
         v = page->view = GTK_TREE_VIEW( w );
         gtk_tooltips_set_tip( tips, w,
-                              _(
-                                  "IP addresses may use wildcards, such as 192.168.*.*" ),
-                              NULL );
+            _( "IP addresses may use wildcards, such as 192.168.*.*" ), NULL );
         sel = gtk_tree_view_get_selection( v );
         g_signal_connect( sel, "changed",
                           G_CALLBACK( onWhitelistSelectionChanged ), page );

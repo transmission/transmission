@@ -103,9 +103,11 @@ onTrackerSelectionChanged( GtkTreeSelection * sel,
                            gpointer           gpage )
 {
     struct tracker_page * page = gpage;
-    const gboolean        has_selection = gtk_tree_selection_count_selected_rows( sel ) > 0;
-    const int             trackerCount = gtk_tree_model_iter_n_children( GTK_TREE_MODEL( page->store ), NULL );
-    const gboolean        ok_to_remove = !page->gtor || ( trackerCount > 1 );
+    const gboolean has_selection =
+        gtk_tree_selection_count_selected_rows( sel ) > 0;
+    GtkTreeModel * model = GTK_TREE_MODEL( page->store );
+    const int trackerCount = gtk_tree_model_iter_n_children( model, NULL );
+    const gboolean ok_to_remove = !page->gtor || ( trackerCount > 1 );
     gtk_widget_set_sensitive( page->remove_button, has_selection && ok_to_remove );
 }
 

@@ -251,8 +251,8 @@ onMainWindowSizeAllocated( GtkWidget *            window,
                            gpointer         gdata UNUSED )
 {
     const gboolean isMaximized = window->window
-                                 && ( gdk_window_get_state( window->window )
-                                      & GDK_WINDOW_STATE_MAXIMIZED );
+                            && ( gdk_window_get_state( window->window )
+                                 & GDK_WINDOW_STATE_MAXIMIZED );
 
     if( !isMaximized )
     {
@@ -285,8 +285,8 @@ static sig_atomic_t global_sigcount = 0;
 static void
 fatalsig( int sig )
 {
-    static const int SIGCOUNT_MAX = 3; /* revert to default handler after this
-                                         many */
+    /* revert to default handler after this many */
+    static const int SIGCOUNT_MAX = 3;
 
     if( ++global_sigcount >= SIGCOUNT_MAX )
     {
@@ -363,19 +363,17 @@ main( int     argc,
     char *              configDir = NULL;
     tr_lockfile_state_t tr_state;
 
-    GOptionEntry        entries[] = {
-        { "paused",     'p',                                         0, G_OPTION_ARG_NONE,
-          &startpaused,
-          _( "Start with all torrents paused" ), NULL },
+    GOptionEntry entries[] = {
+        { "paused",     'p', 0, G_OPTION_ARG_NONE,
+          &startpaused, _( "Start with all torrents paused" ), NULL },
 #ifdef STATUS_ICON_SUPPORTED
-        { "minimized",  'm',                         0, G_OPTION_ARG_NONE,
+        { "minimized",  'm', 0, G_OPTION_ARG_NONE,
           &startminimized,
           _( "Start minimized in system tray" ), NULL },
 #endif
-        { "config-dir", 'g',         0, G_OPTION_ARG_FILENAME, &configDir,
+        { "config-dir", 'g', 0, G_OPTION_ARG_FILENAME, &configDir,
           _( "Where to look for configuration files" ), NULL },
-        { NULL,                   0, 0,                     0, NULL,
-          NULL, NULL }
+        { NULL, 0,   0, 0, NULL, NULL, NULL }
     };
 
     cbdata = g_new0( struct cbdata, 1 );
@@ -974,9 +972,9 @@ setupdrag( GtkWidget *    widget,
            struct cbdata *data )
 {
     GtkTargetEntry targets[] = {
-        { "STRING",                                 0, 0 },
-        { "text/plain",                             0, 0 },
-        { "text/uri-list",                          0, 0 },
+        { "STRING",          0, 0 },
+        { "text/plain",      0, 0 },
+        { "text/uri-list",   0, 0 },
     };
 
     g_signal_connect( widget, "drag_data_received", G_CALLBACK(
@@ -1519,11 +1517,10 @@ doAction( const char * action_name,
     {
         if( NULL == data->prefs )
         {
-            data->prefs = tr_prefs_dialog_new( G_OBJECT(
-                                                   data->core ), data->wind );
+            data->prefs = tr_prefs_dialog_new( G_OBJECT( data->core ),
+                                               data->wind );
             g_signal_connect( data->prefs, "destroy",
-                              G_CALLBACK(
-                                  gtk_widget_destroyed ), &data->prefs );
+                              G_CALLBACK( gtk_widget_destroyed ), &data->prefs );
             gtk_widget_show( GTK_WIDGET( data->prefs ) );
         }
     }
