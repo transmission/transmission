@@ -70,7 +70,7 @@ send_simple_response( struct evhttp_request * req,
 
     evbuffer_add_printf( body, "<h1>%d: %s</h1>", code, code_text );
     if( text )
-        evbuffer_add_printf( body, "<h2>%s</h2>", text );
+        evbuffer_add_printf( body, "%s", text );
     evhttp_send_reply( req, code, code_text, body );
     evbuffer_free( body );
 }
@@ -320,25 +320,41 @@ static void
 handle_clutch( struct evhttp_request * req,
                struct tr_rpc_server *  server )
 {
-    char * pch;
-    char * subpath;
-    char * filename;
     const char * clutchDir = tr_getClutchDir( server->session );
 
     assert( !strncmp( req->uri, "/transmission/web/", 18 ) );
 
-    subpath = tr_strdup( req->uri + 18 );
-    if(( pch = strchr( subpath, '?' )))
-        *pch = '\0';
+    if( !clutchDir || !*clutchDir )
+    {
+        send_simple_response( req, HTTP_NOTFOUND,
+            "<p>Couldn't find Transmission's web interface files!</p>"
+            "<p>Users: to tell Transmission where to look, "
+            "set the TRANSMISSION_WEB_HOME environmental "
+            "variable to the folder where the web interface's "
+            "index.html is located.</p>"
+            "<p>Package Builders: to set a custom default at compile time, "
+            "#define PACKAGE_DATA_DIR in libtransmission/platform.c "
+            "or tweak tr_getClutchDir() by hand.</p>" );
+    }
+    else
+    {
+        char * pch;
+        char * subpath;
+        char * filename;
 
-    filename = *subpath
-        ? tr_strdup_printf( "%s%s%s", clutchDir, TR_PATH_DELIMITER_STR, subpath )
-        : tr_strdup_printf( "%s%s%s", clutchDir, TR_PATH_DELIMITER_STR, "index.html" );
+        subpath = tr_strdup( req->uri + 18 );
+        if(( pch = strchr( subpath, '?' )))
+            *pch = '\0';
 
-    serve_file( req, filename );
+        filename = *subpath
+            ? tr_strdup_printf( "%s%s%s", clutchDir, TR_PATH_DELIMITER_STR, subpath )
+            : tr_strdup_printf( "%s%s%s", clutchDir, TR_PATH_DELIMITER_STR, "index.html" );
 
-    tr_free( filename );
-    tr_free( subpath );
+        serve_file( req, filename );
+
+        tr_free( filename );
+        tr_free( subpath );
+    }
 }
 
 static void
