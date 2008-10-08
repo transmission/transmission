@@ -239,20 +239,28 @@ add_response( struct evhttp_request * req,
         stream.next_in = (Bytef*) content;
         stream.avail_in = content_len;
 
+        /* allocate space for the raw data and call deflate() just once --
+         * we won't use the deflated data if it's longer than the raw data,
+         * so it's okay to let deflate() run out of output buffer space */
         evbuffer_expand( out, content_len );
         stream.next_out = EVBUFFER_DATA( out );
         stream.avail_out = content_len;
 
         state = deflate( &stream, Z_FINISH );
-        if( state != Z_STREAM_END )
-            evbuffer_add( out, content, content_len );
-        else {
+
+        if( state == Z_STREAM_END )
+        {
             EVBUFFER_LENGTH( out ) = content_len - stream.avail_out;
             tr_ninf( MY_NAME, _( "Deflated response from %zu bytes to %zu" ),
                               content_len,
                               EVBUFFER_LENGTH( out ) );
             evhttp_add_header( req->output_headers,
                                "Content-Encoding", "deflate" );
+        }
+        else
+        {
+            evbuffer_drain( out, EVBUFFER_LENGTH( out ) );
+            evbuffer_add( out, content, content_len );
         }
 
         deflateEnd( &stream );
