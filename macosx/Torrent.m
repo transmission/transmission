@@ -80,8 +80,16 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     if (self)
     {
-        if (!fPublicTorrent)
+        //if the public and private torrent files are the same, then there is no public torrent
+        if ([[self torrentLocation] isEqualToString: path])
+        {
+            fPublicTorrent = NO;
+            [fPublicTorrentLocation release];
+            fPublicTorrentLocation = nil;
+        }
+        else if (!fPublicTorrent)
             [self trashFile: path];
+        else;
     }
     return self;
 }
