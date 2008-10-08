@@ -55,7 +55,7 @@ tr_prefs_init_global( void )
 
     pref_int_set_default    ( PREF_KEY_PEER_SOCKET_TOS,
                               TR_DEFAULT_PEER_SOCKET_TOS );
-    pref_flag_set_default   ( PREF_KEY_ALLOW_HIBERNATION, FALSE );
+    pref_flag_set_default   ( PREF_KEY_INHIBIT_HIBERNATION, FALSE );
     pref_flag_set_default   ( PREF_KEY_BLOCKLIST_ENABLED, TRUE );
     pref_flag_set_default   ( PREF_KEY_BLOCKLIST_UPDATES_ENABLED, TRUE );
 
@@ -377,6 +377,33 @@ torrentPage( GObject * core )
 
     w = new_path_chooser_button( PREF_KEY_DOWNLOAD_DIR, core );
     hig_workarea_add_row( t, &row, _( "_Destination folder:" ), w, NULL );
+
+    hig_workarea_finish( t, &row );
+    return t;
+}
+
+/****
+*****  Desktop Tab
+****/
+
+static GtkWidget*
+desktopPage( GObject * core )
+{
+    int          row = 0;
+    const char * s;
+    GtkWidget *  t;
+    GtkWidget *  w;
+
+    t = hig_workarea_create( );
+    hig_workarea_add_section_title( t, &row, _( "Options" ) );
+
+    s = _( "_Inhibit desktop hibernation when torrents are active" );
+    w = new_check_button( s, PREF_KEY_INHIBIT_HIBERNATION, core );
+    hig_workarea_add_wide_control( t, &row, w );
+
+    s = _( "Show _icon in the desktop Notification Area" );
+    w = new_check_button( s, PREF_KEY_SHOW_TRAY_ICON, core );
+    hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_finish( t, &row );
     return t;
@@ -1366,23 +1393,26 @@ tr_prefs_dialog_new( GObject *   core,
     gtk_container_set_border_width ( GTK_CONTAINER ( n ), GUI_PAD );
 
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                             torrentPage( core ),
-                             gtk_label_new ( _( "Torrents" ) ) );
+                              torrentPage( core ),
+                              gtk_label_new ( _( "Torrents" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                             peerPage( core ),
-                             gtk_label_new ( _( "Peers" ) ) );
+                              peerPage( core ),
+                              gtk_label_new ( _( "Peers" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                             networkPage( core ),
-                             gtk_label_new ( _( "Network" ) ) );
+                              networkPage( core ),
+                              gtk_label_new ( _( "Network" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                             trackerPage( core ),
-                             gtk_label_new ( _( "Trackers" ) ) );
+                              desktopPage( core ),
+                              gtk_label_new ( _( "Desktop" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                             bandwidthPage( core ),
-                             gtk_label_new ( _( "Bandwidth" ) ) );
+                              bandwidthPage( core ),
+                              gtk_label_new ( _( "Bandwidth" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                             webPage( core ),
-                             gtk_label_new ( _( "Web" ) ) );
+                              webPage( core ),
+                              gtk_label_new ( _( "Web" ) ) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              trackerPage( core ),
+                              gtk_label_new ( _( "Trackers" ) ) );
 
     g_signal_connect( d, "response", G_CALLBACK( response_cb ), core );
     gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( d )->vbox ), n );

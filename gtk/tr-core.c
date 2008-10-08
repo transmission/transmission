@@ -586,7 +586,7 @@ prefsChanged( TrCore *      core,
         const uint16_t val = pref_int_get( key );
         tr_sessionSetPeerLimit( tr_core_handle( core ), val );
     }
-    else if( !strcmp( key, PREF_KEY_ALLOW_HIBERNATION ) )
+    else if( !strcmp( key, PREF_KEY_INHIBIT_HIBERNATION ) )
     {
         maybeInhibitHibernation( core );
     }
@@ -682,7 +682,7 @@ tr_core_new( tr_handle * h )
     prefsChanged( core, PREF_KEY_SORT_REVERSED, NULL );
     prefsChanged( core, PREF_KEY_DIR_WATCH_ENABLED, NULL );
     prefsChanged( core, PREF_KEY_MAX_PEERS_GLOBAL, NULL );
-    prefsChanged( core, PREF_KEY_ALLOW_HIBERNATION, NULL );
+    prefsChanged( core, PREF_KEY_INHIBIT_HIBERNATION, NULL );
     g_signal_connect( core, "prefs-changed", G_CALLBACK(
                           prefsChanged ), NULL );
 
@@ -1177,27 +1177,19 @@ tr_core_set_hibernation_allowed( TrCore * core,
 static void
 maybeInhibitHibernation( TrCore * core )
 {
-    gboolean     allowHibernation;
-    tr_handle *  session = tr_core_handle( core );
-    tr_torrent * tor = NULL;
+    gboolean inhibit = pref_flag_get( PREF_KEY_INHIBIT_HIBERNATION );
 
-    /* allow hibernation unless we have active torrents */
-    allowHibernation = TRUE;
-    while( ( tor = tr_torrentNext( session, tor ) ) )
+    if( inhibit )
     {
-        if( tr_torrentGetStatus( tor ) != TR_STATUS_STOPPED )
-        {
-            allowHibernation = FALSE;
-            break;
-        }
+        /* don't inhibit if we've got active torrents */
+        tr_handle *  session = tr_core_handle( core );
+        tr_torrent * tor = NULL;
+        while( ( tor = tr_torrentNext( session, tor ) ) )
+            if( tr_torrentGetStatus( tor ) != TR_STATUS_STOPPED )
+                inhibit = FALSE;
     }
 
-    /* even if we do have active torrents,
-    * maybe allow hibernation anyway... */
-    if( !allowHibernation )
-        allowHibernation = pref_flag_get( PREF_KEY_ALLOW_HIBERNATION );
-
-    tr_core_set_hibernation_allowed( core, allowHibernation );
+    tr_core_set_hibernation_allowed( core, !inhibit );
 }
 
 /**
