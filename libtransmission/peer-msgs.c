@@ -327,8 +327,7 @@ struct tr_peermsgs
     tr_publisher_t *       publisher;
 
     struct evbuffer *      outBlock; /* buffer of the current piece message */
-    struct evbuffer *      outMessages; /* buffer of all the non-piece messages
-                                          */
+    struct evbuffer *      outMessages; /* all the non-piece messages */
 
     struct request_list    peerAskedFor;
     struct request_list    peerAskedForFast;
@@ -889,15 +888,23 @@ pumpRequestQueue( tr_peermsgs * msgs )
 
     while( ( count < max ) && reqListPop( &msgs->clientWillAskFor, &req ) )
     {
+        const tr_block_index_t block =
+            _tr_block( msgs->torrent, req.index, req.offset );
+
         assert( requestIsValid( msgs, &req ) );
         assert( tr_bitfieldHas( msgs->info->have, req.index ) );
 
-        protocolSendRequest( msgs, &req );
-        req.time_requested = now;
-        reqListAppend( &msgs->clientAskedFor, &req );
+        /* don't ask for it if we've already got it... this block may have
+         * come in from a different peer after we cancelled a request for it */
+        if( !tr_cpBlockIsComplete( msgs->torrent->completion, block ) )
+        {
+            protocolSendRequest( msgs, &req );
+            req.time_requested = now;
+            reqListAppend( &msgs->clientAskedFor, &req );
 
-        ++count;
-        ++sent;
+            ++count;
+            ++sent;
+        }
     }
 
     if( sent )
