@@ -341,7 +341,7 @@ handle_clutch( struct evhttp_request * req,
         filename = tr_strdup_printf( "%s%s%s",
                        clutchDir,
                        TR_PATH_DELIMITER_STR,
-                       subpath && *subpath ? subpath : ":index.html" );
+                       subpath && *subpath ? subpath : "index.html" );
 
         serve_file( req, filename );
 
