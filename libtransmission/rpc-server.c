@@ -209,70 +209,54 @@ mimetype_guess( const char * path )
     return "application/octet-stream";
 }
 
-#ifdef HAVE_LIBZ
-static int
-compress_response( struct evbuffer  * out,
-                   const void       * content,
-                   size_t             content_len )
-{
-    int err = 0;
-    z_stream stream;
-
-    stream.zalloc = Z_NULL;
-    stream.zfree = Z_NULL;
-    stream.opaque = Z_NULL;
-    deflateInit( &stream, Z_BEST_COMPRESSION );
-
-    stream.next_in = (Bytef*) content;
-    stream.avail_in = content_len;
-
-    while( !err ) {
-        unsigned char buf[1024];
-        int state;
-        stream.next_out = buf;
-        stream.avail_out = sizeof( buf );
-        state = deflate( &stream, Z_FINISH );
-        if( ( state != Z_OK ) && ( state != Z_STREAM_END ) ) {
-            tr_nerr( MY_NAME, _( "Error deflating file: %s" ), zError( err ) );
-            err = state;
-            break;
-        }
-        evbuffer_add( out, buf, sizeof(buf) - stream.avail_out );
-        if( state == Z_STREAM_END )
-            break;
-    }
-
-    /* if the deflated form is larger, then just use the original */
-    if( !err && ( EVBUFFER_LENGTH( out ) >= content_len ) )
-        err = -1;
-
-    if( err )
-        evbuffer_add( out, content, content_len );
-    else
-        tr_ninf( MY_NAME, "deflated response from %zu bytes to %zu",
-                          content_len,
-                          EVBUFFER_LENGTH( out ) );
-
-    deflateEnd( &stream );
-    return err;
-}
-#endif
-
 static void
 add_response( struct evhttp_request * req,
-              struct evbuffer *       response,
+              struct evbuffer *       out,
               const void *            content,
               size_t                  content_len )
 {
-#ifdef HAVE_LIBZ
-    const char * accept_encoding = evhttp_find_header( req->input_headers,
-                                                       "Accept-Encoding" );
-    const int    do_deflate = accept_encoding && strstr( accept_encoding,
-                                                         "deflate" );
-    if( do_deflate && !compress_response( response, content, content_len ) )
-        evhttp_add_header( req->output_headers, "Content-Encoding", "deflate" );
+#ifndef HAVE_LIBZ
+    evbuffer_add( out, content, content_len );
 #else
-    evbuffer_add( response, content, content_len );
+    const char * key = "Accept-Encoding";
+    const char * encoding = evhttp_find_header( req->input_headers, key );
+    const int do_deflate = encoding && strstr( encoding, "deflate" );
+
+    if( !do_deflate )
+    {
+        evbuffer_add( out, content, content_len );
+    }
+    else
+    {
+        int state;
+        z_stream stream;
+
+        stream.zalloc = Z_NULL;
+        stream.zfree = Z_NULL;
+        stream.opaque = Z_NULL;
+        deflateInit( &stream, Z_BEST_COMPRESSION );
+
+        stream.next_in = (Bytef*) content;
+        stream.avail_in = content_len;
+
+        evbuffer_expand( out, content_len );
+        stream.next_out = EVBUFFER_DATA( out );
+        stream.avail_out = content_len;
+
+        state = deflate( &stream, Z_FINISH );
+        if( state != Z_STREAM_END )
+            evbuffer_add( out, content, content_len );
+        else {
+            EVBUFFER_LENGTH( out ) = content_len - stream.avail_out;
+            tr_ninf( MY_NAME, _( "Deflated response from %zu bytes to %zu" ),
+                              content_len,
+                              EVBUFFER_LENGTH( out ) );
+            evhttp_add_header( req->output_headers,
+                               "Content-Encoding", "deflate" );
+        }
+
+        deflateEnd( &stream );
+    }
 #endif
 }
 
@@ -346,9 +330,10 @@ handle_clutch( struct evhttp_request * req,
         if(( pch = strchr( subpath, '?' )))
             *pch = '\0';
 
-        filename = *subpath
-            ? tr_strdup_printf( "%s%s%s", clutchDir, TR_PATH_DELIMITER_STR, subpath )
-            : tr_strdup_printf( "%s%s%s", clutchDir, TR_PATH_DELIMITER_STR, "index.html" );
+        filename = tr_strdup_printf( "%s%s%s",
+                       clutchDir,
+                       TR_PATH_DELIMITER_STR,
+                       subpath && *subpath ? subpath : ":index.html" );
 
         serve_file( req, filename );
 
