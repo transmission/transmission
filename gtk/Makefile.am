@@ -41,7 +41,6 @@ noinst_HEADERS = \
     tr-core.h \
     tr-core-dbus.h \
     tr-icon.h \
-    tr-io.h \
     tr-prefs.h \
     tr-torrent.h \
     tr-window.h \
@@ -71,7 +70,6 @@ transmission_SOURCES = \
     tracker-list.c \
     tr-core.c \
     tr-icon.c \
-    tr-io.c \
     tr-prefs.c \
     tr-torrent.c \
     tr-window.c \
