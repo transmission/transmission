@@ -4,6 +4,14 @@ if TR_UNSTABLE
 GTK_EXTRA_CPPFLAGS="-DG_DISABLE_DEPRECATED -DGDK_PIXBUF_DISABLE_DEPRECATED -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED -DPANGO_DISABLE_DEPRECATED"
 endif
 
+sexy-marshal.h:	marshal.list
+	glib-genmarshal --prefix=sexy_marshal ./marshal.list --header > sexy-marshal.h
+
+sexy-marshal.c:	marshal.list
+	glib-genmarshal --prefix=sexy_marshal ./marshal.list --body > sexy-marshal.c
+
+
+
 AM_CPPFLAGS = \
     -I$(top_srcdir) \
     -I$(top_srcdir)/third-party/ \
@@ -36,6 +44,7 @@ noinst_HEADERS = \
     notify.h \
     stats.h \
     sexy-icon-entry.h \
+    sexy-marshal.h \
     torrent-cell-renderer.h \
     tracker-list.h \
     tr-core.h \
@@ -65,6 +74,7 @@ transmission_SOURCES = \
     msgwin.c \
     notify.c \
     sexy-icon-entry.c \
+    sexy-marshal.c \
     stats.c \
     torrent-cell-renderer.c \
     tracker-list.c \
@@ -117,11 +127,14 @@ tr-core-dbus.h: $(srcdir)/tr-core-dbus.xml
 	$(DBUS_BINDING_TOOL) --mode=glib-server --prefix=tr_core $< > $(@F)
 
 if WIN32
+
 transmission.res: transmission.rc
 	$(WINDRES) -J rc -i transmission.rc -O coff -o transmission.res
 
 BUILT_SOURCES = \
-	transmission.res
+	sexy-marshal.h \
+	sexy-marshal.c \
+	setransmission.res
 
 CLEANFILES += \
 	transmission.res
@@ -131,5 +144,11 @@ transmission_LDADD += \
 
 transmission_LDFLAGS = \
 	-mwindows
-endif
 
+else
+
+BUILT_SOURCES = \
+	sexy-marshal.h \
+	sexy-marshal.c
+
+endif
