@@ -456,15 +456,11 @@ onBlocklistStatus( TrCore * core UNUSED,
     struct blocklist_data * data = gdata;
 
     gdk_threads_enter( );
-    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG(
-                                                  data->
-                                                  dialog ),
-                                              status );
-    gtk_dialog_set_response_sensitive( GTK_DIALOG(
-                                           data->dialog ),
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( data-> dialog ),
+                                              "%s", status );
+    gtk_dialog_set_response_sensitive( GTK_DIALOG( data->dialog ),
                                        GTK_RESPONSE_CANCEL, !isDone );
-    gtk_dialog_set_response_sensitive( GTK_DIALOG(
-                                           data->dialog ),
+    gtk_dialog_set_response_sensitive( GTK_DIALOG( data->dialog ),
                                        GTK_RESPONSE_CLOSE, isDone );
     if( isDone )
         updateBlocklistText( data->check, core );

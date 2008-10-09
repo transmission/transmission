@@ -250,8 +250,8 @@ confirmRemove( GtkWindow * parent,
                                             "<big><b>%s</b></big>",
                                             primary_text );
     if( secondary_text )
-        gtk_message_dialog_format_secondary_markup( GTK_MESSAGE_DIALOG(
-                                                        d ), secondary_text );
+        gtk_message_dialog_format_secondary_markup( GTK_MESSAGE_DIALOG( d ),
+                                                    "%s", secondary_text );
     gtk_dialog_add_buttons( GTK_DIALOG( d ),
                             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                             ( delete_files ? GTK_STOCK_DELETE :

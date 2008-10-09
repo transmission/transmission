@@ -131,7 +131,7 @@ blocklistThreadFunc( gpointer gcore )
         filename2 = g_strdup_printf( "%s.txt", filename );
         cmd = g_strdup_printf( "zcat %s > %s ", filename, filename2 );
         tr_dbg( "%s", cmd );
-        system( cmd );
+        (void) system( cmd );
         g_free( cmd );
     }
 

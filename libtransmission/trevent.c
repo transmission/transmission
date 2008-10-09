@@ -137,9 +137,9 @@ logFunc( int          severity,
          const char * message )
 {
     if( severity >= _EVENT_LOG_ERR )
-        tr_nerr( "%s", message );
+        tr_err( "%s", message );
     else
-        tr_ndbg( "%s", message );
+        tr_dbg( "%s", message );
 }
 
 static void
