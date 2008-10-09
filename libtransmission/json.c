@@ -98,6 +98,7 @@ callback( void *             vdata,
         }
 
         case JSON_T_NULL:
+            tr_bencInitStr( getNode( data ), "", 0 );
             break;
 
         case JSON_T_INTEGER:
@@ -113,8 +114,8 @@ callback( void *             vdata,
             break;
 
         case JSON_T_STRING:
-            tr_bencInitStr( getNode(
-                                data ), value->vu.str.value,
+            tr_bencInitStr( getNode( data ),
+                            value->vu.str.value,
                             value->vu.str.length );
             break;
 
