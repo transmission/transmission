@@ -6,6 +6,7 @@ m4_define([tr_version_suffix], [+])
 m4_define([tr_version], [tr_version_major.tr_version_minor])
 
 AC_INIT([Transmission], [tr_version], [http://trac.transmissionbt.com/newticket], [transmission])
+AC_CONFIG_MACRO_DIR([m4])
 
 TR_VERSION_MAJOR=tr_version_major
 TR_VERSION_MINOR=tr_version_minor
