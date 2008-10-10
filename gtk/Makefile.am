@@ -8,7 +8,8 @@ sexy-marshal.h:	marshal.list
 	glib-genmarshal --prefix=sexy_marshal ./marshal.list --header > sexy-marshal.h
 
 sexy-marshal.c:	marshal.list
-	glib-genmarshal --prefix=sexy_marshal ./marshal.list --body > sexy-marshal.c
+	echo '#include "sexy-marshal.h"' > sexy-marshal.c
+	glib-genmarshal --prefix=sexy_marshal ./marshal.list --body >> sexy-marshal.c
 
 
 
