@@ -631,10 +631,7 @@ tr_malloc( size_t size )
 void*
 tr_malloc0( size_t size )
 {
-    void * ret = tr_malloc( size );
-
-    memset( ret, 0, size );
-    return ret;
+    return size ? calloc( 1, size ) : NULL;
 }
 
 void
