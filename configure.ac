@@ -53,8 +53,8 @@ AC_SUBST(DBUS_GLIB_MINIMUM)
 AC_PROG_CC
 AC_PROG_CXX
 if test "x$GCC" = "xyes" ; then
-    CFLAGS="-g -Wall -W -Wmissing-prototypes -Wdeclaration-after-statement -O3 -funroll-loops"
-    CXXFLAGS="-g -Wall -W -O3 -funroll-loops"
+    CFLAGS="-g -Wall -Wformat-security -W -Wmissing-prototypes -Wdeclaration-after-statement -O3 -funroll-loops"
+    CXXFLAGS="-g -Wall -Wformat-security -W -O3 -funroll-loops"
 fi
 
 AC_HEADER_STDC
