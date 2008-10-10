@@ -1815,9 +1815,14 @@ peerPulse( void * vmsgs )
                                         req.index ) )
         {
             uint8_t * buf = tr_new( uint8_t, req.length );
-
-            if( !tr_ioRead( msgs->torrent, req.index, req.offset,
-                            req.length, buf ) )
+            const int err = tr_ioRead( msgs->torrent,
+                                       req.index, req.offset, req.length,
+                                       buf );
+            if( err )
+            {
+                fireError( msgs, err );
+            }
+            else
             {
                 tr_peerIo *       io = msgs->io;
                 struct evbuffer * out = msgs->outBlock;
