@@ -993,8 +993,7 @@ peerCallbackFunc( void * vpeer,
                 addStrike( t, peer );
                 peer->doPurge = 1;
             }
-            else if( ( e->err == EPROTO )
-                  || ( e->err == ERANGE )
+            else if( ( e->err == ERANGE )
                   || ( e->err == EMSGSIZE )
                   || ( e->err == ENOTCONN ) )
             {

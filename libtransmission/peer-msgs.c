@@ -1431,7 +1431,7 @@ readBtMessage( tr_peermsgs *     msgs,
     {
         dbgmsg( msgs, "bad packet - BT message #%d with a length of %d",
                 (int)id, (int)msglen );
-        fireError( msgs, EPROTO );
+        fireError( msgs, EMSGSIZE );
         return READ_ERR;
     }
 

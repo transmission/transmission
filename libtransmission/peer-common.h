@@ -57,4 +57,8 @@ typedef struct
 }
 tr_peer_event;
 
+#ifdef WIN32
+ #define EMSGSIZE WSAEMSGSIZE 
+#endif
+
 #endif
