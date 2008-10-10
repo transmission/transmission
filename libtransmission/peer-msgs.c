@@ -25,6 +25,9 @@
 #include "completion.h"
 #include "crypto.h"
 #include "inout.h"
+#ifdef WIN32
+#include "net.h" /* for ECONN */
+#endif
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-mgr-private.h"
