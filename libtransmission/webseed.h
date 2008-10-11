@@ -25,7 +25,9 @@ tr_webseed* tr_webseedNew( struct tr_torrent * torrent,
 void        tr_webseedFree( tr_webseed * );
 
 tr_addreq_t tr_webseedAddRequest( tr_webseed *     w,
-                                  tr_piece_index_t piece );
+                                  uint32_t         index,
+                                  uint32_t         offset,
+                                  uint32_t         length );
 
 /** @return true if a request is being processed, or false if idle */
 int         tr_webseedGetSpeed( const tr_webseed * w,

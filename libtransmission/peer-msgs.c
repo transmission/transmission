@@ -198,36 +198,6 @@ reqListAppend( struct request_list *       list,
     list->requests[list->count - 1] = *req;
 }
 
-static void
-reqListAppendPiece( const tr_torrent *    tor,
-                    struct request_list * list,
-                    tr_piece_index_t      piece )
-{
-    const time_t           now = time( NULL );
-    const size_t           n = tr_torPieceCountBlocks( tor, piece );
-    const tr_block_index_t begin = tr_torPieceFirstBlock( tor, piece );
-    const tr_block_index_t end = begin + n;
-    tr_block_index_t       i;
-
-    if( list->count + n >= list->max )
-        reqListReserve( list, list->max + n );
-
-    for( i = begin; i < end; ++i )
-    {
-        if( !tr_cpBlockIsComplete( tor->completion, i ) )
-        {
-            struct peer_request * req = list->requests + list->count++;
-            req->index = piece;
-            req->offset =
-                ( i * tor->blockSize ) - ( piece * tor->info.pieceSize );
-            req->length = tr_torBlockCountBytes( tor, i );
-            req->time_requested = now;
-            assert( tr_torrentReqIsValid( tor, req->index, req->offset,
-                                          req->length ) );
-        }
-    }
-}
-
 static int
 reqListPop( struct request_list * list,
             struct peer_request * setme )
@@ -243,19 +213,6 @@ reqListPop( struct request_list * list,
     }
 
     return success;
-}
-
-static int
-reqListHasPiece( struct request_list *  list,
-                 const tr_piece_index_t piece )
-{
-    uint16_t i;
-
-    for( i = 0; i < list->count; ++i )
-        if( list->requests[i].index == piece )
-            return 1;
-
-    return 0;
 }
 
 static int
@@ -548,13 +505,13 @@ firePeerGotData( tr_peermsgs * msgs,
 }
 
 static void
-fireCancelledReq( tr_peermsgs *          msgs,
-                  const tr_piece_index_t pieceIndex )
+fireCancelledReq( tr_peermsgs * msgs, const struct peer_request * req )
 {
     tr_peer_event e = blankEvent;
-
     e.eventType = TR_PEER_CANCEL;
-    e.pieceIndex = pieceIndex;
+    e.pieceIndex = req->index;
+    e.offset = req->offset;
+    e.length = req->length;
     publish( msgs, &e );
 }
 
@@ -805,43 +762,9 @@ reqIsValid( const tr_peermsgs * peer,
 }
 
 static int
-requestIsValid( const tr_peermsgs *         peer,
-                const struct peer_request * req )
+requestIsValid( const tr_peermsgs * msgs, const struct peer_request * req )
 {
-    return reqIsValid( peer, req->index, req->offset, req->length );
-}
-
-static void
-tr_peerMsgsCancel( tr_peermsgs * msgs,
-                   uint32_t      pieceIndex )
-{
-    uint16_t              i;
-    struct request_list   tmp = REQUEST_LIST_INIT;
-    struct request_list * src;
-
-    src = &msgs->clientWillAskFor;
-    for( i = 0; i < src->count; ++i )
-        if( src->requests[i].index != pieceIndex )
-            reqListAppend( &tmp, src->requests + i );
-
-    /* swap */
-    reqListClear( &msgs->clientWillAskFor );
-    msgs->clientWillAskFor = tmp;
-    tmp = REQUEST_LIST_INIT;
-
-    src = &msgs->clientAskedFor;
-    for( i = 0; i < src->count; ++i )
-        if( src->requests[i].index == pieceIndex )
-            protocolSendCancel( msgs, src->requests + i );
-        else
-            reqListAppend( &tmp, src->requests + i );
-
-    /* swap */
-    reqListClear( &msgs->clientAskedFor );
-    msgs->clientAskedFor = tmp;
-    tmp = REQUEST_LIST_INIT;
-
-    fireCancelledReq( msgs, pieceIndex );
+    return reqIsValid( msgs, req->index, req->offset, req->length );
 }
 
 static void
@@ -858,7 +781,7 @@ expireOldRequests( tr_peermsgs * msgs )
     {
         const struct peer_request * req = &tmp.requests[i];
         if( req->time_requested < oldestAllowed )
-            tr_peerMsgsCancel( msgs, req->index );
+            tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
     }
     reqListClear( &tmp );
 
@@ -869,7 +792,7 @@ expireOldRequests( tr_peermsgs * msgs )
     {
         const struct peer_request * req = &tmp.requests[i];
         if( req->time_requested < oldestAllowed )
-            tr_peerMsgsCancel( msgs, req->index );
+            tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
     }
     reqListClear( &tmp );
 }
@@ -925,19 +848,20 @@ static int
 requestQueueIsFull( const tr_peermsgs * msgs )
 {
     const int req_max = msgs->maxActiveRequests;
-
     return msgs->clientWillAskFor.count >= req_max;
 }
 
 tr_addreq_t
 tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
-                       tr_piece_index_t piece )
+                       uint32_t         index,
+                       uint32_t         offset,
+                       uint32_t         length )
 {
     struct peer_request req;
 
     assert( msgs );
     assert( msgs->torrent );
-    assert( piece < msgs->torrent->info.pieceCount );
+    assert( reqIsValid( msgs, index, offset, length ) );
 
     /**
     ***  Reasons to decline the request
@@ -951,20 +875,24 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
     }
 
     /* peer doesn't have this piece */
-    if( !tr_bitfieldHas( msgs->info->have, piece ) )
+    if( !tr_bitfieldHas( msgs->info->have, index ) )
         return TR_ADDREQ_MISSING;
 
     /* peer's queue is full */
-    if( requestQueueIsFull( msgs ) )
-    {
+    if( requestQueueIsFull( msgs ) ) {
         dbgmsg( msgs, "declining request because we're full" );
         return TR_ADDREQ_FULL;
     }
 
     /* have we already asked for this piece? */
-    if( reqListHasPiece( &msgs->clientAskedFor, piece )
-      || reqListHasPiece( &msgs->clientWillAskFor, piece ) )
-    {
+    req.index = index;
+    req.offset = offset;
+    req.length = length;
+    if( reqListFind( &msgs->clientAskedFor, &req ) != -1 ) {
+        dbgmsg( msgs, "declining because it's a duplicate" );
+        return TR_ADDREQ_DUPLICATE;
+    }
+    if( reqListFind( &msgs->clientWillAskFor, &req ) != -1 ) {
         dbgmsg( msgs, "declining because it's a duplicate" );
         return TR_ADDREQ_DUPLICATE;
     }
@@ -973,9 +901,9 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
     ***  Accept this request
     **/
 
-    dbgmsg( msgs, "added req for piece %lu", (unsigned long)piece );
+    dbgmsg( msgs, "added req for piece %lu", (unsigned long)index );
     req.time_requested = time( NULL );
-    reqListAppendPiece( msgs->torrent, &msgs->clientWillAskFor, piece );
+    reqListAppend( &msgs->clientWillAskFor, &req );
     return TR_ADDREQ_OK;
 }
 
@@ -989,17 +917,43 @@ cancelAllRequestsToPeer( tr_peermsgs * msgs )
     msgs->clientAskedFor = REQUEST_LIST_INIT;
     msgs->clientWillAskFor = REQUEST_LIST_INIT;
 
-    for( i = 0; i < a.count; ++i )
-        fireCancelledReq( msgs, a.requests[i].index );
+    for( i=0; i<a.count; ++i )
+        fireCancelledReq( msgs, &a.requests[i] );
 
-    for( i = 0; i < b.count; ++i )
-    {
-        fireCancelledReq( msgs, b.requests[i].index );
+    for( i = 0; i < b.count; ++i ) {
+        fireCancelledReq( msgs, &b.requests[i] );
         protocolSendCancel( msgs, &b.requests[i] );
     }
 
     reqListClear( &a );
     reqListClear( &b );
+}
+
+void
+tr_peerMsgsCancel( tr_peermsgs * msgs,
+                   uint32_t      pieceIndex,
+                   uint32_t      offset,
+                   uint32_t      length )
+{
+    struct peer_request req;
+
+    assert( msgs != NULL );
+    assert( length > 0 );
+
+    /* have we asked the peer for this piece? */
+    req.index = pieceIndex;
+    req.offset = offset;
+    req.length = length;
+
+    /* if it's only in the queue and hasn't been sent yet, free it */
+    if( !reqListRemove( &msgs->clientWillAskFor, &req ) )
+        fireCancelledReq( msgs, &req );
+
+    /* if it's already been sent, send a cancel message too */
+    if( !reqListRemove( &msgs->clientAskedFor, &req ) ) {
+        protocolSendCancel( msgs, &req );
+        fireCancelledReq( msgs, &req );
+    }
 }
 
 /**
