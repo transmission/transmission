@@ -4,7 +4,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 http://trac.transmissionbt.com/query?group=component&milestone=1.40
 - All Platforms
    + Rewritten bandwidth management code
-   + Lazy bitfields
+   + Lazy bitfields (always on)
    + Support compression when serving Web Interface content and RPC responses
    + Simplify the RPC whitelist
 - Mac
