@@ -3414,7 +3414,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
 {
-    NSMutableArray * idents =  [NSArray arrayWithObjects:
+    NSMutableArray * idents =  [NSMutableArray arrayWithObjects:
                                 TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_REMOVE,
                                 NSToolbarSeparatorItemIdentifier,
                                 TOOLBAR_PAUSE_RESUME_ALL,
