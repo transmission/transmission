@@ -10,18 +10,10 @@
 PEERID_PREFIX="-TR134Z-"
 USERAGENT_PREFIX="1.34+"
 
-
 SVN_REVISION=`find ./macosx ./libtransmission -name "*\.[chmp]" -o -name "*\.cpp" -o -name "*\.po" -o -name "*\.sh" | \
               xargs grep "\$Id:" | \
               grep -v third-party | \
               cut -d"$Id:" -f3 | cut -d" " -f3 | sort -n | tail -n 1`
-
-if [[ "x${PEERID_PREFIX//0-/}" != "x$PEERID_PREFIX" ]]
-then
-    STABLE_RELEASE=yes
-else
-    STABLE_RELEASE=no
-fi
   
 # Generate files to be included: only overwrite them if changed so make
 # won't rebuild everything unless necessary
@@ -34,27 +26,17 @@ replace_if_differs ()
     fi
 }
 
-# Generate version.mk
-cat > macosx/version.mk.new << EOF
-VERSION_REVISION    = "$SVN_REVISION"
-VERSION_STRING      = "$USERAGENT_PREFIX ($SVN_REVISION)"
-STABLE_RELEASE      = "$STABLE_RELEASE"
-EOF
-replace_if_differs macosx/version.mk.new macosx/version.mk
-
 # Generate version.h
 cat > libtransmission/version.h.new << EOF
-#define PEERID_PREFIX         "$PEERID_PREFIX"
-#define USERAGENT_PREFIX      "$USERAGENT_PREFIX"
-#define SVN_REVISION          "$SVN_REVISION"
-#define SHORT_VERSION_STRING  "$USERAGENT_PREFIX"
-#define LONG_VERSION_STRING   "$USERAGENT_PREFIX ($SVN_REVISION)"
+#define PEERID_PREFIX             "$PEERID_PREFIX"
+#define USERAGENT_PREFIX          "$USERAGENT_PREFIX"
+#define SVN_REVISION              "$SVN_REVISION"
+#define SHORT_VERSION_STRING      "$USERAGENT_PREFIX"
+#define LONG_VERSION_STRING       "$USERAGENT_PREFIX ($SVN_REVISION)"
+
+#define VERSION_STRING_INFOPLIST  $USERAGENT_PREFIX
+#define BUNDLE_VERSION_INFOPLIST  $SVN_REVISION
 EOF
 replace_if_differs libtransmission/version.h.new libtransmission/version.h
-
-# Generate Info.plist from Info.plist.in
-sed -e "s/%%BUNDLE_VERSION%%/$SVN_REVISION/" -e "s/%%SHORT_VERSION_STRING%%/$USERAGENT_PREFIX/" \
-        < macosx/Info.plist.in > macosx/Info.plist.new
-replace_if_differs macosx/Info.plist.new macosx/Info.plist
 
 exit 0
