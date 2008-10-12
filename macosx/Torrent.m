@@ -557,8 +557,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             [self updateFileStat];
             
             //determine amount needed
-            int i;
-            for (i = 0; i < [self fileCount]; i++)
+            for (int i = 0; i < [self fileCount]; i++)
             {
                 if (tr_torrentGetFileDL(fHandle, i))
                 {
@@ -791,8 +790,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         capacity += fInfo->trackers[count-1].tier + 1;
     NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: capacity];
     
-    int i, tier = -1;
-    for (i = 0; i < count; i++)
+    for (int i = 0, tier = -1; i < count; i++)
     {
         if (separators && tier != fInfo->trackers[i].tier)
         {
@@ -1000,12 +998,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSArray *) peers
 {
-    int totalPeers, i;
+    int totalPeers;
     tr_peer_stat * peers = tr_torrentPeers(fHandle, &totalPeers);
     
     NSMutableArray * peerDicts = [NSMutableArray arrayWithCapacity: totalPeers];
     
-    for (i = 0; i < totalPeers; i++)
+    for (int i = 0; i < totalPeers; i++)
     {
         tr_peer_stat * peer = &peers[i];
         NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 9];
@@ -1038,12 +1036,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSArray *) webSeeds
 {
-    int webSeedCount = fInfo->webseedCount, i;
+    const int webSeedCount = fInfo->webseedCount;
     NSMutableArray * webSeeds = [NSMutableArray arrayWithCapacity: webSeedCount];
     
     float * dlSpeeds = tr_torrentWebSpeeds(fHandle);
     
-    for (i = 0; i < webSeedCount; i++)
+    for (int i = 0; i < webSeedCount; i++)
     {
         NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 2];
         
@@ -1445,14 +1443,14 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     NSIndexSet * indexSet = [node indexes];
     
-    if (![node isFolder])
+    if ([indexSet count] == 1)
         return fFileStat[[indexSet firstIndex]].progress;
     
     uint64_t have = 0;
-    int index;
-    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (int index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         have += fFileStat[index].bytesCompleted;
     
+    NSAssert([node size], @"director in torrent file has size 0");
     return (float)have / [node size];
 }
 
@@ -1472,8 +1470,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (!fFileStat)
         [self updateFileStat];
     
-    int index;
-    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (int index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         if (fFileStat[index].progress < 1.0)
             return YES;
     return NO;
@@ -1482,8 +1479,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (int) checkForFiles: (NSIndexSet *) indexSet
 {
     BOOL onState = NO, offState = NO;
-    int index;
-    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (int index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
         if (tr_torrentGetFileDL(fHandle, index) || ![self canChangeDownloadCheckForFile: index])
             onState = YES;
@@ -1498,13 +1494,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (void) setFileCheckState: (int) state forIndexes: (NSIndexSet *) indexSet
 {
-    NSUInteger count = [indexSet count], i = 0, index;
+    NSUInteger count = [indexSet count];
     tr_file_index_t * files = malloc(count * sizeof(tr_file_index_t));
-    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
-    {
+    for (NSUInteger index = [indexSet firstIndex], i = 0; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index], i++)
         files[i] = index;
-        i++;
-    }
     
     tr_torrentSetFileDLs(fHandle, files, count, state != NSOffState);
     free(files);
@@ -1515,13 +1508,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet
 {
-    NSUInteger count = [indexSet count], i = 0, index;
+    const NSUInteger count = [indexSet count];
     tr_file_index_t * files = malloc(count * sizeof(tr_file_index_t));
-    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
-    {
+    for (NSUInteger index = [indexSet firstIndex], i = 0; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index], i++)
         files[i] = index;
-        i++;
-    }
     
     tr_torrentSetFilePriorities(fHandle, files, count, priority);
     free(files);
@@ -1529,8 +1519,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (BOOL) hasFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet
 {
-    int index;
-    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (int index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         if (priority == tr_torrentGetFilePriority(fHandle, index) && [self canChangeDownloadCheckForFile: index])
             return YES;
     return NO;
@@ -1541,13 +1530,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     BOOL low = NO, normal = NO, high = NO;
     NSMutableSet * priorities = [NSMutableSet setWithCapacity: 3];
     
-    int index, priority;
-    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (int index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
         if (![self canChangeDownloadCheckForFile: index])
             continue;
         
-        priority = tr_torrentGetFilePriority(fHandle, index);
+        int priority = tr_torrentGetFilePriority(fHandle, index);
         if (priority == TR_PRI_LOW)
         {
             if (low)
@@ -1753,10 +1741,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 {
     if ([self isFolder])
     {
-        int count = [self fileCount], i;
+        int count = [self fileCount];
         NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count];
         
-        for (i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             tr_file * file = &fInfo->files[i];
             

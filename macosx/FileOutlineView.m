@@ -139,11 +139,9 @@
     if (visibleRows.length == 0)
         return;
     
-    int col = [self columnWithIdentifier: @"Priority"];
     NSPoint mouseLocation = [self convertPoint: [[self window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil];
     
-    int row;
-    for (row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
+    for (NSInteger row = visibleRows.location, col = [self columnWithIdentifier: @"Priority"]; row < NSMaxRange(visibleRows); row++)
     {
         FilePriorityCell * cell = (FilePriorityCell *)[self preparedCellAtColumn: col row: row];
         

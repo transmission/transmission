@@ -225,8 +225,7 @@ typedef enum
     
     NSIndexSet * indexSet = [fOutline selectedRowIndexes];
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-    int i;
-    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+    for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
     
     [fTorrent setFileCheckState: state forIndexes: itemIndexes];
@@ -237,8 +236,7 @@ typedef enum
 {
     NSIndexSet * indexSet = [fOutline selectedRowIndexes];
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-    int i;
-    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+    for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
     
     [fTorrent setFileCheckState: NSOnState forIndexes: itemIndexes];
@@ -267,8 +265,7 @@ typedef enum
     
     NSIndexSet * indexSet = [fOutline selectedRowIndexes];
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-    int i;
-    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+    for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
     
     [fTorrent setFilePriority: priority forIndexes: itemIndexes];
@@ -279,8 +276,7 @@ typedef enum
 {
     NSString * folder = [fTorrent downloadFolder];
     NSIndexSet * indexes = [fOutline selectedRowIndexes];
-    int i;
-    for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+    for (NSInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
         [[NSWorkspace sharedWorkspace] selectFile: [folder stringByAppendingPathComponent:
             [[fOutline itemAtRow: i] fullPath]] inFileViewerRootedAtPath: nil];
 }
@@ -297,8 +293,7 @@ typedef enum
     {
         NSString * downloadFolder = [fTorrent downloadFolder];
         NSIndexSet * indexSet = [fOutline selectedRowIndexes];
-        int i;
-        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
             if ([[NSFileManager defaultManager] fileExistsAtPath:
                     [downloadFolder stringByAppendingPathComponent: [[[fTorrent fileList] objectAtIndex: i] fullPath]]])
                 return YES;
@@ -312,10 +307,10 @@ typedef enum
         
         NSIndexSet * indexSet = [fOutline selectedRowIndexes];
         NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-        int i, state = ([menuItem tag] == FILE_CHECK_TAG) ? NSOnState : NSOffState;
-        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
             [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
         
+        NSInteger state = ([menuItem tag] == FILE_CHECK_TAG) ? NSOnState : NSOffState;
         return [fTorrent checkForFiles: itemIndexes] != state && [fTorrent canChangeDownloadCheckForFiles: itemIndexes];
     }
     
@@ -326,8 +321,7 @@ typedef enum
         
         NSIndexSet * indexSet = [fOutline selectedRowIndexes];
         NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-        int i;
-        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
             [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
             
         return [fTorrent canChangeDownloadCheckForFiles: itemIndexes];
@@ -343,9 +337,7 @@ typedef enum
         
         //determine which priorities are checked
         NSIndexSet * indexSet = [fOutline selectedRowIndexes];
-        BOOL current = NO, other = NO;
-        int i, priority;
-        
+        NSInteger priority;
         switch ([menuItem tag])
         {
             case FILE_PRIORITY_HIGH_TAG:
@@ -358,20 +350,21 @@ typedef enum
                 priority = TR_PRI_LOW;
         }
         
+        BOOL current = NO, canChange = NO;
         NSIndexSet * fileIndexSet;
-        for (i = [indexSet firstIndex]; i != NSNotFound && (!current || !other); i = [indexSet indexGreaterThanIndex: i])
+        for (NSInteger i = [indexSet firstIndex]; i != NSNotFound && !current; i = [indexSet indexGreaterThanIndex: i])
         {
             fileIndexSet = [[fOutline itemAtRow: i] indexes];
             if (![fTorrent canChangeDownloadCheckForFiles: fileIndexSet])
                 continue;
-            else if ([fTorrent hasFilePriority: priority forIndexes: fileIndexSet])
+            
+            canChange = YES;
+            if ([fTorrent hasFilePriority: priority forIndexes: fileIndexSet])
                 current = YES;
-            else
-                other = YES;
         }
         
         [menuItem setState: current ? NSOnState : NSOffState];
-        return current || other;
+        return canChange;
     }
     
     return YES;

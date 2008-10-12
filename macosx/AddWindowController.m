@@ -289,8 +289,7 @@
 {
     NSMenu * menu = [fGroupPopUp menu];
     
-    int i;
-    for (i = [menu numberOfItems]-1 - 2; i >= 0; i--)
+    for (NSInteger i = [menu numberOfItems]-1 - 2; i >= 0; i--)
         [menu removeItemAtIndex: i];
         
     NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(changeGroupValue:) isSmall: NO];

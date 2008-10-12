@@ -42,8 +42,7 @@
 {
     NSSegmentedControl * control = (NSSegmentedControl *)[self view];
     
-    int i;
-    for (i = 0; i < [control segmentCount]; i++)
+    for (NSInteger i = 0; i < [control segmentCount]; i++)
         [control setEnabled: [[self target] validateToolbarItem:
             [[[NSToolbarItem alloc] initWithItemIdentifier: [fIdentifiers objectAtIndex: i]] autorelease]] forSegment: i];
 }
@@ -56,11 +55,10 @@
     
     [menu setAutoenablesItems: NO];
     
-    NSMenuItem * addItem;
-    int i, count = [(NSSegmentedControl *)[self view] segmentCount];
-    for (i = 0; i < count; i++)
+    const NSInteger count = [(NSSegmentedControl *)[self view] segmentCount];
+    for (NSInteger i = 0; i < count; i++)
     {
-        addItem = [[NSMenuItem alloc] initWithTitle: [labels objectAtIndex: i] action: [self action] keyEquivalent: @""];
+        NSMenuItem * addItem = [[NSMenuItem alloc] initWithTitle: [labels objectAtIndex: i] action: [self action] keyEquivalent: @""];
         [addItem setTarget: [self target]];
         [addItem setTag: i];
         
@@ -77,8 +75,8 @@
 {
     NSMenuItem * menuItem = [super menuFormRepresentation];
     
-    int i, count = [(NSSegmentedControl *)[self view] segmentCount];
-    for (i = 0; i < count; i++)
+    const NSInteger count = [(NSSegmentedControl *)[self view] segmentCount];
+    for (NSInteger i = 0; i < count; i++)
         [[[menuItem submenu] itemAtIndex: i] setEnabled: [[self target] validateToolbarItem:
             [[[NSToolbarItem alloc] initWithItemIdentifier: [fIdentifiers objectAtIndex: i]] autorelease]]];
     

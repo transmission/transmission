@@ -1087,9 +1087,8 @@ typedef enum
     NSString * folder = [torrent downloadFolder];
     NSIndexSet * indexes = [fileOutlineView selectedRowIndexes];
     NSMutableArray * urlArray = [NSMutableArray arrayWithCapacity: [indexes count]];
-
-    int i;
-    for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+    
+    for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
         FileListNode * item = [fileOutlineView itemAtRow: i];
         if ([self canQuickLookFile: item])
@@ -1104,8 +1103,7 @@ typedef enum
     FileOutlineView * fileOutlineView = [fFileController outlineView];
     NSIndexSet * indexes = [fileOutlineView selectedRowIndexes];
     
-    int i;
-    for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+    for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
         if ([self canQuickLookFile: [fileOutlineView itemAtRow: i]])
             return YES;
     
@@ -1120,8 +1118,7 @@ typedef enum
     NSString * folder = [[fTorrents objectAtIndex: 0] downloadFolder];
     NSRange visibleRows = [fileOutlineView rowsInRect: [fileOutlineView bounds]];
     
-    int row;
-    for (row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
+    for (NSUInteger row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
     {
         FileListNode * rowItem = [fileOutlineView itemAtRow: row];
         if ([[folder stringByAppendingPathComponent: [rowItem fullPath]] isEqualToString: fullPath])
@@ -1638,23 +1635,20 @@ typedef enum
 {
     [[self window] makeKeyWindow];
     
-    int i;
+    NSUInteger index = 1;
     if ([[fTorrents objectAtIndex: 0] hasAddedTrackers])
     {
-        for (i = 1; i < [fTrackers count]; i++)
-            if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+        for (; index < [fTrackers count]; index++)
+            if ([[fTrackers objectAtIndex: index] isKindOfClass: [NSNumber class]])
                 break;
     }
     else
-    {
         [fTrackers insertObject: [NSNumber numberWithInt: 0] atIndex: 0];
-        i = 1;
-    }
     
-    [fTrackers insertObject: @"" atIndex: i];
+    [fTrackers insertObject: @"" atIndex: index];
     [fTrackerTable reloadData];
-    [fTrackerTable selectRow: i byExtendingSelection: NO];
-    [fTrackerTable editColumn: 0 row: i withEvent: nil select: YES];
+    [fTrackerTable selectRow: index byExtendingSelection: NO];
+    [fTrackerTable editColumn: 0 row: index withEvent: nil select: YES];
 }
 
 - (void) removeTrackers

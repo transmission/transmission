@@ -148,11 +148,11 @@
 
 - (void) updateLog: (NSTimer *) timer
 {
-    tr_msg_list * messages, * currentMessage;
+    tr_msg_list * messages;
     if ((messages = tr_getQueuedMessages()) == NULL)
         return;
     
-    for (currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
+    for (tr_msg_list * currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
         NSString * name = currentMessage->name != NULL ? [NSString stringWithUTF8String: currentMessage->name]
                             : [[NSProcessInfo processInfo] processName];

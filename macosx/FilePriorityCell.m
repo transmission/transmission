@@ -37,8 +37,7 @@
         [self setControlSize: NSMiniControlSize];
         [self setSegmentCount: 3];
         
-        int i;
-        for (i = 0; i < [self segmentCount]; i++)
+        for (NSInteger i = 0; i < [self segmentCount]; i++)
         {
             [self setLabel: @"" forSegment: i];
             [self setWidth: 9.0 forSegment: i]; //9 is minimum size to get proper look
@@ -105,7 +104,7 @@
     FileListNode * node = [self representedObject];
     NSSet * priorities = [torrent filePrioritiesForIndexes: [node indexes]];
     
-    int count = [priorities count];
+    const NSUInteger count = [priorities count];
     if (fHoverRow && count > 0)
     {
         [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_LOW]] forSegment: 0];

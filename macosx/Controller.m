@@ -634,8 +634,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSAppleEventDescriptor * directObject = [event paramDescriptorForKeyword: keyDirectObject];
     if ([directObject descriptorType] == typeAEList)
     {
-        unsigned i;
-        for (i = 1; i <= [directObject numberOfItems]; i++)
+        for (NSUInteger i = 1; i <= [directObject numberOfItems]; i++)
             if ((urlString = [[directObject descriptorAtIndex: i] stringValue]))
                 break;
     }
@@ -1283,8 +1282,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //reset the order values if necessary
     if (lowestOrderValue < [fTorrents count])
     {
-        int i;
-        for (i = lowestOrderValue; i < [fTorrents count]; i++)
+        for (int i = lowestOrderValue; i < [fTorrents count]; i++)
             [[fTorrents objectAtIndex: i] setOrderValue: i];
     }
     
@@ -1961,10 +1959,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //get count of each type
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
-    int i = -1;
+    int index = -1;
     while ((torrent = [enumerator nextObject]))
     {
-        i++;
+        index++;
         
         //check status
         if ([torrent isActive] && ![torrent isCheckingWaiting])
@@ -2029,7 +2027,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             }
         }
         
-        [indexes addIndex: i];
+        [indexes addIndex: index];
     }
     
     NSArray * allTorrents = [fTorrents objectsAtIndexes: indexes];
@@ -2057,8 +2055,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         allTorrents = [allTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
         
         NSMutableArray * groupTorrents;
-        int oldGroupValue = -2;
-        for (i = 0; i < [allTorrents count]; i++)
+        for (int i = 0, oldGroupValue = -2; i < [allTorrents count]; i++)
         {
             torrent = [allTorrents objectAtIndex: i];
             int groupValue = [torrent groupValue];
@@ -2229,8 +2226,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)
     {
-        int i;
-        for (i = [menu numberOfItems]-1 - 2; i >= 0; i--)
+        for (int i = [menu numberOfItems]-1 - 2; i >= 0; i--)
             [menu removeItemAtIndex: i];
         
         NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroup:) isSmall: NO];
@@ -2239,8 +2235,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     else if (menu == fGroupFilterMenu)
     {
-        int i;
-        for (i = [menu numberOfItems]-1; i >= 3; i--)
+        for (int i = [menu numberOfItems]-1; i >= 3; i--)
             [menu removeItemAtIndex: i];
         
         NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroupFilter:)
@@ -2256,8 +2251,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         const int speedLimitActionValue[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
         
         NSMenuItem * item;
-        int i;
-        for (i = 0; speedLimitActionValue[i] != -1; i++)
+        for (int i = 0; speedLimitActionValue[i] != -1; i++)
         {
             item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%d KB/s",
                     "Action menu -> upload/download limit"), speedLimitActionValue[i]] action: @selector(setQuickLimitGlobal:)
@@ -2276,8 +2270,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         const float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1 };
         
         NSMenuItem * item;
-        int i;
-        for (i = 0; ratioLimitActionValue[i] != -1; i++)
+        for (int i = 0; ratioLimitActionValue[i] != -1; i++)
         {
             item = [[NSMenuItem alloc] initWithTitle: [NSString localizedStringWithFormat: @"%.2f", ratioLimitActionValue[i]]
                     action: @selector(setQuickRatioGlobal:) keyEquivalent: @""];
@@ -2545,8 +2538,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fAutoImportedNames setArray: importedNames];
     
     NSString * file;
-    int i;
-    for (i = [newNames count] - 1; i >= 0; i--)
+    for (int i = [newNames count] - 1; i >= 0; i--)
     {
         file = [newNames objectAtIndex: i];
         if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] != NSOrderedSame)
@@ -2750,8 +2742,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         //get the torrents to move
         NSMutableArray * movingTorrents = [NSMutableArray arrayWithCapacity: [indexes count]];
-        int i;
-        for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+        for (int i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
             [movingTorrents addObject: [fTableView itemAtRow: i]];
         
         //reset groups
@@ -2779,7 +2770,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             //find torrent to place under
             NSArray * groupTorrents = item ? [item torrents] : fDisplayedTorrents;
             Torrent * topTorrent = nil;
-            for (i = newRow-1; i >= 0; i--)
+            for (int i = newRow-1; i >= 0; i--)
             {
                 Torrent * tempTorrent = [groupTorrents objectAtIndex: i];
                 if (![movingTorrents containsObject: tempTorrent])
@@ -2798,7 +2789,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [fTorrents insertObjects: movingTorrents atIndexes: insertIndexes];
             
             //redo order values
-            for (i = 0; i < [fTorrents count]; i++)
+            for (int i = 0; i < [fTorrents count]; i++)
                 [[fTorrents objectAtIndex: i] setOrderValue: i];
         }
         
@@ -4171,8 +4162,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSString * fullPath = [url path];
         NSRange visibleRows = [fTableView rowsInRect: [fTableView bounds]];
         
-        int row;
-        for (row = 0; row < NSMaxRange(visibleRows); row++)
+        for (int row = 0; row < NSMaxRange(visibleRows); row++)
         {
             id item = [fTableView itemAtRow: row];
             if ([item isKindOfClass: [Torrent class]] && [[(Torrent *)item dataLocation] isEqualToString: fullPath])

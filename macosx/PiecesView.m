@@ -130,12 +130,12 @@
     
     NSImage * image = [self image];
     
-    int i, j, index = -1;
+    int index = -1;
     NSRect rect = NSMakeRect(0, 0, fWidth, fWidth);
     BOOL change = NO;
     
-    for (i = 0; i < fAcross; i++)
-        for (j = 0; j < fAcross; j++)
+    for (NSInteger i = 0; i < fAcross; i++)
+        for (NSInteger j = 0; j < fAcross; j++)
         {
             index++;
             if (index >= fNumPieces)
