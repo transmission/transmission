@@ -352,7 +352,7 @@ typedef enum
         
         BOOL current = NO, canChange = NO;
         NSIndexSet * fileIndexSet;
-        for (NSInteger i = [indexSet firstIndex]; i != NSNotFound && !current; i = [indexSet indexGreaterThanIndex: i])
+        for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         {
             fileIndexSet = [[fOutline itemAtRow: i] indexes];
             if (![fTorrent canChangeDownloadCheckForFiles: fileIndexSet])
@@ -360,7 +360,10 @@ typedef enum
             
             canChange = YES;
             if ([fTorrent hasFilePriority: priority forIndexes: fileIndexSet])
+            {
                 current = YES;
+                break;
+            }
         }
         
         [menuItem setState: current ? NSOnState : NSOffState];
