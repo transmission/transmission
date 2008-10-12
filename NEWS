@@ -9,6 +9,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.40
    + Simplify the RPC whitelist
 - Mac
    + Option to automatically update the blocklist weekly
+   + In the file inspector tab, show progress and size for folders
    + Sparkle updated to 1.5
 - GTK+
    + Option to automatically update the blocklist weekly

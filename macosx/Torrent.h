@@ -25,6 +25,8 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
+@class FileListNode;
+
 #define INVALID -99
 
 typedef enum
@@ -240,7 +242,7 @@ typedef enum
 - (void) updateFileStat;
 
 //methods require fileStats to have been updated recently to be accurate
-- (float) fileProgress: (int) index;
+- (float) fileProgress: (FileListNode *) node;
 - (BOOL) canChangeDownloadCheckForFile: (int) index;
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet;
 - (int) checkForFiles: (NSIndexSet *) indexSet;

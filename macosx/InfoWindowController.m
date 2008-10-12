@@ -1631,7 +1631,7 @@ typedef enum
     if (![[NSFileManager defaultManager] fileExistsAtPath: [[torrent downloadFolder] stringByAppendingPathComponent: [item fullPath]]])
         return NO;
     
-    return [item isFolder] || [torrent fileProgress: [[item indexes] firstIndex]] == 1.0;
+    return [item isFolder] || [torrent fileProgress: item] == 1.0;
 }
 
 - (void) addTrackers

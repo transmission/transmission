@@ -1435,12 +1435,25 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fFileStat = tr_torrentFiles(fHandle, NULL);
 }
 
-- (float) fileProgress: (int) index
+- (float) fileProgress: (FileListNode *) node
 {
+    if ([self isComplete])
+        return 1.0;
+    
     if (!fFileStat)
         [self updateFileStat];
-        
-    return fFileStat[index].progress;
+    
+    NSIndexSet * indexSet = [node indexes];
+    
+    if (![node isFolder])
+        return fFileStat[[indexSet firstIndex]].progress;
+    
+    uint64_t have = 0;
+    int index;
+    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+        have += fFileStat[index].bytesCompleted;
+    
+    return (float)have / [node size];
 }
 
 - (BOOL) canChangeDownloadCheckForFile: (int) index
