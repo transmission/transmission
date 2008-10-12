@@ -31,8 +31,7 @@
     int bottomIndex = bottom ? [self numberOfItems] : 0;
     
     NSMenuItem * item;
-    unsigned int i;
-    for (i = [indexes lastIndex]; i != NSNotFound; i = [indexes indexLessThanIndex: i])
+    for (NSUInteger i = [indexes lastIndex]; i != NSNotFound; i = [indexes indexLessThanIndex: i])
     {
         item = [[menu itemAtIndex: i] retain];
         [menu removeItemAtIndex: i];

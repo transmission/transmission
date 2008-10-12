@@ -115,8 +115,7 @@ GroupsController * fGroupsInstance = nil;
 {
     if (index != -1)
     {
-        int i;
-        for (i = 0; i < [fGroups count]; i++)
+        for (NSInteger i = 0; i < [fGroups count]; i++)
             if (index == [[[fGroups objectAtIndex: i] objectForKey: @"Index"] intValue])
                 return i;
     }
@@ -170,7 +169,7 @@ GroupsController * fGroupsInstance = nil;
 - (void) addNewGroup
 {
     //find the lowest index
-    int index;
+    NSInteger index;
     for (index = 0; index < [fGroups count]; index++)
     {
         BOOL found = NO;
@@ -197,8 +196,7 @@ GroupsController * fGroupsInstance = nil;
 - (void) removeGroupWithRowIndexes: (NSIndexSet *) rowIndexes
 {
     NSMutableIndexSet * indexes = [NSMutableIndexSet indexSet];
-    int index;
-    for (index = [rowIndexes firstIndex]; index != NSNotFound; index = [rowIndexes indexGreaterThanIndex: index])
+    for (NSInteger index = [rowIndexes firstIndex]; index != NSNotFound; index = [rowIndexes indexGreaterThanIndex: index])
         [indexes addIndex: [[[fGroups objectAtIndex: index] objectForKey: @"Index"] intValue]];
     
     [fGroups removeObjectsAtIndexes: rowIndexes];
@@ -218,8 +216,7 @@ GroupsController * fGroupsInstance = nil;
     NSArray * selectedGroups = [fGroups objectsAtIndexes: selectedIndexes];
     
     //determine where to move them
-    int i, originalRow = newRow;
-    for (i = [indexes firstIndex]; i < originalRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+    for (NSInteger i = [indexes firstIndex], startRow = newRow; i < startRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
         newRow--;
     
     //remove objects to reinsert
@@ -227,7 +224,7 @@ GroupsController * fGroupsInstance = nil;
     [fGroups removeObjectsAtIndexes: indexes];
     
     //insert objects at new location
-    for (i = 0; i < [movingGroups count]; i++)
+    for (NSInteger i = 0; i < [movingGroups count]; i++)
         [fGroups insertObject: [movingGroups objectAtIndex: i] atIndex: newRow + i];
     
     [movingGroups release];

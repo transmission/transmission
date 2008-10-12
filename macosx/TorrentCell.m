@@ -683,8 +683,7 @@
     NSIndexSet * previousFinishedIndexes = [torrent previousFinishedPieces];
     NSMutableIndexSet * finishedIndexes = [NSMutableIndexSet indexSet];
     
-    int i;
-    for (i = 0; i < pieceCount; i++)
+    for (NSInteger i = 0; i < pieceCount; i++)
     {
         NSColor * pieceColor;
         if (piecesPercent[i] == 1.0)

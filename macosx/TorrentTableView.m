@@ -71,8 +71,7 @@
             [self setOutlineTableColumn: groupColumn];
             
             //remove all unnecessary columns
-            int i;
-            for (i = [[self tableColumns] count]-1; i >= 0; i--)
+            for (NSInteger i = [[self tableColumns] count]-1; i >= 0; i--)
             {
                 NSTableColumn * column = [[self tableColumns] objectAtIndex: i];
                 if (column != groupColumn)
@@ -255,9 +254,7 @@
         return;
     
     NSPoint mouseLocation = [self convertPoint: [[self window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil];
-    
-    NSUInteger row;
-    for (row = rows.location; row < NSMaxRange(rows); row++)
+    for (NSUInteger row = rows.location; row < NSMaxRange(rows); row++)
     {
         if (![[self itemAtRow: row] isKindOfClass: [Torrent class]])
             continue;
@@ -449,8 +446,8 @@
         }
         else
         {
-            int i, group = [item groupIndex];
-            for (i = 0; i < [self numberOfRows]; i++)
+            int group = [item groupIndex];
+            for (NSInteger i = 0; i < [self numberOfRows]; i++)
             {
                 if ([indexSet containsIndex: i])
                     continue;
@@ -473,8 +470,7 @@
     NSIndexSet * selectedIndexes = [self selectedRowIndexes];
     NSMutableArray * values = [NSMutableArray arrayWithCapacity: [selectedIndexes count]];
     
-    NSUInteger i;
-    for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
+    for (NSUInteger i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
         [values addObject: [self itemAtRow: i]];
     
     return values;
@@ -485,8 +481,7 @@
     NSIndexSet * selectedIndexes = [self selectedRowIndexes];
     NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [selectedIndexes count]]; //take a shot at guessing capacity
     
-    NSUInteger i;
-    for (i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
+    for (NSUInteger i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
     {
         id item = [self itemAtRow: i];
         if ([item isKindOfClass: [Torrent class]])
@@ -608,8 +603,7 @@
     
     [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: self];
     
-    NSInteger i;
-    for (i = [fActionMenu numberOfItems]-1; i >= numberOfNonFileItems; i--)
+    for (NSInteger i = [fActionMenu numberOfItems]-1; i >= numberOfNonFileItems; i--)
         [fActionMenu removeItemAtIndex: i];
     
     [fMenuTorrent release];
@@ -629,8 +623,7 @@
         {
             const int speedLimitActionValue[] = { 0, 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
             
-            int i;
-            for (i = 0; speedLimitActionValue[i] != -1; i++)
+            for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
             {
                 item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%d KB/s",
                         "Action menu -> upload/download limit"), speedLimitActionValue[i]] action: @selector(setQuickLimit:)
@@ -663,8 +656,7 @@
         {
             const float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
             
-            int i;
-            for (i = 0; ratioLimitActionValue[i] != -1.0; i++)
+            for (NSInteger i = 0; ratioLimitActionValue[i] != -1.0; i++)
             {
                 item = [[NSMenuItem alloc] initWithTitle: [NSString localizedStringWithFormat: @"%.2f", ratioLimitActionValue[i]]
                         action: @selector(setQuickRatio:) keyEquivalent: @""];
@@ -708,14 +700,13 @@
     NSRect visibleRect = clipRect;
     NSRange rows = [self rowsInRect: visibleRect];
     BOOL start = YES;
-    int i;
     
     if (rows.length > 0)
     {
         //determine what the first row color should be
         if ([[self itemAtRow: rows.location] isKindOfClass: [Torrent class]])
         {
-            for (i = rows.location-1; i>=0; i--)
+            for (NSInteger i = rows.location-1; i>=0; i--)
             {
                 if (![[self itemAtRow: i] isKindOfClass: [Torrent class]])
                     break;
@@ -728,6 +719,7 @@
             rows.length--;
         }
         
+        NSInteger i;
         for (i = rows.location; i < NSMaxRange(rows); i++)
         {
             if (![[self itemAtRow: i] isKindOfClass: [Torrent class]])
@@ -752,7 +744,7 @@
     int numberOfRects = ceil(visibleRect.size.height / height);
     visibleRect.size.height = height;
     
-    for (i=0; i<numberOfRects; i++)
+    for (NSInteger i=0; i<numberOfRects; i++)
     {
         if (!start)
             NSRectFill(visibleRect);
@@ -847,8 +839,7 @@
         [fPiecesBarAnimation release];
     
     NSMutableArray * progressMarks = [NSMutableArray arrayWithCapacity: 16];
-    NSAnimationProgress i;
-    for (i = 0.0625; i <= 1.0; i += 0.0625)
+    for (NSAnimationProgress i = 0.0625; i <= 1.0; i += 0.0625)
         [progressMarks addObject: [NSNumber numberWithFloat: i]];
     
     fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: TOGGLE_PROGRESS_SECONDS animationCurve: NSAnimationEaseIn];

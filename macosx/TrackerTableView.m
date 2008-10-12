@@ -47,7 +47,6 @@
     NSRect visibleRect = clipRect;
     NSRange rows = [self rowsInRect: visibleRect];
     BOOL start = YES;
-    int i;
     
     if (rows.length > 0)
     {
@@ -58,7 +57,7 @@
         {
             if (![[fTrackers objectAtIndex: rows.location] isKindOfClass: [NSNumber class]])
             {
-                for (i = rows.location-1; i>=0; i--)
+                for (NSInteger i = rows.location-1; i>=0; i--)
                 {
                     if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
                         break;
@@ -72,6 +71,7 @@
             }
         }
         
+        NSInteger i;
         for (i = rows.location; i < NSMaxRange(rows); i++)
         {
             if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]] && onLeopard)
@@ -96,7 +96,7 @@
     int numberOfRects = ceil(visibleRect.size.height / height);
     visibleRect.size.height = height;
     
-    for (i=0; i<numberOfRects; i++)
+    for (NSInteger i=0; i<numberOfRects; i++)
     {
         if (!start)
             NSRectFill(visibleRect);

@@ -125,8 +125,7 @@
         }
         
         //remove potentially invalid addresses
-        NSInteger i;
-        for (i = [fTrackers count]-1; i >= 0; i--)
+        for (NSInteger i = [fTrackers count]-1; i >= 0; i--)
         {
             if (!tr_httpIsValidURL([[fTrackers objectAtIndex: i] UTF8String]))
                 [fTrackers removeObjectAtIndex: i];
@@ -413,8 +412,7 @@
     //parse non-empty tracker strings
     tr_tracker_info * trackerInfo = tr_new0(tr_tracker_info, [fTrackers count]);
     
-    NSUInteger i;
-    for (i = 0; i < [fTrackers count]; i++)
+    for (NSUInteger i = 0; i < [fTrackers count]; i++)
         trackerInfo[i].announce = (char *)[[fTrackers objectAtIndex: i] UTF8String];
     
     //store values
