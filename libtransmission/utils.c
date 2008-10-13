@@ -34,12 +34,13 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h> /* usleep, stat */
+#include <unistd.h> /* usleep, stat, getcwd */
 
 #include "event.h"
 
 #ifdef WIN32
- #include <windows.h>   /* for Sleep */
+ #include <direct.h> /* _getcwd */
+ #include <windows.h> /* Sleep */
 #elif defined( __BEOS__ )
  #include <kernel/OS.h>
 #endif
@@ -452,6 +453,17 @@ tr_loadFile( const char * path,
     fclose( file );
     *size = sb.st_size;
     return buf;
+}
+
+char*
+tr_getcwd( char  * buffer,
+           int     maxlen )
+{
+#ifdef WIN32
+    return _getcwd( buffer, maxlen );
+#else
+    return getcwd( buffer, maxlen );
+#endif
 }
 
 int

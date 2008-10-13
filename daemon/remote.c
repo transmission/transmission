@@ -15,8 +15,6 @@
 #include <stdlib.h>
 #include <string.h> /* strcmp */
 
-#include <unistd.h> /* getcwd */
-
 #include <libevent/event.h>
 #include <curl/curl.h>
 
@@ -155,7 +153,7 @@ absolutify( char *       buf,
     else
     {
         char cwd[MAX_PATH_LENGTH];
-        getcwd( cwd, sizeof( cwd ) );
+        tr_getcwd( cwd, sizeof( cwd ) );
         tr_buildPath( buf, len, cwd, path, NULL );
     }
     return buf;

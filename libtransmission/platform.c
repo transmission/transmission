@@ -18,7 +18,7 @@
  #define BEOS_MAX_THREADS 256
 #elif defined( WIN32 )
  #include <windows.h>
- #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_PROFILE */
+ #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_MYDOCUMENTS */
 #else
  #ifdef SYS_DARWIN
   #include <CoreFoundation/CoreFoundation.h>
@@ -38,6 +38,9 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
+#ifdef WIN32
+#include <libgen.h>
+#endif
 #include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h> /* getuid getpid close */
@@ -267,7 +270,7 @@ getHomeDir( void )
         if( !home )
         {
 #ifdef WIN32
-            SHGetFolderPath( NULL, CSIDL_PROFILE, NULL, 0, home );
+            SHGetFolderPath( NULL, CSIDL_MYDOCUMENTS, NULL, 0, home );
 #elif defined( __BEOS__ ) || defined( __AMIGAOS4__ )
             home = tr_strdup( "" );
 #else
@@ -420,7 +423,7 @@ migrateFiles( const tr_handle * handle )
     }
 }
 
-#ifdef SYS_DARWIN
+#if defined(SYS_DARWIN) || defined(WIN32)
  #define RESUME_SUBDIR  "Resume"
  #define TORRENT_SUBDIR "Torrents"
 #else

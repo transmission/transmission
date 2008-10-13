@@ -220,7 +220,7 @@ void
 tr_webRun( tr_session *       session,
            const char *       url,
            const char *       range,
-           tr_web_done_func * done_func,
+           tr_web_done_func   done_func,
            void *             done_func_user_data )
 {
     if( session->web )

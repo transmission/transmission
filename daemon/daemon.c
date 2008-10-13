@@ -18,7 +18,7 @@
 
 #include <fcntl.h> /* open */
 #include <signal.h>
-#include <unistd.h> /* daemon, getcwd */
+#include <unistd.h> /* daemon */
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
@@ -190,7 +190,7 @@ session_init( const char * configDir,
     ****  If neither of those can be found, the TR_DEFAULT fields are used .
     ***/
 
-    getcwd( mycwd, sizeof( mycwd ) );
+    tr_getcwd( mycwd, sizeof( mycwd ) );
     getConfigStr( dict, KEY_DOWNLOAD_DIR,    &downloadDir,       mycwd );
     getConfigInt( dict, KEY_PEX_ENABLED,     &pexEnabled,
                   TR_DEFAULT_PEX_ENABLED );
@@ -467,10 +467,12 @@ main( int     argc,
     const char * password = NULL;
 
     signal( SIGINT, gotsig );
-    signal( SIGQUIT, gotsig );
     signal( SIGTERM, gotsig );
+#ifndef WIN32 
+    signal( SIGQUIT, gotsig );
     signal( SIGPIPE, SIG_IGN );
     signal( SIGHUP, SIG_IGN );
+#endif
 
     readargs( argc, (const char**)argv, &nofork, &configDir, &downloadDir,
               &rpcPort, &whitelist, &authRequired, &username, &password,
@@ -495,7 +497,7 @@ main( int     argc,
                   blocklistEnabled );
 
     while( !closing )
-        sleep( 1 );
+        tr_wait( 1000 ); /* sleep one second */
 
     saveState( mySession );
     printf( "Closing transmission session..." );

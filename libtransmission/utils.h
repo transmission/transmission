@@ -147,6 +147,12 @@ char*          tr_getLogTimeStr( char * buf,
                                  int    buflen );
 
 /**
+ * a portability wrapper around getcwd().
+ */
+char*          tr_getcwd( char  * buffer,
+                          int     maxlen );
+
+/**
  * a portability wrapper around mkdir().
  * On WIN32, the `permissions' argument is unused.
  *

@@ -62,6 +62,69 @@ static const char * configdir    = NULL;
 static const char * sourceFile   = NULL;
 static const char * comment      = NULL;
 
+static const struct tr_option options[] =
+{
+    { 'a', "announce",             "Set the new torrent's announce URL",
+      "a",  1, "<url>"     },
+    { 'b', "blocklist",            "Enable peer blocklists",
+      "b",  0, NULL        },
+    { 'B', "no-blocklist",         "Disable peer blocklists",
+      "B",  0, NULL        },
+    { 'c', "comment",              "Set the new torrent's comment",
+      "c",  1, "<comment>" },
+    { 'd', "downlimit",            "Set max download speed in KB/s",
+      "d",  1, "<speed>"   },
+    { 'D', "no-downlimit",         "Don't limit the download speed",
+      "D",  0, NULL        },
+    { 910, "encryption-required",  "Encrypt all peer connections",
+      "er", 0, NULL        },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections",
+      "ep", 0, NULL        },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections",
+      "et", 0, NULL        },
+    { 'f', "finish",               "Run a script when the torrent finishes",
+      "f", 1, "<script>" },
+    { 'g', "config-dir",           "Where to find configuration files",
+      "g", 1, "<path>" },
+    { 'i', "info",                 "Show torrent details and exit",
+      "i",  0, NULL        },
+    { 'm', "portmap",              "Enable portmapping via NAT-PMP or UPnP",
+      "m",  0, NULL        },
+    { 'M', "no-portmap",           "Disable portmapping",
+      "M",  0, NULL        },
+    { 'n', "new",                  "Create a new torrent",
+      "n", 1, "<source>" },
+    { 'p', "port",
+      "Port for incoming peers (Default: " TR_DEFAULT_PORT_STR ")",
+      "p", 1, "<port>" },
+    { 'r', "private",              "Set the new torrent's 'private' flag",
+      "r",  0, NULL        },
+    { 's', "scrape",               "Scrape the torrent and exit",
+      "s",  0, NULL        },
+    { 't', "tos",
+      "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR
+      ")",
+      "t", 1, "<tos>" },
+    { 'u', "uplimit",              "Set max upload speed in KB/s",
+      "u",  1, "<speed>"   },
+    { 'U', "no-uplimit",           "Don't limit the upload speed",
+      "U",  0, NULL        },
+    { 'v', "verify",               "Verify the specified torrent",
+      "v",  0, NULL        },
+    { 'w', "download-dir",         "Where to save downloaded data",
+      "w",  1, "<path>"    },
+    {   0, NULL,                   NULL,
+        NULL, 0, NULL        }
+};
+
+static const char *
+getUsage( void )
+{
+    return "A fast and easy BitTorrent client\n"
+           "\n"
+           "Usage: " MY_NAME " [options] <torrent-filename>";
+}
+
 static int          parseCommandLine( int           argc,
                                       const char ** argv );
 
@@ -250,6 +313,12 @@ main( int     argc,
     printf( "Transmission %s - http://www.transmissionbt.com/\n",
             LONG_VERSION_STRING );
 
+    /* user needs to pass in at least one argument */
+    if( argc < 2 ) {
+        tr_getopt_usage( MY_NAME, getUsage( ), options );
+        return EXIT_FAILURE;
+    }
+
     /* Get options */
     if( parseCommandLine( argc, (const char**)argv ) )
         return EXIT_FAILURE;
@@ -284,7 +353,7 @@ main( int     argc,
     /* if no download directory specified, use cwd instead */
     if( !downloadDir )
     {
-        getcwd( cwd, sizeof( cwd ) );
+        tr_getcwd( cwd, sizeof( cwd ) );
         downloadDir = cwd;
     }
 
@@ -468,69 +537,6 @@ cleanup:
 ****
 ****
 ***/
-
-static const char *
-getUsage( void )
-{
-    return "A fast and easy BitTorrent client\n"
-           "\n"
-           "Usage: " MY_NAME " [options] <torrent-filename>";
-}
-
-static const struct tr_option options[] =
-{
-    { 'a', "announce",             "Set the new torrent's announce URL",
-      "a",  1, "<url>"     },
-    { 'b', "blocklist",            "Enable peer blocklists",
-      "b",  0, NULL        },
-    { 'B', "no-blocklist",         "Disable peer blocklists",
-      "B",  0, NULL        },
-    { 'c', "comment",              "Set the new torrent's comment",
-      "c",  1, "<comment>" },
-    { 'd', "downlimit",            "Set max download speed in KB/s",
-      "d",  1, "<speed>"   },
-    { 'D', "no-downlimit",         "Don't limit the download speed",
-      "D",  0, NULL        },
-    { 910, "encryption-required",  "Encrypt all peer connections",
-      "er", 0, NULL        },
-    { 911, "encryption-preferred", "Prefer encrypted peer connections",
-      "ep", 0, NULL        },
-    { 912, "encryption-tolerated", "Prefer unencrypted peer connections",
-      "et", 0, NULL        },
-    { 'f', "finish",               "Run a script when the torrent finishes",
-      "f", 1, "<script>" },
-    { 'g', "config-dir",           "Where to find configuration files",
-      "g", 1, "<path>" },
-    { 'i', "info",                 "Show torrent details and exit",
-      "i",  0, NULL        },
-    { 'm', "portmap",              "Enable portmapping via NAT-PMP or UPnP",
-      "m",  0, NULL        },
-    { 'M', "no-portmap",           "Disable portmapping",
-      "M",  0, NULL        },
-    { 'n', "new",                  "Create a new torrent",
-      "n", 1, "<source>" },
-    { 'p', "port",
-      "Port for incoming peers (Default: " TR_DEFAULT_PORT_STR ")",
-      "p", 1, "<port>" },
-    { 'r', "private",              "Set the new torrent's 'private' flag",
-      "r",  0, NULL        },
-    { 's', "scrape",               "Scrape the torrent and exit",
-      "s",  0, NULL        },
-    { 't', "tos",
-      "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR
-      ")",
-      "t", 1, "<tos>" },
-    { 'u', "uplimit",              "Set max upload speed in KB/s",
-      "u",  1, "<speed>"   },
-    { 'U', "no-uplimit",           "Don't limit the upload speed",
-      "U",  0, NULL        },
-    { 'v', "verify",               "Verify the specified torrent",
-      "v",  0, NULL        },
-    { 'w', "download-dir",         "Where to save downloaded data",
-      "w",  1, "<path>"    },
-    {   0, NULL,                   NULL,
-        NULL, 0, NULL        }
-};
 
 static void
 showUsage( void )

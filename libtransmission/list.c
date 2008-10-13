@@ -78,9 +78,9 @@ tr_list_append( tr_list ** list,
 }
 
 void
-tr_list_insert_sorted( tr_list ** list,
-                       void *     data,
-                        int          compare(const void*, const void*) )
+tr_list_insert_sorted( tr_list            ** list,
+                       void                * data,
+                       TrListCompareFunc     compare )
 {
     /* find l, the node that we'll insert this data before */
     tr_list * l;

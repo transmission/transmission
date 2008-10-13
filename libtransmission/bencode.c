@@ -104,7 +104,7 @@ tr_bencParseInt( const uint8_t *  buf,
         err = EILSEQ;
     else
     {
-        *setme_end = end + 1;
+        *setme_end = (const uint8_t*)end + 1;
         *setme_val = val;
     }
 
@@ -146,8 +146,8 @@ tr_bencParseStr( const uint8_t *  buf,
     if( (const uint8_t*)end + 1 + len > bufend )
         return EILSEQ;
 
-    *setme_end = end + 1 + len;
-    *setme_str = end + 1;
+    *setme_end = (const uint8_t*)end + 1 + len;
+    *setme_str = (const uint8_t*)end + 1;
     *setme_strlen = len;
     return 0;
 }
