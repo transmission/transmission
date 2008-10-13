@@ -118,7 +118,7 @@ struct tr_tracker
     long      lastAnnounceResponse;
 };
 
-#define dbgmsg( name, fmt... ) tr_deepLog( __FILE__, __LINE__, name, ## fmt )
+#define dbgmsg( name, ... ) tr_deepLog( __FILE__, __LINE__, name, __VA_ARGS__ )
 
 /***
 ****

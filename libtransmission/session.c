@@ -573,7 +573,7 @@ deadlineReached( const uint64_t deadline )
 
 #define SHUTDOWN_MAX_SECONDS 30
 
-#define dbgmsg( fmt... ) tr_deepLog( __FILE__, __LINE__, NULL, ## fmt )
+#define dbgmsg( ... ) tr_deepLog( __FILE__, __LINE__, NULL, __VA_ARGS__ )
 
 void
 tr_sessionClose( tr_handle * session )

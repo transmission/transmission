@@ -54,7 +54,7 @@ struct tr_rpc_server
     char *             whitelist;
 };
 
-#define dbgmsg( fmt ... ) tr_deepLog( __FILE__, __LINE__, MY_NAME, ## fmt )
+#define dbgmsg( ... ) tr_deepLog( __FILE__, __LINE__, MY_NAME, __VA_ARGS__ )
 
 /**
 ***

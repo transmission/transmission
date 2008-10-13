@@ -105,23 +105,17 @@ const char* tr_strip_positional_args( const char* fmt );
  #define _( a ) tr_strip_positional_args( a )
 #endif
 
-#define tr_nerr( n, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, n, ## a )
-#define tr_ninf( n, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, n, ## a )
-#define tr_ndbg( n, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, n, ## a )
+#define tr_nerr( n, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, n, __VA_ARGS__ )
+#define tr_ninf( n, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, n, __VA_ARGS__ )
+#define tr_ndbg( n, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, n, __VA_ARGS__ )
 
-#define tr_torerr( tor, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR,\
-                                       tor->info.name, \
-                                       ## a )
-#define tr_torinf( tor, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF,\
-                                       tor->info.name, \
-                                       ## a )
-#define tr_tordbg( tor, a... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG,\
-                                       tor->info.name, \
-                                       ## a )
+#define tr_torerr( tor, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, tor->info.name, __VA_ARGS__ )
+#define tr_torinf( tor, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, tor->info.name, __VA_ARGS__ )
+#define tr_tordbg( tor, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, tor->info.name, __VA_ARGS__ )
 
-#define tr_err( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, NULL, ## a )
-#define tr_inf( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, NULL, ## a )
-#define tr_dbg( a... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, NULL, ## a )
+#define tr_err( ... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, NULL, __VA_ARGS__ )
+#define tr_inf( ... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, NULL, __VA_ARGS__ )
+#define tr_dbg( ... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, NULL, __VA_ARGS__ )
 
 int            tr_wildmat( const char * text,
                            const char * pattern );

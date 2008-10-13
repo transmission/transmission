@@ -345,7 +345,7 @@ myDebug( const char *               file,
     }
 }
 
-#define dbgmsg( msgs, fmt... ) myDebug( __FILE__, __LINE__, msgs, ## fmt )
+#define dbgmsg( msgs, ... ) myDebug( __FILE__, __LINE__, msgs, __VA_ARGS__ )
 
 /**
 ***

@@ -59,7 +59,7 @@
  #define TR_UINT_TO_PTR( i ) ( (void*)( (uint32_t)i ) )
 #endif
 
-#define dbgmsg( fmt... ) tr_deepLog( __FILE__, __LINE__, NULL, ## fmt )
+#define dbgmsg( ... ) tr_deepLog( __FILE__, __LINE__, NULL, __VA_ARGS__ )
 
 /**
 ***

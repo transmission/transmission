@@ -31,7 +31,7 @@
 
 #define PULSE_MSEC 100
 
-#define dbgmsg( fmt... ) tr_deepLog( __FILE__, __LINE__, "web", ## fmt )
+#define dbgmsg( ... ) tr_deepLog( __FILE__, __LINE__, "web", __VA_ARGS__ )
 
 struct tr_web
 {
