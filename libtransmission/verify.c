@@ -67,10 +67,10 @@ checkFile( tr_torrent *    tor,
     int              changed = FALSE;
     int              nofile;
     struct stat      sb;
-    char             path[MAX_PATH_LENGTH];
-    const tr_file *  file = &tor->info.files[fileIndex];
+    char           * path;
+    const tr_file  * file = &tor->info.files[fileIndex];
 
-    tr_buildPath ( path, sizeof( path ), tor->downloadDir, file->name, NULL );
+    path = tr_buildPath( tor->downloadDir, file->name, NULL );
     nofile = stat( path, &sb ) || !S_ISREG( sb.st_mode );
 
     for( i = file->firstPiece;
@@ -109,6 +109,8 @@ checkFile( tr_torrent *    tor,
 
         tr_torrentSetPieceChecked( tor, i, TRUE );
     }
+
+    tr_free( path );
 
     return changed;
 }

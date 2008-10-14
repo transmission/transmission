@@ -122,15 +122,13 @@ loadBlocklists( tr_session * session )
     int         binCount = 0;
     int         newCount = 0;
     struct stat sb;
-    char        dirname[MAX_PATH_LENGTH];
+    char      * dirname;
     DIR *       odir = NULL;
     tr_list *   list = NULL;
     const int   isEnabled = session->isBlocklistEnabled;
 
     /* walk through the directory and find blocklists */
-    tr_buildPath( dirname, sizeof( dirname ), session->configDir,
-                  "blocklists",
-                  NULL );
+    dirname = tr_buildPath( session->configDir, "blocklists", NULL );
     if( !stat( dirname,
                &sb ) && S_ISDIR( sb.st_mode )
       && ( ( odir = opendir( dirname ) ) ) )
@@ -138,14 +136,13 @@ loadBlocklists( tr_session * session )
         struct dirent *d;
         for( d = readdir( odir ); d; d = readdir( odir ) )
         {
-            char filename[MAX_PATH_LENGTH];
+            char * filename;
 
             if( !d->d_name || d->d_name[0] == '.' ) /* skip dotfiles, ., and ..
                                                       */
                 continue;
 
-            tr_buildPath( filename, sizeof( filename ), dirname, d->d_name,
-                          NULL );
+            filename = tr_buildPath( dirname, d->d_name, NULL );
 
             if( tr_stringEndsWith( filename, ".bin" ) )
             {
@@ -176,6 +173,8 @@ loadBlocklists( tr_session * session )
                 tr_list_append( &list, b );
                 ++newCount;
             }
+
+            tr_free( filename );
         }
 
         closedir( odir );
@@ -187,6 +186,8 @@ loadBlocklists( tr_session * session )
         tr_dbg( "Found %d blocklists in \"%s\"", binCount, dirname );
     if( newCount )
         tr_dbg( "Found %d new blocklists in \"%s\"", newCount, dirname );
+
+    tr_free( dirname );
 }
 
 /***
@@ -229,7 +230,7 @@ tr_sessionInitFull( const char *       configDir,
                     const char *       proxyPassword )
 {
     tr_handle * h;
-    char        filename[MAX_PATH_LENGTH];
+    char      * filename;
 
 #ifndef WIN32
     /* Don't exit when writing on a broken socket */
@@ -285,9 +286,9 @@ tr_sessionInitFull( const char *       configDir,
     tr_inf( _( "%s %s started" ), TR_NAME, LONG_VERSION_STRING );
 
     /* initialize the blocklist */
-    tr_buildPath( filename, sizeof( filename ), h->configDir, "blocklists",
-                  NULL );
+    filename = tr_buildPath( h->configDir, "blocklists", NULL );
     tr_mkdirp( filename, 0777 );
+    tr_free( filename );
     h->isBlocklistEnabled = isBlocklistEnabled;
     loadBlocklists( h );
 
@@ -656,18 +657,14 @@ tr_sessionLoadTorrents( tr_handle * h,
                                                      */
             {
                 tr_torrent * tor;
-                char         filename[MAX_PATH_LENGTH];
-                tr_buildPath( filename, sizeof( filename ), dirname,
-                              d->d_name,
-                              NULL );
-
-                tr_ctorSetMetainfoFromFile( ctor, filename );
-                tor = tr_torrentNew( h, ctor, NULL );
-                if( tor )
+                char * path = tr_buildPath( dirname, d->d_name, NULL );
+                tr_ctorSetMetainfoFromFile( ctor, path );
+                if(( tor = tr_torrentNew( h, ctor, NULL )))
                 {
                     tr_list_append( &list, tor );
                     ++n;
                 }
+                tr_free( path );
             }
         }
         closedir( odir );
@@ -794,12 +791,10 @@ tr_blocklistSetContent( tr_session * session,
 
     if( !b )
     {
-        char filename[MAX_PATH_LENGTH];
-        tr_buildPath( filename, sizeof( filename ), session->configDir,
-                      "blocklists", defaultName,
-                      NULL );
-        b = _tr_blocklistNew( filename, session->isBlocklistEnabled );
+        char * path = tr_buildPath( session->configDir, "blocklists", defaultName, NULL );
+        b = _tr_blocklistNew( path, session->isBlocklistEnabled );
         tr_list_append( &session->blocklists, b );
+        tr_free( path );
     }
 
     return _tr_blocklistSetContent( b, contentFilename );
@@ -889,17 +884,15 @@ metainfoLookupRescan( tr_handle * h )
                                                      */
             {
                 tr_info inf;
-                char    filename[MAX_PATH_LENGTH];
-                tr_buildPath( filename, sizeof( filename ), dirname,
-                              d->d_name,
-                              NULL );
-                tr_ctorSetMetainfoFromFile( ctor, filename );
+                char * path = tr_buildPath( dirname, d->d_name, NULL );
+                tr_ctorSetMetainfoFromFile( ctor, path );
                 if( !tr_torrentParse( h, ctor, &inf ) )
                 {
                     tr_list_append( &list, tr_strdup( inf.hashString ) );
-                    tr_list_append( &list, tr_strdup( filename ) );
+                    tr_list_append( &list, tr_strdup( path ) );
                     tr_metainfoFree( &inf );
                 }
+                tr_free( path );
             }
         }
         closedir( odir );

@@ -176,11 +176,9 @@ uint8_t*       tr_loadFile( const char * filename,
 
 /* creates a filename from a series of elements using the
    correct separator for filenames. */
-void           tr_buildPath( char*        buf,
-                             size_t       buflen,
-                             const char * first_element,
-                             ... )
-TR_GNUC_NULL_TERMINATED;
+char*          tr_buildPath( const char * first_element, ... )
+                                              TR_GNUC_NULL_TERMINATED
+                                              TR_GNUC_MALLOC;
 
 struct timeval tr_timevalMsec( uint64_t milliseconds );
 

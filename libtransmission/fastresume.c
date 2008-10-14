@@ -121,30 +121,6 @@ enum
     ( FR_MTIME_LEN( t ) + FR_BLOCK_BITFIELD_LEN( t ) )
 #define FR_SPEED_LEN ( 2 * ( sizeof( uint16_t ) + sizeof( uint8_t ) ) )
 
-#if 0
-static void
-fastResumeFileName( char *             buf,
-                    size_t             buflen,
-                    const tr_torrent * tor,
-                    int                tag )
-{
-    const char * cacheDir = tr_getResumeDir( tor->handle );
-    const char * hash = tor->info.hashString;
-
-    if( !tag )
-    {
-        tr_buildPath( buf, buflen, cacheDir, hash, NULL );
-    }
-    else
-    {
-        char base[1024];
-        tr_snprintf( base, sizeof( base ), "%s-%s", hash, tor->handle->tag );
-        tr_buildPath( buf, buflen, cacheDir, base, NULL );
-    }
-}
-
-#endif
-
 static tr_time_t*
 getMTimes( const tr_torrent * tor,
            int *              setme_n )
@@ -155,10 +131,8 @@ getMTimes( const tr_torrent * tor,
 
     for( i = 0; i < n; ++i )
     {
-        char        fname[MAX_PATH_LENGTH];
         struct stat sb;
-        tr_buildPath( fname, sizeof( fname ),
-                      tor->downloadDir, tor->info.files[i].name, NULL );
+        char * fname = tr_buildPath( tor->downloadDir, tor->info.files[i].name, NULL );
         if( !stat( fname, &sb ) && S_ISREG( sb.st_mode ) )
         {
 #ifdef SYS_DARWIN
@@ -167,187 +141,12 @@ getMTimes( const tr_torrent * tor,
             m[i] = sb.st_mtime;
 #endif
         }
+        tr_free( fname );
     }
 
     *setme_n = n;
     return m;
 }
-
-#if 0
-static void
-fastResumeWriteData( uint8_t      id,
-                     const void * data,
-                     uint32_t     size,
-                     uint32_t     count,
-                     FILE *       file )
-{
-    uint32_t datalen = size * count;
-
-    fwrite( &id, 1, 1, file );
-    fwrite( &datalen, 4, 1, file );
-    fwrite( data, size, count, file );
-}
-
-void
-tr_fastResumeSave( const tr_torrent * tor )
-{
-    char      path[MAX_PATH_LENGTH];
-    FILE *    file;
-    const int version = 1;
-    uint64_t  total;
-
-    fastResumeFileName( path, sizeof path, tor, 1 );
-    file = fopen( path, "wb+" );
-    if( !file )
-    {
-        tr_torerr( tor, _(
-                      "Couldn't open \"%1$s\": %2$s" ), path,
-                  tr_strerror( errno ) );
-        return;
-    }
-
-    /* Write format version */
-    fwrite( &version, 4, 1, file );
-
-    if( TRUE ) /* FR_ID_DOWNLOAD_DIR */
-    {
-        const char * d = tor->downloadDir ? tor->downloadDir : "";
-        const int    byteCount = strlen( d ) + 1;
-        fastResumeWriteData( FR_ID_DOWNLOAD_DIR, d, 1, byteCount, file );
-    }
-
-    /* Write progress data */
-    {
-        int                 i, n;
-        tr_time_t *         mtimes;
-        uint8_t *           buf = malloc( FR_PROGRESS_LEN( tor ) );
-        uint8_t *           walk = buf;
-        const tr_bitfield * bitfield;
-
-        /* mtimes */
-        mtimes = getMTimes( tor, &n );
-        for( i = 0; i < n; ++i )
-            if( !tr_torrentIsFileChecked( tor, i ) )
-                mtimes[i] = ~(tr_time_t)0; /* force a recheck next time */
-        memcpy( walk, mtimes, n * sizeof( tr_time_t ) );
-        walk += n * sizeof( tr_time_t );
-
-        /* completion bitfield */
-        bitfield = tr_cpBlockBitfield( tor->completion );
-        assert( (unsigned)FR_BLOCK_BITFIELD_LEN( tor ) == bitfield->len );
-        memcpy( walk, bitfield->bits, bitfield->len );
-        walk += bitfield->len;
-
-        /* write it */
-        assert( walk - buf == (int)FR_PROGRESS_LEN( tor ) );
-        fastResumeWriteData( FR_ID_PROGRESS, buf, 1, walk - buf, file );
-
-        /* cleanup */
-        free( mtimes );
-        free( buf );
-    }
-
-
-    /* Write the priorities and DND flags */
-    if( TRUE )
-    {
-        int       i;
-        const int n = tor->info.fileCount;
-        char *    buf = tr_new0( char, n * 2 );
-        char *    walk = buf;
-
-        /* priorities */
-        for( i = 0; i < n; ++i )
-        {
-            char      ch;
-            const int priority = tor->info.files[i].priority;
-            switch( priority )
-            {
-                case TR_PRI_LOW:
-                    ch = 'l'; break;              /* low */
-
-                case TR_PRI_HIGH:
-                    ch = 'h'; break;              /* high */
-
-                default:
-                    ch = 'n'; break;              /* normal */
-            }
-            *walk++ = ch;
-        }
-
-        /* dnd flags */
-        for( i = 0; i < n; ++i )
-            *walk++ = tor->info.files[i].dnd ? 't' : 'f';
-
-        /* write it */
-        assert( walk - buf == 2 * n );
-        fastResumeWriteData( FR_ID_PRIORITY, buf, 1, walk - buf, file );
-
-        /* cleanup */
-        tr_free( buf );
-    }
-
-
-    /* Write the torrent ul/dl speed caps */
-    if( TRUE )
-    {
-        const int len = FR_SPEED_LEN;
-        char *    buf = tr_new0( char, len );
-        char *    walk = buf;
-        uint16_t  i16;
-        uint8_t   i8;
-
-        i16 = (uint16_t) tr_torrentGetSpeedLimit( tor, TR_DOWN );
-        memcpy( walk, &i16, 2 ); walk += 2;
-        i8 = (uint8_t) tr_torrentGetSpeedMode( tor, TR_DOWN );
-        memcpy( walk, &i8, 1 ); walk += 1;
-        i16 = (uint16_t) tr_torrentGetSpeedLimit( tor, TR_UP );
-        memcpy( walk, &i16, 2 ); walk += 2;
-        i8 = (uint8_t) tr_torrentGetSpeedMode( tor, TR_UP );
-        memcpy( walk, &i8, 1 ); walk += 1;
-
-        assert( walk - buf == len );
-        fastResumeWriteData( FR_ID_SPEED, buf, 1, walk - buf, file );
-        tr_free( buf );
-    }
-
-    if( TRUE ) /* FR_ID_RUN */
-    {
-        const char is_running = tor->isRunning ? 't' : 'f';
-        fastResumeWriteData( FR_ID_RUN, &is_running, 1, 1, file );
-    }
-
-    /* Write download and upload totals */
-
-    total = tor->downloadedCur + tor->downloadedPrev;
-    fastResumeWriteData( FR_ID_DOWNLOADED, &total, 8, 1, file );
-
-    total = tor->uploadedCur + tor->uploadedPrev;
-    fastResumeWriteData( FR_ID_UPLOADED, &total, 8, 1, file );
-
-    total = tor->corruptCur + tor->corruptPrev;
-    fastResumeWriteData( FR_ID_CORRUPT, &total, 8, 1, file );
-
-    fastResumeWriteData( FR_ID_MAX_PEERS,
-                         &tor->maxConnectedPeers,
-                         sizeof( uint16_t ), 1, file );
-
-    if( !tor->info.isPrivate )
-    {
-        tr_pex *  pex;
-        const int count = tr_peerMgrGetPeers( tor->handle->peerMgr,
-                                              tor->info.hash,
-                                              &pex );
-        if( count > 0 )
-            fastResumeWriteData( FR_ID_PEERS, pex, sizeof( tr_pex ), count,
-                                 file );
-        tr_free( pex );
-    }
-
-    fclose( file );
-}
-
-#endif
 
 /***
 ****
@@ -711,22 +510,20 @@ loadResumeFile( const tr_torrent * tor,
                 size_t *           len )
 {
     uint8_t *    ret = NULL;
-    char         path[MAX_PATH_LENGTH];
     const char * cacheDir = tr_getResumeDir( tor->session );
     const char * hash = tor->info.hashString;
 
     if( !ret && tor->session->tag )
     {
-        char base[1024];
-        tr_snprintf( base, sizeof( base ), "%s-%s", hash, tor->session->tag );
-        tr_buildPath( path, sizeof( path ), cacheDir, base, NULL );
+        char * path = tr_strdup_printf( "%s" TR_PATH_DELIMITER_STR "%s-%s", cacheDir, hash, tor->session->tag );
         ret = tr_loadFile( path, len );
+        tr_free( path );
     }
-
     if( !ret )
     {
-        tr_buildPath( path, sizeof( path ), cacheDir, hash, NULL );
+        char * path = tr_buildPath( cacheDir, hash, NULL );
         ret = tr_loadFile( path, len );
+        tr_free( path );
     }
 
     return ret;
@@ -774,21 +571,20 @@ tr_fastResumeLoad( tr_torrent * tor,
 void
 tr_fastResumeRemove( const tr_torrent * tor )
 {
-    char         path[MAX_PATH_LENGTH];
     const char * cacheDir = tr_getResumeDir( tor->session );
     const char * hash = tor->info.hashString;
 
     if( tor->session->tag )
     {
-        char base[1024];
-        tr_snprintf( base, sizeof( base ), "%s-%s", hash, tor->session->tag );
-        tr_buildPath( path, sizeof( path ), cacheDir, base, NULL );
+        char * path = tr_strdup_printf( "%s" TR_PATH_DELIMITER_STR "%s-%s", cacheDir, hash, tor->session->tag );
         unlink( path );
+        tr_free( path );
     }
     else
     {
-        tr_buildPath( path, sizeof( path ), cacheDir, hash, NULL );
+        char * path = tr_buildPath( cacheDir, hash, NULL );
         unlink( path );
+        tr_free( path );
     }
 }
 

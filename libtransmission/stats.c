@@ -30,25 +30,15 @@ struct tr_stats_handle
 };
 
 static char*
-getOldFilename( const tr_handle * handle,
-                char *            buf,
-                size_t            buflen )
+getOldFilename( const tr_handle * handle )
 {
-    tr_buildPath( buf, buflen, tr_sessionGetConfigDir( handle ),
-                  "stats.benc",
-                  NULL );
-    return buf;
+    return tr_buildPath( tr_sessionGetConfigDir( handle ), "stats.benc", NULL );
 }
 
 static char*
-getFilename( const tr_handle * handle,
-             char *            buf,
-             size_t            buflen )
+getFilename( const tr_handle * handle )
 {
-    tr_buildPath( buf, buflen, tr_sessionGetConfigDir( handle ),
-                  "stats.json",
-                  NULL );
-    return buf;
+    return tr_buildPath( tr_sessionGetConfigDir( handle ), "stats.json", NULL );
 }
 
 static void
@@ -56,16 +46,20 @@ loadCumulativeStats( const tr_handle *  handle,
                      tr_session_stats * setme )
 {
     int     loaded = FALSE;
-    char    filename[MAX_PATH_LENGTH];
+    char   * filename;
     tr_benc top;
 
-    getFilename( handle, filename, sizeof( filename ) );
+    filename = getFilename( handle );
     loaded = !tr_bencLoadJSONFile( filename, &top );
+    tr_free( filename );
+
     if( !loaded )
     {
-        getOldFilename( handle, filename, sizeof( filename ) );
+        filename = getOldFilename( handle );
         loaded = !tr_bencLoadFile( filename, &top );
+        tr_free( filename );
     }
+
     if( loaded )
     {
         int64_t i;
@@ -89,7 +83,7 @@ static void
 saveCumulativeStats( const tr_handle *        handle,
                      const tr_session_stats * s )
 {
-    char    filename[MAX_PATH_LENGTH];
+    char * filename;
     tr_benc top;
 
     tr_bencInitDict( &top, 5 );
@@ -99,11 +93,11 @@ saveCumulativeStats( const tr_handle *        handle,
     tr_bencDictAddInt( &top, "session-count",    s->sessionCount );
     tr_bencDictAddInt( &top, "uploaded-bytes",   s->uploadedBytes );
 
-    getFilename( handle, filename, sizeof( filename ) );
-    tr_deepLog( __FILE__, __LINE__, NULL, "Saving stats to \"%s\"",
-                filename );
+    filename = getFilename( handle );
+    tr_deepLog( __FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename );
     tr_bencSaveJSONFile( filename, &top );
 
+    tr_free( filename );
     tr_bencFree( &top );
 }
 

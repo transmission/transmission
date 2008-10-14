@@ -144,18 +144,18 @@ static int    debug = 0;
 static char * auth = NULL;
 
 static char*
-absolutify( char *       buf,
-            size_t       len,
-            const char * path )
+absolutify( const char * path )
 {
+    char * buf;
+
     if( *path == '/' )
-        tr_strlcpy( buf, path, len );
-    else
-    {
+        buf = tr_strdup( path );
+    else {
         char cwd[MAX_PATH_LENGTH];
         tr_getcwd( cwd, sizeof( cwd ) );
-        tr_buildPath( buf, len, cwd, path, NULL );
+        buf = tr_buildPath( cwd, path, NULL );
     }
+
     return buf;
 }
 
@@ -272,7 +272,6 @@ readargs( int           argc,
     while( ( c = tr_getopt( getUsage( ), argc, argv, opts, &optarg ) ) )
     {
         int     i, n;
-        char    buf[MAX_PATH_LENGTH];
         int     addArg = TRUE;
         tr_benc top, *args, *fields;
         tr_bencInitDict( &top, 3 );
@@ -421,11 +420,13 @@ readargs( int           argc,
                 addIdArg( args, id );
                 break;
 
-            case 'w':
+            case 'w': {
+                char * path = absolutify( optarg );
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddStr( args, "download-dir",
-                                  absolutify( buf, sizeof( buf ), optarg ) );
+                tr_bencDictAddStr( args, "download-dir", path );
+                tr_free( path );
                 break;
+            }
 
             case 'x':
                 tr_bencDictAddStr( &top, "method", "session-set" );

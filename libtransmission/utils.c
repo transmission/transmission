@@ -545,14 +545,12 @@ tr_mkdirp( const char * path_in,
     return 0;
 }
 
-void
-tr_buildPath( char *      buf,
-              size_t      buflen,
-              const char *first_element,
-              ... )
+char*
+tr_buildPath( const char *first_element, ... )
 {
+    char            * ret;
     struct evbuffer * evbuf;
-    const char *      element = first_element;
+    const char      * element = first_element;
     va_list           vl;
 
     evbuf = evbuffer_new( );
@@ -566,13 +564,10 @@ tr_buildPath( char *      buf,
         element = (const char*) va_arg( vl, const char* );
     }
 
-    if( EVBUFFER_LENGTH( evbuf ) )
-        tr_strlcpy( buf, EVBUFFER_DATA( evbuf ), buflen );
-    else
-        *buf = '\0';
-
     va_end( vl );
+    ret = tr_strndup( EVBUFFER_DATA( evbuf ), EVBUFFER_LENGTH( evbuf ) );
     evbuffer_free( evbuf );
+    return ret;
 }
 
 /****

@@ -113,7 +113,7 @@ TrOpenFile( int          i,
 {
     struct tr_openfile * file = &gFd->open[i];
     int                  flags;
-    char                 filename[MAX_PATH_LENGTH];
+    char               * filename;
     struct stat          sb;
 
     /* confirm the parent folder exists */
@@ -121,12 +121,13 @@ TrOpenFile( int          i,
         return ENOENT;
 
     /* create subfolders, if any */
-    tr_buildPath ( filename, sizeof( filename ), folder, torrentFile, NULL );
+    filename = tr_buildPath( folder, torrentFile, NULL );
     if( write )
     {
         char *    tmp = tr_strdup( filename );
         const int err = tr_mkdirp( dirname( tmp ), 0777 ) ? errno : 0;
         tr_free( tmp );
+        tr_free( filename );
         if( err )
             return err;
     }
@@ -145,9 +146,11 @@ TrOpenFile( int          i,
         const int err = errno;
         tr_err( _( "Couldn't open \"%1$s\": %2$s" ), filename,
                tr_strerror( err ) );
+        tr_free( filename );
         return err;
     }
 
+    tr_free( filename );
     return 0;
 }
 
@@ -185,13 +188,13 @@ tr_fdFileCheckout( const char * folder,
 {
     int                  i, winner = -1;
     struct tr_openfile * o;
-    char                 filename[MAX_PATH_LENGTH];
+    char               * filename;
 
     assert( folder && *folder );
     assert( torrentFile && *torrentFile );
     assert( write == 0 || write == 1 );
 
-    tr_buildPath ( filename, sizeof( filename ), folder, torrentFile, NULL );
+    filename = tr_buildPath( folder, torrentFile, NULL );
     dbgmsg( "looking for file '%s', writable %c", filename,
             write ? 'y' : 'n' );
 
@@ -283,6 +286,7 @@ tr_fdFileCheckout( const char * folder,
         const int err = TrOpenFile( winner, folder, torrentFile, write );
         if( err ) {
             tr_lockUnlock( gFd->lock );
+            tr_free( filename );
             errno = err;
             return -1;
         }
@@ -297,6 +301,7 @@ tr_fdFileCheckout( const char * folder,
     o->isCheckedOut = 1;
     o->closeWhenDone = 0;
     o->date = tr_date( );
+    tr_free( filename );
     tr_lockUnlock( gFd->lock );
     return o->fd;
 }

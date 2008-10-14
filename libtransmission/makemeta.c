@@ -47,19 +47,19 @@ getFiles( const char *      dir,
           struct FileList * list )
 {
     int         i;
-    char        buf[MAX_PATH_LENGTH];
+    char        * buf;
     struct stat sb;
     DIR *       odir = NULL;
 
     sb.st_size = 0;
 
-    tr_buildPath( buf, sizeof( buf ), dir, base, NULL );
+    buf = tr_buildPath( dir, base, NULL );
     i = stat( buf, &sb );
     if( i )
     {
-        tr_err( _(
-                   "Torrent Creator is skipping file \"%s\": %s" ), buf,
-               tr_strerror( errno ) );
+        tr_err( _( "Torrent Creator is skipping file \"%s\": %s" ),
+                buf, tr_strerror( errno ) );
+        tr_free( buf );
         return list;
     }
 
@@ -83,6 +83,7 @@ getFiles( const char *      dir,
         list = node;
     }
 
+    tr_free( buf );
     return list;
 }
 

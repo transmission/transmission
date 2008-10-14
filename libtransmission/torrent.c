@@ -1159,11 +1159,10 @@ stopTorrent( void * vtor )
 
     for( i = 0; i < tor->info.fileCount; ++i )
     {
-        char            path[MAX_PATH_LENGTH];
         const tr_file * file = &tor->info.files[i];
-        tr_buildPath( path, sizeof( path ), tor->downloadDir, file->name,
-                      NULL );
+        char * path = tr_buildPath( tor->downloadDir, file->name, NULL );
         tr_fdFileClose( path );
+        tr_free( path );
     }
 }
 
@@ -1645,11 +1644,9 @@ tr_torrentGetMTimes( const tr_torrent * tor,
 
     for( i = 0; i < n; ++i )
     {
-        char        fname[MAX_PATH_LENGTH];
         struct stat sb;
-        tr_buildPath( fname, sizeof( fname ),
-                      tor->downloadDir, tor->info.files[i].name, NULL );
-        if( !stat( fname, &sb ) )
+        char * path = tr_buildPath( tor->downloadDir, tor->info.files[i].name, NULL );
+        if( !stat( path, &sb ) )
         {
 #ifdef SYS_DARWIN
             m[i] = sb.st_mtimespec.tv_sec;
@@ -1657,6 +1654,7 @@ tr_torrentGetMTimes( const tr_torrent * tor,
             m[i] = sb.st_mtime;
 #endif
         }
+        tr_free( path );
     }
 
     *setme_n = n;

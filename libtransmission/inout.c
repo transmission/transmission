@@ -57,7 +57,7 @@ readOrWriteBytes( const tr_torrent * tor,
     typedef size_t ( *iofunc )( int, void *, size_t );
     iofunc          func = ioMode ==
                            TR_IO_READ ? (iofunc)read : (iofunc)write;
-    char            path[MAX_PATH_LENGTH];
+    char          * path;
     struct stat     sb;
     int             fd = -1;
     int             err;
@@ -67,8 +67,9 @@ readOrWriteBytes( const tr_torrent * tor,
     assert( !file->length || ( fileOffset < file->length ) );
     assert( fileOffset + buflen <= file->length );
 
-    tr_buildPath ( path, sizeof( path ), tor->downloadDir, file->name, NULL );
+    path = tr_buildPath( tor->downloadDir, file->name, NULL );
     fileExists = !stat( path, &sb );
+    tr_free( path );
 
     if( !file->length )
         return 0;

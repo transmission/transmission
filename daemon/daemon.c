@@ -31,7 +31,7 @@
 
 static int         closing = FALSE;
 static tr_handle * mySession;
-static char        myConfigFilename[MAX_PATH_LENGTH];
+static char      * myConfigFilename = NULL;
 
 #define KEY_BLOCKLIST         "blocklist-enabled"
 #define KEY_DOWNLOAD_DIR      "download-dir"
@@ -477,11 +477,10 @@ main( int     argc,
     readargs( argc, (const char**)argv, &nofork, &configDir, &downloadDir,
               &rpcPort, &whitelist, &authRequired, &username, &password,
               &blocklistEnabled );
-    if( configDir == NULL )
+    if( configDir )
         configDir = freeme = tr_strdup_printf( "%s-daemon",
                                               tr_getDefaultConfigDir( ) );
-    tr_buildPath( myConfigFilename, sizeof( myConfigFilename ),
-                  configDir, CONFIG_FILE, NULL );
+    myConfigFilename = tr_buildPath( configDir, CONFIG_FILE, NULL );
 
     if( !nofork )
     {
@@ -505,6 +504,7 @@ main( int     argc,
     printf( " done.\n" );
 
     tr_free( freeme );
+    tr_free( myConfigFilename );
     return 0;
 }
 
