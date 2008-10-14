@@ -565,11 +565,11 @@ tr_getClutchDir( const tr_session * session UNUSED )
             {
                 char * path = tr_buildPath( l->data, "transmission", "web", NULL );
                 const int found = isClutchDir( path );
-                tr_free( path );
                 if( found ) {
                     s = path;
                     break;
                 }
+                tr_free( path );
             }
 
             tr_list_free( &candidates, tr_free );
