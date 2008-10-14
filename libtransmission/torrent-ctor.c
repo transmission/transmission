@@ -27,7 +27,7 @@ struct optional_args
 
     unsigned int    isPaused          : 1;
     uint16_t        peerLimit;
-    char            downloadDir[MAX_PATH_LENGTH];
+    char          * downloadDir;
 };
 
 /** Opaque class used when instantiating torrents.
@@ -219,15 +219,13 @@ tr_ctorSetDownloadDir( tr_ctor *    ctor,
 {
     struct optional_args * args = &ctor->optionalArgs[mode];
 
+    args->isSet_downloadDir = 0;
+    tr_free( args->downloadDir );
+
     if( directory )
     {
         args->isSet_downloadDir = 1;
-        tr_strlcpy( args->downloadDir, directory, sizeof( args->downloadDir ) );
-    }
-    else
-    {
-        args->isSet_downloadDir = 0;
-        *args->downloadDir = '\0';
+        args->downloadDir = tr_strdup( directory );
     }
 }
 
@@ -314,6 +312,8 @@ void
 tr_ctorFree( tr_ctor * ctor )
 {
     clearMetainfo( ctor );
+    tr_free( ctor->optionalArgs[1].downloadDir );
+    tr_free( ctor->optionalArgs[0].downloadDir );
     tr_free( ctor );
 }
 

@@ -161,17 +161,16 @@ loadBlocklists( tr_session * session )
                   instead */
                 tr_blocklist * b;
                 const char *   dot = strrchr( d->d_name, '.' );
-                const int      len = dot ? dot - d->d_name : (int)strlen(
-                    d->d_name );
-                char           tmp[MAX_PATH_LENGTH];
-                tr_snprintf( tmp, sizeof( tmp ),
-                             "%s%c%*.*s.bin", dirname, TR_PATH_DELIMITER,
-                             len, len,
-                             d->d_name );
+                const int      len = dot ? dot - d->d_name
+                                         : (int)strlen( d->d_name );
+                char         * tmp = tr_strdup_printf(
+                                        "%s" TR_PATH_DELIMITER_STR "%*.*s.bin",
+                                        dirname, len, len, d->d_name );
                 b = _tr_blocklistNew( tmp, isEnabled );
                 _tr_blocklistSetContent( b, filename );
                 tr_list_append( &list, b );
                 ++newCount;
+                tr_free( tmp );
             }
 
             tr_free( filename );
