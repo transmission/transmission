@@ -140,11 +140,14 @@ void           tr_deepLog( const char * file,
 char*          tr_getLogTimeStr( char * buf,
                                  int    buflen );
 
-/**
- * a portability wrapper around getcwd().
- */
-char*          tr_getcwd( char  * buffer,
-                          int     maxlen );
+/** a portability wrapper for getcwd(). */
+char*          tr_getcwd( void ) TR_GNUC_MALLOC;
+
+/** a portability wrapper for basename(). */
+char*          tr_basename( const char * path ) TR_GNUC_MALLOC;
+
+/** a portability wrapper for dirname(). */
+char*          tr_dirname( const char * path ) TR_GNUC_MALLOC;
 
 /**
  * a portability wrapper around mkdir().

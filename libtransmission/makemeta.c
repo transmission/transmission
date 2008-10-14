@@ -19,7 +19,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <libgen.h> /* dirname, basename */
 #include <dirent.h>
 
 #include "crypto.h" /* tr_sha1 */
@@ -133,14 +132,11 @@ tr_metaInfoBuilderCreate( tr_handle *  handle,
     /* build a list of files containing topFile and,
        if it's a directory, all of its children */
     {
-        char *dir, *base;
-        char  dirbuf[MAX_PATH_LENGTH];
-        char  basebuf[MAX_PATH_LENGTH];
-        tr_strlcpy( dirbuf, topFile, sizeof( dirbuf ) );
-        tr_strlcpy( basebuf, topFile, sizeof( basebuf ) );
-        dir = dirname( dirbuf );
-        base = basename( basebuf );
+        char * dir = tr_dirname( topFile );
+        char * base = tr_basename( topFile );
         files = getFiles( dir, base, NULL );
+        tr_free( base );
+        tr_free( dir );
     }
 
     for( walk = files; walk != NULL; walk = walk->next )
@@ -333,7 +329,7 @@ makeInfoDict( tr_benc *             dict,
               tr_metainfo_builder * builder )
 {
     uint8_t * pch;
-    char      base[MAX_PATH_LENGTH];
+    char    * base;
 
     tr_bencDictReserve( dict, 5 );
 
@@ -353,8 +349,9 @@ makeInfoDict( tr_benc *             dict,
         }
     }
 
-    tr_strlcpy( base, builder->top, sizeof( base ) );
-    tr_bencDictAddStr( dict, "name", basename( base ) );
+    base = tr_basename( builder->top );
+    tr_bencDictAddStr( dict, "name", base );
+    tr_free( base );
 
     tr_bencDictAddInt( dict, "piece length", builder->pieceSize );
 
@@ -519,11 +516,7 @@ tr_makeMetaInfo( tr_metainfo_builder *   builder,
     if( outputFile && *outputFile )
         builder->outputFile = tr_strdup( outputFile );
     else
-    {
-        char out[MAX_PATH_LENGTH];
-        tr_snprintf( out, sizeof( out ), "%s.torrent", builder->top );
-        builder->outputFile = tr_strdup( out );
-    }
+        builder->outputFile = tr_strdup_printf( "%s.torrent", builder->top );
 
     /* enqueue the builder */
     lock = getQueueLock ( builder->handle );

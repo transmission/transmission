@@ -248,50 +248,50 @@ static void
 refreshFromBuilder( MakeMetaUI * ui )
 {
     char                  sizeStr[128];
-    char                  buf[MAX_PATH_LENGTH];
+    char                * buf;
     tr_metainfo_builder * builder = ui->builder;
     const char *          filename = builder ? builder->top : NULL;
 
+
+    /* update the progressbar */
     if( !filename )
-        g_snprintf( buf, sizeof( buf ), _( "No source selected" ) );
+        buf = g_strdup( _( "No source selected" ) );
     else
-        g_snprintf( buf, sizeof( buf ), "%s.torrent (%d%%)", filename, 0 );
+        buf = g_strdup_printf( "%s.torrent (%d%%)", filename, 0 );
     gtk_progress_bar_set_text( GTK_PROGRESS_BAR( ui->progressbar ), buf );
     refreshButtons( ui );
+    g_free( buf );
 
+    /* update the size label */
     if( !filename )
-        g_snprintf( buf, sizeof( buf ), _( "<i>No source selected</i>" ) );
-    else
-    {
+        buf = g_strdup( "<i>No source selected</i>" );
+    else {
         tr_strlsize( sizeStr, builder->totalSize, sizeof( sizeStr ) );
-        g_snprintf( buf, sizeof( buf ),
-                    /* %1$s is the torrent size
-                       %2$'d is its number of files */
-                    ngettext( "<i>%1$s; %2$'d File</i>",
-                              "<i>%1$s; %2$'d Files</i>",
-                              builder->fileCount ),
-                    sizeStr, builder->fileCount );
+        buf = g_strdup_printf( /* %1$s is the torrent size
+                                  %2$'d is its number of files */
+                               ngettext( "<i>%1$s; %2$'d File</i>",
+                                         "<i>%1$s; %2$'d Files</i>",
+                                         builder->fileCount ),
+                               sizeStr, builder->fileCount );
     }
     gtk_label_set_markup ( GTK_LABEL( ui->size_lb ), buf );
+    g_free( buf );
 
+    /* update the pieces label */
     if( !filename )
-        *buf = '\0';
-    else
-    {
-        char countStr[512];
-        g_snprintf( countStr, sizeof( countStr ),
-                    ngettext( "%'d Piece", "%'d Pieces",
-                              builder->pieceCount ),
-                    builder->pieceCount );
+        buf = g_strdup( "" );
+    else {
+        char * countStr = g_strdup_printf( ngettext( "%'d Piece", "%'d Pieces",
+                                                     builder->pieceCount ),
+                                           builder->pieceCount );
         tr_strlsize( sizeStr, builder->pieceSize, sizeof( sizeStr ) );
-        g_snprintf( buf, sizeof( buf ),
-                    /* %1$s is number of pieces;
-                       %2$s is how big each piece is */
-                    _( "%1$s @ %2$s" ),
-                    countStr,
-                    sizeStr );
+        buf = g_strdup_printf( /* %1$s is number of pieces;
+                                  %2$s is how big each piece is */
+                               _( "%1$s @ %2$s" ), countStr, sizeStr );
+        g_free( countStr );
     }
     gtk_label_set_markup ( GTK_LABEL( ui->pieces_lb ), buf );
+    g_free( buf );
 }
 
 static void

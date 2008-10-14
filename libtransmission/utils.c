@@ -195,7 +195,7 @@ tr_deepLog( const char * file,
         va_list           args;
         char              timestr[64];
         struct evbuffer * buf = evbuffer_new( );
-        char *            myfile = tr_strdup( file );
+        char *            base = tr_basename( file );
 
         evbuffer_add_printf( buf, "[%s] ",
                             tr_getLogTimeStr( timestr, sizeof( timestr ) ) );
@@ -204,10 +204,10 @@ tr_deepLog( const char * file,
         va_start( args, fmt );
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
-        evbuffer_add_printf( buf, " (%s:%d)\n", basename( myfile ), line );
+        evbuffer_add_printf( buf, " (%s:%d)\n", base, line );
         (void) fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
 
-        tr_free( myfile );
+        tr_free( base );
         evbuffer_free( buf );
     }
 }
@@ -456,14 +456,34 @@ tr_loadFile( const char * path,
 }
 
 char*
-tr_getcwd( char  * buffer,
-           int     maxlen )
+tr_getcwd( void )
 {
+    char buf[2048];
+    *buf = '\0';
 #ifdef WIN32
-    return _getcwd( buffer, maxlen );
+    _getcwd( buf, sizeof( buf ) );
 #else
-    return getcwd( buffer, maxlen );
+    getcwd( buf, sizeof( buf ) );
 #endif
+    return tr_strdup( buf );
+}
+
+char*
+tr_basename( const char * path )
+{
+    char * tmp = tr_strdup( path );
+    char * ret = tr_strdup( basename( tmp ) );
+    tr_free( tmp );
+    return ret;
+}
+
+char*
+tr_dirname( const char * path )
+{
+    char * tmp = tr_strdup( path );
+    char * ret = tr_strdup( dirname( tmp ) );
+    tr_free( tmp );
+    return ret;
 }
 
 int
@@ -524,10 +544,9 @@ tr_mkdirp( const char * path_in,
         else if( ( sb.st_mode & S_IFMT ) != S_IFDIR )
         {
             /* Node exists but isn't a folder */
-            char buf[MAX_PATH_LENGTH];
-            tr_snprintf( buf, sizeof( buf ), _(
-                             "File \"%s\" is in the way" ), path );
+            char * buf = tr_strdup_printf( _( "File \"%s\" is in the way" ), path );
             tr_err( _( "Couldn't create \"%1$s\": %2$s" ), path_in, buf );
+            tr_free( buf );
             tr_free( path );
             errno = ENOTDIR;
             return -1;

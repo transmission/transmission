@@ -11,7 +11,6 @@
  */
 
 #include <errno.h>
-#include <libgen.h> /* basename */
 #include "transmission.h"
 #include "bencode.h"
 #include "platform.h"
@@ -121,9 +120,9 @@ tr_ctorSetMetainfoFromFile( tr_ctor *    ctor,
                     name = NULL;
             if( !name || !*name )
             {
-                char * tmp = tr_strdup( filename );
-                tr_bencDictAddStr( info, "name", basename( tmp ) );
-                tr_free( tmp );
+                char * base = tr_basename( filename );
+                tr_bencDictAddStr( info, "name", base );
+                tr_free( base );
             }
         }
     }

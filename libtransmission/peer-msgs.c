@@ -16,7 +16,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <libgen.h> /* basename */
 
 #include <event.h>
 
@@ -327,7 +326,7 @@ myDebug( const char *               file,
         va_list           args;
         char              timestr[64];
         struct evbuffer * buf = evbuffer_new( );
-        char *            myfile = tr_strdup( file );
+        char *            base = tr_basename( file );
 
         evbuffer_add_printf( buf, "[%s] %s - %s [%s]: ",
                              tr_getLogTimeStr( timestr, sizeof( timestr ) ),
@@ -337,10 +336,10 @@ myDebug( const char *               file,
         va_start( args, fmt );
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
-        evbuffer_add_printf( buf, " (%s:%d)\n", basename( myfile ), line );
+        evbuffer_add_printf( buf, " (%s:%d)\n", base, line );
         fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
 
-        tr_free( myfile );
+        tr_free( base );
         evbuffer_free( buf );
     }
 }

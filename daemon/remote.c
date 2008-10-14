@@ -151,9 +151,9 @@ absolutify( const char * path )
     if( *path == '/' )
         buf = tr_strdup( path );
     else {
-        char cwd[MAX_PATH_LENGTH];
-        tr_getcwd( cwd, sizeof( cwd ) );
+        char * cwd = tr_getcwd( );
         buf = tr_buildPath( cwd, path, NULL );
+        tr_free( cwd );
     }
 
     return buf;

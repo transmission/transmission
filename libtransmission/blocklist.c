@@ -18,7 +18,6 @@
  #include <windows.h>
 #endif
 
-#include <libgen.h> /* basename */
 #ifndef WIN32
  #include <sys/mman.h>
 #endif
@@ -105,12 +104,9 @@ blocklistLoad( tr_blocklist * b )
     b->fd = fd;
 
     {
-        char * name;
-        char   buf[MAX_PATH_LENGTH];
-        tr_strlcpy( buf, b->filename, sizeof( buf ) );
-        name = basename( buf );
-        tr_inf( _( "Blocklist \"%s\" contains %'u entries" ), name,
-                (unsigned int)b->ruleCount );
+        char * base = tr_basename( b->filename );
+        tr_inf( _( "Blocklist \"%s\" contains %'zu entries" ), base, b->ruleCount );
+        tr_free( base );
     }
 }
 
@@ -296,13 +292,9 @@ _tr_blocklistSetContent( tr_blocklist * b,
     }
 
     {
-        char * name;
-        char   buf[MAX_PATH_LENGTH];
-        tr_strlcpy( buf, b->filename, sizeof( buf ) );
-        name = basename( buf );
-        tr_inf( _(
-                    "Blocklist \"%1$s\" updated with %2$'d entries" ), name,
-                lineCount );
+        char * base = tr_basename( b->filename );
+        tr_inf( _( "Blocklist \"%1$s\" updated with %2$'d entries" ), base, lineCount );
+        tr_free( base );
     }
 
 

@@ -49,13 +49,6 @@ extern "C" {
 
 #define SHA_DIGEST_LENGTH 20
 
-#ifdef __BEOS__
- #include <StorageDefs.h>
- #define MAX_PATH_LENGTH  B_FILE_NAME_LENGTH
-#else
- #define MAX_PATH_LENGTH  1024
-#endif
-
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
 typedef uint64_t tr_block_index_t;

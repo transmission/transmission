@@ -308,7 +308,6 @@ main( int     argc,
     tr_handle *  h;
     tr_ctor *    ctor;
     tr_torrent * tor = NULL;
-    char         cwd[MAX_PATH_LENGTH];
 
     printf( "Transmission %s - http://www.transmissionbt.com/\n",
             LONG_VERSION_STRING );
@@ -352,11 +351,7 @@ main( int     argc,
 
     /* if no download directory specified, use cwd instead */
     if( !downloadDir )
-    {
-        tr_getcwd( cwd, sizeof( cwd ) );
-        downloadDir = cwd;
-    }
-
+        downloadDir = tr_strdup( tr_getcwd( ) );
 
     /* Initialize libtransmission */
     h = tr_sessionInitFull(

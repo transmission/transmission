@@ -167,7 +167,7 @@ session_init( const char * configDir,
               const char * password,
               int          blocklistEnabled )
 {
-    char          mycwd[MAX_PATH_LENGTH];
+    char        * mycwd;
     tr_benc       state, *dict = NULL;
     int           peerPort = -1, peers = -1;
     int           whitelistEnabled = -1;
@@ -190,7 +190,7 @@ session_init( const char * configDir,
     ****  If neither of those can be found, the TR_DEFAULT fields are used .
     ***/
 
-    tr_getcwd( mycwd, sizeof( mycwd ) );
+    mycwd = tr_getcwd( );
     getConfigStr( dict, KEY_DOWNLOAD_DIR,    &downloadDir,       mycwd );
     getConfigInt( dict, KEY_PEX_ENABLED,     &pexEnabled,
                   TR_DEFAULT_PEX_ENABLED );
@@ -258,6 +258,8 @@ session_init( const char * configDir,
 
     if( dict )
         tr_bencFree( &state );
+
+    tr_free( mycwd );
 }
 
 static const char *

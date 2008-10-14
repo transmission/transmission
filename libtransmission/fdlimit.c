@@ -40,7 +40,6 @@
  #include <sys/resource.h> /* getrlimit */
 #endif
 #include <unistd.h>
-#include <libgen.h> /* dirname */
 #include <fcntl.h> /* O_LARGEFILE */
 
 #include <event.h>
@@ -124,8 +123,8 @@ TrOpenFile( int          i,
     filename = tr_buildPath( folder, torrentFile, NULL );
     if( write )
     {
-        char *    tmp = tr_strdup( filename );
-        const int err = tr_mkdirp( dirname( tmp ), 0777 ) ? errno : 0;
+        char * tmp = tr_dirname( filename );
+        const int err = tr_mkdirp( tmp, 0777 ) ? errno : 0;
         tr_free( tmp );
         tr_free( filename );
         if( err )

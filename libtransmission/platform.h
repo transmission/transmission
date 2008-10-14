@@ -32,6 +32,13 @@
  #define TR_PATH_DELIMITER_STR "/"
 #endif
 
+#ifdef __BEOS__
+ #include <StorageDefs.h>
+ #define MAX_PATH_LENGTH  B_FILE_NAME_LENGTH
+#else
+ #define MAX_PATH_LENGTH  1024
+#endif
+
 typedef struct tr_lock   tr_lock;
 typedef struct tr_thread tr_thread;
 
