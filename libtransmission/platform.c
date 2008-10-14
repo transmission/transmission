@@ -637,7 +637,11 @@ tr_lockfile( const char * filename )
  * his paper at: http://www.genesys-e.de/jwalter/mix4win.htm
  */
 
+#if defined(_MSC_VER)
+__declspec( align( 4 ) ) static LONG volatile g_sl;
+#else
 static LONG volatile g_sl __attribute__ ( ( aligned ( 4 ) ) );
+#endif
 
 /* Wait for spin lock */
 static int
@@ -651,7 +655,7 @@ slwait( LONG volatile *sl )
 
 /* Release spin lock */
 static int
-slrelease( LONG *sl )
+slrelease( LONG volatile *sl )
 {
     InterlockedExchange ( sl, 0 );
     return 0;
