@@ -1008,7 +1008,7 @@ void
 tr_sessionSetRPCWhitelist( tr_session * session,
                            const char * whitelist )
 {
-    return tr_rpcSetWhitelist( session->rpcServer, whitelist );
+    tr_rpcSetWhitelist( session->rpcServer, whitelist );
 }
 
 char*
@@ -1021,8 +1021,7 @@ void
 tr_sessionSetRPCWhitelistEnabled( tr_session * session,
                                   int          isEnabled )
 {
-    return tr_rpcSetWhitelistEnabled( session->rpcServer,
-                                      isEnabled );
+    tr_rpcSetWhitelistEnabled( session->rpcServer, isEnabled );
 }
 
 int

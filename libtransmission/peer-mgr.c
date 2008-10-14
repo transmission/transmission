@@ -133,10 +133,10 @@ struct tr_peerMgr
     double         globalPoolHistory[2][BANDWIDTH_PULSE_HISTORY];
 };
 
-#define tordbg( t, ... )
+#define tordbg( t, ... ) \
     tr_deepLog( __FILE__, __LINE__, t->tor->info.name, __VA_ARGS__ )
 
-#define dbgmsg( ... )
+#define dbgmsg( ... ) \
     tr_deepLog( __FILE__, __LINE__, NULL, __VA_ARGS__ )
 
 /**
