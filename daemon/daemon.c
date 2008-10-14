@@ -377,6 +377,7 @@ gotsig( int sig UNUSED )
     closing = TRUE;
 }
 
+#if !defined( WIN32 )
 #if !defined( HAVE_DAEMON )
 static int
 daemon( int nochdir,
@@ -450,7 +451,7 @@ daemon( int nochdir,
 
     return 0;
 }
-
+#endif
 #endif
 
 int
@@ -484,6 +485,7 @@ main( int     argc,
                                               tr_getDefaultConfigDir( ) );
     myConfigFilename = tr_buildPath( configDir, CONFIG_FILE, NULL );
 
+#ifndef WIN32
     if( !nofork )
     {
         if( 0 > daemon( 1, 0 ) )
@@ -492,6 +494,7 @@ main( int     argc,
             exit( 1 );
         }
     }
+#endif
 
     session_init( configDir, downloadDir,
                   rpcPort, whitelist, authRequired, username, password,

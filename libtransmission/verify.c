@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <unistd.h> /* S_ISREG */
 #include <sys/stat.h>
 
 #include "transmission.h"

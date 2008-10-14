@@ -209,7 +209,7 @@ tr_deepLog( const char * file,
         va_end( args );
         evbuffer_add_printf( buf, " (%s:%d)\n", base, line );
 #ifdef WIN32
-        OutputDebugString( EVBUFFER_DATA( buf );
+        OutputDebugString( EVBUFFER_DATA( buf ) );
         if(fp)
 #endif
         (void) fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
