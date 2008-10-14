@@ -36,6 +36,8 @@
 
 #ifdef WIN32
  #define lseek _lseeki64
+ #define read  _read
+ #define write _write
 #endif
 
 enum { TR_IO_READ, TR_IO_WRITE };

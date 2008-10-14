@@ -134,8 +134,8 @@ enum
 ***
 **/
 
-#define dbgmsg( handshake, fmt... ) tr_deepLog(\
-        __FILE__, __LINE__, tr_peerIoGetAddrStr( handshake->io ), ## fmt )
+#define dbgmsg( handshake, ... ) tr_deepLog(\
+        __FILE__, __LINE__, tr_peerIoGetAddrStr( handshake->io ), __VA_ARGS__ )
 
 static const char*
 getStateName( short state )

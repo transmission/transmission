@@ -39,8 +39,8 @@
 ***
 **/
 
-#define dbgmsg( io, fmt... ) \
-    tr_deepLog( __FILE__, __LINE__, tr_peerIoGetAddrStr( io ), ## fmt )
+#define dbgmsg( io, ... ) \
+    tr_deepLog( __FILE__, __LINE__, tr_peerIoGetAddrStr( io ), __VA_ARGS__ )
 
 struct tr_bandwidth
 {

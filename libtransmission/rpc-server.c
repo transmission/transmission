@@ -41,6 +41,10 @@
 #define MY_REALM "Transmission"
 #define TR_N_ELEMENTS( ary ) ( sizeof( ary ) / sizeof( *ary ) )
 
+#ifdef WIN32
+#define strncasecmp _strnicmp
+#endif
+
 struct tr_rpc_server
 {
     unsigned int       isEnabled          : 1;

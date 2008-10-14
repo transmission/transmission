@@ -97,7 +97,7 @@ tr_bencParseInt( const uint8_t *  buf,
         return EILSEQ;
 
     errno = 0;
-    val = strtoll( begin, &endptr, 10 );
+    val = evutil_strtoll( begin, &endptr, 10 );
     if( errno || ( endptr != end ) ) /* incomplete parse */
         err = EILSEQ;
     else if( val && *(const char*)begin == '0' ) /* no leading zeroes! */
