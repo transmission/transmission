@@ -126,9 +126,10 @@ TrOpenFile( int          i,
         char * tmp = tr_dirname( filename );
         const int err = tr_mkdirp( tmp, 0777 ) ? errno : 0;
         tr_free( tmp );
-        tr_free( filename );
-        if( err )
+        if( err ) {
+            tr_free( filename );
             return err;
+        }
     }
 
     /* open the file */
