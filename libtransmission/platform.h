@@ -35,6 +35,9 @@
 #ifdef __BEOS__
  #include <StorageDefs.h>
  #define MAX_PATH_LENGTH  B_FILE_NAME_LENGTH
+#elif defined(WIN32)
+ #include <windows.h>
+ #define MAX_PATH_LENGTH  MAX_PATH
 #else
  #define MAX_PATH_LENGTH  1024
 #endif

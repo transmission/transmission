@@ -219,8 +219,9 @@ tr_ctorSetDownloadDir( tr_ctor *    ctor,
 {
     struct optional_args * args = &ctor->optionalArgs[mode];
 
-    args->isSet_downloadDir = 0;
     tr_free( args->downloadDir );
+    args->downloadDir = NULL;
+    args->isSet_downloadDir = 0;
 
     if( directory )
     {

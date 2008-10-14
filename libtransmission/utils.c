@@ -189,8 +189,11 @@ tr_deepLog( const char * file,
             ... )
 {
     FILE * fp = tr_getLog( );
-
+#ifdef WIN32
+    if( fp || IsDebuggerPresent( ) )
+#else
     if( fp )
+#endif
     {
         va_list           args;
         char              timestr[64];
@@ -205,6 +208,10 @@ tr_deepLog( const char * file,
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
         evbuffer_add_printf( buf, " (%s:%d)\n", base, line );
+#ifdef WIN32
+        OutputDebugString( EVBUFFER_DATA( buf );
+        if(fp)
+#endif
         (void) fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
 
         tr_free( base );
