@@ -70,8 +70,7 @@ int  tr_netResolve( const  char *,
  * Sockets
  **********************************************************************/
 int  tr_netOpenTCP( const struct in_addr * addr,
-                    tr_port_t              port,
-                    int                    priority );
+                    tr_port_t              port );
 
 int  tr_netBindTCP( int port );
 

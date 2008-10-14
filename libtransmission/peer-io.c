@@ -344,7 +344,7 @@ tr_peerIoNewOutgoing( tr_session *           session,
     assert( port >= 0 );
     assert( torrentHash );
 
-    socket = tr_netOpenTCP( in_addr, port, 0 );
+    socket = tr_netOpenTCP( in_addr, port );
 
     return socket < 0
            ? NULL
@@ -451,7 +451,7 @@ tr_peerIoReconnect( tr_peerIo * io )
     if( io->socket >= 0 )
         tr_netClose( io->socket );
 
-    io->socket = tr_netOpenTCP( &io->in_addr, io->port, 0 );
+    io->socket = tr_netOpenTCP( &io->in_addr, io->port );
 
     if( io->socket >= 0 )
     {

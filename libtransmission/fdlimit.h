@@ -79,8 +79,7 @@ void     tr_fdFileClose( const char * filename );
 /***********************************************************************
  * Sockets
  **********************************************************************/
-int      tr_fdSocketCreate( int type,
-                            int priority );
+int      tr_fdSocketCreate( int type );
 
 int      tr_fdSocketAccept( int              b,
                             struct in_addr * addr,

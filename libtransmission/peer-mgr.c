@@ -2504,8 +2504,7 @@ allocateBandwidth( tr_peerMgr * mgr,
     {
         Torrent *    t = torrents[i];
         const size_t used = countPeerBandwidth( t->peers, direction );
-        +countHandshakeBandwidth( t->outgoingHandshakes,
-                                  direction );
+        countHandshakeBandwidth( t->outgoingHandshakes, direction );
 
         /* add this torrent's bandwidth use to allBytesUsed */
         allBytesUsed += used;

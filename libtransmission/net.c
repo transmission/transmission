@@ -117,12 +117,9 @@ makeSocketNonBlocking( int fd )
 }
 
 static int
-createSocket( int type,
-              int priority )
+createSocket( int type )
 {
-    int fd;
-
-    fd = tr_fdSocketCreate( type, priority );
+    int fd = tr_fdSocketCreate( type );
 
     if( fd >= 0 )
         fd = makeSocketNonBlocking( fd );
@@ -140,14 +137,13 @@ createSocket( int type,
 
 int
 tr_netOpenTCP( const struct in_addr * addr,
-               tr_port_t              port,
-               int                    priority )
+               tr_port_t              port )
 {
     int                s;
     struct sockaddr_in sock;
     const int          type = SOCK_STREAM;
 
-    if( ( s = createSocket( type, priority ) ) < 0 )
+    if( ( s = createSocket( type ) ) < 0 )
         return -1;
 
     memset( &sock, 0, sizeof( sock ) );
@@ -187,7 +183,7 @@ tr_netBindTCP( int port )
     int                optval;
 #endif
 
-    if( ( s = createSocket( type, 1 ) ) < 0 )
+    if( ( s = createSocket( type ) ) < 0 )
         return -1;
 
 #ifdef SO_REUSEADDR

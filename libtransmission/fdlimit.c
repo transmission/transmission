@@ -52,12 +52,6 @@
 #include "platform.h" /* tr_lock */
 #include "utils.h"
 
-#if SIZEOF_VOIDP == 8
- #define TR_UINT_TO_PTR( i ) (void*)( (uint64_t)i )
-#else
- #define TR_UINT_TO_PTR( i ) ( (void*)( (uint32_t)i ) )
-#endif
-
 #define dbgmsg( ... ) tr_deepLog( __FILE__, __LINE__, NULL, __VA_ARGS__ )
 
 /**
@@ -84,9 +78,8 @@ struct tr_openfile
 
 struct tr_fd_s
 {
-    int                   reserved;
-    int                   normal;
-    int                   normalMax;
+    int                   socketCount;
+    int                   socketMax;
     tr_lock *             lock;
     struct tr_openfile    open[TR_MAX_OPEN_FILES];
 };
@@ -368,54 +361,28 @@ tr_fdFileClose( const char * filename )
 ****
 ***/
 
-static tr_list * reservedSockets = NULL;
-
-static void
-setSocketPriority( int fd,
-                   int isReserved )
-{
-    if( isReserved )
-        tr_list_append( &reservedSockets, TR_UINT_TO_PTR( fd ) );
-}
-
-static int
-socketWasReserved( int fd )
-{
-    return tr_list_remove_data( &reservedSockets,
-                               TR_UINT_TO_PTR( fd ) ) != NULL;
-}
-
 static int
 getSocketMax( struct tr_fd_s * gFd )
 {
-    return gFd->normalMax;
+    return gFd->socketMax;
 }
 
 int
-tr_fdSocketCreate( int type,
-                   int isReserved )
+tr_fdSocketCreate( int type )
 {
     int s = -1;
 
     tr_lockLock( gFd->lock );
 
-    if( isReserved || ( gFd->normal < getSocketMax( gFd ) ) )
+    if( gFd->socketCount < getSocketMax( gFd ) )
         if( ( s = socket( AF_INET, type, 0 ) ) < 0 )
             tr_err( _( "Couldn't create socket: %s" ),
                    tr_strerror( sockerrno ) );
 
     if( s > -1 )
-    {
-        setSocketPriority( s, isReserved );
+        ++gFd->socketCount;
 
-        if( isReserved )
-            ++gFd->reserved;
-        else
-            ++gFd->normal;
-    }
-
-    assert( gFd->reserved >= 0 );
-    assert( gFd->normal >= 0 );
+    assert( gFd->socketCount >= 0 );
 
     tr_lockUnlock( gFd->lock );
     return s;
@@ -434,17 +401,16 @@ tr_fdSocketAccept( int              b,
     assert( port );
 
     tr_lockLock( gFd->lock );
-    if( gFd->normal < getSocketMax( gFd ) )
+    if( gFd->socketCount < getSocketMax( gFd ) )
     {
         len = sizeof( sock );
         s = accept( b, (struct sockaddr *) &sock, &len );
     }
     if( s > -1 )
     {
-        setSocketPriority( s, FALSE );
         *addr = sock.sin_addr;
         *port = sock.sin_port;
-        gFd->normal++;
+        ++gFd->socketCount;
     }
     tr_lockUnlock( gFd->lock );
 
@@ -469,14 +435,10 @@ tr_fdSocketClose( int s )
     if( s >= 0 )
     {
         socketClose( s );
-        if( socketWasReserved( s ) )
-            --gFd->reserved;
-        else
-            --gFd->normal;
+        --gFd->socketCount;
     }
 
-    assert( gFd->reserved >= 0 );
-    assert( gFd->normal >= 0 );
+    assert( gFd->socketCount >= 0 );
 
     tr_lockUnlock( gFd->lock );
 }
@@ -503,11 +465,11 @@ tr_fdInit( int globalPeerLimit )
         rlim.rlim_cur = MIN( rlim.rlim_max,
                             (rlim_t)( globalPeerLimit + NOFILE_BUFFER ) );
         setrlimit( RLIMIT_NOFILE, &rlim );
-        gFd->normalMax = rlim.rlim_cur - NOFILE_BUFFER;
+        gFd->socketMax = rlim.rlim_cur - NOFILE_BUFFER;
         tr_dbg( "setrlimit( RLIMIT_NOFILE, %d )", (int)rlim.rlim_cur );
     }
 #else
-    gFd->normalMax = globalPeerLimit;
+    gFd->socketMax = globalPeerLimit;
 #endif
     tr_dbg( "%d usable file descriptors", globalPeerLimit );
 
@@ -526,7 +488,6 @@ tr_fdClose( void )
 
     tr_lockFree( gFd->lock );
 
-    tr_list_free( &reservedSockets, NULL );
     tr_free( gFd );
 }
 
@@ -534,12 +495,12 @@ void
 tr_fdSetPeerLimit( uint16_t n )
 {
     assert( gFd != NULL && "tr_fdInit() must be called first!" );
-    gFd->normalMax = n;
+    gFd->socketMax = n;
 }
 
 uint16_t
 tr_fdGetPeerLimit( void )
 {
-    return gFd ? gFd->normalMax : -1;
+    return gFd ? gFd->socketMax : -1;
 }
 
