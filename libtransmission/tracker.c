@@ -345,8 +345,9 @@ onTrackerResponse( tr_session * session,
                    size_t       responseLen,
                    void *       torrent_hash )
 {
-    int          retry;
-    int          success = FALSE;
+    int retry;
+    int success = FALSE;
+    int scrapeFields = 0;
     tr_tracker * t;
 
     onReqDone( session );
@@ -400,13 +401,22 @@ onTrackerResponse( tr_session * session,
                 t->trackerID = tr_strdup( str );
 
             if( ( tr_bencDictFindInt( &benc, "complete", &i ) ) )
+            {
+                ++scrapeFields;
                 t->seederCount = i;
+            }
 
             if( ( tr_bencDictFindInt( &benc, "incomplete", &i ) ) )
+            {
+                ++scrapeFields;
                 t->leecherCount = incomplete = i;
+            }
 
             if( ( tr_bencDictFindInt( &benc, "downloaded", &i ) ) )
+            {
+                ++scrapeFields;
                 t->timesDownloaded = i;
+            }
 
             if( ( tmp = tr_bencDictFind( &benc, "peers" ) ) )
             {
@@ -446,8 +456,21 @@ onTrackerResponse( tr_session * session,
         const time_t now = time ( NULL );
         dbgmsg( t->name, "request succeeded. reannouncing in %d seconds",
                 interval );
-        if( t->scrapeAt <= now )
+
+        /* if the announce response was a superset of the scrape response,
+           treat this as both a successful announce AND scrape. */
+        if( scrapeFields >= 3 ) {
+            t->lastScrapeResponse = responseCode;
+            t->lastScrapeTime = now;
             t->scrapeAt = now + t->scrapeIntervalSec + t->randOffset;
+        }
+
+        /* most trackers don't provide all the scrape responses, but do
+           provide most of them, so don't scrape too soon anyway */
+        if( ( scrapeFields == 2 ) && ( t->scrapeAt <= ( now + 120 ) ) ) {
+            t->scrapeAt = now + t->scrapeIntervalSec + t->randOffset;
+        }
+
         t->reannounceAt = now + interval;
         t->manualAnnounceAllowedAt = now + t->announceMinIntervalSec;
 

@@ -230,7 +230,7 @@ event_cb( int fd, short kind, void * vg )
     }
 
     do {
-        dbgmsg( stderr, "event_cb calling socket_action fd %d, mask %d", fd, mask );
+        dbgmsg( "event_cb calling socket_action fd %d, mask %d", fd, mask );
         rc = curl_multi_socket_action( g->multi, fd, mask, &g->still_running );
     } while( rc == CURLM_CALL_MULTI_PERFORM );
     if( rc != CURLM_OK )
