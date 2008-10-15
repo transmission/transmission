@@ -331,7 +331,7 @@ tr_timerNew( struct tr_handle * handle,
 {
     tr_timer * timer = tr_new0( tr_timer, 1 );
 
-    timer->tv = tr_timevalMsec( interval_milliseconds );
+    tr_timevalMsec( interval_milliseconds, &timer->tv );
     timer->func = func;
     timer->user_data = user_data;
     timer->eh = handle->events;

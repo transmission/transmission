@@ -31,6 +31,12 @@
 
 enum
 {
+    /* the announceAt fields are set to this when the action is disabled */
+    TR_TRACKER_STOPPED = 0,
+
+    /* the announceAt fields are set to this when the action is in progress */
+    TR_TRACKER_BUSY = 1,
+
     HTTP_OK = 200,
 
     /* seconds between tracker pulses */
@@ -315,9 +321,21 @@ onStoppedResponse( tr_session *                 session,
                    size_t          responseLen  UNUSED,
                    void *                       torrent_hash  )
 {
+    tr_tracker * t = findTracker( session, torrent_hash );
+    if( t )
+    {
+        const time_t now = time( NULL );
+
+        t->reannounceAt = TR_TRACKER_STOPPED;
+        t->manualAnnounceAllowedAt = TR_TRACKER_STOPPED;
+
+        if( t->scrapeAt <= now )
+            t->scrapeAt = now + t->scrapeIntervalSec + t->randOffset;
+    }
+
     dbgmsg( NULL, "got a response to some `stop' message" );
-    tr_free( torrent_hash );
     onReqDone( session );
+    tr_free( torrent_hash );
 }
 
 static void
@@ -454,7 +472,7 @@ onTrackerResponse( tr_session * session,
          * request without modifications. */
         publishErrorMessageAndStop( t, _( "Tracker returned a 4xx message" ) );
         t->manualAnnounceAllowedAt = ~(time_t)0;
-        t->reannounceAt = 0;
+        t->reannounceAt = TR_TRACKER_STOPPED;
     }
     else if( 500 <= responseCode && responseCode <= 599 )
     {
@@ -760,13 +778,13 @@ invokeRequest( void * vreq )
         if( req->reqtype == TR_REQ_SCRAPE )
         {
             t->lastScrapeTime = now;
-            t->scrapeAt = 1;
+            t->scrapeAt = TR_TRACKER_BUSY;
         }
         else
         {
             t->lastAnnounceTime = now;
-            t->reannounceAt = 1;
-            t->manualAnnounceAllowedAt = 1;
+            t->reannounceAt = TR_TRACKER_BUSY;
+            t->manualAnnounceAllowedAt = TR_TRACKER_BUSY;
         }
     }
 
@@ -822,7 +840,7 @@ trackerPulse( void * vsession )
           && ( t->scrapeAt <= now )
           && ( trackerSupportsScrape( t, tor ) ) )
         {
-            t->scrapeAt = 1;
+            t->scrapeAt = TR_TRACKER_BUSY;
             enqueueScrape( session, t );
         }
 
@@ -830,8 +848,8 @@ trackerPulse( void * vsession )
           && ( t->reannounceAt <= now )
           && ( t->isRunning ) )
         {
-            t->reannounceAt = 1;
-            t->manualAnnounceAllowedAt = 1;
+            t->reannounceAt = TR_TRACKER_BUSY;
+            t->manualAnnounceAllowedAt = TR_TRACKER_BUSY;
             enqueueRequest( session, t, TR_REQ_REANNOUNCE );
         }
     }
@@ -1050,7 +1068,8 @@ tr_trackerStop( tr_tracker * t )
     if( t && t->isRunning )
     {
         t->isRunning = 0;
-        t->reannounceAt = t->manualAnnounceAllowedAt = 0;
+        t->reannounceAt = TR_TRACKER_STOPPED;
+        t->manualAnnounceAllowedAt = TR_TRACKER_STOPPED;
         enqueueRequest( t->session, t, TR_REQ_STOPPED );
     }
 }

@@ -392,15 +392,12 @@ tr_strip_positional_args( const char* str )
 ***
 **/
 
-struct timeval
-tr_timevalMsec( uint64_t milliseconds )
+void
+tr_timevalMsec( uint64_t milliseconds, struct timeval * setme )
 {
-    struct timeval ret;
     const uint64_t microseconds = milliseconds * 1000;
-
-    ret.tv_sec  = microseconds / 1000000;
-    ret.tv_usec = microseconds % 1000000;
-    return ret;
+    setme->tv_sec  = microseconds / 1000000;
+    setme->tv_usec = microseconds % 1000000;
 }
 
 uint8_t *
