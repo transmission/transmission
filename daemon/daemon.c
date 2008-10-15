@@ -480,9 +480,9 @@ main( int     argc,
     readargs( argc, (const char**)argv, &nofork, &configDir, &downloadDir,
               &rpcPort, &whitelist, &authRequired, &username, &password,
               &blocklistEnabled );
-    if( configDir )
+    if( !configDir )
         configDir = freeme = tr_strdup_printf( "%s-daemon",
-                                              tr_getDefaultConfigDir( ) );
+                                               tr_getDefaultConfigDir( ) );
     myConfigFilename = tr_buildPath( configDir, CONFIG_FILE, NULL );
 
 #ifndef WIN32
