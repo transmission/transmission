@@ -22,6 +22,10 @@
 #include "utils.h"
 #include "web.h"
 
+#if LIBCURL_VERSION_NUM < 0x071003
+#define curl_multi_socket_action(m,fd,mask,i) curl_multi_socket((m),(fd),(i))
+#endif
+
 #define dbgmsg( ... )  tr_deepLog( __FILE__, __LINE__, "web", __VA_ARGS__ )
 
 struct tr_web
