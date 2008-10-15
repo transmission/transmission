@@ -96,7 +96,7 @@ piperead( int s, char *buf, int len )
 } 
  
 #define pipe(a) pgpipe(a) 
-#define pipewrite(a,b,c) send(a,b,c,0) 
+#define pipewrite(a,b,c) send(a,(char*)b,c,0) 
 
 #else
 #define piperead(a,b,c) read(a,b,c) 
@@ -269,7 +269,7 @@ tr_eventClose( tr_handle * handle )
 {
     handle->events->die = TRUE;
     tr_deepLog( __FILE__, __LINE__, NULL, "closing trevent pipe" );
-    close( handle->events->fds[1] );
+    EVUTIL_CLOSESOCKET( handle->events->fds[1] );
 }
 
 /**

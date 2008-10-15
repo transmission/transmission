@@ -187,6 +187,10 @@ static int ascii_class[128] = {
     C_ETC,       C_ETC
 };
 
+// Temporary fix for Win32 target
+#if defined(WIN32) && defined(_WIN32) && defined(IN)
+#undef IN
+#endif
 
 /*
     The state codes.

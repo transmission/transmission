@@ -36,12 +36,13 @@
 
 #ifdef WIN32
  #define lseek _lseeki64
- #ifdef read
-   #undef read
+ #if defined(read)
+    #undef read
  #endif
  #define read  _read
- #ifdef write
-   #undef write
+ 
+ #if defined(write)
+    #undef write
  #endif
  #define write _write
 #endif
