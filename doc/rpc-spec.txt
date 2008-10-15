@@ -158,7 +158,7 @@
    priorities             | array (see below)                    | n/a
    rateDownload (B/s)     | number                               | tr_stat
    rateUpload (B/s)       | number                               | tr_stat
-   recheckProgress        | number                               | tr_stat
+   recheckProgress        | 'double'                             | tr_stat
    scrapeResponse         | string                               | tr_stat
    scrapeURL              | string                               | tr_stat
    seeders                | number                               | tr_stat
