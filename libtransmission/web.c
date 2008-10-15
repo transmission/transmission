@@ -249,7 +249,7 @@ timer_cb( int socket UNUSED, short action UNUSED, void * vg )
 
     do {
         dbgmsg( "timer_cb calling CURL_SOCKET_TIMEOUT" );
-        rc = curl_multi_socket_action( g->multi, 0, CURL_SOCKET_TIMEOUT,
+        rc = curl_multi_socket_action( g->multi, CURL_SOCKET_TIMEOUT, 0,
                                        &g->still_running );
     } while( rc == CURLM_CALL_MULTI_PERFORM );
 
