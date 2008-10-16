@@ -26,8 +26,8 @@
 #import "BlocklistDownloader.h"
 #import "NSApplicationAdditions.h"
 
-//one minute delay before running after option is changed
-#define SMALL_DELAY 60
+//thirty second delay before running after option is changed
+#define SMALL_DELAY 30
 
 //update one week after previous update
 #define FULL_WAIT (60 * 60 * 24 * 7)
