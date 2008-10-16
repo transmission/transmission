@@ -5,15 +5,21 @@
 
 1.1  Terminology
 
-   The JSON terminology in RFC 4627 is used. "array" is equivalent
-   to a benc list; "object" is equivalent to a benc dictionary;
-   and an object's "keys" are the dictionary's string keys.
+   The JSON terminology in RFC 4627 is used.
+
+   In benc terms, a JSON "array" is equivalent to a benc list,
+   a JSON "object" is equivalent to a benc dictionary,
+   and a JSON object's "keys" are the dictionary's string keys.
 
 2.  Message Format
 
    Messages are formatted in a subset of JSON easily represented
-   as bencoded data -- arrays, objects, strings, and whole numbers.
-   Booleans are represented as numbers where 0 is false and 1 is true.
+   as bencoded data.  Arrays, objects, strings, and whole numbers
+   all have one-to-one mappings between JSON and benc.
+
+   Booleans and floating-point numbers are also used in the JSON messages.
+   Those two types aren't native to benc, so they're encoded this way:
+   Booleans are encoded as numbers where 0 is false and 1 is true.
    Floating-point numbers are represented as strings.
 
    Messages are formatted as objects.  There are two types:
