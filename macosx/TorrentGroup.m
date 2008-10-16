@@ -23,6 +23,8 @@
  *****************************************************************************/
 
 #import "TorrentGroup.h"
+#import "Torrent.h"
+#include "utils.h" //tr_getRatio()
 
 @implementation TorrentGroup
 
@@ -50,6 +52,42 @@
 - (NSMutableArray *) torrents
 {
     return fTorrents;
+}
+
+- (float) ratio
+{
+    uint64_t uploaded = 0, downloaded = 0;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+    {
+        uploaded += [torrent uploadedTotal];
+        downloaded += [torrent downloadedTotal];
+    }
+    
+    return tr_getRatio(uploaded, downloaded);
+}
+
+- (float) uploadRate
+{
+    float rate = 0.0;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        rate += [torrent uploadRate];
+    
+    return rate;
+}
+
+- (float) downloadRate
+{
+    float rate = 0.0;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        rate += [torrent downloadRate];
+    
+    return rate;
 }
 
 @end

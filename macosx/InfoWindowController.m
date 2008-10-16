@@ -30,6 +30,7 @@
 #import "QuickLookController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
+#include "utils.h" //tr_getRatio()
 
 #define TAB_INFO_IDENT @"Info"
 #define TAB_ACTIVITY_IDENT @"Activity"
@@ -279,6 +280,7 @@ typedef enum
             [fUploadedTotalField setStringValue: @""];
             [fFailedHashField setStringValue: @""];
             [fDateActivityField setStringValue: @""];
+            [fRatioField setStringValue: @""];
             
             //options fields
             [fUploadLimitPopUp setEnabled: NO];
@@ -335,7 +337,6 @@ typedef enum
         
         [fStateField setStringValue: @""];
         [fProgressField setStringValue: @""];
-        [fRatioField setStringValue: @""];
         
         [fSwarmSpeedField setStringValue: @""];
         [fErrorMessageView setString: @""];
@@ -1370,6 +1371,11 @@ typedef enum
         
         [fPiecesView updateView];
     }
+    else if (numberSelected > 1)
+    {
+        [fRatioField setStringValue: [NSString stringForRatio: tr_getRatio(uploadedTotal, downloadedTotal)]];
+    }
+    else;
 }
 
 #warning reload table when necessary?

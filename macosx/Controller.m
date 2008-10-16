@@ -45,7 +45,7 @@
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 #import "SpeedLimitToTurtleIconTransformer.h"
-#include "utils.h" //tr_getRatio()
+#include "utils.h"
 
 #import "UKKQueue.h"
 #import <Sparkle/Sparkle.h>
@@ -2633,29 +2633,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                         ? @"YingYangGroupTemplate.png" : @"UpArrowGroupTemplate.png"];
         else
         {
+            TorrentGroup * group = (TorrentGroup *)item;
+            
             if ([fDefaults boolForKey: @"DisplayGroupRowRatio"])
-            {
-                uint64_t uploaded = 0, downloaded = 0;
-                NSEnumerator * enumerator = [[item torrents] objectEnumerator];
-                Torrent * torrent;
-                while ((torrent = [enumerator nextObject]))
-                {
-                    uploaded += [torrent uploadedTotal];
-                    downloaded += [torrent downloadedTotal];
-                }
-                
-                return [NSString stringForRatio: tr_getRatio(uploaded, downloaded)];
-            }
+                return [NSString stringForRatio: [group ratio]];
             else
             {
-                BOOL upload = [ident isEqualToString: @"UL"];
-                
-                float rate = 0.0;
-                NSEnumerator * enumerator = [[item torrents] objectEnumerator];
-                Torrent * torrent;
-                while ((torrent = [enumerator nextObject]))
-                    rate += upload ? [torrent uploadRate] : [torrent downloadRate];
-                
+                float rate = [ident isEqualToString: @"UL"] ? [group uploadRate] : [group downloadRate];
                 return [NSString stringForSpeed: rate];
             }
         }

@@ -35,4 +35,8 @@
 - (NSInteger) groupIndex;
 - (NSMutableArray *) torrents;
 
+- (float) ratio;
+- (float) uploadRate;
+- (float) downloadRate;
+
 @end
