@@ -28,6 +28,8 @@
 #define curl_multi_socket_action(m,fd,mask,i) curl_multi_socket((m),(fd),(i))
 #endif
 
+#define DEFAULT_TIMER_MSEC 2000
+
 #define dbgmsg( ... )  tr_deepLog( __FILE__, __LINE__, "web", __VA_ARGS__ )
 /* #define dbgmsg(...)  do { fprintf( stderr, __VA_ARGS__ ); fprintf( stderr, "\n" ); } while( 0 ) */
 
@@ -36,10 +38,11 @@ struct tr_web
     unsigned int dying : 1;
     int prev_running;
     int still_running;
+    long timer_ms;
     CURLM * multi;
     tr_session * session;
-    struct event timer_event;
     tr_list * easy_queue;
+    struct event timer_event;
 };
 
 /***
@@ -55,6 +58,7 @@ struct tr_web_task
     tr_session * session;
     tr_web_done_func * done_func;
     void * done_func_user_data;
+    long timer_ms;
 };
 
 static size_t
@@ -95,11 +99,13 @@ addTask( void * vtask )
         if( !task->range && session->isProxyEnabled ) {
             curl_easy_setopt( easy, CURLOPT_PROXY, session->proxy );
             curl_easy_setopt( easy, CURLOPT_PROXYPORT, session->proxyPort );
-            curl_easy_setopt( easy, CURLOPT_PROXYTYPE, getCurlProxyType( session->proxyType ) );
+            curl_easy_setopt( easy, CURLOPT_PROXYTYPE,
+                                      getCurlProxyType( session->proxyType ) );
             curl_easy_setopt( easy, CURLOPT_PROXYAUTH, CURLAUTH_ANY );
         }
         if( !task->range && session->isProxyAuthEnabled ) {
-            char * str = tr_strdup_printf( "%s:%s", session->proxyUsername, session->proxyPassword );
+            char * str = tr_strdup_printf( "%s:%s", session->proxyUsername,
+                                                    session->proxyPassword );
             curl_easy_setopt( easy, CURLOPT_PROXYUSERPWD, str );
             tr_free( str );
         }
@@ -108,7 +114,8 @@ addTask( void * vtask )
         curl_easy_setopt( easy, CURLOPT_URL, task->url );
         curl_easy_setopt( easy, CURLOPT_WRITEFUNCTION, writeFunc );
         curl_easy_setopt( easy, CURLOPT_WRITEDATA, task );
-        curl_easy_setopt( easy, CURLOPT_USERAGENT, TR_NAME "/" LONG_VERSION_STRING );
+        curl_easy_setopt( easy, CURLOPT_USERAGENT,
+                                             TR_NAME "/" LONG_VERSION_STRING );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYHOST, 0 );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYPEER, 0 );
         //curl_easy_setopt( easy, CURLOPT_FORBID_REUSE, 1 );
@@ -116,15 +123,17 @@ addTask( void * vtask )
         curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1 );
         curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 5 );
         curl_easy_setopt( easy, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
-        curl_easy_setopt( easy, CURLOPT_VERBOSE, getenv( "TR_CURL_VERBOSE" ) != NULL );
+        curl_easy_setopt( easy, CURLOPT_VERBOSE,
+                                         getenv( "TR_CURL_VERBOSE" ) != NULL );
         if( task->range )
             curl_easy_setopt( easy, CURLOPT_RANGE, task->range );
-        else /* don't set encoding if range is sent; it messes up binary data */
+        else /* don't set encoding on webseeds; it messes up binary data */
             curl_easy_setopt( easy, CURLOPT_ENCODING, "" );
 
         if( web->still_running >= MAX_CONCURRENT_TASKS ) {
             tr_list_append( &web->easy_queue, easy );
-            dbgmsg( " >> adding a task to the curl queue... size is now %d", tr_list_size( web->easy_queue ) );
+            dbgmsg( " >> adding a task to the curl queue... size is now %d",
+                                             tr_list_size( web->easy_queue ) );
         } else {
             CURLMcode rc = curl_multi_add_handle( web->multi, easy );
             if( rc == CURLM_OK )
@@ -245,6 +254,20 @@ dbgmsg( "--> still running: %d ... max: %d ... queue size: %d", g->still_running
     }
 }
 
+
+static void
+reset_timer( tr_web * g )
+{
+    struct timeval timeout;
+
+    if( evtimer_pending( &g->timer_event, NULL ) )
+        evtimer_del( &g->timer_event );
+
+    dbgmsg( "adding a timeout for %ld seconds from now", g->timer_ms/1000l );
+    tr_timevalMsec( g->timer_ms, &timeout );
+    timeout_add( &g->timer_event, &timeout );
+}
+
 /* libevent says that sock is ready to be processed, so wake up libcurl */
 static void
 event_cb( int fd, short kind, void * vg )
@@ -272,10 +295,11 @@ event_cb( int fd, short kind, void * vg )
     if( rc != CURLM_OK )
         tr_err( "%s", curl_multi_strerror( rc ) );
 
+    reset_timer( g );
     check_run_count( g );
 }
 
-/* libevent says that timeout_ms have passed, so wake up libcurl */
+/* libevent says that timer_ms have passed, so wake up libcurl */
 static void
 timer_cb( int socket UNUSED, short action UNUSED, void * vg )
 {
@@ -293,6 +317,7 @@ timer_cb( int socket UNUSED, short action UNUSED, void * vg )
     if( rc != CURLM_OK )
         tr_err( "%s", curl_multi_strerror( rc ) );
 
+    reset_timer( g );
     check_run_count( g );
 }
 
@@ -358,15 +383,22 @@ sock_cb( CURL            * e UNUSED,
 }
 
 
-/* libcurl wants us to tell it when timeout_ms have passed */
+/* from libcurl documentation: "The timeout value returned in the long timeout
+   points to, is in number of milliseconds at this very moment. If 0, it means
+   you should proceed immediately without waiting for anything. If it
+   returns -1, there's no timeout at all set.  Note: if libcurl returns a -1
+   timeout here, it just means that libcurl currently has no stored timeout
+   value. You must not wait too long (more than a few seconds perhaps) before
+   you call curl_multi_perform() again."  */
 static void
-multi_timer_cb( CURLM *multi UNUSED, long timeout_ms, void * vweb )
+multi_timer_cb( CURLM *multi UNUSED, long timer_ms, void * g )
 {
-    tr_web * web = vweb;
-    struct timeval timeout;
-    dbgmsg( "adding a timeout for %ld seconds from now", timeout_ms/1000l );
-    tr_timevalMsec( timeout_ms, &timeout );
-    timeout_add( &web->timer_event, &timeout );
+    if( timer_ms < 1 ) {
+        if( timer_ms == 0 ) /* call it immediately */
+            timer_cb( 0, 0, g );
+        timer_ms = DEFAULT_TIMER_MSEC;
+    }
+    reset_timer( g );
 }
 
 /****
@@ -416,6 +448,7 @@ tr_webInit( tr_session * session )
     web = tr_new0( struct tr_web, 1 );
     web->multi = curl_multi_init( );
     web->session = session;
+    web->timer_ms = DEFAULT_TIMER_MSEC; /* default value to overwrite in multi_timer_cb() */
 
     timeout_set( &web->timer_event, timer_cb, web );
     curl_multi_setopt( web->multi, CURLMOPT_SOCKETDATA, web );
