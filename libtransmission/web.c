@@ -22,12 +22,15 @@
 #include "utils.h"
 #include "web.h"
 
+/* arbitrary number */
 #define MAX_CONCURRENT_TASKS 24
 
-#define DEFAULT_TIMER_MSEC 2500
+/* arbitrary number */
+#define DEFAULT_TIMER_MSEC 2000
 
 #define dbgmsg( ... )  tr_deepLog( __FILE__, __LINE__, "web", __VA_ARGS__ )
-/* #define dbgmsg(...)  do { fprintf( stderr, __VA_ARGS__ ); fprintf( stderr, "\n" ); } while( 0 ) */
+/* #define dbgmsg(...) \
+ do { fprintf( stderr, __VA_ARGS__ ); fprintf( stderr, "\n" ); } while( 0 ) */
 
 struct tr_web
 {
@@ -93,10 +96,10 @@ addTask( void * vtask )
 
         if( !task->range && session->isProxyEnabled ) {
             curl_easy_setopt( easy, CURLOPT_PROXY, session->proxy );
+            curl_easy_setopt( easy, CURLOPT_PROXYAUTH, CURLAUTH_ANY );
             curl_easy_setopt( easy, CURLOPT_PROXYPORT, session->proxyPort );
             curl_easy_setopt( easy, CURLOPT_PROXYTYPE,
                                       getCurlProxyType( session->proxyType ) );
-            curl_easy_setopt( easy, CURLOPT_PROXYAUTH, CURLAUTH_ANY );
         }
         if( !task->range && session->isProxyAuthEnabled ) {
             char * str = tr_strdup_printf( "%s:%s", session->proxyUsername,
@@ -105,20 +108,19 @@ addTask( void * vtask )
             tr_free( str );
         }
 
+        curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1 );
+        curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 16 );
+        curl_easy_setopt( easy, CURLOPT_NOSIGNAL, 1 );
         curl_easy_setopt( easy, CURLOPT_PRIVATE, task );
-        curl_easy_setopt( easy, CURLOPT_URL, task->url );
-        curl_easy_setopt( easy, CURLOPT_WRITEFUNCTION, writeFunc );
-        curl_easy_setopt( easy, CURLOPT_WRITEDATA, task );
-        curl_easy_setopt( easy, CURLOPT_USERAGENT,
-                                             TR_NAME "/" LONG_VERSION_STRING );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYHOST, 0 );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYPEER, 0 );
-        curl_easy_setopt( easy, CURLOPT_NOSIGNAL, 1 );
-        curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1 );
-        curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 5 );
-        curl_easy_setopt( easy, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+        curl_easy_setopt( easy, CURLOPT_URL, task->url );
+        curl_easy_setopt( easy, CURLOPT_USERAGENT,
+                                           TR_NAME "/" LONG_VERSION_STRING );
         curl_easy_setopt( easy, CURLOPT_VERBOSE,
-                                         getenv( "TR_CURL_VERBOSE" ) != NULL );
+                                       getenv( "TR_CURL_VERBOSE" ) != NULL );
+        curl_easy_setopt( easy, CURLOPT_WRITEDATA, task );
+        curl_easy_setopt( easy, CURLOPT_WRITEFUNCTION, writeFunc );
         if( task->range )
             curl_easy_setopt( easy, CURLOPT_RANGE, task->range );
         else /* don't set encoding on webseeds; it messes up binary data */
@@ -126,10 +128,10 @@ addTask( void * vtask )
 
         if( web->still_running >= MAX_CONCURRENT_TASKS ) {
             tr_list_append( &web->easy_queue, easy );
-            dbgmsg( " >> adding a task to the curl queue... size is now %d",
-                                             tr_list_size( web->easy_queue ) );
+            dbgmsg( " >> enqueueing a task ... size is now %d",
+                                           tr_list_size( web->easy_queue ) );
         } else {
-            CURLMcode rc = curl_multi_add_handle( web->multi, easy );
+            const CURLMcode rc = curl_multi_add_handle( web->multi, easy );
             if( rc == CURLM_OK )
                 ++web->still_running;
             else
@@ -149,7 +151,16 @@ struct tr_web_sockinfo
 };
 
 static void
-finish_task( struct tr_web_task * task, long response_code )
+task_free( struct tr_web_task * task )
+{
+    evbuffer_free( task->response );
+    tr_free( task->range );
+    tr_free( task->url );
+    tr_free( task );
+}
+
+static void
+task_finish( struct tr_web_task * task, long response_code )
 {
     dbgmsg( "finished a web task... response code is %ld", response_code );
     dbgmsg( "===================================================" );
@@ -158,10 +169,7 @@ finish_task( struct tr_web_task * task, long response_code )
                      EVBUFFER_DATA( task->response ),
                      EVBUFFER_LENGTH( task->response ),
                      task->done_func_user_data );
-    evbuffer_free( task->response );
-    tr_free( task->range );
-    tr_free( task->url );
-    tr_free( task );
+    task_free( task );
 }
 
 static void
@@ -194,7 +202,7 @@ remove_finished_tasks( tr_web * g )
                 curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
                 curl_multi_remove_handle( g->multi, easy );
                 curl_easy_cleanup( easy );
-                finish_task( task, code );
+                task_finish( task, code );
             }
         }
         while ( easy );
@@ -216,11 +224,11 @@ stop_timer( tr_web* g )
 static void
 restart_timer( tr_web * g )
 {
-    struct timeval timeout;
+    struct timeval interval;
     stop_timer( g );
-    dbgmsg( "adding a timeout for %ld seconds from now", g->timer_ms/1000l );
-    tr_timevalMsec( g->timer_ms, &timeout );
-    timeout_add( &g->timer_event, &timeout );
+    dbgmsg( "adding a timeout for %ld seconds from now", g->timer_ms/1000L );
+    tr_timevalMsec( g->timer_ms, &interval );
+    evtimer_add( &g->timer_event, &interval );
 }
 
 static void
@@ -236,7 +244,8 @@ add_tasks_from_queue( tr_web * g )
             if( rc != CURLM_OK )
                 tr_err( "%s", curl_multi_strerror( rc ) );
             else {
-                dbgmsg( "pumped a task out of the curl queue... %d remain", tr_list_size( g->easy_queue ) );
+                dbgmsg( "pumped the task queue, %d remain",
+                        tr_list_size( g->easy_queue ) );
                 ++g->still_running;
             }
         }
@@ -244,16 +253,16 @@ add_tasks_from_queue( tr_web * g )
 }
 
 static void
-webDestroy( tr_web * web )
+web_close( tr_web * g )
 {
-    stop_timer( web );
-    curl_multi_cleanup( web->multi );
-    tr_free( web );
+    stop_timer( g );
+    curl_multi_cleanup( g->multi );
+    tr_free( g );
 }
 
-/* note: this function can free the tr_web if it's been flagged for deletion
-   and there are no more tasks remaining.  so, callers need to make sure to
-   not reference their g pointer after calling this function */
+/* note: this function can free the tr_web if its 'closing' flag is set
+   and no tasks remain.  callers must not reference their g pointer
+   after calling this function */
 static void
 tr_multi_socket_action( tr_web * g, int fd, int mask )
 {
@@ -265,9 +274,9 @@ tr_multi_socket_action( tr_web * g, int fd, int mask )
 
     /* invoke libcurl's processing */
     do {
-        dbgmsg( "event_cb calling socket_action fd %d, mask %d", fd, mask );
         rc = curl_multi_socket_action( g->multi, fd, mask, &g->still_running );
-        dbgmsg( "event_cb(): still_running is %d", g->still_running );
+        dbgmsg( "event_cb(): fd %d, mask %d, still_running is %d",
+                fd, mask, g->still_running );
     } while( rc == CURLM_CALL_MULTI_PERFORM );
     if( rc != CURLM_OK )
         tr_err( "%s", curl_multi_strerror( rc ) );
@@ -279,7 +288,7 @@ tr_multi_socket_action( tr_web * g, int fd, int mask )
     if( !g->still_running ) {
         stop_timer( g );
         if( g->closing ) {
-            webDestroy( g );
+            web_close( g );
             closed = TRUE;
         }
     }
@@ -338,7 +347,8 @@ setsock( curl_socket_t            sockfd,
     const int kind = EV_PERSIST
                    | (( action & CURL_POLL_IN ) ? EV_READ : 0 )
                    | (( action & CURL_POLL_OUT ) ? EV_WRITE : 0 );
-    dbgmsg( "setsock: fd is %d, curl action is %d, libevent action is %d", sockfd, action, kind );
+    dbgmsg( "setsock: fd is %d, curl action is %d, libevent action is %d",
+            sockfd, action, kind );
     if( f->evset )
         event_del( &f->ev );
     event_set( &f->ev, sockfd, kind, event_cb, g );
@@ -380,7 +390,7 @@ sock_cb( CURL            * e UNUSED,
 }
 
 
-/* from libcurl documentation: "If 0, it means you should proceed immediately
+/* libcurl documentation: "If 0, it means you should proceed immediately
  * without waiting for anything. If it returns -1, there's no timeout at all
  * set ... (but) you must not wait too long (more than a few seconds perhaps)
  * before you call curl_multi_perform() again."  */
@@ -444,7 +454,7 @@ tr_webInit( tr_session * session )
     web->session = session;
     web->timer_ms = DEFAULT_TIMER_MSEC; /* overwritten by multi_timer_cb() */
 
-    timeout_set( &web->timer_event, timer_cb, web );
+    evtimer_set( &web->timer_event, timer_cb, web );
     curl_multi_setopt( web->multi, CURLMOPT_SOCKETDATA, web );
     curl_multi_setopt( web->multi, CURLMOPT_SOCKETFUNCTION, sock_cb );
     curl_multi_setopt( web->multi, CURLMOPT_TIMERDATA, web );
@@ -459,7 +469,7 @@ tr_webClose( tr_web ** web_in )
     tr_web * web = *web_in;
     *web_in = NULL;
     if( web->still_running < 1 )
-        webDestroy( web );
+        web_close( web );
     else
         web->closing = 1;
 }
