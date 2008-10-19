@@ -279,6 +279,9 @@ tr_eventClose( tr_handle * handle )
 int
 tr_amInEventThread( struct tr_handle * handle )
 {
+    assert( handle );
+    assert( handle->events );
+
     return tr_amInThread( handle->events->thread );
 }
 
@@ -365,6 +368,9 @@ tr_runInEventThread( struct tr_handle *       handle,
                      void               func( void* ),
                      void *                   user_data )
 {
+    assert( handle );
+    assert( handle->events );
+
     if( tr_amInThread( handle->events->thread ) )
     {
         (func)( user_data );
