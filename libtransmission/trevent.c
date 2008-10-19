@@ -329,8 +329,12 @@ tr_timerNew( struct tr_handle * handle,
              void *             user_data,
              uint64_t           interval_milliseconds )
 {
-    tr_timer * timer = tr_new0( tr_timer, 1 );
+    tr_timer * timer;
 
+    assert( handle );
+    assert( handle->events );
+
+    timer = tr_new0( tr_timer, 1 );
     tr_timevalMsec( interval_milliseconds, &timer->tv );
     timer->func = func;
     timer->user_data = user_data;
