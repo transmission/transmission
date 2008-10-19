@@ -55,6 +55,12 @@ static int            messageQueuing = FALSE;
 static tr_msg_list *  messageQueue = NULL;
 static tr_msg_list ** messageQueueTail = &messageQueue;
 
+#ifndef WIN32
+    /* make null versions of these win32 functions */
+    static int IsDebuggerPresent( void ) { return FALSE; }
+    static void OutputDebugString( const void * unused UNUSED ) { }
+#endif
+
 void
 tr_msgInit( void )
 {
@@ -156,6 +162,19 @@ tr_freeMessageList( tr_msg_list * list )
 ***
 **/
 
+static struct tm *
+tr_localtime_r( time_t *_clock, struct tm *_result )
+{
+#ifdef HAVE_LOCALTIME_R
+    return localtime_r( _clock, _result );
+#else
+    struct tm *p = localtime( _clock );
+    if( p )
+        *(_result) = *p;
+    return p;
+#endif
+}
+
 char*
 tr_getLogTimeStr( char * buf,
                   int    buflen )
@@ -169,11 +188,7 @@ tr_getLogTimeStr( char * buf,
     now = time( NULL );
     gettimeofday( &tv, NULL );
 
-#ifdef WIN32
-    now_tm = *localtime( &now );
-#else
-    localtime_r( &now, &now_tm );
-#endif
+    tr_localtime_r( &now, &now_tm );
     strftime( tmp, sizeof( tmp ), "%H:%M:%S", &now_tm );
     milliseconds = (int)( tv.tv_usec / 1000 );
     tr_snprintf( buf, buflen, "%s.%03d", tmp, milliseconds );
@@ -189,11 +204,7 @@ tr_deepLog( const char * file,
             ... )
 {
     FILE * fp = tr_getLog( );
-#ifdef WIN32
     if( fp || IsDebuggerPresent( ) )
-#else
-    if( fp )
-#endif
     {
         va_list           args;
         char              timestr[64];
@@ -208,11 +219,9 @@ tr_deepLog( const char * file,
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
         evbuffer_add_printf( buf, " (%s:%d)\n", base, line );
-#ifdef WIN32
         OutputDebugString( EVBUFFER_DATA( buf ) );
         if(fp)
-#endif
-        (void) fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
+            (void) fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
 
         tr_free( base );
         evbuffer_free( buf );
@@ -254,6 +263,8 @@ tr_msg( const char * file,
         va_start( ap, fmt );
         evbuffer_add_vprintf( buf, fmt, ap );
         va_end( ap );
+
+        OutputDebugString( EVBUFFER_DATA( buf ) );
 
         if( EVBUFFER_LENGTH( buf ) )
         {

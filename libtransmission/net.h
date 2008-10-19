@@ -28,19 +28,19 @@
 #ifdef WIN32
  #include <inttypes.h>
  #include <winsock2.h>
-typedef int socklen_t;
-typedef uint16_t tr_port_t;
+ typedef int socklen_t;
+ typedef uint16_t tr_port_t;
 #elif defined( __BEOS__ )
  #include <sys/socket.h>
  #include <netinet/in.h>
-typedef unsigned short tr_port_t;
-typedef int socklen_t;
+ typedef unsigned short tr_port_t;
+ typedef int socklen_t;
 #else
  #include <sys/types.h>
  #include <sys/socket.h>
  #include <netinet/in.h>
  #include <arpa/inet.h>
-typedef in_port_t tr_port_t;
+ typedef in_port_t tr_port_t;
 #endif
 
 #ifdef WIN32

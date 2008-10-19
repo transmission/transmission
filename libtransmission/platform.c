@@ -465,9 +465,9 @@ tr_getDefaultConfigDir( void )
             s = tr_buildPath( getHomeDir( ), "Library",
                               "Application Support", "Transmission", NULL );
 #elif defined( WIN32 )
-            char appdata[MAX_PATH_LENGTH];
-            SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
-            s = tr_buildPath( appdata, "Transmission", NULL );
+            char configDir[MAX_PATH_LENGTH];
+            GetModuleFileName( GetModuleHandle( NULL ), configDir, sizeof( configDir ) );
+            s = tr_buildPath( basename( configDir ), "Transmission", NULL );
 #else
             if( ( s = getenv( "XDG_CONFIG_HOME" ) ) )
                 s = tr_buildPath( s, "transmission", NULL );
@@ -513,24 +513,59 @@ tr_getClutchDir( const tr_session * session UNUSED )
         }
         else
         {
+
 #ifdef SYS_DARWIN
-            CFURLRef     appURL = CFBundleCopyBundleURL(
-                 CFBundleGetMainBundle( ) );
-            CFStringRef  appRef = CFURLCopyFileSystemPath(
-                appURL, kCFURLPOSIXPathStyle );
-            const char * appString = CFStringGetCStringPtr(
-                 appRef, CFStringGetFastestEncoding( appRef ) );
+
+            CFURLRef appURL = CFBundleCopyBundleURL( CFBundleGetMainBundle( ) );
+            CFStringRef appRef = CFURLCopyFileSystemPath( appURL,
+                                                         kCFURLPOSIXPathStyle );
+            const char * appString = CFStringGetCStringPtr( appRef,
+                                         CFStringGetFastestEncoding( appRef ) );
             CFRelease( appURL );
             CFRelease( appRef );
 
             s = tr_buildPath( appString, "Contents", "Resources", "web", NULL );
+
 #elif defined( WIN32 )
 
- #warning hey win32 people is this good or is there a better implementation of the next four lines
-            char appdata[MAX_PATH_LENGTH];
-            SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
-            s = tr_buildPath( appdata, "Transmission", NULL );
-#else
+            /* SHGetFolderPath explicitly requires MAX_PATH length */
+            char dir[MAX_PATH];
+            
+            /* Generally, Web interface should be stored in a Web subdir of
+             * calling executable dir. */
+
+            if( s == NULL ) { 
+                /* First, we should check personal AppData/Transmission/Web */
+                SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, dir );
+                s = tr_buildPath( dir, "Transmission", "Web", NULL );
+                if( !isClutchDir( s ) ) {
+                    tr_free( s );
+                    s = NULL;
+                }
+            }
+
+            if( s == NULL ) {
+                /* check personal AppData */
+                SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, dir );
+                s = tr_buildPath( dir, "Transmission", "Web", NULL );
+                if( !isClutchDir( s ) ) {
+                    tr_free( s );
+                    s = NULL;
+                }
+            }
+
+            if( s == NULL) {
+                /* check calling module place */
+                GetModuleFileName( GetModuleHandle( NULL ), dir, sizeof( dir ) );
+                s = tr_buildPath( dirname( dir ), "Web", NULL );
+                if( !isClutchDir( s ) ) {
+                    tr_free( s );
+                    s = NULL;
+                }
+            }
+
+#else /* everyone else, follow the XDG spec */
+
             tr_list *candidates = NULL, *l;
 
             /* XDG_DATA_HOME should be the first in the list of candidates */
@@ -573,7 +608,9 @@ tr_getClutchDir( const tr_session * session UNUSED )
             }
 
             tr_list_free( &candidates, tr_free );
+
 #endif
+
         }
     }
 

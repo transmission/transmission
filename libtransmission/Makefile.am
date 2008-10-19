@@ -150,5 +150,6 @@ version.h:
 	echo '#define PEERID_PREFIX         "'@PEERID_PREFIX@'"' > version.h
 	echo '#define USERAGENT_PREFIX      "'@USERAGENT_PREFIX@'"' >> version.h
 	echo '#define SVN_REVISION          "'`svn info | grep "Revision" | awk -F': ' '{print $$2}'`'"' >> version.h
+	echo '#define SVN_REVISION_NUM      '`svn info | grep "Revision" | awk -F': ' '{print $$2}'`'' >> version.h
 	echo '#define SHORT_VERSION_STRING  "'@USERAGENT_PREFIX@'"' >> version.h
 	echo '#define LONG_VERSION_STRING   "'@USERAGENT_PREFIX@' ('`svn info | grep "Revision" | awk -F': ' '{print $$2}'`')"' >> version.h

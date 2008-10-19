@@ -62,7 +62,7 @@ typedef uint64_t tr_block_index_t;
  * - otherwise, if we're running on Darwin,
  *   "$HOME/Library/Application Support/Transmission" is returned.
  * - otherwise, if we're running on WIN32,
- *   "$CSIDL_APPDATA/Transmission" is returned.
+ *   "$EXE_FOLDER/Transmission" is returned.
  * - otherwise, if XDG_CONFIG_HOME is set,
  *   "$XDG_CONFIG_HOME/transmission" is returned.
  * - lastly, $HOME/.config/transmission" is used.

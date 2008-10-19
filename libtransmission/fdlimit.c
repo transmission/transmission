@@ -489,6 +489,7 @@ tr_fdClose( void )
     tr_lockFree( gFd->lock );
 
     tr_free( gFd );
+    gFd = NULL;
 }
 
 void
