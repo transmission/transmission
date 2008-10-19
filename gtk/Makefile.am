@@ -11,8 +11,6 @@ sexy-marshal.c:	marshal.list
 	echo '#include "sexy-marshal.h"' > sexy-marshal.c
 	glib-genmarshal --prefix=sexy_marshal ./marshal.list --body >> sexy-marshal.c
 
-
-
 AM_CPPFLAGS = \
     -I$(top_srcdir) \
     -I$(top_srcdir)/third-party/ \
@@ -114,6 +112,7 @@ icondir = $(datadir)/pixmaps
 
 EXTRA_DIST = \
     $(DESKTOP_IN_FILES) \
+    marshal.list \
     tr-core-dbus.xml \
     transmission.png
 

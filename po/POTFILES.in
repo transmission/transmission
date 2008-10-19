@@ -18,7 +18,6 @@ gtk/tracker-list.c
 gtk/transmission.desktop.in
 gtk/tr-core.c
 gtk/tr-icon.c
-gtk/tr-io.c
 gtk/tr-prefs.c
 gtk/tr-torrent.c
 gtk/tr-window.c

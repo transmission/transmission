@@ -6,7 +6,7 @@ EXTRA_DIST = \
     MessageWindow.xib \
     StatsWindow.xib \
     Defaults.plist \
-    Info.plist.in \
+    Info.plist \
     Transmission_Prefix.pch \
     version.sh \
     Growl.framework \
