@@ -132,12 +132,12 @@ typedef int timer_func ( void* );
 
 struct tr_timer
 {
-    struct event              event;
-    struct timeval            tv;
+    unsigned int              inCallback : 1;
     timer_func *              func;
     void *                    user_data;
     struct tr_event_handle *  eh;
-    uint8_t                   inCallback;
+    struct timeval            tv;
+    struct event              event;
 };
 
 struct tr_run_data

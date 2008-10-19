@@ -407,6 +407,7 @@ void
 tr_timevalMsec( uint64_t milliseconds, struct timeval * setme )
 {
     const uint64_t microseconds = milliseconds * 1000;
+    assert( setme != NULL );
     setme->tv_sec  = microseconds / 1000000;
     setme->tv_usec = microseconds % 1000000;
 }
