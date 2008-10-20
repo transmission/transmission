@@ -1179,14 +1179,16 @@ maybeInhibitHibernation( TrCore * core )
 {
     gboolean inhibit = pref_flag_get( PREF_KEY_INHIBIT_HIBERNATION );
 
-    if( inhibit )
-    {
-        /* don't inhibit if we've got active torrents */
+    /* always allow hibernation when all the torrents are paused */
+    if( inhibit ) {
+        gboolean active = FALSE;
         tr_handle *  session = tr_core_handle( core );
         tr_torrent * tor = NULL;
-        while( ( tor = tr_torrentNext( session, tor ) ) )
-            if( tr_torrentGetStatus( tor ) != TR_STATUS_STOPPED )
-                inhibit = FALSE;
+        while(( tor = tr_torrentNext( session, tor )))
+            if(( active = ( tr_torrentGetStatus( tor ) != TR_STATUS_STOPPED )))
+                break;
+        if( !active )
+            inhibit = FALSE;
     }
 
     tr_core_set_hibernation_allowed( core, !inhibit );
