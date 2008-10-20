@@ -70,10 +70,9 @@ countActiveTorrents( GtkTreeModel *       model,
                      GtkTreeIter *        iter,
                      gpointer             activeTorrentCount )
 {
-    int status = -1;
-
-    gtk_tree_model_get( model, iter, MC_STATUS, &status, -1 );
-    if( status != TR_STATUS_STOPPED )
+    int activity = -1;
+    gtk_tree_model_get( model, iter, MC_ACTIVITY, &activity, -1 );
+    if( activity != TR_STATUS_STOPPED )
         *(int*)activeTorrentCount += 1;
     return FALSE; /* keep iterating */
 }

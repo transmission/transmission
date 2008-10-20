@@ -389,7 +389,7 @@ typedef enum
     TR_RPC_TORRENT_STARTED,
     TR_RPC_TORRENT_STOPPED,
     TR_RPC_TORRENT_REMOVING,
-    TR_RPC_TORRENT_CHANGED,
+    TR_RPC_TORRENT_CHANGED, /* catch-all for the "torrent-set" rpc method */
     TR_RPC_SESSION_CHANGED
 }
 tr_rpc_callback_type;
@@ -407,17 +407,23 @@ typedef enum
 }
 tr_rpc_callback_status;
 
-typedef tr_rpc_callback_status ( *tr_rpc_func )( tr_session *
-                                                                      handle,
-                                                 tr_rpc_callback_type type,
-                                                 struct tr_torrent *
-                                                                      tor_or_null,
-                                                 void *
-                                                                      user_data );
+typedef tr_rpc_callback_status (*tr_rpc_func)(tr_session          * session,
+                                              tr_rpc_callback_type  type,
+                                              struct tr_torrent   * tor_or_null,
+                                              void                * user_data );
 
-void          tr_sessionSetRPCCallback( tr_session * handle,
-                                        tr_rpc_func  func,
-                                        void *       user_data );
+/**
+ * Register to be notified whenever something is changed via RPC,
+ * such as a torrent being added, removed, started, stopped, etc.
+ *
+ * func is invoked FROM LIBTRANSMISSION'S THREAD!
+ * This means func must be fast (to avoid blocking peers),
+ * shouldn't call libtransmission functions (to avoid deadlock),
+ * and shouldn't modify client-level memory without using a mutex!
+ */
+void tr_sessionSetRPCCallback( tr_session   * session,
+                               tr_rpc_func    func,
+                               void         * user_data );
 
 /**
 ***
@@ -969,28 +975,34 @@ void tr_torrentSetAnnounceList( tr_torrent *            torrent,
 typedef enum
 {
     TR_CP_INCOMPLETE,   /* doesn't have all the desired pieces */
-    TR_CP_DONE,         /* has all the pieces but the DND ones */
+    TR_CP_DONE,         /* has all the desired pieces, but not all pieces */
     TR_CP_COMPLETE      /* has every piece */
 }
-cp_status_t;
+tr_completeness;
 
-typedef void ( tr_torrent_status_func )( tr_torrent * torrent,
-                                         cp_status_t  status,
-                                         void *       user_data );
+typedef void ( tr_torrent_completeness_func )( tr_torrent       * torrent,
+                                               tr_completeness    completeness,
+                                               void             * user_data );
 
 /**
- * Register to be notified whenever a torrent's state changes.
+ * Register to be notified whenever a torrent's "completeness"
+ * changes.  This will be called, for example, when a torrent
+ * finishes downloading and changes from TR_CP_INCOMPLETE to
+ * either TR_CP_COMPLETE or TR_CP_DONE.
  *
  * func is invoked FROM LIBTRANSMISSION'S THREAD!
  * This means func must be fast (to avoid blocking peers),
  * shouldn't call libtransmission functions (to avoid deadlock),
  * and shouldn't modify client-level memory without using a mutex!
+ *
+ * @see tr_completeness
  */
-void tr_torrentSetStatusCallback( tr_torrent *           torrent,
-                                  tr_torrent_status_func func,
-                                  void *                 user_data );
+void tr_torrentSetCompletenessCallback(
+         tr_torrent                    * torrent,
+         tr_torrent_completeness_func    func,
+         void                          * user_data );
 
-void tr_torrentClearStatusCallback( tr_torrent * torrent );
+void tr_torrentClearCompletenessCallback( tr_torrent * torrent );
 
 
 /**
@@ -1154,6 +1166,12 @@ struct tr_info
     tr_file *          files;
 };
 
+/**
+ * What the torrent is doing right now.
+ *
+ * Note: these values will become a straight enum at some point in the future.
+ * Do not rely on their current `bitfield' implementation
+ */
 typedef enum
 {
     TR_STATUS_CHECK_WAIT   = ( 1 << 0 ), /* Waiting in queue to check files */
@@ -1162,7 +1180,7 @@ typedef enum
     TR_STATUS_SEED         = ( 1 << 3 ), /* Seeding */
     TR_STATUS_STOPPED      = ( 1 << 4 )  /* Torrent is stopped */
 }
-tr_torrent_status;
+tr_torrent_activity;
 
 #define TR_STATUS_IS_ACTIVE( s ) ( ( s ) != TR_STATUS_STOPPED )
 
@@ -1174,7 +1192,7 @@ typedef enum
 }
 tr_lockfile_state_t;
 
-tr_torrent_status tr_torrentGetStatus( tr_torrent * );
+tr_torrent_activity tr_torrentGetActivity( tr_torrent * );
 
 enum
 {
@@ -1198,8 +1216,8 @@ typedef struct tr_stat
         @see tr_torrentId() */
     int    id;
 
-    /** The torrent's current status */
-    tr_torrent_status    status;
+    /** What is this torrent doing right now? */
+    tr_torrent_activity activity;
 
     /** Our current announce URL, or NULL if none.
         This URL may change during the session if the torrent's

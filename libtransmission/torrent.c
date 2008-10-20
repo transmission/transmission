@@ -543,7 +543,7 @@ torrentRealInit( tr_handle *     h,
                                                          TR_DOWN ) );
     }
 
-    tor->cpStatus = tr_cpGetStatus( tor->completion );
+    tor->completeness = tr_cpGetStatus( tor->completion );
 
     tor->tracker = tr_trackerNew( tor );
     tor->trackerSubscription =
@@ -739,8 +739,8 @@ tr_torrentStatCached( tr_torrent * tor )
            : tr_torrentStat( tor );
 }
 
-tr_torrent_status
-tr_torrentGetStatus( tr_torrent * tor )
+tr_torrent_activity
+tr_torrentGetActivity( tr_torrent * tor )
 {
     tr_torrentRecheckCompleteness( tor );
 
@@ -750,7 +750,7 @@ tr_torrentGetStatus( tr_torrent * tor )
         return TR_STATUS_CHECK_WAIT;
     if( !tor->isRunning )
         return TR_STATUS_STOPPED;
-    if( tor->cpStatus == TR_CP_INCOMPLETE )
+    if( tor->completeness == TR_CP_INCOMPLETE )
         return TR_STATUS_DOWNLOAD;
 
     return TR_STATUS_SEED;
@@ -773,7 +773,7 @@ tr_torrentStat( tr_torrent * tor )
 
     s = &tor->stats;
     s->id = tor->uniqueId;
-    s->status = tr_torrentGetStatus( tor );
+    s->activity = tr_torrentGetActivity( tor );
     s->error  = tor->error;
     memcpy( s->errorString, tor->errorString,
            sizeof( s->errorString ) );
@@ -808,11 +808,11 @@ tr_torrentStat( tr_torrent * tor )
     s->leftUntilDone = tr_cpLeftUntilDone( tor->completion );
     s->sizeWhenDone = tr_cpSizeWhenDone( tor->completion );
 
-    s->recheckProgress = s->status == TR_STATUS_CHECK
-                         ? 1.0 -
+    s->recheckProgress = s->activity == TR_STATUS_CHECK
+                       ? 1.0 -
                          ( tr_torrentCountUncheckedPieces( tor ) /
                            (double) tor->info.pieceCount )
-                         : 0.0;
+                       : 0.0;
 
     s->swarmSpeed = tr_rcRate( tor->swarmSpeed );
 
@@ -1101,7 +1101,7 @@ checkAndStartImpl( void * vtor )
     tor->isRunning  = 1;
     *tor->errorString = '\0';
     tr_torrentResetTransferStats( tor );
-    tor->cpStatus = tr_cpGetStatus( tor->completion );
+    tor->completeness = tr_cpGetStatus( tor->completion );
     tr_torrentSaveResume( tor );
     tor->startDate = time( NULL );
     tr_trackerStart( tor->tracker );
@@ -1225,7 +1225,7 @@ tr_torrentFree( tr_torrent * tor )
         tr_handle * handle = tor->session;
         tr_globalLock( handle );
 
-        tr_torrentClearStatusCallback( tor );
+        tr_torrentClearCompletenessCallback( tor );
         tr_runInEventThread( handle, closeTorrent, tor );
 
         tr_globalUnlock( handle );
@@ -1265,58 +1265,58 @@ getCompletionString( int type )
 }
 
 static void
-fireStatusChange( tr_torrent * tor,
-                  cp_status_t  status )
+fireCompletenessChange( tr_torrent       * tor,
+                        tr_completeness    status )
 {
     assert( tor );
-    assert(
-        status == TR_CP_INCOMPLETE || status == TR_CP_DONE || status ==
-        TR_CP_COMPLETE );
+    assert( ( status == TR_CP_INCOMPLETE )
+         || ( status == TR_CP_DONE )
+         || ( status == TR_CP_COMPLETE ) );
 
-    if( tor->status_func )
-        tor->status_func( tor, status, tor->status_func_user_data );
+    if( tor->completeness_func )
+        tor->completeness_func( tor, status, tor->completeness_func_user_data );
 }
 
 void
-tr_torrentSetStatusCallback( tr_torrent *           tor,
-                             tr_torrent_status_func func,
-                             void *                 user_data )
+tr_torrentSetCompletenessCallback( tr_torrent                    * tor,
+                                   tr_torrent_completeness_func    func,
+                                   void                          * user_data )
 {
     assert( tor );
-    tor->status_func = func;
-    tor->status_func_user_data = user_data;
+    tor->completeness_func = func;
+    tor->completeness_func_user_data = user_data;
 }
 
 void
-tr_torrentClearStatusCallback( tr_torrent * torrent )
+tr_torrentClearCompletenessCallback( tr_torrent * torrent )
 {
-    tr_torrentSetStatusCallback( torrent, NULL, NULL );
+    tr_torrentSetCompletenessCallback( torrent, NULL, NULL );
 }
 
 void
 tr_torrentRecheckCompleteness( tr_torrent * tor )
 {
-    cp_status_t cpStatus;
+    tr_completeness completeness;
 
     tr_torrentLock( tor );
 
-    cpStatus = tr_cpGetStatus( tor->completion );
+    completeness = tr_cpGetStatus( tor->completion );
 
-    if( cpStatus != tor->cpStatus )
+    if( completeness != tor->completeness )
     {
         const int recentChange = tor->downloadedCur != 0;
 
         if( recentChange )
         {
             tr_torinf( tor, _( "State changed from \"%1$s\" to \"%2$s\"" ),
-                      getCompletionString( tor->cpStatus ),
-                      getCompletionString( cpStatus ) );
+                      getCompletionString( tor->completeness ),
+                      getCompletionString( completeness ) );
         }
 
-        tor->cpStatus = cpStatus;
-        fireStatusChange( tor, cpStatus );
+        tor->completeness = completeness;
+        fireCompletenessChange( tor, completeness );
 
-        if( recentChange && ( cpStatus == TR_CP_COMPLETE ) )
+        if( recentChange && ( completeness == TR_CP_COMPLETE ) )
         {
             tr_trackerCompleted( tor->tracker );
 
@@ -1332,7 +1332,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
 int
 tr_torrentIsSeed( const tr_torrent * tor )
 {
-    return tor->cpStatus == TR_CP_COMPLETE || tor->cpStatus == TR_CP_DONE;
+    return tor->completeness == TR_CP_COMPLETE || tor->completeness == TR_CP_DONE;
 }
 
 /**

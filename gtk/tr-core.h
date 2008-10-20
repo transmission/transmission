@@ -217,7 +217,7 @@ enum
     MC_NAME_COLLATED,
     MC_TORRENT,
     MC_TORRENT_RAW,
-    MC_STATUS,
+    MC_ACTIVITY,
     MC_ROW_COUNT
 };
 

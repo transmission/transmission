@@ -60,7 +60,7 @@
 
 @end
 
-void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void * torrentData)
+void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, void * torrentData)
 {
     [(Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:)
                 withObject: [[NSNumber alloc] initWithInt: status] waitUntilDone: NO];
@@ -950,22 +950,22 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (BOOL) isActive
 {
-    return fStat->status != TR_STATUS_STOPPED;
+    return fStat->activity != TR_STATUS_STOPPED;
 }
 
 - (BOOL) isSeeding
 {
-    return fStat->status == TR_STATUS_SEED;
+    return fStat->activity == TR_STATUS_SEED;
 }
 
 - (BOOL) isChecking
 {
-    return fStat->status == TR_STATUS_CHECK || fStat->status == TR_STATUS_CHECK_WAIT;
+    return fStat->activity == TR_STATUS_CHECK || fStat->activity == TR_STATUS_CHECK_WAIT;
 }
 
 - (BOOL) isCheckingWaiting
 {
-    return fStat->status == TR_STATUS_CHECK_WAIT;
+    return fStat->activity == TR_STATUS_CHECK_WAIT;
 }
 
 - (BOOL) allDownloaded
@@ -1107,10 +1107,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     }
     
     //add time when downloading
-    if (fStat->status == TR_STATUS_DOWNLOAD || ([self isSeeding]
+    if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding]
         && (fRatioSetting == NSOnState || (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]))))
     {
-        int eta = fStat->status == TR_STATUS_DOWNLOAD ? [self eta] : [self etaRatio];
+        int eta = fStat->activity == TR_STATUS_DOWNLOAD ? [self eta] : [self etaRatio];
         string = [string stringByAppendingFormat: @" - %@", [self etaString: eta]];
     }
     
@@ -1130,7 +1130,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     }
     else
     {
-        switch (fStat->status)
+        switch (fStat->activity)
         {
             case TR_STATUS_STOPPED:
                 if (fWaitToStart)
@@ -1193,7 +1193,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     //append even if error
     if ([self isActive] && ![self isChecking])
     {
-        if (fStat->status == TR_STATUS_DOWNLOAD)
+        if (fStat->activity == TR_STATUS_DOWNLOAD)
             string = [string stringByAppendingFormat: @" - %@: %@, %@: %@",
                         NSLocalizedString(@"DL", "Torrent -> status string"), [NSString stringForSpeed: [self downloadRate]],
                         NSLocalizedString(@"UL", "Torrent -> status string"), [NSString stringForSpeed: [self uploadRate]]];
@@ -1209,7 +1209,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 {
     NSString * string;
     
-    switch (fStat->status)
+    switch (fStat->activity)
     {
         case TR_STATUS_STOPPED:
             if (fWaitToStart)
@@ -1259,7 +1259,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (NSString *) stateString
 {
-    switch (fStat->status)
+    switch (fStat->activity)
     {
         case TR_STATUS_STOPPED:
             return NSLocalizedString(@"Paused", "Torrent -> status string");
@@ -1707,7 +1707,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         fInfo = tr_torrentInfo(fHandle);
     }
     
-    tr_torrentSetStatusCallback(fHandle, completenessChangeCallback, self);
+    tr_torrentSetCompletenessCallback(fHandle, completenessChangeCallback, self);
     
     fNameString = [[NSString alloc] initWithUTF8String: fInfo->name];
     fHashString = [[NSString alloc] initWithUTF8String: fInfo->hashString];

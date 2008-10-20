@@ -318,15 +318,15 @@ checkFilterMode( filter_mode_t filter_mode,
     switch( filter_mode )
     {
         case FILTER_MODE_DOWNLOADING:
-            ret = tr_torrentGetStatus( tor ) == TR_STATUS_DOWNLOAD;
+            ret = tr_torrentGetActivity( tor ) == TR_STATUS_DOWNLOAD;
             break;
 
         case FILTER_MODE_SEEDING:
-            ret = tr_torrentGetStatus( tor ) == TR_STATUS_SEED;
+            ret = tr_torrentGetActivity( tor ) == TR_STATUS_SEED;
             break;
 
         case FILTER_MODE_PAUSED:
-            ret = tr_torrentGetStatus( tor ) == TR_STATUS_STOPPED;
+            ret = tr_torrentGetActivity( tor ) == TR_STATUS_STOPPED;
             break;
 
         case FILTER_MODE_ACTIVE:

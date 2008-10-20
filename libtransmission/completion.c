@@ -292,7 +292,7 @@ tr_cpLeftUntilComplete( const tr_completion * cp )
     return cp->tor->info.totalSize - cp->sizeNow;
 }
 
-cp_status_t
+tr_completeness
 tr_cpGetStatus( const tr_completion * cp )
 {
     if( cp->sizeNow == cp->tor->info.totalSize ) return TR_CP_COMPLETE;

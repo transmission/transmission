@@ -36,7 +36,7 @@ void                       tr_cpClose( tr_completion * );
 
 /* General */
 
-cp_status_t                tr_cpGetStatus( const tr_completion * );
+tr_completeness            tr_cpGetStatus( const tr_completion * );
 
 uint64_t                   tr_cpHaveTotal( const tr_completion * );
 

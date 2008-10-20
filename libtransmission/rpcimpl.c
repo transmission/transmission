@@ -377,7 +377,7 @@ addField( const tr_torrent * tor,
     else if( !strcmp( key, "startDate" ) )
         tr_bencDictAddInt( d, key, st->startDate );
     else if( !strcmp( key, "status" ) )
-        tr_bencDictAddInt( d, key, st->status );
+        tr_bencDictAddInt( d, key, st->activity );
     else if( !strcmp( key, "swarmSpeed" ) )
         tr_bencDictAddInt( d, key, (int)( st->swarmSpeed * 1024 ) );
     else if( !strcmp( key, "timesCompleted" ) )

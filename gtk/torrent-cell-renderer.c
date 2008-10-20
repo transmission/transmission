@@ -79,7 +79,7 @@ getProgressString( const tr_info * info,
             tr_strlratio( buf3, torStat->ratio, sizeof( buf3 ) ) );
 
     /* add time when downloading */
-    if( torStat->status == TR_STATUS_DOWNLOAD )
+    if( torStat->activity == TR_STATUS_DOWNLOAD )
     {
         const int eta = torStat->eta;
         GString * gstr = g_string_new( str );
@@ -138,7 +138,7 @@ getShortStatusString( const tr_stat * torStat )
 {
     GString * gstr = g_string_new( NULL );
 
-    switch( torStat->status )
+    switch( torStat->activity )
     {
         case TR_STATUS_STOPPED:
             g_string_assign( gstr, _( "Paused" ) );
@@ -159,7 +159,7 @@ getShortStatusString( const tr_stat * torStat )
         case TR_STATUS_SEED:
         {
             char buf[128];
-            if( torStat->status != TR_STATUS_DOWNLOAD )
+            if( torStat->activity != TR_STATUS_DOWNLOAD )
             {
                 tr_strlratio( buf, torStat->ratio, sizeof( buf ) );
                 g_string_append_printf( gstr, _( "Ratio: %s" ), buf );
@@ -180,9 +180,9 @@ getShortStatusString( const tr_stat * torStat )
 static char*
 getStatusString( const tr_stat * torStat )
 {
-    const int isActive = torStat->status != TR_STATUS_STOPPED;
-    const int isChecking = torStat->status == TR_STATUS_CHECK
-                           || torStat->status == TR_STATUS_CHECK_WAIT;
+    const int isActive = torStat->activity != TR_STATUS_STOPPED;
+    const int isChecking = torStat->activity == TR_STATUS_CHECK
+                        || torStat->activity == TR_STATUS_CHECK_WAIT;
 
     GString * gstr = g_string_new( NULL );
 
@@ -190,7 +190,7 @@ getStatusString( const tr_stat * torStat )
     {
         g_string_assign( gstr, torStat->errorString );
     }
-    else switch( torStat->status )
+    else switch( torStat->activity )
         {
             case TR_STATUS_STOPPED:
             case TR_STATUS_CHECK_WAIT:
@@ -376,14 +376,10 @@ torrent_cell_renderer_render(
         GdkRectangle                        my_expose;
         int                                 w, h;
         struct TorrentCellRendererPrivate * p = self->priv;
-        GtkCellRenderer *                   text_renderer =
-            torStat->error != 0
-            ? p->
-            text_renderer_err
-            : p->
-            text_renderer;
-        const gboolean                      isActive = torStat->status !=
-                                                       TR_STATUS_STOPPED;
+        GtkCellRenderer * text_renderer = torStat->error != 0
+                                        ? p->text_renderer_err
+                                        : p->text_renderer;
+        const gboolean isActive = torStat->activity != TR_STATUS_STOPPED;
 
         my_bg = *background_area;
         my_bg.x += cell->xpad;

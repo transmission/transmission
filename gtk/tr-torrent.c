@@ -162,22 +162,22 @@ notifyInMainThread( gpointer user_data )
 }
 
 static void
-statusChangedCallback( tr_torrent   * tor UNUSED,
-                       cp_status_t        status,
-                       void *             user_data )
+completenessChangedCallback( tr_torrent       * tor UNUSED,
+                             tr_completeness    completeness,
+                             void *             user_data )
 {
-    if( status == TR_CP_COMPLETE )
+    if( completeness == TR_CP_COMPLETE )
         g_idle_add( notifyInMainThread, user_data );
 }
 
 static TrTorrent *
-maketorrent( tr_torrent * handle )
+maketorrent( tr_torrent * tor )
 {
-    TrTorrent * tor = g_object_new( TR_TORRENT_TYPE, NULL );
+    TrTorrent * gtor = g_object_new( TR_TORRENT_TYPE, NULL );
 
-    tor->priv->handle = handle;
-    tr_torrentSetStatusCallback( handle, statusChangedCallback, tor );
-    return tor;
+    gtor->priv->handle = tor;
+    tr_torrentSetCompletenessCallback( tor, completenessChangedCallback, gtor );
+    return gtor;
 }
 
 TrTorrent*
@@ -258,7 +258,7 @@ tr_torrent_status_str( TrTorrent * gtor )
     const int       upeers = MAX ( st->peersGettingFromUs, 0 );
     const int       eta = st->eta;
 
-    switch( st->status )
+    switch( st->activity )
     {
         case TR_STATUS_CHECK_WAIT:
             top =

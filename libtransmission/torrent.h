@@ -194,7 +194,7 @@ struct tr_torrent
     struct tr_completion *     completion;
 
     struct tr_bitfield *       checkedPieces;
-    cp_status_t                cpStatus;
+    tr_completeness            completeness;
 
     struct tr_tracker *        tracker;
     struct tr_publisher_tag *  trackerSubscription;
@@ -211,8 +211,8 @@ struct tr_torrent
     time_t                     doneDate;
     time_t                     startDate;
 
-    tr_torrent_status_func *   status_func;
-    void *                     status_func_user_data;
+    tr_torrent_completeness_func *   completeness_func;
+    void *                     completeness_func_user_data;
 
     unsigned int               isRunning  : 1;
     unsigned int               isDeleting : 1;

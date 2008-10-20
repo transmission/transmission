@@ -377,8 +377,8 @@ compareByState( GtkTreeModel * model,
     int sa, sb, ret;
 
     /* first by state */
-    gtk_tree_model_get( model, a, MC_STATUS, &sa, -1 );
-    gtk_tree_model_get( model, b, MC_STATUS, &sb, -1 );
+    gtk_tree_model_get( model, a, MC_ACTIVITY, &sa, -1 );
+    gtk_tree_model_get( model, b, MC_ACTIVITY, &sb, -1 );
     ret = sa - sb;
 
     /* second by progress */
@@ -714,21 +714,21 @@ tr_core_handle( TrCore * core )
 }
 
 static gboolean
-statsForeach( GtkTreeModel *      model,
+statsForeach( GtkTreeModel * model,
               GtkTreePath  * path UNUSED,
-              GtkTreeIter *       iter,
-              gpointer            gstats )
+              GtkTreeIter  * iter,
+              gpointer       gstats )
 {
     tr_torrent *        tor;
     struct core_stats * stats = gstats;
-    int                 status;
+    int                 activity;
 
     gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
-    status = tr_torrentGetStatus( tor );
+    activity = tr_torrentGetActivity( tor );
 
-    if( status == TR_STATUS_DOWNLOAD )
+    if( activity == TR_STATUS_DOWNLOAD )
         ++stats->downloadCount;
-    else if( status == TR_STATUS_SEED )
+    else if( activity == TR_STATUS_SEED )
         ++stats->seedingCount;
 
     return FALSE;
@@ -795,7 +795,7 @@ tr_core_add_torrent( TrCore *    self,
                                        MC_NAME_COLLATED, collated,
                                        MC_TORRENT,       gtor,
                                        MC_TORRENT_RAW,   tor,
-                                       MC_STATUS,        torStat->status,
+                                       MC_ACTIVITY,      torStat->activity,
                                        -1 );
 
     /* cleanup */
@@ -1009,19 +1009,19 @@ update_foreach( GtkTreeModel *      model,
                 GtkTreeIter *       iter,
                 gpointer       data UNUSED )
 {
-    int         oldStatus;
-    int         newStatus;
+    int         oldActivity;
+    int         newActivity;
     TrTorrent * gtor;
 
     /* maybe update the status column in the model */
     gtk_tree_model_get( model, iter,
                         MC_TORRENT, &gtor,
-                        MC_STATUS, &oldStatus,
+                        MC_ACTIVITY, &oldActivity,
                         -1 );
-    newStatus = tr_torrentGetStatus( tr_torrent_handle( gtor ) );
-    if( newStatus != oldStatus )
+    newActivity = tr_torrentGetActivity( tr_torrent_handle( gtor ) );
+    if( newActivity != oldActivity )
         gtk_list_store_set( GTK_LIST_STORE( model ), iter,
-                            MC_STATUS, newStatus,
+                            MC_ACTIVITY, newActivity,
                             -1 );
 
     /* cleanup */
@@ -1185,7 +1185,7 @@ maybeInhibitHibernation( TrCore * core )
         tr_handle *  session = tr_core_handle( core );
         tr_torrent * tor = NULL;
         while(( tor = tr_torrentNext( session, tor )))
-            if(( active = ( tr_torrentGetStatus( tor ) != TR_STATUS_STOPPED )))
+            if(( active = ( tr_torrentGetActivity( tor ) != TR_STATUS_STOPPED )))
                 break;
         if( !active )
             inhibit = FALSE;

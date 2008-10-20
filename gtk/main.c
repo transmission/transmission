@@ -178,14 +178,14 @@ accumulateStatusForeach( GtkTreeModel *      model,
                          GtkTreeIter *       iter,
                          gpointer            user_data )
 {
-    int                  status = 0;
+    int                  activity = 0;
     struct counts_data * counts = user_data;
 
     ++counts->totalCount;
 
-    gtk_tree_model_get( model, iter, MC_STATUS, &status, -1 );
+    gtk_tree_model_get( model, iter, MC_ACTIVITY, &activity, -1 );
 
-    if( TR_STATUS_IS_ACTIVE( status ) )
+    if( TR_STATUS_IS_ACTIVE( activity ) )
         ++counts->activeCount;
     else
         ++counts->inactiveCount;

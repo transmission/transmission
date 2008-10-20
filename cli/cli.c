@@ -173,9 +173,9 @@ escape( char *          out,
 }
 
 static void
-torrentStateChanged( tr_torrent   * torrent   UNUSED,
-                     cp_status_t    status    UNUSED,
-                     void         * user_data UNUSED )
+torrentCompletenessChanged( tr_torrent       * torrent       UNUSED,
+                            tr_completeness    completeness  UNUSED,
+                            void             * user_data     UNUSED )
 {
     system( finishCall );
 }
@@ -184,10 +184,10 @@ static int leftToScrape = 0;
 
 static void
 scrapeDoneFunc( struct tr_handle    * session UNUSED,
-                long                          response_code,
-                const void *                  response,
-                size_t                        response_byte_count,
-                void *                        host )
+                long                  response_code,
+                const void *          response,
+                size_t                response_byte_count,
+                void *                host )
 {
     tr_benc top, *files;
 
@@ -260,18 +260,18 @@ getStatusStr( const tr_stat * st,
               char *          buf,
               size_t          buflen )
 {
-    if( st->status & TR_STATUS_CHECK_WAIT )
+    if( st->activity & TR_STATUS_CHECK_WAIT )
     {
         tr_snprintf( buf, buflen, "Waiting to verify local files" );
     }
-    else if( st->status & TR_STATUS_CHECK )
+    else if( st->activity & TR_STATUS_CHECK )
     {
         tr_snprintf( buf, buflen,
                      "Verifying local files (%.2f%%, %.2f%% valid)",
                      100 * st->recheckProgress,
                      100.0 * st->percentDone );
     }
-    else if( st->status & TR_STATUS_DOWNLOAD )
+    else if( st->activity & TR_STATUS_DOWNLOAD )
     {
         char ratioStr[80];
         tr_strlratio( ratioStr, st->ratio, sizeof( ratioStr ) );
@@ -287,7 +287,7 @@ getStatusStr( const tr_stat * st,
             st->rateUpload,
             ratioStr );
     }
-    else if( st->status & TR_STATUS_SEED )
+    else if( st->activity & TR_STATUS_SEED )
     {
         char ratioStr[80];
         tr_strlratio( ratioStr, st->ratio, sizeof( ratioStr ) );
@@ -473,7 +473,7 @@ main( int     argc,
 #ifndef WIN32
     signal( SIGHUP, sigHandler );
 #endif
-    tr_torrentSetStatusCallback( tor, torrentStateChanged, NULL );
+    tr_torrentSetCompletenessCallback( tor, torrentCompletenessChanged, NULL );
     tr_torrentStart( tor );
 
     if( verify )
@@ -512,7 +512,7 @@ main( int     argc,
         }
 
         st = tr_torrentStat( tor );
-        if( st->status & TR_STATUS_STOPPED )
+        if( st->activity & TR_STATUS_STOPPED )
             break;
 
         getStatusStr( st, line, sizeof( line ) );
