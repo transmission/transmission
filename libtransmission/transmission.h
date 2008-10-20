@@ -1118,34 +1118,36 @@ tr_piece;
 struct tr_info
 {
     /* Flags */
-    unsigned int    isPrivate   : 1;
-    unsigned int    isMultifile : 1;
+    unsigned int       isPrivate   : 1;
+    unsigned int       isMultifile : 1;
 
     /* General info */
-    uint8_t    hash[SHA_DIGEST_LENGTH];
-    char       hashString[2 * SHA_DIGEST_LENGTH + 1];
-    char *     name;
+    uint8_t            hash[SHA_DIGEST_LENGTH];
+    char               hashString[2 * SHA_DIGEST_LENGTH + 1];
+    char            *  name;
 
-    /* Path to torrent */
-    char *  torrent;
+    /* Path to torrent Transmission's internal copy of the .torrent file.
+       This field exists for compatability reasons in the Mac OS X client
+       and should not be used in new code. */
+    char            *  torrent;
 
     /* these trackers are sorted by tier */
     tr_tracker_info *  trackers;
     int                trackerCount;
 
-    char **            webseeds;
+    char           **  webseeds;
     int                webseedCount;
 
     /* Torrent info */
-    char *    comment;
-    char *    creator;
-    time_t    dateCreated;
+    char             * comment;
+    char             * creator;
+    time_t             dateCreated;
 
     /* Pieces info */
-    uint32_t            pieceSize;
-    tr_piece_index_t    pieceCount;
-    uint64_t            totalSize;
-    tr_piece *          pieces;
+    uint32_t           pieceSize;
+    tr_piece_index_t   pieceCount;
+    uint64_t           totalSize;
+    tr_piece *         pieces;
 
     /* Files info */
     tr_file_index_t    fileCount;
