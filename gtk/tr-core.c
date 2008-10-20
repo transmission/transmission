@@ -914,12 +914,13 @@ tr_core_add_list( TrCore *    core,
                   pref_flag_t prompt )
 {
     const gboolean doStart = pref_flag_eval( start, PREF_KEY_START );
-    const gboolean doPrompt = pref_flag_eval( prompt,
-                                              PREF_KEY_OPTIONS_PROMPT );
-    GSList *       l;
+    const gboolean doPrompt = pref_flag_eval( prompt, PREF_KEY_OPTIONS_PROMPT );
+    GSList * l;
 
     for( l = torrentFiles; l != NULL; l = l->next )
         add_filename( core, l->data, doStart, doPrompt );
+
+    tr_core_torrents_added( core );
     freestrlist( torrentFiles );
 }
 
