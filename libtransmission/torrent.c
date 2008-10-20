@@ -713,6 +713,23 @@ tr_torrentInfo( const tr_torrent * tor )
     return tor ? &tor->info : NULL;
 }
 
+static double
+tr_torrentGetRate( const tr_torrent * tor,
+                   tr_direction       direction )
+{
+    int    i;
+    double bytes = 0;
+
+    assert( tor != NULL );
+    assert( direction == TR_UP || direction == TR_DOWN );
+
+    for( i = 0; i < BANDWIDTH_PULSE_HISTORY; ++i )
+        bytes += tor->rateHistory[direction][i];
+
+    return ( BANDWIDTH_PULSES_PER_SECOND * bytes )
+           / ( BANDWIDTH_PULSE_HISTORY * 1024 );
+}
+
 const tr_stat *
 tr_torrentStatCached( tr_torrent * tor )
 {
@@ -777,9 +794,11 @@ tr_torrentStat( tr_torrent * tor )
                             &s->webseedsSendingToUs,
                             &s->peersSendingToUs,
                             &s->peersGettingFromUs,
-                            s->peersFrom,
-                            &s->rateDownload,
-                            &s->rateUpload );
+                            s->peersFrom );
+
+    s->rateDownload = tr_torrentGetRate( tor, TR_PEER_TO_CLIENT );
+
+    s->rateUpload = tr_torrentGetRate( tor, TR_CLIENT_TO_PEER );
 
     usableSeeds += tor->info.webseedCount;
 

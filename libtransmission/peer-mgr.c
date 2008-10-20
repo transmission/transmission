@@ -1655,9 +1655,7 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                         int *              setmeWebseedsSendingToUs,
                         int *              setmePeersSendingToUs,
                         int *              setmePeersGettingFromUs,
-                        int *              setmePeersFrom,
-                        double *           setmeRateToClient,
-                        double *           setmeRateToPeers )
+                        int *              setmePeersFrom )
 {
     int                 i, size;
     const Torrent *     t;
@@ -1675,8 +1673,6 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
     *setmePeersGettingFromUs   = 0;
     *setmePeersSendingToUs     = 0;
     *setmeWebseedsSendingToUs  = 0;
-    *setmeRateToClient         = 0;
-    *setmeRateToPeers          = 0;
 
     for( i = 0; i < TR_PEER_FROM__MAX; ++i )
         setmePeersFrom[i] = 0;
@@ -1701,10 +1697,6 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
 
         if( atom->flags & ADDED_F_SEED_FLAG )
             ++ * setmeSeedsConnected;
-
-        *setmeRateToClient += tr_peerIoGetRateToClient( peer->io );
-
-        *setmeRateToPeers += tr_peerIoGetRateToPeer( peer->io );
     }
 
     webseeds = (const tr_webseed **) tr_ptrArrayPeek( t->webseeds, &size );
@@ -2506,6 +2498,9 @@ allocateBandwidth( tr_peerMgr * mgr,
         const size_t used = countPeerBandwidth( t->peers, direction );
         countHandshakeBandwidth( t->outgoingHandshakes, direction );
 
+        /* remember this torrent's bytes used */
+        t->tor->rateHistory[direction][pulseNumber] = used;
+
         /* add this torrent's bandwidth use to allBytesUsed */
         allBytesUsed += used;
 
@@ -2517,12 +2512,10 @@ allocateBandwidth( tr_peerMgr * mgr,
                 break;
 
             case TR_SPEEDLIMIT_SINGLE:
-                t->tor->rateHistory[direction][pulseNumber] = used;
-
                 setPeerBandwidth( t->peers, direction,
-                                 t->tor->rateHistory[direction],
-                                 tr_torrentGetSpeedLimit( t->tor,
-                                                          direction ) );
+                                  t->tor->rateHistory[direction],
+                                  tr_torrentGetSpeedLimit( t->tor,
+                                                           direction ) );
                 break;
 
             case TR_SPEEDLIMIT_GLOBAL:
