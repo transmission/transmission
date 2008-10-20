@@ -465,9 +465,9 @@ tr_getDefaultConfigDir( void )
             s = tr_buildPath( getHomeDir( ), "Library",
                               "Application Support", "Transmission", NULL );
 #elif defined( WIN32 )
-            char configDir[MAX_PATH_LENGTH];
-            GetModuleFileName( GetModuleHandle( NULL ), configDir, sizeof( configDir ) );
-            s = tr_buildPath( basename( configDir ), "Transmission", NULL );
+            char appdata[MAX_PATH]; /* SHGetFolderPath() requires MAX_PATH */
+            SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
+            s = tr_buildPath( appdata, "Transmission", NULL );
 #else
             if( ( s = getenv( "XDG_CONFIG_HOME" ) ) )
                 s = tr_buildPath( s, "transmission", NULL );

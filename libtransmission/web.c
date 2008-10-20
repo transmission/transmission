@@ -18,6 +18,7 @@
 
 #include "transmission.h"
 #include "list.h"
+#include "net.h" /* socklen_t */
 #include "trevent.h"
 #include "utils.h"
 #include "web.h"
