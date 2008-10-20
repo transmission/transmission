@@ -14,7 +14,8 @@
 #include "transmission.h"
 #include "bencode.h"
 #include "platform.h"
-#include "session.h" /* tr_sessionFindTorrentFile */
+#include "session.h" /* tr_sessionFindTorrentFile() */
+#include "torrent.h" /* tr_ctorGetSave() */
 #include "utils.h"
 
 #define DEFAULT_MAX_CONNECTED_PEERS 50

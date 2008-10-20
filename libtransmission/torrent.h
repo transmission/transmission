@@ -25,6 +25,19 @@
 #ifndef TR_TORRENT_H
 #define TR_TORRENT_H 1
 
+/**
+***  Package-visible ctor API
+**/
+
+void        tr_ctorSetSave( tr_ctor * ctor,
+                            int       saveMetadataInOurTorrentsDir );
+
+int         tr_ctorGetSave( const tr_ctor * ctor );
+
+/**
+***
+**/
+
 /* just like tr_torrentSetFileDLs but doesn't trigger a fastresume save */
 void        tr_torrentInitFileDLs( tr_torrent *      tor,
                                    tr_file_index_t * files,

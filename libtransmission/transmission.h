@@ -717,9 +717,6 @@ tr_ctor*    tr_ctorNew( const tr_handle * handle );
 
 void        tr_ctorFree( tr_ctor * ctor );
 
-void        tr_ctorSetSave( tr_ctor * ctor,
-                            int       saveMetadataInOurTorrentsDir );
-
 void        tr_ctorSetDeleteSource( tr_ctor * ctor,
                                     uint8_t   doDelete );
 
@@ -766,8 +763,6 @@ int         tr_ctorGetDownloadDir( const tr_ctor * ctor,
 
 int         tr_ctorGetMetainfo( const tr_ctor *         ctor,
                                 const struct tr_benc ** setme );
-
-int         tr_ctorGetSave( const tr_ctor * ctor );
 
 int         tr_ctorGetDeleteSource( const tr_ctor * ctor,
                                     uint8_t *       setmeDoDelete );
