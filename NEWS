@@ -3,7 +3,9 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.40 (2008/mm/dd)
 http://trac.transmissionbt.com/query?group=component&milestone=1.40
 - All Platforms
-   + Rewritten bandwidth management code
+   + Tracker communication uses fewer resources
+   + More accurate bandwidth management
+   + Stability fixes to the RPC and Web Client server
    + Lazy bitfields (always on)
    + Support compression when serving Web Interface content and RPC responses
    + Simplify the RPC whitelist
@@ -14,6 +16,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.40
 - GTK+
    + Option to automatically update the blocklist weekly
    + Added off-hour bandwidth scheduling
+   + Fix a couple of crashes
 - Web Client
    + The Web Client is now out of beta
    + Minor display fixes
