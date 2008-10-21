@@ -2457,8 +2457,7 @@ pumpAllPeers( tr_peerMgr * mgr )
     for( i = 0; i < torrentCount; ++i )
     {
         Torrent * t = tr_ptrArrayNth( mgr->torrents, i );
-        const int peerCount = tr_ptrArraySize( t->peers );
-        for( j = 0; j < peerCount; ++j )
+        for( j = 0; j < tr_ptrArraySize( t->peers ); ++j )
         {
             tr_peer * peer = tr_ptrArrayNth( t->peers, j );
             tr_peerMsgsPulse( peer->msgs );
