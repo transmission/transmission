@@ -639,7 +639,9 @@ typedef struct tr_msg_list
 }
 tr_msg_list;
 
-void          tr_setMessageQueuing( int enable );
+void          tr_setMessageQueuing( int isEnabled );
+
+int           tr_getMessageQueuing( void );
 
 tr_msg_list * tr_getQueuedMessages( void );
 

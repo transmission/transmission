@@ -128,6 +128,19 @@ tr_setMessageQueuing( int enabled )
     tr_lockUnlock( messageLock );
 }
 
+int
+tr_getMessageQueuing( void )
+{
+    int ret;
+
+    tr_msgInit( );
+    tr_lockLock( messageLock );
+    ret = messageQueuing;
+    tr_lockUnlock( messageLock );
+
+    return ret;
+}
+
 tr_msg_list *
 tr_getQueuedMessages( void )
 {
