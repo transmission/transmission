@@ -104,13 +104,14 @@ blocklistThreadFunc( gpointer gcore )
 
     if( ok )
     {
+        long verbose = getenv( "TR_CURL_VERBOSE" ) == NULL ? 0L : 1L;
+
         CURL * curl = curl_easy_init( );
         curl_easy_setopt( curl, CURLOPT_URL, url );
         curl_easy_setopt( curl, CURLOPT_ENCODING, "deflate" );
-        curl_easy_setopt( curl, CURLOPT_USERAGENT,
-                          "Transmission/" LONG_VERSION_STRING );
-        curl_easy_setopt( curl, CURLOPT_VERBOSE, getenv(
-                              "TR_CURL_VERBOSE" ) != NULL );
+        curl_easy_setopt( curl, CURLOPT_USERAGENT, "Transmission/"
+                                                   LONG_VERSION_STRING );
+        curl_easy_setopt( curl, CURLOPT_VERBOSE, verbose );
         curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, writeFunc );
         curl_easy_setopt( curl, CURLOPT_WRITEDATA, &fd );
         curl_easy_setopt( curl, CURLOPT_NOPROGRESS, 1 );

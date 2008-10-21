@@ -235,9 +235,9 @@ add_response( struct evhttp_request * req,
         int state;
         z_stream stream;
 
-        stream.zalloc = Z_NULL;
-        stream.zfree = Z_NULL;
-        stream.opaque = Z_NULL;
+        stream.zalloc = (alloc_func) Z_NULL;
+        stream.zfree = (free_func) Z_NULL;
+        stream.opaque = (voidpf) Z_NULL;
         deflateInit( &stream, Z_BEST_COMPRESSION );
 
         stream.next_in = (Bytef*) content;
