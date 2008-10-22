@@ -15,7 +15,7 @@
 
 #include <inttypes.h>
 
-#include <libtransmission/utils.h> /* TR_GNUC_NULL_TERMINATED */
+#include "utils.h" /* TR_GNUC_NULL_TERMINATED */
 
 /**
 ***
