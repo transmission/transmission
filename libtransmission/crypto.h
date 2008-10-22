@@ -15,6 +15,8 @@
 
 #include <inttypes.h>
 
+#include <libtransmission/utils.h> /* TR_GNUC_NULL_TERMINATED */
+
 /**
 ***
 **/
@@ -73,7 +75,7 @@ void           tr_cryptoEncrypt( tr_crypto *  crypto,
 void           tr_sha1( uint8_t *    setme,
                         const void * content1,
                         int          content1_len,
-                        ... );
+                        ... ) TR_GNUC_NULL_TERMINATED;
 
 
 /** Returns a random number in the range of [0...n) */

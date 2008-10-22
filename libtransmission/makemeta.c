@@ -215,8 +215,9 @@ getHashInfo( tr_metainfo_builder * b )
     if( !fp )
     {
         b->my_errno = errno;
-        tr_snprintf( b->errfile, sizeof( b->errfile ),
-                     b->files[fileIndex].filename );
+        tr_strlcpy( b->errfile,
+                    b->files[fileIndex].filename,
+                    sizeof( b->errfile ) );
         b->result = TR_MAKEMETA_IO_READ;
         tr_free( buf );
         tr_free( ret );
@@ -250,8 +251,9 @@ getHashInfo( tr_metainfo_builder * b )
                     if( !fp )
                     {
                         b->my_errno = errno;
-                        tr_snprintf( b->errfile, sizeof( b->errfile ),
-                                     b->files[fileIndex].filename );
+                        tr_strlcpy( b->errfile,
+                                    b->files[fileIndex].filename,
+                                    sizeof( b->errfile ) );
                         b->result = TR_MAKEMETA_IO_READ;
                         tr_free( buf );
                         tr_free( ret );

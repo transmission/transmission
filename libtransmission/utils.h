@@ -258,7 +258,7 @@ size_t      tr_strlcpy( char *       dst,
 int         tr_snprintf( char *       buf,
                          size_t       buflen,
                          const char * fmt,
-                         ... );
+                         ... ) TR_GNUC_PRINTF( 3, 4 );
 
 const char* tr_strerror( int );
 
