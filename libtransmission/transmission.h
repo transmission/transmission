@@ -98,6 +98,12 @@ tr_proxy_type;
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_CONFIG_DIR               tr_getDefaultConfigDir( )
 /** @see tr_sessionInitFull */
+#ifdef TR_EMBEDDED
+ #define TR_DEFAULT_ENCRYPTION              TR_CLEAR_PREFERRED
+#else
+ #define TR_DEFAULT_ENCRYPTION              TR_ENCRYPTION_PREFERRED
+#endif
+/** @see tr_sessionInitFull */
 #define TR_DEFAULT_PEX_ENABLED              1
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_PORT_FORWARDING_ENABLED  0

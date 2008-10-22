@@ -314,7 +314,7 @@ tr_sessionInit( const char * configDir,
                                TR_DEFAULT_PEX_ENABLED,
                                TR_DEFAULT_PORT_FORWARDING_ENABLED,
                                -1, /* public port */
-                               TR_ENCRYPTION_PREFERRED, /* encryption mode */
+                               TR_DEFAULT_ENCRYPTION, /* encryption mode */
                                TR_DEFAULT_LAZY_BITFIELD_ENABLED,
                                FALSE, /* use upload speed limit? */
                                -1, /* upload speed limit */

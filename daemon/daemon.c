@@ -218,7 +218,7 @@ session_init( const char * configDir,
     getConfigStr( dict, KEY_USERNAME,        &username,          NULL );
     getConfigStr( dict, KEY_PASSWORD,        &password,          NULL );
     getConfigInt( dict, KEY_ENCRYPTION,      &encryption,
-                  TR_ENCRYPTION_PREFERRED );
+                  TR_DEFAULT_ENCRYPTION );
 
     /***
     ****

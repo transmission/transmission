@@ -98,9 +98,11 @@ extern "C" {
 #endif
 
 /* #define DISABLE_GETTEXT */
+#if defined(TR_EMBEDDED) && !defined(DISABLE_GETTEXT)
+ #define DISABLE_GETTEXT
+#endif
 #ifdef DISABLE_GETTEXT
-const char* tr_strip_positional_args( const char* fmt );
-
+ const char * tr_strip_positional_args( const char * fmt );
  #undef _
  #define _( a ) tr_strip_positional_args( a )
 #endif
