@@ -12,6 +12,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.40
 - Mac
    + Option to automatically update the blocklist weekly
    + In the file inspector tab, show progress and size for folders
+   + Scrollbars won't temporarily disappear when the main window auto-resizes
    + Sparkle updated to 1.5
 - GTK+
    + Option to automatically update the blocklist weekly
