@@ -15,11 +15,8 @@
 
 #include <inttypes.h> /* uint16_t */
 
-#ifdef WIN32
- #include <winsock2.h> /* struct in_addr */
-#else
- #include <netinet/in.h> /* struct in_addr */
-#endif
+#include "net.h" /* struct in_addr */
+#include "tr-gnuc.h"
 
 struct in_addr;
 struct tr_handle;
@@ -46,7 +43,7 @@ tr_pex;
 
 int tr_pexCompare( const void * a, const void * b );
 
-tr_peerMgr* tr_peerMgrNew( struct tr_handle * );
+tr_peerMgr* tr_peerMgrNew( struct tr_handle * ) TR_GNUC_MALLOC;
 
 void tr_peerMgrFree( tr_peerMgr * manager );
 

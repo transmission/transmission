@@ -21,8 +21,6 @@
 #include "lock.h"
 #include "logo.h"
 
-#define UNUSED G_GNUC_UNUSED
-
 static TrCore *         myCore = NULL;
 
 static GtkActionGroup * myGroup = NULL;

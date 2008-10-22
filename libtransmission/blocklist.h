@@ -13,32 +13,31 @@
 #ifndef TR_BLOCKLIST_H
 #define TR_BLOCKLIST_H
 
+#include "tr-gnuc.h"
+
 struct in_addr;
 typedef struct tr_blocklist tr_blocklist;
 
 tr_blocklist* _tr_blocklistNew( const char * filename,
-                                int          isEnabled );
+                                int          isEnabled ) TR_GNUC_MALLOC;
 
-int           _tr_blocklistExists( const tr_blocklist * );
+int           _tr_blocklistExists      ( const tr_blocklist    * blocklist );
 
-const char*   _tr_blocklistGetFilename( const tr_blocklist * );
+const char*   _tr_blocklistGetFilename ( const tr_blocklist    * blocklist );
 
-int           _tr_blocklistGetRuleCount( const tr_blocklist * );
+int           _tr_blocklistGetRuleCount( const tr_blocklist    * blocklist );
 
-void          _tr_blocklistFree( tr_blocklist * );
+void          _tr_blocklistFree        ( tr_blocklist          * blocklist );
 
-int           _tr_blocklistIsEnabled( tr_blocklist * );
+int           _tr_blocklistIsEnabled   ( tr_blocklist          * blocklist );
 
-void          _tr_blocklistSetEnabled(             tr_blocklist *,
-                                               int isEnabled );
+void          _tr_blocklistSetEnabled  ( tr_blocklist          * blocklist,
+                                         int                     isEnabled );
 
-int           _tr_blocklistHasAddress(
-              tr_blocklist *,
-    const struct
-    in_addr * addr );
+int           _tr_blocklistHasAddress  ( tr_blocklist          * blocklist,
+                                         const struct in_addr  * addr );
 
-int           _tr_blocklistSetContent(
-                 tr_blocklist *,
-    const char * filename );
+int           _tr_blocklistSetContent  ( tr_blocklist          * blocklist,
+                                         const char            * filename );
 
 #endif

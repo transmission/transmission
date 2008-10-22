@@ -17,6 +17,8 @@
 ***
 **/
 
+#include "tr-gnuc.h"
+
 struct in_addr;
 struct evbuffer;
 struct bufferevent;
@@ -28,17 +30,17 @@ typedef struct tr_peerIo tr_peerIo;
 ***
 **/
 
-tr_peerIo*           tr_peerIoNewOutgoing(
-    struct tr_handle *     session,
-    const struct in_addr * addr,
-    int                    port,
-    const  uint8_t *
-                           torrentHash );
+tr_peerIo*  tr_peerIoNewOutgoing( struct tr_handle *     session,
+                                  const struct in_addr * addr,
+                                  int                    port,
+                                  const  uint8_t       * torrentHash )
+                                                                TR_GNUC_MALLOC;
 
-tr_peerIo*           tr_peerIoNewIncoming( struct tr_handle *     session,
-                                           const struct in_addr * addr,
-                                           uint16_t               port,
-                                           int                    socket );
+tr_peerIo*  tr_peerIoNewIncoming( struct tr_handle *     session,
+                                  const struct in_addr * addr,
+                                  uint16_t               port,
+                                  int                    socket ) 
+                                                                TR_GNUC_MALLOC;
 
 void                 tr_peerIoFree( tr_peerIo * io );
 
@@ -68,13 +70,13 @@ const char*          tr_peerIoAddrStr( const struct in_addr * addr,
 const char*          tr_peerIoGetAddrStr( const tr_peerIo * io );
 
 const struct in_addr*tr_peerIoGetAddress( const tr_peerIo * io,
-                                                uint16_t * port );
+                                          uint16_t        * port );
 
 const uint8_t*       tr_peerIoGetTorrentHash( tr_peerIo * io );
 
 int                  tr_peerIoHasTorrentHash( const tr_peerIo * io );
 
-void                 tr_peerIoSetTorrentHash( tr_peerIo *     io,
+void                 tr_peerIoSetTorrentHash( tr_peerIo     * io,
                                               const uint8_t * hash );
 
 int                  tr_peerIoReconnect( tr_peerIo * io );
@@ -120,11 +122,6 @@ void              tr_peerIoSetIOFuncs( tr_peerIo *     io,
 
 int               tr_peerIoWantsBandwidth( const tr_peerIo * io,
                                                              tr_direction );
-
-#if 0
-void              tr_peerIoTryRead( tr_peerIo * io );
-
-#endif
 
 void              tr_peerIoWrite( tr_peerIo *  io,
                                   const void * writeme,

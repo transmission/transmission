@@ -47,40 +47,7 @@ extern "C" {
  #define TRUE 1
 #endif
 
-#ifndef UNUSED
- #ifdef __GNUC__
-  #define UNUSED __attribute__ ( ( unused ) )
- #else
-  #define UNUSED
- #endif
-#endif
-
-#ifndef TR_GNUC_PRINTF
- #ifdef __GNUC__
-  #define TR_GNUC_PRINTF( fmt,\
-                          args ) __attribute__ ( ( format ( printf, fmt,\
-                                                            args ) ) )
- #else
-  #define TR_GNUC_PRINTF( fmt, args )
- #endif
-#endif
-
-#ifndef TR_GNUC_NULL_TERMINATED
- #if __GNUC__ >= 4
-  #define TR_GNUC_NULL_TERMINATED __attribute__ ( ( __sentinel__ ) )
- #else
-  #define TR_GNUC_NULL_TERMINATED
- #endif
-#endif
-
-#if __GNUC__ > 2 || ( __GNUC__ == 2 && __GNUC_MINOR__ >= 96 )
- #define TR_GNUC_PURE __attribute__ ( ( __pure__ ) )
- #define TR_GNUC_MALLOC __attribute__ ( ( __malloc__ ) )
-#else
- #define TR_GNUC_PURE
- #define TR_GNUC_MALLOC
-#endif
-
+#include "tr-gnuc.h"
 
 /***
 ****
@@ -192,10 +159,10 @@ void tr_timevalMsec( uint64_t           milliseconds,
 
 
 /* return the current date in milliseconds */
-uint64_t       tr_date( void );
+uint64_t       tr_date( void ) TR_GNUC_CONST;
 
 /* wait the specified number of milliseconds */
-void           tr_wait( uint64_t delay_milliseconds );
+void           tr_wait( uint64_t delay_milliseconds ) TR_GNUC_CONST;
 
 /***
 ****
@@ -262,7 +229,7 @@ int         tr_snprintf( char *       buf,
                          const char * fmt,
                          ... ) TR_GNUC_PRINTF( 3, 4 );
 
-const char* tr_strerror( int );
+const char* tr_strerror( int ) TR_GNUC_CONST;
 
 char*       tr_strstrip( char * str );
 
@@ -359,7 +326,7 @@ tr_bitfield* tr_bitfieldOr(                               tr_bitfield*,
     && tr_bitfieldHasFast( bitfield, nth ) )
 
 double tr_getRatio( double numerator,
-                    double denominator );
+                    double denominator ) TR_GNUC_CONST;
 
 #ifdef __cplusplus
 }

@@ -36,6 +36,7 @@
 extern "C" {
 #endif
 
+#include "tr-gnuc.h"
 #include "version.h"
 
 #include <inttypes.h> /* uintN_t */
@@ -727,7 +728,7 @@ tr_ctorMode;
 
 struct tr_benc;
 
-tr_ctor*    tr_ctorNew( const tr_handle * handle );
+tr_ctor*    tr_ctorNew( const tr_handle * handle ) TR_GNUC_MALLOC;
 
 void        tr_ctorFree( tr_ctor * ctor );
 
@@ -809,7 +810,7 @@ int          tr_torrentParse( const tr_handle * handle,
             TR_EDUPLICATE if there's already a matching torrent object. */
 tr_torrent * tr_torrentNew( tr_handle *     handle,
                             const tr_ctor * ctor,
-                            int *           setmeError );
+                            int *           setmeError ) TR_GNUC_MALLOC;
 
 /** @} */
 
