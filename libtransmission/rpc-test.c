@@ -24,57 +24,6 @@ static int test = 0;
         } \
     }
 
-#if 0
-extern char* cidrize( const char * in );
-
-extern int   tr_rpcTestACL( const void * unused,
-                            const char * acl,
-                            char **      setme_errmsg );
-
-static int
-testWildcard( const char * in,
-              const char * expected )
-{
-    int    ok;
-    char * str = cidrize( in );
-
-/* fprintf( stderr, "in [%s] out [%s] expected [%s]\n", in, str, expected ); */
-    ok = expected ? !strcmp( expected, str ) : !str;
-    tr_free( str );
-    return ok;
-}
-#endif
-
-static int
-test_acl( void )
-{
-#if 0
-    int    err;
-    char * errmsg = NULL;
-
-    check( testWildcard( "192.*.*.*", "192.0.0.0/8" ) );
-    check( testWildcard( "192.64.*.*", "192.64.0.0/16" ) );
-    check( testWildcard( "192.64.0.*", "192.64.0.0/24" ) );
-    check( testWildcard( "192.64.0.1", "192.64.0.1/32" ) );
-    check( testWildcard( "+192.*.*.*,-192.64.*.*",
-                         "+192.0.0.0/8,-192.64.0.0/16" ) );
-
-    err = tr_rpcTestACL( NULL, "+192.*.*.*", &errmsg );
-    check( !err );
-    check( !errmsg );
-    err = tr_rpcTestACL( NULL, "+192.*.8.*", &errmsg );
-    check( err );
-    check( errmsg );
-    tr_free( errmsg );
-    errmsg = NULL;
-    err = tr_rpcTestACL( NULL, "+192.*.*.*,-192.168.*.*", &errmsg );
-    check( !err );
-    check( !errmsg );
-#endif
-
-    return 0;
-}
-
 static int
 test_list( void )
 {
@@ -130,8 +79,6 @@ main( void )
 {
     int i;
 
-    if( ( i = test_acl( ) ) )
-        return i;
     if( ( i = test_list( ) ) )
         return i;
 

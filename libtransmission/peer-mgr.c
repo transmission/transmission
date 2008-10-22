@@ -14,7 +14,6 @@
 #include <errno.h>
 #include <string.h> /* memcpy, memcmp, strstr */
 #include <stdlib.h> /* qsort */
-#include <stdio.h> /* printf */
 #include <limits.h> /* INT_MAX */
 
 #include <event.h>
@@ -1754,11 +1753,9 @@ tr_peerMgrWebSpeeds( const tr_peerMgr * manager,
 }
 
 struct tr_peer_stat *
-tr_peerMgrPeerStats(
-    const                          tr_peerMgr  * manager,
-    const                          uint8_t     *
-                                   torrentHash,
-    int               * setmeCount UNUSED )
+tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
+                     const   uint8_t     * torrentHash,
+                     int                 * setmeCount UNUSED )
 {
     int             i, size;
     const Torrent * t;

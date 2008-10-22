@@ -15,17 +15,12 @@
 #include <time.h>
 #include <inttypes.h>
 
-#ifdef WIN32
- #include <winsock2.h> /* inet_ntoa */
-#else
- #include <arpa/inet.h> /* inet_ntoa */
-#endif
-
 #define ENABLE_STRNATPMPERR
 #include <libnatpmp/natpmp.h>
 
 #include "transmission.h"
 #include "natpmp.h"
+#include "net.h" /* inet_ntoa() */
 #include "port-forwarding.h"
 #include "utils.h"
 
