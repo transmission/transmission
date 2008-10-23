@@ -142,7 +142,7 @@ tr_handle * fLib;
     NSAlert * alert = [[NSAlert alloc] init];
     [alert setMessageText: NSLocalizedString(@"Are you sure you want to reset usage statistics?", "Stats reset -> title")];
     [alert setInformativeText: NSLocalizedString(@"This will clear the global statistics displayed by Transmission."
-                                " Individual transfer statistics will not be effected.", "Stats reset -> message")];
+                                " Individual transfer statistics will not be affected.", "Stats reset -> message")];
     [alert setAlertStyle: NSWarningAlertStyle];
     [alert addButtonWithTitle: NSLocalizedString(@"Reset", "Stats reset -> button")];
     [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Stats reset -> button")];
