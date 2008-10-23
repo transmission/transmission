@@ -27,7 +27,13 @@
 
 #define TR_NAME "Transmission"
 
-#include "tr-gnuc.h"
+#ifndef UNUSED
+ #ifdef __GNUC__
+  #define UNUSED __attribute__ ( ( unused ) )
+ #else
+  #define UNUSED
+ #endif
+#endif
 
 enum
 {
@@ -41,7 +47,7 @@ enum
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
-uint8_t*       tr_peerIdNew( void ) TR_GNUC_MALLOC;
+uint8_t*       tr_peerIdNew( void );
 
 const uint8_t* tr_getPeerId( void );
 

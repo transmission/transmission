@@ -88,7 +88,6 @@ noinst_HEADERS = \
     torrent.h \
     tracker.h \
     tr-getopt.h \
-    tr-gnuc.h \
     transmission.h \
     trevent.h \
     upnp.h \
