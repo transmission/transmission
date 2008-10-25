@@ -40,52 +40,48 @@ void          tr_ptrArrayForeach(
                         tr_ptrArray*,
     PtrArrayForeachFunc func );
 
-void          tr_ptrArrayFree(
-                        tr_ptrArray*,
-    PtrArrayForeachFunc func );
+void          tr_ptrArrayFree( tr_ptrArray         * array,
+                               PtrArrayForeachFunc   func );
 
-void*         tr_ptrArrayNth(             tr_ptrArray*,
-                                      int n );
+void*         tr_ptrArrayNth( tr_ptrArray   * array,
+                              int             nth );
 
-void*         tr_ptrArrayBack( tr_ptrArray* );
+void*         tr_ptrArrayBack( tr_ptrArray  * array );
 
-void**        tr_ptrArrayPeek(                   tr_ptrArray*,
-                                           int * size );
+void**        tr_ptrArrayPeek( tr_ptrArray  * array,
+                               int          * size );
 
-void**        tr_ptrArrayBase( tr_ptrArray* );
+void**        tr_ptrArrayBase( tr_ptrArray  * array );
 
-void          tr_ptrArrayClear( tr_ptrArray* );
+void          tr_ptrArrayClear( tr_ptrArray * array );
 
-int           tr_ptrArrayInsert(             tr_ptrArray*,
-                                             void*,
-                                         int pos );
+int           tr_ptrArrayInsert( tr_ptrArray * array,
+                                 void        * insertMe,
+                                 int           pos );
 
-int           tr_ptrArrayAppend( tr_ptrArray*,
-                                 void* );
+int           tr_ptrArrayAppend( tr_ptrArray * array,
+                                 void        * appendMe );
 
-void*         tr_ptrArrayPop( tr_ptrArray* );
+void*         tr_ptrArrayPop( tr_ptrArray    * array );
 
-void          tr_ptrArrayErase(             tr_ptrArray*,
-                                        int begin,
-                                        int end );
+void          tr_ptrArrayErase( tr_ptrArray  * array,
+                                int            begin,
+                                int            end );
 
 int           tr_ptrArraySize( const tr_ptrArray* );
 
 int           tr_ptrArrayEmpty( const tr_ptrArray* );
 
-int           tr_ptrArrayInsertSorted( tr_ptrArray*,
-                                       void*,
-                                        int compare(const void*,
-                                                    const void*) );
+int           tr_ptrArrayInsertSorted( tr_ptrArray * array,
+                                       void        * value,
+                                       int compare(const void*, const void*) );
 
-void*         tr_ptrArrayRemoveSorted( tr_ptrArray*,
-                                       void*,
-                                        int compare(const void*,
-                                                    const void*) );
+void*         tr_ptrArrayRemoveSorted( tr_ptrArray * array,
+                                       void        * value,
+                                       int compare(const void*, const void*) );
 
-void*         tr_ptrArrayFindSorted(                   tr_ptrArray*,
-                                                 const void*,
-                                                  int compare(const void*,
-                                                              const void*) );
+void*         tr_ptrArrayFindSorted( tr_ptrArray * array,
+                                     const void  * key,
+                                     int compare(const void*, const void*) );
 
 #endif

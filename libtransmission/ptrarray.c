@@ -33,8 +33,8 @@ tr_ptrArrayNew( void )
 
     p = tr_new( tr_ptrArray, 1 );
     p->n_items = 0;
-    p->n_alloc = GROW;
-    p->items = tr_new( void*, p->n_alloc );
+    p->n_alloc = 0;
+    p->items = NULL;
 
     return p;
 }
@@ -58,7 +58,7 @@ tr_ptrArrayForeach( tr_ptrArray *       t,
     int i;
 
     assert( t );
-    assert( t->items );
+    assert( t->items || !t->n_items );
     assert( func );
 
     for( i = 0; i < t->n_items; ++i )
@@ -70,7 +70,7 @@ tr_ptrArrayFree( tr_ptrArray *       t,
                  PtrArrayForeachFunc func )
 {
     assert( t );
-    assert( t->items );
+    assert( t->items || !t->n_items );
 
     if( func )
         tr_ptrArrayForeach( t, func );
