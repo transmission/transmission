@@ -1974,7 +1974,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 if (isActive)
                     active++;
                 
-                if (filterStatus && (!(filterActive && isActive) && !filterSeed))
+                if (filterStatus && !((filterActive && isActive) || filterSeed))
                     continue;
             }
             else
@@ -1984,7 +1984,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 if (isActive)
                     active++;
                 
-                if (filterStatus && (!(filterActive && isActive) && !filterDownload))
+                if (filterStatus && !((filterActive && isActive) || filterDownload))
                     continue;
             }
         }
