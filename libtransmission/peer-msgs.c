@@ -945,11 +945,11 @@ tr_peerMsgsCancel( tr_peermsgs * msgs,
     req.length = length;
 
     /* if it's only in the queue and hasn't been sent yet, free it */
-    if( !reqListRemove( &msgs->clientWillAskFor, &req ) )
+    if( reqListRemove( &msgs->clientWillAskFor, &req ) )
         fireCancelledReq( msgs, &req );
 
     /* if it's already been sent, send a cancel message too */
-    if( !reqListRemove( &msgs->clientAskedFor, &req ) ) {
+    if( reqListRemove( &msgs->clientAskedFor, &req ) ) {
         protocolSendCancel( msgs, &req );
         fireCancelledReq( msgs, &req );
     }
