@@ -53,7 +53,7 @@ AboutWindowController * fAboutBoxInstance = nil;
     [fLicenseButton sizeToFit];
     
     NSRect buttonFrame = [fLicenseButton frame];
-    buttonFrame.size.width += 10.0;
+    buttonFrame.size.width += 10.0f;
     buttonFrame.origin.x -= buttonFrame.size.width - oldButtonWidth;
     [fLicenseButton setFrame: buttonFrame];
 }

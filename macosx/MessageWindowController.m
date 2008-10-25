@@ -175,7 +175,7 @@
     NSScroller * scroller = [[fMessageTable enclosingScrollView] verticalScroller];
     BOOL shouldScroll = [scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0;
     
-    int total = [fMessages count];
+    NSUInteger total = [fMessages count];
     if (total > MAX_MESSAGES)
     {
         //remove the oldest
@@ -195,12 +195,12 @@
         [fMessageTable scrollRowToVisible: total-1];
 }
 
-- (int) numberOfRowsInTableView: (NSTableView *) tableView
+- (NSInteger) numberOfRowsInTableView: (NSTableView *) tableView
 {
     return [fMessages count];
 }
 
-- (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) column row: (int) row
+- (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) column row: (NSInteger) row
 {
     NSString * ident = [column identifier];
     NSDictionary * message = [fMessages objectAtIndex: row];
@@ -228,15 +228,16 @@
 }
 
 #warning don't cut off end
-- (float) tableView: (NSTableView *) tableView heightOfRow: (int) row
+- (float) tableView: (NSTableView *) tableView heightOfRow: (NSInteger) row
 {
     NSTableColumn * column = [tableView tableColumnWithIdentifier: @"Message"];
     
     if (!fAttributes)
         fAttributes = [[[[column dataCell] attributedStringValue] attributesAtIndex: 0 effectiveRange: NULL] retain];
     
-    int count = [[[fMessages objectAtIndex: row] objectForKey: @"Message"] sizeWithAttributes: fAttributes].width / [column width];
-    return [tableView rowHeight] * (float)(count+1);
+    CGFloat count = floorf([[[fMessages objectAtIndex: row] objectForKey: @"Message"] sizeWithAttributes: fAttributes].width
+                            / [column width]);
+    return [tableView rowHeight] * (count + 1.0f);
 }
 
 - (void) tableView: (NSTableView *) tableView sortDescriptorsDidChange: (NSArray *) oldDescriptors
@@ -246,7 +247,7 @@
 }
 
 - (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
-                tableColumn: (NSTableColumn *) column row: (int) row mouseLocation: (NSPoint) mouseLocation
+                tableColumn: (NSTableColumn *) column row: (NSInteger) row mouseLocation: (NSPoint) mouseLocation
 {
     NSDictionary * message = [fMessages objectAtIndex: row];
     return [NSString stringWithFormat: @"%@:%@", [[message objectForKey: @"File"] lastPathComponent], [message objectForKey: @"Line"]];
@@ -332,7 +333,7 @@
             didEndSelector: @selector(writeToFileSheetClosed:returnCode:contextInfo:) contextInfo: fileString];
 }
 
-- (void) writeToFileSheetClosed: (NSSavePanel *) panel returnCode: (int) code contextInfo: (NSString *) string
+- (void) writeToFileSheetClosed: (NSSavePanel *) panel returnCode: (NSInteger) code contextInfo: (NSString *) string
 {
     if (code == NSOKButton)
     {

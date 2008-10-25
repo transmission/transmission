@@ -25,11 +25,11 @@
 #import "BadgeView.h"
 #import "NSStringAdditions.h"
 
-#define BETWEEN_PADDING 2.0
+#define BETWEEN_PADDING 2.0f
 
 @interface BadgeView (Private)
 
-- (void) badge: (NSImage *) badge string: (NSString *) string atHeight: (float) height adjustForQuit: (BOOL) quit;
+- (void) badge: (NSImage *) badge string: (NSString *) string atHeight: (CGFloat) height adjustForQuit: (BOOL) quit;
 
 @end
 
@@ -54,7 +54,7 @@
     [super dealloc];
 }
 
-- (BOOL) setRatesWithDownload: (float) downloadRate upload: (float) uploadRate
+- (BOOL) setRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate
 {
     //only needs update if the badges were displayed or are displayed now
     BOOL needsUpdate = fDownloadRate != downloadRate || fUploadRate != uploadRate;
@@ -80,13 +80,13 @@
     {
         NSImage * quitBadge = [NSImage imageNamed: @"QuitBadge.png"];
         [self badge: quitBadge string: NSLocalizedString(@"Quitting", "Dock Badger -> quit")
-                atHeight: (rect.size.height - [quitBadge size].height) * 0.5 adjustForQuit: YES];
+                atHeight: (rect.size.height - [quitBadge size].height) * 0.5f adjustForQuit: YES];
         return;
     }
     
-    BOOL upload = fUploadRate >= 0.1,
-        download = fDownloadRate >= 0.1;
-    float bottom = 0.0;
+    BOOL upload = fUploadRate >= 0.1f,
+        download = fDownloadRate >= 0.1f;
+    CGFloat bottom = 0.0f;
     if (upload)
     {
         NSImage * uploadBadge = [NSImage imageNamed: @"UploadBadge.png"];
@@ -104,17 +104,17 @@
 @implementation BadgeView (Private)
 
 //dock icon must have locked focus
-- (void) badge: (NSImage *) badge string: (NSString *) string atHeight: (float) height adjustForQuit: (BOOL) quit
+- (void) badge: (NSImage *) badge string: (NSString *) string atHeight: (CGFloat) height adjustForQuit: (BOOL) quit
 {
     if (!fAttributes)
     {
         NSShadow * stringShadow = [[NSShadow alloc] init];
-        [stringShadow setShadowOffset: NSMakeSize(2.0, -2.0)];
-        [stringShadow setShadowBlurRadius: 4.0];
+        [stringShadow setShadowOffset: NSMakeSize(2.0f, -2.0f)];
+        [stringShadow setShadowBlurRadius: 4.0f];
         
         fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
             [NSColor whiteColor], NSForegroundColorAttributeName,
-            [NSFont boldSystemFontOfSize: 26.0], NSFontAttributeName, stringShadow, NSShadowAttributeName, nil];
+            [NSFont boldSystemFontOfSize: 26.0f], NSFontAttributeName, stringShadow, NSShadowAttributeName, nil];
         
         [stringShadow release];
     }
@@ -123,14 +123,14 @@
     badgeRect.size = [badge size];
     badgeRect.origin.y = height;
     
-    [badge drawInRect: badgeRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    [badge drawInRect: badgeRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0f];
     
     //string is in center of image
     NSSize stringSize = [string sizeWithAttributes: fAttributes];
     
     NSRect stringRect = badgeRect;
-    stringRect.origin.x += (badgeRect.size.width - stringSize.width) * 0.5;
-    stringRect.origin.y += (badgeRect.size.height - stringSize.height) * 0.5 + (quit ? 2.0 : 1.0); //adjust for shadow, extra for quit
+    stringRect.origin.x += (badgeRect.size.width - stringSize.width) * 0.5f;
+    stringRect.origin.y += (badgeRect.size.height - stringSize.height) * 0.5f + (quit ? 2.0f : 1.0f); //adjust for shadow, extra for quit
     stringRect.size = stringSize;
     
     [string drawInRect: stringRect withAttributes: fAttributes];

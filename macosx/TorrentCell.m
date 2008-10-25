@@ -30,30 +30,30 @@
 #import "NSBezierPathAdditions.h"
 #import "CTGradientAdditions.h"
 
-#define BAR_HEIGHT 12.0
+#define BAR_HEIGHT 12.0f
 
-#define IMAGE_SIZE_REG 32.0
-#define IMAGE_SIZE_MIN 16.0
+#define IMAGE_SIZE_REG 32.0f
+#define IMAGE_SIZE_MIN 16.0f
 
-#define NORMAL_BUTTON_WIDTH 14.0
-#define ACTION_BUTTON_WIDTH 16.0
+#define NORMAL_BUTTON_WIDTH 14.0f
+#define ACTION_BUTTON_WIDTH 16.0f
 
 //ends up being larger than font height
-#define HEIGHT_TITLE 16.0
-#define HEIGHT_STATUS 12.0
+#define HEIGHT_TITLE 16.0f
+#define HEIGHT_STATUS 12.0f
 
-#define PADDING_HORIZONTAL 3.0
-#define PADDING_BETWEEN_IMAGE_AND_TITLE 5.0
-#define PADDING_BETWEEN_IMAGE_AND_BAR 7.0
-#define PADDING_ABOVE_TITLE 4.0
-#define PADDING_ABOVE_MIN_STATUS 4.0
-#define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 2.0
-#define PADDING_BETWEEN_TITLE_AND_PROGRESS 1.0
-#define PADDING_BETWEEN_PROGRESS_AND_BAR 2.0
-#define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0
-#define PADDING_BETWEEN_BAR_AND_STATUS 2.0
+#define PADDING_HORIZONTAL 3.0f
+#define PADDING_BETWEEN_IMAGE_AND_TITLE 5.0f
+#define PADDING_BETWEEN_IMAGE_AND_BAR 7.0f
+#define PADDING_ABOVE_TITLE 4.0f
+#define PADDING_ABOVE_MIN_STATUS 4.0f
+#define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 2.0f
+#define PADDING_BETWEEN_TITLE_AND_PROGRESS 1.0f
+#define PADDING_BETWEEN_PROGRESS_AND_BAR 2.0f
+#define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0f
+#define PADDING_BETWEEN_BAR_AND_STATUS 2.0f
 
-#define PIECES_TOTAL_PERCENT 0.6
+#define PIECES_TOTAL_PERCENT 0.6f
 
 #define MAX_PIECES (18*18)
 
@@ -91,26 +91,26 @@
         [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
     
         fTitleAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
+                                [NSFont messageFontOfSize: 12.0f], NSFontAttributeName,
                                 paragraphStyle, NSParagraphStyleAttributeName, nil];
         fStatusAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
+                                [NSFont messageFontOfSize: 9.0f], NSFontAttributeName,
                                 paragraphStyle, NSParagraphStyleAttributeName, nil];
         [paragraphStyle release];
         
-        fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
-        fBarBorderColor = [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] retain];
+        fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0f green: 0.4f blue: 0.8f alpha: 1.0f] retain];
+        fBarBorderColor = [[NSColor colorWithDeviceWhite: 0.0f alpha: 0.2f] retain];
     }
 	return self;
 }
 
 - (NSRect) iconRectForBounds: (NSRect) bounds
 {
-    float imageSize = [fDefaults boolForKey: @"SmallView"] ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG;
+    CGFloat imageSize = [fDefaults boolForKey: @"SmallView"] ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG;
     
     NSRect result = bounds;
     result.origin.x += PADDING_HORIZONTAL;
-    result.origin.y += floorf((result.size.height - imageSize) * 0.5);
+    result.origin.y += floorf((result.size.height - imageSize) * 0.5f);
     result.size = NSMakeSize(imageSize, imageSize);
     
     return result;
@@ -154,7 +154,7 @@
     else
         result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
     
-    result.size.width = round(NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH));
+    result.size.width = round(NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL - 2.0f * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH));
     
     return result;
 }
@@ -172,9 +172,9 @@
     NSRect result = bounds;
     result.size.height = NORMAL_BUTTON_WIDTH;
     result.size.width = NORMAL_BUTTON_WIDTH;
-    result.origin.x = NSMaxX(bounds) - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
+    result.origin.x = NSMaxX(bounds) - 2.0f * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
     
-    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5;
+    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5f;
     if ([fDefaults boolForKey: @"SmallView"])
         result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
     else
@@ -190,7 +190,7 @@
     result.size.width = NORMAL_BUTTON_WIDTH;
     result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
     
-    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5;
+    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5f;
     if ([fDefaults boolForKey: @"SmallView"])
         result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
     else
@@ -204,8 +204,8 @@
     NSRect result = [self iconRectForBounds: bounds];
     if (![fDefaults boolForKey: @"SmallView"])
     {
-        result.origin.x += (result.size.width - ACTION_BUTTON_WIDTH) * 0.5;
-        result.origin.y += (result.size.height - ACTION_BUTTON_WIDTH) * 0.5;
+        result.origin.x += (result.size.width - ACTION_BUTTON_WIDTH) * 0.5f;
+        result.origin.y += (result.size.height - ACTION_BUTTON_WIDTH) * 0.5f;
         result.size.width = ACTION_BUTTON_WIDTH;
         result.size.height = ACTION_BUTTON_WIDTH;
     }
@@ -383,31 +383,31 @@
     //group coloring
     NSRect iconRect = [self iconRectForBounds: cellFrame];
     
-    int groupValue = [torrent groupValue];
+    NSInteger groupValue = [torrent groupValue];
     if (groupValue != -1)
     {
-        NSRect groupRect = NSInsetRect(iconRect, -1.0, -2.0);
+        NSRect groupRect = NSInsetRect(iconRect, -1.0f, -2.0f);
         if (!minimal)
         {
             groupRect.size.height--;
             groupRect.origin.y--;
         }
-        float radius = minimal ? 3.0 : 6.0;
+        CGFloat radius = minimal ? 3.0f : 6.0f;
         
         NSColor * groupColor = [[GroupsController groups] colorForIndex: groupValue],
-                * darkGroupColor = [groupColor blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]];
+                * darkGroupColor = [groupColor blendedColorWithFraction: 0.2f ofColor: [NSColor whiteColor]];
         
         //border
         NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: groupRect radius: radius];
         [darkGroupColor set];
-        [bp setLineWidth: 2.0];
+        [bp setLineWidth: 2.0f];
         [bp stroke];
         
         //inside
         bp = [NSBezierPath bezierPathWithRoundedRect: groupRect radius: radius];
-        CTGradient * gradient = [CTGradient gradientWithBeginningColor: [groupColor blendedColorWithFraction: 0.7
+        CTGradient * gradient = [CTGradient gradientWithBeginningColor: [groupColor blendedColorWithFraction: 0.7f
                                     ofColor: [NSColor whiteColor]] endingColor: darkGroupColor];
-        [gradient fillBezierPath: bp angle: 90.0];
+        [gradient fillBezierPath: bp angle: 90.0f];
     }
     
     //error image
@@ -422,14 +422,14 @@
     if (!minimal || !(!fTracking && fHoverAction)) //don't show in minimal mode when hovered over
     {
         NSImage * icon = (minimal && error) ? fErrorImage : [torrent icon];
-        [icon drawInRect: iconRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+        [icon drawInRect: iconRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0f];
     }
     
     if (error && !minimal)
     {
         NSRect errorRect = NSMakeRect(NSMaxX(iconRect) - IMAGE_SIZE_MIN, NSMaxY(iconRect) - IMAGE_SIZE_MIN,
                                         IMAGE_SIZE_MIN, IMAGE_SIZE_MIN);
-        [fErrorImage drawInRect: errorRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+        [fErrorImage drawInRect: errorRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0f];
     }
     
     //text color
@@ -497,7 +497,7 @@
     
     [controlImage setFlipped: YES];
     [controlImage drawInRect: [self controlButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
-        fraction: 1.0];
+        fraction: 1.0f];
     
     //reveal button
     NSString * revealImageString;
@@ -511,7 +511,7 @@
     NSImage * revealImage = [NSImage imageNamed: revealImageString];
     [revealImage setFlipped: YES];
     [revealImage drawInRect: [self revealButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
-        fraction: 1.0];
+        fraction: 1.0f];
     
     //action button
     NSString * actionImageString;
@@ -527,7 +527,7 @@
         NSImage * actionImage = [NSImage imageNamed: actionImageString];
         [actionImage setFlipped: YES];
         [actionImage drawInRect: [self actionButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
-            fraction: 1.0];
+            fraction: 1.0f];
     }
     
     //status
@@ -544,8 +544,8 @@
 
 - (void) drawBar: (NSRect) barRect
 {
-    float piecesBarPercent = [(TorrentTableView *)[self controlView] piecesBarPercent];
-    if (piecesBarPercent > 0.0)
+    CGFloat piecesBarPercent = [(TorrentTableView *)[self controlView] piecesBarPercent];
+    if (piecesBarPercent > 0.0f)
     {
         NSRect regularBarRect = barRect, piecesBarRect = barRect;
         piecesBarRect.size.height *= PIECES_TOTAL_PERCENT * piecesBarPercent;
@@ -563,25 +563,25 @@
     }
     
     [fBarBorderColor set];
-    [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
+    [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5f, 0.5f)];
 }
 
 - (void) drawRegularBar: (NSRect) barRect
 {
     Torrent * torrent = [self representedObject];
     
-    int leftWidth = barRect.size.width;
-    float progress = [torrent progress];
+    NSInteger leftWidth = barRect.size.width;
+    CGFloat progress = [torrent progress];
     
-    if (progress < 1.0)
+    if (progress < 1.0f)
     {
-        float rightProgress = 1.0 - progress, progressLeft = [torrent progressLeft];
-        int rightWidth = leftWidth * rightProgress;
+        CGFloat rightProgress = 1.0f - progress, progressLeft = [torrent progressLeft];
+        NSInteger rightWidth = leftWidth * rightProgress;
         leftWidth -= rightWidth;
         
         if (progressLeft < rightProgress)
         {
-            int rightNoIncludeWidth = rightWidth * ((rightProgress - progressLeft) / rightProgress);
+            NSInteger rightNoIncludeWidth = rightWidth * ((rightProgress - progressLeft) / rightProgress);
             rightWidth -= rightNoIncludeWidth;
             
             NSRect noIncludeRect = barRect;
@@ -596,7 +596,7 @@
             if ([torrent isActive] && ![torrent allDownloaded] && ![torrent isChecking]
                 && [fDefaults boolForKey: @"DisplayProgressBarAvailable"])
             {
-                int notAvailableWidth = ceil(rightWidth * [torrent notAvailableDesired]);
+                NSInteger notAvailableWidth = ceil(rightWidth * [torrent notAvailableDesired]);
                 if (notAvailableWidth > 0)
                 {
                     rightWidth -= notAvailableWidth;
@@ -631,7 +631,7 @@
                 [[CTGradient progressYellowGradient] fillRect: completeRect angle: 90];
             else if ([torrent isSeeding])
             {
-                int ratioLeftWidth = leftWidth * (1.0 - [torrent progressStopRatio]);
+                NSInteger ratioLeftWidth = leftWidth * (1.0f - [torrent progressStopRatio]);
                 leftWidth -= ratioLeftWidth;
                 
                 if (ratioLeftWidth > 0)
@@ -657,7 +657,7 @@
         {
             if ([torrent waitingToStart])
             {
-                if ([torrent progressLeft] <= 0.0)
+                if ([torrent progressLeft] <= 0.0f)
                     [[CTGradient progressDarkGreenGradient] fillRect: completeRect angle: 90];
                 else
                     [[CTGradient progressDarkBlueGradient] fillRect: completeRect angle: 90];
@@ -672,8 +672,8 @@
 {
     Torrent * torrent = [self representedObject];
     
-    int pieceCount = MIN([torrent pieceCount], MAX_PIECES);
-    float * piecesPercent = malloc(pieceCount * sizeof(float));
+    NSInteger pieceCount = MIN([torrent pieceCount], MAX_PIECES);
+    CGFloat * piecesPercent = malloc(pieceCount * sizeof(CGFloat));
     [torrent getAmountFinished: piecesPercent size: pieceCount];
     
     NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
@@ -686,7 +686,7 @@
     for (NSInteger i = 0; i < pieceCount; i++)
     {
         NSColor * pieceColor;
-        if (piecesPercent[i] == 1.0)
+        if (piecesPercent[i] == 1.0f)
         {
             if (previousFinishedIndexes && ![previousFinishedIndexes containsIndex: i])
                 pieceColor = [NSColor orangeColor];

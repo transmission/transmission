@@ -31,13 +31,13 @@
     
     NSDictionary * fAttributes;
     
-    float fDownloadRate, fUploadRate;
+    CGFloat fDownloadRate, fUploadRate;
     BOOL fQuitting;
 }
 
 - (id) initWithFrame: (NSRect) frame lib: (tr_handle *) lib;
 
-- (BOOL) setRatesWithDownload: (float) downloadRate upload: (float) uploadRate;
+- (BOOL) setRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate;
 - (void) setQuitting;
 
 @end
