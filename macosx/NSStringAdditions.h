@@ -31,9 +31,9 @@
 
 + (NSString *) stringForFileSize: (uint64_t) size;
 
-+ (NSString *) stringForSpeed: (float) speed;
-+ (NSString *) stringForSpeedAbbrev: (float) speed;
-+ (NSString *) stringForRatio: (float) ratio;
++ (NSString *) stringForSpeed: (CGFloat) speed;
++ (NSString *) stringForSpeedAbbrev: (CGFloat) speed;
++ (NSString *) stringForRatio: (CGFloat) ratio;
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds;
 + (NSString *) timeString: (NSUInteger) seconds showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max;
