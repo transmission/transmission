@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import <IOKit/IOMessage.h>
+#import <IOKit/pwr_mgt/IOPMLib.h>
 
 #import "Controller.h"
 #import "Torrent.h"
@@ -45,7 +46,8 @@
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 #import "SpeedLimitToTurtleIconTransformer.h"
-#include "utils.h"
+#import "metainfo.h"
+#import "utils.h"
 
 #import "UKKQueue.h"
 #import <Sparkle/Sparkle.h>

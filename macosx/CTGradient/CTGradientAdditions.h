@@ -28,15 +28,15 @@
 
 + (CTGradient *) progressGradientForRed: (CGFloat) redComponent green: (CGFloat) greenComponent blue: (CGFloat) blueComponent;
 
-+ (CTGradient *)progressWhiteGradient;
-+ (CTGradient *)progressGrayGradient;
-+ (CTGradient *)progressLightGrayGradient;
-+ (CTGradient *)progressBlueGradient;
-+ (CTGradient *)progressDarkBlueGradient;
-+ (CTGradient *)progressGreenGradient;
-+ (CTGradient *)progressLightGreenGradient;
-+ (CTGradient *)progressDarkGreenGradient;
-+ (CTGradient *)progressRedGradient;
-+ (CTGradient *)progressYellowGradient;
++ (CTGradient *) progressWhiteGradient;
++ (CTGradient *) progressGrayGradient;
++ (CTGradient *) progressLightGrayGradient;
++ (CTGradient *) progressBlueGradient;
++ (CTGradient *) progressDarkBlueGradient;
++ (CTGradient *) progressGreenGradient;
++ (CTGradient *) progressLightGreenGradient;
++ (CTGradient *) progressDarkGreenGradient;
++ (CTGradient *) progressRedGradient;
++ (CTGradient *) progressYellowGradient;
 
 @end

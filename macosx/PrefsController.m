@@ -28,6 +28,7 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
+#import "utils.h"
 
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
@@ -236,7 +237,7 @@ tr_handle * fHandle;
     [fRPCPortField setIntValue: [fDefaults integerForKey: @"RPCPort"]];
     
     //set rpc password - has to be released
-    const char * rpcPassword = tr_sessionGetRPCPassword(fHandle);
+    char * rpcPassword = tr_sessionGetRPCPassword(fHandle);
     [fRPCPasswordField setStringValue: [NSString stringWithUTF8String: rpcPassword]];
     tr_free(rpcPassword);
 }

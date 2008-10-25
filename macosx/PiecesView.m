@@ -25,6 +25,7 @@
 #import "PiecesView.h"
 #import "InfoWindowController.h"
 #import "CTGradient.h"
+#import "utils.h"
 
 #define MAX_ACROSS 18
 #define BETWEEN 1.0

@@ -25,6 +25,7 @@
 #import "DragOverlayWindow.h"
 #import "DragOverlayView.h"
 #import "NSStringAdditions.h"
+#import "metainfo.h"
 
 @implementation DragOverlayWindow
 

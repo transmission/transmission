@@ -66,7 +66,7 @@
 }
 
 CTGradient * fProgressWhiteGradient = nil;
-+ (CTGradient *)progressWhiteGradient
++ (CTGradient *) progressWhiteGradient
 {
     if (!fProgressWhiteGradient)
         fProgressWhiteGradient = [[[self class] progressGradientForRed: 0.95 green: 0.95 blue: 0.95] retain];
@@ -74,7 +74,7 @@ CTGradient * fProgressWhiteGradient = nil;
 }
 
 CTGradient * fProgressGrayGradient = nil;
-+ (CTGradient *)progressGrayGradient
++ (CTGradient *) progressGrayGradient
 {
     if (!fProgressGrayGradient)
         fProgressGrayGradient = [[[self class] progressGradientForRed: 0.7 green: 0.7 blue: 0.7] retain];
@@ -82,7 +82,7 @@ CTGradient * fProgressGrayGradient = nil;
 }
 
 CTGradient * fProgressLightGrayGradient = nil;
-+ (CTGradient *)progressLightGrayGradient
++ (CTGradient *) progressLightGrayGradient
 {
     if (!fProgressLightGrayGradient)
         fProgressLightGrayGradient = [[[self class] progressGradientForRed: 0.87 green: 0.87 blue: 0.87] retain];
@@ -90,7 +90,7 @@ CTGradient * fProgressLightGrayGradient = nil;
 }
 
 CTGradient * fProgressBlueGradient = nil;
-+ (CTGradient *)progressBlueGradient
++ (CTGradient *) progressBlueGradient
 {
     if (!fProgressBlueGradient)
         fProgressBlueGradient = [[[self class] progressGradientForRed: 0.35 green: 0.67 blue: 0.98] retain];
@@ -98,7 +98,7 @@ CTGradient * fProgressBlueGradient = nil;
 }
 
 CTGradient * fProgressDarkBlueGradient = nil;
-+ (CTGradient *)progressDarkBlueGradient
++ (CTGradient *) progressDarkBlueGradient
 {
     if (!fProgressDarkBlueGradient)
         fProgressDarkBlueGradient = [[[self class] progressGradientForRed: 0.616 green: 0.722 blue: 0.776] retain];
@@ -106,7 +106,7 @@ CTGradient * fProgressDarkBlueGradient = nil;
 }
 
 CTGradient * fProgressGreenGradient = nil;
-+ (CTGradient *)progressGreenGradient
++ (CTGradient *) progressGreenGradient
 {
     if (!fProgressGreenGradient)
         fProgressGreenGradient = [[[self class] progressGradientForRed: 0.44 green: 0.89 blue: 0.40] retain];
@@ -114,7 +114,7 @@ CTGradient * fProgressGreenGradient = nil;
 }
 
 CTGradient * fProgressLightGreenGradient = nil;
-+ (CTGradient *)progressLightGreenGradient
++ (CTGradient *) progressLightGreenGradient
 {
     if (!fProgressLightGreenGradient)
         fProgressLightGreenGradient = [[[self class] progressGradientForRed: 0.62 green: 0.99 blue: 0.58] retain];
@@ -122,7 +122,7 @@ CTGradient * fProgressLightGreenGradient = nil;
 }
 
 CTGradient * fProgressDarkGreenGradient = nil;
-+ (CTGradient *)progressDarkGreenGradient
++ (CTGradient *) progressDarkGreenGradient
 {
     if (!fProgressDarkGreenGradient)
         fProgressDarkGreenGradient = [[[self class] progressGradientForRed: 0.627 green: 0.714 blue: 0.639] retain];
@@ -130,7 +130,7 @@ CTGradient * fProgressDarkGreenGradient = nil;
 }
 
 CTGradient * fProgressRedGradient = nil;
-+ (CTGradient *)progressRedGradient
++ (CTGradient *) progressRedGradient
 {
     if (!fProgressRedGradient)
         fProgressRedGradient = [[[self class] progressGradientForRed: 0.902 green: 0.439 blue: 0.451] retain];
@@ -138,7 +138,7 @@ CTGradient * fProgressRedGradient = nil;
 }
 
 CTGradient * fProgressYellowGradient = nil;
-+ (CTGradient *)progressYellowGradient
++ (CTGradient *) progressYellowGradient
 {
     if (!fProgressYellowGradient)
         fProgressYellowGradient = [[[self class] progressGradientForRed: 0.933 green: 0.890 blue: 0.243] retain];
