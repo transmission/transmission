@@ -365,8 +365,43 @@ getSelectedFilesAndDescendants( GtkTreeView * view,
 
     data.sel = gtk_tree_view_get_selection( view );
     data.array  = indices;
-    gtk_tree_model_foreach( gtk_tree_view_get_model(
-                                view ), getSelectedFilesForeach, &data );
+    gtk_tree_model_foreach( gtk_tree_view_get_model( view ),
+                            getSelectedFilesForeach, &data );
+}
+
+struct SubtreeForeachData
+{
+    GArray * array;
+    GtkTreePath * path;
+};
+
+static gboolean
+getSubtreeForeach( GtkTreeModel   * model,
+                   GtkTreePath    * path,
+                   GtkTreeIter    * iter,
+                   gpointer         gdata )
+{
+    struct SubtreeForeachData * data = gdata;
+    unsigned int i;
+    gboolean is_file = FALSE;
+
+    gtk_tree_model_get( model, iter,
+                        FC_IS_FILE, &is_file,
+                        FC_INDEX, &i, -1 );
+    if( is_file )
+        if( !gtk_tree_path_compare( path, data->path ) || gtk_tree_path_is_descendant( path, data->path ) )
+            g_array_append_val( data->array, i );
+
+    return FALSE; /* keep walking */
+}
+
+static void
+getSubtree( GtkTreeView * view, GtkTreePath * path, GArray * indices )
+{
+    struct SubtreeForeachData tmp;
+    tmp.array = indices;
+    tmp.path = path;
+    gtk_tree_model_foreach( gtk_tree_view_get_model( view ), getSubtreeForeach, &tmp );
 }
 
 /* if `path' is a selected row, all selected rows are returned.
@@ -378,8 +413,7 @@ getActiveFilesForPath( GtkTreeView * view,
                        GtkTreePath * path )
 {
     GtkTreeSelection * sel = gtk_tree_view_get_selection( view );
-    GArray *           indices =
-        g_array_new( FALSE, FALSE, sizeof( tr_file_index_t ) );
+    GArray * indices = g_array_new( FALSE, FALSE, sizeof( tr_file_index_t ) );
 
     if( gtk_tree_selection_path_is_selected( sel, path ) )
     {
@@ -389,16 +423,7 @@ getActiveFilesForPath( GtkTreeView * view,
     else
     {
         /* clicked OUTSIDE of the selected row... just use the clicked row */
-        unsigned int   i;
-        gboolean       is_file;
-        GtkTreeModel * model = gtk_tree_view_get_model( view );
-        GtkTreeIter    iter;
-        gtk_tree_model_get_iter( model, &iter, path );
-        gtk_tree_model_get( model, &iter, FC_IS_FILE, &is_file, FC_INDEX,
-                            &i,
-                            -1 );
-        if( is_file )
-            g_array_append_val( indices, i );
+        getSubtree( view, path, indices );
     }
 
     return indices;
