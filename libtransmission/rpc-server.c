@@ -58,7 +58,12 @@ struct tr_rpc_server
     char *             whitelist;
 };
 
-#define dbgmsg( ... ) tr_deepLog( __FILE__, __LINE__, MY_NAME, __VA_ARGS__ )
+#define dbgmsg( ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, MY_NAME, __VA_ARGS__ ); \
+    } while( 0 )
+
 
 /**
 ***

@@ -120,38 +120,34 @@ uint64_t         tr_pieceOffset( const tr_torrent * tor,
                                  uint32_t           offset,
                                  uint32_t           length );
 
-void             tr_torrentInitFilePriority( tr_torrent *    tor,
-                                             tr_file_index_t fileIndex,
-                                             tr_priority_t   priority );
+void             tr_torrentInitFilePriority( tr_torrent       * tor,
+                                             tr_file_index_t    fileIndex,
+                                             tr_priority_t      priority );
 
 
 int              tr_torrentCountUncheckedPieces( const tr_torrent * );
 
-int              tr_torrentIsPieceChecked( const            tr_torrent *,
-                                           tr_piece_index_t piece );
+int              tr_torrentIsPieceChecked( const tr_torrent  * tor,
+                                           tr_piece_index_t    piece );
 
-int              tr_torrentIsFileChecked( const           tr_torrent *,
-                                          tr_file_index_t file );
+int              tr_torrentIsFileChecked( const tr_torrent  * tor,
+                                          tr_file_index_t     file );
 
-void             tr_torrentSetPieceChecked(
-                     tr_torrent *,
-    tr_piece_index_t piece,
-    int              isChecked );
+void             tr_torrentSetPieceChecked( tr_torrent       * tor,
+                                            tr_piece_index_t   piece,
+                                            int                isChecked );
 
-void             tr_torrentSetFileChecked(
-    tr_torrent *,
-    tr_file_index_t
-    file,
-    int
-    isChecked );
+void             tr_torrentSetFileChecked( tr_torrent       * tor,
+                                           tr_file_index_t    file,
+                                           int                isChecked );
 
-void             tr_torrentUncheck( tr_torrent * );
+void             tr_torrentUncheck( tr_torrent * tor );
 
-int              tr_torrentPromoteTracker(                 tr_torrent *,
-                                                       int trackerIndex );
+int              tr_torrentPromoteTracker( tr_torrent   * tor,
+                                           int            trackerIndex );
 
-time_t*          tr_torrentGetMTimes( const    tr_torrent *,
-                                      size_t * setmeCount );
+time_t*          tr_torrentGetMTimes( const tr_torrent  * tor,
+                                      size_t            * setmeCount );
 
 typedef enum
 {

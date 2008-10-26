@@ -29,7 +29,11 @@
 /* arbitrary number */
 #define DEFAULT_TIMER_MSEC 2000
 
-#define dbgmsg( ... )  tr_deepLog( __FILE__, __LINE__, "web", __VA_ARGS__ )
+#define dbgmsg( ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, "web", __VA_ARGS__ ); \
+    } while( 0 )
 /* #define dbgmsg(...) \
  do { fprintf( stderr, __VA_ARGS__ ); fprintf( stderr, "\n" ); } while( 0 ) */
 

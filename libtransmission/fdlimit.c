@@ -52,7 +52,11 @@
 #include "platform.h" /* tr_lock */
 #include "utils.h"
 
-#define dbgmsg( ... ) tr_deepLog( __FILE__, __LINE__, NULL, __VA_ARGS__ )
+#define dbgmsg( ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, NULL, __VA_ARGS__ ); \
+    } while( 0 )
 
 /**
 ***

@@ -124,7 +124,11 @@ struct tr_tracker
     long      lastAnnounceResponse;
 };
 
-#define dbgmsg( name, ... ) tr_deepLog( __FILE__, __LINE__, name, __VA_ARGS__ )
+#define dbgmsg( name, ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, name, __VA_ARGS__ ); \
+    } while( 0 )
 
 /***
 ****

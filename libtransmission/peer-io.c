@@ -40,7 +40,10 @@
 **/
 
 #define dbgmsg( io, ... ) \
-    tr_deepLog( __FILE__, __LINE__, tr_peerIoGetAddrStr( io ), __VA_ARGS__ )
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, tr_peerIoGetAddrStr( io ), __VA_ARGS__ ); \
+    } while( 0 )
 
 struct tr_bandwidth
 {

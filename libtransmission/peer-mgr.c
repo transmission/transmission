@@ -132,10 +132,16 @@ struct tr_peerMgr
 };
 
 #define tordbg( t, ... ) \
-    tr_deepLog( __FILE__, __LINE__, t->tor->info.name, __VA_ARGS__ )
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, t->tor->info.name, __VA_ARGS__ ); \
+    } while( 0 )
 
 #define dbgmsg( ... ) \
-    tr_deepLog( __FILE__, __LINE__, NULL, __VA_ARGS__ )
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, NULL, __VA_ARGS__ ); \
+    } while( 0 )
 
 /**
 ***
@@ -863,7 +869,6 @@ refillPulse( void * vtorrent )
         const uint32_t length = tr_torBlockCountBytes( tor, block );
 
         assert( tr_torrentReqIsValid( tor, index, offset, length ) );
-        assert( _tr_block( tor, index, offset ) == block );
         assert( offset < tr_torPieceCountBytes( tor, index ) );
         assert( (offset + length) <= tr_torPieceCountBytes( tor, index ) );
 
