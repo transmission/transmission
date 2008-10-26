@@ -658,7 +658,7 @@ appsetup( TrWindow *      wind,
 
 /**
  * hideMainWindow, and the timeout hack in toggleMainWindow,
- * are loosely cribbed from Colin Walters' tr-shell.c in Rhythmbox
+ * are loosely cribbed from Colin Walters' rb-shell.c in Rhythmbox
  */
 static gboolean
 idle_hide_mainwindow( gpointer window )
@@ -721,7 +721,7 @@ toggleMainWindow( struct cbdata * cbdata,
         clearTag( &cbdata->idle_hide_mainwindow_tag );
         hideMainWindow( cbdata );
         cbdata->idle_hide_mainwindow_tag = g_timeout_add(
-            250, idle_hide_mainwindow, window );
+            100, idle_hide_mainwindow, window );
     }
     else
     {
