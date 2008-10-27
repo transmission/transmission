@@ -2,46 +2,46 @@ The Transmission Project
 http://www.transmissionbt.com/
 
 Lead Developers <dev@transmissionbt.com>
-        Charles Kerr <charles@transmissionbt.com>  (Daemon, Backend, GTK+ client)
-        Mitchell Livingston <livings124@transmissionbt.com>  (Mac OS X client)
+  Charles Kerr <charles@transmissionbt.com>  (Daemon, Backend, GTK+ client)
+  Mitchell Livingston <livings124@transmissionbt.com>  (Mac OS X client)
 
 Web Client Developers
-	Malcom Jarvis
-	Dave Perrett
-	Kendall Hopkins <SoftwareElves@gmail.com>
-	Charles Kerr
+  Malcom Jarvis
+  Dave Perrett
+  Kendall Hopkins <SoftwareElves@gmail.com>
+  Charles Kerr
 
 Previous Developers
-        Eric Petit <titer@m0k.org>  (Creator)
-        Josh Elsasser <josh@elsasser.org>  (Daemon, Backend, GTK+ client)
-        Bryan Varner <bryan@varnernet.com>  (BeOS client)
+  Eric Petit <titer@m0k.org>  (Creator)
+  Josh Elsasser <josh@elsasser.org>  (Daemon, Backend, GTK+ client)
+  Bryan Varner <bryan@varnernet.com>  (BeOS client)
 
 Project Contributors
-	John Clay (Website maintenance and troubleshooting)
-	Hugo van Heuven, madebysofa  (Main icon design)
-        Nick Pucius  (Help documentation)
-	Rick Patrick  (Mac OS X images)
-	Jonas Rask  (Mac OS X Globe icon)
-	Rashid Eissing  (Mac OS X Transfers preferences icon)
+  John Clay (Website maintenance and troubleshooting)
+  Hugo van Heuven, madebysofa  (Main icon design)
+  Nick Pucius  (Help documentation)
+  Rick Patrick  (Mac OS X images)
+  Jonas Rask  (Mac OS X Globe icon)
+  Rashid Eissing  (Mac OS X Transfers preferences icon)
 
 Mac OS X Translators, current release:
-	Jorge Carrasco  (Spanish)
-	Etienne Samson  (French)
-	Marco Cavazzuti  (Italian)
-	Anton Sotkov  (Russian)
-	Alexander Bykov  (Russian)
-	Maarten Van Coile  (Dutch)
-	Jack Lin  (Traditional Chinese)
-	Can Duruk  (Turkish)
+  Jorge Carrasco  (Spanish)
+  Etienne Samson  (French)
+  Marco Cavazzuti  (Italian)
+  Anton Sotkov  (Russian)
+  Alexander Bykov  (Russian)
+  Maarten Van Coile  (Dutch)
+  Jack Lin  (Traditional Chinese)
+  Can Duruk  (Turkish)
 
 GTK+ Translators:
-	Hundreds of people in an ever-changing list.
-	See the po files for a full list.
+  Hundreds of people in an ever-changing list.
+  See the po files for a full list.
 
 Third-Party Resources:
-        Niels Provos for libevent <http://monkey.org/~provos/libevent/>
-	Thomas Bernard for MiniUPnP and libnatpmp. <http://miniupnp.tuxfamily.org/>
-        The Growl Development Team for Growl. <http://growl.info/>
-        Andy Matuschak for Sparkle. <http://sparkle.andymatuschak.org/>
-        Christian Hammond for SexyIconEntry. <http://www.chipx86.com/wiki/Libsexy> 
-        M. Uli Kusterer for UKKQueue.
+  Nick Mathewson and Niels Provos for libevent. <http://monkey.org/~provos/libevent/>
+  Thomas Bernard for MiniUPnP and libnatpmp. <http://miniupnp.tuxfamily.org/>
+  The Growl Development Team for Growl. <http://growl.info/>
+  Andy Matuschak for Sparkle. <http://sparkle.andymatuschak.org/>
+  Christian Hammond for SexyIconEntry. <http://www.chipx86.com/wiki/Libsexy> 
+  M. Uli Kusterer for UKKQueue.

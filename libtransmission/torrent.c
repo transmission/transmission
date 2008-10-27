@@ -1555,7 +1555,7 @@ tr_torrentReqIsValid( const tr_torrent * tor,
 
     if( index >= tor->info.pieceCount )
         err = 1;
-    if( length < 1 )
+    else if( length < 1 )
         err = 2;
     else if( ( offset + length ) > tr_torPieceCountBytes( tor, index ) )
         err = 3;
