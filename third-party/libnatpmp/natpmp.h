@@ -179,6 +179,8 @@ LIBSPEC int getnatpmprequesttimeout(natpmp_t * p, struct timeval * timeout);
  * NATPMP_ERR_UNDEFINEDERROR */
 LIBSPEC int readnatpmpresponseorretry(natpmp_t * p, natpmpresp_t * response);
 
+#ifdef ENABLE_STRNATPMPERR
 LIBSPEC const char * strnatpmperr(int t);
+#endif
 
 #endif

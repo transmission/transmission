@@ -1,4 +1,4 @@
-/* $Id: getgateway.c,v 1.11 2008/07/02 23:56:11 nanard Exp $ */
+/* $Id: getgateway.c,v 1.12 2008/10/06 10:04:16 nanard Exp $ */
 /* libnatpmp
  * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
  *
@@ -17,9 +17,6 @@
 #include <ctype.h>
 #ifndef WIN32
 #include <netinet/in.h>
-#else
-#include <winsock2.h>
-#include <ws2tcpip.h>
 #endif
 #include <sys/param.h>
 /* There is no portable method to get the default route gateway.
@@ -149,6 +146,7 @@ int getdefaultgateway(in_addr_t * addr)
 	if(l>0) {
 		buf = malloc(l);
 		if(sysctl(mib, sizeof(mib)/sizeof(int), buf, &l, 0, 0) < 0) {
+			free(buf);
 			return FAILED;
 		}
 		for(p=buf; p<buf+l; p+=rt->rtm_msglen) {
