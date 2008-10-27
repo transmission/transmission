@@ -11,8 +11,6 @@
 		35B038130AC5B6EB00A10FDF /* ResumeNoWaitOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */; };
 		35B038140AC5B6EC00A10FDF /* ResumeNoWaitOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */; };
-		3C7A11950D0B2EE300B5701F /* getgateway.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11910D0B2EE300B5701F /* getgateway.c */; };
-		3C7A11960D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
 		3C7A11970D0B2EE300B5701F /* getgateway.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11910D0B2EE300B5701F /* getgateway.c */; };
 		3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11920D0B2EE300B5701F /* getgateway.h */; };
 		3C7A11990D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
@@ -119,6 +117,7 @@
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A250EEB60E2ED87B00A688E6 /* web in Resources */ = {isa = PBXBuildFile; fileRef = A250EE800E2ED87B00A688E6 /* web */; };
+		A254853C0EB66CD4004539DA /* codelength.h in Headers */ = {isa = PBXBuildFile; fileRef = A25485390EB66CBB004539DA /* codelength.h */; };
 		A256588D0A9A695400E8A03B /* MessageWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A256588B0A9A695400E8A03B /* MessageWindowController.m */; };
 		A257C1820CAD3003004E121C /* PeerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A257C1800CAD3003004E121C /* PeerTableView.m */; };
 		A25892640CF1F7E800CCCDDF /* StatsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A25892630CF1F7E800CCCDDF /* StatsWindowController.m */; };
@@ -513,6 +512,7 @@
 		A24B655F0D3F30870079EA4D /* QuitBadge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = QuitBadge.png; path = macosx/Images/QuitBadge.png; sourceTree = "<group>"; };
 		A24F19070A3A790800C9C145 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = macosx/Sparkle.framework; sourceTree = "<group>"; };
 		A250EE800E2ED87B00A688E6 /* web */ = {isa = PBXFileReference; lastKnownFileType = folder; path = web; sourceTree = "<group>"; };
+		A25485390EB66CBB004539DA /* codelength.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = codelength.h; path = "third-party/miniupnp/codelength.h"; sourceTree = "<group>"; };
 		A256588A0A9A695400E8A03B /* MessageWindowController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MessageWindowController.h; path = macosx/MessageWindowController.h; sourceTree = "<group>"; };
 		A256588B0A9A695400E8A03B /* MessageWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MessageWindowController.m; path = macosx/MessageWindowController.m; sourceTree = "<group>"; };
 		A257C17F0CAD3003004E121C /* PeerTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PeerTableView.h; path = macosx/PeerTableView.h; sourceTree = "<group>"; };
@@ -833,8 +833,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BE1183780CE161390002D0F3 /* libminiupnp.a in Frameworks */,
 				BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */,
+				BE1183780CE161390002D0F3 /* libminiupnp.a in Frameworks */,
 				A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1275,6 +1275,7 @@
 				BE1183540CE160C50002D0F3 /* upnpcommands.h */,
 				BE1183550CE160C50002D0F3 /* miniupnpc.h */,
 				BE1183560CE160C50002D0F3 /* minissdpc.h */,
+				A25485390EB66CBB004539DA /* codelength.h */,
 			);
 			name = libminiupnp;
 			sourceTree = "<group>";
@@ -1453,6 +1454,7 @@
 				BE11835E0CE160C50002D0F3 /* upnpcommands.h in Headers */,
 				BE11835F0CE160C50002D0F3 /* miniupnpc.h in Headers */,
 				BE1183600CE160C50002D0F3 /* minissdpc.h in Headers */,
+				A254853C0EB66CD4004539DA /* codelength.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1904,8 +1906,6 @@
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.m in Sources */,
 				A219798B0D07B78400438EA7 /* GroupToolbarItem.m in Sources */,
 				A20BFFB70D091CC700CE5D2B /* ToolbarSegmentedCell.m in Sources */,
-				3C7A11950D0B2EE300B5701F /* getgateway.c in Sources */,
-				3C7A11960D0B2EE300B5701F /* natpmp.c in Sources */,
 				A26397550D0F714300D36DF2 /* ActionPopUpButton.m in Sources */,
 				A25AFDE90D1038AD0092A1BA /* MenuLabel.m in Sources */,
 				A22180980D148A71007D09ED /* GroupsWindowController.m in Sources */,
