@@ -446,7 +446,9 @@ onTrackerResponse( tr_session * session,
     }
     else
     {
-        char * buf = tr_strdup_printf( _( "Tracker request failed.  Got HTTP Status Code %ld (%s)" ),
+        /* %1$ld - http status code, such as 404
+         * %2$s - human-readable explanation of the http status code */
+        char * buf = tr_strdup_printf( _( "Tracker request failed.  Got HTTP Status Code %1$ld (%2$s)" ),
                                       responseCode,
                                       tr_webGetResponseStr( responseCode ) );
         publishWarning( t, buf );

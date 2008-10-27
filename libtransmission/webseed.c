@@ -262,9 +262,9 @@ requestNextChunk( tr_webseed * w )
     thisPass = MIN( left, inf->files[fileIndex].length - fileOffset );
 
     url = makeURL( w, &inf->files[fileIndex] );
-//fprintf( stderr, "url is [%s]\n", url );
+/*fprintf( stderr, "url is [%s]\n", url );*/
     range = tr_strdup_printf( "%"PRIu64"-%"PRIu64, fileOffset, fileOffset + thisPass - 1 );
-//fprintf( stderr, "range is [%s] ... we want %lu total, we have %lu, so %lu are left, and we're asking for %lu this time\n", range, (unsigned long)w->byteCount, (unsigned long)have, (unsigned long)left, (unsigned long)thisPass );
+/*fprintf( stderr, "range is [%s] ... we want %lu total, we have %lu, so %lu are left, and we're asking for %lu this time\n", range, (unsigned long)w->byteCount, (unsigned long)have, (unsigned long)left, (unsigned long)thisPass );*/
     tr_webRun( w->torrent->session, url, range, webResponseFunc, w );
     tr_free( range );
     tr_free( url );
