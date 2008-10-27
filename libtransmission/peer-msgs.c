@@ -597,7 +597,8 @@ void
 tr_peerMsgsSetChoke( tr_peermsgs * msgs,
                      int           choke )
 {
-    const time_t fibrillationTime = time( NULL ) - MIN_CHOKE_PERIOD_SEC;
+    const time_t now = time( NULL );
+    const time_t fibrillationTime = now - MIN_CHOKE_PERIOD_SEC;
 
     assert( msgs );
     assert( msgs->info );
@@ -614,7 +615,7 @@ tr_peerMsgsSetChoke( tr_peermsgs * msgs,
         if( choke )
             cancelAllRequestsToClientExceptFast( msgs );
         protocolSendChoke( msgs, choke );
-        msgs->info->chokeChangedAt = time( NULL );
+        msgs->info->chokeChangedAt = now;
     }
 }
 
@@ -767,14 +768,14 @@ requestIsValid( const tr_peermsgs * msgs, const struct peer_request * req )
 }
 
 static void
-expireOldRequests( tr_peermsgs * msgs )
+expireOldRequests( tr_peermsgs * msgs, const time_t now  )
 {
     int                 i;
     time_t              oldestAllowed;
     struct request_list tmp = REQUEST_LIST_INIT;
 
     /* cancel requests that have been queued for too long */
-    oldestAllowed = time( NULL ) - QUEUED_REQUEST_TTL_SECS;
+    oldestAllowed = now - QUEUED_REQUEST_TTL_SECS;
     reqListCopy( &tmp, &msgs->clientWillAskFor );
     for( i = 0; i < tmp.count; ++i )
     {
@@ -785,7 +786,7 @@ expireOldRequests( tr_peermsgs * msgs )
     reqListClear( &tmp );
 
     /* cancel requests that were sent too long ago */
-    oldestAllowed = time( NULL ) - SENT_REQUEST_TTL_SECS;
+    oldestAllowed = now - SENT_REQUEST_TTL_SECS;
     reqListCopy( &tmp, &msgs->clientAskedFor );
     for( i = 0; i < tmp.count; ++i )
     {
@@ -797,11 +798,10 @@ expireOldRequests( tr_peermsgs * msgs )
 }
 
 static void
-pumpRequestQueue( tr_peermsgs * msgs )
+pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
 {
     const int           max = msgs->maxActiveRequests;
     const int           min = msgs->minActiveRequests;
-    const time_t        now = time( NULL );
     int                 sent = 0;
     int                 count = msgs->clientAskedFor.count;
     struct peer_request req;
@@ -1535,9 +1535,10 @@ readBtMessage( tr_peermsgs *     msgs,
 
 static void
 peerGotBytes( tr_peermsgs * msgs,
-              uint32_t      byteCount )
+              uint32_t      byteCount,
+              const time_t  now )
 {
-    msgs->info->pieceDataActivityDate = time( NULL );
+    msgs->info->pieceDataActivityDate = now;
     firePeerGotData( msgs, byteCount );
 }
 
@@ -1706,8 +1707,8 @@ peerPulse( void * vmsgs )
     ratePulse( msgs );
 
     /*tr_peerIoTryRead( msgs->io );*/
-    pumpRequestQueue( msgs );
-    expireOldRequests( msgs );
+    pumpRequestQueue( msgs, now );
+    expireOldRequests( msgs, now );
 
     if( msgs->sendingBlock )
     {
@@ -1719,10 +1720,9 @@ peerPulse( void * vmsgs )
 
         if( outlen )
         {
-            tr_peerIoWrite( msgs->io, EVBUFFER_DATA(
-                                msgs->outBlock ), outlen );
+            tr_peerIoWrite( msgs->io, EVBUFFER_DATA( msgs->outBlock ), outlen );
             evbuffer_drain( msgs->outBlock, outlen );
-            peerGotBytes( msgs, outlen );
+            peerGotBytes( msgs, outlen, now );
 
             len -= outlen;
             msgs->clientSentAnythingAt = now;
@@ -1733,15 +1733,13 @@ peerPulse( void * vmsgs )
         }
         else dbgmsg( msgs,
                      "stalled writing block... uploadMax %lu, outlen %lu",
-                     uploadMax,
-                     outlen );
+                     uploadMax, outlen );
     }
 
     if( !msgs->sendingBlock )
     {
         struct peer_request req;
-        int                 haveMessages = EVBUFFER_LENGTH(
-            msgs->outMessages ) != 0;
+        const int haveMessages = EVBUFFER_LENGTH( msgs->outMessages ) != 0;
 
         if( haveMessages && !msgs->outMessagesBatchedAt ) /* fresh batch */
         {
