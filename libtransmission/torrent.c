@@ -1555,12 +1555,14 @@ tr_torrentReqIsValid( const tr_torrent * tor,
 
     if( index >= tor->info.pieceCount )
         err = 1;
-    else if( ( offset + length ) >= tr_torPieceCountBytes( tor, index ) )
+    if( length < 1 )
         err = 2;
-    else if( length > MAX_BLOCK_SIZE )
+    else if( ( offset + length ) > tr_torPieceCountBytes( tor, index ) )
         err = 3;
-    else if( tr_pieceOffset( tor, index, offset, length ) > tor->info.totalSize )
+    else if( length > MAX_BLOCK_SIZE )
         err = 4;
+    else if( tr_pieceOffset( tor, index, offset, length ) > tor->info.totalSize )
+        err = 5;
 
     if( err ) fprintf( stderr, "index %lu offset %lu length %lu err %d\n",
                        (unsigned long)index, (unsigned long)offset,
