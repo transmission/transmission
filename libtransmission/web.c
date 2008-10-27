@@ -29,13 +29,19 @@
 /* arbitrary number */
 #define DEFAULT_TIMER_MSEC 2000
 
+#if 0
+#define dbgmsg(...) \
+    do { \
+        fprintf( stderr, __VA_ARGS__ ); \
+        fprintf( stderr, "\n" ); \
+    } while( 0 )
+#else
 #define dbgmsg( ... ) \
     do { \
         if( tr_deepLoggingIsActive( ) ) \
             tr_deepLog( __FILE__, __LINE__, "web", __VA_ARGS__ ); \
     } while( 0 )
-/* #define dbgmsg(...) \
- do { fprintf( stderr, __VA_ARGS__ ); fprintf( stderr, "\n" ); } while( 0 ) */
+#endif
 
 struct tr_web
 {
@@ -113,6 +119,7 @@ addTask( void * vtask )
             tr_free( str );
         }
 
+        curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 60 );
         curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1 );
         curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 16 );
         curl_easy_setopt( easy, CURLOPT_NOSIGNAL, 1 );

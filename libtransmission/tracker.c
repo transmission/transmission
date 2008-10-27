@@ -444,6 +444,14 @@ onTrackerResponse( tr_session * session,
         if( bencLoaded )
             tr_bencFree( &benc );
     }
+    else
+    {
+        char * buf = tr_strdup_printf( _( "Tracker request failed.  Got HTTP Status Code %ld (%s)" ),
+                                      responseCode,
+                                      tr_webGetResponseStr( responseCode ) );
+        publishWarning( t, buf );
+        tr_free( buf );
+    }
 
     retry = updateAddresses( t, success );
 
