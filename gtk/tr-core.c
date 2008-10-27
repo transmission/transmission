@@ -59,6 +59,7 @@ struct TrCorePrivate
     GSList *        monitor_files;
     guint           monitor_idle_tag;
 #endif
+    gboolean        adding_from_watch_dir;
     gboolean        inhibit_allowed;
     gboolean        have_inhibit_cookie;
     gboolean        dbus_error;
@@ -473,7 +474,9 @@ watchFolderIdle( gpointer gcore )
 {
     TrCore * core = TR_CORE( gcore );
 
+    core->priv->adding_from_watch_dir = TRUE;
     tr_core_add_list_defaults( core, core->priv->monitor_files );
+    core->priv->adding_from_watch_dir = FALSE;
 
     /* cleanup */
     core->priv->monitor_files = NULL;
@@ -867,7 +870,14 @@ add_filename( TrCore *     core,
         }
         else if( ( err = tr_torrentParse( handle, ctor, NULL ) ) )
         {
-            tr_core_errsig( core, err, filename );
+            /* don't complain about .torrent files in the watch directory
+               that have already been added... that gets annoying, and we
+               don't want to nag about cleaning up the watch dir */
+            const gboolean quiet = ( err == TR_EDUPLICATE )
+                                && ( core->priv->adding_from_watch_dir );
+            if( !quiet )
+                tr_core_errsig( core, err, filename );
+
             tr_ctorFree( ctor );
         }
         else if( doPrompt )
