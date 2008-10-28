@@ -310,7 +310,7 @@ setupsighandlers( void )
 }
 
 static tr_rpc_callback_status
-onRPCChanged( tr_handle             * handle UNUSED,
+onRPCChanged( tr_session            * session UNUSED,
               tr_rpc_callback_type    type,
               struct tr_torrent     * tor,
               void                  * gdata )
@@ -439,7 +439,7 @@ main( int     argc,
     {
         GtkWindow * win;
 
-        tr_handle * h = tr_sessionInitFull(
+        tr_session * h = tr_sessionInitFull(
             configDir,
             "gtk",
             pref_string_get( PREF_KEY_DOWNLOAD_DIR ),
@@ -501,7 +501,7 @@ main( int     argc,
 static gboolean
 updateScheduledLimits( gpointer data )
 {
-    tr_handle *     tr = (tr_handle *) data;
+    tr_session *    tr = data;
     static gboolean last_state = FALSE;
     gboolean        in_sched_state = FALSE;
 
@@ -641,9 +641,9 @@ appsetup( TrWindow *      wind,
     updatemodel( cbdata );
 
     /* start scheduled rate timer */
-    updateScheduledLimits ( tr_core_handle( cbdata->core ) );
+    updateScheduledLimits ( tr_core_session( cbdata->core ) );
     g_timeout_add( 60 * 1000, updateScheduledLimits,
-                  tr_core_handle( cbdata->core ) );
+                  tr_core_session( cbdata->core ) );
 
     /* either show the window or iconify it */
     if( !minimized )
@@ -1097,8 +1097,8 @@ prefschanged( TrCore * core UNUSED,
               const char *  key,
               gpointer      data )
 {
-    struct cbdata * cbdata = data;
-    tr_handle *     tr     = tr_core_handle( cbdata->core );
+    struct cbdata  * cbdata = data;
+    tr_session     * tr     = tr_core_session( cbdata->core );
 
     if( !strcmp( key, PREF_KEY_ENCRYPTION ) )
     {
@@ -1488,7 +1488,7 @@ doAction( const char * action_name,
     else if( !strcmp ( action_name, "new-torrent" ) )
     {
         GtkWidget * w = make_meta_ui( GTK_WINDOW( data->wind ),
-                                     tr_core_handle( data->core ) );
+                                     tr_core_session( data->core ) );
         gtk_widget_show_all( w );
     }
     else if( !strcmp( action_name, "remove-torrent" ) )

@@ -29,9 +29,9 @@
 
 #define MY_NAME "transmission-daemon"
 
-static int         closing = FALSE;
-static tr_handle * mySession;
-static char      * myConfigFilename = NULL;
+static int           closing = FALSE;
+static tr_session  * mySession = NULL;
+static char        * myConfigFilename = NULL;
 
 #define KEY_BLOCKLIST         "blocklist-enabled"
 #define KEY_DOWNLOAD_DIR      "download-dir"

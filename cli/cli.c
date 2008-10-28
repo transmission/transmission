@@ -183,11 +183,11 @@ torrentCompletenessChanged( tr_torrent       * torrent       UNUSED,
 static int leftToScrape = 0;
 
 static void
-scrapeDoneFunc( struct tr_handle    * session UNUSED,
-                long                  response_code,
-                const void *          response,
-                size_t                response_byte_count,
-                void *                host )
+scrapeDoneFunc( tr_session   * session UNUSED,
+                long           response_code,
+                const void   * response,
+                size_t         response_byte_count,
+                void         * host )
 {
     tr_benc top, *files;
 
@@ -304,10 +304,10 @@ int
 main( int     argc,
       char ** argv )
 {
-    int          error;
-    tr_handle *  h;
-    tr_ctor *    ctor;
-    tr_torrent * tor = NULL;
+    int           error;
+    tr_session  * h;
+    tr_ctor     * ctor;
+    tr_torrent  * tor = NULL;
 
     printf( "Transmission %s - http://www.transmissionbt.com/\n",
             LONG_VERSION_STRING );

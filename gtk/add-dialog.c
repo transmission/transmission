@@ -168,7 +168,7 @@ sourceChanged( GtkFileChooserButton * b,
         int          err = 0;
         int          new_file = 0;
         tr_torrent * torrent;
-        tr_handle *  handle = tr_core_handle( data->core );
+        tr_session * session = tr_core_session( data->core );
 
         if( filename
           && ( !data->filename || strcmp( filename, data->filename ) ) )
@@ -183,7 +183,7 @@ sourceChanged( GtkFileChooserButton * b,
         tr_ctorSetPaused( data->ctor, TR_FORCE, TRUE );
         tr_ctorSetDeleteSource( data->ctor, FALSE );
 
-        if( ( torrent = tr_torrentNew( handle, data->ctor, &err ) ) )
+        if( ( torrent = tr_torrentNew( session, data->ctor, &err ) ) )
         {
             removeOldTorrent( data );
             data->gtor = tr_torrent_new_preexisting( torrent );
@@ -407,15 +407,16 @@ onAddDialogResponse( GtkDialog * dialog,
 
     if( response == GTK_RESPONSE_ACCEPT )
     {
-        GtkWidget *       w = gtk_file_chooser_get_extra_widget(
-             GTK_FILE_CHOOSER( dialog ) );
-        const gboolean    showOptions = gtk_toggle_button_get_active(
-             GTK_TOGGLE_BUTTON ( w ) );
+        GtkFileChooser  * chooser = GTK_FILE_CHOOSER( dialog );
+        GtkWidget       * w = gtk_file_chooser_get_extra_widget( chooser );
+        GtkToggleButton * tb = GTK_TOGGLE_BUTTON( w );
+        const gboolean    showOptions = gtk_toggle_button_get_active( tb );
         const pref_flag_t start = PREF_FLAG_DEFAULT;
-        const pref_flag_t prompt =
-            showOptions ? PREF_FLAG_TRUE : PREF_FLAG_FALSE;
-        GSList *          l = gtk_file_chooser_get_filenames(
-             GTK_FILE_CHOOSER( dialog ) );
+        const pref_flag_t prompt = showOptions
+                                 ? PREF_FLAG_TRUE
+                                 : PREF_FLAG_FALSE;
+        GSList * l = gtk_file_chooser_get_filenames( chooser );
+
         tr_core_add_list( core, l, start, prompt );
     }
 

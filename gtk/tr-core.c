@@ -65,7 +65,7 @@ struct TrCorePrivate
     gboolean        dbus_error;
     guint           inhibit_cookie;
     GtkTreeModel *  model;
-    tr_handle *     handle;
+    tr_session *    session;
 };
 
 static void
@@ -587,7 +587,7 @@ prefsChanged( TrCore *      core,
     else if( !strcmp( key, PREF_KEY_MAX_PEERS_GLOBAL ) )
     {
         const uint16_t val = pref_int_get( key );
-        tr_sessionSetPeerLimit( tr_core_handle( core ), val );
+        tr_sessionSetPeerLimit( tr_core_session( core ), val );
     }
     else if( !strcmp( key, PREF_KEY_INHIBIT_HIBERNATION ) )
     {
@@ -674,11 +674,11 @@ tr_core_get_type( void )
 **/
 
 TrCore *
-tr_core_new( tr_handle * h )
+tr_core_new( tr_session * session )
 {
     TrCore * core = TR_CORE( g_object_new( TR_CORE_TYPE, NULL ) );
 
-    core->priv->handle   = h;
+    core->priv->session  = session;
 
     /* init from prefs & listen to pref changes */
     prefsChanged( core, PREF_KEY_SORT_MODE, NULL );
@@ -695,12 +695,12 @@ tr_core_new( tr_handle * h )
 void
 tr_core_close( TrCore * core )
 {
-    tr_handle * handle = tr_core_handle( core );
+    tr_session * session = tr_core_session( core );
 
-    if( handle )
+    if( session )
     {
-        core->priv->handle = NULL;
-        tr_sessionClose( handle );
+        core->priv->session = NULL;
+        tr_sessionClose( session );
     }
 }
 
@@ -710,10 +710,10 @@ tr_core_model( TrCore * core )
     return isDisposed( core ) ? NULL : core->priv->model;
 }
 
-tr_handle *
-tr_core_handle( TrCore * core )
+tr_session *
+tr_core_session( TrCore * core )
 {
-    return isDisposed( core ) ? NULL : core->priv->handle;
+    return isDisposed( core ) ? NULL : core->priv->session;
 }
 
 static gboolean
@@ -745,7 +745,7 @@ tr_core_get_stats( const TrCore *      core,
 
     if( !isDisposed( core ) )
     {
-        tr_sessionGetSpeed( core->priv->handle,
+        tr_sessionGetSpeed( core->priv->session,
                             &setme->clientDownloadSpeed,
                             &setme->clientUploadSpeed );
 
@@ -815,14 +815,13 @@ tr_core_load( TrCore * self,
     tr_torrent ** torrents;
     tr_ctor *     ctor;
 
-    ctor = tr_ctorNew( tr_core_handle( self ) );
+    ctor = tr_ctorNew( tr_core_session( self ) );
     if( forcePaused )
         tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
     tr_ctorSetPeerLimit( ctor, TR_FALLBACK,
                         pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
 
-    torrents = tr_sessionLoadTorrents ( tr_core_handle(
-                                            self ), ctor, &count );
+    torrents = tr_sessionLoadTorrents ( tr_core_session( self ), ctor, &count );
     for( i = 0; i < count; ++i )
         tr_core_add_torrent( self, tr_torrent_new_preexisting( torrents[i] ) );
 
@@ -855,12 +854,12 @@ add_filename( TrCore *     core,
               gboolean     doStart,
               gboolean     doPrompt )
 {
-    tr_handle * handle = tr_core_handle( core );
+    tr_session * session = tr_core_session( core );
 
-    if( filename && handle )
+    if( filename && session )
     {
         int       err;
-        tr_ctor * ctor = tr_ctorNew( handle );
+        tr_ctor * ctor = tr_ctorNew( session );
         tr_core_apply_defaults( ctor );
         tr_ctorSetPaused( ctor, TR_FORCE, !doStart );
         if( tr_ctorSetMetainfoFromFile( ctor, filename ) )
@@ -868,7 +867,7 @@ add_filename( TrCore *     core,
             tr_core_errsig( core, TR_EINVALID, filename );
             tr_ctorFree( ctor );
         }
-        else if( ( err = tr_torrentParse( handle, ctor, NULL ) ) )
+        else if( ( err = tr_torrentParse( session, ctor, NULL ) ) )
         {
             /* don't complain about .torrent files in the watch directory
                that have already been added... that gets annoying, and we
@@ -885,7 +884,7 @@ add_filename( TrCore *     core,
                                core )->promptsig, 0, ctor );
         else
         {
-            tr_torrent * tor = tr_torrentNew( handle, ctor, &err );
+            tr_torrent * tor = tr_torrentNew( session, ctor, &err );
             if( err )
                 tr_core_errsig( core, err, filename );
             else
@@ -1193,7 +1192,7 @@ maybeInhibitHibernation( TrCore * core )
     /* always allow hibernation when all the torrents are paused */
     if( inhibit ) {
         gboolean active = FALSE;
-        tr_handle *  session = tr_core_handle( core );
+        tr_session *  session = tr_core_session( core );
         tr_torrent * tor = NULL;
         while(( tor = tr_torrentNext( session, tor )))
             if(( active = ( tr_torrentGetActivity( tor ) != TR_STATUS_STOPPED )))

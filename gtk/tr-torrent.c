@@ -187,9 +187,9 @@ tr_torrent_new_preexisting( tr_torrent * tor )
 }
 
 TrTorrent *
-tr_torrent_new_ctor( tr_handle * handle,
-                     tr_ctor *   ctor,
-                     char **     err )
+tr_torrent_new_ctor( tr_session   * session,
+                     tr_ctor      * ctor,
+                     char        ** err )
 {
     tr_torrent * tor;
     int          errcode;
@@ -202,11 +202,11 @@ tr_torrent_new_ctor( tr_handle * handle,
      * doesn't have any concept of the glib trash API */
     tr_ctorGetDeleteSource( ctor, &doTrash );
     tr_ctorSetDeleteSource( ctor, FALSE );
-    tor = tr_torrentNew( handle, ctor, &errcode );
+    tor = tr_torrentNew( session, ctor, &errcode );
 
     if( tor && doTrash )
     {
-        const char * config = tr_sessionGetConfigDir( handle );
+        const char * config = tr_sessionGetConfigDir( session );
         const char * source = tr_ctorGetSourceFile( ctor );
         const int is_internal = source && ( strstr( source, config ) == source );
 

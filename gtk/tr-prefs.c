@@ -427,7 +427,7 @@ static void
 updateBlocklistText( GtkWidget * w,
                      TrCore *    core )
 {
-    const int n = tr_blocklistGetRuleCount( tr_core_handle( core ) );
+    const int n = tr_blocklistGetRuleCount( tr_core_session( core ) );
     char      buf[512];
 
     g_snprintf( buf, sizeof( buf ),
@@ -536,8 +536,8 @@ peerPage( GObject * core )
     gtk_box_pack_start_defaults( GTK_BOX( h ), w );
     b = gtr_button_new_from_stock( GTK_STOCK_REFRESH, _( "_Update" ) );
     data->check = w;
-    g_object_set_data( G_OBJECT( b ), "handle",
-                      tr_core_handle( TR_CORE( core ) ) );
+    g_object_set_data( G_OBJECT( b ), "session",
+                      tr_core_session( TR_CORE( core ) ) );
     g_signal_connect( b, "clicked", G_CALLBACK( onUpdateBlocklistCB ), data );
     gtk_box_pack_start( GTK_BOX( h ), b, FALSE, FALSE, 0 );
     g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), b );
@@ -1228,7 +1228,7 @@ struct test_port_data
 };
 
 static void
-testing_port_done( tr_handle   * handle        UNUSED,
+testing_port_done( tr_session * session        UNUSED,
                    long          response_code UNUSED,
                    const void *                response,
                    size_t                      response_len,
@@ -1257,15 +1257,15 @@ testing_port_begin( gpointer gdata )
         GtkSpinButton * spin = g_object_get_data( G_OBJECT(
                                                       data->label ),
                                                   "tr-port-spin" );
-        tr_handle *     handle = g_object_get_data( G_OBJECT(
+        tr_session *     session = g_object_get_data( G_OBJECT(
                                                         data->label ),
-                                                    "handle" );
+                                                    "session" );
         const int       port = gtk_spin_button_get_value_as_int( spin );
         char            url[256];
         g_snprintf( url, sizeof( url ),
                     "http://portcheck.transmissionbt.com/%d",
                     port );
-        tr_webRun( handle, url, NULL, testing_port_done, data );
+        tr_webRun( session, url, NULL, testing_port_done, data );
     }
     return FALSE;
 }
@@ -1346,8 +1346,8 @@ networkPage( GObject * core )
     hig_workarea_add_row( t, &row, _( "Listening _port:" ), h, w2 );
 
     g_object_set_data( G_OBJECT( l ), "tr-port-spin", w2 );
-    g_object_set_data( G_OBJECT( l ), "handle",
-                      tr_core_handle( TR_CORE( core ) ) );
+    g_object_set_data( G_OBJECT( l ), "session",
+                      tr_core_session( TR_CORE( core ) ) );
     data->id = g_signal_connect( TR_CORE(
                                      core ), "prefs-changed",
                                  G_CALLBACK( onCorePrefsChanged ), data );

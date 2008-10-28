@@ -97,14 +97,14 @@ enum tr_core_err
 
 GType          tr_core_get_type( void );
 
-TrCore *       tr_core_new( tr_handle * );
+TrCore *       tr_core_new( tr_session * );
 
 void           tr_core_close( TrCore* );
 
 /* Return the model used without incrementing the reference count */
 GtkTreeModel * tr_core_model( TrCore * self );
 
-tr_handle *    tr_core_handle( TrCore * self );
+tr_session *   tr_core_session( TrCore * self );
 
 void           tr_core_get_stats( const TrCore *      core,
                                   struct core_stats * setme );

@@ -725,19 +725,19 @@ updateStats( PrivateData * p )
     const char *            pch;
     char                    up[32], down[32], ratio[32], buf[128];
     struct tr_session_stats stats;
-    tr_handle *             handle = tr_core_handle( p->core );
+    tr_session *            session = tr_core_session( p->core );
 
     /* update the stats */
     pch = pref_string_get( PREF_KEY_STATUSBAR_STATS );
     if( !strcmp( pch, "session-ratio" ) )
     {
-        tr_sessionGetStats( handle, &stats );
+        tr_sessionGetStats( session, &stats );
         tr_strlratio( ratio, stats.ratio, sizeof( ratio ) );
         g_snprintf( buf, sizeof( buf ), _( "Ratio: %s" ), ratio );
     }
     else if( !strcmp( pch, "session-transfer" ) )
     {
-        tr_sessionGetStats( handle, &stats );
+        tr_sessionGetStats( session, &stats );
         tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
         tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
         /* Translators: do not translate the "size|" disambiguation prefix.
@@ -748,7 +748,7 @@ updateStats( PrivateData * p )
     }
     else if( !strcmp( pch, "total-transfer" ) )
     {
-        tr_sessionGetCumulativeStats( handle, &stats );
+        tr_sessionGetCumulativeStats( session, &stats );
         tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
         tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
         /* Translators: do not translate the "size|" disambiguation prefix.
@@ -759,7 +759,7 @@ updateStats( PrivateData * p )
     }
     else     /* default is total-ratio */
     {
-        tr_sessionGetCumulativeStats( handle, &stats );
+        tr_sessionGetCumulativeStats( session, &stats );
         tr_strlratio( ratio, stats.ratio, sizeof( ratio ) );
         g_snprintf( buf, sizeof( buf ), _( "Ratio: %s" ), ratio );
     }
@@ -771,9 +771,9 @@ updateSpeeds( PrivateData * p )
 {
     char        buf[128];
     float       u, d;
-    tr_handle * handle = tr_core_handle( p->core );
+    tr_session * session = tr_core_session( p->core );
 
-    tr_sessionGetSpeed( handle, &d, &u );
+    tr_sessionGetSpeed( session, &d, &u );
     tr_strlspeed( buf, d, sizeof( buf ) );
     gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
     tr_strlspeed( buf, u, sizeof( buf ) );
@@ -785,7 +785,7 @@ tr_window_update( TrWindow * self )
 {
     PrivateData * p = get_private_data( self );
 
-    if( p && p->core && tr_core_handle( p->core ) )
+    if( p && p->core && tr_core_session( p->core ) )
     {
         updateSpeeds( p );
         updateTorrentCount( p );

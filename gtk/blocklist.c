@@ -139,7 +139,7 @@ blocklistThreadFunc( gpointer gcore )
     if( ok )
     {
         emitProgress( core, FALSE, _( "Parsing blocklist..." ) );
-        rules = tr_blocklistSetContent( tr_core_handle( core ), filename2 );
+        rules = tr_blocklistSetContent( tr_core_session( core ), filename2 );
     }
 
     if( ok )

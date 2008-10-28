@@ -31,17 +31,17 @@
 
 typedef struct
 {
-    GtkWidget *            filename_entry;
-    GtkWidget *            size_lb;
-    GtkWidget *            pieces_lb;
-    GtkWidget *            announce_list;
-    GtkWidget *            comment_entry;
-    GtkWidget *            progressbar;
-    GtkWidget *            private_check;
-    GtkWidget *            dialog;
+    GtkWidget * filename_entry;
+    GtkWidget * size_lb;
+    GtkWidget * pieces_lb;
+    GtkWidget * announce_list;
+    GtkWidget * comment_entry;
+    GtkWidget * progressbar;
+    GtkWidget * private_check;
+    GtkWidget * dialog;
 
-    tr_metainfo_builder *  builder;
-    tr_handle *            handle;
+    tr_metainfo_builder   *  builder;
+    tr_session            *  session;
 
     gboolean               isBuilding;
 }
@@ -303,7 +303,7 @@ onSourceActivated( GtkEditable * editable,
 
     if( ui->builder )
         tr_metaInfoBuilderFree( ui->builder );
-    ui->builder = tr_metaInfoBuilderCreate( ui->handle, filename );
+    ui->builder = tr_metaInfoBuilderCreate( ui->session, filename );
     refreshFromBuilder( ui );
 }
 
@@ -364,8 +364,8 @@ onChooseFileClicked( GtkButton * b,
 }
 
 GtkWidget*
-make_meta_ui( GtkWindow * parent,
-              tr_handle * handle )
+make_meta_ui( GtkWindow  * parent,
+              tr_session * session )
 {
     int          n;
     int          row = 0;
@@ -373,7 +373,7 @@ make_meta_ui( GtkWindow * parent,
     GtkBox *     main_vbox;
     MakeMetaUI * ui = g_new0 ( MakeMetaUI, 1 );
 
-    ui->handle = handle;
+    ui->session = session;
 
     d = gtk_dialog_new_with_buttons( _(
                                          "New Torrent" ),
