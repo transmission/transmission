@@ -201,6 +201,20 @@ compareVerifyByTorrent( const void * va,
     return a->torrent - b;
 }
 
+int
+tr_verifyInProgress( const tr_torrent * tor )
+{
+    int found = FALSE;
+    tr_lock * lock = getVerifyLock( );
+    tr_lockLock( lock );
+
+    found = ( tor == currentNode.torrent )
+         || ( tr_list_find( verifyList, tor, compareVerifyByTorrent ) != NULL );
+
+    tr_lockUnlock( lock );
+    return found;
+}
+
 void
 tr_verifyRemove( tr_torrent * tor )
 {

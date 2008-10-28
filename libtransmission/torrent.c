@@ -1124,10 +1124,15 @@ torrentStart( tr_torrent * tor,
 
     if( !tor->isRunning )
     {
-        if( reloadProgress )
+        const int isVerifying = tr_verifyInProgress( tor );
+
+        if( !isVerifying && reloadProgress )
             tr_torrentLoadResume( tor, TR_FR_PROGRESS, NULL );
+
         tor->isRunning = 1;
-        tr_verifyAdd( tor, checkAndStartCB );
+
+        if( !isVerifying )
+            tr_verifyAdd( tor, checkAndStartCB );
     }
 
     tr_globalUnlock( tor->session );

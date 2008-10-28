@@ -20,4 +20,6 @@ void tr_verifyAdd( tr_torrent *      tor,
 
 void tr_verifyRemove( tr_torrent * tor );
 
+int tr_verifyInProgress( const tr_torrent * tor );
+
 #endif
