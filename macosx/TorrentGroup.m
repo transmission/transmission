@@ -28,7 +28,7 @@
 
 @implementation TorrentGroup
 
-- (id) initWithGroup: (int) group
+- (id) initWithGroup: (NSInteger) group
 {
     if ((self = [super init]))
     {
@@ -54,7 +54,7 @@
     return fTorrents;
 }
 
-- (float) ratio
+- (CGFloat) ratio
 {
     uint64_t uploaded = 0, downloaded = 0;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
@@ -68,9 +68,9 @@
     return tr_getRatio(uploaded, downloaded);
 }
 
-- (float) uploadRate
+- (CGFloat) uploadRate
 {
-    float rate = 0.0;
+    float rate = 0.0f;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
@@ -79,9 +79,9 @@
     return rate;
 }
 
-- (float) downloadRate
+- (CGFloat) downloadRate
 {
-    float rate = 0.0;
+    float rate = 0.0f;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))

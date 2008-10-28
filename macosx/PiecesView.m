@@ -28,7 +28,7 @@
 #import "utils.h"
 
 #define MAX_ACROSS 18
-#define BETWEEN 1.0
+#define BETWEEN 1.0f
 
 #define HIGH_PEERS 30
 
@@ -46,14 +46,14 @@
     fBack = [[NSImage alloc] initWithSize: [self bounds].size];
     
     [fBack lockFocus];
-    CTGradient * gradient = [CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4]
-                                endingColor: [NSColor colorWithCalibratedWhite: 0.2 alpha: 0.4]];
-    [gradient fillRect: [self bounds] angle: 90.0];
+    CTGradient * gradient = [CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedWhite: 0.0f alpha: 0.4f]
+                                endingColor: [NSColor colorWithCalibratedWhite: 0.2f alpha: 0.4f]];
+    [gradient fillRect: [self bounds] angle: 90.0f];
     [fBack unlockFocus];
     
     //store box colors
-    fGreenAvailabilityColor = [[NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0] retain];
-    fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
+    fGreenAvailabilityColor = [[NSColor colorWithCalibratedRed: 0.0f green: 1.0f blue: 0.4f alpha: 1.0f] retain];
+    fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0f green: 0.4f blue: 0.8f alpha: 1.0f] retain];
             
     //actually draw the box
     [self setTorrent: nil];
@@ -147,7 +147,7 @@
             
             NSColor * pieceColor = nil;
             
-            if (showAvailablity ? pieces[index] == -1 : piecesPercent[index] == 1.0)
+            if (showAvailablity ? pieces[index] == -1 : piecesPercent[index] == 1.0f)
             {
                 if (first || fPieces[index] != PIECE_FINISHED)
                 {
@@ -163,7 +163,7 @@
                     }
                 }
             }
-            else if (showAvailablity ? pieces[index] == 0 : piecesPercent[index] == 0.0)
+            else if (showAvailablity ? pieces[index] == 0 : piecesPercent[index] == 0.0f)
             {
                 if (first || fPieces[index] != PIECE_NONE)
                 {

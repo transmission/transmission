@@ -43,7 +43,7 @@
     NSString * fDestination;
     
     BOOL fDeleteTorrent, fDeleteEnable;
-    int fGroupValue;
+    NSInteger fGroupValue;
     
     NSTimer * fTimer;
 }

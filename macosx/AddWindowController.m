@@ -30,18 +30,18 @@
 #import "NSApplicationAdditions.h"
 #import "ExpandedPathToIconTransformer.h"
 
-#define UPDATE_SECONDS 1.0
+#define UPDATE_SECONDS 1.0f
 
 @interface AddWindowController (Private)
 
 - (void) confirmAdd;
 
-- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) contextInfo;
+- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) contextInfo;
 
 - (void) setGroupsMenu;
 - (void) changeGroupValue: (id) sender;
 
-- (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (int) returnCode contextInfo: (void *) contextInfo;
+- (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo;
 
 @end
 
@@ -210,7 +210,7 @@
     if ([fTorrent isFolder])
     {
         NSString * fileString;
-        int count = [fTorrent fileCount];
+        NSInteger count = [fTorrent fileCount];
         if (count != 1)
             fileString = [NSString stringWithFormat: NSLocalizedString(@"%d files", "Add torrent -> info"), count];
         else
@@ -262,7 +262,7 @@
     [fController askOpenConfirmed: self add: YES]; //ensure last, since it releases this controller
 }
 
-- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) contextInfo
+- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) contextInfo
 {
     if (code == NSOKButton)
     {
@@ -302,7 +302,7 @@
     fGroupValue = [sender tag];
 }
 
-- (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (int) returnCode contextInfo: (void *) contextInfo
+- (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
     if (([NSApp isOnLeopardOrBetter] ? [[alert suppressionButton] state] == NSOnState : returnCode == NSAlertThirdButtonReturn))
         [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningFolderDataSameName"];

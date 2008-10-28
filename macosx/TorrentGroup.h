@@ -30,13 +30,13 @@
     NSMutableArray * fTorrents;
 }
 
-- (id) initWithGroup: (int) group;
+- (id) initWithGroup: (NSInteger) group;
 
 - (NSInteger) groupIndex;
 - (NSMutableArray *) torrents;
 
-- (float) ratio;
-- (float) uploadRate;
-- (float) downloadRate;
+- (CGFloat) ratio;
+- (CGFloat) uploadRate;
+- (CGFloat) downloadRate;
 
 @end

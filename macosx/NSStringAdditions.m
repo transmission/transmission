@@ -47,7 +47,7 @@
     NSString * unit;
     if (size < pow(1024, 2))
     {
-        convertedSize = size / 1024.0;
+        convertedSize = size / 1024.0f;
         unit = NSLocalizedString(@"KB", "File size - kilobytes");
     }
     else if (size < pow(1024, 3))

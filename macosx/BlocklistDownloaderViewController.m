@@ -31,7 +31,7 @@
 
 - (id) initWithPrefsController: (PrefsController *) prefsController;
 - (void) startDownload;
-- (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info;
+- (void) failureSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info;
 
 @end
 
@@ -50,7 +50,7 @@
     CGFloat oldWidth = [fButton frame].size.width;
     [fButton sizeToFit];
     NSRect buttonFrame = [fButton frame];
-    buttonFrame.size.width += 12.0; //sizeToFit sizes a bit too small
+    buttonFrame.size.width += 12.0f; //sizeToFit sizes a bit too small
     buttonFrame.origin.x -= buttonFrame.size.width - oldWidth;
     [fButton setFrame: buttonFrame];
     
@@ -146,7 +146,7 @@
     [downloader setViewController: self];
 }
 
-- (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info
+- (void) failureSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info
 {
     [[alert window] orderOut: self];
     [self release];

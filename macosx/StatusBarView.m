@@ -30,7 +30,7 @@
 {
     if ((self = [super initWithFrame: rect]))
     {
-        fGrayBorderColor = [[NSColor colorWithCalibratedRed: 171.0/255.0 green: 171.0/255.0 blue: 171.0/255.0 alpha: 1.0] retain];
+        fGrayBorderColor = [[NSColor colorWithCalibratedRed: 171.0f/255.0f green: 171.0f/255.0f blue: 171.0f/255.0f alpha: 1.0f] retain];
     }
     return self;
 }
@@ -43,7 +43,7 @@
 
 - (void) drawRect: (NSRect) rect
 {
-    NSRect lineBorderRect = NSMakeRect(rect.origin.x, [self bounds].size.height - 1.0, rect.size.width, 1.0);
+    NSRect lineBorderRect = NSMakeRect(rect.origin.x, [self bounds].size.height - 1.0f, rect.size.width, 1.0f);
     if (NSIntersectsRect(lineBorderRect, rect))
     {
         [[NSColor whiteColor] set];
@@ -52,7 +52,7 @@
         rect.size.height--;
     }
     
-    lineBorderRect.origin.y = 0.0;
+    lineBorderRect.origin.y = 0.0f;
     if (NSIntersectsRect(lineBorderRect, rect))
     {
         [fGrayBorderColor set];

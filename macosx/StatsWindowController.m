@@ -33,7 +33,7 @@
 - (void) updateStats;
 
 - (void) performResetStats;
-- (void) resetSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info;
+- (void) resetSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info;
 
 @end
 
@@ -73,7 +73,7 @@ tr_handle * fLib;
                                             stringByAppendingString: @":"]];
     
     //size all elements
-    float oldWidth = [fUploadedLabelField frame].size.width;
+    CGFloat oldWidth = [fUploadedLabelField frame].size.width;
     
     [fUploadedLabelField sizeToFit];
     [fDownloadedLabelField sizeToFit];
@@ -81,7 +81,7 @@ tr_handle * fLib;
     [fTimeLabelField sizeToFit];
     [fNumOpenedLabelField sizeToFit];
     
-    float maxWidth = MAX([fUploadedLabelField frame].size.width, [fDownloadedLabelField frame].size.width);
+    CGFloat maxWidth = MAX([fUploadedLabelField frame].size.width, [fDownloadedLabelField frame].size.width);
     maxWidth = MAX(maxWidth, [fRatioLabelField frame].size.width);
     maxWidth = MAX(maxWidth, [fTimeLabelField frame].size.width);
     maxWidth = MAX(maxWidth, [fNumOpenedLabelField frame].size.width);
@@ -112,13 +112,13 @@ tr_handle * fLib;
     [[self window] setFrame: windowRect display: YES];
     
     //resize reset button
-    float oldButtonWidth = [fResetButton frame].size.width;
+    CGFloat oldButtonWidth = [fResetButton frame].size.width;
     
     [fResetButton setTitle: NSLocalizedString(@"Reset", "Stats window -> reset button")];
     [fResetButton sizeToFit];
     
     NSRect buttonFrame = [fResetButton frame];
-    buttonFrame.size.width += 10.0;
+    buttonFrame.size.width += 10.0f;
     buttonFrame.origin.x -= buttonFrame.size.width - oldButtonWidth;
     [fResetButton setFrame: buttonFrame];
 }
@@ -206,7 +206,7 @@ tr_handle * fLib;
     [self updateStats];
 }
 
-- (void) resetSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info
+- (void) resetSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info
 {
     [[alert window] orderOut: nil];
     

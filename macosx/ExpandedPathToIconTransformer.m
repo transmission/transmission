@@ -50,7 +50,7 @@
         icon = [[NSWorkspace sharedWorkspace] iconForFile: [value stringByExpandingTildeInPath]];
     
     [icon setScalesWhenResized: YES];
-    [icon setSize: NSMakeSize(16.0, 16.0)];
+    [icon setSize: NSMakeSize(16.0f, 16.0f)];
     
     return icon;
 }
