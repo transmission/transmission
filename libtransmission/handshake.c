@@ -927,7 +927,6 @@ static int
 readIA( tr_handshake *    handshake,
         struct evbuffer * inbuf )
 {
-    int               i;
     const size_t      needlen = handshake->ia_len;
     struct evbuffer * outbuf;
     uint32_t          crypto_select;
@@ -1006,7 +1005,6 @@ readPayloadStream( tr_handshake    * handshake,
 {
     int i;
     const size_t      needlen = HANDSHAKE_SIZE;
-    struct evbuffer * outbuf;
 
     dbgmsg( handshake, "reading payload stream... have %d, need %d",
             (int)EVBUFFER_LENGTH( inbuf ), (int)needlen );
