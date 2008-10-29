@@ -1018,47 +1018,70 @@ canRead( struct bufferevent * evin,
     tr_handshake *    handshake = (tr_handshake *) arg;
     struct evbuffer * inbuf = EVBUFFER_INPUT ( evin );
     ReadState         ret;
+    int               readyForMore = TRUE;
 
     dbgmsg( handshake, "handling canRead; state is [%s]",
            getStateName( handshake->state ) );
 
-    switch( handshake->state )
+    while( readyForMore )
     {
-        case AWAITING_HANDSHAKE:
-            ret = readHandshake    ( handshake, inbuf ); break;
+        switch( handshake->state )
+        {
+            case AWAITING_HANDSHAKE:
+                ret = readHandshake    ( handshake, inbuf ); break;
 
-        case AWAITING_PEER_ID:
-            ret = readPeerId       ( handshake, inbuf ); break;
+            case AWAITING_PEER_ID:
+                ret = readPeerId       ( handshake, inbuf ); break;
 
-        case AWAITING_YA:
-            ret = readYa           ( handshake, inbuf ); break;
+            case AWAITING_YA:
+                ret = readYa           ( handshake, inbuf ); break;
 
-        case AWAITING_PAD_A:
-            ret = readPadA         ( handshake, inbuf ); break;
+            case AWAITING_PAD_A:
+                ret = readPadA         ( handshake, inbuf ); break;
 
-        case AWAITING_CRYPTO_PROVIDE:
-            ret = readCryptoProvide( handshake, inbuf ); break;
+            case AWAITING_CRYPTO_PROVIDE:
+                ret = readCryptoProvide( handshake, inbuf ); break;
 
-        case AWAITING_PAD_C:
-            ret = readPadC         ( handshake, inbuf ); break;
+            case AWAITING_PAD_C:
+                ret = readPadC         ( handshake, inbuf ); break;
 
-        case AWAITING_IA:
-            ret = readIA           ( handshake, inbuf ); break;
+            case AWAITING_IA:
+                ret = readIA           ( handshake, inbuf ); break;
 
-        case AWAITING_YB:
-            ret = readYb           ( handshake, inbuf ); break;
+            case AWAITING_YB:
+                ret = readYb           ( handshake, inbuf ); break;
 
-        case AWAITING_VC:
-            ret = readVC           ( handshake, inbuf ); break;
+            case AWAITING_VC:
+                ret = readVC           ( handshake, inbuf ); break;
 
-        case AWAITING_CRYPTO_SELECT:
-            ret = readCryptoSelect ( handshake, inbuf ); break;
+            case AWAITING_CRYPTO_SELECT:
+                ret = readCryptoSelect ( handshake, inbuf ); break;
 
-        case AWAITING_PAD_D:
-            ret = readPadD         ( handshake, inbuf ); break;
+            case AWAITING_PAD_D:
+                ret = readPadD         ( handshake, inbuf ); break;
 
-        default:
-            assert( 0 );
+            default:
+                assert( 0 );
+        }
+
+        switch( handshake->state )
+        {
+            case AWAITING_PAD_C:
+                readyForMore = EVBUFFER_LENGTH( inbuf ) >= handshake->pad_c_len;
+                break;
+
+            case AWAITING_PAD_D:
+                readyForMore = EVBUFFER_LENGTH( inbuf ) >= handshake->pad_d_len;
+                break;
+
+            case AWAITING_IA:
+                readyForMore = EVBUFFER_LENGTH( inbuf ) >= handshake->ia_len;
+                break;
+
+            default:
+                readyForMore = ret == READ_NOW;
+                break;
+        }
     }
 
     return ret;
