@@ -28,7 +28,7 @@
 
 - (void) appendItemsFromMenu: (NSMenu *) menu atIndexes: (NSIndexSet *) indexes atBottom: (BOOL) bottom
 {
-    int bottomIndex = bottom ? [self numberOfItems] : 0;
+    NSInteger bottomIndex = bottom ? [self numberOfItems] : 0;
     
     NSMenuItem * item;
     for (NSUInteger i = [indexes lastIndex]; i != NSNotFound; i = [indexes indexLessThanIndex: i])

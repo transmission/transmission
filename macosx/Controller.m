@@ -2353,7 +2353,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) autoSpeedLimitChange: (NSNotification *) notification
 {
-    //clear timer here in case its not being reset
+    //clear timer here in case it's not being reset
     [fSpeedLimitTimer invalidate];
     fSpeedLimitTimer = nil;
     

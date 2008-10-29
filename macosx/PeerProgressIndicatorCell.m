@@ -45,8 +45,8 @@
     if ([[NSUserDefaults standardUserDefaults] boolForKey: @"DisplayPeerProgressBarNumber"])
     {
         if (!fAttributes)
-            fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys: [NSFont systemFontOfSize: 11.0], NSFontAttributeName, nil];
-        [[NSString localizedStringWithFormat: @"%.1f%%", [self floatValue] * 100.0] drawInRect: cellFrame withAttributes: fAttributes];
+            fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys: [NSFont systemFontOfSize: 11.0f], NSFontAttributeName, nil];
+        [[NSString localizedStringWithFormat: @"%.1f%%", [self floatValue] * 100.0f] drawInRect: cellFrame withAttributes: fAttributes];
     }
     else
     {
@@ -58,15 +58,15 @@
         }
         
         [super drawWithFrame: cellFrame inView: controlView];
-        if ([self floatValue] >= 1.0)
+        if ([self floatValue] >= 1.0f)
         {
             NSImage * checkImage = [NSImage imageNamed: @"CompleteCheck.png"];
             [checkImage setFlipped: YES];
             
             NSSize imageSize = [checkImage size];
-            NSRect rect = NSMakeRect(cellFrame.origin.x + (cellFrame.size.width - imageSize.width) * 0.5,
-                        cellFrame.origin.y + (cellFrame.size.height - imageSize.height) * 0.5, imageSize.width, imageSize.height);
-            [checkImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+            NSRect rect = NSMakeRect(cellFrame.origin.x + (cellFrame.size.width - imageSize.width) * 0.5f,
+                        cellFrame.origin.y + (cellFrame.size.height - imageSize.height) * 0.5f, imageSize.width, imageSize.height);
+            [checkImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0f];
         }
     }
 }

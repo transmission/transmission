@@ -70,7 +70,7 @@
 
 - (CGFloat) uploadRate
 {
-    float rate = 0.0f;
+    CGFloat rate = 0.0f;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
@@ -81,7 +81,7 @@
 
 - (CGFloat) downloadRate
 {
-    float rate = 0.0f;
+    CGFloat rate = 0.0f;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
