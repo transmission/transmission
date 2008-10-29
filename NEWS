@@ -14,7 +14,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Option to automatically update the blocklist weekly
    + In the file inspector tab, show progress and size for folders
    + Scrollbars correctly appear when the main window auto-resizes
-   + Sparkle updated to 1.5
+   + Sparkle updated to 1.5b6
 - GTK+
    + Option to automatically update the blocklist weekly
    + Added off-hour bandwidth scheduling

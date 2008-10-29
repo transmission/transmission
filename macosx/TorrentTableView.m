@@ -36,8 +36,8 @@
 #define ACTION_MENU_UNLIMITED_TAG 102
 #define ACTION_MENU_LIMIT_TAG 103
 
-#define GROUP_SPEED_IMAGE_COLUMN_WIDTH 8.0
-#define GROUP_RATIO_IMAGE_COLUMN_WIDTH 10.0
+#define GROUP_SPEED_IMAGE_COLUMN_WIDTH 8.0f
+#define GROUP_RATIO_IMAGE_COLUMN_WIDTH 10.0f
 
 #define TOGGLE_PROGRESS_SECONDS 0.175
 
@@ -96,7 +96,7 @@
         
         [self setDelegate: self];
         
-        fPiecesBarPercent = [fDefaults boolForKey: @"PiecesBar"] ? 1.0 : 0.0;
+        fPiecesBarPercent = [fDefaults boolForKey: @"PiecesBar"] ? 1.0f : 0.0f;
     }
     
     return self;
@@ -122,7 +122,7 @@
     [self setGroupStatusColumns];
 }
 
-- (BOOL) isGroupCollapsed: (int) value
+- (BOOL) isGroupCollapsed: (NSInteger) value
 {
     if (value == -1)
         value = MAX_GROUP;
@@ -130,7 +130,7 @@
     return [fCollapsedGroups containsIndex: value];
 }
 
-- (void) removeCollapsedGroup: (int) value
+- (void) removeCollapsedGroup: (NSInteger) value
 {
     if (value == -1)
         value = MAX_GROUP;
@@ -174,7 +174,7 @@
     {
         [cell setRepresentedObject: item];
         
-        int row = [self rowForItem: item];
+        NSInteger row = [self rowForItem: item];
         if ([NSApp isOnLeopardOrBetter])
         {
             [cell setControlHover: row == fMouseControlRow];
@@ -211,7 +211,7 @@
         
         //adjust placement for proper vertical alignment
         if (column == [self columnWithIdentifier: @"Group"])
-            rect.size.height -= 1.0;
+            rect.size.height -= 1.0f;
         
         return rect;
     }
@@ -234,7 +234,7 @@
                 : NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
     else if (ident)
     {
-        int count = [[item torrents] count];
+        NSInteger count = [[item torrents] count];
         if (count == 1)
             return NSLocalizedString(@"1 transfer", "Torrent table -> group row -> tooltip");
         else
@@ -283,21 +283,21 @@
     }
 }
 
-- (void) setControlButtonHover: (int) row
+- (void) setControlButtonHover: (NSInteger) row
 {
     fMouseControlRow = row;
     if (row >= 0)
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
 }
 
-- (void) setRevealButtonHover: (int) row
+- (void) setRevealButtonHover: (NSInteger) row
 {
     fMouseRevealRow = row;
     if (row >= 0)
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
 }
 
-- (void) setActionButtonHover: (int) row
+- (void) setActionButtonHover: (NSInteger) row
 {
     fMouseActionRow = row;
     if (row >= 0)
@@ -312,7 +312,7 @@
     NSNumber * row;
     if ((row = [dict objectForKey: @"Row"]))
     {
-        int rowVal = [row intValue];
+        NSInteger rowVal = [row intValue];
         NSString * type = [dict objectForKey: @"Type"];
         if ([type isEqualToString: @"Action"])
             fMouseActionRow = rowVal;
@@ -352,7 +352,7 @@
 
 - (void) outlineViewItemDidExpand: (NSNotification *) notification
 {
-    int value = [[[notification userInfo] objectForKey: @"NSObject"] groupIndex];
+    NSInteger value = [[[notification userInfo] objectForKey: @"NSObject"] groupIndex];
     if (value < 0)
         value = MAX_GROUP;
     
@@ -365,7 +365,7 @@
 
 - (void) outlineViewItemDidCollapse: (NSNotification *) notification
 {
-    int value = [[[notification userInfo] objectForKey: @"NSObject"] groupIndex];
+    NSInteger value = [[[notification userInfo] objectForKey: @"NSObject"] groupIndex];
     if (value < 0)
         value = MAX_GROUP;
     
@@ -400,7 +400,7 @@
     //avoid weird behavior when showing menu by doing this after mouse down
     if ([self pointInActionRect: point])
     {
-        int row = [self rowAtPoint: point];
+        NSInteger row = [self rowAtPoint: point];
         
         fActionPushedRow = row;
         [self setNeedsDisplayInRect: [self rectOfRow: row]]; //ensure button is pushed down
@@ -413,7 +413,7 @@
     else if (!pushed && [event clickCount] == 2) //double click
     {
         id item = nil;
-        int row = [self rowAtPoint: point];
+        NSInteger row = [self rowAtPoint: point];
         if (row != -1)
             item = [self itemAtRow: row];
         
@@ -446,7 +446,7 @@
         }
         else
         {
-            int group = [item groupIndex];
+            NSInteger group = [item groupIndex];
             for (NSInteger i = 0; i < [self numberOfRows]; i++)
             {
                 if ([indexSet containsIndex: i])
@@ -499,7 +499,7 @@
 
 - (NSMenu *) menuForEvent: (NSEvent *) event
 {
-    int row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
+    NSInteger row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
     if (row >= 0)
     {
         if (![self isRowSelected: row])
@@ -542,7 +542,7 @@
     }
 }
 
-- (NSRect) iconRectForRow: (int) row
+- (NSRect) iconRectForRow: (NSInteger) row
 {
     return [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
 }
@@ -581,7 +581,7 @@
 
 - (void) displayTorrentMenuForEvent: (NSEvent *) event
 {
-    int row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
+    NSInteger row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
     if (row < 0)
         return;
     
@@ -594,7 +594,7 @@
     //place menu below button
     NSRect rect = [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
     NSPoint location = rect.origin;
-    location.y += rect.size.height + 5.0;
+    location.y += rect.size.height + 5.0f;
     location = [self convertPoint: location toView: nil];
     
     NSEvent * newEvent = [NSEvent mouseEventWithType: [event type] location: location
@@ -621,7 +621,7 @@
         NSMenuItem * item;
         if ([menu numberOfItems] == 4)
         {
-            const int speedLimitActionValue[] = { 0, 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
+            const NSInteger speedLimitActionValue[] = { 0, 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
             
             for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
             {
@@ -636,7 +636,7 @@
         }
         
         BOOL upload = menu == fUploadMenu;
-        int mode = [fMenuTorrent speedMode: upload];
+        NSInteger mode = [fMenuTorrent speedMode: upload];
         
         item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
         [item setState: mode == TR_SPEEDLIMIT_SINGLE ? NSOnState : NSOffState];
@@ -654,9 +654,9 @@
         NSMenuItem * item;
         if ([menu numberOfItems] == 4)
         {
-            const float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
+            const CGFloat ratioLimitActionValue[] = { 0.25f, 0.5f, 0.75f, 1.0f, 1.5f, 2.0f, 3.0f, -1.0f };
             
-            for (NSInteger i = 0; ratioLimitActionValue[i] != -1.0; i++)
+            for (NSInteger i = 0; ratioLimitActionValue[i] != -1.0f; i++)
             {
                 item = [[NSMenuItem alloc] initWithTitle: [NSString localizedStringWithFormat: @"%.2f", ratioLimitActionValue[i]]
                         action: @selector(setQuickRatio:) keyEquivalent: @""];
@@ -667,7 +667,7 @@
             }
         }
         
-        int mode = [fMenuTorrent ratioSetting];
+        NSInteger mode = [fMenuTorrent ratioSetting];
         
         item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
         [item setState: mode == NSOnState ? NSOnState : NSOffState];
@@ -734,14 +734,14 @@
             start = !start;
         }
         
-        float newY = NSMaxY([self rectOfRow: i-1]);
+        CGFloat newY = NSMaxY([self rectOfRow: i-1]);
         visibleRect.size.height -= newY - visibleRect.origin.y;
         visibleRect.origin.y = newY;
     }
     
     //remaining visible rows continue alternating
-    float height = [self rowHeight] + [self intercellSpacing].height;
-    int numberOfRects = ceil(visibleRect.size.height / height);
+    CGFloat height = [self rowHeight] + [self intercellSpacing].height;
+    NSInteger numberOfRects = ceil(visibleRect.size.height / height);
     visibleRect.size.height = height;
     
     for (NSInteger i=0; i<numberOfRects; i++)
@@ -758,7 +758,7 @@
 
 - (void) setQuickLimitMode: (id) sender
 {
-    int mode;
+    NSInteger mode;
     switch ([sender tag])
     {
         case ACTION_MENU_UNLIMITED_TAG:
@@ -790,7 +790,7 @@
 
 - (void) setQuickRatioMode: (id) sender
 {
-    int mode;
+    NSInteger mode;
     switch ([sender tag])
     {
         case ACTION_MENU_UNLIMITED_TAG:
@@ -839,7 +839,7 @@
         [fPiecesBarAnimation release];
     
     NSMutableArray * progressMarks = [NSMutableArray arrayWithCapacity: 16];
-    for (NSAnimationProgress i = 0.0625; i <= 1.0; i += 0.0625)
+    for (NSAnimationProgress i = 0.0625f; i <= 1.0f; i += 0.0625f)
         [progressMarks addObject: [NSNumber numberWithFloat: i]];
     
     fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: TOGGLE_PROGRESS_SECONDS animationCurve: NSAnimationEaseIn];
@@ -866,13 +866,13 @@
         if ([fDefaults boolForKey: @"PiecesBar"])
             fPiecesBarPercent = progress;
         else
-            fPiecesBarPercent = 1.0 - progress;
+            fPiecesBarPercent = 1.0f - progress;
         
         [self reloadData];
     }
 }
 
-- (float) piecesBarPercent
+- (CGFloat) piecesBarPercent
 {
     return fPiecesBarPercent;
 }
@@ -883,7 +883,7 @@
 
 - (BOOL) pointInControlRect: (NSPoint) point
 {
-    int row = [self rowAtPoint: point];
+    NSInteger row = [self rowAtPoint: point];
     if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]])
         return NO;
     
@@ -892,7 +892,7 @@
 
 - (BOOL) pointInRevealRect: (NSPoint) point
 {
-    int row = [self rowAtPoint: point];
+    NSInteger row = [self rowAtPoint: point];
     if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]])
         return NO;
     
@@ -901,7 +901,7 @@
 
 - (BOOL) pointInActionRect: (NSPoint) point
 {
-    int row = [self rowAtPoint: point];
+    NSInteger row = [self rowAtPoint: point];
     if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]])
         return NO;
     
@@ -910,7 +910,7 @@
 
 - (BOOL) pointInGroupStatusRect: (NSPoint) point
 {
-    int row = [self rowAtPoint: point];
+    NSInteger row = [self rowAtPoint: point];
     if (row < 0 || [[self itemAtRow: row] isKindOfClass: [Torrent class]])
         return NO;
     
@@ -928,7 +928,7 @@
     
     //change size of image column
     NSTableColumn * ulImageTableColumn = [self tableColumnWithIdentifier: @"UL Image"];
-    float oldWidth = [ulImageTableColumn width], newWidth = ratio ? GROUP_RATIO_IMAGE_COLUMN_WIDTH : GROUP_SPEED_IMAGE_COLUMN_WIDTH;
+    CGFloat oldWidth = [ulImageTableColumn width], newWidth = ratio ? GROUP_RATIO_IMAGE_COLUMN_WIDTH : GROUP_SPEED_IMAGE_COLUMN_WIDTH;
     if (oldWidth != newWidth)
     {
         [ulImageTableColumn setWidth: newWidth];

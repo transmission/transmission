@@ -388,10 +388,10 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     float stopRatio, ratio;
     if ((stopRatio = [self actualStopRatio]) == INVALID || (ratio = [self ratio]) >= stopRatio)
         return 1.0;
-    else if (stopRatio > 0)
+    else if (stopRatio > 0.0)
         return ratio / stopRatio;
     else
-        return 0;
+        return 0.0;
 }
 
 - (tr_speedlimit) speedMode: (BOOL) upload

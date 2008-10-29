@@ -42,31 +42,31 @@
     
     IBOutlet NSMenu * fContextRow, * fContextNoRow;
     
-    int fMouseControlRow, fMouseRevealRow, fMouseActionRow, fActionPushedRow;
+    NSInteger fMouseControlRow, fMouseRevealRow, fMouseActionRow, fActionPushedRow;
     NSArray * fSelectedValues;
     
     IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu, * fRatioMenu;
     Torrent * fMenuTorrent;
     
-    float fPiecesBarPercent;
+    CGFloat fPiecesBarPercent;
     NSAnimation * fPiecesBarAnimation;
 }
 
-- (BOOL) isGroupCollapsed: (int) value;
-- (void) removeCollapsedGroup: (int) value;
+- (BOOL) isGroupCollapsed: (NSInteger) value;
+- (void) removeCollapsedGroup: (NSInteger) value;
 - (void) removeAllCollapsedGroups;
 - (void) saveCollapsedGroups;
 
 - (void) removeButtonTrackingAreas;
-- (void) setControlButtonHover: (int) row;
-- (void) setRevealButtonHover: (int) row;
-- (void) setActionButtonHover: (int) row;
+- (void) setControlButtonHover: (NSInteger) row;
+- (void) setRevealButtonHover: (NSInteger) row;
+- (void) setActionButtonHover: (NSInteger) row;
 
 - (void) selectValues: (NSArray *) values;
 - (NSArray *) selectedValues;
 - (NSArray *) selectedTorrents;
 
-- (NSRect) iconRectForRow: (int) row;
+- (NSRect) iconRectForRow: (NSInteger) row;
 
 - (void) paste: (id) sender;
 
@@ -84,6 +84,6 @@
 - (void) moveDataFile: (id) sender;
 
 - (void) togglePiecesBar;
-- (float) piecesBarPercent;
+- (CGFloat) piecesBarPercent;
 
 @end
