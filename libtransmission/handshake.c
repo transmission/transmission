@@ -122,6 +122,7 @@ enum
     AWAITING_CRYPTO_PROVIDE,
     AWAITING_PAD_C,
     AWAITING_IA,
+    AWAITING_PAYLOAD_STREAM,
 
     /* outgoing */
     AWAITING_YB,
@@ -927,7 +928,7 @@ readIA( tr_handshake *    handshake,
         struct evbuffer * inbuf )
 {
     int               i;
-    const size_t      needlen = handshake->ia_len + HANDSHAKE_SIZE;
+    const size_t      needlen = handshake->ia_len;
     struct evbuffer * outbuf;
     uint32_t          crypto_select;
 
@@ -936,13 +937,6 @@ readIA( tr_handshake *    handshake,
                 inbuf ), (int)needlen );
     if( EVBUFFER_LENGTH( inbuf ) < needlen )
         return READ_LATER;
-
-    dbgmsg( handshake, "reading IA..." );
-    /* parse the handshake ... */
-    i = parseHandshake( handshake, inbuf );
-    dbgmsg( handshake, "parseHandshake returned %d", i );
-    if( i != HANDSHAKE_OK )
-        return tr_handshakeDone( handshake, FALSE );
 
     /**
     ***  B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload
@@ -1001,6 +995,30 @@ readIA( tr_handshake *    handshake,
     tr_peerIoWriteBuf( handshake->io, outbuf );
     evbuffer_free( outbuf );
 
+    /* now await the handshake */
+    setState( handshake, AWAITING_PAYLOAD_STREAM );
+    return READ_NOW;
+}
+
+static int
+readPayloadStream( tr_handshake    * handshake,
+                   struct evbuffer * inbuf )
+{
+    int i;
+    const size_t      needlen = HANDSHAKE_SIZE;
+    struct evbuffer * outbuf;
+
+    dbgmsg( handshake, "reading payload stream... have %d, need %d",
+            (int)EVBUFFER_LENGTH( inbuf ), (int)needlen );
+    if( EVBUFFER_LENGTH( inbuf ) < needlen )
+        return READ_LATER;
+
+    /* parse the handshake ... */
+    i = parseHandshake( handshake, inbuf );
+    dbgmsg( handshake, "parseHandshake returned %d", i );
+    if( i != HANDSHAKE_OK )
+        return tr_handshakeDone( handshake, FALSE );
+
     /* we've completed the BT handshake... pass the work on to peer-msgs */
     return tr_handshakeDone( handshake, TRUE );
 }
@@ -1047,6 +1065,9 @@ canRead( struct bufferevent * evin,
 
             case AWAITING_IA:
                 ret = readIA           ( handshake, inbuf ); break;
+
+            case AWAITING_PAYLOAD_STREAM:
+                ret = readPayloadStream( handshake, inbuf ); break;
 
             case AWAITING_YB:
                 ret = readYb           ( handshake, inbuf ); break;
