@@ -633,7 +633,7 @@ tr_buildPath( const char *first_element, ... )
 
     /* sanity checks & return */
     *pch++ = '\0';
-    assert( pch - buf == bufLen );
+    assert( pch - buf == (off_t)bufLen );
     return buf;
 }
 
