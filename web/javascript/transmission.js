@@ -669,9 +669,9 @@ Transmission.prototype =
 		// remember them for later
 		this._prefs = prefs;
 
-		var down_limit    = prefs[RPC._DownSpeedLimit] / 1024;
+		var down_limit    = prefs[RPC._DownSpeedLimit];
 		var down_limited  = prefs[RPC._DownSpeedLimited];
-		var up_limit      = prefs[RPC._UpSpeedLimit] / 1024;
+		var up_limit      = prefs[RPC._UpSpeedLimit];
 		var up_limited    = prefs[RPC._UpSpeedLimited];
 		
 		$('div.download_location input')[0].value = prefs['download-dir'];
