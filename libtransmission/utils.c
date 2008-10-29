@@ -602,26 +602,39 @@ tr_mkdirp( const char * path_in,
 char*
 tr_buildPath( const char *first_element, ... )
 {
-    char            * ret;
-    struct evbuffer * evbuf;
-    const char      * element = first_element;
-    va_list           vl;
+    size_t bufLen = 0;
+    const char * element;
+    char * buf;
+    char * pch;
+    va_list vl;
 
-    evbuf = evbuffer_new( );
+    /* pass 1: allocate enough space for the string */
     va_start( vl, first_element );
-
-    while( element )
-    {
-        if( EVBUFFER_LENGTH( evbuf ) )
-            evbuffer_add_printf( evbuf, "%c", TR_PATH_DELIMITER );
-        evbuffer_add_printf( evbuf, "%s", element );
+    element = first_element;
+    while( element ) {
+        bufLen += strlen( element ) + 1;
         element = (const char*) va_arg( vl, const char* );
     }
-
+    pch = buf = tr_new0( char, bufLen );
     va_end( vl );
-    ret = tr_strndup( EVBUFFER_DATA( evbuf ), EVBUFFER_LENGTH( evbuf ) );
-    evbuffer_free( evbuf );
-    return ret;
+
+    /* pass 2: build the string piece by piece */
+    va_start( vl, first_element );
+    element = first_element;
+    while( element ) {
+        const size_t elementLen = strlen( element );
+        if( pch != buf )
+            *pch++ = TR_PATH_DELIMITER;
+        memcpy( pch, element, elementLen );
+        pch += elementLen;
+        element = (const char*) va_arg( vl, const char* );
+    }
+    va_end( vl );
+
+    /* sanity checks & return */
+    *pch++ = '\0';
+    assert( pch - buf == bufLen );
+    return buf;
 }
 
 /****
