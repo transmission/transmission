@@ -119,13 +119,14 @@ addTask( void * vtask )
             tr_free( str );
         }
 
-        curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 60 );
-        curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1 );
-        curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 16 );
-        curl_easy_setopt( easy, CURLOPT_NOSIGNAL, 1 );
+        curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 360L );
+        curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 60L );
+        curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1L );
+        curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 16L );
+        curl_easy_setopt( easy, CURLOPT_NOSIGNAL, 1L );
         curl_easy_setopt( easy, CURLOPT_PRIVATE, task );
-        curl_easy_setopt( easy, CURLOPT_SSL_VERIFYHOST, 0 );
-        curl_easy_setopt( easy, CURLOPT_SSL_VERIFYPEER, 0 );
+        curl_easy_setopt( easy, CURLOPT_SSL_VERIFYHOST, 0L );
+        curl_easy_setopt( easy, CURLOPT_SSL_VERIFYPEER, 0L );
         curl_easy_setopt( easy, CURLOPT_URL, task->url );
         curl_easy_setopt( easy, CURLOPT_USERAGENT,
                                            TR_NAME "/" LONG_VERSION_STRING );
@@ -187,40 +188,36 @@ task_finish( struct tr_web_task * task, long response_code )
 static void
 remove_finished_tasks( tr_web * g )
 {
+    CURL * easy;
 
-    if( g->prev_running != g->still_running )
+    do
     {
-        CURL * easy;
+        CURLMsg * msg;
+        int msgs_left;
+        CURLcode res;
 
-        do
-        {
-            CURLMsg * msg;
-            int msgs_left;
-            CURLcode res;
-
-            easy = NULL;
-            while(( msg = curl_multi_info_read( g->multi, &msgs_left ))) {
-                if( msg->msg == CURLMSG_DONE ) {
-                    easy = msg->easy_handle;
-                    res = msg->data.result;
-                    break;
-                }
-            }
-
-            if( easy ) {
-                long code;
-                struct tr_web_task * task;
-                curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
-                curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
-                curl_multi_remove_handle( g->multi, easy );
-                curl_easy_cleanup( easy );
-                task_finish( task, code );
+        easy = NULL;
+        while(( msg = curl_multi_info_read( g->multi, &msgs_left ))) {
+            if( msg->msg == CURLMSG_DONE ) {
+                easy = msg->easy_handle;
+                res = msg->data.result;
+                break;
             }
         }
-        while ( easy );
 
-        g->prev_running = g->still_running;
+        if( easy ) {
+            long code;
+            struct tr_web_task * task;
+            curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
+            curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
+            curl_multi_remove_handle( g->multi, easy );
+            curl_easy_cleanup( easy );
+            task_finish( task, code );
+        }
     }
+    while ( easy );
+
+    g->prev_running = g->still_running;
 }
 
 static void
