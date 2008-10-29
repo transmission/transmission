@@ -927,7 +927,7 @@ readIA( tr_handshake *    handshake,
         struct evbuffer * inbuf )
 {
     int               i;
-    const size_t      needlen = handshake->ia_len;
+    const size_t      needlen = handshake->ia_len + HANDSHAKE_SIZE;
     struct evbuffer * outbuf;
     uint32_t          crypto_select;
 
@@ -1064,24 +1064,14 @@ canRead( struct bufferevent * evin,
                 assert( 0 );
         }
 
-        switch( handshake->state )
-        {
-            case AWAITING_PAD_C:
-                readyForMore = EVBUFFER_LENGTH( inbuf ) >= handshake->pad_c_len;
-                break;
-
-            case AWAITING_PAD_D:
-                readyForMore = EVBUFFER_LENGTH( inbuf ) >= handshake->pad_d_len;
-                break;
-
-            case AWAITING_IA:
-                readyForMore = EVBUFFER_LENGTH( inbuf ) >= handshake->ia_len;
-                break;
-
-            default:
-                readyForMore = ret == READ_NOW;
-                break;
-        }
+        if( ret != READ_NOW )
+            readyForMore = FALSE;
+        else if( handshake->state == AWAITING_PAD_C )
+            readyForMore = EVBUFFER_LENGTH( inbuf ) >= handshake->pad_c_len;
+        else if( handshake->state == AWAITING_PAD_D )
+            readyForMore = EVBUFFER_LENGTH( inbuf ) >= handshake->pad_d_len;
+        else if( handshake->state == AWAITING_IA )
+            readyForMore = EVBUFFER_LENGTH( inbuf ) >= handshake->ia_len;
     }
 
     return ret;
