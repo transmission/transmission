@@ -33,7 +33,7 @@
     NSColor * fGreenAvailabilityColor, * fBluePieceColor;
     
     Torrent * fTorrent;
-    int fNumPieces, fAcross, fWidth, fExtraBorder;
+    NSInteger fNumPieces, fAcross, fWidth, fExtraBorder;
 }
 
 - (void) setTorrent: (Torrent *) torrent;

@@ -82,7 +82,7 @@
         fNumPieces = MIN([fTorrent pieceCount], MAX_ACROSS * MAX_ACROSS);
         fAcross = ceil(sqrt(fNumPieces));
         
-        float width = [self bounds].size.width;
+        CGFloat width = [self bounds].size.width;
         fWidth = (width - (fAcross + 1) * BETWEEN) / fAcross;
         fExtraBorder = (width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
     }
@@ -115,7 +115,7 @@
     }
 
     int8_t * pieces = NULL;
-    float * piecesPercent = NULL;
+    CGFloat * piecesPercent = NULL;
     
     BOOL showAvailablity = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
     if (showAvailablity)
@@ -125,13 +125,13 @@
     }
     else
     {   
-        piecesPercent = (float *)tr_malloc(fNumPieces * sizeof(float));
+        piecesPercent = (CGFloat *)tr_malloc(fNumPieces * sizeof(CGFloat));
         [fTorrent getAmountFinished: piecesPercent size: fNumPieces];
     }
     
     NSImage * image = [self image];
     
-    int index = -1;
+    NSInteger index = -1;
     NSRect rect = NSMakeRect(0, 0, fWidth, fWidth);
     BOOL change = NO;
     
@@ -182,7 +182,7 @@
             else
             {
                 //always redraw "mixed"
-                float percent = showAvailablity ? (float)pieces[index]/HIGH_PEERS : piecesPercent[index];
+                CGFloat percent = showAvailablity ? (CGFloat)pieces[index]/HIGH_PEERS : piecesPercent[index];
                 NSColor * fullColor = showAvailablity ? fGreenAvailabilityColor : fBluePieceColor;
                 pieceColor = [[NSColor whiteColor] blendedColorWithFraction: percent ofColor: fullColor];
                 fPieces[index] = PIECE_SOME;

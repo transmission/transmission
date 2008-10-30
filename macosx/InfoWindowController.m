@@ -441,12 +441,12 @@ typedef enum
         {
             NSString * location = [torrent publicTorrentLocation];
             [fTorrentLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
-            [fTorrentLocationField setToolTip: [location stringByAppendingFormat: @"\n\n%@", [torrent torrentLocation]]];
+            [fTorrentLocationField setToolTip: location];
         }
         else
         {
-            [fTorrentLocationField setStringValue: NSLocalizedString(@"Transmission Support Folder", "Inspector -> torrent location")];
-            [fTorrentLocationField setToolTip: [torrent torrentLocation]];
+            [fTorrentLocationField setStringValue: @""];
+            [fTorrentLocationField setToolTip: nil];
         }
         
         [fDateAddedField setObjectValue: [torrent dateAdded]];
