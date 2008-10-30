@@ -922,7 +922,7 @@ Transmission.prototype =
 			if( total_tracker == null )
 				total_tracker = tracker;
 			else if ( total_tracker.search ( tracker ) == -1 )  
-				total_tracker += '/' + tracker;
+				total_tracker += ', ' + tracker;
 			if( t._is_private )
 				have_private = true;
 			else
