@@ -615,7 +615,7 @@ tr_buildPath( const char *first_element, ... )
         bufLen += strlen( element ) + 1;
         element = (const char*) va_arg( vl, const char* );
     }
-    pch = buf = tr_new0( char, bufLen );
+    pch = buf = tr_new( char, bufLen );
     va_end( vl );
 
     /* pass 2: build the string piece by piece */
@@ -623,16 +623,19 @@ tr_buildPath( const char *first_element, ... )
     element = first_element;
     while( element ) {
         const size_t elementLen = strlen( element );
-        if( pch != buf )
-            *pch++ = TR_PATH_DELIMITER;
         memcpy( pch, element, elementLen );
         pch += elementLen;
+        *pch++ = TR_PATH_DELIMITER;
         element = (const char*) va_arg( vl, const char* );
     }
     va_end( vl );
 
-    /* sanity checks & return */
+    /* terminate the string.  if nonempty, eat the unwanted trailing slash */
+    if( pch != buf )
+        --pch;
     *pch++ = '\0';
+
+    /* sanity checks & return */
     assert( pch - buf == (off_t)bufLen );
     return buf;
 }

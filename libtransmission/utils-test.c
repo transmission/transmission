@@ -1,6 +1,7 @@
 #include <stdio.h> /* fprintf */
 #include <string.h> /* strcmp */
 #include "transmission.h"
+#include "platform.h"
 #include "utils.h"
 #include "crypto.h"
 
@@ -118,6 +119,22 @@ test_strstrip( void )
     return 0;
 }
 
+static int
+test_buildpath( void )
+{
+    char * out;
+
+    out = tr_buildPath( "foo", "bar", NULL );
+    check( !strcmp( out, "foo" TR_PATH_DELIMITER_STR "bar" ) );
+    tr_free( out );
+
+    out = tr_buildPath( "", "foo", "bar", NULL );
+    check( !strcmp( out, TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar" ) );
+    tr_free( out );
+
+    return 0;
+}
+
 int
 main( void )
 {
@@ -140,6 +157,8 @@ main( void )
     tr_free( out );
 
     if( ( i = test_strstrip( ) ) )
+        return i;
+    if( ( i = test_buildpath( ) ) )
         return i;
 
     /* test that tr_cryptoRandInt() stays in-bounds */
