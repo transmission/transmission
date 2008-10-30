@@ -14,6 +14,7 @@ libminiupnp_a_SOURCES = \
 
 noinst_HEADERS = \
     bsdqueue.h \
+    codelength.h \
     declspec.h \
     igd_desc_parse.h \
     minisoap.h \
