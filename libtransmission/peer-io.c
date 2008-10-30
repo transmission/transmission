@@ -587,26 +587,18 @@ tr_peerIoGetBandwidthUsed( const tr_peerIo * io,
 }
 
 size_t
-tr_peerIoGetBandwidthLeft( const tr_peerIo * io,
-                           tr_direction      direction )
-{
-    assert( io );
-    assert( direction == TR_UP || direction == TR_DOWN );
-    return io->bandwidth[direction].bytesLeft;
-}
-
-size_t
 tr_peerIoGetWriteBufferSpace( const tr_peerIo * io )
 {
     const size_t desiredBufferLen = 4096;
-    const size_t currentLiveLen =
-        EVBUFFER_LENGTH( EVBUFFER_OUTPUT( io->bufev ) );
+    const size_t currentLiveLen = EVBUFFER_LENGTH( EVBUFFER_OUTPUT( io->bufev ) );
 
-    const size_t desiredLiveLen = tr_peerIoGetBandwidthLeft( io, TR_UP );
     const size_t currentLbufLen = EVBUFFER_LENGTH( io->output );
+    const size_t desiredLiveLen = io->bandwidth[TR_UP].isUnlimited
+                                ? INT_MAX
+                                : io->bandwidth[TR_UP].bytesLeft;
 
-    const size_t desiredLen = desiredBufferLen + desiredLiveLen;
     const size_t currentLen = currentLiveLen + currentLbufLen;
+    const size_t desiredLen = desiredBufferLen + desiredLiveLen;
 
     size_t       freeSpace = 0;
 
