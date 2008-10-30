@@ -567,37 +567,34 @@ tr_getClutchDir( const tr_session * session UNUSED )
 #else /* everyone else, follow the XDG spec */
 
             tr_list *candidates = NULL, *l;
+            const char * tmp;
 
             /* XDG_DATA_HOME should be the first in the list of candidates */
-            s = getenv( "XDG_DATA_HOME" );
-            if( s && *s )
-                tr_list_append( &candidates, tr_strdup( s ) );
+            tmp = getenv( "XDG_DATA_HOME" );
+            if( tmp && *tmp )
+                tr_list_append( &candidates, tr_strdup( tmp ) );
             else {
                 char * dhome = tr_buildPath( getHomeDir( ), ".local", "share", NULL );
                 tr_list_append( &candidates, dhome );
             }
 
             /* XDG_DATA_DIRS are the backup directories */
-            s = getenv( "XDG_DATA_DIRS" );
-            if( !s || !*s )
-                s =  PACKAGE_DATA_DIR ":/usr/local/share/:/usr/share/";
-            while( s && *s )
-            {
-                char * end = strchr( s, ':' );
-                if( end )
-                {
-                    tr_list_append( &candidates, tr_strndup( s, end - s ) );
-                    s = end + 1;
-                }
-                else
-                {
-                    tr_list_append( &candidates, tr_strdup( s ) );
+            tmp = getenv( "XDG_DATA_DIRS" );
+            if( !tmp || !*tmp )
+                tmp =  PACKAGE_DATA_DIR ":/usr/local/share/:/usr/share/";
+            while( tmp && *tmp ) {
+                const char * end = strchr( tmp, ':' );
+                if( end ) {
+                    tr_list_append( &candidates, tr_strndup( tmp, end - tmp ) );
+                    tmp = end + 1;
+                } else {
+                    tr_list_append( &candidates, tr_strdup( tmp ) );
                     break;
                 }
             }
 
-            for( l = candidates; l; l = l->next )
-            {
+            /* walk through the candidates & look for a match */
+            for( l=candidates; l; l=l->next ) {
                 char * path = tr_buildPath( l->data, "transmission", "web", NULL );
                 const int found = isClutchDir( path );
                 if( found ) {
