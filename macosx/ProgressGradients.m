@@ -57,7 +57,7 @@
     color4.alpha = 1.0f;
     color4.position = 1.0f;
     
-    CTGradient * newInstance = [[[self class] alloc] init];
+    CTGradient * newInstance = [[CTGradient alloc] init];
     [newInstance addElement: &color1];
     [newInstance addElement: &color2];
     [newInstance addElement: &color3];
