@@ -492,6 +492,7 @@ static struct http_msg {
     long code;
     const char * text;
 } http_msg[] = {
+    {   0, "No Response" },
     { 101, "Switching Protocols" },
     { 200, "OK" },
     { 201, "Created" },
@@ -531,8 +532,7 @@ static struct http_msg {
     { 502, "Bad Gateway" },
     { 503, "Service Unavailable" },
     { 504, "Gateway Timeout" },
-    { 505, "HTTP Version Not Supported" },
-    { 0, NULL }
+    { 505, "HTTP Version Not Supported" }
 };
 
 static int
