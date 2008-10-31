@@ -254,8 +254,9 @@ static const char * list_keys[] = {
     "downloadedEver", "eta",              "id",
     "leftUntilDone",
     "name",
+    "peersGettingFromUs", "peersSendingToUs",
     "rateDownload",
-    "rateUpload",     "sizeWhenDone", "status", "uploadedEver"
+    "rateUpload", "sizeWhenDone", "status", "uploadedEver"
 };
 
 static void
@@ -614,36 +615,49 @@ strlsize( char *  buf,
     return buf;
 }
 
-static const char*
-torrentStatusToString( int i )
+static char*
+getStatusString( tr_benc * t, char * buf, size_t buflen )
 {
-    switch( i )
+    int64_t i;
+
+    *buf = '\0';
+
+    if( tr_bencDictFindInt( t, "status", &i ) )
     {
-        case TR_STATUS_CHECK_WAIT:
-            return "Will Verify";
-
-        case TR_STATUS_CHECK:
-            return "Verifying";
-
-        case TR_STATUS_DOWNLOAD:
-            return "Downloading";
-
-        case TR_STATUS_SEED:
-            return "Seeding";
-
-        case TR_STATUS_STOPPED:
-            return "Stopped";
-
-        default:
-            return "Error";
+        if( i==TR_STATUS_STOPPED )
+        {
+            tr_strlcpy( buf, "Stopped", buflen );
+        }
+        else if( i==TR_STATUS_CHECK_WAIT || i==TR_STATUS_CHECK )
+        {
+            const char * str = NULL;
+            char percentBuf[32];
+            if( tr_bencDictFindStr( t, "recheckProgress", &str ) )
+                tr_snprintf( percentBuf, sizeof( percentBuf ), " (%.0f%%)", atof( str ) );
+            else
+                *percentBuf = '\0';
+            tr_snprintf( buf, buflen, "%s%s",
+                         ( i == TR_STATUS_CHECK_WAIT ) ? "Will Verify" : "Verifying",
+                         percentBuf );
+        }
+        else if( i==TR_STATUS_DOWNLOAD || i==TR_STATUS_SEED )
+        {
+            int64_t j = 0;
+            int64_t k = 0;
+            tr_bencDictFindInt( t, "peersGettingFromUs", &j );
+            tr_bencDictFindInt( t, "peersSendingToUs", &k );
+            if( j && k )
+                tr_strlcpy( buf, "Up & Down", buflen );
+            else if( j )
+                tr_strlcpy( buf, (i==TR_STATUS_SEED ? "Uploading" : "Seeding"), buflen );
+            else if( j )
+                tr_strlcpy( buf, "Downloading", buflen );
+            else
+                tr_strlcpy( buf, "Idle", buflen );
+        }
     }
-}
 
-static int
-isVerifying( int status )
-{
-    return ( status == TR_STATUS_CHECK_WAIT )
-           || ( status == TR_STATUS_CHECK );
+    return buf;
 }
 
 static void
@@ -675,17 +689,8 @@ printDetails( tr_benc * top )
             printf( "\n" );
 
             printf( "TRANSFER\n" );
-            if( tr_bencDictFindInt( t, "status", &i ) )
-            {
-                if( isVerifying( i )
-                  && tr_bencDictFindStr( t, "recheckProgress", &str ) )
-                    tr_snprintf( buf, sizeof( buf ), " (%.0f%% Done)",
-                                100.0 * atof(
-                                    str ) );
-                else
-                    *buf = '\0';
-                printf( "  State: %s%s\n", torrentStatusToString( i ), buf );
-            }
+            getStatusString( t, buf, sizeof( buf ) );
+            printf( "  State: %s\n", buf );
 
             if( tr_bencDictFindInt( t, "sizeWhenDone", &i )
               && tr_bencDictFindInt( t, "leftUntilDone", &j ) )
@@ -954,7 +959,7 @@ printTorrentList( tr_benc * top )
       && ( tr_bencDictFindList( args, "torrents", &list ) ) )
     {
         int i, n;
-        printf( "%-3s  %-4s  %-8s  %-6s  %-6s  %-5s  %-11s  %s\n",
+        printf( "%-4s  %-4s  %-8s  %-6s  %-6s  %-5s  %-11s  %s\n",
                 "ID", "Done", "ETA", "Up", "Down", "Ratio", "Status",
                 "Name" );
         for( i = 0, n = tr_bencListSize( list ); i < n; ++i )
@@ -976,12 +981,13 @@ printTorrentList( tr_benc * top )
               && tr_bencDictFindInt( d, "uploadedEver", &upEver ) )
             {
                 char etaStr[16];
+                char statusStr[64];
                 if( leftUntilDone )
                     etaToString( etaStr, sizeof( etaStr ), eta );
                 else
                     tr_snprintf( etaStr, sizeof( etaStr ), "Done" );
                 printf(
-                    "%3d  %3d%%  %-8s  %6.1f  %6.1f  %5.1f  %-11s  %s\n",
+                    "%4d  %3d%%  %-8s  %6.1f  %6.1f  %5.1f  %-11s  %s\n",
                     (int)id,
                     (int)( 100.0 *
                            ( sizeWhenDone - leftUntilDone ) / sizeWhenDone ),
@@ -990,7 +996,7 @@ printTorrentList( tr_benc * top )
                     down / 1024.0,
                     (double)( downEver ? ( (double)upEver /
                                           downEver ) : 0.0 ),
-                    torrentStatusToString( status ),
+                    getStatusString( d, statusStr, sizeof( statusStr ) ),
                     name );
             }
         }
