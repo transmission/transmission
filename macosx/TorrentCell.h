@@ -22,8 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-@class CTGradient;
-
 @interface TorrentCell : NSActionCell
 {
     NSUserDefaults * fDefaults;

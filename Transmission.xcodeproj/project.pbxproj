@@ -305,7 +305,7 @@
 		D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = D4AF3B2D0C41F7A500D46B6B /* list.c */; };
 		D4AF3B300C41F7A600D46B6B /* list.h in Headers */ = {isa = PBXBuildFile; fileRef = D4AF3B2E0C41F7A500D46B6B /* list.h */; };
 		E138A9770C04D88F00C5426C /* CTGradient.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9740C04D88F00C5426C /* CTGradient.m */; };
-		E138A9780C04D88F00C5426C /* CTGradientAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* CTGradientAdditions.m */; };
+		E138A9780C04D88F00C5426C /* ProgressGradients.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -775,8 +775,8 @@
 		D4AF3B2E0C41F7A500D46B6B /* list.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = list.h; path = libtransmission/list.h; sourceTree = "<group>"; };
 		E138A9730C04D88F00C5426C /* CTGradient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CTGradient.h; sourceTree = "<group>"; };
 		E138A9740C04D88F00C5426C /* CTGradient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = CTGradient.m; sourceTree = "<group>"; };
-		E138A9750C04D88F00C5426C /* CTGradientAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CTGradientAdditions.h; sourceTree = "<group>"; };
-		E138A9760C04D88F00C5426C /* CTGradientAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = CTGradientAdditions.m; sourceTree = "<group>"; };
+		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ProgressGradients.h; path = ../ProgressGradients.h; sourceTree = "<group>"; };
+		E138A9760C04D88F00C5426C /* ProgressGradients.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ProgressGradients.m; path = ../ProgressGradients.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1314,8 +1314,8 @@
 			children = (
 				E138A9730C04D88F00C5426C /* CTGradient.h */,
 				E138A9740C04D88F00C5426C /* CTGradient.m */,
-				E138A9750C04D88F00C5426C /* CTGradientAdditions.h */,
-				E138A9760C04D88F00C5426C /* CTGradientAdditions.m */,
+				E138A9750C04D88F00C5426C /* ProgressGradients.h */,
+				E138A9760C04D88F00C5426C /* ProgressGradients.m */,
 			);
 			name = CTGradient;
 			path = macosx/CTGradient;
@@ -1890,7 +1890,7 @@
 				A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */,
 				A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */,
 				E138A9770C04D88F00C5426C /* CTGradient.m in Sources */,
-				E138A9780C04D88F00C5426C /* CTGradientAdditions.m in Sources */,
+				E138A9780C04D88F00C5426C /* ProgressGradients.m in Sources */,
 				A215760B0C0D449A0057A26A /* NSBezierPathAdditions.m in Sources */,
 				A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */,
 				35F373030C2DA89000DAA8F2 /* FilePriorityCell.m in Sources */,

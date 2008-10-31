@@ -28,7 +28,8 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSBezierPathAdditions.h"
-#import "CTGradientAdditions.h"
+#import "ProgressGradients.h"
+#import "CTGradient.h"
 
 #define BAR_HEIGHT 12.0f
 
@@ -588,7 +589,7 @@
             noIncludeRect.origin.x += barRect.size.width - rightNoIncludeWidth;
             noIncludeRect.size.width = rightNoIncludeWidth;
             
-            [[CTGradient progressLightGrayGradient] fillRect: noIncludeRect angle: 90];
+            [[ProgressGradients progressLightGrayGradient] fillRect: noIncludeRect angle: 90];
         }
         
         if (rightWidth > 0)
@@ -605,7 +606,7 @@
                     notAvailableRect.origin.x += leftWidth + rightWidth;
                     notAvailableRect.size.width = notAvailableWidth;
                     
-                    [[CTGradient progressRedGradient] fillRect: notAvailableRect angle: 90];
+                    [[ProgressGradients progressRedGradient] fillRect: notAvailableRect angle: 90];
                 }
             }
             
@@ -615,7 +616,7 @@
                 includeRect.origin.x += leftWidth;
                 includeRect.size.width = rightWidth;
                 
-                [[CTGradient progressWhiteGradient] fillRect: includeRect angle: 90];
+                [[ProgressGradients progressWhiteGradient] fillRect: includeRect angle: 90];
             }
         }
     }
@@ -628,7 +629,7 @@
         if ([torrent isActive])
         {
             if ([torrent isChecking])
-                [[CTGradient progressYellowGradient] fillRect: completeRect angle: 90];
+                [[ProgressGradients progressYellowGradient] fillRect: completeRect angle: 90];
             else if ([torrent isSeeding])
             {
                 NSInteger ratioLeftWidth = leftWidth * (1.0f - [torrent progressStopRatio]);
@@ -640,30 +641,30 @@
                     ratioLeftRect.origin.x += leftWidth;
                     ratioLeftRect.size.width = ratioLeftWidth;
                     
-                    [[CTGradient progressLightGreenGradient] fillRect: ratioLeftRect angle: 90];
+                    [[ProgressGradients progressLightGreenGradient] fillRect: ratioLeftRect angle: 90];
                 }
                 
                 if (leftWidth > 0)
                 {
                     completeRect.size.width = leftWidth;
                     
-                    [[CTGradient progressGreenGradient] fillRect: completeRect angle: 90];
+                    [[ProgressGradients progressGreenGradient] fillRect: completeRect angle: 90];
                 }
             }
             else
-                [[CTGradient progressBlueGradient] fillRect: completeRect angle: 90];
+                [[ProgressGradients progressBlueGradient] fillRect: completeRect angle: 90];
         }
         else
         {
             if ([torrent waitingToStart])
             {
                 if ([torrent progressLeft] <= 0.0f)
-                    [[CTGradient progressDarkGreenGradient] fillRect: completeRect angle: 90];
+                    [[ProgressGradients progressDarkGreenGradient] fillRect: completeRect angle: 90];
                 else
-                    [[CTGradient progressDarkBlueGradient] fillRect: completeRect angle: 90];
+                    [[ProgressGradients progressDarkBlueGradient] fillRect: completeRect angle: 90];
             }
             else
-                [[CTGradient progressGrayGradient] fillRect: completeRect angle: 90];
+                [[ProgressGradients progressGrayGradient] fillRect: completeRect angle: 90];
         }
     }
 }

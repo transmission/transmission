@@ -22,9 +22,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "CTGradientAdditions.h"
+#import "ProgressGradients.h"
+#import "CTGradient.h"
 
-@implementation CTGradient (ProgressBar)
+@implementation ProgressGradients
 
 + (CTGradient *) progressGradientForRed: (CGFloat) redComponent green: (CGFloat) greenComponent blue: (CGFloat) blueComponent
 {

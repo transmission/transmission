@@ -22,9 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "CTGradient.h"
+@class CTGradient;
 
-@interface CTGradient (ProgressBar)
+@interface ProgressGradients : NSObject
 
 + (CTGradient *) progressGradientForRed: (CGFloat) redComponent green: (CGFloat) greenComponent blue: (CGFloat) blueComponent;
 

@@ -26,9 +26,9 @@
 
 @interface FilterButton : NSButton
 {
-    int fCount;
+    NSInteger fCount;
 }
 
-- (void) setCount: (int) count;
+- (void) setCount: (NSInteger) count;
 
 @end

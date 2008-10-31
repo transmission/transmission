@@ -26,7 +26,6 @@
 #import "BadgeView.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
-#import "NSBezierPathAdditions.h"
 
 #define COMPLETED_BOTTOM_PADDING 5.0
 #define SPEED_BOTTOM_PADDING 2.0

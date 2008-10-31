@@ -35,7 +35,7 @@
     return self;
 }
 
-- (void) setCount: (int) count
+- (void) setCount: (NSInteger) count
 {
     if (count == fCount)
         return;
