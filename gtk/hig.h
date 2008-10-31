@@ -13,7 +13,7 @@
 #ifndef __HIG_H__
 #define __HIG_H__
 
-#include <gtk/gtkwidget.h>
+#include <gtk/gtk.h>
 
 /**
 *** utility code for making dialog layout that follows the Gnome HIG.

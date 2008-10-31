@@ -533,7 +533,7 @@ peerPage( GObject * core )
     w = new_check_button( "", PREF_KEY_BLOCKLIST_ENABLED, core );
     updateBlocklistText( w, TR_CORE( core ) );
     h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
-    gtk_box_pack_start_defaults( GTK_BOX( h ), w );
+    gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
     b = gtr_button_new_from_stock( GTK_STOCK_REFRESH, _( "_Update" ) );
     data->check = w;
     g_object_set_data( G_OBJECT( b ), "session",
@@ -788,7 +788,7 @@ webPage( GObject * core )
     page->rpc_tb = GTK_TOGGLE_BUTTON( w );
     g_signal_connect( w, "clicked", G_CALLBACK( onRPCToggled ), page );
     h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
-    gtk_box_pack_start_defaults( GTK_BOX( h ), w );
+    gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
     w = gtk_button_new_from_stock( GTK_STOCK_OPEN );
     page->widgets = g_slist_append( page->widgets, w );
     g_signal_connect( w, "clicked", G_CALLBACK( onLaunchClutchCB ), NULL );
@@ -842,7 +842,6 @@ webPage( GObject * core )
         GtkTreeView *       v;
         GtkWidget *         w;
         GtkWidget *         h;
-        GtkTooltips *       tips = gtk_tooltips_new( );
 
         page->store = GTK_LIST_STORE( m );
         w = gtk_tree_view_new_with_model( m );
@@ -851,8 +850,10 @@ webPage( GObject * core )
 
         page->whitelist_widgets = g_slist_append( page->whitelist_widgets, w );
         v = page->view = GTK_TREE_VIEW( w );
-        gtk_tooltips_set_tip( tips, w,
-            _( "IP addresses may use wildcards, such as 192.168.*.*" ), NULL );
+#if GTK_CHECK_VERSION( 2,12,0 )
+        gtk_widget_set_tooltip_text( w,
+                  _( "IP addresses may use wildcards, such as 192.168.*.*" ) );
+#endif
         sel = gtk_tree_view_get_selection( v );
         g_signal_connect( sel, "changed",
                           G_CALLBACK( onWhitelistSelectionChanged ), page );
@@ -886,14 +887,14 @@ webPage( GObject * core )
                               onRemoveWhitelistClicked ), page );
         page->remove_button = w;
         onWhitelistSelectionChanged( sel, page );
-        gtk_box_pack_start_defaults( GTK_BOX( h ), w );
+        gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
         w = gtk_button_new_from_stock( GTK_STOCK_ADD );
         page->whitelist_widgets = g_slist_append( page->whitelist_widgets, w );
         g_signal_connect( w, "clicked", G_CALLBACK( onAddWhitelistClicked ), page );
-        gtk_box_pack_start_defaults( GTK_BOX( h ), w );
+        gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
         w = gtk_hbox_new( FALSE, 0 );
-        gtk_box_pack_start_defaults( GTK_BOX( w ),
-                                    gtk_alignment_new( 0, 0, 0, 0 ) );
+        gtk_box_pack_start( GTK_BOX( w ), gtk_alignment_new( 0, 0, 0, 0 ),
+                            TRUE, TRUE, 0 );
         gtk_box_pack_start( GTK_BOX( w ), h, FALSE, FALSE, 0 );
         hig_workarea_add_wide_control( t, &row, w );
     }
@@ -1411,7 +1412,7 @@ tr_prefs_dialog_new( GObject *   core,
                               gtk_label_new ( _( "Trackers" ) ) );
 
     g_signal_connect( d, "response", G_CALLBACK( response_cb ), core );
-    gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( d )->vbox ), n );
+    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), n, TRUE, TRUE, 0 );
     gtk_widget_show_all( GTK_DIALOG( d )->vbox );
     return d;
 }

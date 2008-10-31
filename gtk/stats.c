@@ -139,7 +139,7 @@ stats_dialog_create( GtkWindow * parent,
                                              TR_RESPONSE_CLEAR,
                                              -1 );
     t = hig_workarea_create( );
-    gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( d )->vbox ), t );
+    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, 0 );
     ui->core = core;
 
     hig_workarea_add_section_title( t, &row, _( "Current Session" ) );

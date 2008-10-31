@@ -408,18 +408,18 @@ make_meta_ui( GtkWindow  * parent,
     gtk_box_pack_end( GTK_BOX( h2 ), w, FALSE, FALSE, GUI_PAD_SMALL );
     w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
     gtk_widget_set_size_request ( w, 2 * GUI_PAD_BIG, 0 );
-    gtk_box_pack_start_defaults ( GTK_BOX( h2 ), w );
+    gtk_box_pack_start( GTK_BOX( h2 ), w, TRUE, TRUE, 0 );
     gtk_box_pack_start( GTK_BOX( v ), h2, FALSE, FALSE, 0 );
-    gtk_box_pack_start_defaults( GTK_BOX( h ), v );
+    gtk_box_pack_start( GTK_BOX( h ), v, TRUE, TRUE, 0 );
     v = gtk_vbox_new( FALSE, GUI_PAD_SMALL );
     w = gtr_button_new_from_stock( GTK_STOCK_DIRECTORY, _( "F_older" ) );
     focusMe = w;
     g_signal_connect( w, "clicked", G_CALLBACK(
                           onChooseDirectoryClicked ), ui );
-    gtk_box_pack_start_defaults( GTK_BOX( v ), w );
+    gtk_box_pack_start( GTK_BOX( v ), w, TRUE, TRUE, 0 );
     w = gtr_button_new_from_stock( GTK_STOCK_FILE, _( "_File" ) );
     g_signal_connect( w, "clicked", G_CALLBACK( onChooseFileClicked ), ui );
-    gtk_box_pack_start_defaults( GTK_BOX( v ), w );
+    gtk_box_pack_start( GTK_BOX( v ), w, TRUE, TRUE, 0 );
     gtk_box_pack_start( GTK_BOX( h ), v, FALSE, FALSE, 0 );
     hig_workarea_add_wide_control( t, &row, h );
 
@@ -479,7 +479,7 @@ make_meta_ui( GtkWindow  * parent,
     }
 
     hig_workarea_finish( t, &row );
-    gtk_box_pack_start_defaults( main_vbox, t );
+    gtk_box_pack_start( main_vbox, t, TRUE, TRUE, 0 );
 
     w = gtk_frame_new( NULL );
     gtk_frame_set_shadow_type( GTK_FRAME( w ), GTK_SHADOW_NONE );

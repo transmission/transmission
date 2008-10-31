@@ -25,8 +25,7 @@ typedef struct _SexyIconEntry      SexyIconEntry;
 typedef struct _SexyIconEntryClass SexyIconEntryClass;
 typedef struct _SexyIconEntryPriv  SexyIconEntryPriv;
 
-#include <gtk/gtkentry.h>
-#include <gtk/gtkimage.h>
+#include <gtk/gtk.h>
 
 #define SEXY_TYPE_ICON_ENTRY ( sexy_icon_entry_get_type( ) )
 #define SEXY_ICON_ENTRY( obj ) \

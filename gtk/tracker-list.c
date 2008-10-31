@@ -361,12 +361,12 @@ tracker_list_new( TrTorrent * gtor )
 
     w = gtk_button_new_from_stock( GTK_STOCK_ADD );
     g_signal_connect( w, "clicked", G_CALLBACK( onTrackerAddClicked ), page );
-    gtk_box_pack_start_defaults( GTK_BOX( buttons ), w );
+    gtk_box_pack_start( GTK_BOX( buttons ), w, TRUE, TRUE, 0 );
     page->add_button = w;
     w = gtk_button_new_from_stock( GTK_STOCK_REMOVE );
     g_signal_connect( w, "clicked", G_CALLBACK(
                           onTrackerRemoveClicked ), page );
-    gtk_box_pack_start_defaults( GTK_BOX( buttons ), w );
+    gtk_box_pack_start( GTK_BOX( buttons ), w, TRUE, TRUE, 0 );
     page->remove_button = w;
     if( gtor )
     {
@@ -374,19 +374,19 @@ tracker_list_new( TrTorrent * gtor )
         g_signal_connect( w, "clicked", G_CALLBACK(
                               onTrackerSaveClicked ), page );
         gtk_widget_set_sensitive( w, FALSE );
-        gtk_box_pack_start_defaults( GTK_BOX( buttons ), w );
+        gtk_box_pack_start( GTK_BOX( buttons ), w, TRUE, TRUE, 0 );
         page->save_button = w;
 
         w = gtk_button_new_from_stock( GTK_STOCK_REVERT_TO_SAVED );
         g_signal_connect( w, "clicked", G_CALLBACK(
                               onTrackerRevertClicked ), page );
         gtk_widget_set_sensitive( w, FALSE );
-        gtk_box_pack_start_defaults( GTK_BOX( buttons ), w );
+        gtk_box_pack_start( GTK_BOX( buttons ), w, TRUE, TRUE, 0 );
         page->revert_button = w;
     }
 
     gtk_box_pack_start( GTK_BOX( box ), buttons, FALSE, FALSE, 0 );
-    gtk_box_pack_start_defaults( GTK_BOX( top ), fr );
+    gtk_box_pack_start( GTK_BOX( top ), fr, TRUE, TRUE, 0 );
     gtk_box_pack_start( GTK_BOX( top ), box, FALSE, FALSE, 0 );
 
     onTrackerSelectionChanged( sel, page );

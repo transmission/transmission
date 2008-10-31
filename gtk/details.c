@@ -868,7 +868,7 @@ peer_page_new( TrTorrent * gtor )
 
     /* h = gtk_hbox_new (FALSE, GUI_PAD); */
     /* gtk_box_pack_start_defaults (GTK_BOX(h), sw); */
-    gtk_box_pack_start_defaults( GTK_BOX( vbox ), sw );
+    gtk_box_pack_start( GTK_BOX( vbox ), sw, TRUE, TRUE, 0 );
 
     hbox = gtk_hbox_new ( FALSE, GUI_PAD );
     l = gtk_label_new ( NULL );
@@ -876,15 +876,17 @@ peer_page_new( TrTorrent * gtor )
     gtk_box_pack_start ( GTK_BOX( hbox ), l, FALSE, FALSE, 0 );
     l = p->seeders_lb = gtk_label_new ( NULL );
     gtk_box_pack_start ( GTK_BOX( hbox ), l, FALSE, FALSE, 0 );
-    gtk_box_pack_start_defaults ( GTK_BOX( hbox ),
-                                 gtk_alignment_new ( 0.0f, 0.0f, 0.0f, 0.0f ) );
+    gtk_box_pack_start( GTK_BOX( hbox ),
+                        gtk_alignment_new ( 0.0f, 0.0f, 0.0f, 0.0f ),
+                        TRUE, TRUE, 0 );
     l = gtk_label_new ( NULL );
     gtk_label_set_markup ( GTK_LABEL( l ), _( "<b>Leechers:</b>" ) );
     gtk_box_pack_start ( GTK_BOX( hbox ), l, FALSE, FALSE, 0 );
     l = p->leechers_lb = gtk_label_new ( NULL );
     gtk_box_pack_start ( GTK_BOX( hbox ), l, FALSE, FALSE, 0 );
-    gtk_box_pack_start_defaults ( GTK_BOX( hbox ),
-                                 gtk_alignment_new ( 0.0f, 0.0f, 0.0f, 0.0f ) );
+    gtk_box_pack_start( GTK_BOX( hbox ),
+                        gtk_alignment_new ( 0.0f, 0.0f, 0.0f, 0.0f ),
+                        TRUE, TRUE, 0 );
     l = gtk_label_new ( NULL );
     gtk_label_set_markup ( GTK_LABEL( l ), _( "<b>Times Completed:</b>" ) );
     gtk_box_pack_start ( GTK_BOX( hbox ), l, FALSE, FALSE, 0 );
@@ -1560,7 +1562,7 @@ torrent_inspector_new( GtkWindow * parent,
     gtk_notebook_append_page ( GTK_NOTEBOOK( n ), w,
                               gtk_label_new ( _( "Options" ) ) );
 
-    gtk_box_pack_start_defaults ( GTK_BOX( GTK_DIALOG( d )->vbox ), n );
+    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), n, TRUE, TRUE, 0 );
 
     tag = g_timeout_add ( UPDATE_INTERVAL_MSEC, periodic_refresh, d );
     g_object_set_data_full ( G_OBJECT( d ), "tag",

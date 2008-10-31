@@ -12,8 +12,6 @@
 
 #include "assert.h"
 #include <gtk/gtk.h>
-#include <gtk/gtkcellrenderertext.h>
-#include <gtk/gtkcellrendererprogress.h>
 #include <glib/gi18n.h>
 #include <libtransmission/transmission.h>
 #include "hig.h"

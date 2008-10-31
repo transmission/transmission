@@ -384,7 +384,7 @@ addSingleTorrentDialog( GtkWindow * parent,
                           t ), w, col, col + 2, row, row + 1, GTK_FILL, 0,
                       0, 0 );
 
-    gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( d )->vbox ), t );
+    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, 0 );
     gtk_widget_show_all( d );
     return d;
 }

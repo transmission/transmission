@@ -14,7 +14,7 @@
 #define TORRENT_CELL_RENDERER_H
 
 #include <glib-object.h>
-#include <gtk/gtkcellrenderer.h>
+#include <gtk/gtk.h>
 
 #define TORRENT_CELL_RENDERER_TYPE ( torrent_cell_renderer_get_type( ) )
 

@@ -13,7 +13,7 @@
 #ifndef TR_GTK_ADD_DIALOG_H
 #define TR_GTK_ADD_DIALOG_H
 
-#include <gtk/gtkwindow.h>
+#include <gtk/gtk.h>
 #include "tr-core.h"
 
 /* This dialog assumes ownership of the ctor */

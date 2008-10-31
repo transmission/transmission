@@ -1,7 +1,7 @@
 #ifndef TRACKER_LIST_H
 #define TRACKER_LIST_H
 
-#include <gtk/gtkwidget.h>
+#include <gtk/gtk.h>
 #include "tr-torrent.h"
 
 GtkWidget*       tracker_list_new( TrTorrent * gtor );

@@ -13,7 +13,7 @@
 #ifndef GTK_TORRENT_INSPECTOR_H
 #define GTK_TORRENT_INSPECTOR_H
 
-#include <gtk/gtkwindow.h>
+#include <gtk/gtk.h>
 #include "tr-torrent.h"
 
 GtkWidget* torrent_inspector_new( GtkWindow * parent,

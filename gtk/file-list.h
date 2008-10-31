@@ -25,7 +25,7 @@
 #ifndef GTK_TORRENT_FILE_LIST_H
 #define GTK_TORRENT_FILE_LIST_H
 
-#include <gtk/gtkwidget.h>
+#include <gtk/gtk.h>
 #include "tr-torrent.h"
 
 /* create a new file list */

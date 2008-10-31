@@ -13,8 +13,7 @@
 #ifndef __TR_GTK_STATS_H__
 #define __TR_GTK_STATS_H__
 
-#include <gtk/gtkwidget.h>
-#include <gtk/gtkwindow.h>
+#include <gtk/gtk.h>
 #include "tr-core.h"
 
 GtkWidget* stats_dialog_create( GtkWindow * parent,
