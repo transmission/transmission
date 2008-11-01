@@ -4,7 +4,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 <http://trac.transmissionbt.com/query?milestone=1.40&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Tracker communication uses fewer resources
-   + Bandwidth displays now include overhead data transfer
+   + Bandwidth displays now include BitTorrent protocol overhead
    + More accurate bandwidth management
    + Stability, security, and performance improvements to the RPC and Web UI server
    + Lazy bitfields (always on)

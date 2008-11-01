@@ -482,6 +482,8 @@
         {
             fStarted = YES;
             
+            [fProgressView setHidden: YES];
+            
             NSWindow * window = [self window];
             
             NSRect windowRect = [window frame];
