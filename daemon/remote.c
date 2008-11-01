@@ -243,7 +243,7 @@ static const char * details_keys[] = {
     "peersConnected", "peersGettingFromUs", "peersSendingToUs",
     "pieceCount",     "pieceSize",          "rateDownload",
     "rateUpload",      "recheckProgress",
-    "scrapeResponse", "seeders",            "sizeWhenDone",
+    "scrapeResponse", "seeders",
     "sizeWhenDone",    "startDate",
     "status",         "timesCompleted",     "totalSize",
     "uploadedEver",
@@ -652,11 +652,16 @@ getStatusString( tr_benc * t, char * buf, size_t buflen )
             tr_bencDictFindInt( t, "peersSendingToUs", &toUs );
             if( fromUs && toUs )
                 tr_strlcpy( buf, "Up & Down", buflen );
-            else if( fromUs )
-                tr_strlcpy( buf, "Seeding", buflen );
             else if( toUs )
                 tr_strlcpy( buf, "Downloading", buflen );
-            else
+            else if( fromUs ) {
+                int64_t leftUntilDone = 0;
+                tr_bencDictFindInt( t, "leftUntilDone", &leftUntilDone );
+                if( leftUntilDone > 0 )
+                    tr_strlcpy( buf, "Uploading", buflen );
+                else
+                    tr_strlcpy( buf, "Seeding", buflen );
+            } else
                 tr_strlcpy( buf, "Idle", buflen );
             break;
         }
