@@ -25,6 +25,7 @@
 #import "PrefsController.h"
 #import "BlocklistDownloaderViewController.h"
 #import "BlocklistScheduler.h"
+#import "PortChecker.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"

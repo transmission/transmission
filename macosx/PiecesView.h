@@ -23,7 +23,8 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "Torrent.h"
+
+@class Torrent;
 
 @interface PiecesView : NSImageView
 {

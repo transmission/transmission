@@ -23,12 +23,12 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "Torrent.h"
-#import "FileOutlineController.h"
-#import "PiecesView.h"
 #import <transmission.h>
 
+@class Torrent;
 @class TrackerTableView;
+@class FileOutlineController;
+@class PiecesView;
 
 @interface InfoWindowController : NSWindowController
 {

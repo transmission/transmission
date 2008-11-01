@@ -37,7 +37,7 @@
 }
 
 - (id) initWithFolderName: (NSString *) name path: (NSString *) path;
-- (id) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (int) index;
+- (id) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (NSUInteger) index;
 
 - (void) insertChild: (FileListNode *) child;
 - (void) insertIndex: (NSUInteger) index withSize: (uint64_t) size;

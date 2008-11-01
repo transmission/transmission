@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "PiecesView.h"
+#import "Torrent.h"
 #import "InfoWindowController.h"
 #import "CTGradient.h"
 #import "utils.h"

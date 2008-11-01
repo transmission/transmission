@@ -24,7 +24,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
-#import "PortChecker.h"
+
+@class PortChecker;
 
 @interface PrefsController : NSWindowController
 {

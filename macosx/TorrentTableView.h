@@ -24,7 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
-#import <Controller.h>
+#import "Controller.h"
 
 @class TorrentCell;
 

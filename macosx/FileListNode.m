@@ -43,7 +43,7 @@
     return self;
 }
 
-- (id) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (int) index
+- (id) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (NSUInteger) index
 {
     if ((self = [self initWithFolder: NO name: name path: path]))
     {

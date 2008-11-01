@@ -40,7 +40,7 @@
         for (NSInteger i = 0; i < [self segmentCount]; i++)
         {
             [self setLabel: @"" forSegment: i];
-            [self setWidth: 9.0 forSegment: i]; //9 is minimum size to get proper look
+            [self setWidth: 9.0f forSegment: i]; //9 is minimum size to get proper look
         }
         
         [self setImage: [NSImage imageNamed: @"PriorityControlLow.png"] forSegment: 0];
@@ -52,12 +52,12 @@
     return self;
 }
 
-- (void) setSelected: (BOOL) flag forSegment: (int) segment
+- (void) setSelected: (BOOL) flag forSegment: (NSInteger) segment
 {
     [super setSelected: flag forSegment: segment];
     
     //only for when clicking manually
-    int priority;
+    NSInteger priority;
     switch (segment)
     {
         case 0:
@@ -137,8 +137,8 @@
         }
         
         NSSize imageSize = [image size];
-        [image compositeToPoint: NSMakePoint(cellFrame.origin.x + (cellFrame.size.width - imageSize.width) * 0.5,
-                cellFrame.origin.y + (cellFrame.size.height + imageSize.height) * 0.5) operation: NSCompositeSourceOver];
+        [image compositeToPoint: NSMakePoint(cellFrame.origin.x + (cellFrame.size.width - imageSize.width) * 0.5f,
+                cellFrame.origin.y + (cellFrame.size.height + imageSize.height) * 0.5f) operation: NSCompositeSourceOver];
     }
 }
 
