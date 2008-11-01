@@ -6,17 +6,6 @@ echo CLEANING TRANSMISSION
 xcodebuild -project Transmission.xcodeproj clean
 echo BUILDING TRANSMISSION
 xcodebuild -project Transmission.xcodeproj -target Transmission -configuration Release
-echo DELETING INTERFACE BUILDER DATA
-rm -f macosx/Transmission.app/Contents/Resources/*.nib/info.nib
-rm -f macosx/Transmission.app/Contents/Resources/*.nib/classes.nib
-rm -f macosx/Transmission.app/Contents/Resources/*.lproj/*.nib/info.nib
-rm -f macosx/Transmission.app/Contents/Resources/*.lproj/*.nib/classes.nib
-rm -f macosx/Transmission.app/Contents/Frameworks/*.framework/Versions/[A-Z]/Resources/*.nib/info.nib
-rm -f macosx/Transmission.app/Contents/Frameworks/*.framework/Versions/[A-Z]/Resources/*.nib/classes.nib
-rm -f macosx/Transmission.app/Contents/Frameworks/*.framework/Versions/[A-Z]/Resources/*.lproj/*.nib/info.nib
-rm -f macosx/Transmission.app/Contents/Frameworks/*.framework/Versions/[A-Z]/Resources/*.lproj/*.nib/classes.nib
-echo DELETING FRAMEWORK HEADERS
-rm -rf macosx/Transmission.app/Contents/Frameworks/*.framework/Versions/[A-Z]/Headers/*
 echo CREATING RELEASE DIR
 rm -rf release
 mkdir -p release/Transmission
