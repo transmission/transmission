@@ -29,13 +29,13 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
-#define PADDING_HORIZONAL 2.0
-#define IMAGE_FOLDER_SIZE 16.0
-#define IMAGE_ICON_SIZE 32.0
-#define PADDING_BETWEEN_IMAGE_AND_TITLE 4.0
-#define PADDING_ABOVE_TITLE_FILE 2.0
-#define PADDING_BELOW_STATUS_FILE 2.0
-#define PADDING_BETWEEN_NAME_AND_FOLDER_STATUS 4.0
+#define PADDING_HORIZONAL 2.0f
+#define IMAGE_FOLDER_SIZE 16.0f
+#define IMAGE_ICON_SIZE 32.0f
+#define PADDING_BETWEEN_IMAGE_AND_TITLE 4.0f
+#define PADDING_ABOVE_TITLE_FILE 2.0f
+#define PADDING_BELOW_STATUS_FILE 2.0f
+#define PADDING_BETWEEN_NAME_AND_FOLDER_STATUS 4.0f
 
 @interface FileNameCell (Private)
 
@@ -57,11 +57,11 @@
         [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
         
         fTitleAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                            [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
+                            [NSFont messageFontOfSize: 12.0f], NSFontAttributeName,
                             paragraphStyle, NSParagraphStyleAttributeName, nil];
         
         fStatusAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
+                                [NSFont messageFontOfSize: 9.0f], NSFontAttributeName,
                                 paragraphStyle, NSParagraphStyleAttributeName, nil];
         
         [paragraphStyle release];
@@ -116,8 +116,8 @@
     
     result.origin.x += PADDING_HORIZONAL;
     
-    const float IMAGE_SIZE = [(FileListNode *)[self objectValue] isFolder] ? IMAGE_FOLDER_SIZE : IMAGE_ICON_SIZE;
-    result.origin.y += (result.size.height - IMAGE_SIZE) * 0.5;
+    const CGFloat IMAGE_SIZE = [(FileListNode *)[self objectValue] isFolder] ? IMAGE_FOLDER_SIZE : IMAGE_ICON_SIZE;
+    result.origin.y += (result.size.height - IMAGE_SIZE) * 0.5f;
     result.size = NSMakeSize(IMAGE_SIZE, IMAGE_SIZE);
     
     return result;
@@ -177,7 +177,7 @@
     else
     {
         result.origin.x += PADDING_HORIZONAL + IMAGE_FOLDER_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
-        result.origin.y += (result.size.height - titleSize.height) * 0.5;
+        result.origin.y += (result.size.height - titleSize.height) * 0.5f;
     }
     result.size = titleSize;
     result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL);
@@ -200,7 +200,7 @@
     else
     {
         result.origin.x = NSMaxX(titleRect) + PADDING_BETWEEN_NAME_AND_FOLDER_STATUS;
-        result.origin.y = NSMaxY(titleRect) - statusSize.height - 1.0;
+        result.origin.y = NSMaxY(titleRect) - statusSize.height - 1.0f;
     }
         
     result.size = statusSize;
@@ -227,8 +227,8 @@
     FileListNode * node = (FileListNode *)[self objectValue];
     
     NSString * percentString;
-    float progress = [torrent fileProgress: node];
-    percentString = progress == 1.0 ? @"100%" : [NSString localizedStringWithFormat: @"%.2f%%", progress * 100.0];
+    CGFloat progress = [torrent fileProgress: node];
+    percentString = progress == 1.0f ? @"100%" : [NSString localizedStringWithFormat: @"%.2f%%", progress * 100.0f];
     
     
     NSString * status = [NSString localizedStringWithFormat: NSLocalizedString(@"%@ of %@",

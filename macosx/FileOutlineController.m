@@ -30,7 +30,7 @@
 #import "QuickLookController.h"
 #import "NSApplicationAdditions.h"
 
-#define ROW_SMALL_HEIGHT 18.0
+#define ROW_SMALL_HEIGHT 18.0f
 
 typedef enum
 {
@@ -97,7 +97,7 @@ typedef enum
     [fOutline reloadData];
 }
 
-- (int) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
+- (NSInteger) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
 {
     if (!item)
         return fTorrent ? [[fTorrent fileList] count] : 0;
@@ -113,7 +113,7 @@ typedef enum
     return [(FileListNode *)item isFolder];
 }
 
-- (id) outlineView: (NSOutlineView *) outlineView child: (int) index ofItem: (id) item
+- (id) outlineView: (NSOutlineView *) outlineView child: (NSInteger) index ofItem: (id) item
 {
     return [(item ? [(FileListNode *)item children] : [fTorrent fileList]) objectAtIndex: index];
 }
@@ -136,7 +136,7 @@ typedef enum
     {
         [cell setRepresentedObject: item];
         
-        int hoveredRow = [fOutline hoveredRow];
+        NSInteger hoveredRow = [fOutline hoveredRow];
         [(FilePriorityCell *)cell setHovered: hoveredRow != -1 && hoveredRow == [fOutline rowForItem: item]];
     }
     else;
@@ -211,7 +211,7 @@ typedef enum
     return nil;
 }
 
-- (float) outlineView: (NSOutlineView *) outlineView heightOfRowByItem: (id) item
+- (CGFloat) outlineView: (NSOutlineView *) outlineView heightOfRowByItem: (id) item
 {
     if ([(FileListNode *)item isFolder])
         return ROW_SMALL_HEIGHT;
@@ -221,7 +221,7 @@ typedef enum
 
 - (void) setCheck: (id) sender
 {
-    int state = [sender tag] == FILE_UNCHECK_TAG ? NSOffState : NSOnState;
+    NSInteger state = [sender tag] == FILE_UNCHECK_TAG ? NSOffState : NSOnState;
     
     NSIndexSet * indexSet = [fOutline selectedRowIndexes];
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
@@ -250,7 +250,7 @@ typedef enum
 
 - (void) setPriority: (id) sender
 {
-    int priority;
+    NSInteger priority;
     switch ([sender tag])
     {
         case FILE_PRIORITY_HIGH_TAG:

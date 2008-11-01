@@ -80,14 +80,14 @@
             start = !start;
         }
         
-        float newY = NSMaxY([self rectOfRow: i-1]);
+        CGFloat newY = NSMaxY([self rectOfRow: i-1]);
         visibleRect.size.height -= newY - visibleRect.origin.y;
         visibleRect.origin.y = newY;
     }
     
     //remaining visible rows continue alternating
-    float height = [self rowHeight] + [self intercellSpacing].height;
-    int numberOfRects = ceil(visibleRect.size.height / height);
+    CGFloat height = [self rowHeight] + [self intercellSpacing].height;
+    NSInteger numberOfRects = ceil(visibleRect.size.height / height);
     visibleRect.size.height = height;
     
     for (NSInteger i=0; i<numberOfRects; i++)
