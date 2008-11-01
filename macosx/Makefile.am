@@ -28,6 +28,8 @@ EXTRA_DIST = \
     AboutWindowController.m \
     ActionPopUpButton.h \
     ActionPopUpButton.m \
+    AddWindowController.h \
+    AddWindowController.m \
     Badger.h \
     Badger.m \
     BadgeView.h \
@@ -101,8 +103,11 @@ EXTRA_DIST = \
     PrefsController.m \
     PrefsWindow.h \
     PrefsWindow.m \
+    ProgressGradients.h \
+    ProgressGradients.m \
     QuickLookController.h \
     QuickLookController.m \
+    QuickLook.h \
     SpeedLimitToTurtleIconTransformer.h \
     SpeedLimitToTurtleIconTransformer.m \
     StatsWindowController.h \
@@ -111,12 +116,12 @@ EXTRA_DIST = \
     StatusBarView.m \
     ToolbarSegmentedCell.h \
     ToolbarSegmentedCell.m \
-    Torrent.h \
-    Torrent.m \
     TorrentCell.h \
     TorrentCell.m \
     TorrentGroup.h \
     TorrentGroup.m \
+    Torrent.h \
+    Torrent.m \
     TorrentTableView.h \
     TorrentTableView.m \
     TrackerTableView.h \
