@@ -190,11 +190,10 @@
     NSSize statusSize = [string size];
     
     NSRect result;
-    
     if (![(FileListNode *)[self objectValue] isFolder])
     {
         result.origin.x = bounds.origin.x + PADDING_HORIZONAL + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
-        result.origin.y = bounds.origin.y + result.size.height - PADDING_BELOW_STATUS_FILE - statusSize.height;
+        result.origin.y = NSMaxY(bounds) - PADDING_BELOW_STATUS_FILE - statusSize.height;
     }
     else
     {
