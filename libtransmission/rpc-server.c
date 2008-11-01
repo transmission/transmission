@@ -260,6 +260,17 @@ add_response( struct evhttp_request * req,
         if( state == Z_STREAM_END )
         {
             EVBUFFER_LENGTH( out ) = content_len - stream.avail_out;
+
+            /* http://carsten.codimi.de/gzip.yaws/
+               It turns out that some browsers expect deflated data without
+               the first two bytes (a kind of header) and and the last four
+               bytes (an ADLER32 checksum). This format can of course
+               be produced by simply stripping these off. */
+            if( EVBUFFER_LENGTH( out ) >= 6 ) {
+                EVBUFFER_LENGTH( out ) -= 4;
+                evbuffer_drain( out, 2 );
+            }
+
             tr_ninf( MY_NAME, _( "Deflated response from %zu bytes to %zu" ),
                               content_len,
                               EVBUFFER_LENGTH( out ) );
