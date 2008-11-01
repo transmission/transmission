@@ -36,8 +36,8 @@
     {
         fLib = lib;
         
-        [self setBackgroundColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.5]];
-        [self setAlphaValue: 0.0];
+        [self setBackgroundColor: [NSColor colorWithCalibratedWhite: 0.0f alpha: 0.5f]];
+        [self setAlphaValue: 0.0f];
         [self setOpaque: NO];
         [self setHasShadow: NO];
         
@@ -76,22 +76,21 @@
 - (void) setTorrents: (NSArray *) files
 {
     uint64_t size = 0;
-    int count = 0;
+    NSInteger count = 0;
     
     NSString * name;
     BOOL folder;
-    int fileCount = 0;
+    NSInteger fileCount = 0;
     
     NSString * file;
     NSEnumerator * enumerator = [files objectEnumerator];
-    tr_ctor * ctor;
-    tr_info info;
     while ((file = [enumerator nextObject]))
     {
         if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {
-            ctor = tr_ctorNew(fLib);
+            tr_ctor * ctor = tr_ctorNew(fLib);
             tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
+            tr_info info;
             if (tr_torrentParse(fLib, ctor, &info) == TR_OK)
             {
                 count++;
@@ -173,7 +172,7 @@
         [fFadeInAnimation stopAnimation];
         [fFadeOutAnimation setCurrentProgress: 1.0 - [fFadeInAnimation currentProgress]];
     }
-    if ([self alphaValue] > 0.0)
+    if ([self alphaValue] > 0.0f)
         [fFadeOutAnimation startAnimation];
 }
 

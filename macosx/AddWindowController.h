@@ -24,8 +24,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import "Torrent.h"
-#import "FileOutlineController.h"
 
+@class FileOutlineController;
 @class Controller;
 
 @interface AddWindowController : NSWindowController

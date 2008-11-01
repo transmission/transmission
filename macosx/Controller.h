@@ -30,13 +30,13 @@
 #import "AddWindowController.h"
 #import "DragOverlayWindow.h"
 #import "Badger.h"
-#import "StatusBarView.h"
-#import "FilterButton.h"
-#import "MenuLabel.h"
 
 #import <Growl/Growl.h>
 
 @class TorrentTableView;
+@class StatusBarView;
+@class FilterButton;
+@class MenuLabel;
 
 typedef enum
 {

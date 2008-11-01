@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "AddWindowController.h"
+#import "FileOutlineController.h"
 #import "Controller.h"
 #import "GroupsController.h"
 #import "NSStringAdditions.h"
@@ -30,7 +31,7 @@
 #import "NSApplicationAdditions.h"
 #import "ExpandedPathToIconTransformer.h"
 
-#define UPDATE_SECONDS 1.0f
+#define UPDATE_SECONDS 1.0
 
 @interface AddWindowController (Private)
 
