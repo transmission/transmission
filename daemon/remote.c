@@ -649,7 +649,7 @@ getStatusString( tr_benc * t, char * buf, size_t buflen )
             if( j && k )
                 tr_strlcpy( buf, "Up & Down", buflen );
             else if( j )
-                tr_strlcpy( buf, (i==TR_STATUS_SEED ? "Uploading" : "Seeding"), buflen );
+                tr_strlcpy( buf, (i==TR_STATUS_SEED ? "Seeding" : "Uploading"), buflen );
             else if( j )
                 tr_strlcpy( buf, "Downloading", buflen );
             else
