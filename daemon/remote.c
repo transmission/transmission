@@ -618,42 +618,47 @@ strlsize( char *  buf,
 static char*
 getStatusString( tr_benc * t, char * buf, size_t buflen )
 {
-    int64_t i;
+    int64_t status;
 
-    *buf = '\0';
-
-    if( tr_bencDictFindInt( t, "status", &i ) )
+    if( !tr_bencDictFindInt( t, "status", &status ) )
     {
-        if( i==TR_STATUS_STOPPED )
-        {
+        *buf = '\0';
+    }
+    else switch( status )
+    {
+        case TR_STATUS_STOPPED:
             tr_strlcpy( buf, "Stopped", buflen );
-        }
-        else if( i==TR_STATUS_CHECK_WAIT || i==TR_STATUS_CHECK )
-        {
-            const char * str = NULL;
-            char percentBuf[32];
-            if( tr_bencDictFindStr( t, "recheckProgress", &str ) )
-                tr_snprintf( percentBuf, sizeof( percentBuf ), " (%.0f%%)", atof( str ) );
+            break;
+
+        case TR_STATUS_CHECK_WAIT:
+        case TR_STATUS_CHECK: {
+            const char * str = status == TR_STATUS_CHECK_WAIT
+                             ? "Will Verify"
+                             : "Verifying";
+            double percent;
+            if( tr_bencDictFindDouble( t, "recheckProgress", &percent ) )
+                tr_snprintf( buf, buflen, "%s (%.0f%%)", str, percent*100.0 );
             else
-                *percentBuf = '\0';
-            tr_snprintf( buf, buflen, "%s%s",
-                         ( i == TR_STATUS_CHECK_WAIT ) ? "Will Verify" : "Verifying",
-                         percentBuf );
+                tr_strlcpy( buf, str, buflen );
+
+            break;
         }
-        else if( i==TR_STATUS_DOWNLOAD || i==TR_STATUS_SEED )
-        {
-            int64_t j = 0;
-            int64_t k = 0;
-            tr_bencDictFindInt( t, "peersGettingFromUs", &j );
-            tr_bencDictFindInt( t, "peersSendingToUs", &k );
-            if( j && k )
+
+        case TR_STATUS_DOWNLOAD:
+        case TR_STATUS_SEED: {
+            int64_t fromUs = 0;
+            int64_t toUs = 0;
+            tr_bencDictFindInt( t, "peersGettingFromUs", &fromUs );
+            tr_bencDictFindInt( t, "peersSendingToUs", &toUs );
+            if( fromUs && toUs )
                 tr_strlcpy( buf, "Up & Down", buflen );
-            else if( j )
-                tr_strlcpy( buf, (i==TR_STATUS_SEED ? "Seeding" : "Uploading"), buflen );
-            else if( j )
+            else if( fromUs )
+                tr_strlcpy( buf, "Seeding", buflen );
+            else if( toUs )
                 tr_strlcpy( buf, "Downloading", buflen );
             else
                 tr_strlcpy( buf, "Idle", buflen );
+            break;
         }
     }
 
