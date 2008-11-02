@@ -228,7 +228,7 @@
 }
 
 #warning don't cut off end
-- (float) tableView: (NSTableView *) tableView heightOfRow: (NSInteger) row
+- (CGFloat) tableView: (NSTableView *) tableView heightOfRow: (NSInteger) row
 {
     NSTableColumn * column = [tableView tableColumnWithIdentifier: @"Message"];
     

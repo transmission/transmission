@@ -116,7 +116,7 @@
     }
 
     int8_t * pieces = NULL;
-    CGFloat * piecesPercent = NULL;
+    float * piecesPercent = NULL;
     
     BOOL showAvailablity = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
     if (showAvailablity)
@@ -126,7 +126,7 @@
     }
     else
     {   
-        piecesPercent = (CGFloat *)tr_malloc(fNumPieces * sizeof(CGFloat));
+        piecesPercent = (float *)tr_malloc(fNumPieces * sizeof(float));
         [fTorrent getAmountFinished: piecesPercent size: fNumPieces];
     }
     

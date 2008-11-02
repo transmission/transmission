@@ -674,7 +674,7 @@
     Torrent * torrent = [self representedObject];
     
     NSInteger pieceCount = MIN([torrent pieceCount], MAX_PIECES);
-    CGFloat * piecesPercent = malloc(pieceCount * sizeof(CGFloat));
+    float * piecesPercent = malloc(pieceCount * sizeof(float));
     [torrent getAmountFinished: piecesPercent size: pieceCount];
     
     NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil

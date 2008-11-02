@@ -999,12 +999,12 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (NSArray *) peers
 {
-    NSInteger totalPeers;
+    int totalPeers;
     tr_peer_stat * peers = tr_torrentPeers(fHandle, &totalPeers);
     
     NSMutableArray * peerDicts = [NSMutableArray arrayWithCapacity: totalPeers];
     
-    for (NSInteger i = 0; i < totalPeers; i++)
+    for (int i = 0; i < totalPeers; i++)
     {
         tr_peer_stat * peer = &peers[i];
         NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 9];
