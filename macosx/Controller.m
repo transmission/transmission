@@ -533,7 +533,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     if (!fUpdateInProgress && [fDefaults boolForKey: @"CheckQuit"])
     {
-        int active = 0, downloading = 0;
+        NSInteger active = 0, downloading = 0;
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
@@ -563,7 +563,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     return NSTerminateNow;
 }
 
-- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo
+- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
     [NSApp replyToApplicationShouldTerminate: returnCode == NSAlertDefaultReturn];
 }
@@ -890,7 +890,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [dict release];
 }
 
-- (void) incompleteChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (NSDictionary *) dictionary
+- (void) incompleteChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (NSDictionary *) dictionary
 {
     if (code == NSOKButton)
         [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"IncompleteDownloadFolder"];
@@ -900,7 +900,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
 }
 
-- (void) downloadChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (NSDictionary *) dictionary
+- (void) downloadChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (NSDictionary *) dictionary
 {
     if (code == NSOKButton)
     {
@@ -939,7 +939,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         contextInfo: [NSNumber numberWithBool: sender == fOpenIgnoreDownloadFolder]];
 }
 
-- (void) openSheetClosed: (NSOpenPanel *) panel returnCode: (int) code contextInfo: (NSNumber *) useOptions
+- (void) openSheetClosed: (NSOpenPanel *) panel returnCode: (NSInteger) code contextInfo: (NSNumber *) useOptions
 {
     if (code == NSOKButton)
     {
@@ -1043,7 +1043,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fURLSheetOpenButton setEnabled: enable];
 }
 
-- (void) urlSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo
+- (void) urlSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
     [fURLSheetTextField selectText: self];
     if (returnCode != 1)
@@ -1054,7 +1054,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         if ([urlString rangeOfString: @"."].location == NSNotFound)
         {
-            int beforeCom;
+            NSInteger beforeCom;
             if ((beforeCom = [urlString rangeOfString: @"/"].location) != NSNotFound)
                 urlString = [NSString stringWithFormat: @"http://www.%@.com/%@",
                                 [urlString substringToIndex: beforeCom],
@@ -1154,7 +1154,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
 {
     [torrents retain];
-    int active = 0, downloading = 0;
+    NSInteger active = 0, downloading = 0;
 
     if ([fDefaults boolForKey: @"CheckRemove"])
     {
@@ -1177,7 +1177,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             NSString * title, * message;
             
-            int selected = [torrents count];
+            NSInteger selected = [torrents count];
             if (selected == 1)
             {
                 NSString * torrentName = [[torrents objectAtIndex: 0] name];
@@ -1243,7 +1243,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self confirmRemoveTorrents: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
 }
 
-- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (NSDictionary *) dict
+- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (NSDictionary *) dict
 {
     NSArray * torrents = [dict objectForKey: @"Torrents"];
     if (returnCode == NSAlertDefaultReturn)
@@ -1266,7 +1266,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTorrents removeObjectsInArray: torrents];
     
     //for tiger - when 10.5-only repace with NSIntegerMax
-    int lowestOrderValue = INT_MAX;
+    NSInteger lowestOrderValue = INT_MAX;
     enumerator = [torrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
@@ -1288,7 +1288,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //reset the order values if necessary
     if (lowestOrderValue < [fTorrents count])
     {
-        for (int i = lowestOrderValue; i < [fTorrents count]; i++)
+        for (NSInteger i = lowestOrderValue; i < [fTorrents count]; i++)
             [[fTorrents objectAtIndex: i] setOrderValue: i];
     }
     
@@ -1332,7 +1332,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [panel setCanCreateDirectories: YES];
     
     torrents = [torrents retain];
-    int count = [torrents count];
+    NSInteger count = [torrents count];
     if (count == 1)
         [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for \"%@\".",
                             "Move torrent -> select destination folder"), [[torrents objectAtIndex: 0] name]]];
@@ -1344,7 +1344,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         didEndSelector: @selector(moveDataFileChoiceClosed:returnCode:contextInfo:) contextInfo: torrents];
 }
 
-- (void) moveDataFileChoiceClosed: (NSOpenPanel *) panel returnCode: (int) code contextInfo: (NSArray *) torrents
+- (void) moveDataFileChoiceClosed: (NSOpenPanel *) panel returnCode: (NSInteger) code contextInfo: (NSArray *) torrents
 {
     if (code == NSOKButton)
     {
@@ -1401,7 +1401,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
 }
 
-- (void) saveTorrentCopySheetClosed: (NSSavePanel *) panel returnCode: (int) code contextInfo: (NSMutableArray *) torrents
+- (void) saveTorrentCopySheetClosed: (NSSavePanel *) panel returnCode: (NSInteger) code contextInfo: (NSMutableArray *) torrents
 {
     //copy torrent to new location with name of data file
     if (code == NSOKButton)
@@ -1570,7 +1570,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSRect statusFrame = [fStatusButton frame];
     statusFrame.size.width -= 25.0;
     
-    float difference = NSMaxX(statusFrame) + 5.0 - [fTotalDLImageView frame].origin.x;
+    CGFloat difference = NSMaxX(statusFrame) + 5.0 - [fTotalDLImageView frame].origin.x;
     if (difference > 0)
         statusFrame.size.width -= difference;
     
@@ -1580,7 +1580,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) setBottomCountText: (BOOL) filtering
 {
     NSString * totalTorrentsString;
-    int totalCount = [fTorrents count];
+    NSInteger totalCount = [fTorrents count];
     if (totalCount != 1)
         totalTorrentsString = [NSString stringWithFormat: NSLocalizedString(@"%d transfers", "Status bar transfer count"), totalCount];
     else
@@ -1588,7 +1588,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (filtering)
     {
-        int count = [fTableView numberOfRows]; //have to factor in collapsed rows
+        NSInteger count = [fTableView numberOfRows]; //have to factor in collapsed rows
         if (count > 0 && ![[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [Torrent class]])
             count -= [fDisplayedTorrents count];
         
@@ -1604,7 +1604,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     BOOL download = [fDefaults boolForKey: @"Queue"],
         seed = [fDefaults boolForKey: @"QueueSeed"];
     
-    int desiredDownloadActive = [self numToStartFromQueue: YES],
+    NSInteger desiredDownloadActive = [self numToStartFromQueue: YES],
         desiredSeedActive = [self numToStartFromQueue: NO];
     
     Torrent * torrent;
@@ -1641,12 +1641,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentHistory];
 }
 
-- (int) numToStartFromQueue: (BOOL) downloadQueue
+- (NSInteger) numToStartFromQueue: (BOOL) downloadQueue
 {
     if (![fDefaults boolForKey: downloadQueue ? @"Queue" : @"QueueSeed"])
         return 0;
     
-    int desired = [fDefaults integerForKey: downloadQueue ? @"QueueDownloadNumber" : @"QueueSeedNumber"];
+    NSInteger desired = [fDefaults integerForKey: downloadQueue ? @"QueueDownloadNumber" : @"QueueSeedNumber"];
         
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
@@ -1939,7 +1939,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     NSArray * selectedValues = [fTableView selectedValues];
     
-    int active = 0, downloading = 0, seeding = 0, paused = 0;
+    NSInteger active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     BOOL filterActive = NO, filterDownload = NO, filterSeed = NO, filterPause = NO, filterStatus = YES;
     if ([filterType isEqualToString: FILTER_ACTIVE])
@@ -1953,7 +1953,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else
         filterStatus = NO;
     
-    int groupFilterValue = [fDefaults integerForKey: @"FilterGroup"];
+    NSInteger groupFilterValue = [fDefaults integerForKey: @"FilterGroup"];
     BOOL filterGroup = groupFilterValue != GROUP_FILTER_ALL_TAG;
     
     NSString * searchString = [fSearchFilterField stringValue];
@@ -1965,7 +1965,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //get count of each type
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
-    int index = -1;
+    NSInteger index = -1;
     while ((torrent = [enumerator nextObject]))
     {
         index++;
@@ -2061,10 +2061,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         allTorrents = [allTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
         
         NSMutableArray * groupTorrents;
-        for (int i = 0, oldGroupValue = -2; i < [allTorrents count]; i++)
+        for (NSInteger i = 0, oldGroupValue = -2; i < [allTorrents count]; i++)
         {
             torrent = [allTorrents objectAtIndex: i];
-            int groupValue = [torrent groupValue];
+            NSInteger groupValue = [torrent groupValue];
             if (groupValue != oldGroupValue)
             {
                 TorrentGroup * group = [[TorrentGroup alloc] initWithGroup: groupValue];
@@ -2155,7 +2155,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     NSString * oldFilterType = [fDefaults stringForKey: @"FilterSearchType"];
     
-    int prevTag, currentTag = [sender tag];
+    NSInteger prevTag, currentTag = [sender tag];
     if ([oldFilterType isEqualToString: FILTER_TYPE_TRACKER])
         prevTag = FILTER_TYPE_TAG_TRACKER;
     else
@@ -2232,7 +2232,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)
     {
-        for (int i = [menu numberOfItems]-1 - 2; i >= 0; i--)
+        for (NSInteger i = [menu numberOfItems]-1 - 2; i >= 0; i--)
             [menu removeItemAtIndex: i];
         
         NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroup:) isSmall: NO];
@@ -2241,7 +2241,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     else if (menu == fGroupFilterMenu)
     {
-        for (int i = [menu numberOfItems]-1; i >= 3; i--)
+        for (NSInteger i = [menu numberOfItems]-1; i >= 3; i--)
             [menu removeItemAtIndex: i];
         
         NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroupFilter:)
@@ -2254,10 +2254,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if ([menu numberOfItems] > 3)
             return;
         
-        const int speedLimitActionValue[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
+        const NSInteger speedLimitActionValue[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
         
         NSMenuItem * item;
-        for (int i = 0; speedLimitActionValue[i] != -1; i++)
+        for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
         {
             item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%d KB/s",
                     "Action menu -> upload/download limit"), speedLimitActionValue[i]] action: @selector(setQuickLimitGlobal:)
@@ -2276,7 +2276,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         const float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1 };
         
         NSMenuItem * item;
-        for (int i = 0; ratioLimitActionValue[i] != -1; i++)
+        for (NSInteger i = 0; ratioLimitActionValue[i] != -1; i++)
         {
             item = [[NSMenuItem alloc] initWithTitle: [NSString localizedStringWithFormat: @"%.2f", ratioLimitActionValue[i]]
                     action: @selector(setQuickRatioGlobal:) keyEquivalent: @""];
@@ -2314,7 +2314,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) updateGroupsFilterButton
 {
-    int groupIndex = [fDefaults integerForKey: @"FilterGroup"];
+    NSInteger groupIndex = [fDefaults integerForKey: @"FilterGroup"];
     
     NSImage * icon;
     NSString * toolTip;
@@ -2372,7 +2372,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                         fromDate: [fDefaults objectForKey: @"SpeedLimitAutoOffDate"]];
     
     //check if should be on if within range
-    int onTime = [onComponents hour] * 60 + [onComponents minute],
+    NSInteger onTime = [onComponents hour] * 60 + [onComponents minute],
         offTime = [offComponents hour] * 60 + [offComponents minute],
         nowTime = [nowComponents hour] * 60 + [nowComponents minute];
     
@@ -2423,7 +2423,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     * timerComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: timerDate];
     
     //check if should be the next day
-    int nowTime = [nowComponents hour] * 60 + [nowComponents minute],
+    NSInteger nowTime = [nowComponents hour] * 60 + [nowComponents minute],
         timerTime = [timerComponents hour] * 60 + [timerComponents minute];
     if (timerTime < nowTime)
         [nowComponents setDay: [nowComponents day] + 1]; //properly goes to next month when appropriate
@@ -2544,7 +2544,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fAutoImportedNames setArray: importedNames];
     
     NSString * file;
-    for (int i = [newNames count] - 1; i >= 0; i--)
+    for (NSInteger i = [newNames count] - 1; i >= 0; i--)
     {
         file = [newNames objectAtIndex: i];
         if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] != NSOrderedSame)
@@ -2623,13 +2623,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSString * ident = [tableColumn identifier];
         if ([ident isEqualToString: @"Group"])
         {
-            int group = [item groupIndex];
+            NSInteger group = [item groupIndex];
             return group != -1 ? [[GroupsController groups] nameForIndex: group]
                                 : NSLocalizedString(@"No Group", "Group table row");
         }
         else if ([ident isEqualToString: @"Color"])
         {
-            int group = [item groupIndex];
+            NSInteger group = [item groupIndex];
             return [[GroupsController groups] imageForIndex: group];
         }
         else if ([ident isEqualToString: @"DL Image"])
@@ -2645,7 +2645,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 return [NSString stringForRatio: [group ratio]];
             else
             {
-                float rate = [ident isEqualToString: @"UL"] ? [group uploadRate] : [group downloadRate];
+                CGFloat rate = [ident isEqualToString: @"UL"] ? [group uploadRate] : [group downloadRate];
                 return [NSString stringForSpeed: rate];
             }
         }
@@ -2732,14 +2732,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         //get the torrents to move
         NSMutableArray * movingTorrents = [NSMutableArray arrayWithCapacity: [indexes count]];
-        for (int i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+        for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
             [movingTorrents addObject: [fTableView itemAtRow: i]];
         
         //reset groups
         if (item)
         {
             //change groups
-            int groupValue = [item groupIndex];
+            NSInteger groupValue = [item groupIndex];
             NSEnumerator * enumerator = [movingTorrents objectEnumerator];
             Torrent * torrent;
             while ((torrent = [enumerator nextObject]))
@@ -2760,7 +2760,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             //find torrent to place under
             NSArray * groupTorrents = item ? [item torrents] : fDisplayedTorrents;
             Torrent * topTorrent = nil;
-            for (int i = newRow-1; i >= 0; i--)
+            for (NSInteger i = newRow-1; i >= 0; i--)
             {
                 Torrent * tempTorrent = [groupTorrents objectAtIndex: i];
                 if (![movingTorrents containsObject: tempTorrent])
@@ -2779,7 +2779,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [fTorrents insertObjects: movingTorrents atIndexes: insertIndexes];
             
             //redo order values
-            for (int i = 0; i < [fTorrents count]; i++)
+            for (NSInteger i = 0; i < [fTorrents count]; i++)
                 [[fTorrents objectAtIndex: i] setOrderValue: i];
         }
         
@@ -2942,7 +2942,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (!makeSmall && contentSize.height < contentMinSize.height)
         {
             NSRect frame = [fWindow frame];
-            float heightChange = contentMinSize.height - contentSize.height;
+            CGFloat heightChange = contentMinSize.height - contentSize.height;
             frame.size.height += heightChange;
             frame.origin.y -= heightChange;
             
@@ -2975,7 +2975,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTableView reloadData];
 }
 
-- (NSRect) windowFrameByAddingHeight: (float) height checkLimits: (BOOL) check
+- (NSRect) windowFrameByAddingHeight: (CGFloat) height checkLimits: (BOOL) check
 {
     NSScrollView * scrollView = [fTableView enclosingScrollView];
     
@@ -3026,7 +3026,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fStatusBar setHidden: NO];
 
     NSRect frame;
-    float heightChange = [fStatusBar frame].size.height;
+    CGFloat heightChange = [fStatusBar frame].size.height;
     if (!show)
         heightChange *= -1;
     
@@ -3034,7 +3034,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (show && ![fDefaults boolForKey: @"AutoSize"])
     {
         frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
-        float change = [[fWindow screen] visibleFrame].size.height - frame.size.height;
+        CGFloat change = [[fWindow screen] visibleFrame].size.height - frame.size.height;
         if (change < 0.0)
         {
             frame = [fWindow frame];
@@ -3049,9 +3049,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSScrollView * scrollView = [fTableView enclosingScrollView];
     
     //set views to not autoresize
-    unsigned int statsMask = [fStatusBar autoresizingMask];
-    unsigned int filterMask = [fFilterBar autoresizingMask];
-    unsigned int scrollMask = [scrollView autoresizingMask];
+    NSUInteger statsMask = [fStatusBar autoresizingMask];
+    NSUInteger filterMask = [fFilterBar autoresizingMask];
+    NSUInteger scrollMask = [scrollView autoresizingMask];
     [fStatusBar setAutoresizingMask: NSViewNotSizable];
     [fFilterBar setAutoresizingMask: NSViewNotSizable];
     [scrollView setAutoresizingMask: NSViewNotSizable];
@@ -3097,7 +3097,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fFilterBar setHidden: NO];
 
     NSRect frame;
-    float heightChange = [fFilterBar frame].size.height;
+    CGFloat heightChange = [fFilterBar frame].size.height;
     if (!show)
         heightChange *= -1;
     
@@ -3105,7 +3105,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (show && ![fDefaults boolForKey: @"AutoSize"])
     {
         frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
-        float change = [[fWindow screen] visibleFrame].size.height - frame.size.height;
+        CGFloat change = [[fWindow screen] visibleFrame].size.height - frame.size.height;
         if (change < 0.0)
         {
             frame = [fWindow frame];
@@ -3118,8 +3118,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSScrollView * scrollView = [fTableView enclosingScrollView];
 
     //set views to not autoresize
-    unsigned int filterMask = [fFilterBar autoresizingMask];
-    unsigned int scrollMask = [scrollView autoresizingMask];
+    NSUInteger filterMask = [fFilterBar autoresizingMask];
+    NSUInteger scrollMask = [scrollView autoresizingMask];
     [fFilterBar setAutoresizingMask: NSViewNotSizable];
     [scrollView setAutoresizingMask: NSViewNotSizable];
     
@@ -3347,7 +3347,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) allToolbarClicked: (id) sender
 {
-    int tagValue = [sender isKindOfClass: [NSSegmentedControl class]]
+    NSInteger tagValue = [sender isKindOfClass: [NSSegmentedControl class]]
                     ? [(NSSegmentedCell *)[sender cell] tagForSegment: [sender selectedSegment]] : [sender tag];
     switch (tagValue)
     {
@@ -3362,7 +3362,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) selectedToolbarClicked: (id) sender
 {
-    int tagValue = [sender isKindOfClass: [NSSegmentedControl class]]
+    NSInteger tagValue = [sender isKindOfClass: [NSSegmentedControl class]]
                     ? [(NSSegmentedCell *)[sender cell] tagForSegment: [sender selectedSegment]] : [sender tag];
     switch (tagValue)
     {
@@ -3559,7 +3559,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         BOOL checked = NO;
         
-        int index = [menuItem tag];
+        NSInteger index = [menuItem tag];
         NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
@@ -3909,7 +3909,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (NSMenu *) applicationDockMenu: (NSApplication *) sender
 {
-    int seeding = 0, downloading = 0;
+    NSInteger seeding = 0, downloading = 0;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
@@ -4003,10 +4003,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (NSRect) sizedWindowFrame
 {
-    int groups = ([fDisplayedTorrents count] > 0 && ![[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [Torrent class]])
+    NSInteger groups = ([fDisplayedTorrents count] > 0 && ![[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [Torrent class]])
                     ? [fDisplayedTorrents count] : 0;
     
-    float heightChange = (GROUP_SEPARATOR_HEIGHT + [fTableView intercellSpacing].height) * groups
+    CGFloat heightChange = (GROUP_SEPARATOR_HEIGHT + [fTableView intercellSpacing].height) * groups
                         + ([fTableView rowHeight] + [fTableView intercellSpacing].height) * ([fTableView numberOfRows] - groups)
                         - [[fTableView enclosingScrollView] frame].size.height;
     
@@ -4080,13 +4080,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         searchFrame.size.width = SEARCH_FILTER_MIN_WIDTH;
         
         //resize the buttons so they don't overlay
-        int difference = (NSMaxX(pauseRect) + 5.0) - searchFrame.origin.x - 1; //subtract 1, since 0 will be counted
+        NSInteger difference = (NSMaxX(pauseRect) + 5.0) - searchFrame.origin.x - 1; //subtract 1, since 0 will be counted
         
         //decrease downloading by 8, seeding by 1, paused by 1, active by 1, repeat
-        int download = (difference / 11 * 8) + MIN(difference % 11 + 1, 8); //8 for every 11
-        int seed = (difference / 11) + (difference % 11 >= 8 ? 1 : 0);
-        int paused = (difference / 11) + (difference % 11 >= 9 ? 1 : 0);
-        int active = (difference / 11) + (difference % 11 >= 10 ? 1 : 0);
+        NSInteger download = (difference / 11 * 8) + MIN(difference % 11 + 1, 8); //8 for every 11
+        NSInteger seed = (difference / 11) + (difference % 11 >= 8 ? 1 : 0);
+        NSInteger paused = (difference / 11) + (difference % 11 >= 9 ? 1 : 0);
+        NSInteger active = (difference / 11) + (difference % 11 >= 10 ? 1 : 0);
         
         activeRect.size.width -= active;
         
@@ -4156,7 +4156,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSString * fullPath = [url path];
         NSRange visibleRows = [fTableView rowsInRect: [fTableView bounds]];
         
-        for (int row = 0; row < NSMaxRange(visibleRows); row++)
+        for (NSInteger row = 0; row < NSMaxRange(visibleRows); row++)
         {
             id item = [fTableView itemAtRow: row];
             if ([item isKindOfClass: [Torrent class]] && [[(Torrent *)item dataLocation] isEqualToString: fullPath])

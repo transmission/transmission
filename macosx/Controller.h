@@ -130,7 +130,7 @@ typedef enum
 - (void) openURLCancelEndSheet: (id) sender;
 - (void) openURLShowSheet:      (id) sender;
 
-- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo;
+- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo;
 
 - (void) createFile: (id) sender;
 
@@ -148,7 +148,7 @@ typedef enum
 
 - (void) removeTorrents: (NSArray *) torrents
         deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteData;
-- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode
+- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode
                         contextInfo: (NSDictionary *) dict;
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent;
 - (void) removeNoDelete:                (id) sender;
@@ -158,7 +158,7 @@ typedef enum
 
 - (void) moveDataFilesSelected: (id) sender;
 - (void) moveDataFiles: (NSArray *) torrents;
-- (void) moveDataFileChoiceClosed: (NSOpenPanel *) panel returnCode: (int) code contextInfo: (NSArray *) torrents;
+- (void) moveDataFileChoiceClosed: (NSOpenPanel *) panel returnCode: (NSInteger) code contextInfo: (NSArray *) torrents;
 
 - (void) copyTorrentFiles: (id) sender;
 - (void) copyTorrentFileForTorrents: (NSMutableArray *) torrents;
@@ -187,7 +187,7 @@ typedef enum
 - (void) setBottomCountText: (BOOL) filtering;
 
 - (void) updateTorrentsInQueue;
-- (int) numToStartFromQueue: (BOOL) downloadQueue;
+- (NSInteger) numToStartFromQueue: (BOOL) downloadQueue;
 
 - (void) torrentFinishedDownloading: (NSNotification *) notification;
 - (void) torrentRestartedDownloading: (NSNotification *) notification;
