@@ -359,7 +359,7 @@
 "Downloading" = "In download";
 
 /* Blocklist -> message */
-"Downloading blocklist" = "Download della blocklist...";
+"Downloading blocklist" = "Download della blocklist";
 
 /* Torrent -> status string */
 "Downloading from %d of %d peers" = "In download da %1$d su %2$d peer";
@@ -653,7 +653,7 @@
 "Process" = "Processo";
 
 /* Blocklist -> message */
-"Processing blocklist" = "Elaborazione della blocklist...";
+"Processing blocklist" = "Elaborazione della blocklist";
 
 /* Stats window -> label */
 "Program Started" = "Programma avviato";
