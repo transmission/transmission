@@ -270,7 +270,10 @@ getHomeDir( void )
         if( !home )
         {
 #ifdef WIN32
-            SHGetFolderPath( NULL, CSIDL_MYDOCUMENTS, NULL, 0, home );
+            char appdata[MAX_PATH]; /* SHGetFolderPath() requires MAX_PATH */
+            *appdata = '\0';
+            SHGetFolderPath( NULL, CSIDL_MYDOCUMENTS, NULL, 0, appdata );
+            home = tr_strdup( appdata );
 #elif defined( __BEOS__ ) || defined( __AMIGAOS4__ )
             home = tr_strdup( "" );
 #else
@@ -308,7 +311,7 @@ getOldConfigDir( void )
 #elif defined( __AMIGAOS4__ )
         path = tr_strdup( "PROGDIR:.transmission" );
 #elif defined( WIN32 )
-        char appdata[MAX_PATH_LENGTH];
+        char appdata[MAX_PATH]; /* SHGetFolderPath() requires MAX_PATH */
         SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
         path = tr_buildPath( appdata, "Transmission", NULL );
 #else
