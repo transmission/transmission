@@ -249,48 +249,48 @@ tr_encryption_mode;
  * @see TR_DEFAULT_RPC_WHITELIST_ENABLED
  * @see tr_sessionClose()
  */
-tr_handle * tr_sessionInitFull( const char *       configDir,
-                                const char *       tag,
-                                const char *       downloadDir,
-                                int                isPexEnabled,
-                                int                isPortForwardingEnabled,
-                                int                publicPort,
-                                tr_encryption_mode encryptionMode,
-                                int                useLazyBitfield,
-                                int                useUploadLimit,
-                                int                uploadLimit,
-                                int                useDownloadLimit,
-                                int                downloadLimit,
-                                int                peerLimit,
-                                int                messageLevel,
-                                int                isMessageQueueingEnabled,
-                                int                isBlocklistEnabled,
-                                int                peerSocketTOS,
-                                int                rpcIsEnabled,
-                                uint16_t           rpcPort,
-                                int                rpcWhitelistIsEnabled,
-                                const char *       rpcWhitelist,
-                                int                rpcPasswordIsEnabled,
-                                const char *       rpcUsername,
-                                const char *       rpcPassword,
-                                int                proxyIsEnabled,
-                                const char *       proxy,
-                                int                proxyPort,
-                                tr_proxy_type      proxyType,
-                                int                proxyAuthIsEnabled,
-                                const char *       proxyUsername,
-                                const char *       proxyPassword );
+tr_session * tr_sessionInitFull( const char *       configDir,
+                                 const char *       tag,
+                                 const char *       downloadDir,
+                                 int                isPexEnabled,
+                                 int                isPortForwardingEnabled,
+                                 int                publicPort,
+                                 tr_encryption_mode encryptionMode,
+                                 int                useLazyBitfield,
+                                 int                useUploadLimit,
+                                 int                uploadLimit,
+                                 int                useDownloadLimit,
+                                 int                downloadLimit,
+                                 int                peerLimit,
+                                 int                messageLevel,
+                                 int                isMessageQueueingEnabled,
+                                 int                isBlocklistEnabled,
+                                 int                peerSocketTOS,
+                                 int                rpcIsEnabled,
+                                 uint16_t           rpcPort,
+                                 int                rpcWhitelistIsEnabled,
+                                 const char *       rpcWhitelist,
+                                 int                rpcPasswordIsEnabled,
+                                 const char *       rpcUsername,
+                                 const char *       rpcPassword,
+                                 int                proxyIsEnabled,
+                                 const char *       proxy,
+                                 int                proxyPort,
+                                 tr_proxy_type      proxyType,
+                                 int                proxyAuthIsEnabled,
+                                 const char *       proxyUsername,
+                                 const char *       proxyPassword );
 
 
 /** @brief Shorter form of tr_sessionInitFull()
     @deprecated Use tr_sessionInitFull() instead. */
-tr_handle *  tr_sessionInit( const char * configDir,
-                             const char * downloadDir,
-                             const char * tag );
+tr_session *  tr_sessionInit( const char * configDir,
+                              const char * downloadDir,
+                              const char * tag );
 
 /** @brief End a libtransmission session
     @see tr_sessionInitFull() */
-void         tr_sessionClose( tr_handle * );
+void         tr_sessionClose( tr_session * );
 
 /**
  * @brief Return the session's configuration directory
@@ -298,7 +298,7 @@ void         tr_sessionClose( tr_handle * );
  * This is where transmission stores its .torrent files, .resume files,
  * blocklists, etc.
  */
-const char * tr_sessionGetConfigDir( const tr_handle * );
+const char * tr_sessionGetConfigDir( const tr_session * );
 
 /**
  * @brief Set the per-session default download folder for new torrents.
@@ -306,10 +306,8 @@ const char * tr_sessionGetConfigDir( const tr_handle * );
  * @see tr_sessionGetDownloadDir()
  * @see tr_ctorSetDownloadDir()
  */
-void         tr_sessionSetDownloadDir(
-    tr_handle *,
-    const char *
-    downloadDir );
+void tr_sessionSetDownloadDir( tr_session  * session,
+                               const char  * downloadDir );
 
 /**
  * @brief Get the default download folder for new torrents.
@@ -317,7 +315,7 @@ void         tr_sessionSetDownloadDir(
  * This is set by tr_sessionInitFull() or tr_sessionSetDownloadDir(),
  * and can be overridden on a per-torrent basis by tr_ctorSetDownloadDir().
  */
-const char * tr_sessionGetDownloadDir( const tr_handle * );
+const char * tr_sessionGetDownloadDir( const tr_session * session );
 
 /**
  * @brief Set whether or not RPC calls are allowed in this session.
@@ -328,24 +326,24 @@ const char * tr_sessionGetDownloadDir( const tr_handle * );
  * This is intially set by tr_sessionInitFull() and can be
  * queried by tr_sessionIsRPCEnabled().
  */
-void tr_sessionSetRPCEnabled(                     tr_handle *,
-                                              int isEnabled );
+void tr_sessionSetRPCEnabled( tr_session  * session,
+                              int           isEnabled );
 
 /** @brief Get whether or not RPC calls are allowed in this session.
     @see tr_sessionInitFull()
     @see tr_sessionSetRPCEnabled() */
-int  tr_sessionIsRPCEnabled( const tr_handle * handle );
+int  tr_sessionIsRPCEnabled( const tr_session * session );
 
 /** @brief Specify which port to listen for RPC requests on.
     @see tr_sessionInitFull()
     @see tr_sessionGetRPCPort */
-void tr_sessionSetRPCPort( tr_handle * session,
-                           uint16_t port );
+void tr_sessionSetRPCPort( tr_session  * session,
+                           uint16_t      port );
 
 /** @brief Get which port to listen for RPC requests on.
     @see tr_sessionInitFull()
     @see tr_sessionSetRPCPort */
-uint16_t  tr_sessionGetRPCPort( const tr_handle * );
+uint16_t  tr_sessionGetRPCPort( const tr_session * session );
 
 /**
  * @brief Specify a whitelist for remote RPC access
@@ -506,38 +504,35 @@ void               tr_sessionClearStats( tr_session * session );
  * PEX is always disabled in private torrents regardless of this.
  * In public torrents, PEX is enabled by default.
  */
-void               tr_sessionSetPexEnabled(                 tr_session *,
-                                                        int isEnabled );
+void               tr_sessionSetPexEnabled( tr_session  * session,
+                                            int           isEnabled );
 
-int                tr_sessionIsPexEnabled( const tr_session * );
+int                tr_sessionIsPexEnabled( const tr_session * session );
 
-void               tr_sessionSetLazyBitfieldEnabled( tr_handle * handle,
-                                                     int         enabled );
+void               tr_sessionSetLazyBitfieldEnabled( tr_session * session,
+                                                     int          enabled );
 
-int                tr_sessionIsLazyBitfieldEnabled(
-    const tr_handle * handle );
+int                tr_sessionIsLazyBitfieldEnabled( const tr_session * session );
 
-tr_encryption_mode tr_sessionGetEncryption( tr_session * );
+tr_encryption_mode tr_sessionGetEncryption( tr_session * session );
 
-void               tr_sessionSetEncryption(
-                       tr_session *,
-    tr_encryption_mode mode );
+void               tr_sessionSetEncryption( tr_session          * session,
+                                            tr_encryption_mode    mode );
 
 
 /***********************************************************************
 ** Incoming Peer Connections Port
 */
 
-void               tr_sessionSetPortForwardingEnabled(
-        tr_handle *,
-    int enable );
+void  tr_sessionSetPortForwardingEnabled( tr_session  * session,
+                                          int           enabled );
 
-int                tr_sessionIsPortForwardingEnabled( const tr_handle * );
+int   tr_sessionIsPortForwardingEnabled( const tr_session  * session );
 
-void               tr_sessionSetPeerPort( tr_handle *,
-                                          int );
+void  tr_sessionSetPeerPort( tr_session  * session,
+                             int           port);
 
-int                tr_sessionGetPeerPort( const tr_handle * );
+int   tr_sessionGetPeerPort( const tr_session * session );
 
 typedef enum
 {
@@ -549,9 +544,9 @@ typedef enum
 }
 tr_port_forwarding;
 
-tr_port_forwarding tr_sessionGetPortForwarding( const tr_handle * );
+tr_port_forwarding tr_sessionGetPortForwarding( const tr_session * session );
 
-int                tr_sessionCountTorrents( const tr_handle * h );
+int                tr_sessionCountTorrents( const tr_session * session );
 
 typedef enum
 {
@@ -560,30 +555,28 @@ typedef enum
 }
 tr_direction;
 
-void               tr_sessionSetSpeedLimitEnabled( tr_handle *  session,
-                                                   tr_direction direction,
-                                                   int          isEnabled );
+void       tr_sessionSetSpeedLimitEnabled( tr_session    * session,
+                                           tr_direction    direction,
+                                           int             isEnabled );
 
-void               tr_sessionGetSpeed( const tr_handle * session,
-                                       float *           overall_down_KiBs,
-                                       float *           overall_up_KiBs );
+void       tr_sessionGetSpeed( const tr_session  * session,
+                               float             * overall_down_KiBs,
+                               float             * overall_up_KiBs );
 
-int                tr_sessionIsSpeedLimitEnabled(
-    const tr_handle * session,
-    tr_direction
-                      direction );
+int        tr_sessionIsSpeedLimitEnabled( const tr_session  * session,
+                                          tr_direction       direction );
 
-void               tr_sessionSetSpeedLimit( tr_handle *  session,
-                                            tr_direction direction,
-                                            int          KiB_sec );
+void       tr_sessionSetSpeedLimit( tr_session     * session,
+                                    tr_direction     direction,
+                                    int              KiB_sec );
 
-int                tr_sessionGetSpeedLimit( const tr_handle * session,
-                                            tr_direction      direction );
+int        tr_sessionGetSpeedLimit( const tr_session  * session,
+                                    tr_direction        direction );
 
-void               tr_sessionSetPeerLimit( tr_handle * handle,
-                                           uint16_t    maxGlobalPeers );
+void       tr_sessionSetPeerLimit( tr_session  * session,
+                                   uint16_t      maxGlobalPeers );
 
-uint16_t           tr_sessionGetPeerLimit( const tr_handle * handle );
+uint16_t   tr_sessionGetPeerLimit( const tr_session * session );
 
 
 /**
@@ -591,13 +584,11 @@ uint16_t           tr_sessionGetPeerLimit( const tr_handle * handle );
  *  This can be used at startup to kickstart all the torrents
  *  from the previous session.
  */
-tr_torrent **      tr_sessionLoadTorrents( tr_handle * h,
-                                           tr_ctor *   ctor,
-                                           int *       setmeCount );
-
+tr_torrent ** tr_sessionLoadTorrents( tr_session  * session,
+                                      tr_ctor     * ctor,
+                                      int         * setmeCount );
 
 /** @} */
-
 
 /**
 ***
@@ -621,13 +612,13 @@ int  tr_getMessageLevel( void );
 typedef struct tr_msg_list
 {
     /* TR_MSG_ERR, TR_MSG_INF, or TR_MSG_DBG */
-    uint8_t    level;
+    uint8_t level;
 
     /* The line number in the source file where this message originated */
-    int    line;
+    int line;
 
     /* Time the message was generated */
-    time_t    when;
+    time_t when;
 
     /* The torrent associated with this message,
      * or a module name such as "Port Forwarding" for non-torrent messages,
@@ -638,7 +629,7 @@ typedef struct tr_msg_list
     char *  message;
 
     /* The source file where this message originated */
-    const char *  file;
+    const char * file;
 
     /* linked list of messages */
     struct tr_msg_list * next;
@@ -727,7 +718,7 @@ tr_ctorMode;
 
 struct tr_benc;
 
-tr_ctor*    tr_ctorNew( const tr_handle * handle );
+tr_ctor*    tr_ctorNew( const tr_session * session );
 
 void        tr_ctorFree( tr_ctor * ctor );
 
@@ -771,15 +762,15 @@ int         tr_ctorGetPaused( const tr_ctor * ctor,
                               tr_ctorMode     mode,
                               uint8_t *       setmeIsPaused );
 
-int         tr_ctorGetDownloadDir( const tr_ctor * ctor,
-                                   tr_ctorMode     mode,
-                                   const char **   setmeDownloadDir );
+int         tr_ctorGetDownloadDir( const tr_ctor  * ctor,
+                                   tr_ctorMode      mode,
+                                   const char    ** setmeDownloadDir );
 
-int         tr_ctorGetMetainfo( const tr_ctor *         ctor,
+int         tr_ctorGetMetainfo( const tr_ctor         * ctor,
                                 const struct tr_benc ** setme );
 
-int         tr_ctorGetDeleteSource( const tr_ctor * ctor,
-                                    uint8_t *       setmeDoDelete );
+int         tr_ctorGetDeleteSource( const tr_ctor  * ctor,
+                                    uint8_t        * setmeDoDelete );
 
 /* returns NULL if tr_ctorSetMetainfoFromFile() wasn't used */
 const char* tr_ctorGetSourceFile( const tr_ctor * ctor );
@@ -799,17 +790,17 @@ const char* tr_ctorGetSourceFile( const tr_ctor * ctor );
  * metainfo is stored in setme_info and should be freed by the
  * caller via tr_metainfoFree().
  */
-int          tr_torrentParse( const tr_handle * handle,
-                              const tr_ctor *   ctor,
-                              tr_info *         setme_info_or_NULL );
+int tr_torrentParse( const tr_session  * session,
+                     const tr_ctor     * ctor,
+                     tr_info           * setme_info_or_NULL );
 
 /** Instantiate a single torrent.
     @return 0 on success,
             TR_EINVALID if the torrent couldn't be parsed, or
             TR_EDUPLICATE if there's already a matching torrent object. */
-tr_torrent * tr_torrentNew( tr_handle *     handle,
-                            const tr_ctor * ctor,
-                            int *           setmeError );
+tr_torrent * tr_torrentNew( tr_session      * session,
+                            const tr_ctor   * ctor,
+                            int             * setmeError );
 
 /** @} */
 
@@ -823,25 +814,25 @@ tr_torrent * tr_torrentNew( tr_handle *     handle,
 
 /** @brief Frees memory allocated by tr_torrentNew().
            Running torrents are stopped first.  */
-void        tr_torrentFree( tr_torrent * );
+void tr_torrentFree( tr_torrent * torrent );
 
 /** @brief Removes our .torrent and .resume files for
            this torrent, then calls tr_torrentFree(). */
-void        tr_torrentRemove( tr_torrent * );
+void tr_torrentRemove( tr_torrent * torrent );
 
 /** @brief Start a torrent */
-void        tr_torrentStart( tr_torrent * );
+void tr_torrentStart( tr_torrent * torrent );
 
 /** @brief Stop (pause) a torrent */
-void        tr_torrentStop( tr_torrent * );
+void tr_torrentStop( tr_torrent * torrent );
 
 /**
  * @brief Iterate through the torrents.
  *
  * Pass in a NULL pointer to get the first torrent.
  */
-tr_torrent* tr_torrentNext( tr_handle * session,
-                                        tr_torrent * );
+tr_torrent* tr_torrentNext( tr_session  * session,
+                            tr_torrent  * current );
 
 /**
  * @brief Returns this torrent's unique ID.
@@ -850,7 +841,7 @@ tr_torrent* tr_torrentNext( tr_handle * session,
  * between sessions.  If you need that, use tr_info.hash or
  * tr_info.hashString.
  */
-int         tr_torrentId( const tr_torrent * );
+int tr_torrentId( const tr_torrent * torrent );
 
 /****
 *****  Speed Limits
@@ -864,19 +855,19 @@ typedef enum
 }
 tr_speedlimit;
 
-void          tr_torrentSetSpeedMode( tr_torrent *  tor,
-                                      tr_direction  up_or_down,
-                                      tr_speedlimit mode );
+void          tr_torrentSetSpeedMode( tr_torrent     * tor,
+                                      tr_direction     up_or_down,
+                                      tr_speedlimit    mode );
 
 tr_speedlimit tr_torrentGetSpeedMode( const tr_torrent * tor,
                                       tr_direction       direction );
 
-void          tr_torrentSetSpeedLimit( tr_torrent * tor,
-                                       tr_direction up_or_down,
-                                       int          KiB_sec );
+void          tr_torrentSetSpeedLimit( tr_torrent    * tor,
+                                       tr_direction    up_or_down,
+                                       int             KiB_sec );
 
-int           tr_torrentGetSpeedLimit( const tr_torrent * tor,
-                                       tr_direction       direction );
+int           tr_torrentGetSpeedLimit( const tr_torrent  * tor,
+                                       tr_direction        direction );
 
 /****
 *****  Peer Limits
@@ -905,10 +896,10 @@ typedef int8_t tr_priority_t;
  *
  * @param priority must be one of TR_PRI_NORMAL, _HIGH, or _LOW
  */
-void tr_torrentSetFilePriorities( tr_torrent *      tor,
-                                  tr_file_index_t * files,
-                                  tr_file_index_t   fileCount,
-                                  tr_priority_t     priority );
+void tr_torrentSetFilePriorities( tr_torrent       * torrent,
+                                  tr_file_index_t  * files,
+                                  tr_file_index_t    fileCount,
+                                  tr_priority_t      priority );
 
 /**
  * @brief Get this torrent's file priorities.
@@ -917,35 +908,35 @@ void tr_torrentSetFilePriorities( tr_torrent *      tor,
  *         each holding a TR_PRI_NORMAL, TR_PRI_HIGH, or TR_PRI_LOW.
  *         It's the caller's responsibility to free() this.
  */
-tr_priority_t*  tr_torrentGetFilePriorities( const tr_torrent * );
+tr_priority_t*  tr_torrentGetFilePriorities( const tr_torrent * torrent );
 
 /**
  * @brief Single-file form of tr_torrentGetFilePriorities.
  * @return TR_PRI_NORMAL, TR_PRI_HIGH, or TR_PRI_LOW.
  */
-tr_priority_t   tr_torrentGetFilePriority( const           tr_torrent *,
-                                           tr_file_index_t file );
+tr_priority_t   tr_torrentGetFilePriority( const tr_torrent  * torrent,
+                                           tr_file_index_t     file );
 
 /**
  * @brief See if a file's `download' flag is set.
  * @return true if the file's `download' flag is set.
  */
-int             tr_torrentGetFileDL( const           tr_torrent *,
-                                     tr_file_index_t file );
+int tr_torrentGetFileDL( const tr_torrent  * torrent,
+                         tr_file_index_t     file );
 
 /** @brief Set a batch of files to be downloaded or not. */
-void            tr_torrentSetFileDLs( tr_torrent *      tor,
-                                      tr_file_index_t * files,
-                                      tr_file_index_t   fileCount,
-                                      int               do_download );
+void            tr_torrentSetFileDLs( tr_torrent       * torrent,
+                                      tr_file_index_t  * files,
+                                      tr_file_index_t    fileCount,
+                                      int                do_download );
 
 
-const tr_info * tr_torrentInfo( const tr_torrent * );
+const tr_info * tr_torrentInfo( const tr_torrent * torrent );
 
-void            tr_torrentSetDownloadDir(                         tr_torrent *,
-                                                            const char * );
+void tr_torrentSetDownloadDir( tr_torrent  * torrent,
+                               const char  * path );
 
-const char *    tr_torrentGetDownloadDir( const tr_torrent * );
+const char * tr_torrentGetDownloadDir( const tr_torrent * torrent );
 
 /**
 ***
@@ -1026,9 +1017,9 @@ void tr_torrentClearCompletenessCallback( tr_torrent * torrent );
  * tr_torrentCanManualUpdate().
  */
 
-void tr_torrentManualUpdate( tr_torrent * );
+void tr_torrentManualUpdate( tr_torrent * torrent );
 
-int  tr_torrentCanManualUpdate( const tr_torrent * );
+int  tr_torrentCanManualUpdate( const tr_torrent * torrent );
 
 /***********************************************************************
 * tr_torrentPeers
@@ -1075,7 +1066,7 @@ void           tr_torrentPeersFree( tr_peer_stat * peerStats,
  *         return -1 instead of 0 KiB/s.
  *         NOTE: always free this array with tr_free() when you're done with it.
  */
-float*         tr_torrentWebSpeeds( const tr_torrent * tor );
+float*         tr_torrentWebSpeeds( const tr_torrent * torrent );
 
 typedef struct tr_file_stat
 {
@@ -1084,11 +1075,11 @@ typedef struct tr_file_stat
 }
 tr_file_stat;
 
-tr_file_stat * tr_torrentFiles( const tr_torrent * tor,
-                                tr_file_index_t *  fileCount );
+tr_file_stat * tr_torrentFiles( const tr_torrent  * torrent,
+                                tr_file_index_t   * fileCount );
 
-void           tr_torrentFilesFree( tr_file_stat *  stat,
-                                    tr_file_index_t fileCount );
+void tr_torrentFilesFree( tr_file_stat     * files,
+                          tr_file_index_t    fileCount );
 
 
 /***********************************************************************
@@ -1099,15 +1090,15 @@ void           tr_torrentFilesFree( tr_file_stat *  stat,
  * to either -1 if we have the piece, otherwise it is set to the number
  * of connected peers who have the piece.
  **********************************************************************/
-void tr_torrentAvailability( const    tr_torrent *,
-                             int8_t * tab,
-                             int      size );
+void tr_torrentAvailability( const tr_torrent  * torrent,
+                             int8_t            * tab,
+                             int                  size );
 
-void tr_torrentAmountFinished( const tr_torrent * tor,
-                               float *            tab,
-                               int                size );
+void tr_torrentAmountFinished( const tr_torrent  * torrent,
+                               float *             tab,
+                               int                 size );
 
-void tr_torrentVerify( tr_torrent * );
+void tr_torrentVerify( tr_torrent * torrent );
 
 /***********************************************************************
  * tr_info
@@ -1402,24 +1393,24 @@ tr_stat;
 /** Return a pointer to an tr_stat structure with updated information
     on the torrent.  This is typically called by the GUI clients every
     second or so to get a new snapshot of the torrent's status. */
-const tr_stat * tr_torrentStat( tr_torrent * );
+const tr_stat * tr_torrentStat( tr_torrent * torrent );
 
 /** Like tr_torrentStat(), but only recalculates the statistics if it's
     been longer than a second since they were last calculated.  This can
     reduce the CPU load if you're calling tr_torrentStat() frequently. */
-const tr_stat * tr_torrentStatCached( tr_torrent * );
+const tr_stat * tr_torrentStatCached( tr_torrent * torrent );
 
 /** @deprecated this method will be removed in 1.40 */
-void            tr_torrentSetAddedDate( tr_torrent *,
-                                        time_t );
+void tr_torrentSetAddedDate( tr_torrent * torrent,
+                             time_t       addedDate );
 
 /** @deprecated this method will be removed in 1.40 */
-void            tr_torrentSetActivityDate( tr_torrent *,
-                                           time_t );
+void tr_torrentSetActivityDate( tr_torrent * torrent,
+                                time_t       activityDate );
 
 /** @deprecated this method will be removed in 1.40 */
-void            tr_torrentSetDoneDate( tr_torrent *,
-                                       time_t );
+void tr_torrentSetDoneDate( tr_torrent  * torrent,
+                            time_t        doneDate );
 
 /** @} */
 
