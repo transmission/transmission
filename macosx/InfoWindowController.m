@@ -74,7 +74,7 @@ typedef enum
 - (void) updateInfoPeers;
 - (void) updateInfoFiles;
 
-- (NSView *) tabViewForTag: (int) tag;
+- (NSView *) tabViewForTag: (NSInteger) tag;
 - (void) setWebSeedTableHidden: (BOOL) hide animate: (BOOL) animate;
 - (NSArray *) peerSortDescriptors;
 
@@ -97,7 +97,7 @@ typedef enum
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
     
-    float windowHeight = [window frame].size.height;
+    CGFloat windowHeight = [window frame].size.height;
     
     [window setFrameAutosaveName: @"InspectorWindow"];
     [window setFrameUsingName: @"InspectorWindow"];
@@ -120,7 +120,7 @@ typedef enum
     //set selected tab
     fCurrentTabTag = INVALID;
     NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InspectorSelected"];
-    int tag;
+    NSInteger tag;
     if ([identifier isEqualToString: TAB_INFO_IDENT])
         tag = TAB_INFO_TAG;
     else if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
@@ -242,7 +242,7 @@ typedef enum
     [fTorrents release];
     fTorrents = [torrents retain];
 
-    int numberSelected = [fTorrents count];
+    NSUInteger numberSelected = [fTorrents count];
     if (numberSelected != 1)
     {
         if (numberSelected > 0)
@@ -254,7 +254,7 @@ typedef enum
                                             "Inspector -> selected torrents"), numberSelected]];
         
             uint64_t size = 0;
-            int fileCount = 0;
+            NSInteger fileCount = 0;
             NSEnumerator * enumerator = [torrents objectEnumerator];
             Torrent * torrent;
             while ((torrent = [enumerator nextObject]))
@@ -413,7 +413,7 @@ typedef enum
         if ([torrent isFolder])
         {
             NSString * fileString;
-            int fileCount = [torrent fileCount];
+            NSInteger fileCount = [torrent fileCount];
             if (fileCount == 1)
                 fileString = NSLocalizedString(@"1 file", "Inspector -> selected torrents");
             else
@@ -533,10 +533,10 @@ typedef enum
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent = [enumerator nextObject]; //first torrent
     
-    int uploadSpeedMode = [torrent speedMode: YES],
-        uploadSpeedLimit = [torrent speedLimit: YES],
-        downloadSpeedMode = [torrent speedMode: NO],
-        downloadSpeedLimit = [torrent speedLimit: NO];
+    NSInteger uploadSpeedMode = [torrent speedMode: YES],
+                uploadSpeedLimit = [torrent speedLimit: YES],
+                downloadSpeedMode = [torrent speedMode: NO],
+                downloadSpeedLimit = [torrent speedLimit: NO];
     
     while ((torrent = [enumerator nextObject])
             && (uploadSpeedMode != INVALID || uploadSpeedLimit != INVALID
@@ -556,7 +556,7 @@ typedef enum
     }
     
     //set upload view
-    int index;
+    NSInteger index;
     if (uploadSpeedMode == TR_SPEEDLIMIT_SINGLE)
         index = OPTION_POPUP_LIMIT;
     else if (uploadSpeedMode == TR_SPEEDLIMIT_UNLIMITED)
@@ -598,8 +598,8 @@ typedef enum
     enumerator = [fTorrents objectEnumerator];
     torrent = [enumerator nextObject]; //first torrent
     
-    int checkRatio = [torrent ratioSetting];
-    float ratioLimit = [torrent ratioLimit];
+    NSInteger checkRatio = [torrent ratioSetting];
+    CGFloat ratioLimit = [torrent ratioLimit];
     
     while ((torrent = [enumerator nextObject]) && (checkRatio != INVALID || checkRatio != INVALID))
     {
@@ -632,7 +632,7 @@ typedef enum
     enumerator = [fTorrents objectEnumerator];
     torrent = [enumerator nextObject]; //first torrent
     
-    int maxPeers = [torrent maxPeerConnect];
+    NSInteger maxPeers = [torrent maxPeerConnect];
     
     while ((torrent = [enumerator nextObject]))
     {
@@ -683,7 +683,7 @@ typedef enum
 
 - (void) setTab: (id) sender
 {
-    int oldTabTag = fCurrentTabTag;
+    NSInteger oldTabTag = fCurrentTabTag;
     fCurrentTabTag = [fTabMatrix selectedTag];
     if (fCurrentTabTag == oldTabTag)
         return;
@@ -691,7 +691,7 @@ typedef enum
     [self updateInfoStats];
     
     //take care of old view
-    float oldHeight = 0;
+    CGFloat oldHeight = 0;
     NSString * oldResizeSaveKey = nil;
     if (oldTabTag != INVALID)
     {
@@ -789,12 +789,12 @@ typedef enum
     
     if (resizeSaveKey)
     {
-        float height = [[NSUserDefaults standardUserDefaults] floatForKey: resizeSaveKey];
-        if (height != 0)
+        CGFloat height = [[NSUserDefaults standardUserDefaults] floatForKey: resizeSaveKey];
+        if (height != 0.0)
             viewRect.size.height = MAX(height, TAB_MIN_HEIGHT);
     }
     
-    float difference = (viewRect.size.height - oldHeight) * [window userSpaceScaleFactor];
+    CGFloat difference = (viewRect.size.height - oldHeight) * [window userSpaceScaleFactor];
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
     
@@ -825,7 +825,7 @@ typedef enum
 
 - (void) setNextTab
 {
-    int tag = [fTabMatrix selectedTag]+1;
+    NSInteger tag = [fTabMatrix selectedTag]+1;
     if (tag >= [fTabMatrix numberOfColumns])
         tag = 0;
     
@@ -835,7 +835,7 @@ typedef enum
 
 - (void) setPreviousTab
 {
-    int tag = [fTabMatrix selectedTag]-1;
+    NSInteger tag = [fTabMatrix selectedTag]-1;
     if (tag < 0)
         tag = [fTabMatrix numberOfColumns]-1;
     
@@ -843,7 +843,7 @@ typedef enum
     [self setTab: nil];
 }
 
-- (int) numberOfRowsInTableView: (NSTableView *) tableView
+- (NSInteger) numberOfRowsInTableView: (NSTableView *) tableView
 {
     if (tableView == fPeerTable)
         return fPeers ? [fPeers count] : 0;
@@ -854,7 +854,7 @@ typedef enum
     return 0;
 }
 
-- (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) column row: (int) row
+- (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) column row: (NSInteger) row
 {
     if (tableView == fPeerTable)
     {
@@ -898,7 +898,7 @@ typedef enum
         id item = [fTrackers objectAtIndex: row];
         if ([item isKindOfClass: [NSNumber class]])
         {
-            int tier = [item intValue];
+            NSInteger tier = [item intValue];
             if (tier == 0)
                 return NSLocalizedString(@"User-Added", "Inspector -> tracker table");
             else
@@ -935,7 +935,7 @@ typedef enum
     else;
 }
 
-- (BOOL) tableView: (NSTableView *) tableView shouldSelectRow: (int) row
+- (BOOL) tableView: (NSTableView *) tableView shouldSelectRow: (NSInteger) row
 {
     return tableView == fTrackerTable;
 }
@@ -944,7 +944,7 @@ typedef enum
 {
     if ([notification object] == fTrackerTable)
     {
-        int numSelected = [fTrackerTable numberOfSelectedRows];
+        NSInteger numSelected = [fTrackerTable numberOfSelectedRows];
         [fTrackerAddRemoveControl setEnabled: numSelected > 0 forSegment: TRACKER_REMOVE_TAG];
     }
 }
@@ -957,7 +957,7 @@ typedef enum
 }
 
 - (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
-                tableColumn: (NSTableColumn *) column row: (int) row mouseLocation: (NSPoint) mouseLocation
+                tableColumn: (NSTableColumn *) column row: (NSInteger) row mouseLocation: (NSPoint) mouseLocation
 {
     if (tableView == fPeerTable)
     {
@@ -971,7 +971,7 @@ typedef enum
             [components addObject: NSLocalizedString(@"Encrypted Connection", "Inspector -> Peers tab -> table row tooltip")];
         
         NSString * portString;
-        int port;
+        NSInteger port;
         if ((port = [[peer objectForKey: @"Port"] intValue]) > 0)
             portString = [NSString stringWithFormat: @"%d", port];
         else
@@ -1167,7 +1167,7 @@ typedef enum
 - (void) setSpeedMode: (id) sender
 {
     BOOL upload = sender == fUploadLimitPopUp;
-    int mode;
+    NSInteger mode;
     switch ([sender indexOfSelectedItem])
     {
         case OPTION_POPUP_LIMIT:
@@ -1205,7 +1205,7 @@ typedef enum
 - (void) setSpeedLimit: (id) sender
 {
     BOOL upload = sender == fUploadLimitField;
-    int limit = [sender intValue];
+    NSInteger limit = [sender intValue];
     
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
@@ -1216,7 +1216,7 @@ typedef enum
 
 - (void) setRatioSetting: (id) sender
 {
-    int setting;
+    NSInteger setting;
     switch ([sender indexOfSelectedItem])
     {
         case OPTION_POPUP_LIMIT:
@@ -1250,7 +1250,7 @@ typedef enum
 
 - (void) setRatioLimit: (id) sender
 {
-    float limit = [sender floatValue];
+    CGFloat limit = [sender floatValue];
     
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
@@ -1260,7 +1260,7 @@ typedef enum
 
 - (void) setPeersConnectLimit: (id) sender
 {
-    int limit = [sender intValue];
+    NSInteger limit = [sender intValue];
     
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
@@ -1309,7 +1309,7 @@ typedef enum
 
 - (void) updateInfoActivity
 {
-    int numberSelected = [fTorrents count];
+    NSInteger numberSelected = [fTorrents count];
     if (numberSelected == 0)
         return;
     
@@ -1400,7 +1400,7 @@ typedef enum
     [fAnnounceResponseField setToolTip: announceResponse];
     [fAnnounceResponseField setSelectable: ![announceResponse isEqualToString: @""]];
     
-    int announceNext = [torrent nextAnnounceTime];
+    NSInteger announceNext = [torrent nextAnnounceTime];
     NSString * announceNextString;
     switch (announceNext)
     {
@@ -1435,7 +1435,7 @@ typedef enum
     [fScrapeResponseField setToolTip: scrapeResponse];
     [fScrapeResponseField setSelectable: ![scrapeResponse isEqualToString: @""]];
     
-    int scrapeNext = [torrent nextScrapeTime];
+    NSInteger scrapeNext = [torrent nextScrapeTime];
     NSString * scrapeNextString;
     switch (scrapeNext)
     {
@@ -1457,7 +1457,7 @@ typedef enum
         return;
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
-    int seeders = [torrent seeders], leechers = [torrent leechers], completed = [torrent completedFromTracker];
+    NSInteger seeders = [torrent seeders], leechers = [torrent leechers], completed = [torrent completedFromTracker];
     [fSeedersField setStringValue: seeders >= 0 ? [NSString stringWithFormat: @"%d", seeders] : @""];
     [fLeechersField setStringValue: leechers >= 0 ? [NSString stringWithFormat: @"%d", leechers] : @""];
     [fCompletedFromTrackerField setStringValue: completed >= 0 ? [NSString stringWithFormat: @"%d", completed] : @""];
@@ -1466,14 +1466,14 @@ typedef enum
     
     if (active)
     {
-        int total = [torrent totalPeersConnected];
+        NSInteger total = [torrent totalPeersConnected];
         NSString * connected = [NSString stringWithFormat:
                                 NSLocalizedString(@"%d Connected", "Inspector -> Peers tab -> peers"), total];
         
         if (total > 0)
         {
             NSMutableArray * components = [NSMutableArray arrayWithCapacity: 4];
-            int count;
+            NSInteger count;
             if ((count = [torrent totalPeersTracker]) > 0)
                 [components addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d tracker", "Inspector -> Peers tab -> peers"), count]];
@@ -1522,7 +1522,7 @@ typedef enum
         [fFileController reloadData];
 }
 
-- (NSView *) tabViewForTag: (int) tag
+- (NSView *) tabViewForTag: (NSInteger) tag
 {
     switch (tag)
     {
@@ -1560,7 +1560,7 @@ typedef enum
     
     if (hide)
     {
-        float webSeedFrameMaxY = NSMaxY(webSeedFrame);
+        CGFloat webSeedFrameMaxY = NSMaxY(webSeedFrame);
         webSeedFrame.size.height = 0;
         webSeedFrame.origin.y = webSeedFrameMaxY;
         

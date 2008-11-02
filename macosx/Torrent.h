@@ -65,11 +65,11 @@ typedef enum
     NSIndexSet * fPreviousFinishedIndexes;
     NSDate * fPreviousFinishedIndexesDate;
     
-    float fRatioLimit;
-    int fRatioSetting;
+    CGFloat fRatioLimit;
+    NSInteger fRatioSetting;
     BOOL fFinishedSeeding, fWaitToStart, fStalled;
     
-    int fOrderValue, fGroupValue;
+    NSInteger fOrderValue, fGroupValue;
     
     BOOL fAddedTrackers;
     
@@ -89,8 +89,8 @@ typedef enum
 - (void) changeDownloadFolder: (NSString *) folder;
 - (NSString *) downloadFolder;
 
-- (void) getAvailability: (int8_t *) tab size: (int) size;
-- (void) getAmountFinished: (float *) tab size: (int) size;
+- (void) getAvailability: (int8_t *) tab size: (NSInteger) size;
+- (void) getAmountFinished: (float *) tab size: (NSInteger) size;
 - (NSIndexSet *) previousFinishedPieces;
 -(void) setPreviousFinishedPieces: (NSIndexSet *) indexes;
 
@@ -106,18 +106,18 @@ typedef enum
 
 - (void) resetCache;
 
-- (float) ratio;
-- (int) ratioSetting;
-- (void) setRatioSetting: (int) setting;
-- (float) ratioLimit;
-- (void) setRatioLimit: (float) limit;
-- (float) actualStopRatio; //returns INVALID if will not stop
-- (float) progressStopRatio;
+- (CGFloat) ratio;
+- (NSInteger) ratioSetting;
+- (void) setRatioSetting: (NSInteger) setting;
+- (CGFloat) ratioLimit;
+- (void) setRatioLimit: (CGFloat) limit;
+- (CGFloat) actualStopRatio; //returns INVALID if will not stop
+- (CGFloat) progressStopRatio;
 
 - (tr_speedlimit) speedMode: (BOOL) upload;
 - (void) setSpeedMode: (tr_speedlimit) mode upload: (BOOL) upload;
-- (int) speedLimit: (BOOL) upload;
-- (void) setSpeedLimit: (int) limit upload: (BOOL) upload;
+- (NSInteger) speedLimit: (BOOL) upload;
+- (void) setSpeedLimit: (NSInteger) limit upload: (BOOL) upload;
 
 - (void) setMaxPeerConnect: (uint16_t) count;
 - (uint16_t) maxPeerConnect;
@@ -145,12 +145,12 @@ typedef enum
 
 - (NSString *) trackerAddressAnnounce;
 - (NSDate *) lastAnnounceTime;
-- (int) nextAnnounceTime;
+- (NSInteger) nextAnnounceTime;
 - (NSString *) announceResponse;
 
 - (NSString *) trackerAddressScrape;
 - (NSDate *) lastScrapeTime;
-- (int) nextScrapeTime;
+- (NSInteger) nextScrapeTime;
 - (NSString *) scrapeResponse;
 
 - (NSMutableArray *) allTrackers: (BOOL) separators;
@@ -162,8 +162,8 @@ typedef enum
 - (NSString *) creator;
 - (NSDate *) dateCreated;
 
-- (int) pieceSize;
-- (int) pieceCount;
+- (NSInteger) pieceSize;
+- (NSInteger) pieceCount;
 - (NSString *) hashString;
 - (BOOL) privateTorrent;
 
@@ -173,15 +173,15 @@ typedef enum
 
 - (BOOL) publicTorrent;
 
-- (float) progress;
-- (float) progressDone;
-- (float) progressLeft;
-- (float) checkingProgress;
+- (CGFloat) progress;
+- (CGFloat) progressDone;
+- (CGFloat) progressLeft;
+- (CGFloat) checkingProgress;
 
-- (int) eta;
-- (int) etaRatio;
+- (NSInteger) eta;
+- (NSInteger) etaRatio;
 
-- (float) notAvailableDesired;
+- (CGFloat) notAvailableDesired;
 
 - (BOOL) isActive;
 - (BOOL) isSeeding;
@@ -204,51 +204,51 @@ typedef enum
 
 - (NSString *) stateString;
 
-- (int) seeders;
-- (int) leechers;
-- (int) completedFromTracker;
+- (NSInteger) seeders;
+- (NSInteger) leechers;
+- (NSInteger) completedFromTracker;
 
-- (int) totalPeersConnected;
-- (int) totalPeersTracker;
-- (int) totalPeersIncoming;
-- (int) totalPeersCache;
-- (int) totalPeersPex;
-- (int) totalPeersKnown;
+- (NSInteger) totalPeersConnected;
+- (NSInteger) totalPeersTracker;
+- (NSInteger) totalPeersIncoming;
+- (NSInteger) totalPeersCache;
+- (NSInteger) totalPeersPex;
+- (NSInteger) totalPeersKnown;
 
-- (int) peersSendingToUs;
-- (int) peersGettingFromUs;
+- (NSInteger) peersSendingToUs;
+- (NSInteger) peersGettingFromUs;
 
-- (float) downloadRate;
-- (float) uploadRate;
-- (float) totalRate;
+- (CGFloat) downloadRate;
+- (CGFloat) uploadRate;
+- (CGFloat) totalRate;
 - (uint64_t) haveVerified;
 - (uint64_t) haveTotal;
 - (uint64_t) totalSizeSelected;
 - (uint64_t) downloadedTotal;
 - (uint64_t) uploadedTotal;
 - (uint64_t) failedHash;
-- (float) swarmSpeed;
+- (CGFloat) swarmSpeed;
 
-- (int) orderValue;
-- (void) setOrderValue: (int) orderValue;
+- (NSInteger) orderValue;
+- (void) setOrderValue: (NSInteger) orderValue;
 
-- (int) groupValue;
-- (void) setGroupValue: (int) groupValue;
-- (int) groupOrderValue;
+- (NSInteger) groupValue;
+- (void) setGroupValue: (NSInteger) groupValue;
+- (NSInteger) groupOrderValue;
 - (void) checkGroupValueForRemoval: (NSNotification *) notification;
 
 - (NSArray *) fileList;
-- (int) fileCount;
+- (NSInteger) fileCount;
 - (void) updateFileStat;
 
 //methods require fileStats to have been updated recently to be accurate
-- (float) fileProgress: (FileListNode *) node;
-- (BOOL) canChangeDownloadCheckForFile: (int) index;
+- (CGFloat) fileProgress: (FileListNode *) node;
+- (BOOL) canChangeDownloadCheckForFile: (NSInteger) index;
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet;
-- (int) checkForFiles: (NSIndexSet *) indexSet;
-- (void) setFileCheckState: (int) state forIndexes: (NSIndexSet *) indexSet;
-- (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;
-- (BOOL) hasFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;
+- (NSInteger) checkForFiles: (NSIndexSet *) indexSet;
+- (void) setFileCheckState: (NSInteger) state forIndexes: (NSIndexSet *) indexSet;
+- (void) setFilePriority: (NSInteger) priority forIndexes: (NSIndexSet *) indexSet;
+- (BOOL) hasFilePriority: (NSInteger) priority forIndexes: (NSIndexSet *) indexSet;
 - (NSSet *) filePrioritiesForIndexes: (NSIndexSet *) indexSet;
 
 - (NSDate *) dateAdded;
@@ -256,7 +256,7 @@ typedef enum
 - (NSDate *) dateActivity;
 - (NSDate *) dateActivityOrAdd;
 
-- (int) stalledMinutes;
+- (NSInteger) stalledMinutes;
 - (BOOL) isStalled;
 
 - (NSInteger) stateSortKey;

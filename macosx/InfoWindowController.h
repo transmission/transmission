@@ -36,7 +36,7 @@
     NSMutableArray * fTrackers;
     
     IBOutlet NSView * fInfoView, * fActivityView, * fTrackerView, * fPeersView, * fFilesView, * fOptionsView;
-    int fCurrentTabTag;
+    NSInteger fCurrentTabTag;
     IBOutlet NSMatrix * fTabMatrix;
 
     IBOutlet NSImageView * fImageView;
@@ -64,7 +64,7 @@
     IBOutlet NSTextView * fErrorMessageView;
     IBOutlet PiecesView * fPiecesView;
     IBOutlet NSSegmentedControl * fPiecesControl;
-    float fWebSeedTableHeight, fSpaceBetweenWebSeedAndPeer;
+    CGFloat fWebSeedTableHeight, fSpaceBetweenWebSeedAndPeer;
     NSViewAnimation * fWebSeedTableAnimation;
     
     IBOutlet FileOutlineController * fFileController;

@@ -44,14 +44,14 @@
 - (void) updateDownloadFolder;
 
 - (void) createFileList;
-- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size index: (int) index;
+- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size index: (NSInteger) index;
 
 - (void) completenessChange: (NSNumber *) status;
 
 - (void) quickPause;
 - (void) endQuickPause;
 
-- (NSString *) etaString: (int) eta;
+- (NSString *) etaString: (NSInteger) eta;
 
 - (void) updateAllTrackers: (NSMutableArray *) trackers;
 
@@ -231,12 +231,12 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     return [NSString stringWithUTF8String: tr_torrentGetDownloadDir(fHandle)];
 }
 
-- (void) getAvailability: (int8_t *) tab size: (int) size
+- (void) getAvailability: (int8_t *) tab size: (NSInteger) size
 {
     tr_torrentAvailability(fHandle, tab, size);
 }
 
-- (void) getAmountFinished: (float *) tab size: (int) size
+- (void) getAmountFinished: (float *) tab size: (NSInteger) size
 {
     tr_torrentAmountFinished(fHandle, tab, size);
 }
@@ -273,7 +273,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     fStat = tr_torrentStat(fHandle);
     
     //check to stop for ratio
-    float stopRatio;
+    CGFloat stopRatio;
     if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID && [self ratio] >= stopRatio)
     {
         [self setRatioSetting: NSOffState];
@@ -347,33 +347,33 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     [self update];
 }
 
-- (float) ratio
+- (CGFloat) ratio
 {
     return fStat->ratio;
 }
 
-- (int) ratioSetting
+- (NSInteger) ratioSetting
 {
     return fRatioSetting;
 }
 
-- (void) setRatioSetting: (int) setting
+- (void) setRatioSetting: (NSInteger) setting
 {
     fRatioSetting = setting;
 }
 
-- (float) ratioLimit
+- (CGFloat) ratioLimit
 {
     return fRatioLimit;
 }
 
-- (void) setRatioLimit: (float) limit
+- (void) setRatioLimit: (CGFloat) limit
 {
     if (limit >= 0)
         fRatioLimit = limit;
 }
 
-- (float) actualStopRatio
+- (CGFloat) actualStopRatio
 {
     if (fRatioSetting == NSOnState)
         return fRatioLimit;
@@ -383,9 +383,9 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
         return INVALID;
 }
 
-- (float) progressStopRatio
+- (CGFloat) progressStopRatio
 {
-    float stopRatio, ratio;
+    CGFloat stopRatio, ratio;
     if ((stopRatio = [self actualStopRatio]) == INVALID || (ratio = [self ratio]) >= stopRatio)
         return 1.0;
     else if (stopRatio > 0.0)
@@ -404,12 +404,12 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     tr_torrentSetSpeedMode(fHandle, upload ? TR_UP : TR_DOWN, mode);
 }
 
-- (int) speedLimit: (BOOL) upload
+- (NSInteger) speedLimit: (BOOL) upload
 {
     return tr_torrentGetSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN);
 }
 
-- (void) setSpeedLimit: (int) limit upload: (BOOL) upload
+- (void) setSpeedLimit: (NSInteger) limit upload: (BOOL) upload
 {
     tr_torrentSetSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN, limit);
 }
@@ -472,7 +472,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
         //check if moving inside itself
         NSArray * oldComponents = [oldFolder pathComponents],
                 * newComponents = [folder pathComponents];
-        int count;
+        NSInteger count;
         
         if ((count = [oldComponents count]) < [newComponents count]
                 && [[newComponents objectAtIndex: count] isEqualToString: [self name]]
@@ -558,7 +558,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
             [self updateFileStat];
             
             //determine amount needed
-            for (int i = 0; i < [self fileCount]; i++)
+            for (NSInteger i = 0; i < [self fileCount]; i++)
             {
                 if (tr_torrentGetFileDL(fHandle, i))
                 {
@@ -654,7 +654,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     return YES;
 }
 
-- (void) destinationChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) context
+- (void) destinationChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) context
 {
     if (code != NSOKButton)
         return;
@@ -727,13 +727,13 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (NSDate *) lastAnnounceTime
 {
-    int date = fStat->lastAnnounceTime;
+    NSInteger date = fStat->lastAnnounceTime;
     return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
 }
 
-- (int) nextAnnounceTime
+- (NSInteger) nextAnnounceTime
 {
-    int date = fStat->nextAnnounceTime;
+    NSInteger date = fStat->nextAnnounceTime;
     NSTimeInterval difference;
     switch (date)
     {
@@ -743,7 +743,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
             return STAT_TIME_NOW;
         default:
             difference = [[NSDate dateWithTimeIntervalSince1970: date] timeIntervalSinceNow];
-            return difference > 0 ? (int)difference : STAT_TIME_NONE;
+            return difference > 0 ? (NSInteger)difference : STAT_TIME_NONE;
     }
 }
 
@@ -759,13 +759,13 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (NSDate *) lastScrapeTime
 {
-    int date = fStat->lastScrapeTime;
+    NSInteger date = fStat->lastScrapeTime;
     return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
 }
 
-- (int) nextScrapeTime
+- (NSInteger) nextScrapeTime
 {
-    int date = fStat->nextScrapeTime;
+    NSInteger date = fStat->nextScrapeTime;
     NSTimeInterval difference;
     switch (date)
     {
@@ -775,7 +775,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
             return STAT_TIME_NOW;
         default:
             difference = [[NSDate dateWithTimeIntervalSince1970: date] timeIntervalSinceNow];
-            return difference > 0 ? (int)difference : STAT_TIME_NONE;
+            return difference > 0 ? (NSInteger)difference : STAT_TIME_NONE;
     }
 }
 
@@ -786,12 +786,12 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (NSMutableArray *) allTrackers: (BOOL) separators
 {
-    int count = fInfo->trackerCount, capacity = count;
+    NSInteger count = fInfo->trackerCount, capacity = count;
     if (separators)
         capacity += fInfo->trackers[count-1].tier + 1;
     NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: capacity];
     
-    for (int i = 0, tier = -1; i < count; i++)
+    for (NSInteger i = 0, tier = -1; i < count; i++)
     {
         if (separators && tier != fInfo->trackers[i].tier)
         {
@@ -808,7 +808,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 - (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers
 {
     //find added tracker at end of first tier
-    int i;
+    NSInteger i;
     for (i = 1; i < [trackers count]; i++)
         if ([[trackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
             break;
@@ -859,16 +859,16 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (NSDate *) dateCreated
 {
-    int date = fInfo->dateCreated;
+    NSInteger date = fInfo->dateCreated;
     return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
 }
 
-- (int) pieceSize
+- (NSInteger) pieceSize
 {
     return fInfo->pieceSize;
 }
 
-- (int) pieceCount
+- (NSInteger) pieceCount
 {
     return fInfo->pieceCount;
 }
@@ -903,50 +903,50 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     return fPublicTorrent;
 }
 
-- (float) progress
+- (CGFloat) progress
 {
     return fStat->percentComplete;
 }
 
-- (float) progressDone
+- (CGFloat) progressDone
 {
     return fStat->percentDone;
 }
 
-- (float) progressLeft
+- (CGFloat) progressLeft
 {
-    return (float)[self sizeLeft] / [self size];
+    return (CGFloat)[self sizeLeft] / [self size];
 }
 
-- (float) checkingProgress
+- (CGFloat) checkingProgress
 {
     return fStat->recheckProgress;
 }
 
-- (int) eta
+- (NSInteger) eta
 {
     return fStat->eta;
 }
 
-- (int) etaRatio
+- (NSInteger) etaRatio
 {
     if (![self isSeeding])
         return TR_ETA_UNKNOWN;
     
-    float uploadRate = [self uploadRate];
+    CGFloat uploadRate = [self uploadRate];
     if (uploadRate < 0.1)
         return TR_ETA_UNKNOWN;
     
-    float stopRatio = [self actualStopRatio], ratio = [self ratio];
+    CGFloat stopRatio = [self actualStopRatio], ratio = [self ratio];
     if (stopRatio == INVALID || ratio >= stopRatio)
         return TR_ETA_UNKNOWN;
     
-    return (float)MAX([self downloadedTotal], [self haveTotal]) * (stopRatio - ratio) / uploadRate / 1024.0;
+    return (CGFloat)MAX([self downloadedTotal], [self haveTotal]) * (stopRatio - ratio) / uploadRate / 1024.0;
 }
 
-- (float) notAvailableDesired
+- (CGFloat) notAvailableDesired
 {
-    return 1.0 - (float)fStat->desiredAvailable / [self sizeLeft];
+    return 1.0 - (CGFloat)fStat->desiredAvailable / [self sizeLeft];
 }
 
 - (BOOL) isActive
@@ -999,12 +999,12 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (NSArray *) peers
 {
-    int totalPeers;
+    NSInteger totalPeers;
     tr_peer_stat * peers = tr_torrentPeers(fHandle, &totalPeers);
     
     NSMutableArray * peerDicts = [NSMutableArray arrayWithCapacity: totalPeers];
     
-    for (int i = 0; i < totalPeers; i++)
+    for (NSInteger i = 0; i < totalPeers; i++)
     {
         tr_peer_stat * peer = &peers[i];
         NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 9];
@@ -1037,12 +1037,12 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (NSArray *) webSeeds
 {
-    const int webSeedCount = fInfo->webseedCount;
+    const NSInteger webSeedCount = fInfo->webseedCount;
     NSMutableArray * webSeeds = [NSMutableArray arrayWithCapacity: webSeedCount];
     
     float * dlSpeeds = tr_torrentWebSpeeds(fHandle);
     
-    for (int i = 0; i < webSeedCount; i++)
+    for (NSInteger i = 0; i < webSeedCount; i++)
     {
         NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 2];
         
@@ -1065,7 +1065,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     
     if (![self allDownloaded])
     {
-        float progress;
+        CGFloat progress;
         if ([self isFolder] && [fDefaults boolForKey: @"DisplayStatusProgressSelected"])
         {
             string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@ selected", "Torrent -> progress string"),
@@ -1111,7 +1111,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding]
         && (fRatioSetting == NSOnState || (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]))))
     {
-        int eta = fStat->activity == TR_STATUS_DOWNLOAD ? [self eta] : [self etaRatio];
+        NSInteger eta = fStat->activity == TR_STATUS_DOWNLOAD ? [self eta] : [self etaRatio];
         string = [string stringByAppendingFormat: @" - %@", [self etaString: eta]];
     }
     
@@ -1163,7 +1163,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
                     string = [NSString stringWithFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
                                                     "Torrent -> status string"), [self peersSendingToUs]];
                 
-                int webSeedCount = fStat->webseedsSendingToUs;
+                NSInteger webSeedCount = fStat->webseedsSendingToUs;
                 if (webSeedCount > 0)
                 {
                     NSString * webSeedString;
@@ -1280,72 +1280,72 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     }
 }
 
-- (int) seeders
+- (NSInteger) seeders
 {
     return fStat->seeders;
 }
 
-- (int) leechers
+- (NSInteger) leechers
 {
     return fStat->leechers;
 }
 
-- (int) completedFromTracker
+- (NSInteger) completedFromTracker
 {
     return fStat->timesCompleted;
 }
 
-- (int) totalPeersConnected
+- (NSInteger) totalPeersConnected
 {
     return fStat->peersConnected;
 }
 
-- (int) totalPeersTracker
+- (NSInteger) totalPeersTracker
 {
     return fStat->peersFrom[TR_PEER_FROM_TRACKER];
 }
 
-- (int) totalPeersIncoming
+- (NSInteger) totalPeersIncoming
 {
     return fStat->peersFrom[TR_PEER_FROM_INCOMING];
 }
 
-- (int) totalPeersCache
+- (NSInteger) totalPeersCache
 {
     return fStat->peersFrom[TR_PEER_FROM_CACHE];
 }
 
-- (int) totalPeersPex
+- (NSInteger) totalPeersPex
 {
     return fStat->peersFrom[TR_PEER_FROM_PEX];
 }
 
-- (int) totalPeersKnown
+- (NSInteger) totalPeersKnown
 {
     return fStat->peersKnown;
 }
 
-- (int) peersSendingToUs
+- (NSInteger) peersSendingToUs
 {
     return fStat->peersSendingToUs;
 }
 
-- (int) peersGettingFromUs
+- (NSInteger) peersGettingFromUs
 {
     return fStat->peersGettingFromUs;
 }
 
-- (float) downloadRate
+- (CGFloat) downloadRate
 {
     return fStat->rateDownload;
 }
 
-- (float) uploadRate
+- (CGFloat) uploadRate
 {
     return fStat->rateUpload;
 }
 
-- (float) totalRate
+- (CGFloat) totalRate
 {
     return [self downloadRate] + [self uploadRate];
 }
@@ -1380,32 +1380,32 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     return fStat->corruptEver;
 }
 
-- (float) swarmSpeed
+- (CGFloat) swarmSpeed
 {
     return fStat->swarmSpeed;
 }
 
-- (int) orderValue
+- (NSInteger) orderValue
 {
     return fOrderValue;
 }
 
-- (void) setOrderValue: (int) orderValue
+- (void) setOrderValue: (NSInteger) orderValue
 {
     fOrderValue = orderValue;
 }
 
-- (int) groupValue
+- (NSInteger) groupValue
 {
     return fGroupValue;
 }
 
-- (void) setGroupValue: (int) goupValue
+- (void) setGroupValue: (NSInteger) goupValue
 {
     fGroupValue = goupValue;
 }
 
-- (int) groupOrderValue
+- (NSInteger) groupOrderValue
 {
     return [[GroupsController groups] rowValueForIndex: fGroupValue];
 }
@@ -1421,7 +1421,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     return fFileList;
 }
 
-- (int) fileCount
+- (NSInteger) fileCount
 {
     return fInfo->fileCount;
 }
@@ -1434,7 +1434,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     fFileStat = tr_torrentFiles(fHandle, NULL);
 }
 
-- (float) fileProgress: (FileListNode *) node
+- (CGFloat) fileProgress: (FileListNode *) node
 {
     if ([self isComplete])
         return 1.0;
@@ -1448,14 +1448,14 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
         return fFileStat[[indexSet firstIndex]].progress;
     
     uint64_t have = 0;
-    for (int index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         have += fFileStat[index].bytesCompleted;
     
     NSAssert([node size], @"director in torrent file has size 0");
-    return (float)have / [node size];
+    return (CGFloat)have / [node size];
 }
 
-- (BOOL) canChangeDownloadCheckForFile: (int) index
+- (BOOL) canChangeDownloadCheckForFile: (NSInteger) index
 {
     if (!fFileStat)
         [self updateFileStat];
@@ -1471,16 +1471,16 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     if (!fFileStat)
         [self updateFileStat];
     
-    for (int index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         if (fFileStat[index].progress < 1.0)
             return YES;
     return NO;
 }
 
-- (int) checkForFiles: (NSIndexSet *) indexSet
+- (NSInteger) checkForFiles: (NSIndexSet *) indexSet
 {
     BOOL onState = NO, offState = NO;
-    for (int index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
         if (tr_torrentGetFileDL(fHandle, index) || ![self canChangeDownloadCheckForFile: index])
             onState = YES;
@@ -1493,7 +1493,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     return onState ? NSOnState : NSOffState;
 }
 
-- (void) setFileCheckState: (int) state forIndexes: (NSIndexSet *) indexSet
+- (void) setFileCheckState: (NSInteger) state forIndexes: (NSIndexSet *) indexSet
 {
     NSUInteger count = [indexSet count];
     tr_file_index_t * files = malloc(count * sizeof(tr_file_index_t));
@@ -1507,7 +1507,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFileCheckChange" object: self];
 }
 
-- (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet
+- (void) setFilePriority: (NSInteger) priority forIndexes: (NSIndexSet *) indexSet
 {
     const NSUInteger count = [indexSet count];
     tr_file_index_t * files = malloc(count * sizeof(tr_file_index_t));
@@ -1518,9 +1518,9 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     free(files);
 }
 
-- (BOOL) hasFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet
+- (BOOL) hasFilePriority: (NSInteger) priority forIndexes: (NSIndexSet *) indexSet
 {
-    for (int index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         if (priority == tr_torrentGetFilePriority(fHandle, index) && [self canChangeDownloadCheckForFile: index])
             return YES;
     return NO;
@@ -1531,12 +1531,12 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     BOOL low = NO, normal = NO, high = NO;
     NSMutableSet * priorities = [NSMutableSet setWithCapacity: 3];
     
-    for (int index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
         if (![self canChangeDownloadCheckForFile: index])
             continue;
         
-        int priority = tr_torrentGetFilePriority(fHandle, index);
+        NSInteger priority = tr_torrentGetFilePriority(fHandle, index);
         if (priority == TR_PRI_LOW)
         {
             if (low)
@@ -1587,7 +1587,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     return date ? date : [self dateAdded];
 }
 
-- (int) stalledMinutes
+- (NSInteger) stalledMinutes
 {
     time_t start = fStat->startDate;
     if (start == 0)
@@ -1742,10 +1742,10 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 {
     if ([self isFolder])
     {
-        int count = [self fileCount];
+        NSInteger count = [self fileCount];
         NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count];
         
-        for (int i = 0; i < count; i++)
+        for (NSInteger i = 0; i < count; i++)
         {
             tr_file * file = &fInfo->files[i];
             
@@ -1794,7 +1794,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     }
 }
 
-- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size index: (int) index
+- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size index: (NSInteger) index
 {
     NSString * name = [components objectAtIndex: 0];
     BOOL isFolder = [components count] > 1;
@@ -1930,7 +1930,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     fQuickPauseDict = nil;
 }
 
-- (NSString *) etaString: (int) eta
+- (NSString *) etaString: (NSInteger) eta
 {
     switch (eta)
     {
@@ -1946,7 +1946,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 - (void) updateAllTrackers: (NSMutableArray *) trackers
 {
     //get count
-    int count = 0;
+    NSInteger count = 0;
     NSEnumerator * enumerator = [trackers objectEnumerator];
     id object;
     while ((object = [enumerator nextObject]))
@@ -1955,8 +1955,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     
     //recreate the tracker structure
     tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, count);
-    int tier = 0;
-    int i = 0;
+    NSInteger tier = 0, i = 0;
     enumerator = [trackers objectEnumerator];
     while ((object = [enumerator nextObject]))
     {
