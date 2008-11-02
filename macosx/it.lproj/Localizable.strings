@@ -1,14 +1,13 @@
 ﻿/* Inspector -> Activity tab -> progress */
 "%.2f%% (%.2f%% selected)" = "%1$.2f%% (selezionati %2$.2f%%)";
 
-/* Inspector -> Files tab -> file status string */
-"%.2f%% of %@" = "%1$.2f%% su %2$@";
-
 /* Prefs -> blocklist -> message */
 "%@ IP address rules in list" = "%@ regole indirizzi IP nella lista";
 
-/* Blocklist -> message
+/* Inspector -> Files tab -> file status string
+   Blocklist -> message
    Torrent -> progress string */
+
 
 "%@ of %@" = "%1$@ su %2$@";
 
@@ -303,9 +302,6 @@
 /* Inspector -> peer -> status */
 "Currently uploading (interested and not choked)" = "Invio in corso (interessato e non bloccato)";
 
-/* Torrent -> eta string */
-"data not fully available" = "dati non completamente disponibili";
-
 /* Message window -> table column */
 "Date" = "Data";
 
@@ -363,7 +359,7 @@
 "Downloading" = "In download";
 
 /* Blocklist -> message */
-"Downloading blocklist" = "Scaricamento blocklist";
+"Downloading blocklist" = "Download della blocklist...";
 
 /* Torrent -> status string */
 "Downloading from %d of %d peers" = "In download da %1$d su %2$d peer";
@@ -465,6 +461,9 @@
 /* File size - kilobytes */
 "KB" = "KB";
 
+/* Prefs -> blocklist -> message */
+"Last updated" = "Ultimo aggiornamento";
+
 /* About window -> license button */
 "License" = "Licenza";
 
@@ -494,13 +493,18 @@
 /* files tab -> tooltip */
 "Multiple Priorities" = "Priorità multiple";
 
-/* No Ratio
+/* Prefs -> blocklist -> message
+   No Ratio
    Inspector -> Peers tab -> table row tooltip */
+
 
 "N/A" = "N/D";
 
 /* Preferences -> toolbar item title */
 "Network" = "Rete";
+
+/* Prefs -> blocklist -> message */
+"Never" = "Mai";
 
 /* Group table row */
 "No Group" = "Nessun gruppo";
@@ -572,11 +576,11 @@
 /* Open address toolbar item -> palette label */
 "Open Torrent Address" = "Apri indirizzo torrent";
 
-/* Open toolbar item -> palette label */
-"Open Torrent Files" = "Apri file torrent";
-
 /* Open toolbar item -> tooltip */
 "Open torrent files" = "Apri file torrent";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "Apri file torrent";
 
 /* Open address toolbar item -> tooltip */
 "Open torrent web address" = "Apri indirizzo web torrent";
@@ -626,7 +630,7 @@
 "Port" = "Porta";
 
 /* Preferences -> Network -> port status */
-"Port check website is down" = "Il sito per la verifica della porta non è raggiungibile";
+"Port check site is down" = "Il sito di test non è disponibile";
 
 /* Preferences -> Network -> port status */
 "Port is closed" = "Porta chiusa";
@@ -649,7 +653,7 @@
 "Process" = "Processo";
 
 /* Blocklist -> message */
-"Processing blocklist" = "Processamento blocklist";
+"Processing blocklist" = "Elaborazione della blocklist...";
 
 /* Stats window -> label */
 "Program Started" = "Programma avviato";
@@ -752,11 +756,11 @@
 /* Torrent -> status string */
 "Seeding" = "In seed";
 
-/* Torrent -> status string */
-"Seeding complete" = "Seeding completato";
-
 /* Growl notification title */
 "Seeding Complete" = "Seeding completato";
+
+/* Torrent -> status string */
+"Seeding complete" = "Seeding completato";
 
 /* Torrent -> status string */
 "Seeding to %d of %d peers" = "In seed verso %1$d su %2$d peer";
@@ -920,7 +924,7 @@
 "This transfer is active. Once removed, continuing the transfer will require the torrent file." = "Questo trasferimento è in corso. Qualora rimosso, il file torrent sarà richiesto per proseguire nel trasferimento.";
 
 /* Stats reset -> message */
-"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be effected." = "Questo cancellerà le statistiche globali mostrate da Transmission. Le statistiche individuali dei trasferimenti non saranno alterate.";
+"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Questa azione ripulirà le statistiche globali mostrate da Transmission. Le statistiche dei singoli trasferimenti non saranno modificate.";
 
 /* Inspector -> tracker table */
 "Tier %d" = "Livello %d";
