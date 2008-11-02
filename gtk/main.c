@@ -357,6 +357,7 @@ main( int     argc,
     GError *            gerr;
     gboolean            didinit = FALSE;
     gboolean            didlock = FALSE;
+    gboolean            showversion = FALSE;
     gboolean            startpaused = FALSE;
     gboolean            startminimized = FALSE;
     char *              domain = "transmission";
@@ -366,6 +367,8 @@ main( int     argc,
     GOptionEntry entries[] = {
         { "paused",     'p', 0, G_OPTION_ARG_NONE,
           &startpaused, _( "Start with all torrents paused" ), NULL },
+        { "version",    '\0', 0, G_OPTION_ARG_NONE,
+          &showversion, _( "Show version number and exit" ), NULL },
 #ifdef STATUS_ICON_SUPPORTED
         { "minimized",  'm', 0, G_OPTION_ARG_NONE,
           &startminimized,
@@ -395,10 +398,17 @@ main( int     argc,
     if( !gtk_init_with_args( &argc, &argv, _( "[torrent files]" ), entries,
                              domain, &gerr ) )
     {
-        g_message( "%s", gerr->message );
+        fprintf( stderr, "%s\n", gerr->message );
         g_clear_error( &gerr );
         return 0;
     }
+
+    if( showversion )
+    {
+        fprintf( stderr, "%s %s\n", g_get_application_name( ), LONG_VERSION_STRING );
+        return 0;
+    }
+
     if( configDir == NULL )
         configDir = (char*) tr_getDefaultConfigDir( );
 
