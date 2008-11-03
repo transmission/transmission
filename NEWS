@@ -4,13 +4,14 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 <http://trac.transmissionbt.com/query?milestone=1.40&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Tracker communication uses fewer resources
-   + Bandwidth displays now include BitTorrent protocol overhead
    + More accurate bandwidth management
-   + Stability, security, and performance improvements to the RPC and Web UI server
-   + Lazy bitfields (always on)
+   + Bandwidth displays now include BitTorrent protocol overhead
+   + Stability, security, and performance improvements to the RPC/Web UI server
    + Support compression when serving Web UI and RPC responses
    + Simplify the RPC whitelist
-   + Fix 1.3x bug that could re-download some data when not necessary
+   + Fix bug that prevented handshakes with encrypted BitComet peers
+   + Fix 1.3x bug that could re-download some data unnecessarily
+   + Lazy bitfields (always on)
 - Mac
    + Option to automatically update the blocklist weekly
    + In the file inspector tab, show progress and size for folders
@@ -19,7 +20,10 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - GTK+
    + Option to automatically update the blocklist weekly
    + Added off-hour bandwidth scheduling
+   + Simplify file/priority selection in the details dialog
    + Fix a couple of crashes
+   + 5 new translations: Australian, Basque, Kurdish, Kurdish (Sorani), Malay
+   + 43 updated translations
 - Web Client
    + The Web Client is now out of beta
    + Minor display fixes

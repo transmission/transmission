@@ -1,4 +1,4 @@
-# Irish translation for transmission
+# Kurdish (Sorani) translation for transmission
 # Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
 # This file is distributed under the same license as the transmission package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
@@ -8,35 +8,35 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-11-02 14:16-0600\n"
-"PO-Revision-Date: 2008-05-03 16:28+0000\n"
-"Last-Translator: Seanan <Unknown>\n"
-"Language-Team: Irish <ga@li.org>\n"
+"PO-Revision-Date: 2008-09-09 23:12+0000\n"
+"Last-Translator: Ara Bextiyar <arastein@gmail.com>\n"
+"Language-Team: Kurdish (Sorani) <ckb@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n==2 ? 1 : 2;\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Launchpad-Export-Date: 2008-11-03 17:30+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "ڕیزکردن به‌پێی _چالاکی"
 
 #: ../gtk/actions.c:49
 msgid "Sort by _Name"
-msgstr ""
+msgstr "ڕیزکردن به‌پێی _ناو"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "ڕیزکردن به‌پێی _به‌ره‌وپێشچوون"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Ratio"
-msgstr ""
+msgstr "ڕیزکردن به‌پێی _ڕێژه‌"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _State"
-msgstr ""
+msgstr "ڕیزکردن به‌پێی با_ر"
 
 #: ../gtk/actions.c:57
 msgid "Sort by _Tracker"
@@ -44,23 +44,23 @@ msgstr ""
 
 #: ../gtk/actions.c:59
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "ڕیزکردن به‌پێی _ته‌مه‌ن"
 
 #: ../gtk/actions.c:78
 msgid "_Main Window"
-msgstr ""
+msgstr "په‌نجه‌ره‌ی _سه‌ره‌کی"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
-msgstr ""
+msgstr "لۆگی _په‌یام"
 
 #: ../gtk/actions.c:96
 msgid "_Minimal View"
-msgstr ""
+msgstr "بینین به‌ شێوه‌ی _بچوککراوه‌یی"
 
 #: ../gtk/actions.c:99
 msgid "_Reverse Sort Order"
-msgstr ""
+msgstr "_پێچه‌وانه‌کردنه‌وه‌ی ڕیزکردن"
 
 #: ../gtk/actions.c:102
 msgid "_Filterbar"
@@ -72,47 +72,47 @@ msgstr ""
 
 #: ../gtk/actions.c:106
 msgid "_Toolbar"
-msgstr ""
+msgstr "_تووڵئامڕاز"
 
 #: ../gtk/actions.c:112
 msgid "_Torrent"
-msgstr "_Torrent"
+msgstr "_تۆرێنت"
 
 #: ../gtk/actions.c:114
 msgid "_View"
-msgstr "_Amharc"
+msgstr "_بینین"
 
 #: ../gtk/actions.c:117
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "تۆرێنته‌کان _ڕیزبکه‌ به‌ پێی"
 
 #: ../gtk/actions.c:119
 msgid "_Edit"
-msgstr "_Eagar"
+msgstr "_ده‌ستكاریی"
 
 #: ../gtk/actions.c:121
 msgid "_Help"
-msgstr "_Cabhair"
+msgstr "_یارمه‌تی"
 
 #: ../gtk/actions.c:124 ../gtk/actions.c:126
 msgid "Add a torrent"
-msgstr ""
+msgstr "تۆرێنتێک زیادبکه‌"
 
 #: ../gtk/actions.c:125
 msgid "_Add..."
-msgstr "_Cuir Leis..."
+msgstr "_زیادکردن..."
 
 #: ../gtk/actions.c:128
 msgid "_Start"
-msgstr "_Tosaigh"
+msgstr "_ده‌ستپێکردن"
 
 #: ../gtk/actions.c:128
 msgid "Start torrent"
-msgstr ""
+msgstr "ده‌ستپێکردنی تۆرێنت"
 
 #: ../gtk/actions.c:130
 msgid "_Statistics"
-msgstr ""
+msgstr "_ئاماره‌کان"
 
 #: ../gtk/actions.c:133 ../gtk/add-dialog.c:361
 msgid "_Verify Local Data"
@@ -120,55 +120,55 @@ msgstr ""
 
 #: ../gtk/actions.c:135
 msgid "_Pause"
-msgstr "_"
+msgstr "_ڕاگرتن"
 
 #: ../gtk/actions.c:135
 msgid "Pause torrent"
-msgstr ""
+msgstr "تۆرێنت ڕابگره‌"
 
 #: ../gtk/actions.c:138
 msgid "Remove torrent"
-msgstr ""
+msgstr "لابردنی تۆرێنت"
 
 #: ../gtk/actions.c:140
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "په‌ڕگه‌کان _بسڕه‌وه‌ و لایانبده‌"
 
 #: ../gtk/actions.c:142
 msgid "_New..."
-msgstr "_Nua..."
+msgstr "_نوێ..."
 
 #: ../gtk/actions.c:144
 msgid "Create a torrent"
-msgstr "Cruthaigh torrent"
+msgstr "تۆرێنتێک دروست بکه‌"
 
 #: ../gtk/actions.c:146
 msgid "_Quit"
-msgstr "_Scoir"
+msgstr "_ده‌رچوون"
 
 #: ../gtk/actions.c:149
 msgid "Select _All"
-msgstr "Roghnaigh _Uile"
+msgstr "_هه‌مووی دیاری بکه‌"
 
 #: ../gtk/actions.c:151
 msgid "Dese_lect All"
-msgstr "_Díroghnaigh Gach Rud"
+msgstr "_لابردنی دیاریکردنی هه‌موو"
 
 #: ../gtk/actions.c:156
 msgid "_Details"
-msgstr "_Sonraí"
+msgstr "_ورده‌کارییه‌کان"
 
 #: ../gtk/actions.c:156
 msgid "Torrent details"
-msgstr ""
+msgstr "ورده‌کارییه‌کانی تۆرێنت"
 
 #: ../gtk/actions.c:159
 msgid "_Open Folder"
-msgstr ""
+msgstr "_کردنه‌وه‌ی بوخچه‌"
 
 #: ../gtk/actions.c:162
 msgid "_Contents"
-msgstr ""
+msgstr "_ناوه‌ڕۆکه‌کان"
 
 #: ../gtk/actions.c:165
 msgid "Ask Tracker for _More Peers"
@@ -176,47 +176,47 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:238
 msgid "Torrent files"
-msgstr "Comhaid Torrent"
+msgstr "په‌ڕگه‌کانی تۆرێنت"
 
 #: ../gtk/add-dialog.c:243
 msgid "All files"
-msgstr "Gach comhad"
+msgstr "هه‌موو په‌ڕگه‌كان"
 
 #: ../gtk/add-dialog.c:271
 msgid "Torrent Options"
-msgstr "Roghanna Torrent"
+msgstr "هه‌ڵبژاردنه‌کانی تۆرێنت"
 
 #: ../gtk/add-dialog.c:295
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "په‌ڕگه‌کانی سه‌رچاوه‌ بگوازه‌وه‌ بۆ زبڵدان"
 
 #: ../gtk/add-dialog.c:297 ../gtk/tr-prefs.c:370
 msgid "_Start when added"
-msgstr ""
+msgstr "_ده‌ستپێبکه‌ کاتێک زیادکرا"
 
 #: ../gtk/add-dialog.c:308
 msgid "_Torrent file:"
-msgstr ""
+msgstr "په‌ڕگه‌ی _تۆرێنت:"
 
 #: ../gtk/add-dialog.c:314
 msgid "Select Source File"
-msgstr ""
+msgstr "په‌ڕگه‌ی سه‌رچاوه‌ دیاری بکه‌"
 
 #: ../gtk/add-dialog.c:329 ../gtk/tr-prefs.c:379
 msgid "_Destination folder:"
-msgstr ""
+msgstr "بوخچه‌ی _مه‌به‌ست:"
 
 #: ../gtk/add-dialog.c:336
 msgid "Select Destination Folder"
-msgstr ""
+msgstr "بوخچه‌ی مه‌به‌ست دیاری بکه‌"
 
 #: ../gtk/add-dialog.c:434
 msgid "Add a Torrent"
-msgstr "Cuir Torrent Leis"
+msgstr "تۆرێنتێک زیادبکه‌"
 
 #: ../gtk/add-dialog.c:451 ../gtk/tr-prefs.c:366
 msgid "Display _options dialog"
-msgstr ""
+msgstr "گفتوگۆی _هه‌ڵبژاردنه‌کان پیشانبده‌"
 
 #: ../gtk/blocklist.c:89
 msgid "Retrieving blocklist..."
@@ -248,18 +248,18 @@ msgstr ""
 #: ../libtransmission/utils.c:572 ../libtransmission/utils.c:583
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr ""
+msgstr "نه‌توانرا \"%1$s\" دروستبکرێت: %2$s"
 
 #: ../gtk/conf.c:86 ../libtransmission/bencode.c:1323
 #: ../libtransmission/fdlimit.c:181
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr ""
+msgstr "نه‌توانرا \"%1$s\" بکرێته‌وه‌: %2$s"
 
 #: ../gtk/conf.c:91
 #, c-format
 msgid "%s is already running."
-msgstr ""
+msgstr "%s کارده‌کات"
 
 #: ../gtk/details.c:273
 msgid "Web Seeds"
@@ -268,16 +268,16 @@ msgstr ""
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:275 ../gtk/details.c:317
 msgid "Down"
-msgstr ""
+msgstr "داگرتن"
 
 #: ../gtk/details.c:315
 msgid "Address"
-msgstr ""
+msgstr "ناونیشان"
 
 #. 'upload speed' column header.  terse to keep the column narrow.
 #: ../gtk/details.c:319
 msgid "Up"
-msgstr ""
+msgstr "بارکردن"
 
 #: ../gtk/details.c:320
 msgid "Client"
@@ -286,11 +286,11 @@ msgstr ""
 #. 'percent done' column header. terse to keep the column narrow.
 #: ../gtk/details.c:322
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #: ../gtk/details.c:324
 msgid "Status"
-msgstr ""
+msgstr "دۆخ"
 
 #: ../gtk/details.c:619
 msgid "Optimistic unchoke"
@@ -298,19 +298,19 @@ msgstr ""
 
 #: ../gtk/details.c:622
 msgid "Downloading from this peer"
-msgstr ""
+msgstr "داگرتن له‌م هاوه‌ڵه‌وه‌"
 
 #: ../gtk/details.c:626
 msgid "We would download from this peer if they would let us"
-msgstr ""
+msgstr "له‌م هاوه‌ڵه‌وه‌ داده‌گرین گه‌ر ڕێی پێداین"
 
 #: ../gtk/details.c:630
 msgid "Uploading to peer"
-msgstr ""
+msgstr "بارکردن بۆ هاوه‌ڵ"
 
 #: ../gtk/details.c:633
 msgid "We would upload to this peer if they asked"
-msgstr ""
+msgstr "بۆ ئه‌م هاوه‌ڵه‌ بارده‌که‌ین گه‌ر داوایکرد"
 
 #: ../gtk/details.c:638
 msgid "Peer has unchoked us, but we're not interested"
@@ -322,11 +322,11 @@ msgstr ""
 
 #: ../gtk/details.c:647
 msgid "Encrypted connection"
-msgstr ""
+msgstr "په‌یوه‌ندی ئینکریپتکراو"
 
 #: ../gtk/details.c:651
 msgid "Peer was discovered through Peer Exchange (PEX)"
-msgstr ""
+msgstr "هاوه‌ڵ دۆزرایه‌وه‌ به‌ هۆی ئاڵوگۆڕکردنی هاوه‌ڵه‌وه‌ (PEX)"
 
 #: ../gtk/details.c:655
 msgid "Peer is an incoming connection"
@@ -334,7 +334,7 @@ msgstr ""
 
 #: ../gtk/details.c:875
 msgid "<b>Seeders:</b>"
-msgstr ""
+msgstr "<b>پێبه‌خشه‌کان:</b>"
 
 #: ../gtk/details.c:883
 msgid "<b>Leechers:</b>"
@@ -342,33 +342,33 @@ msgstr ""
 
 #: ../gtk/details.c:891
 msgid "<b>Times Completed:</b>"
-msgstr ""
+msgstr "<b>کاتی ته‌واوبوون:</b>"
 
 #: ../gtk/details.c:913 ../gtk/details.c:1449 ../gtk/details.c:1460
 msgid "Never"
-msgstr ""
+msgstr "هه‌رگیز"
 
 #: ../gtk/details.c:938
 msgid "Details"
-msgstr ""
+msgstr "ورده‌کاری"
 
 #: ../gtk/details.c:941 ../gtk/makemeta-ui.c:284
 #, c-format
 msgid "%'d Piece"
 msgid_plural "%'d Pieces"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d پارچه‌"
+msgstr[1] "%'d پارچه‌"
 
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
 #: ../gtk/details.c:947 ../gtk/makemeta-ui.c:290
 #, c-format
 msgid "%1$s @ %2$s"
-msgstr ""
+msgstr "%1$s @ %2$s"
 
 #: ../gtk/details.c:951
 msgid "Pieces:"
-msgstr ""
+msgstr "پارچه‌کان:"
 
 #: ../gtk/details.c:959
 msgid "Hash:"
@@ -380,53 +380,53 @@ msgstr ""
 
 #: ../gtk/details.c:963
 msgid "Public torrent"
-msgstr ""
+msgstr "تۆرێنتی گشتی"
 
 #: ../gtk/details.c:965
 msgid "Privacy:"
-msgstr ""
+msgstr "تایبه‌تی:"
 
 #: ../gtk/details.c:977
 msgid "Comment:"
-msgstr ""
+msgstr "لێدوان:"
 
 #: ../gtk/details.c:981
 msgid "Origins"
-msgstr ""
+msgstr "ڕه‌سه‌نه‌کان"
 
 #: ../gtk/details.c:983
 msgid "Unknown"
-msgstr ""
+msgstr "نه‌زانراو"
 
 #: ../gtk/details.c:985
 msgid "Creator:"
-msgstr ""
+msgstr "دروستکه‌ر:"
 
 #: ../gtk/details.c:989
 msgid "Date:"
-msgstr ""
+msgstr "ڕێكه‌وت:"
 
 #: ../gtk/details.c:992
 msgid "Location"
-msgstr ""
+msgstr "شوێن"
 
 #: ../gtk/details.c:998
 msgid "Destination folder:"
-msgstr ""
+msgstr "بوخچه‌ی مه‌به‌ست:"
 
 #: ../gtk/details.c:1005
 msgid "Torrent file:"
-msgstr ""
+msgstr "په‌ڕگه‌ی تۆرێنت:"
 
 #: ../gtk/details.c:1051
 #, c-format
 msgid "%.1f%%"
-msgstr ""
+msgstr "%.1f%%"
 
 #: ../gtk/details.c:1057
 #, c-format
 msgid "%1$.1f%% (%2$.1f%% selected)"
-msgstr ""
+msgstr "%1$.1f%% (%2$.1f%% دیاریکرا)"
 
 #: ../gtk/details.c:1069
 #, c-format
@@ -435,40 +435,40 @@ msgstr ""
 
 #: ../gtk/details.c:1088 ../gtk/util.c:56 ../gtk/util.c:78
 msgid "None"
-msgstr ""
+msgstr "هیچ"
 
 #: ../gtk/details.c:1110
 msgid "Transfer"
-msgstr ""
+msgstr "گواستنه‌وه‌"
 
 #: ../gtk/details.c:1113
 msgid "State:"
-msgstr ""
+msgstr "بار:"
 
 #: ../gtk/details.c:1116
 msgid "Progress:"
-msgstr ""
+msgstr "به‌ره‌وپێشچوون"
 
 #. "Have" refers to how much of the torrent we have
 #: ../gtk/details.c:1120
 msgid "Have:"
-msgstr ""
+msgstr "هه‌یه‌:"
 
 #: ../gtk/details.c:1123 ../gtk/stats.c:149 ../gtk/stats.c:161
 msgid "Downloaded:"
-msgstr ""
+msgstr "داگیراوه‌:"
 
 #: ../gtk/details.c:1126 ../gtk/stats.c:147 ../gtk/stats.c:159
 msgid "Uploaded:"
-msgstr ""
+msgstr "بارکراو:"
 
 #: ../gtk/details.c:1130
 msgid "Failed DL:"
-msgstr ""
+msgstr "داگیراوی سه‌رنه‌که‌وتوو:"
 
 #: ../gtk/details.c:1133 ../gtk/stats.c:151 ../gtk/stats.c:163
 msgid "Ratio:"
-msgstr ""
+msgstr "ڕێژه‌:"
 
 #: ../gtk/details.c:1136
 msgid "Swarm rate:"
@@ -476,23 +476,23 @@ msgstr ""
 
 #: ../gtk/details.c:1139
 msgid "Error:"
-msgstr ""
+msgstr "هه‌ڵه‌:"
 
 #: ../gtk/details.c:1143
 msgid "Completion"
-msgstr ""
+msgstr "ته‌واوبوون"
 
 #: ../gtk/details.c:1155
 msgid "Dates"
-msgstr ""
+msgstr "ڕێکه‌وته‌کان"
 
 #: ../gtk/details.c:1158
 msgid "Started at:"
-msgstr ""
+msgstr "ده‌ستیپێکردووه‌ له‌:"
 
 #: ../gtk/details.c:1161
 msgid "Last activity at:"
-msgstr ""
+msgstr "دواترین چالاکی له‌:"
 
 #: ../gtk/details.c:1252 ../gtk/tr-prefs.c:554 ../gtk/tr-prefs.c:1164
 msgid "Limits"
@@ -508,11 +508,11 @@ msgstr ""
 
 #: ../gtk/details.c:1293
 msgid "Peer Connections"
-msgstr ""
+msgstr "په‌یوه‌ندییه‌کانی هاوه‌ڵ"
 
 #: ../gtk/details.c:1298
 msgid "_Maximum peers:"
-msgstr ""
+msgstr "_زۆرترین هاوه‌ڵ:"
 
 #: ../gtk/details.c:1353 ../gtk/makemeta-ui.c:427 ../gtk/tr-prefs.c:1412
 msgid "Trackers"
@@ -558,24 +558,24 @@ msgstr ""
 
 #: ../gtk/details.c:1419
 msgid "In progress"
-msgstr ""
+msgstr "له‌ به‌ڕێوه‌چووندایه‌"
 
 #: ../gtk/details.c:1464
 msgid "Now"
-msgstr ""
+msgstr "ئێستا"
 
 #: ../gtk/details.c:1520
 #, c-format
 msgid "Details for %1$s (%2$s)"
-msgstr ""
+msgstr "ورده‌کارییه‌کان بۆ %1$s (%2$s)"
 
 #: ../gtk/details.c:1538
 msgid "Activity"
-msgstr ""
+msgstr "چالاکییه‌کان"
 
 #: ../gtk/details.c:1543 ../gtk/tr-prefs.c:1400
 msgid "Peers"
-msgstr ""
+msgstr "هاوه‌ڵه‌کان"
 
 #: ../gtk/details.c:1548 ../gtk/tr-window.c:525
 msgid "Tracker"
@@ -583,65 +583,65 @@ msgstr ""
 
 #: ../gtk/details.c:1552 ../gtk/msgwin.c:193
 msgid "Information"
-msgstr ""
+msgstr "زانیاریی"
 
 #: ../gtk/details.c:1558 ../gtk/tr-window.c:525
 msgid "Files"
-msgstr ""
+msgstr "په‌ڕگه‌کان"
 
 #: ../gtk/details.c:1563 ../gtk/tr-prefs.c:398 ../gtk/tr-prefs.c:563
 msgid "Options"
-msgstr ""
+msgstr "هه‌ڵبژاردنه‌كان"
 
 #: ../gtk/dialogs.c:120
 msgid "<big><b>Quit Transmission?</b></big>"
-msgstr ""
+msgstr "<big><b>ده‌رچوون له‌ Transmission؟</b></big>"
 
 #: ../gtk/dialogs.c:133
 msgid "_Don't ask me again"
-msgstr ""
+msgstr "_پرسیارم لێ مه‌که‌ره‌وه‌"
 
 #: ../gtk/dialogs.c:227
 msgid "Remove torrent?"
 msgid_plural "Remove torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "تۆرێنت لاببه‌؟"
+msgstr[1] "تۆرێنت لاببه‌؟"
 
 #: ../gtk/dialogs.c:230
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "په‌ڕگه‌ داگیراوه‌کانی ئه‌م تۆرێنته‌ بسڕێته‌وه‌؟"
+msgstr[1] "په‌ڕگه‌ داگیراوه‌کانی ئه‌م تۆرێنتانه‌ بسڕێته‌وه‌؟"
 
 #: ../gtk/dialogs.c:236
 msgid "Some of these torrents are incomplete or connected to peers."
-msgstr ""
+msgstr "هه‌ندێک له‌م تۆرێنتانه‌ ناته‌واون یان په‌یوه‌ندن به‌ هاوه‌ڵه‌وه‌."
 
 #: ../gtk/dialogs.c:241
 msgid "This torrent is incomplete or connected to peers."
 msgid_plural "One of these torrents is incomplete or connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ئه‌م تۆرێنته‌ ناته‌واوه‌ یان په‌یوه‌نده‌ به‌ هاوه‌ڵه‌وه‌."
+msgstr[1] "یه‌کێ له‌م تۆرێنتانه‌ ناته‌واوه‌ یان په‌یوه‌نده‌ به‌ هاوه‌ڵه‌وه‌."
 
 #: ../gtk/file-list.c:622
 msgid "High"
-msgstr ""
+msgstr "به‌رز"
 
 #: ../gtk/file-list.c:626
 msgid "Normal"
-msgstr ""
+msgstr "ئاسایی"
 
 #: ../gtk/file-list.c:630
 msgid "Low"
-msgstr ""
+msgstr "نزم"
 
 #: ../gtk/file-list.c:634
 msgid "Mixed"
-msgstr ""
+msgstr "تێکه‌ڵکراو"
 
 #: ../gtk/file-list.c:666 ../gtk/file-list.c:839
 msgid "filedetails|Download"
-msgstr ""
+msgstr "داگرتن"
 
 #: ../gtk/file-list.c:668 ../gtk/file-list.c:850
 msgid "Priority"
@@ -649,15 +649,15 @@ msgstr ""
 
 #: ../gtk/file-list.c:803
 msgid "filedetails|File"
-msgstr ""
+msgstr "په‌ڕگه‌"
 
 #: ../gtk/file-list.c:824
 msgid "filedetails|Progress"
-msgstr ""
+msgstr "به‌ڕێوه‌چوون"
 
 #: ../gtk/main.c:369
 msgid "Start with all torrents paused"
-msgstr ""
+msgstr "ده‌ستپێبکه‌ له‌گه‌ڵ هه‌موو تۆرێنته‌ ڕاگیراوه‌کان"
 
 #: ../gtk/main.c:371
 msgid "Show version number and exit"
@@ -669,11 +669,11 @@ msgstr ""
 
 #: ../gtk/main.c:378
 msgid "Where to look for configuration files"
-msgstr ""
+msgstr "له‌ کوێ بگه‌ڕێ بۆ په‌ڕگه‌ی شێوه‌پێدان"
 
 #: ../gtk/main.c:391
 msgid "Transmission"
-msgstr ""
+msgstr "Transmission"
 
 #: ../gtk/main.c:398
 msgid "[torrent files]"
@@ -689,7 +689,7 @@ msgstr ""
 
 #: ../gtk/main.c:867
 msgid "<b>Closing Connections</b>"
-msgstr ""
+msgstr "<b>داخستنی په‌یوه‌ندییه‌کان</b>"
 
 #: ../gtk/main.c:871
 msgid "Sending upload/download totals to tracker..."
@@ -697,19 +697,19 @@ msgstr ""
 
 #: ../gtk/main.c:876
 msgid "_Quit Now"
-msgstr ""
+msgstr "_ئێستا ده‌ربچۆ"
 
 #: ../gtk/main.c:1030
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "نه‌توانرا تۆرێنتی تێکچوو زیادبکرێت"
+msgstr[1] "نه‌توانرا تۆرێنتی تێکچوو زیادبکرێت"
 
 #: ../gtk/main.c:1037
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "نه‌توانرا تۆرێنتی دووباره‌ زیادبکرێت"
+msgstr[1] "نه‌توانرا تۆرێنتی دووباره‌ زیادبکرێت"
 
 #: ../gtk/main.c:1287
 msgid "A fast and easy BitTorrent client"
@@ -717,7 +717,7 @@ msgstr ""
 
 #: ../gtk/main.c:1293
 msgid "Copyright 2005-2008 The Transmission Project"
-msgstr ""
+msgstr "مافی له‌به‌رگرتنه‌وه‌ 2005-2008 پارێزراوه‌ بۆ پڕۆژه‌ی Transmission"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -727,25 +727,25 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Seanan https://launchpad.net/~seananoc-gmail"
+"  Ara Bextiyar https://launchpad.net/~arastein"
 
 #: ../gtk/makemeta-ui.c:111
 msgid "Torrent created!"
-msgstr ""
+msgstr "تۆرێنت دروستکرا!"
 
 #: ../gtk/makemeta-ui.c:116 ../gtk/makemeta-ui.c:132 ../gtk/makemeta-ui.c:146
 #, c-format
 msgid "Torrent creation failed: %s"
-msgstr ""
+msgstr "دروستکردنی تۆرێنت سه‌رکه‌وتوو نه‌بوو: %s"
 
 #: ../gtk/makemeta-ui.c:117
 msgid "Invalid URL"
-msgstr ""
+msgstr "URL نه‌گونجاوه‌"
 
 #: ../gtk/makemeta-ui.c:121
 #, c-format
 msgid "Torrent creation cancelled"
-msgstr ""
+msgstr "وازهێنرا له‌ دروستکردنی تۆرێنت"
 
 #: ../gtk/makemeta-ui.c:128 ../libtransmission/blocklist.c:76
 #: ../libtransmission/blocklist.c:233 ../libtransmission/utils.c:441
@@ -755,7 +755,7 @@ msgstr ""
 
 #: ../gtk/makemeta-ui.c:258 ../gtk/makemeta-ui.c:495
 msgid "No source selected"
-msgstr ""
+msgstr "هیچ سه‌رچاوه‌یه‌ک دیاری نه‌کراوه‌"
 
 #. %1$s is the torrent size
 #. %2$'d is its number of files
@@ -763,62 +763,62 @@ msgstr ""
 #, c-format
 msgid "<i>%1$s; %2$'d File</i>"
 msgid_plural "<i>%1$s; %2$'d Files</i>"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "<i>%1$s; %2$'d په‌ڕگه‌</i>"
+msgstr[1] "<i>%1$s; %2$'d په‌ڕگه‌</i>"
 
 #: ../gtk/makemeta-ui.c:354
 msgid "Choose Directory"
-msgstr ""
+msgstr "بوخچه‌یه‌ک هه‌ڵبژێره‌"
 
 #: ../gtk/makemeta-ui.c:363
 msgid "Choose File"
-msgstr ""
+msgstr "په‌ڕگه‌یه‌ک هه‌ڵبژێره‌"
 
 #: ../gtk/makemeta-ui.c:379
 msgid "New Torrent"
-msgstr ""
+msgstr "تۆرێنتێکی نوێ"
 
 #: ../gtk/makemeta-ui.c:394
 msgid "Source"
-msgstr ""
+msgstr "سەرچاوە"
 
 #: ../gtk/makemeta-ui.c:405
 msgid "<i>No source selected</i>"
-msgstr ""
+msgstr "<i>هیچ سه‌رچاوه‌یه‌ک دیاری نه‌کراوه‌</i>"
 
 #: ../gtk/makemeta-ui.c:415
 msgid "F_older"
-msgstr ""
+msgstr "_بوخچه‌"
 
 #: ../gtk/makemeta-ui.c:420
 msgid "_File"
-msgstr ""
+msgstr "_په‌ڕگه‌"
 
 #: ../gtk/makemeta-ui.c:463
 msgid "<b>E_xtras</b>"
-msgstr ""
+msgstr "<b>_زیاده‌کان</b>"
 
 #: ../gtk/makemeta-ui.c:471
 msgid "Commen_t:"
-msgstr ""
+msgstr "_لێدوان:"
 
 #: ../gtk/makemeta-ui.c:474
 msgid "_Private torrent"
-msgstr ""
+msgstr "تۆرێنتی _تایبه‌تی"
 
 #: ../gtk/msgwin.c:87 ../libtransmission/bencode.c:1329
 #: ../libtransmission/blocklist.c:286
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
-msgstr ""
+msgstr "نه‌توانرا په‌ڕگه‌ی \"%1$s\" پاشه‌که‌وتبکرێت: %2$s"
 
 #: ../gtk/msgwin.c:149
 msgid "Save Log"
-msgstr ""
+msgstr "پاشه‌که‌وتکردنی لۆگ"
 
 #: ../gtk/msgwin.c:192
 msgid "Error"
-msgstr ""
+msgstr "هه‌ڵه‌"
 
 #: ../gtk/msgwin.c:194
 msgid "Debug"
@@ -826,46 +826,46 @@ msgstr ""
 
 #: ../gtk/msgwin.c:268
 msgid "Time"
-msgstr ""
+msgstr "کات"
 
 #: ../gtk/msgwin.c:272 ../gtk/tr-window.c:525
 msgid "Name"
-msgstr ""
+msgstr "ناو"
 
 #: ../gtk/msgwin.c:276
 msgid "Message"
-msgstr ""
+msgstr "په‌یام"
 
 #: ../gtk/msgwin.c:452
 msgid "Message Log"
-msgstr ""
+msgstr "لۆگی په‌یام"
 
 #: ../gtk/msgwin.c:487
 msgid "Level"
-msgstr ""
+msgstr "ئاست"
 
 #: ../gtk/notify.c:65
 msgid "Torrent Complete"
-msgstr ""
+msgstr "ته‌واوبوونی تۆرێنت"
 
 #: ../gtk/notify.c:70
 msgid "Open File"
-msgstr ""
+msgstr "کردنه‌وه‌ی په‌ڕگه‌"
 
 #: ../gtk/notify.c:73
 msgid "Open Folder"
-msgstr ""
+msgstr "کردنه‌وه‌ی بوخچه‌"
 
 #: ../gtk/stats.c:75 ../gtk/stats.c:156
 #, c-format
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ده‌ستیسپێکردووه‌ %'d جار"
+msgstr[1] "ده‌ستیسپێکردووه‌ %'d جار"
 
 #: ../gtk/stats.c:128
 msgid "Statistics"
-msgstr ""
+msgstr "ئاماره‌کان"
 
 #: ../gtk/stats.c:145
 msgid "Current Session"
@@ -873,11 +873,11 @@ msgstr ""
 
 #: ../gtk/stats.c:153 ../gtk/stats.c:165
 msgid "Duration:"
-msgstr ""
+msgstr "ماوه‌:"
 
 #: ../gtk/stats.c:155
 msgid "Total"
-msgstr ""
+msgstr "سه‌رجه‌م"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -903,7 +903,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:74
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-msgstr ""
+msgstr "%1$s، بارکراو %2$s (ڕێژه‌: %3$s)"
 
 #: ../gtk/torrent-cell-renderer.c:86 ../gtk/tr-torrent.c:280
 #, c-format
@@ -914,24 +914,24 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:92
 #, c-format
 msgid "%s remaining"
-msgstr ""
+msgstr "%s ماوه‌"
 
 #: ../gtk/torrent-cell-renderer.c:120
 #, c-format
 msgid "speed|Down: %1$s, Up: %2$s"
-msgstr ""
+msgstr "داگرتن: %1$s، بارکردن: %2$s"
 
 #. download speed
 #: ../gtk/torrent-cell-renderer.c:123
 #, c-format
 msgid "Down: %s"
-msgstr ""
+msgstr "داگرتن: %s"
 
 #. upload speed
 #: ../gtk/torrent-cell-renderer.c:126
 #, c-format
 msgid "Up: %s"
-msgstr ""
+msgstr "بارکردن: %s"
 
 #. the torrent isn't uploading or downloading
 #: ../gtk/torrent-cell-renderer.c:129
@@ -940,7 +940,7 @@ msgstr ""
 
 #: ../gtk/torrent-cell-renderer.c:142
 msgid "Paused"
-msgstr ""
+msgstr "ڕاگیرا"
 
 #: ../gtk/torrent-cell-renderer.c:146
 msgid "Waiting to verify local data"
@@ -955,21 +955,23 @@ msgstr ""
 #: ../gtk/tr-window.c:764
 #, c-format
 msgid "Ratio: %s"
-msgstr ""
+msgstr "ڕێژه‌: %s"
 
 #: ../gtk/torrent-cell-renderer.c:205
 #, c-format
 msgid "Downloading from %1$'d of %2$'d connected peer"
 msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "داگرتن له‌ %1$'d له‌ %2$'d هاوه‌ڵی  په‌یوه‌ندی به‌ستراوه‌وه‌"
+msgstr[1] "داگرتن له‌ %1$'d له‌ %2$'d هاوه‌ڵی  په‌یوه‌ندی به‌ستراوه‌وه‌"
 
 #: ../gtk/torrent-cell-renderer.c:216 ../gtk/tr-torrent.c:292
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 msgstr[0] ""
+"پێده‌به‌خشرێت به‌ %1$'d له‌ %2$'d هاوه‌ڵی په‌یوه‌ندی به‌ستراوه‌وه‌"
 msgstr[1] ""
+"پێده‌به‌خشرێت به‌ %1$'d له‌ %2$'d هاوه‌ڵی په‌یوه‌ندی به‌ستراوه‌وه‌"
 
 #: ../gtk/tracker-list.c:329
 msgid "Tier"
@@ -997,7 +999,7 @@ msgstr ""
 
 #: ../gtk/tr-core.c:1109
 msgid "BitTorrent Activity"
-msgstr ""
+msgstr "چالاکی BitTorrent"
 
 #: ../gtk/tr-core.c:1117
 msgid "Disallowing desktop hibernation"
@@ -1025,11 +1027,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:354
 msgid "Adding Torrents"
-msgstr ""
+msgstr "زیادکردنی تۆرێنت"
 
 #: ../gtk/tr-prefs.c:357
 msgid "Automatically _add torrents from:"
-msgstr ""
+msgstr "خۆکارانه‌ تۆرێنته‌کان _زیادبکه‌ له‌:"
 
 #: ../gtk/tr-prefs.c:374
 msgid "Mo_ve source files to Trash"
@@ -1169,15 +1171,15 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1245
 msgid "Port is <b>open</b>"
-msgstr ""
+msgstr "پۆڕت <b>کراوه‌یه‌</b>"
 
 #: ../gtk/tr-prefs.c:1246
 msgid "Port is <b>closed</b>"
-msgstr ""
+msgstr "پۆڕت <b>داخراوه‌</b>"
 
 #: ../gtk/tr-prefs.c:1293
 msgid "<i>Testing port...</i>"
-msgstr ""
+msgstr "<i>تاقیکردنه‌وه‌ی پۆڕت</i>"
 
 #: ../gtk/tr-prefs.c:1339
 msgid "Incoming Peers"
