@@ -1265,8 +1265,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fTorrents removeObjectsInArray: torrents];
     
-    //for tiger - when 10.5-only repace with NSIntegerMax
-    NSInteger lowestOrderValue = INT_MAX;
+    NSInteger lowestOrderValue = NSIntegerMax;
     enumerator = [torrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
