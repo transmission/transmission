@@ -1226,8 +1226,26 @@ struct test_port_data
 {
     GtkWidget *  label;
     gboolean *   alive;
+    char text[128];
 };
 
+/* this is invoked in the gtk main loop's thread */
+static gboolean
+testing_port_done_idle( gpointer gdata )
+{
+    struct test_port_data * data = gdata;
+
+    if( *data->alive )
+    {
+        gdk_threads_enter( );
+        gtk_label_set_markup( GTK_LABEL( data->label ), data->text );
+        gdk_threads_leave( );
+    }
+
+    return FALSE;
+}
+
+/* this is invoked in the libtransmission thread */
 static void
 testing_port_done( tr_session * session        UNUSED,
                    long          response_code UNUSED,
@@ -1240,11 +1258,10 @@ testing_port_done( tr_session * session        UNUSED,
     if( *data->alive )
     {
         const int isOpen = response_len && *(char*)response == '1';
-        gdk_threads_enter( );
-        gtk_label_set_markup( GTK_LABEL( data->label ), isOpen
-                             ? _( "Port is <b>open</b>" )
-                             : _( "Port is <b>closed</b>" ) );
-        gdk_threads_leave( );
+        g_snprintf( data->text, sizeof( data->text ), isOpen 
+                    ? _( "Port is <b>open</b>" )
+                    : _( "Port is <b>closed</b>" ) );
+        g_idle_add( testing_port_done_idle, data );
     }
 }
 
@@ -1255,14 +1272,11 @@ testing_port_begin( gpointer gdata )
 
     if( *data->alive )
     {
-        GtkSpinButton * spin = g_object_get_data( G_OBJECT(
-                                                      data->label ),
-                                                  "tr-port-spin" );
-        tr_session *     session = g_object_get_data( G_OBJECT(
-                                                        data->label ),
-                                                    "session" );
-        const int       port = gtk_spin_button_get_value_as_int( spin );
         char            url[256];
+        GObject       * o       = G_OBJECT( data->label );
+        GtkSpinButton * spin    = g_object_get_data( o, "tr-port-spin" );
+        tr_session    * session = g_object_get_data( o, "session" );
+        const int       port    = gtk_spin_button_get_value_as_int( spin );
         g_snprintf( url, sizeof( url ),
                     "http://portcheck.transmissionbt.com/%d",
                     port );
