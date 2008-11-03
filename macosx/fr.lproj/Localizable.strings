@@ -1,14 +1,12 @@
 ﻿/* Inspector -> Activity tab -> progress */
 "%.2f%% (%.2f%% selected)" = "%1$.2f%% (%2$.2f%% sélectionnés)";
 
-/* Inspector -> Files tab -> file status string */
-"%.2f%% of %@" = "%1$.2f%% sur %2$@";
-
 /* Prefs -> blocklist -> message */
 "%@ IP address rules in list" = "%@ adresses IP dans la liste";
 
 /* Blocklist -> message
    Torrent -> progress string */
+
 
 "%@ of %@" = "%1$@ sur %2$@";
 
@@ -286,13 +284,13 @@
 /* Drag overlay -> file */
 "Create a Torrent File" = "Créer un fichier torrent";
 
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "Créer fichier torrent";
+
 /* Create torrent -> select file
    Create toolbar item -> palette label */
 
 "Create Torrent File" = "Créer Fichier Torrent";
-
-/* Create toolbar item -> tooltip */
-"Create torrent file" = "Créer fichier torrent";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "La création de \"%@\" a échoué.";
@@ -302,9 +300,6 @@
 
 /* Inspector -> peer -> status */
 "Currently uploading (interested and not choked)" = "En envoi (intéressé et pas choqué)";
-
-/* Torrent -> eta string */
-"data not fully available" = "données partiellement disponibles";
 
 /* Message window -> table column */
 "Date" = "Date";
@@ -465,6 +460,9 @@
 /* File size - kilobytes */
 "KB" = "Ko";
 
+/* Prefs -> blocklist -> message */
+"Last updated" = "Dernière mise à jour";
+
 /* About window -> license button */
 "License" = "Licence";
 
@@ -497,10 +495,14 @@
 /* No Ratio
    Inspector -> Peers tab -> table row tooltip */
 
+
 "N/A" = "N/A";
 
 /* Preferences -> toolbar item title */
 "Network" = "Réseau";
+
+/* Prefs -> blocklist -> message */
+"Never" = "Jamais";
 
 /* Group table row */
 "No Group" = "Aucun Groupe";
@@ -572,11 +574,11 @@
 /* Open address toolbar item -> palette label */
 "Open Torrent Address" = "Ouvrir le torrent à l'adresse";
 
-/* Open toolbar item -> palette label */
-"Open Torrent Files" = "Ouvrir des fichiers torrents";
-
 /* Open toolbar item -> tooltip */
 "Open torrent files" = "Ouvre des fichiers torrents";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "Ouvrir des fichiers torrents";
 
 /* Open address toolbar item -> tooltip */
 "Open torrent web address" = "Ouvre le torrent à l'adresse";
@@ -626,7 +628,7 @@
 "Port" = "Port";
 
 /* Preferences -> Network -> port status */
-"Port check website is down" = "Le site de vérification est indisponible";
+"Port check site is down" = "Le site de vérif. est indisponible";
 
 /* Preferences -> Network -> port status */
 "Port is closed" = "Le port est fermé";
@@ -920,7 +922,7 @@
 "This transfer is active. Once removed, continuing the transfer will require the torrent file." = "Ce transfert est actif. Une fois enlevé, la reprise de ce transfert nécessitera le fichier torrent.";
 
 /* Stats reset -> message */
-"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be effected." = "Ceci effacera les statistiques globales affichées apr Transmission. Les statistiques individuelles ne seront pas affectées.";
+"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Ceci effacera les statistiques globales de Transmission. Les statistiques individuelles de transfert ne seront pas affectées.";
 
 /* Inspector -> tracker table */
 "Tier %d" = "%d tier";
@@ -965,9 +967,6 @@
 
 /* Transmission already running alert -> title */
 "Transmission is already running." = "Transmission est déja lancé.";
-
-/* Inspector -> torrent location */
-"Transmission Support Folder" = "Dossier Support de Transmission";
 
 /* Torrent -> status string
    status bar -> status label */
