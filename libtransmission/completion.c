@@ -303,13 +303,19 @@ tr_cpGetStatus( const tr_completion * cp )
 uint64_t
 tr_cpHaveValid( const tr_completion * cp )
 {
-    uint64_t           b = 0;
-    tr_piece_index_t   i;
-    const tr_torrent * tor = cp->tor;
+    uint64_t                  b = 0;
+    tr_piece_index_t          i;
+    const tr_torrent        * tor            = cp->tor;
+    const uint64_t            pieceSize      = tor->info.pieceSize;
+    const uint64_t            lastPieceSize  = tor->lastPieceSize;
+    const tr_piece_index_t    lastPiece      = tor->info.pieceCount - 1;
 
-    for( i = 0; i < tor->info.pieceCount; ++i )
+    for( i=0; i!=lastPiece; ++i )
         if( tr_cpPieceIsComplete( cp, i ) )
-            b += tr_torPieceCountBytes( tor, i );
+            b += pieceSize;
+
+    if( tr_cpPieceIsComplete( cp, lastPiece ) )
+        b += lastPieceSize;
 
     return b;
 }

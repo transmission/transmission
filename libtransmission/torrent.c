@@ -99,8 +99,9 @@ tr_torrentFindFromHash( tr_handle *     handle,
     tr_torrent * tor = NULL;
 
     while( ( tor = tr_torrentNext( handle, tor ) ) )
-        if( !memcmp( tor->info.hash, torrentHash, SHA_DIGEST_LENGTH ) )
-            return tor;
+        if( *tor->info.hash == *torrentHash )
+            if( !memcmp( tor->info.hash, torrentHash, SHA_DIGEST_LENGTH ) )
+                return tor;
 
     return NULL;
 }
