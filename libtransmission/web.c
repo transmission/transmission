@@ -194,13 +194,11 @@ remove_finished_tasks( tr_web * g )
     {
         CURLMsg * msg;
         int msgs_left;
-        CURLcode res;
 
         easy = NULL;
         while(( msg = curl_multi_info_read( g->multi, &msgs_left ))) {
             if( msg->msg == CURLMSG_DONE ) {
                 easy = msg->easy_handle;
-                res = msg->data.result;
                 break;
             }
         }
@@ -404,13 +402,17 @@ sock_cb( CURL            * e UNUSED,
  * set ... (but) you must not wait too long (more than a few seconds perhaps)
  * before you call curl_multi_perform() again."  */
 static void
-multi_timer_cb( CURLM *multi UNUSED, long timer_ms, void * g )
+multi_timer_cb( CURLM *multi UNUSED, long timer_ms, void * vg )
 {
+    tr_web * g = vg;
+
     if( timer_ms < 1 ) {
         if( timer_ms == 0 ) /* call it immediately */
             timer_cb( 0, 0, g );
         timer_ms = DEFAULT_TIMER_MSEC;
     }
+
+    g->timer_ms = timer_ms;
     restart_timer( g );
 }
 
