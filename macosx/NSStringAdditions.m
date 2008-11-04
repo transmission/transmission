@@ -112,14 +112,14 @@
     return [NSString timeString: seconds showSeconds: showSeconds maxFields: NSUIntegerMax];
 }
 
-+ (NSString *) timeString: (NSUInteger) seconds showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max
++ (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max
 {
     NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 4)];
     NSUInteger remaining = seconds;
     
     if (max > 0 && seconds >= (24 * 60 * 60))
     {
-        NSInteger days = remaining / (24 * 60 * 60);
+        NSUInteger days = remaining / (24 * 60 * 60);
         if (days == 1)
             [timeArray addObject: NSLocalizedString(@"1 day", "time string")];
         else

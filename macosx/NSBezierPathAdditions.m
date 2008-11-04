@@ -27,17 +27,17 @@
 
 @implementation NSBezierPath (NSBezierPathAdditions)
 
-+ (NSBezierPath *) bezierPathWithRoundedRect: (NSRect) rect radius: (float) radius
++ (NSBezierPath *) bezierPathWithRoundedRect: (NSRect) rect radius: (CGFloat) radius
 {
     if ([NSApp isOnLeopardOrBetter])
         return [self bezierPathWithRoundedRect: rect xRadius: radius yRadius: radius];
     
-    float minX = NSMinX(rect),
-        minY = NSMinY(rect),
-        maxX = NSMaxX(rect),
-        maxY = NSMaxY(rect),
-        midX = NSMidX(rect),
-        midY = NSMidY(rect);
+    CGFloat minX = NSMinX(rect),
+            minY = NSMinY(rect),
+            maxX = NSMaxX(rect),
+            maxY = NSMaxY(rect),
+            midX = NSMidX(rect),
+            midY = NSMidY(rect);
     
     NSBezierPath * bp = [NSBezierPath bezierPath];
     [bp moveToPoint: NSMakePoint(maxX, midY)];

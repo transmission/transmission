@@ -26,6 +26,6 @@
 
 @interface NSBezierPath (NSBezierPathAdditions)
 
-+ (NSBezierPath *) bezierPathWithRoundedRect: (NSRect) rect radius: (float) radius;
++ (NSBezierPath *) bezierPathWithRoundedRect: (NSRect) rect radius: (CGFloat) radius;
 
 @end

@@ -34,12 +34,12 @@
 
 + (NSString *) chooseFile;
 - (void) updateEnableOpenCheckForTrackers;
-- (void) locationSheetClosed: (NSSavePanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
+- (void) locationSheetClosed: (NSSavePanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) info;
 
-- (void) createBlankAddressAlertDidEnd: (NSAlert *) alert returnCode: (int) returnCode contextInfo: (void *) contextInfo;
+- (void) createBlankAddressAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo;
 - (void) createReal;
 - (void) checkProgress;
-- (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info;
+- (void) failureSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info;
 
 @end
 
@@ -299,7 +299,7 @@
         [fTrackers addObject: @""];
         [fTrackerTable reloadData];
         
-        int row = [fTrackers count] - 1;
+        NSInteger row = [fTrackers count] - 1;
         [fTrackerTable selectRow: row byExtendingSelection: NO];
         [fTrackerTable editColumn: 0 row: row withEvent: nil select: YES];
     }
@@ -363,7 +363,7 @@
     [fOpenCheck setState: (fOpenTorrent && hasTracker) ? NSOnState : NSOffState];
 }
 
-- (void) locationSheetClosed: (NSSavePanel *) panel returnCode: (int) code contextInfo: (void *) info
+- (void) locationSheetClosed: (NSSavePanel *) panel returnCode: (NSInteger) code contextInfo: (void *) info
 {
     if (code == NSOKButton)
     {
@@ -375,7 +375,7 @@
     }
 }
 
-- (void) createBlankAddressAlertDidEnd: (NSAlert *) alert returnCode: (int) returnCode contextInfo: (void *) contextInfo
+- (void) createBlankAddressAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
     if (([NSApp isOnLeopardOrBetter] ? [[alert suppressionButton] state] == NSOnState : returnCode == NSAlertThirdButtonReturn))
         [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningCreatorBlankAddress"];
@@ -392,7 +392,7 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath: fLocation])
     {
         NSArray * pathComponents = [fLocation pathComponents];
-        int count = [pathComponents count];
+        NSInteger count = [pathComponents count];
         
         NSAlert * alert = [[[NSAlert alloc] init] autorelease];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> file already exists warning -> button")];
@@ -505,7 +505,7 @@
     }
 }
 
-- (void) failureSheetClosed: (NSAlert *) alert returnCode: (int) code contextInfo: (void *) info
+- (void) failureSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info
 {
     [[alert window] orderOut: nil];
     [[self window] close];

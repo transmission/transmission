@@ -30,12 +30,12 @@
 {
     if ((self = [super initWithCoder: coder]))
     {
-        fCount = -1;
+        fCount = NSNotFound;
     }
     return self;
 }
 
-- (void) setCount: (NSInteger) count
+- (void) setCount: (NSUInteger) count
 {
     if (count == fCount)
         return;

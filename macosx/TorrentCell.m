@@ -393,7 +393,7 @@
             groupRect.size.height--;
             groupRect.origin.y--;
         }
-        CGFloat radius = minimal ? 3.0f : 6.0f;
+        const CGFloat radius = minimal ? 3.0f : 6.0f;
         
         NSColor * groupColor = [[GroupsController groups] colorForIndex: groupValue],
                 * darkGroupColor = [groupColor blendedColorWithFraction: 0.2f ofColor: [NSColor whiteColor]];
