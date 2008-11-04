@@ -38,7 +38,7 @@
 enum
 {
     /* How frequently to reallocate peer bandwidth. */
-    BANDWIDTH_PULSES_PER_SECOND = 8,
+    BANDWIDTH_PULSES_PER_SECOND = 4,
 
     /* HOw many pulses to remember for averaging the current speed */
     BANDWIDTH_PULSE_HISTORY = ( BANDWIDTH_PULSES_PER_SECOND * 2 )
