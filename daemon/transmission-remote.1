@@ -170,7 +170,7 @@ Enable peer exchange (PEX).
 .It Fl X Fl -no-pex
 Disable peer exchange (PEX).
 
-.It Fl x Fl -peers
+.It Fl z Fl -peers
 List the current torrent's connected peers.
 In the `status' section of the list, the following shorthand is used:
 .D1 D: Downloading from this peer
@@ -220,27 +220,27 @@ $ transmission-remote -a ~/Desktop/*torrent
 
 Get detailed information on the torrent whose ID is '1':
 .Bd -literal -offset indent
-$ transmission-remote -t1 -i"
+$ transmission-remote -t1 -i
 .Ed
 
 Get a list of a torrent's files:
 .Bd -literal -offset indent
-$ transmission-remote -t1 -l"
+$ transmission-remote -t1 -l
 .Ed
 
 Download only its second and fourth files:
 .Bd -literal -offset indent
-$ transmission-remote -t1 -Gall -g2,4"
+$ transmission-remote -t1 -Gall -g2,4
 .Ed
 
 Set all torrents' first two files' priorities to high:
 .Bd -literal -offset indent
-$ transmission-remote -tall -ph1,2"
+$ transmission-remote -tall -ph1,2
 .Ed
 
 Set all torrents' files' priorities to normal:
 .Bd -literal -offset indent
-$ transmission-remote -tall -pnall"
+$ transmission-remote -tall -pnall
 .Ed
 
 .Sh AUTHORS

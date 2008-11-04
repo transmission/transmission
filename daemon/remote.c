@@ -442,6 +442,7 @@ readargs( int           argc,
             case 'z':
                 tr_bencDictAddStr( &top, "method", "torrent-get" );
                 tr_bencDictAddInt( &top, "tag", TAG_PEERS );
+                addIdArg( args, id );
                 fields = tr_bencDictAddList( args, "fields", 1 );
                 tr_bencListAddStr( fields, "peers" );
                 break;
@@ -929,32 +930,48 @@ printFileList( tr_benc * top )
 }
 
 static void
-printPeerList( tr_benc * top )
+printPeersImpl( tr_benc * peers )
 {
-    tr_benc *args, *list;
+    int i, n;
+    printf( "%-20s  %-12s  %-6s  %-6s  %s\n",
+            "Address", "Flags", "Down", "Up", "Client" );
+    for( i = 0, n = tr_bencListSize( peers ); i < n; ++i )
+    {
+        const char * address, * client, * flagstr;
+        int64_t      rateToClient, rateToPeer;
+        tr_benc *    d = tr_bencListChild( peers, i );
+        if( tr_bencDictFindStr( d, "address", &address )
+          && tr_bencDictFindStr( d, "clientName", &client )
+          && tr_bencDictFindStr( d, "flagStr", &flagstr )
+          && tr_bencDictFindInt( d, "rateToClient", &rateToClient )
+          && tr_bencDictFindInt( d, "rateToPeer", &rateToPeer ) )
+        {
+            printf( "%-20s  %-12s  %6.1f  %6.1f  %s\n",
+                    address, flagstr,
+                    rateToClient / 1024.0,
+                    rateToPeer / 1024.0,
+                    client );
+        }
+    }
+}
 
-    if( ( tr_bencDictFindDict( top, "arguments", &args ) )
-      && ( tr_bencDictFindList( args, "peers", &list ) ) )
+static void
+printPeers( tr_benc * top )
+{
+    tr_benc *args, *torrents;
+
+    if( tr_bencDictFindDict( top, "arguments", &args )
+      && tr_bencDictFindList( args, "torrents", &torrents ) )
     {
         int i, n;
-        printf( "%-20s  %-12s  %-5s  %5s  %s\n",
-                "Address", "Flags", "Down", "Up", "Client" );
-        for( i = 0, n = tr_bencListSize( list ); i < n; ++i )
+        for( i=0, n=tr_bencListSize( torrents ); i<n; ++i )
         {
-            const char * address, * client, * flagstr;
-            int64_t      rateToClient, rateToPeer;
-            tr_benc *    d = tr_bencListChild( list, i );
-            if( tr_bencDictFindStr( d, "address", &address )
-              && tr_bencDictFindStr( d, "client", &client )
-              && tr_bencDictFindStr( d, "flagstr", &flagstr )
-              && tr_bencDictFindInt( d, "rateToClient", &rateToClient )
-              && tr_bencDictFindInt( d, "rateToPeer", &rateToPeer ) )
-            {
-                printf( "%-20s  %-12s  %5.1f  %5.1f  %s\n",
-                        address, flagstr,
-                        rateToClient * 1024.0,
-                        rateToPeer * 1024.0,
-                        client );
+            tr_benc * peers;
+            tr_benc * torrent = tr_bencListChild( torrents, i );
+            if( tr_bencDictFindList( torrent, "peers", &peers ) ) {
+                printPeersImpl( peers );
+                if( i+1<n )
+                    printf( "\n" );
             }
         }
     }
@@ -1046,7 +1063,7 @@ processResponse( const char * host,
                 printTorrentList( &top ); break;
 
             case TAG_PEERS:
-                printPeerList( &top ); break;
+                printPeers( &top ); break;
 
             default:
                 if( tr_bencDictFindStr( &top, "result", &str ) )
@@ -1091,7 +1108,7 @@ processRequests( const char *  host,
         CURLcode res;
         curl_easy_setopt( curl, CURLOPT_POSTFIELDS, reqs[i] );
         if( debug )
-            tr_ninf( MY_NAME, "posting [%s]\n", reqs[i] );
+            fprintf( stderr, "posting [%s]\n", reqs[i] );
         if( ( res = curl_easy_perform( curl ) ) )
             tr_nerr( MY_NAME, "(%s:%d) %s", host, port,
                     curl_easy_strerror( res ) );
