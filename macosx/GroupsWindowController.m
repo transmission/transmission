@@ -82,7 +82,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
     GroupsController * groupsController = [GroupsController groups];
-    int groupsIndex = [groupsController indexForRow: row];
+    NSInteger groupsIndex = [groupsController indexForRow: row];
     
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Color"])
@@ -126,7 +126,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 }
 
 - (NSDragOperation) tableView: (NSTableView *) tableView validateDrop: (id <NSDraggingInfo>) info
-    proposedRow: (int) row proposedDropOperation: (NSTableViewDropOperation) operation
+    proposedRow: (NSInteger) row proposedDropOperation: (NSTableViewDropOperation) operation
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: GROUP_TABLE_VIEW_DATA_TYPE])
@@ -138,7 +138,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     return NSDragOperationNone;
 }
 
-- (BOOL) tableView: (NSTableView *) tableView acceptDrop: (id <NSDraggingInfo>) info row: (int) newRow
+- (BOOL) tableView: (NSTableView *) tableView acceptDrop: (id <NSDraggingInfo>) info row: (NSInteger) newRow
     dropOperation: (NSTableViewDropOperation) operation
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];

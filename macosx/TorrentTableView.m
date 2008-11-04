@@ -523,7 +523,7 @@
 //option-command-f will focus the filter bar's search field
 - (void) keyDown: (NSEvent *) event
 {
-    unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
+    const unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
     
     if (firstChar == 'f' && [event modifierFlags] & NSAlternateKeyMask && [event modifierFlags] & NSCommandKeyMask)
         [fController focusFilterField];
