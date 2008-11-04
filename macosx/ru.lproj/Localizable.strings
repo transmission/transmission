@@ -1,14 +1,13 @@
 ﻿/* Inspector -> Activity tab -> progress */
 "%.2f%% (%.2f%% selected)" = "%1$.2f%% (%2$.2f%% выбранного)";
 
-/* Inspector -> Files tab -> file status string */
-"%.2f%% of %@" = "%1$.2f%% из %2$@";
-
 /* Prefs -> blocklist -> message */
-"%@ IP address rules in list" = "%@ IP-адресов в списке";
+"%@ IP address rules in list" = "%@ IP адресов в списке";
 
-/* Blocklist -> message
+/* Inspector -> Files tab -> file status string
+   Blocklist -> message
    Torrent -> progress string */
+
 
 "%@ of %@" = "%1$@ из %2$@";
 
@@ -35,7 +34,7 @@
 "%@, %@ each" = "%1$@, %2$@ каждая";
 
 /* Inspector -> Peers tab -> peers */
-"%d cache" = "%d кеш";
+"%d cache" = "%d в кеше";
 
 /* Inspector -> Peers tab -> peers */
 "%d Connected" = "%d подключено";
@@ -71,7 +70,7 @@
 "%d Seeding" = "%d раздается";
 
 /* Drag overlay -> torrents */
-"%d Torrent Files" = "%d файлов";
+"%d Torrent Files" = "%d торрент-файлов";
 
 /* Inspector -> selected torrents */
 "%d Torrents Selected" = "%d торрентов выбрано";
@@ -147,7 +146,7 @@
 "A blocklist must first be downloaded" = "Необходимо скачать черный список";
 
 /* Create torrent -> file already exists warning -> warning */
-"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "Файл с именем «%1$@» уже есть в папке «%2$@». Выберите новое имя или местоположение, чтобы создать торрент-файл.";
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "Файл с именем «%1$@» уже есть в папке «%2$@». Выберите новое имя или местоположение чтобы создать торрент-файл.";
 
 /* Move inside itself alert -> title */
 "A folder cannot be moved to inside itself." = "Папка не может быть перемещена внутрь себя.";
@@ -295,16 +294,13 @@
 "Create torrent file" = "Создать торрент-файл";
 
 /* Create torrent -> failed -> title */
-"Creation of \"%@\" failed." = "Ошибка во время создания «%@»";
+"Creation of \"%@\" failed." = "При создании «%@» произошла ошибка.";
 
 /* Inspector -> peer -> status */
 "Currently downloading (interested and not choked)" = "Скачиваю (заинтересован и открыт)";
 
 /* Inspector -> peer -> status */
 "Currently uploading (interested and not choked)" = "Раздаю (заинтересован и открыт)";
-
-/* Torrent -> eta string */
-"data not fully available" = "часть данных недоступна";
 
 /* Message window -> table column */
 "Date" = "Дата";
@@ -465,6 +461,9 @@
 /* File size - kilobytes */
 "KB" = "КБ";
 
+/* Prefs -> blocklist -> message */
+"Last updated" = "Последнее обновление";
+
 /* About window -> license button */
 "License" = "Лицензия";
 
@@ -494,13 +493,18 @@
 /* files tab -> tooltip */
 "Multiple Priorities" = "Разные приоритеты";
 
-/* No Ratio
+/* Prefs -> blocklist -> message
+   No Ratio
    Inspector -> Peers tab -> table row tooltip */
 
-"N/A" = "Недоступен";
+
+"N/A" = "Нет данных";
 
 /* Preferences -> toolbar item title */
 "Network" = "Сеть";
+
+/* Prefs -> blocklist -> message */
+"Never" = "Никогда";
 
 /* Group table row */
 "No Group" = "✕";
@@ -572,11 +576,11 @@
 /* Open address toolbar item -> palette label */
 "Open Torrent Address" = "Открыть торрент по адресу";
 
-/* Open toolbar item -> palette label */
-"Open Torrent Files" = "Открыть торрент-файл";
-
 /* Open toolbar item -> tooltip */
 "Open torrent files" = "Открыть торрент-файл";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "Открыть торрент-файл";
 
 /* Open address toolbar item -> tooltip */
 "Open torrent web address" = "Открыть торрент по URL";
@@ -612,10 +616,10 @@
 "Paused" = "Приостановлено";
 
 /* Inspector -> peer -> status */
-"Peer is unchoking you, but you are not interested" = "Пользователь разрешает вам скачивать, но вы не заинтересованы";
+"Peer is unchoking you, but you are not interested" = "Имеющиеся у пользователя части торрента вас не интересуют";
 
 /* Inspector -> peer -> status */
-"Peer wants you to upload, but you do not want to (interested and choked)" = "Пользователь ждет вашей раздачи, однако вы не отправляете данные (заинтересованы и закрыты)";
+"Peer wants you to upload, but you do not want to (interested and choked)" = "Пользователь заинтересован в имеющихся у вас частях торрента, но вы его блокируете";
 
 /* Inspector -> title
    Preferences -> toolbar item title */
@@ -626,7 +630,7 @@
 "Port" = "Порт";
 
 /* Preferences -> Network -> port status */
-"Port check website is down" = "Ошибка при проверке порта";
+"Port check site is down" = "Сайт проверки порта недоступен";
 
 /* Preferences -> Network -> port status */
 "Port is closed" = "Порт закрыт";
@@ -752,11 +756,11 @@
 /* Torrent -> status string */
 "Seeding" = "Раздаю";
 
-/* Torrent -> status string */
-"Seeding complete" = "Раздача завершена";
-
 /* Growl notification title */
 "Seeding Complete" = "Раздача завершена";
+
+/* Torrent -> status string */
+"Seeding complete" = "Раздача завершена";
 
 /* Torrent -> status string */
 "Seeding to %d of %d peers" = "Раздаю к %1$d из %2$d пользователей";
@@ -857,7 +861,7 @@
 /* Move error alert -> message
    Move inside itself alert -> message */
 
-"The move operation of \"%@\" cannot be done." = "Перемещение «%@» не может быть выполнено.";
+"The move operation of \"%@\" cannot be done." = "Не могу переместить «%@».";
 
 /* Torrent download failed -> message */
 "The torrent could not be downloaded from %@: %@." = "Торрент не может быть скачан из %1$@: %2$@.";
@@ -881,7 +885,7 @@
 "The tracker address is part of the torrent file. Once removed, Transmission will no longer attempt to contact it." = "Адрес трекера является частью торрент-файла. После его удаления Transmission больше не сможет работать с ним.";
 
 /* Torrent disk space alert -> message */
-"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Передача будет приостановлена. Освободите место на диске %@ или отмените скачивание нескольких файлов в инспекторе.";
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Передача будет приостановлена. Освободите место на диске %@ или отмените скачивание нескольких файлов в Инспекторе.";
 
 /* Confirm Quit panel -> message */
 "There are %d active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "%d активных раздач будут приостановлены. При следующем запуске они будут автоматически возобновлены.";
@@ -893,7 +897,7 @@
 "There are %d transfers (%d active)." = "%1$d раздач (%2$d активных).";
 
 /* Transmission already running alert -> message */
-"There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Другая копия Transmission уже запущена. Эта копия не может быть запущена, пока не будет завершена существующая.";
+"There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Transmission уже запущен. Новая копия не может быть запущена, пока не будет завершена существующая.";
 
 /* Confirm Quit panel -> message */
 "There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Активная раздача будет приостановлена. При следующем запуске она будет автоматически возобновлена.";
@@ -908,7 +912,7 @@
 "There was a problem creating the file \"%@\"." = "Ошибка во время создания «%@».";
 
 /* Move error alert -> title */
-"There was an error moving the data file." = "Ошибка при перемещении данных.";
+"There was an error moving the data file." = "При перемещении данных произошла ошибка.";
 
 /* Remove built-in tracker alert -> message */
 "These tracker addresses are part of the torrent file. Once removed, Transmission will no longer attempt to contact them." = "Адреса трекеров является частью торрент-файла. После их удаления Transmission больше не сможет работать с ними.";
@@ -917,13 +921,13 @@
 "This folder contains no files." = "Эта папка не содержит файлов.";
 
 /* Removal confirm panel -> message */
-"This transfer is active. Once removed, continuing the transfer will require the torrent file." = "Раздача активна. Для восстановления удаленной раздачи потребуется наличие торрент-файла.";
+"This transfer is active. Once removed, continuing the transfer will require the torrent file." = "Раздача активна. Для восстановления удаленной раздачи потребуется оригинальный торрент-файл.";
 
 /* Stats reset -> message */
-"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be effected." = "Будет очищена общая статистика Transmission. Статистика отдельных раздач не будет затронута.";
+"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Общая статистика Transmission будет сброшена. Статистика индивидуальных раздач сохранится.";
 
 /* Inspector -> tracker table */
-"Tier %d" = "Связка %d";
+"Tier %d" = "%d уровень";
 
 /* Filter toolbar item -> palette label */
 "Toggle Filter" = "Показать/скрыть фильтр";
@@ -935,7 +939,7 @@
 "Toggle the filter bar" = "Показать/скрыть панель фильтра";
 
 /* Inspector toolbar item -> tooltip */
-"Toggle the torrent inspector" = "Показать/скрыть инспектор торрента";
+"Toggle the torrent inspector" = "Показать/скрыть Инспектор торрента";
 
 /* Torrent download error -> title
    Download not a torrent -> title */
@@ -952,7 +956,7 @@
 "Total download speed" = "Общая скорость скачивания";
 
 /* stats total */
-"Total N/A" = "Неизвестно";
+"Total N/A" = "Нет данных";
 
 /* Status Bar -> speed tooltip */
 "Total upload speed" = "Общая скорость раздачи";
@@ -1017,7 +1021,7 @@
 "Yellow" = "Желтая";
 
 /* Inspector -> peer -> status */
-"You unchoked the peer, but the peer is not interested" = "Вы дали разрешение пользователю, но он не заинтересован";
+"You unchoked the peer, but the peer is not interested" = "Пользователь не заинтересован в имеющихся у вас частях торрента";
 
 /* Inspector -> peer -> status */
-"You want to download, but peer does not want to send (interested and choked)" = "Вы желаете скачивать, но пользователь не отправляет данные (заинтересован и закрыт)";
+"You want to download, but peer does not want to send (interested and choked)" = "Вы заинтересованы в имеющихся у пользователя частях торрента, но он вас блокирует";
