@@ -31,7 +31,6 @@
 #include "peer-mgr-private.h"
 #include "peer-msgs.h"
 #include "ptrarray.h"
-#include "stats.h" /* tr_statsAddDownloaded */
 #include "torrent.h"
 #include "trevent.h"
 #include "utils.h"
@@ -1008,7 +1007,6 @@ peerCallbackFunc( void * vpeer,
             tr_torrent * tor = t->tor;
             tor->activityDate = now;
             tor->uploadedCur += e->length;
-            tr_statsAddUploaded( tor->session, e->length );
             if( peer )
             {
                 struct peer_atom * a = getExistingAtom( t, &peer->in_addr );
@@ -1030,7 +1028,6 @@ peerCallbackFunc( void * vpeer,
              * into the jurisdiction of the tracker." */
             if( peer )
                 tor->downloadedCur += e->length;
-            tr_statsAddDownloaded( tor->session, e->length );
             if( peer ) {
                 struct peer_atom * a = getExistingAtom( t, &peer->in_addr );
                 a->piece_data_time = now;

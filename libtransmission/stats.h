@@ -13,16 +13,16 @@
 #ifndef TR_STATS_H
 #define TR_STATS_H
 
-void tr_statsInit( tr_handle * handle );
+void tr_statsInit           ( tr_session  * session );
 
-void tr_statsClose( tr_handle * handle );
+void tr_statsClose          ( tr_session  * session );
 
-void tr_statsAddUploaded( tr_handle * handle,
-                          uint32_t    bytes );
+void tr_statsAddUploaded    ( tr_session  * session,
+                              uint32_t      bytes );
 
-void tr_statsAddDownloaded( tr_handle * handle,
-                            uint32_t    bytes );
+void tr_statsAddDownloaded  ( tr_session  * session,
+                              uint32_t      bytes );
 
-void tr_statsFileCreated( tr_handle * handle );
+void tr_statsFileCreated    ( tr_session  * session );
 
 #endif
