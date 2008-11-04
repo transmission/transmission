@@ -30,7 +30,6 @@
 #include "net.h"
 #include "peer-io.h"
 #include "ratecontrol.h"
-#include "stats.h"  /* tr_statsAddUploaded(), tr_statsAddDownloaded() */
 #include "trevent.h"
 #include "utils.h"
 
@@ -182,7 +181,6 @@ didWriteWrapper( struct bufferevent * e,
         b->bytesLeft -= MIN( b->bytesLeft, (size_t)n );
         b->bytesUsed += n;
         tr_rcTransferred( io->speedometer[TR_UP], n );
-        tr_statsAddUploaded( io->session, n );
         dbgmsg( io,
                 "wrote %zu bytes to peer... upload bytesLeft is now %zu",
                 n,
@@ -215,7 +213,6 @@ canReadWrapper( struct bufferevent * e,
         b->bytesLeft -= MIN( b->bytesLeft, (size_t)n );
         b->bytesUsed += n;
         tr_rcTransferred( io->speedometer[TR_DOWN], n );
-        tr_statsAddDownloaded( io->session, n );
         dbgmsg( io,
                 "%zu new input bytes. bytesUsed is %zu, bytesLeft is %zu",
                 n, b->bytesUsed,
