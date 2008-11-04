@@ -3,12 +3,12 @@ dnl STATUS: "X" for prerelease test builds,
 dnl         "Z" for unsupported trunk builds,
 dnl         "0" for stable, supported releases
 dnl these should be the only two lines you need to change
-USERAGENT_PREFIX="1.40b1"
-PEERID_PREFIX="-TR140X-"
+m4_define([user_agent_prefix],1.40b1)
+m4_define([peer_id_prefix],-TR140X-)
 
-AC_INIT([transmission],[$USERAGENT_PREFIX],[http://trac.transmissionbt.com/newticket])
-AC_SUBST(USERAGENT_PREFIX,[$USERAGENT_PREFIX])
-AC_SUBST(PEERID_PREFIX,[$PEERID_PREFIX])
+AC_INIT([transmission],[user_agent_prefix],[http://trac.transmissionbt.com/newticket])
+AC_SUBST(USERAGENT_PREFIX,[user_agent_prefix])
+AC_SUBST(PEERID_PREFIX,[peer_id_prefix])
 
 AC_CONFIG_MACRO_DIR([m4])
 
