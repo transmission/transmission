@@ -397,7 +397,7 @@ desktopPage( GObject * core )
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Options" ) );
 
-    s = _( "_Inhibit desktop hibernation when torrents are active" );
+    s = _( "Inhibit desktop _hibernation when torrents are active" );
     w = new_check_button( s, PREF_KEY_INHIBIT_HIBERNATION, core );
     hig_workarea_add_wide_control( t, &row, w );
 
