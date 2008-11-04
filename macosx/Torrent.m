@@ -941,7 +941,9 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     if (stopRatio == INVALID || ratio >= stopRatio)
         return TR_ETA_UNKNOWN;
     
-    return (CGFloat)MAX([self downloadedTotal], [self haveTotal]) * (stopRatio - ratio) / uploadRate / 1024.0;
+    CGFloat haveDownloaded = (CGFloat)([self downloadedTotal] > 0 ? [self downloadedTotal] : [self haveVerified]);
+    CGFloat needUploaded = haveDownloaded * (stopRatio - ratio);
+    return needUploaded / uploadRate / 1024.0;
 }
 
 - (CGFloat) notAvailableDesired
