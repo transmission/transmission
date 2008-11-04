@@ -1,34 +1,24 @@
-AC_PREREQ(2.54)
+dnl convention: -TR MAJOR MINOR MAINT STATUS - (each a single char)
+dnl STATUS: "X" for prerelease test builds,
+dnl         "Z" for unsupported trunk builds,
+dnl         "0" for stable, supported releases
+dnl these should be the only two lines you need to change
+USERAGENT_PREFIX="1.40b1"
+PEERID_PREFIX="-TR140X-"
 
-m4_define([tr_version_major], [1])
-m4_define([tr_version_minor], [34])
-m4_define([tr_version_suffix], [+])
-m4_define([tr_version], [tr_version_major.tr_version_minor])
-
-AC_INIT([Transmission], [tr_version], [http://trac.transmissionbt.com/newticket], [transmission])
-AC_CONFIG_MACRO_DIR([m4])
-
-TR_VERSION_MAJOR=tr_version_major
-TR_VERSION_MINOR=tr_version_minor
-TR_VERSION_SUFFIX=tr_version_suffix
-TR_VERSION=tr_version
-
-dnl Someone still needs to hook this up to the system above
-PEERID_PREFIX="-TR134Z-"
-
-USERAGENT_PREFIX=$TR_VERSION$TR_VERSION_SUFFIX
-
-AC_SUBST(PEERID_PREFIX,[$PEERID_PREFIX])
+AC_INIT([transmission],[$USERAGENT_PREFIX],[http://trac.transmissionbt.com/newticket])
 AC_SUBST(USERAGENT_PREFIX,[$USERAGENT_PREFIX])
+AC_SUBST(PEERID_PREFIX,[$PEERID_PREFIX])
+
+AC_CONFIG_MACRO_DIR([m4])
 
 dnl AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SRCDIR(libtransmission/transmission.h)
 AM_INIT_AUTOMAKE([1.9 tar-ustar])
 AC_PROG_LIBTOOL
 
-if test "x$TR_VERSION_SUFFIX" = "x+"; then
-  AC_DEFINE(TR_UNSTABLE, 1,
-            [Define to 1 if this is an unstable version of Transmission])
+if test "x${PEERID_PREFIX: -2:1}" = "xZ"; then
+  AC_DEFINE(TR_UNSTABLE, 1, [Define to 1 if this is an unstable version of Transmission])
   TR_UNSTABLE=yes
 fi
 AM_CONDITIONAL(TR_UNSTABLE, test "x$TR_UNSTABLE" = "xyes")
