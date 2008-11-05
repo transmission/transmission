@@ -18,10 +18,15 @@
 				<tr>
 					<td>
 						<ul>
-						<li>Don't reconnect too frequently to the same peer</li>
-						<li>Webseed bugfix</li>
-						<li>Fix bug that caused some transfers to not be scraped</li>
-						<li>Handle OpenTracker's `downloaded' key in announce responses</li>
+						<li>Tracker communication uses fewer resources</li>
+						<li>More accurate bandwidth management</li>
+						<li>Bandwidth displays now include BitTorrent protocol overhead</li>
+						<li>Stability, security, and performance improvements to the RPC/Web UI server</li>
+						<li>Support compression when serving Web UI and RPC responses</li>
+						<li>Simplify the RPC whitelist</li>
+						<li>Fix bug that prevented handshakes with encrypted BitComet peers</li>
+						<li>Fix 1.3x bug that could re-download some data unnecessarily</li>
+						<li>Lazy bitfields (always on)</li>
 						</ul>
 					</td>
 				</tr>
@@ -36,13 +41,15 @@
 				<tr>
 					<td>
 						<ul>
-						<li>Fix memory leak when updating blocklist</li>
-						<li>Connect to the web interface when the application's path contains a space</li>
+						<li>Option to automatically update the blocklist weekly</li>
+						<li>In the file inspector tab, show progress and size for folders</li>
+						<li>Scrollbars correctly appear when the main window auto-resizes</li>
+						<li>Sparkle updated to 1.5b6</li>
 						</ul>
 					</td>
 				</tr>
 			</table>
-			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?group=component&milestone=1.34&order=severity">click here</a>.</p>
+			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.40&group=component&groupdesc=1&order=severity">click here</a>.</p>
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
 					<td class="red">
@@ -51,7 +58,7 @@
 				</tr>
 				<tr>
 					<td>
-						<p>Transmission now requires at least Mac OS X 10.4.11 with Security Update 2008-002. Mac OS X 10.5 or greater is recommended.</p>
+						<p>Transmission now requires at least Mac OS X 10.4.11 with Security Update 2008-002. Mac OS X 10.5 or greater is highly recommended.</p>
 					</td>
 				</tr>
 			</table>
