@@ -33,6 +33,7 @@
 struct tr_completion
 {
     unsigned int    sizeWhenDoneIsDirty : 1;
+    unsigned int    haveValidIsDirty : 1;
 
     tr_torrent *    tor;
 
@@ -50,6 +51,11 @@ struct tr_completion
        use tr_cpSizeWhenDone() instead! */
     uint64_t    sizeWhenDoneLazy;
 
+    /* number of bytes we'll have when done downloading. [0..info.totalSize]
+       DON'T access this directly; it's a lazy field.
+       use tr_cpHaveValid() instead! */
+    uint64_t    haveValidLazy;
+
     /* number of bytes we want or have now. [0..sizeWhenDone] */
     uint64_t    sizeNow;
 };
@@ -63,6 +69,7 @@ tr_cpReset( tr_completion * cp )
             sizeof( uint16_t ) * cp->tor->info.pieceCount );
     cp->sizeNow = 0;
     cp->sizeWhenDoneIsDirty = 1;
+    cp->haveValidIsDirty = 1;
 }
 
 tr_completion *
@@ -142,8 +149,7 @@ int
 tr_cpPieceIsComplete( const tr_completion * cp,
                       tr_piece_index_t      piece )
 {
-    return cp->completeBlocks[piece] == tr_torPieceCountBlocks( cp->tor,
-                                                                piece );
+    return cp->completeBlocks[piece] == tr_torPieceCountBlocks( cp->tor, piece );
 }
 
 const tr_bitfield *
@@ -185,6 +191,7 @@ tr_cpPieceRem( tr_completion *  cp,
             cp->sizeNow -= tr_torBlockCountBytes( tor, block );
 
     cp->sizeWhenDoneIsDirty = 1;
+    cp->haveValidIsDirty = 1;
     cp->completeBlocks[piece] = 0;
     tr_bitfieldRemRange ( cp->blockBitfield, start, end );
     tr_bitfieldRem( cp->pieceBitfield, piece );
@@ -211,13 +218,14 @@ tr_cpBlockAdd( tr_completion *  cp,
 
         ++cp->completeBlocks[piece];
 
-        if( cp->completeBlocks[piece] == tr_torPieceCountBlocks( tor, piece ) )
+        if( tr_cpPieceIsComplete( cp, piece ) )
             tr_bitfieldAdd( cp->pieceBitfield, piece );
 
         tr_bitfieldAdd( cp->blockBitfield, block );
 
         cp->sizeNow += blockSize;
 
+        cp->haveValidIsDirty = 1;
         cp->sizeWhenDoneIsDirty = 1;
     }
 }
@@ -260,8 +268,7 @@ int
 tr_cpMissingBlocksInPiece( const tr_completion * cp,
                            tr_piece_index_t      piece )
 {
-    return tr_torPieceCountBlocks( cp->tor,
-                                   piece ) - cp->completeBlocks[piece];
+    return tr_torPieceCountBlocks( cp->tor, piece ) - cp->completeBlocks[piece];
 }
 
 /***
@@ -300,24 +307,37 @@ tr_cpGetStatus( const tr_completion * cp )
     return TR_CP_INCOMPLETE;
 }
 
-uint64_t
-tr_cpHaveValid( const tr_completion * cp )
+static uint64_t
+calculateHaveValid( const tr_completion * ccp )
 {
     uint64_t                  b = 0;
     tr_piece_index_t          i;
-    const tr_torrent        * tor            = cp->tor;
+    const tr_torrent        * tor            = ccp->tor;
     const uint64_t            pieceSize      = tor->info.pieceSize;
     const uint64_t            lastPieceSize  = tor->lastPieceSize;
     const tr_piece_index_t    lastPiece      = tor->info.pieceCount - 1;
 
     for( i=0; i!=lastPiece; ++i )
-        if( tr_cpPieceIsComplete( cp, i ) )
+        if( tr_cpPieceIsComplete( ccp, i ) )
             b += pieceSize;
 
-    if( tr_cpPieceIsComplete( cp, lastPiece ) )
+    if( tr_cpPieceIsComplete( ccp, lastPiece ) )
         b += lastPieceSize;
 
     return b;
+}
+
+uint64_t
+tr_cpHaveValid( const tr_completion * ccp )
+{
+    if( ccp->haveValidIsDirty )
+    {
+        tr_completion * cp = (tr_completion *) ccp; /* mutable */
+        cp->haveValidLazy = calculateHaveValid( ccp );
+        cp->haveValidIsDirty = 0;
+    }
+
+    return ccp->haveValidLazy;
 }
 
 uint64_t
