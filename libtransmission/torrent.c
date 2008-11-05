@@ -1768,3 +1768,34 @@ tr_torrentSetDoneDate( tr_torrent * tor,
     tor->doneDate = t;
 }
 
+/**
+***
+**/
+
+uint64_t
+tr_torrentGetBytesLeftToAllocate( const tr_torrent * tor )
+{
+    const tr_file * it;
+    const tr_file * end;
+    struct stat sb;
+    uint64_t bytesLeft = 0;
+
+    for( it=tor->info.files, end=it+tor->info.fileCount; it!=end; ++it )
+    {
+        if( !it->dnd )
+        {
+            char * path = tr_buildPath( tor->downloadDir, it->name, NULL );
+
+            bytesLeft += it->length;
+
+            if( !stat( path, &sb )
+                    && S_ISREG( sb.st_mode )
+                    && ( sb.st_size <= it->length ) )
+                bytesLeft -= sb.st_size;
+
+            tr_free( path );
+        }
+    }
+
+    return bytesLeft;
+}

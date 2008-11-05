@@ -54,7 +54,9 @@ void tr_fdClose( void );
  */
 int  tr_fdFileCheckout( const char * folder,
                         const char * torrentFile,
-                        int          doWrite );
+                        int          doWrite,
+                        int          doPreallocate,
+                        uint64_t     desiredFileSize );
 
 /**
  * Returns an fd from tr_fdFileCheckout() so that other clients may borrow it.

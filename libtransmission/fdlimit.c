@@ -32,6 +32,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef SYS_DARWIN
+#include <fcntl.h>
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -96,6 +99,35 @@ static struct tr_fd_s * gFd = NULL;
 ****
 ***/
 
+static int
+preallocateFile( int fd UNUSED, uint64_t length UNUSED )
+{
+#ifdef HAVE_FALLOCATE
+
+    return fallocate( fd, 0, offset, length );
+
+#elif defined(HAVE_POSIX_FALLOCATE)
+
+    return posix_fallocate( fd, 0, length );
+
+#elif defined(SYS_DARWIN) 
+
+    fstore_t fst;
+    fst.fst_flags = F_ALLOCATECONTIG;
+    fst.fst_posmode = F_PEOFPOSMODE;
+    fst.fst_offset = 0;
+    fst.fst_length = length;
+    fst.fst_bytesalloc = 0;
+    return fcntl( fd, F_PREALLOCATE, &fst );
+
+#else
+
+    #warning no known method to preallocate files on this platform
+    return -1;
+
+#endif
+}
+
 /**
  * returns 0 on success, or an errno value on failure.
  * errno values include ENOENT if the parent folder doesn't exist,
@@ -105,12 +137,15 @@ static int
 TrOpenFile( int          i,
             const char * folder,
             const char * torrentFile,
-            int          write )
+            int          doWrite,
+            int          doPreallocate,
+            uint64_t     desiredFileSize )
 {
     struct tr_openfile * file = &gFd->open[i];
     int                  flags;
     char               * filename;
     struct stat          sb;
+    int                  alreadyExisted;
 
     /* confirm the parent folder exists */
     if( stat( folder, &sb ) || !S_ISDIR( sb.st_mode ) )
@@ -118,7 +153,7 @@ TrOpenFile( int          i,
 
     /* create subfolders, if any */
     filename = tr_buildPath( folder, torrentFile, NULL );
-    if( write )
+    if( doWrite )
     {
         char * tmp = tr_dirname( filename );
         const int err = tr_mkdirp( tmp, 0777 ) ? errno : 0;
@@ -129,8 +164,10 @@ TrOpenFile( int          i,
         }
     }
 
+    alreadyExisted = !stat( filename, &sb ) && S_ISREG( sb.st_mode );
+    
     /* open the file */
-    flags = write ? ( O_RDWR | O_CREAT ) : O_RDONLY;
+    flags = doWrite ? ( O_RDWR | O_CREAT ) : O_RDONLY;
 #ifdef O_LARGEFILE
     flags |= O_LARGEFILE;
 #endif
@@ -147,6 +184,10 @@ TrOpenFile( int          i,
         return err;
     }
 
+    if( ( file->fd >= 0 ) && !alreadyExisted && doPreallocate )
+        if( !preallocateFile( file->fd, desiredFileSize ) )
+            tr_inf( _( "Preallocated file \"%s\"" ), filename );
+       
     tr_free( filename );
     return 0;
 }
@@ -181,7 +222,9 @@ fileIsCheckedOut( const struct tr_openfile * o )
 int
 tr_fdFileCheckout( const char * folder,
                    const char * torrentFile,
-                   int          write )
+                   int          doWrite,
+                   int          doPreallocate,
+                   uint64_t     desiredFileSize )
 {
     int                  i, winner = -1;
     struct tr_openfile * o;
@@ -189,11 +232,11 @@ tr_fdFileCheckout( const char * folder,
 
     assert( folder && *folder );
     assert( torrentFile && *torrentFile );
-    assert( write == 0 || write == 1 );
+    assert( doWrite == 0 || doWrite == 1 );
 
     filename = tr_buildPath( folder, torrentFile, NULL );
     dbgmsg( "looking for file '%s', writable %c", filename,
-            write ? 'y' : 'n' );
+            doWrite ? 'y' : 'n' );
 
     tr_lockLock( gFd->lock );
 
@@ -218,7 +261,7 @@ tr_fdFileCheckout( const char * folder,
             continue;
         }
 
-        if( write && !o->isWritable )
+        if( doWrite && !o->isWritable )
         {
             dbgmsg(
                 "found it!  it's open and available, but isn't writable. closing..." );
@@ -280,7 +323,7 @@ tr_fdFileCheckout( const char * folder,
     o = &gFd->open[winner];
     if( !fileIsOpen( o ) )
     {
-        const int err = TrOpenFile( winner, folder, torrentFile, write );
+        const int err = TrOpenFile( winner, folder, torrentFile, doWrite, doPreallocate, desiredFileSize );
         if( err ) {
             tr_lockUnlock( gFd->lock );
             tr_free( filename );
@@ -288,10 +331,10 @@ tr_fdFileCheckout( const char * folder,
             return -1;
         }
 
-        dbgmsg( "opened '%s' in slot %d, write %c", filename, winner,
-                write ? 'y' : 'n' );
+        dbgmsg( "opened '%s' in slot %d, doWrite %c", filename, winner,
+                doWrite ? 'y' : 'n' );
         tr_strlcpy( o->filename, filename, sizeof( o->filename ) );
-        o->isWritable = write;
+        o->isWritable = doWrite;
     }
 
     dbgmsg( "checking out '%s' in slot %d", filename, winner );

@@ -834,6 +834,9 @@ void tr_torrentStop( tr_torrent * torrent );
 tr_torrent* tr_torrentNext( tr_session  * session,
                             tr_torrent  * current );
 
+
+uint64_t tr_torrentGetBytesLeftToAllocate( const tr_torrent * torrent );
+
 /**
  * @brief Returns this torrent's unique ID.
  *

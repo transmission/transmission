@@ -83,9 +83,7 @@ readOrWriteBytes( const tr_torrent * tor,
 
     if( ( ioMode == TR_IO_READ ) && !fileExists ) /* does file exist? */
         err = errno;
-    else if( ( fd = tr_fdFileCheckout ( tor->downloadDir,
-                                        file->name,
-                                        ioMode == TR_IO_WRITE ) ) < 0 )
+    else if( ( fd = tr_fdFileCheckout ( tor->downloadDir, file->name, ioMode == TR_IO_WRITE, !file->dnd, file->length ) ) < 0 )
         err = errno;
     else if( lseek( fd, (off_t)fileOffset, SEEK_SET ) == ( (off_t)-1 ) )
         err = errno;
@@ -153,7 +151,12 @@ ensureMinimumFileSize( const tr_torrent * tor,
     assert( 0 <= fileIndex && fileIndex < tor->info.fileCount );
     assert( minBytes <= file->length );
 
-    fd = tr_fdFileCheckout( tor->downloadDir, file->name, TRUE );
+    fd = tr_fdFileCheckout( tor->downloadDir,
+                            file->name,
+                            TRUE,
+                            tor->session->doPreallocateFiles && !file->dnd,
+                            file->length );
+
     if( fd < 0 ) /* bad fd */
         err = errno;
     else if( fstat ( fd, &sb ) ) /* how big is the file? */
