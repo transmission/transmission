@@ -250,7 +250,6 @@ recalculateHash( const tr_torrent * tor,
                  uint8_t *          setme )
 {
     size_t   bytesLeft;
-    size_t   n;
     uint32_t offset = 0;
     int      success = TRUE;
     SHA_CTX  sha;
@@ -260,7 +259,7 @@ recalculateHash( const tr_torrent * tor,
     assert( pieceIndex < tor->info.pieceCount );
 
     SHA1_Init( &sha );
-    n = bytesLeft = tr_torPieceCountBytes( tor, pieceIndex );
+    bytesLeft = tr_torPieceCountBytes( tor, pieceIndex );
 
     while( bytesLeft )
     {
