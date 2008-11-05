@@ -4236,6 +4236,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         if (!torrent)
         {
+            [pool release];
+            
             NSLog(@"No torrent found matching the given torrent struct from the RPC callback!");
             return;
         }
