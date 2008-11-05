@@ -1819,6 +1819,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
             node = [[FileListNode alloc] initWithFileName: name path: [parent fullPath] size: size index: index];
         
         [parent insertChild: node];
+        [node release];
     }
     
     if (isFolder)
