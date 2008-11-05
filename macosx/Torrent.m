@@ -550,64 +550,36 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
         
         NSDictionary * systemAttributes = onLeopard ? [fileManager attributesOfFileSystemForPath: downloadFolder error: NULL]
                                             : [fileManager fileSystemAttributesAtPath: downloadFolder];
-        uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue], neededSpace = 0;
+        uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue], 
+                neededSpace = tr_torrentGetBytesLeftToAllocate(fHandle);
         
-        //if the size left is less then remaining space, then there is enough space regardless of preallocation
-        if (remainingSpace < [self sizeLeft])
+        if (remainingSpace < neededSpace)
         {
-            [self updateFileStat];
+            NSAlert * alert = [[NSAlert alloc] init];
+            [alert setMessageText: [NSString stringWithFormat:
+                                    NSLocalizedString(@"Not enough remaining disk space to download \"%@\" completely.",
+                                        "Torrent disk space alert -> title"), [self name]]];
+            [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"The transfer will be paused."
+                                        " Clear up space on %@ or deselect files in the torrent inspector to continue.",
+                                        "Torrent disk space alert -> message"), volumeName]];
+            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent disk space alert -> button")];
+            [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent disk space alert -> button")];
             
-            //determine amount needed
-            for (NSInteger i = 0; i < [self fileCount]; i++)
+            if (onLeopard)
             {
-                if (tr_torrentGetFileDL(fHandle, i))
-                {
-                    tr_file * file = &fInfo->files[i];
-                    
-                    neededSpace += file->length;
-                    
-                    NSString * path = [downloadFolder stringByAppendingPathComponent: [NSString stringWithUTF8String: file->name]];
-                    NSDictionary * fileAttributes = onLeopard ? [fileManager attributesOfItemAtPath: path error: NULL]
-                                                        : [fileManager fileAttributesAtPath: path traverseLink: NO];
-                    if (fileAttributes)
-                    {
-                        unsigned long long fileSize = [[fileAttributes objectForKey: NSFileSize] unsignedLongLongValue];
-                        if (fileSize < neededSpace)
-                            neededSpace -= fileSize;
-                        else
-                            neededSpace = 0;
-                    }
-                }
+                [alert setShowsSuppressionButton: YES];
+                [[alert suppressionButton] setTitle: NSLocalizedString(@"Do not check disk space again",
+                                                        "Torrent disk space alert -> button")];
             }
-            
-            if (remainingSpace < neededSpace)
-            {
-                NSAlert * alert = [[NSAlert alloc] init];
-                [alert setMessageText: [NSString stringWithFormat:
-                                        NSLocalizedString(@"Not enough remaining disk space to download \"%@\" completely.",
-                                            "Torrent disk space alert -> title"), [self name]]];
-                [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"The transfer will be paused."
-                                            " Clear up space on %@ or deselect files in the torrent inspector to continue.",
-                                            "Torrent disk space alert -> message"), volumeName]];
-                [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent disk space alert -> button")];
-                [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent disk space alert -> button")];
-                
-                if (onLeopard)
-                {
-                    [alert setShowsSuppressionButton: YES];
-                    [[alert suppressionButton] setTitle: NSLocalizedString(@"Do not check disk space again",
-                                                            "Torrent disk space alert -> button")];
-                }
-                else
-                    [alert addButtonWithTitle: NSLocalizedString(@"Always Download", "Torrent disk space alert -> button")];
+            else
+                [alert addButtonWithTitle: NSLocalizedString(@"Always Download", "Torrent disk space alert -> button")];
 
-                NSInteger result = [alert runModal];
-                if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertThirdButtonReturn))
-                    [fDefaults setBool: NO forKey: @"WarningRemainingSpace"];
-                [alert release];
-                
-                return result != NSAlertFirstButtonReturn;
-            }
+            NSInteger result = [alert runModal];
+            if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertThirdButtonReturn))
+                [fDefaults setBool: NO forKey: @"WarningRemainingSpace"];
+            [alert release];
+            
+            return result != NSAlertFirstButtonReturn;
         }
     }
     return YES;
