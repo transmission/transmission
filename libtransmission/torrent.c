@@ -1078,8 +1078,8 @@ freeTorrent( tr_torrent * tor )
     assert( h->torrentCount >= 1 );
     h->torrentCount--;
 
-    tr_rcClose( t->pieceSpeed[TR_PEER_TO_CLIENT] );
-    tr_rcClose( t->pieceSpeed[TR_CLIENT_TO_PEER] );
+    tr_rcClose( tor->pieceSpeed[TR_PEER_TO_CLIENT] );
+    tr_rcClose( tor->pieceSpeed[TR_CLIENT_TO_PEER] );
 
     tr_metainfoFree( inf );
     tr_free( tor );
