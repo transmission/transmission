@@ -1013,7 +1013,8 @@ peerCallbackFunc( void * vpeer,
             tr_torrent * tor = t->tor;
             tor->activityDate = now;
             tor->uploadedCur += e->length;
-            tr_rcTransferred ( peer->pieceSpeed[TR_CLIENT_TO_PEER], e->length );
+            if( peer )
+                tr_rcTransferred ( peer->pieceSpeed[TR_CLIENT_TO_PEER], e->length );
             tr_rcTransferred ( tor->pieceSpeed[TR_CLIENT_TO_PEER], e->length );
             tr_rcTransferred ( tor->session->pieceSpeed[TR_CLIENT_TO_PEER], e->length );
             tr_statsAddUploaded( tor->session, e->length );
@@ -1031,7 +1032,8 @@ peerCallbackFunc( void * vpeer,
             tr_torrent * tor = t->tor;
             tor->activityDate = now;
             tr_statsAddDownloaded( tor->session, e->length );
-            tr_rcTransferred ( peer->pieceSpeed[TR_PEER_TO_CLIENT], e->length );
+            if( peer )
+                tr_rcTransferred ( peer->pieceSpeed[TR_PEER_TO_CLIENT], e->length );
             tr_rcTransferred ( tor->pieceSpeed[TR_PEER_TO_CLIENT], e->length );
             tr_rcTransferred ( tor->session->pieceSpeed[TR_PEER_TO_CLIENT], e->length );
             /* only add this to downloadedCur if we got it from a peer --
@@ -2327,8 +2329,8 @@ allocateHowMuch( double         desiredAvgKB,
 {
     const double baseline = desiredAvgKB * 1024.0 /
                             BANDWIDTH_PULSES_PER_SECOND;
-    const double min = baseline * 0.90;
-    const double max = baseline * 1.10;
+    const double min = baseline * 0.85;
+    const double max = baseline * 1.15;
     int          i;
     double       usedBytes;
     double       n;
