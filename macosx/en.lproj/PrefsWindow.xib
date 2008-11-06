@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.02">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9E17</string>
+		<string key="IBDocument.SystemVersion">9F33</string>
 		<string key="IBDocument.InterfaceBuilderVersion">672</string>
-		<string key="IBDocument.AppKitVersion">949.33</string>
+		<string key="IBDocument.AppKitVersion">949.34</string>
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -6486,14 +6486,6 @@ AAABAAAAAQ</bytes>
 					<int key="connectionID">1746</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">setRPCUseWhitelist:</string>
-						<reference key="source" ref="511492310"/>
-						<reference key="destination" ref="151618662"/>
-					</object>
-					<int key="connectionID">1752</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">enabled2: values.RPCUseWhitelist</string>
 						<reference key="source" ref="173651346"/>
@@ -6600,6 +6592,14 @@ AAABAAAAAQ</bytes>
 						<reference key="destination" ref="264419599"/>
 					</object>
 					<int key="connectionID">1758</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setRPCAuthorize:</string>
+						<reference key="source" ref="511492310"/>
+						<reference key="destination" ref="151618662"/>
+					</object>
+					<int key="connectionID">1759</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -9758,7 +9758,7 @@ AAABAAAAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1758</int>
+			<int key="maxID">1759</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
