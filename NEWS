@@ -4,15 +4,14 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 <http://trac.transmissionbt.com/query?milestone=1.40&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Tracker communication uses fewer resources
-   + More accurate bandwidth management
-   + Bandwidth limits now include BitTorrent protocol overhead
-   + Files are preallocated as soon as any data is received for that file
+   + More accurate bandwidth limits
+   + Reduce disk fragmentation by preallocating files
    + Stability, security, and performance improvements to the RPC/Web UI server
    + Support compression when serving Web UI and RPC responses
    + Simplify the RPC whitelist
    + Fix bug that prevented handshakes with encrypted BitComet peers
    + Fix 1.3x bug that could re-download some data unnecessarily
-   + Lazy bitfields (always on)
+   + Lazy bitfields
 - Mac
    + Option to automatically update the blocklist weekly
    + In the file inspector tab, show progress and size for folders
@@ -29,6 +28,10 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + The Web Client is now out of beta
    + Minor display fixes
    + On iPhone/iPod touch, launching from the home screen hides the address bar
+- Daemon
+   + Added the ability to get detailed peer information on torrents
+   + Fix bug that didn't handle --config-dir and TRANSMISSION_HOME correctly
+   + Windows portability
 
 1.34 (2008/09/16)
 <http://trac.transmissionbt.com/query?milestone=1.34&group=component&groupdesc=1&order=severity>
