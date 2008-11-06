@@ -23,12 +23,12 @@ AM_CPPFLAGS = \
 
 AM_CFLAGS = \
     $(GTK_CFLAGS) \
-    $(OPENSSL_CFLAGS) \
     $(LIBCURL_CFLAGS) \
-    $(PTHREAD_CFLAGS) \
     $(GIO_CFLAGS) \
     $(DBUS_GLIB_CFLAGS) \
-    $(LIBNOTIFY_CFLAGS)
+    $(LIBNOTIFY_CFLAGS) \
+    $(OPENSSL_CFLAGS) \
+    $(PTHREAD_CFLAGS)
 
 noinst_HEADERS = \
     actions.h \

@@ -15,8 +15,8 @@ LDADD = \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/libevent/libevent.la \
     $(INTLLIBS) \
-    $(OPENSSL_LIBS) \
     $(LIBCURL_LIBS) \
+    $(OPENSSL_LIBS) \
     $(PTHREAD_LIBS) -lm
 
 transmission_daemon_SOURCES = daemon.c

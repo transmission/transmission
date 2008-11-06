@@ -13,8 +13,8 @@ transmissioncli_LDADD = \
   $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
   $(top_builddir)/third-party/miniupnp/libminiupnp.a \
   $(INTLLIBS) \
-  $(OPENSSL_LIBS) \
   $(LIBCURL_LIBS) \
+  $(OPENSSL_LIBS) \
   $(PTHREAD_LIBS) \
   -lm
 
