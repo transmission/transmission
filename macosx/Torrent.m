@@ -552,7 +552,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
                                             : [fileManager fileSystemAttributesAtPath: downloadFolder];
         uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
         
-        //if the size left is less then remaining space, then there is enough space regardless of preallocation
+        //if the remaining space is greater than the size left, then there is enough space regardless of preallocation
         if (remainingSpace < [self sizeLeft] && remainingSpace < tr_torrentGetBytesLeftToAllocate(fHandle))
         {
             NSAlert * alert = [[NSAlert alloc] init];
