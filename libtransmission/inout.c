@@ -152,10 +152,7 @@ ensureMinimumFileSize( const tr_torrent * tor,
     assert( minBytes <= file->length );
 
     fd = tr_fdFileCheckout( tor->downloadDir,
-                            file->name,
-                            TRUE,
-                            tor->session->doPreallocateFiles && !file->dnd,
-                            file->length );
+                            file->name, TRUE, !file->dnd, file->length );
 
     if( fd < 0 ) /* bad fd */
         err = errno;
