@@ -26,6 +26,7 @@
 struct tr_bitfield;
 struct tr_peerIo;
 struct tr_peermsgs;
+struct tr_ratecontrol;
 
 enum
 {
@@ -36,34 +37,43 @@ enum
 
 typedef struct tr_peer
 {
-    unsigned int    peerIsChoked       : 1;
-    unsigned int    peerIsInterested   : 1;
-    unsigned int    clientIsChoked     : 1;
-    unsigned int    clientIsInterested : 1;
-    unsigned int    doPurge            : 1;
+    unsigned int             peerIsChoked       : 1;
+    unsigned int             peerIsInterested   : 1;
+    unsigned int             clientIsChoked     : 1;
+    unsigned int             clientIsInterested : 1;
+    unsigned int             doPurge            : 1;
 
     /* number of bad pieces they've contributed to */
-    uint8_t     strikes;
+    uint8_t                  strikes;
 
-    uint8_t     encryption_preference;
-    uint16_t    port;
-    struct in_addr in_addr;
-    struct tr_peerIo * io;
+    uint8_t                  encryption_preference;
+    uint16_t                 port;
+    struct in_addr           in_addr;
+    struct tr_peerIo       * io;
 
-    struct tr_bitfield * blame;
-    struct tr_bitfield * have;
-    float    progress;
+    struct tr_bitfield     * blame;
+    struct tr_bitfield     * have;
+
+    /** how complete the peer's copy of the torrent is. [0.0...1.0] */
+    float                    progress;
 
     /* the client name from the `v' string in LTEP's handshake dictionary */
-    char *    client;
+    char                   * client;
 
-    time_t    peerSentPieceDataAt;
-    time_t    chokeChangedAt;
-    time_t    pieceDataActivityDate;
+    time_t                   peerSentPieceDataAt;
+    time_t                   chokeChangedAt;
+    time_t                   pieceDataActivityDate;
 
-    struct tr_peermsgs * msgs;
-    tr_publisher_tag    msgsTag;
+    struct tr_peermsgs     * msgs;
+    tr_publisher_tag         msgsTag;
+
+    /* the rate at which pieces are being transferred between client and peer.
+     * protocol overhead is NOT included; this is only the piece data */
+    struct tr_ratecontrol  * pieceSpeed[2];
 }
 tr_peer;
+
+double tr_peerGetPieceSpeed( const tr_peer    * peer,
+                             tr_direction       direction );
 
 #endif

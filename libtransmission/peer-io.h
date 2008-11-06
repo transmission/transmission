@@ -207,9 +207,5 @@ void              tr_peerIoSetBandwidth( tr_peerIo *  io,
 void              tr_peerIoSetBandwidthUnlimited( tr_peerIo *  io,
                                                   tr_direction direction );
 
-double            tr_peerIoGetRateToClient( const tr_peerIo * io );
-
-double            tr_peerIoGetRateToPeer( const tr_peerIo * io );
-
 
 #endif

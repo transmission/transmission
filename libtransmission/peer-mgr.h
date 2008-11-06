@@ -112,9 +112,6 @@ void tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                              int * setmePeersGettingFromUs,
                              int * setmePeersFrom ); /* TR_PEER_FROM__MAX */
 
-double tr_peerMgrGetRate( const tr_peerMgr  * manager,
-                          tr_direction        direction );
-
 struct tr_peer_stat* tr_peerMgrPeerStats( const tr_peerMgr  * manager,
                                           const uint8_t     * torrentHash,
                                           int               * setmeCount );

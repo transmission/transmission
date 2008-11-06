@@ -27,13 +27,15 @@
 
 typedef struct tr_ratecontrol tr_ratecontrol;
 
-tr_ratecontrol * tr_rcInit( void );
 
-void             tr_rcTransferred(               tr_ratecontrol *,
-                                          size_t byteCount );
+tr_ratecontrol * tr_rcInit        ( void );
 
-float            tr_rcRate( const tr_ratecontrol * );
+void             tr_rcClose       ( tr_ratecontrol         * ratecontrol );
 
-void             tr_rcClose( tr_ratecontrol * );
+void             tr_rcTransferred ( tr_ratecontrol         * ratecontrol,
+                                    size_t                   byteCount );
+
+float            tr_rcRate        ( const tr_ratecontrol   * ratecontrol );
+
 
 #endif

@@ -29,11 +29,34 @@
 #include "crypto.h"
 #include "net.h"
 #include "peer-io.h"
-#include "ratecontrol.h"
 #include "trevent.h"
 #include "utils.h"
 
 #define IO_TIMEOUT_SECS 8
+
+static size_t
+addPacketOverhead( size_t d )
+{
+    /**
+     * http://sd.wareonearth.com/~phil/net/overhead/
+     *
+     * TCP over Ethernet:
+     * Assuming no header compression (e.g. not PPP)
+     * Add 20 IPv4 header or 40 IPv6 header (no options)
+     * Add 20 TCP header
+     * Add 12 bytes optional TCP timestamps
+     * Max TCP Payload data rates over ethernet are thus:
+     *  (1500-40)/(38+1500) = 94.9285 %  IPv4, minimal headers
+     *  (1500-52)/(38+1500) = 94.1482 %  IPv4, TCP timestamps
+     *  (1500-52)/(42+1500) = 93.9040 %  802.1q, IPv4, TCP timestamps
+     *  (1500-60)/(38+1500) = 93.6281 %  IPv6, minimal headers
+     *  (1500-72)/(38+1500) = 92.8479 %  IPv6, TCP timestamps
+     *  (1500-72)/(42+1500) = 92.6070 %  802.1q, IPv6, ICP timestamps
+     */
+    static const double assumed_payload_data_rate = 94.0;
+
+    return (size_t)( d * ( 100.0 / assumed_payload_data_rate ) );
+}
 
 /**
 ***
@@ -82,7 +105,6 @@ struct tr_peerIo
     size_t                 bufferSize[2];
 
     struct tr_bandwidth    bandwidth[2];
-    tr_ratecontrol *       speedometer[2];
 
     tr_crypto *            crypto;
 };
@@ -176,11 +198,11 @@ didWriteWrapper( struct bufferevent * e,
 
     if( len < io->bufferSize[TR_UP] )
     {
-        const size_t          n = io->bufferSize[TR_UP] - len;
+        const size_t payload = io->bufferSize[TR_UP] - len;
+        const size_t n = addPacketOverhead( payload );
         struct tr_bandwidth * b = &io->bandwidth[TR_UP];
         b->bytesLeft -= MIN( b->bytesLeft, (size_t)n );
         b->bytesUsed += n;
-        tr_rcTransferred( io->speedometer[TR_UP], n );
         dbgmsg( io,
                 "wrote %zu bytes to peer... upload bytesLeft is now %zu",
                 n,
@@ -208,11 +230,11 @@ canReadWrapper( struct bufferevent * e,
     /* if the input buffer has grown, record the bytes that were read */
     if( len > io->bufferSize[TR_DOWN] )
     {
-        const size_t          n = len - io->bufferSize[TR_DOWN];
+        const size_t payload = len - io->bufferSize[TR_DOWN];
+        const size_t n = addPacketOverhead( payload );
         struct tr_bandwidth * b = io->bandwidth + TR_DOWN;
         b->bytesLeft -= MIN( b->bytesLeft, (size_t)n );
         b->bytesUsed += n;
-        tr_rcTransferred( io->speedometer[TR_DOWN], n );
         dbgmsg( io,
                 "%zu new input bytes. bytesUsed is %zu, bytesLeft is %zu",
                 n, b->bytesUsed,
@@ -313,8 +335,6 @@ tr_peerIoNew( tr_session *           session,
     io->output = evbuffer_new( );
     io->bandwidth[TR_UP].isUnlimited = 1;
     io->bandwidth[TR_DOWN].isUnlimited = 1;
-    io->speedometer[TR_UP] = tr_rcInit( );
-    io->speedometer[TR_DOWN] = tr_rcInit( );
     bufevNew( io );
     return io;
 }
@@ -359,8 +379,6 @@ io_dtor( void * vio )
 {
     tr_peerIo * io = vio;
 
-    tr_rcClose( io->speedometer[TR_DOWN] );
-    tr_rcClose( io->speedometer[TR_UP] );
     evbuffer_free( io->output );
     bufferevent_free( io->bufev );
     tr_netClose( io->socket );
@@ -645,18 +663,6 @@ tr_peerIoSetBandwidthUnlimited( tr_peerIo *  io,
 
     adjustInputBuffer( io );
     adjustOutputBuffer( io );
-}
-
-double
-tr_peerIoGetRateToClient( const tr_peerIo * io )
-{
-    return tr_rcRate( io->speedometer[TR_DOWN] );
-}
-
-double
-tr_peerIoGetRateToPeer( const tr_peerIo * io )
-{
-    return tr_rcRate( io->speedometer[TR_UP] );
 }
 
 /**

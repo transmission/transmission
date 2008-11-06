@@ -57,6 +57,8 @@ struct tr_metainfo_lookup
     char *  filename;
 };
 
+struct tr_ratecontrol;
+
 struct tr_handle
 {
     unsigned int                 isPortSet          : 1;
@@ -111,6 +113,10 @@ struct tr_handle
 
     struct tr_metainfo_lookup *  metainfoLookup;
     int                          metainfoLookupCount;
+
+    /* the rate at which pieces are being transferred between client and peer.
+     * protocol overhead is NOT included; this is only the piece data */
+    struct tr_ratecontrol     *  pieceSpeed[2];
 };
 
 const char * tr_sessionFindTorrentFile( const tr_session * session,

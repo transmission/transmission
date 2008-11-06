@@ -6,7 +6,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Tracker communication uses fewer resources
    + More accurate bandwidth management
    + Bandwidth displays now include BitTorrent protocol overhead
-   + Files are preallocated as soon as any data is received
+   + Files are preallocated as soon as any data is received for that file
    + Stability, security, and performance improvements to the RPC/Web UI server
    + Support compression when serving Web UI and RPC responses
    + Simplify the RPC whitelist

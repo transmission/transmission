@@ -1680,9 +1680,10 @@ static int
 ratePulse( void * vpeer )
 {
     tr_peermsgs * peer = vpeer;
-    const double  rateToClient = tr_peerIoGetRateToClient( peer->io );
-    const int     estimatedBlocksInNext30Seconds =
-        ( rateToClient * 30 * 1024 ) / peer->torrent->blockSize;
+    const double rateToClient = tr_peerGetPieceSpeed( peer->info,
+                                                      TR_PEER_TO_CLIENT );
+    const int estimatedBlocksInNext30Seconds =
+                  ( rateToClient * 30 * 1024 ) / peer->torrent->blockSize;
 
     peer->minActiveRequests = 4;
     peer->maxActiveRequests = peer->minActiveRequests +

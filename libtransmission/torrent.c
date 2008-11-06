@@ -467,6 +467,9 @@ torrentRealInit( tr_handle *     h,
 
     randomizeTiers( info );
 
+    tor->pieceSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
+    tor->pieceSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
+
     tor->blockSize = getBlockSize( info->pieceSize );
 
     tor->lastPieceSize = info->totalSize % info->pieceSize;
@@ -718,17 +721,10 @@ static double
 tr_torrentGetRate( const tr_torrent * tor,
                    tr_direction       direction )
 {
-    int    i;
-    double bytes = 0;
-
     assert( tor != NULL );
     assert( direction == TR_UP || direction == TR_DOWN );
 
-    for( i = 0; i < BANDWIDTH_PULSE_HISTORY; ++i )
-        bytes += tor->rateHistory[direction][i];
-
-    return ( BANDWIDTH_PULSES_PER_SECOND * bytes )
-           / ( BANDWIDTH_PULSE_HISTORY * 1024 );
+    return tr_rcRate( tor->pieceSpeed[direction] );
 }
 
 const tr_stat *
@@ -1081,6 +1077,9 @@ freeTorrent( tr_torrent * tor )
 
     assert( h->torrentCount >= 1 );
     h->torrentCount--;
+
+    tr_rcClose( t->pieceSpeed[TR_PEER_TO_CLIENT] );
+    tr_rcClose( t->pieceSpeed[TR_CLIENT_TO_PEER] );
 
     tr_metainfoFree( inf );
     tr_free( tor );
@@ -1790,7 +1789,7 @@ tr_torrentGetBytesLeftToAllocate( const tr_torrent * tor )
 
             if( !stat( path, &sb )
                     && S_ISREG( sb.st_mode )
-                    && ( sb.st_size <= it->length ) )
+                    && ( (uint64_t)sb.st_size <= it->length ) )
                 bytesLeft -= sb.st_size;
 
             tr_free( path );

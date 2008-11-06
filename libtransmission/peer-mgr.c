@@ -31,6 +31,7 @@
 #include "peer-mgr-private.h"
 #include "peer-msgs.h"
 #include "ptrarray.h"
+#include "ratecontrol.h"
 #include "stats.h" /* tr_statsAddUploaded, tr_statsAddDownloaded */
 #include "torrent.h"
 #include "trevent.h"
@@ -127,7 +128,6 @@ struct tr_peerMgr
     tr_ptrArray *  torrents; /* Torrent */
     tr_ptrArray *  incomingHandshakes; /* tr_handshake */
     tr_timer *     bandwidthTimer;
-    double         rateHistory[2][BANDWIDTH_PULSE_HISTORY];
     double         globalPoolHistory[2][BANDWIDTH_PULSE_HISTORY];
 };
 
@@ -326,6 +326,8 @@ peerConstructor( const struct in_addr * in_addr )
 
     p = tr_new0( tr_peer, 1 );
     memcpy( &p->in_addr, in_addr, sizeof( struct in_addr ) );
+    p->pieceSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
+    p->pieceSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
     return p;
 }
 
@@ -362,6 +364,9 @@ peerDestructor( tr_peer * peer )
     tr_bitfieldFree( peer->have );
     tr_bitfieldFree( peer->blame );
     tr_free( peer->client );
+
+    tr_rcClose( peer->pieceSpeed[TR_CLIENT_TO_PEER] );
+    tr_rcClose( peer->pieceSpeed[TR_PEER_TO_CLIENT] );
     tr_free( peer );
 }
 
@@ -1008,6 +1013,9 @@ peerCallbackFunc( void * vpeer,
             tr_torrent * tor = t->tor;
             tor->activityDate = now;
             tor->uploadedCur += e->length;
+            tr_rcTransferred ( peer->pieceSpeed[TR_CLIENT_TO_PEER], e->length );
+            tr_rcTransferred ( tor->pieceSpeed[TR_CLIENT_TO_PEER], e->length );
+            tr_rcTransferred ( tor->session->pieceSpeed[TR_CLIENT_TO_PEER], e->length );
             tr_statsAddUploaded( tor->session, e->length );
             if( peer )
             {
@@ -1022,6 +1030,10 @@ peerCallbackFunc( void * vpeer,
             const time_t now = time( NULL );
             tr_torrent * tor = t->tor;
             tor->activityDate = now;
+            tr_statsAddDownloaded( tor->session, e->length );
+            tr_rcTransferred ( peer->pieceSpeed[TR_PEER_TO_CLIENT], e->length );
+            tr_rcTransferred ( tor->pieceSpeed[TR_PEER_TO_CLIENT], e->length );
+            tr_rcTransferred ( tor->session->pieceSpeed[TR_PEER_TO_CLIENT], e->length );
             /* only add this to downloadedCur if we got it from a peer --
              * webseeds shouldn't count against our ratio.  As one tracker
              * admin put it, "Those pieces are downloaded directly from the
@@ -1030,7 +1042,6 @@ peerCallbackFunc( void * vpeer,
              * into the jurisdiction of the tracker." */
             if( peer )
                 tor->downloadedCur += e->length;
-            tr_statsAddDownloaded( tor->session, e->length );
             if( peer ) {
                 struct peer_atom * a = getExistingAtom( t, &peer->in_addr );
                 a->piece_data_time = now;
@@ -1715,23 +1726,6 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
     managerUnlock( manager );
 }
 
-double
-tr_peerMgrGetRate( const tr_peerMgr * manager,
-                   tr_direction       direction )
-{
-    int    i;
-    double bytes = 0;
-
-    assert( manager != NULL );
-    assert( direction == TR_UP || direction == TR_DOWN );
-
-    for( i = 0; i < BANDWIDTH_PULSE_HISTORY; ++i )
-        bytes += manager->rateHistory[direction][i];
-
-    return ( BANDWIDTH_PULSES_PER_SECOND * bytes )
-           / ( BANDWIDTH_PULSE_HISTORY * 1024 );
-}
-
 float*
 tr_peerMgrWebSpeeds( const tr_peerMgr * manager,
                      const uint8_t *    torrentHash )
@@ -1758,6 +1752,17 @@ tr_peerMgrWebSpeeds( const tr_peerMgr * manager,
     managerUnlock( manager );
     return ret;
 }
+
+double
+tr_peerGetPieceSpeed( const tr_peer    * peer,
+                      tr_direction       direction )
+{
+    assert( peer );
+    assert( direction==TR_CLIENT_TO_PEER || direction==TR_PEER_TO_CLIENT );
+
+    return tr_rcRate( peer->pieceSpeed[direction] );
+}
+
 
 struct tr_peer_stat *
 tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
@@ -1790,8 +1795,8 @@ tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
         stat->from               = atom->from;
         stat->progress           = peer->progress;
         stat->isEncrypted        = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
-        stat->rateToPeer         = tr_peerIoGetRateToPeer( peer->io );
-        stat->rateToClient       = tr_peerIoGetRateToClient( peer->io );
+        stat->rateToPeer         = tr_peerGetPieceSpeed( peer, TR_CLIENT_TO_PEER );
+        stat->rateToClient       = tr_peerGetPieceSpeed( peer, TR_PEER_TO_CLIENT );
         stat->peerIsChoked       = peer->peerIsChoked;
         stat->peerIsInterested   = peer->peerIsInterested;
         stat->clientIsChoked     = peer->clientIsChoked;
@@ -1895,11 +1900,11 @@ rechoke( Torrent * t )
             tr_peerMsgsSetChoke( peer->msgs, TRUE );
         else
         {
-            struct ChokeData * node = &choke[size++];
-            node->peer = peer;
-            node->isInterested = peer->peerIsInterested;
-            node->rateToClient = tr_peerIoGetRateToClient( peer->io );
-            node->rateToPeer = tr_peerIoGetRateToPeer( peer->io );
+            struct ChokeData * n = &choke[size++];
+            n->peer         = peer;
+            n->isInterested = peer->peerIsInterested;
+            n->rateToPeer   = tr_peerGetPieceSpeed( peer, TR_CLIENT_TO_PEER );
+            n->rateToClient = tr_peerGetPieceSpeed( peer, TR_PEER_TO_CLIENT );
         }
     }
 
@@ -2322,8 +2327,8 @@ allocateHowMuch( double         desiredAvgKB,
 {
     const double baseline = desiredAvgKB * 1024.0 /
                             BANDWIDTH_PULSES_PER_SECOND;
-    const double min = baseline * 0.66;
-    const double max = baseline * 1.33;
+    const double min = baseline * 0.90;
+    const double max = baseline * 1.10;
     int          i;
     double       usedBytes;
     double       n;
@@ -2570,8 +2575,7 @@ bandwidthPulse( void * vmgr )
 
     /* allocate the upload and download bandwidth */
     for( i = 0; i < 2; ++i )
-        mgr->rateHistory[i][mgr->bandwidthPulseNumber] =
-            allocateBandwidth( mgr, i );
+        allocateBandwidth( mgr, i );
 
     managerUnlock( mgr );
     return TRUE;

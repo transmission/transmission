@@ -29,6 +29,7 @@
 #include "peer-mgr.h"
 #include "platform.h" /* tr_lock */
 #include "port-forwarding.h"
+#include "ratecontrol.h"
 #include "rpc-server.h"
 #include "stats.h"
 #include "torrent.h"
@@ -253,6 +254,8 @@ tr_sessionInitFull( const char *       configDir,
     h->isProxyAuthEnabled = proxyAuthIsEnabled != 0;
     h->proxyUsername = tr_strdup( proxyUsername );
     h->proxyPassword = tr_strdup( proxyPassword );
+    h->pieceSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
+    h->pieceSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
 
     if( configDir == NULL )
         configDir = tr_getDefaultConfigDir( );
@@ -503,10 +506,10 @@ tr_sessionGetSpeed( const tr_handle * session,
                     float *           toPeer )
 {
     if( session && toClient )
-        *toClient = tr_peerMgrGetRate( session->peerMgr, TR_DOWN );
+        *toClient = tr_rcRate( session->pieceSpeed[TR_PEER_TO_CLIENT] );
 
     if( session && toPeer )
-        *toPeer = tr_peerMgrGetRate( session->peerMgr, TR_UP );
+        *toPeer = tr_rcRate( session->pieceSpeed[TR_CLIENT_TO_PEER] );
 }
 
 int
@@ -620,6 +623,8 @@ tr_sessionClose( tr_handle * session )
     }
 
     /* free the session memory */
+    tr_rcClose( session->pieceSpeed[TR_PEER_TO_CLIENT] );
+    tr_rcClose( session->pieceSpeed[TR_CLIENT_TO_PEER] );
     tr_lockFree( session->lock );
     for( i = 0; i < session->metainfoLookupCount; ++i )
         tr_free( session->metainfoLookup[i].filename );
