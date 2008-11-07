@@ -195,7 +195,7 @@ tr_torrentGetSpeedLimit( const tr_torrent * tor,
 }
 
 int
-tr_torrentPieceTransferIsAllowed( const tr_torrent  * tor,
+tr_torrentIsPieceTransferAllowed( const tr_torrent  * tor,
                                   tr_direction        direction )
 {
     int isEnabled = FALSE;
@@ -203,7 +203,8 @@ tr_torrentPieceTransferIsAllowed( const tr_torrent  * tor,
     switch( tr_torrentGetSpeedMode( tor, direction ) )
     {
         case TR_SPEEDLIMIT_GLOBAL:
-            isEnabled = tr_sessionGetSpeedLimit( tor->session, direction ) > 0;
+            isEnabled = !tr_sessionIsSpeedLimitEnabled( tor->session, direction )
+                      || tr_sessionGetSpeedLimit( tor->session, direction ) > 0;
             break;
 
         case TR_SPEEDLIMIT_SINGLE:

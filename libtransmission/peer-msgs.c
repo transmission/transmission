@@ -542,7 +542,7 @@ isPeerInteresting( const tr_peermsgs * msgs )
     if( clientIsSeed )
         return FALSE;
 
-    if( !tr_torrentPieceTransferIsAllowed( msgs->torrent, TR_PEER_TO_CLIENT ) )
+    if( !tr_torrentIsPieceTransferAllowed( msgs->torrent, TR_PEER_TO_CLIENT ) )
         return FALSE;
 
     torrent = msgs->torrent;
@@ -813,7 +813,7 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
         return;
     if( msgs->info->clientIsChoked )
         return;
-    if( !tr_torrentPieceTransferIsAllowed( msgs->torrent, TR_PEER_TO_CLIENT ) )
+    if( !tr_torrentIsPieceTransferAllowed( msgs->torrent, TR_PEER_TO_CLIENT ) )
         return;
 
     while( ( count < max ) && reqListPop( &msgs->clientWillAskFor, &req ) )

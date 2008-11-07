@@ -1891,7 +1891,7 @@ rechoke( Torrent * t )
     int                i, peerCount, size, unchokedInterested;
     tr_peer **         peers = getConnectedPeers( t, &peerCount );
     struct ChokeData * choke = tr_new0( struct ChokeData, peerCount );
-    const int          chokeAll = !tr_torrentPieceTransferIsAllowed( t->tor, TR_CLIENT_TO_PEER );
+    const int          chokeAll = !tr_torrentIsPieceTransferAllowed( t->tor, TR_CLIENT_TO_PEER );
 
     assert( torrentIsLocked( t ) );
 
@@ -2519,7 +2519,7 @@ allocateBandwidth( tr_peerMgr * mgr,
 
         /* if piece data is disallowed, don't bother limiting bandwidth --
          * we won't be asking for, or sending out, any pieces */
-        if( !tr_torrentPieceTransferIsAllowed( t->tor, direction ) )
+        if( !tr_torrentIsPieceTransferAllowed( t->tor, direction ) )
             speedMode = TR_SPEEDLIMIT_UNLIMITED;
         else
             speedMode = tr_torrentGetSpeedMode( t->tor, direction );
