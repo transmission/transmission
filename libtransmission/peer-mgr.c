@@ -1891,6 +1891,7 @@ rechoke( Torrent * t )
     int                i, peerCount, size, unchokedInterested;
     tr_peer **         peers = getConnectedPeers( t, &peerCount );
     struct ChokeData * choke = tr_new0( struct ChokeData, peerCount );
+    const int          chokeAll = !tr_torrentPieceTransferIsAllowed( t->tor, TR_CLIENT_TO_PEER );
 
     assert( torrentIsLocked( t ) );
 
@@ -1900,8 +1901,9 @@ rechoke( Torrent * t )
         tr_peer * peer = peers[i];
         if( peer->progress >= 1.0 ) /* choke all seeds */
             tr_peerMsgsSetChoke( peer->msgs, TRUE );
-        else
-        {
+        else if( chokeAll )
+            tr_peerMsgsSetChoke( peer->msgs, TRUE );
+        else {
             struct ChokeData * n = &choke[size++];
             n->peer         = peer;
             n->isInterested = peer->peerIsInterested;
@@ -2503,8 +2505,10 @@ allocateBandwidth( tr_peerMgr * mgr,
 
     for( i = 0; i < torrentCount; ++i )
     {
-        Torrent *    t = torrents[i];
+        Torrent * t = torrents[i];
         const size_t used = countPeerBandwidth( t->peers, direction );
+        tr_speedlimit speedMode;
+
         countHandshakeBandwidth( t->outgoingHandshakes, direction );
 
         /* remember this torrent's bytes used */
@@ -2513,8 +2517,15 @@ allocateBandwidth( tr_peerMgr * mgr,
         /* add this torrent's bandwidth use to allBytesUsed */
         allBytesUsed += used;
 
+        /* if piece data is disallowed, don't bother limiting bandwidth --
+         * we won't be asking for, or sending out, any pieces */
+        if( !tr_torrentPieceTransferIsAllowed( t->tor, direction ) )
+            speedMode = TR_SPEEDLIMIT_UNLIMITED;
+        else
+            speedMode = tr_torrentGetSpeedMode( t->tor, direction );
+            
         /* process the torrent's peers based on its speed mode */
-        switch( tr_torrentGetSpeedMode( t->tor, direction ) )
+        switch( speedMode )
         {
             case TR_SPEEDLIMIT_UNLIMITED:
                 givePeersUnlimitedBandwidth( t->peers, direction );

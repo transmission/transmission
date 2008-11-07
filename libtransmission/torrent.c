@@ -146,7 +146,7 @@ tr_torrentSetSpeedMode( tr_torrent *  tor,
                         tr_speedlimit mode )
 {
     tr_speedlimit * limit = direction == TR_UP ? &tor->uploadLimitMode
-                            : &tor->downloadLimitMode;
+                                               : &tor->downloadLimitMode;
 
     *limit = mode;
 }
@@ -156,7 +156,7 @@ tr_torrentGetSpeedMode( const tr_torrent * tor,
                         tr_direction       direction )
 {
     return direction == TR_UP ? tor->uploadLimitMode
-           : tor->downloadLimitMode;
+                              : tor->downloadLimitMode;
 }
 
 void
@@ -192,6 +192,34 @@ tr_torrentGetSpeedLimit( const tr_torrent * tor,
         default:
             assert( 0 );
     }
+}
+
+int
+tr_torrentPieceTransferIsAllowed( const tr_torrent  * tor,
+                                  tr_direction        direction )
+{
+    int isEnabled = FALSE;
+
+    switch( tr_torrentGetSpeedMode( tor, direction ) )
+    {
+        case TR_SPEEDLIMIT_GLOBAL:
+            isEnabled = tr_sessionGetSpeedLimit( tor->session, direction ) > 0;
+            break;
+
+        case TR_SPEEDLIMIT_SINGLE:
+            isEnabled = tr_torrentGetSpeedLimit( tor, direction ) > 0;
+            break;
+
+        case TR_SPEEDLIMIT_UNLIMITED:
+            isEnabled = TRUE;
+            break;
+
+        default:
+            assert( 0 && "unhandled speed mode" );
+            break;
+    }
+
+    return isEnabled;
 }
 
 /***
