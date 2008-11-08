@@ -151,8 +151,8 @@
         //set upload and download rate badges
         NSString * downloadRateString = nil, * uploadRateString = nil;
         
-        float downloadRate = tr_sessionGetPieceSpeed(fLib, TR_DOWN),
-                uploadRate = tr_sessionGetPieceSpeed(fLib, TR_UP);
+        float downloadRate = checkDownload ? tr_sessionGetPieceSpeed(fLib, TR_DOWN) : 0.0f;
+        float uploadRate = checkUpload ? tr_sessionGetPieceSpeed(fLib, TR_UP) : 0.0f;
         
         if (checkDownload && downloadRate >= 0.1)
             downloadRateString = [NSString stringForSpeedAbbrev: downloadRate];
