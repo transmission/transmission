@@ -29,19 +29,22 @@ struct tr_webseed
     unsigned int        busy : 1;
     unsigned int        dead : 1;
 
-    tr_torrent *        torrent;
-    char *              url;
+    uint8_t             hash[SHA_DIGEST_LENGTH];
 
-    tr_delivery_func *  callback;
+    char              * url;
+
+    tr_delivery_func  * callback;
     void *              callback_userdata;
 
     tr_piece_index_t    pieceIndex;
     uint32_t            pieceOffset;
     uint32_t            byteCount;
 
-    tr_ratecontrol *    rateDown;
+    tr_ratecontrol    * rateDown;
 
-    struct evbuffer *   content;
+    tr_session        * session;
+
+    struct evbuffer   * content;
 };
 
 /***
@@ -204,13 +207,14 @@ makeURL( tr_webseed *    w,
 static void requestNextChunk( tr_webseed * w );
 
 static void
-webResponseFunc( tr_handle   * session UNUSED,
-                 long                  response_code,
-                 const void *          response,
-                 size_t                response_byte_count,
-                 void *                vw )
+webResponseFunc( tr_handle     * session,
+                 long            response_code,
+                 const void    * response,
+                 size_t          response_byte_count,
+                 void          * vw )
 {
     tr_webseed * w = vw;
+    tr_torrent * tor = tr_torrentFindFromHash( session, w->hash );
     const int    success = ( response_code == 206 );
 
 /*fprintf( stderr, "server responded with code %ld and %lu bytes\n",
@@ -219,7 +223,7 @@ webResponseFunc( tr_handle   * session UNUSED,
     {
         /* FIXME */
     }
-    else
+    else if( tor != NULL )
     {
         evbuffer_add( w->content, response, response_byte_count );
         if( !w->dead )
@@ -231,7 +235,7 @@ webResponseFunc( tr_handle   * session UNUSED,
         if( EVBUFFER_LENGTH( w->content ) < w->byteCount )
             requestNextChunk( w );
         else {
-            tr_ioWrite( w->torrent, w->pieceIndex, w->pieceOffset, w->byteCount, EVBUFFER_DATA(w->content) );
+            tr_ioWrite( tor, w->pieceIndex, w->pieceOffset, w->byteCount, EVBUFFER_DATA(w->content) );
             evbuffer_drain( w->content, EVBUFFER_LENGTH( w->content ) );
             w->busy = 0;
             if( w->dead )
@@ -247,27 +251,32 @@ webResponseFunc( tr_handle   * session UNUSED,
 static void
 requestNextChunk( tr_webseed * w )
 {
-    const tr_info * inf = tr_torrentInfo( w->torrent );
-    const uint32_t have = EVBUFFER_LENGTH( w->content );
-    const uint32_t left = w->byteCount - have;
-    const uint32_t pieceOffset = w->pieceOffset + have;
-    tr_file_index_t fileIndex;
-    uint64_t fileOffset;
-    uint32_t thisPass;
-    char * url;
-    char * range;
+    tr_torrent * tor = tr_torrentFindFromHash( w->session, w->hash );
 
-    tr_ioFindFileLocation( w->torrent, w->pieceIndex, pieceOffset,
-                           &fileIndex, &fileOffset );
-    thisPass = MIN( left, inf->files[fileIndex].length - fileOffset );
+    if( tor != NULL )
+    {
+        const tr_info * inf = tr_torrentInfo( tor );
+        const uint32_t have = EVBUFFER_LENGTH( w->content );
+        const uint32_t left = w->byteCount - have;
+        const uint32_t pieceOffset = w->pieceOffset + have;
+        tr_file_index_t fileIndex;
+        uint64_t fileOffset;
+        uint32_t thisPass;
+        char * url;
+        char * range;
 
-    url = makeURL( w, &inf->files[fileIndex] );
+        tr_ioFindFileLocation( tor, w->pieceIndex, pieceOffset,
+                               &fileIndex, &fileOffset );
+        thisPass = MIN( left, inf->files[fileIndex].length - fileOffset );
+
+        url = makeURL( w, &inf->files[fileIndex] );
 /*fprintf( stderr, "url is [%s]\n", url );*/
-    range = tr_strdup_printf( "%"PRIu64"-%"PRIu64, fileOffset, fileOffset + thisPass - 1 );
+        range = tr_strdup_printf( "%"PRIu64"-%"PRIu64, fileOffset, fileOffset + thisPass - 1 );
 /*fprintf( stderr, "range is [%s] ... we want %lu total, we have %lu, so %lu are left, and we're asking for %lu this time\n", range, (unsigned long)w->byteCount, (unsigned long)have, (unsigned long)left, (unsigned long)thisPass );*/
-    tr_webRun( w->torrent->session, url, range, webResponseFunc, w );
-    tr_free( range );
-    tr_free( url );
+        tr_webRun( w->session, url, range, webResponseFunc, w );
+        tr_free( range );
+        tr_free( url );
+    }
 }
 
 tr_addreq_t
@@ -324,9 +333,10 @@ tr_webseedNew( struct tr_torrent * torrent,
 {
     tr_webseed * w = tr_new0( tr_webseed, 1 );
 
+    memcpy( w->hash, torrent->info.hash, SHA_DIGEST_LENGTH );
+    w->session = torrent->session;
     w->content = evbuffer_new( );
     w->rateDown = tr_rcInit( );
-    w->torrent = torrent;
     w->url = tr_strdup( url );
     w->callback = callback;
     w->callback_userdata = callback_userdata;
