@@ -87,7 +87,7 @@
     {
         float downloadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
                                 ? tr_sessionGetPieceSpeed(fLib, TR_DOWN) : 0.0f;
-        float uploadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
+        float uploadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"]
                             ? tr_sessionGetPieceSpeed(fLib, TR_UP) : 0.0f;
         
         //only update if the badged values change
