@@ -799,8 +799,7 @@ file_list_new( TrTorrent * gtor )
                                                    Don't include the prefix
                                                    "filedetails|" in the
                                                    translation. */
-                                                "title",
-                                                Q_( "filedetails|File" ),
+                                                "title", Q_( "filedetails|File" ),
                                                 NULL ) );
     rend = gtk_cell_renderer_pixbuf_new( );
     gtk_tree_view_column_pack_start( col, rend, FALSE );
@@ -819,14 +818,9 @@ file_list_new( TrTorrent * gtor )
     rend = gtk_cell_renderer_progress_new( );
     /* Translators: this is a column header in Files tab, Details dialog;
        Don't include the prefix "filedetails|" in the translation. */
-    col =
-        gtk_tree_view_column_new_with_attributes( Q_(
-                                                      "filedetails|Progress" ),
-                                                  rend, NULL );
-    gtk_tree_view_column_set_cell_data_func( col, rend, renderProgress,
-                                             NULL,
-                                             NULL );
-    gtk_tree_view_column_set_resizable( col, TRUE );
+    col = gtk_tree_view_column_new_with_attributes( Q_( "filedetails|Progress" ), rend, NULL );
+    gtk_tree_view_column_set_cell_data_func( col, rend, renderProgress, NULL, NULL );
+    gtk_tree_view_column_set_resizable( col, FALSE );
     gtk_tree_view_append_column ( GTK_TREE_VIEW( view ), col );
 
     /* add "enabled" column */
@@ -834,31 +828,23 @@ file_list_new( TrTorrent * gtor )
     /* Translators: this is a column header in Files tab, Details dialog;
        Don't include the prefix "filedetails|" in the translation.
        The items for this column are checkboxes (yes/no) */
-    col =
-        gtk_tree_view_column_new_with_attributes( Q_(
-                                                      "filedetails|Download" ),
-                                                  rend, NULL );
-    gtk_tree_view_column_set_cell_data_func( col, rend, renderDownload,
-                                             NULL,
-                                             NULL );
-    gtk_tree_view_column_set_resizable( col, TRUE );
+    col = gtk_tree_view_column_new_with_attributes( Q_( "filedetails|Download" ), rend, NULL );
+    gtk_tree_view_column_set_cell_data_func( col, rend, renderDownload, NULL, NULL );
+    gtk_tree_view_column_set_resizable( col, FALSE );
     gtk_tree_view_append_column ( GTK_TREE_VIEW( view ), col );
 
     /* add priority column */
     rend = gtk_cell_renderer_text_new( );
-    col = gtk_tree_view_column_new_with_attributes( _(
-                                                        "Priority" ), rend,
-                                                    NULL );
-    gtk_tree_view_column_set_cell_data_func( col, rend, renderPriority,
-                                             NULL,
-                                             NULL );
-    gtk_tree_view_column_set_resizable( col, TRUE );
+    col = gtk_tree_view_column_new_with_attributes( _( "Priority" ), rend, NULL );
+    gtk_tree_view_column_set_cell_data_func( col, rend, renderPriority, NULL, NULL );
+    gtk_tree_view_column_set_resizable( col, FALSE );
     gtk_tree_view_append_column ( GTK_TREE_VIEW( view ), col );
 
     /* create the scrolled window and stick the view in it */
     scroll = gtk_scrolled_window_new( NULL, NULL );
     gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scroll ),
-                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC );
+                                    GTK_POLICY_AUTOMATIC,
+                                    GTK_POLICY_AUTOMATIC );
     gtk_scrolled_window_set_shadow_type ( GTK_SCROLLED_WINDOW( scroll ),
                                           GTK_SHADOW_IN );
     gtk_container_add( GTK_CONTAINER( scroll ), view );
