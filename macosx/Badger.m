@@ -85,10 +85,10 @@
 {
     if ([NSApp isOnLeopardOrBetter])
     {
-        BOOL badgeDownload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"],
-            badgeUpload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"];
-        float downloadRate = badgeDownload ? tr_sessionGetPieceSpeed( fLib, TR_DOWN ) : 0.0f;
-        float uploadRate   = badgeUpload   ? tr_sessionGetPieceSpeed( fLib, TR_UP   ) : 0.0f;
+        float downloadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
+                                ? tr_sessionGetPieceSpeed(fLib, TR_DOWN) : 0.0f;
+        float uploadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
+                            ? tr_sessionGetPieceSpeed(fLib, TR_UP) : 0.0f;
         
         //only update if the badged values change
         if ([(BadgeView *)[[NSApp dockTile] contentView] setRatesWithDownload: downloadRate upload: uploadRate])
@@ -151,8 +151,8 @@
         //set upload and download rate badges
         NSString * downloadRateString = nil, * uploadRateString = nil;
         
-        float downloadRate = tr_sessionGetPieceSpeed( fLib, TR_DOWN );
-        float uploadRate   = tr_sessionGetPieceSpeed( fLib, TR_UP );
+        float downloadRate = tr_sessionGetPieceSpeed(fLib, TR_DOWN),
+                uploadRate = tr_sessionGetPieceSpeed(fLib, TR_UP);
         
         if (checkDownload && downloadRate >= 0.1)
             downloadRateString = [NSString stringForSpeedAbbrev: downloadRate];
