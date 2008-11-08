@@ -2337,8 +2337,8 @@ allocateHowMuch( double                  desired_average_kb_per_sec,
     const int pulses_per_history = TR_RATECONTROL_HISTORY_MSEC / BANDWIDTH_PERIOD_MSEC;
     const double seconds_per_pulse = BANDWIDTH_PERIOD_MSEC / 1000.0;
     const double baseline_bytes_per_pulse = desired_average_kb_per_sec * 1024.0 * seconds_per_pulse;
-    const double min = baseline_bytes_per_pulse * 0.85;
-    const double max = baseline_bytes_per_pulse * 1.15;
+    const double min = baseline_bytes_per_pulse * 0.80;
+    const double max = baseline_bytes_per_pulse * 1.10;
     const double current_bytes_per_pulse = tr_rcRate( ratecontrol ) * 1024.0 * seconds_per_pulse;
     const double next_pulse_bytes = baseline_bytes_per_pulse * ( pulses_per_history + 1 )
                                   - ( current_bytes_per_pulse * pulses_per_history );
@@ -2349,11 +2349,13 @@ allocateHowMuch( double                  desired_average_kb_per_sec,
     clamped = MAX( clamped, min );
     clamped = MIN( clamped, max );
 
-/*fprintf( stderr, "desiredAvgKB is %.2f, rate is %.2f, allocating %.2f (%.2f)\n",
+#if 0
+fprintf( stderr, "desiredAvgKB is %5.2f, rate is %5.2f, allocating %5.2f (%5.2f)\n",
          desired_average_kb_per_sec,
          tr_rcRate( ratecontrol ),
          clamped/1024.0,
-         next_pulse_bytes/1024.0 );*/
+         next_pulse_bytes/1024.0 );
+#endif
 
     return clamped;
 }
