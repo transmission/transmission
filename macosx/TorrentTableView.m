@@ -738,19 +738,19 @@
         visibleRect.size.height -= newY - visibleRect.origin.y;
         visibleRect.origin.y = newY;
     }
-    
-    //remaining visible rows continue alternating
-    CGFloat height = [self rowHeight] + [self intercellSpacing].height;
-    NSInteger numberOfRects = ceil(visibleRect.size.height / height);
-    visibleRect.size.height = height;
-    
-    for (NSInteger i=0; i<numberOfRects; i++)
-    {
-        if (!start)
-            NSRectFill(visibleRect);
         
-        start = !start;
+    //remaining visible rows continue alternating
+    const CGFloat height = [self rowHeight] + [self intercellSpacing].height;
+    const NSInteger numberOfRects = ceil(visibleRect.size.height / height);
+    
+    visibleRect.size.height = height;
+    if (start)
         visibleRect.origin.y += height;
+    
+    for (NSInteger i = start ? 1 : 0; i<numberOfRects; i += 2)
+    {
+        NSRectFill(visibleRect);
+        visibleRect.origin.y += 2 * height;
     }
     
     [super highlightSelectionInClipRect: clipRect];

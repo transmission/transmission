@@ -4229,7 +4229,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
             if (torrentStruct == [torrent torrentStruct])
+            {
+                [torrent retain];
                 break;
+            }
         
         if (!torrent)
         {
@@ -4238,8 +4241,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             NSLog(@"No torrent found matching the given torrent struct from the RPC callback!");
             return;
         }
-        
-        [torrent retain];
     }
     
     switch (type)

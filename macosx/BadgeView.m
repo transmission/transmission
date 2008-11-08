@@ -57,14 +57,12 @@
 - (BOOL) setRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate
 {
     //only needs update if the badges were displayed or are displayed now
-    BOOL needsUpdate = fDownloadRate != downloadRate || fUploadRate != uploadRate;
-    if (needsUpdate)
-    {
-        fDownloadRate = downloadRate;
-        fUploadRate = uploadRate;
-    }
+    if (fDownloadRate == downloadRate && fUploadRate == uploadRate)
+        return NO;
     
-    return needsUpdate;
+    fDownloadRate = downloadRate;
+    fUploadRate = uploadRate;
+    return YES;
 }
 
 - (void) setQuitting

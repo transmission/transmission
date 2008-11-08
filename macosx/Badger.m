@@ -96,9 +96,9 @@
         
         return;
     }
-    else if (fQuittingTiger)
+    
+    if (fQuittingTiger)
         return;
-    else;
     
     //set completed badge to top right
     BOOL completedChange = fCompleted != fCompletedBadged;
