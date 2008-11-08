@@ -282,9 +282,9 @@ getStatusStr( const tr_stat * st,
             st->percentDone * 100.0,
             st->peersSendingToUs,
             st->peersConnected,
-            st->rateDownload,
+            st->pieceDownloadSpeed,
             st->peersGettingFromUs,
-            st->rateUpload,
+            st->pieceUploadSpeed,
             ratioStr );
     }
     else if( st->activity & TR_STATUS_SEED )
@@ -295,7 +295,7 @@ getStatusStr( const tr_stat * st,
             buf, buflen,
             "Seeding, uploading to %d of %d peer(s), %.0f KB/s [%s]",
             st->peersGettingFromUs, st->peersConnected,
-            st->rateUpload, ratioStr );
+            st->pieceUploadSpeed, ratioStr );
     }
     else *buf = '\0';
 }

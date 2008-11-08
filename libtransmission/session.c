@@ -256,6 +256,8 @@ tr_sessionInitFull( const char *       configDir,
     h->proxyPassword = tr_strdup( proxyPassword );
     h->pieceSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
     h->pieceSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
+    h->rawSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
+    h->rawSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
 
     if( configDir == NULL )
         configDir = tr_getDefaultConfigDir( );
@@ -500,16 +502,20 @@ tr_sessionGetPeerLimit( const tr_handle * handle UNUSED )
 ****
 ***/
 
-void
-tr_sessionGetSpeed( const tr_handle * session,
-                    float *           toClient,
-                    float *           toPeer )
+double
+tr_sessionGetPieceSpeed( const tr_session * session, tr_direction dir )
 {
-    if( session && toClient )
-        *toClient = tr_rcRate( session->pieceSpeed[TR_PEER_TO_CLIENT] );
+    assert( dir==TR_UP || dir==TR_DOWN );
 
-    if( session && toPeer )
-        *toPeer = tr_rcRate( session->pieceSpeed[TR_CLIENT_TO_PEER] );
+    return session ? tr_rcRate( session->pieceSpeed[dir] ) : 0.0;
+}
+
+double
+tr_sessionGetRawSpeed( const tr_session * session, tr_direction dir )
+{
+    assert( dir==TR_UP || dir==TR_DOWN );
+
+    return session ? tr_rcRate( session->rawSpeed[dir] ) : 0.0;
 }
 
 int
@@ -625,6 +631,8 @@ tr_sessionClose( tr_handle * session )
     /* free the session memory */
     tr_rcClose( session->pieceSpeed[TR_PEER_TO_CLIENT] );
     tr_rcClose( session->pieceSpeed[TR_CLIENT_TO_PEER] );
+    tr_rcClose( session->rawSpeed[TR_PEER_TO_CLIENT] );
+    tr_rcClose( session->rawSpeed[TR_CLIENT_TO_PEER] );
     tr_lockFree( session->lock );
     for( i = 0; i < session->metainfoLookupCount; ++i )
         tr_free( session->metainfoLookup[i].filename );

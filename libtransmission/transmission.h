@@ -559,9 +559,11 @@ void       tr_sessionSetSpeedLimitEnabled( tr_session    * session,
                                            tr_direction    direction,
                                            int             isEnabled );
 
-void       tr_sessionGetSpeed( const tr_session  * session,
-                               float             * overall_down_KiBs,
-                               float             * overall_up_KiBs );
+double     tr_sessionGetRawSpeed( const tr_session  * session,
+                                  tr_direction        direection );
+
+double     tr_sessionGetPieceSpeed( const tr_session  * session,
+                                    tr_direction        direection );
 
 int        tr_sessionIsSpeedLimitEnabled( const tr_session  * session,
                                           tr_direction       direction );
@@ -1184,6 +1186,8 @@ typedef enum
 }
 tr_torrent_activity;
 
+tr_torrent_activity tr_torrentGetActivity( tr_torrent * );
+
 #define TR_STATUS_IS_ACTIVE( s ) ( ( s ) != TR_STATUS_STOPPED )
 
 typedef enum
@@ -1193,8 +1197,6 @@ typedef enum
     TR_LOCKFILE_ELOCK
 }
 tr_lockfile_state_t;
-
-tr_torrent_activity tr_torrentGetActivity( tr_torrent * );
 
 enum
 {
@@ -1256,11 +1258,21 @@ typedef struct tr_stat
         @see tr_stat.leftUntilDone */
     float    percentDone;
 
-    /** Download speed in KiB/s */
-    double    rateDownload;
+    /** Speed all data being sent for this torrent. (KiB/s)
+        This includes piece data, protocol messages, and TCP overhead */
+    double rawUploadSpeed;
 
-    /** Upload speed in KiB/s */
-    double    rateUpload;
+    /** Speed all data being received for this torrent. (KiB/s)
+        This includes piece data, protocol messages, and TCP overhead */
+    double rawDownloadSpeed;
+
+    /** Speed all piece being sent for this torrent. (KiB/s)
+        This ONLY counts piece data. */
+    double pieceUploadSpeed;
+
+    /** Speed all piece being received for this torrent. (KiB/s)
+        This ONLY counts piece data. */
+    double pieceDownloadSpeed;
 
 #define TR_ETA_NOT_AVAIL -1
 #define TR_ETA_UNKNOWN -2

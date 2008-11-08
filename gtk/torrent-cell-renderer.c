@@ -108,9 +108,9 @@ getShortTransferString( const tr_stat * torStat,
     const int haveUp = torStat->peersGettingFromUs > 0;
 
     if( haveDown )
-        tr_strlspeed( downStr, torStat->rateDownload, sizeof( downStr ) );
+        tr_strlspeed( downStr, torStat->pieceDownloadSpeed, sizeof( downStr ) );
     if( haveUp )
-        tr_strlspeed( upStr, torStat->rateUpload, sizeof( upStr ) );
+        tr_strlspeed( upStr, torStat->pieceUploadSpeed, sizeof( upStr ) );
 
     if( haveDown && haveUp )
         /* Translators: do not translate the "speed|" disambiguation prefix.

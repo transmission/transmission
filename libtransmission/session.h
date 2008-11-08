@@ -35,15 +35,6 @@
  #endif
 #endif
 
-enum
-{
-    /* How frequently to reallocate peer bandwidth. */
-    BANDWIDTH_PULSES_PER_SECOND = 4,
-
-    /* HOw many pulses to remember for averaging the current speed */
-    BANDWIDTH_PULSE_HISTORY = ( BANDWIDTH_PULSES_PER_SECOND * 2 )
-};
-
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
@@ -117,6 +108,9 @@ struct tr_handle
     /* the rate at which pieces are being transferred between client and peer.
      * protocol overhead is NOT included; this is only the piece data */
     struct tr_ratecontrol     *  pieceSpeed[2];
+
+    /* the rate at which bytes are being transferred between client and peer. */
+    struct tr_ratecontrol     *  rawSpeed[2];
 };
 
 const char * tr_sessionFindTorrentFile( const tr_session * session,

@@ -1507,8 +1507,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             if (![fStatusBar isHidden])
             {
                 //set rates
-                float downloadRate, uploadRate;
-                tr_sessionGetSpeed(fLib, &downloadRate, &uploadRate);
+                float downloadRate = tr_sessionGetPieceSpeed( fLib, TR_DOWN );
+                float uploadRate = tr_sessionGetPieceSpeed( fLib, TR_UP );
                 
                 [fTotalDLField setStringValue: [NSString stringForSpeed: downloadRate]];
                 [fTotalULField setStringValue: [NSString stringForSpeed: uploadRate]];

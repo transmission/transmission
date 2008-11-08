@@ -29,6 +29,7 @@
 #include "crypto.h"
 #include "net.h"
 #include "peer-io.h"
+#include "ratecontrol.h"
 #include "trevent.h"
 #include "utils.h"
 
@@ -203,6 +204,7 @@ didWriteWrapper( struct bufferevent * e,
         struct tr_bandwidth * b = &io->bandwidth[TR_UP];
         b->bytesLeft -= MIN( b->bytesLeft, (size_t)n );
         b->bytesUsed += n;
+        tr_rcTransferred( io->session->rawSpeed[TR_UP], n );
         dbgmsg( io,
                 "wrote %zu bytes to peer... upload bytesLeft is now %zu",
                 n,
@@ -235,6 +237,7 @@ canReadWrapper( struct bufferevent * e,
         struct tr_bandwidth * b = io->bandwidth + TR_DOWN;
         b->bytesLeft -= MIN( b->bytesLeft, (size_t)n );
         b->bytesUsed += n;
+        tr_rcTransferred( io->session->rawSpeed[TR_DOWN], n );
         dbgmsg( io,
                 "%zu new input bytes. bytesUsed is %zu, bytesLeft is %zu",
                 n, b->bytesUsed,

@@ -308,8 +308,8 @@ compareByActivity( GtkTreeModel *           model,
     sa = tr_torrentStatCached( ta );
     sb = tr_torrentStatCached( tb );
 
-    if( ( i = compareDouble( sa->rateUpload + sa->rateDownload,
-                             sb->rateUpload + sb->rateDownload ) ) )
+    if( ( i = compareDouble( sa->pieceUploadSpeed + sa->pieceDownloadSpeed,
+                             sb->pieceUploadSpeed + sb->pieceDownloadSpeed ) ) )
         return i;
 
     if( sa->uploadedEver != sb->uploadedEver )
@@ -745,13 +745,13 @@ tr_core_get_stats( const TrCore *      core,
 
     if( !isDisposed( core ) )
     {
-        tr_sessionGetSpeed( core->priv->session,
-                            &setme->clientDownloadSpeed,
-                            &setme->clientUploadSpeed );
+        tr_session * session = core->priv->session;
 
-        gtk_tree_model_foreach( core->priv->model,
-                                statsForeach,
-                                setme );
+        setme->clientDownloadSpeed = tr_sessionGetPieceSpeed( session, TR_DOWN );
+
+        setme->clientUploadSpeed = tr_sessionGetPieceSpeed( session, TR_UP );
+
+        gtk_tree_model_foreach( core->priv->model, statsForeach, setme );
     }
 }
 

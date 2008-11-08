@@ -496,6 +496,8 @@ torrentRealInit( tr_handle *     h,
 
     randomizeTiers( info );
 
+    tor->rawSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
+    tor->rawSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
     tor->pieceSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
     tor->pieceSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
 
@@ -746,16 +748,6 @@ tr_torrentInfo( const tr_torrent * tor )
     return tor ? &tor->info : NULL;
 }
 
-static double
-tr_torrentGetRate( const tr_torrent * tor,
-                   tr_direction       direction )
-{
-    assert( tor != NULL );
-    assert( direction == TR_UP || direction == TR_DOWN );
-
-    return tr_rcRate( tor->pieceSpeed[direction] );
-}
-
 const tr_stat *
 tr_torrentStatCached( tr_torrent * tor )
 {
@@ -822,9 +814,10 @@ tr_torrentStat( tr_torrent * tor )
                             &s->peersGettingFromUs,
                             s->peersFrom );
 
-    s->rateDownload = tr_torrentGetRate( tor, TR_PEER_TO_CLIENT );
-
-    s->rateUpload = tr_torrentGetRate( tor, TR_CLIENT_TO_PEER );
+    s->rawUploadSpeed     = tr_rcRate( tor->rawSpeed[TR_UP] );
+    s->rawDownloadSpeed   = tr_rcRate( tor->rawSpeed[TR_DOWN] );
+    s->pieceUploadSpeed   = tr_rcRate( tor->pieceSpeed[TR_UP] );
+    s->pieceDownloadSpeed = tr_rcRate( tor->pieceSpeed[TR_DOWN] );
 
     usableSeeds += tor->info.webseedCount;
 
@@ -880,10 +873,10 @@ tr_torrentStat( tr_torrent * tor )
 
     if( s->leftUntilDone > s->desiredAvailable )
         s->eta = TR_ETA_NOT_AVAIL;
-    else if( s->rateDownload < 0.1 )
+    else if( s->pieceDownloadSpeed < 0.1 )
         s->eta = TR_ETA_UNKNOWN;
     else
-        s->eta = s->leftUntilDone / s->rateDownload / 1024.0;
+        s->eta = s->leftUntilDone / s->pieceDownloadSpeed / 1024.0;
 
     s->ratio = tr_getRatio(
         s->uploadedEver,
@@ -1109,6 +1102,8 @@ freeTorrent( tr_torrent * tor )
 
     tr_rcClose( tor->pieceSpeed[TR_PEER_TO_CLIENT] );
     tr_rcClose( tor->pieceSpeed[TR_CLIENT_TO_PEER] );
+    tr_rcClose( tor->rawSpeed[TR_PEER_TO_CLIENT] );
+    tr_rcClose( tor->rawSpeed[TR_CLIENT_TO_PEER] );
 
     tr_metainfoFree( inf );
     tr_free( tor );

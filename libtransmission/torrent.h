@@ -229,15 +229,12 @@ struct tr_torrent
 
     int                        uniqueId;
 
-    /* this is the count of raw bytes transferred between the
-     * client and its peers over the past HISTORY time slices.
-     * this count is used for bandwidth allocation, and includes
-     * piece data, protocol overhead, and estimated tcp header overhead. */
-    double                     rateHistory[2][BANDWIDTH_PULSE_HISTORY];
-
     /* the rate at which pieces are being transferred between client and
      * its peers.  protocol overhead is NOT included; only the piece data */
     struct tr_ratecontrol    * pieceSpeed[2];
+
+    /* the rate at which bytes are being sent between client and peers */
+    struct tr_ratecontrol    * rawSpeed[2];
 };
 
 #endif

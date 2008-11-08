@@ -29,9 +29,14 @@
 #include "ratecontrol.h"
 #include "utils.h"
 
-#define INTERVAL_MSEC 1000
-#define GRANULARITY_MSEC 200
-#define HISTORY_SIZE ( INTERVAL_MSEC / GRANULARITY_MSEC )
+enum
+{
+    INTERVAL_MSEC = TR_RATECONTROL_HISTORY_MSEC,
+
+    GRANULARITY_MSEC = 250,
+
+    HISTORY_SIZE = ( INTERVAL_MSEC / GRANULARITY_MSEC )
+};
 
 struct tr_transfer
 {

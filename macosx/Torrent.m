@@ -1311,12 +1311,12 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (CGFloat) downloadRate
 {
-    return fStat->rateDownload;
+    return fStat->pieceDownloadSpeed;
 }
 
 - (CGFloat) uploadRate
 {
-    return fStat->rateUpload;
+    return fStat->pieceUploadSpeed;
 }
 
 - (CGFloat) totalRate

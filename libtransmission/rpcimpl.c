@@ -361,9 +361,9 @@ addField( const tr_torrent * tor,
             tr_bencListAddInt( p, inf->files[i].priority );
     }
     else if( !strcmp( key, "rateDownload" ) )
-        tr_bencDictAddInt( d, key, (int)( st->rateDownload * 1024 ) );
+        tr_bencDictAddInt( d, key, (int)( st->pieceDownloadSpeed * 1024 ) );
     else if( !strcmp( key, "rateUpload" ) )
-        tr_bencDictAddInt( d, key, (int)( st->rateUpload * 1024 ) );
+        tr_bencDictAddInt( d, key, (int)( st->pieceUploadSpeed * 1024 ) );
     else if( !strcmp( key, "recheckProgress" ) )
         tr_bencDictAddDouble( d, key, st->recheckProgress );
     else if( !strcmp( key, "scrapeResponse" ) )
@@ -682,11 +682,9 @@ sessionStats( tr_handle *       h,
 {
     tr_benc *    d = tr_bencDictAddDict( args_out, "session-stats", 10 );
     tr_torrent * tor = NULL;
-    float        up, down;
     int          running = 0;
     int          total = 0;
 
-    tr_sessionGetSpeed( h, &down, &up );
     while( ( tor = tr_torrentNext( h, tor ) ) )
     {
         ++total;
@@ -695,10 +693,10 @@ sessionStats( tr_handle *       h,
     }
 
     tr_bencDictAddInt( d, "activeTorrentCount", running );
-    tr_bencDictAddInt( d, "downloadSpeed", (int)( down * 1024 ) );
+    tr_bencDictAddInt( d, "downloadSpeed", (int)( tr_sessionGetPieceSpeed( h, TR_DOWN ) * 1024 ) );
     tr_bencDictAddInt( d, "pausedTorrentCount", total - running );
     tr_bencDictAddInt( d, "torrentCount", total );
-    tr_bencDictAddInt( d, "uploadSpeed", (int)( up * 1024 ) );
+    tr_bencDictAddInt( d, "uploadSpeed", (int)( tr_sessionGetPieceSpeed( h, TR_UP ) * 1024 ) );
     return NULL;
 }
 

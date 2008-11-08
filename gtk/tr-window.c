@@ -769,15 +769,21 @@ updateStats( PrivateData * p )
 static void
 updateSpeeds( PrivateData * p )
 {
-    char        buf[128];
-    float       u, d;
     tr_session * session = tr_core_session( p->core );
 
-    tr_sessionGetSpeed( session, &d, &u );
-    tr_strlspeed( buf, d, sizeof( buf ) );
-    gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
-    tr_strlspeed( buf, u, sizeof( buf ) );
-    gtk_label_set_text( GTK_LABEL( p->ul_lb ), buf );
+    if( session != NULL )
+    {
+        char buf[128];
+        double d;
+
+        d = tr_sessionGetPieceSpeed( session, TR_DOWN );
+        tr_strlspeed( buf, d, sizeof( buf ) );
+        gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
+
+        d = tr_sessionGetPieceSpeed( session, TR_UP );
+        tr_strlspeed( buf, d, sizeof( buf ) );
+        gtk_label_set_text( GTK_LABEL( p->ul_lb ), buf );
+    }
 }
 
 void

@@ -25,6 +25,11 @@
 #ifndef _TR_RATECONTROL_H_
 #define _TR_RATECONTROL_H_
 
+enum
+{
+    TR_RATECONTROL_HISTORY_MSEC = 2000
+};
+
 typedef struct tr_ratecontrol tr_ratecontrol;
 
 
