@@ -2349,11 +2349,11 @@ allocateHowMuch( double                  desired_average_kb_per_sec,
     clamped = MAX( clamped, min );
     clamped = MIN( clamped, max );
 
-fprintf( stderr, "desiredAvgKB is %.2f, rate is %.2f, allocating %.2f (%.2f)\n",
+/*fprintf( stderr, "desiredAvgKB is %.2f, rate is %.2f, allocating %.2f (%.2f)\n",
          desired_average_kb_per_sec,
          tr_rcRate( ratecontrol ),
          clamped/1024.0,
-         next_pulse_bytes/1024.0 );
+         next_pulse_bytes/1024.0 );*/
 
     return clamped;
 }
