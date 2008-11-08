@@ -17,7 +17,7 @@ AC_CONFIG_SRCDIR(libtransmission/transmission.h)
 AM_INIT_AUTOMAKE([1.9 tar-ustar])
 AC_PROG_LIBTOOL
 
-if test "x${PEERID_PREFIX: -2:1}" = "xZ"; then
+if test m4_substr(peer_id_prefix,6,1) = "Z"; then
   AC_DEFINE(TR_UNSTABLE, 1, [Define to 1 if this is an unstable version of Transmission])
   TR_UNSTABLE=yes
 fi
