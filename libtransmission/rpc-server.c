@@ -20,7 +20,7 @@
 #include <fcntl.h>     /* open */
 #include <unistd.h>    /* close */
 
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
  #include <zlib.h>
 #endif
 
@@ -224,7 +224,7 @@ add_response( struct evhttp_request * req,
               const void *            content,
               size_t                  content_len )
 {
-#ifndef HAVE_LIBZ
+#ifndef HAVE_ZLIB
     evbuffer_add( out, content, content_len );
 #else
     const char * key = "Accept-Encoding";

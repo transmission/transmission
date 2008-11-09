@@ -3,7 +3,11 @@ AM_CPPFLAGS = \
 	-D__TRANSMISSION__ $(LIBEVENT_CPPFLAGS) \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\"
 
-AM_CFLAGS = $(LIBCURL_CFLAGS) $(OPENSSL_CFLAGS) $(PTHREAD_CFLAGS)
+AM_CFLAGS = \
+    $(LIBCURL_CFLAGS) \
+    $(OPENSSL_CFLAGS) \
+    $(PTHREAD_CFLAGS) \
+    $(ZLIB_CFLAGS)
 
 noinst_LIBRARIES = libtransmission.a
 
@@ -108,6 +112,9 @@ TESTS = \
 
 noinst_PROGRAMS = $(TESTS)
 
+APPS_LDFLAGS = \
+    $(ZLIB_LDFLAGS)
+
 APPS_LDADD = \
     ./libtransmission.a  \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
@@ -117,6 +124,7 @@ APPS_LDADD = \
     $(LIBCURL_LIBS) \
     $(OPENSSL_LIBS) \
     $(PTHREAD_LIBS) \
+    $(ZLIB_LIBS) \
     -lm
 
 bencode_test_SOURCES = bencode-test.c

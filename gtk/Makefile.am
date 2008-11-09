@@ -28,7 +28,11 @@ AM_CFLAGS = \
     $(DBUS_GLIB_CFLAGS) \
     $(LIBNOTIFY_CFLAGS) \
     $(OPENSSL_CFLAGS) \
+    $(ZLIB_CFLAGS) \
     $(PTHREAD_CFLAGS)
+
+AM_LDFLAGS = \
+    $(ZLIB_LDFLAGS)
 
 noinst_HEADERS = \
     actions.h \
@@ -101,6 +105,7 @@ transmission_LDADD = \
     $(DBUS_GLIB_LIBS) \
     $(OPENSSL_LIBS) \
     $(LIBCURL_LIBS) \
+    $(ZLIB_LIBS) \
     $(PTHREAD_LIBS) -lm
 
 DESKTOP_IN_FILES=transmission.desktop.in
