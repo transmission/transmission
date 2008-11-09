@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: transmission 1.06\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-11-02 14:16-0600\n"
-"PO-Revision-Date: 2008-10-31 20:29+0000\n"
+"PO-Revision-Date: 2008-11-08 22:45+0000\n"
 "Last-Translator: Geir Hauge <Unknown>\n"
 "Language-Team: Norwegian <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-11-03 17:29+0000\n"
+"X-Launchpad-Export-Date: 2008-11-09 14:14+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -664,7 +664,7 @@ msgstr "Start med alle torrentene stoppet"
 
 #: ../gtk/main.c:371
 msgid "Show version number and exit"
-msgstr ""
+msgstr "Vis versjonsnummer og avslutt"
 
 #: ../gtk/main.c:375
 msgid "Start minimized in system tray"
@@ -1058,7 +1058,7 @@ msgstr "Vis _ikon i varslingsområdet"
 msgid "Enable _blocklist (contains %'d rule)"
 msgid_plural "Enable _blocklist (contains %'d rules)"
 msgstr[0] "Aktiver _blokkeringsliste (inneholder %'d regel)"
-msgstr[1] "Aktiver _blokkeringsliste (inneholder &'d regler)"
+msgstr[1] "Aktiver _blokkeringsliste (inneholder %'d regler)"
 
 #: ../gtk/tr-prefs.c:484
 msgid "Updating Blocklist"
@@ -1431,7 +1431,7 @@ msgstr "Klarte ikke å lese gjennopptakingsfila"
 #: ../libtransmission/fdlimit.c:189
 #, c-format
 msgid "Preallocated file \"%s\""
-msgstr ""
+msgstr "Forhåndsallokert fil «%s»"
 
 #: ../libtransmission/fdlimit.c:426 ../libtransmission/net.c:109
 #, c-format

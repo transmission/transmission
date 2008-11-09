@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2008-11-03 17:29+0000\n"
+"X-Launchpad-Export-Date: 2008-11-09 14:14+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -759,6 +759,8 @@ msgstr ""
 "  TuniX12 https://launchpad.net/~tunix12\n"
 "  Vincent Batoufflet https://launchpad.net/~santx\n"
 "  Vincent Garibal https://launchpad.net/~vincent-garibal\n"
+"  hey_popey https://launchpad.net/~damien-haikal\n"
+"  lp.descamps https://launchpad.net/~lp-descamps\n"
 "  ooliver27 https://launchpad.net/~ooliver27\n"
 "  slurbe https://launchpad.net/~slurbe"
 

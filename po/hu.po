@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-11-02 14:16-0600\n"
-"PO-Revision-Date: 2008-10-06 13:26+0000\n"
+"PO-Revision-Date: 2008-11-04 19:45+0000\n"
 "Last-Translator: Gabor Kelemen <kelemeng@gnome.hu>\n"
 "Language-Team: <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-11-03 17:28+0000\n"
+"X-Launchpad-Export-Date: 2008-11-09 14:13+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -49,7 +49,7 @@ msgstr "_Kor szerinti rendezés"
 
 #: ../gtk/actions.c:78
 msgid "_Main Window"
-msgstr "_Főablak"
+msgstr "_Főablak megjelenítése"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
@@ -249,13 +249,13 @@ msgstr "A blokkolási lista %'d bejegyzéssel frissült"
 #: ../libtransmission/utils.c:572 ../libtransmission/utils.c:583
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr "\"%1$s\" nem hozható létre: %2$s"
+msgstr "„%1$s” nem hozható létre: %2$s"
 
 #: ../gtk/conf.c:86 ../libtransmission/bencode.c:1323
 #: ../libtransmission/fdlimit.c:181
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr "\"%1$s\" nem nyitható meg: %2$s"
+msgstr "„%1$s” nem nyitható meg: %2$s"
 
 #: ../gtk/conf.c:91
 #, c-format
@@ -295,7 +295,7 @@ msgstr "Állapot"
 
 #: ../gtk/details.c:619
 msgid "Optimistic unchoke"
-msgstr ""
+msgstr "Optimista engedélyezés"
 
 #: ../gtk/details.c:622
 msgid "Downloading from this peer"
@@ -662,7 +662,7 @@ msgstr "Az összes torrent indítása felfüggesztettként"
 
 #: ../gtk/main.c:371
 msgid "Show version number and exit"
-msgstr ""
+msgstr "Verziószám megjelenítése és kilépés"
 
 #: ../gtk/main.c:375
 msgid "Start minimized in system tray"
@@ -682,11 +682,11 @@ msgstr "[torrentfájlok]"
 
 #: ../gtk/main.c:552
 msgid "Beginning to use scheduled bandwidth limits"
-msgstr ""
+msgstr "Ütemezett sávszélesség-korlátozások használatának megkezdése"
 
 #: ../gtk/main.c:566
 msgid "Ending use of scheduled bandwidth limits"
-msgstr ""
+msgstr "Ütemezett sávszélesség-korlátozások használatának befejezése"
 
 #: ../gtk/main.c:867
 msgid "<b>Closing Connections</b>"
@@ -759,7 +759,7 @@ msgstr "A torrent létrehozása megszakítva"
 #: ../libtransmission/blocklist.c:233 ../libtransmission/utils.c:441
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
-msgstr "\"%1$s\" nem olvasható be: %2$s"
+msgstr "„%1$s” nem olvasható be: %2$s"
 
 #: ../gtk/makemeta-ui.c:258 ../gtk/makemeta-ui.c:495
 msgid "No source selected"
@@ -818,7 +818,7 @@ msgstr "_Privát torrent"
 #: ../libtransmission/blocklist.c:286
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
-msgstr "A fájl (\"%1$s\") nem menthető: %2$s"
+msgstr "A fájl („%1$s”) nem menthető: %2$s"
 
 #: ../gtk/msgwin.c:149
 msgid "Save Log"
@@ -916,7 +916,7 @@ msgstr "%1$s, feltöltve %2$s (Arány: %3$s)"
 #: ../gtk/torrent-cell-renderer.c:86 ../gtk/tr-torrent.c:280
 #, c-format
 msgid "Remaining time unknown"
-msgstr ""
+msgstr "Hátralévő idő ismeretlen"
 
 #. time remaining
 #: ../gtk/torrent-cell-renderer.c:92
@@ -1047,18 +1047,18 @@ msgstr "Forrásfájlok át_helyezése a Kukába"
 
 #: ../gtk/tr-prefs.c:400
 msgid "_Inhibit desktop hibernation when torrents are active"
-msgstr ""
+msgstr "Számítógép hibernálásának _korlátozása ha aktív torrentek vannak"
 
 #: ../gtk/tr-prefs.c:404
 msgid "Show _icon in the desktop Notification Area"
-msgstr ""
+msgstr "_Ikon megjelenítése az értesítési területen"
 
 #: ../gtk/tr-prefs.c:434
 #, c-format
 msgid "Enable _blocklist (contains %'d rule)"
 msgid_plural "Enable _blocklist (contains %'d rules)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bl_okkolási lista engedélyezése (%'d szabályt tartalmaz)"
+msgstr[1] "Bl_okkolási lista engedélyezése (%'d szabályt tartalmaz)"
 
 #: ../gtk/tr-prefs.c:484
 msgid "Updating Blocklist"
@@ -1066,15 +1066,15 @@ msgstr "Blokkolási lista frissítése"
 
 #: ../gtk/tr-prefs.c:531
 msgid "Blocklist"
-msgstr ""
+msgstr "Blokkolási lista"
 
 #: ../gtk/tr-prefs.c:537
 msgid "_Update"
-msgstr ""
+msgstr "_Frissítés"
 
 #: ../gtk/tr-prefs.c:547
 msgid "Enable _automatic updates"
-msgstr ""
+msgstr "_Automatikus frissítések engedélyezése"
 
 #: ../gtk/tr-prefs.c:557
 msgid "Maximum peers _overall:"
@@ -1123,7 +1123,7 @@ msgstr "_Jelszó:"
 #. require authentication
 #: ../gtk/tr-prefs.c:828
 msgid "Only allow the following IP _addresses to connect:"
-msgstr ""
+msgstr "_Csak a következő IP-címek csatlakozásának engedélyezése:"
 
 #: ../gtk/tr-prefs.c:855
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1132,7 +1132,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:878
 msgid "Addresses:"
-msgstr ""
+msgstr "Címek:"
 
 #: ../gtk/tr-prefs.c:998
 msgid "Tracker Proxy"
@@ -1160,23 +1160,23 @@ msgstr "_Hitelesítés szükséges"
 
 #: ../gtk/tr-prefs.c:1183
 msgid "Scheduled Limits"
-msgstr ""
+msgstr "Ütemezett korlátok"
 
 #: ../gtk/tr-prefs.c:1189
 msgid " and "
-msgstr ""
+msgstr " és "
 
 #: ../gtk/tr-prefs.c:1196
 msgid "_Limit bandwidth between"
-msgstr ""
+msgstr "_Sávszélesség korlátozása"
 
 #: ../gtk/tr-prefs.c:1204
 msgid "Limit d_ownload speed (KB/s):"
-msgstr ""
+msgstr "_Letöltési sebesség korlátozása (KB/s):"
 
 #: ../gtk/tr-prefs.c:1211
 msgid "Limit u_pload speed (KB/s):"
-msgstr ""
+msgstr "_Feltöltési sebesség korlátozása (KB/s):"
 
 #: ../gtk/tr-prefs.c:1245
 msgid "Port is <b>open</b>"
@@ -1192,7 +1192,7 @@ msgstr "<i>Port vizsgálata...</i>"
 
 #: ../gtk/tr-prefs.c:1339
 msgid "Incoming Peers"
-msgstr ""
+msgstr "Bejövő partnerek"
 
 #: ../gtk/tr-prefs.c:1357
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1208,7 +1208,7 @@ msgstr "Torrentek"
 
 #: ../gtk/tr-prefs.c:1397
 msgid "Desktop"
-msgstr ""
+msgstr "Asztal"
 
 #: ../gtk/tr-prefs.c:1403
 msgid "Network"
@@ -1241,7 +1241,7 @@ msgstr "Várakozás a helyi adat ellenőrzésére (%.1f%% ellenőrizve)"
 #: ../gtk/tr-torrent.c:286
 #, c-format
 msgid "%1$s remaining"
-msgstr ""
+msgstr "%1$s van hátra"
 
 #: ../gtk/tr-torrent.c:299 ../libtransmission/port-forwarding.c:175
 msgid "Stopped"
@@ -1417,7 +1417,7 @@ msgstr "Érvénytelen metaadat"
 #: ../libtransmission/blocklist.c:108
 #, c-format
 msgid "Blocklist \"%s\" contains %'zu entries"
-msgstr ""
+msgstr "A(z) „%s” blokkolási lista %'zu bejegyzést tartalmaz"
 
 #: ../libtransmission/blocklist.c:296
 #, c-format
@@ -1432,7 +1432,7 @@ msgstr "A folytatáshoz szükséges adatok nem olvashatók"
 #: ../libtransmission/fdlimit.c:189
 #, c-format
 msgid "Preallocated file \"%s\""
-msgstr ""
+msgstr "A fájl előzetesen lefoglalva: „%s”"
 
 #: ../libtransmission/fdlimit.c:426 ../libtransmission/net.c:109
 #, c-format
@@ -1447,7 +1447,7 @@ msgstr "A torrentkészítő kihagyja a(z) „%s” fájlt: %s"
 #: ../libtransmission/metainfo.c:453
 #, c-format
 msgid "Invalid metadata entry \"%s\""
-msgstr "Érvénytelen metaadat-bejegyzés \"%s\""
+msgstr "Érvénytelen metaadat-bejegyzés „%s”"
 
 #: ../libtransmission/natpmp.c:31
 msgid "Port Forwarding (NAT-PMP)"
@@ -1461,7 +1461,7 @@ msgstr "%s sikeres (%d)"
 #: ../libtransmission/natpmp.c:136
 #, c-format
 msgid "Found public address \"%s\""
-msgstr "Talált publikus cím: \"%s\""
+msgstr "Talált publikus cím: „%s”"
 
 #: ../libtransmission/natpmp.c:171
 #, c-format
@@ -1508,7 +1508,7 @@ msgstr "Nincs átirányítva"
 #: ../libtransmission/port-forwarding.c:98 ../libtransmission/torrent.c:1316
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
-msgstr "Az állapot megváltoztatva: \"%1$s\" -> \"%2$s\""
+msgstr "Az állapot megváltoztatva: „%1$s” -> „%2$s”"
 
 #: ../libtransmission/port-forwarding.c:108
 #, c-format
@@ -1548,12 +1548,12 @@ msgstr "%d partner érkezett a követőtől"
 #: ../libtransmission/torrent.c:234
 #, c-format
 msgid "Tracker warning: \"%s\""
-msgstr "Követőfigyelmeztetés: \"%s\""
+msgstr "Követőfigyelmeztetés: „%s”"
 
 #: ../libtransmission/torrent.c:241
 #, c-format
 msgid "Tracker error: \"%s\""
-msgstr "Követőhiba: \"%s\""
+msgstr "Követőhiba: „%s”"
 
 #: ../libtransmission/torrent.c:1262
 msgid "Done"
@@ -1574,12 +1574,12 @@ msgstr "Portátirányítás (UPnP)"
 #: ../libtransmission/upnp.c:103
 #, c-format
 msgid "Found Internet Gateway Device \"%s\""
-msgstr "Megtalált internetátjáró-eszköz: \"%s\""
+msgstr "Megtalált internetátjáró-eszköz: „%s”"
 
 #: ../libtransmission/upnp.c:106
 #, c-format
 msgid "Local Address is \"%s\""
-msgstr "A helyi cím: \"%s\""
+msgstr "A helyi cím: „%s”"
 
 #: ../libtransmission/upnp.c:139
 #, c-format

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-11-02 14:16-0600\n"
-"PO-Revision-Date: 2008-08-31 06:42+0000\n"
+"PO-Revision-Date: 2008-11-07 22:03+0000\n"
 "Last-Translator: Vladimir Lazic <vlazic@gmail.com>\n"
 "Language-Team: Serbian <sr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2008-11-03 17:28+0000\n"
+"X-Launchpad-Export-Date: 2008-11-09 14:13+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -672,7 +672,7 @@ msgstr "Паузирај торенте при покретању"
 
 #: ../gtk/main.c:371
 msgid "Show version number and exit"
-msgstr ""
+msgstr "Прикажи број верзије па изађи"
 
 #: ../gtk/main.c:375
 msgid "Start minimized in system tray"
@@ -692,11 +692,11 @@ msgstr "[торент датотеке]"
 
 #: ../gtk/main.c:552
 msgid "Beginning to use scheduled bandwidth limits"
-msgstr ""
+msgstr "Постављање заказаних ограничења протока"
 
 #: ../gtk/main.c:566
 msgid "Ending use of scheduled bandwidth limits"
-msgstr ""
+msgstr "Прекид заказаних ограничења протока"
 
 #: ../gtk/main.c:867
 msgid "<b>Closing Connections</b>"
@@ -923,7 +923,7 @@ msgstr "%1$s, послато %2$s (Однос: %3$s)"
 #: ../gtk/torrent-cell-renderer.c:86 ../gtk/tr-torrent.c:280
 #, c-format
 msgid "Remaining time unknown"
-msgstr ""
+msgstr "Није познато колико времена преостаје"
 
 #. time remaining
 #: ../gtk/torrent-cell-renderer.c:92
@@ -1060,14 +1060,15 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:404
 msgid "Show _icon in the desktop Notification Area"
-msgstr ""
+msgstr "Прикажи _иконицу у обавешташној зони панела"
 
 #: ../gtk/tr-prefs.c:434
 #, c-format
 msgid "Enable _blocklist (contains %'d rule)"
 msgid_plural "Enable _blocklist (contains %'d rules)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Укључи _листу блокирања (садржи %'d правило)"
+msgstr[1] "Укључи _листу блокирања (садржи %'d правила)"
+msgstr[2] "Укључи _листу блокирања (садржи %'d правила)"
 
 #: ../gtk/tr-prefs.c:484
 msgid "Updating Blocklist"
@@ -1075,15 +1076,15 @@ msgstr "Освежавам листу забрањених рачунара"
 
 #: ../gtk/tr-prefs.c:531
 msgid "Blocklist"
-msgstr ""
+msgstr "Листа блокирања"
 
 #: ../gtk/tr-prefs.c:537
 msgid "_Update"
-msgstr ""
+msgstr "А_журирај"
 
 #: ../gtk/tr-prefs.c:547
 msgid "Enable _automatic updates"
-msgstr ""
+msgstr "Омогући аут_оматско ажурирање"
 
 #: ../gtk/tr-prefs.c:557
 msgid "Maximum peers _overall:"
@@ -1132,7 +1133,7 @@ msgstr "_Лозинка:"
 #. require authentication
 #: ../gtk/tr-prefs.c:828
 msgid "Only allow the following IP _addresses to connect:"
-msgstr ""
+msgstr "Дозволи само следећим IP _адресана да се конектују:"
 
 #: ../gtk/tr-prefs.c:855
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1140,7 +1141,7 @@ msgstr "IP адреса може да користи знаке замене, к
 
 #: ../gtk/tr-prefs.c:878
 msgid "Addresses:"
-msgstr ""
+msgstr "Адресе:"
 
 #: ../gtk/tr-prefs.c:998
 msgid "Tracker Proxy"
@@ -1168,23 +1169,23 @@ msgstr "_Идентификаци је потребна"
 
 #: ../gtk/tr-prefs.c:1183
 msgid "Scheduled Limits"
-msgstr ""
+msgstr "Заказана ограничења"
 
 #: ../gtk/tr-prefs.c:1189
 msgid " and "
-msgstr ""
+msgstr " и "
 
 #: ../gtk/tr-prefs.c:1196
 msgid "_Limit bandwidth between"
-msgstr ""
+msgstr "О_граничи проток између"
 
 #: ../gtk/tr-prefs.c:1204
 msgid "Limit d_ownload speed (KB/s):"
-msgstr ""
+msgstr "Ограничи брзину п_реузимања (KB/s):"
 
 #: ../gtk/tr-prefs.c:1211
 msgid "Limit u_pload speed (KB/s):"
-msgstr ""
+msgstr "Ограничи брзину с_лања (KB/s):"
 
 #: ../gtk/tr-prefs.c:1245
 msgid "Port is <b>open</b>"
@@ -1216,7 +1217,7 @@ msgstr "Торенти"
 
 #: ../gtk/tr-prefs.c:1397
 msgid "Desktop"
-msgstr ""
+msgstr "Радна површина"
 
 #: ../gtk/tr-prefs.c:1403
 msgid "Network"
@@ -1249,7 +1250,7 @@ msgstr "Проверавам преузете датотеке торента (%
 #: ../gtk/tr-torrent.c:286
 #, c-format
 msgid "%1$s remaining"
-msgstr ""
+msgstr "преостаје %1$s"
 
 #: ../gtk/tr-torrent.c:299 ../libtransmission/port-forwarding.c:175
 msgid "Stopped"
@@ -1432,7 +1433,7 @@ msgstr "Неправилни метаподаци"
 #: ../libtransmission/blocklist.c:108
 #, c-format
 msgid "Blocklist \"%s\" contains %'zu entries"
-msgstr ""
+msgstr "Листа \"%s\" садржи %'zu уноса"
 
 #: ../libtransmission/blocklist.c:296
 #, c-format

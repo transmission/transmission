@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2008-11-03 17:29+0000\n"
+"X-Launchpad-Export-Date: 2008-11-09 14:13+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -738,7 +738,7 @@ msgstr ""
 "  Djavan Fagundes https://launchpad.net/~dnoway\n"
 "  Gerson \"fserve\" Barreiros https://launchpad.net/~fserve\n"
 "  Guilherme Gonçalves https://launchpad.net/~guilherme08\n"
-"  Ugo Rox https://launchpad.net/~ugorox"
+"  Ugo https://launchpad.net/~ugosan"
 
 #: ../gtk/makemeta-ui.c:111
 msgid "Torrent created!"

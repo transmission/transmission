@@ -15,14 +15,14 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-11-02 14:16-0600\n"
-"PO-Revision-Date: 2008-08-03 18:45+0000\n"
-"Last-Translator: David Planella <Unknown>\n"
+"PO-Revision-Date: 2008-11-05 20:27+0000\n"
+"Last-Translator: Joan Duran <jodufi@gmail.com>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-11-03 17:30+0000\n"
+"X-Launchpad-Export-Date: 2008-11-09 14:13+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -443,7 +443,7 @@ msgstr "%1$s (%2$s verificat)"
 
 #: ../gtk/details.c:1088 ../gtk/util.c:56 ../gtk/util.c:78
 msgid "None"
-msgstr "Cap"
+msgstr "Res"
 
 #: ../gtk/details.c:1110
 msgid "Transfer"
@@ -669,7 +669,7 @@ msgstr "Inicia amb tots els torrents en pausa"
 
 #: ../gtk/main.c:371
 msgid "Show version number and exit"
-msgstr ""
+msgstr "Mostra el número de versió i surt"
 
 #: ../gtk/main.c:375
 msgid "Start minimized in system tray"
@@ -690,10 +690,12 @@ msgstr "[fitxers torrent]"
 #: ../gtk/main.c:552
 msgid "Beginning to use scheduled bandwidth limits"
 msgstr ""
+"S'està començant a utilitzar els límits planificats d'amplada de banda"
 
 #: ../gtk/main.c:566
 msgid "Ending use of scheduled bandwidth limits"
 msgstr ""
+"S'està finalitzant la utilització dels límits planificats d'amplada de banda"
 
 #: ../gtk/main.c:867
 msgid "<b>Closing Connections</b>"
@@ -921,13 +923,13 @@ msgstr "%1$s, pujat %2$s (relació: %3$s)"
 #: ../gtk/torrent-cell-renderer.c:86 ../gtk/tr-torrent.c:280
 #, c-format
 msgid "Remaining time unknown"
-msgstr ""
+msgstr "Temps restant desconegut"
 
 #. time remaining
 #: ../gtk/torrent-cell-renderer.c:92
 #, c-format
 msgid "%s remaining"
-msgstr "manca %s"
+msgstr "%s restant"
 
 #: ../gtk/torrent-cell-renderer.c:120
 #, c-format
@@ -1052,18 +1054,18 @@ msgstr "_Mou els fitxers font a la paperera"
 
 #: ../gtk/tr-prefs.c:400
 msgid "_Inhibit desktop hibernation when torrents are active"
-msgstr ""
+msgstr "_Inhabilita la hibernació de l'escriptori quan hi ha torrents actius"
 
 #: ../gtk/tr-prefs.c:404
 msgid "Show _icon in the desktop Notification Area"
-msgstr ""
+msgstr "Mostra la _icona a l'àrea de notificació de l'escriptori"
 
 #: ../gtk/tr-prefs.c:434
 #, c-format
 msgid "Enable _blocklist (contains %'d rule)"
 msgid_plural "Enable _blocklist (contains %'d rules)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Habilita la llista de _bloquejats (conté %'d regla)"
+msgstr[1] "Habilita la llista de _bloquejats (conté %'d regles)"
 
 #: ../gtk/tr-prefs.c:484
 msgid "Updating Blocklist"
@@ -1071,15 +1073,15 @@ msgstr "S'està actualitzant la llista de bloquejats"
 
 #: ../gtk/tr-prefs.c:531
 msgid "Blocklist"
-msgstr ""
+msgstr "Llista de bloquejats"
 
 #: ../gtk/tr-prefs.c:537
 msgid "_Update"
-msgstr ""
+msgstr "_Actualitza"
 
 #: ../gtk/tr-prefs.c:547
 msgid "Enable _automatic updates"
-msgstr ""
+msgstr "Habilita les actualitzacions _automàtiques"
 
 #: ../gtk/tr-prefs.c:557
 msgid "Maximum peers _overall:"
@@ -1128,7 +1130,7 @@ msgstr "Contrasen_ya:"
 #. require authentication
 #: ../gtk/tr-prefs.c:828
 msgid "Only allow the following IP _addresses to connect:"
-msgstr ""
+msgstr "Només permet connectar-se les _adreces IP següents:"
 
 #: ../gtk/tr-prefs.c:855
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1136,7 +1138,7 @@ msgstr "Les adreces IP poden utilitzar comodins, com ara 192.168.*.*"
 
 #: ../gtk/tr-prefs.c:878
 msgid "Addresses:"
-msgstr ""
+msgstr "Adreces:"
 
 #: ../gtk/tr-prefs.c:998
 msgid "Tracker Proxy"
@@ -1164,23 +1166,23 @@ msgstr "Es necessita _autenticació"
 
 #: ../gtk/tr-prefs.c:1183
 msgid "Scheduled Limits"
-msgstr ""
+msgstr "Límits planificats"
 
 #: ../gtk/tr-prefs.c:1189
 msgid " and "
-msgstr ""
+msgstr " i "
 
 #: ../gtk/tr-prefs.c:1196
 msgid "_Limit bandwidth between"
-msgstr ""
+msgstr "_Limita l'amplada de banda entre"
 
 #: ../gtk/tr-prefs.c:1204
 msgid "Limit d_ownload speed (KB/s):"
-msgstr ""
+msgstr "Limita la velocitat de _baixada (KB/s):"
 
 #: ../gtk/tr-prefs.c:1211
 msgid "Limit u_pload speed (KB/s):"
-msgstr ""
+msgstr "Limita la velocitat de _pujada (KB/s):"
 
 #: ../gtk/tr-prefs.c:1245
 msgid "Port is <b>open</b>"
@@ -1196,7 +1198,7 @@ msgstr "<i>S'està comprovant el port...</i>"
 
 #: ../gtk/tr-prefs.c:1339
 msgid "Incoming Peers"
-msgstr ""
+msgstr "Clients d'entrada"
 
 #: ../gtk/tr-prefs.c:1357
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1213,7 +1215,7 @@ msgstr "Torrents"
 
 #: ../gtk/tr-prefs.c:1397
 msgid "Desktop"
-msgstr ""
+msgstr "Escriptori"
 
 #: ../gtk/tr-prefs.c:1403
 msgid "Network"
@@ -1246,7 +1248,7 @@ msgstr "S'estan verificant les dades locals (%.1f%% verificat)"
 #: ../gtk/tr-torrent.c:286
 #, c-format
 msgid "%1$s remaining"
-msgstr ""
+msgstr "%1$s restant"
 
 #: ../gtk/tr-torrent.c:299 ../libtransmission/port-forwarding.c:175
 msgid "Stopped"
@@ -1422,7 +1424,7 @@ msgstr "Metadades invàlides"
 #: ../libtransmission/blocklist.c:108
 #, c-format
 msgid "Blocklist \"%s\" contains %'zu entries"
-msgstr ""
+msgstr "La llista de bloquejats «%s» conté %'zu entrades"
 
 #: ../libtransmission/blocklist.c:296
 #, c-format
@@ -1437,7 +1439,7 @@ msgstr "No s'ha pogut llegir l'historial"
 #: ../libtransmission/fdlimit.c:189
 #, c-format
 msgid "Preallocated file \"%s\""
-msgstr ""
+msgstr "Fitxer preubicat «%s»"
 
 #: ../libtransmission/fdlimit.c:426 ../libtransmission/net.c:109
 #, c-format
