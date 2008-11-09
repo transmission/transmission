@@ -3,8 +3,8 @@ dnl STATUS: "X" for prerelease test builds,
 dnl         "Z" for unsupported trunk builds,
 dnl         "0" for stable, supported releases
 dnl these should be the only two lines you need to change
-m4_define([user_agent_prefix],1.34+)
-m4_define([peer_id_prefix],-TR134Z-)
+m4_define([user_agent_prefix],1.40)
+m4_define([peer_id_prefix],-TR1400-)
 
 AC_INIT([transmission],[user_agent_prefix],[http://trac.transmissionbt.com/newticket])
 AC_SUBST(USERAGENT_PREFIX,[user_agent_prefix])
