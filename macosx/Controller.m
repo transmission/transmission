@@ -211,7 +211,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         fLib = tr_sessionInitFull(NULL, /* use default config directory (Application Support) */
                                 "macosx",
-                                NULL, /* download directory set when adding transfers */
+#warning update when changing in prefs
+                                TR_DEFAULT_CONFIG_DIR, /* download directory set when adding transfers */
                                 [fDefaults boolForKey: @"PEXGlobal"],
                                 [fDefaults boolForKey: @"NatTraversal"],
                                 [fDefaults integerForKey: @"BindPort"],
@@ -4246,7 +4247,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     switch (type)
     {
         case TR_RPC_TORRENT_ADDED:
-            [self performSelectorOnMainThread: @selector(rpcAddTorrentStruct:) withObject:
+                [self performSelectorOnMainThread: @selector(rpcAddTorrentStruct:) withObject:
                 [[NSValue valueWithPointer: torrentStruct] retain] waitUntilDone: NO];
             break;
         
