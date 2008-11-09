@@ -211,8 +211,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         fLib = tr_sessionInitFull(NULL, /* use default config directory (Application Support) */
                                 "macosx",
-#warning update when changing in prefs
-                                TR_DEFAULT_CONFIG_DIR, /* download directory set when adding transfers */
+                                [@"~/Downloads" stringByExpandingTildeInPath],
                                 [fDefaults boolForKey: @"PEXGlobal"],
                                 [fDefaults boolForKey: @"NatTraversal"],
                                 [fDefaults integerForKey: @"BindPort"],
