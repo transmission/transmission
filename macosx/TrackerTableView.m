@@ -93,10 +93,10 @@
     if (start)
         visibleRect.origin.y += height;
     
-    for (NSInteger i = start ? 1 : 0; i<numberOfRects; i += 2)
+    for (NSInteger i = start ? 1 : 0; i < numberOfRects; i += 2)
     {
         NSRectFill(visibleRect);
-        visibleRect.origin.y += 2 * height;
+        visibleRect.origin.y += 2.0 * height;
     }
     
     [super highlightSelectionInClipRect: clipRect];

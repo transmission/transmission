@@ -715,22 +715,10 @@ tr_handle * fHandle;
 - (void) setProxyAddress: (id) sender
 {
     NSString * address = [sender stringValue];
-    BOOL blank = [address isEqualToString: @""];
     
-    if (!blank && [address rangeOfString: @"://"].location == NSNotFound)
-        address = [@"http://" stringByAppendingString: address];
-    
-    if (blank || tr_httpIsValidURL([address UTF8String]))
-    {
-        tr_sessionSetProxy(fHandle, [address UTF8String]);
-        [sender setStringValue: address];
-        [fDefaults setObject: address forKey: @"ProxyAddress"];
-    }
-    else
-    {
-        NSBeep();
-        [sender setStringValue: [fDefaults stringForKey: @"ProxyAddress"]];
-    }
+    tr_sessionSetProxy(fHandle, [address UTF8String]);
+    [sender setStringValue: address];
+    [fDefaults setObject: address forKey: @"ProxyAddress"];
 }
 
 - (void) setProxyPort: (id) sender
