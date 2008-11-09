@@ -20,7 +20,6 @@ else
   AC_MSG_RESULT(no)
 fi])
 
-ZLIB_HOME=/usr/local
 if test ! -f "${ZLIB_HOME}/include/zlib.h"
 then
         ZLIB_HOME=/usr
