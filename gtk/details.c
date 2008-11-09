@@ -682,13 +682,13 @@ peer_page_new( TrTorrent * gtor )
     const tr_info * inf = tr_torrent_info( gtor );
 
     /* TODO: make this configurable? */
-    int             view_columns[] = { PEER_COL_IS_ENCRYPTED,
-                                       PEER_COL_UPLOAD_RATE,
-                                       PEER_COL_DOWNLOAD_RATE,
-                                       PEER_COL_PROGRESS,
-                                       PEER_COL_STATUS,
-                                       PEER_COL_ADDRESS,
-                                       PEER_COL_CLIENT };
+    int view_columns[] = { PEER_COL_IS_ENCRYPTED,
+                           PEER_COL_UPLOAD_RATE,
+                           PEER_COL_DOWNLOAD_RATE,
+                           PEER_COL_PROGRESS,
+                           PEER_COL_STATUS,
+                           PEER_COL_ADDRESS,
+                           PEER_COL_CLIENT };
 
 
     if( inf->webseedCount )
@@ -754,7 +754,6 @@ peer_page_new( TrTorrent * gtor )
     {
         const int           col = view_columns[i];
         const char *        t = _( peer_column_names[col] );
-        gboolean            resizable = TRUE;
         GtkTreeViewColumn * c;
         GtkCellRenderer *   r;
 
@@ -762,80 +761,50 @@ peer_page_new( TrTorrent * gtor )
         {
             case PEER_COL_ADDRESS:
                 r = gtk_cell_renderer_text_new ( );
-                c =
-                    gtk_tree_view_column_new_with_attributes ( t, r, "text",
-                                                               col,
-                                                               NULL );
+                c = gtk_tree_view_column_new_with_attributes ( t, r, "text", col, NULL );
                 break;
 
             case PEER_COL_CLIENT:
                 r = gtk_cell_renderer_text_new ( );
-                c =
-                    gtk_tree_view_column_new_with_attributes ( t, r, "text",
-                                                               col,
-                                                               NULL );
-                gtk_tree_view_column_set_cell_data_func ( c, r,
-                                                          render_client,
-                                                          NULL,
-                                                          NULL );
+                c = gtk_tree_view_column_new_with_attributes ( t, r, "text", col, NULL );
+                gtk_tree_view_column_set_cell_data_func ( c, r, render_client, NULL, NULL );
                 break;
 
             case PEER_COL_PROGRESS:
                 r = gtk_cell_renderer_progress_new ( );
-                c = gtk_tree_view_column_new_with_attributes (
-                    t, r, "value", PEER_COL_PROGRESS, NULL );
+                c = gtk_tree_view_column_new_with_attributes ( t, r, "value", PEER_COL_PROGRESS, NULL );
                 break;
 
             case PEER_COL_IS_ENCRYPTED:
-                resizable = FALSE;
                 r = gtk_cell_renderer_pixbuf_new ( );
                 c = gtk_tree_view_column_new_with_attributes ( t, r, NULL );
-                gtk_tree_view_column_set_sizing (
-                    c, GTK_TREE_VIEW_COLUMN_FIXED );
+                gtk_tree_view_column_set_sizing ( c, GTK_TREE_VIEW_COLUMN_FIXED );
                 gtk_tree_view_column_set_fixed_width ( c, 20 );
-                gtk_tree_view_column_set_cell_data_func ( c, r,
-                                                          render_encrypted,
-                                                          NULL,
-                                                          NULL );
+                gtk_tree_view_column_set_cell_data_func ( c, r, render_encrypted, NULL, NULL );
                 break;
 
             case PEER_COL_DOWNLOAD_RATE:
                 r = gtk_cell_renderer_text_new ( );
-                c =
-                    gtk_tree_view_column_new_with_attributes ( t, r, "text",
-                                                               col,
-                                                               NULL );
-                gtk_tree_view_column_set_cell_data_func ( c, r,
-                                                          render_dl_rate,
-                                                          NULL,
-                                                          NULL );
+                c = gtk_tree_view_column_new_with_attributes ( t, r, "text", col, NULL );
+                gtk_tree_view_column_set_cell_data_func ( c, r, render_dl_rate, NULL, NULL );
                 break;
 
             case PEER_COL_UPLOAD_RATE:
                 r = gtk_cell_renderer_text_new ( );
-                c =
-                    gtk_tree_view_column_new_with_attributes ( t, r, "text",
-                                                               col,
-                                                               NULL );
-                gtk_tree_view_column_set_cell_data_func ( c, r,
-                                                          render_ul_rate,
-                                                          NULL,
-                                                          NULL );
+                c = gtk_tree_view_column_new_with_attributes ( t, r, "text", col, NULL );
+                gtk_tree_view_column_set_cell_data_func ( c, r, render_ul_rate, NULL, NULL );
                 break;
 
             case PEER_COL_STATUS:
                 r = gtk_cell_renderer_text_new( );
-                c =
-                    gtk_tree_view_column_new_with_attributes ( t, r, "text",
-                                                               col,
-                                                               NULL );
+                c = gtk_tree_view_column_new_with_attributes ( t, r, "text", col, NULL );
                 break;
 
             default:
                 abort ( );
         }
 
-        gtk_tree_view_column_set_resizable ( c, resizable );
+        gtk_tree_view_column_set_resizable ( c, FALSE );
         gtk_tree_view_column_set_sort_column_id ( c, col );
         gtk_tree_view_append_column ( GTK_TREE_VIEW( v ), c );
     }
@@ -853,7 +822,7 @@ peer_page_new( TrTorrent * gtor )
 
     w = sw = gtk_scrolled_window_new ( NULL, NULL );
     gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW( w ),
-                                     GTK_POLICY_NEVER,
+                                     GTK_POLICY_AUTOMATIC,
                                      GTK_POLICY_AUTOMATIC );
     gtk_scrolled_window_set_shadow_type ( GTK_SCROLLED_WINDOW( w ),
                                           GTK_SHADOW_IN );
