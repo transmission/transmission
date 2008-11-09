@@ -106,12 +106,12 @@ GroupsController * fGroupsInstance = nil;
     [super dealloc];
 }
 
-- (int) numberOfGroups
+- (NSInteger) numberOfGroups
 {
     return [fGroups count];
 }
 
-- (int) rowValueForIndex: (int) index
+- (NSInteger) rowValueForIndex: (NSInteger) index
 {
     if (index != -1)
     {
@@ -122,40 +122,40 @@ GroupsController * fGroupsInstance = nil;
     return -1;
 }
 
-- (int) indexForRow: (int) row
+- (NSInteger) indexForRow: (NSInteger) row
 {
     return [[[fGroups objectAtIndex: row] objectForKey: @"Index"] intValue];
 }
 
-- (NSString *) nameForIndex: (int) index
+- (NSString *) nameForIndex: (NSInteger) index
 {
-    int orderIndex = [self rowValueForIndex: index];
+    NSInteger orderIndex = [self rowValueForIndex: index];
     return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"Name"] : nil;
 }
 
-- (void) setName: (NSString *) name forIndex: (int) index
+- (void) setName: (NSString *) name forIndex: (NSInteger) index
 {
-    int orderIndex = [self rowValueForIndex: index];
+    NSInteger orderIndex = [self rowValueForIndex: index];
     [[fGroups objectAtIndex: orderIndex] setObject: name forKey: @"Name"];
     [self saveGroups];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
 }
 
-- (NSImage *) imageForIndex: (int) index
+- (NSImage *) imageForIndex: (NSInteger) index
 {
-    int orderIndex = [self rowValueForIndex: index];
+    NSInteger orderIndex = [self rowValueForIndex: index];
     return orderIndex != -1 ? [self imageForGroup: [fGroups objectAtIndex: orderIndex]]
                             : [NSImage imageNamed: @"GroupsNoneTemplate.png"];
 }
 
-- (NSColor *) colorForIndex: (int) index
+- (NSColor *) colorForIndex: (NSInteger) index
 {
-    int orderIndex = [self rowValueForIndex: index];
+    NSInteger orderIndex = [self rowValueForIndex: index];
     return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"Color"] : nil;
 }
 
-- (void) setColor: (NSColor *) color forIndex: (int) index
+- (void) setColor: (NSColor *) color forIndex: (NSInteger) index
 {
     NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
     [dict removeObjectForKey: @"Icon"];
@@ -211,7 +211,7 @@ GroupsController * fGroupsInstance = nil;
     [self saveGroups];
 }
 
-- (NSIndexSet *) moveGroupsAtRowIndexes: (NSIndexSet *) indexes toRow: (int) newRow oldSelected: (NSIndexSet *) selectedIndexes
+- (NSIndexSet *) moveGroupsAtRowIndexes: (NSIndexSet *) indexes toRow: (NSInteger) newRow oldSelected: (NSIndexSet *) selectedIndexes
 {
     NSArray * selectedGroups = [fGroups objectsAtIndexes: selectedIndexes];
     

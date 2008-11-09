@@ -715,9 +715,7 @@ tr_handle * fHandle;
 - (void) setProxyAddress: (id) sender
 {
     NSString * address = [sender stringValue];
-    
     tr_sessionSetProxy(fHandle, [address UTF8String]);
-    [sender setStringValue: address];
     [fDefaults setObject: address forKey: @"ProxyAddress"];
 }
 

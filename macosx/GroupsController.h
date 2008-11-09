@@ -31,23 +31,23 @@
 
 + (GroupsController *) groups;
 
-- (int) numberOfGroups;
+- (NSInteger) numberOfGroups;
 
-- (int) rowValueForIndex: (int) index;
-- (int) indexForRow: (int) row;
+- (NSInteger) rowValueForIndex: (NSInteger) index;
+- (NSInteger) indexForRow: (NSInteger) row;
 
-- (NSString *) nameForIndex: (int) index;
-- (void) setName: (NSString *) name forIndex: (int) index;
+- (NSString *) nameForIndex: (NSInteger) index;
+- (void) setName: (NSString *) name forIndex: (NSInteger) index;
 
-- (NSImage *) imageForIndex: (int) index;
+- (NSImage *) imageForIndex: (NSInteger) index;
 
-- (NSColor *) colorForIndex: (int) index;
-- (void) setColor: (NSColor *) color forIndex: (int) index;
+- (NSColor *) colorForIndex: (NSInteger) index;
+- (void) setColor: (NSColor *) color forIndex: (NSInteger) index;
 
 - (void) addNewGroup;
 - (void) removeGroupWithRowIndexes: (NSIndexSet *) rowIndexes;
 
-- (NSIndexSet *) moveGroupsAtRowIndexes: (NSIndexSet *) indexes toRow: (int) newRow oldSelected: (NSIndexSet *) selectedIndexes;
+- (NSIndexSet *) moveGroupsAtRowIndexes: (NSIndexSet *) indexes toRow: (NSInteger) newRow oldSelected: (NSIndexSet *) selectedIndexes;
 
 - (NSMenu *) groupMenuWithTarget: (id) target action: (SEL) action isSmall: (BOOL) small;
 
