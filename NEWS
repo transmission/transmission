@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.40 (2008/mm/dd)
+1.40 (2008/11/09)
 <http://trac.transmissionbt.com/query?milestone=1.40&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Tracker communication uses fewer resources
