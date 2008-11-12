@@ -257,8 +257,7 @@ updateAddresses( tr_tracker * t,
     {
         /* multitracker spec: "if a connection with a tracker is
            successful, it will be moved to the front of the tier." */
-        t->trackerIndex = tr_torrentPromoteTracker( torrent,
-                                                    t->trackerIndex );
+        t->trackerIndex = tr_torrentPromoteTracker( torrent, t->trackerIndex );
         retry = FALSE; /* we succeeded; no need to retry */
     }
     else if( ++t->trackerIndex >= torrent->info.trackerCount )
@@ -268,8 +267,7 @@ updateAddresses( tr_tracker * t,
     }
     else
     {
-        const tr_tracker_info * n = getCurrentAddressFromTorrent( t,
-                                                                  torrent );
+        const tr_tracker_info * n = getCurrentAddressFromTorrent( t, torrent );
         tr_ninf( t->name, _( "Trying tracker \"%s\"" ), n->announce );
         retry = TRUE;
     }
@@ -444,7 +442,7 @@ onTrackerResponse( tr_session * session,
         if( bencLoaded )
             tr_bencFree( &benc );
     }
-    else
+    else if( responseCode )
     {
         /* %1$ld - http status code, such as 404
          * %2$s - human-readable explanation of the http status code */
@@ -457,19 +455,20 @@ onTrackerResponse( tr_session * session,
 
     retry = updateAddresses( t, success );
 
-    /**
-    ***
-    **/
-
-    if( retry )
+    if( responseCode && retry )
         responseCode = 300;
 
-    if( 200 <= responseCode && responseCode <= 299 )
+    if( responseCode == 0 )
+    {
+        dbgmsg( t->name, "No response from tracker... retrying in two minutes." );
+        t->manualAnnounceAllowedAt = ~(time_t)0;
+        t->reannounceAt = time( NULL ) + t->randOffset + 120;
+    }
+    else if( 200 <= responseCode && responseCode <= 299 )
     {
         const int    interval = t->announceIntervalSec + t->randOffset;
         const time_t now = time ( NULL );
-        dbgmsg( t->name, "request succeeded. reannouncing in %d seconds",
-                interval );
+        dbgmsg( t->name, "request succeeded. reannouncing in %d seconds", interval );
 
         /* if the announce response was a superset of the scrape response,
            treat this as both a successful announce AND scrape. */
@@ -499,8 +498,7 @@ onTrackerResponse( tr_session * session,
         const int interval = 5;
         dbgmsg( t->name, "got a redirect. retrying in %d seconds", interval );
         t->reannounceAt = time( NULL ) + interval;
-        t->manualAnnounceAllowedAt = time( NULL ) +
-                                     t->announceMinIntervalSec;
+        t->manualAnnounceAllowedAt = time( NULL ) + t->announceMinIntervalSec;
     }
     else if( 400 <= responseCode && responseCode <= 499 )
     {
@@ -524,9 +522,7 @@ onTrackerResponse( tr_session * session,
     else
     {
         /* WTF did we get?? */
-        dbgmsg(
-            t->name,
-            "Invalid response from tracker... retrying in two minutes." );
+        dbgmsg( t->name, "Invalid response from tracker... retrying in two minutes." );
         t->manualAnnounceAllowedAt = ~(time_t)0;
         t->reannounceAt = time( NULL ) + t->randOffset + 120;
     }
