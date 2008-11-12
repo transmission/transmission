@@ -22,10 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef WIN32
- #define HAVE_GETRLIMIT
-#endif
-
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
@@ -36,12 +32,12 @@
 #include <fcntl.h>
 #endif
 
+#ifdef HAVE_FALLOCATE
+ #include <linux/falloc.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef HAVE_GETRLIMIT
- #include <sys/time.h> /* getrlimit */
- #include <sys/resource.h> /* getrlimit */
-#endif
 #include <unistd.h>
 #include <fcntl.h> /* O_LARGEFILE */
 
@@ -104,7 +100,7 @@ preallocateFile( int fd UNUSED, uint64_t length UNUSED )
 {
 #ifdef HAVE_FALLOCATE
 
-    return fallocate( fd, 0, offset, length );
+    return fallocate( fd, FALLOC_FL_KEEP_SIZE, 0, length );
 
 #elif defined(HAVE_POSIX_FALLOCATE)
 
@@ -504,20 +500,7 @@ tr_fdInit( int globalPeerLimit )
     assert( gFd == NULL );
     gFd = tr_new0( struct tr_fd_s, 1 );
     gFd->lock = tr_lockNew( );
-
-#ifdef HAVE_GETRLIMIT
-    {
-        struct rlimit rlim;
-        getrlimit( RLIMIT_NOFILE, &rlim );
-        rlim.rlim_cur = MIN( rlim.rlim_max,
-                            (rlim_t)( globalPeerLimit + NOFILE_BUFFER ) );
-        setrlimit( RLIMIT_NOFILE, &rlim );
-        gFd->socketMax = rlim.rlim_cur - NOFILE_BUFFER;
-        tr_dbg( "setrlimit( RLIMIT_NOFILE, %d )", (int)rlim.rlim_cur );
-    }
-#else
     gFd->socketMax = globalPeerLimit;
-#endif
     tr_dbg( "%d usable file descriptors", globalPeerLimit );
 
     for( i = 0; i < TR_MAX_OPEN_FILES; ++i )

@@ -3,8 +3,8 @@ dnl STATUS: "X" for prerelease test builds,
 dnl         "Z" for unsupported trunk builds,
 dnl         "0" for stable, supported releases
 dnl these should be the only two lines you need to change
-m4_define([user_agent_prefix],1.40)
-m4_define([peer_id_prefix],-TR1400-)
+m4_define([user_agent_prefix],1.40+)
+m4_define([peer_id_prefix],-TR140Z-)
 
 AC_INIT([transmission],[user_agent_prefix],[http://trac.transmissionbt.com/newticket])
 AC_SUBST(USERAGENT_PREFIX,[user_agent_prefix])
@@ -49,7 +49,14 @@ fi
 
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_FUNCS([lrintf strlcpy daemon dirname basename daemon strcasecmp localtime_r fallocate posix_fallocate])
+
+AC_MSG_CHECKING([for fallocate])
+AC_TRY_LINK([#include <linux/falloc.h>],
+            [return fallocate(-1,0,0,0);],
+            [AC_DEFINE([HAVE_FALLOCATE],[1],[Defined if fallocate() exists])
+             AC_MSG_RESULT([yes])],
+            [AC_MSG_RESULT([no])])
+AC_CHECK_FUNCS([lrintf strlcpy daemon dirname basename daemon strcasecmp localtime_r posix_fallocate])
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 ACX_PTHREAD
@@ -180,18 +187,18 @@ dnl ----------------------------------------------------------------------------
 dnl
 dnl  wxWidgets detection for the wxWidgets client
 
-AM_OPTIONS_WXCONFIG
-AM_PATH_WXCONFIG($WX_MINIMUM,[have_wx=yes],[have_wx=no])
+build_wx=no
 AC_ARG_ENABLE([wx],
               AC_HELP_STRING([--enable-wx],[build wxWidgets client]),
               [want_wx=${enableval}],
-              [want_wx=no])
-build_wx=no
-if test "x$want_wx" = "xyes" ; then
+              [want_wx=maybe])
+if test "x$want_wx" != "xno"; then
+    AM_OPTIONS_WXCONFIG
+    AM_PATH_WXCONFIG($WX_MINIMUM,[have_wx=yes],[have_wx=no])
     if test "x$have_wx" = "xyes"; then
-      build_wx=yes
-    else
-      AC_MSG_ERROR("wxWidgets not found!")
+        build_wx=yes
+    elif test "x$want_wx" = "xyes"; then 
+        AC_MSG_ERROR("wxWidgets not found!")
     fi
 fi
 AM_CONDITIONAL([BUILD_WX],[test "x$build_wx" = "xyes"])
