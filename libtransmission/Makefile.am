@@ -112,10 +112,10 @@ TESTS = \
 
 noinst_PROGRAMS = $(TESTS)
 
-APPS_LDFLAGS = \
+apps_ldflags = \
     $(ZLIB_LDFLAGS)
 
-APPS_LDADD = \
+apps_ldadd = \
     ./libtransmission.a  \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
@@ -128,21 +128,37 @@ APPS_LDADD = \
     -lm
 
 bencode_test_SOURCES = bencode-test.c
-bencode_test_LDADD = $(APPS_LDADD)
+bencode_test_LDADD = ${apps_ldadd}
+bencode_test_LDFLAGS = ${apps_ldflags}
+
 blocklist_test_SOURCES = blocklist-test.c
-blocklist_test_LDADD = $(APPS_LDADD)
+blocklist_test_LDADD = ${apps_ldadd}
+blocklist_test_LDFLAGS = ${apps_ldflags}
+
 clients_test_SOURCES = clients-test.c
-clients_test_LDADD = $(APPS_LDADD)
+clients_test_LDADD = ${apps_ldadd}
+clients_test_LDFLAGS = ${apps_ldflags}
+
 json_test_SOURCES = json-test.c
-json_test_LDADD = $(APPS_LDADD)
+json_test_LDADD = ${apps_ldadd}
+json_test_LDFLAGS = ${apps_ldflags}
+
 rpc_test_SOURCES = rpc-test.c
-rpc_test_LDADD = $(APPS_LDADD)
+rpc_test_LDADD = ${apps_ldadd}
+rpc_test_LDFLAGS = ${apps_ldflags}
+
 test_fastset_SOURCES = test-fastset.c
-test_fastset_LDADD = $(APPS_LDADD)
+test_fastset_LDADD = ${apps_ldadd}
+test_fastset_LDFLAGS = ${apps_ldflags}
+
 test_peer_id_SOURCES = test-peer-id.c
-test_peer_id_LDADD = $(APPS_LDADD)
+test_peer_id_LDADD = ${apps_ldadd}
+test_peer_id_LDFLAGS = ${apps_ldflags}
+
 utils_test_SOURCES = utils-test.c
-utils_test_LDADD = $(APPS_LDADD)
+utils_test_LDADD = ${apps_ldadd}
+utils_test_LDFLAGS = ${apps_ldflags}
+
 
 
 clean-local:
