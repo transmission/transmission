@@ -49,7 +49,14 @@ fi
 
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_FUNCS([lrintf strlcpy daemon dirname basename daemon strcasecmp localtime_r fallocate posix_fallocate])
+
+AC_MSG_CHECKING([for fallocate])
+AC_TRY_LINK([#include <linux/falloc.h>],
+            [return fallocate(-1,0,0,0);],
+            [AC_DEFINE([HAVE_FALLOCATE],[1],[Defined if fallocate() exists])
+             AC_MSG_RESULT([yes])],
+            [AC_MSG_RESULT([no])])
+AC_CHECK_FUNCS([lrintf strlcpy daemon dirname basename daemon strcasecmp localtime_r posix_fallocate])
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 ACX_PTHREAD

@@ -36,6 +36,10 @@
 #include <fcntl.h>
 #endif
 
+#ifdef HAVE_FALLOCATE
+ #include <linux/falloc.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifdef HAVE_GETRLIMIT
@@ -104,7 +108,7 @@ preallocateFile( int fd UNUSED, uint64_t length UNUSED )
 {
 #ifdef HAVE_FALLOCATE
 
-    return fallocate( fd, 0, offset, length );
+    return fallocate( fd, FALLOC_FL_KEEP_SIZE, 0, length );
 
 #elif defined(HAVE_POSIX_FALLOCATE)
 
