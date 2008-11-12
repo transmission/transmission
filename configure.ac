@@ -180,18 +180,18 @@ dnl ----------------------------------------------------------------------------
 dnl
 dnl  wxWidgets detection for the wxWidgets client
 
-AM_OPTIONS_WXCONFIG
-AM_PATH_WXCONFIG($WX_MINIMUM,[have_wx=yes],[have_wx=no])
+build_wx=no
 AC_ARG_ENABLE([wx],
               AC_HELP_STRING([--enable-wx],[build wxWidgets client]),
               [want_wx=${enableval}],
-              [want_wx=no])
-build_wx=no
-if test "x$want_wx" = "xyes" ; then
+              [want_wx=maybe])
+if test "x$want_wx" != "xno"; then
+    AM_OPTIONS_WXCONFIG
+    AM_PATH_WXCONFIG($WX_MINIMUM,[have_wx=yes],[have_wx=no])
     if test "x$have_wx" = "xyes"; then
-      build_wx=yes
-    else
-      AC_MSG_ERROR("wxWidgets not found!")
+        build_wx=yes
+    elif test "x$want_wx" = "xyes"; then 
+        AC_MSG_ERROR("wxWidgets not found!")
     fi
 fi
 AM_CONDITIONAL([BUILD_WX],[test "x$build_wx" = "xyes"])
