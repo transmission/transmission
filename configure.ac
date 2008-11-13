@@ -191,7 +191,7 @@ build_wx=no
 AC_ARG_ENABLE([wx],
               AC_HELP_STRING([--enable-wx],[build wxWidgets client]),
               [want_wx=${enableval}],
-              [want_wx=maybe])
+              [want_wx=no])
 if test "x$want_wx" != "xno"; then
     AM_OPTIONS_WXCONFIG
     AM_PATH_WXCONFIG($WX_MINIMUM,[have_wx=yes],[have_wx=no])
