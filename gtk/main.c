@@ -220,7 +220,7 @@ refreshTorrentActions( GtkTreeSelection * s )
     action_sensitize( "delete-torrent", counts.totalCount != 0 );
     action_sensitize( "verify-torrent", counts.totalCount != 0 );
     action_sensitize( "open-torrent-folder", counts.totalCount == 1 );
-    action_sensitize( "show-torrent-details", counts.totalCount == 1 );
+    action_sensitize( "show-torrent-properties", counts.totalCount == 1 );
 
     canUpdate = 0;
     gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach,
@@ -1484,7 +1484,7 @@ doAction( const char * action_name,
         GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_selected_foreach( s, openFolderForeach, data );
     }
-    else if( !strcmp ( action_name, "show-torrent-details" ) )
+    else if( !strcmp ( action_name, "show-torrent-properties" ) )
     {
         GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_selected_foreach( s, showInfoForeach, data );

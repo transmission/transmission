@@ -128,7 +128,7 @@ view_row_activated( GtkTreeView       * tree_view UNUSED,
                     GtkTreeViewColumn * column    UNUSED,
                     gpointer            user_data UNUSED )
 {
-    action_activate( "show-torrent-details" );
+    action_activate( "show-torrent-properties" );
 }
 
 static gboolean is_row_visible( GtkTreeModel *,

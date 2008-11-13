@@ -1477,16 +1477,11 @@ torrent_inspector_new( GtkWindow * parent,
     guint           tag;
     GtkWidget *     d, *n, *w;
     tr_torrent *    tor = tr_torrent_handle ( gtor );
-    char            sizeStr[64];
     char            title[512];
     const tr_info * info = tr_torrent_info ( gtor );
 
     /* create the dialog */
-    tr_strlsize( sizeStr, info->totalSize, sizeof( sizeStr ) );
-    /* %1$s is torrent name
-       %2$s its file size */
-    g_snprintf( title, sizeof( title ), _(
-                    "Details for %1$s (%2$s)" ), info->name, sizeStr );
+    g_snprintf( title, sizeof( title ), _( "%s Properties" ), info->name );
     d = gtk_dialog_new_with_buttons ( title, parent, 0,
                                       GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                       NULL );

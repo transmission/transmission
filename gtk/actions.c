@@ -152,9 +152,8 @@ static GtkActionEntry        entries[] =
           action_cb ) },
     { "edit-preferences",     GTK_STOCK_PREFERENCES, NULL,
       NULL,            NULL,                   G_CALLBACK( action_cb ) },
-    { "show-torrent-details", GTK_STOCK_INFO,
-      N_( "_Details" ), "<alt>Return", N_( "Torrent details" ), G_CALLBACK(
-          action_cb ) },
+    { "show-torrent-properties", GTK_STOCK_PROPERTIES,
+      NULL, "<alt>Return", N_( "Torrent properties" ), G_CALLBACK( action_cb ) },
     { "open-torrent-folder",  GTK_STOCK_OPEN,
       N_( "_Open Folder" ), NULL, NULL, G_CALLBACK( action_cb ) },
     { "show-about-dialog",    GTK_STOCK_ABOUT,       NULL,

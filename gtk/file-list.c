@@ -794,7 +794,7 @@ file_list_new( TrTorrent * gtor )
     col = GTK_TREE_VIEW_COLUMN ( g_object_new ( GTK_TYPE_TREE_VIEW_COLUMN,
                                                 "expand", TRUE,
                                                 /* Translators: this is a column
-                                                   header in Files tab, Details
+                                                   header in Files tab, Properties
                                                    dialog;
                                                    Don't include the prefix
                                                    "filedetails|" in the
@@ -816,7 +816,7 @@ file_list_new( TrTorrent * gtor )
 
 
     rend = gtk_cell_renderer_progress_new( );
-    /* Translators: this is a column header in Files tab, Details dialog;
+    /* Translators: this is a column header in Files tab, Properties dialog;
        Don't include the prefix "filedetails|" in the translation. */
     col = gtk_tree_view_column_new_with_attributes( Q_( "filedetails|Progress" ), rend, NULL );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderProgress, NULL, NULL );
@@ -825,7 +825,7 @@ file_list_new( TrTorrent * gtor )
 
     /* add "enabled" column */
     rend = gtk_cell_renderer_toggle_new( );
-    /* Translators: this is a column header in Files tab, Details dialog;
+    /* Translators: this is a column header in Files tab, Properties dialog;
        Don't include the prefix "filedetails|" in the translation.
        The items for this column are checkboxes (yes/no) */
     col = gtk_tree_view_column_new_with_attributes( Q_( "filedetails|Download" ), rend, NULL );
