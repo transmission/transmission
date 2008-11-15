@@ -11,6 +11,7 @@ EXTRA_DIST = \
     version.sh \
     Growl.framework \
     Sparkle.framework \
+    sparkle_dsa_pub.pem \
     CTGradient \
     UKKQueue \
     TransmissionHelp \
