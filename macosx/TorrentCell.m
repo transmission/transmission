@@ -100,7 +100,7 @@
         [paragraphStyle release];
         
         fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0f green: 0.4f blue: 0.8f alpha: 1.0f] retain];
-        fBarBorderColor = [[NSColor colorWithDeviceWhite: 0.0f alpha: 0.2f] retain];
+        fBarBorderColor = [[NSColor colorWithCalibratedWhite: 0.0f alpha: 0.2f] retain];
     }
 	return self;
 }

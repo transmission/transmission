@@ -26,7 +26,6 @@
 #import "FileOutlineView.h"
 #import "Torrent.h"
 #import "FileListNode.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #define PADDING_HORIZONAL 2.0f

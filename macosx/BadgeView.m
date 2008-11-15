@@ -72,7 +72,7 @@
 
 - (void) drawRect: (NSRect) rect
 {
-    [[NSImage imageNamed: @"NSApplicationIcon"] drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    [[NSApp applicationIconImage] drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     
     if (fQuitting)
     {

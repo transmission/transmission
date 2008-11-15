@@ -42,7 +42,6 @@
 #import "BlocklistDownloader.h"
 #import "StatusBarView.h"
 #import "FilterButton.h"
-#import "MenuLabel.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSMenuAdditions.h"
