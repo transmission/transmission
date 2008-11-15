@@ -310,11 +310,10 @@ tr_sessionInitFull( const char *       configDir,
 
 tr_handle *
 tr_sessionInit( const char * configDir,
-                const char * downloadDir,
                 const char * tag )
 {
     return tr_sessionInitFull( configDir,
-                               downloadDir,
+                               TR_DEFAULT_DOWNLOAD_DIR,
                                tag,
                                TR_DEFAULT_PEX_ENABLED,
                                TR_DEFAULT_PORT_FORWARDING_ENABLED,

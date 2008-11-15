@@ -57,17 +57,23 @@ typedef uint64_t tr_block_index_t;
  * @brief returns Transmission's default configuration file directory.
  *
  * The default configuration directory is determined this way:
- * - If the TRANSMISSION_HOME environmental variable is set,
- *   its value is returned.
- * - otherwise, if we're running on Darwin,
- *   "$HOME/Library/Application Support/Transmission" is returned.
- * - otherwise, if we're running on WIN32,
- *   "$EXE_FOLDER/Transmission" is returned.
- * - otherwise, if XDG_CONFIG_HOME is set,
- *   "$XDG_CONFIG_HOME/transmission" is returned.
- * - lastly, $HOME/.config/transmission" is used.
+ * 1. If the TRANSMISSION_HOME environmental variable is set, its value is used.
+ * 2. On Darwin, "${HOME}/Library/Application Support/Transmission" is used.
+ * 3. On Windows, "${CSIDL_APPDATA}/Transmission" is used.
+ * 4. If XDG_CONFIG_HOME is set, "${XDG_CONFIG_HOME}/transmission" is used.
+ * 5. ${HOME}/.config/transmission" is used as a last resort.
  */
 const char* tr_getDefaultConfigDir( void );
+
+/**
+ * @brief returns Transmisson's default download directory.
+ *
+ * The default download directory is determined this way:
+ * 1. If the HOME environmental variable is set, "${HOME}/Downloads" is used.
+ * 2. On Windows, "${CSIDL_MYDOCUMENTS}/Downloads" is used.
+ * 3. Otherwise, getpwuid(getuid())->pw_dir + "/Downloads" is used.
+ */
+const char* tr_getDefaultDownloadDir( void );
 
 typedef struct tr_ctor tr_ctor;
 typedef struct tr_handle tr_handle;
@@ -97,6 +103,8 @@ tr_proxy_type;
 
 /** @see tr_sessionInitFull */
 #define TR_DEFAULT_CONFIG_DIR               tr_getDefaultConfigDir( )
+/** @see tr_sessionInitFull */
+#define TR_DEFAULT_DOWNLOAD_DIR             tr_getDefaultDownloadDir( )
 /** @see tr_sessionInitFull */
 #ifdef TR_EMBEDDED
  #define TR_DEFAULT_ENCRYPTION              TR_CLEAR_PREFERRED
@@ -285,7 +293,6 @@ tr_session * tr_sessionInitFull( const char *       configDir,
 /** @brief Shorter form of tr_sessionInitFull()
     @deprecated Use tr_sessionInitFull() instead. */
 tr_session *  tr_sessionInit( const char * configDir,
-                              const char * downloadDir,
                               const char * tag );
 
 /** @brief End a libtransmission session

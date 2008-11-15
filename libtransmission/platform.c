@@ -483,6 +483,17 @@ tr_getDefaultConfigDir( void )
     return s;
 }
 
+const char*
+tr_getDefaultDownloadDir( void )
+{
+    static char * s = NULL;
+
+    if( s == NULL )
+        s = tr_buildPath( getHomeDir( ), "Downloads", NULL );
+
+    return s;
+}
+
 /***
 ****
 ***/

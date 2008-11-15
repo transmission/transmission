@@ -349,9 +349,8 @@ main( int     argc,
     if( configdir == NULL )
         configdir = tr_getDefaultConfigDir( );
 
-    /* if no download directory specified, use cwd instead */
-    if( !downloadDir )
-        downloadDir = tr_strdup( tr_getcwd( ) );
+    if( downloadDir == NULL )
+        downloadDir = tr_getDefaultDownloadDir( );
 
     /* Initialize libtransmission */
     h = tr_sessionInitFull(

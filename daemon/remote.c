@@ -15,6 +15,12 @@
 #include <stdlib.h>
 #include <string.h> /* strcmp */
 
+#ifdef WIN32 
+ #include <direct.h> /* getcwd */ 
+#else 
+ #include <unistd.h> /* getcwd */ 
+#endif 
+
 #include <libevent/event.h>
 #include <curl/curl.h>
 
@@ -142,6 +148,19 @@ static char * reqs[256]; /* arbitrary max */
 static int    reqCount = 0;
 static int    debug = 0;
 static char * auth = NULL;
+
+static char* 
+tr_getcwd( void ) 
+{ 
+    char buf[2048]; 
+    *buf = '\0'; 
+#ifdef WIN32 
+    _getcwd( buf, sizeof( buf ) ); 
+#else 
+    getcwd( buf, sizeof( buf ) ); 
+#endif 
+    return tr_strdup( buf ); 
+} 
 
 static char*
 absolutify( const char * path )

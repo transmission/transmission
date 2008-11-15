@@ -491,19 +491,6 @@ tr_loadFile( const char * path,
 }
 
 char*
-tr_getcwd( void )
-{
-    char buf[2048];
-    *buf = '\0';
-#ifdef WIN32
-    _getcwd( buf, sizeof( buf ) );
-#else
-    getcwd( buf, sizeof( buf ) );
-#endif
-    return tr_strdup( buf );
-}
-
-char*
 tr_basename( const char * path )
 {
     char * tmp = tr_strdup( path );
