@@ -108,10 +108,9 @@ static const char * LICENSE =
 
 struct cbdata
 {
-    gboolean      minimized;
-    gboolean      closing;
+    unsigned int  isIconified : 1;
+    unsigned int  isClosing   : 1;
     guint         timer;
-    guint         idle_hide_mainwindow_tag;
     gpointer      icon;
     GtkWindow *   wind;
     TrCore *      core;
@@ -263,20 +262,6 @@ onMainWindowSizeAllocated( GtkWidget *            window,
         pref_int_set( PREF_KEY_MAIN_WINDOW_Y, y );
         pref_int_set( PREF_KEY_MAIN_WINDOW_WIDTH, w );
         pref_int_set( PREF_KEY_MAIN_WINDOW_HEIGHT, h );
-    }
-}
-
-static void
-windowStateChanged( GtkWidget * widget    UNUSED,
-                    GdkEventWindowState * event,
-                    gpointer              gdata )
-{
-    if( event->changed_mask & GDK_WINDOW_STATE_ICONIFIED )
-    {
-        struct cbdata * cbdata = gdata;
-        cbdata->minimized =
-            ( event->new_window_state &
-              GDK_WINDOW_STATE_ICONIFIED ) ? 1 : 0;
     }
 }
 
@@ -486,8 +471,6 @@ main( int     argc,
 
         /* create main window now to be a parent to any error dialogs */
         win = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
-        g_signal_connect( win, "window-state-event",
-                          G_CALLBACK( windowStateChanged ), cbdata );
         g_signal_connect( win, "size-allocate",
                           G_CALLBACK( onMainWindowSizeAllocated ), cbdata );
 
@@ -603,24 +586,24 @@ appsetup( TrWindow *      wind,
           GSList *        torrentFiles,
           struct cbdata * cbdata,
           gboolean        forcepause,
-          gboolean        minimized )
+          gboolean        isIconified )
 {
     const pref_flag_t start =
         forcepause ? PREF_FLAG_FALSE : PREF_FLAG_DEFAULT;
     const pref_flag_t prompt = PREF_FLAG_DEFAULT;
 
     /* fill out cbdata */
-    cbdata->wind       = NULL;
-    cbdata->icon       = NULL;
-    cbdata->msgwin     = NULL;
-    cbdata->prefs      = NULL;
-    cbdata->timer      = 0;
-    cbdata->closing    = FALSE;
-    cbdata->errqueue   = NULL;
-    cbdata->dupqueue   = NULL;
-    cbdata->minimized  = minimized;
+    cbdata->wind         = NULL;
+    cbdata->icon         = NULL;
+    cbdata->msgwin       = NULL;
+    cbdata->prefs        = NULL;
+    cbdata->timer        = 0;
+    cbdata->isClosing    = 0;
+    cbdata->errqueue     = NULL;
+    cbdata->dupqueue     = NULL;
+    cbdata->isIconified  = isIconified;
 
-    if( minimized )
+    if( isIconified )
         pref_flag_set( PREF_KEY_SHOW_TRAY_ICON, TRUE );
 
     actions_set_core( cbdata->core );
@@ -656,7 +639,7 @@ appsetup( TrWindow *      wind,
                   tr_core_session( cbdata->core ) );
 
     /* either show the window or iconify it */
-    if( !minimized )
+    if( !isIconified )
         gtk_widget_show( GTK_WIDGET( wind ) );
     else
     {
@@ -666,85 +649,39 @@ appsetup( TrWindow *      wind,
     }
 }
 
-/**
- * hideMainWindow, and the timeout hack in toggleMainWindow,
- * are loosely cribbed from Colin Walters' rb-shell.c in Rhythmbox
- */
-static gboolean
-idle_hide_mainwindow( gpointer window )
-{
-    gtk_widget_hide( window );
-    return FALSE;
-}
-
 static void
-hideMainWindow( struct cbdata * cbdata )
+tr_window_present( GtkWindow * window )
 {
-#if defined( STATUS_ICON_SUPPORTED ) && defined( GDK_WINDOWING_X11 )
-    GdkRectangle bounds;
-    gulong       data[4];
-    Display *    dpy;
-    GdkWindow *  gdk_window;
-
-    gtk_status_icon_get_geometry( GTK_STATUS_ICON(
-                                      cbdata->icon ), NULL, &bounds, NULL );
-    gdk_window = GTK_WIDGET ( cbdata->wind )->window;
-    dpy = gdk_x11_drawable_get_xdisplay ( gdk_window );
-
-    data[0] = bounds.x;
-    data[1] = bounds.y;
-    data[2] = bounds.width;
-    data[3] = bounds.height;
-
-    XChangeProperty ( dpy,
-                      GDK_WINDOW_XID ( gdk_window ),
-                      gdk_x11_get_xatom_by_name_for_display (
-                          gdk_drawable_get_display ( gdk_window ),
-                          "_NET_WM_ICON_GEOMETRY" ),
-                      XA_CARDINAL, 32, PropModeReplace,
-                      (guchar*)&data, 4 );
-
-    gtk_window_set_skip_taskbar_hint( cbdata->wind, TRUE );
+#if GTK_CHECK_VERSION( 2, 8, 0 )
+    gtk_window_present_with_time( window, gtk_get_current_event_time( ) );
+#else
+    gtk_window_present( window );
 #endif
-    gtk_window_iconify( cbdata->wind );
-}
-
-static void
-clearTag( guint * tag )
-{
-    if( *tag )
-        g_source_remove( *tag );
-    *tag = 0;
 }
 
 static void
 toggleMainWindow( struct cbdata * cbdata,
-                  gboolean        present )
+                  gboolean        doPresent )
 {
     GtkWindow * window = GTK_WINDOW( cbdata->wind );
-    const int   hide = !cbdata->minimized;
-    static int  x = 0, y = 0;
+    const int   doShow = cbdata->isIconified;
+    static int  x = 0;
+    static int  y = 0;
 
-    if( ( !present ) && hide )
+    if( doShow || doPresent )
     {
-        gtk_window_get_position( window, &x, &y );
-        clearTag( &cbdata->idle_hide_mainwindow_tag );
-        hideMainWindow( cbdata );
-        cbdata->idle_hide_mainwindow_tag = g_timeout_add(
-            100, idle_hide_mainwindow, window );
+        cbdata->isIconified = 0;
+        gtk_window_set_skip_taskbar_hint( window, FALSE );
+        gtk_window_move( window, x, y );
+        gtk_widget_show( GTK_WIDGET( window ) );
+        tr_window_present( window );
     }
     else
     {
-        gtk_window_set_skip_taskbar_hint( window, FALSE );
-        if( x != 0 && y != 0 )
-            gtk_window_move( window, x, y );
-        gtk_widget_show( GTK_WIDGET( window ) );
-        gtk_window_deiconify( window );
-#if GTK_CHECK_VERSION( 2, 8, 0 )
-        gtk_window_present_with_time( window, gtk_get_current_event_time( ) );
-#else
-        gtk_window_present( window );
-#endif
+        gtk_window_get_position( window, &x, &y );
+        gtk_window_set_skip_taskbar_hint( window, TRUE );
+        gtk_widget_hide( GTK_WIDGET( window ) );
+        cbdata->isIconified = 1;
     }
 }
 
@@ -1238,7 +1175,7 @@ static gboolean
 updatemodel( gpointer gdata )
 {
     struct cbdata *data = gdata;
-    const gboolean done = data->closing || global_sigcount;
+    const gboolean done = data->isClosing || global_sigcount;
 
     if( !done )
     {
