@@ -1842,19 +1842,10 @@ struct ChokeData
 {
     unsigned int    doUnchoke    : 1;
     unsigned int    isInterested : 1;
-    double          rateToClient;
-    double          rateToPeer;
+    unsigned int    isChoked     : 1;
+    int             rate;
     tr_peer *       peer;
 };
-
-static int
-tr_compareDouble( double a,
-                  double b )
-{
-    if( a < b ) return -1;
-    if( a > b ) return 1;
-    return 0;
-}
 
 static int
 compareChoke( const void * va,
@@ -1862,16 +1853,14 @@ compareChoke( const void * va,
 {
     const struct ChokeData * a = va;
     const struct ChokeData * b = vb;
-    int                      diff = 0;
 
-    if( diff == 0 ) /* prefer higher dl speeds */
-        diff = -tr_compareDouble( a->rateToClient, b->rateToClient );
-    if( diff == 0 ) /* prefer higher ul speeds */
-        diff = -tr_compareDouble( a->rateToPeer, b->rateToPeer );
-    if( diff == 0 ) /* prefer unchoked */
-        diff = (int)a->peer->peerIsChoked - (int)b->peer->peerIsChoked;
+    if( a->rate != b->rate ) /* prefer higher overall speeds */
+        return a->rate > b->rate ? -1 : 1;
 
-    return diff;
+    if( a->isChoked != b->isChoked ) /* prefer unchoked */
+        return a->isChoked ? 1 : -1;
+
+    return 0;
 }
 
 static int
@@ -1912,8 +1901,9 @@ rechoke( Torrent * t )
             struct ChokeData * n = &choke[size++];
             n->peer         = peer;
             n->isInterested = peer->peerIsInterested;
-            n->rateToPeer   = tr_peerGetPieceSpeed( peer, TR_CLIENT_TO_PEER );
-            n->rateToClient = tr_peerGetPieceSpeed( peer, TR_PEER_TO_CLIENT );
+            n->isChoked     = peer->peerIsChoked;
+            n->rate = (int)(tr_peerGetPieceSpeed( peer, TR_CLIENT_TO_PEER )
+                            + tr_peerGetPieceSpeed( peer, TR_PEER_TO_CLIENT ) );
         }
     }
 
