@@ -594,9 +594,6 @@ tr_window_new( GtkUIManager * ui_manager,
     gtk_box_pack_start( GTK_BOX( vbox ), h, FALSE, FALSE, 0 );
     g_signal_connect( s, "changed", G_CALLBACK( filter_entry_changed ), p );
 
-    w = gtk_hseparator_new( );
-    gtk_box_pack_start( GTK_BOX( vbox ), w, FALSE, FALSE, 0 );
-
     /* status menu */
     menu = p->status_menu = gtk_menu_new( );
     l = NULL;
@@ -645,7 +642,7 @@ tr_window_new( GtkUIManager * ui_manager,
     gtk_box_pack_end( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     g_signal_connect( w, "button-release-event",
                       G_CALLBACK( onYinYangReleased ), p );
-    gtk_box_pack_start( GTK_BOX( vbox ), h, FALSE, FALSE, 0 );
+    gtk_box_pack_end( GTK_BOX( vbox ), h, FALSE, FALSE, 0 );
 
     menu = gtk_menu_new( );
     l = NULL;
@@ -667,11 +664,11 @@ tr_window_new( GtkUIManager * ui_manager,
     /* workarea */
     p->view = makeview( p, core );
     w = p->scroll = gtk_scrolled_window_new( NULL, NULL );
-    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW(
-                                        w ), GTK_POLICY_NEVER,
+    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( w ),
+                                    GTK_POLICY_NEVER,
                                     GTK_POLICY_AUTOMATIC );
-    gtk_scrolled_window_set_shadow_type( GTK_SCROLLED_WINDOW(
-                                             w ), GTK_SHADOW_IN );
+    gtk_scrolled_window_set_shadow_type( GTK_SCROLLED_WINDOW( w ),
+                                         GTK_SHADOW_IN );
     gtk_container_add( GTK_CONTAINER( w ), p->view );
     gtk_box_pack_start( GTK_BOX( vbox ), w, TRUE, TRUE, 0 );
     gtk_container_set_focus_child( GTK_CONTAINER( vbox ), w );
