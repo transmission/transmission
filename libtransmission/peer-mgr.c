@@ -2509,7 +2509,7 @@ allocateBandwidth( tr_peerMgr * mgr,
         countHandshakeBandwidth( t->outgoingHandshakes, direction );
 
         /* remember this torrent's bytes used */
-        tr_rcTransferred( t->tor->rawSpeed[direction], used );
+        tr_rcTransferred( t->tor->pieceSpeed[direction], used );
 
         /* add this torrent's bandwidth use to allBytesUsed */
         allBytesUsed += used;
@@ -2530,7 +2530,7 @@ allocateBandwidth( tr_peerMgr * mgr,
 
             case TR_SPEEDLIMIT_SINGLE:
                 setPeerBandwidth( t->peers, direction,
-                                  t->tor->rawSpeed[direction],
+                                  t->tor->pieceSpeed[direction],
                                   tr_torrentGetSpeedLimit( t->tor, direction ) );
                 break;
 
