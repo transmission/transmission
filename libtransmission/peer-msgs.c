@@ -1847,18 +1847,19 @@ sendBitfield( tr_peermsgs * msgs )
         /** Lazy bitfields aren't a high priority or secure, so I'm opting for
             speed over a truly random sample -- let's limit the pool size to
             the first 1000 pieces so large torrents don't bog things down */
-        size_t             poolSize = MIN( msgs->torrent->info.pieceCount,
-                                           1000 );
-        tr_piece_index_t * pool = tr_new( tr_piece_index_t, poolSize );
+        size_t poolSize;
+        const size_t maxPoolSize = MIN( msgs->torrent->info.pieceCount, 1000 );
+        tr_piece_index_t * pool = tr_new( tr_piece_index_t, maxPoolSize );
 
         /* build the pool */
-        for( i = 0; i < poolSize; ++i )
-            pool[i] = i;
+        for( i=poolSize=0; i<maxPoolSize; ++i )
+            if( tr_bitfieldHas( field, i ) )
+                pool[poolSize++] = i;
 
         /* pull random piece indices from the pool */
         while( ( poolSize > 0 ) && ( lazyCount < LAZY_PIECE_COUNT ) )
         {
-            const int              pos = tr_cryptoWeakRandInt( poolSize );
+            const int pos = tr_cryptoWeakRandInt( poolSize );
             const tr_piece_index_t piece = pool[pos];
             tr_bitfieldRem( field, piece );
             lazyPieces[lazyCount++] = piece;
