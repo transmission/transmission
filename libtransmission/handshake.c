@@ -333,7 +333,7 @@ sendYa( tr_handshake * handshake )
 
     /* send it */
     setReadState( handshake, AWAITING_YB );
-    tr_peerIoWriteBuf( handshake->io, outbuf );
+    tr_peerIoWriteBuf( handshake->io, outbuf, FALSE );
 
     /* cleanup */
     evbuffer_free( outbuf );
@@ -485,7 +485,7 @@ readYb( tr_handshake *    handshake,
     /* send it */
     tr_cryptoDecryptInit( handshake->crypto );
     setReadState( handshake, AWAITING_VC );
-    tr_peerIoWriteBuf( handshake->io, outbuf );
+    tr_peerIoWriteBuf( handshake->io, outbuf, FALSE );
 
     /* cleanup */
     evbuffer_free( outbuf );
@@ -711,7 +711,7 @@ readHandshake( tr_handshake *    handshake,
     {
         int       msgSize;
         uint8_t * msg = buildHandshakeMessage( handshake, &msgSize );
-        tr_peerIoWrite( handshake->io, msg, msgSize );
+        tr_peerIoWrite( handshake->io, msg, msgSize, FALSE );
         tr_free( msg );
         handshake->haveSentBitTorrentHandshake = 1;
     }
@@ -779,7 +779,7 @@ readYa( tr_handshake *    handshake,
     walk += len;
 
     setReadState( handshake, AWAITING_PAD_A );
-    tr_peerIoWrite( handshake->io, outbuf, walk - outbuf );
+    tr_peerIoWrite( handshake->io, outbuf, walk - outbuf, FALSE );
     return READ_NOW;
 }
 
@@ -991,7 +991,7 @@ readIA( tr_handshake *    handshake,
     }
 
     /* send it out */
-    tr_peerIoWriteBuf( handshake->io, outbuf );
+    tr_peerIoWriteBuf( handshake->io, outbuf, FALSE );
     evbuffer_free( outbuf );
 
     /* now await the handshake */
@@ -1156,7 +1156,7 @@ gotError( struct bufferevent * evbuf UNUSED,
         msg = buildHandshakeMessage( handshake, &msgSize );
         handshake->haveSentBitTorrentHandshake = 1;
         setReadState( handshake, AWAITING_HANDSHAKE );
-        tr_peerIoWrite( handshake->io, msg, msgSize );
+        tr_peerIoWrite( handshake->io, msg, msgSize, FALSE );
         tr_free( msg );
     }
     else
@@ -1203,7 +1203,7 @@ tr_handshakeNew( tr_peerIo *        io,
         uint8_t * msg = buildHandshakeMessage( handshake, &msgSize );
         handshake->haveSentBitTorrentHandshake = 1;
         setReadState( handshake, AWAITING_HANDSHAKE );
-        tr_peerIoWrite( handshake->io, msg, msgSize );
+        tr_peerIoWrite( handshake->io, msg, msgSize, FALSE );
         tr_free( msg );
     }
 

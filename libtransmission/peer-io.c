@@ -27,6 +27,7 @@
 
 #include "transmission.h"
 #include "crypto.h"
+#include "list.h"
 #include "net.h"
 #include "peer-io.h"
 #include "ratecontrol.h"
@@ -76,6 +77,12 @@ struct tr_bandwidth
     size_t          bytesLeft;
 };
 
+struct tr_datatype
+{
+    unsigned int    isPieceData : 1;
+    size_t          length;
+};
+
 struct tr_peerIo
 {
     unsigned int           isEncrypted               : 1;
@@ -92,11 +99,12 @@ struct tr_peerIo
     uint8_t                peerId[20];
     time_t                 timeCreated;
 
-    tr_session *           session;
+    tr_session           * session;
 
     struct in_addr         in_addr;
-    struct bufferevent *   bufev;
-    struct evbuffer *      output;
+    struct bufferevent   * bufev;
+    struct evbuffer      * output;
+    tr_list              * output_datatypes; /* struct tr_datatype */
 
     tr_can_read_cb         canRead;
     tr_did_write_cb        didWrite;
@@ -199,22 +207,33 @@ didWriteWrapper( struct bufferevent * e,
 
     if( len < io->bufferSize[TR_UP] )
     {
-        const size_t payload = io->bufferSize[TR_UP] - len;
-        const size_t n = addPacketOverhead( payload );
-        struct tr_bandwidth * b = &io->bandwidth[TR_UP];
-        b->bytesLeft -= MIN( b->bytesLeft, (size_t)n );
-        b->bytesUsed += n;
-        tr_rcTransferred( io->session->rawSpeed[TR_UP], n );
-        dbgmsg( io,
-                "wrote %zu bytes to peer... upload bytesLeft is now %zu",
-                n,
-                b->bytesLeft );
+        size_t payload = io->bufferSize[TR_UP] - len;
+
+        while( payload )
+        {
+            struct tr_datatype * next = io->output_datatypes->data;
+            const size_t chunk_length = MIN( next->length, payload );
+            const size_t n = addPacketOverhead( chunk_length );
+
+            if( next->isPieceData )
+            {
+                struct tr_bandwidth * b = &io->bandwidth[TR_UP];
+                b->bytesLeft -= MIN( b->bytesLeft, n );
+                b->bytesUsed += n;
+            }
+
+            if( io->didWrite )
+                io->didWrite( io, n, next->isPieceData, io->userData );
+
+            payload -= chunk_length;
+            next->length -= chunk_length;
+            if( !next->length )
+                tr_free( tr_list_pop_front( &io->output_datatypes ) );
+        }
     }
 
     adjustOutputBuffer( io );
 
-    if( io->didWrite )
-        io->didWrite( e, io->userData );
 }
 
 static void
@@ -237,11 +256,7 @@ canReadWrapper( struct bufferevent * e,
         struct tr_bandwidth * b = io->bandwidth + TR_DOWN;
         b->bytesLeft -= MIN( b->bytesLeft, (size_t)n );
         b->bytesUsed += n;
-        tr_rcTransferred( io->session->rawSpeed[TR_DOWN], n );
-        dbgmsg( io,
-                "%zu new input bytes. bytesUsed is %zu, bytesLeft is %zu",
-                n, b->bytesUsed,
-                b->bytesLeft );
+        dbgmsg( io, "%zu new input bytes. bytesUsed is %zu, bytesLeft is %zu", n, b->bytesUsed, b->bytesLeft );
 
         adjustInputBuffer( io );
     }
@@ -386,6 +401,7 @@ io_dtor( void * vio )
     bufferevent_free( io->bufev );
     tr_netClose( io->socket );
     tr_cryptoFree( io->crypto );
+    tr_list_free( &io->output_datatypes, tr_free );
     tr_free( io );
 }
 
@@ -717,10 +733,12 @@ tr_peerIoWantsBandwidth( const tr_peerIo * io,
 }
 
 void
-tr_peerIoWrite( tr_peerIo *  io,
-                const void * writeme,
-                size_t       writemeLen )
+tr_peerIoWrite( tr_peerIo   * io,
+                const void  * writeme,
+                size_t        writemeLen,
+                int           isPieceData )
 {
+    struct tr_datatype * datatype;
     assert( tr_amInEventThread( io->session ) );
     dbgmsg( io, "adding %zu bytes into io->output", writemeLen );
 
@@ -729,16 +747,22 @@ tr_peerIoWrite( tr_peerIo *  io,
     else
         evbuffer_add( io->output, writeme, writemeLen );
 
+    datatype = tr_new( struct tr_datatype, 1 );
+    datatype->isPieceData = isPieceData != 0;
+    datatype->length = writemeLen;
+    tr_list_append( &io->output_datatypes, datatype );
+
     adjustOutputBuffer( io );
 }
 
 void
-tr_peerIoWriteBuf( tr_peerIo *       io,
-                   struct evbuffer * buf )
+tr_peerIoWriteBuf( tr_peerIo         * io,
+                   struct evbuffer   * buf,
+                   int                 isPieceData )
 {
     const size_t n = EVBUFFER_LENGTH( buf );
 
-    tr_peerIoWrite( io, EVBUFFER_DATA( buf ), n );
+    tr_peerIoWrite( io, EVBUFFER_DATA( buf ), n, isPieceData );
     evbuffer_drain( buf, n );
 }
 

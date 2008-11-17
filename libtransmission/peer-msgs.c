@@ -429,7 +429,7 @@ protocolSendChoke( tr_peermsgs * msgs,
 ***  EVENTS
 **/
 
-static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0 };
+static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0, 0 };
 
 static void
 publish( tr_peermsgs *   msgs,
@@ -483,23 +483,28 @@ fireGotBlock( tr_peermsgs *               msgs,
 
 static void
 fireClientGotData( tr_peermsgs * msgs,
-                   uint32_t      length )
+                   uint32_t      length,
+                   int           wasPieceData )
 {
     tr_peer_event e = blankEvent;
 
     e.length = length;
     e.eventType = TR_PEER_CLIENT_GOT_DATA;
+    e.wasPieceData = wasPieceData;
     publish( msgs, &e );
 }
 
 static void
-firePeerGotData( tr_peermsgs * msgs,
-                 uint32_t      length )
+firePeerGotData( tr_peermsgs  * msgs,
+                 uint32_t       length,
+                 int            wasPieceData )
 {
     tr_peer_event e = blankEvent;
 
     e.length = length;
     e.eventType = TR_PEER_PEER_GOT_DATA;
+    e.wasPieceData = wasPieceData;
+
     publish( msgs, &e );
 }
 
@@ -1299,14 +1304,6 @@ static int clientGotBlock( tr_peermsgs *               msgs,
                            const uint8_t *             block,
                            const struct peer_request * req );
 
-static void
-clientGotBytes( tr_peermsgs * msgs,
-                uint32_t      byteCount )
-{
-    msgs->info->pieceDataActivityDate = time( NULL );
-    fireClientGotData( msgs, byteCount );
-}
-
 static int
 readBtPiece( tr_peermsgs *     msgs,
              struct evbuffer * inbuf,
@@ -1342,7 +1339,7 @@ readBtPiece( tr_peermsgs *     msgs,
         assert( EVBUFFER_LENGTH( inbuf ) >= n );
         tr_peerIoReadBytes( msgs->io, inbuf, buf, n );
         evbuffer_add( msgs->incoming.block, buf, n );
-        clientGotBytes( msgs, n );
+        fireClientGotData( msgs, n, TRUE );
         tr_free( buf );
         dbgmsg( msgs, "got %d bytes for block %u:%u->%u ... %d remain",
                (int)n, req->index, req->offset, req->length,
@@ -1539,15 +1536,6 @@ readBtMessage( tr_peermsgs *     msgs,
 }
 
 static void
-peerGotBytes( tr_peermsgs * msgs,
-              uint32_t      byteCount,
-              const time_t  now )
-{
-    msgs->info->pieceDataActivityDate = now;
-    firePeerGotData( msgs, byteCount );
-}
-
-static void
 decrementDownloadedCount( tr_peermsgs * msgs,
                           uint32_t      byteCount )
 {
@@ -1634,6 +1622,13 @@ clientGotBlock( tr_peermsgs *               msgs,
     return 0;
 }
 
+static void
+didWrite( tr_peerIo * io UNUSED, size_t bytesWritten, int wasPieceData, void * vmsgs )
+{
+    tr_peermsgs * msgs = vmsgs;
+    firePeerGotData( msgs, bytesWritten, wasPieceData );
+}
+
 static ReadState
 canRead( struct bufferevent * evin,
          void *               vmsgs )
@@ -1652,19 +1647,23 @@ canRead( struct bufferevent * evin,
         ret = inlen ? readBtPiece( msgs, in, inlen ) : READ_LATER;
     }
     else switch( msgs->state )
-        {
-            case AWAITING_BT_LENGTH:
-                ret = readBtLength ( msgs, in, inlen ); break;
+    {
+        case AWAITING_BT_LENGTH:
+            ret = readBtLength ( msgs, in, inlen ); break;
 
-            case AWAITING_BT_ID:
-                ret = readBtId     ( msgs, in, inlen ); break;
+        case AWAITING_BT_ID:
+            ret = readBtId     ( msgs, in, inlen ); break;
 
-            case AWAITING_BT_MESSAGE:
-                ret = readBtMessage( msgs, in, inlen ); break;
+        case AWAITING_BT_MESSAGE:
+            ret = readBtMessage( msgs, in, inlen ); break;
 
-            default:
-                assert( 0 );
-        }
+        default:
+            assert( 0 );
+    }
+
+    /* log the raw data that was read */
+    if( EVBUFFER_LENGTH( in ) != inlen )
+        fireClientGotData( msgs, inlen - EVBUFFER_LENGTH( in ), FALSE );
 
     return ret;
 }
@@ -1726,20 +1725,16 @@ peerPulse( void * vmsgs )
 
         if( outlen )
         {
-            tr_peerIoWrite( msgs->io, EVBUFFER_DATA( msgs->outBlock ), outlen );
+            tr_peerIoWrite( msgs->io, EVBUFFER_DATA( msgs->outBlock ), outlen, TRUE );
             evbuffer_drain( msgs->outBlock, outlen );
-            peerGotBytes( msgs, outlen, now );
 
             len -= outlen;
             msgs->clientSentAnythingAt = now;
             msgs->sendingBlock = len != 0;
 
-            dbgmsg( msgs, "wrote %d bytes; %d left in block", (int)outlen,
-                    (int)len );
+            dbgmsg( msgs, "wrote %zu bytes; %zu left in block", outlen, len );
         }
-        else dbgmsg( msgs,
-                     "stalled writing block... uploadMax %lu, outlen %lu",
-                     uploadMax, outlen );
+        else dbgmsg( msgs, "stalled writing block... uploadMax %lu, outlen %lu", uploadMax, outlen );
     }
 
     if( !msgs->sendingBlock )
@@ -1749,18 +1744,15 @@ peerPulse( void * vmsgs )
 
         if( haveMessages && !msgs->outMessagesBatchedAt ) /* fresh batch */
         {
-            dbgmsg( msgs, "started an outMessages batch (length is %d)",
-                   (int)EVBUFFER_LENGTH( msgs->outMessages ) );
+            dbgmsg( msgs, "started an outMessages batch (length is %zu)", EVBUFFER_LENGTH( msgs->outMessages ) );
             msgs->outMessagesBatchedAt = now;
         }
         else if( haveMessages
                && ( ( now - msgs->outMessagesBatchedAt ) >
                    msgs->outMessagesBatchPeriod ) )
         {
-            dbgmsg( msgs, "flushing outMessages... (length is %d)",
-                   (int)EVBUFFER_LENGTH(
-                       msgs->outMessages ) );
-            tr_peerIoWriteBuf( msgs->io, msgs->outMessages );
+            dbgmsg( msgs, "flushing outMessages... (length is %zu)", EVBUFFER_LENGTH( msgs->outMessages ) );
+            tr_peerIoWriteBuf( msgs->io, msgs->outMessages, FALSE );
             msgs->clientSentAnythingAt = now;
             msgs->outMessagesBatchedAt = 0;
             msgs->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;
@@ -2089,7 +2081,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
 
     tr_peerIoSetTimeoutSecs( m->io, 150 ); /* timeout after N seconds of
                                              inactivity */
-    tr_peerIoSetIOFuncs( m->io, canRead, NULL, gotError, m );
+    tr_peerIoSetIOFuncs( m->io, canRead, didWrite, gotError, m );
     ratePulse( m );
 
     return m;

@@ -70,6 +70,9 @@ typedef struct tr_peer
     /* the rate at which pieces are being transferred between client and peer.
      * protocol overhead is NOT included; this is only the piece data */
     struct tr_ratecontrol  * pieceSpeed[2];
+
+    /* the rate at which all data is being transferred between client and peer. */
+    struct tr_ratecontrol  * rawSpeed[2];
 }
 tr_peer;
 

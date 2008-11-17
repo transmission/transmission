@@ -330,6 +330,8 @@ peerConstructor( const struct in_addr * in_addr )
     memcpy( &p->in_addr, in_addr, sizeof( struct in_addr ) );
     p->pieceSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
     p->pieceSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
+    p->rawSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
+    p->rawSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
     return p;
 }
 
@@ -367,6 +369,8 @@ peerDestructor( tr_peer * peer )
     tr_bitfieldFree( peer->blame );
     tr_free( peer->client );
 
+    tr_rcClose( peer->rawSpeed[TR_CLIENT_TO_PEER] );
+    tr_rcClose( peer->rawSpeed[TR_PEER_TO_CLIENT] );
     tr_rcClose( peer->pieceSpeed[TR_CLIENT_TO_PEER] );
     tr_rcClose( peer->pieceSpeed[TR_PEER_TO_CLIENT] );
     tr_free( peer );
@@ -1016,18 +1020,37 @@ peerCallbackFunc( void * vpeer,
         {
             const time_t now = time( NULL );
             tr_torrent * tor = t->tor;
+            const tr_direction dir = TR_CLIENT_TO_PEER;
+
             tor->activityDate = now;
-            tor->uploadedCur += e->length;
+
+            if( e->wasPieceData )
+                tor->uploadedCur += e->length;
+
+            /* add it to the raw upload speed */
             if( peer )
-                tr_rcTransferred ( peer->pieceSpeed[TR_CLIENT_TO_PEER], e->length );
-            tr_rcTransferred ( tor->pieceSpeed[TR_CLIENT_TO_PEER], e->length );
-            tr_rcTransferred ( tor->session->pieceSpeed[TR_CLIENT_TO_PEER], e->length );
-            tr_statsAddUploaded( tor->session, e->length );
-            if( peer )
-            {
+                tr_rcTransferred ( peer->rawSpeed[dir], e->length );
+            tr_rcTransferred ( tor->rawSpeed[dir], e->length );
+            tr_rcTransferred ( tor->session->rawSpeed[dir], e->length );
+
+            /* maybe add it to the piece upload speed */
+            if( e->wasPieceData ) {
+                if( peer )
+                    tr_rcTransferred ( peer->pieceSpeed[dir], e->length );
+                tr_rcTransferred ( tor->pieceSpeed[dir], e->length );
+                tr_rcTransferred ( tor->session->pieceSpeed[dir], e->length );
+            }
+
+            /* update the stats */
+            if( e->wasPieceData )
+                tr_statsAddUploaded( tor->session, e->length );
+
+            /* update our atom */
+            if( peer ) {
                 struct peer_atom * a = getExistingAtom( t, &peer->in_addr );
                 a->piece_data_time = now;
             }
+
             break;
         }
 
@@ -1035,24 +1058,43 @@ peerCallbackFunc( void * vpeer,
         {
             const time_t now = time( NULL );
             tr_torrent * tor = t->tor;
+            const tr_direction dir = TR_PEER_TO_CLIENT;
+
             tor->activityDate = now;
-            tr_statsAddDownloaded( tor->session, e->length );
-            if( peer )
-                tr_rcTransferred ( peer->pieceSpeed[TR_PEER_TO_CLIENT], e->length );
-            tr_rcTransferred ( tor->pieceSpeed[TR_PEER_TO_CLIENT], e->length );
-            tr_rcTransferred ( tor->session->pieceSpeed[TR_PEER_TO_CLIENT], e->length );
+
             /* only add this to downloadedCur if we got it from a peer --
              * webseeds shouldn't count against our ratio.  As one tracker
              * admin put it, "Those pieces are downloaded directly from the
              * content distributor, not the peers, it is the tracker's job
              * to manage the swarms, not the web server and does not fit
              * into the jurisdiction of the tracker." */
-            if( peer )
+            if( peer && e->wasPieceData )
                 tor->downloadedCur += e->length;
+
+            /* add it to our raw download speed */
+            if( peer )
+                tr_rcTransferred ( peer->rawSpeed[dir], e->length );
+            tr_rcTransferred ( tor->rawSpeed[dir], e->length );
+            tr_rcTransferred ( tor->session->rawSpeed[dir], e->length );
+
+            /* maybe add it to the piece upload speed */
+            if( e->wasPieceData ) {
+                if( peer )
+                    tr_rcTransferred ( peer->pieceSpeed[dir], e->length );
+                tr_rcTransferred ( tor->pieceSpeed[dir], e->length );
+                tr_rcTransferred ( tor->session->pieceSpeed[dir], e->length );
+            }
+     
+            /* update the stats */ 
+            if( e->wasPieceData )
+                tr_statsAddDownloaded( tor->session, e->length );
+
+            /* update our atom */
             if( peer ) {
                 struct peer_atom * a = getExistingAtom( t, &peer->in_addr );
                 a->piece_data_time = now;
             }
+
             break;
         }
 

@@ -28,14 +28,12 @@ typedef struct tr_peerIo tr_peerIo;
 ***
 **/
 
-tr_peerIo*           tr_peerIoNewOutgoing(
-    struct tr_handle *     session,
-    const struct in_addr * addr,
-    int                    port,
-    const  uint8_t *
-                           torrentHash );
+tr_peerIo*           tr_peerIoNewOutgoing( struct tr_handle     * session,
+                                           const struct in_addr * addr,
+                                           int                    port,
+                                           const  uint8_t       * torrentHash );
 
-tr_peerIo*           tr_peerIoNewIncoming( struct tr_handle *     session,
+tr_peerIo*           tr_peerIoNewIncoming( struct tr_handle     * session,
                                            const struct in_addr * addr,
                                            uint16_t               port,
                                            int                    socket );
@@ -108,31 +106,39 @@ typedef enum
 }
 ReadState;
 
-typedef ReadState ( *tr_can_read_cb )( struct bufferevent*, void* user_data );
-typedef void ( *tr_did_write_cb )( struct bufferevent *, void * );
-typedef void ( *tr_net_error_cb )( struct bufferevent *, short what, void * );
+typedef ReadState ( *tr_can_read_cb  )( struct bufferevent   * ev,
+                                        void                 * user_data );
 
-void              tr_peerIoSetIOFuncs( tr_peerIo *     io,
-                                       tr_can_read_cb  readcb,
-                                       tr_did_write_cb writecb,
-                                       tr_net_error_cb errcb,
-                                       void *          user_data );
+typedef void      ( *tr_did_write_cb )( tr_peerIo            * io,
+                                        size_t                 bytesWritten,
+                                        int                    wasPieceData,
+                                        void                 * userData );
 
-int               tr_peerIoWantsBandwidth( const tr_peerIo * io,
-                                                             tr_direction );
+typedef void      ( *tr_net_error_cb )( struct bufferevent  * ev,
+                                        short                 what,
+                                        void                * userData );
 
-#if 0
-void              tr_peerIoTryRead( tr_peerIo * io );
+void    tr_peerIoSetIOFuncs      ( tr_peerIo        * io,
+                                   tr_can_read_cb     readcb,
+                                   tr_did_write_cb    writecb,
+                                   tr_net_error_cb    errcb,
+                                   void             * user_data );
 
-#endif
+/**
+***
+**/
 
-void              tr_peerIoWrite( tr_peerIo *  io,
-                                  const void * writeme,
-                                  size_t       writemeLen );
+int     tr_peerIoWantsBandwidth ( const tr_peerIo   * io,
+                                  tr_direction        direction );
 
-void              tr_peerIoWriteBuf( tr_peerIo *       io,
-                                     struct evbuffer * buf );
+void    tr_peerIoWrite          ( tr_peerIo         * io,
+                                  const void        * writeme,
+                                  size_t              writemeLen,
+                                  int                 isPieceData );
 
+void    tr_peerIoWriteBuf       ( tr_peerIo         * io,
+                                  struct evbuffer   * buf,
+                                  int                 isPieceData );
 
 /**
 ***
