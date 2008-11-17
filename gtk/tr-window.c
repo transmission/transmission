@@ -642,7 +642,7 @@ tr_window_new( GtkUIManager * ui_manager,
     gtk_box_pack_end( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     g_signal_connect( w, "button-release-event",
                       G_CALLBACK( onYinYangReleased ), p );
-    gtk_box_pack_end( GTK_BOX( vbox ), h, FALSE, FALSE, 0 );
+    gtk_box_pack_start( GTK_BOX( vbox ), h, FALSE, FALSE, 0 );
 
     menu = gtk_menu_new( );
     l = NULL;
