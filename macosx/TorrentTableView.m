@@ -43,6 +43,7 @@
 
 @interface TorrentTableView (Private)
 
+//unused on Leopard
 - (BOOL) pointInControlRect: (NSPoint) point;
 - (BOOL) pointInRevealRect: (NSPoint) point;
 - (BOOL) pointInActionRect: (NSPoint) point;
@@ -304,7 +305,6 @@
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
 }
 
-//when Leopard-only, use these variables instead of pointInActionRect:, etc.
 - (void) mouseEntered: (NSEvent *) event
 {
     NSDictionary * dict = (NSDictionary *)[event userData];
@@ -376,6 +376,7 @@
 - (void) mouseDown: (NSEvent *) event
 {
     NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+    const NSInteger row = [self rowAtPoint: point];
     
     //check to toggle group status before anything else
     if ([self pointInGroupStatusRect: point])
@@ -386,7 +387,11 @@
         return;
     }
     
-    BOOL pushed = [self pointInControlRect: point] || [self pointInRevealRect: point] || [self pointInActionRect: point];
+    BOOL pushed;
+    if ([NSApp isOnLeopardOrBetter])
+        pushed = fMouseActionRow == row || fMouseRevealRow == row || fMouseControlRow == row;
+    else
+        pushed = [self pointInControlRect: point] || [self pointInRevealRect: point] || [self pointInActionRect: point];
     
     //if pushing a button, don't change the selected rows
     if (pushed)
@@ -400,8 +405,6 @@
     //avoid weird behavior when showing menu by doing this after mouse down
     if ([self pointInActionRect: point])
     {
-        NSInteger row = [self rowAtPoint: point];
-        
         fActionPushedRow = row;
         [self setNeedsDisplayInRect: [self rectOfRow: row]]; //ensure button is pushed down
         
@@ -413,7 +416,6 @@
     else if (!pushed && [event clickCount] == 2) //double click
     {
         id item = nil;
-        NSInteger row = [self rowAtPoint: point];
         if (row != -1)
             item = [self itemAtRow: row];
         
