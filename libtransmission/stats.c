@@ -10,8 +10,6 @@
  * $Id$
  */
 
-#include <assert.h>
-
 #include "transmission.h"
 #include "bencode.h"
 #include "platform.h" /* tr_sessionGetConfigDir() */
@@ -131,7 +129,7 @@ tr_statsClose( tr_handle * handle )
 static struct tr_stats_handle *
 getStats( const tr_handle * handle )
 {
-    return handle->sessionStats;
+    return handle ? handle->sessionStats : NULL;
 }
 
 /***
@@ -163,11 +161,12 @@ tr_sessionGetStats( const tr_handle *  handle,
                     tr_session_stats * setme )
 {
     const struct tr_stats_handle * stats = getStats( handle );
-
-    assert( stats );
-    *setme = stats->single;
-    setme->secondsActive = time( NULL ) - stats->startTime;
-    updateRatio( setme );
+    if( stats )
+    {
+        *setme = stats->single;
+        setme->secondsActive = time( NULL ) - stats->startTime;
+        updateRatio( setme );
+    }
 }
 
 void
@@ -175,11 +174,13 @@ tr_sessionGetCumulativeStats( const tr_handle *  handle,
                               tr_session_stats * setme )
 {
     const struct tr_stats_handle * stats = getStats( handle );
-    tr_session_stats               current;
+    tr_session_stats current;
 
-    assert( stats );
-    tr_sessionGetStats( handle, &current );
-    addStats( setme, &stats->old, &current );
+    if( stats )
+    {
+        tr_sessionGetStats( handle, &current );
+        addStats( setme, &stats->old, &current );
+    }
 }
 
 void
