@@ -271,9 +271,11 @@ add_response( struct evhttp_request * req,
                 evbuffer_drain( out, 2 );
             }
 
+#if 0
             tr_ninf( MY_NAME, _( "Deflated response from %zu bytes to %zu" ),
                               content_len,
                               EVBUFFER_LENGTH( out ) );
+#endif
             evhttp_add_header( req->output_headers,
                                "Content-Encoding", "deflate" );
         }
