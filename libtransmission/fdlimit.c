@@ -110,8 +110,8 @@ preallocateFile( const char * filename, uint64_t length )
     if( hFile != INVALID_HANDLE_VALUE )
     {
         LARGE_INTEGER li;
-        li.QuadPart = desiredFileSize;
-        success = SetFilePointerEx( hFile, desiredFileSize, NULL, FILE_BEGIN )
+        li.QuadPart = length;
+        success = SetFilePointerEx( hFile, length, NULL, FILE_BEGIN )
                && SetEndOfFile( hFile );
         CloseHandle( hFile );
     }
