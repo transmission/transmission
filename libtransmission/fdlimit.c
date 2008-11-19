@@ -111,8 +111,7 @@ preallocateFile( const char * filename, uint64_t length )
     {
         LARGE_INTEGER li;
         li.QuadPart = length;
-        success = SetFilePointerEx( hFile, length, NULL, FILE_BEGIN )
-               && SetEndOfFile( hFile );
+        success = SetFilePointerEx( hFile, li, NULL, FILE_BEGIN ) && SetEndOfFile( hFile );
         CloseHandle( hFile );
     }
 
