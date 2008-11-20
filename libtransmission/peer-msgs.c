@@ -1834,6 +1834,7 @@ sendBitfield( tr_peermsgs * msgs )
 
     field = tr_bitfieldDup( tr_cpPieceBitfield( msgs->torrent->completion ) );
 
+#if 0
     if( tr_sessionIsLazyBitfieldEnabled( msgs->session ) )
     {
         /** Lazy bitfields aren't a high priority or secure, so I'm opting for
@@ -1861,6 +1862,7 @@ sendBitfield( tr_peermsgs * msgs )
         /* cleanup */
         tr_free( pool );
     }
+#endif
 
     tr_peerIoWriteUint32( msgs->io, out,
                           sizeof( uint8_t ) + field->byteCount );

@@ -2370,7 +2370,7 @@ allocateHowMuch( double                  desired_average_kb_per_sec,
     const double seconds_per_pulse = BANDWIDTH_PERIOD_MSEC / 1000.0;
     const double baseline_bytes_per_pulse = desired_average_kb_per_sec * 1024.0 * seconds_per_pulse;
     const double min = baseline_bytes_per_pulse * 0.80;
-    const double max = baseline_bytes_per_pulse * 1.10;
+    const double max = baseline_bytes_per_pulse * 1.20;
     const double current_bytes_per_pulse = tr_rcRate( ratecontrol ) * 1024.0 * seconds_per_pulse;
     const double next_pulse_bytes = baseline_bytes_per_pulse * ( pulses_per_history + 1 )
                                   - ( current_bytes_per_pulse * pulses_per_history );
@@ -2411,9 +2411,7 @@ setPeerBandwidth( tr_ptrArray          * peerArray,
     const double welfareBytes = MIN( 2048, bytes * 0.2 );
     const double meritBytes = MAX( 0, bytes - welfareBytes );
     tr_peer **   peers = (tr_peer**) tr_ptrArrayBase( peerArray );
-    tr_peer **   candidates = tr_new( tr_peer *, peerCount );
     int          i;
-    int          candidateCount;
     double       welfare;
     size_t       bytesUsed;
 
@@ -2421,32 +2419,19 @@ setPeerBandwidth( tr_ptrArray          * peerArray,
     assert( welfareBytes >= 0.0 );
     assert( direction == TR_UP || direction == TR_DOWN );
 
-    for( i = candidateCount = 0; i < peerCount; ++i )
-        if( tr_peerIoWantsBandwidth( peers[i]->io, direction ) )
-            candidates[candidateCount++] = peers[i];
-        else
-            tr_peerIoSetBandwidth( peers[i]->io, direction, 0 );
+    for( i=bytesUsed=0; i<peerCount; ++i )
+        bytesUsed += tr_peerIoGetBandwidthUsed( peers[i]->io, direction );
 
-    for( i = bytesUsed = 0; i < candidateCount; ++i )
-        bytesUsed += tr_peerIoGetBandwidthUsed( candidates[i]->io,
-                                                direction );
+   welfare = welfareBytes / peerCount; 
 
-    welfare = welfareBytes / candidateCount;
-
-    for( i = 0; i < candidateCount; ++i )
+    for( i=0; i<peerCount; ++i )
     {
-        tr_peer *    peer = candidates[i];
+        tr_peer * peer = peers[i];
         const double merit = bytesUsed
-                             ? ( meritBytes *
-                                tr_peerIoGetBandwidthUsed( peer->io,
-                                                           direction ) ) /
-                             bytesUsed
-                             : ( meritBytes / candidateCount );
+                           ? ( meritBytes * tr_peerIoGetBandwidthUsed( peer->io, direction ) ) / bytesUsed
+                           : ( meritBytes / peerCount );
         tr_peerIoSetBandwidth( peer->io, direction, merit + welfare );
     }
-
-    /* cleanup */
-    tr_free( candidates );
 }
 
 static size_t
@@ -2512,6 +2497,25 @@ pumpAllPeers( tr_peerMgr * mgr )
     }
 }
 
+static void
+getBandwidthPeers( Torrent       * t,
+                   tr_direction    direction,
+                   tr_ptrArray   * appendme )
+{
+    int i, peerCount;
+    tr_peer ** peers;
+
+    assert( torrentIsLocked( t ) );
+
+    peers = (tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
+
+    for( i=0; i<peerCount; ++i )
+        if( peers[i]->msgs )
+            if(    ( ( direction == TR_PEER_TO_CLIENT ) && clientIsDownloadingFrom( peers[i] ) )
+                || ( ( direction == TR_CLIENT_TO_PEER ) && clientIsUploadingTo( peers[i] ) ) )
+                    tr_ptrArrayAppend( appendme, peers[i] );
+}
+
 /**
  * Allocate bandwidth for each peer connection.
  *
@@ -2571,21 +2575,20 @@ allocateBandwidth( tr_peerMgr * mgr,
                 break;
 
             case TR_SPEEDLIMIT_SINGLE:
-                setPeerBandwidth( t->peers, direction,
+            {
+                tr_ptrArray * peers = tr_ptrArrayNew( );
+                getBandwidthPeers( t, direction, peers );
+                setPeerBandwidth( peers, direction,
                                   t->tor->rawSpeed[direction],
                                   tr_torrentGetSpeedLimit( t->tor, direction ) );
-                break;
-
-            case TR_SPEEDLIMIT_GLOBAL:
-            {
-                int       i;
-                const int n = tr_ptrArraySize( t->peers );
-                for( i = 0; i < n; ++i )
-                    tr_ptrArrayAppend( globalPool,
-                                      tr_ptrArrayNth( t->peers, i ) );
-                poolBytesUsed += used;
+                tr_ptrArrayFree( peers, NULL );
                 break;
             }
+
+            case TR_SPEEDLIMIT_GLOBAL:
+                getBandwidthPeers( t, direction, globalPool );
+                poolBytesUsed += used;
+                break;
         }
     }
 

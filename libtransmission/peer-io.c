@@ -154,7 +154,8 @@ adjustOutputBuffer( tr_peerIo * io )
         io->output = buf;
         EVBUFFER_LENGTH( live ) = desiredLength;
     }
-    else if( EVBUFFER_LENGTH( live ) )
+
+    if( EVBUFFER_LENGTH( live ) )
     {
         bufferevent_enable( io->bufev, EV_WRITE );
     }
