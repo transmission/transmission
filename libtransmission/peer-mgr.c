@@ -1840,7 +1840,7 @@ tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
         tr_netNtop( &peer->in_addr, stat->addr, sizeof( stat->addr ) );
         tr_strlcpy( stat->client, ( peer->client ? peer->client : "" ),
                    sizeof( stat->client ) );
-        stat->port               = peer->port;
+        stat->port               = ntohs( peer->port );
         stat->from               = atom->from;
         stat->progress           = peer->progress;
         stat->isEncrypted        = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;

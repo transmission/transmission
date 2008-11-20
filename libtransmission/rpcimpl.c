@@ -250,6 +250,7 @@ addPeers( const tr_torrent * tor,
         tr_bencDictAddInt( d, "isUploadingTo", peer->isUploadingTo );
         tr_bencDictAddInt( d, "peerIsChoked", peer->peerIsChoked );
         tr_bencDictAddInt( d, "peerIsInterested", peer->peerIsInterested );
+        tr_bencDictAddInt( d, "port", peer->port );
         tr_bencDictAddDouble( d, "progress", peer->progress );
         tr_bencDictAddInt( d, "rateToClient",
                           (int)( peer->rateToClient * 1024.0 ) );
