@@ -58,6 +58,7 @@
 
 struct in_addr;
 struct sockaddr_in;
+struct tr_session;
 
 /***********************************************************************
  * DNS resolution
@@ -69,14 +70,16 @@ int  tr_netResolve( const  char *,
 /***********************************************************************
  * Sockets
  **********************************************************************/
-int  tr_netOpenTCP( const struct in_addr * addr,
+int  tr_netOpenTCP( struct tr_handle     * session,
+                    const struct in_addr * addr,
                     tr_port_t              port );
 
 int  tr_netBindTCP( int port );
 
-int  tr_netAccept( int    s,
-                   struct in_addr *,
-                          tr_port_t * );
+int  tr_netAccept( struct tr_handle  * session,
+                   int                 bound,
+                   struct in_addr    * setme_addr,
+                   tr_port_t         * setme_port );
 
 int  tr_netSetTOS( int s,
                    int tos );

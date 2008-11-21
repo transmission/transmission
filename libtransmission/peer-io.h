@@ -128,9 +128,6 @@ void    tr_peerIoSetIOFuncs      ( tr_peerIo        * io,
 ***
 **/
 
-int     tr_peerIoWantsBandwidth ( const tr_peerIo   * io,
-                                  tr_direction        direction );
-
 void    tr_peerIoWrite          ( tr_peerIo         * io,
                                   const void        * writeme,
                                   size_t              writemeLen,

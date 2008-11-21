@@ -386,7 +386,7 @@ tr_peerIoNewOutgoing( tr_session *           session,
     assert( port >= 0 );
     assert( torrentHash );
 
-    socket = tr_netOpenTCP( in_addr, port );
+    socket = tr_netOpenTCP( session, in_addr, port );
 
     return socket < 0
            ? NULL
@@ -492,7 +492,7 @@ tr_peerIoReconnect( tr_peerIo * io )
     if( io->socket >= 0 )
         tr_netClose( io->socket );
 
-    io->socket = tr_netOpenTCP( &io->in_addr, io->port );
+    io->socket = tr_netOpenTCP( io->session, &io->in_addr, io->port );
 
     if( io->socket >= 0 )
     {
@@ -715,23 +715,6 @@ tr_peerIoIsEncrypted( const tr_peerIo * io )
 /**
 ***
 **/
-
-int
-tr_peerIoWantsBandwidth( const tr_peerIo * io,
-                         tr_direction      direction )
-{
-    assert( direction == TR_UP || direction == TR_DOWN );
-
-    if( direction == TR_DOWN )
-    {
-        return TRUE; /* FIXME -- is there a good way to test for this? */
-    }
-    else
-    {
-        return EVBUFFER_LENGTH( EVBUFFER_OUTPUT( io->bufev ) )
-               || EVBUFFER_LENGTH( io->output );
-    }
-}
 
 void
 tr_peerIoWrite( tr_peerIo   * io,

@@ -105,6 +105,9 @@ struct tr_handle
     struct tr_metainfo_lookup *  metainfoLookup;
     int                          metainfoLookupCount;
 
+    /* the size of the output buffer for peer connections */
+    int so_sndbuf;
+
     /* the rate at which pieces are being transferred between client and peer.
      * protocol overhead is NOT included; this is only the piece data */
     struct tr_ratecontrol     *  pieceSpeed[2];

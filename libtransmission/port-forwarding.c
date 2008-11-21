@@ -42,11 +42,11 @@ struct tr_shared
     int                   bindSocket;
     int                   publicPort;
 
-    tr_handle *           h;
-    tr_timer *            pulseTimer;
+    tr_timer            * pulseTimer;
 
-    tr_upnp *             upnp;
-    tr_natpmp *           natpmp;
+    tr_upnp             * upnp;
+    tr_natpmp           * natpmp;
+    tr_session          * session;
 };
 
 /***
@@ -145,16 +145,15 @@ incomingPeersPulse( tr_shared * s )
         if( s->bindSocket < 0 )
             break;
 
-        socket = tr_netAccept( s->bindSocket, &addr, &port );
+        socket = tr_netAccept( s->session, s->bindSocket, &addr, &port );
         if( socket < 0 )
             break;
 
         tr_deepLog( __FILE__, __LINE__, NULL,
                    "New INCOMING connection %d (%s)",
-                   socket, tr_peerIoAddrStr( &addr,
-                                             port ) );
+                   socket, tr_peerIoAddrStr( &addr, port ) );
 
-        tr_peerMgrAddIncoming( s->h->peerMgr, &addr, port, socket );
+        tr_peerMgrAddIncoming( s->session->peerMgr, &addr, port, socket );
     }
 }
 
@@ -177,7 +176,7 @@ sharedPulse( void * vshared )
         tr_netClose( shared->bindSocket );
         tr_natpmpClose( shared->natpmp );
         tr_upnpClose( shared->upnp );
-        shared->h->shared = NULL;
+        shared->session->shared = NULL;
         tr_free( shared );
         keepPulsing = 0;
     }
@@ -190,19 +189,19 @@ sharedPulse( void * vshared )
 ***/
 
 tr_shared *
-tr_sharedInit( tr_handle * h,
-               int         isEnabled,
-               int         publicPort )
+tr_sharedInit( tr_session  * session,
+               int           isEnabled,
+               int           publicPort )
 {
     tr_shared * s = tr_new0( tr_shared, 1 );
 
-    s->h            = h;
+    s->session      = session;
     s->publicPort   = publicPort;
     s->bindPort     = -1;
     s->bindSocket   = -1;
     s->natpmp       = tr_natpmpInit( );
     s->upnp         = tr_upnpInit( );
-    s->pulseTimer   = tr_timerNew( h, sharedPulse, s, 1000 );
+    s->pulseTimer   = tr_timerNew( session, sharedPulse, s, 1000 );
     s->isEnabled    = isEnabled ? 1 : 0;
     s->upnpStatus   = TR_PORT_UNMAPPED;
     s->natpmpStatus = TR_PORT_UNMAPPED;
@@ -224,7 +223,7 @@ tr_sharedSetPort( tr_shared * s,
 
     s->publicPort = port;
 
-    while( ( tor = tr_torrentNext( s->h, tor ) ) )
+    while( ( tor = tr_torrentNext( s->session, tor ) ) )
         tr_torrentChangeMyPort( tor );
 }
 

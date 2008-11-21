@@ -258,6 +258,7 @@ tr_sessionInitFull( const char *       configDir,
     h->pieceSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
     h->rawSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
     h->rawSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
+    h->so_sndbuf = 1500 * 3; /* 3x MTU for most ethernet/wireless */
 
     if( configDir == NULL )
         configDir = tr_getDefaultConfigDir( );
