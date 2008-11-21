@@ -20,6 +20,8 @@
 ****
 ***/
 
+static struct tr_session_stats STATS_INIT = { 0.0f, 0, 0, 0, 0, 0 };
+
 struct tr_stats_handle
 {
     tr_session_stats    single;
@@ -117,7 +119,7 @@ tr_statsInit( tr_handle * handle )
 void
 tr_statsClose( tr_handle * handle )
 {
-    tr_session_stats cumulative;
+    tr_session_stats cumulative = STATS_INIT;
 
     tr_sessionGetCumulativeStats( handle, &cumulative );
     saveCumulativeStats( handle, &cumulative );
@@ -174,7 +176,7 @@ tr_sessionGetCumulativeStats( const tr_handle *  handle,
                               tr_session_stats * setme )
 {
     const struct tr_stats_handle * stats = getStats( handle );
-    tr_session_stats current;
+    tr_session_stats current = STATS_INIT;
 
     if( stats )
     {
