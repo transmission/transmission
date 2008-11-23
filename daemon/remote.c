@@ -1039,7 +1039,7 @@ processResponse( const char * host,
     tr_benc top;
 
     if( debug )
-        fprintf( stderr, "got response: [%*.*s]\n",
+        fprintf( stderr, "got response:\n--------\n%*.*s\n--------\n", 
                  (int)len, (int)len, (const char*) response );
 
     if( tr_jsonParse( response, len, &top, NULL ) )
