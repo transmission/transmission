@@ -325,29 +325,26 @@ static const char* peer_column_names[N_PEER_COLS] =
 };
 
 static int
-compare_peers( const void * a,
-               const void * b )
+compare_peers( const void * a, const void * b )
 {
     const tr_peer_stat * pa = a;
     const tr_peer_stat * pb = b;
 
-    return strcmp ( pa->addr, pb->addr );
+    return strcmp( pa->addr, pb->addr );
 }
 
 static int
-compare_addr_to_peer( const void * a,
-                      const void * b )
+compare_addr_to_peer( const void * addr, const void * b )
 {
-    const char *         addr = (const char *) a;
     const tr_peer_stat * peer = b;
 
-    return strcmp ( addr, peer->addr );
+    return strcmp( addr, peer->addr );
 }
 
 static void
-peer_row_set( GtkListStore *       store,
-              GtkTreeIter *        iter,
-              const tr_peer_stat * peer )
+peer_row_set( GtkListStore        * store,
+              GtkTreeIter         * iter,
+              const tr_peer_stat  * peer )
 {
     const char * client = peer->client;
 
@@ -388,8 +385,7 @@ peer_model_new( tr_torrent * tor )
                                             G_TYPE_FLOAT, /* downloadFromRate */
                                             G_TYPE_FLOAT, /* uploadToRate */
                                             G_TYPE_STRING, /* client */
-                                            G_TYPE_INT,   /* progress [0..100]
-                                                            */
+                                            G_TYPE_INT,   /* progress [0..100] */
                                             G_TYPE_BOOLEAN, /* isEncrypted */
                                             G_TYPE_STRING ); /* flagString */
 
@@ -486,6 +482,7 @@ typedef struct
     GtkWidget *     seeders_lb;
     GtkWidget *     leechers_lb;
     GtkWidget *     completed_lb;
+    GtkWidget *     peer_tree_view;
 }
 PeerData;
 
@@ -587,6 +584,8 @@ refresh_peers( GtkWidget * top )
     fmtpeercount ( p->completed_lb, stat->timesCompleted );
 
     free( peers );
+
+    gtk_widget_queue_draw( p->peer_tree_view );
 }
 
 #if GTK_CHECK_VERSION( 2, 12, 0 )
@@ -735,12 +734,14 @@ peer_page_new( TrTorrent * gtor )
 
     m  = peer_model_new ( tor );
     v = GTK_WIDGET( g_object_new( GTK_TYPE_TREE_VIEW,
-                                  "model", m,
+                                  "model",  gtk_tree_model_sort_new_with_model( m ),
                                   "rules-hint", TRUE,
 #if GTK_CHECK_VERSION( 2, 12, 0 )
                                   "has-tooltip", TRUE,
 #endif
                                   NULL ) );
+    p->peer_tree_view = v;
+
 #if GTK_CHECK_VERSION( 2, 12, 0 )
     g_signal_connect( v, "query-tooltip",
                       G_CALLBACK( onPeerViewQueryTooltip ), NULL );
