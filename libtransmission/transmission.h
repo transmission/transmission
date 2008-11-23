@@ -45,6 +45,9 @@ extern "C" {
 #ifndef PRIu64
  #define PRIu64 "llu"
 #endif
+#ifndef PRIu32
+ #define PRIu32 "lu"
+#endif
 #include <time.h> /* time_t */
 
 #define SHA_DIGEST_LENGTH 20

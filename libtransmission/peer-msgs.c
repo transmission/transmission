@@ -344,7 +344,11 @@ myDebug( const char *               file,
     }
 }
 
-#define dbgmsg( msgs, ... ) myDebug( __FILE__, __LINE__, msgs, __VA_ARGS__ )
+#define dbgmsg( msgs, ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            myDebug( __FILE__, __LINE__, msgs, __VA_ARGS__ ); \
+    } while( 0 )
 
 /**
 ***
@@ -910,7 +914,8 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
     ***  Accept this request
     **/
 
-    dbgmsg( msgs, "added req for piece %lu", (unsigned long)index );
+    dbgmsg( msgs, "adding req for %"PRIu32":%"PRIu32"->%"PRIu32" to our `will request' list",
+            index, offset, length );
     req.time_requested = time( NULL );
     reqListAppend( &msgs->clientWillAskFor, &req );
     return TR_ADDREQ_OK;
@@ -922,6 +927,7 @@ cancelAllRequestsToPeer( tr_peermsgs * msgs )
     int                 i;
     struct request_list a = msgs->clientWillAskFor;
     struct request_list b = msgs->clientAskedFor;
+    dbgmsg( msgs, "cancelling all requests to peer" );
 
     msgs->clientAskedFor = REQUEST_LIST_INIT;
     msgs->clientWillAskFor = REQUEST_LIST_INIT;
@@ -949,17 +955,21 @@ tr_peerMsgsCancel( tr_peermsgs * msgs,
     assert( msgs != NULL );
     assert( length > 0 );
 
+
     /* have we asked the peer for this piece? */
     req.index = pieceIndex;
     req.offset = offset;
     req.length = length;
 
     /* if it's only in the queue and hasn't been sent yet, free it */
-    if( reqListRemove( &msgs->clientWillAskFor, &req ) )
+    if( reqListRemove( &msgs->clientWillAskFor, &req ) ) {
+        dbgmsg( msgs, "cancelling %"PRIu32":%"PRIu32"->%"PRIu32"\n", pieceIndex, offset, length );
         fireCancelledReq( msgs, &req );
+    }
 
     /* if it's already been sent, send a cancel message too */
     if( reqListRemove( &msgs->clientAskedFor, &req ) ) {
+        dbgmsg( msgs, "cancelling %"PRIu32":%"PRIu32"->%"PRIu32"\n", pieceIndex, offset, length );
         protocolSendCancel( msgs, &req );
         fireCancelledReq( msgs, &req );
     }
@@ -1033,8 +1043,7 @@ parseLtepHandshake( tr_peermsgs *     msgs,
         return;
     }
 
-    dbgmsg( msgs, "here is the ltep handshake we got [%*.*s]", len, len,
-            tmp );
+    dbgmsg( msgs, "here is the handshake: [%*.*s]", len, len,  tmp );
 
     /* does the peer prefer encrypted connections? */
     if( tr_bencDictFindInt( &val, "e", &i ) )
@@ -1690,8 +1699,7 @@ ratePulse( void * vpeer )
                   ( rateToClient * 30 * 1024 ) / peer->torrent->blockSize;
 
     peer->minActiveRequests = 4;
-    peer->maxActiveRequests = peer->minActiveRequests +
-                              estimatedBlocksInNext30Seconds;
+    peer->maxActiveRequests = peer->minActiveRequests + estimatedBlocksInNext30Seconds;
     return TRUE;
 }
 
@@ -1747,11 +1755,10 @@ peerPulse( void * vmsgs )
             dbgmsg( msgs, "started an outMessages batch (length is %zu)", EVBUFFER_LENGTH( msgs->outMessages ) );
             msgs->outMessagesBatchedAt = now;
         }
-        else if( haveMessages
-               && ( ( now - msgs->outMessagesBatchedAt ) >
-                   msgs->outMessagesBatchPeriod ) )
+        else if( ( haveMessages ) &&
+                 ( ( now - msgs->outMessagesBatchedAt ) > msgs->outMessagesBatchPeriod ) )
         {
-            dbgmsg( msgs, "flushing outMessages... (length is %zu)", EVBUFFER_LENGTH( msgs->outMessages ) );
+            dbgmsg( msgs, "flushing outMessages... to %p (length is %zu)", msgs->io, EVBUFFER_LENGTH( msgs->outMessages ) );
             tr_peerIoWriteBuf( msgs->io, msgs->outMessages, FALSE );
             msgs->clientSentAnythingAt = now;
             msgs->outMessagesBatchedAt = 0;
@@ -2014,8 +2021,7 @@ sendPex( tr_peermsgs * msgs )
         tr_peerIoWriteUint8 ( msgs->io, out, msgs->ut_pex_id );
         tr_peerIoWriteBytes ( msgs->io, out, benc, bencLen );
         pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
-        dbgmsg( msgs, "outMessage size is now %d",
-               (int)EVBUFFER_LENGTH( out ) );
+        dbgmsg( msgs, "sending a pex message; outMessage size is now %zu", EVBUFFER_LENGTH( out ) );
 
         /* cleanup */
         tr_free( benc );
