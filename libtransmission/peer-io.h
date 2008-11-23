@@ -198,14 +198,11 @@ void              tr_peerIoDrain( tr_peerIo *       io,
 ***
 **/
 
-size_t            tr_peerIoGetBandwidthUsed( const tr_peerIo * io,
-                                             tr_direction      direction );
-
 size_t            tr_peerIoGetWriteBufferSpace( const tr_peerIo * io );
 
-void              tr_peerIoSetBandwidth( tr_peerIo *  io,
-                                         tr_direction direction,
-                                         size_t       bytesLeft );
+void              tr_peerIoAllocateBandwidth( tr_peerIo *  io,
+                                              tr_direction direction,
+                                              size_t       bytesLeft );
 
 void              tr_peerIoSetBandwidthUnlimited( tr_peerIo *  io,
                                                   tr_direction direction );

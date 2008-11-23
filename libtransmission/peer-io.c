@@ -30,7 +30,6 @@
 #include "list.h"
 #include "net.h"
 #include "peer-io.h"
-#include "ratecontrol.h"
 #include "trevent.h"
 #include "utils.h"
 
@@ -72,9 +71,8 @@ addPacketOverhead( size_t d )
 
 struct tr_bandwidth
 {
-    unsigned int    isUnlimited : 1;
-    size_t          bytesUsed;
-    size_t          bytesLeft;
+    unsigned int  isUnlimited : 1;
+    size_t        bytesLeft;
 };
 
 struct tr_datatype
@@ -220,7 +218,6 @@ didWriteWrapper( struct bufferevent * e,
             {
                 struct tr_bandwidth * b = &io->bandwidth[TR_UP];
                 b->bytesLeft -= MIN( b->bytesLeft, n );
-                b->bytesUsed += n;
             }
 
             if( io->didWrite )
@@ -256,8 +253,7 @@ canReadWrapper( struct bufferevent * e,
         const size_t n = addPacketOverhead( payload );
         struct tr_bandwidth * b = io->bandwidth + TR_DOWN;
         b->bytesLeft -= MIN( b->bytesLeft, (size_t)n );
-        b->bytesUsed += n;
-        dbgmsg( io, "%zu new input bytes. bytesUsed is %zu, bytesLeft is %zu", n, b->bytesUsed, b->bytesLeft );
+        dbgmsg( io, "%zu new input bytes. bytesLeft is %zu", n, b->bytesLeft );
 
         adjustInputBuffer( io );
     }
@@ -616,15 +612,6 @@ tr_peerIoSupportsFEXT( const tr_peerIo * io )
 **/
 
 size_t
-tr_peerIoGetBandwidthUsed( const tr_peerIo * io,
-                           tr_direction      direction )
-{
-    assert( io );
-    assert( direction == TR_UP || direction == TR_DOWN );
-    return io->bandwidth[direction].bytesUsed;
-}
-
-size_t
 tr_peerIoGetWriteBufferSpace( const tr_peerIo * io )
 {
     const size_t desiredBufferLen = 4096;
@@ -649,9 +636,9 @@ tr_peerIoGetWriteBufferSpace( const tr_peerIo * io )
 }
 
 void
-tr_peerIoSetBandwidth( tr_peerIo *  io,
-                       tr_direction direction,
-                       size_t       bytesLeft )
+tr_peerIoAllocateBandwidth( tr_peerIo     * io,
+                            tr_direction    direction,
+                            size_t          bytesLeft )
 {
     struct tr_bandwidth * b;
 
@@ -660,7 +647,6 @@ tr_peerIoSetBandwidth( tr_peerIo *  io,
 
     b = io->bandwidth + direction;
     b->isUnlimited = 0;
-    b->bytesUsed = 0;
     b->bytesLeft = bytesLeft;
 
     adjustOutputBuffer( io );
@@ -678,7 +664,6 @@ tr_peerIoSetBandwidthUnlimited( tr_peerIo *  io,
 
     b = io->bandwidth + direction;
     b->isUnlimited = 1;
-    b->bytesUsed = 0;
     b->bytesLeft = 0;
 
     adjustInputBuffer( io );
@@ -882,4 +867,3 @@ tr_peerIoGetAge( const tr_peerIo * io )
 {
     return time( NULL ) - io->timeCreated;
 }
-
