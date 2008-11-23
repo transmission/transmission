@@ -10,8 +10,6 @@
  * $Id$
  */
 
-#include <assert.h>
-
 #include "transmission.h"
 #include "bencode.h"
 #include "platform.h" /* tr_sessionGetConfigDir() */
@@ -21,6 +19,8 @@
 /***
 ****
 ***/
+
+static struct tr_session_stats STATS_INIT = { 0.0f, 0, 0, 0, 0, 0 };
 
 struct tr_stats_handle
 {
@@ -119,7 +119,7 @@ tr_statsInit( tr_handle * handle )
 void
 tr_statsClose( tr_handle * handle )
 {
-    tr_session_stats cumulative;
+    tr_session_stats cumulative = STATS_INIT;
 
     tr_sessionGetCumulativeStats( handle, &cumulative );
     saveCumulativeStats( handle, &cumulative );
@@ -131,7 +131,7 @@ tr_statsClose( tr_handle * handle )
 static struct tr_stats_handle *
 getStats( const tr_handle * handle )
 {
-    return handle->sessionStats;
+    return handle ? handle->sessionStats : NULL;
 }
 
 /***
@@ -163,11 +163,12 @@ tr_sessionGetStats( const tr_handle *  handle,
                     tr_session_stats * setme )
 {
     const struct tr_stats_handle * stats = getStats( handle );
-
-    assert( stats );
-    *setme = stats->single;
-    setme->secondsActive = time( NULL ) - stats->startTime;
-    updateRatio( setme );
+    if( stats )
+    {
+        *setme = stats->single;
+        setme->secondsActive = time( NULL ) - stats->startTime;
+        updateRatio( setme );
+    }
 }
 
 void
@@ -175,11 +176,13 @@ tr_sessionGetCumulativeStats( const tr_handle *  handle,
                               tr_session_stats * setme )
 {
     const struct tr_stats_handle * stats = getStats( handle );
-    tr_session_stats               current;
+    tr_session_stats current = STATS_INIT;
 
-    assert( stats );
-    tr_sessionGetStats( handle, &current );
-    addStats( setme, &stats->old, &current );
+    if( stats )
+    {
+        tr_sessionGetStats( handle, &current );
+        addStats( setme, &stats->old, &current );
+    }
 }
 
 void
