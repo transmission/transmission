@@ -22,6 +22,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#ifndef WIN32
+ #define HAVE_GETRLIMIT
+#endif
+
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
@@ -38,6 +42,10 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef HAVE_GETRLIMIT
+ #include <sys/time.h> /* getrlimit */
+ #include <sys/resource.h> /* getrlimit */
+#endif
 #include <unistd.h>
 #include <fcntl.h> /* O_LARGEFILE */
 
@@ -95,33 +103,64 @@ static struct tr_fd_s * gFd = NULL;
 ****
 ***/
 
+#ifndef O_LARGEFILE
+#define O_LARGEFILE 0
+#endif
+
 static int
-preallocateFile( int fd UNUSED, uint64_t length UNUSED )
+preallocateFile( const char * filename, uint64_t length )
 {
-#ifdef HAVE_FALLOCATE
+    int success = 0;
 
-    return fallocate( fd, FALLOC_FL_KEEP_SIZE, 0, length );
+#ifdef WIN32
 
-#elif defined(HAVE_POSIX_FALLOCATE)
-
-    return posix_fallocate( fd, 0, length );
-
-#elif defined(SYS_DARWIN) 
-
-    fstore_t fst;
-    fst.fst_flags = F_ALLOCATECONTIG;
-    fst.fst_posmode = F_PEOFPOSMODE;
-    fst.fst_offset = 0;
-    fst.fst_length = length;
-    fst.fst_bytesalloc = 0;
-    return fcntl( fd, F_PREALLOCATE, &fst );
+    HANDLE hFile = CreateFile( filename, GENERIC_WRITE, 0, 0, CREATE_NEW, 0, 0 );
+    if( hFile != INVALID_HANDLE_VALUE )
+    {
+        LARGE_INTEGER li;
+        li.QuadPart = length;
+        success = SetFilePointerEx( hFile, li, NULL, FILE_BEGIN ) && SetEndOfFile( hFile );
+        CloseHandle( hFile );
+    }
 
 #else
 
-    #warning no known method to preallocate files on this platform
-    return -1;
+    int flags = O_RDWR | O_CREAT | O_LARGEFILE;
+    int fd = open( filename, flags, 0666 );
+    if( fd >= 0 )
+    {
+        
+# ifdef HAVE_FALLOCATE
+
+        success = !fallocate( fd, FALLOC_FL_KEEP_SIZE, 0, length );
+
+# elif defined(HAVE_POSIX_FALLOCATE)
+
+        success = !posix_fallocate( fd, 0, length );
+
+# elif defined(SYS_DARWIN) 
+
+        fstore_t fst;
+        fst.fst_flags = F_ALLOCATECONTIG;
+        fst.fst_posmode = F_PEOFPOSMODE;
+        fst.fst_offset = 0;
+        fst.fst_length = length;
+        fst.fst_bytesalloc = 0;
+        success = !fcntl( fd, F_PREALLOCATE, &fst );
+
+# else
+
+        #warning no known method to preallocate files on this platform
+        success = 0;
+
+# endif
+
+        close( fd );
+    }
 
 #endif
+
+    return success;
 }
 
 /**
@@ -161,6 +200,10 @@ TrOpenFile( int          i,
     }
 
     alreadyExisted = !stat( filename, &sb ) && S_ISREG( sb.st_mode );
+
+    if( doWrite && !alreadyExisted && doPreallocate )
+        if( preallocateFile( filename, desiredFileSize ) )
+            tr_inf( _( "Preallocated file \"%s\"" ), filename );
     
     /* open the file */
     flags = doWrite ? ( O_RDWR | O_CREAT ) : O_RDONLY;
@@ -180,10 +223,6 @@ TrOpenFile( int          i,
         return err;
     }
 
-    if( ( file->fd >= 0 ) && !alreadyExisted && doPreallocate )
-        if( !preallocateFile( file->fd, desiredFileSize ) )
-            tr_inf( _( "Preallocated file \"%s\"" ), filename );
-       
     tr_free( filename );
     return 0;
 }
@@ -500,7 +539,20 @@ tr_fdInit( int globalPeerLimit )
     assert( gFd == NULL );
     gFd = tr_new0( struct tr_fd_s, 1 );
     gFd->lock = tr_lockNew( );
+
+#ifdef HAVE_GETRLIMIT
+    {
+        struct rlimit rlim;
+        getrlimit( RLIMIT_NOFILE, &rlim );
+        rlim.rlim_cur = MIN( rlim.rlim_max,
+                            (rlim_t)( globalPeerLimit + NOFILE_BUFFER ) );
+        setrlimit( RLIMIT_NOFILE, &rlim );
+        gFd->socketMax = rlim.rlim_cur - NOFILE_BUFFER;
+        tr_dbg( "setrlimit( RLIMIT_NOFILE, %d )", (int)rlim.rlim_cur );
+    }
+#else
     gFd->socketMax = globalPeerLimit;
+#endif
     tr_dbg( "%d usable file descriptors", globalPeerLimit );
 
     for( i = 0; i < TR_MAX_OPEN_FILES; ++i )

@@ -35,19 +35,30 @@
 ****/
 
 #ifdef WIN32
- #define lseek _lseeki64
  #if defined(read)
-    #undef read
+  #undef read
  #endif
  #define read  _read
  
  #if defined(write)
-    #undef write
+  #undef write
  #endif
  #define write _write
 #endif
 
 enum { TR_IO_READ, TR_IO_WRITE };
+
+static int64_t
+tr_lseek( int fd, int64_t offset, int whence )
+{
+#if defined(_LARGEFILE_SOURCE)
+    return lseek64( fd, (off64_t)offset, whence );
+#elif defined(WIN32)
+    return _lseeki64( fd, offset, whence );
+#else
+    return lseek( fd, (off_t)offset, whence );
+#endif
+}
 
 /* returns 0 on success, or an errno on failure */
 static int
@@ -85,7 +96,7 @@ readOrWriteBytes( const tr_torrent * tor,
         err = errno;
     else if( ( fd = tr_fdFileCheckout ( tor->downloadDir, file->name, ioMode == TR_IO_WRITE, !file->dnd, file->length ) ) < 0 )
         err = errno;
-    else if( lseek( fd, (off_t)fileOffset, SEEK_SET ) == ( (off_t)-1 ) )
+    else if( tr_lseek( fd, (int64_t)fileOffset, SEEK_SET ) == -1 )
         err = errno;
     else if( func( fd, buf, buflen ) != buflen )
         err = errno;
@@ -117,11 +128,10 @@ void
 tr_ioFindFileLocation( const tr_torrent * tor,
                        tr_piece_index_t   pieceIndex,
                        uint32_t           pieceOffset,
-                       tr_file_index_t *  fileIndex,
-                       uint64_t *         fileOffset )
+                       tr_file_index_t  * fileIndex,
+                       uint64_t         * fileOffset )
 {
-    const uint64_t  offset = tr_pieceOffset( tor, pieceIndex, pieceOffset,
-                                             0 );
+    const uint64_t  offset = tr_pieceOffset( tor, pieceIndex, pieceOffset, 0 );
     const tr_file * file;
 
     file = bsearch( &offset,
@@ -135,43 +145,6 @@ tr_ioFindFileLocation( const tr_torrent * tor,
     assert( *fileOffset < file->length );
     assert( tor->info.files[*fileIndex].offset + *fileOffset == offset );
 }
-
-#ifdef WIN32
-/* return 0 on success, or an errno on failure */
-static int
-ensureMinimumFileSize( const tr_torrent * tor,
-                       tr_file_index_t    fileIndex,
-                       uint64_t           minBytes )
-{
-    int             fd;
-    int             err;
-    struct stat     sb;
-    const tr_file * file = &tor->info.files[fileIndex];
-
-    assert( 0 <= fileIndex && fileIndex < tor->info.fileCount );
-    assert( minBytes <= file->length );
-
-    fd = tr_fdFileCheckout( tor->downloadDir,
-                            file->name, TRUE, !file->dnd, file->length );
-
-    if( fd < 0 ) /* bad fd */
-        err = errno;
-    else if( fstat ( fd, &sb ) ) /* how big is the file? */
-        err = errno;
-    else if( sb.st_size >= (off_t)minBytes ) /* already big enough */
-        err = 0;
-    else if( !ftruncate( fd, minBytes ) )  /* grow it */
-        err = 0;
-    else /* couldn't grow it */
-        err = errno;
-
-    if( fd >= 0 )
-        tr_fdFileReturn( fd );
-
-    return err;
-}
-
-#endif
 
 /* returns 0 on success, or an errno on failure */
 static int
@@ -201,12 +174,6 @@ readOrWritePiece( const tr_torrent * tor,
         const uint64_t  bytesThisPass = MIN( buflen,
                                              file->length - fileOffset );
 
-#ifdef WIN32
-        if( ioMode == TR_IO_WRITE )
-            err = ensureMinimumFileSize( tor, fileIndex,
-                                         fileOffset + bytesThisPass );
-        if( !err )
-#endif
         err = readOrWriteBytes( tor, ioMode,
                                 fileIndex, fileOffset, buf, bytesThisPass );
         buf += bytesThisPass;
