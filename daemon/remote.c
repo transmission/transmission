@@ -1127,7 +1127,7 @@ processRequests( const char *  host,
         CURLcode res;
         curl_easy_setopt( curl, CURLOPT_POSTFIELDS, reqs[i] );
         if( debug )
-            fprintf( stderr, "posting [%s]\n", reqs[i] );
+            fprintf( stderr, "posting:\n--------\n%s\n--------\n", reqs[i] );
         if( ( res = curl_easy_perform( curl ) ) )
             tr_nerr( MY_NAME, "(%s:%d) %s", host, port,
                     curl_easy_strerror( res ) );
