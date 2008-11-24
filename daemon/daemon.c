@@ -22,7 +22,6 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
-#include <libtransmission/rpcimpl.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>

@@ -10,7 +10,12 @@
  * $Id$
  */
 
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 #ifndef TR_EVENT_H
+#define TR_EVENT_H
 
 #include <stddef.h> /* size_t */
 #include <inttypes.h> /* uint64_t */

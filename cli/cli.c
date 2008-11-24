@@ -31,7 +31,6 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
 #include <libtransmission/makemeta.h>
-#include <libtransmission/metainfo.h> /* tr_metainfoFree */
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h> /* tr_wait */
 #include <libtransmission/web.h> /* tr_webRun */

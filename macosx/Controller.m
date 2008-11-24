@@ -48,7 +48,6 @@
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 #import "SpeedLimitToTurtleIconTransformer.h"
-#import "metainfo.h"
 #import "utils.h"
 
 #import "UKKQueue.h"

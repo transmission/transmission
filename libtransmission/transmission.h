@@ -806,6 +806,11 @@ int tr_torrentParse( const tr_session  * session,
                      const tr_ctor     * ctor,
                      tr_info           * setme_info_or_NULL );
 
+/** @brief free a metainfo
+    @see tr_torrentParse */
+void tr_metainfoFree( tr_info * inf );
+
+
 /** Instantiate a single torrent.
     @return 0 on success,
             TR_EINVALID if the torrent couldn't be parsed, or
