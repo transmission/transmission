@@ -2,16 +2,17 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.02">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9E17</string>
-		<string key="IBDocument.InterfaceBuilderVersion">670</string>
-		<string key="IBDocument.AppKitVersion">949.33</string>
+		<string key="IBDocument.SystemVersion">9F33</string>
+		<string key="IBDocument.InterfaceBuilderVersion">672</string>
+		<string key="IBDocument.AppKitVersion">949.34</string>
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1603"/>
 			<integer value="2"/>
 			<integer value="3170"/>
 			<integer value="1480"/>
+			<integer value="456"/>
+			<integer value="1603"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3228,6 +3229,26 @@ zJLMsszTzPPNFM00zVXNdc2GzabNx83nzgjOKM5JzmnOis6qzrrO2877zxzPPM9dz33Pns++z9/P79AA
 						<reference key="NSMixedImage" ref="3851078"/>
 						<int key="NSTag">4</int>
 					</object>
+					<object class="NSMenuItem" id="763908271">
+						<reference key="NSMenu" ref="434296936"/>
+						<bool key="NSIsDisabled">YES</bool>
+						<bool key="NSIsSeparator">YES</bool>
+						<string key="NSTitle"/>
+						<string key="NSKeyEquiv"/>
+						<int key="NSKeyEquivModMask">1048576</int>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="322614661"/>
+						<reference key="NSMixedImage" ref="3851078"/>
+					</object>
+					<object class="NSMenuItem" id="780056445">
+						<reference key="NSMenu" ref="434296936"/>
+						<string key="NSTitle">Reveal Data File in Finder</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSKeyEquivModMask">1048576</int>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="322614661"/>
+						<reference key="NSMixedImage" ref="3851078"/>
+					</object>
 					<object class="NSMenuItem" id="274991158">
 						<reference key="NSMenu" ref="434296936"/>
 						<bool key="NSIsDisabled">YES</bool>
@@ -3280,15 +3301,6 @@ zJLMsszTzPPNFM00zVXNdc2GzabNx83nzgjOKM5JzmnOis6qzrrO2877zxzPPM9dz33Pns++z9/P79AA
 						<bool key="NSIsDisabled">YES</bool>
 						<bool key="NSIsSeparator">YES</bool>
 						<string key="NSTitle"/>
-						<string key="NSKeyEquiv"/>
-						<int key="NSKeyEquivModMask">1048576</int>
-						<int key="NSMnemonicLoc">2147483647</int>
-						<reference key="NSOnImage" ref="322614661"/>
-						<reference key="NSMixedImage" ref="3851078"/>
-					</object>
-					<object class="NSMenuItem" id="780056445">
-						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Reveal Data File in Finder</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -7153,7 +7165,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="765094731"/>
 							<reference ref="445319649"/>
-							<reference ref="780056445"/>
 							<reference ref="28621205"/>
 							<reference ref="941182211"/>
 							<reference ref="274991158"/>
@@ -7166,6 +7177,8 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<reference ref="813229434"/>
 							<reference ref="485296611"/>
 							<reference ref="612287796"/>
+							<reference ref="780056445"/>
+							<reference ref="763908271"/>
 						</object>
 						<reference key="parent" ref="52096491"/>
 						<string key="objectName">ContextRowMenu</string>
@@ -8395,6 +8408,11 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="object" ref="86328102"/>
 						<reference key="parent" ref="393698794"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3172</int>
+						<reference key="object" ref="763908271"/>
+						<reference key="parent" ref="434296936"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -8934,8 +8952,11 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>3169.ImportedFromIB2</string>
 					<string>3170.IBPluginDependency</string>
 					<string>3170.ImportedFromIB2</string>
+					<string>3172.IBPluginDependency</string>
+					<string>3172.ImportedFromIB2</string>
 					<string>418.IBPluginDependency</string>
 					<string>418.ImportedFromIB2</string>
+					<string>456.IBEditorWindowLastContentRect</string>
 					<string>456.IBPluginDependency</string>
 					<string>456.ImportedFromIB2</string>
 					<string>457.IBPluginDependency</string>
@@ -9228,7 +9249,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{0, 818}, {400, 177}}</string>
 					<reference ref="9"/>
-					<reference ref="9"/>
+					<integer value="0" id="6"/>
 					<reference ref="9"/>
 					<string>{3.40282e+38, 3.40282e+38}</string>
 					<string>{400, 177}</string>
@@ -9355,7 +9376,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>{{52, 684}, {468, 196}}</string>
 					<reference ref="9"/>
 					<string>{{52, 684}, {468, 196}}</string>
-					<reference ref="9"/>
+					<reference ref="6"/>
 					<reference ref="9"/>
 					<string>{3.40282e+38, 3.40282e+38}</string>
 					<string>{350, 5}</string>
@@ -9524,6 +9545,9 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
+					<string>{{0, 722}, {277, 273}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -9592,7 +9616,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3171</int>
+			<int key="maxID">3172</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

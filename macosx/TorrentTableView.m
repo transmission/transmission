@@ -403,7 +403,7 @@
     fSelectedValues = nil;
     
     //avoid weird behavior when showing menu by doing this after mouse down
-    if ([self pointInActionRect: point])
+    if ([NSApp isOnLeopardOrBetter] ? fMouseActionRow == row : [self pointInActionRect: point])
     {
         fActionPushedRow = row;
         [self setNeedsDisplayInRect: [self rectOfRow: row]]; //ensure button is pushed down
