@@ -2388,7 +2388,7 @@ setTorrentBandwidth( Torrent * t,
     tr_free( peers );
 }
 
-#if 1
+#if 0
 #define DEBUG_DIRECTION TR_DOWN
 #endif
 

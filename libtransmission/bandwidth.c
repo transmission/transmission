@@ -127,7 +127,7 @@ size_t
 tr_bandwidthClamp( const tr_bandwidth  * b,
                    size_t                byteCount )
 {
-const size_t n = byteCount;
+/* const size_t n = byteCount; */
 
     if( b && b->isLimited )
         byteCount = MIN( byteCount, b->bytesLeft );
