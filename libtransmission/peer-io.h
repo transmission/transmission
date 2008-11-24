@@ -20,7 +20,7 @@
 struct in_addr;
 struct evbuffer;
 struct bufferevent;
-struct tr_handle;
+struct tr_bandwidth;
 struct tr_crypto;
 typedef struct tr_peerIo tr_peerIo;
 
@@ -200,12 +200,9 @@ void              tr_peerIoDrain( tr_peerIo *       io,
 
 size_t            tr_peerIoGetWriteBufferSpace( const tr_peerIo * io );
 
-void              tr_peerIoAllocateBandwidth( tr_peerIo *  io,
-                                              tr_direction direction,
-                                              size_t       bytesLeft );
-
-void              tr_peerIoSetBandwidthUnlimited( tr_peerIo *  io,
-                                                  tr_direction direction );
+void              tr_peerIoSetBandwidth( tr_peerIo            * io,
+                                         tr_direction           direction,
+                                         struct tr_bandwidth  * bandwidth );
 
 
 #endif

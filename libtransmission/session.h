@@ -48,7 +48,7 @@ struct tr_metainfo_lookup
     char *  filename;
 };
 
-struct tr_ratecontrol;
+struct tr_bandwidth;
 
 struct tr_handle
 {
@@ -108,12 +108,11 @@ struct tr_handle
     /* the size of the output buffer for peer connections */
     int so_sndbuf;
 
-    /* the rate at which pieces are being transferred between client and peer.
-     * protocol overhead is NOT included; this is only the piece data */
-    struct tr_ratecontrol     *  pieceSpeed[2];
+    /* the size of the input buffer for peer connections */
+    int so_rcvbuf;
 
-    /* the rate at which bytes are being transferred between client and peer. */
-    struct tr_ratecontrol     *  rawSpeed[2];
+    /* monitors the "global pool" speeds */
+    struct tr_bandwidth       * bandwidth[2];
 };
 
 const char * tr_sessionFindTorrentFile( const tr_session * session,

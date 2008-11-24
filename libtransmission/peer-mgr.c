@@ -19,6 +19,8 @@
 #include <event.h>
 
 #include "transmission.h"
+#include "bandwidth.h"
+#include "bencode.h"
 #include "blocklist.h"
 #include "clients.h"
 #include "completion.h"
@@ -56,21 +58,21 @@ enum
     RECONNECT_PERIOD_MSEC = ( 2 * 1000 ),
    
     /* how frequently to reallocate bandwidth */
-    BANDWIDTH_PERIOD_MSEC = 250,
+    BANDWIDTH_PERIOD_MSEC = 333,
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
-    MAX_RECONNECTIONS_PER_PULSE = 2,
+    MAX_RECONNECTIONS_PER_PULSE = 4,
 
     /* max number of peers to ask for per second overall.
     * this throttle is to avoid overloading the router */
-    MAX_CONNECTIONS_PER_SECOND = 4,
+    MAX_CONNECTIONS_PER_SECOND = 8,
 
     /* number of unchoked peers per torrent.
      * FIXME: this probably ought to be configurable */
     MAX_UNCHOKED_PEERS = 14,
 
     /* number of bad pieces a peer is allowed to send before we ban them */
-    MAX_BAD_PIECES_PER_PEER = 3,
+    MAX_BAD_PIECES_PER_PEER = 5,
 
     /* use for bitwise operations w/peer_atom.myflags */
     MYFLAG_BANNED = 1,
@@ -1025,16 +1027,15 @@ peerCallbackFunc( void * vpeer,
             /* add it to the raw upload speed */
             if( peer )
                 tr_rcTransferred ( peer->rawSpeed[dir], e->length );
-            tr_rcTransferred ( tor->rawSpeed[dir], e->length );
-            tr_rcTransferred ( tor->session->rawSpeed[dir], e->length );
 
             /* maybe add it to the piece upload speed */
             if( e->wasPieceData ) {
                 if( peer )
                     tr_rcTransferred ( peer->pieceSpeed[dir], e->length );
-                tr_rcTransferred ( tor->pieceSpeed[dir], e->length );
-                tr_rcTransferred ( tor->session->pieceSpeed[dir], e->length );
             }
+
+            tr_bandwidthUsed( tor->bandwidth[dir], e->length, e->wasPieceData );
+            tr_bandwidthUsed( tor->session->bandwidth[dir], e->length, e->wasPieceData );
 
             /* update the stats */
             if( e->wasPieceData )
@@ -1069,16 +1070,15 @@ peerCallbackFunc( void * vpeer,
             /* add it to our raw download speed */
             if( peer )
                 tr_rcTransferred ( peer->rawSpeed[dir], e->length );
-            tr_rcTransferred ( tor->rawSpeed[dir], e->length );
-            tr_rcTransferred ( tor->session->rawSpeed[dir], e->length );
 
             /* maybe add it to the piece upload speed */
             if( e->wasPieceData ) {
                 if( peer )
                     tr_rcTransferred ( peer->pieceSpeed[dir], e->length );
-                tr_rcTransferred ( tor->pieceSpeed[dir], e->length );
-                tr_rcTransferred ( tor->session->pieceSpeed[dir], e->length );
             }
+
+            tr_bandwidthUsed( tor->bandwidth[dir], e->length, e->wasPieceData );
+            tr_bandwidthUsed( tor->session->bandwidth[dir], e->length, e->wasPieceData );
      
             /* update the stats */ 
             if( e->wasPieceData )
@@ -1939,8 +1939,7 @@ rechoke( Torrent * t )
             n->peer         = peer;
             n->isInterested = peer->peerIsInterested;
             n->isChoked     = peer->peerIsChoked;
-            n->rate = (int)(tr_peerGetPieceSpeed( peer, TR_CLIENT_TO_PEER )
-                            + tr_peerGetPieceSpeed( peer, TR_PEER_TO_CLIENT ) );
+            n->rate         = tr_peerGetPieceSpeed( peer, TR_CLIENT_TO_PEER ) * 1024;
         }
     }
 
@@ -2357,8 +2356,40 @@ reconnectPulse( void * vtorrent )
 *****
 ****/
 
-#if 0
-#define DEBUG_DIRECTION TR_UP
+static void
+pumpAllPeers( tr_peerMgr * mgr )
+{
+    const int torrentCount = tr_ptrArraySize( mgr->torrents );
+    int       i, j;
+
+    for( i = 0; i < torrentCount; ++i )
+    {
+        Torrent * t = tr_ptrArrayNth( mgr->torrents, i );
+        for( j = 0; j < tr_ptrArraySize( t->peers ); ++j )
+        {
+            tr_peer * peer = tr_ptrArrayNth( t->peers, j );
+            tr_peerMsgsPulse( peer->msgs );
+        }
+    }
+}
+
+static void
+setTorrentBandwidth( Torrent * t,
+                     tr_direction dir,
+                     tr_bandwidth * bandwidth )
+{
+    int i;
+    int peerCount = 0;
+    tr_peer ** peers = getConnectedPeers( t, &peerCount );
+
+    for( i=0; i<peerCount; ++i )
+        tr_peerIoSetBandwidth( peers[i]->io, dir, bandwidth );
+
+    tr_free( peers );
+}
+
+#if 1
+#define DEBUG_DIRECTION TR_DOWN
 #endif
 
 static double
@@ -2378,7 +2409,7 @@ allocateHowMuch( tr_direction dir UNUSED, double currentSpeed, double desiredSpe
     const double current_bytes_per_pulse = bytesPerPulse( currentSpeed );
     const double desired_bytes_per_pulse = bytesPerPulse( desiredSpeed );
     const double min = desired_bytes_per_pulse * 0.90;
-    const double max = desired_bytes_per_pulse * 1.25;
+    const double max = desired_bytes_per_pulse * 1.50;
     const double next_pulse_bytes = desired_bytes_per_pulse * ( pulses_per_history + 1 )
                                   - ( current_bytes_per_pulse * pulses_per_history );
     double clamped;
@@ -2390,7 +2421,7 @@ allocateHowMuch( tr_direction dir UNUSED, double currentSpeed, double desiredSpe
 
 #ifdef DEBUG_DIRECTION
 if( dir == DEBUG_DIRECTION )
-fprintf( stderr, "currentSpeed(%5.2f) desiredSpeed(%5.2f), allocating %5.2f (%5.2f)\n",
+fprintf( stderr, "currentSpeed(%5.2f) desiredSpeed(%5.2f), allocating %5.2f (unclamped: %5.2f)\n",
          currentSpeed,
          desiredSpeed,
          clamped/1024.0,
@@ -2399,150 +2430,22 @@ fprintf( stderr, "currentSpeed(%5.2f) desiredSpeed(%5.2f), allocating %5.2f (%5.
 
     return clamped;
 }
-/**
- * Distributes a fixed amount of bandwidth among a set of peers.
- *
- * @param peerArray peers whose client-to-peer bandwidth will be set
- * @param direction whether to allocate upload or download bandwidth
- * @param currentSpeed current speed in KiB/s for this set of peers
- * @param desiredSpeed desired speed in KiB/s for this set of peers
- */
-static void
-setPeerBandwidth( tr_ptrArray          * peerArray,
-                  const tr_direction     direction,
-                  double                 currentSpeed,
-                  double                 desiredSpeed )
-{
-    const int    MINIMUM_WELFARE_BYTES = bytesPerPulse( 5 );
-    int          i;
-    double       welfare;
-    double       meritBytes;
-    double       meritMultiplier;
-    double       welfareBytes;
-    const int    peerCount      = tr_ptrArraySize( peerArray );
-    const double bytes          = allocateHowMuch( direction, currentSpeed, desiredSpeed );
-    tr_peer **   peers          = (tr_peer**) tr_ptrArrayBase( peerArray );
-
-    /* how many bytes we'll allocate based on merit. 
-     *
-     * 1. When just getting started we want to give all the peers a lot
-     *    of `welfare' allocation because we don't know which ones will
-     *    turn out to be productive for us.
-     *
-     * 2. When we've reached steady state and are near our bandwidth limit,
-     *    the bandwidth spent on `welfare' is going to come from peers that
-     *    we already know are productive... which is probably a waste.
-     *
-     * 3. So we tie the merit/welfare allocations to the current speed.
-     *    the closer the current speed gets to the maximum speed, the less
-     *    welfare we allocate.
-     *
-     * 4. We always need to allocate /some/ welfare bytes, otherwise
-     *    the other peers will starve.
-     */
-    meritBytes = bytesPerPulse( MIN( currentSpeed * 1.2, desiredSpeed ) );
-    welfareBytes = bytes > meritBytes ?  bytes - meritBytes : 0;
-    if( welfareBytes < MINIMUM_WELFARE_BYTES )
-        welfareBytes = MINIMUM_WELFARE_BYTES;
-    meritBytes = bytes - welfareBytes;
-    meritMultiplier = currentSpeed > 0.01 ?  meritBytes / currentSpeed : 0.0;
-
-#ifdef DEBUG_DIRECTION
-if( direction == DEBUG_DIRECTION )
-fprintf( stderr, "currentSpeed(%5.2f) desiredSpeed(%5.2f) - k[%.1f] merit [%.1f] welfare [%.1f]\n", currentSpeed, desiredSpeed, bytes/1024.0, meritBytes/1024.0, welfareBytes/1024.0 );
-#endif
-
-    /* how much welfare each peer gets */
-    welfare = welfareBytes / peerCount; 
-
-    for( i=0; i<peerCount; ++i )
-    {
-        tr_peer * peer = peers[i];
-        const size_t merit = tr_rcRate( peers[i]->pieceSpeed[direction] ) * meritMultiplier;
-        tr_peerIoAllocateBandwidth( peer->io, direction, merit + welfare );
-    }
-}
-
-static void
-givePeersUnlimitedBandwidth( tr_ptrArray * peers,
-                             tr_direction  direction )
-{
-    const int n = tr_ptrArraySize( peers );
-    int       i;
-
-    for( i = 0; i < n; ++i )
-    {
-        tr_peer * peer = tr_ptrArrayNth( peers, i );
-        tr_peerIoSetBandwidthUnlimited( peer->io, direction );
-    }
-}
-
-static void
-pumpAllPeers( tr_peerMgr * mgr )
-{
-    const int torrentCount = tr_ptrArraySize( mgr->torrents );
-    int       i, j;
-
-    for( i = 0; i < torrentCount; ++i )
-    {
-        Torrent * t = tr_ptrArrayNth( mgr->torrents, i );
-        for( j = 0; j < tr_ptrArraySize( t->peers ); ++j )
-        {
-            tr_peer * peer = tr_ptrArrayNth( t->peers, j );
-            tr_peerMsgsPulse( peer->msgs );
-        }
-    }
-}
-
-static void
-getBandwidthPeers( Torrent       * t,
-                   tr_direction    dir,
-                   tr_ptrArray   * appendme,
-                   double        * speed )
-{
-    int i, peerCount;
-    tr_peer ** peers;
-
-    assert( t );
-    assert( torrentIsLocked( t ) );
-    assert( dir == TR_UP || dir == TR_DOWN );
-    assert( appendme );
-    assert( speed );
-
-    peers = (tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
-
-    for( i=0; i<peerCount; ++i )
-    {
-        tr_peer * p = peers[i];
-
-        if( p->msgs )
-        {
-            if( ( ( dir == TR_DOWN ) && clientIsDownloadingFrom( p ) ) || ( ( dir == TR_UP ) && clientIsUploadingTo( p ) ) )
-            {
-                tr_ptrArrayAppend( appendme, p );
-                *speed += tr_rcRate( p->pieceSpeed[dir] );
-            }
-        }
-    }
-}
 
 /**
  * Allocate bandwidth for each peer connection.
  *
  * @param mgr the peer manager
  * @param direction whether to allocate upload or download bandwidth
- * @return the amount of directional bandwidth used since the last pulse.
  */
 static void
 allocateBandwidth( tr_peerMgr * mgr,
                    tr_direction direction )
 {
-    tr_session *  session = mgr->session;
-    const int     torrentCount = tr_ptrArraySize( mgr->torrents );
-    Torrent **    torrents = (Torrent **) tr_ptrArrayBase( mgr->torrents );
-    tr_ptrArray * globalPool = tr_ptrArrayNew( );
-    double        globalPoolSpeed = 0;
-    int           i;
+    int              i;
+    tr_session     * session = mgr->session;
+    const int        torrentCount = tr_ptrArraySize( mgr->torrents );
+    Torrent       ** torrents = (Torrent **) tr_ptrArrayBase( mgr->torrents );
+    tr_bandwidth   * global_pool = session->bandwidth[direction];
 
     assert( mgr );
     assert( direction == TR_UP || direction == TR_DOWN );
@@ -2570,36 +2473,52 @@ allocateBandwidth( tr_peerMgr * mgr,
         switch( speedMode )
         {
             case TR_SPEEDLIMIT_UNLIMITED:
-                givePeersUnlimitedBandwidth( t->peers, direction );
+            {
+                tr_bandwidth * b = t->tor->bandwidth[direction];
+                tr_bandwidthSetUnlimited( b );
+                setTorrentBandwidth( t, direction, b );
                 break;
+            }
 
-            case TR_SPEEDLIMIT_SINGLE: {
-                tr_ptrArray * peers = tr_ptrArrayNew( );
-                double speed = 0;
-                getBandwidthPeers( t, direction, peers, &speed );
-                setPeerBandwidth( peers, direction, speed, tr_torrentGetSpeedLimit( t->tor, direction ) );
-                tr_ptrArrayFree( peers, NULL );
+            case TR_SPEEDLIMIT_SINGLE:
+            {
+                tr_bandwidth * b = t->tor->bandwidth[direction];
+                const double currentSpeed = tr_bandwidthGetPieceSpeed( b );
+                const double desiredSpeed = tr_torrentGetSpeedLimit( t->tor, direction );
+                const double bytesPerPulse = allocateHowMuch( direction, currentSpeed, desiredSpeed );
+#ifdef DEBUG_DIRECTION
+if( direction == DEBUG_DIRECTION )
+fprintf( stderr, "single: currentSpeed %.0f ... desiredSpeed %.0f ... bytesPerPulse %.0f\n", currentSpeed, desiredSpeed, bytesPerPulse );
+#endif
+                tr_bandwidthSetLimited( b, bytesPerPulse );
+                setTorrentBandwidth( t, direction, b );
                 break;
             }
 
             case TR_SPEEDLIMIT_GLOBAL:
-                getBandwidthPeers( t, direction, globalPool, &globalPoolSpeed );
+            {
+                setTorrentBandwidth( t, direction, global_pool );
                 break;
+            }
         }
     }
 
     /* handle the global pool's connections */
     if( !tr_sessionIsSpeedLimitEnabled( session, direction ) )
-        givePeersUnlimitedBandwidth( globalPool, direction );
-    else
-        setPeerBandwidth( globalPool, direction, globalPoolSpeed,
-                          tr_sessionGetSpeedLimit( session, direction ) );
+        tr_bandwidthSetUnlimited( global_pool );
+    else {
+        const double currentSpeed = tr_bandwidthGetPieceSpeed( global_pool );
+        const double desiredSpeed = tr_sessionGetSpeedLimit( session, direction );
+        const double bytesPerPulse = allocateHowMuch( direction, currentSpeed, desiredSpeed );
+#ifdef DEBUG_DIRECTION
+if( direction == DEBUG_DIRECTION )
+fprintf( stderr, "global(%p): currentSpeed %.0f ... desiredSpeed %.0f ... bytesPerPulse %.0f\n", global_pool, currentSpeed, desiredSpeed, bytesPerPulse );
+#endif
+        tr_bandwidthSetLimited( session->bandwidth[direction], bytesPerPulse );
+    }
 
     /* now that we've allocated bandwidth, pump all the connected peers */
     pumpAllPeers( mgr );
-
-    /* cleanup */
-    tr_ptrArrayFree( globalPool, NULL );
 }
 
 static int
@@ -2617,4 +2536,3 @@ bandwidthPulse( void * vmgr )
     managerUnlock( mgr );
     return TRUE;
 }
-

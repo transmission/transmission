@@ -32,6 +32,7 @@
 #include <stdlib.h> /* qsort */
 
 #include "transmission.h"
+#include "bandwidth.h"
 #include "bencode.h"
 #include "completion.h"
 #include "crypto.h" /* for tr_sha1 */
@@ -496,10 +497,8 @@ torrentRealInit( tr_handle *     h,
 
     randomizeTiers( info );
 
-    tor->rawSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
-    tor->rawSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
-    tor->pieceSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
-    tor->pieceSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
+    tor->bandwidth[TR_UP] = tr_bandwidthNew( h );
+    tor->bandwidth[TR_DOWN] = tr_bandwidthNew( h );
 
     tor->blockSize = getBlockSize( info->pieceSize );
 
@@ -814,10 +813,10 @@ tr_torrentStat( tr_torrent * tor )
                             &s->peersGettingFromUs,
                             s->peersFrom );
 
-    s->rawUploadSpeed     = tr_rcRate( tor->rawSpeed[TR_UP] );
-    s->rawDownloadSpeed   = tr_rcRate( tor->rawSpeed[TR_DOWN] );
-    s->pieceUploadSpeed   = tr_rcRate( tor->pieceSpeed[TR_UP] );
-    s->pieceDownloadSpeed = tr_rcRate( tor->pieceSpeed[TR_DOWN] );
+    s->rawUploadSpeed     = tr_bandwidthGetRawSpeed  ( tor->bandwidth[TR_UP] );
+    s->rawDownloadSpeed   = tr_bandwidthGetRawSpeed  ( tor->bandwidth[TR_DOWN] );
+    s->pieceUploadSpeed   = tr_bandwidthGetPieceSpeed( tor->bandwidth[TR_UP] );
+    s->pieceDownloadSpeed = tr_bandwidthGetPieceSpeed( tor->bandwidth[TR_DOWN] );
 
     usableSeeds += tor->info.webseedCount;
 
@@ -1100,10 +1099,8 @@ freeTorrent( tr_torrent * tor )
     assert( h->torrentCount >= 1 );
     h->torrentCount--;
 
-    tr_rcClose( tor->pieceSpeed[TR_PEER_TO_CLIENT] );
-    tr_rcClose( tor->pieceSpeed[TR_CLIENT_TO_PEER] );
-    tr_rcClose( tor->rawSpeed[TR_PEER_TO_CLIENT] );
-    tr_rcClose( tor->rawSpeed[TR_CLIENT_TO_PEER] );
+    tr_bandwidthFree( tor->bandwidth[TR_DOWN] );
+    tr_bandwidthFree( tor->bandwidth[TR_UP] );
 
     tr_metainfoFree( inf );
     tr_free( tor );

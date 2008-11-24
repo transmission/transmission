@@ -1631,11 +1631,14 @@ clientGotBlock( tr_peermsgs *               msgs,
     return 0;
 }
 
+static int peerPulse( void * vmsgs );
+
 static void
 didWrite( tr_peerIo * io UNUSED, size_t bytesWritten, int wasPieceData, void * vmsgs )
 {
     tr_peermsgs * msgs = vmsgs;
     firePeerGotData( msgs, bytesWritten, wasPieceData );
+    peerPulse( msgs );
 }
 
 static ReadState
@@ -1698,7 +1701,7 @@ ratePulse( void * vpeer )
     const int estimatedBlocksInNext30Seconds =
                   ( rateToClient * 30 * 1024 ) / peer->torrent->blockSize;
 
-    peer->minActiveRequests = 4;
+    peer->minActiveRequests = 8;
     peer->maxActiveRequests = peer->minActiveRequests + estimatedBlocksInNext30Seconds;
     return TRUE;
 }

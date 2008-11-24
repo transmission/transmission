@@ -25,6 +25,7 @@
 #ifndef TR_TORRENT_H
 #define TR_TORRENT_H 1
 
+struct tr_bandwidth;
 struct tr_ratecontrol;
 
 /**
@@ -229,12 +230,7 @@ struct tr_torrent
 
     int                        uniqueId;
 
-    /* the rate at which pieces are being transferred between client and
-     * its peers.  protocol overhead is NOT included; only the piece data */
-    struct tr_ratecontrol    * pieceSpeed[2];
-
-    /* the rate at which bytes are being sent between client and peers */
-    struct tr_ratecontrol    * rawSpeed[2];
+    struct tr_bandwidth      * bandwidth[2];
 };
 
 #endif

@@ -26,6 +26,7 @@
 #include <event.h>
 
 #include "transmission.h"
+#include "bandwidth.h"
 #include "crypto.h"
 #include "list.h"
 #include "net.h"
@@ -69,12 +70,6 @@ addPacketOverhead( size_t d )
             tr_deepLog( __FILE__, __LINE__, tr_peerIoGetAddrStr( io ), __VA_ARGS__ ); \
     } while( 0 )
 
-struct tr_bandwidth
-{
-    unsigned int  isUnlimited : 1;
-    size_t        bytesLeft;
-};
-
 struct tr_datatype
 {
     unsigned int    isPieceData : 1;
@@ -111,9 +106,8 @@ struct tr_peerIo
 
     size_t                 bufferSize[2];
 
-    struct tr_bandwidth    bandwidth[2];
-
-    tr_crypto *            crypto;
+    tr_bandwidth         * bandwidth[2];
+    tr_crypto            * crypto;
 };
 
 /**
@@ -124,70 +118,48 @@ static void
 adjustOutputBuffer( tr_peerIo * io )
 {
     struct evbuffer * live = EVBUFFER_OUTPUT( io->bufev );
+    size_t curLive = EVBUFFER_LENGTH( live );
+    size_t maxLive = tr_bandwidthClamp( io->bandwidth[TR_UP], io->session->so_sndbuf );
 
-    if( io->bandwidth[TR_UP].isUnlimited )
+    if( ( curLive < maxLive ) && EVBUFFER_LENGTH( io->output ) )
     {
-        bufferevent_write_buffer( io->bufev, io->output );
-    }
-    else if( io->bandwidth[TR_UP].bytesLeft > EVBUFFER_LENGTH( live ) )
-    {
-        /* there's free space in bufev's output buffer;
-           try to fill it up */
-        const size_t desiredLength = io->bandwidth[TR_UP].bytesLeft;
-        const size_t under = desiredLength - EVBUFFER_LENGTH( live );
-        const size_t n = MIN( under, EVBUFFER_LENGTH( io->output ) );
+        size_t freeSpace = maxLive - curLive;
+        size_t n = MIN( freeSpace, EVBUFFER_LENGTH( io->output ) );
         bufferevent_write( io->bufev, EVBUFFER_DATA( io->output ), n );
         evbuffer_drain( io->output, n );
-    }
-    else if( io->bandwidth[TR_UP].bytesLeft < EVBUFFER_LENGTH( live ) )
-    {
-        /* bufev's output buffer exceeds our bandwidth allocation;
-           move the excess out of bufev so it can't be sent yet */
-        const size_t      desiredLength = io->bandwidth[TR_UP].bytesLeft;
-        const size_t      over = EVBUFFER_LENGTH( live ) - desiredLength;
-        struct evbuffer * buf = evbuffer_new( );
-        evbuffer_add( buf, EVBUFFER_DATA( live ) + desiredLength, over );
-        evbuffer_add_buffer( buf, io->output );
-        evbuffer_free( io->output );
-        io->output = buf;
-        EVBUFFER_LENGTH( live ) = desiredLength;
+        curLive += n;
     }
 
-    if( EVBUFFER_LENGTH( live ) )
-    {
+    io->bufferSize[TR_UP] = curLive;
+
+    if( curLive )
         bufferevent_enable( io->bufev, EV_WRITE );
-    }
 
-    io->bufferSize[TR_UP] = EVBUFFER_LENGTH( live );
-
-    dbgmsg( io, "after adjusting the output buffer, its size is now %zu",
-            io->bufferSize[TR_UP] );
+    dbgmsg( io, "after adjusting the output buffer, its size is now %zu", curLive );
 }
 
 static void
 adjustInputBuffer( tr_peerIo * io )
 {
-    if( io->bandwidth[TR_DOWN].isUnlimited )
+    /* FIXME: the max read size probably needs to vary depending on the
+     * number of peers that we have connected...  1024 is going to force
+     * us way over the limit when there are lots of peers */
+    static const int maxBufSize = 1024;
+    const size_t n = tr_bandwidthClamp( io->bandwidth[TR_DOWN], maxBufSize );
+
+    if( !n )
     {
-        dbgmsg( io, "unlimited reading..." );
-        bufferevent_setwatermark( io->bufev, EV_READ, 0, 0 );
-        bufferevent_enable( io->bufev, EV_READ );
+        dbgmsg( io, "disabling reads because we've hit our limit" );
+        bufferevent_disable( io->bufev, EV_READ );
     }
     else
     {
-        const size_t n = io->bandwidth[TR_DOWN].bytesLeft;
-        if( n == 0 )
-        {
-            dbgmsg( io, "disabling reads because we've hit our limit" );
-            bufferevent_disable( io->bufev, EV_READ );
-        }
-        else
-        {
-            dbgmsg( io, "enabling reading of %zu more bytes", n );
-            bufferevent_setwatermark( io->bufev, EV_READ, 0, n );
-            bufferevent_enable( io->bufev, EV_READ );
-        }
+        dbgmsg( io, "enabling reading of %zu more bytes", n );
+        bufferevent_setwatermark( io->bufev, EV_READ, 0, n );
+        bufferevent_enable( io->bufev, EV_READ );
     }
+
+    io->bufferSize[TR_DOWN] = EVBUFFER_LENGTH( EVBUFFER_INPUT( io->bufev ) );
 }
 
 /***
@@ -214,12 +186,6 @@ didWriteWrapper( struct bufferevent * e,
             const size_t chunk_length = MIN( next->length, payload );
             const size_t n = addPacketOverhead( chunk_length );
 
-            if( next->isPieceData )
-            {
-                struct tr_bandwidth * b = &io->bandwidth[TR_UP];
-                b->bytesLeft -= MIN( b->bytesLeft, n );
-            }
-
             if( io->didWrite )
                 io->didWrite( io, n, next->isPieceData, io->userData );
 
@@ -242,21 +208,8 @@ canReadWrapper( struct bufferevent * e,
     int          err = 0;
     tr_peerIo *  io = vio;
     tr_session * session = io->session;
-    const size_t len = EVBUFFER_LENGTH( EVBUFFER_INPUT( e ) );
 
     dbgmsg( io, "canRead" );
-
-    /* if the input buffer has grown, record the bytes that were read */
-    if( len > io->bufferSize[TR_DOWN] )
-    {
-        const size_t payload = len - io->bufferSize[TR_DOWN];
-        const size_t n = addPacketOverhead( payload );
-        struct tr_bandwidth * b = io->bandwidth + TR_DOWN;
-        b->bytesLeft -= MIN( b->bytesLeft, (size_t)n );
-        dbgmsg( io, "%zu new input bytes. bytesLeft is %zu", n, b->bytesLeft );
-
-        adjustInputBuffer( io );
-    }
 
     /* try to consume the input buffer */
     if( io->canRead )
@@ -289,7 +242,7 @@ canReadWrapper( struct bufferevent * e,
     }
 
     if( !err )
-        io->bufferSize[TR_DOWN] = EVBUFFER_LENGTH( EVBUFFER_INPUT( e ) );
+        adjustInputBuffer( io );
 }
 
 static void
@@ -348,8 +301,6 @@ tr_peerIoNew( tr_session *           session,
     io->timeout = IO_TIMEOUT_SECS;
     io->timeCreated = time( NULL );
     io->output = evbuffer_new( );
-    io->bandwidth[TR_UP].isUnlimited = 1;
-    io->bandwidth[TR_DOWN].isUnlimited = 1;
     bufevNew( io );
     return io;
 }
@@ -614,60 +565,34 @@ tr_peerIoSupportsFEXT( const tr_peerIo * io )
 size_t
 tr_peerIoGetWriteBufferSpace( const tr_peerIo * io )
 {
-    const size_t desiredBufferLen = 4096;
+    const size_t desiredLiveLen = tr_bandwidthClamp( io->bandwidth[TR_UP], io->session->so_rcvbuf );
     const size_t currentLiveLen = EVBUFFER_LENGTH( EVBUFFER_OUTPUT( io->bufev ) );
-
-    const size_t currentLbufLen = EVBUFFER_LENGTH( io->output );
-    const size_t desiredLiveLen = io->bandwidth[TR_UP].isUnlimited
-                                ? INT_MAX
-                                : io->bandwidth[TR_UP].bytesLeft;
-
-    const size_t currentLen = currentLiveLen + currentLbufLen;
-    const size_t desiredLen = desiredBufferLen + desiredLiveLen;
-
-    size_t       freeSpace = 0;
+    const size_t desiredQueueLen = io->session->so_sndbuf;
+    const size_t currentQueueLen = EVBUFFER_LENGTH( io->output );
+    const size_t desiredLen = desiredLiveLen + desiredQueueLen;
+    const size_t currentLen = currentLiveLen + currentQueueLen;
+    size_t freeSpace = 0;
 
     if( desiredLen > currentLen )
         freeSpace = desiredLen - currentLen;
-    else
-        freeSpace = 0;
 
     return freeSpace;
 }
 
 void
-tr_peerIoAllocateBandwidth( tr_peerIo     * io,
-                            tr_direction    direction,
-                            size_t          bytesLeft )
+tr_peerIoSetBandwidth( tr_peerIo     * io,
+                       tr_direction    direction,
+                       tr_bandwidth  * bandwidth )
 {
-    struct tr_bandwidth * b;
-
     assert( io );
     assert( direction == TR_UP || direction == TR_DOWN );
 
-    b = io->bandwidth + direction;
-    b->isUnlimited = 0;
-    b->bytesLeft = bytesLeft;
+    io->bandwidth[direction] = bandwidth;
 
-    adjustOutputBuffer( io );
-    adjustInputBuffer( io );
-}
-
-void
-tr_peerIoSetBandwidthUnlimited( tr_peerIo *  io,
-                                tr_direction direction )
-{
-    struct tr_bandwidth * b;
-
-    assert( io );
-    assert( direction == TR_UP || direction == TR_DOWN );
-
-    b = io->bandwidth + direction;
-    b->isUnlimited = 1;
-    b->bytesLeft = 0;
-
-    adjustInputBuffer( io );
-    adjustOutputBuffer( io );
+    if( direction ==  TR_UP )
+        adjustOutputBuffer( io );
+    else
+        adjustInputBuffer( io );
 }
 
 /**
@@ -711,10 +636,7 @@ tr_peerIoWrite( tr_peerIo   * io,
     assert( tr_amInEventThread( io->session ) );
     dbgmsg( io, "adding %zu bytes into io->output", writemeLen );
 
-    if( io->bandwidth[TR_UP].isUnlimited )
-        bufferevent_write( io->bufev, writeme, writemeLen );
-    else
-        evbuffer_add( io->output, writeme, writemeLen );
+    evbuffer_add( io->output, writeme, writemeLen );
 
     datatype = tr_new( struct tr_datatype, 1 );
     datatype->isPieceData = isPieceData != 0;

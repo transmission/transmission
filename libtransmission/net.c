@@ -128,7 +128,9 @@ setSndBuf( tr_session * session, int fd )
     if( fd >= 0 )
     {
         const int sndbuf = session->so_sndbuf;
+        const int rcvbuf = session->so_rcvbuf;
         setsockopt( fd, SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof( sndbuf ) );
+        setsockopt( fd, SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof( rcvbuf ) );
     }
 }
 

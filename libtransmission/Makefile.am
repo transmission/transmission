@@ -12,6 +12,7 @@ AM_CFLAGS = \
 noinst_LIBRARIES = libtransmission.a
 
 libtransmission_a_SOURCES = \
+    bandwidth.c \
     bencode.c \
     blocklist.c \
     clients.c \
@@ -56,6 +57,7 @@ libtransmission_a_SOURCES = \
     wildmat.c
 
 noinst_HEADERS = \
+    bandwidth.c \
     bencode.h \
     blocklist.h \
     clients.h \

@@ -1179,9 +1179,6 @@ tr_handshakeNew( tr_peerIo *        io,
 {
     tr_handshake * handshake;
 
-    tr_peerIoSetBandwidthUnlimited( io, TR_UP );
-    tr_peerIoSetBandwidthUnlimited( io, TR_DOWN );
-
     handshake = tr_new0( tr_handshake, 1 );
     handshake->io = io;
     handshake->crypto = tr_peerIoGetCrypto( io );
