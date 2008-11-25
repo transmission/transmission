@@ -611,6 +611,7 @@ tr_handle * fHandle;
     [fDefaults removeObjectForKey: @"WarningCreatorBlankAddress"];
     [fDefaults removeObjectForKey: @"WarningRemoveBuiltInTracker"];
     [fDefaults removeObjectForKey: @"WarningInvalidOpen"];
+    [fDefaults removeObjectForKey: @"WarningCheckContentsForRemove"];
 }
 
 - (void) setQueue: (id) sender

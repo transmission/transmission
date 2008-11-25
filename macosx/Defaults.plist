@@ -172,6 +172,8 @@
 	<integer>50</integer>
 	<key>UseIncompleteDownloadFolder</key>
 	<false/>
+	<key>WarningCheckContentsForRemove</key>
+	<true/>
 	<key>WarningCreatorBlankAddress</key>
 	<true/>
 	<key>WarningDuplicate</key>

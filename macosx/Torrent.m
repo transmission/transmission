@@ -448,6 +448,64 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (void) trashData
 {
+    if ([self isFolder] && [fDefaults boolForKey: @"WarningCheckContentsForRemove"])
+    {
+        NSEnumerator * enumerator = [[NSFileManager defaultManager] enumeratorAtPath: [self dataLocation]];
+        NSString * file;
+        while ((file = [enumerator nextObject]))
+        {
+            if ([[file lastPathComponent] hasPrefix: @"."])
+                continue;
+            
+            file = [[self name] stringByAppendingPathComponent: file];
+            BOOL isExtra = YES;
+        
+            NSEnumerator * nodeEnumerator = [fFileList objectEnumerator];
+            FileListNode * node;
+            while ((node = [nodeEnumerator nextObject]))
+            {
+                if ([node containsPath: file])
+                {
+                    isExtra = NO;
+                    break;
+                }
+            }
+            
+            if (!isExtra)
+                continue;
+
+            NSLog(@"Extra file found: %@", file);
+            
+            NSAlert * alert = [[NSAlert alloc] init];
+            [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"\"%@\" contains extra content.",
+                                                        "Delete folder with extra contents -> title"), [self name]]];
+            [alert setInformativeText: NSLocalizedString(@"The directory contains data that is not part of the transfer."
+                " Are you sure you want to move this directory to the trash?", "Delete folder with extra contents -> message")];
+            [alert addButtonWithTitle: NSLocalizedString(@"Remove", "Delete folder with extra contents -> button")];
+            [alert addButtonWithTitle: NSLocalizedString(@"Keep", "Delete folder with extra contents -> button")];
+            
+            BOOL onLeopard = [NSApp isOnLeopardOrBetter];
+            if (onLeopard)
+            {
+                [alert setShowsSuppressionButton: YES];
+                [[alert suppressionButton] setTitle: NSLocalizedString(@"Do not check directory contents again",
+                                                        "Delete folder with extra contents -> button")];
+            }
+            else
+                [alert addButtonWithTitle: NSLocalizedString(@"Never Check", "Delete folder with extra contents -> button")];
+
+            NSInteger result = [alert runModal];
+            if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertThirdButtonReturn))
+                [fDefaults setBool: NO forKey: @"WarningCheckContentsForRemove"];
+            [alert release];
+            
+            if (result == NSAlertSecondButtonReturn)
+                return;
+            else
+                break;
+        }
+    }
+    
     [self trashFile: [self dataLocation]];
 }
 

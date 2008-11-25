@@ -996,35 +996,33 @@ typedef enum
         }
         
         //determing status strings from flags 
-        NSMutableArray * statusArray = [NSMutableArray arrayWithCapacity: 3];
+        NSMutableArray * statusArray = [NSMutableArray arrayWithCapacity: 6];
         NSString * flags = [peer objectForKey: @"Flags"];
         
         if ([flags rangeOfString: @"D"].location != NSNotFound)
             [statusArray addObject: NSLocalizedString(@"Currently downloading (interested and not choked)",
                 "Inspector -> peer -> status")];
-        else if ([flags rangeOfString: @"d"].location != NSNotFound)
+        if ([flags rangeOfString: @"d"].location != NSNotFound)
             [statusArray addObject: NSLocalizedString(@"You want to download, but peer does not want to send (interested and choked)",
                 "Inspector -> peer -> status")];
-        else;
-        
         if ([flags rangeOfString: @"U"].location != NSNotFound)
             [statusArray addObject: NSLocalizedString(@"Currently uploading (interested and not choked)",
                 "Inspector -> peer -> status")];
-        else if ([flags rangeOfString: @"u"].location != NSNotFound)
+        if ([flags rangeOfString: @"u"].location != NSNotFound)
             [statusArray addObject: NSLocalizedString(@"Peer wants you to upload, but you do not want to (interested and choked)",
                 "Inspector -> peer -> status")];
-        else;
-        
         if ([flags rangeOfString: @"K"].location != NSNotFound)
             [statusArray addObject: NSLocalizedString(@"Peer is unchoking you, but you are not interested",
                 "Inspector -> peer -> status")];
-        
         if ([flags rangeOfString: @"?"].location != NSNotFound)
             [statusArray addObject: NSLocalizedString(@"You unchoked the peer, but the peer is not interested",
                 "Inspector -> peer -> status")];
         
         if ([statusArray count] > 0)
-            [components addObject: [@"\n" stringByAppendingString: [statusArray componentsJoinedByString: @"\n\n"]]];
+        {
+            NSString * statusStrings = [statusArray componentsJoinedByString: @"\n\n"];
+            [components addObject: [@"\n" stringByAppendingString: statusStrings]];
+        }
         
         return [components componentsJoinedByString: @"\n"];
     }
