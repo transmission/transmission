@@ -172,10 +172,7 @@ struct tr_torrent
     tr_session *             session;
     tr_info                  info;
 
-    int                      uploadLimit;
-    tr_speedlimit            uploadLimitMode;
-    int                      downloadLimit;
-    tr_speedlimit            downloadLimitMode;
+    tr_speedlimit            speedLimitMode[2];
 
     struct tr_ratecontrol *  swarmSpeed;
 
@@ -234,7 +231,7 @@ struct tr_torrent
 
     int                        uniqueId;
 
-    struct tr_bandwidth      * bandwidth[2];
+    struct tr_bandwidth      * bandwidth;
 };
 
 #endif

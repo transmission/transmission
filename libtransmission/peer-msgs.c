@@ -24,6 +24,7 @@
 #include "completion.h"
 #include "crypto.h"
 #include "inout.h"
+#include "iobuf.h"
 #ifdef WIN32
 #include "net.h" /* for ECONN */
 #endif
@@ -1314,9 +1315,10 @@ static int clientGotBlock( tr_peermsgs *               msgs,
                            const struct peer_request * req );
 
 static int
-readBtPiece( tr_peermsgs *     msgs,
-             struct evbuffer * inbuf,
-             size_t            inlen )
+readBtPiece( tr_peermsgs      * msgs,
+             struct evbuffer  * inbuf,
+             size_t             inlen,
+             size_t           * setme_piece_bytes_read )
 {
     struct peer_request * req = &msgs->incoming.blockReq;
 
@@ -1349,6 +1351,7 @@ readBtPiece( tr_peermsgs *     msgs,
         tr_peerIoReadBytes( msgs->io, inbuf, buf, n );
         evbuffer_add( msgs->incoming.block, buf, n );
         fireClientGotData( msgs, n, TRUE );
+        *setme_piece_bytes_read += n;
         tr_free( buf );
         dbgmsg( msgs, "got %d bytes for block %u:%u->%u ... %d remain",
                (int)n, req->index, req->offset, req->length,
@@ -1642,12 +1645,11 @@ didWrite( tr_peerIo * io UNUSED, size_t bytesWritten, int wasPieceData, void * v
 }
 
 static ReadState
-canRead( struct bufferevent * evin,
-         void *               vmsgs )
+canRead( struct tr_iobuf * iobuf, void * vmsgs, size_t * piece )
 {
     ReadState         ret;
     tr_peermsgs *     msgs = vmsgs;
-    struct evbuffer * in = EVBUFFER_INPUT ( evin );
+    struct evbuffer * in = tr_iobuf_input( iobuf );
     const size_t      inlen = EVBUFFER_LENGTH( in );
 
     if( !inlen )
@@ -1656,7 +1658,7 @@ canRead( struct bufferevent * evin,
     }
     else if( msgs->state == AWAITING_BT_PIECE )
     {
-        ret = inlen ? readBtPiece( msgs, in, inlen ) : READ_LATER;
+        ret = inlen ? readBtPiece( msgs, in, inlen, piece ) : READ_LATER;
     }
     else switch( msgs->state )
     {
@@ -1820,13 +1822,12 @@ tr_peerMsgsPulse( tr_peermsgs * msgs )
 }
 
 static void
-gotError( struct bufferevent * evbuf UNUSED,
-          short                      what,
-          void *                     vmsgs )
+gotError( struct tr_iobuf  * iobuf UNUSED,
+          short              what,
+          void             * vmsgs )
 {
     if( what & EVBUFFER_TIMEOUT )
-        dbgmsg( vmsgs, "libevent got a timeout, what=%hd, secs=%d", what,
-                evbuf->timeout_read );
+        dbgmsg( vmsgs, "libevent got a timeout, what=%hd", what );
     if( what & ( EVBUFFER_EOF | EVBUFFER_ERROR ) )
         dbgmsg( vmsgs, "libevent got an error! what=%hd, errno=%d (%s)",
                what, errno, tr_strerror( errno ) );

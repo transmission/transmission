@@ -125,7 +125,6 @@ createSocket( int type )
 static void
 setSndBuf( tr_session * session, int fd )
 {
-#if 0
     if( fd >= 0 )
     {
         const int sndbuf = session->so_sndbuf;
@@ -133,7 +132,6 @@ setSndBuf( tr_session * session, int fd )
         setsockopt( fd, SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof( sndbuf ) );
         setsockopt( fd, SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof( rcvbuf ) );
     }
-#endif
 }
 
 int

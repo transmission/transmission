@@ -27,10 +27,10 @@
 
 #include "publish.h" /* tr_publisher_tag */
 
+struct tr_bandwidth;
 struct tr_bitfield;
 struct tr_peerIo;
 struct tr_peermsgs;
-struct tr_ratecontrol;
 
 enum
 {
@@ -71,12 +71,7 @@ typedef struct tr_peer
     struct tr_peermsgs     * msgs;
     tr_publisher_tag         msgsTag;
 
-    /* the rate at which pieces are being transferred between client and peer.
-     * protocol overhead is NOT included; this is only the piece data */
-    struct tr_ratecontrol  * pieceSpeed[2];
-
-    /* the rate at which all data is being transferred between client and peer. */
-    struct tr_ratecontrol  * rawSpeed[2];
+    struct tr_bandwidth    * bandwidth;
 }
 tr_peer;
 

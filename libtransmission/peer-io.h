@@ -23,9 +23,9 @@
 
 struct in_addr;
 struct evbuffer;
-struct bufferevent;
 struct tr_bandwidth;
 struct tr_crypto;
+struct tr_iobuf;
 typedef struct tr_peerIo tr_peerIo;
 
 /**
@@ -110,17 +110,18 @@ typedef enum
 }
 ReadState;
 
-typedef ReadState ( *tr_can_read_cb  )( struct bufferevent   * ev,
-                                        void                 * user_data );
+typedef ReadState ( *tr_can_read_cb  )( struct tr_iobuf  * iobuf,
+                                        void             * user_data,
+                                        size_t           * setme_piece_byte_count );
 
-typedef void      ( *tr_did_write_cb )( tr_peerIo            * io,
-                                        size_t                 bytesWritten,
-                                        int                    wasPieceData,
-                                        void                 * userData );
+typedef void      ( *tr_did_write_cb )( tr_peerIo        * io,
+                                        size_t             bytesWritten,
+                                        int                wasPieceData,
+                                        void             * userData );
 
-typedef void      ( *tr_net_error_cb )( struct bufferevent  * ev,
-                                        short                 what,
-                                        void                * userData );
+typedef void      ( *tr_net_error_cb )( struct tr_iobuf  * ev,
+                                        short              what,
+                                        void             * userData );
 
 void    tr_peerIoSetIOFuncs      ( tr_peerIo        * io,
                                    tr_can_read_cb     readcb,
@@ -205,8 +206,13 @@ void              tr_peerIoDrain( tr_peerIo *       io,
 size_t            tr_peerIoGetWriteBufferSpace( const tr_peerIo * io );
 
 void              tr_peerIoSetBandwidth( tr_peerIo            * io,
-                                         tr_direction           direction,
                                          struct tr_bandwidth  * bandwidth );
+
+void              tr_peerIoBandwidthUsed( tr_peerIo           * io,
+                                          tr_direction          direction,
+                                          size_t                byteCount,
+                                          int                   isPieceData );
+
 
 
 #endif

@@ -62,8 +62,6 @@ struct tr_handle
     unsigned int                 isProxyEnabled     : 1;
     unsigned int                 isProxyAuthEnabled : 1;
     unsigned int                 isClosed           : 1;
-    unsigned int                 useUploadLimit     : 1;
-    unsigned int                 useDownloadLimit   : 1;
     unsigned int                 useLazyBitfield    : 1;
 
     tr_encryption_mode           encryptionMode;
@@ -87,9 +85,6 @@ struct tr_handle
     char *                       proxy;
     char *                       proxyUsername;
     char *                       proxyPassword;
-
-    int                          uploadLimit;
-    int                          downloadLimit;
 
     struct tr_list *             blocklists;
     struct tr_peerMgr *          peerMgr;
@@ -116,7 +111,7 @@ struct tr_handle
     int so_rcvbuf;
 
     /* monitors the "global pool" speeds */
-    struct tr_bandwidth       * bandwidth[2];
+    struct tr_bandwidth       * bandwidth;
 };
 
 const char * tr_sessionFindTorrentFile( const tr_session * session,

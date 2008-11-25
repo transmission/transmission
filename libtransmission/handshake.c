@@ -24,6 +24,7 @@
 #include "clients.h"
 #include "crypto.h"
 #include "handshake.h"
+#include "iobuf.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "torrent.h"
@@ -1028,13 +1029,15 @@ readPayloadStream( tr_handshake    * handshake,
 ***/
 
 static ReadState
-canRead( struct bufferevent * evin,
-         void *               arg )
+canRead( struct tr_iobuf * iobuf, void * arg, size_t * piece )
 {
-    tr_handshake *    handshake = (tr_handshake *) arg;
-    struct evbuffer * inbuf = EVBUFFER_INPUT ( evin );
+    tr_handshake *    handshake = arg;
+    struct evbuffer * inbuf = tr_iobuf_input( iobuf );
     ReadState         ret;
     int               readyForMore = TRUE;
+
+    /* no piece data in handshake */
+    *piece = 0;
 
     dbgmsg( handshake, "handling canRead; state is [%s]",
            getStateName( handshake->state ) );
@@ -1136,9 +1139,9 @@ tr_handshakeAbort( tr_handshake * handshake )
 }
 
 static void
-gotError( struct bufferevent * evbuf UNUSED,
-          short                      what,
-          void *                     arg )
+gotError( struct tr_iobuf  * iobuf UNUSED,
+          short              what,
+          void             * arg )
 {
     tr_handshake * handshake = (tr_handshake *) arg;
 
@@ -1178,9 +1181,6 @@ tr_handshakeNew( tr_peerIo *        io,
                  void *             doneUserData )
 {
     tr_handshake * handshake;
-
-    tr_peerIoSetBandwidth( io, TR_UP, NULL );
-    tr_peerIoSetBandwidth( io, TR_DOWN, NULL );
 
     handshake = tr_new0( tr_handshake, 1 );
     handshake->io = io;
