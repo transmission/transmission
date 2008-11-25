@@ -481,7 +481,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
                                                         "Delete folder with extra contents -> title"), [self name]]];
             [alert setInformativeText: NSLocalizedString(@"The directory contains data that is not part of the transfer."
                 " Are you sure you want to move this directory to the trash?", "Delete folder with extra contents -> message")];
-            [alert addButtonWithTitle: NSLocalizedString(@"Remove", "Delete folder with extra contents -> button")];
+            [alert addButtonWithTitle: NSLocalizedString(@"Trash", "Delete folder with extra contents -> button")];
             [alert addButtonWithTitle: NSLocalizedString(@"Keep", "Delete folder with extra contents -> button")];
             
             BOOL onLeopard = [NSApp isOnLeopardOrBetter];
