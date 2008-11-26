@@ -239,7 +239,8 @@ tr_bandwidthIsLimited( const tr_bandwidth  * b,
     return b->band[dir].isLimited != 0;
 }
 
-#if 1
+#if 0
+#warning do not check the code in with this enabled
 #define DEBUG_DIRECTION TR_UP
 #endif
 
@@ -248,8 +249,6 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
                       tr_direction    dir,
                       int             period_msec )
 {
-    double clamped = 0;
-
     assert( isBandwidth( b ) );
     assert( isDirection( dir ) );
 
