@@ -485,8 +485,6 @@ torrentRealInit( tr_handle *     h,
 
     tor->bandwidth = tr_bandwidthNew( h, h->bandwidth );
 
-fprintf( stderr, "torrent [%s] bandwidth is %p\n", info->name, tor->bandwidth );
-
     tor->blockSize = getBlockSize( info->pieceSize );
 
     tor->lastPieceSize = info->totalSize % info->pieceSize;
