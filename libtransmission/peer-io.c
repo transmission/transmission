@@ -168,7 +168,7 @@ canReadWrapper( struct tr_iobuf  * iobuf,
             const size_t oldLen = EVBUFFER_LENGTH( tr_iobuf_input( iobuf ) );
             const int ret = io->canRead( iobuf, io->userData, &piece );
 
-            if( ret != err )
+            if( ret != READ_ERR )
             {
                 const size_t used = oldLen - EVBUFFER_LENGTH( tr_iobuf_input( iobuf ) );
                 if( piece )
