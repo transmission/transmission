@@ -256,7 +256,7 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     const double desired_bytes_per_pulse = desiredSpeed * 1024.0 * seconds_per_pulse;
     const double pulses_per_history = (double)HISTORY_MSEC / period_msec;
     const double min = desired_bytes_per_pulse * 0.90;
-    const double max = desired_bytes_per_pulse * 1.50;
+    const double max = desired_bytes_per_pulse * 1.20;
     const double next_pulse_bytes = desired_bytes_per_pulse * ( pulses_per_history + 1 )
                                   - ( current_bytes_per_pulse * pulses_per_history );
     double clamped;

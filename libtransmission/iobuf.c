@@ -126,7 +126,7 @@ tr_iobuf_readcb( int fd, short event, void * arg )
     int res;
     short what = EVBUFFER_READ;
     struct tr_iobuf * b = arg;
-    const size_t howmuch = tr_bandwidthClamp( b->bandwidth, TR_DOWN, 2048 );
+    const size_t howmuch = tr_bandwidthClamp( b->bandwidth, TR_DOWN, b->session->so_rcvbuf );
 
     assert( isBuf( b ) );
 
