@@ -39,7 +39,7 @@
 #define IO_TIMEOUT_SECS 8
 
 static size_t
-addPacketOverhead( size_t d )
+getPacketOverhead( size_t d )
 {
     /**
      * http://sd.wareonearth.com/~phil/net/overhead/
@@ -59,7 +59,7 @@ addPacketOverhead( size_t d )
      */
     static const double assumed_payload_data_rate = 94.0;
 
-    return (size_t)( d * ( 100.0 / assumed_payload_data_rate ) );
+    return (size_t)( d * ( 100.0 / assumed_payload_data_rate ) - d );
 }
 
 /**
@@ -127,16 +127,19 @@ didWriteWrapper( struct tr_iobuf  * iobuf,
     while( bytes_transferred )
     {
         struct tr_datatype * next = io->output_datatypes->data;
-        const size_t chunk_length = MIN( next->length, bytes_transferred );
-        const size_t n = addPacketOverhead( chunk_length );
+        const size_t payload = MIN( next->length, bytes_transferred );
+        const size_t overhead = getPacketOverhead( payload );
 
-        tr_bandwidthUsed( io->bandwidth, TR_UP, n, next->isPieceData );
+        tr_bandwidthUsed( io->bandwidth, TR_UP, payload, next->isPieceData );
+
+        if( overhead > 0 )
+            tr_bandwidthUsed( io->bandwidth, TR_UP, overhead, FALSE );
 
         if( io->didWrite )
-            io->didWrite( io, n, next->isPieceData, io->userData );
+            io->didWrite( io, payload, next->isPieceData, io->userData );
 
-        bytes_transferred -= chunk_length;
-        next->length -= chunk_length;
+        bytes_transferred -= payload;
+        next->length -= payload;
         if( !next->length )
             tr_free( tr_list_pop_front( &io->output_datatypes ) );
     }
