@@ -29,7 +29,7 @@ enum
 {
     HISTORY_MSEC = 2000,
     INTERVAL_MSEC = HISTORY_MSEC,
-    GRANULARITY_MSEC = 250,
+    GRANULARITY_MSEC = 40,
     HISTORY_SIZE = ( INTERVAL_MSEC / GRANULARITY_MSEC ),
     MAGIC_NUMBER = 43143
 };
@@ -41,9 +41,8 @@ struct bratecontrol
 };
 
 static float
-getSpeed( const struct bratecontrol * r )
+getSpeed( const struct bratecontrol * r, int interval_msec )
 {
-    const uint64_t interval_msec = HISTORY_MSEC;
     uint64_t       bytes = 0;
     const uint64_t cutoff = tr_date ( ) - interval_msec;
     int            i = r->newest;
@@ -240,7 +239,7 @@ tr_bandwidthIsLimited( const tr_bandwidth  * b,
     return b->band[dir].isLimited != 0;
 }
 
-#if 0
+#if 1
 #define DEBUG_DIRECTION TR_UP
 #endif
 
@@ -258,32 +257,20 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     {
         const double currentSpeed = tr_bandwidthGetPieceSpeed( b, dir ); /* KiB/s */
         const double desiredSpeed = b->band[dir].desiredSpeed;           /* KiB/s */
-        const double seconds_per_pulse = period_msec / 1000.0;
-        const double current_bytes_per_pulse = currentSpeed * 1024.0 * seconds_per_pulse;
-        const double desired_bytes_per_pulse = desiredSpeed * 1024.0 * seconds_per_pulse;
-        const double pulses_per_history = (double)HISTORY_MSEC / period_msec;
-        const double min = desired_bytes_per_pulse * 0.85;
-        const double max = desired_bytes_per_pulse * 1.15;
-        const double next_pulse_bytes = desired_bytes_per_pulse * ( pulses_per_history + 1 )
-                                      - ( current_bytes_per_pulse * pulses_per_history );
-
-        /* clamp the return value to lessen oscillation */
-        clamped = next_pulse_bytes;
-        clamped = MAX( clamped, min );
-        clamped = MIN( clamped, max );
-
-        b->band[dir].bytesLeft = clamped;
+        const double pulseCount = HISTORY_MSEC / (double)period_msec;
+        const double nextPulseSpeed = desiredSpeed * ( pulseCount + 1 ) - ( currentSpeed * pulseCount );
+        b->band[dir].bytesLeft = nextPulseSpeed * 1024.0 * period_msec / 1000.0;
 
 #ifdef DEBUG_DIRECTION
         if( dir == DEBUG_DIRECTION )
-                fprintf( stderr, "bandwidth %p currentPieceSpeed(%5.2f of %5.2f) desiredSpeed(%5.2f), allocating %5.2f (unclamped: %5.2f)\n",
+                fprintf( stderr, "bandwidth %p currentPieceSpeed(%5.2f of %5.2f) desiredSpeed(%5.2f), allocating %5.2f\n",
                          b, currentSpeed, tr_bandwidthGetRawSpeed( b, dir ), desiredSpeed,
-                         clamped/1024.0, next_pulse_bytes/1024.0 );
+                         b->band[dir].bytesLeft/1024.0 );
 #endif
     }
 
     /* notify the io buffers that there's more bandwidth available */
-    if( !b->band[dir].isLimited || ( clamped > 0.001 ) )
+    if( !b->band[dir].isLimited || ( b->band[dir].bytesLeft > 0 ) )
     {
         int i, n=0;
         short what = dir==TR_UP ? EV_WRITE : EV_READ;
@@ -359,7 +346,7 @@ tr_bandwidthGetRawSpeed( const tr_bandwidth * b, tr_direction dir )
     assert( isBandwidth( b ) );
     assert( isDirection( dir ) );
 
-    return getSpeed( &b->band[dir].raw );
+    return getSpeed( &b->band[dir].raw, HISTORY_MSEC );
 }
 
 double
@@ -368,7 +355,7 @@ tr_bandwidthGetPieceSpeed( const tr_bandwidth * b, tr_direction dir )
     assert( isBandwidth( b ) );
     assert( isDirection( dir ) );
 
-    return getSpeed( &b->band[dir].piece );
+    return getSpeed( &b->band[dir].piece, HISTORY_MSEC );
 }
 
 void
