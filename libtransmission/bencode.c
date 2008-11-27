@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <locale.h>
+
 #include <event.h> /* evbuffer */
 
 #include "ConvertUTF.h"
@@ -707,8 +709,15 @@ tr_bencDictAddDouble( tr_benc *    dict,
                       double       d )
 {
     char buf[128];
+    char * locale;
 
+    /* the json spec requires a '.' decimal point regardless of locale */
+    locale = tr_strdup( setlocale ( LC_NUMERIC, NULL ) );
+    setlocale( LC_NUMERIC, "POSIX" );
     tr_snprintf( buf, sizeof( buf ), "%f", d );
+    setlocale( LC_NUMERIC, locale );
+    tr_free( locale );
+
     return tr_bencDictAddStr( dict, key, buf );
 }
 
