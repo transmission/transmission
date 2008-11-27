@@ -579,7 +579,7 @@ strlratio( char * buf,
             tr_snprintf( buf, buflen, "%'.0f", ratio );
     }
     else if( numerator )
-        tr_strlcpy( buf, "Infinity", buflen );
+        tr_strlcpy( buf, "Inf", buflen );
     else
         tr_strlcpy( buf, "None", buflen );
     return buf;
@@ -1009,20 +1009,21 @@ printTorrentList( tr_benc * top )
             {
                 char etaStr[16];
                 char statusStr[64];
+                char ratioStr[32];
+
                 if( leftUntilDone )
                     etaToString( etaStr, sizeof( etaStr ), eta );
                 else
                     tr_snprintf( etaStr, sizeof( etaStr ), "Done" );
                 printf(
-                    "%4d  %3d%%  %-8s  %6.1f  %6.1f  %5.1f  %-11s  %s\n",
+                    "%4d  %3d%%  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n",
                     (int)id,
                     (int)( 100.0 *
                            ( sizeWhenDone - leftUntilDone ) / sizeWhenDone ),
                     etaStr,
                     up / 1024.0,
                     down / 1024.0,
-                    (double)( downEver ? ( (double)upEver /
-                                          downEver ) : 0.0 ),
+                    strlratio( ratioStr, downEver, upEver, sizeof( ratioStr ) ),
                     getStatusString( d, statusStr, sizeof( statusStr ) ),
                     name );
             }
