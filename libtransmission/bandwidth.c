@@ -254,9 +254,9 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
 
     if( b->band[dir].isLimited )
     {
-        const double currentSpeed = tr_bandwidthGetPieceSpeed( b, dir ); /* KiB/s */
-        const double desiredSpeed = b->band[dir].desiredSpeed;           /* KiB/s */
-        const double pulseCount = HISTORY_MSEC / (double)period_msec;
+        const double currentSpeed = getSpeed( &b->band[dir].piece, HISTORY_MSEC - period_msec );
+        const double desiredSpeed = b->band[dir].desiredSpeed;
+        const double pulseCount = ( HISTORY_MSEC - period_msec ) / (double)period_msec;
         const double nextPulseSpeed = desiredSpeed * ( pulseCount + 1 ) - ( currentSpeed * pulseCount );
         b->band[dir].bytesLeft = nextPulseSpeed * 1024.0 * period_msec / 1000.0;
 
