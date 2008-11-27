@@ -58,7 +58,7 @@ libtransmission_a_SOURCES = \
     wildmat.c
 
 noinst_HEADERS = \
-    bandwidth.c \
+    bandwidth.h \
     bencode.h \
     blocklist.h \
     clients.h \
