@@ -217,8 +217,8 @@ struct tr_torrent
     tr_torrent_completeness_func *   completeness_func;
     void *                     completeness_func_user_data;
 
-    unsigned int               isRunning  : 1;
-    unsigned int               isDeleting : 1;
+    tr_bool                    isRunning;
+    tr_bool                    isDeleting;
 
     uint16_t                   maxConnectedPeers;
 

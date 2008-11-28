@@ -70,7 +70,7 @@ enum
 
 struct tr_tracker
 {
-    unsigned int    isRunning : 1;
+    tr_bool         isRunning;
 
     uint8_t         randOffset;
 

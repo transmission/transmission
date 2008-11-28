@@ -261,10 +261,10 @@ struct tr_incoming
 
 struct tr_peermsgs
 {
-    unsigned int    peerSentBitfield        : 1;
-    unsigned int    peerSupportsPex         : 1;
-    unsigned int    clientSentLtepHandshake : 1;
-    unsigned int    peerSentLtepHandshake   : 1;
+    tr_bool         peerSentBitfield;
+    tr_bool         peerSupportsPex;
+    tr_bool         clientSentLtepHandshake;
+    tr_bool         peerSentLtepHandshake;
 
     uint8_t         state;
     uint8_t         ut_pex_id;

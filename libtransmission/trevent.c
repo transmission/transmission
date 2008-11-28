@@ -132,7 +132,7 @@ typedef int timer_func ( void* );
 
 struct tr_timer
 {
-    unsigned int              inCallback : 1;
+    tr_bool                   inCallback;
     timer_func *              func;
     void *                    user_data;
     struct tr_event_handle *  eh;

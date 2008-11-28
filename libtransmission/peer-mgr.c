@@ -107,7 +107,7 @@ struct peer_atom
 
 typedef struct
 {
-    unsigned int    isRunning : 1;
+    tr_bool         isRunning;
 
     uint8_t         hash[SHA_DIGEST_LENGTH];
     int         *   pendingRequestCount;
@@ -1842,9 +1842,9 @@ tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
 
 struct ChokeData
 {
-    unsigned int    doUnchoke    : 1;
-    unsigned int    isInterested : 1;
-    unsigned int    isChoked     : 1;
+    tr_bool         doUnchoke;
+    tr_bool         isInterested;
+    tr_bool         isChoked;
     int             rate;
     tr_peer *       peer;
 };

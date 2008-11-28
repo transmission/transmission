@@ -32,8 +32,8 @@
 
 struct tr_completion
 {
-    unsigned int    sizeWhenDoneIsDirty : 1;
-    unsigned int    haveValidIsDirty : 1;
+    tr_bool  sizeWhenDoneIsDirty;
+    tr_bool  haveValidIsDirty;
 
     tr_torrent *    tor;
 

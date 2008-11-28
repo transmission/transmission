@@ -22,11 +22,11 @@
 
 struct optional_args
 {
-    unsigned int    isSet_paused      : 1;
-    unsigned int    isSet_connected   : 1;
-    unsigned int    isSet_downloadDir : 1;
+    tr_bool         isSet_paused;
+    tr_bool         isSet_connected;
+    tr_bool         isSet_downloadDir;
 
-    unsigned int    isPaused          : 1;
+    tr_bool         isPaused;
     uint16_t        peerLimit;
     char          * downloadDir;
 };
@@ -36,11 +36,11 @@ struct optional_args
 struct tr_ctor
 {
     const tr_handle *       handle;
-    unsigned int            saveInOurTorrentsDir : 1;
-    unsigned int            doDelete             : 1;
+    tr_bool                 saveInOurTorrentsDir;
+    tr_bool                 doDelete;
 
-    unsigned int            isSet_metainfo       : 1;
-    unsigned int            isSet_delete         : 1;
+    tr_bool                 isSet_metainfo;
+    tr_bool                 isSet_delete;
     tr_benc                 metainfo;
     char *                  sourceFile;
 

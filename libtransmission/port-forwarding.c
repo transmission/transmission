@@ -32,8 +32,8 @@ getKey( void ) { return _( "Port Forwarding" ); }
 
 struct tr_shared
 {
-    unsigned int          isEnabled      : 1;
-    unsigned int          isShuttingDown : 1;
+    tr_bool               isEnabled;
+    tr_bool               isShuttingDown;
 
     tr_port_forwarding    natpmpStatus;
     tr_port_forwarding    upnpStatus;

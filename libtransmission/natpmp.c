@@ -45,9 +45,9 @@ tr_natpmp_state;
 
 struct tr_natpmp
 {
+    tr_bool            isMapped;
+    tr_bool            hasDiscovered;
     int                port;
-    unsigned int       isMapped      : 1;
-    unsigned int       hasDiscovered : 1;
     time_t             renewTime;
     time_t             commandTime;
     tr_natpmp_state    state;

@@ -89,8 +89,8 @@ enum
 
 struct tr_handshake
 {
-    unsigned int          havePeerID                  : 1;
-    unsigned int          haveSentBitTorrentHandshake : 1;
+    tr_bool               havePeerID;
+    tr_bool               haveSentBitTorrentHandshake;
     tr_peerIo *           io;
     tr_crypto *           crypto;
     struct tr_handle *    handle;

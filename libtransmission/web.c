@@ -45,7 +45,7 @@
 
 struct tr_web
 {
-    unsigned int closing : 1;
+    tr_bool closing;
     int prev_running;
     int still_running;
     long timer_ms;

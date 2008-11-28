@@ -83,8 +83,8 @@ bytesUsed( struct bratecontrol * r, size_t size )
 
 struct tr_band
 {
-    unsigned int isLimited : 1;
-    unsigned int honorParentLimits : 1;
+    tr_bool isLimited;
+    tr_bool honorParentLimits;
     size_t bytesLeft;
     double desiredSpeed;
     struct bratecontrol raw;

@@ -74,17 +74,17 @@ getPacketOverhead( size_t d )
 
 struct tr_datatype
 {
-    unsigned int    isPieceData : 1;
-    size_t          length;
+    tr_bool  isPieceData;
+    size_t   length;
 };
 
 struct tr_peerIo
 {
-    unsigned int             isEncrypted               : 1;
-    unsigned int             isIncoming                : 1;
-    unsigned int             peerIdIsSet               : 1;
-    unsigned int             extendedProtocolSupported : 1;
-    unsigned int             fastPeersSupported        : 1;
+    tr_bool                  isEncrypted;
+    tr_bool                  isIncoming;
+    tr_bool                  peerIdIsSet;
+    tr_bool                  extendedProtocolSupported;
+    tr_bool                  fastPeersSupported;
 
     int                      magicNumber;
 

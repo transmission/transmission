@@ -26,8 +26,8 @@
 
 struct tr_webseed
 {
-    unsigned int        busy : 1;
-    unsigned int        dead : 1;
+    tr_bool             busy;
+    tr_bool             dead;
 
     uint8_t             hash[SHA_DIGEST_LENGTH];
 

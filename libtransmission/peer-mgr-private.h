@@ -41,11 +41,11 @@ enum
 
 typedef struct tr_peer
 {
-    unsigned int             peerIsChoked       : 1;
-    unsigned int             peerIsInterested   : 1;
-    unsigned int             clientIsChoked     : 1;
-    unsigned int             clientIsInterested : 1;
-    unsigned int             doPurge            : 1;
+    tr_bool                  peerIsChoked;
+    tr_bool                  peerIsInterested;
+    tr_bool                  clientIsChoked;
+    tr_bool                  clientIsInterested;
+    tr_bool                  doPurge;
 
     /* number of bad pieces they've contributed to */
     uint8_t                  strikes;

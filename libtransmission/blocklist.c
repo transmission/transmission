@@ -46,7 +46,7 @@ struct tr_ip_range
 
 struct tr_blocklist
 {
-    unsigned int          isEnabled : 1;
+    tr_bool               isEnabled;
     int                   fd;
     size_t                ruleCount;
     size_t                byteCount;

@@ -56,13 +56,13 @@ struct tr_bandwidth;
 
 struct tr_handle
 {
-    unsigned int                 isPortSet          : 1;
-    unsigned int                 isPexEnabled       : 1;
-    unsigned int                 isBlocklistEnabled : 1;
-    unsigned int                 isProxyEnabled     : 1;
-    unsigned int                 isProxyAuthEnabled : 1;
-    unsigned int                 isClosed           : 1;
-    unsigned int                 useLazyBitfield    : 1;
+    tr_bool                      isPortSet;
+    tr_bool                      isPexEnabled;
+    tr_bool                      isBlocklistEnabled;
+    tr_bool                      isProxyEnabled;
+    tr_bool                      isProxyAuthEnabled;
+    tr_bool                      isClosed;
+    tr_bool                      useLazyBitfield;
 
     tr_encryption_mode           encryptionMode;
 

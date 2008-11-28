@@ -55,6 +55,7 @@ extern "C" {
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
 typedef uint64_t tr_block_index_t;
+typedef uint8_t tr_bool;
 
 /**
  * @brief returns Transmission's default configuration file directory.
@@ -1047,26 +1048,26 @@ int  tr_torrentCanManualUpdate( const tr_torrent * torrent );
 
 typedef struct tr_peer_stat
 {
-    unsigned int    isEncrypted        : 1;
-    unsigned int    isDownloadingFrom  : 1;
-    unsigned int    isUploadingTo      : 1;
+    tr_bool      isEncrypted;
+    tr_bool      isDownloadingFrom;
+    tr_bool      isUploadingTo;
 
-    unsigned int    peerIsChoked       : 1;
-    unsigned int    peerIsInterested   : 1;
-    unsigned int    clientIsChoked     : 1;
-    unsigned int    clientIsInterested : 1;
-    unsigned int    isIncoming         : 1;
+    tr_bool      peerIsChoked;
+    tr_bool      peerIsInterested;
+    tr_bool      clientIsChoked;
+    tr_bool      clientIsInterested;
+    tr_bool      isIncoming;
 
-    uint8_t         from;
-    uint16_t        port;
+    uint8_t      from;
+    uint16_t     port;
 
-    char            addr[16];
-    char            client[80];
-    char            flagStr[32];
+    char         addr[16];
+    char         client[80];
+    char         flagStr[32];
 
-    float           progress;
-    float           rateToPeer;
-    float           rateToClient;
+    float        progress;
+    float        rateToPeer;
+    float        rateToClient;
 }
 tr_peer_stat;
 
@@ -1149,8 +1150,8 @@ tr_piece;
 struct tr_info
 {
     /* Flags */
-    unsigned int       isPrivate   : 1;
-    unsigned int       isMultifile : 1;
+    tr_bool            isPrivate;
+    tr_bool            isMultifile;
 
     /* General info */
     uint8_t            hash[SHA_DIGEST_LENGTH];

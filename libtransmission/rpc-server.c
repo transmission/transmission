@@ -47,9 +47,9 @@
 
 struct tr_rpc_server
 {
-    unsigned int       isEnabled          : 1;
-    unsigned int       isPasswordEnabled  : 1;
-    unsigned int       isWhitelistEnabled : 1;
+    tr_bool            isEnabled;
+    tr_bool            isPasswordEnabled;
+    tr_bool            isWhitelistEnabled;
     uint16_t           port;
     struct evhttp *    httpd;
     tr_handle *        session;

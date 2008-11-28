@@ -37,12 +37,12 @@ tr_upnp_state;
 
 struct tr_upnp
 {
+    tr_bool            hasDiscovered;
     struct UPNPUrls    urls;
     struct IGDdatas    data;
     int                port;
     char               lanaddr[16];
     unsigned int       isMapped;
-    unsigned int       hasDiscovered : 1;
     tr_upnp_state      state;
 };
 

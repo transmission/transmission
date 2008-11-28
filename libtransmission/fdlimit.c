@@ -79,12 +79,12 @@ enum
 
 struct tr_openfile
 {
-    unsigned int    isCheckedOut  : 1;
-    unsigned int    isWritable    : 1;
-    unsigned int    closeWhenDone : 1;
-    char            filename[MAX_PATH_LENGTH];
-    int             fd;
-    uint64_t        date;
+    tr_bool    isCheckedOut;
+    tr_bool    isWritable;
+    tr_bool    closeWhenDone;
+    char       filename[MAX_PATH_LENGTH];
+    int        fd;
+    uint64_t   date;
 };
 
 struct tr_fd_s

@@ -30,6 +30,8 @@
 #include "crypto.h"
 #include "utils.h"
 
+typedef uint8_t tr_bool;
+
 /**
 ***
 **/
@@ -86,9 +88,9 @@ struct tr_crypto
     RC4_KEY         dec_key;
     RC4_KEY         enc_key;
     uint8_t         torrentHash[SHA_DIGEST_LENGTH];
-    unsigned int    isIncoming       : 1;
-    unsigned int    torrentHashIsSet : 1;
-    unsigned int    mySecretIsSet    : 1;
+    tr_bool         isIncoming;
+    tr_bool         torrentHashIsSet;
+    tr_bool         mySecretIsSet;
     uint8_t         myPublicKey[KEY_LEN];
     uint8_t         mySecret[KEY_LEN];
 };
