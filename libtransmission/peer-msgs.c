@@ -265,7 +265,6 @@ struct tr_peermsgs
     unsigned int    peerSupportsPex         : 1;
     unsigned int    clientSentLtepHandshake : 1;
     unsigned int    peerSentLtepHandshake   : 1;
-    unsigned int    sendingBlock            : 1;
 
     uint8_t         state;
     uint8_t         ut_pex_id;
@@ -286,7 +285,6 @@ struct tr_peermsgs
 
     tr_publisher_t *       publisher;
 
-    struct evbuffer *      outBlock; /* buffer of the current piece message */
     struct evbuffer *      outMessages; /* all the non-piece messages */
 
     struct request_list    peerAskedFor;
@@ -1682,14 +1680,6 @@ canRead( struct tr_iobuf * iobuf, void * vmsgs, size_t * piece )
     return ret;
 }
 
-static void
-sendKeepalive( tr_peermsgs * msgs )
-{
-    dbgmsg( msgs, "sending a keepalive message" );
-    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, 0 );
-    pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
-}
-
 /**
 ***
 **/
@@ -1716,6 +1706,80 @@ popNextRequest( tr_peermsgs *         msgs,
         || reqListPop( &msgs->peerAskedFor, setme );
 }
 
+static size_t
+fillOutputBuffer( tr_peermsgs * msgs, time_t now )
+{
+    size_t bytesWritten = 0;
+    struct peer_request req;
+    const int haveMessages = EVBUFFER_LENGTH( msgs->outMessages ) != 0;
+
+    /**
+    ***  Protocol messages
+    **/
+
+    if( haveMessages && !msgs->outMessagesBatchedAt ) /* fresh batch */
+    {
+        dbgmsg( msgs, "started an outMessages batch (length is %zu)", EVBUFFER_LENGTH( msgs->outMessages ) );
+        msgs->outMessagesBatchedAt = now;
+    }
+    else if( haveMessages && ( ( now - msgs->outMessagesBatchedAt ) >= msgs->outMessagesBatchPeriod ) )
+    {
+        const size_t len = EVBUFFER_LENGTH( msgs->outMessages );
+        /* flush the protocol messages */
+        dbgmsg( msgs, "flushing outMessages... to %p (length is %zu)", msgs->io, len );
+        tr_peerIoWriteBuf( msgs->io, msgs->outMessages, FALSE );
+        msgs->clientSentAnythingAt = now;
+        msgs->outMessagesBatchedAt = 0;
+        msgs->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;
+        bytesWritten +=  len;
+    }
+
+    /**
+    ***  Blocks
+    **/
+
+    if( ( tr_peerIoGetWriteBufferSpace( msgs->io ) >= msgs->torrent->blockSize )
+        && popNextRequest( msgs, &req )
+        && requestIsValid( msgs, &req )
+        && tr_cpPieceIsComplete( msgs->torrent->completion, req.index ) )
+    {
+        /* send a block */
+        uint8_t * buf = tr_new( uint8_t, req.length );
+        const int err = tr_ioRead( msgs->torrent, req.index, req.offset, req.length, buf );
+        if( err ) {
+            fireError( msgs, err );
+        } else {
+            tr_peerIo * io = msgs->io;
+            struct evbuffer * out = evbuffer_new( );
+            dbgmsg( msgs, "sending block %u:%u->%u", req.index, req.offset, req.length );
+            tr_peerIoWriteUint32( io, out, sizeof( uint8_t ) + 2 * sizeof( uint32_t ) + req.length );
+            tr_peerIoWriteUint8 ( io, out, BT_PIECE );
+            tr_peerIoWriteUint32( io, out, req.index );
+            tr_peerIoWriteUint32( io, out, req.offset );
+            tr_peerIoWriteBytes ( io, out, buf, req.length );
+            tr_peerIoWriteBuf( io, out, TRUE );
+            bytesWritten += EVBUFFER_LENGTH( out );
+            evbuffer_free( out );
+            msgs->clientSentAnythingAt = now;
+        }
+        tr_free( buf );
+    }
+
+    /**
+    ***  Keepalive
+    **/
+
+    if( msgs->clientSentAnythingAt
+        && ( ( now - msgs->clientSentAnythingAt ) > KEEPALIVE_INTERVAL_SECS ) )
+    {
+        dbgmsg( msgs, "sending a keepalive message" );
+        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, 0 );
+        pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
+    }
+
+    return bytesWritten;
+}
+
 static int
 peerPulse( void * vmsgs )
 {
@@ -1724,92 +1788,12 @@ peerPulse( void * vmsgs )
 
     ratePulse( msgs );
 
-    /*tr_peerIoTryRead( msgs->io );*/
     pumpRequestQueue( msgs, now );
     expireOldRequests( msgs, now );
 
-    if( msgs->sendingBlock )
-    {
-        const size_t uploadMax = tr_peerIoGetWriteBufferSpace( msgs->io );
-        size_t       len = EVBUFFER_LENGTH( msgs->outBlock );
-        const size_t outlen = MIN( len, uploadMax );
-
-        assert( len );
-
-        if( outlen )
-        {
-            tr_peerIoWrite( msgs->io, EVBUFFER_DATA( msgs->outBlock ), outlen, TRUE );
-            evbuffer_drain( msgs->outBlock, outlen );
-
-            len -= outlen;
-            msgs->clientSentAnythingAt = now;
-            msgs->sendingBlock = len != 0;
-
-            dbgmsg( msgs, "wrote %zu bytes; %zu left in block", outlen, len );
-        }
-        else dbgmsg( msgs, "stalled writing block... uploadMax %lu, outlen %lu", uploadMax, outlen );
-    }
-
-    if( !msgs->sendingBlock )
-    {
-        struct peer_request req;
-        const int haveMessages = EVBUFFER_LENGTH( msgs->outMessages ) != 0;
-
-        if( haveMessages && !msgs->outMessagesBatchedAt ) /* fresh batch */
-        {
-            dbgmsg( msgs, "started an outMessages batch (length is %zu)", EVBUFFER_LENGTH( msgs->outMessages ) );
-            msgs->outMessagesBatchedAt = now;
-        }
-        else if( ( haveMessages ) &&
-                 ( ( now - msgs->outMessagesBatchedAt ) > msgs->outMessagesBatchPeriod ) )
-        {
-            dbgmsg( msgs, "flushing outMessages... to %p (length is %zu)", msgs->io, EVBUFFER_LENGTH( msgs->outMessages ) );
-            tr_peerIoWriteBuf( msgs->io, msgs->outMessages, FALSE );
-            msgs->clientSentAnythingAt = now;
-            msgs->outMessagesBatchedAt = 0;
-            msgs->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;
-        }
-        else if( !EVBUFFER_LENGTH( msgs->outBlock )
-               && popNextRequest( msgs, &req )
-               && requestIsValid( msgs, &req )
-               && tr_cpPieceIsComplete( msgs->torrent->completion,
-                                        req.index ) )
-        {
-            uint8_t * buf = tr_new( uint8_t, req.length );
-            const int err = tr_ioRead( msgs->torrent,
-                                       req.index, req.offset, req.length,
-                                       buf );
-            if( err )
-            {
-                fireError( msgs, err );
-            }
-            else
-            {
-                tr_peerIo *       io = msgs->io;
-                struct evbuffer * out = msgs->outBlock;
-
-                dbgmsg( msgs, "sending block %u:%u->%u", req.index,
-                        req.offset,
-                        req.length );
-                tr_peerIoWriteUint32(
-                    io, out, sizeof( uint8_t ) + 2 * sizeof( uint32_t ) +
-                    req.length );
-                tr_peerIoWriteUint8 ( io, out, BT_PIECE );
-                tr_peerIoWriteUint32( io, out, req.index );
-                tr_peerIoWriteUint32( io, out, req.offset );
-                tr_peerIoWriteBytes ( io, out, buf, req.length );
-                msgs->sendingBlock = 1;
-            }
-
-            tr_free( buf );
-        }
-        else if( ( !haveMessages )
-               && ( now - msgs->clientSentAnythingAt ) >
-                KEEPALIVE_INTERVAL_SECS )
-        {
-            sendKeepalive( msgs );
-        }
-    }
+    for( ;; )
+        if( fillOutputBuffer( msgs, now ) < 1 )
+            break;
 
     return TRUE; /* loop forever */
 }
@@ -2081,7 +2065,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->outMessagesBatchedAt = 0;
     m->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;
     m->incoming.block = evbuffer_new( );
-    m->outBlock = evbuffer_new( );
     m->peerAllowedPieces = NULL;
     m->peerAskedFor = REQUEST_LIST_INIT;
     m->peerAskedForFast = REQUEST_LIST_INIT;
@@ -2116,7 +2099,6 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
         tr_bitfieldFree( msgs->peerAllowedPieces );
         evbuffer_free( msgs->incoming.block );
         evbuffer_free( msgs->outMessages );
-        evbuffer_free( msgs->outBlock );
         tr_free( msgs->pex );
 
         memset( msgs, ~0, sizeof( tr_peermsgs ) );

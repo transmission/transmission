@@ -529,10 +529,23 @@ tr_peerIoSupportsFEXT( const tr_peerIo * io )
 ***
 **/
 
+static size_t
+getDesiredOutputBufferSize( const tr_peerIo * io )
+{
+    /* this is all kind of arbitrary, but what seems to work well is
+     * being large enough to hold the next 15 seconds' worth of input,
+     * or two and a half blocks, whichever is bigger.
+     * It's okay to tweak this as needed */
+    const double maxBlockSize = 16 * 1024; /* 16 KiB is from BT spec */
+    const double currentSpeed = tr_bandwidthGetPieceSpeed( io->bandwidth, TR_UP );
+    const double period = 20; /* arbitrary */
+    return MAX( maxBlockSize*2.5, currentSpeed*1024*period );
+}
+
 size_t
 tr_peerIoGetWriteBufferSpace( const tr_peerIo * io )
 {
-    const size_t desiredLen = io->session->so_sndbuf * 2; /* FIXME: bigger? */
+    const size_t desiredLen = getDesiredOutputBufferSize( io );
     const size_t currentLen = EVBUFFER_LENGTH( tr_iobuf_output( io->iobuf ) );
     size_t freeSpace = 0;
 
