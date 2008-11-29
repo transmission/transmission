@@ -58,10 +58,7 @@
     [fAddRemoveControl setEnabled: NO forSegment: REMOVE_TAG];
     [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
     
-    if ([fTableView numberOfRows] > 0)
-        [fTableView selectRow: 0 byExtendingSelection: NO];
-    else
-        [self updateSelectedColor]; //make sure all fields are disabled
+    [self updateSelectedColor];
 }
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableview
@@ -163,22 +160,13 @@
             break;
         
         case REMOVE_TAG:
-            #warning refactor in color picker (fCurrentColorIndex) code)
-            //close color picker if corresponding row is removed
             row = [fTableView selectedRow];
-            if ([[NSColorPanel sharedColorPanel] isVisible]
-                && row == [[GroupsController groups] rowValueForIndex: fCurrentColorIndex])
-                [[NSColorPanel sharedColorPanel] close];
-            
             [[GroupsController groups] removeGroupWithRowIndex: row];            
                         
             [fTableView reloadData];
             
-            //select the next row
-            if (row == [fTableView numberOfRows])
-                row--;
-            if (row >= 0)
-                [fTableView selectRow: row byExtendingSelection: NO];
+            if ([fTableView numberOfRows] > 0)
+                [fTableView scrollRowToVisible: [fTableView selectedRow]];
             
             break;
     }

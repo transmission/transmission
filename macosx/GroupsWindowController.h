@@ -28,12 +28,11 @@
 
 @interface GroupsWindowController : NSWindowController
 {
-    IBOutlet NSColorWell * fSelectedColorView;
-    IBOutlet NSTextField * fSelectedColorNameField;
     IBOutlet NSTableView * fTableView;
     IBOutlet NSSegmentedControl * fAddRemoveControl;
-    
-    NSInteger fCurrentColorIndex;
+
+    IBOutlet NSColorWell * fSelectedColorView;
+    IBOutlet NSTextField * fSelectedColorNameField;
 }
 
 - (void) addRemoveGroup: (id) sender;
