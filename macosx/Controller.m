@@ -33,7 +33,6 @@
 #import "CreatorWindowController.h"
 #import "StatsWindowController.h"
 #import "QuickLookController.h"
-#import "GroupsWindowController.h"
 #import "GroupsController.h"
 #import "AboutWindowController.h"
 #import "ButtonToolbarItem.h"

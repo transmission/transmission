@@ -88,7 +88,6 @@
 		A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */ = {isa = PBXBuildFile; fileRef = A21FBBA90EDA78C300BC3C51 /* bandwidth.h */; };
 		A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */ = {isa = PBXBuildFile; fileRef = A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */; };
 		A22180980D148A71007D09ED /* GroupsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A22180970D148A71007D09ED /* GroupsWindowController.m */; };
-		A22180B60D148F0F007D09ED /* GroupsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A22180B50D148F0F007D09ED /* GroupsWindow.xib */; };
 		A222E9870E6B21D9009FB003 /* BlocklistDownloaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A222E9860E6B21D9009FB003 /* BlocklistDownloaderViewController.m */; };
 		A222EA7B0E6C32C4009FB003 /* BlocklistScheduler.m in Sources */ = {isa = PBXBuildFile; fileRef = A222EA7A0E6C32C4009FB003 /* BlocklistScheduler.m */; };
 		A224D2640DAAC55F000954EA /* Peers.png in Resources */ = {isa = PBXBuildFile; fileRef = A224D2630DAAC55F000954EA /* Peers.png */; };
@@ -484,7 +483,6 @@
 		A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bandwidth.c; path = libtransmission/bandwidth.c; sourceTree = "<group>"; };
 		A22180960D148A71007D09ED /* GroupsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GroupsWindowController.h; path = macosx/GroupsWindowController.h; sourceTree = "<group>"; };
 		A22180970D148A71007D09ED /* GroupsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GroupsWindowController.m; path = macosx/GroupsWindowController.m; sourceTree = "<group>"; };
-		A22180B50D148F0F007D09ED /* GroupsWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = GroupsWindow.xib; path = macosx/GroupsWindow.xib; sourceTree = "<group>"; };
 		A222E9850E6B21D9009FB003 /* BlocklistDownloaderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlocklistDownloaderViewController.h; path = macosx/BlocklistDownloaderViewController.h; sourceTree = "<group>"; };
 		A222E9860E6B21D9009FB003 /* BlocklistDownloaderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BlocklistDownloaderViewController.m; path = macosx/BlocklistDownloaderViewController.m; sourceTree = "<group>"; };
 		A222EA790E6C32C4009FB003 /* BlocklistScheduler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlocklistScheduler.h; path = macosx/BlocklistScheduler.h; sourceTree = "<group>"; };
@@ -1004,7 +1002,6 @@
 				A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */,
 				A233BD320D8C6585007EE7B4 /* MessageWindow.xib */,
 				A233BD680D8CF2C7007EE7B4 /* StatsWindow.xib */,
-				A22180B50D148F0F007D09ED /* GroupsWindow.xib */,
 				A231274B0D11D0B7003F9AFF /* AboutWindow.xib */,
 				A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */,
 				A20B6FA40C4D97840034AB1D /* PriorityNone.png */,
@@ -1735,7 +1732,6 @@
 				A231274C0D11D0B7003F9AFF /* AboutWindow.xib in Resources */,
 				A29576030D11D63C0093B167 /* Creator.xib in Resources */,
 				A29576130D11D8DD0093B167 /* InfoWindow.xib in Resources */,
-				A22180B60D148F0F007D09ED /* GroupsWindow.xib in Resources */,
 				A20152640D1C1BE70081714F /* PinTemplate.png in Resources */,
 				A23F4FF20D1D98AD002FCB97 /* PrefsWindow.xib in Resources */,
 				A23F50020D1D99D7002FCB97 /* MainMenu.xib in Resources */,

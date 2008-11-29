@@ -34,9 +34,6 @@
 /* enable LibTransmission extension protocol */
 #define ENABLE_LTEP * /
 
-/* enable fast peers extension protocol */
-/* #define ENABLE_FASTPEER */
-
 /***
 ****
 ***/

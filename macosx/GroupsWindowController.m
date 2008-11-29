@@ -39,6 +39,7 @@
 
 @implementation GroupsWindowController
 
+#warning should this still be a window controller?
 - (void) awakeFromNib
 {
     [[[fTableView tableColumnWithIdentifier: @"Button"] dataCell] setTitle: NSLocalizedString(@"Color", "Groups -> color button")];
@@ -160,18 +161,19 @@
 
 - (void) addRemoveGroup: (id) sender
 {
+    NSInteger row;
+    
     switch ([[sender cell] tagForSegment: [sender selectedSegment]])
     {
-        NSInteger row;
-        
         case ADD_TAG:
             [[GroupsController groups] addNewGroup];
             
             [fTableView reloadData];
-            [fTableView deselectAll: self];
             
-            [fTableView editColumn: [fTableView columnWithIdentifier: @"Name"] row: [fTableView numberOfRows]-1 withEvent: nil
-                        select: NO];
+            row = [fTableView numberOfRows]-1;
+            [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
+            [fTableView scrollRowToVisible: row];
+            
             break;
         
         case REMOVE_TAG:

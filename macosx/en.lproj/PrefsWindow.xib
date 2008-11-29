@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.02">
+<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">9F33</string>
-		<string key="IBDocument.InterfaceBuilderVersion">672</string>
+		<string key="IBDocument.InterfaceBuilderVersion">677</string>
 		<string key="IBDocument.AppKitVersion">949.34</string>
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1760"/>
+			<integer value="1779"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+		</object>
+		<object class="NSMutableDictionary" key="IBDocument.Metadata">
+			<bool key="EncodedWithXMLCoder">YES</bool>
+			<object class="NSArray" key="dict.sortedKeys">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+			</object>
+			<object class="NSMutableArray" key="dict.values">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+			</object>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="951209067">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3701,102 +3710,45 @@ AAABAAAAAQ</bytes>
 																<reference ref="8"/>
 																<object class="NSCachedImageRep">
 																	<object class="NSData" key="NSTIFFRepresentation">
-																		<bytes key="NS.bytes">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
-AAAAAQHNAABjdXJ2AAAAAAAAAAEBzQAAY3VydgAAAAAAAAABAc0AAHZjZ3QAAAAAAAAAAAADAQAAAgAA
-ASQBpgJ6A3wEfAV+BoAHggiDCUQJxQqHC4gMiQ2MDrYQaBGREpETkhSUFZUWlReXGMUabxubHJsdnR7I
-IHUhoiKjI88leyamJ9EpfiqrK9Ytgi6tL9oxhzKyM981jDa2N+E5jjq6O+Y9kz6+P+pBlkLCQ+5FmkbG
-R/JJn0rKS/ZNok7OT9BQ0FHRUvxUqlXVVtZX11jYWgRbsVzcXd1e3l/fYOBiDGO5ZORl5WbmZ+do6Gnp
-axVswW3tbu5v73DwcfFy8nP0dPR19Xb2d/d4+Hn5evp7/Hz8ff1/KYDVggGDAoQDhQSGBYcGiAeJCIoJ
-iwqMC40Mjg2PDpAPkRCSEZMSlBOVFJYVlxaYF5kYmhmbGpwbnRyeHZ8eoB+hIKIhoyKkI6UkpiWnJ6gn
-qSiqKasqq+usbK0sri2vL7AwsTGyMbMytDS1NbY2tva3drg3uTi6Ors7vDy9PL49vv6/f8A/wUDCQcNC
-xEPFBMWExkXHRshHyUnKScsKy4vMS81Mzk7PDs+P0FDRUdJS0xLTktRT1VTWVdcW15fYV9lY2lrbGtub
-3FzdXN5d3x7fn+Bf4WDiIeKi42LkY+Vk5iXmpudm6GfpaOop6qrrauxr7WzuLe6u727wb/Fw8jHysvNy
-9HP1dPY19rb3dvh4+Xn6efs6+7v8e/18/j3+vv//AAABIwIOAvADywSrBZMGfAdnCFQJQwo0CycMJw0Y
-DhcPGBAYERUSJhMoFDgVTBZeF3MYjhmvGssb6R0THjYfZyCYIccjASQ9JXEmsSfvKSgqbCu7LQMuQS+R
-MOEyKTOGNNc2KjdwOMU6Fzt4PMw+Fj9vQMJCJEN7RNFGHkd4SL1J+UsxTGVNlU7RUA5RR1J4U6VU1FYK
-V0BYcVmdWsZb710fXk9femCiYcVi6WQVZT9mWGd+aKBpwGrda/ltE24rb0RwaHF8cpBzonS1dch223fq
-ePZ6A3sRfCB9LH41f0CAS4FPgluDYIRlhWyGdIdyiICJgIqDi4mMko2LjpqPmZCXkZGSnJOSlJaVmJao
-l6eYrpmomqubr5y8nbyexZ/MoNGh06LTo9Ok26Xkpuen4qjlqe+q8avvrO6t8q7vr+uw7LHnsuGz4rTa
-tdG2ybfAuLe5r7qcu5K8gL1tvlu/S8A8wSrCEsL5w+DEysW0xpPHcshTyTbKG8r/y9rMtM2KzlrPI8/m
-0LPRfdJF0w7T3dSg1WrWM9b9183Yk9ld2ina89u63ILdS94U3t7fqeBz4TviBOLK45TkXuUn5ezmuueB
-6ErpFend6qTrbOw17P7tye6S71vwJPDs8bPyfPNH9BL02PWl9m/3OfgD+Mf5kfpb+yP77fy2/YD+Sf8W
-//8AAACDAXgCegM7A7oEfQU/Bb8GgQeFCEYIxQmGCocLigxKDMsNjQ6ND44QTxDPEZASkhOTFJMVVBXU
-FpYXlhiYGZoamxubHJwdXB3dHp8foCChIaEioSOjJKQlpSamJ6coqCmpKmkq6iuqLKwtrS6uL68wsDGx
-MrIzszS0NbY2tje2OHg4+Dm6Oro7uzy8Pb0+fj7+P79AwEHBQsJDw0SERQRFxUbGR8dIyEnJSspLi0wM
-TMxNzU7OT89QkFEQUdFS0lPTVNRV1laWVxZX11jYWdla2lubXBtc3F3dXt9f4GDgYaFiIWLiY+Nk5GXl
-ZqZnJmfnaOhp6Wrqa6tsLGzsbe1u7m/vcPBx8XLyc/N09HX1dvZ393i4eTh5+Xr6e/t8/H39fv5//4EA
-ggKDAoQDhQSGBYcHiAeJCInJikqLC4wMjQyODY8PkBCREZIRkxKUE5UUlhaXF5gYmRiaGZsanBydHJ4d
-nx6gH6EgoiGi4qNjpCOlJKYmpyaoJ6koqimrKqwsrS2uLq8vsDCxMbIxszK0M7U0tjW3N7g3uTi6Obs7
-vDu9PL4+vz7AP8FAwkHDQsRDxUXGRsdGyEfJSMpJy0vMds4iz07QUNFQ0lHTfdUq1lbXV9iC2i/bWtyG
-3jPfieE14ozkZOY755Hpaetq7Wzvb/GK9Fr2j/mL/VL//wAAbmRpbgAAAAAAAAY2AACWKwAAVpoAAFOi
-AACGKwAAJ18AABaoAABQDQAAVDkAAgUeAAI9cAABSj0AAwEAAAIAAAABABAAHQAuAEIAWQBzAJAAsAD4
-ASABSwF4AagBzgHnAg8CRwKBAr0C/AM9A4EDxgP8BCEEWQSmBPUFRgWFBa8F7wZHBqEG5gcVB1wHvQgH
-CDkIhAjrCToJbwnACi0KgAq4Cw4LgQvZDBQMbgzoDUUNgw3hDmEOwg8DD2YP7BBREJYQ/RGJEfISOhKl
-EzcTpRPvFF8U9xVpFbYWKxbHF2YYBxiqGSUZdxn0Gp0bRxvzHKAdJB18HgEetR9qICEg2iGUIiIigCMP
-I88kkSVVJhom4ierKEMoqSlCKhEq4SuzLIctXC4zLwwv5zDEMaIygjNkNEc1LDYTNvw35jiXOQ45wDqw
-O6E8lD2IPn8/d0BxQWxCaUNoRGhFa0ZuR3RIe0mESo9Lm0ypTbhOyU/cUPFSB1MeVDhVU1ZwV45YrlnQ
-WvNcGF0+XmZfkGC7YehjF2RHZXlmrGkYalBrimzFbgJvQXCBccNzBnRLdZJ4JHlverx8Cn1afqx//4FU
-hAKFXIa3iBOJcYrRjZWO+ZBfkcaTL5Sal3OY45pTm8WerqAloZ2jF6YQp46pDqqPrZevHbCksi21RLbR
-uGG58b0XvqzAQsN0xQ/GrMhKy4rNLc7R0HbTxtVw1xvYyNwm3djfiuE/5KzmZOgf6drtVu8W8NfymvRf
-9+z5tft//xj//wAAAAIACgAXACkAPwBYAHUAlQC4AN4BBwEwAV8BjgG/AfMCKgJfApoC1AMPA00DjAPN
-BA0ETwSVBNsFIAVpBbAF+AZDBo8G2QclB3UHwwgSCGQIuAkLCVwJrgoECl4KtAsKC2MLvwwVDHAMzQ0q
-DY0N7A5MDq8PDQ9vD9YQQBCkEQ4RdhHbEkYSsRMgE5IT/hRzFO0VahXqFmwW8hd0F/YYehkBGYwaGhqq
-GzkbxhxWHOkdgB4ZHrYfUR/qIIYhJiHIIm4jFyO+JGMlDCXBJm4nHyfSKIkpQin9KrsrfCw9LPctvy6I
-L1QwITDvMb8ykTNqNEQ1HjX7NtU3uTidOYE6ZztXPD09Lz4hPxJABEEDQfJC8UPvROtF5kbzR+tI9UoC
-SxRMF00xTj5PT1BSUWtSeVObVLJVzFbbV/xZFFovW05ccV2ZXsVf52EJYjBjaGSaZb9m8GgpaWVql2vV
-bRtuVW+bcOhyKHN2dMl2HXdzeMp6I3uOfOp+WX/IgTaCpYQShY6HEoiWihiLm401js6QZZH6k42VN5bl
-mJ6aapxVnimgBaHso8KltaeZqYarY61cr0axOLM0tS63LbkouyW9KL8wwT/DSMVRx2zJccuRzaDPvNHe
-0//WH9g92mTci9664OzjGeVC54DpqOvk7hrwZvKe9Ob3KPlu+7b+Af//AAAABgAQAB0AQgBZAJAAsADS
-ASABSwF4AagCDwJHAoECvQM9A4EDxgQPBFkE9QVGBZoF7wZHBqEG/gdcCB8IhAjrCVQJwAotCpwLDguB
-C/cMbgzoDWQOYQ7jD2YP7BBzEP0RiRIWEqUTNxPKFF8U9xWQFscXZhgHGKoZThn0G0cb8xygHVAeAR61
-ICEg2iGUIlEjDyPPJJEmGibiJ6sodilCKuErsyyHLVwuMy8MMMQxojKCM2Q0RzYTNvw35jjSOcA6sDyU
-PYg+fz93QHFCaUNoRGhFa0ZuSHtJhEqPS5tMqU24TslP3FDxUgdTHlQ4VVNXjliuWdBa81wYXT5eZl+Q
-YLth6GMXZEdleWasZ+FpGGpQbMVuAm9BcIFxw3MGdEt1knbaeCR5b3q8fAp9Wn6sf/+BVIKqhAKFXIa3
-iBOJcYrRjDKO+ZBfkcaTL5SalgaXc5jjmlObxZ05nq6gJaGdoxekk6YQp46pDqqPrBKtl68dsKSyLbO4
-tUS20bhhufG7g70XvqzAQsHaw3TFD8asyErJ6cuKzMTNls7R0HbSHdPG1XDWsNeG2Mjadtwm3WveRN+K
-4T/ih+Ni5Kzl9ubT6B/pa+pJ6yjsB+1W7qbvhvBn8UjyKvML8+700PWz9pb3VPfs+IT5Qvon+ub7f/wY
-/J79Ef2E/ff+pP+L//8AAGRlc2MAAAAAAAAACkNvbG9yIExDRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABtbHVj
-AAAAAAAAABIAAAAMbmJOTwAAABIAAADocHRQVAAAABYAAAD6c3ZTRQAAABAAAAEQZmlGSQAAABAAAAEg
-ZGFESwAAABwAAAEwemhDTgAAAAwAAAFMZnJGUgAAABIAAAFYamFKUAAAAA4AAAFqZW5VUwAAABIAAAF4
-cGxQTAAAABIAAAGKcHRCUgAAABgAAAGcZXNFUwAAABIAAAG0emhUVwAAAA4AAAHGcnVSVQAAACQAAAHU
-a29LUgAAAAwAAAH4ZGVERQAAABAAAAIEbmxOTAAAABYAAAIUaXRJVAAAABQAAAIqAEYAYQByAGcAZQAt
-AEwAQwBEAEwAQwBEACAAYQAgAEMAbwByAGUAcwBGAOQAcgBnAC0ATABDAEQAVgDkAHIAaQAtAEwAQwBE
-AEwAQwBEAC0AZgBhAHIAdgBlAHMAawDmAHIAbV9pgnIAIABMAEMARADJAGMAcgBhAG4AIABMAEMARDCr
-MOkw/AAgAEwAQwBEAEMAbwBsAG8AcgAgAEwAQwBEAEsAbwBsAG8AcgAgAEwAQwBEAEwAQwBEACAAQwBv
-AGwAbwByAGkAZABvAEwAQwBEACAAYwBvAGwAbwByX2mCcm2yZnaYb3k6VmgEJgQyBDUEQgQ9BD4EOQAg
-BBYEGgAtBDQEOARBBD8EOwQ1BDnO7LfsACAATABDAEQARgBhAHIAYgAtAEwAQwBEAEsAbABlAHUAcgBl
-AG4ALQBMAEMARABMAEMARAAgAGMAbwBsAG8AcgBpAABtbW9kAAAAAAAABhAAAJxXAAAAAL/4e4AAAAAA
-AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
+																		<bytes key="NS.bytes">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</bytes>
 																	</object>
 																	<string key="NSCacheWindowColorSpace">NSCalibratedRGBColorSpace</string>
 																	<int key="NSCacheWindowBPS">8</int>
@@ -3845,7 +3797,6 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 												</object>
 												<int key="NSResizingMask">1</int>
 												<bool key="NSIsResizeable">YES</bool>
-												<bool key="NSIsEditable">YES</bool>
 												<reference key="NSTableView" ref="638525082"/>
 											</object>
 										</object>
@@ -9510,8 +9461,76 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>-3.ImportedFromIB2</string>
 					<string>115.IBPluginDependency</string>
 					<string>115.ImportedFromIB2</string>
+					<string>1201.IBPluginDependency</string>
+					<string>1202.IBPluginDependency</string>
+					<string>1203.IBPluginDependency</string>
+					<string>1204.IBPluginDependency</string>
+					<string>1205.IBPluginDependency</string>
+					<string>1206.IBPluginDependency</string>
+					<string>1207.IBPluginDependency</string>
+					<string>1208.IBPluginDependency</string>
+					<string>1209.IBPluginDependency</string>
+					<string>1210.IBPluginDependency</string>
+					<string>1211.IBPluginDependency</string>
+					<string>1212.IBPluginDependency</string>
+					<string>1213.IBPluginDependency</string>
+					<string>1214.IBPluginDependency</string>
+					<string>1215.IBPluginDependency</string>
+					<string>1216.IBPluginDependency</string>
+					<string>1217.IBPluginDependency</string>
+					<string>1218.IBPluginDependency</string>
+					<string>1219.IBPluginDependency</string>
+					<string>1220.IBPluginDependency</string>
+					<string>1226.IBPluginDependency</string>
+					<string>1227.IBPluginDependency</string>
+					<string>1228.IBPluginDependency</string>
+					<string>1229.IBPluginDependency</string>
+					<string>1230.IBPluginDependency</string>
+					<string>1231.IBPluginDependency</string>
+					<string>1232.IBPluginDependency</string>
+					<string>1233.IBPluginDependency</string>
+					<string>1234.IBPluginDependency</string>
+					<string>1235.IBPluginDependency</string>
+					<string>1236.IBPluginDependency</string>
+					<string>1238.IBPluginDependency</string>
+					<string>1239.IBPluginDependency</string>
+					<string>1240.IBPluginDependency</string>
+					<string>1241.IBPluginDependency</string>
+					<string>1242.IBPluginDependency</string>
+					<string>1243.IBPluginDependency</string>
+					<string>1244.IBPluginDependency</string>
+					<string>1245.IBPluginDependency</string>
+					<string>1246.IBPluginDependency</string>
+					<string>1247.IBPluginDependency</string>
+					<string>1248.IBPluginDependency</string>
+					<string>1249.IBPluginDependency</string>
+					<string>1250.IBPluginDependency</string>
+					<string>1253.IBPluginDependency</string>
+					<string>1254.IBPluginDependency</string>
+					<string>1255.IBPluginDependency</string>
+					<string>1264.IBPluginDependency</string>
+					<string>1265.IBPluginDependency</string>
+					<string>1266.IBPluginDependency</string>
+					<string>1267.IBPluginDependency</string>
+					<string>1268.IBPluginDependency</string>
+					<string>1269.IBPluginDependency</string>
+					<string>1270.IBPluginDependency</string>
+					<string>1271.IBPluginDependency</string>
+					<string>1272.IBPluginDependency</string>
+					<string>1273.IBPluginDependency</string>
+					<string>1274.IBPluginDependency</string>
+					<string>1275.IBPluginDependency</string>
+					<string>1276.IBPluginDependency</string>
+					<string>1277.IBPluginDependency</string>
+					<string>1278.IBPluginDependency</string>
+					<string>1279.IBPluginDependency</string>
+					<string>1280.IBPluginDependency</string>
+					<string>1281.IBPluginDependency</string>
+					<string>1282.IBPluginDependency</string>
+					<string>1283.IBPluginDependency</string>
 					<string>1293.IBPluginDependency</string>
 					<string>1293.ImportedFromIB2</string>
+					<string>1294.IBPluginDependency</string>
 					<string>1296.IBPluginDependency</string>
 					<string>1296.ImportedFromIB2</string>
 					<string>1297.IBPluginDependency</string>
@@ -9524,21 +9543,29 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>1300.ImportedFromIB2</string>
 					<string>1301.IBPluginDependency</string>
 					<string>1301.ImportedFromIB2</string>
+					<string>1302.IBPluginDependency</string>
+					<string>1303.IBPluginDependency</string>
 					<string>1304.IBEditorWindowLastContentRect</string>
 					<string>1304.IBPluginDependency</string>
 					<string>1304.ImportedFromIB2</string>
 					<string>1305.IBPluginDependency</string>
 					<string>1305.ImportedFromIB2</string>
+					<string>1306.IBPluginDependency</string>
+					<string>1307.IBPluginDependency</string>
 					<string>1308.IBPluginDependency</string>
 					<string>1308.ImportedFromIB2</string>
 					<string>1309.IBPluginDependency</string>
 					<string>1309.ImportedFromIB2</string>
+					<string>1310.IBPluginDependency</string>
 					<string>1334.IBPluginDependency</string>
 					<string>1334.ImportedFromIB2</string>
+					<string>1335.IBPluginDependency</string>
 					<string>1337.IBPluginDependency</string>
 					<string>1337.ImportedFromIB2</string>
+					<string>1338.IBPluginDependency</string>
 					<string>1339.IBPluginDependency</string>
 					<string>1339.ImportedFromIB2</string>
+					<string>1340.IBPluginDependency</string>
 					<string>1361.IBEditorWindowLastContentRect</string>
 					<string>1361.IBPluginDependency</string>
 					<string>1361.ImportedFromIB2</string>
@@ -9575,18 +9602,35 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>1435.ImportedFromIB2</string>
 					<string>1436.IBPluginDependency</string>
 					<string>1437.IBPluginDependency</string>
+					<string>1438.IBPluginDependency</string>
+					<string>1439.IBPluginDependency</string>
+					<string>1440.IBPluginDependency</string>
+					<string>1441.IBPluginDependency</string>
+					<string>1442.IBPluginDependency</string>
+					<string>1443.IBPluginDependency</string>
+					<string>1444.IBPluginDependency</string>
 					<string>1445.IBPluginDependency</string>
 					<string>1445.ImportedFromIB2</string>
+					<string>1446.IBPluginDependency</string>
+					<string>1447.IBPluginDependency</string>
+					<string>1448.IBPluginDependency</string>
 					<string>1449.IBPluginDependency</string>
 					<string>1449.ImportedFromIB2</string>
+					<string>1450.IBPluginDependency</string>
+					<string>1451.IBPluginDependency</string>
+					<string>1452.IBPluginDependency</string>
+					<string>1453.IBPluginDependency</string>
+					<string>1454.IBPluginDependency</string>
 					<string>146.IBPluginDependency</string>
 					<string>146.ImportedFromIB2</string>
 					<string>147.IBPluginDependency</string>
 					<string>147.ImportedFromIB2</string>
 					<string>1473.IBPluginDependency</string>
 					<string>1473.ImportedFromIB2</string>
+					<string>1474.IBPluginDependency</string>
 					<string>1476.IBPluginDependency</string>
 					<string>1476.ImportedFromIB2</string>
+					<string>1477.IBPluginDependency</string>
 					<string>1481.IBEditorWindowLastContentRect</string>
 					<string>1481.IBPluginDependency</string>
 					<string>1481.ImportedFromIB2</string>
@@ -9598,10 +9642,14 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>1492.CustomClassName</string>
 					<string>1492.IBPluginDependency</string>
 					<string>1492.ImportedFromIB2</string>
+					<string>1493.IBPluginDependency</string>
+					<string>1494.IBPluginDependency</string>
 					<string>1495.IBPluginDependency</string>
 					<string>1495.ImportedFromIB2</string>
+					<string>1502.IBPluginDependency</string>
 					<string>1504.IBPluginDependency</string>
 					<string>1504.ImportedFromIB2</string>
+					<string>1505.IBPluginDependency</string>
 					<string>1509.IBPluginDependency</string>
 					<string>1510.IBPluginDependency</string>
 					<string>1518.IBPluginDependency</string>
@@ -9623,6 +9671,7 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>154.ImportedFromIB2</string>
 					<string>1541.IBPluginDependency</string>
 					<string>1541.ImportedFromIB2</string>
+					<string>1542.IBPluginDependency</string>
 					<string>155.IBPluginDependency</string>
 					<string>155.ImportedFromIB2</string>
 					<string>1552.IBPluginDependency</string>
@@ -9630,9 +9679,11 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>1554.CustomClassName</string>
 					<string>1554.IBPluginDependency</string>
 					<string>1554.ImportedFromIB2</string>
+					<string>1555.IBPluginDependency</string>
 					<string>1556.CustomClassName</string>
 					<string>1556.IBPluginDependency</string>
 					<string>1556.ImportedFromIB2</string>
+					<string>1557.IBPluginDependency</string>
 					<string>156.IBPluginDependency</string>
 					<string>156.ImportedFromIB2</string>
 					<string>157.IBPluginDependency</string>
@@ -9645,8 +9696,10 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>159.CustomClassName</string>
 					<string>159.IBPluginDependency</string>
 					<string>159.ImportedFromIB2</string>
+					<string>1590.IBPluginDependency</string>
 					<string>1598.IBPluginDependency</string>
 					<string>1598.ImportedFromIB2</string>
+					<string>1599.IBPluginDependency</string>
 					<string>1603.IBPluginDependency</string>
 					<string>1604.IBPluginDependency</string>
 					<string>1605.CustomClassName</string>
@@ -9661,13 +9714,18 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>1609.IBPluginDependency</string>
 					<string>1610.IBPluginDependency</string>
 					<string>1611.IBPluginDependency</string>
+					<string>1612.IBPluginDependency</string>
+					<string>1613.IBPluginDependency</string>
+					<string>1614.IBPluginDependency</string>
 					<string>163.IBPluginDependency</string>
 					<string>163.ImportedFromIB2</string>
 					<string>1644.IBPluginDependency</string>
 					<string>1644.ImportedFromIB2</string>
+					<string>1645.IBPluginDependency</string>
 					<string>1657.CustomClassName</string>
 					<string>1657.IBPluginDependency</string>
 					<string>1657.ImportedFromIB2</string>
+					<string>1658.IBPluginDependency</string>
 					<string>1660.IBPluginDependency</string>
 					<string>1661.IBPluginDependency</string>
 					<string>1663.IBPluginDependency</string>
@@ -9679,22 +9737,27 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>1668.IBPluginDependency</string>
 					<string>1703.IBPluginDependency</string>
 					<string>1703.ImportedFromIB2</string>
+					<string>1704.IBPluginDependency</string>
 					<string>1705.IBPluginDependency</string>
 					<string>1705.ImportedFromIB2</string>
 					<string>1706.CustomClassName</string>
 					<string>1706.IBPluginDependency</string>
 					<string>1706.ImportedFromIB2</string>
+					<string>1707.IBPluginDependency</string>
 					<string>1717.IBPluginDependency</string>
 					<string>1718.IBPluginDependency</string>
 					<string>1733.CustomClassName</string>
 					<string>1733.IBPluginDependency</string>
 					<string>1733.ImportedFromIB2</string>
+					<string>1734.IBPluginDependency</string>
 					<string>1738.IBPluginDependency</string>
 					<string>1738.ImportedFromIB2</string>
+					<string>1739.IBPluginDependency</string>
 					<string>1741.IBPluginDependency</string>
 					<string>1742.IBPluginDependency</string>
 					<string>1747.IBPluginDependency</string>
 					<string>1747.ImportedFromIB2</string>
+					<string>1748.IBPluginDependency</string>
 					<string>1760.IBEditorWindowLastContentRect</string>
 					<string>1760.IBPluginDependency</string>
 					<string>1771.IBPluginDependency</string>
@@ -9705,6 +9768,7 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>1774.IBPluginDependency</string>
 					<string>1775.IBPluginDependency</string>
 					<string>1776.IBPluginDependency</string>
+					<string>1777.IBPluginDependency</string>
 					<string>1779.IBPluginDependency</string>
 					<string>1780.IBPluginDependency</string>
 					<string>1782.IBPluginDependency</string>
@@ -9748,7 +9812,6 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>229.IBPluginDependency</string>
 					<string>229.ImportedFromIB2</string>
 					<string>23.IBEditorWindowLastContentRect</string>
-					<string>23.IBPluginDependency</string>
 					<string>23.IBWindowTemplateEditedContentRect</string>
 					<string>23.ImportedFromIB2</string>
 					<string>23.editorWindowContentRectSynchronizationRect</string>
@@ -9924,7 +9987,75 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -9937,21 +10068,29 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{597, 478}, {130, 23}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{38, 470}, {535, 298}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
@@ -9989,7 +10128,24 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -9997,9 +10153,9 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{273, 377}, {535, 443}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
@@ -10012,9 +10168,13 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10037,7 +10197,34 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>ColorTextField</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>ColorTextField</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>ColorTextField</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>ColorTextField</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>ColorTextField</string>
@@ -10049,38 +10236,21 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>ColorTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
-					<string>ColorTextField</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>ColorTextField</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
-					<string>ColorTextField</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
-					<string>ColorTextField</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10093,27 +10263,33 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>ColorTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>ColorTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="761722050"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
-					<string>{{219, 539}, {535, 206}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{179, 539}, {535, 206}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="8"/>
 					<reference ref="761722050"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10161,7 +10337,6 @@ AAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMDgAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="761722050"/>
 					<string>{{108, 632}, {535, 107}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{108, 632}, {535, 107}}</string>
 					<reference ref="761722050"/>
 					<string>{{127, 767}, {539, 107}}</string>
