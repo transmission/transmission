@@ -2220,6 +2220,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
+    #warning streamline?
     if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)
     {
         for (NSInteger i = [menu numberOfItems]-1; i >= 0; i--)

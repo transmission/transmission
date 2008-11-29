@@ -208,6 +208,7 @@ GroupsController * fGroupsInstance = nil;
     [self saveGroups];
 }
 
+#warning rework for single row?
 - (NSIndexSet *) moveGroupsAtRowIndexes: (NSIndexSet *) indexes toRow: (NSInteger) newRow oldSelected: (NSIndexSet *) selectedIndexes
 {
     NSArray * selectedGroups = [fGroups objectsAtIndexes: selectedIndexes];
