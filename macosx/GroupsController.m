@@ -196,7 +196,7 @@ GroupsController * fGroupsInstance = nil;
 - (void) removeGroupWithRowIndex: (NSInteger) row
 {
     NSInteger index = [[[fGroups objectAtIndex: row] objectForKey: @"Index"] intValue];
-    [fGroups removeObjectAtIndex: index];
+    [fGroups removeObjectAtIndex: row];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"GroupValueRemoved" object: self userInfo:
         [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: index] forKey: @"Index"]];

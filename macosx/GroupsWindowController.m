@@ -57,7 +57,11 @@
 
     [fAddRemoveControl setEnabled: NO forSegment: REMOVE_TAG];
     [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
-    [self updateSelectedColor];
+    
+    if ([fTableView numberOfRows] > 0)
+        [fTableView selectRow: 0 byExtendingSelection: NO];
+    else
+        [self updateSelectedColor]; //make sure all fields are disabled
 }
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableview
@@ -80,26 +84,6 @@
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
     [self updateSelectedColor];
-}
-
-- (void) updateSelectedColor
-{
-    [fAddRemoveControl setEnabled: [fTableView numberOfSelectedRows] > 0 forSegment: REMOVE_TAG];
-    if ([fTableView numberOfSelectedRows] == 1)
-    {
-        NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
-        [fSelectedColorView setColor: [[GroupsController groups] colorForIndex: index]];
-        [fSelectedColorView setEnabled: YES];
-        [fSelectedColorNameField setStringValue: [[GroupsController groups] nameForIndex: index]];
-        [fSelectedColorNameField setEnabled: YES];
-    }
-    else
-    {
-        [fSelectedColorView setColor: [NSColor whiteColor]];
-        [fSelectedColorView setEnabled: NO];
-        [fSelectedColorNameField setStringValue: @""];
-        [fSelectedColorNameField setEnabled: NO];
-    }
 }
 
 - (void) observeValueForKeyPath: (NSString *) keyPath ofObject: (id) object change: (NSDictionary *) change context: (void *) context
@@ -171,7 +155,7 @@
             [fTableView reloadData];
             
             row = [fTableView numberOfRows]-1;
-            [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
+            [fTableView selectRow: row byExtendingSelection: NO];
             [fTableView scrollRowToVisible: row];
             
             break;
@@ -184,12 +168,41 @@
                 && row == [[GroupsController groups] rowValueForIndex: fCurrentColorIndex])
                 [[NSColorPanel sharedColorPanel] close];
             
-            [[GroupsController groups] removeGroupWithRowIndex: row];
-            
-            [fTableView deselectAll: self];
+            [[GroupsController groups] removeGroupWithRowIndex: row];            
+                        
             [fTableView reloadData];
             
+            //select the next row
+            if (row == [fTableView numberOfRows])
+                row--;
+            if (row >= 0)
+                [fTableView selectRow: row byExtendingSelection: NO];
+            
             break;
+    }
+}
+
+@end
+
+@implementation GroupsWindowController (Private)
+
+- (void) updateSelectedColor
+{
+    [fAddRemoveControl setEnabled: [fTableView numberOfSelectedRows] > 0 forSegment: REMOVE_TAG];
+    if ([fTableView numberOfSelectedRows] == 1)
+    {
+        NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+        [fSelectedColorView setColor: [[GroupsController groups] colorForIndex: index]];
+        [fSelectedColorView setEnabled: YES];
+        [fSelectedColorNameField setStringValue: [[GroupsController groups] nameForIndex: index]];
+        [fSelectedColorNameField setEnabled: YES];
+    }
+    else
+    {
+        [fSelectedColorView setColor: [NSColor whiteColor]];
+        [fSelectedColorView setEnabled: NO];
+        [fSelectedColorNameField setStringValue: @""];
+        [fSelectedColorNameField setEnabled: NO];
     }
 }
 
