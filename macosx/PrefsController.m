@@ -43,11 +43,11 @@
 
 #define TOOLBAR_GENERAL     @"TOOLBAR_GENERAL"
 #define TOOLBAR_TRANSFERS   @"TOOLBAR_TRANSFERS"
+#define TOOLBAR_GROUPS      @"TOOLBAR_GROUPS"
 #define TOOLBAR_BANDWIDTH   @"TOOLBAR_BANDWIDTH"
 #define TOOLBAR_PEERS       @"TOOLBAR_PEERS"
 #define TOOLBAR_NETWORK     @"TOOLBAR_NETWORK"
 #define TOOLBAR_REMOTE      @"TOOLBAR_REMOTE"
-#define TOOLBAR_GROUPS      @"TOOLBAR_GROUPS"
 
 #define PROXY_KEYCHAIN_SERVICE  "Transmission:Proxy"
 #define PROXY_KEYCHAIN_NAME     "Proxy"
@@ -264,6 +264,14 @@ tr_handle * fHandle;
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
     }
+    else if ([ident isEqualToString: TOOLBAR_GROUPS])
+    {
+        [item setLabel: NSLocalizedString(@"Groups", "Preferences -> toolbar item title")];
+        [item setImage: [NSImage imageNamed: @"Groups.png"]];
+        [item setTarget: self];
+        [item setAction: @selector(setPrefView:)];
+        [item setAutovalidates: NO];
+    }
     else if ([ident isEqualToString: TOOLBAR_BANDWIDTH])
     {
         [item setLabel: NSLocalizedString(@"Bandwidth", "Preferences -> toolbar item title")];
@@ -284,14 +292,6 @@ tr_handle * fHandle;
     {
         [item setLabel: NSLocalizedString(@"Network", "Preferences -> toolbar item title")];
         [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNameNetwork : @"Network.png"]];
-        [item setTarget: self];
-        [item setAction: @selector(setPrefView:)];
-        [item setAutovalidates: NO];
-    }
-    else if ([ident isEqualToString: TOOLBAR_GROUPS])
-    {
-        [item setLabel: NSLocalizedString(@"Groups", "Preferences -> toolbar item title")];
-        [item setImage: [NSImage imageNamed: @"Groups.png"]]; // FIXME needs toolbar icon
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
@@ -325,8 +325,8 @@ tr_handle * fHandle;
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
-    return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_BANDWIDTH,
-                                        TOOLBAR_PEERS, TOOLBAR_NETWORK, TOOLBAR_REMOTE, TOOLBAR_GROUPS, nil];
+    return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_GROUPS, TOOLBAR_BANDWIDTH,
+                                        TOOLBAR_PEERS, TOOLBAR_NETWORK, TOOLBAR_REMOTE, nil];
 }
 
 - (void) setPort: (id) sender
@@ -1072,24 +1072,35 @@ tr_handle * fHandle;
 
 - (void) setPrefView: (id) sender
 {
-    NSView * view = fGeneralView;
+    NSString * identifier;
     if (sender)
     {
-        NSString * identifier = [sender itemIdentifier];
-        if ([identifier isEqualToString: TOOLBAR_TRANSFERS])
-            view = fTransfersView;
-        else if ([identifier isEqualToString: TOOLBAR_BANDWIDTH])
-            view = fBandwidthView;
-        else if ([identifier isEqualToString: TOOLBAR_PEERS])
-            view = fPeersView;
-        else if ([identifier isEqualToString: TOOLBAR_NETWORK])
-            view = fNetworkView;
-        else if ([identifier isEqualToString: TOOLBAR_REMOTE])
-            view = fRemoteView;
-        else if ([identifier isEqualToString: TOOLBAR_GROUPS])
-            view = fGroupsView;
-        else; //general view already selected
+        identifier = [sender itemIdentifier];
+        [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"SelectedPrefView"];
     }
+    else
+        identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"SelectedPrefView"];
+    
+    NSView * view;
+    if ([identifier isEqualToString: TOOLBAR_TRANSFERS])
+        view = fTransfersView;
+    else if ([identifier isEqualToString: TOOLBAR_GROUPS])
+        view = fGroupsView;
+    else if ([identifier isEqualToString: TOOLBAR_BANDWIDTH])
+        view = fBandwidthView;
+    else if ([identifier isEqualToString: TOOLBAR_PEERS])
+        view = fPeersView;
+    else if ([identifier isEqualToString: TOOLBAR_NETWORK])
+        view = fNetworkView;
+    else if ([identifier isEqualToString: TOOLBAR_REMOTE])
+        view = fRemoteView;
+    else
+    {
+        identifier = TOOLBAR_GENERAL; //general view is the default selected
+        view = fGeneralView;
+    }
+    
+    [[[self window] toolbar] setSelectedItemIdentifier: identifier];
     
     NSWindow * window = [self window];
     if ([window contentView] == view)
