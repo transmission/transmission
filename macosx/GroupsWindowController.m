@@ -157,6 +157,8 @@
             [fTableView selectRow: row byExtendingSelection: NO];
             [fTableView scrollRowToVisible: row];
             
+            [[fSelectedColorNameField window] makeFirstResponder: fSelectedColorNameField];
+            
             break;
         
         case REMOVE_TAG:
@@ -165,8 +167,9 @@
                         
             [fTableView reloadData];
             
-            if ([fTableView numberOfRows] > 0)
-                [fTableView scrollRowToVisible: [fTableView selectedRow]];
+            NSInteger selectedRow = [fTableView selectedRow];
+            if (selectedRow != -1)
+                [fTableView scrollRowToVisible: selectedRow];
             
             break;
     }
