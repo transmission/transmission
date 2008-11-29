@@ -84,7 +84,6 @@ struct tr_peerIo
     tr_bool                  isIncoming;
     tr_bool                  peerIdIsSet;
     tr_bool                  extendedProtocolSupported;
-    tr_bool                  fastPeersSupported;
 
     int                      magicNumber;
 
@@ -499,30 +498,12 @@ tr_peerIoEnableLTEP( tr_peerIo * io,
     io->extendedProtocolSupported = flag;
 }
 
-void
-tr_peerIoEnableFEXT( tr_peerIo * io,
-                     int         flag )
-{
-    assert( isPeerIo( io ) );
-    assert( flag == 0 || flag == 1 );
-
-    io->fastPeersSupported = flag;
-}
-
 int
 tr_peerIoSupportsLTEP( const tr_peerIo * io )
 {
     assert( isPeerIo( io ) );
 
     return io->extendedProtocolSupported;
-}
-
-int
-tr_peerIoSupportsFEXT( const tr_peerIo * io )
-{
-    assert( isPeerIo( io ) );
-
-    return io->fastPeersSupported;
 }
 
 /**

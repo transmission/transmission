@@ -455,54 +455,6 @@ torrentConstructor( tr_peerMgr * manager,
     return t;
 }
 
-/**
- * For explanation, see http://www.bittorrent.org/fast_extensions.html
- * Also see the "test-allowed-set" unit test
- *
- * @param k number of pieces in set
- * @param sz number of pieces in the torrent
- * @param infohash torrent's SHA1 hash
- * @param ip peer's address
- */
-struct tr_bitfield *
-tr_peerMgrGenerateAllowedSet(
-    const uint32_t         k,
-    const uint32_t         sz,
-    const                  uint8_t        *
-                           infohash,
-    const struct in_addr * ip )
-{
-    uint8_t       w[SHA_DIGEST_LENGTH + 4];
-    uint8_t       x[SHA_DIGEST_LENGTH];
-    tr_bitfield * a;
-    uint32_t      a_size;
-
-    *(uint32_t*)w = ntohl( htonl( ip->s_addr ) & 0xffffff00 );   /* (1) */
-    memcpy( w + 4, infohash, SHA_DIGEST_LENGTH );              /* (2) */
-    tr_sha1( x, w, sizeof( w ), NULL );                        /* (3) */
-
-    a = tr_bitfieldNew( sz );
-    a_size = 0;
-
-    while( a_size < k )
-    {
-        int i;
-        for( i = 0; i < 5 && a_size < k; ++i )                      /* (4) */
-        {
-            uint32_t j = i * 4;                                /* (5) */
-            uint32_t y = ntohl( *( uint32_t* )( x + j ) );             /* (6) */
-            uint32_t index = y % sz;                           /* (7) */
-            if( !tr_bitfieldHas( a, index ) )                  /* (8) */
-            {
-                tr_bitfieldAdd( a, index );                    /* (9) */
-                ++a_size;
-            }
-        }
-        tr_sha1( x, x, sizeof( x ), NULL );                    /* (3) */
-    }
-
-    return a;
-}
 
 static int bandwidthPulse( void * vmgr );
 

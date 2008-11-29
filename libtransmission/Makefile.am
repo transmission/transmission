@@ -110,7 +110,6 @@ TESTS = \
     clients-test \
     json-test \
     rpc-test \
-    test-fastset \
     test-peer-id \
     utils-test
 
@@ -150,10 +149,6 @@ json_test_LDFLAGS = ${apps_ldflags}
 rpc_test_SOURCES = rpc-test.c
 rpc_test_LDADD = ${apps_ldadd}
 rpc_test_LDFLAGS = ${apps_ldflags}
-
-test_fastset_SOURCES = test-fastset.c
-test_fastset_LDADD = ${apps_ldadd}
-test_fastset_LDFLAGS = ${apps_ldflags}
 
 test_peer_id_SOURCES = test-peer-id.c
 test_peer_id_LDADD = ${apps_ldadd}
