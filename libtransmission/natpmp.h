@@ -10,6 +10,10 @@
  * $Id$
  */
 
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 #ifndef TR_NATPMP_H
 #define TR_NATPMP_H 1
 

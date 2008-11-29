@@ -22,6 +22,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 #ifndef TR_FAST_RESUME_H
 #define TR_FAST_RESUME_H
 

@@ -22,6 +22,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 #ifndef _TR_PTR_ARRAY_H_
 #define _TR_PTR_ARRAY_H_
 
@@ -36,9 +40,8 @@ tr_ptrArray * tr_ptrArrayNew( void );
 
 tr_ptrArray * tr_ptrArrayDup( tr_ptrArray* );
 
-void          tr_ptrArrayForeach(
-                        tr_ptrArray*,
-    PtrArrayForeachFunc func );
+void          tr_ptrArrayForeach( tr_ptrArray         * array,
+                                  PtrArrayForeachFunc   func );
 
 void          tr_ptrArrayFree( tr_ptrArray         * array,
                                PtrArrayForeachFunc   func );

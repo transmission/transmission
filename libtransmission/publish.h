@@ -10,6 +10,10 @@
  * $Id$
  */
 
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 #ifndef _TR_PUBLISHER_H_
 #define _TR_PUBLISHER_H_
 

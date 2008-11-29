@@ -25,6 +25,10 @@
 #ifndef TR_COMPLETION_H
 #define TR_COMPLETION_H
 
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 #include "transmission.h"
 
 struct tr_bitfield;

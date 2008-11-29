@@ -10,6 +10,10 @@
  * $Id$
  */
 
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 #ifndef TR_UPNP_H
 #define TR_UPNP_H 1
 
