@@ -193,18 +193,15 @@ GroupsController * fGroupsInstance = nil;
     [self saveGroups];
 }
 
-- (void) removeGroupWithRowIndexes: (NSIndexSet *) rowIndexes
+- (void) removeGroupWithRowIndex: (NSInteger) row
 {
-    NSMutableIndexSet * indexes = [NSMutableIndexSet indexSet];
-    for (NSInteger index = [rowIndexes firstIndex]; index != NSNotFound; index = [rowIndexes indexGreaterThanIndex: index])
-        [indexes addIndex: [[[fGroups objectAtIndex: index] objectForKey: @"Index"] intValue]];
-    
-    [fGroups removeObjectsAtIndexes: rowIndexes];
+    NSInteger index = [[[fGroups objectAtIndex: row] objectForKey: @"Index"] intValue];
+    [fGroups removeObjectAtIndex: index];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"GroupValueRemoved" object: self userInfo:
-        [NSDictionary dictionaryWithObject: indexes forKey: @"Indexes"]];
+        [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: index] forKey: @"Index"]];
     
-    if ([indexes containsIndex: [[NSUserDefaults standardUserDefaults] integerForKey: @"FilterGroup"]])
+    if (index == [[NSUserDefaults standardUserDefaults] integerForKey: @"FilterGroup"])
         [[NSUserDefaults standardUserDefaults] setInteger: -2 forKey: @"FilterGroup"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];

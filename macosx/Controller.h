@@ -209,7 +209,6 @@ typedef enum
 
 - (void) setStatusLabel: (id) sender;
 
-- (void) showGroups: (id) sender;
 - (void) setGroup: (id) sender; //used by delegate-generated menu items
 - (void) setGroupFilter: (id) sender;
 - (void) updateGroupsFilterButton;

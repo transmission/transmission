@@ -1443,7 +1443,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (void) checkGroupValueForRemoval: (NSNotification *) notification
 {
-    if (fGroupValue != -1 && [[[notification userInfo] objectForKey: @"Indexes"] containsIndex: fGroupValue])
+    if (fGroupValue != -1 && [[[notification userInfo] objectForKey: @"Index"] intValue] == fGroupValue)
         fGroupValue = -1;
 }
 

@@ -236,12 +236,6 @@
     }
 }
 
-- (void) showGroupsWindow: (id) sender
-{
-    [fGroupPopUp selectItemWithTag: fGroupValue];
-    [fController showGroups: sender];
-}
-
 @end
 
 @implementation AddWindowController (Private)
@@ -288,14 +282,8 @@
 
 - (void) setGroupsMenu
 {
-    NSMenu * menu = [fGroupPopUp menu];
-    
-    for (NSInteger i = [menu numberOfItems]-1 - 2; i >= 0; i--)
-        [menu removeItemAtIndex: i];
-        
     NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(changeGroupValue:) isSmall: NO];
-    [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange:
-            NSMakeRange(0, [groupMenu numberOfItems])] atBottom: NO];
+    [fGroupPopUp setMenu: groupMenu];
 }
 
 - (void) changeGroupValue: (id) sender

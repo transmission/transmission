@@ -2218,11 +2218,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self updateUI];
 }
 
-- (void) showGroups: (id) sender
-{
-    [[GroupsWindowController groupsWindow] showWindow: self];
-}
-
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
     if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)

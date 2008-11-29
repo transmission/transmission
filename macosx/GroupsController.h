@@ -45,7 +45,7 @@
 - (void) setColor: (NSColor *) color forIndex: (NSInteger) index;
 
 - (void) addNewGroup;
-- (void) removeGroupWithRowIndexes: (NSIndexSet *) rowIndexes;
+- (void) removeGroupWithRowIndex: (NSInteger) row;
 
 - (NSIndexSet *) moveGroupsAtRowIndexes: (NSIndexSet *) indexes toRow: (NSInteger) newRow oldSelected: (NSIndexSet *) selectedIndexes;
 
