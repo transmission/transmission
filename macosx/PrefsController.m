@@ -47,6 +47,7 @@
 #define TOOLBAR_PEERS       @"TOOLBAR_PEERS"
 #define TOOLBAR_NETWORK     @"TOOLBAR_NETWORK"
 #define TOOLBAR_REMOTE      @"TOOLBAR_REMOTE"
+#define TOOLBAR_GROUPS      @"TOOLBAR_GROUPS"
 
 #define PROXY_KEYCHAIN_SERVICE  "Transmission:Proxy"
 #define PROXY_KEYCHAIN_NAME     "Proxy"
@@ -287,6 +288,14 @@ tr_handle * fHandle;
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
     }
+    else if ([ident isEqualToString: TOOLBAR_GROUPS])
+    {
+        [item setLabel: NSLocalizedString(@"Groups", "Preferences -> toolbar item title")];
+        [item setImage: [NSImage imageNamed: @"Groups.png"]]; // FIXME needs toolbar icon
+        [item setTarget: self];
+        [item setAction: @selector(setPrefView:)];
+        [item setAutovalidates: NO];
+    }
     else if ([ident isEqualToString: TOOLBAR_REMOTE])
     {
         [item setLabel: NSLocalizedString(@"Remote", "Preferences -> toolbar item title")];
@@ -317,7 +326,7 @@ tr_handle * fHandle;
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
     return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_BANDWIDTH,
-                                        TOOLBAR_PEERS, TOOLBAR_NETWORK, TOOLBAR_REMOTE, nil];
+                                        TOOLBAR_PEERS, TOOLBAR_NETWORK, TOOLBAR_REMOTE, TOOLBAR_GROUPS, nil];
 }
 
 - (void) setPort: (id) sender
@@ -1077,6 +1086,8 @@ tr_handle * fHandle;
             view = fNetworkView;
         else if ([identifier isEqualToString: TOOLBAR_REMOTE])
             view = fRemoteView;
+        else if ([identifier isEqualToString: TOOLBAR_GROUPS])
+            view = fGroupsView;
         else; //general view already selected
     }
     

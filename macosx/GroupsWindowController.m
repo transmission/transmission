@@ -33,7 +33,7 @@
 
 @interface GroupsWindowController (Private)
 
-- (void) changeColor: (id) sender;
+- (void) updateSelectedColor;
 
 @end
 
@@ -62,8 +62,10 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         [fAddRemoveControl setLabel: @"+" forSegment: ADD_TAG];
         [fAddRemoveControl setLabel: @"-" forSegment: REMOVE_TAG];
     }
-    
+
     [fAddRemoveControl setEnabled: NO forSegment: REMOVE_TAG];
+    [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
+    [self updateSelectedColor];
 }
 
 - (void) windowWillClose: (id) sender
@@ -94,28 +96,53 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 - (void) tableView: (NSTableView *) tableView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn
     row: (NSInteger) row
 {
-    NSString * identifier = [tableColumn identifier];
-    if ([identifier isEqualToString: @"Name"])
-        [[GroupsController groups] setName: object forIndex: [[GroupsController groups] indexForRow: row]];
-    else if ([identifier isEqualToString: @"Button"])
-    {
-        fCurrentColorIndex = [[GroupsController groups] indexForRow: row];
-        
-        NSColorPanel * colorPanel = [NSColorPanel sharedColorPanel];
-        [colorPanel setContinuous: YES];
-        [colorPanel setColor: [[GroupsController groups] colorForIndex: fCurrentColorIndex]];
-        
-        [colorPanel setTarget: self];
-        [colorPanel setAction: @selector(changeColor:)];
-        
-        [colorPanel orderFront: self];
-    }
-    else;
+    [[GroupsController groups] setName: object forIndex: [[GroupsController groups] indexForRow: row]];
+    [self updateSelectedColor];
 }
 
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
+    [self updateSelectedColor];
+}
+
+- (void) updateSelectedColor
+{
     [fAddRemoveControl setEnabled: [fTableView numberOfSelectedRows] > 0 forSegment: REMOVE_TAG];
+    if ([fTableView numberOfSelectedRows] == 1)
+    {
+        int index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+        [fSelectedColorView setColor: [[GroupsController groups] colorForIndex: index]];
+        [fSelectedColorView setEnabled: YES];
+        [fSelectedColorNameField setStringValue: [[GroupsController groups] nameForIndex: index]];
+        [fSelectedColorNameField setEnabled: YES];
+    }
+    else
+    {
+        [fSelectedColorView setColor: [NSColor whiteColor]];
+        [fSelectedColorView setEnabled: NO];
+        [fSelectedColorNameField setStringValue: @""];
+        [fSelectedColorNameField setEnabled: NO];
+    }
+}
+
+- (void) observeValueForKeyPath: (NSString *) keyPath ofObject: (id) object change: (NSDictionary *) change context: (void *) context
+{
+    if (object == fSelectedColorView && [fTableView numberOfSelectedRows] == 1)
+    {
+       int index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+       [[GroupsController groups] setColor: [fSelectedColorView color] forIndex: index];
+       [fTableView setNeedsDisplay: YES];
+    }
+}
+
+- (void) controlTextDidEndEditing: (NSNotification *) notification
+{
+    if ([notification object] == fSelectedColorNameField)
+    {
+       int index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+       [[GroupsController groups] setName: [fSelectedColorNameField stringValue] forIndex: index];
+       [fTableView setNeedsDisplay: YES];
+    }
 }
 
 - (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) rowIndexes toPasteboard: (NSPasteboard *) pboard
@@ -185,16 +212,6 @@ GroupsWindowController * fGroupsWindowInstance = nil;
             
             break;
     }
-}
-
-@end
-
-@implementation GroupsWindowController (Private)
-
-- (void) changeColor: (id) sender
-{
-    [[GroupsController groups] setColor: [sender color] forIndex: fCurrentColorIndex];
-    [fTableView reloadData];
 }
 
 @end

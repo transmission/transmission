@@ -2227,7 +2227,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)
     {
-        for (NSInteger i = [menu numberOfItems]-1 - 2; i >= 0; i--)
+        for (NSInteger i = [menu numberOfItems]-1; i >= 0; i--)
             [menu removeItemAtIndex: i];
         
         NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroup:) isSmall: NO];

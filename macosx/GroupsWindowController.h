@@ -28,6 +28,8 @@
 
 @interface GroupsWindowController : NSWindowController
 {
+    IBOutlet NSColorWell * fSelectedColorView;
+    IBOutlet NSTextField * fSelectedColorNameField;
     IBOutlet NSTableView * fTableView;
     IBOutlet NSSegmentedControl * fAddRemoveControl;
     
