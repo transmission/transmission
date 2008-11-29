@@ -145,6 +145,8 @@
 
 - (void) addRemoveGroup: (id) sender
 {
+    [[NSColorPanel sharedColorPanel] close];
+
     NSInteger row;
     
     switch ([[sender cell] tagForSegment: [sender selectedSegment]])
