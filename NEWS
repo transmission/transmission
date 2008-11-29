@@ -1,5 +1,22 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+
+1.41 (2008/xx/yy)
+<http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity>
+- All Platforms
+   + Fix 1.40 "jumpy upload speed" bug
+   + Fix 1.40 "Got HTTP Status Code: 0" error message.
+   + More accurate bandwidth measurement
+   + Fix autoconf/automake build warnings
+- GTK+
+   + In the Details dialog's peer tabs, rows were sometimes duplicated
+   + Three new translations: Afrikaans, Asturian, Bosnian
+   + Sixteen updated translations
+- Daemon
+   + Minor bugfixes
+   + Windows portability
+
+
 1.40 (2008/11/09)
 <http://trac.transmissionbt.com/query?milestone=1.40&group=component&groupdesc=1&order=severity>
 - All Platforms
@@ -44,10 +61,10 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - Mac
    + Fix memory leak when updating blocklist
    + Connect to the web interface when the application's path contains a space
-+ GTK+
+- GTK+
    + Minor display fixes
    + 15 updated translations + 1 new language
-+ Daemon+
+- Daemon
    + Minor display fixes
 - Web Client
    + Minor display fixes
