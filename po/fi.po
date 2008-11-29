@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: fi\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-11-02 14:16-0600\n"
-"PO-Revision-Date: 2008-10-27 08:19+0000\n"
-"Last-Translator: Ilari Oras <happo1472583@gmail.com>\n"
+"PO-Revision-Date: 2008-11-19 18:53+0000\n"
+"Last-Translator: Elias Julkunen <elias.julkunen@gmail.com>\n"
 "Language-Team: -\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-11-09 14:14+0000\n"
+"X-Launchpad-Export-Date: 2008-11-29 16:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -660,7 +660,7 @@ msgstr "Käynnistä kaikki torrentit pysäytettyinä"
 
 #: ../gtk/main.c:371
 msgid "Show version number and exit"
-msgstr ""
+msgstr "Näytä versionumero ja poistu"
 
 #: ../gtk/main.c:375
 msgid "Start minimized in system tray"
@@ -727,10 +727,12 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Elias Julkunen https://launchpad.net/~eliasj\n"
+"  Erektium https://launchpad.net/~meizinteizi\n"
 "  Ilari Oras https://launchpad.net/~ilarioras\n"
 "  Jaakko Huhtala https://launchpad.net/~jaakko-huhtala\n"
 "  Timo Jyrinki https://launchpad.net/~timo-jyrinki\n"
-"  papukaija https://launchpad.net/~papukaija"
+"  papukaija https://launchpad.net/~papukaija\n"
+"  tommi svanbäck https://launchpad.net/~svabari"
 
 #: ../gtk/makemeta-ui.c:111
 msgid "Torrent created!"
@@ -1065,11 +1067,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:537
 msgid "_Update"
-msgstr ""
+msgstr "_Päivitä"
 
 #: ../gtk/tr-prefs.c:547
 msgid "Enable _automatic updates"
-msgstr ""
+msgstr "Salli _automaattiset päivitykset"
 
 #: ../gtk/tr-prefs.c:557
 msgid "Maximum peers _overall:"
@@ -1127,7 +1129,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:878
 msgid "Addresses:"
-msgstr ""
+msgstr "Osoitteet:"
 
 #: ../gtk/tr-prefs.c:998
 msgid "Tracker Proxy"
@@ -1159,7 +1161,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1189
 msgid " and "
-msgstr ""
+msgstr " ja "
 
 #: ../gtk/tr-prefs.c:1196
 msgid "_Limit bandwidth between"
@@ -1203,7 +1205,7 @@ msgstr "Torrentit"
 
 #: ../gtk/tr-prefs.c:1397
 msgid "Desktop"
-msgstr ""
+msgstr "Työpöytä"
 
 #: ../gtk/tr-prefs.c:1403
 msgid "Network"
@@ -1236,7 +1238,7 @@ msgstr "Odotetaan paikallisen datan tarkistusta (%.1f%% testattu)"
 #: ../gtk/tr-torrent.c:286
 #, c-format
 msgid "%1$s remaining"
-msgstr ""
+msgstr "%1$s jäljellä"
 
 #: ../gtk/tr-torrent.c:299 ../libtransmission/port-forwarding.c:175
 msgid "Stopped"

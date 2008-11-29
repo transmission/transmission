@@ -10,6 +10,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Fix autoconf/automake build warnings
 - GTK+
    + In the Details dialog's peer tabs, rows were sometimes duplicated
+   + Three new translations: Afrikaans, Asturian, Bosnian
+   + Sixteen updated translations
 - Daemon
    + Minor bugfixes
    + Windows portability

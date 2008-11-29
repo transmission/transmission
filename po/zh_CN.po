@@ -5,14 +5,14 @@ msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-11-02 14:16-0600\n"
-"PO-Revision-Date: 2008-11-01 02:01+0000\n"
-"Last-Translator: rainofchaos <rainofchaos@gmail.com>\n"
+"PO-Revision-Date: 2008-11-23 07:38+0000\n"
+"Last-Translator: Aron Xu <Unknown>\n"
 "Language-Team: Chinese (China) <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2008-11-09 14:14+0000\n"
+"X-Launchpad-Export-Date: 2008-11-29 16:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -654,7 +654,7 @@ msgstr "启动时暂停所有任务"
 
 #: ../gtk/main.c:371
 msgid "Show version number and exit"
-msgstr ""
+msgstr "显示版本并退出"
 
 #: ../gtk/main.c:375
 msgid "Start minimized in system tray"
@@ -1157,7 +1157,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1189
 msgid " and "
-msgstr ""
+msgstr " 和 "
 
 #: ../gtk/tr-prefs.c:1196
 msgid "_Limit bandwidth between"

@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-11-02 14:16-0600\n"
-"PO-Revision-Date: 2008-11-04 18:41+0000\n"
-"Last-Translator: Raul Tammesalu <tammesalu@gmail.com>\n"
+"PO-Revision-Date: 2008-11-23 17:23+0000\n"
+"Last-Translator: Taavi Suisalu <Unknown>\n"
 "Language-Team: Estonian <et@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-11-09 14:14+0000\n"
+"X-Launchpad-Export-Date: 2008-11-29 16:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -120,7 +120,7 @@ msgstr "Andmete _kontrollimine kõvakettal"
 
 #: ../gtk/actions.c:135
 msgid "_Pause"
-msgstr "_Pausile"
+msgstr "_Peata"
 
 #: ../gtk/actions.c:135
 msgid "Pause torrent"

@@ -19,22 +19,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-11-09 14:13+0000\n"
+"X-Launchpad-Export-Date: 2008-11-29 16:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SPAIN\n"
 "X-Poedit-Language: Spanish\n"
 
 #: ../gtk/actions.c:47
 msgid "Sort by _Activity"
-msgstr "Ordenar por _actividad"
+msgstr "Ordenar por _Actividad"
 
 #: ../gtk/actions.c:49
 msgid "Sort by _Name"
-msgstr "Ordenar por _nombre"
+msgstr "Ordenar por _Nombre"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _Progress"
-msgstr "Ordenar por _progreso"
+msgstr "Ordenar por _Progreso"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Ratio"
@@ -42,7 +42,7 @@ msgstr "Ordenar por _ratio"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _State"
-msgstr "Ordenar por _estado"
+msgstr "Ordenar por _Estado"
 
 #: ../gtk/actions.c:57
 msgid "Sort by _Tracker"
@@ -54,7 +54,7 @@ msgstr "Ordenar por anti_güedad"
 
 #: ../gtk/actions.c:78
 msgid "_Main Window"
-msgstr "_Ventana principal"
+msgstr "_Ventana Principal"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
@@ -62,7 +62,7 @@ msgstr "_Registro de mensajes"
 
 #: ../gtk/actions.c:96
 msgid "_Minimal View"
-msgstr "_Modo reducido"
+msgstr "Vista _Mínima"
 
 #: ../gtk/actions.c:99
 msgid "_Reverse Sort Order"
@@ -118,11 +118,11 @@ msgstr "Iniciar torrent"
 
 #: ../gtk/actions.c:130
 msgid "_Statistics"
-msgstr "_Estadísticas"
+msgstr "E_stadísticas"
 
 #: ../gtk/actions.c:133 ../gtk/add-dialog.c:361
 msgid "_Verify Local Data"
-msgstr "_Verificar datos descargados"
+msgstr "_Verificar Datos Locales"
 
 #: ../gtk/actions.c:135
 msgid "_Pause"
@@ -154,11 +154,11 @@ msgstr "_Salir"
 
 #: ../gtk/actions.c:149
 msgid "Select _All"
-msgstr "Seleccionar _todo"
+msgstr "Seleccionar _Todo"
 
 #: ../gtk/actions.c:151
 msgid "Dese_lect All"
-msgstr "Dese_leccionar todo"
+msgstr "Dese_leccionar Todo"
 
 #: ../gtk/actions.c:156
 msgid "_Details"
@@ -174,7 +174,7 @@ msgstr "_Abrir carpeta"
 
 #: ../gtk/actions.c:162
 msgid "_Contents"
-msgstr "_Contenidos"
+msgstr ""
 
 #: ../gtk/actions.c:165
 msgid "Ask Tracker for _More Peers"
@@ -458,7 +458,7 @@ msgstr "Progreso:"
 #. "Have" refers to how much of the torrent we have
 #: ../gtk/details.c:1120
 msgid "Have:"
-msgstr "Completado:"
+msgstr "Tengo:"
 
 #: ../gtk/details.c:1123 ../gtk/stats.c:149 ../gtk/stats.c:161
 msgid "Downloaded:"
@@ -470,7 +470,7 @@ msgstr "Subido:"
 
 #: ../gtk/details.c:1130
 msgid "Failed DL:"
-msgstr "Datos erróneos:"
+msgstr "Descargas fallidas:"
 
 #: ../gtk/details.c:1133 ../gtk/stats.c:151 ../gtk/stats.c:163
 msgid "Ratio:"
@@ -651,7 +651,7 @@ msgstr "Descarga"
 
 #: ../gtk/file-list.c:668 ../gtk/file-list.c:850
 msgid "Priority"
-msgstr "Prioridad"
+msgstr ""
 
 #: ../gtk/file-list.c:803
 msgid "filedetails|File"
@@ -749,20 +749,24 @@ msgstr ""
 "\n"
 "Launchpad Contributions:\n"
 "  Alain Bustamante https://launchpad.net/~webmaster-inkedcity\n"
+"  Alfonso Moratalla https://launchpad.net/~vanhell\n"
+"  Alvaro.Godoy https://launchpad.net/~alvaro.godoy\n"
 "  Andres Quintero Arias https://launchpad.net/~anrras-deactivatedaccount\n"
-"  Bajalotodo https://launchpad.net/~alvaro200422\n"
 "  Chaoxic https://launchpad.net/~chaotic-harmony\n"
 "  Daniel Artamendi https://launchpad.net/~danimon\n"
 "  Dante Díaz https://launchpad.net/~dante\n"
 "  Darío Ortega https://launchpad.net/~dario.ortega\n"
+"  DiegoJ https://launchpad.net/~diegojromerolopez\n"
 "  DruiD https://launchpad.net/~kike-edf\n"
 "  Erick Aguilar Bravo https://launchpad.net/~xenokyron\n"
 "  Francisco Vila https://launchpad.net/~francisco-vila\n"
 "  Gabriel Ruiz https://launchpad.net/~anakron\n"
 "  Guillermo González Díez https://launchpad.net/~ibrotha\n"
+"  Helmy Giacoman || Eos87 https://launchpad.net/~eos87\n"
 "  J Álvaro Fernández https://launchpad.net/~jalvarof\n"
 "  Javier Aravena Claramunt https://launchpad.net/~phrodo-00\n"
 "  Jochen Schäfer https://launchpad.net/~lemecje83\n"
+"  Jorge González https://launchpad.net/~jorge-gonzalez-gonzalez\n"
 "  Jorge González https://launchpad.net/~jorgegonz\n"
 "  Jorge_C https://launchpad.net/~jorgecanardo\n"
 "  Kevin https://launchpad.net/~kevin64-deactivatedaccount\n"
@@ -777,6 +781,7 @@ msgstr ""
 "  abasfe https://launchpad.net/~abasfe\n"
 "  fosk https://launchpad.net/~oscarrdg\n"
 "  g.chavira https://launchpad.net/~g-chavira-p\n"
+"  jorge cob https://launchpad.net/~jorgecs10\n"
 "  maty1206 https://launchpad.net/~maty1206\n"
 "  miguelbf https://launchpad.net/~mbouzada"
 
@@ -843,7 +848,7 @@ msgstr "_Carpeta"
 
 #: ../gtk/makemeta-ui.c:420
 msgid "_File"
-msgstr "_Archivo"
+msgstr ""
 
 #: ../gtk/makemeta-ui.c:463
 msgid "<b>E_xtras</b>"
@@ -865,7 +870,7 @@ msgstr "No se pudo guardar el archivo \"%1$s\": %2$s"
 
 #: ../gtk/msgwin.c:149
 msgid "Save Log"
-msgstr "Guardar registro"
+msgstr "Guardar Registro"
 
 #: ../gtk/msgwin.c:192
 msgid "Error"
@@ -889,7 +894,7 @@ msgstr "Mensaje"
 
 #: ../gtk/msgwin.c:452
 msgid "Message Log"
-msgstr "Registro de mensajes"
+msgstr "Registro de Mensajes"
 
 #: ../gtk/msgwin.c:487
 msgid "Level"
@@ -905,7 +910,7 @@ msgstr "Abrir archivo"
 
 #: ../gtk/notify.c:73
 msgid "Open Folder"
-msgstr "Abrir carpeta"
+msgstr "Abrir Carpeta"
 
 #: ../gtk/stats.c:75 ../gtk/stats.c:156
 #, c-format
@@ -920,7 +925,7 @@ msgstr "Estadísticas"
 
 #: ../gtk/stats.c:145
 msgid "Current Session"
-msgstr "Sesión actual"
+msgstr "Sesión Actual"
 
 #: ../gtk/stats.c:153 ../gtk/stats.c:165
 msgid "Duration:"
@@ -1000,7 +1005,7 @@ msgstr "A la espera de verificar datos descargados"
 #: ../gtk/torrent-cell-renderer.c:152 ../gtk/tr-torrent.c:273
 #, c-format
 msgid "Verifying local data (%.1f%% tested)"
-msgstr "Verificando datos descargados (%.1f%% verificado)"
+msgstr "Verificando datos locales (%.1f%% comprobado)"
 
 #: ../gtk/torrent-cell-renderer.c:163 ../gtk/tr-window.c:736
 #: ../gtk/tr-window.c:764
@@ -1222,11 +1227,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1245
 msgid "Port is <b>open</b>"
-msgstr "Puerto <b>abierto</b>"
+msgstr "El puerto está <b>abierto</b>"
 
 #: ../gtk/tr-prefs.c:1246
 msgid "Port is <b>closed</b>"
-msgstr "Puerto <b>cerrado</b>"
+msgstr "El puerto está <b>cerrado</b>"
 
 #: ../gtk/tr-prefs.c:1293
 msgid "<i>Testing port...</i>"
@@ -1295,7 +1300,7 @@ msgstr "Torrent"
 
 #: ../gtk/tr-window.c:253
 msgid "Total Ratio"
-msgstr "Ratio total"
+msgstr "Ratio Total"
 
 #: ../gtk/tr-window.c:254
 msgid "Session Ratio"
@@ -1303,7 +1308,7 @@ msgstr "Ratio de la sesión"
 
 #: ../gtk/tr-window.c:255
 msgid "Total Transfer"
-msgstr "Transferencia total"
+msgstr "Transferencia Total"
 
 #: ../gtk/tr-window.c:256
 msgid "Session Transfer"
@@ -1449,7 +1454,7 @@ msgstr "El archivo del torrente \"%s\" encontró un error desconocido."
 
 #: ../gtk/util.c:397
 msgid "Error opening torrent"
-msgstr "Error al abrir el torrent"
+msgstr ""
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:956
@@ -1615,12 +1620,12 @@ msgstr "Reenvío de puertos (UPnP)"
 #: ../libtransmission/upnp.c:103
 #, c-format
 msgid "Found Internet Gateway Device \"%s\""
-msgstr "Detectado un dispositivo de puerta de enlace a Internet \"%s\""
+msgstr "Encontrado Dispositivo de Puerta de Enlaze a Internet \"%s\""
 
 #: ../libtransmission/upnp.c:106
 #, c-format
 msgid "Local Address is \"%s\""
-msgstr "La dirección local es \"%s\""
+msgstr "La Dirección Local es \"%s\""
 
 #: ../libtransmission/upnp.c:139
 #, c-format
@@ -1666,6 +1671,9 @@ msgstr "En cola para verificación"
 
 #~ msgid "_Open..."
 #~ msgstr "_Abrir..."
+
+#~ msgid "Close _Window"
+#~ msgstr "Cerrar _Ventana"
 
 #~ msgid "Close main window"
 #~ msgstr "Cerrar ventana principal"
@@ -1762,6 +1770,9 @@ msgstr "En cola para verificación"
 
 #~ msgid "_Source file:"
 #~ msgstr "Archivo _fuente:"
+
+#~ msgid "Verify Local Data"
+#~ msgstr "Verificar Datos Locales"
 
 #~ msgid "Open a Torrent"
 #~ msgstr "Abrir un Torrent"

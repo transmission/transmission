@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2008-11-09 14:14+0000\n"
+"X-Launchpad-Export-Date: 2008-11-29 16:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -269,7 +269,7 @@ msgstr "%s est déjà en cours d'exécution."
 
 #: ../gtk/details.c:273
 msgid "Web Seeds"
-msgstr "Graines Web"
+msgstr ""
 
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:275 ../gtk/details.c:317
@@ -746,12 +746,13 @@ msgstr ""
 "  Arzach https://launchpad.net/~arzach\n"
 "  BeN https://launchpad.net/~benjamin-pousse-member\n"
 "  BobMauchin https://launchpad.net/~zebob.m\n"
+"  Cyril GRAGEON https://launchpad.net/~cyril-g\n"
 "  Eric https://launchpad.net/~1eric\n"
 "  Jochen Schäfer https://launchpad.net/~lemecje83\n"
 "  Jonathan Ernst https://launchpad.net/~jonathan.ernst\n"
-"  Kevin https://launchpad.net/~kevin64-deactivatedaccount\n"
 "  Pascal Lemazurier https://launchpad.net/~lemazurierpa56\n"
 "  Penegal https://launchpad.net/~penegal\n"
+"  Pierre Rudloff https://launchpad.net/~tael67\n"
 "  Rafik Ouerchefani https://launchpad.net/~rafik\n"
 "  Rémy Loubet https://launchpad.net/~brxl\n"
 "  Stéphane Loeuillet https://launchpad.net/~leroutier\n"
@@ -762,6 +763,7 @@ msgstr ""
 "  hey_popey https://launchpad.net/~damien-haikal\n"
 "  lp.descamps https://launchpad.net/~lp-descamps\n"
 "  ooliver27 https://launchpad.net/~ooliver27\n"
+"  royto https://launchpad.net/~royto\n"
 "  slurbe https://launchpad.net/~slurbe"
 
 #: ../gtk/makemeta-ui.c:111

@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-11-09 14:12+0000\n"
+"X-Launchpad-Export-Date: 2008-11-29 16:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -731,7 +731,8 @@ msgstr ""
 "\n"
 "Launchpad Contributions:\n"
 "  Emil Pavlov https://launchpad.net/~emil-p-pavlov\n"
-"  Lubomir Marinov https://launchpad.net/~lubomir-marinov"
+"  Lubomir Marinov https://launchpad.net/~lubomir-marinov\n"
+"  Sabry https://launchpad.net/~sabryhomeit"
 
 #: ../gtk/makemeta-ui.c:111
 msgid "Torrent created!"

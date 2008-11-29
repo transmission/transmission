@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-11-02 14:16-0600\n"
-"PO-Revision-Date: 2008-11-01 10:08+0000\n"
+"PO-Revision-Date: 2008-11-17 21:37+0000\n"
 "Last-Translator: Daniel Nylander <yeager@ubuntu.com>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-11-09 14:14+0000\n"
+"X-Launchpad-Export-Date: 2008-11-29 16:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -665,7 +665,7 @@ msgstr "Starta med alla torrentfiler pausade"
 
 #: ../gtk/main.c:371
 msgid "Show version number and exit"
-msgstr ""
+msgstr "Visa versionsnummer och avsluta"
 
 #: ../gtk/main.c:375
 msgid "Start minimized in system tray"
@@ -1434,7 +1434,7 @@ msgstr "Kunde inte läsa återupptagningsfil"
 #: ../libtransmission/fdlimit.c:189
 #, c-format
 msgid "Preallocated file \"%s\""
-msgstr ""
+msgstr "Förallokerade filen \"%s\""
 
 #: ../libtransmission/fdlimit.c:426 ../libtransmission/net.c:109
 #, c-format

@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-11-02 14:16-0600\n"
-"PO-Revision-Date: 2008-09-13 00:43+0000\n"
-"Last-Translator: Kamil Páral <ripper42@gmail.com>\n"
+"PO-Revision-Date: 2008-11-11 16:07+0000\n"
+"Last-Translator: Adrian Guniš <andygun696@gmail.com>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2008-11-09 14:13+0000\n"
+"X-Launchpad-Export-Date: 2008-11-29 16:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -144,7 +144,7 @@ msgstr "Vytvořit torrent"
 
 #: ../gtk/actions.c:146
 msgid "_Quit"
-msgstr "_Ukončit"
+msgstr "U_končit"
 
 #: ../gtk/actions.c:149
 msgid "Select _All"
@@ -665,7 +665,7 @@ msgstr "Spustit se všemi torrenty pozastavenými"
 
 #: ../gtk/main.c:371
 msgid "Show version number and exit"
-msgstr ""
+msgstr "Zobrazit číslo verze a ukončit"
 
 #: ../gtk/main.c:375
 msgid "Start minimized in system tray"
@@ -685,11 +685,11 @@ msgstr "[soubory torrent]"
 
 #: ../gtk/main.c:552
 msgid "Beginning to use scheduled bandwidth limits"
-msgstr ""
+msgstr "Začátek platnosti plánovaných omezení šířky pásma"
 
 #: ../gtk/main.c:566
 msgid "Ending use of scheduled bandwidth limits"
-msgstr ""
+msgstr "Konec platnosti plánovaných omezení šířky pásma"
 
 #: ../gtk/main.c:867
 msgid "<b>Closing Connections</b>"
@@ -701,7 +701,7 @@ msgstr "Zasílání součtů odesílání/stahování trackeru..."
 
 #: ../gtk/main.c:876
 msgid "_Quit Now"
-msgstr "_Ukončit hned"
+msgstr "U_končit hned"
 
 #: ../gtk/main.c:1030
 msgid "Couldn't add corrupt torrent"
@@ -917,7 +917,7 @@ msgstr "%1$s, odesláno %2$s (Poměr: %3$s)"
 #: ../gtk/torrent-cell-renderer.c:86 ../gtk/tr-torrent.c:280
 #, c-format
 msgid "Remaining time unknown"
-msgstr ""
+msgstr "Neznámý zbývající čas"
 
 #. time remaining
 #: ../gtk/torrent-cell-renderer.c:92
@@ -1050,18 +1050,19 @@ msgstr "Přesunout zdrojo_vé soubory do koše"
 
 #: ../gtk/tr-prefs.c:400
 msgid "_Inhibit desktop hibernation when torrents are active"
-msgstr ""
+msgstr "_Zabránit uspání počítače na disk, když jsou torrenty aktivní"
 
 #: ../gtk/tr-prefs.c:404
 msgid "Show _icon in the desktop Notification Area"
-msgstr ""
+msgstr "Zobrazit _ikonu v oznamovací oblasti"
 
 #: ../gtk/tr-prefs.c:434
 #, c-format
 msgid "Enable _blocklist (contains %'d rule)"
 msgid_plural "Enable _blocklist (contains %'d rules)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Povolit seznam _blokovaných (obsahuje %'d údaj)"
+msgstr[1] "Povolit seznam _blokovaných (obsahuje %'d údaje)"
+msgstr[2] "Povolit seznam _blokovaných (obsahuje %'d údajů)"
 
 #: ../gtk/tr-prefs.c:484
 msgid "Updating Blocklist"
@@ -1069,15 +1070,15 @@ msgstr "Aktualizace seznamu blokovaných"
 
 #: ../gtk/tr-prefs.c:531
 msgid "Blocklist"
-msgstr ""
+msgstr "Seznam blokovaných"
 
 #: ../gtk/tr-prefs.c:537
 msgid "_Update"
-msgstr ""
+msgstr "Akt_ualizovat"
 
 #: ../gtk/tr-prefs.c:547
 msgid "Enable _automatic updates"
-msgstr ""
+msgstr "Povolit _automatické aktualizace"
 
 #: ../gtk/tr-prefs.c:557
 msgid "Maximum peers _overall:"
@@ -1126,7 +1127,7 @@ msgstr "_Heslo:"
 #. require authentication
 #: ../gtk/tr-prefs.c:828
 msgid "Only allow the following IP _addresses to connect:"
-msgstr ""
+msgstr "Povolit spojení pouze s následujícími _adresami IP:"
 
 #: ../gtk/tr-prefs.c:855
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1134,7 +1135,7 @@ msgstr "Adresy IP smí používat zástupné znaky, např. 192.168.*.*"
 
 #: ../gtk/tr-prefs.c:878
 msgid "Addresses:"
-msgstr ""
+msgstr "Adresy:"
 
 #: ../gtk/tr-prefs.c:998
 msgid "Tracker Proxy"
@@ -1162,23 +1163,23 @@ msgstr "Je vyž_adováno ověření"
 
 #: ../gtk/tr-prefs.c:1183
 msgid "Scheduled Limits"
-msgstr ""
+msgstr "Plánovaná omezení"
 
 #: ../gtk/tr-prefs.c:1189
 msgid " and "
-msgstr ""
+msgstr " a "
 
 #: ../gtk/tr-prefs.c:1196
 msgid "_Limit bandwidth between"
-msgstr ""
+msgstr "O_mezit šířku pásma mezi"
 
 #: ../gtk/tr-prefs.c:1204
 msgid "Limit d_ownload speed (KB/s):"
-msgstr ""
+msgstr "Max. rychlost s_tahování (KB/s)"
 
 #: ../gtk/tr-prefs.c:1211
 msgid "Limit u_pload speed (KB/s):"
-msgstr ""
+msgstr "Max. rychlost o_desílání (KB/s):"
 
 #: ../gtk/tr-prefs.c:1245
 msgid "Port is <b>open</b>"
@@ -1198,7 +1199,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1357
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr "Použít _přesměrování portu UPnP nebo NAT-PMP z mého routeru"
+msgstr "Použít př_esměrování portu UPnP nebo NAT-PMP z mého routeru"
 
 #: ../gtk/tr-prefs.c:1379
 msgid "Transmission Preferences"
@@ -1210,7 +1211,7 @@ msgstr "Torrenty"
 
 #: ../gtk/tr-prefs.c:1397
 msgid "Desktop"
-msgstr ""
+msgstr "Pracovní prostředí"
 
 #: ../gtk/tr-prefs.c:1403
 msgid "Network"
@@ -1243,7 +1244,7 @@ msgstr "Čekání na ověření místních dat (%.1f%% ověřeno)"
 #: ../gtk/tr-torrent.c:286
 #, c-format
 msgid "%1$s remaining"
-msgstr ""
+msgstr "zbývá %1$s"
 
 #: ../gtk/tr-torrent.c:299 ../libtransmission/port-forwarding.c:175
 msgid "Stopped"
@@ -1287,7 +1288,7 @@ msgstr "_Aktivní"
 #. show only torrents that are trying to download
 #: ../gtk/tr-window.c:518
 msgid "_Downloading"
-msgstr "_Stahováno"
+msgstr "Sta_hováno"
 
 #. show only torrents that are trying to upload
 #: ../gtk/tr-window.c:520
@@ -1426,7 +1427,7 @@ msgstr "Neplatná metadata"
 #: ../libtransmission/blocklist.c:108
 #, c-format
 msgid "Blocklist \"%s\" contains %'zu entries"
-msgstr ""
+msgstr "Seznam blokovaných \"%s\" obsahuje %'zu údajů"
 
 #: ../libtransmission/blocklist.c:296
 #, c-format

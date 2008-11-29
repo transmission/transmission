@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-11-02 14:16-0600\n"
-"PO-Revision-Date: 2008-11-04 19:45+0000\n"
+"PO-Revision-Date: 2008-11-23 22:03+0000\n"
 "Last-Translator: Gabor Kelemen <kelemeng@gnome.hu>\n"
 "Language-Team: <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-11-09 14:13+0000\n"
+"X-Launchpad-Export-Date: 2008-11-29 16:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -626,7 +626,7 @@ msgstr[1] "Néhány torrent befejezetlen vagy partnerekhez csatlakozik."
 
 #: ../gtk/file-list.c:622
 msgid "High"
-msgstr "Nagy"
+msgstr "Magas"
 
 #: ../gtk/file-list.c:626
 msgid "Normal"
@@ -634,7 +634,7 @@ msgstr "Közepes"
 
 #: ../gtk/file-list.c:630
 msgid "Low"
-msgstr "Kicsi"
+msgstr "Alacsony"
 
 #: ../gtk/file-list.c:634
 msgid "Mixed"
@@ -1168,7 +1168,7 @@ msgstr " és "
 
 #: ../gtk/tr-prefs.c:1196
 msgid "_Limit bandwidth between"
-msgstr "_Sávszélesség korlátozása"
+msgstr "_Sávszélesség-korlátozási időszak:"
 
 #: ../gtk/tr-prefs.c:1204
 msgid "Limit d_ownload speed (KB/s):"
