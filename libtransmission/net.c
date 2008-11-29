@@ -123,7 +123,7 @@ createSocket( int type )
 }
 
 static void
-setSndBuf( tr_session * session, int fd )
+setSndBuf( tr_session * session UNUSED, int fd UNUSED )
 {
 #if 0
     if( fd >= 0 )
