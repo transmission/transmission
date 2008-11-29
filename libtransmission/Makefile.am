@@ -12,6 +12,7 @@ AM_CFLAGS = \
 noinst_LIBRARIES = libtransmission.a
 
 libtransmission_a_SOURCES = \
+    bandwidth.c \
     bencode.c \
     blocklist.c \
     clients.c \
@@ -23,6 +24,7 @@ libtransmission_a_SOURCES = \
     ggets.c \
     handshake.c \
     inout.c \
+    iobuf.c \
     json.c \
     JSON_parser.c \
     list.c \
@@ -56,6 +58,7 @@ libtransmission_a_SOURCES = \
     wildmat.c
 
 noinst_HEADERS = \
+    bandwidth.h \
     bencode.h \
     blocklist.h \
     clients.h \
@@ -67,6 +70,7 @@ noinst_HEADERS = \
     ggets.h \
     handshake.h \
     inout.h \
+    iobuf.h \
     json.h \
     JSON_parser.h \
     list.h \

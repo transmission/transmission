@@ -26,8 +26,8 @@
 
 struct tr_webseed
 {
-    unsigned int        busy : 1;
-    unsigned int        dead : 1;
+    tr_bool             busy;
+    tr_bool             dead;
 
     uint8_t             hash[SHA_DIGEST_LENGTH];
 
@@ -51,7 +51,7 @@ struct tr_webseed
 ****
 ***/
 
-static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0 };
+static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0, 0 };
 
 static void
 publish( tr_webseed *    w,
@@ -93,6 +93,8 @@ fireClientGotData( tr_webseed * w,
 
     e.eventType = TR_PEER_CLIENT_GOT_DATA;
     e.length = length;
+    e.wasPieceData = TRUE;
+
     publish( w, &e );
 }
 

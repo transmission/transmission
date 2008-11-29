@@ -32,6 +32,7 @@
 #include <stdlib.h> /* qsort */
 
 #include "transmission.h"
+#include "bandwidth.h"
 #include "bencode.h"
 #include "completion.h"
 #include "crypto.h" /* for tr_sha1 */
@@ -142,56 +143,42 @@ tr_torrentUnlock( const tr_torrent * tor )
 
 void
 tr_torrentSetSpeedMode( tr_torrent *  tor,
-                        tr_direction  direction,
+                        tr_direction  dir,
                         tr_speedlimit mode )
 {
-    tr_speedlimit * limit = direction == TR_UP ? &tor->uploadLimitMode
-                                               : &tor->downloadLimitMode;
+    assert( tor != NULL );
+    assert( dir==TR_UP || dir==TR_DOWN );
+    assert( mode==TR_SPEEDLIMIT_GLOBAL || mode==TR_SPEEDLIMIT_SINGLE || mode==TR_SPEEDLIMIT_UNLIMITED  );
 
-    *limit = mode;
+    tor->speedLimitMode[dir] = mode;
+
+    tr_bandwidthSetLimited( tor->bandwidth, dir, mode==TR_SPEEDLIMIT_SINGLE );
+    tr_bandwidthHonorParentLimits( tor->bandwidth, dir, mode!=TR_SPEEDLIMIT_UNLIMITED );
 }
 
 tr_speedlimit
 tr_torrentGetSpeedMode( const tr_torrent * tor,
-                        tr_direction       direction )
+                        tr_direction       dir )
 {
-    return direction == TR_UP ? tor->uploadLimitMode
-                              : tor->downloadLimitMode;
+    assert( tor != NULL );
+    assert( dir==TR_UP || dir==TR_DOWN );
+
+    return tor->speedLimitMode[dir];
 }
 
 void
 tr_torrentSetSpeedLimit( tr_torrent * tor,
-                         tr_direction direction,
-                         int          single_KiB_sec )
+                         tr_direction dir,
+                         int          desiredSpeed )
 {
-    switch( direction )
-    {
-        case TR_UP:
-            tor->uploadLimit = single_KiB_sec; break;
-
-        case TR_DOWN:
-            tor->downloadLimit = single_KiB_sec; break;
-
-        default:
-            assert( 0 );
-    }
+    tr_bandwidthSetDesiredSpeed( tor->bandwidth, dir, desiredSpeed );
 }
 
 int
 tr_torrentGetSpeedLimit( const tr_torrent * tor,
-                         tr_direction       direction )
+                         tr_direction       dir )
 {
-    switch( direction )
-    {
-        case TR_UP:
-            return tor->uploadLimit;
-
-        case TR_DOWN:
-            return tor->downloadLimit;
-
-        default:
-            assert( 0 );
-    }
+    return tr_bandwidthGetDesiredSpeed( tor->bandwidth, dir );
 }
 
 int
@@ -496,10 +483,7 @@ torrentRealInit( tr_handle *     h,
 
     randomizeTiers( info );
 
-    tor->rawSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
-    tor->rawSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
-    tor->pieceSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
-    tor->pieceSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
+    tor->bandwidth = tr_bandwidthNew( h, h->bandwidth );
 
     tor->blockSize = getBlockSize( info->pieceSize );
 
@@ -541,8 +525,6 @@ torrentRealInit( tr_handle *     h,
 
     tr_torrentInitFilePieces( tor );
 
-    tor->uploadLimit = 0;
-    tor->downloadLimit = 0;
     tor->swarmSpeed = tr_rcInit( );
 
     tr_sha1( tor->obfuscatedHash, "req2", 4,
@@ -814,10 +796,10 @@ tr_torrentStat( tr_torrent * tor )
                             &s->peersGettingFromUs,
                             s->peersFrom );
 
-    s->rawUploadSpeed     = tr_rcRate( tor->rawSpeed[TR_UP] );
-    s->rawDownloadSpeed   = tr_rcRate( tor->rawSpeed[TR_DOWN] );
-    s->pieceUploadSpeed   = tr_rcRate( tor->pieceSpeed[TR_UP] );
-    s->pieceDownloadSpeed = tr_rcRate( tor->pieceSpeed[TR_DOWN] );
+    s->rawUploadSpeed     = tr_bandwidthGetRawSpeed  ( tor->bandwidth, TR_UP );
+    s->rawDownloadSpeed   = tr_bandwidthGetRawSpeed  ( tor->bandwidth, TR_DOWN );
+    s->pieceUploadSpeed   = tr_bandwidthGetPieceSpeed( tor->bandwidth, TR_UP );
+    s->pieceDownloadSpeed = tr_bandwidthGetPieceSpeed( tor->bandwidth, TR_DOWN );
 
     usableSeeds += tor->info.webseedCount;
 
@@ -1100,10 +1082,7 @@ freeTorrent( tr_torrent * tor )
     assert( h->torrentCount >= 1 );
     h->torrentCount--;
 
-    tr_rcClose( tor->pieceSpeed[TR_PEER_TO_CLIENT] );
-    tr_rcClose( tor->pieceSpeed[TR_CLIENT_TO_PEER] );
-    tr_rcClose( tor->rawSpeed[TR_PEER_TO_CLIENT] );
-    tr_rcClose( tor->rawSpeed[TR_CLIENT_TO_PEER] );
+    tr_bandwidthFree( tor->bandwidth );
 
     tr_metainfoFree( inf );
     tr_free( tor );

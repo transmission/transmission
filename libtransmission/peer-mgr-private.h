@@ -10,6 +10,10 @@
  * $Id$
  */
 
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 #ifndef TR_PEER_MGR_PRIVATE_H
 #define TR_PEER_MGR_PRIVATE_H
 
@@ -23,10 +27,10 @@
 
 #include "publish.h" /* tr_publisher_tag */
 
+struct tr_bandwidth;
 struct tr_bitfield;
 struct tr_peerIo;
 struct tr_peermsgs;
-struct tr_ratecontrol;
 
 enum
 {
@@ -37,11 +41,11 @@ enum
 
 typedef struct tr_peer
 {
-    unsigned int             peerIsChoked       : 1;
-    unsigned int             peerIsInterested   : 1;
-    unsigned int             clientIsChoked     : 1;
-    unsigned int             clientIsInterested : 1;
-    unsigned int             doPurge            : 1;
+    tr_bool                  peerIsChoked;
+    tr_bool                  peerIsInterested;
+    tr_bool                  clientIsChoked;
+    tr_bool                  clientIsInterested;
+    tr_bool                  doPurge;
 
     /* number of bad pieces they've contributed to */
     uint8_t                  strikes;
@@ -67,9 +71,7 @@ typedef struct tr_peer
     struct tr_peermsgs     * msgs;
     tr_publisher_tag         msgsTag;
 
-    /* the rate at which pieces are being transferred between client and peer.
-     * protocol overhead is NOT included; this is only the piece data */
-    struct tr_ratecontrol  * pieceSpeed[2];
+    struct tr_bandwidth    * bandwidth;
 }
 tr_peer;
 

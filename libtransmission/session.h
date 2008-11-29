@@ -22,6 +22,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 #ifndef TR_INTERNAL_H
 #define TR_INTERNAL_H 1
 
@@ -48,19 +52,17 @@ struct tr_metainfo_lookup
     char *  filename;
 };
 
-struct tr_ratecontrol;
+struct tr_bandwidth;
 
 struct tr_handle
 {
-    unsigned int                 isPortSet          : 1;
-    unsigned int                 isPexEnabled       : 1;
-    unsigned int                 isBlocklistEnabled : 1;
-    unsigned int                 isProxyEnabled     : 1;
-    unsigned int                 isProxyAuthEnabled : 1;
-    unsigned int                 isClosed           : 1;
-    unsigned int                 useUploadLimit     : 1;
-    unsigned int                 useDownloadLimit   : 1;
-    unsigned int                 useLazyBitfield    : 1;
+    tr_bool                      isPortSet;
+    tr_bool                      isPexEnabled;
+    tr_bool                      isBlocklistEnabled;
+    tr_bool                      isProxyEnabled;
+    tr_bool                      isProxyAuthEnabled;
+    tr_bool                      isClosed;
+    tr_bool                      useLazyBitfield;
 
     tr_encryption_mode           encryptionMode;
 
@@ -84,9 +86,6 @@ struct tr_handle
     char *                       proxyUsername;
     char *                       proxyPassword;
 
-    int                          uploadLimit;
-    int                          downloadLimit;
-
     struct tr_list *             blocklists;
     struct tr_peerMgr *          peerMgr;
     struct tr_shared *           shared;
@@ -105,12 +104,14 @@ struct tr_handle
     struct tr_metainfo_lookup *  metainfoLookup;
     int                          metainfoLookupCount;
 
-    /* the rate at which pieces are being transferred between client and peer.
-     * protocol overhead is NOT included; this is only the piece data */
-    struct tr_ratecontrol     *  pieceSpeed[2];
+    /* the size of the output buffer for peer connections */
+    int so_sndbuf;
 
-    /* the rate at which bytes are being transferred between client and peer. */
-    struct tr_ratecontrol     *  rawSpeed[2];
+    /* the size of the input buffer for peer connections */
+    int so_rcvbuf;
+
+    /* monitors the "global pool" speeds */
+    struct tr_bandwidth       * bandwidth;
 };
 
 const char * tr_sessionFindTorrentFile( const tr_session * session,

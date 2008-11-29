@@ -52,6 +52,8 @@ extern "C" {
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
 typedef uint64_t tr_block_index_t;
+typedef uint8_t tr_bool;
+
 
 /**
  * @brief returns Transmission's default configuration file directory.

@@ -21,6 +21,7 @@
 #include <dirent.h> /* opendir */
 
 #include "transmission.h"
+#include "bandwidth.h"
 #include "blocklist.h"
 #include "fdlimit.h"
 #include "list.h"
@@ -29,7 +30,6 @@
 #include "peer-mgr.h"
 #include "platform.h" /* tr_lock */
 #include "port-forwarding.h"
-#include "ratecontrol.h"
 #include "rpc-server.h"
 #include "stats.h"
 #include "torrent.h"
@@ -254,10 +254,8 @@ tr_sessionInitFull( const char *       configDir,
     h->isProxyAuthEnabled = proxyAuthIsEnabled != 0;
     h->proxyUsername = tr_strdup( proxyUsername );
     h->proxyPassword = tr_strdup( proxyPassword );
-    h->pieceSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
-    h->pieceSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
-    h->rawSpeed[TR_PEER_TO_CLIENT] = tr_rcInit( );
-    h->rawSpeed[TR_CLIENT_TO_PEER] = tr_rcInit( );
+    h->so_sndbuf = 1500 * 3; /* 3x MTU for most ethernet/wireless */
+    h->so_rcvbuf = 8192;
 
     if( configDir == NULL )
         configDir = tr_getDefaultConfigDir( );
@@ -276,14 +274,15 @@ tr_sessionInitFull( const char *       configDir,
 
     /* Initialize rate and file descripts controls */
 
-    h->uploadLimit = uploadLimit;
-    h->useUploadLimit = useUploadLimit;
-    h->downloadLimit = downloadLimit;
-    h->useDownloadLimit = useDownloadLimit;
-
     tr_fdInit( globalPeerLimit );
     h->shared = tr_sharedInit( h, isPortForwardingEnabled, publicPort );
     h->isPortSet = publicPort >= 0;
+
+    h->bandwidth = tr_bandwidthNew( h, NULL );
+    tr_bandwidthSetDesiredSpeed( h->bandwidth, TR_UP, uploadLimit );
+    tr_bandwidthSetDesiredSpeed( h->bandwidth, TR_DOWN, downloadLimit );
+    tr_bandwidthSetLimited( h->bandwidth, TR_UP, useUploadLimit );
+    tr_bandwidthSetLimited( h->bandwidth, TR_DOWN, useDownloadLimit );
 
     /* first %s is the application name
        second %s is the version number */
@@ -443,42 +442,33 @@ tr_sessionGetPortForwarding( const tr_handle * h )
 ***/
 
 void
-tr_sessionSetSpeedLimitEnabled( tr_handle *  h,
-                                tr_direction direction,
-                                int          use_flag )
+tr_sessionSetSpeedLimitEnabled( tr_session      * session,
+                                tr_direction      dir,
+                                int               isLimited )
 {
-    assert( h );
-    assert( direction == TR_UP || direction == TR_DOWN );
-
-    if( direction == TR_UP )
-        h->useUploadLimit = use_flag ? 1 : 0;
-    else
-        h->useDownloadLimit = use_flag ? 1 : 0;
+    tr_bandwidthSetLimited( session->bandwidth, dir, isLimited );
 }
 
 int
-tr_sessionIsSpeedLimitEnabled( const tr_handle * h,
-                               tr_direction      direction )
+tr_sessionIsSpeedLimitEnabled( const tr_session  * session,
+                               tr_direction        dir )
 {
-    return direction == TR_UP ? h->useUploadLimit : h->useDownloadLimit;
+    return !tr_bandwidthIsLimited( session->bandwidth, dir );
 }
 
 void
-tr_sessionSetSpeedLimit( tr_handle *  h,
-                         tr_direction direction,
-                         int          KiB_sec )
+tr_sessionSetSpeedLimit( tr_session    * session,
+                         tr_direction    dir,
+                         int             desiredSpeed )
 {
-    if( direction == TR_DOWN )
-        h->downloadLimit = KiB_sec;
-    else
-        h->uploadLimit = KiB_sec;
+    tr_bandwidthSetDesiredSpeed( session->bandwidth, dir, desiredSpeed );
 }
 
 int
-tr_sessionGetSpeedLimit( const tr_handle * h,
-                         tr_direction      direction )
+tr_sessionGetSpeedLimit( const tr_session  * session,
+                         tr_direction        dir )
 {
-    return direction == TR_UP ? h->uploadLimit : h->downloadLimit;
+    return tr_bandwidthGetDesiredSpeed( session->bandwidth, dir );
 }
 
 /***
@@ -505,17 +495,13 @@ tr_sessionGetPeerLimit( const tr_handle * handle UNUSED )
 double
 tr_sessionGetPieceSpeed( const tr_session * session, tr_direction dir )
 {
-    assert( dir==TR_UP || dir==TR_DOWN );
-
-    return session ? tr_rcRate( session->pieceSpeed[dir] ) : 0.0;
+    return session ? tr_bandwidthGetPieceSpeed( session->bandwidth, dir ) : 0.0;
 }
 
 double
 tr_sessionGetRawSpeed( const tr_session * session, tr_direction dir )
 {
-    assert( dir==TR_UP || dir==TR_DOWN );
-
-    return session ? tr_rcRate( session->rawSpeed[dir] ) : 0.0;
+    return session ? tr_bandwidthGetPieceSpeed( session->bandwidth, dir ) : 0.0;
 }
 
 int
@@ -629,10 +615,7 @@ tr_sessionClose( tr_handle * session )
     }
 
     /* free the session memory */
-    tr_rcClose( session->pieceSpeed[TR_PEER_TO_CLIENT] );
-    tr_rcClose( session->pieceSpeed[TR_CLIENT_TO_PEER] );
-    tr_rcClose( session->rawSpeed[TR_PEER_TO_CLIENT] );
-    tr_rcClose( session->rawSpeed[TR_CLIENT_TO_PEER] );
+    tr_bandwidthFree( session->bandwidth );
     tr_lockFree( session->lock );
     for( i = 0; i < session->metainfoLookupCount; ++i )
         tr_free( session->metainfoLookup[i].filename );

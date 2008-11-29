@@ -122,9 +122,24 @@ createSocket( int type )
     return makeSocketNonBlocking( tr_fdSocketCreate( type ) );
 }
 
+static void
+setSndBuf( tr_session * session UNUSED, int fd UNUSED )
+{
+#if 0
+    if( fd >= 0 )
+    {
+        const int sndbuf = session->so_sndbuf;
+        const int rcvbuf = session->so_rcvbuf;
+        setsockopt( fd, SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof( sndbuf ) );
+        setsockopt( fd, SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof( rcvbuf ) );
+    }
+#endif
+}
+
 int
-tr_netOpenTCP( const struct in_addr * addr,
-               tr_port_t              port )
+tr_netOpenTCP( tr_session            * session,
+               const struct in_addr  * addr,
+               tr_port_t               port )
 {
     int                s;
     struct sockaddr_in sock;
@@ -132,6 +147,8 @@ tr_netOpenTCP( const struct in_addr * addr,
 
     if( ( s = createSocket( type ) ) < 0 )
         return -1;
+
+    setSndBuf( session, s );
 
     memset( &sock, 0, sizeof( sock ) );
     sock.sin_family      = AF_INET;
@@ -197,11 +214,14 @@ tr_netBindTCP( int port )
 }
 
 int
-tr_netAccept( int              b,
-              struct in_addr * addr,
-              tr_port_t *      port )
+tr_netAccept( tr_session      * session,
+              int               b,
+              struct in_addr  * addr,
+              tr_port_t       * port )
 {
-    return makeSocketNonBlocking( tr_fdSocketAccept( b, addr, port ) );
+    int fd = makeSocketNonBlocking( tr_fdSocketAccept( b, addr, port ) );
+    setSndBuf( session, fd );
+    return fd;
 }
 
 void
