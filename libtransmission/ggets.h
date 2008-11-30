@@ -1,3 +1,8 @@
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
+
 /* File ggets.h  - goodgets is a safe alternative to gets */
 /* By C.B. Falconer.  Public domain 2002-06-22            */
 /*    attribution appreciated.                            */

@@ -1,6 +1,10 @@
 #ifndef CONVERT_UNICODE_H
 #define CONVERT_UNICODE_H
 
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 /*
  * Copyright 2001-2004 Unicode, Inc.
  *
