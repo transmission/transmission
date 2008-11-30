@@ -28,7 +28,14 @@ their extended id.
 uTorrent peer exchange messages use the key "ut_pex" in the m
 dictionary.  If the uTorrent peer has pex disabled, this key
 will not be present.  Exchanges messages should be sent approximately
-once every minute.  The payload of a peer exchange message is a
+once every minute when peers have been added or dropped.
+
+If peers have not been added or dropped, uTorrent does not send
+the periodic PEX message.  If uTorrent 1.8.1 recieves an "empty"
+pex message from Transmission 1.40, it appears to interpret this
+as an invalid message and disconnect from Transmission.
+
+The payload of a peer exchange message is a
 bencoded dictionary with the following keys:
 
     added
@@ -40,7 +47,7 @@ bencoded dictionary with the following keys:
         string, one byte of flags for each peer in the above added string.
         according to libtorrent's ut_pex.c:
         0x01 - peer supports encryption
-        0x02 - peer is a seed
+        0x02 - peer is a seed or a partial seed
 
     dropped
         same format as added, contains peers dropped since last peer exchange
