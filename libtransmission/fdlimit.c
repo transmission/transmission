@@ -471,13 +471,13 @@ tr_fdSocketCreate( int type )
 }
 
 int
-tr_fdSocketAccept( int              b,
-                   struct in_addr * addr,
-                   tr_port_t *      port )
+tr_fdSocketAccept( int          b,
+                   tr_address * addr,
+                   tr_port_t  * port )
 {
-    int                s = -1;
-    unsigned int       len;
-    struct sockaddr_in sock;
+    int                     s = -1;
+    unsigned int            len;
+    struct sockaddr_storage sock;
 
     assert( addr );
     assert( port );
@@ -485,13 +485,28 @@ tr_fdSocketAccept( int              b,
     tr_lockLock( gFd->lock );
     if( gFd->socketCount < getSocketMax( gFd ) )
     {
-        len = sizeof( sock );
+        len = sizeof( struct sockaddr );
         s = accept( b, (struct sockaddr *) &sock, &len );
     }
     if( s > -1 )
     {
-        *addr = sock.sin_addr;
-        *port = sock.sin_port;
+        /* "The ss_family field of the sockaddr_storage structure will always
+         * align with the family field of any protocol-specific structure." */
+        if( sock.ss_family == AF_INET )
+        {
+            struct sockaddr_in * sock4 = (struct sockaddr_in *)&sock;
+            addr->type = TR_AF_INET;
+            addr->addr.addr4.s_addr = sock4->sin_addr.s_addr;
+            *port = sock4->sin_port;
+        }
+        else
+        {
+            struct sockaddr_in6 * sock6 = (struct sockaddr_in6 *)&sock;
+            addr->type = TR_AF_INET6;
+            memcpy( &addr->addr, &sock6->sin6_addr,
+                   sizeof( struct sockaddr_in6 ) );
+            *port = sock6->sin6_port;
+        }
         ++gFd->socketCount;
     }
     tr_lockUnlock( gFd->lock );
