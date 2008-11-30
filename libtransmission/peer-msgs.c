@@ -1275,7 +1275,10 @@ readBtMessage( tr_peermsgs *     msgs,
             tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
             dbgmsg( msgs, "got Have: %u", ui32 );
             if( tr_bitfieldAdd( msgs->info->have, ui32 ) )
+            {
                 fireError( msgs, ERANGE );
+                return READ_ERR;
+            }
             updatePeerProgress( msgs );
             tr_rcTransferred( msgs->torrent->swarmSpeed,
                               msgs->torrent->info.pieceSize );
@@ -1505,7 +1508,7 @@ canRead( struct tr_iobuf * iobuf, void * vmsgs, size_t * piece )
     }
 
     /* log the raw data that was read */
-    if( EVBUFFER_LENGTH( in ) != inlen )
+    if( ( ret != READ_ERR ) && ( EVBUFFER_LENGTH( in ) != inlen ) )
         fireClientGotData( msgs, inlen - EVBUFFER_LENGTH( in ), FALSE );
 
     return ret;
@@ -1578,6 +1581,8 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
         const int err = tr_ioRead( msgs->torrent, req.index, req.offset, req.length, buf );
         if( err ) {
             fireError( msgs, err );
+            bytesWritten = 0;
+            msgs = NULL;
         } else {
             tr_peerIo * io = msgs->io;
             struct evbuffer * out = evbuffer_new( );
@@ -1599,7 +1604,8 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
     ***  Keepalive
     **/
 
-    if( msgs->clientSentAnythingAt
+    if( ( msgs != NULL )
+        && ( msgs->clientSentAnythingAt != 0 )
         && ( ( now - msgs->clientSentAnythingAt ) > KEEPALIVE_INTERVAL_SECS ) )
     {
         dbgmsg( msgs, "sending a keepalive message" );
