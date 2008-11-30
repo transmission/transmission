@@ -270,12 +270,17 @@ static const char * details_keys[] = {
 };
 
 static const char * list_keys[] = {
-    "downloadedEver", "eta",              "id",
+    "eta",
+    "id",
     "leftUntilDone",
     "name",
-    "peersGettingFromUs", "peersSendingToUs",
+    "peersGettingFromUs",
+    "peersSendingToUs",
     "rateDownload",
-    "rateUpload", "sizeWhenDone", "status", "uploadedEver"
+    "rateUpload",
+    "sizeWhenDone",
+    "status",
+    "uploadRatio"
 };
 
 static void
@@ -582,26 +587,37 @@ etaToString( char *  buf,
 #define GIGABYTE_FACTOR ( 1024.0 * 1024.0 * 1024.0 )
 
 static char*
+strlratio2( char * buf, double ratio, size_t buflen )
+{
+    if( (int)ratio == TR_RATIO_NA )
+        tr_strlcpy( buf, "None", buflen );
+    else if( (int)ratio == TR_RATIO_INF )
+        tr_strlcpy( buf, "Inf", buflen );
+    else if( ratio < 10.0 )
+        tr_snprintf( buf, buflen, "%'.2f", ratio );
+    else if( ratio < 100.0 )
+        tr_snprintf( buf, buflen, "%'.1f", ratio );
+    else
+        tr_snprintf( buf, buflen, "%'.0f", ratio );
+    return buf;
+}
+
+static char*
 strlratio( char * buf,
            double numerator,
            double denominator,
            size_t buflen )
 {
+    double ratio;
+
     if( denominator )
-    {
-        const double ratio = numerator / denominator;
-        if( ratio < 10.0 )
-            tr_snprintf( buf, buflen, "%'.2f", ratio );
-        else if( ratio < 100.0 )
-            tr_snprintf( buf, buflen, "%'.1f", ratio );
-        else
-            tr_snprintf( buf, buflen, "%'.0f", ratio );
-    }
+        ratio = numerator / denominator;
     else if( numerator )
-        tr_strlcpy( buf, "Inf", buflen );
+        ratio = TR_RATIO_INF;
     else
-        tr_strlcpy( buf, "None", buflen );
-    return buf;
+        ratio = TR_RATIO_NA;
+
+    return strlratio2( buf, ratio, buflen );
 }
 
 static char*
@@ -1010,13 +1026,12 @@ printTorrentList( tr_benc * top )
                 "Name" );
         for( i = 0, n = tr_bencListSize( list ); i < n; ++i )
         {
-            int64_t     id, eta, status, up, down;
-            int64_t     sizeWhenDone, leftUntilDone;
-            int64_t     upEver, downEver;
-            const char *name;
+            int64_t      id, eta, status, up, down;
+            int64_t      sizeWhenDone, leftUntilDone;
+            double       ratio;
+            const char * name;
             tr_benc *   d = tr_bencListChild( list, i );
-            if( tr_bencDictFindInt( d, "downloadedEver", &downEver )
-              && tr_bencDictFindInt( d, "eta", &eta )
+            if( tr_bencDictFindInt( d, "eta", &eta )
               && tr_bencDictFindInt( d, "id", &id )
               && tr_bencDictFindInt( d, "leftUntilDone", &leftUntilDone )
               && tr_bencDictFindStr( d, "name", &name )
@@ -1024,7 +1039,7 @@ printTorrentList( tr_benc * top )
               && tr_bencDictFindInt( d, "rateUpload", &up )
               && tr_bencDictFindInt( d, "sizeWhenDone", &sizeWhenDone )
               && tr_bencDictFindInt( d, "status", &status )
-              && tr_bencDictFindInt( d, "uploadedEver", &upEver ) )
+              && tr_bencDictFindDouble( d, "uploadRatio", &ratio ) )
             {
                 char etaStr[16];
                 char statusStr[64];
@@ -1042,7 +1057,7 @@ printTorrentList( tr_benc * top )
                     etaStr,
                     up / 1024.0,
                     down / 1024.0,
-                    strlratio( ratioStr, downEver, upEver, sizeof( ratioStr ) ),
+                    strlratio2( ratioStr, ratio, sizeof( ratioStr ) ),
                     getStatusString( d, statusStr, sizeof( statusStr ) ),
                     name );
             }
