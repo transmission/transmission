@@ -257,22 +257,25 @@
     [fController askOpenConfirmed: self add: YES]; //ensure last, since it releases this controller
 }
 
+- (void) setDestination: (NSString *) destination
+{
+    [fDestination release];
+    fDestination = [destination retain];
+    
+    [fLocationField setStringValue: [fDestination stringByAbbreviatingWithTildeInPath]];
+    [fLocationField setToolTip: fDestination];
+    
+    ExpandedPathToIconTransformer * iconTransformer = [[ExpandedPathToIconTransformer alloc] init];
+    [fLocationImageView setImage: [iconTransformer transformedValue: fDestination]];
+    [iconTransformer release];
+    
+    [fTorrent changeDownloadFolder: fDestination];
+}
+
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) contextInfo
 {
     if (code == NSOKButton)
-    {
-        [fDestination release];
-        fDestination = [[[openPanel filenames] objectAtIndex: 0] retain];
-        
-        [fLocationField setStringValue: [fDestination stringByAbbreviatingWithTildeInPath]];
-        [fLocationField setToolTip: fDestination];
-        
-        ExpandedPathToIconTransformer * iconTransformer = [[ExpandedPathToIconTransformer alloc] init];
-        [fLocationImageView setImage: [iconTransformer transformedValue: fDestination]];
-        [iconTransformer release];
-        
-        [fTorrent changeDownloadFolder: fDestination];
-    }
+        [self setDestination: [[openPanel filenames] objectAtIndex: 0]];
     else
     {
         if (!fDestination)
@@ -289,6 +292,9 @@
 - (void) changeGroupValue: (id) sender
 {
     fGroupValue = [sender tag];
+    if ([[GroupsController groups] usesCustomDownloadLocationForIndex: fGroupValue] &&
+        [[GroupsController groups] customDownloadLocationForIndex: fGroupValue])
+        [self setDestination: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue]];
 }
 
 - (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo

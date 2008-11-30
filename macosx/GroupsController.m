@@ -166,6 +166,41 @@ GroupsController * fGroupsInstance = nil;
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
 }
 
+- (BOOL) usesCustomDownloadLocationForIndex: (NSInteger) index
+{
+    NSInteger orderIndex = [self rowValueForIndex: index];
+    return orderIndex != -1 ? [[[fGroups objectAtIndex: orderIndex] objectForKey: @"UsesCustomDownloadLocation"] boolValue] : NO;
+}
+
+- (void) setUsesCustomDownloadLocation: (BOOL) useCustomLocation forIndex: (NSInteger) index
+{
+    NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
+    
+    [dict setObject: [NSNumber numberWithBool:useCustomLocation] forKey: @"UsesCustomDownloadLocation"];
+    
+    [[GroupsController groups] saveGroups];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
+}
+
+- (NSString *) customDownloadLocationForIndex: (NSInteger) index
+{
+    NSInteger orderIndex = [self rowValueForIndex: index];
+    return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"CustomDownloadLocation"] : nil;
+}
+
+- (void) setCustomDownloadLocation: (NSString *) location forIndex: (NSInteger) index
+{
+    NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
+    
+    if (location)
+        [dict setObject: location forKey: @"CustomDownloadLocation"];
+    else
+        [dict removeObjectForKey: @"CustomDownloadLocation"];
+    
+    [[GroupsController groups] saveGroups];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
+}
+
 - (void) addNewGroup
 {
     //find the lowest index

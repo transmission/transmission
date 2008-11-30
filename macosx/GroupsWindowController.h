@@ -33,8 +33,12 @@
 
     IBOutlet NSColorWell * fSelectedColorView;
     IBOutlet NSTextField * fSelectedColorNameField;
+    IBOutlet NSButton * fCustomLocationEnableCheck;
+    IBOutlet NSPopUpButton * fCustomLocationPopUp;
 }
 
 - (void) addRemoveGroup: (id) sender;
 
+- (IBAction) toggleUseCustomDownloadLocation: (id) sender;
+- (IBAction) customDownloadLocationSheetShow: (id) sender;
 @end

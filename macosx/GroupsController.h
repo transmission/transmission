@@ -44,6 +44,12 @@
 - (NSColor *) colorForIndex: (NSInteger) index;
 - (void) setColor: (NSColor *) color forIndex: (NSInteger) index;
 
+- (BOOL) usesCustomDownloadLocationForIndex: (NSInteger) index;
+- (void) setUsesCustomDownloadLocation: (BOOL) useCustomLocation forIndex: (NSInteger) index;
+
+- (NSString *) customDownloadLocationForIndex: (NSInteger) index;
+- (void) setCustomDownloadLocation: (NSString *) location forIndex: (NSInteger) index;
+
 - (void) addNewGroup;
 - (void) removeGroupWithRowIndex: (NSInteger) row;
 

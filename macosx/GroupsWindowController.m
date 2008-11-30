@@ -25,6 +25,8 @@
 #import "GroupsWindowController.h"
 #import "GroupsController.h"
 #import "NSApplicationAdditions.h"
+#import "ExpandedPathToPathTransformer.h"
+#import "ExpandedPathToIconTransformer.h"
 
 #define GROUP_TABLE_VIEW_DATA_TYPE @"GroupTableViewDataType"
 
@@ -175,6 +177,57 @@
     }
 }
 
+- (void) customDownloadLocationSheetShow: (id) sender
+{
+    NSOpenPanel * panel = [NSOpenPanel openPanel];
+
+    [panel setPrompt: NSLocalizedString(@"Select", "Preferences -> Open panel prompt")];
+    [panel setAllowsMultipleSelection: NO];
+    [panel setCanChooseFiles: NO];
+    [panel setCanChooseDirectories: YES];
+    [panel setCanCreateDirectories: YES];
+
+    [panel beginSheetForDirectory: nil file: nil types: nil
+        modalForWindow: [fCustomLocationPopUp window] modalDelegate: self didEndSelector:
+        @selector(customDownloadLocationSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+}
+
+- (IBAction) toggleUseCustomDownloadLocation: (id) sender
+{
+    NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+    if ([fCustomLocationEnableCheck state] == NSOnState)
+    {
+        if ([[GroupsController groups] customDownloadLocationForIndex: index])
+            [[GroupsController groups] setUsesCustomDownloadLocation: YES forIndex: index];
+        else
+            [self customDownloadLocationSheetShow: nil];
+    }
+    else
+        [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
+
+    [fCustomLocationPopUp setEnabled: ([fCustomLocationEnableCheck state] == NSOnState)];
+}
+
+- (void) customDownloadLocationSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
+{
+    NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+    NSString * path = [[GroupsController groups] customDownloadLocationForIndex: index];
+    if (code == NSOKButton)
+    {
+        path = [[openPanel filenames] objectAtIndex: 0];
+        [[GroupsController groups] setCustomDownloadLocation: path forIndex: index];
+        [[GroupsController groups] setUsesCustomDownloadLocation: YES forIndex: index];
+        [self updateSelectedColor]; // Update the popup's icon/title
+    }
+    else if (!path)
+    {
+        [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
+        [fCustomLocationEnableCheck setState: NSOffState];
+    }
+
+    [fCustomLocationPopUp selectItemAtIndex: 0];
+}
+
 @end
 
 @implementation GroupsWindowController (Private)
@@ -189,6 +242,21 @@
         [fSelectedColorView setEnabled: YES];
         [fSelectedColorNameField setStringValue: [[GroupsController groups] nameForIndex: index]];
         [fSelectedColorNameField setEnabled: YES];
+        [fCustomLocationEnableCheck setState: [[GroupsController groups] usesCustomDownloadLocationForIndex: index]];
+        [fCustomLocationPopUp setEnabled: ([fCustomLocationEnableCheck state] == NSOnState)];
+        if ([[GroupsController groups] customDownloadLocationForIndex: index])
+        {
+            NSString * location = [[GroupsController groups] customDownloadLocationForIndex: index];
+            ExpandedPathToPathTransformer * pathTransformer = [[[ExpandedPathToPathTransformer alloc] init] autorelease];
+            [[fCustomLocationPopUp itemAtIndex: 0] setTitle: [pathTransformer transformedValue: location]];
+            ExpandedPathToIconTransformer * iconTransformer = [[[ExpandedPathToIconTransformer alloc] init] autorelease];
+            [[fCustomLocationPopUp itemAtIndex: 0] setImage: [iconTransformer transformedValue: location]];
+        }
+        else
+        {
+            [[fCustomLocationPopUp itemAtIndex: 0] setTitle: @""];
+            [[fCustomLocationPopUp itemAtIndex: 0] setImage: nil];
+        }
     }
     else
     {
@@ -196,6 +264,8 @@
         [fSelectedColorView setEnabled: NO];
         [fSelectedColorNameField setStringValue: @""];
         [fSelectedColorNameField setEnabled: NO];
+        [fCustomLocationEnableCheck setEnabled: NO];
+        [fCustomLocationPopUp setEnabled: NO];
     }
 }
 
