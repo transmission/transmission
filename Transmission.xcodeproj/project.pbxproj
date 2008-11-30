@@ -217,6 +217,7 @@
 		A2DF58580DE4B2B0000795D5 /* JSON_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = A2DF576A0DE468C6000795D5 /* JSON_parser.c */; };
 		A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF576B0DE468C6000795D5 /* JSON_parser.h */; };
 		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */; };
+		A2E2EA920EE321C200EB6308 /* Groups.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E2EA910EE321C200EB6308 /* Groups.png */; };
 		A2E9AA760C249AF400085DCF /* Create.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* Create.png */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
 		A2EF7DEC0C96297400FA9811 /* PurpleDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2EF7DEB0C96297400FA9811 /* PurpleDot.png */; };
@@ -682,6 +683,7 @@
 		A2DF57730DE46A6A000795D5 /* QuickLookController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = QuickLookController.m; path = macosx/QuickLookController.m; sourceTree = "<group>"; };
 		A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabButtonCell.h; path = macosx/InfoTabButtonCell.h; sourceTree = "<group>"; };
 		A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTabButtonCell.m; path = macosx/InfoTabButtonCell.m; sourceTree = "<group>"; };
+		A2E2EA910EE321C200EB6308 /* Groups.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Groups.png; path = macosx/Images/Groups.png; sourceTree = "<group>"; };
 		A2E9AA750C249AF400085DCF /* Create.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Create.png; path = macosx/Images/Create.png; sourceTree = "<group>"; };
 		A2EA8E3C0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2EA8E3E0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1029,6 +1031,7 @@
 				A2BC19840CA9AF5A00DD302A /* CompleteCheck.png */,
 				4D752E920913C949008EAAD4 /* Preferences.png */,
 				A21DFF0F0A292B2B007C5F76 /* Transfers.png */,
+				A2E2EA910EE321C200EB6308 /* Groups.png */,
 				A2D0E0480A54A97C003C72CF /* Bandwidth.png */,
 				A224D2630DAAC55F000954EA /* Peers.png */,
 				A29E04B40DA8764100705643 /* Network.png */,
@@ -1760,6 +1763,7 @@
 				A2CB38AF0E1E6896002B514C /* COPYING in Resources */,
 				A250EEB60E2ED87B00A688E6 /* web in Resources */,
 				A22F1E550E7DA8030065DB9D /* sparkle_dsa_pub.pem in Resources */,
+				A2E2EA920EE321C200EB6308 /* Groups.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
