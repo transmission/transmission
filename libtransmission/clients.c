@@ -176,6 +176,11 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
             tr_snprintf( buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s",
                          strint(id+3,1), strint(id+4,1), strint(id+5,1), getMnemonicEnd(id[6]) );
         }
+        if( !memcmp( id+1, "UM", 2 ) )
+        {
+            tr_snprintf( buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s",
+                         strint(id+3,1), strint(id+4,1), strint(id+5,1), getMnemonicEnd(id[6]) );
+        }
 
         else if( !memcmp( id+1, "TR", 2 ) )
         {
