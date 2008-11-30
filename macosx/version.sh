@@ -21,8 +21,9 @@ SVN_REVISION_MAC=`find ./macosx -name "*\.[chmp]" -o -name "*\.cpp" -o -name "*\
               grep -v third-party | \
               cut -d"$Id:" -f3 | cut -d" " -f3 | sort -n | tail -n 1`
 
-if SVN_REVISION_MAC > SVN_REVISION; then
-	SVN_REVISION = SVN_REVISION_MAC
+if [ $SVN_REVISION_MAC -gt $SVN_REVISION ]
+then
+	SVN_REVISION=$SVN_REVISION_MAC
 fi
   
 # Generate files to be included: only overwrite them if changed so make
