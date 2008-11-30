@@ -7,8 +7,8 @@
 #         "Z" for unsupported trunk builds,
 #         "0" for stable, supported releases
 # these should be the only two lines you need to change
-PEERID_PREFIX="-TR1400-"
-USERAGENT_PREFIX="1.40"
+PEERID_PREFIX="-TR140Z-"
+USERAGENT_PREFIX="1.40+"
 
 SVN_REVISION=`find ./libtransmission -name "*\.[chmp]" -o -name "*\.cpp" -o -name "*\.po" -o -name "*\.sh" | \
               xargs grep "\$Id:" | \
