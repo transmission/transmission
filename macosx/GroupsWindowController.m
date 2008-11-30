@@ -223,6 +223,7 @@
     {
         [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
         [fCustomLocationEnableCheck setState: NSOffState];
+        [fCustomLocationPopUp setEnabled: NO];
     }
 
     [fCustomLocationPopUp selectItemAtIndex: 0];

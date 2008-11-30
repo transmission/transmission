@@ -257,7 +257,7 @@
     [fController askOpenConfirmed: self add: YES]; //ensure last, since it releases this controller
 }
 
-- (void) setDestination: (NSString *) destination
+- (void) setDestinationPath: (NSString *) destination
 {
     [fDestination release];
     fDestination = [destination retain];
@@ -275,7 +275,7 @@
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) contextInfo
 {
     if (code == NSOKButton)
-        [self setDestination: [[openPanel filenames] objectAtIndex: 0]];
+        [self setDestinationPath: [[openPanel filenames] objectAtIndex: 0]];
     else
     {
         if (!fDestination)
@@ -291,10 +291,14 @@
 
 - (void) changeGroupValue: (id) sender
 {
+    NSInteger previousGroup = fGroupValue;
     fGroupValue = [sender tag];
     if ([[GroupsController groups] usesCustomDownloadLocationForIndex: fGroupValue] &&
         [[GroupsController groups] customDownloadLocationForIndex: fGroupValue])
-        [self setDestination: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue]];
+        [self setDestinationPath: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue]];
+    else if ([fDestination isEqualToString: [[GroupsController groups] customDownloadLocationForIndex: previousGroup]])
+        [self setDestinationPath: [[NSUserDefaults standardUserDefaults] stringForKey: @"DownloadFolder"]];
+    else;
 }
 
 - (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
