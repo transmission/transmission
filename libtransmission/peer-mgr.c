@@ -1540,7 +1540,7 @@ tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
     const Torrent *    t;
     const tr_torrent * tor;
     float              interval;
-    int                isComplete;
+    int                isSeed;
     int                peerCount;
     const tr_peer **   peers;
 
@@ -1549,8 +1549,7 @@ tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     tor = t->tor;
     interval = tor->info.pieceCount / (float)tabCount;
-    isComplete = tor
-                 && ( tr_cpGetStatus ( tor->completion ) == TR_CP_COMPLETE );
+    isSeed = tor && ( tr_cpGetStatus ( tor->completion ) == TR_SEED );
     peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
 
     memset( tab, 0, tabCount );
@@ -1559,7 +1558,7 @@ tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
     {
         const int piece = i * interval;
 
-        if( isComplete || tr_cpPieceIsComplete( tor->completion, piece ) )
+        if( isSeed || tr_cpPieceIsComplete( tor->completion, piece ) )
             tab[i] = -1;
         else if( peerCount )
         {

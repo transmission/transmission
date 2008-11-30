@@ -995,9 +995,9 @@ void tr_torrentSetAnnounceList( tr_torrent *            torrent,
 
 typedef enum
 {
-    TR_CP_INCOMPLETE,   /* doesn't have all the desired pieces */
-    TR_CP_DONE,         /* has all the desired pieces, but not all pieces */
-    TR_CP_COMPLETE      /* has every piece */
+    TR_LEECH,           /* doesn't have all the desired pieces */
+    TR_SEED,            /* has the entire torrent */
+    TR_PARTIAL_SEED     /* has the desired pieces, but not the entire torrent */
 }
 tr_completeness;
 
@@ -1008,8 +1008,8 @@ typedef void ( tr_torrent_completeness_func )( tr_torrent       * torrent,
 /**
  * Register to be notified whenever a torrent's "completeness"
  * changes.  This will be called, for example, when a torrent
- * finishes downloading and changes from TR_CP_INCOMPLETE to
- * either TR_CP_COMPLETE or TR_CP_DONE.
+ * finishes downloading and changes from TR_LEECH to
+ * either TR_SEED or TR_PARTIAL_SEED.
  *
  * func is invoked FROM LIBTRANSMISSION'S THREAD!
  * This means func must be fast (to avoid blocking peers),
@@ -1326,12 +1326,13 @@ typedef struct tr_stat
     int    timesCompleted;
 
     /** Byte count of all the piece data we'll have downloaded when we're done,
-        whether or not we have it yet. [0...tr_info.totalSize] */
+        whether or not we have it yet.  This may be less than tr_info.totalSize
+        if only some of the torrent's files are wanted.
+        [0...tr_info.totalSize] */
     uint64_t    sizeWhenDone;
 
-    /** Byte count of how much data is left to be downloaded until
-        we're done -- that is, until we've got all the pieces we wanted.
-        [0...tr_info.sizeWhenDone] */
+    /** Byte count of how much data is left to be downloaded until we've got
+        all the pieces that we want.  [0...tr_info.sizeWhenDone] */
     uint64_t    leftUntilDone;
 
     /** Byte count of all the piece data we want and don't have yet,

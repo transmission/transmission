@@ -302,9 +302,9 @@ tr_cpLeftUntilComplete( const tr_completion * cp )
 tr_completeness
 tr_cpGetStatus( const tr_completion * cp )
 {
-    if( cp->sizeNow == cp->tor->info.totalSize ) return TR_CP_COMPLETE;
-    if( cp->sizeNow == tr_cpSizeWhenDone( cp ) ) return TR_CP_DONE;
-    return TR_CP_INCOMPLETE;
+    if( cp->sizeNow == cp->tor->info.totalSize ) return TR_SEED;
+    if( cp->sizeNow == tr_cpSizeWhenDone( cp ) ) return TR_PARTIAL_SEED;
+    return TR_LEECH;
 }
 
 static uint64_t
@@ -354,8 +354,7 @@ tr_cpGetAmountDone( const tr_completion * cp,
     int                i;
     const tr_torrent * tor = cp->tor;
     const float        interval = tor->info.pieceCount / (float)tabCount;
-    const int          isComplete = tr_cpGetStatus ( tor->completion ) ==
-                                    TR_CP_COMPLETE;
+    const int          isSeed = tr_cpGetStatus ( tor->completion ) == TR_SEED;
 
     for( i = 0; i < tabCount; ++i )
     {
@@ -363,7 +362,7 @@ tr_cpGetAmountDone( const tr_completion * cp,
 
         if( tor == NULL )
             tab[i] = 0.0f;
-        else if( isComplete || tr_cpPieceIsComplete( cp, piece ) )
+        else if( isSeed || tr_cpPieceIsComplete( cp, piece ) )
             tab[i] = 1.0f;
         else
             tab[i] = (float)cp->completeBlocks[piece] /

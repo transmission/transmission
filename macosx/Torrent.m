@@ -1885,8 +1885,8 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     BOOL canMove;
     switch ([status intValue])
     {
-        case TR_CP_DONE:
-        case TR_CP_COMPLETE:
+        case TR_SEED:
+        case TR_PARTIAL_SEED:
             canMove = YES;
             
             //move file from incomplete folder to download folder
@@ -1919,7 +1919,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
             break;
         
-        case TR_CP_INCOMPLETE:
+        case TR_LEECH:
             //do not allow to be backed up by Time Machine
             [self setTimeMachineExclude: YES forPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
             

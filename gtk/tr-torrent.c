@@ -166,7 +166,7 @@ completenessChangedCallback( tr_torrent       * tor UNUSED,
                              tr_completeness    completeness,
                              void *             user_data )
 {
-    if( completeness == TR_CP_COMPLETE )
+    if( completeness != TR_LEECH )
         g_idle_add( notifyInMainThread, user_data );
 }
 

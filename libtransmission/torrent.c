@@ -750,7 +750,7 @@ tr_torrentGetActivity( tr_torrent * tor )
         return TR_STATUS_CHECK_WAIT;
     if( !tor->isRunning )
         return TR_STATUS_STOPPED;
-    if( tor->completeness == TR_CP_INCOMPLETE )
+    if( tor->completeness == TR_LEECH )
         return TR_STATUS_DOWNLOAD;
 
     return TR_STATUS_SEED;
@@ -1261,10 +1261,10 @@ getCompletionString( int type )
            "Complete" means we've downloaded every file in the torrent.
            "Done" means we're done downloading the files we wanted, but NOT all
            that exist */
-        case TR_CP_DONE:
+        case TR_PARTIAL_SEED:
             return _( "Done" );
 
-        case TR_CP_COMPLETE:
+        case TR_SEED:
             return _( "Complete" );
 
         default:
@@ -1277,9 +1277,9 @@ fireCompletenessChange( tr_torrent       * tor,
                         tr_completeness    status )
 {
     assert( tor );
-    assert( ( status == TR_CP_INCOMPLETE )
-         || ( status == TR_CP_DONE )
-         || ( status == TR_CP_COMPLETE ) );
+    assert( ( status == TR_LEECH )
+         || ( status == TR_SEED )
+         || ( status == TR_PARTIAL_SEED ) );
 
     if( tor->completeness_func )
         tor->completeness_func( tor, status, tor->completeness_func_user_data );
@@ -1324,7 +1324,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         tor->completeness = completeness;
         fireCompletenessChange( tor, completeness );
 
-        if( recentChange && ( completeness == TR_CP_COMPLETE ) )
+        if( recentChange && ( completeness == TR_SEED ) )
         {
             tr_trackerCompleted( tor->tracker );
 
@@ -1340,7 +1340,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
 int
 tr_torrentIsSeed( const tr_torrent * tor )
 {
-    return tor->completeness == TR_CP_COMPLETE || tor->completeness == TR_CP_DONE;
+    return tor->completeness == TR_SEED || tor->completeness == TR_PARTIAL_SEED;
 }
 
 /**
