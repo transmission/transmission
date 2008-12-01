@@ -70,6 +70,8 @@ EXTRA_DIST = \
     FilterButton.m \
     GroupsController.h \
     GroupsController.m \
+    GroupsPrefsController.h \
+    GroupsPrefsController.m \
     GroupToolbarItem.h \
     GroupToolbarItem.m \
     InfoTabButtonCell.h \

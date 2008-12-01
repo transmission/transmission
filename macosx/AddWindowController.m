@@ -48,6 +48,7 @@
 
 @implementation AddWindowController
 
+#warning don't let group override destination if the destination is already specified (as in adding from creation)
 - (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller
         deleteTorrent: (torrentFileState) deleteTorrent
 {
