@@ -2,7 +2,6 @@ EXTRA_DIST = \
     Credits.rtf \
     AboutWindow.xib \
     BlocklistStatusWindow.xib \
-    GroupsWindow.xib \
     MessageWindow.xib \
     StatsWindow.xib \
     Defaults.plist \
@@ -71,8 +70,6 @@ EXTRA_DIST = \
     FilterButton.m \
     GroupsController.h \
     GroupsController.m \
-    GroupsWindowController.h \
-    GroupsWindowController.m \
     GroupToolbarItem.h \
     GroupToolbarItem.m \
     InfoTabButtonCell.h \
