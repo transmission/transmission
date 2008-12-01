@@ -55,6 +55,7 @@ extern "C" {
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
 typedef uint64_t tr_block_index_t;
+typedef uint16_t tr_port;
 typedef uint8_t tr_bool;
 
 /**
@@ -279,7 +280,7 @@ tr_session * tr_sessionInitFull( const char *       configDir,
                                  int                isBlocklistEnabled,
                                  int                peerSocketTOS,
                                  int                rpcIsEnabled,
-                                 uint16_t           rpcPort,
+                                 tr_port            rpcPort,
                                  int                rpcWhitelistIsEnabled,
                                  const char *       rpcWhitelist,
                                  int                rpcPasswordIsEnabled,
@@ -349,12 +350,12 @@ int  tr_sessionIsRPCEnabled( const tr_session * session );
     @see tr_sessionInitFull()
     @see tr_sessionGetRPCPort */
 void tr_sessionSetRPCPort( tr_session  * session,
-                           uint16_t      port );
+                           tr_port       port );
 
 /** @brief Get which port to listen for RPC requests on.
     @see tr_sessionInitFull()
     @see tr_sessionSetRPCPort */
-uint16_t  tr_sessionGetRPCPort( const tr_session * session );
+tr_port tr_sessionGetRPCPort( const tr_session * session );
 
 /**
  * @brief Specify a whitelist for remote RPC access
@@ -1059,7 +1060,7 @@ typedef struct tr_peer_stat
     tr_bool      isIncoming;
 
     uint8_t      from;
-    uint16_t     port;
+    tr_port      port;
 
     char         addr[16];
     char         client[80];

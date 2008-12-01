@@ -293,7 +293,7 @@ parseOldPeers( tr_benc * bePeers,
         const char *   s;
         int64_t        itmp;
         struct in_addr addr;
-        tr_port_t      port;
+        tr_port        port;
         tr_benc *      peer = &bePeers->val.l.vals[i];
 
         if( !tr_bencDictFindStr( peer, "ip",

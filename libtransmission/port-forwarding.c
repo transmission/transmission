@@ -139,7 +139,7 @@ incomingPeersPulse( tr_shared * s )
     for( ; ; ) /* check for new incoming peer connections */
     {
         int            socket;
-        uint16_t       port;
+        tr_port        port;
         struct in_addr addr;
 
         if( s->bindSocket < 0 )

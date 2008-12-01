@@ -139,7 +139,7 @@ setSndBuf( tr_session * session UNUSED, int fd UNUSED )
 int
 tr_netOpenTCP( tr_session            * session,
                const struct in_addr  * addr,
-               tr_port_t               port )
+               tr_port                 port )
 {
     int                s;
     struct sockaddr_in sock;
@@ -162,10 +162,8 @@ tr_netOpenTCP( tr_session            * session,
 #endif
       && ( sockerrno != EINPROGRESS ) )
     {
-        tr_err( _(
-                   "Couldn't connect socket %d to %s, port %d (errno %d - %s)" ),
-               s, inet_ntoa( *addr ), port,
-               sockerrno, tr_strerror( sockerrno ) );
+        tr_err( _( "Couldn't connect socket %d to %s, port %d (errno %d - %s)" ),
+               s, inet_ntoa( *addr ), (int)port, sockerrno, tr_strerror( sockerrno ) );
         tr_netClose( s );
         s = -1;
     }
@@ -217,7 +215,7 @@ int
 tr_netAccept( tr_session      * session,
               int               b,
               struct in_addr  * addr,
-              tr_port_t       * port )
+              tr_port         * port )
 {
     int fd = makeSocketNonBlocking( tr_fdSocketAccept( b, addr, port ) );
     setSndBuf( session, fd );

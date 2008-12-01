@@ -89,7 +89,7 @@ struct tr_peerIo
 
     uint8_t                  encryptionMode;
     uint8_t                  timeout;
-    uint16_t                 port;
+    tr_port                  port;
     int                      socket;
 
     uint8_t                  peerId[20];
@@ -240,7 +240,7 @@ isPeerIo( const tr_peerIo * io )
 static tr_peerIo*
 tr_peerIoNew( tr_session *           session,
               const struct in_addr * in_addr,
-              uint16_t               port,
+              tr_port                port,
               const uint8_t *        torrentHash,
               int                    isIncoming,
               int                    socket )
@@ -268,7 +268,7 @@ tr_peerIoNew( tr_session *           session,
 tr_peerIo*
 tr_peerIoNewIncoming( tr_session *           session,
                       const struct in_addr * in_addr,
-                      uint16_t               port,
+                      tr_port                port,
                       int                    socket )
 {
     assert( session );
@@ -338,7 +338,7 @@ tr_peerIoGetSession( tr_peerIo * io )
 
 const struct in_addr*
 tr_peerIoGetAddress( const tr_peerIo * io,
-                           uint16_t * port )
+                           tr_port   * port )
 {
     assert( isPeerIo( io ) );
 
@@ -350,7 +350,7 @@ tr_peerIoGetAddress( const tr_peerIo * io,
 
 const char*
 tr_peerIoAddrStr( const struct in_addr * addr,
-                  uint16_t               port )
+                  tr_port                port )
 {
     static char buf[512];
 

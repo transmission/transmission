@@ -39,7 +39,7 @@ tr_peerIo*           tr_peerIoNewOutgoing( struct tr_handle     * session,
 
 tr_peerIo*           tr_peerIoNewIncoming( struct tr_handle     * session,
                                            const struct in_addr * addr,
-                                           uint16_t               port,
+                                           tr_port                port,
                                            int                    socket );
 
 void                 tr_peerIoFree( tr_peerIo * io );
@@ -60,12 +60,12 @@ int                  tr_peerIoSupportsLTEP( const tr_peerIo * io );
 **/
 
 const char*          tr_peerIoAddrStr( const struct in_addr * addr,
-                                       uint16_t               port );
+                                       tr_port                port );
 
 const char*          tr_peerIoGetAddrStr( const tr_peerIo * io );
 
 const struct in_addr*tr_peerIoGetAddress( const tr_peerIo * io,
-                                                uint16_t * port );
+                                          tr_port         * port );
 
 const uint8_t*       tr_peerIoGetTorrentHash( tr_peerIo * io );
 

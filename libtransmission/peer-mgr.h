@@ -43,7 +43,7 @@ enum
 typedef struct tr_pex
 {
     struct in_addr in_addr;
-    uint16_t    port;
+    tr_port     port;
     uint8_t     flags;
 }
 tr_pex;
@@ -60,7 +60,7 @@ int tr_peerMgrPeerIsSeed( const tr_peerMgr      * mgr,
 
 void tr_peerMgrAddIncoming( tr_peerMgr     * manager,
                             struct in_addr * addr,
-                            uint16_t         port,
+                            tr_port          port,
                             int              socket );
 
 tr_pex * tr_peerMgrCompactToPex( const void    * compact,

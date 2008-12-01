@@ -33,18 +33,15 @@
  #include <inttypes.h>
  #include <winsock2.h>
  typedef int socklen_t;
- typedef uint16_t tr_port_t;
 #elif defined( __BEOS__ )
  #include <sys/socket.h>
  #include <netinet/in.h>
- typedef unsigned short tr_port_t;
  typedef int socklen_t;
 #else
  #include <sys/types.h>
  #include <sys/socket.h>
  #include <netinet/in.h>
  #include <arpa/inet.h>
- typedef in_port_t tr_port_t;
 #endif
 
 #ifdef WIN32
@@ -76,14 +73,14 @@ int  tr_netResolve( const  char *,
  **********************************************************************/
 int  tr_netOpenTCP( struct tr_handle     * session,
                     const struct in_addr * addr,
-                    tr_port_t              port );
+                    tr_port                port );
 
 int  tr_netBindTCP( int port );
 
 int  tr_netAccept( struct tr_handle  * session,
                    int                 bound,
                    struct in_addr    * setme_addr,
-                   tr_port_t         * setme_port );
+                   tr_port           * setme_port );
 
 int  tr_netSetTOS( int s,
                    int tos );

@@ -50,7 +50,7 @@ struct tr_rpc_server
     tr_bool            isEnabled;
     tr_bool            isPasswordEnabled;
     tr_bool            isWhitelistEnabled;
-    uint16_t           port;
+    tr_port            port;
     struct evhttp *    httpd;
     tr_handle *        session;
     char *             username;
@@ -566,7 +566,7 @@ restartServer( void * vserver )
 
 void
 tr_rpcSetPort( tr_rpc_server * server,
-               uint16_t        port )
+               tr_port         port )
 {
     if( server->port != port )
     {
@@ -577,7 +577,7 @@ tr_rpcSetPort( tr_rpc_server * server,
     }
 }
 
-uint16_t
+tr_port
 tr_rpcGetPort( const tr_rpc_server * server )
 {
     return server->port;
@@ -684,7 +684,7 @@ tr_rpcClose( tr_rpc_server ** ps )
 tr_rpc_server *
 tr_rpcInit( tr_handle *  session,
             int          isEnabled,
-            uint16_t     port,
+            tr_port      port,
             int          isWhitelistEnabled,
             const char * whitelist,
             int          isPasswordEnabled,

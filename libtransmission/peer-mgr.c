@@ -98,7 +98,7 @@ struct peer_atom
     uint8_t           from;
     uint8_t           flags; /* these match the added_f flags */
     uint8_t           myflags; /* flags that aren't defined in added_f */
-    uint16_t          port;
+    tr_port           port;
     uint16_t          numFails;
     struct in_addr    addr;
     time_t            time; /* when the peer's connection status last changed */
@@ -1113,7 +1113,7 @@ peerCallbackFunc( void * vpeer,
 static void
 ensureAtomExists( Torrent *              t,
                   const struct in_addr * addr,
-                  uint16_t               port,
+                  tr_port                port,
                   uint8_t                flags,
                   uint8_t                from )
 {
@@ -1154,7 +1154,7 @@ myHandshakeDoneCB( tr_handshake *  handshake,
 {
     int                    ok = isConnected;
     int                    success = FALSE;
-    uint16_t               port;
+    tr_port                port;
     const struct in_addr * addr;
     tr_peerMgr *           manager = (tr_peerMgr*) vmanager;
     Torrent *              t;
@@ -1255,7 +1255,7 @@ myHandshakeDoneCB( tr_handshake *  handshake,
 void
 tr_peerMgrAddIncoming( tr_peerMgr *     manager,
                        struct in_addr * addr,
-                       uint16_t         port,
+                       tr_port          port,
                        int              socket )
 {
     managerLock( manager );

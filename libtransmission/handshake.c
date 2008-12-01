@@ -1198,7 +1198,7 @@ tr_handshakeGetIO( tr_handshake * handshake )
 
 const struct in_addr *
 tr_handshakeGetAddr( const struct tr_handshake * handshake,
-                                                 uint16_t * port )
+                     tr_port                   * port )
 {
     assert( handshake );
     assert( handshake->io );

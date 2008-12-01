@@ -471,9 +471,9 @@ tr_fdSocketCreate( int type )
 }
 
 int
-tr_fdSocketAccept( int              b,
-                   struct in_addr * addr,
-                   tr_port_t *      port )
+tr_fdSocketAccept( int               b,
+                   struct in_addr  * addr,
+                   tr_port         * port )
 {
     int                s = -1;
     unsigned int       len;

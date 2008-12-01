@@ -51,7 +51,7 @@ typedef struct tr_peer
     uint8_t                  strikes;
 
     uint8_t                  encryption_preference;
-    uint16_t                 port;
+    tr_port                  port;
     struct in_addr           in_addr;
     struct tr_peerIo       * io;
 
