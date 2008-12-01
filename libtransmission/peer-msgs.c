@@ -1301,8 +1301,7 @@ readBtMessage( tr_peermsgs *     msgs,
             tr_peerIoReadUint32( msgs->io, inbuf, &r.index );
             tr_peerIoReadUint32( msgs->io, inbuf, &r.offset );
             tr_peerIoReadUint32( msgs->io, inbuf, &r.length );
-            dbgmsg( msgs, "got Request: %u:%u->%u", r.index, r.offset,
-                    r.length );
+            dbgmsg( msgs, "got Request: %u:%u->%u", r.index, r.offset, r.length );
             peerMadeRequest( msgs, &r );
             break;
         }
@@ -1313,8 +1312,7 @@ readBtMessage( tr_peermsgs *     msgs,
             tr_peerIoReadUint32( msgs->io, inbuf, &r.index );
             tr_peerIoReadUint32( msgs->io, inbuf, &r.offset );
             tr_peerIoReadUint32( msgs->io, inbuf, &r.length );
-            dbgmsg( msgs, "got a Cancel %u:%u->%u", r.index, r.offset,
-                    r.length );
+            dbgmsg( msgs, "got a Cancel %u:%u->%u", r.index, r.offset, r.length );
             reqListRemove( &msgs->peerAskedFor, &r );
             break;
         }
@@ -1928,6 +1926,7 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
         tr_publisherFree( &msgs->publisher );
         reqListClear( &msgs->clientWillAskFor );
         reqListClear( &msgs->clientAskedFor );
+        reqListClear( &msgs->peerAskedFor );
 
         tr_bitfieldFree( msgs->peerAllowedPieces );
         evbuffer_free( msgs->incoming.block );
