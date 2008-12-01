@@ -21,6 +21,7 @@
 ***
 **/
 
+struct in_addr;
 struct evbuffer;
 struct tr_bandwidth;
 struct tr_crypto;
@@ -31,15 +32,15 @@ typedef struct tr_peerIo tr_peerIo;
 ***
 **/
 
-tr_peerIo*           tr_peerIoNewOutgoing( struct tr_handle * session,
-                                           const tr_address * addr,
-                                           int                port,
-                                           const  uint8_t   * torrentHash );
+tr_peerIo*           tr_peerIoNewOutgoing( struct tr_handle     * session,
+                                           const struct in_addr * addr,
+                                           int                    port,
+                                           const  uint8_t       * torrentHash );
 
-tr_peerIo*           tr_peerIoNewIncoming( struct tr_handle * session,
-                                           const tr_address * addr,
-                                           uint16_t           port,
-                                           int                socket );
+tr_peerIo*           tr_peerIoNewIncoming( struct tr_handle     * session,
+                                           const struct in_addr * addr,
+                                           uint16_t               port,
+                                           int                    socket );
 
 void                 tr_peerIoFree( tr_peerIo * io );
 
@@ -58,12 +59,12 @@ int                  tr_peerIoSupportsLTEP( const tr_peerIo * io );
 ***
 **/
 
-const char*          tr_peerIoAddrStr( const tr_address * addr,
-                                       uint16_t           port );
+const char*          tr_peerIoAddrStr( const struct in_addr * addr,
+                                       uint16_t               port );
 
 const char*          tr_peerIoGetAddrStr( const tr_peerIo * io );
 
-const tr_address *   tr_peerIoGetAddress( const tr_peerIo * io,
+const struct in_addr*tr_peerIoGetAddress( const tr_peerIo * io,
                                                 uint16_t * port );
 
 const uint8_t*       tr_peerIoGetTorrentHash( tr_peerIo * io );

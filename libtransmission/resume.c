@@ -61,7 +61,6 @@ getResumeFilename( const tr_torrent * tor )
 ****
 ***/
 
-/* TODO: fast resume is done with pex */
 static void
 savePeers( tr_benc *          dict,
            const tr_torrent * tor )

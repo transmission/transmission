@@ -21,6 +21,8 @@
 
 #ifdef WIN32
  #include <winsock2.h> /* struct in_addr */
+#else
+ #include <netinet/in.h> /* struct in_addr */
 #endif
 
 #include "publish.h" /* tr_publisher_tag */
@@ -50,7 +52,7 @@ typedef struct tr_peer
 
     uint8_t                  encryption_preference;
     uint16_t                 port;
-    tr_address               addr;
+    struct in_addr           in_addr;
     struct tr_peerIo       * io;
 
     struct tr_bitfield     * blame;

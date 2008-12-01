@@ -114,8 +114,7 @@ incomingPeersPulse( tr_shared * s )
     {
         int socket;
         errno = 0;
-        /* TODO: this is where we want to listen on another socket */
-        socket = tr_netBindTCP( &tr_inaddr_any, s->publicPort );
+        socket = tr_netBindTCP( s->publicPort );
         if( socket >= 0 )
         {
             tr_ninf( getKey( ),
@@ -139,9 +138,9 @@ incomingPeersPulse( tr_shared * s )
 
     for( ; ; ) /* check for new incoming peer connections */
     {
-        int        socket;
-        uint16_t   port;
-        tr_address addr;
+        int            socket;
+        uint16_t       port;
+        struct in_addr addr;
 
         if( s->bindSocket < 0 )
             break;

@@ -799,8 +799,8 @@ tr_blocklistSetContent( tr_session * session,
 }
 
 int
-tr_sessionIsAddressBlocked( const tr_session * session,
-                            const tr_address * addr )
+tr_sessionIsAddressBlocked( const tr_session *     session,
+                            const struct in_addr * addr )
 {
     tr_list * l;
 

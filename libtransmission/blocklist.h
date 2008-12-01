@@ -17,8 +17,7 @@
 #ifndef TR_BLOCKLIST_H
 #define TR_BLOCKLIST_H
 
-struct tr_address;
-
+struct in_addr;
 typedef struct tr_blocklist tr_blocklist;
 
 tr_blocklist* _tr_blocklistNew( const char * filename,
@@ -34,13 +33,16 @@ void          _tr_blocklistFree( tr_blocklist * );
 
 int           _tr_blocklistIsEnabled( tr_blocklist * );
 
-void          _tr_blocklistSetEnabled( tr_blocklist * ,
-                                       int isEnabled );
+void          _tr_blocklistSetEnabled(             tr_blocklist *,
+                                               int isEnabled );
 
-int           _tr_blocklistHasAddress( tr_blocklist *,
-                                       const tr_address * addr );
+int           _tr_blocklistHasAddress(
+              tr_blocklist *,
+    const struct
+    in_addr * addr );
 
-int           _tr_blocklistSetContent( tr_blocklist *,
-                                       const char * filename );
+int           _tr_blocklistSetContent(
+                 tr_blocklist *,
+    const char * filename );
 
 #endif

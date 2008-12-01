@@ -39,8 +39,6 @@
  #endif
 #endif
 
-#include "net.h"
-
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
@@ -123,8 +121,10 @@ void         tr_sessionSetTorrentFile( tr_session * session,
                                        const char * hashString,
                                        const char * filename );
 
-int          tr_sessionIsAddressBlocked( const tr_session * session,
-                                         const tr_address * addr );
+struct in_addr;
+
+int          tr_sessionIsAddressBlocked( const tr_session *     session,
+                                         const struct in_addr * addr );
 
 
 void         tr_globalLock( tr_session * );

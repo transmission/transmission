@@ -19,6 +19,7 @@
 #ifdef WIN32
  #include <winsock2.h>
 #else
+ #include <netinet/in.h> /* struct in_addr */
  #include <arpa/inet.h> /* inet_ntoa */
 #endif
 
@@ -96,7 +97,7 @@ struct tr_peerIo
 
     tr_session             * session;
 
-    tr_address               addr;
+    struct in_addr           in_addr;
     struct tr_iobuf        * iobuf;
     tr_list                * output_datatypes; /* struct tr_datatype */
 
@@ -237,12 +238,12 @@ isPeerIo( const tr_peerIo * io )
 }
 
 static tr_peerIo*
-tr_peerIoNew( tr_session       * session,
-              const tr_address * addr,
-              uint16_t           port,
-              const uint8_t *    torrentHash,
-              int                isIncoming,
-              int                socket )
+tr_peerIoNew( tr_session *           session,
+              const struct in_addr * in_addr,
+              uint16_t               port,
+              const uint8_t *        torrentHash,
+              int                    isIncoming,
+              int                    socket )
 {
     tr_peerIo * io;
 
@@ -253,7 +254,7 @@ tr_peerIoNew( tr_session       * session,
     io->magicNumber = MAGIC_NUMBER;
     io->crypto = tr_cryptoNew( torrentHash, isIncoming );
     io->session = session;
-    io->addr = *addr;
+    io->in_addr = *in_addr;
     io->port = port;
     io->socket = socket;
     io->isIncoming = isIncoming != 0;
@@ -265,38 +266,38 @@ tr_peerIoNew( tr_session       * session,
 }
 
 tr_peerIo*
-tr_peerIoNewIncoming( tr_session       * session,
-                      const tr_address * addr,
-                      uint16_t           port,
-                      int                socket )
+tr_peerIoNewIncoming( tr_session *           session,
+                      const struct in_addr * in_addr,
+                      uint16_t               port,
+                      int                    socket )
 {
     assert( session );
-    assert( addr );
+    assert( in_addr );
     assert( socket >= 0 );
 
-    return tr_peerIoNew( session, addr, port,
+    return tr_peerIoNew( session, in_addr, port,
                          NULL, 1,
                          socket );
 }
 
 tr_peerIo*
-tr_peerIoNewOutgoing( tr_session       * session,
-                      const tr_address * addr,
-                      int                port,
-                      const uint8_t    * torrentHash )
+tr_peerIoNewOutgoing( tr_session *           session,
+                      const struct in_addr * in_addr,
+                      int                    port,
+                      const uint8_t *        torrentHash )
 {
     int socket;
 
     assert( session );
-    assert( addr );
+    assert( in_addr );
     assert( port >= 0 );
     assert( torrentHash );
 
-    socket = tr_netOpenTCP( session, addr, port );
+    socket = tr_netOpenTCP( session, in_addr, port );
 
     return socket < 0
            ? NULL
-           : tr_peerIoNew( session, addr, port, torrentHash, 0, socket );
+           : tr_peerIoNew( session, in_addr, port, torrentHash, 0, socket );
 }
 
 static void
@@ -335,37 +336,33 @@ tr_peerIoGetSession( tr_peerIo * io )
     return io->session;
 }
 
-const tr_address*
+const struct in_addr*
 tr_peerIoGetAddress( const tr_peerIo * io,
-                           uint16_t  * port )
+                           uint16_t * port )
 {
     assert( isPeerIo( io ) );
 
     if( port )
         *port = io->port;
 
-    return &io->addr;
+    return &io->in_addr;
 }
 
 const char*
-tr_peerIoAddrStr( const tr_address * addr,
-                  uint16_t           port )
+tr_peerIoAddrStr( const struct in_addr * addr,
+                  uint16_t               port )
 {
     static char buf[512];
 
-    if( addr->type == TR_AF_INET )
-        tr_snprintf( buf, sizeof( buf ), "%s:%u", tr_ntop_non_ts( addr ),
-                    ntohs( port ) );
-    else
-        tr_snprintf( buf, sizeof( buf ), "[%s]:%u", tr_ntop_non_ts( addr ),
-                    ntohs( port ) );
+    tr_snprintf( buf, sizeof( buf ), "%s:%u", inet_ntoa( *addr ),
+                ntohs( port ) );
     return buf;
 }
 
 const char*
 tr_peerIoGetAddrStr( const tr_peerIo * io )
 {
-    return tr_peerIoAddrStr( &io->addr, io->port );
+    return tr_peerIoAddrStr( &io->in_addr, io->port );
 }
 
 static void
@@ -404,7 +401,7 @@ tr_peerIoReconnect( tr_peerIo * io )
     if( io->socket >= 0 )
         tr_netClose( io->socket );
 
-    io->socket = tr_netOpenTCP( io->session, &io->addr, io->port );
+    io->socket = tr_netOpenTCP( io->session, &io->in_addr, io->port );
 
     if( io->socket >= 0 )
     {
