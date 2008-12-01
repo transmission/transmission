@@ -26,7 +26,7 @@
 
 @class CTGradient;
 
-@interface GroupsWindowController : NSWindowController
+@interface GroupsPrefsController : NSObject
 {
     IBOutlet NSTableView * fTableView;
     IBOutlet NSSegmentedControl * fAddRemoveControl;

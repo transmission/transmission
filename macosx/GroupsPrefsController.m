@@ -22,7 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "GroupsWindowController.h"
+#import "GroupsPrefsController.h"
 #import "GroupsController.h"
 #import "NSApplicationAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
@@ -33,31 +33,25 @@
 #define ADD_TAG 0
 #define REMOVE_TAG 1
 
-@interface GroupsWindowController (Private)
+@interface GroupsPrefsController (Private)
 
 - (void) updateSelectedColor;
 
 @end
 
-@implementation GroupsWindowController
+@implementation GroupsPrefsController
 
-#warning should this still be a window controller?
 - (void) awakeFromNib
 {
-    [[[fTableView tableColumnWithIdentifier: @"Button"] dataCell] setTitle: NSLocalizedString(@"Color", "Groups -> color button")];
-    
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: GROUP_TABLE_VIEW_DATA_TYPE]];
     
-    if ([NSApp isOnLeopardOrBetter])
-        [[self window] setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
-    else
+    if (![NSApp isOnLeopardOrBetter])
     {
         [fAddRemoveControl sizeToFit];
         [fAddRemoveControl setLabel: @"+" forSegment: ADD_TAG];
         [fAddRemoveControl setLabel: @"-" forSegment: REMOVE_TAG];
     }
-
-    [fAddRemoveControl setEnabled: NO forSegment: REMOVE_TAG];
+    
     [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
     
     [self updateSelectedColor];
@@ -231,7 +225,7 @@
 
 @end
 
-@implementation GroupsWindowController (Private)
+@implementation GroupsPrefsController (Private)
 
 - (void) updateSelectedColor
 {
