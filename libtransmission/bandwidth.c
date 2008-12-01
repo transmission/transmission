@@ -257,8 +257,15 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
         const double currentSpeed = getSpeed( &b->band[dir].piece, HISTORY_MSEC - period_msec );
         const double desiredSpeed = b->band[dir].desiredSpeed;
         const double pulseCount = ( HISTORY_MSEC - period_msec ) / (double)period_msec;
-        const double nextPulseSpeed = desiredSpeed * ( pulseCount + 1 ) - ( currentSpeed * pulseCount );
-        b->band[dir].bytesLeft = MAX( 0.0, nextPulseSpeed * 1024.0 * period_msec / 1000.0 );
+        double nextPulseSpeed = desiredSpeed * ( pulseCount + 1 ) - ( currentSpeed * pulseCount );
+
+        /* clamp the speed to prevent oscillation */
+        const double minSpeed = desiredSpeed * 0.8;
+        const double maxSpeed = desiredSpeed * 1.2;
+        nextPulseSpeed = MAX( minSpeed, nextPulseSpeed );
+        nextPulseSpeed = MIN( maxSpeed, nextPulseSpeed );
+
+        b->band[dir].bytesLeft = nextPulseSpeed * 1024.0 * period_msec / 1000.0;
 
 #ifdef DEBUG_DIRECTION
         if( dir == DEBUG_DIRECTION )
