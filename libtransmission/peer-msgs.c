@@ -1962,7 +1962,11 @@ sendPex( tr_peermsgs * msgs )
             "pex: old peer count %d, new peer count %d, added %d, removed %d",
             msgs->pexCount, newCount, diffs.addedCount, diffs.droppedCount );
 
-        if( diffs.addedCount || diffs.droppedCount )
+        if( !diffs.addedCount && !diffs.droppedCount )
+        {
+            tr_free( diffs.elements );
+        }
+        else
         {
             int  i;
             tr_benc val;
