@@ -1764,6 +1764,7 @@ pexElementCb( void * vpex,
     diffs->elements[diffs->elementCount++] = *pex;
 }
 
+/* TODO: ipv6 pex */
 static void
 sendPex( tr_peermsgs * msgs )
 {
@@ -1815,7 +1816,7 @@ sendPex( tr_peermsgs * msgs )
             /* "added" */
             tmp = walk = tr_new( uint8_t, diffs.addedCount * 6 );
             for( i = 0; i < diffs.addedCount; ++i ) {
-                memcpy( walk, &diffs.added[i].in_addr, 4 ); walk += 4;
+                memcpy( walk, &diffs.added[i].addr.addr, 4 ); walk += 4;
                 memcpy( walk, &diffs.added[i].port, 2 ); walk += 2;
             }
             assert( ( walk - tmp ) == diffs.addedCount * 6 );
@@ -1833,7 +1834,7 @@ sendPex( tr_peermsgs * msgs )
             /* "dropped" */
             tmp = walk = tr_new( uint8_t, diffs.droppedCount * 6 );
             for( i = 0; i < diffs.droppedCount; ++i ) {
-                memcpy( walk, &diffs.dropped[i].in_addr, 4 ); walk += 4;
+                memcpy( walk, &diffs.dropped[i].addr.addr, 4 ); walk += 4;
                 memcpy( walk, &diffs.dropped[i].port, 2 ); walk += 2;
             }
             assert( ( walk - tmp ) == diffs.droppedCount * 6 );

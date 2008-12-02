@@ -280,6 +280,7 @@ static uint8_t *
 parseOldPeers( tr_benc * bePeers,
                size_t *  byteCount )
 {
+    /* TODO: IPv6 wtf */
     int       i;
     uint8_t * compact, *walk;
     const int peerCount = bePeers->val.l.count;
@@ -290,17 +291,21 @@ parseOldPeers( tr_benc * bePeers,
 
     for( i = 0, walk = compact; i < peerCount; ++i )
     {
-        const char *   s;
-        int64_t        itmp;
-        struct in_addr addr;
-        tr_port        port;
-        tr_benc *      peer = &bePeers->val.l.vals[i];
-
-        if( !tr_bencDictFindStr( peer, "ip",
-                                 &s ) || tr_netResolve( s, &addr ) )
-            continue;
-
-        memcpy( walk, &addr, 4 );
+        const char * s; 
+        int64_t      itmp; 
+        tr_address   addr; 
+        tr_port      port; 
+        tr_benc    * peer = &bePeers->val.l.vals[i]; 
+ 
+        if( tr_bencDictFindStr( peer, "ip", &s ) ) 
+        { 
+            if( tr_pton( s, &addr ) == NULL ) 
+                continue; 
+            if( addr.type != TR_AF_INET ) 
+                continue; 
+        } 
+ 
+        memcpy( walk, &addr.addr.addr4.s_addr, 4 ); 
         walk += 4;
 
         if( !tr_bencDictFindInt( peer, "port",

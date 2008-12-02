@@ -31,7 +31,7 @@
 #include "transmission.h"
 #include "platform.h"
 #include "blocklist.h"
-#include "net.h" /* tr_netResolve() */
+#include "net.h"
 #include "utils.h"
 
 /***
@@ -198,8 +198,8 @@ _tr_blocklistSetEnabled( tr_blocklist * b,
 }
 
 int
-_tr_blocklistHasAddress( tr_blocklist *         b,
-                         const struct in_addr * addr )
+_tr_blocklistHasAddress( tr_blocklist            * b,
+                         const struct tr_address * addr )
 {
     uint32_t                   needle;
     const struct tr_ip_range * range;
@@ -211,7 +211,7 @@ _tr_blocklistHasAddress( tr_blocklist *         b,
     if( !b->rules )
         return 0;
 
-    needle = ntohl( addr->s_addr );
+    needle = ntohl( addr->addr.addr4.s_addr );
 
     range = bsearch( &needle,
                      b->rules,
@@ -259,7 +259,7 @@ _tr_blocklistSetContent( tr_blocklist * b,
     {
         char *             rangeBegin;
         char *             rangeEnd;
-        struct in_addr     in_addr;
+        struct tr_address  addr;
         struct tr_ip_range range;
 
         rangeBegin = strrchr( line, ':' );
@@ -270,13 +270,13 @@ _tr_blocklistSetContent( tr_blocklist * b,
         if( !rangeEnd ){ free( line ); continue; }
         *rangeEnd++ = '\0';
 
-        if( tr_netResolve( rangeBegin, &in_addr ) )
+        if( !tr_pton( rangeBegin, &addr ) )
             tr_err( "blocklist skipped invalid address [%s]\n", rangeBegin );
-        range.begin = ntohl( in_addr.s_addr );
+        range.begin = ntohl( addr.addr.addr4.s_addr );
 
-        if( tr_netResolve( rangeEnd, &in_addr ) )
+        if( !tr_pton( rangeEnd, &addr ) )
             tr_err( "blocklist skipped invalid address [%s]\n", rangeEnd );
-        range.end = ntohl( in_addr.s_addr );
+        range.end = ntohl( addr.addr.addr4.s_addr );
 
         free( line );
 

@@ -61,6 +61,7 @@ getResumeFilename( const tr_torrent * tor )
 ****
 ***/
 
+/* TODO: resume peers6 */
 static void
 savePeers( tr_benc *          dict,
            const tr_torrent * tor )

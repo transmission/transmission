@@ -21,11 +21,10 @@
 
 #ifdef WIN32
  #include <winsock2.h> /* struct in_addr */
-#else
- #include <netinet/in.h> /* struct in_addr */
 #endif
 
-struct in_addr;
+#include "net.h"
+
 struct tr_handle;
 struct tr_peer_stat;
 struct tr_torrent;
@@ -42,9 +41,9 @@ enum
 
 typedef struct tr_pex
 {
-    struct in_addr in_addr;
-    tr_port     port;
-    uint8_t     flags;
+    tr_address addr;
+    tr_port    port;
+    uint8_t    flags;
 }
 tr_pex;
 
@@ -54,14 +53,14 @@ tr_peerMgr* tr_peerMgrNew( struct tr_handle * );
 
 void tr_peerMgrFree( tr_peerMgr * manager );
 
-int tr_peerMgrPeerIsSeed( const tr_peerMgr      * mgr,
-                          const uint8_t         * torrentHash,
-                          const struct in_addr  * addr );
+int tr_peerMgrPeerIsSeed( const tr_peerMgr  * mgr,
+                          const uint8_t     * torrentHash,
+                          const tr_address  * addr );
 
-void tr_peerMgrAddIncoming( tr_peerMgr     * manager,
-                            struct in_addr * addr,
-                            tr_port          port,
-                            int              socket );
+void tr_peerMgrAddIncoming( tr_peerMgr  * manager,
+                            tr_address  * addr,
+                            tr_port       port,
+                            int           socket );
 
 tr_pex * tr_peerMgrCompactToPex( const void    * compact,
                                  size_t          compactLen,

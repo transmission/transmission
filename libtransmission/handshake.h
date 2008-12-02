@@ -19,7 +19,7 @@
 
 #include "transmission.h"
 
-struct in_addr;
+struct tr_address;
 struct tr_peerIo;
 typedef struct tr_handshake tr_handshake;
 
@@ -35,7 +35,8 @@ tr_handshake *         tr_handshakeNew( struct tr_peerIo * io,
                                         handshakeDoneCB    doneCB,
                                         void *             doneUserData );
 
-const struct in_addr * tr_handshakeGetAddr( const struct tr_handshake  * handshake,
+const struct tr_address *
+                      tr_handshakeGetAddr( const struct tr_handshake  * handshake,
                                             tr_port                    * port );
 
 void                   tr_handshakeAbort( tr_handshake * handshake );

@@ -1196,7 +1196,7 @@ tr_handshakeGetIO( tr_handshake * handshake )
     return handshake->io;
 }
 
-const struct in_addr *
+const tr_address *
 tr_handshakeGetAddr( const struct tr_handshake * handshake,
                      tr_port                   * port )
 {

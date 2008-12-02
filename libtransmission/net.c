@@ -47,6 +47,10 @@
 #include "platform.h"
 #include "utils.h"
 
+const tr_address tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } }; 
+const tr_address tr_inaddr_any = { TR_AF_INET, 
+    { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } }; 
+
 
 void
 tr_netInit( void )
@@ -63,20 +67,77 @@ tr_netInit( void )
     }
 }
 
-/***********************************************************************
- * DNS resolution
- *
- * Synchronous "resolution": only works with character strings
- * representing numbers expressed in the Internet standard `.' notation.
- * Returns a non-zero value if an error occurs.
- **********************************************************************/
-int
-tr_netResolve( const char *     address,
-               struct in_addr * addr )
-{
-    addr->s_addr = inet_addr( address );
-    return addr->s_addr == 0xFFFFFFFF;
-}
+
+const char * 
+tr_ntop( const tr_address * src, char * dst, int size ) 
+{ 
+    if( src->type == TR_AF_INET ) 
+        return inet_ntop( AF_INET, &src->addr, dst, size ); 
+    else 
+        return inet_ntop( AF_INET6, &src->addr, dst, size ); 
+} 
+
+/* 
+ * Non-threadsafe version of tr_ntop, which uses a static memory area for a buffer. 
+ * This function is suitable to be called from libTransmission's networking code, 
+ * which is single-threaded. 
+ */ 
+const char * 
+tr_ntop_non_ts( const tr_address * src ) 
+{ 
+    static char buf[INET6_ADDRSTRLEN]; 
+    return tr_ntop( src, buf, sizeof( buf ) ); 
+} 
+
+tr_address * 
+tr_pton( const char * src, tr_address * dst ) 
+{ 
+    int retval = inet_pton( AF_INET, src, &dst->addr ); 
+    if( retval < 0 ) 
+        return NULL; 
+    else if( retval == 0 ) 
+        retval = inet_pton( AF_INET6, src, &dst->addr ); 
+    else
+    { 
+        dst->type = TR_AF_INET; 
+        return dst; 
+    } 
+
+    if( retval < 1 ) 
+        return NULL; 
+    dst->type = TR_AF_INET6; 
+    return dst; 
+} 
+
+/* 
+ * Compare two tr_address structures. 
+ * Returns: 
+ * <0 if a < b 
+ * >0 if a > b 
+ * 0  if a == b 
+ */ 
+int 
+tr_compareAddresses( const tr_address * a, const tr_address * b) 
+{ 
+    int retval; 
+    int addrlen; 
+
+    /* IPv6 addresses are always "greater than" IPv4 */ 
+    if( a->type == TR_AF_INET && b->type == TR_AF_INET6 ) 
+        return 1; 
+    if( a->type == TR_AF_INET6 && b->type == TR_AF_INET ) 
+        return -1; 
+
+    if( a->type == TR_AF_INET ) 
+        addrlen = sizeof( struct in_addr ); 
+    else 
+        addrlen = sizeof( struct in6_addr ); 
+    retval = memcmp( &a->addr, &b->addr, addrlen ); 
+    if( retval == 0 ) 
+        return 0; 
+     
+    return retval; 
+} 
 
 /***********************************************************************
  * TCP sockets
@@ -136,34 +197,57 @@ setSndBuf( tr_session * session UNUSED, int fd UNUSED )
 #endif
 }
 
-int
-tr_netOpenTCP( tr_session            * session,
-               const struct in_addr  * addr,
-               tr_port                 port )
-{
-    int                s;
-    struct sockaddr_in sock;
-    const int          type = SOCK_STREAM;
+static void 
+setup_sockaddr( const tr_address        * addr, 
+                tr_port                   port, 
+                struct sockaddr_storage * sockaddr) 
+{ 
+    struct sockaddr_in  sock4; 
+    struct sockaddr_in6 sock6; 
+
+    if( addr->type == TR_AF_INET ) 
+    { 
+        memset( &sock4, 0, sizeof( sock4 ) ); 
+        sock4.sin_family      = AF_INET; 
+        sock4.sin_addr.s_addr = addr->addr.addr4.s_addr; 
+        sock4.sin_port        = port; 
+        memcpy( sockaddr, &sock4, sizeof( sock4 ) ); 
+    } 
+    else 
+    { 
+        memset( &sock6, 0, sizeof( sock6 ) ); 
+        sock6.sin6_family = AF_INET6; 
+        sock6.sin6_port = port; 
+        memcpy( &sock6.sin6_addr, &addr->addr, sizeof( struct in6_addr ) ); 
+        memcpy( sockaddr, &sock6, sizeof( sock6 ) ); 
+    } 
+} 
+ 
+int 
+tr_netOpenTCP( tr_session        * session, 
+               const tr_address  * addr, 
+               tr_port             port ) 
+{ 
+    int                     s; 
+    struct sockaddr_storage sock; 
+    const int               type = SOCK_STREAM; 
 
     if( ( s = createSocket( type ) ) < 0 )
         return -1;
 
     setSndBuf( session, s );
 
-    memset( &sock, 0, sizeof( sock ) );
-    sock.sin_family      = AF_INET;
-    sock.sin_addr.s_addr = addr->s_addr;
-    sock.sin_port        = port;
+    setup_sockaddr( addr, port, &sock );
 
     if( ( connect( s, (struct sockaddr *) &sock,
-                  sizeof( struct sockaddr_in ) ) < 0 )
+                  sizeof( struct sockaddr ) ) < 0 )
 #ifdef WIN32
       && ( sockerrno != WSAEWOULDBLOCK )
 #endif
       && ( sockerrno != EINPROGRESS ) )
     {
         tr_err( _( "Couldn't connect socket %d to %s, port %d (errno %d - %s)" ),
-               s, inet_ntoa( *addr ), (int)port, sockerrno, tr_strerror( sockerrno ) );
+               s, tr_ntop_non_ts( addr ), (int)port, sockerrno, tr_strerror( sockerrno ) );
         tr_netClose( s );
         s = -1;
     }
@@ -175,11 +259,11 @@ tr_netOpenTCP( tr_session            * session,
 }
 
 int
-tr_netBindTCP( int port )
+tr_netBindTCP( const tr_address * addr, tr_port port )
 {
-    int                s;
-    struct sockaddr_in sock;
-    const int          type = SOCK_STREAM;
+    int                      s;
+    struct sockaddr_storage  sock;
+    const int                type = SOCK_STREAM;
 
 #if defined( SO_REUSEADDR ) || defined( SO_REUSEPORT )
     int                optval;
@@ -193,29 +277,27 @@ tr_netBindTCP( int port )
     setsockopt( s, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof( optval ) );
 #endif
 
-    memset( &sock, 0, sizeof( sock ) );
-    sock.sin_family      = AF_INET;
-    sock.sin_addr.s_addr = INADDR_ANY;
-    sock.sin_port        = htons( port );
+    setup_sockaddr( addr, htons( port ), &sock );
 
     if( bind( s, (struct sockaddr *) &sock,
-             sizeof( struct sockaddr_in ) ) )
+             sizeof( struct sockaddr ) ) )
     {
-        tr_err( _( "Couldn't bind port %d: %s" ), port,
-               tr_strerror( sockerrno ) );
+        tr_err( _( "Couldn't bind port %d on %s: %s" ), port,
+               tr_ntop_non_ts( addr ), tr_strerror( sockerrno ) );
         tr_netClose( s );
         return -1;
     }
 
-    tr_dbg(  "Bound socket %d to port %d", s, port );
+    tr_dbg(  "Bound socket %d to port %d on %s",
+             s, port, tr_ntop_non_ts( addr ) );
     return s;
 }
 
 int
-tr_netAccept( tr_session      * session,
-              int               b,
-              struct in_addr  * addr,
-              tr_port         * port )
+tr_netAccept( tr_session  * session,
+              int           b,
+              tr_address  * addr,
+              tr_port     * port )
 {
     int fd = makeSocketNonBlocking( tr_fdSocketAccept( b, addr, port ) );
     setSndBuf( session, fd );
@@ -227,16 +309,3 @@ tr_netClose( int s )
 {
     tr_fdSocketClose( s );
 }
-
-void
-tr_netNtop( const struct in_addr * addr,
-            char *                 buf,
-            int                    len )
-{
-    const uint8_t * cast;
-
-    cast = (const uint8_t *)addr;
-    tr_snprintf( buf, len, "%hhu.%hhu.%hhu.%hhu",
-                 cast[0], cast[1], cast[2], cast[3] );
-}
-

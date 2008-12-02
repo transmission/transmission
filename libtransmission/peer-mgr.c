@@ -95,14 +95,14 @@ enum
  * into this list for new ones. */
 struct peer_atom
 {
-    uint8_t           from;
-    uint8_t           flags; /* these match the added_f flags */
-    uint8_t           myflags; /* flags that aren't defined in added_f */
-    tr_port           port;
-    uint16_t          numFails;
-    struct in_addr    addr;
-    time_t            time; /* when the peer's connection status last changed */
-    time_t            piece_data_time;
+    uint8_t     from;
+    uint8_t     flags; /* these match the added_f flags */
+    uint8_t     myflags; /* flags that aren't defined in added_f */
+    tr_port     port;
+    uint16_t    numFails;
+    tr_address  addr;
+    time_t      time; /* when the peer's connection status last changed */
+    time_t      piece_data_time;
 };
 
 typedef struct
@@ -184,22 +184,12 @@ torrentIsLocked( const Torrent * t )
 **/
 
 static int
-compareAddresses( const struct in_addr * a,
-                  const struct in_addr * b )
-{
-    if( a->s_addr != b->s_addr )
-        return a->s_addr < b->s_addr ? -1 : 1;
-
-    return 0;
-}
-
-static int
 handshakeCompareToAddr( const void * va,
                         const void * vb )
 {
     const tr_handshake * a = va;
 
-    return compareAddresses( tr_handshakeGetAddr( a, NULL ), vb );
+    return tr_compareAddresses( tr_handshakeGetAddr( a, NULL ), vb );
 }
 
 static int
@@ -210,26 +200,22 @@ handshakeCompare( const void * a,
 }
 
 static tr_handshake*
-getExistingHandshake( tr_ptrArray *          handshakes,
-                      const struct in_addr * in_addr )
+getExistingHandshake( tr_ptrArray      * handshakes,
+                      const tr_address * addr )
 {
-    return tr_ptrArrayFindSorted( handshakes,
-                                  in_addr,
-                                  handshakeCompareToAddr );
+    return tr_ptrArrayFindSorted( handshakes, addr, handshakeCompareToAddr );
 }
 
 static int
-comparePeerAtomToAddress( const void * va,
-                          const void * vb )
+comparePeerAtomToAddress( const void * va, const void * vb )
 {
     const struct peer_atom * a = va;
 
-    return compareAddresses( &a->addr, vb );
+    return tr_compareAddresses( &a->addr, vb );
 }
 
 static int
-comparePeerAtoms( const void * va,
-                  const void * vb )
+comparePeerAtoms( const void * va, const void * vb )
 {
     const struct peer_atom * b = vb;
 
@@ -270,47 +256,43 @@ getExistingTorrent( tr_peerMgr *    manager,
 }
 
 static int
-peerCompare( const void * va,
-             const void * vb )
+peerCompare( const void * va, const void * vb )
 {
     const tr_peer * a = va;
     const tr_peer * b = vb;
 
-    return compareAddresses( &a->in_addr, &b->in_addr );
+    return tr_compareAddresses( &a->addr, &b->addr );
 }
 
 static int
-peerCompareToAddr( const void * va,
-                   const void * vb )
+peerCompareToAddr( const void * va, const void * vb )
 {
     const tr_peer * a = va;
 
-    return compareAddresses( &a->in_addr, vb );
+    return tr_compareAddresses( &a->addr, vb );
 }
 
 static tr_peer*
-getExistingPeer( Torrent *              torrent,
-                 const struct in_addr * in_addr )
+getExistingPeer( Torrent          * torrent,
+                 const tr_address * addr )
 {
     assert( torrentIsLocked( torrent ) );
-    assert( in_addr );
+    assert( addr );
 
-    return tr_ptrArrayFindSorted( torrent->peers,
-                                  in_addr,
-                                  peerCompareToAddr );
+    return tr_ptrArrayFindSorted( torrent->peers, addr, peerCompareToAddr );
 }
 
 static struct peer_atom*
-getExistingAtom( const                  Torrent * t,
-                 const struct in_addr * addr )
+getExistingAtom( const Torrent    * t,
+                 const tr_address * addr )
 {
     assert( torrentIsLocked( t ) );
     return tr_ptrArrayFindSorted( t->pool, addr, comparePeerAtomToAddress );
 }
 
 static int
-peerIsInUse( const Torrent *        ct,
-             const struct in_addr * addr )
+peerIsInUse( const Torrent    * ct,
+             const tr_address * addr )
 {
     Torrent * t = (Torrent*) ct;
 
@@ -322,29 +304,29 @@ peerIsInUse( const Torrent *        ct,
 }
 
 static tr_peer*
-peerConstructor( tr_torrent * tor, const struct in_addr * in_addr )
+peerConstructor( tr_torrent * tor, const tr_address * addr )
 {
     tr_peer * p;
 
     p = tr_new0( tr_peer, 1 );
-    memcpy( &p->in_addr, in_addr, sizeof( struct in_addr ) );
+    p->addr = *addr;
     p->bandwidth = tr_bandwidthNew( tor->session, tor->bandwidth );
     return p;
 }
 
 static tr_peer*
-getPeer( Torrent *              torrent,
-         const struct in_addr * in_addr )
+getPeer( Torrent          * torrent,
+         const tr_address * addr )
 {
     tr_peer * peer;
 
     assert( torrentIsLocked( torrent ) );
 
-    peer = getExistingPeer( torrent, in_addr );
+    peer = getExistingPeer( torrent, addr );
 
     if( peer == NULL )
     {
-        peer = peerConstructor( torrent->tor, in_addr );
+        peer = peerConstructor( torrent->tor, addr );
         tr_ptrArrayInsertSorted( torrent->peers, peer, peerCompare );
     }
 
@@ -380,7 +362,7 @@ removePeer( Torrent * t,
 
     assert( torrentIsLocked( t ) );
 
-    atom = getExistingAtom( t, &peer->in_addr );
+    atom = getExistingAtom( t, &peer->addr );
     assert( atom );
     atom->time = time( NULL );
 
@@ -530,9 +512,9 @@ clientIsUploadingTo( const tr_peer * peer )
 ***/
 
 int
-tr_peerMgrPeerIsSeed( const tr_peerMgr *     mgr,
-                      const uint8_t *        torrentHash,
-                      const struct in_addr * addr )
+tr_peerMgrPeerIsSeed( const tr_peerMgr * mgr,
+                      const uint8_t    * torrentHash,
+                      const tr_address * addr )
 {
     int                      isSeed = FALSE;
     const Torrent *          t = NULL;
@@ -905,12 +887,12 @@ addStrike( Torrent * t,
            tr_peer * peer )
 {
     tordbg( t, "increasing peer %s strike count to %d",
-            tr_peerIoAddrStr( &peer->in_addr,
+            tr_peerIoAddrStr( &peer->addr,
                               peer->port ), peer->strikes + 1 );
 
     if( ++peer->strikes >= MAX_BAD_PIECES_PER_PEER )
     {
-        struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
+        struct peer_atom * atom = getExistingAtom( t, &peer->addr );
         atom->myflags |= MYFLAG_BANNED;
         peer->doPurge = 1;
         tordbg( t, "banning peer %s",
@@ -975,7 +957,7 @@ peerCallbackFunc( void * vpeer,
 
             /* update our atom */
             if( peer ) {
-                struct peer_atom * a = getExistingAtom( t, &peer->in_addr );
+                struct peer_atom * a = getExistingAtom( t, &peer->addr );
                 a->piece_data_time = now;
             }
 
@@ -1004,7 +986,7 @@ peerCallbackFunc( void * vpeer,
 
             /* update our atom */
             if( peer ) {
-                struct peer_atom * a = getExistingAtom( t, &peer->in_addr );
+                struct peer_atom * a = getExistingAtom( t, &peer->addr );
                 a->piece_data_time = now;
             }
 
@@ -1015,8 +997,7 @@ peerCallbackFunc( void * vpeer,
         {
             if( peer )
             {
-                struct peer_atom * atom = getExistingAtom( t,
-                                                           &peer->in_addr );
+                struct peer_atom * atom = getExistingAtom( t, &peer->addr );
                 const int          peerIsSeed = e->progress >= 1.0;
                 if( peerIsSeed )
                 {
@@ -1111,11 +1092,11 @@ peerCallbackFunc( void * vpeer,
 }
 
 static void
-ensureAtomExists( Torrent *              t,
-                  const struct in_addr * addr,
-                  tr_port                port,
-                  uint8_t                flags,
-                  uint8_t                from )
+ensureAtomExists( Torrent          * t,
+                  const tr_address * addr,
+                  tr_port            port,
+                  uint8_t            flags,
+                  uint8_t            from )
 {
     if( getExistingAtom( t, addr ) == NULL )
     {
@@ -1152,13 +1133,13 @@ myHandshakeDoneCB( tr_handshake *  handshake,
                    const uint8_t * peer_id,
                    void *          vmanager )
 {
-    int                    ok = isConnected;
-    int                    success = FALSE;
-    tr_port                port;
-    const struct in_addr * addr;
-    tr_peerMgr *           manager = (tr_peerMgr*) vmanager;
-    Torrent *              t;
-    tr_handshake *         ours;
+    int                ok = isConnected;
+    int                success = FALSE;
+    tr_port            port;
+    const tr_address * addr;
+    tr_peerMgr       * manager = vmanager;
+    Torrent          * t;
+    tr_handshake     * ours;
 
     assert( io );
     assert( isConnected == 0 || isConnected == 1 );
@@ -1253,17 +1234,17 @@ myHandshakeDoneCB( tr_handshake *  handshake,
 }
 
 void
-tr_peerMgrAddIncoming( tr_peerMgr *     manager,
-                       struct in_addr * addr,
-                       tr_port          port,
-                       int              socket )
+tr_peerMgrAddIncoming( tr_peerMgr * manager,
+                       tr_address * addr,
+                       tr_port      port,
+                       int          socket )
 {
     managerLock( manager );
 
     if( tr_sessionIsAddressBlocked( manager->session, addr ) )
     {
         tr_dbg( "Banned IP address \"%s\" tried to connect to us",
-               inet_ntoa( *addr ) );
+               tr_ntop_non_ts( addr ) );
         tr_netClose( socket );
     }
     else if( getExistingHandshake( manager->incomingHandshakes, addr ) )
@@ -1300,8 +1281,8 @@ tr_peerMgrAddPex( tr_peerMgr *    manager,
     managerLock( manager );
 
     t = getExistingTorrent( manager, torrentHash );
-    if( !tr_sessionIsAddressBlocked( t->manager->session, &pex->in_addr ) )
-        ensureAtomExists( t, &pex->in_addr, pex->port, pex->flags, from );
+    if( !tr_sessionIsAddressBlocked( t->manager->session, &pex->addr ) )
+        ensureAtomExists( t, &pex->addr, pex->port, pex->flags, from );
 
     managerUnlock( manager );
 }
@@ -1320,7 +1301,8 @@ tr_peerMgrCompactToPex( const void *    compact,
 
     for( i = 0; i < n; ++i )
     {
-        memcpy( &pex[i].in_addr, walk, 4 ); walk += 4;
+        pex[i].addr.type = TR_AF_INET;
+        memcpy( &pex[i].addr.addr, walk, 4 ); walk += 4;
         memcpy( &pex[i].port, walk, 2 ); walk += 2;
         if( added_f && ( n == added_f_len ) )
             pex[i].flags = added_f[i];
@@ -1357,7 +1339,7 @@ tr_peerMgrSetBlame( tr_peerMgr *     manager,
                 tordbg(
                     t,
                     "peer %s contributed to corrupt piece (%d); now has %d strikes",
-                    tr_peerIoAddrStr( &peer->in_addr, peer->port ),
+                    tr_peerIoAddrStr( &peer->addr, peer->port ),
                     pieceIndex, (int)peer->strikes + 1 );
                 addStrike( t, peer );
             }
@@ -1371,8 +1353,7 @@ tr_pexCompare( const void * va,
 {
     const tr_pex * a = va;
     const tr_pex * b = vb;
-    int            i =
-        memcmp( &a->in_addr, &b->in_addr, sizeof( struct in_addr ) );
+    int            i = tr_compareAddresses( &a->addr, &b->addr );
 
     if( i ) return i;
     if( a->port < b->port ) return -1;
@@ -1420,7 +1401,7 @@ tr_peerMgrGetPeers( tr_peerMgr *    manager,
         for( i = 0; i < peerCount; ++i, ++walk )
         {
             const tr_peer * peer = peers[i];
-            walk->in_addr = peer->in_addr;
+            walk->addr = peer->addr;
             walk->port = peer->port;
             walk->flags = 0;
             if( peerPrefersCrypto( peer ) ) walk->flags |= ADDED_F_ENCRYPTION_FLAG;
@@ -1657,7 +1638,7 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
     for( i = 0; i < size; ++i )
     {
         const tr_peer *          peer = peers[i];
-        const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
+        const struct peer_atom * atom = getExistingAtom( t, &peer->addr );
 
         if( peer->io == NULL ) /* not connected */
             continue;
@@ -1745,10 +1726,10 @@ tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
     {
         char *                   pch;
         const tr_peer *          peer = peers[i];
-        const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
+        const struct peer_atom * atom = getExistingAtom( t, &peer->addr );
         tr_peer_stat *           stat = ret + i;
 
-        tr_netNtop( &peer->in_addr, stat->addr, sizeof( stat->addr ) );
+        tr_ntop( &peer->addr, stat->addr, sizeof( stat->addr ) );
         tr_strlcpy( stat->client, ( peer->client ? peer->client : "" ),
                    sizeof( stat->client ) );
         stat->port               = ntohs( peer->port );
@@ -1944,7 +1925,7 @@ shouldPeerBeClosed( const Torrent * t,
 {
     const tr_torrent *       tor = t->tor;
     const time_t             now = time( NULL );
-    const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
+    const struct peer_atom * atom = getExistingAtom( t, &peer->addr );
 
     /* if it's marked for purging, close it */
     if( peer->doPurge )
@@ -2206,7 +2187,7 @@ reconnectPulse( void * vtorrent )
         for( i = 0; i < nBad; ++i )
         {
             tr_peer *          peer = connections[i];
-            struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
+            struct peer_atom * atom = getExistingAtom( t, &peer->addr );
             if( peer->pieceDataActivityDate )
                 atom->numFails = 0;
             else

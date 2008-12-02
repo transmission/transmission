@@ -21,8 +21,8 @@
 ***
 **/
 
-struct in_addr;
 struct evbuffer;
+struct tr_address;
 struct tr_bandwidth;
 struct tr_crypto;
 struct tr_iobuf;
@@ -32,40 +32,41 @@ typedef struct tr_peerIo tr_peerIo;
 ***
 **/
 
-tr_peerIo*           tr_peerIoNewOutgoing( struct tr_handle     * session,
-                                           const struct in_addr * addr,
-                                           int                    port,
-                                           const  uint8_t       * torrentHash );
+tr_peerIo*  tr_peerIoNewOutgoing( struct tr_handle        * session,
+                                  const struct tr_address * addr,
+                                  tr_port                   port,
+                                  const  uint8_t          * torrentHash );
 
-tr_peerIo*           tr_peerIoNewIncoming( struct tr_handle     * session,
-                                           const struct in_addr * addr,
-                                           tr_port                port,
-                                           int                    socket );
+tr_peerIo*  tr_peerIoNewIncoming( struct tr_handle        * session,
+                                  const struct tr_address * addr,
+                                  tr_port                   port,
+                                  int                       socket );
 
-void                 tr_peerIoFree( tr_peerIo * io );
+void        tr_peerIoFree       ( tr_peerIo               * io );
 
-tr_session*          tr_peerIoGetSession( tr_peerIo * io );
-
-/**
-***
-**/
-
-void                 tr_peerIoEnableLTEP( tr_peerIo * io,
-                                          int         flag );
-
-int                  tr_peerIoSupportsLTEP( const tr_peerIo * io );
 
 /**
 ***
 **/
 
-const char*          tr_peerIoAddrStr( const struct in_addr * addr,
-                                       tr_port                port );
+void        tr_peerIoEnableLTEP( tr_peerIo * io,
+                                 int         flag );
 
-const char*          tr_peerIoGetAddrStr( const tr_peerIo * io );
+int         tr_peerIoSupportsLTEP( const tr_peerIo * io );
 
-const struct in_addr*tr_peerIoGetAddress( const tr_peerIo * io,
-                                          tr_port         * port );
+/**
+***
+**/
+
+tr_session* tr_peerIoGetSession ( tr_peerIo * io );
+
+const char* tr_peerIoAddrStr( const struct tr_address * addr,
+                              tr_port                   port );
+
+const char* tr_peerIoGetAddrStr( const tr_peerIo * io );
+
+const struct tr_address * tr_peerIoGetAddress( const tr_peerIo * io,
+                                               tr_port         * port );
 
 const uint8_t*       tr_peerIoGetTorrentHash( tr_peerIo * io );
 

@@ -52,6 +52,7 @@ struct tr_metainfo_lookup
     char *  filename;
 };
 
+struct tr_address;
 struct tr_bandwidth;
 
 struct tr_handle
@@ -121,10 +122,8 @@ void         tr_sessionSetTorrentFile( tr_session * session,
                                        const char * hashString,
                                        const char * filename );
 
-struct in_addr;
-
-int          tr_sessionIsAddressBlocked( const tr_session *     session,
-                                         const struct in_addr * addr );
+int          tr_sessionIsAddressBlocked( const tr_session        * session,
+                                         const struct tr_address * addr );
 
 
 void         tr_globalLock( tr_session * );
