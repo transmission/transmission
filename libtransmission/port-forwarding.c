@@ -103,7 +103,7 @@ natPulse( tr_shared * s )
 static void
 incomingPeersPulse( tr_shared * s )
 {
-    int allPaused;
+    tr_bool allPaused;
     tr_torrent * tor;
 
     if( s->bindSocket >= 0 && ( s->bindPort != s->publicPort ) )
@@ -174,7 +174,7 @@ incomingPeersPulse( tr_shared * s )
 static int
 sharedPulse( void * vshared )
 {
-    int         keepPulsing = 1;
+    tr_bool keepPulsing = 1;
     tr_shared * shared = vshared;
 
     natPulse( shared );
