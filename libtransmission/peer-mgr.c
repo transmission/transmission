@@ -972,8 +972,8 @@ peerCallbackFunc( void * vpeer,
                   void * vevent,
                   void * vt )
 {
-    tr_peer *             peer = vpeer; /* may be NULL if peer is a webseed */
-    Torrent *             t = (Torrent *) vt;
+    tr_peer             * peer = vpeer; /* may be NULL if peer is a webseed */
+    Torrent             * t = vt;
     const tr_peer_event * e = vevent;
 
     torrentLock( t );
@@ -1276,7 +1276,7 @@ myHandshakeDoneCB( tr_handshake *  handshake,
 
                 peer->port = port;
                 peer->io = io;
-                peer->msgs = tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
+                tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
                 tr_peerIoSetBandwidth( io, peer->bandwidth );
 
                 success = TRUE;

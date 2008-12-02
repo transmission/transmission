@@ -519,6 +519,9 @@ static void
 publish( tr_peermsgs *   msgs,
          tr_peer_event * e )
 {
+    assert( msgs->info );
+    assert( msgs->info->msgs == msgs );
+
     tr_publisherPublish( msgs->publisher, msgs->info, e );
 }
 
@@ -2128,22 +2131,22 @@ pexPulse( void * vpeer )
 
 tr_peermsgs*
 tr_peerMsgsNew( struct tr_torrent * torrent,
-                struct tr_peer *    info,
+                struct tr_peer *    peer,
                 tr_delivery_func    func,
                 void *              userData,
                 tr_publisher_tag *  setme )
 {
     tr_peermsgs * m;
 
-    assert( info );
-    assert( info->io );
+    assert( peer );
+    assert( peer->io );
 
     m = tr_new0( tr_peermsgs, 1 );
     m->publisher = tr_publisherNew( );
-    m->info = info;
+    m->info = peer;
     m->session = torrent->session;
     m->torrent = torrent;
-    m->io = info->io;
+    m->io = peer->io;
     m->info->clientIsChoked = 1;
     m->info->peerIsChoked = 1;
     m->info->clientIsInterested = 0;
@@ -2159,6 +2162,8 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->peerAskedFor = REQUEST_LIST_INIT;
     m->clientAskedFor = REQUEST_LIST_INIT;
     m->clientWillAskFor = REQUEST_LIST_INIT;
+    peer->msgs = m;
+
     *setme = tr_publisherSubscribe( m->publisher, func, userData );
 
     if( tr_peerIoSupportsLTEP( m->io ) )
@@ -2166,8 +2171,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
 
     tellPeerWhatWeHave( m );
 
-    tr_peerIoSetTimeoutSecs( m->io, 150 ); /* timeout after N seconds of
-                                             inactivity */
+    tr_peerIoSetTimeoutSecs( m->io, 150 ); /* timeout after N seconds of inactivity */
     tr_peerIoSetIOFuncs( m->io, canRead, didWrite, gotError, m );
     ratePulse( m );
 
