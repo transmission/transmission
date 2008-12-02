@@ -89,6 +89,13 @@ enum
 ***
 **/
 
+enum
+{
+    UPLOAD_ONLY_UKNOWN,
+    UPLOAD_ONLY_YES,
+    UPLOAD_ONLY_NO
+};
+
 /* We keep one of these for every peer we know about, whether
  * it's connected or not, so the struct must be small.
  * When our current connections underperform, we dip back
@@ -96,12 +103,14 @@ enum
 struct peer_atom
 {
     uint8_t     from;
-    uint8_t     flags; /* these match the added_f flags */
-    uint8_t     myflags; /* flags that aren't defined in added_f */
+    uint8_t     flags;       /* these match the added_f flags */
+    uint8_t     myflags;     /* flags that aren't defined in added_f */
+    uint8_t     uploadOnly;  /* UPLOAD_ONLY_ */
+    uint8_t     partialSeed;
     tr_port     port;
     uint16_t    numFails;
     tr_address  addr;
-    time_t      time; /* when the peer's connection status last changed */
+    time_t      time;        /* when the peer's connection status last changed */
     time_t      piece_data_time;
 };
 
@@ -980,6 +989,14 @@ peerCallbackFunc( void * vpeer,
 
     switch( e->eventType )
     {
+        case TR_PEER_UPLOAD_ONLY:
+            /* update our atom */
+            if( peer ) {
+                struct peer_atom * a = getExistingAtom( t, &peer->addr );
+                a->uploadOnly = e->uploadOnly ? UPLOAD_ONLY_YES : UPLOAD_ONLY_NO;
+            }
+            break;
+
         case TR_PEER_NEED_REQ:
             refillSoon( t );
             break;
@@ -1458,11 +1475,15 @@ tr_peerMgrGetPeers( tr_peerMgr *    manager,
         for( i = 0; i < peerCount; ++i, ++walk )
         {
             const tr_peer * peer = peers[i];
+            const struct peer_atom * atom = getExistingAtom( t, &peer->addr );
+
             walk->addr = peer->addr;
             walk->port = peer->port;
             walk->flags = 0;
-            if( peerPrefersCrypto( peer ) ) walk->flags |= ADDED_F_ENCRYPTION_FLAG;
-            if( peer->progress >= 1.0 ) walk->flags |= ADDED_F_SEED_FLAG;
+            if( peerPrefersCrypto( peer ) )
+                walk->flags |= ADDED_F_ENCRYPTION_FLAG;
+            if( ( atom->uploadOnly == UPLOAD_ONLY_YES ) || ( peer->progress >= 1.0 ) )
+                walk->flags |= ADDED_F_SEED_FLAG;
         }
 
         assert( ( walk - pex ) == peerCount );
@@ -1884,11 +1905,22 @@ rechoke( Torrent * t )
     for( i = 0, size = 0; i < peerCount; ++i )
     {
         tr_peer * peer = peers[i];
+        struct peer_atom * atom = getExistingAtom( t, &peer->addr );
+
         if( peer->progress >= 1.0 ) /* choke all seeds */
+        {
             tr_peerMsgsSetChoke( peer->msgs, TRUE );
-        else if( chokeAll )
+        }
+        else if( atom->uploadOnly == UPLOAD_ONLY_YES ) /* choke partial seeds */
+        {
             tr_peerMsgsSetChoke( peer->msgs, TRUE );
-        else {
+        }
+        else if( chokeAll ) /* choke everyone if we're not uploading */
+        {
+            tr_peerMsgsSetChoke( peer->msgs, TRUE );
+        }
+        else
+        {
             struct ChokeData * n = &choke[size++];
             n->peer         = peer;
             n->isInterested = peer->peerIsInterested;
@@ -2175,7 +2207,8 @@ getPeerCandidates(                               Torrent * t,
             continue;
 
         /* no need to connect if we're both seeds... */
-        if( seed && ( atom->flags & ADDED_F_SEED_FLAG ) )
+        if( seed && ( ( atom->flags & ADDED_F_SEED_FLAG ) ||
+                      ( atom->uploadOnly == UPLOAD_ONLY_YES ) ) )
             continue;
 
         /* don't reconnect too often */

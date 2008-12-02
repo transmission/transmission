@@ -97,6 +97,7 @@ time_t                  tr_trackerGetManualAnnounceTime( const struct tr_tracker
 void                    tr_trackerGetCounts( const struct tr_tracker *,
                                              int * setme_completedCount,
                                              int * setme_leecherCount,
-                                             int * setme_seederCount );
+                                             int * setme_seederCount,
+                                             int * setme_downloaderCount );
 
 #endif

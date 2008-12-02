@@ -1323,6 +1323,11 @@ typedef struct tr_stat
     /** Number of leechers that the tracker says this torrent has */
     int    leechers;
 
+    /** Number of downloaders that the tracker says this torrent has.
+        This is a new key introduced in BEP 21 and may not be supported by some trackers.
+        If the tracker doesn't support this key, the value here will be -1. */
+    int    downloaders;
+
     /** Number of finished downloads that the tracker says torrent has */
     int    timesCompleted;
 

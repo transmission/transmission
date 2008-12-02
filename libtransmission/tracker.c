@@ -108,6 +108,7 @@ struct tr_tracker
     /* these are set from the latest tracker response... -1 is 'unknown' */
     int       timesDownloaded;
     int       seederCount;
+    int       downloaderCount;
     int       leecherCount;
     char *    trackerID;
 
@@ -538,7 +539,7 @@ onScrapeResponse( tr_session * session,
                   long         responseCode,
                   const void * response,
                   size_t       responseLen,
-                  void *       torrent_hash )
+                  void       * torrent_hash )
 {
     int          success = FALSE;
     int          retry;
@@ -583,9 +584,11 @@ onScrapeResponse( tr_session * session,
                 if( ( tr_bencDictFindInt( tordict, "downloaded", &itmp ) ) )
                     t->timesDownloaded = itmp;
 
+                if( ( tr_bencDictFindInt( tordict, "downloaders", &itmp ) ) )
+                    t->downloaderCount = itmp;
+
                 if( tr_bencDictFindDict( tordict, "flags", &flags ) )
-                    if( ( tr_bencDictFindInt( flags, "min_request_interval",
-                                              &itmp ) ) )
+                    if( ( tr_bencDictFindInt( flags, "min_request_interval", &itmp ) ) )
                         t->scrapeIntervalSec = i;
 
                 /* as per ticket #1045, safeguard against trackers returning
@@ -651,9 +654,9 @@ enum
     TR_REQ_STARTED,
     TR_REQ_COMPLETED,
     TR_REQ_STOPPED,
+    TR_REQ_PAUSED,     /* BEP 21 */
     TR_REQ_REANNOUNCE,
-    TR_REQ_SCRAPE,
-    TR_REQ_COUNT
+    TR_REQ_SCRAPE
 };
 
 struct tr_tracker_request
@@ -712,19 +715,23 @@ buildTrackerRequestURI( tr_tracker *       t,
 }
 
 static struct tr_tracker_request*
-createRequest(                 tr_session * session,
-                               tr_tracker * tracker,
-                           int reqtype )
+createRequest( tr_session * session,
+               tr_tracker * tracker,
+               int          reqtype )
 {
-    static const char*          strings[] =
-    { "started", "completed", "stopped", "", "err" };
-    const tr_torrent *          torrent = tr_torrentFindFromHash(
-        session, tracker->hash );
-    const tr_tracker_info *     address = getCurrentAddressFromTorrent(
-        tracker, torrent );
-    const int                   isStopping = reqtype == TR_REQ_STOPPED;
+    static const char* strings[] = { "started", "completed", "stopped", "paused", "", "err" };
+    const tr_torrent * torrent = tr_torrentFindFromHash( session, tracker->hash );
+    const tr_tracker_info * address = getCurrentAddressFromTorrent( tracker, torrent );
+    int isStopping;
     struct tr_tracker_request * req;
-    struct evbuffer *           url;
+    struct evbuffer * url;
+
+    /* BEP 21: In order to tell the tracker that a peer is a partial seed, it MUST send
+     * an event=paused parameter in every announce while it is a partial seed. */
+    if( tr_cpGetStatus( torrent->completion ) == TR_PARTIAL_SEED )
+        reqtype = TR_REQ_PAUSED;
+
+    isStopping = reqtype == TR_REQ_STOPPED;
 
     url = evbuffer_new( );
     evbuffer_add_printf( url, "%s", address->announce );
@@ -980,6 +987,7 @@ tr_trackerNew( const tr_torrent * torrent )
     t->announceMinIntervalSec   = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
     t->timesDownloaded          = -1;
     t->seederCount              = -1;
+    t->downloaderCount          = -1;
     t->leecherCount             = -1;
     t->lastAnnounceResponse     = -1;
     t->lastScrapeResponse       = -1;
@@ -1060,9 +1068,10 @@ tr_trackerCanManualAnnounce( const tr_tracker * t )
 
 void
 tr_trackerGetCounts( const tr_tracker * t,
-                     int *              setme_completedCount,
-                     int *              setme_leecherCount,
-                     int *              setme_seederCount )
+                     int              * setme_completedCount,
+                     int              * setme_leecherCount,
+                     int              * setme_seederCount,
+                     int              * setme_downloaderCount )
 {
     if( setme_completedCount )
         *setme_completedCount = t->timesDownloaded;
@@ -1072,6 +1081,9 @@ tr_trackerGetCounts( const tr_tracker * t,
 
     if( setme_seederCount )
         *setme_seederCount = t->seederCount;
+
+    if( setme_downloaderCount )
+        *setme_downloaderCount = t->downloaderCount;
 }
 
 void

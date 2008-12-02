@@ -291,6 +291,8 @@ addField( const tr_torrent * tor,
         tr_bencDictAddInt( d, key, st->doneDate );
     else if( !strcmp( key, "downloadedEver" ) )
         tr_bencDictAddInt( d, key, st->downloadedEver );
+    else if( !strcmp( key, "downloaders" ) )
+        tr_bencDictAddInt( d, key, st->downloaders );
     else if( !strcmp( key, "downloadLimitMode" ) )
         tr_bencDictAddInt( d, key, tr_torrentGetSpeedMode( tor, TR_DOWN ) );
     else if( !strcmp( key, "downloadLimit" ) )

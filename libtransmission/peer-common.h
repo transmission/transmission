@@ -48,6 +48,7 @@ typedef enum
     TR_PEER_PEER_PROGRESS,
     TR_PEER_ERROR,
     TR_PEER_CANCEL,
+    TR_PEER_UPLOAD_ONLY,
     TR_PEER_NEED_REQ
 }
 PeerEventType;
@@ -61,6 +62,7 @@ typedef struct
     float            progress;     /* for PEER_PROGRESS */
     int              err;          /* errno for GOT_ERROR */
     int              wasPieceData; /* for GOT_DATA */
+    tr_bool          uploadOnly;   /* for UPLOAD_ONLY */
 }
 tr_peer_event;
 

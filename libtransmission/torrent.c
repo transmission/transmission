@@ -783,9 +783,12 @@ tr_torrentStat( tr_torrent * tor )
     s->announceURL = ti ? ti->announce : NULL;
     s->scrapeURL   = ti ? ti->scrape   : NULL;
     tr_trackerStat( tc, s );
+
     tr_trackerGetCounts( tc, &s->timesCompleted,
-                         &s->leechers,
-                         &s->seeders );
+                             &s->leechers,
+                             &s->seeders,
+                             &s->downloaders );
+
     tr_peerMgrTorrentStats( tor->session->peerMgr,
                             tor->info.hash,
                             &s->peersKnown,

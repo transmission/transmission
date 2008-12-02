@@ -513,7 +513,7 @@ protocolSendHaveNone( tr_peermsgs * msgs )
 ***  EVENTS
 **/
 
-static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0, 0 };
+static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0, 0, 0 };
 
 static void
 publish( tr_peermsgs *   msgs,
@@ -537,10 +537,18 @@ fireError( tr_peermsgs * msgs,
 }
 
 static void
+fireUploadOnly( tr_peermsgs * msgs, tr_bool uploadOnly )
+{
+    tr_peer_event e = blankEvent;
+    e.eventType = TR_PEER_UPLOAD_ONLY;
+    e.uploadOnly = uploadOnly;
+    publish( msgs, &e );
+}
+
+static void
 fireNeedReq( tr_peermsgs * msgs )
 {
     tr_peer_event e = blankEvent;
-
     e.eventType = TR_PEER_NEED_REQ;
     publish( msgs, &e );
 }
@@ -1086,9 +1094,9 @@ sendLtepHandshake( tr_peermsgs * msgs )
         pex = 1;
 
     tr_bencInitDict( &val, 4 );
-    tr_bencDictAddInt( &val, "e",
-                       msgs->session->encryptionMode != TR_CLEAR_PREFERRED );
+    tr_bencDictAddInt( &val, "e", msgs->session->encryptionMode != TR_CLEAR_PREFERRED );
     tr_bencDictAddInt( &val, "p", tr_sessionGetPeerPort( msgs->session ) );
+    tr_bencDictAddInt( &val, "upload_only", tr_torrentIsSeed( msgs->torrent ) );
     tr_bencDictAddStr( &val, "v", TR_NAME " " USERAGENT_PREFIX );
     m  = tr_bencDictAddDict( &val, "m", 1 );
     if( pex )
@@ -1144,6 +1152,10 @@ parseLtepHandshake( tr_peermsgs *     msgs,
             dbgmsg( msgs, "msgs->ut_pex is %d", (int)msgs->ut_pex_id );
         }
     }
+
+    /* look for upload_only (BEP 21) */
+    if( tr_bencDictFindInt( &val, "upload_only", &i ) )
+        fireUploadOnly( msgs, i!=0 );
 
     /* get peer's listening port */
     if( tr_bencDictFindInt( &val, "p", &i ) )
