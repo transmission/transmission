@@ -210,7 +210,6 @@ dnl
 dnl  platform-specific stuff.
 
 AC_CANONICAL_HOST
-have_beos="no"
 have_darwin="no"
 have_msw="no"
 case $host_os in
@@ -229,32 +228,6 @@ case $host_os in
      AC_CHECK_TOOL(WINDRES, windres)
      ;;
 
-  *beos*)
-    have_beos="yes"
-    RELEASE=`uname -r`
-    case $RELEASE in
-      6.*|5.0.4) # Zeta or R5 / BONE beta 7
-        ;;
-      5.0*)       # R5 / net_server
-        CPPFLAGS="$CPPFLAGS -DBEOS_NETSERVER"
-        ;;
-      *)
-        AC_MSG_ERROR("Unsupported BeOS version")
-        ;;
-    esac
-    GCCVER=`$CC -dumpversion`
-    case $GCCVER in
-      2.95.3*|3*|4*)
-        ;;
-      2.9*)
-        BEOS_OLDCC=yes
-        ;;
-      *)
-        AC_MSG_ERROR("Unsupported gcc version")
-        ;;
-    esac
-    ;;
-
   *darwin*)
     have_darwin="yes"
     # Make sure the Universal SDK is installed
@@ -272,12 +245,6 @@ EOF
     ;;
 
 esac
-
-AC_ARG_ENABLE([beos],
-              [AC_HELP_STRING([--enable-beos],[build OS X client])],
-              [build_beos=${enableval}],
-              [build_beos=${have_beos}])
-AM_CONDITIONAL([BUILD_BEOS],[test "x$build_beos" = "xyes"])
 
 AC_ARG_ENABLE([cli],
               [AC_HELP_STRING([--enable-cli],[build command-line client])],
@@ -298,9 +265,6 @@ AC_ARG_ENABLE([daemon],
 AM_CONDITIONAL([BUILD_DAEMON],[test "x$build_daemon" = "xyes"])
 
 
-if test "x$have_beos" = "xyes"; then
-    AC_DEFINE([HAVE_BEOS], 1)
-fi
 if test "x$have_darwin" = "xyes"; then
     AC_DEFINE([HAVE_DARWIN], 1)
 fi
@@ -315,7 +279,6 @@ dnl  Generate the output
 
 AC_CONFIG_FILES([Makefile
                  transmission.spec
-                 beos/Makefile
                  cli/Makefile
                  daemon/Makefile
                  doc/Makefile
@@ -341,7 +304,6 @@ Configuration:
         Compiler:                   ${CXX}
         Build Command-Line client:  ${build_cli}
         Build Daemon:               ${build_daemon}
-        Build BeOS client:          ${build_beos}
         Build GTK+ client:          ${build_gtk}
           ... gio support:          ${use_gio}
           ... dbus-glib support:    ${use_dbus_glib}
