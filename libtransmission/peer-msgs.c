@@ -444,6 +444,7 @@ protocolSendHave( tr_peermsgs * msgs,
     pokeBatchPeriod( msgs, LOW_PRIORITY_INTERVAL_SECS );
 }
 
+#if 0
 static void
 protocolSendAllowedFast( tr_peermsgs * msgs, uint32_t pieceIndex )
 {
@@ -459,6 +460,7 @@ protocolSendAllowedFast( tr_peermsgs * msgs, uint32_t pieceIndex )
     dbgmsg( msgs, "sending Allowed Fast %u...", pieceIndex );
     dbgOutMessageLen( msgs );
 }
+#endif
 
 static void
 protocolSendChoke( tr_peermsgs * msgs,

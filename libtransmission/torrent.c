@@ -1101,7 +1101,7 @@ checkAndStartImpl( void * vtor )
 
     tr_globalLock( tor->session );
 
-    tor->isRunning  = 1;
+    tor->isRunning = 1;
     *tor->errorString = '\0';
     tr_torrentResetTransferStats( tor );
     tor->completeness = tr_cpGetStatus( tor->completion );
@@ -1340,7 +1340,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
 int
 tr_torrentIsSeed( const tr_torrent * tor )
 {
-    return tor->completeness == TR_SEED || tor->completeness == TR_PARTIAL_SEED;
+    return tor->completeness != TR_LEECH;
 }
 
 /**

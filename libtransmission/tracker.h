@@ -90,18 +90,13 @@ void                    tr_trackerChangeMyPort( struct tr_tracker * );
 
 const tr_tracker_info * tr_trackerGetAddress( struct tr_tracker * );
 
-int                     tr_trackerCanManualAnnounce(
-    const struct tr_tracker * );
+int                     tr_trackerCanManualAnnounce( const struct tr_tracker * );
 
-time_t                  tr_trackerGetManualAnnounceTime(
-    const struct tr_tracker * );
+time_t                  tr_trackerGetManualAnnounceTime( const struct tr_tracker * );
 
-void                    tr_trackerGetCounts(
-    const struct tr_tracker *,
-    int *
-                 setme_completedCount,
-    int *
-                 setme_leecherCount,
-    int *        setme_seederCount );
+void                    tr_trackerGetCounts( const struct tr_tracker *,
+                                             int * setme_completedCount,
+                                             int * setme_leecherCount,
+                                             int * setme_seederCount );
 
 #endif

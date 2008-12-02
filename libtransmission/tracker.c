@@ -686,30 +686,29 @@ buildTrackerRequestURI( tr_tracker *       t,
                               "&peer_id=%s"
                               "&port=%d"
                               "&uploaded=%" PRIu64
-                        "&downloaded=%" PRIu64
-                        "&corrupt=%" PRIu64
-                        "&left=%" PRIu64
-                        "&compact=1"
-                        "&numwant=%d"
-                        "&key=%s"
-                        "%s%s"
-                        "%s%s",
-                        strchr( ann, '?' ) ? '&' : '?',
-                        t->escaped,
-                        t->peer_id,
-                        tr_sessionGetPeerPort( t->session ),
-                        torrent->uploadedCur,
-                        torrent->downloadedCur,
-                        torrent->corruptCur,
-                        tr_cpLeftUntilComplete( torrent->completion ),
-                        numwant,
-                        t->key_param,
-                        ( ( eventName && *eventName ) ? "&event=" : "" ),
-                        ( ( eventName && *eventName ) ? eventName : "" ),
-                        ( ( t->trackerID
-                          && *t->trackerID ) ? "&trackerid=" : "" ),
-                        ( ( t->trackerID
-                          && *t->trackerID ) ? t->trackerID : "" ) );
+                              "&downloaded=%" PRIu64
+                              "&corrupt=%" PRIu64
+                              "&left=%" PRIu64
+                              "&compact=1"
+                              "&numwant=%d"
+                              "&key=%s",
+                              strchr( ann, '?' ) ? '&' : '?',
+                              t->escaped,
+                              t->peer_id,
+                              tr_sessionGetPeerPort( t->session ),
+                              torrent->uploadedCur,
+                              torrent->downloadedCur,
+                              torrent->corruptCur,
+                              tr_cpLeftUntilComplete( torrent->completion ),
+                              numwant,
+                              t->key_param );
+
+    if( eventName && *eventName )
+        evbuffer_add_printf( buf, "&event=%s", eventName );
+
+    if( t->trackerID && *t->trackerID )
+        evbuffer_add_printf( buf, "&trackerid=%s", t->trackerID );
+
 }
 
 static struct tr_tracker_request*
