@@ -24,7 +24,7 @@
 #include "web.h"
 
 /* arbitrary number */
-#define MAX_CONCURRENT_TASKS 24
+#define MAX_CONCURRENT_TASKS 50
 
 /* arbitrary number */
 #define DEFAULT_TIMER_MSEC 2000
@@ -119,7 +119,7 @@ addTask( void * vtask )
             tr_free( str );
         }
 
-        curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 360L );
+        curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 3600L );
         curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 60L );
         curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1L );
         curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 16L );
