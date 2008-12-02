@@ -49,10 +49,13 @@ void        tr_peerIoFree       ( tr_peerIo               * io );
 ***
 **/
 
-void        tr_peerIoEnableLTEP( tr_peerIo * io,
-                                 int         flag );
+void        tr_peerIoEnableLTEP( tr_peerIo * io, int flag );
 
 int         tr_peerIoSupportsLTEP( const tr_peerIo * io );
+
+void        tr_peerIoEnableFEXT( tr_peerIo * io, int flag );
+
+int         tr_peerIoSupportsFEXT( const tr_peerIo * io );
 
 /**
 ***

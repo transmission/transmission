@@ -337,10 +337,12 @@ static void
 peerDestructor( tr_peer * peer )
 {
     assert( peer );
-    assert( peer->msgs );
 
-    tr_peerMsgsUnsubscribe( peer->msgs, peer->msgsTag );
-    tr_peerMsgsFree( peer->msgs );
+    if( peer->msgs != NULL )
+    {
+        tr_peerMsgsUnsubscribe( peer->msgs, peer->msgsTag );
+        tr_peerMsgsFree( peer->msgs );
+    }
 
     tr_peerIoFree( peer->io );
 
@@ -810,8 +812,7 @@ refillPulse( void * vtorrent )
         /* find a peer who can ask for this block */
         for( j=0; !handled && j<peerCount; )
         {
-            const int val = tr_peerMsgsAddRequest( peers[j]->msgs,
-                                                   index, offset, length );
+            const int val = tr_peerMsgsAddRequest( peers[j]->msgs, index, offset, length, FALSE );
             switch( val )
             {
                 case TR_ADDREQ_FULL:
@@ -921,6 +922,52 @@ refillSoon( Torrent * t )
 }
 
 static void
+peerSuggestedPiece( Torrent            * t,
+                    tr_peer            * peer,
+                    tr_piece_index_t     pieceIndex,
+                    int                  isFastAllowed )
+{
+    assert( t );
+    assert( peer );
+    assert( peer->msgs );
+
+    /* is this a valid piece? */
+    if(  pieceIndex >= t->tor->info.pieceCount )
+        return;
+
+    /* don't ask for it if we've already got it */
+    if( tr_cpPieceIsComplete( t->tor->completion, pieceIndex ) )
+        return;
+
+    /* don't ask for it if they don't have it */
+    if( !tr_bitfieldHas( peer->have, pieceIndex ) )
+        return;
+
+    /* don't ask for it if we're choked and it's not fast */
+    if( !isFastAllowed && peer->clientIsChoked )
+        return;
+
+    /* request the blocks that we don't have in this piece */
+    {
+        tr_block_index_t block;
+        const tr_torrent * tor = t->tor;
+        const tr_block_index_t start = tr_torPieceFirstBlock( tor, pieceIndex );
+        const tr_block_index_t end = start + tr_torPieceCountBlocks( tor, pieceIndex );
+
+        for( block=start; block<end; ++block )
+        {
+            if( !tr_cpBlockIsComplete( tor->completion, block ) )
+            {
+                const uint32_t offset = getBlockOffsetInPiece( tor, block );
+                const uint32_t length = tr_torBlockCountBytes( tor, block );
+                tr_peerMsgsAddRequest( peer->msgs, pieceIndex, offset, length, TRUE );
+                incrementPieceRequests( t, pieceIndex );
+            }
+        }
+    }
+}
+
+static void
 peerCallbackFunc( void * vpeer,
                   void * vevent,
                   void * vt )
@@ -963,6 +1010,16 @@ peerCallbackFunc( void * vpeer,
 
             break;
         }
+
+        case TR_PEER_CLIENT_GOT_SUGGEST:
+            if( peer )
+                peerSuggestedPiece( t, peer, e->pieceIndex, FALSE );
+            break;
+
+        case TR_PEER_CLIENT_GOT_ALLOWED_FAST:
+            if( peer )
+                peerSuggestedPiece( t, peer, e->pieceIndex, TRUE );
+            break;
 
         case TR_PEER_CLIENT_GOT_DATA:
         {

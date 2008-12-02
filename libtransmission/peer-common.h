@@ -42,6 +42,8 @@ typedef enum
 {
     TR_PEER_CLIENT_GOT_BLOCK,
     TR_PEER_CLIENT_GOT_DATA,
+    TR_PEER_CLIENT_GOT_ALLOWED_FAST,
+    TR_PEER_CLIENT_GOT_SUGGEST,
     TR_PEER_PEER_GOT_DATA,
     TR_PEER_PEER_PROGRESS,
     TR_PEER_ERROR,
@@ -53,7 +55,7 @@ PeerEventType;
 typedef struct
 {
     PeerEventType    eventType;
-    uint32_t         pieceIndex;   /* for GOT_BLOCK, CANCEL */
+    uint32_t         pieceIndex;   /* for GOT_BLOCK, CANCEL, ALLOWED, SUGGEST */
     uint32_t         offset;       /* for GOT_BLOCK */
     uint32_t         length;       /* for GOT_BLOCK + GOT_DATA */
     float            progress;     /* for PEER_PROGRESS */

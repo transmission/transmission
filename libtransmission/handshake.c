@@ -33,6 +33,8 @@
 
 /* enable LibTransmission extension protocol */
 #define ENABLE_LTEP * /
+/* fast extensions */
+#define ENABLE_FAST * /
 
 /***
 ****
@@ -68,6 +70,14 @@ enum
  #define HANDSHAKE_HAS_LTEP( bits ) ( 0 )
  #define HANDSHAKE_SET_LTEP( bits ) ( (void)0 )
 #endif
+
+#ifdef ENABLE_FAST 
+ #define HANDSHAKE_HAS_FASTEXT( bits ) ( ( ( bits )[7] & 0x04 ) ? 1 : 0 ) 
+ #define HANDSHAKE_SET_FASTEXT( bits ) ( ( bits )[7] |= 0x04 ) 
+#else 
+ #define HANDSHAKE_HAS_FASTEXT( bits ) ( 0 ) 
+ #define HANDSHAKE_SET_FASTEXT( bits ) ( (void)0 ) 
+#endif 
 
 /* http://www.azureuswiki.com/index.php/Extension_negotiation_protocol
    these macros are to be used if both extended messaging and the
@@ -203,6 +213,7 @@ buildHandshakeMessage( tr_handshake * handshake,
     walk += HANDSHAKE_NAME_LEN;
     memset( walk, 0, HANDSHAKE_FLAGS_LEN );
     HANDSHAKE_SET_LTEP( walk );
+    HANDSHAKE_SET_FASTEXT( walk );
 
     walk += HANDSHAKE_FLAGS_LEN;
     memcpy( walk, torrentHash, SHA_DIGEST_LENGTH );
@@ -279,11 +290,9 @@ parseHandshake( tr_handshake *    handshake,
     *** Extensions
     **/
 
-    if( HANDSHAKE_HAS_LTEP( reserved ) )
-    {
-        tr_peerIoEnableLTEP( handshake->io, 1 );
-        dbgmsg( handshake, "using ltep" );
-    }
+    tr_peerIoEnableLTEP( handshake->io, HANDSHAKE_HAS_LTEP( reserved ) );
+
+    tr_peerIoEnableFEXT( handshake->io, HANDSHAKE_HAS_FASTEXT( reserved ) );
 
     return HANDSHAKE_OK;
 }
@@ -643,14 +652,12 @@ readHandshake( tr_handshake *    handshake,
     tr_peerIoReadBytes( handshake->io, inbuf, reserved, sizeof( reserved ) );
 
     /**
-    *** Extension negotiation
+    *** Extensions
     **/
 
-    if( HANDSHAKE_HAS_LTEP( reserved ) )
-    {
-        tr_peerIoEnableLTEP( handshake->io, 1 );
-        dbgmsg( handshake, "using ltep" );
-    }
+    tr_peerIoEnableLTEP( handshake->io, HANDSHAKE_HAS_LTEP( reserved ) );
+
+    tr_peerIoEnableFEXT( handshake->io, HANDSHAKE_HAS_FASTEXT( reserved ) );
 
     /* torrent hash */
     tr_peerIoReadBytes( handshake->io, inbuf, hash, sizeof( hash ) );

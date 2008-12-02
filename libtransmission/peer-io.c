@@ -83,6 +83,7 @@ struct tr_peerIo
     tr_bool                  isIncoming;
     tr_bool                  peerIdIsSet;
     tr_bool                  extendedProtocolSupported;
+    tr_bool                  fastExtensionSupported;
 
     int                      magicNumber;
 
@@ -234,6 +235,12 @@ static int
 isPeerIo( const tr_peerIo * io )
 {
     return ( io != NULL ) && ( io->magicNumber == MAGIC_NUMBER );
+}
+
+static int
+isFlag( int flag )
+{
+    return( ( flag == 0 ) || ( flag == 1 ) );
 }
 
 static tr_peerIo*
@@ -487,12 +494,36 @@ tr_peerIoGetPeersId( const tr_peerIo * io )
 **/
 
 void
+tr_peerIoEnableFEXT( tr_peerIo * io,
+                     int         flag )
+{
+    assert( isPeerIo( io ) );
+    assert( isFlag( flag ) );
+
+    dbgmsg( io, "setting FEXT support flag to %d", (flag?1:0) );
+    io->fastExtensionSupported = flag;
+}
+
+int
+tr_peerIoSupportsFEXT( const tr_peerIo * io )
+{
+    assert( isPeerIo( io ) );
+
+    return io->fastExtensionSupported;
+}
+
+/**
+***
+**/
+
+void
 tr_peerIoEnableLTEP( tr_peerIo * io,
                      int         flag )
 {
     assert( isPeerIo( io ) );
-    assert( flag == 0 || flag == 1 );
+    assert( isFlag( flag ) );
 
+    dbgmsg( io, "setting LTEP support flag to %d", (flag?1:0) );
     io->extendedProtocolSupported = flag;
 }
 
