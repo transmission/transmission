@@ -159,13 +159,7 @@ makeSocketNonBlocking( int fd )
 {
     if( fd >= 0 )
     {
-#if defined( __BEOS__ )
-        int flags = 1;
-        if( setsockopt( fd, SOL_SOCKET, SO_NONBLOCK,
-                       &flags, sizeof( int ) ) < 0 )
-#else
         if( evutil_make_socket_nonblocking( fd ) )
-#endif
         {
             tr_err( _( "Couldn't create socket: %s" ),
                    tr_strerror( sockerrno ) );

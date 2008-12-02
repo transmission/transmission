@@ -33,10 +33,6 @@
  #include <inttypes.h>
  #include <winsock2.h>
  typedef int socklen_t;
-#elif defined( __BEOS__ )
- #include <sys/socket.h>
- #include <netinet/in.h>
- typedef int socklen_t;
 #else
  #include <sys/types.h>
  #include <sys/socket.h>

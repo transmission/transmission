@@ -517,11 +517,7 @@ tr_fdSocketAccept( int           b,
 static void
 socketClose( int fd )
 {
-#ifdef BEOS_NETSERVER
-    closesocket( fd );
-#else
     EVUTIL_CLOSESOCKET( fd );
-#endif
 }
 
 void

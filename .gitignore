@@ -1,8 +1,6 @@
 /.depend
 Transmission.xcodeproj/*.mode1
 Transmission.xcodeproj/*.pbxuser
-beos/.depend
-beos/Transmission
 /build
 cli/.depend
 cli/transmissioncli

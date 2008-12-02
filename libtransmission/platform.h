@@ -32,10 +32,7 @@
  #define TR_PATH_DELIMITER_STR "/"
 #endif
 
-#ifdef __BEOS__
- #include <StorageDefs.h>
- #define MAX_PATH_LENGTH  B_FILE_NAME_LENGTH
-#elif defined(WIN32)
+#ifdef WIN32
  #include <windows.h>
  #define MAX_PATH_LENGTH  MAX_PATH
 #else

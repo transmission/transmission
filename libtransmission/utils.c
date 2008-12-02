@@ -41,8 +41,6 @@
 #ifdef WIN32
  #include <direct.h> /* _getcwd */
  #include <windows.h> /* Sleep */
-#elif defined( __BEOS__ )
- #include <kernel/OS.h>
 #endif
 
 #include "transmission.h"
@@ -989,9 +987,7 @@ tr_date( void )
 void
 tr_wait( uint64_t delay_milliseconds )
 {
-#ifdef __BEOS__
-    snooze( 1000 * delay_milliseconds );
-#elif defined( WIN32 )
+#ifdef WIN32
     Sleep( (DWORD)delay_milliseconds );
 #else
     usleep( 1000 * delay_milliseconds );
