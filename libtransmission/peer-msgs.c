@@ -1128,6 +1128,7 @@ messageLengthIsCorrect( const tr_peermsgs * msg,
 
         case BT_HAVE:
         case BT_SUGGEST:
+            return len == 5;
 
         case BT_BITFIELD:
             return len == ( msg->torrent->info.pieceCount + 7u ) / 8u + 1u;
