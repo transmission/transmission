@@ -1053,6 +1053,7 @@ typedef struct tr_peer_stat
     tr_bool      isEncrypted;
     tr_bool      isDownloadingFrom;
     tr_bool      isUploadingTo;
+    tr_bool      isSeed;
 
     tr_bool      peerIsChoked;
     tr_bool      peerIsInterested;

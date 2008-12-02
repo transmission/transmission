@@ -1823,6 +1823,7 @@ tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
         stat->isIncoming         = tr_peerIoIsIncoming( peer->io );
         stat->isDownloadingFrom  = clientIsDownloadingFrom( peer );
         stat->isUploadingTo      = clientIsUploadingTo( peer );
+        stat->isSeed             = ( atom->uploadOnly == UPLOAD_ONLY_YES ) || ( peer->progress >= 1.0 );
 
         pch = stat->flagStr;
         if( t->optimistic == peer ) *pch++ = 'O';
