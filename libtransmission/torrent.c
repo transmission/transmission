@@ -1719,10 +1719,8 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
         /* add the new fields */
         tr_bencDictAddStr( &metainfo, "announce", trackers[0].announce );
         announceList = tr_bencDictAddList( &metainfo, "announce-list", 0 );
-        for( i = 0; i < trackerCount; ++i )
-        {
-            if( prevTier != trackers[i].tier )
-            {
+        for( i = 0; i < trackerCount; ++i ) {
+            if( prevTier != trackers[i].tier ) {
                 prevTier = trackers[i].tier;
                 tier = tr_bencListAddList( announceList, 0 );
             }
@@ -1733,10 +1731,17 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
         memset( &tmpInfo, 0, sizeof( tr_info ) );
         if( !tr_metainfoParse( tor->session, &tmpInfo, &metainfo ) )
         {
-            /* if it's good, save it and use it */
-            tr_metainfoFree( &tor->info );
-            tor->info = tmpInfo;
-            tr_torrentInitFilePieces( tor );
+            /* it's good, so keep these new trackers and free the old ones */
+
+            tr_info swap;
+            swap.trackers = tor->info.trackers;
+            swap.trackerCount = tor->info.trackerCount;
+            tor->info.trackers = tmpInfo.trackers;
+            tor->info.trackerCount = tmpInfo.trackerCount;
+            tmpInfo.trackers = swap.trackers;
+            tmpInfo.trackerCount = swap.trackerCount;
+
+            tr_metainfoFree( &tmpInfo );
             tr_bencSaveFile( tor->info.torrent, &metainfo );
         }
 
