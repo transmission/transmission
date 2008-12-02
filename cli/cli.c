@@ -210,6 +210,8 @@ scrapeDoneFunc( tr_session   * session UNUSED,
                  (char*)host );
 
     --leftToScrape;
+
+    tr_free( host );
 }
 
 static void
@@ -431,7 +433,6 @@ main( int     argc,
                     tr_httpParseURL( scrape, -1, &host, NULL, NULL );
                     ++leftToScrape;
                     tr_webRun( h, url, NULL, scrapeDoneFunc, host );
-                    tr_free( host );
                     tr_free( url );
                 }
             }
