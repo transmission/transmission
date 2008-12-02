@@ -103,6 +103,9 @@ natPulse( tr_shared * s )
 static void
 incomingPeersPulse( tr_shared * s )
 {
+    int allPaused;
+    tr_torrent * tor;
+
     if( s->bindSocket >= 0 && ( s->bindPort != s->publicPort ) )
     {
         tr_ninf( getKey( ), _( "Closing port %d" ), s->bindPort );
@@ -136,7 +139,18 @@ incomingPeersPulse( tr_shared * s )
         }
     }
 
-    for( ; ; ) /* check for new incoming peer connections */
+    /* see if any torrents aren't paused */ 
+    allPaused = 1; 
+    tor = NULL; 
+    while(( tor = tr_torrentNext( s->session, tor ))) { 
+        if( TR_STATUS_IS_ACTIVE( tr_torrentGetActivity( tor ))) { 
+            allPaused = 0; 
+            break; 
+        } 
+    } 
+
+    /* if we have any running torrents, check for new incoming peer connections */ 
+    while( !allPaused )  
     {
         int         socket;
         tr_port     port;
