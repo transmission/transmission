@@ -791,9 +791,11 @@ static void
 cancelAllRequestsToClient( tr_peermsgs * msgs )
 {
     struct peer_request req;
+    const int mustSendCancel = tr_peerIoSupportsFEXT( msgs->io );
 
     while( popNextRequest( msgs, &req ) )
-        protocolSendReject( msgs, &req );
+        if( mustSendCancel )
+            protocolSendReject( msgs, &req );
 }
 
 void
