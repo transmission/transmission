@@ -1,11 +1,17 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
 
+1.50 (2008/xx/yy)
+<http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
+- Mac
+   + Groups (moved to preferences) can have a default location when adding transfers
+
+
 1.41 (2008/xx/yy)
 <http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Fix 1.40 "jumpy upload speed" bug
-   + Fix 1.40 "Got HTTP Status Code: 0" error message.
+   + Fix 1.40 "Got HTTP Status Code: 0" error message
    + More accurate bandwidth measurement
    + Fix autoconf/automake build warnings
 - GTK+
