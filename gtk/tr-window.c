@@ -274,9 +274,9 @@ status_menu_toggled_cb( GtkCheckMenuItem * menu_item,
 ***/
 
 static int
-checkFilterText( filter_text_mode_t filter_text_mode,
-                 const tr_info *    torInfo,
-                 const char *       text )
+checkFilterText( filter_text_mode_t    filter_text_mode,
+                 const tr_info       * torInfo,
+                 const char          * text )
 {
     tr_file_index_t i;
     int             ret = 0;
@@ -287,20 +287,20 @@ checkFilterText( filter_text_mode_t filter_text_mode,
         case FILTER_TEXT_MODE_FILES:
             for( i = 0; i < torInfo->fileCount && !ret; ++i )
             {
-                pch = g_ascii_strdown( torInfo->files[i].name, -1 );
+                pch = g_utf8_casefold( torInfo->files[i].name, -1 );
                 ret = !text || strstr( pch, text ) != NULL;
                 g_free( pch );
             }
             break;
 
         case FILTER_TEXT_MODE_TRACKER:
-            pch = g_ascii_strdown( torInfo->trackers[0].announce, -1 );
+            pch = g_utf8_casefold( torInfo->trackers[0].announce, -1 );
             ret = !text || ( strstr( pch, text ) != NULL );
             g_free( pch );
             break;
 
         default: /* NAME */
-            pch = g_ascii_strdown( torInfo->name, -1 );
+            pch = g_utf8_casefold( torInfo->name, -1 );
             ret = !text || ( strstr( pch, text ) != NULL );
             g_free( pch );
             break;
@@ -354,8 +354,7 @@ is_row_visible( GtkTreeModel * model,
     gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
 
     return checkFilterMode( p->filter_mode, tor )
-           && checkFilterText( p->filter_text_mode, tr_torrentInfo(
-                                   tor ), p->filter_text );
+           && checkFilterText( p->filter_text_mode, tr_torrentInfo( tor ), p->filter_text );
 }
 
 static void updateTorrentCount( PrivateData * p );
@@ -425,7 +424,7 @@ filter_entry_changed( GtkEditable * e,
 
     pch = gtk_editable_get_chars( e, 0, -1 );
     g_free( p->filter_text );
-    p->filter_text = g_ascii_strdown( pch, -1 );
+    p->filter_text = g_utf8_casefold( pch, -1 );
     refilter( p );
     g_free( pch );
 }
