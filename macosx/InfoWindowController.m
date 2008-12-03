@@ -28,6 +28,7 @@
 #import "FileOutlineView.h"
 #import "FileOutlineController.h"
 #import "FileListNode.h"
+#import "PeerProgressIndicatorCell.h"
 #import "TrackerTableView.h"
 #import "PiecesView.h"
 #import "QuickLookController.h"
@@ -910,6 +911,21 @@ typedef enum
     return nil;
 }
 
+- (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn
+    row: (NSInteger) row
+{
+    if (tableView == fPeerTable)
+    {
+        NSString * ident = [tableColumn identifier];
+        
+        if  ([ident isEqualToString: @"Progress"])
+        {
+            NSDictionary * peer = [fPeers objectAtIndex: row];
+            [(PeerProgressIndicatorCell *)cell setSeed: [[peer objectForKey: @"Seed"] boolValue]];
+        }
+    }
+}
+
 - (void) tableView: (NSTableView *) tableView didClickTableColumn: (NSTableColumn *) tableColumn
 {
     if (tableView == fPeerTable)
@@ -964,8 +980,17 @@ typedef enum
         NSDictionary * peer = [fPeers objectAtIndex: row];
         NSMutableArray * components = [NSMutableArray arrayWithCapacity: 5];
         
-        [components addObject: [NSString localizedStringWithFormat: NSLocalizedString(@"Progress: %.1f%%",
-            "Inspector -> Peers tab -> table row tooltip"), [[peer objectForKey: @"Progress"] floatValue] * 100.0]];
+        CGFloat progress = [[peer objectForKey: @"Progress"] floatValue];
+        
+        NSString * seedStatus;
+        if (progress < 1.0 && [[peer objectForKey: @"Seed"] boolValue])
+            seedStatus = [NSString stringWithFormat: @" (%@)", NSLocalizedString(@"Partial Seed",
+                            "Inspector -> Peers tab -> table row tooltip")];
+        else
+            seedStatus = @"";
+        
+        [components addObject: [NSString localizedStringWithFormat: NSLocalizedString(@"Progress: %.1f%%%@",
+            "Inspector -> Peers tab -> table row tooltip"), progress * 100.0, seedStatus]];
         
         if ([[peer objectForKey: @"Encryption"] boolValue])
             [components addObject: NSLocalizedString(@"Encrypted Connection", "Inspector -> Peers tab -> table row tooltip")];
