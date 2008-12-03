@@ -198,7 +198,7 @@ _tr_blocklistSetEnabled( tr_blocklist * b,
 }
 
 int
-_tr_blocklistHasAddress( tr_blocklist *         b,
+_tr_blocklistHasAddress( tr_blocklist         * b,
                          const struct in_addr * addr )
 {
     uint32_t                   needle;
@@ -257,9 +257,10 @@ _tr_blocklistSetContent( tr_blocklist * b,
 
     while( !fggets( &line, in ) )
     {
-        char *             rangeBegin;
-        char *             rangeEnd;
-        struct in_addr     in_addr;
+        char *  rangeBegin;
+        char *  rangeEnd;
+        char *  crpos;
+        struct in_addr in_addr;
         struct tr_ip_range range;
 
         rangeBegin = strrchr( line, ':' );
@@ -269,6 +270,9 @@ _tr_blocklistSetContent( tr_blocklist * b,
         rangeEnd = strchr( rangeBegin, '-' );
         if( !rangeEnd ){ free( line ); continue; }
         *rangeEnd++ = '\0';
+
+        if(( crpos = strchr( rangeEnd, '\r' )))
+            *crpos = '\0';
 
         if( tr_netResolve( rangeBegin, &in_addr ) )
             tr_err( "blocklist skipped invalid address [%s]\n", rangeBegin );
