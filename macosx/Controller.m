@@ -348,8 +348,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //set up status bar
     [fStatusBar setHidden: YES];
     
-    [fTotalDLField setToolTip: NSLocalizedString(@"Total download speed", "Status Bar -> speed tooltip")];
-    [fTotalULField setToolTip: NSLocalizedString(@"Total upload speed", "Status Bar -> speed tooltip")];
+    [self updateSpeedFieldsToolTips];
     
     NSRect statusBarFrame = [fStatusBar frame];
     statusBarFrame.size.width = windowSize.width;
@@ -489,6 +488,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //update when groups change
     [nc addObserver: self selector: @selector(updateGroupsFilters:)
                     name: @"UpdateGroups" object: nil];
+    
+    //update when speed limits are changed
+    [nc addObserver: self selector: @selector(updateSpeedFieldsToolTips)
+                    name: @"SpeedLimitUpdate" object: nil];
 
     //timer to update the interface every second
     [self updateUI];
@@ -1591,6 +1594,42 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [fTotalTorrentsField setStringValue: totalTorrentsString];
+}
+
+- (void) updateSpeedFieldsToolTips
+{
+    NSString * uploadText, * downloadText;
+    
+    if ([fDefaults boolForKey: @"SpeedLimit"])
+    {
+        NSString * speedString = [NSString stringWithFormat: @"%@ (%@)", NSLocalizedString(@"%d KB/s", "Status Bar -> speed tooltip"),
+                                    NSLocalizedString(@"Speed Limit", "Status Bar -> speed tooltip")];
+        
+        uploadText = [NSString stringWithFormat: speedString, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]];
+        downloadText = [NSString stringWithFormat: speedString, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]];
+    }
+    else
+    {
+        if ([fDefaults boolForKey: @"CheckUpload"])
+            uploadText = [NSString stringWithFormat: NSLocalizedString(@"%d KB/s", "Status Bar -> speed tooltip"),
+                            [fDefaults integerForKey: @"UploadLimit"]];
+        else
+            uploadText = NSLocalizedString(@"unlimited", "Status Bar -> speed tooltip");
+        
+        if ([fDefaults boolForKey: @"CheckDownload"])
+            downloadText = [NSString stringWithFormat: NSLocalizedString(@"%d KB/s", "Status Bar -> speed tooltip"),
+                            [fDefaults integerForKey: @"DownloadLimit"]];
+        else
+            downloadText = NSLocalizedString(@"unlimited", "Status Bar -> speed tooltip");
+    }
+    
+    uploadText = [NSLocalizedString(@"Total upload rate", "Status Bar -> speed tooltip")
+                    stringByAppendingFormat: @": %@", uploadText];
+    downloadText = [NSLocalizedString(@"Total download rate", "Status Bar -> speed tooltip")
+                    stringByAppendingFormat: @": %@", downloadText];
+    
+    [fTotalULField setToolTip: uploadText];
+    [fTotalDLField setToolTip: downloadText];
 }
 
 - (void) updateTorrentsInQueue

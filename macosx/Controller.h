@@ -186,6 +186,8 @@ typedef enum
 - (void) resizeStatusButton;
 - (void) setBottomCountText: (BOOL) filtering;
 
+- (void) updateSpeedFieldsToolTips;
+
 - (void) updateTorrentsInQueue;
 - (NSInteger) numToStartFromQueue: (BOOL) downloadQueue;
 

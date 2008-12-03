@@ -536,6 +536,8 @@ tr_handle * fHandle;
         tr_sessionSetSpeedLimitEnabled(fHandle, TR_DOWN, [fDefaults boolForKey: @"CheckDownload"]);
         tr_sessionSetSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"DownloadLimit"]);
     }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
 }
 
 - (void) applyRatioSetting: (id) sender
@@ -1043,6 +1045,8 @@ tr_handle * fHandle;
     
     int upLimit = tr_sessionGetSpeedLimit(fHandle, TR_UP);
     [fDefaults setInteger: upLimit forKey: @"UploadLimit"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
     
     //update gui if loaded
     if (fHasLoaded)
