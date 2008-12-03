@@ -2124,6 +2124,11 @@ compareCandidates( const void * va,
     if( a->time != b->time )
         return a->time < b->time ? -1 : 1;
 
+    /* all other things being equal, prefer peers whose
+     * information comes from a more reliable source */
+    if( a->from != b->from )
+        return a->from < b->from ? -1 : 1;
+
     return 0;
 }
 
