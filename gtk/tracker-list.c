@@ -155,11 +155,10 @@ onTrackerAddClicked( GtkButton * w UNUSED,
     setTrackerChangeState( page, TRUE );
     gtk_list_store_set( page->store, &iter,
                         TR_COL_TIER, 1,
-                        TR_COL_ANNOUNCE, "http://",
+                        TR_COL_ANNOUNCE, "",
                         -1 );
     path = gtk_tree_model_get_path( GTK_TREE_MODEL( page->store ), &iter );
-    gtk_tree_view_set_cursor( page->view,
-                              path,
+    gtk_tree_view_set_cursor( page->view, path,
                               gtk_tree_view_get_column( page->view,
                                                         TR_COL_ANNOUNCE ),
                               TRUE );
