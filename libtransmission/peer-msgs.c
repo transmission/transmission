@@ -1555,7 +1555,7 @@ readBtMessage( tr_peermsgs *     msgs,
             if( fext )
                 fireClientGotSuggest( msgs, ui32 );
             else {
-                fireError( msgs, EPROTO );
+                fireError( msgs, EMSGSIZE );
                 return READ_ERR;
             }
             break;
@@ -1566,7 +1566,7 @@ readBtMessage( tr_peermsgs *     msgs,
             if( fext )
                 fireClientGotAllowedFast( msgs, ui32 );
             else {
-                fireError( msgs, EPROTO );
+                fireError( msgs, EMSGSIZE );
                 return READ_ERR;
             }
             break;
@@ -1577,7 +1577,7 @@ readBtMessage( tr_peermsgs *     msgs,
                 tr_bitfieldAddRange( msgs->info->have, 0, msgs->torrent->info.pieceCount );
                 updatePeerProgress( msgs );
             } else {
-                fireError( msgs, EPROTO );
+                fireError( msgs, EMSGSIZE );
                 return READ_ERR;
             }
             break;
@@ -1589,7 +1589,7 @@ readBtMessage( tr_peermsgs *     msgs,
                 tr_bitfieldClear( msgs->info->have );
                 updatePeerProgress( msgs );
             } else {
-                fireError( msgs, EPROTO );
+                fireError( msgs, EMSGSIZE );
                 return READ_ERR;
             }
             break;
@@ -1604,7 +1604,7 @@ readBtMessage( tr_peermsgs *     msgs,
             if( fext )
                 reqListRemove( &msgs->clientAskedFor, &r );
             else {
-                fireError( msgs, EPROTO );
+                fireError( msgs, EMSGSIZE );
                 return READ_ERR;
             }
             break;
