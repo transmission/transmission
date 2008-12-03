@@ -126,7 +126,7 @@ loadBlocklists( tr_session * session )
     char      * dirname;
     DIR *       odir = NULL;
     tr_list *   list = NULL;
-    const int   isEnabled = session->isBlocklistEnabled;
+    const tr_bool   isEnabled = session->isBlocklistEnabled;
 
     /* walk through the directory and find blocklists */
     dirname = tr_buildPath( session->configDir, "blocklists", NULL );
@@ -759,12 +759,13 @@ tr_blocklistIsEnabled( const tr_session * session )
 
 void
 tr_blocklistSetEnabled( tr_session * session,
-                        int          isEnabled )
+                        tr_bool      isEnabled )
 {
     tr_list * l;
 
-    session->isBlocklistEnabled = isEnabled ? 1 : 0;
-    for( l = session->blocklists; l; l = l->next )
+    session->isBlocklistEnabled = isEnabled != 0;
+
+    for( l=session->blocklists; l!=NULL; l=l->next )
         _tr_blocklistSetEnabled( l->data, isEnabled );
 }
 
@@ -1073,9 +1074,9 @@ tr_sessionIsProxyEnabled( const tr_session * session )
 
 void
 tr_sessionSetProxyEnabled( tr_session * session,
-                           int          isEnabled )
+                           tr_bool      isEnabled )
 {
-    session->isProxyEnabled = isEnabled ? 1 : 0;
+    session->isProxyEnabled = isEnabled != 0;
 }
 
 tr_proxy_type
@@ -1116,7 +1117,7 @@ tr_sessionSetProxy( tr_session * session,
 
 void
 tr_sessionSetProxyPort( tr_session * session,
-                        int          port )
+                        tr_port      port )
 {
     session->proxyPort = port;
 }
@@ -1129,9 +1130,9 @@ tr_sessionIsProxyAuthEnabled( const tr_session * session )
 
 void
 tr_sessionSetProxyAuthEnabled( tr_session * session,
-                               int          isEnabled )
+                               tr_bool      isEnabled )
 {
-    session->isProxyAuthEnabled = isEnabled ? 1 : 0;
+    session->isProxyAuthEnabled = isEnabled != 0;
 }
 
 const char*

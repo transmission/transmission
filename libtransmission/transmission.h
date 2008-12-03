@@ -460,32 +460,26 @@ const char*   tr_sessionGetProxyUsername( const tr_session * );
 
 const char*   tr_sessionGetProxyPassword( const tr_session * );
 
-void          tr_sessionSetProxyEnabled(                     tr_session *,
-                                                         int isEnabled );
+void          tr_sessionSetProxyEnabled( tr_session * session,
+                                         tr_bool      isEnabled );
 
-void          tr_sessionSetProxyAuthEnabled(                     tr_session *,
-                                                             int isEnabled );
+void          tr_sessionSetProxyAuthEnabled( tr_session * session,
+                                             tr_bool      isEnabled );
 
-void          tr_sessionSetProxy(
-    tr_session *,
-    const char *
-    proxy );
+void          tr_sessionSetProxy( tr_session * session,
+                                  const char * proxy );
 
-void          tr_sessionSetProxyPort(                     tr_session *,
-                                                      int port );
+void          tr_sessionSetProxyPort( tr_session * session,
+                                      tr_port      port );
 
-void          tr_sessionSetProxyType( tr_session *,
-                                      tr_proxy_type );
+void          tr_sessionSetProxyType( tr_session    * session,
+                                      tr_proxy_type   proxy_type );
 
-void          tr_sessionSetProxyUsername(
-    tr_session *,
-    const char *
-    username );
+void          tr_sessionSetProxyUsername( tr_session * session,
+                                          const char * username );
 
-void          tr_sessionSetProxyPassword(
-    tr_session *,
-    const char *
-    password );
+void          tr_sessionSetProxyPassword( tr_session * session,
+                                          const char * password );
 
 /**
 ***
@@ -689,7 +683,7 @@ int  tr_blocklistExists( const tr_session * session );
 int  tr_blocklistIsEnabled( const tr_session * session );
 
 void tr_blocklistSetEnabled( tr_session * session,
-                             int          isEnabled );
+                             tr_bool      isEnabled );
 
 
 /** @} */
@@ -738,7 +732,7 @@ tr_ctor*    tr_ctorNew( const tr_session * session );
 void        tr_ctorFree( tr_ctor * ctor );
 
 void        tr_ctorSetDeleteSource( tr_ctor * ctor,
-                                    uint8_t   doDelete );
+                                    tr_bool   doDelete );
 
 int         tr_ctorSetMetainfo( tr_ctor *       ctor,
                                 const uint8_t * metainfo,
@@ -765,9 +759,9 @@ void        tr_ctorSetDownloadDir( tr_ctor *    ctor,
 
 /** Set whether or not the torrent begins downloading/seeding when created.
     (Default: not paused) */
-void        tr_ctorSetPaused( tr_ctor *   ctor,
-                              tr_ctorMode mode,
-                              uint8_t     isPaused );
+void        tr_ctorSetPaused( tr_ctor      * ctor,
+                              tr_ctorMode    mode,
+                              tr_bool        isPaused );
 
 int         tr_ctorGetPeerLimit( const tr_ctor * ctor,
                                  tr_ctorMode     mode,
@@ -775,7 +769,7 @@ int         tr_ctorGetPeerLimit( const tr_ctor * ctor,
 
 int         tr_ctorGetPaused( const tr_ctor * ctor,
                               tr_ctorMode     mode,
-                              uint8_t *       setmeIsPaused );
+                              tr_bool       * setmeIsPaused );
 
 int         tr_ctorGetDownloadDir( const tr_ctor  * ctor,
                                    tr_ctorMode      mode,
@@ -785,7 +779,7 @@ int         tr_ctorGetMetainfo( const tr_ctor         * ctor,
                                 const struct tr_benc ** setme );
 
 int         tr_ctorGetDeleteSource( const tr_ctor  * ctor,
-                                    uint8_t        * setmeDoDelete );
+                                    tr_bool        * setmeDoDelete );
 
 /* returns NULL if tr_ctorSetMetainfoFromFile() wasn't used */
 const char* tr_ctorGetSourceFile( const tr_ctor * ctor );

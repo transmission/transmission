@@ -154,9 +154,9 @@ tr_ctorSetMetainfoFromHash( tr_ctor *    ctor,
 
 void
 tr_ctorSetDeleteSource( tr_ctor * ctor,
-                        uint8_t   deleteSource )
+                        tr_bool   deleteSource )
 {
-    ctor->doDelete = deleteSource ? 1 : 0;
+    ctor->doDelete = deleteSource != 0;
     ctor->isSet_delete = 1;
 }
 
@@ -180,9 +180,9 @@ tr_ctorGetDeleteSource( const tr_ctor * ctor,
 
 void
 tr_ctorSetSave( tr_ctor * ctor,
-                int       saveInOurTorrentsDir )
+                tr_bool   saveInOurTorrentsDir )
 {
-    ctor->saveInOurTorrentsDir = saveInOurTorrentsDir ? 1 : 0;
+    ctor->saveInOurTorrentsDir = saveInOurTorrentsDir != 0;
 }
 
 int
@@ -194,7 +194,7 @@ tr_ctorGetSave( const tr_ctor * ctor )
 void
 tr_ctorSetPaused( tr_ctor *   ctor,
                   tr_ctorMode mode,
-                  uint8_t     isPaused )
+                  tr_bool     isPaused )
 {
     struct optional_args * args = &ctor->optionalArgs[mode];
 

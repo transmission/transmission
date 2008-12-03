@@ -37,7 +37,7 @@ struct tr_ratecontrol;
 **/
 
 void        tr_ctorSetSave( tr_ctor * ctor,
-                            int       saveMetadataInOurTorrentsDir );
+                            tr_bool   saveMetadataInOurTorrentsDir );
 
 int         tr_ctorGetSave( const tr_ctor * ctor );
 
