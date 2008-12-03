@@ -42,6 +42,7 @@
 #endif
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
@@ -120,6 +121,7 @@ struct cbdata
     GSList *      dupqueue;
     GHashTable *  tor2details;
     GHashTable *  details2tor;
+    GtkTreeSelection * sel;
 };
 
 #define CBDATA_PTR "callback-data-pointer"
@@ -197,22 +199,21 @@ accumulateCanUpdateForeach( GtkTreeModel *      model,
                             gpointer            accumulated_status )
 {
     tr_torrent * tor;
-
     gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
     *(int*)accumulated_status |= tr_torrentCanManualUpdate( tor );
 }
 
 static void
-refreshTorrentActions( GtkTreeSelection * s )
+refreshTorrentActions( struct cbdata * data )
 {
     int                canUpdate;
     struct counts_data counts;
+    GtkTreeSelection * s = data->sel;
 
     counts.activeCount = 0;
     counts.inactiveCount = 0;
     counts.totalCount = 0;
-    gtk_tree_selection_selected_foreach( s, accumulateStatusForeach,
-                                         &counts );
+    gtk_tree_selection_selected_foreach( s, accumulateStatusForeach, &counts );
     action_sensitize( "pause-torrent", counts.activeCount != 0 );
     action_sensitize( "start-torrent", counts.inactiveCount != 0 );
     action_sensitize( "remove-torrent", counts.totalCount != 0 );
@@ -222,26 +223,32 @@ refreshTorrentActions( GtkTreeSelection * s )
     action_sensitize( "show-torrent-properties", counts.totalCount == 1 );
 
     canUpdate = 0;
-    gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach,
-                                         &canUpdate );
+    gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach, &canUpdate );
     action_sensitize( "update-tracker", canUpdate != 0 );
 
     {
         GtkTreeView *  view = gtk_tree_selection_get_tree_view( s );
         GtkTreeModel * model = gtk_tree_view_get_model( view );
-        const int      torrentCount = gtk_tree_model_iter_n_children( model,
-                                                                      NULL )
-                                      != 0;
+        const int  torrentCount = gtk_tree_model_iter_n_children( model, NULL ) != 0;
         action_sensitize( "select-all", torrentCount != 0 );
         action_sensitize( "deselect-all", torrentCount != 0 );
+    }
+
+    {
+        tr_torrent * tor = NULL;
+        tr_session * session = tr_core_session( data->core );
+        int activeCount = 0;
+        while(( tor = tr_torrentNext( session, tor )))
+            if( TR_STATUS_IS_ACTIVE( tr_torrentGetActivity( tor )))
+                ++activeCount;
+        action_sensitize( "pause-all-torrents", activeCount != 0 );
     }
 }
 
 static void
-selectionChangedCB( GtkTreeSelection * s,
-                    gpointer unused    UNUSED )
+selectionChangedCB( GtkTreeSelection * s UNUSED, gpointer data )
 {
-    refreshTorrentActions( s );
+    refreshTorrentActions( data );
 }
 
 static void
@@ -702,12 +709,13 @@ winclose( GtkWidget * w    UNUSED,
 
 static void
 rowChangedCB( GtkTreeModel  * model UNUSED,
-              GtkTreePath *         path,
+              GtkTreePath   * path,
               GtkTreeIter   * iter  UNUSED,
-              gpointer              sel )
+              gpointer        gdata )
 {
-    if( gtk_tree_selection_path_is_selected ( sel, path ) )
-        refreshTorrentActions( GTK_TREE_SELECTION( sel ) );
+    struct cbdata * data = gdata;
+    if( gtk_tree_selection_path_is_selected ( data->sel, path ) )
+        refreshTorrentActions( gdata );
 }
 
 static void
@@ -719,15 +727,14 @@ winsetup( struct cbdata * cbdata,
 
     g_assert( NULL == cbdata->wind );
     cbdata->wind = GTK_WINDOW( wind );
+    cbdata->sel = sel = GTK_TREE_SELECTION( tr_window_get_selection( cbdata->wind ) );
 
-    sel = tr_window_get_selection( cbdata->wind );
-    g_signal_connect( sel, "changed", G_CALLBACK(
-                          selectionChangedCB ), NULL );
-    selectionChangedCB( sel, NULL );
+    g_signal_connect( sel, "changed", G_CALLBACK( selectionChangedCB ), cbdata );
+    selectionChangedCB( sel, cbdata );
     model = tr_core_model( cbdata->core );
-    g_signal_connect( model, "row-changed", G_CALLBACK( rowChangedCB ), sel );
+    g_signal_connect( model, "row-changed", G_CALLBACK( rowChangedCB ), cbdata );
     g_signal_connect( wind, "delete-event", G_CALLBACK( winclose ), cbdata );
-    refreshTorrentActions( sel );
+    refreshTorrentActions( cbdata );
 
     setupdrag( GTK_WIDGET( wind ), cbdata );
 }
@@ -1187,7 +1194,7 @@ updatemodel( gpointer gdata )
             tr_window_update( data->wind );
 
         /* update the actions */
-        refreshTorrentActions( tr_window_get_selection( data->wind ) );
+        refreshTorrentActions( data );
     }
 
     return !done;
@@ -1380,48 +1387,59 @@ removeSelected( struct cbdata * data,
     }
 }
 
+static void
+pauseAllTorrents( struct cbdata * data )
+{
+    tr_session * session = tr_core_session( data->core );
+    const char * cmd = "{ \"method\": \"torrent-stop\" }";
+    char * response = tr_rpc_request_exec_json( session, cmd, strlen( cmd ), NULL );
+    tr_free( response );
+}
+
 void
-doAction( const char * action_name,
-          gpointer     user_data )
+doAction( const char * action_name, gpointer user_data )
 {
     struct cbdata * data = user_data;
     gboolean        changed = FALSE;
 
-    if( !strcmp ( action_name, "add-torrent-menu" )
+    if(  !strcmp( action_name, "add-torrent-menu" )
       || !strcmp( action_name, "add-torrent-toolbar" ) )
     {
         addDialog( data->wind, data->core );
     }
-    else if( !strcmp ( action_name, "show-stats" ) )
+    else if( !strcmp( action_name, "show-stats" ) )
     {
-        GtkWidget * dialog = stats_dialog_create( data->wind,
-                                                  data->core );
+        GtkWidget * dialog = stats_dialog_create( data->wind, data->core );
         gtk_widget_show( dialog );
     }
-    else if( !strcmp ( action_name, "start-torrent" ) )
+    else if( !strcmp( action_name, "start-torrent" ) )
     {
         GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_selected_foreach( s, startTorrentForeach, NULL );
         changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
     }
-    else if( !strcmp ( action_name, "pause-torrent" ) )
+    else if( !strcmp( action_name, "pause-all-torrents" ) )
+    {
+        pauseAllTorrents( data );
+    }
+    else if( !strcmp( action_name, "pause-torrent" ) )
     {
         GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_selected_foreach( s, stopTorrentForeach, NULL );
         changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
     }
-    else if( !strcmp ( action_name, "verify-torrent" ) )
+    else if( !strcmp( action_name, "verify-torrent" ) )
     {
         GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_selected_foreach( s, recheckTorrentForeach, NULL );
         changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
     }
-    else if( !strcmp ( action_name, "open-torrent-folder" ) )
+    else if( !strcmp( action_name, "open-torrent-folder" ) )
     {
         GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_selected_foreach( s, openFolderForeach, data );
     }
-    else if( !strcmp ( action_name, "show-torrent-properties" ) )
+    else if( !strcmp( action_name, "show-torrent-properties" ) )
     {
         GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_selected_foreach( s, showInfoForeach, data );
@@ -1432,7 +1450,7 @@ doAction( const char * action_name,
         gtk_tree_selection_selected_foreach( s, updateTrackerForeach,
                                              data->wind );
     }
-    else if( !strcmp ( action_name, "new-torrent" ) )
+    else if( !strcmp( action_name, "new-torrent" ) )
     {
         GtkWidget * w = make_meta_ui( GTK_WINDOW( data->wind ),
                                      tr_core_session( data->core ) );
@@ -1446,21 +1464,21 @@ doAction( const char * action_name,
     {
         removeSelected( data, TRUE );
     }
-    else if( !strcmp ( action_name, "quit" ) )
+    else if( !strcmp( action_name, "quit" ) )
     {
         askquit( data->core, data->wind, wannaquit, data );
     }
-    else if( !strcmp ( action_name, "select-all" ) )
+    else if( !strcmp( action_name, "select-all" ) )
     {
         GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_select_all( s );
     }
-    else if( !strcmp ( action_name, "deselect-all" ) )
+    else if( !strcmp( action_name, "deselect-all" ) )
     {
         GtkTreeSelection * s = tr_window_get_selection( data->wind );
         gtk_tree_selection_unselect_all( s );
     }
-    else if( !strcmp ( action_name, "edit-preferences" ) )
+    else if( !strcmp( action_name, "edit-preferences" ) )
     {
         if( NULL == data->prefs )
         {
@@ -1471,7 +1489,7 @@ doAction( const char * action_name,
             gtk_widget_show( GTK_WIDGET( data->prefs ) );
         }
     }
-    else if( !strcmp ( action_name, "toggle-message-log" ) )
+    else if( !strcmp( action_name, "toggle-message-log" ) )
     {
         if( !data->msgwin )
         {
@@ -1487,7 +1505,7 @@ doAction( const char * action_name,
             data->msgwin = NULL;
         }
     }
-    else if( !strcmp ( action_name, "show-about-dialog" ) )
+    else if( !strcmp( action_name, "show-about-dialog" ) )
     {
         about( data->wind );
     }
@@ -1497,11 +1515,11 @@ doAction( const char * action_name,
         gtr_open_file( url );
         g_free( url );
     }
-    else if( !strcmp ( action_name, "toggle-main-window" ) )
+    else if( !strcmp( action_name, "toggle-main-window" ) )
     {
         toggleMainWindow( data, FALSE );
     }
-    else if( !strcmp ( action_name, "present-main-window" ) )
+    else if( !strcmp( action_name, "present-main-window" ) )
     {
         toggleMainWindow( data, TRUE );
     }

@@ -78,6 +78,8 @@ static const char * fallback_ui_file =
     "    <menuitem action='toggle-message-log'/>\n"
     "    <menuitem action='show-about-dialog'/>\n"
     "    <separator/>\n"
+    "    <menuitem action='pause-all-torrents'/>\n"
+    "    <separator/>\n"
     "    <menuitem action='quit'/>\n"
     "  </popup>\n"
     "\n"
