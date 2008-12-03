@@ -461,7 +461,8 @@ loadFromFile( tr_torrent * tor,
     }
 
     if( ( fieldsToLoad & ( TR_FR_PROGRESS | TR_FR_DOWNLOAD_DIR ) )
-      && tr_bencDictFindStr( &top, KEY_DOWNLOAD_DIR, &str ) )
+      && ( tr_bencDictFindStr( &top, KEY_DOWNLOAD_DIR, &str ) )
+      && ( str && *str ) )
     {
         tr_free( tor->downloadDir );
         tor->downloadDir = tr_strdup( str );
@@ -561,12 +562,12 @@ setFromCtor( tr_torrent *    tor,
 
     if( fields & TR_FR_DOWNLOAD_DIR )
     {
-        const char * downloadDir;
-        if( !tr_ctorGetDownloadDir( ctor, mode, &downloadDir ) )
+        const char * path;
+        if( !tr_ctorGetDownloadDir( ctor, mode, &path ) && path && *path )
         {
             ret |= TR_FR_DOWNLOAD_DIR;
             tr_free( tor->downloadDir );
-            tor->downloadDir = tr_strdup( downloadDir );
+            tor->downloadDir = tr_strdup( path );
         }
     }
 

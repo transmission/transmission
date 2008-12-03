@@ -81,6 +81,7 @@ readOrWriteBytes( const tr_torrent * tor,
     int             err;
     int             fileExists;
 
+    assert( tor->downloadDir && *tor->downloadDir );
     assert( fileIndex < info->fileCount );
     assert( !file->length || ( fileOffset < file->length ) );
     assert( fileOffset + buflen <= file->length );
@@ -171,11 +172,9 @@ readOrWritePiece( const tr_torrent * tor,
     while( buflen && !err )
     {
         const tr_file * file = &info->files[fileIndex];
-        const uint64_t  bytesThisPass = MIN( buflen,
-                                             file->length - fileOffset );
+        const uint64_t  bytesThisPass = MIN( buflen, file->length - fileOffset );
 
-        err = readOrWriteBytes( tor, ioMode,
-                                fileIndex, fileOffset, buf, bytesThisPass );
+        err = readOrWriteBytes( tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass );
         buf += bytesThisPass;
         buflen -= bytesThisPass;
         ++fileIndex;
