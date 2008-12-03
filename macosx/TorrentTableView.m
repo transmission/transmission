@@ -389,7 +389,7 @@
     
     BOOL pushed;
     if ([NSApp isOnLeopardOrBetter])
-        pushed = fMouseActionRow == row || fMouseRevealRow == row || fMouseControlRow == row;
+        pushed = row != -1 && (fMouseActionRow == row || fMouseRevealRow == row || fMouseControlRow == row);
     else
         pushed = [self pointInControlRect: point] || [self pointInRevealRect: point] || [self pointInActionRect: point];
     
@@ -403,7 +403,7 @@
     fSelectedValues = nil;
     
     //avoid weird behavior when showing menu by doing this after mouse down
-    if ([NSApp isOnLeopardOrBetter] ? fMouseActionRow == row : [self pointInActionRect: point])
+    if ([NSApp isOnLeopardOrBetter] ? row != -1 && fMouseActionRow == row : [self pointInActionRect: point])
     {
         fActionPushedRow = row;
         [self setNeedsDisplayInRect: [self rectOfRow: row]]; //ensure button is pushed down
