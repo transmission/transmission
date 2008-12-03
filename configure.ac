@@ -3,10 +3,12 @@ dnl STATUS: "X" for prerelease test builds,
 dnl         "Z" for unsupported trunk builds,
 dnl         "0" for stable, supported releases
 dnl these should be the only two lines you need to change
-m4_define([user_agent_prefix],1.40+)
-m4_define([peer_id_prefix],-TR140Z-)
+m4_define([user_agent_prefix],[1.40+])
+m4_define([peer_id_prefix],[-TR140Z-])
 
-AC_INIT([transmission],[user_agent_prefix],[http://trac.transmissionbt.com/newticket])
+AC_INIT([transmission],
+        [user_agent_prefix],
+        [http://trac.transmissionbt.com/newticket])
 AC_SUBST(USERAGENT_PREFIX,[user_agent_prefix])
 AC_SUBST(PEERID_PREFIX,[peer_id_prefix])
 
@@ -173,15 +175,22 @@ if test "x$build_gtk" = "xyes"; then
     fi
 fi
 
-AC_CHECK_HEADERS([libintl.h])
-IT_PROG_INTLTOOL([0.23],[no-xml])
-GETTEXT_PACKAGE=transmission
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[Gettext package])
-AM_GLIB_GNU_GETTEXT
-transmissionlocaledir='${prefix}/${DATADIRNAME}/locale'
-AC_SUBST(transmissionlocaledir)
+AC_ARG_ENABLE([nls], 
+              AS_HELP_STRING([--enable-nls],[enable native language support]),,
+              [enable_nls=yes])
 
+use_nls=no
+if test "x$enable_nls" = "xyes" ; then
+    use_nls=yes
+    IT_PROG_INTLTOOL([0.23],[no-xml])
+    AC_CHECK_HEADERS([libintl.h])
+    GETTEXT_PACKAGE=transmission
+    AC_SUBST(GETTEXT_PACKAGE)
+    AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[Gettext package])
+    AM_GLIB_GNU_GETTEXT
+    transmissionlocaledir='${prefix}/${DATADIRNAME}/locale'
+    AC_SUBST(transmissionlocaledir)
+fi
 
 dnl ----------------------------------------------------------------------------
 dnl
