@@ -122,7 +122,7 @@ void         tr_sessionSetTorrentFile( tr_session * session,
                                        const char * hashString,
                                        const char * filename );
 
-int          tr_sessionIsAddressBlocked( const tr_session        * session,
+tr_bool      tr_sessionIsAddressBlocked( const tr_session        * session,
                                          const struct tr_address * addr );
 
 
@@ -130,6 +130,6 @@ void         tr_globalLock( tr_session * );
 
 void         tr_globalUnlock( tr_session * );
 
-int          tr_globalIsLocked( const tr_session * );
+tr_bool      tr_globalIsLocked( const tr_session * );
 
 #endif

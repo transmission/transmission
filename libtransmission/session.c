@@ -381,7 +381,7 @@ tr_globalUnlock( struct tr_handle * handle )
     tr_lockUnlock( handle->lock );
 }
 
-int
+tr_bool
 tr_globalIsLocked( const struct tr_handle * handle )
 {
     return handle && tr_lockHave( handle->lock );
@@ -395,35 +395,35 @@ tr_globalIsLocked( const struct tr_handle * handle )
 
 struct bind_port_data
 {
-    tr_handle *  handle;
-    int          port;
+    tr_session * session;
+    tr_port      port;
 };
 
 static void
 tr_setBindPortImpl( void * vdata )
 {
     struct bind_port_data * data = vdata;
-    tr_handle *             handle = data->handle;
-    const int               port = data->port;
+    tr_session * session = data->session;
+    const tr_port port = data->port;
 
-    handle->isPortSet = 1;
-    tr_sharedSetPort( handle->shared, port );
+    session->isPortSet = 1;
+    tr_sharedSetPort( session->shared, port );
 
     tr_free( data );
 }
 
 void
-tr_sessionSetPeerPort( tr_handle * handle,
-                       int         port )
+tr_sessionSetPeerPort( tr_session * session,
+                       tr_port      port )
 {
     struct bind_port_data * data = tr_new( struct bind_port_data, 1 );
 
-    data->handle = handle;
+    data->session = session;
     data->port = port;
-    tr_runInEventThread( handle, tr_setBindPortImpl, data );
+    tr_runInEventThread( session, tr_setBindPortImpl, data );
 }
 
-int
+tr_port
 tr_sessionGetPeerPort( const tr_handle * h )
 {
     assert( h );
@@ -688,33 +688,16 @@ tr_sessionLoadTorrents( tr_handle * h,
 ***/
 
 void
-tr_sessionSetPexEnabled( tr_handle * handle,
-                         int         enabled )
+tr_sessionSetPexEnabled( tr_session * session,
+                         tr_bool      enabled )
 {
-    handle->isPexEnabled = enabled ? 1 : 0;
+    session->isPexEnabled = enabled != 0;
 }
 
-int
-tr_sessionIsPexEnabled( const tr_handle * handle )
+tr_bool
+tr_sessionIsPexEnabled( const tr_session * session )
 {
-    return handle->isPexEnabled;
-}
-
-/***
-****
-***/
-
-void
-tr_sessionSetLazyBitfieldEnabled( tr_handle * handle,
-                                  int         enabled )
-{
-    handle->useLazyBitfield = enabled ? 1 : 0;
-}
-
-int
-tr_sessionIsLazyBitfieldEnabled( const tr_handle * handle )
-{
-    return handle->useLazyBitfield;
+    return session->isPexEnabled;
 }
 
 /***
@@ -722,15 +705,32 @@ tr_sessionIsLazyBitfieldEnabled( const tr_handle * handle )
 ***/
 
 void
-tr_sessionSetPortForwardingEnabled( tr_handle * h,
-                                    int         enable )
+tr_sessionSetLazyBitfieldEnabled( tr_session * session,
+                                  tr_bool      enabled )
 {
-    tr_globalLock( h );
-    tr_sharedTraversalEnable( h->shared, enable );
-    tr_globalUnlock( h );
+    session->useLazyBitfield = enabled != 0;
 }
 
-int
+tr_bool
+tr_sessionIsLazyBitfieldEnabled( const tr_session * session )
+{
+    return session->useLazyBitfield;
+}
+
+/***
+****
+***/
+
+void
+tr_sessionSetPortForwardingEnabled( tr_session  * session,
+                                    tr_bool       enabled )
+{
+    tr_globalLock( session );
+    tr_sharedTraversalEnable( session->shared, enabled );
+    tr_globalUnlock( session );
+}
+
+tr_bool
 tr_sessionIsPortForwardingEnabled( const tr_handle * h )
 {
     return tr_sharedTraversalIsEnabled( h->shared );
@@ -751,7 +751,7 @@ tr_blocklistGetRuleCount( const tr_session * session )
     return n;
 }
 
-int
+tr_bool
 tr_blocklistIsEnabled( const tr_session * session )
 {
     return session->isBlocklistEnabled;
@@ -769,7 +769,7 @@ tr_blocklistSetEnabled( tr_session * session,
         _tr_blocklistSetEnabled( l->data, isEnabled );
 }
 
-int
+tr_bool
 tr_blocklistExists( const tr_session * session )
 {
     return session->blocklists != NULL;
@@ -799,7 +799,7 @@ tr_blocklistSetContent( tr_session * session,
     return _tr_blocklistSetContent( b, contentFilename );
 }
 
-int
+tr_bool
 tr_sessionIsAddressBlocked( const tr_session * session,
                             const tr_address * addr )
 {

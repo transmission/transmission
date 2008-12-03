@@ -512,14 +512,14 @@ void               tr_sessionClearStats( tr_session * session );
  * In public torrents, PEX is enabled by default.
  */
 void               tr_sessionSetPexEnabled( tr_session  * session,
-                                            int           isEnabled );
+                                            tr_bool       isEnabled );
 
-int                tr_sessionIsPexEnabled( const tr_session * session );
+tr_bool            tr_sessionIsPexEnabled( const tr_session * session );
 
 void               tr_sessionSetLazyBitfieldEnabled( tr_session * session,
-                                                     int          enabled );
+                                                     tr_bool       enabled );
 
-int                tr_sessionIsLazyBitfieldEnabled( const tr_session * session );
+tr_bool            tr_sessionIsLazyBitfieldEnabled( const tr_session * session );
 
 tr_encryption_mode tr_sessionGetEncryption( tr_session * session );
 
@@ -532,14 +532,14 @@ void               tr_sessionSetEncryption( tr_session          * session,
 */
 
 void  tr_sessionSetPortForwardingEnabled( tr_session  * session,
-                                          int           enabled );
+                                          tr_bool       enabled );
 
-int   tr_sessionIsPortForwardingEnabled( const tr_session  * session );
+tr_bool tr_sessionIsPortForwardingEnabled( const tr_session  * session );
 
 void  tr_sessionSetPeerPort( tr_session  * session,
-                             int           port);
+                             tr_port       port);
 
-int   tr_sessionGetPeerPort( const tr_session * session );
+tr_port tr_sessionGetPeerPort( const tr_session * session );
 
 typedef enum
 {
@@ -553,7 +553,7 @@ tr_port_forwarding;
 
 tr_port_forwarding tr_sessionGetPortForwarding( const tr_session * session );
 
-int                tr_sessionCountTorrents( const tr_session * session );
+int tr_sessionCountTorrents( const tr_session * session );
 
 typedef enum
 {
@@ -673,17 +673,17 @@ void          tr_freeMessageList( tr_msg_list * freeme );
  *
  * Passing NULL for a filename will clear the blocklist.
  */
-int  tr_blocklistSetContent( tr_session * session,
-                             const char * filename );
+int     tr_blocklistSetContent   ( tr_session       * session,
+                                   const char       * filename );
 
-int  tr_blocklistGetRuleCount( const tr_session * session );
+int     tr_blocklistGetRuleCount ( const tr_session * session );
 
-int  tr_blocklistExists( const tr_session * session );
+tr_bool tr_blocklistExists       ( const tr_session * session );
 
-int  tr_blocklistIsEnabled( const tr_session * session );
+tr_bool tr_blocklistIsEnabled    ( const tr_session * session );
 
-void tr_blocklistSetEnabled( tr_session * session,
-                             tr_bool      isEnabled );
+void    tr_blocklistSetEnabled   ( tr_session       * session,
+                                   tr_bool            isEnabled );
 
 
 /** @} */
