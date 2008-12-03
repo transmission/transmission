@@ -947,8 +947,13 @@ flushAddTorrentErrors( GtkWindow *  window,
     GSList *    l;
     GtkWidget * w;
 
-    for( l = *files; l; l = l->next )
-        g_string_append_printf( s, "%s\n", (const char*)l->data );
+    if( g_slist_length( *files ) > 1 ) {
+        for( l=*files; l!=NULL; l=l->next )
+            g_string_append_printf( s, "\xE2\x88\x99 %s\n", (const char*)l->data );
+    } else {
+        for( l=*files; l!=NULL; l=l->next )
+            g_string_append_printf( s, "%s\n", (const char*)l->data );
+    }
     w = gtk_message_dialog_new( window,
                                 GTK_DIALOG_DESTROY_WITH_PARENT,
                                 GTK_MESSAGE_ERROR,
@@ -972,15 +977,15 @@ showTorrentErrors( struct cbdata * cbdata )
     if( cbdata->errqueue )
         flushAddTorrentErrors( GTK_WINDOW( cbdata->wind ),
                                ngettext( "Couldn't add corrupt torrent",
-                                        "Couldn't add corrupt torrents",
-                                        g_slist_length( cbdata->errqueue ) ),
+                                         "Couldn't add corrupt torrents",
+                                         g_slist_length( cbdata->errqueue ) ),
                                &cbdata->errqueue );
 
     if( cbdata->dupqueue )
         flushAddTorrentErrors( GTK_WINDOW( cbdata->wind ),
                                ngettext( "Couldn't add duplicate torrent",
-                                        "Couldn't add duplicate torrents",
-                                        g_slist_length( cbdata->dupqueue ) ),
+                                         "Couldn't add duplicate torrents",
+                                         g_slist_length( cbdata->dupqueue ) ),
                                &cbdata->dupqueue );
 }
 
@@ -1000,8 +1005,7 @@ coreerr( TrCore * core    UNUSED,
             break;
 
         case TR_EDUPLICATE:
-            c->dupqueue =
-                g_slist_append( c->dupqueue, g_path_get_basename( msg ) );
+            c->dupqueue = g_slist_append( c->dupqueue, g_strdup( msg ) );
             break;
 
         case TR_CORE_ERR_NO_MORE_TORRENTS:

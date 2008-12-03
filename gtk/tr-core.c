@@ -858,37 +858,50 @@ add_filename( TrCore *     core,
 
     if( filename && session )
     {
-        int       err;
-        tr_ctor * ctor = tr_ctorNew( session );
+        tr_ctor * ctor;
+
+        ctor = tr_ctorNew( session );
         tr_core_apply_defaults( ctor );
         tr_ctorSetPaused( ctor, TR_FORCE, !doStart );
+
         if( tr_ctorSetMetainfoFromFile( ctor, filename ) )
         {
             tr_core_errsig( core, TR_EINVALID, filename );
             tr_ctorFree( ctor );
         }
-        else if( ( err = tr_torrentParse( session, ctor, NULL ) ) )
-        {
-            /* don't complain about .torrent files in the watch directory
-               that have already been added... that gets annoying, and we
-               don't want to nag about cleaning up the watch dir */
-            const gboolean quiet = ( err == TR_EDUPLICATE )
-                                && ( core->priv->adding_from_watch_dir );
-            if( !quiet )
-                tr_core_errsig( core, err, filename );
-
-            tr_ctorFree( ctor );
-        }
-        else if( doPrompt )
-            g_signal_emit( core, TR_CORE_GET_CLASS(
-                               core )->promptsig, 0, ctor );
         else
         {
-            tr_torrent * tor = tr_torrentNew( session, ctor, &err );
-            if( err )
-                tr_core_errsig( core, err, filename );
-            else
-                tr_core_add_torrent( core, tr_torrent_new_preexisting( tor ) );
+            tr_info inf;
+            int err = tr_torrentParse( session, ctor, &inf );
+
+            switch( err )
+            {
+                case TR_EINVALID:
+                    tr_core_errsig( core, err, filename );
+                    break;
+
+                case TR_EDUPLICATE:
+                    /* don't complain about .torrent files in the watch directory
+                     * that have already been added... that gets annoying and we
+                     * don't want to be naggign users to clean up their watch dirs */
+                    if( !core->priv->adding_from_watch_dir )
+                        tr_core_errsig( core, err, inf.name );
+                    tr_metainfoFree( &inf );
+                    break;
+
+                default:
+                    if( doPrompt )
+                        g_signal_emit( core, TR_CORE_GET_CLASS( core )->promptsig, 0, ctor );
+                    else {
+                        tr_torrent * tor = tr_torrentNew( session, ctor, &err );
+                        if( err )
+                            tr_core_errsig( core, err, filename );
+                        else
+                            tr_core_add_torrent( core, tr_torrent_new_preexisting( tor ) );
+                    }
+                    tr_metainfoFree( &inf );
+                    break;
+            }
         }
     }
 }
@@ -900,8 +913,8 @@ tr_core_add_file( TrCore *          core,
                   GError     ** err UNUSED )
 {
     add_filename( core, filename,
-                 pref_flag_get( PREF_KEY_START ),
-                 pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) );
+                  pref_flag_get( PREF_KEY_START ),
+                  pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) );
     *success = TRUE;
     return TRUE;
 }
