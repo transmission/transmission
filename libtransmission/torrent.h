@@ -181,8 +181,17 @@ struct tr_torrent
 
     uint8_t                  obfuscatedHash[SHA_DIGEST_LENGTH];
 
+    /* If the initiator of the connection receives a handshake in which the
+     * peer_id does not match the expected peerid, then the initiator is
+     * expected to drop the connection. Note that the initiator presumably
+     * received the peer information from the tracker, which includes the
+     * peer_id that was registered by the peer. The peer_id from the tracker
+     * and in the handshake are expected to match.
+     */
+    uint8_t * peer_id;
+
     /* Where to download */
-    char *  downloadDir;
+    char * downloadDir;
 
     /* How many bytes we ask for per request */
     uint32_t                   blockSize;

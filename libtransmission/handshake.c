@@ -204,11 +204,11 @@ static uint8_t *
 buildHandshakeMessage( tr_handshake * handshake,
                        int *          setme_len )
 {
-    uint8_t *       buf = tr_new0( uint8_t, HANDSHAKE_SIZE );
-    uint8_t *       walk = buf;
-    const uint8_t * torrentHash = tr_cryptoGetTorrentHash(
-        handshake->crypto );
-    const uint8_t * peerId = tr_getPeerId( );
+    uint8_t          * buf = tr_new0( uint8_t, HANDSHAKE_SIZE );
+    uint8_t          * walk = buf;
+    const uint8_t    * torrentHash = tr_cryptoGetTorrentHash( handshake->crypto );
+    const tr_torrent * tor = tr_torrentFindFromHash( handshake->handle, torrentHash );
+    const uint8_t    * peerId = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
 
     memcpy( walk, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN );
     walk += HANDSHAKE_NAME_LEN;
@@ -681,9 +681,7 @@ readHandshake( tr_handshake *    handshake,
     {
         if( !tr_torrentExists( handshake->handle, hash ) )
         {
-            dbgmsg(
-                handshake,
-                "peer is trying to connect to us for a torrent we don't have." );
+            dbgmsg( handshake, "peer is trying to connect to us for a torrent we don't have." );
             return tr_handshakeDone( handshake, FALSE );
         }
         else
@@ -704,8 +702,7 @@ readHandshake( tr_handshake *    handshake,
     }
 
     /**
-    ***  If this is an incoming message, then we need to send a response
-    ***handshake
+    ***  If it's an incoming message, we need to send a response handshake
     **/
 
     if( !handshake->haveSentBitTorrentHandshake )

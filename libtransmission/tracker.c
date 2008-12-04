@@ -1075,8 +1075,15 @@ tr_trackerStart( tr_tracker * t )
 {
     if( t && !t->isRunning )
     {
+        tr_torrent * tor;
+
+        /* change the peer-id */
         tr_free( t->peer_id );
         t->peer_id = tr_peerIdNew( );
+        if(( tor = tr_torrentFindFromHash( t->session, t->hash ))) {
+            tr_free( tor->peer_id );
+            tor->peer_id = (uint8_t*) tr_strdup( t->peer_id );
+        }
 
         t->isRunning = 1;
         enqueueRequest( t->session, t, TR_REQ_STARTED );
