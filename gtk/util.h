@@ -41,7 +41,7 @@ typedef void ( *callbackfunc_t )( void* );
 
 /* return a human-readable string for the size given in bytes. */
 char*       tr_strlsize( char *   buf,
-                         uint64_t size,
+                         guint64  size,
                          size_t   buflen );
 
 /* return a human-readable string for the transfer rate given in bytes. */
