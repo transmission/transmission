@@ -6,6 +6,9 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - All Platforms
    + Fix 1.40 "jumpy upload speed" bug
    + Fix 1.40 "Got HTTP Status Code: 0" error message
+   + Fix handshake peer_id error
+   + Parse peer blocklists from bluetack even if they contain Windows newlines
+   + Fix 1.40 "lazy bitfield" error
    + More accurate bandwidth measurement
    + Fix autoconf/automake build warnings
 - GTK+
