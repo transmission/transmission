@@ -29,7 +29,7 @@ enum
 {
     HISTORY_MSEC = 2000,
     INTERVAL_MSEC = HISTORY_MSEC,
-    GRANULARITY_MSEC = 40,
+    GRANULARITY_MSEC = 50,
     HISTORY_SIZE = ( INTERVAL_MSEC / GRANULARITY_MSEC ),
     MAGIC_NUMBER = 43143
 };
@@ -254,10 +254,14 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
 
     if( b->band[dir].isLimited )
     {
-        const double currentSpeed = getSpeed( &b->band[dir].piece, HISTORY_MSEC - period_msec );
         const double desiredSpeed = b->band[dir].desiredSpeed;
+#if 0
+        const double currentSpeed = getSpeed( &b->band[dir].piece, HISTORY_MSEC - period_msec );
         const double pulseCount = ( HISTORY_MSEC - period_msec ) / (double)period_msec;
         const double nextPulseSpeed = desiredSpeed * ( pulseCount + 1 ) - ( currentSpeed * pulseCount );
+#else
+        const double nextPulseSpeed = desiredSpeed;
+#endif
         b->band[dir].bytesLeft = MAX( 0.0, nextPulseSpeed * 1024.0 * period_msec / 1000.0 );
 
 #ifdef DEBUG_DIRECTION
