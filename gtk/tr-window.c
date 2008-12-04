@@ -83,7 +83,6 @@ typedef struct
     GtkWidget *           dl_lb;
     GtkWidget *           stats_lb;
     GtkWidget *           gutter_lb;
-    GSList *              toggles;
     GtkTreeSelection *    selection;
     GtkCellRenderer *     renderer;
     GtkTreeViewColumn *   column;
@@ -257,19 +256,6 @@ static struct
     { "session-transfer", N_( "Session Transfer" )           }
 };
 
-const char *  filter_names[FILTER_MODE_QTY] = {
-    /* show all torrents */
-    N_( "A_ll" ),
-    /* show only torrents that have connected peers */
-    N_( "_Active" ),
-    /* show only torrents that are trying to download */
-    N_( "_Downloading" ),
-    /* show only torrents that are trying to upload */
-    N_( "_Seeding" ),
-    /* show only torrents that are paused */
-    N_( "_Paused" )
-};
-
 static void
 status_menu_toggled_cb( GtkCheckMenuItem * menu_item,
                         gpointer           vprivate )
@@ -396,40 +382,6 @@ filter_text_toggled_cb( GtkCheckMenuItem * menu_item,
 }
 
 static void
-update_toggle( GtkToggleButton * toggle,
-                   gpointer          vprivate )
-{
-    PrivateData *       p = vprivate;
-    GtkWidget * l;
-    const filter_mode_t mode = 
-            GPOINTER_TO_UINT( g_object_get_data( G_OBJECT( toggle ),
-                                         FILTER_MODE_KEY ) );
-    const char * mnemonic  = (char *) g_object_get_data( G_OBJECT( toggle ), "title");
-
-    char buf[128];
-    int filtercount = 0;
-
-    tr_session * session = tr_core_session(p->core);
-    tr_torrent * torrent = tr_torrentNext(session, 0);
-
-    while (torrent) {
-        if (checkFilterMode(mode, torrent))
-            filtercount++;
-        torrent = tr_torrentNext(session, torrent);
-    }
-
-    l = gtk_bin_get_child( GTK_BIN( toggle ) );
-    if( filtercount )
-        g_snprintf( buf, sizeof( buf ), "%s (%d)", mnemonic, filtercount );
-    else
-        g_snprintf( buf, sizeof( buf ), "%s", mnemonic );
-    gtk_label_set_markup_with_mnemonic( GTK_LABEL( l ), buf );
-
-//ccc
-  //  gtk_button_set_label( GTK_BUTTON( toggle ), buf);
-}
-
-static void
 filter_toggled_cb( GtkToggleButton * toggle,
                    gpointer          vprivate )
 {
@@ -442,7 +394,7 @@ filter_toggled_cb( GtkToggleButton * toggle,
     const filter_mode_t mode =
         GPOINTER_TO_UINT( g_object_get_data( G_OBJECT( toggle ),
                                              FILTER_MODE_KEY ) );
-    
+
     /* update the filter */
     if( isActive )
     {
@@ -454,7 +406,6 @@ filter_toggled_cb( GtkToggleButton * toggle,
     for( l = toggles; l != NULL; l = l->next )
     {
         GtkToggleButton * walk = GTK_TOGGLE_BUTTON( l->data );
-        update_toggle(walk, vprivate);
         if( isActive && ( toggle != walk ) )
             gtk_toggle_button_set_active( walk, FALSE );
     }
@@ -557,7 +508,18 @@ tr_window_new( GtkUIManager * ui_manager,
     GtkWindow *   win;
     GSList *      l;
     GSList *      toggles;
-
+    const char *  filter_names[FILTER_MODE_QTY] = {
+        /* show all torrents */
+        N_( "A_ll" ),
+        /* show only torrents that have connected peers */
+        N_( "_Active" ),
+        /* show only torrents that are trying to download */
+        N_( "_Downloading" ),
+        /* show only torrents that are trying to upload */
+        N_( "_Seeding" ),
+        /* show only torrents that are paused */
+        N_( "_Paused" )
+    };
     const char *  filter_text_names[FILTER_TEXT_MODE_QTY] = {
         N_( "Name" ), N_( "Files" ), N_( "Tracker" )
     };
@@ -601,26 +563,23 @@ tr_window_new( GtkUIManager * ui_manager,
 
     /* filter */
     toggles = NULL;
-    h = p->filter = gtk_hbox_new( FALSE, GUI_PAD );
+    h = p->filter = gtk_hbox_new( FALSE, 0 );
     gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD_SMALL );
     for( i = 0; i < FILTER_MODE_QTY; ++i )
     {
         const char * mnemonic = _( filter_names[i] );
-        GtkWidget * label;
-        w = gtk_toggle_button_new( );
-        label = gtk_label_new_with_mnemonic( mnemonic );
-        gtk_container_add( GTK_CONTAINER( w ), label );
-        g_object_set_data( G_OBJECT( w ), FILTER_MODE_KEY, GINT_TO_POINTER( i ) );
+        w = gtk_toggle_button_new_with_mnemonic( mnemonic );
+        g_object_set_data( G_OBJECT( w ), FILTER_MODE_KEY,
+                          GINT_TO_POINTER( i ) );
         gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), i == FILTER_MODE_ALL );
+        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(
+                                          w ), i == FILTER_MODE_ALL );
         toggles = g_slist_prepend( toggles, w );
         g_signal_connect( w, "toggled", G_CALLBACK( filter_toggled_cb ), p );
         gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
-        g_object_set_data( G_OBJECT( w ), "title", mnemonic);
     }
     for( l = toggles; l != NULL; l = l->next )
         g_object_set_data( G_OBJECT( l->data ), FILTER_TOGGLES_KEY, toggles );
-    p->toggles = toggles;
     s = sexy_icon_entry_new( );
     sexy_icon_entry_add_clear_button( SEXY_ICON_ENTRY( s ) );
     image = gtk_image_new_from_stock( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
@@ -727,10 +686,6 @@ tr_window_new( GtkUIManager * ui_manager,
                                            G_CALLBACK( prefsChanged ), self );
 
     filter_entry_changed( GTK_EDITABLE( s ), p );
-    
-    for( l = toggles; l != NULL; l = l->next ) {
-        update_toggle(GTK_TOGGLE_BUTTON( l->data ), p);
-    }
     return self;
 }
 
@@ -831,7 +786,6 @@ void
 tr_window_update( TrWindow * self )
 {
     PrivateData * p = get_private_data( self );
-    GSList *      l;    
 
     if( p && p->core && tr_core_session( p->core ) )
     {
@@ -839,9 +793,6 @@ tr_window_update( TrWindow * self )
         updateTorrentCount( p );
         updateStats( p );
         refilter( p );
-        for( l = p->toggles; l != NULL; l = l->next ) {
-            update_toggle(GTK_TOGGLE_BUTTON( l->data ), p);
-        }
     }
 }
 
