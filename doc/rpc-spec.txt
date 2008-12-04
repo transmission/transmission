@@ -133,6 +133,7 @@
    desiredAvailable       | number                               | tr_stat
    doneDate               | number                               | tr_stat
    downloadedEver         | number                               | tr_stat
+   downloaders            | number                               | tr_stat
    downloadLimitMode      | number                               | tr_torrent
    downloadLimit          | number                               | tr_torrent
    error                  | number                               | tr_stat
