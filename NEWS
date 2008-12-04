@@ -3,8 +3,13 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.50 (2008/xx/yy)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
+- All Platforms
+   + Support BitTorrent Enhancement Proposal #6 "Fast Extension"
+   + Support BitTorrent Enhancement Proposal #21 "Extension for Partial Seeds"
 - Mac
    + Groups (moved to preferences) can have a default location when adding transfers
+- GTK+
+   + Minor display improvements and HIG compliance
 
 
 1.41 (2008/xx/yy)
@@ -12,6 +17,9 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - All Platforms
    + Fix 1.40 "jumpy upload speed" bug
    + Fix 1.40 "Got HTTP Status Code: 0" error message
+   + Parse peer blocklists from bluetack even if they contain Windows newlines
+   + Fix handshake peer_id error
+   + Fix 1.40 "lazy bitfield" error
    + More accurate bandwidth measurement
    + Fix autoconf/automake build warnings
 - GTK+
