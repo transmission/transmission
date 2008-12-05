@@ -92,6 +92,7 @@ callback( void * vdata, int type, const JSON_value * value )
         }
 
         case JSON_T_NULL:
+            tr_bencInitStrDup( getNode( data ), "" );
             break;
 
         case JSON_T_INTEGER:
