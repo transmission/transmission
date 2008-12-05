@@ -246,8 +246,8 @@ parseHandshake( tr_handshake *    handshake,
     uint8_t reserved[HANDSHAKE_FLAGS_LEN];
     uint8_t hash[SHA_DIGEST_LENGTH];
 
-    dbgmsg( handshake, "payload: need %d, got %d", (int)HANDSHAKE_SIZE,
-           (int)EVBUFFER_LENGTH( inbuf ) );
+    dbgmsg( handshake, "payload: need %d, got %zu",
+            (int)HANDSHAKE_SIZE, EVBUFFER_LENGTH( inbuf ) );
 
     if( EVBUFFER_LENGTH( inbuf ) < HANDSHAKE_SIZE )
         return READ_LATER;
@@ -395,8 +395,7 @@ readYb( tr_handshake *    handshake,
     if( EVBUFFER_LENGTH( inbuf ) < needlen )
         return READ_LATER;
 
-    isEncrypted = memcmp( EVBUFFER_DATA(
-                              inbuf ), HANDSHAKE_NAME, HANDSHAKE_NAME_LEN );
+    isEncrypted = memcmp( EVBUFFER_DATA( inbuf ), HANDSHAKE_NAME, HANDSHAKE_NAME_LEN );
     if( isEncrypted )
     {
         needlen = KEY_LEN;
@@ -407,9 +406,8 @@ readYb( tr_handshake *    handshake,
     dbgmsg( handshake, "got a %s handshake",
            ( isEncrypted ? "encrypted" : "plaintext" ) );
 
-    tr_peerIoSetEncryption(
-        handshake->io, isEncrypted ? PEER_ENCRYPTION_RC4
-        : PEER_ENCRYPTION_NONE );
+    tr_peerIoSetEncryption( handshake->io, isEncrypted ? PEER_ENCRYPTION_RC4
+                                                       : PEER_ENCRYPTION_NONE );
     if( !isEncrypted )
     {
         setState( handshake, AWAITING_HANDSHAKE );
@@ -439,8 +437,8 @@ readYb( tr_handshake *    handshake,
         uint8_t req3[SHA_DIGEST_LENGTH];
         uint8_t buf[SHA_DIGEST_LENGTH];
         tr_sha1( req2, "req2", 4,
-                 tr_cryptoGetTorrentHash(
-                     handshake->crypto ), SHA_DIGEST_LENGTH, NULL );
+                 tr_cryptoGetTorrentHash( handshake->crypto ),
+                 SHA_DIGEST_LENGTH, NULL );
         tr_sha1( req3, "req3", 4, secret, KEY_LEN, NULL );
         for( i = 0; i < SHA_DIGEST_LENGTH; ++i )
             buf[i] = req2[i] ^ req3[i];
@@ -561,9 +559,8 @@ readPadD( tr_handshake *    handshake,
     const size_t needlen = handshake->pad_d_len;
     uint8_t *    tmp;
 
-    dbgmsg( handshake, "pad d: need %d, got %d", (int)needlen,
-           (int)EVBUFFER_LENGTH(
-               inbuf ) );
+    dbgmsg( handshake, "pad d: need %zu, got %zu",
+            needlen, EVBUFFER_LENGTH( inbuf ) );
     if( EVBUFFER_LENGTH( inbuf ) < needlen )
         return READ_LATER;
 
@@ -593,9 +590,8 @@ readHandshake( tr_handshake *    handshake,
     uint8_t   reserved[HANDSHAKE_FLAGS_LEN];
     uint8_t   hash[SHA_DIGEST_LENGTH];
 
-    dbgmsg( handshake, "payload: need %d, got %d",
-           (int)INCOMING_HANDSHAKE_LEN, (int)EVBUFFER_LENGTH(
-               inbuf ) );
+    dbgmsg( handshake, "payload: need %d, got %zu",
+            (int)INCOMING_HANDSHAKE_LEN, EVBUFFER_LENGTH( inbuf ) );
 
     if( EVBUFFER_LENGTH( inbuf ) < INCOMING_HANDSHAKE_LEN )
         return READ_LATER;
@@ -713,14 +709,12 @@ readPeerId( tr_handshake *    handshake,
         return READ_LATER;
 
     /* peer id */
-    tr_peerIoReadBytes( handshake->io, inbuf, handshake->peer_id,
-                        PEER_ID_LEN );
+    tr_peerIoReadBytes( handshake->io, inbuf, handshake->peer_id, PEER_ID_LEN );
     tr_peerIoSetPeersId( handshake->io, handshake->peer_id );
     handshake->havePeerID = TRUE;
     tr_clientForId( client, sizeof( client ), handshake->peer_id );
     dbgmsg( handshake, "peer-id is [%s] ... isIncoming is %d", client,
-           tr_peerIoIsIncoming(
-               handshake->io ) );
+            tr_peerIoIsIncoming( handshake->io ) );
 
     /* if we've somehow connected to ourselves, don't keep the connection */
     peerIsGood =
@@ -738,9 +732,8 @@ readYa( tr_handshake *    handshake,
     const uint8_t *myKey, *secret;
     int            len;
 
-    dbgmsg( handshake, "in readYa... need %d, have %d", (int)KEY_LEN,
-           (int)EVBUFFER_LENGTH(
-               inbuf ) );
+    dbgmsg( handshake, "in readYa... need %d, have %zu",
+            (int)KEY_LEN, EVBUFFER_LENGTH( inbuf ) );
     if( EVBUFFER_LENGTH( inbuf ) < KEY_LEN )
         return READ_LATER;
 
@@ -771,10 +764,8 @@ readPadA( tr_handshake *    handshake,
 {
     uint8_t * pch;
 
-    dbgmsg(
-         handshake,
-        "looking to get past pad a... & resync on hash('req',S) ... have %d bytes",
-        (int)EVBUFFER_LENGTH( inbuf ) );
+    dbgmsg( handshake, "looking to get past pad a... & resync on hash('req',S) ... have %zu bytes",
+            EVBUFFER_LENGTH( inbuf ) );
     /**
     *** Resynchronizing on HASH('req1',S)
     **/
@@ -784,9 +775,8 @@ readPadA( tr_handshake *    handshake,
                  EVBUFFER_LENGTH( inbuf ) );
     if( pch == NULL )
     {
-        dbgmsg( handshake, "no luck so far.. draining %d bytes",
-               (int)EVBUFFER_LENGTH(
-                   inbuf ) );
+        dbgmsg( handshake, "no luck so far.. draining %zu bytes",
+                EVBUFFER_LENGTH( inbuf ) );
         evbuffer_drain( inbuf, EVBUFFER_LENGTH( inbuf ) );
         return READ_LATER;
     }
@@ -849,10 +839,8 @@ readCryptoProvide( tr_handshake *    handshake,
              tr_torrentFindFromObfuscatedHash( handshake->handle,
                                                obfuscatedTorrentHash ) ) )
     {
-        dbgmsg(
-            handshake,
-            "got INCOMING connection's encrypted handshake for torrent [%s]",
-            tor->info.name );
+        dbgmsg( handshake, "got INCOMING connection's encrypted handshake for torrent [%s]",
+                tor->info.name );
         tr_peerIoSetTorrentHash( handshake->io, tor->info.hash );
         if( !tr_torrentAllowsPex( tor )
           && tr_peerMgrPeerIsSeed( handshake->handle->peerMgr,
@@ -913,15 +901,13 @@ readIA( tr_handshake *    handshake,
     struct evbuffer * outbuf;
     uint32_t          crypto_select;
 
-    dbgmsg( handshake, "reading IA... have %d, need %d",
-            (int)EVBUFFER_LENGTH(
-                inbuf ), (int)needlen );
+    dbgmsg( handshake, "reading IA... have %zu, need %zu",
+            EVBUFFER_LENGTH( inbuf ), needlen );
     if( EVBUFFER_LENGTH( inbuf ) < needlen )
         return READ_LATER;
 
     /**
-    ***  B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload
-    ***Stream)
+    ***  B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload Stream)
     **/
 
     tr_cryptoEncryptInit( handshake->crypto );
@@ -950,7 +936,7 @@ readIA( tr_handshake *    handshake,
     }
 
     dbgmsg( handshake, "sending pad d" );
-    /* ENCRYPT(VC, crypto_provide, len(PadC), PadC
+    /* ENCRYPT(VC, crypto_provide, len(PadD), PadD
      * PadD is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
     {
@@ -988,8 +974,8 @@ readPayloadStream( tr_handshake    * handshake,
     int i;
     const size_t      needlen = HANDSHAKE_SIZE;
 
-    dbgmsg( handshake, "reading payload stream... have %d, need %d",
-            (int)EVBUFFER_LENGTH( inbuf ), (int)needlen );
+    dbgmsg( handshake, "reading payload stream... have %zu, need %zu",
+            EVBUFFER_LENGTH( inbuf ), needlen );
     if( EVBUFFER_LENGTH( inbuf ) < needlen )
         return READ_LATER;
 
@@ -1012,10 +998,10 @@ readPayloadStream( tr_handshake    * handshake,
 static ReadState
 canRead( struct tr_iobuf * iobuf, void * arg, size_t * piece )
 {
-    tr_handshake *    handshake = arg;
+    tr_handshake    * handshake = arg;
     struct evbuffer * inbuf = tr_iobuf_input( iobuf );
     ReadState         ret;
-    int               readyForMore = TRUE;
+    tr_bool           readyForMore = TRUE;
 
     /* no piece data in handshake */
     *piece = 0;

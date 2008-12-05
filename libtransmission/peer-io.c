@@ -495,7 +495,7 @@ tr_peerIoGetPeersId( const tr_peerIo * io )
 
 void
 tr_peerIoEnableFEXT( tr_peerIo * io,
-                     int         flag )
+                     tr_bool     flag )
 {
     assert( isPeerIo( io ) );
     assert( isFlag( flag ) );
@@ -504,7 +504,7 @@ tr_peerIoEnableFEXT( tr_peerIo * io,
     io->fastExtensionSupported = flag;
 }
 
-int
+tr_bool
 tr_peerIoSupportsFEXT( const tr_peerIo * io )
 {
     assert( isPeerIo( io ) );
@@ -517,8 +517,8 @@ tr_peerIoSupportsFEXT( const tr_peerIo * io )
 **/
 
 void
-tr_peerIoEnableLTEP( tr_peerIo * io,
-                     int         flag )
+tr_peerIoEnableLTEP( tr_peerIo  * io,
+                     tr_bool      flag )
 {
     assert( isPeerIo( io ) );
     assert( isFlag( flag ) );
@@ -527,7 +527,7 @@ tr_peerIoEnableLTEP( tr_peerIo * io,
     io->extendedProtocolSupported = flag;
 }
 
-int
+tr_bool
 tr_peerIoSupportsLTEP( const tr_peerIo * io )
 {
     assert( isPeerIo( io ) );

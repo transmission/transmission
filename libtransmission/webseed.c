@@ -65,19 +65,14 @@ static void
 fireNeedReq( tr_webseed * w )
 {
     tr_peer_event e = blankEvent;
-
     e.eventType = TR_PEER_NEED_REQ;
     publish( w, &e );
 }
 
 static void
-fireClientGotBlock( tr_webseed * w,
-                    uint32_t     pieceIndex,
-                    uint32_t     offset,
-                    uint32_t     length )
+fireClientGotBlock( tr_webseed * w, uint32_t pieceIndex, uint32_t offset, uint32_t length )
 {
     tr_peer_event e = blankEvent;
-
     e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
     e.pieceIndex = pieceIndex;
     e.offset = offset;
@@ -86,15 +81,12 @@ fireClientGotBlock( tr_webseed * w,
 }
 
 static void
-fireClientGotData( tr_webseed * w,
-                   uint32_t     length )
+fireClientGotData( tr_webseed * w, uint32_t length )
 {
     tr_peer_event e = blankEvent;
-
     e.eventType = TR_PEER_CLIENT_GOT_DATA;
     e.length = length;
     e.wasPieceData = TRUE;
-
     publish( w, &e );
 }
 
@@ -124,75 +116,21 @@ makeURL( tr_webseed *    w,
         {
             switch( *str )
             {
-                case ',':
-                case '-':
-                case '.':
-                case '/':
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                case 'a':
-                case 'b':
-                case 'c':
-                case 'd':
-                case 'e':
-                case 'f':
-                case 'g':
-                case 'h':
-                case 'i':
-                case 'j':
-                case 'k':
-                case 'l':
-                case 'm':
-                case 'n':
-                case 'o':
-                case 'p':
-                case 'q':
-                case 'r':
-                case 's':
-                case 't':
-                case 'u':
-                case 'v':
-                case 'w':
-                case 'x':
-                case 'y':
-                case 'z':
-                case 'A':
-                case 'B':
-                case 'C':
-                case 'D':
-                case 'E':
-                case 'F':
-                case 'G':
-                case 'H':
-                case 'I':
-                case 'J':
-                case 'K':
-                case 'L':
-                case 'M':
-                case 'N':
-                case 'O':
-                case 'P':
-                case 'Q':
-                case 'R':
-                case 'S':
-                case 'T':
-                case 'U':
-                case 'V':
-                case 'W':
-                case 'X':
-                case 'Y':
-                case 'Z':
+                case ',': case '-': case '.': case '/':
+                case '0': case '1': case '2': case '3': case '4':
+                case '5': case '6': case '7': case '8': case '9':
+                case 'a': case 'b': case 'c': case 'd': case 'e':
+                case 'f': case 'g': case 'h': case 'i': case 'j':
+                case 'k': case 'l': case 'm': case 'n': case 'o':
+                case 'p': case 'q': case 'r': case 's': case 't':
+                case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+                case 'A': case 'B': case 'C': case 'D': case 'E':
+                case 'F': case 'G': case 'H': case 'I': case 'J':
+                case 'K': case 'L': case 'M': case 'N': case 'O':
+                case 'P': case 'Q': case 'R': case 'S': case 'T':
+                case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
                     evbuffer_add( out, str, 1 );
                     break;
-
                 default:
                     evbuffer_add_printf( out, "%%%02X", *str );
                     break;
@@ -314,8 +252,7 @@ tr_webseedIsActive( const tr_webseed * w )
 }
 
 int
-tr_webseedGetSpeed( const tr_webseed * w,
-                    float *            setme_KiBs )
+tr_webseedGetSpeed( const tr_webseed * w, float * setme_KiBs )
 {
     const int isActive = tr_webseedIsActive( w );
 
