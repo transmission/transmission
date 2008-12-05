@@ -317,20 +317,20 @@ checkFilterText( filter_text_mode_t    filter_text_mode,
     {
         case FILTER_TEXT_MODE_FILES:
             for( i=0; i<torInfo->fileCount && !ret; ++i ) {
-                pch = g_ascii_strdown( torInfo->files[i].name, -1 );
+                pch = g_utf8_casefold( torInfo->files[i].name, -1 );
                 ret = !text || strstr( pch, text ) != NULL;
                 g_free( pch );
             }
             break;
 
         case FILTER_TEXT_MODE_TRACKER:
-            pch = g_ascii_strdown( torInfo->trackers[0].announce, -1 );
+            pch = g_utf8_casefold( torInfo->trackers[0].announce, -1 );
             ret = !text || ( strstr( pch, text ) != NULL );
             g_free( pch );
             break;
 
         default: /* NAME */
-            pch = g_ascii_strdown( torInfo->name, -1 );
+            pch = g_utf8_casefold( torInfo->name, -1 );
             ret = !text || ( strstr( pch, text ) != NULL );
             g_free( pch );
             break;
@@ -439,7 +439,7 @@ filter_entry_changed( GtkEditable * e, gpointer vprivate )
 
     pch = gtk_editable_get_chars( e, 0, -1 );
     g_free( p->filter_text );
-    p->filter_text = g_ascii_strdown( pch, -1 );
+    p->filter_text = g_utf8_casefold( pch, -1 );
     refilter( p );
     g_free( pch );
 }
