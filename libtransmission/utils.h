@@ -111,6 +111,8 @@ void tr_msg( const char * file, int line,
 
 FILE* tr_getLog( void );
 
+int  tr_deepLoggingIsActive( void );
+
 void tr_deepLog( const char * file, int line,
                  const char * name,
                  const char * fmt, ... ) TR_GNUC_PRINTF( 4, 5 );

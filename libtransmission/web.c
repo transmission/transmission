@@ -29,7 +29,11 @@
 
 #define PULSE_MSEC 500
 
-#define dbgmsg(fmt...) tr_deepLog( __FILE__, __LINE__, "web", ##fmt )
+#define dbgmsg( ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, "web", __VA_ARGS__ ); \
+    } while( 0 )
 
 struct tr_web
 {

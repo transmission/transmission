@@ -66,7 +66,11 @@ struct tr_run_data
     void * user_data;
 };
 
-#define dbgmsg(fmt...) tr_deepLog( __FILE__, __LINE__, "event", ##fmt )
+#define dbgmsg( ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, "event", __VA_ARGS__ ); \
+    } while( 0 )
 
 static void
 readFromPipe( int fd, short eventType, void * veh )

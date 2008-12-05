@@ -127,7 +127,11 @@ struct tr_peerMgr
     tr_ptrArray * incomingHandshakes; /* tr_handshake */
 };
 
-#define tordbg(t, fmt...) tr_deepLog( __FILE__, __LINE__, t->tor->info.name, ##fmt )
+#define tordbg( t, ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, t->tor->info.name, __VA_ARGS__ ); \
+    } while( 0 )
 
 /**
 ***

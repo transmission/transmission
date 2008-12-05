@@ -172,6 +172,12 @@ tr_getLogTimeStr( char * buf, int buflen )
     return buf;
 }
 
+int
+tr_deepLoggingIsActive( void )
+{
+    return tr_getLog != NULL;
+}
+
 void
 tr_deepLog( const char * file, int line, const char * name, const char * fmt, ... )
 {

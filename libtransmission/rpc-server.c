@@ -50,7 +50,11 @@ struct tr_rpc_server
     tr_list * connections;
 };
 
-#define dbgmsg(fmt...) tr_deepLog(__FILE__, __LINE__, MY_NAME, ##fmt )
+#define dbgmsg( ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, MY_NAME, __VA_ARGS__ ); \
+    } while( 0 )
 
 static const char*
 tr_memmem( const char * s1, size_t l1,
