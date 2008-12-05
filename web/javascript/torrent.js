@@ -278,9 +278,9 @@ Torrent.prototype =
 		this._upload_total          = data.uploadedEver;
 		this._download_speed        = data.rateDownload;
 		this._upload_speed          = data.rateUpload;
+		this._peers_connected       = data.peersConnected;
 		this._peers_getting_from_us = data.peersGettingFromUs;
 		this._peers_sending_to_us   = data.peersSendingToUs;
-		this._peers_total           = data.peersKnown;
 		this._error                 = data.error;
 		this._error_message         = data.errorString;
 		this._eta                   = data.eta;
@@ -359,7 +359,7 @@ Torrent.prototype =
 				peer_details = 'Downloading from '
 				             + this.peersSendingToUs()
 				             + ' of '
-				             + this._peers_total
+				             + this._peers_connected
 				             + ' peers - DL: '
 				             + Math.formatBytes(this._download_speed)
 				             + '/s UL: '
@@ -399,7 +399,7 @@ Torrent.prototype =
 				peer_details = 'Seeding to '
 				             + this.peersGettingFromUs()
 				             + ' of '
-				             + this._peers_total
+				             + this._peers_connected
 				             + ' peers - UL: '
 				             + Math.formatBytes(this._upload_speed)
 				             + '/s';
