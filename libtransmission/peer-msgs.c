@@ -902,7 +902,7 @@ tr_peerMsgsAddRequest( tr_peermsgs       * msgs,
 }
 
 static void
-cancelAllRequestsToPeer( tr_peermsgs * msgs )
+cancelAllRequestsToPeer( tr_peermsgs * msgs, int sendCancel )
 {
     int i;
     struct request_list a = msgs->clientWillAskFor;
@@ -916,7 +916,8 @@ cancelAllRequestsToPeer( tr_peermsgs * msgs )
 
     for( i=0; i<b.count; ++i ) {
         fireCancelledReq( msgs, b.requests[i].index );
-        protocolSendCancel( msgs, &b.requests[i] );
+        if( sendCancel )
+            protocolSendCancel( msgs, &b.requests[i] );
     }
 
     reqListClear( &a );
@@ -1319,7 +1320,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_CHOKE:
             dbgmsg( msgs, "got Choke" );
             msgs->info->clientIsChoked = 1;
-            cancelAllRequestsToPeer( msgs );
+            cancelAllRequestsToPeer( msgs, FALSE );
             cancelAllRequestsToClientExceptFast( msgs );
             break;
 
