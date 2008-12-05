@@ -1817,15 +1817,11 @@ sendPex( tr_peermsgs * msgs )
 {
     if( msgs->peerSupportsPex && tr_torrentAllowsPex( msgs->torrent ) )
     {
-        int i;
-        tr_pex * newPex = NULL;
-        const int newCount = tr_peerMgrGetPeers( msgs->handle->peerMgr, msgs->torrent->info.hash, &newPex );
         PexDiffs diffs;
-        tr_benc val, *added, *dropped;
-        uint8_t *tmp, *walk;
-        char * benc;
-        int bencLen;
-        struct evbuffer * out = msgs->outMessages;
+        tr_pex * newPex = NULL;
+        const int newCount = tr_peerMgrGetPeers( msgs->handle->peerMgr,
+                                                 msgs->torrent->info.hash,
+                                                 &newPex );
 
         /* build the diffs */
         diffs.added = tr_new( tr_pex, newCount );
@@ -1838,56 +1834,73 @@ sendPex( tr_peermsgs * msgs )
                         newPex, newCount,
                         tr_pexCompare, sizeof(tr_pex),
                         pexDroppedCb, pexAddedCb, pexElementCb, &diffs );
-        dbgmsg( msgs, "pex: old peer count %d, new peer count %d, added %d, removed %d", msgs->pexCount, newCount, diffs.addedCount, diffs.droppedCount );
+        dbgmsg( msgs,
+                "pex: old peer count %d, new peer count %d, added %d, removed %d",
+                msgs->pexCount, newCount, diffs.addedCount, diffs.droppedCount );
 
-        /* update peer */
-        tr_free( msgs->pex );
-        msgs->pex = diffs.elements;
-        msgs->pexCount = diffs.elementCount;
-
-        /* build the pex payload */
-        tr_bencInitDict( &val, 3 );
-
-        /* "added" */
-        added = tr_bencDictAdd( &val, "added" );
-        tmp = walk = tr_new( uint8_t, diffs.addedCount * 6 );
-        for( i=0; i<diffs.addedCount; ++i ) {
-            memcpy( walk, &diffs.added[i].in_addr, 4 ); walk += 4;
-            memcpy( walk, &diffs.added[i].port, 2 ); walk += 2;
+        if( !diffs.addedCount && !diffs.droppedCount )
+        {
+            tr_free( diffs.elements );
         }
-        assert( ( walk - tmp ) == diffs.addedCount * 6 );
-        tr_bencInitStr( added, tmp, walk-tmp, FALSE );
+        else
+        {
+            int i;
+            tr_benc val, *added, *dropped;
+            uint8_t *tmp, *walk;
+            char * benc;
+            int bencLen;
+            struct evbuffer * out = msgs->outMessages;
 
-        /* "added.f" */
-        tmp = walk = tr_new( uint8_t, diffs.addedCount );
-        for( i=0; i<diffs.addedCount; ++i )
-            *walk++ = diffs.added[i].flags;
-        assert( ( walk - tmp ) == diffs.addedCount );
-        tr_bencDictAddRaw( &val, "added.f", tmp, walk-tmp );
-        tr_free( tmp );
+            /* update peer */
+            tr_free( msgs->pex );
+            msgs->pex = diffs.elements;
+            msgs->pexCount = diffs.elementCount;
 
-        /* "dropped" */
-        dropped = tr_bencDictAdd( &val, "dropped" );
-        tmp = walk = tr_new( uint8_t, diffs.droppedCount * 6 );
-        for( i=0; i<diffs.droppedCount; ++i ) {
-            memcpy( walk, &diffs.dropped[i].in_addr, 4 ); walk += 4;
-            memcpy( walk, &diffs.dropped[i].port, 2 ); walk += 2;
+            /* build the pex payload */
+            tr_bencInitDict( &val, 3 );
+
+            /* "added" */
+            added = tr_bencDictAdd( &val, "added" );
+            tmp = walk = tr_new( uint8_t, diffs.addedCount * 6 );
+            for( i=0; i<diffs.addedCount; ++i ) {
+                memcpy( walk, &diffs.added[i].in_addr, 4 ); walk += 4;
+                memcpy( walk, &diffs.added[i].port, 2 ); walk += 2;
+            }
+            assert( ( walk - tmp ) == diffs.addedCount * 6 );
+            tr_bencInitStr( added, tmp, walk-tmp, FALSE );
+
+            /* "added.f" */
+            tmp = walk = tr_new( uint8_t, diffs.addedCount );
+            for( i=0; i<diffs.addedCount; ++i )
+                *walk++ = diffs.added[i].flags;
+            assert( ( walk - tmp ) == diffs.addedCount );
+            tr_bencDictAddRaw( &val, "added.f", tmp, walk-tmp );
+            tr_free( tmp );
+
+            /* "dropped" */
+            dropped = tr_bencDictAdd( &val, "dropped" );
+            tmp = walk = tr_new( uint8_t, diffs.droppedCount * 6 );
+            for( i=0; i<diffs.droppedCount; ++i ) {
+                memcpy( walk, &diffs.dropped[i].in_addr, 4 ); walk += 4;
+                memcpy( walk, &diffs.dropped[i].port, 2 ); walk += 2;
+            }
+            assert( ( walk - tmp ) == diffs.droppedCount * 6 );
+            tr_bencInitStr( dropped, tmp, walk-tmp, FALSE );
+
+            /* write the pex message */
+            benc = tr_bencSave( &val, &bencLen );
+            tr_peerIoWriteUint32( msgs->io, out, 2*sizeof(uint8_t) + bencLen );
+            tr_peerIoWriteUint8 ( msgs->io, out, BT_LTEP );
+            tr_peerIoWriteUint8 ( msgs->io, out, msgs->ut_pex_id );
+            tr_peerIoWriteBytes ( msgs->io, out, benc, bencLen );
+            pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
+            dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
+
+            tr_free( benc );
+            tr_bencFree( &val );
         }
-        assert( ( walk - tmp ) == diffs.droppedCount * 6 );
-        tr_bencInitStr( dropped, tmp, walk-tmp, FALSE );
-
-        /* write the pex message */
-        benc = tr_bencSave( &val, &bencLen );
-        tr_peerIoWriteUint32( msgs->io, out, 2*sizeof(uint8_t) + bencLen );
-        tr_peerIoWriteUint8 ( msgs->io, out, BT_LTEP );
-        tr_peerIoWriteUint8 ( msgs->io, out, msgs->ut_pex_id );
-        tr_peerIoWriteBytes ( msgs->io, out, benc, bencLen );
-        pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
-        dbgmsg( msgs, "outMessage size is now %d", (int)EVBUFFER_LENGTH(out) );
 
         /* cleanup */
-        tr_free( benc );
-        tr_bencFree( &val );
         tr_free( diffs.added );
         tr_free( diffs.dropped );
         tr_free( newPex );
