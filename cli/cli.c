@@ -137,6 +137,8 @@ scrapeDoneFunc( struct tr_handle    * session UNUSED,
         printf( "unable to parse response (http code %lu) at %s", response_code, (char*)host );
 
     --leftToScrape;
+
+    tr_free( host );
 }
 
 static void
@@ -337,7 +339,6 @@ main( int argc, char ** argv )
                     tr_httpParseURL( scrape, -1, &host, NULL, NULL );
                     ++leftToScrape;
                     tr_webRun( h, url, NULL, scrapeDoneFunc, host );
-                    tr_free( host );
                     tr_free( url );
                 }
             }
