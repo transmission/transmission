@@ -1547,12 +1547,12 @@ compareChoke( const void * va, const void * vb )
     const struct ChokeData * b = vb;
     int diff = 0;
 
-    if( diff == 0 ) /* prefer higher dl speeds */
-        diff = -tr_compareDouble( a->peer->rateToClient, b->peer->rateToClient );
     if( diff == 0 ) /* prefer higher ul speeds */
         diff = -tr_compareDouble( a->peer->rateToPeer, b->peer->rateToPeer );
     if( diff == 0 ) /* prefer unchoked */
         diff = (int)a->peer->peerIsChoked - (int)b->peer->peerIsChoked;
+    if( diff == 0 ) /* prefer higher dl speeds */
+        diff = -tr_compareDouble( a->peer->rateToClient, b->peer->rateToClient );
 
     return diff;
 }
