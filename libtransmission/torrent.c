@@ -1070,6 +1070,7 @@ freeTorrent( tr_torrent * tor )
     tr_bitfieldFree( tor->checkedPieces );
 
     tr_free( tor->downloadDir );
+    tr_free( tor->peer_id );
 
     if( tor == h->torrentList )
         h->torrentList = tor->next;
