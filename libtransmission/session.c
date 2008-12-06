@@ -452,7 +452,7 @@ int
 tr_sessionIsSpeedLimitEnabled( const tr_session  * session,
                                tr_direction        dir )
 {
-    return !tr_bandwidthIsLimited( session->bandwidth, dir );
+    return tr_bandwidthIsLimited( session->bandwidth, dir );
 }
 
 void
