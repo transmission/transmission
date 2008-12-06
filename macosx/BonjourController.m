@@ -61,34 +61,14 @@ BonjourController * fDefaultController = nil;
     fService = nil;
 }
 
-- (void) netServiceWillPublish: (NSNetService *) sender
-{
-    NSLog(@"Will publish the Web UI service on port: %d", [sender port]);
-}
-
 - (void) netService: (NSNetService *) sender didNotPublish: (NSDictionary *) errorDict
 {
-    NSLog(@"Failed to publish the Web UI service on port: %d, with error: %@", [sender port], errorDict);
-}
-
-- (void) netServiceDidPublish: (NSNetService *) sender
-{
-    NSLog(@"Did publish the Web UI service on port: %d", [sender port]);
-}
-
-- (void) netServiceWillResolve: (NSNetService *) sender
-{
-    NSLog(@"Will resolve the Web UI service on port: %d", [sender port]);
+    NSLog(@"Failed to publish the Web Interface service on port: %d, with error: %@", [sender port], errorDict);
 }
 
 - (void) netService: (NSNetService *) sender didNotResolve: (NSDictionary *) errorDict
 {
-    NSLog(@"Failed to resolve the Web UI service on port: %d, with error: %@", [sender port], errorDict);
-}
-
-- (void) netServiceDidResolveAddress: (NSNetService *) sender
-{
-    NSLog(@"Did resolve the Web UI service on port: %d", [sender port]);
+    NSLog(@"Failed to resolve the Web Interface service on port: %d, with error: %@", [sender port], errorDict);
 }
 
 @end
