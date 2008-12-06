@@ -529,8 +529,8 @@ Transmission.prototype =
 		o[RPC._UpSpeedLimit]     = parseInt( $('#prefs_form #upload_rate')[0].value );
 		o[RPC._DownSpeedLimit]   = parseInt( $('#prefs_form #download_rate')[0].value );
 		o[RPC._DownloadDir]      = $('#prefs_form #download_location')[0].value;
-		o[RPC._UpSpeedLimited]   = $('#prefs_form #limit_upload')[0].checked;
-		o[RPC._DownSpeedLimited] = $('#prefs_form #limit_download')[0].checked;
+		o[RPC._UpSpeedLimited]   = $('#prefs_form #limit_upload')[0].checked ? 1 : 0;
+		o[RPC._DownSpeedLimited] = $('#prefs_form #limit_download')[0].checked ? 1 : 0;
 		o[RPC._Encryption]       = $('#prefs_form #encryption')[0].checked
 		                               ? RPC._EncryptionRequired
 		                               : RPC._EncryptionPreferred;
@@ -677,9 +677,9 @@ Transmission.prototype =
 		$('div.download_location input')[0].value = prefs['download-dir'];
 		$('div.port input')[0].value              = prefs['port'];
 		$('div.auto_start input')[0].checked      = prefs[Prefs._AutoStart];
-		$('input#limit_download')[0].checked      = down_limited;
+		$('input#limit_download')[0].checked      = down_limited == 1;
 		$('input#download_rate')[0].value         = down_limit;
-		$('input#limit_upload')[0].checked        = up_limited;
+		$('input#limit_upload')[0].checked        = up_limited == 1;
 		$('input#upload_rate')[0].value           = up_limit;
 		$('input#refresh_rate')[0].value          = prefs[Prefs._RefreshRate];
 		$('div.encryption input')[0].checked      = prefs[RPC._Encryption] == RPC._EncryptionRequired;
