@@ -53,7 +53,7 @@
 - (void) addNewGroup;
 - (void) removeGroupWithRowIndex: (NSInteger) row;
 
-- (NSIndexSet *) moveGroupsAtRowIndexes: (NSIndexSet *) indexes toRow: (NSInteger) newRow oldSelected: (NSIndexSet *) selectedIndexes;
+- (void) moveGroupAtRow: (NSInteger) oldRow toRow: (NSInteger) newRow;
 
 - (NSMenu *) groupMenuWithTarget: (id) target action: (SEL) action isSmall: (BOOL) small;
 

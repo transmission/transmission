@@ -243,39 +243,22 @@ GroupsController * fGroupsInstance = nil;
     [self saveGroups];
 }
 
-#warning rework for single row?
-- (NSIndexSet *) moveGroupsAtRowIndexes: (NSIndexSet *) indexes toRow: (NSInteger) newRow oldSelected: (NSIndexSet *) selectedIndexes
+- (void) moveGroupAtRow: (NSInteger) oldRow toRow: (NSInteger) newRow
 {
-    NSArray * selectedGroups = [fGroups objectsAtIndexes: selectedIndexes];
-    
-    //determine where to move them
-    for (NSInteger i = [indexes firstIndex], startRow = newRow; i < startRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+    if (oldRow < newRow)
         newRow--;
     
     //remove objects to reinsert
-    NSArray * movingGroups = [[fGroups objectsAtIndexes: indexes] retain];
-    [fGroups removeObjectsAtIndexes: indexes];
+    id movingGroup = [[fGroups objectAtIndex: oldRow] retain];
+    [fGroups removeObjectAtIndex: oldRow];
     
     //insert objects at new location
-    for (NSInteger i = 0; i < [movingGroups count]; i++)
-        [fGroups insertObject: [movingGroups objectAtIndex: i] atIndex: newRow + i];
+    [fGroups insertObject: movingGroup atIndex: newRow];
     
-    [movingGroups release];
+    [movingGroup release];
     
     [self saveGroups];
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
-    
-    NSMutableIndexSet * newSelectedIndexes = nil;
-    if ([selectedGroups count] > 0)
-    {
-        newSelectedIndexes = [NSMutableIndexSet indexSet];
-        NSEnumerator * enumerator = [selectedGroups objectEnumerator];
-        NSDictionary * dict;
-        while ((dict = [enumerator nextObject]))
-            [newSelectedIndexes addIndex: [fGroups indexOfObject: dict]];
-    }
-    
-    return newSelectedIndexes;
 }
 
 - (NSMenu *) groupMenuWithTarget: (id) target action: (SEL) action isSmall: (BOOL) small

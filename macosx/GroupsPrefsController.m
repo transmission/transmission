@@ -125,11 +125,23 @@
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: GROUP_TABLE_VIEW_DATA_TYPE])
     {
-        NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: GROUP_TABLE_VIEW_DATA_TYPE]],
-            * selectedIndexes = [[GroupsController groups] moveGroupsAtRowIndexes: indexes toRow: newRow
-                                        oldSelected: [fTableView selectedRowIndexes]];
+        NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: GROUP_TABLE_VIEW_DATA_TYPE]];
+        NSInteger oldRow = [indexes firstIndex], selectedRow = [fTableView selectedRow];
         
-        [fTableView selectRowIndexes: selectedIndexes byExtendingSelection: NO];
+        [[GroupsController groups] moveGroupAtRow: oldRow toRow: newRow];
+        
+        if (oldRow < newRow)
+            newRow--;
+        
+        if (selectedRow == oldRow)
+            selectedRow = newRow;
+        else if (selectedRow > oldRow && selectedRow <= newRow)
+            selectedRow--;
+        else if (selectedRow < oldRow && selectedRow >= newRow)
+            selectedRow++;
+        else;
+        
+        [fTableView selectRow: selectedRow byExtendingSelection: NO];
         [fTableView reloadData];
     }
     
@@ -238,7 +250,8 @@
         [fSelectedColorNameField setStringValue: [[GroupsController groups] nameForIndex: index]];
         [fSelectedColorNameField setEnabled: YES];
         [fCustomLocationEnableCheck setState: [[GroupsController groups] usesCustomDownloadLocationForIndex: index]];
-        [fCustomLocationPopUp setEnabled: ([fCustomLocationEnableCheck state] == NSOnState)];
+        [fCustomLocationEnableCheck setEnabled: YES];
+        [fCustomLocationPopUp setEnabled: [fCustomLocationEnableCheck state] == NSOnState];
         if ([[GroupsController groups] customDownloadLocationForIndex: index])
         {
             NSString * location = [[GroupsController groups] customDownloadLocationForIndex: index];
