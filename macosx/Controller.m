@@ -41,6 +41,7 @@
 #import "BlocklistDownloader.h"
 #import "StatusBarView.h"
 #import "FilterButton.h"
+#import "BonjourController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSMenuAdditions.h"
@@ -521,6 +522,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //auto importing
     [self checkAutoImportDirectory];
+    
+    //registering the Web UI to Bonjour
+    if ([fDefaults boolForKey: @"RPC"])
+        [[BonjourController defaultController] startWithPort: [fDefaults integerForKey: @"RPCPort"]];
 }
 
 - (BOOL) applicationShouldHandleReopen: (NSApplication *) app hasVisibleWindows: (BOOL) visibleWindows
@@ -571,6 +576,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
+    //stop the Bonjour service
+    [[BonjourController defaultController] stop];
+
     //stop blocklist download
     if ([BlocklistDownloader isRunning])
         [[BlocklistDownloader downloader] cancelDownload];

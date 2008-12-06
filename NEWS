@@ -8,6 +8,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Support BitTorrent Enhancement Proposal #21 "Extension for Partial Seeds"
 - Mac
    + Groups (moved to preferences) can have a default location when adding transfers
+   + Bonjour support for web interface
 - GTK+
    + Minor display improvements and HIG compliance
 

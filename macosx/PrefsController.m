@@ -26,6 +26,7 @@
 #import "BlocklistDownloaderViewController.h"
 #import "BlocklistScheduler.h"
 #import "PortChecker.h"
+#import "BonjourController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
@@ -819,7 +820,14 @@ tr_handle * fHandle;
 
 - (void) setRPCEnabled: (id) sender
 {
-    tr_sessionSetRPCEnabled(fHandle, [fDefaults boolForKey: @"RPC"]);
+    BOOL enable = [fDefaults boolForKey: @"RPC"];
+    tr_sessionSetRPCEnabled(fHandle, enable);
+    
+    //Registering the Web UI to Bonjour
+    if (enable)
+        [[BonjourController defaultController] startWithPort: [fDefaults integerForKey: @"RPCPort"]];
+    else
+        [[BonjourController defaultController] stop];
 }
 
 - (void) linkWebUI: (id) sender
@@ -870,6 +878,10 @@ tr_handle * fHandle;
     int port = [sender intValue];
     [fDefaults setInteger: port forKey: @"RPCPort"];
     tr_sessionSetRPCPort(fHandle, port);
+    
+    //Registering the Web UI to Bonjour
+    if ([fDefaults boolForKey:@"RPC"])
+        [[BonjourController defaultController] startWithPort: port];
 }
 
 - (void) setRPCUseWhitelist: (id) sender

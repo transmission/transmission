@@ -981,16 +981,12 @@ typedef enum
         NSMutableArray * components = [NSMutableArray arrayWithCapacity: 5];
         
         CGFloat progress = [[peer objectForKey: @"Progress"] floatValue];
-        
-        NSString * seedStatus;
+        NSString * progressString = [NSString localizedStringWithFormat: NSLocalizedString(@"Progress: %.1f%%",
+                                        "Inspector -> Peers tab -> table row tooltip"), progress * 100.0];
         if (progress < 1.0 && [[peer objectForKey: @"Seed"] boolValue])
-            seedStatus = [NSString stringWithFormat: @" (%@)", NSLocalizedString(@"Partial Seed",
-                            "Inspector -> Peers tab -> table row tooltip")];
-        else
-            seedStatus = @"";
-        
-        [components addObject: [NSString localizedStringWithFormat: NSLocalizedString(@"Progress: %.1f%%%@",
-            "Inspector -> Peers tab -> table row tooltip"), progress * 100.0, seedStatus]];
+            progressString = [progressString stringByAppendingFormat: @" (%@)", NSLocalizedString(@"Partial Seed",
+                                "Inspector -> Peers tab -> table row tooltip")];
+        [components addObject: progressString];
         
         if ([[peer objectForKey: @"Encryption"] boolValue])
             [components addObject: NSLocalizedString(@"Encrypted Connection", "Inspector -> Peers tab -> table row tooltip")];
