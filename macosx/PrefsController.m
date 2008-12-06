@@ -823,11 +823,7 @@ tr_handle * fHandle;
     BOOL enable = [fDefaults boolForKey: @"RPC"];
     tr_sessionSetRPCEnabled(fHandle, enable);
     
-    //Registering the Web UI to Bonjour
-    if (enable)
-        [[BonjourController defaultController] startWithPort: [fDefaults integerForKey: @"RPCPort"]];
-    else
-        [[BonjourController defaultController] stop];
+    [self setRPCWebUIDiscovery: nil];
 }
 
 - (void) linkWebUI: (id) sender
@@ -879,14 +875,20 @@ tr_handle * fHandle;
     [fDefaults setInteger: port forKey: @"RPCPort"];
     tr_sessionSetRPCPort(fHandle, port);
     
-    //Registering the Web UI to Bonjour
-    if ([fDefaults boolForKey:@"RPC"])
-        [[BonjourController defaultController] startWithPort: port];
+    [self setRPCWebUIDiscovery: nil];
 }
 
 - (void) setRPCUseWhitelist: (id) sender
 {
     tr_sessionSetRPCWhitelistEnabled(fHandle, [fDefaults boolForKey: @"RPCUseWhitelist"]);
+}
+
+- (void) setRPCWebUIDiscovery: (id) sender
+{
+    if ([fDefaults boolForKey:@"RPC"] && [fDefaults boolForKey: @"RPCWebDiscovery"])
+        [[BonjourController defaultController] startWithPort: [fDefaults integerForKey: @"RPCPort"]];
+    else
+        [[BonjourController defaultController] stop];
 }
 
 - (void) updateRPCWhitelist

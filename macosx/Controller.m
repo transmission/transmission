@@ -524,7 +524,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self checkAutoImportDirectory];
     
     //registering the Web UI to Bonjour
-    if ([fDefaults boolForKey: @"RPC"])
+    if ([fDefaults boolForKey: @"RPC"] && [fDefaults boolForKey: @"RPCWebDiscovery"])
         [[BonjourController defaultController] startWithPort: [fDefaults integerForKey: @"RPCPort"]];
 }
 

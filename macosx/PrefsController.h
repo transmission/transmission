@@ -133,6 +133,7 @@
 - (void) updateRPCPassword;
 - (void) setRPCPort: (id) sender;
 - (void) setRPCUseWhitelist: (id) sender;
+- (void) setRPCWebUIDiscovery: (id) sender;
 - (void) updateRPCWhitelist;
 - (void) addRemoveRPCIP: (id) sender;
 

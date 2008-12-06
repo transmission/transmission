@@ -120,6 +120,10 @@
 	<false/>
 	<key>QueueSeedNumber</key>
 	<integer>3</integer>
+	<key>RatioCheck</key>
+	<false/>
+	<key>RatioLimit</key>
+	<integer>2</integer>
 	<key>RPC</key>
 	<false/>
 	<key>RPCAuthorize</key>
@@ -130,10 +134,8 @@
 	<integer>9091</integer>
 	<key>RPCUsername</key>
 	<string>admin</string>
-	<key>RatioCheck</key>
+	<key>RPCWebDiscovery</key>
 	<false/>
-	<key>RatioLimit</key>
-	<integer>2</integer>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SeedingSound</key>
