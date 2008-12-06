@@ -166,7 +166,7 @@ utils_test_LDFLAGS = ${apps_ldflags}
 
 
 clean-local:
-	if test -d .svn; then rm version.h; fi;
+	if test -d .svn; then if test -e version.h; then rm version.h; fi; fi;
 
 EXTRA_libtransmission_a_SOURCES = \
     version.h
