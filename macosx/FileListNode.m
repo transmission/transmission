@@ -128,23 +128,6 @@
     return fChildren;
 }
 
-- (BOOL) containsPath: (NSString *) fullPath
-{
-    if ([fullPath isEqualToString: fPath])
-        return YES;
-    
-    if (fIsFolder && [fullPath hasPrefix: fPath])
-    {
-        NSEnumerator * enumerator = [fChildren objectEnumerator];
-        FileListNode * node;
-        while ((node = [enumerator nextObject]))
-            if ([node containsPath: fullPath])
-                return YES;
-    }
-    
-    return NO;
-}
-
 @end
 
 @implementation FileListNode (Private)

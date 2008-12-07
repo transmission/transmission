@@ -52,6 +52,4 @@
 
 - (NSArray *) children;
 
-- (BOOL) containsPath: (NSString *) fullPath;
-
 @end

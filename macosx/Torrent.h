@@ -60,7 +60,7 @@ typedef enum
     NSString * fNameString, * fHashString;
     
     tr_file_stat * fFileStat;
-    NSArray * fFileList;
+    NSArray * fFileList, * fFlatFileList;
     
     NSIndexSet * fPreviousFinishedIndexes;
     NSDate * fPreviousFinishedIndexesDate;
@@ -240,6 +240,7 @@ typedef enum
 - (NSArray *) fileList;
 - (NSInteger) fileCount;
 - (void) updateFileStat;
+- (NSArray *) flatFileList;
 
 //methods require fileStats to have been updated recently to be accurate
 - (CGFloat) fileProgress: (FileListNode *) node;

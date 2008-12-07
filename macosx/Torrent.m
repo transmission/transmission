@@ -43,7 +43,8 @@
 - (void) updateDownloadFolder;
 
 - (void) createFileList;
-- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size index: (NSInteger) index;
+- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size
+    index: (NSInteger) index flatList: (NSMutableArray *) flatFileList;
 
 - (void) completenessChange: (NSNumber *) status;
 
@@ -188,6 +189,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     [fIcon release];
     
     [fFileList release];
+    [fFlatFileList release];
     
     [fQuickPauseDict release];
     
@@ -460,11 +462,11 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
             file = [[self name] stringByAppendingPathComponent: file];
             BOOL isExtra = YES;
         
-            NSEnumerator * nodeEnumerator = [fFileList objectEnumerator];
+            NSEnumerator * nodeEnumerator = [fFlatFileList objectEnumerator];
             FileListNode * node;
             while ((node = [nodeEnumerator nextObject]))
             {
-                if ([node containsPath: file])
+                if ([[node fullPath] hasPrefix: file])
                 {
                     isExtra = NO;
                     break;
@@ -1487,6 +1489,11 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     return (CGFloat)have / [node size];
 }
 
+- (NSArray *) flatFileList
+{
+    return fFlatFileList;
+}
+
 - (BOOL) canChangeDownloadCheckForFile: (NSInteger) index
 {
     if (!fFileStat)
@@ -1775,7 +1782,8 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     if ([self isFolder])
     {
         NSInteger count = [self fileCount];
-        NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count];
+        NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count],
+                    * flatFileList = [[NSMutableArray alloc] initWithCapacity: count];
         
         for (NSInteger i = 0; i < count; i++)
         {
@@ -1803,12 +1811,13 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
                 }
                 
                 [node insertIndex: i withSize: file->length];
-                [self insertPath: pathComponents forParent: node fileSize: file->length index: i];
+                [self insertPath: pathComponents forParent: node fileSize: file->length index: i flatList: flatFileList];
             }
             else
             {
                 FileListNode * node = [[FileListNode alloc] initWithFileName: name path: path size: file->length index: i];
                 [fileList addObject: node];
+                [flatFileList addObject: node];
                 [node release];
             }
             
@@ -1817,16 +1826,21 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
         
         fFileList = [[NSArray alloc] initWithArray: fileList];
         [fileList release];
+        
+        fFlatFileList = [[NSArray alloc] initWithArray: flatFileList];
+        [flatFileList release];
     }
     else
     {
         FileListNode * node = [[FileListNode alloc] initWithFileName: [self name] path: @"" size: [self size] index: 0];
         fFileList = [[NSArray arrayWithObject: node] retain];
+        fFlatFileList = [fFileList copy];
         [node release];
     }
 }
 
-- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size index: (NSInteger) index
+- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size
+    index: (NSInteger) index flatList: (NSMutableArray *) flatFileList
 {
     NSString * name = [components objectAtIndex: 0];
     BOOL isFolder = [components count] > 1;
@@ -1846,7 +1860,10 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
         if (isFolder)
             node = [[FileListNode alloc] initWithFolderName: name path: [parent fullPath]];
         else
+        {
             node = [[FileListNode alloc] initWithFileName: name path: [parent fullPath] size: size index: index];
+            [flatFileList addObject: node];
+        }
         
         [parent insertChild: node];
         [node release];
@@ -1857,7 +1874,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
         [node insertIndex: index withSize: size];
         
         [components removeObjectAtIndex: 0];
-        [self insertPath: components forParent: node fileSize: size index: index];
+        [self insertPath: components forParent: node fileSize: size index: index flatList: flatFileList];
     }
 }
 
