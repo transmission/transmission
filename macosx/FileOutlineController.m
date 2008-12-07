@@ -104,7 +104,7 @@ typedef enum
     if ([text isEqualToString: @""])
         text = nil;
     
-    if (text == fFilterText || [text isEqualToString: fFilterText])
+    if ((!text && !fFilterText) || (text && fFilterText && [text isEqualToString: fFilterText]))
         return;
     
     [fFilterText release];
