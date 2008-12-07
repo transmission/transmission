@@ -72,14 +72,16 @@ typedef enum
     [self setTorrent: nil];
 }
 
+- (void) dealloc
+{
+    [fFileList release];
+    [fFilterText release];
+    [super dealloc];
+}
+
 - (FileOutlineView *) outlineView
 {
     return fOutline;
-}
-
-- (void) outlineViewSelectionDidChange: (NSNotification *) notification
-{
-    [[QuickLookController quickLook] updateQuickLook];
 }
 
 - (void) setTorrent: (Torrent *) torrent
@@ -87,7 +89,43 @@ typedef enum
     fTorrent = torrent;
     [fOutline setTorrent: fTorrent];
     
+    [fFileList release];
+    fFileList = [[fTorrent fileList] retain];
+    
+    [fFilterText release];
+    fFilterText = nil;
+    
     [fOutline deselectAll: nil];
+    [fOutline reloadData];
+}
+
+- (void) setFilterText: (NSString *) text
+{
+    if ([text isEqualToString: @""])
+        text = nil;
+    
+    if (text == fFilterText || [text isEqualToString: fFilterText])
+        return;
+    
+    [fFilterText release];
+    fFilterText = [text retain];
+    
+    [fFileList release];
+    if (!fFilterText)
+        fFileList = [[fTorrent fileList] retain];
+    else
+    {
+        NSMutableArray * list = [NSMutableArray arrayWithCapacity: [fTorrent fileCount]];
+        
+        NSEnumerator * enumerator = [[fTorrent flatFileList] objectEnumerator];
+        FileListNode * node;
+        while ((node = [enumerator nextObject]))
+        if ([[node name] rangeOfString: fFilterText options: NSCaseInsensitiveSearch].location != NSNotFound)
+            [list addObject: node];
+        
+        fFileList = [[NSArray alloc] initWithArray: list];
+    }
+    
     [fOutline reloadData];
 }
 
@@ -97,10 +135,15 @@ typedef enum
     [fOutline reloadData];
 }
 
+- (void) outlineViewSelectionDidChange: (NSNotification *) notification
+{
+    [[QuickLookController quickLook] updateQuickLook];
+}
+
 - (NSInteger) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
 {
     if (!item)
-        return fTorrent ? [[fTorrent fileList] count] : 0;
+        return fFileList ? [fFileList count] : 0;
     else
     {
         FileListNode * node = (FileListNode *)item;
@@ -115,7 +158,7 @@ typedef enum
 
 - (id) outlineView: (NSOutlineView *) outlineView child: (NSInteger) index ofItem: (id) item
 {
-    return [(item ? [(FileListNode *)item children] : [fTorrent fileList]) objectAtIndex: index];
+    return [(item ? [(FileListNode *)item children] : fFileList) objectAtIndex: index];
 }
 
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
@@ -295,7 +338,7 @@ typedef enum
         NSIndexSet * indexSet = [fOutline selectedRowIndexes];
         for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
             if ([[NSFileManager defaultManager] fileExistsAtPath:
-                    [downloadFolder stringByAppendingPathComponent: [[[fTorrent fileList] objectAtIndex: i] fullPath]]])
+                    [downloadFolder stringByAppendingPathComponent: [[fFileList objectAtIndex: i] fullPath]]])
                 return YES;
         return NO;
     }

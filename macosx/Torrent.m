@@ -466,6 +466,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
             FileListNode * node;
             while ((node = [nodeEnumerator nextObject]))
             {
+                #warning this could be more thorough
                 if ([[node fullPath] hasPrefix: file])
                 {
                     isExtra = NO;
