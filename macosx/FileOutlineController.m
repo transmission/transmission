@@ -120,8 +120,8 @@ typedef enum
         NSEnumerator * enumerator = [[fTorrent flatFileList] objectEnumerator];
         FileListNode * node;
         while ((node = [enumerator nextObject]))
-        if ([[node name] rangeOfString: fFilterText options: NSCaseInsensitiveSearch].location != NSNotFound)
-            [list addObject: node];
+            if ([[node name] rangeOfString: fFilterText options: NSCaseInsensitiveSearch].location != NSNotFound)
+                [list addObject: node];
         
         fFileList = [[NSArray alloc] initWithArray: list];
     }
