@@ -495,7 +495,7 @@ typedef enum
         [fTrackerAddRemoveControl setEnabled: YES forSegment: TRACKER_ADD_TAG];
         [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_REMOVE_TAG];
         
-        [fFileFilterField setEnabled: YES];
+        [fFileFilterField setEnabled: [torrent isFolder]];
     }
     
     [fFileFilterField setStringValue: @""];

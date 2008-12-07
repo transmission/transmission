@@ -9,6 +9,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - Mac
    + Groups (moved to preferences) can have a default location when adding transfers
    + Bonjour support for the web interface
+   + File filter field in the inspector
 - GTK+
    + Minor display improvements and HIG compliance
 
