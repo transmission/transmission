@@ -68,6 +68,7 @@
     NSViewAnimation * fWebSeedTableAnimation;
     
     IBOutlet FileOutlineController * fFileController;
+    IBOutlet NSSearchField * fFileFilterField;
     
     IBOutlet NSPopUpButton * fRatioPopUp, * fUploadLimitPopUp, * fDownloadLimitPopUp;
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField, * fPeersConnectField,
@@ -97,6 +98,8 @@
 
 - (void) revealTorrentFile: (id) sender;
 - (void) revealDataFile: (id) sender;
+
+- (void) setFileFilterText: (id) sender;
 
 - (void) setSpeedMode: (id) sender;
 - (void) setSpeedLimit: (id) sender;

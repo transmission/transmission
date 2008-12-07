@@ -394,6 +394,8 @@ typedef enum
         
         [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_ADD_TAG];
         [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_REMOVE_TAG];
+        
+        [fFileFilterField setEnabled: NO];
     }
     else
     {
@@ -492,7 +494,11 @@ typedef enum
         
         [fTrackerAddRemoveControl setEnabled: YES forSegment: TRACKER_ADD_TAG];
         [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_REMOVE_TAG];
+        
+        [fFileFilterField setEnabled: YES];
     }
+    
+    [fFileFilterField setStringValue: @""];
     
     //update stats and settings
     [self updateInfoStats];
@@ -1181,6 +1187,11 @@ typedef enum
 {
     if ([fTorrents count] > 0)
         [[fTorrents objectAtIndex: 0] revealData];
+}
+
+- (void) setFileFilterText: (id) sender
+{
+    [fFileController setFilterText: [sender stringValue]];
 }
 
 - (void) setSpeedMode: (id) sender
