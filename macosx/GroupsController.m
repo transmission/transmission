@@ -192,14 +192,7 @@ GroupsController * fGroupsInstance = nil;
 - (void) setCustomDownloadLocation: (NSString *) location forIndex: (NSInteger) index
 {
     NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
-    
-    if (location)
-        [dict setObject: location forKey: @"CustomDownloadLocation"];
-    else
-    {
-        [dict removeObjectForKey: @"CustomDownloadLocation"];
-        [self setUsesCustomDownloadLocation: NO forIndex: index];
-    }
+    [dict setObject: location forKey: @"CustomDownloadLocation"];
     
     [[GroupsController groups] saveGroups];
 }

@@ -53,6 +53,11 @@
         [fGroupRulesPrefsContainer setHidden: YES]; //get rid of container when 10.5-only
     }
     
+    [fRulesSheetOKButton setStringValue: NSLocalizedString(@"OK", "Groups -> rule editor -> button")];
+    [fRulesSheetCancelButton setStringValue: NSLocalizedString(@"Cancel", "Groups -> rule editor -> button")];
+    [fRulesSheetDescriptionField setStringValue: NSLocalizedString(@"All criteria must be met to assign a transfer on add.",
+                                                    "Groups -> rule editor -> button")];
+    
     [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
     
     [self updateSelectedGroup];
@@ -220,19 +225,21 @@
 - (void) customDownloadLocationSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
 {
     NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
-    NSString * path = [[GroupsController groups] customDownloadLocationForIndex: index];
     if (code == NSOKButton)
     {
-        path = [[openPanel filenames] objectAtIndex: 0];
+        NSString * path = [[openPanel filenames] objectAtIndex: 0];
         [[GroupsController groups] setCustomDownloadLocation: path forIndex: index];
         [[GroupsController groups] setUsesCustomDownloadLocation: YES forIndex: index];
         [self updateSelectedGroup]; //update the popup's icon/title
     }
-    else if (!path)
+    else
     {
-        [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
-        [fCustomLocationEnableCheck setState: NSOffState];
-        [fCustomLocationPopUp setEnabled: NO];
+        if (![[GroupsController groups] customDownloadLocationForIndex: index])
+        {
+            [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
+            [fCustomLocationEnableCheck setState: NSOffState];
+            [fCustomLocationPopUp setEnabled: NO];
+        }
     }
 
     [fCustomLocationPopUp selectItemAtIndex: 0];

@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.02">
+<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">9F33</string>
-		<string key="IBDocument.InterfaceBuilderVersion">672</string>
+		<string key="IBDocument.InterfaceBuilderVersion">677</string>
 		<string key="IBDocument.AppKitVersion">949.34</string>
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="6"/>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<string>com.apple.InterfaceBuilderKit</string>
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+		</object>
+		<object class="NSMutableDictionary" key="IBDocument.Metadata">
+			<bool key="EncodedWithXMLCoder">YES</bool>
+			<object class="NSArray" key="dict.sortedKeys">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+			</object>
+			<object class="NSMutableArray" key="dict.values">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+			</object>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -29,7 +38,7 @@
 			<object class="NSWindowTemplate" id="154698973">
 				<int key="NSWindowStyleMask">1</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{196, 291}, {471, 136}}</string>
+				<string key="NSWindowRect">{{196, 291}, {471, 118}}</string>
 				<int key="NSWTFlags">1677721600</int>
 				<string key="NSWindowTitle">Window</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -133,7 +142,7 @@
 									<double key="NSPercent">5.060241e-01</double>
 								</object>
 							</object>
-							<string key="NSFrame">{{20, 49}, {431, 25}}</string>
+							<string key="NSFrame">{{20, 48}, {431, 25}}</string>
 							<reference key="NSSuperview" ref="464768712"/>
 							<reference key="NSNextKeyView" ref="734691091"/>
 							<int key="NSsFlags">514</int>
@@ -188,13 +197,13 @@
 						<object class="NSTextField" id="332791107">
 							<reference key="NSNextResponder" ref="464768712"/>
 							<int key="NSvFlags">270</int>
-							<string key="NSFrame">{{17, 82}, {436, 34}}</string>
+							<string key="NSFrame">{{17, 81}, {437, 17}}</string>
 							<reference key="NSSuperview" ref="464768712"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="835481534">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">272629760</int>
-								<string key="NSContents">Some helpful text here. Lorem ipsum dolor sit amet, consectetur adipisicing elit.</string>
+								<string key="NSContents">description</string>
 								<object class="NSFont" key="NSSupport">
 									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">1.300000e+01</double>
@@ -214,7 +223,7 @@
 							</object>
 						</object>
 					</object>
-					<string key="NSFrameSize">{471, 136}</string>
+					<string key="NSFrameSize">{471, 118}</string>
 					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
@@ -264,6 +273,30 @@
 						<reference key="destination" ref="154698973"/>
 					</object>
 					<int key="connectionID">17</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fRulesSheetCancelButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="929052796"/>
+					</object>
+					<int key="connectionID">20</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fRulesSheetOKButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1048345917"/>
+					</object>
+					<int key="connectionID">21</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fRulesSheetDescriptionField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="332791107"/>
+					</object>
+					<int key="connectionID">22</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -419,11 +452,11 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilderKit</string>
 					<string>com.apple.InterfaceBuilderKit</string>
-					<string>{{201, 439}, {471, 136}}</string>
+					<string>{{285, 323}, {471, 118}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{201, 439}, {471, 136}}</string>
-					<integer value="0"/>
-					<integer value="0"/>
+					<string>{{285, 323}, {471, 118}}</string>
+					<integer value="0" id="8"/>
+					<reference ref="8"/>
 					<integer value="1"/>
 					<string>{471, 100000}</string>
 					<string>{471, 128}</string>
@@ -460,7 +493,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">17</int>
+			<int key="maxID">22</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -503,6 +536,9 @@
 							<string>fGroupRulesPrefsContainer</string>
 							<string>fGroupRulesSheetWindow</string>
 							<string>fRuleEditor</string>
+							<string>fRulesSheetCancelButton</string>
+							<string>fRulesSheetDescriptionField</string>
+							<string>fRulesSheetOKButton</string>
 							<string>fSelectedColorNameField</string>
 							<string>fSelectedColorView</string>
 							<string>fTableView</string>
@@ -517,6 +553,9 @@
 							<string>NSView</string>
 							<string>NSWindow</string>
 							<string>NSRuleEditor</string>
+							<string>NSButton</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSColorWell</string>
 							<string>NSTableView</string>
@@ -565,7 +604,7 @@
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
-		<string key="IBDocument.LastKnownRelativeProjectPath">../../Transmission.xcodeproj</string>
+		<string key="IBDocument.LastKnownRelativeProjectPath">../Transmission.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 	</data>
 </archive>

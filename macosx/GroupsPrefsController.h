@@ -41,6 +41,9 @@
     IBOutlet NSButton * fAutoAssignRulesEditButton;
     IBOutlet NSWindow * fGroupRulesSheetWindow;
     IBOutlet NSRuleEditor * fRuleEditor;
+    
+    IBOutlet NSButton * fRulesSheetOKButton, * fRulesSheetCancelButton;
+    IBOutlet NSTextField * fRulesSheetDescriptionField;
 }
 
 - (void) addRemoveGroup: (id) sender;
