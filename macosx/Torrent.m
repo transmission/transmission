@@ -221,6 +221,9 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (void) changeDownloadFolder: (NSString *) folder
 {
+    if (fDownloadFolder && [folder isEqualToString: fDownloadFolder])
+        return;
+    
     [fDownloadFolder release];
     fDownloadFolder = [folder retain];
     
@@ -1761,7 +1764,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     fResumeOnWake = NO;
     
     fOrderValue = orderValue ? [orderValue intValue] : tr_sessionCountTorrents(lib) - 1;
-    fGroupValue = groupValue ? [groupValue intValue] : -1;
+    fGroupValue = groupValue ? [groupValue intValue] : [[GroupsController groups] groupIndexForTorrent: self];
     
     fAddedTrackers = addedTrackers ? [addedTrackers boolValue] : NO; 
     

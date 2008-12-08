@@ -7,7 +7,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Support BitTorrent Enhancement Proposal #6 "Fast Extension"
    + Support BitTorrent Enhancement Proposal #21 "Extension for Partial Seeds"
 - Mac
-   + Groups (moved to preferences) can have a default location when adding transfers
+   + Groups (moved to preferences) can be auto-assigned to transfers when adding based on name and tracker (10.5-only)
+   + Groups can have a default location when adding transfers
    + Bonjour support for the web interface
    + File filter field in the inspector
 - GTK+

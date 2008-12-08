@@ -35,6 +35,8 @@
 
 - (NSImage *) imageForGroup: (NSMutableDictionary *) dict;
 
+- (BOOL) torrent: (Torrent *) torrent doesMatchRulesForGroupAtIndex: (NSInteger) index;
+
 @end
 
 @implementation GroupsController
@@ -176,10 +178,9 @@ GroupsController * fGroupsInstance = nil;
 {
     NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
     
-    [dict setObject: [NSNumber numberWithBool:useCustomLocation] forKey: @"UsesCustomDownloadLocation"];
+    [dict setObject: [NSNumber numberWithBool: useCustomLocation] forKey: @"UsesCustomDownloadLocation"];
     
     [[GroupsController groups] saveGroups];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
 }
 
 - (NSString *) customDownloadLocationForIndex: (NSInteger) index
@@ -195,10 +196,54 @@ GroupsController * fGroupsInstance = nil;
     if (location)
         [dict setObject: location forKey: @"CustomDownloadLocation"];
     else
+    {
         [dict removeObjectForKey: @"CustomDownloadLocation"];
+        [self setUsesCustomDownloadLocation: NO forIndex: index];
+    }
     
     [[GroupsController groups] saveGroups];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
+}
+
+- (BOOL) usesAutoAssignRulesForIndex: (NSInteger) index
+{
+    NSInteger orderIndex = [self rowValueForIndex: index];
+    if (orderIndex == -1)
+        return NO;
+    
+    NSNumber * assignRules = [[fGroups objectAtIndex: orderIndex] objectForKey: @"UsesAutoAssignRules"];
+    return assignRules && [assignRules boolValue];
+}
+
+- (void) setUsesAutoAssignRules: (BOOL) useAutoAssignRules forIndex: (NSInteger) index
+{
+    NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
+    
+    [dict setObject: [NSNumber numberWithBool: useAutoAssignRules] forKey: @"UsesAutoAssignRules"];
+    
+    [[GroupsController groups] saveGroups];
+}
+
+- (NSArray *) autoAssignRulesForIndex: (NSInteger) index
+{
+    NSInteger orderIndex = [self rowValueForIndex: index];
+    return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"AutoAssignRules"] : nil;
+}
+
+- (void) setAutoAssignRules: (NSArray *) rules forIndex: (NSInteger) index
+{
+    NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
+    
+    if (rules && [rules count] > 0)
+    {
+        [dict setObject: rules forKey: @"AutoAssignRules"];
+        
+        [[GroupsController groups] saveGroups];
+    }
+    else
+    {
+        [dict removeObjectForKey: @"AutoAssignRules"];
+        [self setUsesAutoAssignRules: NO forIndex: index];
+    }
 }
 
 - (void) addNewGroup
@@ -315,6 +360,19 @@ GroupsController * fGroupsInstance = nil;
     return [menu autorelease];
 }
 
+- (NSInteger) groupIndexForTorrent: (Torrent *) torrent;
+{
+    NSEnumerator * enumerator = [fGroups objectEnumerator];
+    NSMutableDictionary * group;
+    while ((group = [enumerator nextObject]))
+    {
+        NSInteger row = [[group objectForKey: @"Index"] intValue];
+        if ([self torrent: torrent doesMatchRulesForGroupAtIndex: row])
+            return row;
+    }
+    return -1; // Default to no group
+}
+
 @end
 
 @implementation GroupsController (Private)
@@ -368,6 +426,58 @@ GroupsController * fGroupsInstance = nil;
     [icon release];
     
     return icon;
+}
+
+- (BOOL) torrent: (Torrent *) torrent doesMatchRulesForGroupAtIndex: (NSInteger) index
+{
+    if (![self usesAutoAssignRulesForIndex: index])
+        return NO;
+    
+    NSArray * rules = [self autoAssignRulesForIndex: index];
+    if (!rules || [rules count] == 0)
+        return NO;
+    
+    #warning should rules be dict instead of array?
+    NSEnumerator * iterator = [rules objectEnumerator];
+    NSArray * rule = nil;
+    while ((rule = [iterator nextObject]))
+    {
+        NSString * type = [rule objectAtIndex: 0], * place = [rule objectAtIndex: 1], * match = [rule objectAtIndex: 2],
+                * value = nil;
+        if ([type isEqualToString: @"title"])
+            value = [torrent name];
+        else if ([type isEqualToString: @"tracker"])
+        {
+            #warning consider all trackers
+            value = [torrent trackerAddressAnnounce];
+        }
+        else
+            continue;
+        
+        NSStringCompareOptions options = NSCaseInsensitiveSearch;
+        if ([place isEqualToString: @"ends"])
+            options += NSBackwardsSearch;
+        
+        NSRange result = [value rangeOfString: match options: options];
+        if ([place isEqualToString: @"begins"])
+        {
+            if (result.location != 0)
+                return NO;
+        }
+        else if ([place isEqualToString: @"contains"])
+        {
+            if (result.location == NSNotFound)
+                return NO;
+        }
+        else if ([place isEqualToString: @"ends"])
+        {
+            if (NSMaxRange(result) == [value length])
+                return NO;
+        }
+        else
+            continue;
+    }
+    return YES;
 }
 
 @end

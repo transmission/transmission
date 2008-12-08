@@ -37,6 +37,8 @@
 
 - (void) confirmAdd;
 
+- (void) setDestinationPath: (NSString *) destination;
+
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) contextInfo;
 
 - (void) setGroupsMenu;
@@ -64,7 +66,13 @@
                             && [[NSUserDefaults standardUserDefaults] boolForKey: @"DeleteOriginalTorrent"]);
         fDeleteEnable = deleteTorrent == TORRENT_FILE_DEFAULT;
         
-        fGroupValue = -1;
+        fGroupValue = [torrent groupValue];
+        
+        #warning factor in if there already is a destination
+        // set the group’s download location if there is one
+        if ([[GroupsController groups] usesCustomDownloadLocationForIndex: fGroupValue] &&
+            [[GroupsController groups] customDownloadLocationForIndex: fGroupValue])
+            [self setDestinationPath: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue]];
     }
     return self;
 }
@@ -91,7 +99,7 @@
     [self updateStatusField: nil];
     
     [self setGroupsMenu];
-    [fGroupPopUp selectItemWithTag: -1];
+    [fGroupPopUp selectItemWithTag: fGroupValue];
     
     [fStartCheck setState: [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState];
     
@@ -99,14 +107,7 @@
     [fDeleteCheck setEnabled: fDeleteEnable];
     
     if (fDestination)
-    {
-        [fLocationField setStringValue: [fDestination stringByAbbreviatingWithTildeInPath]];
-        [fLocationField setToolTip: fDestination];
-        
-        ExpandedPathToIconTransformer * iconTransformer = [[ExpandedPathToIconTransformer alloc] init];
-        [fLocationImageView setImage: [iconTransformer transformedValue: fDestination]];
-        [iconTransformer release];
-    }
+        [self setDestinationPath: fDestination];
     else
     {
         [fLocationField setStringValue: @""];
@@ -247,7 +248,7 @@
     fTimer = nil;
     
     [fTorrent setWaitToStart: [fStartCheck state] == NSOnState];
-    [fTorrent setGroupValue: [[fGroupPopUp selectedItem] tag]];
+    [fTorrent setGroupValue: fGroupValue];
     
     if ([fDeleteCheck state] == NSOnState)
         [fTorrent trashTorrent];
@@ -260,8 +261,14 @@
 
 - (void) setDestinationPath: (NSString *) destination
 {
-    [fDestination release];
-    fDestination = [destination retain];
+    destination = [destination stringByExpandingTildeInPath];
+    if (!fDestination || ![fDestination isEqualToString: destination])
+    { 
+        [fDestination release];
+        fDestination = [destination retain];
+        
+        [fTorrent changeDownloadFolder: fDestination];
+    }
     
     [fLocationField setStringValue: [fDestination stringByAbbreviatingWithTildeInPath]];
     [fLocationField setToolTip: fDestination];
@@ -269,8 +276,6 @@
     ExpandedPathToIconTransformer * iconTransformer = [[ExpandedPathToIconTransformer alloc] init];
     [fLocationImageView setImage: [iconTransformer transformedValue: fDestination]];
     [iconTransformer release];
-    
-    [fTorrent changeDownloadFolder: fDestination];
 }
 
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) contextInfo

@@ -50,6 +50,7 @@
         [fAddRemoveControl sizeToFit];
         [fAddRemoveControl setLabel: @"+" forSegment: ADD_TAG];
         [fAddRemoveControl setLabel: @"-" forSegment: REMOVE_TAG];
+        [fGroupRulesPrefsContainer setHidden: YES]; //get rid of container when 10.5-only
     }
     
     [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
@@ -235,6 +236,155 @@
     [fCustomLocationPopUp selectItemAtIndex: 0];
 }
 
+#pragma mark -
+#pragma mark Rule editor
+
+- (IBAction) toggleUseAutoAssignRules: (id) sender;
+{
+    NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+    if ([fAutoAssignRulesEnableCheck state] == NSOnState)
+    {
+        if ([[GroupsController groups] autoAssignRulesForIndex: index])
+            [[GroupsController groups] setUsesAutoAssignRules: YES forIndex: index];
+        else
+            [self orderFrontRulesSheet: nil];
+    }
+    else
+        [[GroupsController groups] setUsesAutoAssignRules: NO forIndex: index];
+
+    [fAutoAssignRulesEditButton setEnabled: [fAutoAssignRulesEnableCheck state] == NSOnState];
+}
+
+- (IBAction) orderFrontRulesSheet: (id) sender;
+{
+    if (!fGroupRulesSheetWindow)
+        [NSBundle loadNibNamed: @"GroupRules" owner: self];
+
+    [fRuleEditor removeRowsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fRuleEditor numberOfRows])]
+        includeSubrows: YES];
+
+    NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+    NSArray * rules = [[GroupsController groups] autoAssignRulesForIndex: index];
+    if (rules)
+    {
+        for (NSInteger index = 0; index < [rules count]; index++)
+        {
+            [fRuleEditor addRow: nil];
+            [fRuleEditor setCriteria: [rules objectAtIndex: index] andDisplayValues: [NSArray array] forRowAtIndex: index];
+        }
+    }
+
+    if ([fRuleEditor numberOfRows] == 0)
+        [fRuleEditor addRow: nil];
+
+    [NSApp beginSheet: fGroupRulesSheetWindow
+       modalForWindow: [fTableView window]
+        modalDelegate: nil
+       didEndSelector: NULL
+          contextInfo: NULL];
+}
+
+- (IBAction) cancelRules: (id) sender;
+{
+    [fGroupRulesSheetWindow orderOut: nil];
+    [NSApp endSheet: fGroupRulesSheetWindow];
+    
+    NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+    if (![[GroupsController groups] autoAssignRulesForIndex: index])
+    {
+        [[GroupsController groups] setUsesAutoAssignRules: NO forIndex: index];
+        [fAutoAssignRulesEnableCheck setState: NO];
+        [fAutoAssignRulesEditButton setEnabled: NO];
+    }
+}
+
+- (IBAction) saveRules: (id) sender;
+{
+    [fGroupRulesSheetWindow orderOut: nil];
+    [NSApp endSheet: fGroupRulesSheetWindow];
+    
+    NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+    [[GroupsController groups] setUsesAutoAssignRules: YES forIndex: index];
+    
+    NSMutableArray * rules = [NSMutableArray arrayWithCapacity: [fRuleEditor numberOfRows]];
+    for (NSInteger index = 0; index < [fRuleEditor numberOfRows]; ++index)
+    {
+        NSString * string = [[[fRuleEditor displayValuesForRow: index] objectAtIndex: 2] stringValue];
+        if (string && [string length] > 0)
+        {
+            NSMutableArray * rule = [[[fRuleEditor criteriaForRow: index] mutableCopy] autorelease];
+            [rule replaceObjectAtIndex: 2 withObject: string];
+            [rules addObject: rule];
+        }
+    }
+    
+    [[GroupsController groups] setAutoAssignRules: rules forIndex: index];
+    [fAutoAssignRulesEnableCheck setState: [[GroupsController groups] usesAutoAssignRulesForIndex: index]];
+    [fAutoAssignRulesEditButton setEnabled: [fAutoAssignRulesEnableCheck state] == NSOnState];
+}
+
+static NSString * torrentTitleCriteria = @"title";
+static NSString * trackerURLCriteria = @"tracker";
+static NSString * startsWithCriteria = @"begins";
+static NSString * containsCriteria = @"contains";
+static NSString * endsWithCriteria = @"ends";
+
+- (NSInteger) ruleEditor: (NSRuleEditor *) editor numberOfChildrenForCriterion: (id) criterion withRowType: (NSRuleEditorRowType) rowType
+{
+    if (!criterion)
+        return 2;
+    else if ([criterion isEqualToString: torrentTitleCriteria] || [criterion isEqualToString: trackerURLCriteria])
+        return 3;
+    else if ([criterion isEqualToString: startsWithCriteria] || [criterion isEqualToString: containsCriteria]
+                || [criterion isEqualToString: endsWithCriteria])
+        return 1;
+    else
+        return 0;
+}
+
+- (id) ruleEditor: (NSRuleEditor *) editor child: (NSInteger) index forCriterion: (id) criterion
+    withRowType: (NSRuleEditorRowType) rowType
+{
+    if (criterion == nil)
+        return [[NSArray arrayWithObjects: torrentTitleCriteria, trackerURLCriteria, nil] objectAtIndex: index];
+    else if ([criterion isEqualToString: torrentTitleCriteria] || [criterion isEqualToString: trackerURLCriteria])
+        return [[NSArray arrayWithObjects: startsWithCriteria, containsCriteria, endsWithCriteria, nil] objectAtIndex: index];
+    else
+        return @"";
+}
+
+- (id) ruleEditor: (NSRuleEditor *) editor displayValueForCriterion: (id) criterion inRow: (NSInteger) row
+{
+    if ([criterion isEqualToString: torrentTitleCriteria])
+        return NSLocalizedString(@"Torrent Title", "Groups -> rule editor");
+    else if ([criterion isEqualToString: trackerURLCriteria])
+        return NSLocalizedString(@"Tracker URL", "Groups -> rule editor");
+    else if ([criterion isEqualToString: startsWithCriteria])
+        return NSLocalizedString(@"Starts With", "Groups -> rule editor");
+    else if ([criterion isEqualToString: containsCriteria])
+        return NSLocalizedString(@"Contains", "Groups -> rule editor");
+    else if ([criterion isEqualToString: endsWithCriteria])
+        return NSLocalizedString(@"Ends With", "Groups -> rule editor");
+    else
+    {
+        NSTextField * field = [[NSTextField alloc] initWithFrame: NSMakeRect(0, 0, 130, 22)];
+        [field setStringValue: criterion];
+        return [field autorelease];
+    }
+}
+
+- (void) ruleEditorRowsDidChange: (NSNotification *) notification
+{
+    CGFloat rowHeight        = [fRuleEditor rowHeight];
+    NSInteger numberOfRows   = [fRuleEditor numberOfRows];
+    CGFloat ruleEditorHeight = numberOfRows * rowHeight;
+    CGFloat heightDifference = ruleEditorHeight - [fRuleEditor frame].size.height;
+    NSRect windowFrame       = [fRuleEditor window].frame;
+    windowFrame.size.height += heightDifference;
+    windowFrame.origin.y    -= heightDifference;
+    [fRuleEditor.window setFrame: windowFrame display: YES animate: YES];
+}
+
 @end
 
 @implementation GroupsPrefsController (Private)
@@ -265,6 +415,10 @@
             [[fCustomLocationPopUp itemAtIndex: 0] setTitle: @""];
             [[fCustomLocationPopUp itemAtIndex: 0] setImage: nil];
         }
+
+        [fAutoAssignRulesEnableCheck setState: [[GroupsController groups] usesAutoAssignRulesForIndex: index]];
+        [fAutoAssignRulesEnableCheck setEnabled: YES];
+        [fAutoAssignRulesEditButton setEnabled: ([fAutoAssignRulesEnableCheck state] == NSOnState)];
     }
     else
     {
@@ -274,6 +428,8 @@
         [fSelectedColorNameField setEnabled: NO];
         [fCustomLocationEnableCheck setEnabled: NO];
         [fCustomLocationPopUp setEnabled: NO];
+        [fAutoAssignRulesEnableCheck setEnabled: NO];
+        [fAutoAssignRulesEditButton setEnabled: NO];
     }
 }
 

@@ -108,6 +108,7 @@
 		A234D0D20C79FB3600A82373 /* NSMenuAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
 		A2399CCD0CD3852300225B2B /* NSApplicationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A2399CCC0CD3852300225B2B /* NSApplicationAdditions.m */; };
+		A23A0E310EECB0740091C885 /* GroupRules.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23A0E300EECB0740091C885 /* GroupRules.xib */; };
 		A23F4FF20D1D98AD002FCB97 /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23F4FF00D1D98AD002FCB97 /* PrefsWindow.xib */; };
 		A23F50020D1D99D7002FCB97 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23F50000D1D99D7002FCB97 /* MainMenu.xib */; };
 		A241528B0C0261B8007DD3B4 /* Globe.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FB06950BFF484A0095564D /* Globe.png */; };
@@ -513,6 +514,7 @@
 		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayWindow.h; path = macosx/DragOverlayWindow.h; sourceTree = "<group>"; };
 		A2399CCB0CD3852300225B2B /* NSApplicationAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSApplicationAdditions.h; path = macosx/NSApplicationAdditions.h; sourceTree = "<group>"; };
 		A2399CCC0CD3852300225B2B /* NSApplicationAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSApplicationAdditions.m; path = macosx/NSApplicationAdditions.m; sourceTree = "<group>"; };
+		A23A0E300EECB0740091C885 /* GroupRules.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = GroupRules.xib; path = macosx/GroupRules.xib; sourceTree = "<group>"; };
 		A245030B0D6A1FB000B49D00 /* UpArrowGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpArrowGroupTemplate.png; path = macosx/Images/UpArrowGroupTemplate.png; sourceTree = "<group>"; };
 		A245030D0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownArrowGroupTemplate.png; path = macosx/Images/DownArrowGroupTemplate.png; sourceTree = "<group>"; };
 		A24621350C769CF400088E81 /* trevent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trevent.h; path = libtransmission/trevent.h; sourceTree = "<group>"; };
@@ -1005,6 +1007,7 @@
 				A29576110D11D8DD0093B167 /* InfoWindow.xib */,
 				A29576010D11D63C0093B167 /* Creator.xib */,
 				A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */,
+				A23A0E300EECB0740091C885 /* GroupRules.xib */,
 				A233BD320D8C6585007EE7B4 /* MessageWindow.xib */,
 				A233BD680D8CF2C7007EE7B4 /* StatsWindow.xib */,
 				A231274B0D11D0B7003F9AFF /* AboutWindow.xib */,
@@ -1769,6 +1772,7 @@
 				A250EEB60E2ED87B00A688E6 /* web in Resources */,
 				A22F1E550E7DA8030065DB9D /* sparkle_dsa_pub.pem in Resources */,
 				A2E2EA920EE321C200EB6308 /* Groups.png in Resources */,
+				A23A0E310EECB0740091C885 /* GroupRules.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

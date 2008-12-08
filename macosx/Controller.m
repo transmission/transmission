@@ -860,6 +860,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];
             
+            #warning move into torrent init?
+            if ([torrent groupValue] != -1 && [[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]]
+                && [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]])
+                [torrent changeDownloadFolder: [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]]];
+            
             [torrent update];
             [fTorrents addObject: torrent];
             [torrent release];

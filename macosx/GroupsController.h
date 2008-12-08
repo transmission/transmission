@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "Torrent.h"
 
 @interface GroupsController : NSObject
 {
@@ -50,6 +51,12 @@
 - (NSString *) customDownloadLocationForIndex: (NSInteger) index;
 - (void) setCustomDownloadLocation: (NSString *) location forIndex: (NSInteger) index;
 
+- (BOOL) usesAutoAssignRulesForIndex: (NSInteger) index;
+- (void) setUsesAutoAssignRules: (BOOL) useAutoAssignRules forIndex: (NSInteger) index;
+
+- (NSArray *) autoAssignRulesForIndex: (NSInteger) index;
+- (void) setAutoAssignRules: (NSArray *) rules forIndex: (NSInteger) index;
+
 - (void) addNewGroup;
 - (void) removeGroupWithRowIndex: (NSInteger) row;
 
@@ -57,4 +64,5 @@
 
 - (NSMenu *) groupMenuWithTarget: (id) target action: (SEL) action isSmall: (BOOL) small;
 
+- (NSInteger) groupIndexForTorrent: (Torrent *) torrent;
 @end
