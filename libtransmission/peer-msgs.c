@@ -306,6 +306,11 @@ struct tr_peermsgs
     struct tr_incoming    incoming;
 
     tr_pex *              pex;
+
+    /* if the peer supports the Extension Protocol in BEP 10 and
+       supplied a reqq argument, it's stored here.  otherwise the
+       value is zero and should be ignored. */
+    int64_t               reqq;
 };
 
 /**
@@ -1145,6 +1150,10 @@ parseLtepHandshake( tr_peermsgs *     msgs,
         dbgmsg( msgs, "msgs->port is now %hu", msgs->info->port );
     }
 
+    /* get peer's maximum request queue size */
+    if( tr_bencDictFindInt( &val, "reqq", &i ) )
+        msgs->reqq = i;
+
     tr_bencFree( &val );
     tr_free( tmp );
 }
@@ -1722,16 +1731,16 @@ canRead( struct tr_iobuf * iobuf, void * vmsgs, size_t * piece )
 **/
 
 static int
-ratePulse( void * vpeer )
+ratePulse( void * vmsgs )
 {
-    tr_peermsgs * peer = vpeer;
-    const double rateToClient = tr_peerGetPieceSpeed( peer->info,
-                                                      TR_PEER_TO_CLIENT );
+    tr_peermsgs * msgs = vmsgs;
+    const double rateToClient = tr_peerGetPieceSpeed( msgs->info, TR_PEER_TO_CLIENT );
     const int estimatedBlocksInNext30Seconds =
-                  ( rateToClient * 30 * 1024 ) / peer->torrent->blockSize;
-
-    peer->minActiveRequests = 8;
-    peer->maxActiveRequests = peer->minActiveRequests + estimatedBlocksInNext30Seconds;
+                  ( rateToClient * 30 * 1024 ) / msgs->torrent->blockSize;
+    msgs->minActiveRequests = 8;
+    msgs->maxActiveRequests = msgs->minActiveRequests + estimatedBlocksInNext30Seconds;
+    if( msgs->reqq > 0 )
+        msgs->maxActiveRequests = MIN( msgs->maxActiveRequests, msgs->reqq );
     return TRUE;
 }
 
