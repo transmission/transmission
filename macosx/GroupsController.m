@@ -442,40 +442,46 @@ GroupsController * fGroupsInstance = nil;
     NSArray * rule = nil;
     while ((rule = [iterator nextObject]))
     {
-        NSString * type = [rule objectAtIndex: 0], * place = [rule objectAtIndex: 1], * match = [rule objectAtIndex: 2],
-                * value = nil;
+        NSString * type = [rule objectAtIndex: 0], * place = [rule objectAtIndex: 1], * givenValue = [rule objectAtIndex: 2];
+        NSArray * values;
         if ([type isEqualToString: @"title"])
-            value = [torrent name];
+            values = [NSArray arrayWithObject: [torrent name]];
         else if ([type isEqualToString: @"tracker"])
-        {
-            #warning consider all trackers
-            value = [torrent trackerAddressAnnounce];
-        }
+            values = [torrent allTrackers: NO];
         else
             continue;
         
         NSStringCompareOptions options = NSCaseInsensitiveSearch;
         if ([place isEqualToString: @"ends"])
             options += NSBackwardsSearch;
+        BOOL match = NO;
         
-        NSRange result = [value rangeOfString: match options: options];
-        if ([place isEqualToString: @"begins"])
+        NSEnumerator * enumerator = [values objectEnumerator];
+        NSString * value;
+        while (!match && (value = [enumerator nextObject]))
         {
-            if (result.location != 0)
-                return NO;
+            NSRange result = [value rangeOfString: givenValue options: options];
+            if ([place isEqualToString: @"begins"])
+            {
+                if (result.location == 0)
+                    match = YES;
+            }
+            else if ([place isEqualToString: @"contains"])
+            {
+                if (result.location != NSNotFound)
+                    match = YES;
+            }
+            else if ([place isEqualToString: @"ends"])
+            {
+                if (NSMaxRange(result) == [value length])
+                    match = YES;
+            }
+            else
+                break;
         }
-        else if ([place isEqualToString: @"contains"])
-        {
-            if (result.location == NSNotFound)
-                return NO;
-        }
-        else if ([place isEqualToString: @"ends"])
-        {
-            if (NSMaxRange(result) == [value length])
-                return NO;
-        }
-        else
-            continue;
+        
+        if (!match)
+            return NO;
     }
     return YES;
 }

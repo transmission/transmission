@@ -226,7 +226,7 @@
         path = [[openPanel filenames] objectAtIndex: 0];
         [[GroupsController groups] setCustomDownloadLocation: path forIndex: index];
         [[GroupsController groups] setUsesCustomDownloadLocation: YES forIndex: index];
-        [self updateSelectedGroup]; // update the popup's icon/title
+        [self updateSelectedGroup]; //update the popup's icon/title
     }
     else if (!path)
     {
