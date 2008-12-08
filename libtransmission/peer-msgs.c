@@ -407,7 +407,7 @@ protocolSendRequest( tr_peermsgs *               msgs,
 
     dbgmsg( msgs, "requesting %u:%u->%u...", req->index, req->offset, req->length );
     dbgOutMessageLen( msgs );
-    pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
+    pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
 }
 
 static void
