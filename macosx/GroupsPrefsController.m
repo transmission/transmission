@@ -35,7 +35,7 @@
 
 @interface GroupsPrefsController (Private)
 
-- (void) updateSelectedColor;
+- (void) updateSelectedGroup;
 
 @end
 
@@ -55,7 +55,7 @@
     
     [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
     
-    [self updateSelectedColor];
+    [self updateSelectedGroup];
 }
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableview
@@ -77,7 +77,7 @@
 
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
-    [self updateSelectedColor];
+    [self updateSelectedGroup];
 }
 
 - (void) observeValueForKeyPath: (NSString *) keyPath ofObject: (id) object change: (NSDictionary *) change context: (void *) context
@@ -182,6 +182,8 @@
             
             break;
     }
+    
+    [self updateSelectedGroup];
 }
 
 - (void) customDownloadLocationSheetShow: (id) sender
@@ -224,7 +226,7 @@
         path = [[openPanel filenames] objectAtIndex: 0];
         [[GroupsController groups] setCustomDownloadLocation: path forIndex: index];
         [[GroupsController groups] setUsesCustomDownloadLocation: YES forIndex: index];
-        [self updateSelectedColor]; // Update the popup's icon/title
+        [self updateSelectedGroup]; // update the popup's icon/title
     }
     else if (!path)
     {
@@ -389,7 +391,7 @@ static NSString * endsWithCriteria = @"ends";
 
 @implementation GroupsPrefsController (Private)
 
-- (void) updateSelectedColor
+- (void) updateSelectedGroup
 {
     [fAddRemoveControl setEnabled: [fTableView numberOfSelectedRows] > 0 forSegment: REMOVE_TAG];
     if ([fTableView numberOfSelectedRows] == 1)
