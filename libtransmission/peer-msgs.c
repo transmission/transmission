@@ -383,7 +383,7 @@ protocolSendRequest( tr_peermsgs *               msgs,
     tr_peerIoWriteUint32( io, out, req->length );
     dbgmsg( msgs, "requesting %u:%u->%u... outMessage size is now %d",
            req->index, req->offset, req->length, (int)EVBUFFER_LENGTH( out ) );
-    pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
+    pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
 }
 
 static void
