@@ -17,6 +17,7 @@
 
 #include "transmission.h"
 #include "bandwidth.h"
+#include "crypto.h"
 #include "iobuf.h"
 #include "ptrarray.h"
 #include "utils.h"
@@ -244,10 +245,11 @@ tr_bandwidthIsLimited( const tr_bandwidth  * b,
 #define DEBUG_DIRECTION TR_UP
 #endif
 
-void
-tr_bandwidthAllocate( tr_bandwidth  * b,
-                      tr_direction    dir,
-                      int             period_msec )
+static void
+allocateBandwidth( tr_bandwidth  * b,
+                   tr_direction    dir,
+                   int             period_msec,
+                   tr_ptrArray   * addme_buffers )
 {
     assert( isBandwidth( b ) );
     assert( isDirection( dir ) );
@@ -255,13 +257,7 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     if( b->band[dir].isLimited )
     {
         const double desiredSpeed = b->band[dir].desiredSpeed;
-#if 0
-        const double currentSpeed = getSpeed( &b->band[dir].piece, HISTORY_MSEC - period_msec );
-        const double pulseCount = ( HISTORY_MSEC - period_msec ) / (double)period_msec;
-        const double nextPulseSpeed = desiredSpeed * ( pulseCount + 1 ) - ( currentSpeed * pulseCount );
-#else
         const double nextPulseSpeed = desiredSpeed;
-#endif
         b->band[dir].bytesLeft = MAX( 0.0, nextPulseSpeed * 1024.0 * period_msec / 1000.0 );
 
 #ifdef DEBUG_DIRECTION
@@ -275,16 +271,16 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     /* notify the io buffers that there's more bandwidth available */
     if( !b->band[dir].isLimited || ( b->band[dir].bytesLeft > 0 ) )
     {
-        int i, n=0;
-        short what = dir==TR_UP ? EV_WRITE : EV_READ;
-        struct tr_iobuf ** iobufs = (struct tr_iobuf**) tr_ptrArrayPeek( b->iobufs, &n );
+        int i;
+        const int n = tr_ptrArraySize( b->iobufs );
+        for( i=0; i<n; ++i )
+            tr_ptrArrayAppend( addme_buffers, tr_ptrArrayNth( b->iobufs, i ) );
+    }
+
 #ifdef DEBUG_DIRECTION
 if( ( dir == DEBUG_DIRECTION ) && ( n > 1 ) )
 fprintf( stderr, "bandwidth %p has %d iobufs\n", b, n );
 #endif
-        for( i=0; i<n; ++i )
-            tr_iobuf_enable( iobufs[i], what );
-    }
 
     /* all children should reallocate too */
     if( 1 ) {
@@ -293,6 +289,32 @@ fprintf( stderr, "bandwidth %p has %d iobufs\n", b, n );
         for( i=0; i<n; ++i )
             tr_bandwidthAllocate( children[i], dir, period_msec );
     }
+}
+
+void
+tr_bandwidthAllocate( tr_bandwidth  * b,
+                      tr_direction    dir,
+                      int             period_msec )
+{
+    int n;
+    tr_ptrArray * tmp;
+    struct tr_iobuf ** buffers;
+    const short what = dir==TR_UP ? EV_WRITE : EV_READ;
+
+    tmp = tr_ptrArrayNew( );
+    allocateBandwidth( b, dir, period_msec, tmp );
+    buffers = (struct tr_iobuf**) tr_ptrArrayPeek( b->children, &n );
+
+    /* notify the io buffers in a random order s.t. no
+       particular peer gets to hog all the bandwidth */
+    while( n > 0 ) {
+        const int i = tr_cryptoRandInt( n );
+        tr_iobuf_enable( buffers[i], what );
+        buffers[i] = buffers[n-1];
+        --n;
+    }
+
+    tr_ptrArrayFree( tmp, NULL );
 }
 
 /***
