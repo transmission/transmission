@@ -49,9 +49,9 @@ extern "C" {
  #define PRIu32 "lu"
 #endif
 #include <time.h> /* time_t */
-#include <netinet/in.h> /* INET6_ADDRSTRLEN */
 
 #define SHA_DIGEST_LENGTH 20
+#define TR_INET6_ADDRSTRLEN 46
 
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
@@ -1061,7 +1061,7 @@ typedef struct tr_peer_stat
     uint8_t      from;
     tr_port      port;
 
-    char         addr[INET6_ADDRSTRLEN];
+    char         addr[TR_INET6_ADDRSTRLEN];
     char         client[80];
     char         flagStr[32];
 
