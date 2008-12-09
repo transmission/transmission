@@ -10,7 +10,6 @@
  * $Id$
  */
 
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h> /* free */
 #include <string.h>
@@ -34,6 +33,8 @@
 #include "blocklist.h"
 #include "net.h"
 #include "utils.h"
+
+extern int errno;
 
 /***
 ****  PRIVATE
