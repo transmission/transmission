@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-11-29 16:52+0000\n"
+"X-Launchpad-Export-Date: 2008-12-09 18:13+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -730,6 +730,7 @@ msgstr ""
 "  Morten Justesen https://launchpad.net/~morten-justesen\n"
 "  Peter Skov https://launchpad.net/~a0peter\n"
 "  Philip Munksgaard https://launchpad.net/~pmunksgaard\n"
+"  Soren Hauberg https://launchpad.net/~hauberg\n"
 "  Søren Vind https://launchpad.net/~peecee\n"
 "  nanker https://launchpad.net/~nanker"
 

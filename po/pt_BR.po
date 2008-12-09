@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2008-11-29 16:53+0000\n"
+"X-Launchpad-Export-Date: 2008-12-09 18:14+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -738,6 +738,7 @@ msgstr ""
 "  Djavan Fagundes https://launchpad.net/~dnoway\n"
 "  Gerson \"fserve\" Barreiros https://launchpad.net/~fserve\n"
 "  Guilherme Gonçalves https://launchpad.net/~guilherme08\n"
+"  Irio Irineu https://launchpad.net/~iriomk\n"
 "  Ugo https://launchpad.net/~ugosan"
 
 #: ../gtk/makemeta-ui.c:111
