@@ -285,12 +285,11 @@
 
     if ([fRuleEditor numberOfRows] == 0)
         [fRuleEditor addRow: nil];
+    
+    [fRuleEditor reloadCriteria];
 
-    [NSApp beginSheet: fGroupRulesSheetWindow
-       modalForWindow: [fTableView window]
-        modalDelegate: nil
-       didEndSelector: NULL
-          contextInfo: NULL];
+    [NSApp beginSheet: fGroupRulesSheetWindow modalForWindow: [fTableView window] modalDelegate: nil didEndSelector: NULL
+        contextInfo: NULL];
 }
 
 - (IBAction) cancelRules: (id) sender;
