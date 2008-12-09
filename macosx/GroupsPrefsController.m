@@ -276,17 +276,15 @@
     NSArray * rules = [[GroupsController groups] autoAssignRulesForIndex: index];
     if (rules)
     {
-        for (NSInteger index = 0; index < [rules count]; index++)
+        for (NSInteger i = 0; i < [rules count]; i++)
         {
             [fRuleEditor addRow: nil];
-            [fRuleEditor setCriteria: [rules objectAtIndex: index] andDisplayValues: [NSArray array] forRowAtIndex: index];
+            [fRuleEditor setCriteria: [rules objectAtIndex: i] andDisplayValues: [NSArray array] forRowAtIndex: i];
         }
     }
 
     if ([fRuleEditor numberOfRows] == 0)
         [fRuleEditor addRow: nil];
-    
-    [fRuleEditor reloadCriteria];
 
     [NSApp beginSheet: fGroupRulesSheetWindow modalForWindow: [fTableView window] modalDelegate: nil didEndSelector: NULL
         contextInfo: NULL];
