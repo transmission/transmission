@@ -153,7 +153,7 @@ tr_torrentSetSpeedMode( tr_torrent *  tor,
     tor->speedLimitMode[dir] = mode;
 
     tr_bandwidthSetLimited( tor->bandwidth, dir, mode==TR_SPEEDLIMIT_SINGLE );
-    tr_bandwidthHonorParentLimits( tor->bandwidth, dir, mode!=TR_SPEEDLIMIT_UNLIMITED );
+    tr_bandwidthHonorParentLimits( tor->bandwidth, dir, mode==TR_SPEEDLIMIT_GLOBAL );
 }
 
 tr_speedlimit
