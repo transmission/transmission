@@ -1198,6 +1198,21 @@ stopTorrent( void * vtor )
 }
 
 void
+tr_torrentDeleteLocalData( tr_torrent * tor )
+{
+    tr_file_index_t i;
+
+    for( i=0; i<tor->info.fileCount; ++i )
+    {
+        const tr_file * file = &tor->info.files[i];
+        char * path = tr_buildPath( tor->downloadDir, file->name, NULL );
+        tr_fdFileClose( path );
+        unlink( path );
+        tr_free( path );
+    }
+}
+
+void
 tr_torrentStop( tr_torrent * tor )
 {
     if( tor )

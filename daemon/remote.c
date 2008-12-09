@@ -99,6 +99,8 @@ static tr_option opts[] =
       "pl", 1, "<files>"             },
     { 'r', "remove",               "Remove the current torrent(s)",
       "r",  0, NULL                  },
+    { 'R', "remove-and-delete",    "Remove the current torrent(s) and delete local data",
+      NULL, 0, NULL                  },
     { 's', "start",                "Start the current torrent(s)",
       "s",  0, NULL                  },
     { 'S', "stop",                 "Stop the current torrent(s)",
@@ -412,6 +414,12 @@ readargs( int           argc,
             case 'r':
                 tr_bencDictAddStr( &top, "method", "torrent-remove" );
                 addIdArg( args, id );
+                break;
+
+            case 'R':
+                tr_bencDictAddStr( &top, "method", "torrent-remove" );
+                addIdArg( args, id );
+                tr_bencDictAddInt( args, "delete-local-data", 1 );
                 break;
 
             case 's':

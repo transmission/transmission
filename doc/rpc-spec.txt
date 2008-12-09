@@ -68,7 +68,6 @@
 
    Method name         | libtransmission function
    --------------------+-------------------------------------------------
-   "torrent-remove"    | tr_torrentRemove
    "torrent-start"     | tr_torrentStart
    "torrent-stop"      | tr_torrentStop
    "torrent-verify"    | tr_torrentVerify
@@ -292,6 +291,19 @@
    Response arguments: on success, a "torrent-added" object in the
                        form of one of 3.3's tr_info objects with the
                        fields for id, name, and hashString.
+
+3.5.  Removing a Torrent
+
+   Method name: "torrent-remove"
+
+   Request arguments:
+
+   string                     | value type & description
+   ---------------------------+-------------------------------------------------
+   "ids"                      | array      torrent list, as described in 3.1
+   "delete-local-data"        | 'boolean'  delete local data. (default: false)
+
+   Response arguments: none
 
 
 4.   Session Requests

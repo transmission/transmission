@@ -136,18 +136,21 @@ torrentStop( tr_handle *        h,
 }
 
 static const char*
-torrentRemove( tr_handle *        h,
-               tr_benc *          args_in,
-               tr_benc * args_out UNUSED )
+torrentRemove( tr_handle   * h,
+               tr_benc     * args_in,
+               tr_benc     * args_out UNUSED )
 {
-    int           i, torrentCount;
+    int i;
+    int torrentCount;
     tr_torrent ** torrents = getTorrents( h, args_in, &torrentCount );
 
-    for( i = 0; i < torrentCount; ++i )
+    for( i=0; i<torrentCount; ++i )
     {
-        tr_torrent *                 tor = torrents[i];
-        const tr_rpc_callback_status status = notify(
-            h, TR_RPC_TORRENT_REMOVING, tor );
+        tr_torrent * tor = torrents[i];
+        const tr_rpc_callback_status status = notify( h, TR_RPC_TORRENT_REMOVING, tor );
+        int64_t deleteFlag;
+        if( tr_bencDictFindInt( args_in, "delete-local-data", &deleteFlag ) && deleteFlag )
+            tr_torrentDeleteLocalData( tor );
         if( !( status & TR_RPC_NOREMOVE ) )
             tr_torrentRemove( tor );
     }

@@ -840,6 +840,9 @@ void tr_torrentStart( tr_torrent * torrent );
 /** @brief Stop (pause) a torrent */
 void tr_torrentStop( tr_torrent * torrent );
 
+/** @brief Deletes the torrent data stored on disk. */
+void tr_torrentDeleteLocalData( tr_torrent * torrent );
+
 /**
  * @brief Iterate through the torrents.
  *

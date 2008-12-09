@@ -47,8 +47,9 @@ getopts_usage_line( const tr_option * opt,
     const char * shortName  = opt->shortName ? opt->shortName : "";
     const char * arg        = getArgName( opt );
 
-    printf( "  -%-*s --%-*s %-*s  %s\n", shortWidth, shortName,
-            longWidth, longName,
+    printf( "  %s%-*s %s%-*s %-*s  %s\n",
+            (shortName && *shortName ? "-" : " "), shortWidth, shortName,
+            (longName && *longName ? "--" : "  "), longWidth, longName,
             argWidth, arg,
             opt->description );
 }
