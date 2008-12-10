@@ -179,6 +179,10 @@ AC_ARG_ENABLE([nls],
               AS_HELP_STRING([--enable-nls],[enable native language support]),,
               [enable_nls=yes])
 
+if test "x$build_gtk" = "xyes" -a  "x$enable_nls" = "xno" ; then
+    AC_MSG_ERROR("The gtk client cannot be built without nls support.  Try adding either --enable-nls or --disable-gtk" )
+fi
+
 use_nls=no
 if test "x$enable_nls" = "xyes" ; then
     use_nls=yes
