@@ -303,7 +303,7 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
 
     tmp = tr_ptrArrayNew( );
     allocateBandwidth( b, dir, period_msec, tmp );
-    buffers = (struct tr_iobuf**) tr_ptrArrayPeek( b->children, &n );
+    buffers = (struct tr_iobuf**) tr_ptrArrayPeek( tmp, &n );
 
     /* notify the io buffers in a random order s.t. no
        particular peer gets to hog all the bandwidth */
