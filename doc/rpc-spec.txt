@@ -309,11 +309,13 @@
    "speed-limit-down-enabled" | 'boolean'  true means enabled
    "speed-limit-up"           | number     max global upload speed (in K/s)
    "speed-limit-up-enabled"   | 'boolean'  true means enabled
+   "version"                  | string     long version string "$version ($revision)"
+
 
 4.1.1.  Mutators
 
    Method name: "session-set"
-   Request arguments: one or more of 4.1's arguments
+   Request arguments: one or more of 4.1's arguments, except "version"
    Response arguments: none
 
 4.1.2.  Accessors

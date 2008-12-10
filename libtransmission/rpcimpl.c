@@ -727,6 +727,8 @@ sessionGet( tr_handle *       h,
                        tr_sessionGetSpeedLimit( h, TR_DOWN ) );
     tr_bencDictAddInt( d, "speed-limit-down-enabled",
                       tr_sessionIsSpeedLimitEnabled( h, TR_DOWN ) );
+    tr_bencDictAddStr( d, "version", LONG_VERSION_STRING );
+
     switch( tr_sessionGetEncryption( h ) )
     {
         case TR_CLEAR_PREFERRED:
