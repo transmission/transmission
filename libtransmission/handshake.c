@@ -207,7 +207,7 @@ buildHandshakeMessage( tr_handshake * handshake,
     uint8_t          * walk = buf;
     const uint8_t    * torrentHash = tr_cryptoGetTorrentHash( handshake->crypto );
     const tr_torrent * tor = tr_torrentFindFromHash( handshake->handle, torrentHash );
-    const uint8_t    * peerId = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
+    const uint8_t    * peer_id = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
 
     memcpy( walk, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN );
     walk += HANDSHAKE_NAME_LEN;
@@ -218,10 +218,10 @@ buildHandshakeMessage( tr_handshake * handshake,
     walk += HANDSHAKE_FLAGS_LEN;
     memcpy( walk, torrentHash, SHA_DIGEST_LENGTH );
     walk += SHA_DIGEST_LENGTH;
-    memcpy( walk, peerId, PEER_ID_LEN );
+    memcpy( walk, peer_id, PEER_ID_LEN );
     walk += PEER_ID_LEN;
 
-    assert( strlen( ( const char* )peerId ) == PEER_ID_LEN );
+    assert( strlen( ( const char* )peer_id ) == PEER_ID_LEN );
     assert( walk - buf == HANDSHAKE_SIZE );
     *setme_len = walk - buf;
     return buf;
@@ -245,6 +245,8 @@ parseHandshake( tr_handshake *    handshake,
     uint8_t name[HANDSHAKE_NAME_LEN];
     uint8_t reserved[HANDSHAKE_FLAGS_LEN];
     uint8_t hash[SHA_DIGEST_LENGTH];
+    const tr_torrent * tor;
+    const uint8_t * peer_id;
 
     dbgmsg( handshake, "payload: need %d, got %zu",
             (int)HANDSHAKE_SIZE, EVBUFFER_LENGTH( inbuf ) );
@@ -280,7 +282,10 @@ parseHandshake( tr_handshake *    handshake,
     handshake->havePeerID = TRUE;
     dbgmsg( handshake, "peer-id is [%*.*s]", PEER_ID_LEN, PEER_ID_LEN,
             handshake->peer_id );
-    if( !memcmp( handshake->peer_id, tr_getPeerId( ), PEER_ID_LEN ) )
+
+    tor = tr_torrentFindFromHash( handshake->handle, hash );
+    peer_id = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
+    if( !memcmp( handshake->peer_id, peer_id, PEER_ID_LEN ) )
     {
         dbgmsg( handshake, "streuth!  we've connected to ourselves." );
         return HANDSHAKE_PEER_IS_SELF;
@@ -699,11 +704,13 @@ readHandshake( tr_handshake *    handshake,
 }
 
 static int
-readPeerId( tr_handshake *    handshake,
+readPeerId( tr_handshake    * handshake,
             struct evbuffer * inbuf )
 {
     int  peerIsGood;
     char client[128];
+    tr_torrent * tor;
+    const uint8_t * peer_id;
 
     if( EVBUFFER_LENGTH( inbuf ) < PEER_ID_LEN )
         return READ_LATER;
@@ -717,8 +724,9 @@ readPeerId( tr_handshake *    handshake,
             tr_peerIoIsIncoming( handshake->io ) );
 
     /* if we've somehow connected to ourselves, don't keep the connection */
-    peerIsGood =
-        memcmp( handshake->peer_id, tr_getPeerId( ), PEER_ID_LEN ) ? 1 : 0;
+    tor = tr_torrentFindFromHash( handshake->handle, tr_peerIoGetTorrentHash( handshake->io ) );
+    peer_id = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
+    peerIsGood = memcmp( handshake->peer_id, peer_id, PEER_ID_LEN ) != 0;
     dbgmsg( handshake, "isPeerGood == %d", peerIsGood );
     return tr_handshakeDone( handshake, peerIsGood );
 }
