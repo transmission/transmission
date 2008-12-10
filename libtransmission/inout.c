@@ -30,11 +30,7 @@
 #include "torrent.h"
 #include "utils.h"
 
-#ifdef TR_EMBEDDED
- #define TR_HASH_BUFSIZE (16*1024)
-#else
- #define TR_HASH_BUFSIZE (64*1024)
-#endif
+#define TR_HASH_BUFSIZE (64*1024)
 
 /****
 *****  Low-level IO functions
