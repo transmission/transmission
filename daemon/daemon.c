@@ -91,25 +91,17 @@ saveState( tr_session * s )
     replaceStr( &d, KEY_DOWNLOAD_DIR,    tr_sessionGetDownloadDir( s ) );
     replaceInt( &d, KEY_PEER_LIMIT,      tr_sessionGetPeerLimit( s ) );
     replaceInt( &d, KEY_PEER_PORT,       tr_sessionGetPeerPort( s ) );
-    replaceInt( &d, KEY_PORT_FORWARDING,
-               tr_sessionIsPortForwardingEnabled( s ) );
+    replaceInt( &d, KEY_PORT_FORWARDING, tr_sessionIsPortForwardingEnabled( s ) );
     replaceInt( &d, KEY_PEX_ENABLED,     tr_sessionIsPexEnabled( s ) );
-    replaceStr( &d, KEY_USERNAME,        strs[n++] =
-                   tr_sessionGetRPCUsername(
-                       s ) );
-    replaceStr( &d, KEY_PASSWORD,        strs[n++] =
-                   tr_sessionGetRPCPassword(
-                       s ) );
+    replaceStr( &d, KEY_USERNAME,        strs[n++] = tr_sessionGetRPCUsername( s ) );
+    replaceStr( &d, KEY_PASSWORD,        strs[n++] = tr_sessionGetRPCPassword( s ) );
     replaceStr( &d, KEY_WHITELIST,       strs[n++] = tr_sessionGetRPCWhitelist( s ) );
     replaceInt( &d, KEY_RPC_PORT,        tr_sessionGetRPCPort( s ) );
     replaceInt( &d, KEY_AUTH_REQUIRED,   tr_sessionIsRPCPasswordEnabled( s ) );
-    replaceInt( &d, KEY_DSPEED,
-               tr_sessionGetSpeedLimit( s, TR_DOWN ) );
-    replaceInt( &d, KEY_DSPEED_ENABLED,
-               tr_sessionIsSpeedLimitEnabled( s, TR_DOWN ) );
+    replaceInt( &d, KEY_DSPEED,          tr_sessionGetSpeedLimit( s, TR_DOWN ) );
+    replaceInt( &d, KEY_DSPEED_ENABLED,  tr_sessionIsSpeedLimitEnabled( s, TR_DOWN ) );
     replaceInt( &d, KEY_USPEED,          tr_sessionGetSpeedLimit( s, TR_UP ) );
-    replaceInt( &d, KEY_USPEED_ENABLED,
-               tr_sessionIsSpeedLimitEnabled( s, TR_UP ) );
+    replaceInt( &d, KEY_USPEED_ENABLED,  tr_sessionIsSpeedLimitEnabled( s, TR_UP ) );
     replaceInt( &d, KEY_ENCRYPTION,      tr_sessionGetEncryption( s ) );
 
     tr_bencSaveJSONFile( myConfigFilename, &d );
@@ -192,33 +184,24 @@ session_init( const char * configDir,
 
     mycwd = tr_getcwd( );
     getConfigStr( dict, KEY_DOWNLOAD_DIR,    &downloadDir,       mycwd );
-    getConfigInt( dict, KEY_PEX_ENABLED,     &pexEnabled,
-                  TR_DEFAULT_PEX_ENABLED );
-    getConfigInt( dict, KEY_PORT_FORWARDING, &fwdEnabled,
-                  TR_DEFAULT_PORT_FORWARDING_ENABLED );
-    getConfigInt( dict, KEY_PEER_PORT,       &peerPort,
-                  TR_DEFAULT_PORT );
+    getConfigInt( dict, KEY_PEX_ENABLED,     &pexEnabled,        TR_DEFAULT_PEX_ENABLED );
+    getConfigInt( dict, KEY_PORT_FORWARDING, &fwdEnabled,        TR_DEFAULT_PORT_FORWARDING_ENABLED );
+    getConfigInt( dict, KEY_PEER_PORT,       &peerPort,          TR_DEFAULT_PORT );
     getConfigInt( dict, KEY_DSPEED,          &downLimit,         100 );
     getConfigInt( dict, KEY_DSPEED_ENABLED,  &downLimited,       FALSE );
     getConfigInt( dict, KEY_USPEED,          &upLimit,           100 );
     getConfigInt( dict, KEY_USPEED_ENABLED,  &upLimited,         FALSE );
-    getConfigInt( dict, KEY_LAZY_BITFIELD,   &useLazyBitfield,
-                  TR_DEFAULT_LAZY_BITFIELD_ENABLED );
-    getConfigInt( dict, KEY_PEER_LIMIT,      &peers,
-                  TR_DEFAULT_GLOBAL_PEER_LIMIT );
-    getConfigInt( dict, KEY_BLOCKLIST,       &blocklistEnabled,
-                  TR_DEFAULT_BLOCKLIST_ENABLED );
-    getConfigInt( dict, KEY_RPC_PORT,        &rpcPort,
-                  TR_DEFAULT_RPC_PORT );
-    getConfigInt( dict, KEY_WHITELIST_ENABLED, &whitelistEnabled,
-                  TR_DEFAULT_RPC_WHITELIST_ENABLED );
-    getConfigStr( dict, KEY_WHITELIST,       &whitelist,
-                  TR_DEFAULT_RPC_WHITELIST );
+    getConfigInt( dict, KEY_LAZY_BITFIELD,   &useLazyBitfield,   TR_DEFAULT_LAZY_BITFIELD_ENABLED );
+    getConfigInt( dict, KEY_PEER_LIMIT,      &peers,             TR_DEFAULT_GLOBAL_PEER_LIMIT );
+    getConfigInt( dict, KEY_BLOCKLIST,       &blocklistEnabled,  TR_DEFAULT_BLOCKLIST_ENABLED );
+    getConfigInt( dict, KEY_RPC_PORT,        &rpcPort,           TR_DEFAULT_RPC_PORT );
+    getConfigStr( dict, KEY_WHITELIST,       &whitelist,         TR_DEFAULT_RPC_WHITELIST );
     getConfigInt( dict, KEY_AUTH_REQUIRED,   &authRequired,      FALSE );
     getConfigStr( dict, KEY_USERNAME,        &username,          NULL );
     getConfigStr( dict, KEY_PASSWORD,        &password,          NULL );
-    getConfigInt( dict, KEY_ENCRYPTION,      &encryption,
-                  TR_DEFAULT_ENCRYPTION );
+    getConfigInt( dict, KEY_ENCRYPTION,      &encryption,        TR_DEFAULT_ENCRYPTION );
+
+    whitelistEnabled = whitelist && *whitelist;
 
     /***
     ****
