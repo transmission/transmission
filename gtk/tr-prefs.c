@@ -1117,7 +1117,8 @@ new_time_combo( GObject *    core,
         struct tm   tm;
         tm.tm_hour = i / 60;
         tm.tm_min = i % 60;
-        strftime( buf, sizeof( buf ), "%I:%M %p", &tm );
+        tm.tm_sec = 0;
+        strftime( buf, sizeof( buf ), "%X", &tm );
         gtk_list_store_append( store, &iter );
         gtk_list_store_set( store, &iter, 0, i, 1, buf, -1 );
     }
