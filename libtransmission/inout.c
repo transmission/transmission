@@ -30,8 +30,6 @@
 #include "torrent.h"
 #include "utils.h"
 
-#define TR_HASH_BUFSIZE (64*1024)
-
 /****
 *****  Low-level IO functions
 ****/
@@ -218,14 +216,10 @@ recalculateHash( const tr_torrent * tor,
                  tr_piece_index_t   pieceIndex,
                  uint8_t *          setme )
 {
-    static uint8_t * buf = NULL;
-    size_t bytesLeft;
+    size_t   bytesLeft;
     uint32_t offset = 0;
-    int success = TRUE;
+    int      success = TRUE;
     SHA_CTX  sha;
-
-    if( buf == NULL )
-        buf = tr_new( uint8_t, TR_HASH_BUFSIZE );
 
     assert( tor );
     assert( setme );
@@ -236,7 +230,8 @@ recalculateHash( const tr_torrent * tor,
 
     while( bytesLeft )
     {
-        const int len = MIN( bytesLeft, TR_HASH_BUFSIZE );
+        uint8_t   buf[8192];
+        const int len = MIN( bytesLeft, sizeof( buf ) );
         success = !tr_ioRead( tor, pieceIndex, offset, len, buf );
         if( !success )
             break;
