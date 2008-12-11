@@ -1635,7 +1635,6 @@ clientGotBlock( tr_peermsgs *               msgs,
     ***  Save the block
     **/
 
-    msgs->info->peerSentPieceDataAt = time( NULL );
     if(( err = tr_ioWrite( tor, req->index, req->offset, req->length, data )))
         return err;
 
