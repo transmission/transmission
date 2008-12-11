@@ -257,6 +257,20 @@ struct tr_incoming
     struct evbuffer *      block; /* piece data for incoming blocks */
 };
 
+/**
+ * Low-level communication state information about a connected peer.
+ *
+ * This structure remembers the low-level protocol states that we're
+ * in with this peer, such as active requests, pex messages, and so on.
+ * Its fields are all private to peer-msgs.c.
+ *
+ * Data not directly involved with sending & receiving messages is
+ * stored in tr_peer, where it can be accessed by both peermsgs and
+ * the peer manager.
+ *
+ * @see struct peer_atom
+ * @see tr_peer
+ */
 struct tr_peermsgs
 {
     tr_bool         peerSentBitfield;

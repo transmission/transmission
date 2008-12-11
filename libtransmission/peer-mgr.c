@@ -96,10 +96,15 @@ enum
     UPLOAD_ONLY_NO
 };
 
-/* We keep one of these for every peer we know about, whether
- * it's connected or not, so the struct must be small.
- * When our current connections underperform, we dip back
- * into this list for new ones. */
+/**
+ * Peer information that should be kept even before we've connected and
+ * after we've disconnected.  These are kept in a pool of peer_atoms to decide
+ * which ones would make good candidates for connecting to, and to watch out
+ * for banned peers.
+ *
+ * @see tr_peer
+ * @see tr_peermsgs
+ */
 struct peer_atom
 {
     uint8_t     from;

@@ -22,7 +22,6 @@
 **/
 
 #include "transmission.h"
-#include "publish.h"
 
 typedef enum
 {

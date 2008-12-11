@@ -37,6 +37,12 @@ enum
     ENCRYPTION_PREFERENCE_NO
 };
 
+/**
+ * State information about a connected peer.
+ *
+ * @see struct peer_atom
+ * @see tr_peermsgs
+ */
 typedef struct tr_peer
 {
     tr_bool                  peerIsChoked;

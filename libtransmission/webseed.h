@@ -20,6 +20,7 @@
 typedef struct tr_webseed tr_webseed;
 
 #include "peer-common.h"
+#include "publish.h"
 
 tr_webseed* tr_webseedNew( struct tr_torrent * torrent,
                            const char *        url,
