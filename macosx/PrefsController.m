@@ -349,7 +349,7 @@ tr_handle * fHandle;
     tr_port port = tr_sessionSetPeerPortRandom(fHandle);
     
     [fPortField setIntValue: port];
-    [self setPort: nil];
+    [self setPort: fPortField];
 }
 
 - (void) setNat: (id) sender
