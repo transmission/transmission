@@ -213,7 +213,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 [[[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath] UTF8String],
                                 [fDefaults boolForKey: @"PEXGlobal"],
                                 [fDefaults boolForKey: @"NatTraversal"],
-                                [fDefaults integerForKey: @"BindPort"],
+                                [fDefaults boolForKey: @"RandomPort"] ? -1 : [fDefaults integerForKey: @"BindPort"],
                                 TR_DEFAULT_ENCRYPTION, /* reset in prefs */
                                 TR_DEFAULT_LAZY_BITFIELD_ENABLED,
                                 NO, /* reset in prefs */

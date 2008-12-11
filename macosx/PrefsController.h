@@ -66,6 +66,7 @@
 + (tr_handle *) handle;
 
 - (void) setPort: (id) sender;
+- (void) randomPort: (id) sender;
 - (void) setNat: (id) sender;
 - (void) updatePortStatus;
 - (void) portCheckerDidFinishProbing: (PortChecker *) portChecker;

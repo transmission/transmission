@@ -39,6 +39,9 @@
 #include "web.h"
 #include "crypto.h"
 
+#define PORT_RANDOM_MIN 1024
+#define PORT_RANDOM_MAX 65535
+
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
    characters, where x is the major version number, y is the
    minor version number, z is the maintenance number, and b
@@ -275,6 +278,11 @@ tr_sessionInitFull( const char *       configDir,
     /* Initialize rate and file descripts controls */
 
     tr_fdInit( globalPeerLimit );
+    
+    /* random port */
+    if ( publicPort == -1 )
+        publicPort = tr_cryptoWeakRandInt(PORT_RANDOM_MAX - PORT_RANDOM_MIN + 1) + PORT_RANDOM_MIN;
+    
     h->shared = tr_sharedInit( h, isPortForwardingEnabled, publicPort );
     h->isPortSet = publicPort >= 0;
 
@@ -421,6 +429,14 @@ tr_sessionSetPeerPort( tr_session * session,
     data->session = session;
     data->port = port;
     tr_runInEventThread( session, tr_setBindPortImpl, data );
+}
+
+tr_port
+tr_sessionSetPeerPortRandom( tr_session * session )
+{
+    const tr_port port = tr_cryptoWeakRandInt(PORT_RANDOM_MAX - PORT_RANDOM_MIN + 1) + PORT_RANDOM_MIN;
+    tr_sessionSetPeerPort( session, port);
+    return port;
 }
 
 tr_port

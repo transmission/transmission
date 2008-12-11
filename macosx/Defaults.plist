@@ -120,6 +120,8 @@
 	<false/>
 	<key>QueueSeedNumber</key>
 	<integer>3</integer>
+	<key>RandomPort</key>
+	<false/>
 	<key>RatioCheck</key>
 	<false/>
 	<key>RatioLimit</key>

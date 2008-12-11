@@ -111,6 +111,10 @@ tr_handle * fHandle;
             [fDefaults removeObjectForKey: @"DownloadChoice"];
         }
         
+        //save a new random port
+        if ([fDefaults boolForKey: @"RandomPort"])
+            [fDefaults setInteger: tr_sessionGetPeerPort(fHandle) forKey: @"BindPort"];
+        
         //set auto import
         NSString * autoPath;
         if ([fDefaults boolForKey: @"AutoImport"] && (autoPath = [fDefaults stringForKey: @"AutoImportDirectory"]))
@@ -338,6 +342,14 @@ tr_handle * fHandle;
     
     fPeerPort = -1;
     [self updatePortStatus];
+}
+
+- (void) randomPort: (id) sender
+{
+    tr_port port = tr_sessionSetPeerPortRandom(fHandle);
+    
+    [fPortField setIntValue: port];
+    [self setPort: nil];
 }
 
 - (void) setNat: (id) sender
@@ -1036,7 +1048,7 @@ tr_handle * fHandle;
     [fDefaults setBool: pex forKey: @"PEXGlobal"];
     
     //port
-    int port = tr_sessionGetPeerPort(fHandle);
+    tr_port port = tr_sessionGetPeerPort(fHandle);
     [fDefaults setInteger: port forKey: @"BindPort"];
     
     BOOL nat = tr_sessionIsPortForwardingEnabled(fHandle);

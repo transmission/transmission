@@ -204,6 +204,7 @@ tr_encryption_mode;
  *
  * @param publicPort
  *  Port number to open for incoming peer connections.
+ *  -1 for random port.
  *  #TR_DEFAULT_PORT is the default.
  *
  * @param encryptionMode
@@ -538,6 +539,8 @@ tr_bool tr_sessionIsPortForwardingEnabled( const tr_session  * session );
 
 void  tr_sessionSetPeerPort( tr_session  * session,
                              tr_port       port);
+
+tr_port tr_sessionSetPeerPortRandom( tr_session  * session );
 
 tr_port tr_sessionGetPeerPort( const tr_session * session );
 
