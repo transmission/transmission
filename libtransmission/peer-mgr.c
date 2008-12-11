@@ -48,10 +48,10 @@ enum
     REFILL_PERIOD_MSEC = 333,
 
     /* when many peers are available, keep idle ones this long */
-    MIN_UPLOAD_IDLE_SECS = ( 60 * 3 ),
+    MIN_UPLOAD_IDLE_SECS = ( 30 ),
 
     /* when few peers are available, keep idle ones this long */
-    MAX_UPLOAD_IDLE_SECS = ( 60 * 10 ),
+    MAX_UPLOAD_IDLE_SECS = ( 60 * 5 ),
 
     /* how frequently to decide which peers live and die */
     RECONNECT_PERIOD_MSEC = ( 2 * 1000 ),
@@ -1018,7 +1018,8 @@ peerCallbackFunc( void * vpeer,
             /* update our atom */
             if( peer ) {
                 struct peer_atom * a = getExistingAtom( t, &peer->addr );
-                a->piece_data_time = now;
+                if( e->wasPieceData )
+                    a->piece_data_time = now;
             }
 
             break;
@@ -1056,7 +1057,8 @@ peerCallbackFunc( void * vpeer,
             /* update our atom */
             if( peer ) {
                 struct peer_atom * a = getExistingAtom( t, &peer->addr );
-                a->piece_data_time = now;
+                if( e->wasPieceData )
+                    a->piece_data_time = now;
             }
 
             break;
@@ -1240,6 +1242,7 @@ myHandshakeDoneCB( tr_handshake *  handshake,
         ensureAtomExists( t, addr, port, 0, TR_PEER_FROM_INCOMING );
         atom = getExistingAtom( t, addr );
         atom->time = time( NULL );
+        atom->piece_data_time = 0;
 
         if( atom->myflags & MYFLAG_BANNED )
         {
@@ -2027,9 +2030,9 @@ shouldPeerBeClosed( const Torrent * t,
             : peerCount / (float)relaxStrictnessIfFewerThanN;
         const int lo = MIN_UPLOAD_IDLE_SECS;
         const int hi = MAX_UPLOAD_IDLE_SECS;
-        const int limit = lo + ( ( hi - lo ) * strictness );
-        const time_t then = peer->pieceDataActivityDate;
-        const int idleTime = then ? ( now - then ) : 0;
+        const int limit = hi - ( ( hi - lo ) * strictness );
+        const int idleTime = now - MAX( atom->time, atom->piece_data_time );
+/*fprintf( stderr, "strictness is %.3f, limit is %d seconds... time since connect is %d, time since piece is %d ... idleTime is %d, doPurge is %d\n", (double)strictness, limit, (int)(now - atom->time), (int)(now - atom->piece_data_time), idleTime, idleTime > limit );*/
         if( idleTime > limit ) {
             tordbg( t, "purging peer %s because it's been %d secs since we shared anything",
                        tr_peerIoAddrStr( &atom->addr, atom->port ), idleTime );
@@ -2219,7 +2222,7 @@ reconnectPulse( void * vtorrent )
         for( i = 0; i < nBad; ++i ) {
             tr_peer * peer = connections[i];
             struct peer_atom * atom = getExistingAtom( t, &peer->addr );
-            if( peer->pieceDataActivityDate )
+            if( atom->piece_data_time )
                 atom->numFails = 0;
             else
                 ++atom->numFails;
