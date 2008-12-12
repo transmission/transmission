@@ -111,7 +111,6 @@ struct peer_atom
     uint8_t     flags;       /* these match the added_f flags */
     uint8_t     myflags;     /* flags that aren't defined in added_f */
     uint8_t     uploadOnly;  /* UPLOAD_ONLY_ */
-    uint8_t     partialSeed;
     tr_port     port;
     uint16_t    numFails;
     tr_address  addr;
