@@ -34,24 +34,22 @@
 ***
 **/
 
-int
-tr_bencIsType( const tr_benc * val,
-               int             type )
+tr_bool
+tr_bencIsType( const tr_benc * val, int type )
 {
     return ( val ) && ( val->type == type );
 }
 
-static int
+static tr_bool
 isContainer( const tr_benc * val )
 {
     return tr_bencIsList( val ) || tr_bencIsDict( val );
 }
 
-static int
+static tr_bool
 isSomething( const tr_benc * val )
 {
-    return isContainer( val ) || tr_bencIsInt( val ) || tr_bencIsString(
-               val );
+    return isContainer( val ) || tr_bencIsInt( val ) || tr_bencIsString( val );
 }
 
 static void
@@ -382,8 +380,7 @@ dictIndexOf( const tr_benc * val,
 }
 
 tr_benc *
-tr_bencDictFind( tr_benc *    val,
-                 const char * key )
+tr_bencDictFind( tr_benc * val, const char * key )
 {
     const int i = dictIndexOf( val, key );
 
@@ -417,7 +414,7 @@ tr_bencListChild( tr_benc * val,
     return ret;
 }
 
-int
+tr_bool
 tr_bencGetInt( const tr_benc * val,
                int64_t *       setme )
 {
@@ -428,7 +425,7 @@ tr_bencGetInt( const tr_benc * val,
     return success;
 }
 
-int
+tr_bool
 tr_bencGetStr( const tr_benc * val,
                const char **   setme )
 {
@@ -439,12 +436,10 @@ tr_bencGetStr( const tr_benc * val,
     return success;
 }
 
-int
-tr_bencDictFindInt( tr_benc *    dict,
-                    const char * key,
-                    int64_t *    setme )
+tr_bool
+tr_bencDictFindInt( tr_benc * dict, const char * key, int64_t * setme )
 {
-    int       found = FALSE;
+    tr_bool found = FALSE;
     tr_benc * child = tr_bencDictFindType( dict, key, TYPE_INT );
 
     if( child )
@@ -452,25 +447,22 @@ tr_bencDictFindInt( tr_benc *    dict,
     return found;
 }
 
-int
-tr_bencDictFindDouble( tr_benc *    dict,
-                       const char * key,
-                       double *     setme )
+tr_bool
+tr_bencDictFindDouble( tr_benc * dict, const char * key, double * setme )
 {
     const char * str;
-    const int    success = tr_bencDictFindStr( dict, key, &str );
+    const tr_bool success = tr_bencDictFindStr( dict, key, &str );
 
     if( success )
         *setme = strtod( str, NULL );
+
     return success;
 }
 
-int
-tr_bencDictFindList( tr_benc *    dict,
-                     const char * key,
-                     tr_benc **   setme )
+tr_bool
+tr_bencDictFindList( tr_benc * dict, const char * key, tr_benc ** setme )
 {
-    int       found = FALSE;
+    tr_bool found = FALSE;
     tr_benc * child = tr_bencDictFindType( dict, key, TYPE_LIST );
 
     if( child )
@@ -478,15 +470,14 @@ tr_bencDictFindList( tr_benc *    dict,
         *setme = child;
         found = TRUE;
     }
+
     return found;
 }
 
-int
-tr_bencDictFindDict( tr_benc *    dict,
-                     const char * key,
-                     tr_benc **   setme )
+tr_bool
+tr_bencDictFindDict( tr_benc * dict, const char * key, tr_benc ** setme )
 {
-    int       found = FALSE;
+    tr_bool found = FALSE;
     tr_benc * child = tr_bencDictFindType( dict, key, TYPE_DICT );
 
     if( child )
@@ -494,15 +485,14 @@ tr_bencDictFindDict( tr_benc *    dict,
         *setme = child;
         found = TRUE;
     }
+
     return found;
 }
 
-int
-tr_bencDictFindStr( tr_benc *     dict,
-                    const char *  key,
-                    const char ** setme )
+tr_bool
+tr_bencDictFindStr( tr_benc *  dict, const char *  key, const char ** setme )
 {
-    int       found = FALSE;
+    tr_bool found = FALSE;
     tr_benc * child = tr_bencDictFindType( dict, key, TYPE_STR );
 
     if( child )
@@ -510,16 +500,17 @@ tr_bencDictFindStr( tr_benc *     dict,
         *setme = child->val.s.s;
         found = TRUE;
     }
+
     return found;
 }
 
-int
-tr_bencDictFindRaw( tr_benc *        dict,
-                    const char *     key,
-                    const uint8_t ** setme_raw,
-                    size_t *         setme_len )
+tr_bool
+tr_bencDictFindRaw( tr_benc         * dict,
+                    const char      * key,
+                    const uint8_t  ** setme_raw,
+                    size_t          * setme_len )
 {
-    int       found = FALSE;
+    tr_bool found = FALSE;
     tr_benc * child = tr_bencDictFindType( dict, key, TYPE_STR );
 
     if( child )
@@ -528,6 +519,7 @@ tr_bencDictFindRaw( tr_benc *        dict,
         *setme_len = child->val.s.i;
         found = TRUE;
     }
+
     return found;
 }
 
@@ -1315,6 +1307,76 @@ tr_bencSaveAsJSON( const tr_benc * top,
 /***
 ****
 ***/
+
+static size_t
+tr_bencDictSize( const tr_benc * dict )
+{
+    size_t count = 0;
+
+    if( tr_bencIsDict( dict ) )
+        count = dict->val.l.count / 2;
+
+    return count;
+}
+
+static tr_bool
+tr_bencDictChild( const tr_benc * dict, size_t n, const char ** key, const tr_benc ** val )
+{
+    tr_bool success = 0;
+
+    assert( tr_bencIsDict( dict ) );
+
+    if( tr_bencIsDict( dict ) && (n*2)+1 <= dict->val.l.count )
+    {
+        tr_benc * k = dict->val.l.vals + (n*2);
+        tr_benc * v = dict->val.l.vals + (n*2) + 1;
+        if(( success = tr_bencGetStr( k, key ) && isSomething( v )))
+            *val = v;
+    }
+
+    return success;
+}
+
+void 
+tr_bencMergeDicts( tr_benc * target, const tr_benc * source )
+{
+    size_t i;
+    const size_t sourceCount = tr_bencDictSize( source );
+
+    assert( tr_bencIsDict( target ) );
+    assert( tr_bencIsDict( source ) );
+
+    for( i=0; i<sourceCount; ++i )
+    {
+        const char * key;
+        const tr_benc * val;
+
+        if( tr_bencDictChild( source, i, &key, &val ) )
+        {
+            int64_t i64;
+            const char * str;
+
+            if( tr_bencGetInt( val, &i64 ) )
+            {
+                tr_bencDictRemove( target, key );
+                tr_bencDictAddInt( target, key, i64 );
+            }
+            else if( tr_bencGetStr( val, &str ) )
+            {
+                tr_bencDictRemove( target, key );
+                tr_bencDictAddStr( target, key, str );
+            }
+            else
+            {
+                tr_err( "tr_bencMergeDicts skipping \"%s\"", key );
+            }
+        }
+    }
+}
+
+/*** 
+**** 
+***/ 
 
 static int
 saveFile( const char * filename,
