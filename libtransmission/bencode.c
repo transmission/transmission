@@ -1355,6 +1355,7 @@ tr_bencMergeDicts( tr_benc * target, const tr_benc * source )
         {
             int64_t i64;
             const char * str;
+            tr_benc * t;
 
             if( tr_bencGetInt( val, &i64 ) )
             {
@@ -1366,9 +1367,14 @@ tr_bencMergeDicts( tr_benc * target, const tr_benc * source )
                 tr_bencDictRemove( target, key );
                 tr_bencDictAddStr( target, key, str );
             }
+            else if( tr_bencIsDict( val ) && tr_bencDictFindDict( target, key, &t ) )
+            {
+                tr_bencMergeDicts( t, val );
+            }
             else
             {
-                tr_err( "tr_bencMergeDicts skipping \"%s\"", key );
+            
+                tr_dbg( "tr_bencMergeDicts skipping \"%s\"", key );
             }
         }
     }
