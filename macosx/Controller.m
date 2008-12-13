@@ -823,8 +823,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         //determine download location
         NSString * location;
+        BOOL lockDestination = NO; //don't override the location with a group location if it has a hardcoded path
         if (path)
+        {
             location = [path stringByExpandingTildeInPath];
+            lockDestination = YES;
+        }
         else if ([fDefaults boolForKey: @"DownloadLocationConstant"])
             location = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
         else if (type != ADD_URL)
@@ -842,12 +846,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                             deleteTorrentFile: showWindow ? TORRENT_FILE_SAVE : deleteTorrentFile lib: fLib]))
             continue;
         
+        //change the location if the group calls for it (this has to wait until after the torrent is create)
+        if (!lockDestination && [[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]])
+        {
+            location = [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]];
+            [torrent changeDownloadFolder: location];
+        }
+        
         //verify the data right away if it was newly created
         if (type == ADD_CREATED)
             [torrent resetCache];
-        
-        //don't override the location with a group location if it was a created torrent
-        BOOL lockDestination = location && type == ADD_CREATED;
         
         //add it to the "File -> Open Recent" menu
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
@@ -862,10 +870,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         else
         {
             [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];
-            
-            #warning move into torrent init?
-            if (!lockDestination && [[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]])
-                [torrent changeDownloadFolder: [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]]];
             
             [torrent update];
             [fTorrents addObject: torrent];

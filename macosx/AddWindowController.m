@@ -67,11 +67,6 @@
         fDeleteEnable = deleteTorrent == TORRENT_FILE_DEFAULT;
         
         fGroupValue = [torrent groupValue];
-        
-        #warning factor in if there already is a destination
-        // set the group’s download location if there is one
-        if (!fLockDestination && [[GroupsController groups] usesCustomDownloadLocationForIndex: fGroupValue])
-            [self setDestinationPath: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue]];
     }
     return self;
 }

@@ -170,8 +170,11 @@ GroupsController * fGroupsInstance = nil;
 
 - (BOOL) usesCustomDownloadLocationForIndex: (NSInteger) index
 {
+    if (![self customDownloadLocationForIndex: index])
+        return NO;
+
     NSInteger orderIndex = [self rowValueForIndex: index];
-    return orderIndex != -1 ? [[[fGroups objectAtIndex: orderIndex] objectForKey: @"UsesCustomDownloadLocation"] boolValue] : NO;
+    return [[[fGroups objectAtIndex: orderIndex] objectForKey: @"UsesCustomDownloadLocation"] boolValue];
 }
 
 - (void) setUsesCustomDownloadLocation: (BOOL) useCustomLocation forIndex: (NSInteger) index
