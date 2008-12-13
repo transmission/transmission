@@ -181,11 +181,11 @@ tr_torrentGetSpeedLimit( const tr_torrent * tor,
     return tr_bandwidthGetDesiredSpeed( tor->bandwidth, dir );
 }
 
-int
+tr_bool
 tr_torrentIsPieceTransferAllowed( const tr_torrent  * tor,
                                   tr_direction        direction )
 {
-    int isEnabled = FALSE;
+    tr_bool isEnabled = FALSE;
 
     switch( tr_torrentGetSpeedMode( tor, direction ) )
     {

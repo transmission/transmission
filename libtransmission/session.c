@@ -279,10 +279,10 @@ tr_sessionInitFull( const char *       configDir,
     h->isPortSet = publicPort >= 0;
 
     h->bandwidth = tr_bandwidthNew( h, NULL );
-    tr_bandwidthSetDesiredSpeed( h->bandwidth, TR_UP, uploadLimit );
-    tr_bandwidthSetDesiredSpeed( h->bandwidth, TR_DOWN, downloadLimit );
-    tr_bandwidthSetLimited( h->bandwidth, TR_UP, useUploadLimit );
-    tr_bandwidthSetLimited( h->bandwidth, TR_DOWN, useDownloadLimit );
+    tr_sessionSetSpeedLimit       ( h, TR_UP,   uploadLimit );
+    tr_sessionSetSpeedLimitEnabled( h, TR_UP,   useUploadLimit );
+    tr_sessionSetSpeedLimit       ( h, TR_DOWN, downloadLimit );
+    tr_sessionSetSpeedLimitEnabled( h, TR_DOWN, useDownloadLimit );
 
     /* first %s is the application name
        second %s is the version number */
@@ -441,19 +441,26 @@ tr_sessionGetPortForwarding( const tr_handle * h )
 ****
 ***/
 
+static void
+updateBandwidth( tr_session * session, tr_direction dir )
+{
+    const tr_bool zeroCase = session->speedLimit[dir] < 1 && session->isSpeedLimited[dir];
+
+    tr_bandwidthSetLimited( session->bandwidth, dir, session->isSpeedLimited[dir] && !zeroCase );
+
+    tr_bandwidthSetDesiredSpeed( session->bandwidth, dir, session->speedLimit[dir] );
+}
+
 void
 tr_sessionSetSpeedLimitEnabled( tr_session      * session,
                                 tr_direction      dir,
-                                int               isLimited )
+                                tr_bool           isLimited )
 {
-    tr_bandwidthSetLimited( session->bandwidth, dir, isLimited );
-}
+    assert( session );
+    assert( dir==TR_UP || dir==TR_DOWN );
 
-int
-tr_sessionIsSpeedLimitEnabled( const tr_session  * session,
-                               tr_direction        dir )
-{
-    return tr_bandwidthIsLimited( session->bandwidth, dir );
+    session->isSpeedLimited[dir] = isLimited;
+    updateBandwidth( session, dir );
 }
 
 void
@@ -461,14 +468,31 @@ tr_sessionSetSpeedLimit( tr_session    * session,
                          tr_direction    dir,
                          int             desiredSpeed )
 {
-    tr_bandwidthSetDesiredSpeed( session->bandwidth, dir, desiredSpeed );
+    assert( session );
+    assert( dir==TR_UP || dir==TR_DOWN );
+
+    session->speedLimit[dir] = desiredSpeed;
+    updateBandwidth( session, dir );
+}
+
+tr_bool
+tr_sessionIsSpeedLimitEnabled( const tr_session  * session,
+                               tr_direction        dir )
+{
+    assert( session );
+    assert( dir==TR_UP || dir==TR_DOWN );
+
+    return session->isSpeedLimited[dir];
 }
 
 int
 tr_sessionGetSpeedLimit( const tr_session  * session,
                          tr_direction        dir )
 {
-    return tr_bandwidthGetDesiredSpeed( session->bandwidth, dir );
+    assert( session );
+    assert( dir==TR_UP || dir==TR_DOWN );
+
+    return session->speedLimit[dir];
 }
 
 /***

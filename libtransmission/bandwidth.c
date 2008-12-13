@@ -273,7 +273,6 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     }
 
     /* notify the io buffers that there's more bandwidth available */
-    if( !b->band[dir].isLimited || ( b->band[dir].bytesLeft > 0 ) )
     {
         int i, n=0;
         short what = dir==TR_UP ? EV_WRITE : EV_READ;

@@ -86,7 +86,7 @@ tr_torrent* tr_torrentFindFromObfuscatedHash( tr_session    * session,
 
 int         tr_torrentAllowsPex( const tr_torrent * );
 
-int         tr_torrentIsPieceTransferAllowed( const tr_torrent * torrent,
+tr_bool     tr_torrentIsPieceTransferAllowed( const tr_torrent * torrent,
                                               tr_direction       direction );
 
 /* get the index of this piece's first block */

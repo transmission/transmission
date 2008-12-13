@@ -553,25 +553,26 @@ typedef enum
 }
 tr_direction;
 
-void       tr_sessionSetSpeedLimitEnabled( tr_session    * session,
-                                           tr_direction    direction,
-                                           int             isEnabled );
+void       tr_sessionSetSpeedLimitEnabled ( tr_session        * session,
+                                            tr_direction        direction,
+                                            tr_bool             isEnabled );
 
-double     tr_sessionGetRawSpeed( const tr_session  * session,
-                                  tr_direction        direection );
+tr_bool    tr_sessionIsSpeedLimitEnabled  ( const tr_session  * session,
+                                            tr_direction        direction );
 
-double     tr_sessionGetPieceSpeed( const tr_session  * session,
-                                    tr_direction        direection );
+void       tr_sessionSetSpeedLimit        ( tr_session        * session,
+                                            tr_direction        direction,
+                                            int                 KiB_sec );
 
-int        tr_sessionIsSpeedLimitEnabled( const tr_session  * session,
-                                          tr_direction       direction );
+int        tr_sessionGetSpeedLimit        ( const tr_session  * session,
+                                            tr_direction        direction );
 
-void       tr_sessionSetSpeedLimit( tr_session     * session,
-                                    tr_direction     direction,
-                                    int              KiB_sec );
+double     tr_sessionGetRawSpeed          ( const tr_session  * session,
+                                           tr_direction         direction );
 
-int        tr_sessionGetSpeedLimit( const tr_session  * session,
-                                    tr_direction        direction );
+double     tr_sessionGetPieceSpeed        ( const tr_session  * session,
+                                            tr_direction        direction );
+
 
 void       tr_sessionSetPeerLimit( tr_session  * session,
                                    uint16_t      maxGlobalPeers );
