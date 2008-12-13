@@ -65,6 +65,9 @@ struct tr_handle
     tr_bool                      isClosed;
     tr_bool                      useLazyBitfield;
 
+    tr_bool                      isSpeedLimited[2];
+    int                          speedLimit[2];
+
     tr_encryption_mode           encryptionMode;
 
     struct tr_event_handle *     events;
