@@ -64,12 +64,12 @@ typedef uint8_t tr_bool;
  *
  * The default configuration directory is determined this way:
  * 1. If the TRANSMISSION_HOME environmental variable is set, its value is used.
- * 2. On Darwin, "${HOME}/Library/Application Support/Transmission" is used.
- * 3. On Windows, "${CSIDL_APPDATA}/Transmission" is used.
- * 4. If XDG_CONFIG_HOME is set, "${XDG_CONFIG_HOME}/transmission" is used.
- * 5. ${HOME}/.config/transmission" is used as a last resort.
+ * 2. On Darwin, "${HOME}/Library/Application Support/${appname}" is used.
+ * 3. On Windows, "${CSIDL_APPDATA}/${appname}" is used.
+ * 4. If XDG_CONFIG_HOME is set, "${XDG_CONFIG_HOME}/${appname}" is used.
+ * 5. ${HOME}/.config/${appname}" is used as a last resort.
  */
-const char* tr_getDefaultConfigDir( void );
+const char* tr_getDefaultConfigDir( const char * appname );
 
 /**
  * @brief returns Transmisson's default download directory.
@@ -91,7 +91,7 @@ typedef tr_handle tr_session;
 /**
  * @addtogroup tr_session Session
  *
- * A libtransmission session is created by calling either tr_sessionInitFull()
+ * A libtransmission session is created by calling either tr_sessionInit()
  * or tr_sessionInit().  libtransmission creates a thread for itself so that
  * it can operate independently of the caller's event loop.  The session will
  * continue until tr_sessionClose() is called.
@@ -107,59 +107,6 @@ typedef enum
 }
 tr_proxy_type;
 
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_CONFIG_DIR               tr_getDefaultConfigDir( )
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_DOWNLOAD_DIR             tr_getDefaultDownloadDir( )
-/** @see tr_sessionInitFull */
-#ifdef TR_EMBEDDED
- #define TR_DEFAULT_ENCRYPTION              TR_CLEAR_PREFERRED
-#else
- #define TR_DEFAULT_ENCRYPTION              TR_ENCRYPTION_PREFERRED
-#endif
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PEX_ENABLED              1
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PORT_FORWARDING_ENABLED  0
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PORT                     51413
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PORT_STR                 "51413"
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_LAZY_BITFIELD_ENABLED    1
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_GLOBAL_PEER_LIMIT        200
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PEER_SOCKET_TOS          8
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PEER_SOCKET_TOS_STR      "8"
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_BLOCKLIST_ENABLED        0
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_RPC_ENABLED              0
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_RPC_PORT                 9091
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_RPC_PORT_STR             "9091"
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_RPC_WHITELIST            "127.0.0.1"
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_RPC_WHITELIST_ENABLED    0
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PROXY_ENABLED            0
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PROXY                    NULL
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PROXY_PORT               80
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PROXY_TYPE               TR_PROXY_HTTP
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PROXY_AUTH_ENABLED       0
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PROXY_USERNAME           NULL
-/** @see tr_sessionInitFull */
-#define TR_DEFAULT_PROXY_PASSWORD           NULL
-
 typedef enum
 {
     TR_CLEAR_PREFERRED,
@@ -168,143 +115,144 @@ typedef enum
 }
 tr_encryption_mode;
 
+#define TR_DEFAULT_RPC_WHITELIST "127.0.0.1"
+#define TR_DEFAULT_RPC_PORT_STR "9091"
+#define TR_DEFAULT_PEER_PORT_STR "51413"
+#define TR_DEFAULT_PEER_SOCKET_TOS_STR "8"
+
+#define TR_PREFS_KEY_BLOCKLIST_ENABLED          "blocklist-enabled"
+#define TR_PREFS_KEY_DOWNLOAD_DIR               "download-dir"
+#define TR_PREFS_KEY_DSPEED                     "download-limit"
+#define TR_PREFS_KEY_DSPEED_ENABLED             "download-limit-enabled"
+#define TR_PREFS_KEY_ENCRYPTION                 "encryption"
+#define TR_PREFS_KEY_LAZY_BITFIELD              "lazy-bitfield-enabled"
+#define TR_PREFS_KEY_MSGLEVEL                   "message-level"
+#define TR_PREFS_KEY_MSGQUEUE_ENABLED           "message-queue-enabled"
+#define TR_PREFS_KEY_PEER_LIMIT_GLOBAL          "peer-limit-global"
+#define TR_PREFS_KEY_PEER_LIMIT_TORRENT         "peer-limit-per-torrent"
+#define TR_PREFS_KEY_PEER_PORT                  "peer-port"
+#define TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED   "peer-port-random-enabled"
+#define TR_PREFS_KEY_PEER_PORT_RANDOM_LOW       "peer-port-random-low"
+#define TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH      "peer-port-random-high"
+#define TR_PREFS_KEY_PEER_SOCKET_TOS            "peer-socket-tos"
+#define TR_PREFS_KEY_PEX_ENABLED                "pex-enabled"
+#define TR_PREFS_KEY_PORT_FORWARDING            "port-forwarding-enabled"
+#define TR_PREFS_KEY_PROXY_AUTH_ENABLED         "proxy-auth-enabled"
+#define TR_PREFS_KEY_PROXY_ENABLED              "proxy-enabled"
+#define TR_PREFS_KEY_PROXY_PASSWORD             "proxy-auth-password"
+#define TR_PREFS_KEY_PROXY_PORT                 "proxy-port"
+#define TR_PREFS_KEY_PROXY                      "proxy"
+#define TR_PREFS_KEY_PROXY_TYPE                 "proxy-type"
+#define TR_PREFS_KEY_PROXY_USERNAME             "proxy-auth-username"
+#define TR_PREFS_KEY_RPC_AUTH_REQUIRED          "rpc-authentication-required"
+#define TR_PREFS_KEY_RPC_ENABLED                "rpc-enabled"
+#define TR_PREFS_KEY_RPC_PASSWORD               "rpc-password"
+#define TR_PREFS_KEY_RPC_PORT                   "rpc-port"
+#define TR_PREFS_KEY_RPC_USERNAME               "rpc-username"
+#define TR_PREFS_KEY_RPC_WHITELIST_ENABLED      "rpc-whitelist-enabled"
+#define TR_PREFS_KEY_RPC_WHITELIST              "rpc-whitelist"
+#define TR_PREFS_KEY_USPEED_ENABLED             "upload-limit-enabled"
+#define TR_PREFS_KEY_USPEED                     "upload-limit"
+
+struct tr_benc;
+
 /**
- * @brief Start a libtransmission session.
- * @return an opaque handle to the new session
+ * Add libtransmission's default settings to the benc dictionary.
  *
- * @param configDir
- *  The config directory where libtransmission config subdirectories
- *  will be found, such as "torrents", "resume", and "blocklists".
- *  #TR_DEFAULT_CONFIG_DIR can be used as a default.
+ * Example:
+ * @code
+ *     tr_benc settings;
+ *     int64_t i;
  *
- * @param downloadDir
- *  The default directory to save added torrents.
- *  This can be changed per-session with
- *  tr_sessionSetDownloadDir() and per-torrent with
- *  tr_ctorSetDownloadDir().
+ *     tr_bencInitDict( &settings, 0 );
+ *     tr_sessionGetDefaultSettings( &settings );
+ *     if( tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_PORT, &i ) )
+ *         fprintf( stderr, "the default peer port is %d\n", (int)i );
+ *     tr_bencFree( &settings );
+ * @endcode
  *
- * @param tag
- *  Obsolete.  Only used now for locating legacy fastresume files.
- *  This will be removed at some point in the future.
- *  Valid tags: beos cli daemon gtk macos wx
- *
- * @param isPexEnabled
- *  whether or not PEX is allowed for non-private torrents.
- *  This can be changed per-session with
- *  tr_sessionSetPexEnabled().
- *  #TR_DEFAULT_PEX_ENABLED is the default.
- *
- * @param isPortForwardingEnabled
- *  If true, libtransmission will attempt
- *  to find a local UPnP-enabled or NATPMP-enabled
- *  router and forward a port from there to the local
- *  machine.  This is so remote peers can initiate
- *  connections with us.
- *  #TR_DEFAULT_PORT_FORWARDING_ENABLED is the default.
- *
- * @param publicPort
- *  Port number to open for incoming peer connections.
- *  -1 for random port.
- *  #TR_DEFAULT_PORT is the default.
- *
- * @param encryptionMode
- *  Must be one of #TR_CLEAR_PREFERRED,
- *  #TR_ENCRYPTION_PREFERRED, or #TR_ENCRYPTION_REQUIRED.
- *
- * @param isUploadLimitEnabled
- *  If true, libtransmission will limit the entire
- *  session's upload speed from "uploadLimit".
- *
- * @param uploadLimit
- *  The speed limit to use for the entire session when
- *  "isUploadLimitEnabled" is true.  Units are KiB/s.
- *
- * @param isDownloadLimitEnabled
- *  If true, libtransmission will limit the entire
- *  session's download speed from "downloadLimit".
- *
- * @param downloadLimit
- *  The speed limit to use for the entire session when
- *  "isDownloadLimitEnabled" is true.  Units are KiB/s.
- *
- * @param peerLimit
- *  The maximum number of peer connections allowed in a session.
- *  #TR_DEFAULT_GLOBAL_PEER_LIMIT can be used as a default.
- *
- * @param messageLevel
- *  Verbosity level of libtransmission's logging mechanism.
- *  Must be one of #TR_MSG_ERR, #TR_MSG_INF, #TR_MSG_DBG.
- *
- * @param isMessageQueueingEnabled
- *  If true, then messages will build up in a queue until
- *  processed by the client application.
- *
- * @param isBlocklistEnabled
- *  If true, then Transmission will not allow peer connections
- *  to the IP addressess specified in the blocklist.
- *
- * @param peerSocketTOS
- *
- * @param rpcIsEnabled
- *  If true, then libtransmission will open an http server port
- *  to listen for incoming RPC requests.
- *
- * @param rpcPort
- *  The port on which to listen for incoming RPC requests
- *
- * @param rpcWhitelist
- *  The list of IP addresses allowed to make RPC connections.
- *  @see tr_sessionSetRPCWhitelist()
- *
- * @see TR_DEFAULT_PEER_SOCKET_TOS
- * @see TR_DEFAULT_BLOCKLIST_ENABLED
- * @see TR_DEFAULT_RPC_ENABLED
- * @see TR_DEFAULT_RPC_PORT
- * @see TR_DEFAULT_RPC_WHITELIST
- * @see TR_DEFAULT_RPC_WHITELIST_ENABLED
- * @see tr_sessionClose()
+ * @param initme pointer to a tr_benc dictionary
+ * @see tr_sessionLoadSettings()
+ * @see tr_sessionInit()
+ * @see tr_getDefaultConfigDir()
  */
-tr_session * tr_sessionInitFull( const char *       configDir,
-                                 const char *       tag,
-                                 const char *       downloadDir,
-                                 int                isPexEnabled,
-                                 int                isPortForwardingEnabled,
-                                 int                publicPort,
-                                 tr_encryption_mode encryptionMode,
-                                 int                useLazyBitfield,
-                                 int                useUploadLimit,
-                                 int                uploadLimit,
-                                 int                useDownloadLimit,
-                                 int                downloadLimit,
-                                 int                peerLimit,
-                                 int                messageLevel,
-                                 int                isMessageQueueingEnabled,
-                                 int                isBlocklistEnabled,
-                                 int                peerSocketTOS,
-                                 int                rpcIsEnabled,
-                                 tr_port            rpcPort,
-                                 int                rpcWhitelistIsEnabled,
-                                 const char *       rpcWhitelist,
-                                 int                rpcPasswordIsEnabled,
-                                 const char *       rpcUsername,
-                                 const char *       rpcPassword,
-                                 int                proxyIsEnabled,
-                                 const char *       proxy,
-                                 int                proxyPort,
-                                 tr_proxy_type      proxyType,
-                                 int                proxyAuthIsEnabled,
-                                 const char *       proxyUsername,
-                                 const char *       proxyPassword );
+void tr_sessionGetDefaultSettings( struct tr_benc * dictionary );
 
+/**
+ * Add the session's configuration settings to the benc dictionary.
+ *
+ * FIXME: this probably belongs in libtransmissionapp
+ *
+ * @param session
+ * @param dictionary
+ * @see tr_sessionGetDefaultSettings()
+ */
+void tr_sessionGetSettings( tr_session *, struct tr_benc * dictionary );
 
-/** @brief Shorter form of tr_sessionInitFull()
-    @deprecated Use tr_sessionInitFull() instead. */
-tr_session *  tr_sessionInit( const char * configDir,
-                              const char * tag );
+/**
+ * Load settings from the configuration directory's settings.json file,
+ * using libtransmission's default settings as fallbacks for missing keys.
+ *
+ * FIXME: this belongs in libtransmissionapp
+ *
+ * @param configDir the configuration directory to find settings.json
+ * @param initme pointer to an uninitialized tr_benc
+ * @param appName examples: Transmission, transmission-daemon
+ * @see tr_sessionGetDefaultSettings()
+ * @see tr_sessionInit()
+ * @see tr_sessionSaveSettings()
+ */
+void tr_sessionLoadSettings( struct tr_benc  * dictionary,
+                             const char      * configDir,
+                             const char      * appName );
+
+/**
+ * Add the session's configuration settings to the benc dictionary
+ * and save it to the configuration directory's settings.json file.
+ *
+ * FIXME: this belongs in libtransmissionapp
+ *
+ * @param session
+ * @param dictionary
+ * @see tr_sessionLoadSettings()
+ */
+void tr_sessionSaveSettings( tr_session     * session,
+                             const char     * configDir,
+                             struct tr_benc * dictonary );
+
+/**
+ * Initialize a libtransmission session.
+ *
+ * For example, this will instantiate a session with all the default values:
+ * @code
+ *     tr_benc settings;
+ *     tr_session * session;
+ *     const char * configDir;
+ *
+ *     tr_bencInitDict( &settings, 0 );
+ *     tr_sessionGetDefaultSettings( &settings );
+ *     configDir = tr_getDefaultConfigDir( "Transmission" );
+ *     session = tr_sessionInit( "mac", configDir, true, &settings );
+ *
+ *     tr_bencFree( &settings );
+ * @encode
+ *
+ * @param tag "gtk", "mac", "daemon", etc... this is only for pre-1.30 resume files
+ * @param configDir where Transmission will look for resume files, blocklists, etc.
+ * @param messageQueueingEnabled if false, messages will be dumped to stderr
+ * @param settings libtransmission settings
+ * @see tr_sessionGetDefaultSettings()
+ * @see tr_sessionLoadSettings()
+ * @see tr_getDefaultConfigDir()
+ */
+tr_session * tr_sessionInit( const char     * tag,
+                             const char     * configDir,
+                             tr_bool          messageQueueingEnabled,
+                             struct tr_benc * settings );
 
 /** @brief End a libtransmission session
-    @see tr_sessionInitFull() */
-void         tr_sessionClose( tr_session * );
+    @see tr_sessionInit() */
+void tr_sessionClose( tr_session * );
 
 /**
  * @brief Return the session's configuration directory
@@ -316,7 +264,7 @@ const char * tr_sessionGetConfigDir( const tr_session * );
 
 /**
  * @brief Set the per-session default download folder for new torrents.
- * @see tr_sessionInitFull()
+ * @see tr_sessionInit()
  * @see tr_sessionGetDownloadDir()
  * @see tr_ctorSetDownloadDir()
  */
@@ -326,7 +274,7 @@ void tr_sessionSetDownloadDir( tr_session  * session,
 /**
  * @brief Get the default download folder for new torrents.
  *
- * This is set by tr_sessionInitFull() or tr_sessionSetDownloadDir(),
+ * This is set by tr_sessionInit() or tr_sessionSetDownloadDir(),
  * and can be overridden on a per-torrent basis by tr_ctorSetDownloadDir().
  */
 const char * tr_sessionGetDownloadDir( const tr_session * session );
@@ -337,25 +285,25 @@ const char * tr_sessionGetDownloadDir( const tr_session * session );
  * @details If true, libtransmission will open a server socket to listen
  * for incoming http RPC requests as described in docs/rpc-spec.txt.
  *
- * This is intially set by tr_sessionInitFull() and can be
+ * This is intially set by tr_sessionInit() and can be
  * queried by tr_sessionIsRPCEnabled().
  */
 void tr_sessionSetRPCEnabled( tr_session  * session,
                               int           isEnabled );
 
 /** @brief Get whether or not RPC calls are allowed in this session.
-    @see tr_sessionInitFull()
+    @see tr_sessionInit()
     @see tr_sessionSetRPCEnabled() */
 int  tr_sessionIsRPCEnabled( const tr_session * session );
 
 /** @brief Specify which port to listen for RPC requests on.
-    @see tr_sessionInitFull()
+    @see tr_sessionInit()
     @see tr_sessionGetRPCPort */
 void tr_sessionSetRPCPort( tr_session  * session,
                            tr_port       port );
 
 /** @brief Get which port to listen for RPC requests on.
-    @see tr_sessionInitFull()
+    @see tr_sessionInit()
     @see tr_sessionSetRPCPort */
 tr_port tr_sessionGetRPCPort( const tr_session * session );
 
@@ -372,14 +320,14 @@ void   tr_sessionSetRPCWhitelist( tr_session * session,
 
 /** @brief get the Access Control List for allowing/denying RPC requests.
     @return a comma-separated string of whitelist domains.  tr_free() when done.
-    @see tr_sessionInitFull
+    @see tr_sessionInit
     @see tr_sessionSetRPCWhitelist */
 char* tr_sessionGetRPCWhitelist( const tr_session * );
 
 void  tr_sessionSetRPCWhitelistEnabled( tr_session * session,
                                         int          isEnabled );
 
-int   tr_sessionGetRPCWhitelistEnabled( const tr_session * session );
+tr_bool tr_sessionGetRPCWhitelistEnabled( const tr_session * session );
 
 void  tr_sessionSetRPCPassword( tr_session * session,
                                 const char * password );
@@ -389,7 +337,7 @@ void  tr_sessionSetRPCUsername( tr_session * session,
 
 /** @brief get the password used to restrict RPC requests.
     @return the password string. tr_free() when done.
-    @see tr_sessionInitFull()
+    @see tr_sessionInit()
     @see tr_sessionSetRPCPassword() */
 char* tr_sessionGetRPCPassword( const tr_session * session );
 
@@ -398,7 +346,7 @@ char* tr_sessionGetRPCUsername( const tr_session * session  );
 void  tr_sessionSetRPCPasswordEnabled( tr_session * session,
                                        int          isEnabled );
 
-int   tr_sessionIsRPCPasswordEnabled( const tr_session * session );
+tr_bool tr_sessionIsRPCPasswordEnabled( const tr_session * session );
 
 
 typedef enum
@@ -447,13 +395,13 @@ void tr_sessionSetRPCCallback( tr_session   * session,
 ***
 **/
 
-int           tr_sessionIsProxyEnabled( const tr_session * );
+tr_bool       tr_sessionIsProxyEnabled( const tr_session * );
 
-int           tr_sessionIsProxyAuthEnabled( const tr_session * );
+tr_bool       tr_sessionIsProxyAuthEnabled( const tr_session * );
 
 const char*   tr_sessionGetProxy( const tr_session * );
 
-int           tr_sessionGetProxyPort( const tr_session * );
+tr_port       tr_sessionGetProxyPort( const tr_session * );
 
 tr_proxy_type tr_sessionGetProxyType( const tr_session * );
 
@@ -649,9 +597,9 @@ typedef struct tr_msg_list
 }
 tr_msg_list;
 
-void          tr_setMessageQueuing( int isEnabled );
+void          tr_setMessageQueuing( tr_bool isEnabled );
 
-int           tr_getMessageQueuing( void );
+tr_bool       tr_getMessageQueuing( void );
 
 tr_msg_list * tr_getQueuedMessages( void );
 
@@ -756,7 +704,7 @@ void        tr_ctorSetPeerLimit( tr_ctor *   ctor,
 
 /** Set the download folder for the torrent being added with this ctor.
     @see tr_ctorSetDownloadDir()
-    @see tr_sessionInitFull() */
+    @see tr_sessionInit() */
 void        tr_ctorSetDownloadDir( tr_ctor *    ctor,
                                    tr_ctorMode  mode,
                                    const char * directory );

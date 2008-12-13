@@ -696,9 +696,7 @@ tr_rpcInit( tr_handle *  session,
     s = tr_new0( tr_rpc_server, 1 );
     s->session = session;
     s->port = port;
-    s->whitelist = tr_strdup( whitelist && *whitelist
-                              ? whitelist
-                              : TR_DEFAULT_RPC_WHITELIST );
+    s->whitelist = tr_strdup( whitelist && *whitelist ? whitelist : "127.0.0.1" );
     s->username = tr_strdup( username );
     s->password = tr_strdup( password );
     s->isWhitelistEnabled = isWhitelistEnabled != 0;

@@ -408,9 +408,12 @@ tr_getResumeDir( const tr_handle * handle )
 }
 
 const char*
-tr_getDefaultConfigDir( void )
+tr_getDefaultConfigDir( const char * appname )
 {
     static char * s = NULL;
+
+    if( !appname || !*appname )
+        appname = "Transmission";
 
     if( !s )
     {
@@ -421,17 +424,17 @@ tr_getDefaultConfigDir( void )
         else
         {
 #ifdef SYS_DARWIN
-            s = tr_buildPath( getHomeDir( ), "Library",
-                              "Application Support", "Transmission", NULL );
+            s = tr_buildPath( getHomeDir( ), "Library", "Application Support",
+                              appname, NULL );
 #elif defined( WIN32 )
             char appdata[MAX_PATH]; /* SHGetFolderPath() requires MAX_PATH */
             SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
-            s = tr_buildPath( appdata, "Transmission", NULL );
+            s = tr_buildPath( appdata, appname, NULL );
 #else
             if( ( s = getenv( "XDG_CONFIG_HOME" ) ) )
-                s = tr_buildPath( s, "transmission", NULL );
+                s = tr_buildPath( s, appname, NULL );
             else
-                s = tr_buildPath( getHomeDir( ), ".config", "transmission", NULL );
+                s = tr_buildPath( getHomeDir( ), ".config", appname, NULL );
 #endif
         }
     }

@@ -68,7 +68,7 @@ level_combo_changed_cb( GtkWidget * w,
         gtk_tree_model_get( m, &iter, 1, &level, -1 );
 
         tr_setMessageLevel( level );
-        tr_core_set_pref_int( data->core, PREF_KEY_MSGLEVEL, level );
+        tr_core_set_pref_int( data->core, TR_PREFS_KEY_MSGLEVEL, level );
         data->maxLevel = level;
         gtk_tree_model_filter_refilter( GTK_TREE_MODEL_FILTER( data->filter ) );
     }
@@ -405,7 +405,7 @@ debug_level_combo_new( void )
 
     store = gtk_list_store_new ( 2, G_TYPE_STRING, G_TYPE_INT );
 
-    curlevel = pref_int_get( PREF_KEY_MSGLEVEL );
+    curlevel = pref_int_get( TR_PREFS_KEY_MSGLEVEL );
     for( i = ii = 0; i < G_N_ELEMENTS( trLevels ); ++i )
     {
         GtkTreeIter iter;
@@ -519,7 +519,7 @@ msgwin_new( TrCore * core )
     gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( data->sort ),
                                           COL_SEQUENCE,
                                           GTK_SORT_ASCENDING );
-    data->maxLevel = pref_int_get( PREF_KEY_MSGLEVEL );
+    data->maxLevel = pref_int_get( TR_PREFS_KEY_MSGLEVEL );
     gtk_tree_model_filter_set_visible_func( GTK_TREE_MODEL_FILTER( data->
                                                                    filter ),
                                             isRowVisible, data, NULL );

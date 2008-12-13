@@ -68,6 +68,8 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/version.h>
 
+#define MY_NAME "transmission"
+
 /* interval in milliseconds to update the torrent list display */
 #define UPDATE_INTERVAL         1666
 
@@ -352,7 +354,7 @@ main( int     argc,
     gboolean            showversion = FALSE;
     gboolean            startpaused = FALSE;
     gboolean            startminimized = FALSE;
-    char *              domain = "transmission";
+    char *              domain = MY_NAME;
     char *              configDir = NULL;
     tr_lockfile_state_t tr_state;
 
@@ -402,18 +404,17 @@ main( int     argc,
     }
 
     if( configDir == NULL )
-        configDir = (char*) tr_getDefaultConfigDir( );
+        configDir = (char*) tr_getDefaultConfigDir( MY_NAME );
 
     tr_notify_init( );
-
     didinit = cf_init( configDir, NULL ); /* must come before actions_init */
     tr_prefs_init_global( );
+
     myUIManager = gtk_ui_manager_new ( );
     actions_init ( myUIManager, cbdata );
-    gtk_ui_manager_add_ui_from_string ( myUIManager, fallback_ui_file, -1,
-                                        NULL );
+    gtk_ui_manager_add_ui_from_string ( myUIManager, fallback_ui_file, -1, NULL );
     gtk_ui_manager_ensure_update ( myUIManager );
-    gtk_window_set_default_icon_name ( "transmission" );
+    gtk_window_set_default_icon_name ( MY_NAME );
 
     setupsighandlers( ); /* set up handlers for fatal signals */
 
@@ -440,49 +441,18 @@ main( int     argc,
     if( didlock && ( didinit || cf_init( configDir, &err ) ) )
     {
         GtkWindow * win;
+        tr_session * session;
 
-        tr_session * h = tr_sessionInitFull(
-            configDir,
-            "gtk",
-            pref_string_get( PREF_KEY_DOWNLOAD_DIR ),
-            pref_flag_get( PREF_KEY_PEX ),
-            pref_flag_get( PREF_KEY_PORT_FORWARDING ),
-            pref_int_get( PREF_KEY_PORT ),
-            pref_int_get( PREF_KEY_ENCRYPTION ),
-            pref_flag_get( PREF_KEY_LAZY_BITFIELD ),
-            pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ),
-            pref_int_get( PREF_KEY_UL_LIMIT ),
-            pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ),
-            pref_int_get( PREF_KEY_DL_LIMIT ),
-            pref_int_get( PREF_KEY_MAX_PEERS_GLOBAL ),
-            pref_int_get( PREF_KEY_MSGLEVEL ),
-            TRUE,                 /* message queueing */
-            pref_flag_get( PREF_KEY_BLOCKLIST_ENABLED ),
-            pref_int_get( PREF_KEY_PEER_SOCKET_TOS ),
-            pref_flag_get( PREF_KEY_RPC_ENABLED ),
-            pref_int_get( PREF_KEY_RPC_PORT ),
-            pref_flag_get( PREF_KEY_RPC_WHITELIST_ENABLED ),
-            pref_string_get( PREF_KEY_RPC_WHITELIST ),
-            pref_flag_get( PREF_KEY_RPC_AUTH_ENABLED ),
-            pref_string_get( PREF_KEY_RPC_USERNAME ),
-            pref_string_get( PREF_KEY_RPC_PASSWORD ),
-            pref_flag_get( PREF_KEY_PROXY_SERVER_ENABLED ),
-            pref_string_get( PREF_KEY_PROXY_SERVER ),
-            pref_int_get( PREF_KEY_PROXY_PORT ),
-            pref_int_get( PREF_KEY_PROXY_TYPE ),
-            pref_flag_get( PREF_KEY_PROXY_AUTH_ENABLED ),
-            pref_string_get( PREF_KEY_PROXY_USERNAME ),
-            pref_string_get( PREF_KEY_PROXY_PASSWORD ) );
-
-        cbdata->core = tr_core_new( h );
+        /* initialize the libtransmission session */
+        session = tr_sessionInit( "gtk", configDir, TRUE, pref_get_all( ) );
+        cbdata->core = tr_core_new( session );
 
         /* create main window now to be a parent to any error dialogs */
         win = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
-        g_signal_connect( win, "size-allocate",
-                          G_CALLBACK( onMainWindowSizeAllocated ), cbdata );
+        g_signal_connect( win, "size-allocate", G_CALLBACK( onMainWindowSizeAllocated ), cbdata );
 
         appsetup( win, argfiles, cbdata, startpaused, startminimized );
-        tr_sessionSetRPCCallback( h, onRPCChanged, cbdata );
+        tr_sessionSetRPCCallback( session, onRPCChanged, cbdata );
         gtr_blocklist_maybe_autoupdate( cbdata->core );
 
         gtk_main( );
@@ -555,13 +525,13 @@ updateScheduledLimits( gpointer data )
 
             tr_inf ( _( "Ending use of scheduled bandwidth limits" ) );
 
-            b = pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED );
+            b = pref_flag_get( TR_PREFS_KEY_DSPEED_ENABLED );
             tr_sessionSetSpeedLimitEnabled( tr, TR_DOWN, b );
-            limit = pref_int_get( PREF_KEY_DL_LIMIT );
+            limit = pref_int_get( TR_PREFS_KEY_DSPEED );
             tr_sessionSetSpeedLimit( tr, TR_DOWN, limit );
-            b = pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED );
+            b = pref_flag_get( TR_PREFS_KEY_USPEED_ENABLED );
             tr_sessionSetSpeedLimitEnabled( tr, TR_UP, b );
-            limit = pref_int_get( PREF_KEY_UL_LIMIT );
+            limit = pref_int_get( TR_PREFS_KEY_USPEED );
             tr_sessionSetSpeedLimit( tr, TR_UP, limit );
         }
 
@@ -1058,13 +1028,13 @@ prefschanged( TrCore * core UNUSED,
     struct cbdata  * cbdata = data;
     tr_session     * tr     = tr_core_session( cbdata->core );
 
-    if( !strcmp( key, PREF_KEY_ENCRYPTION ) )
+    if( !strcmp( key, TR_PREFS_KEY_ENCRYPTION ) )
     {
         const int encryption = pref_int_get( key );
         g_message( "setting encryption to %d", encryption );
         tr_sessionSetEncryption( tr, encryption );
     }
-    else if( !strcmp( key, PREF_KEY_PORT ) )
+    else if( !strcmp( key, TR_PREFS_KEY_PEER_PORT ) )
     {
         const int port = pref_int_get( key );
         tr_sessionSetPeerPort( tr, port );
@@ -1080,22 +1050,22 @@ prefschanged( TrCore * core UNUSED,
             cbdata->icon = NULL;
         }
     }
-    else if( !strcmp( key, PREF_KEY_DL_LIMIT_ENABLED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_DSPEED_ENABLED ) )
     {
         const gboolean b = pref_flag_get( key );
         tr_sessionSetSpeedLimitEnabled( tr, TR_DOWN, b );
     }
-    else if( !strcmp( key, PREF_KEY_DL_LIMIT ) )
+    else if( !strcmp( key, TR_PREFS_KEY_DSPEED ) )
     {
         const int limit = pref_int_get( key );
         tr_sessionSetSpeedLimit( tr, TR_DOWN, limit );
     }
-    else if( !strcmp( key, PREF_KEY_UL_LIMIT_ENABLED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_USPEED_ENABLED ) )
     {
         const gboolean b = pref_flag_get( key );
         tr_sessionSetSpeedLimitEnabled( tr, TR_UP, b );
     }
-    else if( !strcmp( key, PREF_KEY_UL_LIMIT ) )
+    else if( !strcmp( key, TR_PREFS_KEY_USPEED ) )
     {
         const int limit = pref_int_get( key );
         tr_sessionSetSpeedLimit( tr, TR_UP, limit );
@@ -1104,78 +1074,78 @@ prefschanged( TrCore * core UNUSED,
     {
         updateScheduledLimits( tr );
     }
-    else if( !strcmp( key, PREF_KEY_PORT_FORWARDING ) )
+    else if( !strcmp( key, TR_PREFS_KEY_PORT_FORWARDING ) )
     {
         const gboolean enabled = pref_flag_get( key );
         tr_sessionSetPortForwardingEnabled( tr, enabled );
     }
-    else if( !strcmp( key, PREF_KEY_PEX ) )
+    else if( !strcmp( key, TR_PREFS_KEY_PEX_ENABLED ) )
     {
         const gboolean b = pref_flag_get( key );
         tr_sessionSetPortForwardingEnabled( tr, b );
     }
-    else if( !strcmp( key, PREF_KEY_RPC_ENABLED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_RPC_ENABLED ) )
     {
         tr_sessionSetRPCEnabled( tr, pref_flag_get( key ) );
     }
-    else if( !strcmp( key, PREF_KEY_RPC_PORT ) )
+    else if( !strcmp( key, TR_PREFS_KEY_RPC_PORT ) )
     {
         tr_sessionSetRPCPort( tr, pref_int_get( key ) );
     }
-    else if( !strcmp( key, PREF_KEY_RPC_ENABLED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_RPC_ENABLED ) )
     {
         tr_sessionSetRPCEnabled( tr, pref_flag_get( key ) );
     }
-    else if( !strcmp( key, PREF_KEY_RPC_WHITELIST ) )
+    else if( !strcmp( key, TR_PREFS_KEY_RPC_WHITELIST ) )
     {
         const char * s = pref_string_get( key );
         tr_sessionSetRPCWhitelist( tr, s );
     }
-    else if( !strcmp( key, PREF_KEY_RPC_WHITELIST_ENABLED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_RPC_WHITELIST_ENABLED ) )
     {
         tr_sessionSetRPCWhitelistEnabled( tr, pref_flag_get( key ) );
     }
-    else if( !strcmp( key, PREF_KEY_RPC_USERNAME ) )
+    else if( !strcmp( key, TR_PREFS_KEY_RPC_USERNAME ) )
     {
         const char * s = pref_string_get( key );
         tr_sessionSetRPCUsername( tr, s );
     }
-    else if( !strcmp( key, PREF_KEY_RPC_PASSWORD ) )
+    else if( !strcmp( key, TR_PREFS_KEY_RPC_PASSWORD ) )
     {
         const char * s = pref_string_get( key );
         tr_sessionSetRPCPassword( tr, s );
     }
-    else if( !strcmp( key, PREF_KEY_RPC_AUTH_ENABLED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_RPC_AUTH_REQUIRED ) )
     {
         const gboolean enabled = pref_flag_get( key );
         tr_sessionSetRPCPasswordEnabled( tr, enabled );
     }
-    else if( !strcmp( key, PREF_KEY_PROXY_SERVER ) )
+    else if( !strcmp( key, TR_PREFS_KEY_PROXY ) )
     {
         const char * s = pref_string_get( key );
         tr_sessionSetProxy( tr, s );
     }
-    else if( !strcmp( key, PREF_KEY_PROXY_TYPE ) )
+    else if( !strcmp( key, TR_PREFS_KEY_PROXY_TYPE ) )
     {
         const int i = pref_int_get( key );
         tr_sessionSetProxyType( tr, i );
     }
-    else if( !strcmp( key, PREF_KEY_PROXY_SERVER_ENABLED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_PROXY_ENABLED ) )
     {
         const gboolean enabled = pref_flag_get( key );
         tr_sessionSetProxyEnabled( tr, enabled );
     }
-    else if( !strcmp( key, PREF_KEY_PROXY_AUTH_ENABLED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_PROXY_AUTH_ENABLED ) )
     {
         const gboolean enabled = pref_flag_get( key );
         tr_sessionSetProxyAuthEnabled( tr, enabled );
     }
-    else if( !strcmp( key, PREF_KEY_PROXY_USERNAME ) )
+    else if( !strcmp( key, TR_PREFS_KEY_PROXY_USERNAME ) )
     {
         const char * s = pref_string_get( key );
         tr_sessionSetProxyUsername( tr, s );
     }
-    else if( !strcmp( key, PREF_KEY_PROXY_PASSWORD ) )
+    else if( !strcmp( key, TR_PREFS_KEY_RPC_PASSWORD ) )
     {
         const char * s = pref_string_get( key );
         tr_sessionSetProxyPassword( tr, s );
@@ -1237,9 +1207,8 @@ about( GtkWindow * parent )
                            "website", website_url,
                            "website-label", website_url,
                            "copyright",
-                           _(
-                               "Copyright 2005-2008 The Transmission Project" ),
-                           "logo-icon-name", "transmission",
+                           _( "Copyright 2005-2008 The Transmission Project" ),
+                           "logo-icon-name", MY_NAME,
 #ifdef SHOW_LICENSE
                            "license", LICENSE,
                            "wrap-license", TRUE,

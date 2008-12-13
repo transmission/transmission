@@ -420,8 +420,9 @@ tr_bencGetInt( const tr_benc * val,
 {
     const int success = tr_bencIsInt( val );
 
-    if( success )
+    if( success && setme )
         *setme = val->val.i;
+
     return success;
 }
 
@@ -444,6 +445,7 @@ tr_bencDictFindInt( tr_benc * dict, const char * key, int64_t * setme )
 
     if( child )
         found = tr_bencGetInt( child, setme );
+
     return found;
 }
 
@@ -453,7 +455,7 @@ tr_bencDictFindDouble( tr_benc * dict, const char * key, double * setme )
     const char * str;
     const tr_bool success = tr_bencDictFindStr( dict, key, &str );
 
-    if( success )
+    if( success && setme )
         *setme = strtod( str, NULL );
 
     return success;
@@ -467,7 +469,8 @@ tr_bencDictFindList( tr_benc * dict, const char * key, tr_benc ** setme )
 
     if( child )
     {
-        *setme = child;
+        if( setme != NULL )
+            *setme = child;
         found = TRUE;
     }
 
@@ -482,7 +485,8 @@ tr_bencDictFindDict( tr_benc * dict, const char * key, tr_benc ** setme )
 
     if( child )
     {
-        *setme = child;
+        if( setme != NULL )
+            *setme = child;
         found = TRUE;
     }
 
@@ -497,7 +501,8 @@ tr_bencDictFindStr( tr_benc *  dict, const char *  key, const char ** setme )
 
     if( child )
     {
-        *setme = child->val.s.s;
+        if( setme )
+            *setme = child->val.s.s;
         found = TRUE;
     }
 
@@ -678,20 +683,48 @@ tr_bencDictAddInt( tr_benc *    dict,
                    const char * key,
                    int64_t      val )
 {
-    tr_benc * child = tr_bencDictAdd( dict, key );
+    tr_benc * child;
 
+    /* see if it already exists, and if so, try to reuse it */
+    if(( child = tr_bencDictFind( dict, key ))) {
+        if( !tr_bencIsInt( child ) ) {
+            tr_bencDictRemove( dict, key );
+            child = NULL;
+        }
+    }
+
+    /* if it doesn't exist, create it */
+    if( child == NULL )
+        child = tr_bencDictAdd( dict, key );
+
+    /* set it */
     tr_bencInitInt( child, val );
+
     return child;
 }
 
 tr_benc*
-tr_bencDictAddStr( tr_benc *    dict,
-                   const char * key,
-                   const char * val )
+tr_bencDictAddStr( tr_benc * dict, const char * key, const char * val )
 {
-    tr_benc * child = tr_bencDictAdd( dict, key );
+    tr_benc * child;
 
+    /* see if it already exists, and if so, try to reuse it */
+    if(( child = tr_bencDictFind( dict, key ))) {
+        if( tr_bencIsString( child ) )
+            tr_free( child->val.s.s );
+        else {
+            tr_bencDictRemove( dict, key );
+            child = NULL;
+        }
+    }
+
+    /* if it doesn't exist, create it */
+    if( child == NULL )
+        child = tr_bencDictAdd( dict, key );
+
+    /* set it */
     tr_bencInitStr( child, val, -1 );
+
     return child;
 }
 

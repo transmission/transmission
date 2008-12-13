@@ -18,8 +18,6 @@
 #include "torrent.h" /* tr_ctorGetSave() */
 #include "utils.h"
 
-#define DEFAULT_MAX_CONNECTED_PEERS 50
-
 struct optional_args
 {
     tr_bool         isSet_paused;
@@ -35,7 +33,7 @@ struct optional_args
  * @ingroup tr_ctor */
 struct tr_ctor
 {
-    const tr_handle *       handle;
+    const tr_session *      session;
     tr_bool                 saveInOurTorrentsDir;
     tr_bool                 doDelete;
 
@@ -139,7 +137,7 @@ tr_ctorSetMetainfoFromHash( tr_ctor *    ctor,
     int          err;
     const char * filename;
 
-    filename = tr_sessionFindTorrentFile( ctor->handle, hashString );
+    filename = tr_sessionFindTorrentFile( ctor->session, hashString );
     if( !filename )
         err = EINVAL;
     else
@@ -298,14 +296,14 @@ tr_ctorGetMetainfo( const tr_ctor *  ctor,
 ***/
 
 tr_ctor*
-tr_ctorNew( const tr_handle * handle )
+tr_ctorNew( const tr_session * session )
 {
     tr_ctor * ctor = tr_new0( struct tr_ctor, 1 );
 
-    ctor->handle = handle;
-    tr_ctorSetPeerLimit( ctor, TR_FALLBACK, DEFAULT_MAX_CONNECTED_PEERS );
+    ctor->session = session;
+    tr_ctorSetPeerLimit( ctor, TR_FALLBACK, session->peerLimitPerTorrent );
     tr_ctorSetPaused( ctor, TR_FALLBACK, FALSE );
-    tr_ctorSetDownloadDir( ctor, TR_FALLBACK, handle->downloadDir );
+    tr_ctorSetDownloadDir( ctor, TR_FALLBACK, session->downloadDir );
     tr_ctorSetSave( ctor, TRUE );
     return ctor;
 }

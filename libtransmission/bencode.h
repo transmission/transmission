@@ -182,6 +182,6 @@ int tr_bencParseStr( const uint8_t *  buf,
 ***
 **/
 
-void  tr_bencMergeDicts( tr_benc * b1, const tr_benc * b2 ); 
+void  tr_bencMergeDicts( tr_benc * target, const tr_benc * source );
 
 #endif

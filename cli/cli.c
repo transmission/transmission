@@ -38,23 +38,14 @@
 #define LINEWIDTH 80
 #define MY_NAME "transmission-cli"
 
-static int          showInfo         = 0;
-static int          showScrape       = 0;
-static int          isPrivate        = 0;
-static int          verboseLevel     = 0;
-static int          encryptionMode   = TR_DEFAULT_ENCRYPTION;
-static int          peerPort         = TR_DEFAULT_PORT;
-static int          peerSocketTOS    = TR_DEFAULT_PEER_SOCKET_TOS;
-static int          blocklistEnabled = TR_DEFAULT_BLOCKLIST_ENABLED;
-static int          uploadLimit      = 20;
-static int          downloadLimit    = -1;
-static int          natTraversal     = TR_DEFAULT_PORT_FORWARDING_ENABLED;
-static int          verify           = 0;
+static tr_bool showInfo         = 0;
+static tr_bool showScrape       = 0;
+static tr_bool isPrivate        = 0;
+static tr_bool verify           = 0;
 static sig_atomic_t gotsig           = 0;
 static sig_atomic_t manualUpdate     = 0;
 
 static const char * torrentPath  = NULL;
-static const char * downloadDir  = NULL;
 static const char * finishCall   = NULL;
 static const char * announce     = NULL;
 static const char * configdir    = NULL;
@@ -63,57 +54,30 @@ static const char * comment      = NULL;
 
 static const struct tr_option options[] =
 {
-    { 'a', "announce",             "Set the new torrent's announce URL",
-      "a",  1, "<url>"     },
-    { 'b', "blocklist",            "Enable peer blocklists",
-      "b",  0, NULL        },
-    { 'B', "no-blocklist",         "Disable peer blocklists",
-      "B",  0, NULL        },
-    { 'c', "comment",              "Set the new torrent's comment",
-      "c",  1, "<comment>" },
-    { 'd', "downlimit",            "Set max download speed in KB/s",
-      "d",  1, "<speed>"   },
-    { 'D', "no-downlimit",         "Don't limit the download speed",
-      "D",  0, NULL        },
-    { 910, "encryption-required",  "Encrypt all peer connections",
-      "er", 0, NULL        },
-    { 911, "encryption-preferred", "Prefer encrypted peer connections",
-      "ep", 0, NULL        },
-    { 912, "encryption-tolerated", "Prefer unencrypted peer connections",
-      "et", 0, NULL        },
-    { 'f', "finish",               "Run a script when the torrent finishes",
-      "f", 1, "<script>" },
-    { 'g', "config-dir",           "Where to find configuration files",
-      "g", 1, "<path>" },
-    { 'i', "info",                 "Show torrent details and exit",
-      "i",  0, NULL        },
-    { 'm', "portmap",              "Enable portmapping via NAT-PMP or UPnP",
-      "m",  0, NULL        },
-    { 'M', "no-portmap",           "Disable portmapping",
-      "M",  0, NULL        },
-    { 'n', "new",                  "Create a new torrent",
-      "n", 1, "<source>" },
-    { 'p', "port",
-      "Port for incoming peers (Default: " TR_DEFAULT_PORT_STR ")",
-      "p", 1, "<port>" },
-    { 'r', "private",              "Set the new torrent's 'private' flag",
-      "r",  0, NULL        },
-    { 's', "scrape",               "Scrape the torrent and exit",
-      "s",  0, NULL        },
-    { 't', "tos",
-      "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR
-      ")",
-      "t", 1, "<tos>" },
-    { 'u', "uplimit",              "Set max upload speed in KB/s",
-      "u",  1, "<speed>"   },
-    { 'U', "no-uplimit",           "Don't limit the upload speed",
-      "U",  0, NULL        },
-    { 'v', "verify",               "Verify the specified torrent",
-      "v",  0, NULL        },
-    { 'w', "download-dir",         "Where to save downloaded data",
-      "w",  1, "<path>"    },
-    {   0, NULL,                   NULL,
-        NULL, 0, NULL        }
+    { 'a', "announce",             "Set the new torrent's announce URL", "a",  1, "<url>"     },
+    { 'b', "blocklist",            "Enable peer blocklists", "b",  0, NULL        },
+    { 'B', "no-blocklist",         "Disable peer blocklists", "B",  0, NULL        },
+    { 'c', "comment",              "Set the new torrent's comment", "c",  1, "<comment>" },
+    { 'd', "downlimit",            "Set max download speed in KB/s", "d",  1, "<speed>"   },
+    { 'D', "no-downlimit",         "Don't limit the download speed", "D",  0, NULL        },
+    { 910, "encryption-required",  "Encrypt all peer connections", "er", 0, NULL        },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL        },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL        },
+    { 'f', "finish",               "Run a script when the torrent finishes", "f", 1, "<script>" },
+    { 'g', "config-dir",           "Where to find configuration files", "g", 1, "<path>" },
+    { 'i', "info",                 "Show torrent details and exit", "i",  0, NULL        },
+    { 'm', "portmap",              "Enable portmapping via NAT-PMP or UPnP", "m",  0, NULL        },
+    { 'M', "no-portmap",           "Disable portmapping", "M",  0, NULL        },
+    { 'n', "new",                  "Create a new torrent", "n", 1, "<source>" },
+    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
+    { 'r', "private",              "Set the new torrent's 'private' flag", "r",  0, NULL        },
+    { 's', "scrape",               "Scrape the torrent and exit", "s",  0, NULL        },
+    { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", 1, "<tos>" },
+    { 'u', "uplimit",              "Set max upload speed in KB/s", "u",  1, "<speed>"   },
+    { 'U', "no-uplimit",           "Don't limit the upload speed", "U",  0, NULL        },
+    { 'v', "verify",               "Verify the specified torrent", "v",  0, NULL        },
+    { 'w', "download-dir",         "Where to save downloaded data", "w",  1, "<path>"    },
+    { 0, NULL, NULL, NULL, 0, NULL }
 };
 
 static const char *
@@ -124,8 +88,7 @@ getUsage( void )
            "Usage: " MY_NAME " [options] <torrent-filename>";
 }
 
-static int          parseCommandLine( int           argc,
-                                      const char ** argv );
+static int parseCommandLine( tr_benc*, int argc, const char ** argv );
 
 static void         sigHandler( int signal );
 
@@ -301,6 +264,26 @@ getStatusStr( const tr_stat * st,
     else *buf = '\0';
 }
 
+static const char*
+getConfigDir( int argc, const char ** argv )
+{
+    int c;
+    const char * configDir = NULL;
+    const char * optarg;
+    const int ind = tr_optind;
+
+    while(( c = tr_getopt( getUsage( ), argc, argv, options, &optarg )))
+        if( c == 'g' )
+            configdir = optarg;
+
+    tr_optind = ind;
+
+    if( configDir == NULL )
+        configDir = tr_getDefaultConfigDir( MY_NAME );
+
+    return configDir;
+}
+
 int
 main( int     argc,
       char ** argv )
@@ -309,6 +292,8 @@ main( int     argc,
     tr_session  * h;
     tr_ctor     * ctor;
     tr_torrent  * tor = NULL;
+    tr_benc settings;
+    const char * configDir;
 
     printf( "Transmission %s - http://www.transmissionbt.com/\n",
             LONG_VERSION_STRING );
@@ -319,71 +304,27 @@ main( int     argc,
         return EXIT_FAILURE;
     }
 
-    /* Get options */
-    if( parseCommandLine( argc, (const char**)argv ) )
+    /* load the defaults from config file + libtransmission defaults */
+    tr_bencInitDict( &settings, 0 );
+    configDir = getConfigDir( argc, (const char**)argv );
+    tr_sessionLoadSettings( &settings, configDir, MY_NAME );
+
+    /* the command line overrides defaults */
+    if( parseCommandLine( &settings, argc, (const char**)argv ) )
         return EXIT_FAILURE;
 
     /* Check the options for validity */
-    if( !torrentPath )
-    {
+    if( !torrentPath ) {
         fprintf( stderr, "No torrent specified!\n" );
-        return EXIT_FAILURE;
-    }
-    if( peerPort < 1 || peerPort > 65535 )
-    {
-        fprintf( stderr, "Error: Port must between 1 and 65535; got %d\n",
-                 peerPort );
-        return EXIT_FAILURE;
-    }
-    if( peerSocketTOS < 0 || peerSocketTOS > 255 )
-    {
-        fprintf( stderr, "Error: value must between 0 and 255; got %d\n",
-                 peerSocketTOS );
         return EXIT_FAILURE;
     }
 
     /* don't bind the port if we're just running the CLI
-     * to get metainfo or to create a torrent */
+       to get metainfo or to create a torrent */
     if( showInfo || showScrape || ( sourceFile != NULL ) )
-        peerPort = -1;
+        tr_bencDictAddInt( &settings, TR_PREFS_KEY_PEER_PORT, -1 );
 
-    if( configdir == NULL )
-        configdir = tr_getDefaultConfigDir( );
-
-    if( downloadDir == NULL )
-        downloadDir = tr_getDefaultDownloadDir( );
-
-    /* Initialize libtransmission */
-    h = tr_sessionInitFull(
-        configdir,
-        "cli",                            /* tag */
-        downloadDir,                       /* where to download torrents */
-        TR_DEFAULT_PEX_ENABLED,
-        natTraversal,                      /* nat enabled */
-        peerPort,
-        encryptionMode,
-        TR_DEFAULT_LAZY_BITFIELD_ENABLED,
-        uploadLimit >= 0,
-        uploadLimit,
-        downloadLimit >= 0,
-        downloadLimit,
-        TR_DEFAULT_GLOBAL_PEER_LIMIT,
-        verboseLevel + 1,                  /* messageLevel */
-        0,                                 /* is message queueing enabled? */
-        blocklistEnabled,
-        peerSocketTOS,
-        TR_DEFAULT_RPC_ENABLED,
-        TR_DEFAULT_RPC_PORT,
-        TR_DEFAULT_RPC_WHITELIST_ENABLED,
-        TR_DEFAULT_RPC_WHITELIST,
-        FALSE, "fnord", "potzrebie",
-        TR_DEFAULT_PROXY_ENABLED,
-        TR_DEFAULT_PROXY,
-        TR_DEFAULT_PROXY_PORT,
-        TR_DEFAULT_PROXY_TYPE,
-        TR_DEFAULT_PROXY_AUTH_ENABLED,
-        TR_DEFAULT_PROXY_USERNAME,
-        TR_DEFAULT_PROXY_PASSWORD );
+    h = tr_sessionInit( "cli", configDir, FALSE, &settings );
 
     if( sourceFile && *sourceFile ) /* creating a torrent */
     {
@@ -407,7 +348,6 @@ main( int     argc,
     ctor = tr_ctorNew( h );
     tr_ctorSetMetainfoFromFile( ctor, torrentPath );
     tr_ctorSetPaused( ctor, TR_FORCE, showScrape );
-    tr_ctorSetDownloadDir( ctor, TR_FORCE, downloadDir );
 
     if( showScrape )
     {
@@ -521,7 +461,11 @@ main( int     argc,
     }
 
 cleanup:
+
+    tr_sessionSaveSettings( h, configDir, &settings );
+
     printf( "\n" );
+    tr_bencFree( &settings );
     tr_sessionClose( h );
     return EXIT_SUCCESS;
 }
@@ -532,112 +476,68 @@ cleanup:
 ****
 ***/
 
-static void
-showUsage( void )
-{
-    tr_getopt_usage( MY_NAME, getUsage( ), options );
-    exit( 0 );
-}
-
 static int
-numarg( const char * arg )
-{
-    char *     end = NULL;
-    const long num = strtol( arg, &end, 10 );
-
-    if( *end )
-    {
-        fprintf( stderr, "Not a number: \"%s\"\n", arg );
-        showUsage( );
-    }
-    return num;
-}
-
-static int
-parseCommandLine( int           argc,
-                  const char ** argv )
+parseCommandLine( tr_benc * d, int argc, const char ** argv )
 {
     int          c;
     const char * optarg;
 
-    while( ( c = tr_getopt( getUsage( ), argc, argv, options, &optarg ) ) )
+    while(( c = tr_getopt( getUsage( ), argc, argv, options, &optarg )))
     {
         switch( c )
         {
             case 'a':
                 announce = optarg; break;
 
-            case 'b':
-                blocklistEnabled = 1; break;
-
-            case 'B':
-                blocklistEnabled = 0; break;
-
-            case 'c':
-                comment = optarg; break;
-
-            case 'd':
-                downloadLimit = numarg( optarg ); break;
-
-            case 'D':
-                downloadLimit = -1; break;
-
-            case 'f':
-                finishCall = optarg; break;
-
-            case 'g':
-                configdir = optarg; break;
-
-            case 'i':
-                showInfo = 1; break;
-
-            case 'm':
-                natTraversal = 1; break;
-
-            case 'M':
-                natTraversal = 0; break;
-
-            case 'n':
-                sourceFile = optarg; break;
-
-            case 'p':
-                peerPort = numarg( optarg ); break;
-
-            case 'r':
-                isPrivate = 1; break;
-
-            case 's':
-                showScrape = 1; break;
-
-            case 't':
-                peerSocketTOS = numarg( optarg ); break;
-
-            case 'u':
-                uploadLimit = numarg( optarg ); break;
-
-            case 'U':
-                uploadLimit = -1; break;
-
-            case 'v':
-                verify = 1; break;
-
-            case 'w':
-                downloadDir = optarg; break;
-
-            case 910:
-                encryptionMode = TR_ENCRYPTION_REQUIRED; break;
-
-            case 911:
-                encryptionMode = TR_CLEAR_PREFERRED; break;
-
-            case 912:
-                encryptionMode = TR_ENCRYPTION_PREFERRED; break;
-
+            case 'b': tr_bencDictAddInt( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, 1 );
+                      break;
+            case 'B': tr_bencDictAddInt( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, 0 );
+                      break;
+            case 'c': comment = optarg;
+                      break;
+            case 'd': tr_bencDictAddInt( d, TR_PREFS_KEY_DSPEED, atoi( optarg ) );
+                      tr_bencDictAddInt( d, TR_PREFS_KEY_DSPEED_ENABLED, 1 );
+                      break;
+            case 'D': tr_bencDictAddInt( d, TR_PREFS_KEY_DSPEED_ENABLED, 0 );
+                      break;
+            case 'f': finishCall = optarg;
+                      break;
+            case 'g': /* handled above */
+                      break;
+            case 'i': showInfo = 1;
+                      break;
+            case 'm': tr_bencDictAddInt( d, TR_PREFS_KEY_PORT_FORWARDING, 1 );
+                      break;
+            case 'M': tr_bencDictAddInt( d, TR_PREFS_KEY_PORT_FORWARDING, 0 );
+                      break;
+            case 'n': sourceFile = optarg; break;
+            case 'p': tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_PORT, 1 );
+                      break;
+            case 'r': isPrivate = 1;
+                      break;
+            case 's': showScrape = 1;
+                      break;
+            case 't': tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_SOCKET_TOS, atoi( optarg ) );
+                      break;
+            case 'u': tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED, atoi( optarg ) );
+                      tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED_ENABLED, 1 );
+                      break;
+            case 'U': tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED_ENABLED, 0 );
+                      break;
+            case 'v': verify = 1;
+                      break;
+            case 'w': tr_bencDictAddStr( d, TR_PREFS_KEY_DOWNLOAD_DIR, optarg );
+                      break;
+            case 910: tr_bencDictAddInt( d, TR_PREFS_KEY_ENCRYPTION, TR_ENCRYPTION_REQUIRED );
+                      break;
+            case 911: tr_bencDictAddInt( d, TR_PREFS_KEY_ENCRYPTION, TR_CLEAR_PREFERRED );
+                      break;
+            case 912: tr_bencDictAddInt( d, TR_PREFS_KEY_ENCRYPTION, TR_ENCRYPTION_PREFERRED );
+                      break;
             case TR_OPT_UNK:
-                torrentPath = optarg; break;
-
-            default:
-                return 1;
+                      torrentPath = optarg;
+                      break;
+            default: return 1;
         }
     }
 

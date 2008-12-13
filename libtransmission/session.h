@@ -58,6 +58,7 @@ struct tr_bandwidth;
 struct tr_handle
 {
     tr_bool                      isPortSet;
+    tr_bool                      isPortRandom;
     tr_bool                      isPexEnabled;
     tr_bool                      isBlocklistEnabled;
     tr_bool                      isProxyEnabled;
@@ -72,6 +73,12 @@ struct tr_handle
 
     struct tr_event_handle *     events;
 
+    uint16_t                     peerLimitPerTorrent;
+
+    tr_port                      peerPort;
+    tr_port                      randomPortLow;
+    tr_port                      randomPortHigh;
+
     int                          proxyPort;
     int                          peerSocketTOS;
 
@@ -79,7 +86,6 @@ struct tr_handle
     tr_torrent *                 torrentList;
 
     char *                       tag;
-
     char *                       configDir;
     char *                       downloadDir;
     char *                       resumeDir;

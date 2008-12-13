@@ -22,6 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+struct tr_benc;
+struct tr_handle;
+
 /**
 ***
 **/
@@ -29,31 +32,20 @@
 #ifndef TG_CONF_H
 #define TG_CONF_H
 
-int64_t     pref_int_get( const char * key );
+int64_t          pref_int_get           ( const char * key );
+void             pref_int_set           ( const char * key, int64_t value );
+void             pref_int_set_default   ( const char * key, int64_t value );
 
-void        pref_int_set( const char * key,
-                          int64_t      value );
+gboolean         pref_flag_get          ( const char * key );
+void             pref_flag_set          ( const char * key, gboolean value );
+void             pref_flag_set_default  ( const char * key, gboolean value );
 
-void        pref_int_set_default( const char * key,
-                                  int64_t      value );
+const char*      pref_string_get        ( const char * key );
+void             pref_string_set        ( const char * key, const char * value );
+void             pref_string_set_default( const char * key, const char * value );
 
-gboolean    pref_flag_get( const char * key );
-
-void        pref_flag_set( const char * key,
-                           gboolean     value );
-
-void        pref_flag_set_default( const char * key,
-                                   gboolean     value );
-
-const char* pref_string_get( const char * key );
-
-void        pref_string_set( const char * key,
-                             const char * value );
-
-void        pref_string_set_default( const char * key,
-                                     const char * value );
-
-void        pref_save( void );
+void             pref_save              ( struct tr_handle * );
+struct tr_benc*  pref_get_all           ( void );
 
 /**
 ***

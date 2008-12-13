@@ -163,7 +163,6 @@ tr_core_dispose( GObject * obj )
     {
         GObjectClass * parent;
 
-        pref_save( );
         core->priv = NULL;
 
         parent = g_type_class_peek( g_type_parent( TR_CORE_TYPE ) );
@@ -449,11 +448,11 @@ tr_core_apply_defaults( tr_ctor * ctor )
 
     if( tr_ctorGetPeerLimit( ctor, TR_FORCE, NULL ) )
         tr_ctorSetPeerLimit( ctor, TR_FORCE,
-                            pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
+                             pref_int_get( TR_PREFS_KEY_PEER_LIMIT_TORRENT ) );
 
     if( tr_ctorGetDownloadDir( ctor, TR_FORCE, NULL ) )
     {
-        const char * path = pref_string_get( PREF_KEY_DOWNLOAD_DIR );
+        const char * path = pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR );
         tr_ctorSetDownloadDir( ctor, TR_FORCE, path );
     }
 }
@@ -584,7 +583,7 @@ prefsChanged( TrCore *      core,
         gboolean     isReversed = pref_flag_get( PREF_KEY_SORT_REVERSED );
         setSort( core, mode, isReversed );
     }
-    else if( !strcmp( key, PREF_KEY_MAX_PEERS_GLOBAL ) )
+    else if( !strcmp( key, TR_PREFS_KEY_PEER_LIMIT_GLOBAL ) )
     {
         const uint16_t val = pref_int_get( key );
         tr_sessionSetPeerLimit( tr_core_session( core ), val );
@@ -684,10 +683,9 @@ tr_core_new( tr_session * session )
     prefsChanged( core, PREF_KEY_SORT_MODE, NULL );
     prefsChanged( core, PREF_KEY_SORT_REVERSED, NULL );
     prefsChanged( core, PREF_KEY_DIR_WATCH_ENABLED, NULL );
-    prefsChanged( core, PREF_KEY_MAX_PEERS_GLOBAL, NULL );
+    prefsChanged( core, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, NULL );
     prefsChanged( core, PREF_KEY_INHIBIT_HIBERNATION, NULL );
-    g_signal_connect( core, "prefs-changed", G_CALLBACK(
-                          prefsChanged ), NULL );
+    g_signal_connect( core, "prefs-changed", G_CALLBACK( prefsChanged ), NULL );
 
     return core;
 }
@@ -700,6 +698,7 @@ tr_core_close( TrCore * core )
     if( session )
     {
         core->priv->session = NULL;
+        pref_save( session );
         tr_sessionClose( session );
     }
 }
@@ -819,7 +818,7 @@ tr_core_load( TrCore * self,
     if( forcePaused )
         tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
     tr_ctorSetPeerLimit( ctor, TR_FALLBACK,
-                        pref_int_get( PREF_KEY_MAX_PEERS_PER_TORRENT ) );
+                         pref_int_get( TR_PREFS_KEY_PEER_LIMIT_TORRENT ) );
 
     torrents = tr_sessionLoadTorrents ( tr_core_session( self ), ctor, &count );
     for( i = 0; i < count; ++i )
@@ -1225,7 +1224,7 @@ static void
 commitPrefsChange( TrCore *     core,
                    const char * key )
 {
-    pref_save( );
+    pref_save( tr_core_session( core ) );
     g_signal_emit( core, TR_CORE_GET_CLASS( core )->prefsig, 0, key );
 }
 

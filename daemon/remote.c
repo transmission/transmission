@@ -34,7 +34,7 @@
 
 #define MY_NAME "transmission-remote"
 #define DEFAULT_HOST "localhost"
-#define DEFAULT_PORT TR_DEFAULT_RPC_PORT
+#define DEFAULT_PORT atoi(TR_DEFAULT_RPC_PORT_STR)
 
 enum { TAG_LIST, TAG_DETAILS, TAG_FILES, TAG_PEERS };
 
@@ -89,7 +89,7 @@ static tr_option opts[] =
     { 'n', "auth",                 "Set authentication info",
       "n",  1, "<username:password>" },
     { 'p', "port",
-      "Port for incoming peers (Default: " TR_DEFAULT_PORT_STR ")",
+      "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")",
       "p", 1, "<port>" },
     { 900, "priority-high",        "Set the files' priorities as high",
       "ph", 1, "<files>"             },

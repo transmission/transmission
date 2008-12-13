@@ -49,7 +49,7 @@
 
 static tr_lock *      messageLock = NULL;
 static int            messageLevel = 0;
-static int            messageQueuing = FALSE;
+static tr_bool        messageQueuing = FALSE;
 static tr_msg_list *  messageQueue = NULL;
 static tr_msg_list ** messageQueueTail = &messageQueue;
 
@@ -118,7 +118,7 @@ tr_getMessageLevel( void )
 }
 
 void
-tr_setMessageQueuing( int enabled )
+tr_setMessageQueuing( tr_bool enabled )
 {
     tr_msgInit( );
     tr_lockLock( messageLock );
@@ -126,7 +126,7 @@ tr_setMessageQueuing( int enabled )
     tr_lockUnlock( messageLock );
 }
 
-int
+tr_bool
 tr_getMessageQueuing( void )
 {
     int ret;
