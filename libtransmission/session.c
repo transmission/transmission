@@ -1187,12 +1187,12 @@ tr_torrentNext( tr_handle *  session,
 
 void
 tr_sessionSetRPCEnabled( tr_session * session,
-                         int          isEnabled )
+                         tr_bool      isEnabled )
 {
     tr_rpcSetEnabled( session->rpcServer, isEnabled );
 }
 
-int
+tr_bool
 tr_sessionIsRPCEnabled( const tr_session * session )
 {
     return tr_rpcIsEnabled( session->rpcServer );
@@ -1235,7 +1235,7 @@ tr_sessionGetRPCWhitelist( const tr_session * session )
 
 void
 tr_sessionSetRPCWhitelistEnabled( tr_session * session,
-                                  int          isEnabled )
+                                  tr_bool      isEnabled )
 {
     tr_rpcSetWhitelistEnabled( session->rpcServer, isEnabled );
 }
@@ -1275,7 +1275,7 @@ tr_sessionGetRPCUsername( const tr_session * session )
 
 void
 tr_sessionSetRPCPasswordEnabled( tr_session * session,
-                                 int          isEnabled )
+                                 tr_bool      isEnabled )
 {
     tr_rpcSetPasswordEnabled( session->rpcServer, isEnabled );
 }

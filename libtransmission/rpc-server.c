@@ -539,14 +539,14 @@ onEnabledChanged( void * vserver )
 
 void
 tr_rpcSetEnabled( tr_rpc_server * server,
-                  int             isEnabled )
+                  tr_bool         isEnabled )
 {
-    server->isEnabled = isEnabled != 0;
+    server->isEnabled = isEnabled;
 
     tr_runInEventThread( server->session, onEnabledChanged, server );
 }
 
-int
+tr_bool
 tr_rpcIsEnabled( const tr_rpc_server * server )
 {
     return server->isEnabled;
@@ -599,12 +599,12 @@ tr_rpcGetWhitelist( const tr_rpc_server * server )
 
 void
 tr_rpcSetWhitelistEnabled( tr_rpc_server  * server,
-                           int              isEnabled )
+                           tr_bool          isEnabled )
 {
     server->isWhitelistEnabled = isEnabled != 0;
 }
 
-int
+tr_bool
 tr_rpcGetWhitelistEnabled( const tr_rpc_server * server )
 {
     return server->isWhitelistEnabled;
@@ -646,13 +646,13 @@ tr_rpcGetPassword( const tr_rpc_server * server )
 
 void
 tr_rpcSetPasswordEnabled( tr_rpc_server * server,
-                          int             isEnabled )
+                          tr_bool          isEnabled )
 {
-    server->isPasswordEnabled = isEnabled != 0;
-    dbgmsg( "setting 'password enabled' to %d", isEnabled );
+    server->isPasswordEnabled = isEnabled;
+    dbgmsg( "setting 'password enabled' to %d", (int)isEnabled );
 }
 
-int
+tr_bool
 tr_rpcIsPasswordEnabled( const tr_rpc_server * server )
 {
     return server->isPasswordEnabled;
@@ -682,12 +682,12 @@ tr_rpcClose( tr_rpc_server ** ps )
 }
 
 tr_rpc_server *
-tr_rpcInit( tr_handle *  session,
-            int          isEnabled,
+tr_rpcInit( tr_handle  * session,
+            tr_bool      isEnabled,
             tr_port      port,
-            int          isWhitelistEnabled,
+            tr_bool      isWhitelistEnabled,
             const char * whitelist,
-            int          isPasswordEnabled,
+            tr_bool      isPasswordEnabled,
             const char * username,
             const char * password )
 {

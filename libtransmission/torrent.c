@@ -85,7 +85,7 @@ tr_torrentFindFromHashString( tr_handle *  handle,
     return NULL;
 }
 
-int
+tr_bool
 tr_torrentExists( const tr_handle * handle,
                   const uint8_t *   torrentHash )
 {
@@ -181,11 +181,11 @@ tr_torrentGetSpeedLimit( const tr_torrent * tor,
     return tr_bandwidthGetDesiredSpeed( tor->bandwidth, dir );
 }
 
-int
+tr_bool
 tr_torrentIsPieceTransferAllowed( const tr_torrent  * tor,
                                   tr_direction        direction )
 {
-    int isEnabled = FALSE;
+    tr_bool isEnabled = FALSE;
 
     switch( tr_torrentGetSpeedMode( tor, direction ) )
     {
@@ -685,19 +685,19 @@ tr_torrentChangeMyPort( tr_torrent * tor )
         tr_trackerChangeMyPort( tor->tracker );
 }
 
-int
+tr_bool
 tr_torrentIsPrivate( const tr_torrent * tor )
 {
     return tor
-           && tor->info.isPrivate;
+        && tor->info.isPrivate;
 }
 
-int
+tr_bool
 tr_torrentAllowsPex( const tr_torrent * tor )
 {
     return tor
-           && tor->session->isPexEnabled
-           && !tr_torrentIsPrivate( tor );
+        && tor->session->isPexEnabled
+        && !tr_torrentIsPrivate( tor );
 }
 
 static void
@@ -1025,7 +1025,7 @@ tr_torrentResetTransferStats( tr_torrent * tor )
 void
 tr_torrentSetHasPiece( tr_torrent *     tor,
                        tr_piece_index_t pieceIndex,
-                       int              has )
+                       tr_bool          has )
 {
     tr_torrentLock( tor );
 
@@ -1355,7 +1355,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
     tr_torrentUnlock( tor );
 }
 
-int
+tr_bool
 tr_torrentIsSeed( const tr_torrent * tor )
 {
     return tor->completeness != TR_LEECH;
@@ -1511,7 +1511,7 @@ void
 tr_torrentInitFileDLs( tr_torrent *      tor,
                        tr_file_index_t * files,
                        tr_file_index_t   fileCount,
-                       int               doDownload )
+                       tr_bool           doDownload )
 {
     tr_file_index_t i;
 
@@ -1528,7 +1528,7 @@ void
 tr_torrentSetFileDLs( tr_torrent *      tor,
                       tr_file_index_t * files,
                       tr_file_index_t   fileCount,
-                      int               doDownload )
+                      tr_bool           doDownload )
 {
     tr_torrentLock( tor );
     tr_torrentInitFileDLs( tor, files, fileCount, doDownload );
@@ -1571,7 +1571,7 @@ _tr_block( const tr_torrent * tor,
     return ret;
 }
 
-int
+tr_bool
 tr_torrentReqIsValid( const tr_torrent * tor,
                       tr_piece_index_t   index,
                       uint32_t           offset,
@@ -1617,7 +1617,7 @@ tr_pieceOffset( const tr_torrent * tor,
 ****
 ***/
 
-int
+tr_bool
 tr_torrentIsPieceChecked( const tr_torrent * tor,
                           tr_piece_index_t   piece )
 {
@@ -1625,9 +1625,9 @@ tr_torrentIsPieceChecked( const tr_torrent * tor,
 }
 
 void
-tr_torrentSetPieceChecked( tr_torrent *     tor,
-                           tr_piece_index_t piece,
-                           int              isChecked )
+tr_torrentSetPieceChecked( tr_torrent        * tor,
+                           tr_piece_index_t    piece,
+                           tr_bool             isChecked )
 {
     if( isChecked )
         tr_bitfieldAdd( tor->checkedPieces, piece );
@@ -1638,7 +1638,7 @@ tr_torrentSetPieceChecked( tr_torrent *     tor,
 void
 tr_torrentSetFileChecked( tr_torrent *    tor,
                           tr_file_index_t fileIndex,
-                          int             isChecked )
+                          tr_bool         isChecked )
 {
     const tr_file *        file = &tor->info.files[fileIndex];
     const tr_piece_index_t begin = file->firstPiece;
@@ -1650,7 +1650,7 @@ tr_torrentSetFileChecked( tr_torrent *    tor,
         tr_bitfieldRemRange ( tor->checkedPieces, begin, end );
 }
 
-int
+tr_bool
 tr_torrentIsFileChecked( const tr_torrent * tor,
                          tr_file_index_t    fileIndex )
 {
@@ -1658,7 +1658,7 @@ tr_torrentIsFileChecked( const tr_torrent * tor,
     const tr_piece_index_t begin = file->firstPiece;
     const tr_piece_index_t end = file->lastPiece + 1;
     tr_piece_index_t       i;
-    int                    isChecked = TRUE;
+    tr_bool                isChecked = TRUE;
 
     for( i = begin; isChecked && i < end; ++i )
         if( !tr_torrentIsPieceChecked( tor, i ) )

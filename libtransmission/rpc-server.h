@@ -20,34 +20,34 @@
 typedef struct tr_rpc_server tr_rpc_server;
 
 tr_rpc_server * tr_rpcInit( struct tr_handle * session,
-                            int                isEnabled,
+                            tr_bool            isEnabled,
                             tr_port            port,
-                            int                isWhitelistEnabled,
-                            const char *       whitelist,
-                            int                isPasswordEnabled,
-                            const char *       username,
-                            const char *       password );
+                            tr_bool            isWhitelistEnabled,
+                            const char       * whitelist,
+                            tr_bool            isPasswordEnabled,
+                            const char       * username,
+                            const char       * password );
 
 void            tr_rpcClose( tr_rpc_server ** freeme );
 
 void            tr_rpcSetEnabled( tr_rpc_server * server,
-                                  int             isEnabled );
+                                  tr_bool         isEnabled );
 
-int             tr_rpcIsEnabled( const tr_rpc_server * server );
+tr_bool         tr_rpcIsEnabled( const tr_rpc_server * server );
 
 void            tr_rpcSetPort( tr_rpc_server * server,
                                tr_port         port );
 
 tr_port         tr_rpcGetPort( const tr_rpc_server * server );
 
-int             tr_rpcSetTest( const tr_rpc_server * server,
-                               const char *          whitelist,
-                               char **               allocme_errmsg );
+int             tr_rpcSetTest( const tr_rpc_server   * server,
+                               const char            * whitelist,
+                               char                 ** allocme_errmsg );
 
 void            tr_rpcSetWhitelistEnabled( tr_rpc_server  * server,
-                                           int              isEnabled );
+                                           tr_bool          isEnabled );
 
-int             tr_rpcGetWhitelistEnabled( const tr_rpc_server * server );
+tr_bool         tr_rpcGetWhitelistEnabled( const tr_rpc_server * server );
 
 void            tr_rpcSetWhitelist( tr_rpc_server * server,
                                     const char *    whitelist );
@@ -65,9 +65,9 @@ void            tr_rpcSetUsername( tr_rpc_server * server,
 char*           tr_rpcGetUsername( const tr_rpc_server * server );
 
 void            tr_rpcSetPasswordEnabled( tr_rpc_server * server,
-                                          int             isEnabled );
+                                          tr_bool         isEnabled );
 
-int             tr_rpcIsPasswordEnabled( const tr_rpc_server * session );
+tr_bool         tr_rpcIsPasswordEnabled( const tr_rpc_server * session );
 
 
 #endif

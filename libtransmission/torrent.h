@@ -49,9 +49,9 @@ int         tr_ctorGetSave( const tr_ctor * ctor );
 void        tr_torrentInitFileDLs( tr_torrent *      tor,
                                    tr_file_index_t * files,
                                    tr_file_index_t   fileCount,
-                                   int               do_download );
+                                   tr_bool           do_download );
 
-int         tr_torrentIsPrivate( const tr_torrent * );
+tr_bool     tr_torrentIsPrivate( const tr_torrent * );
 
 void        tr_torrentRecheckCompleteness( tr_torrent * );
 
@@ -59,17 +59,17 @@ void        tr_torrentResetTransferStats( tr_torrent * );
 
 void        tr_torrentSetHasPiece( tr_torrent *     tor,
                                    tr_piece_index_t pieceIndex,
-                                   int              has );
+                                   tr_bool          has );
 
 void        tr_torrentLock( const tr_torrent * session );
 
 void        tr_torrentUnlock( const tr_torrent * session );
 
-int         tr_torrentIsSeed( const tr_torrent * session );
+tr_bool     tr_torrentIsSeed( const tr_torrent * session );
 
 void        tr_torrentChangeMyPort( tr_torrent * session );
 
-int         tr_torrentExists( const tr_session * session,
+tr_bool     tr_torrentExists( const tr_session * session,
                               const uint8_t    * hash );
 
 tr_torrent* tr_torrentFindFromId( tr_session * session,
@@ -84,9 +84,9 @@ tr_torrent* tr_torrentFindFromHashString( tr_session * session,
 tr_torrent* tr_torrentFindFromObfuscatedHash( tr_session    * session,
                                               const uint8_t * hash );
 
-int         tr_torrentAllowsPex( const tr_torrent * );
+tr_bool     tr_torrentAllowsPex( const tr_torrent * );
 
-int         tr_torrentIsPieceTransferAllowed( const tr_torrent * torrent,
+tr_bool     tr_torrentIsPieceTransferAllowed( const tr_torrent * torrent,
                                               tr_direction       direction );
 
 /* get the index of this piece's first block */
@@ -120,7 +120,7 @@ tr_block_index_t _tr_block( const tr_torrent * tor,
                             tr_piece_index_t   index,
                             uint32_t           offset );
 
-int              tr_torrentReqIsValid( const tr_torrent * tor,
+tr_bool          tr_torrentReqIsValid( const tr_torrent * tor,
                                        tr_piece_index_t   index,
                                        uint32_t           offset,
                                        uint32_t           length );
@@ -137,19 +137,19 @@ void             tr_torrentInitFilePriority( tr_torrent       * tor,
 
 int              tr_torrentCountUncheckedPieces( const tr_torrent * );
 
-int              tr_torrentIsPieceChecked( const tr_torrent  * tor,
+tr_bool          tr_torrentIsPieceChecked( const tr_torrent  * tor,
                                            tr_piece_index_t    piece );
 
-int              tr_torrentIsFileChecked( const tr_torrent  * tor,
+tr_bool          tr_torrentIsFileChecked( const tr_torrent  * tor,
                                           tr_file_index_t     file );
 
 void             tr_torrentSetPieceChecked( tr_torrent       * tor,
                                             tr_piece_index_t   piece,
-                                            int                isChecked );
+                                            tr_bool            isChecked );
 
 void             tr_torrentSetFileChecked( tr_torrent       * tor,
                                            tr_file_index_t    file,
-                                           int                isChecked );
+                                           tr_bool            isChecked );
 
 void             tr_torrentUncheck( tr_torrent * tor );
 

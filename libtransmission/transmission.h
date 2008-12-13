@@ -289,12 +289,12 @@ const char * tr_sessionGetDownloadDir( const tr_session * session );
  * queried by tr_sessionIsRPCEnabled().
  */
 void tr_sessionSetRPCEnabled( tr_session  * session,
-                              int           isEnabled );
+                              tr_bool       isEnabled );
 
 /** @brief Get whether or not RPC calls are allowed in this session.
     @see tr_sessionInit()
     @see tr_sessionSetRPCEnabled() */
-int  tr_sessionIsRPCEnabled( const tr_session * session );
+tr_bool tr_sessionIsRPCEnabled( const tr_session * session );
 
 /** @brief Specify which port to listen for RPC requests on.
     @see tr_sessionInit()
@@ -325,7 +325,7 @@ void   tr_sessionSetRPCWhitelist( tr_session * session,
 char* tr_sessionGetRPCWhitelist( const tr_session * );
 
 void  tr_sessionSetRPCWhitelistEnabled( tr_session * session,
-                                        int          isEnabled );
+                                        tr_bool      isEnabled );
 
 tr_bool tr_sessionGetRPCWhitelistEnabled( const tr_session * session );
 
@@ -344,7 +344,7 @@ char* tr_sessionGetRPCPassword( const tr_session * session );
 char* tr_sessionGetRPCUsername( const tr_session * session  );
 
 void  tr_sessionSetRPCPasswordEnabled( tr_session * session,
-                                       int          isEnabled );
+                                       tr_bool      isEnabled );
 
 tr_bool tr_sessionIsRPCPasswordEnabled( const tr_session * session );
 
@@ -900,7 +900,7 @@ int tr_torrentGetFileDL( const tr_torrent  * torrent,
 void            tr_torrentSetFileDLs( tr_torrent       * torrent,
                                       tr_file_index_t  * files,
                                       tr_file_index_t    fileCount,
-                                      int                do_download );
+                                      tr_bool            do_download );
 
 
 const tr_info * tr_torrentInfo( const tr_torrent * torrent );
