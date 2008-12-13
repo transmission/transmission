@@ -846,6 +846,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (type == ADD_CREATED)
             [torrent resetCache];
         
+        //don't override the location with a group location if it was a created torrent
+        BOOL lockDestination = location && type == ADD_CREATED;
+        
         //add it to the "File -> Open Recent" menu
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
         
@@ -853,7 +856,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (showWindow || !location)
         {
             AddWindowController * addController = [[AddWindowController alloc] initWithTorrent: torrent destination: location
-                                                    controller: self deleteTorrent: deleteTorrentFile];
+                                                    lockDestination: lockDestination controller: self deleteTorrent: deleteTorrentFile];
             [addController showWindow: self];
         }
         else
@@ -861,8 +864,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];
             
             #warning move into torrent init?
-            if ([torrent groupValue] != -1 && [[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]]
-                && [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]])
+            if (!lockDestination && [[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]])
                 [torrent changeDownloadFolder: [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]]];
             
             [torrent update];

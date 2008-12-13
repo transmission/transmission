@@ -50,15 +50,15 @@
 
 @implementation AddWindowController
 
-#warning don't let group override destination if the destination is already specified (as in adding from creation)
-- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller
-        deleteTorrent: (torrentFileState) deleteTorrent
+- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path lockDestination: (BOOL) lockDestination
+    controller: (Controller *) controller deleteTorrent: (torrentFileState) deleteTorrent
 {
     if ((self = [super initWithWindowNibName: @"AddWindow"]))
     {
         fTorrent = torrent;
         if (path)
             fDestination = [[path stringByExpandingTildeInPath] retain];
+        fLockDestination = lockDestination;
         
         fController = controller;
         
@@ -70,8 +70,7 @@
         
         #warning factor in if there already is a destination
         // set the group’s download location if there is one
-        if ([[GroupsController groups] usesCustomDownloadLocationForIndex: fGroupValue] &&
-            [[GroupsController groups] customDownloadLocationForIndex: fGroupValue])
+        if (!fLockDestination && [[GroupsController groups] usesCustomDownloadLocationForIndex: fGroupValue])
             [self setDestinationPath: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue]];
     }
     return self;
@@ -281,7 +280,10 @@
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) contextInfo
 {
     if (code == NSOKButton)
+    {
+        fLockDestination = NO;
         [self setDestinationPath: [[openPanel filenames] objectAtIndex: 0]];
+    }
     else
     {
         if (!fDestination)
@@ -299,12 +301,15 @@
 {
     NSInteger previousGroup = fGroupValue;
     fGroupValue = [sender tag];
-    if ([[GroupsController groups] usesCustomDownloadLocationForIndex: fGroupValue] &&
-        [[GroupsController groups] customDownloadLocationForIndex: fGroupValue])
-        [self setDestinationPath: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue]];
-    else if ([fDestination isEqualToString: [[GroupsController groups] customDownloadLocationForIndex: previousGroup]])
-        [self setDestinationPath: [[NSUserDefaults standardUserDefaults] stringForKey: @"DownloadFolder"]];
-    else;
+    
+    if (!fLockDestination)
+    {
+        if ([[GroupsController groups] usesCustomDownloadLocationForIndex: fGroupValue])
+            [self setDestinationPath: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue]];
+        else if ([fDestination isEqualToString: [[GroupsController groups] customDownloadLocationForIndex: previousGroup]])
+            [self setDestinationPath: [[NSUserDefaults standardUserDefaults] stringForKey: @"DownloadFolder"]];
+        else;
+    }
 }
 
 - (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
