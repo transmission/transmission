@@ -239,6 +239,25 @@ GroupsController * fGroupsInstance = nil;
     }
 }
 
+- (BOOL) rulesNeedAllForIndex: (NSInteger) index
+{
+    NSInteger orderIndex = [self rowValueForIndex: index];
+    if (orderIndex == -1)
+        return YES;
+    
+    NSNumber * enforceAll = [[fGroups objectAtIndex: orderIndex] objectForKey: @"AssignRulesNeedAll"];
+    return !enforceAll || [enforceAll boolValue];
+}
+
+- (void) setRulesNeedAllForIndex: (BOOL) all forIndex: (NSInteger) index
+{
+    NSMutableDictionary * group = [fGroups objectAtIndex: [self rowValueForIndex: index]];
+    
+    [group setObject: [NSNumber numberWithBool: all] forKey: @"AssignRulesNeedAll"];
+    
+    [[GroupsController groups] saveGroups];
+}
+
 - (void) addNewGroup
 {
     //find the lowest index
@@ -430,7 +449,8 @@ GroupsController * fGroupsInstance = nil;
     if (!rules || [rules count] == 0)
         return NO;
     
-    #warning should rules be dict instead of array?
+    const BOOL needAll = [self rulesNeedAllForIndex: index];
+    
     NSEnumerator * iterator = [rules objectEnumerator];
     NSArray * rule = nil;
     while ((rule = [iterator nextObject]))
@@ -444,39 +464,36 @@ GroupsController * fGroupsInstance = nil;
         else
             continue;
         
+        BOOL match = NO;
+        
         NSStringCompareOptions options = NSCaseInsensitiveSearch;
         if ([place isEqualToString: @"ends"])
             options += NSBackwardsSearch;
-        BOOL match = NO;
         
         NSEnumerator * enumerator = [values objectEnumerator];
         NSString * value;
         while (!match && (value = [enumerator nextObject]))
         {
             NSRange result = [value rangeOfString: givenValue options: options];
+            
             if ([place isEqualToString: @"begins"])
-            {
-                if (result.location == 0)
-                    match = YES;
-            }
+                match = result.location == 0;
             else if ([place isEqualToString: @"contains"])
-            {
-                if (result.location != NSNotFound)
-                    match = YES;
-            }
+                match = result.location != NSNotFound;
             else if ([place isEqualToString: @"ends"])
-            {
-                if (NSMaxRange(result) == [value length])
-                    match = YES;
-            }
+                match = NSMaxRange(result) == [value length];
             else
                 break;
         }
         
-        if (!match)
+        if (match && !needAll)
+            return YES;
+        else if (!match && needAll)
             return NO;
+        else;
     }
-    return YES;
+    
+    return needAll;
 }
 
 @end

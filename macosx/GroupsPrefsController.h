@@ -44,6 +44,7 @@
     
     IBOutlet NSButton * fRulesSheetOKButton, * fRulesSheetCancelButton;
     IBOutlet NSTextField * fRulesSheetDescriptionField;
+    IBOutlet NSPopUpButton * fRulesAllAnyButton;
 }
 
 - (void) addRemoveGroup: (id) sender;

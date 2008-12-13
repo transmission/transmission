@@ -57,6 +57,9 @@
 - (NSArray *) autoAssignRulesForIndex: (NSInteger) index;
 - (void) setAutoAssignRules: (NSArray *) rules forIndex: (NSInteger) index;
 
+- (BOOL) rulesNeedAllForIndex: (NSInteger) index;
+- (void) setRulesNeedAllForIndex: (BOOL) all forIndex: (NSInteger) index;
+
 - (void) addNewGroup;
 - (void) removeGroupWithRowIndex: (NSInteger) row;
 

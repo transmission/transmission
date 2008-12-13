@@ -33,6 +33,9 @@
 #define ADD_TAG 0
 #define REMOVE_TAG 1
 
+#define RULES_ALL_TAG 0
+#define RULES_ANY_TAG 1
+
 @interface GroupsPrefsController (Private)
 
 - (void) updateSelectedGroup;
@@ -55,8 +58,13 @@
     
     [fRulesSheetOKButton setStringValue: NSLocalizedString(@"OK", "Groups -> rule editor -> button")];
     [fRulesSheetCancelButton setStringValue: NSLocalizedString(@"Cancel", "Groups -> rule editor -> button")];
-    [fRulesSheetDescriptionField setStringValue: NSLocalizedString(@"All criteria must be met to assign a transfer on add.",
-                                                    "Groups -> rule editor -> button")];
+    [fRulesSheetDescriptionField setStringValue: NSLocalizedString(@"criteria must be met to assign a transfer on add.",
+                                                    "Groups -> rule editor -> button (All/Any criteria must....)")];
+    
+    [[fRulesAllAnyButton itemAtIndex: [fRulesAllAnyButton indexOfItemWithTag: RULES_ALL_TAG]] setTitle:
+        NSLocalizedString(@"All", "Groups -> rule editor -> all/any")];
+    [[fRulesAllAnyButton itemAtIndex: [fRulesAllAnyButton indexOfItemWithTag: RULES_ANY_TAG]] setTitle:
+        NSLocalizedString(@"Any", "Groups -> rule editor -> all/any")];
     
     [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
     
@@ -272,7 +280,7 @@
     [fRuleEditor removeRowsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fRuleEditor numberOfRows])]
         includeSubrows: YES];
 
-    NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+    const NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
     NSArray * rules = [[GroupsController groups] autoAssignRulesForIndex: index];
     if (rules)
     {
@@ -282,10 +290,12 @@
             [fRuleEditor setCriteria: [rules objectAtIndex: i] andDisplayValues: [NSArray array] forRowAtIndex: i];
         }
     }
-
+    
     if ([fRuleEditor numberOfRows] == 0)
         [fRuleEditor addRow: nil];
-
+    
+    [fRulesAllAnyButton selectItemWithTag: [[GroupsController groups] rulesNeedAllForIndex: index] ? RULES_ALL_TAG : RULES_ANY_TAG];
+    
     [NSApp beginSheet: fGroupRulesSheetWindow modalForWindow: [fTableView window] modalDelegate: nil didEndSelector: NULL
         contextInfo: NULL];
 }
@@ -310,6 +320,7 @@
     [NSApp endSheet: fGroupRulesSheetWindow];
     
     NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+    [[GroupsController groups] setRulesNeedAllForIndex: [[fRulesAllAnyButton selectedItem] tag] == RULES_ALL_TAG forIndex: index];
     [[GroupsController groups] setUsesAutoAssignRules: YES forIndex: index];
     
     NSMutableArray * rules = [NSMutableArray arrayWithCapacity: [fRuleEditor numberOfRows]];
