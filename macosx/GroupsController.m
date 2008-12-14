@@ -448,13 +448,10 @@ GroupsController * fGroupsInstance = nil;
     if (![self usesAutoAssignRulesForIndex: index])
         return NO;
     
-    NSArray * rules = [self autoAssignRulesForIndex: index];
-    if (!rules || [rules count] == 0)
-        return NO;
-    
     const BOOL needAll = [self rulesNeedAllForIndex: index];
+    BOOL anyPassed = NO;
     
-    NSEnumerator * iterator = [rules objectEnumerator];
+    NSEnumerator * iterator = [[self autoAssignRulesForIndex: index] objectEnumerator];
     NSArray * rule = nil;
     while ((rule = [iterator nextObject]))
     {
@@ -465,9 +462,7 @@ GroupsController * fGroupsInstance = nil;
         else if ([type isEqualToString: @"tracker"])
             values = [torrent allTrackers: NO];
         else
-            NSAssert1(NO, @"\"%@\" - unknown criteria", type);
-        
-        BOOL match = NO;
+            continue;
         
         NSStringCompareOptions options;
         if ([place isEqualToString: @"begins"])
@@ -477,14 +472,21 @@ GroupsController * fGroupsInstance = nil;
         else if ([place isEqualToString: @"contains"])
             options = NSCaseInsensitiveSearch;
         else
-            NSAssert2(NO, @"\"%@ - %@\" - unknown criteria", type, place);
+            continue;
+        
+        BOOL match = NO;
         
         NSEnumerator * enumerator = [values objectEnumerator];
         NSString * value;
-        while (!match && (value = [enumerator nextObject]))
+        while ((value = [enumerator nextObject]))
         {
             NSRange result = [value rangeOfString: givenValue options: options];
-            match = result.location != NSNotFound;
+            if (result.location != NSNotFound)
+            {
+                match = YES;
+                anyPassed = YES;
+                break;
+            }
         }
         
         if (match && !needAll)
@@ -494,7 +496,7 @@ GroupsController * fGroupsInstance = nil;
         else;
     }
     
-    return needAll;
+    return anyPassed && needAll;
 }
 
 @end
