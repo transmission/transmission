@@ -103,6 +103,8 @@ tr_amInThread( const tr_thread * t )
     return tr_areThreadsEqual( tr_getCurrentThread( ), t->thread );
 }
 
+#include <event.h>
+
 #ifdef WIN32
  #define ThreadFuncReturnType unsigned WINAPI
 #else
@@ -582,18 +584,25 @@ tr_getClutchDir( const tr_session * session UNUSED )
             }
 
             /* XDG_DATA_DIRS are the backup directories */
-            tmp = getenv( "XDG_DATA_DIRS" );
-            if( !tmp || !*tmp )
-                tmp =  PACKAGE_DATA_DIR ":/usr/local/share/:/usr/share/";
-            while( tmp && *tmp ) {
-                const char * end = strchr( tmp, ':' );
-                if( end ) {
-                    tr_list_append( &candidates, tr_strndup( tmp, end - tmp ) );
-                    tmp = end + 1;
-                } else {
-                    tr_list_append( &candidates, tr_strdup( tmp ) );
-                    break;
+            {
+                struct evbuffer * buf = evbuffer_new( );
+                evbuffer_add_printf( buf, "%s:", PACKAGE_DATA_DIR );
+                if(( tmp = getenv( "XDG_DATA_DIRS" )))
+                    evbuffer_add_printf( buf, "%s:", tmp );
+                evbuffer_add_printf( buf, "%s:", "/usr/local/share" );
+                evbuffer_add_printf( buf, "%s:", "/usr/share" );
+                tmp = (const char*) EVBUFFER_DATA( buf );
+                while( tmp && *tmp ) {
+                    const char * end = strchr( tmp, ':' );
+                    if( end ) {
+                        tr_list_append( &candidates, tr_strndup( tmp, end - tmp ) );
+                        tmp = end + 1;
+                    } else if( tmp && *tmp ) {
+                        tr_list_append( &candidates, tr_strdup( tmp ) );
+                        break;
+                    }
                 }
+                evbuffer_free( buf );
             }
 
             /* walk through the candidates & look for a match */
