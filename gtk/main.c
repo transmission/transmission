@@ -1034,6 +1034,18 @@ prefschanged( TrCore * core UNUSED,
         g_message( "setting encryption to %d", encryption );
         tr_sessionSetEncryption( tr, encryption );
     }
+    else if( !strcmp( key, TR_PREFS_KEY_DOWNLOAD_DIR ) )
+    {
+        tr_sessionSetDownloadDir( tr, pref_string_get( key ) );
+    }
+    else if( !strcmp( key, TR_PREFS_KEY_MSGLEVEL ) )
+    {
+        tr_setMessageLevel( pref_int_get( key ) );
+    }
+    else if( !strcmp( key, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED ) )
+    {
+        /* FIXME */
+    }
     else if( !strcmp( key, TR_PREFS_KEY_PEER_PORT ) )
     {
         const int port = pref_int_get( key );
@@ -1088,10 +1100,6 @@ prefschanged( TrCore * core UNUSED,
     {
         const gboolean b = pref_flag_get( key );
         tr_sessionSetPortForwardingEnabled( tr, b );
-    }
-    else if( !strcmp( key, TR_PREFS_KEY_RPC_ENABLED ) )
-    {
-        tr_sessionSetRPCEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_PORT ) )
     {
@@ -1149,6 +1157,15 @@ prefschanged( TrCore * core UNUSED,
     {
         const char * s = pref_string_get( key );
         tr_sessionSetProxyUsername( tr, s );
+    }
+    else if( !strcmp( key, TR_PREFS_KEY_PROXY_PASSWORD ) )
+    {
+        const char * s = pref_string_get( key );
+        tr_sessionSetProxyPassword( tr, s );
+    }
+    else if( !strcmp( key, TR_PREFS_KEY_PROXY_PORT ) )
+    {
+        tr_sessionSetProxyPort( tr, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_PASSWORD ) )
     {
