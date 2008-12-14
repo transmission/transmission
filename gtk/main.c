@@ -1093,13 +1093,11 @@ prefschanged( TrCore * core UNUSED,
     }
     else if( !strcmp( key, TR_PREFS_KEY_PORT_FORWARDING ) )
     {
-        const gboolean enabled = pref_flag_get( key );
-        tr_sessionSetPortForwardingEnabled( tr, enabled );
+        tr_sessionSetPortForwardingEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PEX_ENABLED ) )
     {
-        const gboolean b = pref_flag_get( key );
-        tr_sessionSetPortForwardingEnabled( tr, b );
+        tr_sessionSetPexEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_PORT ) )
     {
