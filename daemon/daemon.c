@@ -53,6 +53,7 @@ static const struct tr_option options[] =
     { 'a', "allowed", "Allowed IP addresses.  (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", 1, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", 0, NULL },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", 0, NULL },
+    { 'd', "dump-settings", "Dump the settings and exit", "d", 0, NULL },
     { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", 0, NULL },
     { 'g', "config-dir", "Where to look for configuration files", "g", 1, "<path>" },
     { 'p', "port", "RPC port (Default: " TR_DEFAULT_RPC_PORT_STR ")", "p", 1, "<port>" },
@@ -180,9 +181,11 @@ main( int     argc,
       char ** argv )
 {
     int c;
+    int64_t i;
     const char * optarg;
     tr_benc settings;
     tr_bool foreground = FALSE;
+    tr_bool dumpSettings = FALSE;
     const char * configDir = NULL;
 
     signal( SIGINT, gotsig );
@@ -209,6 +212,8 @@ main( int     argc,
                       break;
             case 'B': tr_bencDictAddInt( &settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, 0 );
                       break;
+            case 'd': dumpSettings = TRUE;
+                      break;
             case 'f': foreground = TRUE;
                       break;
             case 'g': /* handled above */
@@ -230,6 +235,14 @@ main( int     argc,
         }
     }
 
+    if( dumpSettings )
+    {
+        char * str = tr_bencSaveAsJSON( &settings, NULL );
+        fprintf( stderr, "%s", str );
+        tr_free( str );
+        return 0;
+    }
+
 #ifndef WIN32
     if( !foreground )
     {
@@ -244,7 +257,7 @@ main( int     argc,
     /* start the session */
     mySession = tr_sessionInit( "daemon", configDir, FALSE, &settings );
 
-    if( tr_bencDictFindInt( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, NULL ) )
+    if( tr_bencDictFindInt( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &i ) && i!=0 )
         tr_ninf( MY_NAME, "requiring authentication" );
 
     /* load the torrents */

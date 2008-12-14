@@ -339,7 +339,7 @@ tr_sessionSaveSettings( tr_session * session, const char * configDir, tr_benc * 
         tr_bencFree( &fileSettings );
     }
 
-    tr_inf( "saved \"%s\"", filename );
+    tr_inf( "Saved \"%s\"", filename );
     tr_free( filename );
 }
 
