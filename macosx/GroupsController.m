@@ -470,23 +470,18 @@ GroupsController * fGroupsInstance = nil;
         BOOL match = NO;
         
         NSStringCompareOptions options = NSCaseInsensitiveSearch;
-        if ([place isEqualToString: @"ends"])
-            options += NSBackwardsSearch;
+        if ([place isEqualToString: @"begins"])
+            options += NSAnchoredSearch;
+        else if ([place isEqualToString: @"ends"])
+            options += NSBackwardsSearch + NSAnchoredSearch;
+        else;
         
         NSEnumerator * enumerator = [values objectEnumerator];
         NSString * value;
         while (!match && (value = [enumerator nextObject]))
         {
             NSRange result = [value rangeOfString: givenValue options: options];
-            
-            if ([place isEqualToString: @"begins"])
-                match = result.location == 0;
-            else if ([place isEqualToString: @"contains"])
-                match = result.location != NSNotFound;
-            else if ([place isEqualToString: @"ends"])
-                match = NSMaxRange(result) == [value length];
-            else
-                break;
+            match = result.location != NSNotFound;
         }
         
         if (match && !needAll)
