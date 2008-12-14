@@ -25,6 +25,7 @@
 #import "GroupsController.h"
 #import "CTGradient.h"
 #import "NSBezierPathAdditions.h"
+#import "NSApplicationAdditions.h"
 
 #define ICON_WIDTH 16.0
 #define ICON_WIDTH_SMALL 12.0
@@ -202,6 +203,9 @@ GroupsController * fGroupsInstance = nil;
 
 - (BOOL) usesAutoAssignRulesForIndex: (NSInteger) index
 {
+    if (![NSApp isOnLeopardOrBetter])
+        return NO;
+    
     NSInteger orderIndex = [self rowValueForIndex: index];
     if (orderIndex == -1)
         return NO;
@@ -452,7 +456,7 @@ GroupsController * fGroupsInstance = nil;
     BOOL anyPassed = NO;
     
     NSEnumerator * iterator = [[self autoAssignRulesForIndex: index] objectEnumerator];
-    NSArray * rule = nil;
+    NSArray * rule;
     while ((rule = [iterator nextObject]))
     {
         NSString * type = [rule objectAtIndex: 0], * place = [rule objectAtIndex: 1], * givenValue = [rule objectAtIndex: 2];
@@ -466,9 +470,9 @@ GroupsController * fGroupsInstance = nil;
         
         NSStringCompareOptions options;
         if ([place isEqualToString: @"begins"])
-            options = NSCaseInsensitiveSearch + NSAnchoredSearch;
+            options = NSCaseInsensitiveSearch | NSAnchoredSearch;
         else if ([place isEqualToString: @"ends"])
-            options = NSCaseInsensitiveSearch + NSBackwardsSearch + NSAnchoredSearch;
+            options = NSCaseInsensitiveSearch | NSBackwardsSearch | NSAnchoredSearch;
         else if ([place isEqualToString: @"contains"])
             options = NSCaseInsensitiveSearch;
         else
