@@ -1,7 +1,7 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
 
-1.50 (2008/xx/yy)
+1.50 (2008/mm/dd)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Support BitTorrent Enhancement Proposal #6 "Fast Extension"
@@ -15,7 +15,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Minor display improvements and HIG compliance
 
 
-1.41 (2008/xx/yy)
+1.41 (2008/12/dd)
 <http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Better peer management in large swarms
@@ -24,7 +24,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Honor the peer's BEP 10 reqq key, when available
    + Fix 1.40 "jumpy upload speed" bug
    + Fix handshake peer_id error
-   + Corrrectly handle Windows-style newlines in bluetack blocklists
+   + Corrrectly handle Windows-style newlines in Bluetack blocklists
    + More accurate bandwidth measurement
    + File selection & priority was reset when editing a torrent's tracker list
    + Fix autoconf/automake build warnings

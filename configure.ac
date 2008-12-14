@@ -3,8 +3,8 @@ dnl STATUS: "X" for prerelease test builds,
 dnl         "Z" for unsupported trunk builds,
 dnl         "0" for stable, supported releases
 dnl these should be the only two lines you need to change
-m4_define([user_agent_prefix],[1.40+])
-m4_define([peer_id_prefix],[-TR140Z-])
+m4_define([user_agent_prefix],[1.41+])
+m4_define([peer_id_prefix],[-TR141Z-])
 
 AC_INIT([transmission],
         [user_agent_prefix],
