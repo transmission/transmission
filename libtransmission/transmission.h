@@ -91,10 +91,10 @@ typedef tr_handle tr_session;
 /**
  * @addtogroup tr_session Session
  *
- * A libtransmission session is created by calling either tr_sessionInit()
- * or tr_sessionInit().  libtransmission creates a thread for itself so that
- * it can operate independently of the caller's event loop.  The session will
- * continue until tr_sessionClose() is called.
+ * A libtransmission session is created by calling tr_sessionInit().
+ * libtransmission creates a thread for itself so that it can operate
+ * independently of the caller's event loop.  The session will  continue
+ * until tr_sessionClose() is called.
  *
  * @{
  */
@@ -236,7 +236,7 @@ void tr_sessionSaveSettings( tr_session     * session,
  *     tr_bencFree( &settings );
  * @encode
  *
- * @param tag "gtk", "mac", "daemon", etc... this is only for pre-1.30 resume files
+ * @param tag "gtk", "macosx", "daemon", etc... this is only for pre-1.30 resume files
  * @param configDir where Transmission will look for resume files, blocklists, etc.
  * @param messageQueueingEnabled if false, messages will be dumped to stderr
  * @param settings libtransmission settings

@@ -86,8 +86,6 @@
 	<true/>
 	<key>PEXGlobal</key>
 	<true/>
-	<key>PeerSocketTOS</key>
-	<integer>8</integer>
 	<key>PeersTorrent</key>
 	<integer>60</integer>
 	<key>PeersTotal</key>
