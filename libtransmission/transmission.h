@@ -538,6 +538,11 @@ void       tr_sessionSetPeerLimit( tr_session  * session,
 
 uint16_t   tr_sessionGetPeerLimit( const tr_session * session );
 
+void       tr_sessionSetPeerLimitPerTorrent( tr_session  * session,
+                                             uint16_t      maxGlobalPeers );
+
+uint16_t   tr_sessionGetPeerLimitPerTorrent( const tr_session * session );
+
 
 /**
  *  Load all the torrents in tr_getTorrentDir().

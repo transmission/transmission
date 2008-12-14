@@ -710,6 +710,18 @@ tr_sessionGetPeerLimit( const tr_session * session UNUSED )
     return tr_fdGetPeerLimit( );
 }
 
+void
+tr_sessionSetPeerLimitPerTorrent( tr_session  * session, uint16_t n )
+{
+    session->peerLimitPerTorrent = n;
+}
+
+uint16_t
+tr_sessionGetPeerLimitPerTorrent( const tr_session * session )
+{
+    return session->peerLimitPerTorrent;
+}
+
 /***
 ****
 ***/

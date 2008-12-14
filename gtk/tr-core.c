@@ -588,6 +588,11 @@ prefsChanged( TrCore *      core,
         const uint16_t val = pref_int_get( key );
         tr_sessionSetPeerLimit( tr_core_session( core ), val );
     }
+    else if( !strcmp( key, TR_PREFS_KEY_PEER_LIMIT_TORRENT ) )
+    {
+        const uint16_t val = pref_int_get( key );
+        tr_sessionSetPeerLimitPerTorrent( tr_core_session( core ), val );
+    }
     else if( !strcmp( key, PREF_KEY_INHIBIT_HIBERNATION ) )
     {
         maybeInhibitHibernation( core );
