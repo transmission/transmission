@@ -25,7 +25,6 @@
 
 #include "net.h"
 
-struct tr_handle;
 struct tr_peer_stat;
 struct tr_torrent;
 typedef struct tr_peerMgr tr_peerMgr;
@@ -49,7 +48,7 @@ tr_pex;
 
 int tr_pexCompare( const void * a, const void * b );
 
-tr_peerMgr* tr_peerMgrNew( struct tr_handle * );
+tr_peerMgr* tr_peerMgrNew( tr_session * );
 
 void tr_peerMgrFree( tr_peerMgr * manager );
 

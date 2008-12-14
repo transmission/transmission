@@ -352,7 +352,7 @@ moveFiles( const char * oldDir,
 }
 
 static void
-migrateFiles( const tr_handle * handle )
+migrateFiles( const tr_session * session )
 {
     static int migrated = FALSE;
 
@@ -363,50 +363,50 @@ migrateFiles( const tr_handle * handle )
         migrated = TRUE;
 
         oldDir = getOldTorrentsDir( );
-        newDir = tr_getTorrentDir( handle );
+        newDir = tr_getTorrentDir( session );
         moveFiles( oldDir, newDir );
 
         oldDir = getOldCacheDir( );
-        newDir = tr_getResumeDir( handle );
+        newDir = tr_getResumeDir( session );
         moveFiles( oldDir, newDir );
     }
 }
 
 void
-tr_setConfigDir( tr_handle *  handle,
+tr_setConfigDir( tr_session * session,
                  const char * configDir )
 {
     char * path;
 
-    handle->configDir = tr_strdup( configDir );
+    session->configDir = tr_strdup( configDir );
 
     path = tr_buildPath( configDir, RESUME_SUBDIR, NULL );
     tr_mkdirp( path, 0777 );
-    handle->resumeDir = path;
+    session->resumeDir = path;
 
     path = tr_buildPath( configDir, TORRENT_SUBDIR, NULL );
     tr_mkdirp( path, 0777 );
-    handle->torrentDir = path;
+    session->torrentDir = path;
 
-    migrateFiles( handle );
+    migrateFiles( session );
 }
 
 const char *
-tr_sessionGetConfigDir( const tr_handle * handle )
+tr_sessionGetConfigDir( const tr_session * session )
 {
-    return handle->configDir;
+    return session->configDir;
 }
 
 const char *
-tr_getTorrentDir( const tr_handle * handle )
+tr_getTorrentDir( const tr_session * session )
 {
-    return handle->torrentDir;
+    return session->torrentDir;
 }
 
 const char *
-tr_getResumeDir( const tr_handle * handle )
+tr_getResumeDir( const tr_session * session )
 {
-    return handle->resumeDir;
+    return session->resumeDir;
 }
 
 const char*

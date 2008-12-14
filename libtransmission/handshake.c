@@ -92,7 +92,7 @@ struct tr_handshake
     tr_bool               haveSentBitTorrentHandshake;
     tr_peerIo *           io;
     tr_crypto *           crypto;
-    struct tr_handle *    handle;
+    tr_session *          session;
     uint8_t               myPublicKey[KEY_LEN];
     uint8_t               mySecret[KEY_LEN];
     uint8_t               state;
@@ -206,7 +206,7 @@ buildHandshakeMessage( tr_handshake * handshake,
     uint8_t          * buf = tr_new0( uint8_t, HANDSHAKE_SIZE );
     uint8_t          * walk = buf;
     const uint8_t    * torrentHash = tr_cryptoGetTorrentHash( handshake->crypto );
-    const tr_torrent * tor = tr_torrentFindFromHash( handshake->handle, torrentHash );
+    const tr_torrent * tor = tr_torrentFindFromHash( handshake->session, torrentHash );
     const uint8_t    * peer_id = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
 
     memcpy( walk, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN );
@@ -265,7 +265,7 @@ parseHandshake( tr_handshake *    handshake,
     /* torrent hash */
     tr_peerIoReadBytes( handshake->io, inbuf, hash, sizeof( hash ) );
     assert( tr_peerIoHasTorrentHash( handshake->io ) );
-    if( !tr_torrentExists( handshake->handle, hash )
+    if( !tr_torrentExists( handshake->session, hash )
       || memcmp( hash, tr_peerIoGetTorrentHash( handshake->io ),
                  SHA_DIGEST_LENGTH ) )
     {
@@ -283,7 +283,7 @@ parseHandshake( tr_handshake *    handshake,
     dbgmsg( handshake, "peer-id is [%*.*s]", PEER_ID_LEN, PEER_ID_LEN,
             handshake->peer_id );
 
-    tor = tr_torrentFindFromHash( handshake->handle, hash );
+    tor = tr_torrentFindFromHash( handshake->session, hash );
     peer_id = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
     if( !memcmp( handshake->peer_id, peer_id, PEER_ID_LEN ) )
     {
@@ -664,7 +664,7 @@ readHandshake( tr_handshake *    handshake,
     tr_peerIoReadBytes( handshake->io, inbuf, hash, sizeof( hash ) );
     if( tr_peerIoIsIncoming( handshake->io ) )
     {
-        if( !tr_torrentExists( handshake->handle, hash ) )
+        if( !tr_torrentExists( handshake->session, hash ) )
         {
             dbgmsg( handshake, "peer is trying to connect to us for a torrent we don't have." );
             return tr_handshakeDone( handshake, FALSE );
@@ -724,7 +724,7 @@ readPeerId( tr_handshake    * handshake,
             tr_peerIoIsIncoming( handshake->io ) );
 
     /* if we've somehow connected to ourselves, don't keep the connection */
-    tor = tr_torrentFindFromHash( handshake->handle, tr_peerIoGetTorrentHash( handshake->io ) );
+    tor = tr_torrentFindFromHash( handshake->session, tr_peerIoGetTorrentHash( handshake->io ) );
     peer_id = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
     peerIsGood = memcmp( handshake->peer_id, peer_id, PEER_ID_LEN ) != 0;
     dbgmsg( handshake, "isPeerGood == %d", peerIsGood );
@@ -844,14 +844,14 @@ readCryptoProvide( tr_handshake *    handshake,
     for( i = 0; i < SHA_DIGEST_LENGTH; ++i )
         obfuscatedTorrentHash[i] = req2[i] ^ req3[i];
     if( ( tor =
-             tr_torrentFindFromObfuscatedHash( handshake->handle,
+             tr_torrentFindFromObfuscatedHash( handshake->session,
                                                obfuscatedTorrentHash ) ) )
     {
         dbgmsg( handshake, "got INCOMING connection's encrypted handshake for torrent [%s]",
                 tor->info.name );
         tr_peerIoSetTorrentHash( handshake->io, tor->info.hash );
         if( !tr_torrentAllowsPex( tor )
-          && tr_peerMgrPeerIsSeed( handshake->handle->peerMgr,
+          && tr_peerMgrPeerIsSeed( handshake->session->peerMgr,
                                   tor->info.hash,
                                   tr_peerIoGetAddress( handshake->io, NULL ) ) )
         {
@@ -1163,7 +1163,7 @@ tr_handshakeNew( tr_peerIo *        io,
     handshake->encryptionMode = encryptionMode;
     handshake->doneCB = doneCB;
     handshake->doneUserData = doneUserData;
-    handshake->handle = tr_peerIoGetSession( io );
+    handshake->session = tr_peerIoGetSession( io );
     tr_peerIoSetTimeoutSecs( io, 15 );
 
     tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );

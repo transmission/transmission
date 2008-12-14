@@ -33,21 +33,17 @@
 
 typedef struct tr_shared tr_shared;
 
-tr_shared* tr_sharedInit(         tr_handle *,
-                              int isEnabled,
-                              int publicPort );
+tr_shared* tr_sharedInit( tr_session*, tr_bool isEnabled, tr_bool publicPort );
 
 void       tr_sharedShuttingDown( tr_shared * );
 
-void       tr_sharedSetPort(         tr_shared *,
-                                 int publicPort );
+void       tr_sharedSetPort( tr_shared *, tr_port publicPort );
 
-void       tr_sharedTraversalEnable(         tr_shared *,
-                                         int isEnabled );
+void       tr_sharedTraversalEnable( tr_shared *, tr_bool isEnabled );
 
-int        tr_sharedGetPeerPort( const tr_shared * s );
+tr_port    tr_sharedGetPeerPort( const tr_shared * s );
 
-int        tr_sharedTraversalIsEnabled( const tr_shared * s );
+tr_bool    tr_sharedTraversalIsEnabled( const tr_shared * s );
 
 int        tr_sharedTraversalStatus( const tr_shared * );
 

@@ -147,7 +147,7 @@ makeURL( tr_webseed *    w,
 static void requestNextChunk( tr_webseed * w );
 
 static void
-webResponseFunc( tr_handle     * session,
+webResponseFunc( tr_session    * session,
                  long            response_code,
                  const void    * response,
                  size_t          response_byte_count,

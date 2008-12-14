@@ -23,11 +23,11 @@
 /**
 **/
 
-void      tr_eventInit( struct tr_handle * tr_handle );
+void      tr_eventInit( tr_session * );
 
-void      tr_eventClose( struct tr_handle * tr_handle );
+void      tr_eventClose( tr_session * );
 
-struct event_base * tr_eventGetBase( struct tr_handle * tr_handle );
+struct event_base * tr_eventGetBase( tr_session * );
 
 
 typedef struct tr_timer  tr_timer;
@@ -37,12 +37,10 @@ typedef struct tr_timer  tr_timer;
  * The timer is freed if timer_func returns zero.
  * Otherwise, it's called again after the same interval.
  */
-tr_timer* tr_timerNew(
-    struct tr_handle *               handle,
-    int                 func( void * user_data ),
-    void *                           user_data,
-    uint64_t
-                                     timeout_milliseconds );
+tr_timer* tr_timerNew( tr_session * handle,
+                       int func( void * user_data ),
+                       void * user_data,
+                       uint64_t timeout_milliseconds );
 
 /**
  * Frees a timer and sets the timer pointer to NULL.
@@ -50,10 +48,10 @@ tr_timer* tr_timerNew(
 void      tr_timerFree( tr_timer ** timer );
 
 
-int       tr_amInEventThread( struct tr_handle * handle );
+int       tr_amInEventThread( tr_session * );
 
-void      tr_runInEventThread( struct tr_handle *       handle,
-                               void               func( void* ),
-                               void *                   user_data );
+void      tr_runInEventThread( tr_session * session,
+                               void         func( void* ),
+                               void       * user_data );
 
 #endif

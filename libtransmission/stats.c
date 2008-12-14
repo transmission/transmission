@@ -30,32 +30,32 @@ struct tr_stats_handle
 };
 
 static char*
-getOldFilename( const tr_handle * handle )
+getOldFilename( const tr_session * session )
 {
-    return tr_buildPath( tr_sessionGetConfigDir( handle ), "stats.benc", NULL );
+    return tr_buildPath( tr_sessionGetConfigDir( session ), "stats.benc", NULL );
 }
 
 static char*
-getFilename( const tr_handle * handle )
+getFilename( const tr_session * session )
 {
-    return tr_buildPath( tr_sessionGetConfigDir( handle ), "stats.json", NULL );
+    return tr_buildPath( tr_sessionGetConfigDir( session ), "stats.json", NULL );
 }
 
 static void
-loadCumulativeStats( const tr_handle *  handle,
+loadCumulativeStats( const tr_session * session,
                      tr_session_stats * setme )
 {
     int     loaded = FALSE;
     char   * filename;
     tr_benc top;
 
-    filename = getFilename( handle );
+    filename = getFilename( session );
     loaded = !tr_bencLoadJSONFile( filename, &top );
     tr_free( filename );
 
     if( !loaded )
     {
-        filename = getOldFilename( handle );
+        filename = getOldFilename( session );
         loaded = !tr_bencLoadFile( filename, &top );
         tr_free( filename );
     }
@@ -80,7 +80,7 @@ loadCumulativeStats( const tr_handle *  handle,
 }
 
 static void
-saveCumulativeStats( const tr_handle *        handle,
+saveCumulativeStats( const tr_session * session,
                      const tr_session_stats * s )
 {
     char * filename;
@@ -93,7 +93,7 @@ saveCumulativeStats( const tr_handle *        handle,
     tr_bencDictAddInt( &top, "session-count",    s->sessionCount );
     tr_bencDictAddInt( &top, "uploaded-bytes",   s->uploadedBytes );
 
-    filename = getFilename( handle );
+    filename = getFilename( session );
     tr_deepLog( __FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename );
     tr_bencSaveJSONFile( filename, &top );
 
@@ -106,32 +106,32 @@ saveCumulativeStats( const tr_handle *        handle,
 ***/
 
 void
-tr_statsInit( tr_handle * handle )
+tr_statsInit( tr_session * session )
 {
     struct tr_stats_handle * stats = tr_new0( struct tr_stats_handle, 1 );
 
-    loadCumulativeStats( handle, &stats->old );
+    loadCumulativeStats( session, &stats->old );
     stats->single.sessionCount = 1;
     stats->startTime = time( NULL );
-    handle->sessionStats = stats;
+    session->sessionStats = stats;
 }
 
 void
-tr_statsClose( tr_handle * handle )
+tr_statsClose( tr_session * session )
 {
     tr_session_stats cumulative = STATS_INIT;
 
-    tr_sessionGetCumulativeStats( handle, &cumulative );
-    saveCumulativeStats( handle, &cumulative );
+    tr_sessionGetCumulativeStats( session, &cumulative );
+    saveCumulativeStats( session, &cumulative );
 
-    tr_free( handle->sessionStats );
-    handle->sessionStats = NULL;
+    tr_free( session->sessionStats );
+    session->sessionStats = NULL;
 }
 
 static struct tr_stats_handle *
-getStats( const tr_handle * handle )
+getStats( const tr_session * session )
 {
-    return handle ? handle->sessionStats : NULL;
+    return session ? session->sessionStats : NULL;
 }
 
 /***
@@ -159,10 +159,10 @@ addStats( tr_session_stats *       setme,
 }
 
 void
-tr_sessionGetStats( const tr_handle *  handle,
+tr_sessionGetStats( const tr_session * session,
                     tr_session_stats * setme )
 {
-    const struct tr_stats_handle * stats = getStats( handle );
+    const struct tr_stats_handle * stats = getStats( session );
     if( stats )
     {
         *setme = stats->single;
@@ -172,21 +172,21 @@ tr_sessionGetStats( const tr_handle *  handle,
 }
 
 void
-tr_sessionGetCumulativeStats( const tr_handle *  handle,
+tr_sessionGetCumulativeStats( const tr_session * session,
                               tr_session_stats * setme )
 {
-    const struct tr_stats_handle * stats = getStats( handle );
+    const struct tr_stats_handle * stats = getStats( session );
     tr_session_stats current = STATS_INIT;
 
     if( stats )
     {
-        tr_sessionGetStats( handle, &current );
+        tr_sessionGetStats( session, &current );
         addStats( setme, &stats->old, &current );
     }
 }
 
 void
-tr_sessionClearStats( tr_handle * handle )
+tr_sessionClearStats( tr_session * session )
 {
     tr_session_stats zero;
 
@@ -196,9 +196,9 @@ tr_sessionClearStats( tr_handle * handle )
     zero.filesAdded = 0;
     zero.sessionCount = 0;
     zero.secondsActive = 0;
-    handle->sessionStats->single = handle->sessionStats->old = zero;
 
-    handle->sessionStats->startTime = time( NULL );
+    session->sessionStats->single = session->sessionStats->old = zero;
+    session->sessionStats->startTime = time( NULL );
 }
 
 /**
@@ -206,31 +206,31 @@ tr_sessionClearStats( tr_handle * handle )
 **/
 
 void
-tr_statsAddUploaded( tr_handle * handle,
+tr_statsAddUploaded( tr_session * session,
                      uint32_t    bytes )
 {
     struct tr_stats_handle * s;
 
-    if( ( s = getStats( handle ) ) )
+    if( ( s = getStats( session ) ) )
         s->single.uploadedBytes += bytes;
 }
 
 void
-tr_statsAddDownloaded( tr_handle * handle,
-                       uint32_t    bytes )
+tr_statsAddDownloaded( tr_session * session,
+                       uint32_t     bytes )
 {
     struct tr_stats_handle * s;
 
-    if( ( s = getStats( handle ) ) )
+    if( ( s = getStats( session ) ) )
         s->single.downloadedBytes += bytes;
 }
 
 void
-tr_statsFileCreated( tr_handle * handle )
+tr_statsFileCreated( tr_session * session )
 {
     struct tr_stats_handle * s;
 
-    if( ( s = getStats( handle ) ) )
+    if( ( s = getStats( session ) ) )
         s->single.filesAdded++;
 }
 

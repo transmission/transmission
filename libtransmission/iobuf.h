@@ -68,7 +68,7 @@ typedef void (*tr_iobuf_cb)( struct tr_iobuf*, size_t bytes_transferred, void* )
 typedef void (*tr_iobuf_error_cb)( struct tr_iobuf*, short what, void* );
 
 /** @brief create a new tr_iobuf object. */
-struct tr_iobuf* tr_iobuf_new( struct tr_handle     * session,
+struct tr_iobuf* tr_iobuf_new( tr_session           * session,
                                struct tr_bandwidth  * bandwidth, 
                                int                    fd,
                                short                  event,

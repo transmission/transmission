@@ -32,12 +32,12 @@ typedef struct tr_peerIo tr_peerIo;
 ***
 **/
 
-tr_peerIo*  tr_peerIoNewOutgoing( struct tr_handle        * session,
+tr_peerIo*  tr_peerIoNewOutgoing( tr_session              * session,
                                   const struct tr_address * addr,
                                   tr_port                   port,
                                   const  uint8_t          * torrentHash );
 
-tr_peerIo*  tr_peerIoNewIncoming( struct tr_handle        * session,
+tr_peerIo*  tr_peerIoNewIncoming( tr_session              * session,
                                   const struct tr_address * addr,
                                   tr_port                   port,
                                   int                       socket );

@@ -18,22 +18,21 @@
 ***/
 
 struct tr_benc;
-struct tr_handle;
 
 /* http://www.json.org/ */
-char*tr_rpc_request_exec_json( struct tr_handle * handle,
-                               const void *       request_json,
-                               int                request_len,
-                               int *              response_len );
+char*tr_rpc_request_exec_json( tr_session  * session,
+                               const void  * request_json,
+                               int           request_len,
+                               int         * response_len );
 
 /* see the RPC spec's "Request URI Notation" section */
-char*tr_rpc_request_exec_uri( struct tr_handle * handle,
-                              const void *       request_uri,
-                              int                request_len,
-                              int *              response_len );
+char*tr_rpc_request_exec_uri( tr_session  * session,
+                              const void  * request_uri,
+                              int           request_len,
+                              int         * response_len );
 
 void tr_rpc_parse_list_str( struct tr_benc * setme,
-                            const char *     list_str,
+                            const char     * list_str,
                             size_t           list_str_len );
 
 

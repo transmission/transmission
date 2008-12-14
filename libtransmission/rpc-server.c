@@ -52,7 +52,7 @@ struct tr_rpc_server
     tr_bool            isWhitelistEnabled;
     tr_port            port;
     struct evhttp *    httpd;
-    tr_handle *        session;
+    tr_session *       session;
     char *             username;
     char *             password;
     char *             whitelist;
@@ -682,14 +682,14 @@ tr_rpcClose( tr_rpc_server ** ps )
 }
 
 tr_rpc_server *
-tr_rpcInit( tr_handle  * session,
-            tr_bool      isEnabled,
-            tr_port      port,
-            tr_bool      isWhitelistEnabled,
-            const char * whitelist,
-            tr_bool      isPasswordEnabled,
-            const char * username,
-            const char * password )
+tr_rpcInit( tr_session  * session,
+            tr_bool       isEnabled,
+            tr_port       port,
+            tr_bool       isWhitelistEnabled,
+            const char  * whitelist,
+            tr_bool       isPasswordEnabled,
+            const char  * username,
+            const char  * password )
 {
     tr_rpc_server * s;
 

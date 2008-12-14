@@ -45,28 +45,28 @@
 ***/
 
 static char*
-getTorrentFilename( const tr_handle * handle,
+getTorrentFilename( const tr_session * session,
                     const tr_info *   inf )
 {
     return tr_strdup_printf( "%s%c%s.%16.16s.torrent",
-                             tr_getTorrentDir( handle ),
+                             tr_getTorrentDir( session ),
                              TR_PATH_DELIMITER,
                              inf->name,
                              inf->hashString );
 }
 
 static char*
-getOldTorrentFilename( const tr_handle * handle,
+getOldTorrentFilename( const tr_session * session,
                        const tr_info *   inf )
 {
     char *            ret;
     struct evbuffer * buf = evbuffer_new( );
 
-    evbuffer_add_printf( buf, "%s%c%s", tr_getTorrentDir( handle ),
+    evbuffer_add_printf( buf, "%s%c%s", tr_getTorrentDir( session ),
                          TR_PATH_DELIMITER,
                          inf->hashString );
-    if( handle->tag )
-        evbuffer_add_printf( buf, "-%s", handle->tag );
+    if( session->tag )
+        evbuffer_add_printf( buf, "-%s", session->tag );
 
     ret = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
     evbuffer_free( buf );
@@ -74,19 +74,19 @@ getOldTorrentFilename( const tr_handle * handle,
 }
 
 void
-tr_metainfoMigrate( tr_handle * handle,
+tr_metainfoMigrate( tr_session * session,
                     tr_info *   inf )
 {
     struct stat new_sb;
-    char *      name = getTorrentFilename( handle, inf );
+    char *      name = getTorrentFilename( session, inf );
 
     if( stat( name, &new_sb ) || ( ( new_sb.st_mode & S_IFMT ) != S_IFREG ) )
     {
-        char *    old_name = getOldTorrentFilename( handle, inf );
+        char *    old_name = getOldTorrentFilename( session, inf );
         size_t    contentLen;
         uint8_t * content;
 
-        tr_mkdirp( tr_getTorrentDir( handle ), 0777 );
+        tr_mkdirp( tr_getTorrentDir( session ), 0777 );
         if( ( content = tr_loadFile( old_name, &contentLen ) ) )
         {
             FILE * out;
@@ -104,7 +104,7 @@ tr_metainfoMigrate( tr_handle * handle,
                 {
                     tr_free( inf->torrent );
                     inf->torrent = tr_strdup( name );
-                    tr_sessionSetTorrentFile( handle, inf->hashString, name );
+                    tr_sessionSetTorrentFile( session, inf->hashString, name );
                     unlink( old_name );
                 }
                 fclose( out );
@@ -340,7 +340,7 @@ geturllist( tr_info * inf,
 }
 
 static const char*
-tr_metainfoParseImpl( const tr_handle * handle,
+tr_metainfoParseImpl( const tr_session * session,
                       tr_info *         inf,
                       const tr_benc *   meta_in )
 {
@@ -436,17 +436,17 @@ tr_metainfoParseImpl( const tr_handle * handle,
 
     /* filename of Transmission's copy */
     tr_free( inf->torrent );
-    inf->torrent = getTorrentFilename( handle, inf );
+    inf->torrent = getTorrentFilename( session, inf );
 
     return NULL;
 }
 
 int
-tr_metainfoParse( const tr_handle * handle,
+tr_metainfoParse( const tr_session * session,
                   tr_info *         inf,
                   const tr_benc *   meta_in )
 {
-    const char * badTag = tr_metainfoParseImpl( handle, inf, meta_in );
+    const char * badTag = tr_metainfoParseImpl( session, inf, meta_in );
 
     if( badTag )
     {
@@ -488,16 +488,16 @@ tr_metainfoFree( tr_info * inf )
 }
 
 void
-tr_metainfoRemoveSaved( const tr_handle * handle,
+tr_metainfoRemoveSaved( const tr_session * session,
                         const tr_info *   inf )
 {
     char * filename;
 
-    filename = getTorrentFilename( handle, inf );
+    filename = getTorrentFilename( session, inf );
     unlink( filename );
     tr_free( filename );
 
-    filename = getOldTorrentFilename( handle, inf );
+    filename = getOldTorrentFilename( session, inf );
     unlink( filename );
     tr_free( filename );
 }

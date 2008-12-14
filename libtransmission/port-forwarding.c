@@ -204,8 +204,8 @@ sharedPulse( void * vshared )
 
 tr_shared *
 tr_sharedInit( tr_session  * session,
-               int           isEnabled,
-               int           publicPort )
+               tr_bool       isEnabled,
+               tr_bool       publicPort )
 {
     tr_shared * s = tr_new0( tr_shared, 1 );
 
@@ -230,8 +230,7 @@ tr_sharedShuttingDown( tr_shared * s )
 }
 
 void
-tr_sharedSetPort( tr_shared * s,
-                  int         port )
+tr_sharedSetPort( tr_shared * s, tr_port  port )
 {
     tr_torrent * tor = NULL;
 
@@ -241,20 +240,19 @@ tr_sharedSetPort( tr_shared * s,
         tr_torrentChangeMyPort( tor );
 }
 
-int
+tr_port
 tr_sharedGetPeerPort( const tr_shared * s )
 {
     return s->publicPort;
 }
 
 void
-tr_sharedTraversalEnable( tr_shared * s,
-                          int         isEnabled )
+tr_sharedTraversalEnable( tr_shared * s, tr_bool isEnabled )
 {
     s->isEnabled = isEnabled;
 }
 
-int
+tr_bool
 tr_sharedTraversalIsEnabled( const tr_shared * s )
 {
     return s->isEnabled;

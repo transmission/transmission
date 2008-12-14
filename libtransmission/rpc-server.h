@@ -19,14 +19,14 @@
 
 typedef struct tr_rpc_server tr_rpc_server;
 
-tr_rpc_server * tr_rpcInit( struct tr_handle * session,
-                            tr_bool            isEnabled,
-                            tr_port            port,
-                            tr_bool            isWhitelistEnabled,
-                            const char       * whitelist,
-                            tr_bool            isPasswordEnabled,
-                            const char       * username,
-                            const char       * password );
+tr_rpc_server * tr_rpcInit( tr_session  * session,
+                            tr_bool       isEnabled,
+                            tr_port       port,
+                            tr_bool       isWhitelistEnabled,
+                            const char  * whitelist,
+                            tr_bool       isPasswordEnabled,
+                            const char  * username,
+                            const char  * password );
 
 void            tr_rpcClose( tr_rpc_server ** freeme );
 

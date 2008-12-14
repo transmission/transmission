@@ -60,12 +60,11 @@ tr_torrentId( const tr_torrent * tor )
 }
 
 tr_torrent*
-tr_torrentFindFromId( tr_handle * handle,
-                      int         id )
+tr_torrentFindFromId( tr_session * session, int id )
 {
     tr_torrent * tor = NULL;
 
-    while( ( tor = tr_torrentNext( handle, tor ) ) )
+    while( ( tor = tr_torrentNext( session, tor ) ) )
         if( tor->uniqueId == id )
             return tor;
 
@@ -73,12 +72,11 @@ tr_torrentFindFromId( tr_handle * handle,
 }
 
 tr_torrent*
-tr_torrentFindFromHashString( tr_handle *  handle,
-                              const char * str )
+tr_torrentFindFromHashString( tr_session *  session, const char * str )
 {
     tr_torrent * tor = NULL;
 
-    while( ( tor = tr_torrentNext( handle, tor ) ) )
+    while( ( tor = tr_torrentNext( session, tor ) ) )
         if( !strcmp( str, tor->info.hashString ) )
             return tor;
 
@@ -86,20 +84,17 @@ tr_torrentFindFromHashString( tr_handle *  handle,
 }
 
 tr_bool
-tr_torrentExists( const tr_handle * handle,
-                  const uint8_t *   torrentHash )
+tr_torrentExists( const tr_session * session, const uint8_t *   torrentHash )
 {
-    return tr_torrentFindFromHash( (tr_handle*)handle,
-                                  torrentHash ) != NULL;
+    return tr_torrentFindFromHash( (tr_session*)session, torrentHash ) != NULL;
 }
 
 tr_torrent*
-tr_torrentFindFromHash( tr_handle *     handle,
-                        const uint8_t * torrentHash )
+tr_torrentFindFromHash( tr_session * session, const uint8_t * torrentHash )
 {
     tr_torrent * tor = NULL;
 
-    while( ( tor = tr_torrentNext( handle, tor ) ) )
+    while( ( tor = tr_torrentNext( session, tor ) ) )
         if( *tor->info.hash == *torrentHash )
             if( !memcmp( tor->info.hash, torrentHash, SHA_DIGEST_LENGTH ) )
                 return tor;
@@ -108,12 +103,12 @@ tr_torrentFindFromHash( tr_handle *     handle,
 }
 
 tr_torrent*
-tr_torrentFindFromObfuscatedHash( tr_handle *     handle,
+tr_torrentFindFromObfuscatedHash( tr_session * session,
                                   const uint8_t * obfuscatedTorrentHash )
 {
     tr_torrent * tor = NULL;
 
-    while( ( tor = tr_torrentNext( handle, tor ) ) )
+    while( ( tor = tr_torrentNext( session, tor ) ) )
         if( !memcmp( tor->obfuscatedHash, obfuscatedTorrentHash,
                      SHA_DIGEST_LENGTH ) )
             return tor;
@@ -466,9 +461,9 @@ getBlockSize( uint32_t pieceSize )
 }
 
 static void
-torrentRealInit( tr_handle *     h,
-                 tr_torrent *    tor,
-                 const tr_ctor * ctor )
+torrentRealInit( tr_session      * session,
+                 tr_torrent      * tor,
+                 const tr_ctor   * ctor )
 {
     int        doStart;
     uint64_t   loaded;
@@ -476,14 +471,14 @@ torrentRealInit( tr_handle *     h,
     tr_info *  info = &tor->info;
     static int nextUniqueId = 1;
 
-    tr_globalLock( h );
+    tr_globalLock( session );
 
-    tor->session   = h;
+    tor->session   = session;
     tor->uniqueId = nextUniqueId++;
 
     randomizeTiers( info );
 
-    tor->bandwidth = tr_bandwidthNew( h, h->bandwidth );
+    tor->bandwidth = tr_bandwidthNew( session, session->bandwidth );
 
     tor->blockSize = getBlockSize( info->pieceSize );
 
@@ -531,10 +526,9 @@ torrentRealInit( tr_handle *     h,
              info->hash, SHA_DIGEST_LENGTH,
              NULL );
 
-    tr_peerMgrAddTorrent( h->peerMgr, tor );
+    tr_peerMgrAddTorrent( session->peerMgr, tor );
 
-    assert( h->isPortSet );
-
+    assert( session->isPortSet );
     assert( !tor->downloadedCur );
     assert( !tor->uploadedCur );
 
@@ -569,17 +563,17 @@ torrentRealInit( tr_handle *     h,
     {
         tr_torrent * it = NULL;
         tr_torrent * last = NULL;
-        while( ( it = tr_torrentNext( h, it ) ) )
+        while( ( it = tr_torrentNext( session, it ) ) )
             last = it;
 
         if( !last )
-            h->torrentList = tor;
+            session->torrentList = tor;
         else
             last->next = tor;
-        ++h->torrentCount;
+        ++session->torrentCount;
     }
 
-    tr_globalUnlock( h );
+    tr_globalUnlock( session );
 
     /* maybe save our own copy of the metainfo */
     if( tr_ctorGetSave( ctor ) )
@@ -594,16 +588,16 @@ torrentRealInit( tr_handle *     h,
         }
     }
 
-    tr_metainfoMigrate( h, &tor->info );
+    tr_metainfoMigrate( session, &tor->info );
 
     if( doStart )
         torrentStart( tor, FALSE );
 }
 
 int
-tr_torrentParse( const tr_handle * handle,
-                 const tr_ctor *   ctor,
-                 tr_info *         setmeInfo )
+tr_torrentParse( const tr_session  * session,
+                 const tr_ctor     * ctor,
+                 tr_info           * setmeInfo )
 {
     int             err = 0;
     int             doFree;
@@ -617,13 +611,13 @@ tr_torrentParse( const tr_handle * handle,
     if( !err && tr_ctorGetMetainfo( ctor, &metainfo ) )
         return TR_EINVALID;
 
-    err = tr_metainfoParse( handle, setmeInfo, metainfo );
+    err = tr_metainfoParse( session, setmeInfo, metainfo );
     doFree = !err && ( setmeInfo == &tmp );
 
     if( !err && !getBlockSize( setmeInfo->pieceSize ) )
         err = TR_EINVALID;
 
-    if( !err && tr_torrentExists( handle, setmeInfo->hash ) )
+    if( !err && tr_torrentExists( session, setmeInfo->hash ) )
         err = TR_EDUPLICATE;
 
     if( doFree )
@@ -633,20 +627,20 @@ tr_torrentParse( const tr_handle * handle,
 }
 
 tr_torrent *
-tr_torrentNew( tr_handle *     handle,
-               const tr_ctor * ctor,
-               int *           setmeError )
+tr_torrentNew( tr_session     * session,
+               const tr_ctor  * ctor,
+               int            * setmeError )
 {
     int          err;
     tr_info      tmpInfo;
     tr_torrent * tor = NULL;
 
-    err = tr_torrentParse( handle, ctor, &tmpInfo );
+    err = tr_torrentParse( session, ctor, &tmpInfo );
     if( !err )
     {
         tor = tr_new0( tr_torrent, 1 );
         tor->info = tmpInfo;
-        torrentRealInit( handle, tor, ctor );
+        torrentRealInit( session, tor, ctor );
     }
     else if( setmeError )
     {
@@ -1048,15 +1042,15 @@ static void
 freeTorrent( tr_torrent * tor )
 {
     tr_torrent * t;
-    tr_handle *  h = tor->session;
+    tr_session *  session = tor->session;
     tr_info *    inf = &tor->info;
 
     assert( tor );
     assert( !tor->isRunning );
 
-    tr_globalLock( h );
+    tr_globalLock( session );
 
-    tr_peerMgrRemoveTorrent( h->peerMgr, tor->info.hash );
+    tr_peerMgrRemoveTorrent( session->peerMgr, tor->info.hash );
 
     tr_cpClose( tor->completion );
 
@@ -1071,26 +1065,24 @@ freeTorrent( tr_torrent * tor )
     tr_free( tor->downloadDir );
     tr_free( tor->peer_id );
 
-    if( tor == h->torrentList )
-        h->torrentList = tor->next;
-    else for( t = h->torrentList; t != NULL; t = t->next )
-        {
-            if( t->next == tor )
-            {
-                t->next = tor->next;
-                break;
-            }
+    if( tor == session->torrentList )
+        session->torrentList = tor->next;
+    else for( t = session->torrentList; t != NULL; t = t->next ) {
+        if( t->next == tor ) {
+            t->next = tor->next;
+            break;
         }
+    }
 
-    assert( h->torrentCount >= 1 );
-    h->torrentCount--;
+    assert( session->torrentCount >= 1 );
+    session->torrentCount--;
 
     tr_bandwidthFree( tor->bandwidth );
 
     tr_metainfoFree( inf );
     tr_free( tor );
 
-    tr_globalUnlock( h );
+    tr_globalUnlock( session );
 }
 
 /**
@@ -1248,13 +1240,13 @@ tr_torrentFree( tr_torrent * tor )
 {
     if( tor )
     {
-        tr_handle * handle = tor->session;
-        tr_globalLock( handle );
+        tr_session * session = tor->session;
+        tr_globalLock( session );
 
         tr_torrentClearCompletenessCallback( tor );
-        tr_runInEventThread( handle, closeTorrent, tor );
+        tr_runInEventThread( session, closeTorrent, tor );
 
-        tr_globalUnlock( handle );
+        tr_globalUnlock( session );
     }
 }
 

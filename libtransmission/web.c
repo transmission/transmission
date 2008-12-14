@@ -94,7 +94,7 @@ static void
 addTask( void * vtask )
 {
     struct tr_web_task * task = vtask;
-    const tr_handle * session = task->session;
+    const tr_session * session = task->session;
 
     if( session && session->web )
     {

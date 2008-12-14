@@ -42,16 +42,14 @@
 typedef struct tr_lock   tr_lock;
 typedef struct tr_thread tr_thread;
 
-struct tr_handle;
+void                tr_setConfigDir( tr_session * session,
+                                     const char * configDir );
 
-void                tr_setConfigDir( struct tr_handle * handle,
-                                     const char *       configDir );
+const char *        tr_getResumeDir( const tr_session * );
 
-const char *        tr_getResumeDir( const struct tr_handle * );
+const char *        tr_getTorrentDir( const tr_session * );
 
-const char *        tr_getTorrentDir( const struct tr_handle * );
-
-const char *        tr_getClutchDir( const struct tr_handle * );
+const char *        tr_getClutchDir( const tr_session * );
 
 
 tr_thread*          tr_threadNew( void   ( *func )(void *),

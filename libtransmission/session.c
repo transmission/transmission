@@ -343,7 +343,7 @@ tr_sessionSaveSettings( tr_session * session, const char * configDir, tr_benc * 
     tr_free( filename );
 }
 
-static void metainfoLookupRescan( tr_handle * h );
+static void metainfoLookupRescan( tr_session * );
 
 tr_session *
 tr_sessionInit( const char  * tag,
@@ -532,20 +532,19 @@ tr_sessionInit( const char  * tag,
 ***/
 
 void
-tr_sessionSetDownloadDir( tr_handle *  handle,
-                          const char * dir )
+tr_sessionSetDownloadDir( tr_session * session, const char * dir )
 {
-    if( handle->downloadDir != dir )
+    if( session->downloadDir != dir )
     {
-        tr_free( handle->downloadDir );
-        handle->downloadDir = tr_strdup( dir );
+        tr_free( session->downloadDir );
+        session->downloadDir = tr_strdup( dir );
     }
 }
 
 const char *
-tr_sessionGetDownloadDir( const tr_handle * handle )
+tr_sessionGetDownloadDir( const tr_session * session )
 {
-    return handle->downloadDir;
+    return session->downloadDir;
 }
 
 /***
@@ -553,21 +552,21 @@ tr_sessionGetDownloadDir( const tr_handle * handle )
 ***/
 
 void
-tr_globalLock( struct tr_handle * handle )
+tr_globalLock( tr_session * session )
 {
-    tr_lockLock( handle->lock );
+    tr_lockLock( session->lock );
 }
 
 void
-tr_globalUnlock( struct tr_handle * handle )
+tr_globalUnlock( tr_session * session )
 {
-    tr_lockUnlock( handle->lock );
+    tr_lockUnlock( session->lock );
 }
 
 tr_bool
-tr_globalIsLocked( const struct tr_handle * handle )
+tr_globalIsLocked( const tr_session * session )
 {
-    return handle && tr_lockHave( handle->lock );
+    return session && tr_lockHave( session->lock );
 }
 
 /***********************************************************************
@@ -631,9 +630,9 @@ tr_sessionGetPeerPort( const tr_session * session )
 }
 
 tr_port_forwarding
-tr_sessionGetPortForwarding( const tr_handle * h )
+tr_sessionGetPortForwarding( const tr_session * session )
 {
-    return tr_sharedTraversalStatus( h->shared );
+    return tr_sharedTraversalStatus( session->shared );
 }
 
 /***
@@ -699,8 +698,8 @@ tr_sessionGetSpeedLimit( const tr_session  * session,
 ***/
 
 void
-tr_sessionSetPeerLimit( tr_handle * handle UNUSED,
-                        uint16_t           maxGlobalPeers )
+tr_sessionSetPeerLimit( tr_session * session UNUSED,
+                        uint16_t     maxGlobalPeers )
 {
     tr_fdSetPeerLimit( maxGlobalPeers );
 }
@@ -728,14 +727,13 @@ tr_sessionGetRawSpeed( const tr_session * session, tr_direction dir )
 }
 
 int
-tr_sessionCountTorrents( const tr_handle * h )
+tr_sessionCountTorrents( const tr_session * session )
 {
-    return h->torrentCount;
+    return session->torrentCount;
 }
 
 static int
-compareTorrentByCur( const void * va,
-                     const void * vb )
+compareTorrentByCur( const void * va, const void * vb )
 {
     const tr_torrent * a = *(const tr_torrent**)va;
     const tr_torrent * b = *(const tr_torrent**)vb;
@@ -751,7 +749,7 @@ compareTorrentByCur( const void * va,
 static void
 tr_closeAllConnections( void * vsession )
 {
-    tr_handle *   session = vsession;
+    tr_session *  session = vsession;
     tr_torrent *  tor;
     int           i, n;
     tr_torrent ** torrents;
@@ -798,7 +796,7 @@ deadlineReached( const uint64_t deadline )
     } while( 0 )
 
 void
-tr_sessionClose( tr_handle * session )
+tr_sessionClose( tr_session * session )
 {
     int            i;
     const int      maxwait_msec = SHUTDOWN_MAX_SECONDS * 1000;
@@ -855,14 +853,14 @@ tr_sessionClose( tr_handle * session )
 }
 
 tr_torrent **
-tr_sessionLoadTorrents( tr_handle * h,
-                        tr_ctor *   ctor,
-                        int *       setmeCount )
+tr_sessionLoadTorrents( tr_session * session,
+                        tr_ctor    * ctor,
+                        int        * setmeCount )
 {
     int           i, n = 0;
     struct stat   sb;
     DIR *         odir = NULL;
-    const char *  dirname = tr_getTorrentDir( h );
+    const char *  dirname = tr_getTorrentDir( session );
     tr_torrent ** torrents;
     tr_list *     l = NULL, *list = NULL;
 
@@ -881,7 +879,7 @@ tr_sessionLoadTorrents( tr_handle * h,
                 tr_torrent * tor;
                 char * path = tr_buildPath( dirname, d->d_name, NULL );
                 tr_ctorSetMetainfoFromFile( ctor, path );
-                if(( tor = tr_torrentNew( h, ctor, NULL )))
+                if(( tor = tr_torrentNew( session, ctor, NULL )))
                 {
                     tr_list_append( &list, tor );
                     ++n;
@@ -955,9 +953,9 @@ tr_sessionSetPortForwardingEnabled( tr_session  * session,
 }
 
 tr_bool
-tr_sessionIsPortForwardingEnabled( const tr_handle * h )
+tr_sessionIsPortForwardingEnabled( const tr_session * session )
 {
-    return tr_sharedTraversalIsEnabled( h->shared );
+    return tr_sharedTraversalIsEnabled( session->shared );
 }
 
 /***
@@ -1050,10 +1048,10 @@ compareLookupEntries( const void * va,
 }
 
 static void
-metainfoLookupResort( tr_handle * h )
+metainfoLookupResort( tr_session * session )
 {
-    qsort( h->metainfoLookup,
-           h->metainfoLookupCount,
+    qsort( session->metainfoLookup,
+           session->metainfoLookupCount,
            sizeof( struct tr_metainfo_lookup ),
            compareLookupEntries );
 }
@@ -1069,36 +1067,33 @@ compareHashStringToLookupEntry( const void * va,
 }
 
 const char*
-tr_sessionFindTorrentFile( const tr_handle * h,
-                           const char *      hashStr )
+tr_sessionFindTorrentFile( const tr_session * session,
+                           const char       * hashStr )
 {
     struct tr_metainfo_lookup * l = bsearch( hashStr,
-                                             h->metainfoLookup,
-                                             h->metainfoLookupCount,
-                                             sizeof( struct
-                                                     tr_metainfo_lookup ),
+                                             session->metainfoLookup,
+                                             session->metainfoLookupCount,
+                                             sizeof( struct tr_metainfo_lookup ),
                                              compareHashStringToLookupEntry );
 
     return l ? l->filename : NULL;
 }
 
 static void
-metainfoLookupRescan( tr_handle * h )
+metainfoLookupRescan( tr_session * session )
 {
     int          i;
     int          n;
     struct stat  sb;
-    const char * dirname = tr_getTorrentDir( h );
+    const char * dirname = tr_getTorrentDir( session );
     DIR *        odir = NULL;
     tr_ctor *    ctor = NULL;
     tr_list *    list = NULL;
 
     /* walk through the directory and find the mappings */
-    ctor = tr_ctorNew( h );
+    ctor = tr_ctorNew( session );
     tr_ctorSetSave( ctor, FALSE ); /* since we already have them */
-    if( !stat( dirname,
-               &sb ) && S_ISDIR( sb.st_mode )
-      && ( ( odir = opendir( dirname ) ) ) )
+    if( !stat( dirname, &sb ) && S_ISDIR( sb.st_mode ) && ( ( odir = opendir( dirname ) ) ) )
     {
         struct dirent *d;
         for( d = readdir( odir ); d != NULL; d = readdir( odir ) )
@@ -1109,7 +1104,7 @@ metainfoLookupRescan( tr_handle * h )
                 tr_info inf;
                 char * path = tr_buildPath( dirname, d->d_name, NULL );
                 tr_ctorSetMetainfoFromFile( ctor, path );
-                if( !tr_torrentParse( h, ctor, &inf ) )
+                if( !tr_torrentParse( session, ctor, &inf ) )
                 {
                     tr_list_append( &list, tr_strdup( inf.hashString ) );
                     tr_list_append( &list, tr_strdup( path ) );
@@ -1123,33 +1118,32 @@ metainfoLookupRescan( tr_handle * h )
     tr_ctorFree( ctor );
 
     n = tr_list_size( list ) / 2;
-    h->metainfoLookup = tr_new0( struct tr_metainfo_lookup, n );
-    h->metainfoLookupCount = n;
+    session->metainfoLookup = tr_new0( struct tr_metainfo_lookup, n );
+    session->metainfoLookupCount = n;
     for( i = 0; i < n; ++i )
     {
         char * hashString = tr_list_pop_front( &list );
         char * filename = tr_list_pop_front( &list );
 
-        memcpy( h->metainfoLookup[i].hashString, hashString,
+        memcpy( session->metainfoLookup[i].hashString, hashString,
                 2 * SHA_DIGEST_LENGTH + 1 );
         tr_free( hashString );
-        h->metainfoLookup[i].filename = filename;
+        session->metainfoLookup[i].filename = filename;
     }
 
-    metainfoLookupResort( h );
+    metainfoLookupResort( session );
     tr_dbg( "Found %d torrents in \"%s\"", n, dirname );
 }
 
 void
-tr_sessionSetTorrentFile( tr_handle *  h,
+tr_sessionSetTorrentFile( tr_session * session,
                           const char * hashString,
                           const char * filename )
 {
     struct tr_metainfo_lookup * l = bsearch( hashString,
-                                             h->metainfoLookup,
-                                             h->metainfoLookupCount,
-                                             sizeof( struct
-                                                     tr_metainfo_lookup ),
+                                             session->metainfoLookup,
+                                             session->metainfoLookupCount,
+                                             sizeof( struct tr_metainfo_lookup ),
                                              compareHashStringToLookupEntry );
 
     if( l )
@@ -1162,20 +1156,20 @@ tr_sessionSetTorrentFile( tr_handle *  h,
     }
     else
     {
-        const int                   n = h->metainfoLookupCount++;
+        const int n = session->metainfoLookupCount++;
         struct tr_metainfo_lookup * node;
-        h->metainfoLookup = tr_renew( struct tr_metainfo_lookup,
-                                      h->metainfoLookup,
-                                      h->metainfoLookupCount );
-        node = h->metainfoLookup + n;
+        session->metainfoLookup = tr_renew( struct tr_metainfo_lookup,
+                                            session->metainfoLookup,
+                                            session->metainfoLookupCount );
+        node = session->metainfoLookup + n;
         memcpy( node->hashString, hashString, 2 * SHA_DIGEST_LENGTH + 1 );
         node->filename = tr_strdup( filename );
-        metainfoLookupResort( h );
+        metainfoLookupResort( session );
     }
 }
 
 tr_torrent*
-tr_torrentNext( tr_handle *  session,
+tr_torrentNext( tr_session * session,
                 tr_torrent * tor )
 {
     return tor ? tor->next : session->torrentList;

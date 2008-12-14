@@ -113,7 +113,7 @@ builderFileCompare( const void * va,
 }
 
 tr_metainfo_builder*
-tr_metaInfoBuilderCreate( tr_handle *  handle,
+tr_metaInfoBuilderCreate( tr_session * session,
                           const char * topFile )
 {
     int                   i;
@@ -122,7 +122,7 @@ tr_metaInfoBuilderCreate( tr_handle *  handle,
     tr_metainfo_builder * ret = tr_new0( tr_metainfo_builder, 1 );
 
     ret->top = tr_strdup( topFile );
-    ret->handle = handle;
+    ret->handle = session;
     {
         struct stat sb;
         stat( topFile, &sb );
@@ -444,29 +444,29 @@ static tr_metainfo_builder * queue = NULL;
 static tr_thread *           workerThread = NULL;
 
 static tr_lock*
-getQueueLock( tr_handle * h )
+getQueueLock( tr_session * session )
 {
     static tr_lock * lock = NULL;
+    tr_globalLock( session );
 
-    tr_globalLock( h );
     if( !lock )
         lock = tr_lockNew( );
-    tr_globalUnlock( h );
 
+    tr_globalUnlock( session );
     return lock;
 }
 
 static void
 makeMetaWorkerFunc( void * user_data )
 {
-    tr_handle * handle = (tr_handle *) user_data;
+    tr_session * session = user_data;
 
     for( ; ; )
     {
         tr_metainfo_builder * builder = NULL;
 
         /* find the next builder to process */
-        tr_lock *             lock = getQueueLock ( handle );
+        tr_lock * lock = getQueueLock( session );
         tr_lockLock( lock );
         if( queue )
         {

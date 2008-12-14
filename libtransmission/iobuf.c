@@ -73,7 +73,7 @@ struct tr_iobuf
     int timeout_write; /* in seconds */
     short enabled;     /* events that are currently enabled */
 
-    struct tr_handle * session;
+    tr_session * session;
     struct tr_bandwidth * bandwidth;
 };
 
@@ -245,7 +245,7 @@ tr_iobuf_writecb( int fd, short event, void * arg )
  */
 
 struct tr_iobuf *
-tr_iobuf_new( struct tr_handle    * session,
+tr_iobuf_new( tr_session          * session,
               tr_bandwidth        * bandwidth,
               int                   fd,
               short                 event,
