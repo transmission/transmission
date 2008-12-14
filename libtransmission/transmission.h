@@ -127,7 +127,6 @@ tr_encryption_mode;
 #define TR_PREFS_KEY_ENCRYPTION                 "encryption"
 #define TR_PREFS_KEY_LAZY_BITFIELD              "lazy-bitfield-enabled"
 #define TR_PREFS_KEY_MSGLEVEL                   "message-level"
-#define TR_PREFS_KEY_MSGQUEUE_ENABLED           "message-queue-enabled"
 #define TR_PREFS_KEY_PEER_LIMIT_GLOBAL          "peer-limit-global"
 #define TR_PREFS_KEY_PEER_LIMIT_TORRENT         "peer-limit-per-torrent"
 #define TR_PREFS_KEY_PEER_PORT                  "peer-port"
