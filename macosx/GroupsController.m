@@ -465,16 +465,19 @@ GroupsController * fGroupsInstance = nil;
         else if ([type isEqualToString: @"tracker"])
             values = [torrent allTrackers: NO];
         else
-            continue;
+            NSAssert1(NO, @"\"%@\" - unknown criteria", type);
         
         BOOL match = NO;
         
-        NSStringCompareOptions options = NSCaseInsensitiveSearch;
+        NSStringCompareOptions options;
         if ([place isEqualToString: @"begins"])
-            options += NSAnchoredSearch;
+            options = NSCaseInsensitiveSearch + NSAnchoredSearch;
         else if ([place isEqualToString: @"ends"])
-            options += NSBackwardsSearch + NSAnchoredSearch;
-        else;
+            options = NSCaseInsensitiveSearch + NSBackwardsSearch + NSAnchoredSearch;
+        else if ([place isEqualToString: @"contains"])
+            options = NSCaseInsensitiveSearch;
+        else
+            NSAssert2(NO, @"\"%@ - %@\" - unknown criteria", type, place);
         
         NSEnumerator * enumerator = [values objectEnumerator];
         NSString * value;
