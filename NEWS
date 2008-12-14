@@ -18,20 +18,27 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.41 (2008/xx/yy)
 <http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity>
 - All Platforms
-   + Fix 1.40 "jumpy upload speed" bug
+   + Better peer management in large swarms
    + Fix 1.40 "Got HTTP Status Code: 0" error message
-   + Parse peer blocklists from bluetack even if they contain Windows newlines
-   + Fix handshake peer_id error
    + Fix 1.40 "lazy bitfield" error
+   + Honor the peer's BEP 10 reqq key, when available
+   + Fix 1.40 "jumpy upload speed" bug
+   + Fix handshake peer_id error
+   + Corrrectly handle Windows-style newlines in bluetack blocklists
    + More accurate bandwidth measurement
+   + File selection & priority was reset when editing a torrent's tracker list
    + Fix autoconf/automake build warnings
 - GTK+
    + In the Details dialog's peer tabs, rows were sometimes duplicated
+   + Minor bugfixes, usability changes, and locale improvements
    + Three new translations: Afrikaans, Asturian, Bosnian
    + Sixteen updated translations
 - Daemon
-   + Minor bugfixes
+   + Fix 1.40 bug in handling IP whitelist
+   + Minor bugfixes and output cleanup
    + Windows portability
+- CLI
+   + Fix minor free-memory-read bug
 
 
 1.40 (2008/11/09)
