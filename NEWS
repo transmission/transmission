@@ -1,7 +1,7 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
 
-1.41 (2008/12/dd)
+1.41 (2008/12/14)
 <http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Better peer management in large swarms
