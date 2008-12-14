@@ -93,7 +93,7 @@ typedef tr_handle tr_session;
  *
  * A libtransmission session is created by calling tr_sessionInit().
  * libtransmission creates a thread for itself so that it can operate
- * independently of the caller's event loop.  The session will  continue
+ * independently of the caller's event loop.  The session will continue
  * until tr_sessionClose() is called.
  *
  * @{
