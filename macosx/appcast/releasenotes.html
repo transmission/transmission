@@ -18,21 +18,55 @@
 				<tr>
 					<td>
 						<ul>
-						<li>Better peer management in large swarms</li>
-						<li>Fix 1.40 "Got HTTP Status Code: 0" error message</li>
-						<li>Fix 1.40 "lazy bitfield" error</li>
-						<li>Honor the peer's BEP 10 reqq key, when available</li>
-						<li>Fix 1.40 "jumpy upload speed" bug</li>
-						<li>Fix handshake peer_id error</li>
-						<li>Corrrectly handle Windows-style newlines in Bluetack blocklists</li>
-						<li>More accurate bandwidth measurement</li>
-						<li>File selection & priority was reset when editing a torrent's tracker list</li>
+						<li>Tracker communication uses fewer resources</li>
+						<li>More accurate bandwidth limits</li>
+						<li>Reduce disk fragmentation by preallocating files</li>
+						<li>Stability, security, and performance improvements to the RPC/Web UI server</li>
+						<li>Support compression when serving Web UI and RPC responses</li>
+						<li>Simplify the RPC whitelist</li>
+						<li>Fix bug that prevented handshakes with encrypted BitComet peers</li>
+						<li>Fix 1.3x bug that could re-download some data unnecessarily</li>
+						<li>Lazy bitfields</li>
 						</ul>
 					</td>
 				</tr>
 			</table>
 			<br>
-			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity">click here</a>.</p>
+			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+				<tr>
+					<td class="blue">
+						<h3>Mac-specific Changes</h3>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<ul>
+						<li>Option to automatically update the blocklist weekly</li>
+						<li>In the file inspector tab, show progress and size for folders</li>
+						<li>Scrollbars correctly appear when the main window auto-resizes</li>
+						<li>Sparkle updated to 1.5b6</li>
+						</ul>
+					</td>
+				</tr>
+			</table>
+			<br>
+			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+				<tr>
+					<td class="blue">
+						<h3>Web Client Changes</h3>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<ul>
+						<li>The Web Client is now out of beta</li>
+						<li>Minor display fixes</li>
+						<li>On iPhone/iPod touch, launching from the home screen hides the address bar</li>
+						</ul>
+					</td>
+				</tr>
+			</table>
+			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.40&group=component&groupdesc=1&order=severity">click here</a>.</p>
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
 					<td class="red">
