@@ -1039,6 +1039,11 @@ prefschanged( TrCore * core UNUSED,
         const int port = pref_int_get( key );
         tr_sessionSetPeerPort( tr, port );
     }
+    else if( !strcmp( key, TR_PREFS_KEY_BLOCKLIST_ENABLED ) )
+    {
+        const gboolean flag = pref_flag_get( key );
+        tr_blocklistSetEnabled( tr, flag );
+    }
     else if( !strcmp( key, PREF_KEY_SHOW_TRAY_ICON ) )
     {
         const int show = pref_flag_get( key );
