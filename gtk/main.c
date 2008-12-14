@@ -1116,6 +1116,14 @@ prefschanged( TrCore * core UNUSED,
         g_message( "setting encryption to %d", encryption );
         tr_sessionSetEncryption( tr, encryption );
     }
+    else if( !strcmp( key, PREF_KEY_BLOCKLIST_ENABLED ) )
+    {
+        tr_blocklistSetEnabled( tr, pref_flag_get( key ) ); 
+    }
+    else if( !strcmp( key, PREF_KEY_DOWNLOAD_DIR ) )
+    {
+        tr_sessionSetDownloadDir( tr, pref_string_get( key ) );
+    }
     else if( !strcmp( key, PREF_KEY_PORT ) )
     {
         const int port = pref_int_get( key );
@@ -1158,13 +1166,11 @@ prefschanged( TrCore * core UNUSED,
     }
     else if( !strcmp( key, PREF_KEY_PORT_FORWARDING ) )
     {
-        const gboolean enabled = pref_flag_get( key );
-        tr_sessionSetPortForwardingEnabled( tr, enabled );
+        tr_sessionSetPortForwardingEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, PREF_KEY_PEX ) )
     {
-        const gboolean b = pref_flag_get( key );
-        tr_sessionSetPortForwardingEnabled( tr, b );
+        tr_sessionSetPexEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, PREF_KEY_RPC_ENABLED ) )
     {
@@ -1231,6 +1237,10 @@ prefschanged( TrCore * core UNUSED,
     {
         const char * s = pref_string_get( key );
         tr_sessionSetProxyPassword( tr, s );
+    }
+    else if( !strcmp( key, PREF_KEY_PORT ) )
+    {
+        tr_sessionSetProxyPort( tr, pref_int_get( key ) );
     }
 }
 
