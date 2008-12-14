@@ -10,6 +10,8 @@
  * $Id$
  */
 
+#include <event.h>
+
 #ifdef __BEOS__
  #include <signal.h>
  #include <fs_info.h>
@@ -102,8 +104,6 @@ tr_amInThread( const tr_thread * t )
 {
     return tr_areThreadsEqual( tr_getCurrentThread( ), t->thread );
 }
-
-#include <event.h>
 
 #ifdef WIN32
  #define ThreadFuncReturnType unsigned WINAPI
