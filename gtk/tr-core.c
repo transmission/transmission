@@ -1224,8 +1224,8 @@ static void
 commitPrefsChange( TrCore *     core,
                    const char * key )
 {
-    pref_save( tr_core_session( core ) );
     g_signal_emit( core, TR_CORE_GET_CLASS( core )->prefsig, 0, key );
+    pref_save( tr_core_session( core ) );
 }
 
 void

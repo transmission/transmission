@@ -189,10 +189,7 @@ void
 pref_int_set( const char * key,
               int64_t      value )
 {
-    tr_benc * d = getPrefs( );
-
-    tr_bencDictRemove( d, key );
-    tr_bencDictAddInt( d, key, value );
+    tr_bencDictAddInt( getPrefs( ), key, value );
 }
 
 void
@@ -264,10 +261,7 @@ void
 pref_string_set( const char * key,
                  const char * value )
 {
-    tr_benc * d = getPrefs( );
-
-    tr_bencDictRemove( d, key );
-    tr_bencDictAddStr( d, key, value );
+    tr_bencDictAddStr( getPrefs( ), key, value );
 }
 
 void
