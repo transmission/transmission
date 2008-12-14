@@ -33,7 +33,7 @@
 
 typedef struct tr_shared tr_shared;
 
-tr_shared* tr_sharedInit( tr_session*, tr_bool isEnabled, tr_bool publicPort );
+tr_shared* tr_sharedInit( tr_session*, tr_bool isEnabled, tr_port publicPort );
 
 void       tr_sharedShuttingDown( tr_shared * );
 

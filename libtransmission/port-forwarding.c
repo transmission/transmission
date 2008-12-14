@@ -205,7 +205,7 @@ sharedPulse( void * vshared )
 tr_shared *
 tr_sharedInit( tr_session  * session,
                tr_bool       isEnabled,
-               tr_bool       publicPort )
+               tr_port       publicPort )
 {
     tr_shared * s = tr_new0( tr_shared, 1 );
 
@@ -216,7 +216,7 @@ tr_sharedInit( tr_session  * session,
     s->natpmp       = tr_natpmpInit( );
     s->upnp         = tr_upnpInit( );
     s->pulseTimer   = tr_timerNew( session, sharedPulse, s, 1000 );
-    s->isEnabled    = isEnabled ? 1 : 0;
+    s->isEnabled    = isEnabled;
     s->upnpStatus   = TR_PORT_UNMAPPED;
     s->natpmpStatus = TR_PORT_UNMAPPED;
 
