@@ -543,13 +543,13 @@ static size_t
 getDesiredOutputBufferSize( const tr_peerIo * io )
 {
     /* this is all kind of arbitrary, but what seems to work well is
-     * being large enough to hold the next 15 seconds' worth of input,
-     * or two and a half blocks, whichever is bigger.
+     * being large enough to hold the next 20 seconds' worth of input,
+     * or a few blocks, whichever is bigger.
      * It's okay to tweak this as needed */
     const double maxBlockSize = 16 * 1024; /* 16 KiB is from BT spec */
     const double currentSpeed = tr_bandwidthGetPieceSpeed( io->bandwidth, TR_UP );
     const double period = 20; /* arbitrary */
-    return MAX( maxBlockSize*2.5, currentSpeed*1024*period );
+    return MAX( maxBlockSize*5.5, currentSpeed*1024*period );
 }
 
 size_t

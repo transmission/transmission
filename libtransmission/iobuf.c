@@ -69,6 +69,8 @@ struct tr_iobuf
 
     int magicNumber;
 
+    int fd;
+
     int timeout_read;  /* in seconds */
     int timeout_write; /* in seconds */
     short enabled;     /* events that are currently enabled */
@@ -88,9 +90,9 @@ isBuf( const struct tr_iobuf * iobuf )
 }
 
 static int
-tr_evbuffer_write( struct evbuffer *buffer, int fd, size_t maxlen )
+tr_evbuffer_write( struct evbuffer *buffer, int fd, size_t howmuch )
 {
-    int n = MIN( EVBUFFER_LENGTH( buffer ), maxlen );
+    int n = MIN( EVBUFFER_LENGTH( buffer ), howmuch );
 
 #ifdef WIN32
     n = send(fd, buffer->buffer, n,  0 );
@@ -105,6 +107,48 @@ tr_evbuffer_write( struct evbuffer *buffer, int fd, size_t maxlen )
 
     return n;
 }
+
+int
+tr_iobuf_flush_output_buffer( struct tr_iobuf * b, size_t howmuch )
+{
+    int res;
+
+    assert( isBuf( b ) );
+
+    howmuch = tr_bandwidthClamp( b->bandwidth, TR_UP, howmuch );
+    howmuch = MIN( howmuch, EVBUFFER_LENGTH( b->output ) );
+
+    res = howmuch ? tr_evbuffer_write( b->output, b->fd, howmuch ) : 0;
+
+    if( ( res > 0 ) && ( b->writecb != NULL ) )
+        (*b->writecb)( b, (size_t)res, b->cbarg );
+
+    if( ( res < 0 ) && ( b->errorcb != NULL ) && ( errno != EAGAIN && errno != EINTR && errno != EINPROGRESS ) )
+        (*b->errorcb)( b, (short)res, b->cbarg );
+
+    return res;
+}
+
+int
+tr_iobuf_tryread( struct tr_iobuf * b, size_t howmuch )
+{
+    int res;
+
+    assert( isBuf( b ) );
+
+    howmuch = tr_bandwidthClamp( b->bandwidth, TR_DOWN, howmuch );
+
+    res = howmuch ? evbuffer_read( b->input, b->fd, howmuch ) : 0;
+
+    if( ( res > 0 ) && ( b->readcb != NULL ) )
+        (*b->readcb)( b, (size_t)res, b->cbarg );
+
+    if( ( res < 0 ) && ( b->errorcb != NULL ) && ( errno != EAGAIN && errno != EINTR ) )
+        (*b->errorcb)( b, (short)res, b->cbarg );
+
+    return res;
+}
+
 
 static int
 tr_iobuf_add(struct event *ev, int timeout)
@@ -258,6 +302,7 @@ tr_iobuf_new( tr_session          * session,
 
     b = tr_new0( struct tr_iobuf, 1 );
     b->magicNumber = MAGIC_NUMBER;
+    b->fd = fd;
     b->session = session;
     b->bandwidth = bandwidth;
     b->input = evbuffer_new( );

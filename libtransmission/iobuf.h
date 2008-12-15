@@ -44,6 +44,10 @@
  * 1. the action callbacks include the number of bytes transferred
  * 2. the up/down speeds are directly constrained by our `bandwidth' object
  * 3. the implementation is hidden in the .c file
+ *
+ * 4. a late addition nasty hack to read/write on demand, called from
+ *    bandwidth. this actually seems to make a lot of this class redundant
+ *    and probably should be refactored.
  */
 struct tr_iobuf;
 
@@ -103,5 +107,9 @@ int tr_iobuf_enable( struct tr_iobuf * iobuf, short event );
 /** @brief tell the iobuf to stop polling for certain states.
     @brief event may be EV_READ, EV_WRITE, or EV_READ|EV_WRITE */
 int tr_iobuf_disable( struct tr_iobuf * iobuf, short event );
+
+int tr_iobuf_flush_output_buffer( struct tr_iobuf * iobuf, size_t max );
+
+int tr_iobuf_tryread( struct tr_iobuf * iobuf, size_t max );
 
 #endif

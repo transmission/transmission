@@ -249,7 +249,7 @@ static void
 allocateBandwidth( tr_bandwidth  * b,
                    tr_direction    dir,
                    int             period_msec,
-                   tr_ptrArray   * addme_buffers )
+                   tr_ptrArray   * iobuf_pool )
 {
     assert( isBandwidth( b ) );
     assert( isDirection( dir ) );
@@ -268,12 +268,11 @@ allocateBandwidth( tr_bandwidth  * b,
 #endif
     }
 
-    /* notify the io buffers that there's more bandwidth available */
     {
         int i;
         const int n = tr_ptrArraySize( b->iobufs );
         for( i=0; i<n; ++i )
-            tr_ptrArrayAppend( addme_buffers, tr_ptrArrayNth( b->iobufs, i ) );
+            tr_ptrArrayAppend( iobuf_pool, tr_ptrArrayNth( b->iobufs, i ) );
     }
 
 #ifdef DEBUG_DIRECTION
@@ -286,7 +285,7 @@ fprintf( stderr, "bandwidth %p has %d iobufs\n", b, n );
         int i, n=0;
         struct tr_bandwidth ** children = (struct tr_bandwidth**) tr_ptrArrayPeek( b->children, &n );
         for( i=0; i<n; ++i )
-            tr_bandwidthAllocate( children[i], dir, period_msec );
+            allocateBandwidth( children[i], dir, period_msec, iobuf_pool );
     }
 }
 
@@ -298,21 +297,33 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     int n;
     tr_ptrArray * tmp;
     struct tr_iobuf ** buffers;
-    const short what = dir==TR_UP ? EV_WRITE : EV_READ;
+    const size_t chunkSize = 1024; /* arbitrary */
 
     tmp = tr_ptrArrayNew( );
     allocateBandwidth( b, dir, period_msec, tmp );
     buffers = (struct tr_iobuf**) tr_ptrArrayPeek( tmp, &n );
 
-    /* notify the io buffers in a random order s.t. no
-       particular peer gets to hog all the bandwidth */
-    while( n > 0 ) {
-        const int i = tr_cryptoRandInt( n );
-        tr_iobuf_enable( buffers[i], what );
-        buffers[i] = buffers[n-1];
-        --n;
+    /* loop through all the peers, reading and writing in small chunks,
+     * until we run out of bandwidth or peers. we do it this way to 
+     * prevent one peer from using up all the bandwidth */
+    while( n > 0 )
+    {
+        int i;
+        for( i=0; i<n; )
+        {
+            int byteCount;
+            if( dir == TR_UP )
+                byteCount = tr_iobuf_flush_output_buffer( buffers[i], chunkSize );
+            else
+                byteCount = tr_iobuf_tryread( buffers[i], chunkSize );
+            if( byteCount == (int)chunkSize )
+                ++i;
+            else
+                buffers[i] = buffers[--n];
+        }
     }
 
+    /* cleanup */
     tr_ptrArrayFree( tmp, NULL );
 }
 

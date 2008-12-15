@@ -1132,6 +1132,7 @@ peerCallbackFunc( void * vpeer,
             {
                 addStrike( t, peer );
                 peer->doPurge = 1;
+                tordbg( t, "setting doPurge because we got an EINVAL error" );
             }
             else if( ( e->err == ERANGE )
                   || ( e->err == EMSGSIZE )
@@ -1139,6 +1140,7 @@ peerCallbackFunc( void * vpeer,
             {
                 /* some protocol error from the peer */
                 peer->doPurge = 1;
+                tordbg( t, "setting doPurge because we got an ERANGE, EMSGSIZE, or ENOTCONN error" );
             }
             else /* a local error, such as an IO error */
             {
@@ -2289,6 +2291,8 @@ reconnectPulse( void * vtorrent )
                 atom->numFails = 0;
             else
                 ++atom->numFails;
+             
+            fprintf( stderr, "removing bad peer %s\n", tr_peerIoGetAddrStr( peer->io ) );
             tordbg( t, "removing bad peer %s", tr_peerIoGetAddrStr( peer->io ) );
             removePeer( t, peer );
         }
