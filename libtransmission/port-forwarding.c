@@ -118,9 +118,9 @@ closeCb( int * const socket,
 }
 
 static void
-acceptCb( int * const socket,
-          tr_address * const addr,
-          void * const userData )
+acceptCb( int        * socket,
+          tr_address * addr UNUSED,
+          void       * userData )
 {
     tr_shared * s = ( tr_shared * )userData;
     tr_address clientAddr;
@@ -216,6 +216,7 @@ sharedPulse( void * vshared )
         tr_ninf( getKey( ), _( "Stopped" ) );
         tr_timerFree( &shared->pulseTimer );
         tr_socketListForEach( shared->bindSockets, &closeCb, shared );
+        tr_socketListFree( shared->bindSockets );
         tr_natpmpClose( shared->natpmp );
         tr_upnpClose( shared->upnp );
         shared->session->shared = NULL;
