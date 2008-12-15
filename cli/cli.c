@@ -511,7 +511,7 @@ parseCommandLine( tr_benc * d, int argc, const char ** argv )
             case 'M': tr_bencDictAddInt( d, TR_PREFS_KEY_PORT_FORWARDING, 0 );
                       break;
             case 'n': sourceFile = optarg; break;
-            case 'p': tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_PORT, 1 );
+            case 'p': tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_PORT, atoi( optarg ) );
                       break;
             case 'r': isPrivate = 1;
                       break;
