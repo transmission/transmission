@@ -118,9 +118,9 @@ closeCb( int * const socket,
 }
 
 static void
-acceptCb( int        * socket,
-          tr_address * addr UNUSED,
-          void       * userData )
+acceptCb( int        * const socket,
+          tr_address * const addr UNUSED,
+          void       * const userData )
 {
     tr_shared * s = ( tr_shared * )userData;
     tr_address clientAddr;
