@@ -240,6 +240,68 @@ publishNewPeers( tr_tracker * t,
         tr_publisherPublish( t->publisher, t, &event );
 }
 
+static void
+publishNewPeersCompact( tr_tracker * t,
+                        int          allAreSeeds,
+                        void       * compact,
+                        int          compactLen )
+{
+    int i;
+    uint8_t *array, *walk, *compactWalk;
+    const int peerCount = compactLen / 6;
+    const int arrayLen = peerCount * ( sizeof( tr_address ) + 2 );
+    tr_address addr;
+    tr_port port;
+    
+    addr.type = TR_AF_INET;
+    memset( &addr.addr, 0x00, sizeof( addr.addr ) );
+    array = tr_new( uint8_t, arrayLen );
+    for ( i = 0, walk = array, compactWalk = compact ; i < peerCount ; i++ )
+    {
+        memcpy( &addr.addr.addr4, compactWalk, 4 );
+        memcpy( &port, compactWalk + 4, 2 );
+        
+        memcpy( walk, &addr, sizeof( addr ) );
+        memcpy( walk + sizeof( addr ), &port, 2 );
+        
+        walk += sizeof( tr_address ) + 2;
+        compactWalk += 6;
+    }
+    publishNewPeers( t, allAreSeeds, array, arrayLen );
+    tr_free( array );
+}
+
+static void
+publishNewPeersCompact6( tr_tracker * t,
+                         int          allAreSeeds,
+                         void       * compact,
+                         int          compactLen )
+{
+    int i;
+    uint8_t *array, *walk, *compactWalk;
+    const int peerCount = compactLen / 18;
+    const int arrayLen = peerCount * ( sizeof( tr_address ) + 2 );
+    tr_address addr;
+    tr_port port;
+    
+    addr.type = TR_AF_INET6;
+    memset( &addr.addr, 0x00, sizeof( addr.addr ) );
+    array = tr_new( uint8_t, arrayLen );
+    for ( i = 0, walk = array, compactWalk = compact ; i < peerCount ; i++ )
+    {
+        memcpy( &addr.addr.addr6, compactWalk, 16 );
+        memcpy( &port, compactWalk + 16, 2 );
+        
+        memcpy( walk, &addr, sizeof( addr ) );
+        memcpy( walk + sizeof( addr ), &port, 2 );
+        
+        walk += sizeof( tr_address ) + 2;
+        compactWalk += 6;
+    }
+    publishNewPeers( t, allAreSeeds, array, arrayLen );
+    tr_free( array );
+}
+
 /***
 ****
 ***/
@@ -276,50 +338,43 @@ updateAddresses( tr_tracker * t,
     return retry;
 }
 
-/* Convert to compact form */
 static uint8_t *
 parseOldPeers( tr_benc * bePeers,
                size_t *  byteCount )
 {
-    /* TODO: IPv6 wtf */
     int       i;
-    uint8_t * compact, *walk;
+    uint8_t * array, *walk;
     const int peerCount = bePeers->val.l.count;
 
     assert( bePeers->type == TYPE_LIST );
 
-    compact = tr_new( uint8_t, peerCount * 6 );
+    array = tr_new( uint8_t, peerCount * ( sizeof( tr_address ) + 2 ) );
 
-    for( i = 0, walk = compact; i < peerCount; ++i )
+    for( i = 0, walk = array; i < peerCount; ++i )
     {
-        const char * s; 
-        int64_t      itmp; 
-        tr_address   addr; 
-        tr_port      port; 
-        tr_benc    * peer = &bePeers->val.l.vals[i]; 
- 
-        if( tr_bencDictFindStr( peer, "ip", &s ) ) 
-        { 
-            if( tr_pton( s, &addr ) == NULL ) 
-                continue; 
-            if( addr.type != TR_AF_INET ) 
-                continue; 
-        } 
- 
-        memcpy( walk, &addr.addr.addr4.s_addr, 4 ); 
-        walk += 4;
+        const char * s;
+        int64_t      itmp;
+        tr_address   addr;
+        tr_port    port;
+        tr_benc *    peer = &bePeers->val.l.vals[i];
 
+        if( tr_bencDictFindStr( peer, "ip", &s ) )
+        {
+            if( tr_pton( s, &addr ) == NULL )
+                continue;
+        }
         if( !tr_bencDictFindInt( peer, "port",
                                  &itmp ) || itmp < 0 || itmp > 0xffff )
             continue;
 
+        memcpy( walk, &addr, sizeof( tr_address ) );
         port = htons( itmp );
-        memcpy( walk, &port, 2 );
-        walk += 2;
+        memcpy( walk + sizeof( tr_address ), &port, 2 );
+        walk += sizeof( tr_address ) + 2;
     }
 
-    *byteCount = peerCount * 6;
-    return compact;
+    *byteCount = peerCount * sizeof( tr_address ) + 2;
+    return array;
 }
 
 static void
@@ -432,15 +487,26 @@ onTrackerResponse( tr_session * session,
 
                 if( tmp->type == TYPE_STR ) /* "compact" extension */
                 {
-                    publishNewPeers( t, allAreSeeds, tmp->val.s.s,
-                                     tmp->val.s.i );
+                    publishNewPeersCompact( t, allAreSeeds, tmp->val.s.s,
+                                            tmp->val.s.i );
                 }
                 else if( tmp->type == TYPE_LIST ) /* original protocol */
                 {
                     size_t    byteCount = 0;
-                    uint8_t * compact = parseOldPeers( tmp, &byteCount );
-                    publishNewPeers( t, allAreSeeds, compact, byteCount );
-                    tr_free( compact );
+                    uint8_t * array = parseOldPeers( tmp, &byteCount );
+                    publishNewPeers( t, allAreSeeds, array, byteCount );
+                    tr_free( array );
+                }
+            }
+            
+            if( ( tmp = tr_bencDictFind( &benc, "peers6" ) ) )
+            {
+                const int allAreSeeds = incomplete == 0;
+                
+                if( tmp->type == TYPE_STR ) /* "compact" extension */
+                {
+                    publishNewPeersCompact6( t, allAreSeeds, tmp->val.s.s,
+                                             tmp->val.s.i );
                 }
             }
         }

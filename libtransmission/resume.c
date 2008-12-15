@@ -34,6 +34,7 @@
 #define KEY_MAX_PEERS       "max-peers"
 #define KEY_PAUSED          "paused"
 #define KEY_PEERS           "peers"
+#define KEY_PEERS6          "peers6"
 #define KEY_PRIORITY        "priority"
 #define KEY_PROGRESS        "progress"
 #define KEY_SPEEDLIMIT      "speed-limit"
@@ -61,17 +62,22 @@ getResumeFilename( const tr_torrent * tor )
 ****
 ***/
 
-/* TODO: resume peers6 */
 static void
 savePeers( tr_benc *          dict,
            const tr_torrent * tor )
 {
-    tr_pex *  pex = NULL;
-    const int count = tr_peerMgrGetPeers( tor->session->peerMgr,
-                                          tor->info.hash, &pex );
+    tr_pex * pex = NULL;
+    int count = tr_peerMgrGetPeers( tor->session->peerMgr,
+                                    tor->info.hash, &pex, TR_AF_INET );
 
     if( count > 0 )
         tr_bencDictAddRaw( dict, KEY_PEERS, pex, sizeof( tr_pex ) * count );
+    
+    count = tr_peerMgrGetPeers( tor->session->peerMgr, tor->info.hash, &pex,
+                                TR_AF_INET6 );
+    if( count > 0 )
+        tr_bencDictAddRaw( dict, KEY_PEERS6, pex, sizeof( tr_pex ) * count );
+    
     tr_free( pex );
 }
 
@@ -94,7 +100,22 @@ loadPeers( tr_benc *    dict,
             tr_peerMgrAddPex( tor->session->peerMgr,
                               tor->info.hash, TR_PEER_FROM_CACHE, &pex );
         }
-        tr_tordbg( tor, "Loaded %d peers from resume file", count );
+        tr_tordbg( tor, "Loaded %d IPv4 peers from resume file", count );
+        ret = TR_FR_PEERS;
+    }
+    
+    if( tr_bencDictFindRaw( dict, KEY_PEERS6, &str, &len ) )
+    {
+        int       i;
+        const int count = len / sizeof( tr_pex );
+        for( i = 0; i < count; ++i )
+        {
+            tr_pex pex;
+            memcpy( &pex, str + ( i * sizeof( tr_pex ) ), sizeof( tr_pex ) );
+            tr_peerMgrAddPex( tor->session->peerMgr,
+                              tor->info.hash, TR_PEER_FROM_CACHE, &pex );
+        }
+        tr_tordbg( tor, "Loaded %d IPv6 peers from resume file", count );
         ret = TR_FR_PEERS;
     }
 

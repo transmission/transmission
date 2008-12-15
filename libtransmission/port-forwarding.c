@@ -38,9 +38,9 @@ struct tr_shared
     tr_port_forwarding    natpmpStatus;
     tr_port_forwarding    upnpStatus;
 
-    int                   bindPort;
-    int                   bindSocket;
-    int                   publicPort;
+    tr_bool               shouldChange;
+    tr_socketList       * bindSockets;
+    tr_port               publicPort;
 
     tr_timer            * pulseTimer;
 
@@ -84,10 +84,10 @@ getNatStateStr( int state )
 static void
 natPulse( tr_shared * s )
 {
-    const int port = s->publicPort;
-    const int isEnabled = s->isEnabled && !s->isShuttingDown;
-    int       oldStatus;
-    int       newStatus;
+    const tr_port port = s->publicPort;
+    const int     isEnabled = s->isEnabled && !s->isShuttingDown;
+    int           oldStatus;
+    int           newStatus;
 
     oldStatus = tr_sharedTraversalStatus( s );
     s->natpmpStatus = tr_natpmpPulse( s->natpmp, port, isEnabled );
@@ -100,75 +100,103 @@ natPulse( tr_shared * s )
                 getNatStateStr( newStatus ) );
 }
 
+/*
+ * Callbacks for socket list
+ */
+static void
+closeCb( int * const socket,
+         tr_address * const addr,
+         void * const userData )
+{
+    tr_shared * s = ( tr_shared * )userData;
+    if( *socket >= 0 )
+    {
+        tr_ninf( getKey( ), _( "Closing port %d on %s" ), s->publicPort,
+                tr_ntop_non_ts( addr ) );
+        tr_netClose( *socket );
+    }
+}
+
+static void
+acceptCb( int * const socket,
+          tr_address * const addr,
+          void * const userData )
+{
+    tr_shared * s = ( tr_shared * )userData;
+    tr_address clientAddr;
+    tr_port clientPort;
+    int clientSocket;
+    clientSocket = tr_netAccept( s->session, *socket, &clientAddr, &clientPort );
+    if( clientSocket > 0 )
+    {
+        tr_deepLog( __FILE__, __LINE__, NULL,
+                   "New INCOMING connection %d (%s)",
+                   clientSocket, tr_peerIoAddrStr( &clientAddr, clientPort ) );
+        
+        tr_peerMgrAddIncoming( s->session->peerMgr, &clientAddr, clientPort,
+                              clientSocket );
+    }
+}
+
+static void
+bindCb( int * const socket,
+        tr_address * const addr,
+        void * const userData )
+{
+    tr_shared * s = ( tr_shared * )userData;
+    *socket = tr_netBindTCP( addr, s->publicPort, FALSE );
+    if( *socket >= 0 )
+    {
+        tr_ninf( getKey( ),
+                _( "Opened port %d on %s to listen for incoming peer connections" ),
+                s->publicPort, tr_ntop_non_ts( addr ) );
+        listen( *socket, 10 );
+    }
+    else
+    {
+        tr_nerr( getKey( ),
+                _(
+                  "Couldn't open port %d on %s to listen for incoming peer connections (errno %d - %s)" ),
+                s->publicPort, tr_ntop_non_ts( addr ), errno, tr_strerror( errno ) );
+    }
+}
+
 static void
 incomingPeersPulse( tr_shared * s )
 {
-    tr_bool allPaused;
+    int allPaused;
     tr_torrent * tor;
-
-    if( s->bindSocket >= 0 && ( s->bindPort != s->publicPort ) )
+    
+    if( s->shouldChange )
     {
-        tr_ninf( getKey( ), _( "Closing port %d" ), s->bindPort );
-        tr_netClose( s->bindSocket );
-        s->bindSocket = -1;
+        tr_socketListForEach( s->bindSockets, &closeCb, s );
+        s->shouldChange = FALSE;
+        if( s->publicPort > 0 )
+            tr_socketListForEach( s->bindSockets, &bindCb, s );
     }
-
-    if( ( s->publicPort > 0 ) && ( s->bindPort != s->publicPort ) )
+    
+    /* see if any torrents aren't paused */
+    allPaused = 1;
+    tor = NULL;
+    while( ( tor = tr_torrentNext( s->session, tor ) ) )
     {
-        int socket;
-        errno = 0;
-        socket = tr_netBindTCP( &tr_inaddr_any, s->publicPort );
-        if( socket >= 0 )
+        if( TR_STATUS_IS_ACTIVE( tr_torrentGetActivity( tor ) ) )
         {
-            tr_ninf( getKey( ),
-                     _(
-                         "Opened port %d to listen for incoming peer connections" ),
-                     s->publicPort );
-            s->bindPort = s->publicPort;
-            s->bindSocket = socket;
-            listen( s->bindSocket, 5 );
-        }
-        else
-        {
-            tr_nerr( getKey( ),
-                    _(
-                        "Couldn't open port %d to listen for incoming peer connections (errno %d - %s)" ),
-                    s->publicPort, errno, tr_strerror( errno ) );
-            s->bindPort = -1;
-            s->bindSocket = -1;
+            allPaused = 0;
+            break;
         }
     }
-
-    /* see if any torrents aren't paused */ 
-    allPaused = 1; 
-    tor = NULL; 
-    while(( tor = tr_torrentNext( s->session, tor ))) { 
-        if( TR_STATUS_IS_ACTIVE( tr_torrentGetActivity( tor ))) { 
-            allPaused = 0; 
-            break; 
-        } 
-    } 
-
-    /* if we have any running torrents, check for new incoming peer connections */ 
-    while( !allPaused )  
-    {
-        int         socket;
-        tr_port     port;
-        tr_address  addr;
-
-        if( s->bindSocket < 0 )
-            break;
-
-        socket = tr_netAccept( s->session, s->bindSocket, &addr, &port );
-        if( socket < 0 )
-            break;
-
-        tr_deepLog( __FILE__, __LINE__, NULL,
-                   "New INCOMING connection %d (%s)",
-                   socket, tr_peerIoAddrStr( &addr, port ) );
-
-        tr_peerMgrAddIncoming( s->session->peerMgr, &addr, port, socket );
-    }
+    
+    /* if we have any running torrents, check for new incoming peer connections */
+    /* (jhujhiti):
+     * This has been changed from a loop that will end when the listener queue
+     * is exhausted to one that will only check for one connection at a time.
+     * I think it unlikely that we get many more than one connection in the
+     * time between pulses (currently one second). However, just to be safe,
+     * I have increased the length of the listener queue from 5 to 10
+     * (see acceptCb() above). */
+    if( !allPaused )
+        tr_socketListForEach( s->bindSockets, &acceptCb, s );
 }
 
 static int
@@ -187,7 +215,7 @@ sharedPulse( void * vshared )
     {
         tr_ninf( getKey( ), _( "Stopped" ) );
         tr_timerFree( &shared->pulseTimer );
-        tr_netClose( shared->bindSocket );
+        tr_socketListForEach( shared->bindSockets, &closeCb, shared );
         tr_natpmpClose( shared->natpmp );
         tr_upnpClose( shared->upnp );
         shared->session->shared = NULL;
@@ -202,6 +230,34 @@ sharedPulse( void * vshared )
 ****
 ***/
 
+static tr_socketList *
+setupBindSockets( tr_port port )
+{
+    /* Do we care if an address is in use? Probably not, since it will be
+     * caught later. This will only set up the list of sockets to bind. */
+    int s4, s6;
+    tr_socketList * socks = NULL;
+    s6 = tr_netBindTCP( &tr_in6addr_any, port, TRUE );
+    if( s6 >= 0 || -s6 != EAFNOSUPPORT ) /* we support ipv6 */
+    {
+        socks = tr_socketListNew( &tr_in6addr_any );
+        listen( s6, 1 );
+    }
+    s4 = tr_netBindTCP( &tr_inaddr_any, port, TRUE );
+    if( s4 >= 0 ) /* we bound *with* the ipv6 socket bound (need both)
+                   * or only have ipv4 */
+    {
+        if( socks )
+            tr_socketListAppend( socks, &tr_inaddr_any );
+        else
+            socks = tr_socketListNew( &tr_inaddr_any );
+        tr_netClose( s4 );
+    }
+    if( s6 >= 0 )
+        tr_netClose( s6 );
+    return socks;
+}
+
 tr_shared *
 tr_sharedInit( tr_session  * session,
                tr_bool       isEnabled,
@@ -211,8 +267,9 @@ tr_sharedInit( tr_session  * session,
 
     s->session      = session;
     s->publicPort   = publicPort;
-    s->bindPort     = -1;
-    s->bindSocket   = -1;
+    s->shouldChange = TRUE;
+    s->bindSockets  = setupBindSockets( publicPort );
+    s->shouldChange = TRUE;
     s->natpmp       = tr_natpmpInit( );
     s->upnp         = tr_upnpInit( );
     s->pulseTimer   = tr_timerNew( session, sharedPulse, s, 1000 );
@@ -234,7 +291,8 @@ tr_sharedSetPort( tr_shared * s, tr_port  port )
 {
     tr_torrent * tor = NULL;
 
-    s->publicPort = port;
+    s->publicPort   = port;
+    s->shouldChange = TRUE;
 
     while( ( tor = tr_torrentNext( s->session, tor ) ) )
         tr_torrentChangeMyPort( tor );

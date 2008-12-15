@@ -450,16 +450,19 @@ getSocketMax( struct tr_fd_s * gFd )
 }
 
 int
-tr_fdSocketCreate( int type )
+tr_fdSocketCreate( int domain, int type )
 {
     int s = -1;
 
     tr_lockLock( gFd->lock );
 
     if( gFd->socketCount < getSocketMax( gFd ) )
-        if( ( s = socket( AF_INET, type, 0 ) ) < 0 )
+        if( ( s = socket( domain, type, 0 ) ) < 0 )
+        {
             tr_err( _( "Couldn't create socket: %s" ),
                    tr_strerror( sockerrno ) );
+            s = -sockerrno;
+        }
 
     if( s > -1 )
         ++gFd->socketCount;
@@ -485,7 +488,7 @@ tr_fdSocketAccept( int           b,
     tr_lockLock( gFd->lock );
     if( gFd->socketCount < getSocketMax( gFd ) )
     {
-        len = sizeof( struct sockaddr );
+        len = sizeof( struct sockaddr_storage );
         s = accept( b, (struct sockaddr *) &sock, &len );
     }
     if( s > -1 )
@@ -503,8 +506,7 @@ tr_fdSocketAccept( int           b,
         { 
             struct sockaddr_in6 * sock6 = (struct sockaddr_in6 *)&sock; 
             addr->type = TR_AF_INET6; 
-            memcpy( &addr->addr, &sock6->sin6_addr, 
-                    sizeof( struct sockaddr_in6 ) ); 
+            addr->addr.addr6 = sock6->sin6_addr;
             *port = sock6->sin6_port; 
         } 
         ++gFd->socketCount;

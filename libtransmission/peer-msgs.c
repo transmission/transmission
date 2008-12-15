@@ -282,6 +282,7 @@ struct tr_peermsgs
     uint8_t         state;
     uint8_t         ut_pex_id;
     uint16_t        pexCount;
+    uint16_t        pexCount6;
     uint16_t        minActiveRequests;
     uint16_t        maxActiveRequests;
 
@@ -308,6 +309,7 @@ struct tr_peermsgs
 
     tr_timer             * pexTimer;
     tr_pex               * pex;
+    tr_pex               * pex6;
 
     time_t                 clientSentPexAt;
     time_t                 clientSentAnythingAt;
@@ -1181,19 +1183,40 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
     tr_peerIoReadBytes( msgs->peer->io, inbuf, tmp, msglen );
 
     if( tr_torrentAllowsPex( tor )
-      && (( loaded = !tr_bencLoad( tmp, msglen, &val, NULL )))
-      && tr_bencDictFindRaw( &val, "added", &added, &added_len ))
+      && ( ( loaded = !tr_bencLoad( tmp, msglen, &val, NULL ) ) ) )
     {
-        const uint8_t * added_f = NULL;
-        tr_pex *        pex;
-        size_t          i, n;
-        size_t          added_f_len = 0;
-        tr_bencDictFindRaw( &val, "added.f", &added_f, &added_f_len );
-        pex = tr_peerMgrCompactToPex( added, added_len, added_f, added_f_len, &n );
-        for( i=0; i<n; ++i )
-            tr_peerMgrAddPex( msgs->session->peerMgr, tor->info.hash,
-                              TR_PEER_FROM_PEX, pex + i );
-        tr_free( pex );
+        if( tr_bencDictFindRaw( &val, "added", &added, &added_len ) )
+        {
+            const uint8_t * added_f = NULL;
+            tr_pex *        pex;
+            size_t          i, n;
+            size_t          added_f_len = 0;
+            tr_bencDictFindRaw( &val, "added.f", &added_f, &added_f_len );
+            pex =
+                tr_peerMgrCompactToPex( added, added_len, added_f, added_f_len,
+                                        &n );
+            for( i = 0; i < n; ++i )
+                tr_peerMgrAddPex( msgs->session->peerMgr, tor->info.hash,
+                                  TR_PEER_FROM_PEX, pex + i );
+            tr_free( pex );
+        }
+        
+        if( tr_bencDictFindRaw( &val, "added6", &added, &added_len ) )
+        {
+            const uint8_t * added_f = NULL;
+            tr_pex *        pex;
+            size_t          i, n;
+            size_t          added_f_len = 0;
+            tr_bencDictFindRaw( &val, "added6.f", &added_f, &added_f_len );
+            pex =
+                tr_peerMgrCompact6ToPex( added, added_len, added_f, added_f_len,
+                                         &n );
+            for( i = 0; i < n; ++i )
+                tr_peerMgrAddPex( msgs->session->peerMgr, tor->info.hash,
+                                  TR_PEER_FROM_PEX, pex + i );
+            tr_free( pex );
+        }
+        
     }
 
     if( loaded )
@@ -2005,17 +2028,21 @@ pexElementCb( void * vpex,
     diffs->elements[diffs->elementCount++] = *pex;
 }
 
-/* TODO: ipv6 pex */
 static void
 sendPex( tr_peermsgs * msgs )
 {
     if( msgs->peerSupportsPex && tr_torrentAllowsPex( msgs->torrent ) )
     {
         PexDiffs diffs;
+        PexDiffs diffs6;
         tr_pex * newPex = NULL;
+        tr_pex * newPex6 = NULL;
         const int newCount = tr_peerMgrGetPeers( msgs->session->peerMgr,
                                                  msgs->torrent->info.hash,
-                                                 &newPex );
+                                                 &newPex, TR_AF_INET );
+        const int newCount6 = tr_peerMgrGetPeers( msgs->session->peerMgr,
+                                                  msgs->torrent->info.hash,
+                                                  &newPex6, TR_AF_INET6 );
 
         /* build the diffs */
         diffs.added = tr_new( tr_pex, newCount );
@@ -2028,14 +2055,28 @@ sendPex( tr_peermsgs * msgs )
                         newPex, newCount,
                         tr_pexCompare, sizeof( tr_pex ),
                         pexDroppedCb, pexAddedCb, pexElementCb, &diffs );
+        diffs6.added = tr_new( tr_pex, newCount6 );
+        diffs6.addedCount = 0;
+        diffs6.dropped = tr_new( tr_pex, msgs->pexCount6 );
+        diffs6.droppedCount = 0;
+        diffs6.elements = tr_new( tr_pex, newCount6 + msgs->pexCount6 );
+        diffs6.elementCount = 0;
+        tr_set_compare( msgs->pex6, msgs->pexCount6,
+                        newPex6, newCount6,
+                        tr_pexCompare, sizeof( tr_pex ),
+                        pexDroppedCb, pexAddedCb, pexElementCb, &diffs6 );
         dbgmsg(
             msgs,
             "pex: old peer count %d, new peer count %d, added %d, removed %d",
-            msgs->pexCount, newCount, diffs.addedCount, diffs.droppedCount );
+            msgs->pexCount, newCount + newCount6,
+            diffs.addedCount + diffs6.addedCount,
+            diffs.droppedCount + diffs6.droppedCount );
 
-        if( !diffs.addedCount && !diffs.droppedCount )
+        if( !diffs.addedCount && !diffs.droppedCount && !diffs6.addedCount &&
+            !diffs6.droppedCount )
         {
             tr_free( diffs.elements );
+            tr_free( diffs6.elements );
         }
         else
         {
@@ -2050,13 +2091,18 @@ sendPex( tr_peermsgs * msgs )
             tr_free( msgs->pex );
             msgs->pex = diffs.elements;
             msgs->pexCount = diffs.elementCount;
+            tr_free( msgs->pex6 );
+            msgs->pex6 = diffs6.elements;
+            msgs->pexCount6 = diffs6.elementCount;
 
             /* build the pex payload */
-            tr_bencInitDict( &val, 3 );
+            tr_bencInitDict( &val, 3 ); /* ipv6 support: left as 3:
+                                         * speed vs. likelihood? */
 
             /* "added" */
             tmp = walk = tr_new( uint8_t, diffs.addedCount * 6 );
-            for( i = 0; i < diffs.addedCount; ++i ) {
+            for( i = 0; i < diffs.addedCount; ++i )
+            {
                 memcpy( walk, &diffs.added[i].addr.addr, 4 ); walk += 4;
                 memcpy( walk, &diffs.added[i].port, 2 ); walk += 2;
             }
@@ -2074,12 +2120,47 @@ sendPex( tr_peermsgs * msgs )
 
             /* "dropped" */
             tmp = walk = tr_new( uint8_t, diffs.droppedCount * 6 );
-            for( i = 0; i < diffs.droppedCount; ++i ) {
+            for( i = 0; i < diffs.droppedCount; ++i )
+            {
                 memcpy( walk, &diffs.dropped[i].addr.addr, 4 ); walk += 4;
                 memcpy( walk, &diffs.dropped[i].port, 2 ); walk += 2;
             }
             assert( ( walk - tmp ) == diffs.droppedCount * 6 );
             tr_bencDictAddRaw( &val, "dropped", tmp, walk - tmp );
+            tr_free( tmp );
+            
+            /* "added6" */
+            tmp = walk = tr_new( uint8_t, diffs6.addedCount * 18 );
+            for( i = 0; i < diffs6.addedCount; ++i )
+            {
+                memcpy( walk, &diffs6.added[i].addr.addr.addr6.s6_addr, 16 );
+                walk += 16;
+                memcpy( walk, &diffs6.added[i].port, 2 );
+                walk += 2;
+            }
+            assert( ( walk - tmp ) == diffs6.addedCount * 18 );
+            tr_bencDictAddRaw( &val, "added6", tmp, walk - tmp );
+            tr_free( tmp );
+            
+            /* "added6.f" */
+            tmp = walk = tr_new( uint8_t, diffs6.addedCount );
+            for( i = 0; i < diffs6.addedCount; ++i )
+                *walk++ = diffs6.added[i].flags;
+            assert( ( walk - tmp ) == diffs6.addedCount );
+            tr_bencDictAddRaw( &val, "added6.f", tmp, walk - tmp );
+            tr_free( tmp );
+            
+            /* "dropped6" */
+            tmp = walk = tr_new( uint8_t, diffs6.droppedCount * 18 );
+            for( i = 0; i < diffs6.droppedCount; ++i )
+            {
+                memcpy( walk, &diffs6.dropped[i].addr.addr.addr6.s6_addr, 16 );
+                walk += 16;
+                memcpy( walk, &diffs6.dropped[i].port, 2 );
+                walk += 2;
+            }
+            assert( ( walk - tmp ) == diffs6.droppedCount * 18);
+            tr_bencDictAddRaw( &val, "dropped6", tmp, walk - tmp );
             tr_free( tmp );
 
             /* write the pex message */
@@ -2099,6 +2180,9 @@ sendPex( tr_peermsgs * msgs )
         tr_free( diffs.added );
         tr_free( diffs.dropped );
         tr_free( newPex );
+        tr_free( diffs6.added );
+        tr_free( diffs6.dropped );
+        tr_free( newPex6 );
 
         msgs->clientSentPexAt = time( NULL );
     }
@@ -2175,6 +2259,7 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
 
         evbuffer_free( msgs->incoming.block );
         evbuffer_free( msgs->outMessages );
+        tr_free( msgs->pex6 );
         tr_free( msgs->pex );
 
         memset( msgs, ~0, sizeof( tr_peermsgs ) );

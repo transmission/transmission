@@ -1346,7 +1346,7 @@ tr_peerMgrAddPex( tr_peerMgr *    manager,
     t = getExistingTorrent( manager, torrentHash );
     if( !tr_sessionIsAddressBlocked( t->manager->session, &pex->addr ) )
         ensureAtomExists( t, &pex->addr, pex->port, pex->flags, from );
-
+    
     managerUnlock( manager );
 }
 
@@ -1371,6 +1371,53 @@ tr_peerMgrCompactToPex( const void *    compact,
             pex[i].flags = added_f[i];
     }
 
+    *pexCount = n;
+    return pex;
+}
+
+tr_pex *
+tr_peerMgrCompact6ToPex( const void    * compact,
+                         size_t          compactLen,
+                         const uint8_t * added_f,
+                         size_t          added_f_len,
+                         size_t        * pexCount )
+{
+    size_t          i;
+    size_t          n = compactLen / 18;
+    const uint8_t * walk = compact;
+    tr_pex *        pex = tr_new0( tr_pex, n );
+    
+    for( i = 0; i < n; ++i )
+    {
+        pex[i].addr.type = TR_AF_INET6;
+        memcpy( &pex[i].addr.addr.addr6.s6_addr, walk, 16 ); walk += 16;
+        memcpy( &pex[i].port, walk, 2 ); walk += 2;
+        if( added_f && ( n == added_f_len ) )
+            pex[i].flags = added_f[i];
+    }
+    
+    *pexCount = n;
+    return pex;
+}
+
+tr_pex *
+tr_peerMgrArrayToPex( const void * array,
+                      size_t       arrayLen,
+                      size_t      * pexCount )
+{
+    size_t          i;
+    size_t          n = arrayLen / ( sizeof( tr_address ) + 2 );
+    /*size_t          n = arrayLen / sizeof( tr_peerArrayElement );*/
+    const uint8_t * walk = array;
+    tr_pex        * pex = tr_new0( tr_pex, n );
+    
+    for( i = 0 ; i < n ; i++ ) {
+        memcpy( &pex[i].addr, walk, sizeof( tr_address ) );
+        memcpy( &pex[i].port, walk + sizeof( tr_address ), 2 );
+        pex[i].flags = 0x00;
+        walk += sizeof( tr_address ) + 2;
+    }
+    
     *pexCount = n;
     return pex;
 }
@@ -1434,11 +1481,13 @@ peerPrefersCrypto( const tr_peer * peer )
 }
 
 int
-tr_peerMgrGetPeers( tr_peerMgr *    manager,
+tr_peerMgrGetPeers( tr_peerMgr    * manager,
                     const uint8_t * torrentHash,
-                    tr_pex **       setme_pex )
+                    tr_pex       ** setme_pex,
+                    uint8_t         af)
 {
     int peerCount = 0;
+    int peersReturning = 0;
     const Torrent *  t;
 
     managerLock( manager );
@@ -1452,30 +1501,36 @@ tr_peerMgrGetPeers( tr_peerMgr *    manager,
     {
         int i;
         const tr_peer ** peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
+        /* for now, this will waste memory on torrents that have both
+         * ipv6 and ipv4 peers */
         tr_pex * pex = tr_new( tr_pex, peerCount );
         tr_pex * walk = pex;
 
         for( i=0; i<peerCount; ++i, ++walk )
         {
             const tr_peer * peer = peers[i];
-            const struct peer_atom * atom = getExistingAtom( t, &peer->addr );
-
-            walk->addr = peer->addr;
-            walk->port = peer->port;
-            walk->flags = 0;
-            if( peerPrefersCrypto( peer ) )
-                walk->flags |= ADDED_F_ENCRYPTION_FLAG;
-            if( ( atom->uploadOnly == UPLOAD_ONLY_YES ) || ( peer->progress >= 1.0 ) )
-                walk->flags |= ADDED_F_SEED_FLAG;
+            if( peer->addr.type == af )
+            {
+                const struct peer_atom * atom = getExistingAtom( t, &peer->addr );
+                memcpy( &walk->addr, &peer->addr, sizeof( walk->addr ) );
+                walk->port = peer->port;
+                walk->flags = 0;
+                if( peerPrefersCrypto( peer ) )
+                    walk->flags |= ADDED_F_ENCRYPTION_FLAG;
+                if( ( atom->uploadOnly == UPLOAD_ONLY_YES ) ||
+                    ( peer->progress >= 1.0 ) )
+                    walk->flags |= ADDED_F_SEED_FLAG;
+                peersReturning++;
+            }
         }
 
         assert( ( walk - pex ) == peerCount );
-        qsort( pex, peerCount, sizeof( tr_pex ), tr_pexCompare );
+        qsort( pex, peersReturning, sizeof( tr_pex ), tr_pexCompare );
         *setme_pex = pex;
     }
 
     managerUnlock( manager );
-    return peerCount;
+    return peersReturning;
 }
 
 static int reconnectPulse( void * vtorrent );
@@ -1785,9 +1840,13 @@ tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
         const tr_peer *          peer = peers[i];
         const struct peer_atom * atom = getExistingAtom( t, &peer->addr );
         tr_peer_stat *           stat = ret + i;
+        tr_address               norm_addr;
 
-        tr_ntop( &peer->addr, stat->addr, sizeof(stat->addr) );
-        tr_strlcpy( stat->client, (peer->client ? peer->client : ""), sizeof(stat->client) );
+        memcpy( &norm_addr, &peer->addr, sizeof( tr_address ) );
+        tr_normalizeV4Mapped( &norm_addr );
+        tr_ntop( &norm_addr, stat->addr, sizeof( stat->addr ) );
+        tr_strlcpy( stat->client, ( peer->client ? peer->client : "" ),
+                   sizeof( stat->client ) );
         stat->port               = ntohs( peer->port );
         stat->from               = atom->from;
         stat->progress           = peer->progress;

@@ -222,10 +222,9 @@ onTrackerResponse( void * tracker UNUSED,
         case TR_TRACKER_PEERS:
         {
             size_t   i, n;
-            tr_pex * pex = tr_peerMgrCompactToPex( event->compact,
-                                                   event->compactLen,
-                                                   NULL, 0, &n );
-            if( event->allAreSeeds )
+            tr_pex * pex = tr_peerMgrArrayToPex( event->compact,
+                                                 event->compactLen, &n );
+             if( event->allAreSeeds )
                 tr_tordbg( tor, "Got %d seeds from tracker", (int)n );
             else
                 tr_torinf( tor, _( "Got %d peers from tracker" ), (int)n );

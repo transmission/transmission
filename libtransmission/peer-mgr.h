@@ -67,6 +67,16 @@ tr_pex * tr_peerMgrCompactToPex( const void    * compact,
                                  size_t          added_f_len,
                                  size_t        * setme_pex_count );
 
+tr_pex * tr_peerMgrCompact6ToPex( const void    * compact,
+                                  size_t          compactLen,
+                                  const uint8_t * added_f,
+                                  size_t          added_f_len,
+                                  size_t        * pexCount );
+
+tr_pex * tr_peerMgrArrayToPex( const void * array,
+                               size_t       arrayLen,
+                               size_t      * setme_pex_count );
+
 void tr_peerMgrAddPex( tr_peerMgr     * manager,
                        const uint8_t  * torrentHash,
                        uint8_t          from,
@@ -79,7 +89,8 @@ void tr_peerMgrSetBlame( tr_peerMgr        * manager,
 
 int  tr_peerMgrGetPeers( tr_peerMgr      * manager,
                          const uint8_t   * torrentHash,
-                         tr_pex         ** setme_pex );
+                         tr_pex         ** setme_pex,
+                         uint8_t           af);
 
 void tr_peerMgrStartTorrent( tr_peerMgr     * manager,
                              const uint8_t  * torrentHash );

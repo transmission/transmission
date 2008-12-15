@@ -55,30 +55,51 @@
 
 struct tr_session;
 
-#define TR_AF_INET  0 
-#define TR_AF_INET6 1 
- 
-typedef struct tr_address { 
-    unsigned short type : 1; 
-    union { 
-        /* The order here is important for tr_in{,6}addr_any initialization, 
-         * since we can't use C99 designated initializers */ 
-        struct in6_addr addr6; 
-        struct in_addr  addr4; 
-    } addr; 
-} tr_address; 
- 
-extern const tr_address tr_inaddr_any; 
-extern const tr_address tr_in6addr_any; 
- 
-const char *tr_ntop( const tr_address * src, 
-                     char * dst, 
-                     int size ); 
-const char *tr_ntop_non_ts( const tr_address * src ); 
-tr_address *tr_pton( const char * src, 
-                     tr_address * dst ); 
-int tr_compareAddresses( const tr_address * a, 
-                         const tr_address * b); 
+#define TR_AF_INET  0
+#define TR_AF_INET6 1
+
+typedef struct tr_address {
+    uint8_t type;
+    union {
+        /* The order here is important for tr_in{,6}addr_any initialization,
+         * since we can't use C99 designated initializers */
+        struct in6_addr addr6;
+        struct in_addr  addr4;
+    } addr;
+} tr_address;
+
+extern const tr_address tr_inaddr_any;
+extern const tr_address tr_in6addr_any;
+
+const char *tr_ntop( const tr_address * src,
+                     char * dst,
+                     int size );
+const char *tr_ntop_non_ts( const tr_address * src );
+tr_address *tr_pton( const char * src,
+                     tr_address * dst );
+int tr_compareAddresses( const tr_address * a,
+                         const tr_address * b);
+void tr_normalizeV4Mapped( tr_address * const addr );
+
+/***********************************************************************
+ * Socket list housekeeping
+ **********************************************************************/
+typedef struct tr_socketList tr_socketList;
+tr_socketList *tr_socketListAppend( tr_socketList * const head,
+                                    const tr_address * const addr );
+tr_socketList *tr_socketListNew( const tr_address * const addr );
+void tr_socketListFree( tr_socketList * const head );
+void tr_socketListRemove( tr_socketList * const head,
+                          tr_socketList * const el);
+void tr_socketListTruncate( tr_socketList * const head,
+                            tr_socketList * const start );
+int tr_socketListGetSocket( const tr_socketList * const el );
+const tr_address *tr_socketListGetAddress( const tr_socketList * const el );
+void tr_socketListForEach( tr_socketList * const head,
+                           void ( * cb ) ( int * const,
+                                           tr_address * const,
+                                           void * const ),
+                           void * const userData);
 
 /***********************************************************************
  * Sockets
@@ -88,7 +109,8 @@ int  tr_netOpenTCP( struct tr_handle * session,
                     tr_port            port );
 
 int  tr_netBindTCP( const tr_address * addr,
-                    tr_port            port );
+                    tr_port            port,
+                    tr_bool            suppressMsgs );
 
 int  tr_netAccept( struct tr_handle  * session,
                    int                 bound,
