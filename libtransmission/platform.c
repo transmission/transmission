@@ -10,7 +10,10 @@
  * $Id$
  */
 
-#include <event.h>
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef WIN32
  #include <windows.h>
@@ -27,11 +30,6 @@
  #include <pthread.h>
 #endif
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <sys/stat.h>
 #include <sys/types.h>
 #ifdef WIN32
@@ -45,6 +43,8 @@
 #include "list.h"
 #include "platform.h"
 #include "utils.h"
+
+#include <event.h>
 
 /***
 ****  THREADS
