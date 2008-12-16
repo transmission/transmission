@@ -126,8 +126,6 @@
 		A25892640CF1F7E800CCCDDF /* StatsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A25892630CF1F7E800CCCDDF /* StatsWindowController.m */; };
 		A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* TransmissionHelp */; };
 		A25AFDE90D1038AD0092A1BA /* MenuLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = A25AFDE80D1038AD0092A1BA /* MenuLabel.m */; };
-		A25B400A0EDCB1B8005DD3F6 /* iobuf.c in Sources */ = {isa = PBXBuildFile; fileRef = A25B40080EDCB1B8005DD3F6 /* iobuf.c */; };
-		A25B400B0EDCB1B8005DD3F6 /* iobuf.h in Headers */ = {isa = PBXBuildFile; fileRef = A25B40090EDCB1B8005DD3F6 /* iobuf.h */; };
 		A25D2CBD0CF4C73E0096A262 /* stats.c in Sources */ = {isa = PBXBuildFile; fileRef = A25D2CBB0CF4C7190096A262 /* stats.c */; };
 		A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */ = {isa = PBXBuildFile; fileRef = A25D2CBA0CF4C7190096A262 /* stats.h */; };
 		A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -532,8 +530,6 @@
 		A259316A0A73B2CC002F4FE7 /* TransmissionHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = TransmissionHelp; path = macosx/TransmissionHelp; sourceTree = "<group>"; };
 		A25AFDE70D1038AD0092A1BA /* MenuLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MenuLabel.h; path = macosx/MenuLabel.h; sourceTree = "<group>"; };
 		A25AFDE80D1038AD0092A1BA /* MenuLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MenuLabel.m; path = macosx/MenuLabel.m; sourceTree = "<group>"; };
-		A25B40080EDCB1B8005DD3F6 /* iobuf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = iobuf.c; path = libtransmission/iobuf.c; sourceTree = "<group>"; };
-		A25B40090EDCB1B8005DD3F6 /* iobuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iobuf.h; path = libtransmission/iobuf.h; sourceTree = "<group>"; };
 		A25D2CBA0CF4C7190096A262 /* stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stats.h; path = libtransmission/stats.h; sourceTree = "<group>"; };
 		A25D2CBB0CF4C7190096A262 /* stats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stats.c; path = libtransmission/stats.c; sourceTree = "<group>"; };
 		A25E03E00E4015380086C225 /* tr-getopt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-getopt.h"; path = "libtransmission/tr-getopt.h"; sourceTree = "<group>"; };
@@ -1134,8 +1130,6 @@
 				4D36BA610CA2F00800A63CA5 /* crypto.h */,
 				4D36BA630CA2F00800A63CA5 /* handshake.c */,
 				4D36BA640CA2F00800A63CA5 /* handshake.h */,
-				A25B40080EDCB1B8005DD3F6 /* iobuf.c */,
-				A25B40090EDCB1B8005DD3F6 /* iobuf.h */,
 				4D36BA650CA2F00800A63CA5 /* peer-io.c */,
 				4D36BA660CA2F00800A63CA5 /* peer-io.h */,
 				4D36BA670CA2F00800A63CA5 /* peer-mgr-private.h */,
@@ -1449,7 +1443,6 @@
 				A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */,
 				A25E03E20E4015380086C225 /* tr-getopt.h in Headers */,
 				A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */,
-				A25B400B0EDCB1B8005DD3F6 /* iobuf.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1864,7 +1857,6 @@
 				A25E03E30E4015380086C225 /* tr-getopt.c in Sources */,
 				4DB74F080E8CD75100AEB1A8 /* wildmat.c in Sources */,
 				A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */,
-				A25B400A0EDCB1B8005DD3F6 /* iobuf.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
