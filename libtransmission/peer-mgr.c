@@ -2292,7 +2292,6 @@ reconnectPulse( void * vtorrent )
             else
                 ++atom->numFails;
              
-            fprintf( stderr, "removing bad peer %s\n", tr_peerIoGetAddrStr( peer->io ) );
             tordbg( t, "removing bad peer %s", tr_peerIoGetAddrStr( peer->io ) );
             removePeer( t, peer );
         }
