@@ -80,10 +80,7 @@ void                 tr_peerIoSetTorrentHash( tr_peerIo *     io,
 
 int                  tr_peerIoReconnect( tr_peerIo * io );
 
-int                  tr_peerIoIsIncoming( const tr_peerIo * io );
-
-void                 tr_peerIoSetTimeoutSecs( tr_peerIo * io,
-                                              int         secs );
+tr_bool              tr_peerIoIsIncoming( const tr_peerIo * io );
 
 int                  tr_peerIoGetAge( const tr_peerIo * io );
 
@@ -109,7 +106,7 @@ typedef enum
 }
 ReadState;
 
-typedef ReadState ( *tr_can_read_cb  )( struct tr_iobuf  * iobuf,
+typedef ReadState ( *tr_can_read_cb  )( tr_peerIo        * io,
                                         void             * user_data,
                                         size_t           * setme_piece_byte_count );
 
@@ -118,7 +115,7 @@ typedef void      ( *tr_did_write_cb )( tr_peerIo        * io,
                                         int                wasPieceData,
                                         void             * userData );
 
-typedef void      ( *tr_net_error_cb )( struct tr_iobuf  * ev,
+typedef void      ( *tr_net_error_cb )( tr_peerIo        * io,
                                         short              what,
                                         void             * userData );
 
@@ -155,62 +152,73 @@ typedef enum
 }
 EncryptionMode;
 
-void              tr_peerIoSetEncryption( tr_peerIo * io,
-                                          int         encryptionMode );
+void      tr_peerIoSetEncryption( tr_peerIo * io,
+                                  int         encryptionMode );
 
-int               tr_peerIoIsEncrypted( const tr_peerIo * io );
+int       tr_peerIoIsEncrypted( const tr_peerIo * io );
 
-void              tr_peerIoWriteBytes( tr_peerIo *       io,
-                                       struct evbuffer * outbuf,
-                                       const void *      bytes,
-                                       size_t            byteCount );
+void      tr_peerIoWriteBytes( tr_peerIo *       io,
+                               struct evbuffer * outbuf,
+                               const void *      bytes,
+                               size_t            byteCount );
 
-void              tr_peerIoWriteUint8( tr_peerIo *       io,
-                                       struct evbuffer * outbuf,
-                                       uint8_t           writeme );
+void      tr_peerIoWriteUint8( tr_peerIo *       io,
+                               struct evbuffer * outbuf,
+                               uint8_t           writeme );
 
-void              tr_peerIoWriteUint16( tr_peerIo *       io,
-                                        struct evbuffer * outbuf,
-                                        uint16_t          writeme );
+void      tr_peerIoWriteUint16( tr_peerIo *       io,
+                                struct evbuffer * outbuf,
+                                uint16_t          writeme );
 
-void              tr_peerIoWriteUint32( tr_peerIo *       io,
-                                        struct evbuffer * outbuf,
-                                        uint32_t          writeme );
+void      tr_peerIoWriteUint32( tr_peerIo *       io,
+                                struct evbuffer * outbuf,
+                                uint32_t          writeme );
 
-void              tr_peerIoReadBytes( tr_peerIo *       io,
-                                      struct evbuffer * inbuf,
-                                      void *            bytes,
-                                      size_t            byteCount );
+void      tr_peerIoReadBytes( tr_peerIo *       io,
+                              struct evbuffer * inbuf,
+                              void *            bytes,
+                              size_t            byteCount );
 
-void              tr_peerIoReadUint8( tr_peerIo *       io,
-                                      struct evbuffer * inbuf,
-                                      uint8_t *         setme );
+void      tr_peerIoReadUint8( tr_peerIo *       io,
+                              struct evbuffer * inbuf,
+                              uint8_t *         setme );
 
-void              tr_peerIoReadUint16( tr_peerIo *       io,
-                                       struct evbuffer * inbuf,
-                                       uint16_t *        setme );
+void      tr_peerIoReadUint16( tr_peerIo *       io,
+                               struct evbuffer * inbuf,
+                               uint16_t *        setme );
 
-void              tr_peerIoReadUint32( tr_peerIo *       io,
-                                       struct evbuffer * inbuf,
-                                       uint32_t *        setme );
+void      tr_peerIoReadUint32( tr_peerIo *       io,
+                               struct evbuffer * inbuf,
+                               uint32_t *        setme );
 
-void              tr_peerIoDrain( tr_peerIo *       io,
-                                  struct evbuffer * inbuf,
-                                  size_t            byteCount );
+void      tr_peerIoDrain( tr_peerIo *       io,
+                          struct evbuffer * inbuf,
+                          size_t            byteCount );
 
 /**
 ***
 **/
 
-size_t            tr_peerIoGetWriteBufferSpace( const tr_peerIo * io );
+size_t    tr_peerIoGetWriteBufferSpace( const tr_peerIo * io );
 
-void              tr_peerIoSetBandwidth( tr_peerIo            * io,
-                                         struct tr_bandwidth  * bandwidth );
+void      tr_peerIoSetBandwidth( tr_peerIo            * io,
+                                 struct tr_bandwidth  * bandwidth );
 
-void              tr_peerIoBandwidthUsed( tr_peerIo           * io,
-                                          tr_direction          direction,
-                                          size_t                byteCount,
-                                          int                   isPieceData );
+void      tr_peerIoBandwidthUsed( tr_peerIo           * io,
+                                  tr_direction          direction,
+                                  size_t                byteCount,
+                                  int                   isPieceData );
+
+/**
+***
+**/
+
+int       tr_peerIoFlush( tr_peerIo     * io,
+                          tr_direction    dir,
+                          size_t          byteLimit );
+
+struct evbuffer * tr_peerIoGetReadBuffer( tr_peerIo * io );
+
 
 
 

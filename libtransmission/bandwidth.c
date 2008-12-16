@@ -18,7 +18,7 @@
 #include "transmission.h"
 #include "bandwidth.h"
 #include "crypto.h"
-#include "iobuf.h"
+#include "peer-io.h"
 #include "ptrarray.h"
 #include "utils.h"
 
@@ -99,7 +99,7 @@ struct tr_bandwidth
     int magicNumber;
     tr_session * session;
     tr_ptrArray * children; /* struct tr_bandwidth */
-    tr_ptrArray * iobufs; /* struct tr_iobuf */
+    tr_ptrArray * peers; /* tr_peerIo */
 };
 
 /***
@@ -134,7 +134,7 @@ tr_bandwidthNew( tr_session * session, tr_bandwidth * parent )
     tr_bandwidth * b = tr_new0( tr_bandwidth, 1 );
     b->session = session;
     b->children = tr_ptrArrayNew( );
-    b->iobufs = tr_ptrArrayNew( );
+    b->peers = tr_ptrArrayNew( );
     b->magicNumber = MAGIC_NUMBER;
     b->band[TR_UP].honorParentLimits = 1;
     b->band[TR_DOWN].honorParentLimits = 1;
@@ -148,7 +148,7 @@ tr_bandwidthFree( tr_bandwidth * b )
     assert( isBandwidth( b ) );
 
     tr_bandwidthSetParent( b, NULL );
-    tr_ptrArrayFree( b->iobufs, NULL );
+    tr_ptrArrayFree( b->peers, NULL );
     tr_ptrArrayFree( b->children, NULL );
     b->magicNumber = 0xDEAD;
     tr_free( b );
@@ -249,7 +249,7 @@ static void
 allocateBandwidth( tr_bandwidth  * b,
                    tr_direction    dir,
                    int             period_msec,
-                   tr_ptrArray   * iobuf_pool )
+                   tr_ptrArray   * peer_pool )
 {
     assert( isBandwidth( b ) );
     assert( isDirection( dir ) );
@@ -270,14 +270,14 @@ allocateBandwidth( tr_bandwidth  * b,
 
     {
         int i;
-        const int n = tr_ptrArraySize( b->iobufs );
+        const int n = tr_ptrArraySize( b->peers );
         for( i=0; i<n; ++i )
-            tr_ptrArrayAppend( iobuf_pool, tr_ptrArrayNth( b->iobufs, i ) );
+            tr_ptrArrayAppend( peer_pool, tr_ptrArrayNth( b->peers, i ) );
     }
 
 #ifdef DEBUG_DIRECTION
 if( ( dir == DEBUG_DIRECTION ) && ( n > 1 ) )
-fprintf( stderr, "bandwidth %p has %d iobufs\n", b, n );
+fprintf( stderr, "bandwidth %p has %d peers\n", b, n );
 #endif
 
     /* all children should reallocate too */
@@ -285,7 +285,7 @@ fprintf( stderr, "bandwidth %p has %d iobufs\n", b, n );
         int i, n=0;
         struct tr_bandwidth ** children = (struct tr_bandwidth**) tr_ptrArrayPeek( b->children, &n );
         for( i=0; i<n; ++i )
-            allocateBandwidth( children[i], dir, period_msec, iobuf_pool );
+            allocateBandwidth( children[i], dir, period_msec, peer_pool );
     }
 }
 
@@ -296,30 +296,31 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
 {
     int n;
     tr_ptrArray * tmp;
-    struct tr_iobuf ** buffers;
+    struct tr_peerIo ** peers;
     const size_t chunkSize = 1024; /* arbitrary */
 
     tmp = tr_ptrArrayNew( );
     allocateBandwidth( b, dir, period_msec, tmp );
-    buffers = (struct tr_iobuf**) tr_ptrArrayPeek( tmp, &n );
+    peers = (struct tr_peerIo**) tr_ptrArrayPeek( tmp, &n );
 
     /* loop through all the peers, reading and writing in small chunks,
      * until we run out of bandwidth or peers. we do it this way to 
      * prevent one peer from using up all the bandwidth */
+fprintf( stderr, "%s - %d peers\n", (dir==TR_UP)?"up":"down", n );
     while( n > 0 )
     {
         int i;
         for( i=0; i<n; )
         {
-            int byteCount;
-            if( dir == TR_UP )
-                byteCount = tr_iobuf_flush_output_buffer( buffers[i], chunkSize );
-            else
-                byteCount = tr_iobuf_tryread( buffers[i], chunkSize );
+            const int byteCount = tr_peerIoFlush( peers[i], dir, chunkSize );
+
+            if( byteCount )
+                fprintf( stderr, "peer %p: %d bytes\n", peers[i], byteCount );
+
             if( byteCount == (int)chunkSize )
                 ++i;
             else
-                buffers[i] = buffers[--n];
+                peers[i] = peers[--n];
         }
     }
 
@@ -332,23 +333,23 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
 ***/
 
 void
-tr_bandwidthAddBuffer( tr_bandwidth        * b,
-                       struct tr_iobuf     * iobuf )
+tr_bandwidthAddPeer( tr_bandwidth   * b,
+                     tr_peerIo      * peerIo )
 {
     assert( isBandwidth( b ) );
-    assert( iobuf );
+    assert( peerIo );
 
-    tr_ptrArrayInsertSorted( b->iobufs, iobuf, comparePointers );
+    tr_ptrArrayInsertSorted( b->peers, peerIo, comparePointers );
 }
 
 void
-tr_bandwidthRemoveBuffer( tr_bandwidth        * b,
-                          struct tr_iobuf     * iobuf )
+tr_bandwidthRemovePeer( tr_bandwidth  * b,
+                        tr_peerIo     * peerIo )
 {
     assert( isBandwidth( b ) );
-    assert( iobuf );
+    assert( peerIo );
 
-    tr_ptrArrayRemoveSorted( b->iobufs, iobuf, comparePointers );
+    tr_ptrArrayRemoveSorted( b->peers, peerIo, comparePointers );
 }
 
 /***

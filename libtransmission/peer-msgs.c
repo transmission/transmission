@@ -24,7 +24,6 @@
 #include "completion.h"
 #include "crypto.h"
 #include "inout.h"
-#include "iobuf.h"
 #ifdef WIN32
 #include "net.h" /* for ECONN */
 #endif
@@ -874,6 +873,7 @@ expireOldRequests( tr_peermsgs * msgs, const time_t now  )
     time_t oldestAllowed;
     struct request_list tmp = REQUEST_LIST_INIT;
     const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
+    dbgmsg( msgs, "entering `expire old requests' block" );
 
     /* cancel requests that have been queued for too long */
     oldestAllowed = now - QUEUED_REQUEST_TTL_SECS;
@@ -897,6 +897,8 @@ expireOldRequests( tr_peermsgs * msgs, const time_t now  )
         }
         reqListClear( &tmp );
     }
+
+    dbgmsg( msgs, "leaving `expire old requests' block" );
 }
 
 static void
@@ -1054,13 +1056,13 @@ tr_peerMsgsCancel( tr_peermsgs * msgs,
 
     /* if it's only in the queue and hasn't been sent yet, free it */
     if( reqListRemove( &msgs->clientWillAskFor, &req ) ) {
-        dbgmsg( msgs, "cancelling %"PRIu32":%"PRIu32"->%"PRIu32"\n", pieceIndex, offset, length );
+        dbgmsg( msgs, "cancelling %"PRIu32":%"PRIu32"->%"PRIu32, pieceIndex, offset, length );
         fireCancelledReq( msgs, &req );
     }
 
     /* if it's already been sent, send a cancel message too */
     if( reqListRemove( &msgs->clientAskedFor, &req ) ) {
-        dbgmsg( msgs, "cancelling %"PRIu32":%"PRIu32"->%"PRIu32"\n", pieceIndex, offset, length );
+        dbgmsg( msgs, "cancelling %"PRIu32":%"PRIu32"->%"PRIu32, pieceIndex, offset, length );
         protocolSendCancel( msgs, &req );
         fireCancelledReq( msgs, &req );
     }
@@ -1721,11 +1723,11 @@ didWrite( tr_peerIo * io UNUSED, size_t bytesWritten, int wasPieceData, void * v
 }
 
 static ReadState
-canRead( struct tr_iobuf * iobuf, void * vmsgs, size_t * piece )
+canRead( tr_peerIo * io, void * vmsgs, size_t * piece )
 {
     ReadState         ret;
     tr_peermsgs *     msgs = vmsgs;
-    struct evbuffer * in = tr_iobuf_input( iobuf );
+    struct evbuffer * in = tr_peerIoGetReadBuffer( io );
     const size_t      inlen = EVBUFFER_LENGTH( in );
 
     if( !inlen )
@@ -1767,12 +1769,15 @@ ratePulse( void * vmsgs )
 {
     tr_peermsgs * msgs = vmsgs;
     const double rateToClient = tr_peerGetPieceSpeed( msgs->peer, TR_PEER_TO_CLIENT );
-    const int estimatedBlocksInNext30Seconds =
-                  ( rateToClient * 30 * 1024 ) / msgs->torrent->blockSize;
+    const int seconds = 10;
+    const int estimatedBlocksInPeriod = ( rateToClient * seconds * 1024 ) / msgs->torrent->blockSize;
+
     msgs->minActiveRequests = 8;
-    msgs->maxActiveRequests = msgs->minActiveRequests + estimatedBlocksInNext30Seconds;
+    msgs->maxActiveRequests = msgs->minActiveRequests + estimatedBlocksInPeriod;
+
     if( msgs->reqq > 0 )
         msgs->maxActiveRequests = MIN( msgs->maxActiveRequests, msgs->reqq );
+
     return TRUE;
 }
 
@@ -1881,14 +1886,14 @@ peerPulse( void * vmsgs )
 void
 tr_peerMsgsPulse( tr_peermsgs * msgs )
 {
-    if( msgs != NULL )
+    if( msgs )
         peerPulse( msgs );
 }
 
 static void
-gotError( struct tr_iobuf  * iobuf UNUSED,
-          short              what,
-          void             * vmsgs )
+gotError( tr_peerIo  * io UNUSED,
+          short        what,
+          void       * vmsgs )
 {
     if( what & EVBUFFER_TIMEOUT )
         dbgmsg( vmsgs, "libevent got a timeout, what=%hd", what );
@@ -2239,7 +2244,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
 
     tellPeerWhatWeHave( m );
 
-    tr_peerIoSetTimeoutSecs( m->peer->io, 150 ); /* timeout after N seconds of inactivity */
     tr_peerIoSetIOFuncs( m->peer->io, canRead, didWrite, gotError, m );
     ratePulse( m );
 

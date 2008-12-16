@@ -24,7 +24,6 @@ libtransmission_a_SOURCES = \
     ggets.c \
     handshake.c \
     inout.c \
-    iobuf.c \
     json.c \
     JSON_parser.c \
     list.c \
@@ -70,7 +69,6 @@ noinst_HEADERS = \
     ggets.h \
     handshake.h \
     inout.h \
-    iobuf.h \
     json.h \
     JSON_parser.h \
     list.h \

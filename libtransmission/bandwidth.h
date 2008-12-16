@@ -58,7 +58,10 @@ struct tr_iobuf;
  *   and call tr_bandwidthClamp() before performing I/O to see how much 
  *   bandwidth they can safely use.
  */
+
 typedef struct tr_bandwidth tr_bandwidth;
+
+struct tr_peerIo;
 
 /**
 ***
@@ -166,16 +169,16 @@ void    tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
 ******/
 
 /**
- * @brief add an iobuf to this bandwidth's list of iobufs.
+ * @brief add a tr_peerIo to this bandwidth's list.
  * They will be notified when more bandwidth is made available for them to consume.
  */
-void    tr_bandwidthAddBuffer         ( tr_bandwidth        * bandwidth,
-                                        struct tr_iobuf     * iobuf );
+void    tr_bandwidthAddPeer           ( tr_bandwidth        * bandwidth,
+                                        struct tr_peerIo    * peerIo );
 
 /**
  * @brief remove an iobuf from this bandwidth's list of iobufs.
  */
-void    tr_bandwidthRemoveBuffer      ( tr_bandwidth        * bandwidth,
-                                        struct tr_iobuf     * iobuf );
+void    tr_bandwidthRemovePeer        ( tr_bandwidth        * bandwidth,
+                                        struct tr_peerIo    * peerIo );
 
 #endif
