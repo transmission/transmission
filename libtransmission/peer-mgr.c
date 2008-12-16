@@ -1509,7 +1509,7 @@ tr_peerMgrGetPeers( tr_peerMgr    * manager,
         tr_pex * pex = tr_new( tr_pex, peerCount );
         tr_pex * walk = pex;
 
-        for( i=0; i<peerCount; ++i, ++walk )
+        for( i=0; i<peerCount; ++i )
         {
             const tr_peer * peer = peers[i];
             if( peer->addr.type == af )
@@ -1524,12 +1524,22 @@ tr_peerMgrGetPeers( tr_peerMgr    * manager,
                 if( ( atom->uploadOnly == UPLOAD_ONLY_YES ) ||
                     ( peer->progress >= 1.0 ) )
                     walk->flags |= ADDED_F_SEED_FLAG;
-                peersReturning++;
+                ++peersReturning;
+                ++walk;
             }
         }
 
+#warning this for loop can be removed when we're sure the bug is fixed
+        for( i=0; i<peersReturning; ++i )
+            assert( tr_isAddress( &pex[i].addr ) );
+
         assert( ( walk - pex ) == peerCount );
         qsort( pex, peersReturning, sizeof( tr_pex ), tr_pexCompare );
+
+#warning this for loop can be removed when we're sure the bug is fixed
+        for( i=0; i<peersReturning; ++i )
+            assert( tr_isAddress( &pex[i].addr ) );
+
         *setme_pex = pex;
     }
 
