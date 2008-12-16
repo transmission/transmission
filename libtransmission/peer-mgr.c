@@ -57,7 +57,7 @@ enum
     RECONNECT_PERIOD_MSEC = ( 2 * 1000 ),
    
     /* how frequently to reallocate bandwidth */
-    BANDWIDTH_PERIOD_MSEC = 250,
+    BANDWIDTH_PERIOD_MSEC = 200,
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
     MAX_RECONNECTIONS_PER_PULSE = 4,
@@ -886,6 +886,7 @@ broadcastGotBlock( Torrent * t, uint32_t index, uint32_t offset, uint32_t length
 
     assert( torrentIsLocked( t ) );
 
+    tordbg( t, "got a block; cancelling any duplicate requests from peers %"PRIu32":%"PRIu32"->%"PRIu32, index, offset, length );
     peers = getConnectedPeers( t, &size );
     for( i=0; i<size; ++i )
         tr_peerMsgsCancel( peers[i]->msgs, index, offset, length );
@@ -1514,7 +1515,8 @@ tr_peerMgrGetPeers( tr_peerMgr    * manager,
             if( peer->addr.type == af )
             {
                 const struct peer_atom * atom = getExistingAtom( t, &peer->addr );
-                memcpy( &walk->addr, &peer->addr, sizeof( walk->addr ) );
+                assert( tr_isAddress( &peer->addr ) );
+                walk->addr = peer->addr;
                 walk->port = peer->port;
                 walk->flags = 0;
                 if( peerPrefersCrypto( peer ) )
