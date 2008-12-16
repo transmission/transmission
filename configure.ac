@@ -45,8 +45,8 @@ AC_SUBST(DBUS_GLIB_MINIMUM)
 AC_PROG_CC
 AC_PROG_CXX
 if test "x$GCC" = "xyes" ; then
-    CFLAGS="-g -Wall -Wformat-security -W -Wmissing-prototypes -Wdeclaration-after-statement -O3 -funroll-loops"
-    CXXFLAGS="-g -Wall -Wformat-security -W -O3 -funroll-loops"
+    CFLAGS="-Wall -Wformat-security -W -Wmissing-prototypes -Wdeclaration-after-statement"
+    CXXFLAGS="-Wall -Wformat-security -W"
 fi
 
 AC_HEADER_STDC
@@ -90,6 +90,21 @@ AC_TRY_LINK([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);],
 
 dnl ----------------------------------------------------------------------------
 dnl
+dnl  debugging support
+AC_ARG_ENABLE([debug],
+	      AS_HELP_STRING([--enable-debug],[build with debugging support]),,
+	      [enable_debug=no])
+if test "x$enable_debug" = "xyes" ; then
+	CFLAGS+=" -g "
+	CXXFLAGS+=" -g "
+else
+	CFLAGS+=" -O3 -funroll-loops -DNDEBUG "
+	CXXFLAGS+=" -O3 -funroll-loops -DNDEBUG "
+fi
+
+
+dnl ----------------------------------------------------------------------------
+dnl
 dnl  libevent fun
 
 AC_CONFIG_SUBDIRS([third-party/libevent])
@@ -110,7 +125,7 @@ PKG_CHECK_MODULES(GTK,
                   [have_gtk=yes],
                   [have_gtk=no])
 AC_ARG_ENABLE([gtk],
-              AC_HELP_STRING([--enable-gtk],[build gtk client]),
+              AS_HELP_STRING([--enable-gtk],[build gtk client]),
               [want_gtk=${enableval}],
               [want_gtk=${have_gtk}])
 build_gtk=no
@@ -202,7 +217,7 @@ dnl  wxWidgets detection for the wxWidgets client
 
 build_wx=no
 AC_ARG_ENABLE([wx],
-              AC_HELP_STRING([--enable-wx],[build wxWidgets client]),
+              AS_HELP_STRING([--enable-wx],[build wxWidgets client]),
               [want_wx=${enableval}],
               [want_wx=no])
 if test "x$want_wx" != "xno"; then
@@ -260,19 +275,19 @@ EOF
 esac
 
 AC_ARG_ENABLE([cli],
-              [AC_HELP_STRING([--enable-cli],[build command-line client])],
+              [AS_HELP_STRING([--enable-cli],[build command-line client])],
               [build_cli=${enableval}],
               [build_cli="yes"])
 AM_CONDITIONAL([BUILD_CLI],[test "x$build_cli" = "xyes"])
 
 AC_ARG_ENABLE([mac],
-              [AC_HELP_STRING([--enable-mac],[build OS X client])],
+              [AS_HELP_STRING([--enable-mac],[build OS X client])],
               [build_mac=${enableval}],
               [build_mac=${have_darwin}])
 AM_CONDITIONAL([BUILD_MAC],[test "x$build_mac" = "xyes"])
 
 AC_ARG_ENABLE([daemon],
-              [AC_HELP_STRING([--enable-daemon],[build daemon])],
+              [AS_HELP_STRING([--enable-daemon],[build daemon])],
               [build_daemon=${enableval}],
               [build_daemon="yes"])
 AM_CONDITIONAL([BUILD_DAEMON],[test "x$build_daemon" = "xyes"])
@@ -315,6 +330,7 @@ Configuration:
 
         Source code location:       ${srcdir}
         Compiler:                   ${CXX}
+        Debugging support           ${enable_debug}
         Build Command-Line client:  ${build_cli}
         Build Daemon:               ${build_daemon}
         Build GTK+ client:          ${build_gtk}
