@@ -10,11 +10,6 @@
  * $Id$
  */
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #ifdef WIN32
  #include <windows.h>
  #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_MYDOCUMENTS */
@@ -29,6 +24,11 @@
  #endif
  #include <pthread.h>
 #endif
+
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <sys/stat.h>
 #include <sys/types.h>
