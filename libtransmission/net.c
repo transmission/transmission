@@ -436,8 +436,6 @@ tr_netAccept( tr_session  * session,
 {
     int fd;
 
-    assert( tr_isAddress( addr ) );
-
     fd = makeSocketNonBlocking( tr_fdSocketAccept( b, addr, port ) );
     setSndBuf( session, fd );
     return fd;
