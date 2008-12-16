@@ -394,11 +394,11 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
     const int               type = SOCK_STREAM;
     int                     addrlen;
 
-    assert( tr_isAddress( addr ) );
-
 #if defined( SO_REUSEADDR ) || defined( SO_REUSEPORT )
     int                optval;
 #endif
+
+    assert( tr_isAddress( addr ) );
 
     if( ( s = createSocket( ( addr->type == TR_AF_INET ? AF_INET : AF_INET6 ),
                             type ) ) < 0 )
