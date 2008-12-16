@@ -43,9 +43,9 @@ getUsage( void )
            "A fast and easy BitTorrent client\n"
            "\n"
            MY_NAME " is a headless Transmission session\n"
-                   "that can be controlled via transmission-remote or Clutch.\n"
-                   "\n"
-                   "Usage: " MY_NAME " [options]";
+           "that can be controlled via transmission-remote or Clutch.\n"
+           "\n"
+           "Usage: " MY_NAME " [options]";
 }
 
 static const struct tr_option options[] =
@@ -200,6 +200,7 @@ main( int     argc,
     tr_bencInitDict( &settings, 0 );
     configDir = getConfigDir( argc, (const char**)argv );
     tr_sessionLoadSettings( &settings, configDir, MY_NAME );
+    tr_bencDictAddInt( &settings, TR_PREFS_KEY_RPC_ENABLED, 1 );
 
     /* overwrite settings from the comamndline */
     tr_optind = 1;
