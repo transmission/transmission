@@ -1484,10 +1484,10 @@ peerPrefersCrypto( const tr_peer * peer )
 }
 
 int
-tr_peerMgrGetPeers( tr_peerMgr    * manager,
-                    const uint8_t * torrentHash,
-                    tr_pex       ** setme_pex,
-                    uint8_t         af)
+tr_peerMgrGetPeers( tr_peerMgr      * manager,
+                    const uint8_t   * torrentHash,
+                    tr_pex         ** setme_pex,
+                    uint8_t           af)
 {
     int peerCount = 0;
     int peersReturning = 0;
@@ -1533,7 +1533,7 @@ tr_peerMgrGetPeers( tr_peerMgr    * manager,
         for( i=0; i<peersReturning; ++i )
             assert( tr_isAddress( &pex[i].addr ) );
 
-        assert( ( walk - pex ) == peerCount );
+        assert( ( walk - pex ) == peersReturning );
         qsort( pex, peersReturning, sizeof( tr_pex ), tr_pexCompare );
 
 #warning this for loop can be removed when we're sure the bug is fixed
