@@ -44,8 +44,6 @@
 #include "platform.h"
 #include "utils.h"
 
-#include <event.h>
-
 /***
 ****  THREADS
 ***/
@@ -555,24 +553,23 @@ tr_getClutchDir( const tr_session * session UNUSED )
 
             /* XDG_DATA_DIRS are the backup directories */
             {
-                struct evbuffer * buf = evbuffer_new( );
-                evbuffer_add_printf( buf, "%s:", PACKAGE_DATA_DIR );
-                if(( tmp = getenv( "XDG_DATA_DIRS" )))
-                    evbuffer_add_printf( buf, "%s:", tmp );
-                evbuffer_add_printf( buf, "%s:", "/usr/local/share" );
-                evbuffer_add_printf( buf, "%s:", "/usr/share" );
-                tmp = (const char*) EVBUFFER_DATA( buf );
+                const char * pkg = PACKAGE_DATA_DIR;
+                const char * xdg = getenv( "XDG_DATA_DIRS" );
+                const char * fallback = "/usr/local/share:/usr/share";
+                char * buf = tr_strdup_printf( "%s:%s:%s", (pkg?pkg:""), (xdg?xdg:""), fallback );
+                tmp = buf;
                 while( tmp && *tmp ) {
                     const char * end = strchr( tmp, ':' );
                     if( end ) {
-                        tr_list_append( &candidates, tr_strndup( tmp, end - tmp ) );
+                        if( ( end - tmp ) > 1 )
+                            tr_list_append( &candidates, tr_strndup( tmp, end - tmp ) );
                         tmp = end + 1;
                     } else if( tmp && *tmp ) {
                         tr_list_append( &candidates, tr_strdup( tmp ) );
                         break;
                     }
                 }
-                evbuffer_free( buf );
+                tr_free( buf );
             }
 
             /* walk through the candidates & look for a match */
