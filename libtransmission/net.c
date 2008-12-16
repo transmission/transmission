@@ -127,27 +127,25 @@ tr_normalizeV4Mapped( tr_address * const addr )
  * >0 if a > b 
  * 0  if a == b 
  */ 
-int 
-tr_compareAddresses( const tr_address * a, const tr_address * b) 
-{ 
-    int retval; 
-    int addrlen; 
+int
+tr_compareAddresses( const tr_address * a, const tr_address * b)
+{
+    int addrlen;
+
+    assert( a );
+    assert( b );
+    assert( a->type == TR_AF_INET || a->type == TR_AF_INET6 );
+    assert( b->type == TR_AF_INET || b->type == TR_AF_INET6 );
 
     /* IPv6 addresses are always "greater than" IPv4 */ 
-    if( a->type == TR_AF_INET && b->type == TR_AF_INET6 ) 
-        return 1; 
-    if( a->type == TR_AF_INET6 && b->type == TR_AF_INET ) 
-        return -1; 
+    if( a->type != b->type )
+        return a->type == TR_AF_INET ? 1 : -1;
 
     if( a->type == TR_AF_INET ) 
         addrlen = sizeof( struct in_addr ); 
     else 
         addrlen = sizeof( struct in6_addr ); 
-    retval = memcmp( &a->addr, &b->addr, addrlen ); 
-    if( retval == 0 ) 
-        return 0; 
-     
-    return retval; 
+    return memcmp( &a->addr, &b->addr, addrlen );
 } 
 
 /***********************************************************************
