@@ -1,6 +1,6 @@
 /*
  * Xmission - a cross-platform bittorrent client
- * Copyright (C) 2007 Charles Kerr <charles@rebelbase.com>
+ * Copyright (C) 2007 Charles Kerr <charles@transmissionbt.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
