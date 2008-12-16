@@ -1336,6 +1336,12 @@ tr_peerMgrAddIncoming( tr_peerMgr * manager,
     managerUnlock( manager );
 }
 
+static int
+tr_isPex( const tr_pex * pex )
+{
+    return pex && tr_isAddress( &pex->addr );
+}
+
 void
 tr_peerMgrAddPex( tr_peerMgr *    manager,
                   const uint8_t * torrentHash,
@@ -1343,8 +1349,9 @@ tr_peerMgrAddPex( tr_peerMgr *    manager,
                   const tr_pex *  pex )
 {
     Torrent * t;
-
     managerLock( manager );
+
+    assert( tr_isPex( pex ) );
 
     t = getExistingTorrent( manager, torrentHash );
     if( !tr_sessionIsAddressBlocked( t->manager->session, &pex->addr ) )
@@ -1463,11 +1470,17 @@ tr_pexCompare( const void * va, const void * vb )
 {
     const tr_pex * a = va;
     const tr_pex * b = vb;
-    int i = tr_compareAddresses( &a->addr, &b->addr );
+    int i;
 
-    if( i ) return i;
-    if( a->port < b->port ) return -1;
-    if( a->port > b->port ) return 1;
+    assert( tr_isPex( a ) );
+    assert( tr_isPex( b ) );
+
+    if(( i = tr_compareAddresses( &a->addr, &b->addr )))
+        return i;
+
+    if( a->port != b->port )
+        return a->port < b->port ? -1 : 1;
+
     return 0;
 }
 
@@ -1529,14 +1542,14 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
             }
         }
 
-#warning this for loop can be removed when we're sure the bug is fixed
+#warning this for loop can be removed when we are sure the bug is fixed
         for( i=0; i<peersReturning; ++i )
             assert( tr_isAddress( &pex[i].addr ) );
 
         assert( ( walk - pex ) == peersReturning );
         qsort( pex, peersReturning, sizeof( tr_pex ), tr_pexCompare );
 
-#warning this for loop can be removed when we're sure the bug is fixed
+#warning this for loop can be removed when we are sure the bug is fixed
         for( i=0; i<peersReturning; ++i )
             assert( tr_isAddress( &pex[i].addr ) );
 
