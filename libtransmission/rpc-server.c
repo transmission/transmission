@@ -704,5 +704,17 @@ tr_rpcInit( tr_session  * session,
     s->isEnabled = isEnabled != 0;
     if( isEnabled )
         tr_runInEventThread( session, startServer, s );
+
+    if( isEnabled )
+    {
+        tr_ninf( MY_NAME, _( "Serving RPC and Web requests on port %d" ), (int)port );
+
+        if( isWhitelistEnabled )
+            tr_ninf( MY_NAME, _( "Whitelist is: %s" ), whitelist );
+
+        if( isPasswordEnabled )
+            tr_ninf( MY_NAME, _( "Password required" ) );
+    }
+
     return s;
 }
