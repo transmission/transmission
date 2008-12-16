@@ -68,10 +68,17 @@ tr_netInit( void )
     }
 }
 
+tr_bool
+tr_isAddress( const tr_address * a )
+{
+    return a && ( a->type==AF_INET || a->type==AF_INET6 );
+}
 
 const char * 
 tr_ntop( const tr_address * src, char * dst, int size ) 
-{ 
+{
+    assert( tr_isAddress( src ) );
+
     if( src->type == TR_AF_INET ) 
         return inet_ntop( AF_INET, &src->addr, dst, size ); 
     else 
@@ -113,6 +120,8 @@ tr_pton( const char * src, tr_address * dst )
 void
 tr_normalizeV4Mapped( tr_address * const addr )
 {
+    assert( tr_isAddress( addr ) );
+
     if( addr->type == TR_AF_INET6 && IN6_IS_ADDR_V4MAPPED( &addr->addr.addr6 ) )
     {
         addr->type = TR_AF_INET;
@@ -132,10 +141,8 @@ tr_compareAddresses( const tr_address * a, const tr_address * b)
 {
     int addrlen;
 
-    assert( a );
-    assert( b );
-    assert( a->type == TR_AF_INET || a->type == TR_AF_INET6 );
-    assert( b->type == TR_AF_INET || b->type == TR_AF_INET6 );
+    assert( tr_isAddress( a ) );
+    assert( tr_isAddress( b ) );
 
     /* IPv6 addresses are always "greater than" IPv4 */ 
     if( a->type != b->type )
@@ -163,7 +170,10 @@ tr_socketListAppend( tr_socketList * const head,
                      const tr_address * const addr )
 {
     tr_socketList * tmp;
+
     assert( head );
+    assert( tr_isAddress( addr ) );
+
     for( tmp = head; tmp->next; tmp = tmp->next );
     tmp->next = tr_socketListNew( addr );
     return tmp->next;
@@ -173,6 +183,9 @@ tr_socketList *
 tr_socketListNew( const tr_address * const addr )
 {
     tr_socketList * tmp;
+
+    assert( tr_isAddress( addr ) );
+
     tmp = tr_new( tr_socketList, 1 );
     tmp->socket = -1;
     tmp->addr = *addr;
@@ -184,6 +197,7 @@ void
 tr_socketListFree( tr_socketList * const head )
 {
     assert( head );
+
     if( head->next )
         tr_socketListFree( head->next );
     tr_free( head );
@@ -194,8 +208,10 @@ tr_socketListRemove( tr_socketList * const head,
                      tr_socketList * const el)
 {
     tr_socketList * tmp;
+
     assert( head );
     assert( el );
+
     for( tmp = head; tmp->next && tmp->next != el; tmp = tmp->next );
     tmp->next = el->next;
     el->next = NULL;
@@ -207,17 +223,21 @@ tr_socketListTruncate( tr_socketList * const head,
                        tr_socketList * const start )
 {
     tr_socketList * tmp;
+
     assert( head );
     assert( start );
+
     for( tmp = head; tmp->next && tmp->next != start; tmp = tmp->next );
     tr_socketListFree( start );
     tmp->next = NULL;
 }
 
+#if 0
 int
 tr_socketListGetSocket( const tr_socketList * const el )
 {
     assert( el );
+
     return el->socket;
 }
 
@@ -227,6 +247,7 @@ tr_socketListGetAddress( const tr_socketList * const el )
     assert( el );
     return &el->addr;
 }
+#endif
 
 void
 tr_socketListForEach( tr_socketList * const head,
@@ -245,8 +266,7 @@ tr_socketListForEach( tr_socketList * const head,
  **********************************************************************/
 
 int
-tr_netSetTOS( int s,
-              int tos )
+tr_netSetTOS( int s, int tos )
 {
 #ifdef IP_TOS
     return setsockopt( s, IPPROTO_IP, IP_TOS, (char*)&tos, sizeof( tos ) );
@@ -301,6 +321,9 @@ setup_sockaddr( const tr_address        * addr,
 {
     struct sockaddr_in  sock4;
     struct sockaddr_in6 sock6;
+
+    assert( tr_isAddress( addr ) );
+
     if( addr->type == TR_AF_INET )
     {
         memset( &sock4, 0, sizeof( sock4 ) );
@@ -331,6 +354,8 @@ tr_netOpenTCP( tr_session        * session,
     struct sockaddr_storage sock;
     const int               type = SOCK_STREAM;
     socklen_t               addrlen;
+
+    assert( tr_isAddress( addr ) );
 
     if( ( s = createSocket( ( addr->type == TR_AF_INET ? AF_INET : AF_INET6 ),
                             type ) ) < 0 )
@@ -368,6 +393,8 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
     struct sockaddr_storage sock;
     const int               type = SOCK_STREAM;
     int                     addrlen;
+
+    assert( tr_isAddress( addr ) );
 
 #if defined( SO_REUSEADDR ) || defined( SO_REUSEPORT )
     int                optval;
@@ -407,7 +434,11 @@ tr_netAccept( tr_session  * session,
               tr_address  * addr,
               tr_port     * port )
 {
-    int fd = makeSocketNonBlocking( tr_fdSocketAccept( b, addr, port ) );
+    int fd;
+
+    assert( tr_isAddress( addr ) );
+
+    fd = makeSocketNonBlocking( tr_fdSocketAccept( b, addr, port ) );
     setSndBuf( session, fd );
     return fd;
 }
