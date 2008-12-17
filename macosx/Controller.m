@@ -44,7 +44,6 @@
 #import "BonjourController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
-#import "NSMenuAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 #import "SpeedLimitToTurtleIconTransformer.h"
@@ -2284,15 +2283,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
-    #warning streamline?
     if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)
     {
         for (NSInteger i = [menu numberOfItems]-1; i >= 0; i--)
             [menu removeItemAtIndex: i];
         
         NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroup:) isSmall: NO];
-        [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange:
-                NSMakeRange(0, [groupMenu numberOfItems])] atBottom: NO];
+        const NSInteger groupMenuCount = [groupMenu numberOfItems];
+        for (NSInteger i = 0; i < groupMenuCount; i++)
+        {
+            NSMenuItem * item = [[groupMenu itemAtIndex: 0] retain];
+            [groupMenu removeItemAtIndex: 0];
+            [menu addItem: item];
+            [item release];
+        }
     }
     else if (menu == fGroupFilterMenu)
     {
@@ -2301,8 +2305,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroupFilter:)
                                 isSmall: YES];
-        [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange:
-                NSMakeRange(0, [groupMenu numberOfItems])] atBottom: YES];
+        const NSInteger groupMenuCount = [groupMenu numberOfItems];
+        for (NSInteger i = 0; i < groupMenuCount; i++)
+        {
+            NSMenuItem * item = [[groupMenu itemAtIndex: 0] retain];
+            [groupMenu removeItemAtIndex: 0];
+            [menu addItem: item];
+            [item release];
+        }
     }
     else if (menu == fUploadMenu || menu == fDownloadMenu)
     {

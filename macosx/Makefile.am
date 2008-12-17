@@ -89,8 +89,6 @@ EXTRA_DIST = \
     NSApplicationAdditions.m \
     NSBezierPathAdditions.h \
     NSBezierPathAdditions.m \
-    NSMenuAdditions.h \
-    NSMenuAdditions.m \
     NSStringAdditions.h \
     NSStringAdditions.m \
     PeerProgressIndicatorCell.h \
