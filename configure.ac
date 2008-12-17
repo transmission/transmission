@@ -98,8 +98,8 @@ if test "x$enable_debug" = "xyes" ; then
 	CFLAGS+=" -g "
 	CXXFLAGS+=" -g "
 else
-	CFLAGS+=" -O3 -funroll-loops -DNDEBUG "
-	CXXFLAGS+=" -O3 -funroll-loops -DNDEBUG "
+	CFLAGS+=" -g -O3 -funroll-loops -DNDEBUG "
+	CXXFLAGS+=" -g -O3 -funroll-loops -DNDEBUG "
 fi
 
 
