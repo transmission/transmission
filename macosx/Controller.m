@@ -2292,7 +2292,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [menu removeItemAtIndex: i];
         
         NSMenu * groupMenu;
-        if (filter)
+        if (!filter)
             groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroup:) isSmall: NO];
         else
             groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroupFilter:) isSmall: YES];
