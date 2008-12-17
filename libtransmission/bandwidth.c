@@ -297,7 +297,6 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     int n;
     tr_ptrArray * tmp;
     struct tr_peerIo ** peers;
-    const size_t chunkSize = 1024; /* arbitrary */
 
     tmp = tr_ptrArrayNew( );
     allocateBandwidth( b, dir, period_msec, tmp );
@@ -312,12 +311,13 @@ fprintf( stderr, "%s - %d peers\n", (dir==TR_UP)?"up":"down", n );
         int i;
         for( i=0; i<n; )
         {
-            const int byteCount = tr_peerIoFlush( peers[i], dir, chunkSize );
+            const int increment = n==1 ? 4096 : 1024;
+            const int byteCount = tr_peerIoFlush( peers[i], dir, increment);
 
             if( byteCount )
                 fprintf( stderr, "peer %p: %d bytes\n", peers[i], byteCount );
 
-            if( byteCount == (int)chunkSize )
+            if( byteCount == increment )
                 ++i;
             else
                 peers[i] = peers[--n];

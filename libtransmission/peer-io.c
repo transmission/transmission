@@ -807,7 +807,7 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
     if( res > 0 )
         canReadWrapper( io, res, io );
 
-    if( ( res <= 0 ) && ( io->gotError ) && ( errno != EAGAIN ) && ( errno != EINTR ) )
+    if( ( res <= 0 ) && ( io->gotError ) && ( errno != EAGAIN ) && ( errno != EINTR ) && ( errno != EINPROGRESS ) )
     {
         short what = EVBUFFER_READ | EVBUFFER_ERROR;
         if( res == 0 )
