@@ -27,7 +27,6 @@
 #import "Controller.h"
 #import "GroupsController.h"
 #import "NSStringAdditions.h"
-#import "NSMenuAdditions.h"
 #import "NSApplicationAdditions.h"
 #import "ExpandedPathToIconTransformer.h"
 

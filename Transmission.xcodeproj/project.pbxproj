@@ -105,7 +105,6 @@
 		A232F07E0EEA034A00041646 /* BonjourController.m in Sources */ = {isa = PBXBuildFile; fileRef = A232F07D0EEA034A00041646 /* BonjourController.m */; };
 		A233BD330D8C6585007EE7B4 /* MessageWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A233BD320D8C6585007EE7B4 /* MessageWindow.xib */; };
 		A233BD690D8CF2C7007EE7B4 /* StatsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A233BD680D8CF2C7007EE7B4 /* StatsWindow.xib */; };
-		A234D0D20C79FB3600A82373 /* NSMenuAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
 		A2399CCD0CD3852300225B2B /* NSApplicationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A2399CCC0CD3852300225B2B /* NSApplicationAdditions.m */; };
 		A23A0E310EECB0740091C885 /* GroupRules.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23A0E300EECB0740091C885 /* GroupRules.xib */; };
@@ -506,8 +505,6 @@
 		A232F07D0EEA034A00041646 /* BonjourController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BonjourController.m; path = macosx/BonjourController.m; sourceTree = "<group>"; };
 		A233BD320D8C6585007EE7B4 /* MessageWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = MessageWindow.xib; path = macosx/MessageWindow.xib; sourceTree = "<group>"; };
 		A233BD680D8CF2C7007EE7B4 /* StatsWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = StatsWindow.xib; path = macosx/StatsWindow.xib; sourceTree = "<group>"; };
-		A234D0CF0C79FB3600A82373 /* NSMenuAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSMenuAdditions.h; path = macosx/NSMenuAdditions.h; sourceTree = "<group>"; };
-		A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSMenuAdditions.m; path = macosx/NSMenuAdditions.m; sourceTree = "<group>"; };
 		A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayWindow.m; path = macosx/DragOverlayWindow.m; sourceTree = "<group>"; };
 		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayWindow.h; path = macosx/DragOverlayWindow.h; sourceTree = "<group>"; };
 		A2399CCB0CD3852300225B2B /* NSApplicationAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSApplicationAdditions.h; path = macosx/NSApplicationAdditions.h; sourceTree = "<group>"; };
@@ -1248,8 +1245,6 @@
 				4DE5CC9C0980656F00BE280E /* NSStringAdditions.m */,
 				A215760A0C0D449A0057A26A /* NSBezierPathAdditions.h */,
 				A21576090C0D449A0057A26A /* NSBezierPathAdditions.m */,
-				A234D0CF0C79FB3600A82373 /* NSMenuAdditions.h */,
-				A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */,
 			);
 			name = Additions;
 			sourceTree = "<group>";
@@ -1903,7 +1898,6 @@
 				A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */,
 				35F373030C2DA89000DAA8F2 /* FilePriorityCell.m in Sources */,
 				A2085DDC0C53BC74000BC3B7 /* AboutWindowController.m in Sources */,
-				A234D0D20C79FB3600A82373 /* NSMenuAdditions.m in Sources */,
 				A21282A80CA6C66800EAEE0F /* StatusBarView.m in Sources */,
 				A257C1820CAD3003004E121C /* PeerTableView.m in Sources */,
 				A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */,

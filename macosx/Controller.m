@@ -2283,28 +2283,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
-    if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)
+    if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu || menu == fGroupFilterMenu)
     {
-        for (NSInteger i = [menu numberOfItems]-1; i >= 0; i--)
+        const BOOL filter = menu == fGroupFilterMenu;
+        
+        const NSInteger remaining = filter ? 3 : 0;
+        for (NSInteger i = [menu numberOfItems]-1; i >= remaining; i--)
             [menu removeItemAtIndex: i];
         
-        NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroup:) isSmall: NO];
-        const NSInteger groupMenuCount = [groupMenu numberOfItems];
-        for (NSInteger i = 0; i < groupMenuCount; i++)
-        {
-            NSMenuItem * item = [[groupMenu itemAtIndex: 0] retain];
-            [groupMenu removeItemAtIndex: 0];
-            [menu addItem: item];
-            [item release];
-        }
-    }
-    else if (menu == fGroupFilterMenu)
-    {
-        for (NSInteger i = [menu numberOfItems]-1; i >= 3; i--)
-            [menu removeItemAtIndex: i];
+        NSMenu * groupMenu;
+        if (filter)
+            groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroup:) isSmall: NO];
+        else
+            groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroupFilter:) isSmall: YES];
         
-        NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroupFilter:)
-                                isSmall: YES];
         const NSInteger groupMenuCount = [groupMenu numberOfItems];
         for (NSInteger i = 0; i < groupMenuCount; i++)
         {
