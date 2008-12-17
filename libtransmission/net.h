@@ -55,11 +55,15 @@
 
 struct tr_session;
 
-#define TR_AF_INET  0
-#define TR_AF_INET6 1
+typedef enum tr_address_type
+{
+    TR_AF_INET,
+    TR_AF_INET6
+} tr_address_type;
 
-typedef struct tr_address {
-    uint8_t type;
+typedef struct tr_address
+{
+    tr_address_type type;
     union {
         /* The order here is important for tr_in{,6}addr_any initialization,
          * since we can't use C99 designated initializers */
