@@ -22,6 +22,9 @@ AC_PROG_LIBTOOL
 if test m4_substr(peer_id_prefix,6,1) = "Z"; then
   AC_DEFINE(TR_UNSTABLE, 1, [Define to 1 if this is an unstable version of Transmission])
   TR_UNSTABLE=yes
+  enable_debug=yes
+else
+  enable_debug=no
 fi
 AM_CONDITIONAL(TR_UNSTABLE, test "x$TR_UNSTABLE" = "xyes")
 
@@ -91,9 +94,7 @@ AC_TRY_LINK([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);],
 dnl ----------------------------------------------------------------------------
 dnl
 dnl  debugging support
-AC_ARG_ENABLE([debug],
-	      AS_HELP_STRING([--enable-debug],[build with debugging support]),,
-	      [enable_debug=no])
+AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug],[build with debugging support]),,,)
 if test "x$enable_debug" = "xyes" ; then
 	CFLAGS+=" -g "
 	CXXFLAGS+=" -g "
