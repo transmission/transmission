@@ -305,7 +305,9 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     /* loop through all the peers, reading and writing in small chunks,
      * until we run out of bandwidth or peers. we do it this way to 
      * prevent one peer from using up all the bandwidth */
+#if 0
 fprintf( stderr, "%s - %d peers\n", (dir==TR_UP)?"up":"down", n );
+#endif
     while( n > 0 )
     {
         int i;
@@ -314,8 +316,10 @@ fprintf( stderr, "%s - %d peers\n", (dir==TR_UP)?"up":"down", n );
             const int increment = n==1 ? 4096 : 1024;
             const int byteCount = tr_peerIoFlush( peers[i], dir, increment);
 
+#if 0
             if( byteCount )
                 fprintf( stderr, "peer %p: %d bytes\n", peers[i], byteCount );
+#endif
 
             if( byteCount == increment )
                 ++i;
