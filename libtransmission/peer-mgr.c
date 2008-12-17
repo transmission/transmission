@@ -1348,16 +1348,18 @@ tr_peerMgrAddPex( tr_peerMgr *    manager,
                   uint8_t         from,
                   const tr_pex *  pex )
 {
-    Torrent * t;
-    managerLock( manager );
+    if( tr_isPex( pex ) ) /* safeguard against corrupt data */
+    {
+        Torrent * t;
+        managerLock( manager );
 
-    assert( tr_isPex( pex ) );
 
-    t = getExistingTorrent( manager, torrentHash );
-    if( !tr_sessionIsAddressBlocked( t->manager->session, &pex->addr ) )
-        ensureAtomExists( t, &pex->addr, pex->port, pex->flags, from );
+        t = getExistingTorrent( manager, torrentHash );
+        if( !tr_sessionIsAddressBlocked( t->manager->session, &pex->addr ) )
+            ensureAtomExists( t, &pex->addr, pex->port, pex->flags, from );
     
-    managerUnlock( manager );
+        managerUnlock( manager );
+    }
 }
 
 tr_pex *
