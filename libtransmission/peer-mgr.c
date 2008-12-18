@@ -57,7 +57,7 @@ enum
     RECONNECT_PERIOD_MSEC = ( 2 * 1000 ),
    
     /* how frequently to reallocate bandwidth */
-    BANDWIDTH_PERIOD_MSEC = 200,
+    BANDWIDTH_PERIOD_MSEC = 100,
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
     MAX_RECONNECTIONS_PER_PULSE = 4,
