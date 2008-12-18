@@ -87,6 +87,14 @@ void tr_normalizeV4Mapped( tr_address * const addr );
 
 tr_bool tr_isAddress( const tr_address * a );
 
+typedef struct tr_net_af_support
+{
+    tr_bool has_inet6;
+    tr_bool needs_inet4;
+} tr_net_af_support;
+
+tr_net_af_support tr_net_getAFSupport( tr_port );
+
 /***********************************************************************
  * Socket list housekeeping
  **********************************************************************/

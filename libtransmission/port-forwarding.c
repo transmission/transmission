@@ -234,29 +234,18 @@ sharedPulse( void * vshared )
 static tr_socketList *
 setupBindSockets( tr_port port )
 {
-    /* Do we care if an address is in use? Probably not, since it will be
-     * caught later. This will only set up the list of sockets to bind. */
-    int s4, s6;
+    tr_net_af_support support = tr_net_getAFSupport( port );
     tr_socketList * socks = NULL;
-    s6 = tr_netBindTCP( &tr_in6addr_any, port, TRUE );
-    if( s6 >= 0 || -s6 != EAFNOSUPPORT ) /* we support ipv6 */
-    {
+    if( support.has_inet6 )
         socks = tr_socketListNew( &tr_in6addr_any );
-        listen( s6, 1 );
-    }
-    s4 = tr_netBindTCP( &tr_inaddr_any, port, TRUE );
-    if( s4 >= 0 ) /* we bound *with* the ipv6 socket bound (need both)
-                   * or only have ipv4 */
+    if( support.needs_inet4 )
     {
         if( socks )
             tr_socketListAppend( socks, &tr_inaddr_any );
         else
             socks = tr_socketListNew( &tr_inaddr_any );
-        tr_netClose( s4 );
     }
-    if( s6 >= 0 )
-        tr_netClose( s6 );
-    return socks;
+    return socks; /* Because the dryer gremlins won't */
 }
 
 tr_shared *

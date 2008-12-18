@@ -155,6 +155,35 @@ tr_compareAddresses( const tr_address * a, const tr_address * b)
     return memcmp( &a->addr, &b->addr, addrlen );
 } 
 
+tr_net_af_support
+tr_net_getAFSupport( tr_port port )
+{
+    /* Do we care if an address is in use? Probably not, since it will be
+     * caught later. This will only set up the list of sockets to bind. */
+    static tr_bool alreadyDone       = FALSE;
+    static tr_net_af_support support = { FALSE, FALSE };
+    int s4, s6;
+    if( alreadyDone )
+        return support;
+    s6 = tr_netBindTCP( &tr_in6addr_any, port, TRUE );
+    if( s6 >= 0 || -s6 != EAFNOSUPPORT ) /* we support ipv6 */
+    {
+        listen( s6, 1 );
+        support.has_inet6 = TRUE;
+    }
+    s4 = tr_netBindTCP( &tr_inaddr_any, port, TRUE );
+    if( s4 >= 0 ) /* we bound *with* the ipv6 socket bound (need both)
+                   * or only have ipv4 */
+    {
+        tr_netClose( s4 );
+        support.needs_inet4 = TRUE;
+    }
+    if( s6 >= 0 )
+        tr_netClose( s6 );
+    alreadyDone = TRUE;
+    return support;
+}
+
 /***********************************************************************
  * Socket list housekeeping
  **********************************************************************/
