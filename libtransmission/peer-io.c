@@ -563,7 +563,7 @@ getDesiredOutputBufferSize( const tr_peerIo * io )
     const double maxBlockSize = 16 * 1024; /* 16 KiB is from BT spec */
     const double currentSpeed = tr_bandwidthGetPieceSpeed( io->bandwidth, TR_UP );
     const double period = 20; /* arbitrary */
-    return MAX( maxBlockSize*5.5, currentSpeed*1024*period );
+    return MAX( maxBlockSize*20.5, currentSpeed*1024*period );
 }
 
 size_t
