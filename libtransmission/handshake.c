@@ -1090,18 +1090,25 @@ fireDoneFunc( tr_handshake * handshake,
     return success;
 }
 
+void
+tr_handshakeFree( tr_handshake * handshake )
+{
+    if( handshake->io )
+        tr_peerIoFree( handshake->io );
+
+    tr_free( handshake );
+}
+
 static int
 tr_handshakeDone( tr_handshake * handshake,
                   int            isOK )
 {
-    int success;
+    tr_bool success;
 
     dbgmsg( handshake, "handshakeDone: %s", isOK ? "connected" : "aborting" );
     tr_peerIoSetIOFuncs( handshake->io, NULL, NULL, NULL, NULL );
 
     success = fireDoneFunc( handshake, isOK );
-
-    tr_free( handshake );
 
     return success ? READ_LATER : READ_ERR;
 }
@@ -1190,6 +1197,19 @@ tr_handshakeGetIO( tr_handshake * handshake )
     assert( handshake->io );
 
     return handshake->io;
+}
+
+struct tr_peerIo*
+tr_handshakeStealIO( tr_handshake * handshake )
+{
+    struct tr_peerIo * io;
+
+    assert( handshake );
+    assert( handshake->io );
+
+    io = handshake->io;
+    handshake->io = NULL;
+    return io;
 }
 
 const tr_address *

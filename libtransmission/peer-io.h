@@ -25,7 +25,6 @@ struct evbuffer;
 struct tr_address;
 struct tr_bandwidth;
 struct tr_crypto;
-struct tr_iobuf;
 typedef struct tr_peerIo tr_peerIo;
 
 /**
@@ -213,6 +212,13 @@ void      tr_peerIoBandwidthUsed( tr_peerIo           * io,
 ***
 **/
 
+tr_bool   tr_peerIoHasBandwidthLeft( const tr_peerIo  * io,
+                                     tr_direction       direction );
+
+void      tr_peerIoSetEnabled( tr_peerIo    * io,
+                               tr_direction   dir,
+                               tr_bool        isEnabled );
+                       
 int       tr_peerIoFlush( tr_peerIo     * io,
                           tr_direction    dir,
                           size_t          byteLimit );

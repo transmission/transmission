@@ -294,39 +294,58 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
                       tr_direction    dir,
                       int             period_msec )
 {
-    int n;
+    int i, n, peerCount;
     tr_ptrArray * tmp;
     struct tr_peerIo ** peers;
 
+    /* allocateBandwidth() is a helper function with two purposes:
+     * 1. allocate bandwidth to b and its subtree
+     * 2. accumulate an array of all the peerIos from b and its subtree. */
     tmp = tr_ptrArrayNew( );
     allocateBandwidth( b, dir, period_msec, tmp );
-    peers = (struct tr_peerIo**) tr_ptrArrayPeek( tmp, &n );
+    peers = (struct tr_peerIo**) tr_ptrArrayPeek( tmp, &peerCount );
 
-    /* loop through all the peers, reading and writing in small chunks,
-     * until we run out of bandwidth or peers. we do it this way to 
-     * prevent one peer from using up all the bandwidth */
-#if 0
-fprintf( stderr, "%s - %d peers\n", (dir==TR_UP)?"up":"down", n );
-#endif
-    while( n > 0 )
+    /* Stop all peers from listening for the socket to be ready for IO.
+     * See "Second phase of IO" lower in this function for more info. */
+    for( i=0; i<peerCount; ++i )
+        tr_peerIoSetEnabled( peers[i], dir, FALSE );
+
+    /* First phase of IO.  Tries to distribute bandwidth in a fair/even manner
+     * to avoid "greedy peers" from starving out the other peers: loop through
+     * peers in a round-robin fashion, giving each one of them them small chunks
+     * of bandwidth to use.  (It's small to conserve some of the bandwidth
+     * until the end of the loop).  Keep looping until we run out of bandwidth
+     * or peers that are ready to use it. */
+    n = peerCount;
+    i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a random starting point */
+    for( ; n>0; )
     {
-        int i;
-        for( i=0; i<n; )
-        {
-            const int increment = n==1 ? 4096 : 1024;
-            const int byteCount = tr_peerIoFlush( peers[i], dir, increment);
+        const int increment = n==1 ? 4096 : 1024;
+        const int byteCount = tr_peerIoFlush( peers[i], dir, increment);
 
-#if 0
-            if( byteCount )
-                fprintf( stderr, "peer %p: %d bytes\n", peers[i], byteCount );
-#endif
-
-            if( byteCount == increment )
-                ++i;
-            else
-                peers[i] = peers[--n];
+        if( byteCount == increment )
+            ++i;
+        else {
+            /* peer is done writing for now; move it to the end of the list */
+            tr_peerIo * tmp = peers[i];
+            peers[i] = peers[n-1];
+            peers[n-1] = tmp;
+            --n;
         }
+
+        assert( i <= n );
+        if( i == n )
+            i = 0;
     }
+
+    /* Second phase of IO.  To help us scale well in high bandiwdth situations
+     * such as LANs, enable on-demand IO for peers with bandwidth left to burn.
+     * This on-demand IO for a peer is enabled until either (1) the peer runs
+     * out of bandwidth, or (2) the next tr_bandwidthAllocate() call, when we
+     * start all over again. */
+    for( i=0; i<peerCount; ++i )
+        if( tr_peerIoHasBandwidthLeft( peers[i], dir ) )
+            tr_peerIoSetEnabled( peers[i], dir, TRUE );
 
     /* cleanup */
     tr_ptrArrayFree( tmp, NULL );

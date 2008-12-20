@@ -34,7 +34,6 @@
 #include "utils.h"
 
 #define MAGIC_NUMBER 206745
-#define IO_TIMEOUT_SECS 8
 
 static size_t
 getPacketOverhead( size_t d )
@@ -87,7 +86,6 @@ struct tr_peerIo
     int                magicNumber;
 
     uint8_t            encryptionMode;
-    uint8_t            timeout;
     tr_port            port;
     int                socket;
 
@@ -111,6 +109,9 @@ struct tr_peerIo
 
     struct evbuffer  * inbuf;
     struct evbuffer  * outbuf;
+
+    struct event       event_read;
+    struct event       event_write;
 };
 
 /***
@@ -118,12 +119,8 @@ struct tr_peerIo
 ***/
 
 static void
-didWriteWrapper( void     * unused UNUSED,
-                 size_t     bytes_transferred,
-                 void     * vio )
+didWriteWrapper( tr_peerIo * io, size_t bytes_transferred )
 {
-    tr_peerIo *  io = vio;
-
     while( bytes_transferred )
     {
         struct tr_datatype * next = io->output_datatypes->data;
@@ -146,13 +143,10 @@ didWriteWrapper( void     * unused UNUSED,
 }
 
 static void
-canReadWrapper( void    * unused UNUSED,
-                size_t    bytes_transferred UNUSED,
-                void    * vio )
+canReadWrapper( tr_peerIo * io )
 {
-    int          done = 0;
-    int          err = 0;
-    tr_peerIo *  io = vio;
+    tr_bool done = 0;
+    tr_bool err = 0;
     tr_session * session = io->session;
 
     dbgmsg( io, "canRead" );
@@ -168,14 +162,13 @@ canReadWrapper( void    * unused UNUSED,
             const size_t oldLen = EVBUFFER_LENGTH( io->inbuf );
             const int ret = io->canRead( io, io->userData, &piece );
 
-            if( ret != READ_ERR )
-            {
-                const size_t used = oldLen - EVBUFFER_LENGTH( io->inbuf );
-                if( piece )
-                    tr_bandwidthUsed( io->bandwidth, TR_DOWN, piece, TRUE );
-                if( used != piece )
-                    tr_bandwidthUsed( io->bandwidth, TR_DOWN, used - piece, FALSE );
-            }
+            const size_t used = oldLen - EVBUFFER_LENGTH( io->inbuf );
+
+            if( piece )
+                tr_bandwidthUsed( io->bandwidth, TR_DOWN, piece, TRUE );
+
+            if( used != piece )
+                tr_bandwidthUsed( io->bandwidth, TR_DOWN, used - piece, FALSE );
 
             switch( ret )
             {
@@ -199,45 +192,154 @@ canReadWrapper( void    * unused UNUSED,
     }
 }
 
-#if 0
-static void
-gotErrorWrapper( struct tr_iobuf  * iobuf,
-                 short              what,
-                 void             * userData )
-{
-    tr_peerIo * c = userData;
+#define _isBool(b) (((b)==0 || (b)==1))
 
-    if( c->gotError )
-        c->gotError( iobuf, what, c->userData );
+static int
+isPeerIo( const tr_peerIo * io )
+{
+    return ( io != NULL )
+        && ( io->magicNumber == MAGIC_NUMBER )
+        && ( tr_isAddress( &io->addr ) )
+        && ( _isBool( io->isEncrypted ) )
+        && ( _isBool( io->isIncoming ) )
+        && ( _isBool( io->peerIdIsSet ) )
+        && ( _isBool( io->extendedProtocolSupported ) )
+        && ( _isBool( io->fastExtensionSupported ) );
 }
+
+static void
+event_read_cb( int fd, short event UNUSED, void * vio )
+{
+    int res;
+    short what = EVBUFFER_READ;
+    tr_peerIo * io = vio;
+    const size_t howmuch = tr_bandwidthClamp( io->bandwidth, TR_DOWN, io->session->so_rcvbuf );
+    const tr_direction dir = TR_DOWN;
+
+    assert( isPeerIo( io ) );
+
+    dbgmsg( io, "libevent says this peer is ready to read" );
+
+    /* if we don't have any bandwidth left, stop reading */
+    if( howmuch < 1 ) {
+        tr_peerIoSetEnabled( io, dir, FALSE );
+        return;
+    }
+
+    res = evbuffer_read( io->inbuf, fd, howmuch );
+    if( res == -1 ) {
+        if( errno == EAGAIN || errno == EINTR )
+            goto reschedule;
+        /* error case */
+        what |= EVBUFFER_ERROR;
+    } else if( res == 0 ) {
+        /* eof case */
+        what |= EVBUFFER_EOF;
+    }
+
+    if( res <= 0 )
+        goto error;
+
+    tr_peerIoSetEnabled( io, dir, TRUE );
+
+    /* Invoke the user callback - must always be called last */
+    canReadWrapper( io );
+
+    return;
+
+ reschedule:
+    tr_peerIoSetEnabled( io, dir, TRUE );
+    return;
+
+ error:
+    if( io->gotError != NULL )
+        io->gotError( io, what, io->userData );
+}
+
+static int
+tr_evbuffer_write( tr_peerIo * io, int fd, size_t howmuch )
+{
+    struct evbuffer * buffer = io->outbuf;
+    int n = MIN( EVBUFFER_LENGTH( buffer ), howmuch );
+
+#ifdef WIN32
+    n = send(fd, buffer->buffer, n,  0 );
+#else
+    n = write(fd, buffer->buffer, n );
 #endif
+    dbgmsg( io, "wrote %d to peer (%s)", n, (n==-1?strerror(errno):"") );
+
+    if( n == -1 )
+        return -1;
+    if (n == 0)
+        return 0;
+    evbuffer_drain( buffer, n );
+
+    return n;
+}
+
+static void
+event_write_cb( int fd, short event UNUSED, void * vio )
+{
+    int res = 0;
+    short what = EVBUFFER_WRITE;
+    tr_peerIo * io = vio;
+    size_t howmuch;
+    const tr_direction dir = TR_UP;
+
+    assert( isPeerIo( io ) );
+
+    dbgmsg( io, "libevent says this peer is ready to write" );
+
+    howmuch = MIN( (size_t)io->session->so_sndbuf, EVBUFFER_LENGTH( io->outbuf ) );
+    howmuch = tr_bandwidthClamp( io->bandwidth, dir, howmuch );
+
+    /* if we don't have any bandwidth left, stop writing */
+    if( howmuch < 1 ) {
+        tr_peerIoSetEnabled( io, dir, FALSE );
+        return;
+    }
+
+    res = tr_evbuffer_write( io, fd, howmuch );
+    if (res == -1) {
+#ifndef WIN32
+/*todo. evbuffer uses WriteFile when WIN32 is set. WIN32 system calls do not
+ *  *set errno. thus this error checking is not portable*/
+        if (errno == EAGAIN || errno == EINTR || errno == EINPROGRESS)
+            goto reschedule;
+        /* error case */
+        what |= EVBUFFER_ERROR;
+
+#else
+        goto reschedule;
+#endif
+
+    } else if (res == 0) {
+        /* eof case */
+        what |= EVBUFFER_EOF;
+    }
+    if (res <= 0)
+        goto error;
+
+    if( EVBUFFER_LENGTH( io->outbuf ) )
+        tr_peerIoSetEnabled( io, dir, TRUE );
+
+    didWriteWrapper( io, res );
+    return;
+
+ reschedule:
+    if( EVBUFFER_LENGTH( io->outbuf ) )
+        tr_peerIoSetEnabled( io, dir, TRUE );
+    return;
+
+ error:
+    io->gotError( io, what, io->userData );
+}
 
 /**
 ***
 **/
 
-#if 0
-static void
-bufevNew( tr_peerIo * io )
-{
-    io->iobuf = tr_iobuf_new( io->session,
-                              io->bandwidth,
-                              io->socket,
-                              EV_READ | EV_WRITE,
-                              canReadWrapper,
-                              didWriteWrapper,
-                              gotErrorWrapper,
-                              io );
-
-    tr_iobuf_settimeout( io->iobuf, io->timeout, io->timeout );
-}
-#endif
-
-static int
-isPeerIo( const tr_peerIo * io )
-{
-    return ( io != NULL ) && ( io->magicNumber == MAGIC_NUMBER );
-}
 
 static int
 isFlag( int flag )
@@ -266,10 +368,11 @@ tr_peerIoNew( tr_session       * session,
     io->port = port;
     io->socket = socket;
     io->isIncoming = isIncoming != 0;
-    io->timeout = IO_TIMEOUT_SECS;
     io->timeCreated = time( NULL );
     io->inbuf = evbuffer_new( );
     io->outbuf = evbuffer_new( );
+    event_set( &io->event_read, io->socket, EV_READ, event_read_cb, io );
+    event_set( &io->event_write, io->socket, EV_WRITE, event_write_cb, io );
 #if 0
     bufevNew( io );
 #endif
@@ -314,6 +417,8 @@ io_dtor( void * vio )
 {
     tr_peerIo * io = vio;
 
+    event_del( &io->event_read );
+    event_del( &io->event_write );
     tr_peerIoSetBandwidth( io, NULL );
     evbuffer_free( io->outbuf );
     evbuffer_free( io->inbuf );
@@ -377,30 +482,17 @@ tr_peerIoGetAddrStr( const tr_peerIo * io )
     return tr_peerIoAddrStr( &io->addr, io->port );
 }
 
-#if 0
-static void
-tr_peerIoTryRead( tr_peerIo * io )
-{
-    if( EVBUFFER_LENGTH( tr_iobuf_input( io->iobuf )))
-        (*canReadWrapper)( io->iobuf, ~0, io );
-}
-#endif
-
 void
-tr_peerIoSetIOFuncs( tr_peerIo *     io,
-                     tr_can_read_cb  readcb,
-                     tr_did_write_cb writecb,
-                     tr_net_error_cb errcb,
-                     void *          userData )
+tr_peerIoSetIOFuncs( tr_peerIo        * io,
+                     tr_can_read_cb     readcb,
+                     tr_did_write_cb    writecb,
+                     tr_net_error_cb    errcb,
+                     void             * userData )
 {
     io->canRead = readcb;
     io->didWrite = writecb;
     io->gotError = errcb;
     io->userData = userData;
-
-#if 0
-    tr_peerIoTryRead( io );
-#endif
 }
 
 tr_bool
@@ -435,17 +527,6 @@ tr_peerIoReconnect( tr_peerIo * io )
 
     return -1;
 }
-
-#if 0
-void
-tr_peerIoSetTimeoutSecs( tr_peerIo * io,
-                         int         secs )
-{
-    io->timeout = secs;
-    tr_iobuf_settimeout( io->iobuf, io->timeout, io->timeout );
-    tr_iobuf_enable( io->iobuf, EV_READ | EV_WRITE );
-}
-#endif
 
 /**
 ***
@@ -563,7 +644,8 @@ getDesiredOutputBufferSize( const tr_peerIo * io )
     const double maxBlockSize = 16 * 1024; /* 16 KiB is from BT spec */
     const double currentSpeed = tr_bandwidthGetPieceSpeed( io->bandwidth, TR_UP );
     const double period = 20; /* arbitrary */
-    return MAX( maxBlockSize*20.5, currentSpeed*1024*period );
+    const double numBlocks = 5.5; /* the 5 is arbitrary; the .5 is to leave room for messages */
+    return MAX( maxBlockSize*numBlocks, currentSpeed*1024*period );
 }
 
 size_t
@@ -804,8 +886,8 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
 
     dbgmsg( io, "read %d from peer (%s)", res, (res==-1?strerror(errno):"") );
 
-    if( res > 0 )
-        canReadWrapper( io, res, io );
+    if( EVBUFFER_LENGTH( io->inbuf ) )
+        canReadWrapper( io );
 
     if( ( res <= 0 ) && ( io->gotError ) && ( errno != EAGAIN ) && ( errno != EINTR ) && ( errno != EINPROGRESS ) )
     {
@@ -826,25 +908,13 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
     assert( isPeerIo( io ) );
 
     howmuch = tr_bandwidthClamp( io->bandwidth, TR_UP, howmuch );
-    howmuch = MIN( howmuch, EVBUFFER_LENGTH( io->outbuf ) );
-    n = (int) howmuch;
 
-#ifdef WIN32
-    n = send( io->socket, EVBUFFER_DATA( io->outbuf ), n,  0 );
-#else
-    n = write( io->socket, EVBUFFER_DATA( io->outbuf ),  n );
-#endif
-    dbgmsg( io, "wrote %d to peer (%s)", n, (n==-1?strerror(errno):"") );
+    n = tr_evbuffer_write( io, io->socket, (int)howmuch );
 
     if( n > 0 )
-    {
-        evbuffer_drain( io->outbuf, n );
+        didWriteWrapper( io, n );
 
-        didWriteWrapper( NULL, n, io );
-    }
-
-    if( ( n < 0 ) && ( io->gotError ) && ( errno != EPIPE ) && ( errno != EAGAIN ) && ( errno != EINTR ) && ( errno != EINPROGRESS ) )
-    {
+    if( ( n < 0 ) && ( io->gotError ) && ( errno != EPIPE ) && ( errno != EAGAIN ) && ( errno != EINTR ) && ( errno != EINPROGRESS ) ) {
         short what = EVBUFFER_WRITE | EVBUFFER_ERROR;
         io->gotError( io, what, io->userData );
     }
@@ -874,4 +944,55 @@ tr_peerIoGetReadBuffer( tr_peerIo * io )
     assert( isPeerIo( io ) );
 
     return io->inbuf;
+}
+
+tr_bool
+tr_peerIoHasBandwidthLeft( const tr_peerIo * io, tr_direction dir )
+{
+    assert( isPeerIo( io ) );
+    assert( dir==TR_UP || dir==TR_DOWN );
+
+    return tr_bandwidthClamp( io->bandwidth, dir, 1024 ) > 0;
+}
+
+/***
+****
+****/
+
+static void
+event_enable( tr_peerIo * io, short event )
+{
+    assert( isPeerIo( io ) );
+
+    if( event & EV_READ )
+        event_add( &io->event_read, NULL );
+
+    if( event & EV_WRITE )
+        event_add( &io->event_write, NULL );
+}
+
+static void
+event_disable( struct tr_peerIo * io, short event )
+{
+    assert( isPeerIo( io ) );
+
+    if( event & EV_READ )
+        event_del( &io->event_read );
+
+    if( event & EV_WRITE )
+        event_del( &io->event_write );
+}
+
+
+void
+tr_peerIoSetEnabled( tr_peerIo    * io,
+                     tr_direction   dir,
+                     tr_bool        isEnabled )
+{
+    const short event = dir == TR_UP ? EV_WRITE : EV_READ;
+
+    if( isEnabled )
+        event_enable( io, event );
+    else
+        event_disable( io, event );
 }

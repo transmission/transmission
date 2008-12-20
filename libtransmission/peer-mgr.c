@@ -57,7 +57,7 @@ enum
     RECONNECT_PERIOD_MSEC = ( 2 * 1000 ),
    
     /* how frequently to reallocate bandwidth */
-    BANDWIDTH_PERIOD_MSEC = 100,
+    BANDWIDTH_PERIOD_MSEC = 500,
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
     MAX_RECONNECTIONS_PER_PULSE = 4,
@@ -143,6 +143,7 @@ struct tr_peerMgr
     tr_session      * session;
     tr_ptrArray     * torrents; /* Torrent */
     tr_ptrArray     * incomingHandshakes; /* tr_handshake */
+    tr_ptrArray     * finishedHandshakes; /* tr_handshake */
     tr_timer        * bandwidthTimer;
 };
 
@@ -463,6 +464,7 @@ tr_peerMgrNew( tr_session * session )
     m->session = session;
     m->torrents = tr_ptrArrayNew( );
     m->incomingHandshakes = tr_ptrArrayNew( );
+    m->finishedHandshakes = tr_ptrArrayNew( );
     m->bandwidthTimer = tr_timerNew( session, bandwidthPulse, m, BANDWIDTH_PERIOD_MSEC );
     return m;
 }
@@ -470,6 +472,8 @@ tr_peerMgrNew( tr_session * session )
 void
 tr_peerMgrFree( tr_peerMgr * manager )
 {
+    tr_handshake * handshake;
+
     managerLock( manager );
 
     tr_timerFree( &manager->bandwidthTimer );
@@ -480,6 +484,11 @@ tr_peerMgrFree( tr_peerMgr * manager )
         tr_handshakeAbort( tr_ptrArrayNth( manager->incomingHandshakes, 0 ) );
 
     tr_ptrArrayFree( manager->incomingHandshakes, NULL );
+
+    while(( handshake = tr_ptrArrayPop( manager->finishedHandshakes )))
+        tr_handshakeFree( handshake );
+
+    tr_ptrArrayFree( manager->finishedHandshakes, NULL );
 
     /* free the torrents. */
     tr_ptrArrayFree( manager->torrents, torrentDestructor );
@@ -1194,11 +1203,11 @@ getPeerCount( const Torrent * t )
 
 /* FIXME: this is kind of a mess. */
 static tr_bool
-myHandshakeDoneCB( tr_handshake *  handshake,
-                   tr_peerIo *     io,
+myHandshakeDoneCB( tr_handshake  *  handshake,
+                   tr_peerIo     * io,
                    int             isConnected,
                    const uint8_t * peer_id,
-                   void *          vmanager )
+                   void          * vmanager )
 {
     tr_bool            ok = isConnected;
     tr_bool            success = FALSE;
@@ -1240,8 +1249,6 @@ myHandshakeDoneCB( tr_handshake *  handshake,
             if( atom )
                 ++atom->numFails;
         }
-
-        tr_peerIoFree( io );
     }
     else /* looking good */
     {
@@ -1255,13 +1262,11 @@ myHandshakeDoneCB( tr_handshake *  handshake,
         {
             tordbg( t, "banned peer %s tried to reconnect",
                     tr_peerIoAddrStr( &atom->addr, atom->port ) );
-            tr_peerIoFree( io );
         }
         else if( tr_peerIoIsIncoming( io )
                && ( getPeerCount( t ) >= getMaxPeerCount( t->tor ) ) )
 
         {
-            tr_peerIoFree( io );
         }
         else
         {
@@ -1269,7 +1274,6 @@ myHandshakeDoneCB( tr_handshake *  handshake,
 
             if( peer ) /* we already have this peer */
             {
-                tr_peerIoFree( io );
             }
             else
             {
@@ -1285,7 +1289,7 @@ myHandshakeDoneCB( tr_handshake *  handshake,
                 }
 
                 peer->port = port;
-                peer->io = io;
+                peer->io = tr_handshakeStealIO( handshake );
                 tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
                 tr_peerIoSetBandwidth( io, peer->bandwidth );
 
@@ -1293,6 +1297,9 @@ myHandshakeDoneCB( tr_handshake *  handshake,
             }
         }
     }
+
+    if( !success )
+        tr_ptrArrayAppend( manager->finishedHandshakes, handshake );
 
     if( t )
         torrentUnlock( t );
@@ -1544,16 +1551,8 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
             }
         }
 
-#warning this for loop can be removed when we are sure the bug is fixed
-        for( i=0; i<peersReturning; ++i )
-            assert( tr_isAddress( &pex[i].addr ) );
-
         assert( ( walk - pex ) == peersReturning );
         qsort( pex, peersReturning, sizeof( tr_pex ), tr_pexCompare );
-
-#warning this for loop can be removed when we are sure the bug is fixed
-        for( i=0; i<peersReturning; ++i )
-            assert( tr_isAddress( &pex[i].addr ) );
 
         *setme_pex = pex;
     }
@@ -2394,13 +2393,20 @@ pumpAllPeers( tr_peerMgr * mgr )
 static int
 bandwidthPulse( void * vmgr )
 {
+    tr_handshake * handshake;
     tr_peerMgr * mgr = vmgr;
     managerLock( mgr );
 
+    /* FIXME: this next line probably isn't necessary... */
     pumpAllPeers( mgr );
+
+    /* allocate bandwidth to the peers */
     tr_bandwidthAllocate( mgr->session->bandwidth, TR_UP, BANDWIDTH_PERIOD_MSEC );
     tr_bandwidthAllocate( mgr->session->bandwidth, TR_DOWN, BANDWIDTH_PERIOD_MSEC );
-    pumpAllPeers( mgr );
+
+    /* free all the finished handshakes */
+    while(( handshake = tr_ptrArrayPop( mgr->finishedHandshakes )))
+        tr_handshakeFree( handshake );
 
     managerUnlock( mgr );
     return TRUE;
