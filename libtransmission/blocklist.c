@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <assert.h>
 
 #include "ggets.h"
 
@@ -206,7 +207,9 @@ _tr_blocklistHasAddress( tr_blocklist     * b,
     uint32_t                   needle;
     const struct tr_ip_range * range;
 
-    if( !b->isEnabled )
+    assert( tr_isAddress( addr ) );
+
+    if( !b->isEnabled || addr->type == TR_AF_INET6 )
         return 0;
 
     blocklistEnsureLoaded( b );
