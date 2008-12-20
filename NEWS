@@ -6,7 +6,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - All Platforms
    + Support BitTorrent Enhancement Proposal #6 "Fast Extension"
    + Support BitTorrent Enhancement Proposal #21 "Extension for Partial Seeds"
-   + IPv6 Support
+   + IPv6 support
    + Random port, with optional randomization on startup
 - Mac
    + Groups (moved to preferences) can be auto-assigned to transfers when adding based on name and tracker (10.5-only)

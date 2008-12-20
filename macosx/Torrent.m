@@ -459,18 +459,25 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
         NSString * file;
         while ((file = [enumerator nextObject]))
         {
-            if ([[file lastPathComponent] hasPrefix: @"."])
+            NSArray * actualComponents = [file pathComponents];
+            if ([[actualComponents lastObject] hasPrefix: @"."])
                 continue;
             
-            file = [[self name] stringByAppendingPathComponent: file];
             BOOL isExtra = YES;
         
             NSEnumerator * nodeEnumerator = [fFlatFileList objectEnumerator];
             FileListNode * node;
             while ((node = [nodeEnumerator nextObject]))
             {
-                #warning this could be more thorough
-                if ([[node fullPath] hasPrefix: file])
+                NSArray * listedComponents = [[node fullPath] pathComponents];
+                if ([listedComponents count]-1 < [actualComponents count])
+                    continue;
+                
+                //remove first component (the folder name) and only include the same number of levels
+                listedComponents = [listedComponents objectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange:
+                                    NSMakeRange(1, [actualComponents count])]];
+                
+                if ([listedComponents isEqualToArray: actualComponents])
                 {
                     isExtra = NO;
                     break;
