@@ -402,9 +402,11 @@ tr_netOpenTCP( tr_session        * session,
       && ( sockerrno != EINPROGRESS ) )
     {
         int tmperrno;
-        tr_err( _( "Couldn't connect socket %d to %s, port %d (errno %d - %s)" ),
-               s, tr_ntop_non_ts( addr ), (int)port, sockerrno, tr_strerror( sockerrno ) );
         tmperrno = sockerrno;
+        if( tmperrno != ENETUNREACH || addr->type == TR_AF_INET )
+            tr_err( _( "Couldn't connect socket %d to %s, port %d (errno %d - %s)" ),
+                    s, tr_ntop_non_ts( addr ), (int)port, tmperrno,
+                    tr_strerror( tmperrno ) );
         tr_netClose( s );
         s = -tmperrno;
     }
