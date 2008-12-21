@@ -55,7 +55,8 @@ struct tr_rpc_server
     tr_session *       session;
     char *             username;
     char *             password;
-    char *             whitelist;
+    char *             whitelistStr;
+    tr_list *          whitelist;
 };
 
 #define dbgmsg( ... ) \
@@ -408,30 +409,20 @@ handle_rpc( struct evhttp_request * req,
     tr_free( out );
 }
 
-static int
+static tr_bool
 isAddressAllowed( const tr_rpc_server * server,
                   const char *          address )
 {
-    const char * str;
+    tr_list * l;
 
     if( !server->isWhitelistEnabled )
-        return 1;
+        return TRUE;
 
-    for( str = server->whitelist; str && *str; )
-    {
-        const char * delimiter = strchr( str, ',' );
-        const int    len = delimiter ? delimiter - str : (int)strlen( str );
-        char *       token = tr_strndup( str, len );
-        const int    match = tr_wildmat( address, token );
-        tr_free( token );
-        if( match )
-            return 1;
-        if( !delimiter )
-            break;
-        str = delimiter + 1;
-    }
+    for( l=server->whitelist; l!=NULL; l=l->next )
+        if( tr_wildmat( address, l->data ) )
+            return TRUE;
 
-    return 0;
+    return FALSE;
 }
 
 static void
@@ -463,7 +454,10 @@ handle_request( struct evhttp_request * req,
 
         if( !isAddressAllowed( server, req->remote_host ) )
         {
-            send_simple_response( req, 401, "Unauthorized IP Address" );
+            send_simple_response( req, 401,
+                "<p>Unauthorized IP Address.</p>"
+                "<p>Either disable the IP address whitelist or add your address to it.</p>"
+                "<p>If you're editing settings.json, see the 'rpc-whitelist' and 'rpc-whitelist-enabled' entries.</p>" );
         }
         else if( server->isPasswordEnabled
                  && ( !pass || !user || strcmp( server->username, user )
@@ -585,16 +579,36 @@ tr_rpcGetPort( const tr_rpc_server * server )
 
 void
 tr_rpcSetWhitelist( tr_rpc_server * server,
-                    const char *    whitelist )
+                    const char    * whitelistStr )
 {
-    tr_free( server->whitelist );
-    server->whitelist = tr_strdup( whitelist );
+    void * tmp;
+    const char * walk;
+
+    /* keep the string */
+    tr_free( server->whitelistStr );
+    server->whitelistStr = tr_strdup( whitelistStr );
+
+    /* clear out the old whitelist entries */
+    while(( tmp = tr_list_pop_front( &server->whitelist )))
+        tr_free( tmp );
+
+    /* build the new whitelist entries */
+    for( walk=whitelistStr; walk && *walk; ) {
+        const char * delimiters = " ,;";
+        const size_t len = strcspn( walk, delimiters );
+        char * token = tr_strndup( walk, len );
+        tr_list_append( &server->whitelist, token );
+        tr_ninf( MY_NAME, "Adding address to whitelist: [%s]", token );
+        if( walk[len]=='\0' )
+            break;
+        walk += len + 1;
+    }
 }
 
 char*
 tr_rpcGetWhitelist( const tr_rpc_server * server )
 {
-    return tr_strdup( server->whitelist ? server->whitelist : "" );
+    return tr_strdup( server->whitelistStr ? server->whitelistStr : "" );
 }
 
 void
@@ -665,10 +679,13 @@ tr_rpcIsPasswordEnabled( const tr_rpc_server * server )
 static void
 closeServer( void * vserver )
 {
+    void * tmp;
     tr_rpc_server * s = vserver;
 
     stopServer( s );
-    tr_free( s->whitelist );
+    while(( tmp = tr_list_pop_front( &s->whitelist )))
+        tr_free( tmp );
+    tr_free( s->whitelistStr );
     tr_free( s->username );
     tr_free( s->password );
     tr_free( s );
@@ -696,12 +713,12 @@ tr_rpcInit( tr_session  * session,
     s = tr_new0( tr_rpc_server, 1 );
     s->session = session;
     s->port = port;
-    s->whitelist = tr_strdup( whitelist && *whitelist ? whitelist : "127.0.0.1" );
     s->username = tr_strdup( username );
     s->password = tr_strdup( password );
-    s->isWhitelistEnabled = isWhitelistEnabled != 0;
-    s->isPasswordEnabled = isPasswordEnabled != 0;
+    s->isWhitelistEnabled = isWhitelistEnabled;
+    s->isPasswordEnabled = isPasswordEnabled;
     s->isEnabled = isEnabled != 0;
+    tr_rpcSetWhitelist( s, whitelist ? whitelist : "127.0.0.1" );
     if( isEnabled )
         tr_runInEventThread( session, startServer, s );
 
@@ -710,7 +727,7 @@ tr_rpcInit( tr_session  * session,
         tr_ninf( MY_NAME, _( "Serving RPC and Web requests on port %d" ), (int)port );
 
         if( isWhitelistEnabled )
-            tr_ninf( MY_NAME, _( "Whitelist is: %s" ), whitelist );
+            tr_ninf( MY_NAME, _( "Whitelist enabled" ) );
 
         if( isPasswordEnabled )
             tr_ninf( MY_NAME, _( "Password required" ) );
