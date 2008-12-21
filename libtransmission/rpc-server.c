@@ -598,7 +598,11 @@ tr_rpcSetWhitelist( tr_rpc_server * server,
         const size_t len = strcspn( walk, delimiters );
         char * token = tr_strndup( walk, len );
         tr_list_append( &server->whitelist, token );
-        tr_ninf( MY_NAME, "Adding address to whitelist: [%s]", token );
+        if( strcspn( token, "+-" ) < len )
+            tr_ninf( MY_NAME, "Adding address to whitelist: %s (And it has a '+' or '-'!  Are you using an old ACL by mistake?)", token );
+        else
+            tr_ninf( MY_NAME, "Adding address to whitelist: %s", token );
+        
         if( walk[len]=='\0' )
             break;
         walk += len + 1;
