@@ -280,7 +280,6 @@ struct tr_peermsgs
     uint8_t         ut_pex_id;
     uint16_t        pexCount;
     uint16_t        pexCount6;
-    uint16_t        minActiveRequests;
     uint16_t        maxActiveRequests;
 
     size_t                 fastsetSize;
@@ -903,13 +902,10 @@ static void
 pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
 {
     const int           max = msgs->maxActiveRequests;
-    const int           min = msgs->minActiveRequests;
     int                 sent = 0;
     int                 count = msgs->clientAskedFor.count;
     struct peer_request req;
 
-    if( count > min )
-        return;
     if( msgs->peer->clientIsChoked )
         return;
     if( !tr_torrentIsPieceTransferAllowed( msgs->torrent, TR_PEER_TO_CLIENT ) )
@@ -1768,10 +1764,10 @@ ratePulse( void * vmsgs )
     tr_peermsgs * msgs = vmsgs;
     const double rateToClient = tr_peerGetPieceSpeed( msgs->peer, TR_PEER_TO_CLIENT );
     const int seconds = 10;
+    const int floor = 8;
     const int estimatedBlocksInPeriod = ( rateToClient * seconds * 1024 ) / msgs->torrent->blockSize;
 
-    msgs->minActiveRequests = 8;
-    msgs->maxActiveRequests = msgs->minActiveRequests + estimatedBlocksInPeriod;
+    msgs->maxActiveRequests = floor + estimatedBlocksInPeriod;
 
     if( msgs->reqq > 0 )
         msgs->maxActiveRequests = MIN( msgs->maxActiveRequests, msgs->reqq );
