@@ -1255,3 +1255,8 @@ tr_base64_decode( const void * input,
     return ret;
 }
 
+tr_bool
+tr_isDirection( tr_direction dir )
+{
+    return dir==TR_UP || dir==TR_DOWN;
+}

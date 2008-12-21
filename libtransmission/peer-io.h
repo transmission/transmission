@@ -43,6 +43,8 @@ tr_peerIo*  tr_peerIoNewIncoming( tr_session              * session,
 
 void        tr_peerIoFree       ( tr_peerIo               * io );
 
+tr_bool     tr_isPeerIo         ( const tr_peerIo         * io );
+
 
 /**
 ***

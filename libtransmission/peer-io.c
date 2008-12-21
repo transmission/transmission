@@ -194,8 +194,8 @@ canReadWrapper( tr_peerIo * io )
 
 #define _isBool(b) (((b)==0 || (b)==1))
 
-static int
-isPeerIo( const tr_peerIo * io )
+tr_bool
+tr_isPeerIo( const tr_peerIo * io )
 {
     return ( io != NULL )
         && ( io->magicNumber == MAGIC_NUMBER )
@@ -216,7 +216,7 @@ event_read_cb( int fd, short event UNUSED, void * vio )
     const size_t howmuch = tr_bandwidthClamp( io->bandwidth, TR_DOWN, io->session->so_rcvbuf );
     const tr_direction dir = TR_DOWN;
 
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     dbgmsg( io, "libevent says this peer is ready to read" );
 
@@ -287,7 +287,7 @@ event_write_cb( int fd, short event UNUSED, void * vio )
     size_t howmuch;
     const tr_direction dir = TR_UP;
 
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     dbgmsg( io, "libevent says this peer is ready to write" );
 
@@ -446,7 +446,7 @@ tr_peerIoFree( tr_peerIo * io )
 tr_session*
 tr_peerIoGetSession( tr_peerIo * io )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
     assert( io->session );
 
     return io->session;
@@ -456,7 +456,7 @@ const tr_address*
 tr_peerIoGetAddress( const tr_peerIo * io,
                            tr_port   * port )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     if( port )
         *port = io->port;
@@ -537,7 +537,7 @@ void
 tr_peerIoSetTorrentHash( tr_peerIo *     io,
                          const uint8_t * hash )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     tr_cryptoSetTorrentHash( io->crypto, hash );
 }
@@ -545,7 +545,7 @@ tr_peerIoSetTorrentHash( tr_peerIo *     io,
 const uint8_t*
 tr_peerIoGetTorrentHash( tr_peerIo * io )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
     assert( io->crypto );
 
     return tr_cryptoGetTorrentHash( io->crypto );
@@ -554,7 +554,7 @@ tr_peerIoGetTorrentHash( tr_peerIo * io )
 int
 tr_peerIoHasTorrentHash( const tr_peerIo * io )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
     assert( io->crypto );
 
     return tr_cryptoHasTorrentHash( io->crypto );
@@ -568,7 +568,7 @@ void
 tr_peerIoSetPeersId( tr_peerIo *     io,
                      const uint8_t * peer_id )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     if( ( io->peerIdIsSet = peer_id != NULL ) )
         memcpy( io->peerId, peer_id, 20 );
@@ -579,7 +579,7 @@ tr_peerIoSetPeersId( tr_peerIo *     io,
 const uint8_t*
 tr_peerIoGetPeersId( const tr_peerIo * io )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
     assert( io->peerIdIsSet );
 
     return io->peerId;
@@ -593,7 +593,7 @@ void
 tr_peerIoEnableFEXT( tr_peerIo * io,
                      tr_bool     flag )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
     assert( isFlag( flag ) );
 
     dbgmsg( io, "setting FEXT support flag to %d", (flag?1:0) );
@@ -603,7 +603,7 @@ tr_peerIoEnableFEXT( tr_peerIo * io,
 tr_bool
 tr_peerIoSupportsFEXT( const tr_peerIo * io )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     return io->fastExtensionSupported;
 }
@@ -616,7 +616,7 @@ void
 tr_peerIoEnableLTEP( tr_peerIo  * io,
                      tr_bool      flag )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
     assert( isFlag( flag ) );
 
     dbgmsg( io, "setting LTEP support flag to %d", (flag?1:0) );
@@ -626,7 +626,7 @@ tr_peerIoEnableLTEP( tr_peerIo  * io,
 tr_bool
 tr_peerIoSupportsLTEP( const tr_peerIo * io )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     return io->extendedProtocolSupported;
 }
@@ -666,7 +666,7 @@ void
 tr_peerIoSetBandwidth( tr_peerIo     * io,
                        tr_bandwidth  * bandwidth )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     if( io->bandwidth )
         tr_bandwidthRemovePeer( io->bandwidth, io );
@@ -691,7 +691,7 @@ void
 tr_peerIoSetEncryption( tr_peerIo * io,
                         int         encryptionMode )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
     assert( encryptionMode == PEER_ENCRYPTION_NONE
           || encryptionMode == PEER_ENCRYPTION_RC4 );
 
@@ -838,6 +838,8 @@ tr_peerIoReadUint16( tr_peerIo *       io,
 {
     uint16_t tmp;
 
+    assert( tr_isPeerIo( io ) );
+
     tr_peerIoReadBytes( io, inbuf, &tmp, sizeof( uint16_t ) );
     *setme = ntohs( tmp );
 }
@@ -849,6 +851,8 @@ tr_peerIoReadUint32( tr_peerIo *       io,
 {
     uint32_t tmp;
 
+    assert( tr_isPeerIo( io ) );
+
     tr_peerIoReadBytes( io, inbuf, &tmp, sizeof( uint32_t ) );
     *setme = ntohl( tmp );
 }
@@ -858,8 +862,11 @@ tr_peerIoDrain( tr_peerIo *       io,
                 struct evbuffer * inbuf,
                 size_t            byteCount )
 {
-    uint8_t * tmp = tr_new( uint8_t, byteCount );
+    uint8_t * tmp;
 
+    assert( tr_isPeerIo( io ) );
+
+    tmp = tr_new( uint8_t, byteCount );
     tr_peerIoReadBytes( io, inbuf, tmp, byteCount );
     tr_free( tmp );
 }
@@ -879,7 +886,7 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
 {
     int res;
 
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     howmuch = tr_bandwidthClamp( io->bandwidth, TR_DOWN, howmuch );
 
@@ -906,7 +913,7 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
 {
     int n;
 
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     howmuch = tr_bandwidthClamp( io->bandwidth, TR_UP, howmuch );
 
@@ -928,8 +935,8 @@ tr_peerIoFlush( tr_peerIo  * io, tr_direction dir, size_t limit )
 {
     int ret;
 
-    assert( isPeerIo( io ) );
-    assert( dir==TR_UP || dir==TR_DOWN );
+    assert( tr_isPeerIo( io ) );
+    assert( tr_isDirection( dir ) );
 
     if( dir==TR_DOWN )
         ret = tr_peerIoTryRead( io, limit );
@@ -942,7 +949,7 @@ tr_peerIoFlush( tr_peerIo  * io, tr_direction dir, size_t limit )
 struct evbuffer *
 tr_peerIoGetReadBuffer( tr_peerIo * io )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     return io->inbuf;
 }
@@ -950,8 +957,8 @@ tr_peerIoGetReadBuffer( tr_peerIo * io )
 tr_bool
 tr_peerIoHasBandwidthLeft( const tr_peerIo * io, tr_direction dir )
 {
-    assert( isPeerIo( io ) );
-    assert( dir==TR_UP || dir==TR_DOWN );
+    assert( tr_isPeerIo( io ) );
+    assert( tr_isDirection( dir ) );
 
     return tr_bandwidthClamp( io->bandwidth, dir, 1024 ) > 0;
 }
@@ -963,7 +970,7 @@ tr_peerIoHasBandwidthLeft( const tr_peerIo * io, tr_direction dir )
 static void
 event_enable( tr_peerIo * io, short event )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     if( event & EV_READ )
         event_add( &io->event_read, NULL );
@@ -975,7 +982,7 @@ event_enable( tr_peerIo * io, short event )
 static void
 event_disable( struct tr_peerIo * io, short event )
 {
-    assert( isPeerIo( io ) );
+    assert( tr_isPeerIo( io ) );
 
     if( event & EV_READ )
         event_del( &io->event_read );
@@ -990,7 +997,12 @@ tr_peerIoSetEnabled( tr_peerIo    * io,
                      tr_direction   dir,
                      tr_bool        isEnabled )
 {
-    const short event = dir == TR_UP ? EV_WRITE : EV_READ;
+    short event;
+
+    assert( tr_isPeerIo( io ) );
+    assert( tr_isDirection( dir ) );
+
+    event = dir == TR_UP ? EV_WRITE : EV_READ;
 
     if( isEnabled )
         event_enable( io, event );

@@ -75,6 +75,9 @@ tr_bandwidth*
 /** @brief destroy a tr_bandwidth object */
 void     tr_bandwidthFree             ( tr_bandwidth        * bandwidth );
 
+/** @brief test to see if the pointer refers to a live bandwidth object */
+tr_bool  tr_isBandwidth               ( const tr_bandwidth  * bandwidth );
+
 /******
 *******
 ******/
@@ -100,12 +103,12 @@ double  tr_bandwidthGetDesiredSpeed   ( const tr_bandwidth  * bandwidth,
  */
 void    tr_bandwidthSetLimited        ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
-                                        int                   isLimited );
+                                        tr_bool               isLimited );
 
 /**
  * @return nonzero if this bandwidth throttles its iobufs' speeds
  */
-int     tr_bandwidthIsLimited         ( const tr_bandwidth  * bandwidth,
+tr_bool tr_bandwidthIsLimited         ( const tr_bandwidth  * bandwidth,
                                         tr_direction          direction );
 
 /**
@@ -145,7 +148,7 @@ double  tr_bandwidthGetPieceSpeed     ( const tr_bandwidth  * bandwidth,
 void    tr_bandwidthUsed              ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
                                         size_t                byteCount,
-                                        int                   isPieceData );
+                                        tr_bool               isPieceData );
 
 /******
 *******
@@ -162,7 +165,7 @@ void    tr_bandwidthSetParent         ( tr_bandwidth        * bandwidth,
  */
 void    tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
-                                        int                   isEnabled );
+                                        tr_bool               isEnabled );
 
 /******
 *******

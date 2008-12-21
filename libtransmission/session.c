@@ -655,7 +655,7 @@ tr_sessionSetSpeedLimitEnabled( tr_session      * session,
                                 tr_bool           isLimited )
 {
     assert( session );
-    assert( dir==TR_UP || dir==TR_DOWN );
+    assert( tr_isDirection( dir ) );
 
     session->isSpeedLimited[dir] = isLimited;
     updateBandwidth( session, dir );
@@ -667,7 +667,7 @@ tr_sessionSetSpeedLimit( tr_session    * session,
                          int             desiredSpeed )
 {
     assert( session );
-    assert( dir==TR_UP || dir==TR_DOWN );
+    assert( tr_isDirection( dir ) );
 
     session->speedLimit[dir] = desiredSpeed;
     updateBandwidth( session, dir );
@@ -678,7 +678,7 @@ tr_sessionIsSpeedLimitEnabled( const tr_session  * session,
                                tr_direction        dir )
 {
     assert( session );
-    assert( dir==TR_UP || dir==TR_DOWN );
+    assert( tr_isDirection( dir ) );
 
     return session->isSpeedLimited[dir];
 }
@@ -688,7 +688,7 @@ tr_sessionGetSpeedLimit( const tr_session  * session,
                          tr_direction        dir )
 {
     assert( session );
-    assert( dir==TR_UP || dir==TR_DOWN );
+    assert( tr_isDirection( dir ) );
 
     return session->speedLimit[dir];
 }

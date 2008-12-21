@@ -1405,6 +1405,10 @@ void tr_torrentSetActivityDate( tr_torrent * torrent,
 void tr_torrentSetDoneDate( tr_torrent  * torrent,
                             time_t        doneDate );
 
+/** @brief Sanity checker to test that the direction is TR_UP or TR_DOWN */
+tr_bool tr_isDirection( tr_direction );
+
+
 /** @} */
 
 #ifdef __TRANSMISSION__

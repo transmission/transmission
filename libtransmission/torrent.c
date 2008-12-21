@@ -142,7 +142,7 @@ tr_torrentSetSpeedMode( tr_torrent *  tor,
                         tr_speedlimit mode )
 {
     assert( tor != NULL );
-    assert( dir==TR_UP || dir==TR_DOWN );
+    assert( tr_isDirection( dir ) );
     assert( mode==TR_SPEEDLIMIT_GLOBAL || mode==TR_SPEEDLIMIT_SINGLE || mode==TR_SPEEDLIMIT_UNLIMITED  );
 
     tor->speedLimitMode[dir] = mode;
@@ -156,7 +156,7 @@ tr_torrentGetSpeedMode( const tr_torrent * tor,
                         tr_direction       dir )
 {
     assert( tor != NULL );
-    assert( dir==TR_UP || dir==TR_DOWN );
+    assert( tr_isDirection( dir ) );
 
     return tor->speedLimitMode[dir];
 }
