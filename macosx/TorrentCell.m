@@ -379,7 +379,7 @@
 {
     Torrent * torrent = [self representedObject];
     
-    BOOL minimal = [fDefaults boolForKey: @"SmallView"];
+    const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
     //group coloring
     NSRect iconRect = [self iconRectForBounds: cellFrame];
@@ -412,7 +412,7 @@
     }
     
     //error image
-    BOOL error = [torrent isError];
+    const BOOL error = [torrent isError];
     if (error && !fErrorImage)
     {
         fErrorImage = [NSImage imageNamed: @"Error.png"];
@@ -791,7 +791,7 @@
             return NSLocalizedString(@"Pause the transfer", "Torrent Table -> tooltip");
         else
         {
-            if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
+            if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
                 return NSLocalizedString(@"Resume the transfer right away", "Torrent cell -> button info");
             else if ([torrent waitingToStart])
                 return NSLocalizedString(@"Stop waiting to start", "Torrent cell -> button info");
