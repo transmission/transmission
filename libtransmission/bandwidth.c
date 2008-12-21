@@ -338,7 +338,7 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
             i = 0;
     }
 
-    /* Second phase of IO.  To help us scale well in high bandiwdth situations
+    /* Second phase of IO.  To help us scale well in high bandwidth situations
      * such as LANs, enable on-demand IO for peers with bandwidth left to burn.
      * This on-demand IO for a peer is enabled until either (1) the peer runs
      * out of bandwidth, or (2) the next tr_bandwidthAllocate() call, when we

@@ -96,11 +96,11 @@ dnl
 dnl  debugging support
 AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug],[build with debugging support]),,,)
 if test "x$enable_debug" = "xyes" ; then
-	CFLAGS+=" -g "
-	CXXFLAGS+=" -g "
+	CFLAGS="$CFLAGS -g -O0"
+	CXXFLAGS="$CXXFLAGS -g -O0"
 else
-	CFLAGS+=" -g -O3 -funroll-loops -DNDEBUG "
-	CXXFLAGS+=" -g -O3 -funroll-loops -DNDEBUG "
+	CFLAGS="$CFLAGS -g -O3 -funroll-loops -DNDEBUG "
+	CXXFLAGS="$CXXFLAGS -g -O3 -funroll-loops -DNDEBUG "
 fi
 
 
