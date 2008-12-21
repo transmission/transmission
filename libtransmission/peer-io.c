@@ -333,7 +333,8 @@ event_write_cb( int fd, short event UNUSED, void * vio )
     return;
 
  error:
-    io->gotError( io, what, io->userData );
+    if( io->gotError != NULL )
+        io->gotError( io, what, io->userData );
 }
 
 /**
