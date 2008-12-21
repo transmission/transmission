@@ -85,6 +85,7 @@ int tr_compareAddresses( const tr_address * a,
                          const tr_address * b);
 void tr_normalizeV4Mapped( tr_address * const addr );
 
+void tr_suspectAddress( const tr_address * a, const char * source );
 tr_bool tr_isAddress( const tr_address * a );
 
 typedef struct tr_net_af_support

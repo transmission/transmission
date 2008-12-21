@@ -68,6 +68,36 @@ tr_netInit( void )
     }
 }
 
+void
+tr_suspectAddress( const tr_address * a, const char * source )
+{
+    /* be really aggressive in what we report */
+    if( a->type == TR_AF_INET && !( a->addr.addr4.s_addr & 0xff000000 ) )
+        tr_dbg(  "Funny looking address %s from %s", tr_ntop_non_ts( a ), source );
+    /* /16s taken from ipv6 rib on 21 dec, 2008 */
+    /* this is really, really ugly. expedience over quality */
+    if( a->type == TR_AF_INET6 )
+    {
+        uint16_t slash16;
+        uint16_t valid[] = { 0x339, 0x2002, 0x2003, 0x2400, 0x2401, 0x2402,
+            0x2403, 0x2404, 0x2405, 0x2406, 0x2407, 0x2600, 0x2607, 0x2610,
+            0x2620, 0x2800, 0x2801, 0x2a00, 0x2a01, 0x0a02, 0x2001, 0x0000 };
+        uint16_t *p;
+        tr_bool good = FALSE;
+        p = valid;
+        memcpy( &slash16, &a->addr, 2 );
+        slash16 = ntohs( slash16 );
+        while( *p )
+        {
+            if( slash16 == *p )
+                good = TRUE;
+            p++;
+        }
+        if( !good )
+            tr_dbg(  "Funny looking address %s from %s", tr_ntop_non_ts( a ), source );
+    }
+}
+
 tr_bool
 tr_isAddress( const tr_address * a )
 {
