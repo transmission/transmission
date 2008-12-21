@@ -213,16 +213,16 @@ void
 SpeedStats :: Pulse( tr_handle * handle )
 {
     // add a new record
-    float allUp, allDown;
-    tr_sessionGetSpeed( handle, &allDown, &allUp );
+    const double allUp   = tr_sessionGetPieceSpeed( handle, TR_UP );
+    const double allDown = tr_sessionGetPieceSpeed( handle, TR_DOWN );
     Speed s;
     s.time = time( NULL );
     s.allUp = allUp;
     s.allDown = allDown;
     if( myTorrent ) {
         const tr_stat * stat = tr_torrentStat( myTorrent );
-        s.torrentUp = stat->rateUpload;
-        s.torrentDown = stat->rateDownload;
+        s.torrentUp = stat->pieceUploadSpeed;
+        s.torrentDown = stat->pieceDownloadSpeed;
     }
     myStats.push_back( s );
 

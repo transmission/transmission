@@ -27,7 +27,7 @@ TorrentFilter :: GetFlags( const tr_torrent * tor )
     int flags = 0;
     const tr_stat * s = tr_torrentStat( (tr_torrent*)tor );
 
-    switch( s->status )
+    switch( s->activity )
     {
         case TR_STATUS_DOWNLOAD:
             flags |= FLAG_LEECHING;
@@ -43,7 +43,7 @@ TorrentFilter :: GetFlags( const tr_torrent * tor )
             break;
     }
 
-    flags |= ( ( s->rateUpload + s->rateDownload ) > 0.01 )
+    flags |= ( ( s->pieceUploadSpeed + s->pieceDownloadSpeed ) > 0.01 )
         ? FLAG_ACTIVE
         : FLAG_IDLE;
 

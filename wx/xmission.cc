@@ -285,7 +285,7 @@ MyFrame :: OnStartUpdate( wxUpdateUIEvent& event )
 {
     bool enable = false;
     foreach( torrents_v, mySelectedTorrents, it )
-        if( tr_torrentStatCached(*it)->status == TR_STATUS_STOPPED )
+        if( tr_torrentStatCached(*it)->activity == TR_STATUS_STOPPED )
             enable = true;
     event.Enable( enable );
 }
@@ -293,7 +293,7 @@ void
 MyFrame :: OnStart( wxCommandEvent& WXUNUSED(unused) )
 {
     foreach( torrents_v, mySelectedTorrents, it )
-        if( tr_torrentStatCached(*it)->status == TR_STATUS_STOPPED )
+        if( tr_torrentStatCached(*it)->activity == TR_STATUS_STOPPED )
             tr_torrentStart( *it );
 }
 
@@ -305,7 +305,7 @@ MyFrame :: OnStopUpdate( wxUpdateUIEvent& event )
 {
     bool enable = false;
     foreach( torrents_v, mySelectedTorrents, it )
-        if( tr_torrentStatCached(*it)->status != TR_STATUS_STOPPED )
+        if( tr_torrentStatCached(*it)->activity != TR_STATUS_STOPPED )
             enable = true;
     event.Enable( enable );
 }
@@ -313,7 +313,7 @@ void
 MyFrame :: OnStop( wxCommandEvent& WXUNUSED(unused) )
 {
     foreach( torrents_v, mySelectedTorrents, it )
-        if( tr_torrentStat(*it)->status != TR_STATUS_STOPPED )
+        if( tr_torrentStat(*it)->activity != TR_STATUS_STOPPED )
             tr_torrentStop( *it );
 }
 
@@ -473,8 +473,8 @@ MyFrame :: OnPulse(wxTimerEvent& WXUNUSED(event) )
 
     mySpeedStats->Pulse( handle );
 
-    float down, up;
-    tr_sessionGetSpeed( handle, &down, &up );
+    const double up   = tr_sessionGetPieceSpeed( handle, TR_UP );
+    const double down = tr_sessionGetPieceSpeed( handle, TR_DOWN );
     wxString xstr = _("Total DL: ");
     xstr += getReadableSpeed( down );
     SetStatusText( xstr, 1 );

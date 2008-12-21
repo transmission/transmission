@@ -248,8 +248,8 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent   * tor,
                 break;
 
             case COL_DOWNLOAD_SPEED:
-                if( s->rateDownload > 0.01 )
-                    xstr = getReadableSpeed( s->rateDownload );
+                if( s->pieceDownloadSpeed > 0.01 )
+                    xstr = getReadableSpeed( s->pieceDownloadSpeed );
                 else
                     xstr.Clear( );
                 break;
@@ -304,7 +304,7 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent   * tor,
 
             case COL_STATE: /* FIXME: divine the meaning of these two columns */
             case COL_STATUS:
-                switch( s->status ) {
+                switch( s->activity ) {
                     case TR_STATUS_STOPPED:     xstr = _("Stopped"); break;
                     case TR_STATUS_CHECK:       xstr = wxString::Format ( _("Checking Files (%.0f)"), s->recheckProgress );  break;
                     case TR_STATUS_CHECK_WAIT:  xstr = _("Waiting to Check"); break;
@@ -319,8 +319,8 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent   * tor,
                 break;
 
             case COL_UPLOAD_SPEED:
-                if( s->rateUpload > 0.01 )
-                    xstr = getReadableSpeed( s->rateUpload );
+                if( s->pieceUploadSpeed > 0.01 )
+                    xstr = getReadableSpeed( s->pieceUploadSpeed );
                 else
                     xstr.Clear( );
                 break;
@@ -420,9 +420,9 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
             break;
 
         case COL_DOWNLOAD_SPEED:
-            if( sa->rateDownload < sb->rateDownload )
+            if( sa->pieceDownloadSpeed < sb->pieceDownloadSpeed )
                 ret = -1;
-            else if( sa->rateDownload > sb->rateDownload )
+            else if( sa->pieceDownloadSpeed > sb->pieceDownloadSpeed )
                 ret =  1;
             else
                 ret = 0;
@@ -498,7 +498,7 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
 
         case COL_STATE: /* FIXME */
         case COL_STATUS:
-            ret = sa->status - sb->status;
+            ret = sa->activity - sb->activity;
             break;
 
         case COL_TOTAL:
@@ -506,9 +506,9 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
             break;
 
         case COL_UPLOAD_SPEED:
-            if( sa->rateUpload < sb->rateUpload )
+            if( sa->pieceUploadSpeed < sb->pieceUploadSpeed )
                 ret = -1;
-            else if( sa->rateUpload > sb->rateUpload )
+            else if( sa->pieceUploadSpeed > sb->pieceUploadSpeed )
                 ret = 1;
             else
                 ret = 0;
