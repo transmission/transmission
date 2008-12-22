@@ -28,7 +28,7 @@
 #include "hig.h"
 #include "util.h"
 
-#define UPDATE_INTERVAL_MSEC 2000
+#define UPDATE_INTERVAL_SECONDS 2
 
 /****
 *****  PIECES VIEW
@@ -1529,7 +1529,7 @@ torrent_inspector_new( GtkWindow * parent,
 
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), n, TRUE, TRUE, 0 );
 
-    tag = g_timeout_add ( UPDATE_INTERVAL_MSEC, periodic_refresh, d );
+    tag = gtr_timeout_add_seconds( UPDATE_INTERVAL_SECONDS, periodic_refresh, d );
     g_object_set_data_full ( G_OBJECT( d ), "tag",
                              GUINT_TO_POINTER( tag ), remove_tag );
 

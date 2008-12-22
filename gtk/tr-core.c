@@ -498,8 +498,7 @@ maybeAddTorrent( TrCore *     core,
             p->monitor_files =
                 g_slist_append( p->monitor_files, g_strdup( filename ) );
         if( !p->monitor_idle_tag )
-            p->monitor_idle_tag = g_timeout_add( 1000, watchFolderIdle,
-                                                 core );
+            p->monitor_idle_tag = gtr_timeout_add_seconds( 1, watchFolderIdle, core );
     }
 }
 
