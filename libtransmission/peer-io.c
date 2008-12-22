@@ -73,6 +73,7 @@ struct tr_datatype
 {
     tr_bool  isPieceData;
     size_t   length;
+    struct __tr_list head;
 };
 
 struct tr_peerIo
@@ -106,7 +107,7 @@ struct tr_peerIo
 
     struct evbuffer  * inbuf;
     struct evbuffer  * outbuf;
-    tr_list          * outbuf_datatypes; /* struct tr_datatype */
+    struct __tr_list   outbuf_datatypes; /* struct tr_datatype */
 
     struct event       event_read;
     struct event       event_write;
@@ -121,7 +122,8 @@ didWriteWrapper( tr_peerIo * io, size_t bytes_transferred )
 {
     while( bytes_transferred )
     {
-        struct tr_datatype * next = io->outbuf_datatypes->data;
+        struct tr_datatype * next = __tr_list_entry( io->outbuf_datatypes.next,
+                                                     struct tr_datatype, head );
         const size_t payload = MIN( next->length, bytes_transferred );
         const size_t overhead = getPacketOverhead( payload );
 
@@ -135,8 +137,10 @@ didWriteWrapper( tr_peerIo * io, size_t bytes_transferred )
 
         bytes_transferred -= payload;
         next->length -= payload;
-        if( !next->length )
-            tr_free( tr_list_pop_front( &io->outbuf_datatypes ) );
+        if( !next->length ) {
+            __tr_list_remove( io->outbuf_datatypes.next );
+            tr_free( next );
+	}
     }
 }
 
@@ -360,9 +364,14 @@ tr_peerIoNew( tr_session       * session,
     io->timeCreated = time( NULL );
     io->inbuf = evbuffer_new( );
     io->outbuf = evbuffer_new( );
+
     event_set( &io->event_read, io->socket, EV_READ, event_read_cb, io );
     event_set( &io->event_write, io->socket, EV_WRITE, event_write_cb, io );
+
+    __tr_list_init( &io->outbuf_datatypes );
+
     tr_peerIoSetBandwidth( io, session->bandwidth );
+
     return io;
 }
 
@@ -399,6 +408,13 @@ tr_peerIoNewOutgoing( tr_session       * session,
 }
 
 static void
+trDatatypeFree( void * data )
+{
+    struct tr_datatype * dt = __tr_list_entry( data, struct tr_datatype, head );
+    tr_free(dt);
+}
+
+static void
 io_dtor( void * vio )
 {
     tr_peerIo * io = vio;
@@ -410,7 +426,7 @@ io_dtor( void * vio )
     evbuffer_free( io->inbuf );
     tr_netClose( io->socket );
     tr_cryptoFree( io->crypto );
-    tr_list_free( &io->outbuf_datatypes, tr_free );
+    __tr_list_destroy( &io->outbuf_datatypes, trDatatypeFree );
 
     io->magicNumber = 0xDEAD;
     tr_free( io );
@@ -701,7 +717,9 @@ tr_peerIoWrite( tr_peerIo   * io,
     datatype = tr_new( struct tr_datatype, 1 );
     datatype->isPieceData = isPieceData != 0;
     datatype->length = writemeLen;
-    tr_list_append( &io->outbuf_datatypes, datatype );
+
+    __tr_list_init( &datatype->head );
+    __tr_list_append( &io->outbuf_datatypes, &datatype->head );
 
     evbuffer_add( io->outbuf, writeme, writemeLen );
 }

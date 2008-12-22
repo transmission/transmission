@@ -52,5 +52,80 @@ tr_list* tr_list_find( tr_list *         list,
                        const void *      b,
                        TrListCompareFunc compare_func );
 
+
+/*
+ * Double-linked list with easy memory management and fast
+ * insert/remove operations
+ */
+
+struct __tr_list
+{
+    struct __tr_list * next, * prev;
+};
+
+#define __tr_list_entry(ptr, type, member) ({            \
+    const struct __tr_list *__mptr = (ptr);              \
+    (void *)( (char *)__mptr - offsetof(type,member) );  \
+})
+
+typedef int  ( *__tr_list_cmp_t ) ( const void * a, const void * b );
+typedef void ( *__tr_list_free_t )( void * );
+
+
+/**
+ *    __tr_list_init()
+ *
+ * Init @head as an empty list.
+ */
+void
+__tr_list_init( struct __tr_list * head );
+
+
+/**
+ *    __tr_list_insert()
+ *
+ * Insert @list between @prev and @next.
+ */
+void
+__tr_list_insert( struct __tr_list * list,
+                  struct __tr_list * prev,
+                  struct __tr_list * next);
+
+/**
+ *    __tr_list_splice()
+ *
+ * Connect @prev with @next, removing any nodes that were
+ * in between.
+ */
+void
+__tr_list_splice( struct __tr_list * prev,
+                  struct __tr_list * next);
+
+/**
+ *    __tr_list_append()
+ *
+ * Append @list to the end of @head.
+ */
+void
+__tr_list_append( struct __tr_list * head,
+                  struct __tr_list * list);
+
+/**
+ *    __tr_list_remove()
+ *
+ * Remove @head from the list it is in. 
+ */
+void
+__tr_list_remove( struct __tr_list * head );
+
+/**
+ *    __tr_list_destroy()
+ *
+ * Destroy the list and free all nodes
+ */
+void
+__tr_list_destroy( struct __tr_list * head,
+                   __tr_list_free_t   func);
+
 #endif /* TR_LIST_H */
 
