@@ -483,7 +483,7 @@ file_list_set_torrent( GtkWidget * w,
 
         refresh( data );
 
-        data->timeout_tag = g_timeout_add( 2500, refreshModel, data );
+        data->timeout_tag = gtr_timeout_add_seconds( 2, refreshModel, data );
     }
 
     gtk_tree_view_set_model( GTK_TREE_VIEW( data->view ),

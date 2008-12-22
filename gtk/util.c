@@ -641,3 +641,18 @@ gtr_button_new_from_stock( const char * stock,
     return button;
 }
 
+/***
+****
+***/
+
+guint
+gtr_timeout_add_seconds( guint        interval,
+                         GSourceFunc  function,
+                         gpointer     data )
+{
+#if GLIB_CHECK_VERSION( 2,14,0 )
+    return g_timeout_add_seconds( interval, function, data );
+#else
+    return g_timeout_add( interval*1000, function, data );
+#endif
+}

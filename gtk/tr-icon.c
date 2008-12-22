@@ -26,7 +26,7 @@ tr_icon_new( TrCore * core )
 
 #else
 
- #define UPDATE_INTERVAL 2500
+#define UPDATE_INTERVAL_SECONDS 2
 
 static void
 activated( GtkStatusIcon   * self      UNUSED,
@@ -90,7 +90,7 @@ tr_icon_new( TrCore * core )
 
     g_signal_connect( icon, "activate", G_CALLBACK( activated ), NULL );
     g_signal_connect( icon, "popup-menu", G_CALLBACK( popup ), NULL );
-    id = g_timeout_add( UPDATE_INTERVAL, refresh_tooltip_cb, icon );
+    id = gtr_timeout_add_seconds( UPDATE_INTERVAL_SECONDS, refresh_tooltip_cb, icon );
     g_object_set_data( G_OBJECT( icon ), "tr-core", core );
     g_object_set_data_full( G_OBJECT(
                                 icon ), "update-tag", GUINT_TO_POINTER(

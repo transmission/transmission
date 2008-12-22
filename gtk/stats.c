@@ -169,7 +169,7 @@ stats_dialog_create( GtkWindow * parent,
     updateStats( ui );
     g_object_set_data_full( G_OBJECT( d ), "data", ui, g_free );
     g_signal_connect( d, "response", G_CALLBACK( dialogResponse ), ui );
-    i = g_timeout_add( 1000, updateStats, ui );
+    i = gtr_timeout_add_seconds( 1, updateStats, ui );
     g_object_weak_ref( G_OBJECT( d ), dialogDestroyed, GUINT_TO_POINTER( i ) );
     return d;
 }

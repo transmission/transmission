@@ -652,8 +652,7 @@ appsetup( TrWindow *      wind,
 
     /* start scheduled rate timer */
     updateScheduledLimits ( tr_core_session( cbdata->core ) );
-    g_timeout_add( 60 * 1000, updateScheduledLimits,
-                  tr_core_session( cbdata->core ) );
+    gtr_timeout_add_seconds( 60, updateScheduledLimits, tr_core_session( cbdata->core ) );
 
     /* either show the window or iconify it */
     if( !minimized )

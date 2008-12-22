@@ -1311,7 +1311,7 @@ onCorePrefsChanged( TrCore * core UNUSED,
         data = g_new0( struct test_port_data, 1 );
         data->label = ndata->label;
         data->alive = ndata->alive;
-        g_timeout_add( 3000, testing_port_begin, data );
+        gtr_timeout_add_seconds( 3, testing_port_begin, data );
     }
 }
 

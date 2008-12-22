@@ -28,7 +28,6 @@
 #include "hig.h"
 #include "util.h"
 
-#define UPDATE_INTERVAL_MSEC 2000
 #define PAGE_KEY "page"
 
 struct tracker_page

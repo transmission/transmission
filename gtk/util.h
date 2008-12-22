@@ -95,6 +95,10 @@ char*       gtr_get_help_url( void );
 GtkWidget * gtr_button_new_from_stock( const char * stock,
                                        const char * mnemonic );
 
+guint       gtr_timeout_add_seconds( guint       interval,
+                                     GSourceFunc function,
+                                     gpointer    data );
+
 void        addTorrentErrorDialog( GtkWidget *  window_or_child,
                                    int          err,
                                    const char * filename );
