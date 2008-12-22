@@ -60,7 +60,7 @@ typedef struct
     uint32_t         length;       /* for GOT_BLOCK + GOT_DATA */
     float            progress;     /* for PEER_PROGRESS */
     int              err;          /* errno for GOT_ERROR */
-    int              wasPieceData; /* for GOT_DATA */
+    tr_bool          wasPieceData; /* for GOT_DATA */
     tr_bool          uploadOnly;   /* for UPLOAD_ONLY */
 }
 tr_peer_event;

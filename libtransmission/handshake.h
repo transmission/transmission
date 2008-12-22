@@ -18,8 +18,8 @@
 #define TR_HANDSHAKE_H
 
 #include "transmission.h"
+#include "net.h"
 
-struct tr_address;
 struct tr_peerIo;
 typedef struct tr_handshake tr_handshake;
 
@@ -35,8 +35,7 @@ tr_handshake *         tr_handshakeNew( struct tr_peerIo * io,
                                         handshakeDoneCB    doneCB,
                                         void *             doneUserData );
 
-const struct tr_address *
-                      tr_handshakeGetAddr( const struct tr_handshake  * handshake,
+const tr_address *     tr_handshakeGetAddr( const struct tr_handshake  * handshake,
                                             tr_port                    * port );
 
 void                   tr_handshakeFree( tr_handshake * handshake );

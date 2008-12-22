@@ -465,8 +465,7 @@ tr_peerIoGetAddress( const tr_peerIo * io,
 }
 
 const char*
-tr_peerIoAddrStr( const tr_address * addr,
-                  tr_port            port )
+tr_peerIoAddrStr( const tr_address * addr, tr_port port )
 {
     static char buf[512];
 

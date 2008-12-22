@@ -401,7 +401,7 @@ protocolSendReject( tr_peermsgs * msgs, const struct peer_request * req )
 }
 
 static void
-protocolSendRequest( tr_peermsgs *               msgs,
+protocolSendRequest( tr_peermsgs               * msgs,
                      const struct peer_request * req )
 {
     tr_peerIo       * io  = msgs->peer->io;
@@ -419,7 +419,7 @@ protocolSendRequest( tr_peermsgs *               msgs,
 }
 
 static void
-protocolSendCancel( tr_peermsgs *               msgs,
+protocolSendCancel( tr_peermsgs               * msgs,
                     const struct peer_request * req )
 {
     tr_peerIo       * io  = msgs->peer->io;
@@ -447,7 +447,7 @@ protocolSendHave( tr_peermsgs * msgs,
     tr_peerIoWriteUint8 ( io, out, BT_HAVE );
     tr_peerIoWriteUint32( io, out, index );
 
-    dbgmsg( msgs, "sending Have %u...", index );
+    dbgmsg( msgs, "sending Have %u", index );
     dbgOutMessageLen( msgs );
     pokeBatchPeriod( msgs, LOW_PRIORITY_INTERVAL_SECS );
 }
@@ -772,6 +772,7 @@ sendInterest( tr_peermsgs * msgs,
     dbgmsg( msgs, "Sending %s", weAreInterested ? "Interested" : "Not Interested" );
     tr_peerIoWriteUint32( msgs->peer->io, out, sizeof( uint8_t ) );
     tr_peerIoWriteUint8 ( msgs->peer->io, out, weAreInterested ? BT_INTERESTED : BT_NOT_INTERESTED );
+
     pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
     dbgOutMessageLen( msgs );
 }
@@ -875,7 +876,7 @@ expireOldRequests( tr_peermsgs * msgs, const time_t now  )
     /* cancel requests that have been queued for too long */
     oldestAllowed = now - QUEUED_REQUEST_TTL_SECS;
     reqListCopy( &tmp, &msgs->clientWillAskFor );
-    for( i = 0; i < tmp.count; ++i ) {
+    for( i=0; i<tmp.count; ++i ) {
         const struct peer_request * req = &tmp.requests[i];
         if( req->time_requested < oldestAllowed )
             tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
@@ -933,9 +934,7 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
 
     if( sent )
         dbgmsg( msgs, "pump sent %d requests, now have %d active and %d queued",
-                sent,
-                msgs->clientAskedFor.count,
-                msgs->clientWillAskFor.count );
+                sent, msgs->clientAskedFor.count, msgs->clientWillAskFor.count );
 
     if( count < max )
         fireNeedReq( msgs );
@@ -952,8 +951,7 @@ tr_addreq_t
 tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
                        uint32_t         index,
                        uint32_t         offset,
-                       uint32_t         length,
-                       int              doForce )
+                       uint32_t         length )
 {
     struct peer_request req;
 
@@ -966,17 +964,17 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
     **/
 
     /* don't send requests to choked clients */
-    if( !doForce && msgs->peer->clientIsChoked ) {
+    if( msgs->peer->clientIsChoked ) {
         dbgmsg( msgs, "declining request because they're choking us" );
         return TR_ADDREQ_CLIENT_CHOKED;
     }
 
     /* peer doesn't have this piece */
-    if( !doForce && !tr_bitfieldHas( msgs->peer->have, index ) )
+    if( !tr_bitfieldHas( msgs->peer->have, index ) )
         return TR_ADDREQ_MISSING;
 
     /* peer's queue is full */
-    if( !doForce && requestQueueIsFull( msgs ) ) {
+    if( requestQueueIsFull( msgs ) ) {
         dbgmsg( msgs, "declining request because we're full" );
         return TR_ADDREQ_FULL;
     }
@@ -985,15 +983,13 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
     req.index = index;
     req.offset = offset;
     req.length = length;
-    if( !doForce ) {
-        if( reqListFind( &msgs->clientAskedFor, &req ) != -1 ) {
-            dbgmsg( msgs, "declining because it's a duplicate" );
-            return TR_ADDREQ_DUPLICATE;
-        }
-        if( reqListFind( &msgs->clientWillAskFor, &req ) != -1 ) {
-            dbgmsg( msgs, "declining because it's a duplicate" );
-            return TR_ADDREQ_DUPLICATE;
-        }
+    if( reqListFind( &msgs->clientAskedFor, &req ) != -1 ) {
+        dbgmsg( msgs, "declining because it's a duplicate" );
+        return TR_ADDREQ_DUPLICATE;
+    }
+    if( reqListFind( &msgs->clientWillAskFor, &req ) != -1 ) {
+        dbgmsg( msgs, "declining because it's a duplicate" );
+        return TR_ADDREQ_DUPLICATE;
     }
 
     /**
@@ -1581,7 +1577,6 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             }
             break;
 
-
         case BT_FEXT_HAVE_NONE:
             dbgmsg( msgs, "Got a BT_FEXT_HAVE_NONE" );
             if( fext ) {
@@ -1780,7 +1775,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
 {
     size_t bytesWritten = 0;
     struct peer_request req;
-    const int haveMessages = EVBUFFER_LENGTH( msgs->outMessages ) != 0;
+    const tr_bool haveMessages = EVBUFFER_LENGTH( msgs->outMessages ) != 0;
     const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
 
     /**
@@ -1880,7 +1875,7 @@ peerPulse( void * vmsgs )
 void
 tr_peerMsgsPulse( tr_peermsgs * msgs )
 {
-    if( msgs )
+    if( msgs != NULL )
         peerPulse( msgs );
 }
 
@@ -2202,10 +2197,10 @@ pexPulse( void * vpeer )
 
 tr_peermsgs*
 tr_peerMsgsNew( struct tr_torrent * torrent,
-                struct tr_peer *    peer,
+                struct tr_peer    * peer,
                 tr_delivery_func    func,
-                void *              userData,
-                tr_publisher_tag *  setme )
+                void              * userData,
+                tr_publisher_tag  * setme )
 {
     tr_peermsgs * m;
 
