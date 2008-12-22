@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2008-11-02 14:16-0600\n"
+"POT-Creation-Date: 2008-12-21 13:37-0600\n"
 "PO-Revision-Date: 2008-07-04 10:11+0000\n"
 "Last-Translator: صقر بن عبدالله <Unknown>\n"
 "Language-Team: Arabic <ar@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n % 100 >= "
 "3 && n % 100 <= 10 ? 3 : n % 100 >= 11 && n % 100 <= 99 ? 4 : 5;\n"
-"X-Launchpad-Export-Date: 2008-12-09 18:13+0000\n"
+"X-Launchpad-Export-Date: 2008-12-22 05:09+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -251,8 +251,8 @@ msgstr "تم تحديث القائمة السوداء بمدخلات عددها 
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "تعذّر إنشاء \"%1$s\": %2$s"
 
-#: ../gtk/conf.c:86 ../libtransmission/bencode.c:1323
-#: ../libtransmission/fdlimit.c:181
+#: ../gtk/conf.c:86 ../libtransmission/bencode.c:1332
+#: ../libtransmission/fdlimit.c:220
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "تعذّر فتح \"%1$s\": %2$s"
@@ -293,67 +293,67 @@ msgstr "%"
 msgid "Status"
 msgstr "الحالة"
 
-#: ../gtk/details.c:619
+#: ../gtk/details.c:618
 msgid "Optimistic unchoke"
 msgstr "إطلاق عنان متفائل"
 
-#: ../gtk/details.c:622
+#: ../gtk/details.c:621
 msgid "Downloading from this peer"
 msgstr ""
 
-#: ../gtk/details.c:626
+#: ../gtk/details.c:625
 msgid "We would download from this peer if they would let us"
 msgstr ""
 
-#: ../gtk/details.c:630
+#: ../gtk/details.c:629
 msgid "Uploading to peer"
 msgstr "يجري الرفع إلى الندّ"
 
-#: ../gtk/details.c:633
+#: ../gtk/details.c:632
 msgid "We would upload to this peer if they asked"
 msgstr ""
 
-#: ../gtk/details.c:638
+#: ../gtk/details.c:637
 msgid "Peer has unchoked us, but we're not interested"
 msgstr "أطلق الند لنا العنان، إلا أننا لسنا مهتمين"
 
-#: ../gtk/details.c:643
+#: ../gtk/details.c:642
 msgid "We unchoked this peer, but they're not interested"
 msgstr ""
 
-#: ../gtk/details.c:647
+#: ../gtk/details.c:646
 msgid "Encrypted connection"
 msgstr "اتصال معمّى"
 
-#: ../gtk/details.c:651
+#: ../gtk/details.c:650
 msgid "Peer was discovered through Peer Exchange (PEX)"
 msgstr "اكتُشف الند عبر تبادل الأنداد"
 
-#: ../gtk/details.c:655
+#: ../gtk/details.c:654
 msgid "Peer is an incoming connection"
 msgstr "ندٌّ من اتصال وارد"
 
-#: ../gtk/details.c:875
+#: ../gtk/details.c:845
 msgid "<b>Seeders:</b>"
 msgstr "<b>الناثرون:</b>"
 
-#: ../gtk/details.c:883
+#: ../gtk/details.c:853
 msgid "<b>Leechers:</b>"
 msgstr "<b>المنزّلون:</b>"
 
-#: ../gtk/details.c:891
+#: ../gtk/details.c:861
 msgid "<b>Times Completed:</b>"
 msgstr ""
 
-#: ../gtk/details.c:913 ../gtk/details.c:1449 ../gtk/details.c:1460
+#: ../gtk/details.c:883 ../gtk/details.c:1419 ../gtk/details.c:1430
 msgid "Never"
 msgstr "أبدًا"
 
-#: ../gtk/details.c:938
+#: ../gtk/details.c:908
 msgid "Details"
 msgstr "التفاصيل"
 
-#: ../gtk/details.c:941 ../gtk/makemeta-ui.c:284
+#: ../gtk/details.c:911 ../gtk/makemeta-ui.c:284
 #, c-format
 msgid "%'d Piece"
 msgid_plural "%'d Pieces"
@@ -362,235 +362,235 @@ msgstr[1] ""
 
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
-#: ../gtk/details.c:947 ../gtk/makemeta-ui.c:290
+#: ../gtk/details.c:917 ../gtk/makemeta-ui.c:290
 #, c-format
 msgid "%1$s @ %2$s"
 msgstr ""
 
-#: ../gtk/details.c:951
+#: ../gtk/details.c:921
 msgid "Pieces:"
 msgstr "القطع:"
 
-#: ../gtk/details.c:959
+#: ../gtk/details.c:929
 msgid "Hash:"
 msgstr "التلبيدة:"
 
-#: ../gtk/details.c:962
+#: ../gtk/details.c:932
 msgid "Private to this tracker -- PEX disabled"
 msgstr "خاص بهذا المتتبع -- تم تعطيل تبادل النظراء"
 
-#: ../gtk/details.c:963
+#: ../gtk/details.c:933
 msgid "Public torrent"
 msgstr "تورنت عمومي"
 
-#: ../gtk/details.c:965
+#: ../gtk/details.c:935
 msgid "Privacy:"
 msgstr "الخصوصية:"
 
-#: ../gtk/details.c:977
+#: ../gtk/details.c:947
 msgid "Comment:"
 msgstr "التعليق:"
 
-#: ../gtk/details.c:981
+#: ../gtk/details.c:951
 msgid "Origins"
 msgstr "المصدر"
 
-#: ../gtk/details.c:983
+#: ../gtk/details.c:953
 msgid "Unknown"
 msgstr "مجهول"
 
-#: ../gtk/details.c:985
+#: ../gtk/details.c:955
 msgid "Creator:"
 msgstr "المنشئ:"
 
-#: ../gtk/details.c:989
+#: ../gtk/details.c:959
 msgid "Date:"
 msgstr "التاريخ:"
 
-#: ../gtk/details.c:992
+#: ../gtk/details.c:962
 msgid "Location"
 msgstr "الموضع"
 
-#: ../gtk/details.c:998
+#: ../gtk/details.c:968
 msgid "Destination folder:"
 msgstr "الدليل الوجهة"
 
-#: ../gtk/details.c:1005
+#: ../gtk/details.c:975
 msgid "Torrent file:"
 msgstr "ملف تورنت:"
 
-#: ../gtk/details.c:1051
+#: ../gtk/details.c:1021
 #, c-format
 msgid "%.1f%%"
 msgstr "%.1f%%"
 
-#: ../gtk/details.c:1057
+#: ../gtk/details.c:1027
 #, c-format
 msgid "%1$.1f%% (%2$.1f%% selected)"
 msgstr "%1$.1f%% (%2$.1f%% من الأجزاء المختارة)"
 
-#: ../gtk/details.c:1069
+#: ../gtk/details.c:1039
 #, c-format
 msgid "%1$s (%2$s verified)"
 msgstr "%1$s (%2$s تم التحقق منه)"
 
-#: ../gtk/details.c:1088 ../gtk/util.c:56 ../gtk/util.c:78
+#: ../gtk/details.c:1058 ../gtk/util.c:56 ../gtk/util.c:78
 msgid "None"
 msgstr "لا شيء"
 
-#: ../gtk/details.c:1110
+#: ../gtk/details.c:1080
 msgid "Transfer"
 msgstr "النقل"
 
-#: ../gtk/details.c:1113
+#: ../gtk/details.c:1083
 msgid "State:"
 msgstr "الحالة:"
 
-#: ../gtk/details.c:1116
+#: ../gtk/details.c:1086
 msgid "Progress:"
 msgstr "التقدّم:"
 
 #. "Have" refers to how much of the torrent we have
-#: ../gtk/details.c:1120
+#: ../gtk/details.c:1090
 msgid "Have:"
 msgstr "لدينا:"
 
-#: ../gtk/details.c:1123 ../gtk/stats.c:149 ../gtk/stats.c:161
+#: ../gtk/details.c:1093 ../gtk/stats.c:149 ../gtk/stats.c:161
 msgid "Downloaded:"
 msgstr "مُنزّل:"
 
-#: ../gtk/details.c:1126 ../gtk/stats.c:147 ../gtk/stats.c:159
+#: ../gtk/details.c:1096 ../gtk/stats.c:147 ../gtk/stats.c:159
 msgid "Uploaded:"
 msgstr "مرفوع:"
 
-#: ../gtk/details.c:1130
+#: ../gtk/details.c:1100
 msgid "Failed DL:"
 msgstr "فشل التنزيل:"
 
-#: ../gtk/details.c:1133 ../gtk/stats.c:151 ../gtk/stats.c:163
+#: ../gtk/details.c:1103 ../gtk/stats.c:151 ../gtk/stats.c:163
 msgid "Ratio:"
 msgstr "النسبة:"
 
-#: ../gtk/details.c:1136
+#: ../gtk/details.c:1106
 msgid "Swarm rate:"
 msgstr "سرعة الحشد:"
 
-#: ../gtk/details.c:1139
+#: ../gtk/details.c:1109
 msgid "Error:"
 msgstr "عطل:"
 
-#: ../gtk/details.c:1143
+#: ../gtk/details.c:1113
 msgid "Completion"
 msgstr "التمام"
 
-#: ../gtk/details.c:1155
+#: ../gtk/details.c:1125
 msgid "Dates"
 msgstr "التواريخ"
 
-#: ../gtk/details.c:1158
+#: ../gtk/details.c:1128
 msgid "Started at:"
 msgstr "بدأ في:"
 
-#: ../gtk/details.c:1161
+#: ../gtk/details.c:1131
 msgid "Last activity at:"
 msgstr "آخر نشاط في:"
 
-#: ../gtk/details.c:1252 ../gtk/tr-prefs.c:554 ../gtk/tr-prefs.c:1164
+#: ../gtk/details.c:1222 ../gtk/tr-prefs.c:554 ../gtk/tr-prefs.c:1165
 msgid "Limits"
 msgstr "الحدود"
 
-#: ../gtk/details.c:1256 ../gtk/tr-prefs.c:1166
+#: ../gtk/details.c:1226 ../gtk/tr-prefs.c:1167
 msgid "Limit _download speed (KB/s):"
 msgstr "حدّ سرعة التنزيل (ك. بايت/ث.):"
 
-#: ../gtk/details.c:1275 ../gtk/tr-prefs.c:1174
+#: ../gtk/details.c:1245 ../gtk/tr-prefs.c:1175
 msgid "Limit _upload speed (KB/s):"
 msgstr "حدّ سرعة الرفع (ك. بايت/ث.):"
 
-#: ../gtk/details.c:1293
+#: ../gtk/details.c:1263
 msgid "Peer Connections"
 msgstr "اتصالات الأنداد"
 
-#: ../gtk/details.c:1298
+#: ../gtk/details.c:1268
 msgid "_Maximum peers:"
 msgstr "ال_حدّ الأقصى لعدد الأنداد:"
 
-#: ../gtk/details.c:1353 ../gtk/makemeta-ui.c:427 ../gtk/tr-prefs.c:1412
+#: ../gtk/details.c:1323 ../gtk/makemeta-ui.c:427 ../gtk/tr-prefs.c:1427
 msgid "Trackers"
 msgstr ""
 
-#: ../gtk/details.c:1359
+#: ../gtk/details.c:1329
 msgid "Scrape"
 msgstr "اكشط"
 
-#: ../gtk/details.c:1361
+#: ../gtk/details.c:1331
 msgid "Last scrape at:"
 msgstr "آخر كشط في:"
 
-#: ../gtk/details.c:1366 ../gtk/details.c:1388
+#: ../gtk/details.c:1336 ../gtk/details.c:1358
 msgid "Tracker responded:"
 msgstr "ردّ المتتبع:"
 
-#: ../gtk/details.c:1371
+#: ../gtk/details.c:1341
 msgid "Next scrape in:"
 msgstr "الكشط المقبل بعد:"
 
-#: ../gtk/details.c:1377
+#: ../gtk/details.c:1347
 msgid "Announce"
 msgstr "الإعلان"
 
-#: ../gtk/details.c:1381
+#: ../gtk/details.c:1351
 msgid "Tracker:"
 msgstr "المتتبع:"
 
-#: ../gtk/details.c:1383
+#: ../gtk/details.c:1353
 msgid "Last announce at:"
 msgstr "تم الإعلان الأخير في:"
 
-#: ../gtk/details.c:1393
+#: ../gtk/details.c:1363
 msgid "Next announce in:"
 msgstr "سيجري الإعلان المقبل بعد:"
 
 #. how long until the tracker will honor user
 #. * pressing the "ask for more peers" button
-#: ../gtk/details.c:1400
+#: ../gtk/details.c:1370
 msgid "Manual announce allowed in:"
 msgstr "سيُسمح بالإعلان اليدوي بعد:"
 
-#: ../gtk/details.c:1419
+#: ../gtk/details.c:1389
 msgid "In progress"
 msgstr ""
 
-#: ../gtk/details.c:1464
+#: ../gtk/details.c:1434
 msgid "Now"
 msgstr ""
 
-#: ../gtk/details.c:1520
+#: ../gtk/details.c:1490
 #, c-format
 msgid "Details for %1$s (%2$s)"
 msgstr "تفاصيل %1$s (%2$s)"
 
-#: ../gtk/details.c:1538
+#: ../gtk/details.c:1508
 msgid "Activity"
 msgstr "النشاط"
 
-#: ../gtk/details.c:1543 ../gtk/tr-prefs.c:1400
+#: ../gtk/details.c:1513 ../gtk/tr-prefs.c:1412
 msgid "Peers"
 msgstr "الأنداد"
 
-#: ../gtk/details.c:1548 ../gtk/tr-window.c:525
+#: ../gtk/details.c:1518 ../gtk/tr-window.c:524
 msgid "Tracker"
 msgstr "المُتتبع"
 
-#: ../gtk/details.c:1552 ../gtk/msgwin.c:193
+#: ../gtk/details.c:1522 ../gtk/msgwin.c:193
 msgid "Information"
 msgstr "معلومات"
 
-#: ../gtk/details.c:1558 ../gtk/tr-window.c:525
+#: ../gtk/details.c:1528 ../gtk/tr-window.c:524
 msgid "Files"
 msgstr "الملفات"
 
-#: ../gtk/details.c:1563 ../gtk/tr-prefs.c:398 ../gtk/tr-prefs.c:563
+#: ../gtk/details.c:1533 ../gtk/tr-prefs.c:398 ../gtk/tr-prefs.c:563
 msgid "Options"
 msgstr "الخيارات"
 
@@ -652,19 +652,30 @@ msgstr "منخفضة"
 msgid "Mixed"
 msgstr "مختلط"
 
-#: ../gtk/file-list.c:666 ../gtk/file-list.c:839
+#. Translators: this is a column header in Files tab, Details dialog;
+#. Don't include the prefix "filedetails|" in the translation.
+#. The items for this column are checkboxes (yes/no)
+#: ../gtk/file-list.c:666 ../gtk/file-list.c:831
 msgid "filedetails|Download"
 msgstr "التنزيل"
 
-#: ../gtk/file-list.c:668 ../gtk/file-list.c:850
+#: ../gtk/file-list.c:668 ../gtk/file-list.c:838
 msgid "Priority"
 msgstr "الأولوية"
 
-#: ../gtk/file-list.c:803
+#. Translators: this is a column
+#. header in Files tab, Details
+#. dialog;
+#. Don't include the prefix
+#. "filedetails|" in the
+#. translation.
+#: ../gtk/file-list.c:802
 msgid "filedetails|File"
 msgstr "الملف"
 
-#: ../gtk/file-list.c:824
+#. Translators: this is a column header in Files tab, Details dialog;
+#. Don't include the prefix "filedetails|" in the translation.
+#: ../gtk/file-list.c:821
 msgid "filedetails|Progress"
 msgstr "التقدم"
 
@@ -724,11 +735,11 @@ msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/main.c:1287
+#: ../gtk/main.c:1297
 msgid "A fast and easy BitTorrent client"
 msgstr "عميل «بت تورنت» سريع وسهل الاستخدام"
 
-#: ../gtk/main.c:1293
+#: ../gtk/main.c:1303
 msgid "Copyright 2005-2008 The Transmission Project"
 msgstr "حقوق الطبع محفوظة لمشروع ترانزمشن 2005-2008"
 
@@ -736,7 +747,7 @@ msgstr "حقوق الطبع محفوظة لمشروع ترانزمشن 2005-2008
 #. your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1304
+#: ../gtk/main.c:1314
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -829,8 +840,8 @@ msgstr "ال_تعليق:"
 msgid "_Private torrent"
 msgstr ""
 
-#: ../gtk/msgwin.c:87 ../libtransmission/bencode.c:1329
-#: ../libtransmission/blocklist.c:286
+#: ../gtk/msgwin.c:87 ../libtransmission/bencode.c:1338
+#: ../libtransmission/blocklist.c:290
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "تعذّر حفظ الملف ‏\"%1$s\": ‏%2$s"
@@ -851,7 +862,7 @@ msgstr "تنقيح"
 msgid "Time"
 msgstr "الوقت"
 
-#: ../gtk/msgwin.c:272 ../gtk/tr-window.c:525
+#: ../gtk/msgwin.c:272 ../gtk/tr-window.c:524
 msgid "Name"
 msgstr "الاسم"
 
@@ -978,8 +989,8 @@ msgstr "في انتظار التحقق من البيانات المحلية"
 msgid "Verifying local data (%.1f%% tested)"
 msgstr "يتحقق من البيانات المحلية (تم اختبار %.1f%%)"
 
-#: ../gtk/torrent-cell-renderer.c:163 ../gtk/tr-window.c:736
-#: ../gtk/tr-window.c:764
+#: ../gtk/torrent-cell-renderer.c:163 ../gtk/tr-window.c:735
+#: ../gtk/tr-window.c:763
 #, c-format
 msgid "Ratio: %s"
 msgstr "النسبة: %s"
@@ -1006,11 +1017,11 @@ msgstr[3] "يجري النثر إلى %1$'d من بين %2$'d أنداد متص�
 msgstr[4] "يجري النثر إلى %1$'d من بين %2$'d ندّا متصلا"
 msgstr[5] "يجري النثر إلى %1$'d من بين %2$'d ندّ متصل"
 
-#: ../gtk/tracker-list.c:329
+#: ../gtk/tracker-list.c:328
 msgid "Tier"
 msgstr ""
 
-#: ../gtk/tracker-list.c:341
+#: ../gtk/tracker-list.c:340
 msgid "Announce URL"
 msgstr ""
 
@@ -1073,7 +1084,7 @@ msgid "Mo_ve source files to Trash"
 msgstr "انقل ال_ملفات المصدر إلى المهملات"
 
 #: ../gtk/tr-prefs.c:400
-msgid "_Inhibit desktop hibernation when torrents are active"
+msgid "Inhibit desktop _hibernation when torrents are active"
 msgstr ""
 
 #: ../gtk/tr-prefs.c:404
@@ -1128,7 +1139,7 @@ msgstr ""
 msgid "_Enable web interface"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:801 ../gtk/tr-prefs.c:1347
+#: ../gtk/tr-prefs.c:801 ../gtk/tr-prefs.c:1362
 msgid "Listening _port:"
 msgstr ""
 
@@ -1184,67 +1195,69 @@ msgstr ""
 msgid "_Authentication is required"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1183
+#: ../gtk/tr-prefs.c:1184
 msgid "Scheduled Limits"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1189
+#: ../gtk/tr-prefs.c:1190
 msgid " and "
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1196
+#: ../gtk/tr-prefs.c:1197
 msgid "_Limit bandwidth between"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1204
+#: ../gtk/tr-prefs.c:1205
 msgid "Limit d_ownload speed (KB/s):"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1211
+#: ../gtk/tr-prefs.c:1212
 msgid "Limit u_pload speed (KB/s):"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1245
+#: ../gtk/tr-prefs.c:1263
+#, c-format
 msgid "Port is <b>open</b>"
 msgstr "المنفذ <b>مفتوح</b>"
 
-#: ../gtk/tr-prefs.c:1246
+#: ../gtk/tr-prefs.c:1264
+#, c-format
 msgid "Port is <b>closed</b>"
 msgstr "المنفذ <b>مغلق</b>"
 
-#: ../gtk/tr-prefs.c:1293
+#: ../gtk/tr-prefs.c:1308
 msgid "<i>Testing port...</i>"
 msgstr "<i>جارٍ اختبار المنفذ...</i>"
 
-#: ../gtk/tr-prefs.c:1339
+#: ../gtk/tr-prefs.c:1354
 msgid "Incoming Peers"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1357
+#: ../gtk/tr-prefs.c:1372
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1379
+#: ../gtk/tr-prefs.c:1394
 msgid "Transmission Preferences"
 msgstr "تفضيلات ترانزميشن"
 
-#: ../gtk/tr-prefs.c:1394
+#: ../gtk/tr-prefs.c:1409
 msgid "Torrents"
 msgstr "التورنتات"
 
-#: ../gtk/tr-prefs.c:1397
-msgid "Desktop"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:1403
+#: ../gtk/tr-prefs.c:1415
 msgid "Network"
 msgstr "الشبكة"
 
-#: ../gtk/tr-prefs.c:1406
+#: ../gtk/tr-prefs.c:1418
+msgid "Desktop"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1421
 msgid "Bandwidth"
 msgstr "عرض النطاق"
 
-#: ../gtk/tr-prefs.c:1409
+#: ../gtk/tr-prefs.c:1424
 msgid "Web"
 msgstr ""
 
@@ -1269,7 +1282,7 @@ msgstr "بانتظار التحقق من البيانات المحلية (تم �
 msgid "%1$s remaining"
 msgstr ""
 
-#: ../gtk/tr-torrent.c:299 ../libtransmission/port-forwarding.c:175
+#: ../gtk/tr-torrent.c:299 ../libtransmission/port-forwarding.c:174
 msgid "Stopped"
 msgstr "متوقّف"
 
@@ -1293,37 +1306,37 @@ msgstr "حجم النقل الإجمالي"
 msgid "Session Transfer"
 msgstr "جحم النقل في هذه جلسة"
 
-#: ../gtk/tr-window.c:489
+#: ../gtk/tr-window.c:488
 #, c-format
 msgid "Tracker will allow requests in %s"
 msgstr "سيسمح المتتبع بالطلبات بعد %s"
 
 #. show all torrents
-#: ../gtk/tr-window.c:514
+#: ../gtk/tr-window.c:513
 msgid "A_ll"
 msgstr "ال_كلّ"
 
 #. show only torrents that have connected peers
-#: ../gtk/tr-window.c:516
+#: ../gtk/tr-window.c:515
 msgid "_Active"
 msgstr "_نشِط"
 
 #. show only torrents that are trying to download
-#: ../gtk/tr-window.c:518
+#: ../gtk/tr-window.c:517
 msgid "_Downloading"
 msgstr "_قيد التنزيل"
 
 #. show only torrents that are trying to upload
-#: ../gtk/tr-window.c:520
+#: ../gtk/tr-window.c:519
 msgid "_Seeding"
 msgstr "قيد الن_ثر"
 
 #. show only torrents that are paused
-#: ../gtk/tr-window.c:522
+#: ../gtk/tr-window.c:521
 msgid "_Paused"
 msgstr "أُ_لبِث"
 
-#: ../gtk/tr-window.c:709
+#: ../gtk/tr-window.c:708
 #, c-format
 msgid "%1$'d of %2$'d Torrent"
 msgid_plural "%1$'d of %2$'d Torrents"
@@ -1334,7 +1347,7 @@ msgstr[3] "%1$'d من %2$'d تورنتات"
 msgstr[4] "%1$'d من %2$'d تورنتات"
 msgstr[5] "%1$'d من %2$'d تورنتات"
 
-#: ../gtk/tr-window.c:714
+#: ../gtk/tr-window.c:713
 #, c-format
 msgid "%'d Torrent"
 msgid_plural "%'d Torrents"
@@ -1345,7 +1358,7 @@ msgstr[3] "%'d تورنتات"
 msgstr[4] "%'d تورنتات"
 msgstr[5] "%'d تورنتات"
 
-#: ../gtk/tr-window.c:747 ../gtk/tr-window.c:758
+#: ../gtk/tr-window.c:746 ../gtk/tr-window.c:757
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
 msgstr "منزَّل: %1$s، مرفوع: %2$s"
@@ -1464,7 +1477,7 @@ msgid "Error opening torrent"
 msgstr ""
 
 #. did caller give us an uninitialized val?
-#: ../libtransmission/bencode.c:956
+#: ../libtransmission/bencode.c:965
 msgid "Invalid metadata"
 msgstr "البيانات الشارحة غير صالحة"
 
@@ -1473,7 +1486,7 @@ msgstr "البيانات الشارحة غير صالحة"
 msgid "Blocklist \"%s\" contains %'zu entries"
 msgstr ""
 
-#: ../libtransmission/blocklist.c:296
+#: ../libtransmission/blocklist.c:300
 #, c-format
 msgid "Blocklist \"%1$s\" updated with %2$'d entries"
 msgstr ""
@@ -1483,12 +1496,12 @@ msgstr ""
 msgid "Couldn't read resume file"
 msgstr "تعذّر قراءة ملف الاستئناف"
 
-#: ../libtransmission/fdlimit.c:189
+#: ../libtransmission/fdlimit.c:206
 #, c-format
 msgid "Preallocated file \"%s\""
 msgstr ""
 
-#: ../libtransmission/fdlimit.c:426 ../libtransmission/net.c:109
+#: ../libtransmission/fdlimit.c:461 ../libtransmission/net.c:109
 #, c-format
 msgid "Couldn't create socket: %s"
 msgstr "تعذّر إنشاء المقبس: ‏%s"
@@ -1527,12 +1540,12 @@ msgstr "انتهى إعادة توجيه المنفذ رقم %d"
 msgid "Port %d forwarded successfully"
 msgstr "نجح إعادة توجيه المنفذ رقم %d"
 
-#: ../libtransmission/net.c:149
+#: ../libtransmission/net.c:166
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "تعذّر وصل المقبس رقم %d ب%s على المنفذ رقم %d ‏(errno %d - %s)"
 
-#: ../libtransmission/net.c:189
+#: ../libtransmission/net.c:206
 #, c-format
 msgid "Couldn't bind port %d: %s"
 msgstr "تعذّر ربط المنفذ رقم %d: ‏%s"
@@ -1557,7 +1570,7 @@ msgstr "جارٍ الإيقاف"
 msgid "Not forwarded"
 msgstr "لم تتم إعادة توجيهه"
 
-#: ../libtransmission/port-forwarding.c:98 ../libtransmission/torrent.c:1316
+#: ../libtransmission/port-forwarding.c:98 ../libtransmission/torrent.c:1319
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "تغيرت الحالة من « %1$s » إلى « %2$s »"
@@ -1582,40 +1595,40 @@ msgstr ""
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:287
+#: ../libtransmission/session.c:289
 #, c-format
 msgid "%s %s started"
 msgstr "تم تشغيل %s ‏%s"
 
-#: ../libtransmission/session.c:687
+#: ../libtransmission/session.c:704
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "عدد التورنتت المحملة: %d"
 
-#: ../libtransmission/torrent.c:219
+#: ../libtransmission/torrent.c:236
 #, c-format
 msgid "Got %d peers from tracker"
 msgstr "عدد النظراء المحصول عليها من المتتبع: %d"
 
-#: ../libtransmission/torrent.c:234
+#: ../libtransmission/torrent.c:251
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "تحذير من المتتبع: « %s »"
 
-#: ../libtransmission/torrent.c:241
+#: ../libtransmission/torrent.c:258
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "خطأ من المتتبع: « %s »"
 
-#: ../libtransmission/torrent.c:1262
+#: ../libtransmission/torrent.c:1265
 msgid "Done"
 msgstr "تمّ"
 
-#: ../libtransmission/torrent.c:1265
+#: ../libtransmission/torrent.c:1268
 msgid "Complete"
 msgstr "مكتمل"
 
-#: ../libtransmission/torrent.c:1268
+#: ../libtransmission/torrent.c:1271
 msgid "Incomplete"
 msgstr "غير كامل"
 

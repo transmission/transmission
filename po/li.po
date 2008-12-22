@@ -1,4 +1,4 @@
-# Malayalam translation for transmission
+# Limburgian translation for transmission
 # Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
 # This file is distributed under the same license as the transmission package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
@@ -8,345 +8,345 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-12-21 13:37-0600\n"
-"PO-Revision-Date: 2008-06-05 15:47+0000\n"
-"Last-Translator: പ്രതീഷ് പ്രകാശ് <Unknown>\n"
-"Language-Team: Malayalam <ml@li.org>\n"
+"PO-Revision-Date: 2008-12-18 13:56+0000\n"
+"Last-Translator: snoepjesniek <Unknown>\n"
+"Language-Team: Limburgian <li@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-12-22 05:08+0000\n"
+"X-Launchpad-Export-Date: 2008-12-22 05:09+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "sorteer bie activiteit"
 
 #: ../gtk/actions.c:49
 msgid "Sort by _Name"
-msgstr ""
+msgstr "sorteer bie naam"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "sotteer bie veuroetgang"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Ratio"
-msgstr ""
+msgstr "sorteer bie stummen"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _State"
-msgstr ""
+msgstr "sorteer bie status"
 
 #: ../gtk/actions.c:57
 msgid "Sort by _Tracker"
-msgstr ""
+msgstr "sorteer bie binnehoalserver"
 
 #: ../gtk/actions.c:59
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "sorteer bie leeftied"
 
 #: ../gtk/actions.c:78
 msgid "_Main Window"
-msgstr ""
+msgstr "hoefdvenster"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
-msgstr ""
+msgstr "boadschap biehalder"
 
 #: ../gtk/actions.c:96
 msgid "_Minimal View"
-msgstr ""
+msgstr "zoa min meugelijk zeen"
 
 #: ../gtk/actions.c:99
 msgid "_Reverse Sort Order"
-msgstr ""
+msgstr "sorteervollegorde umkieren"
 
 #: ../gtk/actions.c:102
 msgid "_Filterbar"
-msgstr ""
+msgstr "zeukballek"
 
 #: ../gtk/actions.c:104
 msgid "_Statusbar"
-msgstr "_‌സ്ഥിതിവിവര പട്ട"
+msgstr "bezigballek"
 
 #: ../gtk/actions.c:106
 msgid "_Toolbar"
-msgstr "ടൂള്‍ ബാര്‍ (_T)"
+msgstr "hulpmiddelenballek"
 
 #: ../gtk/actions.c:112
 msgid "_Torrent"
-msgstr "ടോറന്റ് (_T)"
+msgstr "stortvlood"
 
 #: ../gtk/actions.c:114
 msgid "_View"
-msgstr "കാഴ്ച (_V)"
+msgstr "_kiekhook"
 
 #: ../gtk/actions.c:117
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_sorteer stortvlooden bie"
 
 #: ../gtk/actions.c:119
 msgid "_Edit"
-msgstr "മാറ്റം വരുത്തുക (_E)"
+msgstr "_verandere"
 
 #: ../gtk/actions.c:121
 msgid "_Help"
-msgstr "സഹായം _H"
+msgstr "_Hulp"
 
 #: ../gtk/actions.c:124 ../gtk/actions.c:126
 msgid "Add a torrent"
-msgstr ""
+msgstr "eine stortvlood biezetten"
 
 #: ../gtk/actions.c:125
 msgid "_Add..."
-msgstr "ചേര്‍ക്കുക... (_A)"
+msgstr "_biezetten"
 
 #: ../gtk/actions.c:128
 msgid "_Start"
-msgstr "ആരംഭിക്കുക (_S)"
+msgstr "_beginne"
 
 #: ../gtk/actions.c:128
 msgid "Start torrent"
-msgstr ""
+msgstr "stortvlood starte"
 
 #: ../gtk/actions.c:130
 msgid "_Statistics"
-msgstr "സ്ഥിതിവിവരങ്ങള്‍ (_S)"
+msgstr "_wie t dr noe met geit"
 
 #: ../gtk/actions.c:133 ../gtk/add-dialog.c:361
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "_compjoetergegeevens herbekieken"
 
 #: ../gtk/actions.c:135
 msgid "_Pause"
-msgstr "ഇടവേള _P"
+msgstr "_pauze"
 
 #: ../gtk/actions.c:135
 msgid "Pause torrent"
-msgstr ""
+msgstr "stortvload tiedelijk stilzette"
 
 #: ../gtk/actions.c:138
 msgid "Remove torrent"
-msgstr ""
+msgstr "stortvlood weghoalen"
 
 #: ../gtk/actions.c:140
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "alles weghoalen"
 
 #: ../gtk/actions.c:142
 msgid "_New..."
-msgstr "പുതിയ... (_N)"
+msgstr "neie"
 
 #: ../gtk/actions.c:144
 msgid "Create a torrent"
-msgstr ""
+msgstr "enne stortvloed maken"
 
 #: ../gtk/actions.c:146
 msgid "_Quit"
-msgstr "പുറത്ത് കടക്കുക (_Q)"
+msgstr "_Aafsjloete"
 
 #: ../gtk/actions.c:149
 msgid "Select _All"
-msgstr "എല്ലാം തെരഞ്ഞെടുക്കുക (_A)"
+msgstr "_alles keezen"
 
 #: ../gtk/actions.c:151
 msgid "Dese_lect All"
-msgstr "തിരഞ്ഞെടുത്തത് വേണ്ടാതാക്കുക"
+msgstr "nichts keezen"
 
 #: ../gtk/actions.c:156
 msgid "_Details"
-msgstr "വിശദവിവരങ്ങള്‍ (_D)"
+msgstr "oetleg"
 
 #: ../gtk/actions.c:156
 msgid "Torrent details"
-msgstr ""
+msgstr "stortvlood oetleg"
 
 #: ../gtk/actions.c:159
 msgid "_Open Folder"
-msgstr "ഫോള്‍ഡര്‍ തുറക്കുക (_O)"
+msgstr "_map oapenen"
 
 #: ../gtk/actions.c:162
 msgid "_Contents"
-msgstr ""
+msgstr "_inhalt"
 
 #: ../gtk/actions.c:165
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "tracker vroagen vuar _mier minsen"
 
 #: ../gtk/add-dialog.c:238
 msgid "Torrent files"
-msgstr ""
+msgstr "stortvlood bestanje"
 
 #: ../gtk/add-dialog.c:243
 msgid "All files"
-msgstr "എല്ലാ ഫയലുകളും"
+msgstr "alle bestanje"
 
 #: ../gtk/add-dialog.c:271
 msgid "Torrent Options"
-msgstr ""
+msgstr "stortvlood instellinge"
 
 #: ../gtk/add-dialog.c:295
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "bronbestandj noar dreksbak verplaatse"
 
 #: ../gtk/add-dialog.c:297 ../gtk/tr-prefs.c:370
 msgid "_Start when added"
-msgstr ""
+msgstr "beginne wannier biegevoegd"
 
 #: ../gtk/add-dialog.c:308
 msgid "_Torrent file:"
-msgstr ""
+msgstr "_stortvlood bestandj:"
 
 #: ../gtk/add-dialog.c:314
 msgid "Select Source File"
-msgstr ""
+msgstr "kees bronbestandj"
 
 #: ../gtk/add-dialog.c:329 ../gtk/tr-prefs.c:379
 msgid "_Destination folder:"
-msgstr ""
+msgstr "_doelmap"
 
 #: ../gtk/add-dialog.c:336
 msgid "Select Destination Folder"
-msgstr ""
+msgstr "kees doelmap"
 
 #: ../gtk/add-dialog.c:434
 msgid "Add a Torrent"
-msgstr ""
+msgstr "eine stortvlood bievoegen"
 
 #: ../gtk/add-dialog.c:451 ../gtk/tr-prefs.c:366
 msgid "Display _options dialog"
-msgstr ""
+msgstr "instellingescherm bekieken"
 
 #: ../gtk/blocklist.c:89
 msgid "Retrieving blocklist..."
-msgstr ""
+msgstr "blokkenliest ontvange"
 
 #: ../gtk/blocklist.c:99
 #, c-format
 msgid "Unable to get blocklist: %s"
-msgstr ""
+msgstr "kan geine blokliest kriegen %s"
 
 #: ../gtk/blocklist.c:125
 msgid "Unable to get blocklist."
-msgstr ""
+msgstr "kan geine blokliest kriegen"
 
 #: ../gtk/blocklist.c:131
 msgid "Uncompressing blocklist..."
-msgstr ""
+msgstr "blokliest oetpakken"
 
 #: ../gtk/blocklist.c:141
 msgid "Parsing blocklist..."
-msgstr ""
+msgstr "blokliest ontleden"
 
 #: ../gtk/blocklist.c:148
 #, c-format
 msgid "Blocklist updated with %'d entries"
-msgstr ""
+msgstr "blokliest biegewerkt met %'d meugelijkheden"
 
 #: ../gtk/conf.c:61 ../gtk/makemeta-ui.c:142 ../libtransmission/metainfo.c:97
 #: ../libtransmission/utils.c:572 ../libtransmission/utils.c:583
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr ""
+msgstr "kan \"%1$s\": %2$s neet maken"
 
 #: ../gtk/conf.c:86 ../libtransmission/bencode.c:1332
 #: ../libtransmission/fdlimit.c:220
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr ""
+msgstr "kan \"%1$s\": %2$s neet openen"
 
 #: ../gtk/conf.c:91
 #, c-format
 msgid "%s is already running."
-msgstr ""
+msgstr "%s is al bezig"
 
 #: ../gtk/details.c:273
 msgid "Web Seeds"
-msgstr ""
+msgstr "internet bronnen"
 
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:275 ../gtk/details.c:317
 msgid "Down"
-msgstr "താഴോട്ട്"
+msgstr "onder"
 
 #: ../gtk/details.c:315
 msgid "Address"
-msgstr ""
+msgstr "Adres"
 
 #. 'upload speed' column header.  terse to keep the column narrow.
 #: ../gtk/details.c:319
 msgid "Up"
-msgstr "മുകളിലോട്ട്"
+msgstr "Ómhoeg"
 
 #: ../gtk/details.c:320
 msgid "Client"
-msgstr ""
+msgstr "client"
 
 #. 'percent done' column header. terse to keep the column narrow.
 #: ../gtk/details.c:322
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #: ../gtk/details.c:324
 msgid "Status"
-msgstr "നിലവാരം"
+msgstr "huidige veurtgang"
 
 #: ../gtk/details.c:618
 msgid "Optimistic unchoke"
-msgstr ""
+msgstr "Optimistic unchoke"
 
 #: ../gtk/details.c:621
 msgid "Downloading from this peer"
-msgstr ""
+msgstr "downloaden van deze mins"
 
 #: ../gtk/details.c:625
 msgid "We would download from this peer if they would let us"
-msgstr ""
+msgstr "wee zoie downloaden van deze mins as deze det us loat doon"
 
 #: ../gtk/details.c:629
 msgid "Uploading to peer"
-msgstr ""
+msgstr "verzenden noor mins"
 
 #: ../gtk/details.c:632
 msgid "We would upload to this peer if they asked"
-msgstr ""
+msgstr "wee zullen noa deze mins verzende als deze d'r um vroagt"
 
 #: ../gtk/details.c:637
 msgid "Peer has unchoked us, but we're not interested"
-msgstr ""
+msgstr "mins heet os unchoked maar wee willen dr nichts van weiten"
 
 #: ../gtk/details.c:642
 msgid "We unchoked this peer, but they're not interested"
-msgstr ""
+msgstr "wee hubben deze mins unchoked, maar hee is neet geÏntresseerd"
 
 #: ../gtk/details.c:646
 msgid "Encrypted connection"
-msgstr ""
+msgstr "ontcyferde verbinding"
 
 #: ../gtk/details.c:650
 msgid "Peer was discovered through Peer Exchange (PEX)"
-msgstr ""
+msgstr "mins waas ontdekt door de mins oetwisseling (PEX)"
 
 #: ../gtk/details.c:654
 msgid "Peer is an incoming connection"
-msgstr ""
+msgstr "mins is eine binnekomende verbinding"
 
 #: ../gtk/details.c:845
 msgid "<b>Seeders:</b>"
-msgstr ""
+msgstr "<b>Verzenders</b>"
 
 #: ../gtk/details.c:853
 msgid "<b>Leechers:</b>"
-msgstr ""
+msgstr "<b>ontvangers</b>"
 
 #: ../gtk/details.c:861
 msgid "<b>Times Completed:</b>"
-msgstr ""
+msgstr "<b> tieje gehoald </b>"
 
 #: ../gtk/details.c:883 ../gtk/details.c:1419 ../gtk/details.c:1430
 msgid "Never"
-msgstr ""
+msgstr "Noats"
 
 #: ../gtk/details.c:908
 msgid "Details"
@@ -738,7 +738,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  പ്രതീഷ് പ്രകാശ് https://launchpad.net/~pratheesh"
+"  snoepjesniek https://launchpad.net/~nieknooijens"
 
 #: ../gtk/makemeta-ui.c:111
 msgid "Torrent created!"
