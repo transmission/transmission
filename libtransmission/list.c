@@ -77,36 +77,7 @@ tr_list_append( tr_list ** list,
     }
 }
 
-void
-tr_list_insert_sorted( tr_list            ** list,
-                       void                * data,
-                       TrListCompareFunc     compare )
-{
-    /* find l, the node that we'll insert this data before */
-    tr_list * l;
-
-    for( l = *list; l != NULL; l = l->next )
-    {
-        const int c = (compare)( data, l->data );
-        if( c <= 0 )
-            break;
-    }
-
-    if( l == NULL )
-        tr_list_append( list, data );
-    else if( l == *list )
-        tr_list_prepend( list, data );
-    else
-    {
-        tr_list * node = node_alloc( );
-        node->data = data;
-        if( l->prev ){ node->prev = l->prev; node->prev->next = node; }
-        node->next = l;
-        l->prev = node;
-    }
-}
-
-tr_list*
+static tr_list*
 tr_list_find_data( tr_list *    list,
                    const void * data )
 {
@@ -171,17 +142,6 @@ tr_list_find( tr_list *         list,
             return list;
 
     return NULL;
-}
-
-void
-tr_list_foreach( tr_list *         list,
-                 TrListForeachFunc func )
-{
-    while( list )
-    {
-        func( list->data );
-        list = list->next;
-    }
 }
 
 int
