@@ -210,7 +210,7 @@ SpeedStats :: SetTorrent( tr_torrent * tor )
 }
 
 void
-SpeedStats :: Pulse( tr_handle * handle )
+SpeedStats :: Pulse( tr_session * handle )
 {
     // add a new record
     const double allUp   = tr_sessionGetPieceSpeed( handle, TR_UP );

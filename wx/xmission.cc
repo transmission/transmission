@@ -136,7 +136,7 @@ class MyApp : public wxApp
 
 namespace
 {
-    tr_handle * handle = NULL;
+    tr_session * handle = NULL;
 
     typedef std::vector<tr_torrent*> torrents_v;
 }

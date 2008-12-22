@@ -35,7 +35,7 @@
 
 @implementation BadgeView
 
-- (id) initWithFrame: (NSRect) frame lib: (tr_handle *) lib
+- (id) initWithFrame: (NSRect) frame lib: (tr_session *) lib
 {
     if ((self = [super initWithFrame: frame]))
     {

@@ -184,7 +184,7 @@ END_EVENT_TABLE()
 
 
 
-TorrentListCtrl :: TorrentListCtrl( tr_handle       * handle,
+TorrentListCtrl :: TorrentListCtrl( tr_session       * handle,
                                     wxConfig        * config,
                                     wxWindow        * parent,
                                     const wxPoint   & pos,

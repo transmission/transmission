@@ -31,7 +31,7 @@
 class TorrentListCtrl: public wxListCtrl
 {
     public:
-        TorrentListCtrl( tr_handle       * handle,
+        TorrentListCtrl( tr_session       * handle,
                          wxConfig        * config,
                          wxWindow        * parent, 
                          const wxPoint   & pos = wxDefaultPosition,
@@ -123,7 +123,7 @@ class TorrentListCtrl: public wxListCtrl
         bool IsSorted( ) const;
 
     private:
-        tr_handle * myHandle;
+        tr_session * myHandle;
         wxConfig * myConfig;
         torrents_v myTorrents;
         int prevSortCol;

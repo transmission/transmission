@@ -55,7 +55,7 @@ struct tr_metainfo_lookup
 struct tr_address;
 struct tr_bandwidth;
 
-struct tr_handle
+struct tr_session
 {
     tr_bool                      isPortSet;
     tr_bool                      isPortRandom;

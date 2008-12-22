@@ -45,7 +45,7 @@
 
 @implementation CreatorWindowController
 
-+ (void) createTorrentFile: (tr_handle *) handle
++ (void) createTorrentFile: (tr_session *) handle
 {
     //get file/folder for torrent
     NSString * path;
@@ -56,13 +56,13 @@
     [creator showWindow: nil];
 }
 
-+ (void) createTorrentFile: (tr_handle *) handle forFile: (NSString *) file
++ (void) createTorrentFile: (tr_session *) handle forFile: (NSString *) file
 {
     CreatorWindowController * creator = [[self alloc] initWithHandle: handle path: file];
     [creator showWindow: nil];
 }
 
-- (id) initWithHandle: (tr_handle *) handle path: (NSString *) path
+- (id) initWithHandle: (tr_session *) handle path: (NSString *) path
 {
     if ((self = [super initWithWindowNibName: @"Creator"]))
     {

@@ -82,10 +82,9 @@ const char* tr_getDefaultConfigDir( const char * appname );
 const char* tr_getDefaultDownloadDir( void );
 
 typedef struct tr_ctor tr_ctor;
-typedef struct tr_handle tr_handle;
 typedef struct tr_info tr_info;
 typedef struct tr_torrent tr_torrent;
-typedef tr_handle tr_session;
+typedef struct tr_session tr_session;
 
 
 /**

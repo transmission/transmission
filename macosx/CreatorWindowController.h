@@ -49,10 +49,10 @@
     NSUserDefaults * fDefaults;
 }
 
-+ (void) createTorrentFile: (tr_handle *) handle;
-+ (void) createTorrentFile: (tr_handle *) handle forFile: (NSString *) file;
++ (void) createTorrentFile: (tr_session *) handle;
++ (void) createTorrentFile: (tr_session *) handle forFile: (NSString *) file;
 
-- (id) initWithHandle: (tr_handle *) handle path: (NSString *) path;
+- (id) initWithHandle: (tr_session *) handle path: (NSString *) path;
 
 - (void) toggleOpenCheck: (id) sender;
 

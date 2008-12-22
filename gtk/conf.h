@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 struct tr_benc;
-struct tr_handle;
 
 /**
 ***
@@ -44,7 +43,7 @@ const char*      pref_string_get        ( const char * key );
 void             pref_string_set        ( const char * key, const char * value );
 void             pref_string_set_default( const char * key, const char * value );
 
-void             pref_save              ( struct tr_handle * );
+void             pref_save              ( tr_session * );
 struct tr_benc*  pref_get_all           ( void );
 
 /**

@@ -145,7 +145,7 @@ typedef enum
 #define TRAC_URL   @"http://trac.transmissionbt.com/"
 #define DONATE_URL  @"http://www.transmissionbt.com/donate.php"
 
-static tr_rpc_callback_status rpcCallback(tr_handle * handle UNUSED, tr_rpc_callback_type type, struct tr_torrent * torrentStruct, void * controller)
+static tr_rpc_callback_status rpcCallback(tr_session * handle UNUSED, tr_rpc_callback_type type, struct tr_torrent * torrentStruct, void * controller)
 {
     [(Controller *)controller rpcCallback: type forTorrentStruct: torrentStruct];
     return TR_RPC_NOREMOVE; //we'll do the remove manually

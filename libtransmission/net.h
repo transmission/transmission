@@ -119,7 +119,7 @@ void tr_socketListForEach( tr_socketList * const head,
 /***********************************************************************
  * Sockets
  **********************************************************************/
-int  tr_netOpenTCP( struct tr_handle * session,
+int  tr_netOpenTCP( tr_session       * session,
                     const tr_address * addr,
                     tr_port            port );
 
@@ -127,10 +127,10 @@ int  tr_netBindTCP( const tr_address * addr,
                     tr_port            port,
                     tr_bool            suppressMsgs );
 
-int  tr_netAccept( struct tr_handle  * session,
-                   int                 bound,
-                   tr_address        * setme_addr,
-                   tr_port           * setme_port );
+int  tr_netAccept( tr_session * session,
+                   int          bound,
+                   tr_address * setme_addr,
+                   tr_port    * setme_port );
 
 int  tr_netSetTOS( int s,
                    int tos );

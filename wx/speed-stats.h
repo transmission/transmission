@@ -49,7 +49,7 @@ class SpeedStats: public wxPanel
 
         void SetTorrent( struct tr_torrent * );
 
-        void Pulse( tr_handle * handle );
+        void Pulse( tr_session * handle );
 
     public:
 

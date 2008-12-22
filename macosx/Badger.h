@@ -27,7 +27,7 @@
 
 @interface Badger : NSObject
 {
-    tr_handle * fLib;
+    tr_session * fLib;
     
     NSUInteger fCompleted;
     
@@ -38,7 +38,7 @@
     BOOL fSpeedBadge, fQuittingTiger;
 }
 
-- (id) initWithLib: (tr_handle *) lib;
+- (id) initWithLib: (tr_session *) lib;
 
 - (void) updateBadge;
 - (void) incrementCompleted;

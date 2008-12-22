@@ -40,8 +40,8 @@
 @implementation StatsWindowController
 
 StatsWindowController * fStatsWindowInstance = nil;
-tr_handle * fLib;
-+ (StatsWindowController *) statsWindow: (tr_handle *) lib
+tr_session * fLib;
++ (StatsWindowController *) statsWindow: (tr_session *) lib
 {
     if (!fStatsWindowInstance)
     {
