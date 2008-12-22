@@ -48,19 +48,9 @@ void*    tr_list_remove( tr_list **        list,
                          const void *      b,
                          TrListCompareFunc compare_func );
 
-void     tr_list_insert_sorted( tr_list **        list,
-                                void *            data,
-                                TrListCompareFunc compare_func );
-
 tr_list* tr_list_find( tr_list *         list,
                        const void *      b,
                        TrListCompareFunc compare_func );
-
-tr_list* tr_list_find_data( tr_list *    list,
-                            const void * data );
-
-void     tr_list_foreach( tr_list *         list,
-                          TrListForeachFunc foreach_func );
 
 #endif /* TR_LIST_H */
 
