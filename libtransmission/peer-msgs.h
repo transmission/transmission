@@ -55,7 +55,14 @@ tr_addreq_t  tr_peerMsgsAddRequest( tr_peermsgs * peer,
                                     uint32_t      offset,
                                     uint32_t      length );
 
-void         tr_peerMsgsUnsubscribe( tr_peermsgs *    peer,
-                                     tr_publisher_tag tag );
+void         tr_peerMsgsUnsubscribe( tr_peermsgs      * peer,
+                                     tr_publisher_tag   tag );
+
+size_t       tr_generateAllowedSet( tr_piece_index_t  * setmePieces,
+                                    size_t              desiredSetSize,
+                                    size_t              pieceCount,
+                                    const uint8_t     * infohash,
+                                    const tr_address  * addr );
+
 
 #endif

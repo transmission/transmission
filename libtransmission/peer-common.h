@@ -22,7 +22,6 @@
 **/
 
 #include "transmission.h"
-#include "publish.h"
 
 typedef enum
 {
@@ -42,10 +41,13 @@ typedef enum
 {
     TR_PEER_CLIENT_GOT_BLOCK,
     TR_PEER_CLIENT_GOT_DATA,
+    TR_PEER_CLIENT_GOT_ALLOWED_FAST,
+    TR_PEER_CLIENT_GOT_SUGGEST,
     TR_PEER_PEER_GOT_DATA,
     TR_PEER_PEER_PROGRESS,
     TR_PEER_ERROR,
     TR_PEER_CANCEL,
+    TR_PEER_UPLOAD_ONLY,
     TR_PEER_NEED_REQ
 }
 PeerEventType;
@@ -53,12 +55,13 @@ PeerEventType;
 typedef struct
 {
     PeerEventType    eventType;
-    uint32_t         pieceIndex;   /* for GOT_BLOCK, CANCEL */
+    uint32_t         pieceIndex;   /* for GOT_BLOCK, CANCEL, ALLOWED, SUGGEST */
     uint32_t         offset;       /* for GOT_BLOCK */
     uint32_t         length;       /* for GOT_BLOCK + GOT_DATA */
     float            progress;     /* for PEER_PROGRESS */
     int              err;          /* errno for GOT_ERROR */
-    int              wasPieceData; /* for GOT_DATA */
+    tr_bool          wasPieceData; /* for GOT_DATA */
+    tr_bool          uploadOnly;   /* for UPLOAD_ONLY */
 }
 tr_peer_event;
 

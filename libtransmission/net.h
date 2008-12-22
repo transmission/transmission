@@ -64,6 +64,10 @@ struct in_addr;
 struct sockaddr_in;
 struct tr_session;
 
+typedef struct in_addr tr_address;
+
+tr_bool tr_isAddress( const tr_address * a );
+
 /***********************************************************************
  * DNS resolution
  **********************************************************************/
@@ -93,6 +97,9 @@ void tr_netClose( int s );
 void tr_netNtop( const struct in_addr * addr,
                  char *                 buf,
                  int                    len );
+
+int tr_compareAddresses( const struct in_addr * a,
+                         const struct in_addr * b );
 
 void tr_netInit( void );
 

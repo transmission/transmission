@@ -54,6 +54,7 @@
 #include "transmission.h"
 #include "completion.h"
 #include "fastresume.h"
+#include "net.h"
 #include "peer-mgr.h"
 #include "platform.h"
 #include "resume.h" /* TR_FR_ bitwise enum */

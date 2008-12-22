@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2008 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -58,7 +58,10 @@ struct tr_iobuf;
  *   and call tr_bandwidthClamp() before performing I/O to see how much 
  *   bandwidth they can safely use.
  */
+
 typedef struct tr_bandwidth tr_bandwidth;
+
+struct tr_peerIo;
 
 /**
 ***
@@ -71,6 +74,9 @@ tr_bandwidth*
 
 /** @brief destroy a tr_bandwidth object */
 void     tr_bandwidthFree             ( tr_bandwidth        * bandwidth );
+
+/** @brief test to see if the pointer refers to a live bandwidth object */
+tr_bool  tr_isBandwidth               ( const tr_bandwidth  * bandwidth );
 
 /******
 *******
@@ -97,12 +103,12 @@ double  tr_bandwidthGetDesiredSpeed   ( const tr_bandwidth  * bandwidth,
  */
 void    tr_bandwidthSetLimited        ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
-                                        int                   isLimited );
+                                        tr_bool               isLimited );
 
 /**
  * @return nonzero if this bandwidth throttles its iobufs' speeds
  */
-int     tr_bandwidthIsLimited         ( const tr_bandwidth  * bandwidth,
+tr_bool tr_bandwidthIsLimited         ( const tr_bandwidth  * bandwidth,
                                         tr_direction          direction );
 
 /**
@@ -142,7 +148,7 @@ double  tr_bandwidthGetPieceSpeed     ( const tr_bandwidth  * bandwidth,
 void    tr_bandwidthUsed              ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
                                         size_t                byteCount,
-                                        int                   isPieceData );
+                                        tr_bool               isPieceData );
 
 /******
 *******
@@ -159,23 +165,23 @@ void    tr_bandwidthSetParent         ( tr_bandwidth        * bandwidth,
  */
 void    tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
-                                        int                   isEnabled );
+                                        tr_bool               isEnabled );
 
 /******
 *******
 ******/
 
 /**
- * @brief add an iobuf to this bandwidth's list of iobufs.
+ * @brief add a tr_peerIo to this bandwidth's list.
  * They will be notified when more bandwidth is made available for them to consume.
  */
-void    tr_bandwidthAddBuffer         ( tr_bandwidth        * bandwidth,
-                                        struct tr_iobuf     * iobuf );
+void    tr_bandwidthAddPeer           ( tr_bandwidth        * bandwidth,
+                                        struct tr_peerIo    * peerIo );
 
 /**
  * @brief remove an iobuf from this bandwidth's list of iobufs.
  */
-void    tr_bandwidthRemoveBuffer      ( tr_bandwidth        * bandwidth,
-                                        struct tr_iobuf     * iobuf );
+void    tr_bandwidthRemovePeer        ( tr_bandwidth        * bandwidth,
+                                        struct tr_peerIo    * peerIo );
 
 #endif

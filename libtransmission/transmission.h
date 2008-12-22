@@ -52,6 +52,7 @@ extern "C" {
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
 typedef uint64_t tr_block_index_t;
+typedef uint16_t tr_port;
 typedef uint8_t tr_bool;
 
 
@@ -1031,26 +1032,27 @@ int  tr_torrentCanManualUpdate( const tr_torrent * torrent );
 
 typedef struct tr_peer_stat
 {
-    unsigned int    isEncrypted        : 1;
-    unsigned int    isDownloadingFrom  : 1;
-    unsigned int    isUploadingTo      : 1;
+    tr_bool      isEncrypted;
+    tr_bool      isDownloadingFrom;
+    tr_bool      isUploadingTo;
+    tr_bool      isSeed;
 
-    unsigned int    peerIsChoked       : 1;
-    unsigned int    peerIsInterested   : 1;
-    unsigned int    clientIsChoked     : 1;
-    unsigned int    clientIsInterested : 1;
-    unsigned int    isIncoming         : 1;
+    tr_bool      peerIsChoked;
+    tr_bool      peerIsInterested;
+    tr_bool      clientIsChoked;
+    tr_bool      clientIsInterested;
+    tr_bool      isIncoming;
 
-    uint8_t         from;
-    uint16_t        port;
+    uint8_t      from;
+    tr_port      port;
 
-    char            addr[16];
-    char            client[80];
-    char            flagStr[32];
+    char         addr[16];
+    char         client[80];
+    char         flagStr[32];
 
-    float           progress;
-    float           rateToPeer;
-    float           rateToClient;
+    float        progress;
+    float        rateToPeer;
+    float        rateToClient;
 }
 tr_peer_stat;
 
@@ -1425,6 +1427,9 @@ void tr_torrentSetActivityDate( tr_torrent * torrent,
 /** @deprecated this method will be removed in 1.40 */
 void tr_torrentSetDoneDate( tr_torrent  * torrent,
                             time_t        doneDate );
+
+/** @brief Sanity checker to test that the direction is TR_UP or TR_DOWN */
+tr_bool tr_isDirection( tr_direction );
 
 /** @} */
 

@@ -109,8 +109,8 @@ TESTS = \
     bencode-test \
     clients-test \
     json-test \
+    peer-msgs-test \
     rpc-test \
-    test-fastset \
     test-peer-id \
     utils-test
 
@@ -151,9 +151,9 @@ rpc_test_SOURCES = rpc-test.c
 rpc_test_LDADD = ${apps_ldadd}
 rpc_test_LDFLAGS = ${apps_ldflags}
 
-test_fastset_SOURCES = test-fastset.c
-test_fastset_LDADD = ${apps_ldadd}
-test_fastset_LDFLAGS = ${apps_ldflags}
+peer_msgs_test_SOURCES = peer-msgs-test.c
+peer_msgs_test_LDADD = ${apps_ldadd}
+peer_msgs_test_LDFLAGS = ${apps_ldflags}
 
 test_peer_id_SOURCES = test-peer-id.c
 test_peer_id_LDADD = ${apps_ldadd}

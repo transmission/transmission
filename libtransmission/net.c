@@ -63,6 +63,13 @@ tr_netInit( void )
     }
 }
 
+tr_bool
+tr_isAddress( const tr_address * a )
+{
+    return a != NULL; /* this is implemented better in 1.50 */
+}
+
+
 /***********************************************************************
  * DNS resolution
  *
@@ -242,3 +249,11 @@ tr_netNtop( const struct in_addr * addr,
                  cast[0], cast[1], cast[2], cast[3] );
 }
 
+int
+tr_compareAddresses( const struct in_addr * a, const struct in_addr * b )
+{
+    if( a->s_addr != b->s_addr )
+        return a->s_addr < b->s_addr ? -1 : 1;
+
+    return 0;
+}

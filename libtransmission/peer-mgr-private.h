@@ -52,7 +52,7 @@ typedef struct tr_peer
 
     uint8_t                  encryption_preference;
     uint16_t                 port;
-    struct in_addr           in_addr;
+    struct in_addr           addr;
     struct tr_peerIo       * io;
 
     struct tr_bitfield     * blame;

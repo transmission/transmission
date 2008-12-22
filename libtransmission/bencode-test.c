@@ -396,16 +396,16 @@ main( void )
 {
     int i;
 
-    if( ( i = testInt( ) ) )
+    if(( i = testInt( )))
         return i;
 
-    if( ( i = testStr( ) ) )
+    if(( i = testStr( )))
         return i;
 
-    if( ( i = testParse( ) ) )
+    if(( i = testParse( )))
         return i;
 
-    if( ( i = testJSON( ) ) )
+    if(( i = testJSON( )))
         return i;
 
 #ifndef WIN32
