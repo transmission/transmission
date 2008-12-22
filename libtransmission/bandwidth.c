@@ -109,7 +109,10 @@ struct tr_bandwidth
 static int
 comparePointers( const void * a, const void * b )
 {
-    return a - b;
+    if( a != b )
+        return a < b ? -1 : 1;
+
+    return 0;
 }
 
 tr_bool
