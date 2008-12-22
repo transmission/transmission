@@ -113,7 +113,7 @@ getShortTransferString( const tr_stat * torStat,
         tr_strlspeed( upStr, torStat->pieceUploadSpeed, sizeof( upStr ) );
 
     if( haveDown && haveUp )
-        /* Translators: do not translate the "speed|" disambiguation prefix.
+        /* Translators: "speed|" is here for disambiguation.  Please remove it from your translation.
            %1$s is the download speed
            %2$s is the upload speed */
         g_snprintf( buf, buflen, Q_(

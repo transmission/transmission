@@ -736,7 +736,7 @@ updateStats( PrivateData * p )
         tr_sessionGetStats( session, &stats );
         tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
         tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
-        /* Translators: do not translate the "size|" disambiguation prefix.
+        /* Translators: "size|" is here for disambiguation.  Please remove it from your translation.
            %1$s is the size of the data we've downloaded
            %2$s is the size of the data we've uploaded */
         g_snprintf( buf, sizeof( buf ), Q_(
@@ -747,7 +747,7 @@ updateStats( PrivateData * p )
         tr_sessionGetCumulativeStats( session, &stats );
         tr_strlsize( up, stats.uploadedBytes, sizeof( up ) );
         tr_strlsize( down, stats.downloadedBytes, sizeof( down ) );
-        /* Translators: do not translate the "size|" disambiguation prefix.
+        /* Translators: "size|" is here for disambiguation.  Please remove it from your translation.
            %1$s is the size of the data we've downloaded
            %2$s is the size of the data we've uploaded */
         g_snprintf( buf, sizeof( buf ), Q_(
