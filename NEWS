@@ -4,8 +4,6 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.50 (2008/mm/dd)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
 - All Platforms
-   + Support BitTorrent Enhancement Proposal #6 "Fast Extension"
-   + Support BitTorrent Enhancement Proposal #21 "Extension for Partial Seeds"
    + IPv6 support
    + Random port, with optional randomization on startup
 - Mac
@@ -21,9 +19,11 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 <http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Better peer management in large swarms
+   + Support BitTorrent Enhancement Proposal (BEP) #21 "Extension for Partial Seeds"
+   + Partial support for BEP #6 "Fast Extension" (reject, have all/none)
+   + Honor the peer's BEP #10 reqq key, when available
    + Fix 1.40 "Got HTTP Status Code: 0" error message
    + Fix 1.40 "lazy bitfield" error
-   + Honor the peer's BEP 10 reqq key, when available
    + Fix 1.40 "jumpy upload speed" bug
    + Fix handshake peer_id error
    + Corrrectly handle Windows-style newlines in Bluetack blocklists
