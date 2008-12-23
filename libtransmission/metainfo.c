@@ -34,6 +34,7 @@
 #include <event.h> /* struct evbuffer */
 
 #include "transmission.h"
+#include "session.h"
 #include "bencode.h"
 #include "crypto.h" /* tr_sha1 */
 #include "metainfo.h"

@@ -23,6 +23,7 @@
 
 #include "crypto.h" /* tr_sha1 */
 #include "transmission.h"
+#include "session.h"
 #include "bencode.h"
 #include "makemeta.h"
 #include "platform.h" /* threads, locks */

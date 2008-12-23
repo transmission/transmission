@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include "transmission.h"
+#include "session.h"
 #include "bencode.h"
 #include "completion.h"
 #include "fastresume.h"

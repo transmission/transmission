@@ -19,6 +19,7 @@
 #include <event.h>
 
 #include "transmission.h"
+#include "session.h"
 #include "bandwidth.h"
 #include "bencode.h"
 #include "blocklist.h"

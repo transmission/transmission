@@ -18,6 +18,9 @@
 
 #include <signal.h>
 
+#include "transmission.h"
+#include "session.h"
+
 #ifdef WIN32
 
 #include <WinSock2.h> 

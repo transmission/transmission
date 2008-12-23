@@ -52,6 +52,7 @@
 #include <unistd.h> /* unlink */
 
 #include "transmission.h"
+#include "session.h"
 #include "completion.h"
 #include "fastresume.h"
 #include "peer-mgr.h"

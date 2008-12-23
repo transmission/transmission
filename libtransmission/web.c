@@ -17,6 +17,7 @@
 #include <curl/curl.h>
 
 #include "transmission.h"
+#include "session.h"
 #include "list.h"
 #include "net.h" /* socklen_t */
 #include "trevent.h"

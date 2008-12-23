@@ -40,6 +40,7 @@
 #include <unistd.h> /* getuid getpid close */
 
 #include "transmission.h"
+#include "session.h"
 #include "list.h"
 #include "platform.h"
 #include "utils.h"

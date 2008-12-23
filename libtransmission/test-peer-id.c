@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "transmission.h"
+#include "session.h"
 #include "utils.h"
 
 #define VERBOSE 0

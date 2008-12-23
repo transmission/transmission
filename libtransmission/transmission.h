@@ -1417,10 +1417,6 @@ tr_bool tr_isDirection( tr_direction );
 
 /** @} */
 
-#ifdef __TRANSMISSION__
- #include "session.h"
-#endif
-
 #ifdef __cplusplus
 }
 #endif

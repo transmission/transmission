@@ -33,6 +33,7 @@
 #include <stdlib.h> /* qsort */
 
 #include "transmission.h"
+#include "session.h"
 #include "bandwidth.h"
 #include "bencode.h"
 #include "completion.h"

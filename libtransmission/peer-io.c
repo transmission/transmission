@@ -25,6 +25,7 @@
 #include <event.h>
 
 #include "transmission.h"
+#include "session.h"
 #include "bandwidth.h"
 #include "crypto.h"
 #include "list.h"

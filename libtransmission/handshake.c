@@ -20,6 +20,7 @@
 #include <event.h>
 
 #include "transmission.h"
+#include "session.h"
 #include "bencode.h"
 #include "clients.h"
 #include "crypto.h"

@@ -11,6 +11,7 @@
  */
 
 #include "transmission.h"
+#include "session.h"
 #include "bencode.h"
 #include "platform.h" /* tr_sessionGetConfigDir() */
 #include "stats.h"
