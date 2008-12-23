@@ -25,6 +25,7 @@
 #include <sys/types.h> /* stat */
 #include <sys/stat.h> /* stat */
 #include <unistd.h> /* stat */
+#include <dirent.h>
 
 #include <assert.h>
 #include <limits.h> /* INT_MAX */
@@ -40,6 +41,8 @@
 #include "fdlimit.h" /* tr_fdFileClose */
 #include "metainfo.h"
 #include "peer-mgr.h"
+#include "platform.h" /* TR_PATH_DELIMITER_STR */
+#include "ptrarray.h"
 #include "ratecontrol.h"
 #include "torrent.h"
 #include "tracker.h"
@@ -1188,21 +1191,6 @@ stopTorrent( void * vtor )
 }
 
 void
-tr_torrentDeleteLocalData( tr_torrent * tor )
-{
-    tr_file_index_t i;
-
-    for( i=0; i<tor->info.fileCount; ++i )
-    {
-        const tr_file * file = &tor->info.files[i];
-        char * path = tr_buildPath( tor->downloadDir, file->name, NULL );
-        tr_fdFileClose( path );
-        unlink( path );
-        tr_free( path );
-    }
-}
-
-void
 tr_torrentStop( tr_torrent * tor )
 {
     if( tor )
@@ -1814,4 +1802,167 @@ tr_torrentGetBytesLeftToAllocate( const tr_torrent * tor )
     }
 
     return bytesLeft;
+}
+
+/****
+*****  Removing the torrent's local data
+****/
+
+static int
+vstrcmp( const void * a, const void * b )
+{
+    return strcmp( a, b );
+}
+
+static int
+compareLongestFirst( const void * a, const void * b )
+{
+    const size_t alen = strlen( a );
+    const size_t blen = strlen( b );
+
+    if( alen != blen )
+        return alen > blen ? -1 : 1;
+
+    return vstrcmp( a, b );
+}
+
+static void
+addDirtyFile( const char  * root,
+              const char  * filename,
+              tr_ptrArray * dirtyFolders )
+{
+    char * dir = tr_dirname( filename );
+
+    /* add the parent folders to dirtyFolders until we reach the root or a known-dirty */
+    while (     ( dir != NULL )
+             && ( strlen( root ) <= strlen( dir ) )
+             && ( tr_ptrArrayFindSorted( dirtyFolders, dir, vstrcmp ) == NULL ) )
+    {
+        char * tmp;
+        tr_ptrArrayInsertSorted( dirtyFolders, tr_strdup( dir ), vstrcmp );
+        tmp = tr_dirname( dir );
+        tr_free( dir );
+        dir = tmp;
+    }
+
+    tr_free( dir );
+}
+
+static void
+walkLocalData( const tr_torrent * tor,
+               const char       * root,
+               const char       * dir,
+               const char       * base,
+               tr_ptrArray      * torrentFiles,
+               tr_ptrArray      * folders,
+               tr_ptrArray      * dirtyFolders )
+{
+    int i;
+    struct stat sb;
+    char * buf;
+
+    buf = tr_buildPath( dir, base, NULL );
+    i = stat( buf, &sb );
+    if( !i )
+    {
+        DIR * odir = NULL;
+
+        if( S_ISDIR( sb.st_mode ) && ( ( odir = opendir ( buf ) ) ) )
+        {
+            struct dirent *d;
+            tr_ptrArrayInsertSorted( folders, tr_strdup( buf ), vstrcmp );
+            for( d = readdir( odir ); d != NULL; d = readdir( odir ) )
+                if( d->d_name && d->d_name[0] != '.' ) /* skip dotfiles */
+                    walkLocalData( tor, root, buf, d->d_name, torrentFiles, folders, dirtyFolders );
+            closedir( odir );
+        }
+        else if( S_ISREG( sb.st_mode ) && ( sb.st_size > 0 ) )
+        {
+            const char * sub = buf + strlen( tor->downloadDir ) + strlen( TR_PATH_DELIMITER_STR );
+            const tr_bool isTorrentFile = tr_ptrArrayFindSorted( torrentFiles, sub, vstrcmp ) != NULL;
+            if( !isTorrentFile )
+                addDirtyFile( root, buf, dirtyFolders );
+        }
+    }
+
+    tr_free( buf );
+}
+
+static void
+deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
+{
+    int i, n;
+    char ** s;
+    tr_file_index_t f;
+    tr_ptrArray * torrentFiles = tr_ptrArrayNew( );
+    tr_ptrArray * folders = tr_ptrArrayNew( );
+    tr_ptrArray * dirtyFolders = tr_ptrArrayNew( ); /* dirty == contains non-torrent files */
+
+    const char * firstFile = tor->info.files[0].name;
+    const char * cpch = strchr( firstFile, TR_PATH_DELIMITER );
+    char * tmp = cpch ? tr_strndup( firstFile, cpch - firstFile ) : NULL;
+    char * root = tr_buildPath( tor->downloadDir, tmp, NULL );
+
+    for( f=0; f<tor->info.fileCount; ++f )
+        tr_ptrArrayInsertSorted( torrentFiles, tor->info.files[f].name, vstrcmp );
+
+    /* build the set of folders and dirtyFolders */
+    walkLocalData( tor, root, root, NULL, torrentFiles, folders, dirtyFolders );
+
+    /* close all the files because we're about to delete them */
+    for( f=0; f<tor->info.fileCount; ++f ) {
+        char * path = tr_buildPath( tor->downloadDir, tor->info.files[f].name, NULL );
+        tr_fdFileClose( path );
+        tr_free( path );
+    }
+
+    /* try to remove entire folders first, so that the recycle bin will be tidy */
+    s = (char**) tr_ptrArrayPeek( folders, &n );
+    for( i=0; i<n; ++i )
+        if( tr_ptrArrayFindSorted( dirtyFolders, s[i], vstrcmp ) == NULL )
+            fileFunc( s[i] );
+
+    /* now blow away any remaining torrent files, such torrent files in dirty folders */
+    for( f=0; f<tor->info.fileCount; ++f ) {
+        char * path = tr_buildPath( tor->downloadDir, tor->info.files[f].name, NULL );
+        fileFunc( path );
+        tr_free( path );
+    }
+
+    /* Now clean out the directories left empty from the previous step.
+     * Work from deepest to shallowest s.t. lower folders
+     * won't prevent the upper folders from being deleted */
+    {
+        tr_ptrArray * cleanFolders = tr_ptrArrayNew( );
+        s = (char**) tr_ptrArrayPeek( folders, &n );
+        for( i=0; i<n; ++i )
+            if( tr_ptrArrayFindSorted( dirtyFolders, s[i], vstrcmp ) == NULL )
+                tr_ptrArrayInsertSorted( cleanFolders, s[i], compareLongestFirst );
+        s = (char**) tr_ptrArrayPeek( cleanFolders, &n );
+        for( i=0; i<n; ++i )
+            fileFunc( s[i] );
+        tr_ptrArrayFree( cleanFolders, NULL );
+    }
+
+    /* cleanup */
+    tr_ptrArrayFree( dirtyFolders, tr_free );
+    tr_ptrArrayFree( folders, tr_free );
+    tr_ptrArrayFree( torrentFiles, NULL );
+    tr_free( root );
+    tr_free( tmp );
+}
+
+void
+tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
+{
+    if( fileFunc == NULL )
+        fileFunc = unlink;
+
+    if( tor->info.fileCount > 1 )
+        deleteLocalData( tor, fileFunc );
+    else {
+        char * path = tr_buildPath( tor->downloadDir, tor->info.files[0].name, NULL );
+        fileFunc( path );
+        tr_free( path );
+    }
 }

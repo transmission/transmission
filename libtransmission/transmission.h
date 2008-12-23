@@ -795,8 +795,16 @@ void tr_torrentStart( tr_torrent * torrent );
 /** @brief Stop (pause) a torrent */
 void tr_torrentStop( tr_torrent * torrent );
 
-/** @brief Deletes the torrent data stored on disk. */
-void tr_torrentDeleteLocalData( tr_torrent * torrent );
+typedef int tr_fileFunc( const char * filename );
+
+/**
+ * @brief Deletes the torrent's local data.
+ * @param torrent
+ * @param fileFunc Pass in "unlink" to destroy the files or, on platforms with
+ *                 recycle bins, pass in a function that uses it instead.
+ *                 tr_torrentDeleteLocalData() ignores fileFunc's return value.
+ */
+void tr_torrentDeleteLocalData( tr_torrent * torrent,  tr_fileFunc fileFunc );
 
 /**
  * @brief Iterate through the torrents.

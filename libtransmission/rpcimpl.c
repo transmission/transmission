@@ -150,7 +150,7 @@ torrentRemove( tr_session  * session,
         const tr_rpc_callback_status status = notify( session, TR_RPC_TORRENT_REMOVING, tor );
         int64_t deleteFlag;
         if( tr_bencDictFindInt( args_in, "delete-local-data", &deleteFlag ) && deleteFlag )
-            tr_torrentDeleteLocalData( tor );
+            tr_torrentDeleteLocalData( tor, NULL );
         if( !( status & TR_RPC_NOREMOVE ) )
             tr_torrentRemove( tor );
     }
