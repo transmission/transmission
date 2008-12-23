@@ -214,7 +214,10 @@ event_read_cb( int fd, short event UNUSED, void * vio )
 {
     int res;
     tr_peerIo * io = vio;
-    const size_t howmuch = tr_bandwidthClamp( io->bandwidth, TR_DOWN, io->session->so_rcvbuf );
+
+    /* Limit the input buffer to 256K, so it doesn't grow too large */
+    const size_t canread = 256 * 1024 - EVBUFFER_LENGTH( io->inbuf );
+    const size_t howmuch = tr_bandwidthClamp( io->bandwidth, TR_DOWN, canread );
     const tr_direction dir = TR_DOWN;
 
     assert( tr_isPeerIo( io ) );
@@ -290,8 +293,9 @@ event_write_cb( int fd, short event UNUSED, void * vio )
 
     dbgmsg( io, "libevent says this peer is ready to write" );
 
-    howmuch = MIN( (size_t)io->session->so_sndbuf, EVBUFFER_LENGTH( io->outbuf ) );
-    howmuch = tr_bandwidthClamp( io->bandwidth, dir, howmuch );
+    /* Write as much as possible, since the socket is non-blocking, write() will
+     * return if it can't write any more data without blocking */
+    howmuch = tr_bandwidthClamp( io->bandwidth, dir, EVBUFFER_LENGTH( io->outbuf ) );
 
     /* if we don't have any bandwidth left, stop writing */
     if( howmuch < 1 ) {
