@@ -216,9 +216,13 @@ event_read_cb( int fd, short event UNUSED, void * vio )
     tr_peerIo * io = vio;
 
     /* Limit the input buffer to 256K, so it doesn't grow too large */
-    const size_t canread = 256 * 1024 - EVBUFFER_LENGTH( io->inbuf );
-    const size_t howmuch = tr_bandwidthClamp( io->bandwidth, TR_DOWN, canread );
+    size_t howmuch;
     const tr_direction dir = TR_DOWN;
+    const size_t max = 256 * 1024;
+    const size_t curlen = EVBUFFER_LENGTH( io->inbuf );
+
+    howmuch = curlen >= max ? 0 : max - curlen;
+    howmuch = tr_bandwidthClamp( io->bandwidth, TR_DOWN, howmuch );
 
     assert( tr_isPeerIo( io ) );
 
