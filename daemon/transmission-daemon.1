@@ -9,7 +9,7 @@
 .Nm transmission-daemon
 .Fl h
 .Nm
-.Op Fl a Ar (+|-)x.x.x.x[/x],...
+.Op Fl a Ar x.x.x.x,...
 .Op Fl b | B
 .Op Fl f
 .Op Fl g Ar directory
@@ -31,7 +31,7 @@ via RPC commands from transmission's web interface or
 .Bl -tag -width Ds
 
 .It Fl a Fl -allowed Ar x.x.x.x,...
-Allow RPC accecss to a comma-delimited whitelist of IP addresses.
+Allow RPC access to a comma-delimited whitelist of IP addresses.
 Wildcards can be specified in an address by using '*'.
 Default: "127.0.0.1"
 Example: "127.0.0.*,192.168.1.*"
