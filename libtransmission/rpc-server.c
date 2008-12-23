@@ -457,7 +457,8 @@ handle_request( struct evhttp_request * req,
             send_simple_response( req, 401,
                 "<p>Unauthorized IP Address.</p>"
                 "<p>Either disable the IP address whitelist or add your address to it.</p>"
-                "<p>If you're editing settings.json, see the 'rpc-whitelist' and 'rpc-whitelist-enabled' entries.</p>" );
+                "<p>If you're editing settings.json, see the 'rpc-whitelist' and 'rpc-whitelist-enabled' entries.</p>"
+                "<p>If you're still using ACLs, use a whitelist instead.  See the transmission-daemon manpage for details.</p>" );
         }
         else if( server->isPasswordEnabled
                  && ( !pass || !user || strcmp( server->username, user )
