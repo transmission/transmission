@@ -13,10 +13,10 @@
       	<pubDate>Wed, 24 Dec 2008 12:30:00 -0400</pubDate>
       	<enclosure
       	url="http://mirrors.m0k.org/transmission/files/Transmission-1.42.dmg" 
-      	sparkle:version="7487"
+      	sparkle:version="7494"
       	sparkle:shortVersionString="1.42"
-      	sparkle:dsaSignature="MC0CFQCEI0/Xj4pSNO+EhDphuv/QpM0QdAIUNVa4o2iwcmCF/JmQlOJtJP0iwGs="
-      	length="3697050"
+      	sparkle:dsaSignature="MC0CFDGYBe/7/7bAtZXeOqYO26iKrNJMAhUAiHvc+yWm071G/wnKsbOXUlzAgoM="
+      	length="3674660"
       	sparkle:minimumSystemVersion="10.4.11"
       	type="application/octet-stream"/>
     </item>
