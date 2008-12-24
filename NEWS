@@ -1,11 +1,11 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-
 1.50 (2008/mm/dd)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
 - All Platforms
    + IPv6 support
    + Random port, with optional randomization on startup
+   + When removing local data only remove data from the torrent
 - Mac
    + Groups (moved to preferences) can be auto-assigned to transfers when adding based on name and tracker (10.5-only)
    + Groups can have a default location when adding transfers
@@ -14,8 +14,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - GTK+
    + Minor display improvements and HIG compliance
 
-
-1.41 (2008/12/14)
+1.41 (2008/12/dd)
 <http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Better peer management in large swarms
@@ -41,7 +40,6 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Windows portability
 - CLI
    + Fix minor free-memory-read bug
-
 
 1.40 (2008/11/09)
 <http://trac.transmissionbt.com/query?milestone=1.40&group=component&groupdesc=1&order=severity>
