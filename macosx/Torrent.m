@@ -55,7 +55,7 @@
 
 - (void) updateAllTrackers: (NSMutableArray *) trackers;
 
-- (void) trashFile: (NSString *) path;
++ (void) trashFile: (NSString *) path;
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path;
 
@@ -65,6 +65,12 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 {
     [(Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:)
                 withObject: [[NSNumber alloc] initWithInt: status] waitUntilDone: NO];
+}
+
+int trashDataFile(const char * filename)
+{
+    [Torrent trashFile: [NSString stringWithUTF8String: filename]];
+    return 0;
 }
 
 @implementation Torrent
@@ -89,7 +95,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
             fPublicTorrentLocation = nil;
         }
         else if (!fPublicTorrent)
-            [self trashFile: path];
+            [Torrent trashFile: path];
         else;
     }
     return self;
@@ -453,14 +459,14 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (void) trashData
 {
-    [self trashFile: [self dataLocation]];
+    tr_torrentDeleteLocalData(fHandle, trashDataFile);
 }
 
 - (void) trashTorrent
 {
     if (fPublicTorrent)
     {
-        [self trashFile: fPublicTorrentLocation];
+        [Torrent trashFile: fPublicTorrentLocation];
         [fPublicTorrentLocation release];
         fPublicTorrentLocation = nil;
         
@@ -1968,7 +1974,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     tr_free(trackerStructs);
 }
 
-- (void) trashFile: (NSString *) path
++ (void) trashFile: (NSString *) path
 {
     //attempt to move to trash
     if (![[NSWorkspace sharedWorkspace] performFileOperation: NSWorkspaceRecycleOperation
