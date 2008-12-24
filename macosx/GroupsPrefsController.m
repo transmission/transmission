@@ -33,9 +33,6 @@
 #define ADD_TAG 0
 #define REMOVE_TAG 1
 
-#define RULES_ALL_TAG 0
-#define RULES_ANY_TAG 1
-
 @interface GroupsPrefsController (Private)
 
 - (void) updateSelectedGroup;
@@ -58,13 +55,6 @@
     
     [fRulesSheetOKButton setStringValue: NSLocalizedString(@"OK", "Groups -> rule editor -> button")];
     [fRulesSheetCancelButton setStringValue: NSLocalizedString(@"Cancel", "Groups -> rule editor -> button")];
-    [fRulesSheetDescriptionField setStringValue: NSLocalizedString(@"criteria must be met to assign a transfer on add.",
-                                                    "Groups -> rule editor -> button (All/Any criteria must....)")];
-    
-    [[fRulesAllAnyButton itemAtIndex: [fRulesAllAnyButton indexOfItemWithTag: RULES_ALL_TAG]] setTitle:
-        NSLocalizedString(@"All", "Groups -> rule editor -> all/any")];
-    [[fRulesAllAnyButton itemAtIndex: [fRulesAllAnyButton indexOfItemWithTag: RULES_ANY_TAG]] setTitle:
-        NSLocalizedString(@"Any", "Groups -> rule editor -> all/any")];
     
     [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
     
@@ -277,25 +267,12 @@
     if (!fGroupRulesSheetWindow)
         [NSBundle loadNibNamed: @"GroupRules" owner: self];
 
-    [fRuleEditor removeRowsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fRuleEditor numberOfRows])]
-        includeSubrows: YES];
-
-    const NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
-    NSArray * rules = [[GroupsController groups] autoAssignRulesForIndex: index];
-    if (rules)
-    {
-        for (NSInteger i = 0; i < [rules count]; i++)
-        {
-            [fRuleEditor addRow: nil];
-            [fRuleEditor setCriteria: [rules objectAtIndex: i] andDisplayValues: [NSArray array] forRowAtIndex: i];
-        }
-    }
-    
+	NSPredicate *predicate = [[GroupsController groups] autoAssignRulesForIndex: [fTableView selectedRow]];
+	[fRuleEditor setObjectValue: predicate];
+	
     if ([fRuleEditor numberOfRows] == 0)
         [fRuleEditor addRow: nil];
-    
-    [fRulesAllAnyButton selectItemWithTag: [[GroupsController groups] rulesNeedAllForIndex: index] ? RULES_ALL_TAG : RULES_ANY_TAG];
-    
+        
     [NSApp beginSheet: fGroupRulesSheetWindow modalForWindow: [fTableView window] modalDelegate: nil didEndSelector: NULL
         contextInfo: NULL];
 }
@@ -320,74 +297,13 @@
     [NSApp endSheet: fGroupRulesSheetWindow];
     
     NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
-    [[GroupsController groups] setRulesNeedAllForIndex: [[fRulesAllAnyButton selectedItem] tag] == RULES_ALL_TAG forIndex: index];
     [[GroupsController groups] setUsesAutoAssignRules: YES forIndex: index];
     
-    NSMutableArray * rules = [NSMutableArray arrayWithCapacity: [fRuleEditor numberOfRows]];
-    for (NSInteger index = 0; index < [fRuleEditor numberOfRows]; ++index)
-    {
-        NSString * string = [[[fRuleEditor displayValuesForRow: index] objectAtIndex: 2] stringValue];
-        if (string && [string length] > 0)
-        {
-            NSMutableArray * rule = [[[fRuleEditor criteriaForRow: index] mutableCopy] autorelease];
-            [rule replaceObjectAtIndex: 2 withObject: string];
-            [rules addObject: rule];
-        }
-    }
-    
-    [[GroupsController groups] setAutoAssignRules: rules forIndex: index];
+    NSPredicate * predicate = [fRuleEditor objectValue];
+    [[GroupsController groups] setAutoAssignRules: predicate forIndex: index];
+	
     [fAutoAssignRulesEnableCheck setState: [[GroupsController groups] usesAutoAssignRulesForIndex: index]];
     [fAutoAssignRulesEditButton setEnabled: [fAutoAssignRulesEnableCheck state] == NSOnState];
-}
-
-static NSString * torrentTitleCriteria = @"title";
-static NSString * trackerURLCriteria = @"tracker";
-static NSString * startsWithCriteria = @"begins";
-static NSString * containsCriteria = @"contains";
-static NSString * endsWithCriteria = @"ends";
-
-- (NSInteger) ruleEditor: (NSRuleEditor *) editor numberOfChildrenForCriterion: (id) criterion withRowType: (NSRuleEditorRowType) rowType
-{
-    if (!criterion)
-        return 2;
-    else if ([criterion isEqualToString: torrentTitleCriteria] || [criterion isEqualToString: trackerURLCriteria])
-        return 3;
-    else if ([criterion isEqualToString: startsWithCriteria] || [criterion isEqualToString: containsCriteria]
-                || [criterion isEqualToString: endsWithCriteria])
-        return 1;
-    else
-        return 0;
-}
-
-- (id) ruleEditor: (NSRuleEditor *) editor child: (NSInteger) index forCriterion: (id) criterion
-    withRowType: (NSRuleEditorRowType) rowType
-{
-    if (criterion == nil)
-        return [[NSArray arrayWithObjects: torrentTitleCriteria, trackerURLCriteria, nil] objectAtIndex: index];
-    else if ([criterion isEqualToString: torrentTitleCriteria] || [criterion isEqualToString: trackerURLCriteria])
-        return [[NSArray arrayWithObjects: startsWithCriteria, containsCriteria, endsWithCriteria, nil] objectAtIndex: index];
-    else
-        return @"";
-}
-
-- (id) ruleEditor: (NSRuleEditor *) editor displayValueForCriterion: (id) criterion inRow: (NSInteger) row
-{
-    if ([criterion isEqualToString: torrentTitleCriteria])
-        return NSLocalizedString(@"Torrent Title", "Groups -> rule editor");
-    else if ([criterion isEqualToString: trackerURLCriteria])
-        return NSLocalizedString(@"Tracker URL", "Groups -> rule editor");
-    else if ([criterion isEqualToString: startsWithCriteria])
-        return NSLocalizedString(@"Starts With", "Groups -> rule editor");
-    else if ([criterion isEqualToString: containsCriteria])
-        return NSLocalizedString(@"Contains", "Groups -> rule editor");
-    else if ([criterion isEqualToString: endsWithCriteria])
-        return NSLocalizedString(@"Ends With", "Groups -> rule editor");
-    else
-    {
-        NSTextField * field = [[NSTextField alloc] initWithFrame: NSMakeRect(0, 0, 130, 22)];
-        [field setStringValue: criterion];
-        return [field autorelease];
-    }
 }
 
 - (void) ruleEditorRowsDidChange: (NSNotification *) notification

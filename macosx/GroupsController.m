@@ -55,8 +55,13 @@ GroupsController * fGroupsInstance = nil;
     if ((self = [super init]))
     {
         NSData * data;
-        if ((data = [[NSUserDefaults standardUserDefaults] dataForKey: @"Groups"]))
+        if ((data = [[NSUserDefaults standardUserDefaults] dataForKey: @"GroupDicts"]))
+            fGroups = [[NSKeyedUnarchiver unarchiveObjectWithData: data] retain];
+        else if ((data = [[NSUserDefaults standardUserDefaults] dataForKey: @"Groups"])) //handle old groups
+        {
             fGroups = [[NSUnarchiver unarchiveObjectWithData: data] retain];
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey: @"Groups"];
+        }
         else
         {
             //default groups
@@ -210,7 +215,7 @@ GroupsController * fGroupsInstance = nil;
     if (orderIndex == -1)
         return NO;
     
-    NSNumber * assignRules = [[fGroups objectAtIndex: orderIndex] objectForKey: @"UsesAutoAssignRules"];
+    NSNumber * assignRules = [[fGroups objectAtIndex: orderIndex] objectForKey: @"UsesAutoGroupRules"];
     return assignRules && [assignRules boolValue];
 }
 
@@ -218,51 +223,34 @@ GroupsController * fGroupsInstance = nil;
 {
     NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
     
-    [dict setObject: [NSNumber numberWithBool: useAutoAssignRules] forKey: @"UsesAutoAssignRules"];
+    [dict setObject: [NSNumber numberWithBool: useAutoAssignRules] forKey: @"UsesAutoGroupRules"];
     
     [[GroupsController groups] saveGroups];
 }
 
-- (NSArray *) autoAssignRulesForIndex: (NSInteger) index
+- (NSPredicate *) autoAssignRulesForIndex: (NSInteger) index
 {
     NSInteger orderIndex = [self rowValueForIndex: index];
-    return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"AutoAssignRules"] : nil;
+    if (orderIndex == -1)
+		return nil;
+	
+	return  [[fGroups objectAtIndex: orderIndex] objectForKey: @"AutoGroupRules"];
 }
 
-- (void) setAutoAssignRules: (NSArray *) rules forIndex: (NSInteger) index
+- (void) setAutoAssignRules: (NSPredicate *) predicate forIndex: (NSInteger) index
 {
     NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
     
-    if (rules && [rules count] > 0)
+    if (predicate)
     {
-        [dict setObject: rules forKey: @"AutoAssignRules"];
-        
+        [dict setObject: predicate forKey: @"AutoGroupRules"];
         [[GroupsController groups] saveGroups];
     }
     else
     {
-        [dict removeObjectForKey: @"AutoAssignRules"];
+        [dict removeObjectForKey: @"AutoGroupRules"];
         [self setUsesAutoAssignRules: NO forIndex: index];
     }
-}
-
-- (BOOL) rulesNeedAllForIndex: (NSInteger) index
-{
-    NSInteger orderIndex = [self rowValueForIndex: index];
-    if (orderIndex == -1)
-        return YES;
-    
-    NSNumber * enforceAll = [[fGroups objectAtIndex: orderIndex] objectForKey: @"AssignRulesNeedAll"];
-    return !enforceAll || [enforceAll boolValue];
-}
-
-- (void) setRulesNeedAllForIndex: (BOOL) all forIndex: (NSInteger) index
-{
-    NSMutableDictionary * group = [fGroups objectAtIndex: [self rowValueForIndex: index]];
-    
-    [group setObject: [NSNumber numberWithBool: all] forKey: @"AssignRulesNeedAll"];
-    
-    [[GroupsController groups] saveGroups];
 }
 
 - (void) addNewGroup
@@ -410,7 +398,7 @@ GroupsController * fGroupsInstance = nil;
         [tempDict release];
     }
     
-    [[NSUserDefaults standardUserDefaults] setObject: [NSArchiver archivedDataWithRootObject: groups] forKey: @"Groups"];
+    [[NSUserDefaults standardUserDefaults] setObject: [NSKeyedArchiver archivedDataWithRootObject: groups] forKey: @"GroupDicts"];
 }
 
 - (NSImage *) imageForGroup: (NSMutableDictionary *) dict
@@ -451,56 +439,9 @@ GroupsController * fGroupsInstance = nil;
 {
     if (![self usesAutoAssignRulesForIndex: index])
         return NO;
-    
-    const BOOL needAll = [self rulesNeedAllForIndex: index];
-    BOOL anyPassed = NO;
-    
-    NSEnumerator * iterator = [[self autoAssignRulesForIndex: index] objectEnumerator];
-    NSArray * rule;
-    while ((rule = [iterator nextObject]))
-    {
-        NSString * type = [rule objectAtIndex: 0], * place = [rule objectAtIndex: 1], * givenValue = [rule objectAtIndex: 2];
-        NSArray * values;
-        if ([type isEqualToString: @"title"])
-            values = [NSArray arrayWithObject: [torrent name]];
-        else if ([type isEqualToString: @"tracker"])
-            values = [torrent allTrackers: NO];
-        else
-            continue;
-        
-        NSStringCompareOptions options;
-        if ([place isEqualToString: @"begins"])
-            options = NSCaseInsensitiveSearch | NSAnchoredSearch;
-        else if ([place isEqualToString: @"ends"])
-            options = NSCaseInsensitiveSearch | NSBackwardsSearch | NSAnchoredSearch;
-        else if ([place isEqualToString: @"contains"])
-            options = NSCaseInsensitiveSearch;
-        else
-            continue;
-        
-        BOOL match = NO;
-        
-        NSEnumerator * enumerator = [values objectEnumerator];
-        NSString * value;
-        while ((value = [enumerator nextObject]))
-        {
-            NSRange result = [value rangeOfString: givenValue options: options];
-            if (result.location != NSNotFound)
-            {
-                match = YES;
-                anyPassed = YES;
-                break;
-            }
-        }
-        
-        if (match && !needAll)
-            return YES;
-        else if (!match && needAll)
-            return NO;
-        else;
-    }
-    
-    return anyPassed && needAll;
+	
+	NSPredicate * predicate = [self autoAssignRulesForIndex: index];
+	return [predicate evaluateWithObject: torrent];
 }
 
 @end

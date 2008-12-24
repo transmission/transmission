@@ -14,6 +14,11 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - GTK+
    + Minor display improvements and HIG compliance
 
+1.42 (2008/12/24)
+<http://trac.transmissionbt.com/query?milestone=1.42&group=component&groupdesc=1&order=severity>
+- All Platforms
+   + Fix 1.41 lockup issue
+
 1.41 (2008/12/23)
 <http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity>
 - All Platforms

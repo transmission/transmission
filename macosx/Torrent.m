@@ -787,6 +787,11 @@ int trashDataFile(const char * filename)
     return allTrackers;
 }
 
+- (NSString *) trackerList
+{
+    return [[self allTrackers: NO] componentsJoinedByString: @"\n"];
+}
+
 - (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers
 {
     //find added tracker at end of first tier

@@ -154,6 +154,7 @@ typedef enum
 - (NSString *) scrapeResponse;
 
 - (NSMutableArray *) allTrackers: (BOOL) separators;
+- (NSString *) trackerList;
 - (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers;
 - (void) updateAllTrackersForRemove: (NSMutableArray *) trackers;
 - (BOOL) hasAddedTrackers;

@@ -54,11 +54,8 @@
 - (BOOL) usesAutoAssignRulesForIndex: (NSInteger) index;
 - (void) setUsesAutoAssignRules: (BOOL) useAutoAssignRules forIndex: (NSInteger) index;
 
-- (NSArray *) autoAssignRulesForIndex: (NSInteger) index;
-- (void) setAutoAssignRules: (NSArray *) rules forIndex: (NSInteger) index;
-
-- (BOOL) rulesNeedAllForIndex: (NSInteger) index;
-- (void) setRulesNeedAllForIndex: (BOOL) all forIndex: (NSInteger) index;
+- (NSPredicate *) autoAssignRulesForIndex: (NSInteger) index;
+- (void) setAutoAssignRules: (NSPredicate *) predicate forIndex: (NSInteger) index;
 
 - (void) addNewGroup;
 - (void) removeGroupWithRowIndex: (NSInteger) row;
