@@ -61,6 +61,7 @@ GroupsController * fGroupsInstance = nil;
         {
             fGroups = [[NSUnarchiver unarchiveObjectWithData: data] retain];
             [[NSUserDefaults standardUserDefaults] removeObjectForKey: @"Groups"];
+            [self saveGroups];
         }
         else
         {
