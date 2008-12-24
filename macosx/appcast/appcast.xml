@@ -5,18 +5,18 @@
     <link>http://www.transmissionbt.com/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Sun, 13 Dec 2008 23:50:00 -0400</pubDate>
+    <pubDate>Tue, 23 Dec 2008 22:10:00 -0400</pubDate>
 
 	<item>
 		<title>Transmission 1.41</title>
 		<sparkle:releaseNotesLink>http://www.transmissionbt.com/appcast/releasenotes.html</sparkle:releaseNotesLink>
-      	<pubDate>Sat, 13 Dec 2008 23:50:00 -0400</pubDate>
+      	<pubDate>Tue, 23 Dec 2008 22:10:00 -0400</pubDate>
       	<enclosure
       	url="http://mirrors.m0k.org/transmission/files/Transmission-1.41.dmg" 
-      	sparkle:version="7375"
+      	sparkle:version="7487"
       	sparkle:shortVersionString="1.41"
-      	sparkle:dsaSignature="MCwCFBmUruO+FVxgRqs0QO+g9hjLEj1KAhRGYUuliDLDp/CAXXARB7C0DRyDjA=="
-      	length="3915377"
+      	sparkle:dsaSignature="MC0CFQCEI0/Xj4pSNO+EhDphuv/QpM0QdAIUNVa4o2iwcmCF/JmQlOJtJP0iwGs="
+      	length="3697050"
       	sparkle:minimumSystemVersion="10.4.11"
       	type="application/octet-stream"/>
     </item>
