@@ -913,8 +913,7 @@ addStrike( Torrent * t,
         struct peer_atom * atom = getExistingAtom( t, &peer->addr );
         atom->myflags |= MYFLAG_BANNED;
         peer->doPurge = 1;
-        tordbg( t, "banning peer %s",
-               tr_peerIoAddrStr( &atom->addr, atom->port ) );
+        tordbg( t, "banning peer %s", tr_peerIoAddrStr( &atom->addr, atom->port ) );
     }
 }
 
@@ -1140,7 +1139,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
             {
                 addStrike( t, peer );
                 peer->doPurge = 1;
-                tordbg( t, "setting doPurge because we got an EINVAL error" );
+                tordbg( t, "setting %s doPurge flag because we got an EINVAL error", tr_peerIoAddrStr( &peer->addr, peer->port ) );
             }
             else if( ( e->err == ERANGE )
                   || ( e->err == EMSGSIZE )
@@ -1148,7 +1147,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
             {
                 /* some protocol error from the peer */
                 peer->doPurge = 1;
-                tordbg( t, "setting doPurge because we got an ERANGE, EMSGSIZE, or ENOTCONN error" );
+                tordbg( t, "setting %s doPurge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error", tr_peerIoAddrStr( &peer->addr, peer->port ) );
             }
             else /* a local error, such as an IO error */
             {
