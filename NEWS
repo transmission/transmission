@@ -1,7 +1,6 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-
-1.41 (2008/12/14)
+1.41 (2008/12/23)
 <http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Better peer management in large swarms
@@ -27,7 +26,6 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Windows portability
 - CLI
    + Fix minor free-memory-read bug
-
 
 1.40 (2008/11/09)
 <http://trac.transmissionbt.com/query?milestone=1.40&group=component&groupdesc=1&order=severity>
