@@ -962,7 +962,7 @@
 																		<reference ref="731315917"/>
 																	</object>
 																</object>
-																<object class="NSMutableDictionary" id="676392949">
+																<object class="NSMutableDictionary" id="819542565">
 																	<bool key="EncodedWithXMLCoder">YES</bool>
 																	<object class="NSMutableArray" key="dict.sortedKeys">
 																		<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1088,7 +1088,7 @@
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="702563683"/>
 																			<reference ref="839112200"/>
-																			<reference ref="676392949"/>
+																			<reference ref="819542565"/>
 																		</object>
 																		<object class="NSMutableArray">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1194,22 +1194,6 @@
 						<reference key="destination" ref="154698973"/>
 					</object>
 					<int key="connectionID">17</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">fRulesSheetCancelButton</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="929052796"/>
-					</object>
-					<int key="connectionID">20</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">fRulesSheetOKButton</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="1048345917"/>
-					</object>
-					<int key="connectionID">21</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1634,8 +1618,6 @@
 							<string>fGroupRulesPrefsContainer</string>
 							<string>fGroupRulesSheetWindow</string>
 							<string>fRuleEditor</string>
-							<string>fRulesSheetCancelButton</string>
-							<string>fRulesSheetOKButton</string>
 							<string>fSelectedColorNameField</string>
 							<string>fSelectedColorView</string>
 							<string>fTableView</string>
@@ -1650,8 +1632,6 @@
 							<string>NSView</string>
 							<string>NSWindow</string>
 							<string>NSPredicateEditor</string>
-							<string>NSButton</string>
-							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSColorWell</string>
 							<string>NSTableView</string>

@@ -53,9 +53,6 @@
         [fGroupRulesPrefsContainer setHidden: YES]; //get rid of container when 10.5-only
     }
     
-    [fRulesSheetOKButton setStringValue: NSLocalizedString(@"OK", "Groups -> rule editor -> button")];
-    [fRulesSheetCancelButton setStringValue: NSLocalizedString(@"Cancel", "Groups -> rule editor -> button")];
-    
     [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
     
     [self updateSelectedGroup];
