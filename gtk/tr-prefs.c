@@ -70,6 +70,7 @@ tr_prefs_init_global( void )
     pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_WIDTH, 300 );
     pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_X, 50 );
     pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_Y, 50 );
+    pref_string_set_default ( PREF_KEY_MAIN_WINDOW_LAYOUT_ORDER, "menu,toolbar,filter,list,statusbar" );
 
     str = NULL;
 #if GLIB_CHECK_VERSION( 2, 14, 0 )
