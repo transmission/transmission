@@ -16,6 +16,9 @@
 #include <stdlib.h> /* exit, atoi */
 #include <string.h> /* strcmp */
 
+#include <sys/types.h> /* umask*/
+#include <sys/stat.h> /* umask*/
+
 #include <fcntl.h> /* open */
 #include <signal.h>
 #include <unistd.h> /* daemon */
@@ -78,82 +81,52 @@ gotsig( int sig UNUSED )
     closing = TRUE;
 }
 
-#if !defined( WIN32 )
-#if !defined( HAVE_DAEMON )
 static int
-daemon( int nochdir,
-        int noclose )
+tr_daemon( int nochdir, int noclose )
 {
-    switch( fork( ) )
-    {
-        case 0:
-            break;
-
-        case - 1:
-            tr_nerr( MY_NAME, "Error daemonizing (fork)! %d - %s", errno,
-                    strerror(
-                        errno ) );
+#if defined(HAVE_DAEMON) && !defined(WIN32)
+    return daemon( nochdir, noclose );
+#else
+    pid_t pid = fork( );
+    if( pid < 0 )
+        return -1;
+    else if( pid > 0 )
+        _exit( 0 );
+    else {
+        pid = setsid( );
+        if( pid < 0 )
             return -1;
 
-        default:
-            _exit( 0 );
-    }
-
-    if( setsid( ) < 0 )
-    {
-        tr_nerr( MY_NAME, "Error daemonizing (setsid)! %d - %s", errno,
-                strerror(
-                    errno ) );
-        return -1;
-    }
-
-    switch( fork( ) )
-    {
-        case 0:
-            break;
-
-        case - 1:
-            tr_nerr( MY_NAME, "Error daemonizing (fork2)! %d - %s", errno,
-                    strerror(
-                        errno ) );
+        pid = fork( );
+        if( pid < 0 )
             return -1;
-
-        default:
+        else if( pid > 0 )
             _exit( 0 );
-    }
+        else {
 
-    if( !nochdir && 0 > chdir( "/" ) )
-    {
-        tr_nerr( MY_NAME, "Error daemonizing (chdir)! %d - %s", errno,
-                strerror(
-                    errno ) );
-        return -1;
-    }
+            if( !nochdir )
+                if( chdir( "/" ) < 0 )
+                    return -1;
 
-    if( !noclose )
-    {
-        int fd;
-        if( ( ( fd = open( "/dev/null", O_RDONLY ) ) ) != 0 )
-        {
-            dup2( fd,  0 );
-            close( fd );
-        }
-        if( ( ( fd = open( "/dev/null", O_WRONLY ) ) ) != 1 )
-        {
-            dup2( fd, 1 );
-            close( fd );
-        }
-        if( ( ( fd = open( "/dev/null", O_WRONLY ) ) ) != 2 )
-        {
-            dup2( fd, 2 );
-            close( fd );
+            umask( (mode_t)0 );
+
+            if( !noclose ) {
+                /* send stdin, stdout, and stderr to /dev/null */
+                int i;
+                int fd = open( "/dev/null", O_RDWR, 0 );
+                for( i=0; i<3; ++i ) {
+                    if( close( i ) )
+                        return -1;
+                    dup2( fd, i );
+                }
+                close( fd );
+            }
+
+            return 0;
         }
     }
-
-    return 0;
+#endif
 }
-#endif
-#endif
 
 static const char*
 getConfigDir( int argc, const char ** argv )
@@ -247,7 +220,7 @@ main( int     argc,
 #ifndef WIN32
     if( !foreground )
     {
-        if( 0 > daemon( 1, 0 ) )
+        if( 0 > tr_daemon( TRUE, FALSE ) )
         {
             fprintf( stderr, "failed to daemonize: %s\n", strerror( errno ) );
             exit( 1 );
