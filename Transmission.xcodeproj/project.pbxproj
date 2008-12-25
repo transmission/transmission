@@ -476,7 +476,7 @@
 		A21282A60CA6C66800EAEE0F /* StatusBarView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = StatusBarView.m; path = macosx/StatusBarView.m; sourceTree = "<group>"; };
 		A21576090C0D449A0057A26A /* NSBezierPathAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSBezierPathAdditions.m; path = macosx/NSBezierPathAdditions.m; sourceTree = "<group>"; };
 		A215760A0C0D449A0057A26A /* NSBezierPathAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSBezierPathAdditions.h; path = macosx/NSBezierPathAdditions.h; sourceTree = "<group>"; };
-		A215BF5D0F02EBB800350CDB /* en */ = {isa = PBXFileReference; lastKnownFileType = file; name = en; path = macosx/en.lproj/GroupRules.xib; sourceTree = "<group>"; };
+		A215BF5D0F02EBB800350CDB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A21979890D07B78400438EA7 /* GroupToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GroupToolbarItem.h; path = macosx/GroupToolbarItem.h; sourceTree = "<group>"; };
 		A219798A0D07B78400438EA7 /* GroupToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GroupToolbarItem.m; path = macosx/GroupToolbarItem.m; sourceTree = "<group>"; };
 		A21DFF0F0A292B2B007C5F76 /* Transfers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Transfers.png; path = macosx/Images/Transfers.png; sourceTree = "<group>"; };
