@@ -259,9 +259,7 @@
     NSIndexSet * indexes = [fMessageTable selectedRowIndexes];
     NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [indexes count]];
     
-    NSEnumerator * enumerator = [[fMessages objectsAtIndexes: indexes] objectEnumerator];
-    NSDictionary * message;
-    while ((message = [enumerator nextObject]))
+    for (NSDictionary * message in [fMessages objectsAtIndexes: indexes])
         [messageStrings addObject: [self stringForMessage: message]];
     
     [pb setString: [messageStrings componentsJoinedByString: @"\n"] forType: NSStringPboardType];
@@ -315,9 +313,7 @@
     
     //create the text to output
     NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [fMessages count]];
-    NSEnumerator * enumerator = [sortedMessages objectEnumerator];
-    NSDictionary * message;
-    while ((message = [enumerator nextObject]))
+    for (NSDictionary * message in sortedMessages)
         [messageStrings addObject: [self stringForMessage: message]];
     
     NSString * fileString = [[messageStrings componentsJoinedByString: @"\n"] retain];
