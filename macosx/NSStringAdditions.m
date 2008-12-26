@@ -147,15 +147,15 @@
 
 - (NSComparisonResult) compareFinder: (NSString *) string
 {
-    NSInteger comparisonOptions = [NSApp isOnLeopardOrBetter] ? (NSCaseInsensitiveSearch | NSNumericSearch
-                                                            | NSWidthInsensitiveSearch | NSForcedOrderingSearch)
-                                                        : (NSCaseInsensitiveSearch | NSNumericSearch);
+    const NSInteger comparisonOptions = [NSApp isOnLeopardOrBetter]
+                                ? (NSCaseInsensitiveSearch | NSNumericSearch | NSWidthInsensitiveSearch | NSForcedOrderingSearch)
+                                : (NSCaseInsensitiveSearch | NSNumericSearch);
     return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
 }
 
 - (NSComparisonResult) compareNumeric: (NSString *) string
 {
-    NSInteger comparisonOptions = [NSApp isOnLeopardOrBetter] ? (NSNumericSearch | NSForcedOrderingSearch) : NSNumericSearch;
+    const NSInteger comparisonOptions = [NSApp isOnLeopardOrBetter] ? (NSNumericSearch | NSForcedOrderingSearch) : NSNumericSearch;
     return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
 }
 

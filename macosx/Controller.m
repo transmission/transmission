@@ -2113,25 +2113,44 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     BOOL groupRows = [fDefaults boolForKey: @"SortByGroup"] && [NSApp isOnLeopardOrBetter];
     if (groupRows)
     {
+        NSArray * oldTorrentGroups = nil;
+        if ([fDisplayedTorrents count] > 0 && [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
+            oldTorrentGroups = [NSArray arrayWithArray: fDisplayedTorrents];
+        
         [fDisplayedTorrents removeAllObjects];
         
         NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: YES] autorelease];
         allTorrents = [allTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
         
         NSMutableArray * groupTorrents;
-        for (NSInteger i = 0, oldGroupValue = -2; i < [allTorrents count]; i++)
+        NSInteger lastGroupValue = -2, currentOldGroupIndex = 0;
+        NSEnumerator * enumerator = [allTorrents objectEnumerator];
+        while ((torrent = [enumerator nextObject]))
         {
-            torrent = [allTorrents objectAtIndex: i];
             NSInteger groupValue = [torrent groupValue];
-            if (groupValue != oldGroupValue)
+            if (groupValue != lastGroupValue)
             {
-                TorrentGroup * group = [[TorrentGroup alloc] initWithGroup: groupValue];
+                TorrentGroup * group = nil;
+                
+                //try to see if the group already exists
+                for (; oldTorrentGroups && currentOldGroupIndex < [oldTorrentGroups count]; currentOldGroupIndex++)
+                {
+                    TorrentGroup * currentGroup = [oldTorrentGroups objectAtIndex: currentOldGroupIndex];
+                    if ([currentGroup groupIndex] == groupValue)
+                    {
+                        group = currentGroup;
+                        [[currentGroup torrents] removeAllObjects];
+                        break;
+                    }
+                }
+                
+                if (!group)
+                    group = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
+                [fDisplayedTorrents addObject: group];
+                
                 groupTorrents = [group torrents];
                 
-                [fDisplayedTorrents addObject: group];
-                [group release];
-                
-                oldGroupValue = groupValue;
+                lastGroupValue = groupValue;
             }
             
             [groupTorrents addObject: torrent];
