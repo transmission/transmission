@@ -24,11 +24,14 @@
 #include "utils.h"
 #include "web.h"
 
-/* arbitrary number */
-#define MAX_CONCURRENT_TASKS 50
+enum
+{
+    /* arbitrary number */
+    MAX_CONCURRENT_TASKS = 100,
 
-/* arbitrary number */
-#define DEFAULT_TIMER_MSEC 2000
+    /* arbitrary number */
+    DEFAULT_TIMER_MSEC = 2500
+};
 
 #if 0
 #define dbgmsg(...) \
@@ -352,6 +355,7 @@ setsock( curl_socket_t            sockfd,
          struct tr_web          * g,
          struct tr_web_sockinfo * f )
 {
+    struct timeval tv;
     const int kind = EV_PERSIST
                    | (( action & CURL_POLL_IN ) ? EV_READ : 0 )
                    | (( action & CURL_POLL_OUT ) ? EV_WRITE : 0 );
@@ -361,7 +365,8 @@ setsock( curl_socket_t            sockfd,
         event_del( &f->ev );
     event_set( &f->ev, sockfd, kind, event_cb, g );
     f->evset = 1;
-    event_add( &f->ev, NULL );
+    tr_timevalMsec( DEFAULT_TIMER_MSEC, &tv );
+    event_add( &f->ev, &tv );
 }
 
 static void
