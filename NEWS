@@ -7,7 +7,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Random port, with optional randomization on startup
    + When removing local data only remove data from the torrent
 - Mac
-   + Groups (moved to preferences) can be auto-assigned to transfers when adding based on name and tracker (10.5-only)
+   + Requires Mac OS X 10.5 Leopard or newer
+   + Groups (moved to preferences) can be auto-assigned to transfers when adding based on name and tracker
    + Groups can have a default location when adding transfers
    + Bonjour support for the web interface
    + File filter field in the inspector
