@@ -81,9 +81,7 @@
     BOOL folder;
     NSInteger fileCount = 0;
     
-    NSString * file;
-    NSEnumerator * enumerator = [files objectEnumerator];
-    while ((file = [enumerator nextObject]))
+    for (NSString * file in files)
     {
         if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {

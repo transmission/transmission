@@ -1744,9 +1744,8 @@ int trashDataFile(const char * filename)
             if ([pathComponents count] > 0)
             {
                 //determine if folder node already exists
-                NSEnumerator * enumerator = [fileList objectEnumerator];
-                FileListNode * node;
-                while ((node = [enumerator nextObject]))
+                FileListNode * node = nil;
+                for (node in fileList)
                     if ([[node name] isEqualToString: name] && [node isFolder])
                         break;
                 
@@ -1795,8 +1794,7 @@ int trashDataFile(const char * filename)
     FileListNode * node = nil;
     if (isFolder)
     {
-        NSEnumerator * enumerator = [[parent children] objectEnumerator];
-        while ((node = [enumerator nextObject]))
+        for (node in [parent children])
             if ([[node name] isEqualToString: name] && [node isFolder])
                 break;
     }
@@ -1944,17 +1942,14 @@ int trashDataFile(const char * filename)
 {
     //get count
     NSInteger count = 0;
-    NSEnumerator * enumerator = [trackers objectEnumerator];
-    id object;
-    while ((object = [enumerator nextObject]))
+    for (id object in trackers)
         if (![object isKindOfClass: [NSNumber class]])
             count++;
     
     //recreate the tracker structure
     tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, count);
     NSInteger tier = 0, i = 0;
-    enumerator = [trackers objectEnumerator];
-    while ((object = [enumerator nextObject]))
+    for (id object in trackers)
     {
         if (![object isKindOfClass: [NSNumber class]])
         {

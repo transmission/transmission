@@ -406,21 +406,20 @@ tr_session * fHandle;
     
     NSArray * directories = [NSArray arrayWithObjects: @"/System/Library/Sounds", @"/Library/Sounds", @"Library/Sounds", nil];
     
-    BOOL isDirectory;
-    NSString * directory;
-    NSEnumerator * enumerator = [directories objectEnumerator];
-    while ((directory = [enumerator nextObject]))
+    for (NSString * directory in directories)
+    {
+        BOOL isDirectory;
         if ([[NSFileManager defaultManager] fileExistsAtPath: directory isDirectory: &isDirectory] && isDirectory)
         {
-            NSString * sound;
-            NSEnumerator * soundEnumerator = [[[NSFileManager defaultManager] directoryContentsAtPath: directory] objectEnumerator];
-            while ((sound = [soundEnumerator nextObject]))
+            NSArray * directoryContents = [[NSFileManager defaultManager] directoryContentsAtPath: directory];
+            for (NSString * sound in directoryContents)
             {
                 sound = [sound stringByDeletingPathExtension];
                 if ([NSSound soundNamed: sound])
                     [sounds addObject: sound];
             }
         }
+    }
     
     return sounds;
 }
@@ -945,9 +944,7 @@ tr_session * fHandle;
     if ([components count] == 4)
     {
         valid = true;
-        NSEnumerator * enumerator = [components objectEnumerator];
-        NSString * component;
-        while ((component = [enumerator nextObject]))
+        for (NSString * component in components)
         {
             if ([component isEqualToString: @"*"])
                 [newComponents addObject: component];
@@ -1142,9 +1139,7 @@ tr_session * fHandle;
     {
         NSToolbar * toolbar = [window toolbar];
         NSString * itemIdentifier = [toolbar selectedItemIdentifier];
-        NSEnumerator * enumerator = [[toolbar items] objectEnumerator];
-        NSToolbarItem * item;
-        while ((item = [enumerator nextObject]))
+        for (NSToolbarItem * item in [toolbar items])
             if ([[item itemIdentifier] isEqualToString: itemIdentifier])
             {
                 [window setTitle: [item label]];

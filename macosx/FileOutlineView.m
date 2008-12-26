@@ -126,9 +126,7 @@
 {
     [super updateTrackingAreas];
     
-    NSEnumerator * enumerator = [[self trackingAreas] objectEnumerator];
-    NSTrackingArea * area;
-    while ((area = [enumerator nextObject]))
+    for (NSTrackingArea * area in [self trackingAreas])
     {
         if ([area owner] == self && [[area userInfo] objectForKey: @"Row"])
             [self removeTrackingArea: area];
