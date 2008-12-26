@@ -81,12 +81,20 @@ gotsig( int sig UNUSED )
     closing = TRUE;
 }
 
+#if defined(WIN32)
+ #define USE_NO_DAEMON
+#elif !defined(HAVE_DAEMON) || defined(__MIPSEL__)
+ #define USE_TR_DAEMON
+#else
+ #define USE_OS_DAEMON
+#endif
+
 static int
 tr_daemon( int nochdir, int noclose )
 {
-#if defined(HAVE_DAEMON) && !defined(WIN32)
+#if defined(USE_OS_DAEMON)
     return daemon( nochdir, noclose );
-#else
+#elif defined(USE_TR_DAEMON)
     pid_t pid = fork( );
     if( pid < 0 )
         return -1;
@@ -125,6 +133,8 @@ tr_daemon( int nochdir, int noclose )
             return 0;
         }
     }
+#else /* USE_NO_DAEMON */
+    return 0;
 #endif
 }
 
@@ -217,16 +227,11 @@ main( int     argc,
         return 0;
     }
 
-#ifndef WIN32
-    if( !foreground )
+    if( !foreground && tr_daemon( TRUE, FALSE ) < 0 )
     {
-        if( 0 > tr_daemon( TRUE, FALSE ) )
-        {
-            fprintf( stderr, "failed to daemonize: %s\n", strerror( errno ) );
-            exit( 1 );
-        }
+        fprintf( stderr, "failed to daemonize: %s\n", strerror( errno ) );
+        exit( 1 );
     }
-#endif
 
     /* start the session */
     mySession = tr_sessionInit( "daemon", configDir, FALSE, &settings );
