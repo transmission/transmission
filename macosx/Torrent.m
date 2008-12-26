@@ -1744,7 +1744,7 @@ int trashDataFile(const char * filename)
             if ([pathComponents count] > 0)
             {
                 //determine if folder node already exists
-                FileListNode * node = nil;
+                FileListNode * node;
                 for (node in fileList)
                     if ([[node name] isEqualToString: name] && [node isFolder])
                         break;

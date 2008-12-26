@@ -245,9 +245,7 @@ typedef enum
         
             uint64_t size = 0;
             NSInteger fileCount = 0;
-            NSEnumerator * enumerator = [torrents objectEnumerator];
-            Torrent * torrent;
-            while ((torrent = [enumerator nextObject]))
+            for (Torrent * torrent in torrents)
             {
                 size += [torrent size];
                 fileCount += [torrent fileCount];
@@ -1202,9 +1200,7 @@ typedef enum
             return;
     }
     
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in fTorrents)
         [torrent setSpeedMode: mode upload: upload];
     
     NSTextField * field = upload ? fUploadLimitField : fDownloadLimitField;
@@ -1226,10 +1222,7 @@ typedef enum
     BOOL upload = sender == fUploadLimitField;
     NSInteger limit = [sender intValue];
     
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in fTorrents)
         [torrent setSpeedLimit: limit upload: upload];
 }
 
@@ -1251,9 +1244,7 @@ typedef enum
             return;
     }
     
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in fTorrents)
         [torrent setRatioSetting: setting];
     
     BOOL single = setting == NSOnState;
@@ -1271,9 +1262,7 @@ typedef enum
 {
     CGFloat limit = [sender floatValue];
     
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in fTorrents)
         [torrent setRatioLimit: limit];
 }
 
@@ -1281,9 +1270,7 @@ typedef enum
 {
     NSInteger limit = [sender intValue];
     
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in fTorrents)
         [torrent setMaxPeerConnect: limit];
 }
 
@@ -1334,9 +1321,7 @@ typedef enum
     
     uint64_t have = 0, haveVerified = 0, downloadedTotal = 0, uploadedTotal = 0, failedHash = 0;
     NSDate * lastActivity = nil;
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in fTorrents)
     {
         have += [torrent haveTotal];
         haveVerified += [torrent haveVerified];
@@ -1369,7 +1354,7 @@ typedef enum
     
     if (numberSelected == 1)
     {
-        torrent = [fTorrents objectAtIndex: 0];
+        Torrent * torrent = [fTorrents objectAtIndex: 0];
         
         [fStateField setStringValue: [torrent stateString]];
         

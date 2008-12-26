@@ -255,9 +255,7 @@ GroupsController * fGroupsInstance = nil;
     for (index = 0; index < [fGroups count]; index++)
     {
         BOOL found = NO;
-        NSEnumerator * enumerator = [fGroups objectEnumerator];
-        NSDictionary * dict;
-        while ((dict = [enumerator nextObject]))
+        for (NSDictionary * dict in fGroups)
             if ([[dict objectForKey: @"Index"] intValue] == index)
             {
                 found = YES;
@@ -333,9 +331,7 @@ GroupsController * fGroupsInstance = nil;
     [menu addItem: item];
     [item release];
     
-    NSEnumerator * enumerator = [fGroups objectEnumerator];
-    NSMutableDictionary * dict;
-    while ((dict = [enumerator nextObject]))
+    for (NSMutableDictionary * dict in fGroups)
     {
         item = [[NSMenuItem alloc] initWithTitle: [dict objectForKey: @"Name"] action: action keyEquivalent: @""];
         [item setTarget: target];
@@ -364,9 +360,7 @@ GroupsController * fGroupsInstance = nil;
 
 - (NSInteger) groupIndexForTorrent: (Torrent *) torrent;
 {
-    NSEnumerator * enumerator = [fGroups objectEnumerator];
-    NSMutableDictionary * group;
-    while ((group = [enumerator nextObject]))
+    for (NSDictionary * group in fGroups)
     {
         NSInteger row = [[group objectForKey: @"Index"] intValue];
         if ([self torrent: torrent doesMatchRulesForGroupAtIndex: row])
@@ -383,9 +377,7 @@ GroupsController * fGroupsInstance = nil;
 {
     //don't archive the icon
     NSMutableArray * groups = [NSMutableArray arrayWithCapacity: [fGroups count]];
-    NSEnumerator * enumerator = [fGroups objectEnumerator];
-    NSDictionary * dict;
-    while ((dict = [enumerator nextObject]))
+    for (NSDictionary * dict in fGroups)
     {
         NSMutableDictionary * tempDict = [dict mutableCopy];
         [tempDict removeObjectForKey: @"Icon"];

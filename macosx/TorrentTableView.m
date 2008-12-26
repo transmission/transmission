@@ -245,9 +245,7 @@
     fMouseRevealRow = -1;
     fMouseActionRow = -1;
     
-    NSEnumerator * enumerator = [[self trackingAreas] objectEnumerator];
-    NSTrackingArea * area;
-    while ((area = [enumerator nextObject]))
+    for (NSTrackingArea * area in [self trackingAreas])
     {
         if ([area owner] == self && [[area userInfo] objectForKey: @"Row"])
             [self removeTrackingArea: area];
@@ -402,9 +400,7 @@
 {
     NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSet];
     
-    NSEnumerator * enumerator = [values objectEnumerator];
-    id item;
-    while ((item = [enumerator nextObject]))
+    for (id item in values)
     {
         if ([item isKindOfClass: [Torrent class]])
         {
@@ -881,9 +877,7 @@
 
 - (void) createFileMenu: (NSMenu *) menu forFiles: (NSArray *) files
 {
-    NSEnumerator * enumerator = [files objectEnumerator];
-    FileListNode * node;
-    while ((node = [enumerator nextObject]))
+    for (FileListNode * node in files)
     {
         NSString * name = [node name];
         
