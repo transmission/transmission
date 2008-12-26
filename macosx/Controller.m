@@ -163,9 +163,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSString * bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
 
-    NSDictionary * dic;
-    NSEnumerator * enumerator = [[[NSWorkspace sharedWorkspace] launchedApplications] objectEnumerator];
-    while ((dic = [enumerator nextObject]))
+    for (NSDictionary * dic in [[NSWorkspace sharedWorkspace] launchedApplications])
     {
         if ([[dic objectForKey: @"NSApplicationBundleIdentifier"] isEqualToString: bundleIdentifier]
             && [[dic objectForKey: @"NSApplicationProcessIdentifier"] intValue] != processIdentifier)
@@ -367,16 +365,15 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (history)
     {
-        Torrent * torrent;
-        NSDictionary * historyItem;
-        NSEnumerator * enumerator = [history objectEnumerator];
-        while ((historyItem = [enumerator nextObject]))
+        for (NSDictionary * historyItem in history)
+        {
+            Torrent * torrent;
             if ((torrent = [[Torrent alloc] initWithHistory: historyItem lib: fLib]))
             {
                 [fTorrents addObject: torrent];
                 [torrent release];
             }
-        
+        }
         [history release];
     }
     
@@ -519,9 +516,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (!fUpdateInProgress && [fDefaults boolForKey: @"CheckQuit"])
     {
         NSInteger active = 0, downloading = 0;
-        Torrent * torrent;
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent  in fTorrents)
             if ([torrent isActive] && ![torrent isStalled])
             {
                 active++;
@@ -580,9 +575,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //remove all torrent downloads
     if (fPendingTorrentDownloads)
     {
-        NSEnumerator * downloadEnumerator = [fPendingTorrentDownloads objectEnumerator];
-        NSDictionary * downloadDict;
-        while ((downloadDict = [downloadEnumerator nextObject]))
+        for (NSDictionary * downloadDict in fPendingTorrentDownloads)
         {
             NSURLDownload * download = [downloadDict objectForKey: @"Download"];
             [download cancel];
@@ -767,11 +760,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             deleteTorrentFile = TORRENT_FILE_DEFAULT;
     }
     
-    Torrent * torrent;
-    NSString * torrentPath;
     tr_info info;
-    NSEnumerator * enumerator = [filenames objectEnumerator];
-    while ((torrentPath = [enumerator nextObject]))
+    for (NSString * torrentPath in filenames)
     {
         //ensure torrent doesn't already exist
         tr_ctor * ctor = tr_ctorNew(fLib);
@@ -817,6 +807,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                             && (type != ADD_AUTO || ![fDefaults boolForKey: @"DownloadAskManual"]));
         tr_metainfoFree(&info);
         
+        Torrent * torrent;
         if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location
                             deleteTorrentFile: showWindow ? TORRENT_FILE_SAVE : deleteTorrentFile lib: fLib]))
             continue;
@@ -1071,9 +1062,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) resumeTorrents: (NSArray *) torrents
 {
-    NSEnumerator * enumerator = [torrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in torrents)
         [torrent setWaitToStart: YES];
     
     [self updateTorrentsInQueue];
@@ -1088,9 +1077,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [fTorrents count]];
     
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in fTorrents)
         if (![torrent isActive] && [torrent waitingToStart])
             [torrents addObject: torrent];
     
@@ -1100,9 +1087,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) resumeTorrentsNoWait: (NSArray *) torrents
 {
     //iterate through instead of all at once to ensure no conflicts
-    NSEnumerator * enumerator = [torrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in torrents)
         [torrent startTransfer];
     
     [self updateUI];
@@ -1123,9 +1108,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) stopTorrents: (NSArray *) torrents
 {
     //don't want any of these starting then stopping
-    NSEnumerator * enumerator = [torrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in torrents)
         [torrent setWaitToStart: NO];
 
     [torrents makeObjectsPerformSelector: @selector(stopTransfer)];
@@ -1142,9 +1125,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
     if ([fDefaults boolForKey: @"CheckRemove"])
     {
-        Torrent * torrent;
-        NSEnumerator * enumerator = [torrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in torrents)
             if ([torrent isActive])
             {
                 active++;
@@ -1242,16 +1223,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
 {
     //don't want any of these starting then stopping
-    NSEnumerator * enumerator = [torrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in torrents)
         [torrent setWaitToStart: NO];
     
     [fTorrents removeObjectsInArray: torrents];
     
     NSInteger lowestOrderValue = NSIntegerMax;
-    enumerator = [torrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in torrents)
     {
         //let's expand all groups that have removed items - they either don't exist anymore, are already expanded, or are collapsed (rpc)
         [fTableView removeCollapsedGroup: [torrent groupValue]];
@@ -1331,9 +1309,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     if (code == NSOKButton)
     {
-        NSEnumerator * enumerator = [torrents objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in torrents)
             [torrent moveTorrentDataFileTo: [[panel filenames] objectAtIndex: 0]];
     }
     
@@ -1396,17 +1372,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) revealFile: (id) sender
 {
-    NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in [fTableView selectedTorrents])
         [torrent revealData];
 }
 
 - (void) announceSelectedTorrents: (id) sender
 {
-    NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in [fTableView selectedTorrents])
     {
         if ([torrent canManualAnnounce])
             [torrent manualAnnounce];
@@ -1420,9 +1392,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) verifyTorrents: (NSArray *) torrents
 {
-    NSEnumerator * enumerator = [torrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in torrents)
         [torrent resetCache];
     
     [self applyFilter: nil];
@@ -1618,9 +1588,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSInteger desiredDownloadActive = [self numToStartFromQueue: YES],
         desiredSeedActive = [self numToStartFromQueue: NO];
     
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in fTorrents)
     {
         if (![torrent isActive] && ![torrent isChecking] && [torrent waitingToStart])
         {
@@ -1659,9 +1627,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     NSInteger desired = [fDefaults integerForKey: downloadQueue ? @"QueueDownloadNumber" : @"QueueSeedNumber"];
         
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in fTorrents)
     {
         if ([torrent isChecking])
         {
@@ -1769,9 +1735,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     NSMutableArray * history = [NSMutableArray arrayWithCapacity: [fTorrents count]];
 
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in fTorrents)
         [history addObject: [torrent history]];
 
     [history writeToFile: [NSHomeDirectory() stringByAppendingPathComponent: SUPPORT_FOLDER] atomically: YES];
@@ -1906,9 +1870,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //actually sort
     if ([fDefaults boolForKey: @"SortByGroup"])
     {
-        NSEnumerator * enumerator = [fDisplayedTorrents objectEnumerator];
-        TorrentGroup * group;
-        while ((group = [enumerator nextObject]))
+        for (TorrentGroup * group in fDisplayedTorrents)
             [[group torrents] sortUsingDescriptors: descriptors];
     }
     else
@@ -1927,9 +1889,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         previousTorrents = [NSMutableArray array];
         
-        NSEnumerator * enumerator = [fDisplayedTorrents objectEnumerator];
-        TorrentGroup * group;
-        while ((group = [enumerator nextObject]))
+        for (TorrentGroup * group in fDisplayedTorrents)
             [previousTorrents addObjectsFromArray: [group torrents]];
     }
     else
@@ -1961,10 +1921,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSMutableIndexSet * indexes = [NSMutableIndexSet indexSet];
     
     //get count of each type
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent;
     NSInteger index = -1;
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in fTorrents)
     {
         index++;
         
@@ -2010,9 +1968,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             if (filterTracker)
             {
                 BOOL removeTextField = YES;
-                NSEnumerator * trackerEnumerator = [[torrent allTrackers: NO] objectEnumerator];
-                NSString * tracker;
-                while ((tracker = [trackerEnumerator nextObject]))
+                for (NSString * tracker in [torrent allTrackers: NO])
                 {
                     if ([tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location != NSNotFound)
                     {
@@ -2045,8 +2001,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //clear display cache for not-shown torrents
     [previousTorrents removeObjectsInArray: allTorrents];
-    enumerator = [previousTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in previousTorrents)
         [torrent setPreviousFinishedPieces: nil];
     
     //place torrents into groups
@@ -2064,8 +2019,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         NSMutableArray * groupTorrents;
         NSInteger lastGroupValue = -2, currentOldGroupIndex = 0;
-        NSEnumerator * enumerator = [allTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in allTorrents)
         {
             NSInteger groupValue = [torrent groupValue];
             if (groupValue != lastGroupValue)
@@ -2105,9 +2059,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //reset expanded/collapsed rows
     if (groupRows)
     {
-        enumerator = [fDisplayedTorrents objectEnumerator];
-        TorrentGroup * group;
-        while ((group = [enumerator nextObject]))
+        for (TorrentGroup * group in fDisplayedTorrents)
         {
             if ([fTableView isGroupCollapsed: [group groupIndex]])
                 [fTableView collapseItem: group];
@@ -2307,9 +2259,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) setGroup: (id) sender
 {
-    NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in [fTableView selectedTorrents])
     {
         [fTableView removeCollapsedGroup: [torrent groupValue]]; //remove old collapsed group
         
@@ -2551,21 +2501,18 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         fAutoImportedNames = [[NSMutableArray alloc] init];
     [fAutoImportedNames setArray: importedNames];
     
-    NSString * file;
     for (NSInteger i = [newNames count] - 1; i >= 0; i--)
     {
-        file = [newNames objectAtIndex: i];
+        NSString * file = [newNames objectAtIndex: i];
         if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] != NSOrderedSame)
             [newNames removeObjectAtIndex: i];
         else
             [newNames replaceObjectAtIndex: i withObject: [path stringByAppendingPathComponent: file]];
     }
     
-    NSEnumerator * enumerator = [newNames objectEnumerator];
-    tr_ctor * ctor;
-    while ((file = [enumerator nextObject]))
+    for (NSString * file in newNames)
     {
-        ctor = tr_ctorNew(fLib);
+        tr_ctor * ctor = tr_ctorNew(fLib);
         tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
         
         switch (tr_torrentParse(fLib, ctor, NULL))
@@ -2666,9 +2613,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([fDefaults boolForKey: @"SortByGroup"] || [[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER])
     {
         NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSet];
-        NSEnumerator * enumerator = [items objectEnumerator];
-        id torrent;
-        while ((torrent = [enumerator nextObject]))
+        for (id torrent in items)
         {
             if (![torrent isKindOfClass: [Torrent class]])
                 return NO;
@@ -2747,9 +2692,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             //change groups
             NSInteger groupValue = [item groupIndex];
-            NSEnumerator * enumerator = [movingTorrents objectEnumerator];
-            Torrent * torrent;
-            while ((torrent = [enumerator nextObject]))
+            for (Torrent * torrent in movingTorrents)
             {
                 //have to reset objects here to avoid weird crash
                 [[[fTableView parentForItem: torrent] torrents] removeObject: torrent];
@@ -2808,16 +2751,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([[pasteboard types] containsObject: NSFilenamesPboardType])
     {
         //check if any torrent files can be added
-        NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
-        NSEnumerator * enumerator = [files objectEnumerator];
-        NSString * file;
         BOOL torrent = NO;
-        tr_ctor * ctor;
-        while ((file = [enumerator nextObject]))
+        NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
+        for (NSString * file in files)
         {
             if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
             {
-                ctor = tr_ctorNew(fLib);
+                tr_ctor * ctor = tr_ctorNew(fLib);
                 tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
                 switch (tr_torrentParse(fLib, ctor, NULL))
                 {
@@ -2877,14 +2817,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //create an array of files that can be opened
         NSMutableArray * filesToOpen = [[NSMutableArray alloc] init];
         NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
-        NSEnumerator * enumerator = [files objectEnumerator];
-        NSString * file;
-        tr_ctor * ctor;
-        while ((file = [enumerator nextObject]))
+        for (NSString * file in files)
         {
             if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
             {
-                ctor = tr_ctorNew(fLib);
+                tr_ctor * ctor = tr_ctorNew(fLib);
                 tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
                 switch (tr_torrentParse(fLib, ctor, NULL))
                 {
@@ -3413,9 +3350,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //enable pause all item
     if ([ident isEqualToString: TOOLBAR_PAUSE_ALL])
     {
-        Torrent * torrent;
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in fTorrents)
             if ([torrent isActive] || [torrent waitingToStart])
                 return YES;
         return NO;
@@ -3424,9 +3359,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //enable resume all item
     if ([ident isEqualToString: TOOLBAR_RESUME_ALL])
     {
-        Torrent * torrent;
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in fTorrents)
             if (![torrent isActive] && ![torrent waitingToStart])
                 return YES;
         return NO;
@@ -3435,9 +3368,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //enable pause item
     if ([ident isEqualToString: TOOLBAR_PAUSE_SELECTED])
     {
-        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in [fTableView selectedTorrents])
             if ([torrent isActive] || [torrent waitingToStart])
                 return YES;
         return NO;
@@ -3446,9 +3377,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //enable resume item
     if ([ident isEqualToString: TOOLBAR_RESUME_SELECTED])
     {
-        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in [fTableView selectedTorrents])
             if (![torrent isActive] && ![torrent waitingToStart])
                 return YES;
         return NO;
@@ -3553,9 +3482,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         BOOL checked = NO;
         
         NSInteger index = [menuItem tag];
-        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in [fTableView selectedTorrents])
             if (index == [torrent groupValue])
             {
                 checked = YES;
@@ -3684,9 +3611,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             onlyDownloading = [fDefaults boolForKey: @"CheckRemoveDownloading"],
             canDelete = action != @selector(removeDeleteTorrent:) && action != @selector(removeDeleteDataAndTorrent:);
         
-        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in [fTableView selectedTorrents])
         {
             if (!warning && [torrent isActive])
             {
@@ -3721,9 +3646,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //enable pause all item
     if (action == @selector(stopAllTorrents:))
     {
-        Torrent * torrent;
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in fTorrents)
             if ([torrent isActive] || [torrent waitingToStart])
                 return YES;
         return NO;
@@ -3732,9 +3655,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //enable resume all item
     if (action == @selector(resumeAllTorrents:))
     {
-        Torrent * torrent;
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in fTorrents)
             if (![torrent isActive] && ![torrent waitingToStart])
                 return YES;
         return NO;
@@ -3746,9 +3667,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (![fDefaults boolForKey: @"Queue"] && ![fDefaults boolForKey: @"QueueSeed"])
             return NO;
     
-        Torrent * torrent;
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in fTorrents)
             if (![torrent isActive] && [torrent waitingToStart])
                 return YES;
         return NO;
@@ -3760,9 +3679,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (!canUseTable)
             return NO;
         
-        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in [fTableView selectedTorrents])
             if (![torrent isActive])
                 return YES;
         return NO;
@@ -3774,9 +3691,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (!canUseTable)
             return NO;
     
-        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in [fTableView selectedTorrents])
             if ([torrent isActive] || [torrent waitingToStart])
                 return YES;
         return NO;
@@ -3788,9 +3703,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (!canUseTable)
             return NO;
     
-        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in [fTableView selectedTorrents])
             if (![torrent isActive] && ![torrent waitingToStart])
                 return YES;
         return NO;
@@ -3802,9 +3715,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (!canUseTable)
             return NO;
         
-        NSEnumerator * enumerator = [[fTableView selectedTorrents] objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
+        for (Torrent * torrent in [fTableView selectedTorrents])
             if ([torrent canManualAnnounce])
                 return YES;
         return NO;
@@ -3856,15 +3767,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) sleepCallback: (natural_t) messageType argument: (void *) messageArgument
 {
-    NSEnumerator * enumerator;
-    Torrent * torrent;
-
     switch (messageType)
     {
         case kIOMessageSystemWillSleep:
             //if there are any running transfers, wait 15 seconds for them to stop
-            enumerator = [fTorrents objectEnumerator];
-            while ((torrent = [enumerator nextObject]))
+            for (Torrent * torrent in fTorrents)
                 if ([torrent isActive])
                 {
                     //stop all transfers (since some are active) before going to sleep and remember to resume when we wake up
@@ -3880,8 +3787,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             if ([fDefaults boolForKey: @"SleepPrevent"])
             {
                 //prevent idle sleep unless no torrents are active
-                enumerator = [fTorrents objectEnumerator];
-                while ((torrent = [enumerator nextObject]))
+                for (Torrent * torrent in fTorrents)
                     if ([torrent isActive] && ![torrent isStalled] && ![torrent isError])
                     {
                         IOCancelPowerChange(fRootPort, (long) messageArgument);
@@ -3903,9 +3809,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (NSMenu *) applicationDockMenu: (NSApplication *) sender
 {
     NSInteger seeding = 0, downloading = 0;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in fTorrents)
     {
         if ([torrent isSeeding])
             seeding++;
@@ -4111,10 +4015,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     NSArray * selectedTorrents = [fTableView selectedTorrents];
     NSMutableArray * urlArray = [NSMutableArray arrayWithCapacity: [selectedTorrents count]];
-    NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
-    Torrent * torrent;
     
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in selectedTorrents)
         if ([self canQuickLookTorrent: torrent])
             [urlArray addObject: [NSURL fileURLWithPath: [torrent dataLocation]]];
     
@@ -4123,11 +4025,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (BOOL) canQuickLook
 {
-    NSArray * selectedTorrents = [fTableView selectedTorrents];
-    NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
-    Torrent * torrent;
-    
-    while ((torrent = [enumerator nextObject]))
+    for (Torrent * torrent in [fTableView selectedTorrents])
         if ([self canQuickLookTorrent: torrent])
             return YES;
     
@@ -4223,8 +4121,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent = nil;
     if (torrentStruct != NULL && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED))
     {
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
+        for (torrent in fTorrents)
             if (torrentStruct == [torrent torrentStruct])
             {
                 [torrent retain];
