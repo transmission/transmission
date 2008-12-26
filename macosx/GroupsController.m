@@ -229,7 +229,7 @@ GroupsController * fGroupsInstance = nil;
     if (orderIndex == -1)
 		return nil;
 	
-	return  [[fGroups objectAtIndex: orderIndex] objectForKey: @"AutoGroupRules"];
+	return [[fGroups objectAtIndex: orderIndex] objectForKey: @"AutoGroupRules"];
 }
 
 - (void) setAutoAssignRules: (NSPredicate *) predicate forIndex: (NSInteger) index
@@ -429,8 +429,20 @@ GroupsController * fGroupsInstance = nil;
     if (![self usesAutoAssignRulesForIndex: index])
         return NO;
 	
-	NSPredicate * predicate = [self autoAssignRulesForIndex: index];
-	return [predicate evaluateWithObject: torrent];
+    NSPredicate * predicate = [self autoAssignRulesForIndex: index];
+    BOOL eval = NO;
+    @try
+    {
+        eval = [predicate evaluateWithObject:torrent];
+    }
+    @catch (NSException * exception)
+    {
+        NSLog(@"Error when evaluating predicate (%@) - %@", predicate, exception);
+    }
+    @finally
+    {
+        return eval;
+    }
 }
 
 @end
