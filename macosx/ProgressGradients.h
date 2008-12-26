@@ -22,21 +22,19 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-@class CTGradient;
-
 @interface ProgressGradients : NSObject
 
-+ (CTGradient *) progressGradientForRed: (CGFloat) redComponent green: (CGFloat) greenComponent blue: (CGFloat) blueComponent;
++ (NSGradient *) progressGradientForRed: (CGFloat) redComponent green: (CGFloat) greenComponent blue: (CGFloat) blueComponent;
 
-+ (CTGradient *) progressWhiteGradient;
-+ (CTGradient *) progressGrayGradient;
-+ (CTGradient *) progressLightGrayGradient;
-+ (CTGradient *) progressBlueGradient;
-+ (CTGradient *) progressDarkBlueGradient;
-+ (CTGradient *) progressGreenGradient;
-+ (CTGradient *) progressLightGreenGradient;
-+ (CTGradient *) progressDarkGreenGradient;
-+ (CTGradient *) progressRedGradient;
-+ (CTGradient *) progressYellowGradient;
++ (NSGradient *) progressWhiteGradient;
++ (NSGradient *) progressGrayGradient;
++ (NSGradient *) progressLightGrayGradient;
++ (NSGradient *) progressBlueGradient;
++ (NSGradient *) progressDarkBlueGradient;
++ (NSGradient *) progressGreenGradient;
++ (NSGradient *) progressLightGreenGradient;
++ (NSGradient *) progressDarkGreenGradient;
++ (NSGradient *) progressRedGradient;
++ (NSGradient *) progressYellowGradient;
 
 @end

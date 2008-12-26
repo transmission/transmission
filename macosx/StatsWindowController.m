@@ -24,7 +24,6 @@
 
 #import "StatsWindowController.h"
 #import "NSStringAdditions.h"
-#import "NSApplicationAdditions.h"
 
 #define UPDATE_SECONDS 1.0
 
@@ -146,11 +145,7 @@ tr_session * fLib;
     [alert setAlertStyle: NSWarningAlertStyle];
     [alert addButtonWithTitle: NSLocalizedString(@"Reset", "Stats reset -> button")];
     [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Stats reset -> button")];
-    
-    if ([NSApp isOnLeopardOrBetter])
-        [alert setShowsSuppressionButton: YES];
-    else
-        [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Stats reset -> button")];
+    [alert setShowsSuppressionButton: YES];
     
     [alert beginSheetModalForWindow: [self window] modalDelegate: self
         didEndSelector: @selector(resetSheetClosed:returnCode:contextInfo:) contextInfo: nil];
@@ -210,7 +205,7 @@ tr_session * fLib;
 {
     [[alert window] orderOut: nil];
     
-    if (([NSApp isOnLeopardOrBetter] ? [[alert suppressionButton] state] == NSOnState : code == NSAlertThirdButtonReturn))
+    if ([[alert suppressionButton] state] == NSOnState)
         [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningResetStats"];
     
     if (code == NSAlertFirstButtonReturn)

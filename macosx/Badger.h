@@ -30,12 +30,6 @@
     tr_session * fLib;
     
     NSUInteger fCompleted;
-    
-    //tiger-only fields
-    NSImage * fDockIcon, * fBadge;
-    NSDictionary * fAttributes;
-    NSUInteger fCompletedBadged;
-    BOOL fSpeedBadge, fQuittingTiger;
 }
 
 - (id) initWithLib: (tr_session *) lib;

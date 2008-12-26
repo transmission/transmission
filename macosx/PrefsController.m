@@ -27,7 +27,6 @@
 #import "BlocklistScheduler.h"
 #import "PortChecker.h"
 #import "BonjourController.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
 #import "utils.h"
@@ -176,13 +175,6 @@ tr_session * fHandle;
     
     [self setPrefView: nil];
     
-    if (![NSApp isOnLeopardOrBetter])
-    {
-        [fRPCAddRemoveControl sizeToFit];
-        [fRPCAddRemoveControl setLabel: @"+" forSegment: RPC_IP_ADD_TAG];
-        [fRPCAddRemoveControl setLabel: @"-" forSegment: RPC_IP_REMOVE_TAG];
-    }
-    
     //set download folder
     [fFolderPopUp selectItemAtIndex: [fDefaults boolForKey: @"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
     
@@ -256,7 +248,7 @@ tr_session * fHandle;
     if ([ident isEqualToString: TOOLBAR_GENERAL])
     {
         [item setLabel: NSLocalizedString(@"General", "Preferences -> toolbar item title")];
-        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNamePreferencesGeneral : @"Preferences.png"]];
+        [item setImage: [NSImage imageNamed: NSImageNamePreferencesGeneral]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
@@ -288,7 +280,7 @@ tr_session * fHandle;
     else if ([ident isEqualToString: TOOLBAR_PEERS])
     {
         [item setLabel: NSLocalizedString(@"Peers", "Preferences -> toolbar item title")];
-        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNameUserGroup : @"Peers.png"]];
+        [item setImage: [NSImage imageNamed: NSImageNameUserGroup]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
@@ -296,7 +288,7 @@ tr_session * fHandle;
     else if ([ident isEqualToString: TOOLBAR_NETWORK])
     {
         [item setLabel: NSLocalizedString(@"Network", "Preferences -> toolbar item title")];
-        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNameNetwork : @"Network.png"]];
+        [item setImage: [NSImage imageNamed: NSImageNameNetwork]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
@@ -412,9 +404,7 @@ tr_session * fHandle;
 {
     NSMutableArray * sounds = [NSMutableArray array];
     
-    NSMutableArray * directories = [NSMutableArray arrayWithObjects: @"/System/Library/Sounds", @"/Library/Sounds", nil];
-    if ([NSApp isOnLeopardOrBetter])
-        [directories addObject: [NSHomeDirectory() stringByAppendingPathComponent: @"Library/Sounds"]];
+    NSArray * directories = [NSArray arrayWithObjects: @"/System/Library/Sounds", @"/Library/Sounds", @"Library/Sounds", nil];
     
     BOOL isDirectory;
     NSString * directory;
@@ -1161,10 +1151,6 @@ tr_session * fHandle;
                 break;
             }
     }
-    
-    //for network view make sure progress indicator hides itself (get around a Tiger bug)
-    if (![NSApp isOnLeopardOrBetter] && view == fNetworkView && [fPortStatusImage image])
-        [fPortStatusProgress setDisplayedWhenStopped: NO];
 }
 
 - (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info

@@ -28,7 +28,6 @@
 #import "TorrentGroup.h"
 #import "FileListNode.h"
 #import "QuickLookController.h"
-#import "NSApplicationAdditions.h"
 
 #define MAX_GROUP 999999
 
@@ -42,11 +41,6 @@
 #define TOGGLE_PROGRESS_SECONDS 0.175
 
 @interface TorrentTableView (Private)
-
-//unused on Leopard
-- (BOOL) pointInControlRect: (NSPoint) point;
-- (BOOL) pointInRevealRect: (NSPoint) point;
-- (BOOL) pointInActionRect: (NSPoint) point;
 
 - (BOOL) pointInGroupStatusRect: (NSPoint) point;
 
@@ -65,24 +59,6 @@
         fDefaults = [NSUserDefaults standardUserDefaults];
         
         fTorrentCell = [[TorrentCell alloc] init];
-        
-        if (![NSApp isOnLeopardOrBetter])
-        {
-            NSTableColumn * groupColumn = [self tableColumnWithIdentifier: @"Group"];
-            [self setOutlineTableColumn: groupColumn];
-            
-            //remove all unnecessary columns
-            for (NSInteger i = [[self tableColumns] count]-1; i >= 0; i--)
-            {
-                NSTableColumn * column = [[self tableColumns] objectAtIndex: i];
-                if (column != groupColumn)
-                    [self removeTableColumn: column];
-            }
-            
-            [self sizeLastColumnToFit];
-            
-            [groupColumn setDataCell: fTorrentCell];
-        }
         
         NSData * groupData = [fDefaults dataForKey: @"CollapsedGroups"];
         if (groupData)
@@ -175,13 +151,10 @@
     {
         [cell setRepresentedObject: item];
         
-        NSInteger row = [self rowForItem: item];
-        if ([NSApp isOnLeopardOrBetter])
-        {
-            [cell setControlHover: row == fMouseControlRow];
-            [cell setRevealHover: row == fMouseRevealRow];
-            [cell setActionHover: row == fMouseActionRow];
-        }
+        const NSInteger row = [self rowForItem: item];
+        [cell setControlHover: row == fMouseControlRow];
+        [cell setRevealHover: row == fMouseRevealRow];
+        [cell setActionHover: row == fMouseActionRow];
         [cell setActionPushed: row == fActionPushedRow];
     }
     else
@@ -204,7 +177,7 @@
 
 - (NSRect) frameOfCellAtColumn: (NSInteger) column row: (NSInteger) row
 {
-    if (column == -1 || ![NSApp isOnLeopardOrBetter])
+    if (column == -1)
         return [self rectOfRow: row];
     else
     {
@@ -271,9 +244,6 @@
     fMouseControlRow = -1;
     fMouseRevealRow = -1;
     fMouseActionRow = -1;
-    
-    if (![NSApp isOnLeopardOrBetter])
-        return;
     
     NSEnumerator * enumerator = [[self trackingAreas] objectEnumerator];
     NSTrackingArea * area;
@@ -387,11 +357,7 @@
         return;
     }
     
-    BOOL pushed;
-    if ([NSApp isOnLeopardOrBetter])
-        pushed = row != -1 && (fMouseActionRow == row || fMouseRevealRow == row || fMouseControlRow == row);
-    else
-        pushed = [self pointInControlRect: point] || [self pointInRevealRect: point] || [self pointInActionRect: point];
+    const BOOL pushed = row != -1 && (fMouseActionRow == row || fMouseRevealRow == row || fMouseControlRow == row);
     
     //if pushing a button, don't change the selected rows
     if (pushed)
@@ -403,7 +369,7 @@
     fSelectedValues = nil;
     
     //avoid weird behavior when showing menu by doing this after mouse down
-    if ([NSApp isOnLeopardOrBetter] ? row != -1 && fMouseActionRow == row : [self pointInActionRect: point])
+    if (row != -1 && fMouseActionRow == row)
     {
         fActionPushedRow = row;
         [self setNeedsDisplayInRect: [self rectOfRow: row]]; //ensure button is pushed down
@@ -882,33 +848,6 @@
 @end
 
 @implementation TorrentTableView (Private)
-
-- (BOOL) pointInControlRect: (NSPoint) point
-{
-    NSInteger row = [self rowAtPoint: point];
-    if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]])
-        return NO;
-    
-    return NSPointInRect(point, [fTorrentCell controlButtonRectForBounds: [self rectOfRow: row]]);
-}
-
-- (BOOL) pointInRevealRect: (NSPoint) point
-{
-    NSInteger row = [self rowAtPoint: point];
-    if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]])
-        return NO;
-    
-    return NSPointInRect(point, [fTorrentCell revealButtonRectForBounds: [self rectOfRow: row]]);
-}
-
-- (BOOL) pointInActionRect: (NSPoint) point
-{
-    NSInteger row = [self rowAtPoint: point];
-    if (row < 0 || ![[self itemAtRow: row] isKindOfClass: [Torrent class]])
-        return NO;
-    
-    return NSPointInRect(point, [fTorrentCell iconRectForBounds: [self rectOfRow: row]]);
-}
 
 - (BOOL) pointInGroupStatusRect: (NSPoint) point
 {

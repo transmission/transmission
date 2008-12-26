@@ -42,7 +42,6 @@
 #import "StatusBarView.h"
 #import "FilterButton.h"
 #import "BonjourController.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
@@ -306,35 +305,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     contentMinSize.height = [[fWindow contentView] frame].size.height - [[fTableView enclosingScrollView] frame].size.height
                                 + [fTableView rowHeight] + [fTableView intercellSpacing].height;
     [fWindow setContentMinSize: contentMinSize];
-    
-    if ([NSApp isOnLeopardOrBetter])
-    {
-        [fWindow setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
-        [[fTotalTorrentsField cell] setBackgroundStyle: NSBackgroundStyleRaised];
+    [fWindow setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
         
-        [[[fActionButton menu] itemAtIndex: 0] setImage: [NSImage imageNamed: NSImageNameActionTemplate]]; //set in nib if Leopard-only
-        
-        [fBottomTigerLine removeFromSuperview];
-        [fStatusTigerField removeFromSuperview];
-        [fStatusTigerImageView removeFromSuperview];
-    }
-    else
-    {
-        [fActionButton setBezelStyle: NSSmallSquareBezelStyle];
-        [fSpeedLimitButton setBezelStyle: NSSmallSquareBezelStyle];
-        
-        //status bar
-        [fStatusButton setHidden: YES];
-        [fStatusTigerField setHidden: NO];
-        [fStatusTigerImageView setHidden: NO];
-        
-        //filter bar
-        [fNoFilterButton sizeToFit];
-        
-        NSRect activeRect = [fActiveFilterButton frame];
-        activeRect.origin.x = NSMaxX([fNoFilterButton frame]) + 1.0;
-        [fActiveFilterButton setFrame: activeRect];
-    }
+    [[fTotalTorrentsField cell] setBackgroundStyle: NSBackgroundStyleRaised];
     
     [self updateGroupsFilterButton];
     
@@ -637,14 +610,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fDisplayedTorrents release];
     
     [fOverlayWindow release];
+    [fBadger release];
     
     [fAutoImportedNames release];
     [fPendingTorrentDownloads release];
     
     //complete cleanup
     tr_sessionClose(fLib);
-    
-    [fBadger release]; //clears dock icon on Tiger
 }
 
 - (void) handleOpenContentsEvent: (NSAppleEventDescriptor *) event replyEvent: (NSAppleEventDescriptor *) replyEvent
@@ -718,10 +690,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self openFiles: [NSArray arrayWithObject: path] addType: ADD_URL forcePath: nil];
     
     //delete the torrent file after opening
-    if ([NSApp isOnLeopardOrBetter])
-        [[NSFileManager defaultManager] removeItemAtPath: path error: NULL];
-    else
-        [[NSFileManager defaultManager] removeFileAtPath: path handler: nil];
+    [[NSFileManager defaultManager] removeItemAtPath: path error: NULL];
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
     if ([fPendingTorrentDownloads count] == 0)
@@ -989,14 +958,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [alert setAlertStyle: NSWarningAlertStyle];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open invalid alert -> button")];
     
-    BOOL onLeopard = [NSApp isOnLeopardOrBetter];
-    if (onLeopard)
-        [alert setShowsSuppressionButton: YES];
-    else
-        [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Open duplicate alert -> button")];
-    
-    NSInteger result = [alert runModal];
-    if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertSecondButtonReturn))
+    [alert runModal];
+    if ([[alert suppressionButton] state] == NSOnState)
         [fDefaults setBool: NO forKey: @"WarningInvalidOpen"];
     [alert release];
 }
@@ -1014,15 +977,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                             "Open duplicate alert -> message")];
     [alert setAlertStyle: NSWarningAlertStyle];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate alert -> button")];
+    [alert setShowsSuppressionButton: YES];
     
-    BOOL onLeopard = [NSApp isOnLeopardOrBetter];
-    if (onLeopard)
-        [alert setShowsSuppressionButton: YES];
-    else
-        [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Open duplicate alert -> button")];
-    
-    NSInteger result = [alert runModal];
-    if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertSecondButtonReturn))
+    [alert runModal];
+    if ([[alert suppressionButton] state])
         [fDefaults setBool: NO forKey: @"WarningDuplicate"];
     [alert release];
 }
@@ -1565,13 +1523,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                             NSLocalizedString(@"UL", "status bar -> status label"), [NSString stringForFileSize: stats.uploadedBytes]];
                 }
                 
-                if ([NSApp isOnLeopardOrBetter])
-                {
-                    [fStatusButton setTitle: statusString];
-                    [self resizeStatusButton];
-                }
-                else
-                    [fStatusTigerField setStringValue: statusString];
+                [fStatusButton setTitle: statusString];
+                [self resizeStatusButton];
             }
         }
 
@@ -1950,21 +1903,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, orderDescriptor, nil];
     }
     
-    //on Tiger add the group sort descriptor to the front
-    if (![NSApp isOnLeopardOrBetter] && [fDefaults boolForKey: @"SortByGroup"])
-    {
-        NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: YES] autorelease];
-        
-        NSMutableArray * temp = [[NSMutableArray alloc] initWithCapacity: [descriptors count]+1];
-        [temp addObject: groupDescriptor];
-        [temp addObjectsFromArray: descriptors];
-        
-        [descriptors release];
-        descriptors = temp;
-    }
-    
     //actually sort
-    if ([fDefaults boolForKey: @"SortByGroup"] && [NSApp isOnLeopardOrBetter])
+    if ([fDefaults boolForKey: @"SortByGroup"])
     {
         NSEnumerator * enumerator = [fDisplayedTorrents objectEnumerator];
         TorrentGroup * group;
@@ -2110,7 +2050,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent setPreviousFinishedPieces: nil];
     
     //place torrents into groups
-    BOOL groupRows = [fDefaults boolForKey: @"SortByGroup"] && [NSApp isOnLeopardOrBetter];
+    BOOL groupRows = [fDefaults boolForKey: @"SortByGroup"];
     if (groupRows)
     {
         NSArray * oldTorrentGroups = nil;
@@ -2407,14 +2347,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         toolTip = [NSLocalizedString(@"Group", "Groups -> Button") stringByAppendingFormat: @": %@", groupName];
     }
     
-    //tiger doesn't have built-in image scaling in buttons
-    if (![NSApp isOnLeopardOrBetter])
-    {
-        icon = [[icon copy] autorelease];
-        [icon setScalesWhenResized: YES];
-        [icon setSize: NSMakeSize(12.0, 12.0)];
-    }
-    
     [[fGroupFilterMenu itemAtIndex: 0] setImage: icon];
     [fGroupsButton setToolTip: toolTip];
 }
@@ -2513,7 +2445,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     fSpeedLimitTimer = [[NSTimer alloc] initWithFireDate: dateToUse interval: 0 target: self selector: @selector(autoSpeedLimit:)
                         userInfo: [NSNumber numberWithBool: nextIsLimit] repeats: NO];
     
-    NSRunLoop * loop = [NSApp isOnLeopardOrBetter] ? [NSRunLoop mainRunLoop] : [NSRunLoop currentRunLoop];
+    NSRunLoop * loop = [NSRunLoop mainRunLoop];
     [loop addTimer: fSpeedLimitTimer forMode: NSDefaultRunLoopMode];
     [loop addTimer: fSpeedLimitTimer forMode: NSModalPanelRunLoopMode];
     [loop addTimer: fSpeedLimitTimer forMode: NSEventTrackingRunLoopMode];
@@ -2731,8 +2663,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (BOOL) outlineView: (NSOutlineView *) outlineView writeItems: (NSArray *) items toPasteboard: (NSPasteboard *) pasteboard
 {
     //only allow reordering of rows if sorting by order
-    if (([fDefaults boolForKey: @"SortByGroup"] && [NSApp isOnLeopardOrBetter])
-        || [[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER])
+    if ([fDefaults boolForKey: @"SortByGroup"] || [[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER])
     {
         NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSet];
         NSEnumerator * enumerator = [items objectEnumerator];
@@ -3453,36 +3384,22 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
-    NSMutableArray * idents = [NSMutableArray arrayWithObjects:
-                                TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_OPEN_WEB,
-                                TOOLBAR_REMOVE, TOOLBAR_PAUSE_RESUME_SELECTED, TOOLBAR_PAUSE_RESUME_ALL,
-                                TOOLBAR_FILTER, TOOLBAR_INFO,
-                                NSToolbarSeparatorItemIdentifier,
-                                NSToolbarSpaceItemIdentifier,
-                                NSToolbarFlexibleSpaceItemIdentifier,
-                                NSToolbarCustomizeToolbarItemIdentifier, nil];
-    
-    //allow quicklook on leopard
-    if ([NSApp isOnLeopardOrBetter])
-        [idents insertObject: TOOLBAR_QUICKLOOK atIndex: 6];
-    
-    return idents;
+    return [NSArray arrayWithObjects:
+            TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_OPEN_WEB, TOOLBAR_REMOVE,
+            TOOLBAR_PAUSE_RESUME_SELECTED, TOOLBAR_PAUSE_RESUME_ALL,
+            TOOLBAR_QUICKLOOK, TOOLBAR_FILTER, TOOLBAR_INFO,
+            NSToolbarSeparatorItemIdentifier,
+            NSToolbarSpaceItemIdentifier,
+            NSToolbarFlexibleSpaceItemIdentifier,
+            NSToolbarCustomizeToolbarItemIdentifier, nil];
 }
 
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
 {
-    NSMutableArray * idents =  [NSMutableArray arrayWithObjects:
-                                TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_REMOVE,
-                                NSToolbarSeparatorItemIdentifier,
-                                TOOLBAR_PAUSE_RESUME_ALL,
-                                NSToolbarFlexibleSpaceItemIdentifier,
-                                TOOLBAR_FILTER, TOOLBAR_INFO, nil];
-    
-    //allow quicklook on leopard
-    if ([NSApp isOnLeopardOrBetter])
-        [idents insertObject: TOOLBAR_QUICKLOOK atIndex: [idents count]-2];
-    
-    return idents;
+    return [NSArray arrayWithObjects:
+            TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_REMOVE, NSToolbarSeparatorItemIdentifier,
+            TOOLBAR_PAUSE_RESUME_ALL, NSToolbarFlexibleSpaceItemIdentifier,
+            TOOLBAR_QUICKLOOK, TOOLBAR_FILTER, TOOLBAR_INFO, nil];
 }
 
 - (BOOL) validateToolbarItem: (NSToolbarItem *) toolbarItem

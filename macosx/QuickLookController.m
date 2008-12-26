@@ -144,7 +144,7 @@ QuickLookController * fQuickLookInstance = nil;
         fMainController = controller;
         fInfoController = infoController;
         
-        //load the QuickLook framework and set the delegate, no point on trying this on Tiger
+        //load the QuickLook framework and set the delegate
         //animation types: 0 = none; 1 = fade; 2 = zoom
         fQuickLookAvailable = [[NSBundle bundleWithPath: @"/System/Library/PrivateFrameworks/QuickLookUI.framework"] load];
         if (fQuickLookAvailable)

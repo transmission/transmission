@@ -27,7 +27,6 @@
 #import "Controller.h"
 #import "GroupsController.h"
 #import "NSStringAdditions.h"
-#import "NSApplicationAdditions.h"
 #import "ExpandedPathToIconTransformer.h"
 
 #define UPDATE_SECONDS 1.0
@@ -164,11 +163,7 @@
         [alert setAlertStyle: NSWarningAlertStyle];
         [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Add torrent -> same name -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Add", "Add torrent -> same name -> button")];
-        
-        if ([NSApp isOnLeopardOrBetter])
-            [alert setShowsSuppressionButton: YES];
-        else
-            [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Add torrent -> same name -> button")];
+        [alert setShowsSuppressionButton: YES];
         
         [alert beginSheetModalForWindow: [self window] modalDelegate: self
             didEndSelector: @selector(sameNameAlertDidEnd:returnCode:contextInfo:) contextInfo: nil];
@@ -308,7 +303,7 @@
 
 - (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
-    if (([NSApp isOnLeopardOrBetter] ? [[alert suppressionButton] state] == NSOnState : returnCode == NSAlertThirdButtonReturn))
+    if ([[alert suppressionButton] state] == NSOnState)
         [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningFolderDataSameName"];
     
     [alert release];

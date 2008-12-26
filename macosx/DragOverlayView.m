@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "DragOverlayView.h"
-#import "NSBezierPathAdditions.h"
 
 #define PADDING 10.0f
 #define ICON_WIDTH 64.0f
@@ -36,7 +35,7 @@
     {
         //create badge
         NSRect badgeRect = NSMakeRect(0.0f, 0.0f, 325.0f, 84.0f);
-        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: badgeRect radius: 15.0f];
+        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: badgeRect xRadius: 15.0f yRadius: 15.0f];
         
         fBackBadge = [[NSImage alloc] initWithSize: badgeRect.size];
         [fBackBadge lockFocus];

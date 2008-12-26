@@ -24,19 +24,6 @@
 
 #import "Badger.h"
 #import "BadgeView.h"
-#import "NSApplicationAdditions.h"
-#import "NSStringAdditions.h"
-
-#define COMPLETED_BOTTOM_PADDING 5.0
-#define SPEED_BOTTOM_PADDING 2.0
-#define SPEED_BETWEEN_PADDING 2.0
-#define BADGE_HEIGHT 30.0
-
-@interface Badger (Private)
-
-- (void) badgeString: (NSString *) string forRect: (NSRect) rect;
-
-@end
 
 @implementation Badger
 
@@ -48,18 +35,9 @@
         
         fCompleted = 0;
         
-        if ([NSApp isOnLeopardOrBetter])
-        {
-            BadgeView * view = [[BadgeView alloc] initWithFrame: [[[NSApp dockTile] contentView] frame] lib: lib];
-            [[NSApp dockTile] setContentView: view];
-            [view release];
-        }
-        else
-        {
-            fQuittingTiger = NO;
-            fSpeedBadge = NO;
-            fCompletedBadged = 0;
-        }
+        BadgeView * view = [[BadgeView alloc] initWithFrame: [[[NSApp dockTile] contentView] frame] lib: lib];
+        [[NSApp dockTile] setContentView: view];
+        [view release];
         
         //change that just impacts the dock badge
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBadge) name: @"DockBadgeChange" object: nil];
@@ -72,155 +50,25 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
-    if (![NSApp isOnLeopardOrBetter])
-        [NSApp setApplicationIconImage: nil]; //needed on 10.4
-    
-    [fDockIcon release];
-    [fAttributes release];
-    
     [super dealloc];
 }
 
 - (void) updateBadge
 {
-    if ([NSApp isOnLeopardOrBetter])
-    {
-        float downloadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
-                                ? tr_sessionGetPieceSpeed(fLib, TR_DOWN) : 0.0f;
-        float uploadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"]
-                            ? tr_sessionGetPieceSpeed(fLib, TR_UP) : 0.0f;
-        
-        //only update if the badged values change
-        if ([(BadgeView *)[[NSApp dockTile] contentView] setRatesWithDownload: downloadRate upload: uploadRate])
-            [[NSApp dockTile] display];
-        
-        return;
-    }
+    float downloadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
+                            ? tr_sessionGetPieceSpeed(fLib, TR_DOWN) : 0.0f;
+    float uploadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"]
+                        ? tr_sessionGetPieceSpeed(fLib, TR_UP) : 0.0f;
     
-    if (fQuittingTiger)
-        return;
-    
-    //set completed badge to top right
-    BOOL completedChange = fCompleted != fCompletedBadged;
-    if (completedChange)
-    {
-        fCompletedBadged = fCompleted;
-        
-        //force image to reload - copy does not work
-        NSImage * icon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
-        NSSize iconSize = [icon size];
-        
-        [fDockIcon release];
-        fDockIcon = [[NSImage alloc] initWithSize: iconSize];
-        [fDockIcon addRepresentation: [icon bestRepresentationForDevice: nil]];
-        [icon release];
-        
-        if (fCompleted > 0)
-        {
-            if (!fBadge)
-                fBadge = [NSImage imageNamed: @"Badge"];
-            
-            NSRect badgeRect;
-            badgeRect.size = [fBadge size];
-            badgeRect.origin.x = iconSize.width - badgeRect.size.width;
-            badgeRect.origin.y = iconSize.height - badgeRect.size.height;
-            
-            [fDockIcon lockFocus];
-            
-            //place badge
-            [fBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
-            
-            //ignore shadow of badge when placing string
-            badgeRect.size.height -= COMPLETED_BOTTOM_PADDING;
-            badgeRect.origin.y += COMPLETED_BOTTOM_PADDING;
-            
-            //place badge text
-            [self badgeString: [NSString stringWithFormat: @"%d", fCompleted] forRect: badgeRect];
-                        
-            [fDockIcon unlockFocus];
-        }
-    }
-    
-    NSImage * dockIcon = nil;
-    BOOL speedBadge = NO;
-    
-    BOOL checkDownload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"],
-        checkUpload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"];
-    if (checkDownload || checkUpload)
-    {
-        //set upload and download rate badges
-        NSString * downloadRateString = nil, * uploadRateString = nil;
-        
-        float downloadRate = checkDownload ? tr_sessionGetPieceSpeed(fLib, TR_DOWN) : 0.0f;
-        float uploadRate = checkUpload ? tr_sessionGetPieceSpeed(fLib, TR_UP) : 0.0f;
-        
-        if (checkDownload && downloadRate >= 0.1)
-            downloadRateString = [NSString stringForSpeedAbbrev: downloadRate];
-        if (checkUpload && uploadRate >= 0.1)
-            uploadRateString = [NSString stringForSpeedAbbrev: uploadRate];
-        
-        speedBadge = uploadRateString || downloadRateString;
-        if (speedBadge)
-        {
-            if (!fDockIcon)
-                fDockIcon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
-            dockIcon = [fDockIcon copy];
-            
-            NSRect badgeRect;
-            badgeRect.size = [[NSImage imageNamed: @"UploadBadge.png"] size];
-            badgeRect.origin = NSZeroPoint;
-            
-            //ignore shadow of badge when placing string
-            NSRect stringRect = badgeRect;
-            stringRect.size.height -= SPEED_BOTTOM_PADDING;
-            stringRect.origin.y += SPEED_BOTTOM_PADDING;
-            
-            [dockIcon lockFocus];
-            
-            if (uploadRateString)
-            {
-                //place badge and text
-                [[NSImage imageNamed: @"UploadBadge.png"] compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
-                [self badgeString: uploadRateString forRect: stringRect];
-            }
-            
-            if (downloadRateString)
-            {
-                //download rate above upload rate
-                if (uploadRateString)
-                {
-                    float spaceBetween = badgeRect.size.height + SPEED_BETWEEN_PADDING;
-                    badgeRect.origin.y += spaceBetween;
-                    stringRect.origin.y += spaceBetween;
-                }
-                
-                //place badge and text
-                [[NSImage imageNamed: @"DownloadBadge.png"] compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
-                [self badgeString: downloadRateString forRect: stringRect];
-            }
-            
-            [dockIcon unlockFocus];
-        }
-    }
-    
-    //update dock badge
-    if (fSpeedBadge || speedBadge || completedChange)
-    {
-        [NSApp setApplicationIconImage: dockIcon ? dockIcon : fDockIcon];
-        [dockIcon release];
-        
-        fSpeedBadge = speedBadge;
-    }
+    //only update if the badged values change
+    if ([(BadgeView *)[[NSApp dockTile] contentView] setRatesWithDownload: downloadRate upload: uploadRate])
+        [[NSApp dockTile] display];
 }
 
 - (void) incrementCompleted
 {
     fCompleted++;
-    
-    if ([NSApp isOnLeopardOrBetter])
-        [[NSApp dockTile] setBadgeLabel: [NSString stringWithFormat: @"%d", fCompleted]];
-    else
-        [self updateBadge];
+    [[NSApp dockTile] setBadgeLabel: [NSString stringWithFormat: @"%d", fCompleted]];
 }
 
 - (void) clearCompleted
@@ -228,75 +76,15 @@
     if (fCompleted != 0)
     {
         fCompleted = 0;
-        if ([NSApp isOnLeopardOrBetter])
-            [[NSApp dockTile] setBadgeLabel: @""];
-        else
-            [self updateBadge];
+        [[NSApp dockTile] setBadgeLabel: @""];
     }
 }
 
 - (void) setQuitting
 {
-    if ([NSApp isOnLeopardOrBetter])
-    {
-        [self clearCompleted];
-        [(BadgeView *)[[NSApp dockTile] contentView] setQuitting];
-        [[NSApp dockTile] display];
-    }
-    else
-    {
-        fQuittingTiger = YES;
-        
-        fSpeedBadge = NO;
-        fCompleted = 0;
-        fCompletedBadged = 0;
-        
-        NSImage * quitIcon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
-        NSRect rect = NSZeroRect;
-        rect.size = [quitIcon size];
-        
-        NSRect badgeRect = NSMakeRect(0.0, (rect.size.height - BADGE_HEIGHT) * 0.5, rect.size.width, BADGE_HEIGHT);
-        
-        [quitIcon lockFocus];
-        
-        [[NSImage imageNamed: @"QuitBadge.png"] compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
-        [self badgeString: NSLocalizedString(@"Quitting", "Dock Badger -> quit message") forRect: badgeRect];
-        
-        [quitIcon unlockFocus];
-        
-        [NSApp setApplicationIconImage: quitIcon];
-        [quitIcon release];
-    }
-}
-
-@end
-
-@implementation Badger (Private)
-
-//dock icon must have locked focus
-- (void) badgeString: (NSString *) string forRect: (NSRect) rect
-{
-    if (!fAttributes)
-    {
-        NSShadow * stringShadow = [[NSShadow alloc] init];
-        [stringShadow setShadowOffset: NSMakeSize(2.0, -2.0)];
-        [stringShadow setShadowBlurRadius: 4.0];
-        
-        fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-            [NSColor whiteColor], NSForegroundColorAttributeName,
-            [NSFont boldSystemFontOfSize: 26.0], NSFontAttributeName, stringShadow, NSShadowAttributeName, nil];
-        
-        [stringShadow release];
-    }
-    
-    NSSize stringSize = [string sizeWithAttributes: fAttributes];
-    
-    //string is in center of image
-    rect.origin.x += (rect.size.width - stringSize.width) * 0.5;
-    rect.origin.y += (rect.size.height - stringSize.height) * 0.5;
-    rect.size = stringSize;
-                        
-    [string drawInRect: rect withAttributes: fAttributes];
+    [self clearCompleted];
+    [(BadgeView *)[[NSApp dockTile] contentView] setQuitting];
+    [[NSApp dockTile] display];
 }
 
 @end

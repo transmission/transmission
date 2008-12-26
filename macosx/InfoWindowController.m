@@ -32,7 +32,6 @@
 #import "TrackerTableView.h"
 #import "PiecesView.h"
 #import "QuickLookController.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #include "utils.h" //tr_getRatio()
 
@@ -167,26 +166,17 @@ typedef enum
                                             sortDescriptorPrototype]]];
     
     //set table header tool tips
-    if ([NSApp isOnLeopardOrBetter])
-    {
-        [[fPeerTable tableColumnWithIdentifier: @"Encryption"] setHeaderToolTip: NSLocalizedString(@"Encrypted Connection",
-                                                                            "inspector -> peer table -> header tool tip")];
-        [[fPeerTable tableColumnWithIdentifier: @"Progress"] setHeaderToolTip: NSLocalizedString(@"Available",
-                                                                            "inspector -> peer table -> header tool tip")];
-        [[fPeerTable tableColumnWithIdentifier: @"UL To"] setHeaderToolTip: NSLocalizedString(@"Uploading To Peer",
-                                                                            "inspector -> peer table -> header tool tip")];
-        [[fPeerTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Peer",
-                                                                            "inspector -> peer table -> header tool tip")];
-        
-        [[fWebSeedTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Web Seed",
-                                                                            "inspector -> web seed table -> header tool tip")];
-    }
-    else
-    {
-        [fTrackerAddRemoveControl sizeToFit];
-        [fTrackerAddRemoveControl setLabel: @"+" forSegment: TRACKER_ADD_TAG];
-        [fTrackerAddRemoveControl setLabel: @"-" forSegment: TRACKER_REMOVE_TAG];
-    }
+    [[fPeerTable tableColumnWithIdentifier: @"Encryption"] setHeaderToolTip: NSLocalizedString(@"Encrypted Connection",
+                                                                        "inspector -> peer table -> header tool tip")];
+    [[fPeerTable tableColumnWithIdentifier: @"Progress"] setHeaderToolTip: NSLocalizedString(@"Available",
+                                                                        "inspector -> peer table -> header tool tip")];
+    [[fPeerTable tableColumnWithIdentifier: @"UL To"] setHeaderToolTip: NSLocalizedString(@"Uploading To Peer",
+                                                                        "inspector -> peer table -> header tool tip")];
+    [[fPeerTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Peer",
+                                                                        "inspector -> peer table -> header tool tip")];
+    
+    [[fWebSeedTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Web Seed",
+                                                                        "inspector -> web seed table -> header tool tip")];
     
     //prepare for animating peer table and web seed table
     NSRect webSeedTableFrame = [[fWebSeedTable enclosingScrollView] frame];
@@ -248,8 +238,7 @@ typedef enum
     {
         if (numberSelected > 0)
         {
-            [fImageView setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter]
-                                    ? NSImageNameMultipleDocuments : @"NSApplicationIcon"]];
+            [fImageView setImage: [NSImage imageNamed: NSImageNameMultipleDocuments]];
             
             [fNameField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Torrents Selected",
                                             "Inspector -> selected torrents"), numberSelected]];
@@ -1763,14 +1752,10 @@ typedef enum
         [alert addButtonWithTitle: NSLocalizedString(@"Remove", "Remove built-in tracker alert -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Remove built-in tracker alert -> button")];
         
-        BOOL onLeopard = [NSApp isOnLeopardOrBetter];
-        if (onLeopard)
-            [alert setShowsSuppressionButton: YES];
-        else
-            [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Remove built-in tracker alert -> button")];
+        [alert setShowsSuppressionButton: YES];
 
         NSInteger result = [alert runModal];
-        if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertThirdButtonReturn))
+        if ([[alert suppressionButton] state] == NSOnState)
             [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningRemoveBuiltInTracker"];
         [alert release];
         

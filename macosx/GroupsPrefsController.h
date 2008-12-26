@@ -24,19 +24,16 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class CTGradient;
-
 @interface GroupsPrefsController : NSObject
 {
     IBOutlet NSTableView * fTableView;
     IBOutlet NSSegmentedControl * fAddRemoveControl;
-
+    
     IBOutlet NSColorWell * fSelectedColorView;
     IBOutlet NSTextField * fSelectedColorNameField;
     IBOutlet NSButton * fCustomLocationEnableCheck;
     IBOutlet NSPopUpButton * fCustomLocationPopUp;
-
-    IBOutlet NSView * fGroupRulesPrefsContainer;
+    
     IBOutlet NSButton * fAutoAssignRulesEnableCheck;
     IBOutlet NSButton * fAutoAssignRulesEditButton;
     

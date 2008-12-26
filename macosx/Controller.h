@@ -36,7 +36,6 @@
 @class TorrentTableView;
 @class StatusBarView;
 @class FilterButton;
-@class MenuLabel;
 
 typedef enum
 {
@@ -67,15 +66,11 @@ typedef enum
     NSTimer                         * fTimer;
     
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
-    
-    IBOutlet NSBox                  * fBottomTigerLine;
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
     IBOutlet NSTextField            * fTotalTorrentsField;
     
     IBOutlet StatusBarView          * fStatusBar;
     IBOutlet NSButton               * fStatusButton;
-    IBOutlet MenuLabel              * fStatusTigerField;
-    IBOutlet NSImageView            * fStatusTigerImageView;
     IBOutlet NSTextField            * fTotalDLField, * fTotalULField;
     IBOutlet NSImageView            * fTotalDLImageView;
     

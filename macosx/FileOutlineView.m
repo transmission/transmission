@@ -28,7 +28,6 @@
 #import "Torrent.h"
 #import "FileListNode.h"
 #import "QuickLookController.h"
-#import "CTGradient.h"
 
 @implementation FileOutlineView
 
@@ -47,15 +46,15 @@
     
     NSColor * endingColor = [NSColor colorWithCalibratedRed: 217.0/255.0 green: 250.0/255.0 blue: 211.0/255.0 alpha: 1.0];
     NSColor * beginningColor = [endingColor blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
-    fHighPriorityGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
+    fHighPriorityGradient = [[NSGradient alloc] initWithStartingColor: beginningColor endingColor: endingColor];
     
     endingColor = [NSColor colorWithCalibratedRed: 255.0/255.0 green: 243.0/255.0 blue: 206.0/255.0 alpha: 1.0];
     beginningColor = [endingColor blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
-    fLowPriorityGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
+    fLowPriorityGradient = [[NSGradient alloc] initWithStartingColor: beginningColor endingColor: endingColor];
     
     endingColor = [NSColor colorWithCalibratedRed: 225.0/255.0 green: 218.0/255.0 blue: 255.0/255.0 alpha: 1.0];
     beginningColor = [endingColor blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
-    fMixedPriorityGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
+    fMixedPriorityGradient = [[NSGradient alloc] initWithStartingColor: beginningColor endingColor: endingColor];
     
     fMouseRow = -1;
 }
@@ -185,7 +184,7 @@
         
         if ([fTorrent checkForFiles: indexes] != NSOffState)
         {
-            CTGradient * gradient = nil;
+            NSGradient * gradient = nil;
             
             NSSet * priorities = [fTorrent filePrioritiesForIndexes: indexes];
             int count = [priorities count];
@@ -209,7 +208,7 @@
             {
                 NSRect rect = [self rectOfRow: row];
                 rect.size.height -= 1.0;
-                [gradient fillRect: rect angle: 90];
+                [gradient drawInRect: rect angle: 90];
             }
         }
     }

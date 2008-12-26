@@ -25,7 +25,6 @@
 #import "PiecesView.h"
 #import "Torrent.h"
 #import "InfoWindowController.h"
-#import "CTGradient.h"
 #import "utils.h"
 
 #define MAX_ACROSS 18
@@ -47,9 +46,10 @@
     fBack = [[NSImage alloc] initWithSize: [self bounds].size];
     
     [fBack lockFocus];
-    CTGradient * gradient = [CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedWhite: 0.0f alpha: 0.4f]
+    NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [NSColor colorWithCalibratedWhite: 0.0f alpha: 0.4f]
                                 endingColor: [NSColor colorWithCalibratedWhite: 0.2f alpha: 0.4f]];
-    [gradient fillRect: [self bounds] angle: 90.0f];
+    [gradient drawInRect: [self bounds] angle: 90.0f];
+    [gradient release];
     [fBack unlockFocus];
     
     //store box colors

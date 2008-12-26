@@ -26,7 +26,6 @@
 #import "BlocklistDownloaderViewController.h"
 #import "BlocklistScheduler.h"
 #import "PrefsController.h"
-#import "NSApplicationAdditions.h"
 
 #define LIST_URL @"http://download.m0k.org/transmission/files/level1.gz"
 #define DESTINATION [NSTemporaryDirectory() stringByAppendingPathComponent: @"level1.gz"]
@@ -124,11 +123,7 @@ BlocklistDownloader * fDownloader = nil;
 - (void) downloadDidFinish: (NSURLDownload *) download
 {
     fState = BLOCKLIST_DL_PROCESSING;
-    
-    if ([NSApp isOnLeopardOrBetter])
-        [self performSelectorInBackground: @selector(finishDownloadSuccess) withObject: nil];
-    else
-        [self finishDownloadSuccess];
+    [self performSelectorInBackground: @selector(finishDownloadSuccess) withObject: nil];
 }
 
 @end
@@ -157,10 +152,7 @@ BlocklistDownloader * fDownloader = nil;
     tr_blocklistSetContent([PrefsController handle], [DESTINATION UTF8String]);
     
     //delete downloaded file
-    if ([NSApp isOnLeopardOrBetter])
-        [[NSFileManager defaultManager] removeItemAtPath: DESTINATION error: NULL];
-    else
-        [[NSFileManager defaultManager] removeFileAtPath: DESTINATION handler: nil];
+    [[NSFileManager defaultManager] removeItemAtPath: DESTINATION error: NULL];
     
     [fViewController setFinished];
     

@@ -25,11 +25,8 @@
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
 #import "GroupsController.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
-#import "NSBezierPathAdditions.h"
 #import "ProgressGradients.h"
-#import "CTGradient.h"
 
 #define BAR_HEIGHT 12.0f
 
@@ -294,8 +291,7 @@
     }
     else;
     
-    if ([NSApp isOnLeopardOrBetter])
-        [controlView updateTrackingAreas];
+    [controlView updateTrackingAreas];
     
     return YES;
 }
@@ -399,16 +395,17 @@
                 * darkGroupColor = [groupColor blendedColorWithFraction: 0.2f ofColor: [NSColor whiteColor]];
         
         //border
-        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: groupRect radius: radius];
+        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: groupRect xRadius: radius yRadius: radius];
         [darkGroupColor set];
         [bp setLineWidth: 2.0f];
         [bp stroke];
         
         //inside
-        bp = [NSBezierPath bezierPathWithRoundedRect: groupRect radius: radius];
-        CTGradient * gradient = [CTGradient gradientWithBeginningColor: [groupColor blendedColorWithFraction: 0.7f
+        bp = [NSBezierPath bezierPathWithRoundedRect: groupRect xRadius: radius yRadius: radius];
+        NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [groupColor blendedColorWithFraction: 0.7f
                                     ofColor: [NSColor whiteColor]] endingColor: darkGroupColor];
-        [gradient fillBezierPath: bp angle: 90.0f];
+        [gradient drawInBezierPath: bp angle: 90.0f];
+        [gradient release];
     }
     
     //error image
@@ -589,7 +586,7 @@
             noIncludeRect.origin.x += barRect.size.width - rightNoIncludeWidth;
             noIncludeRect.size.width = rightNoIncludeWidth;
             
-            [[ProgressGradients progressLightGrayGradient] fillRect: noIncludeRect angle: 90];
+            [[ProgressGradients progressLightGrayGradient] drawInRect: noIncludeRect angle: 90];
         }
         
         if (rightWidth > 0)
@@ -606,7 +603,7 @@
                     notAvailableRect.origin.x += leftWidth + rightWidth;
                     notAvailableRect.size.width = notAvailableWidth;
                     
-                    [[ProgressGradients progressRedGradient] fillRect: notAvailableRect angle: 90];
+                    [[ProgressGradients progressRedGradient] drawInRect: notAvailableRect angle: 90];
                 }
             }
             
@@ -616,7 +613,7 @@
                 includeRect.origin.x += leftWidth;
                 includeRect.size.width = rightWidth;
                 
-                [[ProgressGradients progressWhiteGradient] fillRect: includeRect angle: 90];
+                [[ProgressGradients progressWhiteGradient] drawInRect: includeRect angle: 90];
             }
         }
     }
@@ -629,7 +626,7 @@
         if ([torrent isActive])
         {
             if ([torrent isChecking])
-                [[ProgressGradients progressYellowGradient] fillRect: completeRect angle: 90];
+                [[ProgressGradients progressYellowGradient] drawInRect: completeRect angle: 90];
             else if ([torrent isSeeding])
             {
                 NSInteger ratioLeftWidth = leftWidth * (1.0f - [torrent progressStopRatio]);
@@ -641,30 +638,30 @@
                     ratioLeftRect.origin.x += leftWidth;
                     ratioLeftRect.size.width = ratioLeftWidth;
                     
-                    [[ProgressGradients progressLightGreenGradient] fillRect: ratioLeftRect angle: 90];
+                    [[ProgressGradients progressLightGreenGradient] drawInRect: ratioLeftRect angle: 90];
                 }
                 
                 if (leftWidth > 0)
                 {
                     completeRect.size.width = leftWidth;
                     
-                    [[ProgressGradients progressGreenGradient] fillRect: completeRect angle: 90];
+                    [[ProgressGradients progressGreenGradient] drawInRect: completeRect angle: 90];
                 }
             }
             else
-                [[ProgressGradients progressBlueGradient] fillRect: completeRect angle: 90];
+                [[ProgressGradients progressBlueGradient] drawInRect: completeRect angle: 90];
         }
         else
         {
             if ([torrent waitingToStart])
             {
                 if ([torrent progressLeft] <= 0.0f)
-                    [[ProgressGradients progressDarkGreenGradient] fillRect: completeRect angle: 90];
+                    [[ProgressGradients progressDarkGreenGradient] drawInRect: completeRect angle: 90];
                 else
-                    [[ProgressGradients progressDarkBlueGradient] fillRect: completeRect angle: 90];
+                    [[ProgressGradients progressDarkBlueGradient] drawInRect: completeRect angle: 90];
             }
             else
-                [[ProgressGradients progressGrayGradient] fillRect: completeRect angle: 90];
+                [[ProgressGradients progressGrayGradient] drawInRect: completeRect angle: 90];
         }
     }
 }

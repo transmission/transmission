@@ -28,7 +28,6 @@
 #import "FilePriorityCell.h"
 #import "FileListNode.h"
 #import "QuickLookController.h"
-#import "NSApplicationAdditions.h"
 
 #define ROW_SMALL_HEIGHT 18.0f
 
@@ -59,13 +58,10 @@ typedef enum
     [fOutline setTarget: self];
     
     //set table header tool tips
-    if ([NSApp isOnLeopardOrBetter])
-    {
-        [[fOutline tableColumnWithIdentifier: @"Check"] setHeaderToolTip: NSLocalizedString(@"Download",
-                                                                            "file table -> header tool tip")];
-        [[fOutline tableColumnWithIdentifier: @"Priority"] setHeaderToolTip: NSLocalizedString(@"Priority",
-                                                                            "file table -> header tool tip")];
-    }
+    [[fOutline tableColumnWithIdentifier: @"Check"] setHeaderToolTip: NSLocalizedString(@"Download",
+                                                                        "file table -> header tool tip")];
+    [[fOutline tableColumnWithIdentifier: @"Priority"] setHeaderToolTip: NSLocalizedString(@"Priority",
+                                                                        "file table -> header tool tip")];
     
     [fOutline setMenu: [self menu]];
     

@@ -25,13 +25,12 @@
 #import <Cocoa/Cocoa.h>
 
 @class Torrent;
-@class CTGradient;
 
 @interface FileOutlineView : NSOutlineView
 {
     Torrent * fTorrent;
     
-    CTGradient * fHighPriorityGradient, * fLowPriorityGradient, * fMixedPriorityGradient;
+    NSGradient * fHighPriorityGradient, * fLowPriorityGradient, * fMixedPriorityGradient;
     
     int fMouseRow;
 }

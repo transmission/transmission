@@ -25,7 +25,6 @@
 #import "Torrent.h"
 #import "GroupsController.h"
 #import "FileListNode.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "utils.h" //tr_httpIsValidURL
 
@@ -556,10 +555,7 @@ int trashDataFile(const char * filename)
     NSString * volumeName;
     if ((volumeName = [[fileManager componentsToDisplayForPath: downloadFolder] objectAtIndex: 0]))
     {
-        BOOL onLeopard = [NSApp isOnLeopardOrBetter];
-        
-        NSDictionary * systemAttributes = onLeopard ? [fileManager attributesOfFileSystemForPath: downloadFolder error: NULL]
-                                            : [fileManager fileSystemAttributesAtPath: downloadFolder];
+        NSDictionary * systemAttributes = [fileManager attributesOfFileSystemForPath: downloadFolder error: NULL];
         uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
         
         //if the remaining space is greater than the size left, then there is enough space regardless of preallocation
@@ -575,17 +571,12 @@ int trashDataFile(const char * filename)
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent disk space alert -> button")];
             [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent disk space alert -> button")];
             
-            if (onLeopard)
-            {
-                [alert setShowsSuppressionButton: YES];
-                [[alert suppressionButton] setTitle: NSLocalizedString(@"Do not check disk space again",
-                                                        "Torrent disk space alert -> button")];
-            }
-            else
-                [alert addButtonWithTitle: NSLocalizedString(@"Always Download", "Torrent disk space alert -> button")];
+            [alert setShowsSuppressionButton: YES];
+            [[alert suppressionButton] setTitle: NSLocalizedString(@"Do not check disk space again",
+                                                    "Torrent disk space alert -> button")];
 
             NSInteger result = [alert runModal];
-            if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertThirdButtonReturn))
+            if ([[alert suppressionButton] state] == NSOnState)
                 [fDefaults setBool: NO forKey: @"WarningRemainingSpace"];
             [alert release];
             
@@ -1987,24 +1978,15 @@ int trashDataFile(const char * filename)
         files: [NSArray arrayWithObject: [path lastPathComponent]] tag: nil])
     {
         //if cannot trash, just delete it (will work if it's on a remote volume)
-        if ([NSApp isOnLeopardOrBetter])
-        {
-            NSError * error;
-            if (![[NSFileManager defaultManager] removeItemAtPath: path error: &error])
-                NSLog(@"Could not trash %@: %@", path, [error localizedDescription]);
-        }
-        else
-        {
-            if (![[NSFileManager defaultManager] removeFileAtPath: path handler: nil])
-                NSLog(@"Could not trash %@", path);
-        }
+        NSError * error;
+        if (![[NSFileManager defaultManager] removeItemAtPath: path error: &error])
+            NSLog(@"Could not trash %@: %@", path, [error localizedDescription]);
     }
 }
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path
 {
-    if ([NSApp isOnLeopardOrBetter])
-        CSBackupSetItemExcluded((CFURLRef)[NSURL fileURLWithPath: path], exclude, true);
+    CSBackupSetItemExcluded((CFURLRef)[NSURL fileURLWithPath: path], exclude, true);
 }
 
 @end

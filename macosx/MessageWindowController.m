@@ -24,7 +24,6 @@
 
 #import "MessageWindowController.h"
 #import "NSStringAdditions.h"
-#import "NSApplicationAdditions.h"
 #import <transmission.h>
 
 #define LEVEL_ERROR 0
@@ -67,8 +66,7 @@
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeColumn)
         name: @"NSTableViewColumnDidResizeNotification" object: fMessageTable];
     
-    if ([NSApp isOnLeopardOrBetter])
-        [window setContentBorderThickness: [[fMessageTable enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
+    [window setContentBorderThickness: [[fMessageTable enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
     
     //initially sort peer table by date
     if ([[fMessageTable sortDescriptors] count] == 0)

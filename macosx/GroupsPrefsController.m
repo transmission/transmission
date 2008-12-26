@@ -24,7 +24,6 @@
 
 #import "GroupsPrefsController.h"
 #import "GroupsController.h"
-#import "NSApplicationAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 
@@ -44,14 +43,6 @@
 - (void) awakeFromNib
 {
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: GROUP_TABLE_VIEW_DATA_TYPE]];
-    
-    if (![NSApp isOnLeopardOrBetter])
-    {
-        [fAddRemoveControl sizeToFit];
-        [fAddRemoveControl setLabel: @"+" forSegment: ADD_TAG];
-        [fAddRemoveControl setLabel: @"-" forSegment: REMOVE_TAG];
-        [fGroupRulesPrefsContainer setHidden: YES]; //get rid of container when 10.5-only
-    }
     
     [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
     

@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "NSStringAdditions.h"
-#import "NSApplicationAdditions.h"
 #import <transmission.h>
 
 @implementation NSString (NSStringAdditions)
@@ -147,15 +146,13 @@
 
 - (NSComparisonResult) compareFinder: (NSString *) string
 {
-    const NSInteger comparisonOptions = [NSApp isOnLeopardOrBetter]
-                                ? (NSCaseInsensitiveSearch | NSNumericSearch | NSWidthInsensitiveSearch | NSForcedOrderingSearch)
-                                : (NSCaseInsensitiveSearch | NSNumericSearch);
+    const NSInteger comparisonOptions = NSCaseInsensitiveSearch | NSNumericSearch | NSWidthInsensitiveSearch | NSForcedOrderingSearch;
     return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
 }
 
 - (NSComparisonResult) compareNumeric: (NSString *) string
 {
-    const NSInteger comparisonOptions = [NSApp isOnLeopardOrBetter] ? (NSNumericSearch | NSForcedOrderingSearch) : NSNumericSearch;
+    const NSInteger comparisonOptions = NSNumericSearch | NSForcedOrderingSearch;
     return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
 }
 

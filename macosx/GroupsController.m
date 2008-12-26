@@ -23,9 +23,6 @@
  *****************************************************************************/
 
 #import "GroupsController.h"
-#import "CTGradient.h"
-#import "NSBezierPathAdditions.h"
-#import "NSApplicationAdditions.h"
 
 #define ICON_WIDTH 16.0
 #define ICON_WIDTH_SMALL 12.0
@@ -209,9 +206,6 @@ GroupsController * fGroupsInstance = nil;
 
 - (BOOL) usesAutoAssignRulesForIndex: (NSInteger) index
 {
-    if (![NSApp isOnLeopardOrBetter])
-        return NO;
-    
     NSInteger orderIndex = [self rowValueForIndex: index];
     if (orderIndex == -1)
         return NO;
@@ -410,7 +404,7 @@ GroupsController * fGroupsInstance = nil;
     
     NSRect rect = NSMakeRect(0.0, 0.0, ICON_WIDTH, ICON_WIDTH);
     
-    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: rect radius: 3.0];
+    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: rect xRadius: 3.0 yRadius: 3.0];
     NSImage * icon = [[NSImage alloc] initWithSize: rect.size];
     
     NSColor * color = [dict objectForKey: @"Color"];
@@ -418,15 +412,17 @@ GroupsController * fGroupsInstance = nil;
     [icon lockFocus];
     
     //border
-    CTGradient * gradient = [CTGradient gradientWithBeginningColor: [color blendedColorWithFraction: 0.45 ofColor:
+    NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [color blendedColorWithFraction: 0.45 ofColor:
                                 [NSColor whiteColor]] endingColor: color];
-    [gradient fillBezierPath: bp angle: 270.0];
+    [gradient drawInBezierPath: bp angle: 270.0];
+    [gradient release];
     
     //inside
-    bp = [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(rect, 1.0, 1.0) radius: 3.0];
-    gradient = [CTGradient gradientWithBeginningColor: [color blendedColorWithFraction: 0.75 ofColor: [NSColor whiteColor]]
+    bp = [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(rect, 1.0, 1.0) xRadius: 3.0 yRadius: 3.0];
+    gradient = [[NSGradient alloc] initWithStartingColor: [color blendedColorWithFraction: 0.75 ofColor: [NSColor whiteColor]]
                 endingColor: [color blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]]];
-    [gradient fillBezierPath: bp angle: 270.0];
+    [gradient drawInBezierPath: bp angle: 270.0];
+    [gradient release];
     
     [icon unlockFocus];
     
