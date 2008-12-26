@@ -107,9 +107,9 @@
     const NSUInteger count = [priorities count];
     if (fHoverRow && count > 0)
     {
-        [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_LOW]] forSegment: 0];
-        [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_NORMAL]] forSegment: 1];
-        [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_HIGH]] forSegment: 2];
+        [super setSelected: [priorities containsObject: [NSNumber numberWithInteger: TR_PRI_LOW]] forSegment: 0];
+        [super setSelected: [priorities containsObject: [NSNumber numberWithInteger: TR_PRI_NORMAL]] forSegment: 1];
+        [super setSelected: [priorities containsObject: [NSNumber numberWithInteger: TR_PRI_HIGH]] forSegment: 2];
         
         [super drawWithFrame: cellFrame inView: controlView];
     }
@@ -122,7 +122,7 @@
             image = [NSImage imageNamed: @"PriorityMixed.png"];
         else
         {
-            switch ([[priorities anyObject] intValue])
+            switch ([[priorities anyObject] integerValue])
             {
                 case TR_PRI_NORMAL:
                     image = [NSImage imageNamed: @"PriorityNormal.png"];

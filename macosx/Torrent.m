@@ -1542,7 +1542,7 @@ int trashDataFile(const char * filename)
             normal = YES;
         }
         
-        [priorities addObject: [NSNumber numberWithInt: priority]];
+        [priorities addObject: [NSNumber numberWithInteger: priority]];
         if (low && normal && high)
             break;
     }
