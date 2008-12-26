@@ -2130,6 +2130,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             NSInteger groupValue = [torrent groupValue];
             if (groupValue != lastGroupValue)
             {
+                lastGroupValue = groupValue;
+                
                 TorrentGroup * group = nil;
                 
                 //try to see if the group already exists
@@ -2149,8 +2151,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 [fDisplayedTorrents addObject: group];
                 
                 groupTorrents = [group torrents];
-                
-                lastGroupValue = groupValue;
             }
             
             [groupTorrents addObject: torrent];
