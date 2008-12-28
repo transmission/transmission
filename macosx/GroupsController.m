@@ -433,7 +433,7 @@ GroupsController * fGroupsInstance = nil;
     BOOL eval = NO;
     @try
     {
-        eval = [predicate evaluateWithObject:torrent];
+        eval = [predicate evaluateWithObject: torrent];
     }
     @catch (NSException * exception)
     {
