@@ -1806,7 +1806,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) sortTorrentsIgnoreSelected
 {
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
-    BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
+    const BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
     
     NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: asc] autorelease];
     
@@ -1885,7 +1885,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     //get all the torrents in the table
     NSMutableArray * previousTorrents;
-    if ([fDisplayedTorrents count] > 0 && ![[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [Torrent class]])
+    if ([fDisplayedTorrents count] > 0 && [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
     {
         previousTorrents = [NSMutableArray array];
         
@@ -1918,14 +1918,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     BOOL filterText = [searchString length] > 0,
         filterTracker = filterText && [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER];
     
-    NSMutableIndexSet * indexes = [NSMutableIndexSet indexSet];
+    NSMutableArray * allTorrents = [NSMutableArray arrayWithCapacity: [fTorrents count]];
     
     //get count of each type
-    NSInteger index = -1;
     for (Torrent * torrent in fTorrents)
     {
-        index++;
-        
         //check status
         if ([torrent isActive] && ![torrent isCheckingWaiting])
         {
@@ -1987,10 +1984,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             }
         }
         
-        [indexes addIndex: index];
+        [allTorrents addObject: torrent];
     }
-    
-    NSArray * allTorrents = [fTorrents objectsAtIndexes: indexes];
     
     //set button tooltips
     [fNoFilterButton setCount: [fTorrents count]];
@@ -2015,7 +2010,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fDisplayedTorrents removeAllObjects];
         
         NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: YES] autorelease];
-        allTorrents = [allTorrents sortedArrayUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
+        [allTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
         
         NSMutableArray * groupTorrents;
         NSInteger lastGroupValue = -2, currentOldGroupIndex = 0;
