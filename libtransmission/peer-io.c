@@ -31,6 +31,7 @@
 #include "list.h"
 #include "net.h"
 #include "peer-io.h"
+#include "platform.h" /* MAX_STACK_ARRAY_SIZE */
 #include "trevent.h"
 #include "utils.h"
 
@@ -769,7 +770,7 @@ tr_peerIoWriteBytes( tr_peerIo       * io,
                      const void      * bytes,
                      size_t            byteCount )
 {
-    uint8_t * tmp;
+    uint8_t tmp[MAX_STACK_ARRAY_SIZE];
 
     switch( io->encryptionMode )
     {
@@ -778,10 +779,14 @@ tr_peerIoWriteBytes( tr_peerIo       * io,
             break;
 
         case PEER_ENCRYPTION_RC4:
-            tmp = tr_new( uint8_t, byteCount );
-            tr_cryptoEncrypt( io->crypto, byteCount, bytes, tmp );
-            evbuffer_add( outbuf, tmp, byteCount );
-            tr_free( tmp );
+            evbuffer_expand( outbuf, byteCount );
+            while( byteCount > 0 ) {
+                const size_t thisPass = MIN( byteCount, sizeof( tmp ) );
+                tr_cryptoEncrypt( io->crypto, thisPass, bytes, tmp );
+                evbuffer_add( outbuf, tmp, thisPass );
+                bytes += thisPass;
+                byteCount -= thisPass;
+            }
             break;
 
         default:
@@ -884,13 +889,16 @@ tr_peerIoDrain( tr_peerIo       * io,
                 struct evbuffer * inbuf,
                 size_t            byteCount )
 {
-    uint8_t * tmp;
+    uint8_t tmp[MAX_STACK_ARRAY_SIZE];
 
     assert( tr_isPeerIo( io ) );
 
-    tmp = tr_new( uint8_t, byteCount );
-    tr_peerIoReadBytes( io, inbuf, tmp, byteCount );
-    tr_free( tmp );
+    while( byteCount > 0 )
+    {
+        const size_t thisPass = MIN( byteCount, sizeof( tmp ) );
+        tr_peerIoReadBytes( io, inbuf, tmp, thisPass );
+        byteCount -= thisPass;
+    }
 }
 
 int

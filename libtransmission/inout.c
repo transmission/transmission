@@ -229,7 +229,7 @@ recalculateHash( const tr_torrent * tor,
 
     while( bytesLeft )
     {
-        uint8_t   buf[8192];
+        uint8_t buf[MAX_STACK_ARRAY_SIZE];
         const int len = MIN( bytesLeft, sizeof( buf ) );
         success = !tr_ioRead( tor, pieceIndex, offset, len, buf );
         if( !success )
