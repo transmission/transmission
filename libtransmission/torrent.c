@@ -537,7 +537,7 @@ torrentRealInit( tr_session      * session,
 
     tor->error   = 0;
 
-    tor->checkedPieces = tr_bitfieldNew( tor->info.pieceCount );
+    tr_bitfieldConstruct( &tor->checkedPieces, tor->info.pieceCount );
     tr_torrentUncheck( tor );
 
     tor->addedDate = time( NULL ); /* this is a default value to be
@@ -1063,7 +1063,7 @@ freeTorrent( tr_torrent * tor )
     tr_trackerFree( tor->tracker );
     tor->tracker = NULL;
 
-    tr_bitfieldFree( tor->checkedPieces );
+    tr_bitfieldDestruct( &tor->checkedPieces );
 
     tr_free( tor->downloadDir );
     tr_free( tor->peer_id );
@@ -1601,7 +1601,7 @@ tr_bool
 tr_torrentIsPieceChecked( const tr_torrent * tor,
                           tr_piece_index_t   piece )
 {
-    return tr_bitfieldHas( tor->checkedPieces, piece );
+    return tr_bitfieldHas( &tor->checkedPieces, piece );
 }
 
 void
@@ -1610,9 +1610,9 @@ tr_torrentSetPieceChecked( tr_torrent        * tor,
                            tr_bool             isChecked )
 {
     if( isChecked )
-        tr_bitfieldAdd( tor->checkedPieces, piece );
+        tr_bitfieldAdd( &tor->checkedPieces, piece );
     else
-        tr_bitfieldRem( tor->checkedPieces, piece );
+        tr_bitfieldRem( &tor->checkedPieces, piece );
 }
 
 void
@@ -1625,9 +1625,9 @@ tr_torrentSetFileChecked( tr_torrent *    tor,
     const tr_piece_index_t end = file->lastPiece + 1;
 
     if( isChecked )
-        tr_bitfieldAddRange ( tor->checkedPieces, begin, end );
+        tr_bitfieldAddRange ( &tor->checkedPieces, begin, end );
     else
-        tr_bitfieldRemRange ( tor->checkedPieces, begin, end );
+        tr_bitfieldRemRange ( &tor->checkedPieces, begin, end );
 }
 
 tr_bool
@@ -1650,14 +1650,13 @@ tr_torrentIsFileChecked( const tr_torrent * tor,
 void
 tr_torrentUncheck( tr_torrent * tor )
 {
-    tr_bitfieldRemRange ( tor->checkedPieces, 0, tor->info.pieceCount );
+    tr_bitfieldRemRange ( &tor->checkedPieces, 0, tor->info.pieceCount );
 }
 
 int
 tr_torrentCountUncheckedPieces( const tr_torrent * tor )
 {
-    return tor->info.pieceCount - tr_bitfieldCountTrueBits(
-               tor->checkedPieces );
+    return tor->info.pieceCount - tr_bitfieldCountTrueBits( &tor->checkedPieces );
 }
 
 time_t*

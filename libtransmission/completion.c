@@ -38,10 +38,10 @@ struct tr_completion
     tr_torrent *    tor;
 
     /* do we have this block? */
-    tr_bitfield *  blockBitfield;
+    tr_bitfield    blockBitfield;
 
     /* do we have this piece? */
-    tr_bitfield *  pieceBitfield;
+    tr_bitfield    pieceBitfield;
 
     /* a block is complete if and only if we have it */
     uint16_t *  completeBlocks;
@@ -63,8 +63,8 @@ struct tr_completion
 static void
 tr_cpReset( tr_completion * cp )
 {
-    tr_bitfieldClear( cp->pieceBitfield );
-    tr_bitfieldClear( cp->blockBitfield );
+    tr_bitfieldClear( &cp->pieceBitfield );
+    tr_bitfieldClear( &cp->blockBitfield );
     memset( cp->completeBlocks, 0,
             sizeof( uint16_t ) * cp->tor->info.pieceCount );
     cp->sizeNow = 0;
@@ -78,9 +78,9 @@ tr_cpInit( tr_torrent * tor )
     tr_completion * cp  = tr_new( tr_completion, 1 );
 
     cp->tor             = tor;
-    cp->blockBitfield   = tr_bitfieldNew( tor->blockCount );
-    cp->pieceBitfield   = tr_bitfieldNew( tor->info.pieceCount );
     cp->completeBlocks  = tr_new( uint16_t, tor->info.pieceCount );
+    tr_bitfieldConstruct( &cp->blockBitfield, tor->blockCount );
+    tr_bitfieldConstruct( &cp->pieceBitfield, tor->info.pieceCount );
     tr_cpReset( cp );
     return cp;
 }
@@ -88,9 +88,9 @@ tr_cpInit( tr_torrent * tor )
 void
 tr_cpClose( tr_completion * cp )
 {
-    tr_free        ( cp->completeBlocks );
-    tr_bitfieldFree( cp->pieceBitfield );
-    tr_bitfieldFree( cp->blockBitfield );
+    tr_free( cp->completeBlocks );
+    tr_bitfieldDestruct( &cp->pieceBitfield );
+    tr_bitfieldDestruct( &cp->blockBitfield );
     tr_free        ( cp );
 }
 
@@ -155,7 +155,7 @@ tr_cpPieceIsComplete( const tr_completion * cp,
 const tr_bitfield *
 tr_cpPieceBitfield( const tr_completion * cp )
 {
-    return cp->pieceBitfield;
+    return &cp->pieceBitfield;
 }
 
 void
@@ -193,15 +193,15 @@ tr_cpPieceRem( tr_completion *  cp,
     cp->sizeWhenDoneIsDirty = 1;
     cp->haveValidIsDirty = 1;
     cp->completeBlocks[piece] = 0;
-    tr_bitfieldRemRange ( cp->blockBitfield, start, end );
-    tr_bitfieldRem( cp->pieceBitfield, piece );
+    tr_bitfieldRemRange ( &cp->blockBitfield, start, end );
+    tr_bitfieldRem( &cp->pieceBitfield, piece );
 }
 
 int
 tr_cpBlockIsComplete( const tr_completion * cp,
                       tr_block_index_t      block )
 {
-    return tr_bitfieldHas( cp->blockBitfield, block );
+    return tr_bitfieldHas( &cp->blockBitfield, block );
 }
 
 void
@@ -219,9 +219,9 @@ tr_cpBlockAdd( tr_completion *  cp,
         ++cp->completeBlocks[piece];
 
         if( tr_cpPieceIsComplete( cp, piece ) )
-            tr_bitfieldAdd( cp->pieceBitfield, piece );
+            tr_bitfieldAdd( &cp->pieceBitfield, piece );
 
-        tr_bitfieldAdd( cp->blockBitfield, block );
+        tr_bitfieldAdd( &cp->blockBitfield, block );
 
         cp->sizeNow += blockSize;
 
@@ -234,11 +234,10 @@ const tr_bitfield *
 tr_cpBlockBitfield( const tr_completion * cp )
 {
     assert( cp );
-    assert( cp->blockBitfield );
-    assert( cp->blockBitfield->bits );
-    assert( cp->blockBitfield->bitCount );
+    assert( cp->blockBitfield.bits );
+    assert( cp->blockBitfield.bitCount );
 
-    return cp->blockBitfield;
+    return &cp->blockBitfield;
 }
 
 int
@@ -249,7 +248,6 @@ tr_cpBlockBitfieldSet( tr_completion * cp,
 
     assert( cp );
     assert( bitfield );
-    assert( cp->blockBitfield );
 
     if( tr_bitfieldTestFast( bitfield, cp->tor->blockCount - 1 ) )
     {

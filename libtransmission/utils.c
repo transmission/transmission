@@ -746,14 +746,24 @@ tr_strstrip( char * str )
 ****/
 
 tr_bitfield*
+tr_bitfieldConstruct( tr_bitfield * b, size_t bitCount )
+{
+    b->bitCount = bitCount;
+    b->byteCount = ( bitCount + 7u ) / 8u;
+    b->bits = tr_new0( uint8_t, b->byteCount );
+    return b;
+}
+
+void
+tr_bitfieldDestruct( tr_bitfield * b )
+{
+    tr_free( b->bits );
+}
+
+tr_bitfield*
 tr_bitfieldNew( size_t bitCount )
 {
-    tr_bitfield * ret = tr_new0( tr_bitfield, 1 );
-
-    ret->bitCount = bitCount;
-    ret->byteCount = ( bitCount + 7u ) / 8u;
-    ret->bits = tr_new0( uint8_t, ret->byteCount );
-    return ret;
+    return tr_bitfieldConstruct( tr_new0( tr_bitfield, 1 ), bitCount );
 }
 
 tr_bitfield*
@@ -772,7 +782,7 @@ tr_bitfieldFree( tr_bitfield * bitfield )
 {
     if( bitfield )
     {
-        tr_free( bitfield->bits );
+        tr_bitfieldDestruct( bitfield );
         tr_free( bitfield );
     }
 }

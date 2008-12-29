@@ -299,14 +299,17 @@ int  tr_httpParseURL( const char * url,
 ****
 ***/
 
-struct tr_bitfield
+typedef struct tr_bitfield
 {
     uint8_t *  bits;
     size_t     bitCount;
     size_t     byteCount;
-};
+}
+tr_bitfield;
 
-typedef struct tr_bitfield tr_bitfield;
+tr_bitfield* tr_bitfieldConstruct( tr_bitfield*, size_t bitcount );
+
+void         tr_bitfieldDestruct( tr_bitfield* );
 
 tr_bitfield* tr_bitfieldNew( size_t bitcount ) TR_GNUC_MALLOC;
 
@@ -346,7 +349,7 @@ tr_bitfield* tr_bitfieldOr(                               tr_bitfield*,
     need to call tr_bitfieldTestFast() first before you
     start looping. */
 #define tr_bitfieldHasFast( bitfield, nth ) \
-    ( ( bitfield->bits[( nth ) >> 3u] << ( ( nth ) & 7u ) & 0x80 ) != 0 )
+    ( ( (bitfield)->bits[( nth ) >> 3u] << ( ( nth ) & 7u ) & 0x80 ) != 0 )
 
 /** @param high the highest nth bit you're going to access */
 #define tr_bitfieldTestFast( bitfield, high ) \

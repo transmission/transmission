@@ -26,6 +26,8 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include "utils.h" /* tr_bitfield */
+
 #ifndef TR_TORRENT_H
 #define TR_TORRENT_H 1
 
@@ -205,7 +207,7 @@ struct tr_torrent
 
     struct tr_completion *     completion;
 
-    struct tr_bitfield *       checkedPieces;
+    struct tr_bitfield         checkedPieces;
     tr_completeness            completeness;
 
     struct tr_tracker *        tracker;
