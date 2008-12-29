@@ -51,9 +51,6 @@ typedef struct
     /* what type of event this is */
     TrackerEventType    messageType;
 
-    /* the torrent's 20-character sha1 hash */
-    const uint8_t *  hash;
-
     /* for TR_TRACKER_WARNING and TR_TRACKER_ERROR */
     const char *  text;
 

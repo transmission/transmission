@@ -98,6 +98,7 @@ struct tr_tracker
     uint8_t    hash[SHA_DIGEST_LENGTH];
     char       escaped[SHA_DIGEST_LENGTH * 3 + 1];
     char *     name;
+    int        torrentId;
 
     /* corresponds to the peer_id sent as a tracker request parameter.
        one tracker admin says: "When the same torrent is opened and
@@ -174,10 +175,9 @@ trackerSupportsScrape( tr_tracker *       t,
 ***/
 
 static tr_tracker *
-findTracker( tr_session *    session,
-             const uint8_t * hash )
+findTracker( tr_session * session, int torrentId )
 {
-    tr_torrent * torrent = tr_torrentFindFromHash( session, hash );
+    tr_torrent * torrent = tr_torrentFindFromId( session, torrentId );
 
     return torrent ? torrent->tracker : NULL;
 }
@@ -186,7 +186,7 @@ findTracker( tr_session *    session,
 ****  PUBLISH
 ***/
 
-static const tr_tracker_event emptyEvent = { 0, NULL, NULL, NULL, 0, 0 };
+static const tr_tracker_event emptyEvent = { 0, NULL, NULL, 0, 0 };
 
 static void
 publishMessage( tr_tracker * t,
@@ -196,7 +196,6 @@ publishMessage( tr_tracker * t,
     if( t )
     {
         tr_tracker_event event = emptyEvent;
-        event.hash = t->hash;
         event.messageType = type;
         event.text = msg;
         tr_publisherPublish( &t->publisher, t, &event );
@@ -232,7 +231,6 @@ publishNewPeers( tr_tracker * t,
 {
     tr_tracker_event event = emptyEvent;
 
-    event.hash = t->hash;
     event.messageType = TR_TRACKER_PEERS;
     event.allAreSeeds = allAreSeeds;
     event.compact = compact;
@@ -382,13 +380,13 @@ parseOldPeers( tr_benc * bePeers,
 }
 
 static void
-onStoppedResponse( tr_session *                 session,
+onStoppedResponse( tr_session    * session,
                    long            responseCode UNUSED,
                    const void    * response     UNUSED,
                    size_t          responseLen  UNUSED,
-                   void *                       torrent_hash  )
+                   void          * torrentId )
 {
-    tr_tracker * t = findTracker( session, torrent_hash );
+    tr_tracker * t = findTracker( session, tr_ptr2int( torrentId ) );
     if( t )
     {
         const time_t now = time( NULL );
@@ -402,7 +400,6 @@ onStoppedResponse( tr_session *                 session,
 
     dbgmsg( NULL, "got a response to some `stop' message" );
     onReqDone( session );
-    tr_free( torrent_hash );
 }
 
 static void
@@ -410,7 +407,7 @@ onTrackerResponse( tr_session * session,
                    long         responseCode,
                    const void * response,
                    size_t       responseLen,
-                   void *       torrent_hash )
+                   void       * torrentId )
 {
     int retry;
     int success = FALSE;
@@ -418,8 +415,7 @@ onTrackerResponse( tr_session * session,
     tr_tracker * t;
 
     onReqDone( session );
-    t = findTracker( session, torrent_hash );
-    tr_free( torrent_hash );
+    t = findTracker( session, tr_ptr2int( torrentId ) );
     if( !t ) /* tracker's been closed */
         return;
 
@@ -609,15 +605,14 @@ onScrapeResponse( tr_session * session,
                   long         responseCode,
                   const void * response,
                   size_t       responseLen,
-                  void       * torrent_hash )
+                  void       * torrentId )
 {
     int          success = FALSE;
     int          retry;
     tr_tracker * t;
 
     onReqDone( session );
-    t = findTracker( session, torrent_hash );
-    tr_free( torrent_hash );
+    t = findTracker( session, tr_ptr2int( torrentId ) );
     if( !t ) /* tracker's been closed... */
         return;
 
@@ -731,8 +726,8 @@ enum
 
 struct tr_tracker_request
 {
-    uint8_t             torrent_hash[SHA_DIGEST_LENGTH];
     int                 reqtype; /* TR_REQ_* */
+    int                 torrentId;
     char *              url;
     tr_web_done_func *  done_func;
     tr_session *        session;
@@ -812,7 +807,7 @@ createRequest( tr_session * session,
     req->reqtype = reqtype;
     req->done_func =  isStopping ? onStoppedResponse : onTrackerResponse;
     req->url = tr_strdup( EVBUFFER_DATA( url ) );
-    memcpy( req->torrent_hash, tracker->hash, SHA_DIGEST_LENGTH );
+    req->torrentId = tracker->torrentId;
 
     evbuffer_free( url );
     return req;
@@ -835,7 +830,7 @@ createScrape( tr_session * session,
     req->reqtype = TR_REQ_SCRAPE;
     req->url = tr_strdup( EVBUFFER_DATA( url ) );
     req->done_func = onScrapeResponse;
-    memcpy( req->torrent_hash, tracker->hash, SHA_DIGEST_LENGTH );
+    req->torrentId = tracker->torrentId;
 
     evbuffer_free( url );
     return req;
@@ -882,8 +877,7 @@ static void
 invokeRequest( void * vreq )
 {
     struct tr_tracker_request * req = vreq;
-    tr_tracker *                t = findTracker( req->session,
-                                                 req->torrent_hash );
+    tr_tracker * t = findTracker( req->session, req->torrentId );
 
     if( t )
     {
@@ -904,8 +898,8 @@ invokeRequest( void * vreq )
 
     ++req->session->tracker->runningCount;
 
-    tr_webRun( req->session, req->url, NULL, req->done_func,
-              tr_memdup( req->torrent_hash, SHA_DIGEST_LENGTH ) );
+    tr_webRun( req->session, req->url, NULL,
+               req->done_func, tr_int2ptr( req->torrentId ) );
 
     freeRequest( req );
 }
@@ -1062,8 +1056,9 @@ tr_trackerNew( const tr_torrent * torrent )
     t->lastAnnounceResponse     = -1;
     t->lastScrapeResponse       = -1;
     t->manualAnnounceAllowedAt  = ~(time_t)0;
-    t->name = tr_strdup( info->name );
-    t->randOffset = tr_cryptoRandInt( 30 );
+    t->name                     = tr_strdup( info->name );
+    t->torrentId                = torrent->uniqueId;
+    t->randOffset               = tr_cryptoRandInt( 30 );
     memcpy( t->hash, info->hash, SHA_DIGEST_LENGTH );
     escape( t->escaped, info->hash, SHA_DIGEST_LENGTH );
     generateKeyParam( t->key_param, KEYLEN );

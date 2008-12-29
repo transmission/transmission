@@ -1284,3 +1284,15 @@ tr_isDirection( tr_direction dir )
 {
     return dir==TR_UP || dir==TR_DOWN;
 }
+
+int
+tr_ptr2int( void* v )
+{
+    return (intptr_t)v;
+}
+
+void*
+tr_int2ptr( int i )
+{
+    return (void*)(intptr_t)i;
+}
