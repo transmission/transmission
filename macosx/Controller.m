@@ -2003,9 +2003,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     BOOL groupRows = [fDefaults boolForKey: @"SortByGroup"];
     if (groupRows)
     {
-        NSArray * oldTorrentGroups = nil;
+        NSMutableArray * oldTorrentGroups = [NSMutableArray array];
         if ([fDisplayedTorrents count] > 0 && [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
-            oldTorrentGroups = [NSArray arrayWithArray: fDisplayedTorrents];
+            [oldTorrentGroups addObjectsFromArray: fDisplayedTorrents];
         
         [fDisplayedTorrents removeAllObjects];
         
@@ -2024,15 +2024,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 TorrentGroup * group = nil;
                 
                 //try to see if the group already exists
-                for (; oldTorrentGroups && currentOldGroupIndex < [oldTorrentGroups count]; currentOldGroupIndex++)
+                for (; currentOldGroupIndex < [oldTorrentGroups count]; currentOldGroupIndex++)
                 {
                     TorrentGroup * currentGroup = [oldTorrentGroups objectAtIndex: currentOldGroupIndex];
-                    if ([currentGroup groupIndex] == groupValue)
+                    const NSInteger currentGroupValue = [currentGroup groupIndex];
+                    if (currentGroupValue == groupValue)
                     {
                         group = currentGroup;
                         [[currentGroup torrents] removeAllObjects];
-                        break;
+                        
+                        currentOldGroupIndex++;
                     }
+                    
+                    if (currentGroupValue >= groupValue)
+                        break;
                 }
                 
                 if (!group)
