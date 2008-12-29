@@ -14,16 +14,39 @@
 #include "list.h"
 #include "utils.h"
 
+/***
+****
+***/
+
+static tr_list * _unusedNodes = NULL;
+
+static const tr_list TR_LIST_INIT = { NULL, NULL, NULL };
+
 static tr_list*
 node_alloc( void )
 {
-    return tr_new0( tr_list, 1 );
+    tr_list * node;
+
+    if( _unusedNodes == NULL )
+        node = tr_new( tr_list, 1 );
+    else {
+        node = _unusedNodes;
+        _unusedNodes = node->next;
+    }
+
+    *node = TR_LIST_INIT;
+    return node;
 }
 
 static void
 node_free( tr_list* node )
 {
-    tr_free( node );
+    if( node )
+    {
+        *node = TR_LIST_INIT;
+        node->next = _unusedNodes;
+        _unusedNodes = node;
+    }
 }
 
 /***
