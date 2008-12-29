@@ -200,32 +200,27 @@ task_finish( struct tr_web_task * task, long response_code )
 static void
 remove_finished_tasks( tr_web * g )
 {
-    CURL * easy;
-
-    do
+    for( ;; )
     {
-        CURLMsg * msg;
-        int msgs_left;
+        int ignored;
+        CURLMsg * msg = curl_multi_info_read( g->multi, &ignored );
 
-        easy = NULL;
-        while(( msg = curl_multi_info_read( g->multi, &msgs_left ))) {
-            if( msg->msg == CURLMSG_DONE ) {
-                easy = msg->easy_handle;
-                break;
-            }
+        if( msg == NULL )
+        {
+            break;
         }
-
-        if( easy ) {
+        else if( ( msg->msg == CURLMSG_DONE ) && ( msg->easy_handle != NULL ) )
+        {
+            CURL * easy = msg->easy_handle;
             long code;
             struct tr_web_task * task;
             curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
             curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
+            task_finish( task, code );
             curl_multi_remove_handle( g->multi, easy );
             curl_easy_cleanup( easy );
-            task_finish( task, code );
         }
     }
-    while ( easy );
 
     g->prev_running = g->still_running;
 }
