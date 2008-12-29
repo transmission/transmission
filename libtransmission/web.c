@@ -55,7 +55,9 @@ struct tr_web
     long timer_ms;
     CURLM * multi;
     tr_session * session;
+#if 0
     tr_list * easy_queue;
+#endif
     struct event timer_event;
 };
 
@@ -144,11 +146,16 @@ addTask( void * vtask )
         else /* don't set encoding on webseeds; it messes up binary data */
             curl_easy_setopt( easy, CURLOPT_ENCODING, "" );
 
-        if( web->still_running >= MAX_CONCURRENT_TASKS ) {
+#if 0
+        if( web->still_running >= MAX_CONCURRENT_TASKS )
+        {
             tr_list_append( &web->easy_queue, easy );
             dbgmsg( " >> enqueueing a task ... size is now %d",
                                            tr_list_size( web->easy_queue ) );
-        } else {
+        }
+        else
+#endif
+        {
             const CURLMcode rc = curl_multi_add_handle( web->multi, easy );
             if( rc == CURLM_OK )
                 ++web->still_running;
@@ -243,6 +250,7 @@ restart_timer( tr_web * g )
     evtimer_add( &g->timer_event, &interval );
 }
 
+#if 0
 static void
 add_tasks_from_queue( tr_web * g )
 {
@@ -263,6 +271,7 @@ add_tasks_from_queue( tr_web * g )
         }
     }
 }
+#endif
 
 static void
 web_close( tr_web * g )
@@ -295,7 +304,9 @@ tr_multi_socket_action( tr_web * g, int fd, int mask )
 
     remove_finished_tasks( g );
 
+#if 0
     add_tasks_from_queue( g );
+#endif
 
     if( !g->still_running ) {
         stop_timer( g );

@@ -59,11 +59,21 @@ static tr_msg_list ** messageQueueTail = &messageQueue;
     static void OutputDebugString( const void * unused UNUSED ) { }
 #endif
 
-void
+static void
 tr_msgInit( void )
 {
-    if( !messageLock )
+    static tr_bool initialized = FALSE;
+
+    if( !initialized )
+    {
+        char * env = getenv( "TR_DEBUG" );
+        messageLevel = ( env ? atoi( env ) : 0 ) + 1;
+        messageLevel = MAX( 1, messageLevel );
+
         messageLock = tr_lockNew( );
+
+        initialized = TRUE;
+    }
 }
 
 FILE*
@@ -100,7 +110,9 @@ tr_setMessageLevel( int level )
 {
     tr_msgInit( );
     tr_lockLock( messageLock );
+
     messageLevel = MAX( 0, level );
+
     tr_lockUnlock( messageLock );
 }
 
@@ -108,12 +120,12 @@ int
 tr_getMessageLevel( void )
 {
     int ret;
-
     tr_msgInit( );
     tr_lockLock( messageLock );
-    ret = messageLevel;
-    tr_lockUnlock( messageLock );
 
+    ret = messageLevel;
+
+    tr_lockUnlock( messageLock );
     return ret;
 }
 
@@ -122,7 +134,9 @@ tr_setMessageQueuing( tr_bool enabled )
 {
     tr_msgInit( );
     tr_lockLock( messageLock );
+
     messageQueuing = enabled;
+
     tr_lockUnlock( messageLock );
 }
 
@@ -130,12 +144,12 @@ tr_bool
 tr_getMessageQueuing( void )
 {
     int ret;
-
     tr_msgInit( );
     tr_lockLock( messageLock );
-    ret = messageQueuing;
-    tr_lockUnlock( messageLock );
 
+    ret = messageQueuing;
+
+    tr_lockUnlock( messageLock );
     return ret;
 }
 
@@ -143,14 +157,14 @@ tr_msg_list *
 tr_getQueuedMessages( void )
 {
     tr_msg_list * ret;
-
-    assert( NULL != messageLock );
+    tr_msgInit( );
     tr_lockLock( messageLock );
+
     ret = messageQueue;
     messageQueue = NULL;
     messageQueueTail = &messageQueue;
-    tr_lockUnlock( messageLock );
 
+    tr_lockUnlock( messageLock );
     return ret;
 }
 
@@ -248,6 +262,15 @@ tr_deepLog( const char  * file,
 /***
 ****
 ***/
+    
+
+int
+tr_msgLoggingIsActive( int level )
+{
+    tr_msgInit( );
+
+    return messageLevel >= level;
+}
 
 void
 tr_msg( const char * file,
@@ -258,18 +281,10 @@ tr_msg( const char * file,
         ... )
 {
     FILE * fp;
-
-    if( messageLock )
-        tr_lockLock( messageLock );
+    tr_msgInit( );
+    tr_lockLock( messageLock );
 
     fp = tr_getLog( );
-
-    if( !messageLevel )
-    {
-        char * env = getenv( "TR_DEBUG" );
-        messageLevel = ( env ? atoi( env ) : 0 ) + 1;
-        messageLevel = MAX( 1, messageLevel );
-    }
 
     if( messageLevel >= level )
     {
@@ -315,8 +330,7 @@ tr_msg( const char * file,
         }
     }
 
-    if( messageLock )
-        tr_lockUnlock( messageLock );
+    tr_lockUnlock( messageLock );
 }
 
 /***

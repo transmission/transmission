@@ -107,22 +107,11 @@ extern "C" {
  #define _( a ) tr_strip_positional_args( a )
 #endif
 
-#define tr_nerr( n, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, n, __VA_ARGS__ )
-#define tr_ninf( n, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, n, __VA_ARGS__ )
-#define tr_ndbg( n, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, n, __VA_ARGS__ )
+/****
+*****
+****/
 
-#define tr_torerr( tor, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, tor->info.name, __VA_ARGS__ )
-#define tr_torinf( tor, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, tor->info.name, __VA_ARGS__ )
-#define tr_tordbg( tor, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, tor->info.name, __VA_ARGS__ )
-
-#define tr_err( ... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, NULL, __VA_ARGS__ )
-#define tr_inf( ... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, NULL, __VA_ARGS__ )
-#define tr_dbg( ... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, NULL, __VA_ARGS__ )
-
-int            tr_wildmat( const char * text,
-                           const char * pattern );
-
-void           tr_msgInit( void );
+int            tr_msgLoggingIsActive( int level );
 
 void           tr_msg( const char * file,
                        int          line,
@@ -130,6 +119,62 @@ void           tr_msg( const char * file,
                        const char * torrent,
                        const char * fmt,
                        ... ) TR_GNUC_PRINTF( 5, 6 );
+
+#define tr_nerr( n, ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_ERR ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_ERR, n, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_ninf( n, ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_INF) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_INF, n, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_ndbg( n, ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_DBG) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_DBG, n, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_torerr( tor, ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_ERR ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_ERR, tor->info.name, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_torinf( tor, ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_INF ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_INF, tor->info.name, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_tordbg( tor, ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_DBG ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_DBG, tor->info.name, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_err( ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_ERR ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_ERR, NULL, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_inf( ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_INF ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_INF, NULL, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_dbg( ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_DBG ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_DBG, NULL, __VA_ARGS__ ); \
+    } while( 0 )
+
+
 
 FILE*          tr_getLog( void );
 
@@ -143,6 +188,10 @@ void           tr_deepLog( const char * file,
 
 char*          tr_getLogTimeStr( char * buf,
                                  int    buflen );
+
+
+int            tr_wildmat( const char * text,
+                           const char * pattern );
 
 /** a portability wrapper for basename(). */
 char*          tr_basename( const char * path ) TR_GNUC_MALLOC;
@@ -319,29 +368,21 @@ void         tr_bitfieldFree( tr_bitfield* );
 
 void         tr_bitfieldClear( tr_bitfield* );
 
-int          tr_bitfieldAdd(                             tr_bitfield*,
-                                                  size_t bit );
+int          tr_bitfieldAdd( tr_bitfield*, size_t bit );
 
-int          tr_bitfieldRem(                             tr_bitfield*,
-                                                  size_t bit );
+int          tr_bitfieldRem( tr_bitfield*, size_t bit );
 
-int          tr_bitfieldAddRange(                             tr_bitfield *,
-                                                       size_t begin,
-                                                       size_t end );
+int          tr_bitfieldAddRange( tr_bitfield *, size_t begin, size_t end );
 
-int          tr_bitfieldRemRange(                             tr_bitfield*,
-                                                       size_t begin,
-                                                       size_t end );
+int          tr_bitfieldRemRange( tr_bitfield*, size_t begin, size_t end );
 
-void         tr_bitfieldDifference(                         tr_bitfield *,
-                                                      const tr_bitfield * );
+void         tr_bitfieldDifference( tr_bitfield *, const tr_bitfield * );
 
 int          tr_bitfieldIsEmpty( const tr_bitfield* );
 
 size_t       tr_bitfieldCountTrueBits( const tr_bitfield* );
 
-tr_bitfield* tr_bitfieldOr(                               tr_bitfield*,
-                                                    const tr_bitfield* );
+tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
 
 /** A stripped-down version of bitfieldHas to be used
     for speed when you're looping quickly.  This version
