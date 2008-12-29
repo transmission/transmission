@@ -126,6 +126,7 @@ addTask( void * vtask )
         curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 3600L );
         curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 60L );
         curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1L );
+        curl_easy_setopt( easy, CURLOPT_FORBID_REUSE, 1L );
         curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 16L );
         curl_easy_setopt( easy, CURLOPT_NOSIGNAL, 1L );
         curl_easy_setopt( easy, CURLOPT_PRIVATE, task );
@@ -355,7 +356,6 @@ setsock( curl_socket_t            sockfd,
          struct tr_web          * g,
          struct tr_web_sockinfo * f )
 {
-    struct timeval tv;
     const int kind = EV_PERSIST
                    | (( action & CURL_POLL_IN ) ? EV_READ : 0 )
                    | (( action & CURL_POLL_OUT ) ? EV_WRITE : 0 );
@@ -365,8 +365,7 @@ setsock( curl_socket_t            sockfd,
         event_del( &f->ev );
     event_set( &f->ev, sockfd, kind, event_cb, g );
     f->evset = 1;
-    tr_timevalMsec( DEFAULT_TIMER_MSEC, &tv );
-    event_add( &f->ev, &tv );
+    event_add( &f->ev, NULL );
 }
 
 static void
