@@ -378,8 +378,6 @@ tr_sessionInit( const char  * tag,
     signal( SIGPIPE, SIG_IGN );
 #endif
 
-    tr_msgInit( );
-
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, &i ); 
     assert( found ); 
     session->peerLimitPerTorrent = i; 
