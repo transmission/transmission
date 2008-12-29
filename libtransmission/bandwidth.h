@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 #ifndef __TRANSMISSION__
@@ -16,8 +16,6 @@
 
 #ifndef TR_BANDWIDTH_H
 #define TR_BANDWIDTH_H
-
-struct tr_iobuf;
 
 /**
  * Bandwidth is an object for measuring and constraining bandwidth speeds.
@@ -49,12 +47,12 @@ struct tr_iobuf;
  *   Call tr_bandwidthAllocate() periodically.  tr_bandwidth knows its current
  *   speed and will decide how many bytes to make available over the
  *   user-specified period to reach the user-specified desired speed.
- *   If appropriate, it notifies its iobufs that new bandwidth is available.
+ *   If appropriate, it notifies its peer-ios that new bandwidth is available.
  * 
  *   tr_bandwidthAllocate() operates on the tr_bandwidth subtree, so usually 
  *   you'll only need to invoke it for the top-level tr_session bandwidth.
  *
- *   The iobufs all have a pointer to their associated tr_bandwidth object,
+ *   The peer-ios all have a pointer to their associated tr_bandwidth object,
  *   and call tr_bandwidthClamp() before performing I/O to see how much 
  *   bandwidth they can safely use.
  */
@@ -99,20 +97,20 @@ double  tr_bandwidthGetDesiredSpeed   ( const tr_bandwidth  * bandwidth,
                                         tr_direction          direction );
 
 /**
- * @brief Set whether or not this bandwidth should throttle its iobufs' speeds
+ * @brief Set whether or not this bandwidth should throttle its peer-io's speeds
  */
 void    tr_bandwidthSetLimited        ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
                                         tr_bool               isLimited );
 
 /**
- * @return nonzero if this bandwidth throttles its iobufs' speeds
+ * @return nonzero if this bandwidth throttles its peer-ios speeds
  */
 tr_bool tr_bandwidthIsLimited         ( const tr_bandwidth  * bandwidth,
                                         tr_direction          direction );
 
 /**
- * @brief allocate the next period_msec's worth of bandwidth for the iobufs to consume
+ * @brief allocate the next period_msec's worth of bandwidth for the peer-ios to consume
  */
 void    tr_bandwidthAllocate          ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
@@ -143,7 +141,7 @@ double  tr_bandwidthGetPieceSpeed     ( const tr_bandwidth  * bandwidth,
 
 /**
  * @brief Notify the bandwidth object that some of its allocated bandwidth has been consumed.
- * This is is usually invoked by the iobuf after a read or write.
+ * This is is usually invoked by the peer-io after a read or write.
  */
 void    tr_bandwidthUsed              ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
@@ -179,7 +177,7 @@ void    tr_bandwidthAddPeer           ( tr_bandwidth        * bandwidth,
                                         struct tr_peerIo    * peerIo );
 
 /**
- * @brief remove an iobuf from this bandwidth's list of iobufs.
+ * @brief remove a peer-io from this bandwidth's list.
  */
 void    tr_bandwidthRemovePeer        ( tr_bandwidth        * bandwidth,
                                         struct tr_peerIo    * peerIo );
