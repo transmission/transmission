@@ -92,7 +92,7 @@ struct tr_tracker
 
     tr_session *      session;
 
-    tr_publisher_t *  publisher;
+    tr_publisher      publisher;
 
     /* torrent hash string */
     uint8_t    hash[SHA_DIGEST_LENGTH];
@@ -199,7 +199,7 @@ publishMessage( tr_tracker * t,
         event.hash = t->hash;
         event.messageType = type;
         event.text = msg;
-        tr_publisherPublish( t->publisher, t, &event );
+        tr_publisherPublish( &t->publisher, t, &event );
     }
 }
 
@@ -238,7 +238,7 @@ publishNewPeers( tr_tracker * t,
     event.compact = compact;
     event.compactLen = compactLen;
     if( compactLen )
-        tr_publisherPublish( t->publisher, t, &event );
+        tr_publisherPublish( &t->publisher, t, &event );
 }
 
 static void
@@ -1048,7 +1048,7 @@ tr_trackerNew( const tr_torrent * torrent )
     ensureGlobalsExist( torrent->session );
 
     t = tr_new0( tr_tracker, 1 );
-    t->publisher = tr_publisherNew( );
+    t->publisher                = TR_PUBLISHER_INIT;
     t->session                  = torrent->session;
     t->scrapeIntervalSec        = DEFAULT_SCRAPE_INTERVAL_SEC;
     t->retryScrapeIntervalSec   = FIRST_SCRAPE_RETRY_INTERVAL_SEC;
@@ -1081,7 +1081,7 @@ onTrackerFreeNow( void * vt )
 {
     tr_tracker * t = vt;
 
-    tr_publisherFree( &t->publisher );
+    tr_publisherDestruct( &t->publisher );
     tr_free( t->name );
     tr_free( t->trackerID );
     tr_free( t->peer_id );
@@ -1105,7 +1105,7 @@ tr_trackerSubscribe( tr_tracker *     t,
                      tr_delivery_func func,
                      void *           user_data )
 {
-    return tr_publisherSubscribe( t->publisher, func, user_data );
+    return tr_publisherSubscribe( &t->publisher, func, user_data );
 }
 
 void
@@ -1113,7 +1113,7 @@ tr_trackerUnsubscribe( tr_tracker *     t,
                        tr_publisher_tag tag )
 {
     if( t )
-        tr_publisherUnsubscribe( t->publisher, tag );
+        tr_publisherUnsubscribe( &t->publisher, tag );
 }
 
 const tr_tracker_info *

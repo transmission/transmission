@@ -17,11 +17,17 @@
 #ifndef _TR_PUBLISHER_H_
 #define _TR_PUBLISHER_H_
 
+struct tr_list;
+
 /**
 ***  A lightweight implementation of the 'Observable' design pattern.
 **/
 
-typedef struct tr_publisher_s tr_publisher_t;
+typedef struct tr_publisher
+{
+    struct tr_list * list;
+}
+tr_publisher;
 
 typedef void * tr_publisher_tag;
 
@@ -33,22 +39,22 @@ typedef void tr_delivery_func ( void * source,
 ***  Observer API
 **/
 
-tr_publisher_tag tr_publisherSubscribe( tr_publisher_t * publisher,
+tr_publisher_tag tr_publisherSubscribe( tr_publisher   * publisher,
                                         tr_delivery_func delivery_func,
                                         void *           user_data );
 
-void             tr_publisherUnsubscribe( tr_publisher_t * publisher,
+void             tr_publisherUnsubscribe( tr_publisher   * publisher,
                                           tr_publisher_tag tag );
 
 /**
 ***  Observable API
 **/
 
-tr_publisher_t * tr_publisherNew( void );
+extern const tr_publisher TR_PUBLISHER_INIT;
 
-void             tr_publisherFree( tr_publisher_t ** publisher );
+void             tr_publisherDestruct( tr_publisher * );
 
-void             tr_publisherPublish( tr_publisher_t * publisher,
+void             tr_publisherPublish( tr_publisher * publisher,
                                       void *           source,
                                       void *           event );
 

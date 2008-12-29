@@ -296,7 +296,7 @@ struct tr_peermsgs
     tr_session *           session;
     tr_torrent *           torrent;
 
-    tr_publisher_t *       publisher;
+    tr_publisher           publisher;
 
     struct evbuffer *      outMessages; /* all the non-piece messages */
 
@@ -530,7 +530,7 @@ publish( tr_peermsgs * msgs, tr_peer_event * e )
     assert( msgs->peer );
     assert( msgs->peer->msgs == msgs );
 
-    tr_publisherPublish( msgs->publisher, msgs->peer, e );
+    tr_publisherPublish( &msgs->publisher, msgs->peer, e );
 }
 
 static void
@@ -2209,7 +2209,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     assert( peer->io );
 
     m = tr_new0( tr_peermsgs, 1 );
-    m->publisher = tr_publisherNew( );
+    m->publisher = TR_PUBLISHER_INIT;
     m->peer = peer;
     m->session = torrent->session;
     m->torrent = torrent;
@@ -2229,7 +2229,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->clientWillAskFor = REQUEST_LIST_INIT;
     peer->msgs = m;
 
-    *setme = tr_publisherSubscribe( m->publisher, func, userData );
+    *setme = tr_publisherSubscribe( &m->publisher, func, userData );
 
     if( tr_peerIoSupportsLTEP( peer->io ) )
         sendLtepHandshake( m );
@@ -2248,7 +2248,7 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
     if( msgs )
     {
         tr_timerFree( &msgs->pexTimer );
-        tr_publisherFree( &msgs->publisher );
+        tr_publisherDestruct( &msgs->publisher );
         reqListClear( &msgs->clientWillAskFor );
         reqListClear( &msgs->clientAskedFor );
         reqListClear( &msgs->peerAskedFor );
@@ -2267,6 +2267,6 @@ void
 tr_peerMsgsUnsubscribe( tr_peermsgs *    peer,
                         tr_publisher_tag tag )
 {
-    tr_publisherUnsubscribe( peer->publisher, tag );
+    tr_publisherUnsubscribe( &peer->publisher, tag );
 }
 
