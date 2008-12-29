@@ -326,14 +326,14 @@ tr_bencParse( const void *     buf,
               const uint8_t ** setme_end )
 {
     int           err;
-    tr_ptrArray * parentStack = tr_ptrArrayNew( );
+    tr_ptrArray   parentStack = TR_PTR_ARRAY_INIT;
 
     top->type = 0; /* set to `uninitialized' */
-    err = tr_bencParseImpl( buf, end, top, parentStack, setme_end );
+    err = tr_bencParseImpl( buf, end, top, &parentStack, setme_end );
     if( err )
         tr_bencFree( top );
 
-    tr_ptrArrayFree( parentStack, NULL );
+    tr_ptrArrayDestruct( &parentStack, NULL );
     return err;
 }
 
@@ -932,13 +932,13 @@ bencWalk( const tr_benc *    top,
           struct WalkFuncs * walkFuncs,
           void *             user_data )
 {
-    tr_ptrArray * stack = tr_ptrArrayNew( );
+    tr_ptrArray stack = TR_PTR_ARRAY_INIT;
 
-    tr_ptrArrayAppend( stack, nodeNew( top ) );
+    tr_ptrArrayAppend( &stack, nodeNew( top ) );
 
-    while( !tr_ptrArrayEmpty( stack ) )
+    while( !tr_ptrArrayEmpty( &stack ) )
     {
-        struct SaveNode * node = tr_ptrArrayBack( stack );
+        struct SaveNode * node = tr_ptrArrayBack( &stack );
         const tr_benc *   val;
 
         if( !node->valIsVisited )
@@ -955,7 +955,7 @@ bencWalk( const tr_benc *    top,
         {
             if( isContainer( node->val ) )
                 walkFuncs->containerEndFunc( node->val, user_data );
-            tr_ptrArrayPop( stack );
+            tr_ptrArrayPop( &stack );
             tr_free( node->children );
             tr_free( node );
             continue;
@@ -973,14 +973,14 @@ bencWalk( const tr_benc *    top,
 
                 case TYPE_LIST:
                     if( val != node->val )
-                        tr_ptrArrayAppend( stack, nodeNew( val ) );
+                        tr_ptrArrayAppend( &stack, nodeNew( val ) );
                     else
                         walkFuncs->listBeginFunc( val, user_data );
                     break;
 
                 case TYPE_DICT:
                     if( val != node->val )
-                        tr_ptrArrayAppend( stack, nodeNew( val ) );
+                        tr_ptrArrayAppend( &stack, nodeNew( val ) );
                     else
                         walkFuncs->dictBeginFunc( val, user_data );
                     break;
@@ -992,7 +992,7 @@ bencWalk( const tr_benc *    top,
             }
     }
 
-    tr_ptrArrayFree( stack, NULL );
+    tr_ptrArrayDestruct( &stack, NULL );
 }
 
 /****
@@ -1087,7 +1087,7 @@ tr_bencFree( tr_benc * val )
 {
     if( val && val->type )
     {
-        tr_ptrArray *    freeme = tr_ptrArrayNew( );
+        tr_ptrArray a = TR_PTR_ARRAY_INIT;
         struct WalkFuncs walkFuncs;
 
         walkFuncs.intFunc = freeDummyFunc;
@@ -1095,9 +1095,9 @@ tr_bencFree( tr_benc * val )
         walkFuncs.dictBeginFunc = freeContainerBeginFunc;
         walkFuncs.listBeginFunc = freeContainerBeginFunc;
         walkFuncs.containerEndFunc = freeDummyFunc;
-        bencWalk( val, &walkFuncs, freeme );
+        bencWalk( val, &walkFuncs, &a );
 
-        tr_ptrArrayFree( freeme, tr_free );
+        tr_ptrArrayDestruct( &a, tr_free );
     }
 }
 

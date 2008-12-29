@@ -19,23 +19,27 @@
 
 #define GROW 32
 
-struct tr_ptrArray
+const tr_ptrArray TR_PTR_ARRAY_INIT = { NULL, 0, 0 };
+
+void
+tr_ptrArrayDestruct( tr_ptrArray * p, PtrArrayForeachFunc func )
 {
-    void ** items;
-    int     n_items;
-    int     n_alloc;
-};
+    assert( p );
+    assert( p->items || !p->n_items );
+
+    if( func )
+        tr_ptrArrayForeach( p, func );
+
+    tr_free( p->items );
+
+    memset( p, ~0, sizeof( tr_ptrArray ) );
+}
 
 tr_ptrArray*
 tr_ptrArrayNew( void )
 {
-    tr_ptrArray * p;
-
-    p = tr_new( tr_ptrArray, 1 );
-    p->n_items = 0;
-    p->n_alloc = 0;
-    p->items = NULL;
-
+    tr_ptrArray * p = tr_new( tr_ptrArray, 1 );
+    *p = TR_PTR_ARRAY_INIT;
     return p;
 }
 
@@ -69,13 +73,7 @@ void
 tr_ptrArrayFree( tr_ptrArray *       t,
                  PtrArrayForeachFunc func )
 {
-    assert( t );
-    assert( t->items || !t->n_items );
-
-    if( func )
-        tr_ptrArrayForeach( t, func );
-
-    tr_free( t->items );
+    tr_ptrArrayDestruct( t, func );
     tr_free( t );
 }
 

@@ -32,9 +32,22 @@
 /**
  * A simple pointer array that resizes itself dynamically.
  */
-typedef struct tr_ptrArray tr_ptrArray;
+typedef struct tr_ptrArray
+{
+    void ** items;
+    int     n_items;
+    int     n_alloc;
+}
+tr_ptrArray;
+
+#define TR_PTR_ARRAY_DATA( A ) ((A)->items)
+#define TR_PTR_ARRAY_LENGTH( A ) ((A)->n_items)
 
 typedef void ( *PtrArrayForeachFunc )( void * );
+
+extern const tr_ptrArray TR_PTR_ARRAY_INIT;
+
+void          tr_ptrArrayDestruct( tr_ptrArray*, PtrArrayForeachFunc func );
 
 tr_ptrArray * tr_ptrArrayNew( void );
 
