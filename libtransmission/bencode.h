@@ -15,6 +15,8 @@
 
 #include <inttypes.h> /* for int64_t */
 
+struct evbuffer;
+
 enum
 {
     TYPE_INT  = 1,
@@ -72,7 +74,7 @@ void      tr_bencFree( tr_benc * );
 
 char*     tr_bencSave( const tr_benc * val, int * len );
 
-char*     tr_bencSaveAsJSON( const tr_benc * top, int * len );
+char*     tr_bencSaveAsJSON( const tr_benc * top, struct evbuffer * out );
 
 int       tr_bencSaveFile( const char * filename, const tr_benc * );
 

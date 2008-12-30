@@ -1311,14 +1311,14 @@ jsonContainerEndFunc( const tr_benc * val,
 }
 
 char*
-tr_bencSaveAsJSON( const tr_benc * top,
-                   int *           len )
+tr_bencSaveAsJSON( const tr_benc * top, struct evbuffer * out )
 {
-    char *           ret;
     struct WalkFuncs walkFuncs;
     struct jsonWalk  data;
 
-    data.out = tr_getBuffer( );
+    evbuffer_drain( out, EVBUFFER_LENGTH( out ) );
+
+    data.out = out;
     data.parents = NULL;
 
     walkFuncs.intFunc = jsonIntFunc;
@@ -1329,14 +1329,10 @@ tr_bencSaveAsJSON( const tr_benc * top,
 
     bencWalk( top, &walkFuncs, &data );
 
-    if( EVBUFFER_LENGTH( data.out ) )
-        evbuffer_add_printf( data.out, "\n" );
-    if( len )
-        *len = EVBUFFER_LENGTH( data.out );
-    ret = tr_strndup( EVBUFFER_DATA( data.out ), EVBUFFER_LENGTH( data.out ) );
+    if( EVBUFFER_LENGTH( out ) )
+        evbuffer_add_printf( out, "\n" );
 
-    tr_releaseBuffer( data.out );
-    return ret;
+    return (char*) EVBUFFER_DATA( out );
 }
 
 /***
@@ -1465,11 +1461,10 @@ int
 tr_bencSaveJSONFile( const char *    filename,
                      const tr_benc * b )
 {
-    int       len;
-    char *    content = tr_bencSaveAsJSON( b, &len );
-    const int err = saveFile( filename, content, len );
-
-    tr_free( content );
+    struct evbuffer * buf = tr_getBuffer( );
+    const char * json = tr_bencSaveAsJSON( b, buf );
+    const int err = saveFile( filename, json, EVBUFFER_LENGTH( buf ) );
+    tr_releaseBuffer( buf );
     return err;
 }
 

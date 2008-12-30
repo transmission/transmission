@@ -17,19 +17,20 @@
 ****  RPC processing
 ***/
 
+struct evbuffer;
 struct tr_benc;
 
 /* http://www.json.org/ */
-char*tr_rpc_request_exec_json( tr_session  * session,
-                               const void  * request_json,
-                               int           request_len,
-                               int         * response_len );
+void tr_rpc_request_exec_json( tr_session       * session,
+                               const void       * request_json,
+                               int                request_len,
+                               struct evbuffer  * setme_response );
 
 /* see the RPC spec's "Request URI Notation" section */
-char*tr_rpc_request_exec_uri( tr_session  * session,
-                              const void  * request_uri,
-                              int           request_len,
-                              int         * response_len );
+void tr_rpc_request_exec_uri( tr_session        * session,
+                              const void        * request_uri,
+                               int                request_len,
+                              struct evbuffer   * setme_response );
 
 void tr_rpc_parse_list_str( struct tr_benc * setme,
                             const char     * list_str,

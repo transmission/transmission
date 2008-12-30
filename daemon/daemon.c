@@ -23,6 +23,8 @@
 #include <signal.h>
 #include <unistd.h> /* daemon */
 
+#include <event.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
 #include <libtransmission/tr-getopt.h>
@@ -245,9 +247,12 @@ main( int     argc,
 
     if( dumpSettings )
     {
-        char * str = tr_bencSaveAsJSON( &settings, NULL );
-        fprintf( stderr, "%s", str );
-        tr_free( str );
+        struct evbuffer * buf = tr_getBuffer( );
+
+        tr_bencSaveAsJSON( &settings, buf );
+        fprintf( stderr, "%s", (char*)EVBUFFER_DATA(buf) );
+
+        tr_releaseBuffer( buf );
         return 0;
     }
 

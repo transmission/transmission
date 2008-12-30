@@ -155,10 +155,10 @@ handle_upload( struct evhttp_request * req,
                     const char * body = strstr( text, "\r\n\r\n" );
                     if( body )
                     {
-                        char *  b64, *json, *freeme;
-                        int     json_len;
+                        char * b64;
                         size_t  body_len;
                         tr_benc top, *args;
+                        struct evbuffer * json = tr_getBuffer( );
 
                         body += 4; /* walk past the \r\n\r\n */
                         body_len = part_len - ( body - text );
@@ -172,13 +172,13 @@ handle_upload( struct evhttp_request * req,
                         b64 = tr_base64_encode( body, body_len, NULL );
                         tr_bencDictAddStr( args, "metainfo", b64 );
                         tr_bencDictAddInt( args, "paused", paused );
-                        json = tr_bencSaveAsJSON( &top, &json_len );
-                        freeme = tr_rpc_request_exec_json( server->session,
-                                                           json, json_len,
-                                                           NULL );
+                        tr_bencSaveAsJSON( &top, json );
+                        tr_rpc_request_exec_json( server->session,
+                                                  EVBUFFER_DATA( json ),
+                                                  EVBUFFER_LENGTH( json ),
+                                                  NULL );
 
-                        tr_free( freeme );
-                        tr_free( json );
+                        tr_releaseBuffer( json );
                         tr_free( b64 );
                         tr_bencFree( &top );
                     }
@@ -376,38 +376,37 @@ handle_clutch( struct evhttp_request * req,
 
 static void
 handle_rpc( struct evhttp_request * req,
-            struct tr_rpc_server *  server )
+            struct tr_rpc_server  * server )
 {
-    int               len = 0;
-    char *            out = NULL;
-    struct evbuffer * buf;
+    struct evbuffer * response = tr_getBuffer( );
 
     if( req->type == EVHTTP_REQ_GET )
     {
         const char * q;
         if( ( q = strchr( req->uri, '?' ) ) )
-            out = tr_rpc_request_exec_uri( server->session,
-                                           q + 1,
-                                           strlen( q + 1 ),
-                                           &len );
+            tr_rpc_request_exec_uri( server->session, q + 1, strlen( q + 1 ), response );
     }
     else if( req->type == EVHTTP_REQ_POST )
     {
-        out = tr_rpc_request_exec_json( server->session,
-                                        EVBUFFER_DATA( req->input_buffer ),
-                                        EVBUFFER_LENGTH( req->input_buffer ),
-                                        &len );
+        tr_rpc_request_exec_json( server->session,
+                                  EVBUFFER_DATA( req->input_buffer ),
+                                  EVBUFFER_LENGTH( req->input_buffer ),
+                                  response );
     }
 
-    buf = tr_getBuffer( );
-    add_response( req, server, buf, out, len );
-    evhttp_add_header( req->output_headers, "Content-Type",
-                       "application/json; charset=UTF-8" );
-    evhttp_send_reply( req, HTTP_OK, "OK", buf );
+    {
+        struct evbuffer * buf = tr_getBuffer( );
+        add_response( req, server, buf,
+                      EVBUFFER_DATA( response ),
+                      EVBUFFER_LENGTH( response ) );
+        evhttp_add_header( req->output_headers, "Content-Type",
+                                                "application/json; charset=UTF-8" );
+        evhttp_send_reply( req, HTTP_OK, "OK", buf );
+        tr_releaseBuffer( buf );
+    }
 
     /* cleanup */
-    tr_releaseBuffer( buf );
-    tr_free( out );
+    tr_releaseBuffer( response );
 }
 
 static tr_bool

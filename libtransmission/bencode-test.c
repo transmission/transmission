@@ -2,6 +2,9 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "event.h"
+
 #include "transmission.h"
 #include "bencode.h"
 #include "json.h"
@@ -309,10 +312,11 @@ testJSONSnippet( const char * benc_str,
                  const char * expected )
 {
     tr_benc top;
-    char *  serialized;
+    struct evbuffer * buf = tr_getBuffer( );
+    char * serialized;
 
     tr_bencLoad( benc_str, strlen( benc_str ), &top, NULL );
-    serialized = tr_bencSaveAsJSON( &top, NULL );
+    serialized = tr_bencSaveAsJSON( &top, buf );
     stripWhitespace( serialized );
 #if 0
     fprintf( stderr, "benc: %s\n", benc_str );
@@ -320,8 +324,8 @@ testJSONSnippet( const char * benc_str,
     fprintf( stderr, "want: %s\n", expected );
 #endif
     check( !strcmp( serialized, expected ) );
-    tr_free( serialized );
     tr_bencFree( &top );
+    tr_releaseBuffer( buf );
     return 0;
 }
 

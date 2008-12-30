@@ -761,14 +761,13 @@ static struct method
     { "torrent-verify", torrentVerify       }
 };
 
-static char*
-request_exec( tr_session * session,
-              tr_benc    * request,
-              int        * response_len )
+static void
+request_exec( tr_session       * session,
+              tr_benc          * request,
+              struct evbuffer  * response_buf )
 {
     int64_t      i;
     const char * str;
-    char *       out;
     tr_benc      response;
     tr_benc *    args_in = tr_bencDictFind( request, "arguments" );
     tr_benc *    args_out = NULL;
@@ -798,30 +797,28 @@ request_exec( tr_session * session,
     tr_bencDictAddStr( &response, "result", result );
     if( tr_bencDictFindInt( request, "tag", &i ) )
         tr_bencDictAddInt( &response, "tag", i );
-    out = tr_bencSaveAsJSON( &response, response_len );
+    if( response_buf != NULL )
+        tr_bencSaveAsJSON( &response, response_buf );
     tr_bencFree( &response );
-    return out;
 }
 
-char*
-tr_rpc_request_exec_json( tr_session * session,
-                          const void * request_json,
-                          int          request_len,
-                          int        * response_len )
+void
+tr_rpc_request_exec_json( tr_session      * session,
+                          const void      * request_json,
+                          int               request_len,
+                          struct evbuffer * response )
 {
     tr_benc top;
-    int     have_content;
-    char *  ret;
+    int have_content;
 
     if( request_len < 0 )
         request_len = strlen( request_json );
 
     have_content = !tr_jsonParse( request_json, request_len, &top, NULL );
-    ret = request_exec( session, have_content ? &top : NULL, response_len );
+    request_exec( session, have_content ? &top : NULL, response );
 
     if( have_content )
         tr_bencFree( &top );
-    return ret;
 }
 
 static void
@@ -903,13 +900,12 @@ tr_rpc_parse_list_str( tr_benc *    setme,
     tr_free( str );
 }
 
-char*
-tr_rpc_request_exec_uri( tr_session * session,
-                         const void * request_uri,
-                         int          request_len,
-                         int        * response_len )
+void
+tr_rpc_request_exec_uri( tr_session      * session,
+                         const void      * request_uri,
+                         int               request_len,
+                         struct evbuffer * response )
 {
-    char *       ret = NULL;
     tr_benc      top, * args;
     char *       request = tr_strndup( request_uri, request_len );
     const char * pch;
@@ -938,11 +934,9 @@ tr_rpc_request_exec_uri( tr_session * session,
         pch = next ? next + 1 : NULL;
     }
 
-    ret = request_exec( session, &top, response_len );
+    request_exec( session, &top, response );
 
     /* cleanup */
     tr_bencFree( &top );
     tr_free( request );
-    return ret;
 }
-

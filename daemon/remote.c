@@ -524,7 +524,12 @@ readargs( int           argc,
         }
 
         if( addArg )
-            reqs[reqCount++] = tr_bencSaveAsJSON( &top, NULL );
+        {
+            struct evbuffer * buf = tr_getBuffer( );
+            reqs[reqCount++] = tr_strdup( tr_bencSaveAsJSON( &top, buf ) );
+            tr_releaseBuffer( buf );
+        }
+
         tr_bencFree( &top );
     }
 }
