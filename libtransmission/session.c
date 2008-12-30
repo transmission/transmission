@@ -221,8 +221,8 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddInt( d, TR_PREFS_KEY_ENCRYPTION,               TR_DEFAULT_ENCRYPTION );
     tr_bencDictAddInt( d, TR_PREFS_KEY_LAZY_BITFIELD,            TRUE );
     tr_bencDictAddInt( d, TR_PREFS_KEY_MSGLEVEL,                 TR_MSG_INF );
-    tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,        240 );
-    tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT,       60 );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,        atoi( TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT,       atoi( TR_DEFAULT_PEER_LIMIT_TORRENT_STR ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_PORT,                atoi( TR_DEFAULT_PEER_PORT_STR ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, FALSE );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,     1024 );

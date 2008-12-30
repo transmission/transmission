@@ -118,6 +118,8 @@ tr_encryption_mode;
 #define TR_DEFAULT_RPC_PORT_STR "9091"
 #define TR_DEFAULT_PEER_PORT_STR "51413"
 #define TR_DEFAULT_PEER_SOCKET_TOS_STR "8"
+#define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR "240"
+#define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "60"
 
 #define TR_PREFS_KEY_BLOCKLIST_ENABLED          "blocklist-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR               "download-dir"

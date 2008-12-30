@@ -65,6 +65,14 @@ static const struct tr_option options[] =
     { 'u', "username", "Set username for authentication", "u", 1, "<username>" },
     { 'v', "password", "Set password for authentication", "v", 1, "<password>" },
     { 'w', "download-dir", "Where to save downloaded data", "w", 1, "<path>" },
+    { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", 1, "<port>" },
+    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
+    { 'M', "no-portmap", "Disable portmapping", "M", 0, NULL },
+    { 'L', "peerlimit-global", "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")", "L", 1, "<limit>" },
+    { 'l', "peerlimit-torrent", "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")", "l", 1, "<limit>" },
+    { 910, "encryption-required",  "Encrypt all peer connections", "er", 0, NULL },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL },
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
@@ -213,6 +221,22 @@ main( int     argc,
             case 'v': tr_bencDictAddStr( &settings, TR_PREFS_KEY_RPC_PASSWORD, optarg );
                       break;
             case 'w': tr_bencDictAddStr( &settings, TR_PREFS_KEY_DOWNLOAD_DIR, optarg );
+                      break;
+            case 'P': tr_bencDictAddInt( &settings, TR_PREFS_KEY_PEER_PORT, atoi( optarg ) );
+                      break;
+            case 'm': tr_bencDictAddInt( &settings, TR_PREFS_KEY_PORT_FORWARDING, 1 );
+                      break;
+            case 'M': tr_bencDictAddInt( &settings, TR_PREFS_KEY_PORT_FORWARDING, 0 );
+                      break;
+            case 'L': tr_bencDictAddInt( &settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, atoi( optarg ) );
+                      break;
+            case 'l': tr_bencDictAddInt( &settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, atoi( optarg ) );
+                      break;
+            case 910: tr_bencDictAddInt( &settings, TR_PREFS_KEY_ENCRYPTION, TR_ENCRYPTION_REQUIRED );
+                      break;
+            case 911: tr_bencDictAddInt( &settings, TR_PREFS_KEY_ENCRYPTION, TR_CLEAR_PREFERRED );
+                      break;
+            case 912: tr_bencDictAddInt( &settings, TR_PREFS_KEY_ENCRYPTION, TR_ENCRYPTION_PREFERRED );
                       break;
             default:  showUsage( );
                       break;
