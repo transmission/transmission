@@ -282,7 +282,7 @@ tr_eventClose( tr_session * session )
 ***
 **/
 
-int
+tr_bool
 tr_amInEventThread( tr_session * session )
 {
     assert( session );

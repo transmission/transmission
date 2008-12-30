@@ -92,7 +92,7 @@ struct tr_peerIo
     tr_port            port;
     int                socket;
 
-    uint8_t            peerId[20];
+    uint8_t            peerId[SHA_DIGEST_LENGTH];
     time_t             timeCreated;
 
     tr_session       * session;

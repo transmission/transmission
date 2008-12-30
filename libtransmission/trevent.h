@@ -48,7 +48,7 @@ tr_timer* tr_timerNew( tr_session * handle,
 void      tr_timerFree( tr_timer ** timer );
 
 
-int       tr_amInEventThread( tr_session * );
+tr_bool   tr_amInEventThread( tr_session * );
 
 void      tr_runInEventThread( tr_session * session,
                                void         func( void* ),

@@ -908,9 +908,7 @@ static void
 enqueueScrape( tr_session * session,
                tr_tracker * tracker )
 {
-    struct tr_tracker_request * req;
-
-    req = createScrape( session, tracker );
+    struct tr_tracker_request * req = createScrape( session, tracker );
     tr_runInEventThread( session, invokeRequest, req );
 }
 
@@ -919,9 +917,7 @@ enqueueRequest( tr_session * session,
                 tr_tracker * tracker,
                 int          reqtype )
 {
-    struct tr_tracker_request * req;
-
-    req = createRequest( session, tracker, reqtype );
+    struct tr_tracker_request * req = createRequest( session, tracker, reqtype );
     tr_runInEventThread( session, invokeRequest, req );
 }
 
