@@ -288,17 +288,18 @@ tr_msg( const char * file,
 
     if( messageLevel >= level )
     {
-        va_list           ap;
-        struct evbuffer * buf = evbuffer_new( );
+        char buf[MAX_STACK_ARRAY_SIZE];
+        va_list ap;
 
         /* build the text message */
+        *buf = '\0';
         va_start( ap, fmt );
-        evbuffer_add_vprintf( buf, fmt, ap );
+        evutil_vsnprintf( buf, sizeof( buf ), fmt, ap );
         va_end( ap );
 
-        OutputDebugString( EVBUFFER_DATA( buf ) );
+        OutputDebugString( buf );
 
-        if( EVBUFFER_LENGTH( buf ) )
+        if( *buf )
         {
             if( messageQueuing )
             {
@@ -306,7 +307,7 @@ tr_msg( const char * file,
                 newmsg = tr_new0( tr_msg_list, 1 );
                 newmsg->level = level;
                 newmsg->when = time( NULL );
-                newmsg->message = tr_strdup( EVBUFFER_DATA( buf ) );
+                newmsg->message = tr_strdup( buf );
                 newmsg->file = file;
                 newmsg->line = line;
                 newmsg->name = tr_strdup( name );
@@ -319,14 +320,11 @@ tr_msg( const char * file,
                 if( fp == NULL )
                     fp = stderr;
                 if( name )
-                    fprintf( fp, "%s: %s\n", name,
-                            (char*)EVBUFFER_DATA( buf ) );
+                    fprintf( fp, "%s: %s\n", name, buf );
                 else
-                    fprintf( fp, "%s\n", (char*)EVBUFFER_DATA( buf ) );
+                    fprintf( fp, "%s\n", buf );
                 fflush( fp );
             }
-
-            evbuffer_free( buf );
         }
     }
 
