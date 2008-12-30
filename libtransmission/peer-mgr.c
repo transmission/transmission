@@ -495,26 +495,6 @@ tr_peerMgrFree( tr_peerMgr * manager )
     tr_free( manager );
 }
 
-static tr_peer**
-getConnectedPeers( Torrent * t, int * setmeCount )
-{
-    int i, peerCount, connectionCount;
-    tr_peer **peers;
-    tr_peer **ret;
-
-    assert( torrentIsLocked( t ) );
-
-    peers = (tr_peer **) tr_ptrArrayPeek( &t->peers, &peerCount );
-    ret = tr_new( tr_peer *, peerCount );
-
-    for( i = connectionCount = 0; i < peerCount; ++i )
-        if( peers[i]->msgs )
-            ret[connectionCount++] = peers[i];
-
-    *setmeCount = connectionCount;
-    return ret;
-}
-
 static int
 clientIsDownloadingFrom( const tr_peer * peer )
 {
@@ -638,11 +618,12 @@ getPreferredPieces( Torrent * t, tr_piece_index_t * pieceCount )
     tr_piece_index_t    poolSize = 0;
     tr_piece_index_t  * pool = tr_new( tr_piece_index_t , inf->pieceCount );
     int                 peerCount;
-    tr_peer**           peers;
+    const tr_peer    ** peers;
 
     assert( torrentIsLocked( t ) );
 
-    peers = getConnectedPeers( t, &peerCount );
+    peers = (const tr_peer**) TR_PTR_ARRAY_DATA( &t->peers );
+    peerCount = TR_PTR_ARRAY_LENGTH( &t->peers );
 
     /* make a list of the pieces that we want but don't have */
     for( i = 0; i < inf->pieceCount; ++i )
@@ -688,8 +669,6 @@ getPreferredPieces( Torrent * t, tr_piece_index_t * pieceCount )
 
         tr_free( p );
     }
-
-    tr_free( peers );
 
     *pieceCount = poolSize;
     return pool;
@@ -887,16 +866,19 @@ refillPulse( void * vtorrent )
 static void
 broadcastGotBlock( Torrent * t, uint32_t index, uint32_t offset, uint32_t length )
 {
-    int i, size;
+    size_t i;
+    size_t peerCount;
     tr_peer ** peers;
 
     assert( torrentIsLocked( t ) );
 
     tordbg( t, "got a block; cancelling any duplicate requests from peers %"PRIu32":%"PRIu32"->%"PRIu32, index, offset, length );
-    peers = getConnectedPeers( t, &size );
-    for( i=0; i<size; ++i )
-        tr_peerMsgsCancel( peers[i]->msgs, index, offset, length );
-    tr_free( peers );
+
+    peerCount = TR_PTR_ARRAY_LENGTH( &t->peers );
+    peers = (tr_peer**) TR_PTR_ARRAY_DATA( &t->peers );
+    for( i=0; i<peerCount; ++i )
+        if( peers[i]->msgs )
+            tr_peerMsgsCancel( peers[i]->msgs, index, offset, length );
 }
 
 static void
@@ -1121,11 +1103,11 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
                     gotBadPiece( t, p );
                 else
                 {
-                    int i, peerCount;
-                    tr_peer ** peers = getConnectedPeers( t, &peerCount );
-                    for( i = 0; i < peerCount; ++i )
+                    int i;
+                    int peerCount = TR_PTR_ARRAY_LENGTH( &t->peers );
+                    tr_peer ** peers = (tr_peer**) TR_PTR_ARRAY_DATA( &t->peers );
+                    for( i=0; i<peerCount; ++i )
                         tr_peerMsgsHave( peers[i]->msgs, p );
-                    tr_free( peers );
                 }
 
                 tr_torrentRecheckCompleteness( tor );
@@ -1674,7 +1656,6 @@ tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
     tr_bool            isSeed;
     int                peerCount;
     const tr_peer **   peers;
-
     managerLock( manager );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
@@ -1708,20 +1689,21 @@ tr_bitfield*
 tr_peerMgrGetAvailable( const tr_peerMgr * manager,
                         const uint8_t *    torrentHash )
 {
-    int           i, size;
-    Torrent *     t;
-    tr_peer **    peers;
+    int i;
+    int peerCount;
+    Torrent * t;
+    const tr_peer ** peers;
     tr_bitfield * pieces;
     managerLock( manager );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     pieces = tr_bitfieldNew( t->tor->info.pieceCount );
-    peers = getConnectedPeers( t, &size );
-    for( i = 0; i < size; ++i )
+    peerCount = TR_PTR_ARRAY_LENGTH( &t->peers );
+    peers = (const tr_peer**) TR_PTR_ARRAY_DATA( &t->peers );
+    for( i=0; i<peerCount; ++i )
         tr_bitfieldOr( pieces, peers[i]->have );
 
     managerUnlock( manager );
-    tr_free( peers );
     return pieces;
 }
 
@@ -1845,16 +1827,17 @@ tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
                      const   uint8_t     * torrentHash,
                      int                 * setmeCount UNUSED )
 {
-    int             i, size;
+    int i, size;
     const Torrent * t;
-    tr_peer **      peers;
-    tr_peer_stat *  ret;
+    const tr_peer ** peers;
+    tr_peer_stat * ret;
 
     assert( manager );
     managerLock( manager );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
-    peers = getConnectedPeers( (Torrent*)t, &size );
+    size = TR_PTR_ARRAY_LENGTH( &t->peers );
+    peers = (const tr_peer**) TR_PTR_ARRAY_DATA( &t->peers );
     ret = tr_new0( tr_peer_stat, size );
 
     for( i = 0; i < size; ++i )
@@ -1900,7 +1883,6 @@ tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
     }
 
     *setmeCount = size;
-    tr_free( peers );
 
     managerUnlock( manager );
     return ret;
@@ -1954,10 +1936,11 @@ isSame( const tr_peer * peer )
 static void
 rechoke( Torrent * t )
 {
-    int                i, peerCount, size, unchokedInterested;
-    tr_peer **         peers = getConnectedPeers( t, &peerCount );
+    int i, size, unchokedInterested;
+    const int peerCount = TR_PTR_ARRAY_LENGTH( &t->peers );
+    tr_peer ** peers = (tr_peer**) TR_PTR_ARRAY_DATA( &t->peers );
     struct ChokeData * choke = tr_new0( struct ChokeData, peerCount );
-    const int          chokeAll = !tr_torrentIsPieceTransferAllowed( t->tor, TR_CLIENT_TO_PEER );
+    const int chokeAll = !tr_torrentIsPieceTransferAllowed( t->tor, TR_CLIENT_TO_PEER );
 
     assert( torrentIsLocked( t ) );
 
@@ -2046,7 +2029,6 @@ rechoke( Torrent * t )
 
     /* cleanup */
     tr_free( choke );
-    tr_free( peers );
 }
 
 static int
