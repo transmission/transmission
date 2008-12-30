@@ -77,7 +77,9 @@ enum
 
     PEX_INTERVAL            = ( 90 * 1000 ), /* msec between sendPex() calls */
 
-    MAX_QUEUE_SIZE          = ( 100 ),
+
+    MAX_BLOCK_SIZE          = ( 1024 * 16 ),
+
 
     /* how long an unsent request can stay queued before it's returned
        back to the peer-mgr's pool of requests */
@@ -867,35 +869,48 @@ requestIsValid( const tr_peermsgs * msgs, const struct peer_request * req )
 }
 
 static void
-expireOldRequests( tr_peermsgs * msgs, const time_t now  )
+expireFromList( tr_peermsgs          * msgs,
+                struct request_list  * list,
+                const time_t           oldestAllowed )
 {
     int i;
-    time_t oldestAllowed;
-    struct request_list tmp = REQUEST_LIST_INIT;
-    const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
-    dbgmsg( msgs, "entering `expire old requests' block" );
 
-    /* cancel requests that have been queued for too long */
-    oldestAllowed = now - QUEUED_REQUEST_TTL_SECS;
-    reqListCopy( &tmp, &msgs->clientWillAskFor );
-    for( i=0; i<tmp.count; ++i ) {
-        const struct peer_request * req = &tmp.requests[i];
+    /* walk through the list, looking for the first req that's too old */
+    for( i=0; i<list->count; ++i ) {
+        const struct peer_request * req = &list->requests[i];
         if( req->time_requested < oldestAllowed )
-            tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
+            break;
     }
-    reqListClear( &tmp );
 
-    /* if the peer doesn't support "Reject Request",
-     * cancel requests that were sent too long ago. */
-    if( !fext ) {
-        oldestAllowed = now - SENT_REQUEST_TTL_SECS;
-        reqListCopy( &tmp, &msgs->clientAskedFor );
-        for( i=0; i<tmp.count; ++i ) {
+    /* if we found one too old, start pruning them */
+    if( i < list->count ) {
+        struct request_list tmp = REQUEST_LIST_INIT;
+        reqListCopy( &tmp, list );
+        for( ; i<tmp.count; ++i ) {
             const struct peer_request * req = &tmp.requests[i];
             if( req->time_requested < oldestAllowed )
                 tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
         }
         reqListClear( &tmp );
+    }
+}
+
+static void
+expireOldRequests( tr_peermsgs * msgs, const time_t now  )
+{
+    time_t oldestAllowed;
+    const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
+    dbgmsg( msgs, "entering `expire old requests' block" );
+
+    /* cancel requests that have been queued for too long */
+    oldestAllowed = now - QUEUED_REQUEST_TTL_SECS;
+    expireFromList( msgs, &msgs->clientWillAskFor, oldestAllowed );
+
+    /* if the peer doesn't support "Reject Request",
+     * cancel requests that were sent too long ago. */
+    if( !fext ) {
+        oldestAllowed = now - SENT_REQUEST_TTL_SECS;
+        expireFromList( msgs, &msgs->clientAskedFor, oldestAllowed );
     }
 
     dbgmsg( msgs, "leaving `expire old requests' block" );
@@ -1817,16 +1832,24 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
         if( requestIsValid( msgs, &req )
             && tr_cpPieceIsComplete( msgs->torrent->completion, req.index ) )
         {
+            int err;
+            static uint8_t * buf = NULL;
+            static struct evbuffer * out = NULL;
+
+            if( buf == NULL )
+                buf = tr_new( uint8_t, MAX_BLOCK_SIZE );
+            if( out == NULL )
+                out = evbuffer_new( );
+
+            assert( !EVBUFFER_LENGTH( out ) );
+
             /* send a block */
-            uint8_t * buf = tr_new( uint8_t, req.length );
-            const int err = tr_ioRead( msgs->torrent, req.index, req.offset, req.length, buf );
-            if( err ) {
+            if(( err = tr_ioRead( msgs->torrent, req.index, req.offset, req.length, buf ))) {
                 fireError( msgs, err );
                 bytesWritten = 0;
                 msgs = NULL;
             } else {
                 tr_peerIo * io = msgs->peer->io;
-                struct evbuffer * out = evbuffer_new( );
                 dbgmsg( msgs, "sending block %u:%u->%u", req.index, req.offset, req.length );
                 tr_peerIoWriteUint32( io, out, sizeof( uint8_t ) + 2 * sizeof( uint32_t ) + req.length );
                 tr_peerIoWriteUint8 ( io, out, BT_PIECE );
@@ -1835,10 +1858,8 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
                 tr_peerIoWriteBytes ( io, out, buf, req.length );
                 tr_peerIoWriteBuf( io, out, TRUE );
                 bytesWritten += EVBUFFER_LENGTH( out );
-                evbuffer_free( out );
                 msgs->clientSentAnythingAt = now;
             }
-            tr_free( buf );
         }
         else if( fext ) /* peer needs a reject message */
         {
