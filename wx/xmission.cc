@@ -53,6 +53,7 @@ extern "C"
 {
   #include <libtransmission/transmission.h>
   #include <libtransmission/utils.h>
+  #include <libtransmission/bencode.h>
 
   #include <images/play.xpm>
   #include <images/stop.xpm>
@@ -390,11 +391,16 @@ void MyFrame :: OnOpen( wxCommandEvent& WXUNUSED(event) )
 bool
 MyApp :: OnInit( )
 {
-    const wxString downloadDir = wxStandardPaths::Get().GetDocumentsDir( );
+    tr_benc settings;
+    const char * configDir;
 
-    handle = tr_sessionInit( tr_getDefaultConfigDir(),
-                             toStr(downloadDir).c_str(),
-                             "wx" );
+    tr_bencInitDict( &settings, 0 );
+    tr_sessionGetDefaultSettings( &settings );
+    configDir = tr_getDefaultConfigDir( "xmission" );
+
+    handle = tr_sessionInit( "wx", configDir, true, &settings );
+    
+    tr_bencFree( &settings );
 
     wxCmdLineParser cmdParser( cmdLineDesc, argc, argv );
     if( cmdParser.Parse ( ) )
