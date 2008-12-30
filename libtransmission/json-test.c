@@ -81,6 +81,7 @@ test_utf8( void )
         tr_bencFree( &top );
     tr_free( json );
 
+    tr_releaseBuffer( buf );
     return 0;
 }
 

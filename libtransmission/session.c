@@ -477,7 +477,6 @@ tr_sessionInit( const char  * tag,
     session->peerPort = session->isPortRandom ? getRandomPort( session ) : j; 
     session->shared = tr_sharedInit( session, i, session->peerPort ); 
     session->isPortSet = session->isPortRandom || j>0; 
-    session->bandwidth = tr_bandwidthNew( session, NULL ); 
 
     /** 
     **/ 
@@ -523,6 +522,7 @@ tr_sessionInit( const char  * tag,
 
     metainfoLookupRescan( session );
 
+    tr_bencFree( &settings );
     return session;
 }
 
