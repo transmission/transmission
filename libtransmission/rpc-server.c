@@ -57,6 +57,10 @@ struct tr_rpc_server
     char *             password;
     char *             whitelistStr;
     tr_list *          whitelist;
+
+#ifdef HAVE_ZLIB
+    z_stream           stream;
+#endif
 };
 
 #define dbgmsg( ... ) \
@@ -222,6 +226,7 @@ mimetype_guess( const char * path )
 
 static void
 add_response( struct evhttp_request * req,
+              struct tr_rpc_server *  server,
               struct evbuffer *       out,
               const void *            content,
               size_t                  content_len )
@@ -240,28 +245,22 @@ add_response( struct evhttp_request * req,
     else
     {
         int state;
-        z_stream stream;
 
-        stream.zalloc = (alloc_func) Z_NULL;
-        stream.zfree = (free_func) Z_NULL;
-        stream.opaque = (voidpf) Z_NULL;
-        deflateInit( &stream, Z_BEST_COMPRESSION );
-
-        stream.next_in = (Bytef*) content;
-        stream.avail_in = content_len;
+        server->stream.next_in = (Bytef*) content;
+        server->stream.avail_in = content_len;
 
         /* allocate space for the raw data and call deflate() just once --
          * we won't use the deflated data if it's longer than the raw data,
          * so it's okay to let deflate() run out of output buffer space */
         evbuffer_expand( out, content_len );
-        stream.next_out = EVBUFFER_DATA( out );
-        stream.avail_out = content_len;
+        server->stream.next_out = EVBUFFER_DATA( out );
+        server->stream.avail_out = content_len;
 
-        state = deflate( &stream, Z_FINISH );
+        state = deflate( &server->stream, Z_FINISH );
 
         if( state == Z_STREAM_END )
         {
-            EVBUFFER_LENGTH( out ) = content_len - stream.avail_out;
+            EVBUFFER_LENGTH( out ) = content_len - server->stream.avail_out;
 
             /* http://carsten.codimi.de/gzip.yaws/
                It turns out that some browsers expect deflated data without
@@ -287,13 +286,14 @@ add_response( struct evhttp_request * req,
             evbuffer_add( out, content, content_len );
         }
 
-        deflateEnd( &stream );
+        deflateReset( &server->stream );
     }
 #endif
 }
 
 static void
 serve_file( struct evhttp_request * req,
+            struct tr_rpc_server *  server,
             const char *            filename )
 {
     if( req->type != EVHTTP_REQ_GET )
@@ -323,7 +323,7 @@ serve_file( struct evhttp_request * req,
             out = tr_getBuffer( );
             evhttp_add_header( req->output_headers, "Content-Type",
                                mimetype_guess( filename ) );
-            add_response( req, out, content, content_len );
+            add_response( req, server, out, content, content_len );
             evhttp_send_reply( req, HTTP_OK, "OK", out );
 
             tr_releaseBuffer( out );
@@ -367,7 +367,7 @@ handle_clutch( struct evhttp_request * req,
                        TR_PATH_DELIMITER_STR,
                        subpath && *subpath ? subpath : "index.html" );
 
-        serve_file( req, filename );
+        serve_file( req, server, filename );
 
         tr_free( filename );
         tr_free( subpath );
@@ -400,7 +400,7 @@ handle_rpc( struct evhttp_request * req,
     }
 
     buf = tr_getBuffer( );
-    add_response( req, buf, out, len );
+    add_response( req, server, buf, out, len );
     evhttp_add_header( req->output_headers, "Content-Type",
                        "application/json; charset=UTF-8" );
     evhttp_send_reply( req, HTTP_OK, "OK", buf );
@@ -691,6 +691,9 @@ closeServer( void * vserver )
     stopServer( s );
     while(( tmp = tr_list_pop_front( &s->whitelist )))
         tr_free( tmp );
+#ifdef HAVE_ZLIB
+    deflateEnd( &s->stream );
+#endif
     tr_free( s->whitelistStr );
     tr_free( s->username );
     tr_free( s->password );
@@ -725,6 +728,14 @@ tr_rpcInit( tr_session  * session,
     s->isPasswordEnabled = isPasswordEnabled;
     s->isEnabled = isEnabled != 0;
     tr_rpcSetWhitelist( s, whitelist ? whitelist : "127.0.0.1" );
+
+#ifdef HAVE_ZLIB
+    s->stream.zalloc = (alloc_func) Z_NULL;
+    s->stream.zfree = (free_func) Z_NULL;
+    s->stream.opaque = (voidpf) Z_NULL;
+    deflateInit( &s->stream, Z_BEST_COMPRESSION );
+#endif
+
     if( isEnabled )
         tr_runInEventThread( session, startServer, s );
 
