@@ -11,7 +11,6 @@ EXTRA_DIST = \
     Growl.framework \
     Sparkle.framework \
     sparkle_dsa_pub.pem \
-    CTGradient \
     UKKQueue \
     TransmissionHelp \
     Images \
