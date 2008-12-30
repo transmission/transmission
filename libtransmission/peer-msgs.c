@@ -329,7 +329,7 @@ myDebug( const char * file, int line,
     {
         va_list           args;
         char              timestr[64];
-        struct evbuffer * buf = evbuffer_new( );
+        struct evbuffer * buf = tr_getBuffer( );
         char *            base = tr_basename( file );
 
         evbuffer_add_printf( buf, "[%s] %s - %s [%s]: ",
@@ -344,7 +344,7 @@ myDebug( const char * file, int line,
         fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
 
         tr_free( base );
-        evbuffer_free( buf );
+        tr_releaseBuffer( buf );
     }
 }
 
@@ -1758,14 +1758,9 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
         {
             int err;
             static uint8_t * buf = NULL;
-            static struct evbuffer * out = NULL;
 
             if( buf == NULL )
                 buf = tr_new( uint8_t, MAX_BLOCK_SIZE );
-            if( out == NULL )
-                out = evbuffer_new( );
-
-            assert( !EVBUFFER_LENGTH( out ) );
 
             /* send a block */
             if(( err = tr_ioRead( msgs->torrent, req.index, req.offset, req.length, buf ))) {
@@ -1774,6 +1769,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
                 msgs = NULL;
             } else {
                 tr_peerIo * io = msgs->peer->io;
+                struct evbuffer * out = tr_getBuffer( );
                 dbgmsg( msgs, "sending block %u:%u->%u", req.index, req.offset, req.length );
                 tr_peerIoWriteUint32( io, out, sizeof( uint8_t ) + 2 * sizeof( uint32_t ) + req.length );
                 tr_peerIoWriteUint8 ( io, out, BT_PIECE );
@@ -1783,6 +1779,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
                 tr_peerIoWriteBuf( io, out, TRUE );
                 bytesWritten += EVBUFFER_LENGTH( out );
                 msgs->clientSentAnythingAt = now;
+                tr_releaseBuffer( out );
             }
         }
         else if( fext ) /* peer needs a reject message */

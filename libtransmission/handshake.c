@@ -314,7 +314,7 @@ sendYa( tr_handshake * handshake )
 {
     int               len;
     const uint8_t *   public_key;
-    struct evbuffer * outbuf = evbuffer_new( );
+    struct evbuffer * outbuf = tr_getBuffer( );
     uint8_t           pad_a[PadA_MAXLEN];
 
     /* add our public key (Ya) */
@@ -333,7 +333,7 @@ sendYa( tr_handshake * handshake )
     tr_peerIoWriteBuf( handshake->io, outbuf, FALSE );
 
     /* cleanup */
-    evbuffer_free( outbuf );
+    tr_releaseBuffer( outbuf );
 }
 
 static uint32_t
@@ -426,7 +426,7 @@ readYb( tr_handshake *    handshake,
 
     /* now send these: HASH('req1', S), HASH('req2', SKEY) xor HASH('req3', S),
      * ENCRYPT(VC, crypto_provide, len(PadC), PadC, len(IA)), ENCRYPT(IA) */
-    outbuf = evbuffer_new( );
+    outbuf = tr_getBuffer( );
 
     /* HASH('req1', S) */
     {
@@ -483,7 +483,7 @@ readYb( tr_handshake *    handshake,
     tr_peerIoWriteBuf( handshake->io, outbuf, FALSE );
 
     /* cleanup */
-    evbuffer_free( outbuf );
+    tr_releaseBuffer( outbuf );
     return READ_LATER;
 }
 
@@ -919,7 +919,7 @@ readIA( tr_handshake *    handshake,
     **/
 
     tr_cryptoEncryptInit( handshake->crypto );
-    outbuf = evbuffer_new( );
+    outbuf = tr_getBuffer( );
 
     dbgmsg( handshake, "sending vc" );
     /* send VC */
@@ -968,7 +968,7 @@ readIA( tr_handshake *    handshake,
 
     /* send it out */
     tr_peerIoWriteBuf( handshake->io, outbuf, FALSE );
-    evbuffer_free( outbuf );
+    tr_releaseBuffer( outbuf );
 
     /* now await the handshake */
     setState( handshake, AWAITING_PAYLOAD_STREAM );

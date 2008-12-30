@@ -61,7 +61,7 @@ getOldTorrentFilename( const tr_session * session,
                        const tr_info *   inf )
 {
     char *            ret;
-    struct evbuffer * buf = evbuffer_new( );
+    struct evbuffer * buf = tr_getBuffer( );
 
     evbuffer_add_printf( buf, "%s%c%s", tr_getTorrentDir( session ),
                          TR_PATH_DELIMITER,
@@ -70,7 +70,7 @@ getOldTorrentFilename( const tr_session * session,
         evbuffer_add_printf( buf, "-%s", session->tag );
 
     ret = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
-    evbuffer_free( buf );
+    tr_releaseBuffer( buf );
     return ret;
 }
 
@@ -136,7 +136,7 @@ getfile( char **      setme,
     }
     else
     {
-        struct evbuffer * buf = evbuffer_new( );
+        struct evbuffer * buf = tr_getBuffer( );
         int               n = tr_bencListSize( path );
         int               i;
 
@@ -154,7 +154,7 @@ getfile( char **      setme,
 
         *setme = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
         /* fprintf( stderr, "[%s]\n", *setme ); */
-        evbuffer_free( buf );
+        tr_releaseBuffer( buf );
         err = 0;
     }
 
@@ -234,12 +234,12 @@ announceToScrape( const char * announce )
     if( ( ( s =
                strrchr( announce, '/' ) ) ) && !strncmp( ++s, "announce", 8 ) )
     {
-        struct evbuffer * buf = evbuffer_new( );
+        struct evbuffer * buf = tr_getBuffer( );
         evbuffer_add( buf, announce, s - announce );
         evbuffer_add( buf, "scrape", 6 );
         evbuffer_add_printf( buf, "%s", s + 8 );
         scrape = tr_strdup( EVBUFFER_DATA( buf ) );
-        evbuffer_free( buf );
+        tr_releaseBuffer( buf );
     }
 
     return scrape;

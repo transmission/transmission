@@ -1043,7 +1043,7 @@ tr_bencSave( const tr_benc * top,
 {
     char *            ret;
     struct WalkFuncs  walkFuncs;
-    struct evbuffer * out = evbuffer_new( );
+    struct evbuffer * out = tr_getBuffer( );
 
     walkFuncs.intFunc = saveIntFunc;
     walkFuncs.stringFunc = saveStringFunc;
@@ -1055,7 +1055,8 @@ tr_bencSave( const tr_benc * top,
     if( len )
         *len = EVBUFFER_LENGTH( out );
     ret = tr_strndup( EVBUFFER_DATA( out ), EVBUFFER_LENGTH( out ) );
-    evbuffer_free( out );
+
+    tr_releaseBuffer( out );
     return ret;
 }
 
@@ -1317,7 +1318,7 @@ tr_bencSaveAsJSON( const tr_benc * top,
     struct WalkFuncs walkFuncs;
     struct jsonWalk  data;
 
-    data.out = evbuffer_new( );
+    data.out = tr_getBuffer( );
     data.parents = NULL;
 
     walkFuncs.intFunc = jsonIntFunc;
@@ -1333,7 +1334,8 @@ tr_bencSaveAsJSON( const tr_benc * top,
     if( len )
         *len = EVBUFFER_LENGTH( data.out );
     ret = tr_strndup( EVBUFFER_DATA( data.out ), EVBUFFER_LENGTH( data.out ) );
-    evbuffer_free( data.out );
+
+    tr_releaseBuffer( data.out );
     return ret;
 }
 

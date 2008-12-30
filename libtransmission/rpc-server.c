@@ -76,13 +76,14 @@ send_simple_response( struct evhttp_request * req,
                       const char *            text )
 {
     const char *      code_text = tr_webGetResponseStr( code );
-    struct evbuffer * body = evbuffer_new( );
+    struct evbuffer * body = tr_getBuffer( );
 
     evbuffer_add_printf( body, "<h1>%d: %s</h1>", code, code_text );
     if( text )
         evbuffer_add_printf( body, "%s", text );
     evhttp_send_reply( req, code, code_text, body );
-    evbuffer_free( body );
+
+    tr_releaseBuffer( body );
 }
 
 static const char*
@@ -319,13 +320,13 @@ serve_file( struct evhttp_request * req,
             struct evbuffer * out;
 
             errno = error;
-            out = evbuffer_new( );
+            out = tr_getBuffer( );
             evhttp_add_header( req->output_headers, "Content-Type",
                                mimetype_guess( filename ) );
             add_response( req, out, content, content_len );
             evhttp_send_reply( req, HTTP_OK, "OK", out );
 
-            evbuffer_free( out );
+            tr_releaseBuffer( out );
             tr_free( content );
         }
     }
@@ -398,14 +399,14 @@ handle_rpc( struct evhttp_request * req,
                                         &len );
     }
 
-    buf = evbuffer_new( );
+    buf = tr_getBuffer( );
     add_response( req, buf, out, len );
     evhttp_add_header( req->output_headers, "Content-Type",
                        "application/json; charset=UTF-8" );
     evhttp_send_reply( req, HTTP_OK, "OK", buf );
 
     /* cleanup */
-    evbuffer_free( buf );
+    tr_releaseBuffer( buf );
     tr_free( out );
 }
 

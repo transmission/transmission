@@ -410,7 +410,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     /* No match */
     if( !*buf )
     {
-        struct evbuffer * out = evbuffer_new( );
+        struct evbuffer * out = tr_getBuffer( );
         const char *in, *in_end;
         for( in=(const char*)id, in_end=in+8; in!=in_end; ++in ) {
             if( isprint( *in ) )
@@ -420,6 +420,6 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         }
 
         tr_strlcpy( buf, EVBUFFER_DATA( out ), buflen );
-        evbuffer_free( out );
+        tr_releaseBuffer( out );
     }
 }
