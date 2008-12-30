@@ -153,6 +153,8 @@ canReadWrapper( tr_peerIo * io )
     tr_bool err = 0;
     tr_session * session = io->session;
 
+    assert( tr_isPeerIo( io ) );
+
     dbgmsg( io, "canRead" );
 
     /* try to consume the input buffer */
@@ -168,11 +170,16 @@ canReadWrapper( tr_peerIo * io )
 
             const size_t used = oldLen - EVBUFFER_LENGTH( io->inbuf );
 
-            if( piece )
-                tr_bandwidthUsed( io->bandwidth, TR_DOWN, piece, TRUE );
+            assert( tr_isPeerIo( io ) );
 
-            if( used != piece )
-                tr_bandwidthUsed( io->bandwidth, TR_DOWN, used - piece, FALSE );
+            if( io->bandwidth != NULL )
+            {
+                if( piece )
+                    tr_bandwidthUsed( io->bandwidth, TR_DOWN, piece, TRUE );
+
+                if( used != piece )
+                    tr_bandwidthUsed( io->bandwidth, TR_DOWN, used - piece, FALSE );
+            }
 
             switch( ret )
             {
