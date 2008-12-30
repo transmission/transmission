@@ -36,7 +36,7 @@
  #include <windows.h>
  #define MAX_PATH_LENGTH  MAX_PATH
 #else
- #define MAX_PATH_LENGTH  1024
+ #define MAX_PATH_LENGTH  2048
 #endif
 
 #define MAX_STACK_ARRAY_SIZE 7168

@@ -678,8 +678,7 @@ tr_strndup( const void * in,
 }
 
 char*
-tr_strdup_printf( const char * fmt,
-                  ... )
+tr_strdup_printf( const char * fmt, ... )
 {
     char *            ret = NULL;
     struct evbuffer * buf;

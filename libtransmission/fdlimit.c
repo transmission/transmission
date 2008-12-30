@@ -261,17 +261,16 @@ tr_fdFileCheckout( const char * folder,
                    int          doPreallocate,
                    uint64_t     desiredFileSize )
 {
-    int                  i, winner = -1;
+    int i, winner = -1;
     struct tr_openfile * o;
-    char               * filename;
+    char filename[MAX_PATH_LENGTH];
 
     assert( folder && *folder );
     assert( torrentFile && *torrentFile );
     assert( doWrite == 0 || doWrite == 1 );
 
-    filename = tr_buildPath( folder, torrentFile, NULL );
-    dbgmsg( "looking for file '%s', writable %c", filename,
-            doWrite ? 'y' : 'n' );
+    tr_snprintf( filename, sizeof( filename ), "%s%c%s", folder, TR_PATH_DELIMITER, torrentFile );
+    dbgmsg( "looking for file '%s', writable %c", filename, doWrite ? 'y' : 'n' );
 
     tr_lockLock( gFd->lock );
 
@@ -361,7 +360,6 @@ tr_fdFileCheckout( const char * folder,
         const int err = TrOpenFile( winner, folder, torrentFile, doWrite, doPreallocate, desiredFileSize );
         if( err ) {
             tr_lockUnlock( gFd->lock );
-            tr_free( filename );
             errno = err;
             return -1;
         }
@@ -376,7 +374,6 @@ tr_fdFileCheckout( const char * folder,
     o->isCheckedOut = 1;
     o->closeWhenDone = 0;
     o->date = tr_date( );
-    tr_free( filename );
     tr_lockUnlock( gFd->lock );
     return o->fd;
 }
