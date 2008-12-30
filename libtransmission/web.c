@@ -126,7 +126,7 @@ addTask( void * vtask )
         }
 
         curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 3600L );
-        curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 60L );
+        curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 120L );
         curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1L );
         curl_easy_setopt( easy, CURLOPT_FORBID_REUSE, 1L );
         curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 16L );
@@ -134,6 +134,7 @@ addTask( void * vtask )
         curl_easy_setopt( easy, CURLOPT_PRIVATE, task );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYHOST, 0L );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYPEER, 0L );
+        curl_easy_setopt( easy, CURLOPT_TIMEOUT, 240L );
         curl_easy_setopt( easy, CURLOPT_URL, task->url );
         curl_easy_setopt( easy, CURLOPT_USERAGENT,
                                            TR_NAME "/" LONG_VERSION_STRING );
