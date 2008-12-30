@@ -25,8 +25,6 @@ EXTRA_DIST = \
     zh_TW.lproj \
     AboutWindowController.h \
     AboutWindowController.m \
-    ActionPopUpButton.h \
-    ActionPopUpButton.m \
     AddWindowController.h \
     AddWindowController.m \
     Badger.h \
@@ -80,14 +78,8 @@ EXTRA_DIST = \
     InfoWindowController.h \
     InfoWindowController.m \
     main.m \
-    MenuLabel.h \
-    MenuLabel.m \
     MessageWindowController.h \
     MessageWindowController.m \
-    NSApplicationAdditions.h \
-    NSApplicationAdditions.m \
-    NSBezierPathAdditions.h \
-    NSBezierPathAdditions.m \
     NSStringAdditions.h \
     NSStringAdditions.m \
     PeerProgressIndicatorCell.h \
