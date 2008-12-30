@@ -687,7 +687,7 @@ blockIteratorNew( Torrent * t )
     struct tr_blockIterator * i = tr_new0( struct tr_blockIterator, 1 );
     i->t = t;
     i->pieces = getPreferredPieces( t, &i->pieceCount );
-    i->blocks = tr_new0( tr_block_index_t, t->tor->blockCount );
+    i->blocks = tr_new0( tr_block_index_t, t->tor->blockCountInPiece );
     return i;
 }
 
@@ -714,6 +714,8 @@ blockIteratorNext( struct tr_blockIterator * i, tr_block_index_t * setme )
             if( !tr_cpBlockIsComplete( tor->completion, block ) )
                 i->blocks[i->blockCount++] = block;
     }
+
+    assert( i->blockCount <= tor->blockCountInPiece );
 
     if(( found = ( i->blockIndex < i->blockCount )))
         *setme = i->blocks[i->blockIndex++];
