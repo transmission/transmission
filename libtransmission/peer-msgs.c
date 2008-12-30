@@ -1420,7 +1420,7 @@ readBtPiece( tr_peermsgs      * msgs,
         while( i > 0 )
         {
             uint8_t buf[MAX_STACK_ARRAY_SIZE];
-            const size_t thisPass = MIN( n, sizeof( buf ) );
+            const size_t thisPass = MIN( i, sizeof( buf ) );
             tr_peerIoReadBytes( msgs->peer->io, inbuf, buf, thisPass );
             evbuffer_add( msgs->incoming.block, buf, thisPass );
             i -= thisPass;
