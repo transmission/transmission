@@ -728,15 +728,15 @@ struct tr_tracker_request
 {
     int                 reqtype; /* TR_REQ_* */
     int                 torrentId;
-    char *              url;
-    tr_web_done_func *  done_func;
+    struct evbuffer   * url;
+    tr_web_done_func  * done_func;
     tr_session *        session;
 };
 
 static void
 freeRequest( struct tr_tracker_request * req )
 {
-    tr_free( req->url );
+    evbuffer_free( req->url );
     tr_free( req );
 }
 
@@ -806,10 +806,9 @@ createRequest( tr_session * session,
     req->session = session;
     req->reqtype = reqtype;
     req->done_func =  isStopping ? onStoppedResponse : onTrackerResponse;
-    req->url = tr_strdup( EVBUFFER_DATA( url ) );
+    req->url = url;
     req->torrentId = tracker->torrentId;
 
-    evbuffer_free( url );
     return req;
 }
 
@@ -828,11 +827,10 @@ createScrape( tr_session * session,
     req = tr_new0( struct tr_tracker_request, 1 );
     req->session = session;
     req->reqtype = TR_REQ_SCRAPE;
-    req->url = tr_strdup( EVBUFFER_DATA( url ) );
+    req->url = url;
     req->done_func = onScrapeResponse;
     req->torrentId = tracker->torrentId;
 
-    evbuffer_free( url );
     return req;
 }
 
@@ -898,7 +896,9 @@ invokeRequest( void * vreq )
 
     ++req->session->tracker->runningCount;
 
-    tr_webRun( req->session, req->url, NULL,
+    tr_webRun( req->session,
+               (char*)EVBUFFER_DATA(req->url),
+               NULL,
                req->done_func, tr_int2ptr( req->torrentId ) );
 
     freeRequest( req );

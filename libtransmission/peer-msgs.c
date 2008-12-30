@@ -32,6 +32,7 @@
 #include "peer-mgr.h"
 #include "peer-mgr-private.h"
 #include "peer-msgs.h"
+#include "platform.h" /* MAX_STACK_ARRAY_SIZE */
 #include "ratecontrol.h"
 #include "stats.h"
 #include "torrent.h"
@@ -1414,13 +1415,19 @@ readBtPiece( tr_peermsgs      * msgs,
         /* read in another chunk of data */
         const size_t nLeft = req->length - EVBUFFER_LENGTH( msgs->incoming.block );
         size_t n = MIN( nLeft, inlen );
-        uint8_t * buf = tr_new( uint8_t, n );
-        assert( EVBUFFER_LENGTH( inbuf ) >= n );
-        tr_peerIoReadBytes( msgs->peer->io, inbuf, buf, n );
-        evbuffer_add( msgs->incoming.block, buf, n );
+        size_t i = n;
+
+        while( i > 0 )
+        {
+            uint8_t buf[MAX_STACK_ARRAY_SIZE];
+            const size_t thisPass = MIN( n, sizeof( buf ) );
+            tr_peerIoReadBytes( msgs->peer->io, inbuf, buf, thisPass );
+            evbuffer_add( msgs->incoming.block, buf, thisPass );
+            i -= thisPass;
+        }
+
         fireClientGotData( msgs, n, TRUE );
         *setme_piece_bytes_read += n;
-        tr_free( buf );
         dbgmsg( msgs, "got %zu bytes for block %u:%u->%u ... %d remain",
                n, req->index, req->offset, req->length,
                (int)( req->length - EVBUFFER_LENGTH( msgs->incoming.block ) ) );

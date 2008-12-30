@@ -39,7 +39,7 @@
  #define MAX_PATH_LENGTH  1024
 #endif
 
-#define MAX_STACK_ARRAY_SIZE 8192
+#define MAX_STACK_ARRAY_SIZE 7168
 
 typedef struct tr_lock   tr_lock;
 typedef struct tr_thread tr_thread;
