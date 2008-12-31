@@ -297,8 +297,6 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     int i, n, peerCount;
     tr_ptrArray tmp = TR_PTR_ARRAY_INIT;
     struct tr_peerIo ** peers;
-    const uint64_t now = tr_date( );
-    const uint64_t cutoff = now + 100; /* 1/10th of a second */
 
 
     /* allocateBandwidth() is a helper function with two purposes:
@@ -314,13 +312,13 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
 
     /* First phase of IO.  Tries to distribute bandwidth fairly to keep faster
      * peers from starving the others.  Loop through the peers, giving each a
-     * small chunk of bandwidth.  Keep looping until we reach the cutoff or
-     * run out of bandwidth and/or peers that can use it */
+     * small chunk of bandwidth.  Keep looping until we run out of bandwidth
+     * and/or peers that can use it */
     n = peerCount;
     i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a random starting point */
-    for( ; n>0 && tr_date()<=cutoff; )
+    for( ; n>1 ; )
     {
-        const int increment = n==1 ? 4096 : 1024;
+        const int increment = 1024;
         const int byteCount = tr_peerIoFlush( peers[i], dir, increment);
 
         if( byteCount == increment )
