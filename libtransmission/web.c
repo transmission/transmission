@@ -128,13 +128,10 @@ addTask( void * vtask )
         curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 3600L );
         curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 120L );
         curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1L );
-        curl_easy_setopt( easy, CURLOPT_FORBID_REUSE, 1L );
-        curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 16L );
         curl_easy_setopt( easy, CURLOPT_NOSIGNAL, 1L );
         curl_easy_setopt( easy, CURLOPT_PRIVATE, task );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYHOST, 0L );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYPEER, 0L );
-        curl_easy_setopt( easy, CURLOPT_TIMEOUT, 240L );
         curl_easy_setopt( easy, CURLOPT_URL, task->url );
         curl_easy_setopt( easy, CURLOPT_USERAGENT,
                                            TR_NAME "/" LONG_VERSION_STRING );
@@ -281,7 +278,7 @@ web_close( tr_web * g )
    and no tasks remain.  callers must not reference their g pointer
    after calling this function */
 static void
-tr_multi_socket_action( tr_web * g, int fd, int mask )
+tr_multi_socket_action( tr_web * g, int fd )
 {
     int closed = FALSE;
     CURLMcode rc;
@@ -291,9 +288,9 @@ tr_multi_socket_action( tr_web * g, int fd, int mask )
 
     /* invoke libcurl's processing */
     do {
-        rc = curl_multi_socket_action( g->multi, fd, mask, &g->still_running );
-        dbgmsg( "event_cb(): fd %d, mask %d, still_running is %d",
-                fd, mask, g->still_running );
+        rc = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
+        dbgmsg( "event_cb(): fd %d, still_running is %d",
+                fd, g->still_running );
     } while( rc == CURLM_CALL_MULTI_PERFORM );
     if( rc != CURLM_OK )
         tr_err( "%s", curl_multi_strerror( rc ) );
@@ -318,24 +315,9 @@ tr_multi_socket_action( tr_web * g, int fd, int mask )
 
 /* libevent says that sock is ready to be processed, so wake up libcurl */
 static void
-event_cb( int fd, short kind, void * g )
+event_cb( int fd, short kind UNUSED, void * g )
 {
-    int error;
-    int mask;
-    socklen_t errsz;
-
-    error = 0;
-    errsz = sizeof( error );
-    getsockopt( fd, SOL_SOCKET, SO_ERROR, &error, &errsz );
-    if( error )
-        mask = CURL_CSELECT_ERR;
-    else {
-        mask = 0;
-        if( kind & EV_READ  ) mask |= CURL_CSELECT_IN;
-        if( kind & EV_WRITE ) mask |= CURL_CSELECT_OUT;
-    }
-
-    tr_multi_socket_action( g, fd, mask );
+    tr_multi_socket_action( g, fd );
 }
 
 /* libevent says that timer_ms have passed, so wake up libcurl */
@@ -343,7 +325,7 @@ static void
 timer_cb( int socket UNUSED, short action UNUSED, void * g )
 {
     dbgmsg( "libevent timer is done" );
-    tr_multi_socket_action( g, CURL_SOCKET_TIMEOUT, 0 );
+    tr_multi_socket_action( g, CURL_SOCKET_TIMEOUT );
 }
 
 static void
