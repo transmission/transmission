@@ -73,7 +73,7 @@ tr_suspectAddress( const tr_address * a, const char * source )
 {
     /* be really aggressive in what we report */
     if( a->type == TR_AF_INET && !( a->addr.addr4.s_addr & 0xff000000 ) )
-        tr_dbg(  "Funny looking address %s from %s", tr_ntop_non_ts( a ), source );
+        tr_err(  "Funny looking address %s from %s", tr_ntop_non_ts( a ), source );
     /* /16s taken from ipv6 rib on 21 dec, 2008 */
     /* this is really, really ugly. expedience over quality */
     if( a->type == TR_AF_INET6 )
@@ -94,7 +94,7 @@ tr_suspectAddress( const tr_address * a, const char * source )
             p++;
         }
         if( !good )
-            tr_dbg(  "Funny looking address %s from %s", tr_ntop_non_ts( a ), source );
+            tr_err(  "Funny looking address %s from %s", tr_ntop_non_ts( a ), source );
     }
 }
 
@@ -415,6 +415,12 @@ tr_netOpenTCP( tr_session        * session,
     socklen_t               addrlen;
 
     assert( tr_isAddress( addr ) );
+
+    /* don't try to connect to multicast addresses */
+    if( addr->type == TR_AF_INET && ( addr->addr.addr4.s_addr & 0xe0000000 ) )
+        return -EINVAL;
+    if( addr->type == TR_AF_INET6 && ( addr->addr.addr6.s6_addr[0] & 0xff ) )
+        return -EINVAL;
 
     if( ( s = createSocket( ( addr->type == TR_AF_INET ? AF_INET : AF_INET6 ),
                             type ) ) < 0 )
