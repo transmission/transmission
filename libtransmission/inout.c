@@ -210,31 +210,42 @@ tr_ioWrite( const tr_torrent * tor,
 *****
 ****/
 
-static int
+static tr_bool
 recalculateHash( const tr_torrent * tor,
                  tr_piece_index_t   pieceIndex,
+                 void             * buffer,
+                 size_t             buflen,
                  uint8_t *          setme )
 {
     size_t   bytesLeft;
     uint32_t offset = 0;
-    int      success = TRUE;
+    tr_bool  success = TRUE;
+    uint8_t  stackbuf[MAX_STACK_ARRAY_SIZE];
     SHA_CTX  sha;
 
-    assert( tor );
-    assert( setme );
+    /* fallback buffer */
+    if( ( buffer == NULL ) || ( buflen < 1 ) )
+    {
+        buffer = stackbuf;
+        buflen = sizeof( stackbuf );
+    }
+
+    assert( tor != NULL );
     assert( pieceIndex < tor->info.pieceCount );
+    assert( buffer != NULL );
+    assert( buflen > 0 );
+    assert( setme != NULL );
 
     SHA1_Init( &sha );
     bytesLeft = tr_torPieceCountBytes( tor, pieceIndex );
 
     while( bytesLeft )
     {
-        uint8_t buf[MAX_STACK_ARRAY_SIZE];
-        const int len = MIN( bytesLeft, sizeof( buf ) );
-        success = !tr_ioRead( tor, pieceIndex, offset, len, buf );
+        const int len = MIN( bytesLeft, buflen );
+        success = !tr_ioRead( tor, pieceIndex, offset, len, buffer );
         if( !success )
             break;
-        SHA1_Update( &sha, buf, len );
+        SHA1_Update( &sha, buffer, len );
         offset += len;
         bytesLeft -= len;
     }
@@ -245,12 +256,14 @@ recalculateHash( const tr_torrent * tor,
     return success;
 }
 
-int
-tr_ioTestPiece( const tr_torrent * tor,
-                int                pieceIndex )
+tr_bool
+tr_ioTestPiece( const tr_torrent  * tor,
+                tr_piece_index_t    pieceIndex,
+                void              * buffer,
+                size_t              buflen )
 {
     uint8_t hash[SHA_DIGEST_LENGTH];
-    const int recalculated = recalculateHash( tor, pieceIndex, hash );
-    return recalculated && !memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH );
-}
 
+    return recalculateHash( tor, pieceIndex, buffer, buflen, hash )
+           && !memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH );
+}

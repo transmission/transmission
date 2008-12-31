@@ -52,10 +52,16 @@ int tr_ioWrite( const struct tr_torrent * tor,
                 const uint8_t *           writeme );
 
 /**
- * returns nonzero if the piece matches its metainfo's SHA1 checksum.
+ * @brief Test to see if the piece matches its metainfo's SHA1 checksum.
+ *
+ * @param optionalBuffer if calling tr_ioTestPiece() repeatedly, you can
+ *                       get best performance by providing a buffer with
+ *                       tor->info.pieceSize bytes.
  */
-int tr_ioTestPiece( const tr_torrent*,
-                    int   piece );
+tr_bool tr_ioTestPiece( const tr_torrent * tor,
+                        tr_piece_index_t   piece,
+                        void             * optionalBuffer,
+                        size_t             optionalBufferLen );
 
 
 /**
