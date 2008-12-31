@@ -1301,19 +1301,39 @@ tr_int2ptr( int i )
 
 static tr_list * _bufferList = NULL;
 
+static tr_lock *
+getBufferLock( void )
+{
+    static tr_lock * lock = NULL;
+    if( lock == NULL )
+        lock = tr_lockNew( );
+    return lock;
+}
+
 struct evbuffer*
 tr_getBuffer( void )
 {
-    struct evbuffer * buf = tr_list_pop_front( &_bufferList );
+    struct evbuffer * buf;
+    tr_lock * l = getBufferLock( );
+    tr_lockLock( l );
+
+    buf = tr_list_pop_front( &_bufferList );
     if( buf == NULL )
         buf = evbuffer_new( );
-    assert( !EVBUFFER_LENGTH( buf ) );
+
+    tr_lockUnlock( l );
     return buf;
 }
 
 void
 tr_releaseBuffer( struct evbuffer * buf )
 {
+    tr_lock * l = getBufferLock( );
+    tr_lockLock( l );
+
     evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
+    assert( EVBUFFER_LENGTH( buf ) == 0 );
     tr_list_prepend( &_bufferList, buf );
+
+    tr_lockUnlock( l );
 }
