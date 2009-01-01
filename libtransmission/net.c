@@ -93,7 +93,7 @@ tr_suspectAddress( const tr_address * a, const char * source )
                 good = TRUE;
             p++;
         }
-        if( !good )
+        if( !good && !IN6_IS_ADDR_V4MAPPED( &a->addr.addr6 ) )
             tr_err(  "Funny looking address %s from %s", tr_ntop_non_ts( a ), source );
     }
 }
