@@ -264,7 +264,6 @@ struct tr_incoming
  */
 struct tr_peermsgs
 {
-    tr_bool         peerSentBitfield;
     tr_bool         peerSupportsPex;
     tr_bool         clientSentLtepHandshake;
     tr_bool         peerSentLtepHandshake;
@@ -1465,7 +1464,6 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen, size_t
         case BT_BITFIELD:
         {
             dbgmsg( msgs, "got a bitfield" );
-            msgs->peerSentBitfield = 1;
             tr_peerIoReadBytes( msgs->peer->io, inbuf, msgs->peer->have->bits, msglen );
             updatePeerProgress( msgs );
             fireNeedReq( msgs );
