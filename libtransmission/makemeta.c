@@ -345,9 +345,9 @@ makeInfoDict( tr_benc *             dict,
                                              builder->fileCount );
         for( i = 0; i < builder->fileCount; ++i )
         {
-            tr_benc * dict = tr_bencListAddDict( list, 2 );
-            tr_benc * length = tr_bencDictAdd( dict, "length" );
-            tr_benc * pathVal = tr_bencDictAdd( dict, "path" );
+            tr_benc * d = tr_bencListAddDict( list, 2 );
+            tr_benc * length = tr_bencDictAdd( d, "length" );
+            tr_benc * pathVal = tr_bencDictAdd( d, "path" );
             getFileInfo( builder->top, &builder->files[i], length, pathVal );
         }
     }

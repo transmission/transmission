@@ -167,9 +167,9 @@ tr_natpmpPulse( struct tr_natpmp * nat,
         logVal( "readnatpmpresponseorretry", val );
         if( val >= 0 )
         {
-            const int port = resp.pnu.newportmapping.privateport;
-            tr_ninf( getKey( ), _( "no longer forwarding port %d" ), port );
-            if( nat->port == port )
+            const int p = resp.pnu.newportmapping.privateport;
+            tr_ninf( getKey( ), _( "no longer forwarding port %d" ), p );
+            if( nat->port == p )
             {
                 nat->port = -1;
                 nat->state = TR_NATPMP_IDLE;

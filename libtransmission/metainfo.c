@@ -182,7 +182,6 @@ parseFiles( tr_info *       inf,
         {
             tr_benc * file;
             tr_benc * path;
-            int64_t   length;
 
             file = tr_bencListChild( files, i );
             if( !tr_bencIsDict( file ) )
@@ -195,11 +194,11 @@ parseFiles( tr_info *       inf,
             if( getfile( &inf->files[i].name, inf->name, path ) )
                 return "path";
 
-            if( !tr_bencDictFindInt( file, "length", &length ) )
+            if( !tr_bencDictFindInt( file, "length", &len ) )
                 return "length";
 
-            inf->files[i].length = length;
-            inf->totalSize      += length;
+            inf->files[i].length = len;
+            inf->totalSize      += len;
         }
     }
     else if( tr_bencGetInt( length, &len ) ) /* single-file mode */
@@ -360,10 +359,10 @@ tr_metainfoParseImpl( const tr_session * session,
     else
     {
         int    len;
-        char * str = tr_bencSave( beInfo, &len );
-        tr_sha1( inf->hash, str, len, NULL );
+        char * bstr = tr_bencSave( beInfo, &len );
+        tr_sha1( inf->hash, bstr, len, NULL );
         tr_sha1_to_hex( inf->hashString, inf->hash );
-        tr_free( str );
+        tr_free( bstr );
     }
 
     /* name */

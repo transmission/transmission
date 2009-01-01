@@ -231,7 +231,6 @@ tr_bencParseImpl( const void *     buf_in,
         {
             int64_t         val;
             const uint8_t * end;
-            int             err;
             tr_benc *       node;
 
             if( ( err = tr_bencParseInt( buf, bufend, &end, &val ) ) )
@@ -289,7 +288,6 @@ tr_bencParseImpl( const void *     buf_in,
             const uint8_t * end;
             const uint8_t * str;
             size_t          str_len;
-            int             err;
             tr_benc *       node;
 
             if( ( err = tr_bencParseStr( buf, bufend, &end, &str, &str_len ) ) )

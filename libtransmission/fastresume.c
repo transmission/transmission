@@ -312,11 +312,12 @@ parsePriorities( tr_torrent *    tor,
     if( len == (uint32_t)( 2 * tor->info.fileCount ) )
     {
         const size_t     n = tor->info.fileCount;
-        const size_t     len = 2 * n;
+        const uint8_t *  walk = buf;
         tr_file_index_t *dnd = NULL, dndCount = 0;
         tr_file_index_t *dl = NULL, dlCount = 0;
         size_t           i;
-        const uint8_t *  walk = buf;
+
+        len = 2 * n;
 
         /* set file priorities */
         for( i = 0; i < n; ++i )

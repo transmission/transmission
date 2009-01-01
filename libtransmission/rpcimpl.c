@@ -68,7 +68,6 @@ getTorrents( tr_session * session,
         {
             tr_torrent * tor = NULL;
             tr_benc *    node = tr_bencListChild( ids, i );
-            int64_t      id;
             const char * str;
             if( tr_bencGetInt( node, &id ) )
                 tor = tr_torrentFindFromId( session, id );

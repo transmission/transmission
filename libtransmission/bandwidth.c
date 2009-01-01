@@ -325,9 +325,9 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
             ++i;
         else {
             /* peer is done writing for now; move it to the end of the list */
-            tr_peerIo * tmp = peers[i];
+            tr_peerIo * pio = peers[i];
             peers[i] = peers[n-1];
-            peers[n-1] = tmp;
+            peers[n-1] = pio;
             --n;
         }
 

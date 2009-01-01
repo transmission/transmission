@@ -35,7 +35,6 @@
 #include "net.h"
 #include "utils.h"
 
-extern int errno;
 
 /***
 ****  PRIVATE
