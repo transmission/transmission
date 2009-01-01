@@ -72,7 +72,7 @@ void
 tr_suspectAddress( const tr_address * a, const char * source )
 {
     /* be really aggressive in what we report */
-    if( a->type == TR_AF_INET && !( a->addr.addr4.s_addr & 0xff000000 ) )
+    if( a->type == TR_AF_INET && !( ntohl( a->addr.addr4.s_addr ) & 0xff000000 ) )
         tr_err(  "Funny looking address %s from %s", tr_ntop_non_ts( a ), source );
     /* /16s taken from ipv6 rib on 21 dec, 2008 */
     /* this is really, really ugly. expedience over quality */
