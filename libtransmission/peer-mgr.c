@@ -1827,7 +1827,7 @@ tr_peerGetPieceSpeed( const tr_peer * peer, tr_direction direction )
 struct tr_peer_stat *
 tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
                      const   uint8_t     * torrentHash,
-                     int                 * setmeCount UNUSED )
+                     int                 * setmeCount )
 {
     int i, size;
     const Torrent * t;
