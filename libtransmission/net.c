@@ -417,7 +417,7 @@ tr_netOpenTCP( tr_session        * session,
     assert( tr_isAddress( addr ) );
 
     /* don't try to connect to multicast addresses */
-    if( addr->type == TR_AF_INET && ( addr->addr.addr4.s_addr & 0xe0000000 ) )
+    if( addr->type == TR_AF_INET && ( ntohl( addr->addr.addr4.s_addr ) & 0xe0000000 ) )
         return -EINVAL;
     if( addr->type == TR_AF_INET6 && ( addr->addr.addr6.s6_addr[0] & 0xff ) )
         return -EINVAL;
