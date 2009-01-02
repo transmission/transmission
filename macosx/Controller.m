@@ -3104,7 +3104,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [item setView: button];
     [button release];
     
-    NSSize buttonSize = NSMakeSize(36.0, 25.0);
+    const NSSize buttonSize = NSMakeSize(36.0, 25.0);
     [item setMinSize: buttonSize];
     [item setMaxSize: buttonSize];
     
@@ -3120,7 +3120,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [item setLabel: NSLocalizedString(@"Create", "Create toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Create Torrent File", "Create toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Create torrent file", "Create toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"Create.png"]];
+        [item setImage: [NSImage imageNamed: @"ToolbarCreateTemplate.png"]];
         [item setTarget: self];
         [item setAction: @selector(createFile:)];
         [item setAutovalidates: NO];
@@ -3134,7 +3134,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [item setLabel: NSLocalizedString(@"Open", "Open toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Open Torrent Files", "Open toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Open torrent files", "Open toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"Open.png"]];
+        [item setImage: [NSImage imageNamed: @"ToolbarOpenTemplate.png"]];
         [item setTarget: self];
         [item setAction: @selector(openShowSheet:)];
         [item setAutovalidates: NO];
@@ -3148,7 +3148,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [item setLabel: NSLocalizedString(@"Open Address", "Open address toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Open Torrent Address", "Open address toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Open torrent web address", "Open address toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"OpenWeb.png"]];
+        [item setImage: [NSImage imageNamed: @"ToolbarOpenWebTemplate.png"]];
         [item setTarget: self];
         [item setAction: @selector(openURLShowSheet:)];
         [item setAutovalidates: NO];
@@ -3162,7 +3162,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [item setLabel: NSLocalizedString(@"Remove", "Remove toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Remove Selected", "Remove toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Remove selected transfers", "Remove toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"Remove.png"]];
+        [item setImage: [NSImage imageNamed: @"ToolbarRemoveTemplate.png"]];
         [item setTarget: self];
         [item setAction: @selector(removeNoDelete:)];
         
@@ -3171,11 +3171,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else if ([ident isEqualToString: TOOLBAR_INFO])
     {
         ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
+        [[(NSButton *)[item view] cell] setShowsStateBy: NSContentsCellMask]; //blue when enabled
         
         [item setLabel: NSLocalizedString(@"Inspector", "Inspector toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Toggle Inspector", "Inspector toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Toggle the torrent inspector", "Inspector toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"Info.png"]];
+        [item setImage: [NSImage imageNamed: @"ToolbarInfoTemplate.png"]];
         [item setTarget: self];
         [item setAction: @selector(showInfo:)];
         
@@ -3193,7 +3194,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [segmentedControl setSegmentCount: 2];
         [segmentedCell setTrackingMode: NSSegmentSwitchTrackingMomentary];
         
-        NSSize groupSize = NSMakeSize(72.0, 25.0);
+        const NSSize groupSize = NSMakeSize(72.0, 25.0);
         [groupItem setMinSize: groupSize];
         [groupItem setMaxSize: groupSize];
         
@@ -3205,12 +3206,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [groupItem setIdentifiers: [NSArray arrayWithObjects: TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL, nil]];
         
         [segmentedCell setTag: TOOLBAR_PAUSE_TAG forSegment: TOOLBAR_PAUSE_TAG];
-        [segmentedControl setImage: [NSImage imageNamed: @"PauseAll.png"] forSegment: TOOLBAR_PAUSE_TAG];
+        [segmentedControl setImage: [NSImage imageNamed: @"ToolbarPauseAllTemplate.png"] forSegment: TOOLBAR_PAUSE_TAG];
         [segmentedCell setToolTip: NSLocalizedString(@"Pause all transfers",
                                     "All toolbar item -> tooltip") forSegment: TOOLBAR_PAUSE_TAG];
         
         [segmentedCell setTag: TOOLBAR_RESUME_TAG forSegment: TOOLBAR_RESUME_TAG];
-        [segmentedControl setImage: [NSImage imageNamed: @"ResumeAll.png"] forSegment: TOOLBAR_RESUME_TAG];
+        [segmentedControl setImage: [NSImage imageNamed: @"ToolbarResumeAllTemplate.png"] forSegment: TOOLBAR_RESUME_TAG];
         [segmentedCell setToolTip: NSLocalizedString(@"Resume all transfers",
                                     "All toolbar item -> tooltip") forSegment: TOOLBAR_RESUME_TAG];
         
@@ -3232,7 +3233,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [segmentedControl setSegmentCount: 2];
         [segmentedCell setTrackingMode: NSSegmentSwitchTrackingMomentary];
         
-        NSSize groupSize = NSMakeSize(72.0, 25.0);
+        const NSSize groupSize = NSMakeSize(72.0, 25.0);
         [groupItem setMinSize: groupSize];
         [groupItem setMaxSize: groupSize];
         
@@ -3244,12 +3245,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [groupItem setIdentifiers: [NSArray arrayWithObjects: TOOLBAR_PAUSE_SELECTED, TOOLBAR_RESUME_SELECTED, nil]];
         
         [segmentedCell setTag: TOOLBAR_PAUSE_TAG forSegment: TOOLBAR_PAUSE_TAG];
-        [segmentedControl setImage: [NSImage imageNamed: @"PauseSelected.png"] forSegment: TOOLBAR_PAUSE_TAG];
+        [segmentedControl setImage: [NSImage imageNamed: @"ToolbarPauseSelectedTemplate.png"] forSegment: TOOLBAR_PAUSE_TAG];
         [segmentedCell setToolTip: NSLocalizedString(@"Pause selected transfers",
                                     "Selected toolbar item -> tooltip") forSegment: TOOLBAR_PAUSE_TAG];
         
         [segmentedCell setTag: TOOLBAR_RESUME_TAG forSegment: TOOLBAR_RESUME_TAG];
-        [segmentedControl setImage: [NSImage imageNamed: @"ResumeSelected.png"] forSegment: TOOLBAR_RESUME_TAG];
+        [segmentedControl setImage: [NSImage imageNamed: @"ToolbarResumeSelectedTemplate.png"] forSegment: TOOLBAR_RESUME_TAG];
         [segmentedCell setToolTip: NSLocalizedString(@"Resume selected transfers",
                                     "Selected toolbar item -> tooltip") forSegment: TOOLBAR_RESUME_TAG];
         
@@ -3262,11 +3263,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else if ([ident isEqualToString: TOOLBAR_FILTER])
     {
         ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
+        [[(NSButton *)[item view] cell] setShowsStateBy: NSContentsCellMask]; //blue when enabled
         
         [item setLabel: NSLocalizedString(@"Filter", "Filter toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Toggle Filter", "Filter toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Toggle the filter bar", "Filter toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"Filter.png"]];
+        [item setImage: [NSImage imageNamed: @"ToolbarFilterTemplate.png"]];
         [item setTarget: self];
         [item setAction: @selector(toggleFilterBar:)];
         
@@ -3386,15 +3388,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //set info image
     if ([ident isEqualToString: TOOLBAR_INFO])
     {
-        [toolbarItem setImage: [[fInfoController window] isVisible] ? [NSImage imageNamed: @"InfoBlue.png"]
-                                                                    : [NSImage imageNamed: @"Info.png"]];
+        [(NSButton *)[toolbarItem view] setState: [[fInfoController window] isVisible]];
         return YES;
     }
     
     //set filter image
     if ([ident isEqualToString: TOOLBAR_FILTER])
     {
-        [toolbarItem setImage: ![fFilterBar isHidden] ? [NSImage imageNamed: @"FilterBlue.png"] : [NSImage imageNamed: @"Filter.png"]];
+        [(NSButton *)[toolbarItem view] setState: ![fFilterBar isHidden]];
         return YES;
     }
     
