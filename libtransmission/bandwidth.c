@@ -316,12 +316,12 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
      * and/or peers that can use it */
     n = peerCount;
     i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a random starting point */
-    for( ; n>1 ; )
+    while( n > 1 )
     {
         const int increment = 1024;
-        const int byteCount = tr_peerIoFlush( peers[i], dir, increment);
+        const int bytesUsed = tr_peerIoFlush( peers[i], dir, increment);
 
-        if( byteCount == increment )
+        if( bytesUsed == increment )
             ++i;
         else {
             /* peer is done writing for now; move it to the end of the list */
@@ -331,7 +331,6 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
             --n;
         }
 
-        assert( i <= n );
         if( i == n )
             i = 0;
     }
