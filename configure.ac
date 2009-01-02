@@ -49,7 +49,7 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_C_INLINE
 if test "x$GCC" = "xyes" ; then
-    CFLAGS="-Wall -Wformat-security -W -Wmissing-prototypes -Wdeclaration-after-statement"
+    CFLAGS="-Wall -Wformat-security -W -Wmissing-prototypes -Wdeclaration-after-statement -std=gnu99"
     CXXFLAGS="-Wall -Wformat-security -W"
 fi
 
