@@ -54,10 +54,8 @@ getSpeed( const struct bratecontrol * r, int interval_msec )
 }
 
 static void
-bytesUsed( struct bratecontrol * r, size_t size )
+bytesUsed( const uint64_t now, struct bratecontrol * r, size_t size )
 {
-    const uint64_t now = tr_date ( );
-
     if( r->transfers[r->newest].date + GRANULARITY_MSEC >= now )
         r->transfers[r->newest].size += size;
     else
@@ -302,11 +300,12 @@ tr_bandwidthGetPieceSpeed( const tr_bandwidth * b, tr_direction dir )
     return getSpeed( &b->band[dir].piece, HISTORY_MSEC );
 }
 
-void
-tr_bandwidthUsed( tr_bandwidth  * b,
-                  tr_direction    dir,
-                  size_t          byteCount,
-                  tr_bool         isPieceData )
+static void
+bandwidthUsedImpl( tr_bandwidth  * b,
+                   tr_direction    dir,
+                   size_t          byteCount,
+                   tr_bool         isPieceData,
+                   uint64_t        now )
 {
     struct tr_band * band;
     size_t oldBytesLeft;
@@ -327,11 +326,20 @@ fprintf( stderr, "%p consumed %5zu bytes of %5s data... was %6zu, now %6zu left\
          b, byteCount, (isPieceData?"piece":"raw"), oldBytesLeft, band->bytesLeft );
 #endif
 
-    bytesUsed( &band->raw, byteCount );
+    bytesUsed( now, &band->raw, byteCount );
 
     if( isPieceData )
-        bytesUsed( &band->piece, byteCount );
+        bytesUsed( now, &band->piece, byteCount );
 
     if( b->parent != NULL )
-        tr_bandwidthUsed( b->parent, dir, byteCount, isPieceData );
+        bandwidthUsedImpl( b->parent, dir, byteCount, isPieceData, now );
+}
+
+void
+tr_bandwidthUsed( tr_bandwidth  * b,
+                  tr_direction    dir,
+                  size_t          byteCount,
+                  tr_bool         isPieceData )
+{
+    bandwidthUsedImpl( b, dir, byteCount, isPieceData, tr_date( ) );
 }
