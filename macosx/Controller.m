@@ -45,7 +45,6 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
-#import "SpeedLimitToTurtleIconTransformer.h"
 #import "bencode.h"
 #import "utils.h"
 
@@ -193,9 +192,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     ExpandedPathToIconTransformer * iconTransformer = [[[ExpandedPathToIconTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer: iconTransformer forName: @"ExpandedPathToIconTransformer"];
-    
-    SpeedLimitToTurtleIconTransformer * speedLimitIconTransformer = [[[SpeedLimitToTurtleIconTransformer alloc] init] autorelease];
-    [NSValueTransformer setValueTransformer: speedLimitIconTransformer forName: @"SpeedLimitToTurtleIconTransformer"];
 }
 
 - (id) init
@@ -2310,6 +2306,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) toggleSpeedLimit: (id) sender
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"SpeedLimit"] forKey: @"SpeedLimit"];
+    [self speedLimitChanged: sender];
+}
+
+- (void) speedLimitChanged: (id) sender
+{
     [fPrefsController applySpeedSettings: nil];
 }
 

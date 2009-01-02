@@ -212,6 +212,7 @@ typedef enum
 - (void) updateGroupsFilters: (NSNotification *) notification;
 
 - (void) toggleSpeedLimit: (id) sender;
+- (void) speedLimitChanged: (id) sender;
 - (void) autoSpeedLimitChange: (NSNotification *) notification;
 - (void) autoSpeedLimit: (NSTimer *) timer;
 - (void) setAutoSpeedLimitTimer: (BOOL) nextIsLimit;
