@@ -48,6 +48,10 @@
 #include "platform.h"
 #include "utils.h"
 
+#ifndef IN_MULTICAST
+#define IN_MULTICAST( a ) ( ( ( a ) & 0xf0000000 ) == 0xe0000000 )
+#endif
+
 const tr_address tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } }; 
 const tr_address tr_inaddr_any = { TR_AF_INET, 
     { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } }; 
@@ -411,7 +415,7 @@ tr_netOpenTCP( tr_session        * session,
     assert( tr_isAddress( addr ) );
 
     /* don't try to connect to multicast addresses */
-    if( addr->type == TR_AF_INET && ( ntohl( addr->addr.addr4.s_addr ) & 0xe0000000 ) )
+    if( addr->type == TR_AF_INET && IN_MULTICAST( htonl( addr->addr.addr4.s_addr ) ) )
         return -EINVAL;
     if( addr->type == TR_AF_INET6 && ( addr->addr.addr6.s6_addr[0] & 0xff ) )
         return -EINVAL;
