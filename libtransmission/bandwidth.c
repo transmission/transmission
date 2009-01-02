@@ -106,7 +106,7 @@ struct tr_bandwidth
 ****
 ***/
 
-static int
+static inline int
 comparePointers( const void * a, const void * b )
 {
     if( a != b )

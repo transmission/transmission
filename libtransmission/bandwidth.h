@@ -74,7 +74,8 @@ tr_bandwidth*
 void     tr_bandwidthFree             ( tr_bandwidth        * bandwidth );
 
 /** @brief test to see if the pointer refers to a live bandwidth object */
-tr_bool  tr_isBandwidth               ( const tr_bandwidth  * bandwidth );
+extern inline tr_bool 
+         tr_isBandwidth               ( const tr_bandwidth  * bandwidth );
 
 /******
 *******
@@ -85,7 +86,8 @@ tr_bool  tr_isBandwidth               ( const tr_bandwidth  * bandwidth );
  * @see tr_bandwidthAllocate
  * @see tr_bandwidthGetDesiredSpeed
  */
-void    tr_bandwidthSetDesiredSpeed   ( tr_bandwidth        * bandwidth,
+extern inline void
+        tr_bandwidthSetDesiredSpeed   ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
                                         double                desiredSpeed );
 
@@ -93,20 +95,23 @@ void    tr_bandwidthSetDesiredSpeed   ( tr_bandwidth        * bandwidth,
  * @brief Get the desired speed (in KiB/s) for ths bandwidth subtree.
  * @see tr_bandwidthSetDesiredSpeed
  */
-double  tr_bandwidthGetDesiredSpeed   ( const tr_bandwidth  * bandwidth,
+extern inline double
+        tr_bandwidthGetDesiredSpeed   ( const tr_bandwidth  * bandwidth,
                                         tr_direction          direction );
 
 /**
  * @brief Set whether or not this bandwidth should throttle its peer-io's speeds
  */
-void    tr_bandwidthSetLimited        ( tr_bandwidth        * bandwidth,
+extern inline void
+        tr_bandwidthSetLimited        ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
                                         tr_bool               isLimited );
 
 /**
  * @return nonzero if this bandwidth throttles its peer-ios speeds
  */
-tr_bool tr_bandwidthIsLimited         ( const tr_bandwidth  * bandwidth,
+extern inline tr_bool
+        tr_bandwidthIsLimited         ( const tr_bandwidth  * bandwidth,
                                         tr_direction          direction );
 
 /**
@@ -130,13 +135,15 @@ size_t  tr_bandwidthClamp             ( const tr_bandwidth  * bandwidth,
 /**
  * @brief Get the raw total of bytes read or sent by this bandwidth subtree.
  */
-double  tr_bandwidthGetRawSpeed       ( const tr_bandwidth  * bandwidth,
+extern inline double
+        tr_bandwidthGetRawSpeed       ( const tr_bandwidth  * bandwidth,
                                         tr_direction          direction );
 
 /**
  * @brief Get the number of piece data bytes read or sent by this bandwidth subtree.
  */
-double  tr_bandwidthGetPieceSpeed     ( const tr_bandwidth  * bandwidth,
+extern inline double
+        tr_bandwidthGetPieceSpeed     ( const tr_bandwidth  * bandwidth,
                                         tr_direction          direction );
 
 /**
@@ -173,13 +180,15 @@ void    tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
  * @brief add a tr_peerIo to this bandwidth's list.
  * They will be notified when more bandwidth is made available for them to consume.
  */
-void    tr_bandwidthAddPeer           ( tr_bandwidth        * bandwidth,
+extern inline void
+        tr_bandwidthAddPeer           ( tr_bandwidth        * bandwidth,
                                         struct tr_peerIo    * peerIo );
 
 /**
  * @brief remove a peer-io from this bandwidth's list.
  */
-void    tr_bandwidthRemovePeer        ( tr_bandwidth        * bandwidth,
+extern inline void
+        tr_bandwidthRemovePeer        ( tr_bandwidth        * bandwidth,
                                         struct tr_peerIo    * peerIo );
 
 #endif

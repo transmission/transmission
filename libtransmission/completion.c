@@ -367,4 +367,3 @@ tr_cpGetAmountDone( const tr_completion * cp,
                      tr_torPieceCountBlocks( tor, piece );
     }
 }
-

@@ -63,15 +63,18 @@ void        tr_torrentSetHasPiece( tr_torrent *     tor,
                                    tr_piece_index_t pieceIndex,
                                    tr_bool          has );
 
-void        tr_torrentLock( const tr_torrent * session );
+extern inline void
+            tr_torrentLock( const tr_torrent * session );
 
-void        tr_torrentUnlock( const tr_torrent * session );
+extern inline void
+            tr_torrentUnlock( const tr_torrent * session );
 
 tr_bool     tr_torrentIsSeed( const tr_torrent * session );
 
 void        tr_torrentChangeMyPort( tr_torrent * session );
 
-tr_bool     tr_torrentExists( const tr_session * session,
+extern inline tr_bool
+            tr_torrentExists( const tr_session * session,
                               const uint8_t    * hash );
 
 tr_torrent* tr_torrentFindFromId( tr_session * session,
@@ -91,31 +94,6 @@ tr_bool     tr_torrentAllowsPex( const tr_torrent * );
 tr_bool     tr_torrentIsPieceTransferAllowed( const tr_torrent * torrent,
                                               tr_direction       direction );
 
-/* get the index of this piece's first block */
-#define tr_torPieceFirstBlock( tor, piece ) ( ( piece ) *\
-                                             ( tor )->blockCountInPiece )
-
-/* what piece index is this block in? */
-#define tr_torBlockPiece( tor, block ) ( ( block ) /\
-                                        ( tor )->blockCountInPiece )
-
-/* how many blocks are in this piece? */
-#define tr_torPieceCountBlocks( tor, piece ) \
-    ( ( ( piece ) ==\
-       ( ( tor )->info.pieceCount - \
-        1 ) ) ? ( tor )->blockCountInLastPiece : ( tor )->blockCountInPiece )
-
-/* how many bytes are in this piece? */
-#define tr_torPieceCountBytes( tor, piece ) \
-    ( ( ( piece ) ==\
-       ( ( tor )->info.pieceCount - \
-        1 ) ) ? ( tor )->lastPieceSize : ( tor )->info.pieceSize )
-
-/* how many bytes are in this block? */
-#define tr_torBlockCountBytes( tor, block ) \
-    ( ( ( block ) ==\
-       ( ( tor )->blockCount - \
-        1 ) ) ? ( tor )->lastBlockSize : ( tor )->blockSize )
 
 #define tr_block( a, b ) _tr_block( tor, a, b )
 tr_block_index_t _tr_block( const tr_torrent * tor,
@@ -244,5 +222,43 @@ struct tr_torrent
 
     struct tr_bandwidth      * bandwidth;
 };
+
+/* get the index of this piece's first block */
+static inline tr_block_index_t
+tr_torPieceFirstBlock( const tr_torrent * tor, const tr_piece_index_t piece )
+{
+    return piece * tor->blockCountInPiece;
+}
+
+/* what piece index is this block in? */
+static inline tr_piece_index_t
+tr_torBlockPiece( const tr_torrent * tor, const tr_block_index_t block )
+{
+    return block / tor->blockCountInPiece;
+}
+
+/* how many blocks are in this piece? */
+static inline uint32_t
+tr_torPieceCountBlocks( const tr_torrent * tor, const tr_piece_index_t piece )
+{
+    return piece == tor->info.pieceCount - 1 ? tor->blockCountInLastPiece
+                                             : tor->blockCountInPiece;
+}
+
+/* how many bytes are in this piece? */
+static inline uint32_t
+tr_torPieceCountBytes( const tr_torrent * tor, const tr_piece_index_t piece )
+{
+    return piece == tor->info.pieceCount - 1 ? tor->lastPieceSize
+                                             : tor->info.pieceSize;
+}
+
+/* how many bytes are in this block? */
+static inline uint32_t
+tr_torBlockCountBytes( const tr_torrent * tor, const tr_block_index_t block )
+{
+    return block == tor->blockCount - 1 ? tor->lastBlockSize
+                                        : tor->blockSize;
+}
 
 #endif

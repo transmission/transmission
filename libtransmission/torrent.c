@@ -411,7 +411,7 @@ struct RandomTracker
 
 /* the tiers will be sorted from lowest to highest,
  * and trackers are randomized within the tiers */
-static int
+static inline int
 compareRandomTracker( const void * va,
                       const void * vb )
 {
@@ -697,7 +697,7 @@ tr_torrentAllowsPex( const tr_torrent * tor )
         && !tr_torrentIsPrivate( tor );
 }
 
-static void
+static inline void
 tr_torrentManualUpdateImpl( void * vtor )
 {
     tr_torrent * tor = vtor;

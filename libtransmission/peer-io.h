@@ -83,7 +83,7 @@ int                  tr_peerIoReconnect( tr_peerIo * io );
 
 tr_bool              tr_peerIoIsIncoming( const tr_peerIo * io );
 
-int                  tr_peerIoGetAge( const tr_peerIo * io );
+extern inline int    tr_peerIoGetAge( const tr_peerIo * io );
 
 
 /**
@@ -180,15 +180,18 @@ void      tr_peerIoReadBytes( tr_peerIo *       io,
                               void *            bytes,
                               size_t            byteCount );
 
-void      tr_peerIoReadUint8( tr_peerIo *       io,
+extern inline void
+          tr_peerIoReadUint8( tr_peerIo *       io,
                               struct evbuffer * inbuf,
                               uint8_t *         setme );
 
-void      tr_peerIoReadUint16( tr_peerIo *       io,
+extern inline void
+          tr_peerIoReadUint16( tr_peerIo *       io,
                                struct evbuffer * inbuf,
                                uint16_t *        setme );
 
-void      tr_peerIoReadUint32( tr_peerIo *       io,
+extern inline void
+          tr_peerIoReadUint32( tr_peerIo *       io,
                                struct evbuffer * inbuf,
                                uint32_t *        setme );
 
@@ -214,7 +217,7 @@ void      tr_peerIoBandwidthUsed( tr_peerIo           * io,
 ***
 **/
 
-tr_bool   tr_peerIoHasBandwidthLeft( const tr_peerIo  * io,
+extern inline tr_bool   tr_peerIoHasBandwidthLeft( const tr_peerIo  * io,
                                      tr_direction       direction );
 
 void      tr_peerIoSetEnabled( tr_peerIo    * io,
@@ -225,7 +228,7 @@ int       tr_peerIoFlush( tr_peerIo     * io,
                           tr_direction    dir,
                           size_t          byteLimit );
 
-struct evbuffer * tr_peerIoGetReadBuffer( tr_peerIo * io );
+extern inline struct evbuffer * tr_peerIoGetReadBuffer( tr_peerIo * io );
 
 
 

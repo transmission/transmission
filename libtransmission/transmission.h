@@ -826,7 +826,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate( const tr_torrent * torrent );
  * between sessions.  If you need that, use tr_info.hash or
  * tr_info.hashString.
  */
-int tr_torrentId( const tr_torrent * torrent );
+extern inline int tr_torrentId( const tr_torrent * torrent );
 
 /****
 *****  Speed Limits

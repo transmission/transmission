@@ -837,6 +837,7 @@ tr_peerIoReadBytes( tr_peerIo       * io,
                     void            * bytes,
                     size_t            byteCount )
 {
+    assert( tr_isPeerIo( io ) );
     assert( EVBUFFER_LENGTH( inbuf ) >= byteCount );
 
     switch( io->encryptionMode )
@@ -869,9 +870,6 @@ tr_peerIoReadUint16( tr_peerIo       * io,
                      uint16_t        * setme )
 {
     uint16_t tmp;
-
-    assert( tr_isPeerIo( io ) );
-
     tr_peerIoReadBytes( io, inbuf, &tmp, sizeof( uint16_t ) );
     *setme = ntohs( tmp );
 }
@@ -882,9 +880,6 @@ tr_peerIoReadUint32( tr_peerIo       * io,
                      uint32_t        * setme )
 {
     uint32_t tmp;
-
-    assert( tr_isPeerIo( io ) );
-
     tr_peerIoReadBytes( io, inbuf, &tmp, sizeof( uint32_t ) );
     *setme = ntohl( tmp );
 }
@@ -895,8 +890,6 @@ tr_peerIoDrain( tr_peerIo       * io,
                 size_t            byteCount )
 {
     uint8_t tmp[MAX_STACK_ARRAY_SIZE];
-
-    assert( tr_isPeerIo( io ) );
 
     while( byteCount > 0 )
     {
@@ -1000,7 +993,6 @@ tr_bool
 tr_peerIoHasBandwidthLeft( const tr_peerIo * io, tr_direction dir )
 {
     assert( tr_isPeerIo( io ) );
-    assert( tr_isDirection( dir ) );
 
     return tr_bandwidthClamp( io->bandwidth, dir, 1024 ) > 0;
 }
