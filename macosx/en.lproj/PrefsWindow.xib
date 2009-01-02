@@ -9,6 +9,8 @@
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="1760"/>
+			<integer value="66"/>
+			<integer value="153"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3345,7 +3347,7 @@ zcfN584IzijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE0
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSCustomView" id="352903881">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3816,7 +3818,7 @@ zcfN584IzijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE0
 							<int key="NSCellFlags2">33554432</int>
 							<object class="NSCustomResource" key="NSContents">
 								<string key="NSClassName">NSImage</string>
-								<string key="NSResourceName">Turtle</string>
+								<string key="NSResourceName">TurtleTemplate</string>
 							</object>
 							<int key="NSAlign">0</int>
 							<int key="NSScale">1</int>
@@ -3935,6 +3937,7 @@ AAABAAAAAQ</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{535, 226}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
 			</object>
@@ -4397,7 +4400,7 @@ AAABAAAAAQ</bytes>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSCustomView" id="204700639">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -5028,6 +5031,7 @@ AAABAAAAAQ</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{535, 345}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
 			</object>
@@ -12521,7 +12525,6 @@ AAABAAAAAQ</bytes>
 							<string>fAutoAssignRulesEnableCheck</string>
 							<string>fCustomLocationEnableCheck</string>
 							<string>fCustomLocationPopUp</string>
-							<string>fGroupRulesPrefsContainer</string>
 							<string>fGroupRulesSheetWindow</string>
 							<string>fRuleEditor</string>
 							<string>fSelectedColorNameField</string>
@@ -12535,7 +12538,6 @@ AAABAAAAAQ</bytes>
 							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSPopUpButton</string>
-							<string>NSView</string>
 							<string>NSWindow</string>
 							<string>NSPredicateEditor</string>
 							<string>NSTextField</string>
@@ -12546,13 +12548,6 @@ AAABAAAAAQ</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">macosx/GroupsPrefsController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSApplication</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">macosx/NSApplicationAdditions.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
