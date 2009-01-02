@@ -139,21 +139,24 @@
     //icon
     [[self image] drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     
-    //title
-    NSColor * specialColor = nil;
-    if ([self isHighlighted]
-            && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]])
-        specialColor = [NSColor whiteColor];
+    NSColor * titleColor, * statusColor;
+    if ([self backgroundStyle] == NSBackgroundStyleDark)
+        titleColor = statusColor = [NSColor whiteColor];
     else if ([[(FileOutlineView *)[self controlView] torrent] checkForFiles: [(FileListNode *)[self objectValue] indexes]] == NSOffState)
-        specialColor = [NSColor disabledControlTextColor];
-    else;
+        titleColor = statusColor = [NSColor disabledControlTextColor];
+    else
+    {
+        titleColor = [NSColor controlTextColor];
+        statusColor = [NSColor darkGrayColor];
+    }
     
-    NSAttributedString * titleString = [self attributedTitleWithColor: specialColor ? specialColor : [NSColor controlTextColor]];
+    //title
+    NSAttributedString * titleString = [self attributedTitleWithColor: titleColor];
     NSRect titleRect = [self rectForTitleWithString: titleString inBounds: cellFrame];
     [titleString drawInRect: titleRect];
     
     //status
-    NSAttributedString * statusString = [self attributedStatusWithColor: specialColor ? specialColor : [NSColor darkGrayColor]];
+    NSAttributedString * statusString = [self attributedStatusWithColor: statusColor];
     NSRect statusRect = [self rectForStatusWithString: statusString withTitleRect: titleRect inBounds: cellFrame];
     [statusString drawInRect: statusRect];
 }

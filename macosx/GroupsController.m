@@ -366,7 +366,7 @@ GroupsController * fGroupsInstance = nil;
         if ([self torrent: torrent doesMatchRulesForGroupAtIndex: row])
             return row;
     }
-    return -1; // Default to no group
+    return -1;
 }
 
 @end

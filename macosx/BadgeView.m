@@ -54,15 +54,15 @@
     [super dealloc];
 }
 
-- (BOOL) setRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate
+- (void) displayRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate
 {
     //only needs update if the badges were displayed or are displayed now
     if (fDownloadRate == downloadRate && fUploadRate == uploadRate)
-        return NO;
+        return;
     
     fDownloadRate = downloadRate;
     fUploadRate = uploadRate;
-    return YES;
+    [self display];
 }
 
 - (void) setQuitting
