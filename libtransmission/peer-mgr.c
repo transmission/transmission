@@ -628,7 +628,7 @@ getPreferredPieces( Torrent * t, tr_piece_index_t * pieceCount )
     /* make a list of the pieces that we want but don't have */
     for( i = 0; i < inf->pieceCount; ++i )
         if( !tor->info.pieces[i].dnd
-                && !tr_cpPieceIsComplete( tor->completion, i ) )
+                && !tr_cpPieceIsComplete( &tor->completion, i ) )
             pool[poolSize++] = i;
 
     /* sort the pool by which to request next */
@@ -649,7 +649,7 @@ getPreferredPieces( Torrent * t, tr_piece_index_t * pieceCount )
             setme->random = tr_cryptoWeakRandInt( INT_MAX );
             setme->pendingRequestCount = getPieceRequests( t, piece );
             setme->missingBlockCount
-                         = tr_cpMissingBlocksInPiece( tor->completion, piece );
+                         = tr_cpMissingBlocksInPiece( &tor->completion, piece );
 
             for( k = 0; k < peerCount; ++k )
             {
@@ -711,7 +711,7 @@ blockIteratorNext( struct tr_blockIterator * i, tr_block_index_t * setme )
         i->blockCount = 0;
         i->blockIndex = 0;
         for( block=b; block!=e; ++block )
-            if( !tr_cpBlockIsComplete( tor->completion, block ) )
+            if( !tr_cpBlockIsComplete( &tor->completion, block ) )
                 i->blocks[i->blockCount++] = block;
     }
 
@@ -1081,12 +1081,12 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 
             tr_block_index_t block = _tr_block( tor, e->pieceIndex, e->offset );
 
-            tr_cpBlockAdd( tor->completion, block );
+            tr_cpBlockAdd( &tor->completion, block );
             decrementPieceRequests( t, e->pieceIndex );
 
             broadcastGotBlock( t, e->pieceIndex, e->offset, e->length );
 
-            if( tr_cpPieceIsComplete( tor->completion, e->pieceIndex ) )
+            if( tr_cpPieceIsComplete( &tor->completion, e->pieceIndex ) )
             {
                 const tr_piece_index_t p = e->pieceIndex;
                 const tr_bool ok = tr_ioTestPiece( tor, p, NULL, 0 );
@@ -1663,7 +1663,7 @@ tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     tor = t->tor;
     interval = tor->info.pieceCount / (float)tabCount;
-    isSeed = tor && ( tr_cpGetStatus ( tor->completion ) == TR_SEED );
+    isSeed = tor && ( tr_cpGetStatus ( &tor->completion ) == TR_SEED );
     peers = (const tr_peer **) TR_PTR_ARRAY_DATA( &t->peers );
     peerCount = TR_PTR_ARRAY_LENGTH( &t->peers );
 
@@ -1673,7 +1673,7 @@ tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
     {
         const int piece = i * interval;
 
-        if( isSeed || tr_cpPieceIsComplete( tor->completion, piece ) )
+        if( isSeed || tr_cpPieceIsComplete( &tor->completion, piece ) )
             tab[i] = -1;
         else if( peerCount ) {
             int j;
@@ -2074,10 +2074,10 @@ shouldPeerBeClosed( const Torrent * t,
         int peerHasEverything;
         if( atom->flags & ADDED_F_SEED_FLAG )
             peerHasEverything = TRUE;
-        else if( peer->progress < tr_cpPercentDone( tor->completion ) )
+        else if( peer->progress < tr_cpPercentDone( &tor->completion ) )
             peerHasEverything = FALSE;
         else {
-            tr_bitfield * tmp = tr_bitfieldDup( tr_cpPieceBitfield( tor->completion ) );
+            tr_bitfield * tmp = tr_bitfieldDup( tr_cpPieceBitfield( &tor->completion ) );
             tr_bitfieldDifference( tmp, peer->have );
             peerHasEverything = tr_bitfieldCountTrueBits( tmp ) == 0;
             tr_bitfieldFree( tmp );

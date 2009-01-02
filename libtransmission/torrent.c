@@ -87,12 +87,6 @@ tr_torrentFindFromHashString( tr_session *  session, const char * str )
     return NULL;
 }
 
-tr_bool
-tr_torrentExists( const tr_session * session, const uint8_t *   torrentHash )
-{
-    return tr_torrentFindFromHash( (tr_session*)session, torrentHash ) != NULL;
-}
-
 tr_torrent*
 tr_torrentFindFromHash( tr_session * session, const uint8_t * torrentHash )
 {
@@ -118,22 +112,6 @@ tr_torrentFindFromObfuscatedHash( tr_session * session,
             return tor;
 
     return NULL;
-}
-
-/***
-****  LOCKS
-***/
-
-void
-tr_torrentLock( const tr_torrent * tor )
-{
-    tr_globalLock( tor->session );
-}
-
-void
-tr_torrentUnlock( const tr_torrent * tor )
-{
-    tr_globalUnlock( tor->session );
 }
 
 /***
@@ -519,7 +497,7 @@ torrentRealInit( tr_session      * session,
     t += tor->blockCountInLastPiece;
     assert( t == (uint64_t)tor->blockCount );
 
-    tor->completion = tr_cpInit( tor );
+    tr_cpConstruct( &tor->completion, tor );
 
     tr_torrentInitFilePieces( tor );
 
@@ -556,7 +534,7 @@ torrentRealInit( tr_session      * session,
                                                          TR_DOWN ) );
     }
 
-    tor->completeness = tr_cpGetStatus( tor->completion );
+    tor->completeness = tr_cpGetStatus( &tor->completion );
 
     tor->tracker = tr_trackerNew( tor );
     tor->trackerSubscription =
@@ -802,11 +780,11 @@ tr_torrentStat( tr_torrent * tor )
 
     usableSeeds += tor->info.webseedCount;
 
-    s->percentComplete = tr_cpPercentComplete ( tor->completion );
+    s->percentComplete = tr_cpPercentComplete ( &tor->completion );
 
-    s->percentDone = tr_cpPercentDone( tor->completion );
-    s->leftUntilDone = tr_cpLeftUntilDone( tor->completion );
-    s->sizeWhenDone = tr_cpSizeWhenDone( tor->completion );
+    s->percentDone   = tr_cpPercentDone  ( &tor->completion );
+    s->leftUntilDone = tr_cpLeftUntilDone( &tor->completion );
+    s->sizeWhenDone  = tr_cpSizeWhenDone ( &tor->completion );
 
     s->recheckProgress = s->activity == TR_STATUS_CHECK
                        ? 1.0 -
@@ -824,8 +802,8 @@ tr_torrentStat( tr_torrent * tor )
     s->corruptEver     = tor->corruptCur    + tor->corruptPrev;
     s->downloadedEver  = tor->downloadedCur + tor->downloadedPrev;
     s->uploadedEver    = tor->uploadedCur   + tor->uploadedPrev;
-    s->haveValid       = tr_cpHaveValid( tor->completion );
-    s->haveUnchecked   = tr_cpHaveTotal( tor->completion ) - s->haveValid;
+    s->haveValid       = tr_cpHaveValid( &tor->completion );
+    s->haveUnchecked   = tr_cpHaveTotal( &tor->completion ) - s->haveValid;
 
 
     if( usableSeeds > 0 )
@@ -846,8 +824,7 @@ tr_torrentStat( tr_torrent * tor )
         s->desiredAvailable = 0;
         for( i = 0; i < tor->info.pieceCount; ++i )
             if( !tor->info.pieces[i].dnd && tr_bitfieldHas( peerPieces, i ) )
-                s->desiredAvailable += tr_cpMissingBlocksInPiece(
-                    tor->completion, i );
+                s->desiredAvailable += tr_cpMissingBlocksInPiece( &tor->completion, i );
         s->desiredAvailable *= tor->blockSize;
         tr_bitfieldFree( peerPieces );
     }
@@ -903,21 +880,21 @@ fileBytesCompleted( const tr_torrent * tor,
 
     if( firstBlock == lastBlock )
     {
-        if( tr_cpBlockIsComplete( tor->completion, firstBlock ) )
+        if( tr_cpBlockIsComplete( &tor->completion, firstBlock ) )
             haveBytes += lastBlockOffset + 1 - firstBlockOffset;
     }
     else
     {
         tr_block_index_t i;
 
-        if( tr_cpBlockIsComplete( tor->completion, firstBlock ) )
+        if( tr_cpBlockIsComplete( &tor->completion, firstBlock ) )
             haveBytes += tor->blockSize - firstBlockOffset;
 
         for( i = firstBlock + 1; i < lastBlock; ++i )
-            if( tr_cpBlockIsComplete( tor->completion, i ) )
+            if( tr_cpBlockIsComplete( &tor->completion, i ) )
                 haveBytes += tor->blockSize;
 
-        if( tr_cpBlockIsComplete( tor->completion, lastBlock ) )
+        if( tr_cpBlockIsComplete( &tor->completion, lastBlock ) )
             haveBytes += lastBlockOffset + 1;
     }
 
@@ -1000,7 +977,7 @@ tr_torrentAmountFinished( const tr_torrent * tor,
                           int                size )
 {
     tr_torrentLock( tor );
-    tr_cpGetAmountDone( tor->completion, tab, size );
+    tr_cpGetAmountDone( &tor->completion, tab, size );
     tr_torrentUnlock( tor );
 }
 
@@ -1030,9 +1007,9 @@ tr_torrentSetHasPiece( tr_torrent *     tor,
     assert( pieceIndex < tor->info.pieceCount );
 
     if( has )
-        tr_cpPieceAdd( tor->completion, pieceIndex );
+        tr_cpPieceAdd( &tor->completion, pieceIndex );
     else
-        tr_cpPieceRem( tor->completion, pieceIndex );
+        tr_cpPieceRem( &tor->completion, pieceIndex );
 
     tr_torrentUnlock( tor );
 }
@@ -1055,7 +1032,7 @@ freeTorrent( tr_torrent * tor )
 
     tr_peerMgrRemoveTorrent( session->peerMgr, tor->info.hash );
 
-    tr_cpClose( tor->completion );
+    tr_cpDestruct( &tor->completion );
 
     tr_rcClose( tor->swarmSpeed );
 
@@ -1102,7 +1079,7 @@ checkAndStartImpl( void * vtor )
     tor->isRunning = 1;
     *tor->errorString = '\0';
     tr_torrentResetTransferStats( tor );
-    tor->completeness = tr_cpGetStatus( tor->completion );
+    tor->completeness = tr_cpGetStatus( &tor->completion );
     tr_torrentSaveResume( tor );
     tor->startDate = time( NULL );
     tr_trackerStart( tor->tracker );
@@ -1306,7 +1283,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
 
     tr_torrentLock( tor );
 
-    completeness = tr_cpGetStatus( tor->completion );
+    completeness = tr_cpGetStatus( &tor->completion );
 
     if( completeness != tor->completeness )
     {
@@ -1499,7 +1476,7 @@ tr_torrentInitFileDLs( tr_torrent *      tor,
 
     for( i = 0; i < fileCount; ++i )
         setFileDND( tor, files[i], doDownload );
-    tr_cpInvalidateDND ( tor->completion );
+    tr_cpInvalidateDND ( &tor->completion );
 
     tr_torrentUnlock( tor );
 }

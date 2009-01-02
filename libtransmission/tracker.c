@@ -767,7 +767,7 @@ buildTrackerRequestURI( tr_tracker *       t,
                               torrent->uploadedCur,
                               torrent->downloadedCur,
                               torrent->corruptCur,
-                              tr_cpLeftUntilComplete( torrent->completion ),
+                              tr_cpLeftUntilComplete( &torrent->completion ),
                               numwant,
                               t->key_param );
 
@@ -793,7 +793,7 @@ createRequest( tr_session * session,
 
     /* BEP 21: In order to tell the tracker that a peer is a partial seed, it MUST send
      * an event=paused parameter in every announce while it is a partial seed. */
-    if( tr_cpGetStatus( torrent->completion ) == TR_PARTIAL_SEED )
+    if( tr_cpGetStatus( &torrent->completion ) == TR_PARTIAL_SEED )
         reqtype = TR_REQ_PAUSED;
 
     isStopping = reqtype == TR_REQ_STOPPED;

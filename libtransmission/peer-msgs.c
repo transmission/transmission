@@ -717,7 +717,7 @@ isPieceInteresting( const tr_peermsgs * msgs,
     const tr_torrent * torrent = msgs->torrent;
 
     return ( !torrent->info.pieces[piece].dnd )                 /* we want it */
-          && ( !tr_cpPieceIsComplete( torrent->completion, piece ) ) /* !have */
+          && ( !tr_cpPieceIsComplete( &torrent->completion, piece ) ) /* !have */
           && ( tr_bitfieldHas( msgs->peer->have, piece ) );    /* peer has it */
 }
 
@@ -737,7 +737,7 @@ isPeerInteresting( const tr_peermsgs * msgs )
         return FALSE;
 
     torrent = msgs->torrent;
-    bitfield = tr_cpPieceBitfield( torrent->completion );
+    bitfield = tr_cpPieceBitfield( &torrent->completion );
 
     if( !msgs->peer->have )
         return TRUE;
@@ -926,7 +926,7 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
 
         /* don't ask for it if we've already got it... this block may have
          * come in from a different peer after we cancelled a request for it */
-        if( !tr_cpBlockIsComplete( msgs->torrent->completion, block ) )
+        if( !tr_cpBlockIsComplete( &msgs->torrent->completion, block ) )
         {
             protocolSendRequest( msgs, &req );
             req.time_requested = now;
@@ -1291,7 +1291,7 @@ peerMadeRequest( tr_peermsgs *               msgs,
 {
     const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
     const int reqIsValid = requestIsValid( msgs, req );
-    const int clientHasPiece = reqIsValid && tr_cpPieceIsComplete( msgs->torrent->completion, req->index );
+    const int clientHasPiece = reqIsValid && tr_cpPieceIsComplete( &msgs->torrent->completion, req->index );
     const int peerIsChoked = msgs->peer->peerIsChoked;
 
     int allow = FALSE;
@@ -1640,7 +1640,7 @@ clientGotBlock( tr_peermsgs *               msgs,
     *** Error checks
     **/
 
-    if( tr_cpBlockIsComplete( tor->completion, block ) ) {
+    if( tr_cpBlockIsComplete( &tor->completion, block ) ) {
         dbgmsg( msgs, "we have this block already..." );
         clientGotUnwantedBlock( msgs, req );
         return 0;
@@ -1752,7 +1752,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
         && popNextRequest( msgs, &req ) )
     {
         if( requestIsValid( msgs, &req )
-            && tr_cpPieceIsComplete( msgs->torrent->completion, req.index ) )
+            && tr_cpPieceIsComplete( &msgs->torrent->completion, req.index ) )
         {
             int err;
             static uint8_t * buf = NULL;
@@ -1849,7 +1849,7 @@ sendBitfield( tr_peermsgs * msgs )
     size_t            i;
     size_t            lazyCount = 0;
 
-    field = tr_bitfieldDup( tr_cpPieceBitfield( msgs->torrent->completion ) );
+    field = tr_bitfieldDup( tr_cpPieceBitfield( &msgs->torrent->completion ) );
 
     if( tr_sessionIsLazyBitfieldEnabled( msgs->session ) )
     {
@@ -1898,11 +1898,11 @@ tellPeerWhatWeHave( tr_peermsgs * msgs )
 {
     const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
 
-    if( fext && ( tr_cpGetStatus( msgs->torrent->completion ) == TR_SEED ) )
+    if( fext && ( tr_cpGetStatus( &msgs->torrent->completion ) == TR_SEED ) )
     {
         protocolSendHaveAll( msgs );
     }
-    else if( fext && ( tr_cpHaveValid( msgs->torrent->completion ) == 0 ) )
+    else if( fext && ( tr_cpHaveValid( &msgs->torrent->completion ) == 0 ) )
     {
         protocolSendHaveNone( msgs );
     }

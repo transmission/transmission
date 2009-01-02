@@ -26,10 +26,12 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include "utils.h" /* tr_bitfield */
-
 #ifndef TR_TORRENT_H
 #define TR_TORRENT_H 1
+
+#include "completion.h" /* tr_completion */
+#include "session.h" /* tr_globalLock(), tr_globalUnlock() */
+#include "utils.h" /* tr_bitfield */
 
 struct tr_bandwidth;
 struct tr_ratecontrol;
@@ -63,19 +65,9 @@ void        tr_torrentSetHasPiece( tr_torrent *     tor,
                                    tr_piece_index_t pieceIndex,
                                    tr_bool          has );
 
-extern inline void
-            tr_torrentLock( const tr_torrent * session );
-
-extern inline void
-            tr_torrentUnlock( const tr_torrent * session );
-
 tr_bool     tr_torrentIsSeed( const tr_torrent * session );
 
 void        tr_torrentChangeMyPort( tr_torrent * session );
-
-extern inline tr_bool
-            tr_torrentExists( const tr_session * session,
-                              const uint8_t    * hash );
 
 tr_torrent* tr_torrentFindFromId( tr_session * session,
                                   int          id );
@@ -183,7 +175,7 @@ struct tr_torrent
     uint32_t                   blockCountInPiece;
     uint32_t                   blockCountInLastPiece;
 
-    struct tr_completion *     completion;
+    struct tr_completion       completion;
 
     struct tr_bitfield         checkedPieces;
     tr_completeness            completeness;
@@ -260,5 +252,24 @@ tr_torBlockCountBytes( const tr_torrent * tor, const tr_block_index_t block )
     return block == tor->blockCount - 1 ? tor->lastBlockSize
                                         : tor->blockSize;
 }
+
+static inline void
+tr_torrentLock( const tr_torrent * tor )
+{
+    tr_globalLock( tor->session );
+}
+
+static inline void
+tr_torrentUnlock( const tr_torrent * tor )
+{
+    tr_globalUnlock( tor->session );
+}
+
+static inline tr_bool
+tr_torrentExists( const tr_session * session, const uint8_t *   torrentHash )
+{
+    return tr_torrentFindFromHash( (tr_session*)session, torrentHash ) != NULL;
+}
+
 
 #endif

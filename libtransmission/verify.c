@@ -86,7 +86,7 @@ checkFile( tr_torrent      * tor,
         }
         else if( !tr_torrentIsPieceChecked( tor, i ) )
         {
-            const int wasComplete = tr_cpPieceIsComplete( tor->completion, i );
+            const int wasComplete = tr_cpPieceIsComplete( &tor->completion, i );
 
             if( tr_ioTestPiece( tor, i, buffer, buflen ) ) /* yay */
             {
