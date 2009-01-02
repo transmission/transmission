@@ -218,7 +218,7 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
      * small chunk of bandwidth.  Keep looping until we run out of bandwidth
      * and/or peers that can use it */
     n = peerCount;
-    dbgmsg( "direction %s ... %d pees to go round-robin", (dir==TR_UP?"UP":"DOWN"), n );
+    dbgmsg( "%d peers to go round-robin for %s", n, (dir==TR_UP?"upload":"download") );
     i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a random starting point */
     while( n > 1 )
     {
