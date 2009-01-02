@@ -99,8 +99,6 @@ EXTRA_DIST = \
     QuickLookController.h \
     QuickLookController.m \
     QuickLook.h \
-    SpeedLimitToTurtleIconTransformer.h \
-    SpeedLimitToTurtleIconTransformer.m \
     StatsWindowController.h \
     StatsWindowController.m \
     StatusBarView.h \
