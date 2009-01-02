@@ -318,12 +318,11 @@ peerIsInUse( const Torrent    * ct,
 }
 
 static tr_peer*
-peerConstructor( tr_torrent * tor, const tr_address * addr )
+peerConstructor( const tr_address * addr )
 {
     tr_peer * p;
     p = tr_new0( tr_peer, 1 );
     p->addr = *addr;
-    p->bandwidth = tr_bandwidthNew( tor->session, tor->bandwidth );
     return p;
 }
 
@@ -339,7 +338,7 @@ getPeer( Torrent          * torrent,
 
     if( peer == NULL )
     {
-        peer = peerConstructor( torrent->tor, addr );
+        peer = peerConstructor( addr );
         tr_ptrArrayInsertSorted( &torrent->peers, peer, peerCompare );
     }
 
@@ -362,8 +361,6 @@ peerDestructor( tr_peer * peer )
     tr_bitfieldFree( peer->have );
     tr_bitfieldFree( peer->blame );
     tr_free( peer->client );
-
-    tr_bandwidthFree( peer->bandwidth );
 
     tr_free( peer );
 }
@@ -1270,8 +1267,8 @@ myHandshakeDoneCB( tr_handshake  * handshake,
 
                 peer->port = port;
                 peer->io = tr_handshakeStealIO( handshake );
+                tr_peerIoSetParent( peer->io, t->tor->bandwidth );
                 tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
-                tr_peerIoSetBandwidth( io, peer->bandwidth );
 
                 success = TRUE;
             }
@@ -1309,7 +1306,7 @@ tr_peerMgrAddIncoming( tr_peerMgr * manager,
         tr_peerIo *    io;
         tr_handshake * handshake;
 
-        io = tr_peerIoNewIncoming( manager->session, addr, port, socket );
+        io = tr_peerIoNewIncoming( manager->session, manager->session->bandwidth, addr, port, socket );
 
         handshake = tr_handshakeNew( io,
                                      manager->session->encryptionMode,
@@ -1817,10 +1814,7 @@ tr_peerMgrWebSpeeds( const tr_peerMgr * manager,
 double
 tr_peerGetPieceSpeed( const tr_peer * peer, tr_direction direction )
 {
-    assert( peer );
-    assert( direction==TR_CLIENT_TO_PEER || direction==TR_PEER_TO_CLIENT );
-
-    return tr_bandwidthGetPieceSpeed( peer->bandwidth, direction );
+    return peer->io ? tr_peerIoGetPieceSpeed( peer->io, direction ) : 0.0;
 }
 
 
@@ -2315,7 +2309,8 @@ reconnectPulse( void * vtorrent )
             tordbg( t, "Starting an OUTGOING connection with %s",
                    tr_peerIoAddrStr( &atom->addr, atom->port ) );
 
-            io = tr_peerIoNewOutgoing( mgr->session, &atom->addr, atom->port, t->hash );
+            io = tr_peerIoNewOutgoing( mgr->session, mgr->session->bandwidth, &atom->addr, atom->port, t->hash );
+
             if( io == NULL )
             {
                 atom->myflags |= MYFLAG_UNREACHABLE;

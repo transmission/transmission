@@ -41,6 +41,12 @@
 #include "web.h"
 #include "crypto.h"
 
+#define dbgmsg( ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, NULL, __VA_ARGS__ ); \
+    } while( 0 )
+
 static tr_port
 getRandomPort( tr_session * s )
 {
@@ -368,6 +374,7 @@ tr_sessionInit( const char  * tag,
     session->bandwidth = tr_bandwidthNew( session, NULL );
     session->lock = tr_lockNew( );
     session->tag = tr_strdup( tag );
+    dbgmsg( "tr_sessionInit: the session's top-level bandwidth object is %p", session->bandwidth );
 
     tr_bencInitDict( &settings, 0 );
     tr_sessionGetDefaultSettings( &settings );
@@ -799,12 +806,6 @@ deadlineReached( const uint64_t deadline )
 }
 
 #define SHUTDOWN_MAX_SECONDS 30
-
-#define dbgmsg( ... ) \
-    do { \
-        if( tr_deepLoggingIsActive( ) ) \
-            tr_deepLog( __FILE__, __LINE__, NULL, __VA_ARGS__ ); \
-    } while( 0 )
 
 void
 tr_sessionClose( tr_session * session )

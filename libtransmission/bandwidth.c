@@ -81,12 +81,10 @@ comparePointers( const void * a, const void * b )
 ***/
 
 tr_bandwidth*
-tr_bandwidthNew( tr_session * session, tr_bandwidth * parent )
+tr_bandwidthConstruct( tr_bandwidth * b, tr_session * session, tr_bandwidth * parent )
 {
-    tr_bandwidth * b = tr_new0( tr_bandwidth, 1 );
     b->session = session;
     b->children = TR_PTR_ARRAY_INIT;
-    b->peers = TR_PTR_ARRAY_INIT;
     b->magicNumber = MAGIC_NUMBER;
     b->band[TR_UP].honorParentLimits = TRUE;
     b->band[TR_DOWN].honorParentLimits = TRUE;
@@ -94,16 +92,16 @@ tr_bandwidthNew( tr_session * session, tr_bandwidth * parent )
     return b;
 }
 
-void
-tr_bandwidthFree( tr_bandwidth * b )
+tr_bandwidth*
+tr_bandwidthDestruct( tr_bandwidth * b )
 {
     assert( tr_isBandwidth( b ) );
 
     tr_bandwidthSetParent( b, NULL );
-    tr_ptrArrayDestruct( &b->peers, NULL );
     tr_ptrArrayDestruct( &b->children, NULL );
     b->magicNumber = 0xDEAD;
-    tr_free( b );
+
+    return b;
 }
 
 /***
@@ -133,17 +131,6 @@ tr_bandwidthSetParent( tr_bandwidth  * b,
         tr_ptrArrayInsertSorted( &parent->children, b, comparePointers );
         b->parent = parent;
     }
-}
-
-void
-tr_bandwidthHonorParentLimits( tr_bandwidth  * b,
-                               tr_direction    dir,
-                               tr_bool         honorParentLimits )
-{
-    assert( tr_isBandwidth( b ) );
-    assert( tr_isDirection( dir ) );
-
-    b->band[dir].honorParentLimits = honorParentLimits;
 }
 
 /***
@@ -179,20 +166,16 @@ allocateBandwidth( tr_bandwidth  * b,
 #endif
     }
 
-    /* traverse & repeat for the subtree */
-    {
-        int i;
-        const int n = TR_PTR_ARRAY_LENGTH( &b->peers );
-        for( i=0; i<n; ++i )
-            tr_ptrArrayAppend( peer_pool, tr_ptrArrayNth( &b->peers, i ) );
-    }
+    /* add this bandwidth's peer, if any, to the peer pool */
+    if( b->peer != NULL )
+        tr_ptrArrayAppend( peer_pool, b->peer );
 
 #ifdef DEBUG_DIRECTION
 if( ( dir == DEBUG_DIRECTION ) && ( n > 1 ) )
 fprintf( stderr, "bandwidth %p has %d peers\n", b, n );
 #endif
 
-    /* all children should reallocate too */
+    /* traverse & repeat for the subtree */
     if( 1 ) {
         int i;
         struct tr_bandwidth ** children = (struct tr_bandwidth**) TR_PTR_ARRAY_DATA( &b->children );
@@ -216,7 +199,8 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
      * 1. allocate bandwidth to b and its subtree
      * 2. accumulate an array of all the peerIos from b and its subtree. */
     allocateBandwidth( b, dir, period_msec, &tmp );
-    peers = (struct tr_peerIo**) tr_ptrArrayPeek( &tmp, &peerCount );
+    peers = (struct tr_peerIo**) TR_PTR_ARRAY_DATA( &tmp );
+    peerCount = TR_PTR_ARRAY_LENGTH( &tmp );
 
     /* Stop all peers from listening for the socket to be ready for IO.
      * See "Second phase of IO" lower in this function for more info. */
@@ -228,11 +212,14 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
      * small chunk of bandwidth.  Keep looping until we run out of bandwidth
      * and/or peers that can use it */
     n = peerCount;
+#ifdef DEBUG_DIRECTION
+if( dir == DEBUG_DIRECTION ) fprintf( stderr, "bandwidth.c: allocate: number of peerIos to go round-robin: %d\n", n );
+#endif
     i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a random starting point */
     while( n > 1 )
     {
         const int increment = 1024;
-        const int bytesUsed = tr_peerIoFlush( peers[i], dir, increment);
+        const int bytesUsed = tr_peerIoFlush( peers[i], dir, increment );
 
         if( bytesUsed == increment )
             ++i;
@@ -260,27 +247,13 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     tr_ptrArrayDestruct( &tmp, NULL );
 }
 
-/***
-****
-***/
-
 void
-tr_bandwidthAddPeer( tr_bandwidth   * b,
-                     tr_peerIo      * peerIo )
+tr_bandwidthSetPeer( tr_bandwidth * b, tr_peerIo * peer )
 {
     assert( tr_isBandwidth( b ) );
-    assert( tr_isPeerIo( peerIo ) );
+    assert( ( peer == NULL ) || tr_isPeerIo( peer ) );
 
-}
-
-void
-tr_bandwidthRemovePeer( tr_bandwidth  * b,
-                        tr_peerIo     * peerIo )
-{
-    assert( tr_isBandwidth( b ) );
-    assert( tr_isPeerIo( peerIo ) );
-
-    tr_ptrArrayRemoveSorted( &b->peers, peerIo, comparePointers );
+    b->peer = peer;
 }
 
 /***

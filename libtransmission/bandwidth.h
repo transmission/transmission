@@ -19,6 +19,7 @@
 
 #include "transmission.h"
 #include "ptrarray.h"
+#include "utils.h" /* tr_new(), tr_free() */
 
 struct tr_peerIo;
 
@@ -102,7 +103,7 @@ typedef struct tr_bandwidth
     int magicNumber;
     tr_session * session;
     tr_ptrArray children; /* struct tr_bandwidth */
-    tr_ptrArray peers; /* tr_peerIo */
+    struct tr_peerIo * peer;
 }
 tr_bandwidth;
 
@@ -111,13 +112,23 @@ tr_bandwidth;
 ***
 **/
 
-/** @brief create a new tr_bandwidth object */
-tr_bandwidth*
-         tr_bandwidthNew              ( tr_session          * session,
-                                        tr_bandwidth        * parent );
+tr_bandwidth* tr_bandwidthConstruct( tr_bandwidth * bandwidth,
+                                     tr_session   * session,
+                                     tr_bandwidth * parent );
 
-/** @brief destroy a tr_bandwidth object */
-void     tr_bandwidthFree             ( tr_bandwidth        * bandwidth );
+/** @brief create a new tr_bandwidth object */
+static inline tr_bandwidth* tr_bandwidthNew( tr_session * session, tr_bandwidth * parent )
+{
+    return tr_bandwidthConstruct( tr_new0( tr_bandwidth, 1 ), session, parent );
+}
+
+tr_bandwidth* tr_bandwidthDestruct( tr_bandwidth * bandwidth );
+
+/** @brief free a tr_bandwidth object */
+static inline void tr_bandwidthFree( tr_bandwidth * bandwidth )
+{
+    tr_free( tr_bandwidthDestruct( bandwidth ) );
+}
 
 /** @brief test to see if the pointer refers to a live bandwidth object */
 static inline tr_bool tr_isBandwidth( const tr_bandwidth  * b )
@@ -219,25 +230,21 @@ void    tr_bandwidthSetParent         ( tr_bandwidth        * bandwidth,
  * But when we set a torrent's speed mode to TR_SPEEDLIMIT_UNLIMITED, then
  * in that particular case we want to ignore the global speed limit...
  */
-void    tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
-                                        tr_direction          direction,
-                                        tr_bool               isEnabled );
+static inline void tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
+                                                   tr_direction          direction,
+                                                   tr_bool               isEnabled )
+{
+    assert( tr_isBandwidth( bandwidth ) );
+    assert( tr_isDirection( direction ) );
+
+    bandwidth->band[direction].honorParentLimits = isEnabled;
+}
 
 /******
 *******
 ******/
 
-/**
- * @brief add a tr_peerIo to this bandwidth's list.
- * They will be notified when more bandwidth is made available for them to consume.
- */
-void tr_bandwidthAddPeer( tr_bandwidth        * bandwidth,
+void tr_bandwidthSetPeer( tr_bandwidth        * bandwidth,
                           struct tr_peerIo    * peerIo );
-
-/**
- * @brief remove a peer-io from this bandwidth's list.
- */
-void tr_bandwidthRemovePeer( tr_bandwidth        * bandwidth,
-                             struct tr_peerIo    * peerIo );
 
 #endif

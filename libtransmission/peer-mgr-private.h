@@ -72,8 +72,6 @@ typedef struct tr_peer
 
     struct tr_peermsgs     * msgs;
     tr_publisher_tag         msgsTag;
-
-    struct tr_bandwidth    * bandwidth;
 }
 tr_peer;
 
