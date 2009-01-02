@@ -22,6 +22,12 @@
 #include "ptrarray.h"
 #include "utils.h"
 
+#define dbgmsg( ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, NULL, __VA_ARGS__ ); \
+    } while( 0 )
+
 /***
 ****
 ***/
@@ -212,9 +218,7 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
      * small chunk of bandwidth.  Keep looping until we run out of bandwidth
      * and/or peers that can use it */
     n = peerCount;
-#ifdef DEBUG_DIRECTION
-if( dir == DEBUG_DIRECTION ) fprintf( stderr, "bandwidth.c: allocate: number of peerIos to go round-robin: %d\n", n );
-#endif
+    dbgmsg( "direction %s ... %d pees to go round-robin", (dir==TR_UP?"UP":"DOWN"), n );
     i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a random starting point */
     while( n > 1 )
     {

@@ -2313,6 +2313,8 @@ reconnectPulse( void * vtorrent )
 
             if( io == NULL )
             {
+                tordbg( t, "peerIo not created; marking peer %s as unreachable",
+                        tr_peerIoAddrStr( &atom->addr, atom->port ) );
                 atom->myflags |= MYFLAG_UNREACHABLE;
             }
             else
