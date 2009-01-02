@@ -790,7 +790,7 @@ refillPulse( void * vtorrent )
     blockIterator = blockIteratorNew( t );
     peers = getPeersUploadingToClient( t, &peerCount );
     webseedCount = tr_ptrArraySize( &t->webseeds );
-    webseeds = tr_memdup( tr_ptrArrayBase( &t->webseeds ),
+    webseeds = tr_memdup( TR_PTR_ARRAY_DATA( &t->webseeds ),
                           webseedCount * sizeof( tr_webseed* ) );
 
     while( ( webseedCount || peerCount )

@@ -85,12 +85,6 @@ tr_ptrArrayPeek( tr_ptrArray * t,
     return t->items;
 }
 
-void**
-tr_ptrArrayBase( tr_ptrArray * t )
-{
-    return t->items;
-}
-
 void*
 tr_ptrArrayNth( tr_ptrArray* t,
                 int          i )
@@ -108,24 +102,6 @@ tr_ptrArrayBack( tr_ptrArray* t )
     assert( t->n_items > 0 );
 
     return tr_ptrArrayNth( t, t->n_items - 1 );
-}
-
-int
-tr_ptrArraySize( const tr_ptrArray * t )
-{
-    return t->n_items;
-}
-
-int
-tr_ptrArrayEmpty( const tr_ptrArray * t )
-{
-    return t->n_items == 0;
-}
-
-void
-tr_ptrArrayClear( tr_ptrArray * t )
-{
-    t->n_items = 0;
 }
 
 int
@@ -149,13 +125,6 @@ tr_ptrArrayInsert( tr_ptrArray * t,
     t->items[pos] = ptr;
     t->n_items++;
     return pos;
-}
-
-int
-tr_ptrArrayAppend( tr_ptrArray * t,
-                   void *        ptr )
-{
-    return tr_ptrArrayInsert( t, ptr, -1 );
 }
 
 void*

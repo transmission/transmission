@@ -29,6 +29,8 @@
 #ifndef _TR_PTR_ARRAY_H_
 #define _TR_PTR_ARRAY_H_
 
+#include "transmission.h"
+
 /**
  * A simple pointer array that resizes itself dynamically.
  */
@@ -67,16 +69,16 @@ void*         tr_ptrArrayBack( tr_ptrArray  * array );
 void**        tr_ptrArrayPeek( tr_ptrArray  * array,
                                int          * size );
 
-void**        tr_ptrArrayBase( tr_ptrArray  * array );
-
-void          tr_ptrArrayClear( tr_ptrArray * array );
+static inline void  tr_ptrArrayClear( tr_ptrArray * a ) { a->n_items = 0; }
 
 int           tr_ptrArrayInsert( tr_ptrArray * array,
                                  void        * insertMe,
                                  int           pos );
 
-int           tr_ptrArrayAppend( tr_ptrArray * array,
-                                 void        * appendMe );
+static inline int tr_ptrArrayAppend( tr_ptrArray * array, void * appendMe )
+{
+    return tr_ptrArrayInsert( array, appendMe, -1 );
+}
 
 void*         tr_ptrArrayPop( tr_ptrArray    * array );
 
@@ -84,9 +86,15 @@ void          tr_ptrArrayErase( tr_ptrArray  * array,
                                 int            begin,
                                 int            end );
 
-int           tr_ptrArraySize( const tr_ptrArray* );
+static inline int tr_ptrArraySize( const tr_ptrArray *  a )
+{
+    return a->n_items;
+}
 
-int           tr_ptrArrayEmpty( const tr_ptrArray* );
+static inline tr_bool tr_ptrArrayEmpty( const tr_ptrArray * a )
+{
+    return tr_ptrArraySize(a) == 0;
+}
 
 int           tr_ptrArrayInsertSorted( tr_ptrArray * array,
                                        void        * value,
