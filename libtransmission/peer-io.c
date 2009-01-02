@@ -78,43 +78,6 @@ struct tr_datatype
     struct __tr_list head;
 };
 
-struct tr_peerIo
-{
-    tr_bool            isEncrypted;
-    tr_bool            isIncoming;
-    tr_bool            peerIdIsSet;
-    tr_bool            extendedProtocolSupported;
-    tr_bool            fastExtensionSupported;
-
-    int                magicNumber;
-
-    uint8_t            encryptionMode;
-    tr_port            port;
-    int                socket;
-
-    uint8_t            peerId[SHA_DIGEST_LENGTH];
-    time_t             timeCreated;
-
-    tr_session       * session;
-
-    tr_address         addr;
-
-    tr_can_read_cb     canRead;
-    tr_did_write_cb    didWrite;
-    tr_net_error_cb    gotError;
-    void *             userData;
-
-    tr_bandwidth     * bandwidth;
-    tr_crypto        * crypto;
-
-    struct evbuffer  * inbuf;
-    struct evbuffer  * outbuf;
-    struct __tr_list   outbuf_datatypes; /* struct tr_datatype */
-
-    struct event       event_read;
-    struct event       event_write;
-};
-
 /***
 ****
 ***/
@@ -799,34 +762,6 @@ tr_peerIoWriteBytes( tr_peerIo       * io,
     }
 }
 
-void
-tr_peerIoWriteUint8( tr_peerIo       * io,
-                     struct evbuffer * outbuf,
-                     uint8_t           writeme )
-{
-    tr_peerIoWriteBytes( io, outbuf, &writeme, sizeof( uint8_t ) );
-}
-
-void
-tr_peerIoWriteUint16( tr_peerIo       * io,
-                      struct evbuffer * outbuf,
-                      uint16_t          writeme )
-{
-    uint16_t tmp = htons( writeme );
-
-    tr_peerIoWriteBytes( io, outbuf, &tmp, sizeof( uint16_t ) );
-}
-
-void
-tr_peerIoWriteUint32( tr_peerIo       * io,
-                      struct evbuffer * outbuf,
-                      uint32_t          writeme )
-{
-    uint32_t tmp = htonl( writeme );
-
-    tr_peerIoWriteBytes( io, outbuf, &tmp, sizeof( uint32_t ) );
-}
-
 /***
 ****
 ***/
@@ -857,34 +792,6 @@ tr_peerIoReadBytes( tr_peerIo       * io,
 }
 
 void
-tr_peerIoReadUint8( tr_peerIo       * io,
-                    struct evbuffer * inbuf,
-                    uint8_t         * setme )
-{
-    tr_peerIoReadBytes( io, inbuf, setme, sizeof( uint8_t ) );
-}
-
-void
-tr_peerIoReadUint16( tr_peerIo       * io,
-                     struct evbuffer * inbuf,
-                     uint16_t        * setme )
-{
-    uint16_t tmp;
-    tr_peerIoReadBytes( io, inbuf, &tmp, sizeof( uint16_t ) );
-    *setme = ntohs( tmp );
-}
-
-void
-tr_peerIoReadUint32( tr_peerIo       * io,
-                     struct evbuffer * inbuf,
-                     uint32_t        * setme )
-{
-    uint32_t tmp;
-    tr_peerIoReadBytes( io, inbuf, &tmp, sizeof( uint32_t ) );
-    *setme = ntohl( tmp );
-}
-
-void
 tr_peerIoDrain( tr_peerIo       * io,
                 struct evbuffer * inbuf,
                 size_t            byteCount )
@@ -897,12 +804,6 @@ tr_peerIoDrain( tr_peerIo       * io,
         tr_peerIoReadBytes( io, inbuf, tmp, thisPass );
         byteCount -= thisPass;
     }
-}
-
-int
-tr_peerIoGetAge( const tr_peerIo * io )
-{
-    return time( NULL ) - io->timeCreated;
 }
 
 /***
@@ -981,22 +882,6 @@ tr_peerIoFlush( tr_peerIo  * io, tr_direction dir, size_t limit )
     return ret;
 }
 
-struct evbuffer *
-tr_peerIoGetReadBuffer( tr_peerIo * io )
-{
-    assert( tr_isPeerIo( io ) );
-
-    return io->inbuf;
-}
-
-tr_bool
-tr_peerIoHasBandwidthLeft( const tr_peerIo * io, tr_direction dir )
-{
-    assert( tr_isPeerIo( io ) );
-
-    return tr_bandwidthClamp( io->bandwidth, dir, 1024 ) > 0;
-}
-
 /***
 ****
 ****/
@@ -1043,3 +928,13 @@ tr_peerIoSetEnabled( tr_peerIo    * io,
     else
         event_disable( io, event );
 }
+
+tr_bool
+tr_peerIoHasBandwidthLeft( const tr_peerIo  * io,
+                           tr_direction       dir )
+{
+    assert( tr_isPeerIo( io ) );
+
+    return tr_bandwidthClamp( io->bandwidth, dir, 1024 ) > 0;
+}
+

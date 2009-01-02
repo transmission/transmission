@@ -21,11 +21,77 @@
 ***
 **/
 
+#include <assert.h>
+
+#include <event.h>
+
+#include "transmission.h"
+#include "list.h" /* __tr_list */
+#include "net.h" /* tr_address */
+
 struct evbuffer;
-struct tr_address;
 struct tr_bandwidth;
 struct tr_crypto;
-typedef struct tr_peerIo tr_peerIo;
+struct tr_peerIo;
+
+typedef enum
+{
+    READ_NOW,
+    READ_LATER,
+    READ_ERR
+}
+ReadState;
+
+typedef ReadState ( *tr_can_read_cb  )( struct tr_peerIo * io,
+                                        void             * user_data,
+                                        size_t           * setme_piece_byte_count );
+
+typedef void      ( *tr_did_write_cb )( struct tr_peerIo * io,
+                                        size_t             bytesWritten,
+                                        int                wasPieceData,
+                                        void             * userData );
+
+typedef void      ( *tr_net_error_cb )( struct tr_peerIo * io,
+                                        short              what,
+                                        void             * userData );
+
+typedef struct tr_peerIo
+{
+    tr_bool            isEncrypted;
+    tr_bool            isIncoming;
+    tr_bool            peerIdIsSet;
+    tr_bool            extendedProtocolSupported;
+    tr_bool            fastExtensionSupported;
+
+    int                magicNumber;
+
+    uint8_t            encryptionMode;
+    tr_port            port;
+    int                socket;
+
+    uint8_t            peerId[SHA_DIGEST_LENGTH];
+    time_t             timeCreated;
+
+    tr_session       * session;
+
+    tr_address         addr;
+
+    tr_can_read_cb     canRead;
+    tr_did_write_cb    didWrite;
+    tr_net_error_cb    gotError;
+    void *             userData;
+
+    struct tr_bandwidth * bandwidth;
+    struct tr_crypto    * crypto;
+
+    struct evbuffer  * inbuf;
+    struct evbuffer  * outbuf;
+    struct __tr_list   outbuf_datatypes; /* struct tr_datatype */
+
+    struct event       event_read;
+    struct event       event_write;
+}
+tr_peerIo;
 
 /**
 ***
@@ -83,7 +149,10 @@ int                  tr_peerIoReconnect( tr_peerIo * io );
 
 tr_bool              tr_peerIoIsIncoming( const tr_peerIo * io );
 
-extern inline int    tr_peerIoGetAge( const tr_peerIo * io );
+static inline int    tr_peerIoGetAge( const tr_peerIo * io )
+{
+    return time( NULL ) - io->timeCreated;
+}
 
 
 /**
@@ -98,27 +167,6 @@ const uint8_t*       tr_peerIoGetPeersId( const tr_peerIo * io );
 /**
 ***
 **/
-
-typedef enum
-{
-    READ_NOW,
-    READ_LATER,
-    READ_ERR
-}
-ReadState;
-
-typedef ReadState ( *tr_can_read_cb  )( tr_peerIo        * io,
-                                        void             * user_data,
-                                        size_t           * setme_piece_byte_count );
-
-typedef void      ( *tr_did_write_cb )( tr_peerIo        * io,
-                                        size_t             bytesWritten,
-                                        int                wasPieceData,
-                                        void             * userData );
-
-typedef void      ( *tr_net_error_cb )( tr_peerIo        * io,
-                                        short              what,
-                                        void             * userData );
 
 void    tr_peerIoSetIOFuncs      ( tr_peerIo        * io,
                                    tr_can_read_cb     readcb,
@@ -163,37 +211,58 @@ void      tr_peerIoWriteBytes( tr_peerIo *       io,
                                const void *      bytes,
                                size_t            byteCount );
 
-void      tr_peerIoWriteUint8( tr_peerIo *       io,
-                               struct evbuffer * outbuf,
-                               uint8_t           writeme );
+static inline void  tr_peerIoWriteUint8( tr_peerIo *       io,
+                                         struct evbuffer * outbuf,
+                                         uint8_t           writeme )
+{
+    tr_peerIoWriteBytes( io, outbuf, &writeme, sizeof( uint8_t ) );
+}
 
-void      tr_peerIoWriteUint16( tr_peerIo *       io,
-                                struct evbuffer * outbuf,
-                                uint16_t          writeme );
+static inline void tr_peerIoWriteUint16( tr_peerIo *       io,
+                                         struct evbuffer * outbuf,
+                                         uint16_t          writeme )
+{
+    const uint16_t tmp = htons( writeme );
+    tr_peerIoWriteBytes( io, outbuf, &tmp, sizeof( uint16_t ) );
+}
 
-void      tr_peerIoWriteUint32( tr_peerIo *       io,
-                                struct evbuffer * outbuf,
-                                uint32_t          writeme );
+static inline void tr_peerIoWriteUint32( tr_peerIo *       io,
+                                         struct evbuffer * outbuf,
+                                         uint32_t          writeme )
+{
+    const uint32_t tmp = htonl( writeme );
+    tr_peerIoWriteBytes( io, outbuf, &tmp, sizeof( uint32_t ) );
+}
 
 void      tr_peerIoReadBytes( tr_peerIo *       io,
                               struct evbuffer * inbuf,
                               void *            bytes,
                               size_t            byteCount );
 
-extern inline void
-          tr_peerIoReadUint8( tr_peerIo *       io,
-                              struct evbuffer * inbuf,
-                              uint8_t *         setme );
+static inline void tr_peerIoReadUint8( tr_peerIo *       io,
+                                       struct evbuffer * inbuf,
+                                       uint8_t *         setme )
+{
+    tr_peerIoReadBytes( io, inbuf, setme, sizeof( uint8_t ) );
+}
 
-extern inline void
-          tr_peerIoReadUint16( tr_peerIo *       io,
-                               struct evbuffer * inbuf,
-                               uint16_t *        setme );
+static inline void tr_peerIoReadUint16( tr_peerIo *       io,
+                                        struct evbuffer * inbuf,
+                                        uint16_t *        setme )
+{
+    uint16_t tmp;
+    tr_peerIoReadBytes( io, inbuf, &tmp, sizeof( uint16_t ) );
+    *setme = ntohs( tmp );
+}
 
-extern inline void
-          tr_peerIoReadUint32( tr_peerIo *       io,
-                               struct evbuffer * inbuf,
-                               uint32_t *        setme );
+static inline void tr_peerIoReadUint32( tr_peerIo *       io,
+                                        struct evbuffer * inbuf,
+                                        uint32_t *        setme )
+{
+    uint32_t tmp;
+    tr_peerIoReadBytes( io, inbuf, &tmp, sizeof( uint32_t ) );
+    *setme = ntohl( tmp );
+}
 
 void      tr_peerIoDrain( tr_peerIo *       io,
                           struct evbuffer * inbuf,
@@ -213,12 +282,12 @@ void      tr_peerIoBandwidthUsed( tr_peerIo           * io,
                                   size_t                byteCount,
                                   int                   isPieceData );
 
+tr_bool   tr_peerIoHasBandwidthLeft( const tr_peerIo  * io,
+                                     tr_direction       dir );
+
 /**
 ***
 **/
-
-extern inline tr_bool   tr_peerIoHasBandwidthLeft( const tr_peerIo  * io,
-                                     tr_direction       direction );
 
 void      tr_peerIoSetEnabled( tr_peerIo    * io,
                                tr_direction   dir,
@@ -228,9 +297,16 @@ int       tr_peerIoFlush( tr_peerIo     * io,
                           tr_direction    dir,
                           size_t          byteLimit );
 
-extern inline struct evbuffer * tr_peerIoGetReadBuffer( tr_peerIo * io );
+/**
+***
+**/
 
+static inline struct evbuffer * tr_peerIoGetReadBuffer( tr_peerIo * io )
+{
+    assert( tr_isPeerIo( io ) );
 
+    return io->inbuf;
+}
 
 
 #endif

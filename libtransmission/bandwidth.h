@@ -17,6 +17,42 @@
 #ifndef TR_BANDWIDTH_H
 #define TR_BANDWIDTH_H
 
+#include "transmission.h"
+#include "ptrarray.h"
+
+struct tr_peerIo;
+
+/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * it's included in the header for inlining and composition. */
+enum
+{
+    HISTORY_MSEC = 2000,
+    INTERVAL_MSEC = HISTORY_MSEC,
+    GRANULARITY_MSEC = 50,
+    HISTORY_SIZE = ( INTERVAL_MSEC / GRANULARITY_MSEC ),
+    MAGIC_NUMBER = 43143
+};
+
+/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * it's included in the header for inlining and composition. */
+struct bratecontrol
+{
+    int newest;
+    struct { uint64_t date, size; } transfers[HISTORY_SIZE];
+};
+
+/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * it's included in the header for inlining and composition. */
+struct tr_band
+{
+    tr_bool isLimited;
+    tr_bool honorParentLimits;
+    size_t bytesLeft;
+    double desiredSpeed;
+    struct bratecontrol raw;
+    struct bratecontrol piece;
+};
+
 /**
  * Bandwidth is an object for measuring and constraining bandwidth speeds.
  *
@@ -56,10 +92,20 @@
  *   and call tr_bandwidthClamp() before performing I/O to see how much 
  *   bandwidth they can safely use.
  */
+typedef struct tr_bandwidth
+{
+    /* these are PRIVATE IMPLEMENTATION details that should not be touched.
+     * it's included in the header for inlining and composition. */
 
-typedef struct tr_bandwidth tr_bandwidth;
+    struct tr_band band[2];
+    struct tr_bandwidth * parent;
+    int magicNumber;
+    tr_session * session;
+    tr_ptrArray children; /* struct tr_bandwidth */
+    tr_ptrArray peers; /* tr_peerIo */
+}
+tr_bandwidth;
 
-struct tr_peerIo;
 
 /**
 ***
@@ -74,8 +120,10 @@ tr_bandwidth*
 void     tr_bandwidthFree             ( tr_bandwidth        * bandwidth );
 
 /** @brief test to see if the pointer refers to a live bandwidth object */
-extern inline tr_bool 
-         tr_isBandwidth               ( const tr_bandwidth  * bandwidth );
+static inline tr_bool tr_isBandwidth( const tr_bandwidth  * b )
+{
+    return ( b != NULL ) && ( b->magicNumber == MAGIC_NUMBER );
+}
 
 /******
 *******
@@ -86,33 +134,42 @@ extern inline tr_bool
  * @see tr_bandwidthAllocate
  * @see tr_bandwidthGetDesiredSpeed
  */
-extern inline void
-        tr_bandwidthSetDesiredSpeed   ( tr_bandwidth        * bandwidth,
-                                        tr_direction          direction,
-                                        double                desiredSpeed );
+static inline void tr_bandwidthSetDesiredSpeed( tr_bandwidth        * bandwidth,
+                                                tr_direction          dir,
+                                                double                desiredSpeed )
+{
+    bandwidth->band[dir].desiredSpeed = desiredSpeed;
+}
 
 /**
  * @brief Get the desired speed (in KiB/s) for ths bandwidth subtree.
  * @see tr_bandwidthSetDesiredSpeed
  */
-extern inline double
-        tr_bandwidthGetDesiredSpeed   ( const tr_bandwidth  * bandwidth,
-                                        tr_direction          direction );
+static inline double
+tr_bandwidthGetDesiredSpeed( const tr_bandwidth  * bandwidth,
+                             tr_direction          dir )
+{
+    return bandwidth->band[dir].desiredSpeed;
+}
 
 /**
  * @brief Set whether or not this bandwidth should throttle its peer-io's speeds
  */
-extern inline void
-        tr_bandwidthSetLimited        ( tr_bandwidth        * bandwidth,
-                                        tr_direction          direction,
-                                        tr_bool               isLimited );
+static inline void tr_bandwidthSetLimited( tr_bandwidth        * bandwidth,
+                                           tr_direction          dir,
+                                           tr_bool               isLimited )
+{
+    bandwidth->band[dir].isLimited = isLimited;
+}
 
 /**
  * @return nonzero if this bandwidth throttles its peer-ios speeds
  */
-extern inline tr_bool
-        tr_bandwidthIsLimited         ( const tr_bandwidth  * bandwidth,
-                                        tr_direction          direction );
+static inline tr_bool tr_bandwidthIsLimited( const tr_bandwidth  * bandwidth,
+                                             tr_direction          dir )
+{
+    return bandwidth->band[dir].isLimited;
+}
 
 /**
  * @brief allocate the next period_msec's worth of bandwidth for the peer-ios to consume
@@ -132,19 +189,13 @@ size_t  tr_bandwidthClamp             ( const tr_bandwidth  * bandwidth,
 *******
 ******/
 
-/**
- * @brief Get the raw total of bytes read or sent by this bandwidth subtree.
- */
-extern inline double
-        tr_bandwidthGetRawSpeed       ( const tr_bandwidth  * bandwidth,
-                                        tr_direction          direction );
+/** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
+double tr_bandwidthGetRawSpeed( const tr_bandwidth  * bandwidth,
+                                tr_direction          direction );
 
-/**
- * @brief Get the number of piece data bytes read or sent by this bandwidth subtree.
- */
-extern inline double
-        tr_bandwidthGetPieceSpeed     ( const tr_bandwidth  * bandwidth,
-                                        tr_direction          direction );
+/** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
+double tr_bandwidthGetPieceSpeed( const tr_bandwidth  * bandwidth,
+                                  tr_direction          direction );
 
 /**
  * @brief Notify the bandwidth object that some of its allocated bandwidth has been consumed.
@@ -180,15 +231,13 @@ void    tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
  * @brief add a tr_peerIo to this bandwidth's list.
  * They will be notified when more bandwidth is made available for them to consume.
  */
-extern inline void
-        tr_bandwidthAddPeer           ( tr_bandwidth        * bandwidth,
-                                        struct tr_peerIo    * peerIo );
+void tr_bandwidthAddPeer( tr_bandwidth        * bandwidth,
+                          struct tr_peerIo    * peerIo );
 
 /**
  * @brief remove a peer-io from this bandwidth's list.
  */
-extern inline void
-        tr_bandwidthRemovePeer        ( tr_bandwidth        * bandwidth,
-                                        struct tr_peerIo    * peerIo );
+void tr_bandwidthRemovePeer( tr_bandwidth        * bandwidth,
+                             struct tr_peerIo    * peerIo );
 
 #endif

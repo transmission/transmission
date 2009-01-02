@@ -26,21 +26,6 @@
 ****
 ***/
 
-enum
-{
-    HISTORY_MSEC = 2000,
-    INTERVAL_MSEC = HISTORY_MSEC,
-    GRANULARITY_MSEC = 50,
-    HISTORY_SIZE = ( INTERVAL_MSEC / GRANULARITY_MSEC ),
-    MAGIC_NUMBER = 43143
-};
-
-struct bratecontrol
-{
-    int newest;
-    struct { uint64_t date, size; } transfers[HISTORY_SIZE];
-};
-
 static float
 getSpeed( const struct bratecontrol * r, int interval_msec )
 {
@@ -82,30 +67,6 @@ bytesUsed( struct bratecontrol * r, size_t size )
 *******
 ******/
 
-struct tr_band
-{
-    tr_bool isLimited;
-    tr_bool honorParentLimits;
-    size_t bytesLeft;
-    double desiredSpeed;
-    struct bratecontrol raw;
-    struct bratecontrol piece;
-};
-
-struct tr_bandwidth
-{
-    struct tr_band band[2];
-    struct tr_bandwidth * parent;
-    int magicNumber;
-    tr_session * session;
-    tr_ptrArray children; /* struct tr_bandwidth */
-    tr_ptrArray peers; /* tr_peerIo */
-};
-
-/***
-****
-***/
-
 static inline int
 comparePointers( const void * a, const void * b )
 {
@@ -113,12 +74,6 @@ comparePointers( const void * a, const void * b )
         return a < b ? -1 : 1;
 
     return 0;
-}
-
-tr_bool
-tr_isBandwidth( const tr_bandwidth * b )
-{
-    return ( b != NULL ) && ( b->magicNumber == MAGIC_NUMBER );
 }
 
 /***
@@ -194,48 +149,6 @@ tr_bandwidthHonorParentLimits( tr_bandwidth  * b,
 /***
 ****
 ***/
-
-void
-tr_bandwidthSetDesiredSpeed( tr_bandwidth  * b,
-                             tr_direction    dir,
-                             double          desiredSpeed )
-{
-    assert( tr_isBandwidth( b ) );
-    assert( tr_isDirection( dir ) );
-
-    b->band[dir].desiredSpeed = desiredSpeed; 
-}
-
-double
-tr_bandwidthGetDesiredSpeed( const tr_bandwidth  * b,
-                             tr_direction          dir )
-{
-    assert( tr_isBandwidth( b ) );
-    assert( tr_isDirection( dir ) );
-
-    return b->band[dir].desiredSpeed;
-}
-
-void
-tr_bandwidthSetLimited( tr_bandwidth  * b,
-                        tr_direction    dir,
-                        tr_bool         isLimited )
-{
-    assert( tr_isBandwidth( b ) );
-    assert( tr_isDirection( dir ) );
-
-    b->band[dir].isLimited = isLimited;
-}
-
-tr_bool
-tr_bandwidthIsLimited( const tr_bandwidth  * b,
-                       tr_direction          dir )
-{
-    assert( tr_isBandwidth( b ) );
-    assert( tr_isDirection( dir ) );
-
-    return b->band[dir].isLimited;
-}
 
 #if 0
 #warning do not check the code in with this enabled
@@ -358,7 +271,6 @@ tr_bandwidthAddPeer( tr_bandwidth   * b,
     assert( tr_isBandwidth( b ) );
     assert( tr_isPeerIo( peerIo ) );
 
-    tr_ptrArrayInsertSorted( &b->peers, peerIo, comparePointers );
 }
 
 void
