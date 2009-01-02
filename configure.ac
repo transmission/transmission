@@ -47,6 +47,7 @@ AC_SUBST(DBUS_GLIB_MINIMUM)
 
 AC_PROG_CC
 AC_PROG_CXX
+AC_C_INLINE
 if test "x$GCC" = "xyes" ; then
     CFLAGS="-Wall -Wformat-security -W -Wmissing-prototypes -Wdeclaration-after-statement"
     CXXFLAGS="-Wall -Wformat-security -W"

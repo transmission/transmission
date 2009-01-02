@@ -87,7 +87,7 @@ void tr_normalizeV4Mapped( tr_address * const addr );
 
 void tr_suspectAddress( const tr_address * a, const char * source );
 
-#define tr_isAddress(a) ( ((a)!=NULL) && ( (a)->type==TR_AF_INET || (a)->type==TR_AF_INET6 ) )
+static inline tr_bool tr_isAddress( const tr_address * a ) { return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 ); }
 
 typedef struct tr_net_af_support
 {
