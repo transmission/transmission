@@ -226,9 +226,8 @@
     Torrent * torrent = [(FileOutlineView *)[self controlView] torrent];
     FileListNode * node = (FileListNode *)[self objectValue];
     
-    NSString * percentString;
     CGFloat progress = [torrent fileProgress: node];
-    percentString = progress == 1.0f ? @"100%" : [NSString localizedStringWithFormat: @"%.2f%%", progress * 100.0f];
+    NSString * percentString = progress == 1.0f ? @"100%" : [NSString localizedStringWithFormat: @"%.2f%%", progress * 100.0f];
     
     
     NSString * status = [NSString localizedStringWithFormat: NSLocalizedString(@"%@ of %@",

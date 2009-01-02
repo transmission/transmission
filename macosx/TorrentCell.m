@@ -433,10 +433,7 @@
     //text color
     NSColor * titleColor, * statusColor;
     if ([self backgroundStyle] == NSBackgroundStyleDark)
-    {
-        titleColor = [NSColor whiteColor];
-        statusColor = [NSColor whiteColor];
-    }
+        titleColor = statusColor = [NSColor whiteColor];
     else
     {
         titleColor = [NSColor controlTextColor];
