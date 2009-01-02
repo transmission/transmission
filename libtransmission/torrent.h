@@ -30,6 +30,7 @@
 #define TR_TORRENT_H 1
 
 #include "completion.h" /* tr_completion */
+#include "ratecontrol.h" /* tr_ratecontrol */
 #include "session.h" /* tr_globalLock(), tr_globalUnlock() */
 #include "utils.h" /* tr_bitfield */
 
@@ -146,7 +147,7 @@ struct tr_torrent
 
     tr_speedlimit            speedLimitMode[2];
 
-    struct tr_ratecontrol *  swarmSpeed;
+    struct tr_ratecontrol    swarmSpeed;
 
     int                      error;
     char                     errorString[128];

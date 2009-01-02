@@ -1457,7 +1457,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen, size_t
                 return READ_ERR;
             }
             updatePeerProgress( msgs );
-            tr_rcTransferred( msgs->torrent->swarmSpeed,
+            tr_rcTransferred( &msgs->torrent->swarmSpeed,
                               msgs->torrent->info.pieceSize );
             break;
 

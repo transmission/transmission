@@ -40,7 +40,7 @@ struct tr_webseed
     uint32_t            pieceOffset;
     uint32_t            byteCount;
 
-    tr_ratecontrol    * rateDown;
+    tr_ratecontrol      rateDown;
 
     tr_session        * session;
 
@@ -169,7 +169,7 @@ webResponseFunc( tr_session    * session,
         if( !w->dead )
         {
             fireClientGotData( w, response_byte_count );
-            tr_rcTransferred( w->rateDown, response_byte_count );
+            tr_rcTransferred( &w->rateDown, response_byte_count );
         }
 
         if( EVBUFFER_LENGTH( w->content ) < w->byteCount )
@@ -256,7 +256,7 @@ tr_webseedGetSpeed( const tr_webseed * w, float * setme_KiBs )
 {
     const int isActive = tr_webseedIsActive( w );
 
-    *setme_KiBs = isActive ? tr_rcRate( w->rateDown ) : 0.0f;
+    *setme_KiBs = isActive ? tr_rcRate( &w->rateDown ) : 0.0f;
     return isActive;
 }
 
@@ -275,10 +275,10 @@ tr_webseedNew( struct tr_torrent * torrent,
     memcpy( w->hash, torrent->info.hash, SHA_DIGEST_LENGTH );
     w->session = torrent->session;
     w->content = evbuffer_new( );
-    w->rateDown = tr_rcInit( );
     w->url = tr_strdup( url );
     w->callback = callback;
     w->callback_userdata = callback_userdata;
+    tr_rcConstruct( &w->rateDown );
 /*fprintf( stderr, "w->callback_userdata is %p\n", w->callback_userdata );*/
     return w;
 }
@@ -295,7 +295,7 @@ tr_webseedFree( tr_webseed * w )
         else
         {
             evbuffer_free( w->content );
-            tr_rcClose( w->rateDown );
+            tr_rcDestruct( &w->rateDown );
             tr_free( w->url );
             tr_free( w );
         }

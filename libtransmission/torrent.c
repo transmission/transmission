@@ -501,7 +501,7 @@ torrentRealInit( tr_session      * session,
 
     tr_torrentInitFilePieces( tor );
 
-    tor->swarmSpeed = tr_rcInit( );
+    tr_rcConstruct( &tor->swarmSpeed );
 
     tr_sha1( tor->obfuscatedHash, "req2", 4,
              info->hash, SHA_DIGEST_LENGTH,
@@ -792,7 +792,7 @@ tr_torrentStat( tr_torrent * tor )
                            (double) tor->info.pieceCount )
                        : 0.0;
 
-    s->swarmSpeed = tr_rcRate( tor->swarmSpeed );
+    s->swarmSpeed = tr_rcRate( &tor->swarmSpeed );
 
     s->activityDate = tor->activityDate;
     s->addedDate    = tor->addedDate;
@@ -1034,7 +1034,7 @@ freeTorrent( tr_torrent * tor )
 
     tr_cpDestruct( &tor->completion );
 
-    tr_rcClose( tor->swarmSpeed );
+    tr_rcDestruct( &tor->swarmSpeed );
 
     tr_trackerUnsubscribe( tor->tracker, tor->trackerSubscription );
     tr_trackerFree( tor->tracker );

@@ -29,17 +29,43 @@
 #ifndef _TR_RATECONTROL_H_
 #define _TR_RATECONTROL_H_
 
+#include <string.h> /* memset() */
+
+#include "transmission.h"
+
+/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * it's included in the header for inlining and composition. */
 enum
 {
-    TR_RATECONTROL_HISTORY_MSEC = 2000
+    TR_RC_HISTORY_MSEC = 2000,
+    TR_RC_GRANULARITY_MSEC = 250,
+    TR_RC_HISTORY_SIZE = ( TR_RC_HISTORY_MSEC / TR_RC_GRANULARITY_MSEC )
 };
 
-typedef struct tr_ratecontrol tr_ratecontrol;
+/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * it's included in the header for inlining and composition. */
+struct tr_transfer
+{
+    uint64_t    date;
+    uint64_t    size;
+};
 
+/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * it's included in the header for inlining and composition. */
+typedef struct tr_ratecontrol
+{
+    int                   newest;
+    struct tr_transfer    transfers[TR_RC_HISTORY_SIZE];
+}
+tr_ratecontrol;
 
-tr_ratecontrol * tr_rcInit        ( void );
+/***
+****
+***/
 
-void             tr_rcClose       ( tr_ratecontrol         * ratecontrol );
+static inline void tr_rcConstruct ( tr_ratecontrol * rc ) { memset( rc, 0, sizeof( tr_ratecontrol ) ); }
+
+static inline void tr_rcDestruct  ( tr_ratecontrol * rc ) { memset( rc, 0xDEAD, sizeof( tr_ratecontrol ) ); }
 
 void             tr_rcTransferred ( tr_ratecontrol         * ratecontrol,
                                     size_t                   byteCount );
