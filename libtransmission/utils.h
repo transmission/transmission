@@ -27,9 +27,13 @@
 
 #include <inttypes.h>
 #include <stdarg.h>
-#include <stddef.h> /* for size_t */
+#include <stddef.h> /* size_t */
 #include <stdio.h> /* FILE* */
+#include <string.h> /* memcpy()* */
+#include <stdlib.h> /* malloc() */
 #include <time.h> /* time_t* */
+
+#include "transmission.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -277,33 +281,39 @@ void tr_releaseBuffer( struct evbuffer * buf );
 ****
 ***/
 
+static inline void* tr_malloc( size_t size )
+{
+    return size ? malloc( size ) : NULL;
+}
+static inline void* tr_malloc0( size_t size )
+{
+    return size ? calloc( 1, size ) : NULL;
+}
+static inline void tr_free( void * p )
+{
+    if( p != NULL )
+        free( p );
+}
+static inline void* tr_memdup( const void * src, int byteCount )
+{
+    return memcpy( tr_malloc( byteCount ), src, byteCount );
+}
+
 #define tr_new( struct_type, n_structs )           \
-    ( (struct_type *) tr_malloc ( ( (size_t) sizeof ( struct_type ) ) * ( (\
-                                                                             size_t) (\
-                                                                             n_structs ) ) ) )
+    ( (struct_type *) tr_malloc ( ( (size_t) sizeof ( struct_type ) ) * ( ( size_t) ( n_structs ) ) ) )
+
 #define tr_new0( struct_type, n_structs )          \
-    ( (struct_type *) tr_malloc0 ( ( (size_t) sizeof ( struct_type ) ) * ( (\
-                                                                              size_t) (\
-                                                                              n_structs ) ) ) )
+    ( (struct_type *) tr_malloc0 ( ( (size_t) sizeof ( struct_type ) ) * ( ( size_t) ( n_structs ) ) ) )
+
 #define tr_renew( struct_type, mem, n_structs )    \
-    ( (struct_type *) realloc ( ( mem ),\
-                               ( (size_t) sizeof ( struct_type ) ) * ( (\
-                                                                          size_t) (\
-                                                                          n_structs ) ) ) )
+    ( (struct_type *) realloc ( ( mem ), ( (size_t) sizeof ( struct_type ) ) * ( ( size_t) ( n_structs ) ) ) )
 
-void*       tr_malloc( size_t ) TR_GNUC_MALLOC;
+char*       tr_strndup( const void * str, int len ) TR_GNUC_MALLOC;
 
-void*       tr_malloc0( size_t ) TR_GNUC_MALLOC;
-
-void        tr_free( void* );
-
-char*       tr_strdup( const void * str ) TR_GNUC_MALLOC;
-
-char*       tr_strndup( const void * str,
-                        int          len ) TR_GNUC_MALLOC;
-
-void*       tr_memdup( const void * src,
-                       int          byteCount ) TR_GNUC_MALLOC;
+static inline char* tr_strdup( const void * in )
+{
+    return tr_strndup( in, in ? strlen( (const char*)in ) : 0 );
+}
 
 char*       tr_strdup_printf( const char * fmt,
                               ... )  TR_GNUC_PRINTF( 1, 2 ) TR_GNUC_MALLOC;
@@ -373,13 +383,19 @@ tr_bitfield;
 
 tr_bitfield* tr_bitfieldConstruct( tr_bitfield*, size_t bitcount );
 
-void         tr_bitfieldDestruct( tr_bitfield* );
+tr_bitfield* tr_bitfieldDestruct( tr_bitfield* );
 
-tr_bitfield* tr_bitfieldNew( size_t bitcount ) TR_GNUC_MALLOC;
+static inline tr_bitfield* tr_bitfieldNew( size_t bitcount )
+{
+    return tr_bitfieldConstruct( tr_new0( tr_bitfield, 1 ), bitcount );
+}
+
+static inline void tr_bitfieldFree( tr_bitfield * b )
+{
+    tr_free( tr_bitfieldDestruct( b ) );
+}
 
 tr_bitfield* tr_bitfieldDup( const tr_bitfield* ) TR_GNUC_MALLOC;
-
-void         tr_bitfieldFree( tr_bitfield* );
 
 void         tr_bitfieldClear( tr_bitfield* );
 
@@ -404,17 +420,23 @@ tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
     has none of tr_bitfieldHas()'s safety checks, so you
     need to call tr_bitfieldTestFast() first before you
     start looping. */
-#define tr_bitfieldHasFast( bitfield, nth ) \
-    ( ( (bitfield)->bits[( nth ) >> 3u] << ( ( nth ) & 7u ) & 0x80 ) != 0 )
+static inline tr_bool tr_bitfieldHasFast( const tr_bitfield * b, const size_t nth )
+{
+    return ( b->bits[nth>>3u] << ( nth & 7u ) & 0x80 ) != 0;
+}
 
 /** @param high the highest nth bit you're going to access */
-#define tr_bitfieldTestFast( bitfield, high ) \
-    ( ( bitfield ) && ( ( bitfield )->bits )\
-    && ( ( high ) < ( bitfield )->bitCount ) )
+static inline tr_bool tr_bitfieldTestFast( const tr_bitfield * b, const size_t high )
+{
+    return ( b != NULL )
+        && ( b->bits != NULL )
+        && ( high < b->bitCount );
+}
 
-#define tr_bitfieldHas( bitfield, nth ) \
-    ( tr_bitfieldTestFast( bitfield, nth )    \
-    && tr_bitfieldHasFast( bitfield, nth ) )
+static inline tr_bool tr_bitfieldHas( const tr_bitfield * b, size_t nth )
+{
+    return tr_bitfieldTestFast( b, nth ) && tr_bitfieldHasFast( b, nth );
+}
 
 double tr_getRatio( double numerator, double denominator );
 

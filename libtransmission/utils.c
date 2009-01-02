@@ -642,22 +642,6 @@ tr_buildPath( const char *first_element, ... )
 *****
 ****/
 
-void*
-tr_memdup( const void * in,
-           int          byteCount )
-{
-    void * out = tr_new( uint8_t, byteCount );
-
-    memcpy( out, in, byteCount );
-    return out;
-}
-
-char*
-tr_strdup( const void * in )
-{
-    return tr_strndup( in, in ? strlen( (const char*)in ) : 0 );
-}
-
 char*
 tr_strndup( const void * in,
             int          len )
@@ -694,25 +678,6 @@ tr_strdup_printf( const char * fmt, ... )
     va_end( ap );
     tr_releaseBuffer( buf );
     return ret;
-}
-
-void*
-tr_malloc( size_t size )
-{
-    return size ? malloc( size ) : NULL;
-}
-
-void*
-tr_malloc0( size_t size )
-{
-    return size ? calloc( 1, size ) : NULL;
-}
-
-void
-tr_free( void * p )
-{
-    if( p )
-        free( p );
 }
 
 const char*
@@ -766,16 +731,12 @@ tr_bitfieldConstruct( tr_bitfield * b, size_t bitCount )
     return b;
 }
 
-void
+tr_bitfield*
 tr_bitfieldDestruct( tr_bitfield * b )
 {
-    tr_free( b->bits );
-}
-
-tr_bitfield*
-tr_bitfieldNew( size_t bitCount )
-{
-    return tr_bitfieldConstruct( tr_new0( tr_bitfield, 1 ), bitCount );
+    if( b )
+        tr_free( b->bits );
+    return b;
 }
 
 tr_bitfield*
@@ -787,16 +748,6 @@ tr_bitfieldDup( const tr_bitfield * in )
     ret->byteCount = in->byteCount;
     ret->bits = tr_memdup( in->bits, in->byteCount );
     return ret;
-}
-
-void
-tr_bitfieldFree( tr_bitfield * bitfield )
-{
-    if( bitfield )
-    {
-        tr_bitfieldDestruct( bitfield );
-        tr_free( bitfield );
-    }
 }
 
 void

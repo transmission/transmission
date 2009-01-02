@@ -30,8 +30,6 @@
 #include "crypto.h"
 #include "utils.h"
 
-typedef uint8_t tr_bool;
-
 /**
 ***
 **/
