@@ -153,8 +153,6 @@ canReadWrapper( tr_peerIo * io )
     tr_bool err = 0;
     tr_session * session = io->session;
 
-    assert( tr_isPeerIo( io ) );
-
     dbgmsg( io, "canRead" );
 
     /* try to consume the input buffer */
@@ -923,8 +921,6 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
 {
     int res = 0;
 
-    assert( tr_isPeerIo( io ) );
-
     if(( howmuch = tr_bandwidthClamp( io->bandwidth, TR_DOWN, howmuch )))
     {
         int e;
@@ -954,8 +950,6 @@ static int
 tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
 {
     int n;
-
-    assert( tr_isPeerIo( io ) );
 
     if(( howmuch = tr_bandwidthClamp( io->bandwidth, TR_UP, howmuch )))
     {

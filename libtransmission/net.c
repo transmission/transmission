@@ -98,12 +98,6 @@ tr_suspectAddress( const tr_address * a, const char * source )
     }
 }
 
-tr_bool
-tr_isAddress( const tr_address * a )
-{
-    return a && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 );
-}
-
 const char * 
 tr_ntop( const tr_address * src, char * dst, int size ) 
 {
