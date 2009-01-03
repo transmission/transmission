@@ -198,7 +198,6 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     tr_ptrArray tmp = TR_PTR_ARRAY_INIT;
     struct tr_peerIo ** peers;
 
-
     /* allocateBandwidth() is a helper function with two purposes:
      * 1. allocate bandwidth to b and its subtree
      * 2. accumulate an array of all the peerIos from b and its subtree. */
@@ -222,6 +221,8 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     {
         const int increment = 1024;
         const int bytesUsed = tr_peerIoFlush( peers[i], dir, increment );
+
+        dbgmsg( "peer #%d of %d used %.2f KiB in this pass", i, n, bytesUsed/1024.0 );
 
         if( bytesUsed == increment )
             ++i;

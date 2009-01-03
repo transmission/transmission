@@ -222,10 +222,15 @@ tr_getLogTimeStr( char * buf,
     return buf;
 }
 
-int
+tr_bool
 tr_deepLoggingIsActive( void )
 {
-    return IsDebuggerPresent() || (tr_getLog()!=NULL);
+    static tr_bool deepLoggingIsActive = -1;
+
+    if( deepLoggingIsActive == -1 )
+        deepLoggingIsActive = IsDebuggerPresent() || (tr_getLog()!=NULL);
+
+    return deepLoggingIsActive;
 }
 
 void
