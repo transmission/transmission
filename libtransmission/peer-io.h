@@ -348,7 +348,7 @@ void      tr_peerIoSetEnabled( tr_peerIo    * io,
                                tr_direction   dir,
                                tr_bool        isEnabled );
                        
-int       tr_peerIoFlush( tr_peerIo     * io,
+ssize_t   tr_peerIoFlush( tr_peerIo     * io,
                           tr_direction    dir,
                           size_t          byteLimit );
 

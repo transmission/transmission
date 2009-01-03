@@ -219,12 +219,12 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a random starting point */
     while( n > 1 )
     {
-        const int increment = 1024;
-        const int bytesUsed = tr_peerIoFlush( peers[i], dir, increment );
+        const size_t increment = 1024;
+        const ssize_t bytesUsed = tr_peerIoFlush( peers[i], dir, increment );
 
-        dbgmsg( "peer #%d of %d used %.2f KiB in this pass", i, n, bytesUsed/1024.0 );
+        dbgmsg( "peer #%d of %d used %zd bytes in this pass", i, n, bytesUsed );
 
-        if( bytesUsed == increment )
+        if( bytesUsed == (ssize_t)increment )
             ++i;
         else {
             /* peer is done writing for now; move it to the end of the list */
