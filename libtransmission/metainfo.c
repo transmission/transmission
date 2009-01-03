@@ -257,7 +257,7 @@ getannounce( tr_info * inf,
     if( tr_bencDictFindList( meta, "announce-list", &tiers ) )
     {
         int       n;
-        int       i, j;
+        int       i, j, validTiers;
         const int numTiers = tr_bencListSize( tiers );
 
         n = 0;
@@ -267,10 +267,11 @@ getannounce( tr_info * inf,
         trackers = tr_new0( tr_tracker_info, n );
         trackerCount = 0;
 
-        for( i = 0; i < numTiers; ++i )
+        for( i = 0, validTiers = 0; i < numTiers; ++i )
         {
             tr_benc * tier = tr_bencListChild( tiers, i );
             const int tierSize = tr_bencListSize( tier );
+            tr_bool anyAdded = FALSE;
             for( j = 0; j < tierSize; ++j )
             {
                 if( tr_bencGetStr( tr_bencListChild( tier, j ), &str ) )
@@ -279,13 +280,18 @@ getannounce( tr_info * inf,
                     if( tr_httpIsValidURL( url ) )
                     {
                         tr_tracker_info * t = trackers + trackerCount++;
-                        t->tier = i;
+                        t->tier = validTiers;
                         t->announce = tr_strdup( url );
                         t->scrape = announceToScrape( url );
+                        
+                        anyAdded = TRUE;
                     }
                     tr_free( url );
                 }
             }
+            
+            if( anyAdded )
+                ++validTiers;
         }
 
         /* did we use any of the tiers? */

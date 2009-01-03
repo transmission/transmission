@@ -759,16 +759,15 @@ int trashDataFile(const char * filename)
 
 - (NSMutableArray *) allTrackers: (BOOL) separators
 {
-    NSInteger count = fInfo->trackerCount, capacity = count;
-    if (separators)
-        capacity += fInfo->trackers[count-1].tier + 1;
+    const NSInteger count = fInfo->trackerCount;
+    const NSInteger capacity = separators ? count + fInfo->trackers[count-1].tier + 1 : count;
     NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: capacity];
     
     for (NSInteger i = 0, tier = -1; i < count; i++)
     {
         if (separators && tier != fInfo->trackers[i].tier)
         {
-            tier = fInfo->trackers[i].tier;
+            tier = fInfo->trackers[i].tier;NSLog(@"%d",tier);
             [allTrackers addObject: [NSNumber numberWithInt: fAddedTrackers ? tier : tier + 1]];
         }
         
