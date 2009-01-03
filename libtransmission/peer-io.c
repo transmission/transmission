@@ -244,9 +244,9 @@ tr_evbuffer_write( tr_peerIo * io, int fd, size_t howmuch )
 
     errno = 0;
 #ifdef WIN32
-    n = send(fd, buffer->buffer, n,  0 );
+    n = send(fd, buffer->buffer, howmuch,  0 );
 #else
-    n = write(fd, buffer->buffer, n );
+    n = write(fd, buffer->buffer, howmuch );
 #endif
     e = errno;
     dbgmsg( io, "wrote %zd to peer (%s)", n, (n==-1?strerror(e):"") );
