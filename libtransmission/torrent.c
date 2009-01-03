@@ -738,7 +738,7 @@ tr_torrentStat( tr_torrent * tor )
            sizeof( s->errorString ) );
 
     tc = tor->tracker;
-    ti = tr_trackerGetAddress( tor->tracker );
+    ti = tr_trackerGetAddress( tor->tracker, tor );
     s->announceURL = ti ? ti->announce : NULL;
     s->scrapeURL   = ti ? ti->scrape   : NULL;
     tr_trackerStat( tc, s );

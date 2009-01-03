@@ -85,7 +85,7 @@ void                    tr_trackerReannounce( struct tr_tracker * );
 
 void                    tr_trackerChangeMyPort( struct tr_tracker * );
 
-const tr_tracker_info * tr_trackerGetAddress( struct tr_tracker * );
+const tr_tracker_info * tr_trackerGetAddress( struct tr_tracker *, const tr_torrent * tor );
 
 int                     tr_trackerCanManualAnnounce( const struct tr_tracker * );
 

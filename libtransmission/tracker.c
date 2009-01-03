@@ -156,7 +156,7 @@ getCurrentAddress( tr_tracker * t )
 {
     const tr_torrent * torrent;
 
-    if( ( torrent = tr_torrentFindFromHash( t->session, t->hash ) ) )
+    if( ( torrent = tr_torrentFindFromId( t->session, t->torrentId ) ) )
         return getCurrentAddressFromTorrent( t, torrent );
     return NULL;
 }
@@ -1108,9 +1108,9 @@ tr_trackerUnsubscribe( tr_tracker *     t,
 }
 
 const tr_tracker_info *
-tr_trackerGetAddress( tr_tracker * t )
+tr_trackerGetAddress( tr_tracker * t, const tr_torrent * torrent )
 {
-    return getCurrentAddress( t );
+    return getCurrentAddressFromTorrent( t, torrent );
 }
 
 time_t
