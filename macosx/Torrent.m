@@ -767,7 +767,7 @@ int trashDataFile(const char * filename)
     {
         if (separators && tier != fInfo->trackers[i].tier)
         {
-            tier = fInfo->trackers[i].tier;NSLog(@"%d",tier);
+            tier = fInfo->trackers[i].tier;
             [allTrackers addObject: [NSNumber numberWithInt: fAddedTrackers ? tier : tier + 1]];
         }
         
