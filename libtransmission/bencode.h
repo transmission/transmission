@@ -156,13 +156,11 @@ tr_bool   tr_bencGetInt( const tr_benc * val, int64_t * setme );
 
 tr_bool   tr_bencGetStr( const tr_benc * val, const char ** setme );
 
-tr_bool   tr_bencIsType( const tr_benc *, int type );
-
-
-#define tr_bencIsInt( b )    tr_bencIsType( ( b ), TYPE_INT )
-#define tr_bencIsDict( b )   tr_bencIsType( ( b ), TYPE_DICT )
-#define tr_bencIsList( b )   tr_bencIsType( ( b ), TYPE_LIST )
-#define tr_bencIsString( b ) tr_bencIsType( ( b ), TYPE_STR )
+static inline tr_bool tr_bencIsType  ( const tr_benc * b, int type ) { return ( b != NULL ) && ( b->type == type ); }
+static inline tr_bool tr_bencIsInt   ( const tr_benc * b ) { return tr_bencIsType( b, TYPE_INT ); }
+static inline tr_bool tr_bencIsDict  ( const tr_benc * b ) { return tr_bencIsType( b, TYPE_DICT ); }
+static inline tr_bool tr_bencIsList  ( const tr_benc * b ) { return tr_bencIsType( b, TYPE_LIST ); }
+static inline tr_bool tr_bencIsString( const tr_benc * b ) { return tr_bencIsType( b, TYPE_STR ); }
 
 /**
 ***  Treat these as private -- they're only made public here

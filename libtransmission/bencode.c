@@ -34,12 +34,6 @@
 ***
 **/
 
-tr_bool
-tr_bencIsType( const tr_benc * val, int type )
-{
-    return ( val ) && ( val->type == type );
-}
-
 static tr_bool
 isContainer( const tr_benc * val )
 {
