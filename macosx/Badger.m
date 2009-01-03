@@ -55,12 +55,14 @@
 
 - (void) updateBadge
 {
-    float downloadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
-                            ? tr_sessionGetPieceSpeed(fLib, TR_DOWN) : 0.0;
-    float uploadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"]
-                        ? tr_sessionGetPieceSpeed(fLib, TR_UP) : 0.0;
+    const float downloadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
+                                ? tr_sessionGetPieceSpeed(fLib, TR_DOWN) : 0.0;
+    const float uploadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"]
+                                ? tr_sessionGetPieceSpeed(fLib, TR_UP) : 0.0;
     
-    [(BadgeView *)[[NSApp dockTile] contentView] displayRatesWithDownload: downloadRate upload: uploadRate];
+    //only update if the badged values change
+    if ([(BadgeView *)[[NSApp dockTile] contentView] setRatesWithDownload: downloadRate upload: uploadRate])
+        [[NSApp dockTile] display];
 }
 
 - (void) incrementCompleted

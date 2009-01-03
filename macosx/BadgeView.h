@@ -37,7 +37,7 @@
 
 - (id) initWithFrame: (NSRect) frame lib: (tr_session *) lib;
 
-- (void) displayRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate;
+- (BOOL) setRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate;
 - (void) setQuitting;
 
 @end

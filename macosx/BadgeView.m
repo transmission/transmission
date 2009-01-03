@@ -54,15 +54,15 @@
     [super dealloc];
 }
 
-- (void) displayRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate
+- (BOOL) setRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate
 {
     //only needs update if the badges were displayed or are displayed now
     if (fDownloadRate == downloadRate && fUploadRate == uploadRate)
-        return;
+        return NO;
     
     fDownloadRate = downloadRate;
     fUploadRate = uploadRate;
-    [self display];
+    return YES;
 }
 
 - (void) setQuitting
@@ -82,8 +82,8 @@
         return;
     }
     
-    BOOL upload = fUploadRate >= 0.1f,
-        download = fDownloadRate >= 0.1f;
+    const BOOL upload = fUploadRate >= 0.1f,
+            download = fDownloadRate >= 0.1f;
     CGFloat bottom = 0.0f;
     if (upload)
     {
