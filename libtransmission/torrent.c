@@ -660,21 +660,6 @@ tr_torrentChangeMyPort( tr_torrent * tor )
         tr_trackerChangeMyPort( tor->tracker );
 }
 
-tr_bool
-tr_torrentIsPrivate( const tr_torrent * tor )
-{
-    return tor
-        && tor->info.isPrivate;
-}
-
-tr_bool
-tr_torrentAllowsPex( const tr_torrent * tor )
-{
-    return tor
-        && tor->session->isPexEnabled
-        && !tr_torrentIsPrivate( tor );
-}
-
 static inline void
 tr_torrentManualUpdateImpl( void * vtor )
 {
@@ -1312,12 +1297,6 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
     tr_torrentUnlock( tor );
 }
 
-tr_bool
-tr_torrentIsSeed( const tr_torrent * tor )
-{
-    return tor->completeness != TR_LEECH;
-}
-
 /**
 ***  File priorities
 **/
@@ -1573,13 +1552,6 @@ tr_pieceOffset( const tr_torrent * tor,
 /***
 ****
 ***/
-
-tr_bool
-tr_torrentIsPieceChecked( const tr_torrent * tor,
-                          tr_piece_index_t   piece )
-{
-    return tr_bitfieldHas( &tor->checkedPieces, piece );
-}
 
 void
 tr_torrentSetPieceChecked( tr_torrent        * tor,

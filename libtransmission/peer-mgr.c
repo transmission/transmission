@@ -164,31 +164,31 @@ struct tr_peerMgr
 ***
 **/
 
-static void
+static inline void
 managerLock( const struct tr_peerMgr * manager )
 {
     tr_globalLock( manager->session );
 }
 
-static void
+static inline void
 managerUnlock( const struct tr_peerMgr * manager )
 {
     tr_globalUnlock( manager->session );
 }
 
-static void
+static inline void
 torrentLock( Torrent * torrent )
 {
     managerLock( torrent->manager );
 }
 
-static void
+static inline void
 torrentUnlock( Torrent * torrent )
 {
     managerUnlock( torrent->manager );
 }
 
-static int
+static inline int
 torrentIsLocked( const Torrent * t )
 {
     return tr_globalIsLocked( t->manager->session );

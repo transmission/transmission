@@ -56,8 +56,6 @@ void        tr_torrentInitFileDLs( tr_torrent *      tor,
                                    tr_file_index_t   fileCount,
                                    tr_bool           do_download );
 
-tr_bool     tr_torrentIsPrivate( const tr_torrent * );
-
 void        tr_torrentRecheckCompleteness( tr_torrent * );
 
 void        tr_torrentResetTransferStats( tr_torrent * );
@@ -65,8 +63,6 @@ void        tr_torrentResetTransferStats( tr_torrent * );
 void        tr_torrentSetHasPiece( tr_torrent *     tor,
                                    tr_piece_index_t pieceIndex,
                                    tr_bool          has );
-
-tr_bool     tr_torrentIsSeed( const tr_torrent * session );
 
 void        tr_torrentChangeMyPort( tr_torrent * session );
 
@@ -81,8 +77,6 @@ tr_torrent* tr_torrentFindFromHashString( tr_session * session,
 
 tr_torrent* tr_torrentFindFromObfuscatedHash( tr_session    * session,
                                               const uint8_t * hash );
-
-tr_bool     tr_torrentAllowsPex( const tr_torrent * );
 
 tr_bool     tr_torrentIsPieceTransferAllowed( const tr_torrent * torrent,
                                               tr_direction       direction );
@@ -109,9 +103,6 @@ void             tr_torrentInitFilePriority( tr_torrent       * tor,
 
 
 int              tr_torrentCountUncheckedPieces( const tr_torrent * );
-
-tr_bool          tr_torrentIsPieceChecked( const tr_torrent  * tor,
-                                           tr_piece_index_t    piece );
 
 tr_bool          tr_torrentIsFileChecked( const tr_torrent  * tor,
                                           tr_file_index_t     file );
@@ -254,14 +245,12 @@ tr_torBlockCountBytes( const tr_torrent * tor, const tr_block_index_t block )
                                         : tor->blockSize;
 }
 
-static inline void
-tr_torrentLock( const tr_torrent * tor )
+static inline void tr_torrentLock( const tr_torrent * tor )
 {
     tr_globalLock( tor->session );
 }
 
-static inline void
-tr_torrentUnlock( const tr_torrent * tor )
+static inline void tr_torrentUnlock( const tr_torrent * tor )
 {
     tr_globalUnlock( tor->session );
 }
@@ -272,5 +261,25 @@ tr_torrentExists( const tr_session * session, const uint8_t *   torrentHash )
     return tr_torrentFindFromHash( (tr_session*)session, torrentHash ) != NULL;
 }
 
+static inline tr_bool
+tr_torrentIsSeed( const tr_torrent * tor )
+{
+    return tor->completeness != TR_LEECH;
+}
+
+static inline tr_bool tr_torrentIsPrivate( const tr_torrent * tor )
+{
+    return ( tor != NULL ) && tor->info.isPrivate;
+}
+
+static inline tr_bool tr_torrentAllowsPex( const tr_torrent * tor )
+{
+    return ( tor != NULL  ) && tor->session->isPexEnabled && !tr_torrentIsPrivate( tor );
+}
+
+static inline tr_bool tr_torrentIsPieceChecked( const tr_torrent  * tor, tr_piece_index_t i )
+{
+    return tr_bitfieldHas( &tor->checkedPieces, i );
+}
 
 #endif
