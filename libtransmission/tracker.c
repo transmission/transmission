@@ -59,7 +59,7 @@ enum
     FIRST_ANNOUNCE_RETRY_INTERVAL_SEC = 30,
 
     /* the value of the 'numwant' argument passed in tracker requests. */
-    NUMWANT = 80,
+    NUMWANT = 200,
 
     /* the length of the 'key' argument passed in tracker requests */
     KEYLEN = 10

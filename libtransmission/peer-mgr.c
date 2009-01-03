@@ -61,11 +61,11 @@ enum
     BANDWIDTH_PERIOD_MSEC = 500,
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
-    MAX_RECONNECTIONS_PER_PULSE = 4,
+    MAX_RECONNECTIONS_PER_PULSE = 16,
 
     /* max number of peers to ask for per second overall.
     * this throttle is to avoid overloading the router */
-    MAX_CONNECTIONS_PER_SECOND = 8,
+    MAX_CONNECTIONS_PER_SECOND = 32,
 
     /* number of unchoked peers per torrent.
      * FIXME: this probably ought to be configurable */
@@ -1175,7 +1175,7 @@ getMaxPeerCount( const tr_torrent * tor )
 static int
 getPeerCount( const Torrent * t )
 {
-    return tr_ptrArraySize( &t->peers ) + tr_ptrArraySize( &t->outgoingHandshakes );
+    return tr_ptrArraySize( &t->peers );// + tr_ptrArraySize( &t->outgoingHandshakes );
 }
 
 /* FIXME: this is kind of a mess. */
@@ -2274,7 +2274,7 @@ reconnectPulse( void * vtorrent )
         struct peer_atom ** candidates = getPeerCandidates( t, &nCandidates );
         struct tr_peer ** connections = getPeersToClose( t, &nBad );
 
-        if( nBad || nCandidates )
+        //if( nBad || nCandidates )
             tordbg( t, "reconnect pulse for [%s]: %d bad connections, "
                     "%d connection candidates, %d atoms, max per pulse is %d",
                     t->tor->info.name, nBad, nCandidates,
@@ -2295,6 +2295,9 @@ reconnectPulse( void * vtorrent )
             tordbg( t, "removing bad peer %s", tr_peerIoGetAddrStr( peer->io ) );
             removePeer( t, peer );
         }
+
+tordbg( t, "nCandidates is %d, MAX_RECONNECTIONS_PER_PULSE is %d, getPeerCount(t) is %d, getMaxPeerCount(t) is %d, newConnectionsThisSecond is %d, MAX_CONNECTIONS_PER_SECOND is %d",
+        (int)nCandidates, (int)MAX_RECONNECTIONS_PER_PULSE, (int)getPeerCount( t ), (int)getMaxPeerCount( t->tor ), (int)newConnectionsThisSecond, (int)MAX_CONNECTIONS_PER_SECOND );
 
         /* add some new ones */
         for( i = 0;    ( i < nCandidates )
