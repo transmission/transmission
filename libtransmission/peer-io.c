@@ -761,7 +761,7 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
 static int
 tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
 {
-    int n;
+    int n = 0;
 
     if(( howmuch = tr_bandwidthClamp( &io->bandwidth, TR_UP, howmuch )))
     {
