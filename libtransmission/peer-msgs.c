@@ -122,22 +122,10 @@ struct peer_request
     time_t      time_requested;
 };
 
-static int
-compareRequest( const void * va, const void * vb )
+static inline tr_bool
+requestsMatch( const struct peer_request * a, const struct peer_request * b )
 {
-    const struct peer_request * a = va;
-    const struct peer_request * b = vb;
-
-    if( a->index != b->index )
-        return a->index < b->index ? -1 : 1;
-
-    if( a->offset != b->offset )
-        return a->offset < b->offset ? -1 : 1;
-
-    if( a->length != b->length )
-        return a->length < b->length ? -1 : 1;
-
-    return 0;
+    return (a->index==b->index) && (a->offset==b->offset) && (a->length==b->length);
 }
 
 struct request_list
@@ -221,7 +209,7 @@ reqListFind( struct request_list *       list,
     uint16_t i;
 
     for( i = 0; i < list->count; ++i )
-        if( !compareRequest( key, list->requests + i ) )
+        if( requestsMatch( key, list->requests + i ) )
             return i;
 
     return -1;
