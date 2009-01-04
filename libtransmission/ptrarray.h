@@ -42,9 +42,6 @@ typedef struct tr_ptrArray
 }
 tr_ptrArray;
 
-#define TR_PTR_ARRAY_DATA( A ) ((A)->items)
-#define TR_PTR_ARRAY_LENGTH( A ) ((A)->n_items)
-
 typedef void ( *PtrArrayForeachFunc )( void * );
 
 extern const tr_ptrArray TR_PTR_ARRAY_INIT;
@@ -85,6 +82,11 @@ void*         tr_ptrArrayPop( tr_ptrArray    * array );
 void          tr_ptrArrayErase( tr_ptrArray  * array,
                                 int            begin,
                                 int            end );
+
+static inline void** tr_ptrArrayBase( const tr_ptrArray * a )
+{
+    return a->items;
+}
 
 static inline int tr_ptrArraySize( const tr_ptrArray *  a )
 {

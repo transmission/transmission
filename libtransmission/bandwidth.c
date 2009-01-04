@@ -182,8 +182,8 @@ fprintf( stderr, "bandwidth %p has %d peers\n", b, n );
     /* traverse & repeat for the subtree */
     if( 1 ) {
         int i;
-        struct tr_bandwidth ** children = (struct tr_bandwidth**) TR_PTR_ARRAY_DATA( &b->children );
-        const int n = TR_PTR_ARRAY_LENGTH( &b->children );
+        struct tr_bandwidth ** children = (struct tr_bandwidth**) tr_ptrArrayBase( &b->children );
+        const int n = tr_ptrArraySize( &b->children );
         for( i=0; i<n; ++i )
             allocateBandwidth( children[i], dir, period_msec, peer_pool );
     }
@@ -202,8 +202,8 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
      * 1. allocate bandwidth to b and its subtree
      * 2. accumulate an array of all the peerIos from b and its subtree. */
     allocateBandwidth( b, dir, period_msec, &tmp );
-    peers = (struct tr_peerIo**) TR_PTR_ARRAY_DATA( &tmp );
-    peerCount = TR_PTR_ARRAY_LENGTH( &tmp );
+    peers = (struct tr_peerIo**) tr_ptrArrayBase( &tmp );
+    peerCount = tr_ptrArraySize( &tmp );
 
     /* Stop all peers from listening for the socket to be ready for IO.
      * See "Second phase of IO" lower in this function for more info. */
