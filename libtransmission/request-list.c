@@ -16,11 +16,9 @@
 #include "utils.h"
 
 static int
-compareRequests( const void * va, const void * vb )
+compareRequests( const struct peer_request * a,
+                 const struct peer_request * b )
 {
-    const struct peer_request * a = va;
-    const struct peer_request * b = vb;
-
     if( a->index != b->index )
         return a->index < b->index ? -1 : 1;
 
@@ -62,6 +60,8 @@ reqListCopy( struct request_list * dest, const struct request_list * src )
     dest->sort = tr_memdup( src->sort, dest->len * sizeof( struct peer_request ) );
 }
 
+typedef int (*compareFunc)(const void * a, const void * b );
+
 static int
 reqListSortPos( const struct request_list * list,
                 const struct peer_request * req,
@@ -71,7 +71,7 @@ reqListSortPos( const struct request_list * list,
                           list->sort,
                           list->len,
                           sizeof( struct peer_request ), 
-                          compareRequests,
+                          (compareFunc)compareRequests,
                           exactMatch );
 }
 

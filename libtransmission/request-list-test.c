@@ -105,6 +105,7 @@ testFoo( void )
     check( !reqListHas( &list, &b ) );
     check( !reqListHas( &list, &c ) );
 
+    reqListClear( &list );
     return 0;
 }
 
