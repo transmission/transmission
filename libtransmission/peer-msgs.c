@@ -743,7 +743,7 @@ expireFromList( tr_peermsgs          * msgs,
     struct request_list tmp = REQUEST_LIST_INIT;
 
     /* since the fifo list is sorted by time, the oldest will be first */
-    if( list->fifo[0].time_requested >= oldestAllowed )
+    if( !list->len || ( list->fifo[0].time_requested >= oldestAllowed ) )
         return;
 
     /* if we found one too old, start pruning them */
