@@ -942,6 +942,7 @@ trackerPulse( void * vsession )
 
         if( ( t->scrapeAt > 1 )
           && ( t->scrapeAt <= now )
+          && ( t->isRunning )
           && ( trackerSupportsScrape( t, tor ) ) )
         {
             t->scrapeAt = TR_TRACKER_BUSY;
