@@ -663,16 +663,18 @@ tr_peerIoWriteBytes( tr_peerIo       * io,
             evbuffer_add( outbuf, bytes, byteCount );
             break;
 
-        case PEER_ENCRYPTION_RC4:
+        case PEER_ENCRYPTION_RC4: {
+            const uint8_t * walk = bytes;
             evbuffer_expand( outbuf, byteCount );
             while( byteCount > 0 ) {
                 const size_t thisPass = MIN( byteCount, sizeof( tmp ) );
-                tr_cryptoEncrypt( io->crypto, thisPass, bytes, tmp );
+                tr_cryptoEncrypt( io->crypto, thisPass, walk, tmp );
                 evbuffer_add( outbuf, tmp, thisPass );
-                bytes += thisPass;
+                walk += thisPass;
                 byteCount -= thisPass;
             }
             break;
+        }
 
         default:
             assert( 0 );
