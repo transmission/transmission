@@ -358,8 +358,6 @@ ssize_t   tr_peerIoFlush( tr_peerIo     * io,
 
 static inline struct evbuffer * tr_peerIoGetReadBuffer( tr_peerIo * io )
 {
-    assert( tr_isPeerIo( io ) );
-
     return io->inbuf;
 }
 

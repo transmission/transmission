@@ -25,20 +25,19 @@ compareRequests( const struct peer_request * a,
     if( a->offset != b->offset )
         return a->offset < b->offset ? -1 : 1;
 
-    if( a->length != b->length )
-        return a->length < b->length ? -1 : 1;
-
     return 0;
 }
 
 const struct request_list REQUEST_LIST_INIT = { 0, 0, NULL, NULL };
+
+static const int GROW = 8;
 
 static void
 reqListReserve( struct request_list * list, size_t max )
 {
     if( list->max < max )
     {
-        list->max = max;
+        list->max = max + GROW;
         list->fifo = tr_renew( struct peer_request, list->fifo, list->max );
         list->sort = tr_renew( struct peer_request, list->sort, list->max );
     }

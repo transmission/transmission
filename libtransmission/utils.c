@@ -1301,12 +1301,13 @@ tr_lowerBound( const void * key,
                tr_bool    * exact_match )
 {
     size_t first = 0;
+    const char * cbase = base;
 
-    while( nmemb > 0 )
+    while( nmemb )
     {
         const size_t half = nmemb / 2;
         const size_t middle = first + half;
-        const int c = compar( key, ((const char*)base) + size*middle );
+        const int c = compar( key, cbase + size*middle );
 
         if( c < 0 )
         {
