@@ -467,7 +467,7 @@ torrent_cell_renderer_render(
 
             my_bg.y = tmp_bg.y + tmp_bg.height;
             my_cell.y = tmp_cell.y + tmp_cell.height;
-            my_expose.y += tmp_expose.y + tmp_cell.height;
+            my_expose.y = tmp_expose.y + tmp_cell.height;
 
             g_free( str );
             g_free( statusStr );
