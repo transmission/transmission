@@ -34,6 +34,7 @@
 #include "peer-msgs.h"
 #include "platform.h" /* MAX_STACK_ARRAY_SIZE */
 #include "ratecontrol.h"
+#include "request-list.h"
 #include "stats.h"
 #include "torrent.h"
 #include "trevent.h"
@@ -102,10 +103,6 @@ enum
     MAX_FAST_SET_SIZE = 3
 };
 
-/**
-***  REQUEST MANAGEMENT
-**/
-
 enum
 {
     AWAITING_BT_LENGTH,
@@ -113,124 +110,6 @@ enum
     AWAITING_BT_MESSAGE,
     AWAITING_BT_PIECE
 };
-
-struct peer_request
-{
-    uint32_t    index;
-    uint32_t    offset;
-    uint32_t    length;
-    time_t      time_requested;
-};
-
-static inline tr_bool
-requestsMatch( const struct peer_request * a, const struct peer_request * b )
-{
-    return (a->index==b->index) && (a->offset==b->offset) && (a->length==b->length);
-}
-
-struct request_list
-{
-    uint16_t               count;
-    uint16_t               max;
-    struct peer_request *  requests;
-};
-
-static const struct request_list REQUEST_LIST_INIT = { 0, 0, NULL };
-
-static void
-reqListReserve( struct request_list * list,
-                uint16_t              max )
-{
-    if( list->max < max )
-    {
-        list->max = max;
-        list->requests = tr_renew( struct peer_request,
-                                   list->requests,
-                                   list->max );
-    }
-}
-
-static void
-reqListClear( struct request_list * list )
-{
-    tr_free( list->requests );
-    *list = REQUEST_LIST_INIT;
-}
-
-static void
-reqListCopy( struct request_list * dest, const struct request_list * src )
-{
-    dest->count = dest->max = src->count;
-    dest->requests = tr_memdup( src->requests, dest->count * sizeof( struct peer_request ) );
-}
-
-static void
-reqListRemoveOne( struct request_list * list,
-                  int                   i )
-{
-    assert( 0 <= i && i < list->count );
-
-    memmove( &list->requests[i],
-             &list->requests[i + 1],
-             sizeof( struct peer_request ) * ( --list->count - i ) );
-}
-
-static void
-reqListAppend( struct request_list *       list,
-               const struct peer_request * req )
-{
-    if( ++list->count >= list->max )
-        reqListReserve( list, list->max + 8 );
-
-    list->requests[list->count - 1] = *req;
-}
-
-static int
-reqListPop( struct request_list * list,
-            struct peer_request * setme )
-{
-    int success;
-
-    if( !list->count )
-        success = FALSE;
-    else {
-        *setme = list->requests[0];
-        reqListRemoveOne( list, 0 );
-        success = TRUE;
-    }
-
-    return success;
-}
-
-static int
-reqListFind( struct request_list *       list,
-             const struct peer_request * key )
-{
-    uint16_t i;
-
-    for( i = 0; i < list->count; ++i )
-        if( requestsMatch( key, list->requests + i ) )
-            return i;
-
-    return -1;
-}
-
-static int
-reqListRemove( struct request_list *       list,
-               const struct peer_request * key )
-{
-    int success;
-    const int i = reqListFind( list, key );
-
-    if( i < 0 )
-        success = FALSE;
-    else {
-        reqListRemoveOne( list, i );
-        success = TRUE;
-    }
-
-    return success;
-}
 
 /**
 ***
@@ -860,26 +739,22 @@ expireFromList( tr_peermsgs          * msgs,
                 struct request_list  * list,
                 const time_t           oldestAllowed )
 {
-    int i;
+    size_t i;
+    struct request_list tmp = REQUEST_LIST_INIT;
 
-    /* walk through the list, looking for the first req that's too old */
-    for( i=0; i<list->count; ++i ) {
-        const struct peer_request * req = &list->requests[i];
-        if( req->time_requested < oldestAllowed )
-            break;
-    }
+    /* since the fifo list is sorted by time, the oldest will be first */
+    if( list->fifo[0].time_requested >= oldestAllowed )
+        return;
 
     /* if we found one too old, start pruning them */
-    if( i < list->count ) {
-        struct request_list tmp = REQUEST_LIST_INIT;
-        reqListCopy( &tmp, list );
-        for( ; i<tmp.count; ++i ) {
-            const struct peer_request * req = &tmp.requests[i];
-            if( req->time_requested < oldestAllowed )
-                tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
-        }
-        reqListClear( &tmp );
+    reqListCopy( &tmp, list );
+    for( i=0; i<tmp.len; ++i ) {
+        const struct peer_request * req = &tmp.fifo[i];
+        if( req->time_requested >= oldestAllowed )
+            break;
+        tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
     }
+    reqListClear( &tmp );
 }
 
 static void
@@ -908,7 +783,7 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
 {
     const int           max = msgs->maxActiveRequests;
     int                 sent = 0;
-    int                 count = msgs->clientAskedFor.count;
+    int                 len = msgs->clientAskedFor.len;
     struct peer_request req;
 
     if( msgs->peer->clientIsChoked )
@@ -916,7 +791,7 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
     if( !tr_torrentIsPieceTransferAllowed( msgs->torrent, TR_PEER_TO_CLIENT ) )
         return;
 
-    while( ( count < max ) && reqListPop( &msgs->clientWillAskFor, &req ) )
+    while( ( len < max ) && reqListPop( &msgs->clientWillAskFor, &req ) )
     {
         const tr_block_index_t block = _tr_block( msgs->torrent, req.index, req.offset );
 
@@ -931,16 +806,16 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
             req.time_requested = now;
             reqListAppend( &msgs->clientAskedFor, &req );
 
-            ++count;
+            ++len;
             ++sent;
         }
     }
 
     if( sent )
         dbgmsg( msgs, "pump sent %d requests, now have %d active and %d queued",
-                sent, msgs->clientAskedFor.count, msgs->clientWillAskFor.count );
+                sent, msgs->clientAskedFor.len, msgs->clientWillAskFor.len );
 
-    if( count < max )
+    if( len < max )
         fireNeedReq( msgs );
 }
 
@@ -948,7 +823,7 @@ static inline int
 requestQueueIsFull( const tr_peermsgs * msgs )
 {
     const int req_max = msgs->maxActiveRequests;
-    return msgs->clientWillAskFor.count >= req_max;
+    return msgs->clientWillAskFor.len >= (size_t)req_max;
 }
 
 tr_addreq_t
@@ -987,11 +862,11 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
     req.index = index;
     req.offset = offset;
     req.length = length;
-    if( reqListFind( &msgs->clientAskedFor, &req ) != -1 ) {
+    if( reqListHas( &msgs->clientAskedFor, &req ) ) {
         dbgmsg( msgs, "declining because it's a duplicate" );
         return TR_ADDREQ_DUPLICATE;
     }
-    if( reqListFind( &msgs->clientWillAskFor, &req ) != -1 ) {
+    if( reqListHas( &msgs->clientWillAskFor, &req ) ) {
         dbgmsg( msgs, "declining because it's a duplicate" );
         return TR_ADDREQ_DUPLICATE;
     }
@@ -1010,7 +885,7 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
 static void
 cancelAllRequestsToPeer( tr_peermsgs * msgs, tr_bool sendCancel )
 {
-    int i;
+    size_t i;
     struct request_list a = msgs->clientWillAskFor;
     struct request_list b = msgs->clientAskedFor;
     dbgmsg( msgs, "cancelling all requests to peer" );
@@ -1018,13 +893,13 @@ cancelAllRequestsToPeer( tr_peermsgs * msgs, tr_bool sendCancel )
     msgs->clientAskedFor = REQUEST_LIST_INIT;
     msgs->clientWillAskFor = REQUEST_LIST_INIT;
 
-    for( i=0; i<a.count; ++i )
-        fireCancelledReq( msgs, &a.requests[i] );
+    for( i=0; i<a.len; ++i )
+        fireCancelledReq( msgs, &a.fifo[i] );
 
-    for( i = 0; i < b.count; ++i ) {
-        fireCancelledReq( msgs, &b.requests[i] );
+    for( i = 0; i < b.len; ++i ) {
+        fireCancelledReq( msgs, &b.fifo[i] );
         if( sendCancel )
-            protocolSendCancel( msgs, &b.requests[i] );
+            protocolSendCancel( msgs, &b.fifo[i] );
     }
 
     reqListClear( &a );
@@ -1686,7 +1561,7 @@ clientGotBlock( tr_peermsgs *               msgs,
     }
 
     dbgmsg( msgs, "peer has %d more blocks we've asked for",
-            msgs->clientAskedFor.count );
+            msgs->clientAskedFor.len );
 
     /**
     *** Error checks

@@ -1287,3 +1287,46 @@ tr_releaseBuffer( struct evbuffer * buf )
 
     tr_lockUnlock( l );
 }
+
+/***
+****
+***/
+
+int
+tr_lowerBound( const void * key,
+               const void * base,
+               size_t       nmemb,
+               size_t       size,
+               int       (* compar)(const void* key, const void* arrayMember),
+               tr_bool    * exact_match )
+{
+    size_t first = 0;
+
+    while( nmemb > 0 )
+    {
+        const size_t half = nmemb / 2;
+        const size_t middle = first + half;
+        const int c = compar( key, ((const char*)base) + size*middle );
+
+        if( c < 0 )
+        {
+            first = middle + 1;
+            nmemb = nmemb - half - 1;
+        }
+        else if( !c )
+        {
+            if( exact_match )
+                *exact_match = TRUE;
+            return middle;
+        }
+        else
+        {
+            nmemb = half;
+        }
+    }
+
+    if( exact_match )
+        *exact_match = FALSE;
+
+    return first;
+}

@@ -315,6 +315,15 @@ static inline char* tr_strdup( const void * in )
     return tr_strndup( in, in ? strlen( (const char*)in ) : 0 );
 }
 
+/* @brief same argument list as bsearch() */
+int tr_lowerBound( const void * key,
+                   const void * base,
+                   size_t       nmemb,
+                   size_t       size,
+                   int       (* compar)(const void* key, const void* arrayMember),
+                   tr_bool    * exact_match );
+
+
 char*       tr_strdup_printf( const char * fmt,
                               ... )  TR_GNUC_PRINTF( 1, 2 ) TR_GNUC_MALLOC;
 
