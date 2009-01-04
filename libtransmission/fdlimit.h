@@ -35,8 +35,6 @@
  **********************************************************************/
 void tr_fdInit( int globalPeerLimit );
 
-void tr_fdClose( void );
-
 /**
  * Returns an fd to the specified filename.
  *
